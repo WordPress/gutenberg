@@ -5,7 +5,7 @@ import { useCallback, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import type { Media } from '../media-editor-provider';
-import type { MediaEditorController } from '../../state';
+import type { MediaEditorSession } from '../../state';
 import {
 	buildModifiers,
 	type Modifier,
@@ -37,7 +37,7 @@ export interface MediaEditorSaveResult {
 }
 
 interface UseSaveMediaEditorArgs {
-	cropper: MediaEditorController;
+	session: MediaEditorSession;
 	id: number;
 	isImage: boolean;
 	media?: Media | null;
@@ -49,13 +49,14 @@ interface UseSaveMediaEditorReturn {
 	save: () => Promise< void >;
 }
 
-function getCropModifiers( cropper: MediaEditorController ): Modifier[] {
-	if ( ! cropper.isCropperDirty || ! cropper.state.image ) {
+function getCropModifiers( session: MediaEditorSession ): Modifier[] {
+	const { state } = session.cropper;
+	if ( ! session.hasOutputEdits || ! state.image ) {
 		return [];
 	}
-	return buildModifiers( cropper.state, {
-		width: cropper.state.image.naturalWidth,
-		height: cropper.state.image.naturalHeight,
+	return buildModifiers( state, {
+		width: state.image.naturalWidth,
+		height: state.image.naturalHeight,
 	} );
 }
 
@@ -80,7 +81,7 @@ function getMetadataEdits(
 }
 
 export function useSaveMediaEditor( {
-	cropper,
+	session,
 	id,
 	isImage,
 	media,
@@ -100,13 +101,13 @@ export function useSaveMediaEditor( {
 		setIsSaving( true );
 		try {
 			let saved: Media | null | undefined;
-			const modifiers = getCropModifiers( cropper );
+			const modifiers = getCropModifiers( session );
 			const previous =
 				modifiers.length > 0 && media
 					? {
 							id,
 							url: media.source_url,
-					  }
+						}
 					: undefined;
 
 			if ( modifiers.length > 0 ) {
@@ -142,7 +143,8 @@ export function useSaveMediaEditor( {
 				saved = ( await saveEditedEntityRecord(
 					'postType',
 					'attachment',
-					id
+					id,
+					{ throwOnError: true }
 				) ) as Media | undefined;
 			}
 
@@ -154,7 +156,7 @@ export function useSaveMediaEditor( {
 
 			if ( next && next.id ) {
 				if ( next.id === id ) {
-					cropper.reset();
+					session.cropper.reset();
 				}
 				onSaved?.( {
 					id: next.id,
@@ -167,20 +169,20 @@ export function useSaveMediaEditor( {
 			const message =
 				error instanceof Error
 					? error.message
-					: ( error as { message?: string } )?.message ??
-					  __( 'An unknown error occurred.' );
+					: ( ( error as { message?: string } )?.message ??
+						__( 'An unknown error occurred.' ) );
 			createErrorNotice(
 				isImage
 					? sprintf(
 							/* translators: %s: Error message. */
 							__( 'Could not save image. %s' ),
 							message
-					  )
+						)
 					: sprintf(
 							/* translators: %s: Error message. */
 							__( 'Could not save media. %s' ),
 							message
-					  ),
+						),
 				{
 					type: 'snackbar',
 					context: MEDIA_EDITOR_NOTICES_CONTEXT,
@@ -192,7 +194,6 @@ export function useSaveMediaEditor( {
 	}, [
 		clearEntityRecordEdits,
 		createErrorNotice,
-		cropper,
 		id,
 		isImage,
 		media,
@@ -201,6 +202,7 @@ export function useSaveMediaEditor( {
 		registry,
 		removeAllNotices,
 		saveEditedEntityRecord,
+		session,
 	] );
 
 	return { isSaving, save };

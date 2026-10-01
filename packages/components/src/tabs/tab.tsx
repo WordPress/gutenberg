@@ -13,7 +13,10 @@ import type { WordPressComponentProps } from '../context';
 export const Tab = forwardRef<
 	HTMLButtonElement,
 	Omit< WordPressComponentProps< TabProps, 'button', false >, 'id' >
->( function Tab( { children, tabId, disabled, render, ...otherProps }, ref ) {
+>( function UnforwardedTab(
+	{ children, tabId, disabled, render, ...otherProps },
+	ref
+) {
 	const { store, instanceId } = useTabsContext() ?? {};
 
 	if ( ! store ) {

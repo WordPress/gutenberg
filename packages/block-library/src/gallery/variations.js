@@ -1,5 +1,7 @@
 import { __ } from '@wordpress/i18n';
+import { gallery, grid } from '@wordpress/icons';
 import { ATTACHED_MEDIA } from './dynamic-source';
+import { isGalleryFlexLayout } from './shared';
 
 const variations = [
 	{
@@ -24,6 +26,34 @@ const variations = [
 		// of scope. Revisit adding `'inserter'` in a follow-up as the feature grows
 		// beyond the post-attached source.
 		scope: [],
+	},
+	{
+		name: 'gallery-flex',
+		title: __( 'Gallery' ),
+		description: __( 'Arrange images in flexible rows.' ),
+		icon: gallery,
+		attributes: {
+			layout: {
+				type: 'flex',
+			},
+		},
+		isActive: ( blockAttributes ) =>
+			isGalleryFlexLayout( blockAttributes.layout ),
+		scope: [ 'transform' ],
+	},
+	{
+		name: 'gallery-grid',
+		title: __( 'Gallery Grid' ),
+		description: __( 'Arrange images in a grid.' ),
+		icon: grid,
+		attributes: {
+			layout: {
+				type: 'grid',
+			},
+		},
+		isActive: ( blockAttributes ) =>
+			blockAttributes.layout?.type === 'grid',
+		scope: [ 'transform' ],
 	},
 ];
 

@@ -10,41 +10,69 @@ import type {
 import type { WidgetName } from '@wordpress/widget-primitives';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardContainerColumnCount } from '../../hooks/use-dashboard-container-column-count';
-import { WidgetActions } from '../widget-actions';
-import { WidgetAttributes } from '../widget-attributes';
 import { WidgetChrome } from '../widget-chrome';
 import { WidgetHeader } from '../widget-header';
 import { WidgetLayoutControls } from '../widget-layout-controls';
 import { WidgetToolbar } from '../widget-toolbar';
 import { WidgetResizeHandle } from './widget-resize-handle';
+import { WidgetTileControls } from './widget-tile-controls';
 import styles from './widgets.module.css';
 import type {
+	DashboardInstanceOperation,
 	DashboardWidget,
 	GridTilePlacement,
 	MasonryTilePlacement,
 } from '../../types';
 
-function toGridLayout( widgets: DashboardWidget[] ): DashboardGridLayoutItem[] {
-	return widgets.map( ( w ) => ( {
-		key: w.uuid,
-		...( w.placement as GridTilePlacement | undefined ),
-	} ) );
+/*
+ * What the policy allows on one tile. The grid reads `draggable` and
+ * `resizable` per item; the others gate the tile's controls and contract.
+ */
+interface TilePermissions {
+	draggable: boolean;
+	resizable: boolean;
+	removable: boolean;
+	editable: boolean;
+}
+
+type TilePermissionsFor = ( widget: DashboardWidget ) => TilePermissions;
+
+function toGridLayout(
+	widgets: DashboardWidget[],
+	permissionsFor: TilePermissionsFor
+): DashboardGridLayoutItem[] {
+	return widgets.map( ( w ) => {
+		const { draggable, resizable } = permissionsFor( w );
+		return {
+			key: w.uuid,
+			...( w.placement as GridTilePlacement | undefined ),
+			draggable,
+			resizable,
+		};
+	} );
 }
 
 function toMasonryLayout(
-	widgets: DashboardWidget[]
+	widgets: DashboardWidget[],
+	permissionsFor: TilePermissionsFor
 ): DashboardLanesLayoutItem[] {
-	return widgets.map( ( w ) => ( {
-		key: w.uuid,
-		...( w.placement as MasonryTilePlacement | undefined ),
-	} ) );
+	return widgets.map( ( w ) => {
+		const { draggable, resizable } = permissionsFor( w );
+		return {
+			key: w.uuid,
+			...( w.placement as MasonryTilePlacement | undefined ),
+			draggable,
+			resizable,
+		};
+	} );
 }
 
+// The interaction flags are policy, not placement: they never persist.
 function applyGridChange(
 	widgets: DashboardWidget[],
 	gridLayout: DashboardGridLayoutItem[]
 ): DashboardWidget[] {
-	return gridLayout.map( ( { key, ...placement } ) => {
+	return gridLayout.map( ( { key, draggable, resizable, ...placement } ) => {
 		const existing = widgets.find( ( w ) => w.uuid === key );
 		if ( ! existing ) {
 			return {
@@ -64,20 +92,22 @@ function applyMasonryChange(
 	widgets: DashboardWidget[],
 	masonryLayout: DashboardLanesLayoutItem[]
 ): DashboardWidget[] {
-	return masonryLayout.map( ( { key, ...placement } ) => {
-		const existing = widgets.find( ( w ) => w.uuid === key );
-		if ( ! existing ) {
+	return masonryLayout.map(
+		( { key, draggable, resizable, ...placement } ) => {
+			const existing = widgets.find( ( w ) => w.uuid === key );
+			if ( ! existing ) {
+				return {
+					uuid: key,
+					type: '' as WidgetName,
+					placement,
+				};
+			}
 			return {
-				uuid: key,
-				type: '' as WidgetName,
+				...existing,
 				placement,
 			};
 		}
-		return {
-			...existing,
-			placement,
-		};
-	} );
+	);
 }
 
 export interface WidgetsProps {
@@ -90,17 +120,44 @@ export interface WidgetsProps {
  * or masonry, picked from `gridSettings.model`).
  */
 export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
-	function Widgets( { className }, ref ) {
-		const { layout, onLayoutChange, editMode, gridSettings, widgetTypes } =
-			useDashboardInternalContext();
-		const { containerRef, columnCount } =
-			useDashboardContainerColumnCount( ref );
+	function UnforwardedWidgets( { className }, ref ) {
+		const {
+			layout,
+			onLayoutChange,
+			editMode,
+			gridSettings,
+			widgetTypes,
+			canPerform,
+		} = useDashboardInternalContext();
+		const { containerRef, columnCount } = useDashboardContainerColumnCount(
+			ref,
+			gridSettings.columns
+		);
 		const isMasonry = gridSettings.model === 'masonry';
+
+		const permissionsFor = useCallback< TilePermissionsFor >(
+			( widget ) => {
+				const widgetType = widgetTypes.find(
+					( type ) => type.name === widget.type
+				);
+				const allows = ( operation: DashboardInstanceOperation ) =>
+					canPerform( { operation, widget, widgetType } );
+				return {
+					draggable: allows( 'move' ),
+					resizable: allows( 'resize' ),
+					removable: allows( 'remove' ),
+					editable: allows( 'edit' ),
+				};
+			},
+			[ widgetTypes, canPerform ]
+		);
 
 		const gridLayout = useMemo(
 			() =>
-				isMasonry ? toMasonryLayout( layout ) : toGridLayout( layout ),
-			[ layout, isMasonry ]
+				isMasonry
+					? toMasonryLayout( layout, permissionsFor )
+					: toGridLayout( layout, permissionsFor ),
+			[ layout, isMasonry, permissionsFor ]
 		);
 
 		const handleGridChange = useCallback(
@@ -123,51 +180,45 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 			const widgetType = widgetTypes.find(
 				( type ) => type.name === widget.type
 			);
-			const hasSettings = !! widgetType?.attributes?.length;
-			const hasActions = !! widgetType?.actions?.length;
-
+			const { removable, resizable, editable } = permissionsFor( widget );
 			const isFullBleed = widgetType?.presentation === 'full-bleed';
-
-			// The active mode's controls: layout while customizing, the
-			// attribute controls (high-relevance fields on the prominent
-			// surface, plus a settings entry point when needed) and the
-			// declared actions otherwise.
-			let controls: React.ReactNode;
-			if ( editMode ) {
-				controls = <WidgetLayoutControls widget={ widget } />;
-			} else if ( ( hasSettings || hasActions ) && widgetType ) {
-				controls = (
-					<>
-						{ hasSettings && (
-							<WidgetAttributes
-								widget={ widget }
-								widgetType={ widgetType }
-							/>
-						) }
-
-						{ hasActions && (
-							<WidgetActions widgetType={ widgetType } />
-						) }
-					</>
-				);
-			}
-
-			const toolbar = controls ? (
-				<WidgetToolbar editMode={ editMode }>
-					{ controls }
-				</WidgetToolbar>
-			) : undefined;
 
 			// Normal mode hosts the toolbar in the in-card header, beside the
 			// identity. Customize controls and full-bleed widgets need it in
 			// the grid's actionable-area slot instead: the slot sits outside
 			// the draggable card, so the controls stay clickable (in-card they
 			// would be captured by the drag listeners).
-			const inSlot = editMode || isFullBleed;
-			const actionableArea =
-				inSlot && toolbar ? (
-					<WidgetHeader overlay>{ toolbar }</WidgetHeader>
-				) : undefined;
+			let actionableArea: React.ReactNode;
+			let headerToolbar: React.ReactNode;
+			if ( editMode ) {
+				if ( removable || resizable ) {
+					actionableArea = (
+						<WidgetHeader overlay>
+							<WidgetToolbar editMode>
+								<WidgetLayoutControls
+									widget={ widget }
+									canRemove={ removable }
+									canResize={ resizable }
+								/>
+							</WidgetToolbar>
+						</WidgetHeader>
+					);
+				}
+			} else if ( widgetType ) {
+				const controls = (
+					<WidgetTileControls
+						widget={ widget }
+						widgetType={ widgetType }
+						editable={ editable }
+						overlay={ isFullBleed }
+					/>
+				);
+				if ( isFullBleed ) {
+					actionableArea = controls;
+				} else {
+					headerToolbar = controls;
+				}
+			}
 
 			return (
 				<WidgetChrome
@@ -178,7 +229,7 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 						[ styles[ 'tile-edit-mode' ] ]: editMode,
 					} ) }
 					actionableArea={ actionableArea }
-					headerToolbar={ ! inSlot ? toolbar : undefined }
+					headerToolbar={ headerToolbar }
 				/>
 			);
 		} );

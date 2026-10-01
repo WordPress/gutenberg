@@ -1,13 +1,14 @@
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-import { Spinner } from '@wordpress/components';
+import { speak } from '@wordpress/a11y';
 import { Component, Suspense } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Card, Notice, Stack, VisuallyHidden } from '@wordpress/ui';
+import { inertValue } from '@wordpress/react-inert-value';
+import { Card, Notice, Spinner, Stack, VisuallyHidden } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 import { WidgetHeader } from '../widget-header';
 import { WidgetRender } from '../widget-render';
+import { WidgetFrameFooter } from './widget-frame-footer';
 import styles from './widget-frame.module.css';
 import type { DashboardWidget } from '../../types';
 
@@ -27,6 +28,10 @@ class WidgetErrorBoundary extends Component<
 
 	static getDerivedStateFromError(): ErrorBoundaryState {
 		return { hasError: true };
+	}
+
+	componentDidCatch() {
+		speak( __( 'This widget encountered an error.' ), 'polite' );
 	}
 
 	render() {
@@ -69,8 +74,9 @@ export interface WidgetFrameProps {
 }
 
 /**
- * Shared framing: `presentation` into header + content, with the error/loading
- * boundaries. Hosts supply the `Card.Root` and their own concerns.
+ * Shared framing: `presentation` into header, content, and the actions footer,
+ * with the error/loading boundaries. Hosts supply the `Card.Root` and their
+ * own concerns.
  *
  * @param {WidgetFrameProps} props Component props.
  */
@@ -113,7 +119,8 @@ export function WidgetFrame( {
 					styles.content,
 					isBodyBleeding && styles[ 'bleed-content' ]
 				) }
-				{ ...( editMode ? { inert: 'true' } : {} ) }
+				// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+				inert={ inertValue( editMode ) }
 			>
 				{ isHeaderHidden && widgetType.title && (
 					<VisuallyHidden render={ <h2 id={ titleId } /> }>
@@ -122,6 +129,12 @@ export function WidgetFrame( {
 				) }
 				{ body }
 			</Card.Content>
+
+			<WidgetFrameFooter
+				widget={ widget }
+				widgetType={ widgetType }
+				editMode={ editMode }
+			/>
 		</>
 	);
 }

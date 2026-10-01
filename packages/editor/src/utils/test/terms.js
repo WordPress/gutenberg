@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { buildTermsTree } from '../terms';
 
 describe( 'buildTermsTree()', () => {

@@ -170,7 +170,45 @@ test.describe( 'Router styles', () => {
 		const csn = page.getByTestId( 'client-side navigation' );
 		const background = page.getByTestId( 'background-from-link' );
 
-		await expect( background ).toHaveScreenshot();
+		const expectBackgroundImage = async (
+			color: 'red' | 'green' | 'blue'
+		) => {
+			const assetPathPattern = `/router-styles-${ color }/assets/10x10_e2e_test_image_${ color }\\.png`;
+
+			// Match the path because the test origin varies between environments.
+			// Decoding the resolved URL also preserves the previous screenshots'
+			// guarantee that the referenced asset loads successfully.
+			await expect( background ).toHaveCSS(
+				'background-image',
+				new RegExp( assetPathPattern )
+			);
+			const imageLoaded = await background.evaluate(
+				async ( element ) => {
+					const match = getComputedStyle(
+						element
+					).backgroundImage.match( /^url\(["']?(.*?)["']?\)$/ );
+
+					if ( ! match ) {
+						return false;
+					}
+
+					const image = new Image();
+					image.src = match[ 1 ];
+
+					try {
+						await image.decode();
+					} catch {
+						return false;
+					}
+
+					return true;
+				}
+			);
+
+			expect( imageLoaded ).toBe( true );
+		};
+
+		await expect( background ).toHaveCSS( 'background-image', 'none' );
 
 		await page.getByTestId( 'link red' ).click();
 
@@ -178,25 +216,25 @@ test.describe( 'Router styles', () => {
 		// It should be visible again after a successful navigation.
 		await expect( csn ).toBeHidden();
 		await expect( csn ).toBeVisible();
-		await expect( background ).toHaveScreenshot();
+		await expectBackgroundImage( 'red' );
 
 		await page.getByTestId( 'link green' ).click();
 
 		await expect( csn ).toBeHidden();
 		await expect( csn ).toBeVisible();
-		await expect( background ).toHaveScreenshot();
+		await expectBackgroundImage( 'green' );
 
 		await page.getByTestId( 'link blue' ).click();
 
 		await expect( csn ).toBeHidden();
 		await expect( csn ).toBeVisible();
-		await expect( background ).toHaveScreenshot();
+		await expectBackgroundImage( 'blue' );
 
 		await page.getByTestId( 'link all' ).click();
 
 		await expect( csn ).toBeHidden();
 		await expect( csn ).toBeVisible();
-		await expect( background ).toHaveScreenshot();
+		await expectBackgroundImage( 'blue' );
 	} );
 
 	test( 'should update style tags with modified content', async ( {

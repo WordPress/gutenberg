@@ -45,9 +45,10 @@ How the widget represents its data and the verbs it exposes: `attributes`, `acti
 
 The `attributes` are the contract between host and widget. The widget owns their shape and meaning; the host owns their values.
 
-Each entry in `attributes` is a DataViews `Field` plus an optional `relevance` hint (`'high' | 'low'`). Its `type` may also reference a registered field type by name, resolved to plain `Field` props before any host reads the schema (see **Field Types**). The widget declares how important an attribute is; the host decides where, and whether, to expose it. When the hint is absent, treat it as `'low'`.
+Each entry in `attributes` is a DataViews `Field` plus an optional `relevance` hint (`'high' | 'medium' | 'low'`). Its `type` may also reference a registered field type by name, resolved to plain `Field` props before any host reads the schema (see **Field Types**). The widget declares how important an attribute is; the host decides where, and whether, to expose it. When the hint is absent, treat it as `'low'`.
 
 -   `'high'`: the host _may_ promote the field to a prominent surface near the instance, for quick in-context editing without opening a separate settings UI.
+-   `'medium'`: worth persistent but compact visibility; a host without such a surface treats it as `'low'`.
 -   `'low'` (default): the field belongs in the host's settings surface, a form built from the full schema.
 
 The widget names importance, not a surface. One host might promote `'high'` fields inline; another might fold everything into a single panel. Both honor the same contract.
@@ -65,6 +66,8 @@ Alongside its data, a widget can declare `actions`: the verbs a user triggers, s
 The pattern matches attributes: the widget declares the intent, and the host decides the surface. It never says "put this in a toolbar"; it names the action, and the host materializes the affordance and places it.
 
 The host never interprets what an action _means_, only how to offer it: which primitive to mount, and where. For a link that means mounting a real link primitive wherever the surface allows one, and deciding how to reach the target, which the widget cannot know (see **Actions**).
+
+A mounted widget can also declare actions at runtime, through `useWidgetActions`, for the verbs its declaration cannot know (see **Actions**).
 
 ## Why the split matters
 

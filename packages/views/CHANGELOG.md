@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Declare `react`, `react-dom`, and their types as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+
+## 1.23.0 (2026-09-23)
+
+## 1.22.0 (2026-09-10)
+
+### Bug Fixes
+
+-   `useViewConfig`: request the full configuration under the same cache key as `getViewConfig( kind, name )`, so a route loader that preloads it no longer triggers a second request. ([#82141](https://github.com/WordPress/gutenberg/pull/82141))
+-   `useView`, `loadView`: ignore a persisted layout `type` that `defaultLayouts` does not offer, resolving the type out of the layers below instead. DataViews renders nothing for a layout it is not given, so a preference saved when a screen still offered that layout used to leave the screen empty, with no way to reset it. Such a type does not count as a modification and is written out of the preference on the next update. ([#82457](https://github.com/WordPress/gutenberg/pull/82457))
+
+## 1.21.0 (2026-08-26)
+
+### Internal
+
+-   Point tsconfig references at split dependencies' build projects. ([#81515](https://github.com/WordPress/gutenberg/pull/81515))
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
 ## 1.20.0 (2026-08-12)
 
 ### Bug Fixes

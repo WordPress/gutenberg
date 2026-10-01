@@ -22,7 +22,7 @@ function ElementItem( { parentMenu, element, label }: ElementItemProps ) {
 		element === 'link'
 			? {
 					textDecoration: 'underline',
-			  }
+				}
 			: {};
 
 	const [ fontFamily ] = useStyle< string >(
@@ -95,8 +95,23 @@ function TypographyElements() {
 				/>
 				<ElementItem
 					parentMenu={ parentMenu }
+					element="cite"
+					label={ __( 'Citations' ) }
+				/>
+				<ElementItem
+					parentMenu={ parentMenu }
 					element="button"
 					label={ __( 'Buttons' ) }
+				/>
+				<ElementItem
+					parentMenu={ parentMenu }
+					element="textInput"
+					label={ __( 'Inputs' ) }
+				/>
+				<ElementItem
+					parentMenu={ parentMenu }
+					element="select"
+					label={ __( 'Selects' ) }
 				/>
 			</ItemGroup>
 		</VStack>

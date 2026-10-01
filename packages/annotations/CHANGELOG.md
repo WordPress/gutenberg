@@ -2,8 +2,21 @@
 
 ## Unreleased
 
-## 3.53.0 (2026-08-12)
+### Bug Fixes
 
+-   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/data`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+
+## 3.56.0 (2026-09-23)
+
+## 3.55.0 (2026-09-10)
+
+## 3.54.0 (2026-08-26)
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 3.53.0 (2026-08-12)
 
 ## 3.52.0 (2026-07-29)
 
