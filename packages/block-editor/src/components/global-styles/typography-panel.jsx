@@ -4,9 +4,9 @@ import {
 	__experimentalNumberControl as NumberControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
-	Notice,
 	ToggleControl,
 } from '@wordpress/components';
+import { Notice } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useCallback, useContext, useMemo } from '@wordpress/element';
 import { getBlockSupport } from '@wordpress/blocks';
@@ -378,10 +378,8 @@ export default function TypographyPanel( {
 	// Only the Default state holds the gradient, so this one cannot change it.
 	const textGradientIsFromBase = clipsToTextHere && ! isTextGradient;
 	const textGradientNotice = textGradientIsFromBase
-		? __(
-				'The text gradient set in the Default state replaces the text color.'
-			)
-		: __( 'The text gradient replaces the text color.' );
+		? __( 'The gradient set in the Default state replaces the text color.' )
+		: __( 'The gradient replaces the text color.' );
 	const inheritedIsTextGradient =
 		inheritedValue?.background?.backgroundClip === 'text';
 	// `background-clip` clips every background layer at once, including the
@@ -1374,11 +1372,13 @@ export default function TypographyPanel( {
 
 					{ textAlign === 'justify' && (
 						<div>
-							<Notice status="warning" isDismissible={ false }>
-								{ __(
-									'Justified text can reduce readability. For better accessibility, use left-aligned text instead.'
-								) }
-							</Notice>
+							<Notice.Root intent="warning">
+								<Notice.Description>
+									{ __(
+										'Justified text can reduce readability. For better accessibility, use left-aligned text instead.'
+									) }
+								</Notice.Description>
+							</Notice.Root>
 						</div>
 					) }
 				</InheritanceToolsPanelItem>
@@ -1388,13 +1388,14 @@ export default function TypographyPanel( {
 					label={ __( 'Color' ) }
 					isShownByDefault={ defaultControls.textColor }
 				>
-					<Notice
-						status="info"
-						isDismissible={ false }
+					<Notice.Root
+						intent="info"
 						className="block-editor-typography-panel__text-gradient-notice"
 					>
-						{ textGradientNotice }
-					</Notice>
+						<Notice.Description>
+							{ textGradientNotice }
+						</Notice.Description>
+					</Notice.Root>
 				</NoticeForControl>
 			) }
 			{ hasTextGradientEnabled && hasBlockBackground && (
@@ -1402,13 +1403,14 @@ export default function TypographyPanel( {
 					label={ __( 'Gradient' ) }
 					isShownByDefault={ defaultControls.textGradient }
 				>
-					<Notice
-						status="info"
-						isDismissible={ false }
+					<Notice.Root
+						intent="info"
 						className="block-editor-typography-panel__text-gradient-notice"
 					>
-						{ backgroundOverrideNotice }
-					</Notice>
+						<Notice.Description>
+							{ backgroundOverrideNotice }
+						</Notice.Description>
+					</Notice.Root>
 				</NoticeForControl>
 			) }
 		</Wrapper>
