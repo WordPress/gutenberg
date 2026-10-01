@@ -564,6 +564,8 @@ mark.wp-note {
 	// scroll behind exactly that color. Move both together if it changes.
 	background-color: $white;
 	z-index: 1;
+	// Align the heading with the grid's first column.
+	padding-inline: 0;
 }
 
 .editor-collab-sidebar-panel__picker-row {
