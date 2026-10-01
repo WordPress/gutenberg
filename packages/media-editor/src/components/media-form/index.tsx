@@ -25,18 +25,6 @@ const PANEL_FIELD_IDS = [
 const ORDERED_FIELD_IDS = [ ...REGULAR_FIELD_IDS, ...PANEL_FIELD_IDS ];
 
 /**
- * The position of a field in the default form: its index among the known
- * fields, or after all of them.
- *
- * @param fieldId The id of the field.
- * @return The rank of the field.
- */
-function getFieldRank( fieldId: string ) {
-	const index = ORDERED_FIELD_IDS.indexOf( fieldId );
-	return index === -1 ? ORDERED_FIELD_IDS.length : index;
-}
-
-/**
  * Props for MediaForm component.
  */
 export interface MediaFormProps {
@@ -69,32 +57,34 @@ export default function MediaForm( {
 		);
 	}
 
-	// The regular (non-panel) fields come first, then the panel fields, each
-	// group in its own order, so the form does not depend on the order the
-	// fields are registered in. The sort is stable: any other field follows,
-	// in the order it was given.
-	const sortedFields = [ ...fields ].sort(
-		( a: Field< Media >, b: Field< Media > ) =>
-			getFieldRank( a.id ) - getFieldRank( b.id )
-	);
+	// The core fields come first, in a fixed order, so the form does not
+	// depend on the order the fields are registered in; the ones that are not
+	// registered render nothing. Any other field follows, in the order it was
+	// given.
+	const fieldIds = [
+		...ORDERED_FIELD_IDS,
+		...fields
+			.map( ( field: Field< Media > ) => field.id )
+			.filter( ( id: string ) => ! ORDERED_FIELD_IDS.includes( id ) ),
+	];
 
 	// Default form structure with panel layout
 	const defaultForm: Form = {
 		layout: {
 			type: 'panel',
 		},
-		fields: sortedFields.map( ( field: Field< Media > ) => {
+		fields: fieldIds.map( ( id ) => {
 			// Use regular layout for main editable fields
-			if ( REGULAR_FIELD_IDS.includes( field.id ) ) {
+			if ( REGULAR_FIELD_IDS.includes( id ) ) {
 				return {
-					id: field.id,
+					id,
 					layout: {
 						type: 'regular',
 						labelPosition: 'top',
 					},
 				};
 			}
-			return field.id;
+			return id;
 		} ),
 	};
 
