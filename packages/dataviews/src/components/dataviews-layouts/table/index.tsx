@@ -9,8 +9,8 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { inertValue } from '@wordpress/ui';
 import { isAppleOS } from '@wordpress/keycodes';
+import { inertValue } from '@wordpress/react-inert-value';
 import DataViewsContext from '../../dataviews-context';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
 import ItemActions from '../../dataviews-item-actions';

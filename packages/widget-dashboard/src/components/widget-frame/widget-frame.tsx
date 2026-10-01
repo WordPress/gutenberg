@@ -3,19 +3,12 @@ import type { ReactNode } from 'react';
 import { speak } from '@wordpress/a11y';
 import { Component, Suspense } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import {
-	Card,
-	Notice,
-	Spinner,
-	Stack,
-	VisuallyHidden,
-	inertValue,
-} from '@wordpress/ui';
+import { inertValue } from '@wordpress/react-inert-value';
+import { Card, Notice, Spinner, Stack, VisuallyHidden } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
-import { splitWidgetActions } from '../../utils/split-widget-actions';
-import { WidgetFooter } from '../widget-footer';
 import { WidgetHeader } from '../widget-header';
 import { WidgetRender } from '../widget-render';
+import { WidgetFrameFooter } from './widget-frame-footer';
 import styles from './widget-frame.module.css';
 import type { DashboardWidget } from '../../types';
 
@@ -100,8 +93,6 @@ export function WidgetFrame( {
 	const isBodyBleeding =
 		presentation === 'full-bleed' || presentation === 'content-bleed';
 
-	const { footer: footerActions } = splitWidgetActions( widgetType );
-
 	const body = (
 		<WidgetErrorBoundary>
 			<Suspense fallback={ <LoadingOverlay /> }>
@@ -139,9 +130,11 @@ export function WidgetFrame( {
 				{ body }
 			</Card.Content>
 
-			{ footerActions.length > 0 && (
-				<WidgetFooter actions={ footerActions } editMode={ editMode } />
-			) }
+			<WidgetFrameFooter
+				widget={ widget }
+				widgetType={ widgetType }
+				editMode={ editMode }
+			/>
 		</>
 	);
 }
