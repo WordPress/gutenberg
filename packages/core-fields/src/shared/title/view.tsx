@@ -26,6 +26,7 @@ export function BaseTitleView( {
 			direction="row"
 			align="center"
 			justify="flex-start"
+			gap="sm"
 			// Tests and styles outside the package select titles by the class
 			// name of the original.
 			className={ clsx( 'fields-field__title', styles.title, className ) }
