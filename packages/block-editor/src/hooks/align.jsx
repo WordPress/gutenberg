@@ -115,8 +115,8 @@ function BlockEditAlignmentToolbarControlsPure( {
 	const { enabled } = useAlignmentMenu( blockAllowedAlignments );
 	const blockEditingMode = useBlockEditingMode();
 	/*
-	 * Only render when some alignment actually works. Many blocks — Paragraph,
-	 * Heading, List, Group among them — support nothing but wide and full, so
+	 * Only render when some alignment actually works. Many blocks — Heading,
+	 * List, Group among them — support nothing but wide and full, so
 	 * in a layout offering neither, a control made only of unavailable options
 	 * would sit on the toolbar unable to change anything.
 	 */

@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Paragraph: Remove the Wide and Full block alignments, reverting [#73958](https://github.com/WordPress/gutenberg/pull/73958), so the default Paragraph toolbar carries one alignment control rather than two. Wrap a Paragraph in a Group to run it wide or full ([#PRNUMBER](https://github.com/WordPress/gutenberg/pull/PRNUMBER)).
 -   Cover: Don't autoplay an embedded background video on the front end when the visitor prefers reduced motion. A new view module swaps the iframe source for one without the autoplay parameters ([#83452](https://github.com/WordPress/gutenberg/pull/83452)).
 -   Columns: Remove the column count slider from the block settings ([#83262](https://github.com/WordPress/gutenberg/pull/83262)).
 -   Avatar: Explain in the block settings that avatars use the Gravatar service, and link users who can manage settings to the Discussion settings where the default avatar is chosen ([#83567](https://github.com/WordPress/gutenberg/pull/83567)).

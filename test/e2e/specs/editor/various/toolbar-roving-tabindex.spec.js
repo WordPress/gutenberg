@@ -132,7 +132,7 @@ test.describe( 'Toolbar roving tabindex', () => {
 		await pageUtils.pressKeys( 'alt+F10' );
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'ArrowRight' );
-		await ToolbarRovingTabindexUtils.expectLabelToHaveFocus( 'Align text' );
+		await ToolbarRovingTabindexUtils.expectLabelToHaveFocus( 'Bold' );
 	} );
 } );
 
