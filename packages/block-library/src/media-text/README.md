@@ -53,6 +53,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
+  - `textColumns`: `true`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
 - [`allowedBlocks`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#allowedblocks): `true`
