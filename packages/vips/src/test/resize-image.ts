@@ -306,10 +306,6 @@ describe( 'resizeImage', () => {
 			mockState.pageHeight = 900;
 			mockState.height = 900 * 150;
 
-			const warn = vi
-				.spyOn( console, 'warn' )
-				.mockImplementation( () => {} );
-
 			await resizeImage(
 				'itemId',
 				buffer,
@@ -336,10 +332,9 @@ describe( 'resizeImage', () => {
 			 * filter had no effect. The warning names the frame count and the
 			 * budget it was measured against.
 			 */
-			expect( warn ).toHaveBeenCalledWith(
+			expect( console ).toHaveWarnedWith(
 				expect.stringContaining( '150 frames' )
 			);
-			warn.mockRestore();
 		} );
 
 		it( 'has no effect on still image formats', async () => {
