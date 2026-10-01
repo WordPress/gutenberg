@@ -16,6 +16,10 @@
 
 -   Grid layout: measure the container as the grid attaches rather than waiting for the resize observer's first report, so the grid no longer renders a frame with every item in a full-width column of its own before snapping to its real column count ([#83752](https://github.com/WordPress/gutenberg/pull/83752)).
 
+### Internal
+
+-   Remove the `use-memo-one` dependency, which the `./wp` bundle no longer imports ([#83952](https://github.com/WordPress/gutenberg/pull/83952)).
+
 ### Documentation
 
 -   Document that a custom `sort` receives the field values returned by `getValue`, not the items ([#83483](https://github.com/WordPress/gutenberg/pull/83483)).
