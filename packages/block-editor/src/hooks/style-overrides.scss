@@ -1,0 +1,36 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+.block-editor-style-overrides {
+	margin-bottom: $grid-unit-30;
+
+	ul {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+}
+
+.block-editor-style-overrides__title {
+	margin: 0 0 $grid-unit-10;
+	font-size: 11px;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+	line-height: 1.4;
+	text-transform: uppercase;
+}
+
+.block-editor-style-overrides__item {
+	display: flex;
+	flex-direction: column;
+	margin: 0;
+	padding: $grid-unit-10 0;
+
+	& + & {
+		border-top: $border-width solid $gray-200;
+	}
+}
+
+.block-editor-style-overrides__origin {
+	color: $gray-700;
+	font-size: $helptext-font-size;
+}
