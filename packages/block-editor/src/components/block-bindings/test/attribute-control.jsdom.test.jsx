@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { getBlockBindingsSource } from '@wordpress/blocks';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
+import BlockContext from '../../block-context';
 import BlockBindingsAttributeControl from '../attribute-control';
 import useBlockBindingsUtils from '../use-block-bindings-utils';
 
@@ -39,15 +40,21 @@ const field = {
 	type: 'string',
 };
 const source = {
+	canUserEditValue: vi.fn(),
 	getValues: vi.fn(),
 	label: 'Post meta',
+	usesContext: [ 'postId' ],
 };
 
 function renderControl( binding ) {
 	useViewportMatch.mockReturnValue( false );
 	getBlockBindingsSource.mockReturnValue( source );
 	useBlockBindingsUtils.mockReturnValue( { updateBlockBindings } );
-	useSelect.mockImplementation( ( _mapSelect, dependencies ) => {
+	useSelect.mockImplementation( ( mapSelect, dependencies ) => {
+		// The read-only check is the only selector depending on the source.
+		if ( dependencies?.[ 1 ] === source ) {
+			return mapSelect( () => ( {} ) );
+		}
 		if ( dependencies?.length === 3 ) {
 			return { 'core/post-meta': [ field ] };
 		}
@@ -58,11 +65,13 @@ function renderControl( binding ) {
 	} );
 
 	return render(
-		<BlockBindingsAttributeControl
-			attribute="content"
-			binding={ binding }
-			blockName="core/paragraph"
-		/>
+		<BlockContext.Provider value={ { postId: 123, postType: 'post' } }>
+			<BlockBindingsAttributeControl
+				attribute="content"
+				binding={ binding }
+				blockName="core/paragraph"
+			/>
+		</BlockContext.Provider>
 	);
 }
 
@@ -81,6 +90,8 @@ async function openFieldMenu( user ) {
 describe( 'BlockBindingsAttributeControl', () => {
 	beforeEach( () => {
 		updateBlockBindings.mockReset();
+		source.canUserEditValue.mockReset();
+		source.canUserEditValue.mockReturnValue( true );
 	} );
 
 	it( 'selects a source field', async () => {
@@ -110,6 +121,41 @@ describe( 'BlockBindingsAttributeControl', () => {
 
 		expect( updateBlockBindings ).toHaveBeenCalledWith( {
 			content: undefined,
+		} );
+	} );
+
+	describe( 'read-only note', () => {
+		const binding = { source: 'core/post-meta', args: field.args };
+
+		it( 'shows a read-only note when the source does not allow editing the value', () => {
+			source.canUserEditValue.mockReturnValue( false );
+			renderControl( binding );
+
+			expect( screen.getByText( 'Read-only' ) ).toBeVisible();
+		} );
+
+		it( 'asks the source with the arguments and context it declared', () => {
+			renderControl( binding );
+
+			expect( source.canUserEditValue ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					args: field.args,
+					context: { postId: 123 },
+				} )
+			);
+		} );
+
+		it( 'does not show the note when the source allows editing the value', () => {
+			renderControl( binding );
+
+			expect( screen.queryByText( 'Read-only' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'does not show the note when the attribute is not connected', () => {
+			source.canUserEditValue.mockReturnValue( false );
+			renderControl();
+
+			expect( screen.queryByText( 'Read-only' ) ).not.toBeInTheDocument();
 		} );
 	} );
 } );

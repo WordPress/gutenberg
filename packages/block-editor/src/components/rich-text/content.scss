@@ -55,6 +55,29 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
 	background-color: transparent;
 }
 
+// Bound text whose source doesn't allow editing it looks like any other text
+// field, so show a lock before it. The lock is drawn with `::before` because the
+// block's `::after` draws the outline of a selected non-editable block. It is
+// inline, so it never overlaps the text, follows the font size and text
+// direction, and is not selectable or copyable.
+.rich-text.is-bound-read-only {
+	&::before {
+		content: "";
+		display: inline-block;
+		width: 0.7em;
+		height: 0.9em;
+		margin-inline-end: 0.3em;
+		vertical-align: -0.1em;
+		background-color: currentcolor;
+		mask-image: url("data:image/svg+xml,%3Csvg viewBox='7 5 10 13' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M15 11h-.2V9c0-1.5-1.2-2.8-2.8-2.8S9.2 7.5 9.2 9v2H9c-.6 0-1 .4-1 1v4c0 .6.4 1 1 1h6c.6 0 1-.4 1-1v-4c0-.6-.4-1-1-1zm-1.8 0h-2.5V9c0-.7.6-1.2 1.2-1.2s1.2.6 1.2 1.2v2z'/%3E%3C/svg%3E");
+		mask-repeat: no-repeat;
+		mask-size: contain;
+		mask-position: center;
+		opacity: 0.6;
+		pointer-events: none;
+	}
+}
+
 .is-selected .non-breaking-space {
 	outline: 1px solid currentColor;
 	outline-offset: -1px;
