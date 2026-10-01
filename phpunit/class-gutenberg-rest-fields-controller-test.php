@@ -105,10 +105,10 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	 * @param string      $name   The entity name.
 	 * @param array[]     $fields The field definitions.
 	 * @param string|null $module The script module id, if any.
-	 * @return bool Whether the fields were registered.
+	 * @return string[] The ids of the fields registered.
 	 */
 	private function register_fields( $kind, $name, $fields, $module = null ) {
-		$registered = false;
+		$registered = array();
 		$callback   = static function ( $registry ) use ( &$registered, $kind, $name, $fields, $module ) {
 			$registered = $registry->register( 'test-plugin', $kind, $name, $fields, $module );
 		};
@@ -131,10 +131,10 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	 * @param string      $name   The entity name.
 	 * @param array[]     $fields The partial field definitions.
 	 * @param string|null $module The script module id, if any.
-	 * @return bool Whether the fields were updated.
+	 * @return string[] The ids of the fields updated.
 	 */
 	private function update_fields( $kind, $name, $fields, $module = null ) {
-		$updated  = false;
+		$updated  = array();
 		$callback = static function ( $registry ) use ( &$updated, $kind, $name, $fields, $module ) {
 			$updated = $registry->update( 'test-plugin', $kind, $name, $fields, $module );
 		};
@@ -286,7 +286,7 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 			unregister_post_type( 'gutenberg_hidden' );
 		}
 
-		$this->assertTrue( $registered, 'The registry accepts the fields.' );
+		$this->assertSame( array( 'secret' ), $registered, 'The registry accepts the fields.' );
 		$this->assertErrorResponse( 'rest_fields_invalid_entity', $response, 404 );
 	}
 

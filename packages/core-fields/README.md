@@ -89,7 +89,7 @@ return array(
 );
 ```
 
-There is no precedence between collections: the registry refuses a field registered twice for the same entity, reporting the duplicate with `_doing_it_wrong()`. A collection redefining a default field needs its post type to exclude that field on the filter.
+There is no precedence between collections: the registry skips a field already registered for the entity, reporting the duplicate with `_doing_it_wrong()`, and registers the rest of the collection. A collection redefining a default field needs its post type to exclude that field on the filter.
 
 ### Loading
 
