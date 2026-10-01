@@ -1,7 +1,8 @@
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
-import { useInstanceId } from '@wordpress/compose';
+import { addFilter } from '@wordpress/hooks';
+import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import InspectorControls from '../components/inspector-controls';
@@ -350,9 +351,36 @@ function StyleOverridesPanel( props: StyleOverridesPanelProps ) {
 	);
 }
 
-export default {
-	edit: StyleOverridesPanel,
-	hasSupport() {
-		return isGlobalStylesInheritanceIndicatorUIEnabled();
-	},
-};
+/*
+ * A filter of its own rather than a block-support hook, so the lists render
+ * after the block's own Advanced controls. Block-support hooks render before
+ * the block's edit, which put the lists above a Button's HTML element and
+ * Link relation controls. Registered before the editor's "Apply globally"
+ * filter, so the lists still come right before it.
+ */
+const withStyleOrigins = createHigherOrderComponent(
+	( BlockEdit ) =>
+		function BlockEditWithStyleOrigins(
+			props: StyleOverridesPanelProps & { isSelected: boolean }
+		) {
+			return (
+				<>
+					<BlockEdit key="edit" { ...props } />
+					{ props.isSelected &&
+						isGlobalStylesInheritanceIndicatorUIEnabled() && (
+							<StyleOverridesPanel
+								name={ props.name }
+								clientId={ props.clientId }
+							/>
+						) }
+				</>
+			);
+		},
+	'withStyleOrigins'
+);
+
+addFilter(
+	'editor.BlockEdit',
+	'core/block-editor/style-origins',
+	withStyleOrigins
+);

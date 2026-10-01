@@ -24,7 +24,7 @@ import textShadow from './text-shadow';
 import fitText from './fit-text';
 import border from './border';
 import customCSS from './custom-css';
-import styleOverrides from './style-overrides';
+import './style-overrides';
 import position from './position';
 import blockStyleVariation from './block-style-variation';
 import layout from './layout';
@@ -45,7 +45,6 @@ createBlockEditFilter(
 		customClassName,
 		style,
 		customCSS,
-		styleOverrides,
 		duotone,
 		fitText,
 		position,
