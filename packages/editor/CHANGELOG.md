@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Notes: Support notes in the Style Book, stored against the user global styles post and anchored to a Style Book example ([#81554](https://github.com/WordPress/gutenberg/pull/81554)).
+
 ### Enhancements
 
 -   `PostAuthor`: The field renders with the `SearchableSelect` component of `@wordpress/ui` instead of `ComboboxControl` and `SelectControl` ([#83323](https://github.com/WordPress/gutenberg/pull/83323)).
@@ -92,7 +96,6 @@
 ### New Features
 
 -   Add a private `SiteExport` menu item, moved from `edit-site`. It offers downloading the theme with the user's changes, only while editing a template or a template part — the entities the exported theme is made of ([#81992](https://github.com/WordPress/gutenberg/pull/81992)).
--   Notes: Support notes in the Style Book, stored against the user global styles post and anchored to a Style Book example ([#73278](https://github.com/WordPress/gutenberg/issues/73278)).
 
 ### Enhancements
 
