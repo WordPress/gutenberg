@@ -156,6 +156,8 @@ Compare the affected old and new behaviour before removing, renaming, or replaci
 
 Search consumers beyond the changed package. Migrating all repository call sites does not prove compatibility for plugins or other npm consumers. Check documented extension points, such as SlotFill children and render callbacks, against the values and compositions they previously accepted. An adapter that handles built-in callers may not handle third-party input. If external usage cannot be established, state that limit and make any retirement of supported behaviour explicit.
 
+Before removing or changing a public API, use [Veloria](https://veloria.dev/) to look for usage in WordPress.org plugins and themes. Search relevant identifiers, hooks, styling hooks, and common access patterns, then inspect matches in context. Record the search scope and relevant results. Matches can demonstrate compatibility impact; no matches do not prove that removal is safe. Private code, commercial products distributed elsewhere, and usages obscured by compilation or dynamic access may remain undiscovered. Use this evidence alongside the API's support policy and migration options.
+
 For tokens, compare semantic purpose and affected modes as well as default values. Follow the [token source guide](/packages/theme/tokens/README.md) and [build procedure](/packages/theme/README.md#building), then inspect the generated assets and consumers affected by the change. Two tokens with equal values in one theme are not necessarily interchangeable.
 
 ## Verify the affected behaviour
