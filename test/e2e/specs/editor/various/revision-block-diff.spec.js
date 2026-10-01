@@ -9,11 +9,11 @@ test.describe( 'Revision Block Diff Panel', () => {
 		editor,
 		page,
 	} ) => {
-		// Insert a paragraph with left alignment.
+		// Insert a heading with left alignment.
 		await editor.insertBlock( {
-			name: 'core/paragraph',
+			name: 'core/heading',
 			attributes: {
-				content: 'Test paragraph',
+				content: 'Test heading',
 				align: 'left',
 			},
 		} );
@@ -53,9 +53,9 @@ test.describe( 'Revision Block Diff Panel', () => {
 			page.getByRole( 'button', { name: 'Restore' } )
 		).toBeVisible();
 
-		// Click on the paragraph block in the revision canvas.
+		// Click on the heading block in the revision canvas.
 		await editor.canvas
-			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.getByRole( 'document', { name: 'Block: Heading' } )
 			.click();
 
 		// Switch to the Block tab in the sidebar.
