@@ -1,8 +1,8 @@
 import { useSortable } from '@dnd-kit/sortable';
 import clsx from 'clsx';
 import { useState, useRef } from '@wordpress/element';
-import { inertValue } from '@wordpress/ui';
 import { useMergeRefs } from '@wordpress/compose';
+import { inertValue } from '@wordpress/react-inert-value';
 import actionableAreaStyles from '../shared/actionable-area-slot.module.css';
 import ResizeHandle from '../shared/resize-handle';
 import { clampResizeDelta, type ResizeSnapSize } from '../shared/resize-snap';

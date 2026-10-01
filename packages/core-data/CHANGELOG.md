@@ -6,6 +6,10 @@
 
 -   `Icon`: add the `keywords` field exposed by the icons REST endpoint ([#82367](https://github.com/WordPress/gutenberg/pull/82367)).
 
+### Bug Fixes
+
+-   `__experimentalFetchLinkSuggestions`: rank results by type (content, taxonomy, post format, attachment), and return everything the endpoints gave rather than cutting the merged results. `perPage` is now the page size asked of each type rather than a limit on what they add up to, so `page` reaches every result ([#83407](https://github.com/WordPress/gutenberg/pull/83407)).
+
 ### Internal
 
 -   Added an internal entity sync interface: `registerEntitySyncManager` and `getEntitySyncManager` let one manager plug into the entity lifecycle (record loads, edits, saves, deletes, and undo). The real-time collaboration experiment now runs through it instead of being called directly by the store. The interface is not exposed outside the package yet ([#83410](https://github.com/WordPress/gutenberg/pull/83410)).

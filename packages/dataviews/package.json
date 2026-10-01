@@ -74,6 +74,7 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/kebab-case": "file:../kebab-case",
 		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/react-inert-value": "file:../react-inert-value",
 		"@wordpress/ui": "file:../ui",
 		"@wordpress/warning": "file:../warning",
 		"change-case": "^4.1.2",
@@ -89,7 +90,6 @@
 		"memize": "^2.1.1",
 		"react-colorful": "^5.6.1",
 		"remove-accents": "^0.5.0",
-		"use-memo-one": "^1.1.3",
 		"uuid": "^14.0.0"
 	},
 	"devDependencies": {
