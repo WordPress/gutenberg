@@ -15,7 +15,7 @@ describe( 'Drawer', () => {
 		const headerRef = createRef< HTMLElement >();
 		const titleRef = createRef< HTMLHeadingElement >();
 		const descriptionRef = createRef< HTMLParagraphElement >();
-		const closeIconRef = createRef< HTMLButtonElement >();
+		const closeIconButtonRef = createRef< HTMLButtonElement >();
 		const contentRef = createRef< HTMLDivElement >();
 
 		await render(
@@ -26,7 +26,7 @@ describe( 'Drawer', () => {
 						<Drawer.Title ref={ titleRef }>
 							Test Drawer
 						</Drawer.Title>
-						<Drawer.CloseIcon ref={ closeIconRef } />
+						<Drawer.CloseIconButton ref={ closeIconButtonRef } />
 					</Drawer.Header>
 					<Drawer.Content ref={ contentRef }>
 						<Drawer.Description ref={ descriptionRef }>
@@ -52,7 +52,9 @@ describe( 'Drawer', () => {
 		expect( headerRef.current?.tagName ).toBe( 'HEADER' );
 		expect( titleRef.current ).toBeInstanceOf( HTMLHeadingElement );
 		expect( descriptionRef.current ).toBeInstanceOf( HTMLParagraphElement );
-		expect( closeIconRef.current ).toBeInstanceOf( HTMLButtonElement );
+		expect( closeIconButtonRef.current ).toBeInstanceOf(
+			HTMLButtonElement
+		);
 		expect( footerRef.current ).toBeInstanceOf( HTMLElement );
 		expect( footerRef.current?.tagName ).toBe( 'FOOTER' );
 		expect( actionRef.current ).toBeInstanceOf( HTMLButtonElement );
@@ -196,7 +198,7 @@ describe( 'Drawer', () => {
 				<Drawer.Popup>
 					<Drawer.Header>
 						<Drawer.Title>Focus test</Drawer.Title>
-						<Drawer.CloseIcon />
+						<Drawer.CloseIconButton />
 					</Drawer.Header>
 					<Drawer.Footer>
 						<Drawer.Action>Confirm</Drawer.Action>
@@ -227,7 +229,7 @@ describe( 'Drawer', () => {
 				<Drawer.Popup initialFocus={ false }>
 					<Drawer.Header>
 						<Drawer.Title>Focus test</Drawer.Title>
-						<Drawer.CloseIcon />
+						<Drawer.CloseIconButton />
 					</Drawer.Header>
 					<button>Content Button</button>
 				</Drawer.Popup>
@@ -260,7 +262,7 @@ describe( 'Drawer', () => {
 				<Drawer.Popup initialFocus={ customFocus }>
 					<Drawer.Header>
 						<Drawer.Title>Focus test</Drawer.Title>
-						<Drawer.CloseIcon />
+						<Drawer.CloseIconButton />
 					</Drawer.Header>
 					<button>Content Button</button>
 				</Drawer.Popup>

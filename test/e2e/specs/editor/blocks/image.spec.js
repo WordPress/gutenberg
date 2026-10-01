@@ -312,45 +312,33 @@ test.describe( 'Image', () => {
 		page,
 		editor,
 	} ) => {
-		// Mock Openverse so the test doesn't depend on which images the live
-		// API returns, or on whether their hosts send CORS headers.
-		const mockImageUrl = 'https://openverse-mock.test/image.png';
-		const mockResult = {
-			title: 'Mock Openverse image',
-			foreign_landing_url: 'https://openverse-mock.test/landing',
-			creator: 'Test Creator',
-			creator_url: 'https://openverse-mock.test/creator',
-			license: 'cc0',
-			license_version: '1.0',
-			license_url: 'https://creativecommons.org/publicdomain/zero/1.0/',
-			url: mockImageUrl,
-			thumbnail: mockImageUrl,
-		};
-		await page.route( 'https://api.openverse.org/v1/images/**', ( route ) =>
+		// Serve Openverse and its image hosts locally; CI runners can't reliably fetch them.
+		const mockImages = [
+			'10x10_e2e_test_image_green.png',
+			'10x10_e2e_test_image_z9T8jK.png',
+		];
+		await page.route( 'https://api.openverse.org/v1/images/?*', ( route ) =>
 			route.fulfill( {
-				headers: { 'Access-Control-Allow-Origin': '*' },
 				json: {
-					results: [
-						{ ...mockResult, id: 'mock-openverse-image-1' },
-						{ ...mockResult, id: 'mock-openverse-image-2' },
-					],
+					results: mockImages.map( ( fileName, index ) => ( {
+						id: `mock-${ index }`,
+						title: fileName,
+						url: `https://openverse.test/${ fileName }`,
+						thumbnail: `https://openverse.test/${ fileName }`,
+						license: 'cc0',
+						license_version: '1.0',
+					} ) ),
 				},
 			} )
 		);
-		await page.route( mockImageUrl, async ( route ) =>
+		await page.route( 'https://openverse.test/*', ( route ) =>
 			route.fulfill( {
-				headers: { 'Access-Control-Allow-Origin': '*' },
-				contentType: 'image/png',
-				body: await fs.readFile(
-					path.join(
-						__dirname,
-						'..',
-						'..',
-						'..',
-						'assets',
-						'10x10_e2e_test_image_z9T8jK.png'
-					)
+				path: path.join(
+					__dirname,
+					'../../../assets',
+					new URL( route.request().url() ).pathname
 				),
+				headers: { 'Access-Control-Allow-Origin': '*' },
 			} )
 		);
 
