@@ -1,20 +1,14 @@
 import { createContext, useContext } from '@wordpress/element';
-import type { CropperState } from '../image-editor';
 import {
 	useMediaEditorState,
 	type MediaEditorSession,
 } from './use-media-editor-state';
-import type { CropOptionsSlice } from './types';
 
 const MediaEditorStateContext = createContext< MediaEditorSession | null >(
 	null
 );
 
 interface MediaEditorStateProviderProps {
-	/** Optional cropper-slice initial state. */
-	initialCropperState?: Partial< CropperState >;
-	/** Optional cropOptions-slice initial state. */
-	initialCropOptions?: Partial< CropOptionsSlice >;
 	/** Child components. */
 	children: React.ReactNode;
 }
@@ -25,19 +19,12 @@ interface MediaEditorStateProviderProps {
  * sidebar) reads from the same store.
  *
  * @param props
- * @param props.initialCropperState
- * @param props.initialCropOptions
  * @param props.children
  */
 export function MediaEditorStateProvider( {
-	initialCropperState,
-	initialCropOptions,
 	children,
 }: MediaEditorStateProviderProps ) {
-	const controller = useMediaEditorState( {
-		cropper: initialCropperState,
-		cropOptions: initialCropOptions,
-	} );
+	const controller = useMediaEditorState();
 
 	return (
 		<MediaEditorStateContext.Provider value={ controller }>
