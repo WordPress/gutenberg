@@ -1072,7 +1072,7 @@ An advanced block that allows displaying taxonomy terms based on different query
 
 -	**Name:** [core/terms-query](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-terms-query/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** align (full, wide), anchor, interactivity, layout, ~~html~~
+-	**Supports:** align (full, wide), anchor, interactivity, layout, spacing (blockGap, margin, padding), ~~html~~
 -	**Attributes:** tagName, termQuery
 
 ## Text Columns (deprecated)
