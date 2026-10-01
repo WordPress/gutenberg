@@ -1,6 +1,11 @@
 const assert = require( 'node:assert/strict' );
 const wordpress = require( '@wordpress/eslint-plugin' );
 
+const profile = process.argv[ 2 ] ?? 'promoted';
+assert.ok( [ 'promoted', 'recommended' ].includes( profile ) );
+const promoted = profile === 'promoted';
+const pollingRules = promoted ? [ 'require-awaited-expect-poll' ] : [];
+
 const cases = [
 	{
 		name: 'still rejects focused tests',
@@ -8,19 +13,19 @@ const cases = [
 		rules: [ 'no-focused-tests' ],
 	},
 	{
-		name: 'rejects a floating polling assertion',
+		name: 'applies the floating polling assertion default',
 		source: "import { test, expect } from 'vitest'; test( 'poll', () => { expect.poll( () => true ).toBe( true ); } );",
-		rules: [ 'require-awaited-expect-poll' ],
+		rules: pollingRules,
 	},
 	{
-		name: 'rejects a floating Browser assertion',
+		name: 'applies the floating Browser assertion default',
 		source: "import { test, expect } from 'vitest'; test( 'element', () => { expect.element( locator ).toBeVisible(); } );",
-		rules: [ 'require-awaited-expect-poll' ],
+		rules: pollingRules,
 	},
 	{
 		name: 'checks an aliased assertion import',
 		source: "import { test, expect, expect as check } from 'vitest'; test( 'poll', () => { expect( true ).toBe( true ); check.poll( () => true ).toBe( true ); } );",
-		rules: [ 'require-awaited-expect-poll' ],
+		rules: pollingRules,
 	},
 	{
 		name: 'accepts awaited polling and Browser assertions',
@@ -35,22 +40,23 @@ const cases = [
 	{
 		name: 'records the concise arrow helper limitation',
 		source: "import { expect } from 'vitest'; const expectVisible = () => expect.element( locator ).toBeVisible();",
-		rules: [ 'require-awaited-expect-poll' ],
+		rules: pollingRules,
 	},
 	{
 		name: 'records the promise aggregation limitation',
 		source: "import { test, expect } from 'vitest'; test( 'aggregated', async () => { await Promise.all( [ expect.poll( () => true ).toBe( true ) ] ); } );",
-		rules: [ 'require-awaited-expect-poll' ],
+		rules: pollingRules,
 	},
 	{
 		name: 'accepts a local directive for valid promise aggregation',
+		promotedOnly: true,
 		source: "import { test, expect } from 'vitest'; test( 'aggregated', async () => {\n// eslint-disable-next-line NAMESPACE/require-awaited-expect-poll\nawait Promise.all( [ expect.poll( () => true ).toBe( true ) ] ); } );",
 		rules: [],
 	},
 	{
-		name: 'accepts generated titles passed through variables',
+		name: 'applies the generated title default',
 		source: "import { test, expect } from 'vitest'; const title = 'generated'; test( title, () => { expect( true ).toBe( true ); } );",
-		rules: [],
+		rules: promoted ? [] : [ 'valid-title' ],
 	},
 	{
 		name: 'still rejects invalid literal titles',
@@ -107,20 +113,29 @@ async function main() {
 		const warningSeverity = namespace === 'vitest' ? 1 : 'warn';
 		const effective =
 			await eslint.calculateConfigForFile( 'example.test.js' );
-		assert.equal(
-			effective.rules[
-				`${ namespace }/require-awaited-expect-poll`
-			][ 0 ],
-			errorSeverity,
-			name
-		);
+		if ( promoted ) {
+			assert.equal(
+				effective.rules[
+					`${ namespace }/require-awaited-expect-poll`
+				][ 0 ],
+				errorSeverity,
+				name
+			);
+		} else {
+			assert.equal(
+				effective.rules[ `${ namespace }/require-awaited-expect-poll` ],
+				undefined,
+				name
+			);
+		}
 		assert.equal(
 			effective.rules[ `${ namespace }/valid-title` ][ 0 ],
 			errorSeverity
 		);
 		assert.equal(
-			effective.rules[ `${ namespace }/valid-title` ][ 1 ].allowArguments,
-			true,
+			effective.rules[ `${ namespace }/valid-title` ][ 1 ]
+				?.allowArguments ?? false,
+			promoted,
 			name
 		);
 		assert.equal(
@@ -145,6 +160,9 @@ async function main() {
 			);
 		}
 		for ( const fixture of cases ) {
+			if ( fixture.promotedOnly && ! promoted ) {
+				continue;
+			}
 			const [ result ] = await eslint.lintText(
 				fixture.source.replaceAll( 'NAMESPACE', namespace ),
 				{ filePath: 'example.test.js' }
@@ -187,7 +205,7 @@ async function main() {
 			[ `${ namespace }/valid-title` ],
 			`${ name }: respects consumer overrides`
 		);
-		console.log( `Passed ${ name } public lint defaults.` );
+		console.log( `Passed ${ name } ${ profile } lint defaults.` );
 	}
 
 	// The documented Jest opt-in must not pick up the Vitest-only defaults.

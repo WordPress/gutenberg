@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `lint-js`: Report `expect.poll()` and `expect.element()` assertions that are neither awaited nor explicitly returned in the default unit-test configuration, following the updated `@wordpress/eslint-plugin` `test-unit` defaults ([#83995](https://github.com/WordPress/gutenberg/pull/83995)).
+
 ### Bug Fixes
 
 -   Add the `stylelint-scss` dependency, a peer of `@wordpress/stylelint-config` ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
