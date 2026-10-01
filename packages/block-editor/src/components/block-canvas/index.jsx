@@ -70,7 +70,7 @@ export function ExperimentalBlockCanvas( {
 			? {
 					scale: zoomLevel,
 					frameSize: '40px',
-			  }
+				}
 			: {};
 
 	if ( ! shouldIframe ) {

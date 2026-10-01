@@ -2,7 +2,7 @@ import {
 	Button,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 	TextControl,
 	TextareaControl as WCTextareaControl,
 } from '@wordpress/components';
@@ -214,7 +214,7 @@ export function Controls( {
 						}
 						isShownByDefault
 					>
-						<CheckboxControl
+						<WCCheckboxControl
 							label={ __( 'Open in new tab' ) }
 							checked={ opensInNewTab }
 							onChange={ ( value ) =>

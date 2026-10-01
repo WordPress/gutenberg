@@ -12,12 +12,11 @@ import {
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { getUndoManager } from './private-selectors';
 import {
+	getFilteredItem,
 	getNormalizedCommaSeparable,
-	setNestedValue,
 	isNumericID,
 	getUserPermissionCacheKey,
 } from './utils';
-import { getSyncManager } from './sync';
 import type * as ET from './entity-types';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
@@ -38,10 +37,7 @@ export interface State {
 	themeGlobalStyleVariations: Record< string, string >;
 	themeGlobalStyleRevisions: Record< number, Array< object > >;
 	undoManager: UndoManager;
-	syncUndoManagerState: {
-		hasRedo: boolean;
-		hasUndo: boolean;
-	};
+	undoManagerReference: Record< string, never >;
 	userPermissions: Record< string, boolean >;
 	users: UserState;
 	navigationFallbackId: EntityRecordKey;
@@ -332,8 +328,7 @@ export interface GetEntityRecord {
 	 */
 	<
 		EntityRecord extends
-			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >,
+			ET.EntityRecord< any > | Partial< ET.EntityRecord< any > >,
 	>(
 		state: State,
 		kind: string,
@@ -355,8 +350,7 @@ export interface GetEntityRecord {
 		): ET.EntityRecordOfQuery< Kind, Name, Query > | undefined;
 		<
 			EntityRecord extends
-				| ET.EntityRecord< any >
-				| Partial< ET.EntityRecord< any > >,
+				ET.EntityRecord< any > | Partial< ET.EntityRecord< any > >,
 		>(
 			kind: string,
 			name: string,
@@ -383,8 +377,7 @@ export interface GetEntityRecord {
 		): Promise< ET.EntityRecordOfQuery< Kind, Name, Query > | undefined >;
 		<
 			EntityRecord extends
-				| ET.EntityRecord< any >
-				| Partial< ET.EntityRecord< any > >,
+				ET.EntityRecord< any > | Partial< ET.EntityRecord< any > >,
 		>(
 			kind: string,
 			name: string,
@@ -392,7 +385,7 @@ export interface GetEntityRecord {
 			query?: GetRecordsHttpQuery
 		): Promise< EntityRecord | undefined >;
 	};
-	__unstableNormalizeArgs?: ( args: EntityRecordArgs ) => EntityRecordArgs;
+	normalizeArgs?: ( args: EntityRecordArgs ) => EntityRecordArgs;
 }
 
 /**
@@ -409,62 +402,40 @@ export interface GetEntityRecord {
  *
  * @return Record.
  */
-export const getEntityRecord = createSelector(
-	( <
-		EntityRecord extends
-			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >,
-	>(
-		state: State,
-		kind: string,
-		name: string,
-		recordId?: EntityRecordKey,
-		query?: GetRecordsHttpQuery
-	): EntityRecord | undefined => {
-		logEntityDeprecation( kind, name, 'getEntityRecord' );
-		const queriedState =
-			state.entities.records?.[ kind ]?.[ name ]?.queriedData;
-		if ( ! queriedState ) {
+export const getEntityRecord = ( <
+	EntityRecord extends
+		ET.EntityRecord< any > | Partial< ET.EntityRecord< any > >,
+>(
+	state: State,
+	kind: string,
+	name: string,
+	recordId?: EntityRecordKey,
+	query?: GetRecordsHttpQuery
+): EntityRecord | undefined => {
+	logEntityDeprecation( kind, name, 'getEntityRecord' );
+	const queriedState =
+		state.entities.records?.[ kind ]?.[ name ]?.queriedData;
+	if ( ! queriedState ) {
+		return undefined;
+	}
+	const context = query?.context ?? 'default';
+
+	if ( ! query || ! query._fields ) {
+		// If expecting a complete item, validate that completeness.
+		if ( ! queriedState.itemIsComplete[ context ]?.[ recordId ] ) {
 			return undefined;
 		}
-		const context = query?.context ?? 'default';
 
-		if ( ! query || ! query._fields ) {
-			// If expecting a complete item, validate that completeness.
-			if ( ! queriedState.itemIsComplete[ context ]?.[ recordId ] ) {
-				return undefined;
-			}
-
-			return queriedState.items[ context ][ recordId ];
-		}
-
-		const item = queriedState.items[ context ]?.[ recordId ];
-		if ( ! item ) {
-			return item;
-		}
-
-		const filteredItem = {};
-		const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
-		for ( let f = 0; f < fields.length; f++ ) {
-			const field = fields[ f ].split( '.' );
-			let value = item;
-			field.forEach( ( fieldName ) => {
-				value = value?.[ fieldName ];
-			} );
-			setNestedValue( filteredItem, field, value );
-		}
-		return filteredItem as EntityRecord;
-	} ) as GetEntityRecord,
-	( state: State, kind, name, recordId, query ) => {
-		const context = query?.context ?? 'default';
-		const queriedState =
-			state.entities.records?.[ kind ]?.[ name ]?.queriedData;
-		return [
-			queriedState?.items[ context ]?.[ recordId ],
-			queriedState?.itemIsComplete[ context ]?.[ recordId ],
-		];
+		return queriedState.items[ context ][ recordId ];
 	}
-) as GetEntityRecord;
+
+	const item = queriedState.items[ context ]?.[ recordId ];
+	if ( ! item ) {
+		return item;
+	}
+
+	return getFilteredItem< EntityRecord >( item, query._fields );
+} ) as GetEntityRecord;
 
 /**
  * Normalizes `recordKey`s that look like numeric IDs to numbers.
@@ -472,7 +443,7 @@ export const getEntityRecord = createSelector(
  * @param args EntityRecordArgs the selector arguments.
  * @return EntityRecordArgs the normalized arguments.
  */
-getEntityRecord.__unstableNormalizeArgs = (
+getEntityRecord.normalizeArgs = (
 	args: EntityRecordArgs
 ): EntityRecordArgs => {
 	const newArgs = [ ...args ] as EntityRecordArgs;
@@ -674,8 +645,7 @@ export interface GetEntityRecords {
 	 */
 	<
 		EntityRecord extends
-			| ET.EntityRecord< any >
-			| Partial< ET.EntityRecord< any > >,
+			ET.EntityRecord< any > | Partial< ET.EntityRecord< any > >,
 	>(
 		state: State,
 		kind: string,
@@ -695,8 +665,7 @@ export interface GetEntityRecords {
 		): ET.EntityRecordOfQuery< Kind, Name, Query >[] | null;
 		<
 			EntityRecord extends
-				| ET.EntityRecord< any >
-				| Partial< ET.EntityRecord< any > >,
+				ET.EntityRecord< any > | Partial< ET.EntityRecord< any > >,
 		>(
 			kind: string,
 			name: string,
@@ -716,8 +685,7 @@ export interface GetEntityRecords {
 		): Promise< ET.EntityRecordOfQuery< Kind, Name, Query >[] | null >;
 		<
 			EntityRecord extends
-				| ET.EntityRecord< any >
-				| Partial< ET.EntityRecord< any > >,
+				ET.EntityRecord< any > | Partial< ET.EntityRecord< any > >,
 		>(
 			kind: string,
 			name: string,
@@ -739,8 +707,7 @@ export interface GetEntityRecords {
  */
 export const getEntityRecords = ( <
 	EntityRecord extends
-		| ET.EntityRecord< any >
-		| Partial< ET.EntityRecord< any > >,
+		ET.EntityRecord< any > | Partial< ET.EntityRecord< any > >,
 >(
 	state: State,
 	kind: string,
@@ -881,7 +848,7 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 							key: entityRecord
 								? entityRecord[
 										entityConfig.key || DEFAULT_ENTITY_KEY
-								  ]
+									]
 								: undefined,
 							title:
 								entityConfig?.getTitle?.( entityRecord ) || '',
@@ -934,7 +901,7 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
 							key: entityRecord
 								? entityRecord[
 										entityConfig.key || DEFAULT_ENTITY_KEY
-								  ]
+									]
 								: undefined,
 							title:
 								entityConfig?.getTitle?.( entityRecord ) || '',
@@ -1259,9 +1226,6 @@ export function getRedoEdit( state: State ): Optional< any > {
  * @return Whether there is a previous edit or not.
  */
 export function hasUndo( state: State ): boolean {
-	if ( getSyncManager()?.undoManager ) {
-		return state.syncUndoManagerState.hasUndo;
-	}
 	return getUndoManager( state ).hasUndo();
 }
 
@@ -1274,9 +1238,6 @@ export function hasUndo( state: State ): boolean {
  * @return Whether there is a next edit or not.
  */
 export function hasRedo( state: State ): boolean {
-	if ( getSyncManager()?.undoManager ) {
-		return state.syncUndoManagerState.hasRedo;
-	}
 	return getUndoManager( state ).hasRedo();
 }
 
@@ -1719,64 +1680,37 @@ export function hasRevision(
  *
  * @return Record.
  */
-export const getRevision = createSelector(
-	(
-		state: State,
-		kind: string,
-		name: string,
-		recordKey: EntityRecordKey,
-		revisionKey: EntityRecordKey,
-		query?: GetRecordsHttpQuery
-	): RevisionRecord | Record< PropertyKey, never > | undefined => {
-		logEntityDeprecation( kind, name, 'getRevision' );
-		const queriedState =
-			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[
-				recordKey
-			];
+export const getRevision = (
+	state: State,
+	kind: string,
+	name: string,
+	recordKey: EntityRecordKey,
+	revisionKey: EntityRecordKey,
+	query?: GetRecordsHttpQuery
+): RevisionRecord | Record< PropertyKey, never > | undefined => {
+	logEntityDeprecation( kind, name, 'getRevision' );
+	const queriedState =
+		state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ recordKey ];
 
-		if ( ! queriedState ) {
+	if ( ! queriedState ) {
+		return undefined;
+	}
+
+	const context = query?.context ?? 'default';
+
+	if ( ! query || ! query._fields ) {
+		// If expecting a complete item, validate that completeness.
+		if ( ! queriedState.itemIsComplete[ context ]?.[ revisionKey ] ) {
 			return undefined;
 		}
 
-		const context = query?.context ?? 'default';
-
-		if ( ! query || ! query._fields ) {
-			// If expecting a complete item, validate that completeness.
-			if ( ! queriedState.itemIsComplete[ context ]?.[ revisionKey ] ) {
-				return undefined;
-			}
-
-			return queriedState.items[ context ][ revisionKey ];
-		}
-
-		const item = queriedState.items[ context ]?.[ revisionKey ];
-		if ( ! item ) {
-			return item;
-		}
-
-		const filteredItem = {};
-		const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
-
-		for ( let f = 0; f < fields.length; f++ ) {
-			const field = fields[ f ].split( '.' );
-			let value = item;
-			field.forEach( ( fieldName ) => {
-				value = value?.[ fieldName ];
-			} );
-			setNestedValue( filteredItem, field, value );
-		}
-
-		return filteredItem;
-	},
-	( state: State, kind, name, recordKey, revisionKey, query ) => {
-		const context = query?.context ?? 'default';
-		const queriedState =
-			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[
-				recordKey
-			];
-		return [
-			queriedState?.items?.[ context ]?.[ revisionKey ],
-			queriedState?.itemIsComplete?.[ context ]?.[ revisionKey ],
-		];
+		return queriedState.items[ context ][ revisionKey ];
 	}
-);
+
+	const item = queriedState.items[ context ]?.[ revisionKey ];
+	if ( ! item ) {
+		return item;
+	}
+
+	return getFilteredItem( item, query._fields );
+};

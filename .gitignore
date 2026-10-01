@@ -7,8 +7,12 @@ build-wp
 node_modules
 .wasm-vips-build
 gutenberg.zip
+/vendor/
 .content-entry.js
 coverage
+/.vitest-attachments/
+/test-results/
+**/__screenshots__/*.browser.test.*/
 .phpunit.result.cache
 .reassure
 .dev-ready
@@ -32,6 +36,7 @@ yarn.lock
 /.cache/**
 !/.cache/.gitkeep
 
+.vitest
 .eslintcache
 *.tsbuildinfo
 /test/unit/.vitest-*-typecheck.json

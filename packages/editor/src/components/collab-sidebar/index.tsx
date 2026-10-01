@@ -6,7 +6,6 @@ import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
 // @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { store as blockEditorStore } from '@wordpress/block-editor';
-// @ts-expect-error - No type declarations available for @wordpress/interface
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import PluginSidebar from '../plugin-sidebar';
@@ -16,6 +15,7 @@ import {
 	SIDEBARS,
 } from './constants';
 import { Notes } from './notes';
+import { NotesDisplayModeMenu } from './notes-display-mode-menu';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
@@ -74,12 +74,14 @@ function NotesSidebar( { postId }: { postId: number } ) {
 	);
 
 	const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
-	const { isDistractionFree } = useSelect( ( select ) => {
+	const { isDistractionFree, areNotesHidden } = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		return {
 			isDistractionFree: get( 'core', 'distractionFree' ),
+			areNotesHidden: get( 'core', 'notesDisplayMode' ) === 'hidden',
 		};
 	}, [] );
+	const { set: setPreference } = useDispatch( preferencesStore );
 	const selectedNoteId = useSelect(
 		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
 		[]
@@ -91,10 +93,10 @@ function NotesSidebar( { postId }: { postId: number } ) {
 	const showFloatingSidebar = isLargeViewport;
 	// Fallback to "All notes" sidebar on smaller viewports.
 	const showAllNotesSidebar = notes.length > 0 || ! showFloatingSidebar;
-	useEnableFloatingSidebar(
+	const hasFloatingNotes =
 		showFloatingSidebar &&
-			( unresolvedNotes.length > 0 || selectedNoteId !== undefined )
-	);
+		( unresolvedNotes.length > 0 || selectedNoteId !== undefined );
+	useEnableFloatingSidebar( hasFloatingNotes && ! areNotesHidden );
 
 	// Resolves to whether the note sidebar actually opened. Callers that stash
 	// state for the form to consume use this to clean up when it did not.
@@ -116,7 +118,14 @@ function NotesSidebar( { postId }: { postId: number } ) {
 		const prevArea = await getActiveComplementaryArea( 'core' );
 		if ( isApproved ) {
 			enableComplementaryArea( 'core', ALL_NOTES_SIDEBAR );
-		} else if ( ! SIDEBARS.includes( prevArea ) || ! showAllNotesSidebar ) {
+		} else if (
+			! SIDEBARS.includes( prevArea ?? '' ) ||
+			! showAllNotesSidebar
+		) {
+			// Acting on a note brings hidden notes back.
+			if ( showFloatingSidebar && areNotesHidden ) {
+				setPreference( 'core', 'notesDisplayMode', 'full' );
+			}
 			enableComplementaryArea(
 				'core',
 				showFloatingSidebar ? FLOATING_NOTES_SIDEBAR : ALL_NOTES_SIDEBAR
@@ -125,7 +134,7 @@ function NotesSidebar( { postId }: { postId: number } ) {
 
 		const currentArea = await getActiveComplementaryArea( 'core' );
 		// Bail out if the current active area is not one of note sidebars.
-		if ( ! SIDEBARS.includes( currentArea ) ) {
+		if ( ! SIDEBARS.includes( currentArea ?? '' ) ) {
 			return false;
 		}
 
@@ -244,7 +253,7 @@ function NotesSidebar( { postId }: { postId: number } ) {
 		blockNoteIds.length > 0
 			? notes.filter( ( thread ) =>
 					blockNoteIds.includes( thread.id as number )
-			  )
+				)
 			: [];
 	const currentThread = pickPrimaryNote( currentThreads );
 
@@ -270,11 +279,16 @@ function NotesSidebar( { postId }: { postId: number } ) {
 				}
 				onClickSelection={ addNewNoteForSelection }
 			/>
+			<NotesDisplayModeMenu
+				hasFloatingNotes={ hasFloatingNotes }
+				hasAllNotes={ showAllNotesSidebar }
+			/>
 			{ showAllNotesSidebar && (
+				// No `name`, so the sidebar doesn't add itself to the "Panels"
+				// menu; the "Notes" submenu toggles it instead.
 				<PluginSidebar
 					// @ts-expect-error PluginSidebar's documented props don't cover the pass-through props it forwards to ComplementaryArea.
 					identifier={ ALL_NOTES_SIDEBAR }
-					name={ ALL_NOTES_SIDEBAR }
 					title={ __( 'All notes' ) }
 					header={
 						<h2 className="interface-complementary-area-header__title">

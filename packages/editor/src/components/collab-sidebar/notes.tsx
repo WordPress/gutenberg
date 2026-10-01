@@ -1,5 +1,5 @@
 import type { CSSProperties, KeyboardEvent, MutableRefObject } from 'react';
-import { Fragment, useEffect, useMemo, useRef } from '@wordpress/element';
+import { Fragment, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Stack, Text } from '@wordpress/ui';
@@ -8,14 +8,9 @@ import { Stack, Text } from '@wordpress/ui';
 import { store as blockEditorStore, privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
 import { NoteThread } from './note-thread';
-import {
-	focusNoteThread,
-	getNoteIdsFromMetadata,
-	pickPrimaryNote,
-	selectNoteBlocks,
-} from './utils';
+import { focusNoteThread, selectNoteBlocks } from './utils';
 import type { Thread } from './utils';
-import { useFloatingBoard, useNoteActions } from './hooks';
+import { useFloatingBoard, useNoteActions, useNoteSelection } from './hooks';
 import { AddNote } from './add-note';
 import { store as editorStore } from '../../store';
 
@@ -47,10 +42,9 @@ export function Notes( {
 	const { getBlockRootClientId, getBlockOrder } =
 		useSelect( blockEditorStore );
 
-	const { noteId, selectedBlockClientId, orderedBlockIds } = useSelect(
+	const { selectedBlockClientId, orderedBlockIds } = useSelect(
 		( select ) => {
 			const {
-				getBlockAttributes,
 				getSelectedBlockClientId,
 				getMultiSelectedBlockClientIds,
 				getClientIdsWithDescendants,
@@ -66,24 +60,18 @@ export function Notes( {
 				getMultiSelectedBlockClientIds()[ 0 ] ??
 				null;
 			return {
-				noteId: clientId
-					? getBlockAttributes( clientId )?.metadata?.noteId
-					: null,
 				selectedBlockClientId: clientId,
 				orderedBlockIds: getClientIdsWithDescendants(),
 			};
 		},
 		[]
 	);
-	const { selectedNote, noteFocused } = useSelect( ( select ) => {
-		const { getSelectedNote, isNoteFocused } = unlock(
-			select( editorStore )
-		);
-		return {
-			selectedNote: getSelectedNote(),
-			noteFocused: isNoteFocused(),
-		};
-	}, [] );
+	const selectedNote = useSelect(
+		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
+		[]
+	);
+
+	useNoteSelection( { notes, sidebarRef } );
 
 	const relatedBlockElement = useBlockElement( selectedBlockClientId );
 
@@ -159,42 +147,6 @@ export function Notes( {
 			relatedBlockElement?.focus();
 		}
 	};
-
-	// Pick the most relevant thread for the selected block. Derived outside
-	// the effect so the effect body stays minimal.
-	const targetNoteId = useMemo( () => {
-		const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
-		const blockThreads = notes.filter( ( t ) =>
-			blockNoteIds.includes( t.id as number )
-		);
-		return pickPrimaryNote( blockThreads )?.id;
-	}, [ noteId, notes ] );
-
-	// Sync the selected note to the new block's primary thread when the
-	// block context changes. The ref tracks the previous block id so the
-	// effect only fires on block transitions, leaving in-block note changes
-	// (Escape, Cancel, "new" form) alone.
-	const prevBlockIdRef = useRef( selectedBlockClientId );
-	useEffect( () => {
-		if ( prevBlockIdRef.current === selectedBlockClientId ) {
-			return;
-		}
-		prevBlockIdRef.current = selectedBlockClientId;
-		selectNote( targetNoteId );
-	}, [ selectedBlockClientId, targetNoteId, selectNote ] );
-
-	// Focus the selected note when requested.
-	useEffect( () => {
-		if ( noteFocused && selectedNote ) {
-			focusNoteThread(
-				selectedNote,
-				sidebarRef.current,
-				selectedNote === 'new' ? '[role="textbox"]' : undefined
-			);
-			// Clear focus flag to avoid re-triggering.
-			selectNote( selectedNote );
-		}
-	}, [ noteFocused, selectedNote, selectNote, sidebarRef ] );
 
 	const { notePositions, registerThread, unregisterThread } =
 		useFloatingBoard( {
@@ -284,7 +236,7 @@ export function Notes( {
 		: threads.findIndex(
 				( thread ) =>
 					thread.status === 'approved' && !! thread.blockClientId
-		  );
+			);
 
 	return (
 		<Stack
@@ -343,7 +295,7 @@ export function Notes( {
 												y: notePositions[ thread.id ],
 												registerThread,
 												unregisterThread,
-										  }
+											}
 										: undefined
 								}
 								onKeyDown={ ( event ) =>

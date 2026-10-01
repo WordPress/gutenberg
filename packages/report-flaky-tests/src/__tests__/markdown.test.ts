@@ -4,9 +4,8 @@ import type { ReportedFlakyTest } from '../types';
 
 describe( 'formatTestErrorMessage', () => {
 	it( 'should format test error message for jest-circus', async () => {
-		const { default: flakyTest } = await import(
-			'../__fixtures__/Should insert new template part on creation.json'
-		);
+		const { default: flakyTest } =
+			await import( '../__fixtures__/Should insert new template part on creation.json' );
 
 		const formatted = formatTestErrorMessage( flakyTest as any );
 
@@ -14,9 +13,8 @@ describe( 'formatTestErrorMessage', () => {
 	} );
 
 	it( 'should format test error message for @playwright/test', async () => {
-		const { default: flakyTest } = await import(
-			'../__fixtures__/should copy only partial selection of text blocks.json'
-		);
+		const { default: flakyTest } =
+			await import( '../__fixtures__/should copy only partial selection of text blocks.json' );
 
 		const formatted = formatTestErrorMessage( flakyTest as any );
 

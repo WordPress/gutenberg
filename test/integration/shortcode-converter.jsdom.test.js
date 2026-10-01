@@ -1,3 +1,4 @@
+import { beforeAll, describe, expect, it } from 'vitest';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { createBlock, registerBlockType } from '@wordpress/blocks';
 import segmentHTMLToShortcodeBlock from '../../packages/blocks/src/api/raw-handling/shortcode-converter';

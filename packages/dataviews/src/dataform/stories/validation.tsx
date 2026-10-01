@@ -23,7 +23,7 @@ function getCustomValidity< Item >(
 			? {
 					type: validity.required.type,
 					message: validity.required.message,
-			  }
+				}
 			: undefined;
 	} else if ( isValid?.elements && validity?.elements ) {
 		customValidity = validity.elements;
@@ -555,7 +555,7 @@ const ValidationComponent = ( {
 						: [
 								{ value: 'option1', label: 'Option 1' },
 								{ value: 'option2', label: 'Option 2' },
-						  ],
+							],
 				getElements:
 					elements === 'async' ? getElements( 'select' ) : undefined,
 				isValid: {
@@ -575,7 +575,7 @@ const ValidationComponent = ( {
 						: [
 								{ value: 'item1', label: 'Item 1' },
 								{ value: 'item2', label: 'Item 2' },
-						  ],
+							],
 				getElements:
 					elements === 'async'
 						? getElements( 'textWithRadio' )
@@ -745,7 +745,7 @@ const ValidationComponent = ( {
 								{ value: 'de', label: 'Germany' },
 								{ value: 'jp', label: 'Japan' },
 								{ value: 'au', label: 'Australia' },
-						  ],
+							],
 				getElements:
 					elements === 'async'
 						? getElements( 'countries' )
@@ -806,7 +806,7 @@ const ValidationComponent = ( {
 								{ value: 'option1', label: 'Option 1' },
 								{ value: 'option2', label: 'Option 2' },
 								{ value: 'option3', label: 'Option 3' },
-						  ],
+							],
 				getElements:
 					elements === 'async'
 						? getElements( 'toggleGroup' )
@@ -848,7 +848,7 @@ const ValidationComponent = ( {
 								{ value: 'strawberry', label: 'Strawberry' },
 								{ value: 'tangerine', label: 'Tangerine' },
 								{ value: 'watermelon', label: 'Watermelon' },
-						  ],
+							],
 				getElements:
 					elements === 'async'
 						? getElements( 'combobox' )

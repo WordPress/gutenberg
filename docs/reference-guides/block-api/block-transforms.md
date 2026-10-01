@@ -116,7 +116,7 @@ To switch between variations of a block that is *already* of the target type, de
 
 **Example: from Paragraph block to Heading block**
 
-To declare this transformation we add the following code into the heading block configuration, which uses the `createBlock` function from the [`wp-blocks` package](/packages/blocks/README.md#createBlock).
+To declare this transformation we add the following code into the heading block configuration, which uses the `createBlock` function from the [`wp-blocks` package](/packages/blocks/README.md#createblock).
 
 ```js
 transforms: {
@@ -407,7 +407,7 @@ transforms: {
 
 **Example: shortcode with wrapped content to block with InnerBlocks**
 
-Shortcodes that wrap inner content (e.g. `[example]<p>Inner.</p>[/example]`) can be transformed into a block with InnerBlocks by passing `match.shortcode.content` through [`rawHandler`](/packages/blocks/README.md#rawHandler) inside `transform`.
+Shortcodes that wrap inner content (e.g. `[example]<p>Inner.</p>[/example]`) can be transformed into a block with InnerBlocks by passing `match.shortcode.content` through [`rawHandler`](/packages/blocks/README.md#rawhandler) inside `transform`.
 
 ```js
 transforms: {

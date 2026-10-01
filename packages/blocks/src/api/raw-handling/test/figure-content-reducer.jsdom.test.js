@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import figureContentReducer from '../figure-content-reducer';
 import { deepFilterHTML } from '../utils';
 

@@ -3,44 +3,43 @@ import { __ } from '@wordpress/i18n';
 import {
 	useState,
 	useEffect,
+	useLayoutEffect,
 	useMemo,
+	useRef,
 	useSyncExternalStore,
 } from '@wordpress/element';
+import { useEvent } from '@wordpress/compose';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 // @ts-expect-error - No type declarations available for @wordpress/block-editor
 // prettier-ignore
 import { store as blockEditorStore, privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
-import { getScrollContainer } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
-// @ts-expect-error - No type declarations available for @wordpress/interface
 import { store as interfaceStore } from '@wordpress/interface';
-import { RichTextData, create, toHTMLString } from '@wordpress/rich-text';
 import type { MutableRefObject } from 'react';
 import { store as editorStore } from '../../store';
 import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
 import { createBoardStore } from './board-store';
-import { NOTE_FORMAT_NAME } from './format';
 import {
-	applyNoteFormat,
 	calculateNotePositions,
+	clearInlineNoteMarker,
 	findNoteInBlock,
+	addNoteIdToMetadata,
+	focusNoteThread,
 	getAttributeTextLength,
 	getInlineMarkerStart,
 	getNoteIdsFromMetadata,
-	addNoteIdToMetadata,
+	getThreadsForBlock,
+	pickPrimaryNote,
+	readInlineSelection,
 	readMultiBlockSelection,
 	removeNoteFormat,
 	removeNoteIdFromMetadata,
+	wrapInlineNote,
 } from './utils';
-import type {
-	BlockAttributes,
-	NoteSegment,
-	NoteSelectionPoint,
-	Thread,
-} from './utils';
+import type { BlockAttributes, NoteSegment, Thread } from './utils';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
@@ -115,7 +114,7 @@ export function useNoteThreads( postId: number | undefined ) {
 				// notes get a one-entry array.
 				blockClientIds:
 					item.parent === 0
-						? clientIdsByNoteId.get( item.id ) ?? []
+						? ( clientIdsByNoteId.get( item.id ) ?? [] )
 						: [],
 			};
 			threadsById.set( item.id, thread );
@@ -206,133 +205,6 @@ export function useNoteThreads( postId: number | undefined ) {
 	};
 }
 
-/**
- * Read an inline selection from block-editor selection state, returning
- * normalized anchor data when a non-collapsed selection sits inside a single
- * rich-text attribute. Returns null for block-level or collapsed selections.
- *
- * @param getSelectionStart Block-editor selector.
- * @param getSelectionEnd   Block-editor selector.
- * @return Normalized segment (clientId, attributeKey, start, end) or null.
- */
-function readInlineSelection(
-	getSelectionStart: () => NoteSelectionPoint | undefined,
-	getSelectionEnd: () => NoteSelectionPoint | undefined
-): NoteSegment | null {
-	const start = getSelectionStart();
-	const end = getSelectionEnd();
-	if (
-		! start?.clientId ||
-		! end?.clientId ||
-		start.clientId !== end.clientId ||
-		! start.attributeKey ||
-		start.offset === undefined ||
-		end.offset === undefined ||
-		start.offset === end.offset
-	) {
-		return null;
-	}
-	// Normalize direction so callers don't have to think about reversed ranges.
-	const [ startOffset, endOffset ] =
-		start.offset < end.offset
-			? [ start.offset, end.offset ]
-			: [ end.offset, start.offset ];
-	return {
-		clientId: start.clientId,
-		attributeKey: start.attributeKey,
-		start: startOffset,
-		end: endOffset,
-	};
-}
-
-/**
- * The block-editor `updateBlockAttributes` action. Passing a list of client ids
- * with `uniqueByBlock` writes several blocks in one dispatch - and so in one
- * undo step - with `attributes` keyed by client id.
- */
-type UpdateBlockAttributes = (
-	clientIds: string | string[],
-	attributes: BlockAttributes | Record< string, BlockAttributes >,
-	options?: { uniqueByBlock?: boolean }
-) => void;
-
-/**
- * Wrap a rich-text range with a core/note marker. Returns a new
- * RichTextData ready to write back into block attributes, or null when the
- * incoming value isn't a rich-text instance (legacy/string attributes).
- *
- * @param value Existing block attribute value.
- * @param id    New note id to embed as `data-id`.
- * @param start Range start offset.
- * @param end   Range end offset.
- * @return Wrapped value or null when the attribute isn't rich text.
- */
-function wrapInlineNote(
-	value: unknown,
-	id: number,
-	start: number,
-	end: number
-): RichTextData | null {
-	if ( ! ( value instanceof RichTextData ) ) {
-		return null;
-	}
-	const record = applyNoteFormat(
-		create( { html: value.toHTMLString() } ),
-		{ type: NOTE_FORMAT_NAME, attributes: { 'data-id': String( id ) } },
-		start,
-		end
-	);
-	// Round-trip through HTML to normalise format references (applyNoteFormat
-	// leaves them un-normalised) so the stored value matches a fresh reload.
-	return RichTextData.fromHTMLString( toHTMLString( { value: record } ) );
-}
-
-/**
- * Strip a note's inline `core/note` marker from every block that holds it, so a
- * deleted or resolved note's highlight does not linger in the content. A
- * multi-block note carries a marker in each block it spans, so this scans them
- * all. No-op for block-level notes (those carry no marker). Used by the resolve
- * path, which only knows the note id; the delete path strips markers inline.
- *
- * @param noteId                      Note id whose markers to remove.
- * @param getClientIdsWithDescendants Block-editor selector.
- * @param getBlockAttributes          Block-editor selector.
- * @param updateBlockAttributes       Block-editor action.
- */
-function clearInlineNoteMarker(
-	noteId: number,
-	getClientIdsWithDescendants: () => string[],
-	getBlockAttributes: (
-		clientId: string
-	) => BlockAttributes | null | undefined,
-	updateBlockAttributes: UpdateBlockAttributes
-) {
-	const attributesByClientId: Record< string, BlockAttributes > = {};
-	for ( const clientId of getClientIdsWithDescendants() ) {
-		const attributes = getBlockAttributes( clientId );
-		const found = findNoteInBlock( attributes, noteId );
-		if ( ! found ) {
-			continue;
-		}
-		const next = removeNoteFormat(
-			attributes?.[ found.attributeKey ],
-			noteId
-		);
-		if ( next ) {
-			attributesByClientId[ clientId ] = {
-				[ found.attributeKey ]: next,
-			};
-		}
-	}
-	// One dispatch, so clearing a multi-block note's markers is one undo step.
-	const clientIds = Object.keys( attributesByClientId );
-	if ( clientIds.length > 0 ) {
-		updateBlockAttributes( clientIds, attributesByClientId, {
-			uniqueByBlock: true,
-		} );
-	}
-}
-
 export function useNoteActions() {
 	const registry = useRegistry();
 	const { createNotice } = useDispatch( noticesStore );
@@ -405,10 +277,10 @@ export function useNoteActions() {
 			const captured = ! parent
 				? unlock(
 						registry.select( editorStore )
-				  ).getPendingNoteSegments()
+					).getPendingNoteSegments()
 				: null;
 			const segments: NoteSegment[] = ! parent
-				? captured ?? readNoteSegments()
+				? ( captured ?? readNoteSegments() )
 				: [];
 
 			const savedRecord = await saveEntityRecord(
@@ -472,7 +344,7 @@ export function useNoteActions() {
 										savedRecord.id,
 										safeStart,
 										safeEnd
-								  )
+									)
 								: null;
 						if ( wrapped ) {
 							newAttributes[ attributeKey ] = wrapped;
@@ -710,6 +582,7 @@ export function useEnableFloatingSidebar( enabled = false ) {
 		const { disableComplementaryArea, enableComplementaryArea } =
 			registry.dispatch( interfaceStore );
 
+		// Hiding the complementary area only changes the preferences store.
 		const unsubscribe = registry.subscribe( () => {
 			// Return `null` to indicate the user hid the complementary area.
 			if ( getActiveComplementaryArea( 'core' ) === null ) {
@@ -728,6 +601,114 @@ export function useEnableFloatingSidebar( enabled = false ) {
 	}, [ enabled, registry ] );
 }
 
+type BoardSnapshot = {
+	heights: Record< string, number >;
+	anchorRects: Record< string, { top: number } >;
+	canvas: HTMLElement | null;
+	frameOffset: number;
+};
+
+type BoardStore = {
+	subscribe: ( listener: () => void ) => () => void;
+	getSnapshot: () => BoardSnapshot;
+	requestMeasure: () => void;
+	registerThread: (
+		id: number | string,
+		blockEl: HTMLElement | null,
+		floatingEl: HTMLElement | null
+	) => void;
+	unregisterThread: ( id: number | string ) => void;
+};
+
+/**
+ * Keeps the selected note in step with the selected block, and focuses the
+ * selected note's thread when the selection asks for it.
+ *
+ * @param {Object} props
+ * @param {Array}  props.notes      Threads shown in the sidebar.
+ * @param {Object} props.sidebarRef Ref to the sidebar element.
+ */
+export function useNoteSelection( {
+	notes,
+	sidebarRef,
+}: {
+	notes: Thread[];
+	sidebarRef: MutableRefObject< HTMLElement | null >;
+} ) {
+	const registry = useRegistry();
+	const { selectNote } = unlock( useDispatch( editorStore ) );
+	// Selecting a note that spans several blocks multi-selects them, and
+	// `getSelectedBlockClientId` is null for a multi-selection. Fall back to
+	// the first block of the range so the note stays selected.
+	const selectedBlockClientId: string | null = useSelect( ( select ) => {
+		const { getSelectedBlockClientId, getMultiSelectedBlockClientIds } =
+			select( blockEditorStore );
+		return (
+			getSelectedBlockClientId() ??
+			getMultiSelectedBlockClientIds()[ 0 ] ??
+			null
+		);
+	}, [] );
+	const { selectedNote, noteFocused } = useSelect( ( select ) => {
+		const { getSelectedNote, isNoteFocused } = unlock(
+			select( editorStore )
+		);
+		return {
+			selectedNote: getSelectedNote(),
+			noteFocused: isNoteFocused(),
+		};
+	}, [] );
+
+	// Select the block's primary note, or clear the selection if it has none.
+	const syncWithBlock = useEvent( ( clientId: string | null ) => {
+		const { getSelectedNote, isNoteFocused } = unlock(
+			registry.select( editorStore )
+		);
+		// A pending focus request is an explicit pick; leave it alone.
+		if ( isNoteFocused() ) {
+			return;
+		}
+		// Orphaned threads have no block either; don't match them.
+		// A multi-block note belongs to every block it spans.
+		const blockThreads = clientId
+			? getThreadsForBlock( notes, clientId )
+			: [];
+		// Selecting a thread also selects its block; keep the picked thread.
+		const currentNoteId = getSelectedNote();
+		if ( blockThreads.some( ( thread ) => thread.id === currentNoteId ) ) {
+			return;
+		}
+		selectNote( pickPrimaryNote( blockThreads )?.id );
+	} );
+
+	// Sync only on block transitions, so in-block changes (Escape, Cancel,
+	// the new note form) are left alone.
+	const prevBlockIdRef = useRef( selectedBlockClientId );
+	useEffect( () => {
+		if ( prevBlockIdRef.current === selectedBlockClientId ) {
+			return;
+		}
+		prevBlockIdRef.current = selectedBlockClientId;
+		syncWithBlock( selectedBlockClientId );
+	}, [ selectedBlockClientId, syncWithBlock ] );
+
+	// Must run after the sync above, which reads the focus flag this clears.
+	useEffect( () => {
+		if ( ! noteFocused || ! selectedNote ) {
+			return;
+		}
+		focusNoteThread(
+			selectedNote,
+			sidebarRef.current,
+			selectedNote === 'new' ? '[role="textbox"]' : undefined
+		);
+		// Re-select without the flag so the focus happens once.
+		selectNote( selectedNote );
+	}, [ noteFocused, selectedNote, selectNote, sidebarRef ] );
+}
+
+const subscribeNoop = () => () => {};
+
 export function useFloatingBoard( {
 	threads,
 	selectedNoteId,
@@ -739,78 +720,73 @@ export function useFloatingBoard( {
 	isFloating?: boolean;
 	sidebarRef?: MutableRefObject< HTMLElement | null >;
 } ) {
-	const [ notePositions, setNotePositions ] = useState<
-		Record< string, number >
-	>( {} );
-	const [ store ] = useState( createBoardStore );
+	// `board-store.js` is plain JavaScript with an `Object` return type.
+	const [ store ] = useState( createBoardStore as () => BoardStore );
 
-	// The board store's snapshot is a heights map keyed by thread id; its JS
-	// inference only sees an empty object literal.
-	const heights = useSyncExternalStore(
-		store.subscribe,
+	// Only floating mode needs measurements; without a subscriber the store
+	// drops its observer.
+	const { heights, anchorRects, canvas, frameOffset } = useSyncExternalStore(
+		isFloating ? store.subscribe : subscribeNoop,
 		store.getSnapshot
-	) as Record< string, number >;
+	);
+
+	// Moving blocks shifts anchors without resizing anything or re-registering.
+	useLayoutEffect( () => {
+		store.requestMeasure();
+	}, [ store, threads ] );
+
+	// Derived during render, so a resize reaches the screen in the same paint.
+	const notePositions = useMemo(
+		() =>
+			calculateNotePositions( {
+				threads,
+				selectedNoteId,
+				blockRects: anchorRects,
+				heights,
+			} ).positions,
+		[ threads, selectedNoteId, anchorRects, heights ]
+	);
 
 	// Notes are positioned in canvas content-space; CSS inherits
-	// `--canvas-scroll` to translate each thread in sync with the canvas.
-	useEffect( () => {
-		if ( ! isFloating || ! sidebarRef?.current ) {
+	// `--canvas-scroll` to translate each thread in sync with the canvas,
+	// so scrolling never re-renders. A layout effect, so the offset is in
+	// place before the first positions paint.
+	useLayoutEffect( () => {
+		const panel = sidebarRef?.current;
+		if ( ! isFloating || ! panel || ! canvas ) {
 			return;
 		}
-
-		const panel = sidebarRef.current;
-		const blockEl = store.getFirstBlockElement();
-		// Climb to the block-list root so nested scroll containers
-		// (e.g. a Group with overflow:auto) don't shadow the canvas.
-		const rootEl = blockEl?.closest( '.is-root-container' ) ?? blockEl;
-		const canvas = rootEl ? getScrollContainer( rootEl ) : null;
 
 		const applyScroll = () => {
 			panel.style.setProperty(
 				'--canvas-scroll',
-				`${ -( canvas?.scrollTop ?? 0 ) }px`
+				`${ -canvas.scrollTop }px`
 			);
 		};
-
-		// Recalc is deferred to a rAF; back-to-back updates collapse into one paint.
-		let rafId = 0;
-		const schedule = () => {
-			window.cancelAnimationFrame( rafId );
-			rafId = window.requestAnimationFrame( () => {
-				const result = calculateNotePositions( {
-					threads,
-					selectedNoteId,
-					blockRects: store.getAnchorRects(),
-					heights,
-					scrollTop: canvas?.scrollTop ?? 0,
-				} );
-
-				setNotePositions( result.positions );
-				applyScroll();
-			} );
-		};
-
-		schedule();
-
-		// Anchors are read from the DOM, so editing, adding or removing any
-		// block leaves the threads after it stale.
-		const contentObserver = new window.ResizeObserver( schedule );
-		if ( rootEl ) {
-			contentObserver.observe( rootEl );
-		}
+		applyScroll();
 
 		// Root scrolling elements (documentElement/body) don't fire scroll
 		// on themselves; capture on the window catches them in either canvas.
-		const view = canvas?.ownerDocument?.defaultView;
+		const view = canvas.ownerDocument.defaultView;
 		const listenerOptions = { passive: true, capture: true };
 		view?.addEventListener( 'scroll', applyScroll, listenerOptions );
-
 		return () => {
-			window.cancelAnimationFrame( rafId );
-			contentObserver.disconnect();
 			view?.removeEventListener( 'scroll', applyScroll, listenerOptions );
+			panel.style.removeProperty( '--canvas-scroll' );
 		};
-	}, [ sidebarRef, heights, isFloating, selectedNoteId, store, threads ] );
+	}, [ sidebarRef, isFloating, canvas ] );
+
+	// Shifts the threads by the canvas frame's offset from the panel.
+	useLayoutEffect( () => {
+		const panel = sidebarRef?.current;
+		if ( ! isFloating || ! panel ) {
+			return;
+		}
+		panel.style.setProperty( '--canvas-offset', `${ frameOffset }px` );
+		return () => {
+			panel.style.removeProperty( '--canvas-offset' );
+		};
+	}, [ sidebarRef, isFloating, frameOffset ] );
 
 	return {
 		notePositions,

@@ -2,6 +2,7 @@ import { _x } from '@wordpress/i18n';
 import { create, RichTextData, toHTMLString } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
 import { getRectangleFromRange } from '@wordpress/dom';
+import { NOTE_FORMAT_NAME } from './constants';
 
 /**
  * Block attributes, keyed by attribute name.
@@ -207,8 +208,6 @@ export function addNoteIdToMetadata(
 	return { ...metadata, noteId: [ ...ids ] };
 }
 
-const NOTE_FORMAT_TYPE = 'core/note';
-
 /**
  * Search a rich-text value for a `core/note` marker matching `noteId` and
  * return its character range. Used to derive an inline note's anchor from
@@ -244,7 +243,7 @@ export function findNoteRange(
 		const stack = formats[ i ] as NoteMarkerFormat[] | undefined;
 		const hit = stack?.find(
 			( f ) =>
-				f.type === NOTE_FORMAT_TYPE &&
+				f.type === NOTE_FORMAT_NAME &&
 				f.attributes &&
 				f.attributes[ 'data-id' ] === target
 		);
@@ -353,6 +352,43 @@ export function getSelectionRect( blockEl: HTMLElement ): DOMRect | null {
 		return null;
 	}
 	return rect;
+}
+
+/**
+ * Measure where a note's floating thread should line up in the canvas.
+ *
+ * An inline note anchors to its in-content marker, so the thread aligns with
+ * the noted text rather than the block. A marker split into several runs
+ * (crossing overlaps) resolves to its first run. The pending new note has no
+ * marker yet, so it anchors to the text selection it will attach to. Anything
+ * else falls back to the block itself. An anchor inside collapsed content
+ * (e.g. a closed Details) falls back to the closest visible block.
+ *
+ * Resolved at read time, because rich-text re-renders replace the marker.
+ *
+ * @param noteId  Note id.
+ * @param blockEl Block element the note belongs to.
+ * @return Anchor rect, in viewport coordinates.
+ */
+export function getNoteAnchorRect(
+	noteId: number | string,
+	blockEl: HTMLElement
+): DOMRect {
+	if ( noteId === 'new' ) {
+		return getSelectionRect( blockEl ) ?? blockEl.getBoundingClientRect();
+	}
+	let anchor =
+		blockEl.querySelector( getNoteMarkerSelector( noteId ) ) ?? blockEl;
+	// Collapsed content still reports the box it would have when expanded,
+	// so its size can't tell it apart. Safari < 17.4 lacks `checkVisibility`.
+	while ( anchor.checkVisibility?.() === false ) {
+		const parentBlock = anchor.parentElement?.closest( '[data-block]' );
+		if ( ! parentBlock ) {
+			break;
+		}
+		anchor = parentBlock;
+	}
+	return anchor.getBoundingClientRect();
 }
 
 // Sentinel that sorts a block-level (whole-block) note before any inline note
@@ -575,7 +611,7 @@ export function applyNoteFormat(
 			continue;
 		}
 		for ( const fmt of stack ) {
-			if ( fmt.type !== NOTE_FORMAT_TYPE ) {
+			if ( fmt.type !== NOTE_FORMAT_NAME ) {
 				continue;
 			}
 			const id = fmt.attributes?.[ 'data-id' ];
@@ -600,7 +636,7 @@ export function applyNoteFormat(
 		if ( ! stack || stack.length < 2 ) {
 			continue;
 		}
-		const notes = stack.filter( ( fmt ) => fmt.type === NOTE_FORMAT_TYPE );
+		const notes = stack.filter( ( fmt ) => fmt.type === NOTE_FORMAT_NAME );
 		if ( notes.length === 0 ) {
 			continue;
 		}
@@ -611,11 +647,92 @@ export function applyNoteFormat(
 					sizeOf( a.attributes?.[ 'data-id' ] )
 			);
 		}
-		const others = stack.filter( ( fmt ) => fmt.type !== NOTE_FORMAT_TYPE );
+		const others = stack.filter( ( fmt ) => fmt.type !== NOTE_FORMAT_NAME );
 		formats[ i ] = [ ...notes, ...others ];
 	}
 
 	return { ...record, formats };
+}
+
+/**
+ * Read an inline selection from block-editor selection state, returning
+ * normalized anchor data when a non-collapsed selection sits inside a single
+ * rich-text attribute. Returns null for block-level or collapsed selections.
+ *
+ * @param getSelectionStart Block-editor selector.
+ * @param getSelectionEnd   Block-editor selector.
+ * @return Normalized segment (clientId, attributeKey, start, end) or null.
+ */
+export function readInlineSelection(
+	getSelectionStart: () => NoteSelectionPoint | undefined,
+	getSelectionEnd: () => NoteSelectionPoint | undefined
+): NoteSegment | null {
+	const start = getSelectionStart();
+	const end = getSelectionEnd();
+	if (
+		! start?.clientId ||
+		! end?.clientId ||
+		start.clientId !== end.clientId ||
+		! start.attributeKey ||
+		start.offset === undefined ||
+		end.offset === undefined ||
+		start.offset === end.offset
+	) {
+		return null;
+	}
+	// Normalize direction so callers don't have to think about reversed ranges.
+	const [ startOffset, endOffset ] =
+		start.offset < end.offset
+			? [ start.offset, end.offset ]
+			: [ end.offset, start.offset ];
+	return {
+		clientId: start.clientId,
+		attributeKey: start.attributeKey,
+		start: startOffset,
+		end: endOffset,
+	};
+}
+
+/**
+ * The block-editor `updateBlockAttributes` action. Passing a list of client ids
+ * with `uniqueByBlock` writes several blocks in one dispatch - and so in one
+ * undo step - with `attributes` keyed by client id.
+ */
+export type UpdateBlockAttributes = (
+	clientIds: string | string[],
+	attributes: BlockAttributes | Record< string, BlockAttributes >,
+	options?: { uniqueByBlock?: boolean }
+) => void;
+
+/**
+ * Wrap a rich-text range with a core/note marker. Returns a new
+ * RichTextData ready to write back into block attributes, or null when the
+ * incoming value isn't a rich-text instance (legacy/string attributes).
+ *
+ * @param value Existing block attribute value.
+ * @param id    New note id to embed as `data-id`.
+ * @param start Range start offset.
+ * @param end   Range end offset.
+ * @return Wrapped value or null when the attribute isn't rich text.
+ */
+export function wrapInlineNote(
+	value: unknown,
+	id: number,
+	start: number,
+	end: number
+): RichTextData | null {
+	if ( ! ( value instanceof RichTextData ) ) {
+		return null;
+	}
+	const record = applyNoteFormat(
+		create( { html: value.toHTMLString() } ),
+		{ type: NOTE_FORMAT_NAME, attributes: { 'data-id': String( id ) } },
+		start,
+		end
+	);
+	// Round-trip through HTML to normalise format references (applyNoteFormat
+	// leaves them un-normalised) so the stored value matches a fresh reload.
+	return RichTextData.fromHTMLString( toHTMLString( { value: record } ) );
 }
 
 /**
@@ -652,7 +769,7 @@ export function removeNoteFormat(
 			const filtered = stack.filter(
 				( format ) =>
 					! (
-						format.type === NOTE_FORMAT_TYPE &&
+						format.type === NOTE_FORMAT_NAME &&
 						format.attributes?.[ 'data-id' ] === target
 					)
 			);
@@ -667,8 +784,54 @@ export function removeNoteFormat(
 	return changed
 		? RichTextData.fromHTMLString(
 				toHTMLString( { value: { ...record, formats } } )
-		  )
+			)
 		: null;
+}
+
+/**
+ * Strip a note's inline `core/note` marker from every block that holds it, so a
+ * deleted or resolved note's highlight does not linger in the content. A
+ * multi-block note carries a marker in each block it spans, so this scans them
+ * all. No-op for block-level notes (those carry no marker). Used by the resolve
+ * path, which only knows the note id; the delete path strips markers inline.
+ *
+ * @param noteId                      Note id whose markers to remove.
+ * @param getClientIdsWithDescendants Block-editor selector.
+ * @param getBlockAttributes          Block-editor selector.
+ * @param updateBlockAttributes       Block-editor action.
+ */
+export function clearInlineNoteMarker(
+	noteId: number,
+	getClientIdsWithDescendants: () => string[],
+	getBlockAttributes: (
+		clientId: string
+	) => BlockAttributes | null | undefined,
+	updateBlockAttributes: UpdateBlockAttributes
+) {
+	const attributesByClientId: Record< string, BlockAttributes > = {};
+	for ( const clientId of getClientIdsWithDescendants() ) {
+		const attributes = getBlockAttributes( clientId );
+		const found = findNoteInBlock( attributes, noteId );
+		if ( ! found ) {
+			continue;
+		}
+		const next = removeNoteFormat(
+			attributes?.[ found.attributeKey ],
+			noteId
+		);
+		if ( next ) {
+			attributesByClientId[ clientId ] = {
+				[ found.attributeKey ]: next,
+			};
+		}
+	}
+	// One dispatch, so clearing a multi-block note's markers is one undo step.
+	const clientIds = Object.keys( attributesByClientId );
+	if ( clientIds.length > 0 ) {
+		updateBlockAttributes( clientIds, attributesByClientId, {
+			uniqueByBlock: true,
+		} );
+	}
 }
 
 /**

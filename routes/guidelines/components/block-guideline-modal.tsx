@@ -46,7 +46,7 @@ export default function BlockGuidelineModal( {
 	const isEditing = !! initialBlock;
 
 	const currentGuideline = selectedBlock
-		? bySlug[ blockSlug( selectedBlock ) ]?.content ?? ''
+		? ( bySlug[ blockSlug( selectedBlock ) ]?.content ?? '' )
 		: '';
 	const [ guidelineText, setGuidelineText ] = useState( currentGuideline );
 

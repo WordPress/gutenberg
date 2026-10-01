@@ -2,7 +2,7 @@ import { createRequire } from 'node:module';
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 const require = createRequire( import.meta.url );
 const fs = require( 'node:fs' );
-const readFile = vi
+let readFile = vi
 	.spyOn( fs.promises, 'readFile' )
 	.mockImplementation( () => undefined );
 const readRawConfigFile = require( '../read-raw-config-file' );
@@ -14,6 +14,7 @@ afterAll( () => {
 
 describe( 'readRawConfigFile', () => {
 	beforeEach( () => {
+		readFile = vi.spyOn( fs.promises, 'readFile' );
 		readFile.mockReset().mockImplementation( () => undefined );
 	} );
 
@@ -27,14 +28,8 @@ describe( 'readRawConfigFile', () => {
 	it( 'rejects when read file fails', async () => {
 		readFile.mockRejectedValue( { message: 'Test' } );
 
-		expect.assertions( 1 );
-
-		try {
-			await readRawConfigFile( '/.wp-env.json' );
-		} catch ( error ) {
-			expect( error ).toEqual(
-				new ValidationError( 'Could not read .wp-env.json: Test' )
-			);
-		}
+		await expect( readRawConfigFile( '/.wp-env.json' ) ).rejects.toEqual(
+			new ValidationError( 'Could not read .wp-env.json: Test' )
+		);
 	} );
 } );

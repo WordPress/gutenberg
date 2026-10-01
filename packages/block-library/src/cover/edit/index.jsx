@@ -9,7 +9,12 @@ import {
 	useState,
 } from '@wordpress/element';
 import { Placeholder, SandBox, Spinner } from '@wordpress/components';
-import { compose, useResizeObserver } from '@wordpress/compose';
+import {
+	compose,
+	useMergeRefs,
+	useReducedMotion,
+	useResizeObserver,
+} from '@wordpress/compose';
 import {
 	withColors,
 	ColorPalette,
@@ -147,7 +152,7 @@ function CoverEdit( {
 								{
 									context: 'view',
 								}
-						  )
+							)
 						: undefined,
 			};
 		},
@@ -208,7 +213,7 @@ function CoverEdit( {
 	const url = useFeaturedImage
 		? mediaUrl
 		: // Ensure the url is not malformed due to sanitization through `wp_kses`.
-		  originalUrl?.replaceAll( '&amp;', '&' );
+			originalUrl?.replaceAll( '&amp;', '&' );
 	const backgroundType = useFeaturedImage
 		? IMAGE_BACKGROUND_TYPE
 		: originalBackgroundType;
@@ -445,6 +450,8 @@ function CoverEdit( {
 		[ url, backgroundType ]
 	);
 
+	const prefersReducedMotion = useReducedMotion();
+
 	// Compute embed HTML for editor display via SandBox
 	const embedHtml = useMemo( () => {
 		if (
@@ -453,8 +460,10 @@ function CoverEdit( {
 		) {
 			return null;
 		}
-		return getBackgroundEmbedHtml( embedPreview.html );
-	}, [ embedPreview, backgroundType ] );
+		return getBackgroundEmbedHtml( embedPreview.html, {
+			autoplay: ! prefersReducedMotion,
+		} );
+	}, [ embedPreview, backgroundType, prefersReducedMotion ] );
 
 	// Set while the media editor has pointed the cover at a freshly
 	// generated file the browser hasn't finished loading; cleared by the
@@ -513,7 +522,11 @@ function CoverEdit( {
 	);
 
 	const ref = useRef();
-	const blockProps = useBlockProps( { ref } );
+	// State, not a ref, so that the element is there on the next render.
+	const [ dropZoneElement, setDropZoneElement ] = useState( null );
+	const blockProps = useBlockProps( {
+		ref: useMergeRefs( [ ref, setDropZoneElement ] ),
+	} );
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
@@ -522,12 +535,20 @@ function CoverEdit( {
 		{
 			allowedBlocks,
 			templateLock,
-			dropZoneElement: ref.current,
+			dropZoneElement,
 		}
 	);
 
 	const mediaElement = useRef();
 	const editMediaButtonRef = useRef();
+
+	// `autoPlay` only applies when the video loads, so pause a video that is
+	// already playing when the user turns on reduced motion.
+	useEffect( () => {
+		if ( prefersReducedMotion && isVideoBackground ) {
+			mediaElement.current?.pause();
+		}
+	}, [ prefersReducedMotion, isVideoBackground ] );
 	const currentSettings = {
 		isVideoBackground,
 		isImageBackground,
@@ -703,10 +724,13 @@ function CoverEdit( {
 			setOverlayColor={ onSetOverlayColor }
 			coverRef={ ref }
 			currentSettings={ currentSettings }
+			onSelectMedia={ onSelectMedia }
+			onUploadError={ onUploadError }
 			toggleUseFeaturedImage={ toggleUseFeaturedImage }
 			updateDimRatio={ onUpdateDimRatio }
 			onClearMedia={ onClearMedia }
 			featuredImage={ media }
+			isSelected={ isSelected }
 		/>
 	);
 
@@ -833,7 +857,7 @@ function CoverEdit( {
 					<video
 						ref={ mediaElement }
 						className="wp-block-cover__video-background"
-						autoPlay
+						autoPlay={ ! prefersReducedMotion }
 						muted
 						loop
 						src={ url }

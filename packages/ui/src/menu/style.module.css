@@ -132,8 +132,10 @@
 				[content-end] var(--wp-ui-menu-item-padding-inline)
 				[item-padding-end];
 			gap: 0;
-			/* Keep every slot anchored to the label's first line. */
+			/* Keep leading content at the top of the content row. */
 			align-items: start;
+			/* Center a single line without shifting wrapped content. */
+			align-content: center;
 			justify-content: stretch;
 			min-width: 0;
 			min-height: var(--wp-ui-menu-item-height);
@@ -162,8 +164,13 @@
 				color: var(--wpds-color-foreground-interactive-neutral);
 				outline: none;
 
+				/*
+				 * Set the outline through the global CSS defense bridge, since
+				 * wp-admin's unlayered `div { outline: 0 }` beats layered styles.
+				 */
 				@media ( forced-colors: active ) {
-					outline: var(--wpds-border-width-xs) solid Highlight;
+					--_gcd-div-outline: var(--wpds-border-width-focus) solid Highlight;
+					--_gcd-a-outline: var(--wpds-border-width-focus) solid Highlight;
 				}
 			}
 
@@ -227,13 +234,15 @@
 
 		.prefix-icon {
 			flex-shrink: 0;
-			/* Center a known-size icon on the first label line. */
+			/* Center a known-size icon on a label line at the top of the row. */
 			align-self: flex-start;
 			margin-block-start: calc((var(--_wp-ui-menu-item-label-line-height) - var(--_wp-ui-menu-prefix-icon-size)) / 2);
 		}
 
 		.item-content {
 			grid-column: content-start / content-end;
+			/* Include the height of leading content when centering these slots. */
+			align-self: stretch;
 			/* Everything after the prefix is laid out independently per item. */
 			display: grid;
 			grid-template-columns:
@@ -251,7 +260,6 @@
 
 		.item-children {
 			grid-column: label-start / label-end;
-			align-self: start;
 			display: inline-flex;
 			flex-direction: column;
 			gap: 2px; /* var(--wpds-dimension-gap-xs); */

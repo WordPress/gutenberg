@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getNewIndexFromPresets } from '../utils';
+import { getNewIndexFromPresets, getValidPseudoStates } from '../utils';
 
 const validPresets = {
 	single: [ { slug: 'preset-1' } ],
@@ -53,5 +53,15 @@ describe( 'getNewIndexFromPresets', () => {
 				expect( newIndex ).toBe( 1 );
 			} );
 		} );
+	} );
+} );
+
+describe( 'getValidPseudoStates', () => {
+	it( 'offers hover, focus, focus-visible and active for the Navigation Link block', () => {
+		expect(
+			getValidPseudoStates( 'core/navigation-link' ).map(
+				( state ) => state.value
+			)
+		).toEqual( [ ':hover', ':focus', ':focus-visible', ':active' ] );
 	} );
 } );

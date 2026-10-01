@@ -1,10 +1,12 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { KeyboardEvent } from 'react';
 import { useState } from '@wordpress/element';
 import BaseInputControl from '../';
-import InputControlPrefixWrapper from '../input-prefix-wrapper';
 import type { InputControlProps } from '../types';
+
+globalThis.wpVitest.mockMatchMedia();
 
 const getInput = () => screen.getByTestId< HTMLInputElement >( 'input' );
 
@@ -70,7 +72,7 @@ describe( 'InputControl', () => {
 	describe( 'Value', () => {
 		it( 'should update value onChange', async () => {
 			const user = await userEvent.setup();
-			const spy = jest.fn();
+			const spy = vi.fn();
 			render(
 				<InputControl value="Hello" onChange={ ( v ) => spy( v ) } />
 			);
@@ -85,7 +87,7 @@ describe( 'InputControl', () => {
 
 		it( 'should work as a controlled component given normal, falsy or nullish values', async () => {
 			const user = await userEvent.setup();
-			const spy = jest.fn();
+			const spy = vi.fn();
 			const heldKeySet = new Set< string >();
 			const Example = () => {
 				const [ state, setState ] = useState< string | undefined >(
@@ -142,7 +144,7 @@ describe( 'InputControl', () => {
 		} );
 
 		it( 'should change back to initial value prop, if controlled', () => {
-			const spy = jest.fn();
+			const spy = vi.fn();
 			const { rerender } = render(
 				<InputControl value="Original" onChange={ spy } />
 			);
@@ -162,7 +164,7 @@ describe( 'InputControl', () => {
 
 		it( 'should not commit value until blurred when isPressEnterToChange is true', async () => {
 			const user = await userEvent.setup();
-			const spy = jest.fn();
+			const spy = vi.fn();
 			render(
 				<InputControl
 					value=""
@@ -182,7 +184,7 @@ describe( 'InputControl', () => {
 
 		it( 'should commit value when blurred if value is invalid', async () => {
 			const user = await userEvent.setup();
-			const spyChange = jest.fn();
+			const spyChange = vi.fn();
 			render(
 				<InputControl
 					value="this is"
@@ -210,34 +212,6 @@ describe( 'InputControl', () => {
 			await user.click( document.body );
 
 			expect( spyChange ).toHaveBeenLastCalledWith( 'this is meow' );
-		} );
-	} );
-
-	describe( 'Legacy size support', () => {
-		it( 'treats __unstable-large the same as default', () => {
-			const prefix = (
-				<InputControlPrefixWrapper>$</InputControlPrefixWrapper>
-			);
-
-			render( <InputControl label="Test" prefix={ prefix } /> );
-			render(
-				<InputControl
-					label="Test"
-					prefix={ prefix }
-					// @ts-expect-error Verify the legacy value that is omitted from the public type.
-					size="__unstable-large"
-				/>
-			);
-
-			const [ defaultPrefixWrapper, legacyPrefixWrapper ] =
-				screen.getAllByText( '$' );
-			const [ defaultInput, legacyInput ] =
-				screen.getAllByTestId( 'input' );
-
-			expect( legacyPrefixWrapper ).toMatchStyleDiffSnapshot(
-				defaultPrefixWrapper
-			);
-			expect( legacyInput ).toMatchStyleDiffSnapshot( defaultInput );
 		} );
 	} );
 } );

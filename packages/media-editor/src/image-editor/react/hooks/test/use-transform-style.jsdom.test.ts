@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useTransformStyle } from '../use-transform-style';
 import type { CropperState, Size } from '../../../core/types';

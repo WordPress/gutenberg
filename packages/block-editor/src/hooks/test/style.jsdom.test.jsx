@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import _style, {
 	getCanvasStateStyleValue,
@@ -15,6 +16,22 @@ describe( 'getInlineStyles', () => {
 
 	it( 'should ignore unknown styles', () => {
 		expect( getInlineStyles( { color: 'red' } ) ).toEqual( {} );
+	} );
+
+	it( 'camelCases vendor-prefixed properties for React', () => {
+		expect(
+			getInlineStyles( {
+				background: {
+					gradient: 'linear-gradient(red, blue)',
+					backgroundClip: 'text',
+				},
+			} )
+		).toEqual( {
+			backgroundImage: 'linear-gradient(red, blue)',
+			backgroundClip: 'text',
+			WebkitBackgroundClip: 'text',
+			WebkitTextFillColor: 'transparent',
+		} );
 	} );
 
 	it( 'should return the correct inline styles', () => {
@@ -577,7 +594,14 @@ describe( 'addSaveProps', () => {
 	};
 
 	const applySkipSerialization = ( features ) => {
-		const updatedSettings = { ...blockSettings };
+		const updatedSettings = {
+			...blockSettings,
+			supports: {
+				spacing: { ...blockSettings.supports.spacing },
+				color: { ...blockSettings.supports.color },
+				typography: { ...blockSettings.supports.typography },
+			},
+		};
 		Object.keys( features ).forEach( ( key ) => {
 			updatedSettings.supports[ key ].__experimentalSkipSerialization =
 				features[ key ];

@@ -12,7 +12,11 @@ import {
 } from '../components/block-edit/context';
 import { useSettings } from '../components';
 import { useSettingsForBlockElement } from '../components/global-styles/hooks';
-import { getValueFromObjectPath, setImmutably } from '../utils/object';
+import {
+	getValueFromObjectPath,
+	isPlainObject,
+	setImmutably,
+} from '../utils/object';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 
@@ -23,11 +27,7 @@ import { unlock } from '../lock-unlock';
  * @return {*} Object cleaned from falsy values
  */
 export const cleanEmptyObject = ( object ) => {
-	if (
-		object === null ||
-		typeof object !== 'object' ||
-		Array.isArray( object )
-	) {
+	if ( ! isPlainObject( object ) ) {
 		return object;
 	}
 
@@ -228,6 +228,7 @@ export function useBlockSettings( name, parentLayout ) {
 		backgroundImage,
 		backgroundSize,
 		gradient,
+		backgroundClip,
 		customFontFamilies,
 		defaultFontFamilies,
 		themeFontFamilies,
@@ -243,6 +244,7 @@ export function useBlockSettings( name, parentLayout ) {
 		textColumns,
 		textDecoration,
 		textIndent,
+		textShadow,
 		writingMode,
 		textTransform,
 		letterSpacing,
@@ -288,10 +290,15 @@ export function useBlockSettings( name, parentLayout ) {
 		isHeadingEnabled,
 		isButtonEnabled,
 		shadow,
+		defaultTextShadowPresetsEnabled,
+		customTextShadowPresets,
+		defaultTextShadowPresets,
+		themeTextShadowPresets,
 	] = useSettings(
 		'background.backgroundImage',
 		'background.backgroundSize',
 		'background.gradient',
+		'background.backgroundClip',
 		'typography.fontFamilies.custom',
 		'typography.fontFamilies.default',
 		'typography.fontFamilies.theme',
@@ -307,6 +314,7 @@ export function useBlockSettings( name, parentLayout ) {
 		'typography.textColumns',
 		'typography.textDecoration',
 		'typography.textIndent',
+		'typography.textShadow',
 		'typography.writingMode',
 		'typography.textTransform',
 		'typography.letterSpacing',
@@ -351,7 +359,11 @@ export function useBlockSettings( name, parentLayout ) {
 		'color.text',
 		'color.heading',
 		'color.button',
-		'shadow'
+		'shadow',
+		'typography.defaultTextShadowPresets',
+		'typography.textShadowPresets.custom',
+		'typography.textShadowPresets.default',
+		'typography.textShadowPresets.theme'
 	);
 
 	const rawSettings = useMemo( () => {
@@ -360,6 +372,7 @@ export function useBlockSettings( name, parentLayout ) {
 				backgroundImage,
 				backgroundSize,
 				gradient,
+				backgroundClip,
 			},
 			color: {
 				palette: {
@@ -409,6 +422,13 @@ export function useBlockSettings( name, parentLayout ) {
 				textColumns,
 				textDecoration,
 				textIndent,
+				textShadow,
+				textShadowPresets: {
+					custom: customTextShadowPresets,
+					default: defaultTextShadowPresets,
+					theme: themeTextShadowPresets,
+				},
+				defaultTextShadowPresets: defaultTextShadowPresetsEnabled,
 				textTransform,
 				letterSpacing,
 				writingMode,
@@ -449,6 +469,7 @@ export function useBlockSettings( name, parentLayout ) {
 		backgroundImage,
 		backgroundSize,
 		gradient,
+		backgroundClip,
 		customFontFamilies,
 		defaultFontFamilies,
 		themeFontFamilies,
@@ -464,6 +485,11 @@ export function useBlockSettings( name, parentLayout ) {
 		textColumns,
 		textDecoration,
 		textIndent,
+		textShadow,
+		customTextShadowPresets,
+		defaultTextShadowPresets,
+		themeTextShadowPresets,
+		defaultTextShadowPresetsEnabled,
 		textTransform,
 		letterSpacing,
 		writingMode,

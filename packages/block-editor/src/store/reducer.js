@@ -419,7 +419,7 @@ function withPersistentBlockChange( reducer ) {
 		const pendingHistoryMode = nextHistoryMode;
 		nextHistoryMode =
 			action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT'
-				? action.history ?? 'merge'
+				? ( action.history ?? 'merge' )
 				: undefined;
 
 		const isExplicitPersistentChange =
@@ -886,7 +886,7 @@ export const blocks = pipe(
 					const updatedAttributeEntries = Object.entries(
 						!! action.options?.uniqueByBlock
 							? action.attributes[ clientId ]
-							: action.attributes ?? {}
+							: ( action.attributes ?? {} )
 					);
 					if ( updatedAttributeEntries.length === 0 ) {
 						continue;
@@ -1725,11 +1725,11 @@ export function settings( state = SETTINGS_DEFAULTS, action ) {
 				? {
 						...SETTINGS_DEFAULTS,
 						...action.settings,
-				  }
+					}
 				: {
 						...state,
 						...action.settings,
-				  };
+					};
 
 			Object.defineProperty( updatedSettings, '__unstableIsPreviewMode', {
 				get() {
@@ -2304,7 +2304,7 @@ export function selectedBlockStyleState( state = undefined, action ) {
 			}
 			const showStateOnCanvas =
 				state?.clientId === action.clientId
-					? state.showStateOnCanvas ?? true
+					? ( state.showStateOnCanvas ?? true )
 					: true;
 			const previousValue =
 				state?.clientId === action.clientId ? state.value : {};
@@ -2628,7 +2628,7 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 					( clientId ) =>
 						state.blocks.attributes.get( clientId )?.metadata
 							?.patternName
-			  );
+				);
 	const disableContentOnlyForTemplateParts =
 		state.settings?.disableContentOnlyForTemplateParts;
 

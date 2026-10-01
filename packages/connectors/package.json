@@ -37,15 +37,19 @@
 		"@wordpress/private-apis": "file:../private-apis"
 	},
 	"devDependencies": {
-		"@types/jest": "^30.0.0",
-		"vitest": "^4.1.10"
+		"vitest": "^5.0.0"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",
-		"react": "^18 || ^19"
+		"@types/react-dom": "^18 || ^19",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
 	},
 	"peerDependenciesMeta": {
 		"@types/react": {
+			"optional": true
+		},
+		"@types/react-dom": {
 			"optional": true
 		}
 	},

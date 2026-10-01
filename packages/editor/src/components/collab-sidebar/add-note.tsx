@@ -106,9 +106,6 @@ export function AddNote( {
 			tabIndex={ 0 }
 			aria-label={ __( 'New note' ) }
 			role="treeitem"
-			style={
-				floating ? { opacity: ! floating.y ? 0 : undefined } : undefined
-			}
 			{ ...focusOutside }
 		>
 			<NoteCard>

@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import deepFreeze from 'deep-freeze';
 import {
 	getEntityRecord,
@@ -20,43 +21,30 @@ import {
 	hasUndo,
 	hasRedo,
 } from '../selectors';
-import { getSyncManager } from '../sync';
+import { getEntitySyncManager } from '../entity-sync';
 
-jest.mock( '../sync', () => ( {
-	getSyncManager: jest.fn(),
+vi.mock( import( '../entity-sync' ), () => ( {
+	getEntitySyncManager: vi.fn(),
 } ) );
 
 describe( 'hasUndo/hasRedo', () => {
 	afterEach( () => {
-		getSyncManager.mockReset();
+		getEntitySyncManager.mockReset();
 	} );
 
-	it( 'reads undo availability from core-data state when a sync undo manager is available', () => {
+	it( 'reads undo availability from the undo manager, also when an entity sync manager is registered', () => {
 		const undoManager = {
-			hasUndo: jest.fn( () => false ),
-			hasRedo: jest.fn( () => false ),
+			hasUndo: vi.fn( () => true ),
+			hasRedo: vi.fn( () => false ),
 		};
-		getSyncManager.mockReturnValue( { undoManager } );
-
-		const state = deepFreeze( {
-			syncUndoManagerState: {
-				hasRedo: true,
-				hasUndo: true,
+		getEntitySyncManager.mockReturnValue( {
+			undoHistory: {
+				undo: vi.fn(),
+				redo: vi.fn(),
+				stopCapturing: vi.fn(),
+				clearRedo: vi.fn(),
 			},
 		} );
-
-		expect( hasUndo( state ) ).toBe( true );
-		expect( hasRedo( state ) ).toBe( true );
-		expect( undoManager.hasUndo ).not.toHaveBeenCalled();
-		expect( undoManager.hasRedo ).not.toHaveBeenCalled();
-	} );
-
-	it( 'falls back to the default undo manager when no sync undo manager is available', () => {
-		const undoManager = {
-			hasUndo: jest.fn( () => true ),
-			hasRedo: jest.fn( () => false ),
-		};
-		getSyncManager.mockReturnValue( undefined );
 
 		const state = { undoManager };
 
@@ -69,8 +57,8 @@ describe( 'hasUndo/hasRedo', () => {
 
 describe( 'getEntityRecord', () => {
 	describe( 'normalizing Post ID passed as recordKey', () => {
-		it( 'normalizes any Post ID recordKey argument to a Number via `__unstableNormalizeArgs` method', async () => {
-			const normalized = getEntityRecord.__unstableNormalizeArgs( [
+		it( 'normalizes any Post ID recordKey argument to a Number via `normalizeArgs` method', async () => {
+			const normalized = getEntityRecord.normalizeArgs( [
 				'postType',
 				'some_post',
 				'123',
@@ -79,7 +67,7 @@ describe( 'getEntityRecord', () => {
 		} );
 
 		it( 'does not normalize recordKey argument unless it is a Post ID', async () => {
-			const normalized = getEntityRecord.__unstableNormalizeArgs( [
+			const normalized = getEntityRecord.normalizeArgs( [
 				'postType',
 				'some_post',
 				'i-am-a-slug-with-a-number-123',
@@ -319,6 +307,120 @@ describe( 'getEntityRecord', () => {
 				bar: undefined,
 			},
 		} );
+	} );
+
+	it( 'should return the same filtered item for equivalent queries', () => {
+		const state = deepFreeze( {
+			entities: {
+				records: {
+					postType: {
+						post: {
+							queriedData: {
+								items: {
+									default: {
+										1: {
+											id: 1,
+											title: { raw: 'chicken' },
+											author: 'bob',
+										},
+									},
+								},
+								itemIsComplete: { default: { 1: true } },
+								queries: {},
+							},
+						},
+					},
+				},
+			},
+		} );
+
+		const first = getEntityRecord( state, 'postType', 'post', 1, {
+			_fields: 'id,title.raw',
+		} );
+		const second = getEntityRecord( state, 'postType', 'post', 1, {
+			_fields: 'id,title.raw',
+		} );
+		// The array form is equivalent to the comma-separated string.
+		const third = getEntityRecord( state, 'postType', 'post', 1, {
+			_fields: [ 'id', 'title.raw' ],
+		} );
+
+		expect( second ).toBe( first );
+		expect( third ).toBe( first );
+		expect( first ).toEqual( { id: 1, title: { raw: 'chicken' } } );
+	} );
+
+	it( 'should not reuse a cached item across different field sets', () => {
+		const state = deepFreeze( {
+			entities: {
+				records: {
+					postType: {
+						post: {
+							queriedData: {
+								items: {
+									default: {
+										1: { id: 1, content: 'chicken' },
+									},
+								},
+								itemIsComplete: { default: { 1: true } },
+								queries: {},
+							},
+						},
+					},
+				},
+			},
+		} );
+
+		expect(
+			getEntityRecord( state, 'postType', 'post', 1, { _fields: 'id' } )
+		).toEqual( { id: 1 } );
+		expect(
+			getEntityRecord( state, 'postType', 'post', 1, {
+				_fields: 'content',
+			} )
+		).toEqual( { content: 'chicken' } );
+	} );
+
+	it( 'should not return a stale filtered item when the record changes', () => {
+		const stateWithContent = ( content ) =>
+			deepFreeze( {
+				entities: {
+					records: {
+						postType: {
+							post: {
+								queriedData: {
+									items: {
+										default: { 1: { id: 1, content } },
+									},
+									itemIsComplete: { default: { 1: true } },
+									queries: {},
+								},
+							},
+						},
+					},
+				},
+			} );
+
+		expect(
+			getEntityRecord(
+				stateWithContent( 'chicken' ),
+				'postType',
+				'post',
+				1,
+				{ _fields: 'content' }
+			)
+		).toEqual( { content: 'chicken' } );
+		expect(
+			getEntityRecord(
+				stateWithContent( 'ribs' ),
+				'postType',
+				'post',
+				1,
+				{
+					_fields: 'content',
+				}
+			)
+		).toEqual( { content: 'ribs' } );
 	} );
 } );
 
@@ -1255,6 +1357,46 @@ describe( 'getRevision', () => {
 			author: 'bob',
 			parent: 1,
 		} );
+	} );
+
+	it( 'should return the same filtered revision for equivalent queries', () => {
+		const state = deepFreeze( {
+			entities: {
+				records: {
+					postType: {
+						post: {
+							revisions: {
+								1: {
+									items: {
+										edit: {
+											10: {
+												id: 10,
+												title: { raw: 'chicken' },
+												parent: 1,
+											},
+										},
+									},
+									itemIsComplete: { edit: { 10: true } },
+									queries: {},
+								},
+							},
+						},
+					},
+				},
+			},
+		} );
+
+		const first = getRevision( state, 'postType', 'post', 1, 10, {
+			context: 'edit',
+			_fields: 'id,title.raw',
+		} );
+		const second = getRevision( state, 'postType', 'post', 1, 10, {
+			context: 'edit',
+			_fields: 'id,title.raw',
+		} );
+
+		expect( second ).toBe( first );
+		expect( first ).toEqual( { id: 10, title: { raw: 'chicken' } } );
 	} );
 } );
 
