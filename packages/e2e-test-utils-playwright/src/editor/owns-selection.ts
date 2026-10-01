@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Locator } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import type { Editor } from './index';
 
 /**

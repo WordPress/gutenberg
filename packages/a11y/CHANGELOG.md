@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `prefersReducedMotion`, which reports whether the user has asked their operating system to reduce motion. It is the counterpart to the `useReducedMotion` hook in `@wordpress/compose`, for code that runs outside React such as block view scripts ([#83452](https://github.com/WordPress/gutenberg/pull/83452)).
+
+## 4.56.0 (2026-09-23)
+
+## 4.55.0 (2026-09-10)
+
+## 4.54.0 (2026-08-26)
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 4.53.0 (2026-08-12)
+
+## 4.52.0 (2026-07-29)
+
 ## 4.51.0 (2026-07-14)
 
 ## 4.50.0 (2026-07-01)

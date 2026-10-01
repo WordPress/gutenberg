@@ -1,23 +1,12 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { wordpress } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Panel from '../';
 import PanelRow from '../row';
 import PanelBody from '../body';
 import InputControl from '../../input-control';
 
 const meta: Meta< typeof Panel > = {
-	title: 'Components/Containers/Panel',
+	title: 'Components/@wordpress-components/Containers/Panel',
 	id: 'components-panel',
 	component: Panel,
 	subcomponents: { PanelRow, PanelBody },

@@ -1,14 +1,7 @@
 'use strict';
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const { existsSync } = require( 'fs' );
 const chalk = require( 'chalk' );
-
-/**
- * Internal dependencies
- */
 const { loadConfig } = require( '../config' );
 const { getRuntime, detectRuntime } = require( '../runtime' );
 

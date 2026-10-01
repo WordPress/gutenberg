@@ -1,8 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { _x } from '@wordpress/i18n';
 import { create, RichTextData } from '@wordpress/rich-text';
+import { getRectangleFromRange } from '@wordpress/dom';
+import { NOTE_FORMAT_NAME } from './constants';
 
 /**
  * Sanitizes a note string by trimming leading and trailing whitespace.
@@ -133,14 +132,12 @@ export function addNoteIdToMetadata( metadata, noteId ) {
 	return { ...metadata, noteId: [ ...ids ] };
 }
 
-const NOTE_FORMAT_TYPE = 'core/note';
-
 /**
  * Search a rich-text value for a `core/note` marker matching `noteId` and
  * return its character range. Used to derive an inline note's anchor from
  * the in-content marker (resilient to edits) rather than stale offset meta.
  *
- * @param {*}             value  Block attribute value (RichTextData, string, or other).
+ * @param {unknown}       value  Block attribute value (RichTextData, string, or other).
  * @param {number|string} noteId Note id to search for.
  * @return {?{start: number, end: number}} Range or null when no marker is found.
  */
@@ -165,7 +162,7 @@ export function findNoteRange( value, noteId ) {
 		const stack = formats[ i ];
 		const hit = stack?.find(
 			( f ) =>
-				f.type === NOTE_FORMAT_TYPE &&
+				f.type === NOTE_FORMAT_NAME &&
 				f.attributes &&
 				f.attributes[ 'data-id' ] === target
 		);
@@ -205,6 +202,106 @@ export function findNoteInBlock( attributes, noteId ) {
 		}
 	}
 	return null;
+}
+
+/**
+ * Build the CSS selector matching a note's in-content `core/note` marker in
+ * the editor canvas. The format serializes as `<mark class="wp-note">` with
+ * the note id in `data-id`.
+ *
+ * @param {number|string} noteId Note id the marker carries.
+ * @return {string} Selector for the note's marker element(s).
+ */
+export function getNoteMarkerSelector( noteId ) {
+	/*
+	 * `noteId` is a server comment ID (always a positive integer), but the
+	 * value composes a selector from stored data, so escape it defensively.
+	 *
+	 * Deliberately not `CSS.escape`: that escapes for *identifier* context,
+	 * where a leading digit is illegal, so it renders the id 7 as `\37 `.
+	 * That is valid, and matches, but it makes every rule
+	 * `buildHighlightCss` generates unreadable. Inside a quoted attribute
+	 * value the only characters that need escaping are the quote, the
+	 * backslash, and raw line breaks (a parse error in a CSS string).
+	 */
+	const escapedId = String( noteId ).replace( /["\\\n\r\f]/g, ( char ) =>
+		char === '"' || char === '\\'
+			? `\\${ char }`
+			: `\\${ char.codePointAt( 0 ).toString( 16 ) } `
+	);
+	return `mark.wp-note[data-id="${ escapedId }"]`;
+}
+
+/**
+ * Measure the bounding rect of the current text selection within a block
+ * element, or return null when there is no usable selection (collapsed, or
+ * not fully inside the block). A pending new note has no in-content marker
+ * yet, so the selection it will attach to is the only anchor available for
+ * positioning its floating form.
+ *
+ * @param {HTMLElement} blockEl Block DOM element to resolve the selection in.
+ * @return {?DOMRect} Selection rect, or null.
+ */
+export function getSelectionRect( blockEl ) {
+	const selection = blockEl.ownerDocument.defaultView?.getSelection();
+	if ( ! selection || selection.rangeCount === 0 || selection.isCollapsed ) {
+		return null;
+	}
+	const range = selection.getRangeAt( 0 );
+	// `isCollapsed` can be false with a collapsed first range, and
+	// `getRectangleFromRange` measures those by inserting a temporary node.
+	if ( range.collapsed ) {
+		return null;
+	}
+	if ( ! blockEl.contains( range.commonAncestorContainer ) ) {
+		return null;
+	}
+	// `getRectangleFromRange` over `Range.getBoundingClientRect()`: it drops
+	// the hairline rects a selection picks up at a line's edge, so a
+	// selection starting at the end of one line aligns to the line that
+	// actually holds the text rather than to the line above it.
+	const rect = getRectangleFromRange( range );
+	// A range with no rendered client rects still yields an all-zero rect
+	// rather than null, which would pin the thread to the top of the canvas.
+	// Treat it as "no usable selection" so callers fall back to the block.
+	if ( ! rect || ( rect.width === 0 && rect.height === 0 ) ) {
+		return null;
+	}
+	return rect;
+}
+
+/**
+ * Measure where a note's floating thread should line up in the canvas.
+ *
+ * An inline note anchors to its in-content marker, so the thread aligns with
+ * the noted text rather than the block. A marker split into several runs
+ * (crossing overlaps) resolves to its first run. The pending new note has no
+ * marker yet, so it anchors to the text selection it will attach to. Anything
+ * else falls back to the block itself. An anchor inside collapsed content
+ * (e.g. a closed Details) falls back to the closest visible block.
+ *
+ * Resolved at read time, because rich-text re-renders replace the marker.
+ *
+ * @param {number|string} noteId  Note id.
+ * @param {HTMLElement}   blockEl Block element the note belongs to.
+ * @return {DOMRect} Anchor rect, in viewport coordinates.
+ */
+export function getNoteAnchorRect( noteId, blockEl ) {
+	if ( noteId === 'new' ) {
+		return getSelectionRect( blockEl ) ?? blockEl.getBoundingClientRect();
+	}
+	let anchor =
+		blockEl.querySelector( getNoteMarkerSelector( noteId ) ) ?? blockEl;
+	// Collapsed content still reports the box it would have when expanded,
+	// so its size can't tell it apart. Safari < 17.4 lacks `checkVisibility`.
+	while ( anchor.checkVisibility?.() === false ) {
+		const parentBlock = anchor.parentElement?.closest( '[data-block]' );
+		if ( ! parentBlock ) {
+			break;
+		}
+		anchor = parentBlock;
+	}
+	return anchor.getBoundingClientRect();
 }
 
 // Sentinel that sorts a block-level (whole-block) note before any inline note
@@ -263,7 +360,7 @@ export function applyNoteFormat( record, format, start, end ) {
 			continue;
 		}
 		for ( const fmt of stack ) {
-			if ( fmt.type !== NOTE_FORMAT_TYPE ) {
+			if ( fmt.type !== NOTE_FORMAT_NAME ) {
 				continue;
 			}
 			const id = fmt.attributes?.[ 'data-id' ];
@@ -288,7 +385,7 @@ export function applyNoteFormat( record, format, start, end ) {
 		if ( ! stack || stack.length < 2 ) {
 			continue;
 		}
-		const notes = stack.filter( ( fmt ) => fmt.type === NOTE_FORMAT_TYPE );
+		const notes = stack.filter( ( fmt ) => fmt.type === NOTE_FORMAT_NAME );
 		if ( notes.length === 0 ) {
 			continue;
 		}
@@ -299,11 +396,81 @@ export function applyNoteFormat( record, format, start, end ) {
 					sizeOf( a.attributes?.[ 'data-id' ] )
 			);
 		}
-		const others = stack.filter( ( fmt ) => fmt.type !== NOTE_FORMAT_TYPE );
+		const others = stack.filter( ( fmt ) => fmt.type !== NOTE_FORMAT_NAME );
 		formats[ i ] = [ ...notes, ...others ];
 	}
 
 	return { ...record, formats };
+}
+
+/**
+ * @typedef {Object} WPSelectionPoint
+ * @property {string} [clientId]     Selected block client id.
+ * @property {string} [attributeKey] Selected rich-text attribute.
+ * @property {number} [offset]       Offset within the attribute.
+ */
+
+/**
+ * Read an inline selection from block-editor selection state, returning
+ * normalized anchor data when a non-collapsed selection sits inside a single
+ * rich-text attribute. Returns null for block-level or collapsed selections.
+ *
+ * @param {() => WPSelectionPoint} getSelectionStart Block-editor selector.
+ * @param {() => WPSelectionPoint} getSelectionEnd   Block-editor selector.
+ * @return {?{clientId: string, attributeKey: string, start: number, end: number}} Normalized selection or null.
+ */
+export function readInlineSelection( getSelectionStart, getSelectionEnd ) {
+	const start = getSelectionStart();
+	const end = getSelectionEnd();
+	if (
+		! start?.clientId ||
+		start.clientId !== end.clientId ||
+		! start.attributeKey ||
+		start.offset === undefined ||
+		end.offset === undefined ||
+		start.offset === end.offset
+	) {
+		return null;
+	}
+	// Normalize direction so callers don't have to think about reversed ranges.
+	const [ startOffset, endOffset ] =
+		start.offset < end.offset
+			? [ start.offset, end.offset ]
+			: [ end.offset, start.offset ];
+	return {
+		clientId: start.clientId,
+		attributeKey: start.attributeKey,
+		start: startOffset,
+		end: endOffset,
+	};
+}
+
+/**
+ * Wrap a rich-text range with a core/note marker. Returns a new
+ * RichTextData ready to write back into block attributes, or null when the
+ * incoming value isn't a rich-text instance (legacy/string attributes).
+ *
+ * @param {unknown} value Existing block attribute value.
+ * @param {number}  id    New note id to embed as `data-id`.
+ * @param {number}  start Range start offset.
+ * @param {number}  end   Range end offset.
+ * @return {?RichTextData} Wrapped value or null when the attribute isn't rich text.
+ */
+export function wrapInlineNote( value, id, start, end ) {
+	if ( ! ( value instanceof RichTextData ) ) {
+		return null;
+	}
+	const record = applyNoteFormat(
+		create( { html: value.toHTMLString() } ),
+		{ type: NOTE_FORMAT_NAME, attributes: { 'data-id': String( id ) } },
+		start,
+		end
+	);
+	// Round-trip through HTML to normalise format references (applyNoteFormat
+	// leaves them un-normalised) so the stored value matches a fresh reload.
+	return RichTextData.fromHTMLString(
+		new RichTextData( record ).toHTMLString()
+	);
 }
 
 /**
@@ -315,7 +482,7 @@ export function applyNoteFormat( record, format, start, end ) {
  * would wipe co-located notes; this filters by `data-id` to drop only the target
  * marker.
  *
- * @param {*}             value  Block attribute value (RichTextData or other).
+ * @param {unknown}       value  Block attribute value (RichTextData or other).
  * @param {number|string} noteId Note id whose marker should be removed.
  * @return {?RichTextData} A new value with the marker removed, or null when the
  *                         attribute isn't rich text or carries no such marker.
@@ -334,7 +501,7 @@ export function removeNoteFormat( value, noteId ) {
 		const filtered = stack.filter(
 			( format ) =>
 				! (
-					format.type === NOTE_FORMAT_TYPE &&
+					format.type === NOTE_FORMAT_NAME &&
 					format.attributes?.[ 'data-id' ] === target
 				)
 		);
@@ -348,8 +515,43 @@ export function removeNoteFormat( value, noteId ) {
 	return changed
 		? RichTextData.fromHTMLString(
 				new RichTextData( { ...record, formats } ).toHTMLString()
-		  )
+			)
 		: null;
+}
+
+/**
+ * Strip a note's inline `core/note` marker from whichever block holds it, if
+ * any, so a deleted or resolved note's highlight does not linger in the content.
+ * No-op for block-level notes (those carry no marker). Used by the resolve path,
+ * which only knows the note id; the delete path strips the marker inline since
+ * it already has the block.
+ *
+ * @param {number}                                         noteId                      Note id whose marker to remove.
+ * @param {() => string[]}                                 getClientIdsWithDescendants Block-editor selector.
+ * @param {(clientId: string) => Record<string, unknown>}  getBlockAttributes          Block-editor selector.
+ * @param {(clientId: string, attributes: Object) => void} updateBlockAttributes       Block-editor action.
+ */
+export function clearInlineNoteMarker(
+	noteId,
+	getClientIdsWithDescendants,
+	getBlockAttributes,
+	updateBlockAttributes
+) {
+	for ( const clientId of getClientIdsWithDescendants() ) {
+		const attributes = getBlockAttributes( clientId );
+		const found = findNoteInBlock( attributes, noteId );
+		if ( ! found ) {
+			continue;
+		}
+		const next = removeNoteFormat(
+			attributes[ found.attributeKey ],
+			noteId
+		);
+		if ( next ) {
+			updateBlockAttributes( clientId, { [ found.attributeKey ]: next } );
+		}
+		return;
+	}
 }
 
 /**
@@ -390,7 +592,7 @@ export function removeNoteIdFromMetadata( metadata, noteId ) {
  * @param {Object}                  params
  * @param {Array}                   params.threads        Ordered list of thread objects.
  * @param {string|number|undefined} params.selectedNoteId ID of the currently selected thread.
- * @param {Object<string,DOMRect>}  params.blockRects     Pre-read bounding rects keyed by thread ID.
+ * @param {Object<string,Object>}   params.blockRects     Anchor rects (`{ top }`) keyed by thread ID.
  * @param {Object<string,number>}   params.heights        Rendered heights keyed by thread ID.
  * @param {number}                  params.scrollTop      Current scroll offset of the editor content.
  * @return {{ positions: Object<string,number> }} Computed top positions.
@@ -404,12 +606,26 @@ export function calculateNotePositions( {
 } ) {
 	const offsets = {};
 
-	const anchorIndex = Math.max(
-		0,
-		threads.findIndex( ( thread ) => thread.id === selectedNoteId )
+	// The overlap sweep walks outward from the anchor assuming each thread's
+	// top is greater than the previous one's. Thread order is document order,
+	// which tracks visual order for notes anchored to their markers, but a
+	// pending "new" note anchors to the live selection and can therefore sit
+	// above notes that precede it in the list. Sort by measured top so the
+	// sweep's assumption holds and cards never displace past their markers.
+	// Threads without a rect keep their relative order; they are skipped
+	// below and never receive a position.
+	const orderedThreads = [ ...threads ].sort(
+		( a, b ) =>
+			( blockRects[ a.id ]?.top ?? Number.MAX_VALUE ) -
+			( blockRects[ b.id ]?.top ?? Number.MAX_VALUE )
 	);
 
-	const anchorThread = threads[ anchorIndex ];
+	const anchorIndex = Math.max(
+		0,
+		orderedThreads.findIndex( ( thread ) => thread.id === selectedNoteId )
+	);
+
+	const anchorThread = orderedThreads[ anchorIndex ];
 
 	if ( ! anchorThread || ! blockRects[ anchorThread.id ] ) {
 		return { positions: {} };
@@ -425,8 +641,8 @@ export function calculateNotePositions( {
 	let prevAdjustedTop = anchorTop + THREAD_ALIGN_OFFSET;
 	let prevHeight = anchorHeight;
 
-	for ( let i = anchorIndex + 1; i < threads.length; i++ ) {
-		const thread = threads[ i ];
+	for ( let i = anchorIndex + 1; i < orderedThreads.length; i++ ) {
+		const thread = orderedThreads[ i ];
 		const threadRect = blockRects[ thread.id ];
 		if ( ! threadRect ) {
 			continue;
@@ -452,7 +668,7 @@ export function calculateNotePositions( {
 	let belowAdjustedTop = anchorTop + THREAD_ALIGN_OFFSET;
 
 	for ( let i = anchorIndex - 1; i >= 0; i-- ) {
-		const thread = threads[ i ];
+		const thread = orderedThreads[ i ];
 		const threadRect = blockRects[ thread.id ];
 		if ( ! threadRect ) {
 			continue;
@@ -478,7 +694,7 @@ export function calculateNotePositions( {
 	// blockRect.top + scrollTop is the block's absolute y within the editor's
 	// scroll content; CSS translates each thread by -scrollTop at render time.
 	const positions = {};
-	for ( const thread of threads ) {
+	for ( const thread of orderedThreads ) {
 		const blockRect = blockRects[ thread.id ];
 		if ( blockRect && offsets[ thread.id ] !== undefined ) {
 			positions[ thread.id ] =

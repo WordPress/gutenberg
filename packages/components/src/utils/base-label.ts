@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { css } from '@emotion/react';
-
-/**
- * Internal dependencies
- */
 import CONFIG from './config-values.js';
 
 // This is a very low-level mixin which you shouldn't have to use directly.

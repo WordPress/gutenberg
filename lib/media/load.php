@@ -199,17 +199,22 @@ function gutenberg_media_processing_filter_rest_index( WP_REST_Response $respons
 add_filter( 'rest_index', 'gutenberg_media_processing_filter_rest_index' );
 
 /**
- * Sets a global JS variable to indicate that HEIC canvas-based upload support is available.
+ * Sets a global JS variable to indicate that client-side media processing is enabled.
  *
- * This flag is set whenever the media processing feature is enabled,
- * regardless of whether the browser supports full VIPS-based processing.
- * Browsers like Safari can use createImageBitmap() to decode HEIC images
- * and convert them to JPEG for server-side sub-size generation.
+ * The flag gates both processing modes: the full VIPS/WASM pipeline (browsers
+ * that pass feature detection) and the HEIC canvas fallback used by browsers
+ * such as Safari that can decode HEIC via createImageBitmap() but lack
+ * SharedArrayBuffer support. The browser-capability check happens client-side.
  */
-function gutenberg_set_heic_upload_support_flag() {
-	wp_add_inline_script( 'wp-block-editor', 'window.__heicUploadSupport = true', 'before' );
+function gutenberg_set_client_side_media_processing_flag() {
+	// Re-check the filter at action time, since other plugins (loaded after Gutenberg)
+	// may have added a filter to disable client-side media processing.
+	if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
+		return;
+	}
+	wp_add_inline_script( 'wp-block-editor', 'window.__clientSideMediaProcessing = true', 'before' );
 }
-add_action( 'admin_init', 'gutenberg_set_heic_upload_support_flag' );
+add_action( 'admin_init', 'gutenberg_set_client_side_media_processing_flag' );
 
 /**
  * Deletes the source-format companion file when its attachment is deleted.
@@ -257,17 +262,6 @@ add_action( 'delete_attachment', 'gutenberg_delete_heic_companion_file' );
 // ── Tier 2: Full client-side processing (VIPS/WASM) ─────────────────
 // Everything below requires cross-origin isolation (Document-Isolation-Policy)
 // and SharedArrayBuffer support, which is only available in Chromium 137+.
-
-/**
- * Sets a global JS variable to indicate that client-side media processing is enabled.
- */
-function gutenberg_set_client_side_media_processing_flag() {
-	if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
-		return;
-	}
-	wp_add_inline_script( 'wp-block-editor', 'window.__clientSideMediaProcessing = true', 'before' );
-}
-add_action( 'admin_init', 'gutenberg_set_client_side_media_processing_flag' );
 
 /**
  * Filters the list of rewrite rules formatted for output to an .htaccess file.
@@ -353,7 +347,7 @@ function gutenberg_set_up_cross_origin_isolation() {
 		return;
 	}
 
-	gutenberg_start_cross_origin_isolation_output_buffer();
+	gutenberg_send_document_isolation_policy_header();
 }
 
 add_action( 'load-post.php', 'gutenberg_set_up_cross_origin_isolation' );
@@ -371,9 +365,16 @@ remove_action( 'load-widgets.php', 'wp_set_up_cross_origin_isolation' );
 /**
  * Sends the Document-Isolation-Policy header for cross-origin isolation.
  *
- * Uses an output buffer to add crossorigin="anonymous" where needed.
+ * `isolate-and-credentialless` loads cross-origin subresources without
+ * credentials instead of blocking them, so no `crossorigin` attribute is
+ * needed on scripts, styles, images, audio, or video for the page to work.
+ * Forcing `crossorigin="anonymous"` would turn those into CORS requests
+ * and break any resource served without `Access-Control-Allow-Origin`,
+ * such as media offloaded to a CDN.
+ *
+ * @return bool Whether the header was sent.
  */
-function gutenberg_start_cross_origin_isolation_output_buffer(): void {
+function gutenberg_send_document_isolation_policy_header(): bool {
 	$chromium_version = gutenberg_get_chromium_major_version();
 
 	/**
@@ -393,88 +394,67 @@ function gutenberg_start_cross_origin_isolation_output_buffer(): void {
 	);
 
 	if ( ! $use_dip ) {
-		return;
+		return false;
 	}
 
-	ob_start(
-		function ( string $output ): string {
-			header( 'Document-Isolation-Policy: isolate-and-credentialless' );
+	header( 'Document-Isolation-Policy: isolate-and-credentialless' );
 
-			return gutenberg_add_crossorigin_attributes( $output );
-		}
-	);
+	return true;
 }
 
 /**
- * Adds crossorigin="anonymous" to relevant tags in the given HTML string.
+ * Removes `crossorigin` attributes from the printed media templates.
  *
- * @param string $html HTML input.
+ * WordPress 7.1 forces `crossorigin="anonymous"` onto the AUDIO and VIDEO
+ * tags inside the Backbone `<script type="text/html">` templates whenever
+ * client-side media processing is enabled. Under
+ * `Document-Isolation-Policy: isolate-and-credentialless` the attribute is
+ * not needed to play cross-origin media, and it turns the load into a CORS
+ * request that fails for media served without CORS headers, such as media
+ * offloaded to a CDN. See https://core.trac.wordpress.org/ticket/65930.
  *
- * @return string Modified HTML.
+ * @param string $html The printed media templates.
+ *
+ * @return string Modified media templates.
  */
-function gutenberg_add_crossorigin_attributes( string $html ): string {
-	$site_url = site_url();
-
-	$processor = new WP_HTML_Tag_Processor( $html );
-
-	// See https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin.
-	$tags = array(
-		'AUDIO'  => 'src',
-		'LINK'   => 'href',
-		'SCRIPT' => 'src',
-		'VIDEO'  => 'src',
-		'SOURCE' => 'src',
-	);
-
-	$tag_names = array_keys( $tags );
-
-	while ( $processor->next_tag() ) {
-		$tag = $processor->get_tag();
-
-		if ( ! in_array( $tag, $tag_names, true ) ) {
+function gutenberg_remove_media_template_crossorigin_attributes( string $html ): string {
+	/*
+	 * The media templates are inside <script type="text/html"> tags,
+	 * whose content is treated as raw text by the HTML Tag Processor.
+	 * Extract each script block's content, process it separately,
+	 * then reassemble the full output.
+	 */
+	$script_processor = new WP_HTML_Tag_Processor( $html );
+	while ( $script_processor->next_tag( 'SCRIPT' ) ) {
+		if ( 'text/html' !== $script_processor->get_attribute( 'type' ) ) {
 			continue;
 		}
-
-		if ( 'AUDIO' === $tag || 'VIDEO' === $tag ) {
-			$processor->set_bookmark( 'audio-video-parent' );
-		}
-
-		$processor->set_bookmark( 'resume' );
-
-		$sought = false;
-
-		$crossorigin = $processor->get_attribute( 'crossorigin' );
-
-		$url = $processor->get_attribute( $tags[ $tag ] );
-
-		if ( is_string( $url ) && ! str_starts_with( $url, $site_url ) && ! str_starts_with( $url, '/' ) && ! is_string( $crossorigin ) ) {
-			if ( 'SOURCE' === $tag ) {
-				$sought = $processor->seek( 'audio-video-parent' );
-
-				if ( $sought ) {
-					$processor->set_attribute( 'crossorigin', 'anonymous' );
-				}
-			} else {
-				$processor->set_attribute( 'crossorigin', 'anonymous' );
-			}
-
-			if ( $sought ) {
-				$processor->seek( 'resume' );
-				$processor->release_bookmark( 'audio-video-parent' );
+		$template_processor = new WP_HTML_Tag_Processor( $script_processor->get_modifiable_text() );
+		while ( $template_processor->next_tag() ) {
+			if (
+				in_array( $template_processor->get_tag(), array( 'AUDIO', 'IMG', 'VIDEO' ), true )
+				&& 'anonymous' === $template_processor->get_attribute( 'crossorigin' )
+			) {
+				$template_processor->remove_attribute( 'crossorigin' );
 			}
 		}
+		$script_processor->set_modifiable_text( $template_processor->get_updated_html() );
 	}
 
-	return $processor->get_updated_html();
+	return $script_processor->get_updated_html();
 }
 
 /**
  * Overrides templates from wp_print_media_templates with custom ones.
  *
- * Adds `crossorigin` attribute to all tags that
- * could have assets loaded from a different domain.
+ * Only needed on WordPress 7.1, the one release whose
+ * `wp_print_media_templates()` injects `crossorigin="anonymous"` itself.
  */
 function gutenberg_override_media_templates(): void {
+	if ( ! function_exists( 'wp_add_crossorigin_attributes' ) || function_exists( 'wp_send_document_isolation_policy_header' ) ) {
+		return;
+	}
+
 	remove_action( 'admin_footer', 'wp_print_media_templates' );
 	add_action(
 		'admin_footer',
@@ -483,17 +463,7 @@ function gutenberg_override_media_templates(): void {
 			wp_print_media_templates();
 			$html = (string) ob_get_clean();
 
-			$tags = array(
-				'audio',
-				'img',
-				'video',
-			);
-
-			foreach ( $tags as $tag ) {
-				$html = (string) str_replace( "<$tag", "<$tag crossorigin=\"anonymous\"", $html );
-			}
-
-			echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo gutenberg_remove_media_template_crossorigin_attributes( $html ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 	);
 }

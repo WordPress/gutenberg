@@ -57,7 +57,9 @@ export function filterURLForDisplay(
 	];
 	const truncatedFile = fileName.slice( -3 ) + '.' + extension;
 	return (
-		file.slice( 0, maxLength - truncatedFile.length - 1 ) +
+		// A negative end would be read as an offset from the end of the string,
+		// keeping most of the file name and returning more than `maxLength`.
+		file.slice( 0, Math.max( 0, maxLength - truncatedFile.length - 1 ) ) +
 		'…' +
 		truncatedFile
 	);

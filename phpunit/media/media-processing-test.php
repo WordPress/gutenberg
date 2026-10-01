@@ -200,61 +200,40 @@ class Media_Processing_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers ::gutenberg_add_crossorigin_attributes
+	 * Tests that the media template processing strips the crossorigin
+	 * attribute WordPress 7.1 forces onto AUDIO, IMG, and VIDEO tags, leaves
+	 * other crossorigin values alone, and does not touch non-template scripts.
+	 *
+	 * @covers ::gutenberg_remove_media_template_crossorigin_attributes
 	 */
-	public function test_add_crossorigin_attributes() {
+	public function test_gutenberg_remove_media_template_crossorigin_attributes(): void {
 		$html = <<<HTML
-<img src="https://www.someothersite.com/test1.jpg" />
-<img src="test2.jpg" />
-<audio><source src="https://www.someothersite.com/test1.mp3"></audio>
-<audio src="https://www.someothersite.com/test1.mp3"></audio>
-<audio src="/test2.mp3"></audio>
-<video><source src="https://www.someothersite.com/test1.mp4"></video>
-<video src="https://www.someothersite.com/test1.mp4"></video>
-<video src="/test2.mp4"></video>
-<script src="https://www.someothersite.com/test1.js"></script>
-<script src="/test2.js"></script>
-<link href="https://www.someothersite.com/test1.css"></link>
-<link href="/test2.css"></link>
+<script type="text/html" id="tmpl-test-media">
+	<img crossorigin="anonymous" src="{{ data.url }}" draggable="false" alt="" />
+	<audio crossorigin="anonymous" controls src="{{ data.url }}"></audio>
+	<audio crossorigin="use-credentials" controls src="{{ data.url }}"></audio>
+	<video crossorigin="anonymous" controls src="{{ data.url }}"></video>
+</script>
+<script type="text/javascript">var notATemplate = '<img crossorigin="anonymous" src="test.jpg" />';</script>
 HTML;
 
-		$expected = <<<HTML
-<img src="https://www.someothersite.com/test1.jpg" />
-<img src="test2.jpg" />
-<audio crossorigin="anonymous"><source src="https://www.someothersite.com/test1.mp3"></audio>
-<audio crossorigin="anonymous" src="https://www.someothersite.com/test1.mp3"></audio>
-<audio src="/test2.mp3"></audio>
-<video crossorigin="anonymous"><source src="https://www.someothersite.com/test1.mp4"></video>
-<video crossorigin="anonymous" src="https://www.someothersite.com/test1.mp4"></video>
-<video src="/test2.mp4"></video>
-<script crossorigin="anonymous" src="https://www.someothersite.com/test1.js"></script>
-<script src="/test2.js"></script>
-<link crossorigin="anonymous" href="https://www.someothersite.com/test1.css"></link>
-<link href="/test2.css"></link>
-HTML;
+		$actual = gutenberg_remove_media_template_crossorigin_attributes( $html );
 
-		$actual = gutenberg_add_crossorigin_attributes( $html );
-
-		$this->assertSame( $expected, $actual );
-	}
-
-	/**
-	 * @covers ::gutenberg_override_media_templates
-	 */
-	public function test_gutenberg_override_media_templates(): void {
-		if ( ! function_exists( '\wp_print_media_templates' ) ) {
-			require_once ABSPATH . WPINC . '/media-template.php';
-		}
-
-		gutenberg_override_media_templates();
-
-		ob_start();
-		do_action( 'admin_footer' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-		$output = ob_get_clean();
-
-		$this->assertStringContainsString( '<audio crossorigin="anonymous"', $output );
-		$this->assertStringContainsString( '<img crossorigin="anonymous"', $output );
-		$this->assertStringContainsString( '<video crossorigin="anonymous"', $output );
+		$this->assertSame(
+			2,
+			substr_count( $actual, 'crossorigin' ),
+			'Only the use-credentials value and the non-template script should keep a crossorigin attribute.'
+		);
+		$this->assertStringContainsString(
+			'<audio crossorigin="use-credentials" controls src="{{ data.url }}"></audio>',
+			$actual,
+			'Other crossorigin values must be preserved.'
+		);
+		$this->assertStringContainsString(
+			"var notATemplate = '<img crossorigin=\"anonymous\" src=\"test.jpg\" />';",
+			$actual,
+			'Script tags that are not text/html templates must not be modified.'
+		);
 	}
 
 	/**

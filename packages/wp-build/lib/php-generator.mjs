@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import { readFile, writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
-
-/**
- * Internal dependencies
- */
 import { getPackageInfoFromFile } from './package-utils.mjs';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );

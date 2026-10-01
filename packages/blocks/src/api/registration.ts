@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { select, dispatch } from '@wordpress/data';
 import { _x } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import i18nBlockSchema from './i18n-block.json';
 import { store as blocksStore } from '../store';
 import { unlock } from '../lock-unlock';

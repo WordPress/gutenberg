@@ -51,7 +51,7 @@ You can then add a scripts section to your package.json file, for example:
 
 You can then use `npm run build` to build your project with all the default webpack settings already configured, likewise for formatting and linting. The `start` command is used for development mode. See the [`@wordpress/scripts` package](/packages/scripts/README.md) for full documentation.
 
-For more info, see the [Getting Started with JavaScript tutorial](/docs/how-to-guides/javascript/js-build-setup.md) in the Block Editor Handbook.
+For more info, see the [Working with JavaScript for the Block Editor guide](/docs/getting-started/fundamentals/javascript-in-the-block-editor.md) in the Block Editor Handbook.
 
 ## Block Editor
 

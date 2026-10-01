@@ -1,26 +1,15 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useResizeObserver } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
-import { Card, Icon, Stack } from '@wordpress/ui';
+import { useCallback, useMemo, useState } from '@wordpress/element';
+import { Card, Icon, Stack, inertValue } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
-
-/**
- * Internal dependencies
- */
 import { WidgetInfotip } from './widget-header-infotip';
+import { useIsTruncated } from './use-is-truncated';
 import {
-	WIDGET_HEADER_IDENTITY_RESERVE,
-	WIDGET_TOOLBAR_CHIP_RESERVE,
 	WidgetHeaderAvailableSizeProvider,
-} from './widget-header-size';
+	WidgetHeaderReserveProvider,
+} from './widget-header-fit';
 import styles from './widget-header.module.css';
 
 export interface WidgetHeaderProps {
@@ -78,12 +67,80 @@ export function WidgetHeader( {
 		( [ entry ] ) => setHeaderWidth( entry.contentRect.width )
 	);
 
+	// Actual footprint of the identity cluster plus the gap before the toolbar.
+	// Measured, so whatever identity holds (a help tip, a future badge) is
+	// reserved without a per-element constant.
+	const [ identityReserve, setIdentityReserve ] = useState( 0 );
+	const identityMeasureRef = useResizeObserver< HTMLDivElement >(
+		( [ entry ] ) => {
+			const { columnGap } = getComputedStyle(
+				entry.target.parentElement as HTMLElement
+			);
+
+			setIdentityReserve(
+				entry.contentRect.width + ( parseFloat( columnGap ) || 0 )
+			);
+		}
+	);
+
+	// Everything in the toolbar the collapsible controls cannot use: the chip's
+	// own padding, and each section beside them (the actions menu, and whatever
+	// the header gains next). Each reports itself; the sum leaves the budget.
+	const [ reserved, setReserved ] = useState< Record< string, number > >(
+		{}
+	);
+	const registerReserved = useCallback( ( id: string, width: number ) => {
+		setReserved( ( current ) =>
+			current[ id ] === width ? current : { ...current, [ id ]: width }
+		);
+	}, [] );
+
+	const unregisterReserved = useCallback( ( id: string ) => {
+		setReserved( ( current ) => {
+			if ( ! ( id in current ) ) {
+				return current;
+			}
+			const next = { ...current };
+			delete next[ id ];
+			return next;
+		} );
+	}, [] );
+
+	const reserveContext = useMemo(
+		() => ( { registerReserved, unregisterReserved } ),
+		[ registerReserved, unregisterReserved ]
+	);
+
+	// A clipped title shows in the infotip, so it renders for a clip even
+	// without a help note. Then it is what the title reclaims once un-clipped.
+	const [ infotipReserve, setInfotipReserve ] = useState( 0 );
+	const infotipMeasureRef = useResizeObserver< HTMLButtonElement >(
+		( [ entry ] ) => {
+			const { columnGap } = getComputedStyle(
+				entry.target.parentElement as HTMLElement
+			);
+			setInfotipReserve(
+				entry.borderBoxSize[ 0 ].inlineSize +
+					( parseFloat( columnGap ) || 0 )
+			);
+		}
+	);
+	const [ titleMeasureRef, isTitleTruncated ] =
+		useIsTruncated< HTMLHeadingElement >(
+			widgetType?.help ? 0 : infotipReserve
+		);
+
 	const hasIdentity = showIdentity && !! widgetType?.title;
+	const totalReserved = Object.values( reserved ).reduce(
+		( sum, width ) => sum + width,
+		0
+	);
+
 	const availableSize =
 		headerWidth > 0
 			? headerWidth -
-			  WIDGET_TOOLBAR_CHIP_RESERVE -
-			  ( hasIdentity ? WIDGET_HEADER_IDENTITY_RESERVE : 0 )
+				( hasIdentity ? identityReserve : 0 ) -
+				totalReserved
 			: null;
 
 	return (
@@ -96,11 +153,13 @@ export function WidgetHeader( {
 		>
 			{ showIdentity && widgetType?.title && (
 				<Stack
+					ref={ identityMeasureRef }
 					direction="row"
 					align="center"
 					gap="sm"
 					className={ styles.identity }
-					{ ...( editMode ? { inert: 'true' } : {} ) }
+					// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+					inert={ inertValue( editMode ) }
 				>
 					{ widgetType.icon && (
 						<span className={ styles.icon } aria-hidden="true">
@@ -108,14 +167,22 @@ export function WidgetHeader( {
 						</span>
 					) }
 
-					<Card.Title id={ titleId } render={ <h2 /> }>
+					<Card.Title
+						ref={ titleMeasureRef }
+						id={ titleId }
+						render={ <h2 /> }
+						className={ styles.title }
+					>
 						{ widgetType.title }
 					</Card.Title>
 
-					{ widgetType.help && (
+					{ ( widgetType.help || isTitleTruncated ) && (
 						<WidgetInfotip
-							content={ widgetType.help.content }
-							links={ widgetType.help.links }
+							ref={ infotipMeasureRef }
+							title={ widgetType.title }
+							showTitle={ isTitleTruncated }
+							content={ widgetType.help?.content }
+							links={ widgetType.help?.links }
 						/>
 					) }
 				</Stack>
@@ -123,9 +190,13 @@ export function WidgetHeader( {
 
 			{ children && (
 				<div className={ styles.toolbar }>
-					<WidgetHeaderAvailableSizeProvider value={ availableSize }>
-						{ children }
-					</WidgetHeaderAvailableSizeProvider>
+					<WidgetHeaderReserveProvider value={ reserveContext }>
+						<WidgetHeaderAvailableSizeProvider
+							value={ availableSize }
+						>
+							{ children }
+						</WidgetHeaderAvailableSizeProvider>
+					</WidgetHeaderReserveProvider>
 				</div>
 			) }
 		</Card.Header>

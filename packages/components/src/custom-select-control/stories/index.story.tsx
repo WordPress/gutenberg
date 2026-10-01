@@ -1,22 +1,11 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import CustomSelectControl from '..';
 
 const meta: Meta< typeof CustomSelectControl > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Selection & Input/Common/CustomSelectControl',
+	title: 'Components/@wordpress-components/Selection & Input/Common/CustomSelectControl',
 	component: CustomSelectControl,
 	id: 'components-customselectcontrol',
 	argTypes: {

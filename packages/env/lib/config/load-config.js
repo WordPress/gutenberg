@@ -1,13 +1,6 @@
 'use strict';
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const { existsSync, promises: fsPromises } = require( 'fs' );
-
-/**
- * Internal dependencies
- */
 const getCacheDirectory = require( './get-cache-directory' );
 const md5 = require( '../md5' );
 const { parseConfig, getConfigFilePath } = require( './parse-config' );

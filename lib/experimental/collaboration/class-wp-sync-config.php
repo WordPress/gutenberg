@@ -45,7 +45,7 @@ if ( ! class_exists( 'WP_Sync_Config' ) ) {
 				return null;
 			}
 
-			if ( false !== strpos( $type_parts[1], '/' ) ) {
+			if ( str_contains( $type_parts[1], '/' ) ) {
 				return null;
 			}
 

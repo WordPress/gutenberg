@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { useLayoutEffect, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect, useContextSystem } from '../../context';
 import type {
@@ -74,6 +63,9 @@ function ToggleGroupControlOptionBase(
 		...otherButtonProps
 	} = buttonProps;
 
+	const isOptionDisabled = Boolean(
+		toggleGroupControlContext.disabled || disabled
+	);
 	const isPressed = toggleGroupControlContext.value === value;
 	const labelClasses = clsx(
 		styles.label,
@@ -120,7 +112,7 @@ function ToggleGroupControlOptionBase(
 				{ isDeselectable ? (
 					<button
 						{ ...commonProps }
-						disabled={ disabled }
+						disabled={ isOptionDisabled }
 						aria-pressed={ isPressed }
 						type="button"
 						onClick={ buttonOnClick }

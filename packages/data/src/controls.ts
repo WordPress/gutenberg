@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { createRegistryControl } from './factory';
 import type { StoreDescriptor } from './types';
 

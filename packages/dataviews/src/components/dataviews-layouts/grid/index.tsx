@@ -1,21 +1,11 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
+import { Stack, inertValue } from '@wordpress/ui';
 import type { ViewGridProps } from '../../../types';
 import getDataByGroup from '../utils/get-data-by-group';
 import useSelectionProps from '../utils/use-selection-props';
+import { hasAPossibleBulkAction } from '../../dataviews-bulk-actions';
 import CompositeGrid from './composite-grid';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
 
@@ -50,10 +40,12 @@ function ViewGrid< Item >( {
 		: data;
 	const { getSelectionProps } = useSelectionProps( {
 		data: orderedData,
-		actions,
 		getItemId,
+		isItemSelectable: ( item ) => hasAPossibleBulkAction( actions, item ),
 		selection,
 		onChangeSelection,
+		selectionMode: 'multi',
+		shouldSelectOnClick: false,
 	} );
 	if ( ! hasData ) {
 		return (
@@ -70,7 +62,7 @@ function ViewGrid< Item >( {
 		className: clsx( className, {
 			'is-refreshing': ! isInfiniteScroll && isDelayedLoading,
 		} ),
-		inert: ! isInfiniteScroll && !! isLoading ? 'true' : undefined,
+		inert: inertValue( ! isInfiniteScroll && isLoading ),
 		isLoading,
 		view,
 		fields,
@@ -104,7 +96,7 @@ function ViewGrid< Item >( {
 													__( '%1$s: %2$s' ),
 													groupField.label,
 													groupName
-											  ) }
+												) }
 									</h3>
 									<CompositeGrid
 										{ ...gridProps }

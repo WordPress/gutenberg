@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	BaseControl,
 	RangeControl,

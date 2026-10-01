@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalHStack as HStack, Button } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
 import {
@@ -16,10 +13,6 @@ import { select } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { Badge, Link } from '@wordpress/ui';
 import { unlock } from '@wordpress/routes-lock-unlock';
-
-/**
- * Internal dependencies
- */
 import { useConnectorPlugin, type PluginStatus } from './use-connector-plugin';
 import {
 	OpenAILogo,
@@ -270,7 +263,7 @@ function ApiKeyConnector( {
 								: async () => {
 										await removeApiKey();
 										actionButtonRef.current?.focus();
-								  }
+									}
 						}
 						onSave={ async ( apiKey: string ) => {
 							await saveApiKey( apiKey );
@@ -371,7 +364,7 @@ function ApplicationPasswordConnector( {
 								: async () => {
 										await removeCredentials();
 										actionButtonRef.current?.focus();
-								  }
+									}
 						}
 						onSave={ async ( credentials ) => {
 							await saveCredentials( credentials );

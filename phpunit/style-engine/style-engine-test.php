@@ -2,7 +2,7 @@
 /**
  * Tests the Style Engine global functions that interact with the WP_Style_Engine class.
  *
- * @package    Gutenberg
+ * @package    gutenberg
  * @subpackage style-engine
  */
 
@@ -607,6 +607,49 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'background-attachment' => 'fixed',
 					),
 				),
+			),
+
+			'inline_background_clip_border_box'            => array(
+				'block_styles'    => array(
+					'background' => array(
+						'backgroundClip' => 'border-box',
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(
+					'css'          => 'background-clip:border-box;-webkit-text-fill-color:currentColor;',
+					'declarations' => array(
+						'background-clip'         => 'border-box',
+						'-webkit-text-fill-color' => 'currentColor',
+					),
+				),
+			),
+
+			'inline_background_clip_text_with_vendor_prefixes' => array(
+				'block_styles'    => array(
+					'background' => array(
+						'backgroundClip' => 'text',
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(
+					'css'          => 'background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;',
+					'declarations' => array(
+						'background-clip'         => 'text',
+						'-webkit-background-clip' => 'text',
+						'-webkit-text-fill-color' => 'transparent',
+					),
+				),
+			),
+
+			'inline_background_clip_invalid_value'         => array(
+				'block_styles'    => array(
+					'background' => array(
+						'backgroundClip' => 'invalid-value',
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(),
 			),
 		);
 	}

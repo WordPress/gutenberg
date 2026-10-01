@@ -6,10 +6,6 @@
  *
  * @package
  */
-
-/**
- * External dependencies
- */
 import { readFile, writeFile, access } from 'fs/promises';
 import path from 'path';
 import esbuild from 'esbuild';
@@ -337,7 +333,6 @@ export const workerCode = ${ JSON.stringify( workerContent ) };
 				target,
 				jsx: 'automatic',
 				jsxImportSource: 'react',
-				loader: { '.js': 'jsx' },
 				plugins,
 			} )
 		);
@@ -360,7 +355,6 @@ export const workerCode = ${ JSON.stringify( workerContent ) };
 				target,
 				jsx: 'automatic',
 				jsxImportSource: 'react',
-				loader: { '.js': 'jsx' },
 				plugins,
 			} )
 		);

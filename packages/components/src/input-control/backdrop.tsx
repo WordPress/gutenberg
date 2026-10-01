@@ -1,19 +1,18 @@
-/**
- * WordPress dependencies
- */
+import clsx from 'clsx';
 import { memo } from '@wordpress/element';
-/**
- * Internal dependencies
- */
 import { BackdropUI } from './styles/input-control-styles';
+import styles from './style.module.scss';
 
 function Backdrop( { disabled = false, isBorderless = false } ) {
 	return (
 		<BackdropUI
 			aria-hidden="true"
-			className="components-input-control__backdrop"
-			disabled={ disabled }
-			isBorderless={ isBorderless }
+			className={ clsx(
+				'components-input-control__backdrop',
+				styles.border,
+				disabled && styles[ 'is-disabled' ],
+				isBorderless && styles[ 'is-borderless' ]
+			) }
 		/>
 	);
 }

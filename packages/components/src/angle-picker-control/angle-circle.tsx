@@ -1,19 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useEffect, useRef } from '@wordpress/element';
 import { __experimentalUseDragging as useDragging } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import styles from './style.module.scss';
-
 import type { WordPressComponentProps } from '../context';
 import type { AngleCircleProps } from './types';
 

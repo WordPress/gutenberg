@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { dispatch, select } from '@wordpress/data';
 import { sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { store } from './store';
 import type {
 	Ability,

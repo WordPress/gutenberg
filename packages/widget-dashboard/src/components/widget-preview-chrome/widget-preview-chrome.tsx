@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useId, useMemo } from '@wordpress/element';
-import { Card } from '@wordpress/ui';
+import { Card, inertValue } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
-
-/**
- * Internal dependencies
- */
 import { WidgetContextProvider } from '../../context/widget-context';
 import { WidgetFrame } from '../widget-frame';
 import styles from './widget-preview-chrome.module.css';
@@ -43,7 +36,11 @@ export function WidgetPreviewChrome( {
 
 	return (
 		<WidgetContextProvider value={ contextValue }>
-			<div className={ styles.viewport } { ...{ inert: '' } }>
+			<div
+				className={ styles.viewport }
+				// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+				inert={ inertValue( true ) }
+			>
 				<div className={ styles.canvas }>
 					<Card.Root
 						render={ <section /> }

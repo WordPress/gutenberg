@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	DropZone,
@@ -16,6 +9,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	BaseControl,
+	withFilters,
 } from '@wordpress/components';
 import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { store as coreStore, type Attachment } from '@wordpress/core-data';
@@ -28,19 +22,24 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 import {
 	archive,
 	audio,
 	video,
 	file,
 	closeSmall,
-	error as errorIcon,
 	chevronUp,
 	chevronDown,
 	chevronLeft,
 	chevronRight,
 } from '@wordpress/icons';
-import { VisuallyHidden, Tooltip } from '@wordpress/ui';
+import {
+	Stack,
+	Tooltip,
+	ValidityIndicator,
+	VisuallyHidden,
+} from '@wordpress/ui';
 import { speak } from '@wordpress/a11y';
 import {
 	MediaUpload,
@@ -48,10 +47,6 @@ import {
 	privateApis as mediaUtilsPrivateApis,
 } from '@wordpress/media-utils';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import type { MediaEditProps } from '../../types';
 import useMovingAnimation from './use-moving-animation';
@@ -91,11 +86,12 @@ function normalizeValue( value: number | number[] | undefined ): number[] {
 
 /**
  * Conditional Media component that uses MediaUploadModal when experiment is enabled,
- * otherwise falls back to media-utils MediaUpload.
+ * otherwise falls back to media-utils MediaUpload. Also what `FilteredMediaUpload`
+ * falls back to when nothing is registered on `editor.MediaUpload`, as in tests.
  *
  * @param root0          Component props.
  * @param root0.render   Render prop function that receives { open } object.
- * @param root0.multiple Whether to allow multiple media selections.
+ * @param root0.multiple Whether to allow multiple media selections; `'add'` keeps the current selection in the legacy media frame.
  * @return The component.
  */
 function ConditionalMediaUpload( { render, multiple, ...props }: any ) {
@@ -107,7 +103,8 @@ function ConditionalMediaUpload( { render, multiple, ...props }: any ) {
 				{ isModalOpen && (
 					<MediaUploadModal
 						{ ...props }
-						multiple={ multiple }
+						// The modal takes a boolean.
+						multiple={ !! multiple }
 						isOpen={ isModalOpen }
 						onClose={ () => {
 							setIsModalOpen( false );
@@ -123,14 +120,19 @@ function ConditionalMediaUpload( { render, multiple, ...props }: any ) {
 		);
 	}
 	// Fallback to media-utils MediaUpload when experiment is disabled.
-	return (
-		<MediaUpload
-			{ ...props }
-			render={ render }
-			multiple={ multiple ? 'add' : undefined }
-		/>
-	);
+	return <MediaUpload { ...props } render={ render } multiple={ multiple } />;
 }
+
+/*
+ * `ConditionalMediaUpload` resolved through `editor.MediaUpload`: the hook
+ * through which the editor supplies its media library to blocks and plugins
+ * extend it (extra sources, validation). Those callbacks assume an editor
+ * context, so `MediaEdit` does not use it; `MediaEditControl` does when
+ * `isPickerFiltered` is set, for fields that render inside the editor.
+ */
+const FilteredMediaUpload = withFilters( 'editor.MediaUpload' )(
+	ConditionalMediaUpload
+) as React.ComponentType< Record< string, unknown > >;
 
 function MediaPickerButton( {
 	open,
@@ -212,7 +214,7 @@ const archiveMimeTypes = [
 function MediaTitle( { attachment }: { attachment: Attachment< 'view' > } ) {
 	return (
 		<Truncate className="fields__media-edit-filename">
-			{ attachment.title.rendered }
+			{ decodeEntities( attachment.title.rendered ) }
 		</Truncate>
 	);
 }
@@ -356,10 +358,12 @@ function ExpandedMediaEditAttachments( {
 									? sprintf(
 											/* translators: %s: The title of the media item. */
 											__( 'Replace %s' ),
-											(
-												attachment as Attachment< 'view' >
-											 ).title.rendered
-									  )
+											decodeEntities(
+												(
+													attachment as Attachment< 'view' >
+												 ).title.rendered
+											)
+										)
 									: __( 'Replace' )
 							}
 							showTooltip
@@ -593,7 +597,15 @@ function CompactMediaEditAttachments( {
  * };
  * ```
  */
-export default function MediaEdit< Item >( {
+export default function MediaEdit< Item >( props: MediaEditProps< Item > ) {
+	return <MediaEditControl { ...props } />;
+}
+
+/*
+ * Body of `MediaEdit`. Package-internal: the featured image field renders it
+ * for the props the public control doesn't offer.
+ */
+export function MediaEditControl< Item >( {
 	data,
 	field,
 	onChange,
@@ -602,8 +614,38 @@ export default function MediaEdit< Item >( {
 	multiple,
 	isExpanded,
 	validity,
-}: MediaEditProps< Item > ) {
+	isPickerFiltered,
+	featuredImageFlow,
+	pickerTitle,
+}: MediaEditProps< Item > & {
+	/**
+	 * Whether the picker resolves through the `editor.MediaUpload` filter, so
+	 * the plugin extensions registered on it apply.
+	 */
+	isPickerFiltered?: boolean;
+	/**
+	 * Opens the featured-image media frame, as the classic panel does; plugins
+	 * extending `editor.MediaUpload` recognize the featured image by it.
+	 */
+	featuredImageFlow?: boolean;
+	/**
+	 * Title of the picker, in place of the field label.
+	 */
+	pickerTitle?: string;
+} ) {
+	const MediaUploadComponent = isPickerFiltered
+		? FilteredMediaUpload
+		: ConditionalMediaUpload;
 	const value = field.getValue( { item: data } );
+	// While the permission is unresolved, show the picker, as the editor does.
+	const canUpload = useSelect(
+		( select ) =>
+			select( coreStore ).canUser( 'create', {
+				kind: 'postType',
+				name: 'attachment',
+			} ) ?? true,
+		[]
+	);
 	const [ isTouched, setIsTouched ] = useState( false );
 	const validityTargetRef = useRef< HTMLInputElement >( null );
 	const [ customValidity, setCustomValidity ] = useState<
@@ -860,10 +902,33 @@ export default function MediaEdit< Item >( {
 		},
 		[ isTouched ]
 	);
-	return (
-		<div onBlur={ onBlur }>
+	if ( ! canUpload ) {
+		return (
 			<fieldset className="fields__media-edit" data-field-id={ field.id }>
-				<ConditionalMediaUpload
+				<WCText>
+					{ sprintf(
+						/* translators: %s: The field label. */
+						__(
+							'%s: To edit this field, you need permission to upload media.'
+						),
+						field.label
+					) }
+				</WCText>
+			</fieldset>
+		);
+	}
+	return (
+		<Stack direction="column" gap="sm" onBlur={ onBlur }>
+			<fieldset className="fields__media-edit" data-field-id={ field.id }>
+				<MediaUploadComponent
+					title={ pickerTitle ?? field.label }
+					featuredImageFlow={ featuredImageFlow }
+					// The deprecated name is passed too, because the callbacks on
+					// `editor.MediaUpload` read it from the props and would
+					// otherwise stop recognizing the featured image. It will be
+					// removed in the near future, and passing both raises no
+					// warning.
+					unstableFeaturedImageFlow={ featuredImageFlow }
 					onSelect={ ( selectedMedia: any ) => {
 						if ( ! multiple ) {
 							onChangeControl( selectedMedia.id );
@@ -910,8 +975,12 @@ export default function MediaEdit< Item >( {
 					// and open in single-select mode so the user picks exactly
 					// one replacement, even if `multiple` is true.
 					value={ targetItemId !== undefined ? targetItemId : value }
-					multiple={ multiple && targetItemId === undefined }
-					title={ field.label }
+					// Pickers on `editor.MediaUpload` take the block-editor
+					// `MediaUpload` value, `'add'` to keep the current selection
+					// or `false`, so the control speaks that API.
+					multiple={
+						multiple && targetItemId === undefined ? 'add' : false
+					}
 					render={ ( { open }: any ) => {
 						// Keep a ref to the latest `open` so the deferred effect can call it.
 						openModalRef.current = open;
@@ -969,24 +1038,11 @@ export default function MediaEdit< Item >( {
 				/>
 			</VisuallyHidden>
 			{ customValidity && (
-				<p
-					className={ clsx(
-						'components-validated-control__indicator',
-						{
-							'is-invalid': customValidity.type === 'invalid',
-							'is-valid': customValidity.type === 'valid',
-						}
-					) }
-				>
-					<WCIcon
-						className="components-validated-control__indicator-icon"
-						icon={ errorIcon }
-						size={ 16 }
-						fill="currentColor"
-					/>
-					{ customValidity.message }
-				</p>
+				<ValidityIndicator
+					type={ customValidity.type }
+					message={ customValidity.message }
+				/>
 			) }
-		</div>
+		</Stack>
 	);
 }

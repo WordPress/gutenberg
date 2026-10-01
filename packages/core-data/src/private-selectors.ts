@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import type { ConnectionStatus } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
 import { getDefaultTemplateId, getEntityRecord, type State } from './selectors';
 import { STORE_NAME } from './name';
 import { unlock } from './lock-unlock';
-import { getSyncManager } from './sync';
+import { getEntitySyncManager } from './entity-sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 type EntityRecordKey = string | number;
@@ -26,8 +19,8 @@ const EMPTY_OBJECT = {};
  * @return The undo manager.
  */
 export function getUndoManager( state: State ) {
-	// undoManager is undefined until the first sync-enabled entity is loaded.
-	return getSyncManager()?.undoManager ?? state.undoManager;
+	// A registered entity sync manager may substitute its own undo manager.
+	return getEntitySyncManager()?.undoManager ?? state.undoManager;
 }
 
 /**
@@ -225,8 +218,9 @@ export const getTemplateId = createRegistrySelector(
 			if ( ! templates ) {
 				return;
 			}
-			const id = templates.find( ( { slug } ) => slug === 'front-page' )
-				?.id;
+			const id = templates.find(
+				( { slug } ) => slug === 'front-page'
+			)?.id;
 			if ( id ) {
 				return id;
 			}
@@ -373,4 +367,26 @@ export function getSyncConnectionStatus(
 	}
 
 	return coalesced;
+}
+
+/**
+ * Returns the sync connection status for a single entity, or undefined if
+ * the entity is not being synced or no provider has reported a status yet.
+ *
+ * @param state    Data state.
+ * @param kind     Entity kind.
+ * @param name     Entity name.
+ * @param recordId Record ID.
+ *
+ * @return The sync connection status for the entity.
+ */
+export function getEntitySyncConnectionStatus(
+	state: State,
+	kind: string,
+	name: string,
+	recordId: EntityRecordKey
+): ConnectionStatus | undefined {
+	return state.syncConnectionStatuses?.[
+		`${ kind }/${ name }:${ recordId }`
+	];
 }

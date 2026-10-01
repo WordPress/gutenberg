@@ -1,14 +1,15 @@
-/**
- * WordPress dependencies
- */
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 
-export function useUserGlobalStyles( id: string ) {
+export function useUserGlobalStyles( id: string | number | undefined ) {
 	const { userGlobalStyles } = useSelect(
 		( select ) => {
+			if ( id === undefined ) {
+				return { userGlobalStyles: undefined };
+			}
+
 			const { getEntityRecord, getEditedEntityRecord, canUser } =
 				select( coreStore );
 

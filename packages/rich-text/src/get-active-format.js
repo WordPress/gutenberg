@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getActiveFormats } from './get-active-formats';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */

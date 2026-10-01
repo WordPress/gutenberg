@@ -1,7 +1,4 @@
-/**
- * Internal dependencies
- */
-import './style.scss';
+import styles from './style.module.css';
 
 // See https://www.figma.com/developers/embed#embed-a-figma-file
 const CONFIG = {
@@ -38,7 +35,7 @@ function FigmaEmbed( { url, title, ...props } ) {
 		<iframe
 			title={ title }
 			src={ normalizedUrl }
-			className="wp-storybook-figma-embed"
+			className={ styles.embed }
 			{ ...props }
 		/>
 	);

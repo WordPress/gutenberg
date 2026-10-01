@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { DELETE, BACKSPACE } from '@wordpress/keycodes';
 import {
 	isCollapsed,
 	isEmpty,
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../../lock-unlock';
 
 const { subscribeOwnedListener } = unlock( richTextPrivateApis );

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Post-type locking', () => {
@@ -92,7 +89,7 @@ test.describe( 'Post-type locking', () => {
 				.click();
 
 			await page.keyboard.type( 'First line' );
-			await page.keyboard.press( 'Enter' );
+			await pageUtils.pressKeys( 'shift+Enter' );
 			await page.keyboard.type( 'Second line' );
 			await pageUtils.pressKeys( 'shift+Enter' );
 			await page.keyboard.type( 'Third line' );

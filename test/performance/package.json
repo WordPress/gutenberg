@@ -21,8 +21,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"devDependencies": {
-		"@playwright/test": "^1.61.1",
-		"@types/node": "^20.19.39",
+		"@playwright/test": "^1.63.0",
+		"@types/node": "^24.13.3",
 		"@wordpress/e2e-test-utils-playwright": "file:../../packages/e2e-test-utils-playwright",
 		"@wordpress/scripts": "file:../../packages/scripts",
 		"wasm-vips": "^0.0.18"

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { combineReducers } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { EDITOR_SETTINGS_DEFAULTS } from './defaults';
 import dataviewsReducer from '../dataviews/store/reducer';
 
