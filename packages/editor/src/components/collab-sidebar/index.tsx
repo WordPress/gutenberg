@@ -201,19 +201,25 @@ function NotesSidebar( { postId }: { postId: number } ) {
 		// `onCreate`, or cleared when the form is dismissed - but the form only
 		// mounts if the sidebar opens, so clear them here when it does not.
 		setPendingNoteSegments( segments );
-		// Collapse the cross-block selection to the anchor block first, then open
-		// the form on the next frames once that selection - and the focus the
-		// editor moves onto the block - has settled. Opening it in the same tick
-		// lets the collapse pull focus out of the form's input; AddNote's blur
+		// Open the form on the next frames, once the selection - and the focus
+		// the editor moves onto the block - has settled. Opening it in the same
+		// tick lets the editor pull focus out of the form's input; AddNote's blur
 		// handler keeps the form open through that, but deferring lets the input
 		// keep focus so the user can type right away.
-		selectBlock( anchorClientId, null );
+		//
+		// Only collapse to the anchor when there is no run to select. Rich text
+		// places the caret for a collapse a few frames later, which would undo
+		// the multi-selection `focusNote` makes for a span.
+		const spanClientIds = segments?.map( ( segment ) => segment.clientId );
+		if ( ! spanClientIds || spanClientIds.length < 2 ) {
+			selectBlock( anchorClientId, null );
+		}
 		const openForm = async () => {
 			const opened = await focusNote( {
 				targetClientId: anchorClientId,
 				noteId: 'new',
 				isApproved: false,
-				spanClientIds: segments?.map( ( segment ) => segment.clientId ),
+				spanClientIds,
 			} );
 			if ( ! opened ) {
 				setPendingNoteSegments( null );
