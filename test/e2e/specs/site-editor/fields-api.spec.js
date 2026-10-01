@@ -71,9 +71,12 @@ async function getCell( table, row, column ) {
 test.describe( 'Fields API', () => {
 	let authorId;
 
+	// Switching the theme writes the `template` and the `stylesheet` options
+	// one after the other, so a request that lands between the two reads a
+	// theme that does not exist and answers 500. Keep it on its own.
 	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'emptytheme' );
 		await Promise.all( [
-			requestUtils.activateTheme( 'emptytheme' ),
 			requestUtils.activatePlugin( PLUGIN_SLUG ),
 			requestUtils.deleteAllPages(),
 		] );
@@ -101,8 +104,8 @@ test.describe( 'Fields API', () => {
 			requestUtils.deactivatePlugin( PLUGIN_SLUG ),
 			requestUtils.resetPreferences(),
 			requestUtils.deleteAllPages(),
-			requestUtils.activateTheme( 'twentytwentyone' ),
 		] );
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test( 'shows the registered fields in the Pages list', async ( {
