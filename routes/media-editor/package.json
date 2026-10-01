@@ -14,6 +14,7 @@
 		"@wordpress/base-styles": "file:../../packages/base-styles",
 		"@wordpress/core-data": "file:../../packages/core-data",
 		"@wordpress/data": "file:../../packages/data",
+		"@wordpress/fields-loader": "file:../../packages/fields-loader",
 		"@wordpress/html-entities": "file:../../packages/html-entities",
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/routes-lock-unlock": "file:../lock-unlock",

@@ -13,6 +13,7 @@
 		{ "path": "../../packages/admin-ui/tsconfig.build.json" },
 		{ "path": "../../packages/core-data/tsconfig.build.json" },
 		{ "path": "../../packages/data" },
+		{ "path": "../../packages/fields-loader/tsconfig.build.json" },
 		{ "path": "../../packages/html-entities/tsconfig.build.json" },
 		{ "path": "../../packages/i18n/tsconfig.build.json" },
 		{ "path": "../../packages/media-editor/tsconfig.build.json" },
