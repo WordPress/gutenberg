@@ -19,6 +19,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `dropCap` | `boolean` | `false` | — |
 | `placeholder` | `string` | — | — |
 | `direction` | `string` | — | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `ltr`, `rtl` |
+| `allowedFormats` | `array` | — | — |
 
 ## Supports
 

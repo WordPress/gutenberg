@@ -24,6 +24,9 @@
 		"direction": {
 			"type": "string",
 			"enum": [ "ltr", "rtl" ]
+		},
+		"allowedFormats": {
+			"type": "array"
 		}
 	},
 	"supports": {

@@ -575,7 +575,7 @@ Start with the basic building block of all narrative.
 -	**Name:** [core/paragraph](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-paragraph/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
 -	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight, textAlign, textColumns, textIndent, textShadow), ~~className~~
--	**Attributes:** content, direction, dropCap, placeholder
+-	**Attributes:** allowedFormats, content, direction, dropCap, placeholder
 
 ## Pattern Placeholder
 
