@@ -26,6 +26,13 @@ export type SearchOptions = {
 	 */
 	subtype?: string;
 	/**
+	 * Result types to rank above the usual order, most wanted first. Everything
+	 * left out keeps its usual place behind them.
+	 *
+	 *     preferTypes: [ { type: 'term', subtype: 'category' } ]
+	 */
+	preferTypes?: TypeOrderEntry[];
+	/**
 	 * Which page of results to return.
 	 */
 	page?: number;
@@ -121,6 +128,7 @@ export default async function fetchLinkSuggestions(
 	const {
 		type,
 		subtype,
+		preferTypes,
 		page,
 		perPage = searchOptions.isInitialSuggestions ? 3 : 20,
 	} = searchOptionsToUse;
@@ -243,7 +251,7 @@ export default async function fetchLinkSuggestions(
 
 	let results = responses.flat();
 	results = results.filter( ( result ) => !! result.id );
-	return sortResults( results, search );
+	return sortResults( { results, search, preferTypes } );
 }
 
 /**
@@ -283,6 +291,12 @@ function getTitleMatch(
 		begins: haystack.startsWith( needle ),
 	};
 }
+
+/**
+ * A position in a type order: a search type, covering everything of that type, or a search type
+ * with one subtype, covering only that subtype.
+ */
+export type TypeOrderEntry = SearchType | { type: SearchType; subtype: string };
 
 /**
  * The order result types are ranked in, most wanted first.
@@ -326,17 +340,34 @@ function getSearchType( result: SearchResult ): SearchType {
 }
 
 /**
- * How much a result's type counts towards its rank.
+ * Where a result's type ranks.
  *
- * Earlier entries in `TYPE_ORDER` are worth more. The comparisons before this one come first, so
- * a title that plainly answers the search still outranks a better-placed type that barely does.
+ * Earlier entries in `TYPE_ORDER` rank higher, and anything a caller prefers outranks the usual
+ * order entirely. The comparisons before this one come first, so a title that plainly answers the
+ * search still outranks a better-placed type that barely does.
  *
  * @param result
+ * @param preferTypes
  *
- * @return The weight to add to the result's score.
+ * @return The rank of the result's type, the highest ranking first.
  */
-function getTypeWeight( result: SearchResult ): number {
-	return TYPE_ORDER.length - TYPE_ORDER.indexOf( getSearchType( result ) );
+function getTypeRank(
+	result: SearchResult,
+	preferTypes: TypeOrderEntry[] = []
+): number {
+	const searchType = getSearchType( result );
+
+	const preferred = preferTypes.findIndex( ( entry ) =>
+		typeof entry === 'string'
+			? entry === searchType
+			: entry.type === searchType && entry.subtype === result.type
+	);
+
+	if ( preferred !== -1 ) {
+		return TYPE_ORDER.length + ( preferTypes.length - preferred );
+	}
+
+	return TYPE_ORDER.length - TYPE_ORDER.indexOf( searchType );
 }
 
 /**
@@ -403,6 +434,18 @@ function getCoverage( title: string, searchTokens: string[] ): number {
 }
 
 /**
+ * What to sort, and how.
+ */
+type SortOptions = {
+	results: SearchResult[];
+	search: string;
+	/**
+	 * Result types to rank above the usual order, most wanted first.
+	 */
+	preferTypes?: TypeOrderEntry[];
+};
+
+/**
  * Sort search results by relevance to the given query.
  *
  * Sorting is necessary as we're querying multiple endpoints and merging the results. For example
@@ -421,17 +464,23 @@ function getCoverage( title: string, searchTokens: string[] ): number {
  * 5. Percentage of matched word: "cat" ranks the title "Cats" above the title "Caterpillar" since
  *    cat is 75% of "Cats" and only 27% of "Caterpillar"
  *
- * @param results
- * @param search
+ * @param options
+ * @param options.results
+ * @param options.search
+ * @param options.preferTypes
  */
-export function sortResults( results: SearchResult[], search: string ) {
+export function sortResults( {
+	results,
+	search,
+	preferTypes,
+}: SortOptions ): SearchResult[] {
 	const searchTokens = tokenize( search );
 
 	const scored = results.map( ( result ) => ( {
 		result,
 		found: countWordsFound( result.title, searchTokens ),
 		...getTitleMatch( result.title, search ),
-		type: getTypeWeight( result ),
+		type: getTypeRank( result, preferTypes ),
 		score: getCoverage( result.title, searchTokens ),
 	} ) );
 
