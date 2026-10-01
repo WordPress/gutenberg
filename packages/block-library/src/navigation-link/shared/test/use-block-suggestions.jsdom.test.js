@@ -3,6 +3,7 @@ import { BlockIcon } from '@wordpress/block-editor';
 import {
 	addBlockSuggestions,
 	BLOCK_SUGGESTION_TYPE,
+	isBlockSuggestion,
 } from '../use-block-suggestions';
 
 const homeLink = {
@@ -45,6 +46,7 @@ describe( 'addBlockSuggestions', () => {
 
 		expect( suggestion ).toEqual( {
 			id: 'core/home-link',
+			blockItemId: 'core/home-link',
 			type: BLOCK_SUGGESTION_TYPE,
 			title: 'Home Link',
 			icon: expect.anything(),
@@ -132,5 +134,25 @@ describe( 'addBlockSuggestions', () => {
 		expect( addBlockSuggestions( suggestions, [ homeLink ], '' ) ).toBe(
 			suggestions
 		);
+	} );
+
+	// A site can register a post type called "block", whose results arrive
+	// with that type, so a block is recognized by something only it carries.
+	it( 'tells a block apart from a post of a type called "block"', () => {
+		const [ blockSuggestion ] = addBlockSuggestions(
+			[],
+			[ homeLink ],
+			'Home'
+		);
+		const postOfTypeBlock = {
+			id: 12,
+			title: 'Home',
+			type: 'block',
+			kind: 'post-type',
+			url: '/block/home',
+		};
+
+		expect( isBlockSuggestion( blockSuggestion ) ).toBe( true );
+		expect( isBlockSuggestion( postOfTypeBlock ) ).toBe( false );
 	} );
 } );

@@ -21,7 +21,7 @@ import { isURL } from '@wordpress/url';
 import { LinkUIPageCreator } from './page-creator';
 import LinkUIBlockInserter from './block-inserter';
 import {
-	BLOCK_SUGGESTION_TYPE,
+	isBlockSuggestion,
 	useBlockSuggestions,
 	useEntityBinding,
 	useLinkPreview,
@@ -240,10 +240,10 @@ function UnforwardedLinkUI( props, ref ) {
 						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
 						transformSuggestions={ transformSuggestions }
 						onChange={ ( updatedValue ) => {
-							if (
-								updatedValue?.type === BLOCK_SUGGESTION_TYPE
-							) {
-								insertBlockFromSuggestion( updatedValue.id );
+							if ( isBlockSuggestion( updatedValue ) ) {
+								insertBlockFromSuggestion(
+									updatedValue.blockItemId
+								);
 								return;
 							}
 

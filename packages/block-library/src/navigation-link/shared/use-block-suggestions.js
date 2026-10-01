@@ -20,6 +20,23 @@ const { searchItems, normalizeString } = unlock( blockEditorPrivateApis );
 export const BLOCK_SUGGESTION_TYPE = 'block';
 
 /**
+ * Whether a suggestion inserts a block rather than setting a link.
+ *
+ * The `type` alone is not enough: a site can register a post type called
+ * "block", whose results arrive with that type. Only a block suggestion
+ * carries the inserter item it was made from.
+ *
+ * @param {Object} suggestion A link suggestion.
+ * @return {boolean} Whether it is a block suggestion.
+ */
+export function isBlockSuggestion( suggestion ) {
+	return (
+		suggestion?.type === BLOCK_SUGGESTION_TYPE &&
+		typeof suggestion.blockItemId === 'string'
+	);
+}
+
+/**
  * The link variations are left out: searching already finds the pages, posts
  * and terms they would link to.
  */
@@ -65,6 +82,7 @@ export function addBlockSuggestions( suggestions, blockItems, searchTerm ) {
 	for ( const item of matches ) {
 		const suggestion = {
 			id: item.id,
+			blockItemId: item.id,
 			type: BLOCK_SUGGESTION_TYPE,
 			title: item.title,
 			icon: createElement( BlockIcon, { icon: item.icon } ),
