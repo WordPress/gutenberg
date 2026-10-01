@@ -100,7 +100,7 @@ jobs:
         steps:
             - name: Gather a list of contributors
               id: props
-              uses: WordPress/props-bot-action@a57e6a2d9e5a37576d413e5c060fa28ece00bfea # WordPress/props-bot-action#288
+              uses: WordPress/props-bot-action@6ff24f6b95fee6aeee3f49a8365cb62a525b2ce7 # trunk
               with:
                   # The PR meta comment carries the list, so the action renders
                   # it to an output and posts nothing itself.
@@ -123,7 +123,7 @@ jobs:
         timeout-minutes: 20
 
         steps:
-            - uses: WordPress/props-bot-action@a57e6a2d9e5a37576d413e5c060fa28ece00bfea # WordPress/props-bot-action#288
+            - uses: WordPress/props-bot-action@6ff24f6b95fee6aeee3f49a8365cb62a525b2ce7 # trunk
               with:
                   post-comment: true
 
