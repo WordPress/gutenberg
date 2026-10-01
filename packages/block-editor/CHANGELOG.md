@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Block alignment is now available in the Layout panel of the block inspector for every block that supports it, as an option that is not shown by default. A new `alignToolbar` block support, defaulting to `true`, controls whether the alignment control also appears in the block toolbar ([#PRNUMBER](https://github.com/WordPress/gutenberg/pull/PRNUMBER)).
+-   Block alignment is now available in the Layout panel of the block inspector for every block that supports it, as an option that is not shown by default. A new `alignToolbar` block support, defaulting to `true`, controls whether the alignment control also appears in the block toolbar ([#83955](https://github.com/WordPress/gutenberg/pull/83955)).
 -   Inserter: Open faster when many block types are registered ([#83446](https://github.com/WordPress/gutenberg/pull/83446)).
 -   State control badges: migrate from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Badge` ([#82608](https://github.com/WordPress/gutenberg/pull/82608)).
 -   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
