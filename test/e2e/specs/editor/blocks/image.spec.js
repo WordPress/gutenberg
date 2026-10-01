@@ -365,11 +365,17 @@ test.describe( 'Image', () => {
 
 			await blockLibrary.getByRole( 'tab', { name: 'Media' } ).click();
 
-			// Each media source is a collapsible panel; open the Openverse one.
-			await blockLibrary
+			// Each media source is a collapsible panel, and clicking the open
+			// one closes it, so only click when it's collapsed.
+			const openverse = blockLibrary
 				.getByRole( 'tabpanel', { name: 'Media' } )
-				.getByRole( 'button', { name: 'Openverse' } )
-				.click();
+				.getByRole( 'button', { name: 'Openverse' } );
+
+			if (
+				( await openverse.getAttribute( 'aria-expanded' ) ) === 'false'
+			) {
+				await openverse.click();
+			}
 		}
 
 		await openMediaTab();
