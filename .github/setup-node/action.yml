@@ -32,11 +32,14 @@ runs:
               echo "NPM_VERSION=$(npm -v)" >> "$GITHUB_OUTPUT"
           shell: bash
 
+        # Windows tar cannot restore the isolated layout's links, so always install there.
         - name: Cache node_modules
           id: cache-node_modules
-          if: ${{ inputs.cache == 'true' }}
+          if: ${{ inputs.cache == 'true' && runner.os != 'Windows' }}
           uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
           with:
+              # The key covers .npmrc because install-strategy decides the layout:
+              # a hoisted tree restored into an isolated checkout resolves nothing.
               # List workspace node_modules explicitly to support all kinds of layouts - hoisted and isolated.
               # A '**/node_modules' glob follows the isolated layout's symlinks and stalls the cache step.
               # The eval package is not a workspace: it installs its own large tree from its own lockfile.
@@ -49,7 +52,7 @@ runs:
                   !test/ai-development/node_modules
                   tools/*/node_modules
                   widgets/*/node_modules
-              key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-npm-${{ steps.node-version.outputs.NPM_VERSION }}-${{ hashFiles('package-lock.json', 'patches/**') }}
+              key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-npm-${{ steps.node-version.outputs.NPM_VERSION }}-${{ hashFiles('package-lock.json', '.npmrc') }}
 
         - name: Install npm dependencies
           if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' }}
