@@ -405,6 +405,7 @@ run( 'npm', [
 	'--no-audit',
 	'--no-fund',
 	'jest@30.5.0',
+	'eslint-plugin-jest@29.16.5',
 	'jest-environment-jsdom@30.5.0',
 	'@wordpress/jest-preset-default@14.2.0',
 	'babel-jest@30.5.0',
@@ -449,7 +450,7 @@ rmSync( path.join( consumer, 'jest.config.cjs' ) );
 for ( const name of [ 'example.test.js', 'example.spec.ts' ] ) {
 	write(
 		name,
-		"import { test, expect } from 'vitest'; test.only( 'fails lint', () => expect( true ).toBe( true ) );"
+		"import { test, expect } from 'vitest'; test.only( 'fails lint', () => { expect.poll( () => true ).toBe( true ); } );"
 	);
 	const output = JSON.parse(
 		run( values.node, [
@@ -464,6 +465,15 @@ for ( const name of [ 'example.test.js', 'example.spec.ts' ] ) {
 		] )
 	);
 	assert.ok( output.rules[ 'vitest/no-focused-tests' ] );
+	assert.equal(
+		output.rules[ 'vitest/require-awaited-expect-poll' ][ 0 ],
+		2
+	);
+	assert.equal( output.rules[ 'vitest/valid-title' ][ 0 ], 2 );
+	assert.equal(
+		output.rules[ 'vitest/valid-title' ][ 1 ].allowArguments,
+		true
+	);
 	assert.equal( output.rules[ 'jest/no-focused-tests' ], undefined );
 	assert.equal( output.languageOptions.globals?.test, undefined );
 	const result = spawnSync(
@@ -477,22 +487,19 @@ for ( const name of [ 'example.test.js', 'example.spec.ts' ] ) {
 			( message ) => message.ruleId === 'vitest/no-focused-tests'
 		)
 	);
+	assert.ok(
+		JSON.parse( result.stdout )[ 0 ].messages.some(
+			( message ) =>
+				message.ruleId === 'vitest/require-awaited-expect-poll'
+		)
+	);
 }
-// The deprecated eslintrc entry still works on ESLint 9 during its transition.
+// Exercise both public entrypoints in the packed consumer, not workspace links.
 write(
-	'lint-legacy.cjs',
-	`const { LegacyESLint } = require('eslint9/use-at-your-own-risk');
-const config = require('@wordpress/eslint-plugin/eslintrc').configs['test-unit'];
-new LegacyESLint({ useEslintrc: false, overrideConfig: config }).lintText("import { test, expect } from 'vitest'; test.only('focused', () => expect(true).toBe(true));").then(results => console.log(JSON.stringify(results[0].messages)));`
+	'lint-defaults.cjs',
+	readFileSync( path.join( fixtureRoot, 'lint-defaults.cjs' ) )
 );
-const legacyMessages = run( values.node, [ 'lint-legacy.cjs' ] ).split(
-	'\n'
-)[ 0 ];
-assert.ok(
-	JSON.parse( legacyMessages ).some(
-		( message ) => message.ruleId === '@vitest/no-focused-tests'
-	)
-);
+console.log( run( values.node, [ 'lint-defaults.cjs' ] ) );
 console.log(
 	'Passed consumer commands, config discovery, jsdom, generated CSS, Jest compatibility, and lint defaults.'
 );
