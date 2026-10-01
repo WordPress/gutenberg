@@ -241,6 +241,20 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 	const [ query, setQuery ] = useState( '' );
 	const searchRef = useRef< HTMLInputElement >( null );
 
+	/*
+	 * Announce once when a pending load fills the grid. A cached dataset
+	 * renders straight away, and searching filters synchronously, so
+	 * neither needs an announcement.
+	 */
+	const [ hasJustLoaded, setHasJustLoaded ] = useState( false );
+	const wasLoadingRef = useRef( isLoading );
+	useEffect( () => {
+		if ( wasLoadingRef.current && ! isLoading && ! error ) {
+			setHasJustLoaded( true );
+		}
+		wasLoadingRef.current = isLoading;
+	}, [ isLoading, error ] );
+
 	const { frequentKeys, recordUse } = useFrequentEmojis();
 	const skinTone = useSelect(
 		( select ) =>
@@ -349,8 +363,6 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 		skinTone,
 	] );
 
-	const matchCount = isSearching ? items.length : 0;
-
 	/**
 	 * Render grid rows of emoji cells, recording usage on selection.
 	 *
@@ -399,13 +411,22 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 		status = __( 'Loading…' );
 	} else if ( error ) {
 		status = __( 'Couldn’t load emojis.' );
-	} else if ( isSearching && matchCount > 0 ) {
+	} else if ( hasJustLoaded && ! isSearching && groups.length > 0 ) {
+		// An empty dataset is left to `Autocomplete.Empty`.
+		const emojiCount = groups.reduce(
+			( total, group ) => total + group.emojis.length,
+			0
+		);
 		status = (
 			<VisuallyHidden>
 				{ sprintf(
-					/* translators: %d: number of emojis matching the search. */
-					_n( '%d emoji found.', '%d emojis found.', matchCount ),
-					matchCount
+					/* translators: %d: number of emojis available to pick. */
+					_n(
+						'%d emoji available.',
+						'%d emojis available.',
+						emojiCount
+					),
+					emojiCount
 				) }
 			</VisuallyHidden>
 		);
@@ -428,7 +449,11 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 				// Enter picks the top hit once the user has typed.
 				autoHighlight
 				value={ query }
-				onValueChange={ setQuery }
+				onValueChange={ ( value: string ) => {
+					setQuery( value );
+					// Searches stay quiet, so drop the load announcement.
+					setHasJustLoaded( false );
+				} }
 			>
 				<div className="editor-collab-sidebar-panel__picker-search">
 					<Autocomplete.InputGroup className="editor-collab-sidebar-panel__picker-input">

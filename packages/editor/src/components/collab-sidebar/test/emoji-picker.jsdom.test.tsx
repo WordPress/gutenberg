@@ -376,7 +376,7 @@ describe( 'EmojiPicker search announcements', () => {
 		expect( onSelect ).toHaveBeenCalledWith( '😁' );
 	} );
 
-	it( 'reports result counts and the empty state through the Autocomplete status', async () => {
+	it( 'leaves synchronous search results unannounced and reports the empty state', async () => {
 		const user = userEvent.setup();
 		render( <EmojiPicker onSelect={ () => {} } /> );
 
@@ -388,15 +388,12 @@ describe( 'EmojiPicker search announcements', () => {
 		} );
 
 		await user.type( searchbox, 'face' );
-		expect( await screen.findByText( '2 emojis found.' ) ).toHaveAttribute(
-			'data-visually-hidden'
+		await waitFor( () =>
+			expect( screen.getAllByRole( 'gridcell' ) ).toHaveLength( 2 )
 		);
-
-		await user.clear( searchbox );
-		await user.type( searchbox, 'grinning' );
 		expect(
-			await screen.findByText( '1 emoji found.' )
-		).toBeInTheDocument();
+			screen.queryByText( /found|available/ )
+		).not.toBeInTheDocument();
 
 		await user.clear( searchbox );
 		await user.type( searchbox, 'zzz' );
@@ -406,21 +403,42 @@ describe( 'EmojiPicker search announcements', () => {
 		expect( screen.getByRole( 'grid', { name: 'Emoji' } ) ).toBeVisible();
 	} );
 
-	it( 'clears the count when the query is cleared', async () => {
-		const user = userEvent.setup();
+	it( 'announces once when a pending load fills the grid, but not for a cached opening', async () => {
+		// The dataset cache is module-wide, so use a URL no other test loads.
+		dispatch( blockEditorStore ).updateSettings( {
+			noteEmojibaseUrl: 'https://example.test/emojibase-pending-load',
+		} );
+		const { unmount } = render( <EmojiPicker onSelect={ () => {} } /> );
+
+		expect(
+			await screen.findByText( '2 emojis available.' )
+		).toHaveAttribute( 'data-visually-hidden' );
+
+		unmount();
 		render( <EmojiPicker onSelect={ () => {} } /> );
 
 		await screen.findAllByRole( 'gridcell' );
+		expect( screen.queryByText( /available/ ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'drops the load announcement once the user searches', async () => {
+		const user = userEvent.setup();
+		dispatch( blockEditorStore ).updateSettings( {
+			noteEmojibaseUrl:
+				'https://example.test/emojibase-search-after-load',
+		} );
+		render( <EmojiPicker onSelect={ () => {} } /> );
+
+		await screen.findByText( '2 emojis available.' );
 
 		const searchbox = screen.getByRole( 'combobox', {
 			name: 'Search emoji',
 		} );
-
 		await user.type( searchbox, 'grinning' );
 		await user.clear( searchbox );
 
-		// Clearing restores the full grid, so no count describes it.
-		expect( screen.queryByText( /found/ ) ).not.toBeInTheDocument();
+		// Restoring the full grid is synchronous, so nothing is announced.
+		expect( screen.queryByText( /available/ ) ).not.toBeInTheDocument();
 	} );
 } );
 
