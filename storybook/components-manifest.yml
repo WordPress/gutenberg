@@ -279,16 +279,73 @@
             - className
             - render
             - style
+- name: Checkbox
+  props:
+      - checked
+      - className
+      - defaultChecked
+      - disabled
+      - form
+      - id
+      - indeterminate
+      - inputRef
+      - name
+      - nativeButton
+      - onCheckedChange
+      - parent
+      - readOnly
+      - render
+      - required
+      - style
+      - uncheckedValue
+      - value
 - name: CheckboxControl
   props:
-      - __nextHasNoMarginBottom
       - checked
+      - className
+      - defaultChecked
+      - description
+      - details
       - disabled
-      - heading
-      - help
+      - form
+      - hideLabelFromVision
+      - id
       - indeterminate
+      - inputRef
       - label
-      - onChange
+      - name
+      - nativeButton
+      - onCheckedChange
+      - parent
+      - readOnly
+      - render
+      - required
+      - style
+      - uncheckedValue
+      - value
+- name: CheckboxGroup
+  props:
+      - allValues
+      - children
+      - className
+      - defaultValue
+      - disabled
+      - onValueChange
+      - render
+      - style
+      - value
+  subcomponents:
+      - name: CheckboxGroup.NestedItems
+        props:
+            - align
+            - children
+            - className
+            - direction
+            - gap
+            - justify
+            - render
+            - style
+            - wrap
 - name: Collapsible.Root
   props:
       - children
@@ -916,24 +973,67 @@
         props:
             - children
             - path
-- name: Notice
+- name: Notice.Root
   props:
-      - __unstableHTML
-      - actions
       - children
       - className
-      - isDismissible
-      - onDismiss
-      - onRemove
-      - politeness
-      - spokenMessage
-      - status
+      - icon
+      - intent
+      - render
+      - style
   subcomponents:
-      - name: NoticeList
+      - name: Notice.ActionButton
+        props:
+            - aria-pressed
+            - children
+            - className
+            - disabled
+            - focusableWhenDisabled
+            - loading
+            - loadingAnnouncement
+            - nativeButton
+            - render
+            - style
+            - variant
+      - name: Notice.ActionLink
         props:
             - children
-            - notices
-            - onRemove
+            - className
+            - openInNewTab
+            - render
+            - style
+            - target
+      - name: Notice.Actions
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Notice.CloseIconButton
+        props:
+            - aria-pressed
+            - className
+            - disabled
+            - focusableWhenDisabled
+            - icon
+            - label
+            - nativeButton
+            - positioner
+            - render
+            - shortcut
+            - style
+      - name: Notice.Description
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Notice.Title
+        props:
+            - children
+            - className
+            - render
+            - style
 - name: Popover
   props:
       - __unstableForcePosition
@@ -1649,7 +1749,8 @@
       - politeness
       - spokenMessage
 - name: Spinner
-  props: []
+  props:
+      - color
 - name: Stack
   props:
       - align
