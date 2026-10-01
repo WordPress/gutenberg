@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Add the `stylelint-scss` dependency, a peer of `@wordpress/stylelint-config` ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+-   `build`, `start` and `lint-pkg-json`: Resolve the default browserslist and npm-package-json-lint configs when dependencies are not hoisted to the project root (npm `install-strategy=linked`, pnpm). The default npm-package-json-lint config moves from `config/npmpackagejsonlint.json` to `config/npmpackagejsonlint.js`.
 
 ## 36.0.0 (2026-09-23)
 
