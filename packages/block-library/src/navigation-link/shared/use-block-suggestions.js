@@ -1,4 +1,5 @@
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
+import { speak } from '@wordpress/a11y';
 import { createElement, useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -160,23 +161,28 @@ export function useBlockSuggestions( {
 		);
 		const index = getBlockIndex( clientId );
 
-		// A caller that tracks the new link, such as the list view, removes it
-		// itself once told about the block, as with the "Add block" pane.
 		if ( onBlockInsert ) {
+			// A caller that tracks the new link, such as the list view, removes
+			// it itself once told about the block, as with the "Add block" pane.
 			insertBlock( block, index, rootClientId, false );
 			onBlockInsert( block );
-			return;
-		}
-
-		// A submenu keeps its items, so the block goes before it, where the
-		// "Add block" pane puts it. An empty link is replaced by the block.
-		if ( getBlockOrder( clientId ).length ) {
+		} else if ( getBlockOrder( clientId ).length ) {
+			// A submenu keeps its items, so the block goes before it, where the
+			// "Add block" pane puts it.
 			insertBlock( block, index, rootClientId );
 			onClose?.();
-			return;
+		} else {
+			// An empty link is replaced by the block.
+			replaceBlock( clientId, block );
 		}
 
-		replaceBlock( clientId, block );
+		speak(
+			sprintf(
+				/* translators: %s: The title of the block that was added. */
+				__( '%s block added.' ),
+				item.title
+			)
+		);
 	};
 
 	return {
