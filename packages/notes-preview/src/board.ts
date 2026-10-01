@@ -105,8 +105,8 @@ export function createBoard(
 			// carries no strings of its own.
 			const template =
 				known.length === 1
-					? indicatorLayer.dataset.labelSingle ?? ''
-					: indicatorLayer.dataset.labelPlural ?? '';
+					? ( indicatorLayer.dataset.labelSingle ?? '' )
+					: ( indicatorLayer.dataset.labelPlural ?? '' );
 
 			button.setAttribute(
 				'aria-label',

@@ -1,13 +1,11 @@
 {
-	"extends": "../../tsconfig.base.json",
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/dev.base.json",
 	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types"
+		"types": [ "gutenberg-vitest-test-env" ]
 	},
 	"references": [
-		{
-			"path": "../interactivity"
-		}
-	],
-	"include": [ "src/**/*" ]
+		{ "path": "./tsconfig.build.json" },
+		{ "path": "../interactivity/tsconfig.build.json" }
+	]
 }
