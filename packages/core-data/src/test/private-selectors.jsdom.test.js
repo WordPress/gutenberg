@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { getUndoManager } from '../private-selectors';
 import { getEntitySyncManager } from '../entity-sync';
 
-vi.mock( '../entity-sync', () => ( {
+vi.mock( import( '../entity-sync' ), () => ( {
 	getEntitySyncManager: vi.fn(),
 } ) );
 
