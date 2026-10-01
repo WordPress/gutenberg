@@ -124,8 +124,10 @@ test.describe( 'Parent selector inserter', () => {
 				name: 'Select parent block: Group',
 			} )
 		).toBeVisible();
+		// Match the inserter itself: the toolbar also carries the "Add note"
+		// button, which a name-based "Add …" locator would catch.
 		await expect(
-			toolbar.getByRole( 'button', { name: /^Add / } )
+			toolbar.locator( '.block-editor-block-parent-selector__inserter' )
 		).toBeHidden();
 	} );
 } );
