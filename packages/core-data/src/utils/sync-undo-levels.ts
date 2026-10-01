@@ -239,6 +239,10 @@ export function applyUndoLevel(
 	syncManager: EntitySyncManager | undefined,
 	type: UndoLevelType
 ): HistoryRecord | undefined {
+	// The sync manager may defer local changes. Closing its level applies
+	// them first, so their levels are in the history before one is moved.
+	syncManager?.undoHistory?.stopCapturing();
+
 	let level = popUndoLevel( undoManager, syncManager, type );
 
 	// A level that applied nothing is stale. Move past it to the next one.

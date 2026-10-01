@@ -11,6 +11,8 @@ import {
 function createSyncManager( syncedIds = [ 'postType/post/1' ] ) {
 	const synced = new Set( syncedIds );
 	const levels = new Map();
+	// Levels of deferred local changes, opened when the manager flushes.
+	const deferredLevels = [];
 	const getLevels = ( kind, name, recordId ) => {
 		const key = `${ kind }/${ name }/${ recordId }`;
 		if ( ! levels.has( key ) ) {
@@ -42,7 +44,11 @@ function createSyncManager( syncedIds = [ 'postType/post/1' ] ) {
 				record.undo += 1;
 				return true;
 			} ),
-			stopCapturing: vi.fn(),
+			// Like the sync manager, closing the level applies deferred
+			// changes first, which opens their levels.
+			stopCapturing: vi.fn( () => {
+				deferredLevels.splice( 0 ).forEach( ( open ) => open() );
+			} ),
 			clearRedo: vi.fn( () => {
 				levels.forEach( ( record ) => {
 					record.redo = 0;
@@ -62,6 +68,18 @@ function createSyncManager( syncedIds = [ 'postType/post/1' ] ) {
 			record.redo = 0;
 			undoManager.addRecord(
 				createSyncUndoLevelRecord( kind, name, recordId )
+			);
+		},
+		// A local change to a synced record that the manager has not
+		// applied yet: its level opens on the next flush.
+		deferLevel(
+			undoManager,
+			kind = 'postType',
+			name = 'post',
+			recordId = 1
+		) {
+			deferredLevels.push( () =>
+				this.openLevel( undoManager, kind, name, recordId )
 			);
 		},
 		// The record was unloaded: it is no longer synced and its levels
@@ -300,6 +318,32 @@ describe( 'applyUndoLevel', () => {
 			'postType',
 			'post',
 			1
+		);
+	} );
+
+	it( 'moves a level whose deferred change has not been applied yet', () => {
+		const undoManager = createUndoManager();
+		const syncManager = createSyncManager();
+		const record = createRecord( 1, 'a', 'b', 'site' );
+
+		// A site edit, then typing in the synced post. The manager defers
+		// the typing, so its level is not in the history yet.
+		recordEntityEdit( undoManager, syncManager, record );
+		syncManager.deferLevel( undoManager );
+
+		// Undo, before the deferred change is applied, moves the typing.
+		expect( applyUndoLevel( undoManager, syncManager, 'undo' ) ).toEqual(
+			[]
+		);
+		expect( syncManager.undoHistory.undo ).toHaveBeenCalledWith(
+			'postType',
+			'post',
+			1
+		);
+
+		// Then the site edit.
+		expect( applyUndoLevel( undoManager, syncManager, 'undo' ) ).toEqual(
+			record
 		);
 	} );
 
