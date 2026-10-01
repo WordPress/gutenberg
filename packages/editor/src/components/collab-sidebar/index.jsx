@@ -15,10 +15,8 @@ import { Notes } from './notes';
 import { NotesDisplayModeMenu } from './notes-display-mode-menu';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
-import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { NoteHighlightStyles } from './note-highlight-styles';
 import { useNoteThreads } from './hooks';
-import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { CanvasMargin } from '../visual-editor/canvas-margin';
 import { unlock } from '../../lock-unlock';
@@ -33,22 +31,18 @@ function NotesSidebar( { postId } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const sidebarRef = useRef( null );
 
-	const { clientId, noteId, isClassicBlock } = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientId, getBlockName } =
+	const { clientId, isClassicBlock } = useSelect( ( select ) => {
+		const { getSelectedBlockClientId, getBlockName } =
 			select( blockEditorStore );
 		const _clientId = getSelectedBlockClientId();
 		return {
 			clientId: _clientId,
-			noteId: _clientId
-				? getBlockAttributes( _clientId )?.metadata?.noteId
-				: null,
 			isClassicBlock: _clientId
 				? getBlockName( _clientId ) === 'core/freeform'
 				: false,
 		};
 	}, [] );
 
-	const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
 	const { isDistractionFree, notesDisplayMode } = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		return {
@@ -107,19 +101,6 @@ function NotesSidebar( { postId } ) {
 		selectNote( targetNoteId, { focus: true } );
 	}
 
-	function openNoteForBlock( targetClientId ) {
-		// A block can carry multiple threads; surface the most relevant.
-		const blockThreads = notes.filter(
-			( thread ) => thread.blockClientId === targetClientId
-		);
-		const target = pickPrimaryNote( blockThreads );
-		return focusNote( {
-			targetClientId,
-			noteId: target?.id ?? 'new',
-			isApproved: target?.status === 'approved',
-		} );
-	}
-
 	function addNewNoteForBlock( targetClientId ) {
 		return focusNote( {
 			targetClientId,
@@ -139,13 +120,6 @@ function NotesSidebar( { postId } ) {
 		}
 	);
 
-	// Surface one thread for the avatar indicator.
-	const currentThreads =
-		blockNoteIds.length > 0
-			? notes.filter( ( thread ) => blockNoteIds.includes( thread.id ) )
-			: [];
-	const currentThread = pickPrimaryNote( currentThreads );
-
 	if ( isDistractionFree ) {
 		return <AddNoteMenuItem isDistractionFree />;
 	}
@@ -156,12 +130,6 @@ function NotesSidebar( { postId } ) {
 				threads={ unresolvedNotes }
 				selectedId={ selectedNoteId }
 			/>
-			{ !! currentThread && (
-				<NoteAvatarIndicator
-					note={ currentThread }
-					onClick={ () => openNoteForBlock( clientId ) }
-				/>
-			) }
 			<AddNoteMenuItem
 				onClick={ ( menuClientId ) =>
 					addNewNoteForBlock( menuClientId )
