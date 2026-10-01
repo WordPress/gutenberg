@@ -184,7 +184,11 @@ export function useNoteActions() {
 		getSelectionStart,
 		getSelectionEnd,
 	} = useSelect( blockEditorStore );
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const {
+		updateBlockAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+		__unstableMarkLastChangeAsPersistent,
+	} = useDispatch( blockEditorStore );
 
 	const onError = ( error ) => {
 		const errorMessage =
@@ -359,6 +363,79 @@ export function useNoteActions() {
 		}
 	};
 
+	/*
+	 * Update a note's anchor without an undo step, since undo can't bring the
+	 * note back with it. The last call flags the post as changed, so "Save
+	 * draft" turns on.
+	 */
+	const updateNoteAnchor = ( clientId, attributes ) => {
+		__unstableMarkNextChangeAsNotPersistent( { history: 'ignore' } );
+		updateBlockAttributes( clientId, attributes );
+		__unstableMarkLastChangeAsPersistent();
+	};
+
+	const restoreNote = async ( noteId, anchor ) => {
+		try {
+			// Untrash first, so a failure doesn't leave an anchor without a note.
+			await saveEntityRecord(
+				'root',
+				'comment',
+				{ id: noteId, status: 'untrash' },
+				{ throwOnError: true }
+			);
+
+			// No anchor (a reply or an orphan), or its block is gone: the
+			// note comes back on its own.
+			const attributes = anchor
+				? getBlockAttributes( anchor.clientId )
+				: null;
+			if ( attributes ) {
+				const newAttributes = {};
+				// The editor's undo may have brought the anchor back already.
+				if (
+					! getNoteIdsFromMetadata( attributes.metadata ).includes(
+						noteId
+					)
+				) {
+					newAttributes.metadata = addNoteIdToMetadata(
+						attributes.metadata,
+						noteId
+					);
+				}
+				const { inline } = anchor;
+				const value = inline && attributes[ inline.attributeKey ];
+				// Re-wrap only text that hasn't changed since the delete;
+				// otherwise the note comes back as a block-level note.
+				if (
+					inline &&
+					! findNoteInBlock( attributes, noteId ) &&
+					value?.text?.slice( inline.start, inline.end ) ===
+						inline.text
+				) {
+					const wrapped = wrapInlineNote(
+						value,
+						noteId,
+						inline.start,
+						inline.end
+					);
+					if ( wrapped ) {
+						newAttributes[ inline.attributeKey ] = wrapped;
+					}
+				}
+				if ( Object.keys( newAttributes ).length > 0 ) {
+					updateNoteAnchor( anchor.clientId, newAttributes );
+				}
+			}
+
+			createNotice( 'snackbar', __( 'Note restored.' ), {
+				type: 'snackbar',
+				isDismissible: true,
+			} );
+		} catch ( error ) {
+			onError( error );
+		}
+	};
+
 	const onDelete = async ( note ) => {
 		try {
 			// Capture the target block *before* the async delete: selection may
@@ -368,23 +445,28 @@ export function useNoteActions() {
 				? note.blockClientId || getSelectedBlockClientId()
 				: null;
 
+			// Without `force`, this moves the note to the trash, so the
+			// snackbar's Undo can bring it back.
 			await deleteEntityRecord( 'root', 'comment', note.id, undefined, {
 				throwOnError: true,
 			} );
 
-			if ( clientId ) {
-				const attributes = getBlockAttributes( clientId );
+			// What Undo needs to re-attach the note to its block.
+			let anchor = null;
+			const attributes = clientId ? getBlockAttributes( clientId ) : null;
+			if (
+				getNoteIdsFromMetadata( attributes?.metadata ).includes(
+					note.id
+				)
+			) {
+				anchor = { clientId };
 				const newAttributes = {
 					metadata: cleanEmptyObject(
-						removeNoteIdFromMetadata(
-							attributes?.metadata,
-							note.id
-						)
+						removeNoteIdFromMetadata( attributes.metadata, note.id )
 					),
 				};
 				// Strip the inline marker too (if any) so the deleted note's
-				// highlight doesn't linger in the content. Folded into the same
-				// attribute update so it's a single undo step.
+				// highlight doesn't linger in the content.
 				const found = findNoteInBlock( attributes, note.id );
 				if ( found ) {
 					const next = removeNoteFormat(
@@ -393,14 +475,24 @@ export function useNoteActions() {
 					);
 					if ( next ) {
 						newAttributes[ found.attributeKey ] = next;
+						anchor.inline = {
+							...found,
+							text: next.text.slice( found.start, found.end ),
+						};
 					}
 				}
-				updateBlockAttributes( clientId, newAttributes );
+				updateNoteAnchor( clientId, newAttributes );
 			}
 
 			createNotice( 'snackbar', __( 'Note deleted.' ), {
 				type: 'snackbar',
 				isDismissible: true,
+				actions: [
+					{
+						label: __( 'Undo' ),
+						onClick: () => restoreNote( note.id, anchor ),
+					},
+				],
 			} );
 
 			return true;
