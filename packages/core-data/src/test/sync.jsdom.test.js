@@ -19,7 +19,7 @@ const { mockSyncManager, mockCreateSyncManager, mockSaveCRDTDoc } = vi.hoisted(
 	}
 );
 
-vi.mock( '@wordpress/sync', () => ( {
+vi.mock( import( '@wordpress/sync' ), () => ( {
 	privateApis: {
 		createSyncManager: mockCreateSyncManager,
 		ConnectionErrorCode: {},
@@ -32,17 +32,17 @@ vi.mock( '@wordpress/sync', () => ( {
 	},
 } ) );
 
-vi.mock( '../lock-unlock', () => ( {
+vi.mock( import( '../lock-unlock' ), () => ( {
 	unlock: ( privateApis ) => privateApis,
 } ) );
 
 // Keep the adapter's module graph small: the entity configs and the CRDT
 // utilities pull in the block library, which does not survive module resets.
-vi.mock( '../entities', () => ( {
+vi.mock( import( '../entities' ), () => ( {
 	DEFAULT_ENTITY_KEY: 'id',
 } ) );
 
-vi.mock( '../utils/crdt', () => ( {
+vi.mock( import( '../utils/crdt' ), () => ( {
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE: '_crdt_document',
 	// Mirrors `getRawValue` in utils/crdt.ts.
 	getRawValue: ( value ) => {
@@ -61,11 +61,11 @@ vi.mock( '../utils/crdt', () => ( {
 	},
 } ) );
 
-vi.mock( '../utils/save-crdt-doc', () => ( {
+vi.mock( import( '../utils/save-crdt-doc' ), () => ( {
 	saveCRDTDoc: mockSaveCRDTDoc,
 } ) );
 
-vi.mock( '../utils/crdt-selection', () => ( {
+vi.mock( import( '../utils/crdt-selection' ), () => ( {
 	getSelectionHistory: vi.fn(),
 	restoreSelection: vi.fn(),
 } ) );

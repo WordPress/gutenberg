@@ -5,7 +5,7 @@ import {
 	tokenize,
 } from '../__experimental-fetch-link-suggestions';
 
-vi.mock( '@wordpress/api-fetch', () => ( {
+vi.mock( import( '@wordpress/api-fetch' ), () => ( {
 	default: vi.fn( ( { path } ) => {
 		switch ( path ) {
 			case '/wp/v2/search?search=&per_page=20&type=post':
