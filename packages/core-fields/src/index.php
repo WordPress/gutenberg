@@ -6,9 +6,8 @@
  * The default fields every post type derives from its supports are
  * registered in code, see register_core_post_type_supports_fields(). Their
  * definitions are the `field.php` files of the `post_type_supports` folder. The
- * post types whose fields differ from the defaults exclude the ones they do
- * not get on the `fields_api_post_type_supports_exclusions` filter, as a
- * plugin would, see exclude_core_post_type_support_fields().
+ * post types whose fields differ from the defaults unregister the ones they
+ * do not get, as a plugin would, see register_core_field_collections().
  *
  * The fields of a single entity, a post type or the site, are declarative
  * collections, the other folders next to this file, see
@@ -45,8 +44,7 @@
  * - `title`, for the post types supporting `title`.
  *
  * It makes no exception for any post type: the fields a post type does not
- * get are excluded on the `fields_api_post_type_supports_exclusions` filter,
- * before they are registered.
+ * get are unregistered afterwards, see register_core_field_collections().
  *
  * Only some fields have JavaScript parts, but every field is registered
  * with the script module of the folder: a post type supporting only
@@ -64,7 +62,7 @@ function register_core_post_type_supports_fields( $registry ) {
 		// arrays, and a support without arguments as `true`.
 		$editor = get_all_post_type_supports( $post_type )['editor'] ?? null;
 
-		$applies    = array(
+		$applies = array(
 			'author'            => post_type_supports( $post_type, 'author' ),
 			'comment_status'    => post_type_supports( $post_type, 'comments' ),
 			'date'              => true,
@@ -85,50 +83,9 @@ function register_core_post_type_supports_fields( $registry ) {
 			'template'          => true,
 			'title'             => post_type_supports( $post_type, 'title' ),
 		);
-		$all_fields = array_keys( array_filter( $applies ) );
-		if ( ! $all_fields ) {
-			continue;
-		}
-
-		/**
-		 * Filters the default fields a post type does not get from its
-		 * supports.
-		 *
-		 * A post type whose fields differ from the defaults excludes some
-		 * or all of them here, before they are registered, and registers
-		 * its own if needed. Callbacks compose: add to the incoming list
-		 * rather than replacing it.
-		 *
-		 * The filter runs when the registry fires `fields_api_init`, on its
-		 * first read after `init`: add callbacks on plugin load or on
-		 * `init`, not later.
-		 *
-		 * @since 7.2.0
-		 *
-		 * @param string[] $excluded_fields The ids of the default fields the
-		 *                                  post type does not get. Default
-		 *                                  empty array.
-		 * @param string   $post_type       The post type.
-		 * @param string[] $all_fields      The ids of the default fields the
-		 *                                  post type supports.
-		 */
-		$excluded_fields = apply_filters( 'fields_api_post_type_supports_exclusions', array(), $post_type, $all_fields );
-		if ( ! is_array( $excluded_fields ) ) {
-			_doing_it_wrong(
-				__FUNCTION__,
-				sprintf(
-					/* translators: 1: The name of a filter. 2: A post type. */
-					__( 'The %1$s filter must return a list of field ids. Nothing is excluded for the post type "%2$s".', 'gutenberg' ),
-					'<code>fields_api_post_type_supports_exclusions</code>',
-					$post_type
-				),
-				'7.2.0'
-			);
-			$excluded_fields = array();
-		}
 
 		// Keeps the alphabetical order of the folders.
-		$fields = array_values( array_intersect_key( $definitions, array_flip( array_diff( $all_fields, $excluded_fields ) ) ) );
+		$fields = array_values( array_intersect_key( $definitions, array_filter( $applies ) ) );
 		if ( $fields ) {
 			$registry->register( 'core', 'postType', $post_type, $fields, '@wordpress/core-fields/post_type_supports' );
 		}
@@ -136,71 +93,9 @@ function register_core_post_type_supports_fields( $registry ) {
 }
 
 /**
- * Excludes the default fields the core post types do not get:
- *
- * - Templates: `author`. Their author is the theme, plugin, site, or user
- *   that provides them rather than their post author, so the `wp_template`
- *   collection has its own author field.
- * - Template parts: `author`. Their author is the theme, plugin, site, or
- *   user that provides them too, so the `wp_template_part` collection has
- *   its own author field.
- * - Templates, template parts, and patterns: `excerpt`. Their excerpt is
- *   their description: templates and patterns edit it with their own
- *   description fields, and template parts do not show it.
- * - Templates, template parts, and navigation menus: `post-content-info`.
- *   Their content is blocks laying out a site, not text to read.
- * - The design post types (templates, template parts, patterns, and
- *   navigation menus): the fields about publishing a post
- *   (`date`, `password`, `scheduled_date`, `slug`, `status`) and the
- *   `template` that renders a post. They lay out a site rather than
- *   publish content.
- * - Pages, templates, template parts, and patterns: `title`. They have
- *   their own title fields in their collections.
- * - Attachments: every default field. The media editor has its own fields,
- *   declared client-side and in the `attachment` collection.
- *
- * @since 7.2.0
- *
- * @param string[] $excluded_fields The ids of the default fields the post
- *                                  type does not get.
- * @param string   $post_type       The post type.
- * @param string[] $all_fields      The ids of the default fields the post
- *                                  type supports.
- * @return string[] The excluded ids, with those of the core post types.
- */
-function exclude_core_post_type_support_fields( $excluded_fields, $post_type, $all_fields ) {
-	switch ( $post_type ) {
-		case 'wp_template':
-		case 'wp_template_part':
-			$excluded_fields[] = 'author';
-			$excluded_fields[] = 'excerpt';
-			$excluded_fields[] = 'post-content-info';
-			$excluded_fields[] = 'title';
-			break;
-		case 'wp_block':
-			$excluded_fields[] = 'excerpt';
-			$excluded_fields[] = 'title';
-			break;
-		case 'page':
-			$excluded_fields[] = 'title';
-			break;
-		case 'wp_navigation':
-			$excluded_fields[] = 'post-content-info';
-			break;
-		case 'attachment':
-			$excluded_fields = array_merge( $excluded_fields, $all_fields );
-			break;
-	}
-	if ( in_array( $post_type, array( 'wp_template', 'wp_template_part', 'wp_block', 'wp_navigation' ), true ) ) {
-		$excluded_fields = array_merge( $excluded_fields, array( 'date', 'password', 'scheduled_date', 'slug', 'status', 'template' ) );
-	}
-	return $excluded_fields;
-}
-add_filter( 'fields_api_post_type_supports_exclusions', 'exclude_core_post_type_support_fields', 10, 3 );
-
-/**
- * Registers the fields of WordPress core: the defaults first, then the
- * collections of single post types, then the collection of the site.
+ * Registers the fields of WordPress core: the defaults first, without the
+ * ones the core post types do not get, then the collections of single post
+ * types, then the collection of the site.
  *
  * Hooked at priority 0, so a plugin hooking `fields_api_init` at the
  * default priority sees the core fields registered, and can update or
@@ -211,12 +106,33 @@ add_filter( 'fields_api_post_type_supports_exclusions', 'exclude_core_post_type_
  * @param WP_Fields_Registry $registry The registry being read.
  */
 function register_core_field_collections( $registry ) {
+	// Defaults registered for all post types based on their supports.
 	register_core_post_type_supports_fields( $registry );
+
+	// page: unregister unwanted default fields, and register its own.
+	$registry->unregister( 'postType', 'page', array( 'title' ) );
 	wp_register_field_collection( $registry, __DIR__ . '/page' );
+
+	// wp_template: unregister unwanted default fields, and register its own.
+	$registry->unregister( 'postType', 'wp_template', array( 'author', 'date', 'excerpt', 'password', 'post-content-info', 'scheduled_date', 'slug', 'status', 'template', 'title' ) );
 	wp_register_field_collection( $registry, __DIR__ . '/wp_template' );
+
+	// wp_template_part: unregister unwanted default fields, and register its own.
+	$registry->unregister( 'postType', 'wp_template_part', array( 'author', 'date', 'excerpt', 'password', 'post-content-info', 'scheduled_date', 'slug', 'status', 'template', 'title' ) );
 	wp_register_field_collection( $registry, __DIR__ . '/wp_template_part' );
+
+	// wp_block: unregister unwanted default fields, and register its own.
+	$registry->unregister( 'postType', 'wp_block', array( 'date', 'excerpt', 'password', 'scheduled_date', 'slug', 'status', 'template', 'title' ) );
 	wp_register_field_collection( $registry, __DIR__ . '/wp_block' );
+
+	// attachment: unregister all default fields, and register its own.
+	$registry->unregister( 'postType', 'attachment' );
 	wp_register_field_collection( $registry, __DIR__ . '/attachment' );
+
+	// wp_navigation: unregister unwanted default fields.
+	$registry->unregister( 'postType', 'wp_navigation', array( 'date', 'password', 'post-content-info', 'scheduled_date', 'slug', 'status', 'template' ) );
+
+	// Register fields for root/site (entity/kind).
 	wp_register_field_collection( $registry, __DIR__ . '/root_site' );
 }
 add_action( 'fields_api_init', 'register_core_field_collections', 0 );

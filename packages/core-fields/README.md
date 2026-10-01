@@ -52,22 +52,14 @@ And each folder of fields may have:
 
 It reads their definitions with `wp_get_field_collection_fields()` and decides in code which post type gets which field, so a field ported later can depend on anything PHP can check: a theme support, a property of the post type, a combination of supports. Every field is registered with the `@wordpress/core-fields/post_type_supports` module.
 
-It makes no exception for any post type. A post type whose fields differ from the defaults excludes the ones it does not get on the `fields_api_post_type_supports_exclusions` filter, before they are registered:
+It makes no exception for any post type. A post type whose fields differ from the defaults unregisters the ones it does not get, once they are registered. Core does it like a plugin would, in `register_core_field_collections()` in `src/index.php`, after the defaults are registered and before the collection of the post type is:
 
-```php
-apply_filters( 'fields_api_post_type_supports_exclusions', string[] $excluded_fields, string $post_type, string[] $all_fields );
-```
-
-The value is the list of the ids of the default fields the post type does not get, empty by default. `$all_fields` lists the defaults the post type supports, the ones it would get; the filter does not run for a post type supporting none. Callbacks compose: add to the incoming list rather than replacing it. A value other than a list is reported with `_doing_it_wrong()` and excludes nothing. The filter runs when the registry fires `fields_api_init`, on its first read after `init`, so add callbacks on plugin load or on `init`.
-
-Core hooks it like a plugin would, with `exclude_core_post_type_support_fields()` in `src/index.php`:
-
-- Templates and template parts exclude `author`, which the `wp_template` and `wp_template_part` collections define for them.
-- Templates, template parts, and patterns exclude `excerpt`, which is their description. The template and pattern collections define their own description fields.
-- Templates, template parts, and navigation menus exclude `post-content-info`, since their content is not text to read.
-- The design post types (templates, template parts, patterns, and navigation menus) exclude the fields about publishing a post (`date`, `password`, `scheduled_date`, `slug`, `status`) and the `template` that renders a post, since they lay out a site rather than publish content.
-- Pages, templates, template parts, and patterns exclude `title`, since their collections define their own title fields.
-- Attachments exclude every default (`$all_fields`), since the media editor has its own fields.
+- Templates and template parts unregister `author`, which the `wp_template` and `wp_template_part` collections define for them.
+- Templates, template parts, and patterns unregister `excerpt`, which is their description. The template and pattern collections define their own description fields.
+- Templates, template parts, and navigation menus unregister `post-content-info`, since their content is not text to read.
+- The design post types (templates, template parts, patterns, and navigation menus) unregister the fields about publishing a post (`date`, `password`, `scheduled_date`, `slug`, `status`) and the `template` that renders a post, since they lay out a site rather than publish content.
+- Pages, templates, template parts, and patterns unregister `title`, since their collections define their own title fields.
+- Attachments unregister every default, since the media editor has its own fields.
 
 ### Collection configuration
 
@@ -89,11 +81,11 @@ return array(
 );
 ```
 
-There is no precedence between collections: the registry skips a field already registered for the entity, reporting the duplicate with `_doing_it_wrong()`, and registers the rest of the collection. A collection redefining a default field needs its post type to exclude that field on the filter.
+There is no precedence between collections: the registry skips a field already registered for the entity, reporting the duplicate with `_doing_it_wrong()`, and registers the rest of the collection. A collection redefining a default field needs that field unregistered first.
 
 ### Loading
 
-`src/index.php` registers the core fields through the public Fields API, exactly as a plugin registers its own. `register_core_field_collections()` runs on the `fields_api_init` action at priority 0: it registers the defaults first, then calls `wp_register_field_collection()` for each collection, listed explicitly. The action fires once `init` has completed, when the supports of the post types are final, and a plugin hooking it at the default priority sees the core fields registered, and can update or unregister them.
+`src/index.php` registers the core fields through the public Fields API, exactly as a plugin registers its own. `register_core_field_collections()` runs on the `fields_api_init` action at priority 0: it registers the defaults first, unregisters the ones the core post types do not get, then calls `wp_register_field_collection()` for each collection, listed explicitly. The action fires once `init` has completed, when the supports of the post types are final, and a plugin hooking it at the default priority sees the core fields registered, and can update or unregister them.
 
 `wp_register_field_collection( $registry, $directory )` reads one collection and registers its fields on the registry the action passes, after the fields registered on the entity before, in the alphabetical order of their folders. Like the registry, it does not check that the entity exists: the `/wp/v2/fields` route only serves the fields of the entities the REST API exposes. It returns whether the collection is valid and the registry accepted all of its fields.
 
@@ -103,21 +95,10 @@ A plugin does the same with its own collections. With the Gutenberg plugin, the 
 add_action(
 	'fields_api_init',
 	function ( $registry ) {
+		// Books do not get the default comment status.
+		$registry->unregister( 'postType', 'book', array( 'comment_status' ) );
 		wp_register_field_collection( $registry, __DIR__ . '/fields/book' );
 	}
-);
-
-// Books do not get the default comment status.
-add_filter(
-	'fields_api_post_type_supports_exclusions',
-	function ( $excluded_fields, $post_type ) {
-		if ( 'book' === $post_type ) {
-			$excluded_fields[] = 'comment_status';
-		}
-		return $excluded_fields;
-	},
-	10,
-	2
 );
 ```
 
