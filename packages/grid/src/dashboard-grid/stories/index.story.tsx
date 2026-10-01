@@ -12,7 +12,8 @@ import type {
 } from '../../shared/types';
 
 const meta: Meta< typeof DashboardGrid > = {
-	title: 'Grid/DashboardGrid',
+	id: 'grid-dashboardgrid',
+	title: 'Widgets/Grid/DashboardGrid',
 	component: DashboardGrid,
 	tags: [ 'status-experimental' ],
 	args: {

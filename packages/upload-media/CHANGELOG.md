@@ -6,8 +6,15 @@
 
 -   Add a `generateAnimatedImageSubsizes` store setting, carried in the REST API root index from the new `wp_generate_animated_image_subsizes` filter, and a matching `preserveAnimation` option on `vipsResizeImage`. With the setting enabled, uncropped sub-sizes of animated images keep their animation instead of flattening to the first frame. It defaults to `false` ([#80385](https://github.com/WordPress/gutenberg/pull/80385)).
 
+## 0.41.0 (2026-09-23)
+
+### New Features
+
+-   Add the `isHeicFile` export, which recognizes a HEIC/HEIF image from its file header rather than from the MIME type the browser infers from the file name ([#81737](https://github.com/WordPress/gutenberg/pull/81737)).
+
 ### Bug Fixes
 
+-   Detect HEIC uploads from the file header rather than the file name, so a HEIC file with a wrong extension or an empty MIME type is converted instead of leaving the upload stuck, and abandon a stalled `ImageDecoder` decode after a timeout instead of hanging the upload ([#81737](https://github.com/WordPress/gutenberg/pull/81737)).
 -   An upload step is no longer silently skipped when the same queue item is processed twice. `processItem` started the next operation without checking whether one was already running, so a re-entrant dispatch (a finishing child sideload pinging its parent, or `resumeQueue` walking the whole queue) ran the same handler a second time, and each run finished the operation, shifting two steps off the item's pipeline ([#83031](https://github.com/WordPress/gutenberg/pull/83031)).
 
 ## 0.40.0 (2026-09-10)

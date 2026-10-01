@@ -2,7 +2,8 @@ import { useState } from '@wordpress/element';
 import TextAlignmentControl from '../';
 
 const meta = {
-	title: 'BlockEditor/TextAlignmentControl',
+	id: 'blockeditor-textalignmentcontrol',
+	title: 'Editor/Block Editor/TextAlignmentControl',
 	component: TextAlignmentControl,
 	tags: [ 'status-private' ],
 	parameters: {

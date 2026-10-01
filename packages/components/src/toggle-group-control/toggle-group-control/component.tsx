@@ -99,7 +99,7 @@ function UnconnectedToggleGroupControl(
  *
  * This component is intended for selecting a single persistent value from a set of options,
  * similar to a how a radio button group would work. If you simply want a toggle to switch between views,
- * use a `TabPanel` instead.
+ * use `Tabs` from `@wordpress/ui` instead.
  *
  * Only use this control when you know for sure the labels of items inside won't
  * wrap. For items with longer labels, you can consider a `SelectControl` or a

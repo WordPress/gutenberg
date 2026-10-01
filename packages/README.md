@@ -60,8 +60,7 @@ When creating a new package, you need to provide at least the following. Package
     		"url": "https://github.com/WordPress/gutenberg/issues"
     	},
     	"engines": {
-    		"node": ">=18.12.0",
-    		"npm": ">=8.19.2"
+    		"node": ">=18.12.0"
     	},
     	"main": "build/index.js",
     	"module": "build-module/index.js",
@@ -377,7 +376,7 @@ Both extend shared base configurations (comments are not necessary):
 }
 ```
 
-Register both projects at the root: `packages/<name>/tsconfig.build.json` in the root `tsconfig.build.json` references, and `packages/<name>` in the root `tsconfig.json` references. Route entry points under `routes/` with a `tsconfig.json` register it in the root `tsconfig.json` references only: their projects emit nothing and nothing else references them, so that registration is what puts them under `npm run typecheck`. A route with TypeScript test files pairs it with a `tsconfig.test.json` covering them, registered the same way.
+Register both projects at the root: `packages/<name>/tsconfig.build.json` in the root `tsconfig.build.json` references, and `packages/<name>` in the root `tsconfig.json` references. Route entry points under `routes/` and widgets under `widgets/` with a `tsconfig.json` register it in the root `tsconfig.json` references only: their projects emit nothing and nothing else references them, so that registration is what puts them under `npm run typecheck`. An entry with TypeScript test files pairs it with a `tsconfig.test.json` covering them, registered the same way.
 
 Packages whose components feed the Storybook components manifest (`components`, `dataviews`, `ui`) carry a third project, `tsconfig.stories.json`, registered in the root `tsconfig.json` only. It type checks the stories against component sources without test types. Storybook's component meta extractor reads props through the closest `tsconfig.json` that lists a story, or through its own inferred project when none does; the inferred project produces the complete manifest and the dev project does not, so stories stay out of `tsconfig.json`. The dev project cannot reference this one either, because a referenced project may not disable emit (TS6310), which is why it is registered at the root only.
 
@@ -403,9 +402,9 @@ For consumers to use the published type declarations, we'll set the `types` fiel
 
 Ensure that the `build-types` directory will be included in the published package, for example if a `files` field is declared.
 
-## Supported Node.js and npm versions
+## Supported Node.js versions
 
-WordPress packages adhere the [Node.js Release Schedule](https://nodejs.org/en/about/previous-releases/). Consequently, the minimum required versions of Node.js and npm are specified using the `engines` field in `package.json` for all packages. This ensures that production applications run only on Active LTS or Maintenance LTS releases on Node.js. LTS release status is "long-term support", which typically guarantees that critical bugs will be fixed for a total of 30 months.
+WordPress packages adhere the [Node.js Release Schedule](https://nodejs.org/en/about/previous-releases/). Consequently, the minimum required version of Node.js is specified using the `engines` field in `package.json` for all packages. This ensures that production applications run only on Active LTS or Maintenance LTS releases on Node.js. LTS release status is "long-term support", which typically guarantees that critical bugs will be fixed for a total of 30 months.
 
 ## Optimizing for bundlers
 
