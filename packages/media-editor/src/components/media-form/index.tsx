@@ -1,28 +1,36 @@
 import { DataForm } from '@wordpress/dataviews';
-import type { Form, Field } from '@wordpress/dataviews';
+import type { Form } from '@wordpress/dataviews';
 import { Spinner, __experimentalVStack as VStack } from '@wordpress/components';
 import { VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import type { ReactNode } from 'react';
 import { useMediaEditorContext } from '../media-editor-provider';
-import type { Media } from '../media-editor-provider';
 
-// Fields that use a regular (non-panel) layout, rendered at the top.
-const REGULAR_FIELD_IDS = [ 'title', 'alt_text', 'caption', 'description' ];
-
-// Fields shown in panels, below the regular ones: the metadata first, then
-// the file information.
-const PANEL_FIELD_IDS = [
-	'date',
-	'author',
-	'filename',
-	'mime_type',
-	'filesize',
-	'media_dimensions',
-	'attached_to',
-];
-
-const ORDERED_FIELD_IDS = [ ...REGULAR_FIELD_IDS, ...PANEL_FIELD_IDS ];
+// The default form lists the core fields in a fixed order, so it does not
+// depend on the order the fields are registered in: the regular (non-panel)
+// fields first, then the fields shown in panels (the metadata, then the file
+// information). A field that is not registered renders nothing.
+const DEFAULT_FORM: Form = {
+	layout: {
+		type: 'panel',
+	},
+	fields: [
+		...[ 'title', 'alt_text', 'caption', 'description' ].map( ( id ) => ( {
+			id,
+			layout: {
+				type: 'regular' as const,
+				labelPosition: 'top' as const,
+			},
+		} ) ),
+		'date',
+		'author',
+		'filename',
+		'mime_type',
+		'filesize',
+		'media_dimensions',
+		'attached_to',
+	],
+};
 
 /**
  * Props for MediaForm component.
@@ -57,38 +65,7 @@ export default function MediaForm( {
 		);
 	}
 
-	// The core fields come first, in a fixed order, so the form does not
-	// depend on the order the fields are registered in; the ones that are not
-	// registered render nothing. Any other field follows, in the order it was
-	// given.
-	const fieldIds = [
-		...ORDERED_FIELD_IDS,
-		...fields
-			.map( ( field: Field< Media > ) => field.id )
-			.filter( ( id: string ) => ! ORDERED_FIELD_IDS.includes( id ) ),
-	];
-
-	// Default form structure with panel layout
-	const defaultForm: Form = {
-		layout: {
-			type: 'panel',
-		},
-		fields: fieldIds.map( ( id ) => {
-			// Use regular layout for main editable fields
-			if ( REGULAR_FIELD_IDS.includes( id ) ) {
-				return {
-					id,
-					layout: {
-						type: 'regular',
-						labelPosition: 'top',
-					},
-				};
-			}
-			return id;
-		} ),
-	};
-
-	const form = formOverrides || defaultForm;
+	const form = formOverrides || DEFAULT_FORM;
 
 	return (
 		<div className="media-editor-form">
