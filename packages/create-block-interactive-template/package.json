@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/create-block-interactive-template",
-	"version": "2.54.0",
+	"version": "2.56.0",
 	"description": "Template for @wordpress/create-block to create interactive blocks with the Interactivity API.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,8 +20,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
-		"npm": ">=8.19.2"
+		"node": ">=18.12.0"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -116,12 +116,15 @@ interface MediaEditorSidebarProps {
 	/** The open panel's id. Always one of `tabs`. */
 	activeTab: string;
 	onSelectTab: ( tab: string ) => void;
+	/** Freeze the open panel while the edit is saving. */
+	disabled?: boolean;
 }
 
 function MediaEditorSidebar( {
 	tabs,
 	activeTab,
 	onSelectTab,
+	disabled = false,
 }: MediaEditorSidebarProps ) {
 	return (
 		<NavigableRegion
@@ -146,7 +149,11 @@ function MediaEditorSidebar( {
 				<div className="media-editor__tablist">
 					<Tabs.List variant="minimal">
 						{ tabs.map( ( tab ) => (
-							<Tabs.Tab key={ tab.id } value={ tab.id }>
+							<Tabs.Tab
+								key={ tab.id }
+								value={ tab.id }
+								disabled={ disabled }
+							>
 								{ tab.title }
 							</Tabs.Tab>
 						) ) }
@@ -287,7 +294,7 @@ function HistoryActions() {
 	const { isImage, isUndoRedoDisabled, onReset, isWide, activePanel } =
 		useMediaEditorFrameContext();
 	const {
-		reset,
+		cropper: { reset },
 		isDirty,
 		hasUndo,
 		hasRedo,
@@ -320,6 +327,9 @@ function HistoryActions() {
 		redoCrop();
 	};
 	const handleReset = () => {
+		if ( isUndoRedoDisabled ) {
+			return;
+		}
 		beginGesture();
 		reset();
 		onReset();
@@ -334,7 +344,7 @@ function HistoryActions() {
 			<Button
 				size="compact"
 				variant="tertiary"
-				disabled={ ! isDirty }
+				disabled={ isUndoRedoDisabled || ! isDirty }
 				accessibleWhenDisabled
 				onClick={ handleReset }
 			>
@@ -425,7 +435,7 @@ function MediaEditorContent( {
 	noticesPortalElement,
 	shouldCloseOnEsc = false,
 }: MediaEditorProps ) {
-	const cropper = useMediaEditor();
+	const session = useMediaEditor();
 	// Width decides whether the settings panel docks beside the canvas or
 	// takes the whole body. It docks from `small` (600px): the modal is the
 	// viewport less a 16px margin either side, so a 320px panel and the
@@ -506,7 +516,7 @@ function MediaEditorContent( {
 		[ id ]
 	);
 
-	const hasChanges = cropper.isCropperDirty || hasEdits;
+	const hasChanges = session.hasOutputEdits || hasEdits;
 
 	const { clearEntityRecordEdits, editEntityRecord, invalidateResolution } =
 		useDispatch( coreStore );
@@ -592,7 +602,7 @@ function MediaEditorContent( {
 		resetCropOptions,
 	} = useCropOptions( { aspectRatioPresets } );
 	const { isSaving, save: saveMediaEditor } = useSaveMediaEditor( {
-		cropper,
+		session,
 		id,
 		isImage,
 		media,
@@ -600,6 +610,14 @@ function MediaEditorContent( {
 	} );
 
 	const handleChange = ( updates: Partial< Media > ) => {
+		// A save reads the pending edits once and then waits. An edit
+		// arriving after that read misses the request, and a crop save
+		// then clears the edits for this id, so it would be lost rather
+		// than merely late. It would also land on the attachment being
+		// replaced, not the new one the modal moves to.
+		if ( isSaving ) {
+			return;
+		}
 		editEntityRecord( 'postType', 'attachment', id, updates );
 	};
 
@@ -634,13 +652,13 @@ function MediaEditorContent( {
 				! target.closest( `[${ CROP_CONTROL_ATTR }]` );
 			if ( ! isMetadataField ) {
 				event.preventDefault();
-				if ( isCropInteractionActive ) {
+				if ( isCropInteractionActive || isSaving ) {
 					return;
 				}
 				if ( isRedoShortcut ) {
-					cropper.redo();
+					session.redo();
 				} else {
-					cropper.undo();
+					session.undo();
 				}
 			}
 		}
@@ -677,6 +695,7 @@ function MediaEditorContent( {
 			<MediaEditorImageControls
 				showAspectRatioControl
 				aspectRatioPresets={ aspectRatioPresets }
+				disabled={ isSaving }
 			/>
 		) : null;
 
@@ -694,10 +713,11 @@ function MediaEditorContent( {
 								aspectRatioValue={ aspectRatioValue }
 								onAspectRatioChange={ setAspectRatioValue }
 								aspectRatioOptions={ aspectRatioOptions }
+								disabled={ isSaving }
 							/>
 						),
 					},
-			  ]
+				]
 			: [] ),
 		{
 			id: DETAILS_PANEL,
@@ -709,6 +729,7 @@ function MediaEditorContent( {
 	const ruler = isImage ? (
 		<MediaEditorFineRotation
 			onPlacementControlInteraction={ signalPlacementControlInteraction }
+			disabled={ isSaving }
 		/>
 	) : null;
 
@@ -716,7 +737,18 @@ function MediaEditorContent( {
 		<MediaEditorProvider
 			value={ media ?? undefined }
 			onChange={ handleChange }
-			settings={ { fields } }
+			settings={ {
+				// Disable the fields while saving, so the guard in
+				// `handleChange` is not silently swallowing typing.
+				// `readOnly` would swap the field's layout mid-save;
+				// disabled keeps it in place and greys it out.
+				fields: isSaving
+					? fields.map( ( field ) => ( {
+							...field,
+							isDisabled: true,
+						} ) )
+					: fields,
+			} }
 		>
 			<div className="media-editor">
 				{ ! media ? (
@@ -745,6 +777,7 @@ function MediaEditorContent( {
 											handleCanvasGestureStart
 										}
 										onGestureEnd={ handleCanvasGestureEnd }
+										disabled={ isSaving }
 									/>
 								) : (
 									<MediaPreview />
@@ -773,6 +806,7 @@ function MediaEditorContent( {
 										: DETAILS_PANEL
 								}
 								onSelectTab={ selectPanel }
+								disabled={ isSaving }
 							/>
 						) }
 					</div>
@@ -805,7 +839,10 @@ function MediaEditorContent( {
 		isSaving,
 		hasMedia: !! media,
 		hasChanges,
-		isUndoRedoDisabled: isCropInteractionActive,
+		// Saving freezes the whole edit surface: `save()` reads the
+		// modifiers once and then awaits, so anything changed after that
+		// would be silently dropped when the save resolves.
+		isUndoRedoDisabled: isCropInteractionActive || isSaving,
 		aspectRatioPresets,
 		isWide,
 		activePanel,

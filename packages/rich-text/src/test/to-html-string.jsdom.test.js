@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+import '../store';
 import { create } from '../create';
 import { toHTMLString } from '../to-html-string';
 import { registerFormatType } from '../register-format-type';
@@ -11,11 +13,6 @@ function createNode( HTML ) {
 }
 
 describe( 'toHTMLString', () => {
-	beforeAll( () => {
-		// Initialize the rich-text store.
-		require( '../store' );
-	} );
-
 	specWithRegistration.forEach(
 		( {
 			description,
@@ -29,7 +26,6 @@ describe( 'toHTMLString', () => {
 				return;
 			}
 
-			// eslint-disable-next-line jest/valid-title
 			it( description, () => {
 				if ( formatName ) {
 					registerFormatType( formatName, formatType );

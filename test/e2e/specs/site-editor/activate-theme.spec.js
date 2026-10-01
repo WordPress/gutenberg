@@ -1,5 +1,11 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+// Whether the run targets the extensible site editor (v2). With its
+// experiment enabled, the themes screen's Live Preview opens the extensible
+// theme preview page, which activates through a confirmation modal and then
+// redirects to the themes screen.
+const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
+
 test.describe( 'Activate theme', () => {
 	test.beforeEach( async ( { admin, page } ) => {
 		await admin.visitAdminPage( 'themes.php' );
@@ -14,6 +20,20 @@ test.describe( 'Activate theme', () => {
 		admin,
 		page,
 	} ) => {
+		if ( isSiteEditorV2 ) {
+			await page
+				.getByRole( 'button', { name: 'Activate', exact: true } )
+				.click();
+			await page
+				.getByRole( 'dialog', { name: 'Activate' } )
+				.getByRole( 'button', { name: /^Activate( & Save)?$/ } )
+				.click();
+			// Activating redirects to the themes screen.
+			await expect(
+				page.getByLabel( 'Customize Emptytheme' )
+			).toBeVisible();
+			return;
+		}
 		await page
 			.getByRole( 'button', { name: 'Activate Emptytheme' } )
 			.click();
@@ -27,7 +47,10 @@ test.describe( 'Activate theme', () => {
 		await expect( page.getByLabel( 'Customize Emptytheme' ) ).toBeVisible();
 	} );
 
-	test( 'activate block theme when live previewing in edit mode', async ( {
+	// The extensible theme preview page has a single activation flow (covered
+	// above); the classic preview's separate edit-mode top bar flow does not
+	// exist there.
+	test( 'activate block theme when live previewing in edit mode @site-editor-v1-only', async ( {
 		editor,
 		admin,
 		page,

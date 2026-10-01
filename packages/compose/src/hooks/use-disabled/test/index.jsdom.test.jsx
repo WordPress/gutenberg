@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { forwardRef } from '@wordpress/element';
 import useDisabled from '../';

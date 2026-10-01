@@ -1,0 +1,12 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.input-wrapper {
+			padding:
+				var(--wpds-dimension-padding-sm)
+				var(--wpds-dimension-padding-sm)
+				var(--wpds-dimension-padding-xs);
+		}
+	}
+}

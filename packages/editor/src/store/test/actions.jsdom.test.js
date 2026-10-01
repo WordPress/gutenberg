@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { speak } from '@wordpress/a11y';
 import apiFetch from '@wordpress/api-fetch';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -6,12 +7,18 @@ import { store as coreStore } from '@wordpress/core-data';
 import { createRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
-jest.mock( '@wordpress/a11y', () => ( {
-	speak: jest.fn(),
-} ) );
+import warning from '@wordpress/warning';
 import { store as editorStore } from '..';
 import * as actions from '../actions';
 import { unlock } from '../../lock-unlock';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+vi.mock( '@wordpress/a11y', () => ( {
+	speak: vi.fn(),
+} ) );
+
+vi.mock( '@wordpress/warning' );
 
 const postId = 44;
 
@@ -876,8 +883,8 @@ describe( 'Post actions', () => {
 				status: 'publish',
 			};
 
-			const dispatch = Object.assign( jest.fn(), {
-				savePost: jest.fn(),
+			const dispatch = Object.assign( vi.fn(), {
+				savePost: vi.fn(),
 			} );
 			const select = {
 				getCurrentPostType: () => 'post',
@@ -885,8 +892,8 @@ describe( 'Post actions', () => {
 			};
 			const registry = {
 				dispatch: () => ( {
-					removeNotice: jest.fn(),
-					createErrorNotice: jest.fn(),
+					removeNotice: vi.fn(),
+					createErrorNotice: vi.fn(),
 				} ),
 				resolveSelect: () => ( {
 					getPostType: () => ( {
@@ -1213,6 +1220,90 @@ describe( 'Editor actions', () => {
 			expect( registry.select( editorStore ).isInserterOpened() ).toBe(
 				false
 			);
+		} );
+	} );
+
+	describe( 'setRenderingMode', () => {
+		beforeEach( () => {
+			warning.mockClear();
+		} );
+
+		it( 'changes the mode when none is fixed', () => {
+			const registry = createRegistryWithStores();
+
+			registry.dispatch( editorStore ).setRenderingMode( 'post-only' );
+			expect( registry.select( editorStore ).getRenderingMode() ).toBe(
+				'post-only'
+			);
+
+			registry
+				.dispatch( editorStore )
+				.setRenderingMode( 'template-locked' );
+			expect( registry.select( editorStore ).getRenderingMode() ).toBe(
+				'template-locked'
+			);
+			expect( warning ).not.toHaveBeenCalled();
+		} );
+
+		it( 'applies the fixed mode, so an editor can enter it', () => {
+			const registry = createRegistryWithStores();
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				renderingMode: 'template-locked',
+			} );
+
+			registry
+				.dispatch( editorStore )
+				.setRenderingMode( 'template-locked' );
+
+			expect( registry.select( editorStore ).getRenderingMode() ).toBe(
+				'template-locked'
+			);
+			// Applying the mode is how the editor enters it, so it is not a
+			// request to refuse.
+			expect( warning ).not.toHaveBeenCalled();
+		} );
+
+		it( 'ignores a move away from the fixed mode, and warns', () => {
+			const registry = createRegistryWithStores();
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				renderingMode: 'template-locked',
+			} );
+			registry
+				.dispatch( editorStore )
+				.setRenderingMode( 'template-locked' );
+
+			registry.dispatch( editorStore ).setRenderingMode( 'post-only' );
+
+			expect( registry.select( editorStore ).getRenderingMode() ).toBe(
+				'template-locked'
+			);
+			expect( warning ).toHaveBeenCalledTimes( 1 );
+			expect( warning ).toHaveBeenCalledWith(
+				expect.stringContaining( "setRenderingMode( 'post-only' )" )
+			);
+		} );
+
+		it( 'changes the mode again once the fixed mode is cleared', () => {
+			const registry = createRegistryWithStores();
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				renderingMode: 'template-locked',
+			} );
+			registry
+				.dispatch( editorStore )
+				.setRenderingMode( 'template-locked' );
+
+			// Leaving a route that fixes the mode sends `undefined`, which
+			// has to clear it: editor settings merge, and the site editor
+			// shares one store across its routes.
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				renderingMode: undefined,
+			} );
+			registry.dispatch( editorStore ).setRenderingMode( 'post-only' );
+
+			expect( registry.select( editorStore ).getRenderingMode() ).toBe(
+				'post-only'
+			);
+			expect( warning ).not.toHaveBeenCalled();
 		} );
 	} );
 } );

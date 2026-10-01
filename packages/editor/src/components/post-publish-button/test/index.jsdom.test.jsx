@@ -1,28 +1,31 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { dispatch, select } from '@wordpress/data';
 import PostPublishButton from '../';
 import { store as editorStore } from '../../../store';
 
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
 describe( 'PostPublishButton', () => {
 	beforeEach( () => {
-		jest.spyOn( select( editorStore ), 'getCurrentPost' ).mockReturnValue( {
+		vi.spyOn( select( editorStore ), 'getCurrentPost' ).mockReturnValue( {
 			_links: {},
 		} );
-		jest.spyOn( dispatch( editorStore ), 'editPost' ).mockReturnValue();
-		jest.spyOn( dispatch( editorStore ), 'savePost' ).mockReturnValue();
+		vi.spyOn( dispatch( editorStore ), 'editPost' ).mockReturnValue();
+		vi.spyOn( dispatch( editorStore ), 'savePost' ).mockReturnValue();
 	} );
 
 	afterEach( () => {
-		jest.restoreAllMocks();
+		vi.restoreAllMocks();
 	} );
 
 	function mockSelector( name, value ) {
-		jest.spyOn( select( editorStore ), name ).mockReturnValue( value );
+		vi.spyOn( select( editorStore ), name ).mockReturnValue( value );
 	}
 
 	function mockHasPublishAction( hasPublishAction ) {
-		jest.spyOn( select( editorStore ), 'getCurrentPost' ).mockReturnValue( {
+		vi.spyOn( select( editorStore ), 'getCurrentPost' ).mockReturnValue( {
 			_links: hasPublishAction ? { 'wp:action-publish': true } : {},
 		} );
 	}

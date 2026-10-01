@@ -110,14 +110,28 @@
 	clear: both;
 }
 
-// Only when the split view is active the visual editor should allow shrinking,
-// its main size should be zero, and overflow should be hidden so that the inner
-// container provides the scrollable viewport.
-.has-metaboxes .interface-interface-skeleton__content:has(.edit-post-meta-boxes-main) .editor-visual-editor {
-	flex-shrink: 1;
-	flex-basis: 0%;
-	overflow: hidden;
-	isolation: isolate;
+// When split view is active the editors should allow shrinking so the meta box
+// pane remains visible and reachable. Apply common sizing to both editors, then
+// specialise overflow handling per editor so scroll behavior is correct.
+.has-metaboxes .interface-interface-skeleton__content:has(.edit-post-meta-boxes-main) {
+	// Shared sizing for both editors.
+	.editor-visual-editor,
+	.editor-text-editor {
+		flex-shrink: 1;
+		flex-basis: 0%;
+		isolation: isolate;
+	}
+
+	// Visual editor: inner container provides the scrollable viewport.
+	.editor-visual-editor {
+		overflow: hidden;
+	}
+
+	// Code (text) editor: allow internal scrolling so long content doesn't push
+	// the meta box pane outside the viewport.
+	.editor-text-editor {
+		overflow: auto;
+	}
 }
 
 .edit-post-layout__snackbar {

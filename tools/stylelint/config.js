@@ -51,7 +51,7 @@ module.exports = {
 				},
 			},
 		],
-		'font-weight-notation': null,
+		'font-weight-notation': 'numeric',
 		'@stylistic/max-line-length': null,
 		'no-descending-specificity': null,
 		'property-disallowed-list': [

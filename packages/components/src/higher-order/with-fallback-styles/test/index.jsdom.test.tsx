@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import withFallbackStyles from '..';
 
@@ -9,7 +10,7 @@ describe( 'withFallbackStyles', () => {
 	it( 'derives the fallback styles from the provided node prop', () => {
 		const node = document.createElement( 'span' );
 		node.dataset.color = 'rgb(1, 2, 3)';
-		const mapNodeToProps = jest.fn( ( el: HTMLElement ) => ( {
+		const mapNodeToProps = vi.fn( ( el: HTMLElement ) => ( {
 			fallbackColor: el.dataset.color,
 		} ) );
 		const Component = withFallbackStyles( mapNodeToProps )( Wrapped );
@@ -25,7 +26,7 @@ describe( 'withFallbackStyles', () => {
 	} );
 
 	it( 'derives the fallback styles from the internal wrapper node when no node prop is given', () => {
-		const mapNodeToProps = jest.fn( ( el: HTMLElement ) => ( {
+		const mapNodeToProps = vi.fn( ( el: HTMLElement ) => ( {
 			fallbackColor: el.tagName.toLowerCase(),
 		} ) );
 		const Component = withFallbackStyles( mapNodeToProps )( Wrapped );

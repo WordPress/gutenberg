@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`PluginPostPublishPanel renders fill properly 1`] = `
+exports[`PluginPostPublishPanel > renders fill properly 1`] = `
 <div>
   <div
     class="components-panel__body my-plugin-post-publish-panel is-opened"

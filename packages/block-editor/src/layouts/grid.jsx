@@ -579,10 +579,10 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 		gridPlacement === 'manual'
 			? __(
 					'Grid items can be manually placed in any position on the grid.'
-			  )
+				)
 			: __(
 					'Grid items are placed automatically depending on their order.'
-			  );
+				);
 
 	return (
 		<ToggleGroupControl

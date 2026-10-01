@@ -1,0 +1,53 @@
+{
+	"$schema": "../../../../../schemas/json/theme.json",
+	"version": 3,
+	"title": "Variation Partial States",
+	"slug": "variation-partial-states",
+	"blockTypes": [ "core/button" ],
+	"styles": {
+		"color": {
+			"text": "red"
+		},
+		":hover": {
+			"color": {
+				"text": "blue"
+			}
+		},
+		"@mobile": {
+			"color": {
+				"text": "green"
+			},
+			":hover": {
+				"color": {
+					"text": "purple"
+				}
+			},
+			"elements": {
+				"link": {
+					"color": {
+						"text": "yellow"
+					}
+				}
+			}
+		},
+		"@tablet": {
+			"typography": {
+				"fontSize": "1.25rem"
+			}
+		},
+		"elements": {
+			"link": {
+				"color": {
+					"text": "fuchsia"
+				}
+			}
+		},
+		"blocks": {
+			"core/heading": {
+				"color": {
+					"text": "violet"
+				}
+			}
+		}
+	}
+}

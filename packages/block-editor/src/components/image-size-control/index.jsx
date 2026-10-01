@@ -1,5 +1,5 @@
 import {
-	SelectControl,
+	SelectControl as WCSelectControl,
 	__experimentalNumberControl as NumberControl,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -83,7 +83,7 @@ export default function ImageSizeControl( {
 	return (
 		<VStack className="block-editor-image-size-control" spacing="4">
 			{ imageSizeOptions && imageSizeOptions.length > 0 && (
-				<SelectControl
+				<WCSelectControl
 					label={ __( 'Resolution' ) }
 					value={ slug }
 					options={ imageSizeOptions }

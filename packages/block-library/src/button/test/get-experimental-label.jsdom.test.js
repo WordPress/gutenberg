@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { settings } from '..';
 
 describe( 'Button block __experimentalLabel', () => {
