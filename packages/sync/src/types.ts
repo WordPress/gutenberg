@@ -211,15 +211,6 @@ export interface SyncManager {
  * when it is the one to undo or redo.
  */
 export interface SyncUndoManager {
-	addToScope: (
-		objectType: ObjectType,
-		objectId: ObjectID,
-		ymap: Y.Map< any >,
-		handlers: Pick<
-			RecordHandlers,
-			'addUndoMeta' | 'restoreUndoMeta' | 'onUndoLevelOpened'
-		>
-	) => void;
 	clearRedo: () => void;
 	hasRedo: () => boolean;
 	hasUndo: () => boolean;

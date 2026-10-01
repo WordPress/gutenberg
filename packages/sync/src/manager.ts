@@ -23,12 +23,14 @@ import type {
 	SyncManagerUpdateOptions,
 	SyncUndoManager,
 } from './types';
-import { createUndoManager } from './undo-manager';
+import {
+	createEntityUndoManager,
+	type EntityUndoManager,
+} from './undo-manager';
 import { docContainsSnapshot, encodeDocSnapshot } from './crdt-snapshot';
 import {
 	createYjsDoc,
 	deserializeCrdtDoc,
-	getEntityId,
 	initializeYjsDoc,
 	markEntityAsSaved,
 	serializeCrdtDoc,
@@ -48,8 +50,22 @@ interface EntityState {
 	objectId: ObjectID;
 	objectType: ObjectType;
 	syncConfig: SyncConfig;
+	undoManager: EntityUndoManager;
 	unload: () => void;
 	ydoc: CRDTDoc;
+}
+
+/**
+ * Get the entity ID for the given object type and object ID.
+ *
+ * @param {ObjectType}    objectType Object type.
+ * @param {ObjectID|null} objectId   Object ID.
+ */
+function getEntityId(
+	objectType: ObjectType,
+	objectId: ObjectID | null
+): EntityID {
+	return `${ objectType }_${ objectId }`;
 }
 
 /**
@@ -65,16 +81,63 @@ export function createSyncManager( debug = false ): SyncManager {
 	const entityStates: Map< EntityID, EntityState > = new Map();
 
 	/**
-	 * The undo history of the loaded entities. Yjs tracks their changes
-	 * through the documents loaded below, so core-data does not record them
-	 * itself. It learns about each level Yjs opens through the record's
-	 * `onUndoLevelOpened` handler, keeps that level in its own undo manager
-	 * next to the records of entities that are not synced, and delegates it
-	 * back here when it is the one to undo or redo.
+	 * The undo history of the loaded entities. Each entity has its own undo
+	 * manager, in which Yjs tracks the changes to its document, so core-data
+	 * does not record them itself. It learns about each level Yjs opens
+	 * through the record's `onUndoLevelOpened` handler, keeps that level in
+	 * its own undo manager next to the records of entities that are not
+	 * synced, and delegates it back here, for that entity, when it is the one
+	 * to undo or redo.
 	 */
-	const undoManager: SyncUndoManager = createUndoManager( {
-		flushPendingUpdates: flushPendingCRDTDocUpdates,
-	} );
+	const undoManager: SyncUndoManager = {
+		undo( objectType: ObjectType, objectId: ObjectID ): boolean {
+			flushPendingCRDTDocUpdates();
+
+			// An unloaded entity has no undo manager, so its levels move
+			// nothing.
+			const entityState = entityStates.get(
+				getEntityId( objectType, objectId )
+			);
+
+			return entityState?.undoManager.undo() ?? false;
+		},
+
+		redo( objectType: ObjectType, objectId: ObjectID ): boolean {
+			flushPendingCRDTDocUpdates();
+
+			const entityState = entityStates.get(
+				getEntityId( objectType, objectId )
+			);
+
+			return entityState?.undoManager.redo() ?? false;
+		},
+
+		hasUndo(): boolean {
+			return [ ...entityStates.values() ].some( ( entityState ) =>
+				entityState.undoManager.hasUndo()
+			);
+		},
+
+		hasRedo(): boolean {
+			return [ ...entityStates.values() ].some( ( entityState ) =>
+				entityState.undoManager.hasRedo()
+			);
+		},
+
+		stopCapturing(): void {
+			flushPendingCRDTDocUpdates();
+			entityStates.forEach( ( entityState ) =>
+				entityState.undoManager.stopCapturing()
+			);
+		},
+
+		clearRedo(): void {
+			flushPendingCRDTDocUpdates();
+			entityStates.forEach( ( entityState ) =>
+				entityState.undoManager.clearRedo()
+			);
+		},
+	};
 
 	/**
 	 * Log debug messages if debugging is enabled.
@@ -221,10 +284,22 @@ export function createSyncManager( debug = false ): SyncManager {
 		};
 
 		const { addUndoMeta, onUndoLevelOpened, restoreUndoMeta } = handlers;
-		undoManager.addToScope( objectType, objectId, recordMap, {
+		const entityUndoManager = createEntityUndoManager( ydoc, recordMap, {
 			addUndoMeta,
 			restoreUndoMeta,
-			onUndoLevelOpened,
+			onUndoLevelOpened: () => {
+				// This entity now has the most recent level. Other entities
+				// must not merge later changes into their older levels, and
+				// their redo levels are gone from the consumer's history.
+				entityStates.forEach( ( other ) => {
+					if ( other.undoManager !== entityUndoManager ) {
+						other.undoManager.stopCapturing();
+						other.undoManager.clearRedo();
+					}
+				} );
+
+				onUndoLevelOpened?.();
+			},
 		} );
 
 		// Declare with let before using it in unload closure.
@@ -237,6 +312,7 @@ export function createSyncManager( debug = false ): SyncManager {
 			objectId,
 			objectType,
 			syncConfig,
+			undoManager: entityUndoManager,
 			unload,
 			ydoc,
 		};
