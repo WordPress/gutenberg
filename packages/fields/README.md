@@ -117,14 +117,6 @@ Format field for BasePost.
 
 Last edited date field for BasePost.
 
-### MediaEdit
-
-Undocumented declaration.
-
-### MediaEditProps
-
-Undocumented declaration.
-
 ### notesField
 
 Notes count field for post types that support editor.notes.

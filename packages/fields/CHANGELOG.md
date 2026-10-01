@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-### Internal
+### Breaking Changes
 
--   `MediaEdit` and its `MediaEditProps` type moved to `@wordpress/media-utils`, which this package re-exports them from. Both exports and their behavior are unchanged.
+-   Remove the `MediaEdit` component and its `MediaEditProps` type. The control moved to `@wordpress/media-utils`, where it is a private API while it is iterated on.
 
 ### Bug Fixes
 
