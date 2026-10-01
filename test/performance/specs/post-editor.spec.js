@@ -280,9 +280,17 @@ test.describe( 'Post Editor Performance', () => {
 		let draftId = null;
 
 		test.beforeAll( async ( { requestUtils } ) => {
-			await requestUtils.setGutenbergExperiments( [
-				'gutenberg-suggestion-mode',
-			] );
+			try {
+				await requestUtils.setGutenbergExperiments( [
+					'gutenberg-suggestion-mode',
+				] );
+			} catch ( error ) {
+				// The branch under comparison may predate suggest mode, in
+				// which case the experiment is not a known setting.
+				if ( error?.code !== 'rest_invalid_param' ) {
+					throw error;
+				}
+			}
 		} );
 
 		test.afterAll( async ( { requestUtils } ) => {
