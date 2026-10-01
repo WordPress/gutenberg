@@ -15,11 +15,11 @@ import { unlock } from '../../lock-unlock';
 
 vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
-vi.mock( '@wordpress/a11y', () => ( {
+vi.mock( import( '@wordpress/a11y' ), () => ( {
 	speak: vi.fn(),
 } ) );
 
-vi.mock( '@wordpress/warning' );
+vi.mock( import( '@wordpress/warning' ) );
 
 const postId = 44;
 
