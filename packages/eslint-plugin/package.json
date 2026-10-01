@@ -66,7 +66,7 @@
 		"@typescript-eslint/parser": "^8.70.1",
 		"eslint": "^10.0.0",
 		"typescript": "npm:@typescript/typescript6@^6.0.2",
-		"vitest": "^5.0.0"
+		"vitest": "^5.0.3"
 	},
 	"peerDependencies": {
 		"eslint": "^9.0.0 || ^10.0.0",
