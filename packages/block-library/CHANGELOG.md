@@ -11,6 +11,7 @@
 -   Gallery: Add an "Order by" sorting control to the static gallery mode, and consolidate sorting control for static and dynamic modes in the Settings panel ([#83438](https://github.com/WordPress/gutenberg/pull/83438)).
 -   Icon: Match an icon's keywords as well as its name and label when searching the icon library ([#82367](https://github.com/WordPress/gutenberg/pull/82367)).
 -   Button: Only open the link popover from the toolbar button or keyboard shortcut instead of whenever a linked button is selected. The toolbar button now shows a pressed state when a link is set ([#30166](https://github.com/WordPress/gutenberg/pull/30166)).
+-   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
 
 ### Bug Fixes
 

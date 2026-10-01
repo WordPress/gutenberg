@@ -9,6 +9,7 @@ import {
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { useEffect, useMemo, useState } from '@wordpress/element';
+import { inertValue } from '@wordpress/ui';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { loadEditorAssets } from '@wordpress/lazy-editor';
 import { unlock } from '@wordpress/routes-lock-unlock';
@@ -45,7 +46,7 @@ function withEditorAssets( FieldEdit: any ) {
 				aria-busy={ ! isReady || undefined }
 				style={ ! isReady ? { opacity: 0.6 } : undefined }
 				// @ts-expect-error inert not typed properly
-				inert={ ! isReady ? 'true' : undefined }
+				inert={ inertValue( ! isReady ) }
 			>
 				<FieldEdit { ...props } />
 			</div>

@@ -25,10 +25,16 @@ class Override_Script_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that script is localized.
+	 * Tests that attached localized data survives script override.
 	 */
 	public function test_localizes_script() {
 		global $wp_scripts;
+
+		wp_localize_script(
+			'gutenberg-dummy-script',
+			'dummyData',
+			array( 'key' => 'value' )
+		);
 
 		gutenberg_override_script(
 			$wp_scripts,
@@ -41,6 +47,10 @@ class Override_Script_Test extends WP_UnitTestCase {
 
 		$script = $wp_scripts->query( 'gutenberg-dummy-script', 'registered' );
 		$this->assertSame( array( 'dependency' ), $script->deps );
+		$this->assertSame(
+			'var dummyData = {"key":"value"};',
+			$script->extra['data']
+		);
 	}
 
 	/**

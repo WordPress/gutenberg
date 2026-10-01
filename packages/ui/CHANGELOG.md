@@ -13,6 +13,7 @@
 
 -   `Autocomplete`, `Combobox`, `Select`, `SearchableSelect`, `SearchableChipSelect`, and the select controls: Add `Separator` subcomponents for dividing popup items and groups ([#83776](https://github.com/WordPress/gutenberg/pull/83776)).
 -   Add `SearchableSelectControl` component ([#80979](https://github.com/WordPress/gutenberg/pull/80979)).
+-   Add `inertValue`, which returns a value for the `inert` prop that both React 18 and React 19 render as the `inert` attribute ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
 
 ### Enhancements
 
@@ -20,6 +21,7 @@
 -   `Spinner`: Show a trackless half-circle like the `Button` loading indicator, with a `color` prop that accepts any CSS color value and defaults to weak neutral foreground. Keep the arc visible in forced-colors mode ([#83775](https://github.com/WordPress/gutenberg/pull/83775)).
 -   Native text inputs and textareas use at least 16px below 600px to avoid iOS Safari zoom. Prefix and suffix text on `Input` match that size. Select and combobox trigger text stay at the `md` font size. ([#82764](https://github.com/WordPress/gutenberg/pull/82764))
 -   `Menu`: Add development-only checks against nesting `Group` and `RadioGroup` within each other, and document how to label radio groups ([#83792](https://github.com/WordPress/gutenberg/pull/83792)).
+-   `Notice`: Mark as recommended for use ([#82685](https://github.com/WordPress/gutenberg/pull/82685)).
 -   `Autocomplete`, `Combobox`, `SearchableSelect`, `SearchableChipSelect`, `SearchableSelectControl`, and `SearchableChipSelectControl` add `ItemLabel` and `ItemDescription` subcomponents. Searchable selection items also accept an optional `description` string ([#83493](https://github.com/WordPress/gutenberg/pull/83493)).
 
 ### Bug Fixes
