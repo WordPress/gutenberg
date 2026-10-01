@@ -465,6 +465,122 @@ const siteStatusWidgetType: WidgetType = {
 	],
 };
 
+/*
+ * A widget whose actions come from two components: the widget declares the
+ * report link, and its export section declares the download.
+ */
+interface Order {
+	id: number;
+	customer: string;
+	total: number;
+}
+
+const ORDERS: Order[] = [
+	{ id: 1041, customer: 'Ada', total: 120 },
+	{ id: 1042, customer: 'Grace', total: 80 },
+	{ id: 1043, customer: 'Linus', total: 45 },
+];
+
+function downloadOrders() {
+	const rows = [
+		'Order,Customer,Total',
+		...ORDERS.map(
+			( order ) => `${ order.id },${ order.customer },${ order.total }`
+		),
+	];
+	const url = URL.createObjectURL(
+		new Blob( [ rows.join( '\n' ) ], { type: 'text/csv' } )
+	);
+	const anchor = document.createElement( 'a' );
+	anchor.href = url;
+	anchor.download = 'orders.csv';
+	anchor.click();
+	URL.revokeObjectURL( url );
+}
+
+function OrdersExportSection() {
+	useWidgetActions( [
+		{
+			id: 'export',
+			label: 'Download CSV',
+			icon: download,
+			relevance: 'medium',
+			callback: async () => {
+				await wait( 1500 );
+				downloadOrders();
+			},
+		},
+	] );
+
+	return (
+		<span
+			style={ {
+				color: 'var(--wpds-color-foreground-content-neutral-weak)',
+				fontSize: 'var(--wpds-typography-font-size-sm)',
+			} }
+		>
+			{ `Export ready for ${ ORDERS.length } orders.` }
+		</span>
+	);
+}
+
+function OrdersWidget() {
+	const [ hasExport, setHasExport ] = useState( true );
+
+	useWidgetActions( [
+		{
+			id: 'report',
+			label: 'View report',
+			relevance: 'high',
+			href: 'admin.php?page=demo-dashboard&p=/orders',
+		},
+	] );
+
+	return (
+		<div
+			style={ {
+				display: 'grid',
+				gap: 'var(--wpds-dimension-gap-sm)',
+				alignContent: 'start',
+				color: 'var(--wpds-color-foreground-content-neutral)',
+			} }
+		>
+			<strong>{ `${ ORDERS.length } orders this week.` }</strong>
+			<ul style={ { margin: 0, paddingInlineStart: '1.25em' } }>
+				{ ORDERS.map( ( order ) => (
+					<li key={ order.id }>
+						{ `#${ order.id } ${ order.customer }, ${ order.total }` }
+					</li>
+				) ) }
+			</ul>
+			{ hasExport && <OrdersExportSection /> }
+			<div>
+				<Button
+					variant="outline"
+					tone="neutral"
+					size="compact"
+					onClick={ () => setHasExport( ! hasExport ) }
+				>
+					{ hasExport ? 'Hide export' : 'Show export' }
+				</Button>
+			</div>
+		</div>
+	);
+}
+
+const ordersWidgetType: WidgetType = {
+	apiVersion: 1,
+	name: 'demo/orders',
+	title: 'Orders',
+	description: 'Two components, each declaring its own actions.',
+	help: {
+		content:
+			'The widget declares <strong>View report</strong>; its export section declares <strong>Download CSV</strong>. Hiding the section withdraws only its own action.',
+	},
+	icon: chartBar,
+	renderModule: 'demo/widgets/orders/render',
+};
+
 // What `import( widget.renderModule )` resolves to in a real host.
 const resolveDemoModule: ResolveWidgetModule = async ( moduleId ) => {
 	let component: ComponentType< WidgetRenderProps< unknown > >;
@@ -474,6 +590,8 @@ const resolveDemoModule: ResolveWidgetModule = async ( moduleId ) => {
 		>;
 	} else if ( moduleId === siteStatusWidgetType.renderModule ) {
 		component = SiteStatusWidget;
+	} else if ( moduleId === ordersWidgetType.renderModule ) {
+		component = OrdersWidget;
 	} else {
 		component = TrafficSnapshotWidget as ComponentType<
 			WidgetRenderProps< unknown >
@@ -842,6 +960,50 @@ A widget declares actions from what its render knows, through \`useWidgetActions
 The footer starts with the declared "Details" link. Once the check settles, "Review 3 items" takes its place, and "Download CSV" appears beside it: a \`callback\` action, disabled while the export runs.
 
 "Resolve one" shrinks the list. Once nothing is left, both runtime actions leave and "Details" returns.
+`,
+			},
+		},
+	},
+};
+
+const COMPOSED_ACTIONS_LAYOUT: DashboardWidget[] = [
+	{
+		uuid: 'orders',
+		type: 'demo/orders',
+		attributes: {},
+		placement: { width: 2, height: 1, order: 1 },
+	},
+];
+
+function ComposedActionsStory() {
+	const [ layout, setLayout ] = useState< DashboardWidget[] >(
+		COMPOSED_ACTIONS_LAYOUT
+	);
+
+	return (
+		<WidgetHostProvider value={ demoHost }>
+			<WidgetDashboard
+				widgetTypes={ [ ordersWidgetType ] }
+				layout={ layout }
+				onLayoutChange={ setLayout }
+				resolveWidgetModule={ resolveDemoModule }
+				gridSettings={ { model: 'grid', rowHeight: 260 } }
+			>
+				<WidgetDashboard.Widgets />
+			</WidgetDashboard>
+		</WidgetHostProvider>
+	);
+}
+
+export const ComposedActions: StoryObj = {
+	render: () => <ComposedActionsStory />,
+	parameters: {
+		docs: {
+			description: {
+				story: `
+A widget declares actions from two components. The widget itself declares "View report"; its export section declares "Download CSV". Both reach the footer.
+
+"Hide export" unmounts the section and withdraws only its action. "Show export" brings it back.
 `,
 			},
 		},
