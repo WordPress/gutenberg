@@ -43,6 +43,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { RichTextData } from '@wordpress/rich-text';
+import type { RichTextValue } from '@wordpress/rich-text';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 // @ts-expect-error No exported types
@@ -174,7 +175,9 @@ function buildAnchorIndex(
 			if ( value instanceof RichTextData ) {
 				// Read marker ids off the parsed formats; serializing every
 				// block's content on every store update was the cost here.
-				for ( const stack of value.formats ) {
+				// `RichTextData` types its `formats` as `never[]`.
+				const formats: RichTextValue[ 'formats' ] = value.formats;
+				for ( const stack of formats ) {
 					for ( const format of stack ?? [] ) {
 						const id =
 							format.type === SUGGESTION_FORMAT_NAME &&
