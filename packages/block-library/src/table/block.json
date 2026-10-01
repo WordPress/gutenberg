@@ -159,6 +159,10 @@
 	"supports": {
 		"anchor": true,
 		"align": true,
+		"background": {
+			"__experimentalSkipSerialization": true,
+			"gradient": true
+		},
 		"color": {
 			"__experimentalSkipSerialization": true,
 			"gradients": true,
@@ -207,6 +211,7 @@
 	},
 	"selectors": {
 		"root": ".wp-block-table > table",
+		"background": ".wp-block-table > table",
 		"spacing": ".wp-block-table"
 	},
 	"styles": [
