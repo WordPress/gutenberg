@@ -27,9 +27,18 @@ export const DEFAULT_CROP_OPTIONS: CropOptionsSlice = {
 };
 
 /**
- * The full composite state for the media editor — cropper geometry
- * plus the sidebar control slice. Future feature slices (text
- * overlays, filters, …) extend this object.
+ * Named edits other than crop, keyed by edit name (for example
+ * `my-plugin/vignette`). An edit that is not present means "no edit".
+ *
+ * Values must be plain data — numbers, strings, booleans, arrays and
+ * objects of those — because the session compares them by content to
+ * tell a real change from a no-op.
+ */
+export type EditsSlice = Record< string, unknown >;
+
+/**
+ * The full composite state for the media editor — cropper geometry,
+ * the sidebar control slice, and named edits.
  *
  * Every undo/redo snapshot is a full `MediaEditorState`. Slices stay
  * referentially equal across actions that don't touch them.
@@ -37,6 +46,7 @@ export const DEFAULT_CROP_OPTIONS: CropOptionsSlice = {
 export interface MediaEditorState {
 	cropper: CropperState;
 	cropOptions: CropOptionsSlice;
+	edits: EditsSlice;
 }
 
 /**
@@ -81,6 +91,8 @@ export type MediaEditorAction =
 	  }
 	/** Reset cropOptions to defaults. */
 	| { type: 'RESET_CROP_OPTIONS' }
+	/** Set a named edit, or remove it when `value` is `undefined`. */
+	| { type: 'SET_EDIT'; payload: { name: string; value: unknown } }
 	/**
 	 * Replace the entire composite state with `payload`. Used by
 	 * undo/redo to restore a full snapshot atomically.
