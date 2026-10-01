@@ -114,7 +114,7 @@ function getOverviewBlockExamples(
 	if ( getBlockType( 'core/paragraph' ) ) {
 		const firstParagraphBlock = createBlock( 'core/paragraph', {
 			content: __(
-				`A paragraph in a website refers to a distinct block of text that is used to present and organize information. It is a fundamental unit of content in web design and is typically composed of a group of related sentences or thoughts focused on a particular topic or idea. Paragraphs play a crucial role in improving the readability and user experience of a website. They break down the text into smaller, manageable chunks, allowing readers to scan the content more easily.`
+				`A paragraph in a website refers to a distinct block of text that is used to present and organize information. It is a fundamental unit of content in web design, typically composed of related sentences focused on a single idea. Paragraphs play a crucial role in improving the readability and user experience of a website. They break down the text into smaller, manageable chunks, <a href="#">including styled links</a>, allowing readers to scan the content more easily.`
 			),
 		} );
 		const secondParagraphBlock = createBlock( 'core/paragraph', {
