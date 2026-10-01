@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { Link } from '../link';
-import { type LinkButtonProps } from './types';
+import { type ButtonLinkProps } from './types';
 import buttonStyles from '../button/style.module.css';
 import styles from './style.module.css';
 
@@ -10,10 +10,10 @@ import styles from './style.module.css';
  * button prominence is intentional.
  *
  * See the [Usage Guidelines](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-button-usage-guidelines--docs)
- * for when to use `Button`, `IconButton`, `Link`, or `LinkButton`.
+ * for when to use `Button`, `IconButton`, `Link`, or `ButtonLink`.
  */
-export const LinkButton = forwardRef< HTMLAnchorElement, LinkButtonProps >(
-	function LinkButton(
+const ForwardedButtonLink = forwardRef< HTMLAnchorElement, ButtonLinkProps >(
+	function ButtonLink(
 		{
 			tone = 'brand',
 			variant = 'solid',
@@ -29,7 +29,7 @@ export const LinkButton = forwardRef< HTMLAnchorElement, LinkButtonProps >(
 				ref={ ref }
 				variant="unstyled"
 				className={ clsx(
-					styles[ 'link-button' ],
+					styles[ 'button-link' ],
 					variant !== 'unstyled' && buttonStyles.button,
 					buttonStyles[ `is-${ tone }` ],
 					buttonStyles[ `is-${ variant }` ],
@@ -43,3 +43,5 @@ export const LinkButton = forwardRef< HTMLAnchorElement, LinkButtonProps >(
 		);
 	}
 );
+
+export { ForwardedButtonLink as ButtonLink };

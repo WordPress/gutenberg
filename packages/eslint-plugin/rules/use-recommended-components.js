@@ -23,6 +23,9 @@ const ALLOWLIST = {
 			'Badge',
 			'Calendar',
 			'Card',
+			'Checkbox',
+			'CheckboxControl',
+			'CheckboxGroup',
 			'Collapsible',
 			'CollapsibleCard',
 			'ControlWithError',
@@ -36,6 +39,7 @@ const ALLOWLIST = {
 			'KeyboardShortcutDescription',
 			'KeyboardShortcutDisplay',
 			'Link',
+			'Notice',
 			'RangeCalendar',
 			'SearchableChipSelect',
 			'SearchableChipSelectControl',
@@ -53,21 +57,19 @@ const ALLOWLIST = {
 			'ValidatedTextareaControl',
 			'ValidityIndicator',
 			'VisuallyHidden',
+			'inertValue',
 			'useKeyboardShortcutProps',
 		],
 		caution: [
 			'AlertDialog',
 			'Breadcrumb',
 			'Button',
-			'Checkbox',
-			'CheckboxGroup',
+			'ButtonLink',
 			'Combobox',
 			'Dialog',
 			'Drawer',
 			'IconButton',
-			'LinkButton',
 			'Menu',
-			'Notice',
 			'Popover',
 			'Radio',
 			'RadioGroup',
@@ -111,6 +113,7 @@ const DENYLIST = {
 		__experimentalZStack: 'Write your own CSS instead.',
 		Animate:
 			'Write your own CSS animations instead, preferably using the motion tokens available in `@wordpress/theme`.',
+		Badge: 'Use `{{ name }}` from `@wordpress/ui` instead.',
 		BaseControl:
 			'Use `Field` from `@wordpress/ui` instead. For a purely visual label, use `Field.VisualLabel`. For a group legend, use `Fieldset` and `Fieldset.Legend`.',
 		Card: 'Use `Card.Root` from `@wordpress/ui` instead.',
@@ -120,6 +123,8 @@ const DENYLIST = {
 		CardHeader:
 			'Use `Card.Header` (and optionally `Card.Title`) from `@wordpress/ui` instead.',
 		CardMedia: 'Use `Card.FullBleed` from `@wordpress/ui` instead.',
+		CheckboxControl:
+			'Use `CheckboxControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		Flex: 'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
 		FlexBlock:
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
@@ -127,6 +132,7 @@ const DENYLIST = {
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
 		__experimentalInputControl:
 			'Use `InputControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
+		Notice: 'Use `Notice` from `@wordpress/ui` instead.',
 		ResponsiveWrapper: 'Use the CSS `aspect-ratio` property instead.',
 		TabPanel: 'Use `Tabs` from `@wordpress/ui` instead.',
 		TabbableContainer: '{{ name }} is planned for deprecation.',

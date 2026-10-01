@@ -603,11 +603,10 @@ export default dedupePlugins( [
 		],
 		rules: {
 			...config.rules,
-			// Callback factories, Promise.all/returned assertions and generated titles
-			// need compatibility checks in step 3 of the same issue.
-			'vitest/valid-describe-callback': 'off',
-			'vitest/valid-expect-in-promise': 'off',
-			'vitest/valid-title': 'off',
+			'vitest/valid-describe-callback': 'error',
+			'vitest/valid-expect-in-promise': 'error',
+			'vitest/valid-title': [ 'error', { allowArguments: true } ],
+			'vitest/require-awaited-expect-poll': 'error',
 			// These checks were enabled by Jest's baseline but are not recommended
 			// Vitest rules. Keep their existing enforcement during the switch.
 			'vitest/no-alias-methods': 'error',
@@ -641,24 +640,6 @@ export default dedupePlugins( [
 			],
 		},
 	} ) ),
-	{
-		files: [ 'packages/block-serialization-spec-parser/shared-tests.js' ],
-		rules: {
-			// The parser helper already passed these checks under its own Jest
-			// override. Keep that stricter baseline while suites await step 3.
-			'vitest/valid-describe-callback': 'error',
-			'vitest/valid-expect-in-promise': 'error',
-			'vitest/valid-title': 'error',
-		},
-	},
-	{
-		files: [ 'test/unit/config/console.vitest.js' ],
-		rules: {
-			// aroundEach receives an awaited runTest callback. The deprecated rule
-			// mistakes it for a done callback; reassess in #83089 step 3.
-			'vitest/no-done-callback': 'off',
-		},
-	},
 	// Recognize only the assertion helpers used by these files. Avoid a global
 	// expect* wildcard, which would also accept unrelated function calls.
 	...[
@@ -1044,6 +1025,37 @@ export default dedupePlugins( [
 							name: '@wordpress/core-data',
 							message:
 								"block-editor is a generic package that doesn't depend on a server or WordPress backend. To provide WordPress integration, consider passing settings to the BlockEditorProvider components.",
+						},
+					],
+				},
+			],
+		},
+	},
+
+	// Override: block-library — the waveform player's default entry initializes
+	// every `[data-waveform-player]` element on the page when it is imported.
+	{
+		files: [ 'packages/block-library/**' ],
+		rules: {
+			'no-restricted-imports': [
+				'error',
+				{
+					paths: [
+						...restrictedImports,
+						{
+							name: '@arraypress/waveform-player',
+							message:
+								'This entry initializes every `[data-waveform-player]` element on the page, including markup the Playlist block does not own. Import `@arraypress/waveform-player/no-autoinit` instead.',
+						},
+					],
+					patterns: [
+						{
+							group: [
+								'@arraypress/waveform-player/*',
+								'!@arraypress/waveform-player/no-autoinit',
+							],
+							message:
+								'Only `@arraypress/waveform-player/no-autoinit` skips the scan that initializes every `[data-waveform-player]` element on the page.',
 						},
 					],
 				},

@@ -443,6 +443,7 @@ export function useEnableFloatingSidebar( enabled = false ) {
 		const { disableComplementaryArea, enableComplementaryArea } =
 			registry.dispatch( interfaceStore );
 
+		// Hiding the complementary area only changes the preferences store.
 		const unsubscribe = registry.subscribe( () => {
 			// Return `null` to indicate the user hid the complementary area.
 			if ( getActiveComplementaryArea( 'core' ) === null ) {
