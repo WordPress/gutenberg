@@ -14,6 +14,7 @@
 	flex: 1;
 	min-height: 0;
 	overflow: hidden;
+	background-color: var(--wpds-color-background-surface-neutral-strong);
 
 	// The page has no footer under the editor, so the body would otherwise
 	// run to the bottom edge. Scoped to the route: the modal has its own

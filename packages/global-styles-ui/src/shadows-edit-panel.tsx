@@ -82,7 +82,7 @@ export default function ShadowsEditPanel() {
 						label: __( 'Delete' ),
 						onClick: () => setIsDeleteOpen( true ),
 					},
-			  ]
+				]
 			: [
 					{
 						label: __( 'Reset' ),
@@ -98,7 +98,7 @@ export default function ShadowsEditPanel() {
 						},
 						disabled: shadow.shadow === baseShadow?.shadow,
 					},
-			  ];
+				];
 
 	return (
 		<>

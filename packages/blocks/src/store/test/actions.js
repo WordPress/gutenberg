@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { addBlockVariations, removeBlockVariations } from '../actions';
 
 describe( 'actions', () => {

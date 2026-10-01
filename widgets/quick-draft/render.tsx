@@ -99,7 +99,7 @@ export default function QuickDraft() {
 			const anyDrafts = getEntityRecords( 'postType', 'post', {
 				status: 'draft',
 				per_page: 1,
-			} ) as Array< { id: number } > | undefined;
+			} );
 			return { hasDrafts: ( anyDrafts?.length ?? 0 ) > 0 };
 		},
 		[ showDraftsList ]

@@ -41,12 +41,11 @@ export default function pluginDsTokenDocs( {
 					continue;
 				}
 
-				// Use the tokens filename (without .json) as the group name
+				// Resolver tokens share the resolver's source location, so use
+				// the stable token namespace for documentation categories.
 				const group =
-					token.token.source.loc
-						?.split( '/' )
-						.at( -1 )
-						?.split( '.json' )[ 0 ] ?? 'Miscellaneous';
+					token.token.id.split( '.' )[ 0 ].replace( /^wpds-/, '' ) ||
+					'Miscellaneous';
 
 				// Group by category
 				semanticTokens[ group ] ??= {};

@@ -74,7 +74,7 @@ interface GridItemProps< Item > extends HTMLAttributes< HTMLDivElement > {
 }
 
 const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
-	function GridItem(
+	function UnforwardedGridItem(
 		{
 			view,
 			selection,
@@ -120,7 +120,7 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 			[ forwardedRef ]
 		);
 		useIntersectionObserver( elementRef, posinset );
-		const instanceId = useInstanceId( GridItem );
+		const instanceId = useInstanceId( UnforwardedGridItem );
 
 		const isSelected = selection.includes( id );
 
@@ -152,8 +152,14 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 					id: `dataviews-view-grid__title-field-${ instanceId }`,
 				};
 			} else {
+				// With no visible title to point at, label the clickable media
+				// area with the item's title so it isn't announced generically.
 				mediaA11yProps = {
-					'aria-label': __( 'Navigate to item' ),
+					'aria-label':
+						titleField?.getValueFormatted( {
+							item,
+							field: titleField,
+						} ) || __( 'Navigate to item' ),
 				};
 			}
 		}
@@ -315,7 +321,7 @@ interface CompositeGridProps< Item > {
 	data: Item[];
 	isInfiniteScroll: boolean;
 	className?: string;
-	inert?: string;
+	inert?: boolean;
 	isLoading?: boolean;
 	view: ViewGridType;
 	fields: NormalizedField< Item >[];

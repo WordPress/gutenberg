@@ -27,7 +27,7 @@ module.exports = ( api ) => {
 						useBuiltIns: 'usage',
 						exclude: exclusions,
 						corejs: require( 'core-js/package.json' ).version,
-				  }
+					}
 				: {} ),
 		};
 

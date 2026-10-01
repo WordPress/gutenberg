@@ -2,6 +2,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import clsx from 'clsx';
 import { useState, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
+import { inertValue } from '@wordpress/react-inert-value';
 import actionableAreaStyles from '../shared/actionable-area-slot.module.css';
 import { GRID_ITEM_DATA_KEY } from '../shared/grid-item-key';
 import ResizeHandle from '../shared/resize-handle';
@@ -41,6 +42,8 @@ export function GridItem( {
 	resizeSnapPreview = null,
 	minResizeWidthPx,
 	minResizeHeightPx,
+	maxResizeWidthPx,
+	maxResizeHeightPx,
 	renderResizeHandle,
 }: GridItemProps ) {
 	const [ resizeDelta, setResizeDelta ] = useState< ResizeDelta | null >(
@@ -79,7 +82,7 @@ export function GridItem( {
 				: Math.min(
 						typeof item.width === 'number' ? item.width : 1,
 						maxColumns
-				  )
+					)
 		}`,
 		gridRowEnd: `span ${ item.height || 1 }`,
 	};
@@ -104,10 +107,18 @@ export function GridItem( {
 			height: verticalResizable ? delta.height : 0,
 		};
 		if ( baselineSize ) {
-			clamped = clampResizeDelta( clamped, baselineSize, {
-				width: minResizeWidthPx,
-				height: verticalResizable ? minResizeHeightPx : undefined,
-			} );
+			clamped = clampResizeDelta(
+				clamped,
+				baselineSize,
+				{
+					width: minResizeWidthPx,
+					height: verticalResizable ? minResizeHeightPx : undefined,
+				},
+				{
+					width: maxResizeWidthPx,
+					height: verticalResizable ? maxResizeHeightPx : undefined,
+				}
+			);
 		}
 		setResizeDelta( clamped );
 		onResize( item.key, clamped );
@@ -126,7 +137,7 @@ export function GridItem( {
 					height: verticalResizable
 						? initialContentSize.height + resizeDelta.height
 						: undefined,
-			  }
+				}
 			: undefined;
 
 	const previewOverlay = resizeSnapPreview ? (
@@ -147,7 +158,8 @@ export function GridItem( {
 				>
 					<div
 						style={ { display: 'contents' } }
-						{ ...( dragging ? { inert: '' } : {} ) }
+						// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+						inert={ inertValue( dragging ) }
 					>
 						{ actionableArea }
 					</div>
