@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a layout lock option to the block locking modal ([#78608](https://github.com/WordPress/gutenberg/pull/78608)).
+
 ### Enhancements
 
 -   Inserter: Open faster when many block types are registered ([#83446](https://github.com/WordPress/gutenberg/pull/83446)).
