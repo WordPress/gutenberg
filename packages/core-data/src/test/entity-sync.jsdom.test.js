@@ -15,8 +15,8 @@ import { getUndoManager } from '../private-selectors';
 import { getEntityRecord, getEntityRecords } from '../resolvers';
 import { hasRedo, hasUndo } from '../selectors';
 
-vi.mock( '@wordpress/api-fetch' );
-vi.mock( '@wordpress/warning' );
+vi.mock( import( '@wordpress/api-fetch' ) );
+vi.mock( import( '@wordpress/warning' ) );
 
 /**
  * A fake manager that records every interface call.

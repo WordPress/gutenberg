@@ -49,6 +49,7 @@
 		"@dnd-kit/sortable": "^10.0.0",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/element": "file:../element",
+		"@wordpress/react-inert-value": "file:../react-inert-value",
 		"@wordpress/style-runtime": "file:../style-runtime",
 		"@wordpress/ui": "file:../ui",
 		"clsx": "^2.1.1"

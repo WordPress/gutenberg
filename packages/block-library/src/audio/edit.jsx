@@ -7,7 +7,8 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { Text, inertValue } from '@wordpress/ui';
+import { inertValue } from '@wordpress/react-inert-value';
+import { Text } from '@wordpress/ui';
 import {
 	BlockControls,
 	BlockIcon,

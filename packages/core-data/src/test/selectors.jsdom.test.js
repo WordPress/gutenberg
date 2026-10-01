@@ -23,7 +23,7 @@ import {
 } from '../selectors';
 import { getEntitySyncManager } from '../entity-sync';
 
-vi.mock( '../entity-sync', () => ( {
+vi.mock( import( '../entity-sync' ), () => ( {
 	getEntitySyncManager: vi.fn(),
 } ) );
 

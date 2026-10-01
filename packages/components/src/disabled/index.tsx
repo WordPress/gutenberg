@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { inertValue } from '@wordpress/ui';
+import { inertValue } from '@wordpress/react-inert-value';
 import type { DisabledProps } from './types';
 import type { WordPressComponentProps } from '../context';
 import Context from './context';

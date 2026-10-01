@@ -12,7 +12,7 @@ import {
 import { getEntitySyncManager } from '../entity-sync';
 import { unlock } from '../lock-unlock';
 
-vi.mock( '@wordpress/api-fetch' );
+vi.mock( import( '@wordpress/api-fetch' ) );
 vi.mock( import( '../entity-sync' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
 	getEntitySyncManager: vi.fn(),
