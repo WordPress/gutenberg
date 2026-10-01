@@ -1,7 +1,9 @@
+import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { Icon, lockSmall } from '@wordpress/icons';
 import { Tooltip, VisuallyHidden } from '@wordpress/ui';
 import { BaseTitleView } from './view';
+import styles from './style.module.css';
 import type { ItemWithTitle } from './get-item-title';
 
 type PatternWithTitle = ItemWithTitle & { type?: string };
@@ -17,7 +19,13 @@ export default function PatternTitleView( {
 } ) {
 	const lockMessage = __( 'This pattern cannot be edited.' );
 	return (
-		<BaseTitleView item={ item } className="fields-field__pattern-title">
+		<BaseTitleView
+			item={ item }
+			className={ clsx(
+				'fields-field__pattern-title',
+				styles[ 'pattern-title' ]
+			) }
+		>
 			{ item.type === 'pattern' && (
 				<>
 					<VisuallyHidden>{ lockMessage }</VisuallyHidden>
