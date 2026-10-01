@@ -1,16 +1,18 @@
 import clsx from 'clsx';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import {
+	Button,
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
 } from '@wordpress/components';
 import { useInstanceId, useDebounce } from '@wordpress/compose';
-import { moreVertical } from '@wordpress/icons';
+import { lockSmall, moreVertical, unlockSmall } from '@wordpress/icons';
 import {
 	useCallback,
 	useMemo,
 	useState,
 	useRef,
+	useEffect,
 	memo,
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -19,6 +21,8 @@ import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { speak } from '@wordpress/a11y';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { Menu } from '@wordpress/ui';
 import ListViewLeaf from './leaf';
 import useListViewScrollIntoView from './use-list-view-scroll-into-view';
 import {
@@ -26,6 +30,7 @@ import {
 	BlockMoverDownButton,
 } from '../block-mover/button';
 import ListViewBlockContents from './block-contents';
+import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { useListViewContext } from './context';
 import {
 	getBlockPositionDescription,
@@ -36,6 +41,8 @@ import { store as blockEditorStore } from '../../store';
 import { groupBlocks } from '../../utils/group-blocks';
 import { getPositionTypeLabel } from '../use-block-display-information';
 import { BlockRenameModal } from '../block-rename';
+import useUnlockBlock from '../block-lock/use-unlock-block';
+import LockMenuContent from './lock-menu-content';
 import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
@@ -63,9 +70,13 @@ function ListViewBlock( {
 	const cellRef = useRef( null );
 	const rowRef = useRef( null );
 	const settingsRef = useRef( null );
+	const lockToggleRef = useRef( null );
+	const shouldFocusLockToggleRef = useRef( false );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ settingsAnchorRect, setSettingsAnchorRect ] = useState();
+	const [ isLockMenuOpen, setIsLockMenuOpen ] = useState( false );
 	const [ isRenameModalOpen, setIsRenameModalOpen ] = useState( false );
+	const unlockBlock = useUnlockBlock( clientId );
 
 	const isFirstSelectedBlock =
 		isSelected && selectedClientIds[ 0 ] === clientId;
@@ -119,6 +130,7 @@ function ListViewBlock( {
 		positionLabel,
 		isSynced,
 		isLocked,
+		canLock,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -129,6 +141,7 @@ function ListViewBlock( {
 				getEditedContentOnlySection,
 				isSyncedBlock,
 				isLockedBlock,
+				canLockBlockType,
 			} = unlock( select( blockEditorStore ) );
 			const settings = getSettings();
 			const attributes = getBlockAttributes( clientId );
@@ -146,10 +159,23 @@ function ListViewBlock( {
 				positionLabel: getPositionTypeLabel( attributes ),
 				isSynced: isSyncedBlock( clientId ),
 				isLocked: isLockedBlock( clientId ),
+				canLock: canLockBlockType( getBlockName( clientId ) ),
 			};
 		},
 		[ clientId ]
 	);
+
+	const blockTitle = useBlockDisplayTitle( {
+		clientId,
+		context: 'list-view',
+	} );
+
+	useEffect( () => {
+		if ( shouldFocusLockToggleRef.current && ! isLocked ) {
+			lockToggleRef.current?.focus();
+			shouldFocusLockToggleRef.current = false;
+		}
+	}, [ isLocked ] );
 
 	const isDisabled = blockEditingMode === 'disabled';
 	const canRename =
@@ -616,6 +642,16 @@ function ListViewBlock( {
 		return rovingTabIndex;
 	};
 
+	function setLockToggleRef( ref, node ) {
+		lockToggleRef.current = node;
+
+		if ( typeof ref === 'function' ) {
+			ref( node );
+		} else if ( ref ) {
+			ref.current = node;
+		}
+	}
+
 	return (
 		<ListViewLeaf
 			className={ classes }
@@ -639,40 +675,150 @@ function ListViewBlock( {
 				colSpan={ colSpan }
 				ref={ cellRef }
 				aria-selected={ !! isSelected }
+				aria-label={ blockTitle || undefined }
+				withoutGridItem
 			>
-				{ ( { ref, tabIndex, onFocus } ) => (
-					<div className="block-editor-list-view-block__contents-container">
-						<ListViewBlockContents
-							clientId={ clientId }
-							onClick={ selectEditorBlock }
-							onContextMenu={
-								isDisabled ? undefined : onContextMenu
-							}
-							onMouseDown={ onMouseDown }
-							onToggleExpanded={
-								isDisabled ? undefined : toggleExpanded
-							}
-							ref={ ref }
-							tabIndex={ getListViewBlockTabIndex( tabIndex ) }
-							onFocus={ onFocus }
-							isExpanded={ canEditBlock ? isExpanded : undefined }
-							isSelected={ isSelected }
-							selectedClientIds={ selectedClientIds }
-							ariaDescribedBy={ descriptionId }
-							visibilityLabel={ blockVisibilityDescription }
-							isDisabled={ isDisabled }
-						/>
-						<AriaReferencedText id={ descriptionId }>
-							{ [
-								blockPositionDescription,
-								blockPropertiesDescription,
-								blockVisibilityDescription,
-							]
-								.filter( Boolean )
-								.join( ' ' ) }
-						</AriaReferencedText>
-					</div>
-				) }
+				<div className="block-editor-list-view-block__contents-container">
+					<TreeGridItem>
+						{ ( { ref, tabIndex, onFocus } ) => (
+							<ListViewBlockContents
+								clientId={ clientId }
+								onClick={ selectEditorBlock }
+								onContextMenu={
+									isDisabled ? undefined : onContextMenu
+								}
+								onMouseDown={ onMouseDown }
+								onToggleExpanded={
+									isDisabled ? undefined : toggleExpanded
+								}
+								ref={ ref }
+								tabIndex={ getListViewBlockTabIndex(
+									tabIndex
+								) }
+								onFocus={ onFocus }
+								isExpanded={
+									canEditBlock ? isExpanded : undefined
+								}
+								isSelected={ isSelected }
+								selectedClientIds={ selectedClientIds }
+								ariaDescribedBy={ descriptionId }
+								visibilityLabel={ blockVisibilityDescription }
+								isDisabled={ isDisabled }
+							/>
+						) }
+					</TreeGridItem>
+					{ ( isLocked || canLock ) &&
+						blockEditingMode === 'default' && (
+							<TreeGridItem>
+								{ ( { ref, tabIndex, onFocus } ) => {
+									const lockButtonClassName = clsx(
+										'block-editor-list-view-block__lock-toggle',
+										{
+											'is-visible':
+												isLocked ||
+												isHovered ||
+												isFirstSelectedBlock,
+										}
+									);
+
+									if ( isLocked && ! isLockMenuOpen ) {
+										return (
+											<Button
+												ref={ ( node ) =>
+													setLockToggleRef(
+														ref,
+														node
+													)
+												}
+												className={
+													lockButtonClassName
+												}
+												size="small"
+												icon={ lockSmall }
+												disabled={ ! canLock }
+												accessibleWhenDisabled
+												label={
+													canLock
+														? __( 'Unlock' )
+														: __( 'Locked' )
+												}
+												tabIndex={ tabIndex }
+												onFocus={ onFocus }
+												onClick={
+													canLock
+														? () => {
+																shouldFocusLockToggleRef.current = true;
+																unlockBlock();
+															}
+														: undefined
+												}
+											/>
+										);
+									}
+
+									const lockButtonIcon = isLocked
+										? lockSmall
+										: unlockSmall;
+									const lockButtonLabel =
+										__( 'Lock settings' );
+
+									return (
+										<Menu.Root
+											modal={ false }
+											open={ isLockMenuOpen }
+											onOpenChange={ ( nextOpen ) =>
+												setIsLockMenuOpen( nextOpen )
+											}
+										>
+											<Menu.Trigger
+												ref={ ( node ) =>
+													setLockToggleRef(
+														ref,
+														node
+													)
+												}
+												tabIndex={ tabIndex }
+												onFocus={ onFocus }
+												render={
+													<Button
+														className={
+															lockButtonClassName
+														}
+														size="small"
+														icon={ lockButtonIcon }
+														label={
+															lockButtonLabel
+														}
+													/>
+												}
+											/>
+											<Menu.Popup
+												positioner={
+													<Menu.Positioner
+														side="bottom"
+														align="start"
+													/>
+												}
+											>
+												<LockMenuContent
+													clientId={ clientId }
+												/>
+											</Menu.Popup>
+										</Menu.Root>
+									);
+								} }
+							</TreeGridItem>
+						) }
+					<AriaReferencedText id={ descriptionId }>
+						{ [
+							blockPositionDescription,
+							blockPropertiesDescription,
+							blockVisibilityDescription,
+						]
+							.filter( Boolean )
+							.join( ' ' ) }
+					</AriaReferencedText>
+				</div>
 			</TreeGridCell>
 			{ hasRenderedMovers && (
 				<>
