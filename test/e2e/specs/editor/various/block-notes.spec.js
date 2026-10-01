@@ -1559,6 +1559,65 @@ test.describe( 'Block Notes', () => {
 			await expect( thread ).toBeVisible();
 		} );
 
+		test( 'keeps notes on the original block after splitting it', async ( {
+			editor,
+			page,
+			pageUtils,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Alpha bravo charlie delta.' },
+			} );
+
+			const paragraph = editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.first();
+
+			await paragraph.click();
+			await blockNoteUtils.selectBlockText( { start: 0, length: 5 } );
+			await blockNoteUtils.addNote( 'Alpha note' );
+			await paragraph.click();
+			await blockNoteUtils.addNote( 'Block note' );
+
+			// Splitting mid-text copies the block's attributes, `metadata.noteId`
+			// included, into the new block, which then claimed the notes.
+			await paragraph.click();
+			await blockNoteUtils.selectBlockText();
+			await pageUtils.pressKeys( 'ArrowRight' );
+			await pageUtils.pressKeys( 'ArrowLeft', { times: 7 } );
+			await page.keyboard.press( 'Enter' );
+
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			const alphaThread = settings.getByRole( 'treeitem', {
+				name: 'Note: Alpha note',
+			} );
+			const blockThread = settings.getByRole( 'treeitem', {
+				name: 'Note: Block note',
+			} );
+			await expect( alphaThread ).toHaveCount( 1 );
+			await expect( blockThread ).toHaveCount( 1 );
+
+			const getSelectedContent = () =>
+				page.evaluate( () => {
+					const { getSelectedBlock } =
+						window.wp.data.select( 'core/block-editor' );
+					return getSelectedBlock()?.attributes.content.toString();
+				} );
+
+			await blockThread.click();
+			await expect
+				.poll( getSelectedContent )
+				.toContain( 'charlie' );
+
+			await alphaThread.click();
+			await expect
+				.poll( getSelectedContent )
+				.toContain( 'charlie' );
+		} );
+
 		test( 'removes the inline marker when the note is deleted', async ( {
 			editor,
 			page,
