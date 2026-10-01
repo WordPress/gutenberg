@@ -1,5 +1,8 @@
 export { speak } from '../shared/index';
-export { prefersReducedMotion } from '../shared/prefers-reduced-motion';
+export {
+	onReducedMotionChange,
+	prefersReducedMotion,
+} from '../shared/prefers-reduced-motion';
 
 /**
  * This no-op function is exported to provide compatibility with the `wp-a11y` Script.
