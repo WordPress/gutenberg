@@ -13,6 +13,7 @@
 ### Internal
 
 -   Update consumers to the renamed `ButtonLink`, `Dialog.CloseIconButton`, and `Drawer.CloseIconButton` components from `@wordpress/ui` ([#83789](https://github.com/WordPress/gutenberg/pull/83789)).
+-   Remove the lint suppression for `Notice` from `@wordpress/ui`, which is now recommended ([#82685](https://github.com/WordPress/gutenberg/pull/82685)).
 
 ## 0.8.0 (2026-09-23)
 
