@@ -177,7 +177,7 @@ function PinnedToggle( {
 							/* translators: %d: Highest count a badge shows before truncating, e.g. "9+". */
 							_x( '%d+', 'truncated badge count' ),
 							MAX_BADGE_COUNT
-					  )
+						)
 					: badge }
 			</span>
 		</div>

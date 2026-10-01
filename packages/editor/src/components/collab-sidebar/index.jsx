@@ -207,7 +207,7 @@ function NotesSidebar( { postId } ) {
 										unseenNoteCount
 									),
 									unseenNoteCount
-							  )
+								)
 							: undefined
 					}
 					closeLabel={ __( 'Close Notes' ) }
