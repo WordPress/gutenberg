@@ -3,25 +3,26 @@ import { store as richTextStore } from './store';
 /**
  * @typedef {Object} WPFormat
  *
- * @property {string}        name        A string identifying the format. Must be
- *                                       unique across all registered formats.
- * @property {string}        tagName     The HTML tag this format will wrap the
- *                                       selection with.
- * @property {boolean}       interactive Whether format makes content interactive or not.
- * @property {boolean}       object      Whether the format represents an object (e.g., `img`, `br`),
- *                                       an object cannot contain other format types.
- * @property {string | null} [className] A class to match the format.
- * @property {string}        title       Name of the format.
- * @property {Function}      edit        Should return a component for the user to
- *                                       interact with the new registered format.
+ * @property {string}        name          A string identifying the format. Must be
+ *                                         unique across all registered formats.
+ * @property {string}        tagName       The HTML tag this format will wrap the
+ *                                         selection with.
+ * @property {boolean}       [interactive] Whether format makes content interactive or not.
+ * @property {boolean}       [object]      Whether the format represents an object (e.g., `img`, `br`),
+ *                                         an object cannot contain other format types.
+ * @property {string | null} [className]   A class to match the format.
+ * @property {string}        title         Name of the format.
+ * @property {Function}      edit          Should return a component for the user to
+ *                                         interact with the new registered format.
  */
 
 /**
  * Registers a new format provided a unique name and an object defining its
  * behavior.
  *
- * @param {string}   name     Format name.
- * @param {WPFormat} settings Format settings.
+ * @param {string}                 name     Format name.
+ * @param {Omit<WPFormat, 'name'>} settings Format settings. `name` is injected
+ *                                          from the first argument.
  *
  * @return {WPFormat|undefined} The format, if it has been successfully
  *                              registered; otherwise `undefined`.

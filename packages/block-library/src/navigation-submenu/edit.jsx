@@ -13,6 +13,7 @@ import {
 	useBlockEditingMode,
 	store as blockEditorStore,
 	getColorClassName,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { useState, useEffect, useRef } from '@wordpress/element';
@@ -256,12 +257,21 @@ export default function NavigationSubmenuEdit( {
 		parentCount >= maxNestingLevel
 			? ALLOWED_BLOCKS.filter(
 					( blockName ) => blockName !== 'core/navigation-submenu'
-			  )
+				)
 			: ALLOWED_BLOCKS;
 
+	// Shadow serialization is skipped so the shadow lands on the dropdown, not the item.
+	const shadowProps = getShadowClassesAndStyles( attributes );
 	const navigationChildBlockProps =
 		getNavigationChildBlockProps( innerBlocksColors );
-	const innerBlocksProps = useInnerBlocksProps( navigationChildBlockProps, {
+	const submenuBlockProps = {
+		...navigationChildBlockProps,
+		style: {
+			...navigationChildBlockProps.style,
+			...shadowProps.style,
+		},
+	};
+	const innerBlocksProps = useInnerBlocksProps( submenuBlockProps, {
 		allowedBlocks,
 		defaultBlock: DEFAULT_BLOCK,
 		directInsert: true,

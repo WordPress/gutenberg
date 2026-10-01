@@ -2,6 +2,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import clsx from 'clsx';
 import { useState, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
+import { inertValue } from '@wordpress/react-inert-value';
 import actionableAreaStyles from '../shared/actionable-area-slot.module.css';
 import ResizeHandle from '../shared/resize-handle';
 import { clampResizeDelta, type ResizeSnapSize } from '../shared/resize-snap';
@@ -91,6 +92,12 @@ export type LanesItemProps = {
 	 */
 	minResizeWidthPx: number;
 
+	/**
+	 * Maximum tile width while resizing, in pixels. Omitted when the
+	 * item declares no width limit.
+	 */
+	maxResizeWidthPx?: number;
+
 	onResizeEnd: () => void;
 
 	renderResizeHandle?: React.ComponentType< ResizeHandleRenderProps >;
@@ -109,6 +116,7 @@ export function LanesItem( {
 	onResizeEnd,
 	resizeSnapPreview = null,
 	minResizeWidthPx,
+	maxResizeWidthPx,
 	renderResizeHandle,
 	dragging = false,
 }: LanesItemProps ) {
@@ -159,9 +167,12 @@ export function LanesItem( {
 		}
 		let clamped: ResizeDelta = { width: delta.width, height: 0 };
 		if ( baselineSize ) {
-			clamped = clampResizeDelta( clamped, baselineSize, {
-				width: minResizeWidthPx,
-			} );
+			clamped = clampResizeDelta(
+				clamped,
+				baselineSize,
+				{ width: minResizeWidthPx },
+				{ width: maxResizeWidthPx }
+			);
 		}
 		setResizeDelta( clamped );
 		onResize( itemKey, clamped );
@@ -177,7 +188,7 @@ export function LanesItem( {
 		resizeDelta && initialContentSize
 			? {
 					width: initialContentSize.width + resizeDelta.width,
-			  }
+				}
 			: undefined;
 
 	const previewOverlay = resizeSnapPreview ? (
@@ -204,7 +215,8 @@ export function LanesItem( {
 				>
 					<div
 						style={ { display: 'contents' } }
-						{ ...( dragging ? { inert: '' } : {} ) }
+						// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+						inert={ inertValue( dragging ) }
 					>
 						{ actionableArea }
 					</div>

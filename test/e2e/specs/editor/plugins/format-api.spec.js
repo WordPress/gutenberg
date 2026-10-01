@@ -37,7 +37,7 @@ test.describe( 'Using Format API', () => {
 		);
 	} );
 
-	test( 'should show unknow formatting button', async ( {
+	test( 'should show unknown formatting button', async ( {
 		editor,
 		page,
 	} ) => {

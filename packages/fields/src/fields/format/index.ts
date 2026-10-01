@@ -40,11 +40,8 @@ const formatField: Field< BasePost > = {
 	getElements: async () => {
 		const themeSupports =
 			await resolveSelect( coreStore ).getThemeSupports();
-		return POST_FORMATS.filter(
-			( f ) =>
-				( themeSupports?.formats as string[] | undefined )?.includes(
-					f.id
-				)
+		return POST_FORMATS.filter( ( f ) =>
+			( themeSupports?.formats as string[] | undefined )?.includes( f.id )
 		).map( ( f ) => ( { value: f.id, label: f.caption } ) );
 	},
 };

@@ -49,7 +49,8 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
 			!! support?.backgroundImage ||
 			!! support?.backgroundSize ||
 			!! support?.backgroundRepeat ||
-			!! support?.gradient
+			!! support?.gradient ||
+			!! support?.backgroundClip
 		);
 	}
 
@@ -219,7 +220,7 @@ export function BackgroundImagePanel( {
 				...style?.background,
 				gradient: gradient
 					? 'var:preset|gradient|' + gradient
-					: style?.background?.gradient ?? style?.color?.gradient,
+					: ( style?.background?.gradient ?? style?.color?.gradient ),
 			},
 		} ),
 	};

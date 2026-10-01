@@ -1,3 +1,6 @@
+import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
+import { getBlockSupport } from '@wordpress/blocks';
+import { select } from '@wordpress/data';
 import {
 	getNodesWithStyles,
 	getNodesWithSettings,
@@ -13,34 +16,20 @@ import {
 } from '../utils/common';
 
 // Mock WordPress data store
-jest.mock( '@wordpress/data', () => ( {
-	select: jest.fn(),
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	select: vi.fn(),
 } ) );
 
 // Mock WordPress blocks store
-jest.mock( '@wordpress/blocks', () => ( {
-	__EXPERIMENTAL_STYLE_PROPERTY: {
-		filter: {
-			value: [ 'filter', 'duotone' ],
-			support: [ 'filter', 'duotone' ],
-		},
-	},
-	__EXPERIMENTAL_ELEMENTS: {
-		link: 'a:where(:not(.wp-element-button))',
-		heading: 'h1, h2, h3, h4, h5, h6',
-		h1: 'h1',
-		h2: 'h2',
-		h3: 'h3',
-		h4: 'h4',
-		h5: 'h5',
-		h6: 'h6',
-		button: '.wp-element-button',
-		caption: '.wp-element-caption',
-	},
-	getBlockSupport: jest.fn(),
-	getBlockTypes: jest.fn(),
-	store: 'core/blocks',
+vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	getBlockSupport: vi.fn(),
+	getBlockTypes: vi.fn(),
 } ) );
+
+const mockedSelect = vi.mocked( select ) as Mock;
+const mockedGetBlockSupport = vi.mocked( getBlockSupport ) as Mock;
 
 // Mock WordPress elements (minimal, no mocking of complex APIs)
 const ELEMENTS = {
@@ -1658,9 +1647,8 @@ describe( 'global styles renderer', () => {
 
 	describe( 'generateGlobalStyles', () => {
 		beforeEach( () => {
-			jest.clearAllMocks();
-			const mockSelect = require( '@wordpress/data' ).select as jest.Mock;
-			mockSelect.mockReturnValue( {
+			vi.clearAllMocks();
+			mockedSelect.mockReturnValue( {
 				getBlockStyles: () => [],
 			} );
 		} );
@@ -1770,8 +1758,7 @@ describe( 'global styles renderer', () => {
 		} );
 
 		it( 'should output duotone SVG filters with __unstableType of svgs', () => {
-			const mockSelect = require( '@wordpress/data' ).select as jest.Mock;
-			mockSelect.mockReturnValue( {
+			mockedSelect.mockReturnValue( {
 				getBlockStyles: () => [],
 			} );
 
@@ -1834,18 +1821,98 @@ describe( 'global styles renderer', () => {
 			expect( assets ).toContain( 'wp-duotone-grayscale' );
 			expect( assets ).toContain( 'wp-duotone-custom-duotone-1' );
 		} );
+
+		describe( 'block gap support', () => {
+			const blockTypes = [
+				{
+					name: 'core/columns',
+					selectors: { root: '.wp-block-columns' },
+					supports: {
+						layout: true,
+						spacing: {
+							blockGap: { __experimentalDefault: '2em' },
+						},
+					},
+				},
+			];
+
+			const getGlobalStylesCSS = ( settings: Record< string, any > ) => {
+				const config: any = {
+					version: 3,
+					settings,
+					styles: {
+						spacing: { blockGap: '24px' },
+						blocks: {
+							// WordPress adds an empty block gap placeholder for
+							// blocks that declare a default block gap value.
+							'core/columns': { spacing: { blockGap: null } },
+						},
+					},
+				};
+				const [ styles ] = generateGlobalStyles( config, blockTypes );
+				return styles
+					.map( ( style: any ) => style.css ?? '' )
+					.join( '' );
+			};
+
+			it( 'outputs block gap styles when the theme opts into block gap', () => {
+				const css = getGlobalStylesCSS( {
+					spacing: { blockGap: true },
+				} );
+
+				expect( css ).toContain(
+					':root :where(.is-layout-flex) { gap: 24px; }'
+				);
+				expect( css ).toContain( '--wp--style--block-gap: 24px;' );
+				expect( css ).not.toContain(
+					':where(.wp-block-columns.is-layout-flex) { gap: 2em; }'
+				);
+			} );
+
+			it( 'outputs fallback gap styles when the theme sets the block gap setting to null', () => {
+				// WordPress' default theme.json sets `spacing.blockGap` to
+				// `null` for themes that do not opt into block gap.
+				const css = getGlobalStylesCSS( {
+					spacing: { blockGap: null },
+				} );
+
+				expect( css ).toContain(
+					':where(.is-layout-flex) { gap: 0.5em; }'
+				);
+				expect( css ).toContain(
+					':where(.wp-block-columns.is-layout-flex) { gap: 2em; }'
+				);
+				expect( css ).not.toContain(
+					':root :where(.is-layout-flex) { gap: 24px; }'
+				);
+				expect( css ).not.toContain( '--wp--style--block-gap' );
+			} );
+
+			it( 'outputs fallback gap styles when the block gap setting is missing', () => {
+				const css = getGlobalStylesCSS( {} );
+
+				expect( css ).toContain(
+					':where(.is-layout-flex) { gap: 0.5em; }'
+				);
+				expect( css ).toContain(
+					':where(.wp-block-columns.is-layout-flex) { gap: 2em; }'
+				);
+				expect( css ).not.toContain(
+					':root :where(.is-layout-flex) { gap: 24px; }'
+				);
+			} );
+		} );
 	} );
 
 	describe( 'getBlockSelectors', () => {
 		beforeEach( () => {
 			// Reset mocks before each test
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 		} );
 
 		it( 'should return block selectors data', () => {
 			// Mock the select function to return getBlockStyles
-			const mockSelect = require( '@wordpress/data' ).select as jest.Mock;
-			mockSelect.mockReturnValue( {
+			mockedSelect.mockReturnValue( {
 				getBlockStyles: () => [ { name: 'foo', label: 'foo' } ],
 			} );
 
@@ -1861,7 +1928,13 @@ describe( 'global styles renderer', () => {
 				category: 'media',
 			};
 			const blockTypes = [ imageBlock ];
-			expect( getBlockSelectors( blockTypes ) ).toEqual( {
+			expect(
+				getBlockSelectors(
+					blockTypes as unknown as Parameters<
+						typeof getBlockSelectors
+					>[ 0 ]
+				)
+			).toEqual( {
 				'core/image': {
 					name: imageBlock.name,
 					selector: imageSelectors.root,
@@ -1882,15 +1955,12 @@ describe( 'global styles renderer', () => {
 
 		it( 'should return block selectors data with old experimental selectors', () => {
 			// Mock the select function to return getBlockStyles with empty array
-			const mockSelect = require( '@wordpress/data' ).select as jest.Mock;
-			mockSelect.mockReturnValue( {
+			mockedSelect.mockReturnValue( {
 				getBlockStyles: () => [],
 			} );
 
 			// Mock getBlockSupport to handle experimental duotone support
-			const mockGetBlockSupport = require( '@wordpress/blocks' )
-				.getBlockSupport as jest.Mock;
-			mockGetBlockSupport.mockImplementation(
+			mockedGetBlockSupport.mockImplementation(
 				( blockType, path, defaultValue ) => {
 					if ( path === 'color.__experimentalDuotone' ) {
 						return 'img';
@@ -1917,7 +1987,13 @@ describe( 'global styles renderer', () => {
 			};
 			const blockTypes = [ imageBlock ];
 
-			expect( getBlockSelectors( blockTypes ) ).toEqual( {
+			expect(
+				getBlockSelectors(
+					blockTypes as unknown as Parameters<
+						typeof getBlockSelectors
+					>[ 0 ]
+				)
+			).toEqual( {
 				'core/image': {
 					name: imageBlock.name,
 					selector: imageSupports.__experimentalSelector,

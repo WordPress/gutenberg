@@ -53,9 +53,9 @@ export default function EditSectionButton( { clientId } ) {
 			<ToolbarButton onClick={ handleClick }>
 				{ isEditing
 					? /* translators: Button label to leave pattern editing mode. */
-					  __( 'Exit pattern' )
+						__( 'Exit pattern' )
 					: /* translators: Button label to enter pattern editing mode. */
-					  __( 'Edit pattern' ) }
+						__( 'Edit pattern' ) }
 			</ToolbarButton>
 		</ToolbarGroup>
 	);

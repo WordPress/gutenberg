@@ -27,30 +27,10 @@ export const Suffix = styled.span`
 	display: flex;
 `;
 
-type BackdropProps = {
-	disabled?: boolean;
-	isBorderless?: boolean;
-};
-
-const backdropBorderColor = ( {
-	disabled,
-	isBorderless,
-}: BackdropProps ): CSSProperties[ 'borderColor' ] => {
-	if ( isBorderless ) {
-		return 'transparent';
-	}
-
-	if ( disabled ) {
-		return COLORS.ui.borderDisabled;
-	}
-
-	return COLORS.ui.border;
-};
-
-export const BackdropUI = styled.div< BackdropProps >`
+// Border color is in style.module.scss.
+export const BackdropUI = styled.div`
 	&&& {
 		box-sizing: border-box;
-		border-color: ${ backdropBorderColor };
 		border-radius: inherit;
 		border-style: solid;
 		border-width: 1px;
@@ -75,11 +55,17 @@ export const Root = styled( Flex )`
 `;
 
 const containerDisabledStyles = ( { disabled }: ContainerProps ) => {
-	const backgroundColor = disabled
-		? COLORS.ui.backgroundDisabled
-		: COLORS.ui.background;
+	if ( ! disabled ) {
+		return undefined;
+	}
 
-	return css( { backgroundColor } );
+	return css`
+		color: ${ COLORS.ui.textDisabled };
+
+		@media ( forced-colors: active ) {
+			color: GrayText;
+		}
+	`;
 };
 
 const containerWidthStyles = ( {
@@ -110,6 +96,7 @@ export const Container = styled.div< ContainerProps >`
 	display: flex;
 	flex: 1;
 	position: relative;
+	background-color: ${ COLORS.ui.background };
 
 	${ containerDisabledStyles }
 	${ containerWidthStyles }
@@ -129,9 +116,17 @@ const disabledStyles = ( { disabled }: InputProps ) => {
 		return '';
 	}
 
-	return css( {
-		color: COLORS.ui.textDisabled,
-	} );
+	return css`
+		color: ${ COLORS.ui.textDisabled };
+
+		@media ( forced-colors: active ) {
+			color: GrayText;
+		}
+
+		&:disabled::placeholder {
+			color: ${ COLORS.ui.textDisabled };
+		}
+	`;
 };
 
 export const fontSizeStyles = ( { inputSize: size }: InputProps ) => {

@@ -1,4 +1,5 @@
 import { createBlock } from '@wordpress/blocks';
+import { inertValue } from '@wordpress/react-inert-value';
 
 const mediaTypeTag = { image: 'img', video: 'video', audio: 'audio' };
 
@@ -31,7 +32,7 @@ export function getBlockAndPreviewFromMedia( media, mediaType ) {
 			src={ media.previewUrl || mediaSrc }
 			alt={ alt }
 			controls={ mediaType === 'audio' ? true : undefined }
-			inert="true"
+			inert={ inertValue( true ) }
 			onError={ ( { currentTarget } ) => {
 				// Fall back to the media source if the preview cannot be loaded.
 				if ( currentTarget.src === media.previewUrl ) {

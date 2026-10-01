@@ -5,12 +5,14 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import {
-	ToggleControl,
-	__experimentalSpacer as Spacer,
+	MenuGroup,
+	MenuItem,
 	__unstableMotion as motion,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
+import { check } from '@wordpress/icons';
+import { Text } from '@wordpress/ui';
 import EditContents from './edit-contents';
 import SkipToSelectedBlock from '../skip-to-selected-block';
 import BlockCard from '../block-card';
@@ -29,7 +31,6 @@ import InspectorControlsLastItem from '../inspector-controls/last-item';
 import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel';
 import PositionControls from '../inspector-controls-tabs/position-controls-panel';
 import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
-import { useBorderPanelLabel } from '../../hooks/border';
 import { BlockStateBadges, BlockStatesControl } from '../../hooks/states';
 import ContentTab from '../inspector-controls-tabs/content-tab';
 import ViewportVisibilityInfo from '../block-visibility/viewport-visibility-info';
@@ -42,12 +43,10 @@ import {
 } from '../../hooks/block-style-state';
 
 function StyleInspectorSlots( {
-	clientId,
 	showAdvancedControls = true,
 	showPositionControls = true,
 	showBindingsControls = true,
 } ) {
-	const borderPanelLabel = useBorderPanelLabel( { clientId } );
 	return (
 		<>
 			<InspectorControls.Slot />
@@ -70,7 +69,7 @@ function StyleInspectorSlots( {
 				group="dimensions"
 				label={ __( 'Dimensions' ) }
 			/>
-			<InspectorControls.Slot group="border" label={ borderPanelLabel } />
+			<InspectorControls.Slot group="border" label={ __( 'Borders' ) } />
 			<InspectorControls.Slot
 				group="elements"
 				label={ __( 'Elements' ) }
@@ -97,8 +96,7 @@ function StyleStateInspectorSlots( {
 	isSectionBlock,
 	selectedBlockStyleState,
 } ) {
-	const borderPanelLabel = useBorderPanelLabel( { clientId } );
-	const showLayoutControls =
+	const isViewportStyleState =
 		hasViewportBlockStyleState( selectedBlockStyleState ) &&
 		! hasPseudoBlockStyleState( selectedBlockStyleState );
 	const showSectionStyleControls =
@@ -130,7 +128,7 @@ function StyleStateInspectorSlots( {
 						label={ __( 'Background' ) }
 						className="background-block-support-panel__inner-wrapper"
 					/>
-					{ showLayoutControls && (
+					{ isViewportStyleState && (
 						<InspectorControls.Slot
 							group="layout"
 							label={ __( 'Layout' ) }
@@ -142,14 +140,18 @@ function StyleStateInspectorSlots( {
 					/>
 					<InspectorControls.Slot
 						group="border"
-						label={ borderPanelLabel }
+						label={ __( 'Borders' ) }
 					/>
 					<InspectorControls.Slot
 						group="elements"
 						label={ __( 'Elements' ) }
 						className="elements-block-support-panel__inner-wrapper"
 					/>
+					{ isViewportStyleState && <PositionControls /> }
 				</>
+			) }
+			{ isViewportStyleState && (
+				<InspectorControls.Slot group="viewport" />
 			) }
 		</>
 	);
@@ -194,7 +196,7 @@ function BlockInspector() {
 		const _renderedBlockClientId = isWithinEditedSection
 			? _selectedBlockClientId
 			: getParentSectionBlock( _selectedBlockClientId ) ||
-			  _selectedBlockClientId;
+				_selectedBlockClientId;
 		const _renderedBlockName =
 			_renderedBlockClientId && getBlockName( _renderedBlockClientId );
 		const _blockType =
@@ -420,11 +422,13 @@ const BlockInspectorSingleBlock = ( {
 } ) => {
 	const listViewRef = useRef( null );
 	const hasMultipleTabs = availableTabs?.length > 1;
-	const hasPseudoState = hasPseudoBlockStyleState( selectedBlockStyleState );
 	const isEditingStyleState =
 		( hasViewportBlockStyleState( selectedBlockStyleState ) &&
 			isResponsiveEditing ) ||
 		hasPseudoBlockStyleState( selectedBlockStyleState );
+	// When a style state is active, the badges replace the block description.
+	const showStateBadges =
+		blockEditingMode === 'default' && isEditingStyleState;
 	const hasParentChildBlockCards =
 		editedContentOnlySection &&
 		editedContentOnlySection !== renderedBlockClientId;
@@ -459,6 +463,9 @@ const BlockInspectorSingleBlock = ( {
 			) }
 			<BlockCard
 				{ ...blockInformation }
+				description={
+					showStateBadges ? undefined : blockInformation.description
+				}
 				allowParentNavigation
 				className={ isBlockSynced && 'is-synced' }
 				isChild={ hasParentChildBlockCards }
@@ -470,25 +477,49 @@ const BlockInspectorSingleBlock = ( {
 							name={ blockName }
 							value={ selectedBlockStyleState }
 							onChange={ onBlockStyleStateChange }
-						/>
+						>
+							<MenuGroup>
+								<MenuItem
+									role="menuitemcheckbox"
+									isSelected={ showStateOnCanvas }
+									icon={ showStateOnCanvas ? check : null }
+									// Previewing is only meaningful while a
+									// non-default pseudo state is selected.
+									disabled={
+										! hasPseudoBlockStyleState(
+											selectedBlockStyleState
+										)
+									}
+									onClick={ () =>
+										onShowStateOnCanvasChange(
+											! showStateOnCanvas
+										)
+									}
+								>
+									{ __( 'Preview on canvas' ) }
+								</MenuItem>
+							</MenuGroup>
+						</BlockStatesControl>
 					)
 				}
 			/>
-			{ blockEditingMode === 'default' && isEditingStyleState && (
-				<Spacer paddingX={ 4 } paddingY={ 2 }>
-					{ hasPseudoState && (
-						<ToggleControl
-							label={ __( 'Show state on canvas' ) }
-							checked={ showStateOnCanvas }
-							onChange={ onShowStateOnCanvasChange }
-						/>
-					) }
+			{ showStateBadges && (
+				<div className="block-editor-block-inspector__state-badges">
+					<Text
+						variant="body-sm"
+						className="block-editor-block-inspector__state-badges-text"
+					>
+						{
+							/* translators: Instructive text shown before the style state badges in the block inspector; the badges indicate the style states the user is currently editing. */
+							__( 'Editing:' )
+						}
+					</Text>
 					<BlockStateBadges
 						name={ blockName }
 						value={ selectedBlockStyleState }
 						isResponsiveEditing={ isResponsiveEditing }
 					/>
-				</Spacer>
+				</div>
 			) }
 			<ViewportVisibilityInfo clientId={ renderedBlockClientId } />
 			<EditContents clientId={ renderedBlockClientId } />
@@ -527,11 +558,7 @@ const BlockInspectorSingleBlock = ( {
 					<InspectorControls.Slot group="content" />
 					<InspectorControls.Slot group="list" ref={ listViewRef } />
 					<ListViewContentPopover listViewRef={ listViewRef } />
-					{ ! isSectionBlock && (
-						<StyleInspectorSlots
-							clientId={ renderedBlockClientId }
-						/>
-					) }
+					{ ! isSectionBlock && <StyleInspectorSlots /> }
 				</>
 			) }
 			{ ! isEditingStyleState && <InspectorControlsLastItem.Slot /> }
