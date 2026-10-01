@@ -5,6 +5,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	RichText,
+	useBackgroundProps,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
@@ -31,6 +32,7 @@ function Edit( {
 } ) {
 	const { ariaLabel } = attributes;
 
+	const backgroundProps = useBackgroundProps( attributes );
 	const colorProps = useColorProps( attributes );
 	const borderProps = useBorderProps( attributes );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
@@ -146,9 +148,14 @@ function Edit( {
 		className: layoutClassNames,
 	} );
 
-	const buttonClassName = clsx( colorProps.className, borderProps.className );
+	const buttonClassName = clsx(
+		backgroundProps.className,
+		colorProps.className,
+		borderProps.className
+	);
 
 	const buttonStyle = {
+		...backgroundProps.style,
 		...colorProps.style,
 		...borderProps.style,
 		...spacingProps.style,
