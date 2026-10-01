@@ -556,7 +556,7 @@ function PushChangesToGlobalStyles( props ) {
 	}
 
 	return (
-		<InspectorControls group="advanced-styles">
+		<InspectorControls group="additional-styles">
 			<PushChangesToGlobalStylesControl { ...props } />
 		</InspectorControls>
 	);

@@ -52,6 +52,6 @@
 		"**/benchmark",
 		"src/components/block-icon/stories/index.story.ts",
 		"src/components/contrast-checker/stories/index.story.ts",
-		"src/components/inspector-controls-tabs/test/advanced-controls-panel.jsdom.test.tsx"
+		"src/components/inspector-controls-tabs/test/advanced-panels.jsdom.test.tsx"
 	]
 }

@@ -1,6 +1,8 @@
 import { __experimentalUseSlotFills as useSlotFills } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import InspectorControlsGroups from '../inspector-controls/groups';
+import InspectorControlsGroups, {
+	PrivateInspectorControlsAllowedBlocks,
+} from '../inspector-controls/groups';
 import { InspectorAdvancedControls } from '../inspector-controls';
 import { TAB_LIST_VIEW, TAB_SETTINGS, TAB_STYLES, TAB_CONTENT } from './utils';
 import { store as blockEditorStore } from '../../store';
@@ -29,7 +31,7 @@ export default function useInspectorControlsTabs(
 ) {
 	const tabs = [];
 	const {
-		'advanced-styles': advancedStylesGroup,
+		'additional-styles': additionalStylesGroup,
 		bindings: bindingsGroup,
 		border: borderGroup,
 		color: colorGroup,
@@ -74,22 +76,29 @@ export default function useInspectorControlsTabs(
 		};
 	}, [] );
 
-	// Advanced styling controls, e.g. Additional CSS, live in the Styles tab's
-	// own advanced panel. Fills for them alone don't warrant a Styles tab, as
-	// that tab would hold nothing but a collapsed panel. When there is no
-	// Styles tab they fall back to the advanced panel in the settings tab, so
-	// they have to be accounted for when deciding whether to show that tab.
+	// Additional styling controls, e.g. Additional CSS, live in the Styles
+	// tab's own "Additional styles" panel. Fills for them alone don't warrant
+	// a Styles tab, as that tab would hold nothing but a collapsed panel.
+	// When there is no Styles tab they appear as a separate panel in the
+	// settings tab, so they have to be accounted for when deciding whether to
+	// show that tab.
 	const hasStylesTab = ! isPreviewMode && ( hasBlockStyles || hasStyleFills );
-	const advancedStylesFills = useSlotFills( advancedStylesGroup.name ) || [];
+	const additionalStylesFills =
+		useSlotFills( additionalStylesGroup.name ) || [];
 
 	// Settings Tab: If we don't have multiple tabs to display
 	// (i.e. both list view and styles), check only the default
 	// InspectorControls slots. If we have multiple tabs, we'll need to check
 	// the advanced controls slot as well to ensure they are rendered.
+	//
+	// The allowed-blocks control renders inside the advanced panel via its own
+	// private slot, so its fills have to be counted here for a Settings tab
+	// that would otherwise be empty to appear.
 	const advancedFills = [
 		...( useSlotFills( InspectorAdvancedControls.slotName ) || [] ),
 		...( useSlotFills( bindingsGroup.name ) || [] ),
-		...( hasStylesTab ? [] : advancedStylesFills ),
+		...( useSlotFills( PrivateInspectorControlsAllowedBlocks.name ) || [] ),
+		...( hasStylesTab ? [] : additionalStylesFills ),
 	];
 
 	const settingsFills = [

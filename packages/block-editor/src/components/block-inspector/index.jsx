@@ -29,6 +29,7 @@ import { SectionStyleControls } from '../inspector-controls-tabs/styles-tab';
 import useInspectorControlsTabs from '../inspector-controls-tabs/use-inspector-controls-tabs';
 import InspectorControlsLastItem from '../inspector-controls/last-item';
 import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel';
+import AdditionalStyles from '../inspector-controls-tabs/additional-styles-panel';
 import PositionControls from '../inspector-controls-tabs/position-controls-panel';
 import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
 import { BlockStateBadges, BlockStatesControl } from '../../hooks/states';
@@ -83,8 +84,9 @@ function StyleInspectorSlots( {
 			{ showAdvancedControls && (
 				<div>
 					{ /* There are no tabs to divide the advanced tools
-					     between, so a single panel holds all of them. */ }
-					<AdvancedControls showStylesControls />
+				     between, so each appears as its own panel. */ }
+					<AdditionalStyles />
+					<AdvancedControls />
 				</div>
 			) }
 		</>

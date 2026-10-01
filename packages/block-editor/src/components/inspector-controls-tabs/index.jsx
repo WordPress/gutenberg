@@ -143,8 +143,8 @@ export default function InspectorControlsTabs( {
 		( tab ) => tab.name === TAB_LIST_VIEW.name
 	);
 
-	// Without a styles tab to host them, the advanced styling controls are
-	// folded into the settings tab's advanced panel.
+	// Without a styles tab to host them, the additional styling controls are
+	// shown as a separate panel in the settings tab.
 	const hasStylesTab = tabs.some( ( tab ) => tab.name === TAB_STYLES.name );
 
 	const switchToListView = ( targetClientId ) => {
@@ -200,7 +200,7 @@ export default function InspectorControlsTabs( {
 				<Tabs.TabPanel tabId={ TAB_SETTINGS.name } focusable={ false }>
 					<SettingsTab
 						showAdvancedControls={ !! blockName }
-						showAdvancedStyleControls={ ! hasStylesTab }
+						showAdditionalStyles={ ! hasStylesTab }
 					/>
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ TAB_STYLES.name } focusable={ false }>
@@ -210,7 +210,7 @@ export default function InspectorControlsTabs( {
 						hasBlockStyles={ hasBlockStyles }
 						isSectionBlock={ isSectionBlock }
 						contentClientIds={ contentClientIds }
-						showAdvancedControls={ !! blockName }
+						showAdditionalStyles={ !! blockName }
 					/>
 				</Tabs.TabPanel>
 			</Tabs>
