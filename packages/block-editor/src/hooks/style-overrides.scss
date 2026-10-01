@@ -11,7 +11,9 @@
 	}
 }
 
-.block-editor-style-overrides__title {
+// Scoped under the wrapper to win over the inspector's own heading margins
+// (`.block-editor-block-inspector h3`).
+.block-editor-style-overrides .block-editor-style-overrides__title {
 	margin: 0 0 $grid-unit-10;
 	font-size: 11px;
 	font-weight: var(--wpds-typography-font-weight-emphasis);
