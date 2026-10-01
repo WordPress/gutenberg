@@ -9,13 +9,13 @@ export default {
 		...baseConfig.typescript,
 		reactDocgenTypescriptOptions: {
 			...baseConfig.typescript?.reactDocgenTypescriptOptions,
-			// Vite's root is this workspace, so include the source files used
-			// by these stories outside that root in the docgen project.
+			// Vite's root is this config's directory, so include the sources
+			// these stories document from outside it in the docgen project.
 			include: [
 				'**/*.tsx',
-				'../../packages/components/src/**/*.tsx',
-				'../../packages/ui/src/**/*.tsx',
-				'../../storybook/**/*.tsx',
+				'../../../packages/components/src/**/*.tsx',
+				'../../../packages/ui/src/**/*.tsx',
+				'../../../storybook/**/*.tsx',
 			],
 		},
 	},
