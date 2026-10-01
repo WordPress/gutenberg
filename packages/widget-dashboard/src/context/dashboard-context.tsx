@@ -280,10 +280,12 @@ export function WidgetDashboardProvider( {
 	// must persist when the user navigates away from the dashboard.
 	useEffect( () => () => scheduleAutoSave.flush(), [ scheduleAutoSave ] );
 
-	const cancel = useCallback( () => {
+	// `useEvent`: the reset flow awaits before cancelling, so this must
+	// revert to the layout as it is by then, not as it was at creation.
+	const cancel = useEvent( () => {
 		setStagingLayout( committedLayout );
 		onEditChange?.( false );
-	}, [ committedLayout, onEditChange ] );
+	} );
 
 	useEffect( () => {
 		if (
