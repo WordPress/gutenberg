@@ -15,7 +15,6 @@ import {
 	BlockContextProvider,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { createBlock } from '@wordpress/blocks';
 import withRegistryProvider from './with-registry-provider';
@@ -145,6 +144,7 @@ function useBlockEditorProps( post, template, mode ) {
  * @param {boolean} props.recovery                       Indicates if the editor is in recovery mode.
  * @param {Array}   props.initialEdits                   The initial edits for the editor.
  * @param {string}  [props.initialViewport]              The device type an entity opens at, one of those `setDeviceType` accepts. Each entity opens at the width it names, so a width set from the device preview is view state that does not follow the user into the next one. The current width is left alone when omitted.
+ * @param {string}  [props.renderingMode]                The rendering mode this editor stays in, one of `post-only` or `template-locked`. Unlike the `defaultRenderingMode` editor setting, which is a starting point the user's saved "Show template" preference overrides, this is what the editor is for: it wins over that preference, and the controls that switch modes are not offered. Use it where only one mode makes sense, such as the site editor screens that show the whole site. The mode is resolved normally when omitted.
  * @param {Object}  props.children                       The child components.
  * @param {Object}  [props.BlockEditorProviderComponent] The block editor provider component to use. Defaults to ExperimentalBlockEditorProvider.
  * @param {Object}  [props.__unstableTemplate]           The template object.
@@ -170,6 +170,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		recovery,
 		initialEdits,
 		initialViewport,
+		renderingMode,
 		children,
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
 		__unstableTemplate: template,
@@ -198,7 +199,11 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					select( coreStore );
 
 				const _mode = getRenderingMode();
-				const _defaultMode = getDefaultRenderingMode( post.type );
+				// A caller that names the mode is stating what this context
+				// is for, so it wins over the post type default and the
+				// user's saved preference.
+				const _defaultMode =
+					renderingMode ?? getDefaultRenderingMode( post.type );
 				/**
 				 * To avoid content "flash", wait until rendering mode has been resolved.
 				 * This is important for the initial render of the editor.
@@ -237,7 +242,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					currentRevisionId: _getCurrentRevisionId(),
 				};
 			},
-			[ post.type, post.id, hasTemplate ]
+			[ post.type, post.id, hasTemplate, renderingMode ]
 		);
 
 		const shouldRenderTemplate = hasTemplate && mode !== 'post-only';
@@ -333,7 +338,6 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			},
 			[ editEntityRecord, post.type, post.id ]
 		);
-		const { removeNotice } = useDispatch( noticesStore );
 
 		// Ideally this should be synced on each change and not just something you do once.
 		useLayoutEffect( () => {
@@ -364,16 +368,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		// Synchronizes the active post with the state
 		useEffect( () => {
 			setEditedPost( post.type, post.id );
-			if (
-				typeof window !== 'undefined' &&
-				window.__experimentalTemplateActivate
-			) {
-				// Clear any notices dependent on the post context.
-				removeNotice( 'template-activate-notice' );
-			}
-
 			return () => setEditedPost( null, null );
-		}, [ post.type, post.id, setEditedPost, removeNotice ] );
+		}, [ post.type, post.id, setEditedPost ] );
 
 		// Opens the entity at the width it asks for. Keyed on the entity as well
 		// as the width, so that moving to another one leaves a width set from
@@ -393,8 +389,13 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		// Synchronize the editor settings as they change.
 		// Do it as a layout effect so that rendered UI with outdated settings is not painted.
 		useLayoutEffect( () => {
-			updateEditorSettings( settings );
-		}, [ settings, updateEditorSettings ] );
+			// Settings merge, so pass the prop even when `undefined`. That clears the
+			// mode when this editor stays mounted but loses the prop, as when going
+			// from Home to Navigation: both show the front page in the same editor.
+			updateEditorSettings( { ...settings, renderingMode } );
+
+			return () => updateEditorSettings( { renderingMode: undefined } );
+		}, [ settings, renderingMode, updateEditorSettings ] );
 
 		// Synchronizes the active template with the state.
 		useEffect( () => {

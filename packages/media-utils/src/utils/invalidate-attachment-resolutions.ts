@@ -24,8 +24,7 @@ export function invalidateAttachmentResolutions(
 	// are EquivalentKeyMap instances (Map-like). Cast the same way the
 	// resolvers-cache-middleware does internally.
 	const entityRecordResolutions = resolvers.getEntityRecords as
-		| Map< string[], { status: string } >
-		| undefined;
+		Map< string[], { status: string } > | undefined;
 
 	entityRecordResolutions?.forEach( ( _value, args ) => {
 		if ( args[ 0 ] === 'postType' && args[ 1 ] === 'attachment' ) {

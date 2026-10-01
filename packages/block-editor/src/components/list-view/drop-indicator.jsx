@@ -35,7 +35,7 @@ export default function ListViewDropIndicatorPreview( {
 		const _rootBlockElement = rootClientId
 			? listViewRef.current.querySelector(
 					`[data-block="${ rootClientId }"]`
-			  )
+				)
 			: undefined;
 
 		// The clientId represents the sibling block, the dragged block will
@@ -44,7 +44,7 @@ export default function ListViewDropIndicatorPreview( {
 		const _blockElement = clientId
 			? listViewRef.current.querySelector(
 					`[data-block="${ clientId }"]`
-			  )
+				)
 			: undefined;
 
 		return [ _rootBlockElement, _blockElement ];
@@ -251,7 +251,7 @@ export default function ListViewDropIndicatorPreview( {
 					// drop indicator.
 					const scrollbarWidth = rtl
 						? scrollContainer.offsetWidth -
-						  scrollContainer.clientWidth
+							scrollContainer.clientWidth
 						: 0;
 
 					if ( left < scrollContainerRect.left + scrollbarWidth ) {

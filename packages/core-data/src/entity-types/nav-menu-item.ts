@@ -7,16 +7,9 @@ import type {
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
 export type NavMenuItemType =
-	| 'taxonomy'
-	| 'post_type'
-	| 'post_type_archive'
-	| 'custom';
+	'taxonomy' | 'post_type' | 'post_type_archive' | 'custom';
 export type NavMenuItemStatus =
-	| 'publish'
-	| 'future'
-	| 'draft'
-	| 'pending'
-	| 'private';
+	'publish' | 'future' | 'draft' | 'pending' | 'private';
 export type Target = '_blank' | '';
 
 declare module './base-entity-records' {

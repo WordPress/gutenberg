@@ -1,64 +1,50 @@
 import { loadView } from '@wordpress/views';
-import type { View, Filter } from '@wordpress/dataviews';
+import { dispatch, resolveSelect, select } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
+import type { View, Field, SupportedLayouts } from '@wordpress/dataviews';
+import { unlock } from '@wordpress/routes-lock-unlock';
+import type { Template } from './types';
 
-export const DEFAULT_VIEW: View = {
-	type: 'grid' as const,
-	perPage: 20,
-	sort: {
-		field: 'title',
-		direction: 'asc' as const,
-	},
-	fields: [ 'author', 'active', 'slug' ],
-	titleField: 'title',
-	descriptionField: 'description',
-	mediaField: 'preview',
-	filters: [],
+const TEMPLATE_POST_TYPE = 'wp_template';
+
+/**
+ * A layer merged on top of a view. Mirrors the `ViewOverrides` type of
+ * `@wordpress/views`, which is not exported.
+ */
+export type ViewOverrides = Partial< Omit< View, 'type' | 'layout' > > & {
+	type?: View[ 'type' ];
+	layout?: Record< string, unknown >;
 };
 
-export const DEFAULT_VIEW_LEGACY: View = {
-	...DEFAULT_VIEW,
-	fields: [ 'author' ],
-};
+export interface ViewListEntry {
+	title: string;
+	slug: string;
+	view?: ViewOverrides;
+}
 
-export const DEFAULT_LAYOUTS = {
-	table: {
-		showMedia: false,
-	},
-	grid: {
-		showMedia: true,
-	},
-	list: {
-		showMedia: false,
-	},
-};
+interface EntityViewConfig {
+	default_view: View | undefined;
+	default_layouts: SupportedLayouts | undefined;
+	view_list: ViewListEntry[] | undefined;
+}
 
-type ActiveViewOverrides = {
-	filters?: Filter[];
-	sort?: View[ 'sort' ];
-};
-
-export function getActiveViewOverridesForTab(
-	activeView: string
-): ActiveViewOverrides {
-	// User view: sort by date, newest first
-	if ( activeView === 'user' ) {
-		return {
-			sort: { field: 'date', direction: 'desc' as const },
-		};
-	}
-	// Active view: no overrides
-	if ( activeView === 'active' ) {
-		return {};
-	}
-	// Author-based view: filter by author
+/**
+ * Resolves the server-provided view configuration for the template post
+ * type, for use in the route loader that runs outside React (where
+ * `useViewConfig` is unavailable).
+ *
+ * @return The entity view configuration.
+ */
+export async function loadTemplateViewConfig(): Promise< EntityViewConfig > {
+	const config = await unlock( resolveSelect( coreStore ) ).getViewConfig(
+		'postType',
+		TEMPLATE_POST_TYPE
+	);
 	return {
-		filters: [
-			{
-				field: 'author',
-				operator: 'isAny',
-				value: [ activeView ],
-			},
-		],
+		default_view: config?.default_view,
+		default_layouts: config?.default_layouts,
+		view_list: config?.view_list,
 	};
 }
 
@@ -66,75 +52,44 @@ export async function ensureView(
 	activeView?: string,
 	search?: { page?: number; search?: string }
 ) {
+	const {
+		default_view: defaultView,
+		default_layouts: defaultLayouts,
+		view_list: viewList,
+	} = await loadTemplateViewConfig();
+	const slug = activeView ?? 'all';
+	if ( ! defaultView ) {
+		throw new Error(
+			`Missing view configuration for the ${ TEMPLATE_POST_TYPE } post type.`
+		);
+	}
 	return loadView( {
 		kind: 'postType',
-		name: 'wp_template',
+		name: TEMPLATE_POST_TYPE,
 		slug: 'default-new',
-		defaultView: DEFAULT_VIEW,
-		activeViewOverrides: getActiveViewOverridesForTab(
-			activeView ?? 'active'
-		),
+		defaultView,
+		defaultLayouts,
+		activeViewOverrides:
+			viewList?.find( ( v ) => v.slug === slug )?.view ?? {},
 		queryParams: search,
 	} );
 }
 
-export function getActiveViewOverridesForTabLegacy(
-	activeView: string
-): ActiveViewOverrides {
-	if ( activeView === 'all' ) {
-		return {};
-	}
-	// Author-based view
-	return {
-		filters: [
-			{
-				field: 'author',
-				operator: 'isAny',
-				value: [ activeView ],
-			},
-		],
-	};
-}
-
-export async function ensureViewLegacy(
-	activeView?: string,
-	search?: { page?: number; search?: string }
-) {
-	return loadView( {
-		kind: 'postType',
-		name: 'wp_template',
-		slug: 'default-new',
-		defaultView: DEFAULT_VIEW_LEGACY,
-		activeViewOverrides: getActiveViewOverridesForTabLegacy(
-			activeView ?? 'all'
-		),
-		queryParams: search,
-	} );
-}
-
-export function viewToQuery( view: View ) {
-	const result: Record< string, any > = {};
-
-	// Pagination, sorting, search.
-	if ( undefined !== view.perPage ) {
-		result.per_page = view.perPage;
-	}
-
-	if ( undefined !== view.page ) {
-		result.page = view.page;
-	}
-
-	if ( ! [ undefined, '' ].includes( view.search ) ) {
-		result.search = view.search;
-	}
-
-	if ( undefined !== view.sort?.field ) {
-		result.orderby = view.sort.field;
-	}
-
-	if ( undefined !== view.sort?.direction ) {
-		result.order = view.sort.direction;
-	}
-
-	return result;
+/**
+ * Resolves the post fields of the template post type, for use in the route
+ * loader that runs outside React (where `usePostFields` is unavailable).
+ *
+ * Registering the post type schema is what `usePostFields` does on mount;
+ * it is a no-op once the schema is registered.
+ *
+ * @return The field definitions the stage renders.
+ */
+export async function loadTemplateFields(): Promise< Field< Template >[] > {
+	await unlock( dispatch( editorStore ) ).registerPostTypeSchema(
+		TEMPLATE_POST_TYPE
+	);
+	return unlock( select( editorStore ) ).getEntityFields(
+		'postType',
+		TEMPLATE_POST_TYPE
+	);
 }

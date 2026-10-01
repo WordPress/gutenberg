@@ -1740,6 +1740,21 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			$response_request['_fields'] = $request['_fields'];
 		}
 
+		/*
+		 * Re-read the post. The 'wp_generate_attachment_metadata' filter above
+		 * runs long after $post was fetched, and a callback that rewrites the
+		 * post row - an optimizer changing post_mime_type once it has
+		 * converted the file, say - would otherwise be missing from this
+		 * response. The editor stores the response as its copy of the record
+		 * rather than reading the attachment again, so a stale row here is
+		 * what it keeps. A callback that deleted the attachment instead leaves
+		 * nothing to respond with, so that is reported as the error it is.
+		 */
+		$post = $this->get_post( $attachment_id );
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
 		return $this->prepare_item_for_response( $post, $response_request );
 	}
 
@@ -1756,8 +1771,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * https://github.com/WordPress/wordpress-develop/pull/11856; until it lands
 	 * the function_exists() guard falls back to the inline implementation below.
 	 *
-	 * @param non-empty-string $mime_type The output image MIME type, e.g. 'image/jpeg'.
-	 * @param array{ width?: non-negative-int, height?: non-negative-int } $size Dimensions ('width', 'height') for the wp_editor_set_quality filter.
+	 * @param non-empty-string                                             $mime_type The output image MIME type, e.g. 'image/jpeg'.
+	 * @param array{ width?: non-negative-int, height?: non-negative-int } $size      Dimensions ('width', 'height') for the wp_editor_set_quality filter.
 	 * @return int<1, 100> Encode quality between 1 and 100.
 	 */
 	private function get_image_encode_quality( string $mime_type, array $size = array() ): int {

@@ -10,7 +10,7 @@
  * See https://github.com/WordPress/wordpress-develop/blob/8f6d31266deecd7eea258bd3d45597355cce13d0/src/wp-includes/block-supports/auto-register.php#L30
  *
  * @param {Object} attributes - Block type attributes from block registration
- * @return {{ fields: Array, form: Object }} fieldsKey and formKey values
+ * @return {{ fields: Array, form: Object }} DataForm fields and form definitions
  */
 export function generateFieldsFromAttributes( attributes ) {
 	const fields = [];
@@ -51,8 +51,13 @@ function createFieldFromAttribute( name, def ) {
 		type: type === 'string' ? 'text' : type,
 	};
 
-	// Add elements for enums (DataForm shows select UI when elements are present)
-	if ( def.enum && Array.isArray( def.enum ) ) {
+	// Add elements for enums (DataForm idiom)
+	if ( type === 'array' && Array.isArray( def.items?.enum ) ) {
+		field.elements = def.items.enum.map( ( value ) => ( {
+			value,
+			label: String( value ),
+		} ) );
+	} else if ( def.enum && Array.isArray( def.enum ) ) {
 		field.elements = def.enum.map( ( value ) => ( {
 			value,
 			label: String( value ),

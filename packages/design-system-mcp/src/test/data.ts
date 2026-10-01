@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
 	getComponents,
 	getComponentDetail,
@@ -16,7 +17,7 @@ const originalFetch = globalThis.fetch;
 function mockFetchResponses(
 	handlers: Record< string, { ok: boolean; body: unknown } >
 ) {
-	globalThis.fetch = jest.fn( ( url: RequestInfo | URL ) => {
+	globalThis.fetch = vi.fn( ( url: RequestInfo | URL ) => {
 		const urlStr = url.toString();
 		const handler = handlers[ urlStr ];
 		if ( ! handler ) {
@@ -37,7 +38,7 @@ function mockFetchResponses(
 describe( 'data', () => {
 	beforeEach( () => {
 		resetCache();
-		globalThis.fetch = jest.fn();
+		globalThis.fetch = vi.fn();
 	} );
 
 	afterEach( () => {

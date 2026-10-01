@@ -8,6 +8,9 @@ export const getSlug = ( item: BasePost ): string => {
 	}
 
 	return (
-		item.slug || cleanForSlug( getItemTitle( item ) ) || item.id.toString()
+		item.slug ||
+		item.generated_slug ||
+		cleanForSlug( getItemTitle( item ) ) ||
+		item.id.toString()
 	);
 };
