@@ -20,7 +20,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=20.10.0"
+		"node": "^20.19.0 || >=22.13.0"
 	},
 	"type": "module",
 	"module": "./lib/build.mjs",
@@ -38,6 +38,7 @@
 		"@emotion/babel-plugin": "^11.13.5",
 		"@wordpress/browserslist-config": "file:../browserslist-config",
 		"@wordpress/style-runtime": "file:../style-runtime",
+		"@wordpress/theme-build-tools": "file:../theme-build-tools",
 		"autoprefixer": "^10.4.21",
 		"browserslist": "^4.28.7",
 		"browserslist-to-esbuild": "^2.1.1",
@@ -56,16 +57,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "^24.13.3",
-		"@wordpress/theme": "file:../theme",
 		"vitest": "^5.0.0"
-	},
-	"peerDependencies": {
-		"@wordpress/theme": ">=0.8.0 <3.0.0"
-	},
-	"peerDependenciesMeta": {
-		"@wordpress/theme": {
-			"optional": true
-		}
 	},
 	"publishConfig": {
 		"access": "public"

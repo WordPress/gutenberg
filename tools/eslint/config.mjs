@@ -1139,7 +1139,11 @@ export default dedupePlugins( [
 
 	// Override: eslint-plugin and theme — disable DS token rules.
 	{
-		files: [ 'packages/eslint-plugin/**', 'packages/theme/**' ],
+		files: [
+			'packages/eslint-plugin/**',
+			'packages/theme/**',
+			'packages/theme-build-tools/**',
+		],
 		rules: {
 			'@wordpress/no-setting-ds-tokens': 'off',
 			'@wordpress/no-unknown-ds-tokens': 'off',

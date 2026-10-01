@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Move the build and Stylelint plugins to the new `@wordpress/theme-build-tools` package; replace `@wordpress/theme/` with `@wordpress/theme-build-tools/` in their import paths ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
+-   Remove the optional `esbuild`, `lightningcss`, `postcss`, `stylelint`, and `vite` peer dependencies ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
+
+### New Features
+
+-   Export the generated design token fallback values as `@wordpress/theme/design-token-fallbacks.js` ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
+
 ### Bug Fixes
 
 -   Avoid intercepting esbuild virtual modules, preserve root custom-property priorities on cleanup, and reject non-finite RGB seed channels while treating missing (`none`) RGB channels as zero. ([#83355](https://github.com/WordPress/gutenberg/pull/83355))

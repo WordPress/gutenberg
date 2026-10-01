@@ -35,6 +35,7 @@ on:
             - 'packages/style-runtime/**'
             - 'packages/stylelint-config/**'
             - 'packages/theme/**'
+            - 'packages/theme-build-tools/**'
             - 'packages/ui/**'
             - 'packages/undo-manager/**'
             - 'packages/views/**'
@@ -89,6 +90,7 @@ jobs:
                     - views
                     # Other packages
                     - theme
+                    - theme-build-tools
                     - components
                     - private-apis
                     - widget-dashboard
