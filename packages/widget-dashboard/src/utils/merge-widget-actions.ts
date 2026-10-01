@@ -36,12 +36,9 @@ export function mergeWidgetActions(
 		return declared;
 	}
 
-	const byId = new Map< string, WidgetRuntimeAction >();
-	runtime.forEach( ( action ) => {
-		if ( ! byId.has( action.id ) ) {
-			byId.set( action.id, action );
-		}
-	} );
+	const byId = new Map< string, WidgetRuntimeAction >(
+		runtime.map( ( action ) => [ action.id, action ] as const )
+	);
 
 	const merged: WidgetRuntimeAction[] = declared.map( ( action ) => {
 		const replacement = byId.get( action.id );
