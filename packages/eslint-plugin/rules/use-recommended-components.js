@@ -9,9 +9,12 @@ const {
  * Allowlist: only the listed components are permitted from these packages.
  * Any other named import will be flagged with the package's message.
  *
+ * Components in `caution` are marked "Use with caution". They are flagged
+ * unless the `allowUseWithCaution` option is enabled.
+ *
  * `message` supports `{{ name }}` and `{{ source }}` placeholders.
  *
- * @type {Record<string, { allowed: string[], message?: string }>}
+ * @type {Record<string, { allowed: string[], caution?: string[], message?: string }>}
  */
 const ALLOWLIST = {
 	'@wordpress/ui': {
@@ -20,6 +23,9 @@ const ALLOWLIST = {
 			'Badge',
 			'Calendar',
 			'Card',
+			'Checkbox',
+			'CheckboxControl',
+			'CheckboxGroup',
 			'Collapsible',
 			'CollapsibleCard',
 			'ControlWithError',
@@ -33,6 +39,7 @@ const ALLOWLIST = {
 			'KeyboardShortcutDescription',
 			'KeyboardShortcutDisplay',
 			'Link',
+			'Notice',
 			'RangeCalendar',
 			'SearchableChipSelect',
 			'SearchableChipSelectControl',
@@ -51,6 +58,24 @@ const ALLOWLIST = {
 			'ValidityIndicator',
 			'VisuallyHidden',
 			'useKeyboardShortcutProps',
+		],
+		caution: [
+			'AlertDialog',
+			'Breadcrumb',
+			'Button',
+			'ButtonLink',
+			'Combobox',
+			'Dialog',
+			'Drawer',
+			'IconButton',
+			'Menu',
+			'Popover',
+			'Radio',
+			'RadioGroup',
+			'SearchableSelect',
+			'SearchableSelectControl',
+			'Switch',
+			'SwitchControl',
 		],
 		message:
 			'`{{ name }}` from `{{ source }}` is not yet recommended for use in a WordPress environment.',
@@ -87,6 +112,7 @@ const DENYLIST = {
 		__experimentalZStack: 'Write your own CSS instead.',
 		Animate:
 			'Write your own CSS animations instead, preferably using the motion tokens available in `@wordpress/theme`.',
+		Badge: 'Use `{{ name }}` from `@wordpress/ui` instead.',
 		BaseControl:
 			'Use `Field` from `@wordpress/ui` instead. For a purely visual label, use `Field.VisualLabel`. For a group legend, use `Fieldset` and `Fieldset.Legend`.',
 		Card: 'Use `Card.Root` from `@wordpress/ui` instead.',
@@ -96,6 +122,8 @@ const DENYLIST = {
 		CardHeader:
 			'Use `Card.Header` (and optionally `Card.Title`) from `@wordpress/ui` instead.',
 		CardMedia: 'Use `Card.FullBleed` from `@wordpress/ui` instead.',
+		CheckboxControl:
+			'Use `CheckboxControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		Flex: 'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
 		FlexBlock:
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
@@ -103,6 +131,7 @@ const DENYLIST = {
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
 		__experimentalInputControl:
 			'Use `InputControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
+		Notice: 'Use `Notice` from `@wordpress/ui` instead.',
 		ResponsiveWrapper: 'Use the CSS `aspect-ratio` property instead.',
 		TabPanel: 'Use `Tabs` from `@wordpress/ui` instead.',
 		TabbableContainer: '{{ name }} is planned for deprecation.',
@@ -125,9 +154,20 @@ const rule = {
 				'Encourage the use of recommended UI components in a WordPress environment.',
 			url: 'https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/use-recommended-components.md',
 		},
-		schema: [],
+		schema: [
+			{
+				type: 'object',
+				properties: {
+					allowUseWithCaution: {
+						type: 'boolean',
+					},
+				},
+				additionalProperties: false,
+			},
+		],
 	},
 	create( context ) {
+		const { allowUseWithCaution = false } = context.options[ 0 ] ?? {};
 		const privateApisState = createPrivateApisState();
 
 		return {
@@ -161,7 +201,11 @@ const rule = {
 
 					if (
 						allowlistEntry &&
-						! allowlistEntry.allowed.includes( name )
+						! allowlistEntry.allowed.includes( name ) &&
+						! (
+							allowUseWithCaution &&
+							allowlistEntry.caution?.includes( name )
+						)
 					) {
 						context.report( {
 							node: specifier,

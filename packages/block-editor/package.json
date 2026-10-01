@@ -58,7 +58,7 @@
 		"build-module/hooks/**"
 	],
 	"dependencies": {
-		"@react-spring/web": "^9.4.5",
+		"@react-spring/web": "^10.1.2",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/blob": "file:../blob",
@@ -88,6 +88,7 @@
 		"@wordpress/preferences": "file:../preferences",
 		"@wordpress/priority-queue": "file:../priority-queue",
 		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/react-inert-value": "file:../react-inert-value",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/style-engine": "file:../style-engine",
 		"@wordpress/token-list": "file:../token-list",

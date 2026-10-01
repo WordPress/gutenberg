@@ -190,6 +190,8 @@ Vitest resets mock implementations and call history, restores spies, resets stub
 
 ### Expected console calls
 
+Gutenberg's internal Vitest setup clears `@wordpress/deprecated`'s logged-message history before each test. A message still logs only once within a test. Suites do not need their own deprecation-history cleanup. To suppress a known deprecation in behavior tests, set its `logged` entry in `beforeEach` and delete that entry in the test that asserts the warning.
+
 Gutenberg's internal Vitest setup fails a test when `console.error`, `console.warn`, `console.info`, or `console.log` has calls that the test did not explicitly expect. Use `toHaveErroredWith`, `toHaveWarnedWith`, `toHaveInformedWith`, or `toHaveLoggedWith` with specific arguments. Asymmetric matchers such as `expect.objectContaining` are supported.
 
 ```js
@@ -600,7 +602,7 @@ End-to-end tests use [Playwright](https://playwright.dev/) as the testing framew
 
 ### Using wp-env
 
-If you're using the built-in [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-environment), you can run the e2e tests locally using this command:
+If you're using the built-in [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-wordpress-environment), you can run the e2e tests locally using this command:
 
 ```bash
 npm run test:e2e
@@ -650,7 +652,7 @@ A test is considered to be **flaky** when it can pass and fail across multiple r
 
 ## PHP testing
 
-Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. If you're using the built-in [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-environment), you can run the PHP tests locally using this command:
+Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. If you're using the built-in [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-wordpress-environment), you can run the PHP tests locally using this command:
 
 ```bash
 npm run test:php

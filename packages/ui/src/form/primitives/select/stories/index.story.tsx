@@ -16,6 +16,10 @@ const meta: Meta< typeof Select.Root > = {
 		'Select.Item': Select.Item,
 		'Select.ItemLabel': Select.ItemLabel,
 		'Select.ItemDescription': Select.ItemDescription,
+		'Select.Separator': Select.Separator,
+	},
+	argTypes: {
+		onValueChange: { action: 'onValueChange' },
 	},
 	parameters: {
 		componentStatus: {
@@ -32,6 +36,12 @@ const defaultItems = Array.from( { length: 6 }, ( _, index ) => ( {
 	value: `item-${ index + 1 }`,
 	label: `Item ${ index + 1 }`,
 } ) );
+
+const separatorItems = [
+	{ value: 'apple', label: 'Apple' },
+	{ value: 'banana', label: 'Banana' },
+	{ value: 'other', label: 'Other' },
+];
 
 export const Default: Story = {
 	args: {
@@ -150,6 +160,29 @@ export const Grouped: Story = {
 						) ) }
 					</Select.Group>
 				) ) }
+			</Select.Popup>,
+		],
+	},
+};
+
+/**
+ * Use `Select.Separator` to set choices apart from each other.
+ */
+export const WithSeparator: Story = {
+	args: {
+		items: separatorItems,
+		children: [
+			<Select.Trigger aria-label="Fruit" key="trigger" />,
+			<Select.Popup key="popup">
+				{ separatorItems.slice( 0, 2 ).map( ( item ) => (
+					<Select.Item key={ item.value } value={ item }>
+						<Select.ItemLabel>{ item.label }</Select.ItemLabel>
+					</Select.Item>
+				) ) }
+				<Select.Separator />
+				<Select.Item value={ separatorItems[ 2 ] }>
+					<Select.ItemLabel>Other</Select.ItemLabel>
+				</Select.Item>
 			</Select.Popup>,
 		],
 	},

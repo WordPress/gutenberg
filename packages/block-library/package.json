@@ -43,6 +43,7 @@
 	"wpScript": true,
 	"wpScriptModuleExports": {
 		"./accordion/view": "./build-module/accordion/view.mjs",
+		"./cover/view": "./build-module/cover/view.mjs",
 		"./file/view": "./build-module/file/view.mjs",
 		"./image/view": "./build-module/image/view.mjs",
 		"./navigation/view": "./build-module/navigation/view.mjs",
@@ -90,7 +91,7 @@
 		"build-module/*/init.mjs"
 	],
 	"dependencies": {
-		"@arraypress/waveform-player": "^1.26.0",
+		"@arraypress/waveform-player": "^1.27.0",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/autop": "file:../autop",
@@ -121,6 +122,7 @@
 		"@wordpress/patterns": "file:../patterns",
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/react-inert-value": "file:../react-inert-value",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/server-side-render": "file:../server-side-render",
 		"@wordpress/shortcode": "file:../shortcode",
