@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   Make sure the ARIA live regions and Intro are always perceivable even when they may inherit `visibility: hidden` from an ancestor element. ([#83932](https://github.com/WordPress/gutenberg/pull/83932))
+
 ### New Features
 
 -   Add `prefersReducedMotion`, which reports whether the user has asked their operating system to reduce motion. It is the counterpart to the `useReducedMotion` hook in `@wordpress/compose`, for code that runs outside React such as block view scripts ([#83452](https://github.com/WordPress/gutenberg/pull/83452)).
