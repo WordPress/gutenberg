@@ -88,6 +88,7 @@
 		"@wordpress/preferences": "file:../preferences",
 		"@wordpress/priority-queue": "file:../priority-queue",
 		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/react-inert-value": "file:../react-inert-value",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/style-engine": "file:../style-engine",
 		"@wordpress/token-list": "file:../token-list",
