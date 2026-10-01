@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   Blocks screen: resolve the font family a block inherits from the root or element styles, so the Typography panel's Appearance control offers only the weights and styles that font provides.
+-   Blocks screen: resolve the font family a block inherits from the root or element styles, so the Typography panel's Appearance control offers only the weights and styles that font provides ([#83946](https://github.com/WordPress/gutenberg/pull/83946)).
 
 ### Internal
 
