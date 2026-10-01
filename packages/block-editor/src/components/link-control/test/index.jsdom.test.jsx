@@ -3402,12 +3402,6 @@ describe( 'URL validation', () => {
 			} )
 		);
 	} );
-
-	// Note: mailto: and tel: protocol URLs are handled by the validation logic
-	// (they skip URL constructor validation if they have a valid protocol),
-	// but testing them in the jsdom environment is problematic as the native
-	// URL constructor behavior may differ. These URLs are covered by the
-	// isURLLike validation which checks for valid protocols.
 } );
 
 describe( 'inputValue prop', () => {
