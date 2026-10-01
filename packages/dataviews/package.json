@@ -74,6 +74,7 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/kebab-case": "file:../kebab-case",
 		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/react-inert-value": "file:../react-inert-value",
 		"@wordpress/ui": "file:../ui",
 		"@wordpress/warning": "file:../warning",
 		"change-case": "^4.1.2",

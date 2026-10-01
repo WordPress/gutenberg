@@ -68,7 +68,7 @@
 		{ "path": "packages/private-apis" },
 		{ "path": "packages/project-management-automation" },
 		{ "path": "packages/react-i18n" },
-		{ "path": "packages/react-inert-value" },
+		{ "path": "packages/react-inert-value/tsconfig.build.json" },
 		{ "path": "packages/redux-routine" },
 		{ "path": "packages/report-flaky-tests/tsconfig.build.json" },
 		{ "path": "packages/rich-text" },
