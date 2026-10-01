@@ -3,7 +3,7 @@ import {
 	InspectorControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { PanelBody, Spinner } from '@wordpress/components';
+import { PanelBody, Spinner, Notice, Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useContext } from '@wordpress/element';
@@ -11,6 +11,7 @@ import NavigationMenuSelector from './navigation-menu-selector';
 import { unlock } from '../../lock-unlock';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import useNavigationMenu from '../use-navigation-menu';
+import usePublishNavigationMenu from './use-publish-navigation-menu';
 import LeafMoreMenu from './leaf-more-menu';
 import { NavigationLinkUI } from './navigation-link-ui';
 import NavigationListViewHeader from './navigation-list-view-header';
@@ -113,6 +114,41 @@ const MenuInspectorControls = ( props ) => {
 	const { isOpened, expandRevision, handleToggle } =
 		useListViewPanelState( clientId );
 
+	const {
+		navigationMenu,
+		canUserUpdateNavigationMenu,
+		hasResolvedCanUserUpdateNavigationMenu,
+	} = useNavigationMenu( currentMenuId );
+	const { publish, isPublishing } = usePublishNavigationMenu( currentMenuId );
+
+	const draftMessage = __(
+		'This navigation menu is a draft. It will not be visible on your live site until published.'
+	);
+	const draftNotice = navigationMenu?.status === 'draft' && (
+		<Notice
+			status="warning"
+			isDismissible={ false }
+			spokenMessage={ draftMessage }
+		>
+			{ draftMessage }
+			{ hasResolvedCanUserUpdateNavigationMenu &&
+				canUserUpdateNavigationMenu && (
+					<>
+						{ ' ' }
+						<Button
+							variant="link"
+							onClick={ publish }
+							isBusy={ isPublishing }
+							disabled={ isPublishing }
+							accessibleWhenDisabled
+						>
+							{ __( 'Publish' ) }
+						</Button>
+					</>
+				) }
+		</Notice>
+	);
+
 	if ( ! showBlockTitle ) {
 		return (
 			<InspectorControls group="list">
@@ -134,6 +170,7 @@ const MenuInspectorControls = ( props ) => {
 							isManageMenusButtonDisabled
 						}
 					/>
+					{ draftNotice }
 					<MainContent
 						{ ...props }
 						expandRevision={ expandRevision }
@@ -169,6 +206,7 @@ const MenuInspectorControls = ( props ) => {
 						}
 					/>
 				) }
+				{ draftNotice }
 				<MainContent { ...props } expandRevision={ expandRevision } />
 			</PanelBody>
 		</InspectorControls>
