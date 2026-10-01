@@ -7,6 +7,7 @@
 -   Inserter: Open faster when many block types are registered ([#83446](https://github.com/WordPress/gutenberg/pull/83446)).
 -   State control badges: migrate from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Badge` ([#82608](https://github.com/WordPress/gutenberg/pull/82608)).
 -   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
+-   Block Switcher: Show the pattern previews' focus ring with the design system's outline instead of a legacy box-shadow ([#83933](https://github.com/WordPress/gutenberg/pull/83933)).
 
 ### Bug Fixes
 
