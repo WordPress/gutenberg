@@ -10,6 +10,7 @@
 ### Bug Fixes
 
 -   `__experimentalFetchLinkSuggestions`: rank results by type (content, taxonomy, post format, attachment), and return everything the endpoints gave rather than cutting the merged results. `perPage` is now the page size asked of each type rather than a limit on what they add up to, so `page` reaches every result ([#83407](https://github.com/WordPress/gutenberg/pull/83407)).
+-   Undo and redo stopped working for entities that real-time collaboration does not sync, such as a post type excluded from collaboration, while a synced entity is loaded in the same editor. core-data's undo manager now stays in charge for every entity and delegates to the sync manager only for synced entities ([#83888](https://github.com/WordPress/gutenberg/pull/83888)).
 
 ### Internal
 
