@@ -53,6 +53,7 @@
 		},
 		"dimensions": {
 			"minHeight": true,
+			"minWidth": true,
 			"__experimentalDefaultControls": {
 				"minHeight": false
 			}
@@ -81,6 +82,7 @@
 				"text": true
 			}
 		},
+		"shadow": true,
 		"layout": {
 			"allowEditing": false
 		},

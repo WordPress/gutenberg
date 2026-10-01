@@ -1,6 +1,6 @@
 import { forwardRef, useId, useRef } from '@wordpress/element';
 import { __experimentalToggleGroupControl as ToggleGroupControl } from '@wordpress/components';
-import { ControlWithError } from './control-with-error';
+import { ControlWithError } from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 
 type ToggleGroupControlProps = React.ComponentProps<
@@ -26,6 +26,7 @@ const UnforwardedValidatedToggleGroupControl = (
 	return (
 		<div className="dataviews-validated-control__wrapper-with-error-delegate">
 			<ControlWithError
+				className="dataviews-validated-control"
 				required={ required }
 				markWhenOptional={ markWhenOptional }
 				customValidity={ customValidity }

@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Babel preset default transpilation works properly 1`] = `
+exports[`Babel preset default > transpilation works properly 1`] = `
 "describe('Babel preset default', () => {
   async function* foo() {
     await 1;

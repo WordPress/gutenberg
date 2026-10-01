@@ -117,6 +117,42 @@ class Tests_Collaboration_Settings extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_collaboration_is_disabled_for_post_type_without_custom_fields() {
+		register_post_type(
+			'rtc_no_meta',
+			array(
+				'show_in_rest' => true,
+				'supports'     => array( 'editor' ),
+			)
+		);
+
+		try {
+			$this->assertTrue( wp_is_post_type_collaboration_disabled( 'rtc_no_meta' ) );
+		} finally {
+			unregister_post_type( 'rtc_no_meta' );
+		}
+	}
+
+	public function test_collaboration_is_enabled_for_post_type_with_custom_fields() {
+		register_post_type(
+			'rtc_with_meta',
+			array(
+				'show_in_rest' => true,
+				'supports'     => array( 'editor', 'custom-fields' ),
+			)
+		);
+
+		try {
+			$this->assertFalse( wp_is_post_type_collaboration_disabled( 'rtc_with_meta' ) );
+		} finally {
+			unregister_post_type( 'rtc_with_meta' );
+		}
+	}
+
+	public function test_collaboration_is_enabled_for_attachments() {
+		$this->assertFalse( wp_is_post_type_collaboration_disabled( 'attachment' ) );
+	}
+
 	public function test_experiment_disables_collaboration_in_site_editor() {
 		global $pagenow;
 

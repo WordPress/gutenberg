@@ -1,10 +1,39 @@
-/* global afterEach, expect, test */
-const { spawnSync } = require( 'node:child_process' );
-const { mkdtempSync, mkdirSync, rmSync, writeFileSync } = require( 'node:fs' );
-const { tmpdir } = require( 'node:os' );
-const { join } = require( 'node:path' );
+import { spawnSync } from 'node:child_process';
+import {
+	mkdtempSync,
+	mkdirSync,
+	readFileSync,
+	rmSync,
+	writeFileSync,
+} from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { parse } from 'jsonc-parser';
+import { afterEach, expect, test } from 'vitest';
 
-const validatorPath = join( __dirname, 'validate-tsconfig.mjs' );
+const validatorPath = fileURLToPath(
+	new URL( 'validate-tsconfig.mjs', import.meta.url )
+);
+
+/*
+ * The validator resolves the base config by package name, so it always reads
+ * the real one rather than anything a fixture writes. Derive the patterns a
+ * build project has to keep the same way it does, so adding a pattern to the
+ * base config does not strand these fixtures.
+ */
+const REQUIRED_BUILD_EXCLUDES = parse(
+	readFileSync(
+		fileURLToPath(
+			import.meta
+				.resolve( '@wordpress/monorepo-tools/tsconfig/base.json' )
+		),
+		'utf8'
+	)
+)
+	.exclude.map( ( pattern ) => pattern.replace( /^\$\{configDir\}\//, '' ) )
+	.filter( ( pattern ) => /test|stories|story/.test( pattern ) );
+
 const temporaryRoots = [];
 
 afterEach( () => {
@@ -14,6 +43,7 @@ afterEach( () => {
 } );
 
 function writeJson( path, contents ) {
+	mkdirSync( dirname( path ), { recursive: true } );
 	writeFileSync( path, JSON.stringify( contents, null, '\t' ) + '\n' );
 }
 
@@ -21,19 +51,18 @@ function writeJson( path, contents ) {
  * Creates a repository root holding a build solution, a root solution and the
  * given packages.
  *
- * @param {Object} repo          Repository description.
- * @param {Object} repo.packages Package name to `{ tsconfigs, dependencies }`.
- * @param {Array}  repo.build    References of the build solution.
- * @param {Array}  repo.root     References of the root solution.
+ * @param {Object} repo           Repository description.
+ * @param {Object} repo.packages  Package name to `{ tsconfigs, dependencies, devDependencies }`.
+ * @param {Object} [repo.routes]  Route name to `{ tsconfigs, dependencies, devDependencies, manifest }`.
+ * @param {Object} [repo.widgets] Widget name to the same shape as a route.
+ * @param {Array}  repo.build     References of the build solution.
+ * @param {Array}  repo.root      References of the root solution.
  * @return {string} Path of the created repository root.
  */
-function createRepo( { packages, build, root } ) {
+function createRepo( { packages, routes, widgets, build, root } ) {
 	const repoRoot = mkdtempSync( join( tmpdir(), 'validate-tsconfig-' ) );
 	temporaryRoots.push( repoRoot );
 
-	writeJson( join( repoRoot, 'tsconfig.base.json' ), {
-		exclude: [ '**/benchmark', '**/test/**', '**/stories/**' ],
-	} );
 	writeJson( join( repoRoot, 'tsconfig.build.json' ), {
 		references: build.map( ( path ) => ( { path } ) ),
 	} );
@@ -41,15 +70,54 @@ function createRepo( { packages, build, root } ) {
 		references: root.map( ( path ) => ( { path } ) ),
 	} );
 
-	for ( const [ name, { tsconfigs, dependencies } ] of Object.entries(
-		packages
-	) ) {
+	for ( const [
+		entryType,
+		name,
+		{ tsconfigs, dependencies, devDependencies, manifest = true, files },
+	] of [
+		...Object.entries( routes ?? {} ).map( ( entry ) => [
+			'routes',
+			...entry,
+		] ),
+		...Object.entries( widgets ?? {} ).map( ( entry ) => [
+			'widgets',
+			...entry,
+		] ),
+	] ) {
+		const entryDir = join( repoRoot, entryType, name );
+		mkdirSync( entryDir, { recursive: true } );
+		if ( manifest ) {
+			writeJson( join( entryDir, 'package.json' ), {
+				name: `@wordpress/route-${ name }`,
+				version: '1.0.0',
+				...( dependencies && { dependencies } ),
+				...( devDependencies && { devDependencies } ),
+			} );
+		}
+		for ( const [ fileName, references ] of Object.entries( tsconfigs ) ) {
+			writeJson( join( entryDir, fileName ), {
+				references: references.map( ( path ) => ( { path } ) ),
+			} );
+		}
+		for ( const file of files ?? [] ) {
+			mkdirSync( join( entryDir, dirname( file ) ), {
+				recursive: true,
+			} );
+			writeFileSync( join( entryDir, file ), 'export {};\n' );
+		}
+	}
+
+	for ( const [
+		name,
+		{ tsconfigs, dependencies, devDependencies },
+	] of Object.entries( packages ) ) {
 		const packageDir = join( repoRoot, 'packages', name );
 		mkdirSync( packageDir, { recursive: true } );
 		writeJson( join( packageDir, 'package.json' ), {
 			name: `@wordpress/${ name }`,
 			version: '1.0.0',
 			...( dependencies && { dependencies } ),
+			...( devDependencies && { devDependencies } ),
 		} );
 		for ( const [ fileName, tsconfig ] of Object.entries( tsconfigs ) ) {
 			const { references = [], ...rest } = Array.isArray( tsconfig )
@@ -287,7 +355,7 @@ test( 'fails when the root solution does not reference the build solution', () =
 const devOnlyPackage = {
 	tsconfigs: {
 		'tsconfig.json': {
-			extends: '../../tsconfig.dev.base.json',
+			extends: '@wordpress/monorepo-tools/tsconfig/dev.base.json',
 			references: [],
 		},
 	},
@@ -296,9 +364,9 @@ const devOnlyPackage = {
 test( 'passes when a package without a build project is in the root solution', () => {
 	const result = runValidator(
 		createRepo( {
-			packages: { 'jest-console': devOnlyPackage },
+			packages: { 'test-utils': devOnlyPackage },
 			build: [],
-			root: [ './tsconfig.build.json', 'packages/jest-console' ],
+			root: [ './tsconfig.build.json', 'packages/test-utils' ],
 		} )
 	);
 
@@ -308,7 +376,7 @@ test( 'passes when a package without a build project is in the root solution', (
 test( 'fails when a package without a build project is missing from the root solution', () => {
 	const result = runValidator(
 		createRepo( {
-			packages: { 'jest-console': devOnlyPackage },
+			packages: { 'test-utils': devOnlyPackage },
 			build: [],
 			root: [ './tsconfig.build.json' ],
 		} )
@@ -316,7 +384,7 @@ test( 'fails when a package without a build project is missing from the root sol
 
 	expect( result.status ).not.toBe( 0 );
 	expect( result.stderr ).toContain(
-		'Missing reference to "packages/jest-console/tsconfig.json" in tsconfig.json'
+		'Missing reference to "packages/test-utils/tsconfig.json" in tsconfig.json'
 	);
 } );
 
@@ -407,7 +475,7 @@ function typedSplitPackage( buildTypes, devTypes ) {
 	return {
 		tsconfigs: {
 			'tsconfig.json': {
-				extends: '../../tsconfig.dev.base.json',
+				extends: '@wordpress/monorepo-tools/tsconfig/dev.base.json',
 				compilerOptions: { types: devTypes },
 				references: [ './tsconfig.build.json' ],
 			},
@@ -470,7 +538,8 @@ test( 'checks the stories project of a package without a build project', () => {
 				icons: {
 					tsconfigs: {
 						'tsconfig.json': {
-							extends: '../../tsconfig.dev.base.json',
+							extends:
+								'@wordpress/monorepo-tools/tsconfig/dev.base.json',
 							references: [],
 						},
 						'tsconfig.stories.json': [],
@@ -495,13 +564,14 @@ test( 'fails when a build project exclude omits a dev-file pattern of the base',
 				blob: {
 					tsconfigs: {
 						'tsconfig.json': {
-							extends: '../../tsconfig.dev.base.json',
+							extends:
+								'@wordpress/monorepo-tools/tsconfig/dev.base.json',
 							references: [ './tsconfig.build.json' ],
 						},
 						'tsconfig.build.json': {
 							exclude: [
 								'**/benchmark',
-								'**/test/**',
+								...REQUIRED_BUILD_EXCLUDES.slice( 0, -1 ),
 								'src/legacy.js',
 							],
 							references: [],
@@ -516,7 +586,9 @@ test( 'fails when a build project exclude omits a dev-file pattern of the base',
 
 	expect( result.status ).not.toBe( 0 );
 	expect( result.stderr ).toContain(
-		'Missing exclude "**/stories/**" in packages/blob/tsconfig.build.json'
+		`Missing exclude "${ REQUIRED_BUILD_EXCLUDES.at(
+			-1
+		) }" in packages/blob/tsconfig.build.json`
 	);
 } );
 
@@ -527,14 +599,14 @@ test( 'passes when a build project keeps every dev-file pattern of the base', ()
 				blob: {
 					tsconfigs: {
 						'tsconfig.json': {
-							extends: '../../tsconfig.dev.base.json',
+							extends:
+								'@wordpress/monorepo-tools/tsconfig/dev.base.json',
 							references: [ './tsconfig.build.json' ],
 						},
 						'tsconfig.build.json': {
 							exclude: [
 								'**/benchmark',
-								'**/test/**',
-								'**/stories/**',
+								...REQUIRED_BUILD_EXCLUDES,
 								'src/legacy.js',
 							],
 							references: [],
@@ -565,4 +637,385 @@ test( 'fails when a package with TypeScript test files has no dev project', () =
 	expect( result.stderr ).toContain(
 		'Missing dev project for the TypeScript test or story files of packages/blob'
 	);
+} );
+
+test( 'passes when a route is registered and references its dependencies', () => {
+	const { status, stderr } = runValidator(
+		createRepo( {
+			packages: { blob: splitPackage },
+			routes: {
+				dashboard: {
+					tsconfigs: {
+						'tsconfig.json': [
+							'../../packages/blob/tsconfig.build.json',
+						],
+					},
+					dependencies: { '@wordpress/blob': 'file:../..' },
+				},
+			},
+			build: [ 'packages/blob/tsconfig.build.json' ],
+			root: [
+				'./tsconfig.build.json',
+				'packages/blob',
+				'routes/dashboard',
+			],
+		} )
+	);
+	expect( stderr ).toBe( '' );
+	expect( status ).toBe( 0 );
+} );
+
+test( 'fails when a route is missing from the root solution', () => {
+	const { status, stderr } = runValidator(
+		createRepo( {
+			packages: { blob: splitPackage },
+			routes: {
+				dashboard: {
+					tsconfigs: {
+						'tsconfig.json': [
+							'../../packages/blob/tsconfig.build.json',
+						],
+					},
+					dependencies: { '@wordpress/blob': 'file:../..' },
+				},
+			},
+			build: [ 'packages/blob/tsconfig.build.json' ],
+			root: [ './tsconfig.build.json', 'packages/blob' ],
+		} )
+	);
+	expect( stderr ).toContain(
+		'Missing reference to "routes/dashboard" in tsconfig.json'
+	);
+	expect( status ).toBe( 1 );
+} );
+
+test( 'fails when a route does not reference a dependency', () => {
+	const { status, stderr } = runValidator(
+		createRepo( {
+			packages: { blob: splitPackage },
+			routes: {
+				dashboard: {
+					tsconfigs: { 'tsconfig.json': [] },
+					dependencies: { '@wordpress/blob': 'file:../..' },
+				},
+			},
+			build: [ 'packages/blob/tsconfig.build.json' ],
+			root: [
+				'./tsconfig.build.json',
+				'packages/blob',
+				'routes/dashboard',
+			],
+		} )
+	);
+	expect( stderr ).toContain(
+		'Missing reference to "../../packages/blob/tsconfig.build.json" in routes/dashboard/tsconfig.json'
+	);
+	expect( status ).toBe( 1 );
+} );
+
+test( 'passes when a route references an unsplit dependency by directory', () => {
+	const { status, stderr } = runValidator(
+		createRepo( {
+			packages: {
+				hooks: { tsconfigs: { 'tsconfig.json': [] } },
+				'test-utils': devOnlyPackage,
+			},
+			routes: {
+				dashboard: {
+					tsconfigs: { 'tsconfig.json': [ '../../packages/hooks' ] },
+					dependencies: {
+						'@wordpress/hooks': 'file:../..',
+						'@wordpress/test-utils': 'file:../..',
+					},
+				},
+			},
+			build: [ 'packages/hooks' ],
+			root: [
+				'./tsconfig.build.json',
+				'packages/test-utils',
+				'routes/dashboard',
+			],
+		} )
+	);
+	expect( stderr ).toBe( '' );
+	expect( status ).toBe( 0 );
+} );
+
+test( 'ignores route devDependencies and routes without a manifest', () => {
+	const { status, stderr } = runValidator(
+		createRepo( {
+			packages: { blob: splitPackage },
+			routes: {
+				dashboard: {
+					tsconfigs: { 'tsconfig.json': [] },
+					devDependencies: { '@wordpress/blob': 'file:../..' },
+				},
+				'site-health': {
+					tsconfigs: { 'tsconfig.json': [] },
+					manifest: false,
+				},
+			},
+			build: [ 'packages/blob/tsconfig.build.json' ],
+			root: [
+				'./tsconfig.build.json',
+				'packages/blob',
+				'routes/dashboard',
+				'routes/site-health',
+			],
+		} )
+	);
+	expect( stderr ).toBe( '' );
+	expect( status ).toBe( 0 );
+} );
+
+test( 'fails when a route has TypeScript files but no tsconfig', () => {
+	const { status, stderr } = runValidator(
+		createRepo( {
+			packages: {},
+			routes: {
+				dashboard: {
+					tsconfigs: {},
+					files: [ 'route.ts' ],
+				},
+			},
+			build: [],
+			root: [ './tsconfig.build.json' ],
+		} )
+	);
+	expect( stderr ).toContain(
+		'Missing tsconfig.json for the TypeScript files of routes/dashboard'
+	);
+	expect( status ).toBe( 1 );
+} );
+
+test( 'passes when a route without a tsconfig has no TypeScript files', () => {
+	const { status, stderr } = runValidator(
+		createRepo( {
+			packages: {},
+			routes: {
+				dashboard: {
+					tsconfigs: {},
+					files: [ 'style.scss' ],
+				},
+			},
+			build: [],
+			root: [ './tsconfig.build.json' ],
+		} )
+	);
+	expect( stderr ).toBe( '' );
+	expect( status ).toBe( 0 );
+} );
+
+test( 'fails when a route has TypeScript test files but no test project', () => {
+	const { status, stderr } = runValidator(
+		createRepo( {
+			packages: {},
+			routes: {
+				dashboard: {
+					tsconfigs: { 'tsconfig.json': [] },
+					files: [ 'hooks/test/layout.test.ts' ],
+				},
+			},
+			build: [],
+			root: [ './tsconfig.build.json', 'routes/dashboard' ],
+		} )
+	);
+	expect( stderr ).toContain(
+		'Missing test project for the TypeScript test files of routes/dashboard'
+	);
+	expect( status ).toBe( 1 );
+} );
+
+test( 'fails when a route test project is missing from the root solution', () => {
+	const { status, stderr } = runValidator(
+		createRepo( {
+			packages: {},
+			routes: {
+				dashboard: {
+					tsconfigs: {
+						'tsconfig.json': [],
+						'tsconfig.test.json': [],
+					},
+					files: [ 'hooks/test/layout.test.ts' ],
+				},
+			},
+			build: [],
+			root: [ './tsconfig.build.json', 'routes/dashboard' ],
+		} )
+	);
+	expect( stderr ).toContain(
+		'Missing reference to "routes/dashboard/tsconfig.test.json" in tsconfig.json'
+	);
+	expect( status ).toBe( 1 );
+} );
+
+test( 'passes when a route test project covers the test files', () => {
+	const { status, stderr } = runValidator(
+		createRepo( {
+			packages: {},
+			routes: {
+				dashboard: {
+					tsconfigs: {
+						'tsconfig.json': [],
+						'tsconfig.test.json': [],
+					},
+					files: [ 'hooks/test/layout.test.ts' ],
+				},
+			},
+			build: [],
+			root: [
+				'./tsconfig.build.json',
+				'routes/dashboard',
+				'routes/dashboard/tsconfig.test.json',
+			],
+		} )
+	);
+	expect( stderr ).toBe( '' );
+	expect( status ).toBe( 0 );
+} );
+
+test( 'passes when a widget is registered and references its dependencies', () => {
+	const { status, stderr } = runValidator(
+		createRepo( {
+			packages: { blob: splitPackage },
+			widgets: {
+				news: {
+					tsconfigs: {
+						'tsconfig.json': [
+							'../../packages/blob/tsconfig.build.json',
+						],
+					},
+					dependencies: { '@wordpress/blob': 'file:../..' },
+				},
+			},
+			build: [ 'packages/blob/tsconfig.build.json' ],
+			root: [ './tsconfig.build.json', 'packages/blob', 'widgets/news' ],
+		} )
+	);
+	expect( stderr ).toBe( '' );
+	expect( status ).toBe( 0 );
+} );
+
+test( 'fails when a widget is missing from the root solution', () => {
+	const { status, stderr } = runValidator(
+		createRepo( {
+			packages: { blob: splitPackage },
+			widgets: {
+				news: {
+					tsconfigs: {
+						'tsconfig.json': [
+							'../../packages/blob/tsconfig.build.json',
+						],
+					},
+					dependencies: { '@wordpress/blob': 'file:../..' },
+				},
+			},
+			build: [ 'packages/blob/tsconfig.build.json' ],
+			root: [ './tsconfig.build.json', 'packages/blob' ],
+		} )
+	);
+	expect( stderr ).toContain(
+		'Missing reference to "widgets/news" in tsconfig.json'
+	);
+	expect( status ).toBe( 1 );
+} );
+
+test( 'fails when a widget does not reference a dependency', () => {
+	const { status, stderr } = runValidator(
+		createRepo( {
+			packages: { blob: splitPackage },
+			widgets: {
+				news: {
+					tsconfigs: { 'tsconfig.json': [] },
+					dependencies: { '@wordpress/blob': 'file:../..' },
+				},
+			},
+			build: [ 'packages/blob/tsconfig.build.json' ],
+			root: [ './tsconfig.build.json', 'packages/blob', 'widgets/news' ],
+		} )
+	);
+	expect( stderr ).toContain(
+		'Missing reference to "../../packages/blob/tsconfig.build.json" in widgets/news/tsconfig.json'
+	);
+	expect( status ).toBe( 1 );
+} );
+
+test( 'fails when a widget has TypeScript files but no tsconfig', () => {
+	const { status, stderr } = runValidator(
+		createRepo( {
+			packages: {},
+			widgets: { news: { tsconfigs: {}, files: [ 'render.tsx' ] } },
+			build: [],
+			root: [ './tsconfig.build.json' ],
+		} )
+	);
+	expect( stderr ).toContain(
+		'Missing tsconfig.json for the TypeScript files of widgets/news'
+	);
+	expect( status ).toBe( 1 );
+} );
+
+test( 'fails when a widget references a package that is not a dependency', () => {
+	const { status, stderr } = runValidator(
+		createRepo( {
+			packages: { blob: splitPackage },
+			widgets: {
+				news: {
+					tsconfigs: {
+						'tsconfig.json': [
+							'../../packages/blob/tsconfig.build.json',
+						],
+					},
+				},
+			},
+			build: [ 'packages/blob/tsconfig.build.json' ],
+			root: [ './tsconfig.build.json', 'packages/blob', 'widgets/news' ],
+		} )
+	);
+	expect( stderr ).toContain(
+		'Reference to "packages/blob" in widgets/news/tsconfig.json without a dependency on "@wordpress/blob".'
+	);
+	expect( status ).toBe( 1 );
+} );
+
+test( 'fails when a package references a package that is not a dependency', () => {
+	const result = runValidator(
+		createRepo( {
+			packages: {
+				blob: splitPackage,
+				blocks: {
+					tsconfigs: {
+						'tsconfig.json': [ '../blob/tsconfig.build.json' ],
+					},
+				},
+			},
+			build: [ 'packages/blob/tsconfig.build.json', 'packages/blocks' ],
+			root: [ './tsconfig.build.json', 'packages/blob' ],
+		} )
+	);
+
+	expect( result.status ).not.toBe( 0 );
+	expect( result.stderr ).toContain(
+		'Reference to "packages/blob" in packages/blocks/tsconfig.json without a dependency on "@wordpress/blob"'
+	);
+} );
+
+test( 'passes when a reference is backed by a devDependency', () => {
+	const result = runValidator(
+		createRepo( {
+			packages: {
+				blob: splitPackage,
+				blocks: {
+					tsconfigs: {
+						'tsconfig.json': [ '../blob/tsconfig.build.json' ],
+					},
+					devDependencies: { '@wordpress/blob': 'file:../blob' },
+				},
+			},
+			build: [ 'packages/blob/tsconfig.build.json', 'packages/blocks' ],
+			root: [ './tsconfig.build.json', 'packages/blob' ],
+		} )
+	);
+
+	expect( result.status ).toBe( 0 );
 } );

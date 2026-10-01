@@ -41,6 +41,11 @@ test.describe( 'Footnotes', () => {
 			return document.activeElement.id;
 		} );
 
+		// The ID is also the anchor target of the footnote link. A CSS
+		// identifier cannot start with a digit, so a letter prefix keeps
+		// `querySelector( '#' + id )` and `#id` style rules working.
+		expect( id1 ).toMatch( /^fn-[0-9a-f-]{36}$/ );
+
 		expect( await editor.getBlocks() ).toMatchObject( [
 			{
 				name: 'core/paragraph',

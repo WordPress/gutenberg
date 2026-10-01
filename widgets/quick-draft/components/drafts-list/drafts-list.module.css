@@ -9,7 +9,7 @@
 	overflow: auto;
 }
 
-.titleHeader {
+.title-header {
 	padding-block-start: var(--wpds-dimension-padding-md);
 	padding-block-end: var(--wpds-dimension-padding-md);
 	padding-inline-start: var(--wpds-dimension-padding-md);
@@ -17,14 +17,14 @@
 }
 
 /* Featured-image cell; fills the list layout's media slot. */
-.thumbImage {
+.thumb-image {
 	width: 100%;
 	height: 100%;
 	border-radius: var(--wpds-border-radius-md);
 	object-fit: cover;
 }
 
-.thumbPlaceholder {
+.thumb-placeholder {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -36,12 +36,12 @@
 }
 
 /* Title link on the left, delete control pushed to the right of the cell. */
-.titleRow {
+.title-row {
 	width: 100%;
 	min-width: 0;
 }
 
-.titleLink {
+.title-link {
 	min-width: 0;
 	overflow: hidden;
 	white-space: nowrap;

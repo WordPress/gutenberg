@@ -1,16 +1,16 @@
 import { useNavigate, useSearch } from '@wordpress/route';
-import type { View, Action } from '@wordpress/dataviews';
+import type { Action, View, SupportedLayouts } from '@wordpress/dataviews';
 import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import { useMemo, useCallback, useState } from '@wordpress/element';
 import type { Post } from '@wordpress/core-data';
 import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
-import { useView } from '@wordpress/views';
+import { useView, useViewConfig } from '@wordpress/views';
 import { DataViews } from '@wordpress/dataviews';
 import { Button } from '@wordpress/components';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { unlock } from '@wordpress/routes-lock-unlock';
-import { getDefaultView } from './view-utils';
+import { getActiveViewOverrides, type ViewOverrides } from './view-utils';
 import { useEditNavigationAction } from './actions/edit-navigation';
 import { AddNavigationModal } from './add-navigation';
 import './style.scss';
@@ -36,10 +36,49 @@ function NavigationList() {
 	const navigate = useNavigate();
 	const searchParams = useSearch( { from: '/navigation/list' } );
 
-	const defaultView: View = useMemo( () => {
-		return getDefaultView();
-	}, [] );
+	const {
+		default_view: defaultView,
+		default_layouts: defaultLayouts,
+		view_list: viewList,
+	} = useViewConfig( {
+		kind: 'postType',
+		name: NAVIGATION_POST_TYPE,
+	} );
+	const activeViewOverrides = useMemo(
+		() => getActiveViewOverrides( viewList, 'all' ),
+		[ viewList ]
+	);
 
+	if ( ! defaultView ) {
+		// The route loader resolves the view configuration before the stage
+		// mounts, so this only guards against the store being reset.
+		return null;
+	}
+
+	return (
+		<NavigationListView
+			defaultView={ defaultView }
+			defaultLayouts={ defaultLayouts }
+			activeViewOverrides={ activeViewOverrides }
+			navigate={ navigate }
+			searchParams={ searchParams }
+		/>
+	);
+}
+
+function NavigationListView( {
+	defaultView,
+	defaultLayouts,
+	activeViewOverrides,
+	navigate,
+	searchParams,
+}: {
+	defaultView: View;
+	defaultLayouts: SupportedLayouts | undefined;
+	activeViewOverrides: ViewOverrides;
+	navigate: ReturnType< typeof useNavigate >;
+	searchParams: ReturnType< typeof useSearch >;
+} ) {
 	const handleQueryParamsChange = useCallback(
 		( params: { page?: number; search?: string } ) => {
 			navigate( {
@@ -57,6 +96,8 @@ function NavigationList() {
 		name: NAVIGATION_POST_TYPE,
 		slug: 'default-new',
 		defaultView,
+		defaultLayouts,
+		activeViewOverrides,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,
 	} );
@@ -144,9 +185,7 @@ function NavigationList() {
 						totalItems,
 						totalPages,
 					} }
-					defaultLayouts={ {
-						list: true,
-					} }
+					defaultLayouts={ defaultLayouts }
 					getItemId={ getItemId }
 					selection={ selection }
 					onReset={ isModified ? resetToDefault : false }
