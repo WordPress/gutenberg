@@ -26,7 +26,8 @@ export default function addIntroText() {
 			'clip-path:inset(50%);' +
 			'border:0;' +
 			'word-wrap:normal !important;' +
-			'word-break:normal !important;'
+			'word-break:normal !important;' +
+			'visibility:visible'
 	);
 	introText.setAttribute( 'hidden', '' );
 
