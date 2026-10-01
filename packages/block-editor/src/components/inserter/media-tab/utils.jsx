@@ -1,5 +1,5 @@
 import { createBlock } from '@wordpress/blocks';
-import { inertValue } from '@wordpress/ui';
+import { inertValue } from '@wordpress/react-inert-value';
 
 const mediaTypeTag = { image: 'img', video: 'video', audio: 'audio' };
 
