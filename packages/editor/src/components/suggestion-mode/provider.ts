@@ -2,7 +2,8 @@ import { useCallback, useMemo } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 // @ts-expect-error No exported types
-import { store as blockEditorStore } from '@wordpress/block-editor';
+// prettier-ignore
+import { store as blockEditorStore, privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
@@ -12,8 +13,12 @@ import type { SuggestionOperation } from './overlay-context';
 import {
 	addNoteIdToMetadata,
 	getNoteIdsFromMetadata,
+	removeNoteIdFromMetadata,
 } from '../collab-sidebar/utils';
 import { ALL_NOTES_SIDEBAR, SIDEBARS } from '../collab-sidebar/constants';
+import { unlock } from '../../lock-unlock';
+
+const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 /**
  * A single suggestion operation.
@@ -656,9 +661,18 @@ export function useSuggestionsProvider() {
 	 *
 	 * @param args           Delete arguments.
 	 * @param args.commentId Comment id to trash.
+	 * @param args.clientId  Block that links to the note, if known. Its
+	 *                       `metadata.noteId` entry is removed so the post
+	 *                       does not save a reference to a trashed note.
 	 */
 	const deleteSuggestion = useCallback(
-		async ( { commentId }: { commentId: number | string | null } ) => {
+		async ( {
+			commentId,
+			clientId,
+		}: {
+			commentId: number | string | null;
+			clientId?: string;
+		} ) => {
 			if ( ! commentId ) {
 				return;
 			}
@@ -669,6 +683,28 @@ export function useSuggestionsProvider() {
 					{ id: commentId, status: 'trash' },
 					{ throwOnError: true }
 				);
+
+				const metadata = clientId
+					? selectBlockAttributes( clientId )?.metadata
+					: undefined;
+				if (
+					clientId &&
+					getNoteIdsFromMetadata( metadata ).includes(
+						Number( commentId )
+					)
+				) {
+					// Bookkeeping, like the link written on create: keep it
+					// out of undo history.
+					markNextChangeAsNotPersistent?.( { history: 'ignore' } );
+					updateBlockAttributes( clientId, {
+						metadata: cleanEmptyObject(
+							removeNoteIdFromMetadata(
+								metadata,
+								Number( commentId )
+							)
+						),
+					} );
+				}
 			} catch ( error: any ) {
 				createNotice(
 					'error',
@@ -678,7 +714,13 @@ export function useSuggestionsProvider() {
 				throw error;
 			}
 		},
-		[ saveEntityRecord, createNotice ]
+		[
+			saveEntityRecord,
+			createNotice,
+			selectBlockAttributes,
+			updateBlockAttributes,
+			markNextChangeAsNotPersistent,
+		]
 	);
 
 	/**

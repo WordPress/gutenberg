@@ -1145,3 +1145,117 @@ describe( 'createSuggestion (notes sidebar switch)', () => {
 		).toBe( FLOATING_NOTES_SIDEBAR );
 	} );
 } );
+
+describe( 'withdrawn suggestions and failed applies', () => {
+	const PARAGRAPH = 'core/test-withdraw-paragraph';
+
+	beforeAll( () => {
+		registerBlockType( PARAGRAPH, {
+			apiVersion: 3,
+			attributes: {
+				content: { type: 'string', default: '' },
+				align: { type: 'string' },
+				metadata: { type: 'object' },
+			},
+			save: () => null,
+			category: 'text',
+			title: 'Test Withdraw Paragraph',
+		} );
+	} );
+
+	afterAll( () => {
+		getBlockTypes().forEach( ( block ) =>
+			unregisterBlockType( block.name )
+		);
+	} );
+
+	function setup( initialBlocks: any[], { failSave = false } = {} ) {
+		const registry = createRegistry();
+		registry.register( noticesStore );
+		registry.register( blockEditorStore );
+		registry.register(
+			createReduxStore( 'core', {
+				reducer: ( state = {} ) => state,
+				actions: {
+					saveEntityRecord: () =>
+						failSave
+							? () => {
+									throw new Error( 'Network error' );
+								}
+							: { type: 'SAVE_ENTITY_RECORD' },
+				},
+				selectors: {
+					getEditedEntityRecord: () => null,
+					getEntityRecord: () => null,
+					getCurrentUser: () => null,
+				},
+			} )
+		);
+		registry.register( createStubInterfaceStore() );
+		registry.dispatch( blockEditorStore ).resetBlocks( initialBlocks );
+
+		let providerHandle: ReturnType< typeof useSuggestionsProvider >;
+		let overlayHandle: ReturnType< typeof useSuggestionOverlay >;
+		function Capture() {
+			providerHandle = useSuggestionsProvider();
+			overlayHandle = useSuggestionOverlay();
+			return null;
+		}
+
+		render(
+			<RegistryProvider value={ registry }>
+				<SuggestionOverlayProvider>
+					<Capture />
+				</SuggestionOverlayProvider>
+			</RegistryProvider>
+		);
+
+		return {
+			registry,
+			getProvider: () => providerHandle,
+			getOverlay: () => overlayHandle,
+		};
+	}
+
+	it( 'unlinks a withdrawn suggestion from the block metadata', async () => {
+		const block = createBlock( PARAGRAPH, {
+			content: 'Hello',
+			metadata: { name: 'Intro', noteId: [ 3, 7 ] },
+		} );
+		const { registry, getProvider } = setup( [ block ] );
+
+		await act( async () => {
+			await getProvider().deleteSuggestion( {
+				commentId: 7,
+				clientId: block.clientId,
+			} );
+		} );
+
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( block.clientId )?.metadata
+		).toEqual( { name: 'Intro', noteId: [ 3 ] } );
+	} );
+
+	it( 'drops empty metadata when the withdrawn note was its only content', async () => {
+		const block = createBlock( PARAGRAPH, {
+			content: 'Hello',
+			metadata: { noteId: [ 7 ] },
+		} );
+		const { registry, getProvider } = setup( [ block ] );
+
+		await act( async () => {
+			await getProvider().deleteSuggestion( {
+				commentId: 7,
+				clientId: block.clientId,
+			} );
+		} );
+
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( block.clientId )?.metadata
+		).toBeUndefined();
+	} );
+} );
