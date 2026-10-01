@@ -258,7 +258,7 @@ function areBlocksEqual( gblock: Block, yblock: YBlock ): boolean {
 						gblock.name,
 						// toJSON() returns plain values despite the Y types.
 						yblockAsJson.attributes as unknown as BlockAttributes
-				  )
+					)
 				: yblockAsJson.attributes,
 		} )
 	);

@@ -3114,8 +3114,7 @@ describe( 'crdt-blocks', () => {
 				blocks.toJSON() as Block[]
 			);
 			return block.attributes.metadata as
-				| Record< string, unknown >
-				| undefined;
+				Record< string, unknown > | undefined;
 		}
 
 		it( 'preserves both notes when two users add a note to the same block concurrently', () => {

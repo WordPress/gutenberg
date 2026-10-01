@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Page, Route } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import { test, expect } from '../fixtures';
 
 /**
