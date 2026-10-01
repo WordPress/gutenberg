@@ -27,6 +27,7 @@
 	},
 	"supports": {
 		"align": [ "wide", "full" ],
+		"alignToolbar": false,
 		"anchor": true,
 		"className": true,
 		"splitting": true,

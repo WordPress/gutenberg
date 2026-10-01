@@ -35,6 +35,7 @@
 	"supports": {
 		"anchor": true,
 		"align": [ "wide", "full" ],
+		"alignToolbar": false,
 		"html": false,
 		"background": {
 			"gradient": true

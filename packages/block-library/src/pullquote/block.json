@@ -23,6 +23,7 @@
 	"supports": {
 		"anchor": true,
 		"align": [ "left", "right", "wide", "full" ],
+		"alignToolbar": false,
 		"background": {
 			"backgroundImage": true,
 			"backgroundSize": true,

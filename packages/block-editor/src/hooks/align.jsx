@@ -1,11 +1,18 @@
 import clsx from 'clsx';
 import { addFilter } from '@wordpress/hooks';
+import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import {
 	getBlockSupport,
 	getBlockType,
 	hasBlockSupport,
 } from '@wordpress/blocks';
-import { BlockControls, BlockAlignmentControl } from '../components';
+import {
+	BlockControls,
+	BlockAlignmentControl,
+	InspectorControls,
+} from '../components';
+import BlockAlignmentSelect from '../components/block-alignment-control/select';
 import useAvailableAlignments, {
 	useAlignmentMenu,
 } from '../components/block-alignment-control/use-available-alignments';
@@ -98,8 +105,9 @@ export function addAttribute( settings ) {
 	return settings;
 }
 
-function BlockEditAlignmentToolbarControlsPure( {
+function BlockEditAlignmentControlsPure( {
 	name: blockName,
+	clientId,
 	align,
 	setAttributes,
 } ) {
@@ -135,27 +143,51 @@ function BlockEditAlignmentToolbarControlsPure( {
 		setAttributes( { align: nextAlign } );
 	};
 
+	/*
+	 * Pass the alignments the block itself supports rather than the ones the
+	 * current layout leaves available. Both controls filter them again, but
+	 * keeping the unfiltered list lets them tell the difference between an
+	 * alignment this block never had and one a parent layout has taken away.
+	 */
 	return (
-		<BlockControls group="block" __experimentalShareWithChildBlocks>
-			<BlockAlignmentControl
-				value={ align }
-				onChange={ updateAlignment }
-				/*
-				 * Pass the alignments the block itself supports rather than the
-				 * ones the current layout leaves available. The control filters
-				 * them again, but keeping the unfiltered list lets it tell the
-				 * difference between an alignment this block never had and one a
-				 * parent layout has taken away.
-				 */
-				controls={ blockAllowedAlignments }
-			/>
-		</BlockControls>
+		<>
+			{ hasBlockSupport( blockName, 'alignToolbar', true ) && (
+				<BlockControls group="block" __experimentalShareWithChildBlocks>
+					<BlockAlignmentControl
+						value={ align }
+						onChange={ updateAlignment }
+						controls={ blockAllowedAlignments }
+					/>
+				</BlockControls>
+			) }
+			<InspectorControls
+				group="layout"
+				resetAllFilter={ ( attributes ) => ( {
+					...attributes,
+					align: undefined,
+				} ) }
+			>
+				<ToolsPanelItem
+					label={ __( 'Alignment' ) }
+					hasValue={ () => !! align }
+					onDeselect={ () => updateAlignment( undefined ) }
+					isShownByDefault={ false }
+					panelId={ clientId }
+				>
+					<BlockAlignmentSelect
+						value={ align }
+						onChange={ updateAlignment }
+						controls={ blockAllowedAlignments }
+					/>
+				</ToolsPanelItem>
+			</InspectorControls>
+		</>
 	);
 }
 
 export default {
 	shareWithChildBlocks: true,
-	edit: BlockEditAlignmentToolbarControlsPure,
+	edit: BlockEditAlignmentControlsPure,
 	useBlockProps,
 	addSaveProps: addAssignedAlign,
 	attributeKeys: [ 'align' ],

@@ -17,6 +17,7 @@
 	},
 	"supports": {
 		"align": [ "wide" ],
+		"alignToolbar": false,
 		"anchor": true,
 		"background": {
 			"backgroundImage": true,

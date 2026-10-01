@@ -1,5 +1,13 @@
+@use "@wordpress/base-styles/variables" as *;
+
 .block-editor-block-alignment-control__menu-group {
 	.components-menu-item__info {
 		margin-top: 0;
 	}
+}
+
+.block-editor-block-alignment-control__item-label {
+	align-items: center;
+	display: flex;
+	gap: $grid-unit-10;
 }

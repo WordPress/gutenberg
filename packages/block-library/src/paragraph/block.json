@@ -28,6 +28,7 @@
 	},
 	"supports": {
 		"align": [ "wide", "full" ],
+		"alignToolbar": false,
 		"splitting": true,
 		"anchor": true,
 		"className": false,

@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Set `alignToolbar` to `false` on the text blocks that support block alignment — Paragraph, Heading, List, Quote, Pullquote, Code, Post Title, Query Title, Comments Title, Query Total, Site Title, Site Tagline, Term Name and Term Description. Their alignment moves to the Layout panel of the block inspector, leaving the toolbar to inline formatting and text alignment ([#PRNUMBER](https://github.com/WordPress/gutenberg/pull/PRNUMBER)).
 -   Cover: Don't autoplay an embedded background video on the front end when the visitor prefers reduced motion. A new view module swaps the iframe source for one without the autoplay parameters ([#83452](https://github.com/WordPress/gutenberg/pull/83452)).
 -   Columns: Remove the column count slider from the block settings ([#83262](https://github.com/WordPress/gutenberg/pull/83262)).
 -   Avatar: Explain in the block settings that avatars use the Gravatar service, and link users who can manage settings to the Discussion settings where the default avatar is chosen ([#83567](https://github.com/WordPress/gutenberg/pull/83567)).

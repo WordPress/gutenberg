@@ -28,6 +28,7 @@
 	"supports": {
 		"anchor": true,
 		"align": true,
+		"alignToolbar": false,
 		"html": false,
 		"background": {
 			"gradient": true

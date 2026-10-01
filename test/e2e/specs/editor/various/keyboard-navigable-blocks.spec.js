@@ -271,9 +271,6 @@ class KeyboardNavigableBlocks {
 		await this.expectLabelToHaveFocus( 'Move down' );
 
 		await this.page.keyboard.press( 'ArrowRight' );
-		await this.expectLabelToHaveFocus( 'Align block' );
-
-		await this.page.keyboard.press( 'ArrowRight' );
 		await this.expectLabelToHaveFocus( 'Align text' );
 
 		await this.page.keyboard.press( 'ArrowRight' );

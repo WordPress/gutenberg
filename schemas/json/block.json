@@ -253,6 +253,11 @@
 					],
 					"default": false
 				},
+				"alignToolbar": {
+					"description": "This property controls whether the block alignment control appears in the block toolbar. Set it to false for a block whose toolbar is about its text rather than its place in the layout; the alignment stays available in the Layout panel of the block inspector.",
+					"type": "boolean",
+					"default": true
+				},
 				"alignWide": {
 					"description": "This property allows to enable wide alignment for your theme. To disable this behavior for a single block, set this flag to false.",
 					"type": "boolean",
