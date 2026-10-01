@@ -305,6 +305,9 @@
 		width: var(--wp--lightbox-container-width);
 		height: var(--wp--lightbox-container-height);
 		z-index: 2000001;
+		// Clicking the image does not close the lightbox, so it should not
+		// appear clickable.
+		cursor: default;
 	}
 
 	.wp-block-image {

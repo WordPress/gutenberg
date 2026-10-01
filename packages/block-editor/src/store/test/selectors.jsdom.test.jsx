@@ -19,7 +19,6 @@ import {
 } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
 import { symbol } from '@wordpress/icons';
-import { logged } from '@wordpress/deprecated';
 import { select, dispatch } from '@wordpress/data';
 import * as selectors from '../selectors';
 import { store } from '../';
@@ -5371,14 +5370,6 @@ describe( '__unstableGetClientIdWithClientIdsTree', () => {
 	const DEPRECATION_MESSAGE =
 		"wp.data.select( 'core/block-editor' ).__unstableGetClientIdWithClientIdsTree is deprecated since version 6.3 and will be removed in version 6.5.";
 
-	beforeEach( () => {
-		delete logged[ DEPRECATION_MESSAGE ];
-	} );
-
-	afterEach( () => {
-		delete logged[ DEPRECATION_MESSAGE ];
-	} );
-
 	it( "should return a stripped down block object containing only its client ID and its inner blocks' client IDs", () => {
 		const state = {
 			blocks: {
@@ -5410,14 +5401,6 @@ describe( '__unstableGetClientIdWithClientIdsTree', () => {
 describe( '__unstableGetClientIdsTree', () => {
 	const DEPRECATION_MESSAGE =
 		"wp.data.select( 'core/block-editor' ).__unstableGetClientIdsTree is deprecated since version 6.3 and will be removed in version 6.5.";
-
-	beforeEach( () => {
-		delete logged[ DEPRECATION_MESSAGE ];
-	} );
-
-	afterEach( () => {
-		delete logged[ DEPRECATION_MESSAGE ];
-	} );
 
 	it( "should return the full content tree starting from the given root, consisting of stripped down block object containing only its client ID and its inner blocks' client IDs", () => {
 		const state = {
