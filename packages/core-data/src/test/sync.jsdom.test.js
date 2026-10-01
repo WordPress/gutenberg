@@ -808,24 +808,24 @@ describe( 'the default entity sync manager', () => {
 			).toHaveBeenCalledTimes( 1 );
 		} );
 
-		it( 'reports a record as synced when the sync manager has it loaded', async () => {
+		it( 'reports a record as loaded when the sync manager has it loaded', async () => {
 			const { getSyncManager } = await import( '../sync' );
 			mockSyncManager.isLoaded.mockReturnValue( true );
 
-			// Nothing is synced before a sync manager exists.
-			expect( manager.isSynced( 'postType', 'post', 1 ) ).toBe( false );
+			// Nothing is loaded before a sync manager exists.
+			expect( manager.isLoaded( 'postType', 'post', 1 ) ).toBe( false );
 			expect( mockCreateSyncManager ).not.toHaveBeenCalled();
 
 			getSyncManager();
 
-			expect( manager.isSynced( 'postType', 'post', 1 ) ).toBe( true );
+			expect( manager.isLoaded( 'postType', 'post', 1 ) ).toBe( true );
 			expect( mockSyncManager.isLoaded ).toHaveBeenCalledWith(
 				'postType/post',
 				1
 			);
 
 			mockSyncManager.isLoaded.mockReturnValue( false );
-			expect( manager.isSynced( 'postType', 'post', 2 ) ).toBe( false );
+			expect( manager.isLoaded( 'postType', 'post', 2 ) ).toBe( false );
 		} );
 	} );
 } );

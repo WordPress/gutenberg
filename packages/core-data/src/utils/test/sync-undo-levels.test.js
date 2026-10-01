@@ -21,7 +21,7 @@ function createSyncManager( syncedIds = [ 'postType/post/1' ] ) {
 
 	return {
 		synced,
-		isSynced: ( kind, name, recordId ) =>
+		isLoaded: ( kind, name, recordId ) =>
 			synced.has( `${ kind }/${ name }/${ recordId }` ),
 		undoHistory: {
 			undo: vi.fn( ( kind, name, recordId ) => {

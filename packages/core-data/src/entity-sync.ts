@@ -240,11 +240,11 @@ export interface EntitySyncManager {
 	unloadAll: () => void;
 
 	/**
-	 * Whether the manager is syncing the record right now: `load` accepted
-	 * it and it was not unloaded since. core-data then leaves the record's
+	 * Whether the manager has the record loaded: `load` accepted it and it
+	 * was not unloaded since. core-data then leaves the record's
 	 * undo history to the manager instead of recording its edits.
 	 */
-	isSynced?: (
+	isLoaded?: (
 		kind: string,
 		name: string,
 		recordId: EntitySyncRecordId

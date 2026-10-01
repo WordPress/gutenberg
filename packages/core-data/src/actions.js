@@ -402,12 +402,12 @@ export const editEntityRecord =
 			isCached: Boolean( options.isCached ),
 			undoIgnore: Boolean( options.undoIgnore ),
 		} );
-		// A record the sync manager is syncing has its undo history tracked
+		// A record the sync manager has loaded has its undo history tracked
 		// by the manager, which reports each level it opens (see
 		// `recordSyncUndoLevel`). Every other record is recorded here.
 		if (
 			! options.undoIgnore &&
-			! syncManager?.isSynced?.( kind, name, recordId )
+			! syncManager?.isLoaded?.( kind, name, recordId )
 		) {
 			recordEntityEdit(
 				select.getUndoManager(),

@@ -46,12 +46,12 @@ function isSyncUndoLevel( changes ) {
 	return true === changes.id?.isSyncUndoLevel;
 }
 
-function isSyncedRecord( syncManager, id ) {
+function isLoadedRecord( syncManager, id ) {
 	if ( ! id || 'object' !== typeof id ) {
 		return false;
 	}
 
-	return Boolean( syncManager?.isSynced?.( id.kind, id.name, id.recordId ) );
+	return Boolean( syncManager?.isLoaded?.( id.kind, id.name, id.recordId ) );
 }
 
 /**
@@ -115,18 +115,18 @@ function popUndoLevel( undoManager, syncManager, type ) {
 	const changes = record.filter(
 		( entry ) =>
 			! isSyncUndoLevel( entry ) &&
-			! isSyncedRecord( syncManager, entry.id )
+			! isLoadedRecord( syncManager, entry.id )
 	);
 
 	// Only the record that opened the level can move it. When the record is
-	// no longer synced, the level is stale and applies nothing.
+	// no longer loaded, the level is stale and applies nothing.
 	const syncLevel = record.find( isSyncUndoLevel );
 	let didApplySyncLevel = false;
 
 	if (
 		undoHistory &&
 		syncLevel &&
-		isSyncedRecord( syncManager, syncLevel.id )
+		isLoadedRecord( syncManager, syncLevel.id )
 	) {
 		const { kind, name, recordId } = syncLevel.id;
 		didApplySyncLevel = undoHistory[ type ]( kind, name, recordId );

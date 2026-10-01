@@ -251,8 +251,8 @@ export function createDefaultEntitySyncManager(
 			return Boolean( getSyncManager() && getSyncConfig( kind, name ) );
 		},
 
-		isSynced( kind, name, recordId ) {
-			// Nothing is synced before a sync manager exists, so do not
+		isLoaded( kind, name, recordId ) {
+			// Nothing is loaded before a sync manager exists, so do not
 			// create one just to answer.
 			if ( ! hasSyncManager() ) {
 				return false;
