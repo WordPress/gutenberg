@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   Stop exporting the `MediaEdit` component and its `MediaEditProps` type. The featured image field keeps rendering the control.
+-   Stop exporting the `MediaEdit` component and its `MediaEditProps` type. The featured image field keeps rendering the control ([#83368](https://github.com/WordPress/gutenberg/pull/83368)).
 
 ### Bug Fixes
 
