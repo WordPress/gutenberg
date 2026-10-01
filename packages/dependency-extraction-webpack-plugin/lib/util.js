@@ -2,7 +2,6 @@ const WORDPRESS_NAMESPACE = '@wordpress/';
 const BUNDLED_PACKAGES = [
 	'@wordpress/admin-ui',
 	'@wordpress/dataviews',
-	'@wordpress/dataviews/wp',
 	'@wordpress/fields',
 	'@wordpress/global-styles-engine',
 	'@wordpress/global-styles-ui',
@@ -29,6 +28,9 @@ const BUNDLED_PACKAGES = [
  */
 function defaultRequestToExternal( request ) {
 	switch ( request ) {
+		case '@wordpress/dataviews/wp':
+			return [ 'wp', 'dataviews' ];
+
 		case 'moment':
 			return request;
 
@@ -123,6 +125,9 @@ function defaultRequestToExternalModule( request ) {
  */
 function defaultRequestToHandle( request ) {
 	switch ( request ) {
+		case '@wordpress/dataviews/wp':
+			return 'wp-dataviews';
+
 		case '@babel/runtime/regenerator':
 			return 'regenerator-runtime';
 
