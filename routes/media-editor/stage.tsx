@@ -11,9 +11,17 @@ import {
 } from '@wordpress/media-editor';
 import { useNavigate, useParams } from '@wordpress/route';
 import { unlock } from '@wordpress/routes-lock-unlock';
+import { useViewConfig } from '@wordpress/views';
 import './style.scss';
 
 const { MediaEditor } = unlock( mediaEditorPrivateApis );
+
+/**
+ * The stage only renders a form, so it requests the `form` of the entity view
+ * configuration alone. Must match the fields the route loader requests so both
+ * resolve under the same cache key.
+ */
+const VIEW_CONFIG_FIELDS = [ 'form' ];
 
 const MEDIA_LIST_PATH = '/types/attachment/list/all';
 const MEDIA_LIBRARY_ADMIN_PATH = 'upload.php';
@@ -59,6 +67,13 @@ function MediaEditorRoute() {
 		kind: 'postType',
 		name: 'attachment',
 	} );
+	// If the form fails to resolve, the editor lays the fields out with its
+	// own default form.
+	const { form } = useViewConfig( {
+		kind: 'postType',
+		name: 'attachment',
+		fields: VIEW_CONFIG_FIELDS,
+	} );
 	const isStandaloneAdminPage = isMediaEditorAdminPage();
 
 	const media = useSelect(
@@ -89,6 +104,7 @@ function MediaEditorRoute() {
 		<MediaEditor
 			id={ attachmentId }
 			fields={ fields }
+			form={ form }
 			onClose={ navigateBack }
 			onSaved={ ( { id: savedId }: SaveResult ) => {
 				if ( savedId !== attachmentId ) {
