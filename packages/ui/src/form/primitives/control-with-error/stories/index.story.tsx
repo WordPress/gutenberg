@@ -5,6 +5,7 @@ import { InputControl } from '../../../input-control';
 import { formDecorator } from '../../../stories/shared';
 
 const meta: Meta< typeof ControlWithError > = {
+	tags: [ 'manifest' ],
 	title: 'Components/@wordpress-ui/Form/Primitives/ControlWithError',
 	id: 'design-system-components-form-primitives-controlwitherror',
 	component: ControlWithError,
@@ -16,9 +17,8 @@ const meta: Meta< typeof ControlWithError > = {
 	decorators: [ formDecorator ],
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'APIs and behavior are still prone to change.',
 		},
 	},
 };

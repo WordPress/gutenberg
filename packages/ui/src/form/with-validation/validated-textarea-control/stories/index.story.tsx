@@ -4,6 +4,7 @@ import { ValidatedTextareaControl } from '../index';
 import { formDecorator } from '../../../stories/shared';
 
 const meta: Meta< typeof ValidatedTextareaControl > = {
+	tags: [ 'manifest' ],
 	title: 'Components/@wordpress-ui/Form/With Validation/ValidatedTextareaControl',
 	id: 'design-system-components-form-with-validation-validatedtextareacontrol',
 	component: ValidatedTextareaControl,
@@ -16,9 +17,8 @@ const meta: Meta< typeof ValidatedTextareaControl > = {
 	decorators: [ formDecorator ],
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'APIs and behavior are still prone to change.',
 		},
 	},
 };

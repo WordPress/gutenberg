@@ -24,6 +24,10 @@
 -   `Notice`: Mark as recommended for use ([#82685](https://github.com/WordPress/gutenberg/pull/82685)).
 -   `Autocomplete`, `Combobox`, `SearchableSelect`, `SearchableChipSelect`, `SearchableSelectControl`, and `SearchableChipSelectControl` add `ItemLabel` and `ItemDescription` subcomponents. Searchable selection items also accept an optional `description` string ([#83493](https://github.com/WordPress/gutenberg/pull/83493)).
 
+### Enhancements
+
+-   `ControlWithError`, `ValidatedInputControl`, `ValidatedTextareaControl`: Mark as recommended for use in a WordPress environment ([#83535](https://github.com/WordPress/gutenberg/pull/83535)).
+
 ### Bug Fixes
 
 -   `Checkbox`: Prevent rounded themes from making checkboxes circular. ([#83526](https://github.com/WordPress/gutenberg/pull/83526))
