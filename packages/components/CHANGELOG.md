@@ -13,6 +13,7 @@
 
 -   `CheckboxControl`: Mark as not recommended for use in a WordPress environment, in favour of `CheckboxControl` from `@wordpress/ui` ([#83771](https://github.com/WordPress/gutenberg/pull/83771)).
 -   `RadioControl`: Match the `@wordpress/ui` Radio colors ([#83270](https://github.com/WordPress/gutenberg/pull/83270)).
+-   `Notice`: Mark as not recommended in favor of `Notice` from `@wordpress/ui` ([#82685](https://github.com/WordPress/gutenberg/pull/82685)).
 -   `CheckboxControl`: Keep the default checkbox at 16px on narrow screens while retaining a 24px click target ([#83612](https://github.com/WordPress/gutenberg/pull/83612)).
 -   `FormToggle`: Match the `@wordpress/ui` `Switch` track, thumb, and border colors across unchecked, checked, hover, and disabled states ([#83773](https://github.com/WordPress/gutenberg/pull/83773)).
 -   `InputControl`, `SelectControl`, `CustomSelectControl`: Darken the field border on hover to the active stroke color used by `@wordpress/ui`. Disabled and borderless fields keep their resting border ([#83306](https://github.com/WordPress/gutenberg/pull/83306)).
