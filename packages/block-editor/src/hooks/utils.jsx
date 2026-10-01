@@ -565,8 +565,26 @@ export function createBlockEditFilter( features ) {
 							shareWithChildBlocks,
 							supportsPatternEditing,
 						} = feature;
+						// While editing a pattern, only the features that
+						// explicitly support it render. `supportsPatternEditing`
+						// is tri-state: `true` opts in, `false` opts out, and
+						// `undefined` is also excluded. The `undefined` features
+						// render through InspectorControlsFill, which already hides
+						// them during pattern editing, so skipping their edit here
+						// is not a visible change; it only matters for the few
+						// controls that fill their own slot, like allowed blocks.
+						if (
+							context[ mayDisplayPatternEditingControlsKey ] &&
+							supportsPatternEditing !== true
+						) {
+							return null;
+						}
+
 						const shouldDisplayControls =
-							( supportsPatternEditing &&
+							// A feature that supports pattern editing renders for the
+							// whole section, including when an inner block is selected
+							// and the section itself is not.
+							( supportsPatternEditing === true &&
 								context[
 									mayDisplayPatternEditingControlsKey
 								] ) ||
