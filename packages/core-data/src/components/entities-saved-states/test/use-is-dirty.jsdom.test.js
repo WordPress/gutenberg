@@ -3,7 +3,7 @@ import { act, renderHook } from '@testing-library/react';
 import { useSelect } from '@wordpress/data';
 import { useIsDirty } from '../hooks/use-is-dirty';
 
-vi.mock( '@wordpress/data', () => {
+vi.mock( import( '@wordpress/data' ), () => {
 	return {
 		useSelect: vi.fn(),
 	};
