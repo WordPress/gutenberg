@@ -34,6 +34,20 @@ function getFormFieldIds() {
 	);
 }
 
+const CORE_FIELD_IDS = [
+	'title',
+	'alt_text',
+	'caption',
+	'description',
+	'date',
+	'author',
+	'filename',
+	'mime_type',
+	'filesize',
+	'media_dimensions',
+	'attached_to',
+];
+
 describe( 'MediaForm', () => {
 	it( 'orders the default form whatever the order of the fields', () => {
 		mockFields = [
@@ -49,12 +63,7 @@ describe( 'MediaForm', () => {
 		render( <MediaForm /> );
 
 		expect( getFormFieldIds() ).toEqual( [
-			'title',
-			'caption',
-			'date',
-			'author',
-			'filename',
-			'attached_to',
+			...CORE_FIELD_IDS,
 			'acme_credit',
 		] );
 	} );
@@ -66,6 +75,10 @@ describe( 'MediaForm', () => {
 
 		render( <MediaForm /> );
 
-		expect( getFormFieldIds() ).toEqual( [ 'title', 'acme_b', 'acme_a' ] );
+		expect( getFormFieldIds() ).toEqual( [
+			...CORE_FIELD_IDS,
+			'acme_b',
+			'acme_a',
+		] );
 	} );
 } );
