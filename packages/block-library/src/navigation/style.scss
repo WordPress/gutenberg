@@ -66,6 +66,28 @@ $navigation-icon-size: 24px;
 		color: inherit;
 	}
 
+	// Colors set on the Navigation block, or on its submenus and overlay
+	// through the overlay colors, reach a link only by inheritance. A Navigation
+	// Link color from Global Styles targets the link directly, so without these
+	// rules it would win over the colors set on this Navigation. They give way
+	// to colors set on the link itself, which are on the anchor and carry
+	// `!important` (a preset class) or are inline (a custom color).
+	&.has-text-color,
+	.wp-block-navigation__submenu-container.has-text-color,
+	.wp-block-navigation__responsive-container.has-text-color {
+		.wp-block-navigation-link {
+			color: inherit;
+		}
+	}
+
+	&.has-background,
+	.wp-block-navigation__submenu-container.has-background,
+	.wp-block-navigation__responsive-container.has-background {
+		.wp-block-navigation-link > .wp-block-navigation-item__content {
+			background-color: transparent;
+		}
+	}
+
 	// The following rules provide class based application of user selected text
 	// decoration via block supports.
 	&.has-text-decoration-underline .wp-block-navigation-item__content {
