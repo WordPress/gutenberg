@@ -31,6 +31,12 @@
 			"__experimentalSkipSerialization": true
 		},
 		"align": [ "left", "center", "right" ],
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalSkipSerialization": true
+		},
 		"html": false,
 		"color": {
 			"__experimentalSkipSerialization": true,
@@ -78,6 +84,7 @@
 	"selectors": {
 		"root": ".wp-block-icon svg",
 		"css": ".wp-block-icon",
+		"background": ".wp-block-icon svg",
 		"shadow": ".wp-block-icon svg",
 		"spacing": {
 			"margin": ".wp-block-icon"
