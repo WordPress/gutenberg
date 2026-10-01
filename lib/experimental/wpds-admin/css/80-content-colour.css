@@ -1,0 +1,162 @@
+/**
+ * Admin content — the page canvas, list tables and metaboxes —
+ * coloured from WordPress Design System tokens.
+ *
+ * The roles are not guessed. `@wordpress/admin-ui`'s Page component and the
+ * extensible site editor's own shell already answer what each token is for, and
+ * this follows them so a PHP-rendered screen and a React screen read as the same
+ * product:
+ *
+ *   shell / page ground   background-surface-neutral-weak
+ *   card and table surface background-surface-neutral-strong
+ *   container borders      stroke-surface-neutral
+ *   primary text           foreground-content-neutral
+ *   secondary text         foreground-content-neutral-weak
+ *
+ * Mapping by role rather than by nearest colour is the whole method here.
+ * Several of the admin's greys have no near neighbour in the system at all; the
+ * question each one has to answer is what it is FOR, not what it looks like.
+ *
+ * CONTRAST RISES, in the place it matters most. WordPress sets body text as `#3c434a`
+ * on an `#f0f0f1` ground, which is 8.8:1. The tokens give `#1e1e1e` on `#f4f4f4`,
+ * which is 15.4:1 — nearly double, on the most-read text in the admin. Secondary
+ * text moves from `#646970` (5.7:1 on white) to `#707070` (5.0:1), lower but
+ * still clear of AA.
+ *
+ * THE ONE THING THAT GOES THE OTHER WAY: container borders lighten from
+ * `#c3c4c7` to `#dbdbdb`. Both are non-text and both are already below the 3:1
+ * that WCAG asks of essential UI boundaries — 1.9:1 before, 1.3:1 after — so
+ * this does not cross a threshold, but it is a real reduction in definition and
+ * it is the change most likely to be argued with. Recorded rather than buried.
+ * A table is still bounded by its white surface against the page ground.
+ *
+ * NOT TOUCHED: link colour, which is the accent and already follows the scheme,
+ * and every semantic colour — the reds, greens and ambers of notices, error
+ * states and status flags. Those are a separate decision.
+ *
+ * NO `!important` IN THIS FILE. See 99-overrides.css for the one exception.
+ */
+
+@layer wpds-overrides, wp-legacy, wpds;
+
+@layer wpds {
+
+	/* -----------------------------------------------------------------------
+	   The page itself
+	   ----------------------------------------------------------------------- */
+
+	body {
+		background: var(--wpds-color-background-surface-neutral-weak);
+		color: var(--wpds-color-foreground-content-neutral);
+	}
+
+	/* -----------------------------------------------------------------------
+	   Container surfaces and their borders
+
+	   WordPress sets these in one shared block in `common.css`, with a note calling
+	   it "large chunks of shared color, from the colors.css merge". The
+	   selector list is repeated as-is rather than narrowed, so the restyle
+	   covers exactly what common.css covers and no more.
+	   ----------------------------------------------------------------------- */
+
+	.widget-top,
+	.menu-item-handle,
+	.widget-inside,
+	#menu-settings-column .accordion-container,
+	#menu-management .menu-edit,
+	.manage-menus,
+	table.widefat,
+	.stuffbox,
+	p.popular-tags,
+	.widgets-holder-wrap,
+	.wp-editor-container,
+	.popular-tags,
+	.feature-filter,
+	.comment-ays,
+	.postbox {
+		border-color: var(--wpds-color-stroke-surface-neutral);
+	}
+
+	table.widefat,
+	.wp-editor-container,
+	.stuffbox,
+	p.popular-tags,
+	.widgets-holder-wrap,
+	.popular-tags,
+	.feature-filter,
+	.comment-ays,
+	.postbox {
+		background: var(--wpds-color-background-surface-neutral-strong);
+	}
+
+	/* -----------------------------------------------------------------------
+	   List tables
+
+	   Row dividers are the one border that barely moves: WordPress's `#dcdcde` and
+	   the token's `#dbdbdb` are the same colour to the eye.
+	   ----------------------------------------------------------------------- */
+
+	.wp-list-table thead th,
+	.wp-list-table thead td,
+	.wp-list-table tfoot th,
+	.wp-list-table tfoot td,
+	.widefat thead th,
+	.widefat thead td,
+	.widefat tfoot th,
+	.widefat tfoot td,
+	#the-list tr td,
+	#the-list tr th {
+		border-color: var(--wpds-color-stroke-surface-neutral);
+	}
+
+	/*
+	 * NO STRIPING RULE HERE, deliberately. WordPress's `#f6f7f7` stays.
+	 *
+	 * The surface ladder has two neutrals below white: `…-neutral` (#fcfcfc)
+	 * and `…-neutral-weak` (#f4f4f4). The first is the correct role for a row
+	 * that recedes one step, and at 2.66% below white it is too faint to
+	 * separate rows on its own — the admin gives list-table rows no border, so
+	 * the stripe is the only separator there is. The second is the page ground,
+	 * and a stripe set from it would match the page behind the table.
+	 *
+	 * The tokens were not designed to express zebra striping; the rest of the
+	 * product separates rows with borders instead. Rather than pick a grey or
+	 * bend a token off its role, this leaves WordPress's value in place, unchanged
+	 * and at its current contrast, until the list-table design work decides
+	 * whether the admin keeps striping at all. Same treatment as the admin bar's
+	 * hover text: where the system has no answer, mirror rather than invent.
+	 */
+
+	/* -----------------------------------------------------------------------
+	   Primary text that WordPress sets explicitly
+
+	   These do not inherit from `body`, so they need naming. Same role, same
+	   token: `#1d2327` was never a different colour from the body text, only a
+	   differently written one.
+	   ----------------------------------------------------------------------- */
+
+	.form-table th,
+	.form-wrap label,
+	.wrap h1,
+	.wrap h2 {
+		color: var(--wpds-color-foreground-content-neutral);
+	}
+
+	/* -----------------------------------------------------------------------
+	   Secondary text
+
+	   Row actions, footer and help text are all the same role: present, but
+	   not the thing being read.
+	   ----------------------------------------------------------------------- */
+
+	.row-actions,
+	.wp-list-table .column-description .plugin-version-author-uri,
+	#wpfooter,
+	#wpfooter p,
+	.form-table span.description,
+	p.description,
+	span.description,
+	.described-by-description {
+		color: var(--wpds-color-foreground-content-neutral-weak);
+	}
+}
