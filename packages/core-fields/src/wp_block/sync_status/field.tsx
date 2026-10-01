@@ -1,6 +1,5 @@
 import type { FieldsScriptParts } from '@wordpress/fields-loader';
 import { __, _x } from '@wordpress/i18n';
-import { Text } from '@wordpress/ui';
 
 type Pattern = {
 	type?: string;
@@ -43,12 +42,15 @@ export const fieldExtensions: FieldsScriptParts< Pattern >[ string ] = {
 		const label = SYNC_STATUS_FILTERS.find(
 			( { value } ) => value === syncStatus
 		)?.label;
+		// A plain `span` rather than a `Text`: the grid renders this inside a
+		// `Badge`, which is itself a `Text` of the `body-sm` variant, and a
+		// nested `Text` would reset the label to the larger default variant.
 		return label ? (
-			<Text
+			<span
 				className={ `fields-field__pattern-sync-status fields-field__pattern-sync-status-${ syncStatus }` }
 			>
 				{ label }
-			</Text>
+			</span>
 		) : null;
 	},
 };
