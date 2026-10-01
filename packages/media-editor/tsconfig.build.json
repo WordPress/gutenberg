@@ -15,7 +15,6 @@
 		{ "path": "../data" },
 		{ "path": "../dataviews/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
-		{ "path": "../fields-loader/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
 		{ "path": "../keyboard-shortcuts" },

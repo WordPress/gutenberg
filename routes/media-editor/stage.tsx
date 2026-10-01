@@ -2,6 +2,7 @@ import type { KeyboardEvent, ReactNode } from 'react';
 import { Breadcrumbs, Page } from '@wordpress/admin-ui';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
+import { useFields } from '@wordpress/fields-loader';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import {
@@ -54,6 +55,10 @@ function MediaEditorRoute() {
 	const { id } = useParams( { from: '/media-editor/$id' } );
 	const attachmentId = parseInt( id, 10 );
 	const navigate = useNavigate();
+	const { fields } = useFields< Media >( {
+		kind: 'postType',
+		name: 'attachment',
+	} );
 	const isStandaloneAdminPage = isMediaEditorAdminPage();
 
 	const media = useSelect(
@@ -83,6 +88,7 @@ function MediaEditorRoute() {
 	return (
 		<MediaEditor
 			id={ attachmentId }
+			fields={ fields }
 			onClose={ navigateBack }
 			onSaved={ ( { id: savedId }: SaveResult ) => {
 				if ( savedId !== attachmentId ) {
