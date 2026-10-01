@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   Remove the `MediaEdit` component and its `MediaEditProps` type. The control moved to `@wordpress/media-utils`, where it is a private API while it is iterated on, and its styles moved to the stylesheet of that package.
+-   Remove the `MediaEdit` component and its `MediaEditProps` type. The control moved to `@wordpress/media-utils`, where it is a private API while it is iterated on, and its styles moved to the stylesheet of that package. ([#83994](https://github.com/WordPress/gutenberg/pull/83994))
 
 ### Bug Fixes
 
