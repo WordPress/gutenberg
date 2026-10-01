@@ -40,9 +40,10 @@ function gutenberg_get_widget_metadata_i18n_schema() {
 /**
  * Translates a widget's user-facing metadata strings.
  *
- * Runs `title`, `description`, `help`, `actions`, and `keywords` through the
- * widget i18n schema using the widget's `textdomain`, leaving every other key
- * untouched. A no-op when the widget declares no `textdomain`.
+ * Runs `title`, `description`, `help`, `actions`, `attributes`, and
+ * `keywords` through the widget i18n schema using the widget's `textdomain`,
+ * leaving every other key untouched. A no-op when the widget declares no
+ * `textdomain`.
  *
  * @param array $widget Widget data from the build manifest.
  * @return array Widget data with its translatable strings localized.
@@ -55,7 +56,7 @@ function gutenberg_translate_widget_metadata( $widget ) {
 
 	$i18n_schema = gutenberg_get_widget_metadata_i18n_schema();
 
-	foreach ( array( 'title', 'description', 'help', 'actions', 'keywords' ) as $field ) {
+	foreach ( array( 'title', 'description', 'help', 'actions', 'attributes', 'keywords' ) as $field ) {
 		if ( isset( $widget[ $field ], $i18n_schema->$field ) ) {
 			$widget[ $field ] = translate_settings_using_i18n_schema( $i18n_schema->$field, $widget[ $field ], $textdomain );
 		}
@@ -168,7 +169,9 @@ function gutenberg_resolve_widget_action_href( $href, $dir_name ) {
  * plus optional `download` / `openInNewTab` / `icon` / `relevance`. Drops
  * incomplete or unsafe entries; dropped hrefs are reported through
  * `_doing_it_wrong()`. With `$dir_name`, resolves widget-local file hrefs
- * first. A malformed `icon` or `relevance` drops the key, never the action.
+ * first. A malformed `icon` or `relevance` drops the key, never the action;
+ * a `download` filename that sanitizes to nothing becomes `true`, the
+ * download under its original name.
  *
  * This is the registration gate for manifest-sourced widget types. Definitions
  * registered only on the client do not pass through it; any future CPT/API
@@ -224,10 +227,12 @@ function gutenberg_sanitize_widget_actions( $actions, $dir_name = '' ) {
 			if ( is_bool( $action['download'] ) ) {
 				$entry['download'] = $action['download'];
 			} else {
-				$filename = sanitize_file_name( (string) $action['download'] );
-				if ( $filename ) {
-					$entry['download'] = $filename;
-				}
+				/*
+				 * A filename that sanitizes to nothing keeps the download
+				 * under the original name; only `false` means navigation.
+				 */
+				$filename          = sanitize_file_name( (string) $action['download'] );
+				$entry['download'] = '' !== $filename ? $filename : true;
 			}
 		}
 
@@ -242,8 +247,125 @@ function gutenberg_sanitize_widget_actions( $actions, $dir_name = '' ) {
 			}
 		}
 
-		if ( isset( $action['relevance'] ) && in_array( $action['relevance'], array( 'high', 'low' ), true ) ) {
+		if ( isset( $action['relevance'] ) && in_array( $action['relevance'], array( 'high', 'medium', 'low' ), true ) ) {
 			$entry['relevance'] = $action['relevance'];
+		}
+
+		$sanitized[] = $entry;
+	}
+
+	return $sanitized ? $sanitized : null;
+}
+
+/**
+ * Sanitizes a widget attribute schema to the JSON-expressible subset of a
+ * DataViews `Field` per entry: a string `id` (required, unique), string
+ * `type` / `label` / `header` / `description` / `placeholder`, boolean
+ * `readOnly` / `isDisabled` / `enableSorting` / `enableHiding` /
+ * `enableGlobalSearch`, `elements` as `value` / `label` / `description`
+ * triples, `filterBy`, `format`, `isValid` without `custom`, `Edit` as a
+ * control name or config, and a `relevance` of `high` / `medium` / `low`. A
+ * malformed or empty key drops, never the entry; an entry without a usable
+ * `id`, or repeating one, drops.
+ *
+ * This is the registration gate for manifest-sourced widget types, the same
+ * boundary `gutenberg_sanitize_widget_actions()` guards.
+ *
+ * @param array|null $attributes Attribute schema from the build manifest.
+ * @return array|null Sanitized schema, or null.
+ */
+function gutenberg_sanitize_widget_attributes( $attributes ) {
+	if ( ! is_array( $attributes ) ) {
+		return null;
+	}
+
+	$string_keys  = array( 'type', 'label', 'header', 'description', 'placeholder' );
+	$boolean_keys = array( 'readOnly', 'isDisabled', 'enableSorting', 'enableHiding', 'enableGlobalSearch' );
+
+	$sanitized = array();
+	$seen      = array();
+	foreach ( $attributes as $attribute ) {
+		if (
+			! is_array( $attribute ) ||
+			! isset( $attribute['id'] ) ||
+			! is_string( $attribute['id'] ) ||
+			'' === $attribute['id'] ||
+			isset( $seen[ $attribute['id'] ] )
+		) {
+			continue;
+		}
+		$seen[ $attribute['id'] ] = true;
+
+		$entry = array( 'id' => $attribute['id'] );
+
+		foreach ( $string_keys as $key ) {
+			if ( isset( $attribute[ $key ] ) && is_string( $attribute[ $key ] ) && '' !== $attribute[ $key ] ) {
+				$entry[ $key ] = $attribute[ $key ];
+			}
+		}
+
+		foreach ( $boolean_keys as $key ) {
+			if ( isset( $attribute[ $key ] ) && is_bool( $attribute[ $key ] ) ) {
+				$entry[ $key ] = $attribute[ $key ];
+			}
+		}
+
+		if ( isset( $attribute['elements'] ) && is_array( $attribute['elements'] ) ) {
+			$elements = array();
+			foreach ( $attribute['elements'] as $element ) {
+				if (
+					! is_array( $element ) ||
+					! array_key_exists( 'value', $element ) ||
+					! ( null === $element['value'] || is_scalar( $element['value'] ) ) ||
+					! isset( $element['label'] ) ||
+					! is_string( $element['label'] )
+				) {
+					continue;
+				}
+
+				$option = array(
+					'value' => $element['value'],
+					'label' => $element['label'],
+				);
+				if ( isset( $element['description'] ) && is_string( $element['description'] ) ) {
+					$option['description'] = $element['description'];
+				}
+				$elements[] = $option;
+			}
+
+			if ( $elements ) {
+				$entry['elements'] = $elements;
+			}
+		}
+
+		if (
+			isset( $attribute['filterBy'] ) &&
+			( false === $attribute['filterBy'] || ( is_array( $attribute['filterBy'] ) && array() !== $attribute['filterBy'] ) )
+		) {
+			$entry['filterBy'] = $attribute['filterBy'];
+		}
+
+		if ( ! empty( $attribute['format'] ) && is_array( $attribute['format'] ) ) {
+			$entry['format'] = $attribute['format'];
+		}
+
+		if ( isset( $attribute['isValid'] ) && is_array( $attribute['isValid'] ) ) {
+			$rules = $attribute['isValid'];
+			unset( $rules['custom'] );
+			if ( $rules ) {
+				$entry['isValid'] = $rules;
+			}
+		}
+
+		if (
+			isset( $attribute['Edit'] ) &&
+			( ( is_string( $attribute['Edit'] ) && '' !== $attribute['Edit'] ) || ( is_array( $attribute['Edit'] ) && array() !== $attribute['Edit'] ) )
+		) {
+			$entry['Edit'] = $attribute['Edit'];
+		}
+
+		if ( isset( $attribute['relevance'] ) && in_array( $attribute['relevance'], array( 'high', 'medium', 'low' ), true ) ) {
+			$entry['relevance'] = $attribute['relevance'];
 		}
 
 		$sanitized[] = $entry;
@@ -310,6 +432,7 @@ function gutenberg_register_widget_types() {
 					$widget['actions'] ?? null,
 					$widget['dir_name'] ?? ''
 				),
+				'attributes'    => gutenberg_sanitize_widget_attributes( $widget['attributes'] ?? null ),
 				'keywords'      => $widget['keywords'] ?? null,
 			)
 		);

@@ -13,7 +13,8 @@ import {
 
 const meta: Meta< typeof RangeCalendar > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Calendar/RangeCalendar',
+	title: 'Components/@wordpress-ui/Calendar/RangeCalendar',
+	id: 'design-system-components-calendar-rangecalendar',
 	component: RangeCalendar,
 	parameters: {
 		componentStatus: {

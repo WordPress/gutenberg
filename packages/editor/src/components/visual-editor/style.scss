@@ -17,8 +17,10 @@
 		background-color: transparent;
 	}
 
-	// Centralize the editor horizontally (flex-direction is column).
+	// Centralize the editor.
+	flex-direction: column;
 	align-items: center;
+	justify-content: center;
 
 	@media (prefers-reduced-motion: no-preference) {
 		transition: padding 0.2s ease-out;

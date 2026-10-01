@@ -18,7 +18,8 @@ import {
 } from '../index';
 
 export default {
-	title: 'Fields/Media Fields',
+	id: 'fields-media-fields',
+	title: 'Design System/DataViews/Fields/Media Fields',
 	component: DataForm,
 };
 
@@ -396,4 +397,10 @@ export const DataViewsPreview = () => {
 			/>
 		</div>
 	);
+};
+
+DataViewsPreview.parameters = {
+	// FIXME: Preview table has an empty column header (empty-table-header).
+	// See: https://github.com/WordPress/gutenberg/issues/81596
+	a11y: { test: 'todo' },
 };

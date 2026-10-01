@@ -80,12 +80,11 @@ div.dataviews-view-list {
 			&:hover,
 			&.is-hovered,
 			&:focus-within {
-				color: var(--wpds-color-foreground-interactive-brand);
-				background-color: var(--wpds-color-background-interactive-brand-weak);
+				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 
 				.dataviews-title-field,
 				.dataviews-view-list__field {
-					color: var(--wpds-color-foreground-interactive-brand);
+					color: var(--wpds-color-foreground-interactive-neutral);
 				}
 			}
 		}
@@ -98,11 +97,11 @@ div.dataviews-view-list {
 	div[role="article"].is-selected:focus-within {
 		.dataviews-view-list__item-wrapper {
 			background-color: var(--wpds-color-background-interactive-brand-weak-active);
-			color: var(--wpds-color-foreground-interactive-neutral);
+			color: var(--wpds-color-foreground-content-neutral);
 
 			.dataviews-title-field,
 			.dataviews-view-list__field {
-				color: var(--wpds-color-foreground-interactive-neutral-active);
+				color: var(--wpds-color-foreground-content-neutral);
 			}
 		}
 	}
@@ -177,7 +176,7 @@ div.dataviews-view-list {
 	}
 
 	.dataviews-view-list__field {
-		color: var(--wpds-color-foreground-interactive-neutral-weak);
+		color: var(--wpds-color-foreground-content-neutral-weak);
 	}
 
 	.dataviews-view-list__fields {

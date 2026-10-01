@@ -1,10 +1,12 @@
-/* global afterEach, expect, test */
-const { spawnSync } = require( 'node:child_process' );
-const { mkdtempSync, mkdirSync, rmSync, writeFileSync } = require( 'node:fs' );
-const { tmpdir } = require( 'node:os' );
-const { dirname, join } = require( 'node:path' );
+import { spawnSync } from 'node:child_process';
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { afterEach, expect, test } from 'vitest';
 
-const validatorPath = join( __dirname, 'validate-package-contents.mjs' );
+const currentDirectory = dirname( fileURLToPath( import.meta.url ) );
+const validatorPath = join( currentDirectory, 'validate-package-contents.mjs' );
 const temporaryRoots = [];
 
 afterEach( () => {

@@ -12,7 +12,14 @@ import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { View, Form, Field } from '../../types';
 
 const meta = {
-	title: 'DataViews/FieldTypes',
+	parameters: {
+		// FIXME: Helper text fails color-contrast.
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
+
+	id: 'dataviews-fieldtypes',
+	title: 'Design System/DataViews/FieldTypes',
 	component: DataForm,
 	argTypes: {
 		type: {

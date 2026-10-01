@@ -4,7 +4,6 @@ import { forwardRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
 import { renderSlotWithChildren } from '../utils/render-slot-with-children';
-import { ThemeProvider } from '../utils/theme-provider';
 import { PopoverValidationProvider } from './context';
 import { Portal } from './portal';
 import { Positioner } from './positioner';
@@ -61,20 +60,15 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 	) : null;
 
 	const popupContent = (
-		<ThemeProvider>
-			<_Popover.Popup
-				ref={ mergedPopupRef }
-				initialFocus={ resolvedInitialFocus }
-				finalFocus={ finalFocus }
-				className={ clsx(
-					useDefaultSurface && styles.popup,
-					className
-				) }
-				{ ...props }
-			>
-				{ popupChildren }
-			</_Popover.Popup>
-		</ThemeProvider>
+		<_Popover.Popup
+			ref={ mergedPopupRef }
+			initialFocus={ resolvedInitialFocus }
+			finalFocus={ finalFocus }
+			className={ clsx( useDefaultSurface && styles.popup, className ) }
+			{ ...props }
+		>
+			{ popupChildren }
+		</_Popover.Popup>
 	);
 
 	const positionedPopup = renderSlotWithChildren(

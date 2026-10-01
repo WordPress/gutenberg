@@ -1,9 +1,8 @@
-import { useMemo } from '@wordpress/element';
+import clsx from 'clsx';
 import type { WordPressComponentProps } from '../context';
 import { useContextSystem } from '../context';
-import * as styles from './styles';
-import { useCx } from '../utils/hooks/use-cx';
 import type { ScrollableProps } from './types';
+import styles from './style.module.scss';
 
 export function useScrollable(
 	props: WordPressComponentProps< ScrollableProps, 'div' >
@@ -15,20 +14,15 @@ export function useScrollable(
 		...otherProps
 	} = useContextSystem( props, 'Scrollable' );
 
-	const cx = useCx();
-
-	const classes = useMemo(
-		() =>
-			cx(
-				styles.Scrollable,
-				styles.scrollableScrollbar,
-				smoothScroll && styles.smoothScroll,
-				scrollDirection === 'x' && styles.scrollX,
-				scrollDirection === 'y' && styles.scrollY,
-				scrollDirection === 'auto' && styles.scrollAuto,
-				className
-			),
-		[ className, cx, scrollDirection, smoothScroll ]
+	const classes = clsx(
+		styles.scrollable,
+		{
+			[ styles[ 'smooth-scroll' ] ]: smoothScroll,
+			[ styles[ 'scroll-x' ] ]: scrollDirection === 'x',
+			[ styles[ 'scroll-y' ] ]: scrollDirection === 'y',
+			[ styles[ 'scroll-auto' ] ]: scrollDirection === 'auto',
+		},
+		className
 	);
 
 	return { ...otherProps, className: classes };

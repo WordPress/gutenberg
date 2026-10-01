@@ -81,7 +81,7 @@ test.describe( 'Block Hooks API', () => {
 
 				await requestUtils.deleteAllPosts();
 				await requestUtils.deleteAllBlocks();
-				await setCollaboration( requestUtils, true );
+				await setCollaboration( requestUtils, false );
 			} );
 
 			test( `should insert hooked blocks into ${ name } on frontend`, async ( {
@@ -222,7 +222,7 @@ test.describe( 'Block Hooks API', () => {
 
 				await requestUtils.deleteAllPosts();
 				await requestUtils.deleteAllBlocks();
-				await setCollaboration( requestUtils, true );
+				await setCollaboration( requestUtils, false );
 			} );
 
 			test( `should insert hooked blocks into ${ name } on frontend`, async ( {
