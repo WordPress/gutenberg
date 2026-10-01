@@ -1,5 +1,3 @@
-@use "@wordpress/base-styles/mixins" as *;
-
 .dataviews-bulk-actions-footer__item-count {
 	color: var(--wpds-color-foreground-content-neutral);
 }
@@ -18,10 +16,6 @@
 
 .dataviews-bulk-actions__clear {
 	margin-inline-start: auto;
-
-	@include break-medium {
-		margin-inline-start: 0;
-	}
 }
 
 .dataviews-bulk-actions__action {
