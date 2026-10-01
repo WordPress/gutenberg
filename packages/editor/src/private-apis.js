@@ -11,7 +11,6 @@ import PluginPostExcerpt from './components/post-excerpt/plugin';
 import PostCardPanel from './components/post-card-panel';
 import PreferencesModal from './components/preferences-modal';
 import { usePostActions } from './components/post-actions/actions';
-import usePostFields from './components/post-fields';
 import MoreMenuItem from './components/more-menu/more-menu-item';
 import MoreMenuPreferenceItem from './components/more-menu/more-menu-preference-item';
 import ToolsMoreMenuGroup from './components/more-menu/tools-more-menu-group';
@@ -38,7 +37,6 @@ lock( privateApis, {
 	PostCardPanel,
 	PreferencesModal,
 	usePostActions,
-	usePostFields,
 	MoreMenuItem,
 	MoreMenuPreferenceItem,
 	ToolsMoreMenuGroup,
