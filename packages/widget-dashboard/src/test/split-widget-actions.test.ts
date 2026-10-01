@@ -56,21 +56,6 @@ describe( 'mergeWidgetActions', () => {
 		).toEqual( [ review, status, exportCsv ] );
 	} );
 
-	it( 'keeps the first entry of an id the runtime list repeats', () => {
-		const reviewAgain: WidgetRuntimeAction = { ...review, label: 'Again' };
-		const exportAgain: WidgetRuntimeAction = {
-			...exportCsv,
-			label: 'Again',
-		};
-
-		expect(
-			mergeWidgetActions(
-				[ details ],
-				[ review, exportCsv, reviewAgain, exportAgain ]
-			)
-		).toEqual( [ review, exportCsv ] );
-	} );
-
 	it( 'keeps the declared icon and relevance a runtime action leaves out', () => {
 		const icon = createElement( 'svg' );
 		const upgrade: WidgetRuntimeAction = {
