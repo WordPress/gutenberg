@@ -25,6 +25,10 @@
 	margin: 0;
 	padding: $grid-unit-10 0;
 
+	&:first-child {
+		padding-top: 0;
+	}
+
 	& + & {
 		border-top: $border-width solid $gray-200;
 	}
