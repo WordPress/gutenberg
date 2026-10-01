@@ -279,7 +279,6 @@ export default function TypographyPanel( {
 	// state is selected. That state layers over it, so a text gradient set
 	// there still paints here.
 	baseValue,
-	// The selected style state, so a viewport can be told from a pseudo state.
 	styleState,
 	settings,
 	blockName,
@@ -337,13 +336,11 @@ export default function TypographyPanel( {
 	 * Text gradient. Stored as `background.gradient` clipped to the text with
 	 * `background.backgroundClip`, because CSS has no gradient text colour.
 	 *
-	 * The setting decides, as it does for every other support.
-	 * `useSettingsForBlockElement` has already folded block support into it, so
-	 * `false` means either the theme or the block said no. It is only undefined
-	 * when the block supports clipping and the theme has not spoken, and there
-	 * `backgroundClip` has no default to fall back on, so block support stands
-	 * in. A theme naming box values without `text` has spoken, and gets no text
-	 * gradient control.
+	 * `useSettingsForBlockElement` has folded block support into the setting,
+	 * so `false` means the theme or the block said no. Only `undefined` falls
+	 * back to block support, because `backgroundClip` has no default in core's
+	 * theme.json. See the settings table in
+	 * docs/reference-guides/block-api/block-supports.md.
 	 */
 	const clipSetting = settings?.background?.backgroundClip;
 	const blockSupportsBackgroundClip = blockName
@@ -355,13 +352,7 @@ export default function TypographyPanel( {
 			: true === clipSetting ||
 				( Array.isArray( clipSetting ) &&
 					clipSetting.includes( 'text' ) );
-	/*
-	 * A text gradient is a clip, and clipping is treated as a property of the
-	 * block rather than of a width: the Default state's clip carries into
-	 * every breakpoint, so only that state sets or clears it. A pseudo state
-	 * does get its own, since its styles are scoped to the selector and apply
-	 * on hover alone.
-	 */
+	// Clipping belongs to the Default state, not a width. See `background-panel.jsx`.
 	const isViewportState = hasViewportBlockStyleState( styleState );
 	const hasTextGradientEnabled =
 		settingAllowsTextClip &&
@@ -382,10 +373,8 @@ export default function TypographyPanel( {
 		: __( 'The gradient replaces the text color.' );
 	const inheritedIsTextGradient =
 		inheritedValue?.background?.backgroundClip === 'text';
-	// `background-clip` clips every background layer at once, including the
-	// color, so applying a text gradient takes over a background set on this
-	// block. Only its own values are considered: clipping away one the block
-	// merely inherits is a normal override, not a loss.
+	// Only the block's own values count: clipping away an inherited background
+	// is a normal override, not a loss.
 	const backgroundGradient = value?.background?.gradient;
 	const backgroundColor = value?.color?.background;
 	const clipsToText =

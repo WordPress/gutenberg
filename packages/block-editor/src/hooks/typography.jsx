@@ -349,8 +349,6 @@ export function TypographyPanel( {
 			settings={ settings }
 			blockName={ name }
 			value={ value }
-			// The selected state layers over the block's Default state, so
-			// the panel needs that value to know what still applies here.
 			baseValue={ isStateSelected ? baseValue : undefined }
 			styleState={ selectedState }
 			onChange={ onChange }

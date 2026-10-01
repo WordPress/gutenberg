@@ -198,9 +198,7 @@ supports: {
 
 Declaring `backgroundClip` alongside `gradient` gives the block a text gradient. The Typography panel then offers a Gradient control that fills the text, storing the gradient in `style.background.gradient` and `text` in `style.background.backgroundClip`. A block with a text gradient is not given the `has-background` class, because the gradient paints the text rather than the block's background.
 
-Which clip values may be used is a theme's decision, through `settings.background.backgroundClip`. It takes `true` for every value, `false` for none, or an array naming the ones to allow, for example `[ "border-box", "text" ]`. A block declaring the support only stands in where a theme has not set it, so a theme can turn a text gradient off on a block that opts in.
-
-The clip control itself is shown only when a value other than `text` is allowed, since the Typography panel's Gradient control already expresses the text value. A theme allowing `[ "text" ]` therefore gets a text gradient and no clip control.
+Which clip values may be used is a theme's decision, through `settings.background.backgroundClip`. It takes `true` for every value, `false` for none, or an array naming the ones to allow, for example `[ "border-box", "text" ]`. A block declaring the support only stands in where a theme has not set it. The clip control appears only when a value other than `text` is allowed, since the Typography panel's Gradient control already expresses the text value.
 
 When a block declares support for a specific background property, its attributes definition is extended to include the `style` attribute.
 
