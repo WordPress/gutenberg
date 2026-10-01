@@ -1,14 +1,14 @@
-import { CheckboxControl as WCCheckboxControl } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import clsx from 'clsx';
-import { InputControl, Stack } from '@wordpress/ui';
+import { CheckboxControl, InputControl, Stack } from '@wordpress/ui';
 import type { PostWithPassword } from './types';
 import styles from './style.module.css';
 
 /*
  * A copy of the password control of `@wordpress/fields`, laid out with
- * `Stack` and editing the password with `InputControl` from `@wordpress/ui`.
+ * `Stack` and built from `CheckboxControl` and `InputControl` of
+ * `@wordpress/ui`.
  */
 export default function PasswordEdit( {
 	data,
@@ -41,11 +41,13 @@ export default function PasswordEdit( {
 			// original.
 			className={ clsx( 'fields-controls__password', styles.password ) }
 		>
-			<WCCheckboxControl
+			<CheckboxControl
 				label={ __( 'Password protected' ) }
-				help={ __( 'Only visible to those who know the password' ) }
+				description={ __(
+					'Only visible to those who know the password'
+				) }
 				checked={ showPassword }
-				onChange={ handleTogglePassword }
+				onCheckedChange={ handleTogglePassword }
 			/>
 			{ showPassword && (
 				<InputControl

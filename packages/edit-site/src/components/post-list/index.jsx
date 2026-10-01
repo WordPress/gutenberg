@@ -1,5 +1,6 @@
 import { Page } from '@wordpress/admin-ui';
-import { Button, Notice } from '@wordpress/components';
+import { Button } from '@wordpress/components';
+import { Notice } from '@wordpress/ui';
 import {
 	store as coreStore,
 	privateApis as coreDataPrivateApis,
@@ -288,9 +289,11 @@ export default function PostList( { postType } ) {
 			}
 		>
 			{ fieldsError && (
-				<Notice status="error" isDismissible={ false }>
-					{ fieldsError.message }
-				</Notice>
+				<Notice.Root intent="error">
+					<Notice.Description>
+						{ fieldsError.message }
+					</Notice.Description>
+				</Notice.Root>
 			) }
 			<DataViews
 				key={ activeView }

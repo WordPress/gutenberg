@@ -5,9 +5,9 @@ import { DataForm } from '@wordpress/dataviews';
 import {
 	Button,
 	Modal,
-	Notice,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
+import { Notice } from '@wordpress/ui';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useFields } from '@wordpress/fields-loader';
@@ -171,9 +171,11 @@ export function QuickEditModal( {
 			</div>
 			<div className="dataviews-action-modal__quick-edit-content">
 				{ fieldsError && (
-					<Notice status="error" isDismissible={ false }>
-						{ fieldsError.message }
-					</Notice>
+					<Notice.Root intent="error">
+						<Notice.Description>
+							{ fieldsError.message }
+						</Notice.Description>
+					</Notice.Root>
 				) }
 				{ hasFinishedResolution &&
 					! isLoadingFields &&

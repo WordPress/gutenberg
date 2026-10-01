@@ -23,6 +23,7 @@
 		"@wordpress/patterns": "file:../../packages/patterns",
 		"@wordpress/route": "file:../../packages/route",
 		"@wordpress/routes-lock-unlock": "file:../lock-unlock",
+		"@wordpress/ui": "file:../../packages/ui",
 		"@wordpress/views": "file:../../packages/views"
 	},
 	"devDependencies": {

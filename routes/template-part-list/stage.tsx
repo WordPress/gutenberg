@@ -20,9 +20,9 @@ import {
 } from '@wordpress/core-data';
 import {
 	Button,
-	Notice,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { Notice } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { useMemo, useCallback, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
@@ -338,9 +338,11 @@ function TemplatePartListView( {
 				</div>
 			) }
 			{ fieldsError && (
-				<Notice status="error" isDismissible={ false }>
-					{ fieldsError.message }
-				</Notice>
+				<Notice.Root intent="error">
+					<Notice.Description>
+						{ fieldsError.message }
+					</Notice.Description>
+				</Notice.Root>
 			) }
 			<DataViews
 				data={ posts }
