@@ -5,6 +5,7 @@ import {
 	RichText,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	getTypographyClassesAndStyles as useTypographyProps,
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
@@ -135,6 +136,7 @@ export default function SearchEdit( {
 	}
 
 	const colorProps = useColorProps( attributes );
+	const shadowProps = getShadowClassesAndStyles( attributes );
 	const [ fluidTypographySettings, layout ] = useSettings(
 		'typography.fluid',
 		'layout'
@@ -237,7 +239,7 @@ export default function SearchEdit( {
 						borderBottomRightRadius:
 							borderProps.style?.borderBottomRightRadius,
 					}
-				: borderProps.style ),
+				: { ...borderProps.style, ...shadowProps.style } ),
 			...typographyProps.style,
 			textDecoration: undefined,
 		};
@@ -288,7 +290,7 @@ export default function SearchEdit( {
 						borderBottomRightRadius:
 							borderProps.style?.borderBottomRightRadius,
 					}
-				: borderProps.style ),
+				: { ...borderProps.style, ...shadowProps.style } ),
 		};
 		return (
 			<>
@@ -526,7 +528,7 @@ export default function SearchEdit( {
 
 	const getWrapperStyles = () => {
 		const styles = isButtonPositionInside
-			? borderProps.style
+			? { ...borderProps.style, ...shadowProps.style }
 			: {
 					borderRadius: borderProps.style?.borderRadius,
 					borderTopLeftRadius: borderProps.style?.borderTopLeftRadius,
