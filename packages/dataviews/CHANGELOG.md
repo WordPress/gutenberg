@@ -12,9 +12,6 @@
 ### Bug Fixes
 
 -   Keep filter and item actions menus dismissible when their triggers become disabled ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
-
-### Bug Fixes
-
 -   Grid layout: measure the container as the grid attaches rather than waiting for the resize observer's first report, so the grid no longer renders a frame with every item in a full-width column of its own before snapping to its real column count ([#83752](https://github.com/WordPress/gutenberg/pull/83752)).
 
 ### Documentation
