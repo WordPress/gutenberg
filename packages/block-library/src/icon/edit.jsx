@@ -18,6 +18,7 @@ import {
 	useBlockProps,
 	useBlockEditingMode,
 	__experimentalUseColorProps as useColorProps,
+	useBackgroundProps,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	getDimensionsClassesAndStyles as useDimensionsProps,
@@ -59,6 +60,7 @@ export function Edit( { attributes, setAttributes } ) {
 	const isContentOnlyMode = useBlockEditingMode() === 'contentOnly';
 
 	const colorProps = useColorProps( attributes );
+	const backgroundProps = useBackgroundProps( attributes );
 	// Only padding is applied to the inner SVG element, matching the front
 	// end. The margin support is serialized to the block wrapper instead.
 	const spacingProps = useSpacingProps( {
@@ -213,6 +215,7 @@ export function Edit( { attributes, setAttributes } ) {
 						wrapperProps={ {
 							className: clsx(
 								colorProps.className,
+								backgroundProps.className,
 								borderProps.className,
 								spacingProps.className,
 								dimensionsProps.className,
@@ -220,6 +223,7 @@ export function Edit( { attributes, setAttributes } ) {
 							),
 							style: {
 								...colorProps.style,
+								...backgroundProps.style,
 								...borderProps.style,
 								...spacingProps.style,
 								...dimensionsProps.style,
