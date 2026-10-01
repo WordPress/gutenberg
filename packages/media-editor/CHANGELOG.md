@@ -9,6 +9,10 @@
 -   Stop the crop's source-pixel snap from recording its own undo entry. A handle crop that magnified the image past 1:1 added an undo step that changed nothing visible, and redoing back onto that crop cleared the rest of the redo history ([#83571](https://github.com/WordPress/gutenberg/pull/83571)).
 -   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
 
+### Internal
+
+-   Show the selected crop aspect ratio in a menu in the compact image controls ([#82968](https://github.com/WordPress/gutenberg/pull/82968)).
+
 ## 0.19.0 (2026-09-23)
 
 ### Bug Fixes

@@ -8,7 +8,7 @@
 | React cropper | `src/image-editor/react/` | DOM measurement, interaction hooks, overlays, stencil rendering, and the pure `useCropperReducer` hook. |
 | Media editor state | `src/state/` | Composite state for the media editor: cropper state, crop options, undo/redo, and gesture boundaries. |
 
-The cropper layer does not own editor history. History belongs to the composite media editor controller because sidebar controls and cropper gestures need one shared undo stack.
+The cropper layer does not own editor history. History belongs to the media editor session because sidebar controls and cropper gestures need one shared undo stack.
 
 ## Coordinate Spaces
 
@@ -37,6 +37,10 @@ The render path uses focused calculations for CSS transforms, stencil placement,
 
 The core reducer is framework-agnostic and serializable. React and media-editor layers add DOM measurement, gestures, undo/redo, save behavior, and UI state.
 
+### Session
+
+`useMediaEditorState()` returns the media editor session. The session owns the source image, every editing slice, the shared undo/redo history, gesture boundaries, and whether the edits change the saved image (`hasOutputEdits`). The cropper is one participant: `session.cropper` is a geometry-only `CropperController` that a `<Cropper>` takes via its `controller` prop, and its `isDirty` covers geometry alone. Replacing the source image (`setSourceImage`, which the cropper's `setImage` also calls) starts a fresh session with default geometry and crop options, a clean baseline, and no history. Save code asks the session, not the cropper, whether image output needs saving.
+
 ### Viewport
 
 Viewport pan/zoom lets the user inspect or follow the crop area without changing the crop output. It is not part of export and should not create undo entries.
@@ -52,4 +56,4 @@ These APIs let code inside `@wordpress/media-editor` compose the cropper. They a
 | Crop data for REST requests | `getSourceRegion()` and `getSourceRegionPercent()`. |
 | Canvas export | `exportCroppedImage()` or `applyToCanvas()`. |
 | Shared cropper state across internal components | `CropperProvider` / `useCropper()`. |
-| Media editor history | `useMediaEditorState()` composite controller. |
+| Media editor history | `useMediaEditorState()` session. |
