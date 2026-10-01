@@ -2,12 +2,17 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `test-unit`: Report `expect.poll()` and `expect.element()` assertions that are neither awaited nor explicitly returned with `vitest/require-awaited-expect-poll`. This also affects the default `wp-scripts lint-js` unit-test configuration ([#83995](https://github.com/WordPress/gutenberg/pull/83995)).
+
 ### New Features
 
 -   `use-recommended-components`: Add an `allowUseWithCaution` option that allows `@wordpress/ui` components marked "Use with caution" ([#83536](https://github.com/WordPress/gutenberg/pull/83536)).
 
 ### Enhancements
 
+-   `test-unit`: Allow generated titles passed through variables with `vitest/valid-title`'s `allowArguments` option ([#83995](https://github.com/WordPress/gutenberg/pull/83995)).
 -   `use-recommended-components`: Recommend `Checkbox`, `CheckboxControl`, and `CheckboxGroup` from `@wordpress/ui`, and flag `CheckboxControl` from `@wordpress/components` ([#83771](https://github.com/WordPress/gutenberg/pull/83771)).
 -   `use-recommended-components`: Update the "Use with caution" entry from `LinkButton` to `ButtonLink` to match the renamed `@wordpress/ui` component ([#83789](https://github.com/WordPress/gutenberg/pull/83789)).
 -   Update `use-recommended-components` rule to mark `Notice` from `@wordpress/ui` as recommended, and to prefer it over `@wordpress/components` `Notice` ([#82685](https://github.com/WordPress/gutenberg/pull/82685)).
