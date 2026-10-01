@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "24.1.0-rc.1",
+	"version": "24.1.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -16,7 +16,7 @@
 	},
 	"engines": {
 		"node": ">=24.18.0",
-		"npm": ">=11.16.0"
+		"npm": ">=11.18.0"
 	},
 	"devEngines": {
 		"runtime": {
@@ -25,7 +25,7 @@
 		},
 		"packageManager": {
 			"name": "npm",
-			"version": ">=11.16.0",
+			"version": ">=11.18.0",
 			"onFail": "error"
 		}
 	},

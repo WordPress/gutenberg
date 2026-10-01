@@ -41,15 +41,29 @@ permissions:
     pull-requests: write
 ```
 
-**`if: ${{ !cancelled() }}`**, so a failed producer still clears its section instead of leaving a stale one behind.
+**A deliberate answer to producer failure.** Use `if: ${{ !cancelled() }}` where a missing result reliably means "nothing to report", so a failed producer clears its section rather than leaving a stale one. Where a missing result is instead indistinguishable from a failure, require the producer to have succeeded, as the props and flaky tests writers do; clearing there would erase something nothing had disproved.
 
 The job also needs `actions/checkout` before `uses: ./tools/pr-meta`, since a local action needs the repository on disk. `sparse-checkout: tools/pr-meta` is enough. Under `pull_request_target` the checkout must stay on the base ref, never the pull request's head.
+
+## What a section gives up
+
+The comment is edited in place, and GitHub only notifies on the `@mention`s in a comment when it is first created. A section that mentions someone therefore does not notify them, so it cannot be the only way they hear about something.
+
+A section is truncated when it is written, not when it is rendered, so this revision never shortens a section it did not produce. That holds only for writers running this revision: an earlier one truncates at render, so a release branch still carrying it will re-cut a section on every write, and a props list long enough to be truncated loses the trailer a committer copies.
+
+That sets the order for backporting to a release branch. This action goes first, on its own; the workflow that adds a section goes after. A branch whose action still truncates at render will cut a section written by another branch, so giving it a producer before the action is what creates the mixed pair.
+
+A workflow triggered by `pull_request_target` or `issue_comment` runs from the default branch whatever the pull request targets, so it reaches release branch pull requests before that branch has been backported anything. `require-base` holds a section back until then: the writer does nothing unless the pull request targets the branch named, so pass `${{ github.event.repository.default_branch }}` and drop it once every release branch carries this action.
 
 ## Adding a section
 
 Add it to `SECTIONS` in `src/sections.ts` with an id, heading, scope and character budget. Headings lead with an emoji, so a reader scanning a comment of seven sections can find theirs without reading any of them. The budgets must sum, with the headings and markers, to less than GitHub's 65536-character comment limit; a test covers that.
 
-A `summary` collapses the section behind a fold labelled with it, for content long enough that it would otherwise push the rest of the comment out of view. Leave it out to keep the section open.
+A producer renders its markdown without knowing where it will sit, so any headings in a body are demoted to sit below the section heading, keeping their relative hierarchy. Headings inside a code fence are left alone, and a body deep enough to need a seventh level flattens at the sixth, markdown having no more. Setext headings, the ones underlined with `=` or `-`, are not demoted.
+
+A `summary` collapses the section behind a fold labelled with it, for content long enough that it would otherwise push the rest of the comment out of view. Leave it out to keep the section open, which is what a body that folds its own items already needs.
+
+`keep` decides which end survives truncation. The default drops the ending, which suits a section whose first lines matter most. `keep: 'end'` drops the beginning instead, for a body like props that closes with the part a reader acts on, and reopens a code fence the dropped start left open.
 
 `scope` decides how staleness is handled. `commit` sections describe one commit, carry its SHA, and are rejected if they arrive from a rerun of an older one. `pr-state` sections describe the pull request as it currently is and carry no SHA.
 
