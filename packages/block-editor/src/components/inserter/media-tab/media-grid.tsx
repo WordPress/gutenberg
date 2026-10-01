@@ -1,4 +1,3 @@
-import clsx from 'clsx';
 import type { ReactNode } from 'react';
 import { useCallback, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -6,7 +5,6 @@ import { DataViews } from '@wordpress/dataviews';
 import type { Action, Field, View } from '@wordpress/dataviews';
 import { Spinner } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-import { dateI18n } from '@wordpress/date';
 import InserterDraggableBlocks from '../../inserter-draggable-blocks';
 import { getBlockAndPreviewFromMedia } from './utils';
 import { useMediaInsert } from './use-media-insert';
@@ -126,38 +124,31 @@ function MediaGridPreview( {
 }
 
 /**
- * The span of dates covered by the page, newest first, so "Page 3 of 42" is
- * never the only wayfinding. Only meaningful for date-ordered results.
+ * Which items of the whole set this page holds, so "Page 3 of 42" is never
+ * the only wayfinding.
+ *
+ * Derived from the page rather than from the items in hand, which are cleared
+ * while the next page loads. The last page is clamped to the total.
  */
-function getDateSpan( mediaList?: MediaItem[] ) {
-	const first = mediaList?.[ 0 ]?.date;
-	const last = mediaList?.[ mediaList.length - 1 ]?.date;
-	if ( ! first || ! last ) {
+function getItemRange( {
+	page,
+	perPage,
+	totalItems,
+}: {
+	page: number;
+	perPage: number;
+	totalItems: number;
+} ) {
+	if ( ! totalItems ) {
 		return undefined;
 	}
-	const newest = dateI18n( 'M Y', first, undefined );
-	const oldest = dateI18n( 'M Y', last, undefined );
-	if ( newest === oldest ) {
-		return newest;
-	}
-	// Within one year the year is only said once ("Jul – May 2024"), which
-	// keeps the span on one line beside the pager in the common case.
-	if (
-		dateI18n( 'Y', first, undefined ) === dateI18n( 'Y', last, undefined )
-	) {
-		return sprintf(
-			/* translators: 1: The newest month on the page, e.g. "Jul". 2: The oldest month on the page, e.g. "May". 3: The year, e.g. "2024". */
-			__( '%1$s – %2$s %3$s' ),
-			dateI18n( 'M', first, undefined ),
-			dateI18n( 'M', last, undefined ),
-			dateI18n( 'Y', first, undefined )
-		);
-	}
+	const start = ( page - 1 ) * perPage + 1;
 	return sprintf(
-		/* translators: 1: The newest month on the page, e.g. "Jul 2024". 2: The oldest month on the page, e.g. "May 2024". */
-		__( '%1$s – %2$s' ),
-		newest,
-		oldest
+		/* translators: 1: The first item shown on the page. 2: The last item shown on the page. 3: The total number of items. */
+		__( '%1$d–%2$d of %3$d' ),
+		start,
+		Math.min( page * perPage, totalItems ),
+		totalItems
 	);
 }
 
@@ -274,9 +265,11 @@ export default function MediaGrid( {
 	// The footer, when present, supplies the breathing room beneath the grid,
 	// so the grid drops its own bottom gutter (see styles).
 	const hasFooter = showPagination || !! footer;
-	// Search results are ordered by relevance, so the span is only shown for
-	// the date-ordered browse.
-	const dateSpan = search ? undefined : getDateSpan( mediaList );
+	const itemRange = getItemRange( {
+		page,
+		perPage,
+		totalItems: paginationInfo.totalItems,
+	} );
 
 	return (
 		<>
@@ -299,11 +292,7 @@ export default function MediaGrid( {
 				<div className="block-editor-inserter__media-grid__search">
 					<DataViews.Search label={ searchLabel } />
 				</div>
-				<DataViews.Layout
-					className={ clsx( 'block-editor-inserter__media-grid', {
-						'has-footer': hasFooter,
-					} ) }
-				/>
+				<DataViews.Layout className="block-editor-inserter__media-grid" />
 				{ hasFooter && (
 					<Stack
 						direction="column"
@@ -317,15 +306,8 @@ export default function MediaGrid( {
 								align="center"
 								gap="sm"
 							>
-								{ /* Always rendered, so the pager doesn't shift when the span resolves (or is absent). */ }
-								<span
-									className="block-editor-inserter__media-grid__date-span"
-									aria-hidden={ ! dateSpan }
-									// The full span, in case the row is too narrow
-									// and it is truncated (see styles).
-									title={ dateSpan }
-								>
-									{ dateSpan ?? ' ' }
+								<span className="block-editor-inserter__media-grid__range">
+									{ itemRange }
 								</span>
 								<DataViews.Pagination />
 							</Stack>
