@@ -1605,6 +1605,106 @@ test.describe( 'Navigation block', () => {
 			await expect( linkButton ).toContainText( 'Published' );
 		} );
 
+		test( 'shows the selected link while a bound entity of another type loads', async ( {
+			editor,
+			page,
+			admin,
+			navigation,
+			requestUtils,
+		} ) => {
+			const linkPopover = navigation.getLinkPopover();
+
+			// Hold the category record request open so the state between
+			// selecting the category and its record loading can be checked.
+			let releaseCategoryRequest;
+			const categoryRequestReleased = new Promise( ( resolve ) => {
+				releaseCategoryRequest = resolve;
+			} );
+			let markCategoryRequestHeld;
+			const categoryRequestHeld = new Promise( ( resolve ) => {
+				markCategoryRequestHeld = resolve;
+			} );
+
+			await test.step( 'Open the Link UI from the appender and search for a category', async () => {
+				const menu = await requestUtils.createNavigationMenu( {
+					title: 'Test Menu',
+					content: `<!-- wp:navigation-link {"label":"Test Page 1","type":"page","id":${ testPage1.id },"kind":"post-type","metadata":{"bindings":{"url":{"source":"core/post-data","args":{"field":"link"}}}}} /-->`,
+				} );
+
+				await admin.createNewPost();
+				await editor.insertBlock( {
+					name: 'core/navigation',
+					attributes: { ref: menu.id },
+				} );
+
+				const navBlock = navigation.getNavBlock();
+				await expect(
+					navBlock.getByRole( 'document', {
+						name: 'Block: Page Link',
+					} )
+				).toBeVisible();
+				await editor.selectBlocks( navBlock );
+				await navigation.getNavBlockInserter().click();
+
+				await expect( navigation.getLinkControlSearch() ).toBeFocused();
+				await page.keyboard.type( 'Uncategorized', { delay: 50 } );
+
+				await expect(
+					page
+						.getByRole( 'listbox', { name: /Search results/ } )
+						.getByRole( 'option', { name: /\/category\// } )
+				).toBeVisible();
+			} );
+
+			await test.step( 'Select the category while its record is loading', async () => {
+				await page.route(
+					/\/wp\/v2\/categories\/\d+/,
+					async ( route ) => {
+						markCategoryRequestHeld();
+						await categoryRequestReleased;
+						await route.continue();
+					}
+				);
+				const urlDetailsResponse = page.waitForResponse( ( response ) =>
+					response.url().includes( 'url-details' )
+				);
+
+				await page
+					.getByRole( 'listbox', { name: /Search results/ } )
+					.getByRole( 'option', { name: /\/category\// } )
+					.click();
+
+				await categoryRequestHeld;
+				// Let the rich preview data arrive, as it would otherwise
+				// replace the title.
+				await urlDetailsResponse;
+
+				await expect(
+					navigation.getLinkControlLink( 'Uncategorized' )
+				).toBeVisible();
+				await expect(
+					linkPopover.getByText( '/category/uncategorized' )
+				).toBeVisible();
+				await expect(
+					linkPopover.getByText( 'No link selected' )
+				).toBeHidden();
+				await expect(
+					linkPopover.getByRole( 'button', { name: 'Add block' } )
+				).toBeHidden();
+			} );
+
+			await test.step( 'Show the category once its record loads', async () => {
+				releaseCategoryRequest();
+
+				await expect(
+					linkPopover.getByText( 'Category', { exact: true } )
+				).toBeVisible();
+				await expect(
+					navigation.getLinkControlLink( 'Uncategorized' )
+				).toBeVisible();
+			} );
+		} );
+
 		test( 'handles unavailable entity binding', async ( {
 			editor,
 			page,
