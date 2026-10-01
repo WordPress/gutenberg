@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
@@ -10,6 +11,7 @@ import {
 	InspectorControls,
 	RichText,
 	useBlockProps,
+	useBackgroundProps,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
@@ -47,17 +49,19 @@ export default function PostNavigationLinkEdit( {
 	const ariaLabel = isNext ? __( 'Next post' ) : __( 'Previous post' );
 
 	/*
-	 * Border, shadow and spacing serialization is skipped for this block so the
-	 * styles are not applied to the empty wrapper the front end renders when
-	 * there is no adjacent post. The editor always renders the link, so they
-	 * always apply here.
+	 * Background, border, shadow and spacing serialization is skipped for this
+	 * block so the styles are not applied to the empty wrapper the front end
+	 * renders when there is no adjacent post. The editor always renders the
+	 * link, so they always apply here.
 	 */
+	const backgroundProps = useBackgroundProps( attributes );
 	const borderProps = useBorderProps( attributes );
 	const shadowProps = getShadowClassesAndStyles( attributes );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
 	const blockProps = useBlockProps( {
-		className: borderProps.className,
+		className: clsx( backgroundProps.className, borderProps.className ),
 		style: {
+			...backgroundProps.style,
 			...borderProps.style,
 			...shadowProps.style,
 			...spacingProps.style,

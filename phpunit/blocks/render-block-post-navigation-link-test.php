@@ -160,6 +160,58 @@ class Tests_Blocks_Render_Post_Navigation_Link extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'border-width:2px', $output );
 	}
 
+	/**
+	 * Returns attributes setting a background image and a gradient.
+	 *
+	 * @return array Block attributes.
+	 */
+	private function background_attributes() {
+		return array(
+			'type'  => 'previous',
+			'style' => array(
+				'background' => array(
+					'backgroundImage' => array( 'url' => 'https://example.com/image.jpg' ),
+					'gradient'        => 'linear-gradient(135deg,#000000 0%,#ffffff 100%)',
+				),
+			),
+		);
+	}
+
+	public function test_empty_wrapper_omits_the_background() {
+		$output = $this->render_block( self::$first_post_id, $this->background_attributes() );
+
+		$this->assertStringContainsString( '></div>', $output, 'The wrapper should render with no content.' );
+		$this->assertStringNotContainsString( 'style=', $output );
+		$this->assertStringNotContainsString( 'has-background', $output );
+	}
+
+	public function test_rendered_link_includes_the_background() {
+		$output = $this->render_block( self::$second_post_id, $this->background_attributes() );
+
+		$this->assertStringContainsString( 'https://example.com/image.jpg', $output );
+		$this->assertStringContainsString( 'linear-gradient(135deg,#000000 0%,#ffffff 100%)', $output );
+		$this->assertStringContainsString( 'background-size:cover', $output );
+		$this->assertSame( 1, substr_count( $output, 'has-background' ) );
+	}
+
+	public function test_background_image_without_a_gradient_adds_the_background_class() {
+		$attributes = array(
+			'type'  => 'previous',
+			'style' => array(
+				'background' => array(
+					'backgroundImage' => array( 'url' => 'https://example.com/image.jpg' ),
+					'backgroundSize'  => 'contain',
+				),
+			),
+		);
+
+		$output = $this->render_block( self::$second_post_id, $attributes );
+
+		$this->assertStringContainsString( 'background-size:contain', $output );
+		$this->assertStringContainsString( 'background-position:50% 50%', $output );
+		$this->assertStringContainsString( 'has-background', $output );
+	}
+
 	public function test_null_from_the_post_link_filter_omits_the_styles() {
 		add_filter( 'previous_post_link', '__return_null' );
 		$output = $this->render_block( self::$second_post_id, $this->styled_attributes() );
