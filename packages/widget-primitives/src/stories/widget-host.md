@@ -81,7 +81,7 @@ It composes through the `render` prop of a UI link, which merges its own anchor 
 </Link>
 ```
 
-`Link`, `LinkButton` and `Menu.LinkItem` take the same anchor props, so one composition serves all three. A consumer that needs the answer before it renders reads `match` itself.
+`Link`, `ButtonLink` and `Menu.LinkItem` take the same anchor props, so one composition serves all three. A consumer that needs the answer before it renders reads `match` itself.
 
 `useWidgetHost` stays available for a capability no component covers yet, or an answer a consumer needs before it renders.
 

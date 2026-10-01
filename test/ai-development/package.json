@@ -26,7 +26,7 @@
 	"type": "module",
 	"devDependencies": {
 		"@anthropic-ai/claude-agent-sdk": "^0.3.251",
-		"promptfoo": "0.122.1"
+		"promptfoo": "0.123.1"
 	},
 	"overrides": {
 		"sharp": "0.35.4",

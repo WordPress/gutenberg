@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
+import { Fragment } from '@wordpress/element';
 import { SearchableChipSelect } from '../';
 import {
 	GROUPED_ITEMS,
@@ -16,6 +17,7 @@ const meta: Meta< typeof SearchableChipSelect > = {
 	subcomponents: {
 		'SearchableChipSelect.Group': SearchableChipSelect.Group,
 		'SearchableChipSelect.GroupLabel': SearchableChipSelect.GroupLabel,
+		'SearchableChipSelect.Separator': SearchableChipSelect.Separator,
 		'SearchableChipSelect.Item': SearchableChipSelect.Item,
 		'SearchableChipSelect.ItemLabel': SearchableChipSelect.ItemLabel,
 		'SearchableChipSelect.ItemDescription':
@@ -140,6 +142,28 @@ export const Grouped: Story = {
 					) }
 				</SearchableChipSelect.Collection>
 			</SearchableChipSelect.Group>
+		),
+	},
+};
+
+/**
+ * Use `SearchableChipSelect.Separator` to set choices apart from each other.
+ */
+export const WithSeparator: Story = {
+	args: {
+		...Default.args,
+		items: [ ...ITEMS.slice( 0, 3 ), { value: 'other', label: 'Other' } ],
+		children: ( item: FixtureItem, index: number ) => (
+			<Fragment key={ item.value }>
+				{ item.value === 'other' && index > 0 && (
+					<SearchableChipSelect.Separator />
+				) }
+				<SearchableChipSelect.Item value={ item }>
+					<SearchableChipSelect.ItemLabel>
+						{ item.label }
+					</SearchableChipSelect.ItemLabel>
+				</SearchableChipSelect.Item>
+			</Fragment>
 		),
 	},
 };
