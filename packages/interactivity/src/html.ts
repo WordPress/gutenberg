@@ -9,6 +9,8 @@ interface TrustedHTML {
 	toJSON: () => string;
 }
 
+declare const dangerousHTMLBrand: unique symbol;
+
 /**
  * An immutable, opaque token produced by `asDangerousHTML()` that the
  * `data-wp-html` directive recognizes as trusted HTML.
@@ -19,8 +21,13 @@ interface TrustedHTML {
  * into a new object, `JSON.stringify()`/`parse()`, …) produces a plain
  * object with none of its own properties, which is not present in that
  * `WeakMap` and is therefore never treated as trusted.
+ *
+ * The type is nominal: only a value returned by `asDangerousHTML()` is
+ * assignable to it, not a string or any other object.
  */
-export type DangerousHTML = Readonly< Record< never, never > >;
+export interface DangerousHTML {
+	readonly [ dangerousHTMLBrand ]: 'DangerousHTML';
+}
 
 // Private: maps each token returned by `asDangerousHTML()` to the HTML value
 // it represents. Never exported — the token itself is the only way to look
@@ -82,7 +89,7 @@ const trustedHtmlByToken = new WeakMap< DangerousHTML, string | TrustedHTML >();
  * ```
  */
 export function asDangerousHTML( html: string | TrustedHTML ): DangerousHTML {
-	const token: DangerousHTML = Object.freeze( Object.create( null ) );
+	const token = Object.freeze( Object.create( null ) ) as DangerousHTML;
 	trustedHtmlByToken.set( token, html );
 	return token;
 }
