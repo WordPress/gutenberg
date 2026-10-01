@@ -156,9 +156,14 @@ function gutenberg_wpds_admin_demoted_handles() {
 /**
  * Escapes a URL for use inside a CSS string in an inline `<style>` element.
  *
- * `esc_url()` is wrong here: it encodes `&` as `&#038;`, and CSS does not
- * decode HTML entities, so a URL carrying `&ver=` would break. Use the raw
- * escaper and then guard the CSS string context and the containing element.
+ * The URL arrives HTML-escaped: `WP_Styles::_css_href()` returns `esc_url()`,
+ * which encodes `&` as `&#038;` and `'` as `&#039;`. CSS does not decode HTML
+ * entities, so a URL carrying more than one query argument would be requested
+ * with the entity still in it. Decode those first, then sanitise, then guard
+ * the CSS string context and the containing element.
+ *
+ * `wp_specialchars_decode()` with `ENT_QUOTES` is the matching decoder: it
+ * handles exactly the `&#038;` and `&#039;` that `esc_url()` produces.
  *
  * @since 24.1.0
  *
@@ -169,7 +174,7 @@ function gutenberg_wpds_admin_escape_css_url( $href ) {
 	return str_replace(
 		array( '\\', '"', '<' ),
 		array( '\\\\', '\\"', '\\3c ' ),
-		esc_url_raw( $href )
+		esc_url_raw( wp_specialchars_decode( $href, ENT_QUOTES ) )
 	);
 }
 
@@ -193,6 +198,24 @@ function gutenberg_wpds_admin_demote_style( $tag, $handle, $href, $media ) {
 	}
 
 	if ( ! in_array( $handle, gutenberg_wpds_admin_demoted_handles(), true ) ) {
+		return $tag;
+	}
+
+	/*
+	 * The colour scheme picker previews a scheme by setting `href` on
+	 * `#colors-css` (wp-admin/js/user-profile.js). Demoting that handle replaces
+	 * the `<link>` with a `<style>` carrying an `@import`, and setting `href` on
+	 * a `<style>` does nothing — the preview silently stops working until the
+	 * page is reloaded.
+	 *
+	 * So the `colors` handle keeps its `<link>` on the two screens that render
+	 * the picker. The cost is that the scheme's stylesheet is unlayered there
+	 * and so outranks this experiment's rules on those screens only; the
+	 * alternative is breaking a WordPress feature, which is worse. A permanent
+	 * version of this restyle lives in WordPress's own stylesheets and has no
+	 * demotion step, so nothing here needs solving upstream.
+	 */
+	if ( 'colors' === $handle && in_array( $GLOBALS['pagenow'] ?? '', array( 'profile.php', 'user-edit.php' ), true ) ) {
 		return $tag;
 	}
 

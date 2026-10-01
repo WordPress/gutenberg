@@ -163,11 +163,20 @@ function gutenberg_wpds_admin_render_harness() {
 			esc_attr__( 'Value', 'gutenberg' ),
 			$attrs // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		);
-		printf(
-			'<td><select%s><option>%s</option></select></td>',
-			$attrs, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			esc_html__( 'Option', 'gutenberg' )
-		);
+		if ( ' readonly' === $attrs ) {
+			/*
+			 * A native `<select>` has no readonly state, so passing the attribute
+			 * here would render an ordinary, editable control in a row labelled
+			 * readonly — the harness would be claiming to show something it is not.
+			 */
+			printf( '<td>%s</td>', esc_html_x( 'N/A', 'form control state', 'gutenberg' ) );
+		} else {
+			printf(
+				'<td><select%s><option>%s</option></select></td>',
+				$attrs, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				esc_html__( 'Option', 'gutenberg' )
+			);
+		}
 		printf(
 			'<td><textarea rows="2"%s>%s</textarea></td>',
 			$attrs, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
