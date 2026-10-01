@@ -557,7 +557,8 @@ function RichTextWrapper(
 				className={ clsx(
 					'block-editor-rich-text__editable',
 					props.className,
-					'rich-text'
+					'rich-text',
+					{ 'is-bound-read-only': disableBoundBlock }
 				) }
 				tabIndex={ tabIndex }
 				data-wp-block-attribute-key={ identifier }
