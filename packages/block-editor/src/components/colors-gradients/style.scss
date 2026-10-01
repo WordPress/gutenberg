@@ -130,9 +130,8 @@ $swatch-gap: 12px;
 * the gap between adjacent items here instead. Grid rows are sized from the
 * item's margin box, so this pulls the item up without adding space below it.
 *
-* Two selectors because the panel is named by its group in the block inspector
-* and carries its own class in Global Styles. The inspector class also owns a
-* grid rule, so Global Styles must not borrow it.
+* Two selectors, for the inspector group and the Global Styles class. See
+* `hooks/typography.scss`.
 */
 .typography-block-support-panel,
 .block-editor-typography-panel--flush-color-items {

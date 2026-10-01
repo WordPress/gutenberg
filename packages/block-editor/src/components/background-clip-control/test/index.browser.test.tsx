@@ -66,4 +66,41 @@ describe( 'BackgroundClipControl', () => {
 
 		expect( onChange ).toHaveBeenCalledWith( 'text' );
 	} );
+
+	it( 'falls back to the first allowed value when nothing is set', async () => {
+		await render(
+			<BackgroundClipControl
+				onChange={ vi.fn() }
+				allowedValues={ [ 'padding-box', 'text' ] }
+			/>
+		);
+
+		expect(
+			await screen.findByRole( 'combobox', { name: 'Clip' } )
+		).toHaveTextContent( 'Padding box' );
+	} );
+
+	it( 'shows the current value', async () => {
+		await render(
+			<BackgroundClipControl
+				value="text"
+				onChange={ vi.fn() }
+				allowedValues={ ALL_BACKGROUND_CLIP_VALUES }
+			/>
+		);
+
+		expect(
+			await screen.findByRole( 'combobox', { name: 'Clip' } )
+		).toHaveTextContent( 'Text' );
+	} );
+
+	it( 'renders nothing when no values are allowed', async () => {
+		await render(
+			<BackgroundClipControl onChange={ vi.fn() } allowedValues={ [] } />
+		);
+
+		expect(
+			screen.queryByRole( 'combobox', { name: 'Clip' } )
+		).not.toBeInTheDocument();
+	} );
 } );

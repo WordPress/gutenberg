@@ -7,9 +7,6 @@ import BackgroundPanel, {
 	hasBackgroundColorValue,
 	hasLegacyColorGradientValue,
 } from '../background-panel';
-import BackgroundClipControl, {
-	ALL_BACKGROUND_CLIP_VALUES,
-} from '../../background-clip-control';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -536,43 +533,6 @@ describe( 'BackgroundPanel background clip', () => {
 		expect(
 			await screen.findByRole( 'combobox', { name: /clip/i } )
 		).toBeInTheDocument();
-	} );
-} );
-
-describe( 'BackgroundClipControl', () => {
-	it( 'falls back to the first allowed value when nothing is set', async () => {
-		render(
-			<BackgroundClipControl
-				onChange={ () => {} }
-				allowedValues={ [ 'padding-box', 'text' ] }
-			/>
-		);
-
-		expect(
-			await screen.findByRole( 'combobox', { name: /clip/i } )
-		).toHaveTextContent( 'Padding box' );
-	} );
-
-	it( 'shows the current value', async () => {
-		render(
-			<BackgroundClipControl
-				value="text"
-				onChange={ () => {} }
-				allowedValues={ ALL_BACKGROUND_CLIP_VALUES }
-			/>
-		);
-
-		expect(
-			await screen.findByRole( 'combobox', { name: /clip/i } )
-		).toHaveTextContent( 'Text' );
-	} );
-
-	it( 'renders nothing when no values are allowed', () => {
-		const { container } = render(
-			<BackgroundClipControl onChange={ () => {} } allowedValues={ [] } />
-		);
-
-		expect( container ).toBeEmptyDOMElement();
 	} );
 } );
 

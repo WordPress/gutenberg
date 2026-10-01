@@ -160,10 +160,13 @@ function ScreenBlock( {
 	// the Default state separately to know what still applies underneath it.
 	const [ baseStyle ] = useStyle( prefix, name, 'merged', false );
 	const baseValue = hasSelectedState ? baseStyle : undefined;
-	const styleState = {
-		viewport: effectiveSelectedViewport,
-		pseudo: selectedPseudoState,
-	};
+	const styleState = useMemo(
+		() => ( {
+			viewport: effectiveSelectedViewport,
+			pseudo: selectedPseudoState,
+		} ),
+		[ effectiveSelectedViewport, selectedPseudoState ]
+	);
 	const inheritedStyleWithResolvedBackground =
 		useStyleWithResolvedBackground( inheritedStyle );
 
