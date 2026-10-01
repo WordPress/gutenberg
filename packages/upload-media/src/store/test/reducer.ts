@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import reducer from '../reducer';
 import {
 	ItemStatus,
@@ -15,7 +16,9 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [
 					{
@@ -38,6 +41,8 @@ describe( 'reducer', () => {
 				blobUrls: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [
 					{
@@ -60,7 +65,9 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [
 					{
@@ -85,6 +92,8 @@ describe( 'reducer', () => {
 				blobUrls: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [
 					{
@@ -106,7 +115,9 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [
 					{
@@ -135,7 +146,9 @@ describe( 'reducer', () => {
 				failureCount: 2,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [],
 			};
@@ -156,7 +169,9 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [
 					{
@@ -180,6 +195,8 @@ describe( 'reducer', () => {
 				blobUrls: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [
 					{
@@ -198,7 +215,9 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [
 					{
@@ -220,6 +239,8 @@ describe( 'reducer', () => {
 				blobUrls: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [
 					{
@@ -242,7 +263,9 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [
 					{
@@ -269,6 +292,8 @@ describe( 'reducer', () => {
 				blobUrls: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [
 					{
@@ -294,7 +319,9 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [
 					{
@@ -319,6 +346,8 @@ describe( 'reducer', () => {
 				blobUrls: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [
 					{
@@ -341,7 +370,9 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [
 					{
@@ -371,7 +402,9 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [
 					{
@@ -396,7 +429,9 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [
 					{
@@ -423,7 +458,9 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [
 					{
@@ -450,7 +487,9 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [
 					{
@@ -486,7 +525,9 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [
 					{
@@ -512,7 +553,9 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [
 					{
@@ -539,7 +582,9 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [
 					{
@@ -573,7 +618,9 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [],
 			};
@@ -590,7 +637,9 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [],
 			};
@@ -607,7 +656,9 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: { '1': [ 'blob:foo' ] },
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [
 					{
@@ -632,7 +683,9 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [],
 			};
@@ -649,7 +702,9 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [],
 			};
@@ -666,7 +721,9 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [
 					{
@@ -695,7 +752,9 @@ describe( 'reducer', () => {
 				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 				queue: [
 					{

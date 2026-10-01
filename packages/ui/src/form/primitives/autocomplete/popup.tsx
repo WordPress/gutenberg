@@ -9,8 +9,8 @@ import { Positioner } from './positioner';
 import type { AutocompletePopupProps } from './types';
 
 export const Popup = forwardRef< HTMLDivElement, AutocompletePopupProps >(
-	function Popup(
-		{ className, portal, positioner, popupWidth, ...restProps },
+	function UnforwardedPopup(
+		{ className, portal, positioner, width, ...restProps },
 		ref
 	) {
 		const popupContent = (
@@ -18,7 +18,7 @@ export const Popup = forwardRef< HTMLDivElement, AutocompletePopupProps >(
 				ref={ ref }
 				className={ clsx(
 					itemPopupStyles.popup,
-					getItemPopupWidthClassName( popupWidth ),
+					getItemPopupWidthClassName( width ),
 					className
 				) }
 				{ ...restProps }

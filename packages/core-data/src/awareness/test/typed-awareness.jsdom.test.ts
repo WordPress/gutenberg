@@ -1,4 +1,4 @@
-import { describe, expect, test, beforeEach, afterEach } from '@jest/globals';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { Y } from '@wordpress/sync';
 import { TypedAwareness } from '../typed-awareness';
 import type { EnhancedState } from '../types';

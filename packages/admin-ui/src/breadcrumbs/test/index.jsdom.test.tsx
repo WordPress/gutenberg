@@ -1,11 +1,18 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import { Breadcrumbs } from '..';
 
-jest.mock( '@wordpress/route', () => ( {
-	Link: ( { to, children }: { to: string; children: React.ReactNode } ) => (
-		<a href={ to }>{ children }</a>
-	),
-} ) );
+vi.mock( import( '@wordpress/route' ), async ( importOriginal ) => {
+	const original = await importOriginal();
+
+	return {
+		...original,
+		Link: ( ( { to, children }: { to: string; children: ReactNode } ) => (
+			<a href={ to }>{ children }</a>
+		) ) as typeof original.Link,
+	};
+} );
 
 describe( 'Breadcrumbs', () => {
 	describe( 'validation', () => {

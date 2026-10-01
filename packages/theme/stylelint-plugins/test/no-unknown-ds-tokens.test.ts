@@ -1,3 +1,4 @@
+import { beforeAll, describe, expect, it } from 'vitest';
 import plugin from '../no-unknown-ds-tokens.mjs';
 import { getStylelintResult } from './utils';
 

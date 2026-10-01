@@ -1,20 +1,21 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import DefaultBlockAppender, { ZWNBSP } from '../';
 import * as blockEditorActions from '../../../store/actions';
 import * as blockEditorSelectors from '../../../store/selectors';
-jest.mock( '../../../store/actions', () => {
-	const actions = jest.requireActual( '../../../store/actions' );
+vi.mock( import( '../../../store/actions' ), async ( importOriginal ) => {
+	const actions = await importOriginal();
 	return {
 		...actions,
-		startTyping: jest.fn( actions.startTyping ),
+		startTyping: vi.fn( actions.startTyping ),
 	};
 } );
-jest.mock( '../../../store/selectors', () => {
-	const selectors = jest.requireActual( '../../../store/selectors' );
+vi.mock( import( '../../../store/selectors' ), async ( importOriginal ) => {
+	const selectors = await importOriginal();
 	return {
 		...selectors,
-		getBlockCount: jest.fn( selectors.getBlockCount ),
+		getBlockCount: vi.fn( selectors.getBlockCount ),
 	};
 } );
 
@@ -26,7 +27,7 @@ describe( 'DefaultBlockAppender', () => {
 	} );
 
 	it( 'should append a default block when input focused', async () => {
-		const startTyping = jest.spyOn( blockEditorActions, 'startTyping' );
+		const startTyping = vi.spyOn( blockEditorActions, 'startTyping' );
 		const user = userEvent.setup();
 
 		const { container } = render( <DefaultBlockAppender /> );

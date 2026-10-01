@@ -13,7 +13,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Menu, Stack, VisuallyHidden } from '@wordpress/ui';
+import { Menu, Stack, VisuallyHidden, inertValue } from '@wordpress/ui';
 import { ActionsMenuGroup, ActionModal } from '../../dataviews-item-actions';
 import DataViewsContext from '../../dataviews-context';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
@@ -219,12 +219,9 @@ function ListItem< Item >( {
 			) }
 			{ ! hasOnlyOnePrimaryAction && (
 				<div role="gridcell">
-					{ /* The `disabled` prop on `Menu.Root` (rather than on
-					     the trigger) keeps the menu from opening while
-					     letting the trigger button stay focusable via its
-					     own `accessibleWhenDisabled`. */ }
-					<Menu.Root disabled={ ! actions.length }>
+					<Menu.Root>
 						<Menu.Trigger
+							disabled={ ! actions.length }
 							render={
 								<Composite.Item
 									id={ generateDropdownTriggerCompositeId(
@@ -237,7 +234,6 @@ function ListItem< Item >( {
 											icon={ moreVertical }
 											label={ __( 'Actions' ) }
 											accessibleWhenDisabled
-											disabled={ ! actions.length }
 											onKeyDownCapture={
 												onDropdownTriggerKeyDown
 											}
@@ -554,7 +550,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		render: <div />,
 		activeId: activeCompositeId,
 		setActiveId: setActiveCompositeId,
-		inert: ! isInfiniteScroll && !! isLoading ? 'true' : undefined,
+		inert: inertValue( ! isInfiniteScroll && isLoading ),
 	};
 	if ( ! hasData ) {
 		return (
@@ -588,7 +584,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 												__( '%1$s: %2$s' ),
 												groupField.label,
 												groupName
-										  ) }
+											) }
 								</h3>
 								{ groupItems.map( ( item ) => {
 									const id =

@@ -77,9 +77,9 @@ function InlineEditButton( {
 			>
 				{ editedContentOnlySection
 					? /* translators: Button label to leave pattern editing mode. */
-					  __( 'Exit pattern' )
+						__( 'Exit pattern' )
 					: /* translators: Button label to enter pattern editing mode. */
-					  __( 'Edit pattern' ) }
+						__( 'Edit pattern' ) }
 			</Button>
 		</Stack>
 	);

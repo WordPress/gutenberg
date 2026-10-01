@@ -1,12 +1,12 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`RovingTabIndexItem allows another component to be specified as the rendered component using the \`as\` prop 1`] = `
+exports[`RovingTabIndexItem > allows another component to be specified as the rendered component using the \`as\` prop 1`] = `
 <div>
   <button />
 </div>
 `;
 
-exports[`RovingTabIndexItem allows children to be declared using a child render function as an alternative to \`as\` 1`] = `
+exports[`RovingTabIndexItem > allows children to be declared using a child render function as an alternative to \`as\` 1`] = `
 <div>
   <button
     class="my-button"
@@ -16,7 +16,7 @@ exports[`RovingTabIndexItem allows children to be declared using a child render 
 </div>
 `;
 
-exports[`RovingTabIndexItem forwards props to the \`as\` component 1`] = `
+exports[`RovingTabIndexItem > forwards props to the \`as\` component 1`] = `
 <div>
   <button
     class="my-button"

@@ -202,7 +202,7 @@ async function dev() {
 					'tsc',
 					[ '--build', '--watch', '--preserveWatchOutput' ],
 					{ cwd: ROOT_DIR, stdio: 'inherit' }
-			  );
+				);
 
 		// Start package build watch and wait for initial build to complete
 		// before signaling ready. wp-build outputs "Watching for changes..."

@@ -13,6 +13,7 @@
 // The resolved values of the semantic `--wpds-*` tokens are covered by the
 // `ThemeProvider` tests (which read them as computed CSS custom properties).
 
+import { describe, expect, it } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { type ReactNode } from 'react';
 import { ThemeProvider } from '../theme-provider';
@@ -133,6 +134,29 @@ describe( 'useThemeProviderStyles', () => {
 					'--wpds-color-background-interactive-brand-strong'
 				]
 			).toBe( '#1e90ff' );
+		} );
+
+		it( 'emits neutral interactive background state properties from the background ramp', () => {
+			const { result } = renderHook( () =>
+				useThemeProviderStyles( { color: { background: '#222222' } } )
+			);
+			const styles = result.current.themeProviderStyles;
+
+			expect(
+				styles[ '--wpds-color-background-interactive-neutral' ]
+			).toBe(
+				styles[ '--wpds-color-background-surface-neutral-strong' ]
+			);
+			expect(
+				styles[ '--wpds-color-background-interactive-neutral-active' ]
+			).toBe(
+				styles[ '--wpds-color-background-surface-neutral-strong' ]
+			);
+			expect(
+				styles[ '--wpds-color-background-interactive-neutral-disabled' ]
+			).toBe(
+				styles[ '--wpds-color-background-surface-neutral-strong' ]
+			);
 		} );
 
 		it( 're-emits inherited color tokens so portaled subtrees can re-apply them', () => {

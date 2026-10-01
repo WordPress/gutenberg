@@ -41,9 +41,7 @@ import { unlock } from '../lock-unlock';
 import { getDimensionResetAttributes } from '../utils/style-state';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
-const { isDefaultBlockStyleState, ResolutionTool } = unlock(
-	blockEditorPrivateApis
-);
+const { ResolutionTool } = unlock( blockEditorPrivateApis );
 
 const hasDimensionValue = ( value ) =>
 	value !== undefined && value !== null && value !== '';
@@ -132,13 +130,18 @@ export default function PostFeaturedImageEdit( {
 		return imageId;
 	}, [ storedFeaturedImage, useFirstImageFromPost, postContent ] );
 
-	const { media, postType, postPermalink, selectedStyleState } = useSelect(
+	const {
+		media,
+		postType,
+		postPermalink,
+		selectedStyleState,
+		hasSelectedStyleState,
+	} = useSelect(
 		( select ) => {
 			const { getEntityRecord, getPostType, getEditedEntityRecord } =
 				select( coreStore );
-			const { getSelectedBlockStyleState } = unlock(
-				select( blockEditorStore )
-			);
+			const { getSelectedBlockStyleState, hasSelectedBlockStyleState } =
+				select( blockEditorStore );
 			return {
 				media:
 					featuredImage &&
@@ -152,12 +155,11 @@ export default function PostFeaturedImageEdit( {
 					postId
 				)?.link,
 				selectedStyleState: getSelectedBlockStyleState( clientId ),
+				hasSelectedStyleState: hasSelectedBlockStyleState( clientId ),
 			};
 		},
 		[ clientId, featuredImage, postTypeSlug, postId ]
 	);
-	const hasSelectedStyleState =
-		! isDefaultBlockStyleState( selectedStyleState );
 
 	const mediaUrl =
 		media?.media_details?.sizes?.[ sizeSlug ]?.source_url ||
@@ -290,7 +292,7 @@ export default function PostFeaturedImageEdit( {
 											// translators: %s: Name of the post type e.g: "post".
 											__( 'Link to %s' ),
 											postType.labels.singular_name
-									  )
+										)
 									: __( 'Link to post' )
 							}
 							isShownByDefault
@@ -472,7 +474,7 @@ export default function PostFeaturedImageEdit( {
 										// translators: %s: The image's alt text.
 										__( 'Featured image: %s' ),
 										media.alt_text
-								  )
+									)
 								: __( 'Featured image' )
 						}
 						style={ imageStyles }

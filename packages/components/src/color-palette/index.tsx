@@ -65,12 +65,12 @@ function SinglePalette( {
 					selectedIconProps={
 						isSelected
 							? {
-									fill:
+									color:
 										colordColor.contrast() >
 										colordColor.contrast( '#000' )
 											? '#fff'
 											: '#000',
-							  }
+								}
 							: {}
 					}
 					tooltipText={
@@ -163,12 +163,12 @@ export function CustomColorPickerDropdown( {
 						// leaving the same gap as the parent popover.
 						placement: 'left-start',
 						offset: 34,
-				  }
+					}
 				: {
 						// Default behavior: open below the anchor
 						placement: 'bottom',
 						offset: 8,
-				  } ),
+					} ),
 			...receivedPopoverProps,
 		} ),
 		[ isRenderedInSidebar, receivedPopoverProps ]
@@ -249,7 +249,7 @@ function UnforwardedColorPalette(
 				),
 				buttonLabelName,
 				displayValue
-		  )
+			)
 		: __( 'Custom color picker' );
 
 	const { metaProps, labelProps, resolvedPresentation } =

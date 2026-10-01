@@ -34,6 +34,7 @@ export default function PostURL( { onClose } ) {
 	const {
 		isEditable,
 		postSlug,
+		hasSlug,
 		postLink,
 		permalinkPrefix,
 		permalinkSuffix,
@@ -51,6 +52,7 @@ export default function PostURL( { onClose } ) {
 			postSlug: safeDecodeURIComponent(
 				select( editorStore ).getEditedPostSlug()
 			),
+			hasSlug: !! select( editorStore ).getEditedPostAttribute( 'slug' ),
 			viewPostLabel: postType?.labels?.view_item,
 			postLink: post.link,
 			permalinkPrefix: permalinkParts?.prefix,
@@ -113,7 +115,7 @@ export default function PostURL( { onClose } ) {
 											icon={ copySmall }
 											ref={ copyButtonRef }
 											size="small"
-											label="Copy"
+											label={ __( 'Copy' ) }
 										/>
 									</InputControlSuffixWrapper>
 								}
@@ -141,11 +143,16 @@ export default function PostURL( { onClose } ) {
 									}
 								} }
 								onBlur={ ( event ) => {
-									editPost( {
-										slug: cleanForSlug(
-											event.target.value
-										),
-									} );
+									// Without a slug the field shows a fallback, which for
+									// a new post is the `auto-draft` placeholder. Writing
+									// it would pin that value as the post slug.
+									if ( hasSlug ) {
+										editPost( {
+											slug: cleanForSlug(
+												event.target.value
+											),
+										} );
+									}
 									if ( forceEmptyField ) {
 										setForceEmptyField( false );
 									}

@@ -1,31 +1,32 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { getUndoManager } from '../private-selectors';
-import { getSyncManager } from '../sync';
+import { getEntitySyncManager } from '../entity-sync';
 
-jest.mock( '../sync', () => ( {
-	getSyncManager: jest.fn(),
+vi.mock( '../entity-sync', () => ( {
+	getEntitySyncManager: vi.fn(),
 } ) );
 
 describe( 'getUndoManager', () => {
 	afterEach( () => {
-		getSyncManager.mockReset();
+		getEntitySyncManager.mockReset();
 	} );
 
 	it( 'returns the sync undo manager when one is available', () => {
 		const syncUndoManager = {
-			addRecord: jest.fn(),
-			hasRedo: jest.fn(),
-			hasUndo: jest.fn(),
-			redo: jest.fn(),
-			undo: jest.fn(),
+			addRecord: vi.fn(),
+			hasRedo: vi.fn(),
+			hasUndo: vi.fn(),
+			redo: vi.fn(),
+			undo: vi.fn(),
 		};
 		const fallbackUndoManager = {
-			addRecord: jest.fn(),
-			hasRedo: jest.fn(),
-			hasUndo: jest.fn(),
-			redo: jest.fn(),
-			undo: jest.fn(),
+			addRecord: vi.fn(),
+			hasRedo: vi.fn(),
+			hasUndo: vi.fn(),
+			redo: vi.fn(),
+			undo: vi.fn(),
 		};
-		getSyncManager.mockReturnValue( {
+		getEntitySyncManager.mockReturnValue( {
 			undoManager: syncUndoManager,
 		} );
 
@@ -42,13 +43,13 @@ describe( 'getUndoManager', () => {
 
 	it( 'returns the default undo manager when there is no sync undo manager', () => {
 		const fallbackUndoManager = {
-			addRecord: jest.fn(),
-			hasRedo: jest.fn(),
-			hasUndo: jest.fn(),
-			redo: jest.fn(),
-			undo: jest.fn(),
+			addRecord: vi.fn(),
+			hasRedo: vi.fn(),
+			hasUndo: vi.fn(),
+			redo: vi.fn(),
+			undo: vi.fn(),
 		};
-		getSyncManager.mockReturnValue( undefined );
+		getEntitySyncManager.mockReturnValue( undefined );
 
 		expect(
 			getUndoManager( {

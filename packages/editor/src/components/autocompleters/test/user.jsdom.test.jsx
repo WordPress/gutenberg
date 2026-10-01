@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getUserLabel } from '../user';
 
 describe( 'user', () => {

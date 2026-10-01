@@ -16,6 +16,7 @@
 	font-size: $helptext-font-size;
 
 	svg {
+		// Keep `fill` as a fallback for custom variation icons that do not use `currentColor`.
 		fill: $gray-600;
 		color: $gray-600 !important;
 	}

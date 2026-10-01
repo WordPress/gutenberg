@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { addFilter, removeFilter } from '@wordpress/hooks';
 import { getBlockSettings } from '../get-block-settings';
 

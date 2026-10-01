@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { matchDashboardHref } from '../match-dashboard-href';
 
 const BASE = 'https://example.com/wp-admin/admin.php?page=dashboard&p=/';

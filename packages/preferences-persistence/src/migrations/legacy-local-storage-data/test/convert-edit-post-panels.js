@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import convertEditPostPanels from '../convert-edit-post-panels';
 
 describe( 'convertEditPostPanels', () => {

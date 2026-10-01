@@ -132,8 +132,10 @@ const getGlobalStylesOpenRevisionsCommands = () =>
 								transition: 'canvas-mode-edit-transition',
 							} );
 						}
-						openGeneralSidebar( 'edit-site/global-styles' );
+						// Select revisions before opening the sidebar, which
+						// resets its navigation as it opens.
 						setStylesPath( '/revisions' );
+						openGeneralSidebar( 'edit-site/global-styles' );
 					},
 				},
 			];

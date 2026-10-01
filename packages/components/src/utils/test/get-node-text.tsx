@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import getNodeText from '../get-node-text';
 
 describe( 'getNodeText', () => {

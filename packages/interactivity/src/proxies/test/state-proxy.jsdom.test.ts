@@ -1,10 +1,17 @@
 /* eslint-disable @eslint-community/eslint-comments/disable-enable-pair */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { effect } from '@preact/signals';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { proxifyState, peek } from '../';
 import { setScope, resetScope, getContext, getElement } from '../../scopes';
 import { setNamespace, resetNamespace } from '../../namespaces';
+
+const trackEffect = ( callback: () => unknown ) =>
+	effect( () => {
+		callback();
+	} );
 
 type State = {
 	a?: number;
@@ -12,16 +19,18 @@ type State = {
 	array: ( number | State[ 'nested' ] )[];
 };
 
-const withScopeAndNs = ( scope, ns, callback ) => () => {
-	setScope( scope );
-	setNamespace( ns );
-	try {
-		return callback();
-	} finally {
-		resetNamespace();
-		resetScope();
-	}
-};
+const withScopeAndNs =
+	< Result >( scope: any, ns: string, callback: () => Result ) =>
+	() => {
+		setScope( scope );
+		setNamespace( ns );
+		try {
+			return callback();
+		} finally {
+			resetNamespace();
+			resetScope();
+		}
+	};
 
 describe( 'Interactivity API', () => {
 	describe( 'state proxy', () => {
@@ -236,15 +245,19 @@ describe( 'Interactivity API', () => {
 			} );
 
 			it( 'should support getter modification', () => {
-				const state = proxifyState< {
+				type CounterState = {
 					counter: number;
 					double: number;
-				} >( 'test', {
-					counter: 1,
-					get double() {
-						return state.counter * 2;
-					},
-				} );
+				};
+				const state: CounterState = proxifyState< CounterState >(
+					'test',
+					{
+						counter: 1,
+						get double(): number {
+							return state.counter * 2;
+						},
+					}
+				);
 
 				const scope = {
 					context: { test: { counter: 2 } },
@@ -597,7 +610,9 @@ describe( 'Interactivity API', () => {
 						return state.counter * 2;
 					},
 				} );
-				effect( () => ( x = state.double ) );
+				effect( () => {
+					x = state.double;
+				} );
 				expect( x ).toBe( 2 );
 				state.counter = 2;
 				expect( x ).toBe( 4 );
@@ -613,28 +628,30 @@ describe( 'Interactivity API', () => {
 						return state.switch === 'a' ? state.a : state.b;
 					},
 				} );
-				effect( () => ( data = state.aOrB.data ) );
+				effect( () => {
+					data = state.aOrB.data;
+				} );
 				expect( data ).toBe( 'a' );
 				state.switch = 'b';
 				expect( data ).toBe( 'b' );
 			} );
 
 			it( 'should subscribe to changes', () => {
-				const spy1 = jest.fn( () => state.a );
-				const spy2 = jest.fn( () => state.nested );
-				const spy3 = jest.fn( () => state.nested.b );
-				const spy4 = jest.fn( () => state.array[ 0 ] );
-				const spy5 = jest.fn(
+				const spy1 = vi.fn( () => state.a );
+				const spy2 = vi.fn( () => state.nested );
+				const spy3 = vi.fn( () => state.nested.b );
+				const spy4 = vi.fn( () => state.array[ 0 ] );
+				const spy5 = vi.fn(
 					() =>
 						typeof state.array[ 1 ] === 'object' &&
 						state.array[ 1 ].b
 				);
 
-				effect( spy1 );
-				effect( spy2 );
-				effect( spy3 );
-				effect( spy4 );
-				effect( spy5 );
+				trackEffect( spy1 );
+				trackEffect( spy2 );
+				trackEffect( spy3 );
+				trackEffect( spy4 );
+				trackEffect( spy5 );
 
 				expect( spy1 ).toHaveBeenCalledTimes( 1 );
 				expect( spy2 ).toHaveBeenCalledTimes( 1 );
@@ -720,13 +737,13 @@ describe( 'Interactivity API', () => {
 			it( 'should subscribe to array length', () => {
 				const array = [ 1 ];
 				const state = proxifyState( 'test', { array } );
-				const spy1 = jest.fn( () => state.array.length );
-				const spy2 = jest.fn( () =>
+				const spy1 = vi.fn( () => state.array.length );
+				const spy2 = vi.fn( () =>
 					state.array.map( ( i: number ) => i )
 				);
 
-				effect( spy1 );
-				effect( spy2 );
+				trackEffect( spy1 );
+				trackEffect( spy2 );
 				expect( spy1 ).toHaveBeenCalledTimes( 1 );
 				expect( spy2 ).toHaveBeenCalledTimes( 1 );
 
@@ -792,15 +809,19 @@ describe( 'Interactivity API', () => {
 			} );
 
 			it( 'should keep subscribed to modified getters', () => {
-				const state = proxifyState< {
+				type CounterState = {
 					counter: number;
 					double: number;
-				} >( 'test', {
-					counter: 1,
-					get double() {
-						return state.counter * 2;
-					},
-				} );
+				};
+				const state: CounterState = proxifyState< CounterState >(
+					'test',
+					{
+						counter: 1,
+						get double(): number {
+							return state.counter * 2;
+						},
+					}
+				);
 
 				const scope = {
 					context: { test: { counter: 2 } },
@@ -963,7 +984,9 @@ describe( 'Interactivity API', () => {
 					get sumValueFromElement() {
 						const element = getElement();
 						return element
-							? this.number + element.attributes.value
+							? this.number +
+									( element.attributes as { value: number } )
+										.value
 							: this.number;
 					},
 				} );
@@ -1006,22 +1029,22 @@ describe( 'Interactivity API', () => {
 			} );
 
 			it( 'should not subscribe to changes when peeking', () => {
-				const spy1 = jest.fn( () => peek( state, 'a' ) );
-				const spy2 = jest.fn( () => peek( state, 'nested' ) );
-				const spy3 = jest.fn( () => peek( state, 'nested' ).b );
-				const spy4 = jest.fn( () => peek( state, 'array' )[ 0 ] );
-				const spy5 = jest.fn( () => {
+				const spy1 = vi.fn( () => peek( state, 'a' ) );
+				const spy2 = vi.fn( () => peek( state, 'nested' ) );
+				const spy3 = vi.fn( () => peek( state, 'nested' ).b );
+				const spy4 = vi.fn( () => peek( state, 'array' )[ 0 ] );
+				const spy5 = vi.fn( () => {
 					const nested = peek( state, 'array' )[ 1 ];
 					return typeof nested === 'object' && nested.b;
 				} );
-				const spy6 = jest.fn( () => peek( state, 'array' ).length );
+				const spy6 = vi.fn( () => peek( state, 'array' ).length );
 
-				effect( spy1 );
-				effect( spy2 );
-				effect( spy3 );
-				effect( spy4 );
-				effect( spy5 );
-				effect( spy6 );
+				trackEffect( spy1 );
+				trackEffect( spy2 );
+				trackEffect( spy3 );
+				trackEffect( spy4 );
+				trackEffect( spy5 );
+				trackEffect( spy6 );
 
 				expect( spy1 ).toHaveBeenCalledTimes( 1 );
 				expect( spy2 ).toHaveBeenCalledTimes( 1 );
@@ -1048,8 +1071,8 @@ describe( 'Interactivity API', () => {
 			} );
 
 			it( 'should subscribe to some changes but not other when peeking inside an object', () => {
-				const spy1 = jest.fn( () => peek( state.nested, 'b' ) );
-				effect( spy1 );
+				const spy1 = vi.fn( () => peek( state.nested, 'b' ) );
+				trackEffect( spy1 );
 				expect( spy1 ).toHaveBeenCalledTimes( 1 );
 				state.nested.b = 22;
 				expect( spy1 ).toHaveBeenCalledTimes( 1 );
@@ -1085,8 +1108,8 @@ describe( 'Interactivity API', () => {
 					peek( state, 'double' )
 				);
 
-				const spy = jest.fn( peekStateDouble );
-				effect( spy );
+				const spy = vi.fn( peekStateDouble );
+				trackEffect( spy );
 				expect( spy ).toHaveBeenCalledTimes( 1 );
 				expect( peekStateDouble() ).toBe( 2 );
 
@@ -1117,8 +1140,8 @@ describe( 'Interactivity API', () => {
 					() => peek( state1, 'double' )
 				);
 
-				const spy = jest.fn( peekStateDouble );
-				effect( spy );
+				const spy = vi.fn( peekStateDouble );
+				trackEffect( spy );
 				expect( spy ).toHaveBeenCalledTimes( 1 );
 				expect( peekStateDouble() ).toBe( 2 );
 
