@@ -1,8 +1,6 @@
 import { __experimentalUseSlotFills as useSlotFills } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import InspectorControlsGroups, {
-	PrivateInspectorControlsAllowedBlocks,
-} from '../inspector-controls/groups';
+import InspectorControlsGroups from '../inspector-controls/groups';
 import { InspectorAdvancedControls } from '../inspector-controls';
 import { TAB_LIST_VIEW, TAB_SETTINGS, TAB_STYLES, TAB_CONTENT } from './utils';
 import { store as blockEditorStore } from '../../store';
@@ -90,14 +88,9 @@ export default function useInspectorControlsTabs(
 	// (i.e. both list view and styles), check only the default
 	// InspectorControls slots. If we have multiple tabs, we'll need to check
 	// the advanced controls slot as well to ensure they are rendered.
-	//
-	// The allowed-blocks control renders inside the advanced panel via its own
-	// private slot, so its fills have to be counted here for a Settings tab
-	// that would otherwise be empty to appear.
 	const advancedFills = [
 		...( useSlotFills( InspectorAdvancedControls.slotName ) || [] ),
 		...( useSlotFills( bindingsGroup.name ) || [] ),
-		...( useSlotFills( PrivateInspectorControlsAllowedBlocks.name ) || [] ),
 		...( hasStylesTab ? [] : additionalStylesFills ),
 	];
 
