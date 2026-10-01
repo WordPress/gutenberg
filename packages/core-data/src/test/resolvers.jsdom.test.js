@@ -10,8 +10,8 @@ import {
 	getCurrentUser,
 } from '../resolvers';
 import { RECEIVE_INTERMEDIATE_RESULTS } from '../utils';
-vi.mock( '@wordpress/api-fetch' );
-vi.mock( '../entity-sync', () => ( {
+vi.mock( import( '@wordpress/api-fetch' ) );
+vi.mock( import( '../entity-sync' ), () => ( {
 	getEntitySyncManager: vi.fn(),
 } ) );
 

@@ -12,7 +12,7 @@ import {
 	__experimentalBatch,
 } from '../actions';
 import { getEntitySyncManager } from '../entity-sync';
-vi.mock( '@wordpress/api-fetch' );
+vi.mock( import( '@wordpress/api-fetch' ) );
 
 vi.mock( import( '../batch' ), async ( importOriginal ) => {
 	const { createBatch } = await importOriginal();
@@ -23,7 +23,7 @@ vi.mock( import( '../batch' ), async ( importOriginal ) => {
 	};
 } );
 
-vi.mock( '../entity-sync', () => ( {
+vi.mock( import( '../entity-sync' ), () => ( {
 	getEntitySyncManager: vi.fn(),
 } ) );
 
