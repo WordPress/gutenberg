@@ -1205,6 +1205,29 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Records the `_doing_it_wrong()` notices a method reports, so a test can
+	 * assert what the notice names.
+	 *
+	 * @param string $method The method whose notices to record.
+	 * @return array A list that fills with the reported messages.
+	 */
+	private function &record_notices( $method ) {
+		$reported = array();
+		add_action(
+			'doing_it_wrong_run',
+			static function ( $function_name, $message ) use ( &$reported, $method ) {
+				if ( $method === $function_name ) {
+					$reported[] = $message;
+				}
+			},
+			10,
+			2
+		);
+
+		return $reported;
+	}
+
+	/**
 	 * An invalid collection is reported and skipped; the valid ones are
 	 * registered.
 	 */
@@ -1357,6 +1380,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 */
 	public function test_registering_a_registered_field_is_refused() {
 		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::register' );
+		$reported   = &$this->record_notices( 'Gutenberg_Fields_Registry::register' );
 		$registered = $this->register_fields(
 			'postType',
 			'page',
@@ -1375,6 +1399,8 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertArrayNotHasKey( 'color', $fields, 'None of the fields of the call is registered.' );
 		$this->assertSame( 'Author', $fields['author']['label'], 'The registered field is left untouched.' );
 		$this->assertArrayNotHasKey( 'plugin/fields', gutenberg_get_registered_field_modules( 'postType', 'page' ) );
+		$this->assertStringContainsString( 'postType "page"', $reported[0], 'The notice names the entity.' );
+		$this->assertStringContainsString( 'already registered: author', $reported[0], 'The notice names the field that is already registered, not the others of the call.' );
 	}
 
 	/**
@@ -1382,10 +1408,13 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 */
 	public function test_registering_the_same_field_twice_is_refused() {
 		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::register' );
+		$reported   = &$this->record_notices( 'Gutenberg_Fields_Registry::register' );
 		$registered = $this->register_fields( 'postType', 'page', array( $this->field( 'color' ), $this->field( 'color' ) ) );
 
 		$this->assertFalse( $registered );
 		$this->assertNotContains( 'color', array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' ) );
+		$this->assertStringContainsString( 'postType "page"', $reported[0], 'The notice names the entity.' );
+		$this->assertStringContainsString( 'more than once in the same call: color', $reported[0], 'The notice names the duplicated field.' );
 	}
 
 	/**
@@ -1546,7 +1575,8 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 */
 	public function test_updating_an_unregistered_field_is_refused() {
 		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::update' );
-		$updated = true;
+		$reported = &$this->record_notices( 'Gutenberg_Fields_Registry::update' );
+		$updated  = true;
 		$this->on_fields_api_init(
 			static function ( $registry ) use ( &$updated ) {
 				$updated = $registry->update(
@@ -1574,6 +1604,8 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertSame( 'Author', $fields['author']['label'], 'None of the fields of the call is updated.' );
 		$this->assertSame( array(), $fields['author']['origin']['updatedBy'] );
 		$this->assertArrayNotHasKey( 'plugin/fields', gutenberg_get_registered_field_modules( 'postType', 'page' ) );
+		$this->assertStringContainsString( 'postType "page"', $reported[0], 'The notice names the entity.' );
+		$this->assertStringContainsString( 'not registered: color', $reported[0], 'The notice names only the field that is not registered.' );
 	}
 
 	/**
