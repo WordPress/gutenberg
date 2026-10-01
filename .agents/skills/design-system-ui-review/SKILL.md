@@ -13,7 +13,8 @@ description: Use when reviewing a Gutenberg, plugin, or application UI/UX change
    and focus, styling and tokens, integration, tests, and compatibility.
    Account for every changed file before deep research; finding one defect
    does not end this pass.
-3. Choose the narrowest review path:
+3. For each new component use or changed composition, read its target-version Storybook usage guidelines, or package documentation when those guidelines are unavailable. Check the UI's purpose against the component's intended and prohibited uses separately from prop support and accessibility mechanics. An accessible name or description does not resolve a documented misuse.
+4. Choose the narrowest review path:
    - **Lightweight:** copy-only or supported-prop changes with no interaction,
      styling, or setup change.
    - **Standard:** component, custom UI, styling, or interaction changes.
