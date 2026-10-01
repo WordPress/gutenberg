@@ -124,6 +124,11 @@ export interface EntitySyncUndoHistory {
 	 * new one. core-data calls it when it records an edit itself, so a later
 	 * synced change cannot merge into a level that is no longer the most
 	 * recent one.
+	 *
+	 * Some managers wait a tick before they apply a local change. Managers
+	 * must apply every waiting change when this is called. core-data calls
+	 * this right before an undo or redo to ensure its history will also
+	 * include deferred changes in the operation.
 	 */
 	stopCapturing: () => void;
 
