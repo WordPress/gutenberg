@@ -42,6 +42,10 @@
 			"types": "./build-types/post_type_supports/index.d.ts",
 			"import": "./build-module/post_type_supports/index.mjs"
 		},
+		"./root_site": {
+			"types": "./build-types/root_site/index.d.ts",
+			"import": "./build-module/root_site/index.mjs"
+		},
 		"./wp_block": {
 			"types": "./build-types/wp_block/index.d.ts",
 			"import": "./build-module/wp_block/index.mjs"
@@ -60,6 +64,7 @@
 		"./attachment": "./build-module/attachment/index.mjs",
 		"./page": "./build-module/page/index.mjs",
 		"./post_type_supports": "./build-module/post_type_supports/index.mjs",
+		"./root_site": "./build-module/root_site/index.mjs",
 		"./wp_block": "./build-module/wp_block/index.mjs",
 		"./wp_template": "./build-module/wp_template/index.mjs",
 		"./wp_template_part": "./build-module/wp_template_part/index.mjs"

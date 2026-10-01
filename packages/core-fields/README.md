@@ -14,6 +14,7 @@ The fields of this package live in folders of `src`:
 - `wp_template_part`: the fields template parts have instead of the defaults (`author`, the theme, plugin, site, or user providing the template part, and `title`).
 - `wp_block`: the fields patterns have instead of the defaults (`excerpt`, their description, `sync-status`, and `title`).
 - `attachment`: the fields of the media editor ported to the server so far (`alt_text`, `attached_to`, `author`, `caption`, `date`, `description`, `filename`, `filesize`, `media_dimensions`, `mime_type`, `title`), instead of all the defaults.
+- `root_site`: the fields of the site, the `site` entity of the `root` kind, shown in the identity screen of the site editor (`description`, its tagline, `site_icon`, `site_logo`, and `title`). The site is not a post type, so it gets no defaults.
 
 Each field has a folder:
 
@@ -136,7 +137,7 @@ _This package assumes that your code will run in an ES2015+ environment. If you'
 
 ## Usage
 
-The package provides the `@wordpress/core-fields/attachment`, `@wordpress/core-fields/page`, `@wordpress/core-fields/post_type_supports`, `@wordpress/core-fields/wp_template`, `@wordpress/core-fields/wp_template_part`, and `@wordpress/core-fields/wp_block` script modules. Their default export follows the `FieldsScriptParts` shape documented in `@wordpress/fields-loader`, the same one a plugin's own field module follows.
+The package provides the `@wordpress/core-fields/attachment`, `@wordpress/core-fields/page`, `@wordpress/core-fields/post_type_supports`, `@wordpress/core-fields/wp_template`, `@wordpress/core-fields/wp_template_part`, `@wordpress/core-fields/wp_block`, and `@wordpress/core-fields/root_site` script modules. Their default export follows the `FieldsScriptParts` shape documented in `@wordpress/fields-loader`, the same one a plugin's own field module follows.
 
 ## Contributing to this package
 

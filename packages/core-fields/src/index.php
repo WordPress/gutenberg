@@ -10,9 +10,9 @@
  * not get on the `fields_api_post_type_supports_exclusions` filter, as a
  * plugin would, see exclude_core_post_type_support_fields().
  *
- * The fields of a single post type are declarative collections, the other
- * folders next to this file, see wp_register_field_collection() for their
- * format.
+ * The fields of a single entity, a post type or the site, are declarative
+ * collections, the other folders next to this file, see
+ * wp_register_field_collection() for their format.
  *
  * @package WordPress
  */
@@ -200,7 +200,7 @@ add_filter( 'fields_api_post_type_supports_exclusions', 'exclude_core_post_type_
 
 /**
  * Registers the fields of WordPress core: the defaults first, then the
- * collections of single post types.
+ * collections of single post types, then the collection of the site.
  *
  * Hooked at priority 0, so a plugin hooking `fields_api_init` at the
  * default priority sees the core fields registered, and can update or
@@ -217,5 +217,6 @@ function register_core_field_collections( $registry ) {
 	wp_register_field_collection( $registry, __DIR__ . '/wp_template_part' );
 	wp_register_field_collection( $registry, __DIR__ . '/wp_block' );
 	wp_register_field_collection( $registry, __DIR__ . '/attachment' );
+	wp_register_field_collection( $registry, __DIR__ . '/root_site' );
 }
 add_action( 'fields_api_init', 'register_core_field_collections', 0 );
