@@ -1608,14 +1608,10 @@ test.describe( 'Block Notes', () => {
 				} );
 
 			await blockThread.click();
-			await expect
-				.poll( getSelectedContent )
-				.toContain( 'charlie' );
+			await expect.poll( getSelectedContent ).toContain( 'charlie' );
 
 			await alphaThread.click();
-			await expect
-				.poll( getSelectedContent )
-				.toContain( 'charlie' );
+			await expect.poll( getSelectedContent ).toContain( 'charlie' );
 		} );
 
 		test( 'removes the inline marker when the note is deleted', async ( {

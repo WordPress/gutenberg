@@ -21,7 +21,7 @@ import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { NoteHighlightStyles } from './note-highlight-styles';
 import { useGlobalStyles } from '../global-styles';
 import { useEnableFloatingSidebar, useNoteThreads } from './hooks';
-import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
+import { pickPrimaryNote } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
@@ -35,22 +35,18 @@ function NotesSidebar( { postId } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const sidebarRef = useRef( null );
 
-	const { clientId, noteId, isClassicBlock } = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientId, getBlockName } =
+	const { clientId, isClassicBlock } = useSelect( ( select ) => {
+		const { getSelectedBlockClientId, getBlockName } =
 			select( blockEditorStore );
 		const _clientId = getSelectedBlockClientId();
 		return {
 			clientId: _clientId,
-			noteId: _clientId
-				? getBlockAttributes( _clientId )?.metadata?.noteId
-				: null,
 			isClassicBlock: _clientId
 				? getBlockName( _clientId ) === 'core/freeform'
 				: false,
 		};
 	}, [] );
 
-	const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
 	const { isDistractionFree, areNotesHidden } = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		return {
@@ -148,10 +144,9 @@ function NotesSidebar( { postId } ) {
 	const backgroundColor = GlobalStyles?.styles?.color?.background;
 
 	// Surface one thread for the avatar indicator.
-	const currentThreads =
-		blockNoteIds.length > 0
-			? notes.filter( ( thread ) => blockNoteIds.includes( thread.id ) )
-			: [];
+	const currentThreads = clientId
+		? notes.filter( ( thread ) => thread.blockClientId === clientId )
+		: [];
 	const currentThread = pickPrimaryNote( currentThreads );
 
 	if ( isDistractionFree ) {

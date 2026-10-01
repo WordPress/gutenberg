@@ -72,16 +72,30 @@ export function useNoteThreads( postId ) {
 		 * Single pass over clientIds builds the forward map and reverse lookup
 		 * together. getNoteIdsFromMetadata returns numeric ids, matching the
 		 * types returned by the comments REST endpoint.
+		 *
+		 * Splitting or duplicating a block copies `metadata.noteId`, so an id
+		 * can appear on several blocks. It belongs to the block holding its
+		 * inline marker, otherwise to the first block in document order.
 		 */
 		const blocksWithNotes = {};
 		const clientIdByNoteId = new Map();
 		for ( const clientId of clientIds ) {
-			const metadata = getBlockAttributes( clientId )?.metadata;
-			const noteIds = getNoteIdsFromMetadata( metadata );
+			const attributes = getBlockAttributes( clientId );
+			const noteIds = getNoteIdsFromMetadata( attributes?.metadata );
 			if ( noteIds.length > 0 ) {
 				blocksWithNotes[ clientId ] = noteIds;
 				for ( const noteId of noteIds ) {
-					clientIdByNoteId.set( noteId, clientId );
+					const owner = clientIdByNoteId.get( noteId );
+					if (
+						! owner ||
+						( ! findNoteInBlock(
+							getBlockAttributes( owner ),
+							noteId
+						) &&
+							findNoteInBlock( attributes, noteId ) )
+					) {
+						clientIdByNoteId.set( noteId, clientId );
+					}
 				}
 			}
 		}
@@ -130,7 +144,7 @@ export function useNoteThreads( postId ) {
 			const orderedThreads = noteIds
 				.map( ( noteId ) => {
 					const thread = threadsById.get( noteId );
-					if ( ! thread ) {
+					if ( ! thread || thread.blockClientId !== clientId ) {
 						return null;
 					}
 					return {
