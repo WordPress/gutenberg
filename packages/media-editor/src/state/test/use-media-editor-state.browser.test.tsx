@@ -25,7 +25,9 @@ function CropperWithHistory( {
 }: {
 	onController: ( controller: MediaEditorSession ) => void;
 } ) {
-	const controller = useMediaEditorState( { cropper: { image: IMAGE } } );
+	const controller = useMediaEditorState();
+	const { setSourceImage } = controller;
+	useEffect( () => setSourceImage( IMAGE ), [ setSourceImage ] );
 	useEffect( () => onController( controller ), [ controller, onController ] );
 	return (
 		<div style={ { width: 648, height: 448 } }>
