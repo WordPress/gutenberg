@@ -6,6 +6,7 @@
  *
  * @covers ::_gutenberg_get_post_type_fields_preload_paths
  * @covers ::_gutenberg_get_site_editor_screen_post_types
+ * @covers ::_gutenberg_get_site_fields_preload_paths
  * @covers ::_gutenberg_preload_entity_fields
  * @covers ::_gutenberg_get_route_post_types
  * @covers ::_gutenberg_preload_route_entity_fields
@@ -118,6 +119,37 @@ class Tests_Preload_Entity_Fields extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The site editor preloads the fields of the site on its identity screen,
+	 * with the path the `getFieldsConfig` core data resolver requests.
+	 */
+	public function test_the_site_editor_preloads_the_fields_of_the_site_on_the_identity_screen() {
+		$_GET['p'] = '/identity';
+		$context   = new WP_Block_Editor_Context( array( 'name' => 'core/edit-site' ) );
+
+		$paths = _gutenberg_preload_entity_fields( array(), $context );
+
+		$this->assertSame( array( '/wp/v2/fields?kind=root&name=site' ), $paths );
+	}
+
+	/**
+	 * The post editor has no identity screen, whatever its `p` query arg.
+	 */
+	public function test_the_post_editor_does_not_preload_the_fields_of_the_site() {
+		$_GET['p'] = '/identity';
+		$post      = self::factory()->post->create_and_get( array( 'post_type' => 'page' ) );
+		$context   = new WP_Block_Editor_Context(
+			array(
+				'name' => 'core/edit-post',
+				'post' => $post,
+			)
+		);
+
+		$paths = _gutenberg_preload_entity_fields( array(), $context );
+
+		$this->assertSame( array( '/wp/v2/fields?kind=postType&name=page' ), $paths );
+	}
+
+	/**
 	 * The site editor preloads the fields of the edited post, once, next to
 	 * those of its screen.
 	 */
@@ -211,6 +243,34 @@ class Tests_Preload_Entity_Fields extends WP_UnitTestCase {
 		// slashes are escaped.
 		$this->assertStringContainsString( 'fields?kind=postType&name=page', $script );
 		$this->assertStringContainsString( '"body"', $script );
+	}
+
+	/**
+	 * The identity route preloads the fields of the site, which only the
+	 * users who manage the options can read.
+	 */
+	public function test_the_identity_route_prints_the_preloaded_fields_of_the_site() {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$_GET['p'] = '/identity';
+
+		_gutenberg_preload_route_entity_fields();
+		$script = $this->get_preloaded_inline_script();
+
+		$this->assertStringContainsString( 'fields?kind=root&name=site', $script );
+		$this->assertStringContainsString( 'site_logo', $script );
+	}
+
+	/**
+	 * The identity route leaves the request to the client for a user who
+	 * cannot read the fields of the site, rather than preloading the error.
+	 */
+	public function test_the_identity_route_preloads_nothing_for_a_user_who_cannot_read_the_site_fields() {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'editor' ) ) );
+		$_GET['p'] = '/identity';
+
+		_gutenberg_preload_route_entity_fields();
+
+		$this->assertSame( '', $this->get_preloaded_inline_script() );
 	}
 
 	/**
