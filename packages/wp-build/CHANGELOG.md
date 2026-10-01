@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Require Node.js `^20.19.0` or `>=22.13.0`, the versions that can `require()` ESM-only packages ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
+
 ### Bug Fixes
 
 -   Add the `@babel/core` dependency, a peer of `esbuild-plugin-babel` ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
