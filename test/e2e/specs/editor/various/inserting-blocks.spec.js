@@ -1008,7 +1008,7 @@ test.describe( 'Attached images media category', () => {
 		requestUtils,
 	} ) => {
 		const post = await requestUtils.createPost( {
-			title: 'Attached images test',
+			title: 'Media attachment test',
 			status: 'draft',
 		} );
 		const media = await requestUtils.uploadMedia(
@@ -1027,7 +1027,10 @@ test.describe( 'Attached images media category', () => {
 		await page.getByLabel( 'Block Inserter' ).click();
 		await page.getByRole( 'tab', { name: 'Media' } ).click();
 		// Each media source is a collapsible panel; open the attached images one.
-		await page.getByRole( 'button', { name: 'Attached images' } ).click();
+		await page
+			.getByRole( 'tabpanel', { name: 'Media' } )
+			.getByRole( 'button', { name: 'Attached images', exact: true } )
+			.click();
 
 		const mediaPanel = page.locator(
 			'.block-editor-inserter__media-panel'
