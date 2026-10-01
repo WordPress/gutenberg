@@ -26,7 +26,7 @@ collab-sidebar/
 │
 ├── hooks.js                        useNoteThreads, useNoteActions, useNoteSelection, useFloatingBoard, useEnableFloatingSidebar
 ├── utils.js                        focusNoteThread, getNoteExcerpt, sanitizeNoteContent, calculateNotePositions, getAvatarBorderColor
-├── board-store.js                  createBoardStore - ResizeObserver + ref registry for floating layout
+├── board-store.js                  createBoardStore - DOM measurement for the floating layout
 ├── constants.js                    sidebar identifier strings
 ├── style.scss
 └── test/
@@ -62,49 +62,54 @@ Goal: in the floating sidebar, each unresolved note appears beside its associate
 
 Three layers cooperate:
 
-### 1. `board-store.js` - imperative DOM registry
+### 1. `board-store.js` - DOM measurement
 
-A plain JS module returning a store created via `createBoardStore()` (one per mounted `Notes`). Holds:
+A plain JS store created via `createBoardStore()` (one per mounted `Notes`). It is the only place that reads layout from the DOM. It holds:
 
 - `blockRefs: Map<noteId, HTMLElement>` - each note's associated block element.
 - `floatingRefs: Map<noteId, HTMLElement>` - each note's floating DOM node.
 - `idByElement: WeakMap<HTMLElement, noteId>` - reverse lookup for the `ResizeObserver`.
-- `heights: { [noteId]: number }` - observed heights of floating elements.
-- `snapshot: { ... }` - frozen shallow copy of `heights` (for `useSyncExternalStore`).
+- `rootEl` / `canvas` / `frameEl` - the block-list root (`.is-root-container`, found from the first registered block), its scroll container, and the canvas `iframe`. When the root changes, the observers are rebuilt.
+- `snapshot: { heights, anchorRects, canvas, frameOffset }` - plain data for `useSyncExternalStore`. `anchorRects[id].top` is in canvas content-space (viewport top + `scrollTop`), so scrolling alone never changes it. `frameOffset` is the canvas frame's top minus the top of the threads' container (their `offsetParent`): anchors are read in the frame's viewport, threads are positioned in the container, and anything above the canvas (e.g. an editor notice or the device preview inset) separates the two.
 
-A single shared `ResizeObserver` watches every registered floating element; when a floating note changes height, it updates `heights`, snapshots, and calls every `listener` in the store's `Set`.
+One `ResizeObserver` watches:
 
-Anchors are read from the DOM, so a thread's position also goes stale whenever content moves under it. That is watched one layer up, in `useFloatingBoard`, not here.
+- each floating element, for thread heights;
+- the root, so editing, adding or removing a block re-anchors the threads below it;
+- the root's parent, which grows when content above the root (e.g. a wrapping post title) moves the root without resizing it;
+- the canvas frame, which shrinks when content above the canvas moves it. A frame that moves without resizing isn't detected.
+
+Each callback runs `measure()`, which reads the heights and anchors (via `getNoteAnchorRect()` in `utils.js`) and emits only when a value changed.
+
+A `MutationObserver` watches `style` attributes under the root. The block move animation offsets moved blocks with a transform, which resizes nothing, so the first pass reads their old positions. The observer calls `requestMeasure()` once a changed element has no transform, so threads move when the animation ends rather than on every frame.
 
 API:
-- `subscribe(listener)` / `getSnapshot()` - wired to React via `useSyncExternalStore`. Disconnects the observer when the last subscriber leaves.
-- `registerThread(id, blockEl, floatingEl)` - called by each `NoteThread` once mounted. Adds the block ref, swaps the floating ref (unobserving the previous one), starts observing the new one, emits.
+- `subscribe(listener)` / `getSnapshot()` - wired to React via `useSyncExternalStore`. The observers only exist while there are subscribers: the first subscriber creates them and observes everything already registered, the last one disconnects them.
+- `registerThread(id, blockEl, floatingEl)` - called by each `NoteThread` once mounted. Updates the refs, swaps the observed floating element, and requests a measurement.
 - `unregisterThread(id)` - inverse; called on unmount.
-- `getAnchorRects()` - returns a batched snapshot of each thread's *anchor* rect, so a thread lines up with the text it annotates rather than with the top of its block. The anchor is resolved per thread at read time, because rich-text re-renders replace the marker element:
-  - an inline note anchors to its in-content `mark.wp-note[data-id]` marker (its first run when the marker is split across several runs);
-  - the pending `new` note has no marker yet, so it anchors to the text selection it is about to wrap;
-  - a block-level note - or any note whose marker or selection can't be measured - falls back to the block's own `getBoundingClientRect()`.
+- `requestMeasure()` - asks for a new pass when anchors may move without anything resizing or re-registering (e.g. blocks reordered).
 
-  Batches reads so subsequent CSS writes don't trigger layout thrash.
-- `getFirstBlockElement()` - the first registered block, used to locate the canvas scroll container.
+Registering never measures directly. `requestMeasure()` re-observes the root; a new observation always reports once, so the observer runs another pass before the next paint, together with any other resizes in that frame.
 
-The store owns DOM references directly, not through React - floating note height changes must update layout without re-rendering the thread list.
+`getNoteAnchorRect(noteId, blockEl)` resolves the anchor at read time, because rich-text re-renders replace the marker element:
+- an inline note anchors to its in-content `mark.wp-note[data-id]` marker (its first run when the marker is split across several runs);
+- the pending `new` note has no marker yet, so it anchors to the text selection it is about to wrap;
+- a block-level note - or any note whose marker or selection can't be measured - falls back to the block's own `getBoundingClientRect()`;
+- an anchor inside collapsed content (e.g. a closed Details) fails `checkVisibility()`, so it climbs to the closest visible block. Collapsed content still reports the box it would have when expanded, so its size can't tell it apart.
 
 ### 2. `useFloatingBoard` - the React bridge (in `hooks.js`)
 
 Lives inside `Notes`. Holds one store instance (`useState(createBoardStore)`) and:
 
-1. Subscribes to `heights` via `useSyncExternalStore(store.subscribe, store.getSnapshot)`.
-2. In a `useEffect` keyed on `threads + heights + selectedNoteId + isFloating + sidebarRef`:
-   - Resolves the canvas scroll container by climbing from the first registered block to `.is-root-container` and calling `getScrollContainer()` on it.
-   - Schedules a single `requestAnimationFrame` that calls `calculateNotePositions({ threads, selectedNoteId, blockRects: store.getAnchorRects(), heights, scrollTop })` (pure function in `utils.js`) and stores the result in React state (`notePositions`).
-   - Observes `.is-root-container` with a `ResizeObserver` that reschedules that same frame, so editing, adding or removing any block re-anchors the threads after it. One observation covers the whole canvas, and it only exists while the board is floating.
-   - Attaches a capture-phase `scroll` listener on the canvas's `defaultView` that writes a CSS variable `--canvas-scroll` to the sidebar panel. (`window` capture catches scrolls on the document root, which don't bubble.)
-3. Returns `{ notePositions, registerThread, unregisterThread }` - the positions flow down as props; the two register callbacks flow to each `NoteThread`.
+1. Subscribes via `useSyncExternalStore` only while floating; otherwise it passes a no-op subscribe, so the store drops its observer.
+2. Requests a measurement whenever `threads` changes. `threads` is rebuilt on any block insert, removal or move, which can shift anchors without resizing the root.
+3. Derives `notePositions` during render with `useMemo( () => calculateNotePositions(...) )` from `threads`, `selectedNoteId` and the snapshot. There is no state, timer or rAF: React re-renders synchronously on a store change, so a resize reaches the screen in the same paint.
+4. In a layout effect keyed on `isFloating + sidebarRef + canvas`, attaches a capture-phase `scroll` listener on the canvas's `defaultView` that writes `--canvas-scroll` on the sidebar panel. (`window` capture catches scrolls on the document root, which don't bubble.) A second layout effect writes the snapshot's `frameOffset` as `--canvas-offset`.
+5. Returns `{ notePositions, registerThread, unregisterThread }` - the positions flow down as props; the two register callbacks flow to each `NoteThread`.
 
 ### 3. `calculateNotePositions` - pure layout math (in `utils.js`)
 
-Given the list of threads, the currently selected note id, the block rects, the floating heights, and the canvas scroll offset, returns `{ positions: { [noteId]: top } }` where `top` is the final canvas-space y-coordinate for each floating thread.
+Given the list of threads, the currently selected note id, the anchor rects, and the floating heights, returns `{ positions: { [noteId]: top } }` where `top` is the final canvas-space y-coordinate for each floating thread.
 
 Algorithm, keyed on the selected note as an **anchor**:
 
@@ -116,11 +121,14 @@ Algorithm, keyed on the selected note as an **anchor**:
 
 ### 4. `FloatingContainer` - the render shell
 
-Renders a `Stack` with `top: floating.y` when in floating mode. CSS uses the `--canvas-scroll` custom property to translate the whole panel in sync with the canvas, so per-thread `top` values stay stable while scrolling.
+Renders a `Stack` with `top: floating.y` when in floating mode. CSS translates each thread by `--canvas-offset` plus `--canvas-scroll`, so it tracks the canvas frame and its scroll, so per-thread `top` values stay stable while scrolling. A `top` transition eases reflows (e.g. on selection change) unless the user prefers reduced motion; a thread's first positioning starts from `top: auto` and doesn't animate.
 
 ### Why this shape
 
-- `ResizeObserver` is canonical for height changes that must drive layout without polling.
-- `useSyncExternalStore` is the right React 18 primitive for "external mutable source with snapshot" - gives concurrent-mode-safe subscriptions without a provider.
-- The scroll listener updates a CSS variable rather than React state, so scrolling doesn't re-render. Per-note `top` only recomputes when threads, heights, selection, or structural inputs change.
-- Batching `getBoundingClientRect` reads inside the `rAF` and separating them from style writes avoids forced layout.
+Each layer has one job, so a new anchor type or layout rule touches only one of them:
+
+- DOM reads happen only in `measure()`, inside the `ResizeObserver` callback. It runs after layout and before paint, so reads are cheap, the result is painted in the same frame, and the browser's resize-loop detection covers any feedback between positions and sizes. Don't add rAFs or timers around it.
+- The snapshot is plain data compared by value, so unrelated resizes don't re-render `Notes`.
+- Observer lifetime follows subscriptions, so remounts (and StrictMode's double effects) rebuild it from the registered refs.
+- `calculateNotePositions` is pure and derived during render; anything computable from props, state and the snapshot should stay out of React state.
+- The scroll listener updates a CSS variable rather than React state, so scrolling doesn't re-render.
