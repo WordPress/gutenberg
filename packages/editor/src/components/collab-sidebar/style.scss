@@ -1,3 +1,4 @@
+@use "@wordpress/base-styles/animations" as *;
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
@@ -30,6 +31,8 @@
 // Pointer events pass through to the canvas, except on threads.
 .editor-collab-sidebar-overlay {
 	height: 100%;
+	// Fades in while "All notes" closes, so notes don't show twice.
+	@include animation__fade-in(var(--wpds-motion-duration-lg), 0s, var(--wpds-motion-easing-balanced));
 
 	&.is-minimized {
 		@include minimized-threads;
