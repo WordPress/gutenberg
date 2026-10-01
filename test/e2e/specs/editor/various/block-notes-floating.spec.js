@@ -875,6 +875,56 @@ test.describe( 'Block Notes: floating notes', () => {
 			expect( hitsCover ).toBe( false );
 		} );
 
+		test( 'keeps viewport-width blocks out of the floating notes margin', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/cover',
+				attributes: {
+					align: 'full',
+					customOverlayColor: '#111111',
+					// Unlike percentage widths, viewport units include the margin.
+					style: { css: 'width: 100vw; max-width: none;' },
+				},
+				comment: 'Viewport-width cover note',
+			} );
+
+			await expect( getFloatingNotes( page ) ).toBeVisible();
+			await expect.poll( () => getReservedWidth( editor ) ).toBe( 280 );
+
+			const cover = editor.canvas.getByRole( 'document', {
+				name: 'Block: Cover',
+			} );
+			const viewportWidth = await cover.evaluate(
+				( element ) => element.ownerDocument.defaultView.innerWidth
+			);
+			await expect( cover ).toHaveCSS( 'width', `${ viewportWidth }px` );
+			await cover.scrollIntoViewIfNeeded();
+
+			const hits = await cover.evaluate( ( element ) => {
+				const doc = element.ownerDocument;
+				const rect = element.getBoundingClientRect();
+				const y = rect.top + rect.height / 2;
+				return {
+					content: element.contains(
+						doc.elementFromPoint( rect.left + 100, y )
+					),
+					// Hit-test inside the iframe so the notes overlay cannot
+					// mask content painting underneath it.
+					margin: element.contains(
+						doc.elementFromPoint(
+							doc.documentElement.clientWidth - 100,
+							y
+						)
+					),
+				};
+			} );
+			expect( hits.content ).toBe( true );
+			expect( hits.margin ).toBe( false );
+		} );
+
 		test( 'minimizes the notes when the canvas is narrow', async ( {
 			editor,
 			page,
