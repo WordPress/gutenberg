@@ -83,6 +83,62 @@ test.describe( 'Copy/cut/paste', () => {
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	test( 'should notify when a whole block is pasted', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/spacer' } );
+		// At this point the spacer wrapper should be focused.
+		await pageUtils.pressKeys( 'primary+c' );
+
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/spacer' },
+				{ name: 'core/spacer' },
+			] );
+		await expect(
+			page
+				.locator( '.components-snackbar__content' )
+				.filter( { hasText: 'Pasted "Spacer".' } )
+		).toBeVisible();
+	} );
+
+	test( 'should not notify on inline paste', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'Inline paste' );
+
+		// A partial text selection is left to rich text, which pastes inline.
+		// Copying one produces no notice either, so neither should pasting it.
+		await pageUtils.pressKeys( 'shift+ArrowLeft' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft' );
+		await pageUtils.pressKeys( 'primary+c' );
+		await page.keyboard.press( 'ArrowRight' );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Inline pastete' },
+			},
+		] );
+		await expect(
+			page
+				.locator( '.components-snackbar__content' )
+				.filter( { hasText: 'Pasted' } )
+		).toHaveCount( 0 );
+	} );
+
 	test( 'should respect inline copy when text is selected', async ( {
 		editor,
 		page,
