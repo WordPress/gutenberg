@@ -7,8 +7,40 @@ import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
 import useBlockLock from '../block-lock/use-block-lock';
 
-export default function LockMenuContent( { clientId } ) {
-	const { isMoveLocked, isRemoveLocked, canLock } = useBlockLock( clientId );
+type LockAttribute = {
+	move?: boolean;
+	remove?: boolean;
+	edit?: boolean;
+};
+
+type BlockLockStatus = {
+	isMoveLocked: boolean;
+	isRemoveLocked: boolean;
+	canLock: boolean;
+};
+
+type LockableBlockAttributes = {
+	lock?: LockAttribute;
+	templateLock?: string;
+	metadata?: { patternName?: string } & Record< string, unknown >;
+};
+
+type LockMenuContentProps = {
+	/**
+	 * Client ID of the block whose lock settings the menu edits.
+	 */
+	clientId: string;
+};
+
+/**
+ * Renders the checkbox items of the List View lock menu: lock movement,
+ * prevent deletion and, where the block supports it, lock the inner layout.
+ */
+export default function LockMenuContent( { clientId }: LockMenuContentProps ) {
+	// The lock hook is untyped JavaScript, so narrow its result here.
+	const { isMoveLocked, isRemoveLocked, canLock } = useBlockLock(
+		clientId
+	) as BlockLockStatus;
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const { blockAttributes, hasLayoutLock, isPatternSection } = useSelect(
 		( select ) => {
@@ -16,7 +48,8 @@ export default function LockMenuContent( { clientId } ) {
 			const { getBlockName, getBlockAttributes } = blockEditorSelect;
 			const { isSectionBlock } = unlock( blockEditorSelect );
 			const blockType = getBlockType( getBlockName( clientId ) );
-			const attributes = getBlockAttributes( clientId );
+			const attributes = getBlockAttributes( clientId ) as
+				LockableBlockAttributes | undefined;
 			const _isPatternSection =
 				!! attributes?.metadata?.patternName &&
 				isSectionBlock( clientId );
@@ -37,14 +70,14 @@ export default function LockMenuContent( { clientId } ) {
 		return null;
 	}
 
-	const applyLock = ( partial ) => {
+	const applyLock = ( partial: LockAttribute ) => {
 		updateBlockAttributes( [ clientId ], {
 			lock: { ...( blockAttributes?.lock ?? {} ), ...partial },
 		} );
 	};
 
-	const toggleInnerBlocksLock = ( checked ) => {
-		const nextAttributes = {
+	const toggleInnerBlocksLock = ( checked: boolean ) => {
+		const nextAttributes: Record< string, unknown > = {
 			templateLock: checked ? 'contentOnly' : undefined,
 		};
 
