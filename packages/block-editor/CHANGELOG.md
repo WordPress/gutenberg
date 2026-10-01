@@ -7,7 +7,7 @@
 -   Inserter: Open faster when many block types are registered ([#83446](https://github.com/WordPress/gutenberg/pull/83446)).
 -   State control badges: migrate from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Badge` ([#82608](https://github.com/WordPress/gutenberg/pull/82608)).
 -   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
--   Inserter: Redesign the Media tab as a single column of collapsible panels, one per media source, with the first open, in place of the category list and flyout panel. Each source renders as a DataViews grid with search, per-item actions and a pager labelled with the page's date span ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+-   Inserter: Redesign the Media tab as a single column of collapsible panels, one per media source, with the first open, in place of the category list and flyout panel. Each source renders as a DataViews grid with search, per-item actions and a pager labelled with the range of items shown ([#82749](https://github.com/WordPress/gutenberg/pull/82749)).
 
 ### Bug Fixes
 
