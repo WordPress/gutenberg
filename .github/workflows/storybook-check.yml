@@ -1,4 +1,4 @@
-name: Storybook build and Smoke Tests
+name: Storybook Build and Smoke Tests
 
 on:
     pull_request:
