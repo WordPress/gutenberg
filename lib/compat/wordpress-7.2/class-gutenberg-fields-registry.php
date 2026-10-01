@@ -102,18 +102,49 @@ final class Gutenberg_Fields_Registry {
 	 *                                   the JavaScript parts of the fields, if any.
 	 * @return bool Whether the fields were registered. False when called
 	 *              outside the `fields_api_init` action, when an argument
-	 *              is invalid, or when a field is already registered.
+	 *              is invalid, or when a field is already registered or
+	 *              appears more than once in the call.
 	 */
 	public function register( $origin, $kind, $name, $fields, $script_module = null ) {
 		if ( ! $this->validate_arguments( __METHOD__, $origin, $kind, $name, $fields, $script_module ) ) {
 			return false;
 		}
 
-		$ids = array_column( $fields, 'id' );
-		if ( count( array_unique( $ids ) ) !== count( $ids ) || array_intersect_key( array_flip( $ids ), $this->fields[ $kind ][ $name ] ?? array() ) ) {
+		$ids        = array_column( $fields, 'id' );
+		$duplicated = array_keys(
+			array_filter(
+				array_count_values( $ids ),
+				static function ( $count ) {
+					return $count > 1;
+				}
+			)
+		);
+		if ( $duplicated ) {
 			_doing_it_wrong(
 				__METHOD__,
-				__( 'A field can only be registered once. Use update() to change a registered field, or unregister it first to replace it.', 'gutenberg' ),
+				sprintf(
+					/* translators: 1: Entity kind, e.g. postType. 2: Entity name, e.g. page. 3: Comma-separated list of field ids. */
+					__( 'A field can only be registered once. These fields of %1$s "%2$s" appear more than once in the same call: %3$s.', 'gutenberg' ),
+					$kind,
+					$name,
+					implode( ', ', $duplicated )
+				),
+				'7.2.0'
+			);
+			return false;
+		}
+
+		$registered_ids = array_keys( array_intersect_key( array_flip( $ids ), $this->fields[ $kind ][ $name ] ?? array() ) );
+		if ( $registered_ids ) {
+			_doing_it_wrong(
+				__METHOD__,
+				sprintf(
+					/* translators: 1: Entity kind, e.g. postType. 2: Entity name, e.g. page. 3: Comma-separated list of field ids. */
+					__( 'A field can only be registered once. These fields of %1$s "%2$s" are already registered: %3$s. Use update() to change a registered field, or unregister it first to replace it.', 'gutenberg' ),
+					$kind,
+					$name,
+					implode( ', ', $registered_ids )
+				),
 				'7.2.0'
 			);
 			return false;
@@ -167,11 +198,18 @@ final class Gutenberg_Fields_Registry {
 			return false;
 		}
 
-		$ids = array_column( $fields, 'id' );
-		if ( array_diff_key( array_flip( $ids ), $this->fields[ $kind ][ $name ] ?? array() ) ) {
+		$ids              = array_column( $fields, 'id' );
+		$unregistered_ids = array_keys( array_diff_key( array_flip( $ids ), $this->fields[ $kind ][ $name ] ?? array() ) );
+		if ( $unregistered_ids ) {
 			_doing_it_wrong(
 				__METHOD__,
-				__( 'Only registered fields can be updated. Use register() to add a field.', 'gutenberg' ),
+				sprintf(
+					/* translators: 1: Entity kind, e.g. postType. 2: Entity name, e.g. page. 3: Comma-separated list of field ids. */
+					__( 'Only registered fields can be updated. These fields of %1$s "%2$s" are not registered: %3$s. Use register() to add a field.', 'gutenberg' ),
+					$kind,
+					$name,
+					implode( ', ', $unregistered_ids )
+				),
 				'7.2.0'
 			);
 			return false;
