@@ -13,7 +13,8 @@
  * with the origins that registered and updated it, and to the script modules
  * registered for it, each with the ids of the fields it applies to.
  * register() adds fields, update() changes registered ones, and both
- * validate the definitions before storing them.
+ * validate the definitions before storing them: a field that cannot be
+ * stored is reported and skipped, and the rest of the call is stored.
  *
  * Fields are registered on the `fields_api_init` action, on the
  * registry its callbacks receive, and only there: register(), update(),
@@ -84,11 +85,13 @@ final class Gutenberg_Fields_Registry {
 	/**
 	 * Registers fields for an entity.
 	 *
-	 * The fields must be new: registering a field with the id of a registered
-	 * field, or the same id twice, is refused and registers none of the
-	 * fields of the call. To change a registered field, see update(); to
-	 * replace it, unregister it first. The script module, if any, applies to
-	 * every field of the call.
+	 * The fields must be new: a field with the id of a registered field is
+	 * reported and skipped, and so is every definition after the first of an
+	 * id that appears more than once in the call. The rest of the fields of
+	 * the call are registered: a field another plugin got to first does not
+	 * cost a plugin the others. To change a registered field, see update();
+	 * to replace it, unregister it first. The script module, if any, applies
+	 * to every field the call registers.
 	 *
 	 * The origin is stored as the `origin` property of each field, as
 	 * `registeredBy`, replacing any `origin` the definition sets.
@@ -100,57 +103,63 @@ final class Gutenberg_Fields_Registry {
 	 * @param array[]     $fields        The list of field definitions, each with an `id`.
 	 * @param string|null $script_module The id of the script module providing
 	 *                                   the JavaScript parts of the fields, if any.
-	 * @return bool Whether the fields were registered. False when called
-	 *              outside the `fields_api_init` action, when an argument
-	 *              is invalid, or when a field is already registered or
-	 *              appears more than once in the call.
+	 * @return string[] The ids of the fields registered, in the order of the
+	 *                  call. Empty when none is, when called outside the
+	 *                  `fields_api_init` action, or when an argument is
+	 *                  invalid.
 	 */
 	public function register( $origin, $kind, $name, $fields, $script_module = null ) {
 		if ( ! $this->validate_arguments( __METHOD__, $origin, $kind, $name, $fields, $script_module ) ) {
-			return false;
+			return array();
 		}
 
-		$ids        = array_column( $fields, 'id' );
-		$duplicated = array_keys(
-			array_filter(
-				array_count_values( $ids ),
-				static function ( $count ) {
-					return $count > 1;
-				}
-			)
-		);
+		$new_fields     = array();
+		$duplicated     = array();
+		$registered_ids = array();
+		foreach ( $fields as $field ) {
+			$id = $field['id'];
+			if ( isset( $this->fields[ $kind ][ $name ][ $id ] ) ) {
+				$registered_ids[ $id ] = $id;
+			} elseif ( isset( $new_fields[ $id ] ) ) {
+				$duplicated[ $id ] = $id;
+			} else {
+				$new_fields[ $id ] = $field;
+			}
+		}
+
 		if ( $duplicated ) {
 			_doing_it_wrong(
 				__METHOD__,
 				sprintf(
 					/* translators: 1: Entity kind, e.g. postType. 2: Entity name, e.g. page. 3: Comma-separated list of field ids. */
-					__( 'A field can only be registered once. These fields of %1$s "%2$s" appear more than once in the same call: %3$s.', 'gutenberg' ),
+					__( 'A field can only be registered once. These fields of %1$s "%2$s" appear more than once in the same call: %3$s. Only their first definition is registered.', 'gutenberg' ),
 					$kind,
 					$name,
 					implode( ', ', $duplicated )
 				),
 				'7.2.0'
 			);
-			return false;
 		}
 
-		$registered_ids = array_keys( array_intersect_key( array_flip( $ids ), $this->fields[ $kind ][ $name ] ?? array() ) );
 		if ( $registered_ids ) {
 			_doing_it_wrong(
 				__METHOD__,
 				sprintf(
 					/* translators: 1: Entity kind, e.g. postType. 2: Entity name, e.g. page. 3: Comma-separated list of field ids. */
-					__( 'A field can only be registered once. These fields of %1$s "%2$s" are already registered: %3$s. Use update() to change a registered field, or unregister it first to replace it.', 'gutenberg' ),
+					__( 'A field can only be registered once. These fields of %1$s "%2$s" are skipped because they are already registered: %3$s. Use update() to change a registered field, or unregister it first to replace it.', 'gutenberg' ),
 					$kind,
 					$name,
 					implode( ', ', $registered_ids )
 				),
 				'7.2.0'
 			);
-			return false;
 		}
 
-		foreach ( $fields as $field ) {
+		if ( ! $new_fields ) {
+			return array();
+		}
+
+		foreach ( $new_fields as $field ) {
 			$this->fields[ $kind ][ $name ][ $field['id'] ] = array_merge(
 				$field,
 				array(
@@ -161,9 +170,10 @@ final class Gutenberg_Fields_Registry {
 				)
 			);
 		}
+		$ids = array_column( $new_fields, 'id' );
 		$this->add_field_module( $kind, $name, $ids, $script_module );
 
-		return true;
+		return $ids;
 	}
 
 	/**
@@ -171,9 +181,10 @@ final class Gutenberg_Fields_Registry {
 	 *
 	 * Each definition is merged into the registered field with its id,
 	 * property by property; the field keeps its position. The fields must be
-	 * registered: updating a field that is not is refused and updates none
-	 * of the fields of the call. The script module, if any, applies to every
-	 * field of the call, on top of the modules the fields have.
+	 * registered: a field that is not is reported and skipped, and the rest
+	 * of the fields of the call are updated. The script module, if any,
+	 * applies to every field the call updates, on top of the modules the
+	 * fields have.
 	 *
 	 * The origin is appended to the `updatedBy` list of the `origin` property
 	 * of each field, once; the rest of the `origin` property cannot be
@@ -189,44 +200,56 @@ final class Gutenberg_Fields_Registry {
 	 *                                   each with the `id` of a registered field.
 	 * @param string|null $script_module The id of the script module providing
 	 *                                   the JavaScript parts of the fields, if any.
-	 * @return bool Whether the fields were updated. False when called outside
-	 *              the `fields_api_init` action, when an argument is invalid,
-	 *              or when a field is not registered.
+	 * @return string[] The ids of the fields updated, in the order of the
+	 *                  call. Empty when none is, when called outside the
+	 *                  `fields_api_init` action, or when an argument is
+	 *                  invalid.
 	 */
 	public function update( $origin, $kind, $name, $fields, $script_module = null ) {
 		if ( ! $this->validate_arguments( __METHOD__, $origin, $kind, $name, $fields, $script_module ) ) {
-			return false;
+			return array();
 		}
 
-		$ids              = array_column( $fields, 'id' );
-		$unregistered_ids = array_keys( array_diff_key( array_flip( $ids ), $this->fields[ $kind ][ $name ] ?? array() ) );
+		$ids              = array();
+		$unregistered_ids = array();
+		foreach ( $fields as $field ) {
+			$id = $field['id'];
+			if ( ! isset( $this->fields[ $kind ][ $name ][ $id ] ) ) {
+				$unregistered_ids[ $id ] = $id;
+				continue;
+			}
+
+			$registered   = $this->fields[ $kind ][ $name ][ $id ];
+			$field_origin = $registered['origin'];
+			if ( ! in_array( $origin, $field_origin['updatedBy'], true ) ) {
+				$field_origin['updatedBy'][] = $origin;
+			}
+
+			$this->fields[ $kind ][ $name ][ $id ] = array_merge( $registered, $field, array( 'origin' => $field_origin ) );
+			if ( ! in_array( $id, $ids, true ) ) {
+				$ids[] = $id;
+			}
+		}
+
 		if ( $unregistered_ids ) {
 			_doing_it_wrong(
 				__METHOD__,
 				sprintf(
 					/* translators: 1: Entity kind, e.g. postType. 2: Entity name, e.g. page. 3: Comma-separated list of field ids. */
-					__( 'Only registered fields can be updated. These fields of %1$s "%2$s" are not registered: %3$s. Use register() to add a field.', 'gutenberg' ),
+					__( 'Only registered fields can be updated. These fields of %1$s "%2$s" are skipped because they are not registered: %3$s. Use register() to add a field.', 'gutenberg' ),
 					$kind,
 					$name,
 					implode( ', ', $unregistered_ids )
 				),
 				'7.2.0'
 			);
-			return false;
 		}
 
-		foreach ( $fields as $field ) {
-			$registered   = $this->fields[ $kind ][ $name ][ $field['id'] ];
-			$field_origin = $registered['origin'];
-			if ( ! in_array( $origin, $field_origin['updatedBy'], true ) ) {
-				$field_origin['updatedBy'][] = $origin;
-			}
-
-			$this->fields[ $kind ][ $name ][ $field['id'] ] = array_merge( $registered, $field, array( 'origin' => $field_origin ) );
+		if ( $ids ) {
+			$this->add_field_module( $kind, $name, $ids, $script_module );
 		}
-		$this->add_field_module( $kind, $name, $ids, $script_module );
 
-		return true;
+		return $ids;
 	}
 
 	/**

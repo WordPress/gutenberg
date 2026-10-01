@@ -248,7 +248,8 @@ function _gutenberg_get_field_collection( $directory ) {
  *
  * The collection registers its fields on the entity, after the fields
  * registered on it before, in the alphabetical order of their folders. The
- * registry refuses a field registered twice for the same entity. Like the
+ * registry skips a field already registered for the entity, and registers
+ * the rest of the collection. Like the
  * registry, it does not check that the entity exists: the `/wp/v2/fields`
  * route only serves the fields of the entities the REST API exposes.
  *
@@ -289,5 +290,7 @@ function gutenberg_register_field_collection( $registry, $directory ) {
 	if ( empty( $collection['fields'] ) ) {
 		return true;
 	}
-	return $registry->register( $collection['origin'], $collection['kind'], $collection['name'], $collection['fields'], $collection['module'] );
+	$registered = $registry->register( $collection['origin'], $collection['kind'], $collection['name'], $collection['fields'], $collection['module'] );
+
+	return count( $registered ) === count( $collection['fields'] );
 }

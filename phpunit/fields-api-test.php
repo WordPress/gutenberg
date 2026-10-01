@@ -158,10 +158,10 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * @param string      $name   The entity name.
 	 * @param array[]     $fields The field definitions.
 	 * @param string|null $module The script module id, if any.
-	 * @return bool Whether the fields were registered.
+	 * @return string[] The ids of the fields registered.
 	 */
 	private function register_fields( $kind, $name, $fields, $module = null ) {
-		$registered = false;
+		$registered = array();
 		$this->on_fields_api_init(
 			static function ( $registry ) use ( &$registered, $kind, $name, $fields, $module ) {
 				$registered = $registry->register( 'test-plugin', $kind, $name, $fields, $module );
@@ -1186,11 +1186,11 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * There is no precedence between collections: a collection redefining a
-	 * field registered before it is refused by the registry, like a plugin
-	 * registering it twice.
+	 * There is no precedence between collections: a field of a collection
+	 * that redefines a field registered before it is skipped by the registry,
+	 * like a plugin registering it twice.
 	 */
-	public function test_a_collection_redefining_a_registered_field_is_refused() {
+	public function test_a_collection_redefining_a_registered_field_is_skipped() {
 		$this->register_post_types( array( 'gutenberg_book' => array( 'title' ) ) );
 		remove_action( 'fields_api_init', 'gutenberg_register_core_field_collections', 0 );
 		$this->core_collections_unhooked = true;
@@ -1218,7 +1218,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		);
 		$fields = gutenberg_get_registered_fields( 'postType', 'gutenberg_book' );
 
-		$this->assertFalse( $result, 'The refused collection returns false.' );
+		$this->assertFalse( $result, 'A collection that loses a field returns false.' );
 		$this->assertSame( array( 'authorship' ), array_column( $fields, 'id' ) );
 		$this->assertSame( 'Authorship', $fields[0]['label'], 'The field registered first is kept.' );
 	}
@@ -1394,10 +1394,11 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A field can only be registered once: registering the id of a
-	 * registered field is refused and leaves it untouched.
+	 * A field can only be registered once: a field with the id of a
+	 * registered field is skipped and leaves it untouched, and the rest of
+	 * the fields of the call are registered.
 	 */
-	public function test_registering_a_registered_field_is_refused() {
+	public function test_registering_a_registered_field_is_skipped() {
 		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::register' );
 		$reported   = &$this->record_notices( 'Gutenberg_Fields_Registry::register' );
 		$registered = $this->register_fields(
@@ -1413,25 +1414,43 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			'plugin/fields'
 		);
 
-		$this->assertFalse( $registered );
+		$this->assertSame( array( 'color' ), $registered, 'The ids of the fields registered are returned.' );
 		$fields = array_column( gutenberg_get_registered_fields( 'postType', 'page' ), null, 'id' );
-		$this->assertArrayNotHasKey( 'color', $fields, 'None of the fields of the call is registered.' );
+		$this->assertArrayHasKey( 'color', $fields, 'The rest of the fields of the call are registered.' );
 		$this->assertSame( 'Author', $fields['author']['label'], 'The registered field is left untouched.' );
-		$this->assertArrayNotHasKey( 'plugin/fields', gutenberg_get_registered_field_modules( 'postType', 'page' ) );
+		$this->assertSame( 'core', $fields['author']['origin']['registeredBy'] );
+		$this->assertSame( array( 'color' ), gutenberg_get_registered_field_modules( 'postType', 'page' )['plugin/fields'], 'The script module only applies to the fields registered.' );
+		$this->assertCount( 1, $reported );
 		$this->assertStringContainsString( 'postType "page"', $reported[0], 'The notice names the entity.' );
 		$this->assertStringContainsString( 'already registered: author', $reported[0], 'The notice names the field that is already registered, not the others of the call.' );
 	}
 
 	/**
-	 * Registering the same id twice in a call is refused.
+	 * An id that appears more than once in a call is registered once, with
+	 * its first definition, and the rest of the fields of the call are
+	 * registered.
 	 */
-	public function test_registering_the_same_field_twice_is_refused() {
+	public function test_registering_the_same_field_twice_keeps_the_first_definition() {
 		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::register' );
 		$reported   = &$this->record_notices( 'Gutenberg_Fields_Registry::register' );
-		$registered = $this->register_fields( 'postType', 'page', array( $this->field( 'color' ), $this->field( 'color' ) ) );
+		$registered = $this->register_fields(
+			'postType',
+			'page',
+			array(
+				$this->field( 'color' ),
+				array(
+					'id'    => 'color',
+					'label' => 'Colour',
+				),
+				$this->field( 'size' ),
+			)
+		);
 
-		$this->assertFalse( $registered );
-		$this->assertNotContains( 'color', array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' ) );
+		$this->assertSame( array( 'color', 'size' ), $registered );
+		$fields = array_column( gutenberg_get_registered_fields( 'postType', 'page' ), null, 'id' );
+		$this->assertSame( $this->field( 'color' )['label'], $fields['color']['label'], 'The first definition is kept.' );
+		$this->assertArrayHasKey( 'size', $fields, 'The rest of the fields of the call are registered.' );
+		$this->assertCount( 1, $reported );
 		$this->assertStringContainsString( 'postType "page"', $reported[0], 'The notice names the entity.' );
 		$this->assertStringContainsString( 'more than once in the same call: color', $reported[0], 'The notice names the duplicated field.' );
 	}
@@ -1440,7 +1459,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * A field unregistered can be registered anew, with a new origin.
 	 */
 	public function test_an_unregistered_field_can_be_registered_again() {
-		$registered = false;
+		$registered = array();
 		$this->on_fields_api_init(
 			static function ( $registry ) use ( &$registered ) {
 				$registry->unregister( 'postType', 'page', array( 'author' ) );
@@ -1448,7 +1467,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			}
 		);
 
-		$this->assertTrue( $registered );
+		$this->assertSame( array( 'author' ), $registered );
 		$fields = array_column( gutenberg_get_registered_fields( 'postType', 'page' ), null, 'id' );
 		$this->assertSame(
 			array(
@@ -1477,8 +1496,8 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			}
 		);
 
-		$this->assertTrue( $result['first'], 'The first entity registers its field.' );
-		$this->assertTrue( $result['second'], 'The second entity registers a field with the same id.' );
+		$this->assertSame( array( 'color' ), $result['first'], 'The first entity registers its field.' );
+		$this->assertSame( array( 'color', 'size' ), $result['second'], 'The second entity registers a field with the same id.' );
 		$this->assertSame( array( 'color' ), array_column( $result['unregistered'], 'id' ), 'Unregistering the first entity only removes its own field.' );
 		$this->assertSame( array(), gutenberg_get_registered_fields( 'a/b', 'c' ) );
 		$this->assertSame( array( 'color', 'size' ), array_column( gutenberg_get_registered_fields( 'a', 'b/c' ), 'id' ), 'The second entity keeps its fields.' );
@@ -1570,7 +1589,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			}
 		);
 
-		$this->assertSame( array( true, true, true ), $updated );
+		$this->assertSame( array( array( 'author' ), array( 'author' ), array( 'author' ) ), $updated );
 		$fields = gutenberg_get_registered_fields( 'postType', 'page' );
 		$this->assertSame( 'author', $fields[0]['id'], 'The field keeps its position.' );
 		$this->assertSame( 'Byline', $fields[0]['label'], 'The last update wins.' );
@@ -1589,13 +1608,13 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Only registered fields can be updated: updating a field that is not is
-	 * refused and updates none of the fields of the call.
+	 * Only registered fields can be updated: a field that is not is skipped,
+	 * and the rest of the fields of the call are updated.
 	 */
-	public function test_updating_an_unregistered_field_is_refused() {
+	public function test_updating_an_unregistered_field_is_skipped() {
 		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::update' );
 		$reported = &$this->record_notices( 'Gutenberg_Fields_Registry::update' );
-		$updated  = true;
+		$updated  = array();
 		$this->on_fields_api_init(
 			static function ( $registry ) use ( &$updated ) {
 				$updated = $registry->update(
@@ -1617,12 +1636,13 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			}
 		);
 
-		$this->assertFalse( $updated );
+		$this->assertSame( array( 'author' ), $updated, 'The ids of the fields updated are returned.' );
 		$fields = array_column( gutenberg_get_registered_fields( 'postType', 'page' ), null, 'id' );
 		$this->assertArrayNotHasKey( 'color', $fields, 'The field is not registered.' );
-		$this->assertSame( 'Author', $fields['author']['label'], 'None of the fields of the call is updated.' );
-		$this->assertSame( array(), $fields['author']['origin']['updatedBy'] );
-		$this->assertArrayNotHasKey( 'plugin/fields', gutenberg_get_registered_field_modules( 'postType', 'page' ) );
+		$this->assertSame( 'Writer', $fields['author']['label'], 'The rest of the fields of the call are updated.' );
+		$this->assertSame( array( 'test-plugin' ), $fields['author']['origin']['updatedBy'] );
+		$this->assertSame( array( 'author' ), gutenberg_get_registered_field_modules( 'postType', 'page' )['plugin/fields'], 'The script module only applies to the fields updated.' );
+		$this->assertCount( 1, $reported );
 		$this->assertStringContainsString( 'postType "page"', $reported[0], 'The notice names the entity.' );
 		$this->assertStringContainsString( 'not registered: color', $reported[0], 'The notice names only the field that is not registered.' );
 	}
@@ -1632,14 +1652,14 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 */
 	public function test_registering_with_an_invalid_origin_is_refused() {
 		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::register' );
-		$registered = true;
+		$registered = null;
 		$this->on_fields_api_init(
 			static function ( $registry ) use ( &$registered ) {
 				$registered = $registry->register( '', 'postType', 'page', array( array( 'id' => 'color' ) ) );
 			}
 		);
 
-		$this->assertFalse( $registered );
+		$this->assertSame( array(), $registered );
 		$this->assertNotContains( 'color', array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' ) );
 	}
 
@@ -1648,14 +1668,14 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 */
 	public function test_registering_fields_that_are_not_a_list_is_refused() {
 		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::register' );
-		$registered = true;
+		$registered = null;
 		$this->on_fields_api_init(
 			static function ( $registry ) use ( &$registered ) {
 				$registered = $registry->register( 'test-plugin', 'postType', 'page', array( 'color' => array( 'id' => 'color' ) ) );
 			}
 		);
 
-		$this->assertFalse( $registered );
+		$this->assertSame( array(), $registered );
 		$this->assertNotContains( 'color', array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' ) );
 	}
 
@@ -1671,7 +1691,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$registry = Gutenberg_Fields_Registry::get_instance();
 		$fired    = did_action( 'fields_api_init' );
 
-		$this->assertFalse( $registry->register( 'test-plugin', 'postType', 'page', array( $this->field( 'color' ) ), 'plugin/color' ) );
+		$this->assertSame( array(), $registry->register( 'test-plugin', 'postType', 'page', array( $this->field( 'color' ) ), 'plugin/color' ) );
 		$this->assertSame( $fired, did_action( 'fields_api_init' ), 'Refusing does not fire the action.' );
 		$this->assertNotContains( 'color', array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' ) );
 		$this->assertArrayNotHasKey( 'plugin/color', gutenberg_get_registered_field_modules( 'postType', 'page' ) );
@@ -1687,7 +1707,8 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$registry = Gutenberg_Fields_Registry::get_instance();
 		$fired    = did_action( 'fields_api_init' );
 
-		$this->assertFalse(
+		$this->assertSame(
+			array(),
 			$registry->update(
 				'test-plugin',
 				'postType',
