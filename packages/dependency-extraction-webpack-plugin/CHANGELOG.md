@@ -5,8 +5,7 @@
 ### Enhancements
 
 -   Add `@wordpress/sync` as a bundled package, so consumer builds bundle it instead of externalizing it to the removed `wp-sync` script ([#81999](https://github.com/WordPress/gutenberg/pull/81999)).
--   Add `@wordpress/entity-fields` as a bundled package, so consumer builds bundle it instead of externalizing it to a nonexistent `wp-entity-fields` script.
--   Add `@wordpress/fields-loader` as a bundled package, so consumer builds bundle it instead of externalizing it to a nonexistent `wp-fields-loader` script.
+-   Add `@wordpress/fields-loader` as a bundled package, so consumer builds bundle it instead of externalizing it to a nonexistent `wp-fields-loader` script ([#83368](https://github.com/WordPress/gutenberg/pull/83368)).
 
 ## 6.56.0 (2026-09-23)
 

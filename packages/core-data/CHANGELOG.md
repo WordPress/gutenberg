@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add the `getFieldsConfig( kind, name )` selector, which returns the fields an entity registered on the server, as the `/wp/v2/fields` REST API route returns them, and the `FieldsConfig` type that describes them.
+-   Add the `getFieldsConfig( kind, name )` selector, which returns the fields an entity registered on the server, as the `/wp/v2/fields` REST API route returns them, and the `FieldsConfig` type that describes them ([#83368](https://github.com/WordPress/gutenberg/pull/83368)).
 
 ### Enhancements
 
