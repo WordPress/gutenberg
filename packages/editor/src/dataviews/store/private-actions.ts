@@ -1,10 +1,7 @@
 import { store as coreStore } from '@wordpress/core-data';
-import type { Action, Field } from '@wordpress/dataviews';
+import type { Action } from '@wordpress/dataviews';
 import { doAction } from '@wordpress/hooks';
-import { __ } from '@wordpress/i18n';
-import { store as noticesStore } from '@wordpress/notices';
 import type { PostType } from '@wordpress/fields';
-import { loadFields } from '@wordpress/fields-loader';
 import {
 	viewPost,
 	viewPostRevisions,
@@ -49,32 +46,6 @@ export function unregisterEntityAction(
 	};
 }
 
-export function registerEntityField< Item >(
-	kind: string,
-	name: string,
-	config: Field< Item >
-) {
-	return {
-		type: 'REGISTER_ENTITY_FIELD' as const,
-		kind,
-		name,
-		config,
-	};
-}
-
-export function unregisterEntityField(
-	kind: string,
-	name: string,
-	fieldId: string
-) {
-	return {
-		type: 'UNREGISTER_ENTITY_FIELD' as const,
-		kind,
-		name,
-		fieldId,
-	};
-}
-
 export function setIsReady( kind: string, name: string ) {
 	return {
 		type: 'SET_IS_READY' as const,
@@ -83,6 +54,15 @@ export function setIsReady( kind: string, name: string ) {
 	};
 }
 
+/**
+ * Registers the actions of a post type, once per post type.
+ *
+ * Its fields are not registered here: every field of an entity comes from the
+ * server, and a screen reads them with `useFields` from
+ * `@wordpress/fields-loader`.
+ *
+ * @param postType The post type.
+ */
 export const registerPostTypeSchema =
 	( postType: string ) =>
 	async ( { registry }: { registry: any } ) => {
@@ -98,13 +78,6 @@ export const registerPostTypeSchema =
 			'postType',
 			postType
 		);
-
-		// Runs in parallel with the lookups the actions need, and is awaited
-		// once they are done.
-		const serverFieldsPromise = loadFields( {
-			kind: 'postType',
-			name: postType,
-		} );
 
 		const postTypeConfig = ( await registry
 			.resolveSelect( coreStore )
@@ -159,36 +132,12 @@ export const registerPostTypeSchema =
 			permanentlyDeletePost,
 		].filter( Boolean );
 
-		let fields: Field< any >[] = [];
-		try {
-			fields = await serverFieldsPromise;
-		} catch {
-			// Every field of a post type is registered on the server, so a
-			// failed load leaves the screen with none; say so rather than
-			// letting it look as if the post type had no fields.
-			registry
-				.dispatch( noticesStore )
-				.createErrorNotice(
-					__(
-						"Some fields couldn't be loaded, so they're missing from this screen. Reload the page to try again."
-					),
-					{ id: 'editor-entity-fields-error', type: 'snackbar' }
-				);
-		}
-
 		registry.batch( () => {
 			actions.forEach( ( action ) => {
 				unlock( registry.dispatch( editorStore ) ).registerEntityAction(
 					'postType',
 					postType,
 					action
-				);
-			} );
-			fields.forEach( ( field ) => {
-				unlock( registry.dispatch( editorStore ) ).registerEntityField(
-					'postType',
-					postType,
-					field
 				);
 			} );
 		} );

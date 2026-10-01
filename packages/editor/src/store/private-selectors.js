@@ -22,7 +22,6 @@ import {
 } from './selectors';
 import {
 	getEntityActions as _getEntityActions,
-	getEntityFields as _getEntityFields,
 	isEntityReady as _isEntityReady,
 } from '../dataviews/store/private-selectors';
 import { unlock } from '../lock-unlock';
@@ -176,10 +175,6 @@ export function getEntityActions( state, ...args ) {
 
 export function isEntityReady( state, ...args ) {
 	return _isEntityReady( state.dataviews, ...args );
-}
-
-export function getEntityFields( state, ...args ) {
-	return _getEntityFields( state.dataviews, ...args );
 }
 
 /**

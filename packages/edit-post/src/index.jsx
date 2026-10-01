@@ -200,10 +200,9 @@ async function preloadResolutions( postType, postId ) {
 						} ),
 					]
 				: [] ),
-			// The post fields and actions of the post type (see
-			// `registerPostTypeSchema` in the editor) include the fields
-			// registered on the server. The editor reports a failure, so it
-			// must not cut the rest of the kickoff short.
+			// The fields of the post type, which the document sidebar reads
+			// with `useFields`. The sidebar reports a failure of its own, so
+			// this must not cut the rest of the kickoff short.
 			...( postType
 				? [
 						core
