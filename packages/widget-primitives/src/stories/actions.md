@@ -85,7 +85,7 @@ const hosted = useWidgetActions(
 
 A runtime action takes the same envelope and one fulfillment: `href`, or `callback`, a function the host runs. A promise it returns keeps the action pending until it settles; reporting the outcome stays the callback's.
 
--   **The list is the whole set.** It replaces the previous one, so an action that does not apply is left out. It is compared by value and needs no memoization.
+-   **Each call declares its own set.** The list replaces that call's previous one, so an action that does not apply is left out; it is compared by value and needs no memoization. Calls from several components of one widget compose, and the last declaration of an `id` wins.
 -   **A shared `id` upgrades the declared action.** The runtime action takes its place and keeps the declared `icon` and `relevance` it leaves out: a declared "Details" becomes "Review 3 items" once the counts arrive. A declared action is never withdrawn, so one that only applies sometimes is declared at runtime alone.
 -   **Placement stays the host's.** Runtime actions ride the same `relevance` scale.
 

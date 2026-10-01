@@ -1,8 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { render, renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { useWidgetActions } from '../use-widget-actions';
 import { WidgetHostProvider } from '../../widget-host';
+import { WidgetActionsCollector } from '../../widget-host/widget-actions-collector';
 import type { WidgetCallbackAction, WidgetRuntimeAction } from '../../types';
 
 function createHost() {
@@ -91,5 +92,79 @@ describe( 'useWidgetActions', () => {
 		unmount();
 
 		expect( declare ).toHaveBeenLastCalledWith( [] );
+	} );
+} );
+
+/* Two components of one widget, each calling the hook. */
+const csvExport: WidgetRuntimeAction = {
+	id: 'export',
+	label: 'Export CSV',
+	relevance: 'medium',
+	href: 'https://example.com/orders.csv',
+};
+
+function Caller( { actions }: { actions: WidgetRuntimeAction[] } ) {
+	useWidgetActions( actions );
+	return null;
+}
+
+function Widget( {
+	withExport,
+	exportAction = csvExport,
+}: {
+	withExport: boolean;
+	exportAction?: WidgetRuntimeAction;
+} ) {
+	return (
+		<>
+			<Caller actions={ [ report ] } />
+			{ withExport && <Caller actions={ [ exportAction ] } /> }
+		</>
+	);
+}
+
+describe( 'useWidgetActions under WidgetActionsCollector', () => {
+	function createCollectingHost() {
+		const { declare, wrapper: Host } = createHost();
+		const wrapper = ( { children }: { children: ReactNode } ) => (
+			<Host>
+				<WidgetActionsCollector>{ children }</WidgetActionsCollector>
+			</Host>
+		);
+
+		return { declare, wrapper };
+	}
+
+	it( 'hands the host what every call declares', () => {
+		const { declare, wrapper } = createCollectingHost();
+
+		render( <Widget withExport />, { wrapper } );
+
+		const declared = declare.mock.lastCall?.[ 0 ];
+		expect( declared ).toHaveLength( 2 );
+		expect( declared ).toEqual(
+			expect.arrayContaining( [ report, csvExport ] )
+		);
+	} );
+
+	it( 'keeps the last declaration of an id two calls share', () => {
+		const { declare, wrapper } = createCollectingHost();
+		const later = { ...report, label: 'View full report' };
+
+		const { rerender } = render( <Widget withExport={ false } />, {
+			wrapper,
+		} );
+		rerender( <Widget withExport exportAction={ later } /> );
+
+		expect( declare ).toHaveBeenLastCalledWith( [ later ] );
+	} );
+
+	it( 'withdraws only what the unmounted call declared', () => {
+		const { declare, wrapper } = createCollectingHost();
+
+		const { rerender } = render( <Widget withExport />, { wrapper } );
+		rerender( <Widget withExport={ false } /> );
+
+		expect( declare ).toHaveBeenLastCalledWith( [ report ] );
 	} );
 } );

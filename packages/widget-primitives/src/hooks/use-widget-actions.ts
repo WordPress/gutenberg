@@ -1,5 +1,6 @@
-import { useLayoutEffect, useRef } from '@wordpress/element';
+import { useId, useLayoutEffect, useMemo, useRef } from '@wordpress/element';
 import { useWidgetHost } from '../widget-host';
+import { useWidgetActionsCollector } from '../widget-host/widget-actions-collector';
 import type { WidgetRuntimeAction } from '../types';
 
 const NO_ACTIONS: WidgetRuntimeAction[] = [];
@@ -38,15 +39,28 @@ function isSameList(
 
 /**
  * Declares the actions a mounted widget wants its host to place. The list
- * is the instance's whole set: leave out what does not apply. It is
- * compared by value, so it can be written inline, and a callback always
- * runs its latest version.
+ * is this call's whole set: leave out what does not apply. Calls from
+ * several components of one widget compose. The list is compared by value,
+ * so it can be written inline, and a callback always runs its latest
+ * version.
  *
  * @param {WidgetRuntimeAction[]} actions The actions to place.
  * @return {boolean} Whether the host places them.
  */
 export function useWidgetActions( actions: WidgetRuntimeAction[] ): boolean {
-	const declare = useWidgetHost().actions?.declare;
+	const hostDeclare = useWidgetHost().actions?.declare;
+	const collector = useWidgetActionsCollector();
+	const callId = useId();
+	// Under `WidgetRender` every call declares through the collector, which
+	// hands the host one list; elsewhere the last call wins.
+	const declare = useMemo(
+		() =>
+			collector
+				? ( next: WidgetRuntimeAction[] ) =>
+						collector.declare( callId, next )
+				: hostDeclare,
+		[ collector, hostDeclare, callId ]
+	);
 	const latestRef = useRef( actions );
 	const declaredRef = useRef< WidgetRuntimeAction[] | null >( null );
 
@@ -93,5 +107,5 @@ export function useWidgetActions( actions: WidgetRuntimeAction[] ): boolean {
 		[ declare ]
 	);
 
-	return !! declare;
+	return collector ? collector.hosted : !! hostDeclare;
 }

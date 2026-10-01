@@ -121,10 +121,53 @@ const widgetTypes: WidgetType[] = [
 		renderModule: 'health-module',
 		presentation: 'full-bleed',
 	},
+	{
+		apiVersion: 1,
+		name: 'test/orders',
+		title: 'Orders',
+		renderModule: 'orders-module',
+	},
 ];
 
-const resolveWidgetModule: ResolveWidgetModule = async () => ( {
-	default: TestWidget as ComponentType< WidgetRenderProps< unknown > >,
+/* Two components, each declaring its own actions. */
+function ExportSection() {
+	useWidgetActions( [
+		{
+			id: 'export',
+			label: 'Export',
+			relevance: 'medium',
+			callback: onExport,
+		},
+	] );
+
+	return <p>Export ready</p>;
+}
+
+function ComposedWidget() {
+	const [ hasExport, setHasExport ] = useState( true );
+	useWidgetActions( [
+		{
+			id: 'report',
+			label: 'View report',
+			relevance: 'high',
+			href: 'admin.php?page=dashboard&p=/report',
+		},
+	] );
+
+	return (
+		<>
+			{ hasExport && <ExportSection /> }
+			<button type="button" onClick={ () => setHasExport( false ) }>
+				Hide export
+			</button>
+		</>
+	);
+}
+
+const resolveWidgetModule: ResolveWidgetModule = async ( moduleId ) => ( {
+	default: ( moduleId === 'orders-module'
+		? ComposedWidget
+		: TestWidget ) as ComponentType< WidgetRenderProps< unknown > >,
 } );
 
 function instance(
@@ -407,6 +450,36 @@ describe( 'runtime actions', () => {
 		await user.click( screen.getByRole( 'button', { name: 'More' } ) );
 		expect(
 			await screen.findByRole( 'menuitem', { name: 'Review 3 items' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'places the actions two components of a widget declare', async () => {
+		render( <Harness layout={ instance( 'test/orders' ) } /> );
+
+		expect(
+			await screen.findByRole( 'link', { name: 'View report' } )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Export' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'withdraws only the actions of the component that unmounts', async () => {
+		const user = userEvent.setup();
+		render( <Harness layout={ instance( 'test/orders' ) } /> );
+		await screen.findByRole( 'button', { name: 'Export' } );
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Hide export' } )
+		);
+
+		await waitFor( () =>
+			expect(
+				screen.queryByRole( 'button', { name: 'Export' } )
+			).not.toBeInTheDocument()
+		);
+		expect(
+			screen.getByRole( 'link', { name: 'View report' } )
 		).toBeInTheDocument();
 	} );
 

@@ -42,7 +42,7 @@ actions: {
 }
 ```
 
-`declare` replaces the runtime actions of one instance; an empty list withdraws them. The host binds it to the instance it renders, so the widget never names which instance it is.
+`declare` replaces the runtime actions of one instance; an empty list withdraws them. The host binds it to the instance it renders, so the widget never names which instance it is. `WidgetRender` joins what every `useWidgetActions` call under it declares, so `declare` always receives the whole list.
 
 The list carries data, not UI: placement and materialization stay the host's. The widget's side is `useWidgetActions`, and the Actions page covers how the list joins the declared actions.
 

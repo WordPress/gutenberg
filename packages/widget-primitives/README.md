@@ -55,7 +55,7 @@ It takes host-supplied records (`WidgetModuleRecord[]`, or `null` while loading)
 
 ### `useWidgetActions( actions )`
 
-It declares the actions a mounted widget wants its host to place. The list is the instance's whole set: an action that does not apply is left out.
+It declares the actions a mounted widget wants its host to place. The list is that call's whole set: an action that does not apply is left out. Several components of one widget can each call it; `WidgetRender` joins their lists before the host sees them.
 
 A runtime action carrying a declared action's `id` takes its place, keeping the declared `icon` and `relevance` it leaves out.
 
