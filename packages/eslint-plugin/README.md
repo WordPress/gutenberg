@@ -108,7 +108,7 @@ The granular rulesets will not define any environment globals. As such, if they 
 
 ### Unit-test lint defaults
 
-The next major release after 27.0.0 adds `vitest/require-awaited-expect-poll` at error severity to `test-unit`. This also affects the default `wp-scripts lint-js` configuration for unit tests. Existing tests can now fail lint if an `expect.poll()` or `expect.element()` assertion is neither awaited nor explicitly returned. The supported ESLint and Vitest ranges remain unchanged.
+The next major release after 27.0.0 adds `vitest/require-awaited-expect-poll` at error severity to `test-unit`. The default `wp-scripts lint-js` unit-test configuration receives the same change in the next major `@wordpress/scripts` release after 36.0.0. Existing tests can now fail lint if an `expect.poll()` or `expect.element()` assertion is neither awaited nor explicitly returned. The supported ESLint and Vitest ranges remain unchanged.
 
 Await assertions in tests. Helpers can explicitly return the assertion promise, provided their callers await it:
 

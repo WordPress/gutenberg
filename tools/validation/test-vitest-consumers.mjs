@@ -447,6 +447,20 @@ assert.match(
 rmSync( path.join( consumer, 'legacy.test.js' ) );
 rmSync( path.join( consumer, 'jest.config.cjs' ) );
 // Inspect the actual fallback lint config, including TS and spec discovery.
+// Packed source includes the next major's defaults before its version is bumped.
+// Registry releases before 28 still use the recommended-only baseline.
+const eslintPluginVersion = JSON.parse(
+	readFileSync(
+		path.join(
+			consumer,
+			'node_modules/@wordpress/eslint-plugin/package.json'
+		),
+		'utf8'
+	)
+).version;
+const promotedLintDefaults =
+	! values[ 'eslint-plugin' ] ||
+	Number( eslintPluginVersion.split( '.' )[ 0 ] ) >= 28;
 for ( const name of [ 'example.test.js', 'example.spec.ts' ] ) {
 	write(
 		name,
@@ -465,14 +479,21 @@ for ( const name of [ 'example.test.js', 'example.spec.ts' ] ) {
 		] )
 	);
 	assert.ok( output.rules[ 'vitest/no-focused-tests' ] );
-	assert.equal(
-		output.rules[ 'vitest/require-awaited-expect-poll' ][ 0 ],
-		2
-	);
+	if ( promotedLintDefaults ) {
+		assert.equal(
+			output.rules[ 'vitest/require-awaited-expect-poll' ][ 0 ],
+			2
+		);
+	} else {
+		assert.equal(
+			output.rules[ 'vitest/require-awaited-expect-poll' ],
+			undefined
+		);
+	}
 	assert.equal( output.rules[ 'vitest/valid-title' ][ 0 ], 2 );
 	assert.equal(
-		output.rules[ 'vitest/valid-title' ][ 1 ].allowArguments,
-		true
+		output.rules[ 'vitest/valid-title' ][ 1 ]?.allowArguments ?? false,
+		promotedLintDefaults
 	);
 	assert.equal( output.rules[ 'jest/no-focused-tests' ], undefined );
 	assert.equal( output.languageOptions.globals?.test, undefined );
@@ -487,11 +508,12 @@ for ( const name of [ 'example.test.js', 'example.spec.ts' ] ) {
 			( message ) => message.ruleId === 'vitest/no-focused-tests'
 		)
 	);
-	assert.ok(
+	assert.equal(
 		JSON.parse( result.stdout )[ 0 ].messages.some(
 			( message ) =>
 				message.ruleId === 'vitest/require-awaited-expect-poll'
-		)
+		),
+		promotedLintDefaults
 	);
 }
 // Exercise both public entrypoints in the packed consumer, not workspace links.
@@ -499,7 +521,12 @@ write(
 	'lint-defaults.cjs',
 	readFileSync( path.join( fixtureRoot, 'lint-defaults.cjs' ) )
 );
-console.log( run( values.node, [ 'lint-defaults.cjs' ] ) );
+console.log(
+	run( values.node, [
+		'lint-defaults.cjs',
+		promotedLintDefaults ? 'promoted' : 'recommended',
+	] )
+);
 console.log(
 	'Passed consumer commands, config discovery, jsdom, generated CSS, Jest compatibility, and lint defaults.'
 );
