@@ -7214,11 +7214,6 @@
 			"count": 4
 		}
 	},
-	"packages/fields/src/components/media-edit.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/fields/src/fields/author/author-view.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -7227,6 +7222,11 @@
 	"packages/fields/src/fields/excerpt/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		}
+	},
+	"packages/fields/src/fields/featured-image/edit.tsx": {
+		"no-restricted-imports": {
+			"count": 1
 		}
 	},
 	"packages/fields/src/fields/parent/parent-edit.tsx": {

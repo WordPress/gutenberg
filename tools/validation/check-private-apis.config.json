@@ -32,7 +32,7 @@
 			"via": "packages/fields/src/lock-unlock.ts"
 		},
 		{
-			"comment": "Unlocks private APIs of @wordpress/media-utils (see its media-edit component). Remove when the unlocked surface goes public.",
+			"comment": "Unlocks private APIs of @wordpress/media-utils (see its featured image field). Remove when the unlocked surface goes public.",
 			"package": "fields",
 			"via": "packages/media-utils/src/private-apis.ts"
 		},

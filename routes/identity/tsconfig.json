@@ -16,10 +16,10 @@
 		{ "path": "../../packages/element/tsconfig.build.json" },
 		{ "path": "../../packages/data" },
 		{ "path": "../../packages/dataviews/tsconfig.build.json" },
-		{ "path": "../../packages/fields/tsconfig.build.json" },
 		{ "path": "../../packages/html-entities/tsconfig.build.json" },
 		{ "path": "../../packages/i18n/tsconfig.build.json" },
 		{ "path": "../../packages/lazy-editor" },
+		{ "path": "../../packages/media-utils/tsconfig.build.json" },
 		{ "path": "../../packages/ui/tsconfig.build.json" },
 		{ "path": "../../packages/views/tsconfig.build.json" }
 	],

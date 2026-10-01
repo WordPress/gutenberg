@@ -8,8 +8,11 @@ import {
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import type { DataFormControlProps } from '@wordpress/dataviews';
-import { MediaEditControl } from '../../components/media-edit';
+import { privateApis as mediaUtilsPrivateApis } from '@wordpress/media-utils';
+import { unlock } from '../../lock-unlock';
 import type { BasePostWithEmbeddedFeaturedMedia } from '../../types';
+
+const { MediaEditControl } = unlock( mediaUtilsPrivateApis );
 
 type Item = BasePostWithEmbeddedFeaturedMedia;
 

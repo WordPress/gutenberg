@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove the `MediaEdit` component and its `MediaEditProps` type. The control moved to `@wordpress/media-utils`, where it is a private API while it is iterated on, and its styles moved to the stylesheet of that package.
+
 ### Bug Fixes
 
 -   `AuthorView`: Fetch the author through the users list in the `view` context, so users who can't edit other users still see the author's name and avatar, including for authors without published posts. ([#83498](https://github.com/WordPress/gutenberg/pull/83498))

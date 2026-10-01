@@ -3,9 +3,12 @@ import { __, _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { DataForm } from '@wordpress/dataviews';
-import { MediaEdit } from '@wordpress/fields';
 import { decodeEntities } from '@wordpress/html-entities';
+import { privateApis as mediaUtilsPrivateApis } from '@wordpress/media-utils';
 import { useViewConfig } from '@wordpress/views';
+import { unlock } from '../../lock-unlock';
+
+const { MediaEdit } = unlock( mediaUtilsPrivateApis );
 
 // The screen only renders a form, so it requests the `form` of the entity
 // view configuration alone.
