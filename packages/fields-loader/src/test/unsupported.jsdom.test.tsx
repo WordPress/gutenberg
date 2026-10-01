@@ -11,10 +11,13 @@ import { loadFields, useFields } from '../fields-loader';
  * A plugin can bundle this package and run it on a WordPress version whose
  * core data store predates the `getFieldsConfig` selector.
  */
-vi.mock( '@wordpress/data', async ( importOriginal ) => ( {
-	...( await importOriginal< typeof import( '@wordpress/data' ) >() ),
-	resolveSelect: () => ( {} ),
-} ) );
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
+	const original = await importOriginal();
+	return {
+		...original,
+		resolveSelect: ( () => ( {} ) ) as typeof original.resolveSelect,
+	};
+} );
 
 const UNSUPPORTED_MESSAGE =
 	'This screen needs a newer version of WordPress to show its fields. Update WordPress, then reload the page.';

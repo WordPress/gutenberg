@@ -6,9 +6,11 @@ const actions = vi.hoisted( () => ( {
 	unregisterEntityField: vi.fn(),
 } ) );
 
-vi.mock( '@wordpress/data', () => ( { dispatch: () => actions } ) );
-vi.mock( '../../lock-unlock', () => ( { unlock: ( value ) => value } ) );
-vi.mock( '../../store', () => ( { store: {} } ) );
+vi.mock( import( '@wordpress/data' ), () => ( { dispatch: () => actions } ) );
+vi.mock( import( '../../lock-unlock' ), () => ( {
+	unlock: ( value ) => value,
+} ) );
+vi.mock( import( '../../store' ), () => ( { store: {} } ) );
 
 describe( 'registerEntityField', () => {
 	it( 'is deprecated and has no effect', () => {
