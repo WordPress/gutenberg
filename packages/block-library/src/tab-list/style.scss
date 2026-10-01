@@ -37,3 +37,11 @@
 		bottom: 0;
 	}
 }
+
+.wp-block-tab-list.is-nowrap {
+	overflow-x: auto;
+
+	:where(button) {
+		flex-shrink: 0;
+	}
+}
