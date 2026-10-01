@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+- Register the fields of the site (`title`, `description`, `site_logo`, and `site_icon`) as the `root_site` collection.
 - Register the fields of patterns and template parts on the server.
 - Register the Posts Page title and site reading settings as fields of the `wp_template` collection.
 - Register the format field of the post types supporting `post-formats`.

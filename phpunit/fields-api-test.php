@@ -1109,6 +1109,25 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The site is not a post type: its collection has all of its fields,
+	 * the ones the identity screen of the site editor shows, with its
+	 * script module.
+	 */
+	public function test_the_site_gets_the_fields_of_its_collection() {
+		$ids    = array( 'description', 'site_icon', 'site_logo', 'title' );
+		$fields = array_column( gutenberg_get_registered_fields( 'root', 'site' ), null, 'id' );
+		$this->assertSame( $ids, array_keys( $fields ) );
+		$this->assertSame( 'text', $fields['title']['type'] );
+		$this->assertSame( 'media', $fields['site_logo']['type'] );
+		$this->assertSame( 'core', $fields['title']['origin']['registeredBy'] );
+		$this->assertSame(
+			array( '@wordpress/core-fields/root_site' => $ids ),
+			gutenberg_get_registered_field_modules( 'root', 'site' ),
+			'Every field of the site is registered with the module of the collection.'
+		);
+	}
+
+	/**
 	 * A plugin drops a default field from its post type by unregistering
 	 * it at the default priority, keeping the others.
 	 */
