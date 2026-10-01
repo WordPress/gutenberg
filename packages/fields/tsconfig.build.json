@@ -5,7 +5,6 @@
 		"checkJs": false
 	},
 	"references": [
-		{ "path": "../a11y/tsconfig.build.json" },
 		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../blob/tsconfig.build.json" },
 		{ "path": "../components/tsconfig.build.json" },

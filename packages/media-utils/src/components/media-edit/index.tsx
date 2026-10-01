@@ -41,17 +41,12 @@ import {
 	VisuallyHidden,
 } from '@wordpress/ui';
 import { speak } from '@wordpress/a11y';
-import {
-	MediaUpload,
-	uploadMedia,
-	privateApis as mediaUtilsPrivateApis,
-} from '@wordpress/media-utils';
 import { store as noticesStore } from '@wordpress/notices';
-import { unlock } from '../../lock-unlock';
-import type { MediaEditProps } from '../../types';
+import MediaUpload from '../media-upload';
+import { MediaUploadModal } from '../media-upload-modal';
+import { uploadMedia } from '../../utils/upload-media';
+import type { MediaEditProps } from './types';
 import useMovingAnimation from './use-moving-animation';
-
-const { MediaUploadModal } = unlock( mediaUtilsPrivateApis );
 
 function AnimatedMediaItem( {
 	children,
@@ -563,8 +558,7 @@ function CompactMediaEditAttachments( {
  * for selecting WordPress media attachments. Supports both the traditional WordPress media
  * library and the experimental DataViews media modal.
  *
- * This component is intended to be used as the `Edit` property of a field definition when
- * registering fields with `registerEntityField` from `@wordpress/editor`.
+ * This component is intended to be used as the `Edit` property of a field definition.
  *
  * @template Item - The type of the item being edited.
  *
@@ -581,8 +575,11 @@ function CompactMediaEditAttachments( {
  *
  * @example
  * ```tsx
- * import { MediaEdit } from '@wordpress/fields';
+ * import { privateApis as mediaUtilsPrivateApis } from '@wordpress/media-utils';
+ * import { unlock } from './lock-unlock';
  * import type { DataFormControlProps } from '@wordpress/dataviews';
+ *
+ * const { MediaEdit } = unlock( mediaUtilsPrivateApis );
  *
  * const featuredImageField = {
  *   id: 'featured_media',
