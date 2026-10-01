@@ -8,7 +8,7 @@
 /**
  * Filters the query loop block query vars to exclude the current post.
  *
- * @param array $query The current query vars.
+ * @param array    $query The current query vars.
  * @param WP_Block $block The block instance.
  *
  * @return array The modified query vars.

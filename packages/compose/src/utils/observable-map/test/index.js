@@ -1,11 +1,12 @@
+import { describe, expect, test, vi } from 'vitest';
 import { observableMap } from '..';
 
 describe( 'ObservableMap', () => {
 	test( 'should observe individual values', () => {
 		const map = observableMap();
 
-		const listenerA = jest.fn();
-		const listenerB = jest.fn();
+		const listenerA = vi.fn();
+		const listenerB = vi.fn();
 
 		const unsubA = map.subscribe( 'a', listenerA );
 		const unsubB = map.subscribe( 'b', listenerB );

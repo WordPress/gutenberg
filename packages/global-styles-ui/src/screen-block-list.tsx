@@ -3,12 +3,12 @@ import { __, sprintf, _n } from '@wordpress/i18n';
 import {
 	Button,
 	FlexItem,
-	privateApis as componentsPrivateApis,
 	SearchControl,
 	__experimentalHStack as HStack,
 	__experimentalText as WCText,
 } from '@wordpress/components';
-import { VisuallyHidden } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { Menu, VisuallyHidden } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import {
 	useState,
@@ -19,6 +19,7 @@ import {
 	useDeferredValue,
 	memo,
 } from '@wordpress/element';
+import type { BlockType } from '@wordpress/blocks';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import {
 	BlockIcon,
@@ -42,9 +43,8 @@ const {
 	useSettingsForBlockElement,
 	useHasColorPanel,
 	useHasBackgroundPanel,
+	searchItems,
 } = unlock( blockEditorPrivateApis );
-
-const { Menu } = unlock( componentsPrivateApis );
 
 /**
  * Whether a value, or anything nested inside it, holds a real user value.
@@ -208,7 +208,6 @@ interface BlockListProps {
 function BlockList( { filterValue, styleFilter }: BlockListProps ) {
 	const sortedBlockTypes = useSortedBlockTypes();
 	const debouncedSpeak = useDebounce( speak, 500 );
-	const { isMatchingSearchTerm } = useSelect( blocksStore );
 	const { user } = useContext( GlobalStylesContext );
 
 	// Computed once for the whole list rather than per row, so the list does
@@ -227,17 +226,19 @@ function BlockList( { filterValue, styleFilter }: BlockListProps ) {
 		return names;
 	}, [ user ] );
 
-	const searchedBlockTypes = ! filterValue
-		? sortedBlockTypes
-		: sortedBlockTypes.filter( ( blockType ) =>
-				isMatchingSearchTerm( blockType, filterValue )
-		  );
+	// Ranks title matches above keyword, category and description matches, the
+	// same way the inserter does. Without a search value the list keeps its
+	// registration order.
+	const searchedBlockTypes: BlockType[] = searchItems(
+		sortedBlockTypes,
+		filterValue
+	);
 
 	const filteredBlockTypes =
 		styleFilter === 'customized'
 			? searchedBlockTypes.filter( ( blockType ) =>
 					customizedBlockNames.has( blockType.name )
-			  )
+				)
 			: searchedBlockTypes;
 
 	const blockTypesListRef = useRef< HTMLDivElement >( null );
@@ -306,7 +307,7 @@ function ScreenBlockList() {
 			<ScreenHeader
 				title={ __( 'Blocks' ) }
 				description={ __(
-					'Customize the appearance of specific blocks and for the whole site.'
+					"Customize how a block looks everywhere it's used."
 				) }
 			/>
 			<HStack
@@ -322,8 +323,8 @@ function ScreenBlockList() {
 					placeholder={ __( 'Search' ) }
 					size="compact"
 				/>
-				<Menu>
-					<Menu.TriggerButton
+				<Menu.Root>
+					<Menu.Trigger
 						render={
 							<Button
 								size="compact"
@@ -333,31 +334,26 @@ function ScreenBlockList() {
 							/>
 						}
 					/>
-					<Menu.Popover>
-						<Menu.RadioItem
-							name="global-styles-block-filter"
-							value="all"
-							checked={ styleFilter === 'all' }
-							onChange={ () => setStyleFilter( 'all' ) }
-							hideOnClick
+					<Menu.Popup>
+						<Menu.RadioGroup
+							value={ styleFilter }
+							onValueChange={ ( value: StyleFilter ) =>
+								setStyleFilter( value )
+							}
 						>
-							<Menu.ItemLabel>
-								{ __( 'All blocks' ) }
-							</Menu.ItemLabel>
-						</Menu.RadioItem>
-						<Menu.RadioItem
-							name="global-styles-block-filter"
-							value="customized"
-							checked={ styleFilter === 'customized' }
-							onChange={ () => setStyleFilter( 'customized' ) }
-							hideOnClick
-						>
-							<Menu.ItemLabel>
-								{ __( 'Customized' ) }
-							</Menu.ItemLabel>
-						</Menu.RadioItem>
-					</Menu.Popover>
-				</Menu>
+							<Menu.RadioItem value="all" closeOnClick>
+								<Menu.ItemLabel>
+									{ __( 'All blocks' ) }
+								</Menu.ItemLabel>
+							</Menu.RadioItem>
+							<Menu.RadioItem value="customized" closeOnClick>
+								<Menu.ItemLabel>
+									{ __( 'Customized' ) }
+								</Menu.ItemLabel>
+							</Menu.RadioItem>
+						</Menu.RadioGroup>
+					</Menu.Popup>
+				</Menu.Root>
 			</HStack>
 			<MemoizedBlockList
 				filterValue={ deferredFilterValue }

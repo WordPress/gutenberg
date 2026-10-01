@@ -1,5 +1,4 @@
 import { __, _x } from '@wordpress/i18n';
-import { MenuItem } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { download } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -11,6 +10,7 @@ import {
 	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
 } from '../../store/constants';
+import MoreMenuItem from '../more-menu/more-menu-item';
 
 /**
  * Menu item offering to download the active theme, with the user's template
@@ -81,8 +81,7 @@ export default function SiteExport() {
 	}
 
 	return (
-		<MenuItem
-			role="menuitem"
+		<MoreMenuItem
 			icon={ download }
 			onClick={ handleExport }
 			info={ __(
@@ -90,6 +89,6 @@ export default function SiteExport() {
 			) }
 		>
 			{ _x( 'Export', 'site exporter menu item' ) }
-		</MenuItem>
+		</MoreMenuItem>
 	);
 }

@@ -14,6 +14,7 @@ import {
 	SIDEBARS,
 } from './constants';
 import { Notes } from './notes';
+import { NotesDisplayModeMenu } from './notes-display-mode-menu';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
@@ -50,12 +51,14 @@ function NotesSidebar( { postId } ) {
 	}, [] );
 
 	const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
-	const { isDistractionFree } = useSelect( ( select ) => {
+	const { isDistractionFree, areNotesHidden } = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		return {
 			isDistractionFree: get( 'core', 'distractionFree' ),
+			areNotesHidden: get( 'core', 'notesDisplayMode' ) === 'hidden',
 		};
 	}, [] );
+	const { set: setPreference } = useDispatch( preferencesStore );
 	const selectedNoteId = useSelect(
 		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
 		[]
@@ -67,10 +70,10 @@ function NotesSidebar( { postId } ) {
 	const showFloatingSidebar = isLargeViewport;
 	// Fallback to "All notes" sidebar on smaller viewports.
 	const showAllNotesSidebar = notes.length > 0 || ! showFloatingSidebar;
-	useEnableFloatingSidebar(
+	const hasFloatingNotes =
 		showFloatingSidebar &&
-			( unresolvedNotes.length > 0 || selectedNoteId !== undefined )
-	);
+		( unresolvedNotes.length > 0 || selectedNoteId !== undefined );
+	useEnableFloatingSidebar( hasFloatingNotes && ! areNotesHidden );
 
 	async function focusNote( {
 		targetClientId,
@@ -85,6 +88,10 @@ function NotesSidebar( { postId } ) {
 		if ( isApproved ) {
 			enableComplementaryArea( 'core', ALL_NOTES_SIDEBAR );
 		} else if ( ! SIDEBARS.includes( prevArea ) || ! showAllNotesSidebar ) {
+			// Acting on a note brings hidden notes back.
+			if ( showFloatingSidebar && areNotesHidden ) {
+				setPreference( 'core', 'notesDisplayMode', 'full' );
+			}
 			enableComplementaryArea(
 				'core',
 				showFloatingSidebar ? FLOATING_NOTES_SIDEBAR : ALL_NOTES_SIDEBAR
@@ -168,10 +175,15 @@ function NotesSidebar( { postId } ) {
 					addNewNoteForBlock( menuClientId )
 				}
 			/>
+			<NotesDisplayModeMenu
+				hasFloatingNotes={ hasFloatingNotes }
+				hasAllNotes={ showAllNotesSidebar }
+			/>
 			{ showAllNotesSidebar && (
+				// No `name`, so the sidebar doesn't add itself to the "Panels"
+				// menu; the "Notes" submenu toggles it instead.
 				<PluginSidebar
 					identifier={ ALL_NOTES_SIDEBAR }
-					name={ ALL_NOTES_SIDEBAR }
 					title={ __( 'All notes' ) }
 					header={
 						<h2 className="interface-complementary-area-header__title">

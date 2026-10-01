@@ -1,10 +1,16 @@
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-import { Spinner } from '@wordpress/components';
+import { speak } from '@wordpress/a11y';
 import { Component, Suspense } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Card, Notice, Stack, VisuallyHidden } from '@wordpress/ui';
+import {
+	Card,
+	Notice,
+	Spinner,
+	Stack,
+	VisuallyHidden,
+	inertValue,
+} from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 import { splitWidgetActions } from '../../utils/split-widget-actions';
 import { WidgetFooter } from '../widget-footer';
@@ -29,6 +35,10 @@ class WidgetErrorBoundary extends Component<
 
 	static getDerivedStateFromError(): ErrorBoundaryState {
 		return { hasError: true };
+	}
+
+	componentDidCatch() {
+		speak( __( 'This widget encountered an error.' ), 'polite' );
 	}
 
 	render() {
@@ -118,7 +128,8 @@ export function WidgetFrame( {
 					styles.content,
 					isBodyBleeding && styles[ 'bleed-content' ]
 				) }
-				{ ...( editMode ? { inert: 'true' } : {} ) }
+				// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+				inert={ inertValue( editMode ) }
 			>
 				{ isHeaderHidden && widgetType.title && (
 					<VisuallyHidden render={ <h2 id={ titleId } /> }>

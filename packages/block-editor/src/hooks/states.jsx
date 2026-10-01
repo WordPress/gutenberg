@@ -71,9 +71,11 @@ const EMPTY_STATE_OPTIONS = [];
  * @param {string}   props.name     Block name.
  * @param {Object}   props.value    Currently selected style-state value.
  * @param {Function} props.onChange Callback when style-state selection changes.
+ * @param {Element}  props.children Optional menu content rendered after the
+ *                                  state groups.
  * @return {Element|null} State control component, or null if not applicable.
  */
-export function BlockStatesControl( { name, value, onChange } ) {
+export function BlockStatesControl( { name, value, onChange, children } ) {
 	const pseudoStateOptions = useMemo(
 		() => getPseudoStateOptions( name ),
 		[ name ]
@@ -91,7 +93,9 @@ export function BlockStatesControl( { name, value, onChange } ) {
 			onChangePseudoState={ ( pseudo ) => onChange( { pseudo } ) }
 			popoverProps={ dropdownMenuProps.popoverProps }
 			showText={ false }
-		/>
+		>
+			{ children }
+		</StateControl>
 	);
 }
 

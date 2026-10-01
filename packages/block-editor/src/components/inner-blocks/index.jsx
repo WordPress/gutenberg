@@ -18,6 +18,7 @@ import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { store as blockEditorStore } from '../../store';
 import useBlockDropZone from '../use-block-drop-zone';
+import { normalizeLegacyLayout } from '../../layouts/utils';
 import { unlock } from '../../lock-unlock';
 
 const EMPTY_OBJECT = {};
@@ -94,11 +95,18 @@ function UncontrolledInnerBlocks( props ) {
 		EMPTY_OBJECT;
 
 	const { allowSizingOnChildren = false } = defaultLayoutBlockSupport;
+	// Legacy markup expresses a constrained layout as `inherit: true` or bare
+	// content/wide sizes with no `type`. Promote it the way the layout styling
+	// hooks do, so the inner blocks resolve to constrained rather than flow.
+	const normalizedLayout = useMemo(
+		() => normalizeLegacyLayout( layout ),
+		[ layout ]
+	);
 	// The support is a config object, e.g. `{ allowSwitching: false, default: { type: 'flex' } }`,
 	// so the layout itself lives under `default`. Passing the config through would leave the
 	// context without a `type`, and consumers would resolve it to the flow layout.
 	const usedLayout =
-		layout || defaultLayoutBlockSupport.default || EMPTY_OBJECT;
+		normalizedLayout || defaultLayoutBlockSupport.default || EMPTY_OBJECT;
 
 	const memoedLayout = useMemo(
 		() => ( {

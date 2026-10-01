@@ -3,7 +3,6 @@ import {
 	__experimentalToolsPanelContext as ToolsPanelContext,
 } from '@wordpress/components';
 import warning from '@wordpress/warning';
-import deprecated from '@wordpress/deprecated';
 import { useEffect, useContext, useMemo } from '@wordpress/element';
 import {
 	useBlockEditContext,
@@ -23,21 +22,8 @@ const PATTERN_EDITING_GROUPS = [ 'content', 'list' ];
 export default function InspectorControlsFill( {
 	children,
 	group = 'default',
-	__experimentalGroup,
 	resetAllFilter,
 } ) {
-	if ( __experimentalGroup ) {
-		deprecated(
-			'`__experimentalGroup` property in `InspectorControlsFill`',
-			{
-				since: '6.2',
-				version: '6.4',
-				alternative: '`group`',
-			}
-		);
-		group = __experimentalGroup;
-	}
-
 	const context = useBlockEditContext();
 	const isSelectedBlock = context[ mayDisplayControlsKey ];
 	const isPatternEditing = context[ mayDisplayPatternEditingControlsKey ];

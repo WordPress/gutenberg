@@ -6,7 +6,8 @@ import {
 import ResolutionTool from '..';
 
 export default {
-	title: 'BlockEditor/ResolutionControl',
+	id: 'blockeditor-resolutioncontrol',
+	title: 'Editor/Block Editor/ResolutionControl',
 	component: ResolutionTool,
 	tags: [ 'status-private' ],
 	parameters: {
