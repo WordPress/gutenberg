@@ -25,6 +25,7 @@
 		{ "path": "../plugins" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
+		{ "path": "../react-inert-value/tsconfig.build.json" },
 		{ "path": "../route" },
 		{ "path": "../style-runtime/tsconfig.build.json" },
 		{ "path": "../theme/tsconfig.build.json" },

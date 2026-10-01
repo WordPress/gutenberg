@@ -197,18 +197,19 @@ function gutenberg_exclude_notes_from_comment_count_7_2( $new_count, $old_count,
 add_filter( 'pre_wp_update_comment_count_now', 'gutenberg_exclude_notes_from_comment_count_7_2', 10, 3 );
 
 /**
- * Returns the allowed emojis for note reactions.
- *
- * Each emoji is an associative array with:
- * - `emoji` (string) The emoji character.
- * - `label` (string) A translated human-readable label.
- * - `value` (string) A slug used as the storage key.
+ * Returns the note reaction emoji settings: the named emoji list plus the
+ * rules for emoji picked from the full picker, which are stored as hex keys.
  *
  * @since 7.2.0
  *
- * @return array[] List of emoji definitions.
+ * @return array {
+ *     @type array[]  $emojis         Named emoji definitions, each with `emoji`,
+ *                                    `label`, and `value` keys.
+ *     @type bool     $allow_unlisted Whether emoji outside the named list are accepted.
+ *     @type string[] $exclude        Normalized hex keys that are never accepted.
+ * }
  */
-function gutenberg_get_note_reaction_emojis() {
+function gutenberg_get_note_reaction_emoji_settings() {
 	$default_emojis = array(
 		array(
 			'emoji' => '❤️',
@@ -238,14 +239,61 @@ function gutenberg_get_note_reaction_emojis() {
 	);
 
 	/**
-	 * Filters the list of allowed emojis for note reactions.
+	 * Filters which emoji note reactions accept.
+	 *
+	 * Named emoji are always accepted. `allow_unlisted` and `exclude` only
+	 * apply to emoji picked from the full picker.
 	 *
 	 * @since 7.2.0
 	 *
-	 * @param array[] $emojis List of emoji definitions. Each item has
-	 *                        `emoji`, `label`, and `value` keys.
+	 * @param array $settings {
+	 *     @type array[]  $emojis         Named emoji definitions. Each item has
+	 *                                    `emoji`, `label`, and `value` keys.
+	 *     @type bool     $allow_unlisted Whether any emoji from the full picker is
+	 *                                    accepted. False limits reactions to the
+	 *                                    named list. Default true.
+	 *     @type string[] $exclude        Emojibase hexcodes to reject, such as
+	 *                                    `1F595`. Excluding an emoji also excludes
+	 *                                    its skin-tone variants. Default empty.
+	 * }
 	 */
-	return apply_filters( 'gutenberg_note_reaction_emojis', $default_emojis );
+	$defaults = array(
+		'emojis'         => $default_emojis,
+		'allow_unlisted' => true,
+		'exclude'        => array(),
+	);
+	$settings = apply_filters( 'gutenberg_note_reaction_emoji_settings', $defaults );
+	// Keys a callback leaves out keep their defaults.
+	$settings = is_array( $settings ) ? wp_parse_args( $settings, $defaults ) : $defaults;
+
+	$exclude = array();
+	if ( is_array( $settings['exclude'] ) ) {
+		foreach ( $settings['exclude'] as $hexcode ) {
+			$hex_key = gutenberg_normalize_note_reaction_hex_key( $hexcode );
+			if ( '' !== $hex_key ) {
+				$exclude[] = $hex_key;
+			}
+		}
+	}
+
+	return array(
+		'emojis'         => is_array( $settings['emojis'] ) ? array_values( $settings['emojis'] ) : array(),
+		'allow_unlisted' => (bool) $settings['allow_unlisted'],
+		'exclude'        => array_values( array_unique( $exclude ) ),
+	);
+}
+
+/**
+ * Returns the named emojis for note reactions.
+ *
+ * @since 7.2.0
+ *
+ * @return array[] List of emoji definitions, each with `emoji`, `label`,
+ *                 and `value` keys.
+ */
+function gutenberg_get_note_reaction_emojis() {
+	$settings = gutenberg_get_note_reaction_emoji_settings();
+	return $settings['emojis'];
 }
 
 /**
@@ -258,12 +306,12 @@ function gutenberg_get_note_reaction_emojis() {
  * @return array Updated block editor settings.
  */
 function gutenberg_add_note_reaction_emojis_setting( $settings ) {
-	$rules = gutenberg_get_note_reaction_emoji_rules();
+	$emoji_settings = gutenberg_get_note_reaction_emoji_settings();
 
-	$settings['noteReactionEmojis']     = gutenberg_get_note_reaction_emojis();
+	$settings['noteReactionEmojis']     = $emoji_settings['emojis'];
 	$settings['noteReactionEmojiRules'] = array(
-		'allowUnlisted' => $rules['allow_unlisted'],
-		'exclude'       => $rules['exclude'],
+		'allowUnlisted' => $emoji_settings['allow_unlisted'],
+		'exclude'       => $emoji_settings['exclude'],
 	);
 	return $settings;
 }
@@ -296,58 +344,6 @@ function gutenberg_normalize_note_reaction_hex_key( $hex_key ) {
 }
 
 /**
- * Returns the rules for reactions picked outside the named emoji list,
- * which the full picker stores as hex keys.
- *
- * @since 7.2.0
- *
- * @return array {
- *     @type bool     $allow_unlisted Whether emoji outside the named list are accepted.
- *     @type string[] $exclude        Normalized hex keys that are never accepted.
- * }
- */
-function gutenberg_get_note_reaction_emoji_rules() {
-	/**
-	 * Filters which emoji note reactions accept beyond the named list from
-	 * `gutenberg_note_reaction_emojis`. Named emoji are always accepted.
-	 *
-	 * @since 7.2.0
-	 *
-	 * @param array $rules {
-	 *     @type bool     $allow_unlisted Whether any emoji from the full picker is
-	 *                                    accepted. False limits reactions to the
-	 *                                    named list. Default true.
-	 *     @type string[] $exclude        Emojibase hexcodes to reject, such as
-	 *                                    `1F595`. Excluding an emoji also excludes
-	 *                                    its skin-tone variants. Default empty.
-	 * }
-	 */
-	$rules = apply_filters(
-		'gutenberg_note_reaction_emoji_rules',
-		array(
-			'allow_unlisted' => true,
-			'exclude'        => array(),
-		)
-	);
-	$rules = is_array( $rules ) ? $rules : array();
-
-	$exclude = array();
-	if ( isset( $rules['exclude'] ) && is_array( $rules['exclude'] ) ) {
-		foreach ( $rules['exclude'] as $hexcode ) {
-			$hex_key = gutenberg_normalize_note_reaction_hex_key( $hexcode );
-			if ( '' !== $hex_key ) {
-				$exclude[] = $hex_key;
-			}
-		}
-	}
-
-	return array(
-		'allow_unlisted' => ! isset( $rules['allow_unlisted'] ) || (bool) $rules['allow_unlisted'],
-		'exclude'        => array_values( array_unique( $exclude ) ),
-	);
-}
-
-/**
  * Whether a hex-key reaction is accepted under the emoji rules. An emoji
  * from the named list is always accepted, including its skin-tone variants.
  *
@@ -362,7 +358,8 @@ function gutenberg_is_note_reaction_hex_key_allowed( $hex_key ) {
 		return false;
 	}
 
-	foreach ( gutenberg_get_note_reaction_emojis() as $entry ) {
+	$settings = gutenberg_get_note_reaction_emoji_settings();
+	foreach ( $settings['emojis'] as $entry ) {
 		if (
 			is_array( $entry ) &&
 			! empty( $entry['emoji'] ) &&
@@ -372,8 +369,7 @@ function gutenberg_is_note_reaction_hex_key_allowed( $hex_key ) {
 		}
 	}
 
-	$rules = gutenberg_get_note_reaction_emoji_rules();
-	return $rules['allow_unlisted'] && ! in_array( $base, $rules['exclude'], true );
+	return $settings['allow_unlisted'] && ! in_array( $base, $settings['exclude'], true );
 }
 
 /**

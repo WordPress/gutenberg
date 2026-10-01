@@ -116,6 +116,12 @@ const config: StorybookConfig = {
 		// Should match defaults in Storybook except for the propFilter.
 		// https://github.com/storybookjs/storybook/blob/3e34a288c8fabc7d5b5cc43b28ae9d674c48e3ea/code/core/src/core-server/presets/common-preset.ts#L162-L168
 		reactDocgenTypescriptOptions: {
+			/*
+			 * Vite's root is this workspace, so the plugin's default glob stops
+			 * at its edge and the documented sources need naming explicitly.
+			 */
+			include: [ '**/*.tsx', '../packages/*/src/**/*.tsx' ],
+			exclude: [ '**/test/**', '**/node_modules/**' ],
 			// Use a docgen-specific TypeScript configuration that disables
 			// project references. Without this, docgen follows referenced
 			// projects' built `.d.ts` declarations and emits a duplicate
@@ -152,8 +158,14 @@ const config: StorybookConfig = {
 			savePropValueAsString: true,
 		},
 	},
-	viteFinal: async ( viteConfig ) => {
+	viteFinal: async ( viteConfig, options ) => {
 		return mergeConfig( viteConfig, {
+			/*
+			 * Storybook roots Vite at the repository root, which owns none of
+			 * the dependencies. Each config roots itself, so the one that
+			 * spreads this gets its own workspace rather than this one.
+			 */
+			root: options.configDir,
 			resolve: {
 				alias: [
 					{

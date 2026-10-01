@@ -1,6 +1,9 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Navigation block - List view editing', () => {
+	// WordPress always has this category, so nothing needs creating or removing.
+	const DEFAULT_CATEGORY_NAME = 'Uncategorized';
+
 	const navMenuBlocksFixture = {
 		title: 'Test Menu',
 		content: `<!-- wp:navigation-link {"label":"Top Level Item 1","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} /-->
@@ -21,6 +24,10 @@ test.describe( 'Navigation block - List view editing', () => {
 		} );
 		await requestUtils.createPage( {
 			title: 'Test Page 3',
+			status: 'publish',
+		} );
+		await requestUtils.createPost( {
+			title: 'Test Post 1',
 			status: 'publish',
 		} );
 	} );
@@ -130,6 +137,7 @@ test.describe( 'Navigation block - List view editing', () => {
 
 	test( `can add new menu items`, async ( {
 		page,
+		pageUtils,
 		editor,
 		requestUtils,
 		linkControl,
@@ -180,44 +188,99 @@ test.describe( 'Navigation block - List view editing', () => {
 		await expect( linkUIInput ).toBeFocused();
 		await expect( linkUIInput ).toBeEmpty();
 
-		// Provides test coverage for feature whereby Custom Link type
-		// should default to `Pages` when displaying the "initial suggestions"
-		// in the Link UI.
-		// See https://github.com/WordPress/gutenberg/pull/54622.
-		const firstResult = await linkControl.getNthSearchResult( 0 );
-		const secondResult = await linkControl.getNthSearchResult( 1 );
-		const thirdResult = await linkControl.getNthSearchResult( 2 );
+		await test.step( 'default initial suggestions are all page type', async () => {
+			// Provides test coverage for feature whereby Custom Link type
+			// should default to `Pages` when displaying the "initial
+			// suggestions" in the Link UI.
+			// See https://github.com/WordPress/gutenberg/pull/54622.
+			const firstResult = await linkControl.getNthSearchResult( 0 );
+			const secondResult = await linkControl.getNthSearchResult( 1 );
+			const thirdResult = await linkControl.getNthSearchResult( 2 );
 
-		const firstResultType =
-			await linkControl.getSearchResultText( firstResult );
+			const firstResultType =
+				await linkControl.getSearchResultType( firstResult );
 
-		const secondResultType =
-			await linkControl.getSearchResultText( secondResult );
+			const secondResultType =
+				await linkControl.getSearchResultType( secondResult );
 
-		const thirdResultType =
-			await linkControl.getSearchResultText( thirdResult );
+			const thirdResultType =
+				await linkControl.getSearchResultType( thirdResult );
 
-		expect( firstResultType ).toContain( 'Page' );
-		expect( secondResultType ).toContain( 'Page' );
-		expect( thirdResultType ).toContain( 'Page' );
+			expect( firstResultType ).toBe( 'Page' );
+			expect( secondResultType ).toBe( 'Page' );
+			expect( thirdResultType ).toBe( 'Page' );
+		} );
 
-		// Grab the text from the first result so we can check (later on) that it was inserted.
-		const firstResultText =
-			await linkControl.getSearchResultText( firstResult );
+		await test.step( 'search from default link returns best page type matches first', async () => {
+			// Search for a string that is the start of a page title
+			await page.keyboard.type( 'Test', { delay: 50 } );
 
-		// Create the link.
-		await firstResult.click();
+			const searchedResults = await linkControl.getSearchResults();
 
-		// Check the new menu item was inserted at the end of the existing menu.
-		await expect(
-			listView
-				.getByRole( 'gridcell', {
-					name: firstResultText,
-				} )
-				.filter( {
-					hasText: 'Block 3 of 3, Level 1.', // proxy for filtering by description.
-				} )
-		).toBeVisible();
+			// The initial suggestions are pages, so wait for a result that can only
+			// come from the typed search before asserting on the order.
+			await expect(
+				searchedResults.filter( { hasText: 'Test Post 1' } )
+			).toBeVisible();
+
+			// The appended item is a Page Link, so first results should be pages
+			const types = await Promise.all(
+				[ 0, 1, 2 ].map( async ( index ) =>
+					linkControl.getSearchResultType(
+						await linkControl.getNthSearchResult( index )
+					)
+				)
+			);
+			expect( types ).toEqual( [ 'Page', 'Page', 'Page' ] );
+		} );
+
+		await test.step( 'can find taxonomy results via default link search', async () => {
+			// Replace the search text with a category name.
+			await pageUtils.pressKeys( 'primary+a' );
+			await page.keyboard.type( DEFAULT_CATEGORY_NAME, { delay: 50 } );
+
+			const searchedResults = await linkControl.getSearchResults();
+			const categoryResult = searchedResults.filter( {
+				hasText: DEFAULT_CATEGORY_NAME,
+			} );
+
+			await expect( categoryResult ).toBeVisible();
+
+			// Nothing else on the site holds the word, so the term leads.
+			expect(
+				await linkControl.getSearchResultType( searchedResults.first() )
+			).toBe( 'Category' );
+		} );
+
+		await test.step( 'can create a taxonomy result via default link search', async () => {
+			// select it with the keyboard
+			await pageUtils.pressKeys( 'ArrowDown' );
+
+			const categoryResult = (
+				await linkControl.getSearchResults()
+			).filter( { hasText: DEFAULT_CATEGORY_NAME } );
+
+			// URLInput is a combobox: focus stays on the input and the
+			// highlighted option carries `aria-selected`.
+			await expect( categoryResult ).toHaveAttribute(
+				'aria-selected',
+				'true'
+			);
+
+			// Submit the link.
+			await pageUtils.pressKeys( 'Enter' );
+
+			// Check the new menu item was inserted at the end of the existing menu.
+			await expect(
+				listView
+					.getByRole( 'gridcell', {
+						name: DEFAULT_CATEGORY_NAME,
+					} )
+					.filter( {
+						hasText: 'Block 3 of 3, Level 1.', // proxy for filtering by description.
+					} )
+			).toBeVisible();
+		} );
 	} );
 
 	test( `can remove menu items`, async ( { page, editor, requestUtils } ) => {
@@ -646,5 +709,13 @@ class LinkControl {
 			.locator( '.components-menu-item__item' ) // this is the only way to get the label text without the URL.
 			.last()
 			.innerText();
+	}
+
+	async getSearchResultType( result ) {
+		await expect( result ).toBeVisible();
+
+		// The entity type renders as a sibling of the label, so it is not part
+		// of the text returned by getSearchResultText.
+		return result.locator( '.components-menu-item__shortcut' ).innerText();
 	}
 }
