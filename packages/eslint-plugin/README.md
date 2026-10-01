@@ -90,7 +90,7 @@ Alternatively, you can opt-in to only the more granular rulesets offered by the 
 - `jsx-a11y` – rules for accessibility in JSX.
 - `react` – rules for React components.
 - `test-e2e` – rules for end-to-end tests written in Puppeteer.
-- `test-unit` – recommended rules for Vitest tests with explicit imports. This changes from Jest at the 27.0.0 major release boundary. Jest consumers can configure `eslint-plugin-jest` directly. See the [migration guide](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/docs/vitest-migration.md).
+- `test-unit` – Vitest's recommended rules with explicit imports, plus checks for awaited polling and Browser assertions. Generated titles passed through variables are allowed. This changes from Jest at the 27.0.0 major release boundary. Jest consumers can configure `eslint-plugin-jest` directly. See the [migration guide](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/docs/vitest-migration.md).
 - `test-playwright` – rules for end-to-end tests written in Playwright.
 
 For example, if your project does not use React, you could use only the ESNext rules:
@@ -105,6 +105,43 @@ export default [ ...wordpress.configs.esnext ];
 These rules can be used additively, so you could spread both `esnext` and `custom` rulesets, but omit the `react` and `jsx-a11y` configurations.
 
 The granular rulesets will not define any environment globals. As such, if they are required for your project, you will need to define them yourself.
+
+### Unit-test lint defaults
+
+The next major release after 27.0.0 adds `vitest/require-awaited-expect-poll` at error severity to `test-unit`. This also affects the default `wp-scripts lint-js` configuration for unit tests. Existing tests can now fail lint if an `expect.poll()` or `expect.element()` assertion is neither awaited nor explicitly returned. The supported ESLint and Vitest ranges remain unchanged.
+
+Await assertions in tests. Helpers can explicitly return the assertion promise, provided their callers await it:
+
+```js
+import { expect, test } from 'vitest';
+
+test( 'waits for the result', async () => {
+	await expect.poll( () => getResult() ).toBe( 'ready' );
+} );
+
+function expectVisible( locator ) {
+	return expect.element( locator ).toBeVisible();
+}
+```
+
+The rule cannot follow promises through variables or `Promise.all()`, and reports concise arrow helpers such as `() => expect.element( locator ).toBeVisible()` even when their callers await them. Use an explicit `return` in these helpers. For valid promise aggregation, keep the awaited promises and use a local rule directive. Review each diagnostic before changing test behavior.
+
+`vitest/valid-title` uses `allowArguments: true` so tests can pass generated titles through variables. Literal titles still receive the recommended validation. Gutenberg's mock-import, filename, assertion-helper, and other repository conventions remain internal.
+
+To override a rule, add a configuration after the preset. Use the `vitest/` namespace in flat config and `@vitest/` in the deprecated ESLint 9 eslintrc wrapper. ESLint 10 supports flat config only:
+
+```js
+import wordpress from '@wordpress/eslint-plugin';
+
+export default [
+	...wordpress.configs[ 'test-unit' ],
+	{
+		rules: {
+			'vitest/valid-title': [ 'error', { allowArguments: false } ],
+		},
+	},
+];
+```
 
 ### Rules
 
