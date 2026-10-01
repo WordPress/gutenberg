@@ -225,13 +225,19 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 		$img_height       = $img_metadata['height'] ?? 'none';
 	}
 
+	// Create unique id and set the image metadata in the state.
+	$unique_image_id = uniqid();
+
+	// The `anchor-name` is used to position the lightbox trigger button
+	// relative to the image using CSS anchor positioning.
+	$img_styles = "anchor-name: --wp-image-$unique_image_id;" . $img_styles;
+	$processor->set_attribute( 'style', $img_styles );
+
 	// Figure.
 	$processor->seek( 'figure' );
 	$figure_class_names = $processor->get_attribute( 'class' );
 	$figure_styles      = $processor->get_attribute( 'style' );
 
-	// Create unique id and set the image metadata in the state.
-	$unique_image_id = uniqid();
 	wp_interactivity_state(
 		'core/image',
 		array(
@@ -271,7 +277,6 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 	$processor->next_tag( 'img' );
 	$processor->set_attribute( 'data-wp-init', 'callbacks.setButtonStyles' );
 	$processor->set_attribute( 'data-wp-on--load', 'callbacks.setButtonStyles' );
-	$processor->set_attribute( 'data-wp-on-window--resize', 'callbacks.setButtonStyles' );
 
 	// Set an event to preload the image on pointerenter and pointerdown(mobile).
 	// Pointerleave is used to cancel the preload if the user hovers away from the image
@@ -302,8 +307,8 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 			data-wp-bind--aria-label="state.thisImage.triggerButtonAriaLabel"
 			data-wp-init="callbacks.initTriggerButton"
 			data-wp-on--click="actions.showLightbox"
-			data-wp-style--right="state.thisImage.buttonRight"
-			data-wp-style--top="state.thisImage.buttonTop"
+			data-wp-style--bottom="state.thisImage.buttonBottom"
+			data-wp-style--position-anchor="state.imageButtonAnchor"
 		>
 			<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 12 12">
 				<path fill="#fff" d="M2 0a2 2 0 0 0-2 2v2h1.5V2a.5.5 0 0 1 .5-.5h2V0H2Zm2 10.5H2a.5.5 0 0 1-.5-.5V8H0v2a2 2 0 0 0 2 2h2v-1.5ZM8 12v-1.5h2a.5.5 0 0 0 .5-.5V8H12v2a2 2 0 0 1-2 2H8Zm2-12a2 2 0 0 1 2 2v2h-1.5V2a.5.5 0 0 0-.5-.5H8V0h2Z" />
