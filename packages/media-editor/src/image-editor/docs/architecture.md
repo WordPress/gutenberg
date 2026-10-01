@@ -41,6 +41,8 @@ The core reducer is framework-agnostic and serializable. React and media-editor 
 
 `useMediaEditorState()` returns the media editor session. The session owns the source image, every editing slice, the shared undo/redo history, gesture boundaries, and whether the edits change the saved image (`hasOutputEdits`). The cropper is one participant: `session.cropper` is a geometry-only `CropperController` that a `<Cropper>` takes via its `controller` prop, and its `isDirty` covers geometry alone. Replacing the source image (`setSourceImage`, which the cropper's `setImage` also calls) starts a fresh session with default geometry and crop options, a clean baseline, and no history. Save code asks the session, not the cropper, whether image output needs saving.
 
+The session also holds named edits other than crop: `session.edits`, set with `session.setEdit( name, value )` and removed by passing `undefined`. They share the crop history, so undo, redo and gestures treat them like any crop change, and a different source image clears them. Values must be plain data, because the session compares them by content to tell a real change from a no-op. Edits do not yet count towards `hasOutputEdits`; nothing saves them.
+
 ### Viewport
 
 Viewport pan/zoom lets the user inspect or follow the crop area without changing the crop output. It is not part of export and should not create undo entries.
