@@ -1,4 +1,4 @@
-name: Storybook build and Smoke Tests
+name: Storybook Build and Smoke Tests
 
 on:
     pull_request:
@@ -19,6 +19,7 @@ permissions: {}
 
 jobs:
     check:
+        name: Storybook Build and Smoke Tests
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
@@ -67,6 +68,7 @@ jobs:
 
             - name: Build E2E Storybook
               env:
+                  NODE_OPTIONS: --max-old-space-size=8192
                   NODE_ENV: test
               run: npm run storybook:e2e:build
 

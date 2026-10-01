@@ -3,13 +3,11 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import MediaEditorCropPanel from '..';
 import type { MediaEditorCropPanelProps } from '..';
 import { MediaEditorStateProvider } from '../../../state';
-import type { CropperState } from '../../../image-editor';
 
 globalThis.wpVitest.mockMatchMedia();
 
 function setupCropPanel(
-	overrides: Partial< MediaEditorCropPanelProps > = {},
-	initialCropperState?: Partial< CropperState >
+	overrides: Partial< MediaEditorCropPanelProps > = {}
 ) {
 	const props: MediaEditorCropPanelProps = {
 		aspectRatioValue: '1',
@@ -23,7 +21,7 @@ function setupCropPanel(
 	};
 
 	render(
-		<MediaEditorStateProvider initialCropperState={ initialCropperState }>
+		<MediaEditorStateProvider>
 			<MediaEditorCropPanel { ...props } />
 		</MediaEditorStateProvider>
 	);

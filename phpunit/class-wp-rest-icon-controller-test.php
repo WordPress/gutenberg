@@ -27,21 +27,6 @@ class WP_Test_REST_Icons_Controller extends WP_Test_REST_TestCase {
 	public function set_up() {
 		parent::set_up();
 
-		/*
-		 * Other suites reset the `WP_Icons_Registry` singleton, wiping the collections and
-		 * icons that `init` only registers once. Replay the registration so order-dependent
-		 * tests pass. `gutenberg_register_default_icon_collections()` registers every default
-		 * collection at once, so drop whatever survived rather than topping up.
-		 */
-		$collections_registry = WP_Icon_Collections_Registry::get_instance();
-		foreach ( array( 'core', 'core-admin' ) as $collection_slug ) {
-			if ( $collections_registry->is_registered( $collection_slug ) ) {
-				$collections_registry->unregister( $collection_slug );
-			}
-		}
-		gutenberg_register_default_icon_collections();
-		gutenberg_register_default_icons();
-
 		$collections = array(
 			'test-public'  => true,
 			'test-private' => false,
@@ -211,6 +196,103 @@ class WP_Test_REST_Icons_Controller extends WP_Test_REST_TestCase {
 
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertEquals( array( 'core/at-symbol' ), array_column( $data, 'name' ) );
+	}
+
+	/**
+	 * Registers an icon carrying keywords, so the keyword tests do not depend on
+	 * the terms any bundled icon happens to ship with.
+	 *
+	 * @return string The registered icon name.
+	 */
+	private function register_keyword_icon() {
+		$icon_name = 'core/keyword-icon';
+
+		wp_register_icon(
+			$icon_name,
+			array(
+				'label'    => 'Keyword Icon',
+				'content'  => '<svg></svg>',
+				'keywords' => array( 'hamburger' ),
+			)
+		);
+
+		return $icon_name;
+	}
+
+	/**
+	 * Test that GET /wp/v2/icons/?search=%s searches icon keywords too.
+	 */
+	public function test_get_items_search_includes_keywords() {
+		wp_set_current_user( self::$editor_id );
+
+		$icon_name = $this->register_keyword_icon();
+
+		try {
+			$request = new WP_REST_Request( 'GET', '/wp/v2/icons' );
+
+			// 'hamburger' is in neither the name nor the label, only the keywords.
+			$request->set_param( 'search', 'hamburger' );
+			$response = rest_get_server()->dispatch( $request );
+			$data     = $response->get_data();
+
+			$this->assertSame( 200, $response->get_status() );
+			$this->assertEquals( array( $icon_name ), array_column( $data, 'name' ) );
+		} finally {
+			wp_unregister_icon( $icon_name );
+		}
+	}
+
+	/**
+	 * Test that the response exposes an icon's keywords, so that clients which
+	 * filter icons locally can match against them.
+	 */
+	public function test_get_items_response_includes_keywords() {
+		wp_set_current_user( self::$editor_id );
+
+		$icon_name = $this->register_keyword_icon();
+
+		try {
+			$request = new WP_REST_Request( 'GET', '/wp/v2/icons' );
+			$request->set_param( 'search', $icon_name );
+			$response = rest_get_server()->dispatch( $request );
+			$data     = $response->get_data();
+
+			$this->assertSame( 200, $response->get_status() );
+			$this->assertCount( 1, $data );
+			$this->assertArrayHasKey( 'keywords', $data[0] );
+			$this->assertContains( 'hamburger', $data[0]['keywords'] );
+		} finally {
+			wp_unregister_icon( $icon_name );
+		}
+	}
+
+	/**
+	 * Test that icons registered without keywords still expose an empty array,
+	 * so consumers do not have to handle a missing field.
+	 */
+	public function test_get_items_response_keywords_defaults_to_empty_array() {
+		wp_set_current_user( self::$editor_id );
+
+		wp_register_icon(
+			'core/no-keywords',
+			array(
+				'label'   => 'No Keywords',
+				'content' => '<svg></svg>',
+			)
+		);
+
+		try {
+			$request = new WP_REST_Request( 'GET', '/wp/v2/icons' );
+			$request->set_param( 'search', 'core/no-keywords' );
+			$response = rest_get_server()->dispatch( $request );
+			$data     = $response->get_data();
+
+			$this->assertSame( 200, $response->get_status() );
+			$this->assertCount( 1, $data );
+			$this->assertSame( array(), $data[0]['keywords'] );
+		} finally {
+			wp_unregister_icon( 'core/no-keywords' );
+		}
 	}
 
 	/**
