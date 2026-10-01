@@ -25,7 +25,7 @@ vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => {
 	};
 } );
 
-vi.mock( '../../../../sync/src/providers', () => ( {
+vi.mock( import( '../../../../sync/src/providers' ), () => ( {
 	getProviderCreators: vi.fn(),
 } ) );
 
