@@ -1258,4 +1258,51 @@ describe( 'withdrawn suggestions and failed applies', () => {
 				.getBlockAttributes( block.clientId )?.metadata
 		).toBeUndefined();
 	} );
+
+	it( 'keeps the overlay entry when applying an attribute suggestion fails', async () => {
+		const block = createBlock( PARAGRAPH, { content: 'Hello' } );
+		const { registry, getProvider, getOverlay } = setup( [ block ], {
+			failSave: true,
+		} );
+		act( () => {
+			getOverlay().captureBaseline( block.clientId, PARAGRAPH, {
+				content: 'Hello',
+			} );
+		} );
+		act( () => {
+			getOverlay().setOverlayAttributes( block.clientId, {
+				align: 'center',
+			} );
+			getOverlay().setCommentId( block.clientId, 7 );
+		} );
+
+		await act( async () => {
+			await getProvider().applySuggestion( {
+				commentId: 7,
+				clientId: block.clientId,
+				payload: {
+					schemaVersion: 2,
+					blockName: PARAGRAPH,
+					baseRevision: null,
+					operations: [
+						{
+							type: 'attribute-set',
+							attribute: 'align',
+							before: null,
+							after: 'center',
+						},
+					],
+				},
+			} );
+		} );
+
+		// The block rolls back and the proposal is still pending, so the
+		// suggester's overlay must survive for a retry.
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( block.clientId )?.align
+		).toBeUndefined();
+		expect( getOverlay().hasOverlay( block.clientId ) ).toBe( true );
+	} );
 } );

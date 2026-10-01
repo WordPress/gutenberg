@@ -928,13 +928,9 @@ export function useSuggestionsProvider() {
 			try {
 				// Bypass the suggest-mode interceptor for this dispatch so
 				// the applied attributes actually land on the live block
-				// instead of being reverted into the overlay. Clearing the
-				// overlay entry resets the per-block suggestion tracking,
-				// so any subsequent user edit captures a fresh baseline
-				// from the post-apply attributes. Outside Suggest mode the
-				// interceptor isn't running and these calls are no-ops.
+				// instead of being reverted into the overlay. Outside Suggest
+				// mode the interceptor isn't running and this is a no-op.
 				requestInterceptorBypass( targetClientId );
-				clearOverlay( targetClientId );
 				updateBlockAttributes( targetClientId, newAttributes );
 
 				await saveEntityRecord(
@@ -947,6 +943,13 @@ export function useSuggestionsProvider() {
 					},
 					{ throwOnError: true }
 				);
+
+				// Reset the per-block suggestion tracking only once the
+				// decision is saved, so a failed save keeps the overlay
+				// entry and the suggestion can be applied again. The next
+				// edit then captures a fresh baseline from the post-apply
+				// attributes.
+				clearOverlay( targetClientId );
 
 				createNotice( 'success', __( 'Suggestion applied.' ), {
 					type: 'snackbar',
