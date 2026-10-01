@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   A form field's `description` accepts a React element as well as a string, matching the field's own `description`, so a card's description can include a link.
+-   A form field's `description` accepts a React element as well as a string, matching the field's own `description`, so a card's description can include a link ([#84002](https://github.com/WordPress/gutenberg/pull/84002)).
 -   List the fields the user can show or hide alphabetically by label in the view config's properties section and in the table's insert column submenus, instead of in the order the consumer declared them ([#83947](https://github.com/WordPress/gutenberg/pull/83947)).
 -   Single-selection filter radio indicators stay visually 16px on narrow screens ([#83840](https://github.com/WordPress/gutenberg/pull/83840)).
 -   Selection checkboxes stay visually 16px on narrow screens while retaining a 24px click target ([#83612](https://github.com/WordPress/gutenberg/pull/83612)).
