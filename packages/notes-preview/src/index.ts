@@ -64,15 +64,11 @@ function toMessage( error: unknown, fallback: string ): string {
 	return fallback;
 }
 
-const { state } = store( NAMESPACE, {
+const { state, actions } = store( NAMESPACE, {
 	state: {
 		get isSelected(): boolean {
 			const context = getContext< ThreadContext >();
 			return !! context.noteId && context.selectedId === context.noteId;
-		},
-
-		get hasSelection(): boolean {
-			return !! getContext< RootContext >().selectedId;
 		},
 
 		get canSubmitReply(): boolean {
@@ -88,7 +84,9 @@ const { state } = store( NAMESPACE, {
 			const noteId =
 				context.noteId ?? ( ref as HTMLElement )?.dataset?.noteId ?? '';
 
-			if ( ! noteId ) {
+			// Clicks inside an already selected card - into the reply box, on
+			// the button - should not scroll the page out from under the reader.
+			if ( ! noteId || context.selectedId === noteId ) {
 				return;
 			}
 
@@ -97,9 +95,35 @@ const { state } = store( NAMESPACE, {
 			board?.scrollToAnchor( noteId );
 		},
 
-		clearSelection(): void {
-			getContext< RootContext >().selectedId = '';
+		handleThreadKeydown( event: KeyboardEvent ): void {
+			const { ref } = getElement();
+
+			// Only the card itself, not the reply box or button inside it.
+			if (
+				event.target !== ref ||
+				( event.key !== 'Enter' && event.key !== ' ' )
+			) {
+				return;
+			}
+
+			event.preventDefault();
+			actions.selectThread();
+		},
+
+		handleRootKeydown( event: KeyboardEvent ): void {
+			const context = getContext< RootContext >();
+
+			if ( event.key !== 'Escape' || ! context.selectedId ) {
+				return;
+			}
+
+			const card = document.querySelector< HTMLElement >(
+				`.wp-notes-preview__thread[data-note-id="${ context.selectedId }"]`
+			);
+
+			context.selectedId = '';
 			board?.setSelected( null );
+			card?.focus();
 		},
 
 		toggleResolved(): void {
@@ -178,6 +202,14 @@ const { state } = store( NAMESPACE, {
 			board = createBoard( ref as HTMLElement, ( noteId ) => {
 				context.selectedId = noteId;
 				board?.setSelected( noteId );
+
+				// On a narrow viewport the rail is a closed drawer; a reader
+				// who asked for a note expects to see it.
+				if ( ! board?.isFloating() ) {
+					context.isRailOpen = true;
+				}
+
+				board?.revealCard( noteId );
 			} );
 
 			return () => {
@@ -193,4 +225,5 @@ const { state } = store( NAMESPACE, {
 	 * the inferred type is narrower than what actually exists.
 	 */
 	state: NotesPreviewState;
+	actions: { selectThread: () => void };
 };

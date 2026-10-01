@@ -7,7 +7,12 @@
  * anchor, and a ResizeObserver covers those.
  */
 
-import { calculateThreadTops, parseNoteIds, type ThreadAnchor } from './layout';
+import {
+	calculateThreadTops,
+	parseNoteIds,
+	DEFAULT_GAP,
+	type ThreadAnchor,
+} from './layout';
 
 const NOTE_BLOCK_SELECTOR = '[data-wp-note-id]';
 
@@ -18,6 +23,8 @@ export interface BoardHandle {
 	measure: () => void;
 	setSelected: ( id: string | null ) => void;
 	scrollToAnchor: ( id: string ) => void;
+	revealCard: ( id: string ) => void;
+	isFloating: () => boolean;
 	destroy: () => void;
 }
 
@@ -45,7 +52,8 @@ function resolveAnchor( block: HTMLElement, noteId: string ): HTMLElement {
  * Wires up the rail for a preview page.
  *
  * @param root     The `.wp-notes-preview` root element.
- * @param onSelect Called with a note ID when an indicator is activated.
+ * @param onSelect Called with a note ID when an indicator or an inline
+ *                 highlight is activated.
  * @return Handle for driving and tearing down the board.
  */
 export function createBoard(
@@ -117,7 +125,9 @@ export function createBoard(
 				const card = cards.get( id ) as HTMLElement;
 				const avatar = document.createElement( 'span' );
 				avatar.className = 'wp-notes-preview__indicator-avatar';
-				avatar.style.backgroundImage = `url(${ card.dataset.authorAvatar })`;
+				avatar.style.backgroundImage = `url(${ JSON.stringify(
+					card.dataset.authorAvatar ?? ''
+				) })`;
 				avatar.style.borderColor = card.dataset.authorColor as string;
 				button.append( avatar );
 			}
@@ -231,8 +241,7 @@ export function createBoard(
 		readAnchors();
 
 		// Threads whose block was deleted have nothing to line up with. They
-		// stay in the rail, listed under their own heading, rather than
-		// vanishing.
+		// stay in the rail, after the aligned cards, rather than vanishing.
 		for ( const [ id, card ] of cards ) {
 			card.classList.toggle( 'is-unanchored', ! anchors.has( id ) );
 		}
@@ -268,6 +277,24 @@ export function createBoard(
 
 		for ( const [ id, top ] of Object.entries( tops ) ) {
 			cards.get( id )?.style.setProperty( 'top', `${ top - origin }px` );
+		}
+
+		// Threads with no anchor follow on after the last aligned card, rather
+		// than all landing at the top of the board on top of each other.
+		let next = Math.max(
+			0,
+			...Object.entries( tops ).map(
+				( [ id, top ] ) => top + ( heights[ id ] ?? 0 ) + DEFAULT_GAP
+			)
+		);
+
+		for ( const [ id, card ] of cards ) {
+			if ( id in tops ) {
+				continue;
+			}
+
+			card.style.setProperty( 'top', `${ next - origin }px` );
+			next += heights[ id ] + DEFAULT_GAP;
 		}
 
 		boardEl.style.height = '';
@@ -341,12 +368,51 @@ export function createBoard(
 			?.scrollIntoView( { block: 'center', behavior: 'smooth' } );
 	}
 
+	/**
+	 * Brings a card into view and focus. Only the drawer scrolls: the aligned
+	 * board's scroller is clipped and driven by the page scroll, and scrolling
+	 * it would knock every card off its anchor.
+	 *
+	 * @param id Note ID.
+	 */
+	function revealCard( id: string ): void {
+		const card = cards.get( id );
+
+		if ( ! card ) {
+			return;
+		}
+
+		if ( ! root.classList.contains( 'is-floating' ) ) {
+			card.scrollIntoView( { block: 'nearest' } );
+		}
+
+		card.focus( { preventScroll: true } );
+	}
+
+	/**
+	 * Selects a thread from its inline highlight, the most direct way to ask
+	 * "what is this note about".
+	 *
+	 * @param event Click anywhere in the document.
+	 */
+	function onDocumentClick( event: MouseEvent ): void {
+		const marker = (
+			event.target as Element | null
+		 )?.closest?.< HTMLElement >( 'mark.wp-note[data-id]' );
+		const id = marker?.dataset.id;
+
+		if ( id && cards.has( id ) ) {
+			onSelect( id );
+		}
+	}
+
 	const observer = new window.ResizeObserver( schedule );
 	observer.observe( document.body );
 
 	const passive = { passive: true } as const;
 	window.addEventListener( 'resize', schedule, passive );
 	window.addEventListener( 'scroll', applyScroll, passive );
+	document.addEventListener( 'click', onDocumentClick );
 
 	buildIndicators();
 	schedule();
@@ -355,11 +421,14 @@ export function createBoard(
 		measure: schedule,
 		setSelected,
 		scrollToAnchor,
+		revealCard,
+		isFloating: () => root.classList.contains( 'is-floating' ),
 		destroy() {
 			window.cancelAnimationFrame( frame );
 			observer.disconnect();
 			window.removeEventListener( 'resize', schedule );
 			window.removeEventListener( 'scroll', applyScroll );
+			document.removeEventListener( 'click', onDocumentClick );
 		},
 	};
 }

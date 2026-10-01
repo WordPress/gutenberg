@@ -197,6 +197,7 @@ function gutenberg_notes_preview_render_thread( $note_id, $thread, $can_reply ) 
 		<?php echo wp_interactivity_data_wp_context( $context ); ?>
 		data-wp-class--is-selected="state.isSelected"
 		data-wp-on--click="actions.selectThread"
+		data-wp-on--keydown="actions.handleThreadKeydown"
 	>
 		<?php
 		gutenberg_notes_preview_render_byline( $comment );
@@ -301,10 +302,10 @@ function gutenberg_notes_preview_render_panel() {
 		data-wp-interactive="gutenberg/notes-preview"
 		<?php echo wp_interactivity_data_wp_context( $root_context ); ?>
 		data-wp-init--board="callbacks.initBoard"
+		data-wp-on--keydown="actions.handleRootKeydown"
 	>
 		<div
 			class="wp-notes-preview__indicators"
-			aria-hidden="true"
 			data-label-single="<?php esc_attr_e( 'Show the note on this block', 'gutenberg' ); ?>"
 			<?php /* translators: %d: Number of notes on the block. */ ?>
 			data-label-plural="<?php esc_attr_e( 'Show the %d notes on this block', 'gutenberg' ); ?>"
