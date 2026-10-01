@@ -1,8 +1,9 @@
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
-import { __, sprintf } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import InspectorControls from '../components/inspector-controls';
 import { useBlockEditingMode } from '../components/block-editing-mode';
@@ -56,10 +57,12 @@ function StyleList( {
 	title,
 	rows,
 	describe,
+	children,
 }: {
 	title: string;
 	rows: Row[];
 	describe: ( row: Row ) => string | null;
+	children?: React.ReactNode;
 } ) {
 	const instanceId = useInstanceId( StyleList );
 	const headingId = `block-editor-style-overrides__title-${ instanceId }`;
@@ -71,36 +74,52 @@ function StyleList( {
 			>
 				{ title }
 			</h3>
-			<ul aria-labelledby={ headingId }>
-				{ rows.map( ( row ) => {
-					const description = describe( row );
-					return (
-						<li
-							key={ row.setting.label }
-							className="block-editor-style-overrides__item"
-						>
-							<span className="block-editor-style-overrides__label">
-								{ row.setting.label }
-							</span>
-							{ description && (
-								<span className="block-editor-style-overrides__origin">
-									{ description }
+			{ !! rows.length && (
+				<ul aria-labelledby={ headingId }>
+					{ rows.map( ( row ) => {
+						const description = describe( row );
+						return (
+							<li
+								key={ row.setting.label }
+								className="block-editor-style-overrides__item"
+							>
+								<span className="block-editor-style-overrides__label">
+									{ row.setting.label }
 								</span>
-							) }
-							{ row.notes.map( ( note ) => (
-								<span
-									key={ note }
-									className="block-editor-style-overrides__origin"
-								>
-									{ note }
-								</span>
-							) ) }
-						</li>
-					);
-				} ) }
-			</ul>
+								{ description && (
+									<span className="block-editor-style-overrides__origin">
+										{ description }
+									</span>
+								) }
+								{ row.notes.map( ( note ) => (
+									<span
+										key={ note }
+										className="block-editor-style-overrides__origin"
+									>
+										{ note }
+									</span>
+								) ) }
+							</li>
+						);
+					} ) }
+				</ul>
+			) }
+			{ children }
 		</div>
 	);
+}
+
+/**
+ * Whether an inherited row only repeats the theme's own styles, with no
+ * parent block, Styles change or custom CSS involved. These rows apply to
+ * almost every block, so they are hidden until asked for.
+ *
+ * @param row Inherited row.
+ * @return Whether the value comes only from the theme.
+ */
+function isThemeOnly( row: Row ): boolean {
+	const { origin, notes } = row;
+	return origin?.type === 'styles' && ! origin.fromUser && ! notes.length;
 }
 
 /*
@@ -108,6 +127,7 @@ function StyleList( {
  * contents while it is open, so none of this runs until someone opens it.
  */
 function StyleOrigins( { name, clientId }: StyleOverridesPanelProps ) {
+	const [ showThemeRows, setShowThemeRows ] = useState( false );
 	const {
 		attributes,
 		variationName,
@@ -286,6 +306,8 @@ function StyleOrigins( { name, clientId }: StyleOverridesPanelProps ) {
 		return null;
 	}
 
+	const themeRowCount = inheritedRows.filter( isThemeOnly ).length;
+
 	return (
 		<>
 			{ !! ownRows.length && (
@@ -306,7 +328,13 @@ function StyleOrigins( { name, clientId }: StyleOverridesPanelProps ) {
 			{ !! inheritedRows.length && (
 				<StyleList
 					title={ __( 'Styles this block inherits' ) }
-					rows={ inheritedRows }
+					rows={
+						showThemeRows
+							? inheritedRows
+							: inheritedRows.filter(
+									( row ) => ! isThemeOnly( row )
+								)
+					}
 					describe={ ( { origin } ) =>
 						origin
 							? sprintf(
@@ -316,7 +344,30 @@ function StyleOrigins( { name, clientId }: StyleOverridesPanelProps ) {
 								)
 							: null
 					}
-				/>
+				>
+					{ !! themeRowCount && (
+						<Button
+							variant="link"
+							className="block-editor-style-overrides__toggle"
+							aria-expanded={ showThemeRows }
+							onClick={ () =>
+								setShowThemeRows( ! showThemeRows )
+							}
+						>
+							{ showThemeRows
+								? __( 'Hide styles from the theme' )
+								: sprintf(
+										/* translators: %d: Number of styles that come from the theme. */
+										_n(
+											'Show %d style from the theme',
+											'Show %d styles from the theme',
+											themeRowCount
+										),
+										themeRowCount
+									) }
+						</Button>
+					) }
+				</StyleList>
 			) }
 		</>
 	);
