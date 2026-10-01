@@ -72,10 +72,12 @@ function render_block_core_icon( $attributes ) {
 		$spacing_styles['padding'] = $attributes['style']['spacing']['padding'];
 	}
 
-	// Dimensions (Width).
+	// Dimensions (Width, Min width, Min height).
 	$dimensions_styles = array();
-	if ( isset( $attributes['style']['dimensions']['width'] ) ) {
-		$dimensions_styles['width'] = $attributes['style']['dimensions']['width'];
+	foreach ( array( 'width', 'minWidth', 'minHeight' ) as $dimension ) {
+		if ( isset( $attributes['style']['dimensions'][ $dimension ] ) ) {
+			$dimensions_styles[ $dimension ] = $attributes['style']['dimensions'][ $dimension ];
+		}
 	}
 
 	// Generate styles and classes.
