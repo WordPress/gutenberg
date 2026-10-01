@@ -10,7 +10,12 @@
 	border-radius: var(--wpds-border-radius-md);
 }
 
+/*
+ * The gray of the original rule, `$gray-100` of `@wordpress/base-styles`. No
+ * surface token carries it, and the lightest one reads lighter than the
+ * placeholder the editors have shown so far.
+ */
 .placeholder {
 	box-shadow: none;
-	background: var(--wpds-color-background-surface-neutral-weak);
+	background: #f0f0f0;
 }
