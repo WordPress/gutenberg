@@ -51,7 +51,6 @@ const CORE_FIELD_IDS = [
 describe( 'MediaForm', () => {
 	it( 'orders the default form whatever the order of the fields', () => {
 		mockFields = [
-			'acme_credit',
 			'caption',
 			'attached_to',
 			'title',
@@ -62,23 +61,16 @@ describe( 'MediaForm', () => {
 
 		render( <MediaForm /> );
 
-		expect( getFormFieldIds() ).toEqual( [
-			...CORE_FIELD_IDS,
-			'acme_credit',
-		] );
+		expect( getFormFieldIds() ).toEqual( CORE_FIELD_IDS );
 	} );
 
-	it( 'keeps the other fields in the order they were given', () => {
+	it( 'leaves the other fields out of the default form', () => {
 		mockFields = [ 'acme_b', 'title', 'acme_a' ].map( ( id ) => ( {
 			id,
 		} ) );
 
 		render( <MediaForm /> );
 
-		expect( getFormFieldIds() ).toEqual( [
-			...CORE_FIELD_IDS,
-			'acme_b',
-			'acme_a',
-		] );
+		expect( getFormFieldIds() ).toEqual( CORE_FIELD_IDS );
 	} );
 } );

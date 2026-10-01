@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Lay out the default attachment form in a fixed order of the core fields, so it no longer depends on the order the fields are passed in. Other fields follow, in the order they are passed in.
+-   Lay out the default attachment form in a fixed order of the core fields, so it no longer depends on the order the fields are passed in. Other fields are no longer part of the default form: pass the `form` prop to `MediaForm` to show them.
 
 ### Bug Fixes
 
