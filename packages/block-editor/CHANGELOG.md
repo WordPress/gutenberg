@@ -7,7 +7,7 @@
 -   Inserter: Open faster when many block types are registered ([#83446](https://github.com/WordPress/gutenberg/pull/83446)).
 -   State control badges: migrate from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Badge` ([#82608](https://github.com/WordPress/gutenberg/pull/82608)).
 -   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
--   `LinkControl`: Add a `transformSuggestions` prop, so a consumer can filter, order or add to the search suggestions before they are shown.
+-   `LinkControl`: Add a `transformSuggestions` prop, so a consumer can filter, order or add to the search suggestions before they are shown ([#83652](https://github.com/WordPress/gutenberg/pull/83652)).
 
 ### Bug Fixes
 
