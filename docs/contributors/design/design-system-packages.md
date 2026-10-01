@@ -142,6 +142,8 @@ decide and document compatibility, migration, release, generated-output, and
 consumer implications. Verify CSS and interaction behaviour in a browser where
 unit tests cannot establish cascade order, focus geometry, or portal behaviour.
 
+When a Design System package is bundled while one or more dependencies are supplied separately by WordPress, follow [Testing published packages across WordPress versions](/docs/contributors/code/package-runtime-compatibility.md). Check each supported entrypoint and version pairing before changing or removing the dependency contract.
+
 Before declaring package work complete, follow the applicable package source
 guidance and account for each relevant contract surface: public
 exports and types; semantics, states, interaction, and refs; compatibility and

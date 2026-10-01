@@ -215,7 +215,7 @@ export default function DocumentBar( props ) {
 										transform: hasBackButton
 											? 'translateX(15%)'
 											: 'translateX(-15%)',
-								  }
+									}
 								: false // Don't show entry animation when DocumentBar mounts.
 						}
 						animate={ {

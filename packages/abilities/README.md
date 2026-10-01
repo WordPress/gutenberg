@@ -4,10 +4,10 @@ Client library for the WordPress Abilities API, providing a standardized way to 
 
 ## Table of Contents
 
--   [Installation](#installation)
--   [Usage](#usage)
--   [API Reference](#api-reference)
--   [Development and Testing](#development-and-testing)
+- [Installation](#installation)
+- [Usage](#usage)
+- [API Reference](#api-reference)
+- [Development and Testing](#development-and-testing)
 
 ## Installation
 
@@ -224,10 +224,10 @@ const result = await executeAbility( 'my-plugin/create-item', {
 
 When using with `@wordpress/data`:
 
--   `getAbilities( args: AbilitiesQueryArgs = {} )` - Returns all abilities from the store, optionally filtered by query arguments
--   `getAbility( name: string )` - Returns a specific ability from the store
--   `getAbilityCategories()` - Returns all categories from the store
--   `getAbilityCategory( slug: string )` - Returns a specific category from the store
+- `getAbilities( args: AbilitiesQueryArgs = {} )` - Returns all abilities from the store, optionally filtered by query arguments
+- `getAbility( name: string )` - Returns a specific ability from the store
+- `getAbilityCategories()` - Returns all categories from the store
+- `getAbilityCategory( slug: string )` - Returns a specific category from the store
 
 ```javascript
 import { useSelect } from '@wordpress/data';

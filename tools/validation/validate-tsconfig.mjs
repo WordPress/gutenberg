@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import { fileURLToPath } from 'url';
-import { dirname, basename, join, relative, resolve } from 'path';
+import { dirname, basename, join, relative, resolve, sep } from 'path';
 import { existsSync, readFileSync } from 'fs';
-import glob from 'glob';
+import { globSync } from 'glob';
 import JSONC from 'jsonc-parser';
 
 let hasErrors = false;
@@ -62,22 +62,39 @@ if ( ! rootSolutionReferences.has( buildSolutionPath ) ) {
 	);
 }
 
-/* Ambient types only test files may use. */
-const TEST_TYPES = new Set( [ 'jest', 'gutenberg-test-env' ] );
+/*
+ * Ambient types only test files may use. Keep the retired Jest names here so
+ * build projects cannot reintroduce them.
+ */
+const TEST_TYPES = new Set( [
+	'jest',
+	'gutenberg-test-env',
+	'gutenberg-vitest-test-env',
+	'vitest/globals',
+] );
 
 /*
  * A package exclude replaces the inherited one, so a build project that sets
  * its own must keep every dev-file pattern the base config excludes.
  */
-const baseConfigPath = resolve( repoRoot, 'tsconfig.base.json' );
+const baseConfigPath = fileURLToPath(
+	import.meta.resolve( '@wordpress/monorepo-tools/tsconfig/base.json' )
+);
+/*
+ * The base config anchors its patterns with `${configDir}` so each project
+ * excludes its own files. Package projects spell the same patterns relative to
+ * themselves, so drop that prefix before comparing.
+ */
 const REQUIRED_BUILD_EXCLUDES = existsSync( baseConfigPath )
-	? ( readTsconfig( baseConfigPath ).exclude ?? [] ).filter( ( pattern ) =>
-			/test|stories|story/.test( pattern )
-	  )
+	? ( readTsconfig( baseConfigPath ).exclude ?? [] )
+			.map( ( pattern ) => pattern.replace( /^\$\{configDir\}\//, '' ) )
+			.filter( ( pattern ) => /test|stories|story/.test( pattern ) )
 	: [];
 
-const packagesWithTypes = glob
-	.sync( 'packages/*/tsconfig.json', { cwd: repoRoot } )
+const packagesWithTypes = globSync( 'packages/*/tsconfig.json', {
+	cwd: repoRoot,
+} )
+	.sort()
 	.map( ( tsconfigPath ) => basename( dirname( tsconfigPath ) ) );
 
 /**
@@ -90,14 +107,13 @@ const packagesWithTypes = glob
 function isDevProject( tsconfigPath ) {
 	const extended = readTsconfig( tsconfigPath ).extends;
 	return (
-		typeof extended === 'string' &&
-		basename( extended ) === 'tsconfig.dev.base.json'
+		typeof extended === 'string' && basename( extended ) === 'dev.base.json'
 	);
 }
 
 /**
  * Returns the projects of a package: src, dev files, and, where stories are
- * type checked against sources without jest types, `tsconfig.stories.json`.
+ * type checked against sources without test types, `tsconfig.stories.json`.
  *
  * @param {string} packageName Package directory name.
  * @return {{srcProject: string|undefined, devProject: string|undefined, storiesProject: string|undefined}} Absolute paths.
@@ -176,11 +192,11 @@ function srcProjectReferences( srcProject, packageName ) {
  */
 function hasDevFiles( packageName ) {
 	return (
-		glob.sync( '**/{test,tests,__tests__,stories}/**/*.{ts,tsx}', {
+		globSync( '**/{test,tests,__tests__,stories}/**/*.{ts,tsx,mts,cts}', {
 			cwd: resolve( repoRoot, 'packages', packageName ),
 			ignore: [ 'node_modules/**', 'build/**', 'build-*/**' ],
 		} ).length > 0 ||
-		glob.sync( '**/*.story.{ts,tsx}', {
+		globSync( '**/*.story.{ts,tsx,mts,cts}', {
 			cwd: resolve( repoRoot, 'packages', packageName ),
 			ignore: [ 'node_modules/**', 'build/**', 'build-*/**' ],
 		} ).length > 0
@@ -248,7 +264,7 @@ for ( const packageName of packagesWithTypes ) {
 		const buildTypes =
 			readTsconfig( srcProject ).compilerOptions?.types ?? [];
 		const devTypes = readTsconfig( devProject ).compilerOptions?.types ?? [
-			'jest',
+			'gutenberg-vitest-test-env',
 		];
 		for ( const type of buildTypes ) {
 			if ( TEST_TYPES.has( type ) ) {
@@ -336,76 +352,80 @@ for ( const packageName of packagesWithTypes ) {
 }
 
 /*
- * Route projects emit nothing and no other project references them, so only
- * the root solution registration puts them under `npm run typecheck`.
+ * Route and widget projects emit nothing and no other project references them,
+ * so only the root solution registration puts them under `npm run typecheck`.
  */
-const routesWithTypes = glob
-	.sync( 'routes/*/tsconfig.json', { cwd: repoRoot } )
-	.map( ( tsconfigPath ) => basename( dirname( tsconfigPath ) ) );
+const entriesWithTypes = globSync( '{routes,widgets}/*/tsconfig.json', {
+	cwd: repoRoot,
+	posix: true,
+} )
+	.sort()
+	.map( ( tsconfigPath ) => dirname( tsconfigPath ) );
 
 /*
- * Registration is only enforced for routes with a tsconfig.json, so a route
+ * Registration is only enforced for entries with a tsconfig.json, so an entry
  * without one would keep its TypeScript files out of the type check silently.
  */
-const routeNames = glob
-	.sync( 'routes/*/', { cwd: repoRoot } )
-	.map( ( routeDir ) => basename( routeDir ) );
+const entryNames = globSync( '{routes,widgets}/*/', {
+	cwd: repoRoot,
+	posix: true,
+} )
+	.sort()
+	.map( ( entryDir ) => entryDir.replace( /\/$/, '' ) );
 
-for ( const routeName of routeNames ) {
-	if ( routesWithTypes.includes( routeName ) ) {
+for ( const entryName of entryNames ) {
+	if ( entriesWithTypes.includes( entryName ) ) {
 		continue;
 	}
 	const hasTypeScriptFiles =
-		glob.sync( '**/*.{ts,tsx}', {
-			cwd: resolve( repoRoot, 'routes', routeName ),
+		globSync( '**/*.{ts,tsx,mts,cts}', {
+			cwd: resolve( repoRoot, entryName ),
 			ignore: [ 'node_modules/**', 'build/**' ],
 		} ).length > 0;
 	if ( hasTypeScriptFiles ) {
 		reportError(
-			`Missing tsconfig.json for the TypeScript files of routes/${ routeName }`
+			`Missing tsconfig.json for the TypeScript files of ${ entryName }`
 		);
 	}
 }
 
-for ( const routeName of routesWithTypes ) {
-	const routeDir = resolve( repoRoot, 'routes', routeName );
-	const routeProject = join( routeDir, 'tsconfig.json' );
-	const routeTestProject = join( routeDir, 'tsconfig.test.json' );
+for ( const entryName of entriesWithTypes ) {
+	const entryDir = resolve( repoRoot, entryName );
+	const entryProject = join( entryDir, 'tsconfig.json' );
+	const entryTestProject = join( entryDir, 'tsconfig.test.json' );
 
-	if ( ! rootSolutionReferences.has( routeProject ) ) {
-		reportError(
-			`Missing reference to "routes/${ routeName }" in tsconfig.json`
-		);
+	if ( ! rootSolutionReferences.has( entryProject ) ) {
+		reportError( `Missing reference to "${ entryName }" in tsconfig.json` );
 	}
 
 	/*
-	 * The route project excludes test directories, so TypeScript test files
+	 * The entry project excludes test directories, so TypeScript test files
 	 * are only checked when a registered test project covers them.
 	 */
 	const hasTestFiles =
-		glob.sync( '**/{test,tests,__tests__}/**/*.{ts,tsx}', {
-			cwd: routeDir,
+		globSync( '**/{test,tests,__tests__}/**/*.{ts,tsx,mts,cts}', {
+			cwd: entryDir,
 			ignore: [ 'node_modules/**', 'build/**' ],
 		} ).length > 0;
-	if ( hasTestFiles && ! existsSync( routeTestProject ) ) {
+	if ( hasTestFiles && ! existsSync( entryTestProject ) ) {
 		reportError(
-			`Missing test project for the TypeScript test files of routes/${ routeName }`
+			`Missing test project for the TypeScript test files of ${ entryName }`
 		);
 	}
 	if (
-		existsSync( routeTestProject ) &&
-		! rootSolutionReferences.has( routeTestProject )
+		existsSync( entryTestProject ) &&
+		! rootSolutionReferences.has( entryTestProject )
 	) {
 		reportError(
-			`Missing reference to "routes/${ routeName }/tsconfig.test.json" in tsconfig.json`
+			`Missing reference to "${ entryName }/tsconfig.test.json" in tsconfig.json`
 		);
 	}
 
-	const packageJsonPath = join( routeDir, 'package.json' );
+	const packageJsonPath = join( entryDir, 'package.json' );
 	if ( ! existsSync( packageJsonPath ) ) {
 		continue;
 	}
-	const references = referencedProjects( routeProject );
+	const references = referencedProjects( entryProject );
 	const packageJson = JSON.parse( readFileSync( packageJsonPath, 'utf8' ) );
 	for ( const dependency of Object.keys( packageJson.dependencies ?? {} ) ) {
 		if ( ! dependency.startsWith( '@wordpress/' ) ) {
@@ -424,9 +444,56 @@ for ( const routeName of routesWithTypes ) {
 		if ( ! references.has( dependencyProject ) ) {
 			reportError(
 				`Missing reference to "${ relative(
-					routeDir,
+					entryDir,
 					dependencyProject
-				) }" in ${ relative( repoRoot, routeProject ) }`
+				) }" in ${ relative( repoRoot, entryProject ) }`
+			);
+		}
+	}
+}
+
+/*
+ * A reference into another package is a build-graph edge, so it must be backed
+ * by a declared dependency, or removed dependencies leave stale references.
+ */
+const workspaceProjects = globSync(
+	'{packages,routes,widgets}/*/tsconfig*.json',
+	{
+		cwd: repoRoot,
+		posix: true,
+	}
+).sort();
+
+for ( const projectPath of workspaceProjects ) {
+	const workspaceDir = dirname( projectPath );
+	const packageJsonPath = resolve( repoRoot, workspaceDir, 'package.json' );
+	if ( ! existsSync( packageJsonPath ) ) {
+		continue;
+	}
+	const packageJson = JSON.parse( readFileSync( packageJsonPath, 'utf8' ) );
+	const declared = new Set( [
+		...Object.keys( packageJson.dependencies ?? {} ),
+		...Object.keys( packageJson.devDependencies ?? {} ),
+		...Object.keys( packageJson.peerDependencies ?? {} ),
+		...Object.keys( packageJson.optionalDependencies ?? {} ),
+	] );
+
+	for ( const reference of referencedProjects(
+		resolve( repoRoot, projectPath )
+	) ) {
+		const referenceFromRoot = relative( repoRoot, reference )
+			.split( sep )
+			.join( '/' );
+		if ( ! referenceFromRoot.startsWith( 'packages/' ) ) {
+			continue;
+		}
+		const referencedPackage = referenceFromRoot.split( '/' )[ 1 ];
+		if ( workspaceDir === `packages/${ referencedPackage }` ) {
+			continue;
+		}
+		if ( ! declared.has( `@wordpress/${ referencedPackage }` ) ) {
+			reportError(
+				`Reference to "packages/${ referencedPackage }" in ${ projectPath } without a dependency on "@wordpress/${ referencedPackage }". Remove the reference, or add the dependency to package.json.`
 			);
 		}
 	}

@@ -69,6 +69,10 @@ function useIsAccessibleToolbar( toolbarRef ) {
 
 	const determineIsAccessibleToolbar = useCallback( () => {
 		const tabbables = focus.tabbable.find( toolbarRef.current );
+		// A hidden toolbar has no tabbables, so keep its current classification.
+		if ( tabbables.length === 0 ) {
+			return;
+		}
 		const onlyToolbarItem = hasOnlyToolbarItem( tabbables );
 		if ( ! onlyToolbarItem ) {
 			deprecated( 'Using custom components as toolbar controls', {

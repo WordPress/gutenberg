@@ -3,6 +3,7 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
 import { createInterpolateElement } from '@wordpress/element';
+import { inertValue } from '@wordpress/ui';
 import CommentsForm from '../../post-comments-form/form';
 
 export default function PostCommentsPlaceholder( { postType, postId } ) {
@@ -17,7 +18,10 @@ export default function PostCommentsPlaceholder( { postType, postId } ) {
 	);
 
 	return (
-		<div className="wp-block-comments__legacy-placeholder" inert="true">
+		<div
+			className="wp-block-comments__legacy-placeholder"
+			inert={ inertValue( true ) }
+		>
 			<h3>
 				{
 					/* translators: %s: Post title. */

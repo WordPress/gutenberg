@@ -17,3 +17,5 @@ export const NOTES_LAST_SEEN_PREFERENCE = 'notesLastSeen';
  * instead of growing with every post the user ever opens.
  */
 export const NOTES_LAST_SEEN_LIMIT = 100;
+
+export const NOTE_FORMAT_NAME = 'core/note';

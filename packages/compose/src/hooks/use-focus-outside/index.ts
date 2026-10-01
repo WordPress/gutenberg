@@ -12,9 +12,7 @@ const INPUT_BUTTON_TYPES = [ 'button', 'submit' ];
  * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
  */
 type FocusNormalizedButton =
-	| HTMLButtonElement
-	| HTMLLinkElement
-	| HTMLInputElement;
+	HTMLButtonElement | HTMLLinkElement | HTMLInputElement;
 
 /**
  * Returns true if the given element is a button element subject to focus
@@ -148,6 +146,8 @@ export default function useFocusOutside(
 			return;
 		}
 
+		// Keep only the latest blur check so a subsequent focus event can cancel it.
+		clearTimeout( blurCheckTimeoutIdRef.current );
 		blurCheckTimeoutIdRef.current = setTimeout( () => {
 			// If document is not focused then focus should remain
 			// inside the wrapped component and therefore we cancel

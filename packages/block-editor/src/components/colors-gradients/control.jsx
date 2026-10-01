@@ -56,7 +56,7 @@ function ColorGradientControlInner( {
 		? ( newColor, _index, newSlug ) => {
 				onColorChange( newColor, newSlug );
 				onGradientChange();
-		  }
+			}
 		: ( newColor, _index, newSlug ) => onColorChange( newColor, newSlug );
 
 	const colorPalette = (
@@ -98,7 +98,7 @@ function ColorGradientControlInner( {
 						? ( newGradient, _index, newSlug ) => {
 								onGradientChange( newGradient, newSlug );
 								onColorChange();
-						  }
+							}
 						: ( newGradient, _index, newSlug ) =>
 								onGradientChange( newGradient, newSlug )
 				}

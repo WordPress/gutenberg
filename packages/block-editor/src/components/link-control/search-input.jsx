@@ -104,7 +104,7 @@ const LinkControlSearchInput = forwardRef(
 				// entity metadata from persisting when switching to a different link type.
 				// For example, when changing from an entity link (kind: 'post-type', type: 'page')
 				// to a custom URL (type: 'link', no kind), we need to ensure the old 'kind'
-				// doesn't carry over. We do want to preserve other properites like title, though.
+				// doesn't carry over. We do want to preserve other properties like title, though.
 				const { id, url, kind, type, ...restLinkProps } =
 					currentLink ?? {};
 				onSelect(

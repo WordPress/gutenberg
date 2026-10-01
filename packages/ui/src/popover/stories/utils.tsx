@@ -60,7 +60,7 @@ export function useMeasure< TRef extends HTMLElement >() {
 export const GenericIframe = forwardRef<
 	HTMLIFrameElement,
 	GenericIframeProps
->( function GenericIframe( { children, ...props }, ref ) {
+>( function UnforwardedGenericIframe( { children, ...props }, ref ) {
 	const [ containerNode, setContainerNode ] = useState< HTMLElement | null >(
 		null
 	);
