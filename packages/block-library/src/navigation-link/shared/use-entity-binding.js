@@ -69,11 +69,15 @@ export function useEntityBinding( { clientId, attributes } ) {
 		hasUrlBinding && metadata?.bindings?.url?.source === expectedSource;
 
 	// Check if the bound entity is available (not deleted) and return the entity record.
-	const { isBoundEntityAvailable, entityRecord } = useSelect(
+	const { isBoundEntityAvailable, entityRecord, isPending } = useSelect(
 		( select ) => {
 			// First check: metadata/binding must exist
 			if ( ! hasCorrectBinding || ! id ) {
-				return { isBoundEntityAvailable: false, entityRecord: null };
+				return {
+					isBoundEntityAvailable: false,
+					isPending: false,
+					entityRecord: null,
+				};
 			}
 
 			const isPostType = kind === 'post-type';
@@ -81,12 +85,20 @@ export function useEntityBinding( { clientId, attributes } ) {
 
 			// Only check entity availability for post types and taxonomies.
 			if ( ! isPostType && ! isTaxonomy ) {
-				return { isBoundEntityAvailable: false, entityRecord: null };
+				return {
+					isBoundEntityAvailable: false,
+					isPending: false,
+					entityRecord: null,
+				};
 			}
 
 			// Skip check in disabled contexts to avoid unnecessary requests.
 			if ( blockEditingMode === 'disabled' ) {
-				return { isBoundEntityAvailable: true, entityRecord: null };
+				return {
+					isBoundEntityAvailable: true,
+					isPending: false,
+					entityRecord: null,
+				};
 			}
 
 			// Second check: entity must exist
@@ -110,6 +122,8 @@ export function useEntityBinding( { clientId, attributes } ) {
 			const isAvailable = hasResolved ? record !== undefined : true;
 			return {
 				isBoundEntityAvailable: isAvailable,
+				// While the record loads, the binding source has no URL to give.
+				isPending: ! hasResolved,
 				entityRecord: record || null,
 			};
 		},
@@ -151,6 +165,7 @@ export function useEntityBinding( { clientId, attributes } ) {
 	return {
 		hasUrlBinding: hasCorrectBinding,
 		isBoundEntityAvailable,
+		isBoundEntityPending: isPending,
 		entityRecord,
 		clearBinding,
 		createBinding,
