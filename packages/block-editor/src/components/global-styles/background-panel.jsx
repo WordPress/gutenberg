@@ -1,7 +1,5 @@
-import {
-	Notice,
-	__experimentalToolsPanel as ToolsPanel,
-} from '@wordpress/components';
+import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
+import { Notice } from '@wordpress/ui';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import BackgroundClipControl, {
@@ -267,10 +265,10 @@ export default function BackgroundImagePanel( {
 		clipsToText && localClip === undefined && !! baseClip;
 	const clipsToTextNotice = clipIsFromBase
 		? __(
-				'The text gradient set in the Default state clips the background to the text, so a color, gradient or image set here paints inside the text.'
+				'The gradient set in the Default state clips the background to the text, including any color or image.'
 			)
 		: __(
-				'The text gradient clips the background to the text, so a color, gradient or image set here paints inside the text.'
+				'The gradient clips the background to the text, including any color or image.'
 			);
 
 	const resetAllFilter = useCallback(
@@ -662,13 +660,14 @@ export default function BackgroundImagePanel( {
 				</InheritanceToolsPanelItem>
 			) }
 			{ clipsToText && (
-				<Notice
-					status="info"
-					isDismissible={ false }
+				<Notice.Root
+					intent="info"
 					className="block-editor-background-panel__clips-to-text-notice"
 				>
-					{ clipsToTextNotice }
-				</Notice>
+					<Notice.Description>
+						{ clipsToTextNotice }
+					</Notice.Description>
+				</Notice.Root>
 			) }
 		</Wrapper>
 	);

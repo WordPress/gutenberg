@@ -1284,7 +1284,7 @@ describe( 'TypographyPanel text gradient', () => {
 		).not.toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 
-	it( 'says the text gradient replaces the text color, leaving the control usable', async () => {
+	it( 'says the gradient replaces the text color, leaving the control usable', async () => {
 		const { container } = await renderPanel( {
 			settings: gradientSettings,
 			blockName: TEST_BLOCK,
@@ -1298,7 +1298,7 @@ describe( 'TypographyPanel text gradient', () => {
 		} );
 
 		expect( textGradientNotice( container ) ).toHaveTextContent(
-			'The text gradient replaces the text color.'
+			'The gradient replaces the text color.'
 		);
 		expect(
 			screen.getByRole( 'button', { name: /Color/ } )
@@ -1359,7 +1359,7 @@ describe( 'TypographyPanel text gradient', () => {
 			} );
 
 			expect( textGradientNotice( container ) ).toHaveTextContent(
-				'The text gradient set in the Default state replaces the text color.'
+				'The gradient set in the Default state replaces the text color.'
 			);
 		} );
 
