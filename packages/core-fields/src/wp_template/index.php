@@ -5,7 +5,7 @@
  *
  * Templates support authors, yet their author is the theme, plugin, site,
  * or user that provides them rather than their post author. So they opt out
- * of the default author field, see exclude_core_post_type_support_fields()
+ * of the default author field, see register_core_field_collections()
  * in `src/index.php`, and get the author field of this collection instead,
  * with its script module. Likewise for the title, labeled after the
  * template.
