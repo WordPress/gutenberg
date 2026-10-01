@@ -8,6 +8,7 @@ import {
 	vi,
 } from 'vitest';
 import { render, act } from '@testing-library/react';
+import apiFetch from '@wordpress/api-fetch';
 import { useEffect } from '@wordpress/element';
 import { createRegistry, RegistryProvider, select } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -75,6 +76,10 @@ const getFormatType = ( name: string ) =>
 	( select( richTextStore as any ) as any ).getFormatType( name );
 
 beforeAll( () => {
+	// The real core-data store resolves selectors over REST, and jsdom has no
+	// server: a failed request can reject after its test ends and fail the run.
+	// Leave requests pending so the records each test seeds are the only data.
+	apiFetch.setFetchHandler( () => new Promise( () => {} ) );
 	registerSuggestionFormat();
 	if ( ! getFormatType( 'test/bold' ) ) {
 		registerFormatType( 'test/bold', {
