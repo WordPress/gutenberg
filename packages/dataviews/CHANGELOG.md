@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Single-selection filter radio indicators stay visually 16px on narrow screens ([#83840](https://github.com/WordPress/gutenberg/pull/83840)).
+-   Selection checkboxes stay visually 16px on narrow screens while retaining a 24px click target ([#83612](https://github.com/WordPress/gutenberg/pull/83612)).
+-   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
+
+### Bug Fixes
+
+-   Keep filter and item actions menus dismissible when their triggers become disabled ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
+
+### Bug Fixes
+
+-   Grid layout: measure the container as the grid attaches rather than waiting for the resize observer's first report, so the grid no longer renders a frame with every item in a full-width column of its own before snapping to its real column count ([#83752](https://github.com/WordPress/gutenberg/pull/83752)).
+
+### Documentation
+
+-   Document that a custom `sort` receives the field values returned by `getValue`, not the items ([#83483](https://github.com/WordPress/gutenberg/pull/83483)).
+
+## 19.1.0 (2026-09-23)
+
 ### New Features
 
 -   Let a picker compose its footer from its parts: `DataViewsPicker.Footer` and `DataViewsPicker.Pagination` render their children in place of their default contents, the new `DataViewsPicker.PageSelect`, `DataViewsPicker.PageNavigation` and `DataViewsPicker.Actions` sub-components are the parts to put inside them, and each takes a `className` ([#83281](https://github.com/WordPress/gutenberg/pull/83281)).
@@ -17,6 +37,7 @@
 
 ### Internal
 
+-   Update Ariakit to 0.4.40 ([#83278](https://github.com/WordPress/gutenberg/pull/83278)).
 -   Remove obsolete Jest test dependencies and types ([#82975](https://github.com/WordPress/gutenberg/pull/82975)).
 -   Update `@base-ui/react` to 1.8.0 for the bundled UI components in the `/wp` entrypoint ([#82835](https://github.com/WordPress/gutenberg/pull/82835)).
 -   Update Ariakit to 0.4.39 and wait for scheduled composite item registration in jsdom tests ([#82831](https://github.com/WordPress/gutenberg/pull/82831)).

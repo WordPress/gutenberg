@@ -87,4 +87,14 @@ class Block_Core_Icon_Render_Test extends WP_UnitTestCase {
 		$this->assertMatchesRegularExpression( '/(?:^|;)\s*rotate\s*:\s*90deg\s*(?:;|$)/', $style );
 		$this->assertLessThan( strpos( $style, 'rotate' ), strpos( $style, 'fill' ) );
 	}
+
+	public function test_renders_only_icons_in_public_collections() {
+		// Renders public core icon.
+		$processor = new WP_HTML_Tag_Processor( gutenberg_render_block_core_icon( array( 'icon' => 'core/caution' ) ) );
+		$this->assertTrue( $processor->next_tag( 'svg' ) );
+
+		// Does not render private core-admin icon.
+		$this->assertNotEmpty( wp_get_icon( 'core-admin/wordpress' ) );
+		$this->assertEmpty( gutenberg_render_block_core_icon( array( 'icon' => 'core-admin/wordpress' ) ) );
+	}
 }

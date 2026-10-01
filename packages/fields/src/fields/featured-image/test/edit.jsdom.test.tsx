@@ -25,7 +25,13 @@ const field = {
 	} ),
 } as any;
 
-const postType = { slug: 'post' };
+const postType = {
+	slug: 'post',
+	labels: {
+		featured_image: 'Cover image',
+		set_featured_image: 'Set cover image',
+	},
+};
 const attachments = [
 	{
 		id: 42,
@@ -82,7 +88,7 @@ const withPickerMarker =
 	( MediaUpload: React.ComponentType< any > ) => ( props: any ) => (
 		<>
 			<MediaUpload { ...props } />
-			<p>Picker extended</p>
+			<p>{ `Picker extended: ${ props.title }` }</p>
 		</>
 	);
 
@@ -120,7 +126,9 @@ describe( 'FeaturedImageEdit', () => {
 		expect(
 			screen.getByRole( 'button', { name: 'Remove' } )
 		).toBeInTheDocument();
-		expect( screen.getByText( 'Picker extended' ) ).toBeInTheDocument();
+		expect(
+			screen.getByText( 'Picker extended: Cover image' )
+		).toBeInTheDocument();
 	} );
 
 	it( 'renders the media control directly, with the plain picker, outside the post context', () => {
@@ -141,10 +149,10 @@ describe( 'FeaturedImageEdit', () => {
 		);
 		expect( screen.queryByText( /^Extended:/ ) ).not.toBeInTheDocument();
 		expect(
-			screen.queryByText( 'Picker extended' )
+			screen.queryByText( /^Picker extended/ )
 		).not.toBeInTheDocument();
 		expect(
-			screen.getByRole( 'button', { name: 'Set featured image' } )
+			screen.getByRole( 'button', { name: 'Set cover image' } )
 		).toBeInTheDocument();
 	} );
 
@@ -165,7 +173,7 @@ describe( 'FeaturedImageEdit', () => {
 		);
 		expect( screen.queryByText( /^Extended:/ ) ).not.toBeInTheDocument();
 		expect(
-			screen.getByRole( 'button', { name: 'Set featured image' } )
+			screen.getByRole( 'button', { name: 'Set cover image' } )
 		).toBeInTheDocument();
 	} );
 } );
