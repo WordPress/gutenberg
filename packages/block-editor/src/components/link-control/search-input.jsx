@@ -3,7 +3,7 @@ import { __ } from '@wordpress/i18n';
 import deprecated from '@wordpress/deprecated';
 import { URLInput } from '../';
 import LinkControlSearchResults from './search-results';
-import { CREATE_TYPE } from './constants';
+import { CREATE_TYPE, NO_RESULTS_TYPE } from './constants';
 import useSearchHandler from './use-search-handler';
 
 // Must be a function as otherwise URLInput will default
@@ -82,6 +82,10 @@ const LinkControlSearchInput = forwardRef(
 			} );
 
 		const onSuggestionSelected = async ( selectedSuggestion ) => {
+			if ( NO_RESULTS_TYPE === selectedSuggestion.type ) {
+				return;
+			}
+
 			let suggestion = selectedSuggestion;
 			if ( CREATE_TYPE === selectedSuggestion.type ) {
 				// Create a new page and call onSelect with the output from the onCreateSuggestion callback.
