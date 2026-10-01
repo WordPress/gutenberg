@@ -4,6 +4,7 @@ import {
 } from '@wordpress/components';
 import warning from '@wordpress/warning';
 import { useEffect, useContext, useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import {
 	useBlockEditContext,
 	mayDisplayControlsKey,
@@ -16,6 +17,8 @@ import {
 	useBlockStyleState,
 } from '../../hooks/block-style-state';
 import { ListViewContentFill } from './list-view-content-popover';
+import { store as blockEditorStore } from '../../store';
+import { listViewContentPopoverKey } from '../../store/private-keys';
 
 const PATTERN_EDITING_GROUPS = [ 'content', 'list' ];
 
@@ -28,6 +31,13 @@ export default function InspectorControlsFill( {
 	const isSelectedBlock = context[ mayDisplayControlsKey ];
 	const isPatternEditing = context[ mayDisplayPatternEditingControlsKey ];
 	const isInListViewTree = context[ isInListViewBlockSupportTreeKey ];
+	const hasListViewContentPopover = useSelect(
+		( select ) =>
+			!! select( blockEditorStore ).getSettings()[
+				listViewContentPopoverKey
+			],
+		[]
+	);
 
 	const Fill = groups[ group ]?.Fill;
 	if ( ! Fill ) {
@@ -58,8 +68,12 @@ export default function InspectorControlsFill( {
 
 	// When inside a section with a parent that has ListView block support,
 	// content controls are rendered as part of the ListView via a popover.
+	// Editors that show only a List View, without a block inspector, opt in
+	// to the same popover outside of sections.
 	const rendersInListView =
-		group === 'content' && isPatternEditing && isInListViewTree;
+		group === 'content' &&
+		isInListViewTree &&
+		( isPatternEditing || hasListViewContentPopover );
 
 	// When using the ListView fill, only render controls for the selected
 	// block. Other blocks return `null`.
