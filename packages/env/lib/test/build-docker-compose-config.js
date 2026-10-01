@@ -209,7 +209,7 @@ describe( 'buildDockerComposeConfig', () => {
 		const PINNED_HEALTHCHECK = {
 			test: [
 				'CMD-SHELL',
-				'if command -v healthcheck.sh > /dev/null; then healthcheck.sh --connect --innodb_initialized; else mysqladmin ping -h 127.0.0.1 --protocol=tcp -uroot -p"$$MYSQL_ROOT_PASSWORD"; fi',
+				'if [ -f /var/lib/mysql/.my-healthcheck.cnf ]; then healthcheck.sh --connect --innodb_initialized; else "$$(command -v mariadb-admin || echo mysqladmin)" ping -h 127.0.0.1 --protocol=tcp -uroot -p"$$MYSQL_ROOT_PASSWORD"; fi',
 			],
 			interval: '5s',
 			timeout: '10s',
@@ -280,7 +280,7 @@ describe( 'buildDockerComposeConfig', () => {
 			'11',
 			'11.4.2',
 		] )(
-			'uses the health check that detects healthcheck.sh for %j',
+			'uses the health check that detects the healthcheck user for %j',
 			( version ) => {
 				const config = buildWithVersions( version, version );
 

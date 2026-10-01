@@ -81,9 +81,13 @@ function getMounts(
  * MARIADB_AUTO_UPGRADE env var ensures its healthcheck user exists for
  * existing installations.
  *
- * Images for a pinned version may predate `healthcheck.sh` (it was added to
- * the images in 2023, and older tags were never rebuilt), so for those the
- * script is used when present and `mysqladmin` is pinged over TCP otherwise.
+ * Images for a pinned version may predate the healthcheck user that
+ * `healthcheck.sh` connects as, whose credentials the entrypoint writes to
+ * `.my-healthcheck.cnf` in the data directory (the script was added to the
+ * images in 2022 and the user in 2023, and older tags were never rebuilt).
+ * For those the script is used only when that file exists, and the server is
+ * pinged over TCP otherwise, with `mariadb-admin` (11.0+ only ships this
+ * name) or `mysqladmin` (versions before 10.4 only ship this name).
  * Using 127.0.0.1 rather than localhost avoids the Unix socket, which the
  * temporary server used to initialize a new volume answers before the real
  * server is listening.
@@ -103,7 +107,7 @@ function getMariaDBHealthcheck( mariadbVersion ) {
 	const test = isPinned
 		? [
 				'CMD-SHELL',
-				'if command -v healthcheck.sh > /dev/null; then healthcheck.sh --connect --innodb_initialized; else mysqladmin ping -h 127.0.0.1 --protocol=tcp -uroot -p"$$MYSQL_ROOT_PASSWORD"; fi',
+				'if [ -f /var/lib/mysql/.my-healthcheck.cnf ]; then healthcheck.sh --connect --innodb_initialized; else "$$(command -v mariadb-admin || echo mysqladmin)" ping -h 127.0.0.1 --protocol=tcp -uroot -p"$$MYSQL_ROOT_PASSWORD"; fi',
 			]
 		: [ 'CMD', 'healthcheck.sh', '--connect', '--innodb_initialized' ];
 
