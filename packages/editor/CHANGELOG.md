@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Notes: Honour a per-action note lock. The notes sidebar now hides or disables the affordances the server reports as locked through the `lockedNoteActions` editor setting, and shows a notice on a fully locked post ([#72724](https://github.com/WordPress/gutenberg/issues/72724)).
+-   Notes: Honour a per-action note lock. The notes sidebar now hides or disables the affordances the server reports as locked through the `lockedNoteActions` editor setting, and shows a notice on a fully locked post ([#81546](https://github.com/WordPress/gutenberg/pull/81546)).
 
 ### Enhancements
 
