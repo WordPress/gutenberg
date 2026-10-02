@@ -1,11 +1,38 @@
 import { DataForm } from '@wordpress/dataviews';
-import type { Form, Field } from '@wordpress/dataviews';
+import type { Form } from '@wordpress/dataviews';
 import { Spinner, __experimentalVStack as VStack } from '@wordpress/components';
 import { VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import type { ReactNode } from 'react';
 import { useMediaEditorContext } from '../media-editor-provider';
-import type { Media } from '../media-editor-provider';
+
+// The form used when the consumer provides none, mirroring the `form` of the
+// `attachment` view configuration on the server. It lists the core fields in
+// a fixed order, so it does not depend on the order the fields are registered
+// in: the regular (non-panel) fields first, then the fields shown in panels
+// (the metadata, then the file information). A field that is not registered
+// renders nothing.
+const DEFAULT_FORM: Form = {
+	layout: {
+		type: 'panel',
+	},
+	fields: [
+		...[ 'title', 'alt_text', 'caption', 'description' ].map( ( id ) => ( {
+			id,
+			layout: {
+				type: 'regular' as const,
+				labelPosition: 'top' as const,
+			},
+		} ) ),
+		'date',
+		'author',
+		'filename',
+		'mime_type',
+		'filesize',
+		'media_dimensions',
+		'attached_to',
+	],
+};
 
 /**
  * Props for MediaForm component.
@@ -22,7 +49,8 @@ export interface MediaFormProps {
  * title, alt text, caption, description, etc.
  *
  * @param props        - Component props.
- * @param props.form   - Optional form configuration.
+ * @param props.form   - Optional form configuration. Takes precedence over
+ *                     the form of the provider settings.
  * @param props.header - Optional header content to display above the form.
  * @return The MediaForm component.
  */
@@ -30,7 +58,12 @@ export default function MediaForm( {
 	form: formOverrides,
 	header,
 }: MediaFormProps ) {
-	const { media, fields, onChange } = useMediaEditorContext();
+	const {
+		media,
+		fields,
+		form: settingsForm,
+		onChange,
+	} = useMediaEditorContext();
 
 	if ( ! media || ! onChange ) {
 		return (
@@ -40,41 +73,7 @@ export default function MediaForm( {
 		);
 	}
 
-	// Fields that use a regular (non-panel) layout, rendered at the top.
-	const regularFieldIds = [ 'title', 'alt_text', 'caption', 'description' ];
-
-	// Place the non-panel (regular layout) fields at the top of the array,
-	// with the remaining panel fields below.
-	const sortedFields = [
-		...fields.filter( ( field: Field< Media > ) =>
-			regularFieldIds.includes( field.id )
-		),
-		...fields.filter(
-			( field: Field< Media > ) => ! regularFieldIds.includes( field.id )
-		),
-	];
-
-	// Default form structure with panel layout
-	const defaultForm: Form = {
-		layout: {
-			type: 'panel',
-		},
-		fields: sortedFields.map( ( field: Field< Media > ) => {
-			// Use regular layout for main editable fields
-			if ( regularFieldIds.includes( field.id ) ) {
-				return {
-					id: field.id,
-					layout: {
-						type: 'regular',
-						labelPosition: 'top',
-					},
-				};
-			}
-			return field.id;
-		} ),
-	};
-
-	const form = formOverrides || defaultForm;
+	const form = formOverrides || settingsForm || DEFAULT_FORM;
 
 	return (
 		<div className="media-editor-form">

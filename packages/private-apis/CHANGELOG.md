@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Allow `@wordpress/core-fields` to use private APIs: the template field it registers on the server reads the `getTemplateId`, `getHomePage`, and `getPostsPageId` private selectors of `@wordpress/core-data` ([#83368](https://github.com/WordPress/gutenberg/pull/83368)).
+
 ## 1.56.0 (2026-09-23)
 
 ## 1.55.0 (2026-09-10)

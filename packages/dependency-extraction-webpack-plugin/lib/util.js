@@ -4,6 +4,7 @@ const BUNDLED_PACKAGES = [
 	'@wordpress/dataviews',
 	'@wordpress/dataviews/wp',
 	'@wordpress/fields',
+	'@wordpress/fields-loader',
 	'@wordpress/global-styles-engine',
 	'@wordpress/global-styles-ui',
 	'@wordpress/grid',

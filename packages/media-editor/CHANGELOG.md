@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Lay out the default attachment form in a fixed order of the core fields, so it no longer depends on the order the fields are passed in. Other fields are no longer part of the default form: pass the `form` prop to `MediaForm` to show them ([#83368](https://github.com/WordPress/gutenberg/pull/83368)).
+-   `MediaEditorProvider` accepts a `settings.form` to lay out the fields with, which `MediaForm` uses when it is given no `form` prop ([#83368](https://github.com/WordPress/gutenberg/pull/83368)).
+
 ### Bug Fixes
 
 -   Stop a pan drag started just after a wheel zoom from recording one undo entry per frame. The drag now ends the pending wheel gesture instead of letting its debounce timer close the drag's gesture mid-drag ([#83558](https://github.com/WordPress/gutenberg/pull/83558)).

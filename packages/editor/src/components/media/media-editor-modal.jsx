@@ -1,13 +1,20 @@
 import { useSettings } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
+import { useFields } from '@wordpress/fields-loader';
 import { privateApis as mediaEditorPrivateApis } from '@wordpress/media-editor';
+import { useViewConfig } from '@wordpress/views';
 import { unlock } from '../../lock-unlock';
-import usePostFields from '../post-fields';
 
 const { MediaEditorModal, store: mediaEditorStore } = unlock(
 	mediaEditorPrivateApis
 );
+
+/**
+ * The modal only renders a form, so it requests the `form` of the entity view
+ * configuration alone.
+ */
+const VIEW_CONFIG_FIELDS = [ 'form' ];
 
 function ratioToNumber( ratio ) {
 	if ( ratio === undefined || ratio === null ) {
@@ -40,11 +47,11 @@ function aspectRatioPresetFromSettings( { name, ratio } = {} ) {
 /**
  * Mounts the MediaEditorModal alongside existing editor modals.
  *
- * Bridges `@wordpress/editor`'s `usePostFields('attachment')` hook
- * into the modal, since `@wordpress/media-editor` cannot depend on
- * `@wordpress/editor`.
+ * Reads the attachment fields with `useFields` and the form they are laid
+ * out with from the entity view configuration, and passes both into the
+ * modal, which takes them as props.
  *
- * Defers the attachment fields and settings reads until the modal
+ * Defers the attachment fields, form and settings reads until the modal
  * actually opens, so editor startup doesn't pay for them on every
  * page load.
  *
@@ -62,7 +69,17 @@ export default function MediaEditorModalMount() {
 }
 
 function MediaEditorModalContent() {
-	const fields = usePostFields( { postType: 'attachment' } );
+	const { fields } = useFields( {
+		kind: 'postType',
+		name: 'attachment',
+	} );
+	// Until the form resolves, and if it fails to, the modal lays the fields
+	// out with its own default form.
+	const { form } = useViewConfig( {
+		kind: 'postType',
+		name: 'attachment',
+		fields: VIEW_CONFIG_FIELDS,
+	} );
 	const [ defaultRatios, themeRatios, showDefaultRatios ] = useSettings(
 		'dimensions.aspectRatios.default',
 		'dimensions.aspectRatios.theme',
@@ -100,6 +117,7 @@ function MediaEditorModalContent() {
 	return (
 		<MediaEditorModal
 			fields={ fields }
+			form={ form }
 			aspectRatioPresets={ aspectRatioPresets }
 		/>
 	);

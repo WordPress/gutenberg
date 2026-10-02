@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Stop exporting the `MediaEdit` component and its `MediaEditProps` type. The featured image field keeps rendering the control ([#83368](https://github.com/WordPress/gutenberg/pull/83368)).
+
 ### Bug Fixes
 
 -   `AuthorView`: Fetch the author through the users list in the `view` context, so users who can't edit other users still see the author's name and avatar, including for authors without published posts. ([#83498](https://github.com/WordPress/gutenberg/pull/83498))

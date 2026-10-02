@@ -7,6 +7,78 @@
  */
 
 /**
+ * Recursively casts empty arrays to objects where the schema types them as
+ * objects.
+ *
+ * PHP cannot distinguish an empty associative array from an empty list, so
+ * `json_encode()` always serializes `array()` as a JSON array (`[]`). A REST
+ * schema, however, may type a value as an object, which must encode as `{}`.
+ * This walks the value against its schema and casts any empty, object-typed
+ * array to an object. Non-empty associative arrays already encode as objects,
+ * so they are left as arrays and only recursed into to fix any nested empty
+ * objects.
+ *
+ * Union schemas (`oneOf`/`anyOf`) are handled only for the empty-array case:
+ * an empty value is cast to an object when any branch allows an object. Such
+ * values are not recursed into.
+ *
+ * @param mixed $value  The value to normalize.
+ * @param array $schema The schema node describing the value.
+ * @return mixed The normalized value, with empty object-typed arrays cast to objects.
+ */
+function gutenberg_rest_cast_empty_objects_from_schema( $value, $schema ) {
+	if ( ! is_array( $value ) || ! is_array( $schema ) ) {
+		return $value;
+	}
+
+	if ( isset( $schema['oneOf'] ) || isset( $schema['anyOf'] ) ) {
+		$branches = isset( $schema['oneOf'] ) ? $schema['oneOf'] : $schema['anyOf'];
+		if ( array() === $value ) {
+			foreach ( $branches as $branch ) {
+				if ( is_array( $branch ) && in_array( 'object', (array) ( isset( $branch['type'] ) ? $branch['type'] : array() ), true ) ) {
+					return (object) array();
+				}
+			}
+		}
+		return $value;
+	}
+
+	$types = (array) ( isset( $schema['type'] ) ? $schema['type'] : array() );
+
+	if ( in_array( 'array', $types, true ) && isset( $schema['items'] ) ) {
+		foreach ( $value as $index => $item ) {
+			$value[ $index ] = gutenberg_rest_cast_empty_objects_from_schema( $item, $schema['items'] );
+		}
+		return $value;
+	}
+
+	if ( in_array( 'object', $types, true ) ) {
+		if ( isset( $schema['properties'] ) ) {
+			foreach ( $schema['properties'] as $property => $property_schema ) {
+				if ( array_key_exists( $property, $value ) ) {
+					$value[ $property ] = gutenberg_rest_cast_empty_objects_from_schema( $value[ $property ], $property_schema );
+				}
+			}
+		}
+		if ( isset( $schema['additionalProperties'] ) && is_array( $schema['additionalProperties'] ) ) {
+			foreach ( $value as $key => $item ) {
+				if ( isset( $schema['properties'][ $key ] ) ) {
+					continue;
+				}
+				$value[ $key ] = gutenberg_rest_cast_empty_objects_from_schema( $item, $schema['additionalProperties'] );
+			}
+		}
+
+		// Empty object-typed arrays must serialize as {} to match the schema.
+		if ( array() === $value ) {
+			return (object) array();
+		}
+	}
+
+	return $value;
+}
+
+/**
  * Registers the View Config REST API routes.
  *
  * Replaces the 7.1 registration so the route is served by the 7.2 controller.
@@ -17,6 +89,19 @@ function gutenberg_register_view_config_controller_endpoints_7_2() {
 }
 remove_action( 'rest_api_init', 'gutenberg_register_view_config_controller_endpoints', PHP_INT_MAX );
 add_action( 'rest_api_init', 'gutenberg_register_view_config_controller_endpoints_7_2', PHP_INT_MAX );
+
+/**
+ * Registers the Fields REST API route.
+ *
+ * Exposes the fields registered on the server on the `fields_api_init` action.
+ *
+ * @see Gutenberg_REST_Fields_Controller_7_2
+ */
+function gutenberg_register_fields_controller_endpoints() {
+	$fields_controller = new Gutenberg_REST_Fields_Controller_7_2();
+	$fields_controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_fields_controller_endpoints' );
 
 /**
  * Registers the Templates and Template Parts REST API routes.

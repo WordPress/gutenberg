@@ -160,12 +160,68 @@ function _gutenberg_get_entity_view_config_root_site( $data ) {
 }
 
 /**
+ * Provides the view configuration for the `attachment` post type.
+ *
+ * An attachment is edited through a form (the media editor) that shares
+ * nothing with the default post type form, so the `form` is replaced: the
+ * editable fields first, in a regular layout, then the metadata and the file
+ * information, in panels. The generic `default_view`, `default_layouts`, and
+ * `view_list` built by gutenberg_get_entity_view_config() are left untouched.
+ *
+ * Core has no callback for this entity, so this is a base definition rather
+ * than a layer on top of one.
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function _gutenberg_get_entity_view_config_posttype_attachment( $data ) {
+	$regular_layout = array(
+		'type'          => 'regular',
+		'labelPosition' => 'top',
+	);
+
+	return $data->set(
+		array(
+			'form' => array(
+				'layout' => array( 'type' => 'panel' ),
+				'fields' => array(
+					array(
+						'id'     => 'title',
+						'layout' => $regular_layout,
+					),
+					array(
+						'id'     => 'alt_text',
+						'layout' => $regular_layout,
+					),
+					array(
+						'id'     => 'caption',
+						'layout' => $regular_layout,
+					),
+					array(
+						'id'     => 'description',
+						'layout' => $regular_layout,
+					),
+					'date',
+					'author',
+					'filename',
+					'mime_type',
+					'filesize',
+					'media_dimensions',
+					'attached_to',
+				),
+			),
+		),
+		1
+	);
+}
+
+/**
  * Post types whose base definition provides its own `form`, without the
  * `status` and `discussion` groups of the default post type form.
  *
  * @var string[]
  */
-const GUTENBERG_VIEW_CONFIG_POST_TYPES_WITH_OWN_FORM = array( 'wp_block', 'wp_template', 'wp_template_part' );
+const GUTENBERG_VIEW_CONFIG_POST_TYPES_WITH_OWN_FORM = array( 'attachment', 'wp_block', 'wp_template', 'wp_template_part' );
 
 /**
  * Makes the panel summary of the `status` and `discussion` groups explicit in
@@ -241,6 +297,12 @@ function gutenberg_register_entity_view_config_filters_7_2() {
 	add_filter(
 		gutenberg_get_entity_view_config_hook_name( 'postType', 'wp_navigation' ),
 		'_gutenberg_get_entity_view_config_posttype_wp_navigation',
+		5,
+		1
+	);
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'postType', 'attachment' ),
+		'_gutenberg_get_entity_view_config_posttype_attachment',
 		5,
 		1
 	);
