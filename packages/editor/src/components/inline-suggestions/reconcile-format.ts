@@ -15,12 +15,7 @@
  * wired for text edits. `analyzeTextEdit` sees no text change for a format-only
  * edit, so format detection needs this separate pass.
  */
-import {
-	RichTextData,
-	slice,
-	applyFormat,
-	removeFormat,
-} from '@wordpress/rich-text';
+import { RichTextData, slice, removeFormat } from '@wordpress/rich-text';
 import { toRichTextRecord } from './rich-text-record';
 import {
 	SUGGESTION_AUTHOR_ATTRIBUTE,
@@ -223,7 +218,7 @@ function suggestionIdAt( record: any, index: number ): string | undefined {
  * A character can sit under more than one marker — typing inside a formatted
  * suggestion nests an `add` marker beneath it — and `suggestionAt` reports only
  * the outermost. Extending applies `core/suggestion` across the whole run, and
- * `applyFormat` drops same-type formats it finds inside a non-collapsed range,
+ * `applyFormatPlan` drops the suggestion markers it finds inside that range,
  * so the extend path has to see the whole stack or it will silently strip a
  * nested marker and orphan its note.
  *
@@ -334,7 +329,7 @@ function findExtendableFormatMarker(
 	/*
 	 * Every character in the toggled range must carry this marker and no other,
 	 * on both sides of the edit. A second marker nested under this one would be
-	 * stripped by the `applyFormat` the extend plan leads to, leaving its note
+	 * stripped by the `applyFormatPlan` the extend plan leads to, leaving its note
 	 * anchored to nothing; refuse rather than extend over it.
 	 */
 	const carriesOnly = ( record: any, i: number ) => {
@@ -512,14 +507,22 @@ export function applyFormatPlan(
 	}
 	const { start, end } = plan.range!;
 
-	const marked = applyFormat(
-		next,
-		{
-			type: SUGGESTION_FORMAT_NAME,
-			attributes,
-		} as any,
-		start,
-		end
-	);
-	return new RichTextData( marked as any );
+	/*
+	 * Stamp the marker as the outermost format on every character, dropping
+	 * any suggestion marker already in the range the way `applyFormat` would.
+	 * `applyFormat` nests a new format inside the formats the whole range
+	 * shares, so bolding a run would serialize as `<strong><mark>…</mark>
+	 * </strong>`. The front end swaps the marker's span for the note's
+	 * original run, which only removes the proposed formatting when that
+	 * formatting sits inside the marker.
+	 */
+	const marker = { type: SUGGESTION_FORMAT_NAME, attributes };
+	const formats = next.formats.slice();
+	for ( let index = start; index < end; index++ ) {
+		const stack = ( formats[ index ] ?? [] ).filter(
+			( format: any ) => format.type !== SUGGESTION_FORMAT_NAME
+		);
+		formats[ index ] = [ marker, ...stack ];
+	}
+	return new RichTextData( { ...next, formats } as any );
 }

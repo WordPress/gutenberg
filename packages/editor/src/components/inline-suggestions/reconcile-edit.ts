@@ -251,14 +251,16 @@ function isOwnMarker( format: any, authorToken: string | null ) {
 }
 
 /**
- * HTML of the inserted run when it carries inline formatting of its own, so the
- * proposed addition can be marked up rather than flattened to plain text — a
- * pasted `<strong>`/`<a href>` reaches the block as a new `content` value, and
- * diffing only `record.text` would drop it.
+ * HTML of the inserted run when it carries inline formatting or objects of its
+ * own, so the proposed addition can be marked up rather than flattened to plain
+ * text — a pasted `<strong>`/`<a href>` or an inline image reaches the block as
+ * a new `content` value, and diffing only `record.text` would drop it. An
+ * image is an object replacement character, which plain text cannot carry.
  *
- * Returns null when the run is unformatted (the plain-text path stays exactly as
- * it was) and when it already carries a suggestion marker: re-marking a marked
- * run would nest one marker inside another.
+ * Returns null when the run is plain text, so the plain-text path stays exactly
+ * as it was. A suggestion marker the run inherited from a neighbouring marker
+ * is left out of the HTML: the caller stamps the run's own marker, and keeping
+ * the inherited one would nest one marker inside another.
  *
  * @param nextRecord Rich-text record of the value after the edit.
  * @param edit       Normalized edit from `analyzeTextEdit`.
@@ -268,23 +270,21 @@ function insertedRunHTML( nextRecord: any, edit: TextEdit ): string | null {
 	if ( ! nextRecord || ! edit.insertedText ) {
 		return null;
 	}
-	const from = edit.start;
-	const to = from + edit.insertedText.length;
-	let hasFormats = false;
-	for ( let index = from; index < to; index++ ) {
-		const stack = nextRecord.formats?.[ index ];
-		if ( ! Array.isArray( stack ) || stack.length === 0 ) {
-			continue;
-		}
-		if ( stack.some( ( f: any ) => f.type === SUGGESTION_FORMAT_NAME ) ) {
-			return null;
-		}
-		hasFormats = true;
-	}
-	if ( ! hasFormats ) {
+	const run = slice(
+		nextRecord,
+		edit.start,
+		edit.start + edit.insertedText.length
+	);
+	const formats = run.formats.map( ( stack: any ) => {
+		const kept = Array.isArray( stack )
+			? stack.filter( ( f: any ) => f.type !== SUGGESTION_FORMAT_NAME )
+			: [];
+		return kept.length ? kept : undefined;
+	} );
+	if ( ! formats.some( Boolean ) && ! run.replacements.some( Boolean ) ) {
 		return null;
 	}
-	return toHTMLString( { value: slice( nextRecord, from, to ) } );
+	return toHTMLString( { value: { ...run, formats } as any } );
 }
 
 export interface MarkerAction {
@@ -292,7 +292,7 @@ export interface MarkerAction {
 	type: 'insert-add' | 'grow-add' | 'wrap-del' | 'remove-add';
 	/** Text to insert/append (insert-add, grow-add). */
 	text?: string;
-	/** HTML of the inserted run when it carries inline formatting (insert-add). */
+	/** HTML of the inserted run when it carries formatting or objects (insert-add, grow-add). */
 	html?: string;
 	/** Insertion offset (insert-add, grow-add). */
 	at?: number;
@@ -407,6 +407,7 @@ export function planEditMarkers(
 			authorToken
 		);
 		if ( extendable ) {
+			const html = insertedRunHTML( nextRecord, edit );
 			return {
 				kind: 'insert',
 				actions: [
@@ -414,6 +415,7 @@ export function planEditMarkers(
 						type: 'grow-add',
 						id: extendable.id,
 						text: edit.insertedText,
+						...( html ? { html } : {} ),
 						at: edit.start,
 					},
 				],
@@ -574,6 +576,7 @@ export function applyEditPlan(
 				}
 				result = growInlineAddition( result, {
 					text: action.text!,
+					html: action.html,
 					attributes: buildSuggestionMarkerAttributes( {
 						id: action.id!,
 						type: SUGGESTION_TYPE_ADDITION,
