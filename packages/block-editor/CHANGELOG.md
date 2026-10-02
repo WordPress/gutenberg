@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### New Features
+
+-   Typography: Add a Gradient control that fills the text with a gradient, shown when `settings.background.backgroundClip` allows the `text` value, or when the block declares the support and a theme has not set it ([#77142](https://github.com/WordPress/gutenberg/pull/77142)).
+-   Background: Add a Clip control for choosing the box a background is painted into, shown when `settings.background.backgroundClip` allows a value other than `text` ([#77142](https://github.com/WordPress/gutenberg/pull/77142)).
+
 ### Enhancements
 
 -   Inserter: Open faster when many block types are registered ([#83446](https://github.com/WordPress/gutenberg/pull/83446)).

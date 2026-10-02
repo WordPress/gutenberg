@@ -74,6 +74,11 @@ function styleToAttributes( style ) {
 		? fontFamilyValue.substring( 'var:preset|font-family|'.length )
 		: undefined;
 	const textColorSlug = extractPresetSlug( textColorValue, 'color' );
+	const backgroundColorValue = style?.color?.background;
+	const backgroundColorSlug = extractPresetSlug(
+		backgroundColorValue,
+		'color'
+	);
 	const textShadowSlug =
 		typeof textShadowValue === 'string' &&
 		textShadowValue?.startsWith( 'var:preset|text-shadow|' )
@@ -87,6 +92,10 @@ function styleToAttributes( style ) {
 	updatedStyle.color = {
 		...updatedStyle.color,
 		text: textColorSlug ? undefined : textColorValue,
+		// The Background panel owns this. A preset lives in the
+		// `backgroundColor` attribute, so writing it here too would store it
+		// twice; a custom color already lives here and is left alone.
+		background: backgroundColorSlug ? undefined : backgroundColorValue,
 	};
 	return {
 		style: cleanEmptyObject( updatedStyle ),
@@ -112,11 +121,27 @@ function attributesToStyle( attributes ) {
 				? 'var:preset|text-shadow|' + attributes.textShadow
 				: attributes.style?.typography?.textShadow,
 		},
+		// Read only, so the panel can tell a text gradient would clip the
+		// block's background away. A gradient has three homes: the `gradient`
+		// attribute for a preset, `color.gradient` for a custom one set before
+		// the background support existed, and `background.gradient` since.
+		// `onChange` puts back whatever the block actually had.
+		background: {
+			...attributes.style?.background,
+			gradient: attributes.gradient
+				? 'var:preset|gradient|' + attributes.gradient
+				: ( attributes.style?.background?.gradient ??
+					attributes.style?.color?.gradient ),
+		},
 		color: {
 			...attributes.style?.color,
 			text: attributes.textColor
 				? 'var:preset|color|' + attributes.textColor
 				: attributes.style?.color?.text,
+			// Read only. `styleToAttributes` folds it back out.
+			background: attributes.backgroundColor
+				? 'var:preset|color|' + attributes.backgroundColor
+				: attributes.style?.color?.background,
 		},
 	};
 }
@@ -165,6 +190,8 @@ export function TypographyPanel( {
 		textColor,
 		textShadow,
 		className,
+		backgroundColor,
+		gradient,
 	} = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled.
@@ -179,6 +206,8 @@ export function TypographyPanel( {
 				fitText: _fitText,
 				textColor: _textColor,
 				className: _className,
+				backgroundColor: _backgroundColor,
+				gradient: _gradient,
 			} = select( blockEditorStore ).getBlockAttributes( clientId ) || {};
 			return {
 				style: _style,
@@ -188,6 +217,8 @@ export function TypographyPanel( {
 				textColor: _textColor,
 				textShadow: _textShadow,
 				className: _className,
+				backgroundColor: _backgroundColor,
+				gradient: _gradient,
 			};
 		},
 		[ clientId, isEnabled ]
@@ -201,26 +232,36 @@ export function TypographyPanel( {
 		selectedState
 	);
 
-	const value = useMemo( () => {
-		if ( isStateSelected ) {
-			return getStyleForState( style, selectedState );
-		}
-		return attributesToStyle( {
+	// The block's Default state, which every other state layers over.
+	const baseValue = useMemo(
+		() =>
+			attributesToStyle( {
+				style,
+				fontFamily,
+				fontSize,
+				textColor,
+				textShadow,
+				backgroundColor,
+				gradient,
+			} ),
+		[
 			style,
-			fontFamily,
 			fontSize,
+			fontFamily,
 			textColor,
 			textShadow,
-		} );
-	}, [
-		isStateSelected,
-		selectedState,
-		style,
-		fontSize,
-		fontFamily,
-		textColor,
-		textShadow,
-	] );
+			backgroundColor,
+			gradient,
+		]
+	);
+
+	const value = useMemo(
+		() =>
+			isStateSelected
+				? getStyleForState( style, selectedState )
+				: baseValue,
+		[ isStateSelected, selectedState, style, baseValue ]
+	);
 
 	const onChange = isStateSelected
 		? ( newStyle ) => {
@@ -230,6 +271,34 @@ export function TypographyPanel( {
 			}
 		: ( newStyle ) => {
 				const newAttributes = styleToAttributes( newStyle );
+
+				const setsTextGradient =
+					'text' === newStyle?.background?.backgroundClip;
+				const hadTextGradient =
+					'text' === style?.background?.backgroundClip;
+
+				// Only a text gradient belongs to this panel, so any other
+				// gradient goes back exactly as the block had it. A block that
+				// already had one is this panel clearing its own value, which
+				// is not a gradient to put back.
+				if ( ! setsTextGradient && ! hadTextGradient ) {
+					newAttributes.style = cleanEmptyObject( {
+						...newAttributes.style,
+						background: {
+							...newAttributes.style?.background,
+							gradient: style?.background?.gradient,
+						},
+						color: {
+							...newAttributes.style?.color,
+							gradient: style?.color?.gradient,
+						},
+					} );
+				} else if ( setsTextGradient && gradient ) {
+					// A preset gradient paints the whole block through the
+					// `background` shorthand, which resets the clip the text
+					// gradient depends on. The text gradient replaces it.
+					newAttributes.gradient = undefined;
+				}
 
 				// If setting a font size and fitText is currently enabled, disable it.
 				const hasFontSize =
@@ -246,6 +315,7 @@ export function TypographyPanel( {
 	// link color selection.
 	const enableContrastChecking =
 		! value?.color?.gradient &&
+		'text' !== value?.background?.backgroundClip &&
 		!! value?.color?.text &&
 		settings?.color?.text &&
 		false !== getBlockSupport( name, [ 'color', 'enableContrastChecker' ] );
@@ -284,7 +354,9 @@ export function TypographyPanel( {
 			as={ Wrapper }
 			panelId={ clientId }
 			settings={ settings }
+			blockName={ name }
 			value={ value }
+			baseValue={ isStateSelected ? baseValue : undefined }
 			onChange={ onChange }
 			defaultControls={ defaultControls }
 			contrastWarning={ contrastWarning }

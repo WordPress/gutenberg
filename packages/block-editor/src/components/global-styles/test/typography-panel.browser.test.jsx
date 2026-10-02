@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { render, renderHook } from 'vitest-browser-react';
+import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import TypographyPanel, { useHasTypographyPanel } from '../typography-panel';
 
 // The inheritance treatment sits behind the
@@ -33,6 +34,37 @@ async function renderPanel( props ) {
 			{ ...props }
 		/>
 	);
+}
+
+// The notice explaining that a text gradient has replaced the text color.
+// Scoped to the rendered panel, because it is announced into a live region on
+// the body too.
+const textGradientNotice = ( container ) =>
+	within( container ).queryByText( /replaces the text color/ );
+
+// The notice shown before a text gradient is chosen, while the block still
+// paints a background of its own.
+const backgroundOverrideNotice = ( container ) =>
+	within( container ).queryByText( /^Setting a text gradient/ );
+
+/**
+ * Activates an item in a ToolsPanel options menu.
+ *
+ * The item is activated from the keyboard rather than clicked. This suite runs
+ * without the stylesheet that gives `.components-popover` its z-index, so the
+ * menu popover computes `z-index: auto` and a real pointer click hit-tests
+ * straight through it onto whichever panel control sits underneath. Key events
+ * go to the focused element and are not subject to hit testing, and the menu is
+ * keyboard operable in any case.
+ *
+ * @param {string}        toggleName Accessible name of the menu toggle.
+ * @param {string|RegExp} itemName   Accessible name of the menu item.
+ */
+async function activatePanelMenuItem( toggleName, itemName ) {
+	await userEvent.click( screen.getByRole( 'button', { name: toggleName } ) );
+	const item = await screen.findByRole( 'menuitem', { name: itemName } );
+	item.focus();
+	await userEvent.keyboard( '{Enter}' );
 }
 
 /**
@@ -956,5 +988,430 @@ describe( 'TypographyPanel layout className preserved regardless of inheritance 
 		expect( letterSpacingItem ).toHaveClass(
 			'is-inherited-from-global-styles'
 		);
+	} );
+} );
+
+describe( 'TypographyPanel text gradient', () => {
+	const GRADIENT =
+		'linear-gradient(135deg, rgb(74, 0, 224) 0%, rgb(142, 45, 226) 100%)';
+	const TEST_BLOCK = 'test/text-gradient';
+
+	// Text colour lives in this panel, so the gradient that replaces it does
+	// too. It needs a gradient palette and the `background.gradient` support
+	// to be selectable at all.
+	const gradientSettings = {
+		...baseSettings,
+		background: { gradient: true },
+		color: {
+			text: true,
+			palette: {
+				theme: [ { name: 'Black', slug: 'black', color: '#000000' } ],
+			},
+			gradients: {
+				theme: [
+					{ name: 'Purple', slug: 'purple-blue', gradient: GRADIENT },
+				],
+			},
+		},
+	};
+
+	// The gradient item is optional, so tests asserting on it opt it in.
+	const shownControls = { textColor: true, textGradient: true };
+
+	const withClip = ( backgroundClip ) => ( {
+		...gradientSettings,
+		background: { ...gradientSettings.background, backgroundClip },
+	} );
+
+	beforeEach( () => {
+		registerBlockType( TEST_BLOCK, {
+			apiVersion: 3,
+			title: 'Text gradient test',
+			category: 'text',
+			supports: { background: { gradient: true, backgroundClip: true } },
+		} );
+	} );
+
+	afterEach( () => {
+		unregisterBlockType( TEST_BLOCK );
+	} );
+
+	it( 'hides the gradient control when neither the block nor the theme opts in', async () => {
+		await renderPanel( {
+			settings: gradientSettings,
+			defaultControls: shownControls,
+		} );
+
+		expect(
+			screen.queryByRole( 'button', { name: /Gradient/ } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'shows the gradient control when the theme allows the text clip', async () => {
+		await renderPanel( {
+			settings: withClip( [ 'text' ] ),
+			defaultControls: shownControls,
+		} );
+
+		expect(
+			screen.getByRole( 'button', { name: /Gradient/ } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'shows the gradient control when the theme names only the text value', async () => {
+		await renderPanel( {
+			settings: withClip( [ 'text' ] ),
+			blockName: TEST_BLOCK,
+			defaultControls: shownControls,
+		} );
+
+		expect(
+			screen.getByRole( 'button', { name: /Gradient/ } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'warns before replacing a gradient stored the legacy way', async () => {
+		// A preset gradient lives in the `gradient` attribute and a custom one
+		// in `color.gradient`. Either is a background the text gradient would
+		// write over, so the hook folds them in and the panel says so first.
+		const { container } = await renderPanel( {
+			settings: gradientSettings,
+			blockName: TEST_BLOCK,
+			defaultControls: shownControls,
+			value: {
+				background: {
+					gradient: 'var:preset|gradient|purple-blue',
+				},
+			},
+		} );
+
+		expect( backgroundOverrideNotice( container ) ).toHaveTextContent(
+			'Setting a text gradient replaces the background gradient.'
+		);
+	} );
+
+	it( 'hides the gradient control when the theme turns the clip off', async () => {
+		await renderPanel( {
+			settings: withClip( false ),
+			blockName: TEST_BLOCK,
+			defaultControls: shownControls,
+		} );
+
+		expect(
+			screen.queryByRole( 'button', { name: /Gradient/ } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'hides the gradient control when the theme allows only box values', async () => {
+		await renderPanel( {
+			settings: withClip( [ 'border-box', 'padding-box' ] ),
+			blockName: TEST_BLOCK,
+			defaultControls: shownControls,
+		} );
+
+		expect(
+			screen.queryByRole( 'button', { name: /Gradient/ } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'shows the gradient control when the block declares clip support', async () => {
+		await renderPanel( {
+			settings: gradientSettings,
+			blockName: TEST_BLOCK,
+			defaultControls: shownControls,
+		} );
+
+		expect(
+			screen.getByRole( 'button', { name: /Gradient/ } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'hides the gradient control when no gradient can be chosen', async () => {
+		await renderPanel( {
+			settings: {
+				...gradientSettings,
+				color: { text: true },
+			},
+			blockName: TEST_BLOCK,
+			defaultControls: shownControls,
+		} );
+
+		expect(
+			screen.queryByRole( 'button', { name: /Gradient/ } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'stores a chosen gradient as a gradient clipped to the text', async () => {
+		const onChange = vi.fn();
+		await renderPanel( {
+			settings: gradientSettings,
+			blockName: TEST_BLOCK,
+			defaultControls: shownControls,
+			onChange,
+		} );
+
+		await userEvent.click(
+			screen.getByRole( 'button', { name: /Gradient/ } )
+		);
+		const swatches = await screen.findAllByRole( 'option' );
+		await userEvent.click( swatches[ 0 ] );
+
+		const result = onChange.mock.calls.at( -1 )[ 0 ];
+		expect( result.background.gradient ).toBe(
+			'var:preset|gradient|purple-blue'
+		);
+		expect( result.background.backgroundClip ).toBe( 'text' );
+	} );
+
+	it( 'clears a legacy color gradient when a text gradient is chosen', async () => {
+		const onChange = vi.fn();
+		await renderPanel( {
+			settings: gradientSettings,
+			blockName: TEST_BLOCK,
+			defaultControls: shownControls,
+			value: { color: { gradient: 'linear-gradient(red, blue)' } },
+			onChange,
+		} );
+
+		await userEvent.click(
+			screen.getByRole( 'button', { name: /Gradient/ } )
+		);
+		const swatches = await screen.findAllByRole( 'option' );
+		await userEvent.click( swatches[ 0 ] );
+
+		const result = onChange.mock.calls.at( -1 )[ 0 ];
+		expect( result.color.gradient ).toBeUndefined();
+	} );
+
+	it( 'keeps the gradient control usable while a background gradient is set', async () => {
+		await renderPanel( {
+			settings: gradientSettings,
+			blockName: TEST_BLOCK,
+			defaultControls: shownControls,
+			value: {
+				background: { gradient: 'var:preset|gradient|purple-blue' },
+			},
+		} );
+
+		expect(
+			screen.getByRole( 'button', { name: /Gradient/ } )
+		).not.toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+
+	it( 'warns that a background color will be clipped to the text', async () => {
+		const { container } = await renderPanel( {
+			settings: gradientSettings,
+			blockName: TEST_BLOCK,
+			defaultControls: shownControls,
+			value: { color: { background: '#000000' } },
+		} );
+
+		expect( backgroundOverrideNotice( container ) ).toHaveTextContent(
+			'Setting a text gradient clips the background color to the text.'
+		);
+	} );
+
+	it( 'warns about a preset background color the same way', async () => {
+		const { container } = await renderPanel( {
+			settings: gradientSettings,
+			blockName: TEST_BLOCK,
+			defaultControls: shownControls,
+			value: { color: { background: 'var:preset|color|black' } },
+		} );
+
+		expect( backgroundOverrideNotice( container ) ).toHaveTextContent(
+			'Setting a text gradient clips the background color to the text.'
+		);
+	} );
+
+	it( 'says nothing for an inherited background', async () => {
+		const { container } = await renderPanel( {
+			settings: gradientSettings,
+			blockName: TEST_BLOCK,
+			defaultControls: shownControls,
+			inheritedValue: {
+				background: { gradient: 'var:preset|gradient|purple-blue' },
+			},
+		} );
+
+		// Clipping away an inherited background is an override, not a loss.
+		expect( backgroundOverrideNotice( container ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'says nothing while the Gradient control is off the panel', async () => {
+		const { container } = await renderPanel( {
+			settings: gradientSettings,
+			blockName: TEST_BLOCK,
+			// Gradient not shown, so there is nothing on screen to warn about.
+			defaultControls: { textColor: true },
+			value: { color: { background: '#000000' } },
+		} );
+
+		expect( backgroundOverrideNotice( container ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'says nothing once the block already clips to the text', async () => {
+		const { container } = await renderPanel( {
+			settings: gradientSettings,
+			blockName: TEST_BLOCK,
+			defaultControls: shownControls,
+			value: {
+				background: {
+					gradient: 'var:preset|gradient|purple-blue',
+					backgroundClip: 'text',
+				},
+			},
+		} );
+
+		expect( backgroundOverrideNotice( container ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'leaves the gradient control enabled for a gradient clipped to the text', async () => {
+		await renderPanel( {
+			settings: gradientSettings,
+			blockName: TEST_BLOCK,
+			defaultControls: shownControls,
+			value: {
+				background: {
+					gradient: 'var:preset|gradient|purple-blue',
+					backgroundClip: 'text',
+				},
+			},
+		} );
+
+		expect(
+			screen.getByRole( 'button', { name: /Gradient/ } )
+		).not.toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+
+	it( 'says the gradient replaces the text color, leaving the control usable', async () => {
+		const { container } = await renderPanel( {
+			settings: gradientSettings,
+			blockName: TEST_BLOCK,
+			defaultControls: shownControls,
+			value: {
+				background: {
+					gradient: 'var:preset|gradient|purple-blue',
+					backgroundClip: 'text',
+				},
+			},
+		} );
+
+		expect( textGradientNotice( container ) ).toHaveTextContent(
+			'The gradient replaces the text color.'
+		);
+		expect(
+			screen.getByRole( 'button', { name: /Color/ } )
+		).not.toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+
+	it( 'shows the contrast warning while the color control is usable', async () => {
+		await renderPanel( {
+			settings: gradientSettings,
+			blockName: TEST_BLOCK,
+			defaultControls: shownControls,
+			contrastWarning: 'This color has poor contrast.',
+		} );
+
+		expect(
+			screen.getByRole( 'button', { name: /low contrast/i } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'clears both halves of the text gradient on Reset all', async () => {
+		const onChange = vi.fn();
+		await renderPanel( {
+			settings: gradientSettings,
+			blockName: TEST_BLOCK,
+			onChange,
+			value: {
+				typography: { lineHeight: '1.7' },
+				background: {
+					gradient: 'var:preset|gradient|purple-blue',
+					backgroundClip: 'text',
+				},
+			},
+		} );
+
+		await activatePanelMenuItem( 'Typography options', /reset all/i );
+
+		const result = onChange.mock.calls.at( -1 )[ 0 ];
+		expect( result.background.gradient ).toBeUndefined();
+		expect( result.background.backgroundClip ).toBeUndefined();
+	} );
+	describe( 'at a non-default viewport', () => {
+		// What the block sets at the default viewport. The clip applies at
+		// every width, so it still governs what a breakpoint can paint.
+		const baseValue = {
+			background: {
+				gradient: 'var:preset|gradient|purple-blue',
+				backgroundClip: 'text',
+			},
+		};
+
+		it( 'names the Default state while its clip governs this breakpoint', async () => {
+			const { container } = await renderPanel( {
+				settings: gradientSettings,
+				blockName: TEST_BLOCK,
+				defaultControls: shownControls,
+				value: {},
+				baseValue,
+			} );
+
+			expect( textGradientNotice( container ) ).toHaveTextContent(
+				'The gradient set in the Default state replaces the text color.'
+			);
+		} );
+
+		it( 'clears a text gradient by writing the CSS initial clip', async () => {
+			const onChange = vi.fn();
+			await renderPanel( {
+				settings: gradientSettings,
+				blockName: TEST_BLOCK,
+				defaultControls: shownControls,
+				value: {
+					background: {
+						gradient: 'var:preset|gradient|purple-blue',
+						backgroundClip: 'text',
+					},
+				},
+				baseValue,
+				onChange,
+			} );
+
+			await activatePanelMenuItem( 'Typography options', /reset all/i );
+
+			// The Default state's declarations are not in a media query, so
+			// clearing here has to say `border-box` rather than nothing.
+			const result = onChange.mock.calls.at( -1 )[ 0 ];
+			expect( result.background.gradient ).toBeUndefined();
+			expect( result.background.backgroundClip ).toBe( 'border-box' );
+		} );
+
+		it( 'offers the gradient control at a breakpoint', async () => {
+			await renderPanel( {
+				settings: gradientSettings,
+				blockName: TEST_BLOCK,
+				defaultControls: shownControls,
+				value: {},
+				baseValue,
+			} );
+
+			expect(
+				screen.getByRole( 'button', { name: /Gradient/ } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'says nothing when the breakpoint overrides the clip', async () => {
+			const { container } = await renderPanel( {
+				settings: gradientSettings,
+				blockName: TEST_BLOCK,
+				defaultControls: shownControls,
+				value: { background: { backgroundClip: 'border-box' } },
+				baseValue,
+			} );
+
+			expect( textGradientNotice( container ) ).not.toBeInTheDocument();
+		} );
 	} );
 } );
