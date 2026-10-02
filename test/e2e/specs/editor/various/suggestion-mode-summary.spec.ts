@@ -126,4 +126,105 @@ test.describe( 'Suggest mode: sidebar summaries', () => {
 		// ...and no markup is quoted at the reviewer.
 		await expect( summary ).not.toContainText( '<strong>' );
 	} );
+
+	test( 'an inserted block quotes the text typed into it', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First paragraph' },
+		} );
+		await switchIntent( page, 'Suggesting' );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first()
+			.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'Enter' );
+		const saved = suggestionSavedPromise( page );
+		await page.keyboard.type( 'Brand new paragraph text' );
+		await saved;
+
+		const sidebar = await openNotesSidebar( page );
+		// The summary follows the live block, so it fills in as typing lands.
+		await expect(
+			sidebar
+				.locator( '.editor-collab-sidebar-panel__suggestion-summary' )
+				.filter( { hasText: 'Insert block:' } )
+		).toHaveText( 'Insert block: paragraph “Brand new paragraph text”' );
+	} );
+
+	test( 'a block-level removal quotes the removed text, like a text deletion does', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First paragraph' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second paragraph' },
+		} );
+		await switchIntent( page, 'Suggesting' );
+
+		// The second paragraph's floating toolbar covers the first one.
+		await page.evaluate( () => {
+			( window as any ).wp.data
+				.dispatch( 'core/block-editor' )
+				.clearSelectedBlock();
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first()
+			.click( { position: { x: 10, y: 10 } } );
+		// Twice: the first selects the text, the second every block.
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+		const saved = suggestionSavedPromise( page );
+		await page.keyboard.press( 'Backspace' );
+		await saved;
+
+		const sidebar = await openNotesSidebar( page );
+		await expect(
+			sidebar
+				.locator( '.editor-collab-sidebar-panel__suggestion-summary' )
+				.filter( { hasText: 'Remove block:' } )
+		).toHaveText( [
+			'Remove block: paragraph “First paragraph”',
+			'Remove block: paragraph “Second paragraph”',
+		] );
+	} );
+
+	test( 'a heading level change names both levels', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { content: 'A heading', level: 3 },
+		} );
+		await switchIntent( page, 'Suggesting' );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Heading' } )
+			.click();
+		const saved = suggestionSavedPromise( page );
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: /^Heading 3$/ } )
+			.click();
+		await page.getByRole( 'menuitem', { name: /^Heading 4/ } ).click();
+		await saved;
+
+		const sidebar = await openNotesSidebar( page );
+		await expect(
+			sidebar
+				.locator( '.editor-collab-sidebar-panel__suggestion-summary' )
+				.filter( { hasText: 'Change:' } )
+		).toHaveText( 'Change: heading level 3 → 4' );
+	} );
 } );
