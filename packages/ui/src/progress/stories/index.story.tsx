@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import * as Progress from '../index';
 import { Stack } from '../../stack';
+import { Text } from '../../text';
 
 type StoryArgs = React.ComponentProps< typeof Progress.Root > &
 	Pick< React.ComponentProps< typeof Progress.Indicator >, 'color' >;
@@ -65,9 +66,10 @@ export const CurrentColor: Story = {
 	args: { color: 'currentColor' },
 	decorators: [
 		( Story ) => (
-			<div style={ { color: '#e85d04' } }>
+			<Stack direction="column" gap="sm" style={ { color: '#7f32c9' } }>
+				<Text>The indicator inherits this text color.</Text>
 				<Story />
-			</div>
+			</Stack>
 		),
 	],
 };
