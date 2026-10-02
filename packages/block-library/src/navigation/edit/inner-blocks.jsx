@@ -7,6 +7,7 @@ import {
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import PlaceholderPreview from './placeholder/placeholder-preview';
+import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import { DEFAULT_BLOCK, PRIORITIZED_INSERTER_BLOCKS } from '../constants';
 
 export default function NavigationInnerBlocks( {
@@ -14,6 +15,9 @@ export default function NavigationInnerBlocks( {
 	hasCustomPlaceholder,
 	orientation,
 	templateLock,
+	uncontrolledBlocks,
+	createNavigationMenu,
+	isCreating,
 } ) {
 	const {
 		isImmediateParentOfSelectedBlock,
@@ -59,7 +63,10 @@ export default function NavigationInnerBlocks( {
 
 	const placeholder = useMemo( () => <PlaceholderPreview />, [] );
 
-	const hasMenuItems = !! blocks?.length;
+	const hasMenuItems = !! ( uncontrolledBlocks || blocks )?.length;
+	const appender = uncontrolledBlocks
+		? undefined
+		: InnerBlocks.ButtonBlockAppender;
 
 	// If there is a `ref` attribute pointing to a `wp_navigation` but
 	// that menu has no **items** (i.e. empty) then show a placeholder.
@@ -73,14 +80,16 @@ export default function NavigationInnerBlocks( {
 			className: 'wp-block-navigation__container',
 		},
 		{
-			value: blocks,
+			value: uncontrolledBlocks ? undefined : blocks,
 			onInput,
 			onChange,
-			prioritizedInserterBlocks: PRIORITIZED_INSERTER_BLOCKS,
+			prioritizedInserterBlocks: uncontrolledBlocks
+				? undefined
+				: PRIORITIZED_INSERTER_BLOCKS,
 			defaultBlock: DEFAULT_BLOCK,
 			directInsert: true,
-			orientation,
-			templateLock,
+			orientation: uncontrolledBlocks ? undefined : orientation,
+			templateLock: uncontrolledBlocks ? undefined : templateLock,
 
 			// As an exception to other blocks which feature nesting, show
 			// the block appender even when a child block is selected.
@@ -94,13 +103,25 @@ export default function NavigationInnerBlocks( {
 				hasSelectedDescendant ||
 				// Show the appender while dragging to allow inserting element between item and the appender.
 				parentOrChildHasSelection
-					? InnerBlocks.ButtonBlockAppender
+					? appender
 					: false,
 			placeholder: showPlaceholder ? placeholder : undefined,
-			__experimentalCaptureToolbars: true,
-			__unstableDisableLayoutClassNames: true,
+			__experimentalCaptureToolbars: ! uncontrolledBlocks,
+			__unstableDisableLayoutClassNames: ! uncontrolledBlocks,
 		}
 	);
 
-	return <div { ...innerBlocksProps } />;
+	return (
+		<>
+			{ uncontrolledBlocks && (
+				<UnsavedInnerBlocks
+					blocks={ uncontrolledBlocks }
+					createNavigationMenu={ createNavigationMenu }
+					isCreating={ isCreating }
+					hasSelection={ isSelected || hasSelectedDescendant }
+				/>
+			) }
+			<div { ...innerBlocksProps } />
+		</>
+	);
 }
