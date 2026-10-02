@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { fineRotation } from '../fine-rotation';
 
 const NO_FLIP = { horizontal: false, vertical: false };

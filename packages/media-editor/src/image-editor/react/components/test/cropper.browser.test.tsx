@@ -233,12 +233,16 @@ describe( 'Cropper', () => {
 			</CropperProvider>
 		);
 
-		fireEvent.click( screen.getByRole( 'button', { name: 'Preview' } ) );
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Preview' } )
+		);
 		expect(
 			await screen.findByTestId( PREVIEW_RECT_TEST_ID )
 		).toBeInTheDocument();
 
-		fireEvent.click( screen.getByRole( 'button', { name: 'Change crop' } ) );
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Change crop' } )
+		);
 
 		await waitFor( () =>
 			expect(
@@ -268,7 +272,7 @@ describe( 'Cropper', () => {
 			).toHaveTextContent( 'ready' );
 		} );
 
-		fireEvent.click(
+		await userEvent.click(
 			screen.getByRole( 'button', { name: 'Unmount cropper' } )
 		);
 

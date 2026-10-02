@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useEffect } from '@wordpress/element';
 import { DEFAULT_STATE } from '../../../core/constants';

@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { useDeferredCommit } from '../use-deferred-commit';
 import { makeRange } from '../crop-input-utils';
@@ -7,10 +8,10 @@ const RANGE = makeRange( 0, 500 );
 function fakeKeyboardEvent(
 	key: 'Enter' | 'Escape'
 ): React.KeyboardEvent< HTMLInputElement > {
-	const target = { blur: jest.fn() };
+	const target = { blur: vi.fn() };
 	return {
 		key,
-		preventDefault: jest.fn(),
+		preventDefault: vi.fn(),
 		currentTarget: target,
 		target,
 	} as unknown as React.KeyboardEvent< HTMLInputElement >;
@@ -18,7 +19,7 @@ function fakeKeyboardEvent(
 
 describe( 'useDeferredCommit', () => {
 	it( 'renders the formatted value when not focused', () => {
-		const onCommit = jest.fn();
+		const onCommit = vi.fn();
 		const { result } = renderHook( () =>
 			useDeferredCommit( {
 				value: 123,
@@ -35,7 +36,7 @@ describe( 'useDeferredCommit', () => {
 	} );
 
 	it( 'commits valid in-range drafts immediately', () => {
-		const onCommit = jest.fn();
+		const onCommit = vi.fn();
 		const { result } = renderHook( () =>
 			useDeferredCommit( {
 				value: 100,
@@ -57,7 +58,7 @@ describe( 'useDeferredCommit', () => {
 				value: 100,
 				range: RANGE,
 				commitStep: 1,
-				onCommit: jest.fn(),
+				onCommit: vi.fn(),
 			} )
 		);
 
@@ -68,7 +69,7 @@ describe( 'useDeferredCommit', () => {
 	} );
 
 	it( 'does not commit out-of-range drafts until completion', () => {
-		const onCommit = jest.fn();
+		const onCommit = vi.fn();
 		const { result } = renderHook( () =>
 			useDeferredCommit( {
 				value: 100,
@@ -85,8 +86,8 @@ describe( 'useDeferredCommit', () => {
 	} );
 
 	it( 'previews valid drafts without committing when live commits are disabled', () => {
-		const onCommit = jest.fn();
-		const onPreview = jest.fn();
+		const onCommit = vi.fn();
+		const onPreview = vi.fn();
 		const { result } = renderHook( () =>
 			useDeferredCommit( {
 				value: 100,
@@ -106,9 +107,9 @@ describe( 'useDeferredCommit', () => {
 	} );
 
 	it( 'commits deferred preview drafts on blur', () => {
-		const onCommit = jest.fn();
-		const onCommitEnd = jest.fn();
-		const onPreview = jest.fn();
+		const onCommit = vi.fn();
+		const onCommitEnd = vi.fn();
+		const onPreview = vi.fn();
 		const { result } = renderHook( () =>
 			useDeferredCommit( {
 				value: 100,
@@ -131,8 +132,8 @@ describe( 'useDeferredCommit', () => {
 	} );
 
 	it( 'clears deferred previews on Escape without committing', () => {
-		const onCommit = jest.fn();
-		const onPreview = jest.fn();
+		const onCommit = vi.fn();
+		const onPreview = vi.fn();
 		const { result } = renderHook( () =>
 			useDeferredCommit( {
 				value: 100,
@@ -153,8 +154,8 @@ describe( 'useDeferredCommit', () => {
 	} );
 
 	it( 'clears deferred previews once when Enter triggers blur', () => {
-		const onCommit = jest.fn();
-		const onPreview = jest.fn();
+		const onCommit = vi.fn();
+		const onPreview = vi.fn();
 		const { result } = renderHook( () =>
 			useDeferredCommit( {
 				value: 100,
@@ -177,8 +178,8 @@ describe( 'useDeferredCommit', () => {
 	} );
 
 	it( 'cancels deferred previews when value changes externally during focus', async () => {
-		const onCommit = jest.fn();
-		const onPreview = jest.fn();
+		const onCommit = vi.fn();
+		const onPreview = vi.fn();
 		const { result, rerender } = renderHook(
 			( { value }: { value: number } ) =>
 				useDeferredCommit( {
@@ -202,7 +203,7 @@ describe( 'useDeferredCommit', () => {
 	} );
 
 	it( 'does not commit outward edits from an already out-of-range value', () => {
-		const onCommit = jest.fn();
+		const onCommit = vi.fn();
 		const { result } = renderHook( () =>
 			useDeferredCommit( {
 				value: -10,
@@ -222,8 +223,8 @@ describe( 'useDeferredCommit', () => {
 	} );
 
 	it( 'clamps and finalises on blur', () => {
-		const onCommit = jest.fn();
-		const onCommitEnd = jest.fn();
+		const onCommit = vi.fn();
+		const onCommitEnd = vi.fn();
 		const { result } = renderHook( () =>
 			useDeferredCommit( {
 				value: 100,
@@ -243,8 +244,8 @@ describe( 'useDeferredCommit', () => {
 	} );
 
 	it( 'does not fire onCommitEnd until the user blurs or presses Enter', () => {
-		const onCommit = jest.fn();
-		const onCommitEnd = jest.fn();
+		const onCommit = vi.fn();
+		const onCommitEnd = vi.fn();
 		const { result } = renderHook( () =>
 			useDeferredCommit( {
 				value: 100,
@@ -268,8 +269,8 @@ describe( 'useDeferredCommit', () => {
 	} );
 
 	it( 'leaves out-of-range drafts editable until blur', () => {
-		const onCommit = jest.fn();
-		const onCommitEnd = jest.fn();
+		const onCommit = vi.fn();
+		const onCommitEnd = vi.fn();
 		const { result } = renderHook( () =>
 			useDeferredCommit( {
 				value: 100,
@@ -296,8 +297,8 @@ describe( 'useDeferredCommit', () => {
 	} );
 
 	it( 'commits + finalises on Enter', () => {
-		const onCommit = jest.fn();
-		const onCommitEnd = jest.fn();
+		const onCommit = vi.fn();
+		const onCommitEnd = vi.fn();
 		const { result } = renderHook( () =>
 			useDeferredCommit( {
 				value: 100,
@@ -317,8 +318,8 @@ describe( 'useDeferredCommit', () => {
 	} );
 
 	it( 'commits the latest draft when change and blur happen before a rerender', () => {
-		const onCommit = jest.fn();
-		const onCommitEnd = jest.fn();
+		const onCommit = vi.fn();
+		const onCommitEnd = vi.fn();
 		const { result } = renderHook( () =>
 			useDeferredCommit( {
 				value: 100,
@@ -343,8 +344,8 @@ describe( 'useDeferredCommit', () => {
 	} );
 
 	it( 'rolls back to the focus-time value on Escape', () => {
-		const onCommit = jest.fn();
-		const onCommitEnd = jest.fn();
+		const onCommit = vi.fn();
+		const onCommitEnd = vi.fn();
 		const { result } = renderHook( () =>
 			useDeferredCommit( {
 				value: 100,
@@ -366,7 +367,7 @@ describe( 'useDeferredCommit', () => {
 	} );
 
 	it( 'keeps the typed draft when external state changes during focus', () => {
-		const onCommit = jest.fn();
+		const onCommit = vi.fn();
 		const { result, rerender } = renderHook(
 			( { value }: { value: number } ) =>
 				useDeferredCommit( {
@@ -387,7 +388,7 @@ describe( 'useDeferredCommit', () => {
 	} );
 
 	it( 'keeps an in-progress draft when external state changes during focus', () => {
-		const onCommit = jest.fn();
+		const onCommit = vi.fn();
 		const { result, rerender } = renderHook(
 			( { value }: { value: number } ) =>
 				useDeferredCommit( {
@@ -407,8 +408,8 @@ describe( 'useDeferredCommit', () => {
 	} );
 
 	it( 'displays the latest external value once the user blurs', () => {
-		const onCommit = jest.fn();
-		const onCommitEnd = jest.fn();
+		const onCommit = vi.fn();
+		const onCommitEnd = vi.fn();
 		const { result, rerender } = renderHook(
 			( { value }: { value: number } ) =>
 				useDeferredCommit( {
@@ -433,8 +434,8 @@ describe( 'useDeferredCommit', () => {
 	} );
 
 	it( 'does not commit the focus-time value on Enter when only external state changed', () => {
-		const onCommit = jest.fn();
-		const onCommitEnd = jest.fn();
+		const onCommit = vi.fn();
+		const onCommitEnd = vi.fn();
 		const { result, rerender } = renderHook(
 			( { value }: { value: number } ) =>
 				useDeferredCommit( {
@@ -457,14 +458,14 @@ describe( 'useDeferredCommit', () => {
 	} );
 
 	it( 'fires onSessionStart on focus and onSessionEnd on blur', () => {
-		const onSessionStart = jest.fn();
-		const onSessionEnd = jest.fn();
+		const onSessionStart = vi.fn();
+		const onSessionEnd = vi.fn();
 		const { result } = renderHook( () =>
 			useDeferredCommit( {
 				value: 100,
 				range: RANGE,
 				commitStep: 1,
-				onCommit: jest.fn(),
+				onCommit: vi.fn(),
 				onSessionStart,
 				onSessionEnd,
 			} )
@@ -485,13 +486,13 @@ describe( 'useDeferredCommit', () => {
 	it.each( [ 'Enter', 'Escape' ] as const )(
 		'fires onSessionEnd exactly once on %s (not again from the resulting blur)',
 		( key ) => {
-			const onSessionEnd = jest.fn();
+			const onSessionEnd = vi.fn();
 			const { result } = renderHook( () =>
 				useDeferredCommit( {
 					value: 100,
 					range: RANGE,
 					commitStep: 1,
-					onCommit: jest.fn(),
+					onCommit: vi.fn(),
 					onSessionEnd,
 				} )
 			);
@@ -506,14 +507,14 @@ describe( 'useDeferredCommit', () => {
 	);
 
 	it( 'ends an active session before flushing a pending live commit on unmount', () => {
-		const onCommitEnd = jest.fn();
-		const onSessionEnd = jest.fn();
+		const onCommitEnd = vi.fn();
+		const onSessionEnd = vi.fn();
 		const { result, unmount } = renderHook( () =>
 			useDeferredCommit( {
 				value: 100,
 				range: RANGE,
 				commitStep: 1,
-				onCommit: jest.fn(),
+				onCommit: vi.fn(),
 				onCommitEnd,
 				onSessionEnd,
 			} )

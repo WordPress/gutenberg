@@ -6,8 +6,7 @@ import { MediaEditorStateProvider } from '../../../state';
 
 globalThis.wpVitest.mockMatchMedia();
 
-jest.mock( '../crop-advanced-panel', () => ( {
-	__esModule: true,
+vi.mock( import( '../crop-advanced-panel' ), () => ( {
 	default: () => <div data-testid="crop-advanced-panel" />,
 } ) );
 

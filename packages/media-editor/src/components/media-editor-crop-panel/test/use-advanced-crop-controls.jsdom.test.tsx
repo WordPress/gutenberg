@@ -1,12 +1,13 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { useAdvancedCropControls } from '../use-advanced-crop-controls';
 
-const mockSetCropRect = jest.fn();
-const mockSetRotation = jest.fn();
-const mockSettleCrop = jest.fn();
-const mockBeginGesture = jest.fn();
-const mockEndGesture = jest.fn();
-const mockSetPreviewCropRect = jest.fn();
+const mockSetCropRect = vi.fn();
+const mockSetRotation = vi.fn();
+const mockSettleCrop = vi.fn();
+const mockBeginGesture = vi.fn();
+const mockEndGesture = vi.fn();
+const mockSetPreviewCropRect = vi.fn();
 
 const defaultState = {
 	image: { src: 'test.jpg', naturalWidth: 1000, naturalHeight: 500 },
@@ -44,28 +45,42 @@ let mockCropperState = defaultState;
 let mockCropGeometry: typeof defaultGeometry | { isReady: false } =
 	defaultGeometry;
 
-jest.mock( '../../../state', () => ( {
-	useMediaEditor: () => ( {
-		state: mockCropperState,
-		setCropRect: mockSetCropRect,
-		setRotation: mockSetRotation,
-		settleCrop: mockSettleCrop,
-		beginGesture: mockBeginGesture,
-		endGesture: mockEndGesture,
-	} ),
-} ) );
+vi.mock(
+	import( '../../../state' ),
+	() =>
+		( {
+			useMediaEditor: () => ( {
+				cropper: {
+					state: mockCropperState,
+					setCropRect: mockSetCropRect,
+					setRotation: mockSetRotation,
+					settleCrop: mockSettleCrop,
+				},
+				beginGesture: mockBeginGesture,
+				endGesture: mockEndGesture,
+			} ),
+		} ) as unknown as typeof import( '../../../state' )
+);
 
-jest.mock( '../../../image-editor/react/hooks/use-crop-geometry', () => ( {
-	useCropGeometry: () => mockCropGeometry,
-} ) );
+vi.mock(
+	import( '../../../image-editor/react/hooks/use-crop-geometry' ),
+	() =>
+		( {
+			useCropGeometry: () => mockCropGeometry,
+		} ) as unknown as typeof import( '../../../image-editor/react/hooks/use-crop-geometry' )
+);
 
-jest.mock( '../../../image-editor/react/components/cropper-provider', () => ( {
-	useSetCropperPreviewRect: () => mockSetPreviewCropRect,
-} ) );
+vi.mock(
+	import( '../../../image-editor/react/components/cropper-provider' ),
+	() =>
+		( {
+			useSetCropperPreviewRect: () => mockSetPreviewCropRect,
+		} ) as unknown as typeof import( '../../../image-editor/react/components/cropper-provider' )
+);
 
 describe( 'useAdvancedCropControls', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 		mockCropperState = defaultState;
 		mockCropGeometry = defaultGeometry;
 	} );
