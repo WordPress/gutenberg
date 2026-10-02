@@ -30,3 +30,12 @@ export {
 } from './background-panel';
 export { default as StateControl } from './state-control';
 export { default as StateControlBadges } from './state-control-badges';
+export { getStyleLabel } from './style-labels';
+export {
+	EMPTY_VALUE_LABEL,
+	formatStyleValue,
+	formatBorderShorthand,
+	formatBorderRadius,
+	formatSpacingShorthand,
+	formatBlockGap,
+} from './format-style-value';

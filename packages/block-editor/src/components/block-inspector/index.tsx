@@ -10,10 +10,10 @@ import {
 	__unstableMotion as motion,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import type { ReactNode } from 'react';
 import { check } from '@wordpress/icons';
-import { Text } from '@wordpress/ui';
+import { Stack, Text } from '@wordpress/ui';
 import EditContents from './edit-contents';
 import { PrivateBlockInspectorEditOriginal } from './edit-original-slot-fill';
 import SkipToSelectedBlock from '../skip-to-selected-block';
@@ -38,6 +38,7 @@ import { BlockStateBadges, BlockStatesControl } from '../../hooks/states';
 import ContentTab from '../inspector-controls-tabs/content-tab';
 import ViewportVisibilityInfo from '../block-visibility/viewport-visibility-info';
 import { unlock } from '../../lock-unlock';
+import StyleChangesIndicator from '../global-styles/inheritance/style-changes-indicator';
 import {
 	BlockStyleStateProvider,
 	hasPseudoBlockStyleState,
@@ -440,6 +441,8 @@ const BlockInspectorSingleBlock = ( {
 	blockStatesEditingEnabled = true,
 }: BlockInspectorSingleBlockProps ) => {
 	const listViewRef = useRef< HTMLDivElement >( null );
+	const [ inspectorElement, setInspectorElement ] =
+		useState< HTMLDivElement | null >( null );
 	const hasMultipleTabs = availableTabs?.length > 1;
 	const isEditingStyleState =
 		( hasViewportBlockStyleState( selectedBlockStyleState ) &&
@@ -472,7 +475,10 @@ const BlockInspectorSingleBlock = ( {
 	};
 
 	return (
-		<div className="block-editor-block-inspector">
+		<div
+			className="block-editor-block-inspector"
+			ref={ setInspectorElement }
+		>
 			{ hasParentChildBlockCards && (
 				<BlockCard
 					{ ...parentBlockInformation }
@@ -496,35 +502,44 @@ const BlockInspectorSingleBlock = ( {
 				isChild={ hasParentChildBlockCards as boolean }
 				clientId={ renderedBlockClientId }
 				controls={
-					blockEditingMode === 'default' &&
-					blockStatesEditingEnabled && (
-						<BlockStatesControl
-							name={ blockName }
-							value={ selectedBlockStyleState }
-							onChange={ onBlockStyleStateChange }
-						>
-							<MenuGroup>
-								<MenuItem
-									role="menuitemcheckbox"
-									isSelected={ showStateOnCanvas }
-									icon={ showStateOnCanvas ? check : null }
-									// Previewing is only meaningful while a
-									// non-default pseudo state is selected.
-									disabled={
-										! hasPseudoBlockStyleState(
-											selectedBlockStyleState
-										)
-									}
-									onClick={ () =>
-										onShowStateOnCanvasChange(
-											! showStateOnCanvas
-										)
-									}
+					blockEditingMode === 'default' && (
+						<Stack direction="row" align="center" gap="xs">
+							<StyleChangesIndicator
+								clientId={ renderedBlockClientId }
+								popoverAnchor={ inspectorElement }
+							/>
+							{ blockStatesEditingEnabled && (
+								<BlockStatesControl
+									name={ blockName }
+									value={ selectedBlockStyleState }
+									onChange={ onBlockStyleStateChange }
 								>
-									{ __( 'Preview on canvas' ) }
-								</MenuItem>
-							</MenuGroup>
-						</BlockStatesControl>
+									<MenuGroup>
+										<MenuItem
+											role="menuitemcheckbox"
+											isSelected={ showStateOnCanvas }
+											icon={
+												showStateOnCanvas ? check : null
+											}
+											// Previewing is only meaningful while a
+											// non-default pseudo state is selected.
+											disabled={
+												! hasPseudoBlockStyleState(
+													selectedBlockStyleState
+												)
+											}
+											onClick={ () =>
+												onShowStateOnCanvasChange(
+													! showStateOnCanvas
+												)
+											}
+										>
+											{ __( 'Preview on canvas' ) }
+										</MenuItem>
+									</MenuGroup>
+								</BlockStatesControl>
+							) }
+						</Stack>
 					)
 				}
 			/>
