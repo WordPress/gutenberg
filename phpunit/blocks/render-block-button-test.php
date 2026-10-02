@@ -136,4 +136,47 @@ class Render_Block_Button_Test extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'wp-block-button__width-33', $result );
 		$this->assertStringContainsString( '--wp--block-button--width: 33;', $result );
 	}
+
+	/**
+	 * @covers ::gutenberg_render_block_core_button
+	 */
+	public function test_background_image_applies_to_link() {
+		$attributes = array(
+			'style' => array(
+				'background' => array(
+					'backgroundImage' => array(
+						'url' => 'https://example.com/image.jpg',
+					),
+				),
+			),
+		);
+
+		$result    = gutenberg_render_block_core_button( $attributes, self::$button_content );
+		$processor = new WP_HTML_Tag_Processor( $result );
+		$processor->next_tag( 'a' );
+
+		$this->assertSame( "background-image:url('https://example.com/image.jpg');background-size:cover;", $processor->get_attribute( 'style' ) );
+		$this->assertTrue( $processor->has_class( 'has-background' ) );
+	}
+
+	/**
+	 * @covers ::gutenberg_render_block_core_button
+	 */
+	public function test_background_gradient_appends_to_existing_link_style() {
+		$content    = '<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" style="color:#fff">Click me</a></div>';
+		$attributes = array(
+			'style' => array(
+				'background' => array(
+					'gradient' => 'linear-gradient(red, blue)',
+				),
+			),
+		);
+
+		$result = gutenberg_render_block_core_button( $attributes, $content );
+
+		$this->assertSame(
+			'<div class="wp-block-button"><a class="wp-block-button__link wp-element-button has-background" style="color:#fff;background-image:linear-gradient(red, blue);">Click me</a></div>',
+			$result
+		);
+	}
 }
