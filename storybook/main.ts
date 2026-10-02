@@ -6,7 +6,6 @@ import emotion from '@rolldown/plugin-emotion';
 import type { StorybookConfig } from '@storybook/react-vite';
 import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks';
 import dsTokenFallbacksJs from '@wordpress/theme/vite-plugins/vite-ds-token-fallbacks';
-import { createPostcssBrowserPlugin } from './postcss-browser-plugin.mjs';
 import { statusIndexer } from './status-indexer.js';
 
 /**
@@ -16,28 +15,6 @@ function getAbsolutePath( packageName: string ) {
 	return path.dirname(
 		fileURLToPath( import.meta.resolve( `${ packageName }/package.json` ) )
 	);
-}
-
-/**
- * Serve the English Emojibase dataset for the Editor/EmojiPicker story,
- * mirroring the `build/emojibase-data/<locale>/` layout. Only `en` is
- * mapped, to keep the published Storybook artifact small.
- *
- * Resolved rather than hardcoded to `node_modules/`, since the package is
- * declared by the `tools/build-scripts` workspace and a non-hoisted
- * install would otherwise point at a missing directory.
- */
-function emojibaseStaticDirs() {
-	try {
-		return [
-			{
-				from: path.join( getAbsolutePath( 'emojibase-data' ), 'en' ),
-				to: '/emojibase-data/en',
-			},
-		];
-	} catch {
-		return [];
-	}
 }
 
 const { NODE_ENV = 'development' } = process.env;
@@ -77,7 +54,7 @@ const config: StorybookConfig = {
 	stories,
 	// Tags stories with their `componentStatus` so the sidebar can show it.
 	experimental_indexers: ( existing = [] ) => [ statusIndexer, ...existing ],
-	staticDirs: [ './static', ...emojibaseStaticDirs() ],
+	staticDirs: [ './static' ],
 	addons: [
 		{
 			name: getAbsolutePath( '@storybook/addon-docs' ),
@@ -177,15 +154,6 @@ const config: StorybookConfig = {
 						),
 					},
 				],
-			},
-			optimizeDeps: {
-				rolldownOptions: {
-					plugins: [
-						createPostcssBrowserPlugin(
-							path.resolve( import.meta.dirname, '..' )
-						),
-					],
-				},
 			},
 			plugins: [
 				dsTokenFallbacksJs(),
