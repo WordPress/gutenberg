@@ -11,7 +11,6 @@
 		"dbaeumer.vscode-eslint", // ESLint
 		"esbenp.prettier-vscode", // Prettier - Code formatter
 		"obliviousharmony.vscode-php-codesniffer", // PHP_CodeSniffer
-		"stylelint.vscode-stylelint", // Stylelint
-		"TypeScriptTeam.native-preview" // Native TypeScript preview
+		"stylelint.vscode-stylelint" // Stylelint
 	]
 }
