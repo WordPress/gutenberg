@@ -396,6 +396,17 @@ async function parseRootConfig( configFile, rawConfig, options ) {
 		}
 		parsedConfig.testsEnvironment = rawConfig.testsEnvironment;
 	}
+	if ( rawConfig.runtime !== undefined ) {
+		const availableRuntimes = [ 'docker', 'playground' ];
+		if ( ! availableRuntimes.includes( rawConfig.runtime ) ) {
+			throw new ValidationError(
+				`Invalid ${ configFile }: "runtime" must be one of: ${ availableRuntimes.join(
+					', '
+				) }.`
+			);
+		}
+		parsedConfig.runtime = rawConfig.runtime;
+	}
 	parsedConfig.lifecycleScripts = {};
 	if ( rawConfig.lifecycleScripts ) {
 		checkObjectWithValues(
@@ -475,6 +486,7 @@ async function parseEnvironmentConfig(
 			case 'testsPort':
 			case 'autoPort':
 			case 'testsEnvironment':
+			case 'runtime':
 			case 'lifecycleScripts':
 			case 'env': {
 				if ( options.rootConfig ) {

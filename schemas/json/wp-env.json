@@ -106,6 +106,12 @@
 				"multisite": {
 					"description": "Whether to set up a multisite installation.",
 					"type": "boolean"
+				},
+				"runtime": {
+					"description": "The runtime to use for the environment. 'docker' uses Docker containers, 'playground' uses WordPress Playground (experimental).",
+					"type": "string",
+					"enum": [ "docker", "playground" ],
+					"default": "docker"
 				}
 			}
 		},
@@ -121,7 +127,8 @@
 				"mappings",
 				"phpmyadmin",
 				"phpmyadminPort",
-				"multisite"
+				"multisite",
+				"runtime"
 			]
 		}
 	},
