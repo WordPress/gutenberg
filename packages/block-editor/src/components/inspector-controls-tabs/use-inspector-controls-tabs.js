@@ -29,6 +29,7 @@ export default function useInspectorControlsTabs(
 ) {
 	const tabs = [];
 	const {
+		'additional-styles': additionalStylesGroup,
 		bindings: bindingsGroup,
 		border: borderGroup,
 		color: colorGroup,
@@ -65,6 +66,24 @@ export default function useInspectorControlsTabs(
 	];
 	const hasStyleFills = styleFills.length;
 
+	const { tabSettings, isPreviewMode } = useSelect( ( select ) => {
+		const settings = select( blockEditorStore ).getSettings();
+		return {
+			tabSettings: settings.blockInspectorTabs,
+			isPreviewMode: settings.isPreviewMode,
+		};
+	}, [] );
+
+	// Additional styling controls, e.g. Additional CSS, live in the Styles
+	// tab's own "Additional styles" panel. Fills for them alone don't warrant
+	// a Styles tab, as that tab would hold nothing but a collapsed panel.
+	// When there is no Styles tab they appear as a separate panel in the
+	// settings tab, so they have to be accounted for when deciding whether to
+	// show that tab.
+	const hasStylesTab = ! isPreviewMode && ( hasBlockStyles || hasStyleFills );
+	const additionalStylesFills =
+		useSlotFills( additionalStylesGroup.name ) || [];
+
 	// Settings Tab: If we don't have multiple tabs to display
 	// (i.e. both list view and styles), check only the default
 	// InspectorControls slots. If we have multiple tabs, we'll need to check
@@ -72,6 +91,7 @@ export default function useInspectorControlsTabs(
 	const advancedFills = [
 		...( useSlotFills( InspectorAdvancedControls.slotName ) || [] ),
 		...( useSlotFills( bindingsGroup.name ) || [] ),
+		...( hasStylesTab ? [] : additionalStylesFills ),
 	];
 
 	const settingsFills = [
@@ -99,15 +119,7 @@ export default function useInspectorControlsTabs(
 		tabs.push( TAB_SETTINGS );
 	}
 
-	const { tabSettings, isPreviewMode } = useSelect( ( select ) => {
-		const settings = select( blockEditorStore ).getSettings();
-		return {
-			tabSettings: settings.blockInspectorTabs,
-			isPreviewMode: settings.isPreviewMode,
-		};
-	}, [] );
-
-	if ( ! isPreviewMode && ( hasBlockStyles || hasStyleFills ) ) {
+	if ( hasStylesTab ) {
 		tabs.push( TAB_STYLES );
 	}
 

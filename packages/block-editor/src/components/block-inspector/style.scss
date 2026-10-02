@@ -40,6 +40,14 @@
 		// Ensures this PanelBody is treated like the ToolsPanel, removing double borders.
 		margin-top: -$border-width;
 	}
+
+	// The Advanced panel can hold two slot groups at once, the settings tools
+	// and the styling tools. Each slot renders its own container, so the
+	// margin between controls above stops at the last control of a container.
+	// Restore the gap where two containers meet.
+	.block-editor-block-inspector__advanced > div + div {
+		margin-top: $grid-unit-20;
+	}
 }
 
 .block-editor-block-inspector__no-blocks,

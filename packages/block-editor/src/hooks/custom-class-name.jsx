@@ -34,7 +34,7 @@ function CustomClassNameControlsPure( { className, setAttributes } ) {
 	}
 
 	return (
-		<InspectorControls group="advanced">
+		<InspectorControls group="additional-styles">
 			<TextControl
 				autoComplete="off"
 				label={ __( 'Additional CSS class(es)' ) }
