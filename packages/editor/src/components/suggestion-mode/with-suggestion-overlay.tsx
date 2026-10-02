@@ -153,7 +153,9 @@ function SuggestingBlockEdit( {
 		(
 			nextAttributes:
 				| Record< string, any >
-				| ( ( current: Record< string, any > ) => Record< string, any > )
+				| ( (
+						current: Record< string, any >
+				  ) => Record< string, any > )
 		) => {
 			/*
 			 * Edits inside a block that IS the suggestion write through to
@@ -178,8 +180,8 @@ function SuggestingBlockEdit( {
 				isDeferredInsertion( clientId ) ||
 				( blockEditor &&
 					( isPartOfPendingInsertion( blockEditor, clientId ) ||
-						blockEditor.getMultiSelectedBlockClientIds?.()
-							?.length > 0 ) )
+						blockEditor.getMultiSelectedBlockClientIds?.()?.length >
+							0 ) )
 			) {
 				setAttributes( nextAttributes );
 				return;

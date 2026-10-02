@@ -1211,9 +1211,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			blockEditor.getBlockAttributes( a.clientId )?.metadata?.suggestion
 		).toBeUndefined();
 		expect( getOverlay().entries[ a.clientId ] ).toBeUndefined();
-		expect(
-			registry.select( noticesStore ).getNotices()
-		).toEqual(
+		expect( registry.select( noticesStore ).getNotices() ).toEqual(
 			expect.arrayContaining( [
 				expect.objectContaining( {
 					id: 'suggestion-move-into-insertion',
