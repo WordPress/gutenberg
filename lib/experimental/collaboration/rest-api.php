@@ -29,3 +29,45 @@ function gutenberg_override_autosaves_rest_controller( $args ) {
 }
 
 add_filter( 'register_post_type_args', 'gutenberg_override_autosaves_rest_controller', 10, 1 );
+
+/**
+ * Adds a `collaboration_disabled` field to post types that support real-time
+ * collaboration, so the editor knows whether to sync the post it loads.
+ *
+ * @since 7.2.0
+ */
+function gutenberg_register_collaboration_disabled_rest_field() {
+	if ( ! wp_is_collaboration_enabled() ) {
+		return;
+	}
+
+	$post_types = array_values(
+		array_filter(
+			get_post_types( array( 'show_in_rest' => true ) ),
+			static function ( $post_type ) {
+				return ! wp_is_post_type_collaboration_disabled( $post_type );
+			}
+		)
+	);
+
+	register_rest_field(
+		$post_types,
+		'collaboration_disabled',
+		array(
+			'schema'       => array(
+				'description' => __( 'Whether real-time collaboration is disabled for the post.', 'gutenberg' ),
+				'type'        => 'boolean',
+				'context'     => array( 'edit' ),
+				'readonly'    => true,
+			),
+			'get_callback' => static function ( $item ) {
+				// Templates use a string ID and carry the post ID in `wp_id`.
+				$post = get_post( isset( $item['wp_id'] ) ? $item['wp_id'] : $item['id'] );
+
+				// Leave records that are not stored as posts to the post type check.
+				return $post ? wp_is_post_collaboration_disabled( $post ) : false;
+			},
+		)
+	);
+}
+add_action( 'rest_api_init', 'gutenberg_register_collaboration_disabled_rest_field' );
