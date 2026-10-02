@@ -243,7 +243,8 @@ export function useOpenImageMediaEditorModal( {
 	// the update needs to read — those synced from the attachment's metadata,
 	// and those derived from which attachment the block points at; add more
 	// here if the sync policy grows.
-	const { id, url, alt, caption, sizeSlug, linkDestination } = attributes;
+	const { id, url, alt, caption, sizeSlug, linkDestination, href } =
+		attributes;
 	const registry = useRegistry();
 	const openMediaEditorModal = useSelect(
 		( select ) =>
@@ -261,6 +262,7 @@ export function useOpenImageMediaEditorModal( {
 		caption: caption?.toString(),
 		sizeSlug,
 		linkDestination,
+		href,
 	} );
 	// Snapshot of the attachment's metadata taken just before the modal opens,
 	// used as the baseline for detecting what changed during the editing session.
@@ -268,11 +270,6 @@ export function useOpenImageMediaEditorModal( {
 	// Incremented on every handleMediaUpdate call; stale async continuations
 	// check against this to bail out if a newer update has since started.
 	const mediaEditorMetadataSyncRequestRef = useRef( 0 );
-	// The alt text and caption a save overwrote on the block, and the
-	// attachment it moved the block away from. The media editor's Undo moves
-	// the block back but reports only that attachment's id and url, so this is
-	// what lets the update restore the block's own metadata too.
-	const mediaEditorUndoMetadataRef = useRef();
 
 	useEffect( () => {
 		blockAttributesRef.current = {
@@ -282,8 +279,9 @@ export function useOpenImageMediaEditorModal( {
 			caption: caption?.toString(),
 			sizeSlug,
 			linkDestination,
+			href,
 		};
-	}, [ alt, caption, id, linkDestination, sizeSlug, url ] );
+	}, [ alt, caption, href, id, linkDestination, sizeSlug, url ] );
 
 	// Reads the cached attachment record. The `attachment` postType entity
 	// fetches with `context: 'edit'` by default, so `getEditedEntityRecord`
@@ -340,7 +338,7 @@ export function useOpenImageMediaEditorModal( {
 	);
 
 	const handleMediaUpdate = useCallback(
-		async ( { id: newId, url: newUrl } ) => {
+		async ( { id: newId, url: newUrl }, session ) => {
 			if ( typeof newId !== 'number' ) {
 				return;
 			}
@@ -349,10 +347,6 @@ export function useOpenImageMediaEditorModal( {
 			// reuse a stale snapshot.
 			const originalAttachment = mediaEditorMetadataBaselineRef.current;
 			mediaEditorMetadataBaselineRef.current = undefined;
-			// Likewise the metadata the last save overwrote: only the update
-			// straight after that save, its Undo, may restore it.
-			const undoMetadata = mediaEditorUndoMetadataRef.current;
-			mediaEditorUndoMetadataRef.current = undefined;
 			const syncRequest = ++mediaEditorMetadataSyncRequestRef.current;
 			const nextAttributes = {};
 
@@ -360,6 +354,10 @@ export function useOpenImageMediaEditorModal( {
 			const isNewAttachment = newId !== currentBlockAttributes.id;
 
 			if ( isNewAttachment ) {
+				// Capture the block's selected-size URL, not the attachment's
+				// full-size URL supplied by the modal's fallback Undo.
+				session.undoAttributes.id = currentBlockAttributes.id;
+				session.undoAttributes.url = currentBlockAttributes.url;
 				nextAttributes.id = newId;
 				nextAttributes.url = newUrl ?? currentBlockAttributes.url;
 				if ( nextAttributes.url !== currentBlockAttributes.url ) {
@@ -388,6 +386,7 @@ export function useOpenImageMediaEditorModal( {
 				// A newer update started while we were awaiting; discard
 				// this one.
 				if (
+					session.isUndone ||
 					syncRequest !== mediaEditorMetadataSyncRequestRef.current
 				) {
 					return;
@@ -422,22 +421,6 @@ export function useOpenImageMediaEditorModal( {
 							nextAttributes,
 							resolvedMetadataAttributes
 						);
-
-						// Only a save to a new attachment offers an Undo, so
-						// only then keep the values being overwritten.
-						if ( isNewAttachment ) {
-							mediaEditorUndoMetadataRef.current = {
-								id: currentBlockAttributes.id,
-								attributes: Object.fromEntries(
-									Object.keys(
-										resolvedMetadataAttributes
-									).map( ( key ) => [
-										key,
-										latestBlockAttributes[ key ],
-									] )
-								),
-							};
-						}
 					}
 				}
 
@@ -469,14 +452,15 @@ export function useOpenImageMediaEditorModal( {
 				}
 			}
 
-			// The media editor's Undo: the block is going back to the
-			// attachment the last save moved it away from, so put back the
-			// alt text and caption that save overwrote.
-			if ( undoMetadata?.id === newId ) {
-				Object.assign( nextAttributes, undoMetadata.attributes );
-			}
-
 			if ( Object.keys( nextAttributes ).length ) {
+				// Only restore values this save changed. Block-specific
+				// metadata and unrelated edits must not be overwritten.
+				for ( const key of Object.keys( nextAttributes ) ) {
+					if ( ! Object.hasOwn( session.undoAttributes, key ) ) {
+						session.undoAttributes[ key ] =
+							blockAttributesRef.current[ key ];
+					}
+				}
 				blockAttributesRef.current = {
 					...blockAttributesRef.current,
 					...nextAttributes,
@@ -496,11 +480,6 @@ export function useOpenImageMediaEditorModal( {
 		if ( ! id || ! openMediaEditorModal ) {
 			return;
 		}
-
-		// A new session starts. Drop any metadata kept for the last save's
-		// Undo, so a save in this session that returns the block to that same
-		// attachment isn't mistaken for it.
-		mediaEditorUndoMetadataRef.current = undefined;
 
 		// Snapshot the attachment's current metadata before the user makes
 		// any changes so handleMediaUpdate can compare against it later. Use
@@ -525,9 +504,24 @@ export function useOpenImageMediaEditorModal( {
 				: fallbackAttachmentRecord ) ||
 			cachedAttachmentRecord;
 
+		// Each opening owns its Undo snapshot, so a later session cannot
+		// replace the values captured by an earlier snackbar.
+		const session = { undoAttributes: {}, isUndone: false };
 		openMediaEditorModal( {
 			id,
-			onUpdate: handleMediaUpdate,
+			onUpdate: ( updated ) => handleMediaUpdate( updated, session ),
+			onUndo: () => {
+				session.isUndone = true;
+				const { undoAttributes } = session;
+				if ( Object.hasOwn( undoAttributes, 'url' ) ) {
+					onUrlChange?.( undoAttributes.url );
+				}
+				blockAttributesRef.current = {
+					...blockAttributesRef.current,
+					...undoAttributes,
+				};
+				setAttributes( undoAttributes );
+			},
 			onClose,
 		} );
 	}, [
@@ -535,8 +529,10 @@ export function useOpenImageMediaEditorModal( {
 		handleMediaUpdate,
 		id,
 		onClose,
+		onUrlChange,
 		openMediaEditorModal,
 		resolveAttachmentRecord,
+		setAttributes,
 	] );
 
 	return id && openMediaEditorModal ? openImageMediaEditorModal : undefined;
