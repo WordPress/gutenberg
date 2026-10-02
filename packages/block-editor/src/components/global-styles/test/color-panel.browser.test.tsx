@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { screen } from '@testing-library/react';
 import { render, renderHook } from 'vitest-browser-react';
-import ColorPanel, {
+import BaseColorPanel, {
 	useHasColorPanel,
 	useHasTextPanel,
 	useHasBackgroundColorPanel,
@@ -11,6 +11,12 @@ import ColorPanel, {
 	useHasButtonPanel,
 	useHasCaptionPanel,
 } from '../color-panel';
+import type { ColorPanelProps } from '../types';
+
+// The per-control indicators default to off now; these tests cover them.
+const ColorPanel = ( props: ColorPanelProps ) => (
+	<BaseColorPanel showInheritanceLabelIndicators { ...props } />
+);
 
 // The inheritance treatment sits behind the
 // `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these

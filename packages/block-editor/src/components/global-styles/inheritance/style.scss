@@ -184,3 +184,60 @@
 	transform: translate(-50%, -50%);
 	color: var(--wp-admin-theme-color, #3858e9);
 }
+
+// Style changes popover opened from the block card's indicator.
+// Same footprint as the small toggle button, so the card never shifts.
+.block-editor-style-changes-indicator,
+.block-editor-style-changes-indicator__placeholder {
+	display: flex;
+	flex: none;
+	width: $button-size-small;
+	height: $button-size-small;
+}
+
+.block-editor-style-changes-indicator__content .components-popover__content {
+	width: 280px;
+	padding: $grid-unit-20;
+}
+
+.block-editor-style-changes__heading {
+	margin: 0;
+	padding: 0 $grid-unit-10;
+	font-size: $font-size-x-small;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+	line-height: $font-line-height-x-small;
+	text-transform: uppercase;
+}
+
+// Matches the group heading so the disclosure reads as one. The selector
+// outweighs Button's icon-and-text padding; the inset allows for its 1px border.
+.block-editor-style-changes__toggle.components-button.has-icon.has-text {
+	justify-content: space-between;
+	width: 100%;
+	padding: 0 calc(#{$grid-unit-10} - #{$border-width});
+	font-size: $font-size-x-small;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+	text-transform: uppercase;
+	color: inherit;
+}
+
+.block-editor-style-changes__text {
+	flex: 1;
+	min-width: 0;
+}
+
+.block-editor-style-changes__label {
+	font-size: $default-font-size;
+	line-height: $font-line-height-small;
+}
+
+.block-editor-style-changes__source,
+.block-editor-style-changes__value {
+	font-size: $font-size-small;
+	line-height: $font-line-height-small;
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+.block-editor-style-changes__value {
+	max-width: 120px;
+}

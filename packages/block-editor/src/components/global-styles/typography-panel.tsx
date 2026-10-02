@@ -40,11 +40,7 @@ import {
 	findNearestStyleAndWeight,
 } from './typography-utils';
 import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
-import {
-	getInheritanceProps,
-	InheritanceToolsPanelItem,
-	isGlobalStylesInheritanceIndicatorUIEnabled,
-} from './inheritance';
+import { getInheritanceProps, InheritanceToolsPanelItem } from './inheritance';
 import type {
 	PanelResetAllFilter,
 	PanelStyle,
@@ -296,7 +292,7 @@ export default function TypographyPanel( {
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 	isGlobalStyles = false,
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
+	showInheritanceLabelIndicators = false,
 	contrastWarning,
 }: TypographyPanelProps ) {
 	const {

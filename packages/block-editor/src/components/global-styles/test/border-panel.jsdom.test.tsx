@@ -2,8 +2,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { UserEvent } from '@testing-library/user-event';
-import BorderPanel from '../border-panel';
-import type { PresetsPerOrigin, ShadowPreset } from '../types';
+import BaseBorderPanel from '../border-panel';
+import type { BorderPanelProps, PresetsPerOrigin, ShadowPreset } from '../types';
+
+// The per-control indicators default to off now; these tests cover them.
+const BorderPanel = ( props: BorderPanelProps ) => (
+	<BaseBorderPanel showInheritanceLabelIndicators { ...props } />
+);
 
 globalThis.wpVitest.mockMatchMedia();
 

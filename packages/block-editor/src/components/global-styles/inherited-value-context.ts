@@ -287,3 +287,30 @@ export function useResolvedStyle(
 		selectedState,
 	] );
 }
+
+/**
+ * Hook: returns what `useResolvedStyle` resolves against, so a caller can name
+ * the element or variation behind a source descriptor, which only carries its
+ * layer.
+ *
+ * @param {?string} blockName Block name (e.g. `core/heading`).
+ * @param {?string} className Block `className` used to detect an applied variation.
+ * @return {{ globalStyles: ?Object, elements: string[], variationName: ?string }} Global Styles config, element layers (low to high precedence) and variation slug.
+ */
+export function useResolvedStyleContext( blockName, className ) {
+	const { variationName, headingLevel } = useVariationAndElements(
+		blockName,
+		className
+	);
+	const globalStyles = useRawGlobalStyles();
+	return useMemo(
+		() => ( {
+			globalStyles,
+			elements: blockName
+				? getElementLayers( blockName, headingLevel )
+				: [],
+			variationName,
+		} ),
+		[ globalStyles, blockName, headingLevel, variationName ]
+	);
+}

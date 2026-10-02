@@ -14,11 +14,7 @@ import {
 	extractPresetSlug,
 	encodeColorValueWithPalette,
 } from '../../utils/color-values';
-import {
-	getInheritanceProps,
-	InheritanceToolsPanelItem,
-	isGlobalStylesInheritanceIndicatorUIEnabled,
-} from './inheritance';
+import { getInheritanceProps, InheritanceToolsPanelItem } from './inheritance';
 import type {
 	BackgroundPanelProps,
 	PanelResetAllFilter,
@@ -233,7 +229,7 @@ export default function BackgroundImagePanel( {
 	defaultValues = {},
 	headerLabel = __( 'Background' ),
 	contrastWarning,
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
+	showInheritanceLabelIndicators = false,
 }: BackgroundPanelProps ) {
 	const {
 		colors,

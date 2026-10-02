@@ -1,16 +1,19 @@
 import { useMemo } from '@wordpress/element';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import {
 	getStyle,
 	getValueFromVariable,
 } from '@wordpress/global-styles-engine';
-import { getStyleLabel } from './style-labels';
-import {
+import { unlock } from '../../lock-unlock';
+
+const {
+	getStyleLabel,
 	formatStyleValue,
 	formatBorderShorthand,
 	formatBorderRadius,
 	formatSpacingShorthand,
 	formatBlockGap,
-} from './format-style-value';
+} = unlock( blockEditorPrivateApis );
 
 /**
  * Turns a raw style value into readable text, using the row's `format` hint so

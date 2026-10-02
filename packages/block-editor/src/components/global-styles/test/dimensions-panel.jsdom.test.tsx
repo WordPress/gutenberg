@@ -2,8 +2,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
-import DimensionsPanel from '../dimensions-panel';
+import BaseDimensionsPanel from '../dimensions-panel';
 import type { DimensionsPanelProps } from '../types';
+
+// The per-control indicators default to off now; these tests cover them.
+const DimensionsPanel = ( props: DimensionsPanelProps ) => (
+	<BaseDimensionsPanel showInheritanceLabelIndicators { ...props } />
+);
 
 globalThis.wpVitest.mockMatchMedia();
 

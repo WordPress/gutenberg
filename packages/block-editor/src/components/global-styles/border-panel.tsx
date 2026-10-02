@@ -17,11 +17,7 @@ import {
 } from './utils';
 import { setImmutably } from '../../utils/object';
 import { ShadowPopover, useShadowPresets } from './shadow-panel-components';
-import {
-	getInheritanceProps,
-	InheritanceToolsPanelItem,
-	isGlobalStylesInheritanceIndicatorUIEnabled,
-} from './inheritance';
+import { getInheritanceProps, InheritanceToolsPanelItem } from './inheritance';
 import type {
 	BorderPanelProps,
 	PanelBorderRadius,
@@ -116,7 +112,7 @@ export default function BorderPanel( {
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
+	showInheritanceLabelIndicators = false,
 }: BorderPanelProps ) {
 	const colors = useColorsPerOrigin( settings );
 	const itemPopoverProps = useToolsPanelItemPopoverProps();
