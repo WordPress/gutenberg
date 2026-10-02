@@ -6,7 +6,7 @@ import {
 	userPermissions,
 	autosaves,
 	currentUser,
-	syncUndoManagerState,
+	undoManagerReference,
 	undoManager,
 } from '../reducer';
 
@@ -539,33 +539,19 @@ describe( 'undoManager', () => {
 	} );
 } );
 
-describe( 'syncUndoManagerState', () => {
-	it( 'stores sync undo manager availability', () => {
-		const state = syncUndoManagerState( undefined, {
-			type: 'SYNC_UNDO_MANAGER_CHANGE',
-			hasRedo: false,
-			hasUndo: true,
-		} );
+describe( 'undoManagerReference', () => {
+	it( 'changes when the entity sync manager records an undo level', () => {
+		const originalState = undoManagerReference( undefined, {} );
 
-		expect( state ).toEqual( {
-			hasRedo: false,
-			hasUndo: true,
-		} );
-	} );
-
-	it( 'updates sync undo manager availability', () => {
-		const state = syncUndoManagerState(
-			{ hasRedo: false, hasUndo: true },
-			{
-				type: 'SYNC_UNDO_MANAGER_CHANGE',
-				hasRedo: true,
-				hasUndo: false,
-			}
-		);
-
-		expect( state ).toEqual( {
-			hasRedo: true,
-			hasUndo: false,
-		} );
+		expect(
+			undoManagerReference( originalState, {
+				type: 'EDIT_ENTITY_RECORD',
+			} )
+		).toBe( originalState );
+		expect(
+			undoManagerReference( originalState, {
+				type: 'RECORD_SYNC_UNDO_LEVEL',
+			} )
+		).not.toBe( originalState );
 	} );
 } );

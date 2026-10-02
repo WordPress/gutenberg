@@ -1,13 +1,13 @@
 import { describe, expect, it, vi } from 'vitest';
 import attachMediaInPost from '..';
 
-vi.mock( '@wordpress/core-data', () => ( { store: {} } ) );
+vi.mock( import( '@wordpress/core-data' ), () => ( { store: {} } ) );
 
 const { mockInvalidate } = vi.hoisted( () => ( {
 	mockInvalidate: vi.fn(),
 } ) );
 
-vi.mock( '../invalidate-attachment-resolutions', () => ( {
+vi.mock( import( '../invalidate-attachment-resolutions' ), () => ( {
 	default: mockInvalidate,
 } ) );
 
