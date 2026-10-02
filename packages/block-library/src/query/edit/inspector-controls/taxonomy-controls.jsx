@@ -353,11 +353,10 @@ function TaxonomyItem( {
 		setValue( newValue );
 		onChange( newValue.map( ( item ) => Number( item.value ) ) );
 	};
-	// A request is pending either while the debounce has not caught up with what
-	// has been typed, or while the request it triggered is still resolving.
+	const isDebouncing = ! isHierarchical && inputValue !== search;
 	const isPending = isHierarchical
 		? ! treeHasResolved
-		: inputValue !== search || ! listHasResolved;
+		: isDebouncing || ! listHasResolved;
 	return (
 		<div className="block-library-query-inspector__taxonomy-control">
 			<SearchableChipSelectControl
@@ -373,8 +372,10 @@ function TaxonomyItem( {
 					}
 				} }
 				// A flat taxonomy is searched server side, so opt out of the
-				// built-in client side filtering rather than filtering twice.
-				filter={ isHierarchical ? undefined : null }
+				// built-in client side filtering rather than filtering twice,
+				// except to narrow the previous results until the search runs.
+				filter={ isHierarchical || isDebouncing ? undefined : null }
+				autoHighlight
 				isItemEqualToValue={ isItemEqualToValue }
 				statusContent={
 					isPending ? (
