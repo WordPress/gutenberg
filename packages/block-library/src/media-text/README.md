@@ -53,6 +53,8 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
+- [`filter`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#filter):
+  - [`duotone`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#filter-duotone): `true`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
 - [`allowedBlocks`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#allowedblocks): `true`
@@ -65,6 +67,13 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 
 - `postId`
 - `postType`
+
+## CSS Selectors
+
+_Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
+
+- **filter**:
+  - duotone: `.wp-block-media-text > .wp-block-media-text__media img, .wp-block-media-text > .wp-block-media-text__media video`
 
 ## Block Markup
 
