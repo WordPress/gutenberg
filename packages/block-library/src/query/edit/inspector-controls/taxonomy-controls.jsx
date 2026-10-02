@@ -24,18 +24,11 @@ const BASE_QUERY = {
 const FLAT_QUERY = { ...BASE_QUERY, _fields: 'id,name' };
 const TREE_QUERY = { ...BASE_QUERY, _fields: 'id,name,parent', per_page: -1 };
 
-/**
- * How the limit for the browsable list of terms was chosen:
- *  - Matches the `per_page` range set by the REST API.
- *  - Mirrors the limit used by the post editor's flat term selector.
- */
 const MAX_TERMS_TO_LIST = 100;
 const MAX_SEARCH_RESULTS = 20;
 
 /**
- * Terms are listed and selected as `{ value, label }` items, where `value` is
- * the stringified term id. Items come from different requests than the selected
- * value, so they are never referentially equal and have to be matched by id.
+ * Matches items by term id.
  *
  * @param {{value: string}} item     An item from the list.
  * @param {{value: string}} selected A currently selected item.
@@ -44,9 +37,7 @@ const MAX_SEARCH_RESULTS = 20;
 const isItemEqualToValue = ( item, selected ) => item.value === selected.value;
 
 /**
- * Announces how many terms the list holds, once it holds them. The count comes
- * from the list itself rather than from what was requested, so it stays right
- * whatever narrows it.
+ * Announces how many terms the list holds.
  *
  * @return {React.JSX.Element|null} The announcement, or nothing while the list is empty.
  */
@@ -74,9 +65,7 @@ const termToItem = ( term ) => ( {
 } );
 
 /**
- * Turns the terms of a hierarchical taxonomy into items, keyed by term id. A
- * nested term is named after the terms it sits under, so that two terms
- * sharing a name can be told apart, in the list and in the chip alike.
+ * Turns the terms of a hierarchical taxonomy into items, keyed by term id.
  *
  * @param {Array<{id: number, name: string, parent: number}>} terms All the terms of the taxonomy.
  * @return {Map<number, {value: string, label: string}>} The items, keyed by term id.
@@ -193,7 +182,8 @@ export function TaxonomyControls( { onChange, query } ) {
  *
  * The list of terms is browsable: opening the control lists the existing terms
  * without requiring the user to remember and type their names. Typing narrows
- * the list down through a server side search.
+ * the list down, in the browser for a hierarchical taxonomy and through a
+ * server side search for a flat one.
  *
  * @param {Object}   props                 The props for the component.
  * @param {Object}   props.taxonomy        The taxonomy object.
@@ -210,17 +200,11 @@ function TaxonomyItem( {
 	onChange,
 	label,
 } ) {
-	// The list of terms is only requested once the user opens the control, so
-	// that merely rendering the inspector does not fetch terms nobody browses.
-	// Once opened, it stays subscribed to avoid refetching on every reopen.
 	const [ hasOpened, setHasOpened ] = useState( false );
 	const [ inputValue, setInputValue ] = useState( '' );
 	const [ search, setSearch ] = useState( '' );
 	const [ value, setValue ] = useState( EMPTY_ARRAY );
 	const debouncedSearch = useDebounce( setSearch, 250 );
-	// A hierarchical taxonomy is fetched whole, like in the post editor's
-	// hierarchical term selector, so that each term can be named after all the
-	// terms it sits under. A flat one can be much larger, so it is searched.
 	const isHierarchical = !! taxonomy.hierarchical;
 	const needsTree = isHierarchical && ( hasOpened || !! termIds?.length );
 	const { tree, treeHasResolved } = useSelect(
@@ -258,7 +242,6 @@ function TaxonomyItem( {
 				taxonomy.slug,
 				{
 					...FLAT_QUERY,
-					// Without a search, list the terms so they can be browsed.
 					...( search
 						? { search, per_page: MAX_SEARCH_RESULTS }
 						: { per_page: MAX_TERMS_TO_LIST } ),
@@ -350,15 +333,10 @@ function TaxonomyItem( {
 				'assertive'
 			);
 		}
-		// Reset the search so that the full list is offered for the next
-		// selection, cancelling a search the debounce has not yet run.
 		debouncedSearch.cancel();
 		setInputValue( '' );
 		setSearch( '' );
-		// Show the selection right away. The effect above only catches up once
-		// the request for the selected terms resolves, and until it does the
-		// control would still be given the previous value, so a second selection
-		// made in the meantime would be sent on its own and replace the first.
+		// Show the selection right away, before the selected terms resolve.
 		setValue( newValue );
 		onChange( newValue.map( ( item ) => Number( item.value ) ) );
 	};
@@ -388,9 +366,6 @@ function TaxonomyItem( {
 						setHasOpened( true );
 					}
 				} }
-				// A flat taxonomy is searched server side, so opt out of the
-				// built-in client side filtering rather than filtering twice,
-				// except to narrow the previous results until the search runs.
 				filter={ isHierarchical || isDebouncing ? undefined : null }
 				autoHighlight={ inputValue ? 'always' : true }
 				isItemEqualToValue={ isItemEqualToValue }
@@ -404,8 +379,6 @@ function TaxonomyItem( {
 						<ListedTermCount />
 					)
 				}
-				// The status above reports the pending state, so the list should
-				// not also claim there are no results before it has looked.
 				emptyContent={ isPending ? null : undefined }
 			/>
 		</div>
