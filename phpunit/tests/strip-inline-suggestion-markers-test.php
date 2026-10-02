@@ -148,6 +148,129 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'data-wp-suggestion-strip', $stripped );
 	}
 
+	/**
+	 * Creates a pending format suggestion note on a post.
+	 *
+	 * @param int    $post_id     Post the note belongs to.
+	 * @param string $before_html Original run recorded on the note.
+	 * @param string $status      Suggestion lifecycle status, if any.
+	 * @return int Note comment ID.
+	 */
+	private function create_format_note( $post_id, $before_html, $status = '' ) {
+		$note_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'note',
+				'comment_approved' => '0',
+			)
+		);
+		$payload = array(
+			'operations' => array(
+				array(
+					'type'           => 'inline-suggestion',
+					'attribute'      => 'content',
+					'suggestionType' => 'format',
+					'beforeHTML'     => $before_html,
+					'afterHTML'      => '<strong>' . $before_html . '</strong>',
+				),
+			),
+		);
+		update_comment_meta( $note_id, '_wp_suggestion', wp_slash( wp_json_encode( $payload ) ) );
+		if ( $status ) {
+			update_comment_meta( $note_id, '_wp_suggestion_status', $status );
+		}
+		return $note_id;
+	}
+
+	/**
+	 * Renders a block as if it were part of the given post.
+	 *
+	 * @param int    $post_id Post being rendered.
+	 * @param string $html    Block HTML.
+	 * @return string Filtered block HTML.
+	 */
+	private function strip_in_post( $post_id, $html ) {
+		$GLOBALS['post'] = get_post( $post_id );
+		return gutenberg_strip_inline_suggestion_markers( $html );
+	}
+
+	public function test_pending_format_restores_the_original_run() {
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_format_note( $post_id, 'world' );
+		$html    = '<p>Hello <mark class="wp-suggestion" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>world</strong></mark></p>';
+
+		// The proposed bold must not reach readers until it is accepted.
+		$this->assertSame( '<p>Hello world</p>', $this->strip_in_post( $post_id, $html ) );
+	}
+
+	public function test_pending_format_restores_original_formatting() {
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_format_note( $post_id, '<em>world</em>' );
+		$html    = '<p>Hello <mark class="wp-suggestion" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>world</strong></mark>!</p>';
+
+		$this->assertSame( '<p>Hello <em>world</em>!</p>', $this->strip_in_post( $post_id, $html ) );
+	}
+
+	public function test_applied_format_keeps_the_proposed_formatting() {
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_format_note( $post_id, 'world', 'applied' );
+		$html    = '<p>Hello <mark class="wp-suggestion" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>world</strong></mark></p>';
+
+		$this->assertSame( '<p>Hello <strong>world</strong></p>', $this->strip_in_post( $post_id, $html ) );
+	}
+
+	public function test_format_note_from_another_post_is_not_rendered() {
+		// A marker copied into another post must not pull that post's
+		// (possibly private) text onto this page.
+		$other_id = self::factory()->post->create( array( 'post_status' => 'private' ) );
+		$post_id  = self::factory()->post->create();
+		$note_id  = $this->create_format_note( $other_id, 'secret' );
+		$html     = '<p><mark class="wp-suggestion" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>world</strong></mark></p>';
+
+		$this->assertSame( '<p><strong>world</strong></p>', $this->strip_in_post( $post_id, $html ) );
+	}
+
+	public function test_format_marker_without_a_note_unwraps() {
+		$post_id = self::factory()->post->create();
+		$html    = '<p><mark class="wp-suggestion" data-suggestion-id="999999" data-suggestion-type="format"><strong>world</strong></mark></p>';
+
+		$this->assertSame( '<p><strong>world</strong></p>', $this->strip_in_post( $post_id, $html ) );
+	}
+
+	public function test_restored_run_is_not_reparsed_for_markers() {
+		// A marker inside the recorded original is unwrapped, never resolved
+		// again, so a note cannot reference itself into a loop.
+		$post_id = self::factory()->post->create();
+		$note_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'note',
+				'comment_approved' => '0',
+			)
+		);
+		$inner   = '<mark class="wp-suggestion" data-suggestion-id="' . $note_id . '" data-suggestion-type="format">world</mark>';
+		update_comment_meta(
+			$note_id,
+			'_wp_suggestion',
+			wp_slash(
+				wp_json_encode(
+					array(
+						'operations' => array(
+							array(
+								'type'           => 'inline-suggestion',
+								'suggestionType' => 'format',
+								'beforeHTML'     => $inner,
+							),
+						),
+					)
+				)
+			)
+		);
+		$html = '<p>' . $inner . '</p>';
+
+		$this->assertSame( '<p>world</p>', $this->strip_in_post( $post_id, $html ) );
+	}
+
 	public function test_filter_is_registered_on_render_block() {
 		$this->assertNotFalse(
 			has_filter( 'render_block', 'gutenberg_strip_inline_suggestion_markers' )

@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
 	RichTextData,
+	registerFormatType,
 	store as richTextStore,
 	unregisterFormatType,
 } from '@wordpress/rich-text';
@@ -534,5 +535,55 @@ describe( 'applyEditPlan', () => {
 		expect( result.toHTMLString() ).toContain(
 			'<a href="https://example.com">'
 		);
+	} );
+
+	describe( 'inline images', () => {
+		const IMAGE = '<img src="https://example.com/a.png" alt="">';
+
+		beforeAll( () => {
+			registerFormatType( 'test/image', {
+				title: 'Image',
+				tagName: 'img',
+				className: null,
+				object: true,
+				attributes: { url: 'src', alt: 'alt' },
+				edit: () => null,
+			} as any );
+		} );
+
+		afterAll( () => {
+			unregisterFormatType( 'test/image' );
+		} );
+
+		it( 'keeps an inline image inserted as a new addition', () => {
+			const prev = rtd( 'Hello' );
+			const { actions } = planEditMarkers(
+				prev,
+				rtd( `Hello${ IMAGE }` )
+			);
+			const result = applyEditPlan( prev, actions, {
+				authorId: 2,
+				ids: [ 60 ],
+			} );
+			expect( result.toHTMLString() ).toBe(
+				rtd( `Hello${ add( 60, IMAGE, 2 ) }` ).toHTMLString()
+			);
+		} );
+
+		it( 'keeps an inline image that grows the author’s own addition', () => {
+			const prev = rtd( `Hello${ add( 61, ' new', 2 ) }` );
+			const { actions } = planEditMarkers(
+				prev,
+				rtd( `Hello${ add( 61, ' new', 2 ) }${ IMAGE }` ),
+				{ authorId: 2 }
+			);
+			const result = applyEditPlan( prev, actions, {
+				authorId: 2,
+				ids: [],
+			} );
+			expect( result.toHTMLString() ).toBe(
+				rtd( `Hello${ add( 61, ` new${ IMAGE }`, 2 ) }` ).toHTMLString()
+			);
+		} );
 	} );
 } );

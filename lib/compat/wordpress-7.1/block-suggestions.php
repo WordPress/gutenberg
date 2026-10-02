@@ -227,6 +227,10 @@ add_action( 'init', 'gutenberg_register_suggestion_meta' );
  *   is accepted in the editor.
  * - `add` (suggested addition): the marked text is proposed new content, so the
  *   wrapper *and* the text are removed. It only becomes permanent when accepted.
+ * - `format` (suggested formatting change): the marked run carries the proposed
+ *   formatting, so the whole span is replaced with the original run recorded on
+ *   the note (see `gutenberg_get_pending_format_suggestion_html()`). When that
+ *   original cannot be resolved the marker falls back to deletion handling.
  *
  * The raw `post_content` (and the REST `raw` view, revisions, exports) keeps the
  * markers so the editor can re-attach on reload. Only `wp-suggestion` markers
@@ -244,13 +248,31 @@ add_action( 'init', 'gutenberg_register_suggestion_meta' );
  * (https://github.com/WordPress/gutenberg/discussions/54583); once it lands this
  * offset pass can be replaced with a single `WP_HTML_Tag_Processor` call.
  *
- * @param string $block_content Rendered block HTML.
+ * @param string        $block_content Rendered block HTML.
+ * @param array         $block         Parsed block. Unused.
+ * @param WP_Block|null $instance      Block instance, whose `postId` context
+ *                                     names the post being rendered.
  * @return string Block HTML with wp-suggestion markers stripped (type-aware).
  */
-function gutenberg_strip_inline_suggestion_markers( $block_content ) {
+function gutenberg_strip_inline_suggestion_markers( $block_content, $block = array(), $instance = null ) {
+	/*
+	 * Set while a restored original run is stripped, so markers inside it are
+	 * unwrapped rather than resolved again - a note cannot pull in another
+	 * note's original, or its own.
+	 */
+	static $restoring = false;
+
 	if ( false === strpos( $block_content, 'wp-suggestion' ) ) {
 		return $block_content;
 	}
+
+	$post_id = 0;
+	if ( ! $restoring ) {
+		$post_id = ( $instance instanceof WP_Block && isset( $instance->context['postId'] ) )
+			? (int) $instance->context['postId']
+			: (int) get_the_ID();
+	}
+	$restorations = array();
 
 	/*
 	 * Flag the suggestion markers with a sentinel attribute carrying the strip
@@ -271,9 +293,18 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 		// An unknown or missing type defaults to deletion (unwrap, keep text)
 		// so a malformed marker never silently drops content. A planted
 		// sentinel on a genuine marker is overwritten with the derived mode.
-		$mode = ( 'add' === $processor->get_attribute( 'data-suggestion-type' ) )
-			? 'add'
-			: 'del';
+		$type = $processor->get_attribute( 'data-suggestion-type' );
+		$mode = ( 'add' === $type ) ? 'add' : 'del';
+		if ( 'format' === $type ) {
+			$original = gutenberg_get_pending_format_suggestion_html(
+				(int) $processor->get_attribute( 'data-suggestion-id' ),
+				$post_id
+			);
+			if ( null !== $original ) {
+				$mode           = 'format-' . count( $restorations );
+				$restorations[] = $original;
+			}
+		}
 		$processor->set_attribute( 'data-wp-suggestion-strip', $mode );
 		$found = true;
 	}
@@ -296,9 +327,10 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 	 */
 	if ( preg_match_all( '~</?mark\b[^>]*>~i', $block_content, $tags, PREG_OFFSET_CAPTURE ) ) {
 		// Pair each flagged opener with its matching closer via a nesting
-		// stack. Collect half-open byte ranges to remove: for a deletion the
+		// stack. Collect half-open byte ranges to replace: for a deletion the
 		// opener and closer tags only (text kept); for an addition the whole
-		// span.
+		// span (replaced with nothing); for a format change the whole span,
+		// replaced with the original run.
 		$open_stack = array();
 		$removals   = array();
 		foreach ( $tags[0] as $tag ) {
@@ -312,19 +344,30 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 					continue;
 				}
 				if ( 'add' === $open['mode'] ) {
-					$removals[] = array( $open['start'], $offset + $length );
+					$removals[] = array( $open['start'], $offset + $length, '' );
+				} elseif ( 'del' === $open['mode'] ) {
+					$removals[] = array( $open['start'], $open['end'], '' );
+					$removals[] = array( $offset, $offset + $length, '' );
 				} else {
-					$removals[] = array( $open['start'], $open['end'] );
-					$removals[] = array( $offset, $offset + $length );
+					$removals[] = array( $open['start'], $offset + $length, $open['mode'] );
 				}
 				continue;
 			}
 
 			$mode = 'none';
-			if ( false !== strpos( $html, 'data-wp-suggestion-strip="add"' ) ) {
-				$mode = 'add';
-			} elseif ( false !== strpos( $html, 'data-wp-suggestion-strip="del"' ) ) {
-				$mode = 'del';
+			if ( preg_match( '~data-wp-suggestion-strip="(add|del|format-\d+)"~', $html, $sentinel ) ) {
+				$mode = $sentinel[1];
+			}
+			if ( 0 === strpos( $mode, 'format-' ) ) {
+				// The mode carries the restored run, already stripped.
+				$index = (int) substr( $mode, strlen( 'format-' ) );
+				if ( isset( $restorations[ $index ] ) ) {
+					$restoring = true;
+					$mode      = array( gutenberg_strip_inline_suggestion_markers( $restorations[ $index ] ) );
+					$restoring = false;
+				} else {
+					$mode = 'del';
+				}
 			}
 			$open_stack[] = array(
 				'start' => $offset,
@@ -334,14 +377,21 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 		}
 
 		if ( ! empty( $removals ) ) {
-			// Merge overlapping/adjacent ranges so a deletion nested inside an
-			// addition (already wholly removed) doesn't double-remove and
-			// corrupt offsets.
-			sort( $removals );
+			// Drop ranges nested inside an earlier one so a marker inside an
+			// addition or a restored format run (already wholly replaced)
+			// doesn't double-replace and corrupt offsets. Markers nest, so a
+			// range either starts at or after the previous one's end or lies
+			// inside it; the outer range's replacement wins.
+			usort(
+				$removals,
+				function ( $a, $b ) {
+					return ( $a[0] === $b[0] ) ? $b[1] - $a[1] : $a[0] - $b[0];
+				}
+			);
 			$merged = array();
 			foreach ( $removals as $range ) {
 				$last = count( $merged ) - 1;
-				if ( $last >= 0 && $range[0] <= $merged[ $last ][1] ) {
+				if ( $last >= 0 && $range[0] < $merged[ $last ][1] ) {
 					if ( $range[1] > $merged[ $last ][1] ) {
 						$merged[ $last ][1] = $range[1];
 					}
@@ -350,9 +400,10 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 				}
 			}
 
-			// Remove from the end so earlier offsets remain valid.
+			// Replace from the end so earlier offsets remain valid.
 			for ( $i = count( $merged ) - 1; $i >= 0; $i-- ) {
-				$block_content = substr_replace( $block_content, '', $merged[ $i ][0], $merged[ $i ][1] - $merged[ $i ][0] );
+				$replacement   = is_array( $merged[ $i ][2] ) ? $merged[ $i ][2][0] : $merged[ $i ][2];
+				$block_content = substr_replace( $block_content, $replacement, $merged[ $i ][0], $merged[ $i ][1] - $merged[ $i ][0] );
 			}
 		}
 	}
@@ -373,7 +424,51 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 
 	return $block_content;
 }
-add_filter( 'render_block', 'gutenberg_strip_inline_suggestion_markers' );
+add_filter( 'render_block', 'gutenberg_strip_inline_suggestion_markers', 10, 3 );
+
+/**
+ * Resolves the original run of a pending inline format suggestion.
+ *
+ * A `format` marker's run carries the proposed formatting; the note records the
+ * run as it was in its payload's `beforeHTML`. The original is only returned
+ * for a note on the post being rendered, so a marker copied into another post
+ * cannot pull that post's text onto this page, and only while the suggestion
+ * has not been applied.
+ *
+ * `beforeHTML` was filtered at write time to what its author could publish
+ * directly (see `gutenberg_sanitize_suggestion_payload()`).
+ *
+ * @param int $note_id Note comment ID from the marker.
+ * @param int $post_id Post being rendered.
+ * @return string|null Original run HTML, or null when it cannot be resolved.
+ */
+function gutenberg_get_pending_format_suggestion_html( $note_id, $post_id ) {
+	if ( $note_id <= 0 || $post_id <= 0 ) {
+		return null;
+	}
+	$note = get_comment( $note_id );
+	if ( ! $note || 'note' !== $note->comment_type || (int) $note->comment_post_ID !== $post_id ) {
+		return null;
+	}
+	if ( 'applied' === get_comment_meta( $note_id, '_wp_suggestion_status', true ) ) {
+		return null;
+	}
+	$payload = json_decode( (string) get_comment_meta( $note_id, '_wp_suggestion', true ), true );
+	if ( ! is_array( $payload ) || ! isset( $payload['operations'] ) || ! is_array( $payload['operations'] ) ) {
+		return null;
+	}
+	foreach ( $payload['operations'] as $operation ) {
+		if (
+			is_array( $operation ) &&
+			isset( $operation['suggestionType'], $operation['beforeHTML'] ) &&
+			'format' === $operation['suggestionType'] &&
+			is_string( $operation['beforeHTML'] )
+		) {
+			return $operation['beforeHTML'];
+		}
+	}
+	return null;
+}
 
 /**
  * Hide un-accepted structural suggestions on the front end.
