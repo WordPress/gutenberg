@@ -21,9 +21,9 @@ Do not treat an API as private only because its name starts with
 public compatibility obligations. Verify their status against the
 [canonical API boundary guidance](/docs/contributors/code/coding-guidelines.md#legacy-experimental-apis-plugin-only-apis-and-private-apis).
 
-Use the package contribution workflows when changing `packages/components`, `packages/ui`, or `packages/theme`. A package change must consider its published API and users beyond the Gutenberg call sites. When a change includes both package code and application code, check both contracts. Keep product-specific behaviour in the consuming package; add shared behaviour to the Design System only when it belongs in a reusable component or token.
+Use the package contribution workflows when changing `packages/components`, `packages/ui`, or `packages/theme`. A package change must consider its published API and users beyond the Gutenberg call sites. When a change includes both package code and application code, check both contracts. Keep product-specific behavior in the consuming package; add shared behavior to the Design System only when it belongs in a reusable component or token.
 
-If the public surface cannot meet a product need, document the behaviour,
+If the public surface cannot meet a product need, document the behavior,
 affected consumers, attempted composition, and proposed public contract. Do
 not bypass that decision with a package-private import.
 
@@ -48,9 +48,9 @@ Use the package documentation as the source of durable facts:
 Use evidence for the state it actually describes:
 
 - The deployed checkout or runtime is authoritative for available exports,
-  styles, and runtime behaviour. An installed package proves compile-time
+  styles, and runtime behavior. An installed package proves compile-time
   types, not an externalized runtime API.
-- In a review, establish whether the checkout is the base, proposed head, or another revision. Read the diff with the corresponding source. An unapplied diff is not evidence that its new API is missing, and a head checkout is not evidence of the old behaviour.
+- In a review, establish whether the checkout is the base, proposed head, or another revision. Read the diff with the corresponding source. An unapplied diff is not evidence that its new API is missing, and a head checkout is not evidence of the old behavior.
 - The Design System MCP server and current Storybook describe current
   recommendations. They do not prove that an older target exports an API.
 
@@ -77,7 +77,7 @@ instead of copying component mappings into documentation or agent instructions:
 2. Otherwise, inspect the maintained `ALLOWLIST` and `DENYLIST` in the
    [`use-recommended-components` ESLint rule source](/packages/eslint-plugin/rules/use-recommended-components.js).
    Its [documentation](/packages/eslint-plugin/docs/rules/use-recommended-components.md)
-   explains rule behaviour and links migration guides.
+   explains rule behavior and links migration guides.
 3. When the rule does not cover a component, inspect that component's
    `*.story.*` source file in the target checkout. Use its `componentStatus` and
    notes. The [rendered Storybook](https://wordpress.github.io/gutenberg/) is a
@@ -87,7 +87,7 @@ instead of copying component mappings into documentation or agent instructions:
 
 For an application on older package versions, use the corresponding version of
 those sources and verify the choice against its installed exports, types, and
-documentation. Preserve behavioural, styling, accessibility, and compatibility
+documentation. Preserve behavioral, styling, accessibility, and compatibility
 parity when migrating an existing component.
 
 For forms that edit a dataset, consider [`DataForm`](/packages/dataviews/README.md#dataform). For inline validation, read the [Validated Form Controls overview](/packages/ui/src/form/with-validation/stories/overview.mdx), including its status and limitations, and verify the target-version exports. Choose based on the form's state and validation needs rather than replacing individual controls without checking the whole form.
@@ -97,7 +97,7 @@ Use `--wp--preset--*` custom properties for `theme.json` presets and
 block-facing styles. Token names and values change over time, so do not copy a
 token inventory into a guide, application convention, or skill.
 
-Prefer component props when they already express the styling intent. For custom styles, use the MCP server's `get_design_tokens` or the [Design Tokens Reference](/packages/theme/docs/tokens.md#how-to-pick-a-token) to choose a token by semantic purpose and state, not by matching its current raw value. Not every CSS literal needs a token. Distinguish interface styling from content styling by what the element represents; a content preview inside the editor can still use the active theme's presets.
+Prefer component props when they already express the styling intent. For custom styles, use the Design System MCP server's `get_design_tokens` when available. Without MCP, use the [Design Tokens Reference](/packages/theme/docs/tokens.md#how-to-pick-a-token). Choose a token by semantic purpose and state, not by matching its current raw value. Not every CSS literal needs a token. Use the active theme's `theme.json` presets when styling blocks or content previews, including previews inside the editor.
 
 ### Setup depends on the document
 
@@ -130,8 +130,8 @@ Identify the affected consumers and a relevant component or token precedent. For
 
 Keep implementation details distinct from public API. For public changes,
 decide and document compatibility, migration, release, generated-output, and
-consumer implications. Verify CSS and interaction behaviour in a browser where
-unit tests cannot establish cascade order, focus geometry, or portal behaviour.
+consumer implications. Verify CSS and interaction behavior in a browser where
+unit tests cannot establish cascade order, focus geometry, or portal behavior.
 
 When changing a contract between a bundled Design System package and a dependency supplied separately by WordPress, follow [Testing published packages across WordPress versions](/docs/contributors/code/package-runtime-compatibility.md). Check the supported entrypoints and version pairings affected by that contract. An unrelated internal edit does not need this matrix.
 
@@ -146,21 +146,21 @@ An internal refactor does not automatically need new stories or public documenta
 
 ### Compare contracts before replacing an API
 
-Compare the affected old and new behaviour before removing, renaming, or replacing a component, prop, token, or extension point. Include accepted values and defaults, controlled and uncontrolled state, callback arguments, rendered semantics, ref targets, styling hooks, and keyboard or focus behaviour where they apply. A compact comparison table can help with a multi-part migration.
+Compare the affected old and new behavior before removing, renaming, or replacing a component, prop, token, or extension point. Include accepted values and defaults, controlled and uncontrolled state, callback arguments, rendered semantics, ref targets, styling hooks, and keyboard or focus behavior where they apply. A compact comparison table can help with a multi-part migration.
 
-Search consumers beyond the changed package. Migrating all repository call sites does not prove compatibility for plugins or other npm consumers. Check documented extension points, such as SlotFill children and render callbacks, against the values and compositions they previously accepted. An adapter that handles built-in callers may not handle third-party input. If external usage cannot be established, state that limit and make any retirement of supported behaviour explicit.
+Search consumers beyond the changed package. Migrating all repository call sites does not prove compatibility for plugins or other npm consumers. Check documented extension points, such as SlotFill children and render callbacks, against the values and compositions they previously accepted. An adapter that handles built-in callers may not handle third-party input. If external usage cannot be established, state that limit and make any retirement of supported behavior explicit.
 
 Before removing or changing a public API, use [Veloria](https://veloria.dev/) to look for usage in WordPress.org plugins and themes. Search relevant identifiers, hooks, styling hooks, and common access patterns, then inspect matches in context. Record the search scope and relevant results. Matches can demonstrate compatibility impact; no matches do not prove that removal is safe. Private code, commercial products distributed elsewhere, and usages obscured by compilation or dynamic access may remain undiscovered. Use this evidence alongside the API's support policy and migration options.
 
 For tokens, compare semantic purpose and affected modes as well as default values. Follow the [token source guide](/packages/theme/tokens/README.md) and [build procedure](/packages/theme/README.md#building), then inspect the generated assets and consumers affected by the change. Two tokens with equal values in one theme are not necessarily interchangeable.
 
-## Verify the affected behaviour
+## Verify the affected behavior
 
-Select verification from the changed contract and the [testing overview](/docs/contributors/code/testing-overview.md#folder-structure). Use existing coverage where it proves the behaviour. Keep state and structural checks in jsdom; use Browser Mode or a reproducible browser check for computed styles, layout, native focus, scrolling, and transitions. Load the styles used by the real consumer. Class assertions, mocked geometry, and snapshots alone do not prove visual parity.
+Select verification from the changed contract and the [testing overview](/docs/contributors/code/testing-overview.md#folder-structure). Use existing coverage where it proves the behavior. Keep state and structural checks in jsdom; use Browser Mode or a reproducible browser check for computed styles, layout, native focus, scrolling, and transitions. Load the styles used by the real consumer. Class assertions, mocked geometry, and snapshots alone do not prove visual parity.
 
-Do not add or request tests just because coverage is absent. Rely on a third-party dependency's tests for behaviour it owns and that the change leaves intact. Focus local coverage on our transformations, overrides, state handling, and integration where they introduce a concrete regression risk. Identify the supported use case, likely failure, and consequence before adding a test, then choose the smallest check not already covered. Avoid duplicating dependency suites, enumerating every prop combination, or building fixtures for speculative edge cases. Weigh realistic likelihood and impact together; an uncommon supported use case can still matter when failure has a serious consequence.
+Do not add or request tests just because coverage is absent. Rely on a third-party dependency's tests for behavior it owns and that the change leaves intact. Focus local coverage on our transformations, overrides, state handling, and integration where they introduce a concrete regression risk. Identify the supported use case, likely failure, and consequence before adding a test, then choose the smallest check not already covered. Avoid duplicating dependency suites, enumerating every prop combination, or building fixtures for speculative edge cases. Weigh realistic likelihood and impact together; an uncommon supported use case can still matter when failure has a serious consequence.
 
-For interaction changes, check the keyboard and pointer paths, accessible names, state transitions, dismissal, or focus return that our changes can affect. Use existing coverage of unchanged behaviour. Compare accessibility requirements with the applicable [ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/), [ARIA specification](https://www.w3.org/TR/wai-aria-1.2/), or [WCAG](https://www.w3.org/TR/WCAG22/). A passing automated check is evidence for the rules it checks, not proof of complete accessibility.
+For interaction changes, check the keyboard and pointer paths, accessible names, state transitions, dismissal, or focus return that our changes can affect. Use existing coverage of unchanged behavior. Compare accessibility requirements with the applicable [ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/), [ARIA specification](https://www.w3.org/TR/wai-aria-1.2/), or [WCAG](https://www.w3.org/TR/WCAG22/). A passing automated check is evidence for the rules it checks, not proof of complete accessibility.
 
 For style or token changes, select conditions based on the declarations or token modes being changed. Relevant cases can include light and dark themes, nested providers, density, RTL, forced colors, reduced motion, long or translated content, zoom, or constrained containers; this is not a required test matrix. Inspect composed consumers where their overrides or layout can change the result. Check whether a responsive decision depends on the viewport or the component's container before choosing a breakpoint or measurement API.
 
