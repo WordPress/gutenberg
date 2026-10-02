@@ -505,7 +505,10 @@ describe( 'summarizeOperations', () => {
 			},
 		] );
 		expect( lines ).toEqual( [
-			{ label: 'Change:', value: 'additional CSS class' },
+			{
+				label: 'Change:',
+				value: 'additional CSS class default → is-highlighted',
+			},
 		] );
 	} );
 
@@ -521,7 +524,7 @@ describe( 'summarizeOperations', () => {
 			},
 		] );
 		expect( lines ).toEqual( [
-			{ label: 'Change:', value: 'font family' },
+			{ label: 'Change:', value: 'font family default → serif' },
 		] );
 	} );
 
@@ -799,5 +802,124 @@ describe( 'summarizeOperations', () => {
 		expect( lines ).toEqual( [
 			{ label: 'Move block:', value: 'paragraph' },
 		] );
+	} );
+
+	it( 'quotes the resolved text of an inserted block', () => {
+		// An inserted paragraph never showed what was typed into it (B1).
+		expect(
+			summarizeOperations( [
+				{
+					type: 'block-insert-after',
+					clientId: 'abc',
+					blockName: 'core/paragraph',
+					text: 'Brand new paragraph text',
+				},
+			] )
+		).toEqual( [
+			{
+				label: 'Insert block:',
+				value: 'paragraph “Brand new paragraph text”',
+			},
+		] );
+	} );
+
+	it( 'quotes the resolved text of a removed block inside a container', () => {
+		// A block-level removal read differently from deleting the same
+		// words as a text selection (B2).
+		expect(
+			summarizeOperations( [
+				{
+					type: 'block-remove',
+					clientId: 'abc',
+					blockName: 'core/paragraph',
+					parentBlockName: 'core/group',
+					text: 'First   paragraph',
+				},
+			] )
+		).toEqual( [
+			{
+				label: 'Remove block:',
+				value: 'paragraph in group “First paragraph”',
+			},
+		] );
+	} );
+
+	it( 'keeps the bare structural label when the block has no text', () => {
+		expect(
+			summarizeOperations( [
+				{
+					type: 'block-move',
+					clientId: 'abc',
+					blockName: 'core/image',
+					text: '   ',
+				},
+			] )
+		).toEqual( [ { label: 'Move block:', value: 'image' } ] );
+	} );
+
+	it( 'ellipsizes long structural block text', () => {
+		const [ line ] = summarizeOperations( [
+			{
+				type: 'block-insert-after',
+				clientId: 'abc',
+				blockName: 'core/paragraph',
+				text: 'word '.repeat( 100 ),
+			},
+		] );
+		expect( line.value.length ).toBeLessThanOrEqual(
+			'paragraph “”'.length + 120
+		);
+		expect( line.value ).toMatch( /…”$/ );
+	} );
+
+	it( 'states both sides of a scalar attribute change', () => {
+		// "Change: heading level" left the reviewer to guess the level (B14).
+		expect(
+			summarizeOperations( [
+				{
+					type: 'attribute-set',
+					attribute: 'level',
+					before: 3,
+					after: 4,
+				},
+			] )
+		).toEqual( [ { label: 'Change:', value: 'heading level 3 → 4' } ] );
+	} );
+
+	it( 'calls an unset attribute value the default', () => {
+		expect(
+			summarizeOperations( [
+				{
+					type: 'attribute-set',
+					attribute: 'textAlign',
+					before: undefined,
+					after: 'center',
+				},
+				{
+					type: 'attribute-set',
+					attribute: 'fontSize',
+					before: 'large',
+					after: null,
+				},
+			] )
+		).toEqual( [
+			{
+				label: 'Change:',
+				value: 'text alignment default → center, font size large → default',
+			},
+		] );
+	} );
+
+	it( 'keeps the bare name for an object-valued attribute change', () => {
+		expect(
+			summarizeOperations( [
+				{
+					type: 'attribute-set',
+					attribute: 'style',
+					before: { color: { text: '#000' } },
+					after: { color: { text: '#f00' } },
+				},
+			] )
+		).toEqual( [ { label: 'Change:', value: 'style' } ] );
 	} );
 } );

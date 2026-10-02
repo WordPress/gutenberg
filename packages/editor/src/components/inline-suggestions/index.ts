@@ -48,6 +48,7 @@ export {
 	rejectInlineFormat,
 	insertInlineAddition,
 	removeInlineAdditionRange,
+	reviseOwnAddition,
 	findAdditionRange,
 	growInlineAddition,
 	buildSuggestionMarkerAttributes,
@@ -71,4 +72,5 @@ export {
 	hasSuggestionMarkers,
 	stripSuggestionMarkers,
 	stripSuggestionMarkersFromAttributes,
+	settleInsertedSuggestionMarkers,
 } from './strip-markers';

@@ -760,6 +760,148 @@ export function removeInlineAdditionRange(
 }
 
 /**
+ * Type over a selection that touches the editing author's own pending
+ * addition: the author revising what they proposed rather than editing over
+ * someone else's suggestion.
+ *
+ * - A selection wholly inside the addition loses the selected characters (they
+ *   were never in the post) and the typed run takes their place inside the
+ *   same marker, so the proposal stays one marker and one note.
+ * - A selection that also covers original text on ONE side of the addition
+ *   turns that part into a `del` run carrying the same id, and the typed run
+ *   replaces the selected part of the addition: the note becomes a
+ *   replacement, as a type-over of plain text would have been.
+ *
+ * Declines (null) anything else: no own addition at the selection, original
+ * text on both sides, original text that already carries a suggestion marker,
+ * or a note that already owns a `del` run (a second one would fragment it).
+ *
+ * @param value               Block attribute value (RichTextData or other).
+ * @param options             Options.
+ * @param options.start       Selection start (inclusive).
+ * @param options.end         Selection end (exclusive).
+ * @param options.text        Typed text.
+ * @param options.html        HTML of the typed run when it carries formatting.
+ * @param options.authorToken Id of the author typing, as a string, or null.
+ * @return The revised value, the addition's id and new span, the caret, and
+ *         whether the note became a replacement; or null.
+ */
+export function reviseOwnAddition(
+	value: any,
+	{
+		start,
+		end,
+		text,
+		html,
+		authorToken,
+	}: {
+		start: number;
+		end: number;
+		text?: string;
+		html?: string;
+		authorToken: string | null;
+	}
+): {
+	value: any;
+	id: string;
+	markerStart: number;
+	markerEnd: number;
+	caret: number;
+	isReplacement: boolean;
+} | null {
+	if ( ! ( value instanceof RichTextData ) || start >= end ) {
+		return null;
+	}
+	const typedLength = (
+		html ? create( { html } ) : create( { text: text ?? '' } )
+	).text.length;
+	if ( ! typedLength ) {
+		return null;
+	}
+	const record = toRichTextRecord( value )!;
+	const { formats } = record;
+	// The marker left of `end` covers a selection inside the addition or
+	// starting before it; the one at `start` covers a selection running
+	// past its end.
+	const run =
+		formatsAdditionRunToExtend( formats, end, authorToken ) ??
+		formatsAdditionRunToExtend( formats, start + 1, authorToken );
+	if ( ! run || run.start >= end || run.end <= start ) {
+		return null;
+	}
+	const before = start < run.start;
+	const after = end > run.end;
+	if ( before && after ) {
+		return null;
+	}
+	const outside = before
+		? { start, end: run.start }
+		: { start: run.end, end };
+	if ( before || after ) {
+		if (
+			formatsRangeHasSuggestion( formats, outside.start, outside.end )
+		) {
+			return null;
+		}
+		const ownsDeletion = formats.some( ( stack: any ) =>
+			stack?.some(
+				( f: any ) =>
+					f.type === SUGGESTION_FORMAT_NAME &&
+					f.attributes?.[ SUGGESTION_ID_ATTRIBUTE ] === run.id &&
+					f.attributes?.[ SUGGESTION_TYPE_ATTRIBUTE ] ===
+						SUGGESTION_TYPE_DELETION
+			)
+		);
+		if ( ownsDeletion ) {
+			return null;
+		}
+	}
+	const attributes = suggestionFormatAt( formats, run.start ).attributes;
+	const ownStart = Math.max( start, run.start );
+	const ownEnd = Math.min( end, run.end );
+	const remainingEnd = run.end - ( ownEnd - ownStart );
+	let next = growInlineAddition(
+		new RichTextData( remove( record as any, ownStart, ownEnd ) as any ),
+		{
+			text,
+			html,
+			attributes,
+			markerStart: run.start,
+			markerEnd: remainingEnd,
+			at: ownStart,
+		}
+	);
+	const markerEnd = remainingEnd + typedLength;
+	if ( before || after ) {
+		// Original text before the addition keeps its offsets; text after it
+		// moved with the addition's new end.
+		const deletionStart = before ? outside.start : markerEnd;
+		next = new RichTextData(
+			applyFormat(
+				toRichTextRecord( next )! as any,
+				{
+					type: SUGGESTION_FORMAT_NAME,
+					attributes: {
+						...attributes,
+						[ SUGGESTION_TYPE_ATTRIBUTE ]: SUGGESTION_TYPE_DELETION,
+					},
+				} as any,
+				deletionStart,
+				deletionStart + ( outside.end - outside.start )
+			) as any
+		);
+	}
+	return {
+		value: next,
+		id: run.id,
+		markerStart: run.start,
+		markerEnd,
+		caret: ownStart + typedLength,
+		isReplacement: before || after,
+	};
+}
+
+/**
  * The span of the `add` run carrying a suggestion id. A replacement's id also
  * marks the `del` run after it, which `findSuggestionRange` would include;
  * growing that whole span would re-stamp the replaced text as proposed text.

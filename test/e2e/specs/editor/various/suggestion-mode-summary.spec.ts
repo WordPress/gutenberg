@@ -126,4 +126,174 @@ test.describe( 'Suggest mode: sidebar summaries', () => {
 		// ...and no markup is quoted at the reviewer.
 		await expect( summary ).not.toContainText( '<strong>' );
 	} );
+
+	test( 'an inserted block quotes the text typed into it', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First paragraph' },
+		} );
+		await switchIntent( page, 'Suggesting' );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first()
+			.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'Enter' );
+		const saved = suggestionSavedPromise( page );
+		await page.keyboard.type( 'Brand new paragraph text' );
+		await saved;
+
+		const sidebar = await openNotesSidebar( page );
+		// The summary follows the live block, so it fills in as typing lands.
+		await expect(
+			sidebar
+				.locator( '.editor-collab-sidebar-panel__suggestion-summary' )
+				.filter( { hasText: 'Insert block:' } )
+		).toHaveText( 'Insert block: paragraph “Brand new paragraph text”' );
+	} );
+
+	test( 'a block-level removal quotes the removed text, like a text deletion does', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First paragraph' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second paragraph' },
+		} );
+		await switchIntent( page, 'Suggesting' );
+
+		// The second paragraph's floating toolbar covers the first one.
+		await page.evaluate( () => {
+			( window as any ).wp.data
+				.dispatch( 'core/block-editor' )
+				.clearSelectedBlock();
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first()
+			.click( { position: { x: 10, y: 10 } } );
+		// Twice: the first selects the text, the second every block.
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+		const saved = suggestionSavedPromise( page );
+		await page.keyboard.press( 'Backspace' );
+		await saved;
+
+		const sidebar = await openNotesSidebar( page );
+		await expect(
+			sidebar
+				.locator( '.editor-collab-sidebar-panel__suggestion-summary' )
+				.filter( { hasText: 'Remove block:' } )
+		).toHaveText( [
+			'Remove block: paragraph “First paragraph”',
+			'Remove block: paragraph “Second paragraph”',
+		] );
+	} );
+
+	test( 'a heading level change names both levels', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { content: 'A heading', level: 3 },
+		} );
+		await switchIntent( page, 'Suggesting' );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Heading' } )
+			.click();
+		const saved = suggestionSavedPromise( page );
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: /^Heading 3$/ } )
+			.click();
+		await page.getByRole( 'menuitem', { name: /^Heading 4/ } ).click();
+		await saved;
+
+		const sidebar = await openNotesSidebar( page );
+		await expect(
+			sidebar
+				.locator( '.editor-collab-sidebar-panel__suggestion-summary' )
+				.filter( { hasText: 'Change:' } )
+		).toHaveText( 'Change: heading level 3 → 4' );
+	} );
+
+	test( 'a long type-over summary collapses and expands to the full quoted text', async ( {
+		editor,
+		page,
+	} ) => {
+		const original =
+			'This original paragraph is long enough that the replaced side of the summary has to be cut short, so a reviewer could not read it in full.';
+		const replacement =
+			'This proposed replacement is much longer than the sixty characters a Replace line shows on each side, and the reviewer needs some way to read every word of it before accepting or rejecting the suggestion.';
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: original },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		// Select the whole text and type over it: one replace suggestion.
+		await page.keyboard.press( 'ControlOrMeta+a' );
+		const saved = suggestionSavedPromise( page );
+		await page.keyboard.type( replacement );
+		// The markers are only written once the note POST returns its id.
+		await saved;
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="add"]'
+			)
+		).toHaveText( replacement );
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="del"]'
+			)
+		).toHaveText( original );
+
+		const sidebar = await openNotesSidebar( page );
+		const summary = sidebar
+			.locator( '.editor-collab-sidebar-panel__suggestion-summary' )
+			.filter( { hasText: 'Replace:' } )
+			.first();
+		await expect( summary ).toBeVisible();
+
+		// Collapsed by default: the quote is cut short on both sides.
+		await expect( summary ).not.toContainText( original );
+		await expect( summary ).not.toContainText( replacement );
+
+		const toggle = summary.getByRole( 'button', { name: 'Show more' } );
+		await expect( toggle ).toHaveAttribute( 'aria-expanded', 'false' );
+		await toggle.click();
+
+		await expect( summary ).toContainText( original );
+		await expect( summary ).toContainText( replacement );
+		const collapse = summary.getByRole( 'button', { name: 'Show less' } );
+		await expect( collapse ).toHaveAttribute( 'aria-expanded', 'true' );
+		// Focus stays on the toggle so the keyboard user is not dropped.
+		await expect( collapse ).toBeFocused();
+
+		// Keyboard operable both ways.
+		await page.keyboard.press( 'Enter' );
+		await expect( summary ).not.toContainText( replacement );
+		await expect(
+			summary.getByRole( 'button', { name: 'Show more' } )
+		).toBeFocused();
+		await page.keyboard.press( 'Space' );
+		await expect( summary ).toContainText( replacement );
+	} );
 } );
