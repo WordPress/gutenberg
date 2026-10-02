@@ -1234,7 +1234,8 @@ describe( 'SyncManager', () => {
 
 			expect( mockSyncConfig.shouldSync ).toHaveBeenCalledWith(
 				'post',
-				'123'
+				'123',
+				mockRecord
 			);
 			expect(
 				mockSyncConfig.applyChangesToCRDTDoc
@@ -1257,7 +1258,8 @@ describe( 'SyncManager', () => {
 
 			expect( mockSyncConfig.shouldSync ).toHaveBeenCalledWith(
 				'post',
-				'123'
+				'123',
+				mockRecord
 			);
 			expect(
 				mockSyncConfig.applyChangesToCRDTDoc

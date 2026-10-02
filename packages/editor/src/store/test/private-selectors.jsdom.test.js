@@ -99,12 +99,14 @@ describe( 'isCollaborationEnabledForCurrentPost', () => {
 	function setupRegistry( {
 		collaborationSupported = true,
 		syncConfig = {},
+		record = { id: 123 },
 	} = {} ) {
 		isCollaborationEnabledForCurrentPost.registry = {
 			select: ( store ) => {
 				if ( store === coreStore ) {
 					const selectors = {
 						getEntityConfig: () => ( { syncConfig } ),
+						getRawEntityRecord: () => record,
 					};
 					lock( selectors, {
 						isCollaborationSupported: () => collaborationSupported,
@@ -124,7 +126,9 @@ describe( 'isCollaborationEnabledForCurrentPost', () => {
 		const state = { postType: 'book', postId: 123 };
 
 		expect( isCollaborationEnabledForCurrentPost( state ) ).toBe( true );
-		expect( shouldSync ).toHaveBeenCalledWith( 'postType/book', 123 );
+		expect( shouldSync ).toHaveBeenCalledWith( 'postType/book', 123, {
+			id: 123,
+		} );
 	} );
 
 	it( 'returns false when the current post type sync config does not support persistence', () => {
@@ -143,6 +147,21 @@ describe( 'isCollaborationEnabledForCurrentPost', () => {
 				shouldSync: () => false,
 				supportsPersistence: true,
 			},
+		} );
+
+		const state = { postType: 'book', postId: 123 };
+
+		expect( isCollaborationEnabledForCurrentPost( state ) ).toBe( false );
+	} );
+
+	it( 'returns false when the sync config should not sync the current post', () => {
+		setupRegistry( {
+			syncConfig: {
+				shouldSync: ( objectType, objectId, record ) =>
+					! record.collaboration_disabled,
+				supportsPersistence: true,
+			},
+			record: { id: 123, collaboration_disabled: true },
 		} );
 
 		const state = { postType: 'book', postId: 123 };

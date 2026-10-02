@@ -152,7 +152,8 @@ export interface SyncConfig {
 	getPersistedCRDTDoc?: ( record: ObjectData ) => string | null;
 	shouldSync?: (
 		objectType: ObjectType,
-		objectId: ObjectID | null
+		objectId: ObjectID | null,
+		record?: ObjectData
 	) => boolean;
 	supportsPersistence?: boolean;
 }

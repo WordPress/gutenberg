@@ -441,11 +441,11 @@ async function loadPostTypeEntities() {
 					null
 				);
 			},
-			shouldSync: () =>
+			shouldSync: ( objectType, objectId, record ) =>
 				! (
 					Array.isArray( window._wpCollaborationDisabledPostTypes ) &&
 					window._wpCollaborationDisabledPostTypes.includes( name )
-				),
+				) && ! record?.collaboration_disabled,
 		};
 
 		return entity;
