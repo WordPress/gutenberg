@@ -7,7 +7,6 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { useResizeObserver } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
 import DataViewsContext from '../components/dataviews-context';
 import { VIEW_LAYOUTS } from '../components/dataviews-layouts';
@@ -21,14 +20,20 @@ import DataViewsLayout from '../components/dataviews-layout';
 import {
 	DataViewsPickerFooter,
 	DataViewsPickerBulkActionToolbar,
+	PickerActions,
 } from '../components/dataviews-picker-footer';
 import DataViewsSearch from '../components/dataviews-search';
-import { DataViewsPagination } from '../components/dataviews-pagination';
+import {
+	DataViewsPageNavigation,
+	DataViewsPageSelect,
+	DataViewsPagination,
+} from '../components/dataviews-pagination';
 import DataViewsViewConfig, {
 	DataviewsViewConfigDropdown,
 	ViewTypeMenu,
 } from '../components/dataviews-view-config';
 import normalizeFields from '../field-types';
+import useContainerWidth from '../hooks/use-container-width';
 import useData from '../hooks/use-data';
 import { useInfiniteScroll } from '../hooks/use-infinite-scroll';
 import usePageClamp from '../hooks/use-page-clamp';
@@ -256,15 +261,7 @@ function DataViewsPicker< Item >( {
 		setVisibleEntries?: React.Dispatch< React.SetStateAction< number[] > >;
 	};
 	const containerRef = useRef< HTMLDivElement >( null );
-	const [ containerWidth, setContainerWidth ] = useState( 0 );
-	const resizeObserverRef = useResizeObserver(
-		( resizeObserverEntries: any ) => {
-			setContainerWidth(
-				resizeObserverEntries[ 0 ].borderBoxSize[ 0 ].inlineSize
-			);
-		},
-		{ box: 'border-box' }
-	);
+	const [ containerWidth, resizeObserverRef ] = useContainerWidth();
 	const [ openedFilter, setOpenedFilter ] = useState< string | null >( null );
 	function setSelectionWithChange( value: SelectionOrUpdater ) {
 		const newValue =
@@ -379,6 +376,7 @@ function DataViewsPicker< Item >( {
 // Populate the DataViews sub components
 const DataViewsPickerSubComponents =
 	DataViewsPicker as typeof DataViewsPicker & {
+		Actions: typeof PickerActions;
 		BulkActionToolbar: typeof DataViewsPickerBulkActionToolbar;
 		Footer: typeof DataViewsPickerFooter;
 		Filters: typeof Filters;
@@ -386,11 +384,14 @@ const DataViewsPickerSubComponents =
 		FiltersToggle: typeof FiltersToggle;
 		Layout: typeof DataViewsLayout;
 		LayoutSwitcher: typeof ViewTypeMenu;
+		PageNavigation: typeof DataViewsPageNavigation;
+		PageSelect: typeof DataViewsPageSelect;
 		Pagination: typeof DataViewsPagination;
 		Search: typeof DataViewsSearch;
 		ViewConfig: typeof DataviewsViewConfigDropdown;
 	};
 
+DataViewsPickerSubComponents.Actions = PickerActions;
 DataViewsPickerSubComponents.BulkActionToolbar =
 	DataViewsPickerBulkActionToolbar;
 DataViewsPickerSubComponents.Footer = DataViewsPickerFooter;
@@ -399,6 +400,8 @@ DataViewsPickerSubComponents.FiltersToggled = FiltersToggled;
 DataViewsPickerSubComponents.FiltersToggle = FiltersToggle;
 DataViewsPickerSubComponents.Layout = DataViewsLayout;
 DataViewsPickerSubComponents.LayoutSwitcher = ViewTypeMenu;
+DataViewsPickerSubComponents.PageNavigation = DataViewsPageNavigation;
+DataViewsPickerSubComponents.PageSelect = DataViewsPageSelect;
 DataViewsPickerSubComponents.Pagination = DataViewsPagination;
 DataViewsPickerSubComponents.Search = DataViewsSearch;
 DataViewsPickerSubComponents.ViewConfig = DataviewsViewConfigDropdown;

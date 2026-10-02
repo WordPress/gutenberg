@@ -10,6 +10,8 @@
 
 -   Match, update, and attach `data-wp-router-region` values with a `namespace::` prefix or a JSON scalar under the id registered by the directive runtime, using one shared directive-value interpretation exposed through `@wordpress/interactivity`'s private API. Previously, navigation keyed those regions under a different id or `undefined` and never updated them. ([#83280](https://github.com/WordPress/gutenberg/pull/83280))
 
+## 2.56.0 (2026-09-23)
+
 ## 2.55.0 (2026-09-10)
 
 ## 2.54.0 (2026-08-26)

@@ -5,7 +5,10 @@ import type { ButtonProps } from '../button/types';
 import styles from './style.module.css';
 
 const OverflowTriggerButton = forwardRef< HTMLButtonElement, ButtonProps >(
-	function OverflowTriggerButton( { children, className, ...props }, ref ) {
+	function UnforwardedOverflowTriggerButton(
+		{ children, className, ...props },
+		ref
+	) {
 		return (
 			<Button
 				{ ...props }

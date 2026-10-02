@@ -39,20 +39,21 @@ describe( 'executeLifecycleScript', () => {
 	} );
 
 	it( 'should throw LifecycleScriptError when process errors', async () => {
-		try {
-			await executeLifecycleScript(
-				'test',
-				{
-					lifecycleScripts: {
-						test: 'node -vvvvvvv',
-					},
+		const execution = executeLifecycleScript(
+			'test',
+			{
+				lifecycleScripts: {
+					test: 'node -vvvvvvv',
 				},
-				spinner
-			);
-		} catch ( error ) {
-			expect( error ).toBeInstanceOf( LifecycleScriptError );
-			expect( error.message ).toMatch( /test Error:\n.*bad option/ );
-		}
+			},
+			spinner
+		);
+		await expect( execution ).rejects.toBeInstanceOf(
+			LifecycleScriptError
+		);
+		await expect( execution ).rejects.toThrow(
+			/test Error:\n.*bad option/
+		);
 	} );
 
 	it( 'includes all stderr when the process fails', async () => {

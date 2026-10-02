@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/scripts",
-	"version": "35.0.0",
+	"version": "36.0.0",
 	"description": "Collection of reusable scripts for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,8 +19,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": "^22.22.2 || ^24.15.0 || >=26.0.0",
-		"npm": ">=8.19.2"
+		"node": "^22.22.2 || ^24.15.0 || >=26.0.0"
 	},
 	"files": [
 		"bin",
@@ -77,6 +76,7 @@
 		"schema-utils": "^4.2.0",
 		"source-map-loader": "^3.0.0",
 		"stylelint": "^17.14.1",
+		"stylelint-scss": "^7.2.0",
 		"terser-webpack-plugin": "^5.3.10",
 		"url-loader": "^4.1.1",
 		"webpack": "^5.111.0",
@@ -86,7 +86,7 @@
 	},
 	"devDependencies": {
 		"rimraf": "^5.0.10",
-		"vitest": "^5.0.0"
+		"vitest": "^5.0.3"
 	},
 	"peerDependencies": {
 		"@playwright/test": ">=1",

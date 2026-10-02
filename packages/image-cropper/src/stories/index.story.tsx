@@ -10,7 +10,7 @@ import ImageCropper from '../components/image-cropper';
 import ImageCropperProvider, { useImageCropper } from '../provider';
 import type { ImageCropperProps, MediaSize } from '../types';
 import { MIN_ZOOM, MAX_ZOOM } from '../constants';
-import './style.css';
+import styles from './style.module.css';
 
 export default {
 	id: 'imagecropper-imagecropper',
@@ -21,8 +21,8 @@ export default {
 const DefaultComponent = ( args: ImageCropperProps ) => {
 	return (
 		<ImageCropperProvider>
-			<div className="image-cropper__container-wrapper-story">
-				<div className="image-cropper__container-story">
+			<div className={ styles[ 'container-wrapper' ] }>
+				<div className={ styles.container }>
 					<ImageCropper { ...args } />
 				</div>
 			</div>
@@ -199,9 +199,9 @@ const WithControlsContent = ( args: ImageCropperProps ) => {
 				</HStack>
 			</VStack>
 
-			<div className="image-cropper__container-wrapper-story">
+			<div className={ styles[ 'container-wrapper' ] }>
 				<div
-					className="image-cropper__container-story"
+					className={ styles.container }
 					ref={ containerRef }
 					style={ {
 						...containerStyle,
