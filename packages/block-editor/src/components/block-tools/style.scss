@@ -107,8 +107,9 @@
 		pointer-events: all;
 		margin-top: $grid-unit-10;
 		margin-bottom: $grid-unit-10;
-		border: $border-width solid $gray-900;
+		border: $border-width solid $gray-300;
 		border-radius: $radius-small;
+		box-shadow: $elevation-x-small;
 		overflow: visible; // allow the parent selector to be visible
 		position: static;
 		width: auto;
@@ -131,11 +132,6 @@
 
 	.block-editor-block-toolbar {
 		overflow: visible;
-	}
-
-	.block-editor-block-toolbar .components-toolbar-group,
-	.block-editor-block-toolbar .components-toolbar {
-		border-right-color: $gray-900;
 	}
 
 	// Hide the block toolbar if the insertion point is shown.
@@ -164,7 +160,7 @@
 		// detached position and the full border are its own.
 		&:has(.block-editor-block-parent-selector__inserter) {
 			left: calc(-#{$grid-unit-60} - #{$grid-unit-30} - #{$grid-unit-15} - #{$grid-unit-10} - 3 * #{$border-width});
-			border: $border-width solid $gray-900;
+			border: $border-width solid $gray-300;
 			border-radius: $radius-small;
 			// The box paints the background, like the toolbar box does for
 			// its groups.
@@ -253,7 +249,7 @@
 		}
 
 		.block-editor-block-parent-selector__button {
-			border: $border-width solid $gray-900;
+			border: $border-width solid $gray-300;
 			padding-right: 6px;
 			padding-left: 6px;
 			background-color: $white;
@@ -276,7 +272,7 @@
 
 		.block-editor-block-mover__move-button-container,
 		.block-editor-block-toolbar__block-controls .block-editor-block-mover {
-			border-left: 1px solid $gray-900;
+			border-left: 1px solid $gray-300;
 		}
 	}
 }
