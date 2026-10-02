@@ -19,6 +19,7 @@
 ### Enhancements
 
 -   `Switch`, `SwitchControl`: Mark as recommended for use in a WordPress environment ([#84097](https://github.com/WordPress/gutenberg/pull/84097)).
+-   `Progress`: Mark as recommended for use in a WordPress environment.
 -   `Menu`: Keep parent items highlighted with a neutral background while their submenus are open ([#84031](https://github.com/WordPress/gutenberg/pull/84031)).
 -   `Menu`: Align group labels and separators with item labels when a radio or checkbox column indents those labels ([#83993](https://github.com/WordPress/gutenberg/pull/83993)).
 -   `Menu`: Tighten item spacing and cap menus at 320px wide ([#84028](https://github.com/WordPress/gutenberg/pull/84028)).
