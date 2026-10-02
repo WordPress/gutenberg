@@ -10,6 +10,7 @@ const BUNDLED_PACKAGES = [
 	'@wordpress/icons',
 	'@wordpress/interface',
 	'@wordpress/kebab-case',
+	'@wordpress/react-inert-value',
 	'@wordpress/style-runtime',
 	'@wordpress/ui',
 	'@wordpress/undo-manager',
