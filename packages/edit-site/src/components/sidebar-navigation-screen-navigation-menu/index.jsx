@@ -2,13 +2,10 @@ import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { decodeEntities } from '@wordpress/html-entities';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { SidebarNavigationScreenWrapper } from '../sidebar-navigation-screen-navigation-menus';
-import ScreenNavigationMoreMenu from './more-menu';
 import SingleNavigationMenu from './single-navigation-menu';
 import useNavigationMenuHandlers from './use-navigation-menu-handlers';
-import buildNavigationLabel from '../sidebar-navigation-screen-navigation-menus/build-navigation-label';
 import { unlock } from '../../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
@@ -45,8 +42,6 @@ export default function SidebarNavigationScreenNavigationMenu( { backPath } ) {
 
 	const isLoading = isResolving || isSaving || isDeleting;
 
-	const menuTitle = navigationMenu?.title?.rendered || navigationMenu?.slug;
-
 	const { handleSave, handleDelete, handleDuplicate } =
 		useNavigationMenuHandlers();
 
@@ -72,29 +67,6 @@ export default function SidebarNavigationScreenNavigationMenu( { backPath } ) {
 			<SidebarNavigationScreenWrapper
 				description={ __( 'Navigation Menu missing.' ) }
 				backPath={ backPath }
-			/>
-		);
-	}
-
-	if ( ! navigationMenu?.content?.raw ) {
-		return (
-			<SidebarNavigationScreenWrapper
-				actions={
-					<ScreenNavigationMoreMenu
-						menuId={ navigationMenu?.id }
-						menuTitle={ decodeEntities( menuTitle ) }
-						onDelete={ _handleDelete }
-						onSave={ _handleSave }
-						onDuplicate={ _handleDuplicate }
-					/>
-				}
-				backPath={ backPath }
-				title={ buildNavigationLabel(
-					navigationMenu?.title,
-					navigationMenu?.id,
-					navigationMenu?.status
-				) }
-				description={ __( 'This Navigation Menu is empty.' ) }
 			/>
 		);
 	}

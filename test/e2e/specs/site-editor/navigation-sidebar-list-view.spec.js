@@ -147,6 +147,58 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			).toBeVisible();
 		} );
 	} );
+
+	test( 'shows the appender for an empty menu', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const createdMenu = await requestUtils.createNavigationMenu( {
+			title: 'Empty Navigation Menu',
+			content: '',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		await expect(
+			listView.getByRole( 'button', { name: 'Add page' } )
+		).toBeVisible();
+	} );
+
+	test( 'can add the first item to an empty menu', async ( {
+		admin,
+		page,
+		requestUtils,
+		linkControl,
+	} ) => {
+		const createdMenu = await requestUtils.createNavigationMenu( {
+			title: 'Empty Navigation Menu',
+			content: '',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		await listView.getByRole( 'button', { name: 'Add page' } ).click();
+		await linkControl.useLinkControlSearch( 'Test Page 1' );
+
+		await expect(
+			listView.getByRole( 'link', { name: 'Test Page 1' } )
+		).toBeVisible();
+	} );
 } );
 
 class LinkControl {
