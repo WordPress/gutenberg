@@ -21,11 +21,15 @@ function renderPanelsMenu( {
 	activeArea = sidebars.document,
 	hasOtherPanel = true,
 	hasBlockSelection = false,
+	isDistractionFree = false,
 } = {} ) {
 	const registry = createRegistry();
 	registry.register( preferencesStore );
 	registry.register( interfaceStore );
 	registry.register( blockEditorStore );
+	registry
+		.dispatch( preferencesStore )
+		.set( 'core', 'distractionFree', isDistractionFree );
 	registry
 		.dispatch( interfaceStore )
 		.enableComplementaryArea( 'core', activeArea );
@@ -69,6 +73,18 @@ async function openPanelsMenu( user: ReturnType< typeof userEvent.setup > ) {
 }
 
 describe( 'Panels menu', () => {
+	it( 'omits Inspector while distraction-free mode hides sidebars', async () => {
+		const user = userEvent.setup();
+		renderPanelsMenu( { isDistractionFree: true } );
+		await openPanelsMenu( user );
+		expect(
+			screen.queryByRole( 'menuitemcheckbox', { name: 'Inspector' } )
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByRole( 'menuitemcheckbox', { name: 'Plugin panel' } )
+		).toBeVisible();
+	} );
+
 	it( 'hides the submenu when Inspector is the only panel', async () => {
 		const user = userEvent.setup();
 		renderPanelsMenu( { hasOtherPanel: false } );

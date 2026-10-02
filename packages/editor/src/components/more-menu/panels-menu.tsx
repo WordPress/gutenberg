@@ -4,23 +4,33 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { ActionItem, store as interfaceStore } from '@wordpress/interface';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
+import { store as preferencesStore } from '@wordpress/preferences';
 import MoreMenuItem from './more-menu-item';
 import MoreMenuSubmenu, { toMenuItems } from './more-menu-submenu';
 import { sidebars } from '../sidebar/constants';
 
 export default function PanelsMenu() {
-	const { isInspectorOpen, inspectorTab } = useSelect( ( select ) => {
-		const activeArea =
-			select( interfaceStore ).getActiveComplementaryArea( 'core' );
-		return {
-			isInspectorOpen:
-				activeArea === sidebars.document ||
-				activeArea === sidebars.block,
-			inspectorTab: select( blockEditorStore ).getBlockSelectionStart()
-				? sidebars.block
-				: sidebars.document,
-		};
-	}, [] );
+	const { isInspectorOpen, inspectorTab, isDistractionFree } = useSelect(
+		( select ) => {
+			const activeArea =
+				select( interfaceStore ).getActiveComplementaryArea( 'core' );
+			return {
+				isDistractionFree: select( preferencesStore ).get(
+					'core',
+					'distractionFree'
+				),
+				isInspectorOpen:
+					activeArea === sidebars.document ||
+					activeArea === sidebars.block,
+				inspectorTab: select(
+					blockEditorStore
+				).getBlockSelectionStart()
+					? sidebars.block
+					: sidebars.document,
+			};
+		},
+		[]
+	);
 	const { enableComplementaryArea, disableComplementaryArea } =
 		useDispatch( interfaceStore );
 
@@ -33,20 +43,25 @@ export default function PanelsMenu() {
 		>
 			{ ( items ) => (
 				<MoreMenuSubmenu label={ __( 'Panels' ) }>
-					<MoreMenuItem
-						role="menuitemcheckbox"
-						aria-checked={ isInspectorOpen }
-						icon={ isRTL() ? drawerLeft : drawerRight }
-						onClick={ () => {
-							if ( isInspectorOpen ) {
-								disableComplementaryArea( 'core' );
-							} else {
-								enableComplementaryArea( 'core', inspectorTab );
-							}
-						} }
-					>
-						{ __( 'Inspector' ) }
-					</MoreMenuItem>
+					{ ! isDistractionFree && (
+						<MoreMenuItem
+							role="menuitemcheckbox"
+							aria-checked={ isInspectorOpen }
+							icon={ isRTL() ? drawerLeft : drawerRight }
+							onClick={ () => {
+								if ( isInspectorOpen ) {
+									disableComplementaryArea( 'core' );
+								} else {
+									enableComplementaryArea(
+										'core',
+										inspectorTab
+									);
+								}
+							} }
+						>
+							{ __( 'Inspector' ) }
+						</MoreMenuItem>
+					) }
 					{ toMenuItems( items ) }
 				</MoreMenuSubmenu>
 			) }
