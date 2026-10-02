@@ -15,7 +15,6 @@ import AdvancedPanel, {
 } from '../components/global-styles/advanced-panel';
 import { cleanEmptyObject, usePrivateStyleOverride } from './utils';
 import {
-	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
 	isDefaultBlockStyleState,
 	setStyleForState,
@@ -150,12 +149,7 @@ function CustomCSSControl( {
 	const stateStyle = isStateSelected
 		? getStyleForState( style, selectedState ) || {}
 		: style;
-	// A viewport state (and no pseudo-state) is edited via the dedicated
-	// "viewport" InspectorControls group, rendered at the bottom of the
-	// inspector rather than folded under the "Advanced" panel.
-	const isViewportState =
-		selectedState?.viewport !== DEFAULT_BLOCK_STYLE_STATE.viewport &&
-		selectedState?.pseudo === DEFAULT_BLOCK_STYLE_STATE.pseudo;
+	const inspectorGroup = isStateSelected ? 'styleStates' : 'advanced';
 
 	function onChange( newStyle ) {
 		// Normalize whitespace-only CSS to undefined so it gets cleaned up.
@@ -185,9 +179,9 @@ function CustomCSSControl( {
 	);
 
 	return (
-		<InspectorControls group={ isViewportState ? 'viewport' : 'advanced' }>
-			{ isViewportState ? (
-				<div className="block-editor-hooks-custom-css__viewport-panel">
+		<InspectorControls group={ inspectorGroup }>
+			{ isStateSelected ? (
+				<div className="block-editor-hooks-custom-css__state-panel">
 					{ panel }
 				</div>
 			) : (
