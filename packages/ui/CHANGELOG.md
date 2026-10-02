@@ -33,6 +33,7 @@
 ### Internal
 
 -   Document component status in `CONTRIBUTING.md` ([#83536](https://github.com/WordPress/gutenberg/pull/83536)).
+-   Declare `@types/react-dom` as a dev dependency ([#84013](https://github.com/WordPress/gutenberg/pull/84013)).
 
 ### Documentation
 
