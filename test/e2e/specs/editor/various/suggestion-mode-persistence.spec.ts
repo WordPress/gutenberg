@@ -792,4 +792,109 @@ test.describe( 'Suggestion mode persistence', () => {
 		expect( serialized ).toContain( 'Hello world' );
 		expect( serialized ).not.toContain( 'data-suggestion-id' );
 	} );
+
+	test( 'a pending format change renders the original formatting on the front end', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		/*
+		 * The marked run carries the PROPOSED formatting in post_content, so the
+		 * render strip has to swap the original run back in until the
+		 * suggestion is accepted.
+		 */
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Format target' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await paragraph.click();
+		await pageUtils.pressKeys( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 6 } );
+		await pageUtils.pressKeys( 'primary+b' );
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="format"]'
+			)
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		await switchIntent( page, 'Editing' );
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const body = page.locator( 'body' );
+		await expect( body.getByText( 'Format target' ) ).toBeVisible();
+		await expect(
+			body.locator( 'strong' ).filter( { hasText: 'target' } )
+		).toHaveCount( 0 );
+
+		// Accepted, the proposed formatting becomes real.
+		await page.goto( `/wp-admin/post.php?post=${ postId }&action=edit` );
+		await decideSuggestion( page, 'Accept' );
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Save', exact: true } )
+			.click();
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Post updated' } )
+			.waitFor();
+		await page.goto( `/?p=${ postId }` );
+		await expect(
+			page.locator( 'body strong' ).filter( { hasText: 'target' } )
+		).toBeVisible();
+	} );
+
+	test( 'a suggested inline image keeps the image until it is decided', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const media = await requestUtils.uploadMedia(
+			'./assets/10x10_e2e_test_image_z9T8jK.png'
+		);
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Picture here' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await editor.showBlockToolbar();
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'More' } )
+			.click();
+		await page.getByRole( 'menuitem', { name: 'Inline image' } ).click();
+		const modal = page.locator( '.media-modal' );
+		await modal.getByRole( 'tab', { name: 'Media Library' } ).click();
+		await modal.locator( `li[data-id="${ media.id }"]` ).click();
+		await modal
+			.getByRole( 'button', { name: 'Select', exact: true } )
+			.click();
+
+		// The image is the proposed addition, inside its marker.
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="add"] img'
+			)
+		).toBeVisible();
+
+		await decideSuggestion( page, 'Accept' );
+		await expect
+			.poll( editor.getEditedPostContent )
+			.toMatch(
+				/Picture here<img [^>]*src="[^"]+10x10_e2e_test_image_z9T8jK[^"]*\.png"/
+			);
+	} );
 } );
