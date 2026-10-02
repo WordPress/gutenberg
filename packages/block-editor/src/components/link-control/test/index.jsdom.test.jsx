@@ -1086,6 +1086,74 @@ describe( 'Link submission', () => {
 		// onChange should not be called
 		expect( mockOnChange ).not.toHaveBeenCalled();
 	} );
+
+	describe( 'after selecting a suggestion with Tab', () => {
+		// Tab selects a suggestion by putting its URL in the input, and moves
+		// focus on to the submit button, so submitting must keep the suggestion.
+		it( 'should submit the suggestion, not only its URL', async () => {
+			const user = userEvent.setup();
+			const mockOnChange = vi.fn();
+			const [ firstSuggestion ] = fauxEntitySuggestions;
+
+			render( <LinkControl value={ {} } onChange={ mockOnChange } /> );
+
+			const searchInput = screen.getByRole( 'combobox', {
+				name: 'Search or type URL',
+			} );
+			await user.type( searchInput, 'Hello' );
+			await screen.findByRole( 'listbox', {
+				name: /Search results for.*/,
+			} );
+
+			triggerArrowDown( searchInput );
+			fireEvent.keyDown( searchInput, { key: 'Tab', keyCode: 9 } );
+
+			expect( searchInput ).toHaveValue( firstSuggestion.url );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Submit' } )
+			);
+
+			expect( mockOnChange ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					id: firstSuggestion.id,
+					type: firstSuggestion.type,
+					title: firstSuggestion.title,
+				} )
+			);
+		} );
+
+		it( 'should submit what was typed once the URL is edited', async () => {
+			const user = userEvent.setup();
+			const mockOnChange = vi.fn();
+
+			render( <LinkControl value={ {} } onChange={ mockOnChange } /> );
+
+			const searchInput = screen.getByRole( 'combobox', {
+				name: 'Search or type URL',
+			} );
+			await user.type( searchInput, 'Hello' );
+			await screen.findByRole( 'listbox', {
+				name: /Search results for.*/,
+			} );
+
+			triggerArrowDown( searchInput );
+			fireEvent.keyDown( searchInput, { key: 'Tab', keyCode: 9 } );
+
+			await user.clear( searchInput );
+			await user.type( searchInput, 'https://wordpress.org' );
+			await user.click(
+				screen.getByRole( 'button', { name: 'Submit' } )
+			);
+
+			expect( mockOnChange ).toHaveBeenCalledWith(
+				expect.objectContaining( { url: 'https://wordpress.org' } )
+			);
+			expect( mockOnChange ).not.toHaveBeenCalledWith(
+				expect.objectContaining( { id: expect.anything() } )
+			);
+		} );
+	} );
 } );
 
 describe( 'Default search suggestions', () => {

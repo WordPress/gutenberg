@@ -14,6 +14,7 @@
 
 ### Bug Fixes
 
+-   `LinkControl`: Keep a suggestion selected with Tab when the link is submitted, instead of submitting only its URL, so a page selected this way stays linked to the page ([#84004](https://github.com/WordPress/gutenberg/pull/84004)).
 -   Fix the translator comments for the "blocks moved" and "blocks added" screen reader messages, which described the count as a block name ([#83555](https://github.com/WordPress/gutenberg/pull/83555)).
 -   `BlockCompare`: Show whitespace differences in the Resolve Block dialog. The markup's spaces and blank lines are kept instead of collapsed by the browser, and each added or removed line break gets a visible marker, so a diff made only of whitespace no longer looks identical on both sides. The dialog also shows the markup of a converted Custom HTML block, which is kept in its `innerContent` rather than produced by `save`, instead of an empty diff ([#82397](https://github.com/WordPress/gutenberg/pull/82397)).
 -   Inserter: Stop re-rendering the block list when the block selection changes while the inserter is open ([#83284](https://github.com/WordPress/gutenberg/pull/83284)).
