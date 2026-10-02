@@ -28,6 +28,12 @@
 		"ariaLabel": true,
 		"visibility": false,
 		"lock": false,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalSkipSerialization": true
+		},
 		"color": {
 			"background": true,
 			"text": true,
@@ -68,6 +74,7 @@
 		}
 	},
 	"selectors": {
+		"background": ".wp-block-tab-list button",
 		"border": ".wp-block-tab-list button",
 		"color": {
 			"background": ".wp-block-tab-list button",
