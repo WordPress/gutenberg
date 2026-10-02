@@ -13,14 +13,14 @@ import {
 	hexKeyToEmoji,
 	buildEmojiBySlugMap,
 	useReactionEmojis,
-} from './reaction-emoji-picker';
+} from './reaction-emojis';
 import { useEmojiLabel } from './emojibase-data';
 import {
 	getReactionTargetKey,
 	getReactionsQueryArgs,
 	type ReactionSummary,
 	type ReactionTarget,
-} from './block-reactions';
+} from '../block-reactions';
 
 /**
  * A comment record as returned by the reactions REST query.
@@ -348,7 +348,6 @@ function ReactionButton( {
 										?.focus();
 								}
 							}
-							invalidateReactionNames( target, slug );
 							setNames( null );
 							onToggleReaction( slug );
 						} }

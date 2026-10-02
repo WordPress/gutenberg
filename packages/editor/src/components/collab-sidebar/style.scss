@@ -390,59 +390,6 @@ mark.wp-note {
 	line-height: 1;
 }
 
-// Split the Dropdown's default 8px `.components-popover__content` padding
-// between the popover and the scrolling emoji group below, so the emoji buttons
-// keep the same breathing room while their focus ring stays inside the
-// scroll container instead of being clipped by it.
-.editor-collab-sidebar-panel__add-reaction-popover .components-popover__content {
-	padding: $grid-unit-05;
-}
-
-
-.editor-collab-sidebar-panel__emoji-picker {
-	display: flex;
-	// The emoji list is filterable server-side, so it can grow well
-	// beyond the 5 defaults. Wrap into rows of 8 (32px compact
-	// buttons) and scroll past 6 rows instead of letting the popover
-	// grow unbounded.
-	flex-wrap: wrap;
-	// `.components-popover__content` is `width: min-content`, which would
-	// otherwise squeeze this wrapping row down to one column per emoji.
-	width: max-content;
-	// Scrolling clips on both axes, so leave room for the focus ring of
-	// the buttons on the edges. The padding is added to the row and column
-	// caps below, which are border-box measurements.
-	padding: $grid-unit-05;
-	max-width: 8 * 32px + 2 * $grid-unit-05;
-	max-height: 6 * 32px + 2 * $grid-unit-05;
-	overflow-y: auto;
-}
-
-// 32px emoji targets: compact density matching peer pickers and the
-// editor's compact button size. Clears the WCAG 2.2 AA 24px minimum
-// (2.5.8) but not the AAA 44px target (2.5.5), at which an 8-column grid
-// would outgrow the sidebar-anchored popover.
-.editor-collab-sidebar-panel__emoji-option {
-	// Pin the track to 32px so the `max-width` above lands exactly 8 emoji
-	// per row; the compact Button's own padding and minimum size would
-	// otherwise widen the flex item past the 32px width.
-	flex: 0 0 32px;
-	min-width: 0;
-	padding: 0;
-	font-size: 18px;
-	justify-content: center;
-}
-
-// Curated fallback shown when the full picker's module or dataset fails.
-.editor-collab-sidebar-panel__picker-fallback-note {
-	display: flex;
-	align-items: center;
-	gap: var(--wpds-dimension-gap-xs);
-	padding-top: var(--wpds-dimension-padding-xs);
-	color: var(--wpds-color-foreground-content-neutral-weak);
-	font-size: var(--wpds-typography-font-size-xs);
-}
-
 // Width comes from the picker below, so the wrapper fits it via Popover's
 // default `width: min-content`; sizing the wrapper instead leaves slack.
 //
@@ -581,6 +528,8 @@ mark.wp-note {
 	// scroll behind exactly that color. Move both together if it changes.
 	background-color: $white;
 	z-index: 1;
+	// Align the heading with the grid's first column.
+	padding-inline: 0;
 }
 
 .editor-collab-sidebar-panel__picker-row {

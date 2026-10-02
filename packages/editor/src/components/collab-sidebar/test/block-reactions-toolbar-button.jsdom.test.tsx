@@ -64,7 +64,7 @@ describe( 'BlockReactionsToolbarButton', () => {
 			screen.getByRole( 'button', { name: 'React to block' } )
 		);
 		await user.click(
-			await screen.findByRole( 'button', { name: 'Heart' } )
+			await screen.findByRole( 'gridcell', { name: 'Heart' } )
 		);
 
 		expect( onToggleReaction ).toHaveBeenCalledWith( {

@@ -8,8 +8,8 @@
  */
 
 /**
- * Drops the Emojibase dataset URL so the editor falls back to the curated
- * quick row. Runs late to win over `gutenberg_add_emojibase_settings()`.
+ * Drops the Emojibase dataset URL so the picker offers only the named
+ * reaction set. Runs late to win over `gutenberg_add_emojibase_settings()`.
  *
  * @param array $settings Existing block editor settings.
  * @return array Updated block editor settings.

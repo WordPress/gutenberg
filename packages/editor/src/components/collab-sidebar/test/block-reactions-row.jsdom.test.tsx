@@ -133,7 +133,7 @@ describe( 'BlockReactionsRow', () => {
 
 		await user.click( trigger );
 		await user.click(
-			await screen.findByRole( 'button', { name: 'Rocket' } )
+			await screen.findByRole( 'gridcell', { name: 'Rocket' } )
 		);
 
 		expect( onToggleBlockReaction ).toHaveBeenCalledWith( {

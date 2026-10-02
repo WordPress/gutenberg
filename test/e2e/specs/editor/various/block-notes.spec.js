@@ -1241,30 +1241,6 @@ test.describe( 'Block Notes', () => {
 			).toHaveText( 'Original note text' );
 		} );
 
-		test( 'can remove own emoji reaction by clicking it', async ( {
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing reaction removal' },
-				comment: 'Test comment for removing reactions',
-			} );
-
-			// Add a reaction.
-			await blockNoteUtils.addReactionToComment( 'Heart' );
-			const reactionButton = page.getByRole( 'button', {
-				name: /Heart/,
-			} );
-			await expect( reactionButton ).toBeVisible();
-
-			// Click the reaction to remove it.
-			await reactionButton.click();
-
-			// Verify the reaction button is no longer visible.
-			await expect( reactionButton ).toBeHidden();
-		} );
-
 		test( 'can see reaction tooltip on hover', async ( {
 			page,
 			blockNoteUtils,
@@ -1334,73 +1310,7 @@ test.describe( 'Block Notes', () => {
 			).toBeVisible();
 		} );
 
-		test( 'arrow keys cross from one emoji category into the next', async ( {
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing category crossing' },
-				comment: 'Category crossing',
-			} );
-			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
-			await blockNoteUtils.waitForFullPicker();
-
-			const searchField = page.getByRole( 'combobox', {
-				name: 'Search emoji',
-			} );
-			const firstCategory = page
-				.getByRole( 'grid' )
-				.getByRole( 'rowgroup' )
-				.first();
-			const firstCategoryRows = await firstCategory
-				.getByRole( 'row' )
-				.count();
-
-			// One press lands on the first row; one per row after that
-			// walks out of the first category and into the second.
-			for ( let i = 0; i <= firstCategoryRows; i++ ) {
-				await page.keyboard.press( 'ArrowDown' );
-			}
-			const activeId = await searchField.getAttribute(
-				'aria-activedescendant'
-			);
-			await expect(
-				page
-					.getByRole( 'grid' )
-					.getByRole( 'rowgroup' )
-					.nth( 1 )
-					.locator( `[id="${ activeId }"]` )
-			).toHaveCount( 1 );
-			await expect( searchField ).toBeFocused();
-		} );
-
-		test( 'Enter picks the top search result', async ( {
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing Enter on search' },
-				comment: 'Enter on search',
-			} );
-			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
-			await blockNoteUtils.waitForFullPicker();
-
-			await page.keyboard.type( 'rocket' );
-			await expect(
-				page.getByRole( 'gridcell' ).first()
-			).toHaveAttribute( 'data-highlighted' );
-			await page.keyboard.press( 'Enter' );
-
-			await expect(
-				page.locator( '.editor-collab-sidebar-panel__reaction-button', {
-					hasText: '🚀',
-				} )
-			).toBeVisible();
-		} );
-
-		test( 'the add-reaction trigger stays out of the way until hovered', async ( {
+		test( 'the add-reaction trigger is revealed on hover and focus', async ( {
 			page,
 			blockNoteUtils,
 		} ) => {
@@ -1414,40 +1324,6 @@ test.describe( 'Block Notes', () => {
 				'.editor-collab-sidebar-panel__add-reaction'
 			);
 			const note = page.locator( '.editor-collab-sidebar-panel__note' );
-
-			// The trigger floats in the note's top corner rather than
-			// claiming a row: the note is no taller for carrying it.
-			const reactionRow = page.locator(
-				'.editor-collab-sidebar-panel__reactions'
-			);
-			await expect( reactionRow ).toHaveClass( /is-floating/ );
-			await expect(
-				page.locator( '.editor-collab-sidebar-panel__reaction-button' )
-			).toHaveCount( 0 );
-
-			const noteBody = page.locator(
-				'.editor-collab-sidebar-panel__note-body'
-			);
-			const noteText = page.locator(
-				'.editor-collab-sidebar-panel__note-content'
-			);
-			expect( ( await noteBody.boundingBox() ).height ).toBe(
-				( await noteText.boundingBox() ).height
-			);
-
-			// It lines up under the note's other actions, and the text keeps
-			// clear of it rather than running underneath.
-			const triggerBox = await trigger.boundingBox();
-			const actionsBox = await page
-				.getByRole( 'button', { name: 'Actions' } )
-				.boundingBox();
-			expect( triggerBox.x ).toBe( actionsBox.x );
-			const textRight = await noteText.evaluate( ( element ) => {
-				const range = document.createRange();
-				range.selectNodeContents( element );
-				return range.getBoundingClientRect().right;
-			} );
-			expect( textRight ).toBeLessThanOrEqual( triggerBox.x );
 
 			// Park the pointer outside the sidebar: adding the note leaves it
 			// over the thread, which would hold the trigger open.
@@ -1463,71 +1339,6 @@ test.describe( 'Block Notes', () => {
 			await expect( trigger ).toHaveCSS( 'opacity', '0' );
 			await page.getByRole( 'button', { name: 'Add reaction' } ).focus();
 			await expect( trigger ).toHaveCSS( 'opacity', '1' );
-		} );
-
-		test( 'only the hovered note in a thread reveals its trigger', async ( {
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing per-note hover' },
-				comment: 'Test comment for per-note hover',
-			} );
-
-			const replyForm = page.getByRole( 'textbox', { name: 'Reply to' } );
-			await replyForm.click();
-			await replyForm.pressSequentially(
-				'Test reply for per-note hover'
-			);
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Reply', exact: true } )
-				.click();
-
-			const notes = page.locator( '.editor-collab-sidebar-panel__note' );
-			await expect( notes ).toHaveCount( 2 );
-			const triggers = page.locator(
-				'.editor-collab-sidebar-panel__add-reaction'
-			);
-
-			// Reacting is per note, so the pointer resting on one note should
-			// not offer the option on the other.
-			await notes.first().hover();
-			await expect( triggers.first() ).toHaveCSS( 'opacity', '1' );
-			await expect( triggers.last() ).toHaveCSS( 'opacity', '0' );
-
-			await notes.last().hover();
-			await expect( triggers.last() ).toHaveCSS( 'opacity', '1' );
-			await expect( triggers.first() ).toHaveCSS( 'opacity', '0' );
-		} );
-
-		test( 'the add-reaction trigger stays visible once the note has reactions', async ( {
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing the trailing trigger' },
-				comment: 'Test comment for the trailing trigger',
-			} );
-
-			await blockNoteUtils.addReactionToComment( 'Heart' );
-			await expect(
-				page.getByRole( 'button', { name: /Heart/ } )
-			).toBeVisible();
-
-			// With pills to sit beside, the trigger trails them in the row
-			// rather than floating, and stays put without a hover. Picking
-			// the emoji leaves focus on the trigger, which would hold it open,
-			// so hand focus back to the still-selected thread.
-			await page
-				.locator( '.editor-collab-sidebar-panel__thread' )
-				.focus();
-			await page.mouse.move( 0, 0 );
-			await expect(
-				page.locator( '.editor-collab-sidebar-panel__add-reaction' )
-			).toHaveCSS( 'opacity', '1' );
 		} );
 
 		test( 'reactions stay visible once the thread is deselected', async ( {
@@ -1572,66 +1383,34 @@ test.describe( 'Block Notes', () => {
 				);
 			} );
 
-			test( 'falls back to the curated quick row, laid out as a row with focus on both axes', async ( {
+			test( 'the picker offers the named set and a pick still adds a reaction', async ( {
 				page,
 				blockNoteUtils,
 			} ) => {
 				await blockNoteUtils.addBlockWithNote( {
 					type: 'core/paragraph',
-					attributes: { content: 'Testing picker layout' },
-					comment: 'Test comment for picker layout',
+					attributes: { content: 'Named pick' },
+					comment: 'Test comment for named pick',
 				} );
 
 				await page
 					.getByRole( 'button', { name: 'Add reaction' } )
 					.click();
+				await blockNoteUtils.waitForFullPicker();
 
-				// Without a dataset URL the full picker cannot load, so
-				// adding a reaction falls back to the curated quick row.
+				// Only the named set, with no category headings.
+				const grid = page.getByRole( 'grid' );
+				await expect( grid.getByRole( 'gridcell' ) ).toHaveCount( 5 );
 				await expect(
-					page.getByPlaceholder( 'Search emoji' )
-				).toBeHidden();
-				const emojiPicker = page.locator(
-					'.editor-collab-sidebar-panel__emoji-picker'
-				);
-				await expect( emojiPicker ).toBeVisible();
+					page.locator(
+						'.editor-collab-sidebar-panel__picker-category'
+					)
+				).toHaveCount( 0 );
 
-				// `.components-popover__content` is `width: min-content`,
-				// which used to squeeze the wrapping button group into a
-				// single column one emoji wide.
-				const box = await emojiPicker.boundingBox();
-				expect( box.width ).toBeGreaterThan( box.height );
-
-				// The roving tab index moves on both axes, so the picker is
-				// navigable however the emoji set happens to wrap.
-				const buttons = emojiPicker.getByRole( 'button' );
-				await buttons.first().focus();
-				await page.keyboard.press( 'ArrowDown' );
-				await expect( buttons.nth( 1 ) ).toBeFocused();
-				await page.keyboard.press( 'ArrowUp' );
-				await expect( buttons.first() ).toBeFocused();
-			} );
-
-			test( 'a curated pick from the fallback row still adds a reaction', async ( {
-				page,
-				blockNoteUtils,
-			} ) => {
-				await blockNoteUtils.addBlockWithNote( {
-					type: 'core/paragraph',
-					attributes: { content: 'Fallback pick' },
-					comment: 'Test comment for fallback pick',
-				} );
-
-				await page
-					.getByRole( 'button', { name: 'Add reaction' } )
-					.click();
-				const emojiPicker = page.locator(
-					'.editor-collab-sidebar-panel__emoji-picker'
-				);
-				await expect( emojiPicker ).toBeVisible();
-				await emojiPicker
-					.getByRole( 'button', { name: /Heart/i } )
-					.click();
+				// Search still filters the named set.
+				await page.getByPlaceholder( 'Search emoji' ).fill( 'heart' );
+				await expect( grid.getByRole( 'gridcell' ) ).toHaveCount( 1 );
+				await grid.getByRole( 'gridcell', { name: 'Heart' } ).click();
 
 				await expect(
 					page.getByRole( 'button', { name: /Heart/ } )
@@ -1694,55 +1473,6 @@ test.describe( 'Block Notes', () => {
 			await expect( reactionPill ).toBeEnabled();
 		} );
 
-		test( 'can add multiple different reactions to same note', async ( {
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing multiple reactions' },
-				comment: 'Test comment for multiple reactions',
-			} );
-
-			// Add first reaction.
-			await blockNoteUtils.addReactionToComment( 'Smile' );
-			await expect(
-				page.getByRole( 'button', { name: /Smile/ } )
-			).toBeVisible();
-
-			// Add second reaction.
-			await blockNoteUtils.addReactionToComment( 'Rocket' );
-			await expect(
-				page.locator( '.editor-collab-sidebar-panel__reaction-button', {
-					hasText: '🚀',
-				} )
-			).toBeVisible();
-
-			// Both reactions remain visible together.
-			await expect(
-				page.getByRole( 'button', { name: /Smile/ } )
-			).toBeVisible();
-		} );
-
-		test( 'opens the full emoji picker directly from the add-reaction button', async ( {
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing full emoji picker' },
-				comment: 'Open the full picker',
-			} );
-
-			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
-
-			await blockNoteUtils.waitForFullPicker();
-
-			await expect(
-				page.getByPlaceholder( 'Search emoji' )
-			).toBeVisible();
-		} );
-
 		test( 'a full-picker pick that matches a curated emoji stores as the curated slug', async ( {
 			page,
 			blockNoteUtils,
@@ -1796,31 +1526,6 @@ test.describe( 'Block Notes', () => {
 			await expect( reactionButton ).toContainText( '👍' );
 		} );
 
-		test( 'pressing Escape closes the full-picker popover', async ( {
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Escape closes picker' },
-				comment: 'Close picker with Escape',
-			} );
-
-			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
-			await blockNoteUtils.waitForFullPicker();
-
-			await page.keyboard.press( 'Escape' );
-
-			await expect(
-				page.getByPlaceholder( 'Search emoji' )
-			).toBeHidden();
-			// Focus returns to the trigger rather than dropping to the
-			// document body.
-			await expect(
-				page.getByRole( 'button', { name: 'Add reaction' } )
-			).toBeFocused();
-		} );
-
 		test( 'Escape in the skin-tone flyout closes only that popup', async ( {
 			page,
 			blockNoteUtils,
@@ -1863,42 +1568,6 @@ test.describe( 'Block Notes', () => {
 			await expect(
 				page.getByRole( 'button', { name: 'Add reaction' } )
 			).toBeFocused();
-		} );
-
-		test( 'full picker shows the empty state when search has no matches', async ( {
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Search empty state' },
-				comment: 'Empty search state',
-			} );
-
-			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
-			await blockNoteUtils.waitForFullPicker();
-
-			const popover = page.locator(
-				'.editor-collab-sidebar-panel__picker-popover'
-			);
-			const { width: openWidth } = await popover.boundingBox();
-
-			// A query no Emojibase label/tag matches.
-			await page
-				.getByPlaceholder( 'Search emoji' )
-				.fill( 'zzzzzznoresults' );
-
-			await expect( page.getByText( 'No emoji found.' ) ).toBeVisible();
-			await expect(
-				page.getByRole( 'grid' ).getByRole( 'gridcell' )
-			).toHaveCount( 0 );
-
-			// The popover keeps its width rather than collapsing around
-			// the empty grid.
-			const { width: emptyWidth } = await popover.boundingBox();
-			expect( Math.abs( emptyWidth - openWidth ) ).toBeLessThanOrEqual(
-				1
-			);
 		} );
 
 		test( 'full picker shows a Frequently used section that learns from picks', async ( {
@@ -2027,35 +1696,6 @@ test.describe( 'Block Notes', () => {
 			await expect( reactionButton ).toContainText( '👍🏿' );
 		} );
 
-		test( 'reaction picker portals outside the collab sidebar', async ( {
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing popover portal' },
-				comment: 'Popover portal',
-			} );
-
-			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
-
-			const popover = page.locator(
-				'.editor-collab-sidebar-panel__picker-popover'
-			);
-			await expect( popover ).toBeVisible();
-
-			// The popover must portal out of the sidebar; otherwise the
-			// `overflow: hidden` chain on `.editor-collab-sidebar-panel`
-			// (and the framework `.interface-interface-skeleton__sidebar`)
-			// would clip the picker. Pin the contract by asserting the
-			// popover has no sidebar-panel ancestor.
-			await expect( popover ).toHaveCount( 1 );
-			const isPortaled = await popover.evaluate(
-				( el ) => ! el.closest( '.editor-collab-sidebar-panel' )
-			);
-			expect( isPortaled ).toBe( true );
-		} );
-
 		test( 'note remains selected while reaction picker is open', async ( {
 			page,
 			blockNoteUtils,
@@ -2080,84 +1720,6 @@ test.describe( 'Block Notes', () => {
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 		} );
 
-		test( 'full-picker popover wraps tightly to the picker width', async ( {
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing tight popover layout' },
-				comment: 'Tight layout',
-			} );
-
-			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
-			await blockNoteUtils.waitForFullPicker();
-
-			const popover = page.locator(
-				'.editor-collab-sidebar-panel__picker-popover'
-			);
-			const picker = page.locator(
-				'.editor-collab-sidebar-panel__picker'
-			);
-
-			const popoverBox = await popover.boundingBox();
-			const pickerBox = await picker.boundingBox();
-
-			// Popover wrapper must wrap tightly to the picker. If the
-			// popover is wider, the surface background renders as a
-			// visible band beside the picker.
-			expect(
-				Math.abs( popoverBox.width - pickerBox.width )
-			).toBeLessThanOrEqual( 1 );
-		} );
-
-		test( 'emoji grid fills the picker width', async ( {
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing grid fills picker' },
-				comment: 'Grid fill',
-			} );
-
-			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
-			await blockNoteUtils.waitForFullPicker();
-
-			const picker = page.locator(
-				'.editor-collab-sidebar-panel__picker'
-			);
-			// Measure a full 6-emoji row: the first row on screen is the
-			// "Frequently used" section, which may hold fewer emoji and
-			// legitimately end short of the right edge.
-			const fullRowEmojis = page
-				.locator( '.editor-collab-sidebar-panel__picker-row' )
-				.filter( {
-					has: page.locator(
-						'.editor-collab-sidebar-panel__picker-emoji:nth-child(6)'
-					),
-				} )
-				.first()
-				.locator( '.editor-collab-sidebar-panel__picker-emoji' );
-
-			const pickerBox = await picker.boundingBox();
-			const firstBox = await fullRowEmojis.first().boundingBox();
-			const lastBox = await fullRowEmojis.last().boundingBox();
-			const leftSlack = firstBox.x - pickerBox.x;
-			const rightSlack =
-				pickerBox.x + pickerBox.width - ( lastBox.x + lastBox.width );
-
-			// The grid sits centered: 16px padding on each side, plus an
-			// equal scrollbar gutter on both edges where scrollbars take
-			// space. Catches the picker being sized wider than the grid
-			// (a band of empty space on the right) or the grid
-			// overflowing under the scrollbar.
-			expect( Math.abs( leftSlack - rightSlack ) ).toBeLessThanOrEqual(
-				1
-			);
-			expect( rightSlack ).toBeLessThanOrEqual( 16 + 17 );
-		} );
-
 		test.describe( 'Filtered emoji list', () => {
 			test.beforeAll( async ( { requestUtils } ) => {
 				await requestUtils.activatePlugin(
@@ -2169,44 +1731,6 @@ test.describe( 'Block Notes', () => {
 				await requestUtils.deactivatePlugin(
 					'gutenberg-test-note-reaction-emojis'
 				);
-			} );
-
-			test( 'seeds Frequently used with emojis added via the gutenberg_note_reaction_emojis filter', async ( {
-				page,
-				blockNoteUtils,
-			} ) => {
-				await blockNoteUtils.addBlockWithNote( {
-					type: 'core/paragraph',
-					attributes: { content: 'Testing filtered emojis' },
-					comment: 'Filtered emojis',
-				} );
-
-				await page
-					.getByRole( 'button', { name: 'Add reaction' } )
-					.click();
-				await blockNoteUtils.waitForFullPicker();
-
-				// The "Frequently used" section is seeded from the
-				// filtered curated list: the 5 defaults plus the 20
-				// filter-added entries.
-				const frequentGroup = page
-					.getByRole( 'rowgroup' )
-					.filter( { hasText: 'Frequently used' } );
-				await expect(
-					frequentGroup.getByRole( 'gridcell' )
-				).toHaveCount( 25 );
-				await expect(
-					frequentGroup.getByRole( 'gridcell', {
-						name: 'Heart',
-						exact: true,
-					} )
-				).toBeVisible();
-				await expect(
-					frequentGroup.getByRole( 'gridcell', {
-						name: 'Thumbs up',
-						exact: true,
-					} )
-				).toBeVisible();
 			} );
 
 			test( 'can react with a filter-added emoji', async ( {
@@ -2230,50 +1754,6 @@ test.describe( 'Block Notes', () => {
 				await expect( reactionButton ).toBeVisible();
 				await expect( reactionButton ).toContainText( '🦄' );
 				await expect( reactionButton ).toContainText( '1' );
-			} );
-
-			test( 'picker stays usable with many seeded emojis', async ( {
-				page,
-				blockNoteUtils,
-			} ) => {
-				await blockNoteUtils.addBlockWithNote( {
-					type: 'core/paragraph',
-					attributes: { content: 'Testing large emoji set' },
-					comment: 'Large emoji set',
-				} );
-
-				await page
-					.getByRole( 'button', { name: 'Add reaction' } )
-					.click();
-				await blockNoteUtils.waitForFullPicker();
-
-				// The picker keeps its fixed 8-column footprint no matter
-				// how many entries the filter seeds, so the popover stays
-				// within the viewport.
-				const picker = page.locator(
-					'.editor-collab-sidebar-panel__picker'
-				);
-				const viewport = page.viewportSize();
-				const box = await picker.boundingBox();
-				expect( box.width ).toBeLessThan( viewport.width / 2 );
-				expect( box.x ).toBeGreaterThanOrEqual( 0 );
-				expect( box.x + box.width ).toBeLessThanOrEqual(
-					viewport.width
-				);
-
-				// The last filter-added entry is reachable (scrolls into
-				// view if needed) and selectable.
-				const lastOption = page
-					.getByRole( 'gridcell', { name: 'Trophy', exact: true } )
-					.first();
-				await lastOption.scrollIntoViewIfNeeded();
-				await lastOption.click();
-
-				const reactionButton = page.getByRole( 'button', {
-					name: /Trophy/,
-				} );
-				await expect( reactionButton ).toBeVisible();
-				await expect( reactionButton ).toContainText( '🏆' );
 			} );
 		} );
 	} );

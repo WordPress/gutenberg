@@ -283,6 +283,49 @@ test.describe( 'Navigation block - List view editing', () => {
 		} );
 	} );
 
+	// See https://github.com/WordPress/gutenberg/issues/76803.
+	test( `can add a block from the link search results`, async ( {
+		page,
+		editor,
+		requestUtils,
+		linkControl,
+	} ) => {
+		const { id: menuId } =
+			await requestUtils.createNavigationMenu( navMenuBlocksFixture );
+
+		await editor.insertBlock( {
+			name: 'core/navigation',
+			attributes: {
+				ref: menuId,
+			},
+		} );
+
+		await editor.openDocumentSettingsSidebar();
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+			description: 'Structure for navigation menu: Test Menu',
+		} );
+
+		await listView.getByRole( 'button', { name: 'Add page' } ).click();
+
+		await expect( linkControl.getSearchInput() ).toBeFocused();
+		await page.keyboard.type( 'Home', { delay: 50 } );
+
+		await page
+			.getByRole( 'listbox', { name: /Search results/ } )
+			.getByRole( 'option', { name: /Home Link/ } )
+			.click();
+
+		// The block takes the new link's place at the end of the menu. Being
+		// the third of three shows the new link was not left behind.
+		await expect(
+			listView
+				.getByRole( 'gridcell', { name: 'Home Link' } )
+				.filter( { hasText: 'Block 3 of 3, Level 1.' } )
+		).toBeVisible();
+	} );
+
 	test( `can remove menu items`, async ( { page, editor, requestUtils } ) => {
 		await requestUtils.createNavigationMenu( navMenuBlocksFixture );
 

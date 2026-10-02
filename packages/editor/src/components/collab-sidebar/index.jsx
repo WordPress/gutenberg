@@ -66,7 +66,7 @@ function NotesSidebar( { postId } ) {
 		[]
 	);
 
-	const { notes, unresolvedNotes, reactionsMap } = useNoteThreads( postId );
+	const { notes, unresolvedNotes } = useNoteThreads( postId );
 
 	// Only enable the floating sidebar for large viewports.
 	const showFloatingSidebar = isLargeViewport;
@@ -218,11 +218,7 @@ function NotesSidebar( { postId } ) {
 					icon={ commentIcon }
 					closeLabel={ __( 'Close Notes' ) }
 				>
-					<Notes
-						notes={ notes }
-						sidebarRef={ sidebarRef }
-						reactionsMap={ reactionsMap }
-					/>
+					<Notes notes={ notes } sidebarRef={ sidebarRef } />
 				</PluginSidebar>
 			) }
 			{ isLargeViewport && (
@@ -238,7 +234,6 @@ function NotesSidebar( { postId } ) {
 						notes={ unresolvedNotes }
 						sidebarRef={ sidebarRef }
 						styles={ { backgroundColor } }
-						reactionsMap={ reactionsMap }
 						isFloating
 					/>
 				</PluginSidebar>

@@ -13,7 +13,7 @@ import {
 } from '@wordpress/block-editor';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { invalidateReactionNames } from './reaction-display';
+import { invalidateReactionNames } from './reactions/reaction-display';
 import {
 	BLOCK_REACTION_PARAM,
 	applyBlockReactionDelta,

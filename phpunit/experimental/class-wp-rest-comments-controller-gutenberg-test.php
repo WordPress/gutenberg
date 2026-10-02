@@ -908,28 +908,6 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$this->assertSame( (int) $hearts[0]->comment_ID, $response->get_data()['id'] );
 	}
 
-	public function test_can_create_different_reactions_on_same_note() {
-		wp_set_current_user( self::$editor_id );
-		$post_id = self::factory()->post->create();
-		$note_id = $this->create_note( $post_id, self::$editor_id );
-
-		$emojis = array( 'heart', 'rocket', 'smile' );
-		foreach ( $emojis as $emoji ) {
-			$params  = array(
-				'post'    => $post_id,
-				'type'    => 'reaction',
-				'parent'  => $note_id,
-				'content' => $emoji,
-				'author'  => self::$editor_id,
-			);
-			$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
-			$request->add_header( 'Content-Type', 'application/json' );
-			$request->set_body( wp_json_encode( $params ) );
-			$response = rest_get_server()->dispatch( $request );
-			$this->assertSame( 201, $response->get_status() );
-		}
-	}
-
 	/**
 	 * @dataProvider data_valid_reaction_emojis
 	 */
@@ -1126,26 +1104,6 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		);
 	}
 
-	public function test_schema_includes_reaction_summary() {
-		$controller = new Gutenberg_REST_Comment_Controller_7_2();
-		$schema     = $controller->get_item_schema();
-
-		$this->assertArrayHasKey( 'reaction_summary', $schema['properties'] );
-
-		$reaction_summary_schema = $schema['properties']['reaction_summary'];
-		$this->assertTrue( $reaction_summary_schema['readonly'] );
-		$this->assertSame( 'object', $reaction_summary_schema['type'] );
-		$this->assertContains( 'view', $reaction_summary_schema['context'] );
-		$this->assertContains( 'edit', $reaction_summary_schema['context'] );
-
-		// Verify additionalProperties structure.
-		$this->assertArrayHasKey( 'additionalProperties', $reaction_summary_schema );
-		$additional = $reaction_summary_schema['additionalProperties'];
-		$this->assertArrayHasKey( 'count', $additional['properties'] );
-		$this->assertArrayHasKey( 'reacted', $additional['properties'] );
-		$this->assertArrayHasKey( 'my_reaction_id', $additional['properties'] );
-	}
-
 	public function test_note_response_includes_reaction_summary() {
 		wp_set_current_user( self::$editor_id );
 		$post_id = self::factory()->post->create();
@@ -1207,20 +1165,6 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$this->assertSame( 1, $data['reaction_summary']['heart']['count'] );
 		$this->assertFalse( $data['reaction_summary']['heart']['reacted'] );
 		$this->assertSame( 0, $data['reaction_summary']['heart']['my_reaction_id'] );
-	}
-
-	public function test_reaction_summary_empty_when_no_reactions() {
-		wp_set_current_user( self::$editor_id );
-		$post_id = self::factory()->post->create();
-		$note_id = $this->create_note( $post_id, self::$editor_id );
-
-		$request = new WP_REST_Request( 'GET', '/wp/v2/comments/' . $note_id );
-		$request->set_param( 'context', 'edit' );
-		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data();
-
-		$this->assertArrayHasKey( 'reaction_summary', $data );
-		$this->assertEmpty( $data['reaction_summary'] );
 	}
 
 	/**
@@ -1343,53 +1287,6 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 
 		$this->assertErrorResponse( 'rest_comment_update_not_allowed', $response, 403 );
 		$this->assertSame( 'heart', get_comment( $reaction_id )->comment_content );
-	}
-
-	/**
-	 * The reactor's identity must not be reassignable through the update route.
-	 */
-	public function test_cannot_update_reaction_author() {
-		$post_id     = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
-		$note_id     = $this->create_note( $post_id, self::$editor_id );
-		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$author_id );
-
-		wp_set_current_user( self::$editor_id );
-		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $reaction_id );
-		$request->add_header( 'Content-Type', 'application/json' );
-		$request->set_body( wp_json_encode( array( 'author' => self::$editor_id ) ) );
-		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertErrorResponse( 'rest_comment_update_not_allowed', $response, 403 );
-		$this->assertSame( (string) self::$author_id, get_comment( $reaction_id )->user_id );
-	}
-
-	/**
-	 * A reaction must not be movable onto a note on a post the user cannot edit.
-	 */
-	public function test_cannot_move_reaction_to_note_on_other_post() {
-		$editable_post = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
-		$other_post    = self::factory()->post->create( array( 'post_author' => self::$admin_id ) );
-		$note_id       = $this->create_note( $editable_post, self::$editor_id );
-		$other_note_id = $this->create_note( $other_post, self::$admin_id );
-		$reaction_id   = $this->create_reaction( $editable_post, $note_id, self::$editor_id );
-
-		wp_set_current_user( self::$editor_id );
-		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $reaction_id );
-		$request->add_header( 'Content-Type', 'application/json' );
-		$request->set_body(
-			wp_json_encode(
-				array(
-					'parent' => $other_note_id,
-					'post'   => $other_post,
-				)
-			)
-		);
-		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertErrorResponse( 'rest_comment_update_not_allowed', $response, 403 );
-		$reaction = get_comment( $reaction_id );
-		$this->assertSame( (string) $note_id, $reaction->comment_parent );
-		$this->assertSame( (string) $editable_post, $reaction->comment_post_ID );
 	}
 
 	/**

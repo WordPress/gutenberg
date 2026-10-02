@@ -4,16 +4,17 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /*
- * Emojibase loading shared by the full picker (lazy) and the reaction
- * pills (eager, labels only). Kept dependency-light so importing it does
- * not pull the picker UI into the main bundle.
+ * Emojibase loading shared by the picker and the reaction pills (labels
+ * only). Kept dependency-light so importing it does not pull the picker
+ * UI along.
  */
 
 /**
  * Emojibase configuration read from the block editor settings.
  */
 export interface EmojibaseConfig {
-	// Null when the site serves no dataset, which hides the full picker.
+	// Null when the site serves no dataset; the picker then offers the
+	// named reaction set only.
 	baseUrl: string | null;
 	labelOverrides: Record< string, string > | null;
 }
@@ -223,7 +224,8 @@ export function useEmojibaseData(
 		const cached = dataCache.get( `${ baseUrl }|${ locale }` );
 		return {
 			data: cached?.data || null,
-			isLoading: ! cached,
+			// Nothing loads without a URL, so never report it as pending.
+			isLoading: !! baseUrl && ! cached,
 			error: null,
 		};
 	} );

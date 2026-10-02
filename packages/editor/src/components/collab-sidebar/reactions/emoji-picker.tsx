@@ -22,11 +22,13 @@ import {
 import type { EmojibaseEntry } from './emojibase-data';
 import { useFrequentEmojis } from './frequent-emojis';
 import {
+	emojiToHexKey,
 	getNamedHexKeys,
 	isReactionEmojiAllowed,
 	useReactionEmojiRules,
 	useReactionEmojis,
-} from './reaction-emoji-picker';
+} from './reaction-emojis';
+import type { CuratedEmoji } from './reaction-emojis';
 import SkinTonePicker, { applySkinTone } from './skin-tone-picker';
 
 /**
@@ -61,7 +63,6 @@ interface EmojiOptionGroup {
 
 interface EmojiPickerProps {
 	onSelect: ( emoji: string ) => void;
-	onError?: () => void;
 }
 
 /**
@@ -205,16 +206,33 @@ export function searchEmojis(
 }
 
 /**
- * Full searchable emoji picker. Emoji data and labels come from the
- * per-locale Emojibase files at `noteEmojibaseUrl`; UI chrome strings go
- * through `@wordpress/i18n`.
+ * Shape the named reaction list like Emojibase records, so the grid can
+ * offer it through the same cells and search when no dataset is loaded.
+ *
+ * @param emojis The named emoji list.
+ * @return Equivalent Emojibase-style records.
+ */
+export function namedEmojisToEntries(
+	emojis: CuratedEmoji[]
+): EmojibaseEntry[] {
+	return emojis.map( ( { emoji, label } ) => ( {
+		hexcode: emojiToHexKey( emoji ),
+		emoji,
+		label,
+	} ) );
+}
+
+/**
+ * Searchable emoji picker. Emoji data and labels come from the per-locale
+ * Emojibase files at `noteEmojibaseUrl`; UI chrome strings go through
+ * `@wordpress/i18n`. Without a dataset (no URL configured, or the fetch
+ * failed) the grid offers the named reaction set instead, so reacting
+ * keeps working.
  *
  * @param props          Component props.
  * @param props.onSelect Called with the selected emoji character.
- * @param props.onError  Called when the Emojibase dataset fails to load,
- *                       so the parent can swap in a fallback picker.
  */
-export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
+export default function EmojiPicker( { onSelect }: EmojiPickerProps ) {
 	const { baseUrl, labelOverrides } = useEmojibaseConfig();
 	const [ locale ] = useState( detectLocale );
 	const {
@@ -224,10 +242,11 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 	} = useEmojibaseData( baseUrl, locale );
 	const namedEmojis = useReactionEmojis();
 	const rules = useReactionEmojiRules();
+	const hasDataset = !! dataset;
 	// Offer only what the REST API accepts under the site's emoji rules.
 	const data = useMemo( () => {
 		if ( ! dataset ) {
-			return dataset;
+			return namedEmojisToEntries( namedEmojis );
 		}
 		const namedKeys = getNamedHexKeys( namedEmojis );
 		return dataset.filter( ( entry ) =>
@@ -240,6 +259,20 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 	}, [ dataset, namedEmojis, rules ] );
 	const [ query, setQuery ] = useState( '' );
 	const searchRef = useRef< HTMLInputElement >( null );
+
+	/*
+	 * Announce once when a pending load fills the grid. A cached dataset
+	 * renders straight away, and searching filters synchronously, so
+	 * neither needs an announcement.
+	 */
+	const [ hasJustLoaded, setHasJustLoaded ] = useState( false );
+	const wasLoadingRef = useRef( isLoading );
+	useEffect( () => {
+		if ( wasLoadingRef.current && ! isLoading && ! error ) {
+			setHasJustLoaded( true );
+		}
+		wasLoadingRef.current = isLoading;
+	}, [ isLoading, error ] );
 
 	const { frequentKeys, recordUse } = useFrequentEmojis();
 	const skinTone = useSelect(
@@ -261,14 +294,14 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 	}, [] );
 
 	const groups = useMemo(
-		() => ( data ? groupEmojis( data ) : [] ),
-		[ data ]
+		() => ( hasDataset ? groupEmojis( data ) : [] ),
+		[ data, hasDataset ]
 	);
 
 	// Resolves stored frequently-used hex keys back to full records.
 	const recordByHexKey = useMemo( () => {
 		const map = new Map< string, EmojibaseEntry >();
-		for ( const entry of data || [] ) {
+		for ( const entry of data ) {
 			if ( typeof entry.group === 'number' ) {
 				map.set( normalizeHexcode( entry.hexcode ), entry );
 			}
@@ -277,6 +310,8 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 	}, [ data ] );
 
 	const isSearching = !! query.trim();
+	// The named set is a handful of emoji, so it needs no category headings.
+	const isFlat = isSearching || ! hasDataset;
 
 	/*
 	 * The items handed to `Autocomplete.Root`: category groups while
@@ -304,6 +339,12 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 				hexKey: normalizeHexcode( entry.hexcode ),
 			};
 		};
+
+		if ( ! hasDataset ) {
+			return searchEmojis( data, query, labelOverrides ).map( ( entry ) =>
+				toOption( entry, 'named' )
+			);
+		}
 
 		if ( isSearching ) {
 			/*
@@ -340,6 +381,8 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 			} ) ),
 		].filter( ( group ) => group.items.length > 0 );
 	}, [
+		data,
+		hasDataset,
 		groups,
 		isSearching,
 		query,
@@ -348,8 +391,6 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 		recordByHexKey,
 		skinTone,
 	] );
-
-	const matchCount = isSearching ? items.length : 0;
 
 	/**
 	 * Render grid rows of emoji cells, recording usage on selection.
@@ -383,29 +424,29 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 			</Autocomplete.Row>
 		) );
 
-	// The parent swaps in the curated picker so reacting keeps working.
-	useEffect( () => {
-		if ( error ) {
-			onError?.();
-		}
-	}, [ error, onError ] );
-
-	if ( ! baseUrl ) {
-		return null;
-	}
-
 	let status: ReactNode = null;
 	if ( isLoading ) {
 		status = __( 'Loading…' );
 	} else if ( error ) {
-		status = __( 'Couldn’t load emojis.' );
-	} else if ( isSearching && matchCount > 0 ) {
+		status = __(
+			'Couldn’t load the full emoji picker. Basic reactions are available.'
+		);
+	} else if ( hasJustLoaded && ! isSearching && groups.length > 0 ) {
+		// An empty dataset is left to `Autocomplete.Empty`.
+		const emojiCount = groups.reduce(
+			( total, group ) => total + group.emojis.length,
+			0
+		);
 		status = (
 			<VisuallyHidden>
 				{ sprintf(
-					/* translators: %d: number of emojis matching the search. */
-					_n( '%d emoji found.', '%d emojis found.', matchCount ),
-					matchCount
+					/* translators: %d: number of emojis available to pick. */
+					_n(
+						'%d emoji available.',
+						'%d emojis available.',
+						emojiCount
+					),
+					emojiCount
 				) }
 			</VisuallyHidden>
 		);
@@ -428,7 +469,11 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 				// Enter picks the top hit once the user has typed.
 				autoHighlight
 				value={ query }
-				onValueChange={ setQuery }
+				onValueChange={ ( value: string ) => {
+					setQuery( value );
+					// Searches stay quiet, so drop the load announcement.
+					setHasJustLoaded( false );
+				} }
 			>
 				<div className="editor-collab-sidebar-panel__picker-search">
 					<Autocomplete.InputGroup className="editor-collab-sidebar-panel__picker-input">
@@ -472,16 +517,16 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 				<div className="editor-collab-sidebar-panel__picker-viewport">
 					<Autocomplete.Status>{ status }</Autocomplete.Status>
 					<Autocomplete.Empty>
-						{ isLoading || error ? null : __( 'No emoji found.' ) }
+						{ isLoading ? null : __( 'No emoji found.' ) }
 					</Autocomplete.Empty>
 					<Autocomplete.List
 						aria-label={ _x( 'Emoji', 'emoji picker grid label' ) }
 						className={ clsx(
 							'editor-collab-sidebar-panel__picker-list',
-							{ 'is-searching': isSearching }
+							{ 'is-searching': isFlat }
 						) }
 					>
-						{ isSearching
+						{ isFlat
 							? renderRows( items as EmojiOption[] )
 							: ( group: EmojiOptionGroup ) => (
 									<Autocomplete.Group

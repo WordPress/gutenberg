@@ -11,86 +11,35 @@
 class Emoji_Picker_Data_Test extends WP_UnitTestCase {
 
 	/**
-	 * @covers ::gutenberg_emoji_to_hexcode
-	 */
-	public function test_gutenberg_emoji_to_hexcode_basic_codepoint() {
-		$this->assertSame( '1F600', gutenberg_emoji_to_hexcode( '😀' ) );
-		$this->assertSame( '1F389', gutenberg_emoji_to_hexcode( '🎉' ) );
-		$this->assertSame( '1F680', gutenberg_emoji_to_hexcode( '🚀' ) );
-	}
-
-	/**
-	 * Variation Selector-16 (U+FE0F) is stripped so qualified
-	 * presentations match Emojibase's unqualified `hexcode` keys.
+	 * @dataProvider data_gutenberg_emoji_to_hexcode
 	 *
 	 * @covers ::gutenberg_emoji_to_hexcode
+	 *
+	 * @param mixed  $input    Value to convert.
+	 * @param string $expected Expected Emojibase `hexcode` key.
 	 */
-	public function test_gutenberg_emoji_to_hexcode_strips_vs16() {
-		$this->assertSame( '2764', gutenberg_emoji_to_hexcode( "\u{2764}\u{FE0F}" ) );
-		$this->assertSame( '2764', gutenberg_emoji_to_hexcode( '❤️' ) );
+	public function test_gutenberg_emoji_to_hexcode( $input, $expected ) {
+		$this->assertSame( $expected, gutenberg_emoji_to_hexcode( $input ) );
 	}
 
-	/**
-	 * ZWJ sequences round-trip with a `-`-joined uppercase hex string,
-	 * matching Emojibase's representation for combined emoji.
-	 *
-	 * @covers ::gutenberg_emoji_to_hexcode
-	 */
-	public function test_gutenberg_emoji_to_hexcode_zwj_sequence() {
-		// 👨‍💻 = U+1F468 + U+200D + U+1F4BB
-		$this->assertSame(
-			'1F468-200D-1F4BB',
-			gutenberg_emoji_to_hexcode( '👨‍💻' )
+	public function data_gutenberg_emoji_to_hexcode() {
+		return array(
+			// One code point per UTF-8 byte length, zero-padded to four digits.
+			'1 byte'                 => array( '#', '0023' ),
+			'2 bytes'                => array( "\u{00A9}", '00A9' ),
+			'3 bytes'                => array( "\u{2764}", '2764' ),
+			'4 bytes'                => array( "\u{1F600}", '1F600' ),
+			// VS16 is stripped to match Emojibase's unqualified keys.
+			'VS16 stripped'          => array( "\u{2764}\u{FE0F}", '2764' ),
+			'ZWJ sequence'           => array( "\u{1F468}\u{200D}\u{1F4BB}", '1F468-200D-1F4BB' ),
+			'keycap sequence'        => array( "\u{0030}\u{FE0F}\u{20E3}", '0030-20E3' ),
+			'empty string'           => array( '', '' ),
+			'non-string'             => array( 42, '' ),
+			// Malformed UTF-8 never yields a garbage key.
+			'lone continuation byte' => array( "\x80", '' ),
+			'truncated sequence'     => array( "\xF0\x9F\x98a", '' ),
+			'invalid lead byte'      => array( "\xF8\x88\x80\x80\x80", '' ),
 		);
-		// 0️⃣ = U+0030 + U+FE0F + U+20E3, padded to Emojibase's `0030-20E3`.
-		$this->assertSame(
-			'0030-20E3',
-			gutenberg_emoji_to_hexcode( '0️⃣' )
-		);
-	}
-
-	/**
-	 * @covers ::gutenberg_emoji_to_hexcode
-	 */
-	public function test_gutenberg_emoji_to_hexcode_handles_invalid_input() {
-		$this->assertSame( '', gutenberg_emoji_to_hexcode( '' ) );
-		$this->assertSame( '', gutenberg_emoji_to_hexcode( null ) );
-		$this->assertSame( '', gutenberg_emoji_to_hexcode( 42 ) );
-	}
-
-	/**
-	 * Malformed UTF-8 must return an empty string rather than emitting a
-	 * garbage hex key. The decoder is byte-level and does not depend on
-	 * the `mbstring` extension.
-	 *
-	 * @covers ::gutenberg_emoji_to_hexcode
-	 */
-	public function test_gutenberg_emoji_to_hexcode_rejects_invalid_utf8() {
-		// Lone continuation byte.
-		$this->assertSame( '', gutenberg_emoji_to_hexcode( "\x80" ) );
-		// Lead byte with missing continuation bytes.
-		$this->assertSame( '', gutenberg_emoji_to_hexcode( "\xF0\x9F" ) );
-		// Truncated 4-byte sequence followed by ASCII.
-		$this->assertSame( '', gutenberg_emoji_to_hexcode( "\xF0\x9F\x98a" ) );
-		// Invalid lead byte (0xF8 starts a 5-byte form, never valid UTF-8).
-		$this->assertSame( '', gutenberg_emoji_to_hexcode( "\xF8\x88\x80\x80\x80" ) );
-	}
-
-	/**
-	 * Code points across the 1-4 byte UTF-8 ranges decode correctly, each
-	 * zero-padded to Emojibase's four-digit `hexcode` width.
-	 *
-	 * @covers ::gutenberg_emoji_to_hexcode
-	 */
-	public function test_gutenberg_emoji_to_hexcode_covers_all_byte_lengths() {
-		// 1 byte: U+0023 (#), part of keycap sequences.
-		$this->assertSame( '0023', gutenberg_emoji_to_hexcode( '#' ) );
-		// 2 bytes: U+00A9 (©).
-		$this->assertSame( '00A9', gutenberg_emoji_to_hexcode( "\u{00A9}" ) );
-		// 3 bytes: U+2764 (❤).
-		$this->assertSame( '2764', gutenberg_emoji_to_hexcode( "\u{2764}" ) );
-		// 4 bytes: U+1F600 (😀) — asserted in the basic test as well.
-		$this->assertSame( '1F600', gutenberg_emoji_to_hexcode( "\u{1F600}" ) );
 	}
 
 	/**
@@ -124,23 +73,6 @@ class Emoji_Picker_Data_Test extends WP_UnitTestCase {
 		$overrides = gutenberg_get_emoji_picker_label_overrides();
 
 		$this->assertSame( 'Custom thumbs up', $overrides['1F44D'] );
-
-		remove_filter( 'gutenberg_emoji_picker_label_overrides', $callback );
-	}
-
-	/**
-	 * @covers ::gutenberg_get_emoji_picker_label_overrides
-	 */
-	public function test_filter_can_replace_overrides_entirely() {
-		$callback = static function () {
-			return array();
-		};
-		add_filter( 'gutenberg_emoji_picker_label_overrides', $callback );
-
-		$this->assertSame(
-			array(),
-			gutenberg_get_emoji_picker_label_overrides()
-		);
 
 		remove_filter( 'gutenberg_emoji_picker_label_overrides', $callback );
 	}

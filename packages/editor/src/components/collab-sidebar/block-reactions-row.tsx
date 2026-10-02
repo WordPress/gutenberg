@@ -7,8 +7,8 @@ import {
 	// @ts-expect-error - No type declarations available for @wordpress/block-editor
 } from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
-import ReactionDisplay from './reaction-display';
-import { AddReactionButton } from './add-reaction-picker';
+import ReactionDisplay from './reactions/reaction-display';
+import { AddReactionButton } from './reactions/add-reaction-button';
 import { useCurrentPostRef } from './use-block-reactions';
 import type { ReactionSummary, ReactionTarget } from './block-reactions';
 
@@ -96,7 +96,6 @@ export function BlockReactionsRow( {
 					onRemoveLast={ onRemoveLast }
 				>
 					<AddReactionButton
-						target={ target }
 						label={ __( 'Add block reaction' ) }
 						onToggleReaction={ toggle }
 					/>

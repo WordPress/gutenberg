@@ -1,7 +1,6 @@
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import {
-	useCallback,
 	useState,
 	useEffect,
 	useLayoutEffect,
@@ -17,8 +16,6 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as editorStore } from '../../store';
@@ -41,7 +38,6 @@ import {
 } from './utils';
 import {
 	BLOCK_REACTIONS_ENTRY_TYPE,
-	applyReactionSummaryDelta,
 	getBlockReactionsEntryId,
 	getBlockReactionsId,
 } from './block-reactions';
@@ -63,22 +59,6 @@ export function useNoteThreads( postId ) {
 		queryArgs,
 		{ enabled: !! postId && typeof postId === 'number' }
 	);
-
-	// Build reactionsMap from the reaction_summary field on each note.
-	// Shape: { [noteId]: { [emojiSlug]: { count, reacted, my_reaction_id } } }
-	const reactionsMap = useMemo( () => {
-		if ( ! threads || threads.length === 0 ) {
-			return {};
-		}
-
-		const map = {};
-		threads.forEach( ( thread ) => {
-			if ( thread.reaction_summary ) {
-				map[ thread.id ] = thread.reaction_summary;
-			}
-		} );
-		return map;
-	}, [ threads ] );
 
 	const { getBlockAttributes } = useSelect( blockEditorStore );
 	const { clientIds } = useSelect( ( select ) => {
@@ -252,47 +232,12 @@ export function useNoteThreads( postId ) {
 	return {
 		notes,
 		unresolvedNotes,
-		reactionsMap,
 	};
 }
 
-/**
- * Folds a completed reaction toggle into a cached note record.
- *
- * Used to keep `reaction_summary` usable when the refetch that would
- * normally replace it fails: without it, the next toggle reads a stale
- * `reacted` / `my_reaction_id` pair and takes the wrong branch.
- *
- * @param {Object} note              The cached note record.
- * @param {string} emoji             The reaction storage slug that changed.
- * @param {number} [addedReactionId] The new reaction's comment ID when one was
- *                                   added; omitted when one was removed.
- * @return {Object} The note with an updated `reaction_summary`.
- */
-function applyReactionDelta( note, emoji, addedReactionId ) {
-	return {
-		...note,
-		reaction_summary: applyReactionSummaryDelta(
-			note.reaction_summary,
-			emoji,
-			addedReactionId
-		),
-	};
-}
-
-/*
- * Per-note count of landed reaction mutations. Each toggle refetches the
- * whole `reaction_summary`, so a refresh issued before a later mutation
- * landed would overwrite that mutation's result; the counter lets it tell.
- * Module-level so every `useNoteActions` instance shares it.
- */
-const reactionMutationCounts = new Map();
-
-export function useNoteActions( reactionsMap = {} ) {
+export function useNoteActions() {
 	const { createNotice } = useDispatch( noticesStore );
-	const { saveEntityRecord, deleteEntityRecord, receiveEntityRecords } =
-		useDispatch( coreStore );
-	const { getEntityRecord } = useSelect( coreStore );
+	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
 	const {
 		getBlockAttributes,
@@ -526,127 +471,10 @@ export function useNoteActions( reactionsMap = {} ) {
 		}
 	};
 
-	const onToggleReaction = useCallback(
-		async ( { commentId, emoji } ) => {
-			// Check if the user already reacted via reaction_summary.
-			const noteReactions = reactionsMap[ commentId ] || {};
-			const emojiData = noteReactions[ emoji ];
-			const isRemoving = !! (
-				emojiData?.reacted && emojiData?.my_reaction_id
-			);
-			let addedReactionId;
-
-			try {
-				if ( isRemoving ) {
-					// Force-delete the reaction comment rather than
-					// trashing it (the WP REST default). Reactions
-					// don't have a trash workflow, and a trashed
-					// reaction would otherwise linger in `wp_comments`
-					// indefinitely each time the user toggles it off.
-					await deleteEntityRecord(
-						'root',
-						'comment',
-						emojiData.my_reaction_id,
-						{ force: true },
-						{ throwOnError: true }
-					);
-				} else {
-					// Add a new reaction as a comment record.
-					const saved = await saveEntityRecord(
-						'root',
-						'comment',
-						{
-							post: getCurrentPostId(),
-							type: 'reaction',
-							parent: commentId,
-							content: emoji,
-							status: 'approve',
-						},
-						{ throwOnError: true }
-					);
-					addedReactionId = saved?.id;
-				}
-			} catch ( error ) {
-				onError( error );
-				return;
-			}
-
-			// `reaction_summary` is computed server-side and cached on the
-			// parent note's entity record. Mutating a reaction comment
-			// doesn't invalidate that field, so a subsequent toggle would
-			// read stale `reacted` / `my_reaction_id` data and route into
-			// the wrong branch (deleting an already-removed comment).
-			//
-			// The mutation has landed, so fold its known effect into the
-			// cached record first. That keeps the next toggle correct even
-			// if the refetch below never succeeds.
-			const mutationCount =
-				( reactionMutationCounts.get( commentId ) ?? 0 ) + 1;
-			reactionMutationCounts.set( commentId, mutationCount );
-
-			const cached = getEntityRecord( 'root', 'comment', commentId );
-			if ( cached ) {
-				receiveEntityRecords( 'root', 'comment', [
-					applyReactionDelta(
-						cached,
-						emoji,
-						isRemoving ? undefined : addedReactionId
-					),
-				] );
-			}
-
-			// Then refetch the parent note (1 record) for the authoritative
-			// summary, which also picks up other users' reactions.
-			// `receiveEntityRecords` with no `query` arg updates the
-			// per-record cache, which the list selector reads through by ID
-			// — so the LIST view picks up the fresh `reaction_summary`
-			// without re-fetching every other note on the post. Only the
-			// summary is requested and merged, so the view-context response
-			// can't replace the cached edit-context fields like
-			// `content.raw`, which seeds the edit form.
-			try {
-				const refreshed = await apiFetch( {
-					path: addQueryArgs( `/wp/v2/comments/${ commentId }`, {
-						_fields: 'id,reaction_summary',
-					} ),
-				} );
-				// A newer mutation landed after this snapshot was requested;
-				// its own refresh will carry the authoritative summary.
-				if (
-					reactionMutationCounts.get( commentId ) !== mutationCount
-				) {
-					return;
-				}
-				const latest = getEntityRecord( 'root', 'comment', commentId );
-				if ( latest ) {
-					receiveEntityRecords( 'root', 'comment', [
-						{
-							...latest,
-							reaction_summary: refreshed.reaction_summary,
-						},
-					] );
-				}
-			} catch {
-				// The toggle itself succeeded and the local delta above
-				// already keeps this note's reactions consistent, so there
-				// is nothing to report; the next load reconciles the rest.
-			}
-		},
-		[
-			reactionsMap,
-			deleteEntityRecord,
-			saveEntityRecord,
-			getCurrentPostId,
-			getEntityRecord,
-			receiveEntityRecords,
-		]
-	);
-
 	return {
 		onCreate,
 		onEdit,
 		onDelete,
-		onToggleReaction,
 	};
 }
 

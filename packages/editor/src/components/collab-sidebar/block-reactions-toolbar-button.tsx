@@ -9,23 +9,14 @@ import {
 	// @ts-expect-error - No type declarations available for @wordpress/block-editor
 } from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
-import { AddReactionButton } from './add-reaction-picker';
-import { getBlockReactionsId, type ReactionTarget } from './block-reactions';
-import {
-	useBlockReactionActions,
-	useCurrentPostRef,
-} from './use-block-reactions';
+import { AddReactionButton } from './reactions/add-reaction-button';
+import { getBlockReactionsId } from './block-reactions';
+import { useBlockReactionActions } from './use-block-reactions';
 
 const { NoteIconToolbarSlotFill } = unlock( blockEditorPrivateApis );
 
-// Stands in for an anchor the block has not minted yet. The picker's target
-// only feeds its reactor-name cache, so a placeholder is harmless; the real
-// anchor is minted inside the toggle.
-const PENDING_ANCHOR = 'pending';
-
 export interface BlockReactionsToolbarButtonProps {
 	clientId: string;
-	reactionsId?: string;
 	disabled?: boolean;
 	onToggleReaction: ( args: { clientId: string; emoji: string } ) => void;
 }
@@ -35,26 +26,16 @@ export interface BlockReactionsToolbarButtonProps {
  *
  * @param props                  Component props.
  * @param props.clientId         The block client id.
- * @param props.reactionsId      The block's reaction anchor, if minted.
  * @param props.disabled         Whether reacting is unavailable.
  * @param props.onToggleReaction Adds or removes a reaction on the block.
  */
 export function BlockReactionsToolbarButton( {
 	clientId,
-	reactionsId,
 	disabled = false,
 	onToggleReaction,
 }: BlockReactionsToolbarButtonProps ) {
-	const { postId } = useCurrentPostRef();
-	const target: ReactionTarget = {
-		kind: 'block',
-		postId: postId ?? 0,
-		reactionsId: reactionsId ?? PENDING_ANCHOR,
-	};
-
 	return (
 		<AddReactionButton
-			target={ target }
 			label={ __( 'React to block' ) }
 			className="editor-block-reactions-toolbar-button"
 			disabled={ disabled }
@@ -126,7 +107,6 @@ export function SelectedBlockReactionsToolbarButton( {
 		<NoteIconToolbarSlotFill.Fill>
 			<BlockReactionsToolbarButton
 				clientId={ clientId }
-				reactionsId={ reactionsId }
 				// A classic block has no block-level anchor to write, and a
 				// locked block cannot take a new one.
 				disabled={ isClassic || ( ! reactionsId && ! canEdit ) }

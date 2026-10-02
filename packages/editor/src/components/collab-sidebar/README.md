@@ -25,11 +25,19 @@ collab-sidebar/
 ├── add-note-menu-item.jsx           AddNoteMenuItem - block-toolbar "Add note" trigger
 ├── note-indicator-toolbar.jsx       NoteAvatarIndicator - toolbar participants avatars
 ├── floating-container.jsx           FloatingContainer - stack wrapper that applies `top` in floating mode
-├── reaction-display.tsx             ReactionDisplay - reaction pills for a note or block target
-├── add-reaction-picker.tsx          AddReactionButton - add-reaction trigger opening the emoji picker
 ├── block-reactions-row.tsx          BlockReactionsRow - a block's own reactions (icon + pills + trigger)
 ├── block-reactions-entry.tsx        BlockReactionsEntry - sidebar entry for a block with reactions but no note
 ├── block-reactions-toolbar-button.tsx  BlockReactionsToolbarButton - block-toolbar "React to block" trigger
+│
+├── reactions/                       emoji reactions on a note
+│   ├── use-reaction.ts              useReaction( note ) - the note's `reaction_summary` + toggleReaction
+│   ├── reaction-display.tsx         ReactionDisplay - reaction pills for a note or block target
+│   ├── add-reaction-button.tsx      AddReactionButton - the picker's popover trigger
+│   ├── emoji-picker.tsx             EmojiPicker - Autocomplete grid over the Emojibase dataset
+│   ├── skin-tone-picker.tsx         SkinTonePicker - default skin tone preference flyout
+│   ├── emojibase-data.ts            Emojibase dataset loading, labels, and settings
+│   ├── frequent-emojis.ts           useFrequentEmojis - persisted "Frequently used" section
+│   └── reaction-emojis.ts           named reaction set, storage keys, and the site's emoji rules
 │
 ├── hooks.js                        useNoteThreads, useNoteActions, useNoteSelection, useFloatingBoard, useEnableFloatingSidebar
 ├── use-block-reactions.ts          useBlockReactionSummary, useBlockReactionActions
