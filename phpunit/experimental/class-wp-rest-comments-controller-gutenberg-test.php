@@ -697,7 +697,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	/**
 	 * @dataProvider data_invalid_reaction_inputs
 	 *
-	 * @param string $parent_kind  One of 'none', 'note', or 'comment' — what the
+	 * @param string $parent_kind  One of 'none', 'note', or 'comment' - what the
 	 *                             reaction's `parent` field references.
 	 * @param string|array $content The reaction storage key (slug) to submit,
 	 *                              as a string or as `{ raw }`.
@@ -766,9 +766,10 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
-	 * A pick from the full emoji picker that is not in the curated list is
-	 * submitted as a lowercase hex code-point sequence, which the picker
-	 * decodes back into the emoji. Those keys must round-trip through create.
+	 * A pick from the emoji picker that is not in the named list is
+	 * submitted as a lowercase hex code-point sequence, which the reaction
+	 * pill decodes back into the emoji. Those keys must round-trip through
+	 * create.
 	 *
 	 * @dataProvider data_valid_reaction_hex_keys
 	 *
@@ -1361,7 +1362,8 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
-	 * Core cascades a trashed note to its `note` children only.
+	 * Core cascades a trashed note to its `note` children only, so
+	 * reactions need their own trash and restore cascade.
 	 */
 	public function test_trashing_note_trashes_and_restores_its_reactions() {
 		if ( ! EMPTY_TRASH_DAYS ) {

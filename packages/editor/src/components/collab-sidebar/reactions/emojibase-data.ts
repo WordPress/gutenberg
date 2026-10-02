@@ -5,8 +5,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /*
  * Emojibase loading shared by the picker and the reaction pills (labels
- * only). Kept dependency-light so importing it does not pull the picker
- * UI along.
+ * only).
  */
 
 /**
@@ -277,7 +276,7 @@ export function useEmojibaseData(
 /**
  * Normalize an Emojibase hexcode (`2764-FE0F`) to the reaction storage key
  * form: lowercase, four-digit padded, U+FE0F stripped (`2764`). Must agree
- * with `emojiToHexKey()` in `reaction-emoji-picker.tsx`.
+ * with `emojiToHexKey()` in `reaction-emojis.ts`.
  *
  * @param hexcode Emojibase hexcode.
  * @return Normalized hex key.

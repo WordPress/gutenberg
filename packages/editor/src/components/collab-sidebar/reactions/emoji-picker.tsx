@@ -258,8 +258,8 @@ export default function EmojiPicker( {
 	const [ isOpen, setIsOpen ] = useState( false );
 	/*
 	 * Every note renders a trigger, so hold the dataset fetch until the
-	 * user reaches for one: hovering or focusing it warms the data before
-	 * the popup opens.
+	 * user reaches for one: hovering, focusing, or opening it warms the
+	 * data, ideally before the popup opens.
 	 */
 	const [ isWarm, setIsWarm ] = useState( false );
 	const warm = () => setIsWarm( true );
