@@ -29,6 +29,7 @@ import EditSectionButton from './edit-section-button';
 import { unlock } from '../../lock-unlock';
 import { deviceTypeKey } from '../../store/private-keys';
 import BlockToolbarIcon from './block-toolbar-icon';
+import RemoveBlockButton from './remove-block-button';
 import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
 
 /**
@@ -305,6 +306,7 @@ export function PrivateBlockToolbar( {
 						</>
 					) }
 				<BlockEditVisuallyButton clientIds={ blockClientIds } />
+				<RemoveBlockButton clientIds={ blockClientIds } />
 				<BlockSettingsMenu clientIds={ blockClientIds } />
 			</div>
 		</NavigableToolbar>

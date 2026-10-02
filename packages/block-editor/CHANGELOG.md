@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   Block Toolbar: Add a Delete button to the block toolbar of every block, next to the Options menu. It is disabled when the selected block or blocks cannot be removed ([#83549](https://github.com/WordPress/gutenberg/pull/83549)).
 -   Inserter: Open faster when many block types are registered ([#83446](https://github.com/WordPress/gutenberg/pull/83446)).
 -   State control badges: migrate from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Badge` ([#82608](https://github.com/WordPress/gutenberg/pull/82608)).
 -   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
