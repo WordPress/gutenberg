@@ -1,5 +1,4 @@
-import { __, _x } from '@wordpress/i18n';
-import { Button, Composite } from '@wordpress/components';
+import { _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 // @ts-expect-error - No type declarations available for @wordpress/block-editor
@@ -12,10 +11,6 @@ export interface CuratedEmoji {
 	emoji: string;
 	label: string;
 	value: string;
-}
-
-interface ReactionEmojiPickerProps {
-	onSelect: ( slug: string ) => void;
 }
 
 /**
@@ -291,50 +286,4 @@ export function buildEmojiBySlugMap(
 	emojis: CuratedEmoji[] = REACTION_EMOJIS
 ): Map< string, CuratedEmoji > {
 	return new Map( emojis.map( ( entry ) => [ entry.value, entry ] ) );
-}
-
-/**
- * A row of curated emoji buttons: the fallback picker used when no
- * Emojibase URL is configured.
- *
- * @param props          Component props.
- * @param props.onSelect Called with the chosen slug when the user picks a
- *                       curated emoji.
- */
-export default function ReactionEmojiPicker( {
-	onSelect,
-}: ReactionEmojiPickerProps ) {
-	const emojis = useReactionEmojis();
-
-	return (
-		<Composite
-			/*
-			 * A labelled group, not a listbox: picking closes the popover, so
-			 * there is no selected option to expose. `Composite` is here only
-			 * for the roving tab index.
-			 *
-			 * No `orientation`: the list can wrap into rows or stack into a
-			 * column, so both axes must move focus.
-			 */
-			role="group"
-			aria-label={ __( 'Add an emoji reaction' ) }
-			className="editor-collab-sidebar-panel__emoji-picker"
-		>
-			{ emojis.map( ( { emoji, label, value } ) => (
-				<Composite.Item
-					key={ value }
-					render={
-						<Button
-							size="compact"
-							onClick={ () => onSelect( value ) }
-							aria-label={ label }
-							className="editor-collab-sidebar-panel__emoji-option"
-						/>
-					}
-				>
-					{ emoji }
-				</Composite.Item>
-			) ) }
-		</Composite>
-	);
 }
