@@ -242,7 +242,6 @@
 			justify-content: center;
 			gap: var(--wpds-dimension-gap-xs);
 			min-width: 0;
-			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
 		.prefix-icon {
@@ -278,6 +277,24 @@
 			min-width: 0;
 		}
 
+		/*
+		 * Descriptions take their own row so suffixes, shortcuts and chevrons
+		 * stay centered on the label line. An item's own prefix pulls them out
+		 * to the prefix column.
+		 */
+		.item-descriptions {
+			grid-row: 2;
+			grid-column: content-start / content-end;
+			display: flex;
+			flex-direction: column;
+			min-width: 0;
+			pointer-events: none;
+
+			&.has-prefix {
+				grid-column: prefix-start / content-end;
+			}
+		}
+
 		.item-label {
 			--_gcd-heading-color: currentColor;
 			--_gcd-p-line-height: var(--_wp-ui-menu-item-label-line-height);
@@ -295,6 +312,13 @@
 			overflow-wrap: anywhere;
 			/* For better optical alignment and spacing */
 			padding-block-end: var(--wpds-dimension-padding-xs);
+		}
+
+		/* Match `Menu.ItemDescription`, which uses the `body-sm` text variant. */
+		.item-suffix,
+		.item-shortcut {
+			font-size: var(--wpds-typography-font-size-sm);
+			line-height: var(--wpds-typography-line-height-xs);
 		}
 
 		.item-suffix {
@@ -352,13 +376,11 @@
 			content: "\2196";
 		}
 
-		.item[data-highlighted]:not([aria-disabled="true"]) .item-prefix,
 		.item[data-highlighted]:not([aria-disabled="true"]) .item-description,
 		.item[data-highlighted]:not([aria-disabled="true"]) .item-suffix,
 		.item[data-highlighted]:not([aria-disabled="true"]) .item-shortcut,
 		.item[data-highlighted]:not([aria-disabled="true"]) .item-trailing,
 		.item[data-highlighted]:not([aria-disabled="true"]) .item-selection-indicator,
-		.item[aria-disabled="true"] .item-prefix,
 		.item[aria-disabled="true"] .item-description,
 		.item[aria-disabled="true"] .item-suffix,
 		.item[aria-disabled="true"] .item-shortcut,
