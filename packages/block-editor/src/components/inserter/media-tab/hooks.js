@@ -113,31 +113,6 @@ export function useMediaResults( category, query = {}, refreshKey ) {
 	};
 }
 
-/**
- * Delays surfacing a loading state until a request has been in flight for
- * `delay` ms, so brief operations (e.g. a quick attach/detach refetch) don't
- * flash a loading indicator at all. Mirrors the DataViews `useDelayedLoading`
- * hook.
- *
- * @param {boolean} isLoading Whether a request is currently in flight.
- * @param {number}  delay     Milliseconds to wait before showing the loader.
- * @return {boolean} Whether the loading state should be shown yet.
- */
-export function useDelayedLoading( isLoading, delay = 400 ) {
-	const [ showLoading, setShowLoading ] = useState( false );
-	useEffect( () => {
-		if ( ! isLoading ) {
-			return undefined;
-		}
-		const timeout = setTimeout( () => setShowLoading( true ), delay );
-		return () => {
-			clearTimeout( timeout );
-			setShowLoading( false );
-		};
-	}, [ isLoading, delay ] );
-	return showLoading;
-}
-
 export function useMediaCategories( rootClientId ) {
 	const [ categories, setCategories ] = useState( [] );
 

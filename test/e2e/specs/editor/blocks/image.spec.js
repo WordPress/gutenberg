@@ -365,18 +365,25 @@ test.describe( 'Image', () => {
 
 			await blockLibrary.getByRole( 'tab', { name: 'Media' } ).click();
 
-			await blockLibrary
+			// Each media source is a collapsible panel, and clicking the open
+			// one closes it, so only click when it's collapsed.
+			const openverse = blockLibrary
 				.getByRole( 'tabpanel', { name: 'Media' } )
-				.getByRole( 'tab', { name: 'Openverse' } )
-				.click();
+				.getByRole( 'button', { name: 'Openverse' } );
+
+			if (
+				( await openverse.getAttribute( 'aria-expanded' ) ) === 'false'
+			) {
+				await openverse.click();
+			}
 		}
 
 		await openMediaTab();
 
-		// Drag the first image from the media library into the image block.
+		// Drag the first image from the media grid into the image block.
 		await blockLibrary
-			.getByRole( 'listbox', { name: 'Media List' } )
-			.getByRole( 'option' )
+			.getByRole( 'grid' )
+			.locator( '.block-editor-inserter__media-grid__preview' )
 			.first()
 			.dragTo( imageBlock, { steps: 3 } );
 
@@ -406,10 +413,10 @@ test.describe( 'Image', () => {
 
 		await openMediaTab();
 
-		// Drag the second image from the media library into the image block.
+		// Drag the second image from the media grid into the image block.
 		await blockLibrary
-			.getByRole( 'listbox', { name: 'Media List' } )
-			.getByRole( 'option' )
+			.getByRole( 'grid' )
+			.locator( '.block-editor-inserter__media-grid__preview' )
 			.nth( 1 )
 			.dragTo( imageBlock, { steps: 3 } );
 
