@@ -248,13 +248,13 @@
 		"label": "Caution",
 		"filePath": "library/caution.svg",
 		"collections": [ "core" ],
-		"keywords": [ "alert", "warning" ]
+		"keywords": [ "alert", "exclamation", "warning" ]
 	},
 	{
 		"slug": "caution-filled",
 		"label": "Caution Filled",
 		"filePath": "library/caution-filled.svg",
-		"keywords": [ "alert", "warning" ]
+		"keywords": [ "alert", "exclamation", "warning" ]
 	},
 	{
 		"slug": "chart-bar",
@@ -566,7 +566,7 @@
 		"label": "File",
 		"filePath": "library/file.svg",
 		"collections": [ "core" ],
-		"keywords": [ "folder" ]
+		"keywords": [ "archive", "document", "folder" ]
 	},
 	{
 		"slug": "filter",
@@ -931,7 +931,7 @@
 		"slug": "lifesaver",
 		"label": "Lifesaver",
 		"filePath": "library/lifesaver.svg",
-		"keywords": [ "buoy" ]
+		"keywords": [ "buoy", "ring" ]
 	},
 	{
 		"slug": "line-dashed",
@@ -1432,7 +1432,7 @@
 		"slug": "seen",
 		"label": "Seen",
 		"filePath": "library/seen.svg",
-		"keywords": [ "show", "visible", "eye" ]
+		"keywords": [ "eye", "show", "visible" ]
 	},
 	{
 		"slug": "send",
