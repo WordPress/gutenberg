@@ -79,7 +79,6 @@ function gutenberg_record_edit_root_attachment_id( $new_image_meta, $new_attachm
 
 	return $new_image_meta;
 }
-add_filter( 'wp_edited_image_metadata', 'gutenberg_record_edit_root_attachment_id', 10, 3 );
 
 /**
  * Registers `edit_root` as a REST field on the attachment schema.
@@ -114,7 +113,6 @@ function gutenberg_register_edit_root_field() {
 		)
 	);
 }
-add_action( 'rest_api_init', 'gutenberg_register_edit_root_field' );
 
 /**
  * Resolves the `edit_root` field value for a REST response.
@@ -196,7 +194,6 @@ function gutenberg_add_edit_root_link( $response, $post, $request ) {
 
 	return $response;
 }
-add_filter( 'rest_prepare_attachment', 'gutenberg_add_edit_root_link', 10, 3 );
 
 /**
  * Clear `_wp_attachment_edit_root_id` from descendants when their
@@ -232,4 +229,17 @@ function gutenberg_clear_edit_root_attachment_id_on_delete( $attachment_id ) {
 		true
 	);
 }
-add_action( 'delete_attachment', 'gutenberg_clear_edit_root_attachment_id_on_delete' );
+
+// Register only when core doesn't ship the edit-root lineage itself
+// (WordPress 7.2, https://github.com/WordPress/wordpress-develop/pull/13303):
+// core defines `wp_get_edit_root_attachment_id()` in `post.php`, loaded
+// before any plugin, so its presence means core already records the
+// meta, exposes the field and link, and cleans up on delete. The
+// functions above stay defined either way — the test suite calls them
+// directly — only the duplicate registrations are skipped.
+if ( ! function_exists( 'wp_get_edit_root_attachment_id' ) ) {
+	add_filter( 'wp_edited_image_metadata', 'gutenberg_record_edit_root_attachment_id', 10, 3 );
+	add_action( 'rest_api_init', 'gutenberg_register_edit_root_field' );
+	add_filter( 'rest_prepare_attachment', 'gutenberg_add_edit_root_link', 10, 3 );
+	add_action( 'delete_attachment', 'gutenberg_clear_edit_root_attachment_id_on_delete' );
+}
