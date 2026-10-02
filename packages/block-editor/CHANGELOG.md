@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `useBackgroundProps` and `getBackgroundClassesAndStyles`, and honour `background.__experimentalSkipSerialization` in the editor ([#83943](https://github.com/WordPress/gutenberg/pull/83943)).
+
 ### Enhancements
 
 -   Inserter: Open faster when many block types are registered ([#83446](https://github.com/WordPress/gutenberg/pull/83446)).
