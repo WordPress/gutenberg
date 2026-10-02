@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import {
@@ -51,6 +51,8 @@ export function NoteThread( {
 	);
 	const floatingRef = useRef( null );
 	const isKeyboardTabbingRef = useRef( false );
+	// Minimized threads expand only while focused, not on block selection.
+	const [ hasFocus, setHasFocus ] = useState( false );
 
 	const registerThread = floating?.registerThread;
 	const unregisterThread = floating?.unregisterThread;
@@ -82,6 +84,7 @@ export function NoteThread( {
 	 * React tree. It also ignores window/tab blur.
 	 */
 	const focusOutside = useFocusOutside( ( event ) => {
+		setHasFocus( false );
 		// When another note is clicked, do nothing because the current note is automatically closed.
 		const isNoteFocused = event.relatedTarget?.closest(
 			'.editor-collab-sidebar-panel__thread'
@@ -118,6 +121,7 @@ export function NoteThread( {
 	function onFocus( event ) {
 		// Cancel any pending deselect and highlight the related block.
 		focusOutside.onFocus( event );
+		setHasFocus( true );
 		debouncedToggleBlockHighlight.cancel();
 		toggleBlockHighlight( note.blockClientId, true );
 	}
@@ -189,6 +193,7 @@ export function NoteThread( {
 			}
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
 				'is-selected': isSelected,
+				'has-focus': hasFocus,
 			} ) }
 			id={ `note-thread-${ note.id }` }
 			gap="md"

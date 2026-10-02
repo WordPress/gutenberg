@@ -1,18 +1,63 @@
+@use "@wordpress/base-styles/animations" as *;
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 
-.interface-interface-skeleton__sidebar:has(.editor-collab-sidebar) {
-	box-shadow: none;
+// Threads collapse to avatar pills, showing the author on hover or focus.
+// Selecting the block only highlights its thread; focusing it expands it.
+@mixin minimized-threads {
+	.editor-collab-sidebar-panel__thread.is-floating:not(.is-selected.has-focus) {
+		left: auto;
+		padding: $grid-unit-10;
+
+		.editor-collab-sidebar-panel__deleted-block-notice,
+		.editor-collab-sidebar-panel__more-reply-separator,
+		.editor-collab-sidebar-panel__note ~ .editor-collab-sidebar-panel__note,
+		.editor-collab-sidebar-panel__note > :not(:first-child),
+		.editor-collab-sidebar-panel__note-actions {
+			display: none;
+		}
+
+		.editor-collab-sidebar-panel__user-info {
+			white-space: nowrap;
+		}
+
+		&:not(:hover, :focus-within) .editor-collab-sidebar-panel__user-info {
+			display: none;
+		}
+	}
 }
 
-.editor-collab-sidebar__header {
-	display: none;
-}
-
-.editor-collab-sidebar {
+// Pointer events pass through to the canvas, except on threads.
+.editor-collab-sidebar-overlay {
 	height: 100%;
-	overflow: hidden;
+	// Fades in while "All notes" closes, so notes don't show twice.
+	@include animation__fade-in(var(--wpds-motion-duration-lg), 0s, var(--wpds-motion-easing-balanced));
+
+	&.is-minimized {
+		@include minimized-threads;
+	}
+
+	// The canvas margin's compact tier. Keep in sync with `canvas-margin.js`.
+	@container (width < 880px) {
+		@include minimized-threads;
+	}
+
+	// The canvas draws the divider.
+	.editor-collab-sidebar-panel {
+		border-left: 0;
+	}
+
+	// The margin spans the canvas scrollbar; shift the panel off it.
+	.editor-resizable-editor.has-canvas-margin & .editor-collab-sidebar-panel {
+		margin-inline-start: calc(-1 * var(--canvas-scrollbar-width, 0px));
+		margin-inline-end: var(--canvas-scrollbar-width, 0px);
+	}
+
+	.editor-collab-sidebar-panel__thread,
+	.editor-collab-sidebar-panel__add-note {
+		pointer-events: auto;
+	}
 }
 
 .editor-collab-sidebar-panel {
