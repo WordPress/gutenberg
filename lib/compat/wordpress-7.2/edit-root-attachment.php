@@ -176,6 +176,18 @@ function gutenberg_add_edit_root_link( $response, $post, $request ) {
 		return $response;
 	}
 
+	// Only advertise a link the requester could actually follow: skip
+	// when the edit root no longer exists or the requester cannot read
+	// it, matching core's guard on the `featured_media` link. The
+	// `edit_root` field itself still carries the stored id — the link
+	// is a promise that `?_embed` can hydrate it, the field is not.
+	if (
+		'publish' !== get_post_status( $edit_root_id ) &&
+		! current_user_can( 'read_post', $edit_root_id )
+	) {
+		return $response;
+	}
+
 	// Mirror `featured_media`: an embeddable link so clients can
 	// hydrate the edit root attachment with `?_embed`. Core fires
 	// `rest_prepare_attachment` twice per attachment — once from the

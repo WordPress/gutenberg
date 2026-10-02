@@ -128,6 +128,27 @@ class Gutenberg_Edit_Root_Attachment_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_stale_edit_root_id_keeps_field_but_omits_link() {
+		$child = $this->make_attachment();
+		update_post_meta(
+			$child,
+			GUTENBERG_EDIT_ROOT_ATTACHMENT_ID_META_KEY,
+			123456789
+		);
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/media/' . $child );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_do_request( $request );
+
+		// The field trusts the stored meta; the link is only advertised
+		// when the target exists and is readable.
+		$this->assertSame( 123456789, $response->get_data()['edit_root'] );
+		$this->assertArrayNotHasKey(
+			'https://api.w.org/edit-root',
+			$response->get_links()
+		);
+	}
+
 	public function test_field_limited_request_omits_link() {
 		$edit_root = $this->make_attachment();
 		$child     = $this->make_attachment( $edit_root );
