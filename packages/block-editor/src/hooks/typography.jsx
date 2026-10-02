@@ -272,9 +272,16 @@ export function TypographyPanel( {
 		: ( newStyle ) => {
 				const newAttributes = styleToAttributes( newStyle );
 
+				const setsTextGradient =
+					'text' === newStyle?.background?.backgroundClip;
+				const hadTextGradient =
+					'text' === style?.background?.backgroundClip;
+
 				// Only a text gradient belongs to this panel, so any other
-				// gradient goes back exactly as the block had it.
-				if ( 'text' !== newStyle?.background?.backgroundClip ) {
+				// gradient goes back exactly as the block had it. A block that
+				// already had one is this panel clearing its own value, which
+				// is not a gradient to put back.
+				if ( ! setsTextGradient && ! hadTextGradient ) {
 					newAttributes.style = cleanEmptyObject( {
 						...newAttributes.style,
 						background: {
@@ -286,7 +293,7 @@ export function TypographyPanel( {
 							gradient: style?.color?.gradient,
 						},
 					} );
-				} else if ( gradient ) {
+				} else if ( setsTextGradient && gradient ) {
 					// A preset gradient paints the whole block through the
 					// `background` shorthand, which resets the clip the text
 					// gradient depends on. The text gradient replaces it.
@@ -350,7 +357,6 @@ export function TypographyPanel( {
 			blockName={ name }
 			value={ value }
 			baseValue={ isStateSelected ? baseValue : undefined }
-			styleState={ selectedState }
 			onChange={ onChange }
 			defaultControls={ defaultControls }
 			contrastWarning={ contrastWarning }
