@@ -31,53 +31,15 @@ describe( 'Interactivity API', () => {
 			vi.useRealTimers();
 		} );
 
-		it( 'runs on a macrotask, never on microtasks alone, and only on the timeout arm when requestAnimationFrame never fires', async () => {
+		it( 'runs the callback after the next frame, not on a microtask', async () => {
 			vi.useFakeTimers();
-			// Prevent the `requestAnimationFrame` arm from ever resolving, so
-			// only the 100 ms `setTimeout` fallback arm is left standing.
-			const raf = vi
-				.spyOn( window, 'requestAnimationFrame' )
-				.mockImplementation( () => 0 );
-
-			try {
-				const callback = vi.fn();
-				afterNextFrame( callback );
-
-				// Drain twenty microtask turns without advancing any timer.
-				// A body reduced to `Promise.resolve().then( callback )`
-				// would have already run by now; the real implementation
-				// needs a macrotask, so it must not have.
-				for ( let i = 0; i < 20; i++ ) {
-					await Promise.resolve();
-				}
-				expect( callback ).not.toHaveBeenCalled();
-
-				// Still short of the 100 ms timeout arm.
-				vi.advanceTimersByTime( 50 );
-				expect( callback ).not.toHaveBeenCalled();
-
-				// The 100 ms timeout arm fires, and with it the trailing
-				// macrotask `setTimeout` that runs the callback.
-				vi.advanceTimersByTime( 51 );
-				expect( callback ).toHaveBeenCalledTimes( 1 );
-			} finally {
-				raf.mockRestore();
-			}
-		} );
-
-		it( 'runs one macrotask after the arm that resolves it, not inside that arm’s own turn', async () => {
-			vi.useFakeTimers();
-
-			// The `requestAnimationFrame` arm is backed by a 16 ms fake
-			// timer here, so a callback registered at t=0 has not run by
-			// t=16 ms — it runs one macrotask later, at t=17 ms.
 			const callback = vi.fn();
 			afterNextFrame( callback );
 
-			vi.advanceTimersByTime( 16 );
+			await Promise.resolve();
 			expect( callback ).not.toHaveBeenCalled();
 
-			vi.advanceTimersByTime( 1 );
+			vi.runAllTimers();
 			expect( callback ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );

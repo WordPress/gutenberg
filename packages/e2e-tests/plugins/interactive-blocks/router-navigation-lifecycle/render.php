@@ -70,7 +70,7 @@ if ( isset( $attributes['secondRegionId'] ) ) {
 			?>
 			<?php
 			/*
-			 * FIXTURE TRAP: `data-wp-interactive` is repeated here even
+			 * Note: `data-wp-interactive` is repeated here even
 			 * though the outer wrapper above already carries it. Do not
 			 * "simplify" this away. The directive runtime's own hydration
 			 * resolves the namespace from any ancestor, so omitting it here
@@ -206,7 +206,7 @@ if ( isset( $attributes['secondRegionId'] ) ) {
 			 * `inner-region`. Both posts using `nested` render the same
 			 * two ids, so the router updates both regions on navigation.
 			 *
-			 * FIXTURE TRAP (see above): both the outer and the inner
+			 * Note (see above): both the outer and the inner
 			 * region element carry `data-wp-interactive` on *themselves*,
 			 * not only on an ancestor -- `regionsSelector` requires it on
 			 * the region-bearing element itself.

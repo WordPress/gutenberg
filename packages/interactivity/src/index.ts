@@ -53,7 +53,7 @@ const requiredConsent =
 
 export const privateApis = (
 	lock: 'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
-): any => {
+) => {
 	if ( lock === requiredConsent ) {
 		return {
 			getRegionRootFragment,

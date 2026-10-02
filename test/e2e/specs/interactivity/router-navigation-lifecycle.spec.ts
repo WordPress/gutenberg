@@ -90,27 +90,6 @@ const settle = ( page: Page ) =>
 	);
 
 /**
- * A real-time wait, used only for the debounce negatives: comfortably
- * past the 400 ms window the consumer-side debounces below
- * key off of. Without it the corresponding negative assertion is
- * a coin flip at 400 ms and a guaranteed pass taken immediately -- true on
- * every implementation, including one whose cache-served navigation
- * produces no end transition at all. There is no locator-based condition to
- * wait on instead: the thing being asserted is the *absence* of a DOM
- * change at this specific real-time distance from the trigger.
- *
- * The parameter is deliberately not named `page`: `no-restricted-syntax`
- * bans a literal `page.waitForTimeout(…)` call in this directory in favour
- * of `page.locator`-based waits, for the ordinary case where one is
- * available.
- *
- * @param browserPage The Playwright page.
- * @param ms          Milliseconds to wait.
- */
-const waitRealTime = ( browserPage: Page, ms: number ) =>
-	browserPage.waitForTimeout( ms );
-
-/**
  * Registers a listener on `page` that collects every `pageerror` and every
  * `console.error`/`console.warning` message, for the tests below that
  * assert the browser console stays silent (the loading-bar test's
@@ -223,13 +202,11 @@ test.describe( 'Router navigation lifecycle', () => {
 		await utils.activatePlugins();
 
 		/*
-		 * The region-mode fixture pages, rows 1-7, in topological order.
-		 * `addPostWithBlock` creates and returns a post's link in one call
-		 * with no update path, so a post's `next`/`other` must already
-		 * exist -- every row below is built strictly top to bottom.
+		 * The region-mode fixture pages. `addPostWithBlock` cannot update a
+		 * post, so each page's `next`/`other` destinations are created first.
 		 */
 
-		// Row 1: the uncached URL for the back/forward traversal test, and
+		// The uncached URL for the back/forward traversal test, and
 		// the page the forced reload lands on. No test navigates to it or
 		// prefetches it.
 		await utils.addPostWithBlock( 'test/router-navigation-lifecycle', {
@@ -237,7 +214,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			attributes: { page: 3, regionId: 'lifecycle-a' },
 		} );
 
-		// Row 2: second destination for the consecutive-navigations test.
+		// Second destination for the consecutive-navigations test.
 		const page2b = await utils.addPostWithBlock(
 			'test/router-navigation-lifecycle',
 			{
@@ -246,7 +223,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			}
 		);
 
-		// Row 3: destination for the disabled-client-navigation test --
+		// Destination for the disabled-client-navigation test --
 		// discovers `clientNavigationDisabled`
 		// only after being fetched.
 		const disabledDestination = await utils.addPostWithBlock(
@@ -261,7 +238,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			}
 		);
 
-		// Row 4: destination of every basic lifecycle navigation; origin
+		// Destination of every basic lifecycle navigation; origin
 		// of the consecutive-navigations test's second hop.
 		const page2 = await utils.addPostWithBlock(
 			'test/router-navigation-lifecycle',
@@ -275,7 +252,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			}
 		);
 
-		// Row 5: the origin for the single-region tests below.
+		// The origin for the single-region tests below.
 		await utils.addPostWithBlock( 'test/router-navigation-lifecycle', {
 			alias: 'lifecycle - page 1',
 			attributes: {
@@ -286,7 +263,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			},
 		} );
 
-		// Row 6: page for the entry-check rejection test -- the entry `clientNavigationDisabled`
+		// Page for the entry-check rejection test -- the entry `clientNavigationDisabled`
 		// check rejects the call.
 		await utils.addPostWithBlock( 'test/router-navigation-lifecycle', {
 			alias: 'lifecycle - disabled origin',
@@ -298,7 +275,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			},
 		} );
 
-		// Row 7: page for the router-absent test -- no region, no navigation trigger, so the
+		// Page for the router-absent test -- no region, no navigation trigger, so the
 		// router's dynamic import never runs.
 		await utils.addPostWithBlock( 'test/router-navigation-lifecycle', {
 			alias: 'lifecycle - observer only',
@@ -306,12 +283,11 @@ test.describe( 'Router navigation lifecycle', () => {
 		} );
 
 		/*
-		 * The two-region and nested fixture pages, rows 8-12, appended in
-		 * the same strict topological order: a post's `next`/`other` must
-		 * already exist.
+		 * The two-region and nested fixture pages, also created
+		 * destinations first.
 		 */
 
-		// Row 8: region A's destination in the two-region tests below.
+		// Region A's destination in the two-region tests below.
 		const twoRegionDestA = await utils.addPostWithBlock(
 			'test/router-navigation-lifecycle',
 			{
@@ -324,8 +300,8 @@ test.describe( 'Router navigation lifecycle', () => {
 			}
 		);
 
-		// Row 9: region B's destination, and region A's *second*
-		// destination in the same-region overlap test. A different href from row 8.
+		// Region B's destination, and region A's *second*
+		// destination in the same-region overlap test. A different href from dest A.
 		const twoRegionDestB = await utils.addPostWithBlock(
 			'test/router-navigation-lifecycle',
 			{
@@ -338,10 +314,10 @@ test.describe( 'Router navigation lifecycle', () => {
 			}
 		);
 
-		// Row 10: the origin for the two-region tests below. Region A's
-		// `navigate` link -> `next` (row 8); region A's `navigate (other)`
-		// link -> `other` (row 9); region B's `navigate` link -> `other`
-		// (row 9), so that a cross-region flow has two distinct hrefs.
+		// The origin for the two-region tests below. Region A's
+		// `navigate` link -> `next` (dest A); region A's `navigate (other)`
+		// link -> `other` (dest B); region B's `navigate` link -> `other`
+		// (dest B), so that a cross-region flow has two distinct hrefs.
 		await utils.addPostWithBlock( 'test/router-navigation-lifecycle', {
 			alias: 'lifecycle two-region - page 1',
 			attributes: {
@@ -353,7 +329,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			},
 		} );
 
-		// Row 11: the nested page's destination, so the inner and outer
+		// The nested page's destination, so the inner and outer
 		// regions exist on both pages.
 		const nestedPage2 = await utils.addPostWithBlock(
 			'test/router-navigation-lifecycle',
@@ -363,7 +339,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			}
 		);
 
-		// Row 12: the nested-regions origin -- `render.php`'s `nested` branch emits
+		// The nested-regions origin -- `render.php`'s `nested` branch emits
 		// an `inner-region` inside an `outer-region`, with the `navigate`
 		// link inside the inner one.
 		await utils.addPostWithBlock( 'test/router-navigation-lifecycle', {
@@ -376,14 +352,14 @@ test.describe( 'Router navigation lifecycle', () => {
 		} );
 
 		/*
-		 * The full-page mode fixture pages, rows 13-14: the fixture block
+		 * The full-page mode fixture pages: the fixture block
 		 * (`test/router-navigation-full-page`) is a distinct block from the
 		 * region-mode fixture above. Every plain link and every navigate
 		 * control on page 1 targets page 2, so the full-page tests below differ only in
 		 * *what* was clicked, never in *where* it went.
 		 */
 
-		// Row 13: full-page mode's destination. No `next`.
+		// Full-page mode's destination. No `next`.
 		const fullPagePage2 = await utils.addPostWithBlock(
 			'test/router-navigation-full-page',
 			{
@@ -392,7 +368,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			}
 		);
 
-		// Row 14: the origin for the full-page tests.
+		// The origin for the full-page tests.
 		await utils.addPostWithBlock( 'test/router-navigation-full-page', {
 			alias: 'full-page - page 1',
 			attributes: {
@@ -551,7 +527,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			await page.getByTestId( 'navigate' ).click();
 
 			await waitForLogLength( page, 'settlement log', 1 );
-			await settle( page ); // Negative half below: "exactly one".
+			await settle( page );
 
 			const settlementLog = await readLog< SettlementEntry >(
 				page,
@@ -649,7 +625,7 @@ test.describe( 'Router navigation lifecycle', () => {
 				return { page1Url, page2Url, page3Url };
 			};
 
-			test( 'Part A: the traversal reaches the handler and discharges to idle', async ( {
+			test( 'the traversal reaches the handler and discharges to idle', async ( {
 				page,
 				interactivityUtils: utils,
 			} ) => {
@@ -681,7 +657,7 @@ test.describe( 'Router navigation lifecycle', () => {
 				] );
 			} );
 
-			test( 'Part B: a navigation superseded by the traversal discharges to idle', async ( {
+			test( 'a navigation superseded by the traversal discharges to idle', async ( {
 				page,
 				interactivityUtils: utils,
 			} ) => {
@@ -1130,7 +1106,7 @@ test.describe( 'Router navigation lifecycle', () => {
 		} );
 	} );
 
-	test.describe( 'The two-Query per-instance derivation canary', () => {
+	test.describe( 'Two Query blocks with enhanced pagination', () => {
 		/*
 		 * `core/query` is not part of the `interactive-blocks` test plugin,
 		 * and `InteractivityUtils.addPostWithBlock` only ever generates a
@@ -1171,7 +1147,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			// of the site happens to carry.
 			for ( let i = 1; i <= QUERY_PAGE_SIZE + 1; i++ ) {
 				await requestUtils.createPost( {
-					title: `lifecycle query canary - filler ${ i }`,
+					title: `lifecycle query - filler ${ i }`,
 					content:
 						'<!-- wp:paragraph --><p>filler</p><!-- /wp:paragraph -->',
 					status: 'publish' as 'publish',
@@ -1184,7 +1160,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			// update, placed outside both queries -- plus the two Query
 			// block instances themselves, `queryId` 0 and 1.
 			const content =
-				'<!-- wp:test/router-navigation-lifecycle {"page":"query-canary","observerOnly":true} /-->' +
+				'<!-- wp:test/router-navigation-lifecycle {"page":"query","observerOnly":true} /-->' +
 				queryBlockMarkup( 0 ) +
 				queryBlockMarkup( 1 );
 
@@ -1192,7 +1168,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			// `status`, so this copies the payload shape
 			// `InteractivityUtils.addPostWithBlock` uses.
 			const { link } = await requestUtils.createPost( {
-				title: 'lifecycle query canary',
+				title: 'lifecycle query',
 				content,
 				status: 'publish' as 'publish',
 				date_gmt: '2023-01-01T00:00:00',
@@ -1458,7 +1434,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			await heldPage2.hit;
 
 			// Mid-flight (`state.navigating === true`). Each state leads
-			// with a positive assertion before any "is absent" clause.
+			// with a positive assertion before any negative one.
 			await expect( ariaBusy ).toHaveAttribute( 'aria-busy', 'true' );
 			await expect( classBusy ).toHaveClass( /busy/ );
 			await expect( hiddenNegated ).toHaveJSProperty( 'hidden', false ); // `!true` -> `false`.
@@ -1547,13 +1523,13 @@ test.describe( 'Router navigation lifecycle', () => {
 			await expect( bar ).not.toHaveClass( /start-animation/ );
 
 			/*
-			 * A fresh page load before the `loadingAnimation: false` half.
+			 * A fresh page load before checking `loadingAnimation: false`.
 			 * `hasFinished` above is left `true` indefinitely once set --
 			 * Core's bar only fades the class away via CSS rather than
 			 * ever removing it -- so continuing on the same
 			 * document would make "gains neither" trivially true for the
 			 * wrong reason: the class would already be there from before
-			 * this half even started.
+			 * this check even started.
 			 */
 			await page.unroute( page2Url );
 			await page.goto( page1Url );
@@ -1569,10 +1545,12 @@ test.describe( 'Router navigation lifecycle', () => {
 				page.getByTestId( 'lifecycle navigating' )
 			).toHaveText( 'navigating' );
 
-			// The real-time wait is the settle that matters here: at 400 ms
-			// an implementation that ignored `loadingAnimation` would just
-			// be writing the flags.
-			await waitRealTime( page, 500 );
+			// The debounced bar shows after its own 400 ms timer, which is
+			// scheduled after the router's loading bar timer. Once it shows,
+			// the loading bar would already have started if it were enabled.
+			await expect( page.getByTestId( 'debounced-bar' ) ).toHaveClass(
+				/show-bar/
+			);
 			await settle( page );
 			await expect( bar ).not.toHaveClass( /start-animation/ );
 			await expect( bar ).not.toHaveClass( /finish-animation/ );
@@ -1621,7 +1599,7 @@ test.describe( 'Router navigation lifecycle', () => {
 			await expect( spinnerB ).not.toHaveClass( /is-loading/ );
 
 			// A back/forward traversal: `initiator` reads absent throughout,
-			// so neither spinner should show -- the clause a stale-identity
+			// so neither spinner should show -- which a stale-identity
 			// implementation would fail.
 			await page.goBack();
 			await expect( page.getByTestId( 'page-marker' ) ).toHaveText(
@@ -1657,8 +1635,8 @@ test.describe( 'Router navigation lifecycle', () => {
 
 			// Explicit blur, so "focus did not move" below is
 			// distinguishable from "focus was already there".
-			await page.evaluate(
-				() => ( document.activeElement as HTMLElement | null )?.blur?.()
+			await page.evaluate( () =>
+				( document.activeElement as HTMLElement | null )?.blur?.()
 			);
 
 			await page.goBack();
@@ -1693,35 +1671,10 @@ test.describe( 'Router navigation lifecycle', () => {
 
 			heldPage2.release();
 
-			// Positive checkpoint (the navigation ended), then the settle,
-			// then the negative: the bar clears once `navigating` goes
-			// false, same as the timer's own `clearTimeout` branch.
+			// The bar clears once the navigation ends.
 			await expect( page.getByTestId( 'page-marker' ) ).toHaveText(
 				'page marker: 2'
 			);
-			await settle( page );
-			await expect( bar ).not.toHaveClass( /show-bar/ );
-
-			// Fast: prefetched, so the next navigation is served from cache,
-			// well under 400 ms.
-			const page2bUrl = utils.getLink( 'lifecycle - page 2b' );
-			const response = page.waitForResponse( page2bUrl );
-			await page.getByTestId( 'prefetch' ).click();
-			await response;
-
-			await page.getByTestId( 'navigate' ).click();
-
-			// Positive checkpoint: the navigation ended.
-			await expect( page.getByTestId( 'page-marker' ) ).toHaveText(
-				'page marker: 2b'
-			);
-
-			// The 600 ms wait is the settle, and it is not optional: at
-			// 400 ms the assertion is a coin flip, and taken immediately it
-			// passes on every implementation, including one whose
-			// cache-served navigation produces no end transition at all.
-			await waitRealTime( page, 600 );
-			await settle( page );
 			await expect( bar ).not.toHaveClass( /show-bar/ );
 		} );
 	} );

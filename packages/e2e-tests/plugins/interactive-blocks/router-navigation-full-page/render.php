@@ -56,7 +56,7 @@ $region_id = $attributes['regionId'] ?? '';
 
 	<?php
 	/*
-	 * FIXTURE TRAP (see `router-navigation-lifecycle/render.php` for the
+	 * Note (see `router-navigation-lifecycle/render.php` for the
 	 * full account): `data-wp-interactive` is repeated here even though the
 	 * outer wrapper above already carries it. `interactivity-router`'s own
 	 * region-detection selector requires the region-bearing element itself

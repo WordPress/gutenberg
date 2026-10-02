@@ -170,16 +170,14 @@ const { state } = store( 'router-navigation-lifecycle', {
 	actions: {
 		navigate: withSyncEvent( function* ( e ) {
 			e.preventDefault();
-			const { actions: router } = yield import(
-				'@wordpress/interactivity-router'
-			);
+			const { actions: router } =
+				yield import( '@wordpress/interactivity-router' );
 			yield router.navigate( e.target.href );
 		} ),
 		navigateSilent: withSyncEvent( function* ( e ) {
 			e.preventDefault();
-			const { actions: router } = yield import(
-				'@wordpress/interactivity-router'
-			);
+			const { actions: router } =
+				yield import( '@wordpress/interactivity-router' );
 			yield router.navigate( e.target.href, {
 				loadingAnimation: false,
 				screenReaderAnnouncement: false,
@@ -187,41 +185,36 @@ const { state } = store( 'router-navigation-lifecycle', {
 		} ),
 		refresh: withSyncEvent( function* ( e ) {
 			e.preventDefault();
-			const { actions: router } = yield import(
-				'@wordpress/interactivity-router'
-			);
+			const { actions: router } =
+				yield import( '@wordpress/interactivity-router' );
 			yield router.navigate( window.location.href, { force: true } );
 		} ),
 		navigateDeclared: withSyncEvent( function* ( e ) {
 			e.preventDefault();
-			const { actions: router } = yield import(
-				'@wordpress/interactivity-router'
-			);
+			const { actions: router } =
+				yield import( '@wordpress/interactivity-router' );
 			yield router.navigate( e.target.href, {
 				initiator: 'my-plugin/declared',
 			} );
 		} ),
 		navigateSuppressed: withSyncEvent( function* ( e ) {
 			e.preventDefault();
-			const { actions: router } = yield import(
-				'@wordpress/interactivity-router'
-			);
+			const { actions: router } =
+				yield import( '@wordpress/interactivity-router' );
 			yield router.navigate( e.target.href, { initiator: null } );
 		} ),
 		navigateTimeout: withSyncEvent( function* ( e ) {
 			e.preventDefault();
-			const { actions: router } = yield import(
-				'@wordpress/interactivity-router'
-			);
+			const { actions: router } =
+				yield import( '@wordpress/interactivity-router' );
 			yield router.navigate( e.target.href, {
 				timeout: NAVIGATE_TIMEOUT,
 			} );
 		} ),
 		prefetch: withSyncEvent( function* ( e ) {
 			e.preventDefault();
-			const { actions: router } = yield import(
-				'@wordpress/interactivity-router'
-			);
+			const { actions: router } =
+				yield import( '@wordpress/interactivity-router' );
 			yield router.prefetch( e.target.href );
 		} ),
 	},
@@ -246,7 +239,7 @@ const { state } = store( 'router-navigation-lifecycle', {
 		 * watcher's whole point is to observe the *committed* page rather
 		 * than any reactive value of its own.
 		 *
-		 * FIXTURE TRAP: `populateServerData()` merges each navigation's
+		 * Note: `populateServerData()` merges each navigation's
 		 * server state with `override: false`
 		 * (`packages/interactivity/src/proxies/state.ts:378-389`), so an
 		 * *existing* key such as `state.readout` is never overwritten
@@ -384,8 +377,7 @@ function persistLogBeforeUnload() {
  */
 window.addEventListener( '_test_navigate_scopeless_', async () => {
 	const link = document.querySelector( '[data-testid="navigate"]' );
-	const { actions: router } = await import(
-		'@wordpress/interactivity-router'
-	);
+	const { actions: router } =
+		await import( '@wordpress/interactivity-router' );
 	await router.navigate( link.href );
 } );

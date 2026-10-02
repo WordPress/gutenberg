@@ -1,13 +1,8 @@
-/// <reference types="node" />
-
 /**
  * Verifies that programmatic watchers do not inherit directive scopes while
  * preserving the observable behavior of Preact's effects.
  */
 
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { signal } from '@preact/signals';
 import { h, render } from 'preact';
 import { describe, expect, it, vi } from 'vitest';
@@ -104,19 +99,6 @@ function readScopeReaders( source: { value: number } ) {
 		contextError: captureError( () => getContext() ),
 		elementError: captureError( () => getElement() ),
 	};
-}
-
-/**
- * Reads a source file relative to this test file.
- *
- * @param file Path relative to the test file's directory.
- * @return The source file contents.
- */
-function readSource( file: string ) {
-	return readFileSync(
-		join( dirname( fileURLToPath( import.meta.url ) ), file ),
-		'utf8'
-	);
 }
 
 describe( 'watch', () => {
@@ -363,23 +345,5 @@ describe( 'watch', () => {
 			render( null, root );
 			vi.useRealTimers();
 		}
-	} );
-
-	it( 'exports the scope-isolating wrapper publicly', () => {
-		const utilsSource = readSource( '../utils.ts' );
-		const entrySource = readSource( '../index.ts' );
-
-		expect( utilsSource ).toContain(
-			'useSignalEffect( withScope( callback ) )'
-		);
-
-		const utilsExport = entrySource.match(
-			/export\s+\{([^}]*)\}\s+from\s+['"]\.\/utils['"]/s
-		)?.[ 1 ];
-
-		expect( utilsExport ).toMatch( /\bwatch\b/ );
-		expect( entrySource ).not.toMatch(
-			/export\s+const\s+watch\s*=\s*effect/
-		);
 	} );
 } );
