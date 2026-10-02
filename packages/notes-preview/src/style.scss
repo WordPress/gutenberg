@@ -192,6 +192,12 @@ html.wp-notes-preview-active {
 	// Long threads on short posts still need their reply box reachable.
 	max-height: 90vh;
 	overflow-y: auto;
+
+	// A scroll container clips the stripe to its padding box anyway; reaching
+	// past it into the border adds a pixel of overflow and a scroll bar.
+	&.is-selected::before {
+		inset-block: 0;
+	}
 }
 
 /**
