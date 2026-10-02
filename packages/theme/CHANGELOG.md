@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The `design-tokens.js` export now provides `tokens` (keyed by variable name, with `$description`, `$type`, `group`, and `modes.default` containing `$value` and `css`) and `groups` (keyed by source group) named exports, replacing the previous flat array default export ([#76604](https://github.com/WordPress/gutenberg/pull/76604)).
+
 ### Bug Fixes
 
 -   Avoid intercepting esbuild virtual modules, preserve root custom-property priorities on cleanup, and reject non-finite RGB seed channels while treating missing (`none`) RGB channels as zero. ([#83355](https://github.com/WordPress/gutenberg/pull/83355))

@@ -21,7 +21,7 @@ This README is the entry point for package consumers. It covers how to load desi
 | --- | --- |
 | `@wordpress/theme` | `ThemeProvider` and the generated token scale types, such as `PaddingSize` and `GapSize`. Derive provider props and callback types from the component as shown below. |
 | `@wordpress/theme/design-tokens.css` | Default semantic `--wpds-*` custom properties. Load once per document. |
-| `@wordpress/theme/design-tokens.js` | Default export containing the list of semantic CSS custom property names. It contains names, not token values, and does not load styles. |
+| `@wordpress/theme/design-tokens.js` | Named exports `tokens` and `groups`. `tokens` is keyed by CSS custom property name and includes `$description`, `$type`, `group`, and the default mode's `$value` and `css`. `groups` lists those names by source group. This module does not load styles. |
 | Build plugin subpaths | The four public integrations listed under [Build Plugins](#build-plugins). |
 | Stylelint plugin subpaths | The three public rules listed under [Stylelint Plugins](#stylelint-plugins). |
 
@@ -32,9 +32,9 @@ Runtime APIs supplied by WordPress follow its [backward compatibility policy](ht
 To inspect token names in development tooling:
 
 ```js
-import tokenNames from '@wordpress/theme/design-tokens.js';
+import { tokens } from '@wordpress/theme/design-tokens.js';
 
-const isKnownToken = tokenNames.includes( '--wpds-dimension-gap-sm' );
+const isKnownToken = Object.keys( tokens ).includes( '--wpds-dimension-gap-sm' );
 ```
 
 ## Design Tokens

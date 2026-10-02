@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react';
-import wpdsTokens from '../../prebuilt/js/design-tokens.mjs';
+import { tokens as wpdsTokens } from '../../prebuilt/js/design-tokens.mjs';
 
-const typographyTokens = wpdsTokens.filter( ( tokenName ) =>
+const typographyTokens = Object.keys( wpdsTokens ).filter( ( tokenName ) =>
 	tokenName.startsWith( '--wpds-typography-' )
 );
 
