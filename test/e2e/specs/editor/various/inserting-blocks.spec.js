@@ -465,6 +465,39 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await expect( blockLibrary ).toBeHidden();
 	} );
 
+	test( 'moves between inserter items with a roving tab index (-webkit)', async ( {
+		admin,
+		page,
+		pageUtils,
+	} ) => {
+		await admin.createNewPost();
+		await page
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
+			.click();
+
+		const textBlocks = page
+			.getByRole( 'region', { name: 'Block Library' } )
+			.getByRole( 'listbox', { name: 'Text' } );
+		const options = textBlocks.getByRole( 'option' );
+
+		await options.first().focus();
+		await expect( options.first() ).toHaveAttribute( 'tabindex', '0' );
+		await expect( options.nth( 1 ) ).toHaveAttribute( 'tabindex', '-1' );
+
+		// Tab leaves the list instead of walking through its items.
+		await page.keyboard.press( 'Tab' );
+		await expect( textBlocks.locator( ':focus' ) ).toHaveCount( 0 );
+
+		await pageUtils.pressKeys( 'shift+Tab' );
+		await expect( options.first() ).toBeFocused();
+
+		// Arrow keys move focus, and the tab stop follows it.
+		await page.keyboard.press( 'ArrowRight' );
+		await expect( options.nth( 1 ) ).toBeFocused();
+		await expect( options.nth( 1 ) ).toHaveAttribute( 'tabindex', '0' );
+		await expect( options.nth( 2 ) ).toHaveAttribute( 'tabindex', '-1' );
+	} );
+
 	test( 'should insert block with the slash inserter when using multiple words', async ( {
 		admin,
 		editor,

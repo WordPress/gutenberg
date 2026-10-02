@@ -21,18 +21,20 @@ import {
 
 const meta: Meta< typeof SearchableChipSelectControl > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/SearchableChipSelectControl',
+	title: 'Components/@wordpress-ui/Form/SearchableChipSelectControl',
+	id: 'design-system-components-form-searchablechipselectcontrol',
 	component: SearchableChipSelectControl,
-	// Temporary: Due to an upstream bug, render the root explicitly so the
-	// components manifest extractor can resolve props from the JSX.
-	//
-	// See: https://github.com/storybookjs/storybook/issues/34877
-	render: ( args ) => <SearchableChipSelectControl { ...args } />,
 	subcomponents: {
 		'SearchableChipSelectControl.Group': SearchableChipSelectControl.Group,
 		'SearchableChipSelectControl.GroupLabel':
 			SearchableChipSelectControl.GroupLabel,
+		'SearchableChipSelectControl.Separator':
+			SearchableChipSelectControl.Separator,
 		'SearchableChipSelectControl.Item': SearchableChipSelectControl.Item,
+		'SearchableChipSelectControl.ItemLabel':
+			SearchableChipSelectControl.ItemLabel,
+		'SearchableChipSelectControl.ItemDescription':
+			SearchableChipSelectControl.ItemDescription,
 		'SearchableChipSelectControl.ChipWithRemove':
 			SearchableChipSelectControl.ChipWithRemove,
 		'SearchableChipSelectControl.Collection':
@@ -61,6 +63,14 @@ export const Default: Story = {
 		...SearchableChipSelectStories.Default.args,
 		label: 'Label',
 		description: 'This is a description.',
+	},
+};
+
+export const WithItemDescriptions: Story = {
+	...SearchableChipSelectStories.WithItemDescriptions,
+	args: {
+		...SearchableChipSelectStories.WithItemDescriptions.args,
+		label: 'Fruit',
 	},
 };
 
@@ -283,6 +293,18 @@ export const Grouped: Story = {
 };
 
 /**
+ * Use `SearchableChipSelectControl.Separator` to set choices apart from each other.
+ */
+export const WithSeparator: Story = {
+	...SearchableChipSelectStories.WithSeparator,
+	args: {
+		...SearchableChipSelectStories.WithSeparator.args,
+		label: 'Fruit',
+		description: 'Choose your favorite fruits.',
+	},
+};
+
+/**
  * Grouped items with a creatable footer item. Include the creatable item in
  * `items` as a creatable-only group. Handle the creation of the item in
  * `onValueChange`.
@@ -349,7 +371,9 @@ export const GroupedCreatable: Story = {
 									key={ item.value }
 									value={ item }
 								>
-									{ item.label }
+									<SearchableChipSelectControl.ItemLabel>
+										{ item.label }
+									</SearchableChipSelectControl.ItemLabel>
 								</SearchableChipSelectControl.Item>
 							) }
 						</SearchableChipSelectControl.Collection>

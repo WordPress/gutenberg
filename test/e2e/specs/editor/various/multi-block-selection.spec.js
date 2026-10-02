@@ -1035,7 +1035,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		] );
 	} );
 
-	test( 'should select the whole paragraph on triple click from the block edge', async ( {
+	test( 'should select the whole paragraph on triple click', async ( {
 		page,
 		editor,
 		multiBlockSelectionUtils,
@@ -1048,24 +1048,14 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Second' },
 		} );
-
-		// Deselect the block so the rich text element is not focused and the
-		// selection observer, not the rich text, dispatches the selection.
 		await page.evaluate( () =>
 			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
 		);
 
-		const paragraph = editor.canvas
+		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
-			.first();
-		const box = await paragraph.boundingBox();
-
-		// Triple click just left of the paragraph text (on the canvas
-		// padding), so the paragraph selection is made without focusing the
-		// rich text element.
-		await page.mouse.click( box.x - 5, box.y + box.height / 2, {
-			clickCount: 3,
-		} );
+			.first()
+			.click( { clickCount: 3 } );
 
 		await expect
 			.poll( multiBlockSelectionUtils.getSelectedBlocks )
@@ -1094,6 +1084,13 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 				startOffset: 0,
 				endOffset: 'One two three'.length,
 			} );
+
+		// Typing replaces the selection.
+		await page.keyboard.type( 'x' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'x' } },
+			{ name: 'core/paragraph', attributes: { content: 'Second' } },
+		] );
 	} );
 
 	test( 'should gradually multi-select', async ( {
@@ -1552,6 +1549,123 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 				attributes: { content: '<strong>1</strong>|2' },
 			},
 		] );
+	} );
+
+	test( 'should preserve other style attributes on selected blocks when updating a specific style property', async ( {
+		page,
+		editor,
+		pageUtils,
+		multiBlockSelectionUtils,
+	} ) => {
+		// Insert 3 paragraph blocks with different custom background colors
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'First',
+				style: { color: { background: '#ff0000' } },
+			},
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'Second',
+				style: { color: { background: '#00ff00' } },
+			},
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'Third',
+				style: { color: { background: '#0000ff' } },
+			},
+		} );
+
+		// Select all 3 blocks
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1, 2, 3 ] );
+
+		// Open block settings sidebar
+		await editor.openDocumentSettingsSidebar();
+
+		const settings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await settings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
+
+		// Wait for the color picker to appear and click white
+		await page.getByRole( 'option', { name: 'White' } ).click();
+
+		// Check that the blocks have the white text color but kept their
+		// original backgrounds and content.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'First',
+					textColor: 'white',
+					style: { color: { background: '#ff0000' } },
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Second',
+					textColor: 'white',
+					style: { color: { background: '#00ff00' } },
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Third',
+					textColor: 'white',
+					style: { color: { background: '#0000ff' } },
+				},
+			},
+		] );
+
+		// Clicking the active color again clears the text color on all
+		// selected blocks, while the distinct backgrounds remain.
+		await page.getByRole( 'option', { name: 'White' } ).click();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'First',
+					style: { color: { background: '#ff0000' } },
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Second',
+					style: { color: { background: '#00ff00' } },
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Third',
+					style: { color: { background: '#0000ff' } },
+				},
+			},
+		] );
+
+		const blocksAfterClear = await editor.getBlocks();
+		expect(
+			blocksAfterClear.map( ( block ) => block.attributes.textColor )
+		).toEqual( [ undefined, undefined, undefined ] );
 	} );
 
 	test.describe( 'shift+click multi-selection', () => {
