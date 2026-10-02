@@ -30,10 +30,7 @@ import { getResolvedValue } from '@wordpress/global-styles-engine';
 import type { ComponentProps, RefObject } from 'react';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import { hasBackgroundImageValue } from '../global-styles/background-panel';
-import {
-	InheritanceResetButton,
-	isGlobalStylesInheritanceIndicatorUIEnabled,
-} from '../global-styles/inheritance';
+import { InheritanceResetButton } from '../global-styles/inheritance';
 import { useToolsPanelItemPopoverProps } from '../global-styles/utils';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
@@ -739,7 +736,7 @@ export default function BackgroundImagePanel( {
 	inheritedValue = value,
 	settings,
 	defaultValues = {},
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
+	showInheritanceLabelIndicators = false,
 }: BackgroundImageControlProps ) {
 	/*
 	 * Resolve inherited `ref` pointers for background controls.

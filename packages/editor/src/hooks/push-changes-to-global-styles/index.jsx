@@ -22,8 +22,10 @@ import { unlock } from '../../lock-unlock';
 import setNestedValue from '../../utils/set-nested-value';
 import { useGlobalStyles } from '../../components/global-styles/hooks';
 import ApplyGloballyModal from './apply-globally-modal';
+import StyleSourcesDropdown from './style-sources-dropdown';
 
-const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
+const { cleanEmptyObject, isGlobalStylesInheritanceIndicatorUIEnabled } =
+	unlock( blockEditorPrivateApis );
 
 // Block Gap is a special case and isn't defined within the blocks
 // style properties config. We'll add it here to allow it to be pushed
@@ -558,6 +560,9 @@ function PushChangesToGlobalStyles( props ) {
 	return (
 		<InspectorAdvancedControls>
 			<PushChangesToGlobalStylesControl { ...props } />
+			{ isGlobalStylesInheritanceIndicatorUIEnabled() && (
+				<StyleSourcesDropdown { ...props } />
+			) }
 		</InspectorAdvancedControls>
 	);
 }

@@ -33,3 +33,83 @@
 	color: $gray-900;
 	overflow-wrap: anywhere;
 }
+
+.editor-style-sources__dropdown {
+	display: block;
+}
+
+.editor-style-sources__popover .components-popover__content {
+	width: 320px;
+}
+
+// Popover sets an inline `max-height` on its content, so the scroll cap lives here.
+.editor-style-sources {
+	max-height: min(640px, 75vh);
+	overflow-y: auto;
+	padding: $grid-unit-20;
+	font-size: 13px;
+
+	.block-editor-inspector-popover-header {
+		margin-bottom: $grid-unit-20;
+	}
+}
+
+.editor-style-sources__group + .editor-style-sources__group {
+	margin-top: $grid-unit-30;
+}
+
+.editor-style-sources__group-header {
+	margin-bottom: $grid-unit-10;
+}
+
+// The uppercase inspector heading, as on `BaseControl` labels.
+.editor-style-sources__group-title {
+	margin: 0;
+	font-size: 11px;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+	line-height: 1.4;
+	text-transform: uppercase;
+	color: var(--wpds-color-foreground-content-neutral);
+
+	&:focus {
+		outline: none;
+	}
+}
+
+.editor-style-sources__label {
+	font-size: 13px;
+	color: var(--wpds-color-foreground-content-neutral);
+}
+
+.editor-style-sources__value {
+	flex-shrink: 0;
+	font-size: 13px;
+	text-align: right;
+}
+
+.editor-style-sources__secondary {
+	font-size: 12px;
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+.editor-style-sources__row .components-button.is-link {
+	flex-shrink: 0;
+	font-size: 12px;
+}
+
+.editor-style-sources__note {
+	margin: 0;
+	font-size: 12px;
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+// Mirrors the `BaseControl` help text under "Apply globally".
+.editor-style-sources__control {
+	margin-bottom: $grid-unit-30;
+}
+
+.editor-style-sources__help {
+	margin: $grid-unit-10 0 0;
+	font-size: 12px;
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
