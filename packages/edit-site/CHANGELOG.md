@@ -11,7 +11,7 @@
 ### Enhancements
 
 -   The pages, templates, and patterns lists and the Quick Edit form read their fields from the server, through the Entity fields API. Fields registered with `registerEntityField` from `@wordpress/editor` no longer show: register them on the server ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
--   Block theme previews: show the previewed theme as a badge below the sidebar screen title, rather than prefixing the title itself ([#50920](https://github.com/WordPress/gutenberg/issues/50920)).
+-   Block theme previews: show the previewed theme as a badge below the sidebar screen title, rather than prefixing the title itself ([#84029](https://github.com/WordPress/gutenberg/pull/84029)).
 
 ### Bug Fixes
 
