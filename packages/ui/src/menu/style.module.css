@@ -34,7 +34,7 @@
 			&:has(.item-selection-indicator) {
 				--wp-ui-menu-item-padding-inline: var(--wpds-dimension-padding-sm);
 				--wp-ui-menu-selection-indicator-track-size: var(--wpds-dimension-gap-xs);
-				--wp-ui-menu-selection-indicator-gap: var(--wpds-dimension-gap-xs);
+				--wp-ui-menu-selection-indicator-gap: var(--wpds-dimension-gap-sm);
 			}
 		}
 

@@ -4,7 +4,13 @@ import type { KeyboardShortcut } from '../utils/keyboard-shortcut';
 import type { ComponentProps } from '../utils/types';
 import type { IconProps } from '../icon/types';
 
-export type PrefixIconProps = IconProps;
+export interface PrefixIconProps extends IconProps {
+	/**
+	 * The size (width and height) of the icon.
+	 * @default 20
+	 */
+	size?: number;
+}
 
 export type PortalProps = ComponentProps< typeof _Menu.Portal >;
 

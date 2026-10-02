@@ -71,12 +71,12 @@ function queryExternalLinkIndicator( item: HTMLElement ) {
 }
 
 describe( 'Menu', () => {
-	it( 'renders prefix icons at 24px by default', () => {
+	it( 'renders prefix icons at 20px by default', () => {
 		render( <Menu.PrefixIcon icon={ <svg /> } role="img" /> );
 
 		const icon = screen.getByRole( 'img', { hidden: true } );
-		expect( icon ).toHaveAttribute( 'width', '24' );
-		expect( icon ).toHaveAttribute( 'height', '24' );
+		expect( icon ).toHaveAttribute( 'width', '20' );
+		expect( icon ).toHaveAttribute( 'height', '20' );
 	} );
 
 	it( 'supports custom icon sizes and forwards SVG props and refs', () => {
