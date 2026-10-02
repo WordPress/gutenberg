@@ -486,5 +486,30 @@ test.describe( 'Query block', () => {
 				},
 			] );
 		} );
+
+		test( 'should announce when a term is added or removed', async ( {
+			page,
+			editor,
+		} ) => {
+			const categoriesControl = await addQueryWithTaxonomyFilters( {
+				page,
+				editor,
+			} );
+			await categoriesControl.click();
+			await page.getByRole( 'option', { name: 'Beluga' } ).click();
+
+			const announcement = page.locator( '#a11y-speak-assertive' );
+			await expect( announcement ).toContainText( 'Category added' );
+
+			const removeButton = page.getByRole( 'button', {
+				name: 'Remove',
+				exact: true,
+			} );
+			await expect( removeButton ).toHaveAccessibleDescription(
+				/Beluga/
+			);
+			await removeButton.click();
+			await expect( announcement ).toContainText( 'Category removed' );
+		} );
 	} );
 } );
