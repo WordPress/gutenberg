@@ -9,9 +9,10 @@
 		.popup {
 			--wp-ui-menu-popup-padding: var(--wpds-dimension-padding-xs);
 			--wp-ui-menu-min-width: 160px;
-			--wp-ui-menu-max-width: var(--wpds-dimension-surface-width-md);
-			--wp-ui-menu-item-padding-inline: var(--wpds-dimension-padding-md);
-			--_wp-ui-menu-group-head-padding-base: var(--wpds-dimension-padding-md);
+			--wp-ui-menu-max-width: var(--wpds-dimension-surface-width-sm);
+			--wp-ui-menu-item-padding-inline: var(--wpds-dimension-padding-sm);
+			--_wp-ui-menu-item-padding-inline-start: var(--wp-ui-menu-item-padding-inline);
+			--_wp-ui-menu-group-head-padding-base: var(--wpds-dimension-padding-sm);
 			--wp-ui-menu-group-head-padding-inline: var(--_wp-ui-menu-group-head-padding-base);
 			--wp-ui-menu-selection-indicator-track-size: 0px;
 			--wp-ui-menu-selection-indicator-size: var(--wpds-dimension-size-sm);
@@ -31,10 +32,11 @@
 			background-color: var(--wpds-color-background-surface-neutral-strong);
 			outline: none;
 
+			/* The indicator already sets labels in, so tighten the start edge. */
 			&:has(.item-selection-indicator) {
-				--wp-ui-menu-item-padding-inline: var(--wpds-dimension-padding-sm);
+				--_wp-ui-menu-item-padding-inline-start: var(--wpds-dimension-padding-xs);
 				--wp-ui-menu-selection-indicator-track-size: var(--wpds-dimension-size-2xs);
-				--wp-ui-menu-selection-indicator-gap: var(--wpds-dimension-gap-sm);
+				--wp-ui-menu-selection-indicator-gap: var(--wpds-dimension-gap-xs);
 			}
 		}
 
@@ -68,7 +70,7 @@
 
 			display: grid;
 			grid-template-columns:
-				[item-padding-start] var(--wp-ui-menu-item-padding-inline)
+				[item-padding-start] var(--_wp-ui-menu-item-padding-inline-start)
 				[selection-start] var(--wp-ui-menu-selection-indicator-track-size)
 				[selection-end] var(--wp-ui-menu-selection-indicator-gap)
 				[prefix-start] max-content
@@ -134,7 +136,7 @@
 			display: grid;
 			grid-column: 1 / -1;
 			grid-template-columns:
-				[item-padding-start] var(--wp-ui-menu-item-padding-inline)
+				[item-padding-start] var(--_wp-ui-menu-item-padding-inline-start)
 				[selection-start] var(--wp-ui-menu-selection-indicator-track-size)
 				[selection-end] var(--wp-ui-menu-selection-indicator-gap)
 				[prefix-start] max-content
