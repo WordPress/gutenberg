@@ -11,7 +11,6 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { setTimeout } from 'node:timers/promises';
-import { pathToFileURL } from 'node:url';
 
 type Svn = (
 	args: string[],
@@ -65,21 +64,21 @@ function treesMatch(
 	actual: string,
 	relative = ''
 ): boolean {
-	const names = new Set( [
-		...fs.readdirSync( expected ),
-		...fs.readdirSync( actual ),
-	] );
+	// Directory entries preserve filename case even when path lookup does not.
+	const expectedNames = new Set( fs.readdirSync( expected ) );
+	const actualNames = new Set( fs.readdirSync( actual ) );
+	const names = new Set( [ ...expectedNames, ...actualNames ] );
 	let matches = true;
 	for ( const name of names ) {
 		const expectedPath = path.join( expected, name );
 		const actualPath = path.join( actual, name );
 		const label = relative ? `${ relative }/${ name }` : name;
-		const expectedStat = fs.lstatSync( expectedPath, {
-			throwIfNoEntry: false,
-		} );
-		const actualStat = fs.lstatSync( actualPath, {
-			throwIfNoEntry: false,
-		} );
+		const expectedStat = expectedNames.has( name )
+			? fs.lstatSync( expectedPath )
+			: undefined;
+		const actualStat = actualNames.has( name )
+			? fs.lstatSync( actualPath )
+			: undefined;
 		if ( ! expectedStat || ! actualStat ) {
 			console.error(
 				`Only in ${ expectedStat ? 'expected' : 'actual' }: ${ label }`
@@ -371,10 +370,7 @@ export async function publishToSvn(
 	}
 }
 
-if (
-	process.argv[ 1 ] &&
-	import.meta.url === pathToFileURL( path.resolve( process.argv[ 1 ] ) ).href
-) {
+if ( import.meta.main ) {
 	try {
 		await publishToSvn( process.argv.slice( 2 ) );
 	} catch ( error ) {

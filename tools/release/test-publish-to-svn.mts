@@ -285,13 +285,19 @@ function setup( t: TestContext ) {
 	};
 }
 
-test( 'reject missing arguments with usage guidance', () => {
-	const result = spawnSync( process.execPath, [ SCRIPT ], {
-		encoding: 'utf8',
-	} );
-	assert.equal( result.status, 1 );
-	assert.match( result.stderr, /Usage: / );
-	assert.doesNotMatch( result.stderr, /unbound variable|test password/ );
+test( 'reject missing arguments with usage guidance', ( t ) => {
+	const root = fs.mkdtempSync( path.join( os.tmpdir(), 'svn-entrypoint-' ) );
+	t.after( () => fs.rmSync( root, { recursive: true, force: true } ) );
+	const alias = path.join( root, 'publisher.mts' );
+	fs.symlinkSync( SCRIPT, alias );
+	for ( const entry of [ SCRIPT, alias ] ) {
+		const result = spawnSync( process.execPath, [ entry ], {
+			encoding: 'utf8',
+		} );
+		assert.equal( result.status, 1 );
+		assert.match( result.stderr, /Usage: / );
+		assert.doesNotMatch( result.stderr, /unbound variable|test password/ );
+	}
 } );
 
 test( 'reject invalid options before publication', async ( t ) => {
@@ -442,6 +448,64 @@ test( 'reject binary content differences', async ( t ) => {
 		f.logs.join( '\n' ),
 		/Files expected\/build\/binary.dat and actual\/build\/binary.dat differ/
 	);
+} );
+
+test( 'reject differently cased filenames', async ( t ) => {
+	// This case also runs without SVN on a case-insensitive host filesystem.
+	const root = fs.mkdtempSync(
+		path.join( os.tmpdir(), 'svn-filename-case-' )
+	);
+	t.after( () => fs.rmSync( root, { recursive: true, force: true } ) );
+	const source = path.join( root, 'release' );
+	fs.mkdirSync( source );
+	fs.writeFileSync( path.join( source, 'Expected.js' ), 'same bytes' );
+	const logs: string[] = [];
+	t.mock.method( console, 'log', ( value: unknown ) =>
+		logs.push( String( value ) )
+	);
+	t.mock.method( console, 'error', ( value: unknown ) =>
+		logs.push( String( value ) )
+	);
+	const env = {
+		PLUGIN_REPO_URL: 'file:///unused',
+		VERSION: '23.9.0',
+		SVN_USERNAME: 'test',
+		SVN_PASSWORD: 'test',
+		SVN_VERIFY_TIMEOUT: '1',
+		SVN_VERIFY_RETRY_INTERVAL: '1',
+	};
+	const svn = ( args: string[] ): SpawnSyncReturns< string > => {
+		let stdout = '';
+		if ( args[ 0 ] === 'list' ) {
+			stdout = '23.9.0/\n';
+		} else if ( args[ 0 ] === 'info' ) {
+			stdout = '1\n';
+		} else if ( args[ 0 ] === 'export' ) {
+			const actual = args[ args.indexOf( '--no-auth-cache' ) - 1 ];
+			fs.mkdirSync( actual );
+			fs.writeFileSync(
+				path.join( actual, 'expected.js' ),
+				'same bytes'
+			);
+		} else {
+			assert.fail( `Unexpected SVN command: ${ args[ 0 ] }` );
+		}
+		return {
+			pid: 0,
+			output: [ null, stdout, '' ],
+			stdout,
+			stderr: '',
+			status: 0,
+			signal: null,
+		};
+	};
+	await assert.rejects(
+		publishToSvn( [ source, 'tag' ], env, svn ),
+		/Could not verify SVN release/
+	);
+	assert.match( logs.join( '\n' ), /Only in expected: Expected.js/ );
+	assert.match( logs.join( '\n' ), /Only in actual: expected.js/ );
+	assert.doesNotMatch( logs.join( '\n' ), /Verified SVN release/ );
 } );
 
 test( 'reject symlink target differences even when target contents match', async ( t ) => {
