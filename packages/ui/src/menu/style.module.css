@@ -145,8 +145,8 @@
 			gap: 0;
 			/* Keep leading content at the top of the content row. */
 			align-items: start;
-			/* Extra content extends below the first label line. */
-			align-content: start;
+			/* Center a single line without shifting wrapped content. */
+			align-content: center;
 			justify-content: stretch;
 			min-width: 0;
 			min-height: var(--wp-ui-menu-item-height);
@@ -280,7 +280,6 @@
 
 		.item-children {
 			grid-column: label-start / label-end;
-			align-self: start;
 			display: inline-flex;
 			flex-direction: column;
 			gap: 2px; /* var(--wpds-dimension-gap-xs); */
