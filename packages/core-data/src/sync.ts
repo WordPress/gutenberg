@@ -251,6 +251,21 @@ export function createDefaultEntitySyncManager(
 			return Boolean( getSyncManager() && getSyncConfig( kind, name ) );
 		},
 
+		isLoaded( kind, name, recordId ) {
+			// Nothing is loaded before a sync manager exists, so do not
+			// create one just to answer.
+			if ( ! hasSyncManager() ) {
+				return false;
+			}
+
+			return Boolean(
+				getSyncManager()?.isLoaded(
+					`${ kind }/${ name }`,
+					toObjectId( recordId )
+				)
+			);
+		},
+
 		load( kind, name, recordId, record, handlers ) {
 			const syncConfig = getSyncConfig( kind, name );
 			const manager = getSyncManager();
@@ -350,10 +365,33 @@ export function createDefaultEntitySyncManager(
 			}
 		},
 
-		// A getter, so the value is read when core-data asks: the undo
-		// manager only exists once a synced entity is loaded.
-		get undoManager() {
-			return getSyncManager()?.undoManager;
+		// A getter, so the value is read when core-data asks. There is no
+		// history before a sync manager exists, and asking must not create
+		// one.
+		get undoHistory() {
+			if ( ! hasSyncManager() ) {
+				return undefined;
+			}
+
+			const undoManager = getSyncManager()?.undoManager;
+			if ( ! undoManager ) {
+				return undefined;
+			}
+
+			return {
+				undo: ( kind, name, recordId ) =>
+					undoManager.undo(
+						`${ kind }/${ name }`,
+						toObjectId( recordId )
+					),
+				redo: ( kind, name, recordId ) =>
+					undoManager.redo(
+						`${ kind }/${ name }`,
+						toObjectId( recordId )
+					),
+				stopCapturing: () => undoManager.stopCapturing(),
+				clearRedo: () => undoManager.clearRedo(),
+			};
 		},
 	};
 }
@@ -447,7 +485,7 @@ function createRecordHandlers(
 		editRecord: handlers.editRecord,
 		getEditedRecord: handlers.getEditedRecord,
 		refetchRecord: handlers.refetchRecord,
-		onUndoStackChange: handlers.onUndoStackChange,
+		onUndoLevelOpened: handlers.onUndoLevelOpened,
 
 		// Handle sync connection status changes.
 		onStatusChange: ( status: ConnectionStatus | null ) => {

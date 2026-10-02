@@ -4,7 +4,19 @@
 
 ### Enhancements
 
+-   List the fields the user can show or hide alphabetically by label in the view config's properties section and in the table's insert column submenus, instead of in the order the consumer declared them ([#83947](https://github.com/WordPress/gutenberg/pull/83947)).
+-   Single-selection filter radio indicators stay visually 16px on narrow screens ([#83840](https://github.com/WordPress/gutenberg/pull/83840)).
 -   Selection checkboxes stay visually 16px on narrow screens while retaining a 24px click target ([#83612](https://github.com/WordPress/gutenberg/pull/83612)).
+-   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
+
+### Bug Fixes
+
+-   Keep filter and item actions menus dismissible when their triggers become disabled ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
+-   Grid layout: measure the container as the grid attaches rather than waiting for the resize observer's first report, so the grid no longer renders a frame with every item in a full-width column of its own before snapping to its real column count ([#83752](https://github.com/WordPress/gutenberg/pull/83752)).
+
+### Internal
+
+-   Remove the `use-memo-one` dependency, which the `./wp` bundle no longer imports ([#83952](https://github.com/WordPress/gutenberg/pull/83952)).
 
 ### Documentation
 
