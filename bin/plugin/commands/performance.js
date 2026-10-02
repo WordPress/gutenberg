@@ -331,6 +331,7 @@ async function runPerformanceTests( branches, options ) {
 			JSON.stringify(
 				{
 					core: 'WordPress/WordPress',
+					mariadbVersion: '10.11',
 					plugins: [ path.join( environmentDirectory, 'plugin' ) ],
 					themes: [
 						path.join(
