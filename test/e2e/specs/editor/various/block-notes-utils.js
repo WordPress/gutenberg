@@ -214,7 +214,11 @@ class BlockNoteUtils {
 	 * @param {string} emoji Exact emoji label, e.g. "Heart".
 	 */
 	async addReactionToBlock( emoji ) {
-		await this.#editor.clickBlockToolbarButton( 'React to block' );
+		await this.#editor.showBlockToolbar();
+		await this.#page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'combobox', { name: 'React to block' } )
+			.click();
 		await this.waitForFullPicker();
 		await this.#page
 			.getByRole( 'gridcell', { name: emoji, exact: true } )
