@@ -5,16 +5,15 @@ import {
 	type PostEditorAwarenessState,
 } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
-
 import Avatar from './avatar';
 import AvatarGroup from './avatar-group';
 import { CollaboratorsList } from './list';
 import { unlock } from '../../lock-unlock';
 import { getAvatarUrl } from '../collaborators-overlay/get-avatar-url';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
-
-import './styles/collaborators-presence.scss';
+import { createCursorRegistry } from '../collaborators-overlay/cursor-registry';
 import { CollaboratorsOverlay } from '../collaborators-overlay';
+import { getCollaboratorDisplayName } from '../../utils/get-collaborator-display-name';
 
 const { useActiveCollaborators } = unlock( privateApis );
 
@@ -57,6 +56,8 @@ export function CollaboratorsPresence( {
 		} );
 	}, [ activeCollaborators ] );
 
+	const [ cursorRegistry ] = useState( createCursorRegistry );
+
 	const [ isPopoverVisible, setIsPopoverVisible ] = useState( false );
 	const [ popoverAnchor, setPopoverAnchor ] = useState< HTMLElement | null >(
 		null
@@ -75,7 +76,7 @@ export function CollaboratorsPresence( {
 		<>
 			<div className="editor-collaborators-presence">
 				<Button
-					__next40pxDefaultSize
+					size="compact"
 					className="editor-collaborators-presence__button"
 					onClick={ () => setIsPopoverVisible( ! isPopoverVisible ) }
 					isPressed={ isPopoverVisible }
@@ -93,7 +94,9 @@ export function CollaboratorsPresence( {
 								src={ getAvatarUrl(
 									me.collaboratorInfo.avatar_urls
 								) }
-								name={ me.collaboratorInfo.name }
+								name={ getCollaboratorDisplayName(
+									me.collaboratorInfo
+								) }
 								borderColor="var(--wp-admin-theme-color)"
 								size="small"
 							/>
@@ -106,11 +109,12 @@ export function CollaboratorsPresence( {
 										collaboratorState.collaboratorInfo
 											.avatar_urls
 									) }
-									name={
-										collaboratorState.collaboratorInfo.name
-									}
+									name={ getCollaboratorDisplayName(
+										collaboratorState.collaboratorInfo
+									) }
 									borderColor={ getAvatarBorderColor(
-										collaboratorState.collaboratorInfo.id
+										collaboratorState.collaboratorInfo.id ??
+											collaboratorState.clientId
 									) }
 									size="small"
 								/>
@@ -123,10 +127,15 @@ export function CollaboratorsPresence( {
 						activeCollaborators={ collaboratorsForList }
 						popoverAnchor={ popoverAnchor }
 						setIsPopoverVisible={ setIsPopoverVisible }
+						cursorRegistry={ cursorRegistry }
 					/>
 				) }
 			</div>
-			<CollaboratorsOverlay postId={ postId } postType={ postType } />
+			<CollaboratorsOverlay
+				postId={ postId }
+				postType={ postType }
+				cursorRegistry={ cursorRegistry }
+			/>
 		</>
 	);
 }

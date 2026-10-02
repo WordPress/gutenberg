@@ -1,0 +1,82 @@
+import { resolveSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import { loadView } from '@wordpress/views';
+import Editor from '../editor';
+import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
+import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-unsupported';
+import PageTemplates from '../page-templates';
+import { unlock } from '../../lock-unlock';
+import { isThemeDataLoaded } from './utils';
+
+async function isTemplateListView( query ) {
+	const { activeView = 'active' } = query;
+	const config = await unlock( resolveSelect( coreStore ) ).getViewConfig(
+		'postType',
+		'wp_template'
+	);
+	const defaultView = config?.default_view;
+	const activeViewOverrides =
+		config?.view_list?.find( ( v ) => v.slug === activeView )?.view ?? {};
+	const view = await loadView( {
+		kind: 'postType',
+		name: 'wp_template',
+		slug: 'default',
+		defaultView,
+		activeViewOverrides,
+	} );
+	return view.type === 'list';
+}
+
+export const templatesRoute = {
+	name: 'templates',
+	path: '/template',
+	areas: {
+		sidebar( { siteData } ) {
+			if ( ! isThemeDataLoaded( siteData ) ) {
+				return null;
+			}
+			return siteData.currentTheme.is_block_theme ? (
+				<SidebarNavigationScreenTemplatesBrowse backPath="/" />
+			) : (
+				<SidebarNavigationScreenUnsupported />
+			);
+		},
+		content( { siteData } ) {
+			const isBlockTheme = siteData.currentTheme?.is_block_theme;
+			if ( ! isBlockTheme ) {
+				return undefined;
+			}
+			return <PageTemplates />;
+		},
+		async preview( { query, siteData } ) {
+			const isBlockTheme = siteData.currentTheme?.is_block_theme;
+			if ( ! isBlockTheme ) {
+				return undefined;
+			}
+			const isListView = await isTemplateListView( query );
+			return isListView ? <Editor /> : undefined;
+		},
+		mobileSidebar( { siteData } ) {
+			if ( ! isThemeDataLoaded( siteData ) ) {
+				return <></>;
+			}
+			if ( ! siteData.currentTheme.is_block_theme ) {
+				return <SidebarNavigationScreenUnsupported />;
+			}
+			return undefined;
+		},
+		mobileContent( { siteData } ) {
+			const isBlockTheme = siteData.currentTheme?.is_block_theme;
+			if ( ! isBlockTheme ) {
+				return undefined;
+			}
+			return <PageTemplates />;
+		},
+	},
+	widths: {
+		async content( { query } ) {
+			const isListView = await isTemplateListView( query );
+			return isListView ? 380 : undefined;
+		},
+	},
+};

@@ -138,7 +138,7 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
  * @param string        $feature       Name of the feature to check support for.
  * @param mixed         $default_value Fallback value for feature support, defaults to false.
  *
- * @return boolean                  Whether or not the feature is supported.
+ * @return boolean Whether or not the feature is supported.
  */
 function gutenberg_has_border_feature_support( $block_type, $feature, $default_value = false ) {
 	// Check if all border support features have been opted into via `"__experimentalBorder": true`.

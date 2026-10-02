@@ -1,12 +1,4 @@
-/**
- * External dependencies
- */
-import { type ColorTypes } from 'colorjs.io/fn';
-
-/**
- * Internal dependencies
- */
-import './register-color-spaces';
+import { type PlainColorObject } from 'colorjs.io/fn';
 import {
 	WHITE,
 	BLACK,
@@ -15,9 +7,9 @@ import {
 	ACCENT_SCALE_BASE_LIGHTNESS_THRESHOLDS,
 	MAX_BISECTION_ITERATIONS,
 	CONTRAST_EPSILON,
-} from './constants';
-import type { Ramp, RampConfig, RampDirection } from './types';
-import { getContrast } from './color-utils';
+} from './constants.ts';
+import type { Ramp, RampConfig, RampDirection } from './types.ts';
+import { getContrast } from './color-utils.ts';
 
 /**
  * Build a dependency graph from the steps configuration
@@ -42,10 +34,15 @@ function buildDependencyGraph( config: RampConfig ): {
 	// Build the graph
 	Object.entries( config ).forEach( ( [ stepName, stepConfig ] ) => {
 		const step = stepName as keyof Ramp;
-		const reference = stepConfig.contrast.reference;
+		const references = [
+			stepConfig.contrast.reference,
+			...( stepConfig.contrast.additionalReferences ?? [] ),
+		];
 
-		dependencies.get( step )!.push( reference );
-		dependents.get( reference )!.push( step );
+		for ( const reference of references ) {
+			dependencies.get( step )!.push( reference );
+			dependents.get( reference )!.push( step );
+		}
 
 		// Add dependency for sameAsIfPossible
 		if ( stepConfig.sameAsIfPossible ) {
@@ -123,6 +120,7 @@ export function stepsForStep(
 		}
 
 		visit( stepConfig.contrast.reference );
+		stepConfig.contrast.additionalReferences?.forEach( visit );
 		if ( stepConfig.sameAsIfPossible ) {
 			visit( stepConfig.sameAsIfPossible );
 		}
@@ -135,21 +133,32 @@ export function stepsForStep(
 
 /**
  * Finds out whether a lighter or a darker foreground color achieves a better
- * contrast against the seed
- * @param seed
+ * contrast against every reference color
+ * @param references
  * @param preferLighter Whether the check should favor white foreground color
  * @return An object with "better" and "worse" properties, each holding a
  * ramp direction value.
  */
 export function computeBetterFgColorDirection(
-	seed: ColorTypes,
+	references: string | PlainColorObject | readonly PlainColorObject[],
 	preferLighter?: boolean
 ): {
 	better: RampDirection;
 	worse: RampDirection;
 } {
-	const contrastAgainstBlack = getContrast( seed, BLACK );
-	const contrastAgainstWhite = getContrast( seed, WHITE );
+	const referenceColors = Array.isArray( references )
+		? references
+		: [ references ];
+	const contrastAgainstBlack = Math.min(
+		...referenceColors.map( ( reference ) =>
+			getContrast( reference, BLACK )
+		)
+	);
+	const contrastAgainstWhite = Math.min(
+		...referenceColors.map( ( reference ) =>
+			getContrast( reference, WHITE )
+		)
+	);
 
 	return contrastAgainstBlack >
 		contrastAgainstWhite +
@@ -184,7 +193,7 @@ export function clampAccentScaleReferenceLightness(
 }
 
 /**
- * Find the value of of `L` (luminance) that produces a `C` (color) that has a
+ * Find the value of `L` (luminance) that produces a `C` (color) that has a
  * `value` (contrast delta) equal to zero.
  * @param calculateC     Calculate `C` from a given `L`.
  * @param calculateValue Calculate value (delta) for a given `C`.

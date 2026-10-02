@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { RequestUtils } from './index';
 
 type CreateBlockPayload = {
@@ -54,11 +51,5 @@ export async function createBlock(
 	this: RequestUtils,
 	payload: CreateBlockPayload
 ) {
-	const block = await this.rest( {
-		path: '/wp/v2/blocks',
-		method: 'POST',
-		data: { ...payload },
-	} );
-
-	return block;
+	return this.createRecord( 'blocks', { ...payload } );
 }

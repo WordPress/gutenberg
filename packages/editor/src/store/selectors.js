@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	getFreeformContentHandlerName,
 	getDefaultBlockName,
@@ -11,14 +8,12 @@ import { isInTheFuture, getDate } from '@wordpress/date';
 import { addQueryArgs, cleanForSlug } from '@wordpress/url';
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
-import { Platform } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	privateApis as coreDataPrivateApis,
+} from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import {
 	ATTACHMENT_POST_TYPE,
 	EDIT_MERGE_PROPERTIES,
@@ -27,9 +22,10 @@ import {
 	AUTOSAVE_PROPERTIES,
 } from './constants';
 import { getPostRawValue } from './reducer';
-import { getTemplatePartIcon } from '../utils/get-template-part-icon';
 import { unlock } from '../lock-unlock';
-import { getTemplateInfo } from '../utils/get-template-info';
+import { getDeviceTypeByCanvasWidth } from '../utils/device-type';
+
+const { getTemplateInfo, getTemplatePartIcon } = unlock( coreDataPrivateApis );
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -524,8 +520,7 @@ export function isEditedPostSaveable( state ) {
 	return (
 		!! getEditedPostAttribute( state, 'title' ) ||
 		!! getEditedPostAttribute( state, 'excerpt' ) ||
-		! isEditedPostEmpty( state ) ||
-		Platform.OS === 'native'
+		! isEditedPostEmpty( state )
 	);
 }
 
@@ -993,8 +988,8 @@ export function getPermalink( state ) {
 
 /**
  * Returns the slug for the post being edited, preferring a manually edited
- * value if one exists, then a sanitized version of the current post title, and
- * finally the post ID.
+ * value if one exists, then the server-generated slug from the post entity,
+ * then a JS approximation of the current post title, and finally the post ID.
  *
  * @param {Object} state Editor state.
  *
@@ -1003,6 +998,7 @@ export function getPermalink( state ) {
 export function getEditedPostSlug( state ) {
 	return (
 		getEditedPostAttribute( state, 'slug' ) ||
+		getEditedPostAttribute( state, 'generated_slug' ) ||
 		cleanForSlug( getEditedPostAttribute( state, 'title' ) ) ||
 		getCurrentPostId( state )
 	);
@@ -1253,6 +1249,12 @@ export const isEditorPanelOpened = createRegistrySelector(
 /**
  * A block selection object.
  *
+ * This type is duplicated to avoid creating circular dependencies.
+ *
+ * @see {import("@wordpress/block-editor/src/store/actions").WPBlockSelection}
+ * @see {import("@wordpress/block-editor/src/store/selectors").WPBlockSelection}
+ * @see {import("@wordpress/core-data/src/types").WPBlockSelection}
+ *
  * @typedef {Object} WPBlockSelection
  *
  * @property {string} clientId     A block client ID.
@@ -1344,11 +1346,15 @@ export function getRenderingMode( state ) {
  */
 export const getDeviceType = createRegistrySelector(
 	( select ) => ( state ) => {
-		const isZoomOut = unlock( select( blockEditorStore ) ).isZoomOut();
+		const blockEditorSelect = unlock( select( blockEditorStore ) );
+		const isZoomOut = blockEditorSelect.isZoomOut();
 		if ( isZoomOut ) {
 			return 'Desktop';
 		}
-		return state.deviceType;
+		const canvasWidth = state.canvasWidth;
+		const viewportSettings =
+			blockEditorSelect.getSettings().__experimentalFeatures?.viewport;
+		return getDeviceTypeByCanvasWidth( canvasWidth, viewportSettings );
 	}
 );
 
@@ -1879,27 +1885,3 @@ export const getPostTypeLabel = createRegistrySelector(
 export function isPublishSidebarOpened( state ) {
 	return state.publishSidebarActive;
 }
-
-/**
- * Returns whether the collaboration is enabled for the current post.
- *
- * @return {boolean} Whether collaboration is enabled.
- */
-export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
-	( select ) => ( state ) => {
-		// Return early, if collaboration is not supported.
-		if ( ! unlock( select( coreStore ) ).isCollaborationSupported() ) {
-			return false;
-		}
-
-		const currentPostType = getCurrentPostType( state );
-		const entityConfig = select( coreStore ).getEntityConfig(
-			'postType',
-			currentPostType
-		);
-
-		return Boolean(
-			entityConfig?.syncConfig && window._wpCollaborationEnabled
-		);
-	}
-);

@@ -1,27 +1,15 @@
-/**
- * External dependencies
- */
 import { useStoreState } from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import warning from '@wordpress/warning';
 import type { TabPanelProps } from './types';
 import { TabPanel as StyledTabPanel } from './styles';
-
-import warning from '@wordpress/warning';
 import { useTabsContext } from './context';
 import type { WordPressComponentProps } from '../context';
 
 export const TabPanel = forwardRef<
 	HTMLDivElement,
 	Omit< WordPressComponentProps< TabPanelProps, 'div', false >, 'id' >
->( function TabPanel(
+>( function UnforwardedTabPanel(
 	{ children, tabId, focusable = true, ...otherProps },
 	ref
 ) {

@@ -1,0 +1,42 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`flags warnings with invalid custom-property-pattern css > snapshot matches warnings 1`] = `
+[
+  {
+    "column": 2,
+    "endColumn": 28,
+    "endLine": 2,
+    "line": 2,
+    "rule": "custom-property-pattern",
+    "severity": "error",
+    "text": "Do not use "--_gcd-heading-font-weight". \`--_gcd-*\` and \`--_wp-*\` variables are private and will break at any time. (custom-property-pattern)",
+  },
+  {
+    "column": 2,
+    "endColumn": 23,
+    "endLine": 3,
+    "line": 3,
+    "rule": "custom-property-pattern",
+    "severity": "error",
+    "text": "Do not use "--_wp-ui-elevation-sm". \`--_gcd-*\` and \`--_wp-*\` variables are private and will break at any time. (custom-property-pattern)",
+  },
+  {
+    "column": 19,
+    "endColumn": 45,
+    "endLine": 7,
+    "line": 7,
+    "rule": "custom-property-pattern",
+    "severity": "error",
+    "text": "Do not use "--_gcd-heading-font-weight". \`--_gcd-*\` and \`--_wp-*\` variables are private and will break at any time. (custom-property-pattern)",
+  },
+  {
+    "column": 18,
+    "endColumn": 39,
+    "endLine": 8,
+    "line": 8,
+    "rule": "custom-property-pattern",
+    "severity": "error",
+    "text": "Do not use "--_wp-ui-elevation-sm". \`--_gcd-*\` and \`--_wp-*\` variables are private and will break at any time. (custom-property-pattern)",
+  },
+]
+`;

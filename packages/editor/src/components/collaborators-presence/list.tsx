@@ -2,17 +2,18 @@ import { __ } from '@wordpress/i18n';
 import { Popover, Button } from '@wordpress/components';
 import { closeSmall } from '@wordpress/icons';
 import { type PostEditorAwarenessState } from '@wordpress/core-data';
-
+import { speak } from '@wordpress/a11y';
 import Avatar from './avatar';
 import { getAvatarUrl } from '../collaborators-overlay/get-avatar-url';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
-
-import './styles/collaborators-list.scss';
+import { type CursorRegistry } from '../collaborators-overlay/cursor-registry';
+import { getCollaboratorDisplayName } from '../../utils/get-collaborator-display-name';
 
 interface CollaboratorsListProps {
 	activeCollaborators: PostEditorAwarenessState[];
 	popoverAnchor?: HTMLElement | null;
 	setIsPopoverVisible: ( isVisible: boolean ) => void;
+	cursorRegistry: CursorRegistry;
 }
 
 /**
@@ -23,12 +24,28 @@ interface CollaboratorsListProps {
  * @param props.activeCollaborators List of active collaborators
  * @param props.popoverAnchor       Anchor element for the popover
  * @param props.setIsPopoverVisible Callback to set the visibility of the popover
+ * @param props.cursorRegistry      Shared registry for scroll-to-cursor support
  */
 export function CollaboratorsList( {
 	activeCollaborators,
 	popoverAnchor,
 	setIsPopoverVisible,
+	cursorRegistry,
 }: CollaboratorsListProps ) {
+	const handleCollaboratorClick = ( clientId: number ) => {
+		const success = cursorRegistry.scrollToCursor( clientId, {
+			behavior: 'smooth',
+			block: 'center',
+			highlightDuration: 2000,
+		} );
+
+		if ( success ) {
+			speak( __( 'Scrolled to cursor' ), 'polite' );
+
+			setIsPopoverVisible( false );
+		}
+	};
+
 	return (
 		<Popover
 			anchor={ popoverAnchor }
@@ -56,27 +73,34 @@ export function CollaboratorsList( {
 				<div className="editor-collaborators-presence__list-items">
 					{ activeCollaborators.map( ( collaboratorState ) => {
 						const isCurrentUser = collaboratorState.isMe;
+						const displayName = getCollaboratorDisplayName(
+							collaboratorState.collaboratorInfo
+						);
 						return (
 							<button
 								key={ collaboratorState.clientId }
 								className="editor-collaborators-presence__list-item"
-								disabled
+								disabled={ isCurrentUser }
+								onClick={ () =>
+									handleCollaboratorClick(
+										collaboratorState.clientId
+									)
+								}
 							>
 								<Avatar
 									src={ getAvatarUrl(
 										collaboratorState.collaboratorInfo
 											.avatar_urls
 									) }
-									name={
-										collaboratorState.collaboratorInfo.name
-									}
+									name={ displayName }
 									borderColor={
 										isCurrentUser
 											? 'var(--wp-admin-theme-color)'
 											: getAvatarBorderColor(
 													collaboratorState
-														.collaboratorInfo.id
-											  )
+														.collaboratorInfo.id ??
+														collaboratorState.clientId
+												)
 									}
 									dimmed={ ! collaboratorState.isConnected }
 								/>
@@ -84,8 +108,7 @@ export function CollaboratorsList( {
 									<div className="editor-collaborators-presence__list-item-name">
 										{ isCurrentUser
 											? __( 'You' )
-											: collaboratorState.collaboratorInfo
-													.name }
+											: displayName }
 									</div>
 								</div>
 							</button>

@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import { compose } from '@wordpress/compose';
 import { combineReducers } from '@wordpress/data';
 import { createUndoManager } from '@wordpress/undo-manager';
-
-/**
- * Internal dependencies
- */
-import { ifMatchingAction, replaceAction } from './utils';
+import { clearUnchangedEdits, ifMatchingAction, replaceAction } from './utils';
 import { reducer as queriedDataReducer } from './queried-data';
 import { rootEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 import { ConnectionErrorCode } from './sync';
@@ -90,10 +79,10 @@ export function currentTheme( state = undefined, action ) {
 /**
  * Reducer managing the current global styles id.
  *
- * @param {string|undefined} state  Current state.
+ * @param {number|undefined} state  Current state.
  * @param {Object}           action Dispatched action.
  *
- * @return {string|undefined} Updated state.
+ * @return {number|undefined} Updated state.
  */
 export function currentGlobalStylesId( state = undefined, action ) {
 	switch ( action.type ) {
@@ -150,19 +139,23 @@ const withMultiEntityRecordEdits = ( reducer ) => ( state, action ) => {
 
 		let newState = state;
 		record.forEach( ( { id: { kind, name, recordId }, changes } ) => {
+			const persistedRecord =
+				state?.queriedData?.items?.default?.[ recordId ];
+			const edits = Object.fromEntries(
+				Object.entries( changes ).map( ( [ key, value ] ) => [
+					key,
+					action.type === 'UNDO' ? value.from : value.to,
+				] )
+			);
+
 			newState = reducer( newState, {
 				type: 'EDIT_ENTITY_RECORD',
 				kind,
 				name,
 				recordId,
-				edits: Object.entries( changes ).reduce(
-					( acc, [ key, value ] ) => {
-						acc[ key ] =
-							action.type === 'UNDO' ? value.from : value.to;
-						return acc;
-					},
-					{}
-				),
+				// Clear edits matching the persisted record so the entity is
+				// no longer dirty after undoing back to its saved state.
+				edits: clearUnchangedEdits( edits, persistedRecord ),
 			} );
 		} );
 		return newState;
@@ -460,6 +453,18 @@ export function undoManager( state = createUndoManager() ) {
 	return state;
 }
 
+// The undo manager above is a mutable object, so changes to it do not change
+// state on their own. Entity edits, undo, and redo are store actions already.
+// A level the entity sync manager adds to it arrives outside of one, so this
+// reference changes then, and selectors reading the undo manager run again.
+export function undoManagerReference( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECORD_SYNC_UNDO_LEVEL':
+			return {};
+	}
+	return state;
+}
+
 export function editsReference( state = {}, action ) {
 	switch ( action.type ) {
 		case 'EDIT_ENTITY_RECORD':
@@ -576,10 +581,10 @@ export function navigationFallbackId( state = null, action ) {
 /**
  * Reducer managing the theme global styles revisions.
  *
- * @param {Record<string, object>} state  Current state.
- * @param {Object}                 action Dispatched action.
+ * @param {Record<number, Array<object>>} state  Current state.
+ * @param {Object}                        action Dispatched action.
  *
- * @return {Record<string, object>} Updated state.
+ * @return {Record<number, Array<object>>} Updated state.
  */
 export function themeGlobalStyleRevisions( state = {}, action ) {
 	switch ( action.type ) {
@@ -721,6 +726,32 @@ export function collaborationSupported( state = true, action ) {
 	return state;
 }
 
+/**
+ * Reducer managing view configs, keyed by `kind/name`.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function viewConfigs( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_VIEW_CONFIG': {
+			const key = `${ action.kind }/${ action.name }`;
+			// Merge so a partial (`_fields`) response doesn't clobber
+			// properties already received for the same entity.
+			return {
+				...state,
+				[ key ]: {
+					...state[ key ],
+					...action.config,
+				},
+			};
+		}
+	}
+	return state;
+}
+
 export default combineReducers( {
 	users,
 	currentTheme,
@@ -731,6 +762,7 @@ export default combineReducers( {
 	themeGlobalStyleRevisions,
 	entities,
 	editsReference,
+	undoManagerReference,
 	undoManager,
 	embedPreviews,
 	userPermissions,
@@ -745,4 +777,5 @@ export default combineReducers( {
 	editorAssets,
 	syncConnectionStatuses,
 	collaborationSupported,
+	viewConfigs,
 } );

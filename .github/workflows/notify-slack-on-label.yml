@@ -9,7 +9,7 @@ on:
 jobs:
     notify:
         if: ${{ github.event.label.name == 'Needs Testing' }}
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions: {}
         env:
             SLACK_WEBHOOK_URL: ${{ secrets.SLACK_NEEDS_TESTING_LABEL_ADDED_WEBHOOK_URL }}

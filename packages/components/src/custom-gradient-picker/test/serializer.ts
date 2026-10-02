@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, test } from 'vitest';
 import {
 	serializeGradientColor,
 	serializeGradientPosition,

@@ -1,8 +1,3 @@
-/**
- * Internal dependencies
- */
-import type { ButtonProps } from '../button/types';
-
 export type RadioGroupProps = {
 	/**
 	 * Accessible label for the radio group
@@ -32,7 +27,14 @@ export type RadioGroupProps = {
 	children: React.ReactNode;
 };
 
-export type RadioProps = Pick< ButtonProps, '__next40pxDefaultSize' > & {
+export type RadioProps = {
+	/**
+	 * Start opting into the larger default height that will become the default size in a future version.
+	 *
+	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+	 * @ignore
+	 */
+	__next40pxDefaultSize?: boolean;
 	/**
 	 * The actual value of the radio element.
 	 */

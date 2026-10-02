@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const {
 	test: base,
 	expect,
@@ -17,6 +14,14 @@ const test = base.extend( {
 } );
 
 test.describe( 'Widgets screen', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await Promise.all( [
+			// TODO: Ideally we can bundle our test theme directly in the repo.
+			requestUtils.activateTheme( 'twentytwenty' ),
+			requestUtils.deleteAllWidgets(),
+		] );
+	} );
+
 	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.visitAdminPage( 'widgets.php' );
 
@@ -27,14 +32,6 @@ test.describe( 'Widgets screen', () => {
 
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllWidgets();
-	} );
-
-	test.beforeAll( async ( { requestUtils } ) => {
-		await Promise.all( [
-			// TODO: Ideally we can bundle our test theme directly in the repo.
-			requestUtils.activateTheme( 'twentytwenty' ),
-			requestUtils.deleteAllWidgets(),
-		] );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -51,8 +48,11 @@ test.describe( 'Widgets screen', () => {
 			'Update button should start out disabled'
 		).toBeDisabled();
 
-		const [ firstWidgetArea, secondWidgetArea ] =
-			await widgetsScreen.widgetAreas.all();
+		await expect
+			.poll( () => widgetsScreen.widgetAreas.count() )
+			.toBeGreaterThanOrEqual( 2 );
+		const firstWidgetArea = widgetsScreen.widgetAreas.first();
+		const secondWidgetArea = widgetsScreen.widgetAreas.nth( 1 );
 
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
@@ -83,7 +83,11 @@ test.describe( 'Widgets screen', () => {
 			{ name: /^Empty block/ }
 		);
 
-		await addedParagraphBlockInFirstWidgetArea.focus();
+		// Click rather than focus programmatically: once the widget area has
+		// a sibling, the block's editable is an inert part of the editing
+		// host and cannot hold focus; the click places the caret through the
+		// host like a real interaction.
+		await addedParagraphBlockInFirstWidgetArea.click();
 		await page.keyboard.type( 'First Paragraph' );
 
 		await widgetsScreen.getBlockInGlobalInserter( 'Paragraph' );
@@ -91,7 +95,7 @@ test.describe( 'Widgets screen', () => {
 		// TODO: We can add a test for the insertion indicator here.
 		await addParagraphBlock.click();
 
-		await addedParagraphBlockInFirstWidgetArea.focus();
+		await addedParagraphBlockInFirstWidgetArea.click();
 		await page.keyboard.type( 'Second Paragraph' );
 
 		const addShortCodeBlock =
@@ -116,7 +120,7 @@ test.describe( 'Widgets screen', () => {
 			secondWidgetArea.getByRole( 'document', {
 				name: /^Empty block/,
 			} );
-		await addedParagraphBlockInSecondWidgetArea.focus();
+		await addedParagraphBlockInSecondWidgetArea.click();
 		await page.keyboard.type( 'Third Paragraph' );
 
 		await expect.poll( widgetsScreen.getWidgetAreaBlocks ).toMatchObject( {
@@ -570,10 +574,14 @@ test.describe( 'Widgets screen', () => {
 		await widgetsScreen.saveWidgets();
 
 		// Delete the last block and save again.
+		// Click rather than focus programmatically: the block is still
+		// selected from its insertion, so its editable is an inert part of
+		// the editing host and cannot hold focus; the click places the caret
+		// through the host like a real interaction.
 		await firstWidgetArea
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: 'Second Paragraph' } )
-			.focus();
+			.click();
 		await pageUtils.pressKeys( 'access+z' );
 		await widgetsScreen.saveWidgets();
 
@@ -633,6 +641,8 @@ test.describe( 'Widgets screen', () => {
 		await pageUtils.setBrowserViewport( 'small' );
 
 		const firstWidgetArea = widgetsScreen.widgetAreas.first();
+		// Wait for the widget areas to render before inserting.
+		await expect( firstWidgetArea ).toBeVisible();
 
 		const addParagraphBlock =
 			await widgetsScreen.getBlockInGlobalInserter( 'Paragraph' );
@@ -653,6 +663,34 @@ test.describe( 'Widgets screen', () => {
 				},
 			],
 		} );
+	} );
+
+	// Check for regressions of https://github.com/WordPress/gutenberg/issues/52328.
+	test( 'should open the welcome guide from the Options menu', async ( {
+		page,
+	} ) => {
+		const welcomeGuide = page.getByRole( 'dialog', {
+			name: 'Welcome to block Widgets',
+		} );
+		await expect( welcomeGuide ).toBeHidden();
+
+		await page
+			.getByRole( 'region', { name: 'Widgets top bar' } )
+			.getByRole( 'button', { name: 'Options', exact: true } )
+			.click();
+
+		// The item opens a dialog, so it is a plain menu item rather than a
+		// preference toggle (`menuitemcheckbox`).
+		const welcomeGuideMenuItem = page.getByRole( 'menuitem', {
+			name: 'Welcome Guide',
+		} );
+		await expect( welcomeGuideMenuItem ).toHaveAttribute(
+			'aria-haspopup',
+			'dialog'
+		);
+		await welcomeGuideMenuItem.click();
+
+		await expect( welcomeGuide ).toBeVisible();
 	} );
 } );
 

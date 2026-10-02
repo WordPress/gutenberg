@@ -1,20 +1,10 @@
-/**
- * External dependencies
- */
+import { describe, it } from 'vitest';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../wordpress-component';
 
 // Static TypeScript checks
-/* eslint-disable jest/expect-expect */
+/* eslint-disable vitest/expect-expect -- TypeScript checks these cases during typecheck. */
 describe( 'WordPressComponentProps', () => {
 	it( 'should not accept a ref', () => {
 		const Foo = ( props: WordPressComponentProps< {}, 'div' > ) => (
@@ -35,4 +25,4 @@ describe( 'WordPressComponentProps', () => {
 		<ForwardedFoo ref={ null } />;
 	} );
 } );
-/* eslint-enable jest/expect-expect */
+/* eslint-enable vitest/expect-expect */

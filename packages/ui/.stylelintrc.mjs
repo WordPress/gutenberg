@@ -1,18 +1,8 @@
 /** @type {import('stylelint').Config} */
 export default {
-	extends: '../../.stylelintrc.js',
+	extends: '@wordpress/stylelint-tools/config',
 	rules: {
-		'declaration-property-value-disallowed-list': [
-			{
-				cursor: [ 'pointer' ],
-			},
-			{
-				message: ( property, value ) => {
-					if ( property === 'cursor' ) {
-						return 'Use the `var( --wpds-cursor-control )` token for interactive non-link controls. If this is for a link, you can disable this rule.';
-					}
-				},
-			},
-		],
+		// `@wordpress/stylelint-config` forbids `--_gcd-*` and `--_wp-*` via `custom-property-pattern`. Disable that rule here so this package can keep using those private tokens.
+		'custom-property-pattern': null,
 	},
 };

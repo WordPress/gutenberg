@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useState, useEffect } from '@wordpress/element';
 
 /** @typedef {import('@wordpress/element').RefObject} RefObject */

@@ -13,7 +13,7 @@ export function setDelayedInterval( callback: () => void, delayMs: number ) {
 	const runner = () => {
 		try {
 			callback();
-		} catch ( error ) {
+		} catch {
 			// Do nothing
 		}
 

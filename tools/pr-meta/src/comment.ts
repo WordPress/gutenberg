@@ -1,0 +1,565 @@
+import { COMMENT_LIMIT, SECTIONS, getSection } from './sections.ts';
+import type { SectionDefinition } from './sections.ts';
+
+export const COMMENT_MARKER = '<!-- gutenberg-pr-meta -->';
+const COMMENT_HEADING = '### 🤖 PR meta 🤖';
+
+export type ParsedSection = {
+	id: string;
+	body: string;
+	sha?: string;
+	runUrl?: string;
+};
+
+export type SectionUpdate = {
+	id: string;
+	body: string;
+	sha?: string;
+	runUrl?: string;
+};
+
+const SECTION_PATTERN =
+	/<!-- pr-meta:section:([a-z0-9-]+)((?: [a-z]+=[^\s>]*)*) -->\n([\s\S]*?)\n<!-- \/pr-meta:section:\1 -->/g;
+
+export function isPrMetaComment( body: string ): boolean {
+	return body.startsWith( COMMENT_MARKER );
+}
+
+/**
+ * Neutralises section delimiters in producer content.
+ *
+ * Some bodies carry text this repository does not control, most of all the
+ * flaky tests section, which interpolates errors thrown by PR-authored tests.
+ * An unescaped delimiter there could close its own section early and forge
+ * another one.
+ *
+ * @param body Untrusted markdown.
+ * @return The same markdown with every delimiter rendered inert.
+ */
+export function sanitizeBody( body: string ): string {
+	return body.replace( /<!--(\s*\/?\s*)pr-meta:/g, '&lt;!--$1pr-meta:' );
+}
+
+/** Section headings are `####`, so a body's own headings start below them. */
+const BODY_HEADING_LEVEL = 5;
+const MAX_HEADING_LEVEL = 6;
+
+/*
+ * The hashes and the rest of the line, so neither is reconstructed by hand.
+ * `s` matters: without it a `.` stops at the carriage return of a CRLF body,
+ * so no line would match and the body would be left half demoted.
+ */
+const HEADING = /^( {0,3})(#{1,6})([ \t].*|\r?)$/s;
+/* A fence opens on three or more backticks or tildes, indented at most three. */
+const FENCE = /^ {0,3}(`{3,}|~{3,})(.*)$/s;
+
+/**
+ * Tracks whether a line falls inside a fenced code block.
+ *
+ * A fence closes only on the character it opened with, repeated at least as
+ * many times.
+ *
+ * @return A tracker fed one line at a time, in order.
+ */
+function fenceTracker() {
+	let open: string | undefined;
+
+	return {
+		/**
+		 * @param line The next line of the body.
+		 * @return Whether it is fenced, its delimiters included.
+		 */
+		track( line: string ): boolean {
+			const match = line.match( FENCE );
+
+			if ( ! match ) {
+				return open !== undefined;
+			}
+
+			const [ , marker, info ] = match;
+
+			if ( open === undefined ) {
+				if ( marker.startsWith( '`' ) && info.includes( '`' ) ) {
+					return false;
+				}
+				open = marker;
+				return true;
+			}
+
+			if (
+				marker[ 0 ] === open[ 0 ] &&
+				marker.length >= open.length &&
+				info.trim() === ''
+			) {
+				open = undefined;
+			}
+
+			return true;
+		},
+
+		/** The marker of a fence still waiting to be closed. */
+		get openMarker() {
+			return open;
+		},
+	};
+}
+
+/**
+ * Pushes a body's own headings below the heading of its section.
+ *
+ * A producer renders its markdown without knowing where it will sit, so props
+ * opens with `## Unlinked Accounts` and would outrank the `#### Props` above
+ * it. Shifting them all by the same amount keeps their hierarchy intact.
+ *
+ * @param body Markdown that may carry its own headings.
+ * @return The same markdown, its headings demoted.
+ */
+export function demoteHeadings( body: string ): string {
+	const lines = body.split( '\n' );
+
+	let fences = fenceTracker();
+	let shallowest = MAX_HEADING_LEVEL;
+
+	for ( const line of lines ) {
+		const level = fences.track( line )
+			? undefined
+			: line.match( HEADING )?.[ 2 ].length;
+
+		if ( level !== undefined ) {
+			shallowest = Math.min( shallowest, level );
+		}
+	}
+
+	const shift = Math.max( 0, BODY_HEADING_LEVEL - shallowest );
+
+	if ( shift === 0 ) {
+		return body;
+	}
+
+	fences = fenceTracker();
+
+	return lines
+		.map( ( line ) => {
+			if ( fences.track( line ) ) {
+				return line;
+			}
+
+			return line.replace(
+				HEADING,
+				( _, indent, hashes, rest ) =>
+					`${ indent }${ '#'.repeat(
+						Math.min( hashes.length + shift, MAX_HEADING_LEVEL )
+					) }${ rest }`
+			);
+		} )
+		.join( '\n' );
+}
+
+function parseAttributes(
+	raw: string
+): Pick< ParsedSection, 'sha' | 'runUrl' > {
+	const attributes: Pick< ParsedSection, 'sha' | 'runUrl' > = {};
+
+	for ( const pair of raw.trim().split( /\s+/ ).filter( Boolean ) ) {
+		const [ key, value ] = pair.split( '=' );
+		if ( key === 'sha' ) {
+			attributes.sha = safeSha( value );
+		} else if ( key === 'run' ) {
+			attributes.runUrl = safeRunUrl( value );
+		}
+	}
+
+	return attributes;
+}
+
+export function parseSections( commentBody: string ): ParsedSection[] {
+	const sections: ParsedSection[] = [];
+
+	for ( const match of commentBody.matchAll( SECTION_PATTERN ) ) {
+		const [ , id, rawAttributes, body ] = match;
+		sections.push( { id, body, ...parseAttributes( rawAttributes ) } );
+	}
+
+	return sections;
+}
+
+/**
+ * Whether every delimiter in a comment belongs to a section that parses.
+ *
+ * A body with an unbalanced delimiter would lose the surrounding content on
+ * the next render, so the writer refuses to touch it rather than quietly
+ * dropping someone else's section.
+ *
+ * @param commentBody An existing unified comment.
+ * @return Whether the comment can be safely rewritten.
+ */
+export function isParseable( commentBody: string ): boolean {
+	const delimiters = commentBody.match( /<!-- \/?pr-meta:section:/g ) ?? [];
+
+	return delimiters.length === parseSections( commentBody ).length * 2;
+}
+
+/**
+ * Keeps the start of a body, closing whatever the cut left open.
+ *
+ * @param body The body to cut.
+ * @param room How many characters the cut may keep.
+ * @param note The truncation note to append.
+ * @return The shortened body.
+ */
+/*
+ * A run URL is one this repository builds, so anything longer is not one. It
+ * is kept in the marker and the footer as well as the note, and nothing else
+ * bounds what a caller passes.
+ */
+const MAX_RUN_URL = 256;
+
+/*
+ * Marker attributes carry no whitespace and no `>`, or the section stops
+ * parsing. Rather than escape them, take only a value that already reads like
+ * what it claims to be, whether it arrives from a caller or from a comment a
+ * previous revision wrote.
+ */
+const SHA = /^[0-9a-f]{7,40}$/;
+/* `http` too: Enterprise Server serves Actions over it when TLS is off. */
+const RUN_URL = /^https?:\/\/[^\s>]+$/;
+
+function safeSha( value?: string ): string | undefined {
+	return value && SHA.test( value ) ? value : undefined;
+}
+
+function safeRunUrl( value?: string ): string | undefined {
+	return value && value.length <= MAX_RUN_URL && RUN_URL.test( value )
+		? value
+		: undefined;
+}
+
+function keepStart( body: string, room: number, note: string ): string {
+	const head = body.slice( 0, room );
+
+	/*
+	 * A paragraph break, so the cut falls between whole items, unless that
+	 * throws most of the room away: a stack trace is one fenced block with no
+	 * blank line in it, and cutting above the fence would keep none of it.
+	 */
+	const paragraph = head.lastIndexOf( '\n\n' );
+	const boundary =
+		paragraph > room / 2 ? paragraph : head.lastIndexOf( '\n' );
+	const kept = boundary > 0 ? head.slice( 0, boundary ) : head;
+
+	return `${ kept }${ closeOpenBlocks( kept ) }\n\n${ note }`;
+}
+
+/**
+ * Keeps the end of a body, repairing the blocks at both cut edges.
+ *
+ * @param body The body to cut.
+ * @param room How many characters the cut may keep.
+ * @param note The truncation note to prepend.
+ * @return The shortened body, or nothing when there is no safe cut.
+ */
+function keepEnd(
+	body: string,
+	room: number,
+	note: string
+): string | undefined {
+	/*
+	 * Never mid-line: that could split a fence opener. Never at the first
+	 * paragraph break either, which inside a fence of single-spaced lines
+	 * falls past the closing marker and drops the trailer.
+	 */
+	const cut = body.slice( body.length - room );
+	const boundary = cut.indexOf( '\n' ) + 1;
+
+	if ( boundary <= 0 ) {
+		return undefined;
+	}
+
+	const kept = cut.slice( boundary );
+	const dropped = body.slice( 0, body.length - kept.length );
+	const reopened = `${ note }${ reopenBlocks( dropped ) }\n\n${ kept }`;
+
+	/* The kept end can leave a block open just as the dropped start can. */
+	return `${ reopened }${ closeOpenBlocks( reopened ) }`;
+}
+
+function truncate(
+	body: string,
+	definition: SectionDefinition,
+	runUrl?: string
+) {
+	if ( body.length <= definition.budget ) {
+		return body;
+	}
+
+	const link = runUrl ? ` [See the full report](${ runUrl }).` : '';
+	const linked = `<sub>Truncated.${ link }</sub>`;
+	/* A link with no room left to sit in is worth less than the body it cost. */
+	const note =
+		linked.length > definition.budget / 2
+			? '<sub>Truncated.</sub>'
+			: linked;
+	const shorten = ( room: number ) =>
+		definition.keep === 'end'
+			? ( keepEnd( body, room, note ) ?? keepStart( body, room, note ) )
+			: keepStart( body, room, note );
+
+	/*
+	 * Closing an open block costs a marker of no fixed length, so measure the
+	 * result and cut again by the overflow rather than reserving a guess.
+	 */
+	let room = definition.budget - note.length;
+	for ( let attempt = 0; attempt < 8 && room > 0; attempt++ ) {
+		const candidate = shorten( room );
+
+		if ( candidate.length <= definition.budget ) {
+			return candidate;
+		}
+
+		room -= candidate.length - definition.budget;
+	}
+
+	/* Nothing of the body fits, so say only that, and within the budget. */
+	return note.slice( 0, definition.budget );
+}
+
+/**
+ * Reopens the fence a dropped prefix left open.
+ *
+ * @param dropped The part of a body cut from its start.
+ * @return The opening markup the remainder needs, if any.
+ */
+function reopenBlocks( dropped: string ): string {
+	const fences = fenceTracker();
+	for ( const line of dropped.split( '\n' ) ) {
+		fences.track( line );
+	}
+
+	return fences.openMarker ? `\n\n${ fences.openMarker }` : '';
+}
+
+/**
+ * Closes the code fences and disclosures a truncated body left open.
+ *
+ * @param body A body that has been cut short.
+ * @return The closing markup it needs, if any.
+ */
+function closeOpenBlocks( body: string ): string {
+	const closing = [];
+
+	/* Closes with the marker that opened, not always three backticks. */
+	const fences = fenceTracker();
+	for ( const line of body.split( '\n' ) ) {
+		fences.track( line );
+	}
+	if ( fences.openMarker ) {
+		closing.push( fences.openMarker );
+	}
+
+	const open = ( body.match( /<details>/g ) ?? [] ).length;
+	const closed = ( body.match( /<\/details>/g ) ?? [] ).length;
+	closing.push(
+		...Array( Math.max( open - closed, 0 ) ).fill( '</details>' )
+	);
+
+	return closing.length > 0 ? `\n${ closing.join( '\n' ) }` : '';
+}
+
+function renderFooter( section: ParsedSection, headSha?: string ) {
+	if ( ! section.sha ) {
+		return '';
+	}
+
+	const short = section.sha.slice( 0, 7 );
+	const link = section.runUrl ? ` [Run](${ section.runUrl })` : '';
+	const stale = headSha && section.sha !== headSha;
+
+	return stale
+		? `\n\n<sub>From \`${ short }\`, not the current head.${ link }</sub>`
+		: `\n\n<sub>\`${ short }\`${ link }</sub>`;
+}
+
+function renderSection(
+	section: ParsedSection,
+	definition: SectionDefinition | undefined,
+	headSha?: string
+) {
+	const attributes = [
+		section.sha && `sha=${ section.sha }`,
+		section.runUrl && `run=${ section.runUrl }`,
+	]
+		.filter( Boolean )
+		.join( ' ' );
+	const open = `<!-- pr-meta:section:${ section.id }${
+		attributes ? ` ${ attributes }` : ''
+	} -->`;
+	const close = `<!-- /pr-meta:section:${ section.id } -->`;
+	const heading = definition ? `#### ${ definition.heading }\n\n` : '';
+	const body = section.body;
+
+	const delimited = `${ open }\n${ body }\n${ close }`;
+
+	/*
+	 * The heading, the fold and the footer all sit outside the delimiters.
+	 * Everything between them is read back verbatim as the body, so a
+	 * decoration kept inside would be re-rendered on top of itself at every
+	 * write. The blank lines are what let GitHub render markdown inside the
+	 * fold.
+	 */
+	const content = definition?.summary
+		? `<details>\n<summary>${ definition.summary }</summary>\n\n${ delimited }\n\n</details>`
+		: delimited;
+
+	return `${ heading }${ content }${ renderFooter( section, headSha ) }`;
+}
+
+/**
+ * Orders sections by the registry, keeping ids it does not know at the end so
+ * a workflow running an older revision of this action never loses its section.
+ *
+ * @param sections Sections in no particular order.
+ * @return The same sections in render order.
+ */
+function inRegistryOrder( sections: ParsedSection[] ): ParsedSection[] {
+	const known = SECTIONS.map( ( { id } ) =>
+		sections.find( ( section ) => section.id === id )
+	).filter( ( section ): section is ParsedSection => Boolean( section ) );
+	const unknown = sections.filter(
+		( section ) => ! getSection( section.id )
+	);
+
+	return [ ...known, ...unknown ];
+}
+
+/**
+ * Drops trailing sections until the comment fits.
+ *
+ * Section budgets are chosen to fit together, but a section written by a newer
+ * revision of this action is outside that arithmetic, and GitHub rejects an
+ * oversized body outright. Registry order puts what a human acts on first, so
+ * trimming from the end sheds the least important content.
+ *
+ * @param sections Sections in render order.
+ * @param render   Renders the whole comment from a list of sections.
+ * @return The sections that fit.
+ */
+function withinLimit(
+	sections: ParsedSection[],
+	render: ( kept: ParsedSection[] ) => string
+): ParsedSection[] {
+	const kept = [ ...sections ];
+
+	while ( kept.length > 1 && render( kept ).length > COMMENT_LIMIT ) {
+		kept.pop();
+	}
+
+	return kept;
+}
+
+export function renderComment(
+	sections: ParsedSection[],
+	headSha?: string
+): string {
+	const render = ( kept: ParsedSection[] ) =>
+		`${ COMMENT_MARKER }\n${ COMMENT_HEADING }\n\n${ kept
+			.map( ( section ) =>
+				renderSection( section, getSection( section.id ), headSha )
+			)
+			.join( '\n\n' ) }\n`;
+
+	return render( withinLimit( inRegistryOrder( sections ), render ) );
+}
+
+export type MergeResult = {
+	/** The full comment body to write, when there is one. */
+	body?: string;
+	/** Whether the comment should be deleted, its last section having gone. */
+	remove?: boolean;
+	/** Set when the update was dropped, explaining why. */
+	rejected?: string;
+};
+
+/**
+ * Applies one section update to an existing unified comment.
+ *
+ * @param existing The current comment body, or `undefined` when there is none.
+ * @param update   The section to insert, replace or, with an empty body, remove.
+ * @param headSha  Current head SHA of the pull request, when known.
+ * @return The merged comment body, or the reason the update was dropped.
+ */
+export function mergeSection(
+	existing: string | undefined,
+	update: SectionUpdate,
+	headSha?: string
+): MergeResult {
+	const definition = getSection( update.id );
+
+	if ( ! definition ) {
+		return { rejected: `Unknown section "${ update.id }".` };
+	}
+
+	const sections = existing ? parseSections( existing ) : [];
+
+	const current = sections.find( ( section ) => section.id === update.id );
+	/* Before the check below, so an unusable one is rejected, not stored. */
+	const sha = safeSha( update.sha );
+
+	/*
+	 * A rerun of an older commit, or a run cancelled mid-flight, can finish
+	 * after a newer one. Only the current head, or a refresh of what the
+	 * section already shows, may write it. This covers clearing a section as
+	 * much as filling one: an old rerun that happens to be clean would
+	 * otherwise wipe a newer result. Both SHAs are required rather than
+	 * optional, since without either one the two cases are indistinguishable
+	 * and guessing lets the stale run through.
+	 */
+	if ( definition.scope === 'commit' && ( update.body || current ) ) {
+		if ( ! sha || ! headSha ) {
+			return {
+				rejected:
+					'A commit-scoped section needs both its own commit and the current head.',
+			};
+		}
+
+		if ( sha !== headSha && sha !== current?.sha ) {
+			return {
+				rejected: `Result is for ${ sha }, which is neither the head (${ headSha }) nor the commit already reported.`,
+			};
+		}
+	}
+
+	const runUrl = safeRunUrl( update.runUrl );
+
+	/*
+	 * Leading spaces stay: trimming them would turn indented code into a
+	 * fence. Truncated here rather than at render, so a writer running an
+	 * older revision cannot cut a section it did not produce.
+	 */
+	const body = truncate(
+		demoteHeadings( sanitizeBody( update.body ) )
+			.replace( /^[\r\n]+/, '' )
+			.trimEnd(),
+		definition,
+		runUrl
+	);
+	const remaining = sections.filter(
+		( section ) => section.id !== update.id
+	);
+	const next = body
+		? [
+				...remaining,
+				{
+					id: update.id,
+					body,
+					sha: definition.scope === 'commit' ? sha : undefined,
+					runUrl: definition.scope === 'commit' ? runUrl : undefined,
+				},
+			]
+		: remaining;
+
+	if ( next.length === 0 ) {
+		return { remove: Boolean( existing ) };
+	}
+
+	return { body: renderComment( next, headSha ) };
+}

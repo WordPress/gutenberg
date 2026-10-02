@@ -1,19 +1,13 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import {
 	Panel,
 	__experimentalToolsPanel as ToolsPanel,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import WidthHeightTool from '../width-height-tool';
 
 export default {
-	title: 'BlockEditor/DimensionsTool/WidthHeightTool',
+	id: 'blockeditor-dimensionstool-widthheighttool',
+	title: 'Editor/Block Editor/DimensionsTool/WidthHeightTool',
 	component: WidthHeightTool,
 	tags: [ 'status-private' ],
 	argTypes: {

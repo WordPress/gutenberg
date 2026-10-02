@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { SeparatorProps } from '@ariakit/react';
-
-/**
- * Internal dependencies
- */
 import type { SpaceInput } from '../utils/space';
 
 export type DividerProps = Omit<

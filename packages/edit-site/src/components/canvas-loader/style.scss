@@ -13,10 +13,10 @@
 		animation: 0.5s ease 0.2s edit-site-canvas-loader__fade-in-animation;
 		animation-fill-mode: forwards;
 	}
+}
 
-	& > div {
-		width: 160px;
-	}
+.edit-site-canvas-loader__progress {
+	width: 160px;
 }
 
 @keyframes edit-site-canvas-loader__fade-in-animation {

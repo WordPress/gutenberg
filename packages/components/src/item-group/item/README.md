@@ -1,8 +1,6 @@
 # `Item`
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
+<p class="callout callout-alert">This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.</p>
 
 `Item` is used in combination with `ItemGroup` to display a list of items grouped and styled together.
 

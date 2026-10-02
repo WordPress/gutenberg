@@ -2,6 +2,53 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   The sync manager's undo manager no longer stands in for the editor's undo manager. It is the undo history of the loaded entities only: it reports each level Yjs opens through the new `onUndoLevelOpened` record handler (replacing `onUndoStackChange`), and `undo()` and `redo()` take the entity whose level to move and return whether a level was moved. Each entity has its own Yjs undo manager, which replaces the copied `YMultiDocUndoManager`. `stopCapturing()` and `clearRedo()` let the consumer keep its own history in step. The manager exposes `isLoaded()`, and its undo manager exists from creation instead of from the first load. Together with the `core-data` change, undo and redo keep working for entities collaboration does not sync ([#83888](https://github.com/WordPress/gutenberg/pull/83888)).
+
+## 1.56.0 (2026-09-23)
+
+### New Features
+
+-   Pass the Yjs module to sync provider creators as the `Y` property of the provider creator options. Providers should use it instead of the `window.wp.sync.Y` global, which will be removed in a future release ([#82621](https://github.com/WordPress/gutenberg/pull/82621)).
+
+## 1.55.0 (2026-09-10)
+
+## 1.54.0 (2026-08-26)
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+-   Provide the default HTTP polling provider only when the Real-Time Collaboration experiment sets `window.__experimentalEnableRealTimeCollaboration`, replacing the `window._wpCollaborationEnabled` option flag ([#80658](https://github.com/WordPress/gutenberg/pull/80658)).
+
+## 1.53.0 (2026-08-12)
+
+## 1.52.0 (2026-07-29)
+
+## 1.51.0 (2026-07-14)
+
+## 1.50.0 (2026-07-01)
+
+## 1.49.0 (2026-06-24)
+
+## 1.48.1 (2026-06-16)
+
+## 1.48.0 (2026-06-10)
+
+-   Prevent RTC polling interval filters from slowing active HTTP polling.
+
+## 1.47.0 (2026-05-27)
+
+## 1.46.0 (2026-05-14)
+
+## 1.45.0 (2026-04-29)
+
+## 1.44.0 (2026-04-15)
+
+## 1.43.0 (2026-04-01)
+
+## 1.42.0 (2026-03-18)
+
 ## 1.41.0 (2026-03-04)
 
 ## 1.40.0 (2026-02-18)

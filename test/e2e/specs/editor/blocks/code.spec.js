@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Code', () => {
@@ -10,7 +7,7 @@ test.describe( 'Code', () => {
 
 	test( 'can be created by three backticks', async ( { editor, page } ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '```<?php' );
 
@@ -90,12 +87,14 @@ test.describe( 'Code', () => {
 
 		test.describe( 'FROM HTML', () => {
 			test( 'should preserve the content', async ( { editor } ) => {
-				await editor.insertBlock( {
-					name: 'core/html',
-					attributes: {
-						content: 'initial content',
-					},
-				} );
+				// The HTML block's markup lives in its inner content, not in
+				// an attribute, so it can't be seeded via `insertBlock`.
+				await editor.setContent(
+					`<!-- wp:html -->\ninitial content\n<!-- /wp:html -->`
+				);
+				await editor.canvas
+					.locator( '[data-type="core/html"]' )
+					.click();
 				await editor.transformBlockTo( 'core/code' );
 				const codeBlock = ( await editor.getBlocks() )[ 0 ];
 				expect( codeBlock.name ).toBe( 'core/code' );
@@ -110,7 +109,6 @@ test.describe( 'Code', () => {
 				await editor.insertBlock( {
 					name: 'core/html',
 					attributes: {
-						content: 'initial content',
 						metadata: {
 							name: 'Custom name',
 						},

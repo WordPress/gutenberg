@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import BaseControl from '.';
 import type { BaseControlProps } from './types';
 

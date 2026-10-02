@@ -11,7 +11,14 @@ import { WithMaxWidthWrapper } from './decorators/with-max-width-wrapper';
 import { WithRTL } from './decorators/with-rtl';
 import { WithDesignSystemTheme } from './decorators/with-design-system-theme';
 import { ComponentStatusIndicator } from './components/component-status-indicator';
+import { handlePreloadError } from './load-error-recovery';
 import theme from './theme';
+
+if ( typeof window !== 'undefined' ) {
+	window.addEventListener( 'vite:preloadError', handlePreloadError, {
+		once: true,
+	} );
+}
 
 export const globalTypes = {
 	direction: {
@@ -58,7 +65,10 @@ export const globalTypes = {
 		},
 	},
 	dsColorTheme: {},
-	dsDensity: {},
+	dsPrimaryColor: {},
+	dsBackgroundColor: {},
+	dsCursorControl: {},
+	dsCornerRadius: {},
 };
 
 export const decorators = [
@@ -69,7 +79,11 @@ export const decorators = [
 ];
 
 export const parameters = {
+	a11y: {
+		test: 'error',
+	},
 	controls: {
+		expanded: true,
 		sort: 'requiredFirst',
 	},
 	backgrounds: {
@@ -96,25 +110,65 @@ export const parameters = {
 	},
 	options: {
 		storySort: ( a, b ) => {
+			// Top-level folders in sidebar order. Every root is listed so the
+			// order is deliberate; a nested array orders the folder before it.
 			const SECTION_ORDER = [
-				'Docs',
-				'Playground',
-				'BlockEditor',
+				'Introduction',
+				'Design System',
+				[
+					'Introduction',
+					'Contributing',
+					'Foundations',
+					'Tokens',
+					'Theme',
+					'Patterns',
+					'DataViews',
+					'Admin UI',
+					'Icons',
+				],
 				'Components',
 				[
-					'Actions',
-					'Containers',
-					'Feedback',
-					'Layout',
-					'Navigation',
-					'Overlays',
-					'Selection & Input',
-					'Typography',
-					'Utilities',
-					'Deprecated',
+					'Introduction',
+					'@wordpress-ui',
+					[ 'Introduction' ],
+					'@wordpress-components',
+					[
+						'Introduction',
+						'Contributing Guidelines',
+						'Actions',
+						'Containers',
+						'Feedback',
+						'Layout',
+						'Navigation',
+						'Overlays',
+						'Selection & Input',
+						'Typography',
+						'Utilities',
+						'Deprecated',
+					],
 				],
-				'Icons',
-				'Design System',
+				'Editor',
+				[
+					'Block Editor',
+					'Global Styles',
+					'Image Cropper',
+					'Media Editor',
+					'Upload Progress Snackbar',
+				],
+				'Widgets',
+				[
+					'Primitives',
+					[ 'Introduction', 'Anatomy', 'System Architecture' ],
+					'Dashboard',
+					[
+						'Introduction',
+						'Anatomy',
+						'Widget Chrome',
+						'Playground',
+					],
+					'Grid',
+				],
+				'Playground',
 			];
 			const PRIORITIZED_MDX_DOCS = [ 'Introduction', 'Overview' ];
 
@@ -250,4 +304,4 @@ export const parameters = {
 	},
 };
 
-export const tags = [ 'autodocs' ];
+export const tags = [ 'autodocs', '!manifest' ];

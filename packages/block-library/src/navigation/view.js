@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	store,
 	getContext,
@@ -80,6 +77,20 @@ const { state, actions } = store(
 					? ctx.overlayOpenedBy
 					: ctx.submenuOpenedBy;
 			},
+			get isSubmenuOpen() {
+				const ctx = getContext();
+				const isDefaultOverlayOpen =
+					! ctx.hasCustomOverlay &&
+					Object.values( ctx.overlayOpenedBy || {} ).filter( Boolean )
+						.length > 0;
+
+				// A submenu can be opened by user interaction or by being in a default overlay.
+				// If it is a regular navigation or within a custom overlay, it is opened by user interaction.
+				// If it's in a default overlay, it is forced opened via CSS.
+				// Because default overlays always force submenus open, we return true
+				// if the default overlay is open.
+				return isDefaultOverlayOpen || state.isMenuOpen;
+			},
 		},
 		actions: {
 			openMenuOnHover( event ) {
@@ -88,13 +99,8 @@ const { state, actions } = store(
 				if ( event?.pointerType === 'touch' ) {
 					return;
 				}
-				const { type, overlayOpenedBy } = getContext();
-				if (
-					type === 'submenu' &&
-					// Only open on hover if the overlay is closed.
-					Object.values( overlayOpenedBy || {} ).filter( Boolean )
-						.length === 0
-				) {
+				const { type } = getContext();
+				if ( type === 'submenu' ) {
 					actions.openMenu( 'hover' );
 				}
 			},
@@ -102,13 +108,8 @@ const { state, actions } = store(
 				if ( event?.pointerType === 'touch' ) {
 					return;
 				}
-				const { type, overlayOpenedBy } = getContext();
-				if (
-					type === 'submenu' &&
-					// Only close on hover if the overlay is closed.
-					Object.values( overlayOpenedBy || {} ).filter( Boolean )
-						.length === 0
-				) {
+				const { type } = getContext();
+				if ( type === 'submenu' ) {
 					actions.closeMenu( 'hover' );
 				}
 			},

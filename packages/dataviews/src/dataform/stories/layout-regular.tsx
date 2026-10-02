@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DataForm from '../index';
 import type {
 	CardLayout,
@@ -27,6 +20,7 @@ type SamplePost = {
 	password?: string;
 	filesize?: number;
 	dimensions?: string;
+	file_type?: string;
 	tags?: string[];
 	address1?: string;
 	address2?: string;
@@ -55,11 +49,16 @@ const fields: Field< SamplePost >[] = [
 	{
 		id: 'date',
 		label: 'Date',
+		type: 'date',
+	},
+	{
+		id: 'datetime',
+		label: 'DateTime',
 		type: 'datetime',
 	},
 	{
 		id: 'birthdate',
-		label: 'Date as options',
+		label: 'DateTime as options',
 		type: 'datetime',
 		elements: [
 			{ value: '', label: 'Select a date' },
@@ -126,11 +125,11 @@ const fields: Field< SamplePost >[] = [
 		id: 'can_comment',
 		label: 'Allow people to leave a comment',
 		type: 'boolean',
-		Edit: 'checkbox',
+		Edit: 'toggle',
 	},
 	{
 		id: 'filesize',
-		label: 'File Size',
+		label: 'File size',
 		type: 'integer',
 		readOnly: true,
 	},
@@ -138,6 +137,12 @@ const fields: Field< SamplePost >[] = [
 		id: 'dimensions',
 		label: 'Dimensions',
 		type: 'text',
+		readOnly: true,
+	},
+	{
+		// No type and no Edit: a read-only field without an edit control.
+		id: 'file_type',
+		label: 'File type',
 		readOnly: true,
 	},
 	{
@@ -177,7 +182,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'longDescription',
-		label: 'Long Description',
+		label: 'Long description',
 		type: 'text',
 		Edit: {
 			control: 'textarea',
@@ -186,7 +191,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'comment_status',
-		label: 'Comment Status',
+		label: 'Comment status',
 		type: 'text',
 		Edit: 'radio',
 		elements: [
@@ -196,7 +201,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'ping_status',
-		label: 'Allow Pings/Trackbacks',
+		label: 'Allow pings/trackbacks',
 		type: 'boolean',
 	},
 	{
@@ -230,7 +235,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'flight_status',
-		label: 'Flight Status',
+		label: 'Flight status',
 		type: 'text',
 		Edit: 'radio',
 		elements: [
@@ -301,7 +306,7 @@ const getLayoutFromStoryArgs = ( {
 			type: 'card',
 		};
 		if ( withHeader !== undefined ) {
-			// @ts-ignore We want to demo the effects of configuring withHeader.
+			// @ts-expect-error `cardLayout` is narrowed to the member whose `withHeader` can only be `true`.
 			cardLayout.withHeader = withHeader;
 		}
 		layout = cardLayout;
@@ -312,8 +317,10 @@ const getLayoutFromStoryArgs = ( {
 
 const LayoutRegularComponent = ( {
 	labelPosition,
+	disabled = false,
 }: {
 	labelPosition: 'default' | 'top' | 'side' | 'none';
+	disabled?: boolean;
 } ) => {
 	const [ post, setPost ] = useState( {
 		title: 'Hello, World!',
@@ -322,15 +329,29 @@ const LayoutRegularComponent = ( {
 		status: 'draft',
 		reviewer: 'fulano',
 		email: 'hello@wordpress.org',
-		date: '2021-01-01T12:00:00',
+		date: '2021-01-01',
+		datetime: '2021-01-01T12:00:00',
 		birthdate: '1950-02-23T12:00:00',
 		sticky: false,
 		can_comment: false,
 		filesize: 1024,
 		dimensions: '1920x1080',
+		file_type: 'JPEG',
 		tags: [ 'photography' ],
 		description: 'This is a sample description.',
 	} );
+
+	// Make fields disabled when control is set to disabled.
+	const _fields: Field< SamplePost >[] = useMemo( () => {
+		if ( ! disabled ) {
+			return fields;
+		}
+
+		return fields.map( ( field ) => ( {
+			...field,
+			isDisabled: true,
+		} ) );
+	}, [ disabled ] );
 
 	const form: Form = useMemo(
 		() => ( {
@@ -342,16 +363,18 @@ const LayoutRegularComponent = ( {
 				'title',
 				'order',
 				'sticky',
+				'can_comment',
 				'author',
 				'status',
 				'reviewer',
 				'email',
 				'password',
 				'date',
+				'datetime',
 				'birthdate',
-				'can_comment',
 				'filesize',
 				'dimensions',
+				'file_type',
 				'tags',
 				'description',
 				'longDescription',
@@ -363,7 +386,7 @@ const LayoutRegularComponent = ( {
 	return (
 		<DataForm< SamplePost >
 			data={ post }
-			fields={ fields }
+			fields={ _fields }
 			form={ form }
 			onChange={ ( edits ) =>
 				setPost( ( prev ) => ( {

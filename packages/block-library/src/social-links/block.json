@@ -60,6 +60,9 @@
 				"type": "flex"
 			}
 		},
+		"background": {
+			"gradient": true
+		},
 		"color": {
 			"enableContrastChecker": false,
 			"background": true,
@@ -95,6 +98,7 @@
 				"style": true
 			}
 		},
+		"shadow": true,
 		"contentRole": true,
 		"listView": true
 	},

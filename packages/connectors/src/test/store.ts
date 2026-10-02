@@ -1,11 +1,5 @@
-/**
- * WordPress dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { createRegistry } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store, STORE_NAME } from '../store';
 import { unlock } from '../lock-unlock';
 
@@ -37,7 +31,7 @@ describe( 'connectors store', () => {
 			const before = getConnectors();
 
 			registerConnector( 'test', {
-				label: 'Test',
+				name: 'Test',
 				description: 'A test connector',
 			} );
 
@@ -47,7 +41,7 @@ describe( 'connectors store', () => {
 			expect( after ).toHaveLength( 1 );
 			expect( after[ 0 ] ).toMatchObject( {
 				slug: 'test',
-				label: 'Test',
+				name: 'Test',
 			} );
 		} );
 	} );
@@ -61,23 +55,23 @@ describe( 'connectors store', () => {
 			);
 
 			registerConnector( 'test', {
-				label: 'Original',
+				name: 'Original',
 				description: 'Original description',
 			} );
 
 			registerConnector( 'test', {
-				label: 'Updated',
+				name: 'Updated',
 			} );
 
 			const connector = getConnector( 'test' );
 			expect( connector ).toMatchObject( {
 				slug: 'test',
-				label: 'Updated',
+				name: 'Updated',
 				description: 'Original description',
 			} );
 		} );
 
-		it( 'should allow updating render and icon independently', () => {
+		it( 'should allow updating render and logo independently', () => {
 			const registry = createRegistryWithStore();
 			const { getConnector } = unlock( registry.select( STORE_NAME ) );
 			const { registerConnector } = unlock(
@@ -86,7 +80,7 @@ describe( 'connectors store', () => {
 
 			const originalRender = () => null;
 			registerConnector( 'test', {
-				label: 'Test',
+				name: 'Test',
 				description: 'A test connector',
 				render: originalRender,
 			} );
@@ -98,7 +92,7 @@ describe( 'connectors store', () => {
 
 			const connector = getConnector( 'test' );
 			expect( connector?.render ).toBe( newRender );
-			expect( connector?.label ).toBe( 'Test' );
+			expect( connector?.name ).toBe( 'Test' );
 			expect( connector?.description ).toBe( 'A test connector' );
 		} );
 	} );
@@ -114,7 +108,7 @@ describe( 'connectors store', () => {
 			);
 
 			registerConnector( 'test', {
-				label: 'Test',
+				name: 'Test',
 				description: 'A test connector',
 			} );
 
@@ -134,7 +128,7 @@ describe( 'connectors store', () => {
 			);
 
 			registerConnector( 'test', {
-				label: 'Test',
+				name: 'Test',
 				description: 'A test connector',
 			} );
 

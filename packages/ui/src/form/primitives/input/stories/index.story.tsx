@@ -1,14 +1,24 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Input, InputLayout } from '../../../..';
+import { Input } from '../index';
+import { InputLayout } from '../../input-layout';
+import { WithSuffixControl as InputLayoutWithSuffixControl } from '../../input-layout/stories/index.story';
 
 const meta: Meta< typeof Input > = {
-	title: 'Design System/Components/Form/Primitives/Input',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-ui/Form/Primitives/Input',
+	id: 'design-system-components-form-primitives-input',
 	component: Input,
 	argTypes: {
 		defaultValue: { control: false },
 		onValueChange: { action: 'onValueChange' },
 		value: { control: false },
 		type: { control: 'text' },
+	},
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;
@@ -18,6 +28,7 @@ type Story = StoryObj< typeof Input >;
 export const Default: Story = {
 	args: {
 		placeholder: 'Placeholder',
+		'aria-label': 'Value',
 	},
 };
 
@@ -28,7 +39,15 @@ export const Default: Story = {
 export const WithPrefix: Story = {
 	args: {
 		placeholder: 'username',
+		'aria-label': 'Username',
 		prefix: <InputLayout.Slot>@</InputLayout.Slot>,
+	},
+};
+
+export const WithSuffixControl: Story = {
+	args: {
+		'aria-label': 'Value',
+		suffix: InputLayoutWithSuffixControl.args?.suffix,
 	},
 };
 

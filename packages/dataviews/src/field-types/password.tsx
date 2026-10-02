@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { NormalizedField } from '../types';
 import type { FieldType } from '../types/private';
 import isValidRequired from './utils/is-valid-required';

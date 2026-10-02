@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { debounce } from '../../utils/debounce';
 import useRefEffect from '../use-ref-effect';
 
@@ -32,6 +29,8 @@ import useRefEffect from '../use-ref-effect';
  */
 export default function useDisabled( {
 	isDisabled: isDisabledProp = false,
+}: {
+	isDisabled?: boolean;
 } = {} ) {
 	return useRefEffect(
 		( node ) => {
@@ -45,13 +44,13 @@ export default function useDisabled( {
 			}
 
 			/** A variable keeping track of the previous updates in order to restore them. */
-			const updates: Function[] = [];
+			const updates: ( () => void )[] = [];
 			const disable = () => {
 				node.childNodes.forEach( ( child ) => {
 					if ( ! ( child instanceof defaultView.HTMLElement ) ) {
 						return;
 					}
-					if ( ! child.getAttribute( 'inert' ) ) {
+					if ( ! child.hasAttribute( 'inert' ) ) {
 						child.setAttribute( 'inert', 'true' );
 						updates.push( () => {
 							child.removeAttribute( 'inert' );
