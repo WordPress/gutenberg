@@ -54,8 +54,10 @@
  * than run together into a phrase nobody typed.
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { Stack, Text } from '@wordpress/ui';
-import { useMemo } from '@wordpress/element';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Matches the note card's own "Show more" toggle.
+import { Button as UIButton, Stack, Text } from '@wordpress/ui';
+import { useMemo, useState } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 import { __unstableStripHTML as wpStripHTML } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { wordDiff, MAX_DIFF_LENGTH } from './word-diff';
@@ -647,14 +649,15 @@ function changedRuns(
  */
 function textDelta(
 	before: string,
-	after: string
+	after: string,
+	max: number = SUMMARY_MAX_CHARS
 ): { inserted: string; deleted: string } {
 	const segments = wordDiff( before, after );
 	const inserted = changedRuns( segments, 'insert' ).join( RUN_GAP );
 	const deleted = changedRuns( segments, 'delete' ).join( RUN_GAP );
 	return {
-		inserted: inserted.trim() ? ellipsize( inserted ) : '',
-		deleted: deleted.trim() ? ellipsize( deleted ) : '',
+		inserted: inserted.trim() ? ellipsize( inserted, max ) : '',
+		deleted: deleted.trim() ? ellipsize( deleted, max ) : '',
 	};
 }
 
@@ -680,15 +683,25 @@ function isTextLike( value: any ): boolean {
  * attribute changes are collapsed into a single `Change:` line listing the
  * touched settings.
  *
- * @param operations Operations.
+ * Quoted text is capped so a long edit stays a one-or-two line precis; pass
+ * `truncate: false` for the uncapped wording behind a "Show more" toggle. Both
+ * calls return the same lines in the same order, only the quotes differ.
+ *
+ * @param operations       Operations.
+ * @param options          Options.
+ * @param options.truncate Whether to cap quoted text. Defaults to true.
  * @return Rendered lines.
  */
 export function summarizeOperations(
-	operations: SuggestionOperation[] | null | undefined
+	operations: SuggestionOperation[] | null | undefined,
+	{ truncate = true }: { truncate?: boolean } = {}
 ): Array< { label: string; value: string } > {
 	if ( ! Array.isArray( operations ) || operations.length === 0 ) {
 		return [];
 	}
+
+	const textMax = truncate ? SUMMARY_MAX_CHARS : Infinity;
+	const sideMax = truncate ? REPLACE_SIDE_MAX_CHARS : Infinity;
 
 	const lines: Array< { label: string; value: string } > = [];
 	const attributeLabels: string[] = [];
@@ -773,18 +786,16 @@ export function summarizeOperations(
 						value: sprintf(
 							/* translators: 1: text being replaced. 2: proposed replacement text. */
 							__( '%1$s → %2$s' ),
-							presentText(
-								clampText( removed, REPLACE_SIDE_MAX_CHARS )
-							),
-							presentText(
-								clampText( added, REPLACE_SIDE_MAX_CHARS )
-							)
+							presentText( clampText( removed, sideMax ) ),
+							presentText( clampText( added, sideMax ) )
 						),
 					} );
 				} else if ( added || removed ) {
 					lines.push( {
 						label: added ? __( 'Add:' ) : __( 'Delete:' ),
-						value: presentText( clampText( added || removed ) ),
+						value: presentText(
+							clampText( added || removed, textMax )
+						),
 					} );
 				} else {
 					attributeLabels.push( attributeLabel( op.attribute ) );
@@ -796,7 +807,9 @@ export function summarizeOperations(
 			// of collapsing it the way the word-diff path does. Only fall back
 			// to the attribute label when no text resolved (marker edited away),
 			// signalled by a non-string or empty `op.text`.
-			const text = isTextLike( op.text ) ? clampText( op.text ) : '';
+			const text = isTextLike( op.text )
+				? clampText( op.text, textMax )
+				: '';
 			if ( text === '' ) {
 				attributeLabels.push( attributeLabel( op.attribute ) );
 				continue;
@@ -828,7 +841,7 @@ export function summarizeOperations(
 			if ( afterName && afterName !== beforeName ) {
 				lines.push( {
 					label: __( 'Rename block:' ),
-					value: `“${ ellipsize( afterName ) }”`,
+					value: `“${ ellipsize( afterName, textMax ) }”`,
 				} );
 				continue;
 			}
@@ -838,7 +851,7 @@ export function summarizeOperations(
 					value: sprintf(
 						/* translators: %s: the block's current custom name. */
 						__( 'reset “%s” to the default name' ),
-						ellipsize( beforeName )
+						ellipsize( beforeName, textMax )
 					),
 				} );
 				continue;
@@ -901,7 +914,11 @@ export function summarizeOperations(
 			continue;
 		}
 
-		const { inserted, deleted } = textDelta( beforeText, afterText );
+		const { inserted, deleted } = textDelta(
+			beforeText,
+			afterText,
+			textMax
+		);
 		/*
 		 * An edit that both removes and inserts is one change, not two. Two
 		 * lines read as an unrelated delete plus re-add — a paragraph merged
@@ -914,8 +931,8 @@ export function summarizeOperations(
 				value: sprintf(
 					/* translators: 1: text being replaced. 2: proposed replacement text. */
 					__( '%1$s → %2$s' ),
-					presentText( ellipsize( deleted, REPLACE_SIDE_MAX_CHARS ) ),
-					presentText( ellipsize( inserted, REPLACE_SIDE_MAX_CHARS ) )
+					presentText( ellipsize( deleted, sideMax ) ),
+					presentText( ellipsize( inserted, sideMax ) )
 				),
 			} );
 		} else if ( inserted ) {
@@ -985,6 +1002,11 @@ export function summarizeOperations(
  * Compact sidebar summary of a suggestion — "Add: …", "Delete: …",
  * "Change: …". Designed to mirror a Google Docs-style review note.
  *
+ * Quotes are capped so the card stays compact. When a cap cut anything, a
+ * "Show more" toggle swaps in the full wording: the collapsed text is cut,
+ * not clipped with CSS, so what the toggle hides is hidden from assistive
+ * technology too, and focus stays on the toggle across the swap.
+ *
  * @param props            Props.
  * @param props.operations Operations to summarize.
  */
@@ -993,14 +1015,28 @@ export default function SuggestionSummary( {
 }: {
 	operations: SuggestionOperation[];
 } ) {
+	const [ isExpanded, setIsExpanded ] = useState( false );
+	const summaryId = useInstanceId(
+		SuggestionSummary,
+		'editor-collab-sidebar-panel__suggestion-summary'
+	);
 	const lines = useMemo(
 		() => summarizeOperations( operations ),
 		[ operations ]
 	);
-
+	const fullLines = useMemo(
+		() => summarizeOperations( operations, { truncate: false } ),
+		[ operations ]
+	);
 	if ( lines.length === 0 ) {
 		return null;
 	}
+
+	const isTruncated = lines.some(
+		( line, index ) => line.value !== fullLines[ index ]?.value
+	);
+
+	const shownLines = isTruncated && isExpanded ? fullLines : lines;
 
 	return (
 		<Stack
@@ -1008,11 +1044,33 @@ export default function SuggestionSummary( {
 			gap="xs"
 			className="editor-collab-sidebar-panel__suggestion-summary"
 		>
-			{ lines.map( ( line, index ) => (
-				<Text key={ index } variant="body-md">
-					<strong>{ line.label }</strong> <em>{ line.value }</em>
-				</Text>
-			) ) }
+			<Stack direction="column" gap="xs" id={ summaryId }>
+				{ shownLines.map( ( line, index ) => (
+					<Text key={ index } variant="body-md">
+						<strong>{ line.label }</strong> <em>{ line.value }</em>
+					</Text>
+				) ) }
+			</Stack>
+			{ isTruncated && (
+				<UIButton
+					className="editor-collab-sidebar-panel__show-more-button"
+					variant="unstyled"
+					size="small"
+					aria-expanded={ isExpanded }
+					aria-controls={ summaryId }
+					onClick={ ( event ) => {
+						/*
+						 * A click that reaches the thread selects it, and
+						 * selecting moves focus to the thread, which would
+						 * pull focus off the toggle the user just pressed.
+						 */
+						event.stopPropagation();
+						setIsExpanded( ! isExpanded );
+					} }
+				>
+					{ isExpanded ? __( 'Show less' ) : __( 'Show more' ) }
+				</UIButton>
+			) }
 		</Stack>
 	);
 }
