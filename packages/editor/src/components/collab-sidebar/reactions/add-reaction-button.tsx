@@ -12,13 +12,12 @@ import {
 	emojiToStorageKey,
 	useReactionEmojiRules,
 	useReactionEmojis,
-} from './reaction-emoji-picker';
+} from './reaction-emojis';
 import {
 	detectLocale,
 	loadEmojibaseData,
 	useEmojibaseConfig,
 } from './emojibase-data';
-import { invalidateReactionNames } from './reaction-display';
 
 /*
  * `Dropdown`'s popover renders through `Popover.Slot` or a `<body>`-level
@@ -27,7 +26,6 @@ import { invalidateReactionNames } from './reaction-display';
 const POPOVER_PROPS = { placement: 'bottom-end' } as const;
 
 interface AddReactionButtonProps {
-	noteId: number;
 	disabled?: boolean;
 	onToggleReaction: ( slug: string ) => void;
 }
@@ -37,13 +35,11 @@ interface AddReactionButtonProps {
  * with its "Frequently used" section seeded from the named set.
  *
  * @param props                  Component props.
- * @param props.noteId           The parent note comment ID.
  * @param props.disabled         Whether the button is disabled (e.g. on a
  *                               resolved note thread).
  * @param props.onToggleReaction Callback to toggle a reaction.
  */
 export function AddReactionButton( {
-	noteId,
 	disabled = false,
 	onToggleReaction,
 }: AddReactionButtonProps ) {
@@ -98,10 +94,7 @@ export function AddReactionButton( {
 				<EmojiPicker
 					onSelect={ ( emoji ) => {
 						onClose();
-						// Adding a reaction changes the slug's reactor list.
-						const slug = emojiToStorageKey( emoji, emojis );
-						invalidateReactionNames( noteId, slug );
-						onToggleReaction( slug );
+						onToggleReaction( emojiToStorageKey( emoji, emojis ) );
 					} }
 				/>
 			) }

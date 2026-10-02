@@ -33,8 +33,6 @@ export function NoteThread( {
 	onEditNote,
 	onAddReply,
 	onDeleteNote,
-	onToggleReaction,
-	reactionsMap,
 	isSelected,
 	sidebarRef,
 	floating,
@@ -245,8 +243,6 @@ export function NoteThread( {
 				onEditNote={ onEditNote }
 				onDeleteNote={ onDeleteNote }
 				onResolve={ handleResolve }
-				onToggleReaction={ onToggleReaction }
-				reactions={ reactionsMap?.[ note.id ] }
 				isThreadResolved={ isThreadResolved }
 			/>
 			{ isSelected &&
@@ -258,8 +254,6 @@ export function NoteThread( {
 						isSelected={ isSelected }
 						onEditNote={ onEditNote }
 						onDeleteNote={ onDeleteNote }
-						onToggleReaction={ onToggleReaction }
-						reactions={ reactionsMap?.[ reply.id ] }
 						isThreadResolved={ isThreadResolved }
 					/>
 				) ) }
@@ -298,8 +292,6 @@ export function NoteThread( {
 					isSelected={ false }
 					onEditNote={ onEditNote }
 					onDeleteNote={ onDeleteNote }
-					onToggleReaction={ onToggleReaction }
-					reactions={ reactionsMap?.[ lastReply.id ] }
 					isThreadResolved={ isThreadResolved }
 				/>
 			) }

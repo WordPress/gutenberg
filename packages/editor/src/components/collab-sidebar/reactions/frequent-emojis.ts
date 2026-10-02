@@ -5,7 +5,7 @@ import {
 	REACTION_EMOJIS,
 	emojiToHexKey,
 	useReactionEmojis,
-} from './reaction-emoji-picker';
+} from './reaction-emojis';
 
 /**
  * A recorded frequently-used emoji: its normalized hex key and how many

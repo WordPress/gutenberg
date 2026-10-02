@@ -27,8 +27,8 @@ import {
 	isReactionEmojiAllowed,
 	useReactionEmojiRules,
 	useReactionEmojis,
-} from './reaction-emoji-picker';
-import type { CuratedEmoji } from './reaction-emoji-picker';
+} from './reaction-emojis';
+import type { CuratedEmoji } from './reaction-emojis';
 import SkinTonePicker, { applySkinTone } from './skin-tone-picker';
 
 /**

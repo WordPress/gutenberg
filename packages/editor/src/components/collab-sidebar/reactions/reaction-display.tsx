@@ -13,7 +13,7 @@ import {
 	hexKeyToEmoji,
 	buildEmojiBySlugMap,
 	useReactionEmojis,
-} from './reaction-emoji-picker';
+} from './reaction-emojis';
 import { useEmojiLabel } from './emojibase-data';
 
 interface ReactionSummaryEntry {
@@ -26,7 +26,7 @@ interface ReactionSummaryEntry {
 /**
  * The reaction summary keyed by storage slug (curated slug or hex key).
  */
-type ReactionSummary = Record< string, ReactionSummaryEntry >;
+export type ReactionSummary = Record< string, ReactionSummaryEntry >;
 
 /**
  * A comment record as returned by the reactions REST query.
@@ -342,7 +342,6 @@ function ReactionButton( {
 									)
 									?.focus();
 							}
-							invalidateReactionNames( noteId, slug );
 							setNames( null );
 							onToggleReaction( slug );
 						} }
