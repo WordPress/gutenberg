@@ -48,6 +48,13 @@ import type { SuggestionWriteQueue } from './suggestion-write-queue';
 // skipped in those environments.
 const BLOCK_EDITOR_STORE_NAME = 'core/block-editor';
 
+/**
+ * Reserved overlay key for a suggested post title. The title is not a block,
+ * so its entry is exempt from the orphan prune and persists as
+ * `post-attribute-set` ops on a note with no block anchor.
+ */
+export const POST_TITLE_OVERLAY_KEY = '__post_title__';
+
 /*
  * Monotonic sequence shared by every capture path so the undo guard can order
  * an overlay-held attribute suggestion against marker/structural captures
@@ -390,7 +397,7 @@ export function overlayReducer(
 			let changed = false;
 			const next: OverlayEntries = {};
 			for ( const key of keys ) {
-				if ( liveIds.has( key ) ) {
+				if ( key === POST_TITLE_OVERLAY_KEY || liveIds.has( key ) ) {
 					next[ key ] = state[ key ];
 				} else {
 					changed = true;
@@ -763,7 +770,9 @@ export function SuggestionOverlayProvider( {
 		// One lookup per entry; the full-tree id list is only built when an
 		// orphan is actually found.
 		const hasOrphan = Object.keys( entries ).some(
-			( key ) => ! blockEditor.getBlockName( key )
+			( key ) =>
+				key !== POST_TITLE_OVERLAY_KEY &&
+				! blockEditor.getBlockName( key )
 		);
 		if ( hasOrphan ) {
 			dispatch( {
