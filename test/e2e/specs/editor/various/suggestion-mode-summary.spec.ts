@@ -151,12 +151,18 @@ test.describe( 'Suggest mode: sidebar summaries', () => {
 		await page.keyboard.press( 'ControlOrMeta+a' );
 		const saved = suggestionSavedPromise( page );
 		await page.keyboard.type( replacement );
+		// The markers are only written once the note POST returns its id.
+		await saved;
 		await expect(
 			paragraph.locator(
 				'mark.wp-suggestion[data-suggestion-type="add"]'
 			)
 		).toHaveText( replacement );
-		await saved;
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="del"]'
+			)
+		).toHaveText( original );
 
 		const sidebar = await openNotesSidebar( page );
 		const summary = sidebar
