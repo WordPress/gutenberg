@@ -198,6 +198,75 @@ function getStateBackgroundResetCSS( stateStyles, selector ) {
 }
 
 /**
+ * Returns the CSS a state needs to escape a text clip it layers over.
+ *
+ * A state's declarations sit in a media query or a selector of their own, but
+ * the styles it layers over do not, so they keep applying until the state says
+ * otherwise. Setting a box clip restores the text through the style engine's
+ * `-webkit-text-fill-color: currentColor`, but the gradient underneath carries
+ * on painting as a block background. A state that paints a background of its
+ * own is left alone, since that background is what the user asked for.
+ *
+ * @param {Object}  stateStyles State style object.
+ * @param {Object=} baseStyle   Styles the state layers over.
+ * @param {string}  selector    CSS selector for the generated style.
+ * @return {string|undefined} CSS string with the background-image reset.
+ */
+function getStateTextClipEscapeCSS( stateStyles, baseStyle, selector ) {
+	if ( 'text' !== baseStyle?.background?.backgroundClip ) {
+		return undefined;
+	}
+
+	const stateClip = stateStyles?.background?.backgroundClip;
+	if ( ! stateClip || 'text' === stateClip ) {
+		return undefined;
+	}
+
+	const paintsItsOwnBackground =
+		!! stateStyles?.background?.gradient ||
+		!! stateStyles?.background?.backgroundImage ||
+		!! stateStyles?.color?.gradient;
+	if ( paintsItsOwnBackground ) {
+		return undefined;
+	}
+
+	const declaration = 'background-image: unset !important';
+	return selector
+		? `${ selector } { ${ declaration }; }`
+		: `${ declaration };`;
+}
+
+/**
+ * Returns the fill reset a state needs when it sets a text color under a clip.
+ *
+ * A text clip paints the glyphs with `-webkit-text-fill-color: transparent`, so
+ * a color set by a state that does not also set its own clip is never painted.
+ * A state that sets a clip gets the right fill from the style engine already.
+ *
+ * @param {Object}  stateStyles State style object.
+ * @param {Object=} baseStyle   Styles the state layers over.
+ * @param {string}  selector    CSS selector for the generated style.
+ * @return {string|undefined} CSS string with the text fill reset.
+ */
+function getStateTextFillResetCSS( stateStyles, baseStyle, selector ) {
+	if ( 'text' !== baseStyle?.background?.backgroundClip ) {
+		return undefined;
+	}
+
+	if (
+		! stateStyles?.color?.text ||
+		stateStyles?.background?.backgroundClip
+	) {
+		return undefined;
+	}
+
+	const declaration = '-webkit-text-fill-color: currentColor !important';
+	return selector
+		? `${ selector } { ${ declaration }; }`
+		: `${ declaration };`;
+}
+
+/**
  * Returns fallback dimension styles that keep state styles aligned with the
  * default dimensions block-support output.
  *
@@ -261,11 +330,14 @@ function getStateTextAlignCSS( stateStyles, selector ) {
  * border styles should not become important because they must not override
  * explicitly authored default border styles.
  *
- * @param {Object} stateStyles State style object.
- * @param {string} selector    CSS selector for the generated style.
+ * @param {Object}  stateStyles State style object.
+ * @param {string}  selector    CSS selector for the generated style.
+ * @param {Object=} baseStyle   Styles the state layers over, so a rule can tell
+ *                              what it has to override. Undefined for the
+ *                              Default state, which layers over nothing.
  * @return {string} Generated stylesheet.
  */
-export function getStateStylesCSS( stateStyles, selector ) {
+export function getStateStylesCSS( stateStyles, selector, baseStyle ) {
 	const fallbackDimensionStyles =
 		getStateFallbackDimensionStyles( stateStyles );
 	const stylesWithDimensionFallbacks = fallbackDimensionStyles
@@ -282,8 +354,25 @@ export function getStateStylesCSS( stateStyles, selector ) {
 		stateStyles,
 		selector
 	);
+	const textClipEscapeCSS = getStateTextClipEscapeCSS(
+		stateStyles,
+		baseStyle,
+		selector
+	);
+	const textFillResetCSS = getStateTextFillResetCSS(
+		stateStyles,
+		baseStyle,
+		selector
+	);
 
-	return [ importantCSS, textAlignCSS, fallbackCSS, backgroundResetCSS ]
+	return [
+		importantCSS,
+		textAlignCSS,
+		fallbackCSS,
+		backgroundResetCSS,
+		textClipEscapeCSS,
+		textFillResetCSS,
+	]
 		.filter( Boolean )
 		.join( '\n' );
 }
@@ -380,15 +469,17 @@ function getStateStyleGroups( stateStyles, name ) {
  * @param {string}  options.name         Block name.
  * @param {string}  options.baseSelector Block-instance scoping selector.
  * @param {string=} options.state        Optional pseudo-state, e.g. ":hover".
+ * @param {Object=} options.baseStyle    Styles the state layers over.
  * @return {string|undefined} Generated stylesheet.
  */
 export function getBlockStateStylesCSS( stateStyles, options ) {
-	const { name, baseSelector, state = '' } = options;
+	const { name, baseSelector, state = '', baseStyle } = options;
 	const rules = getStateStyleGroups( stateStyles, name )
 		.map( ( { selector: blockSelector, style } ) =>
 			getStateStylesCSS(
 				style,
-				buildScopedBlockSelector( baseSelector, blockSelector, state )
+				buildScopedBlockSelector( baseSelector, blockSelector, state ),
+				baseStyle
 			)
 		)
 		.filter( Boolean );
@@ -422,12 +513,13 @@ function getRootStateStyles( stateStyles, nestedKeys ) {
 /**
  * Generates CSS rules for supported pseudo-state styles.
  *
- * @param {Object} style        Block style object containing pseudo-state styles.
- * @param {string} name         Block name.
- * @param {string} baseSelector Base selector used to scope generated CSS.
+ * @param {Object}  style        Block style object containing pseudo-state styles.
+ * @param {string}  name         Block name.
+ * @param {string}  baseSelector Base selector used to scope generated CSS.
+ * @param {Object=} baseStyle    Styles these pseudo states layer over.
  * @return {string[]} Generated CSS rule strings.
  */
-function getPseudoStateCSSRules( style, name, baseSelector ) {
+function getPseudoStateCSSRules( style, name, baseSelector, baseStyle ) {
 	const validPseudoStates = VALID_BLOCK_PSEUDO_STATES[ name ];
 	if ( ! validPseudoStates ) {
 		return [];
@@ -441,6 +533,7 @@ function getPseudoStateCSSRules( style, name, baseSelector ) {
 				name,
 				baseSelector,
 				state: pseudoState,
+				baseStyle,
 			} );
 			if ( css ) {
 				cssRules.push( css );
@@ -472,6 +565,7 @@ export function getResponsiveStateCSSRules(
 	const cssRules = [];
 	const validPseudoStates = VALID_BLOCK_PSEUDO_STATES[ name ] ?? [];
 	const nestedStateKeys = [ 'elements', ...validPseudoStates ];
+	const defaultRootStyles = getRootStateStyles( style, nestedStateKeys );
 	const responsiveMediaQueries =
 		getResponsiveMediaQueries( viewportSettings );
 
@@ -486,13 +580,15 @@ export function getResponsiveStateCSSRules(
 			}
 
 			const viewportCSSRules = [];
-			const rootCSS = getBlockStateStylesCSS(
-				getRootStateStyles( viewportStyles, nestedStateKeys ),
-				{
-					name,
-					baseSelector,
-				}
+			const viewportRootStyles = getRootStateStyles(
+				viewportStyles,
+				nestedStateKeys
 			);
+			const rootCSS = getBlockStateStylesCSS( viewportRootStyles, {
+				name,
+				baseSelector,
+				baseStyle: defaultRootStyles,
+			} );
 			if ( rootCSS ) {
 				viewportCSSRules.push( rootCSS );
 			}
@@ -507,7 +603,14 @@ export function getResponsiveStateCSSRules(
 			}
 
 			viewportCSSRules.push(
-				...getPseudoStateCSSRules( viewportStyles, name, baseSelector )
+				...getPseudoStateCSSRules(
+					viewportStyles,
+					name,
+					baseSelector,
+					// A pseudo state here sits under both the Default state
+					// and this viewport's own styles.
+					mergeStyleObjects( defaultRootStyles, viewportRootStyles )
+				)
 			);
 
 			if ( viewportCSSRules.length ) {
@@ -1042,7 +1145,17 @@ function useBlockProps( { clientId, name, style } ) {
 		}
 
 		cssRules.push(
-			...getPseudoStateCSSRules( style, name, baseElementSelector )
+			...getPseudoStateCSSRules(
+				style,
+				name,
+				baseElementSelector,
+				// A pseudo state at the Default viewport layers over the
+				// block's own styles.
+				getRootStateStyles( style, [
+					'elements',
+					...( VALID_BLOCK_PSEUDO_STATES[ name ] ?? [] ),
+				] )
+			)
 		);
 
 		cssRules.push(
