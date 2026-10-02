@@ -73,9 +73,8 @@ const { state } = store( 'router-navigation-full-page', {
 			 * the block-action test relies on.
 			 */
 			e.preventDefault();
-			const { actions: router } = yield import(
-				'@wordpress/interactivity-router'
-			);
+			const { actions: router } =
+				yield import( '@wordpress/interactivity-router' );
 			yield router.navigate( e.target.href );
 		} ),
 	},
