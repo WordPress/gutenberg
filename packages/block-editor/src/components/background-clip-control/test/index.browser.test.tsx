@@ -31,6 +31,7 @@ describe( 'BackgroundClipControl', () => {
 		);
 
 		expect( await openOptions() ).toEqual( [
+			'Default',
 			'Border box',
 			'Padding box',
 			'Content box',
@@ -47,6 +48,7 @@ describe( 'BackgroundClipControl', () => {
 		);
 
 		expect( await openOptions() ).toEqual( [
+			'Default',
 			'Border box',
 			'Padding box',
 		] );
@@ -67,7 +69,7 @@ describe( 'BackgroundClipControl', () => {
 		expect( onChange ).toHaveBeenCalledWith( 'text' );
 	} );
 
-	it( 'falls back to the first allowed value when nothing is set', async () => {
+	it( 'says nothing is set rather than naming the first allowed value', async () => {
 		await render(
 			<BackgroundClipControl
 				onChange={ vi.fn() }
@@ -75,9 +77,29 @@ describe( 'BackgroundClipControl', () => {
 			/>
 		);
 
+		// `border-box` is what the block actually renders, and it is not in
+		// this theme's list, so no value may stand in for it.
 		expect(
 			await screen.findByRole( 'combobox', { name: 'Clip' } )
-		).toHaveTextContent( 'Padding box' );
+		).toHaveTextContent( 'Default' );
+	} );
+
+	it( 'reports an unset value to the caller as undefined', async () => {
+		const onChange = vi.fn();
+		await render(
+			<BackgroundClipControl
+				value="text"
+				onChange={ onChange }
+				allowedValues={ ALL_BACKGROUND_CLIP_VALUES }
+			/>
+		);
+
+		await openOptions();
+		await userEvent.click(
+			screen.getByRole( 'option', { name: 'Default' } )
+		);
+
+		expect( onChange ).toHaveBeenCalledWith( undefined );
 	} );
 
 	it( 'shows the current value', async () => {
