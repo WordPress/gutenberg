@@ -128,6 +128,36 @@ class Gutenberg_Edit_Root_Attachment_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_field_limited_request_omits_link() {
+		$edit_root = $this->make_attachment();
+		$child     = $this->make_attachment( $edit_root );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/media/' . $child );
+		$request->set_param( 'context', 'edit' );
+		$request->set_param( '_fields', 'id' );
+		$response = rest_do_request( $request );
+
+		$this->assertArrayNotHasKey(
+			'https://api.w.org/edit-root',
+			$response->get_links()
+		);
+	}
+
+	public function test_field_limited_request_keeps_link_when_links_included() {
+		$edit_root = $this->make_attachment();
+		$child     = $this->make_attachment( $edit_root );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/media/' . $child );
+		$request->set_param( 'context', 'edit' );
+		$request->set_param( '_fields', 'id,_links' );
+		$response = rest_do_request( $request );
+
+		$this->assertArrayHasKey(
+			'https://api.w.org/edit-root',
+			$response->get_links()
+		);
+	}
+
 	public function test_view_context_omits_field_and_link() {
 		$edit_root = $this->make_attachment();
 		$child     = $this->make_attachment( $edit_root );

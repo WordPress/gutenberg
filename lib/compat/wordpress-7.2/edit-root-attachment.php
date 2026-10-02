@@ -156,6 +156,23 @@ function gutenberg_add_edit_root_link( $response, $post, $request ) {
 		return $response;
 	}
 
+	// Requests that limit the response with `_fields` get the link only
+	// when they ask for it: core itself skips building its links unless
+	// `_links` or `_embedded` is included, so adding ours would hand a
+	// field-limited response a `_links` member core intended to omit.
+	$fields = wp_parse_list( $request['_fields'] ?? '' );
+	if ( ! empty( $fields ) ) {
+		if ( $request->has_param( '_embed' ) ) {
+			$fields[] = '_embedded';
+		}
+		if (
+			! rest_is_field_included( '_links', $fields ) &&
+			! rest_is_field_included( '_embedded', $fields )
+		) {
+			return $response;
+		}
+	}
+
 	$edit_root_id = gutenberg_get_edit_root_attachment_id( $post->ID );
 	if ( $edit_root_id === (int) $post->ID ) {
 		return $response;
