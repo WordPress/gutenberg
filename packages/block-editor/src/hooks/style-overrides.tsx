@@ -1,4 +1,6 @@
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { ToggleControl } from '@wordpress/components';
+import { store as preferencesStore } from '@wordpress/preferences';
 import { useMemo } from '@wordpress/element';
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { addFilter } from '@wordpress/hooks';
@@ -16,6 +18,7 @@ import { isGlobalStylesInheritanceIndicatorUIEnabled } from '../components/globa
 import { getVariationNameFromClass } from './block-style-variation';
 import {
 	getCSSNotes,
+	getOriginLabel,
 	getOriginPhrase,
 	getStyleSettings,
 	getStylesLayer,
@@ -121,6 +124,17 @@ function isThemeOnly( row: Row ): boolean {
  * contents while it is open, so none of this runs until someone opens it.
  */
 function StyleOrigins( { name, clientId }: StyleOverridesPanelProps ) {
+	// Prototype switch between two wordings: full sentences, or short labels
+	// under headings that say whether the block overrides or inherits.
+	const isVerbose: boolean = useSelect(
+		( select ) =>
+			select( preferencesStore ).get(
+				'core/block-editor',
+				'styleOriginsVerbose'
+			) ?? true,
+		[]
+	);
+	const { set: setPreference } = useDispatch( preferencesStore );
 	const {
 		attributes,
 		variationName,
@@ -271,7 +285,8 @@ function StyleOrigins( { name, clientId }: StyleOverridesPanelProps ) {
 					blockTitle,
 					attributes?.style?.css,
 					mergedStyles,
-					isOwn || !! origin
+					isOwn || !! origin,
+					! isVerbose
 				),
 			};
 			if ( isOwn ) {
@@ -293,6 +308,7 @@ function StyleOrigins( { name, clientId }: StyleOverridesPanelProps ) {
 		parentNames,
 		parentAttributes,
 		parentSources,
+		isVerbose,
 	] );
 
 	if ( ! ownRows.length && ! inheritedRows.length ) {
@@ -303,36 +319,72 @@ function StyleOrigins( { name, clientId }: StyleOverridesPanelProps ) {
 	// little, so the list leaves them out.
 	const notableRows = inheritedRows.filter( ( row ) => ! isThemeOnly( row ) );
 
+	if ( ! ownRows.length && ! notableRows.length ) {
+		return null;
+	}
+
+	const getOriginText = ( origin: Origin ) =>
+		isVerbose
+			? getOriginPhrase( origin, names )
+			: getOriginLabel( origin, names );
+
+	const describeOwn = ( { origin }: Row ) => {
+		if ( ! origin ) {
+			return isVerbose
+				? __( 'Only set on this block.' )
+				: __( 'Only here' );
+		}
+		return isVerbose
+			? sprintf(
+					/* translators: %s: Where the overridden value comes from, e.g. "the theme’s styles for Pullquote blocks". */
+					__( 'Overrides %s.' ),
+					getOriginText( origin )
+				)
+			: sprintf(
+					/* translators: %s: Where the overridden value comes from, e.g. "Theme · Pullquote blocks". */
+					__( 'Overrides %s' ),
+					getOriginText( origin )
+				);
+	};
+
+	const describeInherited = ( { origin }: Row ) => {
+		if ( ! origin ) {
+			return null;
+		}
+		return isVerbose
+			? sprintf(
+					/* translators: %s: Where the value comes from, e.g. "the Group block it is inside". */
+					__( 'From %s.' ),
+					getOriginText( origin )
+				)
+			: getOriginText( origin );
+	};
+
 	return (
 		<>
+			<ToggleControl
+				label={ __( 'Describe in full sentences' ) }
+				checked={ isVerbose }
+				onChange={ () =>
+					setPreference(
+						'core/block-editor',
+						'styleOriginsVerbose',
+						! isVerbose
+					)
+				}
+			/>
 			{ !! ownRows.length && (
 				<StyleList
 					title={ __( 'Styles set on this block' ) }
 					rows={ ownRows }
-					describe={ ( { origin } ) =>
-						origin
-							? sprintf(
-									/* translators: %s: Where the overridden value comes from, e.g. "the theme’s styles for Pullquote blocks". */
-									__( 'Overrides %s.' ),
-									getOriginPhrase( origin, names )
-								)
-							: __( 'Only set on this block.' )
-					}
+					describe={ describeOwn }
 				/>
 			) }
 			{ !! notableRows.length && (
 				<StyleList
 					title={ __( 'Styles this block inherits' ) }
 					rows={ notableRows }
-					describe={ ( { origin } ) =>
-						origin
-							? sprintf(
-									/* translators: %s: Where the value comes from, e.g. "the Group block it is inside". */
-									__( 'From %s.' ),
-									getOriginPhrase( origin, names )
-								)
-							: null
-					}
+					describe={ describeInherited }
 				/>
 			) }
 		</>

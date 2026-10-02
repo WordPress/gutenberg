@@ -401,6 +401,71 @@ export function getOriginPhrase( origin: Origin, names: Names ): string {
 	return fromUser ? __( 'the site’s Styles' ) : __( 'the theme' );
 }
 
+function scoped( who: string, what: string ): string {
+	return sprintf(
+		/* translators: 1: Who set it, e.g. "Theme" or "Styles". 2: What it applies to, e.g. "Pullquote blocks". */
+		__( '%1$s · %2$s' ),
+		who,
+		what
+	);
+}
+
+/**
+ * Names an origin as a short label, for the simple variant of the lists, where
+ * the list headings say whether the block overrides it or inherits it.
+ *
+ * @param origin Where the value comes from.
+ * @param names  Names of the block, its style and its element.
+ * @return The label, e.g. "Theme · Pullquote blocks" or "Group block (parent)".
+ */
+export function getOriginLabel( origin: Origin, names: Names ): string {
+	if ( origin.type === 'parent' ) {
+		const parent = sprintf(
+			/* translators: %s: Parent block title, e.g. "Group". */
+			__( '%s block (parent)' ),
+			names.getTitle( origin.parentName )
+		);
+		if ( origin.via === 'block' ) {
+			return parent;
+		}
+		return scoped(
+			parent,
+			origin.via === 'user' ? __( 'Styles' ) : __( 'Theme' )
+		);
+	}
+	const who = origin.fromUser ? __( 'Styles' ) : __( 'Theme' );
+	if ( origin.layer === 'blockVariation' ) {
+		return scoped(
+			who,
+			sprintf(
+				/* translators: %s: Block style name, e.g. "Outline". */
+				__( '%s style' ),
+				names.variationLabel ?? ''
+			)
+		);
+	}
+	if ( origin.layer === 'block' ) {
+		return scoped(
+			who,
+			sprintf(
+				/* translators: %s: Block title, e.g. "Pullquote". */
+				__( '%s blocks' ),
+				names.blockTitle
+			)
+		);
+	}
+	if ( origin.layer === 'element' ) {
+		const element = ( names.element ?? '' ).replace( /^h\d$/, 'heading' );
+		const elementNames: Record< string, string > = {
+			button: __( 'Buttons' ),
+			link: __( 'Links' ),
+			heading: __( 'Headings' ),
+		};
+		return scoped( who, elementNames[ element ] ?? element );
+	}
+	return who;
+}
+
 /**
  * Notes for custom CSS that also sets a setting's properties, most specific
  * first: the block's own Additional CSS, the Additional CSS for the block type
@@ -413,6 +478,7 @@ export function getOriginPhrase( origin: Origin, names: Names ): string {
  * @param styles         Merged Global Styles.
  * @param hasOtherSource Whether the block or Styles also set it, so the notes
  *                       say "also".
+ * @param simple         Short labels instead of sentences.
  * @return Notes, one per CSS source.
  */
 export function getCSSNotes(
@@ -421,9 +487,39 @@ export function getCSSNotes(
 	blockTitle: string,
 	blockCSS: unknown,
 	styles: any,
-	hasOtherSource = true
+	hasOtherSource = true,
+	simple = false
 ): string[] {
-	const notes = [];
+	const notes: string[] = [];
+	if ( simple ) {
+		const labels = [];
+		if ( cssSetsProperty( blockCSS, setting.css ) ) {
+			labels.push( __( 'Additional CSS' ) );
+		}
+		if (
+			cssSetsProperty( styles?.blocks?.[ blockName ]?.css, setting.css )
+		) {
+			labels.push(
+				sprintf(
+					/* translators: %s: Block title, e.g. "Pullquote". */
+					__( 'Styles · Additional CSS for %s blocks' ),
+					blockTitle
+				)
+			);
+		}
+		if ( stylesheetSetsProperty( styles?.css, setting.css, blockName ) ) {
+			labels.push( __( 'Styles · Additional CSS' ) );
+		}
+		return hasOtherSource
+			? labels.map( ( label ) =>
+					sprintf(
+						/* translators: %s: A CSS source, e.g. "Additional CSS". */
+						__( 'Also: %s' ),
+						label
+					)
+				)
+			: labels;
+	}
 	if ( cssSetsProperty( blockCSS, setting.css ) ) {
 		notes.push(
 			hasOtherSource

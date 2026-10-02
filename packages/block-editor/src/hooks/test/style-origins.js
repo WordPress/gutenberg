@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
 	cssSetsProperty,
 	getCSSNotes,
+	getOriginLabel,
 	getOriginPhrase,
 	getStyleSettings,
 	getStylesLayer,
@@ -219,5 +220,62 @@ describe( 'getOriginPhrase', () => {
 		).toBe(
 			'the Group block it is inside, which gets it from the theme’s styles for Group blocks'
 		);
+	} );
+} );
+
+describe( 'getOriginLabel', () => {
+	it( 'names each origin briefly', () => {
+		expect(
+			getOriginLabel(
+				{ type: 'styles', layer: 'root', fromUser: false },
+				names
+			)
+		).toBe( 'Theme' );
+		expect(
+			getOriginLabel(
+				{ type: 'styles', layer: 'block', fromUser: true },
+				names
+			)
+		).toBe( 'Styles · Pullquote blocks' );
+		expect(
+			getOriginLabel(
+				{ type: 'styles', layer: 'element', fromUser: false },
+				names
+			)
+		).toBe( 'Theme · Headings' );
+		expect(
+			getOriginLabel(
+				{ type: 'styles', layer: 'blockVariation', fromUser: false },
+				names
+			)
+		).toBe( 'Theme · Outline style' );
+		expect(
+			getOriginLabel(
+				{ type: 'parent', parentName: 'core/group', via: 'block' },
+				names
+			)
+		).toBe( 'Group block (parent)' );
+		expect(
+			getOriginLabel(
+				{ type: 'parent', parentName: 'core/group', via: 'user' },
+				names
+			)
+		).toBe( 'Group block (parent) · Styles' );
+	} );
+
+	it( 'labels CSS sources briefly', () => {
+		const args = [
+			setting( 'Letter case' ),
+			'core/paragraph',
+			'Paragraph',
+			'text-transform: uppercase;',
+			{},
+		];
+		expect( getCSSNotes( ...args, false, true ) ).toEqual( [
+			'Additional CSS',
+		] );
+		expect( getCSSNotes( ...args, true, true ) ).toEqual( [
+			'Also: Additional CSS',
+		] );
 	} );
 } );
