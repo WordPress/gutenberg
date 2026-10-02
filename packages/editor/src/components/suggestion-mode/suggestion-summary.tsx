@@ -20,6 +20,8 @@
  *                        (e.g. `level` → "heading level") and humanizes any
  *                        attribute not in that map so a brand-new attribute
  *                        isn't silently swallowed or shown as `camelCase`.
+ *                        A scalar value states both sides of the change
+ *                        ("heading level 3 → 4"); objects keep the bare name.
  *   - **Rename block:** — the one attribute change worth its own line: a
  *                        block renamed through `metadata.name`, reported
  *                        with the name being proposed.
@@ -38,7 +40,8 @@
  * want to hunt for in the canvas, so a line that renders as an empty or
  * ambiguous quote is a review failure: whitespace-only edits are described by
  * kind and count ("3 spaces") rather than quoted into invisibility, and
- * structural lines name the parent block when there is one.
+ * structural lines name the parent block when there is one and quote the
+ * block's text when the sidebar resolved some.
  *
  * "Change:" and the two "… formatting:" labels name different families of
  * suggestion, so they have to be readable as different things in a mixed list.
@@ -51,8 +54,10 @@
  * than run together into a phrase nobody typed.
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { Stack, Text } from '@wordpress/ui';
-import { useMemo } from '@wordpress/element';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Matches the note card's own "Show more" toggle.
+import { Button as UIButton, Stack, Text } from '@wordpress/ui';
+import { useMemo, useState } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 import { __unstableStripHTML as wpStripHTML } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { wordDiff, MAX_DIFF_LENGTH } from './word-diff';
@@ -170,6 +175,96 @@ function structuralBlockLabel( blockName: any, parentBlockName: any ): string {
 		__( '%1$s in %2$s' ),
 		name,
 		friendlyBlockName( parentBlockName )
+	);
+}
+
+/**
+ * Value of a structural line: the block label, followed by the block's text
+ * when the sidebar resolved some into `op.text`. Without the text, removing a
+ * whole paragraph read "Remove block: paragraph" while deleting the same words
+ * as a text selection read "Delete: “First paragraph”", and an inserted
+ * paragraph never showed what was typed into it. A block with no text (an
+ * image, an empty paragraph) keeps the bare label.
+ *
+ * @param op Structural operation.
+ * @return Display value.
+ */
+function structuralBlockValue( op: any ): string {
+	const label = structuralBlockLabel( op.blockName, op.parentBlockName );
+	const text = isTextLike( op.text ) ? ellipsize( op.text ) : '';
+	if ( text === '' ) {
+		return label;
+	}
+	return `${ label } “${ text }”`;
+}
+
+/**
+ * Whether an attribute value is a plain scalar that reads sensibly in a
+ * summary line. Objects (style, metadata) and arrays have no short form, so
+ * they keep the bare attribute name.
+ *
+ * @param value Attribute value.
+ * @return True for strings, numbers, booleans, and unset values.
+ */
+function isScalarAttributeValue( value: any ): boolean {
+	return (
+		value === null ||
+		value === undefined ||
+		[ 'string', 'number', 'boolean' ].includes( typeof value )
+	);
+}
+
+/**
+ * Present one side of a scalar attribute change. An unset value is the
+ * block's default, so say that rather than showing an empty string.
+ *
+ * @param value Scalar attribute value.
+ * @return Display text.
+ */
+function presentAttributeValue( value: any ): string {
+	if ( value === null || value === undefined || value === '' ) {
+		return __( 'default' );
+	}
+	return ellipsize( String( value ), REPLACE_SIDE_MAX_CHARS );
+}
+
+/**
+ * Display name for an attribute key: the friendly label when there is one,
+ * the humanized key otherwise.
+ *
+ * @param key Attribute key.
+ * @return Display name.
+ */
+function attributeLabel( key: any ): string {
+	return (
+		( ATTRIBUTE_LABELS as Record< string, string > )[ key ] ??
+		humanizeAttributeName( key )
+	);
+}
+
+/**
+ * Describe a non-text attribute change. "Change: heading level" left the
+ * reviewer to guess which level was proposed; a scalar value is short enough
+ * to state both sides of ("heading level 3 → 4"). Object values have no short
+ * form and keep the bare name.
+ *
+ * @param op `attribute-set` operation.
+ * @return Display text.
+ */
+function describeAttributeChange( op: any ): string {
+	const name = attributeLabel( op.attribute );
+	if (
+		! isScalarAttributeValue( op.before ) ||
+		! isScalarAttributeValue( op.after )
+	) {
+		return name;
+	}
+	return sprintf(
+		/* translators: 1: setting name, e.g. "heading level". 2: current value. 3: proposed value. */
+		__( '%1$s %2$s → %3$s' ),
+		name,
+		presentAttributeValue( op.before ),
+		presentAttributeValue( op.after )
 	);
 }
 
@@ -554,14 +649,15 @@ function changedRuns(
  */
 function textDelta(
 	before: string,
-	after: string
+	after: string,
+	max: number = SUMMARY_MAX_CHARS
 ): { inserted: string; deleted: string } {
 	const segments = wordDiff( before, after );
 	const inserted = changedRuns( segments, 'insert' ).join( RUN_GAP );
 	const deleted = changedRuns( segments, 'delete' ).join( RUN_GAP );
 	return {
-		inserted: inserted.trim() ? ellipsize( inserted ) : '',
-		deleted: deleted.trim() ? ellipsize( deleted ) : '',
+		inserted: inserted.trim() ? ellipsize( inserted, max ) : '',
+		deleted: deleted.trim() ? ellipsize( deleted, max ) : '',
 	};
 }
 
@@ -587,15 +683,25 @@ function isTextLike( value: any ): boolean {
  * attribute changes are collapsed into a single `Change:` line listing the
  * touched settings.
  *
- * @param operations Operations.
+ * Quoted text is capped so a long edit stays a one-or-two line precis; pass
+ * `truncate: false` for the uncapped wording behind a "Show more" toggle. Both
+ * calls return the same lines in the same order, only the quotes differ.
+ *
+ * @param operations       Operations.
+ * @param options          Options.
+ * @param options.truncate Whether to cap quoted text. Defaults to true.
  * @return Rendered lines.
  */
 export function summarizeOperations(
-	operations: SuggestionOperation[] | null | undefined
+	operations: SuggestionOperation[] | null | undefined,
+	{ truncate = true }: { truncate?: boolean } = {}
 ): Array< { label: string; value: string } > {
 	if ( ! Array.isArray( operations ) || operations.length === 0 ) {
 		return [];
 	}
+
+	const textMax = truncate ? SUMMARY_MAX_CHARS : Infinity;
+	const sideMax = truncate ? REPLACE_SIDE_MAX_CHARS : Infinity;
 
 	const lines: Array< { label: string; value: string } > = [];
 	const attributeLabels: string[] = [];
@@ -608,21 +714,21 @@ export function summarizeOperations(
 		if ( op.type === 'block-remove' ) {
 			lines.push( {
 				label: __( 'Remove block:' ),
-				value: structuralBlockLabel( op.blockName, op.parentBlockName ),
+				value: structuralBlockValue( op ),
 			} );
 			continue;
 		}
 		if ( op.type === 'block-insert-after' ) {
 			lines.push( {
 				label: __( 'Insert block:' ),
-				value: structuralBlockLabel( op.blockName, op.parentBlockName ),
+				value: structuralBlockValue( op ),
 			} );
 			continue;
 		}
 		if ( op.type === 'block-move' ) {
 			lines.push( {
 				label: __( 'Move block:' ),
-				value: structuralBlockLabel( op.blockName, op.parentBlockName ),
+				value: structuralBlockValue( op ),
 			} );
 			continue;
 		}
@@ -657,7 +763,7 @@ export function summarizeOperations(
 					if ( linkChange ) {
 						linkChanges.push( linkChange );
 					} else {
-						attributeLabels.push( op.attribute );
+						attributeLabels.push( attributeLabel( op.attribute ) );
 					}
 				}
 				continue;
@@ -680,21 +786,19 @@ export function summarizeOperations(
 						value: sprintf(
 							/* translators: 1: text being replaced. 2: proposed replacement text. */
 							__( '%1$s → %2$s' ),
-							presentText(
-								clampText( removed, REPLACE_SIDE_MAX_CHARS )
-							),
-							presentText(
-								clampText( added, REPLACE_SIDE_MAX_CHARS )
-							)
+							presentText( clampText( removed, sideMax ) ),
+							presentText( clampText( added, sideMax ) )
 						),
 					} );
 				} else if ( added || removed ) {
 					lines.push( {
 						label: added ? __( 'Add:' ) : __( 'Delete:' ),
-						value: presentText( clampText( added || removed ) ),
+						value: presentText(
+							clampText( added || removed, textMax )
+						),
 					} );
 				} else {
-					attributeLabels.push( op.attribute );
+					attributeLabels.push( attributeLabel( op.attribute ) );
 				}
 				continue;
 			}
@@ -703,9 +807,11 @@ export function summarizeOperations(
 			// of collapsing it the way the word-diff path does. Only fall back
 			// to the attribute label when no text resolved (marker edited away),
 			// signalled by a non-string or empty `op.text`.
-			const text = isTextLike( op.text ) ? clampText( op.text ) : '';
+			const text = isTextLike( op.text )
+				? clampText( op.text, textMax )
+				: '';
 			if ( text === '' ) {
-				attributeLabels.push( op.attribute );
+				attributeLabels.push( attributeLabel( op.attribute ) );
 				continue;
 			}
 			lines.push( {
@@ -718,7 +824,7 @@ export function summarizeOperations(
 			continue;
 		}
 		if ( op.type !== 'attribute-set' ) {
-			attributeLabels.push( op.attribute );
+			attributeLabels.push( attributeLabel( op.attribute ) );
 			continue;
 		}
 
@@ -735,7 +841,7 @@ export function summarizeOperations(
 			if ( afterName && afterName !== beforeName ) {
 				lines.push( {
 					label: __( 'Rename block:' ),
-					value: `“${ ellipsize( afterName ) }”`,
+					value: `“${ ellipsize( afterName, textMax ) }”`,
 				} );
 				continue;
 			}
@@ -745,7 +851,7 @@ export function summarizeOperations(
 					value: sprintf(
 						/* translators: %s: the block's current custom name. */
 						__( 'reset “%s” to the default name' ),
-						ellipsize( beforeName )
+						ellipsize( beforeName, textMax )
 					),
 				} );
 				continue;
@@ -769,7 +875,11 @@ export function summarizeOperations(
 			( op.after?.length ?? 0 ) <= MAX_DIFF_LENGTH;
 
 		if ( ! canTextDiff ) {
-			attributeLabels.push( op.attribute );
+			attributeLabels.push(
+				isContent
+					? attributeLabel( op.attribute )
+					: describeAttributeChange( op )
+			);
 			continue;
 		}
 
@@ -798,13 +908,17 @@ export function summarizeOperations(
 				if ( linkChange ) {
 					linkChanges.push( linkChange );
 				} else {
-					attributeLabels.push( op.attribute );
+					attributeLabels.push( attributeLabel( op.attribute ) );
 				}
 			}
 			continue;
 		}
 
-		const { inserted, deleted } = textDelta( beforeText, afterText );
+		const { inserted, deleted } = textDelta(
+			beforeText,
+			afterText,
+			textMax
+		);
 		/*
 		 * An edit that both removes and inserts is one change, not two. Two
 		 * lines read as an unrelated delete plus re-add — a paragraph merged
@@ -817,8 +931,8 @@ export function summarizeOperations(
 				value: sprintf(
 					/* translators: 1: text being replaced. 2: proposed replacement text. */
 					__( '%1$s → %2$s' ),
-					presentText( ellipsize( deleted, REPLACE_SIDE_MAX_CHARS ) ),
-					presentText( ellipsize( inserted, REPLACE_SIDE_MAX_CHARS ) )
+					presentText( ellipsize( deleted, sideMax ) ),
+					presentText( ellipsize( inserted, sideMax ) )
 				),
 			} );
 		} else if ( inserted ) {
@@ -832,7 +946,7 @@ export function summarizeOperations(
 				value: presentText( deleted ),
 			} );
 		} else {
-			attributeLabels.push( op.attribute );
+			attributeLabels.push( attributeLabel( op.attribute ) );
 		}
 	}
 
@@ -875,14 +989,9 @@ export function summarizeOperations(
 		 * suggestion, so their labels have to be tellable apart at a glance in
 		 * a mixed list. "Format:" next to "Formatting:" was not.
 		 */
-		const labels = attributeLabels.map(
-			( key ) =>
-				( ATTRIBUTE_LABELS as Record< string, string > )[ key ] ??
-				humanizeAttributeName( key )
-		);
 		lines.push( {
 			label: __( 'Change:' ),
-			value: joinAttributeLabels( labels ),
+			value: joinAttributeLabels( attributeLabels ),
 		} );
 	}
 
@@ -893,6 +1002,11 @@ export function summarizeOperations(
  * Compact sidebar summary of a suggestion — "Add: …", "Delete: …",
  * "Change: …". Designed to mirror a Google Docs-style review note.
  *
+ * Quotes are capped so the card stays compact. When a cap cut anything, a
+ * "Show more" toggle swaps in the full wording: the collapsed text is cut,
+ * not clipped with CSS, so what the toggle hides is hidden from assistive
+ * technology too, and focus stays on the toggle across the swap.
+ *
  * @param props            Props.
  * @param props.operations Operations to summarize.
  */
@@ -901,14 +1015,28 @@ export default function SuggestionSummary( {
 }: {
 	operations: SuggestionOperation[];
 } ) {
+	const [ isExpanded, setIsExpanded ] = useState( false );
+	const summaryId = useInstanceId(
+		SuggestionSummary,
+		'editor-collab-sidebar-panel__suggestion-summary'
+	);
 	const lines = useMemo(
 		() => summarizeOperations( operations ),
 		[ operations ]
 	);
-
+	const fullLines = useMemo(
+		() => summarizeOperations( operations, { truncate: false } ),
+		[ operations ]
+	);
 	if ( lines.length === 0 ) {
 		return null;
 	}
+
+	const isTruncated = lines.some(
+		( line, index ) => line.value !== fullLines[ index ]?.value
+	);
+
+	const shownLines = isTruncated && isExpanded ? fullLines : lines;
 
 	return (
 		<Stack
@@ -916,11 +1044,33 @@ export default function SuggestionSummary( {
 			gap="xs"
 			className="editor-collab-sidebar-panel__suggestion-summary"
 		>
-			{ lines.map( ( line, index ) => (
-				<Text key={ index } variant="body-md">
-					<strong>{ line.label }</strong> <em>{ line.value }</em>
-				</Text>
-			) ) }
+			<Stack direction="column" gap="xs" id={ summaryId }>
+				{ shownLines.map( ( line, index ) => (
+					<Text key={ index } variant="body-md">
+						<strong>{ line.label }</strong> <em>{ line.value }</em>
+					</Text>
+				) ) }
+			</Stack>
+			{ isTruncated && (
+				<UIButton
+					className="editor-collab-sidebar-panel__show-more-button"
+					variant="unstyled"
+					size="small"
+					aria-expanded={ isExpanded }
+					aria-controls={ summaryId }
+					onClick={ ( event ) => {
+						/*
+						 * A click that reaches the thread selects it, and
+						 * selecting moves focus to the thread, which would
+						 * pull focus off the toggle the user just pressed.
+						 */
+						event.stopPropagation();
+						setIsExpanded( ! isExpanded );
+					} }
+				>
+					{ isExpanded ? __( 'Show less' ) : __( 'Show more' ) }
+				</UIButton>
+			) }
 		</Stack>
 	);
 }

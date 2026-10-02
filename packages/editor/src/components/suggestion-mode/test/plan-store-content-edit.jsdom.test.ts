@@ -5,7 +5,10 @@ import {
 	store as richTextStore,
 } from '@wordpress/rich-text';
 import { select } from '@wordpress/data';
-import { planStoreContentEdit } from '../plan-store-content-edit';
+import {
+	planStoreContentEdit,
+	settleStoreContentRemoval,
+} from '../plan-store-content-edit';
 import {
 	registerSuggestionFormat,
 	SUGGESTION_FORMAT_NAME,
@@ -140,6 +143,106 @@ describe( 'planStoreContentEdit', () => {
 				{ content: rtd( withAddition ) },
 				{ content: rtd( withAddition.replace( 'NEW', 'NEWER' ) ) },
 				{ content: rtd( withAddition.replace( 'NEW', 'NEWER' ) ) },
+				1
+			)
+		).toBeNull();
+	} );
+} );
+
+describe( 'settleStoreContentRemoval', () => {
+	const marker = ( type: string, author: number, text: string ) =>
+		`<mark class="wp-suggestion" data-suggestion-id="7" data-suggestion-type="${ type }" data-author="${ author }">${ text }</mark>`;
+
+	it( "retracts the author's own addition from the removed run, so the rest plans as a deletion", () => {
+		// "Hello world again" + own " and more", split after "aga".
+		const previous = {
+			content: rtd(
+				`Hello world again${ marker( 'add', 1, ' and more' ) }`
+			),
+		};
+		const current = { content: rtd( 'Hello world aga' ) };
+		const settled = settleStoreContentRemoval(
+			previous,
+			current,
+			current,
+			1
+		);
+		expect( settled ).not.toBeNull();
+		expect( settled?.refuse ).toBeFalsy();
+		const retracted = ( settled as any ).previous;
+		expect( retracted.content.toHTMLString() ).toBe( 'Hello world again' );
+		// No marker of the addition is left, so its note is withdrawn.
+		expect( ( settled as any ).withdrawnIds ).toEqual( [ '7' ] );
+
+		expect(
+			planStoreContentEdit( retracted, current, current, 1 )
+		).toEqual( {
+			kind: 'delete',
+			actions: [
+				{ type: 'wrap-del', start: 15, end: 17, newNote: true },
+			],
+		} );
+	} );
+
+	it( 'keeps the part of an own addition before the split', () => {
+		const previous = {
+			content: rtd( `Hello${ marker( 'add', 1, ' and more' ) }` ),
+		};
+		const current = {
+			content: rtd( `Hello${ marker( 'add', 1, ' and' ) }` ),
+		};
+		const settled = settleStoreContentRemoval(
+			previous,
+			current,
+			current,
+			1
+		) as any;
+		expect( settled.previous.content.toHTMLString() ).toBe(
+			current.content.toHTMLString()
+		);
+		// The head keeps part of the addition, so its note stays.
+		expect( settled.withdrawnIds ).toEqual( [] );
+	} );
+
+	it.each( [
+		[ "another author's addition", marker( 'add', 2, ' theirs' ) ],
+		[ "another author's deletion", marker( 'del', 2, ' theirs' ) ],
+		[ "the author's own deletion", marker( 'del', 1, ' mine' ) ],
+		[ "the author's own format change", marker( 'format', 1, ' mine' ) ],
+	] )( 'refuses a removal that would carry off %s', ( _, html ) => {
+		const previous = { content: rtd( `Hello world${ html } end` ) };
+		const current = { content: rtd( 'Hello wo' ) };
+		expect(
+			settleStoreContentRemoval( previous, current, current, 1 )
+		).toEqual( { refuse: true } );
+	} );
+
+	it( 'leaves an unmarked removal and non-removals to the plain planner', () => {
+		const marked = rtd( `Hello world${ marker( 'add', 2, ' theirs' ) }` );
+		// The removed run is before the marker, which survives untouched.
+		expect(
+			settleStoreContentRemoval(
+				{ content: rtd( 'Hello brave world' ) },
+				{ content: rtd( 'Hello ' ) },
+				{ content: rtd( 'Hello ' ) },
+				1
+			)
+		).toBeNull();
+		// An insertion.
+		expect(
+			settleStoreContentRemoval(
+				{ content: marked },
+				{ content: rtd( `X${ marked.toHTMLString() }` ) },
+				{ content: rtd( `X${ marked.toHTMLString() }` ) },
+				1
+			)
+		).toBeNull();
+		// Other attributes changing alongside.
+		expect(
+			settleStoreContentRemoval(
+				{ content: marked, level: 2 },
+				{ content: rtd( 'Hello' ), level: 3 },
+				{ content: rtd( 'Hello' ), level: 3 },
 				1
 			)
 		).toBeNull();

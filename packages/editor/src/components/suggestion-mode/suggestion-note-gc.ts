@@ -58,6 +58,7 @@ import {
 	isSuggestionDecisionInFlight,
 	parseSuggestionPayload,
 	rememberResolvedSuggestion,
+	takeWithdrawnAnchor,
 } from './provider';
 import {
 	SUGGESTION_CLASS,
@@ -601,6 +602,7 @@ export default function SuggestionNoteGC() {
 				entriesRef.current
 			);
 			if ( present ) {
+				takeWithdrawnAnchor( idKey );
 				seenRef.current.add( idKey );
 				keptRef.current.delete( idKey );
 				if ( timers.has( idKey ) ) {
@@ -608,6 +610,9 @@ export default function SuggestionNoteGC() {
 					timers.delete( idKey );
 				}
 				continue;
+			}
+			if ( takeWithdrawnAnchor( idKey ) ) {
+				seenRef.current.add( idKey );
 			}
 			if (
 				! seenRef.current.has( idKey ) ||

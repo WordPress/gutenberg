@@ -19,6 +19,8 @@ import {
 	buildSuggestionMarkerAttributes,
 	insertInlineAddition,
 	growInlineAddition,
+	rejectInlineDeletion,
+	reviseOwnAddition,
 	valueAdditionRunToExtend,
 	valueRangeHasSuggestion,
 } from '../inline-suggestions';
@@ -152,6 +154,8 @@ function readInlinePasteHTML(
  * - Type-over (entering text with a non-collapsed selection) is one
  *   replacement note: an `add` run for the new text at the selection start,
  *   then a `del` run over the selected text, both keyed to the same note.
+ *   Over the author's own pending addition it revises that addition in place
+ *   (`reviseOwnAddition`); over anyone else's marker it is refused.
  * - A simple single-line paste is handled on the `paste` event (capture phase,
  *   ahead of the editor's own paste pipeline) and inserted exactly like typed
  *   text; over a selection it is a type-over. Multi-line / block-level paste is
@@ -189,7 +193,7 @@ export default function SuggestionAdditionKeyboard() {
 	} = useSelect( blockEditorStore );
 	const { updateBlockAttributes, selectionChange } =
 		useDispatch( blockEditorStore );
-	const { createSuggestion } = useSuggestionsProvider();
+	const { createSuggestion, updateSuggestion } = useSuggestionsProvider();
 	const { getBlockName } = useSelect( blockEditorStore );
 	const { requestInterceptorBypass, isDeferredInsertion } =
 		useSuggestionOverlay();
@@ -403,6 +407,47 @@ export default function SuggestionAdditionKeyboard() {
 	);
 
 	/*
+	 * A type-over that reached original text next to the author's own
+	 * addition added a `del` run under that addition's note, so the note now
+	 * describes a replacement. If the note cannot be updated, the `del` run is
+	 * dropped again so the note still matches its markers; the typed text
+	 * stays in the addition.
+	 */
+	const promoteToReplacement = useCallback(
+		async ( clientId: string, attributeKey: string, id: string ) => {
+			try {
+				await updateSuggestion( {
+					commentId: id,
+					blockName: getBlockName( clientId ),
+					operations: [
+						{
+							type: INLINE_OP_TYPE,
+							attribute: attributeKey,
+							suggestionType: SUGGESTION_TYPE_REPLACEMENT,
+						},
+					],
+				} );
+			} catch {
+				// `updateSuggestion` already surfaced a notice.
+				requestInterceptorBypass( clientId );
+				updateBlockAttributes( clientId, {
+					[ attributeKey ]: rejectInlineDeletion(
+						getBlockAttributes( clientId )?.[ attributeKey ],
+						id
+					),
+				} );
+			}
+		},
+		[
+			updateSuggestion,
+			getBlockName,
+			getBlockAttributes,
+			requestInterceptorBypass,
+			updateBlockAttributes,
+		]
+	);
+
+	/*
 	 * Route a unit of inserted content (a typed character or a pasted run,
 	 * described by a `RunSegment`) to the right place: buffer it while a note
 	 * request is in flight, grow the open marker when the caret is still at its
@@ -482,6 +527,51 @@ export default function SuggestionAdditionKeyboard() {
 			 */
 			const start = domRange ? domRange.start : caret.start;
 			const end = domRange ? domRange.end : caret.end;
+			/*
+			 * Typing over a selection in the author's own pending addition
+			 * revises that proposal, so it is kept in the same marker and
+			 * note rather than refused as an overlap below (#73411, B11).
+			 */
+			if ( start !== end ) {
+				const revised = reviseOwnAddition(
+					getBlockAttributes( clientId )?.[ attributeKey ],
+					{
+						start,
+						end,
+						text,
+						html: segment.html ?? undefined,
+						authorToken:
+							authorId === null || authorId === undefined
+								? null
+								: String( authorId ),
+					}
+				);
+				if ( revised ) {
+					runRef.current = {
+						clientId,
+						attributeKey,
+						id: revised.id,
+						start: revised.markerStart,
+						end: revised.markerEnd,
+						caret: revised.caret,
+						pending: [],
+					};
+					commit(
+						clientId,
+						attributeKey,
+						revised.value,
+						revised.caret
+					);
+					if ( revised.isReplacement ) {
+						promoteToReplacement(
+							clientId,
+							attributeKey,
+							revised.id
+						);
+					}
+					return true;
+				}
+			}
 			if (
 				start !== end &&
 				valueRangeHasSuggestion(
@@ -600,6 +690,7 @@ export default function SuggestionAdditionKeyboard() {
 			isDeferredInsertion,
 			beginInsertion,
 			commit,
+			promoteToReplacement,
 			registry,
 			resetRun,
 			authorId,
