@@ -90,7 +90,7 @@ function termToItem( term ) {
 					_x( '%1$s (%2$s)', 'term' ),
 					name,
 					decodeEntities( parentName )
-			  )
+				)
 			: name,
 	};
 }
