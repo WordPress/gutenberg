@@ -19,6 +19,7 @@ vi.mock( import( '../entity-sync' ), async ( importOriginal ) => ( {
 } ) );
 
 describe( 'editMediaEntity', () => {
+	const select = { hasResolutionFailed: () => false };
 	let dispatch;
 	let resolveSelect;
 
@@ -42,6 +43,7 @@ describe( 'editMediaEntity', () => {
 
 	it( 'should return early when recordId is not provided', async () => {
 		const result = await editMediaEntity( null )( {
+			select,
 			dispatch,
 			resolveSelect,
 		} );
@@ -55,6 +57,7 @@ describe( 'editMediaEntity', () => {
 		resolveSelect.getEntitiesConfig.mockReturnValue( [] );
 
 		const result = await editMediaEntity( 123 )( {
+			select,
 			dispatch,
 			resolveSelect,
 		} );
@@ -84,6 +87,7 @@ describe( 'editMediaEntity', () => {
 			recordId,
 			edits
 		)( {
+			select,
 			dispatch,
 			resolveSelect,
 		} );
@@ -141,7 +145,7 @@ describe( 'editMediaEntity', () => {
 
 		const result = await editMediaEntity( recordId, edits, {
 			throwOnError: false,
-		} )( { dispatch, resolveSelect } );
+		} )( { select, dispatch, resolveSelect } );
 
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'SAVE_ENTITY_RECORD_START',
@@ -174,6 +178,7 @@ describe( 'editMediaEntity', () => {
 
 		await expect(
 			editMediaEntity( recordId, edits, { throwOnError: true } )( {
+				select,
 				dispatch,
 				resolveSelect,
 			} )
@@ -191,7 +196,7 @@ describe( 'editMediaEntity', () => {
 
 		await editMediaEntity( recordId, edits, {
 			__unstableFetch: customFetch,
-		} )( { dispatch, resolveSelect } );
+		} )( { select, dispatch, resolveSelect } );
 
 		expect( customFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/media/123/edit',
@@ -211,6 +216,7 @@ describe( 'editMediaEntity', () => {
 			recordId,
 			edits
 		)( {
+			select,
 			dispatch,
 			resolveSelect,
 		} );

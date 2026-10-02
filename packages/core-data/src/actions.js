@@ -2,7 +2,12 @@ import { v4 as uuid } from 'uuid';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
-import { clearUnchangedEdits, getNestedValue, setNestedValue } from './utils';
+import {
+	clearUnchangedEdits,
+	getNestedValue,
+	getOrLoadEntityConfig,
+	setNestedValue,
+} from './utils';
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
@@ -276,11 +281,13 @@ export const deleteEntityRecord =
 		query,
 		{ __unstableFetch = apiFetch, throwOnError = false } = {}
 	) =>
-	async ( { dispatch, resolveSelect } ) => {
+	async ( { select, dispatch, resolveSelect } ) => {
 		logEntityDeprecation( kind, name, 'deleteEntityRecord' );
-		const configs = await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.kind === kind && config.name === name
+		const entityConfig = await getOrLoadEntityConfig(
+			{ select, dispatch, resolveSelect },
+			kind,
+			name,
+			{ throwOnError }
 		);
 		let error;
 		let deletedRecord = false;
@@ -559,9 +566,11 @@ export const saveEntityRecord =
 		} = options;
 
 		logEntityDeprecation( kind, name, 'saveEntityRecord' );
-		const configs = await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.kind === kind && config.name === name
+		const entityConfig = await getOrLoadEntityConfig(
+			{ select, dispatch, resolveSelect },
+			kind,
+			name,
+			{ throwOnError }
 		);
 		if ( ! entityConfig ) {
 			return;
@@ -853,9 +862,11 @@ export const saveEditedEntityRecord =
 		if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
 			return;
 		}
-		const configs = await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.kind === kind && config.name === name
+		const entityConfig = await getOrLoadEntityConfig(
+			{ select, dispatch, resolveSelect },
+			kind,
+			name,
+			{ throwOnError: options?.throwOnError }
 		);
 		if ( ! entityConfig ) {
 			return;
@@ -902,12 +913,17 @@ export const __experimentalSaveSpecifiedEntityEdits =
 			setNestedValue( editsToSave, item, getNestedValue( edits, item ) );
 		}
 
-		const configs = await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.kind === kind && config.name === name
+		const entityConfig = await getOrLoadEntityConfig(
+			{ select, dispatch, resolveSelect },
+			kind,
+			name,
+			{ throwOnError: options?.throwOnError }
 		);
+		if ( ! entityConfig ) {
+			return;
+		}
 
-		const entityIdKey = entityConfig?.key || DEFAULT_ENTITY_KEY;
+		const entityIdKey = entityConfig.key || DEFAULT_ENTITY_KEY;
 
 		// If a record key is provided then update the existing record.
 		// This necessitates providing `recordKey` to saveEntityRecord as part of the
@@ -1047,11 +1063,12 @@ export function receiveDefaultTemplateId( query, templateId ) {
  */
 export const receiveRevisions =
 	( kind, name, recordKey, records, query, invalidateCache = false, meta ) =>
-	async ( { dispatch, resolveSelect } ) => {
+	async ( { select, dispatch, resolveSelect } ) => {
 		logEntityDeprecation( kind, name, 'receiveRevisions' );
-		const configs = await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.kind === kind && config.name === name
+		const entityConfig = await getOrLoadEntityConfig(
+			{ select, dispatch, resolveSelect },
+			kind,
+			name
 		);
 		const key = entityConfig?.revisionKey ?? DEFAULT_ENTITY_KEY;
 

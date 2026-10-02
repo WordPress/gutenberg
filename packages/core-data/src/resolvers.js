@@ -7,6 +7,7 @@ import { additionalEntityConfigLoaders, DEFAULT_ENTITY_KEY } from './entities';
 import { getEntitySyncManager } from './entity-sync';
 import {
 	forwardResolver,
+	getOrLoadEntityConfig,
 	getNormalizedCommaSeparable,
 	getUserPermissionCacheKey,
 	getUserPermissionsFromAllowHeader,
@@ -59,9 +60,11 @@ export const getCurrentUser =
 export const getEntityRecord =
 	( kind, name, key = '', query ) =>
 	async ( { select, dispatch, registry, resolveSelect } ) => {
-		const configs = await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.name === name && config.kind === kind
+		const entityConfig = await getOrLoadEntityConfig(
+			{ select, dispatch, resolveSelect },
+			kind,
+			name,
+			{ throwOnError: true }
 		);
 		if ( ! entityConfig ) {
 			return;
@@ -280,10 +283,12 @@ export const getEditedEntityRecord = forwardResolver( 'getEntityRecord' );
  */
 export const getEntityRecords =
 	( kind, name, query = {} ) =>
-	async ( { dispatch, registry, resolveSelect } ) => {
-		const configs = await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.name === name && config.kind === kind
+	async ( { select, dispatch, registry, resolveSelect } ) => {
+		const entityConfig = await getOrLoadEntityConfig(
+			{ select, dispatch, resolveSelect },
+			kind,
+			name,
+			{ throwOnError: true }
 		);
 		if ( ! entityConfig ) {
 			return;
@@ -567,20 +572,17 @@ export const getEmbedPreview =
  */
 export const canUser =
 	( resource, id ) =>
-	async ( { dispatch, resolveSelect } ) => {
+	async ( { select, dispatch, resolveSelect } ) => {
 		let resourcePath = null;
 		if ( typeof resource === 'object' ) {
 			if ( ! resource.kind || ! resource.name ) {
 				throw new Error( 'The entity resource object is not valid.' );
 			}
 
-			const configs = await resolveSelect.getEntitiesConfig(
-				resource.kind
-			);
-			const entityConfig = configs.find(
-				( config ) =>
-					config.name === resource.name &&
-					config.kind === resource.kind
+			const entityConfig = await getOrLoadEntityConfig(
+				{ select, dispatch, resolveSelect },
+				resource.kind,
+				resource.name
 			);
 			if ( ! entityConfig ) {
 				return;
@@ -875,19 +877,27 @@ export const getNavigationFallbackId =
 
 export const getDefaultTemplateId =
 	( query ) =>
-	async ( { dispatch, registry, resolveSelect } ) => {
+	async ( { select, dispatch, registry, resolveSelect } ) => {
 		const template = await apiFetch( {
 			path: addQueryArgs( '/wp/v2/templates/lookup', query ),
 		} );
-		// Wait for the entities config to be loaded, otherwise receiving
-		// the template as an entity will not work.
-		await resolveSelect.getEntitiesConfig( 'postType' );
 		const id = template?.id;
+		// Wait for the entity config to be loaded, otherwise receiving
+		// the template as an entity will not work.
+		const entityConfig = id
+			? await getOrLoadEntityConfig(
+					{ select, dispatch, resolveSelect },
+					'postType',
+					template.type
+				)
+			: undefined;
 
 		registry.batch( () => {
 			dispatch.receiveDefaultTemplateId( query, id || '' );
 			// Endpoint may return an empty object if no template is found.
-			if ( id ) {
+			// Without a config, leave the record to `getEntityRecord`, which
+			// retries loading the config.
+			if ( entityConfig ) {
 				template.id = id;
 				dispatch.receiveEntityRecords(
 					'postType',
@@ -916,10 +926,11 @@ export const getDefaultTemplateId =
  */
 export const getRevisions =
 	( kind, name, recordKey, query = {} ) =>
-	async ( { dispatch, resolveSelect } ) => {
-		const configs = await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.name === name && config.kind === kind
+	async ( { select, dispatch, resolveSelect } ) => {
+		const entityConfig = await getOrLoadEntityConfig(
+			{ select, dispatch, resolveSelect },
+			kind,
+			name
 		);
 
 		if ( ! entityConfig ) {
@@ -1044,9 +1055,10 @@ getRevisions.shouldInvalidate = ( action, kind, name, recordKey ) =>
 export const getRevision =
 	( kind, name, recordKey, revisionKey, query ) =>
 	async ( { select, dispatch, resolveSelect } ) => {
-		const configs = await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.name === name && config.kind === kind
+		const entityConfig = await getOrLoadEntityConfig(
+			{ select, dispatch, resolveSelect },
+			kind,
+			name
 		);
 
 		if ( ! entityConfig ) {
@@ -1164,16 +1176,15 @@ export const getEntitiesConfig =
 			return;
 		}
 
-		try {
-			const configs = await loader.loadEntities();
-			if ( ! configs.length ) {
-				return;
-			}
-
-			dispatch.addEntities( configs );
-		} catch {
-			// Do nothing if the request comes back with an API error.
+		// A failed request fails the resolution rather than finishing it, so
+		// `getOrLoadEntityConfig` can tell a failed load from a kind without
+		// entities and retry it.
+		const configs = await loader.loadEntities();
+		if ( ! configs.length ) {
+			return;
 		}
+
+		dispatch.addEntities( configs );
 	};
 
 /**

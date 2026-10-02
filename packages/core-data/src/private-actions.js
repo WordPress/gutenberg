@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 import { STORE_NAME } from './name';
 import { getEntitySyncManager } from './entity-sync';
 import { createSyncUndoLevelRecord } from './utils/sync-undo-levels';
+import getOrLoadEntityConfig from './utils/get-or-load-entity-config';
 
 /**
  * Returns an action object used in signalling that the registered post meta
@@ -53,7 +54,7 @@ export const editMediaEntity =
 		edits = {},
 		{ __unstableFetch = apiFetch, throwOnError = false } = {}
 	) =>
-	async ( { dispatch, resolveSelect } ) => {
+	async ( { select, dispatch, resolveSelect } ) => {
 		if ( ! recordId ) {
 			return;
 		}
@@ -61,9 +62,11 @@ export const editMediaEntity =
 		const kind = 'postType';
 		const name = 'attachment';
 
-		const configs = await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.kind === kind && config.name === name
+		const entityConfig = await getOrLoadEntityConfig(
+			{ select, dispatch, resolveSelect },
+			kind,
+			name,
+			{ throwOnError }
 		);
 
 		if ( ! entityConfig ) {

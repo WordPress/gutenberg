@@ -15,6 +15,8 @@ vi.mock( import( '../entity-sync' ), () => ( {
 	getEntitySyncManager: vi.fn(),
 } ) );
 
+const select = { hasResolutionFailed: () => false };
+
 describe( 'getEntityRecord', () => {
 	const POST_TYPE = { slug: 'post' };
 	const POST_TYPE_RESPONSE = { json: () => Promise.resolve( POST_TYPE ) };
@@ -58,7 +60,7 @@ describe( 'getEntityRecord', () => {
 			'root',
 			'postType',
 			'post'
-		)( { dispatch, registry, resolveSelect } );
+		)( { select, dispatch, registry, resolveSelect } );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -94,7 +96,7 @@ describe( 'getEntityRecord', () => {
 			'postType',
 			'post',
 			query
-		)( { dispatch, registry, resolveSelect } );
+		)( { select, dispatch, registry, resolveSelect } );
 
 		// Trigger apiFetch, test that the query is present in the url.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -145,6 +147,7 @@ describe( 'getEntityRecord', () => {
 			'post',
 			1
 		)( {
+			select,
 			dispatch,
 			registry,
 			resolveSelect: resolveSelectWithSync,
@@ -190,6 +193,7 @@ describe( 'getEntityRecord', () => {
 			'post',
 			1
 		)( {
+			select,
 			dispatch,
 			registry,
 			resolveSelect: resolveSelectWithSync,
@@ -220,7 +224,8 @@ describe( 'getEntityRecord', () => {
 		const resolveSelectWithSync = {
 			getEntitiesConfig: vi.fn( () => ENTITIES_WITH_SYNC ),
 		};
-		const select = {
+		const selectWithoutCollaboration = {
+			...select,
 			isCollaborationSupported: vi.fn( () => false ),
 		};
 
@@ -231,14 +236,16 @@ describe( 'getEntityRecord', () => {
 			'post',
 			1
 		)( {
-			select,
+			select: selectWithoutCollaboration,
 			dispatch,
 			registry,
 			resolveSelect: resolveSelectWithSync,
 		} );
 
 		expect( syncManager.load ).not.toHaveBeenCalled();
-		expect( select.isCollaborationSupported ).toHaveBeenCalledTimes( 1 );
+		expect(
+			selectWithoutCollaboration.isCollaborationSupported
+		).toHaveBeenCalledTimes( 1 );
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
 			'postType',
 			'post',
@@ -273,6 +280,7 @@ describe( 'getEntityRecord', () => {
 			'post',
 			1
 		)( {
+			select,
 			dispatch,
 			registry,
 			resolveSelect: resolveSelectWithSync,
@@ -316,6 +324,7 @@ describe( 'getEntityRecord', () => {
 			'post',
 			1
 		)( {
+			select,
 			dispatch,
 			registry,
 			resolveSelect: resolveSelectWithSync,
@@ -359,6 +368,7 @@ describe( 'getEntityRecord', () => {
 
 		// Call with a query parameter
 		await getEntityRecord( 'postType', 'post', 1, { foo: 'bar' } )( {
+			select,
 			dispatch,
 			registry,
 			resolveSelect: resolveSelectWithSync,
@@ -418,7 +428,7 @@ describe( 'getEntityRecords', () => {
 		await getEntityRecords(
 			'root',
 			'postType'
-		)( { dispatch, registry, resolveSelect } );
+		)( { select, dispatch, registry, resolveSelect } );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -450,7 +460,7 @@ describe( 'getEntityRecords', () => {
 		await getEntityRecords(
 			'root',
 			'postType'
-		)( { dispatch, registry, resolveSelect } );
+		)( { select, dispatch, registry, resolveSelect } );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -484,7 +494,7 @@ describe( 'getEntityRecords', () => {
 		await getEntityRecords(
 			'root',
 			'postType'
-		)( { dispatch, registry, resolveSelect } );
+		)( { select, dispatch, registry, resolveSelect } );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -530,6 +540,7 @@ describe( 'getEntityRecords', () => {
 		await getEntityRecords( 'postType', 'post', {
 			_fields: Object.keys( postsWithLinks[ 0 ] ).join( ',' ),
 		} )( {
+			select,
 			dispatch,
 			registry,
 			resolveSelect,
@@ -571,6 +582,7 @@ describe( 'getEntityRecords', () => {
 		await getEntityRecords( 'postType', 'post', {
 			_fields: Object.keys( postsWithoutLinks[ 0 ] ).join( ',' ),
 		} )( {
+			select,
 			dispatch,
 			registry,
 			resolveSelect,
@@ -618,7 +630,7 @@ describe( 'getEntityRecords', () => {
 		await getEntityRecords( 'postType', 'attachment', {
 			per_page: -1,
 			[ RECEIVE_INTERMEDIATE_RESULTS ]: true,
-		} )( { dispatch, registry, resolveSelect } );
+		} )( { select, dispatch, registry, resolveSelect } );
 
 		// 3 calls for intermediate results (one per page), plus 1 final call with complete records
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes( 4 );
@@ -704,7 +716,7 @@ describe( 'taxonomy pagination', () => {
 		await getEntityRecords( 'taxonomy', 'category', {
 			per_page: 2,
 			page: 1,
-		} )( { dispatch, registry, resolveSelect } );
+		} )( { select, dispatch, registry, resolveSelect } );
 
 		expect( triggerFetch ).toHaveBeenLastCalledWith( {
 			path: '/wp/v2/categories?context=edit&per_page=2&page=1',
@@ -743,7 +755,7 @@ describe( 'taxonomy pagination', () => {
 		await getEntityRecords( 'taxonomy', 'category', {
 			per_page: 2,
 			page: 1,
-		} )( { dispatch, registry, resolveSelect } );
+		} )( { select, dispatch, registry, resolveSelect } );
 
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
 			'taxonomy',
@@ -836,8 +848,9 @@ describe( 'canUser', () => {
 			Promise.reject( { status: 404 } )
 		);
 
-		await canUser( 'media' )( { dispatch, resolveSelect } );
+		await canUser( 'media' )( { select, dispatch, resolveSelect } );
 		await canUser( { kind: 'postType', name: 'attachment' } )( {
+			select,
 			dispatch,
 			resolveSelect,
 		} );
@@ -856,7 +869,7 @@ describe( 'canUser', () => {
 			headers: new Map(),
 		} ) );
 
-		await canUser( 'media' )( { dispatch, resolveSelect } );
+		await canUser( 'media' )( { select, dispatch, resolveSelect } );
 
 		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith( {
 			'create/media': false,
@@ -869,6 +882,7 @@ describe( 'canUser', () => {
 	it( 'throws an error when an entity resource object is malformed', async () => {
 		await expect(
 			canUser( { name: 'wp_block' } )( {
+				select,
 				dispatch,
 				resolveSelect,
 			} )
@@ -880,7 +894,7 @@ describe( 'canUser', () => {
 			headers: new Map( [ [ 'allow', 'GET' ] ] ),
 		} ) );
 
-		await canUser( 'media' )( { dispatch, resolveSelect } );
+		await canUser( 'media' )( { select, dispatch, resolveSelect } );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/media',
@@ -902,6 +916,7 @@ describe( 'canUser', () => {
 		} ) );
 
 		await canUser( { kind: 'postType', name: 'attachment' } )( {
+			select,
 			dispatch,
 			resolveSelect,
 		} );
@@ -922,7 +937,7 @@ describe( 'canUser', () => {
 			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
 		} ) );
 
-		await canUser( 'media' )( { dispatch, resolveSelect } );
+		await canUser( 'media' )( { select, dispatch, resolveSelect } );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/media',
@@ -941,6 +956,7 @@ describe( 'canUser', () => {
 		} ) );
 
 		await canUser( { kind: 'postType', name: 'attachment' } )( {
+			select,
 			dispatch,
 			resolveSelect,
 		} );
@@ -961,7 +977,7 @@ describe( 'canUser', () => {
 			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
 		} ) );
 
-		await canUser( 'blocks', 123 )( { dispatch, resolveSelect } );
+		await canUser( 'blocks', 123 )( { select, dispatch, resolveSelect } );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/blocks/123',
@@ -983,7 +999,7 @@ describe( 'canUser', () => {
 			kind: 'postType',
 			name: 'wp_block',
 			id: 123,
-		} )( { dispatch, resolveSelect } );
+		} )( { select, dispatch, resolveSelect } );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/blocks/123',
@@ -1001,7 +1017,7 @@ describe( 'canUser', () => {
 			headers: new Map( [ [ 'allow', 'POST, GET' ] ] ),
 		} ) );
 
-		await canUser( 'blocks' )( { dispatch, resolveSelect } );
+		await canUser( 'blocks' )( { select, dispatch, resolveSelect } );
 
 		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
 
@@ -1043,7 +1059,10 @@ describe( 'getAutosaves', () => {
 		const resolveSelect = Object.assign( vi.fn(), {
 			getPostType: vi.fn( () => postEntityConfig ),
 		} );
-		await getAutosaves( postType, postId )( { dispatch, resolveSelect } );
+		await getAutosaves(
+			postType,
+			postId
+		)( { select, dispatch, resolveSelect } );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit`,
@@ -1070,7 +1089,10 @@ describe( 'getAutosaves', () => {
 		const resolveSelect = Object.assign( vi.fn(), {
 			getPostType: vi.fn( () => postEntityConfig ),
 		} );
-		await getAutosaves( postType, postId )( { dispatch, resolveSelect } );
+		await getAutosaves(
+			postType,
+			postId
+		)( { select, dispatch, resolveSelect } );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit`,

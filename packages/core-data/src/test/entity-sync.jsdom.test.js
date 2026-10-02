@@ -129,6 +129,7 @@ describe( 'the entity sync interface', () => {
 	} );
 
 	describe( 'getEntityRecord', () => {
+		const select = { hasResolutionFailed: () => false };
 		const registry = { batch: ( callback ) => callback() };
 		const POST_RECORD = { id: 1, title: 'Test Post' };
 		const resolveSelect = {
@@ -149,7 +150,7 @@ describe( 'the entity sync interface', () => {
 				'postType',
 				'post',
 				1
-			)( { dispatch, registry, resolveSelect } );
+			)( { select, dispatch, registry, resolveSelect } );
 
 			expect( manager.shouldSync ).toHaveBeenCalledWith(
 				'postType',
@@ -173,20 +174,20 @@ describe( 'the entity sync interface', () => {
 
 		it( 'does not load records with a query, a string id, or when shouldSync declines', async () => {
 			await getEntityRecord( 'postType', 'post', 1, { context: 'view' } )(
-				{ dispatch, registry, resolveSelect }
+				{ select, dispatch, registry, resolveSelect }
 			);
 			await getEntityRecord(
 				'postType',
 				'post',
 				'hello-world'
-			)( { dispatch, registry, resolveSelect } );
+			)( { select, dispatch, registry, resolveSelect } );
 
 			manager.shouldSync.mockReturnValue( false );
 			await getEntityRecord(
 				'postType',
 				'post',
 				1
-			)( { dispatch, registry, resolveSelect } );
+			)( { select, dispatch, registry, resolveSelect } );
 
 			expect( manager.load ).not.toHaveBeenCalled();
 		} );
@@ -196,7 +197,7 @@ describe( 'the entity sync interface', () => {
 				'postType',
 				'post',
 				1
-			)( { dispatch, registry, resolveSelect } );
+			)( { select, dispatch, registry, resolveSelect } );
 
 			const handlers = manager.load.mock.calls[ 0 ][ 4 ];
 
@@ -228,7 +229,7 @@ describe( 'the entity sync interface', () => {
 				'postType',
 				'post',
 				1
-			)( { dispatch, registry, resolveSelect } );
+			)( { select, dispatch, registry, resolveSelect } );
 
 			const handlers = manager.load.mock.calls[ 0 ][ 4 ];
 			const REFETCHED = { id: 1, title: 'Refetched' };
@@ -255,7 +256,7 @@ describe( 'the entity sync interface', () => {
 				'postType',
 				'post',
 				1
-			)( { dispatch, registry, resolveSelect } );
+			)( { select, dispatch, registry, resolveSelect } );
 
 			expect( manager.load ).not.toHaveBeenCalled();
 			expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
@@ -268,6 +269,7 @@ describe( 'the entity sync interface', () => {
 	} );
 
 	describe( 'getEntityRecords', () => {
+		const select = { hasResolutionFailed: () => false };
 		const registry = { batch: ( callback ) => callback() };
 		const resolveSelect = {
 			getEntitiesConfig: vi.fn( () => [ POST_ENTITY ] ),
@@ -277,6 +279,7 @@ describe( 'the entity sync interface', () => {
 			apiFetch.mockImplementation( () => ( {} ) );
 
 			await getEntityRecords( 'postType', 'post', { per_page: -1 } )( {
+				select,
 				dispatch,
 				registry,
 				resolveSelect,
@@ -293,6 +296,7 @@ describe( 'the entity sync interface', () => {
 			apiFetch.mockImplementation( () => ( {} ) );
 
 			await getEntityRecords( 'postType', 'post', { per_page: 10 } )( {
+				select,
 				dispatch,
 				registry,
 				resolveSelect,
@@ -357,7 +361,10 @@ describe( 'the entity sync interface', () => {
 
 	describe( 'saveEntityRecord', () => {
 		const persistedRecord = { id: 10, title: 'Initial', meta: {} };
-		const select = { getRawEntityRecord: () => persistedRecord };
+		const select = {
+			hasResolutionFailed: () => false,
+			getRawEntityRecord: () => persistedRecord,
+		};
 		const resolveSelect = {
 			getEntitiesConfig: vi.fn( () => [ POST_ENTITY ] ),
 		};
@@ -510,6 +517,7 @@ describe( 'the entity sync interface', () => {
 
 	describe( 'deleteEntityRecord', () => {
 		it( 'unloads the deleted record', async () => {
+			const select = { hasResolutionFailed: () => false };
 			const resolveSelect = {
 				getEntitiesConfig: vi.fn( () => [ POST_ENTITY ] ),
 			};
@@ -519,7 +527,7 @@ describe( 'the entity sync interface', () => {
 				'postType',
 				'post',
 				10
-			)( { dispatch, resolveSelect } );
+			)( { select, dispatch, resolveSelect } );
 
 			expect( manager.unload ).toHaveBeenCalledWith(
 				'postType',

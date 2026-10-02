@@ -4,6 +4,7 @@ export { default as getFilteredItem } from './get-filtered-item';
 export { default as getNormalizedCommaSeparable } from './get-normalized-comma-separable';
 export { default as ifMatchingAction } from './if-matching-action';
 export { default as forwardResolver } from './forward-resolver';
+export { default as getOrLoadEntityConfig } from './get-or-load-entity-config';
 export { default as replaceAction } from './replace-action';
 export { default as withWeakMapCache } from './with-weak-map-cache';
 export { default as setNestedValue } from './set-nested-value';

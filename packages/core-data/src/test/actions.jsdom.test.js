@@ -579,6 +579,8 @@ describe( 'clearEntityRecordEdits', () => {
 } );
 
 describe( 'deleteEntityRecord', () => {
+	const select = { hasResolutionFailed: () => false };
+
 	beforeEach( async () => {
 		apiFetch.mockReset();
 	} );
@@ -603,7 +605,7 @@ describe( 'deleteEntityRecord', () => {
 			'postType',
 			'post',
 			deletedRecord.id
-		)( { dispatch, resolveSelect } );
+		)( { select, dispatch, resolveSelect } );
 
 		expect( apiFetch ).toHaveBeenCalledTimes( 1 );
 		expect( apiFetch ).toHaveBeenCalledWith( {
@@ -661,7 +663,7 @@ describe( 'deleteEntityRecord', () => {
 				{
 					throwOnError: true,
 				}
-			)( { dispatch, resolveSelect } )
+			)( { select, dispatch, resolveSelect } )
 		).rejects.toEqual( new Error( 'API error' ) );
 	} );
 
@@ -691,7 +693,7 @@ describe( 'deleteEntityRecord', () => {
 				{
 					throwOnError: false,
 				}
-			)( { dispatch, resolveSelect } )
+			)( { select, dispatch, resolveSelect } )
 		).resolves.toBe( false );
 	} );
 } );
@@ -711,6 +713,7 @@ describe( 'saveEditedEntityRecord', () => {
 			},
 		];
 		const select = {
+			hasResolutionFailed: () => false,
 			getEntityRecordNonTransientEdits: () => [],
 			hasEditsForEntityRecord: () => true,
 		};
@@ -751,6 +754,7 @@ describe( 'saveEditedEntityRecord', () => {
 			},
 		];
 		const select = {
+			hasResolutionFailed: () => false,
 			getEntityRecordNonTransientEdits: () => [],
 			hasEditsForEntityRecord: () => true,
 		};
@@ -799,6 +803,7 @@ describe( 'saveEntityRecord', () => {
 			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
 		];
 		const select = {
+			hasResolutionFailed: () => false,
 			getRawEntityRecord: () => post,
 		};
 		const resolveSelect = { getEntitiesConfig: vi.fn( () => configs ) };
@@ -864,6 +869,7 @@ describe( 'saveEntityRecord', () => {
 			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
 		];
 		const select = {
+			hasResolutionFailed: () => false,
 			getRawEntityRecord: () => post,
 		};
 		const resolveSelect = { getEntitiesConfig: vi.fn( () => entities ) };
@@ -886,6 +892,7 @@ describe( 'saveEntityRecord', () => {
 			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
 		];
 		const select = {
+			hasResolutionFailed: () => false,
 			getRawEntityRecord: () => post,
 		};
 		const resolveSelect = { getEntitiesConfig: vi.fn( () => entities ) };
@@ -908,6 +915,7 @@ describe( 'saveEntityRecord', () => {
 			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
 		];
 		const select = {
+			hasResolutionFailed: () => false,
 			getRawEntityRecord: () => post,
 		};
 		const resolveSelect = { getEntitiesConfig: vi.fn( () => configs ) };
@@ -1017,6 +1025,7 @@ describe( 'saveEntityRecord', () => {
 				} )
 			);
 			const select = {
+				hasResolutionFailed: () => false,
 				getRawEntityRecord: () => persistedRecord,
 			};
 			const resolveSelect = {
@@ -1104,6 +1113,7 @@ describe( 'saveEntityRecord', () => {
 				},
 			];
 			const select = {
+				hasResolutionFailed: () => false,
 				getRawEntityRecord: () => persistedRecord,
 			};
 			const resolveSelect = {
@@ -1148,6 +1158,7 @@ describe( 'saveEntityRecord', () => {
 				},
 			];
 			const select = {
+				hasResolutionFailed: () => false,
 				getRawEntityRecord: () => persistedRecord,
 			};
 			const resolveSelect = {
@@ -1179,6 +1190,7 @@ describe( 'saveEntityRecord', () => {
 				},
 			];
 			const select = {
+				hasResolutionFailed: () => false,
 				getRawEntityRecord: () => undefined,
 			};
 			const resolveSelect = {
@@ -1229,6 +1241,7 @@ describe( 'saveEntityRecord', () => {
 			},
 		];
 		const select = {
+			hasResolutionFailed: () => false,
 			getRawEntityRecord: () => ( {} ),
 		};
 		const resolveSelect = { getEntitiesConfig: vi.fn( () => configs ) };
@@ -1298,6 +1311,7 @@ describe( 'saveEntityRecord', () => {
 		beforeEach( () => {
 			dispatch.receiveAutosaves = vi.fn();
 			select = {
+				hasResolutionFailed: () => false,
 				getRawEntityRecord: () => persistedRecord,
 			};
 			syncManager = {
