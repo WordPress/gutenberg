@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `getConfig` accepts a type parameter describing the config it returns, like `getContext` does, so consumers can read typed config values. It defaults to `any`, so existing calls are unaffected ([#71692](https://github.com/WordPress/gutenberg/pull/71692)).
+
 ### Bug Fixes
 
 -   Run `watch()` callbacks without a directive scope. A callback passed to `watch()` no longer inherits the scope of the action or callback that called `watch()`, so `getContext()` and `getElement()` throw inside it, as they already did when `watch()` was called outside any scope. ([#83280](https://github.com/WordPress/gutenberg/pull/83280))
@@ -9,10 +13,6 @@
 ### Internal
 
 -   Add `afterNextFrame`, `getScope`, and `parseDirectiveValue` to the `privateApis` bundle. `@wordpress/interactivity-router` uses the scheduling and scope seams to publish navigation lifecycle state, while the shared directive-value interpretation keeps the directive runtime, page preparation, and initiator attribution consistent. ([#83280](https://github.com/WordPress/gutenberg/pull/83280))
-
-### Enhancements
-
--   `getConfig` accepts a type parameter describing the config it returns, like `getContext` does, so consumers can read typed config values. It defaults to `any`, so existing calls are unaffected ([#71692](https://github.com/WordPress/gutenberg/pull/71692)).
 
 ## 6.56.0 (2026-09-23)
 
