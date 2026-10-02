@@ -27,6 +27,7 @@ import {
 	uniqueId,
 } from './fixtures';
 import { expectValidatedInputControlDeprecationIfCalled } from '../../url-input/test/fixtures/validated-input-control-deprecation';
+import { CREATE_TYPE } from '../constants';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -3661,5 +3662,226 @@ describe( 'Front page and blog home labelling', () => {
 
 		expect( option ).toHaveTextContent( 'Category' );
 		expect( option ).not.toHaveTextContent( 'Front page' );
+	} );
+} );
+
+describe( 'Transforming suggestions', () => {
+	it( 'should render the suggestions returned by transformSuggestions', async () => {
+		const user = userEvent.setup();
+		const [ firstSuggestion ] = fauxEntitySuggestions;
+		const transformSuggestions = vi.fn( () => [ firstSuggestion ] );
+
+		render( <LinkControl transformSuggestions={ transformSuggestions } /> );
+
+		await user.type(
+			screen.getByRole( 'combobox', { name: 'Search or type URL' } ),
+			'Hello'
+		);
+
+		const searchResults = await screen.findByRole( 'listbox', {
+			name: /Search results for.*/,
+		} );
+
+		expect( transformSuggestions ).toHaveBeenCalledWith(
+			fauxEntitySuggestions,
+			expect.objectContaining( {
+				isInitialSuggestions: false,
+				searchTerm: 'Hello',
+			} )
+		);
+
+		const options = within( searchResults ).getAllByRole( 'option' );
+
+		expect( options ).toHaveLength( 1 );
+		expect( options[ 0 ] ).toHaveTextContent( firstSuggestion.title );
+	} );
+
+	it( 'should add the create suggestion after the transformed suggestions', async () => {
+		const user = userEvent.setup();
+		const transformSuggestions = vi.fn( ( suggestions ) =>
+			[ ...suggestions ].reverse()
+		);
+
+		render(
+			<LinkControl
+				createSuggestion={ vi.fn() }
+				transformSuggestions={ transformSuggestions }
+			/>
+		);
+
+		await user.type(
+			screen.getByRole( 'combobox', { name: 'Search or type URL' } ),
+			'Hello'
+		);
+
+		const searchResults = await screen.findByRole( 'listbox', {
+			name: /Search results for.*/,
+		} );
+
+		// The create option is not a search result, so it keeps its place
+		// at the end whatever order the consumer chooses.
+		for ( const [ suggestions ] of transformSuggestions.mock.calls ) {
+			expect( suggestions ).not.toContainEqual(
+				expect.objectContaining( { type: CREATE_TYPE } )
+			);
+		}
+
+		const options = within( searchResults ).getAllByRole( 'option' );
+
+		expect( options.at( -1 ) ).toHaveTextContent( 'Create:' );
+	} );
+
+	it( 'should label a front page that transformSuggestions adds', async () => {
+		const user = userEvent.setup();
+		const frontPage = {
+			id: 1,
+			title: 'Home',
+			type: 'page',
+			kind: 'post-type',
+			url: '/home',
+		};
+		const transformSuggestions = vi.fn( ( suggestions ) => [
+			frontPage,
+			...suggestions,
+		] );
+
+		useSelect.mockImplementation( () => ( {
+			fetchSearchSuggestions: () => Promise.resolve( [] ),
+			fetchRichUrlData: mockFetchRichUrlData,
+			pageOnFront: 1,
+			pageForPosts: 2,
+		} ) );
+
+		render( <LinkControl transformSuggestions={ transformSuggestions } /> );
+
+		await user.type(
+			screen.getByRole( 'combobox', { name: 'Search or type URL' } ),
+			'Home'
+		);
+
+		const searchResults = await screen.findByRole( 'listbox', {
+			name: /Search results for.*/,
+		} );
+
+		expect(
+			within( searchResults ).getByRole( 'option', { name: /Home/ } )
+		).toHaveTextContent( 'Front page' );
+	} );
+
+	it( 'should not call transformSuggestions for a URL', async () => {
+		const user = userEvent.setup();
+		const transformSuggestions = vi.fn( ( suggestions ) => suggestions );
+
+		render( <LinkControl transformSuggestions={ transformSuggestions } /> );
+
+		await user.click(
+			screen.getByRole( 'combobox', { name: 'Search or type URL' } )
+		);
+		await user.paste( 'https://example.com' );
+
+		await screen.findByRole( 'listbox', {
+			name: /Search results for.*/,
+		} );
+
+		expect( transformSuggestions ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should call transformSuggestions for initial suggestions too', async () => {
+		const transformSuggestions = vi.fn( ( suggestions ) => suggestions );
+
+		render(
+			<LinkControl
+				showInitialSuggestions
+				transformSuggestions={ transformSuggestions }
+			/>
+		);
+
+		await screen.findByRole( 'listbox', {
+			name: 'Suggestions',
+		} );
+
+		expect( transformSuggestions ).toHaveBeenCalledWith(
+			fauxEntitySuggestions.slice( 0, 3 ),
+			expect.objectContaining( { isInitialSuggestions: true } )
+		);
+	} );
+
+	describe( 'with a suggestion that is not a link', () => {
+		const blockSuggestion = {
+			id: 'core/home-link',
+			type: 'block',
+			title: 'Home Link',
+			icon: <svg data-testid="block-suggestion-icon" />,
+			typeLabel: 'Block',
+		};
+
+		it( 'should show the icon and type label the suggestion provides', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<LinkControl
+					transformSuggestions={ ( suggestions ) => [
+						blockSuggestion,
+						...suggestions,
+					] }
+				/>
+			);
+
+			await user.type(
+				screen.getByRole( 'combobox', { name: 'Search or type URL' } ),
+				'Home'
+			);
+
+			const searchResults = await screen.findByRole( 'listbox', {
+				name: /Search results for.*/,
+			} );
+			const option = within( searchResults ).getByRole( 'option', {
+				name: /Home Link/,
+			} );
+
+			expect( option ).toHaveTextContent( 'Block' );
+			expect(
+				within( option ).getByTestId( 'block-suggestion-icon' )
+			).toBeVisible();
+		} );
+
+		// It has no URL of its own, so it must not be held back by URL
+		// validation.
+		it( 'should pass the suggestion to onChange', async () => {
+			const user = userEvent.setup();
+			const mockOnChange = vi.fn();
+
+			render(
+				<LinkControl
+					onChange={ mockOnChange }
+					transformSuggestions={ ( suggestions ) => [
+						blockSuggestion,
+						...suggestions,
+					] }
+				/>
+			);
+
+			await user.type(
+				screen.getByRole( 'combobox', { name: 'Search or type URL' } ),
+				'Home'
+			);
+
+			const searchResults = await screen.findByRole( 'listbox', {
+				name: /Search results for.*/,
+			} );
+
+			await user.click(
+				within( searchResults ).getByRole( 'option', {
+					name: /Home Link/,
+				} )
+			);
+
+			expect( mockOnChange ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					id: 'core/home-link',
+					type: 'block',
+				} )
+			);
+		} );
 	} );
 } );
