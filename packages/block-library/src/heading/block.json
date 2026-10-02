@@ -31,6 +31,7 @@
 		"className": true,
 		"splitting": true,
 		"background": {
+			"backgroundClip": true,
 			"backgroundImage": true,
 			"backgroundSize": true,
 			"gradient": true,
@@ -44,16 +45,6 @@
 			"radius": true,
 			"style": true,
 			"width": true
-		},
-		"background": {
-			"backgroundClip": true,
-			"backgroundImage": true,
-			"backgroundSize": true,
-			"gradient": true,
-			"__experimentalDefaultControls": {
-				"backgroundImage": false,
-				"gradient": false
-			}
 		},
 		"color": {
 			"gradients": true,
