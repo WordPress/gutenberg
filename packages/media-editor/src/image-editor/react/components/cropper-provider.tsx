@@ -148,8 +148,7 @@ export function useSetCropperPreviewRect(): (
  * @return Current draft crop rectangle, or null when no preview is active.
  */
 export function useOptionalCropperPreviewRect():
-	| CropperState[ 'cropRect' ]
-	| null {
+	CropperState[ 'cropRect' ] | null {
 	return useContext( CropperContext )?.previewCropRect ?? null;
 }
 

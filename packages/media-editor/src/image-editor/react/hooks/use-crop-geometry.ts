@@ -42,7 +42,7 @@ export function useCropGeometry(): UseCropGeometryReturn {
 				? {
 						width: cropper.state.image.naturalWidth,
 						height: cropper.state.image.naturalHeight,
-				  }
+					}
 				: { width: 0, height: 0 },
 		[ cropper.state.image ]
 	);
