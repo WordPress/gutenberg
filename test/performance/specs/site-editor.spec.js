@@ -61,11 +61,14 @@ test.describe( 'Site Editor Performance', () => {
 	test.describe( 'Loading', () => {
 		let draftId = null;
 
-		test( 'Setup the test page', async ( { admin, perfUtils } ) => {
-			await admin.createNewPost( { postType: 'page' } );
-			await perfUtils.loadBlocksForLargePost();
+		test( 'Setup the test page', async ( { requestUtils, perfUtils } ) => {
+			const content = await perfUtils.loadContentForLargePost();
+			const page = await requestUtils.createPage( {
+				content,
+				status: 'draft',
+			} );
 
-			draftId = await perfUtils.saveDraft();
+			draftId = page.id;
 		} );
 
 		const samples = 10;
@@ -109,12 +112,15 @@ test.describe( 'Site Editor Performance', () => {
 	test.describe( 'Typing', () => {
 		let draftId = null;
 
-		test( 'Setup the test post', async ( { admin, editor, perfUtils } ) => {
-			await admin.createNewPost( { postType: 'page' } );
-			await perfUtils.loadBlocksForLargePost();
-			await editor.insertBlock( { name: 'core/paragraph' } );
+		test( 'Setup the test post', async ( { requestUtils, perfUtils } ) => {
+			const content = await perfUtils.loadContentForLargePost();
+			const page = await requestUtils.createPage( {
+				content:
+					content + `<!-- wp:paragraph --><!-- /wp:paragraph -->`,
+				status: 'draft',
+			} );
 
-			draftId = await perfUtils.saveDraft();
+			draftId = page.id;
 		} );
 
 		test( 'Run the test', async ( { admin, perfUtils, metrics } ) => {
@@ -238,12 +244,21 @@ test.describe( 'Site Editor Performance', () => {
 				 * If there is a Replace template button (old UI), click it, otherwise, click the "transform into" button.
 				 * Once the performance tests are updated to compare compatible versions this code can be removed.
 				 */
+				const actionsButton = page.locator(
+					'.edit-site-template-card__actions button[aria-label="Actions"]'
+				);
+				const transformButton = page.getByRole( 'button', {
+					name: 'Transform into:',
+				} );
+
+				// The older UI's Actions menu only renders once the block
+				// patterns have loaded from the REST API, which can finish
+				// after the sidebar opens. Wait for whichever UI appears
+				// instead of checking once and picking the wrong branch.
+				await actionsButton.or( transformButton ).first().waitFor();
+
 				// eslint-disable-next-line no-restricted-syntax
-				const isActionsButtonVisible = await page
-					.locator(
-						'.edit-site-template-card__actions button[aria-label="Actions"]'
-					)
-					.isVisible();
+				const isActionsButtonVisible = await actionsButton.isVisible();
 
 				if ( isActionsButtonVisible ) {
 					await page
