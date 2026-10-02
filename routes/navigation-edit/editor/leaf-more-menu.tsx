@@ -5,6 +5,13 @@ import { __, sprintf } from '@wordpress/i18n';
 // @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
+import { unlock } from '@wordpress/routes-lock-unlock';
+
+// Blocks whose content controls open in the List View popover.
+const BLOCKS_WITH_CONTENT_POPOVER = [
+	'core/navigation-link',
+	'core/navigation-submenu',
+];
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -24,7 +31,9 @@ export default function LeafMoreMenu( {
 		duplicateBlocks,
 		insertBeforeBlock,
 		insertAfterBlock,
-	} = useDispatch( blockEditorStore );
+		selectBlock,
+		openListViewContentPanel,
+	} = unlock( useDispatch( blockEditorStore ) );
 
 	const removeLabel = sprintf(
 		/* translators: %s: block name */
@@ -72,6 +81,14 @@ export default function LeafMoreMenu( {
 			[ clientId ]
 		);
 
+	const canEdit = useSelect(
+		( select ) =>
+			BLOCKS_WITH_CONTENT_POPOVER.includes(
+				select( blockEditorStore ).getBlockName( clientId )
+			),
+		[ clientId ]
+	);
+
 	return (
 		<DropdownMenu
 			icon={ moreVertical }
@@ -84,6 +101,17 @@ export default function LeafMoreMenu( {
 			{ ( { onClose } ) => (
 				<>
 					<MenuGroup>
+						{ canEdit && (
+							<MenuItem
+								onClick={ () => {
+									selectBlock( clientId );
+									openListViewContentPanel();
+									onClose();
+								} }
+							>
+								{ __( 'Edit' ) }
+							</MenuItem>
+						) }
 						<MenuItem
 							icon={ chevronUp }
 							disabled={ isFirst }

@@ -39,10 +39,16 @@ function useInspectorPopoverPlacement() {
  * `InspectorControlsFill`.
  *
  * @param {Object}                 props
- * @param {RefObject<HTMLElement>} props.listViewRef Ref to the List View slot for the block inspector.
+ * @param {RefObject<HTMLElement>} props.listViewRef  Ref to the List View slot for the block inspector.
+ * @param {Object}                 props.popoverProps Optional props for the popover, replacing the default placement.
  */
-export function ListViewContentPopover( { listViewRef } ) {
-	const { popoverProps } = useInspectorPopoverPlacement();
+export function ListViewContentPopover( {
+	listViewRef,
+	popoverProps: popoverPropsOverride,
+} ) {
+	const { popoverProps: defaultPopoverProps } =
+		useInspectorPopoverPlacement();
+	const popoverProps = popoverPropsOverride ?? defaultPopoverProps;
 	const fills = useSlotFills( LIST_VIEW_CONTENT_PANEL_SLOT );
 	const hasFills = Boolean( fills && fills.length );
 

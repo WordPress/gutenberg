@@ -19,6 +19,11 @@ type Block = {
 
 const { PrivateListView } = unlock( blockEditorPrivateApis );
 
+const CONTENT_POPOVER_PROPS = {
+	placement: 'right-start',
+	offset: 16,
+};
+
 // Needs to be kept in sync with the query used at packages/block-library/src/page-list/edit.jsx.
 const MAX_PAGE_COUNT = 100;
 const PAGES_QUERY = [
@@ -88,8 +93,11 @@ export default function NavigationMenuContent( {
 		},
 		[ rootClientId ]
 	);
-	const { replaceBlock, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
+	const {
+		replaceBlock,
+		__unstableMarkNextChangeAsNotPersistent,
+		openListViewContentPanel,
+	} = unlock( useDispatch( blockEditorStore ) );
 
 	const offCanvasOnselect = useCallback(
 		( block: Block ) => {
@@ -103,8 +111,13 @@ export default function NavigationMenuContent( {
 					createBlock( 'core/navigation-link', block.attributes )
 				);
 			}
+			openListViewContentPanel();
 		},
-		[ __unstableMarkNextChangeAsNotPersistent, replaceBlock ]
+		[
+			__unstableMarkNextChangeAsNotPersistent,
+			replaceBlock,
+			openListViewContentPanel,
+		]
 	);
 
 	// The hidden block is needed because it makes block edit side effects trigger.
@@ -118,6 +131,7 @@ export default function NavigationMenuContent( {
 					blockSettingsMenu={ LeafMoreMenu }
 					showAppender
 					additionalBlockContent={ NavigationLinkUI }
+					contentPopoverProps={ CONTENT_POPOVER_PROPS }
 					isExpanded
 				/>
 			) }

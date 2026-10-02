@@ -36,6 +36,7 @@ import { store as blockEditorStore } from '../../store';
 import { BlockSettingsDropdown } from '../block-settings-menu/block-settings-dropdown';
 import { BLOCK_LIST_ITEM_HEIGHT, focusListItem } from './utils';
 import useClipboardHandler from './use-clipboard-handler';
+import { ListViewContentPopover } from '../inspector-controls/list-view-content-popover';
 
 const expansion = ( state, action ) => {
 	const { type, clientIds } = action;
@@ -87,6 +88,7 @@ const expansion = ( state, action ) => {
  * @param {string}         props.description            Optional accessible description for the tree grid component.
  * @param {?Function}      props.onSelect               Optional callback to be invoked when a block is selected. Receives the block object that was selected.
  * @param {?ComponentType} props.additionalBlockContent Component that renders additional block content UI.
+ * @param {?Object}        props.contentPopoverProps    When set, renders the selected block's content controls in a popover anchored to its row, using these popover props. Requires the `listViewContentPopoverKey` block editor setting.
  * @param {Ref}            ref                          Forwarded ref
  */
 function ListViewComponent(
@@ -103,6 +105,7 @@ function ListViewComponent(
 		description,
 		onSelect,
 		additionalBlockContent: AdditionalBlockContent,
+		contentPopoverProps,
 	},
 	ref
 ) {
@@ -426,6 +429,12 @@ function ListViewComponent(
 					</ListViewInsertedBlockContext.Provider>
 				</ListViewContext.Provider>
 			</TreeGrid>
+			{ contentPopoverProps && (
+				<ListViewContentPopover
+					listViewRef={ elementRef }
+					popoverProps={ contentPopoverProps }
+				/>
+			) }
 		</AsyncModeProvider>
 	);
 }
@@ -446,6 +455,7 @@ export default forwardRef( ( props, ref ) => {
 			onSelect={ null }
 			additionalBlockContent={ null }
 			blockSettingsMenu={ undefined }
+			contentPopoverProps={ undefined }
 		/>
 	);
 } );
