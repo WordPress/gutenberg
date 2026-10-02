@@ -276,9 +276,10 @@ describe( 'SuggestionFormatKeyboard', () => {
 		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
 		expect( getContent() ).toContain( 'data-suggestion-id="9"' );
 		expect( getContent() ).toContain( 'data-suggestion-type="format"' );
-		// The proposed bold survives, wrapping the marked run.
+		// The proposed bold survives inside the marker, so the front end can
+		// swap the whole span for the original run.
 		expect( getContent() ).toMatch(
-			/<strong><mark [^>]*>world<\/mark><\/strong>/
+			/<mark [^>]*><strong>world<\/strong><\/mark>/
 		);
 	} );
 

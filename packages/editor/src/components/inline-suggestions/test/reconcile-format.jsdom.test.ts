@@ -299,6 +299,35 @@ describe( 'applyFormatPlan', () => {
 		expect( html.match( /world/g ) ).toHaveLength( 1 );
 	} );
 
+	it( 'wraps the marker around the run’s own formatting', () => {
+		const prev = rtd( 'Hello world' );
+		const next = rtd( 'Hello <strong>world</strong>' );
+		const plan = planFormatMarkers( prev, next );
+		const result = applyFormatPlan( next, plan, { id: 10, authorId: 7 } );
+
+		// The front end replaces the marker's whole span with the original
+		// run, so the proposed formatting has to sit inside it.
+		expect( result.toHTMLString() ).toBe(
+			rtd(
+				`Hello ${ formatMark( 10, '<strong>world</strong>' ) }`
+			).toHTMLString()
+		);
+	} );
+
+	it( 'keeps one marker over a run with mixed formatting', () => {
+		const prev = rtd( 'Hello <em>wor</em>ld' );
+		const next = rtd( 'Hello <strong><em>wor</em>ld</strong>' );
+		const plan = planFormatMarkers( prev, next );
+		const result = applyFormatPlan( next, plan, { id: 11, authorId: 7 } );
+
+		const html = result.toHTMLString();
+		expect( html.match( /<mark/g ) ).toHaveLength( 1 );
+		expect( findSuggestionRange( result, 11 ) ).toEqual( {
+			start: 6,
+			end: 11,
+		} );
+	} );
+
 	it( 'preserves a link (format attributes) in the marked run', () => {
 		const prev = rtd( 'see docs' );
 		const next = rtd( 'see <a href="https://w.org">docs</a>' );
