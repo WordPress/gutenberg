@@ -41,9 +41,8 @@ export function getBackgroundClassesAndStyles( attributes ) {
  * Derives the background related props for a block from its background block
  * support attributes.
  *
- * Blocks should use this hook in edit components rather than
- * `getBackgroundClassesAndStyles`, so it can resolve editor settings later,
- * as `useBorderProps` and `useColorProps` do, without a new API.
+ * Prefer this in edit components so editor settings can be resolved later
+ * without a new API.
  *
  * @param {Object} attributes Block attributes.
  *

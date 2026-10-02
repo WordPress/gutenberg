@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add `useBackgroundProps` and `getBackgroundClassesAndStyles`, which return the background support's classes and inline styles so a block that skips background serialization can apply them to an inner element. The editor now also honours `background.__experimentalSkipSerialization` ([#83943](https://github.com/WordPress/gutenberg/pull/83943)).
+-   Add `useBackgroundProps` and `getBackgroundClassesAndStyles`, and honour `background.__experimentalSkipSerialization` in the editor ([#83943](https://github.com/WordPress/gutenberg/pull/83943)).
 
 ### Enhancements
 
