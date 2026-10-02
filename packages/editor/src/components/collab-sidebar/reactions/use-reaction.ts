@@ -11,7 +11,7 @@ import { invalidateReactionNames } from './reaction-display';
 import {
 	applyReactionSummaryDelta,
 	type ReactionSummary,
-} from '../block-reactions';
+} from './block-reactions';
 
 /**
  * The parts of a note comment record that reactions read.

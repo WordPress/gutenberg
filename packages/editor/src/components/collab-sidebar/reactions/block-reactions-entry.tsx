@@ -18,10 +18,10 @@ import {
 	privateApis as blockEditorPrivateApis,
 	// @ts-expect-error - No type declarations available for @wordpress/block-editor
 } from '@wordpress/block-editor';
-import { FloatingContainer } from './floating-container';
-import { scrollNoteThreadIntoView } from './utils';
-import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
+import { FloatingContainer } from '../floating-container';
+import { scrollNoteThreadIntoView } from '../utils';
+import { store as editorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 import {
 	BlockReactionsRow,
 	useBlockReactionsLabel,

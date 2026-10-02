@@ -11,9 +11,9 @@ import {
 	privateApis as blockEditorPrivateApis,
 	// @ts-expect-error - No type declarations available for @wordpress/block-editor
 } from '@wordpress/block-editor';
-import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
-import { invalidateReactionNames } from './reactions/reaction-display';
+import { store as editorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
+import { invalidateReactionNames } from './reaction-display';
 import {
 	BLOCK_REACTION_PARAM,
 	applyBlockReactionDelta,

@@ -20,7 +20,7 @@ import {
 	getReactionsQueryArgs,
 	type ReactionSummary,
 	type ReactionTarget,
-} from '../block-reactions';
+} from './block-reactions';
 
 /**
  * A comment record as returned by the reactions REST query.

@@ -40,8 +40,8 @@ import {
 	BLOCK_REACTIONS_ENTRY_TYPE,
 	getBlockReactionsEntryId,
 	getBlockReactionsId,
-} from './block-reactions';
-import { useBlockReactionSummary } from './use-block-reactions';
+} from './reactions/block-reactions';
+import { useBlockReactionSummary } from './reactions/use-block-reactions';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 

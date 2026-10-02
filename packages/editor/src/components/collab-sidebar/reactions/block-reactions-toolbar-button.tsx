@@ -8,8 +8,8 @@ import {
 	privateApis as blockEditorPrivateApis,
 	// @ts-expect-error - No type declarations available for @wordpress/block-editor
 } from '@wordpress/block-editor';
-import { unlock } from '../../lock-unlock';
-import { AddReactionButton } from './reactions/add-reaction-button';
+import { unlock } from '../../../lock-unlock';
+import { AddReactionButton } from './add-reaction-button';
 import { getBlockReactionsId } from './block-reactions';
 import { useBlockReactionActions } from './use-block-reactions';
 

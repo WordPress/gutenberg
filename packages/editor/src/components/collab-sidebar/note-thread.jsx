@@ -18,7 +18,7 @@ import { Note } from './note';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { FloatingContainer } from './floating-container';
-import { BlockReactionsRow } from './block-reactions-row';
+import { BlockReactionsRow } from './reactions/block-reactions-row';
 import {
 	focusNoteThread,
 	getNoteExcerpt,

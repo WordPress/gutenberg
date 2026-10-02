@@ -8,9 +8,9 @@ import {
 } from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
 import { NoteThread } from './note-thread';
-import { BlockReactionsEntry } from './block-reactions-entry';
-import { isBlockReactionsEntry } from './block-reactions';
-import { useBlockReactionActions } from './use-block-reactions';
+import { BlockReactionsEntry } from './reactions/block-reactions-entry';
+import { isBlockReactionsEntry } from './reactions/block-reactions';
+import { useBlockReactionActions } from './reactions/use-block-reactions';
 import { focusNoteThread } from './utils';
 import { useFloatingBoard, useNoteActions, useNoteSelection } from './hooks';
 import { AddNote } from './add-note';
