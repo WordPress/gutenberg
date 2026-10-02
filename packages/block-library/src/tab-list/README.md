@@ -42,6 +42,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `padding`: `true`
   - `blockGap`: `true`
+- [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
 
 ## Context
 
@@ -56,6 +57,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
 
 - **border**: `.wp-block-tab-list button`
+- **shadow**: `.wp-block-tab-list button`
 - **color**:
   - background: `.wp-block-tab-list button`
   - text: `.wp-block-tab-list button`
