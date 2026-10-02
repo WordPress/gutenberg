@@ -10,7 +10,6 @@ import ColorGradientDropdownItem from './color-gradient-dropdown-item';
 import { useHasBackgroundColorPanel } from './color-panel';
 import { useColorGradientSettings } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
-import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
 import { setImmutably } from '../../utils/object';
 import {
 	extractPresetSlug,
@@ -169,7 +168,6 @@ export default function BackgroundImagePanel( {
 	// governs what this one can paint.
 	baseValue,
 	// The selected style state, so a viewport can be told from a pseudo state.
-	styleState,
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
@@ -234,16 +232,7 @@ export default function BackgroundImagePanel( {
 	const hasBoxClipValue = allowedClipValues.some(
 		( clipValue ) => clipValue !== 'text'
 	);
-	/*
-	 * Clipping is treated as a property of the block rather than of a width.
-	 * The Default state's clip carries into every breakpoint, and splitting it
-	 * by width produced controls that could not do what they offered, so a
-	 * viewport state does not get to change it. A pseudo state does: its
-	 * styles are scoped to the selector, so a clip set there applies on hover
-	 * alone rather than fighting the Default state everywhere else.
-	 */
-	const isViewportState = hasViewportBlockStyleState( styleState );
-	const showBackgroundClipControl = hasBoxClipValue && ! isViewportState;
+	const showBackgroundClipControl = hasBoxClipValue;
 
 	const localClip = value?.background?.backgroundClip;
 	const baseClip = baseValue?.background?.backgroundClip;

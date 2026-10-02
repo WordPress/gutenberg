@@ -846,12 +846,11 @@ describe( 'BackgroundPanel at a non-default viewport', () => {
 		expect( clipsToTextNotice( container ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'hides the clip control, which belongs to the Default state', () => {
+	it( "offers the clip control, showing the Default state's value", async () => {
 		render(
 			<BackgroundPanel
 				value={ {} }
 				baseValue={ baseValue }
-				styleState={ { viewport: '@mobile', pseudo: 'default' } }
 				settings={ {
 					...colorSettings,
 					background: {
@@ -865,33 +864,11 @@ describe( 'BackgroundPanel at a non-default viewport', () => {
 			/>
 		);
 
-		expect(
-			screen.queryByRole( 'combobox', { name: /clip/i } )
-		).not.toBeInTheDocument();
-	} );
-
-	it( 'keeps the clip control at a pseudo state, which scopes it to hover', async () => {
-		render(
-			<BackgroundPanel
-				value={ {} }
-				baseValue={ baseValue }
-				styleState={ { viewport: 'default', pseudo: ':hover' } }
-				settings={ {
-					...colorSettings,
-					background: {
-						...colorSettings.background,
-						backgroundClip: true,
-					},
-				} }
-				defaultControls={ { backgroundClip: true } }
-				onChange={ () => {} }
-				panelId="test-panel"
-			/>
-		);
-
+		// A breakpoint can set its own clip, and reads the Default state's
+		// value until it does, because that is what the block is painting.
 		expect(
 			await screen.findByRole( 'combobox', { name: /clip/i } )
-		).toBeInTheDocument();
+		).toHaveTextContent( 'Text' );
 	} );
 
 	it( "says nothing when the default viewport doesn't clip to text", () => {

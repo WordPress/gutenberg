@@ -24,7 +24,6 @@ import ColorGradientDropdownItem from './color-gradient-dropdown-item';
 import { useHasTextPanel } from './color-panel';
 import { useColorGradientSettings } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
-import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
 import { setImmutably } from '../../utils/object';
 import {
 	extractPresetSlug,
@@ -279,7 +278,6 @@ export default function TypographyPanel( {
 	// state is selected. That state layers over it, so a text gradient set
 	// there still paints here.
 	baseValue,
-	styleState,
 	settings,
 	blockName,
 	panelId,
@@ -352,13 +350,10 @@ export default function TypographyPanel( {
 			: true === clipSetting ||
 				( Array.isArray( clipSetting ) &&
 					clipSetting.includes( 'text' ) );
-	// Clipping belongs to the Default state, not a width. See `background-panel.jsx`.
-	const isViewportState = hasViewportBlockStyleState( styleState );
 	const hasTextGradientEnabled =
 		settingAllowsTextClip &&
 		!! settings?.background?.gradient &&
-		hasGradientColors &&
-		! isViewportState;
+		hasGradientColors;
 
 	const isTextGradient = value?.background?.backgroundClip === 'text';
 	const baseClip = baseValue?.background?.backgroundClip;
@@ -405,10 +400,19 @@ export default function TypographyPanel( {
 				? encodeGradientValue( newGradient, newSlug )
 				: undefined
 		);
+		/*
+		 * Clearing has to say `border-box` rather than nothing while the
+		 * Default state clips to the text, because that state's declarations
+		 * are not in a media query and would otherwise keep applying here.
+		 * `border-box` is the CSS initial value, and the style engine pairs it
+		 * with `-webkit-text-fill-color: currentColor`, which paints the text
+		 * again.
+		 */
+		const clearedClip = 'text' === baseClip ? 'border-box' : undefined;
 		changedObject = setImmutably(
 			changedObject,
 			[ 'background', 'backgroundClip' ],
-			newGradient ? 'text' : undefined
+			newGradient ? 'text' : clearedClip
 		);
 		// Mirrors `setGradient` in the Background panel. The legacy
 		// `color.gradient` location writes the `background` shorthand, which
@@ -937,7 +941,10 @@ export default function TypographyPanel( {
 				? {
 						...previousValue?.background,
 						gradient: undefined,
-						backgroundClip: undefined,
+						// See `setTextGradient`: a state has to say
+						// `border-box` to escape the Default state's clip.
+						backgroundClip:
+							'text' === baseClip ? 'border-box' : undefined,
 					}
 				: previousValue?.background;
 
@@ -958,7 +965,7 @@ export default function TypographyPanel( {
 				},
 			};
 		},
-		[ hasTextColorEnabled, hasTextGradientEnabled ]
+		[ baseClip, hasTextColorEnabled, hasTextGradientEnabled ]
 	);
 
 	return (
