@@ -62,6 +62,7 @@ import {
 	MoveGhostsProvider,
 } from '../suggestion-mode';
 import { registerSuggestionFormat } from '../inline-suggestions';
+import SuggestionFormatEdit from '../collab-sidebar/suggestion-format-edit';
 
 /*
  * Register the suggestion overlay filters once when the editor provider
@@ -76,10 +77,10 @@ if ( isSuggestionModeEnabled() ) {
 
 // Register the `core/suggestion` inline marker format so rich-text round-trips
 // suggestion markers in block content and the annotations API can decorate
-// them. The format is inert (no toolbar entry): suggestions are created by
-// editing in Suggest mode, not from a control. Idempotent, so it's safe
-// globally.
-registerSuggestionFormat();
+// them. It has no toolbar entry: suggestions are created by editing in Suggest
+// mode, not from a control. Its `edit` selects the note of the marker under
+// the caret. Idempotent, so it's safe globally.
+registerSuggestionFormat( SuggestionFormatEdit );
 
 // Keep suggestion markers, `metadata.suggestion` and `metadata.noteId` off the
 // clipboard. Registered unconditionally for the same reason as the format:
