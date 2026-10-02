@@ -153,6 +153,16 @@ export function getReactionsQueryArgs(
 const BLOCK_REACTIONS_ENTRY_TYPE = 'block-reactions';
 
 /**
+ * The id of the sidebar entry for a block with reactions but no note.
+ *
+ * @param clientId The block client id.
+ * @return The entry id.
+ */
+export function getBlockReactionsEntryId( clientId: string ): string {
+	return `block-reactions-${ clientId }`;
+}
+
+/**
  * Whether a sidebar thread is the entry for a block with reactions but no
  * note.
  *
@@ -191,6 +201,8 @@ export interface SidebarThreads {
  * @param summary            Every block's reaction summary on the post.
  * @param clientIds          Every block client id, in document order.
  * @param getBlockAttributes Block-editor selector.
+ * @param reactingClientId   A block the user is reacting to from the
+ *                           toolbar, listed before its first reaction.
  * @return The lists with block reactions added.
  */
 export function addBlockReactionEntries(
@@ -199,9 +211,10 @@ export function addBlockReactionEntries(
 	clientIds: string[],
 	getBlockAttributes: (
 		clientId: string
-	) => { metadata?: { reactionsId?: unknown } } | null | undefined
+	) => { metadata?: { reactionsId?: unknown } } | null | undefined,
+	reactingClientId?: string
 ): SidebarThreads {
-	if ( ! Object.keys( summary ).length ) {
+	if ( ! Object.keys( summary ).length && ! reactingClientId ) {
 		return threads;
 	}
 
@@ -212,7 +225,8 @@ export function addBlockReactionEntries(
 		const reactionsId = getBlockReactionsId(
 			getBlockAttributes( clientId )?.metadata
 		);
-		if ( ! reactionsId || ! summary[ reactionsId ] ) {
+		const hasReactions = !! reactionsId && !! summary[ reactionsId ];
+		if ( ! hasReactions && clientId !== reactingClientId ) {
 			return;
 		}
 		const threadIndex = unresolved.findIndex(
@@ -225,7 +239,7 @@ export function addBlockReactionEntries(
 			};
 		} else {
 			unresolved.push( {
-				id: `block-reactions:${ reactionsId }`,
+				id: getBlockReactionsEntryId( clientId ),
 				type: BLOCK_REACTIONS_ENTRY_TYPE,
 				parent: 0,
 				status: 'hold',

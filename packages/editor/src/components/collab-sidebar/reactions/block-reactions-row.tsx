@@ -34,8 +34,8 @@ export function useBlockReactionsLabel( clientId: string ): string {
 
 /**
  * A block's reaction pills and add-reaction trigger, as one row in the
- * sidebar. Rendered only once the block has at least one reaction, so the
- * trigger never needs to float.
+ * sidebar. Shown once the block has a reaction, or while the user is
+ * reacting to it from the toolbar, so the trigger never needs to float.
  *
  * @param props              Component props.
  * @param props.clientId     The block client id.
@@ -54,10 +54,6 @@ export function BlockReactionsRow( {
 	const label = useBlockReactionsLabel( clientId );
 	const blockInformation = useBlockDisplayInformation( clientId );
 
-	if ( ! reactionsId ) {
-		return null;
-	}
-
 	return (
 		// The editor sets `cornerRadius="none"`, but reactions read as
 		// badges rather than controls, so the row opts into the pill shape
@@ -73,7 +69,11 @@ export function BlockReactionsRow( {
 					className="editor-collab-sidebar-panel__block-reactions-icon"
 				/>
 				<ReactionDisplay
-					target={ { kind: 'block', postId, reactionsId } }
+					target={ {
+						kind: 'block',
+						postId,
+						reactionsId: reactionsId ?? '',
+					} }
 					reactions={ reactions }
 					onToggleReaction={ toggleReaction }
 					onRemoveLast={ onRemoveLast }

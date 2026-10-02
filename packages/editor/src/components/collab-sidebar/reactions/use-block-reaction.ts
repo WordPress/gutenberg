@@ -62,8 +62,7 @@ export function useBlockReactionSummary(): BlockReactionSummary {
  *
  * @param clientId The block client id.
  * @return The post id, the block's anchor and reaction summary, and the
- *         toggle callback, which resolves to `true` once the reaction has
- *         been saved or removed.
+ *         toggle callback.
  */
 export function useBlockReaction( clientId: string ) {
 	const summary = useBlockReactionSummary();
@@ -95,9 +94,9 @@ export function useBlockReaction( clientId: string ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const toggleReaction = useCallback(
-		async ( slug: string ): Promise< boolean > => {
+		async ( slug: string ) => {
 			if ( ! postId ) {
-				return false;
+				return;
 			}
 
 			// Mint the anchor before any request, synchronously, so two
@@ -171,7 +170,7 @@ export function useBlockReaction( clientId: string ) {
 						: __( 'An error occurred while performing an update.' ),
 					{ type: 'snackbar', isDismissible: true }
 				);
-				return false;
+				return;
 			}
 
 			invalidateReactionNames(
@@ -217,7 +216,6 @@ export function useBlockReaction( clientId: string ) {
 				// The local delta above already keeps this block's
 				// reactions consistent; the next load reconciles the rest.
 			}
-			return true;
 		},
 		[
 			clientId,

@@ -208,17 +208,19 @@ class BlockNoteUtils {
 	}
 
 	/**
-	 * Open the block toolbar's reaction picker for the selected block and
-	 * pick an emoji by its exact label.
+	 * React to the selected block: the toolbar button brings the block's
+	 * reactions into the sidebar and focuses their trigger, which opens the
+	 * picker. Picks an emoji by its exact label.
 	 *
 	 * @param {string} emoji Exact emoji label, e.g. "Heart".
 	 */
 	async addReactionToBlock( emoji ) {
-		await this.#editor.showBlockToolbar();
-		await this.#page
-			.getByRole( 'toolbar', { name: 'Block tools' } )
-			.getByRole( 'combobox', { name: 'React to block' } )
-			.click();
+		await this.#editor.clickBlockToolbarButton( 'React to block' );
+		const trigger = this.#page.getByRole( 'combobox', {
+			name: 'Add block reaction',
+		} );
+		await expect( trigger ).toBeFocused();
+		await trigger.click();
 		await this.waitForFullPicker();
 		await this.#page
 			.getByRole( 'gridcell', { name: emoji, exact: true } )

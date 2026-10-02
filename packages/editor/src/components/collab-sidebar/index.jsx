@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
@@ -19,11 +19,18 @@ import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { BlockReactionsToolbarButton } from './reactions/block-reactions-toolbar-button';
-import { isBlockReactionsEntry } from './reactions/block-reactions';
+import {
+	getBlockReactionsEntryId,
+	isBlockReactionsEntry,
+} from './reactions/block-reactions';
 import { NoteHighlightStyles } from './note-highlight-styles';
 import { useGlobalStyles } from '../global-styles';
 import { useEnableFloatingSidebar, useNoteThreads } from './hooks';
-import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
+import {
+	focusNoteThread,
+	getNoteIdsFromMetadata,
+	pickPrimaryNote,
+} from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
@@ -66,7 +73,19 @@ function NotesSidebar( { postId } ) {
 		[]
 	);
 
-	const { notes, unresolvedNotes } = useNoteThreads( postId );
+	// The block the user is reacting to from the toolbar, listed in the
+	// sidebar before its first reaction until another block is selected.
+	const [ reactingClientId, setReactingClientId ] = useState();
+	useEffect( () => {
+		setReactingClientId( ( current ) =>
+			current === clientId ? current : undefined
+		);
+	}, [ clientId ] );
+
+	const { notes, unresolvedNotes } = useNoteThreads(
+		postId,
+		reactingClientId
+	);
 
 	// Only enable the floating sidebar for large viewports.
 	const showFloatingSidebar = isLargeViewport;
@@ -136,10 +155,10 @@ function NotesSidebar( { postId } ) {
 		} );
 	}
 
-	// A reaction from the toolbar lands in the sidebar, so bring that into
-	// view when it is not already showing. The floating sidebar only takes
-	// over on its own once the user closes whatever area is active.
-	async function revealBlockReactions() {
+	// The picker lives with the block's reactions in the sidebar: on its
+	// first unresolved thread, or in an entry of its own.
+	async function reactToBlock( targetClientId ) {
+		setReactingClientId( targetClientId );
 		const currentArea = await getActiveComplementaryArea( 'core' );
 		if ( ! SIDEBARS.includes( currentArea ) ) {
 			enableComplementaryArea(
@@ -147,6 +166,19 @@ function NotesSidebar( { postId } ) {
 				showFloatingSidebar ? FLOATING_NOTES_SIDEBAR : ALL_NOTES_SIDEBAR
 			);
 		}
+		const threadId =
+			unresolvedNotes.find(
+				( thread ) => thread.blockClientId === targetClientId
+			)?.id ?? getBlockReactionsEntryId( targetClientId );
+		selectNote( threadId );
+		// Wait a frame for a sidebar that was closed to mount.
+		window.requestAnimationFrame( () =>
+			focusNoteThread(
+				threadId,
+				sidebarRef.current,
+				'.editor-collab-sidebar-panel__block-reactions .editor-collab-sidebar-panel__add-reaction-button'
+			)
+		);
 	}
 
 	useShortcut(
@@ -192,7 +224,7 @@ function NotesSidebar( { postId } ) {
 			{ !! clientId && (
 				<BlockReactionsToolbarButton
 					clientId={ clientId }
-					onReacted={ revealBlockReactions }
+					onClick={ () => reactToBlock( clientId ) }
 				/>
 			) }
 			<AddNoteMenuItem

@@ -343,9 +343,6 @@ mark.wp-note {
 	// option on every note in it at once.
 	.editor-collab-sidebar-panel__note:hover
 	.editor-collab-sidebar-panel__add-reaction-button,
-	// A block's reactions row is its own hover target, outside any note.
-	.editor-collab-sidebar-panel__block-reactions:hover
-	.editor-collab-sidebar-panel__add-reaction-button,
 	// Reveal on the trigger itself rather than on the thread: the thread is
 	// `tabIndex={ 0 }`, so a thread-level `:focus-within` would hold for as
 	// long as the note is selected and the fade would never take effect.

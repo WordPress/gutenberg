@@ -41,7 +41,7 @@ import { useBlockReactionSummary } from './reactions/use-block-reaction';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
-export function useNoteThreads( postId ) {
+export function useNoteThreads( postId, reactingClientId ) {
 	const queryArgs = {
 		post: postId,
 		type: 'note',
@@ -176,9 +176,16 @@ export function useNoteThreads( postId ) {
 				noteThreads,
 				blockReactionSummary,
 				clientIds,
-				getBlockAttributes
+				getBlockAttributes,
+				reactingClientId
 			),
-		[ noteThreads, blockReactionSummary, clientIds, getBlockAttributes ]
+		[
+			noteThreads,
+			blockReactionSummary,
+			clientIds,
+			getBlockAttributes,
+			reactingClientId,
+		]
 	);
 }
 

@@ -1,4 +1,3 @@
-import type { ReactElement } from 'react';
 import { __ } from '@wordpress/i18n';
 /*
  * `IconButton` is pending Design System review (WordPress/gutenberg#76135);
@@ -18,7 +17,6 @@ import { useEmojibaseConfig } from './emojibase-data';
 interface AddReactionButtonProps {
 	disabled?: boolean;
 	label?: string;
-	trigger?: ReactElement;
 	onToggleReaction: ( slug: string ) => void;
 }
 
@@ -31,14 +29,11 @@ interface AddReactionButtonProps {
  *                               resolved note thread).
  * @param props.label            Accessible name of the trigger and of the
  *                               picker popup. Defaults to "Add reaction".
- * @param props.trigger          Replaces the default icon button (e.g. with
- *                               a toolbar button), which names itself.
  * @param props.onToggleReaction Callback to toggle a reaction.
  */
 export function AddReactionButton( {
 	disabled = false,
 	label = __( 'Add reaction' ),
-	trigger,
 	onToggleReaction,
 }: AddReactionButtonProps ) {
 	const emojis = useReactionEmojis();
@@ -55,17 +50,15 @@ export function AddReactionButton( {
 		<EmojiPicker
 			label={ label }
 			trigger={
-				trigger ?? (
-					<IconButton
-						size="small"
-						// A plain glyph, per the design: no ring or fill at rest.
-						variant="minimal"
-						tone="neutral"
-						className="editor-collab-sidebar-panel__add-reaction-button"
-						icon={ reactionIcon }
-						label={ label }
-					/>
-				)
+				<IconButton
+					size="small"
+					// A plain glyph, per the design: no ring or fill at rest.
+					variant="minimal"
+					tone="neutral"
+					className="editor-collab-sidebar-panel__add-reaction-button"
+					icon={ reactionIcon }
+					label={ label }
+				/>
 			}
 			disabled={ disabled }
 			onSelect={ ( emoji ) =>

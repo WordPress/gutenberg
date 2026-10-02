@@ -1778,7 +1778,7 @@ test.describe( 'Block Notes', () => {
 			await requestUtils.deleteAllComments( 'reaction' );
 		} );
 
-		test( 'reacting from the toolbar mints one anchor and lists the block', async ( {
+		test( 'reacting from the toolbar lists the block and mints one anchor', async ( {
 			editor,
 			blockNoteUtils,
 		} ) => {
@@ -1806,17 +1806,19 @@ test.describe( 'Block Notes', () => {
 			await expect( rocket ).toBeVisible();
 			expect( await blockNoteUtils.getReactionsId() ).toBe( firstId );
 
-			// Removing the last reaction takes the whole entry with it, so
-			// focus has to land somewhere that still exists: the block.
+			// Removing the last reaction sends focus back to the block. The
+			// entry stays while the block is selected, then goes with it.
 			await heart.click();
 			await expect( heart ).toBeHidden();
 			await rocket.click();
-			await expect( entry ).toBeHidden();
+			await expect( rocket ).toBeHidden();
 			await expect(
 				editor.canvas.getByRole( 'document', {
 					name: 'Block: Paragraph',
 				} )
 			).toBeFocused();
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			await expect( entry ).toBeHidden();
 		} );
 
 		test( 'block reactions survive a reload once the post is saved', async ( {
