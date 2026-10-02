@@ -1,18 +1,11 @@
 import * as Ariakit from '@ariakit/react';
 import { forwardRef, useContext } from '@wordpress/element';
-import { Icon } from '@wordpress/icons';
-import { SVG, Circle } from '@wordpress/primitives';
+import { Icon, check } from '@wordpress/icons';
 import type { WordPressComponentProps } from '../context';
 import { Context } from './context';
 import type { RadioItemProps } from './types';
 import * as Styled from './styles';
 import { useMenuItemHideOnClick } from './use-menu-item-hide-on-click';
-
-const radioCheck = (
-	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-		<Circle cx={ 12 } cy={ 12 } r={ 3 }></Circle>
-	</SVG>
-);
 
 export const RadioItem = forwardRef<
 	HTMLDivElement,
@@ -45,7 +38,7 @@ export const RadioItem = forwardRef<
 				// Override some ariakit inline styles
 				style={ { width: 'auto', height: 'auto' } }
 			>
-				<Icon icon={ radioCheck } size={ 24 } />
+				<Icon icon={ check } size={ 24 } />
 			</Ariakit.MenuItemCheck>
 
 			<Styled.ItemContentWrapper>
