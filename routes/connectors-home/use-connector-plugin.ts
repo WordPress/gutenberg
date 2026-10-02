@@ -28,7 +28,7 @@ interface UseConnectorPluginReturn {
 	pluginStatus: PluginStatus;
 	canInstallPlugins: boolean | undefined;
 	canActivatePlugins: boolean | undefined;
-	canDeactivatePlugins: boolean | undefined;
+	canDeactivate: boolean;
 	isExpanded: boolean;
 	setIsExpanded: ( expanded: boolean ) => void;
 	isBusy: boolean;
@@ -39,7 +39,7 @@ interface UseConnectorPluginReturn {
 	keySource: ApiKeySource;
 	handleButtonClick: () => void;
 	getButtonLabel: () => string;
-	deactivatePlugin: () => Promise< void >;
+	deactivatePlugin: () => Promise< boolean >;
 	saveApiKey: ( apiKey: string ) => Promise< void >;
 	removeApiKey: () => Promise< void >;
 	saveCredentials: ( credentials: {
@@ -74,6 +74,7 @@ export function useConnectorPlugin( {
 
 	const {
 		derivedPluginStatus,
+		isNetworkActive,
 		canManagePlugins,
 		currentApiKey,
 		currentUsername,
@@ -119,6 +120,7 @@ export function useConnectorPlugin( {
 				hasStoredCredentials: credentialsExist,
 				hasResolvedSettings: settingsResolved,
 				canInstallPlugins: canCreate,
+				isNetworkActive: false,
 			};
 
 			if ( ! pluginFileFromServer ) {
@@ -153,14 +155,16 @@ export function useConnectorPlugin( {
 			// Plugin data resolved — user has API permissions.
 			if ( plugin ) {
 				// Treat both single-site and network-active plugins as active.
-				const isPluginActive =
-					plugin.status === 'active' ||
+				const isPluginNetworkActive =
 					plugin.status === 'network-active';
+				const isPluginActive =
+					plugin.status === 'active' || isPluginNetworkActive;
 				return {
 					...common,
 					derivedPluginStatus: ( isPluginActive
 						? 'active'
 						: 'inactive' ) as PluginStatus,
+					isNetworkActive: isPluginNetworkActive,
 					canManagePlugins: true,
 				};
 			}
@@ -193,7 +197,12 @@ export function useConnectorPlugin( {
 
 	// Use canManagePlugins (from plugin entity resolution) for activation capability.
 	const canActivatePlugins = canManagePlugins;
-	const canDeactivatePlugins = canManagePlugins;
+	// Deactivating a network-active plugin from a subsite affects the whole network.
+	const canDeactivate =
+		pluginStatus === 'active' &&
+		!! pluginFileFromServer &&
+		canManagePlugins === true &&
+		! isNetworkActive;
 
 	const isConnected =
 		( pluginStatus === 'active' && connectedState ) ||
@@ -347,12 +356,12 @@ export function useConnectorPlugin( {
 	};
 
 	const deactivatePlugin = async () => {
-		if ( ! pluginFileFromServer ) {
-			return;
+		if ( ! canDeactivate ) {
+			return false;
 		}
 		setIsDeactivating( true );
 		try {
-			await saveEntityRecord(
+			const updatedPlugin = ( await saveEntityRecord(
 				'root',
 				'plugin',
 				{
@@ -360,8 +369,12 @@ export function useConnectorPlugin( {
 					status: 'inactive',
 				},
 				{ throwOnError: true }
-			);
-			setPluginStatusOverride( 'inactive' );
+			) ) as { status?: string } | undefined;
+			// Read the status from the store, which has the saved record.
+			setPluginStatusOverride( null );
+			if ( updatedPlugin?.status !== 'inactive' ) {
+				throw new Error( 'The plugin is still active.' );
+			}
 			setIsExpanded( false );
 			createSuccessNotice(
 				sprintf(
@@ -374,6 +387,7 @@ export function useConnectorPlugin( {
 					type: 'snackbar',
 				}
 			);
+			return true;
 		} catch {
 			createErrorNotice(
 				sprintf(
@@ -386,6 +400,7 @@ export function useConnectorPlugin( {
 					type: 'snackbar',
 				}
 			);
+			return false;
 		} finally {
 			setIsDeactivating( false );
 		}
@@ -533,7 +548,7 @@ export function useConnectorPlugin( {
 		pluginStatus,
 		canInstallPlugins,
 		canActivatePlugins,
-		canDeactivatePlugins,
+		canDeactivate,
 		isExpanded,
 		setIsExpanded,
 		isBusy: isBusy || isDeactivating,
