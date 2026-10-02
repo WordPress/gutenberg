@@ -184,9 +184,20 @@ It is called with the suggestions and an object with two properties:
 -   `searchTerm`: what the user typed.
 -   `isInitialSuggestions`: `true` for the suggestions shown before anything is typed.
 
-Return the suggestions to show, or a Promise that resolves to them. It is not called when the user types a URL.
+Return the suggestions to show, as an array or a Promise that resolves to one. It is not called when the user types a URL.
 
-A suggestion you add can set `typeLabel`, the label shown beside it, and `icon`, an icon element such as one from `@wordpress/icons`. Selecting any suggestion calls `onChange` with it, so a suggestion that is not a link can be recognized there by its `type`.
+Each suggestion is an object. These are the properties `LinkControl` reads:
+
+-   `id` (`string|number`): identifies the suggestion, together with its `type`. A suggestion without one is treated as a typed URL, and its `url` must be valid.
+-   `title` (`string`): the text shown for the suggestion.
+-   `type` (`string`): what kind of result it is, such as `page` or `post`. It is shown beside the title, unless `typeLabel` is set.
+-   `url` (`string`, optional): shown under the title, and used as the link's URL when the suggestion is chosen.
+-   `typeLabel` (`string`, optional): the label shown beside the title, in place of `type`.
+-   `icon` (`Element`, optional): the icon shown before the title, such as one from `@wordpress/icons`. Without it, a known `type` shows its own icon.
+
+Choosing a suggestion calls `onChange` with it, including any properties of your own. To act on a suggestion that is not a link, give it a property only your suggestions have and check for that in `onChange`. Don't rely on `type` alone: a site can register a post type with the same name, and its results will arrive with that `type`.
+
+Leave out media results:
 
 ```jsx
 <LinkControl
@@ -194,6 +205,49 @@ A suggestion you add can set `typeLabel`, the label shown beside it, and `icon`,
 		suggestions.filter( ( suggestion ) => suggestion.kind !== 'media' )
 	}
 />
+```
+
+Add a suggestion that runs an action instead of setting a link:
+
+```jsx
+import { __ } from '@wordpress/i18n';
+import { plus } from '@wordpress/icons';
+
+function MyLinkControl( { link, setLink, openNewPageForm } ) {
+	return (
+		<LinkControl
+			value={ link }
+			transformSuggestions={ (
+				suggestions,
+				{ searchTerm, isInitialSuggestions }
+			) => {
+				if ( isInitialSuggestions ) {
+					return suggestions;
+				}
+
+				return [
+					...suggestions,
+					{
+						id: 'new-page',
+						type: 'action',
+						title: searchTerm,
+						typeLabel: __( 'New page' ),
+						icon: plus,
+						isNewPageAction: true,
+					},
+				];
+			} }
+			onChange={ ( nextValue ) => {
+				if ( nextValue.isNewPageAction ) {
+					openNewPageForm( nextValue.title );
+					return;
+				}
+
+				setLink( nextValue );
+			} }
+		/>
+	);
+}
 ```
 
 ### forceIsEditingLink
