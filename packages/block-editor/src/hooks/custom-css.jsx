@@ -125,6 +125,16 @@ function renderCustomCSSStateEntries( entries, baseSelector ) {
 }
 
 /**
+ * Filters custom CSS state entries that contain HTML markup.
+ *
+ * @param {Object[]} entries Custom CSS state entries.
+ * @return {Object[]} Valid custom CSS state entries.
+ */
+export function getValidCustomCSSStateEntries( entries ) {
+	return entries.filter( ( { css } ) => validateCSS( css ) );
+}
+
+/**
  * Inspector control for custom CSS.
  *
  * @param {Object}   props               Component props.
@@ -242,13 +252,14 @@ function useBlockProps( { style, clientId, name } ) {
 		[ style, name, viewportSettings ]
 	);
 
-	// Valid when there is at least one non-empty custom CSS value across all
-	// states and none of them contain HTML markup. A single invalid state
-	// invalidates the whole block's custom CSS, matching the server-side
-	// rendering in gutenberg_render_custom_css_support_styles().
-	const isValidCSS =
-		customCSSStateEntries.length > 0 &&
-		customCSSStateEntries.every( ( entry ) => validateCSS( entry.css ) );
+	// Keep valid CSS states even when another state contains HTML markup,
+	// matching the server-side rendering in
+	// gutenberg_render_custom_css_support_styles().
+	const validCustomCSSStateEntries = useMemo(
+		() => getValidCustomCSSStateEntries( customCSSStateEntries ),
+		[ customCSSStateEntries ]
+	);
+	const hasValidCSS = validCustomCSSStateEntries.length > 0;
 
 	const canEditCSS = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().canEditCSS,
@@ -283,16 +294,16 @@ function useBlockProps( { style, clientId, name } ) {
 	const customCSSSelector = `.${ customCSSIdentifier }`;
 
 	// Transform the custom CSS using the same logic as global styles.
-	// Only process if CSS is valid (doesn't contain HTML markup).
+	// Only process CSS states that don't contain HTML markup.
 	const transformedCSS = useMemo( () => {
-		if ( ! isValidCSS ) {
+		if ( ! hasValidCSS ) {
 			return undefined;
 		}
 		return renderCustomCSSStateEntries(
-			customCSSStateEntries,
+			validCustomCSSStateEntries,
 			customCSSSelector
 		);
-	}, [ isValidCSS, customCSSStateEntries, customCSSSelector ] );
+	}, [ hasValidCSS, validCustomCSSStateEntries, customCSSSelector ] );
 
 	// Inject the CSS via style override. The type makes EditorStyles print
 	// it after all other overrides (e.g. block style variations), matching
@@ -306,7 +317,7 @@ function useBlockProps( { style, clientId, name } ) {
 	} );
 
 	// Only add the class if there's valid custom CSS.
-	if ( ! isValidCSS ) {
+	if ( ! hasValidCSS ) {
 		return {};
 	}
 

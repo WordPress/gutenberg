@@ -451,6 +451,30 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that valid CSS state entries are preserved when another state contains HTML.
+	 *
+	 * @covers ::gutenberg_get_valid_custom_css_state_entries
+	 */
+	public function test_custom_css_keeps_valid_state_entries_when_filtering_invalid_css() {
+		$valid_entry = array(
+			'css'         => 'color: red;',
+			'pseudo'      => null,
+			'media_query' => null,
+		);
+
+		$entries = array(
+			$valid_entry,
+			array(
+				'css'         => '<script>alert(1)</script>',
+				'pseudo'      => ':hover',
+				'media_query' => null,
+			),
+		);
+
+		$this->assertSame( array( $valid_entry ), gutenberg_get_valid_custom_css_state_entries( $entries ) );
+	}
+
+	/**
 	 * Tests that valid CSS without HTML markup is accepted.
 	 *
 	 * @covers ::gutenberg_render_custom_css_support_styles
