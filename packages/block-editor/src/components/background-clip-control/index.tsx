@@ -40,17 +40,30 @@ export default function BackgroundClipControl( {
 		return null;
 	}
 
-	// `border-box` is the CSS initial value, so it stands in when nothing is set.
+	// Nothing set is its own state. The first allowed value is not necessarily
+	// `border-box`, so standing it in would report a clip the block is not
+	// using.
+	const defaultOption = {
+		key: 'default',
+		name: __( 'Default' ),
+		className: 'block-editor-background-clip-control__option is-default',
+	};
 	const selectedOption =
-		options.find( ( option ) => option.key === value ) ?? options[ 0 ];
+		options.find( ( option ) => option.key === value ) ?? defaultOption;
 
 	return (
 		<CustomSelectControl
 			className="block-editor-background-clip-control"
 			label={ __( 'Clip' ) }
-			options={ options }
+			options={ [ defaultOption, ...options ] }
 			value={ selectedOption }
-			onChange={ ( { selectedItem } ) => onChange( selectedItem?.key ) }
+			onChange={ ( { selectedItem } ) =>
+				onChange(
+					selectedItem?.key === defaultOption.key
+						? undefined
+						: selectedItem?.key
+				)
+			}
 		/>
 	);
 }
