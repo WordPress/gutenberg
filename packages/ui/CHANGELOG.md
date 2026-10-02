@@ -17,7 +17,7 @@
 
 ### Enhancements
 
--   `Menu`: Reduce the space reserved for selection indicators and move them closer to the popup edge without changing their size.
+-   `Menu`: Reduce the space reserved for selection indicators and move them closer to the popup edge without changing their size ([#84015](https://github.com/WordPress/gutenberg/pull/84015)).
 -   `Menu`: Align group labels and separators with item labels when a radio or checkbox column indents those labels ([#83993](https://github.com/WordPress/gutenberg/pull/83993)).
 -   `Checkbox`, `CheckboxControl`, `CheckboxGroup`: Mark as recommended for use in a WordPress environment ([#83771](https://github.com/WordPress/gutenberg/pull/83771)).
 -   `Spinner`: Show a trackless half-circle like the `Button` loading indicator, with a `color` prop that accepts any CSS color value and defaults to weak neutral foreground. Keep the arc visible in forced-colors mode ([#83775](https://github.com/WordPress/gutenberg/pull/83775)).
