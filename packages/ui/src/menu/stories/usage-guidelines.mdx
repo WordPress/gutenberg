@@ -67,7 +67,7 @@ Use `Menu.RadioItem` within `Menu.RadioGroup` for mutually exclusive states, suc
 
 Use `Menu.Group` for related commands, links, or checkbox items. `Menu.Group` and `Menu.RadioGroup` can be siblings in the same popup. Each submenu has its own groups.
 
-Keep prefix icon usage consistent within each group. For the best visual results, give every item in the group a prefix icon, or omit prefix icons from every item. Different groups can make different choices. See [Add prefix icons](#add-prefix-icons) for alignment details and an example.
+Keep prefix icon usage consistent within each group. Use icons on every item in the group, or omit them from the whole group. Different groups can make different choices. See [Add prefix icons](#add-prefix-icons) for alignment details and an example.
 
 <Canvas of={ UsageGuidelinesStories.CheckedOptionsWithinACommandMenu } />
 
@@ -102,9 +102,11 @@ import { Menu } from '@wordpress/ui';
 
 ## Add prefix icons
 
-> For the best visual results, use prefix icons on every item in a group, or use no prefix icons in that group. If one item needs a prefix icon, prefer adding meaningful icons to all the other items too. Avoid using an icon to highlight just one item in a group.
+Use prefix icons when familiar symbols help users recognize and find actions, such as Copy or Print. Choose icons that match the labels and have a clear meaning in context. Omit icons when the labels are already easy to scan or no clear icon exists. Do not add icons only for decoration or to draw attention to a single item.
 
-Item labels align within the same group. When any item has a prefix icon, the group reserves an icon column for all its items. Items without icons keep their labels aligned, but have empty space before them. A group with only one or a few icons can look visually unbalanced. If an exception is necessary, aim for icons on almost all items and keep exceptions rare. If meaningful icons are not available for the other items, prefer omitting icons from the whole group.
+> Use prefix icons on every item in a group, or omit them from the whole group. If only one item would benefit from an icon, prefer omitting it rather than adding unnecessary icons to the other items.
+
+Item labels align within the same group. When any item has a prefix icon, the group reserves an icon column for all its items. Items without icons keep their labels aligned, but have empty space before them. A group with only one or a few icons can look visually unbalanced.
 
 Each `Menu.Group` and `Menu.RadioGroup` has its own icon column, so one group can have icons while another has none. Items directly inside `Menu.Popup` share an icon column, even when separated by `Menu.Separator`. Apply the same guidance within each submenu. Checkbox and radio selection indicators are separate from prefix icons; they do not count toward this recommendation.
 
@@ -120,9 +122,6 @@ import { Menu } from '@wordpress/ui';
 	</Menu.Item>
 	<Menu.Item prefix={ <Menu.PrefixIcon icon={ archive } /> }>
 		<Menu.ItemLabel>Archive</Menu.ItemLabel>
-		<Menu.ItemDescription>
-			Move this item to the archive.
-		</Menu.ItemDescription>
 	</Menu.Item>
 </Menu.Group>;
 ```
@@ -131,9 +130,34 @@ In the following example, every item in the Actions group has an icon, while the
 
 <Canvas of={ UsageGuidelinesStories.ConsistentPrefixIconsWithinGroups } />
 
-The prefix slot already hides its contents from assistive technology. Keep meaningful text in `Menu.ItemLabel` or `Menu.ItemDescription`.
+The prefix slot already hides its contents from assistive technology. Keep the action clear in `Menu.ItemLabel`; do not rely on the icon to convey its meaning.
 
 Other non-interactive React content can still be passed directly to `prefix`. It retains its natural height and starts at the top of the item. `Menu.PrefixIcon` does not change the sizing of other prefix content.
+
+## Keep labels clear and descriptions rare
+
+Write short, clear item labels that users can understand on their own. Most items should not need a description. Improve an unclear label before adding supporting text.
+
+Use `Menu.ItemDescription` only when an item needs essential context that the label cannot convey concisely, such as a consequence users need to know before choosing it. Keep descriptions brief and limit them to the few items that need them. Do not repeat the label or describe an obvious action.
+
+Avoid combining a prefix icon and a description in the same item. Both add visual detail and can make the menu harder to scan. Prefer a clear label with only the supporting element the item needs.
+
+```tsx
+<Menu.Group>
+	<Menu.Item>
+		<Menu.ItemLabel>Rename…</Menu.ItemLabel>
+	</Menu.Item>
+	<Menu.Item>
+		<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+	</Menu.Item>
+	<Menu.Item>
+		<Menu.ItemLabel>Delete…</Menu.ItemLabel>
+		<Menu.ItemDescription>
+			Also deletes all versions of this item.
+		</Menu.ItemDescription>
+	</Menu.Item>
+</Menu.Group>;
+```
 
 ## Use an ellipsis for actions that need more input
 
@@ -153,7 +177,9 @@ The consumer must add the ellipsis because `Menu.Item` cannot infer what happens
 -   **Putting commands or links in Select.** Use `Menu.Item` for commands and `Menu.LinkItem` for destinations.
 -   **Using Menu for a large set of searchable commands.** Use `Autocomplete` when users need to filter commands or suggestions by typing.
 -   **Using radio items to recreate a Select.** Use `Menu.RadioItem` only when the state belongs inside a broader command menu.
--   **Adding a prefix icon to only one or a few items in a group.** The icon column leaves empty space beside the other items. Prefer meaningful icons on every item, or omit icons from the whole group. Keep exceptions rare and limited to groups where almost all items have icons.
+-   **Adding a prefix icon to only one or a few items in a group.** The icon column leaves empty space beside the other items. Omit icons from the whole group when clear, useful icons are not available for every item.
+-   **Combining a prefix icon and a description in the same item.** Prefer a clear label with only the supporting element the item needs.
+-   **Adding descriptions to most or all items.** Write labels that stand on their own. Reserve descriptions for essential context on a few items.
 -   **Adding an ellipsis to every item that opens another interface.** Reserve it for commands that require more input before completion. Do not add it when opening the interface completes the command, as with **Preferences**.
 
 ## References
