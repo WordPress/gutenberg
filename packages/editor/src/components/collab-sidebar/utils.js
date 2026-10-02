@@ -595,7 +595,7 @@ export function removeNoteIdFromMetadata( metadata, noteId ) {
  * @param {Object<string,Object>}   params.blockRects     Anchor rects (`{ top }`) keyed by thread ID.
  * @param {Object<string,number>}   params.heights        Rendered heights keyed by thread ID.
  * @param {number}                  params.scrollTop      Current scroll offset of the editor content.
- * @return {{ positions: Object<string,number> }} Computed top positions.
+ * @return {{ positions: Object<string,number>, contentHeight: number }} Computed top positions, and the content height that fits every measured thread.
  */
 export function calculateNotePositions( {
 	threads,
@@ -628,7 +628,7 @@ export function calculateNotePositions( {
 	const anchorThread = orderedThreads[ anchorIndex ];
 
 	if ( ! anchorThread || ! blockRects[ anchorThread.id ] ) {
-		return { positions: {} };
+		return { positions: {}, contentHeight: 0 };
 	}
 
 	const anchorRect = blockRects[ anchorThread.id ];
@@ -692,17 +692,26 @@ export function calculateNotePositions( {
 	}
 
 	// blockRect.top + scrollTop is the block's absolute y within the editor's
-	// scroll content; CSS translates each thread by -scrollTop at render time.
+	// scroll content. The content height reaches a gap past the lowest
+	// measured thread's box, which starts a THREAD_GAP (its top margin, the
+	// one THREAD_ALIGN_OFFSET cancels) below its position.
 	const positions = {};
+	let contentHeight = 0;
 	for ( const thread of orderedThreads ) {
 		const blockRect = blockRects[ thread.id ];
 		if ( blockRect && offsets[ thread.id ] !== undefined ) {
-			positions[ thread.id ] =
-				blockRect.top + scrollTop + offsets[ thread.id ];
+			const top = blockRect.top + scrollTop + offsets[ thread.id ];
+			positions[ thread.id ] = top;
+			if ( heights[ thread.id ] ) {
+				contentHeight = Math.max(
+					contentHeight,
+					top + THREAD_GAP + heights[ thread.id ] + THREAD_GAP
+				);
+			}
 		}
 	}
 
-	return { positions };
+	return { positions, contentHeight };
 }
 
 /**

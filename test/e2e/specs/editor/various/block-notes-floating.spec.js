@@ -80,14 +80,44 @@ test.describe( 'Block Notes: floating notes', () => {
 			: ( await target.boundingBox() ).y;
 	}
 
-	async function expectAligned( item, anchor ) {
+	// Distance from a thread to its anchor. Scrolling must not change it.
+	async function getOffset( item, anchor ) {
+		return ( await getTop( item ) ) - ( await getTop( anchor ) );
+	}
+
+	// Aligned, or at a captured offset (a thread pushed off its anchor).
+	async function expectAligned(
+		item,
+		anchor,
+		{ offset = 0, tolerance = ALIGN_TOLERANCE } = {}
+	) {
 		await expect
 			.poll( async () =>
-				Math.abs(
-					( await getTop( item ) ) - ( await getTop( anchor ) )
-				)
+				Math.abs( ( await getOffset( item, anchor ) ) - offset )
 			)
-			.toBeLessThan( ALIGN_TOLERANCE );
+			.toBeLessThan( tolerance );
+	}
+
+	function getCanvasScrollTop( editor ) {
+		return editor.canvas
+			.locator( 'html' )
+			.evaluate( ( root ) => root.scrollTop );
+	}
+
+	function scrollCanvasTo( editor, top ) {
+		return editor.canvas
+			.locator( 'html' )
+			.evaluate( ( root, value ) => root.scrollTo( 0, value ), top );
+	}
+
+	// Enough content below for the canvas to scroll.
+	async function addSpacerParagraphs( editor, count = 8 ) {
+		for ( let i = 0; i < count; i++ ) {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: SPACER_TEXT },
+			} );
+		}
 	}
 
 	// Guards that an anchor is far enough below its block's top that
@@ -470,26 +500,16 @@ test.describe( 'Block Notes: floating notes', () => {
 			attributes: { content: 'Noted' },
 			comment: 'Scrolling note',
 		} );
-		// Enough content below for the canvas to scroll.
-		for ( let i = 0; i < 8; i++ ) {
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: SPACER_TEXT },
-			} );
-		}
+		await addSpacerParagraphs( editor );
 
 		const thread = getThread( page, 'Scrolling note' );
 		const noted = getParagraph( editor, 'Noted' );
-		const scrollCanvasTo = ( top ) =>
-			editor.canvas
-				.locator( 'html' )
-				.evaluate( ( el, value ) => el.scrollTo( 0, value ), top );
 
-		await scrollCanvasTo( 0 );
+		await scrollCanvasTo( editor, 0 );
 		await expectAligned( thread, noted );
 		const { y: initialTop } = await noted.boundingBox();
 
-		await scrollCanvasTo( 150 );
+		await scrollCanvasTo( editor, 150 );
 
 		await expect
 			.poll( async () => ( await noted.boundingBox() ).y )
@@ -497,9 +517,9 @@ test.describe( 'Block Notes: floating notes', () => {
 		await expectAligned( thread, noted );
 	} );
 
-	// A selected thread that extends below the fold is scrolled into view,
-	// which scrolls the floating panel and shifts every thread off its anchor.
-	test.fixme( 'keeps a selected thread aligned when it extends below the fold', async ( {
+	// Scrolling a selected thread into view scrolls the floating panel, which
+	// mirrors the canvas, so every thread keeps its anchor.
+	test( 'keeps a selected thread aligned when it extends below the fold', async ( {
 		editor,
 		page,
 		blockNoteUtils,
@@ -586,6 +606,140 @@ test.describe( 'Block Notes: floating notes', () => {
 		await expectAligned( tallThread, getParagraph( editor, 'Tall block' ) );
 	} );
 
+	test( 'adds no room to a post that already scrolls past its threads', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Alpha' },
+			comment: 'Alpha note',
+		} );
+		await addSpacerParagraphs( editor );
+
+		const getScrollHeight = () =>
+			editor.canvas
+				.locator( 'html' )
+				.evaluate( ( root ) => root.scrollHeight );
+		const thread = getThread( page, 'Alpha note' );
+		await editor.selectBlocks( getParagraph( editor, 'Alpha' ) );
+		await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+		const expandedHeight = await getScrollHeight();
+
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.focus();
+		await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+
+		expect( await getScrollHeight() ).toBe( expandedHeight );
+	} );
+
+	// Many notes on a short post overflow the viewport while the content
+	// alone gives the canvas nothing to scroll.
+	test.describe( 'Short posts', () => {
+		test.use( { viewport: { width: 1440, height: 700 } } );
+
+		const LABELS = [
+			'Alpha',
+			'Bravo',
+			'Charlie',
+			'Delta',
+			'Echo',
+			'Foxtrot',
+			'Golf',
+			'Hotel',
+		];
+
+		// Where the last thread sits below its paragraph before the test
+		// scrolls. Only the first thread is anchored; the rest stack below it.
+		let lastOffset;
+
+		// Adds the notes, then collapses the last one and scrolls back up.
+		test.beforeEach( async ( { editor, page, blockNoteUtils } ) => {
+			for ( const label of LABELS ) {
+				await blockNoteUtils.addBlockWithNote( {
+					type: 'core/paragraph',
+					attributes: { content: label },
+					comment: `${ label } note`,
+				} );
+			}
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.focus();
+			await expect( getThread( page, 'Hotel note' ) ).toHaveAttribute(
+				'aria-expanded',
+				'false'
+			);
+			await scrollCanvasTo( editor, 0 );
+			lastOffset = await getOffset(
+				getThread( page, 'Hotel note' ),
+				getParagraph( editor, 'Hotel' )
+			);
+		} );
+
+		// The threads moved with the canvas: the anchored one still lines up
+		// with its paragraph, and a stacked one kept its distance.
+		async function expectStackFollowed( { editor, page } ) {
+			await expectAligned(
+				getThread( page, 'Alpha note' ),
+				getParagraph( editor, 'Alpha' )
+			);
+			await expectAligned(
+				getThread( page, 'Hotel note' ),
+				getParagraph( editor, 'Hotel' ),
+				{ offset: lastOffset, tolerance: 2 }
+			);
+		}
+
+		test( 'reaches the last thread by scrolling beside the threads', async ( {
+			editor,
+			page,
+		} ) => {
+			const lastThread = getThread( page, 'Hotel note' );
+			await expect( lastThread ).not.toBeInViewport();
+
+			// The strip left of the threads passes the wheel to the canvas.
+			const region = await getFloatingNotes( page ).boundingBox();
+			await page.mouse.move( region.x + 6, region.y + region.height / 2 );
+			await page.mouse.wheel( 0, 2000 );
+
+			await expect( lastThread ).toBeInViewport( { ratio: 1 } );
+			await expectStackFollowed( { editor, page } );
+		} );
+
+		test( 'scrolls the canvas with the wheel over a thread', async ( {
+			editor,
+			page,
+		} ) => {
+			await getThread( page, 'Alpha note' ).hover();
+			await page.mouse.wheel( 0, 200 );
+
+			await expect
+				.poll( () => getCanvasScrollTop( editor ) )
+				.toBeGreaterThan( 100 );
+			await expectStackFollowed( { editor, page } );
+		} );
+
+		test( 'scrolls the canvas to a thread focused by keyboard', async ( {
+			editor,
+			page,
+		} ) => {
+			const lastThread = getThread( page, 'Hotel note' );
+			await getThread( page, 'Alpha note' ).focus();
+			await expect( lastThread ).not.toBeInViewport();
+
+			await page.keyboard.press( 'End' );
+
+			await expect( lastThread ).toBeFocused();
+			await expect( lastThread ).toBeInViewport( { ratio: 1 } );
+			await expect
+				.poll( () => getCanvasScrollTop( editor ) )
+				.toBeGreaterThan( 100 );
+			await expectStackFollowed( { editor, page } );
+		} );
+	} );
+
 	test.describe( 'Tall threads', () => {
 		// Short enough that a few replies exceed the thread's height cap.
 		test.use( { viewport: { width: 1440, height: 600 } } );
@@ -644,6 +798,45 @@ test.describe( 'Block Notes: floating notes', () => {
 
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 			await expect( thread ).toBeInViewport( { ratio: FULLY_VISIBLE } );
+		} );
+
+		test( 'scrolls the thread before the canvas', async ( {
+			browserName,
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			// eslint-disable-next-line playwright/no-skipped-test
+			test.skip(
+				browserName === 'firefox',
+				'Firefox keeps a wheel gesture on the scroller it started in.'
+			);
+
+			await addTallThread( { blockNoteUtils } );
+
+			// Adding the replies scrolled the thread to its reply form.
+			const thread = getThread( page, 'Tall note' );
+			await thread.evaluate( ( element ) => {
+				element.scrollTop = 0;
+			} );
+			const getThreadScrollTop = () =>
+				thread.evaluate( ( element ) => element.scrollTop );
+
+			await thread.hover();
+			const canvasScrollTop = await getCanvasScrollTop( editor );
+			await page.mouse.wheel( 0, 100 );
+			await expect.poll( getThreadScrollTop ).toBeGreaterThan( 50 );
+			expect( await getCanvasScrollTop( editor ) ).toBe(
+				canvasScrollTop
+			);
+
+			// Past the thread's end, the wheel reaches the canvas.
+			await expect
+				.poll( async () => {
+					await page.mouse.wheel( 0, 400 );
+					return getCanvasScrollTop( editor );
+				} )
+				.toBeGreaterThan( canvasScrollTop );
 		} );
 	} );
 
