@@ -11,6 +11,7 @@ gutenberg.zip
 .content-entry.js
 coverage
 /.vitest-attachments/
+/packages/theme/figma/
 /test-results/
 **/__screenshots__/*.browser.test.*/
 .phpunit.result.cache
