@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `isKeyboardEvent`: Match letter and digit shortcuts on non-Latin keyboard layouts, like Cyrillic, where `event.key` holds the localized character ([#83554](https://github.com/WordPress/gutenberg/pull/83554)).
+
 ## 4.56.0 (2026-09-23)
 
 ### New Features
