@@ -75,6 +75,23 @@ function gutenberg_get_custom_css_state_entries( $style, $block_name ) {
 }
 
 /**
+ * Filters custom CSS state entries that contain HTML markup.
+ *
+ * @param array[] $state_entries Custom CSS state entries.
+ * @return array[] Valid custom CSS state entries.
+ */
+function gutenberg_get_valid_custom_css_state_entries( $state_entries ) {
+	return array_values(
+		array_filter(
+			$state_entries,
+			static function ( $entry ) {
+				return ! preg_match( '#</?\w+#', $entry['css'] );
+			}
+		)
+	);
+}
+
+/**
  * Render the custom CSS stylesheet and add class name to block as required.
  *
  * @since 7.0.0
@@ -111,12 +128,10 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 		return $parsed_block;
 	}
 
-	// Validate CSS doesn't contain HTML markup (same validation as global styles REST API).
-	// A single invalid state invalidates all of the block's custom CSS.
-	foreach ( $state_entries as $entry ) {
-		if ( preg_match( '#</?\w+#', $entry['css'] ) ) {
-			return $parsed_block;
-		}
+	// Skip CSS containing HTML markup, matching global styles REST API validation.
+	$state_entries = gutenberg_get_valid_custom_css_state_entries( $state_entries );
+	if ( empty( $state_entries ) ) {
+		return $parsed_block;
 	}
 
 	// Generate a unique class name for this block instance.
