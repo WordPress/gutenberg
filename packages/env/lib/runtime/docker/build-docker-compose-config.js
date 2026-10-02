@@ -73,46 +73,35 @@ function getMounts(
 }
 
 /**
- * Gets the database healthcheck for the given MariaDB version.
+ * Gets the database healthcheck.
  *
- * The default `lts` and `latest` images ship MariaDB's `healthcheck.sh`:
- * --connect verifies a TCP connection and that the entrypoint has finished,
- * and --innodb_initialized ensures InnoDB is fully initialized. The
- * MARIADB_AUTO_UPGRADE env var ensures its healthcheck user exists for
- * existing installations.
+ * MariaDB's `healthcheck.sh` runs when the image can use it: --connect
+ * verifies a TCP connection and that the entrypoint has finished, and
+ * --innodb_initialized ensures InnoDB is fully initialized. It connects as a
+ * healthcheck user whose credentials the entrypoint writes to
+ * `.my-healthcheck.cnf` in the data directory, and the MARIADB_AUTO_UPGRADE env
+ * var ensures that user exists for existing installations.
  *
- * Images for a pinned version may predate the healthcheck user that
- * `healthcheck.sh` connects as, whose credentials the entrypoint writes to
- * `.my-healthcheck.cnf` in the data directory (the script was added to the
- * images in 2022 and the user in 2023, and older tags were never rebuilt).
- * For those the script is used only when that file exists, and the server is
- * pinged over TCP otherwise, with `mariadb-admin` (11.0+ only ships this
- * name) or `mysqladmin` (versions before 10.4 only ship this name).
- * Using 127.0.0.1 rather than localhost avoids the Unix socket, which the
- * temporary server used to initialize a new volume answers before the real
- * server is listening.
+ * Images for older MariaDB versions may predate that user or the script (the
+ * script was added to the images in 2022 and the user in 2023, and older tags
+ * were never rebuilt), so the script is used only when that file exists, and
+ * the server is pinged over TCP otherwise, with `mariadb-admin` (11.0+ only
+ * ships this name) or `mysqladmin` (versions before 10.4 only ship this name).
+ * The image is checked at runtime rather than by its tag, so every version,
+ * including `lts` and `latest`, uses the same check. Using 127.0.0.1 rather
+ * than localhost avoids the Unix socket, which the temporary server used to
+ * initialize a new volume answers before the real server is listening.
  *
  * Timing is generous to support slow CI environments.
  *
- * @param {string|null|undefined} mariadbVersion The configured MariaDB version.
- *
  * @return {Object} A docker-compose healthcheck object.
  */
-function getMariaDBHealthcheck( mariadbVersion ) {
-	const isPinned =
-		!! mariadbVersion &&
-		mariadbVersion !== 'lts' &&
-		mariadbVersion !== 'latest';
-
-	const test = isPinned
-		? [
-				'CMD-SHELL',
-				'if [ -f /var/lib/mysql/.my-healthcheck.cnf ]; then healthcheck.sh --connect --innodb_initialized; else "$$(command -v mariadb-admin || echo mysqladmin)" ping -h 127.0.0.1 --protocol=tcp -uroot -p"$$MYSQL_ROOT_PASSWORD"; fi',
-			]
-		: [ 'CMD', 'healthcheck.sh', '--connect', '--innodb_initialized' ];
-
+function getMariaDBHealthcheck() {
 	return {
-		test,
+		test: [
+			'CMD-SHELL',
+			'if [ -f /var/lib/mysql/.my-healthcheck.cnf ]; then healthcheck.sh --connect --innodb_initialized; else "$$(command -v mariadb-admin || echo mysqladmin)" ping -h 127.0.0.1 --protocol=tcp -uroot -p"$$MYSQL_ROOT_PASSWORD"; fi',
+		],
 		interval: '5s',
 		timeout: '10s',
 		retries: 12,
@@ -233,9 +222,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				MARIADB_AUTO_UPGRADE: '1',
 			},
 			volumes: [ 'mysql:/var/lib/mysql' ],
-			healthcheck: getMariaDBHealthcheck(
-				config.env.development.mariadbVersion
-			),
+			healthcheck: getMariaDBHealthcheck(),
 		},
 		wordpress: {
 			depends_on: {
@@ -313,9 +300,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				MARIADB_AUTO_UPGRADE: '1',
 			},
 			volumes: [ 'mysql-test:/var/lib/mysql' ],
-			healthcheck: getMariaDBHealthcheck(
-				config.env.tests.mariadbVersion
-			),
+			healthcheck: getMariaDBHealthcheck(),
 		};
 		services[ 'tests-wordpress' ] = {
 			depends_on: {

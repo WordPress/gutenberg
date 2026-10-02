@@ -165,10 +165,8 @@ describe( 'buildDockerComposeConfig', () => {
 
 		expect( config.services.mysql.healthcheck ).toBeDefined();
 		expect( config.services.mysql.healthcheck.test ).toEqual( [
-			'CMD',
-			'healthcheck.sh',
-			'--connect',
-			'--innodb_initialized',
+			'CMD-SHELL',
+			'if [ -f /var/lib/mysql/.my-healthcheck.cnf ]; then healthcheck.sh --connect --innodb_initialized; else "$$(command -v mariadb-admin || echo mysqladmin)" ping -h 127.0.0.1 --protocol=tcp -uroot -p"$$MYSQL_ROOT_PASSWORD"; fi',
 		] );
 		expect( config.services.mysql.healthcheck.interval ).toBe( '5s' );
 		expect( config.services.mysql.healthcheck.timeout ).toBe( '10s' );
@@ -182,10 +180,8 @@ describe( 'buildDockerComposeConfig', () => {
 
 		expect( config.services[ 'tests-mysql' ].healthcheck ).toBeDefined();
 		expect( config.services[ 'tests-mysql' ].healthcheck.test ).toEqual( [
-			'CMD',
-			'healthcheck.sh',
-			'--connect',
-			'--innodb_initialized',
+			'CMD-SHELL',
+			'if [ -f /var/lib/mysql/.my-healthcheck.cnf ]; then healthcheck.sh --connect --innodb_initialized; else "$$(command -v mariadb-admin || echo mysqladmin)" ping -h 127.0.0.1 --protocol=tcp -uroot -p"$$MYSQL_ROOT_PASSWORD"; fi',
 		] );
 		expect(
 			config.services[ 'tests-mysql' ].environment.MARIADB_AUTO_UPGRADE
@@ -193,20 +189,7 @@ describe( 'buildDockerComposeConfig', () => {
 	} );
 
 	describe( 'mariadbVersion', () => {
-		const MODERN_HEALTHCHECK = {
-			test: [
-				'CMD',
-				'healthcheck.sh',
-				'--connect',
-				'--innodb_initialized',
-			],
-			interval: '5s',
-			timeout: '10s',
-			retries: 12,
-			start_period: '60s',
-		};
-
-		const PINNED_HEALTHCHECK = {
+		const HEALTHCHECK = {
 			test: [
 				'CMD-SHELL',
 				'if [ -f /var/lib/mysql/.my-healthcheck.cnf ]; then healthcheck.sh --connect --innodb_initialized; else "$$(command -v mariadb-admin || echo mysqladmin)" ping -h 127.0.0.1 --protocol=tcp -uroot -p"$$MYSQL_ROOT_PASSWORD"; fi',
@@ -227,7 +210,7 @@ describe( 'buildDockerComposeConfig', () => {
 			} );
 		}
 
-		it( 'uses mariadb:lts and the current health check by default', () => {
+		it( 'uses mariadb:lts by default', () => {
 			const config = buildDockerComposeConfig( {
 				workDirectoryPath: '/path',
 				env: { development: CONFIG, tests: CONFIG },
@@ -238,7 +221,7 @@ describe( 'buildDockerComposeConfig', () => {
 					'mariadb:lts'
 				);
 				expect( config.services[ service ].healthcheck ).toEqual(
-					MODERN_HEALTHCHECK
+					HEALTHCHECK
 				);
 			}
 		} );
@@ -247,65 +230,27 @@ describe( 'buildDockerComposeConfig', () => {
 			const config = buildWithVersions( null, null );
 
 			expect( config.services.mysql.image ).toBe( 'mariadb:lts' );
-			expect( config.services.mysql.healthcheck ).toEqual(
-				MODERN_HEALTHCHECK
-			);
 		} );
 
 		it( 'uses each environment’s own version', () => {
 			const config = buildWithVersions( '10.3', 'latest' );
 
 			expect( config.services.mysql.image ).toBe( 'mariadb:10.3' );
-			expect( config.services.mysql.healthcheck ).toEqual(
-				PINNED_HEALTHCHECK
-			);
 			expect( config.services[ 'tests-mysql' ].image ).toBe(
 				'mariadb:latest'
 			);
-			expect( config.services[ 'tests-mysql' ].healthcheck ).toEqual(
-				MODERN_HEALTHCHECK
-			);
 		} );
 
-		it.each( [
-			'5',
-			'5.5',
-			'10.0',
-			'10.3',
-			'10.3.39',
-			'10.5.8',
-			'10.6.4',
-			'10',
-			'10.11',
-			'11',
-			'11.4.2',
-		] )(
-			'uses the health check that detects the healthcheck user for %j',
+		it.each( [ '10.3', 'lts', 'latest' ] )(
+			'uses the same health check for %j',
 			( version ) => {
 				const config = buildWithVersions( version, version );
 
-				expect( config.services.mysql.image ).toBe(
-					`mariadb:${ version }`
-				);
 				expect( config.services.mysql.healthcheck ).toEqual(
-					PINNED_HEALTHCHECK
+					HEALTHCHECK
 				);
 				expect( config.services[ 'tests-mysql' ].healthcheck ).toEqual(
-					PINNED_HEALTHCHECK
-				);
-			}
-		);
-
-		it.each( [ 'lts', 'latest' ] )(
-			'uses the current health check for %j',
-			( version ) => {
-				const config = buildWithVersions( version, version );
-
-				expect( config.services.mysql.image ).toBe(
-					`mariadb:${ version }`
-				);
-				expect( config.services.mysql.healthcheck ).toEqual(
-					MODERN_HEALTHCHECK
+					HEALTHCHECK
 				);
 			}
 		);
