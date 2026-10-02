@@ -83,7 +83,7 @@ Add a user’s avatar.
 
 -	**Name:** [core/avatar](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-avatar/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** align, anchor, color (~~background~~, ~~text~~), filter (duotone), interactivity (clientNavigation), spacing (margin, padding), ~~alignWide~~, ~~html~~
+-	**Supports:** align, anchor, color (~~background~~, ~~text~~), filter (duotone), interactivity (clientNavigation), shadow, spacing (margin, padding), ~~alignWide~~, ~~html~~
 -	**Attributes:** isLink, linkTarget, size, userId
 
 ## Pattern
@@ -121,7 +121,7 @@ Prompt visitors to take action with a group of button-style links.
 -	**Name:** [core/buttons](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-buttons/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Allowed Blocks:** core/button
--	**Supports:** align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, ~~text~~), contentRole, interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), listView, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, ~~text~~), contentRole, dimensions (minHeight, minWidth), interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), listView, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 
 ## Calendar
 
@@ -430,7 +430,7 @@ Display a list of your most recent posts.
 
 -	**Name:** [core/latest-posts](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-latest-posts/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
--	**Supports:** align, anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), interactivity (clientNavigation), layout, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align, anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), layout, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** addLinkToFeaturedImage, categories, displayAuthor, displayFeaturedImage, displayPostContent, displayPostContentRadio, displayPostDate, excerptLength, featuredImageAlign, featuredImageSizeHeight, featuredImageSizeSlug, featuredImageSizeWidth, order, orderBy, postsToShow, selectedAuthor
 
 ## List
@@ -841,7 +841,7 @@ Display the total number of results in a query.
 -	**Name:** [core/query-total](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query-total/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
 -	**Ancestor:** core/query
--	**Supports:** align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** displayType
 
 ## Quote
@@ -961,7 +961,7 @@ Display the tab buttons for a tabbed interface.
 -	**Name:** [core/tab-list](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab-list/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/tabs
--	**Supports:** ariaLabel, color (background, text), layout (default, ~~allowOrientation~~, ~~allowVerticalAlignment~~, ~~allowWrap~~), spacing (blockGap, padding), typography (fontSize), ~~html~~, ~~lock~~, ~~visibility~~
+-	**Supports:** ariaLabel, color (background, text), layout (default, ~~allowOrientation~~, ~~allowVerticalAlignment~~, ~~allowWrap~~), shadow, spacing (blockGap, padding), typography (fontSize), ~~html~~, ~~lock~~, ~~visibility~~
 -	**Attributes:** tabs
 
 ## Tab Panel

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Runtime actions: the footer and the More menu place the actions a mounted widget declares through `useWidgetActions`, merged with the type's actions by `id`. A `callback` action mounts a button, disabled while a promise it returns settles ([#83877](https://github.com/WordPress/gutenberg/pull/83877)).
+
 ### Enhancements
 
 -   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).

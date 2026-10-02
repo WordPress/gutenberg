@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { inertValue } from '../inert-value';
+import { inertValue } from '..';
 
 /**
  * Re-imports the helper with React reporting the given version. The helper
@@ -15,7 +15,7 @@ async function inertValueForReact( version: string ) {
 		...( await importOriginal< typeof import( 'react' ) >() ),
 		version,
 	} ) );
-	return ( await import( '../inert-value' ) ).inertValue;
+	return ( await import( '..' ) ).inertValue;
 }
 
 describe( 'inertValue', () => {
