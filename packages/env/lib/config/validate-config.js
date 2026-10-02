@@ -1,4 +1,5 @@
 'use strict';
+const { MARIADB_IMAGE_TAGS } = require( './db-env' );
 
 /**
  * @typedef {import('./parse-source-string').WPSource} WPSource
@@ -154,8 +155,8 @@ function checkVersion( configFile, configKey, version ) {
 }
 
 /**
- * Validates a MariaDB version and throws if it isn't valid. Accepts the
- * "lts" and "latest" image tags or a numeric version such as "10.11".
+ * Validates a MariaDB version and throws if it isn't valid. Accepts one of
+ * the MariaDB image tags, such as "lts", or a numeric version such as "10.11".
  *
  * @param {string} configFile The config file we're validating.
  * @param {string} configKey  The configuration key we're validating.
@@ -168,13 +169,16 @@ function checkMariaDBVersion( configFile, configKey, version ) {
 		);
 	}
 
-	if ( version === 'lts' || version === 'latest' ) {
+	if ( MARIADB_IMAGE_TAGS.includes( version ) ) {
 		return;
 	}
 
 	if ( ! /^[0-9]+(?:\.[0-9]+)*$/.test( version ) ) {
+		const tags = MARIADB_IMAGE_TAGS.map( ( tag ) => `"${ tag }"` ).join(
+			', '
+		);
 		throw new ValidationError(
-			`Invalid ${ configFile }: "${ configKey }" must be "lts", "latest", or a version such as "10.11" or "11.4.2".`
+			`Invalid ${ configFile }: "${ configKey }" must be ${ tags }, or a version such as "10.11" or "11.4.2".`
 		);
 	}
 }

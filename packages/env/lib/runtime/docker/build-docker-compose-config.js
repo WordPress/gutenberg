@@ -212,7 +212,9 @@ module.exports = function buildDockerComposeConfig( config ) {
 	// Build the services object, conditionally including tests services.
 	const services = {
 		mysql: {
-			image: `mariadb:${ config.env.development.mariadbVersion ?? 'lts' }`,
+			image: dbEnv.getMariaDBImage(
+				config.env.development.mariadbVersion
+			),
 			ports: [ developmentMysqlPorts ],
 			environment: {
 				MYSQL_ROOT_HOST: '%',
@@ -290,7 +292,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 		}}:80`;
 
 		services[ 'tests-mysql' ] = {
-			image: `mariadb:${ config.env.tests.mariadbVersion ?? 'lts' }`,
+			image: dbEnv.getMariaDBImage( config.env.tests.mariadbVersion ),
 			ports: [ testsMysqlPorts ],
 			environment: {
 				MYSQL_ROOT_HOST: '%',
