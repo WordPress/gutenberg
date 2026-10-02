@@ -4,6 +4,8 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+import { Badge, Stack } from '@wordpress/ui';
+import { decodeEntities } from '@wordpress/html-entities';
 import { isRTL, __, sprintf } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
@@ -13,10 +15,7 @@ import { useContext } from '@wordpress/element';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import SidebarButton from '../sidebar-button';
-import {
-	isPreviewingTheme,
-	currentlyPreviewingTheme,
-} from '../../utils/is-previewing-theme';
+import { currentlyPreviewingTheme } from '../../utils/is-previewing-theme';
 import { SidebarNavigationContext } from '../sidebar';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
@@ -41,8 +40,11 @@ export default function SidebarNavigationScreen( {
 				// Do not call `getTheme` with null, it will cause a request to
 				// the server.
 				previewingThemeName: currentlyPreviewingThemeId
-					? select( coreStore ).getTheme( currentlyPreviewingThemeId )
-							?.name?.rendered
+					? decodeEntities(
+							select( coreStore ).getTheme(
+								currentlyPreviewingThemeId
+							)?.name?.rendered ?? ''
+						)
 					: undefined,
 			};
 		},
@@ -93,14 +95,7 @@ export default function SidebarNavigationScreen( {
 						level={ 1 }
 						size={ 20 }
 					>
-						{ ! isPreviewingTheme()
-							? title
-							: sprintf(
-									/* translators: 1: theme name. 2: title */
-									__( 'Previewing %1$s: %2$s' ),
-									previewingThemeName,
-									title
-								) }
+						{ title }
 					</Heading>
 					{ actions && (
 						<div className="edit-site-sidebar-navigation-screen__actions">
@@ -109,6 +104,20 @@ export default function SidebarNavigationScreen( {
 					) }
 				</HStack>
 				<div className="edit-site-sidebar-navigation-screen__content">
+					{ /* A row Stack gives the badge a block-level box of its
+					     own: left inline, its vertical padding would overlap
+					     the text that follows. */ }
+					{ previewingThemeName && (
+						<Stack className="edit-site-sidebar-navigation-screen__preview-badge">
+							<Badge intent="informational">
+								{ sprintf(
+									/* translators: %s: theme name. */
+									__( 'Previewing %s' ),
+									previewingThemeName
+								) }
+							</Badge>
+						</Stack>
+					) }
 					{ description && (
 						<div className="edit-site-sidebar-navigation-screen__description">
 							{ description }
