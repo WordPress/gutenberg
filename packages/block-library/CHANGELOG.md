@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Navigation Link: Search every entity type from the link UI instead of only the link's own type; so a category, tag or post can be added without needing to add that specific type's navigation link block ([#83408](https://github.com/WordPress/gutenberg/pull/83408)).
 -   Cover: Don't autoplay an embedded background video on the front end when the visitor prefers reduced motion. A new view module swaps the iframe source for one without the autoplay parameters ([#83452](https://github.com/WordPress/gutenberg/pull/83452)).
 -   Columns: Remove the column count slider from the block settings ([#83262](https://github.com/WordPress/gutenberg/pull/83262)).
 -   Avatar: Explain in the block settings that avatars use the Gravatar service, and link users who can manage settings to the Discussion settings where the default avatar is chosen ([#83567](https://github.com/WordPress/gutenberg/pull/83567)).
@@ -22,6 +23,7 @@
 -   Image: Stop the lightbox from removing `inert` that a theme set on elements outside the overlay ([#83480](https://github.com/WordPress/gutenberg/pull/83480)).
 -   Image: Show the original image proportions in the lightbox and animate the thumbnail crop during zooming ([#79058](https://github.com/WordPress/gutenberg/pull/79058)).
 -   Template Part: Fall back to the theme's template part file and report the error with `wp_trigger_error()` when the customized template part can't be loaded, instead of rendering nothing and logging an `Undefined property: WP_Error::$content` warning ([#83809](https://github.com/WordPress/gutenberg/pull/83809)).
+-   Post Featured Image: Do not wrap the media placeholder in a post link when `isLink` comes from the template, so adding a featured image no longer crashes the editor ([#81584](https://github.com/WordPress/gutenberg/pull/81584)).
 -   Image: Percent-encode the inline SVG in the circle-mask style's `mask-image`, and drop the malformed `;utf8` media type parameter, so audit tools no longer report the data URI as an invalid `url()` value ([#82333](https://github.com/WordPress/gutenberg/pull/82333)).
 
 ### Internal
