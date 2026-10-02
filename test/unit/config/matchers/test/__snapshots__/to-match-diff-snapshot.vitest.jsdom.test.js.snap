@@ -1,0 +1,23 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`snapshotDiff > formats the established uncolored object diff > object visibility 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+  Object {
+-   "visible": false,
++   "visible": true,
+  }
+`;
+
+exports[`snapshotDiff > supports custom annotations > custom annotations 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+  Array [
+-   "old",
++   "new",
+  ]
+`;

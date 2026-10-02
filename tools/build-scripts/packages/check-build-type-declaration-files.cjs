@@ -29,8 +29,8 @@ const chalk = require( 'chalk' );
  */
 async function packageNeedsExtraCheck( packagePath ) {
 	/*
-	 * Migrated packages compile src from tsconfig.build.json; the default
-	 * tsconfig.json is their dev project.
+	 * A split package compiles src from tsconfig.build.json; its default
+	 * tsconfig.json is the dev project.
 	 */
 	let configPath = path.join( packagePath, 'tsconfig.build.json' );
 	try {
@@ -75,7 +75,7 @@ async function getDecFile( packagePath ) {
 async function typecheckDeclarations( file ) {
 	return new Promise( ( resolve, reject ) => {
 		exec(
-			`npx tsc --ignoreConfig --target esnext --moduleResolution bundler --noEmit --skipLibCheck "${ file }"`,
+			`npm exec --no -- tsc --ignoreConfig --target esnext --moduleResolution bundler --noEmit --skipLibCheck "${ file }"`,
 			( error, stdout, stderr ) => {
 				if ( error ) {
 					reject( { file, error, stderr, stdout } );

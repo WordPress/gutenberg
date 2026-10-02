@@ -1,6 +1,6 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
 	"compilerOptions": {
 		"types": [
 			"gutenberg-env",
@@ -19,15 +19,15 @@
 		{ "path": "../hooks" },
 		{ "path": "../html-entities/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
-		{ "path": "../icons" },
-		{ "path": "../is-shallow-equal" },
+		{ "path": "../icons/tsconfig.build.json" },
+		{ "path": "../is-shallow-equal/tsconfig.build.json" },
 		{ "path": "../kebab-case" },
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
-		{ "path": "../react-i18n" },
+		{ "path": "../react-inert-value/tsconfig.build.json" },
 		{ "path": "../rich-text" },
-		{ "path": "../style-runtime" },
+		{ "path": "../style-runtime/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../warning" }
 	]

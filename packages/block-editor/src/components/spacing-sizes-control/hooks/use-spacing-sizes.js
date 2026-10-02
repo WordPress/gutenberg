@@ -50,7 +50,7 @@ export default function useSpacingSizes() {
 						size: undefined,
 					},
 					...sizes,
-			  ]
+				]
 			: sizes;
 	}, [ customSizes, themeSizes, defaultSizes ] );
 }

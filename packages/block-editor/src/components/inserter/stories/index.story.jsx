@@ -4,7 +4,10 @@ import { ExperimentalBlockEditorProvider } from '../../provider';
 import { patternCategories, patterns, reusableBlocks } from './utils/fixtures';
 import Inserter from '../';
 
-export default { title: 'BlockEditor/Inserter' };
+export default {
+	id: 'blockeditor-inserter',
+	title: 'Editor/Block Editor/Inserter',
+};
 
 // For the purpose of this story, we need to register the core blocks samples.
 registerCoreBlocks();

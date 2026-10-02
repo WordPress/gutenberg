@@ -233,7 +233,6 @@ export function FocalPointPicker( {
 	};
 
 	const classes = clsx( 'components-focal-point-picker-control', className );
-	const Label = hideLabelFromVision ? VisuallyHidden : StyledLabel;
 
 	useUpdateEffect( () => {
 		setShowGridOverlay( true );
@@ -246,11 +245,25 @@ export function FocalPointPicker( {
 
 	return (
 		<Container { ...restProps } as="fieldset" className={ classes }>
-			{ !! label && <Label as="legend">{ label }</Label> }
+			{ !! label &&
+				( hideLabelFromVision ? (
+					<VisuallyHidden as="legend">{ label }</VisuallyHidden>
+				) : (
+					<StyledLabel as="legend">{ label }</StyledLabel>
+				) ) }
 			<MediaWrapper className="components-focal-point-picker-wrapper">
 				<MediaContainer
 					className="components-focal-point-picker"
 					onKeyDown={ arrowKeyStep }
+					onPointerDown={ ( event ) => {
+						if ( event.button !== 0 ) {
+							return;
+						}
+						// Keep the gesture when the pointer crosses into the editor canvas iframe.
+						event.currentTarget.setPointerCapture(
+							event.pointerId
+						);
+					} }
 					onMouseDown={ startDrag }
 					onBlur={ () => {
 						if ( isDragging ) {

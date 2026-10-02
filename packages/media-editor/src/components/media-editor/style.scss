@@ -1,4 +1,4 @@
-@use "@wordpress/base-styles/breakpoints" as breakpoints;
+@use "@wordpress/base-styles/breakpoints" as *;
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
@@ -17,72 +17,96 @@
 		justify-content: center;
 	}
 
-	.interface-interface-skeleton {
-		position: relative;
-		top: auto;
-		right: auto;
-		bottom: auto;
-		left: auto;
-		height: 100%;
-		max-height: none;
+	// The media editor owns this layout rather than borrowing
+	// `InterfaceSkeleton`, whose header/footer/secondary-sidebar slots,
+	// distraction-free mode and admin-bar offsets were all unused here and had
+	// to be reset in CSS.
+	//
+	// Below `small` one view fills it at a time, switched from the header.
+	// From `small` up the canvas and the panel are columns side by side.
+	//
+	// A containment context, so the canvas can size itself against the room
+	// it actually has rather than the viewport. The two differ by whatever
+	// chrome the host puts beside the editor: none in the modal, but 160px
+	// of wp-admin menu in the route until it folds at 960px.
+	.media-editor__body {
+		container-type: inline-size;
+		container-name: media-editor-body;
+		display: flex;
 		flex: 1;
-		flex-direction: column;
+		min-height: 0;
 	}
 
-	// The skeleton must always sit in the modal's flow (`top: auto`). The reset
-	// above sets that, but `@wordpress/interface` offsets every
-	// `.interface-interface-skeleton` below the admin bar in fullscreen mode via
-	// `.is-fullscreen-mode .interface-interface-skeleton { top: ... }`. That
-	// selector ties the reset's specificity, so source order lets it win and
-	// pushes the editor (and the fine-rotation ruler under the canvas) down
-	// inside our full-screen modal that already overlays the admin bar.
-	// Re-assert `top` at a specificity that beats it, anchored on the modal
-	// frame (`.media-editor` only ever renders inside `.media-editor-modal`).
-	.media-editor-modal & .interface-interface-skeleton.interface-interface-skeleton {
-		top: auto;
-	}
-
-	.interface-interface-skeleton__editor {
-		min-width: 0;
-		flex: 1;
-	}
-
-	// Canvas column: image fills the available height; in panel mode the
-	// fine-rotation ruler sits directly beneath it.
+	// Canvas column: the grey stage on top, the controls that act on it
+	// beneath. The column itself is transparent — only the stage is grey.
 	.media-editor__content {
 		display: flex;
 		flex: 1;
 		flex-direction: column;
+		min-width: 0;
 		min-height: 0;
-		// Inset the canvas + fine-rotation ruler as one rounded grey panel
-		// with a horizontal-only gutter. The ruler is always a child here
-		// (never the footer), so the two share a container and the panel is
-		// fully rounded at every viewport.
-		margin: 0 $grid-unit-30;
-		border-radius: $radius-large;
-		overflow: hidden;
-	}
+		margin: $grid-unit-30 $grid-unit-30 $grid-unit-10 $grid-unit-30;
 
-	.media-editor__canvas-toolbar {
-		display: flex;
-		flex-shrink: 0;
-		justify-content: center;
-		// Share the canvas grey so the ruler strip blends into the same
-		// surface as the area around the image.
-		background: $gray-200;
-		padding: $grid-unit-10 $grid-unit-20;
+		// The panel docks from `small`, so between there and `large` the
+		// canvas takes whatever the 320px panel leaves — about 200px at
+		// 600px, 380px at 782px. Cramped, but a cramped preview beside
+		// reachable controls beats a panel that hides the image outright.
+		@include break-small() {
+			margin: 0 $grid-unit-30;
+		}
 
-		.media-editor-fine-rotation {
-			flex: 0 1 360px;
-			min-width: 0;
+		// Promise the canvas a floor only where the body is wide enough to
+		// keep it: 520px canvas + 320px panel + this column's 24px gutter.
+		// Asking for it below that pushes the layout past its container
+		// instead of shrinking the canvas, which is what put a scrollbar on
+		// the route between 961px and 1024px — wide enough for the floor by
+		// viewport, but not once the wp-admin menu had taken its 160px.
+		@container media-editor-body (min-width: #{520px + 320px + $grid-unit-30}) {
+			min-width: 520px;
 		}
 	}
 
+	// The fine-rotation ruler and, below `small`, the rotate/flip/zoom
+	// controls: ruler on top, controls below, centred. Sized to its content
+	// (`flex: 0 0 auto`) so the stage above keeps every pixel the toolbar
+	// doesn't need. Transparent itself — only the ruler takes the grey.
+	.media-editor__canvas-toolbar {
+		display: flex;
+		flex: 0 0 auto;
+		flex-direction: column;
+		align-items: center;
+		gap: $grid-unit-15;
+
+		// The ruler strip carries the canvas grey, as on trunk, so it reads as
+		// the same surface the image sits on: the band spans the column while
+		// the ruler itself is capped and centred within it. The controls
+		// below stay on the modal's own background — they act on the image
+		// but are not part of it.
+		.media-editor-fine-rotation {
+			display: flex;
+			justify-content: center;
+			align-self: stretch;
+			background: $gray-200;
+			border-radius: 0 0 $radius-large $radius-large;
+			padding: $grid-unit-10 $grid-unit-20;
+
+			// Trunk's measure for the ruler itself (`flex: 0 1 360px` there,
+			// where the strip was a row); the grey band around it spans.
+			.rotation-ruler {
+				flex: 0 1 360px;
+				min-width: 0;
+			}
+		}
+	}
+
+	// The stage: the surface the image sits on. Fully rounded on its own —
+	// non-image media has no ruler band beneath it (see `:has` below).
 	.media-editor__canvas-area {
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		background: $gray-200;
+		border-radius: $radius-large;
 		overflow: auto;
 		flex: 1;
 		min-height: 0;
@@ -99,114 +123,92 @@
 		}
 	}
 
+	// Settings panel. Below `small` it takes the whole body: there is no room
+	// to put a 320px column beside a canvas worth looking at, and that is
+	// also where the transform controls fall back to a row under the canvas.
+	// From `small` up it docks as a column, so cropping and previewing happen
+	// together — the canvas is tight at the bottom of that range but present,
+	// where a full-screen panel would have hidden it completely.
 	.media-editor__sidebar {
-		@include reset;
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		min-width: 0;
+		min-height: 0;
+		// No scrolling here: the tab strip has to stay put while the fields
+		// move, so the open pane is the scroll container instead.
+		overflow: hidden;
 
-		// Equal inline gutter so focus rings (outline + offset) and the zoom
-		// slider thumb at its minimum sit inside the sidebar without shifting
-		// the panel toward one edge. The complementary area uses overflow: auto
-		// and the skeleton sidebar overflow: hidden, so a 1px-only left inset
-		// still clips the 2px focus outline.
+		// The `sm` surface-width token, up from the 280px `$sidebar-width`
+		// this used to inherit: #81121 reports the panel reading as squished
+		// at roughly 250px, with four editable fields stacked above six
+		// read-only facts.
 		@include break-small() {
-			padding-inline: $grid-unit-10;
+			flex: none;
+			width: var(--wpds-dimension-surface-width-sm);
 		}
 	}
 
-	.media-editor__sidebar-panel {
-		padding-bottom: $grid-unit-30;
+	// The strip and the open pane, stacked. No inline padding: the pane below
+	// scrolls, and a gutter here would inset its scrollbar from the sidebar
+	// edge. The strip and the pane carry their own instead.
+	.media-editor__tabs {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		min-height: 0;
 	}
 
-	// Borderless controls panel: clear the InterfaceSkeleton sidebar's
-	// default top border, left box-shadow, and high-contrast outline so the
-	// panel sits flush with no divider lines.
-	// NOTE: overrides @wordpress/interface internals. The sidebar region has
-	// no className prop, so this targets `interface-interface-skeleton__sidebar`
-	// directly — update here if that class is renamed upstream.
-	.interface-interface-skeleton__sidebar {
-		border-top: 0;
-		box-shadow: none;
-		outline: 1px solid transparent;
-	}
-
-	// Below `small` the sidebar is a full-width overlay, so the panel carries
-	// its own all-around gutter. From `small` up it's the right-hand column and
-	// drops its left/bottom padding (the sidebar supplies the left gutter).
-	.media-editor__panel {
-		padding: $grid-unit-20;
-
-		@include break-small() {
-			padding: $grid-unit-30 $grid-unit-30 0 0;
-		}
-	}
-
-	// NOTE: overrides @wordpress/components Panel/Button internals to align
-	// the sidebar header (tabs + close button). Targets their classes
-	// directly; update here if they are renamed upstream.
-	.components-panel__header.media-editor__sidebar-header {
-		padding-left: 0;
-		padding-right: $grid-unit-10;
-		margin-right: $grid-unit-30;
-		margin-right: 0;
-
-		// When the sidebar is not a full page column, we offset the header to match the overall gutter.
-		@include break-small() {
-			margin-right: $grid-unit-30;
-		}
-		.components-button.has-icon {
-			padding: 0;
-
-			@include break-small() {
-				display: flex;
-			}
-		}
-	}
-
-	// `ComplementaryArea`'s "mobile" mode is hard-coded to the `medium`
-	// breakpoint: below 782px it renders an animated fill wrapper and writes
-	// `width: 100vw` inline on both it and the inner panel. We want the sidebar
-	// to mirror InterfaceSkeleton's column/overlay collapse but shifted to
-	// `small`, so we override that inline width by breakpoint (`!important` is
-	// the only way to beat an inline style). `:has(__fill)` scopes the changes
-	// to when the panel is actually open: the skeleton sidebar wrapper is always
-	// present (empty when closed), so touching it unconditionally would paint an
-	// empty box over the canvas.
-
-	// Column (small–medium): between 600px and 782px `ComplementaryArea` is
-	// still in its mobile mode (inline `100vw`, see above) and the skeleton
-	// sidebar is absolutely positioned, so pull the open panel back in-flow at
-	// the sidebar width to sit it beside the canvas as a column.
+	// Wraps `Tabs.List`, which sizes itself to its tabs and so cannot carry a
+	// rule across the strip. A sibling of the scrolling pane rather than a
+	// sticky box inside it, so it holds its place without joining the scroll
+	// container — which is what lets the pane's scrollbar reach the edge.
 	//
-	// Bounded *below* the medium breakpoint on purpose. From 782px up,
-	// `InterfaceSkeleton` already makes the sidebar a `position: relative`,
-	// `width: auto` column and `ComplementaryArea` animates its width to
-	// `$sidebar-width` — exactly like the main editor. Pinning the width with
-	// `!important` there would freeze that open/close tween (the panel would
-	// sit mounted and unchanged for the animation's duration, then pop in or
-	// out), so we leave it to the skeleton. Below 782px there's nothing to
-	// freeze: `ComplementaryArea` zeroes the animation duration in mobile mode.
-	@media (min-width: #{ breakpoints.$break-small }) and (max-width: #{ (breakpoints.$break-medium - 1) }) {
-		.interface-interface-skeleton__sidebar:has(.interface-complementary-area__fill) {
-			position: relative !important;
-		}
+	// Margin, not padding: the rule below is drawn on this box's edge, so an
+	// inset from inside would still run the sidebar's full width. The margin
+	// pulls the box in instead, ending the rule where the tabs and the fields
+	// below it start.
+	.media-editor__tablist {
+		flex-shrink: 0;
+		margin-inline: $grid-unit-30;
+		background: $white;
+		border-bottom: $border-width solid $gray-300;
+	}
 
-		.interface-complementary-area__fill,
-		.interface-complementary-area {
-			width: $sidebar-width !important;
+	// The scrolling pane. Full width so its scrollbar sits against the
+	// sidebar edge; the gutter is padding here rather than margin so the
+	// scrollbar stays outside it. Matches the canvas column's inline margin,
+	// so the fields line up with the image when the panel is closed.
+	.media-editor__panel {
+		flex: 1;
+		min-height: 0;
+		overflow-y: auto;
+		padding-block: $grid-unit-30;
+		padding-inline: $grid-unit-30;
+	}
+
+	// The ruler band shares the canvas grey and sits flush under it, so the
+	// two are one panel with four rounded corners rather than two stacked
+	// cards: the canvas gives up its bottom corners and the band takes them.
+	// Keyed on the band actually being there — non-image media has no ruler,
+	// and its canvas stays rounded all round.
+	.media-editor__content:has(.media-editor-fine-rotation) .media-editor__canvas-area {
+		border-end-start-radius: 0;
+		border-end-end-radius: 0;
+	}
+
+	// Below `small` an open panel owns the body, so the canvas steps aside
+	// rather than being squeezed into an unusable sliver. Keyed on any panel
+	// being open rather than on which one: no rule needs to tell them apart.
+	.media-editor__body.has-panel-open .media-editor__content {
+		display: none;
+
+		@include break-small() {
+			display: flex;
+			margin: 0 0 0 $grid-unit-30;
 		}
 	}
 
-	// Overlay (< small): the open panel fills the modal width (it would
-	// otherwise shrink-wrap, since the inline `100vw` is overridden below).
-	@media (max-width: #{ (breakpoints.$break-small - 1) }) {
-		.interface-interface-skeleton__sidebar:has(.interface-complementary-area__fill) {
-			width: 100%;
-		}
-
-		.interface-complementary-area__fill,
-		.interface-complementary-area {
-			width: 100% !important;
-		}
-	}
 }
 
 .media-editor__snackbar {

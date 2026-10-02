@@ -1,10 +1,10 @@
 import { forwardRef, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-import { CheckboxControl } from '@wordpress/components';
-import { ControlWithError } from './control-with-error';
+import { CheckboxControl as WCCheckboxControl } from '@wordpress/components';
+import { ControlWithError } from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 
-type CheckboxControlProps = React.ComponentProps< typeof CheckboxControl >;
+type CheckboxControlProps = React.ComponentProps< typeof WCCheckboxControl >;
 
 type ValidatedCheckboxControlProps = CheckboxControlProps &
 	ValidatedControlProps;
@@ -23,6 +23,7 @@ const UnforwardedValidatedCheckboxControl = (
 
 	return (
 		<ControlWithError
+			className="dataviews-validated-control"
 			required={ required }
 			markWhenOptional={ markWhenOptional }
 			ref={ mergedRefs }
@@ -33,7 +34,7 @@ const UnforwardedValidatedCheckboxControl = (
 				)
 			}
 		>
-			<CheckboxControl
+			<WCCheckboxControl
 				// TODO: Upstream limitation - CheckboxControl doesn't support uncontrolled mode, visually.
 				{ ...restProps }
 			/>

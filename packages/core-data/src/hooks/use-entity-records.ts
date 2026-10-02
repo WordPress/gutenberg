@@ -46,8 +46,10 @@ export type WithPermissions< RecordType > = RecordType & {
 	permissions: { delete: boolean; update: boolean };
 };
 
-interface EntityRecordsWithPermissionsResolution< RecordType >
-	extends Omit< EntityRecordsResolution< RecordType >, 'records' > {
+interface EntityRecordsWithPermissionsResolution< RecordType > extends Omit<
+	EntityRecordsResolution< RecordType >,
+	'records'
+> {
 	/** The requested entity records with permissions */
 	records: WithPermissions< RecordType >[] | null;
 }
@@ -193,7 +195,7 @@ export function useEntityRecordsWithPermissions< RecordType >(
 								'_links',
 							] ),
 						].join(),
-				  }
+					}
 				: {} ),
 		},
 		options

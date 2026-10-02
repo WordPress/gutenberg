@@ -1,5 +1,5 @@
 import { createContext } from '@wordpress/element';
-import type { ThemeProviderSettings } from './types';
+import type { ThemeProviderSettings } from './types.ts';
 
 interface ThemeContextType {
 	resolvedSettings: ThemeProviderSettings;

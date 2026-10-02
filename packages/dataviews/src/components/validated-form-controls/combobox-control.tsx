@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { ComboboxControl } from '@wordpress/components';
-import { ControlWithError } from './control-with-error';
+import { ControlWithError } from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 
 type ComboboxControlProps = React.ComponentProps< typeof ComboboxControl >;
@@ -39,6 +39,7 @@ const UnforwardedValidatedComboboxControl = (
 	return (
 		// TODO: Bug - Missing value error is not cleared immediately on change, waits for blur.
 		<ControlWithError
+			className="dataviews-validated-control"
 			required={ required }
 			markWhenOptional={ markWhenOptional }
 			ref={ mergedRefs }

@@ -58,14 +58,21 @@ export const route = {
 	},
 	title: async ( { params }: { params: PostEditParams } ) => {
 		const postId = getPostId( params );
-		const post = await resolveSelect( coreStore ).getEntityRecord(
+		const post = ( await resolveSelect( coreStore ).getEntityRecord(
 			'postType',
 			params.type,
 			postId
-		);
+		) ) as { title?: { rendered?: string; raw?: string } } | undefined;
 
 		if ( post?.title?.rendered ) {
 			return decodeEntities( post.title.rendered );
+		}
+
+		// Some records only carry a raw title: the blocks REST controller
+		// strips `title.rendered` from patterns in every context, and a
+		// record received from a save has no rendered fields either.
+		if ( post?.title?.raw ) {
+			return post.title.raw;
 		}
 
 		const postType = await resolveSelect( coreStore ).getPostType(
