@@ -236,16 +236,16 @@ $suggestion-deletion-text-color: color-mix(in srgb, #{$suggestion-deletion-color
 
 // Move ghost: a non-interactive placeholder rendered at a moved block's
 // original position (by the editor-package suggestion HOC) so a reviewer
-// can see where the block came from. Dimmed + struck-through, tinted with
-// the suggester's color (shared with the decorated block at the destination
-// via `--suggestion-author-color`), with a small "Moved from here" label so
-// the ghost reads as one half of a move pair.
+// can see where the block came from. Struck-through and tinted with the
+// suggester's color (shared with the decorated block at the destination via
+// `--suggestion-author-color`), with a small "Moved from here" label so the
+// ghost reads as one half of a move pair. Only the icon is dimmed: the text
+// color is already mixed for contrast, and opacity would undo that.
 .is-suggestion-move-ghost {
 	display: block;
 	position: relative;
 	margin: var(--wpds-dimension-gap-md) 0;
 	padding: var(--wpds-dimension-padding-md);
-	opacity: 0.6;
 	color: $suggestion-text-color;
 	border: var(--wpds-border-width-xs) dotted $suggestion-color;
 	border-radius: var(--wpds-border-radius-sm);
@@ -260,6 +260,10 @@ $suggestion-deletion-text-color: color-mix(in srgb, #{$suggestion-deletion-color
 		font-size: var(--wpds-typography-font-size-xs);
 		font-weight: var(--wpds-typography-font-weight-emphasis);
 		text-decoration: none;
+
+		svg {
+			opacity: 0.6;
+		}
 	}
 
 	.is-suggestion-move-ghost__excerpt {
