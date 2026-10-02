@@ -310,7 +310,11 @@ Actions carry the same `relevance` scale, mapped to surfaces of decreasing promi
 - **Footer, trailing**: `relevance: 'medium'` actions render as compact affordances: icon-only links when the action declares an icon, text links otherwise.
 - **More menu**: the rest collapse into the three-dots menu in the tile header.
 
-Every affordance is a real anchor. Full-bleed widgets have no footer, so all of their actions stay in the menu.
+Every link affordance is a real anchor. Full-bleed widgets have no footer, so all of their actions stay in the menu.
+
+A mounted widget adds to that list at runtime through `useWidgetActions` from `@wordpress/widget-primitives`. The engine merges what it declares with the type's actions by `id` and routes the result on the same scale.
+
+A `callback` action mounts a button, or a menu item in the More menu, disabled while a promise it returns settles.
 
 ## Authoring widgets
 

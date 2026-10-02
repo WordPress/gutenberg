@@ -78,6 +78,7 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/react-inert-value": "file:../react-inert-value",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/style-runtime": "file:../style-runtime",
 		"@wordpress/ui": "file:../ui",
