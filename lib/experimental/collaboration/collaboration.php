@@ -181,6 +181,39 @@ if ( ! function_exists( 'wp_is_post_type_collaboration_disabled' ) ) {
 	}
 }
 
+if ( ! function_exists( 'wp_is_post_collaboration_disabled' ) ) {
+	/**
+	 * Determines whether real-time collaboration is disabled for a post.
+	 *
+	 * Checked when the editor loads, so a status change applies on the next load.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param int|WP_Post $post Post ID or post object.
+	 * @return bool Whether real-time collaboration is disabled for the post.
+	 */
+	function wp_is_post_collaboration_disabled( $post ) {
+		$post = get_post( $post );
+		if ( ! $post ) {
+			return true;
+		}
+
+		if ( wp_is_post_type_collaboration_disabled( $post->post_type ) ) {
+			return true;
+		}
+
+		/**
+		 * Filters whether real-time collaboration is disabled for a post.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param bool    $disabled Whether real-time collaboration is disabled for the post.
+		 * @param WP_Post $post     Post object.
+		 */
+		return (bool) apply_filters( 'wp_is_post_collaboration_disabled', false, $post );
+	}
+}
+
 /**
  * Disables real-time collaboration for post types that cannot persist the
  * CRDT document.
