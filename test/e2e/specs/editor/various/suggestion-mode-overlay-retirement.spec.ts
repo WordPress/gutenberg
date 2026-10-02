@@ -603,7 +603,7 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 		expect( serialized ).toContain( '<em>' );
 	} );
 
-	test( 'invariant: typing over a marked run is declined, not swallowed by an overlay', async ( {
+	test( 'invariant: typing over your own pending addition revises it, not an overlay', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -625,20 +625,19 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 			`${ SUGGESTION_MARK }[data-suggestion-type="add"]`
 		);
 		await expect( addMarker ).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		const id = await addMarker.getAttribute( 'data-suggestion-id' );
 
 		/*
-		 * Select the pending addition and type over it. The type-over would
-		 * wrap the selection in a `del` marker, re-attributing the existing
-		 * marker's text to a second note; the fallback hid the marker instead.
+		 * Select part of the pending addition and type over it. The author
+		 * revises their own proposal in place (#73411, B11); the edit must
+		 * never fall back to an overlay that hides the marker. Another
+		 * author's marker is still refused (see `suggestion-mode.spec.ts`).
 		 */
 		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 3 } );
 		await page.keyboard.type( 'X' );
 
-		await expect(
-			page
-				.locator( '.components-snackbar-list' )
-				.getByText( 'overlaps a pending suggestion' )
-		).toBeVisible();
+		await expect( addMarker ).toHaveText( ' X' );
+		await expect( addMarker ).toHaveAttribute( 'data-suggestion-id', id! );
 
 		await deselect( page );
 
@@ -646,7 +645,7 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 1 );
 		await expect
 			.poll( () => paragraph.textContent() )
-			.toBe( 'Hello world NEW' );
+			.toBe( 'Hello world X' );
 	} );
 
 	/*
