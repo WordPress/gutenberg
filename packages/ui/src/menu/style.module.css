@@ -107,7 +107,6 @@
 			min-width: 0;
 			min-height: var(--wpds-dimension-size-sm);
 			padding-block: var(--wpds-dimension-padding-xs);
-			margin-block-end: var(--wpds-dimension-gap-xs);
 			margin-inline: calc(var(--wp-ui-menu-group-head-padding-inline) - var(--_wp-ui-menu-group-head-padding-base));
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-xs);
@@ -120,7 +119,7 @@
 		.separator {
 			grid-column: prefix-start / content-end;
 			height: var(--wpds-border-width-xs);
-			margin-block: var(--wpds-dimension-gap-xs);
+			margin-block: var(--wpds-dimension-gap-sm);
 			margin-inline: calc(var(--wp-ui-menu-group-head-padding-inline) - var(--_wp-ui-menu-group-head-padding-base));
 			background-color: var(--wpds-color-stroke-surface-neutral-weak);
 
