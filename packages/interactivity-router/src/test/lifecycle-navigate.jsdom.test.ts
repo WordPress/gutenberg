@@ -8,7 +8,7 @@
  * must stay first.
  */
 
-import { describe, expect, test, vi } from 'vitest';
+import { beforeAll, describe, expect, test, vi } from 'vitest';
 import { privateApis, store, watch } from '@wordpress/interactivity';
 import { importScriptModules } from '../assets/script-modules';
 import {
@@ -42,22 +42,26 @@ const { populateServerData } = privateApis(
 let state: ( typeof import( '../index' ) )[ 'state' ];
 let actions: ( typeof import( '../index' ) )[ 'actions' ];
 
+// Readings of `state.navigating` by a watcher subscribed before the router
+// loads.
+const runsBeforeLoad: Array< boolean | undefined > = [];
+
+beforeAll( async () => {
+	const { state: routerState } = store( 'core/router' ) as {
+		state: typeof state;
+	};
+	const stop = watch( () => {
+		runsBeforeLoad.push( routerState.navigating );
+	} );
+	( { state, actions } = await import( '../index' ) );
+	stop();
+} );
+
 describe( 'before the first navigation', () => {
-	test( 'the lifecycle keys are undefined, and loading the router does not re-run watchers that read them', async () => {
-		const { state: routerState } = store( 'core/router' ) as {
-			state: typeof state;
-		};
-		const runs: Array< boolean | undefined > = [];
-		const stop = watch( () => {
-			runs.push( routerState.navigating );
-		} );
-
-		( { state, actions } = await import( '../index' ) );
-
-		expect( runs ).toEqual( [ undefined ] );
+	test( 'the lifecycle keys are undefined, and loading the router does not re-run watchers that read them', () => {
+		expect( runsBeforeLoad ).toEqual( [ undefined ] );
 		expect( state.navigating ).toBeUndefined();
 		expect( state.initiator ).toBeUndefined();
-		stop();
 	} );
 
 	test( 'prefetch() does not change the lifecycle', async () => {

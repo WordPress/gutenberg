@@ -25,3 +25,5 @@ window.performance.measure = () => undefined as unknown as PerformanceMeasure;
 	// eslint-disable-next-line no-console
 	console.error( error );
 } );
+
+export {};
