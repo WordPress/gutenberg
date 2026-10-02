@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Query: Add a "With Results" block, the inverse of Query No Results. It holds the blocks that should only appear when the query has matching posts, so content like a heading or Post Template can be hidden as a group when a Query Loop has nothing to show ([#83125](https://github.com/WordPress/gutenberg/pull/83125)).
+
 ### Enhancements
 
 -   Navigation Link: Search every entity type from the link UI instead of only the link's own type; so a category, tag or post can be added without needing to add that specific type's navigation link block ([#83408](https://github.com/WordPress/gutenberg/pull/83408)).

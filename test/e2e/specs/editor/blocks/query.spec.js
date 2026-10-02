@@ -104,4 +104,90 @@ test.describe( 'Query block', () => {
 			] );
 		} );
 	} );
+
+	test.describe( 'With Results block', () => {
+		test( 'shows content next to Post Template only when the query has matching posts', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/query',
+				attributes: { query: { postType: 'post', inherit: false } },
+				innerBlocks: [
+					{
+						name: 'core/query-with-results',
+						innerBlocks: [
+							{
+								name: 'core/heading',
+								attributes: { content: 'Related posts' },
+							},
+							{ name: 'core/post-template' },
+						],
+					},
+					{
+						name: 'core/query-no-results',
+						innerBlocks: [
+							{
+								name: 'core/paragraph',
+								attributes: { content: 'Nothing found' },
+							},
+						],
+					},
+				],
+			} );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			await expect(
+				page.getByRole( 'heading', { name: 'Related posts' } )
+			).toBeVisible();
+			await expect( page.getByText( 'Nothing found' ) ).toBeHidden();
+		} );
+
+		test( 'hides content next to Post Template, and shows No Results, when the query has no matching posts', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/query',
+				attributes: {
+					query: {
+						postType: 'post',
+						search: 'no-post-should-match-this-search-term',
+						inherit: false,
+					},
+				},
+				innerBlocks: [
+					{
+						name: 'core/query-with-results',
+						innerBlocks: [
+							{
+								name: 'core/heading',
+								attributes: { content: 'Related posts' },
+							},
+							{ name: 'core/post-template' },
+						],
+					},
+					{
+						name: 'core/query-no-results',
+						innerBlocks: [
+							{
+								name: 'core/paragraph',
+								attributes: { content: 'Nothing found' },
+							},
+						],
+					},
+				],
+			} );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			await expect(
+				page.getByRole( 'heading', { name: 'Related posts' } )
+			).toBeHidden();
+			await expect( page.getByText( 'Nothing found' ) ).toBeVisible();
+		} );
+	} );
 } );
