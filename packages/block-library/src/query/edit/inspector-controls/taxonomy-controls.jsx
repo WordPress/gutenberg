@@ -258,13 +258,6 @@ function TaxonomyItem( {
 				taxonomy.slug,
 				{
 					...FLAT_QUERY,
-					// Exclude the opposite control's terms, to prevent users
-					// from selecting the same term in both the include and the
-					// exclude control. The terms selected in this control stay
-					// listed, so that they can be deselected from the list and
-					// so that selecting one does not change the query, which
-					// would refetch the list mid-selection.
-					exclude: oppositeTermIds,
 					// Without a search, list the terms so they can be browsed.
 					...( search
 						? { search, per_page: MAX_SEARCH_RESULTS }
@@ -279,7 +272,7 @@ function TaxonomyItem( {
 				),
 			};
 		},
-		[ isHierarchical, hasOpened, search, taxonomy.slug, oppositeTermIds ]
+		[ isHierarchical, hasOpened, search, taxonomy.slug ]
 	);
 	// `existingTerms` are the selected terms of a flat taxonomy, fetched with the same fields as the list.
 	// They are used to extract the terms' names to populate the control properly
@@ -327,14 +320,12 @@ function TaxonomyItem( {
 		);
 	}, [ termIds, selectedItemById ] );
 	const items = useMemo( () => {
-		if ( ! isHierarchical ) {
-			return listedTerms.map( termToItem );
-		}
-		const excludedIds = new Set( oppositeTermIds );
-		return Array.from( treeItemById )
-			.filter( ( [ id ] ) => ! excludedIds.has( id ) )
-			.map( ( [ , item ] ) => item );
-	}, [ isHierarchical, listedTerms, treeItemById, oppositeTermIds ] );
+		const excludedIds = new Set( oppositeTermIds.map( String ) );
+		const listed = isHierarchical
+			? Array.from( treeItemById.values() )
+			: listedTerms.map( termToItem );
+		return listed.filter( ( item ) => ! excludedIds.has( item.value ) );
+	}, [ isHierarchical, treeItemById, listedTerms, oppositeTermIds ] );
 	const onInputValueChange = ( nextInputValue ) => {
 		setInputValue( nextInputValue );
 		if ( ! isHierarchical ) {
