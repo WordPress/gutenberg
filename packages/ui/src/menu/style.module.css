@@ -11,6 +11,7 @@
 			--wp-ui-menu-min-width: 160px;
 			--wp-ui-menu-max-width: var(--wpds-dimension-surface-width-md);
 			--wp-ui-menu-item-padding-inline: var(--wpds-dimension-padding-md);
+			--_wp-ui-menu-item-padding-inline-start: var(--wp-ui-menu-item-padding-inline);
 			--_wp-ui-menu-group-head-padding-base: var(--wpds-dimension-padding-md);
 			--wp-ui-menu-group-head-padding-inline: var(--_wp-ui-menu-group-head-padding-base);
 			--wp-ui-menu-selection-indicator-track-size: 0px;
@@ -33,6 +34,7 @@
 
 			&:has(.item-selection-indicator) {
 				--wp-ui-menu-item-padding-inline: 6px;
+				--_wp-ui-menu-item-padding-inline-start: max(0px, calc(var(--wp-ui-menu-item-padding-inline) - var(--wpds-dimension-gap-xs)));
 				--wp-ui-menu-selection-indicator-track-size: var(--wpds-dimension-size-xs);
 			}
 		}
@@ -67,7 +69,7 @@
 
 			display: grid;
 			grid-template-columns:
-				[item-padding-start] var(--wp-ui-menu-item-padding-inline)
+				[item-padding-start] var(--_wp-ui-menu-item-padding-inline-start)
 				[selection-start] var(--wp-ui-menu-selection-indicator-track-size)
 				[selection-end] var(--wp-ui-menu-selection-indicator-gap)
 				[prefix-start] max-content
@@ -133,7 +135,7 @@
 			display: grid;
 			grid-column: 1 / -1;
 			grid-template-columns:
-				[item-padding-start] var(--wp-ui-menu-item-padding-inline)
+				[item-padding-start] var(--_wp-ui-menu-item-padding-inline-start)
 				[selection-start] var(--wp-ui-menu-selection-indicator-track-size)
 				[selection-end] var(--wp-ui-menu-selection-indicator-gap)
 				[prefix-start] max-content
