@@ -10,18 +10,18 @@ const DEFAULT_RENDER = <Text />;
 /**
  * Displays the formatted progress value. Use a child function to customize it.
  */
-export const Value = forwardRef< HTMLSpanElement, ValueProps >(
-	function ProgressValue(
-		{ className, render = DEFAULT_RENDER, ...props },
-		ref
-	) {
-		return (
-			<_Progress.Value
-				ref={ ref }
-				render={ render }
-				className={ clsx( styles.value, className ) }
-				{ ...props }
-			/>
-		);
-	}
-);
+const Value = forwardRef< HTMLSpanElement, ValueProps >( function ProgressValue(
+	{ className, render = DEFAULT_RENDER, ...props },
+	ref
+) {
+	return (
+		<_Progress.Value
+			ref={ ref }
+			render={ render }
+			className={ clsx( styles.value, className ) }
+			{ ...props }
+		/>
+	);
+} );
+
+export { Value };

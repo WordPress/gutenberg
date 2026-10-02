@@ -10,18 +10,18 @@ const DEFAULT_RENDER = <Text />;
 /**
  * The visible label, automatically used as the progress bar's accessible name.
  */
-export const Label = forwardRef< HTMLSpanElement, LabelProps >(
-	function ProgressLabel(
-		{ className, render = DEFAULT_RENDER, ...props },
-		ref
-	) {
-		return (
-			<_Progress.Label
-				ref={ ref }
-				render={ render }
-				className={ clsx( styles.label, className ) }
-				{ ...props }
-			/>
-		);
-	}
-);
+const Label = forwardRef< HTMLSpanElement, LabelProps >( function ProgressLabel(
+	{ className, render = DEFAULT_RENDER, ...props },
+	ref
+) {
+	return (
+		<_Progress.Label
+			ref={ ref }
+			render={ render }
+			className={ clsx( styles.label, className ) }
+			{ ...props }
+		/>
+	);
+} );
+
+export { Label };

@@ -15,21 +15,21 @@ const DEFAULT_RENDER = ( props: React.ComponentProps< typeof Stack > ) => (
  * Pass `null` as the value for indeterminate progress.
  * Use `Progress.Label`, `aria-label`, or `aria-labelledby` to name the task.
  */
-export const Root = forwardRef< HTMLDivElement, RootProps >(
-	function ProgressRoot(
-		{ className, render = DEFAULT_RENDER, ...props },
-		ref
-	) {
-		return (
-			<_Progress.Root
-				ref={ ref }
-				render={ render }
-				getAriaValueText={ ( formattedValue ) =>
-					formattedValue || __( 'In progress' )
-				}
-				className={ clsx( resetStyles[ 'box-sizing' ], className ) }
-				{ ...props }
-			/>
-		);
-	}
-);
+const Root = forwardRef< HTMLDivElement, RootProps >( function ProgressRoot(
+	{ className, render = DEFAULT_RENDER, ...props },
+	ref
+) {
+	return (
+		<_Progress.Root
+			ref={ ref }
+			render={ render }
+			getAriaValueText={ ( formattedValue ) =>
+				formattedValue || __( 'In progress' )
+			}
+			className={ clsx( resetStyles[ 'box-sizing' ], className ) }
+			{ ...props }
+		/>
+	);
+} );
+
+export { Root };

@@ -8,7 +8,7 @@ import styles from './style.module.css';
 /**
  * The filled portion of the track, or an animation for indeterminate progress.
  */
-export const Indicator = forwardRef< HTMLDivElement, IndicatorProps >(
+const Indicator = forwardRef< HTMLDivElement, IndicatorProps >(
 	function ProgressIndicator( { color, className, style, ...props }, ref ) {
 		return (
 			<_Progress.Indicator
@@ -24,3 +24,5 @@ export const Indicator = forwardRef< HTMLDivElement, IndicatorProps >(
 		);
 	}
 );
+
+export { Indicator };

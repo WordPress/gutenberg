@@ -15,15 +15,11 @@ const meta: Meta< StoryArgs > = {
 		'Progress.Label': Progress.Label,
 		'Progress.Value': Progress.Value,
 	},
-	argTypes: {
-		color: { control: 'text' },
-		value: { control: { type: 'number', min: 0, max: 100 } },
-	},
 	parameters: {
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
-			notes: 'New component, pending design review. The existing ProgressBar in @wordpress/components remains supported.',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`.',
 		},
 	},
 	args: { value: 60 },
@@ -62,14 +58,14 @@ export const BarOnly: Story = {
 
 /** The color prop changes the indicator, leaving the other parts unchanged. */
 export const CustomColor: Story = {
-	args: { color: '#8b2fc9' },
+	args: { color: '#e85d04' },
 };
 
 export const CurrentColor: Story = {
 	args: { color: 'currentColor' },
 	decorators: [
 		( Story ) => (
-			<div style={ { color: '#8b2fc9' } }>
+			<div style={ { color: '#e85d04' } }>
 				<Story />
 			</div>
 		),
@@ -77,7 +73,7 @@ export const CurrentColor: Story = {
 };
 
 /** Use the same task-specific units for visible and accessible value text. */
-export const CustomRange: Story = {
+export const CustomValueFormat: Story = {
 	args: {
 		value: 3,
 		max: 10,
