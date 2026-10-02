@@ -15,8 +15,9 @@ const meta: Meta< typeof ProgressBar > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'recommended',
+			status: 'not-recommended',
 			whereUsed: 'global',
+			notes: 'Use [`Progress`](?path=/docs/design-system-components-progress--docs) from `@wordpress/ui` instead.',
 		},
 	},
 };

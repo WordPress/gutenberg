@@ -1,3 +1,4 @@
+import { Progress } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalText as WCText,
@@ -7,7 +8,6 @@ import {
 	Notice,
 	FormFileUpload,
 	FlexItem,
-	ProgressBar,
 } from '@wordpress/components';
 import { useContext, useState } from '@wordpress/element';
 import type { FontFace } from '@wordpress/core-data';
@@ -224,7 +224,15 @@ function UploadFonts() {
 				{ isUploading && (
 					<FlexItem>
 						<div className="font-library__upload-area">
-							<ProgressBar />
+							<Progress.Root
+								className="font-library__progress"
+								value={ null }
+								aria-label={ __( 'Uploading fonts' ) }
+							>
+								<Progress.Track>
+									<Progress.Indicator />
+								</Progress.Track>
+							</Progress.Root>
 						</div>
 					</FlexItem>
 				) }

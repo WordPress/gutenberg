@@ -8,6 +8,7 @@
 
 ### Internal
 
+-   Font Library: Replace `ProgressBar` with `Progress` from `@wordpress/ui`.
 -   Font Library: Use the public `Menu` from `@wordpress/ui` for font collection actions ([#82965](https://github.com/WordPress/gutenberg/pull/82965)).
 
 ## 1.23.0 (2026-09-23)
