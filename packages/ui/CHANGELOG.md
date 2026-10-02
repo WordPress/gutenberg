@@ -12,10 +12,12 @@
 ### New Features
 
 -   `Autocomplete`, `Combobox`, `Select`, `SearchableSelect`, `SearchableChipSelect`, and the select controls: Add `Separator` subcomponents for dividing popup items and groups ([#83776](https://github.com/WordPress/gutenberg/pull/83776)).
+-   `Progress`: Add a compound progress component with a track, indicator, accessible label, and formatted value. ([#83781](https://github.com/WordPress/gutenberg/pull/83781))
 -   Add `SearchableSelectControl` component ([#80979](https://github.com/WordPress/gutenberg/pull/80979)).
 
 ### Enhancements
 
+-   `Menu`: Align group labels and separators with item labels when a radio or checkbox column indents those labels ([#83993](https://github.com/WordPress/gutenberg/pull/83993)).
 -   `Checkbox`, `CheckboxControl`, `CheckboxGroup`: Mark as recommended for use in a WordPress environment ([#83771](https://github.com/WordPress/gutenberg/pull/83771)).
 -   `Spinner`: Show a trackless half-circle like the `Button` loading indicator, with a `color` prop that accepts any CSS color value and defaults to weak neutral foreground. Keep the arc visible in forced-colors mode ([#83775](https://github.com/WordPress/gutenberg/pull/83775)).
 -   Native text inputs and textareas use at least 16px below 600px to avoid iOS Safari zoom. Prefix and suffix text on `Input` match that size. Select and combobox trigger text stay at the `md` font size. ([#82764](https://github.com/WordPress/gutenberg/pull/82764))
@@ -33,6 +35,7 @@
 ### Internal
 
 -   Document component status in `CONTRIBUTING.md` ([#83536](https://github.com/WordPress/gutenberg/pull/83536)).
+-   Declare `@types/react-dom` as a dev dependency ([#84013](https://github.com/WordPress/gutenberg/pull/84013)).
 
 ### Documentation
 
