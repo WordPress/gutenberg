@@ -19,7 +19,7 @@ const meta: Meta< StoryArgs > = {
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`.',
+			notes: 'Not yet recommended.',
 		},
 	},
 	args: { value: 60 },
