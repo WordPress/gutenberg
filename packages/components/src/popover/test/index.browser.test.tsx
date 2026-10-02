@@ -10,7 +10,6 @@ import {
 	placementToMotionAnimationProps,
 } from '../utils';
 import Popover from '..';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '../style.scss';
 import { Provider as SlotFillProvider } from '../../slot-fill';
 import type { PopoverProps } from '../types';
