@@ -6,6 +6,9 @@ import {
 	alignLeft,
 	alignCenter,
 	alignRight,
+	copy,
+	info,
+	lock,
 } from '@wordpress/icons';
 import {
 	ariaKeyShortcut,
@@ -183,11 +186,7 @@ export const Default: Story = {
 								<Menu.Item>
 									<Menu.ItemLabel>Favorites</Menu.ItemLabel>
 								</Menu.Item>
-								<Menu.Item
-									prefix={
-										<Menu.PrefixIcon icon={ archive } />
-									}
-								>
+								<Menu.Item>
 									<Menu.ItemLabel>Archive</Menu.ItemLabel>
 								</Menu.Item>
 								<Menu.SubmenuRoot>
@@ -266,14 +265,14 @@ export const RichItems: Story = {
 			<>
 				<Menu.Trigger>Open menu</Menu.Trigger>
 				<Menu.Popup>
-					<Menu.Item>
+					<Menu.Item prefix={ <Menu.PrefixIcon icon={ info } /> }>
 						<Menu.ItemLabel>Label</Menu.ItemLabel>
 						<Menu.ItemDescription>Help text</Menu.ItemDescription>
 						<Menu.ItemDescription>
 							Additional context
 						</Menu.ItemDescription>
 					</Menu.Item>
-					<Menu.Item>
+					<Menu.Item prefix={ <Menu.PrefixIcon icon={ info } /> }>
 						<Menu.ItemLabel>
 							A long menu item label that wraps onto multiple
 							lines
@@ -293,7 +292,11 @@ export const RichItems: Story = {
 							Description text keeps the same highlighted area.
 						</Menu.ItemDescription>
 					</Menu.Item>
-					<Menu.Item disabled shortcut={ SHORTCUTS.downloads }>
+					<Menu.Item
+						disabled
+						prefix={ <Menu.PrefixIcon icon={ lock } /> }
+						shortcut={ SHORTCUTS.downloads }
+					>
 						<Menu.ItemLabel>Disabled item</Menu.ItemLabel>
 						<Menu.ItemDescription>
 							Disabled foreground treatment applies to all item
@@ -328,7 +331,10 @@ export const GroupedItems: Story = {
 						>
 							<Menu.ItemLabel>Save</Menu.ItemLabel>
 						</Menu.Item>
-						<Menu.Item suffix="Edited">
+						<Menu.Item
+							prefix={ <Menu.PrefixIcon icon={ copy } /> }
+							suffix="Edited"
+						>
 							<Menu.ItemLabel>Save as copy…</Menu.ItemLabel>
 							<Menu.ItemDescription>
 								Create a duplicate from the current version.

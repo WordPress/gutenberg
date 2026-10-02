@@ -113,6 +113,14 @@ export interface MenuItemLayoutProps {
 	/**
 	 * Presentational content displayed before the item label.
 	 * Use `Menu.PrefixIcon` for consistent icon sizing and alignment.
+	 *
+	 * For the best visual results, use prefix icons on every item in the same
+	 * group, or omit them from the whole group. An icon on any item reserves
+	 * space before every label in that group, including items without icons.
+	 * Labels stay aligned, but sparse icons can look visually unbalanced.
+	 * Keep exceptions rare and prefer icons on almost all items if needed.
+	 * Each `Menu.Group` and `Menu.RadioGroup` has its own icon column. Items
+	 * directly inside `Menu.Popup` share one, even across `Menu.Separator`.
 	 */
 	prefix?: ReactNode;
 
