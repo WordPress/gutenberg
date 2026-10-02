@@ -420,6 +420,7 @@ describe( 'getEntityRecords', () => {
 			receiveEntityRecords: vi.fn(),
 			__unstableAcquireStoreLock: vi.fn(),
 			__unstableReleaseStoreLock: vi.fn(),
+			finishResolutions: vi.fn(),
 		} );
 
 		// Provide response
@@ -452,6 +453,7 @@ describe( 'getEntityRecords', () => {
 			receiveEntityRecords: vi.fn(),
 			__unstableAcquireStoreLock: vi.fn(),
 			__unstableReleaseStoreLock: vi.fn(),
+			finishResolutions: vi.fn(),
 		} );
 
 		// Provide response
@@ -682,6 +684,7 @@ describe( 'taxonomy pagination', () => {
 			receiveEntityRecords: vi.fn(),
 			__unstableAcquireStoreLock: vi.fn().mockResolvedValue( 'lock' ),
 			__unstableReleaseStoreLock: vi.fn(),
+			finishResolutions: vi.fn(),
 		} );
 		triggerFetch.mockReset();
 
@@ -708,10 +711,14 @@ describe( 'taxonomy pagination', () => {
 				.mockResolvedValue( loadedTaxonomyEntities ),
 		};
 
-		triggerFetch.mockResolvedValueOnce( [
-			{ id: 1, name: 'Category 1' },
-			{ id: 2, name: 'Category 2' },
-		] );
+		triggerFetch.mockResolvedValueOnce( {
+			json: () =>
+				Promise.resolve( [
+					{ id: 1, name: 'Category 1' },
+					{ id: 2, name: 'Category 2' },
+				] ),
+			headers: { get: () => null },
+		} );
 
 		await getEntityRecords( 'taxonomy', 'category', {
 			per_page: 2,

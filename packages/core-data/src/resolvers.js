@@ -499,8 +499,11 @@ export const getEntityRecords =
 
 				dispatch.__unstableReleaseStoreLock( lock );
 			} );
-		} catch {
+		} catch ( error ) {
 			dispatch.__unstableReleaseStoreLock( lock );
+			// Fail the resolution, so the failure is not mistaken for a
+			// successful response.
+			throw error;
 		}
 	};
 

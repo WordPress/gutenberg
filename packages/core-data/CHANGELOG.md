@@ -11,6 +11,7 @@
 
 -   `__experimentalFetchLinkSuggestions`: rank results by type (content, taxonomy, post format, attachment), and return everything the endpoints gave rather than cutting the merged results. `perPage` is now the page size asked of each type rather than a limit on what they add up to, so `page` reaches every result ([#83407](https://github.com/WordPress/gutenberg/pull/83407)).
 -   Undo and redo stopped working for entities that real-time collaboration does not sync, such as a post type excluded from collaboration, while a synced entity is loaded in the same editor. core-data's undo manager now stays in charge for every entity and delegates to the sync manager only for synced entities ([#83888](https://github.com/WordPress/gutenberg/pull/83888)).
+-   `getEntityRecords`: a failed request now fails the resolution instead of finishing it without records, so `resolveSelect` rejects with the request's error and `hasResolutionFailed` reports it. Previously the failure was indistinguishable from a successful response.
 -   A failed load of an entity kind's configs, such as the `taxonomy` kind after a rate-limited request, no longer leaves those entities unknown for the rest of the session. `getEntitiesConfig` now fails its resolution, and the next request for an entity of that kind loads the configs again. Saves and deletes reject with the load error when `throwOnError` is set.
 
 ### Internal

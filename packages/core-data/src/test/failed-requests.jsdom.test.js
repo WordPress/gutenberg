@@ -50,6 +50,30 @@ describe( 'failed requests', () => {
 		triggerFetch.mockReset();
 	} );
 
+	describe( 'getEntityRecords', () => {
+		it( 'fails the resolution when the request fails', async () => {
+			mockResponses(
+				{ 'OPTIONS /wp/v2/settings': {} },
+				new Set( [ '/wp/v2/taxonomies?context=edit' ] )
+			);
+
+			await expect(
+				registry
+					.resolveSelect( coreDataStore )
+					.getEntityRecords( 'root', 'taxonomy' )
+			).rejects.toBe( TOO_MANY_REQUESTS );
+
+			const select = registry.select( coreDataStore );
+			expect(
+				select.hasResolutionFailed( 'getEntityRecords', [
+					'root',
+					'taxonomy',
+				] )
+			).toBe( true );
+			expect( select.getEntityRecords( 'root', 'taxonomy' ) ).toBeNull();
+		} );
+	} );
+
 	describe( 'loading entity configs', () => {
 		it( 'fails the resolution of records whose configs fail to load', async () => {
 			mockResponses( {}, new Set( [ TAXONOMIES_PATH ] ) );
