@@ -34,7 +34,6 @@ export function NoteThread( {
 	onEditNote,
 	onAddReply,
 	onDeleteNote,
-	onToggleBlockReaction,
 	isSelected,
 	sidebarRef,
 	floating,
@@ -239,15 +238,10 @@ export function NoteThread( {
 					{ __( 'Original block deleted.' ) }
 				</p>
 			) }
-			{ note.blockReactions && (
+			{ note.hasBlockReactions && (
 				// Reactions on the block itself lead the block's first
 				// thread, ahead of the notes and their own reactions.
-				<BlockReactionsRow
-					clientId={ note.blockClientId }
-					reactionsId={ note.blockReactions.reactionsId }
-					reactions={ note.blockReactions.summary }
-					onToggleBlockReaction={ onToggleBlockReaction }
-				/>
+				<BlockReactionsRow clientId={ note.blockClientId } />
 			) }
 			<Note
 				note={ note }

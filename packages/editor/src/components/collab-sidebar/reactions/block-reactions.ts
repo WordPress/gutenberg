@@ -41,33 +41,17 @@ export const BLOCK_REACTION_PARAM = 'block';
 /**
  * Shape the server accepts for a block anchor.
  */
-export const REACTIONS_ID_PATTERN = /^[a-z0-9]{6,16}$/;
-
-const REACTIONS_ID_LENGTH = 8;
-const BASE36 = 'abcdefghijklmnopqrstuvwxyz0123456789';
+const REACTIONS_ID_PATTERN = /^[a-z0-9]{6,16}$/;
 
 /**
  * Mints a block anchor: eight lowercase base-36 characters.
  *
- * Uses the Web Crypto API when it is there (it is, in any secure or
- * insecure browsing context), and falls back to `Math.random` otherwise.
- *
  * @return A fresh anchor matching `REACTIONS_ID_PATTERN`.
  */
 export function generateReactionsId(): string {
-	const cryptoApi = globalThis.crypto;
-	if ( cryptoApi?.getRandomValues ) {
-		const bytes = cryptoApi.getRandomValues(
-			new Uint8Array( REACTIONS_ID_LENGTH )
-		);
-		return Array.from( bytes, ( byte ) => BASE36[ byte % 36 ] ).join( '' );
-	}
-
-	let id = '';
-	while ( id.length < REACTIONS_ID_LENGTH ) {
-		id += Math.random().toString( 36 ).slice( 2 );
-	}
-	return id.slice( 0, REACTIONS_ID_LENGTH );
+	const BASE36 = 'abcdefghijklmnopqrstuvwxyz0123456789';
+	const bytes = globalThis.crypto.getRandomValues( new Uint8Array( 8 ) );
+	return Array.from( bytes, ( byte ) => BASE36[ byte % 36 ] ).join( '' );
 }
 
 /**
@@ -84,73 +68,6 @@ export function getBlockReactionsId(
 	return typeof value === 'string' && REACTIONS_ID_PATTERN.test( value )
 		? value
 		: undefined;
-}
-
-/**
- * Returns the metadata with a reaction anchor added.
- *
- * @param metadata    The block's current `metadata` attribute.
- * @param reactionsId The anchor to write.
- * @return Updated metadata.
- */
-export function addReactionsIdToMetadata(
-	metadata: Record< string, unknown > | undefined | null,
-	reactionsId: string
-): Record< string, unknown > {
-	return { ...( metadata ?? {} ), reactionsId };
-}
-
-interface EnsureBlockReactionsIdRegistry {
-	getBlockAttributes: (
-		clientId: string
-	) => Record< string, any > | null | undefined;
-	updateBlockAttributes: (
-		clientId: string,
-		attributes: Record< string, unknown >
-	) => void;
-	cleanEmptyObject: < T >( object: T ) => T | undefined;
-	generateId?: () => string;
-}
-
-/**
- * Returns the block's reaction anchor, minting and writing one when the
- * block has none.
- *
- * The write is synchronous so two toggles in quick succession share one
- * anchor. Like the first note on a block, it makes the post dirty until
- * saved; a reaction created before that save is orphaned if the save never
- * happens, which is the same trade-off notes already make.
- *
- * @param clientId                       The block client id.
- * @param registry                       Block-editor selectors and actions.
- * @param registry.getBlockAttributes    Block-editor selector.
- * @param registry.updateBlockAttributes Block-editor action.
- * @param registry.cleanEmptyObject      Drops empty metadata objects.
- * @param registry.generateId            Anchor generator, overridable in tests.
- * @return The anchor.
- */
-export function ensureBlockReactionsId(
-	clientId: string,
-	{
-		getBlockAttributes,
-		updateBlockAttributes,
-		cleanEmptyObject,
-		generateId = generateReactionsId,
-	}: EnsureBlockReactionsIdRegistry
-): string {
-	const metadata = getBlockAttributes( clientId )?.metadata;
-	const existing = getBlockReactionsId( metadata );
-	if ( existing ) {
-		return existing;
-	}
-
-	const reactionsId = generateId();
-	updateBlockAttributes( clientId, {
-		metadata: cleanEmptyObject(
-			addReactionsIdToMetadata( metadata, reactionsId )
-		),
-	} );
-	return reactionsId;
 }
 
 /**
@@ -198,37 +115,6 @@ export function applyReactionSummaryDelta(
 }
 
 /**
- * Folds a completed block reaction toggle into a post's block summary.
- *
- * @param blockSummary    The cached summary for every block.
- * @param reactionsId     The block anchor that changed.
- * @param slug            The reaction storage slug that changed.
- * @param addedReactionId The new reaction's comment ID when one was added.
- * @return A new block summary; untouched anchors keep their identity.
- */
-export function applyBlockReactionDelta(
-	blockSummary: BlockReactionSummary | null | undefined,
-	reactionsId: string,
-	slug: string,
-	addedReactionId?: number
-): BlockReactionSummary {
-	const next = { ...( blockSummary || {} ) };
-	const summary = applyReactionSummaryDelta(
-		next[ reactionsId ],
-		slug,
-		addedReactionId
-	);
-
-	if ( Object.keys( summary ).length > 0 ) {
-		next[ reactionsId ] = summary;
-	} else {
-		delete next[ reactionsId ];
-	}
-
-	return next;
-}
-
-/**
  * A stable string for a target, used as a cache key.
  *
  * @param target The reaction target.
@@ -264,10 +150,11 @@ export function getReactionsQueryArgs(
 /**
  * The sidebar entry type for a block that has reactions but no note.
  */
-export const BLOCK_REACTIONS_ENTRY_TYPE = 'block-reactions';
+const BLOCK_REACTIONS_ENTRY_TYPE = 'block-reactions';
 
 /**
- * Whether a sidebar thread is the synthetic block-reactions entry.
+ * Whether a sidebar thread is the entry for a block with reactions but no
+ * note.
  *
  * @param thread A thread from the notes list.
  * @return True for a block-reactions entry.
@@ -278,12 +165,88 @@ export function isBlockReactionsEntry(
 	return thread?.type === BLOCK_REACTIONS_ENTRY_TYPE;
 }
 
+export interface SidebarThread {
+	id: number | string;
+	blockClientId?: string | null;
+	[ key: string ]: unknown;
+}
+
+export interface SidebarThreads {
+	notes: SidebarThread[];
+	unresolvedNotes: SidebarThread[];
+}
+
 /**
- * The thread id of a block's synthetic reactions entry.
+ * Adds block reactions to the sidebar's thread list.
  *
- * @param reactionsId The block anchor.
- * @return The entry id.
+ * A block's reactions row rides on the block's first unresolved thread,
+ * flagged `hasBlockReactions`. The floating view lists only unresolved
+ * threads, so a block with no unresolved note gets an entry of its own,
+ * placed among the unresolved threads in document order. An anchor whose
+ * block is gone is not listed: a reaction carries no content worth keeping
+ * in view, and undo restores the block with its anchor.
+ *
+ * @param threads            `notes` (unresolved, orphans, resolved) and
+ *                           `unresolvedNotes` from `useNoteThreads`.
+ * @param summary            Every block's reaction summary on the post.
+ * @param clientIds          Every block client id, in document order.
+ * @param getBlockAttributes Block-editor selector.
+ * @return The lists with block reactions added.
  */
-export function getBlockReactionsEntryId( reactionsId: string ): string {
-	return `block-reactions:${ reactionsId }`;
+export function addBlockReactionEntries(
+	threads: SidebarThreads,
+	summary: BlockReactionSummary,
+	clientIds: string[],
+	getBlockAttributes: (
+		clientId: string
+	) => { metadata?: { reactionsId?: unknown } } | null | undefined
+): SidebarThreads {
+	if ( ! Object.keys( summary ).length ) {
+		return threads;
+	}
+
+	const unresolved = [ ...threads.unresolvedNotes ];
+	const blockIndex = new Map< string, number >();
+	clientIds.forEach( ( clientId, index ) => {
+		blockIndex.set( clientId, index );
+		const reactionsId = getBlockReactionsId(
+			getBlockAttributes( clientId )?.metadata
+		);
+		if ( ! reactionsId || ! summary[ reactionsId ] ) {
+			return;
+		}
+		const threadIndex = unresolved.findIndex(
+			( thread ) => thread.blockClientId === clientId
+		);
+		if ( threadIndex !== -1 ) {
+			unresolved[ threadIndex ] = {
+				...unresolved[ threadIndex ],
+				hasBlockReactions: true,
+			};
+		} else {
+			unresolved.push( {
+				id: `block-reactions:${ reactionsId }`,
+				type: BLOCK_REACTIONS_ENTRY_TYPE,
+				parent: 0,
+				status: 'hold',
+				blockClientId: clientId,
+				reply: [],
+			} );
+		}
+	} );
+	// A stable sort, so threads on one block keep their order.
+	unresolved.sort(
+		( a, b ) =>
+			( blockIndex.get( a.blockClientId ?? '' ) ?? 0 ) -
+			( blockIndex.get( b.blockClientId ?? '' ) ?? 0 )
+	);
+
+	return {
+		notes: [
+			...unresolved,
+			// Orphans and resolved threads, as they were.
+			...threads.notes.slice( threads.unresolvedNotes.length ),
+		],
+		unresolvedNotes: unresolved,
+	};
 }

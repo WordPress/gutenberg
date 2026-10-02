@@ -26,15 +26,12 @@ import {
 	BlockReactionsRow,
 	useBlockReactionsLabel,
 } from './block-reactions-row';
-import type { ReactionSummary } from './block-reactions';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
 export interface BlockReactionsEntryData {
 	id: string;
 	blockClientId: string;
-	reactionsId: string;
-	reactions: ReactionSummary;
 }
 
 interface FloatingProps {
@@ -48,15 +45,11 @@ interface FloatingProps {
 }
 
 interface BlockReactionsEntryProps {
-	entry: BlockReactionsEntryData;
+	note: BlockReactionsEntryData;
 	isSelected: boolean;
 	sidebarRef: RefObject< HTMLElement | null >;
 	floating?: FloatingProps;
 	onKeyDown: ( event: KeyboardEvent< HTMLElement > ) => void;
-	onToggleBlockReaction: ( args: {
-		clientId: string;
-		emoji: string;
-	} ) => void;
 }
 
 /**
@@ -66,22 +59,23 @@ interface BlockReactionsEntryProps {
  * block highlighting) so keyboard navigation and focus helpers treat it as
  * one more thread in the list.
  *
- * @param props                       Component props.
- * @param props.entry                 The synthetic entry from `useNoteThreads`.
- * @param props.isSelected            Whether the entry is the selected note.
- * @param props.sidebarRef            The sidebar list element.
- * @param props.floating              Floating-board registration, in the
- *                                    floating sidebar.
- * @param props.onKeyDown             List keyboard navigation.
- * @param props.onToggleBlockReaction Adds or removes a reaction on the block.
+ * Takes the same props as `NoteThread`, so the list renders either one,
+ * and ignores the note-only ones.
+ *
+ * @param props            Component props.
+ * @param props.note       The synthetic entry from `useNoteThreads`.
+ * @param props.isSelected Whether the entry is the selected note.
+ * @param props.sidebarRef The sidebar list element.
+ * @param props.floating   Floating-board registration, in the floating
+ *                         sidebar.
+ * @param props.onKeyDown  List keyboard navigation.
  */
 export function BlockReactionsEntry( {
-	entry,
+	note: entry,
 	isSelected,
 	sidebarRef,
 	floating,
 	onKeyDown,
-	onToggleBlockReaction,
 }: BlockReactionsEntryProps ) {
 	const isFloating = !! floating;
 	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
@@ -180,9 +174,6 @@ export function BlockReactionsEntry( {
 		>
 			<BlockReactionsRow
 				clientId={ entry.blockClientId }
-				reactionsId={ entry.reactionsId }
-				reactions={ entry.reactions }
-				onToggleBlockReaction={ onToggleBlockReaction }
 				onRemoveLast={ () => {
 					// The entry unmounts with its last pill, so focus has to
 					// leave before that happens.

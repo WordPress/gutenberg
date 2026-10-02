@@ -35,8 +35,8 @@ collab-sidebar/
 │   ├── emojibase-data.ts            Emojibase dataset loading, labels, and settings
 │   ├── frequent-emojis.ts           useFrequentEmojis - persisted "Frequently used" section
 │   ├── reaction-emojis.ts           named reaction set, storage keys, and the site's emoji rules
-│   ├── block-reactions.ts           reaction target type, anchor helpers, summary delta helpers
-│   ├── use-block-reactions.ts       useBlockReactionSummary, useBlockReactionActions
+│   ├── block-reactions.ts           reaction target type, block anchor helpers, sidebar entry merging
+│   ├── use-block-reaction.ts        useBlockReaction( clientId ) - a block's reactions + toggleReaction
 │   ├── block-reactions-row.tsx      BlockReactionsRow - a block's own reactions (icon + pills + trigger)
 │   ├── block-reactions-entry.tsx    BlockReactionsEntry - sidebar entry for a block with reactions but no note
 │   └── block-reactions-toolbar-button.tsx  BlockReactionsToolbarButton - block-toolbar "React to block" trigger
@@ -57,7 +57,7 @@ NotesSidebarContainer (index.jsx)         - gates on post type support
  └── NotesSidebar (index.jsx)             - owns sidebarRef + useNoteThreads + sidebar registration
       ├── AddNoteMenuItem                - slot fill in the block toolbar
       ├── NoteAvatarIndicator            - slot fill in the block toolbar (per-thread avatars)
-      ├── SelectedBlockReactionsToolbarButton - slot fill in the block toolbar ("React to block")
+      ├── BlockReactionsToolbarButton - slot fill in the block toolbar ("React to block")
       ├── PluginSidebar (all-notes)      - full sidebar
       │    └── Notes (notes.jsx)          - owns outer Stack + aria-label + useNoteActions + keyboard nav
       │         ├── AddNote              - rendered when no threads (template-locked) or selectedNote === 'new'
@@ -79,11 +79,11 @@ NotesSidebarContainer (index.jsx)         - gates on post type support
 
 ## Block reactions
 
-A reaction on a block is a top-level `reaction` comment on the post (no parent), anchored to the block through the `_wp_reaction_block` comment meta. The anchor is `metadata.reactionsId` on the block: a short id the editor mints on the block's first reaction (`ensureBlockReactionsId` in `block-reactions.ts`), which like the first note makes the post dirty until saved. Blocks have no server-side identity, so the anchor lives in the content.
+A reaction on a block is a top-level `reaction` comment on the post (no parent), anchored to the block through the `_wp_reaction_block` comment meta. The anchor is `metadata.reactionsId` on the block: a short id the editor mints on the block's first reaction, which like the first note makes the post dirty until saved. Blocks have no server-side identity, so the anchor lives in the content.
 
-The server returns every block reaction on the post as one read-only `block_reaction_summary` field on the post record (`edit` context, single-item requests only), keyed by anchor and then by emoji slug with the same `{ count, reacted, my_reaction_id }` shape as a note's `reaction_summary`. `useBlockReactionSummary` reads it off the raw post record; `useBlockReactionActions().onToggleBlockReaction` posts or deletes the reaction comment, folds the result into the cached post record as a partial (so unsaved edits survive) and refetches only the summary.
+The server returns every block reaction on the post as one read-only `block_reaction_summary` field on the post record (`edit` context, single-item requests only), keyed by anchor and then by emoji slug with the same `{ count, reacted, my_reaction_id }` shape as a note's `reaction_summary`. `useBlockReaction( clientId )` mirrors `useReaction( note )`: it reads the block's slice of that summary off the raw post record, and its `toggleReaction` posts or deletes the reaction comment, folds the result into the cached post record as a partial (so unsaved edits survive) and refetches only the summary.
 
-`useNoteThreads` merges reacted blocks into the thread list in document order. A block's reactions row leads its first unresolved thread, so the floating view (which lists only unresolved threads) agrees with the full sidebar; a block with no unresolved note gets a `BlockReactionsEntry` of its own above the "Resolved" divider. An anchor with no matching block is not listed: a reaction carries no content worth keeping in view once its block is gone, and undo restores the block with its anchor.
+`useNoteThreads` merges reacted blocks into the thread list in document order (`addBlockReactionEntries`). A block's reactions row leads its first unresolved thread, so the floating view (which lists only unresolved threads) agrees with the full sidebar; a block with no unresolved note gets a `BlockReactionsEntry` of its own above the "Resolved" divider. An anchor with no matching block is not listed: a reaction carries no content worth keeping in view once its block is gone, and undo restores the block with its anchor.
 
 The trigger names are deliberately distinct: "React to block" in the toolbar, "Add block reaction" in the sidebar row, and "Add reaction" on a note.
 

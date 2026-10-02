@@ -18,7 +18,7 @@ import { NotesDisplayModeMenu } from './notes-display-mode-menu';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
-import { SelectedBlockReactionsToolbarButton } from './reactions/block-reactions-toolbar-button';
+import { BlockReactionsToolbarButton } from './reactions/block-reactions-toolbar-button';
 import { isBlockReactionsEntry } from './reactions/block-reactions';
 import { NoteHighlightStyles } from './note-highlight-styles';
 import { useGlobalStyles } from '../global-styles';
@@ -190,7 +190,7 @@ function NotesSidebar( { postId } ) {
 				/>
 			) }
 			{ !! clientId && (
-				<SelectedBlockReactionsToolbarButton
+				<BlockReactionsToolbarButton
 					clientId={ clientId }
 					onReacted={ revealBlockReactions }
 				/>

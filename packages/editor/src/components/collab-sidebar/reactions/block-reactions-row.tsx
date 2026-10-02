@@ -9,8 +9,7 @@ import {
 import { unlock } from '../../../lock-unlock';
 import ReactionDisplay from './reaction-display';
 import { AddReactionButton } from './add-reaction-button';
-import { useCurrentPostRef } from './use-block-reactions';
-import type { ReactionSummary, ReactionTarget } from './block-reactions';
+import { useBlockReaction } from './use-block-reaction';
 
 const { useBlockDisplayTitle } = unlock( blockEditorPrivateApis );
 
@@ -33,47 +32,31 @@ export function useBlockReactionsLabel( clientId: string ): string {
 	);
 }
 
-export interface BlockReactionsRowProps {
-	clientId: string;
-	reactionsId: string;
-	reactions: ReactionSummary;
-	onToggleBlockReaction: ( args: {
-		clientId: string;
-		emoji: string;
-	} ) => void;
-	onRemoveLast?: () => void;
-}
-
 /**
  * A block's reaction pills and add-reaction trigger, as one row in the
  * sidebar. Rendered only once the block has at least one reaction, so the
  * trigger never needs to float.
  *
- * @param props                       Component props.
- * @param props.clientId              The block client id.
- * @param props.reactionsId           The block's reaction anchor.
- * @param props.reactions             The block's reaction summary.
- * @param props.onToggleBlockReaction Adds or removes a reaction on the block.
- * @param props.onRemoveLast          Where to send focus when the last pill
- *                                    is removed and this row unmounts.
+ * @param props              Component props.
+ * @param props.clientId     The block client id.
+ * @param props.onRemoveLast Where to send focus when the last pill is
+ *                           removed and this row unmounts.
  */
 export function BlockReactionsRow( {
 	clientId,
-	reactionsId,
-	reactions,
-	onToggleBlockReaction,
 	onRemoveLast,
-}: BlockReactionsRowProps ) {
-	const { postId } = useCurrentPostRef();
+}: {
+	clientId: string;
+	onRemoveLast?: () => void;
+} ) {
+	const { postId, reactionsId, reactions, toggleReaction } =
+		useBlockReaction( clientId );
 	const label = useBlockReactionsLabel( clientId );
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const target: ReactionTarget = {
-		kind: 'block',
-		postId: postId ?? 0,
-		reactionsId,
-	};
-	const toggle = ( emoji: string ) =>
-		onToggleBlockReaction( { clientId, emoji } );
+
+	if ( ! reactionsId ) {
+		return null;
+	}
 
 	return (
 		// The editor sets `cornerRadius="none"`, but reactions read as
@@ -90,14 +73,14 @@ export function BlockReactionsRow( {
 					className="editor-collab-sidebar-panel__block-reactions-icon"
 				/>
 				<ReactionDisplay
-					target={ target }
+					target={ { kind: 'block', postId, reactionsId } }
 					reactions={ reactions }
-					onToggleReaction={ toggle }
+					onToggleReaction={ toggleReaction }
 					onRemoveLast={ onRemoveLast }
 				>
 					<AddReactionButton
 						label={ __( 'Add block reaction' ) }
-						onToggleReaction={ toggle }
+						onToggleReaction={ toggleReaction }
 					/>
 				</ReactionDisplay>
 			</div>
