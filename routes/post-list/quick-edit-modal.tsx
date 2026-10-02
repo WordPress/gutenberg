@@ -9,9 +9,9 @@ import {
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { useEffect, useMemo, useState } from '@wordpress/element';
-import { inertValue } from '@wordpress/ui';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { loadEditorAssets } from '@wordpress/lazy-editor';
+import { inertValue } from '@wordpress/react-inert-value';
 import { unlock } from '@wordpress/routes-lock-unlock';
 
 const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
