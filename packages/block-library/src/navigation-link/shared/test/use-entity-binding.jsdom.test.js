@@ -278,6 +278,118 @@ describe( 'useEntityBinding', () => {
 		} );
 	} );
 
+	describe( 'isBoundEntityPending', () => {
+		const termBindingAttributes = {
+			metadata: {
+				bindings: {
+					url: {
+						source: 'core/term-data',
+						args: { field: 'link' },
+					},
+				},
+			},
+			id: 1,
+			kind: 'taxonomy',
+			type: 'category',
+		};
+
+		// Runs the hook's selector against a fake core-data store.
+		function mockCoreStore( { record, hasFinishedResolution } ) {
+			const selectors = {
+				getEntityRecord: vi.fn( () => record ),
+				hasFinishedResolution: vi.fn( () => hasFinishedResolution ),
+			};
+			useSelect.mockImplementation( ( mapSelect ) =>
+				mapSelect( () => selectors )
+			);
+			return selectors;
+		}
+
+		it( 'is true while the bound entity record is still loading', () => {
+			mockCoreStore( {
+				record: undefined,
+				hasFinishedResolution: false,
+			} );
+
+			const { result } = renderHook( () =>
+				useEntityBinding( {
+					clientId: 'test-client-id',
+					attributes: termBindingAttributes,
+				} )
+			);
+
+			expect( result.current.isBoundEntityPending ).toBe( true );
+			expect( result.current.isBoundEntityAvailable ).toBe( true );
+		} );
+
+		it( 'is false once the bound entity record has loaded', () => {
+			mockCoreStore( {
+				record: { id: 1, name: 'Uncategorized' },
+				hasFinishedResolution: true,
+			} );
+
+			const { result } = renderHook( () =>
+				useEntityBinding( {
+					clientId: 'test-client-id',
+					attributes: termBindingAttributes,
+				} )
+			);
+
+			expect( result.current.isBoundEntityPending ).toBe( false );
+			expect( result.current.isBoundEntityAvailable ).toBe( true );
+		} );
+
+		it( 'is false when the bound entity was deleted, so it still reads as missing', () => {
+			mockCoreStore( { record: undefined, hasFinishedResolution: true } );
+
+			const { result } = renderHook( () =>
+				useEntityBinding( {
+					clientId: 'test-client-id',
+					attributes: termBindingAttributes,
+				} )
+			);
+
+			expect( result.current.isBoundEntityPending ).toBe( false );
+			expect( result.current.isBoundEntityAvailable ).toBe( false );
+		} );
+
+		it( 'is false when the link has no binding', () => {
+			mockCoreStore( {
+				record: undefined,
+				hasFinishedResolution: false,
+			} );
+
+			const { result } = renderHook( () =>
+				useEntityBinding( {
+					clientId: 'test-client-id',
+					attributes: { metadata: {}, id: null },
+				} )
+			);
+
+			expect( result.current.isBoundEntityPending ).toBe( false );
+		} );
+
+		it( 'checks the resolution of post_tag for a tag link', () => {
+			const selectors = mockCoreStore( {
+				record: undefined,
+				hasFinishedResolution: false,
+			} );
+
+			const { result } = renderHook( () =>
+				useEntityBinding( {
+					clientId: 'test-client-id',
+					attributes: { ...termBindingAttributes, type: 'tag' },
+				} )
+			);
+
+			expect( selectors.hasFinishedResolution ).toHaveBeenCalledWith(
+				'getEntityRecord',
+				[ 'taxonomy', 'post_tag', 1 ]
+			);
+			expect( result.current.isBoundEntityPending ).toBe( true );
+		} );
+	} );
+
 	describe( 'buildNavigationLinkEntityBinding', () => {
 		it( 'returns correct binding for post-type', () => {
 			const binding = buildNavigationLinkEntityBinding( 'post-type' );
