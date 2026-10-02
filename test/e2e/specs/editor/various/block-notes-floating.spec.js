@@ -709,7 +709,10 @@ test.describe( 'Block Notes: floating sidebar', () => {
 				editor,
 				blockNoteUtils,
 			} );
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
 
 			// There is no marker yet, so the form anchors to the selection the
 			// note will attach to. The canvas keeps it while the form has focus.
@@ -779,7 +782,10 @@ test.describe( 'Block Notes: floating sidebar', () => {
 			} );
 			await blockNoteUtils.clickNotesMenuItem( 'Hide notes' );
 
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
 			await expect(
 				page.getByRole( 'textbox', { name: 'New note', exact: true } )
 			).toBeFocused();

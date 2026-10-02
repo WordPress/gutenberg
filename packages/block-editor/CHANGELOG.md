@@ -23,6 +23,7 @@
 ### Internal
 
 -   Apply the disabled state to block binding menu triggers instead of their roots ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
+-   Remove the private `NoteIconSlotFill` API and its slot in the block settings dropdown. The "Add note" action now renders as a dedicated block toolbar button through `NoteIconToolbarSlotFill` ([#78205](https://github.com/WordPress/gutenberg/pull/78205)).
 
 ## 18.0.0 (2026-09-23)
 
