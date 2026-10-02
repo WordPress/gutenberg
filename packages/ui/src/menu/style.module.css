@@ -119,7 +119,7 @@
 		.separator {
 			grid-column: prefix-start / content-end;
 			height: var(--wpds-border-width-xs);
-			margin-block: var(--wpds-dimension-gap-sm);
+			margin-block: var(--wpds-dimension-gap-xs);
 			margin-inline: calc(var(--wp-ui-menu-group-head-padding-inline) - var(--_wp-ui-menu-group-head-padding-base));
 			background-color: var(--wpds-color-stroke-surface-neutral-weak);
 
