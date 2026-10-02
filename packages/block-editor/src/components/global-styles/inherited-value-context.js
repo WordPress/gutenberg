@@ -160,6 +160,27 @@ function getElementLayers( blockName, headingLevel ) {
 }
 
 /**
+ * Element layers for a block rendered outside its own edit context, from the
+ * block's attributes and the block context its edit component receives.
+ *
+ * @param {string}  blockName      Block name.
+ * @param {?Object} attributes     Block attributes.
+ * @param {?Object} [blockContext] Block context passed to the block's edit.
+ * @return {string[]} Ordered element keys, low to high precedence.
+ */
+export function getBlockElementLayers( blockName, attributes, blockContext ) {
+	const contextKey = CONTEXT_HEADING_LEVEL_BLOCKS[ blockName ]?.contextKey;
+	return getElementLayers(
+		blockName,
+		getHeadingLevel(
+			blockName,
+			attributes?.level,
+			contextKey ? blockContext?.[ contextKey ] : undefined
+		)
+	);
+}
+
+/**
  * Internal hook that derives the active block-style-variation slug from a
  * block's `className` by matching registered styles via
  * `getVariationNameFromClass`, together with the element layers that paint
