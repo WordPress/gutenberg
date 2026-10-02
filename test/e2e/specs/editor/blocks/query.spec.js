@@ -109,6 +109,7 @@ test.describe( 'Query block', () => {
 		let categoryIds = [];
 		let parentCategoryIds = [];
 		let nestedCategoryIds = [];
+		let deepCategoryIds = [];
 
 		test.beforeAll( async ( { requestUtils } ) => {
 			const createCategory = ( data ) =>
@@ -139,12 +140,31 @@ test.describe( 'Query block', () => {
 				)
 			);
 			nestedCategoryIds = nested.map( ( { id } ) => id );
+
+			// Terms sharing a name under parents that share a name too.
+			const years = await Promise.all(
+				[ '2023', '2024' ].map( ( name ) => createCategory( { name } ) )
+			);
+			const yearSports = await Promise.all(
+				years.map( ( { id: parent } ) =>
+					createCategory( { name: 'Sports', parent } )
+				)
+			);
+			const yearNews = await Promise.all(
+				yearSports.map( ( { id: parent } ) =>
+					createCategory( { name: 'News', parent } )
+				)
+			);
+			deepCategoryIds = [ ...yearNews, ...yearSports, ...years ].map(
+				( { id } ) => id
+			);
 		} );
 
 		test.afterAll( async ( { requestUtils } ) => {
 			// Nested terms first, so that deleting a parent does not move them
 			// up to the top level instead.
 			for ( const id of [
+				...deepCategoryIds,
 				...nestedCategoryIds,
 				...parentCategoryIds,
 				...categoryIds,
@@ -311,10 +331,31 @@ test.describe( 'Query block', () => {
 			// Two terms share the name "News", so each is listed with the term
 			// it sits under. The option's accessible name carries it too.
 			await expect(
-				page.getByRole( 'option', { name: 'News (Sports)' } )
+				page.getByRole( 'option', {
+					name: 'News (Sports)',
+					exact: true,
+				} )
 			).toBeVisible();
 			await expect(
-				page.getByRole( 'option', { name: 'News (Technology)' } )
+				page.getByRole( 'option', {
+					name: 'News (Technology)',
+					exact: true,
+				} )
+			).toBeVisible();
+
+			// A term is named after all the terms it sits under, so that terms
+			// whose parents share a name can be told apart too.
+			await expect(
+				page.getByRole( 'option', {
+					name: 'News (2023 › Sports)',
+					exact: true,
+				} )
+			).toBeVisible();
+			await expect(
+				page.getByRole( 'option', {
+					name: 'News (2024 › Sports)',
+					exact: true,
+				} )
 			).toBeVisible();
 
 			// A term at the top level keeps its bare name.
@@ -322,18 +363,32 @@ test.describe( 'Query block', () => {
 				page.getByRole( 'option', { name: 'Alpaca', exact: true } )
 			).toBeVisible();
 
-			// A search only returns the terms that matched it, so the parents
-			// have to be looked up separately for the context to survive.
+			// The context survives narrowing the list down.
 			await categoriesControl.fill( 'News' );
 			await expect(
-				page.getByRole( 'option', { name: 'News (Sports)' } )
+				page.getByRole( 'option', {
+					name: 'News (Sports)',
+					exact: true,
+				} )
 			).toBeVisible();
 			await expect(
-				page.getByRole( 'option', { name: 'News (Technology)' } )
+				page.getByRole( 'option', {
+					name: 'News (Technology)',
+					exact: true,
+				} )
+			).toBeVisible();
+
+			await expect(
+				page.getByRole( 'option', {
+					name: 'News (2024 › Sports)',
+					exact: true,
+				} )
 			).toBeVisible();
 
 			// The term behind the label is the one that gets stored.
-			await page.getByRole( 'option', { name: 'News (Sports)' } ).click();
+			await page
+				.getByRole( 'option', { name: 'News (Sports)', exact: true } )
+				.click();
 
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{

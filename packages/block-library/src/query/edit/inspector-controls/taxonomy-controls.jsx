@@ -14,17 +14,14 @@ import { sprintf, _n, _x, __ } from '@wordpress/i18n';
 import { useTaxonomies } from '../../utils';
 
 const EMPTY_ARRAY = [];
+const EMPTY_MAP = new Map();
 const BASE_QUERY = {
 	order: 'asc',
 	orderby: 'name',
 	context: 'view',
 };
-const NON_HIERARCHICAL_QUERY = { ...BASE_QUERY, _fields: 'id,name' };
-const HIERARCHICAL_QUERY = {
-	...BASE_QUERY,
-	_fields: 'id,name,parent,_links.up,_embedded',
-	_embed: 'up',
-};
+const FLAT_QUERY = { ...BASE_QUERY, _fields: 'id,name' };
+const TREE_QUERY = { ...BASE_QUERY, _fields: 'id,name,parent', per_page: -1 };
 
 /**
  * How the limit for the browsable list of terms was chosen:
@@ -70,29 +67,52 @@ function ListedTermCount() {
 	);
 }
 
+const termToItem = ( term ) => ( {
+	value: String( term.id ),
+	label: decodeEntities( term.name ),
+} );
+
 /**
- * A nested term is named after the term it sits under, so that two terms
- * sharing a name can be told apart, in the list and in the chip alike. The
- * label is also the option's accessible name, and the component has no
- * separate slot for secondary text.
+ * Turns the terms of a hierarchical taxonomy into items, keyed by term id. A
+ * nested term is named after the terms it sits under, so that two terms
+ * sharing a name can be told apart, in the list and in the chip alike.
  *
- * @param {Object} term A term fetched from the API.
- * @return {{value: string, label: string}} The term as an item.
+ * @param {Array<{id: number, name: string, parent: number}>} terms All the terms of the taxonomy.
+ * @return {Map<number, {value: string, label: string}>} The items, keyed by term id.
  */
-function termToItem( term ) {
-	const name = decodeEntities( term.name );
-	const parentName = term._embedded?.up?.[ 0 ]?.name;
-	return {
-		value: String( term.id ),
-		label: parentName
-			? sprintf(
-					/* translators: 1: term name. 2: name of the term it sits under. */
-					_x( '%1$s (%2$s)', 'term' ),
-					name,
-					decodeEntities( parentName )
-				)
-			: name,
-	};
+function getTreeItems( terms ) {
+	const termById = new Map( terms.map( ( term ) => [ term.id, term ] ) );
+	const items = new Map();
+	for ( const term of terms ) {
+		const ancestors = [];
+		const visited = new Set( [ term.id ] );
+		let parent = termById.get( term.parent );
+		while ( parent && ! visited.has( parent.id ) ) {
+			visited.add( parent.id );
+			ancestors.unshift( decodeEntities( parent.name ) );
+			parent = termById.get( parent.parent );
+		}
+		const name = decodeEntities( term.name );
+		items.set( term.id, {
+			value: String( term.id ),
+			label: ancestors.length
+				? sprintf(
+						/* translators: 1: term name. 2: the terms it sits under, from the top level down. */
+						_x( '%1$s (%2$s)', 'term' ),
+						name,
+						ancestors.reduce( ( path, ancestor ) =>
+							sprintf(
+								/* translators: 1: a term. 2: the term it holds. */
+								_x( '%1$s › %2$s', 'term ancestors' ),
+								path,
+								ancestor
+							)
+						)
+					)
+				: name,
+		} );
+	}
+	return items;
 }
 
 export function TaxonomyControls( { onChange, query } ) {
@@ -197,14 +217,36 @@ function TaxonomyItem( {
 	const [ search, setSearch ] = useState( '' );
 	const [ value, setValue ] = useState( EMPTY_ARRAY );
 	const debouncedSearch = useDebounce( setSearch, 250 );
-	// A hierarchical taxonomy can hold terms that share a name under different
-	// parents, so the parent is embedded to tell them apart in the list.
-	const baseQuery = taxonomy.hierarchical
-		? HIERARCHICAL_QUERY
-		: NON_HIERARCHICAL_QUERY;
+	// A hierarchical taxonomy is fetched whole, like in the post editor's
+	// hierarchical term selector, so that each term can be named after all the
+	// terms it sits under. A flat one can be much larger, so it is searched.
+	const isHierarchical = !! taxonomy.hierarchical;
+	const needsTree = isHierarchical && ( hasOpened || !! termIds?.length );
+	const { tree, treeHasResolved } = useSelect(
+		( select ) => {
+			if ( ! needsTree ) {
+				return { tree: null, treeHasResolved: false };
+			}
+			const { getEntityRecords, hasFinishedResolution } =
+				select( coreStore );
+			const selectorArgs = [ 'taxonomy', taxonomy.slug, TREE_QUERY ];
+			return {
+				tree: getEntityRecords( ...selectorArgs ),
+				treeHasResolved: hasFinishedResolution(
+					'getEntityRecords',
+					selectorArgs
+				),
+			};
+		},
+		[ needsTree, taxonomy.slug ]
+	);
+	const treeItemById = useMemo(
+		() => ( tree ? getTreeItems( tree ) : EMPTY_MAP ),
+		[ tree ]
+	);
 	const { listedTerms, listHasResolved } = useSelect(
 		( select ) => {
-			if ( ! hasOpened ) {
+			if ( isHierarchical || ! hasOpened ) {
 				return { listedTerms: EMPTY_ARRAY, listHasResolved: false };
 			}
 			const { getEntityRecords, hasFinishedResolution } =
@@ -214,7 +256,7 @@ function TaxonomyItem( {
 				'taxonomy',
 				taxonomy.slug,
 				{
-					...baseQuery,
+					...FLAT_QUERY,
 					// Exclude the opposite control's terms, to prevent users
 					// from selecting the same term in both the include and the
 					// exclude control. The terms selected in this control stay
@@ -236,52 +278,67 @@ function TaxonomyItem( {
 				),
 			};
 		},
-		[ hasOpened, search, taxonomy.slug, baseQuery, oppositeTermIds ]
+		[ isHierarchical, hasOpened, search, taxonomy.slug, oppositeTermIds ]
 	);
-	// `existingTerms` are the selected terms, fetched with the same fields as the list.
+	// `existingTerms` are the selected terms of a flat taxonomy, fetched with the same fields as the list.
 	// They are used to extract the terms' names to populate the control properly
 	// and to sanitize the provided `termIds`, by setting only the ones that exist.
 	const existingTerms = useSelect(
 		( select ) => {
-			if ( ! termIds?.length ) {
+			if ( isHierarchical || ! termIds?.length ) {
 				return EMPTY_ARRAY;
 			}
 			const { getEntityRecords } = select( coreStore );
 			return getEntityRecords( 'taxonomy', taxonomy.slug, {
-				...baseQuery,
+				...FLAT_QUERY,
 				include: termIds,
 				per_page: termIds.length,
 			} );
 		},
-		[ taxonomy.slug, baseQuery, termIds ]
+		[ isHierarchical, taxonomy.slug, termIds ]
 	);
+	const selectedItemById = useMemo( () => {
+		if ( isHierarchical ) {
+			return treeItemById;
+		}
+		return new Map(
+			( existingTerms || EMPTY_ARRAY ).map( ( term ) => [
+				term.id,
+				termToItem( term ),
+			] )
+		);
+	}, [ isHierarchical, treeItemById, existingTerms ] );
 	// Update the `value` state only after the selectors are resolved
 	// to avoid emptying the input when we're changing terms.
 	useEffect( () => {
 		if ( ! termIds?.length ) {
 			setValue( EMPTY_ARRAY );
 		}
-		if ( ! existingTerms?.length ) {
+		if ( ! selectedItemById.size ) {
 			return;
 		}
 		// Returns only the existing entity ids. This prevents the component
 		// from crashing in the editor, when non existing ids are provided.
-		const sanitizedValue = termIds.reduce( ( accumulator, id ) => {
-			const entity = existingTerms.find( ( term ) => term.id === id );
-			if ( entity ) {
-				accumulator.push( termToItem( entity ) );
-			}
-			return accumulator;
-		}, [] );
-		setValue( sanitizedValue );
-	}, [ termIds, existingTerms ] );
-	const items = useMemo(
-		() => listedTerms.map( termToItem ),
-		[ listedTerms ]
-	);
+		setValue(
+			termIds
+				.map( ( id ) => selectedItemById.get( id ) )
+				.filter( Boolean )
+		);
+	}, [ termIds, selectedItemById ] );
+	const items = useMemo( () => {
+		if ( ! isHierarchical ) {
+			return listedTerms.map( termToItem );
+		}
+		const excludedIds = new Set( oppositeTermIds );
+		return Array.from( treeItemById )
+			.filter( ( [ id ] ) => ! excludedIds.has( id ) )
+			.map( ( [ , item ] ) => item );
+	}, [ isHierarchical, listedTerms, treeItemById, oppositeTermIds ] );
 	const onInputValueChange = ( nextInputValue ) => {
 		setInputValue( nextInputValue );
-		debouncedSearch( nextInputValue );
+		if ( ! isHierarchical ) {
+			debouncedSearch( nextInputValue );
+		}
 	};
 	const onTermsChange = ( newValue ) => {
 		// Reset the search so that the full list is offered for the next
@@ -298,7 +355,9 @@ function TaxonomyItem( {
 	};
 	// A request is pending either while the debounce has not caught up with what
 	// has been typed, or while the request it triggered is still resolving.
-	const isPending = inputValue !== search || ! listHasResolved;
+	const isPending = isHierarchical
+		? ! treeHasResolved
+		: inputValue !== search || ! listHasResolved;
 	return (
 		<div className="block-library-query-inspector__taxonomy-control">
 			<SearchableChipSelectControl
@@ -313,9 +372,9 @@ function TaxonomyItem( {
 						setHasOpened( true );
 					}
 				} }
-				// Terms are searched server side, so opt out of the built-in
-				// client side filtering rather than filtering twice.
-				filter={ null }
+				// A flat taxonomy is searched server side, so opt out of the
+				// built-in client side filtering rather than filtering twice.
+				filter={ isHierarchical ? undefined : null }
 				isItemEqualToValue={ isItemEqualToValue }
 				statusContent={
 					isPending ? (
