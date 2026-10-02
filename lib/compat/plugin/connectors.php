@@ -42,8 +42,11 @@ function _gutenberg_connectors_add_settings_menu_item(): void {
  *
  * @access private
  *
- * @param string[] $preload_paths Paths already queued for preloading.
- * @return string[] Paths with the Connectors-specific requests appended.
+ * @param array<string|string[]> $preload_paths Paths already queued for preloading.
+ * @return array<string|string[]> Paths with the Connectors-specific requests appended.
+ *
+ * @phpstan-param array<non-falsy-string|array{ non-falsy-string, 'GET'|'OPTIONS' }> $preload_paths
+ * @phpstan-return array<non-falsy-string|array{ non-falsy-string, 'GET'|'OPTIONS' }>
  */
 function _gutenberg_connectors_preload_paths( array $preload_paths ): array {
 	// getEntityRecord( 'root', 'site' ) in use-connector-plugin.ts / ai-plugin-callout.tsx.
