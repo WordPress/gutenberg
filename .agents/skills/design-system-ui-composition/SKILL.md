@@ -11,7 +11,13 @@ Inspect the target interface and a relevant nearby precedent. Identify what the 
 
 Keep an existing supported component for a narrow copy or prop edit when its behaviour and setup remain suitable. Do not turn that edit into a component migration or inventory unrelated runtime setup.
 
-When component or token selection matters, read [Choose a recommended component](../../../docs/contributors/design/design-system-packages.md#choose-a-recommended-component). Verify the public API against the [target version](../../../docs/contributors/design/design-system-packages.md#check-the-target-version), including whether the application bundles the dependency or WordPress supplies it.
+## Choose components and tokens
+
+Use the Design System MCP server's `get_components` to find the recommended component, then `get_component_details` to check its behaviour, props, usage, and import. Without MCP, follow [Choose a recommended component](../../../docs/contributors/design/design-system-packages.md#choose-a-recommended-component).
+
+Prefer component props for styling they already support. For custom styles, use `get_design_tokens` or the [token reference](../../../packages/theme/docs/tokens.md). Choose semantic `--wpds-*` tokens by the element's purpose and state, not by matching a raw value. Use `--wp--preset--*` for theme presets and content styling, including content previews inside the editor. Do not mechanically replace every CSS literal with a token.
+
+For Gutenberg, verify the API against the current source. For external projects using a different package or WordPress version, follow the [target-version checks](../../../docs/contributors/design/design-system-packages.md#check-the-target-version).
 
 Choose the smallest public composition that meets the interaction contract. A nearby menu or dialog is not a reason to add that behaviour to a simple trigger. Keep product-specific compositions in the consuming package.
 
@@ -26,4 +32,4 @@ If a public API cannot meet the need, describe the missing behaviour and options
 
 ## Verify and finish
 
-Use [Verify the affected behaviour](../../../docs/contributors/design/design-system-packages.md#verify-the-affected-behaviour) to exercise the changed interaction and rendering context. Report what was verified and what remains uncertain. A missing check is a verification gap; stop dependent work only when missing evidence prevents a safe decision.
+Use [Verify the affected behaviour](../../../docs/contributors/design/design-system-packages.md#verify-the-affected-behaviour) to select checks for the changed interaction and rendering context. Reuse existing coverage and rely on dependency tests for behaviour the dependency owns. Add a local test only when our code or integration introduces a meaningful regression risk that existing coverage does not address. Report what was verified and any material uncertainty.

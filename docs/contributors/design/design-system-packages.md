@@ -105,6 +105,8 @@ Use `--wp--preset--*` custom properties for `theme.json` presets and
 block-facing styles. Token names and values change over time, so do not copy a
 token inventory into a guide, application convention, or skill.
 
+Prefer component props when they already express the styling intent. For custom styles, use the MCP server's `get_design_tokens` or the [Design Tokens Reference](/packages/theme/docs/tokens.md#how-to-pick-a-token) to choose a token by semantic purpose and state, not by matching its current raw value. Not every CSS literal needs a token. Distinguish interface styling from content styling by what the element represents; a content preview inside the editor can still use the active theme's presets.
+
 ### Setup depends on the document
 
 Standard WordPress editor screens manage shared styles centrally. A separate application, iframe, or popup window can require its own stylesheet and theming setup. Inventory which public packages render in each document, then follow the applicable package setup guidance:
@@ -163,6 +165,8 @@ For tokens, compare semantic purpose and affected modes as well as default value
 ## Verify the affected behaviour
 
 Select verification from the changed contract and the [testing overview](/docs/contributors/code/testing-overview.md#folder-structure). Use existing coverage where it proves the behaviour. Keep state and structural checks in jsdom; use Browser Mode or a reproducible browser check for computed styles, layout, native focus, scrolling, and transitions. Load the styles used by the real consumer. Class assertions, mocked geometry, and snapshots alone do not prove visual parity.
+
+Do not add or request tests just because coverage is absent. Rely on a third-party dependency's tests for behaviour it owns and that the change leaves intact. Focus local coverage on our transformations, overrides, state handling, and integration where they introduce a concrete regression risk. Identify the supported use case, likely failure, and consequence before adding a test, then choose the smallest check not already covered. Avoid duplicating dependency suites, enumerating every prop combination, or building fixtures for speculative edge cases. Weigh realistic likelihood and impact together; an uncommon supported use case can still matter when failure has a serious consequence.
 
 For interaction changes, exercise the relevant keyboard and pointer paths, accessible names, state transitions, dismissal, and focus return in the actual composition. Compare accessibility requirements with the applicable [ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/), [ARIA specification](https://www.w3.org/TR/wai-aria-1.2/), or [WCAG](https://www.w3.org/TR/WCAG22/). A passing automated check is evidence for the rules it checks, not proof of complete accessibility.
 
