@@ -35,6 +35,7 @@
 -   `UnitControl`: After clearing a value whose unit is not in `units`, give the next typed value the unit shown in the select instead of the cleared one ([#83492](https://github.com/WordPress/gutenberg/pull/83492)).
 -   `ResizableBox`: Update `re-resizable` to `6.11.2`, which supports React 18 and renders the top and left handles before the content so focus order matches visual order ([#83754](https://github.com/WordPress/gutenberg/pull/83754)).
 -   `PaletteEdit`: Keep an item's slug when it is renamed, so blocks and styles that reference the preset keep working ([#83750](https://github.com/WordPress/gutenberg/pull/83750)).
+-   `FocalPointPicker`: End a drag when the pointer is released outside the control, including over the editor canvas ([#83348](https://github.com/WordPress/gutenberg/pull/83348)).
 
 ### Internal
 
@@ -70,7 +71,6 @@
 
 ### Bug Fixes
 
--   `FocalPointPicker`: End a drag when the pointer is released outside the control, including over the editor canvas ([#83348](https://github.com/WordPress/gutenberg/pull/83348)).
 -   `BaseControl`, `CheckboxControl`, `RadioControl`, `ToggleControl`: Use the design system foreground color for labels so they stay the correct color instead of inheriting the surrounding text color ([#83318](https://github.com/WordPress/gutenberg/pull/83318)).
 -   `FocalPointPicker`: Keep a surrounding scroll container from gaining a horizontal scrollbar when the focal point sits on an edge, without clipping the handle ([#68915](https://github.com/WordPress/gutenberg/pull/68915)).
 -   `Card`: Keep shadow radii aligned with the Card's actual radius regardless of render order ([#82572](https://github.com/WordPress/gutenberg/pull/82572)).
