@@ -117,9 +117,9 @@ export function TaxonomyControls( { onChange, query } ) {
 		<VStack spacing={ 4 }>
 			{ taxonomies.map( ( taxonomy ) => {
 				const includeTermIds =
-					taxQuery?.include?.[ taxonomy.slug ] || [];
+					taxQuery?.include?.[ taxonomy.slug ] || EMPTY_ARRAY;
 				const excludeTermIds =
-					taxQuery?.exclude?.[ taxonomy.slug ] || [];
+					taxQuery?.exclude?.[ taxonomy.slug ] || EMPTY_ARRAY;
 				const onChangeTaxQuery = (
 					newTermIds,
 					/** @type {'include'|'exclude'} */ key
