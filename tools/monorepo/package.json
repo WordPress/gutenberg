@@ -32,7 +32,7 @@
 		"@wordpress/admin-ui": "file:../../packages/admin-ui",
 		"@wordpress/data": "file:../../packages/data",
 		"@wordpress/theme": "file:../../packages/theme",
-		"vitest": "^5.0.0"
+		"vitest": "^5.0.3"
 	},
 	"publishConfig": {
 		"access": "public"
