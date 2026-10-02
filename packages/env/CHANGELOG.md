@@ -12,6 +12,10 @@
 -   Point the apt sources of the bullseye-based WordPress images (PHP 7.4, 8.0, and 8.2) at `archive.debian.org`, so building them no longer fails now that Debian 11 has reached end-of-life and left the regular mirrors.
 -   Allow unauthenticated apt packages when building the stretch-based WordPress images (PHP 7.0), since `archive.debian.org`'s own signing keys for the long-archived stretch suite have since expired.
 
+### Bug Fixes
+
+-   Add MySQL healthcheck to prevent race condition where WordPress containers start before MySQL is fully initialized. Uses MariaDB's official `healthcheck.sh` script with `MARIADB_AUTO_UPGRADE` to support both new and existing installations ([#75046](https://github.com/WordPress/gutenberg/pull/75046)).
+
 ## 8.1.1 (2023-06-17)
 
 ### Bug fix
