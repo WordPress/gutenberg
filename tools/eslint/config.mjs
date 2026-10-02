@@ -549,6 +549,8 @@ export default dedupePlugins( [
 			`routes/**/*.${ SCRIPT_EXT }`,
 			`widgets/**/*.${ SCRIPT_EXT }`,
 		],
+		// Tests load styles directly instead of using WordPress's enqueue path.
+		ignores: vitestLintFiles,
 		rules: {
 			'@wordpress/no-non-module-stylesheet-imports': 'error',
 		},

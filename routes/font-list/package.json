@@ -20,5 +20,8 @@
 		"@wordpress/global-styles-ui": "file:../../packages/global-styles-ui",
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/private-apis": "file:../../packages/private-apis"
+	},
+	"devDependencies": {
+		"@types/react": "^18.3.27"
 	}
 }
