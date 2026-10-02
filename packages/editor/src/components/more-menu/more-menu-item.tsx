@@ -63,6 +63,11 @@ type MoreMenuItemProps = Omit<
 	label?: string;
 
 	/**
+	 * Value supplied by the Panels menu's radio group adapter.
+	 */
+	radioValue?: string;
+
+	/**
 	 * Callback invoked when the item is selected.
 	 */
 	onClick?: ( event?: MouseEvent< HTMLElement > ) => void;
@@ -120,6 +125,7 @@ function UnforwardedMoreMenuItem(
 		isSelected,
 		label,
 		onClick,
+		radioValue,
 		role,
 		shortcut,
 		target,
@@ -153,6 +159,25 @@ function UnforwardedMoreMenuItem(
 	const checked =
 		isSelected ?? ( ariaChecked === true || ariaChecked === 'true' );
 	const isMixed = isSelected === undefined && ariaChecked === 'mixed';
+
+	if ( role === 'menuitemradio' && radioValue !== undefined ) {
+		return (
+			<Menu.RadioItem
+				ref={ ref }
+				aria-label={ itemAriaLabel }
+				closeOnClick
+				disabled={ disabled }
+				onClick={ onClick }
+				prefix={ prefix }
+				shortcut={ itemShortcut }
+				{ ...props }
+				value={ radioValue }
+			>
+				{ itemLabel }
+				{ description }
+			</Menu.RadioItem>
+		);
+	}
 
 	if ( role === 'menuitemcheckbox' && ! isMixed ) {
 		return (
@@ -195,9 +220,8 @@ function UnforwardedMoreMenuItem(
 		);
 	}
 
-	// `Menu.RadioItem` only works inside a `Menu.RadioGroup`, which a fill
-	// cannot join, and `Menu.CheckboxItem` has no mixed state. Both fall back
-	// to a plain item carrying the role and the state itself.
+	// Radio fills outside the Panels radio group and mixed checkboxes carry
+	// their own checked state without joining a group.
 	const checkableProps =
 		role === 'menuitemradio' || role === 'menuitemcheckbox'
 			? { role, 'aria-checked': isMixed ? ( 'mixed' as const ) : checked }

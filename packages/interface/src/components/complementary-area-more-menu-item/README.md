@@ -1,6 +1,6 @@
 # ComplementaryAreaMoreMenuItem
 
-Renders an item in the more menu that allows toggling a complementary area.
+Renders an item in the more menu for a complementary area. In the editor's Panels submenu, default items select the area and keep it open when activated again. In other menus, they toggle the area open or closed.
 Props not referenced here are passed to the component used to render the menu item.
 
 ### scope

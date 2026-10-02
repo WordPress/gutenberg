@@ -1,18 +1,21 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { SlotFillProvider } from '@wordpress/components';
+import { MenuItem, SlotFillProvider } from '@wordpress/components';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 // @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
+	ActionItem,
 	ComplementaryAreaMoreMenuItem,
 	store as interfaceStore,
 } from '@wordpress/interface';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Menu } from '@wordpress/ui';
 import PanelsMenu from '../panels-menu';
+import MoreMenuItem from '../more-menu-item';
 import { sidebars } from '../../sidebar/constants';
 
 vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
@@ -22,6 +25,15 @@ function renderPanelsMenu( {
 	hasOtherPanel = true,
 	hasBlockSelection = false,
 	isDistractionFree = false,
+	extraItems,
+	legacyHost = false,
+}: {
+	activeArea?: string;
+	hasOtherPanel?: boolean;
+	hasBlockSelection?: boolean;
+	isDistractionFree?: boolean;
+	extraItems?: ReactNode;
+	legacyHost?: boolean;
 } = {} ) {
 	const registry = createRegistry();
 	registry.register( preferencesStore );
@@ -46,7 +58,14 @@ function renderPanelsMenu( {
 						<Menu.Item>
 							<Menu.ItemLabel>Other option</Menu.ItemLabel>
 						</Menu.Item>
-						<PanelsMenu />
+						{ legacyHost ? (
+							<ActionItem.Slot
+								name="core/plugin-more-menu"
+								fillProps={ { as: MoreMenuItem } }
+							/>
+						) : (
+							<PanelsMenu />
+						) }
 					</Menu.Popup>
 				</Menu.Root>
 				{ hasOtherPanel && (
@@ -58,6 +77,7 @@ function renderPanelsMenu( {
 						Plugin panel
 					</ComplementaryAreaMoreMenuItem>
 				) }
+				{ extraItems }
 			</SlotFillProvider>
 		</RegistryProvider>
 	);
@@ -78,10 +98,10 @@ describe( 'Panels menu', () => {
 		renderPanelsMenu( { isDistractionFree: true } );
 		await openPanelsMenu( user );
 		expect(
-			screen.queryByRole( 'menuitemcheckbox', { name: 'Inspector' } )
+			screen.queryByRole( 'menuitemradio', { name: 'Inspector' } )
 		).not.toBeInTheDocument();
 		expect(
-			screen.getByRole( 'menuitemcheckbox', { name: 'Plugin panel' } )
+			screen.getByRole( 'menuitemradio', { name: 'Plugin panel' } )
 		).toBeVisible();
 	} );
 
@@ -104,10 +124,10 @@ describe( 'Panels menu', () => {
 			renderPanelsMenu( { activeArea } );
 			await openPanelsMenu( user );
 			expect(
-				screen.getByRole( 'menuitemcheckbox', { name: 'Inspector' } )
+				screen.getByRole( 'menuitemradio', { name: 'Inspector' } )
 			).toBeChecked();
 			expect(
-				screen.getByRole( 'menuitemcheckbox', { name: 'Plugin panel' } )
+				screen.getByRole( 'menuitemradio', { name: 'Plugin panel' } )
 			).not.toBeChecked();
 		}
 	);
@@ -122,10 +142,10 @@ describe( 'Panels menu', () => {
 			} );
 			await openPanelsMenu( user );
 			expect(
-				screen.getByRole( 'menuitemcheckbox', { name: 'Inspector' } )
+				screen.getByRole( 'menuitemradio', { name: 'Inspector' } )
 			).not.toBeChecked();
 			fireEvent.click(
-				screen.getByRole( 'menuitemcheckbox', { name: 'Inspector' } )
+				screen.getByRole( 'menuitemradio', { name: 'Inspector' } )
 			);
 			expect(
 				registry
@@ -134,35 +154,38 @@ describe( 'Panels menu', () => {
 			).toBe( hasBlockSelection ? sidebars.block : sidebars.document );
 			await openPanelsMenu( user );
 			expect(
-				screen.getByRole( 'menuitemcheckbox', { name: 'Inspector' } )
+				screen.getByRole( 'menuitemradio', { name: 'Inspector' } )
 			).toBeChecked();
 		}
 	);
 
-	it( 'closes Inspector when its checked item is activated', async () => {
-		const user = userEvent.setup();
-		const { registry } = renderPanelsMenu();
-		await openPanelsMenu( user );
-		fireEvent.click(
-			screen.getByRole( 'menuitemcheckbox', { name: 'Inspector' } )
-		);
-		expect(
-			registry
-				.select( interfaceStore )
-				.getActiveComplementaryArea( 'core' )
-		).toBeNull();
-		await openPanelsMenu( user );
-		expect(
-			screen.getByRole( 'menuitemcheckbox', { name: 'Inspector' } )
-		).not.toBeChecked();
-	} );
+	it.each( [ sidebars.document, sidebars.block ] )(
+		'keeps the %s Inspector tab open when its selected radio is activated',
+		async ( activeArea ) => {
+			const user = userEvent.setup();
+			const { registry } = renderPanelsMenu( { activeArea } );
+			await openPanelsMenu( user );
+			fireEvent.click(
+				screen.getByRole( 'menuitemradio', { name: 'Inspector' } )
+			);
+			expect(
+				registry
+					.select( interfaceStore )
+					.getActiveComplementaryArea( 'core' )
+			).toBe( activeArea );
+			await openPanelsMenu( user );
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Inspector' } )
+			).toBeChecked();
+		}
+	);
 
 	it( 'keeps plugin panels selectable alongside Inspector', async () => {
 		const user = userEvent.setup();
 		const { registry } = renderPanelsMenu();
 		await openPanelsMenu( user );
 		fireEvent.click(
-			screen.getByRole( 'menuitemcheckbox', { name: 'Plugin panel' } )
+			screen.getByRole( 'menuitemradio', { name: 'Plugin panel' } )
 		);
 		expect(
 			registry
@@ -171,10 +194,185 @@ describe( 'Panels menu', () => {
 		).toBe( 'plugin/sidebar' );
 		await openPanelsMenu( user );
 		expect(
-			screen.getByRole( 'menuitemcheckbox', { name: 'Plugin panel' } )
+			screen.getByRole( 'menuitemradio', { name: 'Plugin panel' } )
 		).toBeChecked();
 		expect(
-			screen.getByRole( 'menuitemcheckbox', { name: 'Inspector' } )
+			screen.getByRole( 'menuitemradio', { name: 'Inspector' } )
 		).not.toBeChecked();
+	} );
+	it( 'keeps a plugin panel open when its selected radio is activated', async () => {
+		const user = userEvent.setup();
+		const { registry } = renderPanelsMenu( {
+			activeArea: 'plugin/sidebar',
+		} );
+		await openPanelsMenu( user );
+		fireEvent.click(
+			screen.getByRole( 'menuitemradio', { name: 'Plugin panel' } )
+		);
+		expect(
+			registry
+				.select( interfaceStore )
+				.getActiveComplementaryArea( 'core' )
+		).toBe( 'plugin/sidebar' );
+	} );
+
+	it( 'retains checked checkbox toggles when the host does not opt into radios', async () => {
+		const user = userEvent.setup();
+		const { registry } = renderPanelsMenu( {
+			activeArea: 'plugin/sidebar',
+			legacyHost: true,
+		} );
+		await user.click( screen.getByRole( 'button', { name: 'Options' } ) );
+		const item = await screen.findByRole( 'menuitemcheckbox', {
+			name: 'Plugin panel',
+		} );
+		expect( item ).toBeChecked();
+		await user.click( item );
+		expect(
+			registry
+				.select( interfaceStore )
+				.getActiveComplementaryArea( 'core' )
+		).toBeNull();
+	} );
+
+	it( 'uses the panel identifier even when a fill supplies another value', async () => {
+		const user = userEvent.setup();
+		renderPanelsMenu( {
+			activeArea: 'plugin/another',
+			extraItems: (
+				<ComplementaryAreaMoreMenuItem
+					scope="core"
+					target="another"
+					identifier="plugin/another"
+					value="unrelated"
+				>
+					Another panel
+				</ComplementaryAreaMoreMenuItem>
+			),
+		} );
+		await openPanelsMenu( user );
+		expect(
+			screen.getByRole( 'menuitemradio', { name: 'Another panel' } )
+		).toBeChecked();
+	} );
+
+	it( 'opens Inspector when all panels are closed', async () => {
+		const user = userEvent.setup();
+		const { registry } = renderPanelsMenu();
+		registry.dispatch( interfaceStore ).disableComplementaryArea( 'core' );
+		await openPanelsMenu( user );
+		expect(
+			screen.getByRole( 'menuitemradio', { name: 'Inspector' } )
+		).not.toBeChecked();
+		expect(
+			screen.getByRole( 'menuitemradio', { name: 'Plugin panel' } )
+		).not.toBeChecked();
+		fireEvent.click(
+			screen.getByRole( 'menuitemradio', { name: 'Inspector' } )
+		);
+		expect(
+			registry
+				.select( interfaceStore )
+				.getActiveComplementaryArea( 'core' )
+		).toBe( sidebars.document );
+	} );
+
+	it( 'preserves plugin actions, links, and independent checkboxes', async () => {
+		const user = userEvent.setup();
+		const onClick = vi.fn();
+		renderPanelsMenu( {
+			extraItems: (
+				<>
+					<ActionItem
+						name="core/plugin-more-menu"
+						onClick={ onClick }
+					>
+						Plugin action
+					</ActionItem>
+					<ActionItem
+						name="core/plugin-more-menu"
+						href="https://wordpress.org"
+					>
+						Plugin link
+					</ActionItem>
+					<ActionItem
+						name="core/plugin-more-menu"
+						role="menuitemcheckbox"
+						aria-checked
+						aria-controls="plugin-feature"
+					>
+						Plugin option
+					</ActionItem>
+				</>
+			),
+		} );
+		await openPanelsMenu( user );
+		expect(
+			screen.getByRole( 'menuitem', { name: 'Plugin link' } )
+		).toHaveAttribute( 'href', 'https://wordpress.org' );
+		expect(
+			screen.getByRole( 'menuitemcheckbox', { name: 'Plugin option' } )
+		).toBeChecked();
+		fireEvent.click(
+			screen.getByRole( 'menuitem', { name: 'Plugin action' } )
+		);
+		expect( onClick ).toHaveBeenCalledWith(
+			expect.objectContaining( { type: 'click' } )
+		);
+	} );
+	it( 'keeps custom plugin panel items in the radio group', async () => {
+		const user = userEvent.setup();
+		const onClick = vi.fn();
+		renderPanelsMenu( {
+			activeArea: 'plugin/custom',
+			extraItems: (
+				<ActionItem
+					name="core/plugin-more-menu"
+					as={ MenuItem }
+					role="menuitemradio"
+					value="plugin/custom"
+					onClick={ onClick }
+				>
+					Custom panel
+				</ActionItem>
+			),
+		} );
+		await openPanelsMenu( user );
+		const item = screen.getByRole( 'menuitemradio', {
+			name: 'Custom panel',
+		} );
+		expect( item ).toBeChecked();
+		fireEvent.click( item );
+		expect( onClick ).toHaveBeenCalledWith(
+			expect.objectContaining( { type: 'click' } )
+		);
+	} );
+
+	it( 'preserves explicit checkbox panel toggles', async () => {
+		const user = userEvent.setup();
+		const { registry } = renderPanelsMenu( {
+			activeArea: 'plugin/sidebar',
+			extraItems: (
+				<ComplementaryAreaMoreMenuItem
+					scope="core"
+					target="legacy"
+					identifier="plugin/sidebar"
+					role="menuitemcheckbox"
+				>
+					Legacy toggle
+				</ComplementaryAreaMoreMenuItem>
+			),
+		} );
+		await openPanelsMenu( user );
+		const item = screen.getByRole( 'menuitemcheckbox', {
+			name: 'Legacy toggle',
+		} );
+		expect( item ).toBeChecked();
+		fireEvent.click( item );
+		expect(
+			registry
+				.select( interfaceStore )
+				.getActiveComplementaryArea( 'core' )
+		).toBeNull();
 	} );
 } );
