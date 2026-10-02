@@ -584,5 +584,48 @@ test.describe( 'Query block', () => {
 			).toBeHidden();
 			expect( listRequests ).toEqual( [] );
 		} );
+
+		test( 'should keep the matching tags listed while a search loads', async ( {
+			page,
+			editor,
+		} ) => {
+			await page.route(
+				( url ) =>
+					(
+						url.searchParams.get( 'rest_route' ) ?? url.pathname
+					).includes( '/wp/v2/tags' ) &&
+					url.search.includes( 'search' ),
+				async ( route ) => {
+					await new Promise( ( resolve ) =>
+						setTimeout( resolve, 3000 )
+					);
+					await route.continue();
+				}
+			);
+
+			await addQueryWithTaxonomyFilters( { page, editor } );
+			const tagsControl = page.getByRole( 'combobox', {
+				name: 'Tags',
+				exact: true,
+			} );
+			await tagsControl.click();
+			await expect(
+				page.getByRole( 'option', { name: 'Alpaca' } )
+			).toBeVisible();
+
+			const searchRequest = page.waitForRequest( ( request ) =>
+				decodeURIComponent( request.url() ).includes( 'search=Capy' )
+			);
+			await tagsControl.pressSequentially( 'Capy' );
+			await searchRequest;
+
+			await expect( page.getByText( 'Loading…' ) ).toBeVisible();
+			await expect(
+				page.getByRole( 'option', { name: 'Capybara' } )
+			).toBeVisible( { timeout: 1000 } );
+			await expect(
+				page.getByRole( 'option', { name: 'Alpaca' } )
+			).toBeHidden( { timeout: 1000 } );
+		} );
 	} );
 } );
