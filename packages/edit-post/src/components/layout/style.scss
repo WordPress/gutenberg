@@ -10,6 +10,12 @@
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
+
+	// Until a height is set by resizing, limit the pane to half of the
+	// available height so it doesn't cover the editor canvas.
+	&.is-resizable.is-auto-height:not(.is-resizing) {
+		max-height: 50%;
+	}
 }
 
 .edit-post-meta-boxes-main__presenter {

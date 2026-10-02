@@ -333,7 +333,8 @@ function MetaBoxesMain() {
 			ref={ setMainRefs }
 			className={ clsx(
 				'edit-post-meta-boxes-main',
-				! isShort && 'is-resizable'
+				! isShort && 'is-resizable',
+				isAutoHeight && 'is-auto-height'
 			) }
 			style={ { height: usedHeight } }
 		>
