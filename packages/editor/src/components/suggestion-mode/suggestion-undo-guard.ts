@@ -346,16 +346,27 @@ export default function SuggestionUndoGuard() {
 		const originalUndo = coreActions.undo;
 		const originalRedo = coreActions.redo;
 
+		/*
+		 * Arm an adoption only when there is a history record to land: an
+		 * undo or redo with nothing to replay changes no block, so the token
+		 * would wait for the next real edit and let it skip capture.
+		 */
+		const coreSelect = registry.select( coreStore );
+
 		coreActions.undo = ( ...args ) => {
 			if ( withdrawNewestSuggestion() ) {
 				return Promise.resolve();
 			}
-			armUndoRedoAdoption();
+			if ( coreSelect.hasUndo?.() ?? true ) {
+				armUndoRedoAdoption();
+			}
 			return originalUndo( ...args );
 		};
 
 		coreActions.redo = ( ...args ) => {
-			armUndoRedoAdoption();
+			if ( coreSelect.hasRedo?.() ?? true ) {
+				armUndoRedoAdoption();
+			}
 			return originalRedo( ...args );
 		};
 
