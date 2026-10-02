@@ -110,6 +110,7 @@ test.describe( 'Query block', () => {
 		let parentCategoryIds = [];
 		let nestedCategoryIds = [];
 		let deepCategoryIds = [];
+		let tagIds = [];
 
 		test.beforeAll( async ( { requestUtils } ) => {
 			const createCategory = ( data ) =>
@@ -158,6 +159,17 @@ test.describe( 'Query block', () => {
 			deepCategoryIds = [ ...yearNews, ...yearSports, ...years ].map(
 				( { id } ) => id
 			);
+
+			const tags = await Promise.all(
+				[ 'Alpaca', 'Capybara' ].map( ( name ) =>
+					requestUtils.rest( {
+						path: '/wp/v2/tags',
+						method: 'POST',
+						data: { name },
+					} )
+				)
+			);
+			tagIds = tags.map( ( { id } ) => id );
 		} );
 
 		test.afterAll( async ( { requestUtils } ) => {
@@ -171,6 +183,13 @@ test.describe( 'Query block', () => {
 			] ) {
 				await requestUtils.rest( {
 					path: `/wp/v2/categories/${ id }`,
+					method: 'DELETE',
+					params: { force: true },
+				} );
+			}
+			for ( const id of tagIds ) {
+				await requestUtils.rest( {
+					path: `/wp/v2/tags/${ id }`,
 					method: 'DELETE',
 					params: { force: true },
 				} );
@@ -399,6 +418,68 @@ test.describe( 'Query block', () => {
 								include: {
 									category: [ nestedCategoryIds[ 0 ] ],
 								},
+							},
+						},
+					},
+				},
+			] );
+		} );
+
+		test( 'should select the first matching term on Enter', async ( {
+			page,
+			editor,
+		} ) => {
+			const categoriesControl = await addQueryWithTaxonomyFilters( {
+				page,
+				editor,
+			} );
+			await categoriesControl.click();
+			await expect(
+				page.getByRole( 'option', { name: 'Alpaca' } )
+			).toBeVisible();
+			await categoriesControl.fill( 'Capy' );
+			await page.keyboard.press( 'Enter' );
+
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/query',
+					attributes: {
+						query: {
+							taxQuery: {
+								include: { category: [ categoryIds[ 2 ] ] },
+							},
+						},
+					},
+				},
+			] );
+		} );
+
+		test( 'should not select a stale tag on Enter before the search runs', async ( {
+			page,
+			editor,
+		} ) => {
+			await addQueryWithTaxonomyFilters( { page, editor } );
+			const tagsControl = page.getByRole( 'combobox', {
+				name: 'Tags',
+				exact: true,
+			} );
+			await tagsControl.click();
+			await expect(
+				page.getByRole( 'option', { name: 'Alpaca' } )
+			).toBeVisible();
+
+			// Enter is pressed well within the search debounce, while the list
+			// still holds the terms listed before typing.
+			await tagsControl.pressSequentially( 'Capy' );
+			await page.keyboard.press( 'Enter' );
+
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/query',
+					attributes: {
+						query: {
+							taxQuery: {
+								include: { post_tag: [ tagIds[ 1 ] ] },
 							},
 						},
 					},
