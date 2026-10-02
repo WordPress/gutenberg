@@ -9,6 +9,7 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState, useEffect, useMemo, Fragment } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
+import { speak } from '@wordpress/a11y';
 import { decodeEntities } from '@wordpress/html-entities';
 import { sprintf, _n, _x, __ } from '@wordpress/i18n';
 import { useTaxonomies } from '../../utils';
@@ -341,6 +342,23 @@ function TaxonomyItem( {
 		}
 	};
 	const onTermsChange = ( newValue ) => {
+		if ( newValue.length !== value.length ) {
+			const singularName = taxonomy.labels?.singular_name ?? __( 'Term' );
+			speak(
+				newValue.length > value.length
+					? sprintf(
+							/* translators: %s: taxonomy singular name, e.g. "Tag". */
+							_x( '%s added', 'term' ),
+							singularName
+						)
+					: sprintf(
+							/* translators: %s: taxonomy singular name, e.g. "Tag". */
+							_x( '%s removed', 'term' ),
+							singularName
+						),
+				'assertive'
+			);
+		}
 		// Reset the search so that the full list is offered for the next
 		// selection, cancelling a search the debounce has not yet run.
 		debouncedSearch.cancel();
