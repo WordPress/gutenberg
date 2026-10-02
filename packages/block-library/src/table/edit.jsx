@@ -15,6 +15,7 @@ import {
 	useBlockProps,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalUseBorderProps as useBorderProps,
+	useBackgroundProps,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { __, _x } from '@wordpress/i18n';
@@ -102,6 +103,7 @@ function TableEdit( {
 
 	const colorProps = useColorProps( attributes );
 	const borderProps = useBorderProps( attributes );
+	const backgroundProps = useBackgroundProps( attributes );
 	const blockEditingMode = useBlockEditingMode();
 
 	const tableRef = useRef();
@@ -526,6 +528,7 @@ function TableEdit( {
 					className={ clsx(
 						colorProps.className,
 						borderProps.className,
+						backgroundProps.className,
 						{
 							'has-fixed-layout': hasFixedLayout,
 							// This is required in the editor only to overcome
@@ -536,7 +539,11 @@ function TableEdit( {
 							),
 						}
 					) }
-					style={ { ...colorProps.style, ...borderProps.style } }
+					style={ {
+						...colorProps.style,
+						...borderProps.style,
+						...backgroundProps.style,
+					} }
 				>
 					{ renderedSections }
 				</table>

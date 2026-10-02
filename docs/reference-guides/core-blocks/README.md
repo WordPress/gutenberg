@@ -990,7 +990,7 @@ Create structured content in rows and columns to display information.
 
 -	**Name:** [core/table](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-table/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
--	**Supports:** align, anchor, color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight)
+-	**Supports:** align, anchor, background (gradient), color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight)
 -	**Attributes:** body, caption, foot, hasFixedLayout, head
 
 ## Table of Contents
