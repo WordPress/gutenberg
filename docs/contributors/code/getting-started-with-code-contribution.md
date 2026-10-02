@@ -218,7 +218,7 @@ We recommend configuring your editor to automatically check for syntax and lint 
 
 If you use Visual Studio Code, the repository ships a managed workspace configuration so the editor uses the same linting, formatting, PHP, and TypeScript tooling as the Gutenberg repository. The first time you open the folder, VS Code prompts you to install the [recommended extensions](https://github.com/WordPress/gutenberg/blob/HEAD/.vscode/extensions.json) and to allow an automatic task that copies [`.vscode/settings.dist.jsonc`](https://github.com/WordPress/gutenberg/blob/HEAD/.vscode/settings.dist.jsonc) to `.vscode/settings.json`. Allow both and you're set up.
 
-The installer does not overwrite a `settings.json` you have customized. To stop it managing yours, remove the comments at the top of the file. You can re-run it at any time from the Command Palette via **Tasks: Run Task → Install VS Code settings**.
+The installer replaces `settings.json` whenever it still starts with the managed comments, so edits made there are lost when the template changes. To keep your own settings, remove those comments; the installer then leaves the file alone. You can re-run it at any time from the Command Palette via **Tasks: Run Task → Install VS Code settings**.
 
 The settings point the TypeScript, ESLint, Prettier, and Stylelint extensions at the workspaces that install them, because those tools are not installed in the root `node_modules`. If you maintain your own settings, copy those paths from the template.
 
