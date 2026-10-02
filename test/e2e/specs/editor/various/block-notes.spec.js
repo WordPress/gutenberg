@@ -1528,7 +1528,7 @@ test.describe( 'Block Notes', () => {
 			await expect( reactionButton ).toContainText( '👍' );
 		} );
 
-		test( 'Escape in the skin-tone flyout closes only that popup', async ( {
+		test( 'Escape in the skin-tone menu closes only that popup', async ( {
 			page,
 			blockNoteUtils,
 		} ) => {
@@ -1538,24 +1538,26 @@ test.describe( 'Block Notes', () => {
 				comment: 'Escape unwinds one layer at a time',
 			} );
 
-			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
+			await page
+				.getByRole( 'combobox', { name: 'Add reaction' } )
+				.click();
 			await blockNoteUtils.waitForFullPicker();
 
-			// Open the nested skin-tone flyout; focus moves into its
-			// listbox (onto the selected swatch).
+			// Open the nested skin-tone menu.
 			const skinToneToggle = page.getByRole( 'button', {
 				name: /^Skin tone:/,
 			} );
 			await skinToneToggle.click();
-			const skinToneListbox = page.getByRole( 'listbox', {
-				name: 'Choose your default skin tone',
-			} );
-			await expect( skinToneListbox ).toBeVisible();
+			// The notes' Actions menus stay mounted, so pick out this one.
+			const skinToneMenu = page
+				.getByRole( 'menu' )
+				.filter( { hasText: 'Choose your default skin tone' } );
+			await expect( skinToneMenu ).toBeVisible();
 
-			// The first Escape closes only the flyout, returns focus to
-			// its toggle, and leaves the full picker open.
+			// The first Escape closes only the menu, returns focus to its
+			// toggle, and leaves the full picker open.
 			await page.keyboard.press( 'Escape' );
-			await expect( skinToneListbox ).toBeHidden();
+			await expect( skinToneMenu ).toBeHidden();
 			await expect( skinToneToggle ).toBeFocused();
 			await expect(
 				page.getByPlaceholder( 'Search emoji' )
@@ -1662,22 +1664,25 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'button', { name: 'Skin tone: Default skin tone' } )
 				.click();
 
-			// The flyout has an explicit heading and six swatches, with
-			// the default tone selected.
+			// The menu has an explicit heading and six tones, with the
+			// default tone checked.
 			await expect(
 				page.getByText( 'Choose your default skin tone' )
 			).toBeVisible();
-			const swatches = page.getByRole( 'option' );
-			await expect( swatches ).toHaveCount( 6 );
+			const tones = page.getByRole( 'menuitemradio' );
+			await expect( tones ).toHaveCount( 6 );
 			await expect(
-				page.getByRole( 'option', { name: 'Default skin tone' } )
-			).toHaveAttribute( 'aria-selected', 'true' );
+				page.getByRole( 'menuitemradio', { name: 'Default skin tone' } )
+			).toHaveAttribute( 'aria-checked', 'true' );
 
 			await page
-				.getByRole( 'option', { name: 'Dark skin tone', exact: true } )
+				.getByRole( 'menuitemradio', {
+					name: 'Dark skin tone',
+					exact: true,
+				} )
 				.click();
 
-			// The toggle reflects the new tone and the flyout closes.
+			// The toggle reflects the new tone and the menu closes.
 			await expect(
 				page.getByRole( 'button', {
 					name: 'Skin tone: Dark skin tone',

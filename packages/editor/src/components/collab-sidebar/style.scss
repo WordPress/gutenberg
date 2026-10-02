@@ -413,32 +413,9 @@ mark.wp-note {
 	justify-content: center;
 }
 
-.editor-collab-sidebar-panel__skin-tone-menu {
-	padding: var(--wpds-dimension-padding-sm);
-	font-family: var(--wpds-typography-font-family-body);
-}
-
-.editor-collab-sidebar-panel__skin-tone-heading {
-	padding-bottom: var(--wpds-dimension-padding-sm);
-	color: var(--wpds-color-foreground-content-neutral-weak);
-	font-size: var(--wpds-typography-font-size-xs);
-	font-weight: var(--wpds-typography-font-weight-emphasis);
-}
-
-.editor-collab-sidebar-panel__skin-tone-options {
-	display: flex;
-	gap: var(--wpds-dimension-gap-xs);
-}
-
-.editor-collab-sidebar-panel__skin-tone-option {
-	// In its own flyout, outside the picker's scope, so read the token here.
-	width: var(--wpds-dimension-size-md);
+.editor-collab-sidebar-panel__skin-tone-swatch {
 	font-size: 18px;
-	justify-content: center;
-
-	&[aria-selected="true"] {
-		background-color: var(--wpds-color-background-interactive-neutral-weak-active);
-	}
+	line-height: 1;
 }
 
 .editor-collab-sidebar-panel__picker-viewport {
