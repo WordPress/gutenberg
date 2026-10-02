@@ -211,15 +211,9 @@
 			}
 		}
 
-		.checkbox-selection-icon {
+		.item-selection-icon {
 			/* Optical alignment with the item label. */
 			translate: 0 1px;
-		}
-
-		.radio-selection-icon {
-			width: var(--wpds-dimension-size-xs);
-			height: var(--wpds-dimension-size-xs);
-			fill: currentColor;
 		}
 
 		.item-prefix {

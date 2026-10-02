@@ -1,7 +1,7 @@
 import { Menu as _Menu } from '@base-ui/react/menu';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-import { Circle, SVG } from '@wordpress/primitives';
+import { check } from '@wordpress/icons';
 import { Icon } from '../icon';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
 import resetStyles from '../utils/css/resets.module.css';
@@ -9,12 +9,6 @@ import styles from './style.module.css';
 import { MenuItemContentContext } from './context';
 import { ItemContent, useItemContent } from './item';
 import type { RadioItemProps } from './types';
-
-const radioCheck = (
-	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-		<Circle cx={ 12 } cy={ 12 } r={ 3 } />
-	</SVG>
-);
 
 /**
  * Renders a menu item that works like a radio button in a group.
@@ -65,8 +59,9 @@ const RadioItem = forwardRef< HTMLDivElement, RadioItemProps >(
 					className={ styles[ 'item-selection-indicator' ] }
 				>
 					<Icon
-						icon={ radioCheck }
-						className={ styles[ 'radio-selection-icon' ] }
+						icon={ check }
+						size={ 24 }
+						className={ styles[ 'item-selection-icon' ] }
 						aria-hidden="true"
 					/>
 				</_Menu.RadioItemIndicator>
