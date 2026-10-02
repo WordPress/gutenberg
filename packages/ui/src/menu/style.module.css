@@ -32,9 +32,8 @@
 			outline: none;
 
 			&:has(.item-selection-indicator) {
-				--wp-ui-menu-item-padding-inline: var(--wpds-dimension-padding-sm);
-				--wp-ui-menu-selection-indicator-track-size: var(--wpds-dimension-gap-xs);
-				--wp-ui-menu-selection-indicator-gap: var(--wpds-dimension-gap-sm);
+				--wp-ui-menu-item-padding-inline: 6px;
+				--wp-ui-menu-selection-indicator-track-size: var(--wpds-dimension-size-xs);
 			}
 		}
 
@@ -209,8 +208,6 @@
 		.item-selection-indicator {
 			grid-column: selection-start / selection-end;
 			justify-self: center;
-			/* Let the full-size icon extend into the leading item padding. */
-			margin-inline-start: calc(-1 * var(--wpds-dimension-gap-xs));
 			display: flex;
 			align-items: center;
 			justify-content: center;
