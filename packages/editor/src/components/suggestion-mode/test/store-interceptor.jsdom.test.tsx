@@ -1112,6 +1112,116 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		).toBe( 'pending-insert' );
 	} );
 
+	async function insertPendingGroup( registry: any, index: number ) {
+		const child = createBlock( TEST_BLOCK_NAME, { content: 'Child' } );
+		const group = createBlock( TEST_BLOCK_NAME, { content: 'Group' }, [
+			child,
+		] );
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).insertBlock( group, index );
+			// What the Group's inner block list registers in the editor;
+			// without it the store refuses to insert into the Group.
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockListSettings( group.clientId, {} );
+		} );
+		await flushSubscribers();
+		return { group, child };
+	}
+
+	it( 'lets a deleted child of a pending insertion stay deleted', async () => {
+		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
+		const { registry, getOverlay } = setup( { initialBlocks: [ a ] } );
+		const { group, child } = await insertPendingGroup( registry, 1 );
+
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).removeBlock( child.clientId );
+		} );
+		await flushSubscribers();
+
+		expect(
+			registry.select( blockEditorStore ).getBlockOrder( group.clientId )
+		).toEqual( [] );
+		expect( getOverlay().entries[ child.clientId ] ).toBeUndefined();
+	} );
+
+	it( 'does not restore the children of a removed pending insertion', async () => {
+		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
+		const { registry } = setup( { initialBlocks: [ a ] } );
+		const { group, child } = await insertPendingGroup( registry, 1 );
+
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).removeBlock( group.clientId );
+		} );
+		await flushSubscribers();
+
+		const blockEditor = registry.select( blockEditorStore );
+		expect( blockEditor.getClientIdsWithDescendants() ).toEqual( [
+			a.clientId,
+		] );
+		expect( blockEditor.getBlock( child.clientId ) ).toBeNull();
+	} );
+
+	it( 'adopts a block added inside a pending insertion as part of it', async () => {
+		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
+		const { registry, getOverlay } = setup( { initialBlocks: [ a ] } );
+		const { group } = await insertPendingGroup( registry, 1 );
+
+		const added = createBlock( TEST_BLOCK_NAME, { content: 'Added' } );
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.insertBlock( added, 1, group.clientId );
+		} );
+		await flushSubscribers();
+
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( added.clientId )?.metadata?.suggestion
+		).toBeUndefined();
+		expect( getOverlay().entries[ added.clientId ] ).toBeUndefined();
+	} );
+
+	it( 'moves an existing block back out of a pending insertion', async () => {
+		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
+		const b = createBlock( TEST_BLOCK_NAME, { content: 'B' } );
+		const { registry, getOverlay } = setup( { initialBlocks: [ a, b ] } );
+		const { group, child } = await insertPendingGroup( registry, 2 );
+
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.moveBlockToPosition( a.clientId, '', group.clientId, 0 );
+		} );
+		await flushSubscribers();
+
+		const blockEditor = registry.select( blockEditorStore );
+		// Inside the insertion it would be hidden on the front end and
+		// deleted along with the Group if the insertion were rejected.
+		expect( blockEditor.getBlockOrder() ).toEqual( [
+			a.clientId,
+			b.clientId,
+			group.clientId,
+		] );
+		expect( blockEditor.getBlockOrder( group.clientId ) ).toEqual( [
+			child.clientId,
+		] );
+		expect(
+			blockEditor.getBlockAttributes( a.clientId )?.metadata?.suggestion
+		).toBeUndefined();
+		expect( getOverlay().entries[ a.clientId ] ).toBeUndefined();
+		expect(
+			registry.select( noticesStore ).getNotices()
+		).toEqual(
+			expect.arrayContaining( [
+				expect.objectContaining( {
+					id: 'suggestion-move-into-insertion',
+				} ),
+			] )
+		);
+	} );
+
 	it( 'preserves the ORIGINAL from-position when a pending-move block is moved again', async () => {
 		// Reject must restore the true baseline. If a second move
 		// overwrote the marker with the intermediate position, rejecting
