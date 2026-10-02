@@ -8,7 +8,7 @@
 
 ### Internal
 
--   Update `@wp-playground/cli` to 3.1.56, which replaces the `fs-ext` optional dependency, compiled with `node-gyp` at install time, with `fs-ext-extra-prebuilt`, which ships prebuilt binaries and works without running install scripts.
+-   Update `@wp-playground/cli` to 3.1.56, which replaces the `fs-ext` optional dependency, compiled with `node-gyp` at install time, with `fs-ext-extra-prebuilt`, which ships prebuilt binaries and works without running install scripts ([#84012](https://github.com/WordPress/gutenberg/pull/84012)).
 
 ## 11.16.0 (2026-09-23)
 
