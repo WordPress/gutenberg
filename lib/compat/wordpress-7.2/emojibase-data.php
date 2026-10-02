@@ -22,7 +22,7 @@
  */
 function gutenberg_add_emojibase_settings( $settings ) {
 	// Without the copied data the picker would 404 on every open; leaving
-	// the URL unset makes it fall back to the quick reactions instead.
+	// the URL unset makes the grid offer the named reaction set instead.
 	if ( is_dir( gutenberg_dir_path() . 'build/emojibase-data' ) ) {
 		$settings['noteEmojibaseUrl'] = gutenberg_url( 'build/emojibase-data' );
 	}
@@ -91,7 +91,8 @@ function gutenberg_emoji_to_hexcode( $emoji ) {
  *
  * Emojibase translates labels for 28 locales only; the filter below lets
  * sites fill the gap for the emojis they care about. Seeded with the
- * curated reactions so both rows show the same label.
+ * named reactions so an emoji keeps its named label when the grid shows
+ * the Emojibase dataset.
  *
  * @since 7.2.0
  *
@@ -127,7 +128,7 @@ function gutenberg_get_emoji_picker_label_overrides() {
 		$defaults
 	);
 
-	// A non-string label would crash `label.toLowerCase()` in searchEmojis().
+	// A non-string label would crash `override.toLowerCase()` in searchEmojis().
 	$overrides = is_array( $overrides ) ? $overrides : array();
 	return array_filter( $overrides, 'is_string' );
 }

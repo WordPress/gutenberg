@@ -349,7 +349,7 @@ mark.wp-note {
 	.editor-collab-sidebar-panel__reactions
 	.editor-collab-sidebar-panel__add-reaction-button:focus,
 	// While the picker is open the pointer is over the popup, not the
-	// thread, and focus has moved into the popup's own portal.
+	// note, and focus has moved into the popup's own portal.
 	.editor-collab-sidebar-panel__reactions
 	.editor-collab-sidebar-panel__add-reaction-button[data-popup-open] {
 		opacity: 1;
@@ -374,7 +374,7 @@ mark.wp-note {
 
 .editor-collab-sidebar-panel__reaction-button-emoji {
 	// Render the emoji glyph larger than the button's text size so it
-	// visually balances with the 24px reaction icon next to it.
+	// visually balances with the add-reaction icon that trails the pills.
 	font-size: 16px;
 	line-height: 1;
 }
@@ -443,18 +443,9 @@ mark.wp-note {
 	scroll-padding-block: var(--wpds-dimension-size-md) 0;
 }
 
-// Loading state shown while the lazy picker chunk downloads.
-.editor-collab-sidebar-panel__picker-status {
-	display: grid;
-	place-items: center;
-	height: 100%;
-	color: var(--wpds-color-foreground-content-neutral-weak);
-}
-
 // Hold the grid's width even while it is empty (loading, or no search
-// results) so the popover doesn't resize and reposition.
-.editor-collab-sidebar-panel__picker-list,
-.editor-collab-sidebar-panel__picker-status {
+// results) so the popup doesn't resize and reposition.
+.editor-collab-sidebar-panel__picker-list {
 	min-inline-size: var(--emoji-picker-grid-width);
 }
 

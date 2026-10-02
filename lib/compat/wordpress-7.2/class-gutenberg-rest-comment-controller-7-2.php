@@ -498,11 +498,11 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			}
 
 			// Validate the reaction content. We accept either:
-			// - a curated slug (e.g. "heart") from the allowed emoji list
+			// - a named slug (e.g. "heart") from the allowed emoji list
 			//   (filterable via `gutenberg_note_reaction_emoji_settings`), or
 			// - a lowercase hex-codepoint sequence joined by `-` (e.g.
 			//   "1f44d" for 👍 or "1f468-200d-1f4bb" for 👨‍💻), which is how
-			//   the full emoji picker stores a pick outside that list.
+			//   the picker stores a pick from the Emojibase dataset.
 			// Raw emoji bytes are rejected because the comments table is
 			// not guaranteed to be utf8mb4 across all WordPress installs;
 			// clients normalize before submitting.
@@ -551,7 +551,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			}
 
 			// Enforce uniqueness: prevent duplicate emoji per user per target.
-			// Limit to active reactions — trashed reactions are invisible and
+			// Limit to active reactions - trashed reactions are invisible and
 			// must not block the user from re-adding the same emoji.
 			$existing = get_comments(
 				gutenberg_get_reaction_target_query_args(

@@ -1185,7 +1185,7 @@ test.describe( 'Block Notes', () => {
 			await expect( reactionButton ).toContainText( '❤' );
 			await expect( reactionButton ).toContainText( '1' );
 
-			// The duplicate-reaction error must never appear — pins both
+			// The duplicate-reaction error must never appear - pins both
 			// fixes (client refetch + server status='approve' query)
 			// against regression.
 			await expect(
@@ -1269,7 +1269,7 @@ test.describe( 'Block Notes', () => {
 			).toBeVisible();
 		} );
 
-		test( 'reaction buttons are keyboard accessible', async ( {
+		test( 'the emoji picker is keyboard accessible', async ( {
 			page,
 			blockNoteUtils,
 		} ) => {
@@ -1280,10 +1280,10 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			// Open the emoji picker with keyboard.
-			const addReactionButton = page.getByRole( 'combobox', {
+			const addReactionTrigger = page.getByRole( 'combobox', {
 				name: 'Add reaction',
 			} );
-			await addReactionButton.focus();
+			await addReactionTrigger.focus();
 			await page.keyboard.press( 'Enter' );
 
 			await blockNoteUtils.waitForFullPicker();
@@ -1485,8 +1485,9 @@ test.describe( 'Block Notes', () => {
 
 			// Open the full picker and click the plain heart specifically.
 			/*
-			 * "Heart" is label-overridden, and the helper's regex lookup
-			 * would otherwise match "smiling face with hearts" first.
+			 * Search first so the click lands on the Emojibase entry, not
+			 * the Frequently used seed. "Heart" is a label override, so the
+			 * exact match skips "smiling face with hearts".
 			 */
 			await page
 				.getByRole( 'combobox', { name: 'Add reaction' } )
@@ -1498,8 +1499,8 @@ test.describe( 'Block Notes', () => {
 				.click();
 
 			/*
-			 * The same button the curated row produces. Broken storage
-			 * normalization would leave a stray hex-key button instead.
+			 * One pill showing the heart and a count of 1, as a named-set
+			 * pick produces.
 			 */
 			const reactionButton = page.locator(
 				'.editor-collab-sidebar-panel__reaction-button'
@@ -1729,9 +1730,9 @@ test.describe( 'Block Notes', () => {
 				.click();
 			await blockNoteUtils.waitForFullPicker();
 
-			// Focus has moved into the portaled popover, but the note's
-			// onBlur handler exempts `.components-popover` so the thread
-			// stays selected and the trigger stays mounted.
+			// Focus has moved into the portaled popup, but its focus events
+			// still bubble to the thread's `useFocusOutside` through the
+			// React tree, so the thread stays selected and the trigger mounted.
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 		} );
 

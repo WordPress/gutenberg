@@ -43,15 +43,15 @@ class Emoji_Picker_Data_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The default override map seeds the curated reaction emojis so the
-	 * full picker shows the same translated label as the curated row.
+	 * The default override map seeds the named reaction emojis so the
+	 * picker shows their translated labels on the Emojibase entries.
 	 *
 	 * @covers ::gutenberg_get_emoji_picker_label_overrides
 	 */
 	public function test_default_overrides_seeded_from_curated_reactions() {
 		$overrides = gutenberg_get_emoji_picker_label_overrides();
 
-		// Heart, Celebration, Smile, Eyes, Rocket — the five curated
+		// Heart, Celebration, Smile, Eyes, Rocket - the five curated
 		// reactions defined in gutenberg_get_note_reaction_emojis().
 		$this->assertArrayHasKey( '2764', $overrides );
 		$this->assertArrayHasKey( '1F389', $overrides );
@@ -120,8 +120,8 @@ class Emoji_Picker_Data_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The picker configuration rides on the block editor settings — no
-	 * page globals — so the editor package reads it through its normal
+	 * The picker configuration rides on the block editor settings - no
+	 * page globals - so the editor package reads it through its normal
 	 * settings boundary.
 	 *
 	 * @covers ::gutenberg_add_emojibase_settings

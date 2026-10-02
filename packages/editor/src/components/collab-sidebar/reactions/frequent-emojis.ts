@@ -23,8 +23,8 @@ export interface FrequentEmojiEntry {
  */
 export const FREQUENT_EMOJIS_PREFERENCE_KEY = 'emojiPickerFrequentEmojis';
 
-// Four rows of the picker's 8-column grid.
-export const MAX_FREQUENT_EMOJIS = 32;
+// Five full rows of the picker's 6-column grid.
+export const MAX_FREQUENT_EMOJIS = 30;
 
 /**
  * Seeds the frequently-used section before any picks. Never persisted:

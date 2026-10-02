@@ -61,8 +61,8 @@ function gutenberg_get_internal_comment_types() {
 /**
  * Updates the comment type for avatars to include internal comment types.
  *
- * Replaces the 6.9 implementation to also add the 'reaction' type
- * to the list of comment types for which avatars should be retrieved.
+ * Adds the 'reaction' type to core's default 'comment' and 'note' avatar
+ * comment types.
  *
  * @param array $comment_type The array of comment types.
  * @return array The updated array of comment types.
@@ -70,13 +70,14 @@ function gutenberg_get_internal_comment_types() {
 function gutenberg_update_get_avatar_comment_type_7_2( $comment_type ) {
 	return array_values( array_unique( array_merge( $comment_type, gutenberg_get_internal_comment_types() ) ) );
 }
-remove_filter( 'get_avatar_comment_types', 'update_get_avatar_comment_type' );
 add_filter( 'get_avatar_comment_types', 'gutenberg_update_get_avatar_comment_type_7_2' );
 
 /**
- * Excludes block comments and reactions from the admin comments query.
+ * Excludes notes and reactions from comment queries that request no
+ * specific type.
  *
- * Replaces the 6.9 implementation to also exclude 'reaction' type.
+ * Core's WP_Comment_Query already excludes 'note'; this also excludes
+ * 'reaction'.
  *
  * @global wpdb $wpdb WordPress database abstraction object.
  *
@@ -98,7 +99,6 @@ function gutenberg_exclude_block_comments_from_admin_7_2( $clauses, $query ) {
 
 	return $clauses;
 }
-remove_action( 'comments_clauses', 'exclude_block_comments_from_admin', 10 );
 add_action( 'comments_clauses', 'gutenberg_exclude_block_comments_from_admin_7_2', 10, 2 );
 
 /**
@@ -125,7 +125,8 @@ add_filter( 'comment_feed_where', 'gutenberg_exclude_internal_comment_types_from
 /**
  * Filter the comment count query to exclude notes and reactions.
  *
- * Replaces the 6.9 implementation to also exclude 'reaction' type.
+ * Core hardcodes the 'note' exclusion in this query; this also excludes
+ * 'reaction'.
  *
  * @param string $query The SQL query string.
  * @return string The modified SQL query string.
@@ -133,10 +134,10 @@ add_filter( 'comment_feed_where', 'gutenberg_exclude_internal_comment_types_from
 function gutenberg_filter_comment_count_query_exclude_block_comments_7_2( $query ) {
 	if ( str_starts_with( $query, 'SELECT comment_post_ID, COUNT(comment_ID) as num_comments FROM' ) && str_contains( $query, 'comment_approved' ) ) {
 		// Add an exclusion clause for each internal type not already present.
-		// Core (and older versions of this filter) may have already injected
-		// the note-only exclusion, so expanding per type - rather than bailing
-		// when any exclusion exists - ensures reactions are excluded too and
-		// keeps the filter idempotent if it runs more than once.
+		// Core's query already hardcodes the note-only exclusion, so expanding
+		// per type - rather than bailing when any exclusion exists - ensures
+		// reactions are excluded too and keeps the filter idempotent if it
+		// runs more than once.
 		$type_clauses = array();
 		foreach ( gutenberg_get_internal_comment_types() as $internal_type ) {
 			$clause = "comment_type != '" . esc_sql( $internal_type ) . "'";
@@ -155,7 +156,8 @@ add_filter( 'query', 'gutenberg_filter_comment_count_query_exclude_block_comment
 /**
  * Adjusts the comments list table query so notes and reactions never display.
  *
- * Replaces the 6.9 implementation to also handle 'reaction' type.
+ * Extends core's 'note' guard in WP_Comments_List_Table to the 'reaction'
+ * type.
  *
  * @param array $args An array of get_comments() arguments.
  * @return array Possibly modified arguments for get_comments().
@@ -171,7 +173,7 @@ add_filter( 'comments_list_table_query_args', 'gutenberg_hide_note_from_comment_
 /**
  * Override comment_count to exclude notes and reactions from the comment count.
  *
- * Replaces the 6.9 implementation to also exclude 'reaction' type.
+ * Core's default count excludes only 'note'; this also excludes 'reaction'.
  *
  * @param int|null $new_count The new comment count. Default null.
  * @param int      $old_count The old comment count.
@@ -198,7 +200,8 @@ add_filter( 'pre_wp_update_comment_count_now', 'gutenberg_exclude_notes_from_com
 
 /**
  * Returns the note reaction emoji settings: the named emoji list plus the
- * rules for emoji picked from the full picker, which are stored as hex keys.
+ * rules for emoji picked from the Emojibase dataset, which are stored as
+ * hex keys.
  *
  * @since 7.2.0
  *
@@ -242,7 +245,7 @@ function gutenberg_get_note_reaction_emoji_settings() {
 	 * Filters which emoji note reactions accept.
 	 *
 	 * Named emoji are always accepted. `allow_unlisted` and `exclude` only
-	 * apply to emoji picked from the full picker.
+	 * apply to emoji picked from the Emojibase dataset.
 	 *
 	 * @since 7.2.0
 	 *
@@ -415,7 +418,7 @@ function gutenberg_delete_note_reactions( $comment_id, $comment ) {
 		return;
 	}
 
-	// Every status: trashing the note, or the user removing a reaction,
+	// Every status: trashing the note, or a REST delete without `force`,
 	// leaves reactions in the trash.
 	foreach ( gutenberg_get_note_reaction_ids( $comment ) as $reaction_id ) {
 		wp_delete_comment( $reaction_id, true );
@@ -441,7 +444,7 @@ function gutenberg_trash_note_reactions( $comment_id, $comment ) {
 	}
 
 	// Flag each one so restoring the note brings back only these, not
-	// reactions the user had already removed.
+	// reactions already in the trash (a REST delete without `force`).
 	foreach ( gutenberg_get_note_reaction_ids( $comment, 'approve' ) as $reaction_id ) {
 		if ( wp_trash_comment( $reaction_id ) ) {
 			add_comment_meta( $reaction_id, '_wp_trash_meta_with_note', '1', true );
@@ -454,8 +457,8 @@ add_action( 'trashed_comment', 'gutenberg_trash_note_reactions', 10, 2 );
  * Restores a note's reactions along with the note.
  *
  * The counterpart to gutenberg_trash_note_reactions(): only reactions
- * flagged as trashed along with the note come back. Ones the user removed
- * beforehand stay in the trash.
+ * flagged as trashed along with the note come back. Ones already in the
+ * trash beforehand stay there.
  *
  * @since 7.2.0
  *

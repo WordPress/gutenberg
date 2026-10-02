@@ -6,8 +6,8 @@
  * is not a network cost.
  *
  * Runs from `tools/build-scripts/build.mjs` and `dev.mjs` after wp-build
- * populates `build/`. Exits 0 when emojibase-data is missing: the editor degrades
- * by hiding the "More emojis" trigger.
+ * populates `build/`. Exits 0 when emojibase-data is missing: the picker
+ * degrades to offering the site's named reaction set.
  */
 
 import { mkdir, copyFile } from 'fs/promises';
@@ -47,7 +47,7 @@ const FILES = [ 'data.json' ];
 /*
  * Every locale Emojibase translates. Must stay in sync with
  * `EMOJIBASE_LOCALES` in
- * `packages/editor/src/components/collab-sidebar/emojibase-data.ts`.
+ * `packages/editor/src/components/collab-sidebar/reactions/emojibase-data.ts`.
  * Each locale costs ~780KB on disk (~22MB total), ~95KB gzipped over the
  * wire, and only the active one is fetched per editor session.
  */
@@ -87,7 +87,7 @@ async function copyEmojibaseData() {
 		console.warn(
 			'⚠️  emojibase-data not found',
 			SRC_DIR ? `at ${ SRC_DIR }` : '',
-			'— skipping. Run `npm install` to fetch it.'
+			'- skipping. Run `npm install` to fetch it.'
 		);
 		return;
 	}
