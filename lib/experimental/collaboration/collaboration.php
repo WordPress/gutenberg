@@ -373,7 +373,7 @@ function gutenberg_filter_locked_posts_heartbeat_for_rtc( $response, $data = arr
 			}
 
 			$post = get_post( $post_id );
-			if ( ! $post || wp_is_post_type_collaboration_disabled( $post->post_type ) ) {
+			if ( ! $post || wp_is_post_collaboration_disabled( $post ) ) {
 				continue;
 			}
 
@@ -409,7 +409,7 @@ if ( ! function_exists( 'gutenberg_block_quick_edit_for_active_lock' ) ) {
 		}
 
 		$post = get_post( $post_id );
-		if ( ! $post || wp_is_post_type_collaboration_disabled( $post->post_type ) ) {
+		if ( ! $post || wp_is_post_collaboration_disabled( $post ) ) {
 			return;
 		}
 
@@ -537,7 +537,7 @@ function gutenberg_post_list_collaboration_row_actions( $actions, $post ) {
 		return $actions;
 	}
 
-	if ( wp_is_post_type_collaboration_disabled( $post->post_type ) ) {
+	if ( wp_is_post_collaboration_disabled( $post ) ) {
 		return $actions;
 	}
 
@@ -599,7 +599,7 @@ function gutenberg_add_autosave_details_to_editor_settings( $settings, $block_ed
 
 	$post = $block_editor_context->post;
 
-	if ( wp_is_post_type_collaboration_disabled( $post->post_type ) ) {
+	if ( wp_is_post_collaboration_disabled( $post ) ) {
 		return $settings;
 	}
 
