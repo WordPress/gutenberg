@@ -5,6 +5,11 @@
 ### Enhancements
 
 -   `Icon`: add the `keywords` field exposed by the icons REST endpoint ([#82367](https://github.com/WordPress/gutenberg/pull/82367)).
+-   `__experimentalFetchLinkSuggestions`: add a `preferTypes` option to rank matches from one or more search types above the usual order ([#83408](https://github.com/WordPress/gutenberg/pull/83408)).
+
+### Bug Fixes
+
+-   `__experimentalFetchLinkSuggestions`: rank results by type (content, taxonomy, post format, attachment), and return everything the endpoints gave rather than cutting the merged results. `perPage` is now the page size asked of each type rather than a limit on what they add up to, so `page` reaches every result ([#83407](https://github.com/WordPress/gutenberg/pull/83407)).
 
 ### Internal
 

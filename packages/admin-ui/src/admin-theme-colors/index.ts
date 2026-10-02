@@ -8,7 +8,11 @@ const DEFAULT_THEME_COLORS: AdminThemeColors = {
 	background: '#222524',
 };
 
-const ADMIN_THEME_COLORS = new Map< string, AdminThemeColors >( [
+/*
+ * Exported from this module only, not from the package, so tooling in this
+ * repository can read the list of bundled schemes without duplicating it.
+ */
+export const ADMIN_THEME_COLORS = new Map< string, AdminThemeColors >( [
 	[ 'modern', DEFAULT_THEME_COLORS ],
 	[ 'fresh', { primary: '#007cba', background: '#25292b' } ],
 	[ 'midnight', { primary: '#cf4339', background: '#3d4042' } ],
