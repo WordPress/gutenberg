@@ -157,4 +157,128 @@ class WP_Block_Supports_Spacing_Test extends WP_UnitTestCase {
 
 		$this->assertSame( $expected, $actual );
 	}
+
+	/**
+	 * @dataProvider data_generate_spacing_size_preset_fixtures
+	 *
+	 * @param array  $spacing_size    A spacingSizes preset value as seen in theme.json.
+	 * @param array  $settings        Theme JSON settings array that overrides any global theme settings.
+	 * @param string $expected_output Expected output of gutenberg_get_spacing_size_value().
+	 */
+	public function test_gutenberg_get_spacing_size_value( $spacing_size, $settings, $expected_output ) {
+		$actual = gutenberg_get_spacing_size_value( $spacing_size, $settings );
+
+		$this->assertSame( $expected_output, $actual );
+	}
+
+	/**
+	 * Data provider for test_gutenberg_get_spacing_size_value.
+	 *
+	 * @return array
+	 */
+	public function data_generate_spacing_size_preset_fixtures() {
+		return array(
+			'returns null when size is not set'   => array(
+				'spacing_size'    => array(),
+				'settings'        => array(),
+				'expected_output' => null,
+			),
+
+			'returns value when fluid spacing is deactivated' => array(
+				'spacing_size'    => array(
+					'size' => '28px',
+				),
+				'settings'        => array(),
+				'expected_output' => '28px',
+			),
+
+			'returns value when fluid is `false`' => array(
+				'spacing_size'    => array(
+					'size'  => '1.75rem',
+					'fluid' => false,
+				),
+				'settings'        => array(
+					'spacing' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => '1.75rem',
+			),
+
+			'returns value when global fluid is enabled but preset has no fluid bounds' => array(
+				'spacing_size'    => array(
+					'size' => '1.75rem',
+				),
+				'settings'        => array(
+					'spacing' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => '1.75rem',
+			),
+
+			'returns value when preset fluid is `true` with no explicit min/max' => array(
+				'spacing_size'    => array(
+					'size'  => '1.75rem',
+					'fluid' => true,
+				),
+				'settings'        => array(),
+				'expected_output' => '1.75rem',
+			),
+
+			'returns value when preset fluid is missing `max`' => array(
+				'spacing_size'    => array(
+					'size'  => '1.75rem',
+					'fluid' => array(
+						'min' => '1.5rem',
+					),
+				),
+				'settings'        => array(),
+				'expected_output' => '1.75rem',
+			),
+
+			'returns clamp value with explicit min/max and default viewport widths' => array(
+				'spacing_size'    => array(
+					'size'  => '1.75rem',
+					'fluid' => array(
+						'min' => '1.5rem',
+						'max' => '1.75rem',
+					),
+				),
+				'settings'        => array(),
+				'expected_output' => 'clamp(1.5rem, 1.5rem + ((1vw - 0.2rem) * 0.313), 1.75rem)',
+			),
+
+			'returns clamp value using px units'  => array(
+				'spacing_size'    => array(
+					'size'  => '32px',
+					'fluid' => array(
+						'min' => '16px',
+						'max' => '32px',
+					),
+				),
+				'settings'        => array(),
+				'expected_output' => 'clamp(16px, 1rem + ((1vw - 3.2px) * 1.25), 32px)',
+			),
+
+			'returns clamp value with custom global viewport widths' => array(
+				'spacing_size'    => array(
+					'size'  => '2rem',
+					'fluid' => array(
+						'min' => '1rem',
+						'max' => '2rem',
+					),
+				),
+				'settings'        => array(
+					'spacing' => array(
+						'fluid' => array(
+							'minViewportWidth' => '768px',
+							'maxViewportWidth' => '1280px',
+						),
+					),
+				),
+				'expected_output' => 'clamp(1rem, 1rem + ((1vw - 0.48rem) * 3.125), 2rem)',
+			),
+		);
+	}
 }
