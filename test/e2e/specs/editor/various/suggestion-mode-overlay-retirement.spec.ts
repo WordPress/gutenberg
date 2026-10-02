@@ -768,9 +768,10 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 			await addMarker.getAttribute( 'data-suggestion-id' )
 		);
 
-		// Caret between "aga" and "in and more".
-		await page.keyboard.press( 'End' );
-		await pageUtils.pressKeys( 'ArrowLeft', { times: 11 } );
+		// Caret between "aga" and "in and more". Counted from the start: the
+		// marker boundary takes an extra arrow press of its own.
+		await page.keyboard.press( 'Home' );
+		await pageUtils.pressKeys( 'ArrowRight', { times: 15 } );
 		await page.keyboard.press( 'Enter' );
 
 		// The head strikes through only the base text that moved.
