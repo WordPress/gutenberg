@@ -33,7 +33,6 @@ const LinkControlSearchInput = forwardRef(
 			allowDirectEntry = true,
 			showInitialSuggestions = false,
 			suggestionsQuery = {},
-			withURLSuggestion = true,
 			transformSuggestions = null,
 			createSuggestionButtonText,
 			hideLabelFromVision = false,
@@ -47,7 +46,6 @@ const LinkControlSearchInput = forwardRef(
 			suggestionsQuery,
 			allowDirectEntry,
 			withCreateSuggestion,
-			withURLSuggestion,
 			transformSuggestions
 		);
 

@@ -93,7 +93,6 @@ export default function useSearchHandler(
 	suggestionsQuery,
 	allowDirectEntry,
 	withCreateSuggestion,
-	withURLSuggestion,
 	transformSuggestions
 ) {
 	const { fetchSearchSuggestions, pageOnFront, pageForPosts } = useSelect(
