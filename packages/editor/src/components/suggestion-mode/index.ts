@@ -3,6 +3,9 @@ export {
 	SuggestionOverlayProvider,
 	useSuggestionOverlay,
 	overlayReducer,
+	useOverlayEntry,
+	useSuggestionOverlayActions,
+	POST_TITLE_OVERLAY_KEY,
 } from './overlay-context';
 export {
 	default as withSuggestionOverlay,
@@ -44,6 +47,8 @@ export {
 	parseSuggestionPayload,
 	payloadByteLength,
 	findStructuralOp,
+	findPostAttributeOps,
+	postOperationsFromOverlay,
 	clearSuggestionMarkerAttributes,
 	PAYLOAD_MAX_BYTES,
 	SCHEMA_VERSION,
