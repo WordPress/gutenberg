@@ -299,7 +299,7 @@ test.describe( 'Query block', () => {
 				( url ) =>
 					(
 						url.searchParams.get( 'rest_route' ) ?? url.pathname
-					).includes( '/wp/v2/categories' ) &&
+					).includes( '/wp/v2/tags' ) &&
 					url.search.includes( 'include' ),
 				async ( route ) => {
 					await new Promise( ( resolve ) =>
@@ -309,11 +309,10 @@ test.describe( 'Query block', () => {
 				}
 			);
 
-			const categoriesControl = await addQueryWithTaxonomyFilters( {
-				page,
-				editor,
-			} );
-			await categoriesControl.click();
+			await addQueryWithTaxonomyFilters( { page, editor } );
+			await page
+				.getByRole( 'combobox', { name: 'Tags', exact: true } )
+				.click();
 
 			await page.getByRole( 'option', { name: 'Alpaca' } ).click();
 			await page.getByRole( 'option', { name: 'Capybara' } ).click();
@@ -324,12 +323,7 @@ test.describe( 'Query block', () => {
 					attributes: {
 						query: {
 							taxQuery: {
-								include: {
-									category: [
-										categoryIds[ 0 ],
-										categoryIds[ 2 ],
-									],
-								},
+								include: { post_tag: tagIds },
 							},
 						},
 					},
