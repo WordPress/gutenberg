@@ -1,39 +1,12 @@
 import { _x, sprintf } from '@wordpress/i18n';
 import { formatFontStyle } from './format-font-style';
 import { formatFontWeight } from './format-font-weight';
+import { parseFontWeightValue } from './parse-font-weight';
 import type {
 	FontFamilyFace,
 	FormattedFont,
 	CombinedStyleAndWeightOption,
 } from './types';
-
-/*
- * The absolute keywords a `@font-face` weight may use. `lighter` and `bolder` are
- * relative to the parent and are not allowed there, so they are not listed.
- */
-const FONT_WEIGHT_KEYWORDS: Record< string, number | undefined > = {
-	normal: 400,
-	bold: 700,
-};
-
-function isValidWeight( weight: number | undefined ): weight is number {
-	return (
-		weight !== undefined &&
-		Number.isFinite( weight ) &&
-		weight >= 1 &&
-		weight <= 1000
-	);
-}
-
-/*
- * Read one end of a `@font-face` weight range as a number, or undefined when it is
- * neither a number nor a keyword the property accepts.
- */
-function parseWeightValue( value: string ): number | undefined {
-	const token = value.trim().toLowerCase();
-	const weight = FONT_WEIGHT_KEYWORDS[ token ] ?? Number( token );
-	return isValidWeight( weight ) ? weight : undefined;
-}
 
 const FONT_STYLES = [
 	{
@@ -113,8 +86,8 @@ export function getFontStylesAndWeights(
 		) {
 			// Read both ends, which may be keywords: "normal 900" is 400 to 900.
 			const [ startStr, endStr ] = face.fontWeight.trim().split( /\s+/ );
-			const start = parseWeightValue( startStr );
-			const end = parseWeightValue( endStr );
+			const start = parseFontWeightValue( startStr );
+			const end = parseFontWeightValue( endStr );
 
 			// A range this property cannot express is left to the face's own
 			// formatting below rather than offering weights nobody declared.

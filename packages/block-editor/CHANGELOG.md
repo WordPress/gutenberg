@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Typography: Variable fonts can use any weight within their declared range. Appearance separates the style selector from a weight picker, which offers both named presets and a direct numeric value ([#83141](https://github.com/WordPress/gutenberg/pull/83141)).
+
 ### Enhancements
 
 -   Inserter: Open faster when many block types are registered ([#83446](https://github.com/WordPress/gutenberg/pull/83446)).
