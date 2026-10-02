@@ -150,8 +150,8 @@ function StyleStateInspectorSlots( {
 					{ isViewportStyleState && <PositionControls /> }
 				</>
 			) }
-			{ isViewportStyleState && (
-				<InspectorControls.Slot group="viewport" />
+			{ ! isDefaultBlockStyleState( selectedBlockStyleState ) && (
+				<InspectorControls.Slot group="styleStates" />
 			) }
 		</>
 	);
