@@ -6,7 +6,7 @@ import { createElement } from '@wordpress/element';
 import { store as coreDataStore } from '../../index';
 import useResourcePermissions from '../use-resource-permissions';
 
-vi.mock( '@wordpress/api-fetch' );
+vi.mock( import( '@wordpress/api-fetch' ) );
 
 describe( 'useResourcePermissions', () => {
 	let registry;

@@ -3,7 +3,7 @@ import { createBlobURL } from '@wordpress/blob';
 import imageCorrector from '../image-corrector';
 import { deepFilterHTML } from '../utils';
 
-vi.mock( '@wordpress/blob', () => ( {
+vi.mock( import( '@wordpress/blob' ), () => ( {
 	createBlobURL: vi.fn( () => 'blob:local-url' ),
 } ) );
 

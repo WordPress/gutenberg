@@ -225,7 +225,10 @@ describe( 'SuggestionAutoSave', () => {
 		await flushPromises();
 
 		expect( deleteSuggestion ).toHaveBeenCalledTimes( 1 );
-		expect( deleteSuggestion ).toHaveBeenCalledWith( { commentId: 42 } );
+		expect( deleteSuggestion ).toHaveBeenCalledWith( {
+			commentId: 42,
+			clientId: 'a',
+		} );
 	} );
 
 	it( 'does not duplicate work when the user keeps typing during an in-flight save', async () => {

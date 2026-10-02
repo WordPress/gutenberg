@@ -205,7 +205,7 @@ export default function SuggestionAutoSave() {
 			try {
 				if ( operations.length === 0 ) {
 					if ( commentId ) {
-						await deleteRef.current( { commentId } );
+						await deleteRef.current( { commentId, clientId } );
 						writeCommentId( clientId, null );
 					}
 				} else if ( commentId ) {
