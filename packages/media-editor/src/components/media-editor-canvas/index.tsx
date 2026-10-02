@@ -80,7 +80,6 @@ export default function MediaEditorCanvas( {
 
 	useEffect( () => {
 		if (
-			cropperImage ||
 			! mediaUrl ||
 			! Number.isFinite( mediaWidth ) ||
 			! Number.isFinite( mediaHeight ) ||

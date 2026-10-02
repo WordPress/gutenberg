@@ -1,7 +1,26 @@
-import { beforeEach, describe, expect, test } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
+import {
+	cleanup as cleanupBrowser,
+	render as renderBrowser,
+} from 'vitest-browser-react';
 import { screen, act, within, waitFor } from '@testing-library/react';
-import { createBlock } from '@wordpress/blocks';
+import {
+	createBlock,
+	getBlockTypes,
+	unregisterBlockType,
+} from '@wordpress/blocks';
+import { createElement, useState } from '@wordpress/element';
+import { dispatch, select } from '@wordpress/data';
+import {
+	store as richTextStore,
+	unregisterFormatType,
+} from '@wordpress/rich-text';
+import {
+	BlockInspector,
+	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import {
 	initializeEditor,
 	selectBlock,
@@ -12,6 +31,16 @@ import { registerCoreBlocks } from '@wordpress/block-library';
 import '../../../../block-editor/src/components/block-popover/style.scss';
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports -- Browser fixtures need the styles WordPress normally enqueues.
 import '../../../../components/src/popover/style.scss';
+import { unlock } from '../../lock-unlock';
+import { getMediaColor } from '../edit/color-utils';
+
+vi.mock( import( '../edit/color-utils' ), { spy: true } );
+
+const {
+	ExperimentalBlockCanvas: BlockCanvas,
+	ExperimentalBlockEditorProvider: BlockEditorProvider,
+	openMediaEditorModalKey,
+} = unlock( blockEditorPrivateApis );
 const defaultSettings = {
 	__experimentalFeatures: {
 		color: {
@@ -209,6 +238,154 @@ describe( 'Cover block', () => {
 					'presentation'
 				)
 			).not.toBeInTheDocument();
+		} );
+	} );
+
+	describe( 'media editor Undo', () => {
+		const originalUrl =
+			'data:image/svg+xml,' +
+			encodeURIComponent(
+				'<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10" fill="black"/></svg>'
+			);
+		const updatedImage = { id: 11, url: `${ originalUrl }#edited` };
+
+		beforeEach( () => {
+			vi.mocked( getMediaColor ).mockResolvedValue( '#ffffff' );
+		} );
+
+		afterEach( async () => {
+			await cleanupBrowser();
+			getBlockTypes().forEach( ( { name } ) =>
+				unregisterBlockType( name )
+			);
+			select( richTextStore )
+				.getFormatTypes()
+				.forEach( ( { name } ) => unregisterFormatType( name ) );
+		} );
+
+		async function openMediaEditor( initialAttributes = {} ) {
+			const openModal = vi.fn();
+			const block = createBlock( 'core/cover', {
+				id: 10,
+				url: originalUrl,
+				backgroundType: 'image',
+				sizeSlug: 'medium',
+				overlayColor: 'black',
+				isDark: true,
+				isUserOverlayColor: false,
+				...initialAttributes,
+			} );
+			function TestEditor() {
+				const [ blocks, setBlocks ] = useState( [ block ] );
+				return createElement(
+					BlockEditorProvider,
+					{
+						value: blocks,
+						onInput: setBlocks,
+						onChange: setBlocks,
+						useSubRegistry: false,
+						settings: {
+							...defaultSettings,
+							[ openMediaEditorModalKey ]: openModal,
+						},
+					},
+					createElement( BlockInspector ),
+					createElement( BlockCanvas, {
+						height: '100%',
+						shouldIframe: false,
+					} )
+				);
+			}
+			await renderBrowser( createElement( TestEditor ) );
+			await userEvent.click( screen.getByLabelText( 'Block: Cover' ) );
+			await userEvent.click(
+				screen.getByRole( 'button', { name: 'Edit image' } )
+			);
+			const { clientId } = select( blockEditorStore ).getBlocks()[ 0 ];
+			return {
+				...openModal.mock.calls[ 0 ][ 0 ],
+				getAttributes: () =>
+					select( blockEditorStore ).getBlockAttributes( clientId ),
+				editAttributes: ( attributes ) =>
+					dispatch( blockEditorStore ).updateBlockAttributes(
+						clientId,
+						attributes
+					),
+			};
+		}
+
+		test( 'restores only the previous image without reverting Cover settings', async () => {
+			const { onUpdate, onUndo, getAttributes, editAttributes } =
+				await openMediaEditor();
+			await act( () => onUpdate( updatedImage ) );
+			expect( getAttributes() ).toMatchObject( {
+				id: 11,
+				sizeSlug: 'full',
+				overlayColor: 'white',
+				isDark: false,
+			} );
+			await act( () =>
+				editAttributes( { dimRatio: 75, sizeSlug: 'large' } )
+			);
+			const beforeUndo = getAttributes();
+
+			act( () => onUndo() );
+
+			expect( getAttributes() ).toEqual( {
+				...beforeUndo,
+				id: 10,
+				url: originalUrl,
+			} );
+		} );
+
+		test( 'preserves an overlay chosen after saving when undoing the media update', async () => {
+			const { onUpdate, onUndo, getAttributes, editAttributes } =
+				await openMediaEditor();
+			await act( () => onUpdate( updatedImage ) );
+			await act( () =>
+				editAttributes( {
+					overlayColor: undefined,
+					customOverlayColor: '#000000',
+					isUserOverlayColor: true,
+					dimRatio: 90,
+					isDark: true,
+				} )
+			);
+
+			const beforeUndo = getAttributes();
+			act( () => onUndo() );
+
+			expect( getAttributes() ).toEqual( {
+				...beforeUndo,
+				id: 10,
+				url: originalUrl,
+			} );
+		} );
+
+		test( 'does not reapply a media update when Undo runs before its color loads', async () => {
+			const { onUpdate, onUndo, getAttributes } = await openMediaEditor();
+			const previous = getAttributes();
+			let resolveColor;
+			vi.mocked( getMediaColor ).mockReturnValueOnce(
+				new Promise( ( resolve ) => {
+					resolveColor = resolve;
+				} )
+			);
+			let updatePromise;
+			act( () => {
+				updatePromise = onUpdate( updatedImage );
+			} );
+
+			act( () => onUndo() );
+			await act( async () => {
+				resolveColor( '#ffffff' );
+				await updatePromise;
+			} );
+
+			expect( getAttributes() ).toEqual( previous );
+			expect(
+				screen.getByRole( 'button', { name: 'Edit image' } )
+			).toBeEnabled();
 		} );
 	} );
 
