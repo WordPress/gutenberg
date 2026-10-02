@@ -62,6 +62,32 @@ async function waitForSuggestionSaved( page: any ) {
 	);
 }
 
+async function openNotesSidebar( page: any ) {
+	const allNotesToggle = page
+		.getByRole( 'region', { name: 'Editor top bar' } )
+		.getByRole( 'button', { name: 'All notes', exact: true } );
+	if (
+		( await allNotesToggle.getAttribute( 'aria-expanded' ) ) === 'false'
+	) {
+		await allNotesToggle.click();
+	}
+	return page.getByRole( 'region', { name: 'Editor settings' } );
+}
+
+async function getParagraphs( page: any ) {
+	return page.evaluate( () =>
+		window.wp.data
+			.select( 'core/block-editor' )
+			.getBlocks()
+			.map( ( block: any ) => ( {
+				content: String( block.attributes.content ?? '' ),
+				noteIds: [ block.attributes.metadata?.noteId ?? [] ]
+					.flat()
+					.map( Number ),
+			} ) )
+	);
+}
+
 async function deselect( page: any ) {
 	// Inline marks render in place of the plain proposed value only once the
 	// block is deselected.
@@ -704,6 +730,134 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 			.nth( 1 );
 		await expect( tail ).toHaveClass( /is-suggestion-pending-insert/ );
 		await expect( tail ).toHaveText( 'jumps over the lazy dog.' );
+	} );
+
+	/*
+	 * A split inside a block that already holds the user's own pending
+	 * addition (#73411, B8). The head's truncation removes part of the marked
+	 * run, which the planner used to decline, so the head fell back to a
+	 * whole-attribute overlay ("Replace: ...", outlined like an attribute
+	 * change), and the tail was built from the original content, copying the
+	 * marker and its note id into a second block.
+	 */
+	test( 'seam: a split after an own addition moves the addition to the tail as plain text', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world again' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' and more' );
+		const addMarker = paragraph.locator(
+			`${ SUGGESTION_MARK }[data-suggestion-type="add"]`
+		);
+		await expect( addMarker ).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		await expect( addMarker ).toHaveText( ' and more' );
+		const addId = Number(
+			await addMarker.getAttribute( 'data-suggestion-id' )
+		);
+
+		// Caret between "aga" and "in and more". Counted from the start: the
+		// marker boundary takes an extra arrow press of its own.
+		await page.keyboard.press( 'Home' );
+		await pageUtils.pressKeys( 'ArrowRight', { times: 15 } );
+		await page.keyboard.press( 'Enter' );
+
+		// The head strikes through only the base text that moved.
+		const delMarker = paragraph.locator(
+			`${ SUGGESTION_MARK }[data-suggestion-type="del"]`
+		);
+		await expect( delMarker ).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		await expect( delMarker ).toHaveText( 'in' );
+		await deselect( page );
+
+		await expect( paragraph ).toHaveText( 'Hello world again' );
+		await expect( paragraph ).not.toHaveClass( /is-suggestion-pending\b/ );
+		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 1 );
+
+		// The tail is a pending insertion holding the moved text, unmarked: the
+		// whole block is the proposal, so its own `add` has nothing to add.
+		const tail = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.nth( 1 );
+		await expect( tail ).toHaveClass( /is-suggestion-pending-insert/ );
+		await expect( tail ).toHaveText( 'in and more' );
+		await expect( tail.locator( SUGGESTION_MARK ) ).toHaveCount( 0 );
+
+		// Neither block keeps a link to the retired addition note.
+		const [ head, tailBlock ] = await getParagraphs( page );
+		expect( head.content ).not.toContain( `"${ addId }"` );
+		expect( tailBlock.content ).not.toContain( 'data-suggestion-id' );
+		expect( tailBlock.noteIds ).not.toContain( addId );
+
+		// Each note is listed once, and the addition note is collected now
+		// that nothing anchors it.
+		const sidebar = await openNotesSidebar( page );
+		const threads = sidebar.locator(
+			'.editor-collab-sidebar-panel__thread'
+		);
+		await expect( threads ).toHaveCount( 2 );
+		await expect(
+			sidebar.locator( `[id="note-thread-${ addId }"]` )
+		).toHaveCount( 0 );
+		const threadIds = await threads.evaluateAll( ( els: Element[] ) =>
+			els.map( ( el ) => el.id )
+		);
+		expect( new Set( threadIds ).size ).toBe( threadIds.length );
+	} );
+
+	test( "invariant: a split inside another author's pending marker is declined", async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content:
+					'Hello <mark class="wp-suggestion" data-suggestion-id="987654" data-suggestion-type="add" data-author="987654">brave new</mark> world',
+			},
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		// Caret inside the other author's addition ("Hello br|ave new"), so
+		// the run a split would remove from this block carries their marker.
+		await page.keyboard.press( 'Home' );
+		await pageUtils.pressKeys( 'ArrowRight', { times: 8 } );
+		await page.keyboard.press( 'Enter' );
+
+		await expect(
+			page
+				.locator( '.components-snackbar-list' )
+				.getByText( 'overlaps a pending suggestion' )
+		).toBeVisible();
+
+		await deselect( page );
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		).toHaveCount( 1 );
+		await expect( paragraph ).not.toHaveClass( /is-suggestion-pending/ );
+		await expect( paragraph ).toHaveText( 'Hello brave new world' );
+		await expect(
+			paragraph.locator(
+				`${ SUGGESTION_MARK }[data-suggestion-id="987654"]`
+			)
+		).toHaveText( 'brave new' );
 	} );
 
 	/*
