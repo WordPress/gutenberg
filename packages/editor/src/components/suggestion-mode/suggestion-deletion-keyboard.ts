@@ -25,6 +25,7 @@ import {
 	getCandidateDocuments,
 	isEventTargetSelectedRichText,
 	readEventRange,
+	readLiveInlineSelection,
 } from './keyboard-target';
 import {
 	previousGraphemeBoundary,
@@ -32,6 +33,7 @@ import {
 } from './grapheme-boundaries';
 import { isPartOfPendingInsertion } from './store-interceptor';
 import { notifyEditRefused } from './refuse-edit';
+import { rebaseRunAnchor } from './run-anchor';
 
 /**
  * Read a rich-text value's plain text and its per-character format stacks,
@@ -126,14 +128,17 @@ export function isWithinOwnAddition(
  * Whether a delete keystroke that arrives while a run's note request is still
  * in flight belongs to that run. The run has no id yet, so it cannot grow;
  * the keystroke is counted and replayed once the id resolves. Only a repeat
- * in the same field and direction is a repeat: a Delete after a pending
- * Backspace, or a Backspace in another attribute, starts a run of its own.
+ * in the same field and direction, at the caret the run started from, is a
+ * repeat: a Delete after a pending Backspace, a Backspace in another attribute,
+ * or one after the caret moved, starts a run of its own. The run's keystrokes
+ * were cancelled, so an unmoved caret still reads the run's starting offset.
  *
  * @param run                  The in-progress run, if any.
  * @param context              The current keystroke's context.
  * @param context.clientId     Block client id.
  * @param context.attributeKey Rich-text attribute name.
  * @param context.isBackward   True for Backspace, false for Delete.
+ * @param context.pos          Collapsed caret offset, when known.
  * @return True when this keystroke is a buffered repeat of `run`.
  */
 export function isBufferedDeleteRepeat(
@@ -142,10 +147,12 @@ export function isBufferedDeleteRepeat(
 		clientId,
 		attributeKey,
 		isBackward,
+		pos,
 	}: {
 		clientId: string;
 		attributeKey: string;
 		isBackward: boolean;
+		pos?: number;
 	}
 ): boolean {
 	return Boolean(
@@ -153,7 +160,10 @@ export function isBufferedDeleteRepeat(
 		run.id === null &&
 		run.clientId === clientId &&
 		run.attributeKey === attributeKey &&
-		run.dir === ( isBackward ? 'backward' : 'forward' )
+		run.dir === ( isBackward ? 'backward' : 'forward' ) &&
+		( pos === undefined ||
+			run.anchorPos === undefined ||
+			run.anchorPos === pos )
 	);
 }
 
@@ -379,6 +389,8 @@ type DeletionRun = {
 	caret: number;
 	dir: string;
 	steps: number;
+	/** The caret offset the run started from. */
+	anchorPos?: number;
 };
 
 /**
@@ -670,6 +682,7 @@ export default function SuggestionDeletionKeyboard() {
 					clientId,
 					attributeKey,
 					isBackward,
+					pos,
 				} )
 			) {
 				run!.steps += 1;
@@ -691,58 +704,90 @@ export default function SuggestionDeletionKeyboard() {
 				caret: isBackward ? start : pos,
 				dir: isBackward ? 'backward' : 'forward',
 				steps: 1,
+				anchorPos: pos,
 			};
 			runRef.current = newRun;
 			try {
 				const id = await openDeletionNote( clientId, attributeKey );
-				if ( runRef.current !== newRun ) {
-					// The run was reset while its note was in flight (a mode
-					// change, a keystroke that is not a delete): the note has
-					// no marker and never will, so trash it.
-					cleanupAbandonedNotes( clientId, [ id ] );
-					return;
-				}
-				if ( ! id ) {
-					resetRun();
-					return;
-				}
 				/*
-				 * The range was anchored before the note round trip. If the
-				 * intent changed or the text moved underneath it meanwhile,
-				 * the buffered keystrokes describe characters that are no
-				 * longer there: drop the gesture and its note.
+				 * The range was anchored before the note round trip, and
+				 * every keystroke of the run was cancelled, so the deletion
+				 * still applies wherever the caret went meanwhile (another
+				 * block, a keystroke that is not a delete) as long as the
+				 * text around it is intact. When it is not, or Suggest mode
+				 * was left, the buffered keystrokes describe characters that
+				 * are no longer there: drop the gesture and its note.
 				 */
+				const isCurrent = runRef.current === newRun;
 				const current =
 					getBlockAttributes( clientId )?.[ attributeKey ];
 				const stillSuggesting =
 					unlock(
 						registry.select( STORE_NAME )
 					).getEditorIntent() === EDITOR_INTENT_SUGGEST;
-				const { formats } = readValueMetrics( current );
+				const { text: currentText, formats } =
+					readValueMetrics( current );
+				const anchor =
+					id && stillSuggesting
+						? rebaseRunAnchor(
+								{ start: newRun.start, end: newRun.end },
+								text,
+								currentText
+							)
+						: null;
 				if (
-					! stillSuggesting ||
-					! isDeletionTargetUnchanged( text, current ) ||
+					! anchor ||
 					formatsRangeHasSuggestion(
 						formats,
-						newRun.start,
-						newRun.end
+						anchor.start,
+						anchor.end
 					)
 				) {
-					resetRun();
-					cleanupAbandonedNotes( clientId, [ id ] );
+					if ( isCurrent ) {
+						resetRun();
+					}
+					if ( id ) {
+						cleanupAbandonedNotes( clientId, [ id ] );
+					}
 					return;
+				}
+				const shift = anchor.start - newRun.start;
+				/*
+				 * The caret only follows the marker while the user is still
+				 * at the run: its keystrokes were cancelled, so the DOM caret
+				 * still reads `pos`. The store only identifies the field; its
+				 * offsets lag the DOM.
+				 */
+				const liveCaret = readInlineCaret(
+					getSelectionStart,
+					getSelectionEnd
+				);
+				const liveRange = readLiveInlineSelection(
+					clientId,
+					attributeKey
+				);
+				const followCaret =
+					isCurrent &&
+					liveCaret?.clientId === clientId &&
+					liveCaret?.attributeKey === attributeKey &&
+					( ! liveRange ||
+						( liveRange.start === pos + shift &&
+							liveRange.end === pos + shift ) );
+				if ( isCurrent && ! followCaret ) {
+					resetRun();
 				}
 				newRun.id = id;
 				const grown = expandBufferedDeleteRun( {
-					text,
+					text: currentText,
 					formats,
-					start: newRun.start,
-					end: newRun.end,
+					start: anchor.start,
+					end: anchor.end,
 					isBackward,
 					repeats: newRun.steps - 1,
 				} );
 				newRun.start = grown.start;
 				newRun.end = grown.end;
+				newRun.caret += shift;
 				if ( grown.blocked ) {
 					notifyEditRefused( registry );
 				}
@@ -755,7 +800,7 @@ export default function SuggestionDeletionKeyboard() {
 					id,
 					newRun.start,
 					newRun.end,
-					newRun.caret
+					followCaret ? newRun.caret : undefined
 				);
 			} catch {
 				if ( runRef.current === newRun ) {
@@ -769,6 +814,8 @@ export default function SuggestionDeletionKeyboard() {
 			resetRun,
 			cleanupAbandonedNotes,
 			getBlockAttributes,
+			getSelectionStart,
+			getSelectionEnd,
 			registry,
 		]
 	);

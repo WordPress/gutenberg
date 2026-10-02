@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { overlayReducer } from '../overlay-context';
+import { overlayReducer, POST_TITLE_OVERLAY_KEY } from '../overlay-context';
 
 describe( 'overlayReducer', () => {
 	const CLIENT_ID = 'abc-123';
@@ -399,5 +399,22 @@ describe( 'overlayReducer', () => {
 			type: 'block-remove',
 			clientId: CLIENT_ID,
 		} );
+	} );
+
+	it( 'never prunes the post title entry, which has no block', () => {
+		const state = {
+			[ POST_TITLE_OVERLAY_KEY ]: {
+				blockName: '',
+				baselineAttributes: { title: 'Old' },
+				overlayAttributes: { title: 'New' },
+				commentId: null,
+				syncedOpsKey: null,
+			},
+		};
+		const next = overlayReducer( state, {
+			type: 'PRUNE_ORPHANS',
+			liveClientIds: new Set( [ 'alive-1' ] ),
+		} );
+		expect( next ).toBe( state );
 	} );
 } );

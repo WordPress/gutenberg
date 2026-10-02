@@ -8,7 +8,10 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { STORE_NAME } from '../../store/constants';
-import { useSuggestionOverlay } from './overlay-context';
+import {
+	useSuggestionOverlay,
+	POST_TITLE_OVERLAY_KEY,
+} from './overlay-context';
 import type { SuggestionOperation } from './overlay-context';
 import {
 	addNoteIdToMetadata,
@@ -314,6 +317,60 @@ export function applyOperations(
 }
 
 /**
+ * Op type for a change to a post field (today only the title) rather than a
+ * block attribute. Its note has no block anchor.
+ */
+export const POST_ATTRIBUTE_OP_TYPE = 'post-attribute-set';
+
+/**
+ * Build `post-attribute-set` operations from a post-level overlay entry.
+ *
+ * @param baseline Post fields captured on first edit.
+ * @param overlay  Proposed post fields.
+ * @return Operations describing the suggestion.
+ */
+export function postOperationsFromOverlay(
+	baseline: Record< string, any > | null | undefined,
+	overlay: Record< string, any > | null | undefined
+): SuggestionOperation[] {
+	return operationsFromOverlay( baseline, overlay ).map( ( op ) => ( {
+		...op,
+		type: POST_ATTRIBUTE_OP_TYPE,
+	} ) );
+}
+
+/**
+ * The post-level operations in a payload.
+ *
+ * @param operations Operations from a payload.
+ * @return The `post-attribute-set` operations, possibly empty.
+ */
+export function findPostAttributeOps(
+	operations: SuggestionOperation[] | null | undefined
+): SuggestionOperation[] {
+	if ( ! Array.isArray( operations ) ) {
+		return [];
+	}
+	return operations.filter( ( op ) => op?.type === POST_ATTRIBUTE_OP_TYPE );
+}
+
+/**
+ * The post edits that accepting post-level operations makes.
+ *
+ * @param operations Post-level operations.
+ * @return Edits for `editPost`.
+ */
+export function applyPostOperations(
+	operations: SuggestionOperation[]
+): Record< string, any > {
+	const edits: Record< string, any > = {};
+	for ( const op of findPostAttributeOps( operations ) ) {
+		edits[ op.attribute ] = op.after;
+	}
+	return edits;
+}
+
+/**
  * Report whether applying the suggestion's operations over the block's
  * current attributes would overwrite concurrent changes made by someone
  * else. A suggestion is considered conflicting only when the baseline
@@ -342,7 +399,12 @@ export function hasAttributeConflict(
 		return false;
 	}
 	for ( const op of operations ) {
-		if ( op.type !== 'attribute-set' ) {
+		// Post-level ops compare against the post's fields, which the caller
+		// passes as `currentAttributes` for such a payload.
+		if (
+			op.type !== 'attribute-set' &&
+			op.type !== POST_ATTRIBUTE_OP_TYPE
+		) {
 			continue;
 		}
 		if (
@@ -643,7 +705,8 @@ export function useSuggestionsProvider() {
 					{ throwOnError: true }
 				);
 
-				if ( savedRecord?.id ) {
+				// A post-level suggestion has no block to link.
+				if ( savedRecord?.id && clientId !== POST_TITLE_OVERLAY_KEY ) {
 					// Append to the noteId array so a fresh suggestion on a
 					// block whose previous note(s) have been applied or
 					// rejected coexists with them rather than overwriting
@@ -665,7 +728,9 @@ export function useSuggestionsProvider() {
 							savedRecord.id
 						),
 					} );
+				}
 
+				if ( savedRecord?.id ) {
 					// Surface the new note: when a non-notes sidebar (e.g.
 					// post or block settings) is open, switch it to the
 					// notes sidebar so the suggestion is immediately
@@ -872,6 +937,54 @@ export function useSuggestionsProvider() {
 					isDismissible: true,
 				} );
 				return false;
+			}
+
+			/*
+			 * A post-level suggestion (the title) has no block: accept writes
+			 * the proposed fields with `editPost`, which the Suggest mode
+			 * capture never intercepts, so no bypass is needed. Rolled back
+			 * if the decision fails to save, like the attribute path below.
+			 */
+			const postOps = findPostAttributeOps( payload.operations );
+			if ( postOps.length > 0 ) {
+				const editor = registry.select( STORE_NAME ) as any;
+				const { editPost } = registry.dispatch( STORE_NAME ) as any;
+				const previous: Record< string, any > = {};
+				for ( const op of postOps ) {
+					previous[ op.attribute ] = editor.getEditedPostAttribute(
+						op.attribute
+					);
+				}
+				try {
+					editPost( applyPostOperations( postOps ) );
+					await saveEntityRecord(
+						'root',
+						'comment',
+						{
+							id: commentId,
+							status: 'approved',
+							meta: { _wp_suggestion_status: 'applied' },
+						},
+						{ throwOnError: true }
+					);
+					clearOverlayForComment( POST_TITLE_OVERLAY_KEY, commentId );
+					if ( ! silent ) {
+						createNotice( 'success', __( 'Suggestion applied.' ), {
+							type: 'snackbar',
+							isDismissible: true,
+						} );
+					}
+				} catch ( error: any ) {
+					editPost( previous );
+					createNotice(
+						'error',
+						error?.message ||
+							__( 'Failed to save suggestion status.' ),
+						{ type: 'snackbar', isDismissible: true }
+					);
+					return false;
+				}
+				return true;
 			}
 
 			// `thread.blockClientId` is derived by matching `metadata.noteId`
@@ -1186,6 +1299,7 @@ export function useSuggestionsProvider() {
 			requestInterceptorBypass,
 			clearOverlay,
 			clearOverlayForComment,
+			registry,
 		]
 	);
 
@@ -1219,6 +1333,41 @@ export function useSuggestionsProvider() {
 			payload?: SuggestionPayload | null;
 			silent?: boolean;
 		} ) => {
+			/*
+			 * A post-level suggestion never touched the post: reject only
+			 * records the decision and drops the proposed value from the
+			 * overlay so the field shows the real title again.
+			 */
+			if ( findPostAttributeOps( payload?.operations ).length > 0 ) {
+				try {
+					await saveEntityRecord(
+						'root',
+						'comment',
+						{
+							id: commentId,
+							status: 'approved',
+							meta: { _wp_suggestion_status: 'rejected' },
+						},
+						{ throwOnError: true }
+					);
+					clearOverlayForComment( POST_TITLE_OVERLAY_KEY, commentId );
+					if ( ! silent ) {
+						createNotice( 'success', __( 'Suggestion rejected.' ), {
+							type: 'snackbar',
+							isDismissible: true,
+						} );
+					}
+				} catch ( error: any ) {
+					createNotice(
+						'error',
+						error?.message || __( 'Failed to reject suggestion.' ),
+						{ type: 'snackbar', isDismissible: true }
+					);
+					return false;
+				}
+				return true;
+			}
+
 			// Inline suggestions: reject restores the block's pre-suggestion
 			// content for the marked attribute — a deletion keeps the text and
 			// drops the marker, an addition removes the proposed text with its

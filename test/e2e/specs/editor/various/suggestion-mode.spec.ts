@@ -422,6 +422,230 @@ test.describe( 'Suggestion mode', () => {
 		await expect( summaries.first() ).toContainText( 'ADDXXED' );
 	} );
 
+	test.describe( 'leaving a run before its note resolves', () => {
+		/*
+		 * Holds every note POST until the returned function is called, so the
+		 * caret can move while the first keystroke's note is still in flight
+		 * without depending on server timing.
+		 */
+		async function holdNotePosts( page: any ) {
+			let release = () => {};
+			const gate = new Promise< void >( ( resolve ) => {
+				release = resolve;
+			} );
+			await page.route(
+				/\/wp\/v2\/comments(\?|$)/,
+				async ( route: any ) => {
+					if ( route.request().method() === 'POST' ) {
+						await gate;
+					}
+					await route.continue();
+				}
+			);
+			return release;
+		}
+
+		async function setUpHeadingAndParagraph( editor: any, page: any ) {
+			await editor.insertBlock( {
+				name: 'core/heading',
+				attributes: { content: 'Heading', level: 2 },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Paragraph' },
+			} );
+			await switchIntent( page, 'Suggesting' );
+			// The selected block's toolbar covers the top of the heading.
+			await page.evaluate( () => {
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.clearSelectedBlock();
+			} );
+			return {
+				heading: editor.canvas.getByRole( 'document', {
+					name: 'Block: Heading',
+				} ),
+				paragraph: editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} ),
+			};
+		}
+
+		test( 'clicking another block keeps the typed run in the first block', async ( {
+			editor,
+			page,
+		} ) => {
+			const { heading, paragraph } = await setUpHeadingAndParagraph(
+				editor,
+				page
+			);
+			const release = await holdNotePosts( page );
+
+			await heading.click( { position: { x: 10, y: 10 } } );
+			await page.keyboard.press( 'End' );
+			const posted = page.waitForRequest(
+				( request: any ) =>
+					/\/wp\/v2\/comments(\?|$)/.test( request.url() ) &&
+					request.method() === 'POST'
+			);
+			await page.keyboard.type( ' A' );
+			await posted;
+			await paragraph.click();
+			release();
+
+			const marker = heading.locator(
+				'mark.wp-suggestion[data-suggestion-type="add"]'
+			);
+			await expect( marker ).toHaveText( ' A' );
+			await expect( marker ).toHaveAttribute(
+				'data-suggestion-id',
+				/\d/
+			);
+			await expect( heading ).toHaveText( 'Heading A' );
+			await expect( paragraph ).toHaveText( 'Paragraph' );
+			await expect( paragraph.locator( 'mark' ) ).toHaveCount( 0 );
+			// The caret stays where the user went rather than jumping back.
+			await expect(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+			).toHaveClass( /is-selected/ );
+		} );
+
+		test( 'pressing Enter splits after the typed run', async ( {
+			editor,
+			page,
+		} ) => {
+			const { paragraph } = await setUpHeadingAndParagraph(
+				editor,
+				page
+			);
+			const release = await holdNotePosts( page );
+
+			await paragraph.click();
+			await page.keyboard.press( 'End' );
+			const posted = page.waitForRequest(
+				( request: any ) =>
+					/\/wp\/v2\/comments(\?|$)/.test( request.url() ) &&
+					request.method() === 'POST'
+			);
+			await page.keyboard.type( ' tail' );
+			await posted;
+			await page.keyboard.press( 'Enter' );
+			await page.keyboard.type( 'next' );
+			release();
+
+			const paragraphs = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await expect( paragraphs ).toHaveCount( 2 );
+			const head = paragraphs.first();
+			const marker = head.locator(
+				'mark.wp-suggestion[data-suggestion-type="add"]'
+			);
+			await expect( marker ).toHaveText( ' tail' );
+			await expect( marker ).toHaveAttribute(
+				'data-suggestion-id',
+				/\d/
+			);
+			await expect( head ).toHaveText( 'Paragraph tail' );
+			const tail = paragraphs.nth( 1 );
+			await expect( tail ).toHaveText( 'next' );
+			await expect( tail ).toHaveClass( /is-suggestion-pending-insert/ );
+		} );
+
+		test( 'typing in another block captures both runs in their own blocks', async ( {
+			editor,
+			page,
+		} ) => {
+			const { heading, paragraph } = await setUpHeadingAndParagraph(
+				editor,
+				page
+			);
+			const release = await holdNotePosts( page );
+
+			await heading.click( { position: { x: 10, y: 10 } } );
+			await page.keyboard.press( 'End' );
+			const posted = page.waitForRequest(
+				( request: any ) =>
+					/\/wp\/v2\/comments(\?|$)/.test( request.url() ) &&
+					request.method() === 'POST'
+			);
+			await page.keyboard.type( 'A' );
+			await posted;
+			await paragraph.click();
+			await page.keyboard.press( 'End' );
+			await page.keyboard.type( 'BC' );
+			release();
+
+			const headingMarker = heading.locator(
+				'mark.wp-suggestion[data-suggestion-type="add"]'
+			);
+			const paragraphMarker = paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="add"]'
+			);
+			await expect( headingMarker ).toHaveText( 'A' );
+			await expect( paragraphMarker ).toHaveText( 'BC' );
+			await expect( heading ).toHaveText( 'HeadingA' );
+			await expect( paragraph ).toHaveText( 'ParagraphBC' );
+			await expect( headingMarker ).toHaveAttribute(
+				'data-suggestion-id',
+				/\d/
+			);
+			await expect( paragraphMarker ).toHaveAttribute(
+				'data-suggestion-id',
+				/\d/
+			);
+			// Two notes, one per block.
+			const ids = await editor.canvas
+				.locator( 'mark.wp-suggestion' )
+				.evaluateAll( ( marks: Element[] ) =>
+					marks.map( ( mark ) =>
+						mark.getAttribute( 'data-suggestion-id' )
+					)
+				);
+			expect( new Set( ids ).size ).toBe( 2 );
+		} );
+
+		test( 'a Backspace keeps its del marker when typing moves to another block', async ( {
+			editor,
+			page,
+		} ) => {
+			const { heading, paragraph } = await setUpHeadingAndParagraph(
+				editor,
+				page
+			);
+			const release = await holdNotePosts( page );
+
+			await heading.click( { position: { x: 10, y: 10 } } );
+			await page.keyboard.press( 'End' );
+			const posted = page.waitForRequest(
+				( request: any ) =>
+					/\/wp\/v2\/comments(\?|$)/.test( request.url() ) &&
+					request.method() === 'POST'
+			);
+			await page.keyboard.press( 'Backspace' );
+			await posted;
+			await paragraph.click();
+			await page.keyboard.press( 'End' );
+			await page.keyboard.type( 'BC' );
+			release();
+
+			await expect(
+				heading.locator(
+					'mark.wp-suggestion[data-suggestion-type="del"]'
+				)
+			).toHaveText( 'g' );
+			await expect( heading ).toHaveText( 'Heading' );
+			await expect(
+				paragraph.locator(
+					'mark.wp-suggestion[data-suggestion-type="add"]'
+				)
+			).toHaveText( 'BC' );
+			await expect( paragraph ).toHaveText( 'ParagraphBC' );
+		} );
+	} );
+
 	test( 'delete — golden path: deleting a selection becomes an in-content del marker', async ( {
 		editor,
 		page,
