@@ -15,6 +15,10 @@ export type Item = {
 	value: string;
 	disabled?: boolean;
 	/**
+	 * Supplementary text for the item in the popup.
+	 */
+	description?: string;
+	/**
 	 * When `true`, the item renders in the list footer, not the main list,
 	 * when it is in the filtered items.
 	 */
