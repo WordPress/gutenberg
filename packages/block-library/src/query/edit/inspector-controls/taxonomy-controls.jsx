@@ -376,7 +376,15 @@ function TaxonomyItem( {
 		? ! treeHasResolved
 		: isDebouncing || ! listHasResolved;
 	return (
-		<div className="block-library-query-inspector__taxonomy-control">
+		<div
+			className="block-library-query-inspector__taxonomy-control"
+			onKeyDownCapture={ ( event ) => {
+				if ( event.key === 'Enter' && isPending && ! items.length ) {
+					event.preventDefault();
+					event.stopPropagation();
+				}
+			} }
+		>
 			<SearchableChipSelectControl
 				label={ label }
 				items={ items }
@@ -393,7 +401,7 @@ function TaxonomyItem( {
 				// built-in client side filtering rather than filtering twice,
 				// except to narrow the previous results until the search runs.
 				filter={ isHierarchical || isDebouncing ? undefined : null }
-				autoHighlight
+				autoHighlight={ inputValue ? 'always' : true }
 				isItemEqualToValue={ isItemEqualToValue }
 				statusContent={
 					isPending ? (
