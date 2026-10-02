@@ -215,6 +215,15 @@ class WP_Theme_JSON_Gutenberg {
 			'properties'        => array( 'box-shadow' ),
 		),
 		array(
+			'path'              => array( 'backdropFilter', 'presets' ),
+			'prevent_override'  => array( 'backdropFilter', 'defaultPresets' ),
+			'use_default_names' => false,
+			'value_key'         => 'backdropFilter',
+			'css_vars'          => '--wp--preset--backdrop-filter--$slug',
+			'classes'           => array(),
+			'properties'        => array( 'backdrop-filter' ),
+		),
+		array(
 			'path'              => array( 'border', 'radiusSizes' ),
 			'prevent_override'  => false,
 			'use_default_names' => false,
@@ -322,6 +331,7 @@ class WP_Theme_JSON_Gutenberg {
 		'text-indent'                       => array( 'typography', 'textIndent' ),
 		'filter'                            => array( 'filter', 'duotone' ),
 		'box-shadow'                        => array( 'shadow' ),
+		'backdrop-filter'                   => array( 'backdropFilter' ),
 		'height'                            => array( 'dimensions', 'height' ),
 		'width'                             => array( 'dimensions', 'width' ),
 		'writing-mode'                      => array( 'typography', 'writingMode' ),
@@ -480,6 +490,10 @@ class WP_Theme_JSON_Gutenberg {
 			'units'               => null,
 		),
 		'shadow'                        => array(
+			'presets'        => null,
+			'defaultPresets' => null,
+		),
+		'backdropFilter'                => array(
 			'presets'        => null,
 			'defaultPresets' => null,
 		),
