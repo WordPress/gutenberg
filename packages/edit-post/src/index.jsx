@@ -166,7 +166,9 @@ async function preloadResolutions( postType, postId ) {
 	const coreSelect = select( coreDataStore );
 
 	try {
-		await Promise.all( [
+		// Settle every resolver, so one failure doesn't skip the later
+		// phases while the preloaded data can still serve them.
+		await Promise.allSettled( [
 			core.getCurrentUser(),
 			core.getEntitiesConfig( 'postType' ),
 			core.getEntitiesConfig( 'taxonomy' ),
@@ -267,7 +269,7 @@ async function preloadResolutions( postType, postId ) {
 		}
 
 		if ( tasks.length ) {
-			await Promise.all( tasks );
+			await Promise.allSettled( tasks );
 		}
 
 		// Phase 3: requests whose capability check only resolved in phase 2.
