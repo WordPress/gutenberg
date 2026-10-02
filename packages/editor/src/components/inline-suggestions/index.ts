@@ -48,6 +48,7 @@ export {
 	rejectInlineFormat,
 	insertInlineAddition,
 	removeInlineAdditionRange,
+	reviseOwnAddition,
 	findAdditionRange,
 	growInlineAddition,
 	buildSuggestionMarkerAttributes,
