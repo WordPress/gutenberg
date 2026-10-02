@@ -273,6 +273,46 @@ export const RichItems: Story = {
 	},
 };
 
+export const WrappedItems: Story = {
+	parameters: {
+		docs: {
+			description: {
+				story: 'Exercises wrapping and disabled styling with deliberately long labels and descriptions. In product menus, keep labels short and use descriptions only when needed.',
+			},
+		},
+	},
+	args: {
+		children: (
+			<>
+				<Menu.Trigger>Open menu</Menu.Trigger>
+				<Menu.Popup style={ { width: 240 } }>
+					<Menu.Item shortcut={ SHORTCUTS.save } suffix="Modified">
+						<Menu.ItemLabel>
+							A long menu item label that wraps onto multiple
+							lines
+						</Menu.ItemLabel>
+						<Menu.ItemDescription>
+							This deliberately long description should wrap below
+							the label without overlapping the suffix or
+							shortcut.
+						</Menu.ItemDescription>
+					</Menu.Item>
+					<Menu.Item disabled shortcut={ SHORTCUTS.downloads }>
+						<Menu.ItemLabel>
+							A disabled item with a long label that wraps onto
+							multiple lines
+						</Menu.ItemLabel>
+						<Menu.ItemDescription>
+							The disabled foreground treatment should apply to
+							the label, description, and shortcut.
+						</Menu.ItemDescription>
+					</Menu.Item>
+				</Menu.Popup>
+			</>
+		),
+	},
+};
+
 export const GroupedItems: Story = {
 	args: {
 		children: (
