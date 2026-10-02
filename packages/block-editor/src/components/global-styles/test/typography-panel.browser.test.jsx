@@ -26,6 +26,7 @@ afterEach( () => {
 async function renderPanel( props ) {
 	return await render(
 		<TypographyPanel
+			showInheritanceLabelIndicators
 			value={ {} }
 			settings={ baseSettings }
 			onChange={ () => {} }
@@ -233,6 +234,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		// Reset: local value cleared.
 		await rerender(
 			<TypographyPanel
+				showInheritanceLabelIndicators
 				value={ {} }
 				inheritedValue={ inheritedValue }
 				settings={ baseSettings }
@@ -745,6 +747,7 @@ describe( 'TypographyPanel — duplicate-hex preset slug identity', () => {
 
 		await render(
 			<TypographyPanel
+				showInheritanceLabelIndicators
 				value={ {} }
 				inheritedValue={ {
 					color: { text: 'var:preset|color|dark-text' },
@@ -769,6 +772,7 @@ describe( 'TypographyPanel — duplicate-hex preset slug identity', () => {
 	it( 'marks only the local preset as selected when another preset shares its hex', async () => {
 		await render(
 			<TypographyPanel
+				showInheritanceLabelIndicators
 				value={ { color: { text: 'var:preset|color|dark-text' } } }
 				settings={ DUPLICATE_PALETTE_SETTINGS }
 				panelId="test"
@@ -791,6 +795,7 @@ describe( 'TypographyPanel — setTextColor link sync', () => {
 
 		await render(
 			<TypographyPanel
+				showInheritanceLabelIndicators
 				value={ {} }
 				inheritedValue={ {
 					color: { text: sharedRef },
@@ -819,6 +824,7 @@ describe( 'TypographyPanel — setTextColor link sync', () => {
 
 		await render(
 			<TypographyPanel
+				showInheritanceLabelIndicators
 				value={ {} }
 				inheritedValue={ {
 					// Both resolve to #000, but they are different preset references.
@@ -854,6 +860,7 @@ describe( 'TypographyPanel — setTextColor link sync', () => {
 
 		await render(
 			<TypographyPanel
+				showInheritanceLabelIndicators
 				value={ {
 					elements: {
 						link: {
@@ -904,6 +911,7 @@ describe( 'TypographyPanel — setTextColor link sync', () => {
 
 		await render(
 			<TypographyPanel
+				showInheritanceLabelIndicators
 				value={ {
 					color: { text: sharedRef },
 					elements: { link: { color: { text: sharedRef } } },

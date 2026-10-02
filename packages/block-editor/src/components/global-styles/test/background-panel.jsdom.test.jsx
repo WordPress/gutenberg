@@ -178,6 +178,7 @@ describe( 'BackgroundPanel — duplicate gradient preset slug identity', () => {
 
 		render(
 			<BackgroundPanel
+				showInheritanceLabelIndicators
 				value={ {} }
 				inheritedValue={ {
 					background: { gradient: 'var:preset|gradient|dup-text' },
@@ -206,6 +207,7 @@ describe( 'BackgroundPanel — duplicate gradient preset slug identity', () => {
 
 		render(
 			<BackgroundPanel
+				showInheritanceLabelIndicators
 				value={ {
 					background: { gradient: 'var:preset|gradient|dup-text' },
 				} }
@@ -243,6 +245,7 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 
 			render(
 				<BackgroundPanel
+					showInheritanceLabelIndicators
 					value={ value }
 					inheritedValue={ inheritedValue }
 					settings={ baseSettings }
@@ -269,6 +272,7 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 
 			render(
 				<BackgroundPanel
+					showInheritanceLabelIndicators
 					value={ {} }
 					inheritedValue={ inheritedValue }
 					settings={ baseSettings }
@@ -302,6 +306,7 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 
 			render(
 				<BackgroundPanel
+					showInheritanceLabelIndicators
 					value={ value }
 					inheritedValue={ inheritedValue }
 					settings={ {
@@ -335,6 +340,7 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 
 			render(
 				<BackgroundPanel
+					showInheritanceLabelIndicators
 					value={ {} }
 					inheritedValue={ inheritedValue }
 					settings={ baseSettings }
@@ -378,6 +384,7 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 
 			render(
 				<BackgroundPanel
+					showInheritanceLabelIndicators
 					value={ value }
 					inheritedValue={ inheritedValue }
 					settings={ baseSettings }
@@ -404,6 +411,7 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 		it( 'returns null when no controls are enabled', () => {
 			const { container } = render(
 				<BackgroundPanel
+					showInheritanceLabelIndicators
 					value={ {} }
 					inheritedValue={ {} }
 					settings={ {

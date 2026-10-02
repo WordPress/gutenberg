@@ -237,6 +237,7 @@ describe( 'ColorPanel — duplicate-hex preset slug identity', () => {
 	it( 'marks only the local link preset as selected when another preset shares its hex', async () => {
 		await render(
 			<ColorPanel
+				showInheritanceLabelIndicators
 				value={ {
 					elements: {
 						link: {
@@ -266,6 +267,7 @@ describe( 'ColorPanel — additional elements', () => {
 	it( 'renders additional element color controls', async () => {
 		await render(
 			<ColorPanel
+				showInheritanceLabelIndicators
 				value={ {} }
 				settings={ settingsWithColors( {
 					text: true,
@@ -298,6 +300,7 @@ describe( 'ColorPanel — inherited Global Styles label treatment', () => {
 
 			await render(
 				<ColorPanel
+					showInheritanceLabelIndicators
 					value={ value }
 					inheritedValue={ inheritedValue }
 					settings={ baseSettings }
@@ -340,6 +343,7 @@ describe( 'ColorPanel — inherited Global Styles label treatment', () => {
 		it( 'paints an inherited link preset via its CSS custom property', async () => {
 			const { container } = await render(
 				<ColorPanel
+					showInheritanceLabelIndicators
 					value={ {} }
 					inheritedValue={ {
 						elements: {
@@ -365,6 +369,7 @@ describe( 'ColorPanel — inherited Global Styles label treatment', () => {
 		it( 'paints an inherited element (heading) preset via its CSS custom property', async () => {
 			const { container } = await render(
 				<ColorPanel
+					showInheritanceLabelIndicators
 					value={ {} }
 					inheritedValue={ {
 						elements: {

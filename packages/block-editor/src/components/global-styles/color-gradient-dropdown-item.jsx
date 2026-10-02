@@ -14,7 +14,6 @@ import {
 	getInheritanceProps,
 	InheritanceResetButton,
 	InheritanceToolsPanelItem,
-	isGlobalStylesInheritanceIndicatorUIEnabled,
 } from './inheritance';
 import { useToolsPanelItemPopoverProps } from './utils';
 
@@ -195,7 +194,7 @@ export default function ColorGradientDropdownItem( {
 	className = 'block-editor-tools-panel-color-gradient-settings__item',
 	isPlaceholder = false,
 	hasInheritedValue = false,
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
+	showInheritanceLabelIndicators = false,
 } ) {
 	const popoverProps = useToolsPanelItemPopoverProps();
 	const colorGradientDropdownButtonRef = useRef( undefined );

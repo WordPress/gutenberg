@@ -63,6 +63,7 @@ describe( 'FiltersPanel — visual treatment and display-without-commit', () => 
 
 		render(
 			<FiltersPanel
+				showInheritanceLabelIndicators
 				value={ value }
 				inheritedValue={ inheritedValue }
 				settings={ baseSettings }
@@ -85,6 +86,7 @@ describe( 'FiltersPanel — visual treatment and display-without-commit', () => 
 
 		render(
 			<FiltersPanel
+				showInheritanceLabelIndicators
 				value={ value }
 				inheritedValue={ {} }
 				settings={ baseSettings }
@@ -111,6 +113,7 @@ describe( 'FiltersPanel — visual treatment and display-without-commit', () => 
 
 		render(
 			<FiltersPanel
+				showInheritanceLabelIndicators
 				value={ {} }
 				inheritedValue={ inheritedValue }
 				settings={ baseSettings }
@@ -131,6 +134,7 @@ describe( 'FiltersPanel — visual treatment and display-without-commit', () => 
 
 		const { container } = render(
 			<FiltersPanel
+				showInheritanceLabelIndicators
 				value={ {} }
 				inheritedValue={ inheritedValue }
 				settings={ baseSettings }
@@ -177,6 +181,7 @@ describe( 'FiltersPanel — visual treatment and display-without-commit', () => 
 
 		render(
 			<FiltersPanel
+				showInheritanceLabelIndicators
 				value={ value }
 				inheritedValue={ value }
 				settings={ baseSettings }
@@ -229,6 +234,7 @@ describe( 'FiltersPanel — duplicate duotone presets', () => {
 
 		render(
 			<FiltersPanel
+				showInheritanceLabelIndicators
 				value={ {
 					filter: { duotone: 'var:preset|duotone|custom-duotone-2' },
 				} }
@@ -254,6 +260,7 @@ describe( 'FiltersPanel — duplicate duotone presets', () => {
 
 		render(
 			<FiltersPanel
+				showInheritanceLabelIndicators
 				value={ {} }
 				inheritedValue={ {} }
 				settings={ duplicateSettings }

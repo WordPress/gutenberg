@@ -80,6 +80,11 @@ import {
 	isRelativePath,
 } from './components/link-control/is-url-like';
 import { isElementVisible } from './utils/dom';
+import {
+	useResolvedStyle,
+	useResolvedStyleContext,
+} from './components/global-styles/inherited-value-context';
+import { isGlobalStylesInheritanceIndicatorUIEnabled } from './components/global-styles/inheritance';
 
 const { getDuotoneFilter } = unlock( globalStylesEnginePrivateApis );
 
@@ -123,6 +128,9 @@ lock( privateApis, {
 	globalStylesDataKey,
 	globalStylesLinksDataKey,
 	selectBlockPatternsKey,
+	useResolvedStyle,
+	useResolvedStyleContext,
+	isGlobalStylesInheritanceIndicatorUIEnabled,
 	requiresWrapperOnCopy,
 	PrivateInserterLibrary,
 	reusableBlocksSelectKey,
