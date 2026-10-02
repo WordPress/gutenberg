@@ -12,7 +12,7 @@
 
 ### Documentation
 
--   `Menu`: Recommend consistent prefix icon usage within each group and explain item label alignment ([#84020](https://github.com/WordPress/gutenberg/pull/84020)).
+-   `Menu`: Explain when to use prefix icons and descriptions, recommend consistent icon usage within each group, and favor short, clear labels ([#84020](https://github.com/WordPress/gutenberg/pull/84020)).
 
 ## 0.24.0 (2026-10-07)
 
