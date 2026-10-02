@@ -6,6 +6,7 @@
 
 -   Add a `mariadbVersion` option and `WP_ENV_MARIADB_VERSION` environment variable to choose the MariaDB version used by the Docker runtime, including versions older than 10.4 ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
 -   Explain why `wp-env start` fails when a database was last used by a newer MariaDB version, which MariaDB cannot downgrade from ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
+-   Stop `wp-env start` with an error naming the image when an image cannot be pulled and is not available locally, such as a `mariadbVersion` that does not exist, instead of reporting that cached images will be used ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
 
 ### Bug Fixes
 

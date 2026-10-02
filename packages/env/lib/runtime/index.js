@@ -5,6 +5,7 @@ const {
 	UnsupportedCommandError,
 	EnvironmentNotInitializedError,
 	DatabaseDowngradeError,
+	MissingImageError,
 } = require( './errors' );
 const { setCache, getCache } = require( '../cache' );
 
@@ -86,4 +87,5 @@ module.exports = {
 	UnsupportedCommandError,
 	EnvironmentNotInitializedError,
 	DatabaseDowngradeError,
+	MissingImageError,
 };

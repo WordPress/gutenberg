@@ -40,8 +40,47 @@ class DatabaseDowngradeError extends Error {
 	}
 }
 
+/**
+ * Error thrown when images the environment needs could not be pulled and are
+ * not available locally, so the environment cannot start.
+ */
+class MissingImageError extends Error {
+	/**
+	 * @param {Array<{image: string, services: string[]}>} missingImages The images that are missing, with the services that use them.
+	 * @param {string}                                     [details]     The output Docker reported while pulling. Its last line, which states the cause, is included.
+	 */
+	constructor( missingImages, details ) {
+		const images = missingImages
+			.map(
+				( { image, services } ) =>
+					`\`${ image }\` (${ services.join( ', ' ) })`
+			)
+			.join( ', ' );
+		const isMariaDB = missingImages.some( ( { image } ) =>
+			image.startsWith( 'mariadb:' )
+		);
+
+		super(
+			[
+				`Could not pull ${ images }, and ${
+					missingImages.length === 1 ? 'it is' : 'they are'
+				} not available locally.${
+					isMariaDB
+						? ' Check that "mariadbVersion" is a published MariaDB version, such as "10.11" or "lts".'
+						: ''
+				}`,
+				details?.trim().split( '\n' ).pop(),
+			]
+				.filter( Boolean )
+				.join( '\n\n' )
+		);
+		this.name = 'MissingImageError';
+	}
+}
+
 module.exports = {
 	UnsupportedCommandError,
 	EnvironmentNotInitializedError,
 	DatabaseDowngradeError,
+	MissingImageError,
 };

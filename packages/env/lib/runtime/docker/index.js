@@ -11,7 +11,8 @@ const {
 } = require( './docker-config' );
 const getHostUser = require( './get-host-user' );
 const { findDatabaseDowngrade } = require( './database-downgrade' );
-const { DatabaseDowngradeError } = require( '../errors' );
+const { findMissingImages } = require( './missing-images' );
+const { DatabaseDowngradeError, MissingImageError } = require( '../errors' );
 const downloadSources = require( './download-sources' );
 const downloadWPPHPUnit = require( './download-wp-phpunit' );
 const {
@@ -166,7 +167,17 @@ class DockerRuntime {
 
 			try {
 				await dockerCompose.pullAll( dockerComposeConfig );
-			} catch {
+			} catch ( error ) {
+				// An image that is neither pullable nor cached, such as a MariaDB
+				// version that does not exist, would only fail later with a less
+				// clear error, so stop here and name it.
+				const missingImages = await findMissingImages(
+					dockerComposeConfigPath
+				);
+				if ( missingImages.length ) {
+					throw new MissingImageError( missingImages, error?.err );
+				}
+
 				// Note: pulling the images requires connecting to the Docker
 				// registry, which may be unavailable (e.g., offline or an
 				// outage). Locally cached images will be used instead, so this
