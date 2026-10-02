@@ -67,7 +67,11 @@ if ( packResult.status !== 0 ) {
 	process.exit( packResult.status ?? 1 );
 }
 
-const [ pack ] = JSON.parse( packResult.stdout );
+/* npm v12 keys `pack --json` output by package name; older versions return an array. */
+const packOutput = JSON.parse( packResult.stdout );
+const [ pack ] = Array.isArray( packOutput )
+	? packOutput
+	: Object.values( packOutput );
 const packedPaths = pack.files.map( ( { path } ) => path );
 const packedPathSet = new Set( packedPaths );
 const disallowedPathPatterns = [
