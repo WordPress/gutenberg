@@ -63,6 +63,26 @@ async function openNotesSidebar( page: any ) {
 	}
 }
 
+async function deselect( page: any ) {
+	await page.evaluate( () => {
+		( window as any ).wp.data
+			.dispatch( 'core/block-editor' )
+			.clearSelectedBlock();
+	} );
+}
+
+/**
+ * Click a marker by its coordinates. Marks re-render under the pointer, so a
+ * locator click can race the element it resolved.
+ *
+ * @param {import('@playwright/test').Page}    page    Playwright page.
+ * @param {import('@playwright/test').Locator} locator Marker locator.
+ */
+async function clickMark( page: any, locator: any ) {
+	const box = await locator.boundingBox();
+	await page.mouse.click( box.x + box.width / 2, box.y + box.height / 2 );
+}
+
 test.describe( 'Suggestion marker reveal', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.setGutenbergExperiments( [
@@ -121,6 +141,81 @@ test.describe( 'Suggestion marker reveal', () => {
 			'background-color',
 			'rgba(0, 0, 0, 0)'
 		);
+	} );
+
+	test( "the caret in a marker selects that marker's note", async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'alpha bravo charlie delta' },
+		} );
+		await switchIntent( page, 'Suggesting' );
+		await deselect( page );
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click( { position: { x: 10, y: 10 } } );
+
+		// Two replacements in one block: "bravo" and "delta" typed over.
+		await page.keyboard.press( 'Home' );
+		await pageUtils.pressKeys( 'ArrowRight', { times: 6 } );
+		await pageUtils.pressKeys( 'shift+ArrowRight', { times: 5 } );
+		await page.keyboard.type( 'BRAVO' );
+		const bravo = paragraph
+			.locator( 'mark.wp-suggestion[data-suggestion-type="add"]' )
+			.filter( { hasText: 'BRAVO' } );
+		await expect( bravo ).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await page.keyboard.type( 'DELTA' );
+		const delta = paragraph
+			.locator( 'mark.wp-suggestion[data-suggestion-type="add"]' )
+			.filter( { hasText: 'DELTA' } );
+		await expect( delta ).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		const bravoId = await bravo.getAttribute( 'data-suggestion-id' );
+		const deltaId = await delta.getAttribute( 'data-suggestion-id' );
+		await expect( bravo ).not.toHaveAttribute(
+			'data-suggestion-id',
+			deltaId as string
+		);
+
+		await openNotesSidebar( page );
+		const bravoThread = page.locator( `#note-thread-${ bravoId }` );
+		const deltaThread = page.locator( `#note-thread-${ deltaId }` );
+		await expect( bravoThread ).toBeVisible();
+		await expect( deltaThread ).toBeVisible();
+
+		// Entering the block through its second marker selects that marker's
+		// note, not the block's first one.
+		await deselect( page );
+		await clickMark( page, delta );
+		await expect( deltaThread ).toHaveClass( /is-selected/ );
+		await expect( bravoThread ).not.toHaveClass( /is-selected/ );
+		await expect( delta ).toHaveCSS( 'outline-style', 'solid' );
+
+		// With the block already selected, the selection follows the caret:
+		// by click…
+		await clickMark( page, bravo );
+		await expect( bravoThread ).toHaveClass( /is-selected/ );
+		await expect( deltaThread ).not.toHaveClass( /is-selected/ );
+		await expect( bravo ).toHaveCSS( 'outline-style', 'solid' );
+		await expect( delta ).toHaveCSS( 'outline-style', 'none' );
+
+		// …and by arrowing into the deleted half of the other replacement,
+		// which carries the same id as its added half.
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 2 } );
+		await expect( deltaThread ).toHaveClass( /is-selected/ );
+		await expect( bravoThread ).not.toHaveClass( /is-selected/ );
+
+		// Leaving every marker for plain text deselects, as inline notes do.
+		await page.keyboard.press( 'Home' );
+		await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
+		await expect( deltaThread ).not.toHaveClass( /is-selected/ );
+		await expect( bravoThread ).not.toHaveClass( /is-selected/ );
 	} );
 
 	test( 'floating note cards never stack on top of one another', async ( {
