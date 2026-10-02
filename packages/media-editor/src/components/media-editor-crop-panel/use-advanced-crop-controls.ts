@@ -84,14 +84,8 @@ export function useAdvancedCropControls( {
 	freeformCrop,
 	onPlacementControlInteraction,
 }: UseAdvancedCropControlsArgs ): AdvancedCropControlsState {
-	const {
-		state,
-		setCropRect,
-		setRotation,
-		settleCrop,
-		beginGesture,
-		endGesture,
-	} = useMediaEditor();
+	const { cropper, beginGesture, endGesture } = useMediaEditor();
+	const { state, setCropRect, setRotation, settleCrop } = cropper;
 	const geometry = useCropGeometry();
 	const setPreviewCropRect = useSetCropperPreviewRect();
 
@@ -101,7 +95,7 @@ export function useAdvancedCropControls( {
 				? {
 						width: state.image.naturalWidth,
 						height: state.image.naturalHeight,
-				  }
+					}
 				: { width: 0, height: 0 },
 		[ state.image ]
 	);

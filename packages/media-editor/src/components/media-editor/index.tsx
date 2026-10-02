@@ -882,10 +882,10 @@ export function MediaEditor( props: MediaEditorProps ) {
 }
 
 function MediaEditorWithCropperProvider( props: MediaEditorProps ) {
-	const controller = useMediaEditor();
+	const { cropper } = useMediaEditor();
 
 	return (
-		<CropperProvider controller={ controller }>
+		<CropperProvider controller={ cropper }>
 			<MediaEditorContent { ...props } />
 		</CropperProvider>
 	);

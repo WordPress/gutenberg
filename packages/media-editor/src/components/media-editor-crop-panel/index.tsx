@@ -42,7 +42,7 @@ export default function MediaEditorCropPanel( {
 	aspectRatioOptions,
 	disabled = false,
 }: MediaEditorCropPanelProps ) {
-	const { state } = useMediaEditor();
+	const { state } = useMediaEditor().cropper;
 	const resolvedAspectRatio = resolveAspectRatio(
 		aspectRatioValue,
 		state.image
