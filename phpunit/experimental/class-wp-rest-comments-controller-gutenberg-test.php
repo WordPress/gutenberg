@@ -5,10 +5,9 @@
  *
  * Coverage areas:
  *   - **Permissions**: that post editors can create/read/update note comments
- *     under the `edit_post` shortcut; that suggestion-lifecycle updates
- *     (`status`, `meta._wp_suggestion_status`) are accepted while attempts
- *     to rewrite content/author/date fall back to the core `edit_comment`
- *     check; that contributors and subscribers are gated as expected.
+ *     and apply suggestions through core's `edit_comment` check (mapped to
+ *     `edit_post` on the parent post); that contributors and subscribers are
+ *     gated as expected.
  *   - **Suggestion meta round-trip**: that `_wp_suggestion` and
  *     `_wp_suggestion_status` survive create + read + update, and that the
  *     payload-size cap (`GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES`) is
@@ -876,8 +875,8 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		);
 
 		$response = rest_get_server()->dispatch( $request );
-		// The suggestion-lifecycle override passed because the editor owns
-		// the parent post; the update succeeds with a 200 status.
+		// Core maps `edit_comment` to `edit_post` on the parent post, which
+		// the editor holds; the update succeeds with a 200 status.
 		$this->assertSame( 200, $response->get_status() );
 	}
 
@@ -1075,164 +1074,5 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 
 		$stored = get_comment_meta( $comment_id, '_wp_suggestion', true );
 		$this->assertSame( '', $stored, 'Oversized payload should be rejected, not truncated.' );
-	}
-
-	/**
-	 * Test that `is_suggestion_lifecycle_update` correctly rejects
-	 * request bodies that touch fields outside the suggestion-lifecycle
-	 * allowlist. We assert against the private helper via a request
-	 * probe rather than through the full REST dispatch because actual
-	 * permission behavior for `edit_comment` on a foreign note on a
-	 * post the current user authored is governed by core's
-	 * `map_meta_cap` for `edit_comment` (which delegates to `edit_post`
-	 * on the comment's parent post) — outside the scope of this override.
-	 */
-	public function test_lifecycle_update_rejects_non_allowlisted_fields() {
-		$cases = array(
-			'content field blocks shortcut'        => array(
-				'body'     => array(
-					'status'  => 'approved',
-					'content' => 'rewritten',
-				),
-				'expected' => false,
-			),
-			'only id/status/meta passes shortcut'  => array(
-				'body'     => array(
-					'status' => 'approved',
-					'meta'   => array(
-						'_wp_suggestion_status' => 'applied',
-					),
-				),
-				'expected' => true,
-			),
-			'non-approved status blocks shortcut'  => array(
-				'body'     => array(
-					'status' => 'spam',
-				),
-				'expected' => false,
-			),
-			'non-allowlisted meta blocks shortcut' => array(
-				'body'     => array(
-					'meta' => array(
-						'_wp_note_status' => 'resolved',
-					),
-				),
-				'expected' => false,
-			),
-		);
-
-		foreach ( $cases as $label => $case ) {
-			$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/1' );
-			$request->add_header( 'Content-Type', 'application/json' );
-			$request->set_body( wp_json_encode( $case['body'] ) );
-
-			$reflection = new ReflectionMethod(
-				'Gutenberg_REST_Comment_Controller_7_1',
-				'is_suggestion_lifecycle_update'
-			);
-			if ( PHP_VERSION_ID < 80100 ) {
-				$reflection->setAccessible( true );
-			}
-
-			$this->assertSame(
-				$case['expected'],
-				$reflection->invoke( null, $request ),
-				"Lifecycle shortcut expectation mismatched for: {$label}"
-			);
-		}
-	}
-
-	/**
-	 * Test that a field smuggled in as a QUERY parameter alongside a
-	 * lifecycle-only body does not take the lifecycle shortcut. Core's
-	 * `update_item` reads `$request['content']` from the merged param view
-	 * (JSON > POST > GET > URL), so `PUT /wp/v2/comments/<id>?content=x`
-	 * with a lifecycle-only JSON body would rewrite the note while a
-	 * body-only allowlist still classified it as a lifecycle update.
-	 */
-	public function test_lifecycle_update_rejects_query_param_content_rewrite() {
-		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/1' );
-		$request->add_header( 'Content-Type', 'application/json' );
-		$request->set_query_params( array( 'content' => 'rewritten via query param' ) );
-		$request->set_body(
-			wp_json_encode(
-				array(
-					'status' => 'approved',
-					'meta'   => array(
-						'_wp_suggestion_status' => 'applied',
-					),
-				)
-			)
-		);
-
-		$reflection = new ReflectionMethod(
-			'Gutenberg_REST_Comment_Controller_7_1',
-			'is_suggestion_lifecycle_update'
-		);
-		if ( PHP_VERSION_ID < 80100 ) {
-			$reflection->setAccessible( true );
-		}
-		$this->assertFalse(
-			$reflection->invoke( null, $request ),
-			'A content rewrite via query parameter must not take the lifecycle shortcut.'
-		);
-	}
-
-	/**
-	 * Test that REST meta-parameters that ride on every editor request
-	 * (api-fetch appends `_locale=user`) do not disqualify an otherwise
-	 * lifecycle-only update from the shortcut.
-	 */
-	public function test_lifecycle_update_ignores_rest_meta_query_params() {
-		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/1' );
-		$request->add_header( 'Content-Type', 'application/json' );
-		$request->set_query_params( array( '_locale' => 'user' ) );
-		$request->set_body(
-			wp_json_encode(
-				array(
-					'status' => 'approved',
-					'meta'   => array(
-						'_wp_suggestion_status' => 'applied',
-					),
-				)
-			)
-		);
-
-		$reflection = new ReflectionMethod(
-			'Gutenberg_REST_Comment_Controller_7_1',
-			'is_suggestion_lifecycle_update'
-		);
-		if ( PHP_VERSION_ID < 80100 ) {
-			$reflection->setAccessible( true );
-		}
-		$this->assertTrue( $reflection->invoke( null, $request ) );
-	}
-
-	/**
-	 * Test that the lifecycle helper also accepts form-encoded request
-	 * bodies, not only JSON. Custom integrations may issue updates with
-	 * `application/x-www-form-urlencoded` and should benefit from the
-	 * same `edit_post` shortcut as the JSON path.
-	 */
-	public function test_lifecycle_update_accepts_form_encoded_bodies() {
-		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/1' );
-		$request->add_header( 'Content-Type', 'application/x-www-form-urlencoded' );
-		$request->set_body_params(
-			array(
-				'status' => 'approved',
-				'meta'   => array(
-					'_wp_suggestion_status' => 'applied',
-				),
-			)
-		);
-
-		$reflection = new ReflectionMethod(
-			'Gutenberg_REST_Comment_Controller_7_1',
-			'is_suggestion_lifecycle_update'
-		);
-		if ( PHP_VERSION_ID < 80100 ) {
-			$reflection->setAccessible( true );
-		}
-		$this->assertTrue( $reflection->invoke( null, $request ) );
 	}
 }
