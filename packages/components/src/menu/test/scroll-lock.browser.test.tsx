@@ -5,7 +5,6 @@ import { useState } from '@wordpress/element';
 import { Menu } from '..';
 import Modal from '../../modal';
 // Load the body scroll-lock rule that WordPress enqueues for Modal.
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '../../modal/style.scss';
 
 const MenuWithModal = () => {

@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 // Browser Mode loads source CSS without the build's token fallbacks.
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '@wordpress/theme/design-tokens.css';
 import * as Progress from '../index';
 
