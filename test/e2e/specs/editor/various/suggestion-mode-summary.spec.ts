@@ -227,4 +227,73 @@ test.describe( 'Suggest mode: sidebar summaries', () => {
 				.filter( { hasText: 'Change:' } )
 		).toHaveText( 'Change: heading level 3 → 4' );
 	} );
+
+	test( 'a long type-over summary collapses and expands to the full quoted text', async ( {
+		editor,
+		page,
+	} ) => {
+		const original =
+			'This original paragraph is long enough that the replaced side of the summary has to be cut short, so a reviewer could not read it in full.';
+		const replacement =
+			'This proposed replacement is much longer than the sixty characters a Replace line shows on each side, and the reviewer needs some way to read every word of it before accepting or rejecting the suggestion.';
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: original },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		// Select the whole text and type over it: one replace suggestion.
+		await page.keyboard.press( 'ControlOrMeta+a' );
+		const saved = suggestionSavedPromise( page );
+		await page.keyboard.type( replacement );
+		// The markers are only written once the note POST returns its id.
+		await saved;
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="add"]'
+			)
+		).toHaveText( replacement );
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="del"]'
+			)
+		).toHaveText( original );
+
+		const sidebar = await openNotesSidebar( page );
+		const summary = sidebar
+			.locator( '.editor-collab-sidebar-panel__suggestion-summary' )
+			.filter( { hasText: 'Replace:' } )
+			.first();
+		await expect( summary ).toBeVisible();
+
+		// Collapsed by default: the quote is cut short on both sides.
+		await expect( summary ).not.toContainText( original );
+		await expect( summary ).not.toContainText( replacement );
+
+		const toggle = summary.getByRole( 'button', { name: 'Show more' } );
+		await expect( toggle ).toHaveAttribute( 'aria-expanded', 'false' );
+		await toggle.click();
+
+		await expect( summary ).toContainText( original );
+		await expect( summary ).toContainText( replacement );
+		const collapse = summary.getByRole( 'button', { name: 'Show less' } );
+		await expect( collapse ).toHaveAttribute( 'aria-expanded', 'true' );
+		// Focus stays on the toggle so the keyboard user is not dropped.
+		await expect( collapse ).toBeFocused();
+
+		// Keyboard operable both ways.
+		await page.keyboard.press( 'Enter' );
+		await expect( summary ).not.toContainText( replacement );
+		await expect(
+			summary.getByRole( 'button', { name: 'Show more' } )
+		).toBeFocused();
+		await page.keyboard.press( 'Space' );
+		await expect( summary ).toContainText( replacement );
+	} );
 } );
