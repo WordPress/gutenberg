@@ -370,6 +370,9 @@ function ViewTable< Item >( {
 	const handleHeaderContextMenu = ( event: React.MouseEvent ) => {
 		event.preventDefault();
 		event.stopPropagation();
+		if ( disableHeaderControls ) {
+			return;
+		}
 		const virtualAnchor = {
 			getBoundingClientRect: () => ( {
 				x: event.clientX,
@@ -508,29 +511,43 @@ function ViewTable< Item >( {
 					} ) }
 					onContextMenu={ handleHeaderContextMenu }
 				>
-					<tr
-						className="dataviews-view-table__row"
-						// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
-						inert={ disableHeaderControls ? 'true' : undefined }
-					>
+					<tr className="dataviews-view-table__row">
 						{ hasBulkActions && (
 							<th
 								className="dataviews-view-table__checkbox-column"
 								scope="col"
 								onContextMenu={ handleHeaderContextMenu }
 							>
-								<BulkSelectionCheckbox
-									checkboxRef={ tableSelectionRef }
-									selection={ selection }
-									onChangeSelection={ onChangeSelection }
-									data={ data }
-									actions={ actions }
-									getItemId={ getItemId }
-								/>
+								<div
+									// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+									inert={ inertValue(
+										disableHeaderControls
+									) }
+									aria-hidden={
+										disableHeaderControls || undefined
+									}
+								>
+									<BulkSelectionCheckbox
+										checkboxRef={ tableSelectionRef }
+										selection={ selection }
+										onChangeSelection={ onChangeSelection }
+										data={ data }
+										actions={ actions }
+										getItemId={ getItemId }
+									/>
+								</div>
 							</th>
 						) }
 						{ hasPrimaryColumn && (
-							<th scope="col">
+							<th
+								scope="col"
+								aria-sort={
+									view.sort?.field === titleField?.id &&
+									view.sort
+										? sortValues[ view.sort.direction ]
+										: undefined
+								}
+							>
 								{ titleField && (
 									<ColumnHeaderMenu
 										ref={ headerMenuRef(
@@ -538,6 +555,7 @@ function ViewTable< Item >( {
 											0
 										) }
 										fieldId={ titleField.id }
+										isCovered={ disableHeaderControls }
 										view={ view }
 										fields={ fields }
 										onChangeView={ onChangeView }
@@ -593,6 +611,7 @@ function ViewTable< Item >( {
 									<ColumnHeaderMenu
 										ref={ headerMenuRef( column, index ) }
 										fieldId={ column }
+										isCovered={ disableHeaderControls }
 										view={ view }
 										fields={ fields }
 										onChangeView={ onChangeView }
@@ -632,7 +651,7 @@ function ViewTable< Item >( {
 									className="dataviews-view-table__bulk-actions-overlay"
 									ref={ bulkActionsRef }
 									// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
-									inert={ isLoading ? 'true' : undefined }
+									inert={ inertValue( !! isLoading ) }
 								>
 									<BulkActionToolbar
 										onActionInProgressChange={

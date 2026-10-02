@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import { Spinner } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { inertValue } from '@wordpress/react-inert-value';
 import { Stack } from '@wordpress/ui';
 import type { ViewGridProps } from '../../../types';
 import getDataByGroup from '../utils/get-data-by-group';
@@ -88,7 +89,7 @@ function ViewGrid< Item >( {
 				<div
 					className="dataviews-view-grid__bulk-actions-header"
 					// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
-					inert={ isLoading ? 'true' : undefined }
+					inert={ inertValue( !! isLoading ) }
 				>
 					<BulkActionToolbar
 						onActionInProgressChange={ setIsActionInProgress }

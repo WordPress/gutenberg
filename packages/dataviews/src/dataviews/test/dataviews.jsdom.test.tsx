@@ -145,7 +145,7 @@ function DataViewWrapper( {
 
 function getBulkActionToolbar() {
 	return screen
-		.getByText( /\d+ Items? selected/ )
+		.getByText( /\d+ items? selected/ )
 		.closest< HTMLDivElement >( '.dataviews-bulk-actions' )!;
 }
 
@@ -191,7 +191,7 @@ describe( 'DataViews component', () => {
 		expect( console ).toHaveWarnedWith(
 			'DataViews.BulkActionToolbar is deprecated. Please use DataViews.Layout instead.'
 		);
-		expect( screen.getByText( '1 Item selected' ) ).toBeInTheDocument();
+		expect( screen.getByText( '1 item selected' ) ).toBeInTheDocument();
 		expect( screen.getByRole( 'button', { name: 'Delete' } ) ).toHaveClass(
 			'is-secondary'
 		);
@@ -208,7 +208,7 @@ describe( 'DataViews component', () => {
 		await user.click(
 			screen.getAllByRole( 'checkbox', { name: 'Select all' } ).at( -1 )!
 		);
-		expect( screen.getByText( '3 Items selected' ) ).toBeInTheDocument();
+		expect( screen.getByText( '3 items selected' ) ).toBeInTheDocument();
 		expect( screen.getByRole( 'button', { name: 'Delete' } ) ).toHaveClass(
 			'is-secondary'
 		);
@@ -253,7 +253,7 @@ describe( 'DataViews component', () => {
 			expect(
 				screen.getByRole( 'button', { name: 'Process' } )
 			).toHaveClass( 'is-busy' );
-			expect( screen.getByText( '1 Item selected' ) ).toBeVisible();
+			expect( screen.getByText( '1 item selected' ) ).toBeVisible();
 			finishAction!();
 			await waitFor( () =>
 				expect(
@@ -304,7 +304,7 @@ describe( 'DataViews component', () => {
 
 	it( 'moves default table bulk actions into the header and preserves focus', async () => {
 		render( <DataViewWrapper actions={ actions } /> );
-		expect( screen.getByText( '3 Items' ) ).toBeInTheDocument();
+		expect( screen.getByText( '3 items' ) ).toBeInTheDocument();
 		expect(
 			screen.getAllByRole( 'checkbox', { name: 'Select all' } )
 		).toHaveLength( 1 );
@@ -318,15 +318,17 @@ describe( 'DataViews component', () => {
 			'rowgroup'
 		)[ 0 ];
 		const toolbarCell = within( tableHeader ).getByRole( 'cell', {
-			name: /3 Items selected/,
+			name: /3 items selected/,
 		} );
 		const titleHeader = within( tableHeader ).getByRole( 'columnheader', {
 			name: 'Title',
 		} );
 		expect( tableHeader ).not.toHaveAttribute( 'inert' );
 		// eslint-disable-next-line testing-library/no-node-access
-		expect( titleHeader.closest( 'tr' ) ).toHaveAttribute( 'inert' );
-		expect( within( titleHeader ).getByRole( 'button' ) ).toBeEnabled();
+		expect( titleHeader.closest( 'tr' ) ).not.toHaveAttribute( 'inert' );
+		expect(
+			within( titleHeader ).getByRole( 'button', { hidden: true } )
+		).toHaveAttribute( 'inert' );
 		expect(
 			within( toolbarCell ).getByRole( 'checkbox', {
 				name: 'Deselect all',
