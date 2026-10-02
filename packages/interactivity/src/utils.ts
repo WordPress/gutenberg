@@ -64,7 +64,7 @@ export const splitTask =
 				return new Promise( ( resolve ) => {
 					setTimeout( resolve, 0 );
 				} );
-		  };
+			};
 /**
  * Executes the passed callback on `DOMContentLoaded`, or immediately if that
  * event has already been triggered.
@@ -413,8 +413,8 @@ export const isPlainObject = (
 ): candidate is Record< string, unknown > =>
 	Boolean(
 		candidate &&
-			typeof candidate === 'object' &&
-			candidate.constructor === Object
+		typeof candidate === 'object' &&
+		candidate.constructor === Object
 	);
 
 /**
@@ -432,8 +432,8 @@ export function withSyncEvent( callback: Function ): SyncAwareFunction {
 export type DeepReadonly< T > = T extends ( ...args: any[] ) => any
 	? T
 	: T extends object
-	? { readonly [ K in keyof T ]: DeepReadonly< T[ K ] > }
-	: T;
+		? { readonly [ K in keyof T ]: DeepReadonly< T[ K ] > }
+		: T;
 
 // WeakMap cache to reuse proxies for the same read-only objects.
 const readOnlyMap = new WeakMap< object, object >();

@@ -3,6 +3,6 @@
 @mixin focus-ring() {
 	@include base-mixins.outset-ring__focus();
 
-	--_gcd-a-outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
-	--_gcd-div-outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+	--_gcd-a-outline: var(--wpds-border-width-focus) solid var(--focus-color, var(--wpds-color-stroke-focus));
+	--_gcd-div-outline: var(--wpds-border-width-focus) solid var(--focus-color, var(--wpds-color-stroke-focus));
 }

@@ -8,8 +8,8 @@ A package that provides React UI components for the WordPress Design System, bui
 
 While similar in scope to `@wordpress/components`, there are a few key differences:
 
--   `@wordpress/components` grew organically as a collection of unrelated UI elements for WordPress screens. In contrast, this package is an implementation of a design system that guarantees user- and developer-facing cohesion between components.
--   Unlike `@wordpress/components`, this package is not bundled as a WordPress script available on the `window.wp` global and is instead distributed as an npm package that follows [semantic versioning](https://semver.org/) for release changes.
+- `@wordpress/components` grew organically as a collection of unrelated UI elements for WordPress screens. In contrast, this package is an implementation of a design system that guarantees user- and developer-facing cohesion between components.
+- Unlike `@wordpress/components`, this package is not bundled as a WordPress script available on the `window.wp` global and is instead distributed as an npm package that follows [semantic versioning](https://semver.org/) for release changes.
 
 `@wordpress/theme`, `@wordpress/ui`, and `@wordpress/icons` form the foundational layer of the Design System. Higher-level compositional packages, including `@wordpress/dataviews` and `@wordpress/admin-ui`, build common solutions from those foundations. See the version-matched [Design System introduction](../../storybook/stories/design-system/introduction.mdx) in a Gutenberg checkout, or the [latest copy on Gutenberg trunk](https://github.com/WordPress/gutenberg/blob/trunk/storybook/stories/design-system/introduction.mdx) when reading this package outside the monorepo.
 
@@ -17,14 +17,14 @@ This package includes many common UI components, but equivalent components can s
 
 This is a companion to the `@wordpress/theme` package that provides:
 
--   **Design Tokens**: A comprehensive system of design tokens for colors, spacing, typography, and more
--   **Theme System**: A flexible theming provider for consistent theming across applications
+- **Design Tokens**: A comprehensive system of design tokens for colors, spacing, typography, and more
+- **Theme System**: A flexible theming provider for consistent theming across applications
 
 ## Installation
 
 Install using NPM:
 
-```
+```bash
 npm install @wordpress/ui
 ```
 
@@ -40,7 +40,7 @@ In standard WordPress editor screens (such as the post editor or the site editor
 
 The components ship with built-in fallback values for all CSS custom properties, so they work out of the box without any theme setup. For full theming capabilities, it's recommended that you install and load the design tokens stylesheet:
 
-```
+```bash
 npm install @wordpress/theme
 ```
 
@@ -90,6 +90,12 @@ function App() {
 This opts the app into a shared body-level overlay container so `@wordpress/ui` overlays reliably stack above `@wordpress/components` overlays. The opt-in is one-way and idempotent. It is not needed in standard WordPress editor screens, where the slot auto-enables based on `window.wp.components`.
 
 ## Usage
+
+### Component names
+
+Component names describe what the component is, with modifiers for its appearance or purpose. `IconButton` is a button that displays an icon. `ButtonLink` is a link styled as a button. `Dialog.CloseIconButton`, `Drawer.CloseIconButton`, and `Notice.CloseIconButton` provide icon buttons for close or dismiss actions.
+
+Compound components group related parts under one name. For example, `ButtonLink.Icon` renders an icon inside `ButtonLink`, and `Menu.LinkItem` is a link item within a menu. See [Component naming](./CONTRIBUTING.md#component-naming) for contributor guidance.
 
 ### Basic Component Usage
 
@@ -167,15 +173,15 @@ For a given state `x`, the convention is:
 
 For example, a component with an open/closed state would expose:
 
--   `defaultOpen` — initial open state (uncontrolled)
--   `open` — current open state (controlled)
--   `onOpenChange` — called when the open state changes
+- `defaultOpen` — initial open state (uncontrolled)
+- `open` — current open state (controlled)
+- `onOpenChange` — called when the open state changes
 
 And a component with a selectable value would expose:
 
--   `defaultValue` — initial value (uncontrolled)
--   `value` — current value (controlled)
--   `onValueChange` — called when the value changes
+- `defaultValue` — initial value (uncontrolled)
+- `value` — current value (controlled)
+- `onValueChange` — called when the value changes
 
 #### Uncontrolled usage
 
@@ -231,31 +237,7 @@ The `onXChange` callback is distinct from the native DOM `onChange` event handle
 
 Components that wrap native form elements may still support native event handlers (like `onChange`, `onInput`) for interoperability, but `onXChange` is the recommended approach within this package.
 
-#### Guidelines for component authors
-
-When designing props for a new component:
-
--   Always offer both controlled and uncontrolled modes when the component has user-facing state.
--   Name the uncontrolled prop `defaultX`, the controlled prop `x`, and the callback `onXChange`.
--   In JSDoc comments, indicate which mode each prop is for and cross-reference the alternative:
-    ```ts
-    /**
-     * Whether the panel is currently open (controlled).
-     *
-     * To render an uncontrolled component, use the `defaultOpen` prop instead.
-     */
-    open?: boolean;
-    /**
-     * Whether the panel is initially open (uncontrolled).
-     * @default false
-     */
-    defaultOpen?: boolean;
-    /**
-     * Event handler called when the open state changes.
-     */
-    onOpenChange?: ( open: boolean ) => void;
-    ```
--   Provide a `@default` JSDoc tag for the uncontrolled prop when there is a sensible default.
+For guidance on implementing this pattern in new components, see [Controlled and uncontrolled props](./CONTRIBUTING.md#controlled-and-uncontrolled-props).
 
 ## Contributing to this package
 

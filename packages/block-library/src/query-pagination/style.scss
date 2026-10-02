@@ -1,4 +1,7 @@
 .wp-block-query-pagination {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+
 	// This moves the next link to the right side of the container,
 	// which is important when it's the only block displayed
 	// and the block has a "space-between" justification.

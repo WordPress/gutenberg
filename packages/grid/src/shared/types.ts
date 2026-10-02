@@ -159,3 +159,38 @@ export interface ResizeHandleProps {
 	 */
 	renderResizeHandle?: React.ComponentType< ResizeHandleRenderProps >;
 }
+
+/**
+ * Per-item width limits, in pixels. Surfaces quantize each limit to
+ * whole tracks (minimums round up, maximums round down), bound rendered
+ * spans and resize gestures at the result, and never write it into the
+ * layout. A quantized minimum wins over a smaller quantized maximum.
+ */
+export type GridItemWidthLimits = {
+	/**
+	 * Minimum tile width in pixels.
+	 */
+	minWidth?: number;
+
+	/**
+	 * Maximum tile width in pixels.
+	 */
+	maxWidth?: number;
+};
+
+/**
+ * Per-item size limits on both axes, in pixels, for surfaces with row
+ * tracks. Height limits quantize against the row track when `rowHeight`
+ * is numeric and stay open otherwise.
+ */
+export type GridItemLimits = GridItemWidthLimits & {
+	/**
+	 * Minimum tile height in pixels.
+	 */
+	minHeight?: number;
+
+	/**
+	 * Maximum tile height in pixels.
+	 */
+	maxHeight?: number;
+};

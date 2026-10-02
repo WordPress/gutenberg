@@ -1,5 +1,96 @@
 <?php
 
+/**
+ * Returns the SVG elements and attributes allowed for registered icons.
+ *
+ * @return array[] Allowed SVG elements and attributes.
+ * @phpstan-return array<non-falsy-string, array<non-falsy-string, true>>
+ */
+function gutenberg_get_allowed_icon_svg_tags(): array {
+	$allow_attributes = static function ( string ...$attribute_names ): array {
+		return array_fill_keys( $attribute_names, true );
+	};
+
+	$stroke_attributes = $allow_attributes(
+		'style',
+		'stroke',
+		'stroke-width',
+		'stroke-linecap',
+		'stroke-linejoin',
+		'stroke-miterlimit',
+		'vector-effect',
+	);
+
+	return array(
+		'svg'     => array_merge(
+			$allow_attributes(
+				'class',
+				'xmlns',
+				'width',
+				'height',
+				'viewbox',
+				'aria-hidden',
+				'role',
+				'focusable',
+				'fill',
+				'fill-rule',
+				'clip-rule',
+			),
+			$stroke_attributes
+		),
+		'path'    => array_merge(
+			$allow_attributes(
+				'fill',
+				'fill-rule',
+				'clip-rule',
+				'd',
+				'opacity',
+				'transform',
+			),
+			$stroke_attributes
+		),
+		'polygon' => array_merge(
+			$allow_attributes(
+				'fill',
+				'fill-rule',
+				'clip-rule',
+				'points',
+				'transform',
+				'focusable',
+			),
+			$stroke_attributes
+		),
+		'rect'    => array_merge(
+			$allow_attributes(
+				'fill',
+				'fill-rule',
+				'clip-rule',
+				'x',
+				'y',
+				'width',
+				'height',
+				'rx',
+				'ry',
+				'transform',
+			),
+			$stroke_attributes
+		),
+		'circle'  => array_merge(
+			$allow_attributes(
+				'fill',
+				'fill-rule',
+				'clip-rule',
+				'cx',
+				'cy',
+				'r',
+				'transform',
+			),
+			$stroke_attributes
+		),
+	);
+}
+
+
 class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	/**
 	 * Overridden to skip the parent's core icon registration, which uses the
@@ -16,11 +107,13 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 * @param array  $icon_properties {
 	 *     List of properties for the icon.
 	 *
-	 *     @type string $label     Required. A human-readable label for the icon.
-	 *     @type string $content   Optional. SVG markup for the icon.
-	 *                             If not provided, the content will be retrieved from the `file_path` if set.
-	 *                             If both `content` and `file_path` are not set, the icon will not be registered.
-	 *     @type string $file_path Optional. The full path to the file containing the icon content.
+	 *     @type string   $label     Required. A human-readable label for the icon.
+	 *     @type string   $content   Optional. SVG markup for the icon.
+	 *                               If not provided, the content will be retrieved from the `file_path` if set.
+	 *                               If both `content` and `file_path` are not set, the icon will not be registered.
+	 *     @type string   $file_path Optional. The full path to the file containing the icon content.
+	 *     @type string[] $keywords  Optional. Additional search terms for the icon, matched by
+	 *                               `get_registered_icons()` alongside the name and label.
 	 * }
 	 * @return bool True if the icon was registered with success and false otherwise.
 	 */
@@ -63,7 +156,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			return false;
 		}
 
-		$allowed_keys = array_fill_keys( array( 'label', 'content', 'file_path' ), 1 );
+		$allowed_keys = array_fill_keys( array( 'label', 'content', 'file_path', 'keywords' ), 1 );
 		foreach ( array_keys( $icon_properties ) as $key ) {
 			if ( ! array_key_exists( $key, $allowed_keys ) ) {
 				_doing_it_wrong(
@@ -99,6 +192,28 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				'7.0.0'
 			);
 			return false;
+		}
+
+		if ( array_key_exists( 'keywords', $icon_properties ) ) {
+			if ( ! is_array( $icon_properties['keywords'] ) ) {
+				_doing_it_wrong(
+					__METHOD__,
+					__( 'Icon keywords must be an array of strings.', 'gutenberg' ),
+					'7.2.0'
+				);
+				return false;
+			}
+
+			foreach ( $icon_properties['keywords'] as $keyword ) {
+				if ( ! is_string( $keyword ) ) {
+					_doing_it_wrong(
+						__METHOD__,
+						__( 'Icon keywords must be an array of strings.', 'gutenberg' ),
+						'7.2.0'
+					);
+					return false;
+				}
+			}
 		}
 
 		if (
@@ -186,6 +301,23 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	}
 
 	/**
+	 * Sanitizes the icon SVG content.
+	 *
+	 * Overrides the base class to allow the `rect` and `circle` shapes, plus the
+	 * stroke-related attributes and inline styles required by stroke-based icons.
+	 *
+	 * The signature is intentionally left without type declarations to stay
+	 * compatible with the parent WP_Icons_Registry::sanitize_icon_content()
+	 * shipped in WordPress core, which declares none.
+	 *
+	 * @param string $icon_content The icon SVG content to sanitize.
+	 * @return string The sanitized icon SVG content.
+	 */
+	protected function sanitize_icon_content( $icon_content ) {
+		return wp_kses( $icon_content, gutenberg_get_allowed_icon_svg_tags() );
+	}
+
+	/**
 	 * Retrieves the content of a registered icon.
 	 *
 	 * Overridden so that the file validation is applied even when the base
@@ -230,16 +362,45 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	}
 
 	/**
-	 * Modified to also search in icon labels
+	 * Determines whether an icon matches a search term.
+	 *
+	 * The term is matched case-insensitively against the icon's name, its label,
+	 * and any of its keywords.
+	 *
+	 * @param array  $icon   Registered icon properties.
+	 * @param string $search Search term.
+	 * @return bool True if the icon matches the search term, false otherwise.
+	 */
+	protected function icon_matches_search( $icon, $search ) {
+		if ( false !== stripos( $icon['name'], $search ) ) {
+			return true;
+		}
+
+		if ( false !== stripos( $icon['label'], $search ) ) {
+			return true;
+		}
+
+		foreach ( $icon['keywords'] ?? array() as $keyword ) {
+			if ( false !== stripos( $keyword, $search ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Modified to also search in icon labels and keywords.
+	 *
+	 * @param string $search Optional. Search term matched against each icon's name,
+	 *                       label, and keywords. Default empty string, which returns
+	 *                       every registered icon.
 	 */
 	public function get_registered_icons( $search = '' ) {
 		$icons = array();
 
 		foreach ( $this->registered_icons as $icon ) {
-			if ( ! empty( $search )
-				&& false === stripos( $icon['name'], $search )
-				&& false === stripos( $icon['label'], $search )
-			) {
+			if ( ! empty( $search ) && ! $this->icon_matches_search( $icon, $search ) ) {
 				continue;
 			}
 
@@ -256,7 +417,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 * The base `$instance` slot is intentionally not redefined, so both
 	 * `WP_Icons_Registry::get_instance()` (used by core) and this method share
 	 * one instance. An existing base registry is upgraded, replaying any
-	 * non-`core/` icons so they are not lost.
+	 * non-`core/` and non-`core-admin/` icons so they are not lost.
 	 */
 	public static function get_instance() {
 		if ( ! self::$instance instanceof self ) {
@@ -265,7 +426,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 
 			if ( null !== $original_registry ) {
 				foreach ( $original_registry->get_registered_icons() as $icon ) {
-					if ( str_starts_with( $icon['name'], 'core/' ) ) {
+					if ( str_starts_with( $icon['name'], 'core/' ) || str_starts_with( $icon['name'], 'core-admin/' ) ) {
 						continue;
 					}
 					$icon_properties = array( 'label' => $icon['label'] );
@@ -275,6 +436,9 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 						$icon_properties['file_path'] = $icon['file_path'];
 					} else {
 						continue;
+					}
+					if ( ! empty( $icon['keywords'] ) ) {
+						$icon_properties['keywords'] = $icon['keywords'];
 					}
 					$gutenberg_registry->register( $icon['name'], $icon_properties );
 				}

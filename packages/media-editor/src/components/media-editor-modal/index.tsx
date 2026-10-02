@@ -26,40 +26,21 @@ interface MediaEditorModalProps {
 	aspectRatioPresets?: AspectRatioPreset[];
 }
 
-interface ModalFooterProps {
-	layout: 'wide' | 'narrow';
-}
-
 /**
- * The modal's footer chrome. The fine-rotation ruler always lives under the
- * canvas (in `media-editor__content`), never here, so it stays constrained to
- * the canvas column at every viewport. One JSX tree per layout; DOM order
- * matches visual order.
+ * The modal's footer chrome. The fine-rotation ruler and the image controls
+ * both live under the canvas (in `media-editor__content`), never here, so the
+ * footer has one layout at every width: History on the left, Cancel/Save on
+ * the right.
  */
-function ModalFooter( { layout }: ModalFooterProps ) {
+function ModalFooter() {
 	return (
 		<div
-			className={ `media-editor-modal__footer is-${ layout }` }
+			className="media-editor-modal__footer"
 			role="region"
 			aria-label={ __( 'Editor actions' ) }
 		>
-			{ layout === 'wide' ? (
-				// Sidebar is a column: the image controls live in the Crop
-				// panel, so the footer is just History + Cancel/Save.
-				<>
-					<MediaEditor.HistoryActions />
-					<MediaEditor.SaveActions />
-				</>
-			) : (
-				// Sidebar collapsed: the image controls drop into the footer.
-				<>
-					<MediaEditor.ImageControls />
-					<div className="media-editor-modal__footer-row">
-						<MediaEditor.HistoryActions />
-						<MediaEditor.SaveActions />
-					</div>
-				</>
-			) }
+			<MediaEditor.HistoryActions />
+			<MediaEditor.SaveActions />
 		</div>
 	);
 }
@@ -144,7 +125,6 @@ export function MediaEditorModal( {
 			} }
 			renderFrame={ ( {
 				children,
-				layout,
 				onRequestClose,
 				onKeyDown,
 				shouldCloseOnClickOutside,
@@ -166,7 +146,7 @@ export function MediaEditorModal( {
 						}
 					>
 						{ children }
-						<ModalFooter layout={ layout } />
+						<ModalFooter />
 					</Modal>
 				</ShortcutProvider>
 			) }

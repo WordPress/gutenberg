@@ -5,35 +5,65 @@ import * as SaveSubmitStories from './save-and-submit.story';
 
 # Save & Submit
 
-Guidelines for form submission and saving settings.
+Guidelines for saving settings and submitting forms.
 
-## Feedback
+## Choose one save model per surface
 
-The following feedback patterns help users interpret save and submit results.
+Before designing a settings screen, make a deliberate choice: does the surface **save automatically** as the user makes changes, or does it **collect changes behind an explicit “Save changes” button**?
 
-### Saving
+Pick one for the entire surface. **Do not mix the two.** A page where some fields save instantly while others wait for a button leaves the user unable to tell what has actually been saved and what is still pending. This is the core reason mixed saving feels unreliable.
 
-- While saving the button state switches to a busy or loading state.
-- A [Snackbar](https://wordpress.github.io/gutenberg/?path=/docs/components-snackbar--docs) confirms a successful save.
+-   **Autosave** is the preferred default for modern interfaces whose fields can be validated and persisted independently and asynchronously (for example, React screens built with DataViews `DataForm`). Nothing is ever “unsaved”, so there is no Save button and no unsaved-changes prompt.
+-   **Manual save** remains a fully supported choice, and is the right one when changes are interdependent and should apply together, when saving has side effects that are better batched into a single action, or when the environment submits a whole form at once (for example, classic WordPress admin screens, or third-party pages that post to PHP).
+
+When in doubt, prefer autosave, but commit to whichever model you choose across every field on the surface.
+
+## Autosave model
+
+Each change is persisted as it is made. There is no Save button and no unsaved-changes guard, because there is never any unsaved state.
+
+-   **Toggles, selects, and radios** save immediately on change.
+-   **Text and number fields** save on blur, or debounced after the user stops typing, never on every keystroke.
+-   **Per-field feedback.** While a field is saving, show a subtle inline indicator on that field; confirm success inline and quietly. Reserve the [Snackbar](https://wordpress.github.io/gutenberg/?path=/docs/components-snackbar--docs) for changes whose effect isn’t otherwise visible, and avoid one snackbar per field.
+-   **Per-field errors.** If a save fails, surface the error inline at the field, keep the user’s entered value, and let them retry. A failure on one field must not block editing the others.
+-   **No global Save button** and **no “leave without saving?” prompt**. Both imply pending state that this model doesn’t have.
+
+Because autosave depends on fields saving independently, it isn’t suitable when several fields must be validated or applied together. Those cases call for the manual save model.
+
+## Manual save model
+
+Edits are held locally and applied together when the user clicks a single primary **Save changes** button.
 
 <Canvas of={ SaveSubmitStories.SaveFormLayoutCard } />
 
+### Saving
+
+-   While saving, the button switches to a busy or loading state.
+-   A [Snackbar](https://wordpress.github.io/gutenberg/?path=/docs/components-snackbar--docs) confirms a successful save.
+
 ### No unsaved changes
 
-When all changes are saved the Save button is disabled and reveals a “No unsaved changes” tooltip on hover or focus.
+When all changes are saved, the Save button is disabled and can reveal a “No unsaved changes” tooltip on hover or focus.
 
-### Invalid fields
+### Unsaved changes on exit
 
-If the save or submit fails due to user error (an invalid field or a required field is omitted) then the page scrolls with animation to the first invalid field, which shows a validation error message.
+If the user navigates away with unsaved edits, prompt them to confirm before leaving so their changes aren’t lost. This guard exists **only** in the manual save model; an autosave surface never needs it.
 
-### Failed save
+### Invalid fields, partial saves, and failed saves
 
-If the save process fails for any reason the user is notified via `ConfirmDialog`.
+For automatic saving methods, an invalid field can require being addressed before saving, e.g. by outputting an error message right below the relevant input control. 
 
-### Auto-save
+In some situations, however, some options might save successfully save while others still need attention. In this case, through a `Notice`, tell people what saved and what still needs attention. And never stack a success and an error on top of each other. You can list multiple areas that need attention in the `Notice` component, so you don't have to stack multiple.
+
+For fully failed saves, show the reason in the `Notice`.
+
+## Toggles
+
+A toggle implies immediate effect, like a light switch, which makes it a natural fit for autosave surfaces where a change takes effect as soon as it is flipped. On a manual-save surface, nothing applies until the Save button is clicked, so weigh whether that immediacy still reads true.
 
 - Auto-saving is restricted to `ToggleControl` fields.
 - Follows the same feedback conventions as other save methods.
 - It is preferable to use a toggle instead of a checkbox for turning features on and off. The exception would be if the checkbox is part of a form with other fields that also need to be updated at the same time.
 - Keep labels short. Use the description under the toggle or in the card title to provide more context.
 - Lead labels with a verb like “Use, Allow, Show,” or “Enable”.
+

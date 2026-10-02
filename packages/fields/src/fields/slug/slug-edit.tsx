@@ -1,7 +1,7 @@
 import {
 	Button,
 	ExternalLink,
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 	__experimentalVStack as VStack,
@@ -79,7 +79,7 @@ const SlugEdit = ( {
 							{ __( 'Learn more' ) }
 						</ExternalLink>
 					</VStack>
-					<InputControl
+					<WCInputControl
 						prefix={
 							<InputControlPrefixWrapper>
 								/

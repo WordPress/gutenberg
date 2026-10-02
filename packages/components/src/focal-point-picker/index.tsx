@@ -233,7 +233,6 @@ export function FocalPointPicker( {
 	};
 
 	const classes = clsx( 'components-focal-point-picker-control', className );
-	const Label = hideLabelFromVision ? VisuallyHidden : StyledLabel;
 
 	useUpdateEffect( () => {
 		setShowGridOverlay( true );
@@ -246,7 +245,12 @@ export function FocalPointPicker( {
 
 	return (
 		<Container { ...restProps } as="fieldset" className={ classes }>
-			{ !! label && <Label as="legend">{ label }</Label> }
+			{ !! label &&
+				( hideLabelFromVision ? (
+					<VisuallyHidden as="legend">{ label }</VisuallyHidden>
+				) : (
+					<StyledLabel as="legend">{ label }</StyledLabel>
+				) ) }
 			<MediaWrapper className="components-focal-point-picker-wrapper">
 				<MediaContainer
 					className="components-focal-point-picker"
