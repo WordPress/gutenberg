@@ -5,22 +5,25 @@ description: Use when planning or implementing changes to @wordpress/components,
 
 # Contribute to the WordPress Design System
 
-## Establish the contract
+Read the affected package's `AGENTS.md` and the relevant [package contribution guidance](../../../docs/contributors/design/design-system-packages.md#change-a-package-safely).
 
-1. Identify the requested outcome, affected package, and consumers. For a proposal, distinguish agreed behaviour from open design decisions.
-2. Read [Working with WordPress Design System packages](../../../docs/contributors/design/design-system-packages.md#change-a-package-safely) and the affected package's `AGENTS.md`. Follow its links for the component, styling, theming, or token work at hand.
-3. Classify the change by its effect. Internal work preserves supported behaviour; public changes include additions, removals, renames, and changes to observable behaviour, even without a type change.
-4. For a new capability, check existing public composition and similar components or tokens. If they meet the need, use them within the requested scope. For unresolved public design decisions, follow [Contributing to the Design System](../../../storybook/stories/design-system/contributing.md#fix-it-at-the-source) before implementation. Continue independent work that does not depend on that decision.
+## Choose the smallest change
 
-## Implement within the boundary
+Start from the consumer's need. For a bug fix, reproduce the failure and identify the behaviour to restore. For a refactor, identify the behaviour to preserve. A new capability needs a concrete use case and an explanation of why existing public composition is insufficient.
 
-- Keep product-specific behaviour in the consuming package. A mixed package-and-consumer task also uses [design-system-ui-composition](../design-system-ui-composition/SKILL.md) for the application changes.
-- For replacements and migrations, compare the affected old and new contracts using the [compatibility guidance](../../../docs/contributors/design/design-system-packages.md#compare-contracts-before-replacing-an-api). Establish the regression or baseline behaviour before editing.
-- Apply [package-runtime-compatibility](../package-runtime-compatibility/SKILL.md) when the change affects a contract between a bundled package and dependencies supplied separately by WordPress. The mere presence of an external dependency does not require a compatibility matrix for an unrelated edit.
-- For an Emotion migration, use [emotion-to-scss-modules](../emotion-to-scss-modules/SKILL.md).
+When choosing a component or token, use the MCP server's `get_components`, `get_component_details`, and `get_design_tokens` as appropriate, or the guide's [recommendation sources](../../../docs/contributors/design/design-system-packages.md#choose-a-recommended-component) and the [token reference](../../../packages/theme/docs/tokens.md). Check the current source before adding an API that appears to be missing.
 
-## Verify the affected behaviour
+Keep product-specific behaviour in the consuming package and use [design-system-ui-composition](../design-system-ui-composition/SKILL.md) for that work. For unresolved public design decisions, follow [Contributing to the Design System](../../../storybook/stories/design-system/contributing.md#fix-it-at-the-source) before implementation; continue work that does not depend on that decision.
 
-Use the public guide's [completion checks](../../../docs/contributors/design/design-system-packages.md#change-a-package-safely) and [verification guidance](../../../docs/contributors/design/design-system-packages.md#verify-the-affected-behaviour). Choose checks for the affected contract; documentation-only edits do not need a component interaction suite. Follow the repository's required lint, type, build, and changelog rules.
+## Preserve the affected contracts
 
-Report the resulting behaviour and any unresolved compatibility or verification gap. Do not claim visual parity from types, snapshots, or class assertions alone.
+- Follow the package's component, prop/ref, state, and styling conventions. Reuse existing composition and helpers instead of rebuilding behaviour already provided by a dependency.
+- For removals, replacements, or behaviour changes, compare the affected old and new contracts using the [compatibility guidance](../../../docs/contributors/design/design-system-packages.md#compare-contracts-before-replacing-an-api). Include plugin and npm consumers, even when all Gutenberg callers have been migrated.
+- For token changes, choose by semantic purpose and affected modes, then follow the [token source guide](../../../packages/theme/tokens/README.md) and [build procedure](../../../packages/theme/README.md#building). For Emotion migrations, use [emotion-to-scss-modules](../emotion-to-scss-modules/SKILL.md).
+- Use [package-runtime-compatibility](../package-runtime-compatibility/SKILL.md) only when changing a contract between independently updated package and WordPress versions.
+
+## Verify what changed
+
+Start with existing tests and stories. Add coverage only for a concrete regression risk introduced by our code or integration that existing coverage does not address. Rely on dependency tests for behaviour the dependency owns; avoid speculative edge cases and exhaustive combinations. Use the guide's [verification choices](../../../docs/contributors/design/design-system-packages.md#verify-the-affected-behaviour) for checks that need a browser.
+
+Follow the [completion checks](../../../docs/contributors/design/design-system-packages.md#change-a-package-safely) for affected exports, documentation, generated files, and changelogs, along with the repository's required checks. State any material verification gap without claiming visual parity from snapshots or class assertions.

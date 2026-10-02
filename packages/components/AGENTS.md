@@ -1,9 +1,9 @@
 # Components package guidance
 
-Before changing or reviewing this package, read the relevant sections of [CONTRIBUTING.md](./CONTRIBUTING.md). It covers compatibility, component APIs, styling, stories, and documentation. Existing components can have compatibility constraints that differ from the conventions for new components.
+Use [design-system-contribution](../../.agents/skills/design-system-contribution/SKILL.md) for package implementation and [design-system-code-review](../../.agents/skills/design-system-code-review/SKILL.md) for review. Read the guidance relevant to the change:
 
--   For package implementation or review, use the repository's [design-system-contribution](../../.agents/skills/design-system-contribution/SKILL.md) or [design-system-code-review](../../.agents/skills/design-system-code-review/SKILL.md) skill, respectively.
--   For Emotion migrations, use [emotion-to-scss-modules](../../.agents/skills/emotion-to-scss-modules/SKILL.md).
--   For consumer component selection, follow [Choose a recommended component](../../docs/contributors/design/design-system-packages.md#choose-a-recommended-component). This package remains supported; moving an existing consumer to `@wordpress/ui` requires a separate compatibility assessment.
+-   [CONTRIBUTING.md](./CONTRIBUTING.md) for component APIs, compatibility, styling, stories, and documentation. Existing components can have compatibility constraints that differ from the conventions for new components.
+-   The affected component's README, types, stories, and consumers before changing its contract.
+-   [emotion-to-scss-modules](../../.agents/skills/emotion-to-scss-modules/SKILL.md) for an Emotion migration.
 
-Check the affected component's README, types, stories, and consumers before changing its contract. Use the [cross-package guide](../../docs/contributors/design/design-system-packages.md#verify-the-affected-behaviour) to select verification for the changed behaviour.
+For consumer component selection, follow [Choose a recommended component](../../docs/contributors/design/design-system-packages.md#choose-a-recommended-component). This package remains supported; do not migrate existing consumers to `@wordpress/ui` just because it is newer.

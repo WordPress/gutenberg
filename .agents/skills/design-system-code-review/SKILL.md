@@ -5,23 +5,17 @@ description: Use when reviewing changes to @wordpress/components, @wordpress/ui,
 
 # Review a WordPress Design System contribution
 
-## Establish the review boundary
+Read the affected package's `AGENTS.md` and [Working with WordPress Design System packages](../../../docs/contributors/design/design-system-packages.md#change-a-package-safely). Review the proposed source and the consumers it affects. For a mixed package-and-consumer change, also use [design-system-ui-review](../design-system-ui-review/SKILL.md) on the application code.
 
-1. Read the complete diff and identify the affected packages and observable behaviour. Distinguish internal changes from additions, removals, renames, or changes to supported behaviour.
-2. Read [Working with WordPress Design System packages](../../../docs/contributors/design/design-system-packages.md#change-a-package-safely) and the affected package's `AGENTS.md`. Follow only the source guidance relevant to the change.
-3. Establish what the checkout represents: base, proposed head, or another revision. Use the diff and corresponding source together; do not assume the checkout is always the baseline. Check API availability against the target version. Current Storybook or MCP recommendations do not prove older runtime support.
-4. For a mixed change, also use [design-system-ui-review](../design-system-ui-review/SKILL.md) on its application consumers.
+## What to look for
 
-## Review the affected contracts
+1. **Behaviour in the wrong package or duplicated implementation.** Keep product-specific behaviour in the consumer. Check whether existing components, helpers, or tokens already meet the need before adding another API or implementation. Use the MCP server's `get_components` and `get_component_details`, or the guide's [recommendation sources](../../../docs/contributors/design/design-system-packages.md#choose-a-recommended-component), when component selection matters; verify the result against the reviewed source.
+2. **Broken component composition.** Check changes to prop and ref forwarding, rendered elements, controlled and uncontrolled state, callback arguments, and default behaviour. Inspect affected wrappers and compound components. Test our changed integration where it introduces a meaningful risk; do not duplicate the underlying dependency's behaviour tests.
+3. **Incompatible public changes.** Use the guide's [contract comparison](../../../docs/contributors/design/design-system-packages.md#compare-contracts-before-replacing-an-api) for removed or changed props, exports, tokens, styling hooks, and extension points. Include external consumers; migrated Gutenberg callers do not prove plugin compatibility. Check that published types resolve through declared dependencies.
+4. **Styles that break composition or theming.** Look for inappropriate hard-coded values, tokens selected by value rather than purpose, lost consumer overrides, and declarations that depend on stylesheet order. Use `get_design_tokens` or the [token reference](../../../packages/theme/docs/tokens.md) for semantic choices, and the package's styling guidance for its CSS conventions. Check portal destinations and affected theme modes when the change can alter them.
+5. **Interaction or accessibility regressions.** Check the semantics, accessible names, keyboard paths, focus, and disabled states the change can affect. Use the guide's [verification guidance](../../../docs/contributors/design/design-system-packages.md#verify-the-affected-behaviour) for standards and browser evidence. Passing types or class assertions do not prove interaction or visual parity.
+6. **Public documentation or generated output left behind.** Check affected prop documentation, stories, component status and recommendation metadata, generated token assets, and required changelogs. Do not request new stories or documentation for an unchanged capability.
 
-For internal work, verify preservation of behaviour and focused coverage. For a public change, assess Gutenberg and external consumers separately, following the guide's [contract comparison](../../../docs/contributors/design/design-system-packages.md#compare-contracts-before-replacing-an-api). Complete the affected comparison even after finding one defect; a table is useful for a multi-part replacement, not required for every edit.
+Apply [package-runtime-compatibility](../package-runtime-compatibility/SKILL.md) only when the changed contract crosses independently updated package and WordPress versions. For an Emotion migration, use the [migration guide](../../../packages/components/emotion-to-scss-modules.md) to check cascade and consumer compatibility.
 
-Check applicable exports, types, documentation, recommendation metadata, generated files, and changelog requirements through the guide's [completion checks](../../../docs/contributors/design/design-system-packages.md#change-a-package-safely). Apply [package-runtime-compatibility](../package-runtime-compatibility/SKILL.md) when the changed contract crosses independently updated package and WordPress versions.
-
-Use the guide's [verification guidance](../../../docs/contributors/design/design-system-packages.md#verify-the-affected-behaviour) to distinguish source evidence from behaviour that needs a browser. For an Emotion migration, also read the [migration guide](../../../packages/components/emotion-to-scss-modules.md).
-
-## Report supported findings
-
-Tie each finding to a changed line, the affected contract, source or consumer evidence, and concrete impact. A diff excerpt or an unrun check is a verification gap unless other evidence proves a defect. Repository requirements can justify a finding without a runtime regression; cite the requirement and its consequence.
-
-Recheck findings against the complete proposed change. Separate defects, verification gaps, and optional follow-ups. Give the smallest coherent correction and proportional severity. Report no findings when the evidence supports none. This review does not authorize edits or posting a GitHub review.
+Keep findings tied to the change, including downstream effects. Missing tests alone are not a finding. Reuse existing coverage and request a new check only for a concrete, meaningful risk introduced by our code or integration. Combine concerns that have one coherent fix.

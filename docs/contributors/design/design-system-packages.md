@@ -29,20 +29,12 @@ not bypass that decision with a package-private import.
 
 ## Check the target version
 
-Before choosing or reviewing an API, identify where the application gets it in
-production:
+For a Gutenberg change, use the proposed source and its dependencies. Check other versions when the consuming application runs a different package or WordPress release:
 
-1. For a Gutenberg change, use the PR head or current checkout.
-2. If the application bundles the package, check the installed package version.
-3. If WordPress provides the package at runtime, check the application's minimum
-   supported WordPress version. Verify that version provides the required export
-   and script or style handle.
+1. If the application bundles the package, check the installed package version.
+2. If WordPress provides the package at runtime, check the application's minimum supported WordPress version. Verify that version provides the required export and script or style handle.
 
-Build tools call the third case "externalized": the package is not included in
-the application bundle. Inspect the build configuration and generated asset
-metadata to confirm which case applies. The default
-[`@wordpress/dependency-extraction-webpack-plugin`](/packages/dependency-extraction-webpack-plugin/README.md)
-externalizes many WordPress packages.
+Build tools call the second case "externalized": the package is not included in the application bundle. When the source of the runtime dependency is unclear, inspect the build configuration and generated asset metadata. The default [`@wordpress/dependency-extraction-webpack-plugin`](/packages/dependency-extraction-webpack-plugin/README.md) externalizes many WordPress packages.
 
 Use the package documentation as the source of durable facts:
 
@@ -141,7 +133,7 @@ decide and document compatibility, migration, release, generated-output, and
 consumer implications. Verify CSS and interaction behaviour in a browser where
 unit tests cannot establish cascade order, focus geometry, or portal behaviour.
 
-When a Design System package is bundled while one or more dependencies are supplied separately by WordPress, follow [Testing published packages across WordPress versions](/docs/contributors/code/package-runtime-compatibility.md). Check each supported entrypoint and version pairing before changing or removing the dependency contract.
+When changing a contract between a bundled Design System package and a dependency supplied separately by WordPress, follow [Testing published packages across WordPress versions](/docs/contributors/code/package-runtime-compatibility.md). Check the supported entrypoints and version pairings affected by that contract. An unrelated internal edit does not need this matrix.
 
 Before declaring package work complete, check the requirements affected by the change:
 
@@ -168,12 +160,8 @@ Select verification from the changed contract and the [testing overview](/docs/c
 
 Do not add or request tests just because coverage is absent. Rely on a third-party dependency's tests for behaviour it owns and that the change leaves intact. Focus local coverage on our transformations, overrides, state handling, and integration where they introduce a concrete regression risk. Identify the supported use case, likely failure, and consequence before adding a test, then choose the smallest check not already covered. Avoid duplicating dependency suites, enumerating every prop combination, or building fixtures for speculative edge cases. Weigh realistic likelihood and impact together; an uncommon supported use case can still matter when failure has a serious consequence.
 
-For interaction changes, exercise the relevant keyboard and pointer paths, accessible names, state transitions, dismissal, and focus return in the actual composition. Compare accessibility requirements with the applicable [ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/), [ARIA specification](https://www.w3.org/TR/wai-aria-1.2/), or [WCAG](https://www.w3.org/TR/WCAG22/). A passing automated check is evidence for the rules it checks, not proof of complete accessibility.
+For interaction changes, check the keyboard and pointer paths, accessible names, state transitions, dismissal, or focus return that our changes can affect. Use existing coverage of unchanged behaviour. Compare accessibility requirements with the applicable [ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/), [ARIA specification](https://www.w3.org/TR/wai-aria-1.2/), or [WCAG](https://www.w3.org/TR/WCAG22/). A passing automated check is evidence for the rules it checks, not proof of complete accessibility.
 
-For style or token changes, select the conditions that can expose a regression: light and dark themes, nested providers, density, RTL, forced colors, reduced motion, long or translated content, zoom, or constrained containers. Inspect relevant composed consumers as well as the isolated story. Check whether a responsive decision depends on the viewport or the component's container before choosing a breakpoint or measurement API.
+For style or token changes, select conditions based on the declarations or token modes being changed. Relevant cases can include light and dark themes, nested providers, density, RTL, forced colors, reduced motion, long or translated content, zoom, or constrained containers; this is not a required test matrix. Inspect composed consumers where their overrides or layout can change the result. Check whether a responsive decision depends on the viewport or the component's container before choosing a breakpoint or measurement API.
 
 Run the repository's applicable lint, type, generation, and build checks. Distinguish verified results from manual steps that have not been run. A blocked browser check limits a parity claim; it does not by itself prove a defect.
-
-## Review checklist
-
-Consumer reviews apply the [contract comparison](#compare-contracts-before-replacing-an-api) and [verification guidance](#verify-the-affected-behaviour) to the changed interface. Package reviews also apply the [package completion checks](#change-a-package-safely). Distinguish a demonstrated regression or violated repository requirement from a preferred implementation pattern, and report verification gaps separately from defects.
