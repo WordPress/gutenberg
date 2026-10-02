@@ -6,6 +6,7 @@
 
 -   `Icon`: add the `keywords` field exposed by the icons REST endpoint ([#82367](https://github.com/WordPress/gutenberg/pull/82367)).
 -   `__experimentalFetchLinkSuggestions`: add a `preferTypes` option to rank matches from one or more search types above the usual order ([#83408](https://github.com/WordPress/gutenberg/pull/83408)).
+-   Real-time collaboration skips syncing post records whose `collaboration_disabled` field is `true`, which the server sets through the `wp_is_post_collaboration_disabled` filter ([#84026](https://github.com/WordPress/gutenberg/pull/84026)).
 
 ### Bug Fixes
 
