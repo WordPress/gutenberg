@@ -1280,7 +1280,7 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			// Open the emoji picker with keyboard.
-			const addReactionButton = page.getByRole( 'button', {
+			const addReactionButton = page.getByRole( 'combobox', {
 				name: 'Add reaction',
 			} );
 			await addReactionButton.focus();
@@ -1320,9 +1320,9 @@ test.describe( 'Block Notes', () => {
 				comment: 'Test comment for the hover trigger',
 			} );
 
-			const trigger = page.locator(
-				'.editor-collab-sidebar-panel__add-reaction'
-			);
+			const trigger = page.getByRole( 'combobox', {
+				name: 'Add reaction',
+			} );
 			const note = page.locator( '.editor-collab-sidebar-panel__note' );
 
 			// Park the pointer outside the sidebar: adding the note leaves it
@@ -1337,7 +1337,7 @@ test.describe( 'Block Notes', () => {
 			// the thread, which stays focused for as long as it is selected.
 			await page.mouse.move( 0, 0 );
 			await expect( trigger ).toHaveCSS( 'opacity', '0' );
-			await page.getByRole( 'button', { name: 'Add reaction' } ).focus();
+			await trigger.focus();
 			await expect( trigger ).toHaveCSS( 'opacity', '1' );
 		} );
 
@@ -1365,7 +1365,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'textbox', { name: 'Add title' } )
 				.focus();
 			await expect(
-				page.getByRole( 'button', { name: 'Add reaction' } )
+				page.getByRole( 'combobox', { name: 'Add reaction' } )
 			).toHaveCount( 0 );
 			await expect( reactionButton ).toBeVisible();
 		} );
@@ -1394,7 +1394,7 @@ test.describe( 'Block Notes', () => {
 				} );
 
 				await page
-					.getByRole( 'button', { name: 'Add reaction' } )
+					.getByRole( 'combobox', { name: 'Add reaction' } )
 					.click();
 				await blockNoteUtils.waitForFullPicker();
 
@@ -1449,7 +1449,7 @@ test.describe( 'Block Notes', () => {
 			// Resolving posts a "Marked as resolved" reply that carries its
 			// own add trigger, so the root note's is the first of the two.
 			const addReaction = sidebar
-				.getByRole( 'button', { name: 'Add reaction' } )
+				.getByRole( 'combobox', { name: 'Add reaction' } )
 				.first();
 			const resolveButton = sidebar.getByRole( 'button', {
 				name: 'Resolve',
@@ -1488,7 +1488,9 @@ test.describe( 'Block Notes', () => {
 			 * "Heart" is label-overridden, and the helper's regex lookup
 			 * would otherwise match "smiling face with hearts" first.
 			 */
-			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
+			await page
+				.getByRole( 'combobox', { name: 'Add reaction' } )
+				.click();
 			await blockNoteUtils.waitForFullPicker();
 			await page.getByPlaceholder( 'Search emoji' ).fill( 'Heart' );
 			await page
@@ -1526,7 +1528,7 @@ test.describe( 'Block Notes', () => {
 			await expect( reactionButton ).toContainText( '👍' );
 		} );
 
-		test( 'Escape in the skin-tone flyout closes only that popup', async ( {
+		test( 'Escape in the skin-tone menu closes only that popup', async ( {
 			page,
 			blockNoteUtils,
 		} ) => {
@@ -1536,24 +1538,26 @@ test.describe( 'Block Notes', () => {
 				comment: 'Escape unwinds one layer at a time',
 			} );
 
-			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
+			await page
+				.getByRole( 'combobox', { name: 'Add reaction' } )
+				.click();
 			await blockNoteUtils.waitForFullPicker();
 
-			// Open the nested skin-tone flyout; focus moves into its
-			// listbox (onto the selected swatch).
+			// Open the nested skin-tone menu.
 			const skinToneToggle = page.getByRole( 'button', {
 				name: /^Skin tone:/,
 			} );
 			await skinToneToggle.click();
-			const skinToneListbox = page.getByRole( 'listbox', {
-				name: 'Choose your default skin tone',
-			} );
-			await expect( skinToneListbox ).toBeVisible();
+			// The notes' Actions menus stay mounted, so pick out this one.
+			const skinToneMenu = page
+				.getByRole( 'menu' )
+				.filter( { hasText: 'Choose your default skin tone' } );
+			await expect( skinToneMenu ).toBeVisible();
 
-			// The first Escape closes only the flyout, returns focus to
-			// its toggle, and leaves the full picker open.
+			// The first Escape closes only the menu, returns focus to its
+			// toggle, and leaves the full picker open.
 			await page.keyboard.press( 'Escape' );
-			await expect( skinToneListbox ).toBeHidden();
+			await expect( skinToneMenu ).toBeHidden();
 			await expect( skinToneToggle ).toBeFocused();
 			await expect(
 				page.getByPlaceholder( 'Search emoji' )
@@ -1566,7 +1570,7 @@ test.describe( 'Block Notes', () => {
 				page.getByPlaceholder( 'Search emoji' )
 			).toBeHidden();
 			await expect(
-				page.getByRole( 'button', { name: 'Add reaction' } )
+				page.getByRole( 'combobox', { name: 'Add reaction' } )
 			).toBeFocused();
 		} );
 
@@ -1588,7 +1592,9 @@ test.describe( 'Block Notes', () => {
 					.set( 'core', 'emojiPickerFrequentEmojis', [] )
 			);
 
-			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
+			await page
+				.getByRole( 'combobox', { name: 'Add reaction' } )
+				.click();
 			await blockNoteUtils.waitForFullPicker();
 
 			// Seeded with the curated set, so it has content before any picks.
@@ -1625,7 +1631,9 @@ test.describe( 'Block Notes', () => {
 				.click();
 
 			// On reopening, the pick has joined the Frequently used section.
-			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
+			await page
+				.getByRole( 'combobox', { name: 'Add reaction' } )
+				.click();
 			await blockNoteUtils.waitForFullPicker();
 			await expect(
 				frequentSection.getByRole( 'gridcell', {
@@ -1645,7 +1653,9 @@ test.describe( 'Block Notes', () => {
 				comment: 'Pick a toned thumbs up',
 			} );
 
-			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
+			await page
+				.getByRole( 'combobox', { name: 'Add reaction' } )
+				.click();
 			await blockNoteUtils.waitForFullPicker();
 
 			// The persistent toggle next to the search field shows the
@@ -1654,22 +1664,25 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'button', { name: 'Skin tone: Default skin tone' } )
 				.click();
 
-			// The flyout has an explicit heading and six swatches, with
-			// the default tone selected.
+			// The menu has an explicit heading and six tones, with the
+			// default tone checked.
 			await expect(
 				page.getByText( 'Choose your default skin tone' )
 			).toBeVisible();
-			const swatches = page.getByRole( 'option' );
-			await expect( swatches ).toHaveCount( 6 );
+			const tones = page.getByRole( 'menuitemradio' );
+			await expect( tones ).toHaveCount( 6 );
 			await expect(
-				page.getByRole( 'option', { name: 'Default skin tone' } )
-			).toHaveAttribute( 'aria-selected', 'true' );
+				page.getByRole( 'menuitemradio', { name: 'Default skin tone' } )
+			).toHaveAttribute( 'aria-checked', 'true' );
 
 			await page
-				.getByRole( 'option', { name: 'Dark skin tone', exact: true } )
+				.getByRole( 'menuitemradio', {
+					name: 'Dark skin tone',
+					exact: true,
+				} )
 				.click();
 
-			// The toggle reflects the new tone and the flyout closes.
+			// The toggle reflects the new tone and the menu closes.
 			await expect(
 				page.getByRole( 'button', {
 					name: 'Skin tone: Dark skin tone',
@@ -1711,7 +1724,9 @@ test.describe( 'Block Notes', () => {
 			} );
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 
-			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
+			await page
+				.getByRole( 'combobox', { name: 'Add reaction' } )
+				.click();
 			await blockNoteUtils.waitForFullPicker();
 
 			// Focus has moved into the portaled popover, but the note's

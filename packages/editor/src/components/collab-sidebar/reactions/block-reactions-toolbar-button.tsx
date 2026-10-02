@@ -37,31 +37,17 @@ export function BlockReactionsToolbarButton( {
 	return (
 		<AddReactionButton
 			label={ __( 'React to block' ) }
-			className="editor-block-reactions-toolbar-button"
+			trigger={
+				<ToolbarButton
+					icon={ reactionIcon }
+					label={ __( 'React to block' ) }
+					showTooltip
+				/>
+			}
 			disabled={ disabled }
 			onToggleReaction={ ( emoji ) =>
 				onToggleReaction( { clientId, emoji } )
 			}
-			renderToggle={ ( {
-				isOpen,
-				onToggle,
-				disabled: isDisabled,
-				label,
-				onPrefetch,
-			} ) => (
-				<ToolbarButton
-					icon={ reactionIcon }
-					label={ label }
-					aria-haspopup="dialog"
-					aria-expanded={ isOpen }
-					isPressed={ isOpen }
-					disabled={ isDisabled }
-					onClick={ onToggle }
-					onMouseEnter={ onPrefetch }
-					onFocus={ onPrefetch }
-					showTooltip
-				/>
-			) }
 		/>
 	);
 }

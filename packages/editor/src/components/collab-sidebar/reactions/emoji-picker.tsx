@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import clsx from 'clsx';
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import {
@@ -62,6 +62,19 @@ interface EmojiOptionGroup {
 }
 
 interface EmojiPickerProps {
+	/**
+	 * The button that opens the picker, passed to `Autocomplete.Trigger`
+	 * as its `render` element.
+	 */
+	trigger: ReactElement;
+	/**
+	 * Whether the trigger is disabled.
+	 */
+	disabled?: boolean;
+	/**
+	 * Accessible name for the picker popup.
+	 */
+	label: string;
 	onSelect: ( emoji: string ) => void;
 }
 
@@ -223,23 +236,40 @@ export function namedEmojisToEntries(
 }
 
 /**
- * Searchable emoji picker. Emoji data and labels come from the per-locale
- * Emojibase files at `noteEmojibaseUrl`; UI chrome strings go through
- * `@wordpress/i18n`. Without a dataset (no URL configured, or the fetch
- * failed) the grid offers the named reaction set instead, so reacting
- * keeps working.
+ * Searchable emoji picker: a trigger button opening an autocomplete popup
+ * with the search field on top of the emoji grid. Emoji data and labels
+ * come from the per-locale Emojibase files at `noteEmojibaseUrl`; UI chrome
+ * strings go through `@wordpress/i18n`. Without a dataset (no URL
+ * configured, or the fetch failed) the grid offers the named reaction set
+ * instead, so reacting keeps working.
  *
  * @param props          Component props.
+ * @param props.trigger  The button that opens the picker.
+ * @param props.disabled Whether the trigger is disabled.
+ * @param props.label    Accessible name for the popup.
  * @param props.onSelect Called with the selected emoji character.
  */
-export default function EmojiPicker( { onSelect }: EmojiPickerProps ) {
+export default function EmojiPicker( {
+	trigger,
+	disabled = false,
+	label,
+	onSelect,
+}: EmojiPickerProps ) {
+	const [ isOpen, setIsOpen ] = useState( false );
+	/*
+	 * Every note renders a trigger, so hold the dataset fetch until the
+	 * user reaches for one: hovering or focusing it warms the data before
+	 * the popup opens.
+	 */
+	const [ isWarm, setIsWarm ] = useState( false );
+	const warm = () => setIsWarm( true );
 	const { baseUrl, labelOverrides } = useEmojibaseConfig();
 	const [ locale ] = useState( detectLocale );
 	const {
 		data: dataset,
 		isLoading,
 		error,
-	} = useEmojibaseData( baseUrl, locale );
+	} = useEmojibaseData( isWarm ? baseUrl : null, locale );
 	const namedEmojis = useReactionEmojis();
 	const rules = useReactionEmojiRules();
 	const hasDataset = !! dataset;
@@ -258,7 +288,6 @@ export default function EmojiPicker( { onSelect }: EmojiPickerProps ) {
 		);
 	}, [ dataset, namedEmojis, rules ] );
 	const [ query, setQuery ] = useState( '' );
-	const searchRef = useRef< HTMLInputElement >( null );
 
 	/*
 	 * Announce once when a pending load fills the grid. A cached dataset
@@ -284,14 +313,6 @@ export default function EmojiPicker( { onSelect }: EmojiPickerProps ) {
 		[]
 	);
 	const { set: setPreference } = useDispatch( preferencesStore );
-
-	/*
-	 * The popover runs its focus-on-mount pass before the lazy chunk and
-	 * dataset resolve, so focus would otherwise stay on the loading state.
-	 */
-	useEffect( () => {
-		searchRef.current?.focus();
-	}, [] );
 
 	const groups = useMemo(
 		() => ( hasDataset ? groupEmojis( data ) : [] ),
@@ -413,6 +434,7 @@ export default function EmojiPicker( { onSelect }: EmojiPickerProps ) {
 						// Enter on the highlighted cell clicks it too.
 						onClick={ () => {
 							recordUse( option.hexKey );
+							setIsOpen( false );
 							onSelect( option.value );
 						} }
 					>
@@ -453,32 +475,53 @@ export default function EmojiPicker( { onSelect }: EmojiPickerProps ) {
 	}
 
 	return (
-		<div className="editor-collab-sidebar-panel__picker">
-			{ /*
-			 * An always-open inline autocomplete: focus stays in the search
-			 * field while the arrow keys move a highlight through the grid
-			 * (`aria-activedescendant`), and Enter picks the highlighted
-			 * emoji.
-			 */ }
-			<Autocomplete.Root
-				inline
-				open
-				grid
-				items={ items }
-				filter={ null }
-				// Enter picks the top hit once the user has typed.
-				autoHighlight
-				value={ query }
-				onValueChange={ ( value: string ) => {
-					setQuery( value );
-					// Searches stay quiet, so drop the load announcement.
-					setHasJustLoaded( false );
-				} }
+		<Autocomplete.Root
+			grid
+			open={ isOpen }
+			onOpenChange={ ( nextOpen: boolean ) => {
+				setIsOpen( nextOpen );
+				if ( nextOpen ) {
+					warm();
+				}
+			} }
+			// Start each opening from the full grid.
+			onOpenChangeComplete={ ( nextOpen: boolean ) => {
+				if ( ! nextOpen ) {
+					setQuery( '' );
+				}
+			} }
+			items={ items }
+			filter={ null }
+			// Enter picks the top hit once the user has typed.
+			autoHighlight
+			value={ query }
+			onValueChange={ ( value: string, { reason } ) => {
+				// Picking a cell would otherwise fill the search field.
+				if ( reason === 'item-press' ) {
+					return;
+				}
+				setQuery( value );
+				// Searches stay quiet, so drop the load announcement.
+				setHasJustLoaded( false );
+			} }
+		>
+			<Autocomplete.Trigger
+				render={ trigger }
+				disabled={ disabled }
+				onMouseEnter={ warm }
+				onFocus={ warm }
+			/>
+			<Autocomplete.Popup
+				aria-label={ label }
+				width="content"
+				className="editor-collab-sidebar-panel__picker"
+				positioner={
+					<Autocomplete.Positioner side="bottom" align="end" />
+				}
 			>
 				<div className="editor-collab-sidebar-panel__picker-search">
 					<Autocomplete.InputGroup className="editor-collab-sidebar-panel__picker-input">
 						<Autocomplete.Input
-							ref={ searchRef }
 							aria-label={ __( 'Search emoji' ) }
 							placeholder={ __( 'Search emoji' ) }
 							render={
@@ -542,7 +585,7 @@ export default function EmojiPicker( { onSelect }: EmojiPickerProps ) {
 								) }
 					</Autocomplete.List>
 				</div>
-			</Autocomplete.Root>
-		</div>
+			</Autocomplete.Popup>
+		</Autocomplete.Root>
 	);
 }

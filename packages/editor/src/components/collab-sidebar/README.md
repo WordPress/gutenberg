@@ -29,9 +29,9 @@ collab-sidebar/
 ├── reactions/                       emoji reactions on a note or a block
 │   ├── use-reaction.ts              useReaction( note ) - the note's `reaction_summary` + toggleReaction
 │   ├── reaction-display.tsx         ReactionDisplay - reaction pills for a note or block target
-│   ├── add-reaction-button.tsx      AddReactionButton - the picker's popover trigger
-│   ├── emoji-picker.tsx             EmojiPicker - Autocomplete grid over the Emojibase dataset
-│   ├── skin-tone-picker.tsx         SkinTonePicker - default skin tone preference flyout
+│   ├── add-reaction-button.tsx      AddReactionButton - the add-reaction trigger for the picker
+│   ├── emoji-picker.tsx             EmojiPicker - Autocomplete trigger + popup grid over the Emojibase dataset
+│   ├── skin-tone-picker.tsx         SkinTonePicker - default skin tone preference Menu
 │   ├── emojibase-data.ts            Emojibase dataset loading, labels, and settings
 │   ├── frequent-emojis.ts           useFrequentEmojis - persisted "Frequently used" section
 │   ├── reaction-emojis.ts           named reaction set, storage keys, and the site's emoji rules

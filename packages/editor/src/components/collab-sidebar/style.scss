@@ -273,14 +273,6 @@ mark.wp-note {
 // radius, the neutral minimal treatment marks the trigger and reactions
 // left by others, and the brand outline marks the current user's own.
 // Only the row layout and the emoji's own metrics live here.
-.editor-collab-sidebar-panel__add-reaction {
-	// `Dropdown` wraps its trigger in an inline-block container. As a
-	// flex item that becomes a block, leaving the inline-flex trigger on
-	// a line box whose descender space makes the wrapper taller than the
-	// 24px button and stretches the pills beside it to match. A flex
-	// wrapper has no line box, so the whole row stays at button height.
-	display: flex;
-}
 
 // Reactions on the block itself: its icon, then the pills and the trigger,
 // wrapping together. Never floats, since the row exists only once there is a
@@ -335,7 +327,7 @@ mark.wp-note {
 // with a control it has no way to reveal.
 @media (hover: hover) {
 	.editor-collab-sidebar-panel__reactions.is-floating
-	.editor-collab-sidebar-panel__add-reaction {
+	.editor-collab-sidebar-panel__add-reaction-button {
 		// Fading rather than removing keeps the button in the tab order and
 		// keeps the action row from reflowing as the pointer moves over it.
 		opacity: 0;
@@ -350,19 +342,19 @@ mark.wp-note {
 	// reaction belongs to one note, so a thread-wide reveal would offer the
 	// option on every note in it at once.
 	.editor-collab-sidebar-panel__note:hover
-	.editor-collab-sidebar-panel__add-reaction,
+	.editor-collab-sidebar-panel__add-reaction-button,
 	// A block's reactions row is its own hover target, outside any note.
 	.editor-collab-sidebar-panel__block-reactions:hover
-	.editor-collab-sidebar-panel__add-reaction,
+	.editor-collab-sidebar-panel__add-reaction-button,
 	// Reveal on the trigger itself rather than on the thread: the thread is
 	// `tabIndex={ 0 }`, so a thread-level `:focus-within` would hold for as
 	// long as the note is selected and the fade would never take effect.
 	.editor-collab-sidebar-panel__reactions
-	.editor-collab-sidebar-panel__add-reaction:focus-within,
-	// While the picker is open the pointer is over the popover, not the
-	// thread, and focus has moved into the popover's own portal.
+	.editor-collab-sidebar-panel__add-reaction-button:focus,
+	// While the picker is open the pointer is over the popup, not the
+	// thread, and focus has moved into the popup's own portal.
 	.editor-collab-sidebar-panel__reactions
-	.editor-collab-sidebar-panel__add-reaction:has([aria-expanded="true"]) {
+	.editor-collab-sidebar-panel__add-reaction-button[data-popup-open] {
 		opacity: 1;
 	}
 }
@@ -379,7 +371,7 @@ mark.wp-note {
 // Opening the picker with a pointer leaves DOM focus on the trigger once
 // it closes, parking a focus ring on the note at rest. Keep the ring for
 // keyboard focus and while the picker is open, and drop it otherwise.
-.editor-collab-sidebar-panel__add-reaction-button:focus:not(:focus-visible):not([aria-expanded="true"]) {
+.editor-collab-sidebar-panel__add-reaction-button:focus:not(:focus-visible):not([data-popup-open]) {
 	outline: none;
 }
 
@@ -390,19 +382,8 @@ mark.wp-note {
 	line-height: 1;
 }
 
-// Width comes from the picker below, so the wrapper fits it via Popover's
-// default `width: min-content`; sizing the wrapper instead leaves slack.
-//
-// `contentClassName` lands on the outer `.components-popover`, while
-// Dropdown's 8px padding lives on `.components-popover__content`. Zero it
-// so the picker manages its own padding. Surface, radius, and elevation
-// stay at the popover defaults.
-.editor-collab-sidebar-panel__picker-popover {
-	.components-popover__content {
-		padding: 0;
-	}
-}
-
+// The picker is the `Autocomplete.Popup` itself, which supplies the
+// surface, radius, and elevation; the rules below own its layout.
 .editor-collab-sidebar-panel__picker {
 	// Grid geometry from the design: six 40px cells with a 4px gap and
 	// 16px padding on both sides.
@@ -449,32 +430,9 @@ mark.wp-note {
 	justify-content: center;
 }
 
-.editor-collab-sidebar-panel__skin-tone-menu {
-	padding: var(--wpds-dimension-padding-sm);
-	font-family: var(--wpds-typography-font-family-body);
-}
-
-.editor-collab-sidebar-panel__skin-tone-heading {
-	padding-bottom: var(--wpds-dimension-padding-sm);
-	color: var(--wpds-color-foreground-content-neutral-weak);
-	font-size: var(--wpds-typography-font-size-xs);
-	font-weight: var(--wpds-typography-font-weight-emphasis);
-}
-
-.editor-collab-sidebar-panel__skin-tone-options {
-	display: flex;
-	gap: var(--wpds-dimension-gap-xs);
-}
-
-.editor-collab-sidebar-panel__skin-tone-option {
-	// In its own flyout, outside the picker's scope, so read the token here.
-	width: var(--wpds-dimension-size-md);
+.editor-collab-sidebar-panel__skin-tone-swatch {
 	font-size: 18px;
-	justify-content: center;
-
-	&[aria-selected="true"] {
-		background-color: var(--wpds-color-background-interactive-neutral-weak-active);
-	}
+	line-height: 1;
 }
 
 .editor-collab-sidebar-panel__picker-viewport {
@@ -524,9 +482,8 @@ mark.wp-note {
 .editor-collab-sidebar-panel__picker-category {
 	position: sticky;
 	top: 0;
-	// `.components-popover` paints `$white`, not a token, and rows must
-	// scroll behind exactly that color. Move both together if it changes.
-	background-color: $white;
+	// Rows scroll behind it, so match the `Autocomplete.Popup` surface.
+	background-color: var(--wpds-color-background-surface-neutral-strong);
 	z-index: 1;
 	// Align the heading with the grid's first column.
 	padding-inline: 0;

@@ -1,6 +1,5 @@
-import type { ReactNode } from 'react';
+import type { ReactElement } from 'react';
 import { __ } from '@wordpress/i18n';
-import { Dropdown } from '@wordpress/components';
 /*
  * `IconButton` is pending Design System review (WordPress/gutenberg#76135);
  * used here so the trigger matches the reaction pills beside it.
@@ -14,33 +13,13 @@ import {
 	useReactionEmojiRules,
 	useReactionEmojis,
 } from './reaction-emojis';
-import {
-	detectLocale,
-	loadEmojibaseData,
-	useEmojibaseConfig,
-} from './emojibase-data';
-
-/*
- * `Dropdown`'s popover renders through `Popover.Slot` or a `<body>`-level
- * container, so either way it escapes the sidebar's `overflow: hidden`.
- */
-const POPOVER_PROPS = { placement: 'bottom-end' } as const;
-
-interface RenderToggleArgs {
-	isOpen: boolean;
-	onToggle: () => void;
-	disabled: boolean;
-	label: string;
-	// Warms the dataset; unset when there is none to load.
-	onPrefetch?: () => void;
-}
+import { useEmojibaseConfig } from './emojibase-data';
 
 interface AddReactionButtonProps {
 	disabled?: boolean;
 	label?: string;
-	className?: string;
+	trigger?: ReactElement;
 	onToggleReaction: ( slug: string ) => void;
-	renderToggle?: ( args: RenderToggleArgs ) => ReactNode;
 }
 
 /**
@@ -51,29 +30,20 @@ interface AddReactionButtonProps {
  * @param props.disabled         Whether the button is disabled (e.g. on a
  *                               resolved note thread).
  * @param props.label            Accessible name of the trigger and of the
- *                               picker dialog. Defaults to "Add reaction".
- * @param props.className        Class of the dropdown wrapper. Defaults to
- *                               the sidebar's hover-revealed trigger class.
+ *                               picker popup. Defaults to "Add reaction".
+ * @param props.trigger          Replaces the default icon button (e.g. with
+ *                               a toolbar button), which names itself.
  * @param props.onToggleReaction Callback to toggle a reaction.
- * @param props.renderToggle     Renders a custom trigger (e.g. a toolbar
- *                               button) in place of the default icon button.
  */
 export function AddReactionButton( {
 	disabled = false,
 	label = __( 'Add reaction' ),
-	className = 'editor-collab-sidebar-panel__add-reaction',
+	trigger,
 	onToggleReaction,
-	renderToggle,
 }: AddReactionButtonProps ) {
 	const emojis = useReactionEmojis();
 	const rules = useReactionEmojiRules();
 	const { baseUrl } = useEmojibaseConfig();
-
-	// Warm the dataset before the popover opens; the loader caches, so
-	// repeat calls on every hover are free.
-	const prefetchDataset = baseUrl
-		? () => loadEmojibaseData( baseUrl, detectLocale() ).catch( () => {} )
-		: undefined;
 
 	// With an emptied named list and no dataset, or a dataset limited to
 	// that list, there is nothing to pick.
@@ -82,29 +52,10 @@ export function AddReactionButton( {
 	}
 
 	return (
-		<Dropdown
-			className={ className }
-			popoverProps={ {
-				...POPOVER_PROPS,
-				/*
-				 * The popover constrains tabbing, so name it as a
-				 * non-modal dialog rather than leave screen readers with
-				 * an unnamed generic container.
-				 */
-				role: 'dialog',
-				'aria-label': label,
-			} }
-			contentClassName="editor-collab-sidebar-panel__picker-popover"
-			renderToggle={ ( { isOpen, onToggle } ) =>
-				renderToggle ? (
-					renderToggle( {
-						isOpen,
-						onToggle,
-						disabled,
-						label,
-						onPrefetch: prefetchDataset,
-					} )
-				) : (
+		<EmojiPicker
+			label={ label }
+			trigger={
+				trigger ?? (
 					<IconButton
 						size="small"
 						// A plain glyph, per the design: no ring or fill at rest.
@@ -113,23 +64,13 @@ export function AddReactionButton( {
 						className="editor-collab-sidebar-panel__add-reaction-button"
 						icon={ reactionIcon }
 						label={ label }
-						aria-haspopup="dialog"
-						aria-expanded={ isOpen }
-						disabled={ disabled }
-						onClick={ onToggle }
-						onMouseEnter={ prefetchDataset }
-						onFocus={ prefetchDataset }
 					/>
 				)
 			}
-			renderContent={ ( { onClose } ) => (
-				<EmojiPicker
-					onSelect={ ( emoji ) => {
-						onClose();
-						onToggleReaction( emojiToStorageKey( emoji, emojis ) );
-					} }
-				/>
-			) }
+			disabled={ disabled }
+			onSelect={ ( emoji ) =>
+				onToggleReaction( emojiToStorageKey( emoji, emojis ) )
+			}
 		/>
 	);
 }

@@ -1,7 +1,7 @@
 import { __, sprintf } from '@wordpress/i18n';
-import { Button, Composite, Dropdown } from '@wordpress/components';
-import { useFocusReturn, useInstanceId } from '@wordpress/compose';
-import { useEffect } from '@wordpress/element';
+import { Button } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { Menu } from '@wordpress/ui';
 import type { EmojibaseEntry, EmojibaseSkin } from './emojibase-data';
 
 /**
@@ -16,11 +16,6 @@ interface SkinToneOption {
 interface SkinTonePickerProps {
 	value: number;
 	onChange: ( tone: number ) => void;
-}
-
-interface SkinToneMenuProps extends SkinTonePickerProps {
-	baseId: string;
-	onClose: () => void;
 }
 
 /**
@@ -58,92 +53,8 @@ export function applySkinTone(
 }
 
 /**
- * The flyout body: a heading and the six-swatch listbox.
- *
- * @param props          Component props.
- * @param props.value    The selected tone, 0–5.
- * @param props.onChange Called with the newly selected tone.
- * @param props.baseId   Unique ID prefix for the heading and options.
- * @param props.onClose  Closes the flyout.
- */
-function SkinToneMenu( {
-	value,
-	onChange,
-	baseId,
-	onClose,
-}: SkinToneMenuProps ) {
-	const headingId = `${ baseId }-heading`;
-	const optionId = ( tone: number ) => `${ baseId }-option-${ tone }`;
-	const current =
-		SKIN_TONES.find( ( option ) => option.tone === value ) ||
-		SKIN_TONES[ 0 ];
-	const selectedOptionId = optionId( current.tone );
-
-	/*
-	 * Per the APG listbox pattern focus lands on the selected option. The
-	 * popover's focus-on-mount and the composite's `defaultActiveId` race
-	 * against item registration, so move focus explicitly on mount.
-	 */
-	useEffect( () => {
-		document.getElementById( selectedOptionId )?.focus();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [] );
-
-	// Disabling the popover's focus-on-mount also disables its focus return.
-	const focusReturnRef = useFocusReturn();
-
-	return (
-		<div
-			ref={ focusReturnRef }
-			className="editor-collab-sidebar-panel__skin-tone-menu"
-		>
-			<div
-				id={ headingId }
-				className="editor-collab-sidebar-panel__skin-tone-heading"
-			>
-				{ __( 'Choose your default skin tone' ) }
-			</div>
-			<Composite
-				role="listbox"
-				/*
-				 * `orientation` only configures arrow-key handling and is
-				 * not rendered, so set the ARIA attribute explicitly.
-				 */
-				orientation="horizontal"
-				aria-orientation="horizontal"
-				aria-labelledby={ headingId }
-				defaultActiveId={ selectedOptionId }
-				className="editor-collab-sidebar-panel__skin-tone-options"
-			>
-				{ SKIN_TONES.map( ( { tone, emoji, label } ) => (
-					<Composite.Item
-						key={ tone }
-						id={ optionId( tone ) }
-						render={
-							<Button
-								role="option"
-								size="compact"
-								aria-selected={ tone === value }
-								aria-label={ label }
-								className="editor-collab-sidebar-panel__skin-tone-option"
-								onClick={ () => {
-									onChange( tone );
-									onClose();
-								} }
-							/>
-						}
-					>
-						{ emoji }
-					</Composite.Item>
-				) ) }
-			</Composite>
-		</div>
-	);
-}
-
-/**
- * Skin tone selector: a toggle showing the selected tone, opening a flyout
- * of six swatches under a heading.
+ * Skin tone selector: a toggle showing the selected tone, opening a menu
+ * of the six tones as a radio group.
  *
  * @param props          Component props.
  * @param props.value    The selected tone, 0–5.
@@ -153,54 +64,58 @@ export default function SkinTonePicker( {
 	value,
 	onChange,
 }: SkinTonePickerProps ) {
-	const baseId = useInstanceId(
-		SkinTonePicker,
-		'editor-collab-sidebar-panel__skin-tone'
-	);
-	// Mirrors `SkinToneMenu`'s heading id, to name the popup container.
-	const headingId = `${ baseId }-heading`;
 	const current =
 		SKIN_TONES.find( ( option ) => option.tone === value ) ||
 		SKIN_TONES[ 0 ];
 
 	return (
-		<Dropdown
-			popoverProps={ {
-				placement: 'bottom-end',
-				/*
-				 * A heading can't live inside a listbox, so the wrapper is
-				 * exposed as a named non-modal dialog.
-				 */
-				role: 'dialog',
-				'aria-labelledby': headingId,
-			} }
-			// The menu focuses the selected swatch; this would focus the first.
-			focusOnMount={ false }
-			renderToggle={ ( { isOpen, onToggle } ) => (
-				<Button
-					__next40pxDefaultSize
-					className="editor-collab-sidebar-panel__skin-tone-toggle"
-					onClick={ onToggle }
-					aria-haspopup="dialog"
-					aria-expanded={ isOpen }
-					label={ sprintf(
-						// translators: %s: the selected skin tone, e.g. "Medium skin tone".
-						__( 'Skin tone: %s' ),
-						current.label
-					) }
-					showTooltip
+		<Menu.Root>
+			<Menu.Trigger
+				render={
+					<Button
+						__next40pxDefaultSize
+						className="editor-collab-sidebar-panel__skin-tone-toggle"
+						label={ sprintf(
+							// translators: %s: the selected skin tone, e.g. "Medium skin tone".
+							__( 'Skin tone: %s' ),
+							current.label
+						) }
+						showTooltip
+					/>
+				}
+			>
+				{ current.emoji }
+			</Menu.Trigger>
+			<Menu.Popup
+				positioner={ <Menu.Positioner side="bottom" align="end" /> }
+			>
+				<Menu.RadioGroup
+					value={ current.tone }
+					onValueChange={ ( tone: number ) => onChange( tone ) }
 				>
-					{ current.emoji }
-				</Button>
-			) }
-			renderContent={ ( { onClose } ) => (
-				<SkinToneMenu
-					value={ value }
-					onChange={ onChange }
-					baseId={ baseId }
-					onClose={ onClose }
-				/>
-			) }
-		/>
+					<Menu.GroupLabel>
+						{ __( 'Choose your default skin tone' ) }
+					</Menu.GroupLabel>
+					{ SKIN_TONES.map( ( { tone, emoji, label } ) => (
+						<Menu.RadioItem
+							key={ tone }
+							value={ tone }
+							// Picking a tone is the whole task, so close on it.
+							closeOnClick
+							prefix={
+								<span
+									className="editor-collab-sidebar-panel__skin-tone-swatch"
+									aria-hidden="true"
+								>
+									{ emoji }
+								</span>
+							}
+						>
+							<Menu.ItemLabel>{ label }</Menu.ItemLabel>
+						</Menu.RadioItem>
+					) ) }
+				</Menu.RadioGroup>
+			</Menu.Popup>
+		</Menu.Root>
 	);
 }
