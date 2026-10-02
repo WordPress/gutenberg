@@ -18,7 +18,7 @@
 ### Enhancements
 
 -   `Menu`: Align group labels and separators with item labels when a radio or checkbox column indents those labels ([#83993](https://github.com/WordPress/gutenberg/pull/83993)).
--   `Menu`: Tighten item spacing. Items use 8px inline padding by default. When a menu has radio or checkbox items, the start padding and the gap after the selection column are 4px, so labels start 24px from the item edge. Menus and submenus are at most 320px wide, down from 400px ([#84028](https://github.com/WordPress/gutenberg/pull/84028)).
+-   `Menu`: Tighten item spacing. Items use 8px inline padding by default. When a menu has radio or checkbox items, the start padding and the gap after the selection column are 4px, so labels start 24px from the item edge. Descriptions sit directly below the label, without the previous 2px gap. Menus and submenus are at most 320px wide, down from 400px ([#84028](https://github.com/WordPress/gutenberg/pull/84028)).
 -   `Menu.PrefixIcon`: Render at 16px by default instead of 24px. A `size` prop still sets a custom size ([#84028](https://github.com/WordPress/gutenberg/pull/84028)).
 -   `Checkbox`, `CheckboxControl`, `CheckboxGroup`: Mark as recommended for use in a WordPress environment ([#83771](https://github.com/WordPress/gutenberg/pull/83771)).
 -   `Spinner`: Show a trackless half-circle like the `Button` loading indicator, with a `color` prop that accepts any CSS color value and defaults to weak neutral foreground. Keep the arc visible in forced-colors mode ([#83775](https://github.com/WordPress/gutenberg/pull/83775)).
