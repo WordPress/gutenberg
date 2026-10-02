@@ -62,9 +62,14 @@ import { store as coreStore } from '@wordpress/core-data';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { useSuggestionOverlay } from './overlay-context';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
-import { parseSuggestionPayload } from './provider';
+import { parseSuggestionPayload, rememberWithdrawnAnchor } from './provider';
 import { createRevertGuard } from '../attribute-suggestions/revert-guard';
-import { planStoreContentEdit } from './plan-store-content-edit';
+import {
+	planStoreContentEdit,
+	settleStoreContentRemoval,
+} from './plan-store-content-edit';
+import { notifyEditRefused } from './refuse-edit';
+import { settleInsertedSuggestionMarkers } from '../inline-suggestions';
 import { unlock } from '../../lock-unlock';
 import { getBlockTreeVersion } from './block-tree-version';
 
@@ -92,6 +97,57 @@ function readNoteIds(
 		return [];
 	}
 	return [ value ];
+}
+
+/**
+ * The attribute changes that settle a newly inserted block's inherited
+ * suggestion state before it is tagged as a pending insertion.
+ *
+ * A split builds its tail from the original block's attributes, so the tail
+ * arrives with the head's inline markers and `metadata.noteId` linkage: one
+ * note anchored in two blocks and listed twice in the sidebar (#73411, B8).
+ * The markers are resolved the way the front end renders them
+ * (`settleInsertedSuggestionMarkers`), and the block drops every note link it
+ * shares with another block or whose marker was just resolved. A block that
+ * is new this tick cannot own a note yet, so any link it carries is inherited.
+ *
+ * @param attributes     Inserted block's attributes.
+ * @param authorId       Current author id.
+ * @param otherNoteIdsOf Lazily collects the note ids linked from every other
+ *                       block, read only when the block carries links.
+ * @return Changed attributes only; empty when nothing needed settling.
+ */
+function settleInsertedAttributes(
+	attributes: Record< string, any >,
+	authorId: number | string | null,
+	otherNoteIdsOf: () => Set< string >
+): Record< string, any > {
+	const changes: Record< string, any > = {};
+	const resolvedIds = new Set< string >();
+	for ( const [ key, value ] of Object.entries( attributes ?? {} ) ) {
+		if ( key === 'metadata' ) {
+			continue;
+		}
+		const settled = settleInsertedSuggestionMarkers( value, authorId );
+		if ( settled.value !== value ) {
+			changes[ key ] = settled.value;
+			settled.ids.forEach( ( id ) => resolvedIds.add( id ) );
+		}
+	}
+	const noteIds = readNoteIds( attributes?.metadata );
+	if ( noteIds.length > 0 ) {
+		const otherNoteIds = otherNoteIdsOf();
+		const kept = noteIds.filter(
+			( id ) =>
+				! resolvedIds.has( String( id ) ) &&
+				! otherNoteIds.has( String( id ) )
+		);
+		if ( kept.length !== noteIds.length ) {
+			const { noteId, ...rest } = attributes.metadata;
+			changes.metadata = kept.length ? { ...rest, noteId: kept } : rest;
+		}
+	}
+	return changes;
 }
 
 /**
@@ -1234,6 +1290,35 @@ export default function SuggestionStoreInterceptor() {
 			 */
 			const insertionsThisFire = [];
 
+			const settleInsertedBlock = (
+				clientId: string,
+				attributes: Record< string, any >,
+				clientIds: string[]
+			) =>
+				settleInsertedAttributes( attributes, currentUserId, () => {
+					const ids = new Set< string >();
+					for ( const otherId of clientIds ) {
+						if ( otherId === clientId ) {
+							continue;
+						}
+						for ( const id of readNoteIds(
+							blockEditor.getBlockAttributes( otherId )?.metadata
+						) ) {
+							ids.add( String( id ) );
+						}
+					}
+					return ids;
+				} );
+
+			/*
+			 * Blocks whose content change was declined this fire. A split
+			 * dispatches the head's truncation and the new tail block
+			 * together, and the head is visited first (document order), so
+			 * a tail that follows a declined head is removed again rather
+			 * than captured as an insertion.
+			 */
+			const declinedSplitHeads = new Set< string >();
+
 			for ( const clientId of liveClientIds ) {
 				let previous = snapshot.get( clientId );
 				const current = blockEditor.getBlockAttributes( clientId );
@@ -1278,6 +1363,26 @@ export default function SuggestionStoreInterceptor() {
 					// "already-processed-new-block" parents.
 					const block = blockEditor.getBlock?.( clientId );
 
+					const previousSibling =
+						blockEditor.getPreviousBlockClientId?.( clientId );
+					if (
+						previousSibling &&
+						declinedSplitHeads.has( previousSibling )
+					) {
+						isDispatchingOwnWrite = true;
+						try {
+							blockEditorDispatch.__unstableMarkNextChangeAsNotPersistent();
+							blockEditorDispatch.removeBlock( clientId, false );
+							blockEditorDispatch.selectBlock(
+								previousSibling,
+								-1
+							);
+						} finally {
+							isDispatchingOwnWrite = false;
+						}
+						continue;
+					}
+
 					// Defer empty placeholder blocks. Clicking the default
 					// block appender (or the empty canvas below the last
 					// block) inserts an unmodified default paragraph, but an
@@ -1317,6 +1422,11 @@ export default function SuggestionStoreInterceptor() {
 							? siblingIds[ indexInParent - 1 ]
 							: null;
 
+					const settled = settleInsertedBlock(
+						clientId,
+						current,
+						liveClientIds
+					);
 					isDispatchingOwnWrite = true;
 					try {
 						/*
@@ -1326,14 +1436,24 @@ export default function SuggestionStoreInterceptor() {
 						 */
 						blockEditorDispatch.__unstableMarkNextChangeAsNotPersistent();
 						blockEditorDispatch.updateBlockAttributes( clientId, {
-							metadata: withSuggestionMarker( current?.metadata, {
-								type: 'pending-insert',
-								authorId: currentUserId,
-							} ),
+							...settled,
+							metadata: withSuggestionMarker(
+								settled.metadata ?? current?.metadata,
+								{
+									type: 'pending-insert',
+									authorId: currentUserId,
+								}
+							),
 						} );
 					} finally {
 						isDispatchingOwnWrite = false;
 					}
+					snapshot.set(
+						clientId,
+						blockEditor.getBlockAttributes( clientId )
+					);
+					const insertedBlock =
+						blockEditor.getBlock?.( clientId ) ?? block;
 
 					const insertOp = {
 						type: 'block-insert-after',
@@ -1352,7 +1472,7 @@ export default function SuggestionStoreInterceptor() {
 							? ( blockEditor.getBlockName?.( parentClientId ) ??
 								null )
 							: null,
-						block,
+						block: insertedBlock,
 					};
 					setStructuralOpRef.current?.(
 						clientId,
@@ -1387,7 +1507,7 @@ export default function SuggestionStoreInterceptor() {
 					previous = adopted;
 				}
 
-				const delta = diffAttributes( previous, current );
+				let delta = diffAttributes( previous, current );
 				if ( ! delta ) {
 					snapshot.set( clientId, current );
 					continue;
@@ -1422,7 +1542,54 @@ export default function SuggestionStoreInterceptor() {
 				// System metadata is filtered out before the change is
 				// classified — it isn't a user edit, and `delta.restore`
 				// already preserves it.
-				const overlayChanged = stripSystemMetadata( delta.changed );
+				let overlayChanged = stripSystemMetadata( delta.changed );
+
+				/*
+				 * A removal whose run carries markers (the head of a split
+				 * inside a marked block, #73411 B8): the author's own proposed
+				 * text in it is retracted, since the split carries it on into
+				 * the new block, and the rest plans as a deletion below. Any
+				 * other marker in the run declines the edit outright, and the
+				 * split's tail goes with it.
+				 */
+				const removal = settleStoreContentRemoval(
+					previous,
+					current,
+					overlayChanged,
+					currentUserId
+				);
+				if ( removal?.refuse ) {
+					revertGuard.expect( clientId, delta.restore );
+					isDispatchingOwnWrite = true;
+					try {
+						blockEditorDispatch.__unstableMarkNextChangeAsNotPersistent();
+						blockEditorDispatch.updateBlockAttributes(
+							clientId,
+							delta.restore
+						);
+					} finally {
+						isDispatchingOwnWrite = false;
+					}
+					revertGuard.isEcho(
+						clientId,
+						blockEditor.getBlockAttributes( clientId )
+					);
+					declinedSplitHeads.add( clientId );
+					notifyEditRefused( registry );
+					continue;
+				}
+				if ( removal ) {
+					removal.withdrawnIds.forEach( rememberWithdrawnAnchor );
+					previous = removal.previous;
+					snapshot.set( clientId, previous );
+					delta = diffAttributes( previous, current );
+					if ( ! delta ) {
+						// Only the author's own proposed text was removed.
+						snapshot.set( clientId, current );
+						continue;
+					}
+					overlayChanged = stripSystemMetadata( delta.changed );
+				}
 
 				/*
 				 * A `content` change that is a plain removal goes to the

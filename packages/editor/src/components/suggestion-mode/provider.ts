@@ -514,6 +514,35 @@ export function rememberResolvedSuggestion( commentId: number | string ) {
 	resolvedThisSession.add( String( commentId ) );
 }
 
+/*
+ * Notes whose last inline marker an edit removed on purpose, such as a split
+ * carrying the author's own proposed text into the new block (#73411, B8).
+ * The note collector only trashes a note whose anchor it has seen, and a
+ * quick edit can remove the marker before the thread list that would let it
+ * see the anchor has loaded. Recording the withdrawal counts as having seen
+ * it, so the note is still collected, behind the collector's reply guard.
+ */
+const withdrawnAnchors = new Set< string >();
+
+/**
+ * Record that an edit removed a note's last inline marker.
+ *
+ * @param commentId Comment id.
+ */
+export function rememberWithdrawnAnchor( commentId: number | string ) {
+	withdrawnAnchors.add( String( commentId ) );
+}
+
+/**
+ * Take a recorded withdrawal, so it is acted on once.
+ *
+ * @param commentId Comment id.
+ * @return Whether a withdrawal was recorded for the note.
+ */
+export function takeWithdrawnAnchor( commentId: number | string ) {
+	return withdrawnAnchors.delete( String( commentId ) );
+}
+
 /**
  * Comment-meta backed suggestions provider. The provider shape is stable so
  * a future Yjs-backed provider can swap in without touching the UI.

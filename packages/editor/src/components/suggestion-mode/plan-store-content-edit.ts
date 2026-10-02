@@ -1,4 +1,14 @@
-import { planEditMarkers } from '../inline-suggestions';
+import { RichTextData, remove } from '@wordpress/rich-text';
+import {
+	SUGGESTION_AUTHOR_ATTRIBUTE,
+	SUGGESTION_FORMAT_NAME,
+	SUGGESTION_ID_ATTRIBUTE,
+	SUGGESTION_TYPE_ADDITION,
+	SUGGESTION_TYPE_ATTRIBUTE,
+	analyzeTextEdit,
+	planEditMarkers,
+} from '../inline-suggestions';
+import { toRichTextRecord } from '../inline-suggestions/rich-text-record';
 
 /**
  * True for plain strings and for objects that stringify to a meaningful HTML
@@ -85,4 +95,124 @@ export function planStoreContentEdit(
 		return null;
 	}
 	return plan;
+}
+
+/**
+ * Settle the markers inside a store-level removal from a block's `content`
+ * before it is planned, so the removal can still become a deletion marker.
+ *
+ * The splitting Enter is the case (#73411, B8): the head loses everything after
+ * the caret, markers included, and `planEditMarkers` won't wrap a `del` marker
+ * over a run that already carries one. The whole change then fell back to the
+ * overlay, outlining the block and listing it as a whole-content "Replace".
+ *
+ * - The author's own proposed text in the removed run is retracted: it was
+ *   never part of the post, and the split carries it on into the new block, so
+ *   it leaves this one outright rather than being proposed for deletion.
+ * - Any other marker in the removed run declines the edit. Another author's
+ *   suggestion has to be resolved before anyone edits over it, and the
+ *   author's own deletion or formatting proposal would move to the new block
+ *   as plain text, silently dropping it.
+ *
+ * @param previous   Block attributes before the change.
+ * @param current    Block attributes after the change.
+ * @param changed    Changed attributes, system metadata already stripped.
+ * @param [authorId] Current author id.
+ * @return `null` when the change is not a marked removal from `content`;
+ * `{ refuse: true }` when it must be declined; otherwise `{ previous }`, the
+ * attributes to plan the removal from, with the retracted text gone, and
+ * `withdrawnIds`, the notes whose every marker the removal took.
+ */
+export function settleStoreContentRemoval(
+	previous: Record< string, any >,
+	current: Record< string, any >,
+	changed: Record< string, any >,
+	authorId?: number | string | null
+):
+	| { refuse: true }
+	| {
+			refuse?: false;
+			previous: Record< string, any >;
+			withdrawnIds: string[];
+	  }
+	| null {
+	const keys = Object.keys( changed ?? {} );
+	if ( keys.length !== 1 || keys[ 0 ] !== 'content' ) {
+		return null;
+	}
+	const prevContent = previous?.content;
+	if ( ! ( prevContent instanceof RichTextData ) ) {
+		return null;
+	}
+	const record = toRichTextRecord( prevContent );
+	const nextRecord = toRichTextRecord( current?.content );
+	if ( ! record || ! nextRecord ) {
+		return null;
+	}
+	const edit = analyzeTextEdit( record.text, nextRecord.text );
+	if ( edit.kind !== 'delete' ) {
+		return null;
+	}
+	const authorToken =
+		authorId !== undefined && authorId !== null ? String( authorId ) : '';
+	const retract: boolean[] = [];
+	const retractedIds = new Set< string >();
+	let marked = false;
+	for ( let i = edit.start; i < edit.end; i++ ) {
+		const marker = record.formats[ i ]?.find(
+			( format ) => format.type === SUGGESTION_FORMAT_NAME
+		);
+		if ( ! marker ) {
+			continue;
+		}
+		const attributes = ( marker.attributes ?? {} ) as Record<
+			string,
+			string
+		>;
+		if (
+			attributes[ SUGGESTION_TYPE_ATTRIBUTE ] !==
+				SUGGESTION_TYPE_ADDITION ||
+			String( attributes[ SUGGESTION_AUTHOR_ATTRIBUTE ] ?? '' ) !==
+				authorToken
+		) {
+			return { refuse: true };
+		}
+		retract[ i ] = true;
+		retractedIds.add( String( attributes[ SUGGESTION_ID_ATTRIBUTE ] ) );
+		marked = true;
+	}
+	if ( ! marked ) {
+		return null;
+	}
+	let settled = record;
+	// Last run first, so earlier offsets stay valid as text is removed.
+	for ( let end = edit.end; end > edit.start; ) {
+		if ( ! retract[ end - 1 ] ) {
+			end--;
+			continue;
+		}
+		let start = end - 1;
+		while ( start > edit.start && retract[ start - 1 ] ) {
+			start--;
+		}
+		settled = remove( settled, start, end );
+		end = start;
+	}
+	// An addition split partway keeps its note anchored in what stays.
+	for ( const stack of nextRecord.formats ) {
+		for ( const format of stack ?? [] ) {
+			if ( format.type === SUGGESTION_FORMAT_NAME ) {
+				retractedIds.delete(
+					String( format.attributes?.[ SUGGESTION_ID_ATTRIBUTE ] )
+				);
+			}
+		}
+	}
+	return {
+		previous: {
+			...previous,
+			content: new RichTextData( settled as any ),
+		},
+		withdrawnIds: [ ...retractedIds ],
+	};
 }

@@ -72,4 +72,5 @@ export {
 	hasSuggestionMarkers,
 	stripSuggestionMarkers,
 	stripSuggestionMarkersFromAttributes,
+	settleInsertedSuggestionMarkers,
 } from './strip-markers';
