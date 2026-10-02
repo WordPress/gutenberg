@@ -9,7 +9,9 @@ import { useSelect } from '@wordpress/data';
 // @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { check, closeSmall } from '@wordpress/icons';
+import { store as editorStore } from '../../store';
 import {
+	findPostAttributeOps,
 	findStructuralOp,
 	hasAttributeConflict,
 	parseSuggestionPayload,
@@ -57,8 +59,28 @@ export function useSuggestionDecision( thread: any ) {
 	// every suggestion as stale even when the block content hasn't
 	// diverged. We only prompt when the specific attributes a suggestion
 	// targets have actually moved away from the captured baseline.
+	const postOps = useMemo(
+		() => findPostAttributeOps( payload?.operations ),
+		[ payload ]
+	);
+	const isPostSuggestion = postOps.length > 0;
 	const { blockExists, hasConflict } = useSelect(
 		( select ) => {
+			// A post-level suggestion targets the post itself, which always
+			// exists; its staleness is checked against the post's fields.
+			if ( isPostSuggestion ) {
+				const { getEditedPostAttribute } = select( editorStore );
+				const currentFields = Object.fromEntries(
+					postOps.map( ( op: any ) => [
+						op.attribute,
+						getEditedPostAttribute( op.attribute ),
+					] )
+				);
+				return {
+					blockExists: true,
+					hasConflict: hasAttributeConflict( currentFields, postOps ),
+				};
+			}
 			const { getBlock, getBlockAttributes } = select( blockEditorStore );
 			const currentAttributes = thread?.blockClientId
 				? getBlockAttributes( thread.blockClientId )
@@ -76,7 +98,7 @@ export function useSuggestionDecision( thread: any ) {
 					),
 			};
 		},
-		[ thread?.blockClientId, payload ]
+		[ thread?.blockClientId, payload, isPostSuggestion, postOps ]
 	);
 
 	if ( ! payload ) {
@@ -133,7 +155,8 @@ export function useSuggestionDecision( thread: any ) {
 	// Derive the disabled state and its reason from ONE predicate so the
 	// button and the explanatory text can't disagree. A thread without a
 	// resolved blockClientId has no live target either.
-	const isTargetMissing = ! thread?.blockClientId || ! blockExists;
+	const isTargetMissing =
+		! isPostSuggestion && ( ! thread?.blockClientId || ! blockExists );
 	const applyDisabled = busy || isTargetMissing;
 	const applyDisabledReason = isTargetMissing
 		? __( 'Target block has been deleted.' )
@@ -144,6 +167,7 @@ export function useSuggestionDecision( thread: any ) {
 		suggestionStatus,
 		isResolved,
 		isGrouped,
+		isPostSuggestion,
 		busy,
 		onApplyClick,
 		onReject,
@@ -221,9 +245,13 @@ export function SuggestionActionButtons( {
 					onCancel={ dismissStaleDialog }
 					confirmButtonText={ __( 'Apply anyway' ) }
 				>
-					{ __(
-						'This block has changed since the suggestion was made. Applying it will overwrite the newer edit. Continue?'
-					) }
+					{ decision.isPostSuggestion
+						? __(
+								'The title has changed since the suggestion was made. Applying it will overwrite the newer edit. Continue?'
+							)
+						: __(
+								'This block has changed since the suggestion was made. Applying it will overwrite the newer edit. Continue?'
+							) }
 				</ConfirmDialog>
 			) }
 		</Stack>
