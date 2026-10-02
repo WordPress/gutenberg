@@ -648,6 +648,248 @@ test.describe( 'Suggestion mode', () => {
 		).toHaveCount( 0 );
 	} );
 
+	test( 'type-over inside your own pending addition revises that marker', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Fixing a typo by selecting it and typing over it is a revision of
+		// the suggester's own proposal, not an edit overlapping someone
+		// else's suggestion (#73411).
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' wrold' );
+
+		const added = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="add"]'
+		);
+		await expect( added ).toHaveText( ' wrold' );
+		await expect( added ).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		const id = await added.getAttribute( 'data-suggestion-id' );
+
+		// Select "ro" and type over it. A collapsed arrow at the marker's
+		// edge only steps through its formats, so select "rold", collapse to
+		// its start and extend from there.
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 4 } );
+		await page.keyboard.press( 'ArrowLeft' );
+		await pageUtils.pressKeys( 'shift+ArrowRight', { times: 2 } );
+		await page.keyboard.type( 'or' );
+
+		await expect( added ).toHaveCount( 1 );
+		await expect( added ).toHaveText( ' world' );
+		await expect( added ).toHaveAttribute( 'data-suggestion-id', id! );
+		await expect( paragraph ).toHaveText( 'Hello world' );
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="del"]'
+			)
+		).toHaveCount( 0 );
+
+		// Typing on from the caret keeps growing the same marker.
+		await page.keyboard.type( 's' );
+		await expect( added ).toHaveText( ' worsld' );
+		await expect( added ).toHaveAttribute( 'data-suggestion-id', id! );
+
+		await expect(
+			page
+				.locator( '.components-snackbar-list' )
+				.getByText( 'overlaps a pending suggestion' )
+		).toHaveCount( 0 );
+
+		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
+		const allNotesToggle = topBar.getByRole( 'button', {
+			name: 'All notes',
+			exact: true,
+		} );
+		if (
+			( await allNotesToggle.getAttribute( 'aria-expanded' ) ) === 'false'
+		) {
+			await allNotesToggle.click();
+		}
+		const summaries = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.locator( '.editor-collab-sidebar-panel__suggestion-summary' );
+		await expect( summaries ).toHaveCount( 1 );
+		await expect( summaries ).toContainText( 'Add:' );
+		await expect( summaries ).toContainText( 'worsld' );
+	} );
+
+	test( 'type-over straddling your own pending addition becomes one Replace', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// A selection covering original text and part of the suggester's own
+		// addition: the original part is proposed for deletion and the typed
+		// text replaces the selected part of the addition, all under the one
+		// note (#73411).
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' wrold' );
+
+		const added = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="add"]'
+		);
+		const deleted = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="del"]'
+		);
+		await expect( added ).toHaveText( ' wrold' );
+		await expect( added ).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		const id = await added.getAttribute( 'data-suggestion-id' );
+
+		// Select "lo wr": "lo" is original text, " wr" the addition.
+		await page.keyboard.press( 'Home' );
+		await pageUtils.pressKeys( 'ArrowRight', { times: 3 } );
+		await pageUtils.pressKeys( 'shift+ArrowRight', { times: 5 } );
+		const saved = suggestionSavedPromise( page );
+		await page.keyboard.type( 'p wr' );
+
+		await expect( deleted ).toHaveText( 'lo' );
+		await expect( added ).toHaveText( 'p wrold' );
+		await expect( deleted ).toHaveAttribute( 'data-suggestion-id', id! );
+		await expect( added ).toHaveAttribute( 'data-suggestion-id', id! );
+		await expect( paragraph ).toHaveText( 'Hellop wrold' );
+		await saved;
+
+		await expect(
+			page
+				.locator( '.components-snackbar-list' )
+				.getByText( 'overlaps a pending suggestion' )
+		).toHaveCount( 0 );
+
+		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
+		const allNotesToggle = topBar.getByRole( 'button', {
+			name: 'All notes',
+			exact: true,
+		} );
+		if (
+			( await allNotesToggle.getAttribute( 'aria-expanded' ) ) === 'false'
+		) {
+			await allNotesToggle.click();
+		}
+		const sidebar = page.getByRole( 'region', { name: 'Editor settings' } );
+		const summaries = sidebar.locator(
+			'.editor-collab-sidebar-panel__suggestion-summary'
+		);
+		await expect( summaries ).toHaveCount( 1 );
+		await expect( summaries ).toContainText( 'Replace:' );
+		await expect( summaries ).toContainText( '“lo” → “p wrold”' );
+
+		// The note resolves both halves.
+		await sidebar
+			.getByRole( 'button', { name: 'Reject suggestion' } )
+			.click();
+		await expect( paragraph ).toHaveText( 'Hello' );
+		await expect( paragraph.locator( 'mark.wp-suggestion' ) ).toHaveCount(
+			0
+		);
+	} );
+
+	test( 'type-over inside another author’s pending addition is refused', async ( {
+		editor,
+		page,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = () =>
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.first();
+		await paragraph().click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' wrold' );
+		const added = () =>
+			paragraph().locator(
+				'mark.wp-suggestion[data-suggestion-type="add"]'
+			);
+		await expect( added() ).toHaveText( ' wrold' );
+		await expect( added() ).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		// Hand the marker and its note to another suggester.
+		const noteId = Number(
+			await added().getAttribute( 'data-suggestion-id' )
+		);
+		const otherAuthor = await requestUtils.createUser( {
+			username: 'othertypeover',
+			email: 'other.typeover@example.com',
+			password: 'othertypeoverpassword',
+			roles: [ 'editor' ],
+		} );
+		await requestUtils.rest( {
+			method: 'PUT',
+			path: `/wp/v2/comments/${ noteId }`,
+			data: { author: otherAuthor.id },
+		} );
+		await editor.saveDraft();
+		const postId = await page.evaluate( () =>
+			window.wp.data.select( 'core/editor' ).getCurrentPostId()
+		);
+		const post = await requestUtils.rest( {
+			path: `/wp/v2/posts/${ postId }`,
+			params: { context: 'edit' },
+		} );
+		await requestUtils.rest( {
+			method: 'PUT',
+			path: `/wp/v2/posts/${ postId }`,
+			data: {
+				content: post.content.raw.replace(
+					new RegExp(
+						`(data-suggestion-id="${ noteId }"[^>]*data-author=")\\d+`
+					),
+					`$1${ otherAuthor.id }`
+				),
+			},
+		} );
+		await page.reload();
+		await expect( added() ).toHaveAttribute(
+			'data-author',
+			String( otherAuthor.id )
+		);
+
+		await switchIntent( page, 'Suggesting' );
+		await paragraph().click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 2 } );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 2 } );
+		await page.keyboard.type( 'o' );
+
+		await expect(
+			page
+				.locator( '.components-snackbar-list' )
+				.getByText( 'overlaps a pending suggestion' )
+		).toBeVisible();
+		await expect( added() ).toHaveCount( 1 );
+		await expect( added() ).toHaveText( ' wrold' );
+		await expect( paragraph() ).toHaveText( 'Hello wrold' );
+	} );
+
 	test( 'Backspace corrects the new text of a type-over', async ( {
 		editor,
 		page,
