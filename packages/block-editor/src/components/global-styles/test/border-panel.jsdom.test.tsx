@@ -65,6 +65,7 @@ describe( 'BorderPanel — panel and control labels', () => {
 	it( 'titles the panel "Borders" when border and shadow controls are available', () => {
 		render(
 			<BorderPanel
+				showInheritanceLabelIndicators
 				value={ {} }
 				settings={ settingsAll }
 				onChange={ () => {} }
@@ -83,6 +84,7 @@ describe( 'BorderPanel — panel and control labels', () => {
 		// is what lets each control keep its own visible label.
 		render(
 			<BorderPanel
+				showInheritanceLabelIndicators
 				value={ {} }
 				settings={ shadowOnlySettings }
 				onChange={ () => {} }
@@ -102,6 +104,7 @@ describe( 'BorderPanel — panel and control labels', () => {
 		// label row. Both now share the same layout.
 		render(
 			<BorderPanel
+				showInheritanceLabelIndicators
 				value={ {} }
 				settings={ borderOnlySettings }
 				onChange={ () => {} }
@@ -144,6 +147,7 @@ describe( 'BorderPanel — panel and control labels', () => {
 	it( 'labels the shadow control even when no border control is available', () => {
 		render(
 			<BorderPanel
+				showInheritanceLabelIndicators
 				value={ {} }
 				settings={ shadowOnlySettings }
 				onChange={ () => {} }
@@ -162,6 +166,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 
 			render(
 				<BorderPanel
+					showInheritanceLabelIndicators
 					value={ {} }
 					inheritedValue={ inheritedValue }
 					settings={ settingsAll }
@@ -182,6 +187,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 
 			render(
 				<BorderPanel
+					showInheritanceLabelIndicators
 					value={ {} }
 					inheritedValue={ inheritedValue }
 					settings={ settingsAll }
@@ -206,6 +212,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 
 			render(
 				<BorderPanel
+					showInheritanceLabelIndicators
 					value={ value }
 					inheritedValue={ inheritedValue }
 					settings={ settingsAll }
@@ -232,6 +239,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 
 			render(
 				<BorderPanel
+					showInheritanceLabelIndicators
 					value={ {} }
 					inheritedValue={ inheritedValue }
 					settings={ settingsAll }
@@ -253,6 +261,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 
 			render(
 				<BorderPanel
+					showInheritanceLabelIndicators
 					value={ {} }
 					inheritedValue={ inheritedValue }
 					settings={ settingsAll }
@@ -286,6 +295,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 
 			render(
 				<BorderPanel
+					showInheritanceLabelIndicators
 					value={ {} }
 					inheritedValue={ inheritedValue }
 					settings={ settingsAll }
@@ -330,6 +340,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 
 			render(
 				<BorderPanel
+					showInheritanceLabelIndicators
 					value={ value }
 					inheritedValue={ inheritedValue }
 					settings={ settingsAll }
@@ -368,6 +379,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 
 			render(
 				<BorderPanel
+					showInheritanceLabelIndicators
 					value={ {} }
 					inheritedValue={ inheritedValue }
 					settings={ settingsAll }
@@ -405,6 +417,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 
 			render(
 				<BorderPanel
+					showInheritanceLabelIndicators
 					value={ {} }
 					inheritedValue={ inheritedValue }
 					settings={ settingsAll }
@@ -426,6 +439,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 
 			render(
 				<BorderPanel
+					showInheritanceLabelIndicators
 					value={ value }
 					inheritedValue={ inheritedValue }
 					settings={ settingsAll }
@@ -449,6 +463,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 
 			render(
 				<BorderPanel
+					showInheritanceLabelIndicators
 					value={ {} }
 					inheritedValue={ inheritedValue }
 					settings={ settingsAll }
@@ -465,6 +480,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 
 			render(
 				<BorderPanel
+					showInheritanceLabelIndicators
 					value={ {} }
 					inheritedValue={ inheritedValue }
 					settings={ settingsAll }
@@ -491,6 +507,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 
 			render(
 				<BorderPanel
+					showInheritanceLabelIndicators
 					value={ value }
 					inheritedValue={ inheritedValue }
 					settings={ settingsAll }
@@ -516,6 +533,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 
 			render(
 				<BorderPanel
+					showInheritanceLabelIndicators
 					value={ value }
 					inheritedValue={ {} }
 					settings={ settingsAll }
@@ -575,6 +593,7 @@ describe( 'BorderPanel — shadow preset persistence', () => {
 
 		render(
 			<BorderPanel
+				showInheritanceLabelIndicators
 				value={ {} }
 				settings={ shadowSettings( {
 					default: [ defaultPreset ],
@@ -599,6 +618,7 @@ describe( 'BorderPanel — shadow preset persistence', () => {
 
 		render(
 			<BorderPanel
+				showInheritanceLabelIndicators
 				value={ {} }
 				settings={ shadowSettings( {
 					default: [ defaultPreset ],
@@ -623,6 +643,7 @@ describe( 'BorderPanel — shadow preset persistence', () => {
 
 		render(
 			<BorderPanel
+				showInheritanceLabelIndicators
 				value={ {} }
 				settings={ shadowSettings( {
 					default: [ defaultPreset ],
@@ -647,6 +668,7 @@ describe( 'BorderPanel — shadow preset persistence', () => {
 
 		render(
 			<BorderPanel
+				showInheritanceLabelIndicators
 				value={ {} }
 				settings={ shadowSettings( {
 					theme: [ themePreset ],
@@ -668,6 +690,7 @@ describe( 'BorderPanel — shadow preset persistence', () => {
 
 		render(
 			<BorderPanel
+				showInheritanceLabelIndicators
 				value={ {} }
 				settings={ shadowSettings(
 					{
@@ -716,6 +739,7 @@ describe( 'BorderPanel — shadow preset persistence', () => {
 
 		render(
 			<BorderPanel
+				showInheritanceLabelIndicators
 				value={ {} }
 				settings={ shadowSettings( {
 					theme: [ themeShadowOne ],
@@ -751,6 +775,7 @@ describe( 'BorderPanel — shadow preset persistence', () => {
 		// default one, so this is the state right after adding one.
 		render(
 			<BorderPanel
+				showInheritanceLabelIndicators
 				value={ {} }
 				settings={ shadowSettings( {
 					default: [ defaultPreset ],

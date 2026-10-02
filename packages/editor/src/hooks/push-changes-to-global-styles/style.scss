@@ -33,3 +33,78 @@
 	color: $gray-900;
 	overflow-wrap: anywhere;
 }
+
+.editor-style-sources-modal {
+	// A steady size whatever the row count; the content scrolls past it.
+	height: min(760px, calc(100vh - #{$grid-unit-80 * 2}));
+
+	// Mirrors the "Apply globally" modal footer.
+	.components-modal__content {
+		padding-bottom: 0;
+	}
+
+	.dataviews-footer {
+		padding-bottom: $grid-unit-30;
+	}
+
+	.dataviews-layout__container {
+		overflow-x: hidden;
+
+		@media ( max-width: #{ $break-small } ) {
+			overflow-x: auto;
+		}
+	}
+
+	// Outranks the DataViews rule that shrinks every non-primary column.
+	.dataviews-wrapper .dataviews-layout__container .dataviews-view-table {
+		col.dataviews-view-table__col-first-data {
+			width: 20%;
+		}
+
+		col.dataviews-view-table__col-value,
+		col.dataviews-view-table__col-source,
+		col.dataviews-view-table__col-theme-value {
+			width: 18%;
+		}
+
+		col.dataviews-view-table__col-set-in {
+			width: auto;
+		}
+
+		// The same text colour whether or not a row is selected.
+		td {
+			color: var(--wpds-color-foreground-content-neutral);
+			font-size: $default-font-size;
+		}
+	}
+
+	// Rows are acted on from the footer only. DataViews still renders a row
+	// actions column for the bulk actions, so hide it.
+	.dataviews-view-table__actions-column,
+	.dataviews-view-table col.dataviews-view-table__col-actions {
+		display: none;
+	}
+}
+
+.editor-style-sources-modal__summary {
+	font-size: $default-font-size;
+	padding-bottom: $grid-unit-20;
+}
+
+.editor-style-sources-modal__value {
+	color: var(--wpds-color-foreground-content-neutral);
+	overflow-wrap: anywhere;
+}
+
+.editor-style-sources-modal__inherited-label {
+	font-weight: var(--wpds-typography-font-weight-default);
+}
+
+.editor-style-sources-modal__this-block {
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+}
+
+.editor-style-sources-modal__muted {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	font-size: $helptext-font-size;
+}

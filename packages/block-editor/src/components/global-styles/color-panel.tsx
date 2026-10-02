@@ -14,7 +14,6 @@ import {
 	extractPresetSlug,
 	encodeColorValueWithPalette,
 } from '../../utils/color-values';
-import { isGlobalStylesInheritanceIndicatorUIEnabled } from './inheritance';
 import type {
 	ColorGradientDropdownItemProps,
 	ColorGradientTabConfig,
@@ -154,7 +153,7 @@ export default function ColorPanel( {
 	children,
 	contrastWarning,
 	additionalElements,
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
+	showInheritanceLabelIndicators = false,
 }: ColorPanelProps ) {
 	const {
 		colors,

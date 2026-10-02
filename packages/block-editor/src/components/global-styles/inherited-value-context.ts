@@ -135,7 +135,7 @@ function useContextHeadingLevel(
  * @param headingLevel Resolved heading level, from `getHeadingLevel`.
  * @return Ordered element keys, low to high precedence.
  */
-function getElementLayers(
+export function getElementLayers(
 	blockName: string,
 	headingLevel: number | undefined
 ): string[] {

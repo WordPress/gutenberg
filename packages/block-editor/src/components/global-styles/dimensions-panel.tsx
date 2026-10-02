@@ -25,11 +25,7 @@ import {
 	hasPseudoBlockStyleState,
 	hasViewportBlockStyleState,
 } from '../../hooks/block-style-state';
-import {
-	getInheritanceProps,
-	InheritanceToolsPanelItem,
-	isGlobalStylesInheritanceIndicatorUIEnabled,
-} from './inheritance';
+import { getInheritanceProps, InheritanceToolsPanelItem } from './inheritance';
 import type { BlockStyleState } from '../../hooks/types';
 import type { ChildLayout } from '../child-layout-control/types';
 import type {
@@ -397,7 +393,7 @@ export default function DimensionsPanel( {
 	includeLayoutControls = false,
 	allowAxialBlockGap = true,
 	styleState = DEFAULT_BLOCK_STYLE_STATE,
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
+	showInheritanceLabelIndicators = false,
 }: DimensionsPanelProps ) {
 	const { dimensions, spacing } = settings;
 
