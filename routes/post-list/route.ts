@@ -62,11 +62,13 @@ export const route = {
 
 		// Otherwise, fetch the first post from the filtered query
 		const query = viewToQuery( view, params.type );
-		const posts = await resolveSelect( coreStore ).getEntityRecords(
-			'postType',
-			params.type,
-			{ ...query, per_page: 1 }
-		);
+		const posts = await resolveSelect( coreStore )
+			.getEntityRecords( 'postType', params.type, {
+				...query,
+				per_page: 1,
+			} )
+			// A failed request falls back to the empty preview.
+			.catch( () => null );
 
 		// Return first post if available
 		if ( posts && posts.length > 0 ) {

@@ -56,11 +56,10 @@ export const route = {
 
 		// Otherwise, fetch the first template part from the filtered query
 		const query = viewToQuery( view );
-		const posts = await resolveSelect( coreStore ).getEntityRecords(
-			'postType',
-			'wp_template_part',
-			query
-		);
+		const posts = await resolveSelect( coreStore )
+			.getEntityRecords( 'postType', 'wp_template_part', query )
+			// A failed request falls back to the empty preview.
+			.catch( () => null );
 
 		// Return first template part if available
 		if ( posts && posts.length > 0 ) {

@@ -60,11 +60,10 @@ export const route = {
 		// uses, so the records are shared) and apply the view client-side
 		// over the same field definitions the stage renders.
 		const [ templates, fields ] = await Promise.all( [
-			resolveSelect( coreStore ).getEntityRecords(
-				'postType',
-				'wp_template',
-				{ per_page: -1 }
-			) as Promise< Template[] | null >,
+			resolveSelect( coreStore )
+				.getEntityRecords( 'postType', 'wp_template', { per_page: -1 } )
+				// A failed request falls back to the empty preview.
+				.catch( () => null ) as Promise< Template[] | null >,
 			loadTemplateFields(),
 		] );
 		const template = filterSortAndPaginate( templates ?? [], view, fields )

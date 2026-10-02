@@ -164,7 +164,9 @@ export function FlatTermSelector( { slug } ) {
 				.getEntityRecords( 'taxonomy', slug, {
 					...DEFAULT_QUERY,
 					search,
-				} );
+				} )
+				// A failed search offers no suggestions.
+				.catch( () => null );
 
 			// Ignore a request whose search no longer matches the input.
 			if ( lastSearchRef.current === search ) {

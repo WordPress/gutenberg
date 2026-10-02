@@ -580,13 +580,14 @@ export function MediaUploadModal( {
 						per_page: -1,
 					};
 
-					const selectedPosts = await resolveSelect(
-						coreStore
-					).getEntityRecords< RestAttachment >(
-						'postType',
-						'attachment',
-						selectedPostsQuery
-					);
+					const selectedPosts = await resolveSelect( coreStore )
+						.getEntityRecords< RestAttachment >(
+							'postType',
+							'attachment',
+							selectedPostsQuery
+						)
+						// Keep the modal usable when the request fails.
+						.catch( () => null );
 
 					// Transform the selected posts to the expected Attachment format
 					const transformedPosts = ( selectedPosts ?? [] )

@@ -32,11 +32,14 @@ export const route = {
 			search?: string;
 		};
 	} ) => {
-		const navigations = ( await resolveSelect( coreStore ).getEntityRecords(
-			'postType',
-			NAVIGATION_POST_TYPE,
-			PRELOADED_NAVIGATION_MENUS_QUERY
-		) ) as { id: number }[] | null;
+		const navigations = ( await resolveSelect( coreStore )
+			.getEntityRecords(
+				'postType',
+				NAVIGATION_POST_TYPE,
+				PRELOADED_NAVIGATION_MENUS_QUERY
+			)
+			// A failed request falls back to the empty preview.
+			.catch( () => null ) ) as { id: number }[] | null;
 		const firstNavigation = navigations?.[ 0 ];
 
 		if ( ! firstNavigation ) {
@@ -57,12 +60,15 @@ export const route = {
 		await Promise.all( [
 			// Preload the view configuration the stage resolves its view from.
 			loadNavigationViewConfig(),
-			// Preload navigation menus
-			resolveSelect( coreStore ).getEntityRecords(
-				'postType',
-				NAVIGATION_POST_TYPE,
-				PRELOADED_NAVIGATION_MENUS_QUERY
-			),
+			// Preload navigation menus. A failed preload shouldn't fail the
+			// route.
+			resolveSelect( coreStore )
+				.getEntityRecords(
+					'postType',
+					NAVIGATION_POST_TYPE,
+					PRELOADED_NAVIGATION_MENUS_QUERY
+				)
+				.catch( () => null ),
 			resolveSelect( coreStore ).canUser( 'create', {
 				kind: 'postType',
 				name: NAVIGATION_POST_TYPE,
@@ -70,9 +76,11 @@ export const route = {
 			// Preload post type object (what usePostFields needs)
 			resolveSelect( coreStore ).getPostType( NAVIGATION_POST_TYPE ),
 			// Preload users data (what usePostFields needs for author field)
-			resolveSelect( coreStore ).getEntityRecords( 'root', 'user', {
-				per_page: -1,
-			} ),
+			resolveSelect( coreStore )
+				.getEntityRecords( 'root', 'user', {
+					per_page: -1,
+				} )
+				.catch( () => null ),
 		] );
 	},
 };
