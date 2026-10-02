@@ -34,7 +34,7 @@
 .label-text.label-text.label-text {
 	color: $components-color-foreground-inverted;
 	display: block;
-	font-size: 13px;
+	font-size: $font-size-medium;
 	line-height: 1.4;
 	white-space: nowrap;
 }

@@ -322,15 +322,15 @@
 	/* 2X large font size */
 	--wpds-typography-font-size-2xl: 32px;
 	/* Large font size */
-	--wpds-typography-font-size-lg: 15px;
+	--wpds-typography-font-size-lg: 16px;
 	/* Medium font size */
-	--wpds-typography-font-size-md: 13px;
+	--wpds-typography-font-size-md: 14px;
 	/* Small font size */
 	--wpds-typography-font-size-sm: 12px;
 	/* Extra large font size */
 	--wpds-typography-font-size-xl: 20px;
 	/* Extra small font size */
-	--wpds-typography-font-size-xs: 11px;
+	--wpds-typography-font-size-xs: 10px;
 	/* Baseline text weight for body copy and UI text */
 	--wpds-typography-font-weight-default: 400;
 	/* Elevated text weight for labels, controls, and headings */
