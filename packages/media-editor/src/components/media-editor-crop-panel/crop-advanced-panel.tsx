@@ -12,6 +12,7 @@ interface CropAdvancedPanelProps {
 	aspectRatio?: number;
 	freeformCrop: boolean;
 	onPlacementControlInteraction?: () => void;
+	disabled?: boolean;
 }
 
 const DEGREE_SUFFIX = <InputControlSuffixWrapper>°</InputControlSuffixWrapper>;
@@ -20,6 +21,7 @@ export default function CropAdvancedPanel( {
 	aspectRatio,
 	freeformCrop,
 	onPlacementControlInteraction,
+	disabled = false,
 }: CropAdvancedPanelProps ) {
 	const controls = useAdvancedCropControls( {
 		aspectRatio,
@@ -64,6 +66,7 @@ export default function CropAdvancedPanel( {
 					step={ fineRotation.step }
 					commitStep={ fineRotation.step }
 					suffix={ DEGREE_SUFFIX }
+					disabled={ disabled }
 					onCommit={ fineRotation.onEdit }
 					onCommitEnd={ fineRotation.onEditEnd }
 					onSessionStart={ onSessionStart }
@@ -81,7 +84,9 @@ export default function CropAdvancedPanel( {
 						value={ rect.left }
 						range={ ranges.left }
 						disabled={
-							! canMoveCropRect || ! ranges.left.isEditable
+							disabled ||
+							! canMoveCropRect ||
+							! ranges.left.isEditable
 						}
 						commitOnChange={ false }
 						onPreview={ ( value ) => onPreview( 'left', value ) }
@@ -94,7 +99,9 @@ export default function CropAdvancedPanel( {
 						value={ rect.top }
 						range={ ranges.top }
 						disabled={
-							! canMoveCropRect || ! ranges.top.isEditable
+							disabled ||
+							! canMoveCropRect ||
+							! ranges.top.isEditable
 						}
 						commitOnChange={ false }
 						onPreview={ ( value ) => onPreview( 'top', value ) }
@@ -112,7 +119,7 @@ export default function CropAdvancedPanel( {
 						label={ __( 'Width' ) }
 						value={ rect.width }
 						range={ ranges.width }
-						disabled={ ! ranges.width.isEditable }
+						disabled={ disabled || ! ranges.width.isEditable }
 						commitOnChange={ false }
 						onPreview={ ( value ) => onPreview( 'width', value ) }
 						onCommit={ ( value ) => onEdit( 'width', value ) }
@@ -122,7 +129,7 @@ export default function CropAdvancedPanel( {
 						label={ __( 'Height' ) }
 						value={ rect.height }
 						range={ ranges.height }
-						disabled={ ! ranges.height.isEditable }
+						disabled={ disabled || ! ranges.height.isEditable }
 						commitOnChange={ false }
 						onPreview={ ( value ) => onPreview( 'height', value ) }
 						onCommit={ ( value ) => onEdit( 'height', value ) }

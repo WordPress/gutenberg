@@ -323,4 +323,20 @@ describe( 'CropAdvancedPanel', () => {
 
 		expect( mockSetRotation ).toHaveBeenCalledWith( 30 );
 	} );
+
+	it( 'disables every field while the edit is saving', () => {
+		render( <CropAdvancedPanel freeformCrop disabled /> );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Advanced' } ) );
+
+		expect( screen.getByLabelText( 'Fine rotation angle' ) ).toBeDisabled();
+		expect(
+			screen.getByLabelText( 'Crop horizontal position' )
+		).toBeDisabled();
+		expect(
+			screen.getByLabelText( 'Crop vertical position' )
+		).toBeDisabled();
+		expect( screen.getByLabelText( 'Width' ) ).toBeDisabled();
+		expect( screen.getByLabelText( 'Height' ) ).toBeDisabled();
+	} );
 } );

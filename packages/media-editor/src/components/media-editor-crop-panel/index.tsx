@@ -75,6 +75,7 @@ export default function MediaEditorCropPanel( {
 				aspectRatio={ resolvedAspectRatio }
 				freeformCrop
 				onPlacementControlInteraction={ onPlacementControlInteraction }
+				disabled={ disabled }
 			/>
 		</Stack>
 	);
