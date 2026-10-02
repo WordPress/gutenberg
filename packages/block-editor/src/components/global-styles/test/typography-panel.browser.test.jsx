@@ -1363,29 +1363,38 @@ describe( 'TypographyPanel text gradient', () => {
 			);
 		} );
 
-		it( 'hides the gradient control, which belongs to the Default state', async () => {
+		it( 'clears a text gradient by writing the CSS initial clip', async () => {
+			const onChange = vi.fn();
 			await renderPanel( {
 				settings: gradientSettings,
 				blockName: TEST_BLOCK,
 				defaultControls: shownControls,
-				value: {},
+				value: {
+					background: {
+						gradient: 'var:preset|gradient|purple-blue',
+						backgroundClip: 'text',
+					},
+				},
 				baseValue,
-				styleState: { viewport: '@mobile', pseudo: 'default' },
+				onChange,
 			} );
 
-			expect(
-				screen.queryByRole( 'button', { name: /Gradient/ } )
-			).not.toBeInTheDocument();
+			await activatePanelMenuItem( 'Typography options', /reset all/i );
+
+			// The Default state's declarations are not in a media query, so
+			// clearing here has to say `border-box` rather than nothing.
+			const result = onChange.mock.calls.at( -1 )[ 0 ];
+			expect( result.background.gradient ).toBeUndefined();
+			expect( result.background.backgroundClip ).toBe( 'border-box' );
 		} );
 
-		it( 'keeps the gradient control at a pseudo state, which scopes it to hover', async () => {
+		it( 'offers the gradient control at a breakpoint', async () => {
 			await renderPanel( {
 				settings: gradientSettings,
 				blockName: TEST_BLOCK,
 				defaultControls: shownControls,
 				value: {},
 				baseValue,
-				styleState: { viewport: 'default', pseudo: ':hover' },
 			} );
 
 			expect(
