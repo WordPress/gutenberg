@@ -30,6 +30,7 @@ import {
 } from './keyboard-target';
 import { isPartOfPendingInsertion } from './store-interceptor';
 import { notifyEditRefused } from './refuse-edit';
+import { readValueText, rebaseRunAnchor } from './run-anchor';
 
 type RunSegment = {
 	/** Plain text of the segment. */
@@ -49,6 +50,12 @@ type AdditionRun = {
 	end: number;
 	caret: number;
 	pending: RunSegment[];
+	/**
+	 * While the note is in flight: the range the run was opened over and the
+	 * attribute's text at that moment, so the deferred write can be placed
+	 * by content rather than by wherever the caret is when the id resolves.
+	 */
+	anchor?: { start: number; end: number; text: string };
 };
 
 /**
@@ -224,6 +231,66 @@ export default function SuggestionAdditionKeyboard() {
 		[ requestInterceptorBypass, updateBlockAttributes, selectionChange ]
 	);
 
+	/*
+	 * Write a run the user has moved away from. The caret stays where the
+	 * user put it: when it sits later in the same field, it shifts by the
+	 * inserted length so it stays on the same character, and so does the
+	 * anchor of a run the user opened there in the meantime.
+	 */
+	const commitDetached = useCallback(
+		(
+			clientId: string,
+			attributeKey: string,
+			value: any,
+			at: number,
+			length: number
+		) => {
+			const live = readInlineCaret( getSelectionStart, getSelectionEnd );
+			const sameField =
+				live &&
+				live.clientId === clientId &&
+				live.attributeKey === attributeKey;
+			const selection = sameField
+				? ( readLiveInlineSelection( clientId, attributeKey ) ?? live )
+				: null;
+			requestInterceptorBypass( clientId );
+			updateBlockAttributes( clientId, { [ attributeKey ]: value } );
+			const inFlight = runRef.current;
+			if (
+				inFlight?.anchor &&
+				inFlight.clientId === clientId &&
+				inFlight.attributeKey === attributeKey
+			) {
+				const text = readValueText( value );
+				const moved = rebaseRunAnchor(
+					inFlight.anchor,
+					inFlight.anchor.text,
+					text
+				);
+				if ( moved ) {
+					inFlight.anchor = { ...moved, text };
+				}
+			}
+			if ( selection ) {
+				const shift = ( offset: number ) =>
+					offset >= at ? offset + length : offset;
+				selectionChange(
+					clientId,
+					attributeKey,
+					shift( selection.start ),
+					shift( selection.end )
+				);
+			}
+		},
+		[
+			getSelectionStart,
+			getSelectionEnd,
+			requestInterceptorBypass,
+			updateBlockAttributes,
+			selectionChange,
+		]
+	);
+
 	// Open a fresh inline-suggestion note of the given kind for a block,
 	// resolving to the new comment id (or null on failure/empty).
 	const openInlineNote = useCallback(
@@ -276,20 +343,28 @@ export default function SuggestionAdditionKeyboard() {
 				end: start,
 				caret: start,
 				pending: [ segment ],
+				anchor: {
+					start,
+					end,
+					text: readValueText(
+						getBlockAttributes( clientId )?.[ attributeKey ]
+					),
+				},
 			};
 			runRef.current = run;
 			/*
 			 * Whether the live caret still reads the run's block, attribute
-			 * and selection. Checked after every await: if the user relocated
-			 * during the note round trip the run is abandoned — writing the
-			 * buffered characters into the old location would materialize
-			 * text where the user no longer is. The offsets come from the DOM
+			 * and selection, i.e. the user is still at the run and the caret
+			 * should follow the written text. The offsets come from the DOM
 			 * selection, as `start` / `end` did: the store's offsets lag the
 			 * DOM under fast typing, so they only identify the field. Every
 			 * keystroke of the run was cancelled, so an unchanged selection
-			 * still reads exactly `start` / `end`.
+			 * still reads exactly the run's range.
 			 */
-			const caretStillAnchored = () => {
+			const caretStillAnchored = ( range: {
+				start: number;
+				end: number;
+			} ) => {
 				const live = readInlineCaret(
 					getSelectionStart,
 					getSelectionEnd
@@ -307,7 +382,8 @@ export default function SuggestionAdditionKeyboard() {
 				);
 				return (
 					! domRange ||
-					( domRange.start === start && domRange.end === end )
+					( domRange.start === range.start &&
+						domRange.end === range.end )
 				);
 			};
 			/*
@@ -335,26 +411,50 @@ export default function SuggestionAdditionKeyboard() {
 						? SUGGESTION_TYPE_REPLACEMENT
 						: SUGGESTION_TYPE_ADDITION
 				);
-				// The run may have been abandoned (mode change) or the caret
-				// may have relocated while the request was in flight.
-				if ( runRef.current !== run ) {
+				/*
+				 * Every keystroke of the run was cancelled, so the buffered
+				 * text belongs where the run was opened, wherever the caret
+				 * went in the meantime: clicking another block or pressing
+				 * Enter must not discard it (#73411). It is written whenever
+				 * the text around that spot is intact, so it can never land
+				 * at an offset that now means something else; otherwise, or
+				 * when Suggest mode was left, the gesture is dropped.
+				 */
+				const stillSuggesting =
+					unlock(
+						registry.select( STORE_NAME )
+					).getEditorIntent() === EDITOR_INTENT_SUGGEST;
+				const attributes = getBlockAttributes( clientId );
+				const anchor =
+					id && stillSuggesting && attributes && run.anchor
+						? rebaseRunAnchor(
+								run.anchor,
+								run.anchor.text,
+								readValueText( attributes[ attributeKey ] )
+							)
+						: null;
+				if ( ! anchor ) {
 					abandon( id );
 					return;
 				}
-				if ( ! id || ! caretStillAnchored() ) {
-					abandon( id );
-					return;
+				const followCaret =
+					runRef.current === run && caretStillAnchored( anchor );
+				if ( ! followCaret && runRef.current === run ) {
+					// The user moved on: the next keystroke starts afresh.
+					resetRun();
 				}
 				const buffered = mergeRunSegments( run.pending );
 				run.id = id;
 				run.pending = [];
+				run.anchor = undefined;
+				run.start = anchor.start;
 				/*
 				 * Compose the whole gesture into ONE content value — the `del`
 				 * marker over the replaced range plus the addition run — and
 				 * write it once. A type-over is a single user gesture, so it
 				 * must occupy a single undo level.
 				 */
-				let value = getBlockAttributes( clientId )?.[ attributeKey ];
+				let value = attributes[ attributeKey ];
 				if ( isTypeOver ) {
 					const deleted = wrapInlineMarker( value, {
 						formatType: SUGGESTION_FORMAT_NAME,
@@ -363,8 +463,8 @@ export default function SuggestionAdditionKeyboard() {
 							type: SUGGESTION_TYPE_DELETION,
 							authorId,
 						} ),
-						start,
-						end,
+						start: anchor.start,
+						end: anchor.end,
 					} );
 					if ( deleted ) {
 						value = deleted;
@@ -383,7 +483,17 @@ export default function SuggestionAdditionKeyboard() {
 				} );
 				run.end = run.start + buffered.text.length;
 				run.caret = run.end;
-				commit( clientId, attributeKey, inserted, run.caret );
+				if ( followCaret ) {
+					commit( clientId, attributeKey, inserted, run.caret );
+				} else {
+					commitDetached(
+						clientId,
+						attributeKey,
+						inserted,
+						run.start,
+						buffered.text.length
+					);
+				}
 			} catch {
 				// `createSuggestion` already surfaces a notice on failure; drop
 				// the run so the next edit starts clean.
@@ -396,8 +506,10 @@ export default function SuggestionAdditionKeyboard() {
 			getSelectionEnd,
 			openInlineNote,
 			commit,
+			commitDetached,
 			resetRun,
 			cleanupAbandonedNotes,
+			registry,
 			authorId,
 		]
 	);
@@ -428,20 +540,23 @@ export default function SuggestionAdditionKeyboard() {
 			const inFlight = runRef.current;
 			if ( inFlight && inFlight.id === null ) {
 				/*
-				 * A note request is still in flight. Buffer as long as the
-				 * caret still reads the run's block and attribute — offsets
-				 * are ignored because during a type-over the selection hasn't
-				 * collapsed yet. If the user clicked into a different block or
-				 * attribute during the round trip, abandon the run instead:
-				 * the buffered characters were never rendered (their edits
-				 * were cancelled), so flushing them would materialize text at
-				 * a place the user has already left. The current keystroke
-				 * then starts a fresh run at the new caret below.
+				 * A note request is still in flight. Buffer while the caret
+				 * still sits where the run was opened: its keystrokes were
+				 * cancelled, so the DOM selection is unchanged (during a
+				 * type-over it has not collapsed yet). If the user moved to
+				 * another block, attribute or offset, leave the run to flush
+				 * at its own spot when its id resolves, and start a fresh run
+				 * at the new caret below.
 				 */
+				const anchor = inFlight.anchor;
 				if (
 					caret &&
 					caret.clientId === inFlight.clientId &&
-					caret.attributeKey === inFlight.attributeKey
+					caret.attributeKey === inFlight.attributeKey &&
+					( ! domRange ||
+						! anchor ||
+						( domRange.start === anchor.start &&
+							domRange.end === anchor.end ) )
 				) {
 					inFlight.pending.push( segment );
 					return true;
