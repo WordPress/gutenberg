@@ -185,6 +185,16 @@ describe( 'isBufferedDeleteRepeat', () => {
 			} )
 		).toBe( false );
 	} );
+
+	it( 'does not count a delete after the caret moved within the field', () => {
+		const anchored = { ...inFlight, anchorPos: 5 };
+		expect( isBufferedDeleteRepeat( anchored, { ...key, pos: 5 } ) ).toBe(
+			true
+		);
+		expect( isBufferedDeleteRepeat( anchored, { ...key, pos: 2 } ) ).toBe(
+			false
+		);
+	} );
 } );
 
 describe( 'isDeletionTargetUnchanged', () => {

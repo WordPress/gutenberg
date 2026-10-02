@@ -732,6 +732,27 @@ export function summarizeOperations(
 			} );
 			continue;
 		}
+		// A post title suggestion quotes the whole old and new title: titles
+		// are short, and a word diff would hide what the title would read.
+		if ( op.type === 'post-attribute-set' ) {
+			const before = stripTags( op.before ?? '' );
+			const after = stripTags( op.after ?? '' );
+			lines.push( {
+				label:
+					op.attribute === 'title'
+						? __( 'Title:' )
+						: `${ humanizeAttributeName( op.attribute ) }:`,
+				value: before
+					? sprintf(
+							/* translators: 1: current post title. 2: proposed post title. */
+							__( '%1$s → %2$s' ),
+							`“${ clampText( before, REPLACE_SIDE_MAX_CHARS ) }”`,
+							`“${ clampText( after, REPLACE_SIDE_MAX_CHARS ) }”`
+						)
+					: `“${ clampText( after ) }”`,
+			} );
+			continue;
+		}
 		// An inline suggestion (Option B) stores no before/after text — the
 		// proposed words live in the in-content marker. The sidebar resolves
 		// that text into `op.text` before summarizing, so report it as a plain
