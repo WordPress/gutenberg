@@ -550,5 +550,39 @@ test.describe( 'Query block', () => {
 				},
 			] );
 		} );
+
+		test( "should hide the other control's terms without refetching the list", async ( {
+			page,
+			editor,
+		} ) => {
+			await addQueryWithTaxonomyFilters( { page, editor } );
+			await page
+				.getByRole( 'combobox', { name: 'Tags', exact: true } )
+				.click();
+			await page.getByRole( 'option', { name: 'Alpaca' } ).click();
+			await page.keyboard.press( 'Escape' );
+
+			const listRequests = [];
+			page.on( 'request', ( request ) => {
+				const url = decodeURIComponent( request.url() );
+				if (
+					url.includes( '/wp/v2/tags' ) &&
+					! url.includes( 'include' )
+				) {
+					listRequests.push( url );
+				}
+			} );
+
+			await page
+				.getByRole( 'combobox', { name: 'Exclude: Tags', exact: true } )
+				.click();
+			await expect(
+				page.getByRole( 'option', { name: 'Capybara' } )
+			).toBeVisible();
+			await expect(
+				page.getByRole( 'option', { name: 'Alpaca' } )
+			).toBeHidden();
+			expect( listRequests ).toEqual( [] );
+		} );
 	} );
 } );
