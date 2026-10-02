@@ -38,11 +38,7 @@ import {
 	findNearestStyleAndWeight,
 } from './typography-utils';
 import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
-import {
-	getInheritanceProps,
-	InheritanceToolsPanelItem,
-	isGlobalStylesInheritanceIndicatorUIEnabled,
-} from './inheritance';
+import { getInheritanceProps, InheritanceToolsPanelItem } from './inheritance';
 
 const MIN_TEXT_COLUMNS = 1;
 const MAX_TEXT_COLUMNS = 6;
@@ -273,7 +269,7 @@ export default function TypographyPanel( {
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 	isGlobalStyles = false,
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
+	showInheritanceLabelIndicators = false,
 	contrastWarning,
 } ) {
 	const {

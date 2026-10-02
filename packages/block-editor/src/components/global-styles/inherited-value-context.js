@@ -117,7 +117,7 @@ function useContextHeadingLevel( blockName ) {
  * @param {?number} headingLevel Resolved heading level, from `getHeadingLevel`.
  * @return {string[]} Ordered element keys, low to high precedence.
  */
-function getElementLayers( blockName, headingLevel ) {
+export function getElementLayers( blockName, headingLevel ) {
 	switch ( blockName ) {
 		case 'core/button':
 			return [ 'button' ];
