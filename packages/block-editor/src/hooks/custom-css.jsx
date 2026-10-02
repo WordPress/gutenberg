@@ -26,14 +26,6 @@ import { unlock } from '../lock-unlock';
 
 const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
-// Breakpoint keys that can carry their own state style objects (and, in turn,
-// their own `css` value). Used as a fallback when viewport settings aren't
-// available (e.g. in `addSaveProps`, which runs outside any block context).
-// When settings are available, breakpoints are derived dynamically instead
-// via `getResponsiveMediaQueries`, so this only needs to match the current
-// breakpoints for the no-settings fallback case.
-const RESPONSIVE_STATE_KEYS = [ '@mobile', '@tablet' ];
-
 // Stable reference for useInstanceId.
 const CUSTOM_CSS_INSTANCE_REFERENCE = {};
 
@@ -53,9 +45,9 @@ const EMPTY_STYLE = {};
  * @param {Object} [viewportSettings] Viewport breakpoint settings. When
  *                                    omitted (e.g. from `addSaveProps`, which
  *                                    runs outside any block context),
- *                                    breakpoints fall back to the static
- *                                    `RESPONSIVE_STATE_KEYS` list and entries
- *                                    are returned without a `mediaQuery`.
+ *                                    default responsive aliases are used and
+ *                                    entries are returned without a
+ *                                    `mediaQuery`.
  * @return {Object[]} Entries with `css`, `pseudoState` (string|undefined),
  *                     and `mediaQuery` (string|undefined) keys.
  */
@@ -76,7 +68,9 @@ function getCustomCSSStateEntries( style, blockName, viewportSettings ) {
 
 	const breakpoints = viewportSettings
 		? Object.entries( getResponsiveMediaQueries( viewportSettings ) )
-		: RESPONSIVE_STATE_KEYS.map( ( breakpoint ) => [ breakpoint ] );
+		: Object.keys( getResponsiveMediaQueries() ).map( ( breakpoint ) => [
+				breakpoint,
+			] );
 
 	breakpoints.forEach( ( [ breakpoint, mediaQuery ] ) => {
 		const breakpointStyle = style?.[ breakpoint ];
