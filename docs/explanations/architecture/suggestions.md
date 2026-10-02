@@ -234,6 +234,11 @@ A payload carries at most one structural op (the auto-save loop persists each st
 | `block-remove`      | the serialized `block` | `removeBlock` |
 | `block-insert-after`| `anchorClientId`, `parentClientId`, the serialized `block` | `insertBlock` |
 | `block-move`        | `fromAnchorClientId` / `fromParentClientId` / `fromIndex`, `toAnchorClientId` / `toParentClientId` | `moveBlockToPosition` |
+| `post-attribute-set`| `attribute`, `before`, `after` | `editPost` |
+
+### Post title suggestions
+
+The post title is not a block, so it has its own capture path. In Suggest intent `usePostTitle` never writes the post: it holds the proposed title in the overlay under the reserved key `POST_TITLE_OVERLAY_KEY`, which the orphan prune skips, and the title field shows the proposed value with the `is-suggestion-pending` class. The auto-saver turns that entry into `post-attribute-set` ops on a note with no block anchor (no `metadata.noteId` link is written). The sidebar labels such a note "Post title" rather than treating it as an orphan. Accept applies the ops with `editPost` (rolled back if the decision fails to save) and compares the post's current fields for the staleness prompt; Reject only records the decision and drops the overlay entry, since the post was never touched. Like other overlay-held suggestions, the pending title preview is in-memory: after a reload the field shows the real title and the note alone carries the suggestion.
 
 ### v1 → v2 compatibility
 
