@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug fix
+
+-   Point the apt sources of the buster-based WordPress images (PHP 7.1 and 7.2) at `archive.debian.org`, so building them no longer fails now that Debian 10 has reached end-of-life and left the regular mirrors.
+-   Point the apt sources of the bullseye-based WordPress images (PHP 7.4, 8.0, and 8.2) at `archive.debian.org`, so building them no longer fails now that Debian 11 has reached end-of-life and left the regular mirrors.
+-   Allow unauthenticated apt packages when building the stretch-based WordPress images (PHP 7.0), since `archive.debian.org`'s own signing keys for the long-archived stretch suite have since expired.
+
 ## 8.1.1 (2023-06-17)
 
 ### Bug fix
