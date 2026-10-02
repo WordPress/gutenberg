@@ -64,7 +64,11 @@ jobs:
 
     e2e-playwright:
         name: Playwright - ${{ matrix.part }}
-        runs-on: 'ubuntu-24.04'
+        # Playwright 1.32.0 (pinned on this branch) predates Ubuntu 24.04 support:
+        # `--with-deps` can't install the browsers' system packages there, and
+        # Firefox crashes partway through the run. On Ubuntu 22.04 all three
+        # browsers install and pass.
+        runs-on: 'ubuntu-22.04'
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
