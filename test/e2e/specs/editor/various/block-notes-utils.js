@@ -152,7 +152,7 @@ class BlockNoteUtils {
 	}
 	async addReactionToComment( emoji ) {
 		await this.#page
-			.getByRole( 'button', { name: 'Add reaction' } )
+			.getByRole( 'combobox', { name: 'Add reaction' } )
 			.click();
 		await this.waitForFullPicker();
 
@@ -190,7 +190,7 @@ class BlockNoteUtils {
 	 */
 	async pickFullPickerEmojiBySearch( search ) {
 		await this.#page
-			.getByRole( 'button', { name: 'Add reaction' } )
+			.getByRole( 'combobox', { name: 'Add reaction' } )
 			.click();
 		await this.waitForFullPicker();
 

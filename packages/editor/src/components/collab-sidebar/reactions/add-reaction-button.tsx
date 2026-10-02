@@ -1,5 +1,4 @@
 import { __ } from '@wordpress/i18n';
-import { Dropdown } from '@wordpress/components';
 /*
  * `IconButton` is pending Design System review (WordPress/gutenberg#76135);
  * used here so the trigger matches the reaction pills beside it.
@@ -13,17 +12,7 @@ import {
 	useReactionEmojiRules,
 	useReactionEmojis,
 } from './reaction-emojis';
-import {
-	detectLocale,
-	loadEmojibaseData,
-	useEmojibaseConfig,
-} from './emojibase-data';
-
-/*
- * `Dropdown`'s popover renders through `Popover.Slot` or a `<body>`-level
- * container, so either way it escapes the sidebar's `overflow: hidden`.
- */
-const POPOVER_PROPS = { placement: 'bottom-end' } as const;
+import { useEmojibaseConfig } from './emojibase-data';
 
 interface AddReactionButtonProps {
 	disabled?: boolean;
@@ -47,12 +36,6 @@ export function AddReactionButton( {
 	const rules = useReactionEmojiRules();
 	const { baseUrl } = useEmojibaseConfig();
 
-	// Warm the dataset before the popover opens; the loader caches, so
-	// repeat calls on every hover are free.
-	const prefetchDataset = baseUrl
-		? () => loadEmojibaseData( baseUrl, detectLocale() ).catch( () => {} )
-		: undefined;
-
 	// With an emptied named list and no dataset, or a dataset limited to
 	// that list, there is nothing to pick.
 	if ( ! emojis.length && ( ! baseUrl || ! rules.allowUnlisted ) ) {
@@ -60,20 +43,9 @@ export function AddReactionButton( {
 	}
 
 	return (
-		<Dropdown
-			className="editor-collab-sidebar-panel__add-reaction"
-			popoverProps={ {
-				...POPOVER_PROPS,
-				/*
-				 * The popover constrains tabbing, so name it as a
-				 * non-modal dialog rather than leave screen readers with
-				 * an unnamed generic container.
-				 */
-				role: 'dialog',
-				'aria-label': __( 'Add reaction' ),
-			} }
-			contentClassName="editor-collab-sidebar-panel__picker-popover"
-			renderToggle={ ( { isOpen, onToggle } ) => (
+		<EmojiPicker
+			label={ __( 'Add reaction' ) }
+			trigger={
 				<IconButton
 					size="small"
 					// A plain glyph, per the design: no ring or fill at rest.
@@ -82,22 +54,12 @@ export function AddReactionButton( {
 					className="editor-collab-sidebar-panel__add-reaction-button"
 					icon={ reactionIcon }
 					label={ __( 'Add reaction' ) }
-					aria-haspopup="dialog"
-					aria-expanded={ isOpen }
-					disabled={ disabled }
-					onClick={ onToggle }
-					onMouseEnter={ prefetchDataset }
-					onFocus={ prefetchDataset }
 				/>
-			) }
-			renderContent={ ( { onClose } ) => (
-				<EmojiPicker
-					onSelect={ ( emoji ) => {
-						onClose();
-						onToggleReaction( emojiToStorageKey( emoji, emojis ) );
-					} }
-				/>
-			) }
+			}
+			disabled={ disabled }
+			onSelect={ ( emoji ) =>
+				onToggleReaction( emojiToStorageKey( emoji, emojis ) )
+			}
 		/>
 	);
 }

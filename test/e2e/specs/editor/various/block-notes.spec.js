@@ -1280,7 +1280,7 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			// Open the emoji picker with keyboard.
-			const addReactionButton = page.getByRole( 'button', {
+			const addReactionButton = page.getByRole( 'combobox', {
 				name: 'Add reaction',
 			} );
 			await addReactionButton.focus();
@@ -1320,9 +1320,9 @@ test.describe( 'Block Notes', () => {
 				comment: 'Test comment for the hover trigger',
 			} );
 
-			const trigger = page.locator(
-				'.editor-collab-sidebar-panel__add-reaction'
-			);
+			const trigger = page.getByRole( 'combobox', {
+				name: 'Add reaction',
+			} );
 			const note = page.locator( '.editor-collab-sidebar-panel__note' );
 
 			// Park the pointer outside the sidebar: adding the note leaves it
@@ -1337,7 +1337,7 @@ test.describe( 'Block Notes', () => {
 			// the thread, which stays focused for as long as it is selected.
 			await page.mouse.move( 0, 0 );
 			await expect( trigger ).toHaveCSS( 'opacity', '0' );
-			await page.getByRole( 'button', { name: 'Add reaction' } ).focus();
+			await trigger.focus();
 			await expect( trigger ).toHaveCSS( 'opacity', '1' );
 		} );
 
@@ -1365,7 +1365,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'textbox', { name: 'Add title' } )
 				.focus();
 			await expect(
-				page.getByRole( 'button', { name: 'Add reaction' } )
+				page.getByRole( 'combobox', { name: 'Add reaction' } )
 			).toHaveCount( 0 );
 			await expect( reactionButton ).toBeVisible();
 		} );
@@ -1394,7 +1394,7 @@ test.describe( 'Block Notes', () => {
 				} );
 
 				await page
-					.getByRole( 'button', { name: 'Add reaction' } )
+					.getByRole( 'combobox', { name: 'Add reaction' } )
 					.click();
 				await blockNoteUtils.waitForFullPicker();
 
@@ -1449,7 +1449,7 @@ test.describe( 'Block Notes', () => {
 			// Resolving posts a "Marked as resolved" reply that carries its
 			// own add trigger, so the root note's is the first of the two.
 			const addReaction = sidebar
-				.getByRole( 'button', { name: 'Add reaction' } )
+				.getByRole( 'combobox', { name: 'Add reaction' } )
 				.first();
 			const resolveButton = sidebar.getByRole( 'button', {
 				name: 'Resolve',
@@ -1488,7 +1488,9 @@ test.describe( 'Block Notes', () => {
 			 * "Heart" is label-overridden, and the helper's regex lookup
 			 * would otherwise match "smiling face with hearts" first.
 			 */
-			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
+			await page
+				.getByRole( 'combobox', { name: 'Add reaction' } )
+				.click();
 			await blockNoteUtils.waitForFullPicker();
 			await page.getByPlaceholder( 'Search emoji' ).fill( 'Heart' );
 			await page
@@ -1566,7 +1568,7 @@ test.describe( 'Block Notes', () => {
 				page.getByPlaceholder( 'Search emoji' )
 			).toBeHidden();
 			await expect(
-				page.getByRole( 'button', { name: 'Add reaction' } )
+				page.getByRole( 'combobox', { name: 'Add reaction' } )
 			).toBeFocused();
 		} );
 
@@ -1588,7 +1590,9 @@ test.describe( 'Block Notes', () => {
 					.set( 'core', 'emojiPickerFrequentEmojis', [] )
 			);
 
-			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
+			await page
+				.getByRole( 'combobox', { name: 'Add reaction' } )
+				.click();
 			await blockNoteUtils.waitForFullPicker();
 
 			// Seeded with the curated set, so it has content before any picks.
@@ -1625,7 +1629,9 @@ test.describe( 'Block Notes', () => {
 				.click();
 
 			// On reopening, the pick has joined the Frequently used section.
-			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
+			await page
+				.getByRole( 'combobox', { name: 'Add reaction' } )
+				.click();
 			await blockNoteUtils.waitForFullPicker();
 			await expect(
 				frequentSection.getByRole( 'gridcell', {
@@ -1645,7 +1651,9 @@ test.describe( 'Block Notes', () => {
 				comment: 'Pick a toned thumbs up',
 			} );
 
-			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
+			await page
+				.getByRole( 'combobox', { name: 'Add reaction' } )
+				.click();
 			await blockNoteUtils.waitForFullPicker();
 
 			// The persistent toggle next to the search field shows the
@@ -1711,7 +1719,9 @@ test.describe( 'Block Notes', () => {
 			} );
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 
-			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
+			await page
+				.getByRole( 'combobox', { name: 'Add reaction' } )
+				.click();
 			await blockNoteUtils.waitForFullPicker();
 
 			// Focus has moved into the portaled popover, but the note's
