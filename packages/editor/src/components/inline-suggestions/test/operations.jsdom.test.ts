@@ -15,6 +15,7 @@ import {
 	rejectInlineReplacement,
 	findAdditionRange,
 	removeInlineAdditionRange,
+	reviseOwnAddition,
 	acceptInlineFormat,
 	rejectInlineFormat,
 	insertInlineAddition,
@@ -986,5 +987,192 @@ describe( 'inline replacement operations', () => {
 		expect( findSuggestionText( shrunk, 7, 'add' ) ).toBe( 'm' );
 		expect( findSuggestionText( shrunk, 7, 'del' ) ).toBe( 'your' );
 		expect( shrunk.text ).toBe( 'This is myour first doc' );
+	} );
+} );
+
+describe( 'reviseOwnAddition', () => {
+	beforeAll( () => {
+		registerSuggestionFormat();
+	} );
+
+	afterAll( () => {
+		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
+			unregisterFormatType( SUGGESTION_FORMAT_NAME );
+		}
+	} );
+
+	const addBy = ( id: number, author: number, text: string ) =>
+		`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="add" data-author="${ author }">${ text }</mark>`;
+
+	it( 'replaces a selection inside the addition within the same marker', () => {
+		// "Hello wrold": select "ro" (offsets 7-9) and type "or".
+		const value = RichTextData.fromHTMLString(
+			`Hello${ addBy( 4, 1, ' wrold' ) }`
+		);
+		const result = reviseOwnAddition( value, {
+			start: 7,
+			end: 9,
+			text: 'or',
+			authorToken: '1',
+		} );
+		expect( result ).toMatchObject( {
+			id: '4',
+			markerStart: 5,
+			markerEnd: 11,
+			caret: 9,
+			isReplacement: false,
+		} );
+		expect( result!.value.text ).toBe( 'Hello world' );
+		expect( findSuggestionText( result!.value, 4, 'add' ) ).toBe(
+			' world'
+		);
+		expect( result!.value.toHTMLString().match( /<mark/g ) ).toHaveLength(
+			1
+		);
+	} );
+
+	it( 'replaces the whole addition when it is all selected', () => {
+		const value = RichTextData.fromHTMLString(
+			`Hello${ addBy( 4, 1, ' wrold' ) }`
+		);
+		const result = reviseOwnAddition( value, {
+			start: 5,
+			end: 11,
+			text: '!',
+			authorToken: '1',
+		} );
+		expect( result!.value.text ).toBe( 'Hello!' );
+		expect( findSuggestionText( result!.value, 4, 'add' ) ).toBe( '!' );
+		expect( result!.caret ).toBe( 6 );
+	} );
+
+	it( 'marks original text before the addition for deletion under the same id', () => {
+		// Select "lo wr" (offsets 3-8) and type "p wr".
+		const value = RichTextData.fromHTMLString(
+			`Hello${ addBy( 4, 1, ' wrold' ) }`
+		);
+		const result = reviseOwnAddition( value, {
+			start: 3,
+			end: 8,
+			text: 'p wr',
+			authorToken: '1',
+		} );
+		expect( result ).toMatchObject( {
+			markerStart: 5,
+			markerEnd: 12,
+			caret: 9,
+			isReplacement: true,
+		} );
+		expect( findSuggestionText( result!.value, 4, 'del' ) ).toBe( 'lo' );
+		expect( findSuggestionText( result!.value, 4, 'add' ) ).toBe(
+			'p wrold'
+		);
+		expect( result!.value.text ).toBe( 'Hellop wrold' );
+		// The deletion keeps the addition's author.
+		const deletionTag = result!.value
+			.toHTMLString()
+			.match( /<mark[^>]*data-suggestion-type="del"[^>]*>/ )![ 0 ];
+		expect( deletionTag ).toContain( 'data-author="1"' );
+	} );
+
+	it( 'marks original text after the addition for deletion under the same id', () => {
+		// "a NEW b": select "W b" (offsets 4-7) and type "w".
+		const value = RichTextData.fromHTMLString(
+			`a${ addBy( 4, 1, ' NEW' ) } b`
+		);
+		const result = reviseOwnAddition( value, {
+			start: 4,
+			end: 7,
+			text: 'w',
+			authorToken: '1',
+		} );
+		expect( result ).toMatchObject( {
+			markerStart: 1,
+			markerEnd: 5,
+			caret: 5,
+			isReplacement: true,
+		} );
+		expect( findSuggestionText( result!.value, 4, 'add' ) ).toBe( ' NEw' );
+		expect( findSuggestionText( result!.value, 4, 'del' ) ).toBe( ' b' );
+		expect( result!.value.text ).toBe( 'a NEw b' );
+	} );
+
+	it( 'declines another author’s addition', () => {
+		const value = RichTextData.fromHTMLString(
+			`Hello${ addBy( 4, 2, ' wrold' ) }`
+		);
+		expect(
+			reviseOwnAddition( value, {
+				start: 7,
+				end: 9,
+				text: 'or',
+				authorToken: '1',
+			} )
+		).toBeNull();
+	} );
+
+	it( 'declines a selection with original text on both sides', () => {
+		const value = RichTextData.fromHTMLString(
+			`a${ addBy( 4, 1, ' NEW' ) } b`
+		);
+		expect(
+			reviseOwnAddition( value, {
+				start: 0,
+				end: 7,
+				text: 'x',
+				authorToken: '1',
+			} )
+		).toBeNull();
+	} );
+
+	it( 'declines when the original part carries another suggestion', () => {
+		const value = RichTextData.fromHTMLString(
+			`He${ del( 9, 'll' ) }o${ addBy( 4, 1, ' wrold' ) }`
+		);
+		expect(
+			reviseOwnAddition( value, {
+				start: 2,
+				end: 8,
+				text: 'x',
+				authorToken: '1',
+			} )
+		).toBeNull();
+	} );
+
+	it( 'declines straddling a replacement that already owns a deletion', () => {
+		const value = RichTextData.fromHTMLString(
+			`Hi ${ addBy( 4, 1, 'new' ) }<mark class="wp-suggestion" data-suggestion-id="4" data-suggestion-type="del" data-author="1">old</mark>`
+		);
+		expect(
+			reviseOwnAddition( value, {
+				start: 1,
+				end: 4,
+				text: 'x',
+				authorToken: '1',
+			} )
+		).toBeNull();
+		// Inside the replacement's addition is still a revision.
+		const inside = reviseOwnAddition( value, {
+			start: 3,
+			end: 6,
+			text: 'fresh',
+			authorToken: '1',
+		} );
+		expect( findSuggestionText( inside!.value, 4, 'add' ) ).toBe( 'fresh' );
+		expect( findSuggestionText( inside!.value, 4, 'del' ) ).toBe( 'old' );
+	} );
+
+	it( 'declines a selection outside any addition', () => {
+		const value = RichTextData.fromHTMLString(
+			`Hello${ addBy( 4, 1, ' wrold' ) }`
+		);
+		expect(
+			reviseOwnAddition( value, {
+				start: 0,
+				end: 3,
+				text: 'x',
+				authorToken: '1',
+			} )
+		).toBeNull();
 	} );
 } );
