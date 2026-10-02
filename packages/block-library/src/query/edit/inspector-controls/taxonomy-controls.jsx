@@ -257,6 +257,13 @@ function TaxonomyItem( {
 		},
 		[ isHierarchical, hasOpened, search, taxonomy.slug ]
 	);
+	const [ lastListedTerms, setLastListedTerms ] = useState( EMPTY_ARRAY );
+	useEffect( () => {
+		if ( listHasResolved ) {
+			setLastListedTerms( listedTerms );
+		}
+	}, [ listHasResolved, listedTerms ] );
+	const shownTerms = listHasResolved ? listedTerms : lastListedTerms;
 	// `existingTerms` are the selected terms of a flat taxonomy, fetched with the same fields as the list.
 	// They are used to extract the terms' names to populate the control properly
 	// and to sanitize the provided `termIds`, by setting only the ones that exist.
@@ -306,9 +313,9 @@ function TaxonomyItem( {
 		const excludedIds = new Set( oppositeTermIds.map( String ) );
 		const listed = isHierarchical
 			? Array.from( treeItemById.values() )
-			: listedTerms.map( termToItem );
+			: shownTerms.map( termToItem );
 		return listed.filter( ( item ) => ! excludedIds.has( item.value ) );
-	}, [ isHierarchical, treeItemById, listedTerms, oppositeTermIds ] );
+	}, [ isHierarchical, treeItemById, shownTerms, oppositeTermIds ] );
 	const onInputValueChange = ( nextInputValue ) => {
 		setInputValue( nextInputValue );
 		if ( ! isHierarchical ) {
@@ -348,7 +355,12 @@ function TaxonomyItem( {
 		<div
 			className="block-library-query-inspector__taxonomy-control"
 			onKeyDownCapture={ ( event ) => {
-				if ( event.key === 'Enter' && isPending && ! items.length ) {
+				if (
+					event.key === 'Enter' &&
+					isPending &&
+					event.target.getAttribute( 'role' ) === 'combobox' &&
+					! event.target.getAttribute( 'aria-activedescendant' )
+				) {
 					event.preventDefault();
 					event.stopPropagation();
 				}
@@ -366,7 +378,7 @@ function TaxonomyItem( {
 						setHasOpened( true );
 					}
 				} }
-				filter={ isHierarchical || isDebouncing ? undefined : null }
+				filter={ isHierarchical || isPending ? undefined : null }
 				autoHighlight={ inputValue ? 'always' : true }
 				isItemEqualToValue={ isItemEqualToValue }
 				statusContent={
