@@ -53,7 +53,7 @@
  * re-open a withdrawn attribute or structural suggestion; an inline marker
  * restored by redo gets its note back via `SuggestionNoteGC`.
  */
-import { useRegistry, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 // @ts-expect-error No exported types
@@ -63,6 +63,7 @@ import type { OverlayEntry } from './overlay-context';
 import { operationsFromOverlay } from './provider';
 import { removeNoteIdFromMetadata } from '../collab-sidebar/utils';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
+import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 /*
@@ -229,6 +230,34 @@ export default function SuggestionUndoGuard() {
 
 	const requestInterceptorBypassRef = useRef( requestInterceptorBypass );
 	requestInterceptorBypassRef.current = requestInterceptorBypass;
+
+	/*
+	 * Tell the Undo button when there is a suggestion to withdraw. An
+	 * attribute suggestion leaves no core-data history, so without this the
+	 * button stays inert and never reaches the wrapped `undo` below. A
+	 * `history` candidate is left to the real stack, which already reports it.
+	 */
+	const hasWithdrawableSuggestion = useSelect(
+		( select ) => {
+			if ( ! isSuggestMode ) {
+				return false;
+			}
+			const newest = findNewestPendingSuggestion(
+				entries,
+				select( blockEditorStore )
+			);
+			return !! newest && newest.kind !== 'history';
+		},
+		[ isSuggestMode, entries ]
+	);
+	const { setHasSuggestionUndo } = unlock( useDispatch( editorStore ) );
+	useEffect( () => {
+		setHasSuggestionUndo( hasWithdrawableSuggestion );
+	}, [ hasWithdrawableSuggestion, setHasSuggestionUndo ] );
+	useEffect(
+		() => () => setHasSuggestionUndo( false ),
+		[ setHasSuggestionUndo ]
+	);
 
 	useEffect( () => {
 		if ( ! isSuggestMode ) {
