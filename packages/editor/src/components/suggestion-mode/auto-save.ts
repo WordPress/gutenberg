@@ -37,9 +37,16 @@
 import { useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
-import { useSuggestionOverlay } from './overlay-context';
+import {
+	useSuggestionOverlay,
+	POST_TITLE_OVERLAY_KEY,
+} from './overlay-context';
 import type { OverlayEntry, SuggestionOperation } from './overlay-context';
-import { operationsFromOverlay, useSuggestionsProvider } from './provider';
+import {
+	operationsFromOverlay,
+	postOperationsFromOverlay,
+	useSuggestionsProvider,
+} from './provider';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 
@@ -74,12 +81,23 @@ export function fingerprintOperations(
  * removal — in which case the structural op leads and any attribute ops
  * follow.
  *
- * @param entry Overlay entry.
+ * The post title entry is not a block, so its diff becomes
+ * `post-attribute-set` ops instead.
+ *
+ * @param entry      Overlay entry.
+ * @param [clientId] The entry's overlay key.
  * @return Ops describing the entry's pending suggestion.
  */
 export function operationsForEntry(
-	entry: OverlayEntry
+	entry: OverlayEntry,
+	clientId?: string
 ): SuggestionOperation[] {
+	if ( clientId === POST_TITLE_OVERLAY_KEY ) {
+		return postOperationsFromOverlay(
+			entry.baselineAttributes,
+			entry.overlayAttributes
+		);
+	}
 	const ops: SuggestionOperation[] = [];
 	if ( entry.structuralOp ) {
 		ops.push( entry.structuralOp );
@@ -170,7 +188,7 @@ export default function SuggestionAutoSave() {
 			if ( ! entry ) {
 				return;
 			}
-			const operations = operationsForEntry( entry );
+			const operations = operationsForEntry( entry, clientId );
 			const fingerprint = fingerprintOperations( operations );
 			if ( fingerprint === entry.syncedOpsKey ) {
 				return;
@@ -292,7 +310,7 @@ export default function SuggestionAutoSave() {
 			if ( previous[ clientId ] === entry ) {
 				continue;
 			}
-			const operations = operationsForEntry( entry );
+			const operations = operationsForEntry( entry, clientId );
 			const fingerprint = fingerprintOperations( operations );
 			if ( fingerprint === entry.syncedOpsKey ) {
 				continue;

@@ -38,6 +38,9 @@ import {
 	useSuggestionsProvider,
 	getSuggestionsResolvedThisSession,
 	forgetResolvedSuggestion,
+	findPostAttributeOps,
+	postOperationsFromOverlay,
+	applyPostOperations,
 } from '../provider';
 import {
 	SuggestionOverlayProvider,
@@ -135,6 +138,49 @@ describe( 'operationsFromOverlay', () => {
 	it( 'returns an empty array for an empty overlay', () => {
 		expect( operationsFromOverlay( { a: 1 }, {} ) ).toEqual( [] );
 		expect( operationsFromOverlay( { a: 1 }, null ) ).toEqual( [] );
+	} );
+} );
+
+describe( 'post attribute operations', () => {
+	const TITLE_OP = {
+		type: 'post-attribute-set',
+		attribute: 'title',
+		before: 'Old',
+		after: 'New',
+	};
+
+	it( 'builds post-attribute-set ops from a title overlay', () => {
+		expect(
+			postOperationsFromOverlay( { title: 'Old' }, { title: 'New' } )
+		).toEqual( [ TITLE_OP ] );
+		expect(
+			postOperationsFromOverlay( { title: 'Same' }, { title: 'Same' } )
+		).toEqual( [] );
+	} );
+
+	it( 'finds only the post attribute ops in a payload', () => {
+		expect(
+			findPostAttributeOps( [
+				{ type: 'attribute-set', attribute: 'level' },
+				TITLE_OP,
+			] )
+		).toEqual( [ TITLE_OP ] );
+		expect( findPostAttributeOps( undefined ) ).toEqual( [] );
+	} );
+
+	it( 'turns post attribute ops into post edits', () => {
+		expect( applyPostOperations( [ TITLE_OP ] ) ).toEqual( {
+			title: 'New',
+		} );
+	} );
+
+	it( 'reports a conflict once the live title moved off the baseline', () => {
+		expect( hasAttributeConflict( { title: 'Old' }, [ TITLE_OP ] ) ).toBe(
+			false
+		);
+		expect(
+			hasAttributeConflict( { title: 'Edited since' }, [ TITLE_OP ] )
+		).toBe( true );
 	} );
 } );
 

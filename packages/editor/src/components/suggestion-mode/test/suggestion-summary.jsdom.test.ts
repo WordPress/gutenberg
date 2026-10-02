@@ -922,4 +922,32 @@ describe( 'summarizeOperations', () => {
 			] )
 		).toEqual( [ { label: 'Change:', value: 'style' } ] );
 	} );
+
+	it( 'summarizes a post title suggestion as before and after', () => {
+		expect(
+			summarizeOperations( [
+				{
+					type: 'post-attribute-set',
+					attribute: 'title',
+					before: 'Old title',
+					after: 'New title',
+				},
+			] )
+		).toEqual( [
+			{ label: 'Title:', value: '“Old title” → “New title”' },
+		] );
+	} );
+
+	it( 'quotes only the proposed title when the post had none', () => {
+		expect(
+			summarizeOperations( [
+				{
+					type: 'post-attribute-set',
+					attribute: 'title',
+					before: '',
+					after: 'Fresh title',
+				},
+			] )
+		).toEqual( [ { label: 'Title:', value: '“Fresh title”' } ] );
+	} );
 } );

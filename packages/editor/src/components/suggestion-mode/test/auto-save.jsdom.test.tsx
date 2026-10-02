@@ -8,6 +8,7 @@ import SuggestionAutoSave, { operationsForEntry } from '../auto-save';
 import {
 	SuggestionOverlayProvider,
 	useSuggestionOverlay,
+	POST_TITLE_OVERLAY_KEY,
 } from '../overlay-context';
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
@@ -580,6 +581,28 @@ describe( 'operationsForEntry', () => {
 				attribute: 'content',
 				before: 'a',
 				after: 'b',
+			},
+		] );
+	} );
+
+	it( 'derives post-attribute-set ops for the post title entry', () => {
+		expect(
+			operationsForEntry(
+				{
+					blockName: '',
+					baselineAttributes: { title: 'Old' },
+					overlayAttributes: { title: 'New' },
+					commentId: null,
+					syncedOpsKey: null,
+				},
+				POST_TITLE_OVERLAY_KEY
+			)
+		).toEqual( [
+			{
+				type: 'post-attribute-set',
+				attribute: 'title',
+				before: 'Old',
+				after: 'New',
 			},
 		] );
 	} );
