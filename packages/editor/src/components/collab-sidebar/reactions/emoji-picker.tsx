@@ -14,7 +14,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	detectLocale,
-	getOverrideLabel,
 	normalizeHexcode,
 	useEmojibaseConfig,
 	useEmojibaseData,
@@ -22,11 +21,9 @@ import {
 import type { EmojibaseEntry } from './emojibase-data';
 import { useFrequentEmojis } from './frequent-emojis';
 import {
+	REACTION_EMOJIS,
 	emojiToHexKey,
-	getNamedHexKeys,
-	isReactionEmojiAllowed,
-	useReactionEmojiRules,
-	useReactionEmojis,
+	getCuratedLabel,
 } from './reaction-emojis';
 import type { CuratedEmoji } from './reaction-emojis';
 import SkinTonePicker, { applySkinTone } from './skin-tone-picker';
@@ -181,15 +178,13 @@ export function chunkRows< T >( emojis: T[] ): T[][] {
  * Case-insensitive search over emoji labels and Emojibase tags. Returns
  * the unfiltered list when the query is empty.
  *
- * @param emojis    Emoji records.
- * @param query     Search query.
- * @param overrides Map of `hexcode => translated label`.
+ * @param emojis Emoji records.
+ * @param query  Search query.
  * @return Matching emoji records.
  */
 export function searchEmojis(
 	emojis: EmojibaseEntry[],
-	query: string,
-	overrides: Record< string, string > | null
+	query: string
 ): EmojibaseEntry[] {
 	const trimmed = query.trim().toLowerCase();
 	if ( ! trimmed ) {
@@ -197,11 +192,11 @@ export function searchEmojis(
 	}
 	return emojis.filter( ( entry ) => {
 		/*
-		 * Match both the override and the original Emojibase label, so
-		 * searching either name finds the emoji.
+		 * Match both the curated and the Emojibase label, so searching
+		 * either name finds the emoji.
 		 */
-		const override = getOverrideLabel( overrides, entry.hexcode );
-		if ( override && override.toLowerCase().includes( trimmed ) ) {
+		const curated = getCuratedLabel( normalizeHexcode( entry.hexcode ) );
+		if ( curated && curated.toLowerCase().includes( trimmed ) ) {
 			return true;
 		}
 		if ( entry.label && entry.label.toLowerCase().includes( trimmed ) ) {
@@ -263,30 +258,18 @@ export default function EmojiPicker( {
 	 */
 	const [ isWarm, setIsWarm ] = useState( false );
 	const warm = () => setIsWarm( true );
-	const { baseUrl, labelOverrides } = useEmojibaseConfig();
+	const { baseUrl } = useEmojibaseConfig();
 	const [ locale ] = useState( detectLocale );
 	const {
 		data: dataset,
 		isLoading,
 		error,
 	} = useEmojibaseData( isWarm ? baseUrl : null, locale );
-	const namedEmojis = useReactionEmojis();
-	const rules = useReactionEmojiRules();
 	const hasDataset = !! dataset;
-	// Offer only what the REST API accepts under the site's emoji rules.
-	const data = useMemo( () => {
-		if ( ! dataset ) {
-			return namedEmojisToEntries( namedEmojis );
-		}
-		const namedKeys = getNamedHexKeys( namedEmojis );
-		return dataset.filter( ( entry ) =>
-			isReactionEmojiAllowed(
-				normalizeHexcode( entry.hexcode ),
-				rules,
-				namedKeys
-			)
-		);
-	}, [ dataset, namedEmojis, rules ] );
+	const data = useMemo(
+		() => dataset ?? namedEmojisToEntries( REACTION_EMOJIS ),
+		[ dataset ]
+	);
 	const [ query, setQuery ] = useState( '' );
 
 	/*
@@ -337,7 +320,7 @@ export default function EmojiPicker( {
 	/*
 	 * The items handed to `Autocomplete.Root`: category groups while
 	 * browsing, a flat list while searching. Filtering stays ours
-	 * (`filter={ null }`), since it matches label overrides and Emojibase
+	 * (`filter={ null }`), since it matches curated labels and Emojibase
 	 * tags, so these are already the visible results.
 	 */
 	const items = useMemo( (): EmojiOptionGroup[] | EmojiOption[] => {
@@ -354,7 +337,7 @@ export default function EmojiPicker( {
 				key: `${ prefix }-${ entry.hexcode }`,
 				value: display.emoji,
 				label:
-					getOverrideLabel( labelOverrides, display.hexcode ) ||
+					getCuratedLabel( normalizeHexcode( display.hexcode ) ) ||
 					display.label ||
 					'',
 				hexKey: normalizeHexcode( entry.hexcode ),
@@ -362,7 +345,7 @@ export default function EmojiPicker( {
 		};
 
 		if ( ! hasDataset ) {
-			return searchEmojis( data, query, labelOverrides ).map( ( entry ) =>
+			return searchEmojis( data, query ).map( ( entry ) =>
 				toOption( entry, 'named' )
 			);
 		}
@@ -374,9 +357,7 @@ export default function EmojiPicker( {
 			 * mostly-empty headers.
 			 */
 			return groups
-				.flatMap( ( group ) =>
-					searchEmojis( group.emojis, query, labelOverrides )
-				)
+				.flatMap( ( group ) => searchEmojis( group.emojis, query ) )
 				.map( ( entry ) => toOption( entry, 'search' ) );
 		}
 
@@ -407,7 +388,6 @@ export default function EmojiPicker( {
 		groups,
 		isSearching,
 		query,
-		labelOverrides,
 		frequentKeys,
 		recordByHexKey,
 		skinTone,

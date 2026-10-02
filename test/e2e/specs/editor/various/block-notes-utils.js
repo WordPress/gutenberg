@@ -156,9 +156,9 @@ class BlockNoteUtils {
 			.click();
 		await this.waitForFullPicker();
 
-		// Curated and filter-provided reactions carry exact label
-		// overrides (e.g. "Heart") and are seeded into the "Frequently
-		// used" section, so an exact-name gridcell lookup finds them
+		// Curated reactions carry their own exact labels (e.g. "Heart")
+		// and are seeded into the "Frequently used" section, so an
+		// exact-name gridcell lookup finds them
 		// without matching Emojibase labels that merely contain the name
 		// (e.g. "smiling face with hearts").
 		await this.#page

@@ -9,11 +9,7 @@ import { Button, Stack, Tooltip } from '@wordpress/ui';
 import { useState, useCallback, useMemo } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-import {
-	hexKeyToEmoji,
-	buildEmojiBySlugMap,
-	useReactionEmojis,
-} from './reaction-emojis';
+import { hexKeyToEmoji, buildEmojiBySlugMap } from './reaction-emojis';
 import { useEmojiLabel } from './emojibase-data';
 
 interface ReactionSummaryEntry {
@@ -388,13 +384,7 @@ export default function ReactionDisplay( {
 	onToggleReaction,
 	children,
 }: ReactionDisplayProps ) {
-	// The list is filterable server-side (and static per page load),
-	// so index it once per list identity.
-	const emojis = useReactionEmojis();
-	const emojiBySlug = useMemo(
-		() => buildEmojiBySlugMap( emojis ),
-		[ emojis ]
-	);
+	const emojiBySlug = useMemo( () => buildEmojiBySlugMap(), [] );
 	const reactedSlugs = getReactedSlugs( reactions );
 
 	if ( reactedSlugs.length === 0 && ! children ) {

@@ -1486,7 +1486,7 @@ test.describe( 'Block Notes', () => {
 			// Open the full picker and click the plain heart specifically.
 			/*
 			 * Search first so the click lands on the Emojibase entry, not
-			 * the Frequently used seed. "Heart" is a label override, so the
+			 * the Frequently used seed. "Heart" is a curated label, so the
 			 * exact match skips "smiling face with hearts".
 			 */
 			await page
@@ -1734,43 +1734,6 @@ test.describe( 'Block Notes', () => {
 			// still bubble to the thread's `useFocusOutside` through the
 			// React tree, so the thread stays selected and the trigger mounted.
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
-		} );
-
-		test.describe( 'Filtered emoji list', () => {
-			test.beforeAll( async ( { requestUtils } ) => {
-				await requestUtils.activatePlugin(
-					'gutenberg-test-note-reaction-emojis'
-				);
-			} );
-
-			test.afterAll( async ( { requestUtils } ) => {
-				await requestUtils.deactivatePlugin(
-					'gutenberg-test-note-reaction-emojis'
-				);
-			} );
-
-			test( 'can react with a filter-added emoji', async ( {
-				page,
-				blockNoteUtils,
-			} ) => {
-				await blockNoteUtils.addBlockWithNote( {
-					type: 'core/paragraph',
-					attributes: { content: 'Testing filtered reaction' },
-					comment: 'Filtered reaction',
-				} );
-
-				// Exercises the whole path: the picker offers the custom
-				// entry, the REST API accepts its slug, and the pill
-				// resolves the slug back to the filtered emoji and label.
-				await blockNoteUtils.addReactionToComment( 'Unicorn' );
-
-				const reactionButton = page.getByRole( 'button', {
-					name: /Unicorn/,
-				} );
-				await expect( reactionButton ).toBeVisible();
-				await expect( reactionButton ).toContainText( '🦄' );
-				await expect( reactionButton ).toContainText( '1' );
-			} );
 		} );
 	} );
 

@@ -494,8 +494,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			}
 
 			// Validate the reaction content. We accept either:
-			// - a named slug (e.g. "heart") from the allowed emoji list
-			//   (filterable via `gutenberg_note_reaction_emoji_settings`), or
+			// - a named slug (e.g. "heart") from the curated emoji list, or
 			// - a lowercase hex-codepoint sequence joined by `-` (e.g.
 			//   "1f44d" for 👍 or "1f468-200d-1f4bb" for 👨‍💻), which is how
 			//   the picker stores a pick from the Emojibase dataset.
@@ -530,12 +529,6 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 						break;
 					}
 				}
-			}
-
-			// Sites can exclude emoji or limit reactions to the named list
-			// via `gutenberg_note_reaction_emoji_settings`.
-			if ( $is_hex_key && ! $is_curated_slug ) {
-				$is_hex_key = gutenberg_is_note_reaction_hex_key_allowed( $emoji_slug );
 			}
 
 			if ( ! $is_curated_slug && ! $is_hex_key ) {

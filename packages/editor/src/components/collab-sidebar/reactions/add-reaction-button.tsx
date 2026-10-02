@@ -7,12 +7,7 @@ import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/ui';
 import { reaction as reactionIcon } from '@wordpress/icons';
 import EmojiPicker from './emoji-picker';
-import {
-	emojiToStorageKey,
-	useReactionEmojiRules,
-	useReactionEmojis,
-} from './reaction-emojis';
-import { useEmojibaseConfig } from './emojibase-data';
+import { emojiToStorageKey } from './reaction-emojis';
 
 interface AddReactionButtonProps {
 	disabled?: boolean;
@@ -32,16 +27,6 @@ export function AddReactionButton( {
 	disabled = false,
 	onToggleReaction,
 }: AddReactionButtonProps ) {
-	const emojis = useReactionEmojis();
-	const rules = useReactionEmojiRules();
-	const { baseUrl } = useEmojibaseConfig();
-
-	// With an emptied named list and no dataset, or a dataset limited to
-	// that list, there is nothing to pick.
-	if ( ! emojis.length && ( ! baseUrl || ! rules.allowUnlisted ) ) {
-		return null;
-	}
-
 	return (
 		<EmojiPicker
 			label={ __( 'Add reaction' ) }
@@ -58,7 +43,7 @@ export function AddReactionButton( {
 			}
 			disabled={ disabled }
 			onSelect={ ( emoji ) =>
-				onToggleReaction( emojiToStorageKey( emoji, emojis ) )
+				onToggleReaction( emojiToStorageKey( emoji ) )
 			}
 		/>
 	);

@@ -32,7 +32,7 @@ collab-sidebar/
 │   ├── skin-tone-picker.tsx         SkinTonePicker - default skin tone preference Menu
 │   ├── emojibase-data.ts            Emojibase dataset loading, labels, and settings
 │   ├── frequent-emojis.ts           useFrequentEmojis - persisted "Frequently used" section
-│   └── reaction-emojis.ts           named reaction set, storage keys, and the site's emoji rules
+│   └── reaction-emojis.ts           curated reaction set and storage keys
 │
 ├── hooks.js                        useNoteThreads, useNoteActions, useNoteSelection, useFloatingBoard, useEnableFloatingSidebar
 ├── utils.js                        focusNoteThread, getNoteExcerpt, sanitizeNoteContent, calculateNotePositions, getAvatarBorderColor
