@@ -6,6 +6,8 @@ import {
 } from '@wordpress/components';
 import { Stack, Text } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
+import { getBlockType } from '@wordpress/blocks';
+import { RichTextData } from '@wordpress/rich-text';
 // @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { check, closeSmall } from '@wordpress/icons';
@@ -16,9 +18,60 @@ import {
 	useSuggestionsProvider,
 } from '../suggestion-mode';
 import SuggestionSummary from '../suggestion-mode/suggestion-summary';
-import { findSuggestionText } from '../inline-suggestions';
+import {
+	findSuggestionText,
+	stripSuggestionMarkers,
+} from '../inline-suggestions';
 
 const EMPTY_ARRAY: Array< string | null > = [];
+
+const STRUCTURAL_OP_TYPES = new Set( [
+	'block-insert-after',
+	'block-remove',
+	'block-move',
+] );
+
+/**
+ * Plain visible text of a block, read from its first non-empty rich-text
+ * attribute with suggestion markers unwrapped. Lets a structural summary say
+ * which block it means. Returns null for a block with no text (an image
+ * without a caption, a container, an empty paragraph).
+ *
+ * @param blockName  Block name.
+ * @param attributes Block attributes.
+ * @return The block's text, or null.
+ */
+function readBlockText(
+	blockName: string | undefined,
+	attributes: Record< string, any > | null | undefined
+): string | null {
+	if ( ! blockName || ! attributes ) {
+		return null;
+	}
+	const definitions: Record< string, any > =
+		getBlockType( blockName )?.attributes ?? {};
+	for ( const [ key, definition ] of Object.entries( definitions ) ) {
+		if (
+			definition?.type !== 'rich-text' &&
+			definition?.source !== 'rich-text'
+		) {
+			continue;
+		}
+		const value = stripSuggestionMarkers( attributes[ key ] );
+		let text = '';
+		if ( value instanceof RichTextData ) {
+			text = value.text;
+		} else if ( typeof value === 'string' ) {
+			text = RichTextData.fromHTMLString( value ).text;
+		}
+		// Drop the object replacement character inline images leave behind.
+		text = text.replace( /\uFFFC/g, '' ).trim();
+		if ( text ) {
+			return text;
+		}
+	}
+	return null;
+}
 
 /**
  * Read-only status constants — keep in sync with `_wp_suggestion_status`
@@ -273,14 +326,47 @@ function ResolvedSuggestionSummary( {
 		},
 		[ operations, thread?.blockClientId, thread?.id ]
 	);
+	/*
+	 * A structural op carries no text of its own, so read it from the block:
+	 * the live one first, which tracks typing into an inserted block, then
+	 * the snapshot the interceptor records on the op.
+	 */
+	const blockTexts = useSelect(
+		( select ) => {
+			if (
+				! operations.some( ( op: any ) =>
+					STRUCTURAL_OP_TYPES.has( op.type )
+				)
+			) {
+				return EMPTY_ARRAY;
+			}
+			const { getBlockAttributes } = select( blockEditorStore );
+			return operations.map( ( op: any ) => {
+				if ( ! STRUCTURAL_OP_TYPES.has( op.type ) ) {
+					return null;
+				}
+				// `op.clientId` is session-local and goes stale on reload;
+				// the thread's block id is resolved from block metadata.
+				const liveAttributes =
+					( op.clientId && getBlockAttributes( op.clientId ) ) ||
+					( thread?.blockClientId &&
+						getBlockAttributes( thread.blockClientId ) ) ||
+					null;
+				return readBlockText(
+					op.blockName,
+					liveAttributes ?? op.block?.attributes
+				);
+			} );
+		},
+		[ operations, thread?.blockClientId ]
+	);
 	const resolvedOperations = useMemo(
 		() =>
-			operations.map( ( op: any, index: number ) =>
-				markerTexts[ index ]
-					? { ...op, text: markerTexts[ index ] }
-					: op
-			),
-		[ operations, markerTexts ]
+			operations.map( ( op: any, index: number ) => {
+				const text = markerTexts[ index ] ?? blockTexts[ index ];
+				return text ? { ...op, text } : op;
+			} ),
+		[ operations, markerTexts, blockTexts ]
 	);
 
 	return <SuggestionSummary operations={ resolvedOperations } />;

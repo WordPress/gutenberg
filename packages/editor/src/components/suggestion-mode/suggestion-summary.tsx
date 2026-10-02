@@ -20,6 +20,8 @@
  *                        (e.g. `level` → "heading level") and humanizes any
  *                        attribute not in that map so a brand-new attribute
  *                        isn't silently swallowed or shown as `camelCase`.
+ *                        A scalar value states both sides of the change
+ *                        ("heading level 3 → 4"); objects keep the bare name.
  *   - **Rename block:** — the one attribute change worth its own line: a
  *                        block renamed through `metadata.name`, reported
  *                        with the name being proposed.
@@ -38,7 +40,8 @@
  * want to hunt for in the canvas, so a line that renders as an empty or
  * ambiguous quote is a review failure: whitespace-only edits are described by
  * kind and count ("3 spaces") rather than quoted into invisibility, and
- * structural lines name the parent block when there is one.
+ * structural lines name the parent block when there is one and quote the
+ * block's text when the sidebar resolved some.
  *
  * "Change:" and the two "… formatting:" labels name different families of
  * suggestion, so they have to be readable as different things in a mixed list.
@@ -170,6 +173,96 @@ function structuralBlockLabel( blockName: any, parentBlockName: any ): string {
 		__( '%1$s in %2$s' ),
 		name,
 		friendlyBlockName( parentBlockName )
+	);
+}
+
+/**
+ * Value of a structural line: the block label, followed by the block's text
+ * when the sidebar resolved some into `op.text`. Without the text, removing a
+ * whole paragraph read "Remove block: paragraph" while deleting the same words
+ * as a text selection read "Delete: “First paragraph”", and an inserted
+ * paragraph never showed what was typed into it. A block with no text (an
+ * image, an empty paragraph) keeps the bare label.
+ *
+ * @param op Structural operation.
+ * @return Display value.
+ */
+function structuralBlockValue( op: any ): string {
+	const label = structuralBlockLabel( op.blockName, op.parentBlockName );
+	const text = isTextLike( op.text ) ? ellipsize( op.text ) : '';
+	if ( text === '' ) {
+		return label;
+	}
+	return `${ label } “${ text }”`;
+}
+
+/**
+ * Whether an attribute value is a plain scalar that reads sensibly in a
+ * summary line. Objects (style, metadata) and arrays have no short form, so
+ * they keep the bare attribute name.
+ *
+ * @param value Attribute value.
+ * @return True for strings, numbers, booleans, and unset values.
+ */
+function isScalarAttributeValue( value: any ): boolean {
+	return (
+		value === null ||
+		value === undefined ||
+		[ 'string', 'number', 'boolean' ].includes( typeof value )
+	);
+}
+
+/**
+ * Present one side of a scalar attribute change. An unset value is the
+ * block's default, so say that rather than showing an empty string.
+ *
+ * @param value Scalar attribute value.
+ * @return Display text.
+ */
+function presentAttributeValue( value: any ): string {
+	if ( value === null || value === undefined || value === '' ) {
+		return __( 'default' );
+	}
+	return ellipsize( String( value ), REPLACE_SIDE_MAX_CHARS );
+}
+
+/**
+ * Display name for an attribute key: the friendly label when there is one,
+ * the humanized key otherwise.
+ *
+ * @param key Attribute key.
+ * @return Display name.
+ */
+function attributeLabel( key: any ): string {
+	return (
+		( ATTRIBUTE_LABELS as Record< string, string > )[ key ] ??
+		humanizeAttributeName( key )
+	);
+}
+
+/**
+ * Describe a non-text attribute change. "Change: heading level" left the
+ * reviewer to guess which level was proposed; a scalar value is short enough
+ * to state both sides of ("heading level 3 → 4"). Object values have no short
+ * form and keep the bare name.
+ *
+ * @param op `attribute-set` operation.
+ * @return Display text.
+ */
+function describeAttributeChange( op: any ): string {
+	const name = attributeLabel( op.attribute );
+	if (
+		! isScalarAttributeValue( op.before ) ||
+		! isScalarAttributeValue( op.after )
+	) {
+		return name;
+	}
+	return sprintf(
+		/* translators: 1: setting name, e.g. "heading level". 2: current value. 3: proposed value. */
+		__( '%1$s %2$s → %3$s' ),
+		name,
+		presentAttributeValue( op.before ),
+		presentAttributeValue( op.after )
 	);
 }
 
@@ -607,21 +700,21 @@ export function summarizeOperations(
 		if ( op.type === 'block-remove' ) {
 			lines.push( {
 				label: __( 'Remove block:' ),
-				value: structuralBlockLabel( op.blockName, op.parentBlockName ),
+				value: structuralBlockValue( op ),
 			} );
 			continue;
 		}
 		if ( op.type === 'block-insert-after' ) {
 			lines.push( {
 				label: __( 'Insert block:' ),
-				value: structuralBlockLabel( op.blockName, op.parentBlockName ),
+				value: structuralBlockValue( op ),
 			} );
 			continue;
 		}
 		if ( op.type === 'block-move' ) {
 			lines.push( {
 				label: __( 'Move block:' ),
-				value: structuralBlockLabel( op.blockName, op.parentBlockName ),
+				value: structuralBlockValue( op ),
 			} );
 			continue;
 		}
@@ -656,7 +749,7 @@ export function summarizeOperations(
 					if ( linkChange ) {
 						linkChanges.push( linkChange );
 					} else {
-						attributeLabels.push( op.attribute );
+						attributeLabels.push( attributeLabel( op.attribute ) );
 					}
 				}
 				continue;
@@ -668,7 +761,7 @@ export function summarizeOperations(
 			// signalled by a non-string or empty `op.text`.
 			const text = isTextLike( op.text ) ? clampText( op.text ) : '';
 			if ( text === '' ) {
-				attributeLabels.push( op.attribute );
+				attributeLabels.push( attributeLabel( op.attribute ) );
 				continue;
 			}
 			lines.push( {
@@ -681,7 +774,7 @@ export function summarizeOperations(
 			continue;
 		}
 		if ( op.type !== 'attribute-set' ) {
-			attributeLabels.push( op.attribute );
+			attributeLabels.push( attributeLabel( op.attribute ) );
 			continue;
 		}
 
@@ -732,7 +825,11 @@ export function summarizeOperations(
 			( op.after?.length ?? 0 ) <= MAX_DIFF_LENGTH;
 
 		if ( ! canTextDiff ) {
-			attributeLabels.push( op.attribute );
+			attributeLabels.push(
+				isContent
+					? attributeLabel( op.attribute )
+					: describeAttributeChange( op )
+			);
 			continue;
 		}
 
@@ -761,7 +858,7 @@ export function summarizeOperations(
 				if ( linkChange ) {
 					linkChanges.push( linkChange );
 				} else {
-					attributeLabels.push( op.attribute );
+					attributeLabels.push( attributeLabel( op.attribute ) );
 				}
 			}
 			continue;
@@ -795,7 +892,7 @@ export function summarizeOperations(
 				value: presentText( deleted ),
 			} );
 		} else {
-			attributeLabels.push( op.attribute );
+			attributeLabels.push( attributeLabel( op.attribute ) );
 		}
 	}
 
@@ -838,14 +935,9 @@ export function summarizeOperations(
 		 * suggestion, so their labels have to be tellable apart at a glance in
 		 * a mixed list. "Format:" next to "Formatting:" was not.
 		 */
-		const labels = attributeLabels.map(
-			( key ) =>
-				( ATTRIBUTE_LABELS as Record< string, string > )[ key ] ??
-				humanizeAttributeName( key )
-		);
 		lines.push( {
 			label: __( 'Change:' ),
-			value: joinAttributeLabels( labels ),
+			value: joinAttributeLabels( attributeLabels ),
 		} );
 	}
 
