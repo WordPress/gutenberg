@@ -1,37 +1,66 @@
+import type { CSSProperties, KeyboardEvent, MutableRefObject } from 'react';
 import { Fragment, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Stack, Text } from '@wordpress/ui';
-import {
-	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor
+// prettier-ignore
+import { store as blockEditorStore, privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
 import { NoteThread } from './note-thread';
-import { focusNoteThread } from './utils';
+import { focusNoteThread, selectNoteBlocks } from './utils';
+import type { Thread } from './utils';
 import { useFloatingBoard, useNoteActions, useNoteSelection } from './hooks';
 import { AddNote } from './add-note';
 import { store as editorStore } from '../../store';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
+export function Notes( {
+	notes,
+	sidebarRef,
+	isFloating = false,
+	styles,
+}: {
+	notes: Thread[];
+	sidebarRef: MutableRefObject< HTMLElement | null >;
+	isFloating?: boolean;
+	styles?: CSSProperties;
+} ) {
 	const {
 		onCreate: onAddReply,
 		onEdit: onEditNote,
 		onDelete,
 	} = useNoteActions();
 	const { selectNote } = unlock( useDispatch( editorStore ) );
-	const { selectBlock, toggleBlockSpotlight } = unlock(
+	const { selectBlock, multiSelect, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
 	);
+	// Bound selectors, read imperatively by `selectNoteBlocks` to tell an
+	// unbroken span from one with a gap. Passing the store descriptor doesn't
+	// subscribe this component to store changes.
+	const { getBlockRootClientId, getBlockOrder } =
+		useSelect( blockEditorStore );
 
 	const { selectedBlockClientId, orderedBlockIds } = useSelect(
 		( select ) => {
-			const { getSelectedBlockClientId, getClientIdsWithDescendants } =
-				select( blockEditorStore );
+			const {
+				getSelectedBlockClientId,
+				getMultiSelectedBlockClientIds,
+				getClientIdsWithDescendants,
+			} = select( blockEditorStore );
+			/*
+			 * Selecting a note that spans several blocks multi-selects them,
+			 * and `getSelectedBlockClientId` returns null for a multi-selection.
+			 * Fall back to the first block of the range, the note's anchor, so
+			 * the note stays in context instead of being deselected.
+			 */
+			const clientId =
+				getSelectedBlockClientId() ??
+				getMultiSelectedBlockClientIds()[ 0 ] ??
+				null;
 			return {
-				selectedBlockClientId: getSelectedBlockClientId(),
+				selectedBlockClientId: clientId,
 				orderedBlockIds: getClientIdsWithDescendants(),
 			};
 		},
@@ -53,13 +82,13 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 		if ( ! isFloating || selectedNote !== 'new' ) {
 			return notes;
 		}
-		const newNoteThread = {
+		const newNoteThread: Thread = {
 			id: 'new',
 			blockClientId: selectedBlockClientId,
 			content: { rendered: '' },
 		};
-		const out = [];
-		orderedBlockIds.forEach( ( blockId ) => {
+		const out: Thread[] = [];
+		orderedBlockIds.forEach( ( blockId: string ) => {
 			// Blocks can carry multiple notes — surface them all.
 			const threadsForBlock = notes.filter(
 				( t ) => t.blockClientId === blockId
@@ -80,7 +109,7 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 		orderedBlockIds,
 	] );
 
-	const handleDelete = async ( note ) => {
+	const handleDelete = async ( note: Thread ) => {
 		const currentIndex = threads.findIndex( ( t ) => t.id === note.id );
 		const nextThread = threads[ currentIndex + 1 ];
 		const prevThread = threads[ currentIndex - 1 ];
@@ -104,8 +133,12 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 			focusNoteThread( adjacentThread.id, sidebarRef.current );
 			if ( adjacentThread.blockClientId ) {
 				toggleBlockSpotlight( adjacentThread.blockClientId, true );
-				// Pass `null` as the second parameter to prevent focusing the block.
-				selectBlock( adjacentThread.blockClientId, null );
+				selectNoteBlocks( adjacentThread, {
+					selectBlock,
+					multiSelect,
+					getBlockRootClientId,
+					getBlockOrder,
+				} );
 			}
 		} else {
 			selectNote( undefined );
@@ -125,7 +158,11 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
 
-	const navigate = ( event, thread, isSelected ) => {
+	const navigate = (
+		event: KeyboardEvent< HTMLElement >,
+		thread: Thread,
+		isSelected: boolean
+	) => {
 		if ( event.defaultPrevented ) {
 			return;
 		}
@@ -141,8 +178,12 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 			// Expand thread.
 			selectNote( thread.id );
 			if ( !! thread.blockClientId ) {
-				// Pass `null` as the second parameter to prevent focusing the block.
-				selectBlock( thread.blockClientId, null );
+				selectNoteBlocks( thread, {
+					selectBlock,
+					multiSelect,
+					getBlockRootClientId,
+					getBlockOrder,
+				} );
 				toggleBlockSpotlight( thread.blockClientId, true );
 			}
 		} else if (
@@ -205,7 +246,7 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 			direction="column"
 			gap="md"
 			justify="flex-start"
-			ref={ ( node ) => {
+			ref={ ( node: HTMLElement | null ) => {
 				// Sometimes previous sidebar unmounts after the new one mounts.
 				// This ensures we always have the latest reference.
 				if ( node ) {

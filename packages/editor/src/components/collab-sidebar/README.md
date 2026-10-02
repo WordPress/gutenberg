@@ -12,36 +12,36 @@ Notes are stored as WordPress comments (`type: 'note'`) attached to the post. A 
 ```
 collab-sidebar/
 ├── README.md                       this file
-├── index.jsx                        NotesSidebarContainer → NotesSidebar (entry, toolbar slot fills)
-├── notes.jsx                        Notes - coordinator (outer Stack, actions, keyboard nav)
-├── note-thread.jsx                  NoteThread - per-thread (selection, floating registration, reply form)
+├── index.tsx                        NotesSidebarContainer → NotesSidebar (entry, toolbar slot fills)
+├── notes.tsx                        Notes - coordinator (outer Stack, actions, keyboard nav)
+├── note-thread.tsx                  NoteThread - per-thread (selection, floating registration, reply form)
 ├── note.jsx                         Note - per-card state (edit/delete mode, menu, dialog)
-├── note-card.jsx                    NoteCard - presentational shell (byline + actions slot + children)
+├── note-card.tsx                    NoteCard - presentational shell (byline + actions slot + children)
 ├── note-byline.jsx                  NoteByline - avatar + name + relative date
 ├── note-form.jsx                    NoteForm - rich text input + submit/cancel
-├── add-note.jsx                     AddNote - new-note surface (floating + template-locked cases)
-├── add-note-menu-item.jsx           AddNoteMenuItem - block-toolbar "Add note" trigger
+├── add-note.tsx                     AddNote - new-note surface (floating + template-locked cases)
+├── add-note-menu-item.tsx           AddNoteMenuItem - block-toolbar "Add note" trigger
 ├── note-indicator-toolbar.jsx       NoteAvatarIndicator - toolbar participants avatars
-├── floating-container.jsx           FloatingContainer - stack wrapper that applies `top` in floating mode
+├── floating-container.tsx           FloatingContainer - stack wrapper that applies `top` in floating mode
 │
-├── hooks.js                        useNoteThreads, useNoteActions, useNoteSelection, useFloatingBoard, useEnableFloatingSidebar
-├── utils.js                        focusNoteThread, getNoteExcerpt, sanitizeNoteContent, calculateNotePositions, getAvatarBorderColor
+├── hooks.ts                        useNoteThreads, useNoteActions, useNoteSelection, useFloatingBoard, useEnableFloatingSidebar
+├── utils.ts                        focusNoteThread, getNoteExcerpt, sanitizeNoteContent, calculateNotePositions, getAvatarBorderColor
 ├── board-store.js                  createBoardStore - DOM measurement for the floating layout
 ├── constants.js                    sidebar identifier strings
 ├── style.scss
 └── test/
-    └── utils.js
+    └── utils.jsdom.test.ts
 ```
 
 ## Component hierarchy
 
 ```
-NotesSidebarContainer (index.jsx)         - gates on post type support
- └── NotesSidebar (index.jsx)             - owns sidebarRef + useNoteThreads + sidebar registration
+NotesSidebarContainer (index.tsx)         - gates on post type support
+ └── NotesSidebar (index.tsx)             - owns sidebarRef + useNoteThreads + sidebar registration
       ├── AddNoteMenuItem                - slot fill in the block toolbar
       ├── NoteAvatarIndicator            - slot fill in the block toolbar (per-thread avatars)
       ├── PluginSidebar (all-notes)      - full sidebar
-      │    └── Notes (notes.jsx)          - owns outer Stack + aria-label + useNoteActions + keyboard nav
+      │    └── Notes (notes.tsx)          - owns outer Stack + aria-label + useNoteActions + keyboard nav
       │         ├── AddNote              - rendered when no threads (template-locked) or selectedNote === 'new'
       │         └── NoteThread[]         - per thread
       │              └── <FloatingContainer>
@@ -79,7 +79,7 @@ One `ResizeObserver` watches:
 - the root's parent, which grows when content above the root (e.g. a wrapping post title) moves the root without resizing it;
 - the canvas frame, which shrinks when content above the canvas moves it. A frame that moves without resizing isn't detected.
 
-Each callback runs `measure()`, which reads the heights and anchors (via `getNoteAnchorRect()` in `utils.js`) and emits only when a value changed.
+Each callback runs `measure()`, which reads the heights and anchors (via `getNoteAnchorRect()` in `utils.ts`) and emits only when a value changed.
 
 A `MutationObserver` watches `style` attributes under the root. The block move animation offsets moved blocks with a transform, which resizes nothing, so the first pass reads their old positions. The observer calls `requestMeasure()` once a changed element has no transform, so threads move when the animation ends rather than on every frame.
 
@@ -97,7 +97,7 @@ Registering never measures directly. `requestMeasure()` re-observes the root; a 
 - a block-level note - or any note whose marker or selection can't be measured - falls back to the block's own `getBoundingClientRect()`;
 - an anchor inside collapsed content (e.g. a closed Details) fails `checkVisibility()`, so it climbs to the closest visible block. Collapsed content still reports the box it would have when expanded, so its size can't tell it apart.
 
-### 2. `useFloatingBoard` - the React bridge (in `hooks.js`)
+### 2. `useFloatingBoard` - the React bridge (in `hooks.ts`)
 
 Lives inside `Notes`. Holds one store instance (`useState(createBoardStore)`) and:
 
@@ -107,7 +107,7 @@ Lives inside `Notes`. Holds one store instance (`useState(createBoardStore)`) an
 4. In a layout effect keyed on `isFloating + sidebarRef + canvas`, attaches a capture-phase `scroll` listener on the canvas's `defaultView` that writes `--canvas-scroll` on the sidebar panel. (`window` capture catches scrolls on the document root, which don't bubble.) A second layout effect writes the snapshot's `frameOffset` as `--canvas-offset`.
 5. Returns `{ notePositions, registerThread, unregisterThread }` - the positions flow down as props; the two register callbacks flow to each `NoteThread`.
 
-### 3. `calculateNotePositions` - pure layout math (in `utils.js`)
+### 3. `calculateNotePositions` - pure layout math (in `utils.ts`)
 
 Given the list of threads, the currently selected note id, the anchor rects, and the floating heights, returns `{ positions: { [noteId]: top } }` where `top` is the final canvas-space y-coordinate for each floating thread.
 

@@ -59,6 +59,10 @@
 
 -   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`, `PluginPreviewMenuItem`: Deprecate the `as` prop, which reached the item only because these components forward every extra prop. The menu now renders the item itself, so the prop is ignored ([#82319](https://github.com/WordPress/gutenberg/pull/82319)).
 
+### New Features
+
+-   Notes: Support notes that span several adjacent blocks, so feedback that runs from one block into the next can be left as a single note. The note is anchored in every block it covers, and selecting, resolving, or deleting it applies across the whole span. Opening the note - from the sidebar, from the block toolbar, or while the new-note form is open - keeps every spanned block lit under the spotlight, and hovering the thread outlines all of them ([#80009](https://github.com/WordPress/gutenberg/pull/80009)).
+
 ### Enhancements
 
 -   Media Library modal: Pass the current post and its post type to the modal so its "Attached to" filter can offer media uploaded to that post, under the post type's own wording. Only a viewable post type is passed on: a template has no front end of its own, so media can't be uploaded to one ([#81974](https://github.com/WordPress/gutenberg/pull/81974)).

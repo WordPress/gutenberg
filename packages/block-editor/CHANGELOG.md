@@ -11,6 +11,8 @@
 -   Inserter: Open faster when many block types are registered ([#83446](https://github.com/WordPress/gutenberg/pull/83446)).
 -   State control badges: migrate from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Badge` ([#82608](https://github.com/WordPress/gutenberg/pull/82608)).
 -   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
+-   Block settings menu: Render the private note slot for a multi-block selection as well as a single block, passing the number of selected blocks through `fillProps` so the fill can offer an entry for the whole selection ([#80009](https://github.com/WordPress/gutenberg/pull/80009)).
+-   Block highlight: More than one block can be highlighted at a time. `toggleBlockHighlight` adds to or removes from the set instead of replacing a single id, so a note spanning several blocks can outline the whole run it covers; `isBlockHighlighted` is unchanged ([#80009](https://github.com/WordPress/gutenberg/pull/80009)).
 
 ### Bug Fixes
 
