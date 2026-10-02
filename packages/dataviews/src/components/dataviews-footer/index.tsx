@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { useContext } from '@wordpress/element';
-import { Stack, inertValue } from '@wordpress/ui';
+import { inertValue } from '@wordpress/react-inert-value';
+import { Stack } from '@wordpress/ui';
 import DataViewsContext from '../dataviews-context';
 import DataViewsPagination, {
 	hasPaginationControls,

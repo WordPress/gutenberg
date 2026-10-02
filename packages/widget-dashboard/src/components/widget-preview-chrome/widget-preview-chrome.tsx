@@ -1,5 +1,6 @@
 import { useId, useMemo } from '@wordpress/element';
-import { Card, inertValue } from '@wordpress/ui';
+import { inertValue } from '@wordpress/react-inert-value';
+import { Card } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 import { WidgetContextProvider } from '../../context/widget-context';
 import { WidgetFrame } from '../widget-frame';
