@@ -28,7 +28,7 @@
 
 ### Bug Fixes
 
--   `Menu`: Keep item content top aligned and align the first submenu item's label with its parent item's label ([#84031](https://github.com/WordPress/gutenberg/pull/84031)).
+-   `Menu`: Align the first submenu item's label with its parent label, including when items have descriptions or wrapped labels ([#84031](https://github.com/WordPress/gutenberg/pull/84031)).
 -   `Checkbox`: Prevent rounded themes from making checkboxes circular. ([#83526](https://github.com/WordPress/gutenberg/pull/83526))
 -   `Select`, `SelectControl`, `Combobox`, `SearchableSelect`, `SearchableChipSelect`, `SearchableChipSelectControl`: Align the selected-item checkmark with the first line of the item label while keeping single-line items vertically centered. ([#82942](https://github.com/WordPress/gutenberg/pull/82942))
 -   `Popover`: Close non-modal popovers when the user presses inside a same-origin iframe. ([#83509](https://github.com/WordPress/gutenberg/pull/83509))

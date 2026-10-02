@@ -128,8 +128,7 @@
 
 		.item {
 			--wp-ui-menu-item-height: var(--wpds-dimension-size-md);
-			/* Keep the first line centered within the minimum item height. */
-			--wp-ui-menu-item-padding-block: max(var(--wpds-dimension-padding-xs), calc((var(--wp-ui-menu-item-height) - var(--_wp-ui-menu-item-label-line-height)) / 2));
+			--wp-ui-menu-item-padding-block: var(--wpds-dimension-padding-xs);
 			--_gcd-a-border-radius: var(--wpds-border-radius-sm);
 
 			display: grid;
@@ -262,6 +261,8 @@
 
 		.item-content {
 			grid-column: content-start / content-end;
+			/* Include the height of leading content when centering these slots. */
+			align-self: stretch;
 			/* Everything after the prefix is laid out independently per item. */
 			display: grid;
 			grid-template-columns:
@@ -270,7 +271,7 @@
 				[suffix-end shortcut-start] auto
 				[shortcut-end trailing-start] auto
 				[trailing-end];
-			align-items: start;
+			align-items: center;
 			box-sizing: border-box;
 			min-width: 0;
 			/* Keep clicks on presentational labels and suffixes routed to the menu item. */
@@ -279,6 +280,7 @@
 
 		.item-children {
 			grid-column: label-start / label-end;
+			align-self: start;
 			display: inline-flex;
 			flex-direction: column;
 			gap: 2px; /* var(--wpds-dimension-gap-xs); */
@@ -321,7 +323,6 @@
 
 		.item-trailing {
 			grid-column: trailing-start / trailing-end;
-			height: var(--_wp-ui-menu-item-label-line-height);
 			display: flex;
 			align-items: center;
 			margin-inline-start: var(--wpds-dimension-gap-md);
