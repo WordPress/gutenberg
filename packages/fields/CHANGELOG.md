@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Template choices: Resolve the active template from the choices for the edited post slug and post type, keeping the assignment when available and otherwise using the first choice ([#83083](https://github.com/WordPress/gutenberg/pull/83083)).
+
 ### Bug Fixes
 
 -   `AuthorView`: Fetch the author through the users list in the `view` context, so users who can't edit other users still see the author's name and avatar, including for authors without published posts. ([#83498](https://github.com/WordPress/gutenberg/pull/83498))

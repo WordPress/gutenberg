@@ -90,3 +90,85 @@ test.describe( 'Template resolution', () => {
 		} );
 	} );
 } );
+
+test.describe( 'Filtered template choices', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'emptytheme' );
+		await requestUtils.activatePlugin(
+			'gutenberg-test-post-template-choices'
+		);
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPages();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-post-template-choices'
+		);
+		await requestUtils.activateTheme( 'twentytwentyone' );
+	} );
+
+	test( 'shows only the extension template for the restricted page slug', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const post = await requestUtils.createPage( {
+			title: 'Landing page',
+			slug: 'landing-page',
+			status: 'publish',
+		} );
+		await admin.editPost( post.id );
+		await editor.openDocumentSettingsSidebar();
+		const control = page.getByRole( 'button', {
+			name: 'Template options',
+		} );
+		await expect( control ).toHaveText( 'Landing page' );
+		await control.click();
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Change template' } )
+		).toBeDisabled();
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Use default template' } )
+		).toHaveCount( 0 );
+	} );
+
+	test( 'switches from the assigned template when the page slug becomes restricted', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const post = await requestUtils.createPage( {
+			title: 'Regular page',
+			slug: 'regular-page',
+			status: 'publish',
+			template: 'standard-page',
+		} );
+		await admin.editPost( post.id );
+		await editor.openDocumentSettingsSidebar();
+		const control = page.getByRole( 'button', {
+			name: 'Template options',
+		} );
+		await expect( control ).toHaveText( 'Standard page' );
+
+		await page.getByRole( 'button', { name: /^Change link/ } ).click();
+		await page
+			.getByRole( 'textbox', { name: 'Slug' } )
+			.fill( 'landing-page' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Escape' );
+
+		await expect( control ).toHaveText( 'Landing page' );
+		await control.click();
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Change template' } )
+		).toBeDisabled();
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Use default template' } )
+		).toHaveCount( 0 );
+	} );
+} );

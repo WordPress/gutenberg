@@ -1,5 +1,4 @@
 import { useCallback, useMemo } from '@wordpress/element';
-import type { WpTemplate } from '@wordpress/core-data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { DataFormControlProps } from '@wordpress/dataviews';
 import { SelectControl as WCSelectControl } from '@wordpress/components';
@@ -7,7 +6,7 @@ import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { getItemTitle } from '../../actions/utils';
 import type { BasePost } from '../../types';
-import { useDefaultTemplateLabel, useTemplateFieldMode } from './hooks';
+import { usePostTemplate, useTemplateFieldMode } from './hooks';
 import { unlock } from '../../lock-unlock';
 
 type TemplateEditComponentProps = Omit<
@@ -16,8 +15,6 @@ type TemplateEditComponentProps = Omit<
 > & {
 	onChange: ( value: string ) => void;
 };
-
-const EMPTY_ARRAY: [] = [];
 
 function ClassicTemplateEdit( {
 	data,
@@ -73,49 +70,39 @@ function BlockThemeTemplateEdit( {
 	const postId =
 		typeof data.id === 'number' ? data.id : parseInt( data.id, 10 );
 	const slug = data.slug;
-	const { templates, canSwitchTemplate } = useSelect(
-		( select ) => {
-			const allTemplates =
-				select( coreStore ).getEntityRecords< WpTemplate >(
-					'postType',
-					'wp_template',
-					{
-						per_page: -1,
-						post_type: postType,
-					}
-				) ?? EMPTY_ARRAY;
-
-			const { getHomePage, getPostsPageId } = unlock(
-				select( coreStore )
-			);
-			const singlePostId = String( postId );
-			const isPostsPage = getPostsPageId() === singlePostId;
-			const isFrontPage =
-				postType === 'page' && getHomePage()?.postId === singlePostId;
-
-			return {
-				templates: allTemplates,
-				canSwitchTemplate: ! isPostsPage && ! isFrontPage,
-			};
-		},
-		[ postId, postType ]
-	);
-	const defaultTemplateLabel = useDefaultTemplateLabel(
-		postType,
-		postId,
-		slug
-	);
-	const value = field.getValue( { item: data } );
+	const assignedSlug = field.getValue( { item: data } );
+	const { currentTemplate, defaultTemplate, canSwitchTemplate, templates } =
+		usePostTemplate( postType, postId, slug, assignedSlug );
+	const value =
+		currentTemplate && currentTemplate.id !== defaultTemplate?.id
+			? currentTemplate.slug
+			: '';
 	const options = useMemo( () => {
-		const templateOptions = templates.map( ( template ) => ( {
-			label: getItemTitle( template ),
-			value: template.slug,
-		} ) );
-		return [
-			{ label: defaultTemplateLabel, value: '' },
-			...templateOptions,
-		];
-	}, [ templates, defaultTemplateLabel ] );
+		const templateOptions = templates
+			.filter( ( template ) => !! template.content.raw )
+			.map( ( template ) => ( {
+				label: getItemTitle( template ),
+				value: template.id === defaultTemplate?.id ? '' : template.slug,
+				disabled: false,
+			} ) );
+		if (
+			currentTemplate &&
+			! templateOptions.some( ( option ) => option.value === value )
+		) {
+			templateOptions.unshift( {
+				label: getItemTitle( currentTemplate ),
+				value,
+				disabled: true,
+			} );
+		}
+		return templateOptions;
+	}, [ templates, currentTemplate, defaultTemplate, value ] );
+	if ( ! currentTemplate ) {
+		return null;
+	}
+	const hasAlternative = options.some(
+		( option ) => ! option.disabled && option.value !== value
+	);
 	return (
 		<WCSelectControl
 			label={ __( 'Template' ) }
@@ -123,7 +110,9 @@ function BlockThemeTemplateEdit( {
 			value={ value }
 			options={ options }
 			onChange={ onChange }
-			disabled={ ! canSwitchTemplate }
+			disabled={
+				! canSwitchTemplate || ! defaultTemplate || ! hasAlternative
+			}
 		/>
 	);
 }

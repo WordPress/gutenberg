@@ -240,19 +240,27 @@ export const getTemplateId = createRegistrySelector(
 				slug: 'home',
 			} );
 		}
-		// First see if the post/page has an assigned template and fetch it.
-		const currentTemplateSlug = editedEntity.template;
-		if ( currentTemplateSlug ) {
-			const currentTemplate = select( STORE_NAME )
-				.getEntityRecords( 'postType', 'wp_template', {
-					per_page: -1,
-				} )
-				?.find( ( { slug } ) => slug === currentTemplateSlug );
-			if ( currentTemplate ) {
-				return currentTemplate.id;
+		const templates = select( STORE_NAME ).getEntityRecords(
+			'postType',
+			'wp_template',
+			{
+				per_page: -1,
+				post_type: postType,
+				slug: editedEntity.slug || undefined,
 			}
+		);
+		if ( ! templates ) {
+			return;
 		}
-		// If no template is assigned, use the default template.
+		// Keep the assignment when it is available; otherwise use the first
+		// choice returned by the server for this post's edited slug.
+		const currentTemplate =
+			templates.find( ( { slug } ) => slug === editedEntity.template ) ??
+			templates[ 0 ];
+		if ( currentTemplate ) {
+			return currentTemplate.id;
+		}
+		// If no templates are available, use the hierarchy default.
 		let slugToCheck;
 		// In `draft` status we might not have a slug available, so we use the `single`
 		// post type templates slug(ex page, single-post, single-product etc..).
