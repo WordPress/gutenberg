@@ -4,6 +4,7 @@ const PlaygroundRuntime = require( './playground' );
 const {
 	UnsupportedCommandError,
 	EnvironmentNotInitializedError,
+	DatabaseDowngradeError,
 } = require( './errors' );
 const { setCache, getCache } = require( '../cache' );
 
@@ -84,4 +85,5 @@ module.exports = {
 	PlaygroundRuntime,
 	UnsupportedCommandError,
 	EnvironmentNotInitializedError,
+	DatabaseDowngradeError,
 };

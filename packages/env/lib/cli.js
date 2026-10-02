@@ -11,6 +11,7 @@ const {
 	getRuntime,
 	UnsupportedCommandError,
 	EnvironmentNotInitializedError,
+	DatabaseDowngradeError,
 } = require( './runtime' );
 
 // Spinner.
@@ -39,7 +40,8 @@ const withSpinner =
 			( error ) => {
 				if (
 					error instanceof UnsupportedCommandError ||
-					error instanceof EnvironmentNotInitializedError
+					error instanceof EnvironmentNotInitializedError ||
+					error instanceof DatabaseDowngradeError
 				) {
 					// Error is a known user-facing error.
 					spinner.fail( error.message );

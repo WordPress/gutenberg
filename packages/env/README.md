@@ -840,7 +840,7 @@ You can tell `wp-env` which MariaDB version the database should run, for compati
 }
 ```
 
-MariaDB cannot start on a database written by a newer version. When switching to a lower version, run `wp-env destroy` first so the database is recreated.
+MariaDB cannot start on a database last used by a newer version. When that happens, `wp-env start` stops with an error that names both versions. To switch to a lower version, run `wp-env cleanup` first so the databases are recreated.
 
 MariaDB 5.5 and 10.0 images are not published for ARM processors. On Apple silicon, run those versions under emulation by setting `DOCKER_DEFAULT_PLATFORM=linux/amd64` before running `wp-env start`.
 
