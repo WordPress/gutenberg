@@ -9,6 +9,7 @@ import {
 	hasSuggestionMarkers,
 	stripSuggestionMarkers,
 	stripSuggestionMarkersFromAttributes,
+	settleInsertedSuggestionMarkers,
 } from '../strip-markers';
 import { registerSuggestionFormat, SUGGESTION_FORMAT_NAME } from '../format';
 
@@ -130,5 +131,83 @@ describe( 'stripSuggestionMarkersFromAttributes', () => {
 		expect( stripSuggestionMarkersFromAttributes( undefined ) ).toBe(
 			undefined
 		);
+	} );
+} );
+
+describe( 'settleInsertedSuggestionMarkers', () => {
+	const authored = (
+		type: string,
+		id: number,
+		author: number,
+		text: string
+	) =>
+		`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="${ type }" data-author="${ author }">${ text }</mark>`;
+
+	it( "keeps the author's own addition as plain text", () => {
+		const { value, ids } = settleInsertedSuggestionMarkers(
+			RichTextData.fromHTMLString(
+				`in${ authored( 'add', 7, 1, ' and more' ) }`
+			),
+			1
+		);
+		expect( value ).toBeInstanceOf( RichTextData );
+		expect( value.toHTMLString() ).toBe( 'in and more' );
+		expect( ids ).toEqual( [ '7' ] );
+	} );
+
+	it( "drops another author's addition, text and all", () => {
+		const { value, ids } = settleInsertedSuggestionMarkers(
+			`one ${ authored( 'add', 8, 2, 'two ' ) }three`,
+			1
+		);
+		expect( value ).toBe( 'one three' );
+		expect( ids ).toEqual( [ '8' ] );
+	} );
+
+	it( 'keeps text proposed for deletion and formatting proposed on a run', () => {
+		const { value, ids } = settleInsertedSuggestionMarkers(
+			`${ authored( 'del', 3, 2, 'gone' ) } and ${ authored(
+				'format',
+				4,
+				1,
+				'<strong>bold</strong>'
+			) }`,
+			1
+		);
+		expect( value ).toBe( 'gone and <strong>bold</strong>' );
+		expect( ids ).toEqual( [ '3', '4' ] );
+	} );
+
+	it( 'removes several foreign runs without shifting the others', () => {
+		const { value } = settleInsertedSuggestionMarkers(
+			`a${ authored( 'add', 5, 2, 'X' ) }b${ authored(
+				'add',
+				6,
+				1,
+				'Y'
+			) }c${ authored( 'add', 5, 2, 'ZZ' ) }`,
+			1
+		);
+		expect( value ).toBe( 'abYc' );
+	} );
+
+	it( 'treats an unauthored addition as foreign unless the author is unknown', () => {
+		const html = `a${ add( 9, 'b' ) }c`;
+		expect( settleInsertedSuggestionMarkers( html, 1 ).value ).toBe( 'ac' );
+		expect( settleInsertedSuggestionMarkers( html, null ).value ).toBe(
+			'abc'
+		);
+	} );
+
+	it( 'returns marker-free and non-string values by reference', () => {
+		const clean = RichTextData.fromHTMLString( 'clean' );
+		expect( settleInsertedSuggestionMarkers( clean, 1 ) ).toEqual( {
+			value: clean,
+			ids: [],
+		} );
+		expect( settleInsertedSuggestionMarkers( clean, 1 ).value ).toBe(
+			clean
+		);
+		expect( settleInsertedSuggestionMarkers( 3, 1 ).value ).toBe( 3 );
 	} );
 } );
