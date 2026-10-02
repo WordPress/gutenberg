@@ -8,18 +8,21 @@ import styles from './style.module.css';
 /**
  * The neutral track containing the filled meter indicator.
  */
-export const Track = forwardRef< HTMLDivElement, TrackProps >(
-	function MeterTrack( { className, ...props }, ref ) {
-		return (
-			<_Meter.Track
-				ref={ ref }
-				className={ clsx(
-					resetStyles[ 'box-sizing' ],
-					styles.track,
-					className
-				) }
-				{ ...props }
-			/>
-		);
-	}
-);
+const Track = forwardRef< HTMLDivElement, TrackProps >( function MeterTrack(
+	{ className, ...props },
+	ref
+) {
+	return (
+		<_Meter.Track
+			ref={ ref }
+			className={ clsx(
+				resetStyles[ 'box-sizing' ],
+				styles.track,
+				className
+			) }
+			{ ...props }
+		/>
+	);
+} );
+
+export { Track };

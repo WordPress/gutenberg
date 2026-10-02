@@ -91,7 +91,7 @@ describe( 'Meter', () => {
 				ref={ rootRef }
 				value={ 60 }
 				render={ <div data-custom="root" /> }
-				className="custom-progress"
+				className="custom-meter"
 			>
 				<Meter.Label
 					ref={ labelRef }
@@ -118,7 +118,7 @@ describe( 'Meter', () => {
 		expect( rootRef.current ).toBe(
 			screen.getByRole( 'meter', { name: 'Storage used' } )
 		);
-		expect( rootRef.current ).toHaveClass( 'custom-progress' );
+		expect( rootRef.current ).toHaveClass( 'custom-meter' );
 		expect( labelRef.current ).toBe( screen.getByText( 'Storage used' ) );
 		expect( valueRef.current ).toBe( screen.getByText( '60%' ) );
 		for ( const [ ref, name ] of [
