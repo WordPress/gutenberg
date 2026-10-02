@@ -19,8 +19,10 @@
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/icons": "file:../../packages/icons",
 		"@wordpress/lazy-editor": "file:../../packages/lazy-editor",
+		"@wordpress/react-inert-value": "file:../../packages/react-inert-value",
 		"@wordpress/route": "file:../../packages/route",
 		"@wordpress/routes-lock-unlock": "file:../lock-unlock",
+		"@wordpress/ui": "file:../../packages/ui",
 		"@wordpress/views": "file:../../packages/views"
 	}
 }

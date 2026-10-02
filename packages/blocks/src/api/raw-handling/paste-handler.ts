@@ -20,6 +20,7 @@ import shortcodeConverter from './shortcode-converter';
 import markdownConverter from './markdown-converter';
 import iframeRemover from './iframe-remover';
 import googleDocsUIDRemover from './google-docs-uid-remover';
+import nonBreakingSpaceCorrector from './non-breaking-space-corrector';
 import htmlFormattingRemover from './html-formatting-remover';
 import formatSpaceCorrector from './format-space-corrector';
 import brRemover from './br-remover';
@@ -57,6 +58,7 @@ function filterInlineHTML( HTML: string ): string {
 	);
 
 	HTML = deepFilterHTML( HTML, [
+		nonBreakingSpaceCorrector,
 		htmlFormattingRemover,
 		formatSpaceCorrector,
 		brRemover,
@@ -225,6 +227,7 @@ export function pasteHandler( {
 			piece = deepFilterHTML(
 				piece,
 				[
+					nonBreakingSpaceCorrector,
 					htmlFormattingRemover,
 					formatSpaceCorrector,
 					brRemover,

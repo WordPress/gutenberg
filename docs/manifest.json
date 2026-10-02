@@ -2724,6 +2724,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/react-inert-value",
+		"slug": "packages-react-inert-value",
+		"markdown_source": "../packages/react-inert-value/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/readable-js-assets-webpack-plugin",
 		"slug": "packages-readable-js-assets-webpack-plugin",
 		"markdown_source": "../packages/readable-js-assets-webpack-plugin/README.md",
