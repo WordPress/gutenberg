@@ -286,6 +286,27 @@ describe( 'validate-config', () => {
 			);
 		} );
 
+		it.each( [
+			'abc8',
+			'8.2-apache',
+			'8.5-fpm',
+			'php8.2',
+			'8.x',
+			'8.2 ',
+			'',
+		] )(
+			'throws for a value that is not only a version number: %j',
+			( version ) => {
+				expect( () =>
+					checkVersion( 'test.json', 'test', version )
+				).toThrow(
+					new ValidationError(
+						'Invalid test.json: "test" must be a string of the format "X", "X.X", or "X.X.X".'
+					)
+				);
+			}
+		);
+
 		it( 'passes for different version formats', () => {
 			expect( () =>
 				checkVersion( 'test.json', 'test', '1' )

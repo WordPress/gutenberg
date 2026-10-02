@@ -1,6 +1,12 @@
 'use strict';
 const { MARIADB_IMAGE_TAGS } = require( './db-env' );
 
+/*
+ * A version number such as "8", "8.2", or "8.2.1". Anchored so that the whole
+ * value has to match, as in the JSON schema.
+ */
+const VERSION_PATTERN = /^[0-9]+(?:\.[0-9]+)*$/;
+
 /**
  * @typedef {import('./parse-source-string').WPSource} WPSource
  */
@@ -141,13 +147,9 @@ function checkObjectWithValues(
  * @param {string} version    The version that we're checking.
  */
 function checkVersion( configFile, configKey, version ) {
-	if ( typeof version !== 'string' ) {
-		throw new ValidationError(
-			`Invalid ${ configFile }: "${ configKey }" must be a string.`
-		);
-	}
+	checkString( configFile, configKey, version );
 
-	if ( ! version.match( /[0-9]+(?:\.[0-9]+)*/ ) ) {
+	if ( ! VERSION_PATTERN.test( version ) ) {
 		throw new ValidationError(
 			`Invalid ${ configFile }: "${ configKey }" must be a string of the format "X", "X.X", or "X.X.X".`
 		);
@@ -163,17 +165,13 @@ function checkVersion( configFile, configKey, version ) {
  * @param {string} version    The version that we're checking.
  */
 function checkMariaDBVersion( configFile, configKey, version ) {
-	if ( typeof version !== 'string' ) {
-		throw new ValidationError(
-			`Invalid ${ configFile }: "${ configKey }" must be a string.`
-		);
-	}
+	checkString( configFile, configKey, version );
 
 	if ( MARIADB_IMAGE_TAGS.includes( version ) ) {
 		return;
 	}
 
-	if ( ! /^[0-9]+(?:\.[0-9]+)*$/.test( version ) ) {
+	if ( ! VERSION_PATTERN.test( version ) ) {
 		const tags = MARIADB_IMAGE_TAGS.map( ( tag ) => `"${ tag }"` ).join(
 			', '
 		);
