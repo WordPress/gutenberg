@@ -677,9 +677,12 @@ test.describe( 'Suggestion mode', () => {
 		await expect( added ).toHaveAttribute( 'data-suggestion-id', /\d/ );
 		const id = await added.getAttribute( 'data-suggestion-id' );
 
-		// Select "ro" and type over it.
-		await pageUtils.pressKeys( 'ArrowLeft', { times: 2 } );
-		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 2 } );
+		// Select "ro" and type over it. A collapsed arrow at the marker's
+		// edge only steps through its formats, so select "rold", collapse to
+		// its start and extend from there.
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 4 } );
+		await page.keyboard.press( 'ArrowLeft' );
+		await pageUtils.pressKeys( 'shift+ArrowRight', { times: 2 } );
 		await page.keyboard.type( 'or' );
 
 		await expect( added ).toHaveCount( 1 );
@@ -755,8 +758,9 @@ test.describe( 'Suggestion mode', () => {
 		const id = await added.getAttribute( 'data-suggestion-id' );
 
 		// Select "lo wr": "lo" is original text, " wr" the addition.
-		await pageUtils.pressKeys( 'ArrowLeft', { times: 3 } );
-		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await page.keyboard.press( 'Home' );
+		await pageUtils.pressKeys( 'ArrowRight', { times: 3 } );
+		await pageUtils.pressKeys( 'shift+ArrowRight', { times: 5 } );
 		const saved = suggestionSavedPromise( page );
 		await page.keyboard.type( 'p wr' );
 
