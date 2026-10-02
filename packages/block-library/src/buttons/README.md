@@ -41,6 +41,9 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
+- [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
+  - `minHeight`: `true`
+  - `minWidth`: `true`
 - [`layout`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout):
   - [`allowSwitching`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowswitching): `false`
   - [`allowInheriting`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowinheriting): `false`
