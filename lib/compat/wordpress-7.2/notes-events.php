@@ -165,13 +165,17 @@ function gutenberg_notify_note_event( ?WP_Comment $comment, $request = null, boo
 			continue;
 		}
 
+		/*
+		 * The post author is emailed about every event whether or not they
+		 * follow the thread, so an unfollow link could not stop these emails.
+		 */
 		gutenberg_send_note_event_notification(
 			$user,
 			$comment,
 			$post,
 			$root_id,
 			$event,
-			in_array( $user_id, $followers, true )
+			$user_id !== $post_author_id && in_array( $user_id, $followers, true )
 		);
 	}
 }
@@ -243,9 +247,9 @@ function gutenberg_send_note_event_notification( WP_User $user, WP_Comment $comm
 	$body = implode( "\n", $lines );
 
 	/*
-	 * Only followers are offered the unfollow link. A post author who never
-	 * joined the thread has no subscription to end, and core's own note
-	 * emails to them answer to the site-wide setting instead.
+	 * Only followers are offered the unfollow link. The post author is never
+	 * offered it, following or not: they hear about every event, and core's
+	 * own note emails to them answer to the site-wide setting instead.
 	 */
 	if ( $is_follower ) {
 		$body .= "\n\n";

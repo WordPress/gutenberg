@@ -276,9 +276,11 @@ class Tests_Notes_Events extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The post author following their own post is one recipient, not two.
+	 * The post author following their own post is one recipient, not two, and
+	 * is not offered an unfollow link that could not stop event emails.
 	 *
 	 * @covers ::gutenberg_notify_note_event
+	 * @covers ::gutenberg_send_note_event_notification
 	 */
 	public function test_a_following_post_author_receives_exactly_one_email(): void {
 		$root = $this->start_thread( 'Please look at this', self::$commenter->ID );
@@ -286,7 +288,9 @@ class Tests_Notes_Events extends WP_UnitTestCase {
 
 		$this->post_event( $root, self::$resolver->ID, 'resolved' );
 
-		$this->assertCount( 1, $this->emails_to( self::$post_author->user_email ) );
+		$emails = $this->emails_to( self::$post_author->user_email );
+		$this->assertCount( 1, $emails );
+		$this->assertStringNotContainsString( 'wp_note_unfollow', $emails[0]['message'] );
 	}
 
 	/**
