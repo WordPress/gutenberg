@@ -6,42 +6,32 @@ import { _x } from '@wordpress/i18n';
 export interface CuratedEmoji {
 	emoji: string;
 	label: string;
-	value: string;
 }
 
 /**
- * Curated emoji set for reactions.
- * The `value` slug is used as the storage key in the database to avoid
- * potential encoding issues with emoji characters.
+ * Curated emoji set for reactions, seeding "Frequently used" and naming
+ * these emoji with their own translated labels.
  */
 export const REACTION_EMOJIS: CuratedEmoji[] = [
-	{ emoji: '❤️', label: _x( 'Heart', 'emoji reaction' ), value: 'heart' },
-	{
-		emoji: '🎉',
-		label: _x( 'Celebration', 'emoji reaction' ),
-		value: 'celebration',
-	},
-	{ emoji: '😄', label: _x( 'Smile', 'emoji reaction' ), value: 'smile' },
-	{ emoji: '👀', label: _x( 'Eyes', 'emoji reaction' ), value: 'eyes' },
-	{ emoji: '🚀', label: _x( 'Rocket', 'emoji reaction' ), value: 'rocket' },
+	{ emoji: '❤️', label: _x( 'Heart', 'emoji reaction' ) },
+	{ emoji: '🎉', label: _x( 'Celebration', 'emoji reaction' ) },
+	{ emoji: '😄', label: _x( 'Smile', 'emoji reaction' ) },
+	{ emoji: '👀', label: _x( 'Eyes', 'emoji reaction' ) },
+	{ emoji: '🚀', label: _x( 'Rocket', 'emoji reaction' ) },
 ];
 
 /**
- * Reactions storage format:
- *
- * - Curated picks are stored as their slug, e.g. `heart`.
- * - Full-picker picks are stored as lowercase hex code points joined by
- *   `-`, e.g. `1f44d`. U+FE0F is stripped so `2764-fe0f` collapses into
- *   the curated `heart` slug, and each code point is padded to four digits
- *   to match the Emojibase `hexcode` field.
+ * Reactions storage format: every reaction, curated or not, is stored as
+ * lowercase hex code points joined by `-`, e.g. `2764` or `1f44d`. U+FE0F
+ * is stripped so both presentations of an emoji share one key, and each
+ * code point is padded to four digits to match the Emojibase `hexcode`
+ * field.
  *
  * ASCII keys sidestep utf8/utf8mb4 portability issues on the comments
  * table and group stably in the `reaction_summary` aggregation.
  */
 
-// Keys written before the padding rule can be two digits wide, so reading
-// stays lenient even though writing always pads.
-const HEX_KEY_RE = /^[0-9a-f]{2,6}(-[0-9a-f]{2,6})*$/;
+const HEX_KEY_RE = /^[0-9a-f]{4,6}(-[0-9a-f]{4,6})*$/;
 
 const VARIATION_SELECTOR = '\u{FE0F}';
 const EMOJI_RE = /^\p{Emoji}$/u;
@@ -121,24 +111,6 @@ export function hexKeyToEmoji( hexKey: string ): string {
 }
 
 /**
- * Map a chosen emoji character to its storage key. If the emoji matches
- * a curated reaction (after stripping VS-16) returns its slug, otherwise
- * returns the hex-codepoint key.
- *
- * @param emoji  The emoji character.
- * @param emojis Curated emoji list to match against.
- * @return The storage key (slug or hex codepoints).
- */
-export function emojiToStorageKey(
-	emoji: string,
-	emojis: CuratedEmoji[] = REACTION_EMOJIS
-): string {
-	const hex = emojiToHexKey( emoji );
-	const curated = emojis.find( ( r ) => emojiToHexKey( r.emoji ) === hex );
-	return curated ? curated.value : hex;
-}
-
-/**
  * The translated label of a curated reaction, so the full picker and the
  * pills name it the same way the quick reactions do.
  *
@@ -149,16 +121,4 @@ export function getCuratedLabel( hexKey: string ): string | undefined {
 	return REACTION_EMOJIS.find(
 		( entry ) => emojiToHexKey( entry.emoji ) === hexKey
 	)?.label;
-}
-
-/**
- * Build a Map keyed by slug for O(1) emoji and label lookups.
- *
- * @param emojis The emoji list to index.
- * @return Map from slug to `{ emoji, label, value }` entry.
- */
-export function buildEmojiBySlugMap(
-	emojis: CuratedEmoji[] = REACTION_EMOJIS
-): Map< string, CuratedEmoji > {
-	return new Map( emojis.map( ( entry ) => [ entry.value, entry ] ) );
 }

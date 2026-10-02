@@ -199,44 +199,6 @@ function gutenberg_exclude_notes_from_comment_count_7_2( $new_count, $old_count,
 add_filter( 'pre_wp_update_comment_count_now', 'gutenberg_exclude_notes_from_comment_count_7_2', 10, 3 );
 
 /**
- * Returns the named emojis for note reactions.
- *
- * @since 7.2.0
- *
- * @return array[] List of emoji definitions, each with `emoji`, `label`,
- *                 and `value` keys.
- */
-function gutenberg_get_note_reaction_emojis() {
-	return array(
-		array(
-			'emoji' => '❤️',
-			'label' => _x( 'Heart', 'emoji reaction', 'gutenberg' ),
-			'value' => 'heart',
-		),
-		array(
-			'emoji' => '🎉',
-			'label' => _x( 'Celebration', 'emoji reaction', 'gutenberg' ),
-			'value' => 'celebration',
-		),
-		array(
-			'emoji' => '😄',
-			'label' => _x( 'Smile', 'emoji reaction', 'gutenberg' ),
-			'value' => 'smile',
-		),
-		array(
-			'emoji' => '👀',
-			'label' => _x( 'Eyes', 'emoji reaction', 'gutenberg' ),
-			'value' => 'eyes',
-		),
-		array(
-			'emoji' => '🚀',
-			'label' => _x( 'Rocket', 'emoji reaction', 'gutenberg' ),
-			'value' => 'rocket',
-		),
-	);
-}
-
-/**
  * Returns the reaction children of a note.
  *
  * @since 7.2.0

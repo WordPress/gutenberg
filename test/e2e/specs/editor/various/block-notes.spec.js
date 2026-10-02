@@ -1473,20 +1473,38 @@ test.describe( 'Block Notes', () => {
 			await expect( reactionPill ).toBeEnabled();
 		} );
 
-		test( 'a full-picker pick that matches a curated emoji stores as the curated slug', async ( {
+		test( 'a curated pick and the same emoji from search share one hex key', async ( {
 			page,
 			blockNoteUtils,
 		} ) => {
 			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/paragraph',
-				attributes: { content: 'Curated normalization' },
-				comment: 'Pick heart from full picker',
+				attributes: { content: 'Curated hex key' },
+				comment: 'Pick heart twice',
 			} );
 
-			// Open the full picker and click the plain heart specifically.
+			// The Frequently used seed stores the heart by its hex key.
+			const created = page.waitForRequest(
+				( request ) =>
+					request.method() === 'POST' &&
+					/\/wp\/v2\/comments/.test(
+						decodeURIComponent( request.url() )
+					)
+			);
+			await blockNoteUtils.addReactionToComment( 'Heart' );
+			expect( ( await created ).postDataJSON().content ).toBe( '2764' );
+
+			const reactionButton = page.locator(
+				'.editor-collab-sidebar-panel__reaction-button'
+			);
+			await expect( reactionButton ).toHaveCount( 1 );
+			await expect( reactionButton ).toContainText( '❤' );
+			await expect( reactionButton ).toContainText( '1' );
+
 			/*
-			 * Search first so the click lands on the Emojibase entry, not
-			 * the Frequently used seed. "Heart" is a curated label, so the
+			 * Picking the same heart from the search results resolves to
+			 * the same key, so it toggles the existing reaction off rather
+			 * than adding a second pill. "Heart" is a curated label, so the
 			 * exact match skips "smiling face with hearts".
 			 */
 			await page
@@ -1497,17 +1515,7 @@ test.describe( 'Block Notes', () => {
 			await page
 				.getByRole( 'gridcell', { name: 'Heart', exact: true } )
 				.click();
-
-			/*
-			 * One pill showing the heart and a count of 1, as a named-set
-			 * pick produces.
-			 */
-			const reactionButton = page.locator(
-				'.editor-collab-sidebar-panel__reaction-button'
-			);
-			await expect( reactionButton ).toHaveCount( 1 );
-			await expect( reactionButton ).toContainText( '❤' );
-			await expect( reactionButton ).toContainText( '1' );
+			await expect( reactionButton ).toHaveCount( 0 );
 		} );
 
 		test( 'a full-picker pick that is not curated renders the chosen emoji', async ( {

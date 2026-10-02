@@ -356,13 +356,13 @@ export function getCachedEmojiLabel(
  * Resolve the label for a hex-key reaction so its pill tooltip reads like a
  * curated one. A loaded dataset resolves from the module cache; otherwise
  * the fetch waits for `load`, since the dataset is ~775KB and should not be
- * pulled just because a note carries a full-picker reaction. Until then the
+ * pulled just because a note carries a reaction. Until then the
  * emoji character stands in, which assistive technology announces by its
  * Unicode name.
  *
  * @param hexKey  Normalized reaction hex key, e.g. `1f44d`.
  * @param enabled Whether resolution should run (false for curated
- *                slugs, which have their own labels).
+ *                emoji, which have their own labels).
  * @param load    Whether to fetch the dataset when it isn't cached.
  * @return The resolved label, or null while unresolved.
  */

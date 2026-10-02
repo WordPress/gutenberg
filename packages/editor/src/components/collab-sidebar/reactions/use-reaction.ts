@@ -26,18 +26,18 @@ export interface ReactionTarget {
  * `reacted` / `my_reaction_id` pair and takes the wrong branch.
  *
  * @param note            The cached note record.
- * @param slug            The reaction storage slug that changed.
+ * @param hexKey          The reaction hex key that changed.
  * @param addedReactionId The new reaction's comment ID when one was added;
  *                        omitted when one was removed.
  * @return The note with an updated `reaction_summary`.
  */
 export function applyReactionDelta< T extends ReactionTarget >(
 	note: T,
-	slug: string,
+	hexKey: string,
 	addedReactionId?: number
 ): T {
 	const summary: ReactionSummary = { ...( note.reaction_summary || {} ) };
-	const entry = summary[ slug ];
+	const entry = summary[ hexKey ];
 
 	if ( addedReactionId ) {
 		// Concurrent adds converge server-side on one surviving row, so a
@@ -45,7 +45,7 @@ export function applyReactionDelta< T extends ReactionTarget >(
 		if ( entry?.my_reaction_id === addedReactionId ) {
 			return note;
 		}
-		summary[ slug ] = {
+		summary[ hexKey ] = {
 			count: ( entry?.count || 0 ) + 1,
 			reacted: true,
 			my_reaction_id: addedReactionId,
@@ -53,9 +53,9 @@ export function applyReactionDelta< T extends ReactionTarget >(
 	} else if ( entry ) {
 		const count = entry.count - 1;
 		if ( count > 0 ) {
-			summary[ slug ] = { count, reacted: false };
+			summary[ hexKey ] = { count, reacted: false };
 		} else {
-			delete summary[ slug ];
+			delete summary[ hexKey ];
 		}
 	}
 
@@ -75,7 +75,7 @@ const reactionMutationCounts = new Map< number, number >();
  *
  * `reaction_summary` is computed server-side and cached on the note's
  * entity record, so the summary the note carries is the source of truth
- * for whether the current user has already reacted with a slug.
+ * for whether the current user has already reacted with an emoji.
  *
  * @param note The note comment record.
  * @return The note's reaction summary and the toggle callback.
@@ -89,8 +89,8 @@ export function useReaction( note: ReactionTarget ) {
 	const { getCurrentPostId } = useSelect( editorStore );
 
 	const toggleReaction = useCallback(
-		async ( slug: string ) => {
-			const entry = reactions?.[ slug ];
+		async ( hexKey: string ) => {
+			const entry = reactions?.[ hexKey ];
 			const myReactionId = entry?.reacted
 				? entry.my_reaction_id
 				: undefined;
@@ -120,7 +120,7 @@ export function useReaction( note: ReactionTarget ) {
 							post: getCurrentPostId(),
 							type: 'reaction',
 							parent: noteId,
-							content: slug,
+							content: hexKey,
 							status: 'approve',
 						},
 						{ throwOnError: true }
@@ -142,8 +142,8 @@ export function useReaction( note: ReactionTarget ) {
 				return;
 			}
 
-			// The slug's reactor list changed, so the pill tooltip refetches.
-			invalidateReactionNames( noteId, slug );
+			// The emoji's reactor list changed, so the pill tooltip refetches.
+			invalidateReactionNames( noteId, hexKey );
 
 			// Mutating a reaction comment doesn't invalidate the cached
 			// `reaction_summary`, so a subsequent toggle would read stale
@@ -163,7 +163,7 @@ export function useReaction( note: ReactionTarget ) {
 				receiveEntityRecords( 'root', 'comment', [
 					applyReactionDelta(
 						cached,
-						slug,
+						hexKey,
 						isRemoving ? undefined : addedReactionId
 					),
 				] );

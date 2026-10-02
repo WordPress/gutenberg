@@ -7,11 +7,11 @@ import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/ui';
 import { reaction as reactionIcon } from '@wordpress/icons';
 import EmojiPicker from './emoji-picker';
-import { emojiToStorageKey } from './reaction-emojis';
+import { emojiToHexKey } from './reaction-emojis';
 
 interface AddReactionButtonProps {
 	disabled?: boolean;
-	onToggleReaction: ( slug: string ) => void;
+	onToggleReaction: ( hexKey: string ) => void;
 }
 
 /**
@@ -42,9 +42,7 @@ export function AddReactionButton( {
 				/>
 			}
 			disabled={ disabled }
-			onSelect={ ( emoji ) =>
-				onToggleReaction( emojiToStorageKey( emoji ) )
-			}
+			onSelect={ ( emoji ) => onToggleReaction( emojiToHexKey( emoji ) ) }
 		/>
 	);
 }

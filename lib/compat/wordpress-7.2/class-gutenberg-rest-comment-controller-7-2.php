@@ -25,7 +25,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		$schema = parent::get_item_schema();
 
 		$schema['properties']['reaction_summary'] = array(
-			'description'          => __( 'Aggregated reaction counts for this note, keyed by emoji slug.', 'gutenberg' ),
+			'description'          => __( 'Aggregated reaction counts for this note, keyed by emoji hex key.', 'gutenberg' ),
 			'type'                 => 'object',
 			'context'              => array( 'view', 'edit' ),
 			'readonly'             => true,
@@ -246,11 +246,11 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 * Checks if a given request has access to update a comment.
 	 *
 	 * Reactions are immutable: they carry an author, a parent note and a
-	 * canonical emoji slug that `create_item()` validates as a set, and the
+	 * canonical emoji hex key that `create_item()` validates as a set, and the
 	 * generic update route re-validates none of it. Allowing updates would
 	 * let anyone who can edit the note's post reattribute a reaction to
 	 * another user, move it to a note on a post they cannot edit, or store a
-	 * duplicate or invalid slug. Toggling a reaction off is a delete.
+	 * duplicate or invalid key. Toggling a reaction off is a delete.
 	 *
 	 * @since 7.2.0
 	 *
@@ -426,7 +426,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 * Creates a comment.
 	 *
 	 * Extends the 6.9 implementation to support 'reaction' comment type
-	 * with validation for parent note, valid emoji slugs, and uniqueness.
+	 * with validation for parent note, valid emoji hex keys, and uniqueness.
 	 *
 	 * @since 7.2.0
 	 *
@@ -451,9 +451,9 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			);
 		}
 
-		// The canonical reaction slug, populated once validated below so the
+		// The canonical reaction key, populated once validated below so the
 		// stored content matches what was validated (not the raw input).
-		$reaction_slug = null;
+		$reaction_key = null;
 
 		// Validate reaction-specific requirements.
 		if ( ! empty( $request['type'] ) && 'reaction' === $request['type'] ) {
@@ -493,36 +493,31 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				);
 			}
 
-			// Validate the reaction content. We accept either:
-			// - a named slug (e.g. "heart") from the curated emoji list, or
-			// - a lowercase hex-codepoint sequence joined by `-` (e.g.
-			//   "1f44d" for 👍 or "1f468-200d-1f4bb" for 👨‍💻), which is how
-			//   the picker stores a pick from the Emojibase dataset.
+			// Validate the reaction content: the emoji's Emojibase hex key,
+			// lowercase code points padded to four digits and joined by `-`
+			// (e.g. "2764" for ❤️ or "1f468-200d-1f4bb" for 👨‍💻).
 			// Raw emoji bytes are rejected because the comments table is
 			// not guaranteed to be utf8mb4 across all WordPress installs;
 			// clients normalize before submitting.
-			$emojis      = gutenberg_get_note_reaction_emojis();
-			$valid_slugs = wp_list_pluck( $emojis, 'value' );
-			$emoji_slug  = '';
+			$emoji_key = '';
 
 			// Accept `content` as a string or `{ raw }`, like prepare_item_for_database().
 			if ( isset( $request['content'] ) && is_string( $request['content'] ) ) {
-				$emoji_slug = wp_strip_all_tags( $request['content'] );
+				$emoji_key = wp_strip_all_tags( $request['content'] );
 			} elseif ( isset( $request['content']['raw'] ) && is_string( $request['content']['raw'] ) ) {
-				$emoji_slug = wp_strip_all_tags( $request['content']['raw'] );
+				$emoji_key = wp_strip_all_tags( $request['content']['raw'] );
 			}
 
-			$is_curated_slug = in_array( $emoji_slug, $valid_slugs, true );
-			$is_hex_key      = (bool) preg_match(
-				'/^[0-9a-f]{2,6}(-[0-9a-f]{2,6}){0,15}$/',
-				$emoji_slug
+			$is_hex_key = (bool) preg_match(
+				'/^[0-9a-f]{4,6}(-[0-9a-f]{4,6}){0,15}$/',
+				$emoji_key
 			);
 
-			// A hex-shaped slug must still be made of assignable Unicode code
+			// A hex key must still be made of assignable Unicode code
 			// points: reject anything above U+10FFFF or in the UTF-16 surrogate
 			// range (U+D800–U+DFFF).
 			if ( $is_hex_key ) {
-				foreach ( explode( '-', $emoji_slug ) as $codepoint ) {
+				foreach ( explode( '-', $emoji_key ) as $codepoint ) {
 					$value = hexdec( $codepoint );
 					if ( $value > 0x10FFFF || ( $value >= 0xD800 && $value <= 0xDFFF ) ) {
 						$is_hex_key = false;
@@ -531,7 +526,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				}
 			}
 
-			if ( ! $is_curated_slug && ! $is_hex_key ) {
+			if ( ! $is_hex_key ) {
 				return new WP_Error(
 					'rest_comment_invalid_reaction',
 					__( 'Invalid reaction emoji.', 'gutenberg' ),
@@ -552,7 +547,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			);
 
 			foreach ( $existing as $existing_reaction ) {
-				if ( wp_strip_all_tags( $existing_reaction->comment_content ) === $emoji_slug ) {
+				if ( wp_strip_all_tags( $existing_reaction->comment_content ) === $emoji_key ) {
 					return new WP_Error(
 						'rest_comment_duplicate_reaction',
 						__( 'You have already reacted with this emoji.', 'gutenberg' ),
@@ -561,7 +556,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				}
 			}
 
-			$reaction_slug = $emoji_slug;
+			$reaction_key = $emoji_key;
 		}
 
 		$prepared_comment = $this->prepare_item_for_database( $request );
@@ -571,11 +566,11 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 
 		$prepared_comment['comment_type'] = $request['type'];
 
-		// Persist the validated, canonical reaction slug rather than the raw
+		// Persist the validated, canonical reaction key rather than the raw
 		// request content, so stored values stay consistent for grouping and
-		// counting (e.g. "<b>heart</b>" is stored as "heart").
-		if ( null !== $reaction_slug ) {
-			$prepared_comment['comment_content'] = $reaction_slug;
+		// counting (e.g. "<b>2764</b>" is stored as "2764").
+		if ( null !== $reaction_key ) {
+			$prepared_comment['comment_content'] = $reaction_key;
 		}
 
 		if ( ! isset( $prepared_comment['comment_content'] ) ) {
@@ -618,7 +613,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		// Pin a reaction to the current user, whatever author details the
 		// request carried. Author fields alone leave `user_id` at 0, which
 		// the uniqueness check and the reaction summary both key on.
-		if ( null !== $reaction_slug ) {
+		if ( null !== $reaction_key ) {
 			$user = wp_get_current_user();
 
 			$prepared_comment['user_id']              = $user->ID;
@@ -713,7 +708,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		// duplicates. Every concurrent request applies the same rule, so they
 		// all settle on the same surviving row. If this request's own row lost
 		// the race, repoint the response to the survivor.
-		if ( null !== $reaction_slug ) {
+		if ( null !== $reaction_key ) {
 			$matching   = get_comments(
 				array(
 					'parent'  => $request['parent'],
@@ -726,7 +721,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			);
 			$duplicates = array();
 			foreach ( $matching as $candidate ) {
-				if ( wp_strip_all_tags( $candidate->comment_content ) === $reaction_slug ) {
+				if ( wp_strip_all_tags( $candidate->comment_content ) === $reaction_key ) {
 					$duplicates[] = (int) $candidate->comment_ID;
 				}
 			}
@@ -962,7 +957,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 * Checks if comment content is allowed.
 	 *
 	 * Extends the 6.9 implementation to also allow reaction content
-	 * (emoji slugs are always valid content).
+	 * (emoji hex keys are always valid content).
 	 *
 	 * @since 7.2.0
 	 *
@@ -970,7 +965,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 * @return bool True if the content is allowed, false otherwise.
 	 */
 	protected function check_is_comment_content_allowed( $prepared_comment ) {
-		// Note reactions always have content (the emoji slug).
+		// Note reactions always have content (the emoji hex key).
 		if ( isset( $prepared_comment['comment_type'] ) && 'reaction' === $prepared_comment['comment_type'] ) {
 			return true;
 		}
