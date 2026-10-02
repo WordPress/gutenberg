@@ -505,5 +505,50 @@ test.describe( 'Query block', () => {
 			await removeButton.click();
 			await expect( announcement ).toContainText( 'Category removed' );
 		} );
+
+		test( 'should keep the typed text when Enter is pressed while terms load', async ( {
+			page,
+			editor,
+		} ) => {
+			await page.route(
+				( url ) =>
+					(
+						url.searchParams.get( 'rest_route' ) ?? url.pathname
+					).includes( '/wp/v2/categories' ),
+				async ( route ) => {
+					await new Promise( ( resolve ) =>
+						setTimeout( resolve, 1000 )
+					);
+					await route.continue();
+				}
+			);
+
+			const categoriesControl = await addQueryWithTaxonomyFilters( {
+				page,
+				editor,
+			} );
+			await categoriesControl.click();
+			await categoriesControl.pressSequentially( 'Capy' );
+			await page.keyboard.press( 'Enter' );
+			await expect( categoriesControl ).toHaveValue( 'Capy' );
+
+			await expect(
+				page.getByRole( 'option', { name: 'Capybara' } )
+			).toBeVisible();
+			await page.keyboard.press( 'Enter' );
+
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/query',
+					attributes: {
+						query: {
+							taxQuery: {
+								include: { category: [ categoryIds[ 2 ] ] },
+							},
+						},
+					},
+				},
+			] );
+		} );
 	} );
 } );
