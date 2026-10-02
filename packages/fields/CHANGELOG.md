@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `MediaEdit`: Use design system's outine focus ring instead of previous box-shadow based implementation. ([#83854](https://github.com/WordPress/gutenberg/pull/83854))
+
 ### Bug Fixes
 
 -   `AuthorView`: Fetch the author through the users list in the `view` context, so users who can't edit other users still see the author's name and avatar, including for authors without published posts. ([#83498](https://github.com/WordPress/gutenberg/pull/83498))
