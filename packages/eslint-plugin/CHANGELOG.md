@@ -9,7 +9,6 @@
 ### Enhancements
 
 -   `use-recommended-components`: Recognize the new `@wordpress/ui` Meter as use-with-caution. ([#83855](https://github.com/WordPress/gutenberg/pull/83855))
-
 -   `use-recommended-components`: Recommend `Checkbox`, `CheckboxControl`, and `CheckboxGroup` from `@wordpress/ui`, and flag `CheckboxControl` from `@wordpress/components` ([#83771](https://github.com/WordPress/gutenberg/pull/83771)).
 -   `use-recommended-components`: Update the "Use with caution" entry from `LinkButton` to `ButtonLink` to match the renamed `@wordpress/ui` component ([#83789](https://github.com/WordPress/gutenberg/pull/83789)).
 -   Update `use-recommended-components` rule to mark `Notice` from `@wordpress/ui` as recommended, and to prefer it over `@wordpress/components` `Notice` ([#82685](https://github.com/WordPress/gutenberg/pull/82685)).
