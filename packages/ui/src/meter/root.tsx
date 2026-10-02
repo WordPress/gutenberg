@@ -13,7 +13,7 @@ const DEFAULT_RENDER = ( props: React.ComponentProps< typeof Stack > ) => (
  * Groups the meter, label, and value for a measured quantity.
  * Use `Meter.Label`, `aria-label`, or `aria-labelledby` to name the quantity.
  */
-export const Root = forwardRef< HTMLDivElement, RootProps >( function MeterRoot(
+const Root = forwardRef< HTMLDivElement, RootProps >( function MeterRoot(
 	{ className, render = DEFAULT_RENDER, ...props },
 	ref
 ) {
@@ -26,3 +26,5 @@ export const Root = forwardRef< HTMLDivElement, RootProps >( function MeterRoot(
 		/>
 	);
 } );
+
+export { Root };

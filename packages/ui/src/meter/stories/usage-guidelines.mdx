@@ -1,0 +1,48 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as MeterStories from './index.story';
+import * as ProgressStories from '../../progress/stories/index.story';
+
+<Meta
+	id="design-system-components-meter-usage-guidelines"
+	title="Components/@wordpress-ui/Meter/Usage Guidelines"
+/>
+
+# Meter usage guidelines
+
+## When to use Meter
+
+Use `Meter` for a measured quantity within a known range, such as storage usage, battery charge, or a score. The range needs a meaningful minimum and maximum. See the [WAI-ARIA meter pattern](https://www.w3.org/WAI/ARIA/apg/patterns/meter/).
+
+Use [Progress](?path=/docs/design-system-components-progress-usage-guidelines--docs) for task completion, such as uploading files or exporting data. Choose the component by what the value represents. Meter's track is 8px by default; Progress has a 1.5px track.
+
+<Canvas of={ MeterStories.Default } />
+
+<Canvas of={ ProgressStories.Default } />
+
+## Label the quantity
+
+Use `Meter.Label` to describe the measured quantity. If you omit the visible label, give `Meter.Root` an accessible name through `aria-label` or `aria-labelledby`. Meter is informational and does not add a Tab stop.
+
+Place `Meter.Indicator` inside `Meter.Track`. Keep `Meter.Label` and `Meter.Value` outside Track so its clipping does not hide the text. Use `Stack` to arrange the label and value together.
+
+<Canvas of={ MeterStories.BarOnly } />
+
+## Choose a measurement value
+
+Pass a numeric `value`. The default range is 0 to 100. Use `min` and `max` for measurements with different units, with a minimum less than the maximum. Values outside the range are clamped.
+
+Meter has no indeterminate state. If the measurement is unknown, show that in text instead of passing `null` or a made-up value.
+
+## Format values for the quantity
+
+`Meter.Value` displays a percentage by default. Use `format` and `locale` to change number formatting. For measurement-specific text, provide a child function to Value and use `getAriaValueText` on Root to give assistive technology the same information. The formatted value is clamped to the range; the callback's second argument is the raw numeric value.
+
+<Canvas of={ MeterStories.CustomValueFormat } />
+
+## Choose an indicator tone
+
+The indicator uses a neutral tone by default. Use `tone="brand"` for a brand-colored indicator. Only the indicator changes color; the track, label, and value keep their own colors.
+
+Tones do not indicate success, warning, or error, and Meter does not change color at thresholds. Provide visible status text when a quantity needs interpretation. Native meter attributes such as `low`, `high`, and `optimum` are not supported.
+
+<Canvas of={ MeterStories.Brand } />

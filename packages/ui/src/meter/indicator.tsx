@@ -8,7 +8,7 @@ import styles from './style.module.css';
 /**
  * The filled portion of the track representing the measured value.
  */
-export const Indicator = forwardRef< HTMLDivElement, IndicatorProps >(
+const Indicator = forwardRef< HTMLDivElement, IndicatorProps >(
 	function MeterIndicator( { tone = 'neutral', className, ...props }, ref ) {
 		return (
 			<_Meter.Indicator
@@ -24,3 +24,5 @@ export const Indicator = forwardRef< HTMLDivElement, IndicatorProps >(
 		);
 	}
 );
+
+export { Indicator };
