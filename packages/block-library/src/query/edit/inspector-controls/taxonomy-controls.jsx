@@ -7,24 +7,23 @@ import {
 } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import {
-	useState,
-	useEffect,
-	useMemo,
-	useCallback,
-	Fragment,
-} from '@wordpress/element';
+import { useState, useEffect, useMemo, Fragment } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
 import { sprintf, _n, _x, __ } from '@wordpress/i18n';
 import { useTaxonomies } from '../../utils';
 
 const EMPTY_ARRAY = [];
-const EMPTY_MAP = new Map();
 const BASE_QUERY = {
 	order: 'asc',
 	orderby: 'name',
 	context: 'view',
+};
+const NON_HIERARCHICAL_QUERY = { ...BASE_QUERY, _fields: 'id,name' };
+const HIERARCHICAL_QUERY = {
+	...BASE_QUERY,
+	_fields: 'id,name,parent,_links.up,_embedded',
+	_embed: 'up',
 };
 
 /**
@@ -69,6 +68,31 @@ function ListedTermCount() {
 			) }
 		</VisuallyHidden>
 	);
+}
+
+/**
+ * A nested term is named after the term it sits under, so that two terms
+ * sharing a name can be told apart, in the list and in the chip alike. The
+ * label is also the option's accessible name, and the component has no
+ * separate slot for secondary text.
+ *
+ * @param {Object} term A term fetched from the API.
+ * @return {{value: string, label: string}} The term as an item.
+ */
+function termToItem( term ) {
+	const name = decodeEntities( term.name );
+	const parentName = term._embedded?.up?.[ 0 ]?.name;
+	return {
+		value: String( term.id ),
+		label: parentName
+			? sprintf(
+					/* translators: 1: term name. 2: name of the term it sits under. */
+					_x( '%1$s (%2$s)', 'term' ),
+					name,
+					decodeEntities( parentName )
+			  )
+			: name,
+	};
 }
 
 export function TaxonomyControls( { onChange, query } ) {
@@ -174,15 +198,10 @@ function TaxonomyItem( {
 	const [ value, setValue ] = useState( EMPTY_ARRAY );
 	const debouncedSearch = useDebounce( setSearch, 250 );
 	// A hierarchical taxonomy can hold terms that share a name under different
-	// parents, so the parent is fetched to tell them apart in the list.
-	const isHierarchical = !! taxonomy.hierarchical;
-	const baseQuery = useMemo(
-		() => ( {
-			...BASE_QUERY,
-			_fields: isHierarchical ? 'id,name,parent' : 'id,name',
-		} ),
-		[ isHierarchical ]
-	);
+	// parents, so the parent is embedded to tell them apart in the list.
+	const baseQuery = taxonomy.hierarchical
+		? HIERARCHICAL_QUERY
+		: NON_HIERARCHICAL_QUERY;
 	const { listedTerms, listHasResolved } = useSelect(
 		( select ) => {
 			if ( ! hasOpened ) {
@@ -219,7 +238,7 @@ function TaxonomyItem( {
 		},
 		[ hasOpened, search, taxonomy.slug, baseQuery, oppositeTermIds ]
 	);
-	// `existingTerms` are the ones fetched from the API and their type is `{ id: number; name: string }`.
+	// `existingTerms` are the selected terms, fetched with the same fields as the list.
 	// They are used to extract the terms' names to populate the control properly
 	// and to sanitize the provided `termIds`, by setting only the ones that exist.
 	const existingTerms = useSelect(
@@ -235,80 +254,6 @@ function TaxonomyItem( {
 			} );
 		},
 		[ taxonomy.slug, baseQuery, termIds ]
-	);
-	// A parent can be missing from both requests above: the list is capped, and
-	// a search only returns the terms that matched it. Look those parents up on
-	// their own, so every term can be shown with its context.
-	const unlistedParentIds = useMemo( () => {
-		if ( ! isHierarchical ) {
-			return EMPTY_ARRAY;
-		}
-		const fetchedTerms = [ ...listedTerms, ...( existingTerms || [] ) ];
-		const fetchedIds = new Set( fetchedTerms.map( ( term ) => term.id ) );
-		const missingIds = new Set();
-		for ( const term of fetchedTerms ) {
-			if ( term.parent && ! fetchedIds.has( term.parent ) ) {
-				missingIds.add( term.parent );
-			}
-		}
-		// Sorted, so the same set of parents is always the same query.
-		return missingIds.size
-			? Array.from( missingIds ).sort( ( a, b ) => a - b )
-			: EMPTY_ARRAY;
-	}, [ isHierarchical, listedTerms, existingTerms ] );
-	const unlistedParentTerms = useSelect(
-		( select ) => {
-			if ( ! unlistedParentIds.length ) {
-				return EMPTY_ARRAY;
-			}
-			const { getEntityRecords } = select( coreStore );
-			return (
-				getEntityRecords( 'taxonomy', taxonomy.slug, {
-					...baseQuery,
-					include: unlistedParentIds,
-					per_page: unlistedParentIds.length,
-				} ) || EMPTY_ARRAY
-			);
-		},
-		[ taxonomy.slug, baseQuery, unlistedParentIds ]
-	);
-	const parentNameById = useMemo( () => {
-		if ( ! isHierarchical ) {
-			return EMPTY_MAP;
-		}
-		const names = new Map();
-		for ( const term of [
-			...listedTerms,
-			...( existingTerms || [] ),
-			...unlistedParentTerms,
-		] ) {
-			names.set( term.id, decodeEntities( term.name ) );
-		}
-		return names;
-	}, [ isHierarchical, listedTerms, existingTerms, unlistedParentTerms ] );
-	// A nested term is named after the term it sits under, so that two terms
-	// sharing a name can be told apart, in the list and in the chip alike. The
-	// label is also the option's accessible name, and the component has no
-	// separate slot for secondary text.
-	const termToItem = useCallback(
-		( term ) => {
-			const name = decodeEntities( term.name );
-			const parentName = term.parent
-				? parentNameById.get( term.parent )
-				: undefined;
-			return {
-				value: String( term.id ),
-				label: parentName
-					? sprintf(
-							/* translators: 1: term name. 2: name of the term it sits under. */
-							_x( '%1$s (%2$s)', 'term' ),
-							name,
-							parentName
-					  )
-					: name,
-			};
-		},
-		[ parentNameById ]
 	);
 	// Update the `value` state only after the selectors are resolved
 	// to avoid emptying the input when we're changing terms.
@@ -329,10 +274,10 @@ function TaxonomyItem( {
 			return accumulator;
 		}, [] );
 		setValue( sanitizedValue );
-	}, [ termIds, existingTerms, termToItem ] );
+	}, [ termIds, existingTerms ] );
 	const items = useMemo(
 		() => listedTerms.map( termToItem ),
-		[ listedTerms, termToItem ]
+		[ listedTerms ]
 	);
 	const onInputValueChange = ( nextInputValue ) => {
 		setInputValue( nextInputValue );
