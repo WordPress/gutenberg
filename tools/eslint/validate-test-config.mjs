@@ -43,6 +43,27 @@ for ( const file of [ nodeTest, jsdomTest, browserTest, sharedHelper ] ) {
 	assert.equal( config.languageOptions.globals.jest, undefined );
 }
 
+// JavaScript mock paths use ESLint; TypeScript retains its convention validator.
+for ( const file of [
+	nodeTest,
+	'packages/blocks/src/store/test/selectors.jsdom.test.jsx',
+	'packages/block-editor/src/components/link-control/test/keyboard-selection.browser.test.js',
+	sharedHelper,
+	'test/unit/config/global-mocks.vitest.js',
+	'test/unit/scripts/validate-vitest-conventions.mjs',
+] ) {
+	const config = await eslint.calculateConfigForFile( file );
+	assert.equal(
+		config.rules[ 'vitest/prefer-import-in-mock' ]?.[ 0 ],
+		2,
+		`${ file }: JavaScript mock paths must use imports`
+	);
+}
+for ( const file of [ jsdomTest, browserTest ] ) {
+	const config = await eslint.calculateConfigForFile( file );
+	assert.equal( config.rules[ 'vitest/prefer-import-in-mock' ], undefined );
+}
+
 const tabsConfig = await eslint.calculateConfigForFile(
 	'packages/ui/src/tabs/test/index.browser.test.tsx'
 );
@@ -66,6 +87,7 @@ assert.equal( legacyE2E.rules[ 'jest/no-focused-tests' ][ 0 ], 2 );
 assert.equal( legacyE2E.rules[ 'jest/valid-title' ][ 0 ], 2 );
 assert.equal( legacyE2E.settings.jest.version, 30 );
 assert.equal( legacyE2E.plugins.vitest, undefined );
+assert.equal( legacyE2E.rules[ 'vitest/prefer-import-in-mock' ], undefined );
 
 /**
  * Lint fixtures through the real config while ignoring unrelated style rules.
@@ -84,11 +106,51 @@ async function lintTestRules( file, source ) {
 			( { ruleId } ) =>
 				ruleId?.startsWith( 'vitest/' ) ||
 				ruleId?.startsWith( 'jest/' ) ||
-				ruleId === 'no-restricted-globals'
+				ruleId === 'no-restricted-globals' ||
+				ruleId === 'import/no-unresolved'
 		)
 		.map( ( { ruleId } ) => ruleId )
 		.sort();
 }
+
+// Imports expose mock paths to the existing unresolved-import check.
+for ( const method of [ 'mock', 'doMock' ] ) {
+	assert.deepEqual(
+		await lintTestRules(
+			nodeTest,
+			`import { vi } from 'vitest'; vi.${ method }( '@wordpress/api-fetch' );`
+		),
+		[ 'vitest/prefer-import-in-mock' ]
+	);
+	assert.deepEqual(
+		await lintTestRules(
+			nodeTest,
+			`import { vi } from 'vitest'; vi.${ method }( import( '@wordpress/api-fetch' ) );`
+		),
+		[]
+	);
+	assert.deepEqual(
+		await lintTestRules(
+			nodeTest,
+			`import { vi } from 'vitest'; vi.${ method }( import( './missing-vitest-mock-target.js' ) );`
+		),
+		[ 'import/no-unresolved' ]
+	);
+}
+assert.deepEqual(
+	await lintTestRules(
+		nodeTest,
+		"import { vi as mocker } from 'vitest'; mocker.mock( '@wordpress/api-fetch' );"
+	),
+	[ 'vitest/prefer-import-in-mock' ]
+);
+assert.deepEqual(
+	await lintTestRules(
+		nodeTest,
+		"const vi = { mock() {} }; vi.mock( './not-a-module' );"
+	),
+	[]
+);
 
 assert.deepEqual(
 	await lintTestRules(
