@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `SyncConfig.shouldSync` receives the entity record as an optional third argument, so a config can decide per record whether to sync it ([#84026](https://github.com/WordPress/gutenberg/pull/84026)).
+
 ### Bug Fixes
 
 -   The sync manager's undo manager no longer stands in for the editor's undo manager. It is the undo history of the loaded entities only: it reports each level Yjs opens through the new `onUndoLevelOpened` record handler (replacing `onUndoStackChange`), and `undo()` and `redo()` take the entity whose level to move and return whether a level was moved. Each entity has its own Yjs undo manager, which replaces the copied `YMultiDocUndoManager`. `stopCapturing()` and `clearRedo()` let the consumer keep its own history in step. The manager exposes `isLoaded()`, and its undo manager exists from creation instead of from the first load. Together with the `core-data` change, undo and redo keep working for entities collaboration does not sync ([#83888](https://github.com/WordPress/gutenberg/pull/83888)).

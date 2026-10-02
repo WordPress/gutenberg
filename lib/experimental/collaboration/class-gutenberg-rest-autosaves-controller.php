@@ -98,9 +98,9 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 			require_once ABSPATH . 'wp-admin/includes/post.php';
 		}
 
-		// Post-type collaboration support is determined after the autosaves
-		// controller is selected, so disabled post types must delegate to Core.
-		if ( wp_is_post_type_collaboration_disabled( $post->post_type ) ) {
+		// Collaboration support is determined after the autosaves controller
+		// is selected, so posts with collaboration disabled must delegate to Core.
+		if ( wp_is_post_collaboration_disabled( $post ) ) {
 			return parent::create_item( $request );
 		}
 

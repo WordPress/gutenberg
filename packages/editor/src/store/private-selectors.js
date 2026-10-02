@@ -600,7 +600,12 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 			false !==
 				syncConfig.shouldSync?.(
 					`postType/${ currentPostType }`,
-					currentPostId
+					currentPostId,
+					select( coreStore ).getRawEntityRecord(
+						'postType',
+						currentPostType,
+						currentPostId
+					)
 				)
 		);
 	}

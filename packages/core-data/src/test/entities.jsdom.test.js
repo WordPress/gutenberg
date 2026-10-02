@@ -251,6 +251,39 @@ describe( 'loadPostTypeEntities', () => {
 		expect( bookEntity.syncConfig.shouldSync() ).toBe( false );
 	} );
 
+	it( 'should not sync post records disabled for collaboration', async () => {
+		window.__experimentalEnableRealTimeCollaboration = true;
+		window._wpCollaborationDisabledPostTypes = [];
+
+		const mockPostTypes = {
+			book: {
+				name: 'Books',
+				rest_base: 'books',
+				rest_namespace: 'wp/v2',
+			},
+		};
+
+		apiFetch.mockResolvedValueOnce( mockPostTypes );
+
+		const postTypeLoader = additionalEntityConfigLoaders.find(
+			( loader ) => loader.kind === 'postType'
+		);
+		const entities = await postTypeLoader.loadEntities();
+		const { shouldSync } = entities.find(
+			( e ) => e.name === 'book'
+		).syncConfig;
+
+		expect(
+			shouldSync( 'postType/book', '1', { collaboration_disabled: true } )
+		).toBe( false );
+		expect(
+			shouldSync( 'postType/book', '1', {
+				collaboration_disabled: false,
+			} )
+		).toBe( true );
+		expect( shouldSync( 'postType/book', '1' ) ).toBe( true );
+	} );
+
 	it( 'should skip taxonomy rest_base when taxonomy is not found in fetched taxonomies', async () => {
 		window.__experimentalEnableRealTimeCollaboration = true;
 

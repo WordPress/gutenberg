@@ -193,7 +193,9 @@ export function createSyncManager( debug = false ): SyncManager {
 			return; // Already bootstrapped.
 		}
 
-		if ( false === syncConfig.shouldSync?.( objectType, objectId ) ) {
+		if (
+			false === syncConfig.shouldSync?.( objectType, objectId, record )
+		) {
 			log( 'loadEntity', 'shouldSync false, skipping', entityId );
 			return; // Sync config indicates that this entity should not be synced.
 		}
