@@ -11,7 +11,7 @@ import { Progress, Stack } from '@wordpress/ui';
 		<Progress.Value />
 	</Stack>
 	<Progress.Track>
-		<Progress.Indicator tone="brand" />
+		<Progress.Indicator />
 	</Progress.Track>
 </Progress.Root>;
 ```
@@ -22,7 +22,7 @@ import { Progress, Stack } from '@wordpress/ui';
 | --- | --- | --- |
 | `Progress.Root` | Shares task state and exposes the `progressbar` role. Defaults to a vertical `Stack` with a small gap. | Required `value: number \| null`; `min`, `max`, `format`, `locale`, `getAriaValueText` |
 | `Progress.Track` | The neutral background that contains and clips the indicator. | `children` |
-| `Progress.Indicator` | The filled portion of the track, or an animation for indeterminate progress. | `tone: 'neutral' \| 'brand'`, default `'neutral'`; optional `color` |
+| `Progress.Indicator` | The filled portion of the track, or an animation for indeterminate progress. | Optional `color` |
 | `Progress.Label` | Visible text automatically associated with the root through `aria-labelledby`. | `children` |
 | `Progress.Value` | Displays the root's formatted value, or nothing for indeterminate progress. | Optional `children` function receiving `(formattedValue, value)` |
 
@@ -59,10 +59,10 @@ The Value child function follows Base UI's API. Check the numeric `value` for `n
 
 Track fills the available width and has the same 1.5px height as the existing `@wordpress/components` ProgressBar. Default colors and corner radius follow `@wordpress/theme`.
 
-Indicator's `tone` controls its color. Neutral and brand use the corresponding WPDS background thumb tokens. Its `color` prop accepts any CSS color, including CSS variables and `currentColor` to inherit the surrounding text color. An explicit color overrides `tone` and `style.color`, preserving other inline styles. Track, Label, and Value keep their own colors.
+Indicator uses the neutral WPDS background thumb token by default. Its `color` prop accepts any CSS color, including CSS variables and `currentColor` to inherit the surrounding text color. An explicit color overrides `style.color`, preserving other inline styles. Track, Label, and Value keep their own colors.
 
 ```tsx
-<Progress.Indicator tone="brand" color="#8b2fc9" />
+<Progress.Indicator color="#8b2fc9" />
 ```
 
 ## Moving from `@wordpress/components`

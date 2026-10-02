@@ -51,10 +51,6 @@
 			}
 		}
 
-		.is-brand {
-			color: var(--wpds-color-background-thumb-brand);
-		}
-
 		@media (forced-colors: active) {
 			.indicator {
 				forced-color-adjust: none;

@@ -20,14 +20,7 @@ export type IndicatorProps = Omit<
 	'color'
 > & {
 	/**
-	 * The color intent of the filled indicator. Overridden by `color`.
-	 *
-	 * @default "neutral"
-	 */
-	tone?: 'neutral' | 'brand';
-
-	/**
-	 * The filled indicator color, overriding `tone`. Accepts any CSS color value,
+	 * The filled indicator color. Accepts any CSS color value,
 	 * including `currentColor` to inherit the surrounding text color.
 	 * The track, label, and value keep their own colors.
 	 */

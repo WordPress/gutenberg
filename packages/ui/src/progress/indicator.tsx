@@ -9,10 +9,7 @@ import styles from './style.module.css';
  * The filled portion of the track, or an animation for indeterminate progress.
  */
 export const Indicator = forwardRef< HTMLDivElement, IndicatorProps >(
-	function ProgressIndicator(
-		{ tone = 'neutral', color, className, style, ...props },
-		ref
-	) {
+	function ProgressIndicator( { color, className, style, ...props }, ref ) {
 		return (
 			<_Progress.Indicator
 				ref={ ref }
@@ -20,7 +17,6 @@ export const Indicator = forwardRef< HTMLDivElement, IndicatorProps >(
 				className={ clsx(
 					resetStyles[ 'box-sizing' ],
 					styles.indicator,
-					styles[ `is-${ tone }` ],
 					className
 				) }
 				{ ...props }

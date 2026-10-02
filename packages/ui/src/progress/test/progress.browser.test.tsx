@@ -91,7 +91,7 @@ describe( 'Progress', () => {
 		[ 'dark', '#1e1e1e', '#3858e9' ],
 		[ 'custom', '#ffffff', '#008060' ],
 	] )(
-		'uses thumb tokens and keeps a neutral track in a %s theme',
+		'uses neutral thumb and track colors in a %s theme',
 		async ( _, background, primary ) => {
 			await render(
 				<ThemeProvider color={ { background, primary } }>
@@ -100,26 +100,11 @@ describe( 'Progress', () => {
 							<Progress.Indicator data-testid="neutral-indicator" />
 						</Progress.Track>
 					</Progress.Root>
-					<Progress.Root aria-label="Brand" value={ 50 }>
-						<Progress.Track data-testid="brand-track">
-							<Progress.Indicator
-								tone="brand"
-								data-testid="brand-indicator"
-							/>
-						</Progress.Track>
-					</Progress.Root>
 					<div
 						data-testid="neutral-color-reference"
 						style={ {
 							backgroundColor:
 								'var(--wpds-color-background-thumb-neutral)',
-						} }
-					/>
-					<div
-						data-testid="brand-color-reference"
-						style={ {
-							backgroundColor:
-								'var(--wpds-color-background-thumb-brand)',
 						} }
 					/>
 				</ThemeProvider>
@@ -136,21 +121,8 @@ describe( 'Progress', () => {
 				'rgba(0, 0, 0, 0)'
 			);
 			const neutral = screen.getByTestId( 'neutral-track' );
-			const brand = screen.getByTestId( 'brand-track' );
-			// The indicator has no separate semantic role.
-			const indicator = getComputedStyle(
-				screen.getByTestId( 'brand-indicator' )
-			);
-			expect( getComputedStyle( brand ).backgroundColor ).toBe(
+			expect( neutralIndicator.backgroundColor ).not.toBe(
 				getComputedStyle( neutral ).backgroundColor
-			);
-			expect( indicator.backgroundColor ).toBe(
-				getComputedStyle(
-					screen.getByTestId( 'brand-color-reference' )
-				).backgroundColor
-			);
-			expect( indicator.backgroundColor ).not.toBe(
-				getComputedStyle( brand ).backgroundColor
 			);
 		}
 	);
@@ -185,14 +157,13 @@ describe( 'Progress', () => {
 		);
 	} );
 
-	it( 'applies tone and custom color to the bar', async () => {
+	it( 'applies custom color and restores neutral when cleared', async () => {
 		const Example = ( { color }: { color?: string } ) => (
 			<Progress.Root value={ 60 } style={ { color: 'rgb(0, 128, 0)' } }>
 				<Progress.Label>Uploading files</Progress.Label>
 				<Progress.Value />
 				<Progress.Track data-testid="track">
 					<Progress.Indicator
-						tone="brand"
 						color={ color }
 						style={ { opacity: 0.8 } }
 						data-testid="indicator"
@@ -208,7 +179,7 @@ describe( 'Progress', () => {
 		const trackColor = getComputedStyle( track ).backgroundColor;
 		const labelColor = getComputedStyle( label ).color;
 		const valueColor = getComputedStyle( value ).color;
-		const brandColor = getComputedStyle( indicator ).backgroundColor;
+		const neutralColor = getComputedStyle( indicator ).backgroundColor;
 		expect( getComputedStyle( track ).height ).toBe( '1.5px' );
 
 		await rerender( <Example color="rgb(139, 47, 201)" /> );
@@ -227,7 +198,7 @@ describe( 'Progress', () => {
 
 		await rerender( <Example /> );
 		expect( getComputedStyle( indicator ).backgroundColor ).toBe(
-			brandColor
+			neutralColor
 		);
 	} );
 } );
