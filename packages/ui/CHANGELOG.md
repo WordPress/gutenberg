@@ -17,7 +17,7 @@
 
 ### Enhancements
 
--   `Menu`: Keep parent items highlighted with a neutral background while their submenus are open.
+-   `Menu`: Keep parent items highlighted with a neutral background while their submenus are open ([#84031](https://github.com/WordPress/gutenberg/pull/84031)).
 -   `Menu`: Align group labels and separators with item labels when a radio or checkbox column indents those labels ([#83993](https://github.com/WordPress/gutenberg/pull/83993)).
 -   `Checkbox`, `CheckboxControl`, `CheckboxGroup`: Mark as recommended for use in a WordPress environment ([#83771](https://github.com/WordPress/gutenberg/pull/83771)).
 -   `Spinner`: Show a trackless half-circle like the `Button` loading indicator, with a `color` prop that accepts any CSS color value and defaults to weak neutral foreground. Keep the arc visible in forced-colors mode ([#83775](https://github.com/WordPress/gutenberg/pull/83775)).
