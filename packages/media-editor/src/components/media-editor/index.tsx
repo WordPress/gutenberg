@@ -27,7 +27,11 @@ import {
 } from '@wordpress/keycodes';
 import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import type { Field } from '@wordpress/dataviews';
-import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react';
+import type {
+	KeyboardEvent as ReactKeyboardEvent,
+	ReactElement,
+	ReactNode,
+} from 'react';
 import { MediaEditorProvider } from '../media-editor-provider';
 import type { Media } from '../media-editor-provider';
 import MediaPreview from '../media-preview';
@@ -71,7 +75,7 @@ const CROP_PANEL = 'crop';
 interface MediaEditorTab {
 	id: string;
 	title: string;
-	render: () => JSX.Element;
+	render: () => ReactElement;
 }
 
 export interface MediaEditorFrameProps {
@@ -105,7 +109,7 @@ export interface MediaEditorProps {
 	aspectRatioPresets?: AspectRatioPreset[];
 	onClose?: () => void;
 	onSaved?: ( result: MediaEditorSaveResult ) => void;
-	renderFrame: ( props: MediaEditorFrameProps ) => JSX.Element;
+	renderFrame: ( props: MediaEditorFrameProps ) => ReactElement;
 	noticesClassName?: string;
 	noticesPortalElement?: Element | null;
 	shouldCloseOnEsc?: boolean;
@@ -526,8 +530,9 @@ function MediaEditorContent( {
 	const [ isPlacementActive, setIsPlacementActive ] = useState( false );
 	const [ isCanvasGestureActive, setIsCanvasGestureActive ] =
 		useState( false );
-	const placementControlTimerRef =
-		useRef< ReturnType< typeof setTimeout > >();
+	const placementControlTimerRef = useRef<
+		ReturnType< typeof setTimeout > | undefined
+	>( undefined );
 
 	const signalPlacementControlInteraction = useCallback( () => {
 		setIsPlacementActive( true );

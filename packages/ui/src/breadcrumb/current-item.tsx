@@ -2,7 +2,7 @@ import { mergeProps, useRender } from '@base-ui/react';
 import clsx from 'clsx';
 import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useState } from '@wordpress/element';
-import type { ForwardedRef } from 'react';
+import type { ForwardedRef, ReactElement } from 'react';
 import * as Tooltip from '../tooltip';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
 import focusStyles from '../utils/css/focus.module.scss';
@@ -84,7 +84,11 @@ function VisibleCurrentItem( {
 		>
 			{ showSeparator && <Separator /> }
 			<Tooltip.Root disabled={ ! isTruncated }>
-				<Tooltip.Trigger render={ currentItem } />
+				<Tooltip.Trigger
+					render={
+						currentItem as ReactElement< Record< string, unknown > >
+					}
+				/>
 				{ isTruncated && <Tooltip.Popup>{ children }</Tooltip.Popup> }
 			</Tooltip.Root>
 		</Item>

@@ -20,7 +20,7 @@ function getMeasurementProps( props: Record< string, unknown > ) {
 	);
 }
 
-function sanitizeElement( element: ReactElement ) {
+function sanitizeElement( element: ReactElement< Record< string, unknown > > ) {
 	const behaviorOverrides: Record< string, unknown > = { ref: null };
 
 	for ( const propName of Object.keys( element.props ) ) {
@@ -40,7 +40,7 @@ function getMeasurementRender< TRender >( render: TRender ): TRender {
 		const renderFunction = render as (
 			props: Record< string, unknown >,
 			...args: unknown[]
-		) => ReactElement;
+		) => ReactElement< Record< string, unknown > >;
 
 		return ( ( props: Record< string, unknown >, ...args: unknown[] ) =>
 			sanitizeElement(
@@ -48,7 +48,9 @@ function getMeasurementRender< TRender >( render: TRender ): TRender {
 			) ) as TRender;
 	}
 
-	return sanitizeElement( render as ReactElement ) as TRender;
+	return sanitizeElement(
+		render as ReactElement< Record< string, unknown > >
+	) as TRender;
 }
 
 export { getMeasurementProps, getMeasurementRender };
