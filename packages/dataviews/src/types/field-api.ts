@@ -574,7 +574,7 @@ export type NormalizedField< Item > = Omit<
 	 * Callback used to sort the field. Defaults to the sorter
 	 * of the field's type.
 	 *
-	 * Receives the field valuesof the two items being compared.
+	 * Receives the field values of the two items being compared.
 	 */
 	sort: ( a: any, b: any, direction: SortDirection ) => number;
 

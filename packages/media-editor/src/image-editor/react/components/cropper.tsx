@@ -571,14 +571,17 @@ function CropperInner(
 			return;
 		}
 
-		setCropRect( snappedCropRect );
+		// The display scale crossing the threshold is not an edit, so the
+		// snap must not record an undo entry. Recording it here would also
+		// clear the redo stack whenever an undo or redo crosses it.
+		adjustCropRectForViewport( snappedCropRect );
 	}, [
+		adjustCropRectForViewport,
 		aspectRatio,
 		displayScale,
 		freeformCrop,
 		naturalWidth,
 		naturalHeight,
-		setCropRect,
 		state,
 	] );
 

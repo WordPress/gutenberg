@@ -27,16 +27,32 @@ class WP_Test_REST_Icons_Controller extends WP_Test_REST_TestCase {
 	public function set_up() {
 		parent::set_up();
 
-		/*
-		 * Other suites reset the `WP_Icons_Registry` singleton, wiping the core icons that
-		 * `init` only registers once. Re-register them when empty so order-dependent tests pass.
-		 */
-		if ( ! WP_Icon_Collections_Registry::get_instance()->is_registered( 'core' ) ) {
-			gutenberg_register_default_icon_collections();
+		$collections = array(
+			'test-public'  => true,
+			'test-private' => false,
+		);
+		foreach ( $collections as $slug => $is_public ) {
+			wp_register_icon_collection(
+				$slug,
+				array(
+					'label'  => $slug,
+					'public' => $is_public,
+				)
+			);
+			wp_register_icon(
+				$slug . '/visibility-icon',
+				array(
+					'label'   => 'Visibility Icon',
+					'content' => '<svg viewBox="0 0 24 24"><path d="M0 0h24v24H0z" /></svg>',
+				)
+			);
 		}
-		if ( empty( WP_Icons_Registry_Gutenberg::get_instance()->get_registered_icons() ) ) {
-			gutenberg_register_default_icons();
-		}
+	}
+
+	public function tear_down() {
+		wp_unregister_icon_collection( 'test-public' );
+		wp_unregister_icon_collection( 'test-private' );
+		parent::tear_down();
 	}
 
 	/**
@@ -183,6 +199,103 @@ class WP_Test_REST_Icons_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Registers an icon carrying keywords, so the keyword tests do not depend on
+	 * the terms any bundled icon happens to ship with.
+	 *
+	 * @return string The registered icon name.
+	 */
+	private function register_keyword_icon() {
+		$icon_name = 'core/keyword-icon';
+
+		wp_register_icon(
+			$icon_name,
+			array(
+				'label'    => 'Keyword Icon',
+				'content'  => '<svg></svg>',
+				'keywords' => array( 'hamburger' ),
+			)
+		);
+
+		return $icon_name;
+	}
+
+	/**
+	 * Test that GET /wp/v2/icons/?search=%s searches icon keywords too.
+	 */
+	public function test_get_items_search_includes_keywords() {
+		wp_set_current_user( self::$editor_id );
+
+		$icon_name = $this->register_keyword_icon();
+
+		try {
+			$request = new WP_REST_Request( 'GET', '/wp/v2/icons' );
+
+			// 'hamburger' is in neither the name nor the label, only the keywords.
+			$request->set_param( 'search', 'hamburger' );
+			$response = rest_get_server()->dispatch( $request );
+			$data     = $response->get_data();
+
+			$this->assertSame( 200, $response->get_status() );
+			$this->assertEquals( array( $icon_name ), array_column( $data, 'name' ) );
+		} finally {
+			wp_unregister_icon( $icon_name );
+		}
+	}
+
+	/**
+	 * Test that the response exposes an icon's keywords, so that clients which
+	 * filter icons locally can match against them.
+	 */
+	public function test_get_items_response_includes_keywords() {
+		wp_set_current_user( self::$editor_id );
+
+		$icon_name = $this->register_keyword_icon();
+
+		try {
+			$request = new WP_REST_Request( 'GET', '/wp/v2/icons' );
+			$request->set_param( 'search', $icon_name );
+			$response = rest_get_server()->dispatch( $request );
+			$data     = $response->get_data();
+
+			$this->assertSame( 200, $response->get_status() );
+			$this->assertCount( 1, $data );
+			$this->assertArrayHasKey( 'keywords', $data[0] );
+			$this->assertContains( 'hamburger', $data[0]['keywords'] );
+		} finally {
+			wp_unregister_icon( $icon_name );
+		}
+	}
+
+	/**
+	 * Test that icons registered without keywords still expose an empty array,
+	 * so consumers do not have to handle a missing field.
+	 */
+	public function test_get_items_response_keywords_defaults_to_empty_array() {
+		wp_set_current_user( self::$editor_id );
+
+		wp_register_icon(
+			'core/no-keywords',
+			array(
+				'label'   => 'No Keywords',
+				'content' => '<svg></svg>',
+			)
+		);
+
+		try {
+			$request = new WP_REST_Request( 'GET', '/wp/v2/icons' );
+			$request->set_param( 'search', 'core/no-keywords' );
+			$response = rest_get_server()->dispatch( $request );
+			$data     = $response->get_data();
+
+			$this->assertSame( 200, $response->get_status() );
+			$this->assertCount( 1, $data );
+			$this->assertSame( array(), $data[0]['keywords'] );
+		} finally {
+			wp_unregister_icon( 'core/no-keywords' );
+		}
+	}
+
+	/**
 	 * Test that search is case-insensitive.
 	 */
 	public function test_get_items_search_case_insensitive() {
@@ -292,30 +405,105 @@ class WP_Test_REST_Icons_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
-	 * Test that icons registered as non-public are omitted from the collection.
+	 * Test that icons in non-public collections are omitted from lists and search results.
+	 *
+	 * @dataProvider data_icon_visibility_searches
+	 *
+	 * @param string $search Icon search term.
 	 */
-	public function test_get_items_omits_non_public_icons() {
+	public function test_get_items_omits_non_public_collections( $search ) {
 		wp_set_current_user( self::$editor_id );
 
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/icons' );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/icons' );
+		$request->set_param( 'search', $search );
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertSame( 200, $response->get_status() );
 
 		$names = wp_list_pluck( $response->get_data(), 'name' );
-		$this->assertContains( 'core/plus', $names );
-		$this->assertNotContains( 'core/wordpress', $names );
+		$this->assertContains( 'test-public/visibility-icon', $names );
+		$this->assertNotContains( 'test-private/visibility-icon', $names );
 	}
 
 	/**
-	 * Test that an icon registered as non-public is not readable by name.
+	 * Provides icon searches that match both public and non-public collections.
+	 *
+	 * @return array[]
 	 */
-	public function test_get_item_returns_404_for_non_public_icon() {
+	public function data_icon_visibility_searches() {
+		return array(
+			'all icons'    => array( '' ),
+			'search icons' => array( 'visibility' ),
+		);
+	}
+
+	/**
+	 * Test that an icon in a non-public collection is not readable by name.
+	 */
+	public function test_get_item_returns_404_for_non_public_collection() {
 		wp_set_current_user( self::$editor_id );
 
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/icons/core/wordpress' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/icons/test-private/visibility-icon' );
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertErrorResponse( 'rest_icon_not_found', $response, 404 );
+	}
+
+	/**
+	 * Test that non-public collections cannot be requested by URL or query parameter.
+	 *
+	 * @dataProvider data_non_public_collection_requests
+	 *
+	 * @param string $route REST API route.
+	 * @param array  $query REST API query parameters.
+	 */
+	public function test_get_collection_icons_returns_404_for_non_public_collection( $route, $query ) {
+		wp_set_current_user( self::$editor_id );
+
+		$request = new WP_REST_Request( 'GET', $route );
+		$request->set_query_params( $query );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_icon_collection_not_found', $response, 404 );
+	}
+
+	/**
+	 * Provides requests scoped to a non-public collection.
+	 *
+	 * @return array[]
+	 */
+	public function data_non_public_collection_requests() {
+		return array(
+			'collection route' => array( '/wp/v2/icons/test-private', array() ),
+			'collection query' => array( '/wp/v2/icons', array( 'collection' => 'test-private' ) ),
+		);
+	}
+
+	/**
+	 * Test that non-public collections are omitted from the collection list.
+	 */
+	public function test_get_collections_omits_non_public_collections() {
+		wp_set_current_user( self::$editor_id );
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/icon-collections' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+
+		$slugs = wp_list_pluck( $response->get_data(), 'slug' );
+		$this->assertContains( 'test-public', $slugs );
+		$this->assertNotContains( 'test-private', $slugs );
+	}
+
+	/**
+	 * Test that non-public collections are not readable by slug.
+	 */
+	public function test_get_collection_returns_404_for_non_public_collection() {
+		wp_set_current_user( self::$editor_id );
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/icon-collections/test-private' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_icon_collection_not_found', $response, 404 );
 	}
 }
