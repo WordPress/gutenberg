@@ -188,6 +188,10 @@
     - changed-files:
           - any-glob-to-any-file: 'packages/media-utils/**'
 
+'[Package] Notes Preview':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/notes-preview/**'
+
 '[Package] Notices':
     - changed-files:
           - any-glob-to-any-file: 'packages/notices/**'

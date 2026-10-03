@@ -59,6 +59,7 @@
 		{ "path": "packages/media-editor/tsconfig.build.json" },
 		{ "path": "packages/media-fields/tsconfig.build.json" },
 		{ "path": "packages/media-utils/tsconfig.build.json" },
+		{ "path": "packages/notes-preview/tsconfig.build.json" },
 		{ "path": "packages/notices/tsconfig.build.json" },
 		{ "path": "packages/plugins" },
 		{ "path": "packages/preferences/tsconfig.build.json" },
