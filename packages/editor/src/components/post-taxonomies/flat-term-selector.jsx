@@ -80,6 +80,10 @@ export function FlatTermSelector( { slug } ) {
 	// Terms being created, so that a request that resolves can tell whether its
 	// term is still shown by the time it does.
 	const pendingTermsRef = useRef( new Set() );
+	// Names with a creation already in flight, so the same name isn't created
+	// (and POSTed) twice if its creation is triggered again before the first
+	// request resolves.
+	const inFlightCreatesRef = useRef( new Set() );
 	const registry = useRegistry();
 
 	const { editPost } = useDispatch( editorStore );
@@ -245,6 +249,14 @@ export function FlatTermSelector( { slug } ) {
 	}
 
 	async function createTerm( name ) {
+		// A name whose creation is already in flight is not created again: the
+		// pending request will resolve (or fail) for it once.
+		const createKey = name.toLowerCase();
+		if ( inFlightCreatesRef.current.has( createKey ) ) {
+			return;
+		}
+		inFlightCreatesRef.current.add( createKey );
+
 		const pendingTerm = {
 			// A term removed and created again shouldn't share a key with the
 			// earlier request, which may still resolve.
@@ -262,14 +274,19 @@ export function FlatTermSelector( { slug } ) {
 			createErrorNotice( error.message, {
 				type: 'snackbar',
 			} );
-			// Nothing was assigned, so only the shown term has to go.
+			// The pending token has no id to assign, so it can't stay in the
+			// field — but the name the user typed shouldn't be lost with it.
+			// Restore it to the input so the creation can simply be retried.
 			pendingTermsRef.current.delete( pendingTerm.value );
 			setValues( ( currentValues ) =>
 				currentValues.filter(
 					( item ) => ! isSameTerm( item, pendingTerm )
 				)
 			);
+			setInputValue( name );
 			return;
+		} finally {
+			inFlightCreatesRef.current.delete( createKey );
 		}
 
 		// The term was removed while it was being created.
