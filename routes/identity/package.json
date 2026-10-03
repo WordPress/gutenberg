@@ -17,8 +17,12 @@
 		"@wordpress/html-entities": "file:../../packages/html-entities",
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/lazy-editor": "file:../../packages/lazy-editor",
+		"@wordpress/react-inert-value": "file:../../packages/react-inert-value",
 		"@wordpress/routes-lock-unlock": "file:../lock-unlock",
 		"@wordpress/ui": "file:../../packages/ui",
 		"@wordpress/views": "file:../../packages/views"
+	},
+	"devDependencies": {
+		"@types/react": "^18.3.27"
 	}
 }
