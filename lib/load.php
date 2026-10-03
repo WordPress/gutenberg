@@ -135,6 +135,10 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-workflow-palette' ) ) {
 	require __DIR__ . '/experimental/workflow-palette.php';
 }
 
+if ( gutenberg_is_experiment_enabled( 'gutenberg-notes-on-previews' ) ) {
+	require __DIR__ . '/experimental/notes-preview.php';
+}
+
 if ( gutenberg_is_experiment_enabled( 'gutenberg-wpds-admin-restyle' ) ) {
 	require __DIR__ . '/experimental/wpds-admin/load.php';
 }
