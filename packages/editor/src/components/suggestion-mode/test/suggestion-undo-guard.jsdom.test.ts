@@ -1,5 +1,25 @@
 import { describe, expect, it, vi } from 'vitest';
-import { findNewestPendingSuggestion } from '../suggestion-undo-guard';
+import { act, render } from '@testing-library/react';
+import {
+	createReduxStore,
+	createRegistry,
+	RegistryProvider,
+} from '@wordpress/data';
+import { createElement } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as preferencesStore } from '@wordpress/preferences';
+// @ts-expect-error No exported types
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { createBlock, registerBlockType } from '@wordpress/blocks';
+import SuggestionUndoGuard, {
+	findNewestPendingSuggestion,
+} from '../suggestion-undo-guard';
+import {
+	SuggestionOverlayProvider,
+	useSuggestionOverlay,
+} from '../overlay-context';
+import { store as editorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 
 // The editor store pulls in `@wordpress/viewport`, which reads
 // `window.matchMedia` while loading.
@@ -221,5 +241,109 @@ describe( 'findNewestPendingSuggestion', () => {
 		expect(
 			findNewestPendingSuggestion( entries, blockEditor )
 		).toMatchObject( { kind: 'history', clientId: 'doomed-block' } );
+	} );
+} );
+
+describe( 'SuggestionUndoGuard', () => {
+	function setup( {
+		hasUndo = false,
+		hasRedo = false,
+		blocks = [] as any[],
+	} = {} ) {
+		const undo = vi.fn( () => Promise.resolve() );
+		const redo = vi.fn( () => Promise.resolve() );
+		const registry = createRegistry();
+		registry.register(
+			createReduxStore( 'core', {
+				reducer: ( state = {} ) => state,
+				actions: { undo, redo },
+				selectors: {
+					hasUndo: () => hasUndo,
+					hasRedo: () => hasRedo,
+					getRawEntityRecord: () => undefined,
+					getEntityRecordEdits: () => undefined,
+				},
+			} )
+		);
+		registry.register( noticesStore );
+		registry.register( preferencesStore );
+		registry.register( blockEditorStore );
+		registry.register( editorStore );
+		registry.dispatch( blockEditorStore ).resetBlocks( blocks );
+		unlock( registry.dispatch( editorStore ) ).setEditorIntent( 'suggest' );
+
+		const overlay: { current: any } = { current: null };
+		function Probe() {
+			overlay.current = useSuggestionOverlay();
+			return null;
+		}
+		render(
+			createElement(
+				RegistryProvider,
+				{ value: registry },
+				createElement(
+					SuggestionOverlayProvider,
+					null,
+					createElement( SuggestionUndoGuard ),
+					createElement( Probe )
+				)
+			)
+		);
+		return { registry, overlay };
+	}
+
+	it( 'does not arm an adoption when there is nothing to undo or redo', () => {
+		const { registry, overlay } = setup();
+		const core: any = registry.dispatch( 'core' );
+		core.undo();
+		core.redo();
+		// A stray token would let the next block edit skip capture.
+		expect( overlay.current.consumeUndoRedoAdoption() ).toBe( false );
+	} );
+
+	it( 'arms one adoption per undo or redo that has a history record', () => {
+		const { registry, overlay } = setup( {
+			hasUndo: true,
+			hasRedo: true,
+		} );
+		const core: any = registry.dispatch( 'core' );
+		core.undo();
+		core.redo();
+		expect( overlay.current.consumeUndoRedoAdoption() ).toBe( true );
+		expect( overlay.current.consumeUndoRedoAdoption() ).toBe( true );
+		expect( overlay.current.consumeUndoRedoAdoption() ).toBe( false );
+	} );
+
+	it( 'reports a withdrawable suggestion so Undo is offered without core history', () => {
+		registerBlockType( 'test/undo-guard', {
+			apiVersion: 3,
+			title: 'Test',
+			category: 'text',
+			attributes: { level: { type: 'number', default: 2 } },
+			save: () => null,
+		} );
+		const block = createBlock( 'test/undo-guard' );
+		const { registry, overlay } = setup( { blocks: [ block ] } );
+		const editor = unlock( registry.select( editorStore ) );
+		expect( editor.hasSuggestionUndo() ).toBe( false );
+
+		act( () => {
+			overlay.current.captureBaseline(
+				block.clientId,
+				'test/undo-guard',
+				{
+					level: 2,
+				}
+			);
+			overlay.current.setOverlayAttributes( block.clientId, {
+				level: 3,
+			} );
+		} );
+		expect( editor.hasSuggestionUndo() ).toBe( true );
+
+		act( () => {
+			( registry.dispatch( 'core' ) as any ).undo();
+		} );
+		expect( editor.hasSuggestionUndo() ).toBe( false );
 	} );
 } );

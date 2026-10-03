@@ -78,10 +78,13 @@ function isStringLike( value: any ): boolean {
 /**
  * Attribute keys whose values are known to be object-valued and therefore
  * need a one-level-deep merge so the overlay preserves untouched fields.
- * Other attributes are replaced wholesale (which matches `setAttributes`
- * semantics for primitive and array values).
+ * `metadata` is the only one: the interceptor strips the system keys
+ * (`noteId`, `suggestion`) from the metadata it routes into the overlay, so
+ * the overlay copy is partial. Other attributes, `style` included, are
+ * replaced wholesale, which matches `setAttributes` semantics: a style reset
+ * sends a style object without the cleared fields.
  */
-const DEEP_MERGE_KEYS = new Set( [ 'style', 'metadata' ] );
+const DEEP_MERGE_KEYS = new Set( [ 'metadata' ] );
 
 /**
  * Would routing this edit into the overlay hide a marker that is currently
@@ -117,11 +120,9 @@ function overlayWouldHideMarkers(
 
 /**
  * Apply an overlay attribute set on top of the block's real attributes for
- * rendering. Keys in `DEEP_MERGE_KEYS` (currently `style` and `metadata`)
- * are one-level-merged so a partial overlay payload — e.g. tweaking
- * `style.color` while leaving `style.typography` alone — preserves the
- * untouched fields. Every other key is replaced wholesale, matching
- * `setAttributes` semantics for primitive and array values.
+ * rendering. Keys in `DEEP_MERGE_KEYS` (currently `metadata`) are
+ * one-level-merged so the system fields the overlay never carries survive.
+ * Every other key is replaced wholesale, matching `setAttributes` semantics.
  *
  * @param base    Block's real attributes from the block-editor store.
  * @param overlay Pending overlay attributes; `null` is a no-op.
@@ -212,6 +213,19 @@ function SuggestingBlockEdit( {
 		const core = select( coreStore );
 		return { authorId: core?.getCurrentUser?.()?.id ?? null };
 	}, [] );
+
+	const mergedAttributes = useMemo(
+		() => mergeOverlayAttributes( attributes, overlayAttributes ),
+		[ attributes, overlayAttributes ]
+	);
+
+	// What the block sees, kept current between renders as well: an updater
+	// function passed to `setAttributes` (Table does this for cell edits)
+	// must build on the previous update even when two land before a render.
+	const mergedAttributesRef = useRef( mergedAttributes );
+	useEffect( () => {
+		mergedAttributesRef.current = mergedAttributes;
+	}, [ mergedAttributes ] );
 
 	// Does an overlay entry currently exist for this block? This is the
 	// source of truth; `captureBaseline` only creates an entry when there
@@ -342,7 +356,13 @@ function SuggestingBlockEdit( {
 	);
 
 	const wrappedSetAttributes = useCallback(
-		( nextAttributes: Record< string, any > ) => {
+		(
+			nextAttributes:
+				| Record< string, any >
+				| ( (
+						current: Record< string, any >
+				  ) => Record< string, any > )
+		) => {
 			/*
 			 * Edits inside a block that IS the suggestion write through to
 			 * the real attributes instead of the overlay and the marker
@@ -356,33 +376,42 @@ function SuggestingBlockEdit( {
 			 *   as the block's new baseline. Checked against the live store
 			 *   because the outer pass-through branch only catches up after
 			 *   its `useSelect` re-renders.
+			 *
+			 * A multi-selection update also goes to the real setter, which
+			 * applies the change to every selected block. The store
+			 * interceptor then turns each block's change into its own
+			 * suggestion and restores the real attributes.
 			 */
 			const blockEditor = registry?.select?.( blockEditorStore );
 			if (
 				isDeferredInsertion( clientId ) ||
 				( blockEditor &&
-					isPartOfPendingInsertion( blockEditor, clientId ) )
+					( isPartOfPendingInsertion( blockEditor, clientId ) ||
+						blockEditor.getMultiSelectedBlockClientIds?.()?.length >
+							0 ) )
 			) {
 				setAttributes( nextAttributes );
 				return;
 			}
+			// An updater function builds on what the block sees now, overlay
+			// included, so resolve it before any handler inspects the edit.
+			const updates =
+				typeof nextAttributes === 'function'
+					? nextAttributes( mergedAttributesRef.current )
+					: nextAttributes;
 			// A formatting-only change becomes a live `format` marker rather
 			// than an overlay diff; everything else (text edits, primitive
 			// attribute changes) still routes to the overlay below.
 			// The block-editor store holds the live value RichText renders (a
 			// format-suggestion block keeps no overlay entry), so the block's
 			// current attributes are the "before" side of the format diff.
-			if (
-				maybeHandleFormatEdit( nextAttributes, attributesRef.current )
-			) {
+			if ( maybeHandleFormatEdit( updates, attributesRef.current ) ) {
 				return;
 			}
 			// A text edit that surfaced as a fresh `content` value (not caught
 			// by the typing/deletion keyboards) becomes inline markers too, so
 			// it never reaches the overlay diff path.
-			if (
-				maybeHandleContentEdit( nextAttributes, attributesRef.current )
-			) {
+			if ( maybeHandleContentEdit( updates, attributesRef.current ) ) {
 				return;
 			}
 			/*
@@ -394,12 +423,14 @@ function SuggestingBlockEdit( {
 			 * paste or IME commit the marker plan can't resolve), so the
 			 * invariant holds however the edit arrived.
 			 */
-			if (
-				overlayWouldHideMarkers( nextAttributes, attributesRef.current )
-			) {
+			if ( overlayWouldHideMarkers( updates, attributesRef.current ) ) {
 				notifyEditRefused( registry );
 				return;
 			}
+			mergedAttributesRef.current = {
+				...mergedAttributesRef.current,
+				...updates,
+			};
 			/*
 			 * First overlay write for this block snapshots the current
 			 * attributes as the baseline; subsequent writes only record
@@ -424,7 +455,7 @@ function SuggestingBlockEdit( {
 			}
 			setOverlayAttributes(
 				clientId,
-				stripSuggestionMarkersFromAttributes( nextAttributes )
+				stripSuggestionMarkersFromAttributes( updates )
 			);
 		},
 		[
@@ -439,11 +470,6 @@ function SuggestingBlockEdit( {
 			setAttributes,
 			registry,
 		]
-	);
-
-	const mergedAttributes = useMemo(
-		() => mergeOverlayAttributes( attributes, overlayAttributes ),
-		[ attributes, overlayAttributes ]
 	);
 
 	return (
