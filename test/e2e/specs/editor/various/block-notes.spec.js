@@ -73,6 +73,25 @@ test.describe( 'Block Notes', () => {
 		await expect( thread ).toBeFocused();
 	} );
 
+	test( 'shows an icon and shortcut on the "Add note" menu item', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Testing block comments' },
+		} );
+		await editor.clickBlockToolbarButton( 'Options' );
+		const menuItem = page
+			.getByRole( 'menu', { name: 'Options' } )
+			.getByRole( 'menuitem', { name: 'Add note' } );
+
+		await expect( menuItem.locator( 'svg' ) ).toBeVisible();
+		await expect(
+			menuItem.locator( '.components-menu-item__shortcut' )
+		).not.toBeEmpty();
+	} );
+
 	test( 'can reply to a block note', async ( { page, blockNoteUtils } ) => {
 		await blockNoteUtils.addBlockWithNote( {
 			type: 'core/paragraph',
