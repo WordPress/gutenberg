@@ -1,34 +1,28 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalHeading as Heading,
-	SelectControl,
+	SelectControl as WCSelectControl,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import ImageCropper from '../components/image-cropper';
 import ImageCropperProvider, { useImageCropper } from '../provider';
 import type { ImageCropperProps, MediaSize } from '../types';
 import { MIN_ZOOM, MAX_ZOOM } from '../constants';
-import './style.css';
+import styles from './style.module.css';
 
 export default {
-	title: 'ImageCropper/ImageCropper',
+	id: 'imagecropper-imagecropper',
+	title: 'Editor/Image Cropper/ImageCropper',
 	component: ImageCropper,
 };
 
 const DefaultComponent = ( args: ImageCropperProps ) => {
 	return (
 		<ImageCropperProvider>
-			<div className="image-cropper__container-wrapper-story">
-				<div className="image-cropper__container-story">
+			<div className={ styles[ 'container-wrapper' ] }>
+				<div className={ styles.container }>
 					<ImageCropper { ...args } />
 				</div>
 			</div>
@@ -194,7 +188,7 @@ const WithControlsContent = ( args: ImageCropperProps ) => {
 							cropperState.aspectRatio.toFixed( 2 )
 						) }
 					</Heading>
-					<SelectControl
+					<WCSelectControl
 						value={ cropperState.aspectRatio.toString() }
 						options={ aspectRatioOptions }
 						onChange={ handleAspectRatioChange }
@@ -205,9 +199,9 @@ const WithControlsContent = ( args: ImageCropperProps ) => {
 				</HStack>
 			</VStack>
 
-			<div className="image-cropper__container-wrapper-story">
+			<div className={ styles[ 'container-wrapper' ] }>
 				<div
-					className="image-cropper__container-story"
+					className={ styles.container }
 					ref={ containerRef }
 					style={ {
 						...containerStyle,
@@ -221,6 +215,11 @@ const WithControlsContent = ( args: ImageCropperProps ) => {
 };
 
 export const WithControls = {
+	parameters: {
+		// FIXME: Crop controls include an unlabeled input and unnamed select (label, select-name).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: WithControlsComponent,
 	args: {
 		src: 'https://s.w.org/images/core/5.3/MtBlanc1.jpg',

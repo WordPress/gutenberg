@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import isEmpty from './is-empty';
 import remove from './remove';
 import unwrap from './unwrap';
@@ -52,9 +49,18 @@ export default function cleanNodeList( nodeList, doc, schema, inline ) {
 					} = schema[ tag ];
 
 					// If the node is empty and it's supposed to have children,
-					// remove the node.
+					// remove the node. For phrasing content nodes that contain
+					// only whitespace, unwrap instead to preserve the text.
+					// See https://github.com/WordPress/gutenberg/issues/50898
 					if ( children && ! allowEmpty && isEmpty( node ) ) {
-						remove( node );
+						if (
+							isPhrasingContent( node ) &&
+							node.hasChildNodes()
+						) {
+							unwrap( node );
+						} else {
+							remove( node );
+						}
 						return;
 					}
 

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import styled from '@emotion/styled';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import { boxSizingReset, COLORS, CONFIG } from '../../utils';
 import { HStack } from '../../h-stack';
@@ -33,8 +26,11 @@ export const ViewNextMonthButton = styled( Button )`
 `;
 
 export const NavigatorHeading = styled( Heading )`
-	font-size: ${ CONFIG.fontSize };
-	font-weight: ${ CONFIG.fontWeight };
+	/* Override Heading's module typography in either document's style order. */
+	&& {
+		font-size: ${ CONFIG.fontSize };
+		font-weight: ${ CONFIG.fontWeight };
+	}
 	grid-column: 2 / 7;
 
 	strong {

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createBlock, rawHandler } from '@wordpress/blocks';
 
 const LIST_STYLES = {

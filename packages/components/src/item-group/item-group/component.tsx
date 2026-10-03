@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { useItemGroup } from './hook';
@@ -30,6 +23,7 @@ function UnconnectedItemGroup(
 	const size = sizeProp || contextSize;
 
 	const contextValue = {
+		isList: otherProps.role === 'list' || otherProps.role === 'directory',
 		spacedAround,
 		size,
 	};

@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import NumberControl from '..';
 
 const meta: Meta< typeof NumberControl > = {
-	title: 'Components/Selection & Input/Common/NumberControl',
+	title: 'Components/@wordpress-components/Selection & Input/Common/NumberControl',
 	id: 'components-numbercontrol',
 	component: NumberControl,
 	argTypes: {
@@ -25,14 +14,14 @@ const meta: Meta< typeof NumberControl > = {
 		type: { control: { type: 'text' } },
 		value: { control: false },
 	},
-	tags: [ 'status-experimental', 'manifest' ],
+	tags: [ 'status-experimental' ],
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'recommended',
+			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by [`InputControl`](?path=/docs/design-system-components-form-inputcontrol--docs) with `type="number"` in `@wordpress/ui`, but continue using for now.',
+			notes: 'For new use cases, use [`InputControl`](?path=/docs/design-system-components-form-inputcontrol--docs) with `type="number"` from `@wordpress/ui` instead. Existing usages should migrate with caution, due to significant differences in behavior. See the [migration guide](?path=/docs/components-inputcontrol--migration-guide).',
 		},
 	},
 };

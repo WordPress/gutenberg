@@ -1,13 +1,6 @@
 'use strict';
-/**
- * External dependencies
- */
 const fs = require( 'fs' );
 const path = require( 'path' );
-
-/**
- * Internal dependencies
- */
 const { hasSameCoreSource } = require( './wordpress' );
 const { dbEnv } = require( '../../config' );
 const getHostUser = require( './get-host-user' );
@@ -107,7 +100,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				config.env.tests,
 				hostUser.name,
 				'tests-wordpress'
-		  )
+			)
 		: [];
 
 	// We use a custom Dockerfile in order to make sure that

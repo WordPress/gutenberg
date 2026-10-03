@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
 import type { SerializedStyles } from '@emotion/react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import type { CSSProperties, ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../../context';
 import { Flex, FlexItem } from '../../flex';
 import { Text } from '../../text';
@@ -34,30 +27,10 @@ export const Suffix = styled.span`
 	display: flex;
 `;
 
-type BackdropProps = {
-	disabled?: boolean;
-	isBorderless?: boolean;
-};
-
-const backdropBorderColor = ( {
-	disabled,
-	isBorderless,
-}: BackdropProps ): CSSProperties[ 'borderColor' ] => {
-	if ( isBorderless ) {
-		return 'transparent';
-	}
-
-	if ( disabled ) {
-		return COLORS.ui.borderDisabled;
-	}
-
-	return COLORS.ui.border;
-};
-
-export const BackdropUI = styled.div< BackdropProps >`
+// Border color is in style.module.scss.
+export const BackdropUI = styled.div`
 	&&& {
 		box-sizing: border-box;
-		border-color: ${ backdropBorderColor };
 		border-radius: inherit;
 		border-style: solid;
 		border-width: 1px;
@@ -79,25 +52,20 @@ export const Root = styled( Flex )`
 	position: relative;
 	border-radius: ${ CONFIG.radiusSmall };
 	padding-top: 0;
-
-	// Focus within, excluding cases where auxiliary controls in prefix or suffix have focus.
-	&:focus-within:not( :has( :is( ${ Prefix }, ${ Suffix } ):focus-within ) ) {
-		${ BackdropUI } {
-			border-color: ${ COLORS.ui.borderFocus };
-			box-shadow: ${ CONFIG.controlBoxShadowFocus };
-			// Windows High Contrast mode will show this outline, but not the box-shadow.
-			outline: 2px solid transparent;
-			outline-offset: -2px;
-		}
-	}
 `;
 
 const containerDisabledStyles = ( { disabled }: ContainerProps ) => {
-	const backgroundColor = disabled
-		? COLORS.ui.backgroundDisabled
-		: COLORS.ui.background;
+	if ( ! disabled ) {
+		return undefined;
+	}
 
-	return css( { backgroundColor } );
+	return css`
+		color: ${ COLORS.ui.textDisabled };
+
+		@media ( forced-colors: active ) {
+			color: GrayText;
+		}
+	`;
 };
 
 const containerWidthStyles = ( {
@@ -128,6 +96,7 @@ export const Container = styled.div< ContainerProps >`
 	display: flex;
 	flex: 1;
 	position: relative;
+	background-color: ${ COLORS.ui.background };
 
 	${ containerDisabledStyles }
 	${ containerWidthStyles }
@@ -147,9 +116,17 @@ const disabledStyles = ( { disabled }: InputProps ) => {
 		return '';
 	}
 
-	return css( {
-		color: COLORS.ui.textDisabled,
-	} );
+	return css`
+		color: ${ COLORS.ui.textDisabled };
+
+		@media ( forced-colors: active ) {
+			color: GrayText;
+		}
+
+		&:disabled::placeholder {
+			color: ${ COLORS.ui.textDisabled };
+		}
+	`;
 };
 
 export const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
@@ -278,6 +255,36 @@ export const Input = styled.input< InputProps >`
 
 		&:-ms-input-placeholder {
 			color: ${ COLORS.ui.darkGrayPlaceholder };
+		}
+
+		&[type='date'],
+		&[type='datetime-local'],
+		&[type='month'],
+		&[type='time'],
+		&[type='week'] {
+			&::-webkit-datetime-edit {
+				display: flex;
+				align-items: center;
+				height: 100%;
+			}
+		}
+
+		/* Hide Safari's value-like placeholder (e.g. \`12:30\`) in empty
+		   date/time inputs. While the input is focused, the browser's
+		   segment editor must stay visible for typing. */
+		@supports ( -webkit-hyphens: none ) and
+			( not ( -moz-appearance: none ) ) {
+			/* Safari only */
+			&[type='date'][data-empty-value]:not( :focus ),
+			&[type='time'][data-empty-value]:not( :focus ),
+			&[type='datetime-local'][data-empty-value]:not( :focus ) {
+				color: transparent;
+
+				/* Hide slashes in date when input is disabled. */
+				&:disabled::-webkit-datetime-edit-text {
+					color: transparent;
+				}
+			}
 		}
 
 		&[type='email'],

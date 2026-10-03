@@ -33,9 +33,6 @@ The RTL version of the stylesheet is available at `@wordpress/components/build-s
 Within Gutenberg, these components can be accessed by importing from the `components` root directory:
 
 ```jsx
-/**
- * WordPress dependencies
- */
 import { Button } from '@wordpress/components';
 
 export default function MyButton() {
@@ -53,14 +50,7 @@ The following example illustrates how you can wrap a component using a
 `Popover` and have those popovers render to a single location in the DOM.
 
 ```jsx
-/**
- * External dependencies
- */
 import { Popover, SlotFillProvider } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import { MyComponentWithPopover } from './my-component';
 
 const Example = () => {

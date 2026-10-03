@@ -1,20 +1,9 @@
-/**
- * WordPress dependencies
- */
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { moreVertical, trash } from '@wordpress/icons';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { IconButton } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../lock-unlock';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { IconButton, Menu } from '@wordpress/ui';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import type { DashboardWidget, GridTilePlacement } from '../../types';
-
-const { Menu } = unlock( componentsPrivateApis );
 
 type NamedGridWidth = Exclude<
 	NonNullable< GridTilePlacement[ 'width' ] >,
@@ -26,15 +15,32 @@ export interface WidgetLayoutControlsProps {
 	 * The instance these controls manage within the layout.
 	 */
 	widget: DashboardWidget< unknown >;
+
+	/**
+	 * Whether the policy allows removing the instance.
+	 *
+	 * @default true
+	 */
+	canRemove?: boolean;
+
+	/**
+	 * Whether the policy allows resizing the instance.
+	 *
+	 * @default true
+	 */
+	canResize?: boolean;
 }
 
 /**
- * Customize-mode controls: width menu and removal.
+ * Customize-mode controls: width menu and removal, each following the
+ * policy's answer for its operation.
  *
  * @param {WidgetLayoutControlsProps} props Component props.
  */
 export function WidgetLayoutControls( {
 	widget,
+	canRemove = true,
+	canResize = true,
 }: WidgetLayoutControlsProps ): React.ReactNode {
 	const { layout, onLayoutChange } = useDashboardInternalContext();
 	const width = widget.placement?.width;
@@ -48,7 +54,7 @@ export function WidgetLayoutControls( {
 							...currentWidget.placement,
 							width: nextWidth,
 						},
-				  }
+					}
 				: currentWidget
 		);
 		onLayoutChange( nextLayout );
@@ -68,50 +74,51 @@ export function WidgetLayoutControls( {
 
 	return (
 		<>
-			<Menu>
-				<Menu.TriggerButton
-					render={
-						<IconButton
-							icon={ moreVertical }
-							label={ __( 'Widget options' ) }
-							size="compact"
-							variant="minimal"
-							tone="neutral"
-						/>
-					}
+			{ canResize && (
+				<Menu.Root>
+					<Menu.Trigger
+						render={
+							<IconButton
+								icon={ moreVertical }
+								label={ __( 'Widget options' ) }
+								size="compact"
+								variant="minimal"
+								tone="neutral"
+							/>
+						}
+					/>
+
+					<Menu.Popup>
+						<Menu.RadioGroup
+							value={ width ?? null }
+							onValueChange={ onNamedWidthChange }
+						>
+							<Menu.GroupLabel>{ __( 'Width' ) }</Menu.GroupLabel>
+							<Menu.RadioItem value="fill" closeOnClick>
+								<Menu.ItemLabel>
+									{ __( 'Use available width' ) }
+								</Menu.ItemLabel>
+							</Menu.RadioItem>
+							<Menu.RadioItem value="full" closeOnClick>
+								<Menu.ItemLabel>
+									{ __( 'Make full width' ) }
+								</Menu.ItemLabel>
+							</Menu.RadioItem>
+						</Menu.RadioGroup>
+					</Menu.Popup>
+				</Menu.Root>
+			) }
+
+			{ canRemove && (
+				<IconButton
+					icon={ trash }
+					label={ __( 'Remove' ) }
+					size="compact"
+					variant="minimal"
+					tone="neutral"
+					onClick={ onRemove }
 				/>
-
-				<Menu.Popover>
-					<Menu.Group>
-						<Menu.GroupLabel>{ __( 'Width' ) }</Menu.GroupLabel>
-						<Menu.Item
-							disabled={ width === 'fill' }
-							onClick={ () => onNamedWidthChange( 'fill' ) }
-						>
-							<Menu.ItemLabel>
-								{ __( 'Use available width' ) }
-							</Menu.ItemLabel>
-						</Menu.Item>
-						<Menu.Item
-							disabled={ width === 'full' }
-							onClick={ () => onNamedWidthChange( 'full' ) }
-						>
-							<Menu.ItemLabel>
-								{ __( 'Make full width' ) }
-							</Menu.ItemLabel>
-						</Menu.Item>
-					</Menu.Group>
-				</Menu.Popover>
-			</Menu>
-
-			<IconButton
-				icon={ trash }
-				label={ __( 'Remove' ) }
-				size="compact"
-				variant="minimal"
-				tone="neutral"
-				onClick={ onRemove }
-			/>
+			) }
 		</>
 	);
 }

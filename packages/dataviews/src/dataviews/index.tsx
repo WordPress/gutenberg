@@ -1,12 +1,4 @@
-/**
- * External dependencies
- */
-import type { ReactNode, ComponentProps, ReactElement } from 'react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	useContext,
 	useEffect,
@@ -14,12 +6,7 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { useResizeObserver } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DataViewsContext from '../components/dataviews-context';
 import { VIEW_LAYOUTS } from '../components/dataviews-layouts';
 import {
@@ -38,46 +25,12 @@ import DataViewsViewConfig, {
 	ViewTypeMenu,
 } from '../components/dataviews-view-config';
 import normalizeFields from '../field-types';
+import useContainerWidth from '../hooks/use-container-width';
 import useData from '../hooks/use-data';
 import { useInfiniteScroll } from '../hooks/use-infinite-scroll';
-import type { Action, Field, View, SupportedLayouts } from '../types';
+import usePageClamp from '../hooks/use-page-clamp';
+import type { SupportedLayouts, DataViewsProps, ItemWithId } from '../types';
 import type { SelectionOrUpdater } from '../types/private';
-type ItemWithId = { id: string };
-
-type DataViewsProps< Item > = {
-	view: View;
-	onChangeView: ( view: View ) => void;
-	fields: Field< Item >[];
-	search?: boolean;
-	searchLabel?: string;
-	actions?: Action< Item >[];
-	data: Item[];
-	isLoading?: boolean;
-	paginationInfo: {
-		totalItems: number;
-		totalPages: number;
-	};
-	defaultLayouts?: SupportedLayouts;
-	selection?: string[];
-	onChangeSelection?: ( items: string[] ) => void;
-	onClickItem?: ( item: Item ) => void;
-	renderItemLink?: (
-		props: {
-			item: Item;
-		} & ComponentProps< 'a' >
-	) => ReactElement;
-	isItemClickable?: ( item: Item ) => boolean;
-	header?: ReactNode;
-	getItemLevel?: ( item: Item ) => number;
-	children?: ReactNode;
-	config?: {
-		perPageSizes: number[];
-	};
-	empty?: ReactNode;
-	onReset?: ( () => void ) | false;
-} & ( Item extends ItemWithId
-	? { getItemId?: ( item: Item ) => string }
-	: { getItemId: ( item: Item ) => string } );
 
 const defaultGetItemId = ( item: ItemWithId ) => item.id;
 const defaultIsItemClickable = () => true;
@@ -183,15 +136,7 @@ function DataViews< Item >( {
 		setVisibleEntries?: React.Dispatch< React.SetStateAction< number[] > >;
 	};
 	const containerRef = useRef< HTMLDivElement >( null );
-	const [ containerWidth, setContainerWidth ] = useState( 0 );
-	const resizeObserverRef = useResizeObserver(
-		( resizeObserverEntries: any ) => {
-			setContainerWidth(
-				resizeObserverEntries[ 0 ].borderBoxSize[ 0 ].inlineSize
-			);
-		},
-		{ box: 'border-box' }
-	);
+	const [ containerWidth, resizeObserverRef ] = useContainerWidth();
 	const [ openedFilter, setOpenedFilter ] = useState< string | null >( null );
 	function setSelectionWithChange( value: SelectionOrUpdater ) {
 		const newValue =
@@ -234,6 +179,13 @@ function DataViews< Item >( {
 		paginationInfo,
 		containerRef,
 		setVisibleEntries,
+	} );
+
+	usePageClamp( {
+		view,
+		onChangeView,
+		isLoading,
+		totalPages: paginationInfo.totalPages,
 	} );
 
 	useEffect( () => {

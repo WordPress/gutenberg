@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -8,16 +5,13 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalView as View,
 	__experimentalText as WCText,
+	Button,
 	Navigator,
 } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
 // @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import type { StateDefinition } from './utils';
 import { unlock } from './lock-unlock';
 
@@ -26,6 +20,12 @@ const { StateControl, StateControlBadges } = unlock( blockEditorPrivateApis );
 interface ScreenHeaderProps {
 	title: string;
 	description?: string | React.ReactElement;
+	/**
+	 * Replaces the back button's default navigation. Without it the button
+	 * moves up one path segment, which is wrong for a screen whose path
+	 * carries a selection (for example `/revisions/12`) rather than a
+	 * sub-screen.
+	 */
 	onBack?: () => void;
 	viewportStates?: StateDefinition[];
 	pseudoStates?: StateDefinition[];
@@ -54,12 +54,24 @@ export function ScreenHeader( {
 				<Spacer marginBottom={ 0 } paddingX={ 4 } paddingY={ 3 }>
 					<VStack spacing={ 2 }>
 						<HStack spacing={ 2 } alignment="top">
-							<Navigator.BackButton
-								icon={ isRTL() ? chevronRight : chevronLeft }
-								size="small"
-								label={ __( 'Back' ) }
-								onClick={ onBack }
-							/>
+							{ onBack ? (
+								<Button
+									icon={
+										isRTL() ? chevronRight : chevronLeft
+									}
+									size="small"
+									label={ __( 'Back' ) }
+									onClick={ onBack }
+								/>
+							) : (
+								<Navigator.BackButton
+									icon={
+										isRTL() ? chevronRight : chevronLeft
+									}
+									size="small"
+									label={ __( 'Back' ) }
+								/>
+							) }
 							<Spacer>
 								<HStack justify="space-between" alignment="top">
 									<Heading

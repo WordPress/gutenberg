@@ -14,8 +14,8 @@ A _host_ is any context that renders widgets: a dashboard, a sidebar, a plugin p
 
 The shapes a host reads to discover and render a widget:
 
-- `WidgetType`, `WidgetName`, `WidgetIcon`
-- `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`
+-   `WidgetType`, `WidgetName`, `WidgetIcon`
+-   `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`
 
 Defined here and re-exported nowhere else.
 
@@ -23,7 +23,7 @@ Defined here and re-exported nowhere else.
 
 `WidgetAttributeField< Item >` is for widget authors, not hosts. It narrows a DataViews `Field.id` to the keys of the widget's attribute object, so a typo'd field `id` is caught while authoring.
 
-It also accepts an optional `relevance` hint (`'high' | 'low'`). The widget declares importance, not a surface. See **Anatomy** for how hosts may use it.
+It also accepts an optional `relevance` hint (`'high' | 'medium' | 'low'`). The widget declares importance, not a surface. See **Anatomy** for how hosts may use it.
 
 How a widget is authored (its folder, `widget.json`, `widget.ts`, `render.tsx`) is covered in **System Architecture**.
 
@@ -31,8 +31,8 @@ How a widget is authored (its folder, `widget.json`, `widget.ts`, `render.tsx`) 
 
 `useWidgetTypes( records )` takes host-supplied widget-module records, imports each record's metadata module, and returns:
 
-- `WidgetType[]`
-- `isResolvingWidgetTypes`, which stays `true` before records are supplied (`null` or `undefined`) and while their metadata modules are still importing
+-   `WidgetType[]`
+-   `isResolvingWidgetTypes`, which stays `true` before records are supplied (`null` or `undefined`) and while their metadata modules are still importing
 
 The hook reaches for no store or endpoint. The host fetches the records however it wants and passes them in.
 
@@ -41,6 +41,14 @@ The hook reaches for no store or endpoint. The host fetches the records however 
 `registerFieldType( definition )` names a reusable field type that widget attributes can reference via `type` (for example `type: 'location'`), so an attribute ships a custom control without importing one. The consuming application owns the vocabulary; `useWidgetTypes` resolves the references into plain DataViews `Field` props while it assembles each `WidgetType`, and unregistered names degrade exactly as unknown types do in DataViews.
 
 See **Field Types** for the full pipeline.
+
+### Host capabilities
+
+`HostLink` is the anchor consumers mount for a link target, and the only piece of the seam most of them touch. It reads the host's `links` capability and mounts the application's own link or a plain anchor, so no consumer branches on it.
+
+`WidgetHostProvider` / `useWidgetHost`: the seam itself, through which the embedding application provides what only it knows. Every capability is optional, and an absent one degrades to the host-agnostic behavior. `links` is the first: recognition of the application's own routes plus its router's link primitive. Applications mount the provider; the hook reads the bag directly, for a capability no component covers yet.
+
+See **Widget Host** for the contract.
 
 ### Rendering
 

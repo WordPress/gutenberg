@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Registered sources', () => {
@@ -903,6 +900,7 @@ test.describe( 'Registered sources', () => {
 				} )
 				.getByRole( 'textbox' );
 			await buttonBlock.click();
+			await pageUtils.pressKeys( 'primary+k' );
 			await page
 				.getByRole( 'button', { name: 'Edit link', exact: true } )
 				.click();

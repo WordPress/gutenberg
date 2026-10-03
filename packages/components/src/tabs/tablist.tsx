@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import { useStoreState } from '@ariakit/react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import warning from '@wordpress/warning';
 import { forwardRef, useLayoutEffect, useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import type { TabListProps } from './types';
 import type { WordPressComponentProps } from '../context';
 import type { ElementOffsetRect } from '../utils/element-rect';
@@ -70,7 +59,7 @@ function useScrollRectIntoView(
 export const TabList = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< TabListProps, 'div', false >
->( function TabList( { children, ...otherProps }, ref ) {
+>( function UnforwardedTabList( { children, ...otherProps }, ref ) {
 	const { store } = useTabsContext() ?? {};
 
 	const selectedId = useStoreState( store, 'selectedId' );

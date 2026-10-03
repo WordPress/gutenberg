@@ -29,7 +29,6 @@
 	"supports": {
 		"align": [ "wide", "full" ],
 		"splitting": true,
-		"editableRoot": true,
 		"anchor": true,
 		"className": false,
 		"__experimentalBorder": {
@@ -38,6 +37,7 @@
 			"style": true,
 			"width": true
 		},
+		"shadow": true,
 		"color": {
 			"gradients": true,
 			"link": true,
@@ -67,6 +67,7 @@
 			"__experimentalLetterSpacing": true,
 			"__experimentalTextTransform": true,
 			"__experimentalWritingMode": true,
+			"textShadow": true,
 			"fitText": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true

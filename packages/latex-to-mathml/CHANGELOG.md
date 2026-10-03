@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Write `columnalign` on the cells of `aligned`, `cases` and tagged equations, so the alignment is part of the MathML, and strip the classes temml adds for its own stylesheet ([#83164](https://github.com/WordPress/gutenberg/pull/83164)).
+
+## 1.24.0 (2026-09-23)
+
+## 1.23.0 (2026-09-10)
+
+## 1.22.0 (2026-08-26)
+
+## 1.21.0 (2026-08-12)
+
+
+## 1.20.0 (2026-07-29)
+
 ## 1.19.0 (2026-07-14)
 
 ## 1.18.0 (2026-07-01)

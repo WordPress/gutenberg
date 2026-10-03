@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
 import warning from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import { store as coreStore } from '../';
 import { Status } from './constants';
 import useQuerySelect from './use-query-select';

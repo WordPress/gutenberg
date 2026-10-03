@@ -1,25 +1,17 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport } from '@wordpress/blocks';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import {
 	getColorClassName,
 	getColorObjectByAttributeValues,
 } from '../components/colors';
 import { __experimentalGetGradientClass } from '../components/gradients';
 import { transformStyles, shouldSkipSerialization } from './utils';
-import { getBackgroundImageClasses } from './background';
+import {
+	BACKGROUND_SUPPORT_KEY,
+	getBackgroundImageClasses,
+} from './background';
 import { useSettings } from '../components/use-settings';
 
 export const COLOR_SUPPORT_KEY = 'color';
@@ -173,6 +165,23 @@ export function addSaveProps( props, blockNameOrType, attributes ) {
 	return props;
 }
 
+// Mirror of the background support's per-feature skip on the front end.
+function getSerializedBackgroundClasses( name, style ) {
+	const shouldSerialize = ( feature ) =>
+		! shouldSkipSerialization( name, BACKGROUND_SUPPORT_KEY, feature );
+
+	return getBackgroundImageClasses( {
+		background: {
+			backgroundImage: shouldSerialize( 'backgroundImage' )
+				? style?.background?.backgroundImage
+				: undefined,
+			gradient: shouldSerialize( 'gradient' )
+				? style?.background?.gradient
+				: undefined,
+		},
+	} );
+}
+
 function useBlockProps( {
 	name,
 	backgroundColor,
@@ -194,11 +203,16 @@ function useBlockProps( {
 		],
 		[ userPalette, themePalette, defaultPalette ]
 	);
-	if (
-		! hasColorSupport( name ) ||
-		shouldSkipSerialization( name, COLOR_SUPPORT_KEY )
-	) {
+	if ( ! hasColorSupport( name ) ) {
 		return {};
+	}
+
+	// Each support adds `has-background` for the values it serializes, so a
+	// background image still adds it when color serialization is skipped.
+	const backgroundClassName = getSerializedBackgroundClasses( name, style );
+
+	if ( shouldSkipSerialization( name, COLOR_SUPPORT_KEY ) ) {
+		return backgroundClassName ? { className: backgroundClassName } : {};
 	}
 	const extraStyles = {};
 
@@ -228,18 +242,15 @@ function useBlockProps( {
 		style,
 	} );
 
-	const hasBackgroundValue =
-		backgroundColor ||
-		style?.color?.background ||
-		gradient ||
-		style?.color?.gradient;
+	const hasColorBackgroundClass = saveProps.className
+		?.split( ' ' )
+		.includes( 'has-background' );
 
 	return {
 		...saveProps,
 		className: clsx(
 			saveProps.className,
-			// Add background image classes in the editor, if not already handled by background color values.
-			! hasBackgroundValue && getBackgroundImageClasses( style )
+			! hasColorBackgroundClass && backgroundClassName
 		),
 	};
 }

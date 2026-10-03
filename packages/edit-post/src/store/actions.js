@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -12,10 +9,6 @@ import { addAction } from '@wordpress/hooks';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { getMetaBoxContainer } from '../utils/meta-boxes';
 import { unlock } from '../lock-unlock';
 

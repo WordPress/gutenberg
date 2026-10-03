@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { parse as grammarParse } from '@wordpress/block-serialization-default-parser';
 import { autop } from '@wordpress/autop';
-
-/**
- * Internal dependencies
- */
 import {
 	getFreeformContentHandlerName,
 	getUnregisteredTypeHandlerName,

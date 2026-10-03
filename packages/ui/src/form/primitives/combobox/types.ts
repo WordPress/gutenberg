@@ -1,7 +1,7 @@
 import type { Combobox as _Combobox } from '@base-ui/react/combobox';
-import type { ReactElement } from 'react';
-
+import type { ReactElement, ReactNode } from 'react';
 import type { ComponentProps } from '../../../utils/types';
+import type { ItemPopupWidthProps } from '../../../utils/css/item-popup';
 import type { InputLayoutProps } from '../input-layout/types';
 
 type ComboboxSize = Exclude< InputLayoutProps[ 'size' ], 'small' >;
@@ -22,6 +22,8 @@ export type ComboboxChipWithRemoveProps = Omit<
 	prefix?: React.ReactNode;
 	/**
 	 * Accessible label for the remove button.
+	 * Keep this to the action (for example `Remove`). The chip label describes
+	 * the button.
 	 *
 	 * @default __( 'Remove' )
 	 */
@@ -50,17 +52,49 @@ export type ComboboxGroupLabelProps = ComponentProps<
 
 export type ComboboxInputProps = Omit<
 	ComponentProps< typeof _Combobox.Input >,
-	'size'
+	'size' | 'type' // The combobox role is only valid on input type="text".
 >;
 
-export type ComboboxItemProps = ComponentProps< typeof _Combobox.Item > & {
+export type ComboboxInputGroupProps = ComponentProps<
+	typeof _Combobox.InputGroup
+> & {
 	children?: React.ReactNode;
+};
+
+export type ComboboxItemLabelProps = ComponentProps< 'span' > & {
 	/**
-	 * The size of the item.
-	 *
-	 * @default 'default'
+	 * The primary label and accessible name of a combobox item.
 	 */
-	size?: ComboboxSize;
+	children: ReactNode;
+};
+
+export type ComboboxItemDescriptionProps = ComponentProps< 'span' > & {
+	/**
+	 * Content that contributes to the combobox item's accessible description.
+	 */
+	children: ReactNode;
+};
+
+type ComboboxItemChildren =
+	| ReactElement< ComboboxItemLabelProps >
+	| [
+			ReactElement< ComboboxItemLabelProps >,
+			...(
+				| ReactElement< ComboboxItemDescriptionProps >
+				| false
+				| null
+				| undefined
+			)[],
+	  ];
+
+export type ComboboxItemProps = Omit<
+	ComponentProps< typeof _Combobox.Item >,
+	'children'
+> & {
+	/**
+	 * One direct ItemLabel, followed by zero or more ItemDescription components.
+	 */
+	children: ComboboxItemChildren;
 	/**
 	 * The variant of the item.
 	 *
@@ -88,29 +122,39 @@ export type PortalProps = ComponentProps< typeof _Combobox.Portal >;
 
 export type PositionerProps = ComponentProps< typeof _Combobox.Positioner >;
 
-export type ComboboxPopupProps = ComponentProps< typeof _Combobox.Popup > & {
-	children?: React.ReactNode;
-	/**
-	 * Optional portal element, typically `<Combobox.Portal />` with custom
-	 * `container`. When omitted, `Combobox.Popup` uses `Combobox.Portal` with
-	 * default props. Do not pass `children` on the portal element; they would be
-	 * ignored.
-	 */
-	portal?: ReactElement< Omit< PortalProps, 'children' > >;
-	/**
-	 * Optional positioner element, typically `<Combobox.Positioner />` with
-	 * custom positioning props (`side`, `align`, `sideOffset`, collision
-	 * settings, etc.). When omitted, `Combobox.Popup` uses
-	 * `Combobox.Positioner` with default props. Do not pass `children` on the
-	 * positioner element; they would be ignored.
-	 */
-	positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
-};
+export type ComboboxPopupProps = ComponentProps< typeof _Combobox.Popup > &
+	ItemPopupWidthProps & {
+		children?: React.ReactNode;
+		/**
+		 * Optional portal element, typically `<Combobox.Portal />` with custom
+		 * `container`. When omitted, `Combobox.Popup` uses `Combobox.Portal` with
+		 * default props. Do not pass `children` on the portal element; they would be
+		 * ignored.
+		 */
+		portal?: ReactElement< Omit< PortalProps, 'children' > >;
+		/**
+		 * Optional positioner element, typically `<Combobox.Positioner />` with
+		 * custom positioning props (`side`, `align`, `sideOffset`, collision
+		 * settings, etc.). When omitted, `Combobox.Popup` uses
+		 * `Combobox.Positioner` with default props. Do not pass `children` on the
+		 * positioner element; they would be ignored.
+		 */
+		positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
+	};
 
 export type ComboboxRootProps<
 	Value,
 	Multiple extends boolean | undefined = false,
 > = _Combobox.Root.Props< Value, Multiple >;
+
+export type ComboboxSeparatorProps = Omit<
+	ComponentProps< typeof _Combobox.Separator >,
+	'orientation'
+>;
+
+export type ComboboxStatusProps = ComponentProps< typeof _Combobox.Status > & {
+	children?: React.ReactNode;
+};
 
 export type ComboboxTriggerProps = ComponentProps<
 	typeof _Combobox.Trigger

@@ -3,15 +3,18 @@
 //
 // The timeline only renders in revisions mode, so its ancestors are scoped
 // with `:has()` — keeping this layout out of the generic editor sidebar.
+//
+// Keep each `:has()` the subject of its rule: a subject below it recalculates
+// the anchor's whole subtree on every DOM change in the editor.
 .interface-complementary-area:has(.editor-post-revisions-timeline) {
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
+}
 
-	// The tabs header keeps its natural height.
-	.editor-sidebar__panel-tabs {
-		flex-shrink: 0;
-	}
+// The tabs header keeps its natural height. Inert unless the rule above applies.
+.interface-complementary-area > .editor-sidebar__panel-tabs {
+	flex-shrink: 0;
 }
 
 .editor-sidebar__panel:has(.editor-post-revisions-timeline) {
@@ -19,25 +22,25 @@
 	flex-direction: column;
 	flex: 1;
 	min-height: 0;
+}
 
-	// The document tab panel hands its bounded height down to the timeline.
-	[role="tabpanel"]:has(.editor-post-revisions-timeline) {
-		display: flex;
-		flex-direction: column;
-		flex: 1;
-		min-height: 0;
-	}
+// The document tab panel hands its bounded height down to the timeline.
+.editor-sidebar__panel [role="tabpanel"]:has(.editor-post-revisions-timeline) {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0;
+}
 
-	// Cap only the post-meta diff content so a large
-	// diff (e.g. footnotes) can't dominate the column.
-	.editor-revision-meta-diff__content {
-		max-height: 80px;
-		overflow-y: auto;
-	}
+// Cap only the post-meta diff content so a large
+// diff (e.g. footnotes) can't dominate the column.
+.editor-sidebar__panel .editor-revision-meta-diff__content {
+	max-height: 80px;
+	overflow-y: auto;
+}
 
-	// timeline grows to fill the leftover space and scrolls internally.
-	.editor-post-revisions-timeline {
-		flex: 1;
-		min-height: 0;
-	}
+// timeline grows to fill the leftover space and scrolls internally.
+.editor-sidebar__panel .editor-post-revisions-timeline {
+	flex: 1;
+	min-height: 0;
 }

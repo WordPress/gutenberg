@@ -10,7 +10,8 @@ textarea.editor-post-text-editor {
 	width: 100%;
 	box-shadow: none;
 	resize: none;
-	overflow: hidden;
+	field-sizing: content;
+	overflow: auto;
 	font-family: $editor-html-font;
 	line-height: 2.4;
 	min-height: 200px;

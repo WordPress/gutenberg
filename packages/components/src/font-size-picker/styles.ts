@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import styled from '@emotion/styled';
-
-/**
- * Internal dependencies
- */
 import BaseControl from '../base-control';
 import Button from '../button';
 import CustomSelectControl from '../custom-select-control';

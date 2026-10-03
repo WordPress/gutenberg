@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useContext, useMemo } from '@wordpress/element';
 import { getQueryArgs, getPath, buildQueryString } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { ConfigContext, type NavigationOptions, useHistory } from './router';
 
 export function useLink( to: string, options: NavigationOptions = {} ) {

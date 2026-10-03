@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
 import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
@@ -8,10 +5,6 @@ import {
 	__experimentalSpacer as Spacer,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import TypographyPanel from './typography-panel';
 import { ScreenHeader } from './screen-header';
 import TypographyPreview from './typography-preview';
@@ -33,9 +26,21 @@ const elements = {
 		description: __( 'Manage the fonts and typography used on captions.' ),
 		title: __( 'Captions' ),
 	},
+	cite: {
+		description: __( 'Manage the fonts and typography used on citations.' ),
+		title: __( 'Citations' ),
+	},
 	button: {
 		description: __( 'Manage the fonts and typography used on buttons.' ),
 		title: __( 'Buttons' ),
+	},
+	textInput: {
+		description: __( 'Manage the fonts and typography used on inputs.' ),
+		title: __( 'Inputs' ),
+	},
+	select: {
+		description: __( 'Manage the fonts and typography used on selects.' ),
+		title: __( 'Selects' ),
 	},
 };
 

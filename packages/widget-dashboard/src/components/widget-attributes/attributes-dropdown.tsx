@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { DataForm } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
 import { useMemo } from '@wordpress/element';
@@ -15,10 +12,6 @@ import {
 	VisuallyHidden,
 } from '@wordpress/ui';
 /* eslint-enable @wordpress/use-recommended-components */
-
-/**
- * Internal dependencies
- */
 import styles from './widget-attributes.module.css';
 import type { WidgetAttributeValues } from '../../types';
 

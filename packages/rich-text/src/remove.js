@@ -1,7 +1,3 @@
-/**
- * Internal dependencies
- */
-
 import { insert } from './insert';
 import { create } from './create';
 

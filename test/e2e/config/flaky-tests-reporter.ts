@@ -6,9 +6,6 @@
  *   but displayed as **passed** in the original test suite.
  * - If it fail all 3 times, then it's a **failed** test.
  */
-/**
- * External dependencies
- */
 import fs from 'fs';
 import type { Reporter, TestCase, TestResult } from '@playwright/test/reporter';
 import filenamify from 'filenamify';

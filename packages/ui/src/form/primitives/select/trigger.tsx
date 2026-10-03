@@ -3,14 +3,14 @@ import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { chevronDown } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-import focusStyles from '../../../utils/css/focus.module.css';
+import focusStyles from '../../../utils/css/focus.module.scss';
 import selectTriggerStyles from '../../../utils/css/select-trigger.module.css';
 import { InputLayout } from '../input-layout';
 import { Icon } from '../../../icon';
 import type { SelectTriggerProps } from './types';
 
 export const Trigger = forwardRef< HTMLButtonElement, SelectTriggerProps >(
-	function Trigger(
+	function UnforwardedTrigger(
 		{
 			className,
 			size,

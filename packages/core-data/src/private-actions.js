@@ -1,16 +1,11 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { STORE_NAME } from './name';
-import { getSyncManager, hasSyncManager } from './sync';
+import { getEntitySyncManager } from './entity-sync';
+import { createSyncUndoLevelRecord } from './utils/sync-undo-levels';
 
 /**
  * Returns an action object used in signalling that the registered post meta
@@ -177,12 +172,8 @@ export const setCollaborationSupported =
 	( supported ) =>
 	( { dispatch } ) => {
 		dispatch( { type: 'SET_COLLABORATION_SUPPORTED', supported } );
-		if ( ! supported && hasSyncManager() ) {
-			getSyncManager().unloadAll();
-			dispatch.__unstableNotifySyncUndoManagerChange( {
-				hasUndo: false,
-				hasRedo: false,
-			} );
+		if ( ! supported ) {
+			getEntitySyncManager()?.unloadAll();
 		}
 	};
 
@@ -205,22 +196,27 @@ export function receiveViewConfig( kind, name, config ) {
 }
 
 /**
- * Returns an action object used to notify core-data that the sync undo manager
- * state changed outside of the core-data reducer, e.g. The Yjs UndoManager
- * captured an undo level.
+ * Records that the entity sync manager opened a new undo level for a record
+ * it syncs, so the level takes its place in core-data's undo history next to
+ * the edits core-data records itself.
  *
- * @param {Object}  state         The sync undo stack state.
- * @param {boolean} state.hasRedo Whether there are changes to redo.
- * @param {boolean} state.hasUndo Whether there are changes to undo.
- *
- * @return {Object} Action object.
+ * @param {string}        kind     Kind of the record.
+ * @param {string}        name     Name of the record.
+ * @param {number|string} recordId Id of the record.
  */
-export function __unstableNotifySyncUndoManagerChange( state ) {
-	return {
-		type: 'SYNC_UNDO_MANAGER_CHANGE',
-		...state,
+export const recordSyncUndoLevel =
+	( kind, name, recordId ) =>
+	( { select, dispatch } ) => {
+		select
+			.getUndoManager()
+			.addRecord( createSyncUndoLevelRecord( kind, name, recordId ) );
+
+		// The undo manager is a mutable object held in state, so change
+		// state for `hasUndo` and `hasRedo` to be read again. The sync
+		// manager reports levels outside of entity edits, for example after
+		// a deferred document update.
+		dispatch( { type: 'RECORD_SYNC_UNDO_LEVEL' } );
 	};
-}
 
 /**
  * Returns an action object used to set the sync connection status for an entity or collection.
@@ -313,7 +309,10 @@ export const saveDirtyEntities =
 				pendingSavedRecords.push(
 					registry
 						.dispatch( STORE_NAME )
-						.saveEditedEntityRecord( kind, name, key )
+						.saveEditedEntityRecord( kind, name, key, {
+							throwOnError: true,
+						} )
+						.catch( ensureError )
 				);
 			}
 		} );
@@ -325,15 +324,19 @@ export const saveDirtyEntities =
 						'root',
 						'site',
 						undefined,
-						siteItemsToSave
+						siteItemsToSave,
+						{
+							throwOnError: true,
+						}
 					)
+					.catch( ensureError )
 			);
 		}
 		registry
 			.dispatch( blockEditorStore )
 			.__unstableMarkLastChangeAsPersistent();
 
-		Promise.all( pendingSavedRecords )
+		return Promise.all( pendingSavedRecords )
 			.then( async ( values ) => {
 				if ( onSave ) {
 					await onSave();
@@ -341,12 +344,23 @@ export const saveDirtyEntities =
 				return values;
 			} )
 			.then( ( values ) => {
-				if (
-					values.some( ( value ) => typeof value === 'undefined' )
-				) {
+				const errors = values.filter( ( v ) => v instanceof Error );
+				if ( errors.length ) {
+					const firstMessage = errors.find(
+						( e ) => e.message
+					)?.message;
+
 					registry
 						.dispatch( noticesStore )
-						.createErrorNotice( __( 'Saving failed.' ) );
+						.createErrorNotice(
+							decodeEntities(
+								firstMessage || __( 'Saving failed.' )
+							),
+							{
+								type: 'snackbar',
+								id: saveNoticeId,
+							}
+						);
 				} else {
 					registry
 						.dispatch( noticesStore )
@@ -370,7 +384,43 @@ export const saveDirtyEntities =
 				registry
 					.dispatch( noticesStore )
 					.createErrorNotice(
-						`${ __( 'Saving failed.' ) } ${ error }`
+						decodeEntities(
+							error?.message || __( 'Saving failed.' )
+						),
+						{
+							type: 'snackbar',
+							id: saveNoticeId,
+						}
 					)
 			);
+
+		function ensureError( error ) {
+			if ( error instanceof Error ) {
+				return error;
+			}
+
+			// Expect certain errors to be plain objects with a `message`
+			// property, such as those thrown by `apiFetch`. Otherwise, do our
+			// best to infer a message via duck typing.
+			let message;
+			if ( ! error ) {
+			} else if ( typeof error.message === 'string' ) {
+				message = error.message;
+			} else if ( typeof error === 'string' ) {
+				message = error;
+			} else if (
+				// Only consider own method, lest we erroneously end up calling
+				// `Object#toString` at the end of the prototype chain, thereby
+				// returning `"[object Object]"`.
+				Object.hasOwn( error, 'toString' ) &&
+				typeof error.toString === 'function'
+			) {
+				const result = error.toString();
+				if ( typeof result === 'string' ) {
+					message = result;
+				}
+			}
+
+			return new Error( message, { cause: error } );
+		}
 	};

@@ -1,33 +1,19 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import styled from '@emotion/styled';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import {
 	ToggleGroupControl,
 	ToggleGroupControlOption,
 } from '../../toggle-group-control';
-
-/**
- * Internal dependencies
- */
 import { ToolsPanel, ToolsPanelItem } from '..';
 import Panel from '../../panel';
 import UnitControl from '../../unit-control';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 
 const meta: Meta< typeof ToolsPanel > = {
-	title: 'Components/ToolsPanel',
+	id: 'components-toolspanel',
+	title: 'Components/@wordpress-components/ToolsPanel',
 	component: ToolsPanel,
 	subcomponents: { ToolsPanelItem },
 	argTypes: {

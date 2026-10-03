@@ -1,17 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useContext } from '@wordpress/element';
+import { inertValue } from '@wordpress/react-inert-value';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DataViewsContext from '../dataviews-context';
 import DataViewsPagination, {
 	hasPaginationControls,
@@ -55,8 +45,8 @@ export default function DataViewsFooter() {
 	return (
 		<div
 			className="dataviews-footer"
-			// @ts-ignore
-			inert={ isRefreshing ? 'true' : undefined }
+			// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+			inert={ inertValue( isRefreshing ) }
 		>
 			<Stack
 				direction="row"

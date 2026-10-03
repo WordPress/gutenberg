@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { DataFormProps } from '../types';
 import normalizeFields from '../field-types';
 import { DataFormProvider } from '../components/dataform-context';

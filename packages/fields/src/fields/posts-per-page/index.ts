@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import type { Field } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { SiteSettings } from '../../types';
 
 const postsPerPageField: Field< SiteSettings > = {

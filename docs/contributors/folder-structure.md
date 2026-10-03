@@ -9,8 +9,7 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── CONTRIBUTING.md
     │
     ├── .editorconfig
-    ├── eslint.config.cjs
-    ├── eslint.config.strict.cjs
+    ├── eslint.config.mjs
     ├── .jshintignore
     ├── prettier.config.mjs
     ├── .stylelintignore
@@ -25,7 +24,7 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── babel.config.js
     ├── jsconfig.json
     ├── tsconfig.json
-    ├── tsconfig.base.json
+    ├── tsconfig.build.json
     ├── webpack.config.js
     │   Transpilation and bundling Config files.
     │

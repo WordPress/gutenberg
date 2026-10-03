@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import {
@@ -8,13 +5,8 @@ import {
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import { isSelectionForward } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { getBlockClientId } from '../../utils/dom';
-import { canHostEditableRoot } from './use-editable-root';
 import { setContentEditableWrapper } from './utils';
 import { unlock } from '../../lock-unlock';
 
@@ -109,7 +101,6 @@ export default function useSelectionObserver() {
 		startMultiSelect,
 		stopMultiSelect,
 	} = useDispatch( blockEditorStore );
-	const blockEditorSelectors = useSelect( blockEditorStore );
 	const {
 		getBlockParents,
 		getBlockSelectionStart,
@@ -117,7 +108,8 @@ export default function useSelectionObserver() {
 		getSelectionStart,
 		getSelectionEnd,
 		getSelectedBlockClientId,
-	} = blockEditorSelectors;
+		canHostEditableRoot,
+	} = unlock( useSelect( blockEditorStore ) );
 	return useRefEffect(
 		( node ) => {
 			const { ownerDocument } = node;
@@ -185,10 +177,7 @@ export default function useSelectionObserver() {
 						// always move it), which must not re-enable the wrapper
 						// after another block has been selected.
 						collapsedClientId === getSelectedBlockClientId() &&
-						canHostEditableRoot(
-							blockEditorSelectors,
-							collapsedClientId
-						)
+						canHostEditableRoot( collapsedClientId )
 					) {
 						setContentEditableWrapper( node, true );
 
@@ -209,6 +198,7 @@ export default function useSelectionObserver() {
 						) {
 							node.focus();
 						}
+
 						return;
 					}
 
@@ -217,12 +207,21 @@ export default function useSelectionObserver() {
 						! isMultiSelecting()
 					) {
 						setContentEditableWrapper( node, false );
-						let element =
-							startNode.nodeType === startNode.ELEMENT_NODE
-								? startNode
-								: startNode.parentElement;
-						element = element?.closest( '[contenteditable]' );
-						element?.focus();
+						// Only return focus to the field if the wrapper had
+						// it. If Escape moved focus to the canvas stop in the
+						// parent document, the wrapper is only the stale
+						// active element and focus must not come back.
+						if (
+							ownerDocument.activeElement === node &&
+							ownerDocument.hasFocus()
+						) {
+							let element =
+								startNode.nodeType === startNode.ELEMENT_NODE
+									? startNode
+									: startNode.parentElement;
+							element = element?.closest( '[contenteditable]' );
+							element?.focus();
+						}
 					}
 					return;
 				}
@@ -435,9 +434,9 @@ export default function useSelectionObserver() {
 			}
 
 			// Native `selectionchange` events are asynchronous: a clipboard
-			// event may fire before the store has been updated with a cross
-			// block selection that was just made. Sync it before the clipboard
-			// handlers (bubble phase) read the store.
+			// event or a keydown may fire before the store has been updated
+			// with a cross block selection that was just made. Sync it before
+			// the handlers that read the store run.
 			function ensureMultiBlockSelectionSync( event ) {
 				const selection = defaultView.getSelection();
 
@@ -454,9 +453,22 @@ export default function useSelectionObserver() {
 					extractSelectionEndNode( selection, isTripleClick )
 				);
 
-				if ( startClientId !== endClientId ) {
-					onSelectionChange( event );
+				if ( startClientId === endClientId ) {
+					return;
 				}
+
+				// Skip when the store already reflects the block range. The
+				// sync runs on every keydown, and a `multiSelect` dispatch
+				// announces itself to screen readers, so an unchanged range
+				// must not be dispatched again.
+				if (
+					getSelectionStart().clientId === startClientId &&
+					getSelectionEnd().clientId === endClientId
+				) {
+					return;
+				}
+
+				onSelectionChange( event );
 			}
 
 			ownerDocument.addEventListener(
@@ -471,6 +483,13 @@ export default function useSelectionObserver() {
 			defaultView.addEventListener( 'mouseup', onMouseUp );
 			node.addEventListener( 'mousedown', onMouseDown );
 			node.addEventListener( 'keydown', onKeyDown );
+			// On the window, so it runs before any document listener that
+			// reads the store on keydown, whatever order they were added in.
+			defaultView.addEventListener(
+				'keydown',
+				ensureMultiBlockSelectionSync,
+				true
+			);
 			ownerDocument.addEventListener(
 				'copy',
 				ensureMultiBlockSelectionSync,
@@ -494,6 +513,11 @@ export default function useSelectionObserver() {
 				defaultView.removeEventListener( 'mouseup', onMouseUp );
 				node.removeEventListener( 'mousedown', onMouseDown );
 				node.removeEventListener( 'keydown', onKeyDown );
+				defaultView.removeEventListener(
+					'keydown',
+					ensureMultiBlockSelectionSync,
+					true
+				);
 				ownerDocument.removeEventListener(
 					'copy',
 					ensureMultiBlockSelectionSync,

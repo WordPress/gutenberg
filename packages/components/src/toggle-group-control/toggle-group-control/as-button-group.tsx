@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { View } from '../../view';
 import { useControlledValue } from '../../utils';
 import type { WordPressComponentProps } from '../../context';
@@ -26,6 +19,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 		value: valueProp,
 		id: idProp,
 		setSelectedElement,
+		disabled,
 		...otherProps
 	}: WordPressComponentProps<
 		ToggleGroupControlMainControlProps,
@@ -63,6 +57,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 			isBlock: ! isAdaptiveWidth,
 			isDeselectable: true,
 			setSelectedElement,
+			disabled: Boolean( disabled ),
 		} ),
 		[
 			baseId,
@@ -70,6 +65,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 			setSelectedValue,
 			isAdaptiveWidth,
 			setSelectedElement,
+			disabled,
 		]
 	);
 
@@ -81,6 +77,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 				ref={ forwardedRef }
 				role="group"
 				id={ baseId }
+				aria-disabled={ disabled || undefined }
 			>
 				{ children }
 			</View>

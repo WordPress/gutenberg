@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Using Format API', () => {
@@ -22,7 +19,7 @@ test.describe( 'Using Format API', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'First paragraph' );
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
@@ -40,7 +37,7 @@ test.describe( 'Using Format API', () => {
 		);
 	} );
 
-	test( 'should show unknow formatting button', async ( {
+	test( 'should show unknown formatting button', async ( {
 		editor,
 		page,
 	} ) => {
@@ -68,7 +65,7 @@ test.describe( 'Using Format API', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'First paragraph' );
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import './hooks';
 
 export { storeConfig, store } from './store';

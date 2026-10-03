@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import type { h as createElement, RefObject } from 'preact';
 import { signal } from '@preact/signals';
-
-/**
- * Internal dependencies
- */
 import { getNamespace } from './namespaces';
 import { deepReadOnly, deepClone } from './utils';
 import type { Evaluate } from './hooks';

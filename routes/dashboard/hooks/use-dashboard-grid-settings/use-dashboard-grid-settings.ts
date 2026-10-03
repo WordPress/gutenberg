@@ -1,12 +1,10 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	DEFAULT_GRID,
 	DEFAULT_ROW_HEIGHT,
 	normalizeGridSettings,
+	WIDGET_DASHBOARD_COLUMN_COUNT,
 } from '@wordpress/widget-dashboard';
 import type { WidgetGridSettings } from '@wordpress/widget-dashboard';
 
@@ -24,11 +22,15 @@ const KEY = 'dashboardGridSettings';
 export function useDashboardGridSettings(): WidgetGridSettings {
 	return useSelect( ( select ) => {
 		const stored = select( preferencesStore ).get( SCOPE, KEY ) as
-			| WidgetGridSettings
-			| undefined;
-		return normalizeGridSettings(
-			stored ?? DEFAULT_GRID,
-			DEFAULT_ROW_HEIGHT
-		);
+			WidgetGridSettings | undefined;
+		return {
+			...normalizeGridSettings(
+				stored ?? DEFAULT_GRID,
+				DEFAULT_ROW_HEIGHT
+			),
+			// The removed Columns control persisted other counts into this
+			// preference; pinning on read keeps those stale values inert.
+			columns: WIDGET_DASHBOARD_COLUMN_COUNT,
+		};
 	}, [] );
 }

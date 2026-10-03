@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
 import { useEffect, useLayoutEffect, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { CropperState } from '../../core/types';
 import { getSourceRegion } from '../../core/source-region';
 

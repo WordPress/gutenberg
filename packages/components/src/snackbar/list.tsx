@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useReducedMotion } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Snackbar from '.';
 import {
 	__unstableMotion as motion,

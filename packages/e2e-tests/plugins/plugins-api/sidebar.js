@@ -88,4 +88,22 @@
 		icon: 'text',
 		render: MySidebarPlugin,
 	} );
+
+	// A pinnable sidebar without a PluginSidebarMoreMenuItem of its own, so the
+	// only More Menu item for it is the one PluginSidebar injects.
+	function MyInjectedItemSidebarPlugin() {
+		return el(
+			PluginSidebar,
+			{
+				name: 'injected-item-sidebar',
+				title: __( 'Injected menu item' ),
+			},
+			el( PanelBody, {}, __( 'Injected menu item content' ) )
+		);
+	}
+
+	registerPlugin( 'my-injected-item-sidebar-plugin', {
+		icon: 'text',
+		render: MyInjectedItemSidebarPlugin,
+	} );
 } )();
