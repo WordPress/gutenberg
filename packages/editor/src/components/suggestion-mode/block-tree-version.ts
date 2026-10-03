@@ -8,9 +8,15 @@
  * in a separate `getBlocks( controlledClientId )` tree while the root stays
  * the same. The version below watches the root tree and every controlled
  * subtree, so an edit anywhere in the document produces a new version.
+ *
+ * The list of controlled blocks is rebuilt whenever the block order changes.
+ * A block that becomes controlled after the version was taken gets its inner
+ * blocks through `replaceInnerBlocks`, which changes the order even when the
+ * root tree keeps its identity.
  */
 
 type Entry = {
+	clientIds: unknown;
 	controlledIds: string[];
 	trees: unknown[];
 	version: object;
@@ -19,12 +25,12 @@ type Entry = {
 const entriesByRoot = new WeakMap< object, Entry >();
 
 function controlledSubtrees( blockEditor: any ) {
-	const controlledIds: string[] = (
-		blockEditor.getClientIdsWithDescendants?.() ?? []
-	).filter( ( clientId: string ) =>
+	const clientIds = blockEditor.getClientIdsWithDescendants?.() ?? [];
+	const controlledIds: string[] = clientIds.filter( ( clientId: string ) =>
 		blockEditor.areInnerBlocksControlled?.( clientId )
 	);
 	return {
+		clientIds,
 		controlledIds,
 		trees: controlledIds.map( ( clientId ) =>
 			blockEditor.getBlocks( clientId )
@@ -51,13 +57,15 @@ export function getBlockTreeVersion( blockEditor: any ): object | null {
 		entriesByRoot.set( root, created );
 		return created.version;
 	}
-	const changed = entry.controlledIds.some(
-		( clientId, index ) =>
-			blockEditor.getBlocks( clientId ) !== entry.trees[ index ]
-	);
+	const changed =
+		blockEditor.getClientIdsWithDescendants?.() !== entry.clientIds ||
+		entry.controlledIds.some(
+			( clientId, index ) =>
+				blockEditor.getBlocks( clientId ) !== entry.trees[ index ]
+		);
 	if ( changed ) {
-		// A controlled subtree can gain or lose controlled blocks of its
-		// own, so the list is rebuilt along with the trees.
+		// Blocks can gain or lose controlled inner blocks, so the list is
+		// rebuilt along with the trees.
 		Object.assign( entry, controlledSubtrees( blockEditor ), {
 			version: {},
 		} );
