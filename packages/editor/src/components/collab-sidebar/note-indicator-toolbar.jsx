@@ -1,7 +1,6 @@
 import { ToolbarButton } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
 import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
@@ -63,49 +62,16 @@ function ThreadParticipants( { participants } ) {
 	);
 }
 
-export function NoteAvatarIndicator( { onClick, note } ) {
-	const threadParticipants = useMemo( () => {
-		if ( ! note ) {
-			return [];
-		}
-
-		// Track thread participants (original author + repliers), sorted by
-		// date so they appear in chronological order.
-		const participantsMap = new Map();
-		const allNotes = [ note, ...note.reply ].sort(
-			( a, b ) => new Date( a.date ) - new Date( b.date )
-		);
-
-		for ( const entry of allNotes ) {
-			if ( ! entry.author_name || participantsMap.has( entry.author ) ) {
-				continue;
-			}
-
-			participantsMap.set( entry.author, {
-				id: entry.author,
-				name: entry.author_name,
-				avatar:
-					entry.author_avatar_urls?.[ '48' ] ||
-					entry.author_avatar_urls?.[ '96' ],
-			} );
-		}
-
-		return Array.from( participantsMap.values() );
-	}, [ note ] );
-
-	if ( ! threadParticipants.length ) {
-		return null;
-	}
-
+export function NoteAvatarIndicator( { onClick, participants } ) {
 	return (
 		<NoteIconToolbarSlotFill.Fill>
 			<ToolbarButton
 				className="editor-note-indicator"
 				label={ __( 'View notes' ) }
-				onClick={ () => onClick() }
+				onClick={ onClick }
 				showTooltip
 			>
-				<ThreadParticipants participants={ threadParticipants } />
+				<ThreadParticipants participants={ participants } />
 			</ToolbarButton>
 		</NoteIconToolbarSlotFill.Fill>
 	);
