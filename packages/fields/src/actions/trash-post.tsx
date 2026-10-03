@@ -32,7 +32,8 @@ const trashPost: Action< PostWithPermissions > = {
 		return (
 			!! item.status &&
 			! [ 'auto-draft', 'trash' ].includes( item.status ) &&
-			item.permissions?.delete
+			item.permissions?.delete &&
+			!! item._links?.[ 'wp:action-trash' ]
 		);
 	},
 	supportsBulk: true,
