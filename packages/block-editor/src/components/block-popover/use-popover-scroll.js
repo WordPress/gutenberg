@@ -31,14 +31,17 @@ function usePopoverScroll( contentRef ) {
 					// Dispatching the event won’t cause scrolling but it does make the event
 					// available to edit-post’s meta box pane’s height adjustment effect.
 					// TODO: something more tailored/explicit seems appealing - like a custom event.
-					scrollContainer.dispatchEvent(
+					const isNotPrevented = scrollContainer.dispatchEvent(
 						new window.WheelEvent( 'wheel', {
 							deltaX,
 							deltaY,
 							bubbles: true,
+							cancelable: true,
 						} )
 					);
-					scrollContainer.scrollBy( deltaX, deltaY );
+					if ( isNotPrevented ) {
+						scrollContainer.scrollBy( deltaX, deltaY );
+					}
 				}
 			}
 			// Tell the browser that we do not call event.preventDefault
