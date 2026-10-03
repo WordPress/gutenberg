@@ -63,6 +63,10 @@ function NotesSidebar( { postId } ) {
 		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
 		[]
 	);
+	const hasDrafts = useSelect(
+		( select ) => unlock( select( editorStore ) ).hasNoteDrafts(),
+		[]
+	);
 
 	const { notes, unresolvedNotes } = useNoteThreads( postId );
 
@@ -70,9 +74,15 @@ function NotesSidebar( { postId } ) {
 	const showFloatingSidebar = isLargeViewport;
 	// Fallback to "All notes" sidebar on smaller viewports.
 	const showAllNotesSidebar = notes.length > 0 || ! showFloatingSidebar;
+	/*
+	 * Unsent drafts keep the sidebar mounted so its block-transition logic
+	 * can reopen the new note form when a draft's block is reselected.
+	 */
 	const hasFloatingNotes =
 		showFloatingSidebar &&
-		( unresolvedNotes.length > 0 || selectedNoteId !== undefined );
+		( unresolvedNotes.length > 0 ||
+			selectedNoteId !== undefined ||
+			hasDrafts );
 	useEnableFloatingSidebar( hasFloatingNotes && ! areNotesHidden );
 
 	async function focusNote( {

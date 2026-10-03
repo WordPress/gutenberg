@@ -470,7 +470,7 @@ export function useNoteSelection( { notes, sidebarRef } ) {
 
 	// Select the block's primary note, or clear the selection if it has none.
 	const syncWithBlock = useEvent( ( clientId ) => {
-		const { getSelectedNote, isNoteFocused } = unlock(
+		const { getSelectedNote, isNoteFocused, getNoteDraft } = unlock(
 			registry.select( editorStore )
 		);
 		// A pending focus request is an explicit pick; leave it alone.
@@ -486,7 +486,16 @@ export function useNoteSelection( { notes, sidebarRef } ) {
 		if ( blockThreads.some( ( thread ) => thread.id === currentNoteId ) ) {
 			return;
 		}
-		selectNote( pickPrimaryNote( blockThreads )?.id );
+		/*
+		 * When the block has no thread but carries an unsent draft, reopen
+		 * the new note form so the draft surfaces again like saved threads.
+		 */
+		const hasDraft =
+			!! clientId && !! getNoteDraft( `new-note-${ clientId }` );
+		selectNote(
+			pickPrimaryNote( blockThreads )?.id ??
+				( hasDraft ? 'new' : undefined )
+		);
 	} );
 
 	// Sync only on block transitions, so in-block changes (Escape, Cancel,
