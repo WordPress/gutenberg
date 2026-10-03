@@ -142,8 +142,8 @@ export function useReaction( note: ReactionTarget ) {
 				return;
 			}
 
-			// The emoji's reactor list changed, so the pill tooltip refetches.
-			invalidateReactionNames( noteId, hexKey );
+			// The note's reactor lists changed, so its pill tooltips refetch.
+			invalidateReactionNames( noteId );
 
 			// Mutating a reaction comment doesn't invalidate the cached
 			// `reaction_summary`, so a subsequent toggle would read stale
