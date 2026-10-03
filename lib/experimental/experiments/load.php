@@ -105,6 +105,11 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Enables the Guidelines page under Settings and the experimental knowledge storage (wp_knowledge).', 'gutenberg' ),
 				),
 				array(
+					'id'          => 'gutenberg-head-code',
+					'label'       => __( 'Head code', 'gutenberg' ),
+					'description' => __( 'Adds a Head code field to Settings > General for markup printed in the <head> of every front-end page, such as verification meta tags or analytics scripts.', 'gutenberg' ),
+				),
+				array(
 					'id'          => 'gutenberg-wpds-admin-restyle',
 					'label'       => __( 'Admin design tokens', 'gutenberg' ),
 					'description' => __( 'Styles wp-admin from WordPress Design System tokens, so every admin screen reads as one product regardless of how it is rendered. No markup changes. (Warning: this can change how plugin styles apply to admin screens, and it loads admin stylesheets one by one instead of combined. Use it for testing, not on a live site.)', 'gutenberg' ),
