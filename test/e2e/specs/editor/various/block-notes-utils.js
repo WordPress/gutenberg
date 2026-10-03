@@ -244,6 +244,21 @@ class BlockNoteUtils {
 	}
 
 	/**
+	 * A reaction pill in a block's reactions row, whether the row stands on
+	 * its own or leads the block's note thread.
+	 *
+	 * @param {string} emoji      Emoji label, e.g. "Heart".
+	 * @param {string} blockTitle The block's display title.
+	 * @return {import('@playwright/test').Locator} The pill.
+	 */
+	blockReactionPill( emoji, blockTitle = 'Paragraph' ) {
+		return this.#page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'group', { name: `Reactions on ${ blockTitle }` } )
+			.getByRole( 'button', { name: new RegExp( emoji ) } );
+	}
+
+	/**
 	 * The reaction anchor written to the first block's metadata, if any.
 	 *
 	 * @return {Promise<string|undefined>} The anchor.

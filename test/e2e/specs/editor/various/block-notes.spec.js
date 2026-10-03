@@ -1721,12 +1721,12 @@ test.describe( 'Block Notes', () => {
 			const firstId = await blockNoteUtils.getReactionsId();
 
 			const entry = blockNoteUtils.blockReactionsEntry( 'Paragraph' );
-			const heart = entry.getByRole( 'button', { name: /Heart/ } );
+			const heart = blockNoteUtils.blockReactionPill( 'Heart' );
 			await expect( heart ).toContainText( '1' );
 
 			// A second reaction reuses the anchor.
 			await blockNoteUtils.addReactionToBlock( 'Rocket' );
-			const rocket = entry.getByRole( 'button', { name: /Rocket/ } );
+			const rocket = blockNoteUtils.blockReactionPill( 'Rocket' );
 			await expect( rocket ).toBeVisible();
 			expect( await blockNoteUtils.getReactionsId() ).toBe( firstId );
 
@@ -1756,19 +1756,13 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			await blockNoteUtils.addReactionToBlock( 'Heart' );
-			await expect(
-				blockNoteUtils
-					.blockReactionsEntry( 'Paragraph' )
-					.getByRole( 'button', { name: /Heart/ } )
-			).toBeVisible();
+			const pill = blockNoteUtils.blockReactionPill( 'Heart' );
+			await expect( pill ).toBeVisible();
 
 			await editor.saveDraft();
 			await page.reload();
 			await blockNoteUtils.openBlockNoteSidebar();
 
-			const pill = blockNoteUtils
-				.blockReactionsEntry( 'Paragraph' )
-				.getByRole( 'button', { name: /Heart/ } );
 			await expect( pill ).toBeVisible();
 			await expect( pill ).toContainText( '1' );
 		} );
@@ -1840,14 +1834,16 @@ test.describe( 'Block Notes', () => {
 			await expect(
 				blockNoteUtils.blockReactionsEntry( 'Paragraph' )
 			).toHaveCount( 0 );
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', {
+					name: 'Note: Note beside block reactions',
+				} );
 			await expect(
-				page
-					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'treeitem', {
-						name: 'Note: Note beside block reactions',
-					} )
-					.locator( '.editor-collab-sidebar-panel__block-reactions' )
-					.getByRole( 'button', { name: /Heart/ } )
+				thread.getByRole( 'group', { name: 'Reactions on Paragraph' } )
+			).toBeVisible();
+			await expect(
+				blockNoteUtils.blockReactionPill( 'Heart' )
 			).toBeVisible();
 		} );
 	} );
