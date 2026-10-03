@@ -16,6 +16,25 @@ async function expectNoHorizontalPageScroll( page ) {
 		.toBeLessThanOrEqual( 1 );
 }
 
+// When the long string also appears in theme chrome (adjacent post nav, author
+// bio outside the block), page scrollWidth is not a reliable signal. Assert the
+// Media & Text block itself stays within the viewport instead.
+async function expectMediaTextFitsViewport( page ) {
+	await expect
+		.poll( async () => {
+			return page.evaluate( () => {
+				const mediaText = document.querySelector(
+					'.wp-block-media-text'
+				);
+				const root = document.documentElement;
+				return (
+					mediaText.getBoundingClientRect().width - root.clientWidth
+				);
+			} );
+		} )
+		.toBeLessThanOrEqual( 1 );
+}
+
 test.describe( 'Media & Text', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
@@ -151,7 +170,7 @@ test.describe( 'Media & Text', () => {
 		page,
 		requestUtils,
 	} ) => {
-		await requestUtils.rest( {
+		const fixturePost = await requestUtils.rest( {
 			method: 'POST',
 			path: '/wp/v2/posts',
 			data: {
@@ -161,35 +180,45 @@ test.describe( 'Media & Text', () => {
 			},
 		} );
 
-		await editor.insertBlock( {
-			name: 'core/media-text',
-			attributes: {
-				mediaType: 'image',
-				mediaUrl: 'https://s.w.org/images/core/5.3/MtBlanc1.jpg',
-			},
-			innerBlocks: [
-				{
-					name: 'core/latest-posts',
-					attributes: {
-						postsToShow: 1,
-						displayPostContent: false,
-					},
+		try {
+			await editor.insertBlock( {
+				name: 'core/media-text',
+				attributes: {
+					mediaType: 'image',
+					mediaUrl: 'https://s.w.org/images/core/5.3/MtBlanc1.jpg',
 				},
-			],
-		} );
+				innerBlocks: [
+					{
+						name: 'core/latest-posts',
+						attributes: {
+							postsToShow: 1,
+							displayPostContent: false,
+						},
+					},
+				],
+			} );
 
-		const postId = await editor.publishPost();
-		await page.goto( `/?p=${ postId }` );
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
 
-		const latestPostsItem = page.locator(
-			'.wp-block-media-text__content .wp-block-latest-posts li'
-		);
-		await expect( latestPostsItem.first() ).toBeVisible();
-		await expect( latestPostsItem.first() ).toHaveCSS(
-			'overflow-wrap',
-			'anywhere'
-		);
-		await expectNoHorizontalPageScroll( page );
+			const latestPostsItem = page.locator(
+				'.wp-block-media-text__content .wp-block-latest-posts li'
+			);
+			await expect( latestPostsItem.first() ).toBeVisible();
+			await expect( latestPostsItem.first() ).toHaveCSS(
+				'overflow-wrap',
+				'anywhere'
+			);
+			// Long titles can also appear in theme post navigation outside the
+			// block, so assert on Media & Text fitting the viewport.
+			await expectMediaTextFitsViewport( page );
+		} finally {
+			await requestUtils.rest( {
+				method: 'DELETE',
+				path: `/wp/v2/posts/${ fixturePost.id }`,
+				params: { force: true },
+			} );
+		}
 	} );
 
 	test( 'should keep nested Author Biography wrapping so the page does not scroll horizontally', async ( {
@@ -228,7 +257,9 @@ test.describe( 'Media & Text', () => {
 			);
 			await expect( biography ).toBeVisible();
 			await expect( biography ).toHaveCSS( 'overflow-wrap', 'anywhere' );
-			await expectNoHorizontalPageScroll( page );
+			// The same bio can render in theme chrome outside Media & Text, so
+			// assert on the block fitting the viewport rather than page scroll.
+			await expectMediaTextFitsViewport( page );
 		} finally {
 			await requestUtils.rest( {
 				method: 'POST',
