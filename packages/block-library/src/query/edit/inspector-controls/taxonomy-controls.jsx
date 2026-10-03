@@ -215,12 +215,14 @@ function TaxonomyItem( {
 			const { getEntityRecords, hasFinishedResolution } =
 				select( coreStore );
 			const selectorArgs = [ 'taxonomy', taxonomy.slug, TREE_QUERY ];
+			const records = getEntityRecords( ...selectorArgs );
+			const hasResolved = hasFinishedResolution(
+				'getEntityRecords',
+				selectorArgs
+			);
 			return {
-				tree: getEntityRecords( ...selectorArgs ),
-				treeHasResolved: hasFinishedResolution(
-					'getEntityRecords',
-					selectorArgs
-				),
+				tree: hasResolved ? records : null,
+				treeHasResolved: hasResolved,
 			};
 		},
 		[ needsTree, taxonomy.slug ]
