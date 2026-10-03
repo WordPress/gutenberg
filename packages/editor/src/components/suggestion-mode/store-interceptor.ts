@@ -60,6 +60,8 @@ import { useRegistry, useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 import { useSuggestionOverlay } from './overlay-context';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { parseSuggestionPayload, rememberWithdrawnAnchor } from './provider';
@@ -576,6 +578,32 @@ function isPartOfPendingInsertion(
 	return parents.some(
 		( id: string ) => markerType( id ) === 'pending-insert'
 	);
+}
+
+/**
+ * Whether a block sat inside a pending insertion in a tree snapshot: one of
+ * its recorded ancestors carried a `pending-insert` marker. Answers for blocks
+ * the live store no longer has, so removals can be judged by where they were.
+ *
+ * @param tree     Tree snapshot from `captureTreeSnapshot`.
+ * @param clientId Block client ID.
+ * @return True when a recorded ancestor is a pending insert.
+ */
+function wasInsidePendingInsertion(
+	tree: ReturnType< typeof captureTreeSnapshot >,
+	clientId: string
+): boolean {
+	let parentId = tree.parentByClientId.get( clientId ) ?? null;
+	while ( parentId !== null ) {
+		if (
+			tree.blocksByClientId.get( parentId )?.attributes?.metadata
+				?.suggestion?.type === 'pending-insert'
+		) {
+			return true;
+		}
+		parentId = tree.parentByClientId.get( parentId ) ?? null;
+	}
+	return false;
 }
 
 /*
@@ -1362,6 +1390,22 @@ export default function SuggestionStoreInterceptor() {
 					// presence wouldn't distinguish "pre-existing" from
 					// "already-processed-new-block" parents.
 					const block = blockEditor.getBlock?.( clientId );
+					const parentClientId =
+						blockEditor.getBlockRootClientId?.( clientId ) || null;
+
+					// A block added inside a pending insertion is part of
+					// that insertion: accepting or rejecting the insertion
+					// decides it too, so it gets no marker or note of its
+					// own. Checked before the empty-placeholder deferral so
+					// an empty child is adopted right away.
+					if (
+						parentClientId !== null &&
+						isPartOfPendingInsertion( blockEditor, parentClientId )
+					) {
+						snapshot.set( clientId, current );
+						unmarkDeferredInsertion( clientId );
+						continue;
+					}
 
 					const previousSibling =
 						blockEditor.getPreviousBlockClientId?.( clientId );
@@ -1401,8 +1445,6 @@ export default function SuggestionStoreInterceptor() {
 
 					snapshot.set( clientId, current );
 					unmarkDeferredInsertion( clientId );
-					const parentClientId =
-						blockEditor.getBlockRootClientId?.( clientId ) || null;
 					const parentExisted =
 						parentClientId === null ||
 						tree.blocksByClientId.has( parentClientId );
@@ -1743,6 +1785,48 @@ export default function SuggestionStoreInterceptor() {
 				 * still part of that insertion and needs nothing.
 				 */
 				const ownMarker = currentAttrs.metadata?.suggestion?.type;
+				/*
+				 * Existing content can't join a pending insertion: the
+				 * server leaves the whole insertion out of the published
+				 * render, and rejecting it removes everything inside. Put
+				 * the block back where it was and say why.
+				 */
+				const wasPartOfInsertion =
+					ownMarker === 'pending-insert' ||
+					wasInsidePendingInsertion( tree, move.clientId );
+				if (
+					! wasPartOfInsertion &&
+					move.toParentClientId !== null &&
+					isPartOfPendingInsertion(
+						blockEditor,
+						move.toParentClientId
+					)
+				) {
+					isDispatchingOwnWrite = true;
+					try {
+						blockEditorDispatch.__unstableMarkNextChangeAsNotPersistent();
+						blockEditorDispatch.moveBlockToPosition(
+							move.clientId,
+							move.toParentClientId,
+							move.fromParentClientId ?? '',
+							move.fromIndex
+						);
+					} finally {
+						isDispatchingOwnWrite = false;
+					}
+					registry
+						.dispatch( noticesStore )
+						?.createInfoNotice(
+							__(
+								'Existing content can’t be moved into a suggested block.'
+							),
+							{
+								id: 'suggestion-move-into-insertion',
+								type: 'snackbar',
+							}
+						);
+					continue;
+				}
 				const leftInsertion =
 					move.fromParentClientId !== null &&
 					isPartOfPendingInsertion(
@@ -1893,12 +1977,17 @@ export default function SuggestionStoreInterceptor() {
 					// the same trace. Only a linked note that records the
 					// removal as applied confirms the decision; anything
 					// else is re-inserted and stays pending.
+					//
+					// Content inside a pending insertion has no published
+					// state to preserve either, so removing it (or the
+					// whole insertion with it) stands.
 					const trackedAttributes =
 						tree.blocksByClientId.get( clientId )?.attributes;
 					const trackedMarker =
 						trackedAttributes?.metadata?.suggestion?.type;
 					if (
 						trackedMarker === 'pending-insert' ||
+						wasInsidePendingInsertion( tree, clientId ) ||
 						isAppliedRemoval( coreSelect, trackedAttributes )
 					) {
 						snapshot.delete( clientId );

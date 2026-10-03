@@ -75,4 +75,20 @@ describe( 'getBlockTreeVersion', () => {
 		expect( select().getBlocks() ).toBe( rootBefore );
 		expect( getBlockTreeVersion( select() ) ).not.toBe( before );
 	} );
+
+	it( 'changes when a block becomes controlled after the version was taken', () => {
+		const registry = createRegistry();
+		registry.register( blockEditorStore );
+		const select = () => registry.select( blockEditorStore );
+		const dispatch: any = registry.dispatch( blockEditorStore );
+		const container = createBlock( 'test/container' );
+		const inner = createBlock( 'test/text', { content: 'inner' } );
+		dispatch.resetBlocks( [ container ] );
+		getBlockTreeVersion( select() );
+		dispatch.setHasControlledInnerBlocks( container.clientId, true );
+		dispatch.replaceInnerBlocks( container.clientId, [ inner ] );
+		const before = getBlockTreeVersion( select() );
+		dispatch.updateBlockAttributes( inner.clientId, { content: 'x' } );
+		expect( getBlockTreeVersion( select() ) ).not.toBe( before );
+	} );
 } );

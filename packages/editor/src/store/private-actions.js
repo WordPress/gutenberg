@@ -759,6 +759,20 @@ export const restoreRevision =
 	};
 
 /**
+ * Record whether Undo would withdraw a pending suggestion the core-data history
+ * does not hold. Dispatched by the suggestion undo guard.
+ *
+ * @param {boolean} hasSuggestionUndo Whether a suggestion can be undone.
+ * @return {Object} Action object.
+ */
+export function setHasSuggestionUndo( hasSuggestionUndo ) {
+	return {
+		type: 'SET_HAS_SUGGESTION_UNDO',
+		hasSuggestionUndo,
+	};
+}
+
+/**
  * Select a note by its ID, or clear the selection.
  *
  * @param {undefined|number|'new'} noteId          The note ID to select, 'new' to open the new note form, or undefined to clear.
