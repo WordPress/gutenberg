@@ -7682,6 +7682,19 @@
 			"count": 1
 		}
 	},
+	"packages/media-utils/src/components/media-edit/index.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 4
+		},
+		"react-hooks/refs": {
+			"count": 7
+		}
+	},
+	"packages/media-utils/src/components/media-edit/use-moving-animation.ts": {
+		"react-hooks/refs": {
+			"count": 3
+		}
+	},
 	"packages/media-utils/src/components/media-upload-modal/upload-status-popover.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
