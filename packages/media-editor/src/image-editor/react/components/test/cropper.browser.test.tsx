@@ -2,14 +2,22 @@ import { afterEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
+import { useEffect, useState } from '@wordpress/element';
 import { Cropper } from '../cropper';
 import type { CropperController } from '../../hooks/use-cropper-reducer';
+import {
+	CropperProvider,
+	useCropper,
+	useCropperMeasurements,
+	useSetCropperPreviewRect,
+} from '../cropper-provider';
 import { DEFAULT_STATE } from '../../../core/constants';
 import { getSourceRegion } from '../../../core/source-region';
 // Browser Mode needs the package's real styles for layout and transitions.
 import '../../../style.scss';
 
 const GRID_TEST_ID = 'cropper-grid';
+const PREVIEW_RECT_TEST_ID = 'cropper-preview-rect';
 const GRID_INTERACTIVE_CLASS =
 	'wp-media-editor-image-editor__canvas--grid-interactive';
 const SHOW_GRID_CLASS = 'wp-media-editor-image-editor__canvas--show-grid';
@@ -41,6 +49,93 @@ function createController(): CropperController {
 		setVisualSize: vi.fn(),
 		adjustCropRectForViewport: vi.fn(),
 	};
+}
+
+function CropperWithPreview() {
+	const controller = useCropper();
+	const setPreviewCropRect = useSetCropperPreviewRect();
+
+	useEffect( () => {
+		setPreviewCropRect( {
+			x: 0.2,
+			y: 0.2,
+			width: 0.3,
+			height: 0.3,
+		} );
+	}, [ setPreviewCropRect ] );
+
+	return (
+		<Cropper
+			src="test.jpg"
+			controller={ controller }
+			showDimming={ false }
+		/>
+	);
+}
+
+function CropperWithPreviewControls() {
+	const controller = useCropper();
+	const setPreviewCropRect = useSetCropperPreviewRect();
+
+	return (
+		<>
+			<button
+				type="button"
+				onClick={ () =>
+					setPreviewCropRect( {
+						x: 0.2,
+						y: 0.2,
+						width: 0.3,
+						height: 0.3,
+					} )
+				}
+			>
+				Preview
+			</button>
+			<button
+				type="button"
+				onClick={ () =>
+					controller.setCropRect( {
+						x: 0.1,
+						y: 0.1,
+						width: 0.4,
+						height: 0.4,
+					} )
+				}
+			>
+				Change crop
+			</button>
+			<Cropper
+				src="test.jpg"
+				controller={ controller }
+				showDimming={ false }
+			/>
+		</>
+	);
+}
+
+function CropperMeasurementLifecycle() {
+	const controller = useCropper();
+	const { elementSize } = useCropperMeasurements();
+	const [ isMounted, setIsMounted ] = useState( true );
+
+	return (
+		<>
+			<button type="button" onClick={ () => setIsMounted( false ) }>
+				Unmount cropper
+			</button>
+			<div data-testid="cropper-measurement-status">
+				{ elementSize.width > 0 ? 'ready' : 'unready' }
+			</div>
+			{ isMounted && (
+				<Cropper
+					src="test.jpg"
+					controller={ controller }
+					showDimming={ false }
+				/>
+			) }
+		</>
+	);
 }
 
 function CropperFixture( { children }: { children: React.ReactNode } ) {
@@ -100,6 +195,91 @@ describe( 'Cropper', () => {
 		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
 		expect( canvas ).not.toHaveClass( GRID_INTERACTIVE_CLASS );
 		expect( canvas ).not.toHaveClass( SHOW_GRID_CLASS );
+	} );
+
+	it( 'renders a draft crop preview from provider state', async () => {
+		await renderCropper(
+			<CropperProvider
+				initialState={ {
+					image: {
+						src: 'test.jpg',
+						naturalWidth: 600,
+						naturalHeight: 400,
+					},
+				} }
+			>
+				<CropperWithPreview />
+			</CropperProvider>
+		);
+
+		expect(
+			await screen.findByTestId( PREVIEW_RECT_TEST_ID )
+		).toBeInTheDocument();
+	} );
+
+	it( 'clears a draft crop preview when cropper state changes', async () => {
+		await renderCropper(
+			<CropperProvider
+				initialState={ {
+					image: {
+						src: 'test.jpg',
+						naturalWidth: 600,
+						naturalHeight: 400,
+					},
+				} }
+			>
+				<CropperWithPreviewControls />
+			</CropperProvider>
+		);
+
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Preview' } )
+		);
+		expect(
+			await screen.findByTestId( PREVIEW_RECT_TEST_ID )
+		).toBeInTheDocument();
+
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Change crop' } )
+		);
+
+		await waitFor( () =>
+			expect(
+				screen.queryByTestId( PREVIEW_RECT_TEST_ID )
+			).not.toBeInTheDocument()
+		);
+	} );
+
+	it( 'clears provider measurements when the cropper unmounts', async () => {
+		await renderCropper(
+			<CropperProvider
+				initialState={ {
+					image: {
+						src: 'test.jpg',
+						naturalWidth: 600,
+						naturalHeight: 400,
+					},
+				} }
+			>
+				<CropperMeasurementLifecycle />
+			</CropperProvider>
+		);
+
+		await waitFor( () => {
+			expect(
+				screen.getByTestId( 'cropper-measurement-status' )
+			).toHaveTextContent( 'ready' );
+		} );
+
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Unmount cropper' } )
+		);
+
+		await waitFor( () => {
+			expect(
+				screen.getByTestId( 'cropper-measurement-status' )
+			).toHaveTextContent( 'unready' );
+		} );
 	} );
 
 	it( 'describes and focuses the crop area when requested', async () => {
