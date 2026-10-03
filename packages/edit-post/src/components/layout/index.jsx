@@ -228,9 +228,12 @@ const MetaBoxesMain = forwardRef( ( _props, ref ) => {
 				height
 			);
 		}
-		metaBoxesMainRef.current.style.height = styleHeight;
+		const pane = metaBoxesMainRef.current;
+		pane.style.height = styleHeight;
 		if ( ! isShort ) {
-			separatorRef.current.ariaValueNow = getAriaValueNow( height );
+			separatorRef.current.ariaValueNow = getAriaValueNow(
+				height === 'auto' ? pane.offsetHeight : height
+			);
 		}
 	} );
 
