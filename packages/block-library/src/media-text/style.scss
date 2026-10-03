@@ -52,8 +52,18 @@
 	grid-column: 2;
 	grid-row: 1;
 	/*rtl:end:ignore*/
-	// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- Pending review of overflow-wrap alternative.
-	word-break: break-word;
+	word-break: normal;
+	overflow-wrap: anywhere;
+
+	// Nested blocks that set overflow-wrap: break-word (Quote, Pullquote, Code,
+	// Embed, Latest Posts, Author Biography, Verse, Columns, …) override the
+	// inherited anywhere and let long unbroken text inflate the content
+	// column's min-content size (horizontal page scroll). Re-assert anywhere on
+	// all descendants; Search's button opts out via
+	// `.wp-block-search__button { overflow-wrap: normal }`.
+	*:not(.wp-block-search__button) {
+		overflow-wrap: anywhere;
+	}
 }
 
 // Zero specificity so the default padding can be overridden by theme.json or theme styles.
