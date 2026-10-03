@@ -113,6 +113,16 @@ export interface MenuItemLayoutProps {
 	/**
 	 * Presentational content displayed before the item label.
 	 * Use `Menu.PrefixIcon` for consistent icon sizing and alignment.
+	 *
+	 * Use familiar icons when they help users recognize actions. Use prefix
+	 * icons on every item in the same group, or omit them from the whole group.
+	 * Prefer omitting an icon over adding unnecessary icons to the other items.
+	 * An icon on any item reserves space before every label in that group,
+	 * including items without icons. Labels stay aligned, but sparse icons can
+	 * look visually unbalanced. Each `Menu.Group` and `Menu.RadioGroup` has its
+	 * own icon column. Items directly inside `Menu.Popup` share one, even across
+	 * `Menu.Separator`. Avoid combining a prefix icon and a description in the
+	 * same item.
 	 */
 	prefix?: ReactNode;
 
@@ -134,7 +144,7 @@ export interface MenuItemLayoutProps {
 export interface ItemLabelProps extends ComponentProps< 'span' > {
 	/**
 	 * The primary label for a menu item. Use as the first direct child of every
-	 * menu item.
+	 * menu item. Keep labels short, clear, and understandable on their own.
 	 */
 	children: ReactNode;
 }
@@ -143,7 +153,9 @@ export interface ItemDescriptionProps extends ComponentProps< 'span' > {
 	/**
 	 * Supplementary content displayed below a menu item label. Use as a direct
 	 * child after `Menu.ItemLabel`. Content should be text or non-interactive
-	 * inline markup.
+	 * inline markup. Use sparingly, only for essential context that a short,
+	 * clear label cannot convey. Avoid combining a description and a prefix
+	 * icon in the same item.
 	 */
 	children: ReactNode;
 }
