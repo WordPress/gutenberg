@@ -1,5 +1,8 @@
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
+import { select } from '@wordpress/data';
+import { store as blockEditorStore } from '../store';
+import { hasPatternOverridesDefaultBinding } from '../utils/block-bindings';
 
 const META_ATTRIBUTE_NAME = 'metadata';
 
@@ -91,6 +94,36 @@ export function addTransforms( result, source, index, results ) {
 		hasBlockSupport( result.name, 'visibility', true )
 	) {
 		preservedMetadata.blockVisibility = sourceMetadata.blockVisibility;
+	}
+
+	// Pattern overrides binding
+	const supportedAttributesSetting =
+		select( blockEditorStore )?.getSettings?.()
+			?.__experimentalBlockBindingsSupportedAttributes;
+	const supportsBindings = supportedAttributesSetting
+		? !! supportedAttributesSetting[ result.name ]
+		: true;
+
+	if (
+		hasPatternOverridesDefaultBinding( sourceMetadata.bindings ) &&
+		! hasPatternOverridesDefaultBinding(
+			result.attributes?.metadata?.bindings
+		) &&
+		hasBlockSupport( result.name, 'renaming', true ) &&
+		supportsBindings
+	) {
+		const targetBindings = {};
+		if ( result.attributes?.metadata?.bindings ) {
+			for ( const [ attr, val ] of Object.entries(
+				result.attributes.metadata.bindings
+			) ) {
+				if ( val !== undefined ) {
+					targetBindings[ attr ] = val;
+				}
+			}
+		}
+		targetBindings.__default = sourceMetadata.bindings.__default;
+		preservedMetadata.bindings = targetBindings;
 	}
 
 	if ( Object.keys( preservedMetadata ).length > 0 ) {

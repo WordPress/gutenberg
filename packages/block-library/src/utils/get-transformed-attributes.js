@@ -56,8 +56,21 @@ export function getTransformedAttributes(
 					if ( ! transformedMetadata.includes( prop ) ) {
 						return obj;
 					}
-					obj[ prop ] =
-						prop === 'bindings' ? bindingsCallback( value ) : value;
+					if ( prop === 'bindings' ) {
+						const transformedBindings = bindingsCallback( value );
+						if ( transformedBindings ) {
+							const cleanBindings = Object.fromEntries(
+								Object.entries( transformedBindings ).filter(
+									( [ , binding ] ) => binding !== undefined
+								)
+							);
+							if ( Object.keys( cleanBindings ).length > 0 ) {
+								obj.bindings = cleanBindings;
+							}
+						}
+					} else {
+						obj[ prop ] = value;
+					}
 					return obj;
 				},
 				{}
