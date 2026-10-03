@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `ComplementaryAreaMoreMenuItem`: Let the editor's Panels submenu use radios and keep the selected panel open when activated again. Other menus retain checkbox toggles ([#84033](https://github.com/WordPress/gutenberg/pull/84033)).
+
 ## 10.2.0 (2026-09-23)
 
 ### Enhancements

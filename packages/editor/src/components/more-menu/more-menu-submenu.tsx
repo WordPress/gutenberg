@@ -1,4 +1,4 @@
-import { Children, isValidElement } from '@wordpress/element';
+import { Children, cloneElement, isValidElement } from '@wordpress/element';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Menu } from '@wordpress/ui';
 import type { ComponentProps, ReactNode } from 'react';
@@ -24,17 +24,47 @@ type MoreMenuSubmenuProps = {
  * would skip it. The `render` prop makes it part of the menu, while the fill
  * keeps rendering its own markup.
  *
- * @param fills Fills of the slot.
+ * @param fills              Fills of the slot.
+ * @param options            Adapter options.
+ * @param options.radioGroup Whether the containing submenu provides a radio group.
  *
  * @return The fills as menu items.
  */
-export function toMenuItems( fills: ReactNode ) {
+export function toMenuItems(
+	fills: ReactNode,
+	{ radioGroup = false }: { radioGroup?: boolean } = {}
+) {
 	return Children.map( fills, ( fill ) => {
 		if (
-			! isValidElement< { href?: string } >( fill ) ||
-			fill.type === MoreMenuItem
+			! isValidElement< {
+				href?: string;
+				role?: string;
+				value?: string;
+				radioValue?: string;
+				'data-wp-complementary-area'?: string;
+			} >( fill )
 		) {
 			return fill;
+		}
+		const panelValue = fill.props[ 'data-wp-complementary-area' ];
+		let radioValue: string | undefined;
+		if ( radioGroup ) {
+			if (
+				fill.props.role === 'menuitemradio' &&
+				typeof fill.props.value === 'string'
+			) {
+				radioValue = fill.props.value;
+			} else if (
+				fill.props.role === 'menuitemcheckbox' &&
+				typeof panelValue === 'string'
+			) {
+				radioValue = panelValue;
+			}
+		}
+		if ( fill.type === MoreMenuItem ) {
+			return radioValue !== undefined
+				? cloneElement( fill, { role: 'menuitemradio', radioValue } )
+				: fill;
 		}
 
 		// The fill renders the content of the item, so the label element it
@@ -42,6 +72,24 @@ export function toMenuItems( fills: ReactNode ) {
 		// Naming falls back to the content of the fill.
 		const label = <Menu.ItemLabel>{ null }</Menu.ItemLabel>;
 		const render = fill as ComponentProps< typeof Menu.Item >[ 'render' ];
+		if ( radioValue !== undefined ) {
+			return (
+				<Menu.RadioItem
+					nativeButton
+					aria-labelledby=""
+					value={ radioValue }
+					render={
+						cloneElement( fill, {
+							role: 'menuitemradio',
+							value: radioValue,
+						} ) as typeof render
+					}
+					closeOnClick
+				>
+					{ label }
+				</Menu.RadioItem>
+			);
+		}
 
 		return fill.props.href !== undefined ? (
 			<Menu.LinkItem aria-labelledby="" render={ render }>

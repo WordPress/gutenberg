@@ -39,6 +39,7 @@ export type ComplementaryAreaToggleProps = {
 	/**
 	 * The role of the rendered component. Roles that support a checked state
 	 * get `aria-checked` set when the complementary area is open.
+	 * A rendered `menuitemradio` selects the area and keeps it open when activated again.
 	 */
 	role?: AriaRole;
 	/**

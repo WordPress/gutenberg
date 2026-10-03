@@ -24,6 +24,7 @@ export function useHasComplementaryAreaMenuItem(
 export function DefaultComplementaryAreaMoreMenuItem( {
 	scope,
 	target,
+	role,
 	...props
 }: DefaultComplementaryAreaMoreMenuItemProps ) {
 	return (
@@ -34,7 +35,10 @@ export function DefaultComplementaryAreaMoreMenuItem( {
 					{ ...toggleProps }
 				/>
 			) }
-			role="menuitemcheckbox"
+			role={ role ?? 'menuitemcheckbox' }
+			data-wp-complementary-area={
+				scope === 'core' && role === undefined
+			}
 			name={ target }
 			scope={ scope }
 			{ ...props }
