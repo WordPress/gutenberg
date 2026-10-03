@@ -34,7 +34,7 @@ collab-sidebar/
 │   ├── skin-tone-picker.tsx         SkinTonePicker - default skin tone preference Menu
 │   ├── emojibase-data.ts            Emojibase dataset loading, labels, and settings
 │   ├── frequent-emojis.ts           useFrequentEmojis - persisted "Frequently used" section
-│   ├── reaction-emojis.ts           named reaction set, storage keys, and the site's emoji rules
+│   ├── reaction-emojis.ts           curated reaction set and storage keys
 │   ├── block-reactions.ts           reaction target type, block anchor helpers, sidebar entry merging
 │   ├── use-block-reaction.ts        useBlockReaction( clientId ) - a block's reactions + toggleReaction
 │   ├── block-reactions-row.tsx      BlockReactionsRow - a block's own reactions (icon + pills + trigger)

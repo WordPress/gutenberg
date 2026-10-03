@@ -94,7 +94,7 @@ export function useBlockReaction( clientId: string ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const toggleReaction = useCallback(
-		async ( slug: string ) => {
+		async ( hexKey: string ) => {
 			if ( ! postId ) {
 				return;
 			}
@@ -125,7 +125,7 @@ export function useBlockReaction( clientId: string ) {
 					{ id: postId, block_reaction_summary: next },
 				] );
 
-			const entry = readSummary()[ anchor ]?.[ slug ];
+			const entry = readSummary()[ anchor ]?.[ hexKey ];
 			const myReactionId = entry?.reacted
 				? entry.my_reaction_id
 				: undefined;
@@ -151,7 +151,7 @@ export function useBlockReaction( clientId: string ) {
 							type: 'reaction',
 							parent: 0,
 							[ BLOCK_REACTION_PARAM ]: anchor,
-							content: slug,
+							content: hexKey,
 							status: 'approve',
 						},
 						{ throwOnError: true }
@@ -175,7 +175,7 @@ export function useBlockReaction( clientId: string ) {
 
 			invalidateReactionNames(
 				{ kind: 'block', postId, reactionsId: anchor },
-				slug
+				hexKey
 			);
 
 			// Fold the known effect into the cached post record first, so
@@ -185,7 +185,7 @@ export function useBlockReaction( clientId: string ) {
 			const current = readSummary();
 			const next = applyReactionSummaryDelta(
 				current[ anchor ],
-				slug,
+				hexKey,
 				myReactionId ? undefined : addedReactionId
 			);
 			const { [ anchor ]: _previous, ...others } = current;

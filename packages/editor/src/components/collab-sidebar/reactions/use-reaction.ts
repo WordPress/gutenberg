@@ -29,21 +29,21 @@ export interface ReactableNote {
  * `reacted` / `my_reaction_id` pair and takes the wrong branch.
  *
  * @param note            The cached note record.
- * @param slug            The reaction storage slug that changed.
+ * @param hexKey          The reaction hex key that changed.
  * @param addedReactionId The new reaction's comment ID when one was added;
  *                        omitted when one was removed.
  * @return The note with an updated `reaction_summary`.
  */
 export function applyReactionDelta< T extends ReactableNote >(
 	note: T,
-	slug: string,
+	hexKey: string,
 	addedReactionId?: number
 ): T {
 	return {
 		...note,
 		reaction_summary: applyReactionSummaryDelta(
 			note.reaction_summary,
-			slug,
+			hexKey,
 			addedReactionId
 		),
 	};
@@ -62,7 +62,7 @@ const reactionMutationCounts = new Map< number, number >();
  *
  * `reaction_summary` is computed server-side and cached on the note's
  * entity record, so the summary the note carries is the source of truth
- * for whether the current user has already reacted with a slug.
+ * for whether the current user has already reacted with an emoji.
  *
  * @param note The note comment record.
  * @return The note's reaction summary and the toggle callback.
@@ -76,8 +76,8 @@ export function useReaction( note: ReactableNote ) {
 	const { getCurrentPostId } = useSelect( editorStore );
 
 	const toggleReaction = useCallback(
-		async ( slug: string ) => {
-			const entry = reactions?.[ slug ];
+		async ( hexKey: string ) => {
+			const entry = reactions?.[ hexKey ];
 			const myReactionId = entry?.reacted
 				? entry.my_reaction_id
 				: undefined;
@@ -107,7 +107,7 @@ export function useReaction( note: ReactableNote ) {
 							post: getCurrentPostId(),
 							type: 'reaction',
 							parent: noteId,
-							content: slug,
+							content: hexKey,
 							status: 'approve',
 						},
 						{ throwOnError: true }
@@ -129,8 +129,8 @@ export function useReaction( note: ReactableNote ) {
 				return;
 			}
 
-			// The slug's reactor list changed, so the pill tooltip refetches.
-			invalidateReactionNames( { kind: 'note', id: noteId }, slug );
+			// The emoji's reactor list changed, so the pill tooltip refetches.
+			invalidateReactionNames( { kind: 'note', id: noteId }, hexKey );
 
 			// Mutating a reaction comment doesn't invalidate the cached
 			// `reaction_summary`, so a subsequent toggle would read stale
@@ -150,7 +150,7 @@ export function useReaction( note: ReactableNote ) {
 				receiveEntityRecords( 'root', 'comment', [
 					applyReactionDelta(
 						cached,
-						slug,
+						hexKey,
 						isRemoving ? undefined : addedReactionId
 					),
 				] );

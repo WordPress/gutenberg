@@ -6,14 +6,10 @@ import { __, sprintf, _n } from '@wordpress/i18n';
  */
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Button, Stack, Tooltip } from '@wordpress/ui';
-import { useState, useCallback, useMemo } from '@wordpress/element';
+import { useState, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-import {
-	hexKeyToEmoji,
-	buildEmojiBySlugMap,
-	useReactionEmojis,
-} from './reaction-emojis';
+import { getCuratedLabel, hexKeyToEmoji } from './reaction-emojis';
 import { useEmojiLabel } from './emojibase-data';
 import {
 	getReactionTargetKey,
@@ -31,47 +27,47 @@ interface ReactionComment {
 }
 
 /**
- * Get the count of reactions for a specific slug.
+ * Get the count of reactions for a specific emoji.
  *
- * @param reactions The reactions summary (keyed by slug).
- * @param slug      The reaction slug to count.
+ * @param reactions The reactions summary (keyed by hex key).
+ * @param hexKey    The reaction hex key to count.
  * @return The count of reactions.
  */
 function getReactionCount(
 	reactions: ReactionSummary | null | undefined,
-	slug: string
+	hexKey: string
 ): number {
-	return reactions?.[ slug ]?.count || 0;
+	return reactions?.[ hexKey ]?.count || 0;
 }
 
 /**
- * Check if the current user has reacted with a specific slug.
+ * Check if the current user has reacted with a specific emoji.
  *
- * @param reactions The reactions summary (keyed by slug).
- * @param slug      The reaction slug to check.
+ * @param reactions The reactions summary (keyed by hex key).
+ * @param hexKey    The reaction hex key to check.
  * @return Whether the user has reacted.
  */
 function hasUserReacted(
 	reactions: ReactionSummary | null | undefined,
-	slug: string
+	hexKey: string
 ): boolean {
-	return reactions?.[ slug ]?.reacted || false;
+	return reactions?.[ hexKey ]?.reacted || false;
 }
 
 /**
- * Get all reaction slugs that have reactions.
+ * Get all reaction hex keys that have reactions.
  *
- * @param reactions The reactions summary (keyed by slug).
- * @return Array of slugs with reactions.
+ * @param reactions The reactions summary (keyed by hex key).
+ * @return Array of hex keys with reactions.
  */
-export function getReactedSlugs(
+export function getReactedHexKeys(
 	reactions: ReactionSummary | null | undefined
 ): string[] {
 	if ( ! reactions ) {
 		return [];
 	}
 	return Object.keys( reactions ).filter(
-		( slug ) => reactions[ slug ]?.count > 0
+		( hexKey ) => reactions[ hexKey ]?.count > 0
 	);
 }
 
@@ -126,7 +122,7 @@ const MAX_REACTION_PAGES = 10;
 /**
  * Fetches every reaction on a target, across every emoji.
  *
- * The REST collection cannot be filtered by reaction slug, so the whole set
+ * The REST collection cannot be filtered by reaction hex key, so the whole set
  * has to come back before it can be grouped. Walks the pages rather than
  * reading only the first one, which would drop reactors on a busy target.
  *
@@ -173,34 +169,34 @@ async function fetchReactions(
 	return null;
 }
 
-// Module-level cache for reaction details: { "targetKey:slug": string[] }
+// Module-level cache for reaction details: { "targetKey:hexKey": string[] }
 const reactionNamesCache: Record< string, string[] > = {};
 
 /**
- * Drop the cached reactor names for a target/slug pair, so the next tooltip
+ * Drop the cached reactor names for a target/hex key pair, so the next tooltip
  * refetches them.
  *
  * @param target The note or block the reaction hangs off.
- * @param slug   The reaction slug.
+ * @param hexKey The reaction hex key.
  */
 export function invalidateReactionNames(
 	target: ReactionTarget,
-	slug: string
+	hexKey: string
 ): void {
 	delete reactionNamesCache[
-		`${ getReactionTargetKey( target ) }:${ slug }`
+		`${ getReactionTargetKey( target ) }:${ hexKey }`
 	];
 }
 
 interface ReactionButtonProps {
 	target: ReactionTarget;
-	slug: string;
+	hexKey: string;
 	count: number;
 	isActive: boolean;
 	emoji: string;
 	emojiLabel?: string;
 	disabled?: boolean;
-	onToggleReaction: ( slug: string ) => void;
+	onToggleReaction: ( hexKey: string ) => void;
 	onRemoveLast?: () => void;
 }
 
@@ -209,7 +205,7 @@ interface ReactionButtonProps {
  *
  * @param props                  Component props.
  * @param props.target           The note or block the reaction hangs off.
- * @param props.slug             The emoji slug.
+ * @param props.hexKey           The emoji hex key.
  * @param props.count            The reaction count.
  * @param props.isActive         Whether the current user reacted.
  * @param props.emoji            The emoji character.
@@ -224,7 +220,7 @@ interface ReactionButtonProps {
  */
 function ReactionButton( {
 	target,
-	slug,
+	hexKey,
 	count,
 	isActive,
 	emoji,
@@ -238,11 +234,10 @@ function ReactionButton( {
 	// Hover or keyboard focus, which gates the Emojibase fetch below.
 	const [ isReached, setIsReached ] = useState( false );
 	/*
-	 * Full-picker reactions are stored as hex keys with no curated label,
-	 * so resolve one from Emojibase; until it arrives the emoji character
-	 * stands in.
+	 * An emoji outside the curated set has no label of its own, so resolve
+	 * one from Emojibase; until it arrives the emoji character stands in.
 	 */
-	const resolvedLabel = useEmojiLabel( slug, ! emojiLabel, isReached );
+	const resolvedLabel = useEmojiLabel( hexKey, ! emojiLabel, isReached );
 	const label = emojiLabel || resolvedLabel || emoji;
 	/*
 	 * Derived, not stored: the names and label requests race, and a stored
@@ -253,7 +248,7 @@ function ReactionButton( {
 
 	const fetchReactionNames = useCallback( () => {
 		setIsReached( true );
-		const cacheKey = `${ getReactionTargetKey( target ) }:${ slug }`;
+		const cacheKey = `${ getReactionTargetKey( target ) }:${ hexKey }`;
 		if ( reactionNamesCache[ cacheKey ] ) {
 			setNames( reactionNamesCache[ cacheKey ] );
 			return;
@@ -287,7 +282,7 @@ function ReactionButton( {
 						const clean = content
 							?.replace?.( /<[^>]*>/g, '' )
 							?.trim();
-						return clean === slug;
+						return clean === hexKey;
 					} )
 					.map( ( r ) => r.author_name );
 
@@ -300,7 +295,7 @@ function ReactionButton( {
 			.finally( () => {
 				setIsFetching( false );
 			} );
-	}, [ target, slug, isFetching ] );
+	}, [ target, hexKey, isFetching ] );
 
 	const defaultLabel = sprintf(
 		/* translators: 1: emoji label, 2: count of reactions */
@@ -349,7 +344,7 @@ function ReactionButton( {
 								}
 							}
 							setNames( null );
-							onToggleReaction( slug );
+							onToggleReaction( hexKey );
 						} }
 						onMouseEnter={ fetchReactionNames }
 						onFocus={ fetchReactionNames }
@@ -370,7 +365,7 @@ interface ReactionDisplayProps {
 	target: ReactionTarget;
 	reactions: ReactionSummary | null | undefined;
 	disabled?: boolean;
-	onToggleReaction: ( slug: string ) => void;
+	onToggleReaction: ( hexKey: string ) => void;
 	onRemoveLast?: () => void;
 	children?: ReactNode;
 }
@@ -380,7 +375,7 @@ interface ReactionDisplayProps {
  *
  * @param props                  Component props.
  * @param props.target           The note or block the reactions hang off.
- * @param props.reactions        The reaction summary (keyed by slug).
+ * @param props.reactions        The reaction summary (keyed by hex key).
  * @param props.disabled         Whether reactions can no longer be toggled
  *                               (the thread is resolved).
  * @param props.onToggleReaction Callback to toggle a reaction.
@@ -398,16 +393,9 @@ export default function ReactionDisplay( {
 	onRemoveLast,
 	children,
 }: ReactionDisplayProps ) {
-	// The list is filterable server-side (and static per page load),
-	// so index it once per list identity.
-	const emojis = useReactionEmojis();
-	const emojiBySlug = useMemo(
-		() => buildEmojiBySlugMap( emojis ),
-		[ emojis ]
-	);
-	const reactedSlugs = getReactedSlugs( reactions );
+	const reactedHexKeys = getReactedHexKeys( reactions );
 
-	if ( reactedSlugs.length === 0 && ! children ) {
+	if ( reactedHexKeys.length === 0 && ! children ) {
 		return null;
 	}
 
@@ -420,20 +408,19 @@ export default function ReactionDisplay( {
 			justify="flex-start"
 			wrap="wrap"
 		>
-			{ reactedSlugs.map( ( slug ) => {
-				const count = getReactionCount( reactions, slug );
-				const isActive = hasUserReacted( reactions, slug );
-				const entry = emojiBySlug.get( slug );
+			{ reactedHexKeys.map( ( hexKey ) => {
+				const count = getReactionCount( reactions, hexKey );
+				const isActive = hasUserReacted( reactions, hexKey );
 
 				return (
 					<ReactionButton
-						key={ slug }
+						key={ hexKey }
 						target={ target }
-						slug={ slug }
+						hexKey={ hexKey }
 						count={ count }
 						isActive={ isActive }
-						emoji={ entry?.emoji ?? hexKeyToEmoji( slug ) }
-						emojiLabel={ entry?.label }
+						emoji={ hexKeyToEmoji( hexKey ) }
+						emojiLabel={ getCuratedLabel( hexKey ) }
 						disabled={ disabled }
 						onToggleReaction={ onToggleReaction }
 						onRemoveLast={ onRemoveLast }

@@ -11,7 +11,9 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { moreVertical, published } from '@wordpress/icons';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
-import ReactionDisplay, { getReactedSlugs } from './reactions/reaction-display';
+import ReactionDisplay, {
+	getReactedHexKeys,
+} from './reactions/reaction-display';
 import { AddReactionButton } from './reactions/add-reaction-button';
 import { useReaction } from './reactions/use-reaction';
 
@@ -83,7 +85,7 @@ export function Note( {
 	}, [ rawContent ] );
 
 	const canResolve = note.parent === 0;
-	const hasReactions = getReactedSlugs( reactions ).length > 0;
+	const hasReactions = getReactedHexKeys( reactions ).length > 0;
 	// Not while editing: the trigger floats over the note's corner, which
 	// during an edit is the form's own text field.
 	const canReact = isSelected && actionState !== 'edit';

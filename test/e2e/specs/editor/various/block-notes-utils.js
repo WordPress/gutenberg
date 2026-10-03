@@ -156,9 +156,9 @@ class BlockNoteUtils {
 			.click();
 		await this.waitForFullPicker();
 
-		// Curated and filter-provided reactions carry exact label
-		// overrides (e.g. "Heart") and are seeded into the "Frequently
-		// used" section, so an exact-name gridcell lookup finds them
+		// Curated reactions carry their own exact labels (e.g. "Heart")
+		// and are seeded into the "Frequently used" section, so an
+		// exact-name gridcell lookup finds them
 		// without matching Emojibase labels that merely contain the name
 		// (e.g. "smiling face with hearts").
 		await this.#page
@@ -168,9 +168,8 @@ class BlockNoteUtils {
 	}
 
 	/**
-	 * Wait for the emoji picker popup to open and its grid to render
-	 * at least one cell. Until the Emojibase data loads the grid shows
-	 * the named set, so this does not wait for the full dataset.
+	 * Wait for the emoji picker popup to open and the Emojibase data to
+	 * fill its grid with at least one cell.
 	 */
 	async waitForFullPicker() {
 		await expect(

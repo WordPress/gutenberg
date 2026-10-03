@@ -28,16 +28,16 @@ class Block_Reactions_Test extends WP_Test_REST_TestCase {
 	 * @param int    $post_id Post the block belongs to.
 	 * @param string $anchor  Block anchor (`metadata.reactionsId`).
 	 * @param int    $user_id Reacting user.
-	 * @param string $slug    Reaction storage slug.
+	 * @param string $hex_key    Reaction hex key.
 	 * @return int Reaction comment ID.
 	 */
-	protected function insert_block_reaction( $post_id, $anchor, $user_id, $slug = 'heart' ) {
+	protected function insert_block_reaction( $post_id, $anchor, $user_id, $hex_key = '2764' ) {
 		return wp_insert_comment(
 			array(
 				'comment_post_ID'  => $post_id,
 				'comment_parent'   => 0,
 				'comment_type'     => 'reaction',
-				'comment_content'  => $slug,
+				'comment_content'  => $hex_key,
 				'comment_approved' => 1,
 				'user_id'          => $user_id,
 				'comment_meta'     => array( '_wp_reaction_block' => $anchor ),
@@ -188,8 +188,8 @@ class Block_Reactions_Test extends WP_Test_REST_TestCase {
 
 	public function test_get_block_reaction_summary_shape() {
 		$post_id = self::factory()->post->create();
-		$mine    = $this->insert_block_reaction( $post_id, 'blockaaa', self::$editor_id, 'heart' );
-		$this->insert_block_reaction( $post_id, 'blockaaa', self::$other_editor_id, 'heart' );
+		$mine    = $this->insert_block_reaction( $post_id, 'blockaaa', self::$editor_id, '2764' );
+		$this->insert_block_reaction( $post_id, 'blockaaa', self::$other_editor_id, '2764' );
 		$this->insert_block_reaction( $post_id, 'blockbbb', self::$other_editor_id, 'rocket' );
 
 		$summary = gutenberg_get_block_reaction_summary( $post_id, self::$editor_id );
@@ -197,7 +197,7 @@ class Block_Reactions_Test extends WP_Test_REST_TestCase {
 		$this->assertSame(
 			array(
 				'blockaaa' => array(
-					'heart' => array(
+					'2764' => array(
 						'count'          => 2,
 						'reacted'        => true,
 						'my_reaction_id' => $mine,
@@ -236,7 +236,7 @@ class Block_Reactions_Test extends WP_Test_REST_TestCase {
 				'comment_post_ID'  => $post_id,
 				'comment_parent'   => $note_id,
 				'comment_type'     => 'reaction',
-				'comment_content'  => 'heart',
+				'comment_content'  => '2764',
 				'comment_approved' => 1,
 				'user_id'          => self::$editor_id,
 			)
@@ -260,7 +260,7 @@ class Block_Reactions_Test extends WP_Test_REST_TestCase {
 		$this->assertSame(
 			array(
 				'blockaaa' => array(
-					'heart' => array(
+					'2764' => array(
 						'count'          => 1,
 						'reacted'        => true,
 						'my_reaction_id' => $mine,

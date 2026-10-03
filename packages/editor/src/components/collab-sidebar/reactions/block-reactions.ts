@@ -24,7 +24,7 @@ export interface ReactionSummaryEntry {
 }
 
 /**
- * A reaction summary keyed by storage slug (curated slug or hex key).
+ * A reaction summary keyed by emoji hex key.
  */
 export type ReactionSummary = Record< string, ReactionSummaryEntry >;
 
@@ -78,18 +78,18 @@ export function getBlockReactionsId(
  * `my_reaction_id` pair and takes the wrong branch.
  *
  * @param summary         The cached summary.
- * @param slug            The reaction storage slug that changed.
+ * @param hexKey          The reaction hex key that changed.
  * @param addedReactionId The new reaction's comment ID when one was added;
  *                        omitted when one was removed.
  * @return A new summary.
  */
 export function applyReactionSummaryDelta(
 	summary: ReactionSummary | null | undefined,
-	slug: string,
+	hexKey: string,
 	addedReactionId?: number
 ): ReactionSummary {
 	const next = { ...( summary || {} ) };
-	const entry = next[ slug ];
+	const entry = next[ hexKey ];
 
 	if ( addedReactionId ) {
 		// Concurrent adds converge server-side on one surviving row, so a
@@ -97,7 +97,7 @@ export function applyReactionSummaryDelta(
 		if ( entry?.my_reaction_id === addedReactionId ) {
 			return next;
 		}
-		next[ slug ] = {
+		next[ hexKey ] = {
 			count: ( entry?.count || 0 ) + 1,
 			reacted: true,
 			my_reaction_id: addedReactionId,
@@ -105,9 +105,9 @@ export function applyReactionSummaryDelta(
 	} else if ( entry ) {
 		const count = entry.count - 1;
 		if ( count > 0 ) {
-			next[ slug ] = { count, reacted: false };
+			next[ hexKey ] = { count, reacted: false };
 		} else {
-			delete next[ slug ];
+			delete next[ hexKey ];
 		}
 	}
 

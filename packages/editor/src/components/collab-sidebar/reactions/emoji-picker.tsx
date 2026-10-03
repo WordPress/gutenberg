@@ -14,21 +14,13 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	detectLocale,
-	getOverrideLabel,
 	normalizeHexcode,
 	useEmojibaseConfig,
 	useEmojibaseData,
 } from './emojibase-data';
 import type { EmojibaseEntry } from './emojibase-data';
 import { useFrequentEmojis } from './frequent-emojis';
-import {
-	emojiToHexKey,
-	getNamedHexKeys,
-	isReactionEmojiAllowed,
-	useReactionEmojiRules,
-	useReactionEmojis,
-} from './reaction-emojis';
-import type { CuratedEmoji } from './reaction-emojis';
+import { getCuratedLabel } from './reaction-emojis';
 import SkinTonePicker, { applySkinTone } from './skin-tone-picker';
 
 /**
@@ -181,15 +173,13 @@ export function chunkRows< T >( emojis: T[] ): T[][] {
  * Case-insensitive search over emoji labels and Emojibase tags. Returns
  * the unfiltered list when the query is empty.
  *
- * @param emojis    Emoji records.
- * @param query     Search query.
- * @param overrides Map of `hexcode => translated label`.
+ * @param emojis Emoji records.
+ * @param query  Search query.
  * @return Matching emoji records.
  */
 export function searchEmojis(
 	emojis: EmojibaseEntry[],
-	query: string,
-	overrides: Record< string, string > | null
+	query: string
 ): EmojibaseEntry[] {
 	const trimmed = query.trim().toLowerCase();
 	if ( ! trimmed ) {
@@ -197,11 +187,11 @@ export function searchEmojis(
 	}
 	return emojis.filter( ( entry ) => {
 		/*
-		 * Match both the override and the original Emojibase label, so
-		 * searching either name finds the emoji.
+		 * Match both the curated and the Emojibase label, so searching
+		 * either name finds the emoji.
 		 */
-		const override = getOverrideLabel( overrides, entry.hexcode );
-		if ( override && override.toLowerCase().includes( trimmed ) ) {
+		const curated = getCuratedLabel( normalizeHexcode( entry.hexcode ) );
+		if ( curated && curated.toLowerCase().includes( trimmed ) ) {
 			return true;
 		}
 		if ( entry.label && entry.label.toLowerCase().includes( trimmed ) ) {
@@ -219,29 +209,11 @@ export function searchEmojis(
 }
 
 /**
- * Shape the named reaction list like Emojibase records, so the grid can
- * offer it through the same cells and search when no dataset is loaded.
- *
- * @param emojis The named emoji list.
- * @return Equivalent Emojibase-style records.
- */
-export function namedEmojisToEntries(
-	emojis: CuratedEmoji[]
-): EmojibaseEntry[] {
-	return emojis.map( ( { emoji, label } ) => ( {
-		hexcode: emojiToHexKey( emoji ),
-		emoji,
-		label,
-	} ) );
-}
-
-/**
  * Searchable emoji picker: a trigger button opening an autocomplete popup
  * with the search field on top of the emoji grid. Emoji data and labels
  * come from the per-locale Emojibase files at `noteEmojibaseUrl`; UI chrome
  * strings go through `@wordpress/i18n`. Without a dataset (no URL
- * configured, or the fetch failed) the grid offers the named reaction set
- * instead, so reacting keeps working.
+ * configured, or the fetch failed) the popup shows an error message.
  *
  * @param props          Component props.
  * @param props.trigger  The button that opens the picker.
@@ -263,30 +235,14 @@ export default function EmojiPicker( {
 	 */
 	const [ isWarm, setIsWarm ] = useState( false );
 	const warm = () => setIsWarm( true );
-	const { baseUrl, labelOverrides } = useEmojibaseConfig();
+	const { baseUrl } = useEmojibaseConfig();
 	const [ locale ] = useState( detectLocale );
 	const {
 		data: dataset,
 		isLoading,
 		error,
 	} = useEmojibaseData( isWarm ? baseUrl : null, locale );
-	const namedEmojis = useReactionEmojis();
-	const rules = useReactionEmojiRules();
-	const hasDataset = !! dataset;
-	// Offer only what the REST API accepts under the site's emoji rules.
-	const data = useMemo( () => {
-		if ( ! dataset ) {
-			return namedEmojisToEntries( namedEmojis );
-		}
-		const namedKeys = getNamedHexKeys( namedEmojis );
-		return dataset.filter( ( entry ) =>
-			isReactionEmojiAllowed(
-				normalizeHexcode( entry.hexcode ),
-				rules,
-				namedKeys
-			)
-		);
-	}, [ dataset, namedEmojis, rules ] );
+	const data = useMemo( () => dataset ?? [], [ dataset ] );
 	const [ query, setQuery ] = useState( '' );
 
 	/*
@@ -314,10 +270,7 @@ export default function EmojiPicker( {
 	);
 	const { set: setPreference } = useDispatch( preferencesStore );
 
-	const groups = useMemo(
-		() => ( hasDataset ? groupEmojis( data ) : [] ),
-		[ data, hasDataset ]
-	);
+	const groups = useMemo( () => groupEmojis( data ), [ data ] );
 
 	// Resolves stored frequently-used hex keys back to full records.
 	const recordByHexKey = useMemo( () => {
@@ -331,13 +284,11 @@ export default function EmojiPicker( {
 	}, [ data ] );
 
 	const isSearching = !! query.trim();
-	// The named set is a handful of emoji, so it needs no category headings.
-	const isFlat = isSearching || ! hasDataset;
 
 	/*
 	 * The items handed to `Autocomplete.Root`: category groups while
 	 * browsing, a flat list while searching. Filtering stays ours
-	 * (`filter={ null }`), since it matches label overrides and Emojibase
+	 * (`filter={ null }`), since it matches curated labels and Emojibase
 	 * tags, so these are already the visible results.
 	 */
 	const items = useMemo( (): EmojiOptionGroup[] | EmojiOption[] => {
@@ -354,18 +305,12 @@ export default function EmojiPicker( {
 				key: `${ prefix }-${ entry.hexcode }`,
 				value: display.emoji,
 				label:
-					getOverrideLabel( labelOverrides, display.hexcode ) ||
+					getCuratedLabel( normalizeHexcode( display.hexcode ) ) ||
 					display.label ||
 					'',
 				hexKey: normalizeHexcode( entry.hexcode ),
 			};
 		};
-
-		if ( ! hasDataset ) {
-			return searchEmojis( data, query, labelOverrides ).map( ( entry ) =>
-				toOption( entry, 'named' )
-			);
-		}
 
 		if ( isSearching ) {
 			/*
@@ -374,9 +319,7 @@ export default function EmojiPicker( {
 			 * mostly-empty headers.
 			 */
 			return groups
-				.flatMap( ( group ) =>
-					searchEmojis( group.emojis, query, labelOverrides )
-				)
+				.flatMap( ( group ) => searchEmojis( group.emojis, query ) )
 				.map( ( entry ) => toOption( entry, 'search' ) );
 		}
 
@@ -401,17 +344,7 @@ export default function EmojiPicker( {
 				),
 			} ) ),
 		].filter( ( group ) => group.items.length > 0 );
-	}, [
-		data,
-		hasDataset,
-		groups,
-		isSearching,
-		query,
-		labelOverrides,
-		frequentKeys,
-		recordByHexKey,
-		skinTone,
-	] );
+	}, [ groups, isSearching, query, frequentKeys, recordByHexKey, skinTone ] );
 
 	/**
 	 * Render grid rows of emoji cells, recording usage on selection.
@@ -446,13 +379,12 @@ export default function EmojiPicker( {
 			</Autocomplete.Row>
 		) );
 
+	const loadFailed = !! error || ! baseUrl;
 	let status: ReactNode = null;
 	if ( isLoading ) {
 		status = __( 'Loading…' );
-	} else if ( error ) {
-		status = __(
-			'Couldn’t load the full emoji picker. Basic reactions are available.'
-		);
+	} else if ( loadFailed ) {
+		status = __( 'Couldn’t load emojis.' );
 	} else if ( hasJustLoaded && ! isSearching && groups.length > 0 ) {
 		// An empty dataset is left to `Autocomplete.Empty`.
 		const emojiCount = groups.reduce(
@@ -560,16 +492,18 @@ export default function EmojiPicker( {
 				<div className="editor-collab-sidebar-panel__picker-viewport">
 					<Autocomplete.Status>{ status }</Autocomplete.Status>
 					<Autocomplete.Empty>
-						{ isLoading ? null : __( 'No emoji found.' ) }
+						{ isLoading || loadFailed
+							? null
+							: __( 'No emoji found.' ) }
 					</Autocomplete.Empty>
 					<Autocomplete.List
 						aria-label={ _x( 'Emoji', 'emoji picker grid label' ) }
 						className={ clsx(
 							'editor-collab-sidebar-panel__picker-list',
-							{ 'is-searching': isFlat }
+							{ 'is-searching': isSearching }
 						) }
 					>
-						{ isFlat
+						{ isSearching
 							? renderRows( items as EmojiOption[] )
 							: ( group: EmojiOptionGroup ) => (
 									<Autocomplete.Group

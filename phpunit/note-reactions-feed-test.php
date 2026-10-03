@@ -41,7 +41,7 @@ class Tests_Note_Reactions_Feed extends WP_UnitTestCase {
 				'comment_post_ID'  => self::$post_id,
 				'comment_parent'   => $note_id,
 				'comment_type'     => 'reaction',
-				'comment_content'  => 'heart',
+				'comment_content'  => '2764',
 				'comment_approved' => '1',
 			)
 		);

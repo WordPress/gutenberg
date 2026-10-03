@@ -7,22 +7,17 @@ import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/ui';
 import { reaction as reactionIcon } from '@wordpress/icons';
 import EmojiPicker from './emoji-picker';
-import {
-	emojiToStorageKey,
-	useReactionEmojiRules,
-	useReactionEmojis,
-} from './reaction-emojis';
-import { useEmojibaseConfig } from './emojibase-data';
+import { emojiToHexKey } from './reaction-emojis';
 
 interface AddReactionButtonProps {
 	disabled?: boolean;
 	label?: string;
-	onToggleReaction: ( slug: string ) => void;
+	onToggleReaction: ( hexKey: string ) => void;
 }
 
 /**
  * Standalone add-reaction button, opening the searchable emoji picker
- * with its "Frequently used" section seeded from the named set.
+ * with its "Frequently used" section seeded from the curated set.
  *
  * @param props                  Component props.
  * @param props.disabled         Whether the button is disabled (e.g. on a
@@ -36,16 +31,6 @@ export function AddReactionButton( {
 	label = __( 'Add reaction' ),
 	onToggleReaction,
 }: AddReactionButtonProps ) {
-	const emojis = useReactionEmojis();
-	const rules = useReactionEmojiRules();
-	const { baseUrl } = useEmojibaseConfig();
-
-	// With an emptied named list and no dataset, or a dataset limited to
-	// that list, there is nothing to pick.
-	if ( ! emojis.length && ( ! baseUrl || ! rules.allowUnlisted ) ) {
-		return null;
-	}
-
 	return (
 		<EmojiPicker
 			label={ label }
@@ -61,9 +46,7 @@ export function AddReactionButton( {
 				/>
 			}
 			disabled={ disabled }
-			onSelect={ ( emoji ) =>
-				onToggleReaction( emojiToStorageKey( emoji, emojis ) )
-			}
+			onSelect={ ( emoji ) => onToggleReaction( emojiToHexKey( emoji ) ) }
 		/>
 	);
 }

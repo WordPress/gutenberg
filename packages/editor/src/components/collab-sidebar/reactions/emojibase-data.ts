@@ -2,6 +2,7 @@ import { useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 // @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { getCuratedLabel } from './reaction-emojis';
 
 /*
  * Emojibase loading shared by the picker and the reaction pills (labels
@@ -12,32 +13,28 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * Emojibase configuration read from the block editor settings.
  */
 export interface EmojibaseConfig {
-	// Null when the site serves no dataset; the picker then offers the
-	// named reaction set only.
+	// Null when the site serves no dataset.
 	baseUrl: string | null;
-	labelOverrides: Record< string, string > | null;
 }
 
 /**
  * Read the Emojibase configuration from the block editor settings. The
- * plugin sets these server-side; npm consumers supply them themselves.
+ * plugin sets it server-side; npm consumers supply it themselves.
  *
- * @return The Emojibase base URL and label overrides.
+ * @return The Emojibase base URL.
  */
 export function useEmojibaseConfig(): EmojibaseConfig {
-	return useSelect( ( select ) => {
-		const settings: Record< string, unknown > =
-			select( blockEditorStore ).getSettings();
-		const baseUrl = settings.noteEmojibaseUrl;
-		const labelOverrides = settings.noteEmojiLabelOverrides;
-		return {
-			baseUrl: typeof baseUrl === 'string' && baseUrl ? baseUrl : null,
-			labelOverrides:
-				labelOverrides && typeof labelOverrides === 'object'
-					? ( labelOverrides as Record< string, string > )
-					: null,
-		};
-	}, [] );
+	const baseUrl = useSelect(
+		( select ) =>
+			(
+				select( blockEditorStore ).getSettings() as Record<
+					string,
+					unknown
+				>
+			 ).noteEmojibaseUrl,
+		[]
+	);
+	return { baseUrl: typeof baseUrl === 'string' && baseUrl ? baseUrl : null };
 }
 
 /**
@@ -294,43 +291,16 @@ export function normalizeHexcode( hexcode: string ): string {
 const labelMapCache = new Map< string, Map< string, string > >();
 
 /**
- * Look up a site's label override for an Emojibase entry.
+ * Build (and cache) a normalized-hex-key to label Map for a dataset, with
+ * the curated reactions keeping their own labels.
  *
- * Emojibase hexcodes may keep U+FE0F (`2764-FE0F-200D-1F525`) while the
- * server writes keys normalized without it, so try the raw hexcode first
- * and the normalized form second.
- *
- * @param overrides Map of `hexcode => translated label`, or null.
- * @param hexcode   The entry's Emojibase hexcode.
- * @return The override label, or undefined when there is none.
- */
-export function getOverrideLabel(
-	overrides: Record< string, string > | null,
-	hexcode: string
-): string | undefined {
-	if ( ! overrides ) {
-		return undefined;
-	}
-	return (
-		overrides[ hexcode ] ??
-		overrides[ normalizeHexcode( hexcode ).toUpperCase() ]
-	);
-}
-
-/**
- * Build (and cache) a normalized-hex-key to label Map for a dataset,
- * applying per-site overrides. Overrides come from editor settings and are
- * page-static, so the cache is keyed by dataset alone.
- *
- * @param cacheKey  `baseUrl|locale` cache key.
- * @param data      Emojibase emoji records.
- * @param overrides Map of `hexcode => translated label`, or null.
+ * @param cacheKey `baseUrl|locale` cache key.
+ * @param data     Emojibase emoji records.
  * @return Map from hex key to label.
  */
 function buildLabelMap(
 	cacheKey: string,
-	data: EmojibaseEntry[],
-	overrides: Record< string, string > | null
+	data: EmojibaseEntry[]
 ): Map< string, string > {
 	const existing = labelMapCache.get( cacheKey );
 	if ( existing ) {
@@ -338,10 +308,8 @@ function buildLabelMap(
 	}
 	const map = new Map< string, string >();
 	const indexEntry = ( hexcode: string, label: string ) => {
-		map.set(
-			normalizeHexcode( hexcode ),
-			getOverrideLabel( overrides, hexcode ) || label
-		);
+		const hexKey = normalizeHexcode( hexcode );
+		map.set( hexKey, getCuratedLabel( hexKey ) || label );
 	};
 	for ( const entry of data ) {
 		if ( ! entry.hexcode || ! entry.label ) {
@@ -365,15 +333,13 @@ function buildLabelMap(
  * Look up the label for a stored hex-key reaction from the already
  * loaded dataset, without triggering a fetch.
  *
- * @param hexKey    Normalized reaction hex key, e.g. `1f44d`.
- * @param baseUrl   Same-origin URL of the Emojibase dataset directory.
- * @param overrides Map of `hexcode => translated label`, or null.
+ * @param hexKey  Normalized reaction hex key, e.g. `1f44d`.
+ * @param baseUrl Same-origin URL of the Emojibase dataset directory.
  * @return The label, or null when unknown/not loaded.
  */
 export function getCachedEmojiLabel(
 	hexKey: string,
-	baseUrl: string | null,
-	overrides: Record< string, string > | null
+	baseUrl: string | null
 ): string | null {
 	if ( ! baseUrl ) {
 		return null;
@@ -383,22 +349,20 @@ export function getCachedEmojiLabel(
 	if ( ! cached ) {
 		return null;
 	}
-	return (
-		buildLabelMap( cacheKey, cached.data, overrides ).get( hexKey ) || null
-	);
+	return buildLabelMap( cacheKey, cached.data ).get( hexKey ) || null;
 }
 
 /**
  * Resolve the label for a hex-key reaction so its pill tooltip reads like a
  * curated one. A loaded dataset resolves from the module cache; otherwise
  * the fetch waits for `load`, since the dataset is ~775KB and should not be
- * pulled just because a note carries a full-picker reaction. Until then the
+ * pulled just because a note carries a reaction. Until then the
  * emoji character stands in, which assistive technology announces by its
  * Unicode name.
  *
  * @param hexKey  Normalized reaction hex key, e.g. `1f44d`.
  * @param enabled Whether resolution should run (false for curated
- *                slugs, which have their own labels).
+ *                emoji, which have their own labels).
  * @param load    Whether to fetch the dataset when it isn't cached.
  * @return The resolved label, or null while unresolved.
  */
@@ -407,9 +371,9 @@ export function useEmojiLabel(
 	enabled: boolean,
 	load: boolean
 ): string | null {
-	const { baseUrl, labelOverrides } = useEmojibaseConfig();
+	const { baseUrl } = useEmojibaseConfig();
 	const [ label, setLabel ] = useState< string | null >( () =>
-		enabled ? getCachedEmojiLabel( hexKey, baseUrl, labelOverrides ) : null
+		enabled ? getCachedEmojiLabel( hexKey, baseUrl ) : null
 	);
 
 	useEffect( () => {
@@ -425,8 +389,7 @@ export function useEmojiLabel(
 				}
 				const resolved = buildLabelMap(
 					`${ baseUrl }|${ locale }`,
-					data,
-					labelOverrides
+					data
 				).get( hexKey );
 				if ( resolved ) {
 					setLabel( resolved );
@@ -438,7 +401,7 @@ export function useEmojiLabel(
 		return () => {
 			cancelled = true;
 		};
-	}, [ hexKey, enabled, load, label, baseUrl, labelOverrides ] );
+	}, [ hexKey, enabled, load, label, baseUrl ] );
 
 	return label;
 }

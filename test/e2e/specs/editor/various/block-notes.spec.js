@@ -1370,54 +1370,6 @@ test.describe( 'Block Notes', () => {
 			await expect( reactionButton ).toBeVisible();
 		} );
 
-		test.describe( 'Emojibase dataset unavailable', () => {
-			test.beforeAll( async ( { requestUtils } ) => {
-				await requestUtils.activatePlugin(
-					'gutenberg-test-note-emojibase-unavailable'
-				);
-			} );
-
-			test.afterAll( async ( { requestUtils } ) => {
-				await requestUtils.deactivatePlugin(
-					'gutenberg-test-note-emojibase-unavailable'
-				);
-			} );
-
-			test( 'the picker offers the named set and a pick still adds a reaction', async ( {
-				page,
-				blockNoteUtils,
-			} ) => {
-				await blockNoteUtils.addBlockWithNote( {
-					type: 'core/paragraph',
-					attributes: { content: 'Named pick' },
-					comment: 'Test comment for named pick',
-				} );
-
-				await page
-					.getByRole( 'combobox', { name: 'Add reaction' } )
-					.click();
-				await blockNoteUtils.waitForFullPicker();
-
-				// Only the named set, with no category headings.
-				const grid = page.getByRole( 'grid' );
-				await expect( grid.getByRole( 'gridcell' ) ).toHaveCount( 5 );
-				await expect(
-					page.locator(
-						'.editor-collab-sidebar-panel__picker-category'
-					)
-				).toHaveCount( 0 );
-
-				// Search still filters the named set.
-				await page.getByPlaceholder( 'Search emoji' ).fill( 'heart' );
-				await expect( grid.getByRole( 'gridcell' ) ).toHaveCount( 1 );
-				await grid.getByRole( 'gridcell', { name: 'Heart' } ).click();
-
-				await expect(
-					page.getByRole( 'button', { name: /Heart/ } )
-				).toContainText( '1' );
-			} );
-		} );
-
 		test( 'resolving a thread locks its reactions', async ( {
 			page,
 			blockNoteUtils,
@@ -1473,20 +1425,38 @@ test.describe( 'Block Notes', () => {
 			await expect( reactionPill ).toBeEnabled();
 		} );
 
-		test( 'a full-picker pick that matches a curated emoji stores as the curated slug', async ( {
+		test( 'a curated pick and the same emoji from search share one hex key', async ( {
 			page,
 			blockNoteUtils,
 		} ) => {
 			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/paragraph',
-				attributes: { content: 'Curated normalization' },
-				comment: 'Pick heart from full picker',
+				attributes: { content: 'Curated hex key' },
+				comment: 'Pick heart twice',
 			} );
 
-			// Open the full picker and click the plain heart specifically.
+			// The Frequently used seed stores the heart by its hex key.
+			const created = page.waitForRequest(
+				( request ) =>
+					request.method() === 'POST' &&
+					/\/wp\/v2\/comments/.test(
+						decodeURIComponent( request.url() )
+					)
+			);
+			await blockNoteUtils.addReactionToComment( 'Heart' );
+			expect( ( await created ).postDataJSON().content ).toBe( '2764' );
+
+			const reactionButton = page.locator(
+				'.editor-collab-sidebar-panel__reaction-button'
+			);
+			await expect( reactionButton ).toHaveCount( 1 );
+			await expect( reactionButton ).toContainText( '❤' );
+			await expect( reactionButton ).toContainText( '1' );
+
 			/*
-			 * Search first so the click lands on the Emojibase entry, not
-			 * the Frequently used seed. "Heart" is a label override, so the
+			 * Picking the same heart from the search results resolves to
+			 * the same key, so it toggles the existing reaction off rather
+			 * than adding a second pill. "Heart" is a curated label, so the
 			 * exact match skips "smiling face with hearts".
 			 */
 			await page
@@ -1497,17 +1467,7 @@ test.describe( 'Block Notes', () => {
 			await page
 				.getByRole( 'gridcell', { name: 'Heart', exact: true } )
 				.click();
-
-			/*
-			 * One pill showing the heart and a count of 1, as a named-set
-			 * pick produces.
-			 */
-			const reactionButton = page.locator(
-				'.editor-collab-sidebar-panel__reaction-button'
-			);
-			await expect( reactionButton ).toHaveCount( 1 );
-			await expect( reactionButton ).toContainText( '❤' );
-			await expect( reactionButton ).toContainText( '1' );
+			await expect( reactionButton ).toHaveCount( 0 );
 		} );
 
 		test( 'a full-picker pick that is not curated renders the chosen emoji', async ( {
@@ -1734,43 +1694,6 @@ test.describe( 'Block Notes', () => {
 			// still bubble to the thread's `useFocusOutside` through the
 			// React tree, so the thread stays selected and the trigger mounted.
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
-		} );
-
-		test.describe( 'Filtered emoji list', () => {
-			test.beforeAll( async ( { requestUtils } ) => {
-				await requestUtils.activatePlugin(
-					'gutenberg-test-note-reaction-emojis'
-				);
-			} );
-
-			test.afterAll( async ( { requestUtils } ) => {
-				await requestUtils.deactivatePlugin(
-					'gutenberg-test-note-reaction-emojis'
-				);
-			} );
-
-			test( 'can react with a filter-added emoji', async ( {
-				page,
-				blockNoteUtils,
-			} ) => {
-				await blockNoteUtils.addBlockWithNote( {
-					type: 'core/paragraph',
-					attributes: { content: 'Testing filtered reaction' },
-					comment: 'Filtered reaction',
-				} );
-
-				// Exercises the whole path: the picker offers the custom
-				// entry, the REST API accepts its slug, and the pill
-				// resolves the slug back to the filtered emoji and label.
-				await blockNoteUtils.addReactionToComment( 'Unicorn' );
-
-				const reactionButton = page.getByRole( 'button', {
-					name: /Unicorn/,
-				} );
-				await expect( reactionButton ).toBeVisible();
-				await expect( reactionButton ).toContainText( '🦄' );
-				await expect( reactionButton ).toContainText( '1' );
-			} );
 		} );
 	} );
 

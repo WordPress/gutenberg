@@ -329,7 +329,7 @@ function gutenberg_get_reaction_summary_entry_schema() {
  *
  * @param int $post_id Post ID.
  * @param int $user_id User whose own reactions are flagged. Default 0.
- * @return array `{ anchor: { slug: { count, reacted, my_reaction_id } } }`.
+ * @return array `{ anchor: { hex_key: { count, reacted, my_reaction_id } } }`.
  */
 function gutenberg_get_block_reaction_summary( $post_id, $user_id = 0 ) {
 	global $wpdb;
@@ -337,7 +337,7 @@ function gutenberg_get_block_reaction_summary( $post_id, $user_id = 0 ) {
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	$rows = $wpdb->get_results(
 		$wpdb->prepare(
-			"SELECT m.meta_value AS block, c.comment_content AS slug, COUNT(*) AS reaction_count,
+			"SELECT m.meta_value AS block, c.comment_content AS hex_key, COUNT(*) AS reaction_count,
 				MIN( CASE WHEN c.user_id = %d THEN c.comment_ID ELSE NULL END ) AS my_reaction_id
 			FROM {$wpdb->comments} c
 			INNER JOIN {$wpdb->commentmeta} m ON m.comment_id = c.comment_ID AND m.meta_key = %s
@@ -356,10 +356,10 @@ function gutenberg_get_block_reaction_summary( $post_id, $user_id = 0 ) {
 	$summary = array();
 	foreach ( (array) $rows as $row ) {
 		$anchor         = (string) $row->block;
-		$slug           = wp_strip_all_tags( $row->slug );
+		$hex_key        = wp_strip_all_tags( $row->hex_key );
 		$my_reaction_id = (int) $row->my_reaction_id;
 
-		$summary[ $anchor ][ $slug ] = array(
+		$summary[ $anchor ][ $hex_key ] = array(
 			'count'          => (int) $row->reaction_count,
 			'reacted'        => $my_reaction_id > 0,
 			'my_reaction_id' => $my_reaction_id,
@@ -420,7 +420,7 @@ function gutenberg_register_block_reaction_summary_field() {
 		array(
 			'get_callback' => 'gutenberg_get_block_reaction_summary_field',
 			'schema'       => array(
-				'description'          => __( 'Aggregated reaction counts for each block in this post, keyed by block anchor and then by emoji slug. Only present on single-item requests.', 'gutenberg' ),
+				'description'          => __( 'Aggregated reaction counts for each block in this post, keyed by block anchor and then by emoji hex key. Only present on single-item requests.', 'gutenberg' ),
 				'type'                 => array( 'object', 'null' ),
 				'context'              => array( 'edit' ),
 				'readonly'             => true,
