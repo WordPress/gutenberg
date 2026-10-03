@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { Menu as _Menu } from '@base-ui/react/menu';
-import { forwardRef, useRef, useState } from '@wordpress/element';
+import { forwardRef, useCallback, useRef, useState } from '@wordpress/element';
 import { useIsomorphicLayoutEffect, useMergeRefs } from '@wordpress/compose';
 import { ITEM_POPUP_POSITIONER_PROPS } from '../form/primitives/constants';
 import resetStyles from '../utils/css/resets.module.css';
@@ -15,14 +15,17 @@ const MENU_SUBMENU_POPUP_POSITIONER_PROPS = {
 	collisionPadding: 12,
 } as const satisfies PositionerProps;
 
+type AlignOffsetFunction = Exclude<
+	PositionerProps[ 'alignOffset' ],
+	number | undefined
+>;
+
 function getSubmenuLabelOffset(
 	positioner: HTMLDivElement | null,
 	trigger?: HTMLDivElement | null
 ) {
 	const popup = positioner?.querySelector( `.${ styles.popup }` );
-	const popupStyles =
-		popup?.ownerDocument.defaultView?.getComputedStyle( popup );
-	if ( ! positioner || ! popupStyles ) {
+	if ( ! positioner || ! popup ) {
 		return 0;
 	}
 
@@ -31,6 +34,11 @@ function getSubmenuLabelOffset(
 	);
 	const firstLabel = popup?.querySelector( `.${ styles[ 'item-label' ] }` );
 	if ( ! trigger || ! parentLabel || ! firstLabel ) {
+		const popupStyles =
+			popup.ownerDocument.defaultView?.getComputedStyle( popup );
+		if ( ! popupStyles ) {
+			return 0;
+		}
 		return -(
 			parseFloat( popupStyles.paddingTop ) +
 			parseFloat( popupStyles.borderTopWidth )
@@ -61,23 +69,89 @@ const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
 		const mergedRef = useMergeRefs( [ ref, positionerRef ] );
 		const [ measuredAnchor, setMeasuredAnchor ] =
 			useState< PositionerProps[ 'anchor' ] >();
+		const lastOffsetRef = useRef< number >();
+		const cachedOffsetRef = useRef< {
+			offset: number;
+			dimensions: Parameters< AlignOffsetFunction >[ 0 ];
+			positioner: HTMLDivElement;
+			trigger?: HTMLDivElement | null;
+		} >();
+		const cacheFrameRef = useRef< { window: Window; id: number } >();
 		const defaultProps = isSubmenu
 			? MENU_SUBMENU_POPUP_POSITIONER_PROPS
 			: ITEM_POPUP_POSITIONER_PROPS;
 
-		const alignOffset: PositionerProps[ 'alignOffset' ] = ( {
-			side,
-			align,
-		} ) => {
-			if ( side === 'top' || side === 'bottom' || align !== 'start' ) {
-				return 0;
-			}
+		const alignOffset = useCallback< AlignOffsetFunction >(
+			( dimensions ) => {
+				const { side, align, anchor, positioner: size } = dimensions;
+				if (
+					side === 'top' ||
+					side === 'bottom' ||
+					align !== 'start'
+				) {
+					return 0;
+				}
 
-			return getSubmenuLabelOffset(
-				positionerRef.current,
-				props.anchor ? undefined : submenuTriggerRef?.current
-			);
-		};
+				const positioner = positionerRef.current;
+				if ( ! positioner ) {
+					return 0;
+				}
+				if (
+					positioner.hidden ||
+					positioner.hasAttribute( 'data-closed' )
+				) {
+					return lastOffsetRef.current ?? 0;
+				}
+				const trigger = props.anchor
+					? undefined
+					: submenuTriggerRef?.current;
+				const cached = cachedOffsetRef.current;
+				if (
+					cached?.positioner === positioner &&
+					cached.trigger === trigger &&
+					cached.dimensions.anchor.width === anchor.width &&
+					cached.dimensions.anchor.height === anchor.height &&
+					cached.dimensions.positioner.width === size.width &&
+					cached.dimensions.positioner.height === size.height
+				) {
+					return cached.offset;
+				}
+
+				const offset = getSubmenuLabelOffset( positioner, trigger );
+				lastOffsetRef.current = offset;
+				cachedOffsetRef.current = {
+					offset,
+					dimensions,
+					positioner,
+					trigger,
+				};
+				const ownerWindow = positioner.ownerDocument.defaultView;
+				if ( ownerWindow && ! cacheFrameRef.current ) {
+					// Reuse reads during positioning resets, but refresh next frame
+					// even if styles moved the labels without resizing their boxes.
+					cacheFrameRef.current = {
+						window: ownerWindow,
+						id: ownerWindow.requestAnimationFrame( () => {
+							cachedOffsetRef.current = undefined;
+							cacheFrameRef.current = undefined;
+						} ),
+					};
+				}
+				return offset;
+			},
+			[ props.anchor, submenuTriggerRef ]
+		);
+
+		useIsomorphicLayoutEffect( () => {
+			return () => {
+				const frame = cacheFrameRef.current;
+				if ( frame ) {
+					frame.window.cancelAnimationFrame( frame.id );
+				}
+				cacheFrameRef.current = undefined;
+				cachedOffsetRef.current = undefined;
+			};
+		}, [] );
 
 		useIsomorphicLayoutEffect( () => {
 			if (
@@ -101,16 +175,29 @@ const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
 				return;
 			}
 
-			let previousOffset: number | undefined;
 			const observer = new ResizeObserverConstructor( () => {
+				if (
+					! positioner ||
+					positioner.hidden ||
+					positioner.hasAttribute( 'data-closed' ) ||
+					positioner.dataset.side === 'top' ||
+					positioner.dataset.side === 'bottom' ||
+					positioner.dataset.align !== 'start'
+				) {
+					return;
+				}
 				const nextOffset = getSubmenuLabelOffset( positioner, trigger );
+				const previousOffset = lastOffsetRef.current;
+				lastOffsetRef.current = nextOffset;
+				if ( cachedOffsetRef.current ) {
+					cachedOffsetRef.current.offset = nextOffset;
+				}
 				if (
 					previousOffset !== undefined &&
 					Math.abs( nextOffset - previousOffset ) < 0.01
 				) {
 					return;
 				}
-				previousOffset = nextOffset;
 				/*
 				 * The popup can keep its maximum height while its first item grows.
 				 * Refresh the virtual anchor to make Base UI rerun positioning even
