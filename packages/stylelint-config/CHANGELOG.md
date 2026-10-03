@@ -2,9 +2,15 @@
 
 ## Unreleased
 
+## 26.0.0 (2026-09-23)
+
 ### Breaking Changes
 
 -   Fix the `font-weight-notation` rule to only accept numeric values and disallow relative weights. ([#82778](https://github.com/WordPress/gutenberg/pull/82778)).
+
+### Enhancements
+
+-   Enable `custom-property-pattern` to disallow `--_gcd-*` and `--_wp-*` custom properties. Stylelint does not merge this rule, so projects that already set `custom-property-pattern` will not gain the ban and need to include `(?!_(?:gcd|wp)-)` in their own pattern if they want it. ([#83025](https://github.com/WordPress/gutenberg/pull/83025), [#83075](https://github.com/WordPress/gutenberg/pull/83075))
 
 ## 25.0.0 (2026-09-10)
 

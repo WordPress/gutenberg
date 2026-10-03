@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+### New Features
+
+-   Runtime actions: the footer and the More menu place the actions a mounted widget declares through `useWidgetActions`, merged with the type's actions by `id`. A `callback` action mounts a button, disabled while a promise it returns settles ([#83877](https://github.com/WordPress/gutenberg/pull/83877)).
+
+### Enhancements
+
+-   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
+
+### Bug Fixes
+
+-   Widget error boundary: Explicitly announce widget errors with polite priority ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
+
+### Internal
+
+-   Update consumers to the renamed `ButtonLink`, `Dialog.CloseIconButton`, and `Drawer.CloseIconButton` components from `@wordpress/ui` ([#83789](https://github.com/WordPress/gutenberg/pull/83789)).
+-   Remove the lint suppression for `Notice` from `@wordpress/ui`, which is now recommended ([#82685](https://github.com/WordPress/gutenberg/pull/82685)).
+
+## 0.8.0 (2026-09-23)
+
 ### Enhancements
 
 -   Tile padding defaults to `--wpds-dimension-padding-lg` instead of the
@@ -17,6 +36,7 @@
 
 ### Internal
 
+-   Disable `custom-property-pattern` for this package so private `--_wp-*` tokens remain allowed ([#83075](https://github.com/WordPress/gutenberg/pull/83075)).
 -   Route link actions through `HostLink` from `@wordpress/widget-primitives`,
     replacing the per-surface host link gating and `getActionRoute`
     ([#82952](https://github.com/WordPress/gutenberg/pull/82952)).

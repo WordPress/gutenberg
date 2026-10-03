@@ -2,7 +2,7 @@ import { forwardRef } from '@wordpress/element';
 import clsx from 'clsx';
 import * as Card from '../card';
 import * as Collapsible from '../collapsible';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import type { ContentProps } from './types';
 
 /**

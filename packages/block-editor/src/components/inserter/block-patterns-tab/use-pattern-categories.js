@@ -1,5 +1,5 @@
 import { useMemo } from '@wordpress/element';
-import { _x, _n, sprintf } from '@wordpress/i18n';
+import { _n, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import usePatternsState from '../hooks/use-patterns-state';
 import {
@@ -7,18 +7,9 @@ import {
 	allPatternsCategory,
 	myPatternsCategory,
 	starterPatternsCategory,
+	getPopulatedCategories,
 	INSERTER_PATTERN_TYPES,
 } from './utils';
-
-function hasRegisteredCategory( pattern, allCategories ) {
-	if ( ! pattern.categories || ! pattern.categories.length ) {
-		return false;
-	}
-
-	return pattern.categories.some( ( cat ) =>
-		allCategories.some( ( category ) => category.name === cat )
-	);
-}
 
 export function usePatternCategories( rootClientId, sourceFilter = 'all' ) {
 	const [ patterns, allCategories ] = usePatternsState(
@@ -39,27 +30,10 @@ export function usePatternCategories( rootClientId, sourceFilter = 'all' ) {
 
 	// Remove any empty categories.
 	const populatedCategories = useMemo( () => {
-		const categories = allCategories
-			.filter( ( category ) =>
-				filteredPatterns.some( ( pattern ) =>
-					pattern.categories?.includes( category.name )
-				)
-			)
-			.sort( ( a, b ) => a.label.localeCompare( b.label ) );
-
-		if (
-			filteredPatterns.some(
-				( pattern ) => ! hasRegisteredCategory( pattern, allCategories )
-			) &&
-			! categories.find(
-				( category ) => category.name === 'uncategorized'
-			)
-		) {
-			categories.push( {
-				name: 'uncategorized',
-				label: _x( 'Uncategorized' ),
-			} );
-		}
+		const categories = getPopulatedCategories(
+			filteredPatterns,
+			allCategories
+		);
 		if (
 			filteredPatterns.some( ( pattern ) =>
 				pattern.blockTypes?.includes( 'core/post-content' )

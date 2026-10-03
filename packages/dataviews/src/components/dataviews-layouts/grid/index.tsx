@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { inertValue } from '@wordpress/react-inert-value';
 import { Stack } from '@wordpress/ui';
 import type { ViewGridProps } from '../../../types';
 import getDataByGroup from '../utils/get-data-by-group';
@@ -62,7 +63,7 @@ function ViewGrid< Item >( {
 		className: clsx( className, {
 			'is-refreshing': ! isInfiniteScroll && isDelayedLoading,
 		} ),
-		inert: ! isInfiniteScroll && !! isLoading ? 'true' : undefined,
+		inert: inertValue( ! isInfiniteScroll && isLoading ),
 		isLoading,
 		view,
 		fields,

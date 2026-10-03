@@ -2,8 +2,26 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `Icon`: add the `keywords` field exposed by the icons REST endpoint ([#82367](https://github.com/WordPress/gutenberg/pull/82367)).
+-   `__experimentalFetchLinkSuggestions`: add a `preferTypes` option to rank matches from one or more search types above the usual order ([#83408](https://github.com/WordPress/gutenberg/pull/83408)).
+
 ### Bug Fixes
 
+-   `__experimentalFetchLinkSuggestions`: rank results by type (content, taxonomy, post format, attachment), and return everything the endpoints gave rather than cutting the merged results. `perPage` is now the page size asked of each type rather than a limit on what they add up to, so `page` reaches every result ([#83407](https://github.com/WordPress/gutenberg/pull/83407)).
+-   Undo and redo stopped working for entities that real-time collaboration does not sync, such as a post type excluded from collaboration, while a synced entity is loaded in the same editor. core-data's undo manager now stays in charge for every entity and delegates to the sync manager only for synced entities ([#83888](https://github.com/WordPress/gutenberg/pull/83888)).
+
+### Internal
+
+-   Added an internal entity sync interface: `registerEntitySyncManager` and `getEntitySyncManager` let one manager plug into the entity lifecycle (record loads, edits, saves, deletes, and undo). The real-time collaboration experiment now runs through it instead of being called directly by the store. The interface is not exposed outside the package yet ([#83410](https://github.com/WordPress/gutenberg/pull/83410)).
+-   Import the sync manager, `Delta`, and the CRDT constants from `@wordpress/sync` directly instead of unlocking them from its removed `privateApis` export ([#81999](https://github.com/WordPress/gutenberg/pull/81999)).
+
+## 8.1.0 (2026-09-23)
+
+### Bug Fixes
+
+-   `__experimentalFetchLinkSuggestions`: give each result a unique key when scoring instead of relying on its id, which could be a duplicate id from another table ([#83113](https://github.com/WordPress/gutenberg/pull/83113)).
 -   The `save<Entity>` and `delete<Entity>` shortcut actions resolve with their saved or deleted record types instead of `void` ([#77162](https://github.com/WordPress/gutenberg/pull/77162)).
 -   `canUser`: `resolveSelect` no longer returns `undefined` when another action on the same resource is already resolving. The four actions now share one resolution instead of the resolver marking siblings as resolved before the request completes ([#82638](https://github.com/WordPress/gutenberg/pull/82638)).
 

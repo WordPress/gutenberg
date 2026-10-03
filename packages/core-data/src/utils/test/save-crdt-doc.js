@@ -3,8 +3,8 @@ import apiFetch from '@wordpress/api-fetch';
 import { getSyncManager } from '../../sync';
 import { saveCRDTDoc } from '../save-crdt-doc';
 
-vi.mock( '@wordpress/api-fetch' );
-vi.mock( '../../sync', () => ( {
+vi.mock( import( '@wordpress/api-fetch' ) );
+vi.mock( import( '../../sync' ), () => ( {
 	getSyncManager: vi.fn(),
 } ) );
 

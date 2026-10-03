@@ -26,14 +26,27 @@ const handleEntitySearch = async (
 	fetchSearchSuggestions,
 	withCreateSuggestion,
 	pageOnFront,
-	pageForPosts
+	pageForPosts,
+	transformSuggestions
 ) => {
 	const { isInitialSuggestions } = suggestionsQuery;
 
-	const results = await fetchSearchSuggestions( val, suggestionsQuery );
+	let results = await fetchSearchSuggestions( val, suggestionsQuery );
 
-	// Identify front page and update type to match.
+	if ( transformSuggestions ) {
+		results = await transformSuggestions( results, {
+			isInitialSuggestions: !! isInitialSuggestions,
+			searchTerm: val,
+		} );
+	}
+
+	// Identify front page and update type to match. Posts, terms and media can
+	// share an id, so only pages are considered.
 	results.map( ( result ) => {
+		if ( result.type !== 'page' ) {
+			return result;
+		}
+
 		if ( Number( result.id ) === pageOnFront ) {
 			result.isFrontPage = true;
 			return result;
@@ -79,7 +92,8 @@ const handleEntitySearch = async (
 export default function useSearchHandler(
 	suggestionsQuery,
 	allowDirectEntry,
-	withCreateSuggestion
+	withCreateSuggestion,
+	transformSuggestions
 ) {
 	const { fetchSearchSuggestions, pageOnFront, pageForPosts } = useSelect(
 		( select ) => {
@@ -109,7 +123,8 @@ export default function useSearchHandler(
 						fetchSearchSuggestions,
 						withCreateSuggestion,
 						pageOnFront,
-						pageForPosts
+						pageForPosts,
+						transformSuggestions
 					);
 		},
 		[
@@ -118,6 +133,7 @@ export default function useSearchHandler(
 			pageOnFront,
 			pageForPosts,
 			suggestionsQuery,
+			transformSuggestions,
 			withCreateSuggestion,
 		]
 	);
