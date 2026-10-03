@@ -1,5 +1,7 @@
 import { useNavigate, useSearch } from '@wordpress/route';
 import { Page } from '@wordpress/admin-ui';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
 	privateApis as editorPrivateApis,
@@ -24,6 +26,7 @@ import './style.scss';
 
 const { GlobalStylesUIWrapper, GlobalStylesActionMenu } =
 	unlock( editorPrivateApis );
+const { ToolsPanelLocationContext } = unlock( blockEditorPrivateApis );
 
 function Stage() {
 	const navigate = useNavigate();
@@ -169,11 +172,13 @@ function Stage() {
 			}
 		>
 			<div className="routes-styles__content">
-				<GlobalStylesUIWrapper
-					path={ section }
-					onPathChange={ onChangeSection }
-					settings={ editorSettings }
-				/>
+				<ToolsPanelLocationContext.Provider value="page">
+					<GlobalStylesUIWrapper
+						path={ section }
+						onPathChange={ onChangeSection }
+						settings={ editorSettings }
+					/>
+				</ToolsPanelLocationContext.Provider>
 			</div>
 			{ isActivatePanelOpen && (
 				<Modal
