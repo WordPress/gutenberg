@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
@@ -18,10 +18,19 @@ import { NotesDisplayModeMenu } from './notes-display-mode-menu';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
+import { BlockReactionsMenuItem } from './reactions/block-reactions-menu-item';
+import {
+	getBlockReactionsEntryId,
+	isBlockReactionsEntry,
+} from './reactions/block-reactions';
 import { NoteHighlightStyles } from './note-highlight-styles';
 import { useGlobalStyles } from '../global-styles';
 import { useEnableFloatingSidebar, useNoteThreads } from './hooks';
-import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
+import {
+	focusNoteThread,
+	getNoteIdsFromMetadata,
+	pickPrimaryNote,
+} from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
@@ -64,7 +73,19 @@ function NotesSidebar( { postId } ) {
 		[]
 	);
 
-	const { notes, unresolvedNotes } = useNoteThreads( postId );
+	// The block the user is reacting to from the toolbar, listed in the
+	// sidebar before its first reaction until another block is selected.
+	const [ reactingClientId, setReactingClientId ] = useState();
+	useEffect( () => {
+		setReactingClientId( ( current ) =>
+			current === clientId ? current : undefined
+		);
+	}, [ clientId ] );
+
+	const { notes, unresolvedNotes } = useNoteThreads(
+		postId,
+		reactingClientId
+	);
 
 	// Only enable the floating sidebar for large viewports.
 	const showFloatingSidebar = isLargeViewport;
@@ -114,7 +135,9 @@ function NotesSidebar( { postId } ) {
 	function openNoteForBlock( targetClientId ) {
 		// A block can carry multiple threads; surface the most relevant.
 		const blockThreads = notes.filter(
-			( thread ) => thread.blockClientId === targetClientId
+			( thread ) =>
+				thread.blockClientId === targetClientId &&
+				! isBlockReactionsEntry( thread )
 		);
 		const target = pickPrimaryNote( blockThreads );
 		return focusNote( {
@@ -130,6 +153,32 @@ function NotesSidebar( { postId } ) {
 			noteId: 'new',
 			isApproved: false,
 		} );
+	}
+
+	// The picker lives with the block's reactions in the sidebar: on its
+	// first unresolved thread, or in an entry of its own.
+	async function reactToBlock( targetClientId ) {
+		setReactingClientId( targetClientId );
+		const currentArea = await getActiveComplementaryArea( 'core' );
+		if ( ! SIDEBARS.includes( currentArea ) ) {
+			enableComplementaryArea(
+				'core',
+				showFloatingSidebar ? FLOATING_NOTES_SIDEBAR : ALL_NOTES_SIDEBAR
+			);
+		}
+		const threadId =
+			unresolvedNotes.find(
+				( thread ) => thread.blockClientId === targetClientId
+			)?.id ?? getBlockReactionsEntryId( targetClientId );
+		selectNote( threadId );
+		// Wait a frame for a sidebar that was closed to mount.
+		window.requestAnimationFrame( () =>
+			focusNoteThread(
+				threadId,
+				sidebarRef.current,
+				'.editor-collab-sidebar-panel__block-reactions .editor-collab-sidebar-panel__add-reaction-button'
+			)
+		);
 	}
 
 	useShortcut(
@@ -161,7 +210,9 @@ function NotesSidebar( { postId } ) {
 	return (
 		<>
 			<NoteHighlightStyles
-				threads={ unresolvedNotes }
+				threads={ unresolvedNotes.filter(
+					( thread ) => ! isBlockReactionsEntry( thread )
+				) }
 				selectedId={ selectedNoteId }
 			/>
 			{ !! currentThread && (
@@ -174,6 +225,9 @@ function NotesSidebar( { postId } ) {
 				onClick={ ( menuClientId ) =>
 					addNewNoteForBlock( menuClientId )
 				}
+			/>
+			<BlockReactionsMenuItem
+				onClick={ ( menuClientId ) => reactToBlock( menuClientId ) }
 			/>
 			<NotesDisplayModeMenu
 				hasFloatingNotes={ hasFloatingNotes }

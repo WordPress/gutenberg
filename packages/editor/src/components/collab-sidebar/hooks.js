@@ -36,10 +36,12 @@ import {
 	removeNoteIdFromMetadata,
 	wrapInlineNote,
 } from './utils';
+import { addBlockReactionEntries } from './reactions/block-reactions';
+import { useBlockReactionSummary } from './reactions/use-block-reaction';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
-export function useNoteThreads( postId ) {
+export function useNoteThreads( postId, reactingClientId ) {
 	const queryArgs = {
 		post: postId,
 		type: 'note',
@@ -63,7 +65,7 @@ export function useNoteThreads( postId ) {
 	}, [] );
 
 	// Process notes to build the tree structure.
-	const { notes, unresolvedNotes } = useMemo( () => {
+	const noteThreads = useMemo( () => {
 		if ( ! threads || threads.length === 0 ) {
 			return { notes: [], unresolvedNotes: [] };
 		}
@@ -167,10 +169,24 @@ export function useNoteThreads( postId ) {
 		};
 	}, [ clientIds, threads, getBlockAttributes ] );
 
-	return {
-		notes,
-		unresolvedNotes,
-	};
+	const blockReactionSummary = useBlockReactionSummary();
+	return useMemo(
+		() =>
+			addBlockReactionEntries(
+				noteThreads,
+				blockReactionSummary,
+				clientIds,
+				getBlockAttributes,
+				reactingClientId
+			),
+		[
+			noteThreads,
+			blockReactionSummary,
+			clientIds,
+			getBlockAttributes,
+			reactingClientId,
+		]
+	);
 }
 
 export function useNoteActions() {

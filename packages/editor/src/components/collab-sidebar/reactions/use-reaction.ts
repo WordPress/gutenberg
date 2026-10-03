@@ -8,12 +8,15 @@ import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as editorStore } from '../../../store';
 import { invalidateReactionNames } from './reaction-display';
-import type { ReactionSummary } from './reaction-display';
+import {
+	applyReactionSummaryDelta,
+	type ReactionSummary,
+} from './block-reactions';
 
 /**
  * The parts of a note comment record that reactions read.
  */
-export interface ReactionTarget {
+export interface ReactableNote {
 	id: number;
 	reaction_summary?: ReactionSummary | null;
 }
@@ -31,35 +34,19 @@ export interface ReactionTarget {
  *                        omitted when one was removed.
  * @return The note with an updated `reaction_summary`.
  */
-export function applyReactionDelta< T extends ReactionTarget >(
+export function applyReactionDelta< T extends ReactableNote >(
 	note: T,
 	hexKey: string,
 	addedReactionId?: number
 ): T {
-	const summary: ReactionSummary = { ...( note.reaction_summary || {} ) };
-	const entry = summary[ hexKey ];
-
-	if ( addedReactionId ) {
-		// Concurrent adds converge server-side on one surviving row, so a
-		// repeated ID is already counted.
-		if ( entry?.my_reaction_id === addedReactionId ) {
-			return note;
-		}
-		summary[ hexKey ] = {
-			count: ( entry?.count || 0 ) + 1,
-			reacted: true,
-			my_reaction_id: addedReactionId,
-		};
-	} else if ( entry ) {
-		const count = entry.count - 1;
-		if ( count > 0 ) {
-			summary[ hexKey ] = { count, reacted: false };
-		} else {
-			delete summary[ hexKey ];
-		}
-	}
-
-	return { ...note, reaction_summary: summary };
+	return {
+		...note,
+		reaction_summary: applyReactionSummaryDelta(
+			note.reaction_summary,
+			hexKey,
+			addedReactionId
+		),
+	};
 }
 
 /*
@@ -80,7 +67,7 @@ const reactionMutationCounts = new Map< number, number >();
  * @param note The note comment record.
  * @return The note's reaction summary and the toggle callback.
  */
-export function useReaction( note: ReactionTarget ) {
+export function useReaction( note: ReactableNote ) {
 	const { id: noteId, reaction_summary: reactions } = note;
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord, receiveEntityRecords } =
@@ -143,7 +130,7 @@ export function useReaction( note: ReactionTarget ) {
 			}
 
 			// The emoji's reactor list changed, so the pill tooltip refetches.
-			invalidateReactionNames( noteId, hexKey );
+			invalidateReactionNames( { kind: 'note', id: noteId }, hexKey );
 
 			// Mutating a reaction comment doesn't invalidate the cached
 			// `reaction_summary`, so a subsequent toggle would read stale
@@ -158,7 +145,7 @@ export function useReaction( note: ReactionTarget ) {
 			reactionMutationCounts.set( noteId, mutationCount );
 
 			const cached = getEntityRecord( 'root', 'comment', noteId ) as
-				ReactionTarget | undefined;
+				ReactableNote | undefined;
 			if ( cached ) {
 				receiveEntityRecords( 'root', 'comment', [
 					applyReactionDelta(

@@ -1697,6 +1697,157 @@ test.describe( 'Block Notes', () => {
 		} );
 	} );
 
+	test.describe( 'Block Reactions', () => {
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllComments( 'reaction' );
+		} );
+
+		test( 'reacting from the block options menu lists the block and mints one anchor', async ( {
+			editor,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Testing block reactions' },
+			} );
+
+			await blockNoteUtils.addReactionToBlock( 'Heart' );
+
+			// The first reaction on a block writes a durable anchor to the
+			// block's metadata, which is how reaction rows find it again.
+			await expect
+				.poll( () => blockNoteUtils.getReactionsId() )
+				.toMatch( /^[a-z0-9]{6,16}$/ );
+			const firstId = await blockNoteUtils.getReactionsId();
+
+			const entry = blockNoteUtils.blockReactionsEntry( 'Paragraph' );
+			const heart = blockNoteUtils.blockReactionPill( 'Heart' );
+			await expect( heart ).toContainText( '1' );
+
+			// A second reaction reuses the anchor.
+			await blockNoteUtils.addReactionToBlock( 'Rocket' );
+			const rocket = blockNoteUtils.blockReactionPill( 'Rocket' );
+			await expect( rocket ).toBeVisible();
+			expect( await blockNoteUtils.getReactionsId() ).toBe( firstId );
+
+			// Removing the last reaction sends focus back to the block. The
+			// entry stays while the block is selected, then goes with it.
+			await heart.click();
+			await expect( heart ).toBeHidden();
+			await rocket.click();
+			await expect( rocket ).toBeHidden();
+			await expect(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+			).toBeFocused();
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			await expect( entry ).toBeHidden();
+		} );
+
+		test( 'block reactions survive a reload once the post is saved', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Testing block reaction persistence' },
+			} );
+
+			await blockNoteUtils.addReactionToBlock( 'Heart' );
+			const pill = blockNoteUtils.blockReactionPill( 'Heart' );
+			await expect( pill ).toBeVisible();
+
+			await editor.saveDraft();
+			await page.reload();
+			await blockNoteUtils.openBlockNoteSidebar();
+
+			await expect( pill ).toBeVisible();
+			await expect( pill ).toContainText( '1' );
+		} );
+
+		test( 'a block with reactions but no note is listed and selects its block', async ( {
+			editor,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Reacted paragraph' },
+			} );
+			await blockNoteUtils.addReactionToBlock( 'Heart' );
+
+			// Move the selection elsewhere so clicking the entry has work to do.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Another paragraph' },
+			} );
+			const reactedBlock = editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.first();
+			await expect( reactedBlock ).not.toHaveClass( /is-selected/ );
+
+			const entry = blockNoteUtils.blockReactionsEntry( 'Paragraph' );
+			await entry.click();
+
+			// Selecting the block must not sync the entry back out of the
+			// selection just because the block carries no note.
+			await expect( reactedBlock ).toHaveClass( /is-selected/ );
+			await expect( entry ).toHaveAttribute( 'aria-expanded', 'true' );
+		} );
+
+		test( 'deleting the block hides its reactions entry and undo brings it back', async ( {
+			editor,
+			pageUtils,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Testing block deletion' },
+			} );
+			await blockNoteUtils.addReactionToBlock( 'Heart' );
+			const entry = blockNoteUtils.blockReactionsEntry( 'Paragraph' );
+			await expect( entry ).toBeVisible();
+
+			await editor.clickBlockOptionsMenuItem( 'Delete' );
+			await expect( entry ).toBeHidden();
+
+			// The summary still lives on the post record, so restoring the
+			// block (and its anchor) restores the entry without a refetch.
+			await pageUtils.pressKeys( 'primary+z' );
+			await expect( entry ).toBeVisible();
+		} );
+
+		test( 'a block with a note shows its reactions on the note thread', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Block with a note and reactions' },
+				comment: 'Note beside block reactions',
+			} );
+
+			await blockNoteUtils.addReactionToBlock( 'Heart' );
+
+			// The row leads the block's thread rather than a standalone entry.
+			await expect(
+				blockNoteUtils.blockReactionsEntry( 'Paragraph' )
+			).toHaveCount( 0 );
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', {
+					name: 'Note: Note beside block reactions',
+				} );
+			await expect(
+				thread.getByRole( 'group', { name: 'Reactions on Paragraph' } )
+			).toBeVisible();
+			await expect(
+				blockNoteUtils.blockReactionPill( 'Heart' )
+			).toBeVisible();
+		} );
+	} );
+
 	test.describe( 'Multiple notes per block', () => {
 		test( 'can add multiple notes to the same block', async ( {
 			editor,

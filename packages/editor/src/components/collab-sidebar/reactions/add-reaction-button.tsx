@@ -11,6 +11,7 @@ import { emojiToHexKey } from './reaction-emojis';
 
 interface AddReactionButtonProps {
 	disabled?: boolean;
+	label?: string;
 	onToggleReaction: ( hexKey: string ) => void;
 }
 
@@ -21,15 +22,18 @@ interface AddReactionButtonProps {
  * @param props                  Component props.
  * @param props.disabled         Whether the button is disabled (e.g. on a
  *                               resolved note thread).
+ * @param props.label            Accessible name of the trigger and of the
+ *                               picker popup. Defaults to "Add reaction".
  * @param props.onToggleReaction Callback to toggle a reaction.
  */
 export function AddReactionButton( {
 	disabled = false,
+	label = __( 'Add reaction' ),
 	onToggleReaction,
 }: AddReactionButtonProps ) {
 	return (
 		<EmojiPicker
-			label={ __( 'Add reaction' ) }
+			label={ label }
 			trigger={
 				<IconButton
 					size="small"
@@ -38,7 +42,7 @@ export function AddReactionButton( {
 					tone="neutral"
 					className="editor-collab-sidebar-panel__add-reaction-button"
 					icon={ reactionIcon }
-					label={ __( 'Add reaction' ) }
+					label={ label }
 				/>
 			}
 			disabled={ disabled }

@@ -205,6 +205,68 @@ class BlockNoteUtils {
 		await expect( match ).toBeVisible();
 		await match.click();
 	}
+
+	/**
+	 * React to the selected block: the block options menu item brings the block's
+	 * reactions into the sidebar and focuses their trigger, which opens the
+	 * picker. Picks an emoji by its exact label.
+	 *
+	 * @param {string} emoji Exact emoji label, e.g. "Heart".
+	 */
+	async addReactionToBlock( emoji ) {
+		await this.#editor.clickBlockOptionsMenuItem( 'Add reaction' );
+		const trigger = this.#page.getByRole( 'combobox', {
+			name: 'Add block reaction',
+		} );
+		await expect( trigger ).toBeFocused();
+		await trigger.click();
+		await this.waitForFullPicker();
+		await this.#page
+			.getByRole( 'gridcell', { name: emoji, exact: true } )
+			.first()
+			.click();
+	}
+
+	/**
+	 * The sidebar entry listing a block's reactions when the block has no
+	 * note of its own.
+	 *
+	 * @param {string} blockTitle The block's display title, e.g. "Paragraph".
+	 * @return {import('@playwright/test').Locator} The entry.
+	 */
+	blockReactionsEntry( blockTitle ) {
+		return this.#page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'treeitem', {
+				name: `Reactions on ${ blockTitle }`,
+				exact: true,
+			} );
+	}
+
+	/**
+	 * A reaction pill in a block's reactions row, whether the row stands on
+	 * its own or leads the block's note thread.
+	 *
+	 * @param {string} emoji      Emoji label, e.g. "Heart".
+	 * @param {string} blockTitle The block's display title.
+	 * @return {import('@playwright/test').Locator} The pill.
+	 */
+	blockReactionPill( emoji, blockTitle = 'Paragraph' ) {
+		return this.#page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'group', { name: `Reactions on ${ blockTitle }` } )
+			.getByRole( 'button', { name: new RegExp( emoji ) } );
+	}
+
+	/**
+	 * The reaction anchor written to the first block's metadata, if any.
+	 *
+	 * @return {Promise<string|undefined>} The anchor.
+	 */
+	async getReactionsId() {
+		const blocks = await this.#editor.getBlocks();
+		return blocks[ 0 ]?.attributes?.metadata?.reactionsId;
+	}
 }
 
 module.exports = { BlockNoteUtils };

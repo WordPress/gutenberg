@@ -18,6 +18,7 @@ import { Note } from './note';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { FloatingContainer } from './floating-container';
+import { BlockReactionsRow } from './reactions/block-reactions-row';
 import {
 	focusNoteThread,
 	getNoteExcerpt,
@@ -236,6 +237,11 @@ export function NoteThread( {
 				<p className="editor-collab-sidebar-panel__deleted-block-notice">
 					{ __( 'Original block deleted.' ) }
 				</p>
+			) }
+			{ note.hasBlockReactions && (
+				// Reactions on the block itself lead the block's first
+				// thread, ahead of the notes and their own reactions.
+				<BlockReactionsRow clientId={ note.blockClientId } />
 			) }
 			<Note
 				note={ note }

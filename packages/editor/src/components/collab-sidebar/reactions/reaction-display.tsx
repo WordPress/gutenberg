@@ -11,18 +11,12 @@ import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { getCuratedLabel, hexKeyToEmoji } from './reaction-emojis';
 import { useEmojiLabel } from './emojibase-data';
-
-interface ReactionSummaryEntry {
-	count: number;
-	reacted?: boolean;
-	// The current user's reaction comment ID, used to delete it again.
-	my_reaction_id?: number;
-}
-
-/**
- * The reaction summary keyed by emoji hex key.
- */
-export type ReactionSummary = Record< string, ReactionSummaryEntry >;
+import {
+	getReactionTargetKey,
+	getReactionsQueryArgs,
+	type ReactionSummary,
+	type ReactionTarget,
+} from './block-reactions';
 
 /**
  * A comment record as returned by the reactions REST query.
@@ -121,23 +115,23 @@ function formatReactionTooltip( names: string[], emojiLabel: string ): string {
 
 const REACTIONS_PER_PAGE = 100;
 
-// A note with more reactions than this is not worth walking page by page just
-// to name them; the pill falls back to its count-based label instead.
+// A target with more reactions than this is not worth walking page by page
+// just to name them; the pill falls back to its count-based label instead.
 const MAX_REACTION_PAGES = 10;
 
 /**
- * Fetches every reaction on a note, across every emoji.
+ * Fetches every reaction on a target, across every emoji.
  *
  * The REST collection cannot be filtered by reaction hex key, so the whole set
  * has to come back before it can be grouped. Walks the pages rather than
- * reading only the first one, which would drop reactors on a busy note.
+ * reading only the first one, which would drop reactors on a busy target.
  *
- * @param noteId The parent note comment ID.
- * @return All reactions on the note, or `null` if there are more than the
+ * @param target The note or block the reactions hang off.
+ * @return All reactions on the target, or `null` if there are more than the
  *         walk is willing to fetch.
  */
-async function fetchNoteReactions(
-	noteId: number
+async function fetchReactions(
+	target: ReactionTarget
 ): Promise< ReactionComment[] | null > {
 	const reactions: ReactionComment[] = [];
 
@@ -146,9 +140,7 @@ async function fetchNoteReactions(
 		try {
 			batch = await apiFetch< ReactionComment[] >( {
 				path: addQueryArgs( '/wp/v2/comments', {
-					parent: noteId,
-					type: 'reaction',
-					status: 'all',
+					...getReactionsQueryArgs( target ),
 					page,
 					per_page: REACTIONS_PER_PAGE,
 					_fields: 'author_name,content',
@@ -177,25 +169,27 @@ async function fetchNoteReactions(
 	return null;
 }
 
-// Module-level cache for reaction details: { "noteId:hexKey": string[] }
+// Module-level cache for reaction details: { "targetKey:hexKey": string[] }
 const reactionNamesCache: Record< string, string[] > = {};
 
 /**
- * Drop the cached reactor names for a note/hex key pair, so the next tooltip
+ * Drop the cached reactor names for a target/hex key pair, so the next tooltip
  * refetches them.
  *
- * @param noteId The parent note comment ID.
+ * @param target The note or block the reaction hangs off.
  * @param hexKey The reaction hex key.
  */
 export function invalidateReactionNames(
-	noteId: number,
+	target: ReactionTarget,
 	hexKey: string
 ): void {
-	delete reactionNamesCache[ `${ noteId }:${ hexKey }` ];
+	delete reactionNamesCache[
+		`${ getReactionTargetKey( target ) }:${ hexKey }`
+	];
 }
 
 interface ReactionButtonProps {
-	noteId: number;
+	target: ReactionTarget;
 	hexKey: string;
 	count: number;
 	isActive: boolean;
@@ -203,13 +197,14 @@ interface ReactionButtonProps {
 	emojiLabel?: string;
 	disabled?: boolean;
 	onToggleReaction: ( hexKey: string ) => void;
+	onRemoveLast?: () => void;
 }
 
 /**
  * A single reaction pill button that lazy-loads user names on hover.
  *
  * @param props                  Component props.
- * @param props.noteId           The parent note comment ID.
+ * @param props.target           The note or block the reaction hangs off.
  * @param props.hexKey           The emoji hex key.
  * @param props.count            The reaction count.
  * @param props.isActive         Whether the current user reacted.
@@ -219,9 +214,12 @@ interface ReactionButtonProps {
  * @param props.disabled         Whether the reaction can no longer be toggled
  *                               (the thread is resolved).
  * @param props.onToggleReaction Callback to toggle a reaction.
+ * @param props.onRemoveLast     Where to send focus when removing the last
+ *                               reaction unmounts this pill. Defaults to the
+ *                               enclosing sidebar thread.
  */
 function ReactionButton( {
-	noteId,
+	target,
 	hexKey,
 	count,
 	isActive,
@@ -229,6 +227,7 @@ function ReactionButton( {
 	emojiLabel,
 	disabled = false,
 	onToggleReaction,
+	onRemoveLast,
 }: ReactionButtonProps ) {
 	const [ names, setNames ] = useState< string[] | null >( null );
 	const [ isFetching, setIsFetching ] = useState( false );
@@ -249,7 +248,7 @@ function ReactionButton( {
 
 	const fetchReactionNames = useCallback( () => {
 		setIsReached( true );
-		const cacheKey = `${ noteId }:${ hexKey }`;
+		const cacheKey = `${ getReactionTargetKey( target ) }:${ hexKey }`;
 		if ( reactionNamesCache[ cacheKey ] ) {
 			setNames( reactionNamesCache[ cacheKey ] );
 			return;
@@ -266,7 +265,7 @@ function ReactionButton( {
 		 */
 		setNames( null );
 		setIsFetching( true );
-		fetchNoteReactions( noteId )
+		fetchReactions( target )
 			.then( ( reactions ) => {
 				// A truncated walk would drop reactors, and a partial name
 				// list reads as complete. Keep the count-based label instead.
@@ -296,7 +295,7 @@ function ReactionButton( {
 			.finally( () => {
 				setIsFetching( false );
 			} );
-	}, [ noteId, hexKey, isFetching ] );
+	}, [ target, hexKey, isFetching ] );
 
 	const defaultLabel = sprintf(
 		/* translators: 1: emoji label, 2: count of reactions */
@@ -331,14 +330,18 @@ function ReactionButton( {
 						onClick={ ( event: MouseEvent< HTMLElement > ) => {
 							event.stopPropagation();
 							// When removing the last reaction for this emoji,
-							// the button will disappear. Move focus to the
-							// parent note to prevent focus loss.
+							// the button will disappear. Move focus somewhere
+							// that survives it to prevent focus loss.
 							if ( isActive && count === 1 ) {
-								( event.target as HTMLElement )
-									.closest< HTMLElement >(
-										'.editor-collab-sidebar-panel__thread'
-									)
-									?.focus();
+								if ( onRemoveLast ) {
+									onRemoveLast();
+								} else {
+									( event.target as HTMLElement )
+										.closest< HTMLElement >(
+											'.editor-collab-sidebar-panel__thread'
+										)
+										?.focus();
+								}
 							}
 							setNames( null );
 							onToggleReaction( hexKey );
@@ -359,10 +362,11 @@ function ReactionButton( {
 }
 
 interface ReactionDisplayProps {
-	noteId: number;
+	target: ReactionTarget;
 	reactions: ReactionSummary | null | undefined;
 	disabled?: boolean;
 	onToggleReaction: ( hexKey: string ) => void;
+	onRemoveLast?: () => void;
 	children?: ReactNode;
 }
 
@@ -370,20 +374,23 @@ interface ReactionDisplayProps {
  * Display current reactions with counts as pill-shaped buttons.
  *
  * @param props                  Component props.
- * @param props.noteId           The parent note comment ID.
+ * @param props.target           The note or block the reactions hang off.
  * @param props.reactions        The reaction summary (keyed by hex key).
  * @param props.disabled         Whether reactions can no longer be toggled
  *                               (the thread is resolved).
  * @param props.onToggleReaction Callback to toggle a reaction.
+ * @param props.onRemoveLast     Where to send focus when the last reaction
+ *                               of a pill is removed.
  * @param props.children         Rendered after the last pill, inside the same
  *                               wrapping row, so a trailing control follows
  *                               the pills onto whichever line they end on.
  */
 export default function ReactionDisplay( {
-	noteId,
+	target,
 	reactions,
 	disabled = false,
 	onToggleReaction,
+	onRemoveLast,
 	children,
 }: ReactionDisplayProps ) {
 	const reactedHexKeys = getReactedHexKeys( reactions );
@@ -408,7 +415,7 @@ export default function ReactionDisplay( {
 				return (
 					<ReactionButton
 						key={ hexKey }
-						noteId={ noteId }
+						target={ target }
 						hexKey={ hexKey }
 						count={ count }
 						isActive={ isActive }
@@ -416,6 +423,7 @@ export default function ReactionDisplay( {
 						emojiLabel={ getCuratedLabel( hexKey ) }
 						disabled={ disabled }
 						onToggleReaction={ onToggleReaction }
+						onRemoveLast={ onRemoveLast }
 					/>
 				);
 			} ) }
