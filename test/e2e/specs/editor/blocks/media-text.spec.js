@@ -5,6 +5,17 @@ const LONG_BUTTON_LABEL = 'A'.repeat( 50 );
 // Long enough to inflate the Media & Text content column without mid-word wrapping.
 const LONG_UNBROKEN_TEXT = 'A'.repeat( 200 );
 
+async function expectNoHorizontalPageScroll( page ) {
+	await expect
+		.poll( async () => {
+			return page.evaluate( () => {
+				const root = document.documentElement;
+				return root.scrollWidth - root.clientWidth;
+			} );
+		} )
+		.toBeLessThanOrEqual( 1 );
+}
+
 test.describe( 'Media & Text', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
@@ -67,16 +78,10 @@ test.describe( 'Media & Text', () => {
 			.toBeLessThan( 1.35 );
 	} );
 
-	test( 'should keep nested Quote wrapping so the page does not scroll horizontally', async ( {
-		editor,
-		page,
-	} ) => {
-		await editor.insertBlock( {
-			name: 'core/media-text',
-			attributes: {
-				mediaType: 'image',
-				mediaUrl: 'https://s.w.org/images/core/5.3/MtBlanc1.jpg',
-			},
+	const nestedWrappingCases = [
+		{
+			name: 'Quote',
+			selector: '.wp-block-media-text__content .wp-block-quote',
 			innerBlocks: [
 				{
 					name: 'core/quote',
@@ -88,24 +93,148 @@ test.describe( 'Media & Text', () => {
 					],
 				},
 			],
+		},
+		{
+			name: 'Embed caption',
+			selector: '.wp-block-media-text__content .wp-block-embed',
+			innerBlocks: [
+				{
+					name: 'core/embed',
+					attributes: {
+						url: 'https://wordpress.org/gutenberg',
+						caption: LONG_UNBROKEN_TEXT,
+					},
+				},
+			],
+		},
+		{
+			name: 'Verse',
+			selector: '.wp-block-media-text__content .wp-block-verse',
+			innerBlocks: [
+				{
+					name: 'core/verse',
+					attributes: { content: LONG_UNBROKEN_TEXT },
+				},
+			],
+		},
+	];
+
+	for ( const wrappingCase of nestedWrappingCases ) {
+		test( `should keep nested ${ wrappingCase.name } wrapping so the page does not scroll horizontally`, async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/media-text',
+				attributes: {
+					mediaType: 'image',
+					mediaUrl: 'https://s.w.org/images/core/5.3/MtBlanc1.jpg',
+				},
+				innerBlocks: wrappingCase.innerBlocks,
+			} );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			const nested = page.locator( wrappingCase.selector );
+			await expect( nested.first() ).toBeVisible();
+			await expect( nested.first() ).toHaveCSS(
+				'overflow-wrap',
+				'anywhere'
+			);
+			await expectNoHorizontalPageScroll( page );
+		} );
+	}
+
+	test( 'should keep nested Latest Posts titles wrapping so the page does not scroll horizontally', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/posts',
+			data: {
+				title: LONG_UNBROKEN_TEXT,
+				status: 'publish',
+				content: 'Latest Posts overflow-wrap fixture.',
+			},
+		} );
+
+		await editor.insertBlock( {
+			name: 'core/media-text',
+			attributes: {
+				mediaType: 'image',
+				mediaUrl: 'https://s.w.org/images/core/5.3/MtBlanc1.jpg',
+			},
+			innerBlocks: [
+				{
+					name: 'core/latest-posts',
+					attributes: {
+						postsToShow: 1,
+						displayPostContent: false,
+					},
+				},
+			],
 		} );
 
 		const postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }` );
 
-		const quote = page.locator(
-			'.wp-block-media-text__content .wp-block-quote'
+		const latestPostsItem = page.locator(
+			'.wp-block-media-text__content .wp-block-latest-posts li'
 		);
-		await expect( quote ).toBeVisible();
-		await expect( quote ).toHaveCSS( 'overflow-wrap', 'anywhere' );
+		await expect( latestPostsItem.first() ).toBeVisible();
+		await expect( latestPostsItem.first() ).toHaveCSS(
+			'overflow-wrap',
+			'anywhere'
+		);
+		await expectNoHorizontalPageScroll( page );
+	} );
 
-		await expect
-			.poll( async () => {
-				return page.evaluate( () => {
-					const root = document.documentElement;
-					return root.scrollWidth - root.clientWidth;
-				} );
-			} )
-			.toBeLessThanOrEqual( 1 );
+	test( 'should keep nested Author Biography wrapping so the page does not scroll horizontally', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const me = await requestUtils.rest( {
+			method: 'GET',
+			path: '/wp/v2/users/me',
+			params: { context: 'edit' },
+		} );
+		const previousDescription = me.description ?? '';
+
+		await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/users/me',
+			data: { description: LONG_UNBROKEN_TEXT },
+		} );
+
+		try {
+			await editor.insertBlock( {
+				name: 'core/media-text',
+				attributes: {
+					mediaType: 'image',
+					mediaUrl: 'https://s.w.org/images/core/5.3/MtBlanc1.jpg',
+				},
+				innerBlocks: [ { name: 'core/post-author-biography' } ],
+			} );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			const biography = page.locator(
+				'.wp-block-media-text__content .wp-block-post-author-biography'
+			);
+			await expect( biography ).toBeVisible();
+			await expect( biography ).toHaveCSS( 'overflow-wrap', 'anywhere' );
+			await expectNoHorizontalPageScroll( page );
+		} finally {
+			await requestUtils.rest( {
+				method: 'POST',
+				path: '/wp/v2/users/me',
+				data: { description: previousDescription },
+			} );
+		}
 	} );
 } );
