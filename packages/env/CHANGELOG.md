@@ -2,8 +2,14 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a `mariadbVersion` option and `WP_ENV_MARIADB_VERSION` environment variable to choose the MariaDB version used by the Docker runtime, including versions older than 10.4 ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
+-   Explain why `wp-env start` fails when a database was last used by a newer MariaDB version, which MariaDB cannot downgrade from ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
+
 ### Bug Fixes
 
+-   Reject a `phpVersion` or `WP_ENV_PHP_VERSION` that is not only a version number, such as `8.2-apache` or `abc8`, instead of failing later because the Docker image does not exist ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
 -   Pass `-T` to `docker compose exec` when stdin is not a terminal, so commands run from a Git hook, which has a TTY on stdout but not on stdin, no longer fail with "cannot attach stdin to a TTY-enabled container" ([#78374](https://github.com/WordPress/gutenberg/pull/78374)).
 
 ### Internal

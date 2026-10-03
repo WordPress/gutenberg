@@ -1,5 +1,17 @@
+import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
 import { createRequire } from 'node:module';
-import { afterAll, describe, expect, it, vi } from 'vitest';
+import os from 'node:os';
+import path from 'node:path';
+import {
+	afterAll,
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
 const require = createRequire( import.meta.url );
 const getHostUserPath = require.resolve( '../runtime/docker/get-host-user' );
 const originalGetHostUser = require( getHostUserPath );
@@ -164,12 +176,9 @@ describe( 'buildDockerComposeConfig', () => {
 		} );
 
 		expect( config.services.mysql.healthcheck ).toBeDefined();
-		expect( config.services.mysql.healthcheck.test ).toEqual( [
-			'CMD',
-			'healthcheck.sh',
-			'--connect',
-			'--innodb_initialized',
-		] );
+		expect( config.services.mysql.healthcheck.test[ 0 ] ).toBe(
+			'CMD-SHELL'
+		);
 		expect( config.services.mysql.healthcheck.interval ).toBe( '5s' );
 		expect( config.services.mysql.healthcheck.timeout ).toBe( '10s' );
 		expect( config.services.mysql.healthcheck.retries ).toBe( 12 );
@@ -180,16 +189,184 @@ describe( 'buildDockerComposeConfig', () => {
 			'1'
 		);
 
-		expect( config.services[ 'tests-mysql' ].healthcheck ).toBeDefined();
-		expect( config.services[ 'tests-mysql' ].healthcheck.test ).toEqual( [
-			'CMD',
-			'healthcheck.sh',
-			'--connect',
-			'--innodb_initialized',
-		] );
+		expect( config.services[ 'tests-mysql' ].healthcheck ).toEqual(
+			config.services.mysql.healthcheck
+		);
 		expect(
 			config.services[ 'tests-mysql' ].environment.MARIADB_AUTO_UPGRADE
 		).toBe( '1' );
+	} );
+
+	describe( 'mariadbVersion', () => {
+		function buildWithVersions( development, tests ) {
+			return buildDockerComposeConfig( {
+				workDirectoryPath: '/path',
+				env: {
+					development: { ...CONFIG, mariadbVersion: development },
+					tests: { ...CONFIG, mariadbVersion: tests },
+				},
+			} );
+		}
+
+		it( 'uses mariadb:lts by default', () => {
+			const config = buildDockerComposeConfig( {
+				workDirectoryPath: '/path',
+				env: { development: CONFIG, tests: CONFIG },
+			} );
+
+			for ( const service of [ 'mysql', 'tests-mysql' ] ) {
+				expect( config.services[ service ].image ).toBe(
+					'mariadb:lts'
+				);
+			}
+		} );
+
+		it( 'treats null the same as unset', () => {
+			const config = buildWithVersions( null, null );
+
+			expect( config.services.mysql.image ).toBe( 'mariadb:lts' );
+		} );
+
+		it( 'uses each environment’s own version', () => {
+			const config = buildWithVersions( '10.3', 'latest' );
+
+			expect( config.services.mysql.image ).toBe( 'mariadb:10.3' );
+			expect( config.services[ 'tests-mysql' ].image ).toBe(
+				'mariadb:latest'
+			);
+		} );
+
+		it.each( [ '10.3', 'latest' ] )(
+			'uses the same health check for %j as for the default',
+			( version ) => {
+				const { healthcheck } = buildWithVersions( null, null ).services
+					.mysql;
+				const config = buildWithVersions( version, version );
+
+				expect( config.services.mysql.healthcheck ).toEqual(
+					healthcheck
+				);
+				expect( config.services[ 'tests-mysql' ].healthcheck ).toEqual(
+					healthcheck
+				);
+			}
+		);
+	} );
+
+	/*
+	 * Runs the health check command in a shell, with stub scripts in place of
+	 * the MariaDB tools. Each stub logs how it was called and exits with the
+	 * code the test gives it.
+	 */
+	describe( 'MariaDB health check command', () => {
+		const STUB =
+			'#!/bin/sh\necho "${0##*/} $*" >> "$STUB_LOG"\nexit "$EXIT_CODE"\n';
+		let directory;
+		let binDirectory;
+		let logFile;
+		let configFile;
+
+		beforeEach( () => {
+			directory = fs.mkdtempSync(
+				path.join( os.tmpdir(), 'wp-env-healthcheck-' )
+			);
+			binDirectory = path.join( directory, 'bin' );
+			logFile = path.join( directory, 'calls.log' );
+			configFile = path.join( directory, '.my-healthcheck.cnf' );
+			fs.mkdirSync( binDirectory );
+		} );
+
+		afterEach( () => {
+			fs.rmSync( directory, { recursive: true, force: true } );
+		} );
+
+		function addStub( name, exitCode ) {
+			const stubPath = path.join( binDirectory, name );
+			fs.writeFileSync(
+				stubPath,
+				STUB.replace( '"$EXIT_CODE"', String( exitCode ) )
+			);
+			fs.chmodSync( stubPath, 0o755 );
+		}
+
+		/*
+		 * Runs the command the way Docker does after Compose replaces each `$$`
+		 * with `$`, with the data directory's config file moved into the temporary
+		 * directory, and only the stubs on the PATH.
+		 */
+		function runHealthcheck() {
+			const [ , command ] = buildDockerComposeConfig( {
+				workDirectoryPath: '/path',
+				env: { development: CONFIG, tests: CONFIG },
+			} ).services.mysql.healthcheck.test;
+			const script = command
+				.replaceAll( '$$', '$' )
+				.replace( '/var/lib/mysql/.my-healthcheck.cnf', configFile );
+
+			let exitCode = 0;
+			try {
+				execFileSync( '/bin/sh', [ '-c', script ], {
+					env: {
+						PATH: binDirectory,
+						STUB_LOG: logFile,
+						MYSQL_ROOT_PASSWORD: 'password',
+					},
+					stdio: 'ignore',
+				} );
+			} catch ( error ) {
+				exitCode = error.status;
+			}
+
+			const calls = fs.existsSync( logFile )
+				? fs.readFileSync( logFile, 'utf8' ).trim().split( '\n' )
+				: [];
+
+			return { exitCode, calls };
+		}
+
+		it.each( [ 0, 1 ] )(
+			'runs healthcheck.sh and returns its exit code %j when the healthcheck user exists',
+			( exitCode ) => {
+				fs.writeFileSync( configFile, '' );
+				addStub( 'healthcheck.sh', exitCode );
+				addStub( 'mariadb-admin', 0 );
+
+				expect( runHealthcheck() ).toEqual( {
+					exitCode,
+					calls: [ 'healthcheck.sh --connect --innodb_initialized' ],
+				} );
+			}
+		);
+
+		it.each( [ 0, 1 ] )(
+			'pings with mariadb-admin and returns its exit code %j without the healthcheck user',
+			( exitCode ) => {
+				addStub( 'healthcheck.sh', 0 );
+				addStub( 'mariadb-admin', exitCode );
+				addStub( 'mysqladmin', 0 );
+
+				expect( runHealthcheck() ).toEqual( {
+					exitCode,
+					calls: [
+						'mariadb-admin ping -h 127.0.0.1 --protocol=tcp -uroot -ppassword',
+					],
+				} );
+			}
+		);
+
+		it.each( [ 0, 1 ] )(
+			'pings with mysqladmin and returns its exit code %j when mariadb-admin is missing',
+			( exitCode ) => {
+				addStub( 'mysqladmin', exitCode );
+
+				expect( runHealthcheck() ).toEqual( {
+					exitCode,
+					calls: [
+						'mysqladmin ping -h 127.0.0.1 --protocol=tcp -uroot -ppassword',
+					],
+				} );
+			}
+		);
 	} );
 
 	it( 'should use service_healthy condition for WordPress depends_on', () => {
