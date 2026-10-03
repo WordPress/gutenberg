@@ -140,9 +140,6 @@ export function Edit( { attributes, setAttributes } ) {
 						toggleProps={ {
 							as: ToolbarButton,
 						} }
-						popoverProps={ {
-							className: 'is-alternate',
-						} }
 						text={ __( 'Label' ) }
 					>
 						{ () => (

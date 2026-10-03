@@ -19,11 +19,9 @@
 
 	.components-popover__content {
 		width: 300px;
-		border: $border-width solid $gray-900;
 		background: $white;
 		border-radius: $radius-medium;
 		outline: none;
-		box-shadow: none;
 		overflow: auto;
 	}
 
