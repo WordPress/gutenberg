@@ -1,0 +1,1 @@
+import{n}from"./rolldown-runtime-DiifJuVD.js";import{c as e,l as t}from"./useRenderElement-Cenhia9I.js";function inertValue(n){return t(19)?n:n?"true":void 0}function init_inertValue(){return(init_inertValue=n(()=>{e()}))()}export{init_inertValue as n,inertValue as t};

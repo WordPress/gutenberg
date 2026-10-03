@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-DiifJuVD.js";function isElementDisabled(e){return null==e||e.hasAttribute("disabled")||"true"===e.getAttribute("aria-disabled")}function init_isElementDisabled(){return(init_isElementDisabled=e(()=>{}))()}export{isElementDisabled as n,init_isElementDisabled as t};
