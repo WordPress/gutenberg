@@ -1732,6 +1732,34 @@ test.describe( 'Block Notes', () => {
 				await expect( reactionButton ).toContainText( '🦄' );
 				await expect( reactionButton ).toContainText( '1' );
 			} );
+
+			test( 'the picker does not offer an excluded emoji', async ( {
+				page,
+				blockNoteUtils,
+			} ) => {
+				await blockNoteUtils.addBlockWithNote( {
+					type: 'core/paragraph',
+					attributes: { content: 'Testing excluded emoji' },
+					comment: 'Excluded emoji',
+				} );
+
+				await page
+					.getByRole( 'combobox', { name: 'Add reaction' } )
+					.click();
+				await blockNoteUtils.waitForFullPicker();
+				const search = page.getByPlaceholder( 'Search emoji' );
+
+				// The REST API rejects the excluded emoji, so the picker
+				// must not offer it, while its sibling stays available.
+				await search.fill( 'thumbs up' );
+				await expect(
+					page.getByRole( 'gridcell', { name: /thumbs up/i } )
+				).not.toHaveCount( 0 );
+				await search.fill( 'thumbs down' );
+				await expect(
+					page.getByRole( 'gridcell', { name: /thumbs down/i } )
+				).toHaveCount( 0 );
+			} );
 		} );
 	} );
 
