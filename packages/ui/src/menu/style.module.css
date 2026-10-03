@@ -7,7 +7,7 @@
 		}
 
 		.popup {
-			--wp-ui-menu-popup-padding: var(--_wp-ui-menu-popup-padding);
+			--wp-ui-menu-popup-padding: var(--wpds-dimension-padding-xs);
 			--wp-ui-menu-min-width: 160px;
 			--wp-ui-menu-max-width: var(--wpds-dimension-surface-width-md);
 			--wp-ui-menu-item-padding-inline: var(--wpds-dimension-padding-md);
@@ -26,7 +26,7 @@
 			padding: var(--wp-ui-menu-popup-padding);
 			scroll-padding: var(--wp-ui-menu-popup-padding);
 			border-radius: var(--wpds-border-radius-md);
-			border: var(--_wp-ui-menu-popup-border-width) solid var(--wpds-color-stroke-surface-neutral);
+			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 			box-shadow: var(--_wp-ui-menu-elevation-md);
 			background-color: var(--wpds-color-background-surface-neutral-strong);
 			outline: none;
