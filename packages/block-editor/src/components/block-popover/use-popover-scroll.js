@@ -14,7 +14,7 @@ function usePopoverScroll( contentRef ) {
 	const effect = useRefEffect(
 		( node ) => {
 			function onWheel( event ) {
-				const { deltaX, deltaY, target } = event;
+				const { deltaX, deltaY, target, ctrlKey } = event;
 				const contentEl = contentRef.current;
 				let scrollContainer = scrollContainerCache.get( contentEl );
 				if ( ! scrollContainer ) {
@@ -35,6 +35,7 @@ function usePopoverScroll( contentRef ) {
 						new window.WheelEvent( 'wheel', {
 							deltaX,
 							deltaY,
+							ctrlKey,
 							bubbles: true,
 							cancelable: true,
 						} )
