@@ -241,6 +241,7 @@ export default function EmojiPicker( {
 		data: dataset,
 		isLoading,
 		error,
+		retry,
 	} = useEmojibaseData( isWarm ? baseUrl : null, locale );
 	const data = useMemo( () => dataset ?? [], [ dataset ] );
 	const [ query, setQuery ] = useState( '' );
@@ -414,6 +415,10 @@ export default function EmojiPicker( {
 				setIsOpen( nextOpen );
 				if ( nextOpen ) {
 					warm();
+					// A failed load would otherwise stick until reload.
+					if ( error ) {
+						retry();
+					}
 				}
 			} }
 			// Start each opening from the full grid.
