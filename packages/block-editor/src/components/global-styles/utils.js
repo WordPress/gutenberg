@@ -9,8 +9,8 @@ const POPOVER_PROPS = {
 	},
 	page: {
 		placement: 'right-start',
-		// Panel padding (16px) + screen padding (12px) + canvas padding (16px) + spacing (20px)
-		offset: 64,
+		// Panel padding (16px) + screen padding (12px) + spacing (4px)
+		offset: 32,
 	},
 };
 
@@ -23,8 +23,8 @@ const ITEM_POPOVER_PROPS = {
 	},
 	page: {
 		placement: 'right-start',
-		// Panel padding (16px) + screen padding (12px) + canvas padding (16px) + spacing (20px)
-		offset: 64,
+		// Panel padding (16px) + screen padding (12px) + spacing (4px)
+		offset: 32,
 		shift: true,
 	},
 };
