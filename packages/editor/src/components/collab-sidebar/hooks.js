@@ -176,7 +176,7 @@ export function useNoteThreads( postId ) {
 export function useNoteActions() {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
-	const { getCurrentPostId } = useSelect( editorStore );
+	const { getNotesPostId } = unlock( useSelect( editorStore ) );
 	const {
 		getBlockAttributes,
 		getClientIdsWithDescendants,
@@ -213,7 +213,7 @@ export function useNoteActions() {
 				'root',
 				'comment',
 				{
-					post: getCurrentPostId(),
+					post: getNotesPostId(),
 					content,
 					status: 'hold',
 					type: 'note',
@@ -291,7 +291,7 @@ export function useNoteActions() {
 
 				// Then create a new note with the metadata.
 				const newNoteData = {
-					post: getCurrentPostId(),
+					post: getNotesPostId(),
 					content: content || '', // Empty content for resolve, content for reopen.
 					type: 'note',
 					status,
