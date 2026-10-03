@@ -330,7 +330,7 @@ A `.jsdom.test.*` or `.browser.test.*` filename alone does not select an environ
 -   Replace `@wordpress/jest-console` matchers with local `vi.spyOn( console, 'error' )` assertions and restore the spy. Unexpected console output does not fail a Vitest test by default. If your suite requires that contract, implement and test it in your own setup. Do not import Gutenberg's console setup.
 -   Review snapshots when converting them. Keep runner-neutral `@testing-library/jest-dom` and snapshot-diff matchers where needed.
 -   Use `--update` for snapshots and `--no-file-parallelism` for debugging. Jest options such as `--runInBand`, `--updateSnapshot`, and `--ci` are not interchangeable with Vitest options.
--   The public `test-unit` ESLint config uses `@vitest/eslint-plugin` recommended rules without declaring globals. Projects retaining Jest should install `eslint-plugin-jest` and select its `flat/recommended` config explicitly.
+-   The public `test-unit` ESLint config uses `@vitest/eslint-plugin` recommended rules without declaring globals. The next major releases after `@wordpress/eslint-plugin` 27.0.0 and `@wordpress/scripts` 36.0.0 also require awaited or explicitly returned `expect.poll()` and `expect.element()` assertions and allow generated titles passed through variables. See the [unit-test lint defaults](/packages/eslint-plugin/README.md#unit-test-lint-defaults) for migration guidance and rule limitations. Projects retaining Jest should install `eslint-plugin-jest` and select its `flat/recommended` config explicitly.
 
 ## Generated WordPress CSS
 

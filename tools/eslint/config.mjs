@@ -608,10 +608,6 @@ export default dedupePlugins( [
 		ignores: vitestLintIgnores,
 		rules: {
 			...config.rules,
-			'vitest/valid-describe-callback': 'error',
-			'vitest/valid-expect-in-promise': 'error',
-			'vitest/valid-title': [ 'error', { allowArguments: true } ],
-			'vitest/require-awaited-expect-poll': 'error',
 			// These checks were enabled by Jest's baseline but are not recommended
 			// Vitest rules. Keep their existing enforcement during the switch.
 			'vitest/no-alias-methods': 'error',
