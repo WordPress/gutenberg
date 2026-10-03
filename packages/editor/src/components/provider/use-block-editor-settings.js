@@ -87,6 +87,8 @@ const BLOCK_EDITOR_SETTINGS = [
 	'locale',
 	'maxWidth',
 	'noteEmojibaseUrl',
+	'noteEmojiLabelOverrides',
+	'noteReactionEmojis',
 	'postContentAttributes',
 	'postsPerPage',
 	'readOnly',

@@ -10,7 +10,11 @@ import { useState, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { getCuratedLabel, hexKeyToEmoji } from './reaction-emojis';
-import { useEmojiLabel } from './emojibase-data';
+import {
+	getOverrideLabel,
+	useEmojibaseConfig,
+	useEmojiLabel,
+} from './emojibase-data';
 
 interface ReactionSummaryEntry {
 	count: number;
@@ -386,6 +390,7 @@ export default function ReactionDisplay( {
 	onToggleReaction,
 	children,
 }: ReactionDisplayProps ) {
+	const { labelOverrides } = useEmojibaseConfig();
 	const reactedHexKeys = getReactedHexKeys( reactions );
 
 	if ( reactedHexKeys.length === 0 && ! children ) {
@@ -413,7 +418,10 @@ export default function ReactionDisplay( {
 						count={ count }
 						isActive={ isActive }
 						emoji={ hexKeyToEmoji( hexKey ) }
-						emojiLabel={ getCuratedLabel( hexKey ) }
+						emojiLabel={
+							getOverrideLabel( labelOverrides, hexKey ) ||
+							getCuratedLabel( hexKey )
+						}
 						disabled={ disabled }
 						onToggleReaction={ onToggleReaction }
 					/>

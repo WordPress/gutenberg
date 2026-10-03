@@ -1695,6 +1695,44 @@ test.describe( 'Block Notes', () => {
 			// React tree, so the thread stays selected and the trigger mounted.
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 		} );
+
+		test.describe( 'Filtered emoji list', () => {
+			test.beforeAll( async ( { requestUtils } ) => {
+				await requestUtils.activatePlugin(
+					'gutenberg-test-note-reaction-emojis'
+				);
+			} );
+
+			test.afterAll( async ( { requestUtils } ) => {
+				await requestUtils.deactivatePlugin(
+					'gutenberg-test-note-reaction-emojis'
+				);
+			} );
+
+			test( 'can react with a filter-added emoji', async ( {
+				page,
+				blockNoteUtils,
+			} ) => {
+				await blockNoteUtils.addBlockWithNote( {
+					type: 'core/paragraph',
+					attributes: { content: 'Testing filtered reaction' },
+					comment: 'Filtered reaction',
+				} );
+
+				// Exercises the whole path: the picker offers the named
+				// entry under its own label, the REST API accepts its hex
+				// key, and the pill resolves the key back to the emoji and
+				// label.
+				await blockNoteUtils.addReactionToComment( 'Unicorn' );
+
+				const reactionButton = page.getByRole( 'button', {
+					name: /Unicorn/,
+				} );
+				await expect( reactionButton ).toBeVisible();
+				await expect( reactionButton ).toContainText( '🦄' );
+				await expect( reactionButton ).toContainText( '1' );
+			} );
+		} );
 	} );
 
 	test.describe( 'Multiple notes per block', () => {

@@ -7,7 +7,11 @@ import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/ui';
 import { reaction as reactionIcon } from '@wordpress/icons';
 import EmojiPicker from './emoji-picker';
-import { emojiToHexKey } from './reaction-emojis';
+import {
+	emojiToHexKey,
+	useReactionEmojiRules,
+	useReactionEmojis,
+} from './reaction-emojis';
 
 interface AddReactionButtonProps {
 	disabled?: boolean;
@@ -16,7 +20,7 @@ interface AddReactionButtonProps {
 
 /**
  * Standalone add-reaction button, opening the searchable emoji picker
- * with its "Frequently used" section seeded from the curated set.
+ * with its "Frequently used" section seeded from the named set.
  *
  * @param props                  Component props.
  * @param props.disabled         Whether the button is disabled (e.g. on a
@@ -27,6 +31,15 @@ export function AddReactionButton( {
 	disabled = false,
 	onToggleReaction,
 }: AddReactionButtonProps ) {
+	const emojis = useReactionEmojis();
+	const rules = useReactionEmojiRules();
+
+	// A site that empties the named list and allows nothing else leaves
+	// nothing to pick.
+	if ( ! emojis.length && ! rules.allowUnlisted ) {
+		return null;
+	}
+
 	return (
 		<EmojiPicker
 			label={ __( 'Add reaction' ) }
