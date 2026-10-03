@@ -207,7 +207,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 * @param string $html_containing_svg HTML fragment containing the SVG to sanitize.
 	 * @return string The sanitized SVG, or an empty string when no valid SVG is found.
 	 */
-	private function sanitize_inline_svg( $html_containing_svg ) {
+	private function sanitize_inline_svg( string $html_containing_svg ): string {
 		// Core attributes applicable to most elements. `data-*` is a wildcard
 		// supported by wp_kses() and matches any data attribute.
 		$core_attributes = $this->get_allowed_attribute_list( 'class', 'data-*', 'id', 'style' );
