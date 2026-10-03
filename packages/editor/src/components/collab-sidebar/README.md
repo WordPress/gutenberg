@@ -39,7 +39,7 @@ collab-sidebar/
 │   ├── use-block-reaction.ts        useBlockReaction( clientId ) - a block's reactions + toggleReaction
 │   ├── block-reactions-row.tsx      BlockReactionsRow - a block's own reactions (icon + pills + trigger)
 │   ├── block-reactions-entry.tsx    BlockReactionsEntry - sidebar entry for a block with reactions but no note
-│   └── block-reactions-toolbar-button.tsx  BlockReactionsToolbarButton - block-toolbar button that opens the block's reactions
+│   └── block-reactions-menu-item.tsx  BlockReactionsMenuItem - block options "Add reaction" item that opens the block's reactions
 │
 ├── hooks.js                        useNoteThreads, useNoteActions, useNoteSelection, useFloatingBoard, useEnableFloatingSidebar
 ├── utils.js                        focusNoteThread, getNoteExcerpt, sanitizeNoteContent, calculateNotePositions, getAvatarBorderColor
@@ -57,7 +57,7 @@ NotesSidebarContainer (index.jsx)         - gates on post type support
  └── NotesSidebar (index.jsx)             - owns sidebarRef + useNoteThreads + sidebar registration
       ├── AddNoteMenuItem                - slot fill in the block toolbar
       ├── NoteAvatarIndicator            - slot fill in the block toolbar (per-thread avatars)
-      ├── BlockReactionsToolbarButton - slot fill in the block toolbar ("React to block")
+      ├── BlockReactionsMenuItem         - slot fill in the block options menu ("Add reaction")
       ├── PluginSidebar (all-notes)      - full sidebar
       │    └── Notes (notes.jsx)          - owns outer Stack + aria-label + useNoteActions + keyboard nav
       │         ├── AddNote              - rendered when no threads (template-locked) or selectedNote === 'new'
@@ -85,7 +85,7 @@ The server returns every block reaction on the post as one read-only `block_reac
 
 `useNoteThreads` merges reacted blocks into the thread list in document order (`addBlockReactionEntries`). A block's reactions row leads its first unresolved thread, so the floating view (which lists only unresolved threads) agrees with the full sidebar; a block with no unresolved note gets a `BlockReactionsEntry` of its own above the "Resolved" divider. An anchor with no matching block is not listed: a reaction carries no content worth keeping in view once its block is gone, and undo restores the block with its anchor.
 
-The picker lives only in the sidebar. "React to block" in the block toolbar is a plain button: it lists the selected block in the sidebar even before its first reaction (until another block is selected) and focuses the row's "Add block reaction" trigger. Note reactions keep their own "Add reaction" trigger.
+The picker lives only in the sidebar. "Add reaction" in the block options menu, after "Add note", is a plain menu item: it lists the selected block in the sidebar even before its first reaction (until another block is selected) and focuses the row's "Add block reaction" trigger. Note reactions keep their own "Add reaction" trigger.
 
 ## Floating board
 

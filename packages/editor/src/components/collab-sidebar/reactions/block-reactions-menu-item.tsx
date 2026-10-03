@@ -1,6 +1,5 @@
-import { ToolbarButton } from '@wordpress/components';
+import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { reaction as reactionIcon } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import {
@@ -11,18 +10,9 @@ import {
 import { unlock } from '../../../lock-unlock';
 import { getBlockReactionsId } from './block-reactions';
 
-const { NoteIconToolbarSlotFill } = unlock( blockEditorPrivateApis );
+const { NoteIconSlotFill } = unlock( blockEditorPrivateApis );
 
-/**
- * The selected block's "React to block" toolbar button, filled into the
- * note toolbar slot beside the note avatar indicator. It opens the block's
- * reactions in the sidebar, where the picker lives.
- *
- * @param props          Component props.
- * @param props.clientId The selected block's client id.
- * @param props.onClick  Brings the block's reactions into view.
- */
-export function BlockReactionsToolbarButton( {
+function BlockReactionsMenuItemControl( {
 	clientId,
 	onClick,
 }: {
@@ -53,14 +43,42 @@ export function BlockReactionsToolbarButton( {
 	}
 
 	return (
-		<NoteIconToolbarSlotFill.Fill>
-			<ToolbarButton
-				icon={ reactionIcon }
-				label={ __( 'React to block' ) }
-				disabled={ isDisabled }
-				accessibleWhenDisabled
-				onClick={ onClick }
-			/>
-		</NoteIconToolbarSlotFill.Fill>
+		<MenuItem onClick={ onClick } disabled={ isDisabled }>
+			{ __( 'Add reaction' ) }
+		</MenuItem>
+	);
+}
+
+/**
+ * The "Add reaction" item in the block options menu, filled into the note
+ * slot after "Add note". It opens the block's reactions in the sidebar,
+ * where the picker lives.
+ *
+ * @param props         Component props.
+ * @param props.onClick Brings the block's reactions into view.
+ */
+export function BlockReactionsMenuItem( {
+	onClick,
+}: {
+	onClick: ( clientId: string ) => void;
+} ) {
+	return (
+		<NoteIconSlotFill.Fill>
+			{ ( {
+				clientId,
+				onClose,
+			}: {
+				clientId: string;
+				onClose: () => void;
+			} ) => (
+				<BlockReactionsMenuItemControl
+					clientId={ clientId }
+					onClick={ () => {
+						onClick( clientId );
+						onClose();
+					} }
+				/>
+			) }
+		</NoteIconSlotFill.Fill>
 	);
 }

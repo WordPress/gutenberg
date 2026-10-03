@@ -207,14 +207,14 @@ class BlockNoteUtils {
 	}
 
 	/**
-	 * React to the selected block: the toolbar button brings the block's
+	 * React to the selected block: the block options menu item brings the block's
 	 * reactions into the sidebar and focuses their trigger, which opens the
 	 * picker. Picks an emoji by its exact label.
 	 *
 	 * @param {string} emoji Exact emoji label, e.g. "Heart".
 	 */
 	async addReactionToBlock( emoji ) {
-		await this.#editor.clickBlockToolbarButton( 'React to block' );
+		await this.#editor.clickBlockOptionsMenuItem( 'Add reaction' );
 		const trigger = this.#page.getByRole( 'combobox', {
 			name: 'Add block reaction',
 		} );

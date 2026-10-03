@@ -1702,7 +1702,7 @@ test.describe( 'Block Notes', () => {
 			await requestUtils.deleteAllComments( 'reaction' );
 		} );
 
-		test( 'reacting from the toolbar lists the block and mints one anchor', async ( {
+		test( 'reacting from the block options menu lists the block and mints one anchor', async ( {
 			editor,
 			blockNoteUtils,
 		} ) => {

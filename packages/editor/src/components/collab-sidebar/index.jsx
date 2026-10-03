@@ -18,7 +18,7 @@ import { NotesDisplayModeMenu } from './notes-display-mode-menu';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
-import { BlockReactionsToolbarButton } from './reactions/block-reactions-toolbar-button';
+import { BlockReactionsMenuItem } from './reactions/block-reactions-menu-item';
 import {
 	getBlockReactionsEntryId,
 	isBlockReactionsEntry,
@@ -221,16 +221,13 @@ function NotesSidebar( { postId } ) {
 					onClick={ () => openNoteForBlock( clientId ) }
 				/>
 			) }
-			{ !! clientId && (
-				<BlockReactionsToolbarButton
-					clientId={ clientId }
-					onClick={ () => reactToBlock( clientId ) }
-				/>
-			) }
 			<AddNoteMenuItem
 				onClick={ ( menuClientId ) =>
 					addNewNoteForBlock( menuClientId )
 				}
+			/>
+			<BlockReactionsMenuItem
+				onClick={ ( menuClientId ) => reactToBlock( menuClientId ) }
 			/>
 			<NotesDisplayModeMenu
 				hasFloatingNotes={ hasFloatingNotes }
