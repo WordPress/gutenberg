@@ -209,7 +209,7 @@ const PlaylistTrackEdit = ( {
 							<BaseControl.VisualLabel>
 								{ __( 'Track image' ) }
 							</BaseControl.VisualLabel>
-							<div className="editor-video-poster-control">
+							<div className="wp-block-playlist-track__inspector-image">
 								{ !! image && (
 									<img
 										src={ image }

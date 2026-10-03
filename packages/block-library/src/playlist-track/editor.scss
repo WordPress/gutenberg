@@ -1,0 +1,19 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.wp-block-playlist-track__inspector-image {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: $grid-unit-10;
+
+	img {
+		display: block;
+		flex: 1 1 100%;
+		width: 100%;
+		max-width: 100%;
+		height: auto;
+		max-height: $grid-unit * 25;
+		object-fit: contain;
+		object-position: left center;
+	}
+}
