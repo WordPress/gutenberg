@@ -10,6 +10,7 @@
 
 ### Bug Fixes
 
+-   Notes: Keep a note attached to its block when leaving without saving. Adding or deleting a note triggers an autosave, and orphaned notes are re-attached from the current user's autosave on load ([#83511](https://github.com/WordPress/gutenberg/pull/83511)).
 -   Keep post actions and note actions menus dismissible when their triggers become disabled. Close the View menu when it becomes unavailable ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
 -   Remove redundant menu groups from the mode switcher and preview menu, and associate the Editor label with its radio group ([#83792](https://github.com/WordPress/gutenberg/pull/83792)).
 -   Error boundary: Explicitly announce the error title and description, excluding action labels ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
