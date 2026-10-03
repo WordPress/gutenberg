@@ -93,7 +93,9 @@ Resizes an image using vips.
 
 UltraHDR JPEGs are auto-detected and preserved: libvips's `uhdrload*` has higher priority than `jpegload*`, so `newFromBuffer`/`thumbnailBuffer` decode the gain map alongside the base image, and `jpegsave*` delegates to `uhdrsave*` on output when a gain map is attached.
 
-Sub-sizes of animated images are generated from the first frame only, matching WordPress core's server-side behavior: both GD and Imagick flatten animated images when resizing, and `wp_calculate_image_srcset()` prevents flattened sub-sizes and the animated full-size image from mixing in a srcset. Loading all frames (`[n=-1]`) would re-encode a full animated GIF per sub-size, which takes tens of seconds for long animations and can produce sub-sizes larger than the original file. See <https://github.com/WordPress/gutenberg/issues/80266>.
+Sub-sizes of animated images are generated from the first frame only by default, matching WordPress core's server-side behavior: both GD and Imagick flatten animated images when resizing, and `wp_calculate_image_srcset()` prevents flattened sub-sizes and the animated full-size image from mixing in a srcset. Loading all frames (`[n=-1]`) re-encodes a full animated GIF per sub-size, which takes tens of seconds for long animations and can produce sub-sizes larger than the original file. See <https://github.com/WordPress/gutenberg/issues/80266>.
+
+Sites can opt into animated sub-sizes via the `wp_generate_animated_image_subsizes` filter, carried here as the `preserveAnimation` option. Cropped sizes always flatten to the first frame (per-frame cropping is not supported), also matching the pre-existing behavior. Animations whose decoded frames would not fit the WASM heap also flatten to the first frame, so an opted-in site gets a static sub-size rather than a failed upload. See <https://github.com/WordPress/gutenberg/issues/80383>.
 
 _Parameters_
 
@@ -199,7 +201,9 @@ Resizes an image using vips.
 
 UltraHDR JPEGs are auto-detected and preserved: libvips's `uhdrload*` has higher priority than `jpegload*`, so `newFromBuffer`/`thumbnailBuffer` decode the gain map alongside the base image, and `jpegsave*` delegates to `uhdrsave*` on output when a gain map is attached.
 
-Sub-sizes of animated images are generated from the first frame only, matching WordPress core's server-side behavior: both GD and Imagick flatten animated images when resizing, and `wp_calculate_image_srcset()` prevents flattened sub-sizes and the animated full-size image from mixing in a srcset. Loading all frames (`[n=-1]`) would re-encode a full animated GIF per sub-size, which takes tens of seconds for long animations and can produce sub-sizes larger than the original file. See <https://github.com/WordPress/gutenberg/issues/80266>.
+Sub-sizes of animated images are generated from the first frame only by default, matching WordPress core's server-side behavior: both GD and Imagick flatten animated images when resizing, and `wp_calculate_image_srcset()` prevents flattened sub-sizes and the animated full-size image from mixing in a srcset. Loading all frames (`[n=-1]`) re-encodes a full animated GIF per sub-size, which takes tens of seconds for long animations and can produce sub-sizes larger than the original file. See <https://github.com/WordPress/gutenberg/issues/80266>.
+
+Sites can opt into animated sub-sizes via the `wp_generate_animated_image_subsizes` filter, carried here as the `preserveAnimation` option. Cropped sizes always flatten to the first frame (per-frame cropping is not supported), also matching the pre-existing behavior. Animations whose decoded frames would not fit the WASM heap also flatten to the first frame, so an opted-in site gets a static sub-size rather than a failed upload. See <https://github.com/WordPress/gutenberg/issues/80383>.
 
 _Parameters_
 

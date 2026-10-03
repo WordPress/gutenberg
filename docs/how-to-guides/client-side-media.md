@@ -16,12 +16,12 @@ Client-side media processing activates only when the browser, device, and networ
 
 The pipeline depends on [`Document-Isolation-Policy`](https://developer.mozilla.org/en-US/docs/Web/API/Window/crossOriginIsolated) (DIP) to enable `SharedArrayBuffer`, which is currently limited to Chromium-based browsers.
 
-| Browser | Minimum version | Notes |
-| --- | --- | --- |
-| Chrome | 137+ | Full support via Document-Isolation-Policy. |
-| Edge | 137+ | Full support via Document-Isolation-Policy. |
-| Firefox | — | Not supported (no Document-Isolation-Policy support). |
-| Safari | — | Not supported for the WASM pipeline; the HEIC canvas fallback still works. |
+| Browser | Minimum version | Notes                                                                      |
+| ------- | --------------- | -------------------------------------------------------------------------- |
+| Chrome  | 137+            | Full support via Document-Isolation-Policy.                                |
+| Edge    | 137+            | Full support via Document-Isolation-Policy.                                |
+| Firefox | —               | Not supported (no Document-Isolation-Policy support).                      |
+| Safari  | —               | Not supported for the WASM pipeline; the HEIC canvas fallback still works. |
 
 ### Browser capabilities
 
@@ -34,11 +34,11 @@ In addition to a supported browser, these APIs must be available:
 
 ### Device and network
 
-| Requirement | Threshold | Reason |
-| --- | --- | --- |
-| Device memory | > 2 GB | WASM image processing holds the full image plus working buffers in memory; devices reporting ≤ 2 GB RAM are excluded to avoid out-of-memory crashes. |
-| CPU cores | ≥ 2 | A WASM worker can monopolize a core during encode; at least two cores keeps the UI thread responsive. |
-| Network connection | Not `2g`/`slow-2g`, Save-Data off | The ~13 MB worker download is gated to faster connections; `3g` and above are allowed. |
+| Requirement        | Threshold                         | Reason                                                                                                                                               |
+| ------------------ | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Device memory      | > 2 GB                            | WASM image processing holds the full image plus working buffers in memory; devices reporting ≤ 2 GB RAM are excluded to avoid out-of-memory crashes. |
+| CPU cores          | ≥ 2                               | A WASM worker can monopolize a core during encode; at least two cores keeps the UI thread responsive.                                                |
+| Network connection | Not `2g`/`slow-2g`, Save-Data off | The ~13 MB worker download is gated to faster connections; `3g` and above are allowed.                                                               |
 
 > **Note:** HEIC/HEIF decoding uses a separate, looser gate. It needs only `createImageBitmap` and `OffscreenCanvas`, so Safari can convert iPhone photos even though it can't run the WASM pipeline. See [Supported file formats](#supported-file-formats).
 
@@ -138,6 +138,17 @@ add_filter( 'image_max_bit_depth', function () {
 
 The client snaps the cap to the depths the AVIF encoder supports (8, 10, or 12 bits).
 
+### Animated image sub-sizes
+
+The `wp_generate_animated_image_subsizes` filter controls whether sub-sizes of animated images (such as GIFs) keep their animation. By default, sub-sizes are generated from the first frame only, matching WordPress core's server-side behavior. Returning `true` opts the site into animated sub-sizes:
+
+```php
+// Generate animated sub-sizes for animated images.
+add_filter( 'wp_generate_animated_image_subsizes', '__return_true' );
+```
+
+Only uncropped sub-sizes keep their animation; cropped sizes (such as `thumbnail`) are always generated from the first frame. Animated sub-sizes take longer to encode and produce larger files than static ones — for long animations, each sub-size can approach the original file's size. Uploads that take the server-side path also still produce static sub-sizes, as core has no animated resize support.
+
 ## Supported file formats
 
 Client-side processing handles the following MIME types in the WASM/vips pipeline: `image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/avif`. Files outside this set fall through to one of two paths depending on type:
@@ -204,21 +215,21 @@ dispatch( uploadStore ).addItems( {
 
 ### Available selectors
 
-| Selector | Returns | Description |
-| --- | --- | --- |
-| `isUploading()` | `boolean` | Whether any upload is currently active. |
-| `isUploadingById( id )` | `boolean` | Whether a specific attachment ID is being uploaded. |
-| `isUploadingByUrl( url )` | `boolean` | Whether a specific URL is being uploaded. |
-| `getItems()` | `array` | All items in the upload queue. |
-| `getSettings()` | `object` | Current upload settings (concurrency limits, allowed types, etc.). |
+| Selector                  | Returns   | Description                                                        |
+| ------------------------- | --------- | ------------------------------------------------------------------ |
+| `isUploading()`           | `boolean` | Whether any upload is currently active.                            |
+| `isUploadingById( id )`   | `boolean` | Whether a specific attachment ID is being uploaded.                |
+| `isUploadingByUrl( url )` | `boolean` | Whether a specific URL is being uploaded.                          |
+| `getItems()`              | `array`   | All items in the upload queue.                                     |
+| `getSettings()`           | `object`  | Current upload settings (concurrency limits, allowed types, etc.). |
 
 ### Available actions
 
-| Action | Description |
-| --- | --- |
-| `addItems( args )` | Add files to the upload queue. Accepts `files`, `onChange`, `onSuccess`, `onBatchSuccess`, `onError`, `additionalData`, `allowedTypes`. |
-| `cancelItem( id, error )` | Cancel an in-progress upload and clean up resources. |
-| `retryItem( id )` | Retry a failed upload. |
+| Action                    | Description                                                                                                                             |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `addItems( args )`        | Add files to the upload queue. Accepts `files`, `onChange`, `onSuccess`, `onBatchSuccess`, `onError`, `additionalData`, `allowedTypes`. |
+| `cancelItem( id, error )` | Cancel an in-progress upload and clean up resources.                                                                                    |
+| `retryItem( id )`         | Retry a failed upload.                                                                                                                  |
 
 ## Server-side plugin compatibility
 
@@ -324,12 +335,12 @@ POST /wp/v2/media/{id}/sideload
 
 ### Parameters
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| `image_size` | string \| string[] | Yes | The image size name (e.g., `thumbnail`, `medium`, `large`, `scaled`, `original`). Pass an array to register a single physical file under multiple sizes that share dimensions. |
-| `generate_sub_sizes` | boolean | No | Whether the server should generate additional sub-sizes from this upload. Default `true`. |
-| `convert_format` | boolean | No | Whether to apply server-side format conversion via `image_editor_output_format`. Default `true`. |
-| `replace_file` | boolean | No | When `true`, replaces the attachment's main file with the uploaded file, updating the MIME type and metadata and deleting the old file. Default `false`. Used by the HEIC → JPEG companion path. |
+| Parameter            | Type               | Required | Description                                                                                                                                                                                      |
+| -------------------- | ------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `image_size`         | string \| string[] | Yes      | The image size name (e.g., `thumbnail`, `medium`, `large`, `scaled`, `original`). Pass an array to register a single physical file under multiple sizes that share dimensions.                   |
+| `generate_sub_sizes` | boolean            | No       | Whether the server should generate additional sub-sizes from this upload. Default `true`.                                                                                                        |
+| `convert_format`     | boolean            | No       | Whether to apply server-side format conversion via `image_editor_output_format`. Default `true`.                                                                                                 |
+| `replace_file`       | boolean            | No       | When `true`, replaces the attachment's main file with the uploaded file, updating the MIME type and metadata and deleting the old file. Default `false`. Used by the HEIC → JPEG companion path. |
 
 ### Example
 
@@ -352,20 +363,20 @@ The endpoint checks that the uploaded file's dimensions are appropriate for the 
 
 ## Troubleshooting
 
-| Problem | Cause | Solution |
-| --- | --- | --- |
-| Client-side processing not activating | Browser lacks Document-Isolation-Policy support | Client-side processing requires Chrome/Edge 137+. Check `window.crossOriginIsolated` in the browser console. |
-| Client-side processing not activating on Chrome 137+ | `Document-Isolation-Policy` header not sent | Verify you're editing a post or page (the header is skipped on admin pages with an `action` other than `edit`). Some third-party page builders may suppress the header. |
-| CSP blocks worker creation | `worker-src` directive too restrictive | Add `blob:` to the `worker-src` CSP directive: `worker-src 'self' blob:` |
-| Processing falls back on capable browser | Feature disabled server-side | Check that `wp_client_side_media_processing_enabled` filter is not returning `false`. |
-| Large images cause browser to slow down | Insufficient device memory | Devices with ≤ 2 GB RAM are automatically excluded. Consider reducing the big image size threshold for your site. |
-| Feature disabled on a low-spec laptop | Below 2 CPU cores or 2 GB RAM | These thresholds protect underpowered devices from out-of-memory crashes and are not configurable. Affected devices fall back to server-side processing. |
-| Feature disabled on slow network | `2g`/`slow-2g` connection or Save-Data is on | The ~13 MB worker download is gated behind `effectiveType` and `saveData`. `3g` and faster connections are allowed. |
-| HEIC upload error on a server without HEIC support | Server-side HEIC decoder missing | The client converts HEIC to JPEG before upload — this should not occur in browsers that match `isHeicCanvasSupported()`. Verify the browser provides `createImageBitmap` and `OffscreenCanvas`. |
-| Upload fails with "image transcoding error" | Unsupported format or corrupt file | Verify the file is a supported format (JPEG, PNG, WebP, AVIF, GIF, HEIC). |
-| Save Draft button stays disabled | Lock not released | Ensure all upload items have completed or been cancelled. The lock releases when the upload queue is empty. |
-| Sideload request rejected with a 400 dimension error | Uploaded variant doesn't match the declared `image_size` | The sideload endpoint validates dimensions. Make sure the file matches the size in `image_size`: an exact match for `original`, or within the registered maximum for a named size like `thumbnail`. |
-| A plugin's image-processing hook stopped running | Hook doesn't fire on the client path | `wp_image_editors`, `image_make_intermediate_size`, and `image_memory_limit` never fire when processing happens in the browser. See [Hooks that no longer apply](#hooks-that-no-longer-apply) for replacements. |
+| Problem                                              | Cause                                                    | Solution                                                                                                                                                                                                        |
+| ---------------------------------------------------- | -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Client-side processing not activating                | Browser lacks Document-Isolation-Policy support          | Client-side processing requires Chrome/Edge 137+. Check `window.crossOriginIsolated` in the browser console.                                                                                                    |
+| Client-side processing not activating on Chrome 137+ | `Document-Isolation-Policy` header not sent              | Verify you're editing a post or page (the header is skipped on admin pages with an `action` other than `edit`). Some third-party page builders may suppress the header.                                         |
+| CSP blocks worker creation                           | `worker-src` directive too restrictive                   | Add `blob:` to the `worker-src` CSP directive: `worker-src 'self' blob:`                                                                                                                                        |
+| Processing falls back on capable browser             | Feature disabled server-side                             | Check that `wp_client_side_media_processing_enabled` filter is not returning `false`.                                                                                                                           |
+| Large images cause browser to slow down              | Insufficient device memory                               | Devices with ≤ 2 GB RAM are automatically excluded. Consider reducing the big image size threshold for your site.                                                                                               |
+| Feature disabled on a low-spec laptop                | Below 2 CPU cores or 2 GB RAM                            | These thresholds protect underpowered devices from out-of-memory crashes and are not configurable. Affected devices fall back to server-side processing.                                                        |
+| Feature disabled on slow network                     | `2g`/`slow-2g` connection or Save-Data is on             | The ~13 MB worker download is gated behind `effectiveType` and `saveData`. `3g` and faster connections are allowed.                                                                                             |
+| HEIC upload error on a server without HEIC support   | Server-side HEIC decoder missing                         | The client converts HEIC to JPEG before upload — this should not occur in browsers that match `isHeicCanvasSupported()`. Verify the browser provides `createImageBitmap` and `OffscreenCanvas`.                 |
+| Upload fails with "image transcoding error"          | Unsupported format or corrupt file                       | Verify the file is a supported format (JPEG, PNG, WebP, AVIF, GIF, HEIC).                                                                                                                                       |
+| Save Draft button stays disabled                     | Lock not released                                        | Ensure all upload items have completed or been cancelled. The lock releases when the upload queue is empty.                                                                                                     |
+| Sideload request rejected with a 400 dimension error | Uploaded variant doesn't match the declared `image_size` | The sideload endpoint validates dimensions. Make sure the file matches the size in `image_size`: an exact match for `original`, or within the registered maximum for a named size like `thumbnail`.             |
+| A plugin's image-processing hook stopped running     | Hook doesn't fire on the client path                     | `wp_image_editors`, `image_make_intermediate_size`, and `image_memory_limit` never fire when processing happens in the browser. See [Hooks that no longer apply](#hooks-that-no-longer-apply) for replacements. |
 
 ## Debugging the WASM processor
 
