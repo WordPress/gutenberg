@@ -125,7 +125,7 @@
 		"label": "Audio",
 		"filePath": "library/audio.svg",
 		"collections": [ "core" ],
-		"keywords": [ "music" ]
+		"keywords": [ "music", "note" ]
 	},
 	{
 		"slug": "background",
@@ -546,14 +546,14 @@
 		"label": "Envelope",
 		"filePath": "library/envelope.svg",
 		"collections": [ "core" ],
-		"keywords": [ "email" ]
+		"keywords": [ "email", "letter", "post" ]
 	},
 	{
 		"slug": "error",
 		"label": "Error",
 		"filePath": "library/error.svg",
 		"collections": [ "core" ],
-		"keywords": [ "alert", "caution", "warning" ]
+		"keywords": [ "alert", "caution", "exclamation", "warning" ]
 	},
 	{
 		"slug": "external",
@@ -1801,7 +1801,7 @@
 		"slug": "unseen",
 		"label": "Unseen",
 		"filePath": "library/unseen.svg",
-		"keywords": [ "hide" ]
+		"keywords": [ "eye", "hide", "hidden" ]
 	},
 	{
 		"slug": "update",
