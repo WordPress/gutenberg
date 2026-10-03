@@ -53,6 +53,7 @@ const LayoutCardSaveExample = () => {
 
 const meta: Meta< typeof LayoutCardSaveExample > = {
 	title: 'Design System/Patterns/Save & Submit',
+	id: 'design-system-patterns-save-submit',
 	component: LayoutCardSaveExample,
 	parameters: {
 		controls: { disable: true },
