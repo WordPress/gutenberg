@@ -1,5 +1,8 @@
 export { useSettingsForBlockElement } from './hooks';
-export { ToolsPanelLocationContext } from './utils';
+export {
+	ToolsPanelLocationContext,
+	useToolsPanelItemPopoverProps,
+} from './utils';
 export {
 	default as TypographyPanel,
 	useHasTypographyPanel,

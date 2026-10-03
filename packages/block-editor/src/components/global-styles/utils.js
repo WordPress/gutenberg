@@ -14,6 +14,21 @@ const POPOVER_PROPS = {
 	},
 };
 
+const ITEM_POPOVER_PROPS = {
+	sidebar: {
+		placement: 'left-start',
+		// Panel padding (16px) + spacing (20px)
+		offset: 36,
+		shift: true,
+	},
+	page: {
+		placement: 'right-start',
+		// Panel padding (16px) + screen padding (12px) + canvas padding (16px) + spacing (20px)
+		offset: 64,
+		shift: true,
+	},
+};
+
 /**
  * Where the panels are rendered: `sidebar` or `page`.
  */
@@ -28,6 +43,11 @@ export function useToolsPanelDropdownMenuProps() {
 					POPOVER_PROPS[ location ] ?? POPOVER_PROPS.sidebar,
 			}
 		: {};
+}
+
+export function useToolsPanelItemPopoverProps() {
+	const location = useContext( ToolsPanelLocationContext );
+	return ITEM_POPOVER_PROPS[ location ] ?? ITEM_POPOVER_PROPS.sidebar;
 }
 
 /**
