@@ -90,7 +90,11 @@ export function NoteThread( {
 			return;
 		}
 
-		// Drop the highlight, unless another note (possibly on the same block) now owns it.
+		/*
+		 * Drop the highlight, unless another note (possibly on the same block) now owns it.
+		 * The block highlight only clears itself on `SELECT_BLOCK`, so moving the caret to
+		 * another block or clearing the block selection relies on this to reset it.
+		 */
 		if ( ! isNoteFocused ) {
 			// Discard a hover toggle still in flight so it can't re-highlight afterwards.
 			debouncedToggleBlockHighlight.cancel();

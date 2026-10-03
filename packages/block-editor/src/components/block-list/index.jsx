@@ -42,28 +42,28 @@ function Root( { className, ...settings } ) {
 		isPreviewMode,
 		editedContentOnlySection,
 	} = useSelect( ( select ) => {
-		const {
-			getSettings,
-			isTyping,
-			hasBlockSpotlight,
-			getEditedContentOnlySection,
-		} = unlock( select( blockEditorStore ) );
+		const { getSettings, isTyping, getEditedContentOnlySection } = unlock(
+			select( blockEditorStore )
+		);
 		const {
 			outlineMode,
 			focusMode,
 			isPreviewMode: _isPreviewMode,
 		} = getSettings();
+		const _editedContentOnlySection = getEditedContentOnlySection();
 		return {
 			isOutlineMode: outlineMode && ! isTyping(),
 			/*
-			 * Spotlight fades everything but the block being worked on, which
-			 * has nothing to offer a canvas that cannot be edited — a preview
-			 * would just render most of its content faded out.
+			 * A preview cannot be edited, so nothing should fade there.
+			 * Editing a content-only section dims the rest of the canvas the
+			 * same way the user preference does. Nothing else switches the
+			 * fade on: notes mark their block with its outline instead.
 			 */
 			isFocusMode:
-				! _isPreviewMode && ( focusMode || hasBlockSpotlight() ),
+				! _isPreviewMode &&
+				( focusMode || !! _editedContentOnlySection ),
 			isPreviewMode: _isPreviewMode,
-			editedContentOnlySection: getEditedContentOnlySection(),
+			editedContentOnlySection: _editedContentOnlySection,
 		};
 	}, [] );
 	const registry = useRegistry();
