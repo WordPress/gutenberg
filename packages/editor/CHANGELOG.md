@@ -10,6 +10,7 @@
 
 ### Bug Fixes
 
+-   Notes: Truncate a collapsed long note to the text that fits, rather than clipping it with CSS. What "Show more" hides is now out of the tab order and out of the accessibility tree, the cut is marked with an ellipsis, the toggle carries `aria-expanded` and `aria-controls`, and expanding moves the reading position to the start of the note instead of leaving it below the text ([#81459](https://github.com/WordPress/gutenberg/pull/81459)).
 -   Keep post actions and note actions menus dismissible when their triggers become disabled. Close the View menu when it becomes unavailable ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
 -   Remove redundant menu groups from the mode switcher and preview menu, and associate the Editor label with its radio group ([#83792](https://github.com/WordPress/gutenberg/pull/83792)).
 -   Error boundary: Explicitly announce the error title and description, excluding action labels ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
