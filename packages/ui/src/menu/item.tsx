@@ -98,6 +98,7 @@ function ItemContent( {
 	const hasTrailing = Children.toArray( trailing ).some(
 		( child ) => child !== ''
 	);
+	const [ label, ...descriptions ] = Children.toArray( children );
 
 	/*
 	 * Content comes first in the DOM because Base UI falls back to the item's
@@ -107,9 +108,7 @@ function ItemContent( {
 	return (
 		<>
 			<span className={ styles[ 'item-content' ] }>
-				<span className={ styles[ 'item-children' ] }>
-					{ children }
-				</span>
+				<span className={ styles[ 'item-children' ] }>{ label }</span>
 				{ hasSuffix && (
 					<span className={ styles[ 'item-suffix' ] }>
 						{ suffix }
@@ -126,6 +125,16 @@ function ItemContent( {
 					</span>
 				) }
 			</span>
+			{ descriptions.length > 0 && (
+				<span
+					className={ clsx(
+						styles[ 'item-descriptions' ],
+						hasPrefix && styles[ 'has-prefix' ]
+					) }
+				>
+					{ descriptions }
+				</span>
+			) }
 			{ hasPrefix && (
 				<span aria-hidden="true" className={ styles[ 'item-prefix' ] }>
 					{ prefix }
