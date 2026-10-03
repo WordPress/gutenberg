@@ -482,7 +482,7 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	 *
 	 * @return array<non-empty-string, array{ input: string, expected: string }>
 	 */
-	public function data_sanitize_inline_svg() {
+	public function data_sanitize_inline_svg(): array {
 		/*
 		 * WordPress 7.1 preserves the `xmlns:xlink` namespace attribute when
 		 * serializing inline SVG through WP_HTML_Processor; WordPress 7.0 strips
