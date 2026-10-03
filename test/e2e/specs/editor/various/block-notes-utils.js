@@ -115,7 +115,7 @@ class BlockNoteUtils {
 		await expect(
 			this.#page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: `Note: ${ content }` } )
+				.getByRole( 'listitem', { name: `Note: ${ content }` } )
 		).toBeVisible();
 	}
 
