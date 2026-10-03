@@ -14,7 +14,7 @@ exports[`design token fallback build plugin parity > transforms supported CSS in
 "/* Token references in CSS comments are not transformed: var(--wpds-border-radius-sm). */
 .fixture {
 	color: var(--wpds-color-foreground-content-neutral, #1e1e1e);
-	content: "var(--wpds-border-radius-sm, 2px)";
+	content: "var(--wpds-border-radius-sm)";
 }
 "
 `;

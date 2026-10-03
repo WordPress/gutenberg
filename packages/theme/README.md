@@ -306,6 +306,8 @@ These rules validate design token usage in CSS. Enable them in your Stylelint co
 
 Reports references to unknown `--wpds-*` tokens.
 
+The rule checks CSS `var()` references. It ignores token-like text in strings and URLs.
+
 ### `plugin-wpds/no-setting-wpds-custom-properties`
 
 Reports definitions or overrides in the `--wpds-*` namespace.
@@ -328,6 +330,8 @@ The build plugins inject generated fallbacks into bare `var(--wpds-*)` reference
 | `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks`                 | Vite          | JS/TS |
 
 Existing fallbacks are unchanged. An unknown token in a bare reference in transformed values fails the build.
+
+The PostCSS plugin leaves token-like text in CSS strings and URLs unchanged.
 
 The JavaScript plugins treat token references in string values, JSX attribute values, and static template parts as CSS. This includes tagged templates such as `String.raw`. They leave comments, regular expressions, property names, module paths, JSX text, and TypeScript types unchanged. Token names assembled across template expressions are not resolved. As before, a token reference in a runtime message string is also treated as CSS.
 
