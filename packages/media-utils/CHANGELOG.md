@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Route uploads started from the editor's media modal through the client-side media pipeline instead of `async-upload.php`, so they are processed the same way as a file dropped on a block ([#82473](https://github.com/WordPress/gutenberg/pull/82473)).
 -   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
 -   `MediaUpload`: Fix `allowedTypes` being ignored when `gallery` prop is `true` ([#78257](https://github.com/WordPress/gutenberg/pull/78257)).
 
