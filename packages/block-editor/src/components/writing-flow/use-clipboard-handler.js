@@ -4,6 +4,7 @@ import {
 	getBlockTransforms,
 	hasBlockSupport,
 	switchToBlockType,
+	createBlock,
 } from '@wordpress/blocks';
 import {
 	documentHasSelection,
@@ -61,6 +62,7 @@ export default function useClipboardHandler() {
 		flashBlock,
 		removeBlocks,
 		replaceBlocks,
+		updateBlockAttributes,
 		__unstableDeleteSelection,
 		__unstableExpandSelection,
 		__unstableSplitSelection,
@@ -209,6 +211,40 @@ export default function useClipboardHandler() {
 							return accumulator;
 						}, [] )
 						.flat();
+
+					if (
+						selectedBlockClientIds.length === 1 &&
+						blocks.length === 1
+					) {
+						const selectedName = getBlockName(
+							selectedBlockClientIds[ 0 ]
+						);
+						// Attempt to transform to the selected block type.
+						const transformed = switchToBlockType(
+							blocks[ 0 ],
+							selectedName
+						);
+						if ( transformed?.length === 1 ) {
+							const block = transformed[ 0 ];
+							const emptyBlock = createBlock( selectedName );
+							const updates = {};
+							for ( const attributeName in block.attributes ) {
+								if (
+									block.attributes[ attributeName ] !==
+									emptyBlock.attributes[ attributeName ]
+								) {
+									updates[ attributeName ] =
+										block.attributes[ attributeName ];
+								}
+							}
+							event.preventDefault();
+							updateBlockAttributes(
+								selectedBlockClientIds[ 0 ],
+								updates
+							);
+							return;
+						}
+					}
 				} else {
 					blocks = pasteHandler( {
 						HTML: html,

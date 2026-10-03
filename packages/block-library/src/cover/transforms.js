@@ -10,12 +10,21 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
-			transform: ( { caption, url, alt, align, id, anchor, style } ) =>
+			transform: ( {
+				caption,
+				url,
+				blob,
+				alt,
+				align,
+				id,
+				anchor,
+				style,
+			} ) =>
 				createBlock(
 					'core/cover',
 					{
 						dimRatio: 50,
-						url,
+						url: url ?? blob,
 						alt,
 						align,
 						id,
