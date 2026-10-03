@@ -10,6 +10,7 @@
 
 ### Bug Fixes
 
+-   `PostLockedModal`: Show the modal while real-time collaboration is enabled when the post's edit lock belongs to an editor without collaboration support, such as the classic editor or a page builder. Those sessions do not merge changes, so suppressing the modal let two people edit at once and the second save overwrote the first ([#82245](https://github.com/WordPress/gutenberg/pull/82245)).
 -   Keep post actions and note actions menus dismissible when their triggers become disabled. Close the View menu when it becomes unavailable ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
 -   Remove redundant menu groups from the mode switcher and preview menu, and associate the Editor label with its radio group ([#83792](https://github.com/WordPress/gutenberg/pull/83792)).
 -   Error boundary: Explicitly announce the error title and description, excluding action labels ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).

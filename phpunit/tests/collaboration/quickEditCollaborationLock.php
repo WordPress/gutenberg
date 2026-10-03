@@ -39,6 +39,8 @@ class Tests_Collaboration_QuickEditCollaborationLock extends WP_UnitTestCase {
 	public function tear_down() {
 		delete_post_meta( self::$post_id, '_edit_lock' );
 		delete_post_meta( self::$post_id, '_edit_last' );
+		delete_post_meta( self::$post_id, GUTENBERG_COLLABORATIVE_SESSION_META_KEY );
+		wp_cache_delete( self::$post_id, GUTENBERG_COLLABORATIVE_LOCK_CACHE_GROUP );
 		unset( $_POST['post_ID'], $_POST['_inline_edit'], $_REQUEST['_inline_edit'] );
 
 		parent::tear_down();
@@ -46,6 +48,15 @@ class Tests_Collaboration_QuickEditCollaborationLock extends WP_UnitTestCase {
 
 	private function set_edit_lock( int $user_id, int $age = 0 ) {
 		update_post_meta( self::$post_id, '_edit_lock', ( time() - $age ) . ':' . $user_id );
+	}
+
+	/**
+	 * Marks a user as editing the post in a collaborative editor.
+	 *
+	 * @param int $user_id User in the collaborative session.
+	 */
+	private function set_collaborative_session( int $user_id ) {
+		gutenberg_mark_collaborative_edit_session( self::$post_id, $user_id );
 	}
 
 	private function prime_inline_save_request() {
@@ -97,6 +108,7 @@ class Tests_Collaboration_QuickEditCollaborationLock extends WP_UnitTestCase {
 
 	public function test_heartbeat_removes_user_details_from_other_user_entries() {
 		$this->set_edit_lock( self::$editor_id );
+		$this->set_collaborative_session( self::$editor_id );
 		$key = 'post-' . self::$post_id;
 
 		$response = gutenberg_filter_locked_posts_heartbeat_for_rtc(
@@ -116,6 +128,23 @@ class Tests_Collaboration_QuickEditCollaborationLock extends WP_UnitTestCase {
 			array( 'text' => 'Currently being edited' ),
 			$response['wp-check-locked-posts'][ $key ]
 		);
+	}
+
+	public function test_heartbeat_keeps_user_details_when_the_lock_is_not_collaborative() {
+		$this->set_edit_lock( self::$editor_id );
+		$key       = 'post-' . self::$post_id;
+		$lock_data = array(
+			'text'          => 'Editor is currently editing',
+			'avatar_src'    => 'https://example.com/avatar.png',
+			'avatar_src_2x' => 'https://example.com/avatar-2x.png',
+		);
+
+		$response = gutenberg_filter_locked_posts_heartbeat_for_rtc(
+			array( 'wp-check-locked-posts' => array( $key => $lock_data ) ),
+			array( 'wp-check-locked-posts' => array( $key ) )
+		);
+
+		$this->assertSame( $lock_data, $response['wp-check-locked-posts'][ $key ] );
 	}
 
 	public function test_inline_save_guard_is_registered_on_core_quick_edit_ajax_hook() {
