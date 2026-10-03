@@ -5,6 +5,7 @@
 ### New Features
 
 -   Add the `justifySpaceAround` icon ([#83519](https://github.com/WordPress/gutenberg/pull/83519)).
+-   Add the `formInput` icon, used by the Global Styles form control screens ([#81645](https://github.com/WordPress/gutenberg/pull/81645)).
 
 ### Enhancements
 
