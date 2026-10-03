@@ -282,10 +282,15 @@ test.describe( 'Accordion', () => {
 			],
 		} );
 
+		// Accordion Item has little of its own click target in the canvas, so
+		// select the heading first and then its parent item.
 		await editor.canvas
-			.getByRole( 'document', { name: 'Block: Accordion Item' } )
-			.first()
+			.getByRole( 'document', { name: 'Block: Accordion Heading' } )
+			.filter( { hasText: 'Item 1' } )
 			.click();
+		await editor.clickBlockToolbarButton(
+			'Select parent block: Accordion Item'
+		);
 		await editor.clickBlockOptionsMenuItem( 'Add before' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
