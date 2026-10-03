@@ -4,6 +4,7 @@ import { useMemo, useState } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useViewportMatch } from '@wordpress/compose';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { Button, __experimentalHStack as HStack } from '@wordpress/components';
 import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
@@ -14,6 +15,7 @@ import { unlock } from '../../lock-unlock';
 const { GlobalStylesUIWrapper, GlobalStylesActionMenu } =
 	unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
+const { ToolsPanelLocationContext } = unlock( blockEditorPrivateApis );
 
 const GlobalStylesPageActions = ( {
 	isStyleBookOpened,
@@ -99,11 +101,13 @@ export default function SidebarGlobalStyles() {
 			headingLevel={ 2 }
 		>
 			<div className="edit-site-styles__content">
-				<GlobalStylesUIWrapper
-					path={ section }
-					onPathChange={ onChangeSection }
-					settings={ settings }
-				/>
+				<ToolsPanelLocationContext.Provider value="page">
+					<GlobalStylesUIWrapper
+						path={ section }
+						onPathChange={ onChangeSection }
+						settings={ settings }
+					/>
+				</ToolsPanelLocationContext.Provider>
 			</div>
 		</Page>
 	);
