@@ -43,6 +43,7 @@ const meta: Meta< typeof Autocomplete.Root > = {
 		'Autocomplete.Value': Autocomplete.Value,
 		'Autocomplete.Empty': Autocomplete.Empty,
 		'Autocomplete.Status': Autocomplete.Status,
+		'Autocomplete.Trigger': Autocomplete.Trigger,
 		'Autocomplete.Clear': Autocomplete.Clear,
 	},
 	argTypes: {

@@ -409,7 +409,11 @@ export function useNoteActions() {
 		}
 	};
 
-	return { onCreate, onEdit, onDelete };
+	return {
+		onCreate,
+		onEdit,
+		onDelete,
+	};
 }
 
 export function useEnableFloatingSidebar( enabled = false ) {
