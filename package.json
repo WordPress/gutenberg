@@ -16,7 +16,7 @@
 	},
 	"engines": {
 		"node": ">=24.18.0",
-		"npm": ">=11.18.0"
+		"npm": ">=12.0.2"
 	},
 	"devEngines": {
 		"runtime": {
@@ -25,7 +25,7 @@
 		},
 		"packageManager": {
 			"name": "npm",
-			"version": ">=11.18.0",
+			"version": ">=12.0.2",
 			"onFail": "error"
 		}
 	},
@@ -83,8 +83,6 @@
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.63.0",
-		"@types/react": "^18.3.27",
-		"@types/react-dom": "^18.3.1",
 		"@typescript/native": "npm:typescript@^7.0.2",
 		"@wordpress/env": "file:./packages/env",
 		"@wordpress/eslint-tools": "file:./tools/eslint",
@@ -226,5 +224,17 @@
 		"tools/*",
 		"widgets/*",
 		"!test/ai-development"
-	]
+	],
+	"allowScripts": {
+		"@parcel/watcher": false,
+		"@swc/core": false,
+		"core-js": false,
+		"core-js-pure": false,
+		"esbuild": false,
+		"file:packages/icons": true,
+		"fs-ext-extra-prebuilt": false,
+		"fsevents": false,
+		"nx": false,
+		"unrs-resolver": false
+	}
 }

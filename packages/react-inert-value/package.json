@@ -56,5 +56,10 @@
 	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	}
 }
