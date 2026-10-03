@@ -104,9 +104,15 @@
 		},
 		"shadow": {
 			"__experimentalSkipSerialization": true
+		},
+		"dimensions": {
+			"minWidth": true,
+			"minHeight": true,
+			"__experimentalSkipSerialization": true
 		}
 	},
 	"selectors": {
+		"dimensions": ".wp-block-video video",
 		"shadow": ".wp-block-video video"
 	},
 	"editorStyle": "wp-block-video-editor",
