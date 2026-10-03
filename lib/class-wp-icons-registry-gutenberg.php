@@ -974,7 +974,12 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			// An external `.svg` file is XML, but sanitize_inline_svg() expects an
 			// inline HTML fragment. A dedicated XML sanitizer should handle this
 			// in the future.
-			$content = $this->sanitize_inline_svg( file_get_contents( $icon_path ) );
+			$content = file_get_contents( $icon_path );
+			if ( is_string( $content ) ) {
+				$content = $this->sanitize_inline_svg( $content );
+			} else {
+				$content = false;
+			}
 
 			if ( empty( $content ) ) {
 				wp_trigger_error(
