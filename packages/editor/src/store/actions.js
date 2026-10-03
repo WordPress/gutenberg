@@ -1,6 +1,7 @@
 import { speak } from '@wordpress/a11y';
 import apiFetch from '@wordpress/api-fetch';
 import { escapeHTML } from '@wordpress/escape-html';
+import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
 import warning from '@wordpress/warning';
 import {
@@ -380,9 +381,12 @@ export function refreshPost() {
 
 /**
  * Action for trashing the current post in the editor.
+ *
+ * @param {Object}  [options]       Options.
+ * @param {boolean} [options.force] Whether to delete the post permanently instead of moving it to the trash.
  */
 export const trashPost =
-	() =>
+	( { force = false } = {} ) =>
 	async ( { select, dispatch, registry } ) => {
 		const postTypeSlug = select.getCurrentPostType();
 		const postType = await registry
@@ -394,11 +398,17 @@ export const trashPost =
 		try {
 			const post = select.getCurrentPost();
 			await apiFetch( {
-				path: `/${ restNamespace }/${ restBase }/${ post.id }`,
+				path: addQueryArgs(
+					`/${ restNamespace }/${ restBase }/${ post.id }`,
+					force ? { force } : {}
+				),
 				method: 'DELETE',
 			} );
 
-			await dispatch.savePost();
+			// A permanently deleted post has nothing left to save.
+			if ( ! force ) {
+				await dispatch.savePost();
+			}
 		} catch ( error ) {
 			registry
 				.dispatch( noticesStore )
