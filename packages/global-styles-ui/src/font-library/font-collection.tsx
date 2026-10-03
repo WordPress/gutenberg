@@ -88,7 +88,8 @@ function FontCollection( { slug }: { slug: string } ) {
 	const [ renderConfirmDialog, setRenderConfirmDialog ] = useState(
 		requiresPermission && ! getGoogleFontsPermissionFromStorage()
 	);
-	const { installFonts, isInstalling } = useContext( FontLibraryContext );
+	const { installFonts, isInstalling, baseCustomFonts } =
+		useContext( FontLibraryContext );
 	const { record: selectedCollection, isResolving: isLoading } =
 		useEntityRecord< FontCollectionType >( 'root', 'fontCollection', slug );
 
@@ -163,6 +164,29 @@ function FontCollection( { slug }: { slug: string } ) {
 	};
 
 	const fontToInstallOutline = getFontsOutline( fontsToInstall );
+	const installedFontsOutline = getFontsOutline( baseCustomFonts );
+
+	const isFontFaceInstalled = ( face: FontFace ) =>
+		!! selectedFont &&
+		isFontFontFaceInOutline(
+			selectedFont.slug,
+			selectedFont.fontFace ? face : null, // If the font has no fontFace, we want to check if the font is installed
+			installedFontsOutline
+		);
+
+	const installableFontFaces = selectedFont?.fontFace?.filter(
+		( face ) => ! isFontFaceInstalled( face )
+	);
+
+	const isAllInstalled =
+		!! selectedFont &&
+		( selectedFont.fontFace?.length
+			? installableFontFaces?.length === 0
+			: isFontFontFaceInOutline(
+					selectedFont.slug,
+					null,
+					installedFontsOutline
+				) );
 
 	const resetFontsToInstall = () => {
 		setFontsToInstall( [] );
@@ -175,18 +199,20 @@ function FontCollection( { slug }: { slug: string } ) {
 
 	// Check if any fonts are selected.
 	const isIndeterminate =
-		selectFontCount > 0 &&
-		selectFontCount !== selectedFont?.fontFace?.length;
+		selectFontCount > 0 && selectFontCount !== installableFontFaces?.length;
 
-	// Check if all fonts are selected.
-	const isSelectAllChecked =
-		selectFontCount === selectedFont?.fontFace?.length;
+	// Check if all installable fonts are selected.
+	const isSelectAllChecked = selectFontCount === installableFontFaces?.length;
 
 	// Toggle select all fonts.
 	const toggleSelectAll = () => {
 		const newFonts: FontFamily[] = [];
 		if ( ! isSelectAllChecked && selectedFont ) {
-			newFonts.push( selectedFont );
+			newFonts.push(
+				selectedFont.fontFace
+					? { ...selectedFont, fontFace: installableFontFaces }
+					: selectedFont
+			);
 		}
 
 		setFontsToInstall( newFonts );
@@ -434,9 +460,10 @@ function FontCollection( { slug }: { slug: string } ) {
 							<WCCheckboxControl
 								className="font-library__select-all"
 								label={ __( 'Select all' ) }
-								checked={ isSelectAllChecked }
+								checked={ isSelectAllChecked || isAllInstalled }
 								onChange={ toggleSelectAll }
 								indeterminate={ isIndeterminate }
+								disabled={ isAllInstalled }
 							/>
 							<VStack spacing={ 0 }>
 								{ /*
@@ -467,6 +494,9 @@ function FontCollection( { slug }: { slug: string } ) {
 																? face
 																: null, // If the font has no fontFace, we want to check if the font is in the outline
 															fontToInstallOutline
+														) }
+														installed={ isFontFaceInstalled(
+															face
 														) }
 													/>
 												</li>
