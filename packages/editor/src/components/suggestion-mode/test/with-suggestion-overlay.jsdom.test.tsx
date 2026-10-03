@@ -7,7 +7,7 @@
  *    clear-and-re-edit cycle, and handing text/format edits off to the
  *    marker path instead of the overlay.
  * 2. `mergeOverlayAttributes` — replace-vs-deep-merge contract for
- *    overlapping overlay keys, including the `style`/`metadata` deep merge
+ *    overlapping overlay keys, including the `metadata` deep merge
  *    that keeps untouched fields alive.
  */
 import { beforeAll, describe, expect, it, vi } from 'vitest';
@@ -345,6 +345,85 @@ describe( 'withSuggestionOverlay', () => {
 		}
 	} );
 
+	it( 'evaluates updater functions against the overlay, including updates before a render', () => {
+		function UpdaterBlock( { attributes, setAttributes }: any ) {
+			return (
+				<>
+					<div data-testid="content">{ attributes.content }</div>
+					<button
+						type="button"
+						onClick={ () => {
+							const append = ( current: any ) => ( {
+								content: current.content + '!',
+							} );
+							setAttributes( append );
+							setAttributes( append );
+						} }
+					>
+						edit
+					</button>
+				</>
+			);
+		}
+		const WrappedUpdater = withSuggestionOverlay( UpdaterBlock );
+		const setAttributes = vi.fn();
+		renderWithProviders(
+			<WrappedUpdater
+				clientId="a"
+				name="core/paragraph"
+				attributes={ { content: 'Hello' } }
+				setAttributes={ setAttributes }
+			/>,
+			{ intent: 'suggest' }
+		);
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+
+		expect( setAttributes ).not.toHaveBeenCalled();
+		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
+			'Hello!!!!'
+		);
+	} );
+
+	it( 'hands a multi-selection update to the real setter so every selected block changes', () => {
+		// The real setter applies the change to each selected block; the
+		// store interceptor then captures one suggestion per block.
+		registerBlockType( 'core/test-multi', {
+			apiVersion: 3,
+			title: 'Test',
+			category: 'text',
+			attributes: { content: { type: 'string', default: '' } },
+			save() {
+				return null;
+			},
+		} );
+		const first = createBlock( 'core/test-multi', { content: 'One' } );
+		const second = createBlock( 'core/test-multi', { content: 'Two' } );
+
+		const setAttributes = vi.fn();
+		const { registry } = renderWithProviders(
+			<Wrapped
+				clientId={ first.clientId }
+				name="core/test-multi"
+				attributes={ first.attributes }
+				setAttributes={ setAttributes }
+			/>,
+			{ intent: 'suggest', blocks: [ first, second ] }
+		);
+		act( () => {
+			registry
+				.dispatch( blockEditorStore )
+				.multiSelect( first.clientId, second.clientId );
+		} );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			content: 'proposed',
+		} );
+	} );
+
 	it( 'writes setAttributes through (no overlay) for a pending-insert block in Suggest intent', () => {
 		// A pending-insert block has no "before" worth preserving — the
 		// block itself is the suggestion. Routing edits through the
@@ -611,22 +690,21 @@ describe( 'mergeOverlayAttributes', () => {
 		).toEqual( { content: 'Hello', level: 3 } );
 	} );
 
-	it( 'one-level merges the style attribute so untouched fields survive', () => {
+	it( 'replaces the style attribute wholesale, like setAttributes', () => {
+		// A reset sends a style object without the cleared fields; merging
+		// would bring them back.
 		expect(
 			mergeOverlayAttributes(
 				{
 					style: {
 						typography: { fontSize: '16px' },
-						color: 'red',
+						color: { background: 'red' },
 					},
 				},
-				{ style: { color: 'blue' } }
+				{ style: { color: { background: 'red' } } }
 			)
 		).toEqual( {
-			style: {
-				typography: { fontSize: '16px' },
-				color: 'blue',
-			},
+			style: { color: { background: 'red' } },
 		} );
 	} );
 
@@ -651,7 +729,7 @@ describe( 'mergeOverlayAttributes', () => {
 	} );
 
 	it( 'replaces non-deep-merge object attributes wholesale', () => {
-		// `metadata` and `style` are deep-merged; everything else is
+		// `metadata` is deep-merged; everything else is
 		// replaced even if it happens to be an object.
 		expect(
 			mergeOverlayAttributes(
