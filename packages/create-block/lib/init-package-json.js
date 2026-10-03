@@ -18,6 +18,7 @@ module.exports = async ( {
 	isDynamicVariant,
 	customPackageJSON,
 	rootDirectory,
+	includeTests,
 } ) => {
 	info( '' );
 	info( 'Creating a "package.json" file.' );
