@@ -11,6 +11,7 @@
 
 ### Enhancements
 
+-   `ProgressBar`: Mark as not recommended and direct consumers to `Progress` from `@wordpress/ui`. ([#84021](https://github.com/WordPress/gutenberg/pull/84021))
 -   `CheckboxControl`: Mark as not recommended for use in a WordPress environment, in favour of `CheckboxControl` from `@wordpress/ui` ([#83771](https://github.com/WordPress/gutenberg/pull/83771)).
 -   `RadioControl`: Match the `@wordpress/ui` Radio colors ([#83270](https://github.com/WordPress/gutenberg/pull/83270)).
 -   `Notice`: Mark as not recommended in favor of `Notice` from `@wordpress/ui` ([#82685](https://github.com/WordPress/gutenberg/pull/82685)).

@@ -18,9 +18,8 @@ const meta: Meta< StoryArgs > = {
 	},
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Not yet recommended.',
 		},
 	},
 	args: { value: 60 },
