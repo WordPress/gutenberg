@@ -141,7 +141,7 @@ const MetaBoxesMain = forwardRef( ( _props, ref ) => {
 		const { get } = select( preferencesStore );
 		const { isMetaBoxLocationVisible } = select( editPostStore );
 		return [
-			get( 'core/edit-post', 'metaBoxesMainIsOpen' ),
+			!! get( 'core/edit-post', 'metaBoxesMainIsOpen' ),
 			get( 'core/edit-post', 'metaBoxesMainOpenHeight' ),
 			isMetaBoxLocationVisible( 'normal' ) ||
 				isMetaBoxLocationVisible( 'advanced' ) ||
