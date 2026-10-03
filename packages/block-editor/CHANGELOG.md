@@ -13,6 +13,10 @@
 -   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
 -   `LinkControl`: Add a `transformSuggestions` prop, so a consumer can filter, order or add to the search suggestions before they are shown ([#83652](https://github.com/WordPress/gutenberg/pull/83652)).
 
+### Deprecations
+
+-   `Autocomplete`: deprecate the component. Pass completers to `RichText` through its `autocompleters` prop ([#83542](https://github.com/WordPress/gutenberg/pull/83542)).
+
 ### Bug Fixes
 
 -   Fix the translator comments for the "blocks moved" and "blocks added" screen reader messages, which described the count as a block name ([#83555](https://github.com/WordPress/gutenberg/pull/83555)).

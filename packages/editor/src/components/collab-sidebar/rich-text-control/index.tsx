@@ -3,8 +3,8 @@ import type { ReactNode } from 'react';
 import {
 	SlotFillProvider,
 	privateApis as componentsPrivateApis,
-	__unstableUseAutocompleteProps as useAutocompleteProps,
 } from '@wordpress/components';
+import type { __unstableUseAutocompleteProps } from '@wordpress/components';
 import {
 	useMergeRefs,
 	useRefEffect,
@@ -31,9 +31,10 @@ import FormatEdit from './format-edit';
 // `@wordpress/rich-text` dependency; the `Validated` wrapper adds the same
 // required/validity treatment the other form controls get. This module is
 // the "assembly" that injects the rich-text wiring into it.
-const { ValidatedContentEditableControl: RichTextControlShell } = unlock(
-	componentsPrivateApis
-);
+const {
+	ValidatedContentEditableControl: RichTextControlShell,
+	useAutocompleteProps,
+} = unlock( componentsPrivateApis );
 
 // `KeyboardShortcutContext` / `InputEventContext` are the same context objects
 // that format types' `RichTextShortcut` / `RichTextInputEvent` read. Format
@@ -50,9 +51,10 @@ const {
 } = unlock( richTextPrivateApis );
 
 // The completer shape isn't exported from `@wordpress/components`, so derive
-// it from the autocomplete hook's own parameter type.
+// it from the autocomplete hook's parameter type. The deprecated export has
+// the same signature as the private hook and is only used here as a type.
 type Completer = Parameters<
-	typeof useAutocompleteProps
+	typeof __unstableUseAutocompleteProps
 >[ 0 ][ 'completers' ][ number ];
 
 // Shared empty reference so the default `completers` value is stable across

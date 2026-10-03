@@ -26,6 +26,11 @@
 
 -   Deprecate `Badge` in the private APIs; use `Badge` from `@wordpress/ui` instead. ([#82379](https://github.com/WordPress/gutenberg/pull/82379)).
 
+### Deprecations
+
+-   `Autocomplete`: deprecate the component. In the block editor, pass completers to `RichText` through its `autocompleters` prop ([#83542](https://github.com/WordPress/gutenberg/pull/83542)).
+-   `__unstableUseAutocompleteProps`: deprecate the export. The hook is now a private API ([#83542](https://github.com/WordPress/gutenberg/pull/83542)).
+
 ### Bug Fixes
 
 -   `Popover`: Keep the `will-change: transform` hint only while the popover is moving, so its content is no longer left on a compositing layer that Chrome can render blurry ([#77359](https://github.com/WordPress/gutenberg/pull/77359)).

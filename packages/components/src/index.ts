@@ -25,7 +25,7 @@ export { __unstableMotion, __unstableAnimatePresence } from './animation';
 export { default as AnglePickerControl } from './angle-picker-control';
 export {
 	default as Autocomplete,
-	useAutocompleteProps as __unstableUseAutocompleteProps,
+	useDeprecatedAutocompleteProps as __unstableUseAutocompleteProps,
 } from './autocomplete';
 export { default as BaseControl, useBaseControlProps } from './base-control';
 export {
