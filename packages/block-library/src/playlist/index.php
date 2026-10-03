@@ -29,7 +29,8 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 			if ( 'core/playlist-track' === $inner_block->name ) {
 				$track_attributes = $inner_block->attributes;
 
-				if ( empty( $track_attributes['id'] ) ) {
+				// A track must have an attachment ID or a playable source URL to render.
+				if ( empty( $track_attributes['id'] ) && empty( $track_attributes['src'] ) ) {
 					continue;
 				}
 
