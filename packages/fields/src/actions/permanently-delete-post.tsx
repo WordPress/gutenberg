@@ -25,7 +25,12 @@ const permanentlyDeletePost: Action< PostWithPermissions > = {
 			return false;
 		}
 		const { status, permissions } = item;
-		return status === 'trash' && permissions?.delete;
+		if ( ! status || status === 'auto-draft' || ! permissions?.delete ) {
+			return false;
+		}
+
+		// Without the trash link, deleting is permanent.
+		return status === 'trash' || ! item._links?.[ 'wp:action-trash' ];
 	},
 	hideModalHeader: true,
 	modalFocusOnMount: 'firstContentElement',
