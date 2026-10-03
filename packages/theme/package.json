@@ -159,6 +159,7 @@
 	"scripts": {
 		"build:default-ramps": "node bin/generate-default-ramps/index.ts",
 		"build:tokens": "node bin/generate-primitive-tokens/index.ts && node bin/build-design-tokens/index.ts",
+		"build:figma": "node bin/build-figma-tokens/index.ts",
 		"build": "npm run build:default-ramps && npm run build:tokens",
 		"lint:package-contents": "wp-validate-package-contents . --disallow-path src",
 		"postbuild": "prettier --write tokens/color.json tokens/modes prebuilt src/prebuilt src/color-ramps/lib/default-ramps.ts docs ../base-styles/internal/_wpds-token-fallbacks.scss"
