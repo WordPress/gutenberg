@@ -639,6 +639,21 @@ export function getEditorIntent( state ) {
 }
 
 /**
+ * Whether Undo would withdraw a pending suggestion that the core-data history
+ * does not know about. Only true while suggesting.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether a suggestion is available to undo.
+ */
+export function hasSuggestionUndo( state ) {
+	return (
+		getEditorIntent( state ) === EDITOR_INTENT_SUGGEST &&
+		!! state.hasSuggestionUndo
+	);
+}
+
+/**
  * Whether the editor is in a read-only intent.
  *
  * The `view` intent is offered in the Mode menu as a "Read-only preview of
