@@ -44,6 +44,7 @@
 		{ "path": "packages/notices" },
 		{ "path": "packages/preferences" },
 		{ "path": "packages/priority-queue" },
+		{ "path": "packages/react-inert-value" },
 		{ "path": "packages/report-flaky-tests" },
 		{ "path": "packages/report-flaky-tests/tsconfig.test.json" },
 		{ "path": "packages/server-side-render" },
