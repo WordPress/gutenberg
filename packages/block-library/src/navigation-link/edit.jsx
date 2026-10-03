@@ -10,15 +10,14 @@ import {
 	RichText,
 	useBlockProps,
 	store as blockEditorStore,
-	getColorClassName,
 	useInnerBlocksProps,
+	__experimentalUseColorProps as useColorProps,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { VisuallyHidden } from '@wordpress/ui';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { useMergeRefs, useInstanceId } from '@wordpress/compose';
-import { getColors } from '../navigation/edit/utils';
 import {
 	Controls,
 	LinkUI,
@@ -102,7 +101,6 @@ export default function NavigationLinkEdit( {
 
 	const {
 		isAtMaxNesting,
-		isTopLevelLink,
 		isParentOfSelectedBlock,
 		hasChildren,
 		parentBlockClientId,
@@ -136,7 +134,6 @@ export default function NavigationLinkEdit( {
 				isAtMaxNesting:
 					getBlockParentsByBlockName( clientId, NESTING_BLOCK_NAMES )
 						.length >= maxNestingLevel,
-				isTopLevelLink: isTopLevel,
 				isParentOfSelectedBlock: hasSelectedInnerBlock(
 					clientId,
 					true
@@ -278,13 +275,6 @@ export default function NavigationLinkEdit( {
 		setIsLinkOpen( false );
 	}
 
-	const {
-		textColor,
-		customTextColor,
-		backgroundColor,
-		customBackgroundColor,
-	} = getColors( context, ! isTopLevelLink );
-
 	function onKeyDown( event ) {
 		if ( isKeyboardEvent.primary( event, 'k' ) ) {
 			// Required to prevent the command center from opening,
@@ -303,6 +293,9 @@ export default function NavigationLinkEdit( {
 		? sprintf( 'navigation-link-edit-%d-desc', instanceId )
 		: undefined;
 
+	// Colors inherited from the parent Navigation block are deliberately not
+	// applied here. The list item inherits them from the navigation wrapper, or
+	// from the submenu container when it sits in a submenu.
 	const blockProps = useBlockProps( {
 		ref: useMergeRefs( [ setPopoverAnchor, listItemRef ] ),
 		className: clsx( 'wp-block-navigation-item', {
@@ -310,18 +303,9 @@ export default function NavigationLinkEdit( {
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
 			'has-child': hasChildren,
-			'has-text-color': !! textColor || !! customTextColor,
-			[ getColorClassName( 'color', textColor ) ]: !! textColor,
-			'has-background': !! backgroundColor || customBackgroundColor,
-			[ getColorClassName( 'background-color', backgroundColor ) ]:
-				!! backgroundColor,
 		} ),
 		'aria-describedby': missingEntityDescriptionId,
 		'aria-invalid': hasMissingEntity,
-		style: {
-			color: ! textColor && customTextColor,
-			backgroundColor: ! backgroundColor && customBackgroundColor,
-		},
 		onKeyDown,
 	} );
 
@@ -348,9 +332,22 @@ export default function NavigationLinkEdit( {
 		};
 	}
 
-	const classes = clsx( 'wp-block-navigation-item__content', {
-		'wp-block-navigation-link__placeholder': needsValidLink,
-	} );
+	// Color serialization is skipped so the block's own colors land on the
+	// anchor rather than the list item, which also wraps the submenu. Colors
+	// inherited from the parent Navigation block stay on the list item.
+	//
+	// `useColorProps` rather than `getColorClassesAndStyles`: it resolves a
+	// preset to an inline value as well as a class, so the color still shows
+	// in editor contexts that don't load the theme's palette stylesheet.
+	const contentColorProps = useColorProps( attributes );
+
+	const classes = clsx(
+		'wp-block-navigation-item__content',
+		contentColorProps.className,
+		{
+			'wp-block-navigation-link__placeholder': needsValidLink,
+		}
+	);
 
 	const missingText = getMissingText( type );
 	const invalidLinkHelpText = getInvalidLinkHelpText();
@@ -392,7 +389,7 @@ export default function NavigationLinkEdit( {
 					</VisuallyHidden>
 				) }
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
-				<a className={ classes }>
+				<a className={ classes } style={ contentColorProps.style }>
 					{ /* eslint-enable */ }
 					{ ! url && ! metadata?.bindings?.url ? (
 						<div className="wp-block-navigation-link__placeholder-text">
