@@ -12,6 +12,7 @@ import { FloatingContainer } from './floating-container';
 import { focusNoteThread } from './utils';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { useNoteLock } from './use-note-lock';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
@@ -31,6 +32,7 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
 	const isSubmittingRef = useRef( false );
+	const { lockedActions } = useNoteLock();
 
 	/*
 	 * Dismiss the form once focus leaves it. `useFocusOutside` keeps the form
@@ -69,7 +71,16 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 		toggleBlockSpotlight( clientId, false );
 	};
 
-	if ( selectedNote !== 'new' || ! clientId ) {
+	/*
+	 * A lock applied after the form opened leaves a stale `'new'` selection
+	 * behind, so the form is gated on render rather than only at its entry
+	 * points.
+	 */
+	if (
+		selectedNote !== 'new' ||
+		! clientId ||
+		lockedActions.has( 'create' )
+	) {
 		return null;
 	}
 
