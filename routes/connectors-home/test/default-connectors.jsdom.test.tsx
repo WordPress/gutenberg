@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
 	privateApis as connectorsPrivateApis,
@@ -25,10 +26,11 @@ const MASKED_API_KEY = '•'.repeat( 16 ) + 'fj39';
 function mockConnectorPlugin( {
 	isConnected,
 	currentApiKey,
+	...overrides
 }: {
 	isConnected: boolean;
 	currentApiKey: string;
-} ) {
+} & Partial< ReturnType< typeof useConnectorPlugin > > ) {
 	mockedUseConnectorPlugin.mockReturnValue( {
 		pluginStatus: 'active',
 		canInstallPlugins: true,
@@ -44,6 +46,9 @@ function mockConnectorPlugin( {
 		getButtonLabel: () => ( isConnected ? 'Edit' : 'Set up' ),
 		saveApiKey: vi.fn(),
 		removeApiKey: vi.fn(),
+		canDeactivate: false,
+		deactivatePlugin: vi.fn(),
+		...overrides,
 	} as unknown as ReturnType< typeof useConnectorPlugin > );
 }
 
@@ -129,5 +134,146 @@ describe( 'API key connector', () => {
 		expect(
 			screen.getByRole( 'button', { name: 'Save' } )
 		).toBeInTheDocument();
+	} );
+
+	describe( 'Deactivate button', () => {
+		it( 'is shown when the plugin can be deactivated', () => {
+			mockConnectorPlugin( {
+				isConnected: true,
+				currentApiKey: MASKED_API_KEY,
+				isExpanded: false,
+				canDeactivate: true,
+			} );
+
+			render( renderConnector( connector ) );
+
+			expect(
+				screen.getByRole( 'button', { name: 'Deactivate' } )
+			).toBeVisible();
+		} );
+
+		it( 'is not shown when the plugin cannot be deactivated', () => {
+			mockConnectorPlugin( {
+				isConnected: true,
+				currentApiKey: MASKED_API_KEY,
+				isExpanded: false,
+				canDeactivate: false,
+			} );
+
+			render( renderConnector( connector ) );
+
+			expect(
+				screen.queryByRole( 'button', { name: 'Deactivate' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'is not shown while the settings are expanded', () => {
+			mockConnectorPlugin( {
+				isConnected: true,
+				currentApiKey: MASKED_API_KEY,
+				isExpanded: true,
+				canDeactivate: true,
+			} );
+
+			render( renderConnector( connector ) );
+
+			expect(
+				screen.queryByRole( 'button', { name: 'Deactivate' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'moves focus to the main action button after deactivating', async () => {
+			const user = userEvent.setup();
+			const deactivatePlugin = vi.fn().mockResolvedValue( true );
+			mockConnectorPlugin( {
+				isConnected: true,
+				currentApiKey: MASKED_API_KEY,
+				isExpanded: false,
+				canDeactivate: true,
+				deactivatePlugin,
+			} );
+
+			render( renderConnector( connector ) );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Deactivate' } )
+			);
+
+			expect( deactivatePlugin ).toHaveBeenCalledTimes( 1 );
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'button', { name: 'Edit' } )
+				).toHaveFocus()
+			);
+		} );
+
+		it( 'keeps focus on the Deactivate button when it fails', async () => {
+			const user = userEvent.setup();
+			mockConnectorPlugin( {
+				isConnected: true,
+				currentApiKey: MASKED_API_KEY,
+				isExpanded: false,
+				canDeactivate: true,
+				deactivatePlugin: vi.fn().mockResolvedValue( false ),
+			} );
+
+			render( renderConnector( connector ) );
+
+			const button = screen.getByRole( 'button', {
+				name: 'Deactivate',
+			} );
+			await user.click( button );
+
+			expect( button ).toHaveFocus();
+		} );
+	} );
+} );
+
+describe( 'Application password connector', () => {
+	let connector: ConnectorConfig;
+
+	beforeEach( () => {
+		document.body.innerHTML = `<script type="application/json" id="wp-script-module-data-options-connectors-wp-admin">${ JSON.stringify(
+			{
+				connectors: {
+					'example-service': {
+						name: 'Example Service',
+						description: 'An example service.',
+						type: 'ai_provider',
+						authentication: {
+							method: 'application_password',
+							settingName: 'connectors_example_service',
+							keySource: 'database',
+							isConnected: true,
+						},
+						plugin: {
+							file: 'example-service/example-service.php',
+							isInstalled: true,
+							isActivated: true,
+						},
+					},
+				},
+			}
+		) }</script>`;
+
+		registerDefaultConnectors();
+		connector = unlock( select( connectorsStore ) ).getConnector(
+			'example-service'
+		);
+	} );
+
+	it( 'shows the Deactivate button when the plugin can be deactivated', () => {
+		mockConnectorPlugin( {
+			isConnected: true,
+			currentApiKey: '',
+			isExpanded: false,
+			canDeactivate: true,
+		} );
+
+		render( renderConnector( connector ) );
+
+		expect(
+			screen.getByRole( 'button', { name: 'Deactivate' } )
+		).toBeVisible();
 	} );
 } );
