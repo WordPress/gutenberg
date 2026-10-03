@@ -3403,9 +3403,6 @@
 	"packages/block-library/src/navigation/edit/unsaved-inner-blocks.jsx": {
 		"react-hooks/refs": {
 			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
 	"packages/block-library/src/navigation/save.jsx": {

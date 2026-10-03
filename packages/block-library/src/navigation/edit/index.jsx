@@ -21,7 +21,7 @@ import {
 	store as coreStore,
 	useEntityRecords,
 } from '@wordpress/core-data';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -36,14 +36,13 @@ import {
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { page } from '@wordpress/icons';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, serialize } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import useNavigationMenu from '../use-navigation-menu';
 import Placeholder from './placeholder';
 import ResponsiveWrapper from './responsive-wrapper';
 import NavigationInnerBlocks from './inner-blocks';
 import NavigationMenuNameControl from './navigation-menu-name-control';
-import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import NavigationMenuDeleteControl from './navigation-menu-delete-control';
 import useNavigationNotice from './use-navigation-notice';
 import OverlayMenuPreview from './overlay-menu-preview';
@@ -352,6 +351,16 @@ function Navigation( {
 		isError: createNavigationMenuIsError,
 	} = useCreateNavigationMenu( clientId );
 
+	const registry = useRegistry();
+	const isConvertingInnerBlocksRef = useRef( false );
+	const createNavigationMenuFromInnerBlocks = useCallback(
+		( title, blocks ) => {
+			isConvertingInnerBlocksRef.current = true;
+			return createNavigationMenu( title, blocks );
+		},
+		[ createNavigationMenu ]
+	);
+
 	const createUntitledEmptyNavigationMenu = async () => {
 		await createNavigationMenu( '' );
 	};
@@ -486,8 +495,11 @@ function Navigation( {
 		[ selectBlock, clientId, setRef ]
 	);
 
+	const isCreatedMenu =
+		createNavigationMenuIsSuccess && ref === createNavigationMenuPost?.id;
 	const isEntityAvailable =
-		! isNavigationMenuMissing && isNavigationMenuResolved;
+		! isNavigationMenuMissing &&
+		( isNavigationMenuResolved || isCreatedMenu );
 
 	// If the block has inner blocks, but no menu id, then these blocks are either:
 	// - inserted via a pattern.
@@ -557,10 +569,12 @@ function Navigation( {
 	// - there is a ref attribute pointing to a Navigation Post
 	// - the Navigation Post isn't available (hasn't resolved) yet.
 	const isLoading =
-		! hasResolvedNavigationMenus ||
-		isCreatingNavigationMenu ||
-		isConvertingClassicMenu ||
-		!! ( ref && ! isEntityAvailable && ! isConvertingClassicMenu );
+		! hasUnsavedBlocks &&
+		! isCreatedMenu &&
+		( ! hasResolvedNavigationMenus ||
+			isCreatingNavigationMenu ||
+			isConvertingClassicMenu ||
+			!! ( ref && ! isEntityAvailable && ! isConvertingClassicMenu ) );
 
 	const textDecoration = attributes.style?.typography?.textDecoration;
 
@@ -655,9 +669,29 @@ function Navigation( {
 		}
 
 		if ( createNavigationMenuIsSuccess ) {
-			handleUpdateMenu( createNavigationMenuPost?.id, {
-				focusNavigationBlock: true,
-			} );
+			if ( isConvertingInnerBlocksRef.current ) {
+				registry.batch( () => {
+					// Adopt the current blocks, including edits made during the request,
+					// so the entity handoff does not replace the selected block IDs.
+					const blocks = registry
+						.select( blockEditorStore )
+						.getBlocks( clientId );
+					registry
+						.dispatch( coreStore )
+						.editEntityRecord(
+							'postType',
+							'wp_navigation',
+							createNavigationMenuPost.id,
+							{ blocks, content: serialize( blocks ) }
+						);
+					handleUpdateMenu( createNavigationMenuPost.id );
+				} );
+				isConvertingInnerBlocksRef.current = false;
+			} else {
+				handleUpdateMenu( createNavigationMenuPost?.id, {
+					focusNavigationBlock: true,
+				} );
+			}
 
 			showNavigationMenuStatusNotice(
 				__( `Navigation Menu successfully created.` )
@@ -665,6 +699,7 @@ function Navigation( {
 		}
 
 		if ( createNavigationMenuIsError ) {
+			isConvertingInnerBlocksRef.current = false;
 			showNavigationMenuStatusNotice(
 				__( 'Failed to create Navigation Menu.' )
 			);
@@ -679,6 +714,8 @@ function Navigation( {
 		handleUpdateMenu,
 		hideNavigationMenuStatusNotice,
 		showNavigationMenuStatusNotice,
+		registry,
+		clientId,
 	] );
 
 	useEffect( () => {
@@ -955,61 +992,9 @@ function Navigation( {
 	const isManageMenusButtonDisabled =
 		! hasManagePermissions || ! hasResolvedNavigationMenus;
 
-	if ( hasUnsavedBlocks && ! isCreatingNavigationMenu ) {
-		return (
-			<>
-				<MenuInspectorControls
-					clientId={ clientId }
-					createNavigationMenuIsSuccess={
-						createNavigationMenuIsSuccess
-					}
-					createNavigationMenuIsError={ createNavigationMenuIsError }
-					currentMenuId={ ref }
-					isNavigationMenuMissing={ isNavigationMenuMissing }
-					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
-					onCreateNew={ createUntitledEmptyNavigationMenu }
-					onSelectClassicMenu={ onSelectClassicMenu }
-					onSelectNavigationMenu={ onSelectNavigationMenu }
-					isLoading={ isLoading }
-					blockEditingMode={ blockEditingMode }
-				/>
-				{ blockEditingMode === 'default' && stylingInspectorControls }
-				<TagName
-					{ ...blockProps }
-					aria-describedby={
-						! isPlaceholder ? accessibleDescriptionId : undefined
-					}
-				>
-					<AccessibleDescription id={ accessibleDescriptionId }>
-						{ __( 'Unsaved Navigation Menu.' ) }
-					</AccessibleDescription>
-					<ResponsiveWrapper
-						id={ clientId }
-						onToggle={ setResponsiveMenuVisibility }
-						isOpen={ isResponsiveMenuOpen }
-						hasIcon={ hasIcon }
-						icon={ icon }
-						isResponsive={ isResponsive }
-						isHiddenByDefault={ isHiddenByDefault }
-						overlayBackgroundColor={ overlayBackgroundColor }
-						overlayTextColor={ overlayTextColor }
-						overlay={ overlay }
-						onNavigateToEntityRecord={ onNavigateToEntityRecord }
-					>
-						<UnsavedInnerBlocks
-							createNavigationMenu={ createNavigationMenu }
-							blocks={ uncontrolledInnerBlocks }
-							hasSelection={ isSelected || isInnerBlockSelected }
-						/>
-					</ResponsiveWrapper>
-				</TagName>
-			</>
-		);
-	}
-
 	// Show a warning if the selected menu is no longer available.
 	// TODO - the user should be able to select a new one?
-	if ( ref && isNavigationMenuMissing ) {
+	if ( ! hasUnsavedBlocks && ref && isNavigationMenuMissing ) {
 		return (
 			<>
 				<MenuInspectorControls
@@ -1145,9 +1130,17 @@ function Navigation( {
 
 						{ ( ! isLoading || isHiddenByDefault ) && (
 							<>
-								<AccessibleMenuDescription
-									id={ accessibleDescriptionId }
-								/>
+								{ hasUnsavedBlocks ? (
+									<AccessibleDescription
+										id={ accessibleDescriptionId }
+									>
+										{ __( 'Unsaved Navigation Menu.' ) }
+									</AccessibleDescription>
+								) : (
+									<AccessibleMenuDescription
+										id={ accessibleDescriptionId }
+									/>
+								) }
 								<ResponsiveWrapper
 									id={ clientId }
 									onToggle={ setResponsiveMenuVisibility }
@@ -1165,9 +1158,21 @@ function Navigation( {
 										onNavigateToEntityRecord
 									}
 								>
-									{ isEntityAvailable && (
+									{ ( hasUnsavedBlocks ||
+										isEntityAvailable ) && (
 										<NavigationInnerBlocks
 											clientId={ clientId }
+											uncontrolledBlocks={
+												hasUnsavedBlocks
+													? uncontrolledInnerBlocks
+													: undefined
+											}
+											createNavigationMenu={
+												createNavigationMenuFromInnerBlocks
+											}
+											isCreating={
+												isCreatingNavigationMenu
+											}
 											hasCustomPlaceholder={
 												!! CustomPlaceholder
 											}
