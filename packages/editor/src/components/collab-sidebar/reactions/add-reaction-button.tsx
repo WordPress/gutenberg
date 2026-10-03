@@ -16,7 +16,7 @@ interface AddReactionButtonProps {
 
 /**
  * Standalone add-reaction button, opening the searchable emoji picker
- * with its "Frequently used" section seeded from the named set.
+ * with its "Frequently used" section seeded from the curated set.
  *
  * @param props                  Component props.
  * @param props.disabled         Whether the button is disabled (e.g. on a

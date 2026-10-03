@@ -168,9 +168,8 @@ class BlockNoteUtils {
 	}
 
 	/**
-	 * Wait for the emoji picker popup to open and its grid to render
-	 * at least one cell. Until the Emojibase data loads the grid shows
-	 * the named set, so this does not wait for the full dataset.
+	 * Wait for the emoji picker popup to open and the Emojibase data to
+	 * fill its grid with at least one cell.
 	 */
 	async waitForFullPicker() {
 		await expect(

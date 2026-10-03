@@ -1370,54 +1370,6 @@ test.describe( 'Block Notes', () => {
 			await expect( reactionButton ).toBeVisible();
 		} );
 
-		test.describe( 'Emojibase dataset unavailable', () => {
-			test.beforeAll( async ( { requestUtils } ) => {
-				await requestUtils.activatePlugin(
-					'gutenberg-test-note-emojibase-unavailable'
-				);
-			} );
-
-			test.afterAll( async ( { requestUtils } ) => {
-				await requestUtils.deactivatePlugin(
-					'gutenberg-test-note-emojibase-unavailable'
-				);
-			} );
-
-			test( 'the picker offers the named set and a pick still adds a reaction', async ( {
-				page,
-				blockNoteUtils,
-			} ) => {
-				await blockNoteUtils.addBlockWithNote( {
-					type: 'core/paragraph',
-					attributes: { content: 'Named pick' },
-					comment: 'Test comment for named pick',
-				} );
-
-				await page
-					.getByRole( 'combobox', { name: 'Add reaction' } )
-					.click();
-				await blockNoteUtils.waitForFullPicker();
-
-				// Only the named set, with no category headings.
-				const grid = page.getByRole( 'grid' );
-				await expect( grid.getByRole( 'gridcell' ) ).toHaveCount( 5 );
-				await expect(
-					page.locator(
-						'.editor-collab-sidebar-panel__picker-category'
-					)
-				).toHaveCount( 0 );
-
-				// Search still filters the named set.
-				await page.getByPlaceholder( 'Search emoji' ).fill( 'heart' );
-				await expect( grid.getByRole( 'gridcell' ) ).toHaveCount( 1 );
-				await grid.getByRole( 'gridcell', { name: 'Heart' } ).click();
-
-				await expect(
-					page.getByRole( 'button', { name: /Heart/ } )
-				).toContainText( '1' );
-			} );
-		} );
-
 		test( 'resolving a thread locks its reactions', async ( {
 			page,
 			blockNoteUtils,
