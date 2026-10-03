@@ -80,7 +80,8 @@
 			"role": "content"
 		},
 		"level": {
-			"type": "number"
+			"type": "number",
+			"default": 3
 		},
 		"iconPosition": {
 			"type": "string",

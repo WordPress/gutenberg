@@ -22,6 +22,7 @@
 						"attributes": {
 							"openByDefault": false,
 							"title": "Accordion Title",
+							"level": 3,
 							"iconPosition": "right",
 							"showIcon": true
 						},
