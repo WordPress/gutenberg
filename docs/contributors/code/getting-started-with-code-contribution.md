@@ -216,83 +216,11 @@ We recommend configuring your editor to automatically check for syntax and lint 
 
 ### Visual Studio Code
 
-If you use Visual Studio Code, the following extensions and workspace settings can help the editor use the same linting, formatting, PHP, and TypeScript tooling as the Gutenberg repository. These settings are optional and should live in your local `.vscode/settings.json` file. Do not commit your personal workspace settings; add `.vscode/settings.json` to your [global gitignore file](https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files#configuring-ignored-files-for-all-repositories-on-your-computer) if needed.
+If you use Visual Studio Code, the repository ships a managed workspace configuration so the editor uses the same linting, formatting, PHP, and TypeScript tooling as the Gutenberg repository. The first time you open the folder, VS Code prompts you to install the [recommended extensions](https://github.com/WordPress/gutenberg/blob/HEAD/.vscode/extensions.json) and to allow an automatic task that copies [`.vscode/settings.dist.jsonc`](https://github.com/WordPress/gutenberg/blob/HEAD/.vscode/settings.dist.jsonc) to `.vscode/settings.json`. Allow both and you're set up.
 
-Recommended extensions:
+The installer replaces `settings.json` whenever it still starts with the managed comments, so edits made there are lost when the template changes. To keep your own settings, remove those comments; the installer then leaves the file alone. You can re-run it at any time from the Command Palette via **Tasks: Run Task → Install VS Code settings**.
 
--   [EditorConfig for VS Code](https://marketplace.visualstudio.com/items?itemName=editorconfig.editorconfig)
--   [PHP Intelephense](https://marketplace.visualstudio.com/items?itemName=bmewburn.vscode-intelephense-client)
--   [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
--   [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
--   [PHP_CodeSniffer](https://marketplace.visualstudio.com/items?itemName=obliviousharmony.vscode-php-codesniffer)
--   [Stylelint](https://marketplace.visualstudio.com/items?itemName=stylelint.vscode-stylelint)
--   [Native TypeScript Preview](https://marketplace.visualstudio.com/items?itemName=TypeScriptTeam.native-preview)
-
-You can start with this workspace settings file:
-
-```jsonc
-{
-	"search.exclude": {
-		"**/.cache/**": true,
-		"**/build/**": true,
-		"**/build-module/**": true,
-		"**/build-types/**": true,
-		"**/build-style/**": true,
-		"**/node_modules/**": true,
-		"**/vendor/**": true
-	},
-	// Use TypeScript from the workspace instead of VS Code's built-in TypeScript version.
-	"js/ts.tsdk.path": "tools/build-scripts/node_modules/@typescript/native/lib",
-	// Use ESLint, Prettier and Stylelint from the respective paths.
-	"eslint.nodePath": "tools/eslint/node_modules",
-	"prettier.prettierPath": "packages/prettier-config/node_modules/prettier",
-	"stylelint.stylelintPath": "tools/stylelint/node_modules/stylelint",
-	"[php]": {
-		"editor.formatOnSave": true,
-		"editor.defaultFormatter": "obliviousharmony.vscode-php-codesniffer"
-	},
-	"eslint.bulkSuppression.enable": true,
-	"eslint.bulkSuppression.location": "tools/eslint/suppressions.json",
-	"eslint.bulkSuppression.severity": "hint",
-	"intelephense.environment.phpVersion": "7.4.0",
-	"intelephense.files.exclude": [
-		"**/.cache/**",
-		"**/.git/**",
-		"**/.history/**",
-		"**/build/**",
-		"**/build-module/**",
-		"**/build-types/**",
-		"**/build-style/**",
-		"**/node_modules/**",
-		"**/vendor/**"
-	],
-	"phpCodeSniffer.autoExecutable": true,
-	"phpCodeSniffer.standard": "Automatic",
-	"phpCodeSniffer.exclude": [
-		"**/.git/**",
-		"**/.svn/**",
-		"**/.hg/**",
-		"**/.cache/**",
-		"**/build/**",
-		"**/node_modules/**",
-		"**/vendor/**"
-	],
-	"[javascript][javascriptreact][typescript][typescriptreact]": {
-		"editor.formatOnSave": false,
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
-	},
-	"editor.codeActionsOnSave": {
-		"source.fixAll.eslint": "explicit",
-		"source.fixAll.stylelint": "explicit"
-	},
-	"[css][scss][sass]": {
-		"editor.formatOnSave": false,
-		"editor.defaultFormatter": "stylelint.vscode-stylelint"
-	},
-	"stylelint.validate": [ "css", "postcss", "scss" ],
-	"js/ts.experimental.useTsgo": true
-}
-```
+The settings point the TypeScript, ESLint, Prettier, and Stylelint extensions at the workspaces that install them, because those tools are not installed in the root `node_modules`. If you maintain your own settings, copy those paths from the template.
 
 ### EditorConfig
 
