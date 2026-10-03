@@ -227,7 +227,7 @@ export function TypographyPanel( {
 				setAttributes( {
 					style: setStyleForState( style, selectedState, newStyle ),
 				} );
-		  }
+			}
 		: ( newStyle ) => {
 				const newAttributes = styleToAttributes( newStyle );
 
@@ -240,7 +240,7 @@ export function TypographyPanel( {
 				}
 
 				setAttributes( newAttributes );
-		  };
+			};
 
 	// Link color failures are reported by the Elements panel, which owns the
 	// link color selection.

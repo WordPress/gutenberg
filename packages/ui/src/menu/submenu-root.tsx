@@ -1,5 +1,5 @@
 import { Menu as _Menu } from '@base-ui/react/menu';
-import { MenuContext } from './context';
+import { MenuContext, MenuGroupContext } from './context';
 import type { SubmenuRootProps } from './types';
 
 /**
@@ -8,7 +8,9 @@ import type { SubmenuRootProps } from './types';
 function SubmenuRoot( props: SubmenuRootProps ) {
 	return (
 		<MenuContext.Provider value={ { isSubmenu: true } }>
-			<_Menu.SubmenuRoot { ...props } />
+			<MenuGroupContext.Provider value={ null }>
+				<_Menu.SubmenuRoot { ...props } />
+			</MenuGroupContext.Provider>
 		</MenuContext.Provider>
 	);
 }

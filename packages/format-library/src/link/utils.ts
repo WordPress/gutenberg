@@ -11,7 +11,54 @@ import {
 	isValidFragment,
 } from '@wordpress/url';
 import type { RichTextValue, RichTextFormat } from '@wordpress/rich-text';
-import type { LinkFormat, LinkFormatOptions } from '../types';
+
+/**
+ * The attributes carried on an active `core/link` format.
+ */
+export type LinkFormatAttributes = {
+	url: string;
+	type?: string;
+	id?: string;
+	target?: string;
+	rel?: string;
+	class?: string;
+};
+
+export interface LinkFormat {
+	type: 'core/link';
+	attributes: LinkFormatAttributes;
+}
+
+/**
+ * The options accepted by `createLinkFormat`.
+ */
+export interface LinkFormatOptions {
+	/**
+	 * The href of the link.
+	 */
+	url: string;
+	/**
+	 * The type of the link.
+	 */
+	type?: string;
+	/**
+	 * The ID of the link.
+	 */
+	id?: string;
+	/**
+	 * Whether this link will open in a new window.
+	 */
+	opensInNewWindow?: boolean;
+	/**
+	 * Whether this link is marked as no follow relationship.
+	 */
+	nofollow?: boolean;
+	/**
+	 * The CSS classes to apply to the link.
+	 */
+	cssClasses?: string;
+}
+
 /**
  * Check for issues with the provided href.
  *

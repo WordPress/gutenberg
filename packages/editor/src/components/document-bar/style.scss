@@ -22,7 +22,6 @@
 	}
 
 	.components-button {
-		border-radius: $grid-unit-05;
 
 		@media not (prefers-reduced-motion) {
 			transition: background-color 0.1s ease-out;

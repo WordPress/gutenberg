@@ -18,12 +18,32 @@ import { Popover } from '@wordpress/components';
 import { Tabs } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import type { RichTextValue } from '@wordpress/rich-text';
-import type {
-	ColorObject,
-	ColorPickerProps,
-	InlineColorUIProps,
-} from '../types';
 import { textColor as settings, transparentValue } from './index';
+
+/**
+ * A colour entry from the `color.palette` theme setting.
+ */
+export interface ColorObject {
+	slug: string;
+	color: string;
+	name?: string;
+}
+
+interface InlineColorUIProps {
+	name: string;
+	isActive: boolean;
+	value: RichTextValue;
+	onChange: ( value: RichTextValue ) => void;
+	onClose: () => void;
+	contentRef: React.RefObject< HTMLElement >;
+}
+
+interface ColorPickerProps {
+	name: string;
+	property: 'color' | 'backgroundColor';
+	value: RichTextValue;
+	onChange: ( value: RichTextValue ) => void;
+}
 
 const TABS = [
 	{ name: 'color', title: __( 'Text' ) },

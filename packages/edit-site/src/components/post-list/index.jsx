@@ -307,7 +307,7 @@ export default function PostList( { postType } ) {
 						? () => {
 								resetToDefault();
 								history.invalidate();
-						  }
+							}
 						: false
 				}
 			/>

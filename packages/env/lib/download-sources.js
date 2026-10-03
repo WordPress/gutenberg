@@ -45,7 +45,7 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 		? ( message ) => {
 				spinner.info( `SimpleGit: ${ message }` );
 				spinner.start();
-		  }
+			}
 		: () => {};
 	onProgress( 0 );
 
@@ -105,7 +105,7 @@ async function downloadZipSource( source, { onProgress, spinner, debug } ) {
 		? ( message ) => {
 				spinner.info( `NodeGit: ${ message }` );
 				spinner.start();
-		  }
+			}
 		: () => {};
 	onProgress( 0 );
 

@@ -34,12 +34,18 @@
 		"anchor": true,
 		"ariaLabel": true,
 		"html": false,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true
+		},
 		"color": {
 			"text": true,
 			"background": true,
 			"gradients": true,
 			"link": true
 		},
+		"shadow": true,
 		"spacing": {
 			"margin": true,
 			"padding": true
@@ -47,6 +53,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,

@@ -59,7 +59,7 @@ function useScrollRectIntoView(
 export const TabList = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< TabListProps, 'div', false >
->( function TabList( { children, ...otherProps }, ref ) {
+>( function UnforwardedTabList( { children, ...otherProps }, ref ) {
 	const { store } = useTabsContext() ?? {};
 
 	const selectedId = useStoreState( store, 'selectedId' );

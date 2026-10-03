@@ -1,0 +1,124 @@
+@use "../utils/theme-variables" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+// The outer 1px box shadow supplies the remaining pixel of the 8px radius.
+$border-radius: $radius-large - 1px;
+$border-color: rgba(0, 0, 0, 0.1);
+
+.card {
+	box-shadow: 0 0 0 1px $border-color;
+	outline: none;
+}
+
+.card-borderless {
+	box-shadow: none;
+}
+
+.is-rounded {
+	border-radius: $border-radius;
+}
+
+.content {
+	height: 100%;
+}
+
+.header {
+	border-bottom: 1px solid $border-color;
+	border-color: $border-color;
+	box-sizing: border-box;
+
+	&:last-child {
+		border-bottom: none;
+	}
+}
+
+.footer {
+	border-top: 1px solid $border-color;
+	border-color: $border-color;
+	box-sizing: border-box;
+
+	&:first-of-type {
+		border-top: none;
+	}
+}
+
+.body {
+	box-sizing: border-box;
+	height: auto;
+	max-height: 100%;
+}
+
+.is-scrollable {
+	height: 100%;
+}
+
+.media {
+	box-sizing: border-box;
+	overflow: hidden;
+
+	& > img,
+	& > iframe {
+		display: block;
+		height: auto;
+		max-width: 100%;
+		width: 100%;
+	}
+}
+
+.header,
+.footer,
+.body,
+.media {
+	&:first-of-type {
+		border-start-start-radius: $border-radius;
+		border-start-end-radius: $border-radius;
+	}
+
+	&:last-of-type {
+		border-end-start-radius: $border-radius;
+		border-end-end-radius: $border-radius;
+	}
+}
+
+// Override Divider's border reset, orientation-specific display and inline-size
+// regardless of stylesheet insertion order.
+.divider.divider {
+	box-sizing: border-box;
+	display: block;
+	width: 100%;
+	border-color: $border-color;
+}
+
+.section-borderless {
+	border: none;
+}
+
+.is-shady {
+	background-color: $components-color-gray-100;
+}
+
+@each $size, $padding in (
+	none: 0,
+	x-small: $grid-unit-10,
+	small: $grid-unit-20,
+	medium: $grid-unit-20 $grid-unit-30,
+	large: $grid-unit-30 $grid-unit-40
+) {
+	.padding-#{$size} {
+		padding: $padding;
+	}
+}
+
+@each $side in block-start, block-end, inline-start, inline-end {
+	@each $size, $padding in (
+		none: 0,
+		x-small: $grid-unit-10,
+		small: $grid-unit-20,
+		medium: $grid-unit-30,
+		large: $grid-unit-40
+	) {
+		.padding-#{$side}-#{$size} {
+			padding-#{$side}: $padding;
+		}
+	}
+}

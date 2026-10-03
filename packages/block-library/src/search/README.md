@@ -40,6 +40,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`lineHeight`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `margin`: `true`
+  - `padding`: `true`
 - [`html`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#html): `false`
 
 ## CSS Selectors

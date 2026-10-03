@@ -1,15 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { RadioGroup } from '@base-ui/react/radio-group';
 import { Radio } from '../';
+import { RadioGroup } from '../../radio-group';
 
 const meta: Meta< typeof Radio > = {
-	title: 'Design System/Components/Form/Primitives/Radio',
+	title: 'Components/@wordpress-ui/Form/Primitives/Radio',
+	id: 'design-system-components-form-primitives-radio',
 	component: Radio,
 	parameters: {
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components` and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135). Radio must be rendered inside a RadioGroup, which will be added to the package later.',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components` and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };

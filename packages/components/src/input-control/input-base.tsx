@@ -1,8 +1,10 @@
 import type { ForwardedRef } from 'react';
+import clsx from 'clsx';
 import { useInstanceId } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
 import Backdrop from './backdrop';
 import Label from './label';
+import styles from './style.module.scss';
 import { Container, Root, Prefix, Suffix } from './styles/input-control-styles';
 import type { InputBaseProps, LabelPosition } from './types';
 import type { WordPressComponentProps } from '../context';
@@ -95,7 +97,10 @@ function InputBase(
 			</Label>
 			<Container
 				__unstableInputWidth={ __unstableInputWidth }
-				className="components-input-control__container"
+				className={ clsx(
+					'components-input-control__container',
+					styles.container
+				) }
 				disabled={ disabled }
 				hideLabel={ hideLabel }
 				labelPosition={ labelPosition }

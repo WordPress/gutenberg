@@ -403,6 +403,9 @@ test.describe( 'Cover', () => {
 
 		await editor.selectBlocks( coverBlock );
 
+		// The focal point picker is in the Settings tab of the block inspector.
+		await page.getByRole( 'tab', { name: 'Settings' } ).click();
+
 		// The focal point picker renders as a `legend`-labelled group, so both
 		// spinbuttons are resolved through it.
 		const focalPointGroup = page.getByRole( 'group', {

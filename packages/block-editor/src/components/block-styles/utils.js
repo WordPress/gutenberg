@@ -72,7 +72,7 @@ export function getRenderedStyles( styles ) {
 					isDefault: true,
 				},
 				...styles,
-		  ];
+			];
 }
 
 /**

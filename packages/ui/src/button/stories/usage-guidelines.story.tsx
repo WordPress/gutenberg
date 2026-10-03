@@ -4,13 +4,14 @@ import { cog } from '@wordpress/icons';
 import { Button } from '../index';
 import { IconButton } from '../../icon-button';
 import { Link } from '../../link';
-import { LinkButton } from '../../link-button';
+import { ButtonLink } from '../../button-link';
 import { Stack } from '../../stack';
 import { Text } from '../../text';
 import * as Tooltip from '../../tooltip';
 
 const meta: Meta = {
-	title: 'Design System/Components/Button/Usage Guidelines',
+	title: 'Components/@wordpress-ui/Button/Usage Guidelines',
+	id: 'design-system-components-button-usage-guidelines',
 	parameters: {
 		controls: { disable: true },
 	},
@@ -71,23 +72,23 @@ export const UseLinkForInlineNavigation: Story = {
 };
 
 /**
- * Use `LinkButton` when navigation should look like a `Button`, such as
+ * Use `ButtonLink` when navigation should look like a `Button`, such as
  * standalone calls to action that require an `href`.
  *
  * Note: Prefer `Link` for navigation when possible. Its underline and link
  * styling set clearer expectations than a button-shaped control.
  */
-export const UseLinkButtonForNavigation: Story = {
+export const UseButtonLinkForNavigation: Story = {
 	render: () => (
 		<Stack direction="column" gap="md">
 			<Text variant="body-md" render={ <p /> }>
-				Standalone navigation calls to action can use `LinkButton` when
+				Standalone navigation calls to action can use `ButtonLink` when
 				button styling matches the surrounding UI.
 			</Text>
 			<div>
-				<LinkButton href="https://make.wordpress.org/" openInNewTab>
+				<ButtonLink href="https://make.wordpress.org/" openInNewTab>
 					Get started
-				</LinkButton>
+				</ButtonLink>
 			</div>
 			<Text variant="body-md" render={ <p /> }>
 				{ createInterpolateElement(

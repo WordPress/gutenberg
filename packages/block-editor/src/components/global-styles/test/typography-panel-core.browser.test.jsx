@@ -25,8 +25,8 @@ const baseSettings = {
 	},
 };
 
-// Two presets with distinct slugs and distinct hex values, enough to drive the
-// text color dropdown.
+// Three presets with distinct slugs and distinct hex values, enough to drive the
+// text color dropdown and to tell "left alone" apart from "synced".
 const PALETTE_SETTINGS = {
 	color: {
 		text: true,
@@ -37,6 +37,7 @@ const PALETTE_SETTINGS = {
 			theme: [
 				{ color: '#0000ff', name: 'Blue', slug: 'blue' },
 				{ color: '#ff0000', name: 'Red', slug: 'red' },
+				{ color: '#00ff00', name: 'Green', slug: 'green' },
 			],
 		},
 	},
@@ -61,7 +62,7 @@ const getItem = ( name ) => {
 	return control.closest( '.components-tools-panel-item' );
 };
 
-describe( 'TypographyPanel — experiment off', () => {
+describe( 'TypographyPanel with the indicator experiment off', () => {
 	// `showInheritanceLabelIndicators` defaults to the experiment flag, so a
 	// caller that passes no prop gets no inheritance treatment. The layout
 	// className must still come through.
@@ -114,9 +115,36 @@ describe( 'TypographyPanel — experiment off', () => {
 			screen.getByRole( 'button', { name: /^reset$/i } )
 		).toBeInTheDocument();
 	} );
+
+	// The point of the change: the value reaches the control for everyone,
+	// while every part of the indicator treatment stays behind the experiment.
+	it( 'shows the inherited value on the control and no inheritance treatment', async () => {
+		await renderPanel( {
+			value: {},
+			inheritedValue: { typography: { lineHeight: '1.5' } },
+			showInheritanceLabelIndicators: false,
+		} );
+
+		expect(
+			screen.getByRole( 'spinbutton', { name: /line height/i } )
+		).toHaveValue( 1.5 );
+
+		const lineHeightItem = getItem( /line height/i );
+		expect( lineHeightItem ).not.toHaveClass(
+			'is-inherited-from-global-styles'
+		);
+		expect( lineHeightItem ).not.toHaveClass(
+			'has-local-override-from-global-styles'
+		);
+		expect(
+			screen.queryByRole( 'button', {
+				name: 'Reset to inherited value',
+			} )
+		).not.toBeInTheDocument();
+	} );
 } );
 
-describe( 'TypographyPanel — experiment off, setTextColor link sync', () => {
+describe( 'TypographyPanel setTextColor link sync', () => {
 	async function pickRed( value, inheritedValue ) {
 		const onChange = vi.fn();
 		await render(
@@ -138,42 +166,60 @@ describe( 'TypographyPanel — experiment off, setTextColor link sync', () => {
 		return onChange.mock.calls[ 0 ][ 0 ];
 	}
 
-	it( 'leaves an unset link color alone when a text color is already set', async () => {
-		// With the experiment on this falls back to the inherited link color
-		// and syncs. Off, it compares the inherited text and link colors
-		// directly, which on this path is the block's own pair, so a link
-		// color that was never set does not start tracking.
-		const result = await pickRed( {
-			color: { text: 'var:preset|color|blue' },
-		} );
+	const BLUE = 'var:preset|color|blue';
+	const RED = 'var:preset|color|red';
+	const GREEN = 'var:preset|color|green';
 
-		expect( result?.color?.text ).toBe( 'var:preset|color|red' );
-		expect( result?.elements?.link?.color?.text ).toBeUndefined();
-	} );
-
-	it( 'starts a link color tracking when neither is set', async () => {
-		// Both sides are undefined, so they compare as matching and the link
-		// color starts following the text color.
+	it( 'starts a link color tracking when nothing is set', async () => {
 		const result = await pickRed( {} );
 
-		expect( result?.color?.text ).toBe( 'var:preset|color|red' );
-		expect( result?.elements?.link?.color?.text ).toBe(
-			'var:preset|color|red'
-		);
+		expect( result?.color?.text ).toBe( RED );
+		expect( result?.elements?.link?.color?.text ).toBe( RED );
+	} );
+
+	it( 'starts a link color tracking when only a text color is set', async () => {
+		const result = await pickRed( { color: { text: BLUE } } );
+
+		expect( result?.color?.text ).toBe( RED );
+		expect( result?.elements?.link?.color?.text ).toBe( RED );
+	} );
+
+	// The local branch of `shouldSyncLinkColor`, which the pre-inheritance
+	// comparison could not express: it only ever looked at `inheritedValue`.
+	it( 'keeps a local link color tracking while it matches the text color', async () => {
+		const result = await pickRed( {
+			color: { text: BLUE },
+			elements: { link: { color: { text: BLUE } } },
+		} );
+
+		expect( result?.color?.text ).toBe( RED );
+		expect( result?.elements?.link?.color?.text ).toBe( RED );
+	} );
+
+	it( 'leaves a link color alone once it differs from the text color', async () => {
+		// Green is neither the outgoing text color nor the incoming one, so a
+		// green link surviving proves it was left untouched rather than synced.
+		const result = await pickRed( {
+			color: { text: BLUE },
+			elements: { link: { color: { text: GREEN } } },
+		} );
+
+		expect( result?.color?.text ).toBe( RED );
+		expect( result?.elements?.link?.color?.text ).toBe( GREEN );
 	} );
 
 	// In Global Styles `value` is the user config and `inheritedValue` the
-	// merged one. Comparing `value` would find undefined on both sides.
-	it( 'reads the merged config, not the user config, in Global Styles', async () => {
+	// merged one, so an unset local link color defers to the merged pair.
+	it( 'defers to the inherited pair when no local link color is set', async () => {
 		const result = await pickRed(
 			{},
 			{
-				color: { text: 'var:preset|color|blue' },
-				elements: { link: { color: { text: 'var:preset|color|red' } } },
+				color: { text: BLUE },
+				elements: { link: { color: { text: RED } } },
 			}
 		);
 
-		expect( result?.color?.text ).toBe( 'var:preset|color|red' );
+		expect( result?.color?.text ).toBe( RED );
 		// The theme's text and link colors differ, so the link does not track.
 		expect( result?.elements?.link?.color?.text ).toBeUndefined();
 	} );

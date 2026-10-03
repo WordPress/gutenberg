@@ -6,7 +6,7 @@ import { createElement } from '@wordpress/element';
 import { store as coreDataStore } from '../../index';
 import useEntityRecord from '../use-entity-record';
 
-vi.mock( '@wordpress/api-fetch' );
+vi.mock( import( '@wordpress/api-fetch' ) );
 
 describe( 'useEntityRecord', () => {
 	let registry;

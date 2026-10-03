@@ -70,7 +70,7 @@ export default {
 							key: `user-${ user.slug }`,
 							value: user,
 							label: getUserLabel( user ),
-					  } ) )
+						} ) )
 					: [],
 			[ users ]
 		);

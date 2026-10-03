@@ -1,58 +1,31 @@
 ---
 name: design-system-contribution
-description: Use when planning or implementing a safe `@wordpress/components`, `@wordpress/ui`, or `@wordpress/theme` change in a local Gutenberg checkout; do not use for consumer-only application changes or infer commit, push, or pull-request authority.
+description: Use when planning or implementing changes to @wordpress/components, @wordpress/ui, or @wordpress/theme in a Gutenberg checkout. For application code that only consumes these packages, use design-system-ui-composition.
 ---
 
 # Contribute to the WordPress Design System
 
-## Classify the change
+In a Gutenberg checkout, read the relative links below from the checked-out revision. Outside a checkout, resolve them from `.agents/skills/design-system-contribution/` in [Gutenberg on GitHub](https://github.com/WordPress/gutenberg/tree/trunk).
 
-1. State the requested outcome and relevant package or consumers.
-2. Classify the change as internal or public:
-   - **Internal:** preserves the public contract and observable behaviour.
-   - **Public:** adds or changes supported behaviour.
-3. For a public change, state the missing behaviour and audit existing public
-   composition and similar components or tokens.
-4. If supported behaviour already meets the public need, recommend it and stop
-   unless the request establishes a distinct contract.
+Read the affected package's `AGENTS.md` and the relevant [package contribution guidance](../../../docs/contributors/design/design-system-packages.md#change-a-package-safely).
 
-Read the cross-package guide and the package-specific source guidance that
-matches the change:
+## Choose the smallest change
 
-- [`docs/contributors/design/design-system-packages.md`](../../../docs/contributors/design/design-system-packages.md)
-- [`packages/components/CONTRIBUTING.md`](../../../packages/components/CONTRIBUTING.md)
-- [`packages/ui/CONTRIBUTING.md`](../../../packages/ui/CONTRIBUTING.md)
-- [`packages/theme/README.md`](../../../packages/theme/README.md)
-- [`packages/theme/tokens/README.md`](../../../packages/theme/tokens/README.md)
+Start from the consumer's need. For a bug fix, reproduce the failure and identify the behavior to restore. For a refactor, identify the behavior to preserve. A new capability needs a concrete use case and an explanation of why existing public composition is insufficient.
 
-Use an available WordPress Design System MCP server to learn current direction
-when useful, but verify implementation and compatibility against this checkout.
+When choosing a component or token, use the Design System MCP server's `get_components`, `get_component_details`, and `get_design_tokens` as appropriate when available. Without MCP, use the guide's [recommendation sources](../../../docs/contributors/design/design-system-packages.md#choose-a-recommended-component) and the [token reference](../../../packages/theme/docs/tokens.md). Check the current source before adding an API that appears to be missing.
 
-## Scale work to the contract
+Keep product-specific behavior in the consuming package and use [design-system-ui-composition](../design-system-ui-composition/SKILL.md) for that work. For unresolved public design decisions, follow [Contributing to the Design System](../../../storybook/stories/design-system/contributing.md#fix-it-at-the-source) before implementation; continue work that does not depend on that decision.
 
-- For an internal change, preserve the public contract and run focused checks.
-- For a public change, define the contract and assess external consumers,
-  compatibility, migration, documentation, and generated output.
-- For a replacement or rename, compare observable old and new values, states,
-  and interaction—not only types or class names.
+## Preserve the affected contracts
 
-Follow current package precedents only where they apply. Do not add optional
-stories, public documentation, release notes, or compatibility machinery for
-an unchanged public capability. Still follow the repository's required package
-changelog policy for production code changes.
+- Follow the package's component, prop/ref, state, and styling conventions. Reuse existing composition and helpers instead of rebuilding behavior already provided by a dependency.
+- For removals, replacements, or behavior changes, compare the affected old and new contracts using the [compatibility guidance](../../../docs/contributors/design/design-system-packages.md#compare-contracts-before-replacing-an-api). Include plugin and npm consumers, even when all Gutenberg callers have been migrated.
+- For token changes, choose by semantic purpose and affected modes, then follow the [token source guide](../../../packages/theme/tokens/README.md) and [build procedure](../../../packages/theme/README.md#building). For Emotion migrations, use [emotion-to-scss-modules](../emotion-to-scss-modules/SKILL.md).
+- Use [package-runtime-compatibility](../package-runtime-compatibility/SKILL.md) only when changing a contract between independently updated package and WordPress versions.
 
-If a published package can run with a dependency supplied separately by WordPress, apply the [`package-runtime-compatibility`](../package-runtime-compatibility/SKILL.md) skill before implementation.
+## Verify what changed
 
-## Finish
+Start with existing tests and stories. Add coverage only for a concrete regression risk introduced by our code or integration that existing coverage does not address. Rely on dependency tests for behavior the dependency owns; avoid speculative edge cases and exhaustive combinations. Use the guide's [verification choices](../../../docs/contributors/design/design-system-packages.md#verify-the-affected-behavior) for checks that need a browser.
 
-Use the public guide's
-[package completion gate](../../../docs/contributors/design/design-system-packages.md#change-a-package-safely)
-with the applicable package source guidance. Mark each relevant contract
-surface complete, not applicable, or blocked.
-
-Run focused tests and required lint, type, generation, or build checks. Verify
-interaction or CSS behaviour where source-level tests cannot establish it.
-
-Stop for product or design-system agreement when a public component, token, or
-API lacks accepted behaviour. Include consumer evidence, alternatives,
-compatibility impact, and the proposed contract.
+Follow the [completion checks](../../../docs/contributors/design/design-system-packages.md#change-a-package-safely) for affected exports, documentation, generated files, and changelogs, along with the repository's required checks. State any material verification gap without claiming visual parity from snapshots or class assertions.

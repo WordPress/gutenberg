@@ -18,8 +18,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=20.10.0",
-		"npm": ">=10.2.3"
+		"node": ">=20.10.0"
 	},
 	"files": [
 		"src",
@@ -36,6 +35,20 @@
 		"@wordpress/data": "file:../data",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/preferences": "file:../preferences"
+	},
+	"peerDependencies": {
+		"@types/react": "^18 || ^19",
+		"@types/react-dom": "^18 || ^19",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		},
+		"@types/react-dom": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

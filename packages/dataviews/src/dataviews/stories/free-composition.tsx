@@ -15,6 +15,7 @@ import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { View } from '../../types';
 import { actions, data, fields, type SpaceObject } from './fixtures';
 import { LAYOUT_TABLE } from '../../constants';
+import styles from './style.module.css';
 
 /**
  * Custom composition example
@@ -24,10 +25,10 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 
 	return (
 		<>
-			<Heading className="free-composition-heading" level={ 2 }>
+			<Heading className={ styles.heading } level={ 2 }>
 				{ __( 'Solar System numbers' ) }
 			</Heading>
-			<div className="free-composition-header">
+			<div className={ styles.header }>
 				<Stack direction="column" gap="lg">
 					<Stack direction="row" justify="start" gap="sm">
 						<DataViews.Search label={ __( 'Search content' ) } />
@@ -95,7 +96,7 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 					</Card.Root>
 				</Stack>
 			</div>
-			<DataViews.Layout className="free-composition-dataviews-layout" />
+			<DataViews.Layout className={ styles.layout } />
 		</>
 	);
 }
@@ -161,7 +162,7 @@ export const FreeCompositionComponent = () => {
 					gap="sm"
 					justify="space-around"
 					align="center"
-					className="free-composition-dataviews-empty"
+					className={ styles.empty }
 				>
 					<WCText size={ 18 } as="p">
 						No planets

@@ -10,6 +10,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { isAppleOS } from '@wordpress/keycodes';
+import { inertValue } from '@wordpress/react-inert-value';
 import DataViewsContext from '../../dataviews-context';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
 import ItemActions from '../../dataviews-item-actions';
@@ -430,7 +431,7 @@ function ViewTable< Item >( {
 				aria-describedby={ tableNoticeId }
 				role={ isInfiniteScroll ? 'feed' : undefined }
 				// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
-				inert={ ! isInfiniteScroll && isLoading ? 'true' : undefined }
+				inert={ inertValue( ! isInfiniteScroll && isLoading ) }
 			>
 				<colgroup>
 					{ hasBulkActions && (
@@ -505,15 +506,15 @@ function ViewTable< Item >( {
 										canMove={ false }
 										canInsertLeft={
 											isRtl
-												? view.layout?.enableMoving ??
-												  true
+												? ( view.layout?.enableMoving ??
+													true )
 												: false
 										}
 										canInsertRight={
 											isRtl
 												? false
-												: view.layout?.enableMoving ??
-												  true
+												: ( view.layout?.enableMoving ??
+													true )
 										}
 									/>
 								) }
@@ -569,8 +570,7 @@ function ViewTable< Item >( {
 								className={ clsx(
 									'dataviews-view-table__actions-column',
 									{
-										'dataviews-view-table__actions-column--sticky':
-											true,
+										'dataviews-view-table__actions-column--sticky': true,
 										'dataviews-view-table__actions-column--stuck':
 											! isHorizontalScrollEnd,
 									}
@@ -605,7 +605,7 @@ function ViewTable< Item >( {
 													__( '%1$s: %2$s' ),
 													groupField.label,
 													groupName
-											  ) }
+												) }
 									</td>
 								</tr>
 								{ groupItems.map( ( item, index ) => {

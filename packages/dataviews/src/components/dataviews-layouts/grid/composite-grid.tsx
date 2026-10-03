@@ -74,7 +74,7 @@ interface GridItemProps< Item > extends HTMLAttributes< HTMLDivElement > {
 }
 
 const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
-	function GridItem(
+	function UnforwardedGridItem(
 		{
 			view,
 			selection,
@@ -120,7 +120,7 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 			[ forwardedRef ]
 		);
 		useIntersectionObserver( elementRef, posinset );
-		const instanceId = useInstanceId( GridItem );
+		const instanceId = useInstanceId( UnforwardedGridItem );
 
 		const isSelected = selection.includes( id );
 
@@ -321,7 +321,7 @@ interface CompositeGridProps< Item > {
 	data: Item[];
 	isInfiniteScroll: boolean;
 	className?: string;
-	inert?: string;
+	inert?: boolean;
 	isLoading?: boolean;
 	view: ViewGridType;
 	fields: NormalizedField< Item >[];

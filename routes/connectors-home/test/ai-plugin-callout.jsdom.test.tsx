@@ -10,7 +10,7 @@ vi.mock(
 	() =>
 		( {
 			speak: vi.fn(),
-		} ) as unknown as typeof import('@wordpress/a11y')
+		} ) as unknown as typeof import( '@wordpress/a11y' )
 );
 
 vi.mock( import( '@wordpress/components' ), async () => {
@@ -38,7 +38,7 @@ vi.mock( import( '@wordpress/components' ), async () => {
 							'button',
 							{ ref, type: 'button', onClick, disabled },
 							children
-					  )
+						)
 		),
 		ExternalLink: ( {
 			href,
@@ -47,7 +47,7 @@ vi.mock( import( '@wordpress/components' ), async () => {
 			href: string;
 			children: ReactNode;
 		} ) => createElement( 'a', { href }, children ),
-	} as unknown as typeof import('@wordpress/components');
+	} as unknown as typeof import( '@wordpress/components' );
 } );
 
 vi.mock(
@@ -55,7 +55,7 @@ vi.mock(
 	() =>
 		( {
 			store: 'core',
-		} ) as unknown as typeof import('@wordpress/core-data')
+		} ) as unknown as typeof import( '@wordpress/core-data' )
 );
 
 vi.mock(
@@ -92,7 +92,7 @@ vi.mock(
 			),
 			register: vi.fn(),
 			keyedReducer: vi.fn( () => ( reducer: unknown ) => reducer ),
-		} ) as unknown as typeof import('@wordpress/data')
+		} ) as unknown as typeof import( '@wordpress/data' )
 );
 
 vi.mock(
@@ -109,7 +109,7 @@ vi.mock(
 					},
 				},
 			} ) ),
-		} ) as unknown as typeof import('../default-connectors')
+		} ) as unknown as typeof import( '../default-connectors' )
 );
 
 vi.mock(
@@ -117,7 +117,7 @@ vi.mock(
 	() =>
 		( {
 			WpLogoDecoration: () => null,
-		} ) as unknown as typeof import('../wp-logo-decoration')
+		} ) as unknown as typeof import( '../wp-logo-decoration' )
 );
 
 type StoreState = {

@@ -60,7 +60,7 @@ export const settings = {
 						/* translators: %s: accessibility text; summary title. */
 						__( 'Details. %s' ),
 						summary
-				  );
+					);
 		}
 	},
 	save,

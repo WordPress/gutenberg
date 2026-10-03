@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { render } from '@testing-library/react';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { BlockEditorProvider, ExperimentalBlockEditorProvider } from '../';
@@ -64,10 +64,6 @@ describe( 'BlockEditorProvider', () => {
 		expect( settings ).toHaveProperty( 'stableSetting' );
 	} );
 	it( 'preserves deprecated getters incoming from the settings reducer', async () => {
-		const consoleWarn = vi
-			.spyOn( global.console, 'warn' )
-			.mockImplementation( () => {} );
-
 		const { container } = render(
 			<BlockEditorProvider
 				settings={ {
@@ -85,11 +81,9 @@ describe( 'BlockEditorProvider', () => {
 			} )
 		);
 
-		expect( consoleWarn ).toHaveBeenCalledWith(
+		expect( console ).toHaveWarnedWith(
 			'__unstableIsPreviewMode is deprecated since version 6.8. Please use isPreviewMode instead.'
 		);
-
-		consoleWarn.mockRestore();
 	} );
 } );
 

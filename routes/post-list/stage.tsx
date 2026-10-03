@@ -8,7 +8,12 @@ import {
 import { useView, useViewConfig } from '@wordpress/views';
 import { DataViews } from '@wordpress/dataviews';
 import { Page } from '@wordpress/admin-ui';
-import type { View, Action, SupportedLayouts } from '@wordpress/dataviews';
+import type {
+	View,
+	Action,
+	SupportedLayouts,
+	Form,
+} from '@wordpress/dataviews';
 import {
 	store as coreStore,
 	privateApis as coreDataPrivateApis,
@@ -58,6 +63,7 @@ function PostList() {
 		default_view: defaultView,
 		default_layouts: defaultLayouts,
 		view_list: viewList,
+		form: quickEditForm,
 	} = useViewConfig( {
 		kind: 'postType',
 		name: postType,
@@ -81,6 +87,7 @@ function PostList() {
 			defaultLayouts={ defaultLayouts }
 			viewList={ viewList }
 			activeViewOverrides={ activeViewOverrides }
+			quickEditForm={ quickEditForm }
 		/>
 	);
 }
@@ -92,6 +99,7 @@ function PostListView( {
 	defaultLayouts,
 	viewList,
 	activeViewOverrides,
+	quickEditForm,
 }: {
 	postType: string;
 	slug: string;
@@ -99,6 +107,7 @@ function PostListView( {
 	defaultLayouts: SupportedLayouts | undefined;
 	viewList: ViewListEntry[] | undefined;
 	activeViewOverrides: ViewOverrides;
+	quickEditForm: Form | undefined;
 } ) {
 	const invalidate = useInvalidate();
 	const navigate = useNavigate();
@@ -442,6 +451,7 @@ function PostListView( {
 						postType={ postType }
 						postId={ selection }
 						closeModal={ closeQuickEditModal }
+						quickEditForm={ quickEditForm }
 					/>
 				) }
 		</Page>

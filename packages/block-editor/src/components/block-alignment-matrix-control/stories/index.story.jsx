@@ -2,7 +2,8 @@ import { useState } from '@wordpress/element';
 import BlockAlignmentMatrixControl from '../';
 
 const meta = {
-	title: 'BlockEditor/BlockAlignmentMatrixControl',
+	id: 'blockeditor-blockalignmentmatrixcontrol',
+	title: 'Editor/Block Editor/BlockAlignmentMatrixControl',
 	component: BlockAlignmentMatrixControl,
 	parameters: {
 		docs: {

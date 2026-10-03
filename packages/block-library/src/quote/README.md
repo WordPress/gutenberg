@@ -32,6 +32,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - `gradient`: `true`
 - [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
   - `minHeight`: `true`
+  - `minWidth`: `true`
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
@@ -39,6 +40,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`gradients`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
   - [`heading`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-heading): `true`
   - [`link`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
+- [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
 - [`layout`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout):
   - [`allowEditing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowediting): `false`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):

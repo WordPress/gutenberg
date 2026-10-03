@@ -341,11 +341,15 @@ test.describe( 'List View', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Paragraph text' },
 		} );
-		await expect(
-			editor.canvas.getByRole( 'document', {
-				name: 'Block: Paragraph',
-			} )
-		).toBeFocused();
+		await expect
+			.poll( () =>
+				editor.ownsSelection(
+					editor.canvas.getByRole( 'document', {
+						name: 'Block: Paragraph',
+					} )
+				)
+			)
+			.toBe( true );
 
 		// Open List View.
 		await pageUtils.pressKeys( 'access+o' );
@@ -1588,7 +1592,7 @@ class ListViewUtils {
 			focusedRows.length > 0
 				? await focusedRows[ focusedRows.length - 1 ].getAttribute(
 						'data-block'
-				  )
+					)
 				: null;
 		// Don't use the util to get the unmodified default block when it's empty.
 		const blocks = await this.#page.evaluate( () =>

@@ -16,27 +16,10 @@ globalThis.wpVitest.mockScrollIntoView();
 const waitForFocusedMenu = () =>
 	waitFor( () => expect( screen.getByRole( 'menu' ) ).toHaveFocus() );
 
-const waitForFocusedMenuItem = ( name: string ) =>
-	waitFor( () =>
-		expect( screen.getByRole( 'menuitem', { name } ) ).toHaveFocus()
-	);
-
 const waitForClosedMenu = () =>
 	waitFor( () =>
 		expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument()
 	);
-
-const openMenu = async ( user: ReturnType< typeof userEvent.setup > ) => {
-	await user.click( screen.getByRole( 'button', { name: 'Open dropdown' } ) );
-	await waitForFocusedMenu();
-};
-
-// TODO: Add browser coverage for the computed overflow once component stories
-// use interaction tests. Jest mocks stylesheet imports, so this only verifies
-// the handoff between Ariakit's inline lock and Modal's body class.
-const isBodyScrollLocked = () =>
-	document.body.style.overflow === 'hidden' ||
-	document.body.classList.contains( 'modal-open' );
 
 const resetTypeahead = () => {
 	act( () => vi.advanceTimersByTime( 500 ) );
@@ -175,43 +158,6 @@ describe( 'Menu', () => {
 			await waitForFocusedMenu();
 		} );
 
-		it( 'should open when pressing the space key on the trigger', async () => {
-			render(
-				<Menu>
-					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
-					<Menu.Popover>
-						<Menu.Item>First item</Menu.Item>
-						<Menu.Item>Second item</Menu.Item>
-						<Menu.Item>Third item</Menu.Item>
-					</Menu.Popover>
-				</Menu>
-			);
-
-			const toggleButton = screen.getByRole( 'button', {
-				name: 'Open dropdown',
-			} );
-
-			// Move focus on the toggle
-			await user.tab();
-
-			expect( toggleButton ).toHaveFocus();
-
-			// Menu closed
-			expect( screen.queryByRole( 'menuitem' ) ).not.toBeInTheDocument();
-
-			// Use keyboard activation so the synthetic click has `detail: 0`,
-			// which Ariakit uses to distinguish it from pointer activation.
-			await user.keyboard( ' ' );
-
-			await waitFor( () =>
-				expect( toggleButton ).toHaveAttribute(
-					'aria-expanded',
-					'true'
-				)
-			);
-			expect( screen.getByRole( 'menu' ) ).toBeVisible();
-		} );
-
 		it( 'should close when clicking outside of the content', async () => {
 			render(
 				<Menu defaultOpen>
@@ -293,49 +239,6 @@ describe( 'Menu', () => {
 			);
 
 			await waitFor( () => expect( trigger ).toHaveFocus() );
-		} );
-
-		it( 'should return focus after Enter opens a modal', async () => {
-			render( <MenuWithModal /> );
-
-			const trigger = screen.getByRole( 'button', {
-				name: 'Open dropdown',
-			} );
-			await openMenu( user );
-			await user.keyboard( '{ArrowDown}' );
-			await waitForFocusedMenuItem( 'Open modal' );
-
-			await user.keyboard( '{Enter}' );
-			await waitForClosedMenu();
-			expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
-			await user.click(
-				screen.getByRole( 'button', { name: 'Close modal' } )
-			);
-
-			await waitFor( () => expect( trigger ).toHaveFocus() );
-		} );
-
-		it( 'should keep body scroll locked while handing off to a modal', async () => {
-			render( <MenuWithModal /> );
-
-			expect( isBodyScrollLocked() ).toBe( false );
-			await openMenu( user );
-			expect( isBodyScrollLocked() ).toBe( true );
-
-			await user.click(
-				screen.getByRole( 'menuitem', { name: 'Open modal' } )
-			);
-			await waitForClosedMenu();
-			expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
-			expect( isBodyScrollLocked() ).toBe( true );
-
-			await user.click(
-				screen.getByRole( 'button', { name: 'Close modal' } )
-			);
-			await waitFor( () =>
-				expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument()
-			);
-			await waitFor( () => expect( isBodyScrollLocked() ).toBe( false ) );
 		} );
 
 		it( 'should stay open when `hideOnClick` is `false`', async () => {

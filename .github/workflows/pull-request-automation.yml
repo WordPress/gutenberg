@@ -2,6 +2,8 @@ on:
     pull_request_target:
         types: [opened]
     push:
+        branches:
+            - trunk
 name: Pull request automation
 
 # Disable permissions for all available scopes by default.

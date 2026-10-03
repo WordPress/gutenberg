@@ -1,69 +1,27 @@
 ---
 name: design-system-ui-review
-description: Use when reviewing a Gutenberg, plugin, or application UI/UX change for correct public WordPress Design System usage and user-facing behaviour, including a component, control, visual styling, token, interaction, layout, overlay, or other user-facing interface; do not use to implement a change or review Design System package source.
+description: Use when reviewing Gutenberg, plugin, or application UI for WordPress Design System usage, including custom UI. For changes to Design System packages themselves, use design-system-code-review.
 ---
 
-# Review a WordPress Design System interface
+# Review UI for Design System use
 
-## Start shallow
+In a Gutenberg checkout, read the relative links below from the checked-out revision. Outside a checkout, resolve them from `.agents/skills/design-system-ui-review/` in [Gutenberg on GitHub](https://github.com/WordPress/gutenberg/tree/trunk).
 
-1. Define the changed user-facing behaviour, affected users, runtime document,
-   target versions, and dependency deployment boundary.
-2. Scan the complete diff once for semantics and accessibility, interaction
-   and focus, styling and tokens, integration, tests, and compatibility.
-   Account for every changed file before deep research; finding one defect
-   does not end this pass.
-3. Choose the narrowest review path:
-   - **Lightweight:** copy-only or supported-prop changes with no interaction,
-     styling, or setup change.
-   - **Standard:** component, custom UI, styling, or interaction changes.
-   - **Deep:** migrations, public-contract risk, or separate documents and
-     overlays.
+Read [Working with WordPress Design System packages](../../../docs/contributors/design/design-system-packages.md). Inspect the changed UI and styles, and consumers affected by the change. For a mixed package-and-consumer change, also use [design-system-code-review](../design-system-code-review/SKILL.md) on the package source.
 
-On the lightweight path, verify the target runtime API, every changed consumer,
-and required changelog coverage. State what the change improves and what
-behaviour and semantics remain unchanged, then stop. Do not reopen component selection
-without evidence that the existing component is unsuitable.
+## What to look for
 
-## Deepen only material questions
+1. **Custom UI that duplicates a recommended component.** Check hand-built controls such as notices, buttons, dialogs, and menus. Use the Design System MCP server's `get_components`, then `get_component_details` to verify the recommended component's behavior, props, and import. Without MCP, use the guide's [recommendation sources](../../../docs/contributors/design/design-system-packages.md#choose-a-recommended-component). Recommend a replacement when it meets the requirements and avoids unnecessary custom code or improves consistency; a visible bug is not required.
+2. **Hard-coded visual values.** Look for colors, spacing, radii, typography, and shadows that should follow the Design System. Use the Design System MCP server's `get_design_tokens` when available. Without MCP, use the [token reference](../../../packages/theme/docs/tokens.md) to find a semantic token for the element's purpose and state. Prefer an existing component prop when it already expresses the intent. Do not replace every CSS literal or select a token merely because its current value matches.
+3. **Tokens used for the wrong purpose.** Use semantic `--wpds-*` tokens for Design System interface styling and `--wp--preset--*` when styling blocks or content previews with the active theme's `theme.json` presets. Judge what is being styled: a content preview inside the editor can still need the active theme's presets. Check token roles and states as well as prefixes.
+4. **Dependence on component internals.** Flag imports from package-private paths and selectors that depend on private classes or markup. Use documented props, styling hooks, or composition. If none meets the need, identify the missing capability rather than inventing an unsupported override.
+5. **Accessibility problems in custom controls or composition.** Check accessible names, required keyboard behavior, focus indication, and focus handling affected by the change. If a recommended component supplies the missing behavior, name it. Use the guide's [verification guidance](../../../docs/contributors/design/design-system-packages.md#verify-the-affected-behavior) for the applicable standards and browser checks.
+6. **Styles or theming lost at the rendering destination.** Inspect the actual portal container and owner document. A same-document portal can lose inherited tokens without needing another stylesheet or root provider. For iframes and new windows, check existing [document setup](../../../docs/contributors/design/design-system-packages.md#setup-depends-on-the-document) before recommending additions.
 
-Use the recommendation sources in
-[Working with WordPress Design System packages](../../../docs/contributors/design/design-system-packages.md#choose-a-recommended-component)
-only when component, package, prop, token, or setup selection is material.
-Apply that guide's evidence precedence: treat the supplied diff as the proposed
-post-change state, verify availability against the target version, and use MCP
-as current-direction context rather than target-version proof.
+For Gutenberg, verify recommendations against the reviewed source. For external projects using a different package or WordPress version, follow the guide's [target-version checks](../../../docs/contributors/design/design-system-packages.md#check-the-target-version). For replacements, use its [contract comparison](../../../docs/contributors/design/design-system-packages.md#compare-contracts-before-replacing-an-api), including external extension points.
 
-For standard and deep reviews, investigate only the dimensions made material
-by the first pass. Judge custom UI by demonstrated user, accessibility,
-consistency, or maintenance impact—not by the mere existence of a public
-alternative. For separate documents, verify the applicable package setup in
-the document that renders the interface.
+## Keep the review focused
 
-When custom UI has a material defect, explicitly decide whether the smallest
-coherent fix is to repair it or replace it with a verified public component.
-Do not leave the implementation direction implicit.
-
-## Finding evidence gate
-
-Before reporting a finding, establish:
-
-1. the incorrect user-observable behaviour or public contract;
-2. the exact changed line that causes it;
-3. target-version source or runtime evidence for the expected behaviour; and
-4. why the change is required now rather than an optional enhancement.
-
-If any part is missing, resolve it, report a verification gap, or omit the
-finding. Treat missing context in a diff excerpt as a gap unless the complete
-diff proves an omission. Missing tests alone are not a defect without a
-demonstrated regression or repository requirement.
-
-## Output contract
-
-Recheck every finding against the complete diff and source. Classify each
-concern as a defect, verification gap, or optional follow-up. Report material
-findings with user impact, target evidence, and the smallest coherent
-direction, plus focused verification of the affected behaviour. Report no
-findings when the evidence exposes none. Do not prescribe package internals in
-a consumer review. Route package-source reviews to
-`design-system-code-review`, then stop.
+- Do not request unrelated cleanup or migrate an existing supported component for a narrow copy or prop edit. Downstream breakage caused by the change is still in scope, even when the affected consumer is unchanged.
+- Do not request tests merely because coverage is absent. Rely on dependency coverage for behavior the dependency owns. Request a local test only for a concrete, meaningful regression risk introduced by our code or integration that existing coverage does not address. Follow the guide's [test-selection guidance](../../../docs/contributors/design/design-system-packages.md#verify-the-affected-behavior); avoid speculative edge cases and exhaustive combinations.
+- Name the verified component or token and explain what it improves. Combine findings when one replacement resolves them. Do not invent a replacement when the correct outcome is to identify a Design System gap.

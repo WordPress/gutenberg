@@ -103,7 +103,7 @@ export default function InputWidget( {
 							//
 							// In practice, this means the filter will not be able to find an empty string as the value.
 							value: nextValue === '' ? undefined : nextValue,
-					  }
+						}
 					: _filter
 			),
 		} );

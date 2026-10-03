@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/widgets",
-	"version": "4.55.0",
+	"version": "4.56.0",
 	"description": "Functionality used by the widgets block editor in the Widgets screen and the Customizer.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -17,8 +17,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
-		"npm": ">=8.19.2"
+		"node": ">=18.12.0"
 	},
 	"files": [
 		"src",

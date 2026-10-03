@@ -48,7 +48,7 @@ function BlockHTML( { clientId } ) {
 					...block,
 					attributes,
 					originalContent: content,
-			  } )
+				} )
 			: [ true ];
 
 		updateBlock( clientId, {

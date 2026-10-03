@@ -527,7 +527,7 @@ function createFromElement( { element, range, isEditableTree } ) {
 									? node.nodeValue
 									: node.getAttribute(
 											'data-rich-text-comment'
-									  ),
+										),
 						},
 					},
 				],

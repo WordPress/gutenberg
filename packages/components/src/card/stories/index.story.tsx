@@ -14,7 +14,7 @@ import Button from '../../button';
 const meta: Meta< typeof Card > = {
 	component: Card,
 	subcomponents: { CardHeader, CardBody, CardDivider, CardMedia, CardFooter },
-	title: 'Components/Containers/Card',
+	title: 'Components/@wordpress-components/Containers/Card',
 	id: 'components-card',
 	argTypes: {
 		as: {

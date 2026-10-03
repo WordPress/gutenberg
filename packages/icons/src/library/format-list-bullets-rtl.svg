@@ -1,3 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-	<path d="M4 8.8h8.9V7.2H4v1.6zm0 7h8.9v-1.5H4v1.5zM18 13c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="fill: none" stroke="currentColor" stroke-width="1.5">
+	<path d="M13 8H4M13 16H4" vector-effect="non-scaling-stroke" />
+	<path d="M18 9.25C17.3096 9.25 16.75 8.69036 16.75 8C16.75 7.30964 17.3096 6.75 18 6.75C18.6904 6.75 19.25 7.30964 19.25 8C19.25 8.69036 18.6904 9.25 18 9.25Z" fill="currentColor" stroke="none" />
+	<path d="M18 17.25C17.3096 17.25 16.75 16.6904 16.75 16C16.75 15.3096 17.3096 14.75 18 14.75C18.6904 14.75 19.25 15.3096 19.25 16C19.25 16.6904 18.6904 17.25 18 17.25Z" fill="currentColor" stroke="none" />
+	<path d="M18 9.25C17.3096 9.25 16.75 8.69036 16.75 8C16.75 7.30964 17.3096 6.75 18 6.75C18.6904 6.75 19.25 7.30964 19.25 8C19.25 8.69036 18.6904 9.25 18 9.25Z" vector-effect="non-scaling-stroke" />
+	<path d="M18 17.25C17.3096 17.25 16.75 16.6904 16.75 16C16.75 15.3096 17.3096 14.75 18 14.75C18.6904 14.75 19.25 15.3096 19.25 16C19.25 16.6904 18.6904 17.25 18 17.25Z" vector-effect="non-scaling-stroke" />
 </svg>

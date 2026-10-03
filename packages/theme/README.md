@@ -2,8 +2,8 @@
 
 A theming package that's part of the WordPress Design System. It has two parts:
 
--   **Design Tokens**: A comprehensive system of design tokens for colors, spacing, typography, and more.
--   **Theme System**: A flexible theming provider for consistent theming across applications.
+- **Design Tokens**: A comprehensive system of design tokens for colors, spacing, typography, and more.
+- **Theme System**: A flexible theming provider for consistent theming across applications.
 
 This package is not a WordPress block theme, site theme, or `theme.json` API. It provides the WordPress Design System's design tokens and React theming primitives for JavaScript packages and applications.
 
@@ -11,9 +11,31 @@ This package is not a WordPress block theme, site theme, or `theme.json` API. It
 
 This README is the entry point for package consumers. It covers how to load design tokens, use `ThemeProvider`, and configure the package's development tooling.
 
--   To use design tokens and `ThemeProvider`, start here.
--   To pick the right design token or browse every available token, see the generated [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md).
--   To edit token source files, see the [Design Tokens Maintainer's Guide](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/tokens/README.md).
+- To use design tokens and `ThemeProvider`, start here.
+- To pick the right design token or browse every available token, see the generated [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md).
+- To edit token source files, see the [Design Tokens Maintainer's Guide](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/tokens/README.md).
+
+## Public API
+
+| Entrypoint | Supported use |
+| --- | --- |
+| `@wordpress/theme` | `ThemeProvider` and the generated token scale types, such as `PaddingSize` and `GapSize`. Derive provider props and callback types from the component as shown below. |
+| `@wordpress/theme/design-tokens.css` | Default semantic `--wpds-*` custom properties. Load once per document. |
+| `@wordpress/theme/design-tokens.js` | Default export containing the list of semantic CSS custom property names. It contains names, not token values, and does not load styles. |
+| Build plugin subpaths | The four public integrations listed under [Build Plugins](#build-plugins). |
+| Stylelint plugin subpaths | The three public rules listed under [Stylelint Plugins](#stylelint-plugins). |
+
+The `privateApis` export exists for temporary compatibility with older WordPress bundles. It is not a supported consumer API. Token source JSON, ramp builders, generated fallback maps, and other paths not listed in the package's `exports` are implementation details.
+
+Runtime APIs supplied by WordPress follow its [backward compatibility policy](https://developer.wordpress.org/block-editor/contributors/code/backward-compatibility/). Installing a newer npm package does not upgrade the runtime supplied by WordPress. Check the target WordPress version before using a runtime API. Tooling subpaths use the installed npm package. Removing or renaming semantic tokens is a compatibility change; meaningful value changes belong in the changelog.
+
+To inspect token names in development tooling:
+
+```js
+import tokenNames from '@wordpress/theme/design-tokens.js';
+
+const isKnownToken = tokenNames.includes( '--wpds-dimension-gap-sm' );
+```
 
 ## Design Tokens
 
@@ -31,8 +53,8 @@ The [`ThemeProvider`](#theme-provider) component can be used to customize token 
 
 The design system splits token delivery into two complementary layers:
 
--   **Static stylesheet (`design-tokens.css`)** — defines the default value for every `--wpds-*` custom property at the document `:root`. Loaded once per document (the main page, _and_ each iframe you render React into). Provides a working baseline even before any JavaScript runs.
--   **Runtime `<ThemeProvider>`** — applies per-instance overrides for a subtree, on top of the static defaults. Use it to override individual settings (e.g. `color.primary`, `cursor.control`).
+- **Static stylesheet (`design-tokens.css`)** — defines the default value for every `--wpds-*` custom property at the document `:root`. Loaded once per document (the main page, _and_ each iframe you render React into). Provides a working baseline even before any JavaScript runs.
+- **Runtime `<ThemeProvider>`** — applies per-instance overrides for a subtree, on top of the static defaults. Use it to override individual settings (e.g. `color.primary`, `cursor.control`).
 
 #### Within WordPress
 
@@ -70,8 +92,8 @@ The semantic color tokens are designed so the default foreground/background pair
 
 Design tokens do not replace component-level accessibility handling:
 
--   **Forced colors:** components are still responsible for `forced-colors` overrides where native high-contrast rendering would otherwise hide borders, icons, focus rings, or state indicators.
--   **Reduced motion:** motion tokens provide shared durations and easing curves, but consuming components are still responsible for respecting `prefers-reduced-motion` for non-essential animations.
+- **Forced colors:** components are still responsible for `forced-colors` overrides where native high-contrast rendering would otherwise hide borders, icons, focus rings, or state indicators.
+- **Reduced motion:** motion tokens provide shared durations and easing curves, but consuming components are still responsible for respecting `prefers-reduced-motion` for non-essential animations.
 
 For example, define non-essential transitions only when the user has not requested reduced motion:
 
@@ -101,10 +123,14 @@ function App() {
 }
 ```
 
+When a setting is omitted, it inherits from the closest parent `ThemeProvider`. If there is no parent value, the prebuilt defaults from the design-tokens stylesheet apply.
+
+`ThemeProvider` does not accept wrapper customization props such as `className`, `style`, `as`, `render`, or `ref`.
+
 The `color` prop accepts an object with the following optional properties:
 
--   `primary`: The primary/accent seed color (default: `'#3858e9'`).
--   `background`: The background seed color (default: `'#fcfcfc'`).
+- `primary`: The primary/accent seed color (default: `'#3858e9'`).
+- `background`: The background seed color (default: `'#fcfcfc'`).
 
 Both properties accept a fully opaque sRGB-parseable string: a hex value (e.g. `#3858e9`), an `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`). Non-opaque alpha values, `transparent`, and other CSS color spaces (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and will throw an error.
 
@@ -128,15 +154,38 @@ Use `onColorWarnings` to receive structured warnings after the provider calculat
 
 The callback reports failures from the generated ramp checks and a defined set of semantic foreground/background pairs. It does not validate every possible token pairing. It receives an empty array when all checked targets are met. Ramp warnings identify the affected ramp and step. Contrast warnings identify the semantic foreground/background token pair and include the required and achieved contrast values. React may invoke the callback more than once in development under Strict Mode.
 
+### TypeScript props and warnings
+
+Derive types from the public component instead of importing package internals:
+
+```ts
+import type { ComponentProps } from 'react';
+import { ThemeProvider } from '@wordpress/theme';
+
+type ThemeProviderProps = ComponentProps< typeof ThemeProvider >;
+type OnColorWarnings = NonNullable< ThemeProviderProps[ 'onColorWarnings' ] >;
+type ThemeProviderColorWarning = Parameters< OnColorWarnings >[ 0 ][ number ];
+
+const onColorWarnings: OnColorWarnings = ( warnings ) => {
+	for ( const warning of warnings ) {
+		if ( warning.type === 'contrast' ) {
+			console.log( warning.foregroundToken, warning.achievedContrast );
+		} else {
+			console.log( warning.ramp, warning.step );
+		}
+	}
+};
+```
+
+The derived warning type is a union. Check `type` before accessing the fields specific to ramp or contrast warnings. Derive individual settings in the same way, for example `ThemeProviderProps[ 'cornerRadius' ]`.
+
+### Cursor and corner radius
+
 The `cursor` prop accepts an object with the following optional properties:
 
--   `control`: The cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). Accepts `'default'` or `'pointer'` (default: `'pointer'`).
+- `control`: The cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). Accepts `'default'` or `'pointer'` (default: `'pointer'`).
 
 The `cornerRadius` prop sets the overall roundness preset for the theme subtree. Accepts `'none'` (square corners), `'subtle'`, `'moderate'`, or `'pronounced'` (most rounded) (default: `'subtle'`). This scales the primitive `--wpds-border-radius-*` tokens for the provider subtree. The preset sets the overall amount of roundness, not an individual border-radius token size.
-
-When a setting is omitted, it inherits from the closest parent `ThemeProvider`. If there is no parent value, the prebuilt defaults from the design-tokens stylesheet apply.
-
-`ThemeProvider` does not accept wrapper customization props such as `className`, `style`, `as`, `render`, or `ref`.
 
 ### Light and dark themes
 
@@ -278,7 +327,13 @@ The build plugins inject generated fallbacks into bare `var(--wpds-*)` reference
 | `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks`           | esbuild       | JS/TS |
 | `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks`                 | Vite          | JS/TS |
 
-Existing fallbacks are unchanged. An unknown token in a bare reference fails the build.
+Existing fallbacks are unchanged. An unknown token in a bare reference in transformed values fails the build.
+
+The JavaScript plugins treat token references in string values, JSX attribute values, and static template parts as CSS. This includes tagged templates such as `String.raw`. They leave comments, regular expressions, property names, module paths, JSX text, and TypeScript types unchanged. Token names assembled across template expressions are not resolved. As before, a token reference in a runtime message string is also treated as CSS.
+
+Files the JavaScript parser cannot read are left unchanged for the downstream compiler. To add fallbacks in Vite files that use custom syntax, configure the syntax-stripping plugin with `enforce: 'pre'` and list it before the token fallback plugin.
+
+Both JavaScript plugins preserve source maps. The Vite plugin runs before JavaScript and TypeScript compilation and supports module IDs with query strings. It skips `?raw` and `?url` imports so their exported file contents and URLs stay unchanged.
 
 ### PostCSS
 
@@ -304,7 +359,7 @@ const { code } = transform( {
 } );
 ```
 
-> **Note:** CSS Modules [`from global`](https://lightningcss.dev/css-modules.html#local-css-variables) references (for example `var(--wpds-dimension-gap-sm from global)` with `cssModules.dashedIdents`) are not yet supported. The visitor rebuilds `var()` from the token name alone, so `from` metadata is dropped and global custom properties may be incorrectly hashed.
+The visitor preserves CSS Modules [`from global`](https://lightningcss.dev/css-modules.html#local-css-variables) references such as `var(--wpds-dimension-gap-sm from global)` when it adds a fallback. Custom properties inside generated fallbacks, including `--wp-admin-*` variables, also remain global so admin overrides still apply.
 
 ### esbuild
 

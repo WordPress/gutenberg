@@ -69,11 +69,10 @@ export type DashboardLanesLayoutItem = {
  * - Both together: `columns` caps the count, `minColumnWidth` enforces
  *   a per-tile width floor that can reduce the count below the cap.
  */
-export interface DashboardLanesProps
-	extends Omit<
-		React.ComponentPropsWithoutRef< 'div' >,
-		'children' | 'className' | 'style'
-	> {
+export interface DashboardLanesProps extends Omit<
+	React.ComponentPropsWithoutRef< 'div' >,
+	'children' | 'className' | 'style'
+> {
 	/**
 	 * Array of layout items.
 	 */

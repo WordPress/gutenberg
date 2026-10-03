@@ -3,13 +3,9 @@ import { userEvent } from 'vitest/browser';
 import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '../style.scss';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '../../button/style.scss';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '../../dropdown/style.scss';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '../../popover/style.scss';
 import CustomGradientPicker from '../';
 import CustomGradientBar from '../gradient-bar';

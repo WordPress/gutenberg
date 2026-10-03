@@ -16,6 +16,8 @@ export type SectionDefinition = {
 	budget: number;
 	/** Label for a section long enough to collapse. Omitted leaves it open. */
 	summary?: string;
+	/** Which end truncation keeps. Defaults to the start. */
+	keep?: 'start' | 'end';
 };
 
 /*
@@ -34,7 +36,9 @@ export const SECTIONS: SectionDefinition[] = [
 		id: 'props',
 		heading: '🎉 Props',
 		scope: 'pr-state',
-		budget: 8000,
+		budget: 20000,
+		// The trailer a committer copies is the last thing in the body.
+		keep: 'end',
 	},
 	{
 		id: 'labels',
@@ -52,21 +56,20 @@ export const SECTIONS: SectionDefinition[] = [
 		id: 'bundle-size',
 		heading: '📦 Bundle size',
 		scope: 'commit',
-		budget: 12000,
+		budget: 10000,
 	},
 	{
 		id: 'performance',
 		heading: '⚡ Performance',
 		scope: 'commit',
-		budget: 12000,
+		budget: 10000,
 		summary: 'Show the results',
 	},
 	{
 		id: 'flaky-tests',
 		heading: '🏁 Flaky tests',
 		scope: 'commit',
-		budget: 16000,
-		summary: 'Show the failures',
+		budget: 14000,
 	},
 ];
 

@@ -21,13 +21,11 @@ function isGreater( a: Comparable, b: Comparable ): boolean {
  * Recursive stable sorting comparator function.
  *
  * @param field Field to sort by.
- * @param items Items to sort.
  * @param order Order, 'asc' or 'desc'.
  * @return Comparison function to be used in a `.sort()`.
  */
 const comparator = < T extends SortItem >(
 	field: SortField< T >,
-	items: T[],
 	order: string
 ) => {
 	return ( a: T, b: T ) => {
@@ -47,16 +45,7 @@ const comparator = < T extends SortItem >(
 			return order === 'asc' ? -1 : 1;
 		}
 
-		const orderA = items.findIndex( ( item ) => item === a );
-		const orderB = items.findIndex( ( item ) => item === b );
-
-		// Stable sort: maintaining original array order
-		if ( orderA > orderB ) {
-			return 1;
-		} else if ( orderB > orderA ) {
-			return -1;
-		}
-
+		// `Array.prototype.sort` is stable, so ties keep their original order.
 		return 0;
 	};
 };
@@ -77,5 +66,5 @@ export function orderBy< T extends SortItem >(
 	field: SortField< T >,
 	order = 'asc'
 ) {
-	return items.concat().sort( comparator( field, items, order ) );
+	return items.concat().sort( comparator( field, order ) );
 }

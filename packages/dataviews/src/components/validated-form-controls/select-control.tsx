@@ -1,10 +1,10 @@
 import { forwardRef, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-import { SelectControl } from '@wordpress/components';
+import { SelectControl as WCSelectControl } from '@wordpress/components';
 import { ControlWithError } from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 
-type SelectControlProps = React.ComponentProps< typeof SelectControl >;
+type SelectControlProps = React.ComponentProps< typeof WCSelectControl >;
 
 type ValidatedSelectControlProps = Omit<
 	SelectControlProps,
@@ -34,7 +34,7 @@ const UnforwardedValidatedSelectControl = (
 			customValidity={ customValidity }
 			getValidityTarget={ () => validityTargetRef.current }
 		>
-			<SelectControl
+			<WCSelectControl
 				ref={ mergedRefs }
 				{
 					// A runtime boolean cannot statically discriminate

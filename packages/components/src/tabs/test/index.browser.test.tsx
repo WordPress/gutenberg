@@ -81,7 +81,7 @@ const TABS_WITH_ALPHA_DISABLED = TABS.map( ( tabObj ) =>
 					...tabObj.tab,
 					disabled: true,
 				},
-		  }
+			}
 		: tabObj
 );
 
@@ -93,7 +93,7 @@ const TABS_WITH_BETA_DISABLED = TABS.map( ( tabObj ) =>
 					...tabObj.tab,
 					disabled: true,
 				},
-		  }
+			}
 		: tabObj
 );
 
@@ -930,7 +930,7 @@ describe( 'Tabs', () => {
 										),
 
 										tabpanel: { focusable: false },
-								  }
+									}
 								: tabObj
 						) }
 					/>

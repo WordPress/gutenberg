@@ -3,7 +3,8 @@ import { useState } from '@wordpress/element';
 import { CheckboxControl, CheckboxGroup, Fieldset } from '..';
 
 const meta: Meta = {
-	title: 'Design System/Components/Form/Checkbox Groups',
+	title: 'Components/@wordpress-ui/Form/Checkbox Groups',
+	id: 'design-system-components-form-checkbox-groups',
 	tags: [ '!autodocs', '!dev' ],
 	parameters: {
 		controls: { disable: true },

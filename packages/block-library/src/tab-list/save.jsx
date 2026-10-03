@@ -4,6 +4,7 @@ import {
 	useBlockProps,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 } from '@wordpress/block-editor';
 
@@ -16,6 +17,7 @@ export default function save( { attributes } ) {
 	const colorProps = getColorClassesAndStyles( attributes );
 	const borderProps = getBorderClassesAndStyles( attributes );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
+	const shadowProps = getShadowClassesAndStyles( attributes );
 
 	const buttonClassName = clsx( colorProps.className, borderProps.className );
 
@@ -23,6 +25,7 @@ export default function save( { attributes } ) {
 		...colorProps.style,
 		...borderProps.style,
 		...spacingProps.style,
+		...shadowProps.style,
 	};
 
 	return (

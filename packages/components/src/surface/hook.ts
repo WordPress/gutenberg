@@ -27,7 +27,7 @@ export function useSurface(
 				'--wp-components-surface-background-size-dotted': `${
 					backgroundSize - 1
 				}px`,
-		  }
+			}
 		: style;
 
 	return {

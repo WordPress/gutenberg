@@ -401,7 +401,7 @@ supports: {
 
 _**Note:** Deprecated since WordPress 6.3._
 
-This property has been replaced by [`filter.duotone`](#filterduotone).
+This property has been replaced by [`filter.duotone`](#filter-duotone).
 
 ### color.gradients
 
@@ -1042,7 +1042,7 @@ When the block declares support for `shadow`, the attributes definition is exten
     -   `padding`: type `boolean` or `array`, default value `false`
     -   `blockGap`: type `boolean` or `array`, default value `false`
 
-This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/theme-support.md#cover-block-padding).
+This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/theme-support.md#spacing-control).
 
 ```js
 supports: {

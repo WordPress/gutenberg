@@ -1,0 +1,40 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as ProgressStories from './index.story';
+
+<Meta id="design-system-components-progress-usage-guidelines" title="Components/@wordpress-ui/Progress/Usage Guidelines" />
+
+# Progress usage guidelines
+
+## When to use Progress
+
+Use `Progress` to show how much of a task has completed, such as uploading files, exporting data, or installing an update. Keep the indicator close to the task it describes.
+
+Use a meter for a measurement within a known range, such as storage usage or battery charge. A meter describes a quantity rather than task completion. See the [WAI-ARIA meter pattern](https://www.w3.org/WAI/ARIA/apg/patterns/meter/). A link to the WordPress UI Meter component will be added when it is available.
+
+## Label the task
+
+Use `Progress.Label` to describe the task. If you omit the visible label, give `Progress.Root` an accessible name through `aria-label` or `aria-labelledby`.
+
+Place `Progress.Indicator` inside `Progress.Track`. Keep `Progress.Label` and `Progress.Value` outside Track so its clipping does not hide the text. Use `Stack` to arrange the label and value together.
+
+<Canvas of={ ProgressStories.Default } />
+
+## Choose a progress value
+
+Pass a numeric `value` when the amount of completed work is known. The default range is 0 to 100. Use `min` and `max` for tasks with different units.
+
+Pass `value={ null }` when the amount of completed work is unknown. Indeterminate progress shows activity without suggesting a completion percentage.
+
+<Canvas of={ ProgressStories.Indeterminate } />
+
+## Format values for the task
+
+`Progress.Value` displays a percentage by default. Use `format` and `locale` to change number formatting. For task-specific text, provide a child function to Value and use `getAriaValueText` on Root to give assistive technology the same information. Check whether the numeric value is `null` before displaying a completion amount.
+
+<Canvas of={ ProgressStories.CustomValueFormat } />
+
+## Customize the indicator color
+
+The indicator uses a neutral color by default. Its optional `color` prop accepts CSS colors, including CSS variables. Use `currentColor` to inherit the surrounding text color. Only the indicator changes color.
+
+<Canvas of={ ProgressStories.CustomColor } />

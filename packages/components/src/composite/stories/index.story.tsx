@@ -6,7 +6,7 @@ import { Tooltip } from '../../tooltip';
 
 const meta: Meta< typeof Composite > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Utilities/Composite',
+	title: 'Components/@wordpress-components/Utilities/Composite',
 	id: 'components-composite',
 	component: Composite,
 	subcomponents: {
@@ -60,7 +60,6 @@ const meta: Meta< typeof Composite > = {
 							fontStyle: 'italic',
 						} }
 					>
-						{ /* eslint-disable-next-line no-restricted-syntax */ }
 						<p id="list-title">Notes</p>
 						<ul aria-labelledby="list-title">
 							<li>

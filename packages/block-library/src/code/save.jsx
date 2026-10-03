@@ -14,7 +14,7 @@ export default function save( { attributes } ) {
 						? attributes.content
 						: attributes.content.toHTMLString( {
 								preserveWhiteSpace: true,
-						  } )
+							} )
 				) }
 			/>
 		</pre>

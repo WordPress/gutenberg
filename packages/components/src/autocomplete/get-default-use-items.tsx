@@ -73,12 +73,12 @@ export default function getDefaultUseItems( autocompleter: WPCompleter ) {
 								keywords: autocompleter.getOptionKeywords
 									? autocompleter.getOptionKeywords(
 											optionData
-									  )
+										)
 									: [],
 								isDisabled: autocompleter.isOptionDisabled
 									? autocompleter.isOptionDisabled(
 											optionData
-									  )
+										)
 									: false,
 							} )
 						);

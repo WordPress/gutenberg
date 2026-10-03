@@ -47,7 +47,7 @@ export default function MediaAttachedToEdit( {
 						),
 						value: data.post.toString(),
 					},
-			  ]
+				]
 			: [];
 	const [ options, setOptions ] =
 		useState< { label: string; value: string }[] >( defaultPost );

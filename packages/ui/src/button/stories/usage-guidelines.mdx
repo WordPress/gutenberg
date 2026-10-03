@@ -3,7 +3,7 @@ import * as UsageGuidelinesStories from './usage-guidelines.story';
 
 <Meta of={ UsageGuidelinesStories } />
 
-# Button, IconButton, Link, and LinkButton
+# Button, IconButton, Link, and ButtonLink
 
 Choose the component based on **what happens when the user activates it**, not only on how it should look.
 
@@ -14,7 +14,7 @@ Choose the component based on **what happens when the user activates it**, not o
 | --- | --- | --- | --- |
 | Performs an action on the current page | [Button](?path=/docs/design-system-components-button--docs), [IconButton](?path=/docs/design-system-components-iconbutton--docs) | \`<button>\` | Save, Delete, Submit, toolbar icon actions |
 | Navigate to another page or URL | [Link](?path=/docs/design-system-components-link--docs) | \`<a>\` | "Learn more", docs links, external references |
-| Navigate with button styling | [LinkButton](?path=/docs/design-system-components-linkbutton--docs) | \`<a>\` | Standalone CTAs, card actions |
+| Navigate with button styling | [ButtonLink](?path=/docs/design-system-components-buttonlink--docs) | \`<a>\` | Standalone CTAs, card actions |
 ` }</Markdown>
 
 ## Use `Button` and `IconButton` for actions
@@ -53,24 +53,24 @@ Compose `Text` as the host and `Link` via `render` when you need typography from
 
 See [Link](?path=/docs/design-system-components-link--docs) for API details and examples.
 
-## Use `LinkButton` for navigation with button styling
+## Use `ButtonLink` for navigation with button styling
 
-Use `LinkButton` when the destination is a **URL** and the control should **look like a `Button`** — for example, standalone calls to action, card footers, or notice actions where button weight fits the layout.
+Use `ButtonLink` when the destination is a **URL** and the control should **look like a `Button`** — for example, standalone calls to action, card footers, or notice actions where button weight fits the layout.
 
-`LinkButton` shares `Button` visual props (`variant`, `tone`, `size`) but renders an `<a>` like `Link`. Use `openInNewTab` for external destinations (adds `target="_blank"` and an accessible new-tab indicator). It does **not** support `disabled`, `loading`, `focusableWhenDisabled`, `nativeButton`, or toggle `aria-pressed`.
+`ButtonLink` shares `Button` visual props (`variant`, `tone`, `size`) but renders an `<a>` like `Link`. Use `openInNewTab` for external destinations (adds `target="_blank"` and an accessible new-tab indicator). It does **not** support `disabled`, `loading`, `focusableWhenDisabled`, `nativeButton`, or toggle `aria-pressed`.
 
-Do **not** use `LinkButton` for form submit, dialogs, or other non-navigation actions — use `Button` instead.
+Do **not** use `ButtonLink` for form submit, dialogs, or other non-navigation actions — use `Button` instead.
 
-Do **not** use `Button` with `render={ <a href="…" /> }` and `nativeButton={ false }` for new code when `LinkButton` fits; `LinkButton` is the supported pattern for button-styled links.
+Do **not** use `Button` with `render={ <a href="…" /> }` and `nativeButton={ false }` for new code when `ButtonLink` fits; `ButtonLink` is the supported pattern for button-styled links.
 
-<Canvas of={ UsageGuidelinesStories.UseLinkButtonForNavigation } />
+<Canvas of={ UsageGuidelinesStories.UseButtonLinkForNavigation } />
 
-> **Note:** Prefer `Link` for navigation when possible. Its underline and link styling communicate where the user is going more clearly than a button-shaped control. Reach for `LinkButton` only when you have considered `Button` and `Link` and still need button prominence.
+> **Note:** Prefer `Link` for navigation when possible. Its underline and link styling communicate where the user is going more clearly than a button-shaped control. Reach for `ButtonLink` only when you have considered `Button` and `Link` and still need button prominence.
 
-See [LinkButton](?path=/docs/design-system-components-linkbutton--docs) for API details and examples.
+See [ButtonLink](?path=/docs/design-system-components-buttonlink--docs) for API details and examples.
 
 ## Common mistakes
 
 -   **`Button` or `IconButton` + `onClick` for navigation** — Prefer `Link` with a real `href` so keyboard, assistive technology, and browser link affordances stay correct.
--   **`LinkButton` when `Link` would work** — Default to `Link` for navigation; button styling can obscure that the control goes elsewhere.
--   **`LinkButton` for submit or toggle actions** — Use `Button` or `IconButton`, depending on whether the control needs a visible text label or is icon-only; `LinkButton` does not support loading or pressed toggle styling.
+-   **`ButtonLink` when `Link` would work** — Default to `Link` for navigation; button styling can obscure that the control goes elsewhere.
+-   **`ButtonLink` for submit or toggle actions** — Use `Button` or `IconButton`, depending on whether the control needs a visible text label or is icon-only; `ButtonLink` does not support loading or pressed toggle styling.

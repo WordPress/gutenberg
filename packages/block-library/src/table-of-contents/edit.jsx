@@ -8,7 +8,7 @@ import { createBlock } from '@wordpress/blocks';
 import {
 	Spinner,
 	ToggleControl,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	ToolbarButton,
 	ToolbarGroup,
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -222,10 +222,10 @@ export default function TableOfContentsEdit( props ) {
 							onlyIncludeCurrentPage
 								? __(
 										'Only including headings from the current page (if the post is paginated).'
-								  )
+									)
 								: __(
 										'Include headings from all pages (if the post is paginated).'
-								  )
+									)
 						}
 					/>
 				</ToolsPanelItem>
@@ -237,7 +237,7 @@ export default function TableOfContentsEdit( props ) {
 					}
 					isShownByDefault
 				>
-					<SelectControl
+					<WCSelectControl
 						label={ __( 'Include headings down to level' ) }
 						value={ maxLevel || '' }
 						options={ [
@@ -258,10 +258,10 @@ export default function TableOfContentsEdit( props ) {
 							! maxLevel
 								? __(
 										'Including all heading levels in the table of contents.'
-								  )
+									)
 								: __(
 										'Only include headings up to and including this level.'
-								  )
+									)
 						}
 					/>
 				</ToolsPanelItem>

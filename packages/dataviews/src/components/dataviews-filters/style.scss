@@ -264,8 +264,8 @@
 				content: "";
 				border-radius: 50%;
 				box-sizing: inherit;
-				width: vars.$radio-input-size-sm * 0.5;
-				height: vars.$radio-input-size-sm * 0.5;
+				width: vars.$radio-input-size * 0.5;
+				height: vars.$radio-input-size * 0.5;
 				position: absolute;
 				top: 50%;
 				left: 50%;
@@ -276,10 +276,6 @@
 				// This border serves as a background color in Windows High Contrast mode.
 				border: 4px solid var(--wpds-color-foreground-interactive-brand-strong);
 
-				@include break-small() {
-					width: vars.$radio-input-size * 0.5;
-					height: vars.$radio-input-size * 0.5;
-				}
 			}
 		}
 	}

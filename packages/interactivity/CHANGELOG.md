@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `getConfig` accepts a type parameter describing the config it returns, like `getContext` does, so consumers can read typed config values. It defaults to `any`, so existing calls are unaffected ([#71692](https://github.com/WordPress/gutenberg/pull/71692)).
+
+## 6.56.0 (2026-09-23)
+
 ## 6.55.0 (2026-09-10)
 
 ## 6.54.0 (2026-08-26)

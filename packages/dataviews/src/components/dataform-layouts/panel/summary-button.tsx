@@ -87,12 +87,12 @@ export default function SummaryButton< Item >( {
 				// translators: %s: Field name.
 				_x( 'Edit %s (has errors)', 'field' ),
 				fieldLabel || ''
-		  )
+			)
 		: sprintf(
 				// translators: %s: Field name.
 				_x( 'Edit %s', 'field' ),
 				fieldLabel || ''
-		  );
+			);
 
 	return (
 		<div className={ className }>

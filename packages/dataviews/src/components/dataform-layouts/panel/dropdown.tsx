@@ -100,7 +100,7 @@ function PanelDropdown< Item >( {
 			fields: !! field.children
 				? field.children
 				: // If not explicit children return the field id itself.
-				  [ { id: field.id, layout: DEFAULT_LAYOUT } ],
+					[ { id: field.id, layout: DEFAULT_LAYOUT } ],
 		} ),
 		[ field ]
 	);
@@ -121,6 +121,9 @@ function PanelDropdown< Item >( {
 	if ( ! fieldDefinition ) {
 		return null;
 	}
+	const isDisabled =
+		fieldDefinition.readOnly === true ||
+		fieldDefinition.isDisabled( { item: data, field: fieldDefinition } );
 
 	return (
 		<div
@@ -144,7 +147,7 @@ function PanelDropdown< Item >( {
 						summaryFields={ summaryFields }
 						validity={ validity }
 						touched={ touched }
-						disabled={ fieldDefinition.readOnly === true }
+						disabled={ isDisabled }
 						isOpen={ isOpen }
 						onClick={ onToggle }
 					/>

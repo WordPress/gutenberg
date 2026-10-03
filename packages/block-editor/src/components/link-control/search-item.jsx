@@ -42,7 +42,10 @@ const TYPES = {
 function SearchItemIcon( { isURL, suggestion } ) {
 	let icon = null;
 
-	if ( isURL ) {
+	// A suggestion added by `transformSuggestions` can bring its own icon.
+	if ( suggestion.icon ) {
+		icon = suggestion.icon;
+	} else if ( isURL ) {
 		icon = globe;
 	} else if ( suggestion.type in TYPES ) {
 		icon = TYPES[ suggestion.type ].icon;
@@ -166,6 +169,11 @@ function getVisualTypeName( suggestion ) {
 
 	if ( suggestion.isBlogHome ) {
 		return __( 'Blog home' );
+	}
+
+	// A suggestion added by `transformSuggestions` can bring its own label.
+	if ( suggestion.typeLabel ) {
+		return suggestion.typeLabel;
 	}
 
 	// Provide translated labels for built-in post types. Ideally, the API would return the localised CPT or taxonomy label.

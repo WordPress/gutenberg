@@ -12,7 +12,11 @@ import {
 } from '../components/block-edit/context';
 import { useSettings } from '../components';
 import { useSettingsForBlockElement } from '../components/global-styles/hooks';
-import { getValueFromObjectPath, setImmutably } from '../utils/object';
+import {
+	getValueFromObjectPath,
+	isPlainObject,
+	setImmutably,
+} from '../utils/object';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 
@@ -23,11 +27,7 @@ import { unlock } from '../lock-unlock';
  * @return {*} Object cleaned from falsy values
  */
 export const cleanEmptyObject = ( object ) => {
-	if (
-		object === null ||
-		typeof object !== 'object' ||
-		Array.isArray( object )
-	) {
+	if ( ! isPlainObject( object ) ) {
 		return object;
 	}
 
@@ -228,6 +228,7 @@ export function useBlockSettings( name, parentLayout ) {
 		backgroundImage,
 		backgroundSize,
 		gradient,
+		backgroundClip,
 		customFontFamilies,
 		defaultFontFamilies,
 		themeFontFamilies,
@@ -297,6 +298,7 @@ export function useBlockSettings( name, parentLayout ) {
 		'background.backgroundImage',
 		'background.backgroundSize',
 		'background.gradient',
+		'background.backgroundClip',
 		'typography.fontFamilies.custom',
 		'typography.fontFamilies.default',
 		'typography.fontFamilies.theme',
@@ -370,6 +372,7 @@ export function useBlockSettings( name, parentLayout ) {
 				backgroundImage,
 				backgroundSize,
 				gradient,
+				backgroundClip,
 			},
 			color: {
 				palette: {
@@ -466,6 +469,7 @@ export function useBlockSettings( name, parentLayout ) {
 		backgroundImage,
 		backgroundSize,
 		gradient,
+		backgroundClip,
 		customFontFamilies,
 		defaultFontFamilies,
 		themeFontFamilies,

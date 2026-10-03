@@ -5,7 +5,8 @@ import { keyboardReturn } from '@wordpress/icons';
 import URLPopover from '../';
 
 const meta = {
-	title: 'BlockEditor/URLPopover',
+	id: 'blockeditor-urlpopover',
+	title: 'Editor/Block Editor/URLPopover',
 	component: URLPopover,
 	parameters: {
 		// FIXME: Story uses a raw unstyled input whose placeholder fails color-contrast.

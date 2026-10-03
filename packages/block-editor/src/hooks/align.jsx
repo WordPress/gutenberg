@@ -112,18 +112,15 @@ function BlockEditAlignmentToolbarControlsPure( {
 		hasBlockSupport( blockName, 'alignWide', true )
 	);
 
-	const { enabled, unavailable } = useAlignmentMenu( blockAllowedAlignments );
+	const { enabled } = useAlignmentMenu( blockAllowedAlignments );
 	const blockEditingMode = useBlockEditingMode();
 	/*
-	 * Render whenever there is something to say, which includes having only
-	 * unavailable alignments to report: a Group supports nothing but wide and
-	 * full, so in a layout offering neither the control would otherwise vanish
-	 * from the block most likely to want them.
+	 * Only render when some alignment actually works. Many blocks — Paragraph,
+	 * Heading, List, Group among them — support nothing but wide and full, so
+	 * in a layout offering neither, a control made only of unavailable options
+	 * would sit on the toolbar unable to change anything.
 	 */
-	if (
-		( ! enabled.length && ! unavailable.length ) ||
-		blockEditingMode !== 'default'
-	) {
+	if ( ! enabled.length || blockEditingMode !== 'default' ) {
 		return null;
 	}
 

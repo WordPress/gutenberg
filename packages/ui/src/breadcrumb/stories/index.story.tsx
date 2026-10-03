@@ -5,7 +5,8 @@ import type { ComponentProps } from 'react';
 import * as Breadcrumb from '../';
 
 const meta: Meta< typeof Breadcrumb.Root > = {
-	title: 'Design System/Components/Breadcrumb',
+	title: 'Components/@wordpress-ui/Breadcrumb',
+	id: 'design-system-components-breadcrumb',
 	component: Breadcrumb.Root,
 	subcomponents: {
 		'Breadcrumb.LinkItem': Breadcrumb.LinkItem,
@@ -140,7 +141,7 @@ export const LongLabelsAndRtl: Story = {
 };
 
 const RouterLink = forwardRef< HTMLAnchorElement, ComponentProps< 'a' > >(
-	function RouterLink( { children, ...props }, ref ) {
+	function UnforwardedRouterLink( { children, ...props }, ref ) {
 		return (
 			<a { ...props } ref={ ref } data-router-link>
 				{ children }

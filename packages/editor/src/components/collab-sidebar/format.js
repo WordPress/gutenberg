@@ -6,8 +6,6 @@ import { store as editorStore } from '../../store';
 import { SIDEBARS } from './constants';
 import { unlock } from '../../lock-unlock';
 
-export const NOTE_FORMAT_NAME = 'core/note';
-
 /*
  * Anchoring-only format: it serializes an inline note's in-content marker as
  * `<mark class="wp-note" data-id="N">`. Notes are added from the block options

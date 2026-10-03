@@ -316,8 +316,10 @@ const deepMergeRecursive = (
 
 			// Handle nested objects
 		} else if ( isPlainObject( source[ key ] ) ) {
-			const targetValue = Object.getOwnPropertyDescriptor( target, key )
-				?.value;
+			const targetValue = Object.getOwnPropertyDescriptor(
+				target,
+				key
+			)?.value;
 			if ( isNew || ( override && ! isPlainObject( targetValue ) ) ) {
 				// Create a new object if the property is new or needs to be overridden
 				target[ key ] = {};
