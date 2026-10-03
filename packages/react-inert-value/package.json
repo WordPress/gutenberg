@@ -1,0 +1,60 @@
+{
+	"name": "@wordpress/react-inert-value",
+	"version": "1.0.0-prerelease",
+	"description": "Return a React `inert` prop value that works under both React 18 and React 19.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"react",
+		"inert"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/react-inert-value/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/react-inert-value"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=20.10.0"
+	},
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"default": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScript": false,
+	"types": "build-types",
+	"sideEffects": false,
+	"devDependencies": {
+		"vitest": "^5.0.3"
+	},
+	"peerDependencies": {
+		"@types/react": "^18 || ^19",
+		"react": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

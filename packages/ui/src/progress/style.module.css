@@ -1,0 +1,71 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.label,
+		.value {
+			color: var(--wpds-color-foreground-content-neutral);
+		}
+
+		.value {
+			font-variant-numeric: tabular-nums;
+		}
+
+		.track {
+			position: relative;
+			overflow: hidden;
+			width: 100%;
+			/* Preserve the thin default of the original ProgressBar. */
+			height: 1.5px;
+			border-radius: var(--wpds-border-radius-lg);
+			background-color: var(--wpds-color-background-track-neutral);
+
+			@media (forced-colors: active) {
+				outline: var(--wpds-border-width-xs) solid CanvasText;
+				outline-offset: var(--wpds-border-width-xs);
+			}
+		}
+
+		.indicator {
+			position: absolute;
+			inset-block-start: 0;
+			height: 100%;
+			border-radius: inherit;
+			color: var(--wpds-color-background-thumb-neutral);
+			background-color: currentColor;
+
+			@media not (prefers-reduced-motion) {
+				transition: width var(--wpds-motion-duration-xl) ease-in-out;
+			}
+
+			&[data-indeterminate] {
+				width: 50%;
+				/* Loading motion needs a longer cycle than the transition tokens. */
+				animation: progress-slide 1.5s ease-in-out infinite;
+				transition: none;
+
+				@media (prefers-reduced-motion: reduce) {
+					animation-duration: 3s;
+					animation-timing-function: steps(4, end);
+				}
+			}
+		}
+
+		@media (forced-colors: active) {
+			.indicator {
+				forced-color-adjust: none;
+				background-color: CanvasText;
+			}
+		}
+
+		@keyframes progress-slide {
+			from {
+				inset-inline-start: -50%;
+			}
+
+			to {
+				inset-inline-start: 100%;
+			}
+		}
+	}
+}
