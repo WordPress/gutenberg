@@ -119,6 +119,7 @@
 				]
 			},
 			{ "docs/how-to-guides/enqueueing-assets-in-the-editor.md": [] },
+			{ "docs/how-to-guides/extend-editor.md": [] },
 			{ "docs/how-to-guides/feature-flags.md": [] },
 			{ "docs/how-to-guides/format-api.md": [] },
 			{ "docs/how-to-guides/internationalization.md": [] },
