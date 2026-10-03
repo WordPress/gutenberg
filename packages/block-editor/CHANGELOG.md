@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   Mixed block selections containing text blocks now expose the core style controls shared by every selected text block, while leaving non-text blocks unchanged ([#81118](https://github.com/WordPress/gutenberg/pull/81118)).
 -   Inserter: Open faster when many block types are registered ([#83446](https://github.com/WordPress/gutenberg/pull/83446)).
 -   State control badges: migrate from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Badge` ([#82608](https://github.com/WordPress/gutenberg/pull/82608)).
 -   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
