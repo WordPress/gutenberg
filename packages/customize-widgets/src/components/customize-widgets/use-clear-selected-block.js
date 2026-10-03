@@ -40,6 +40,7 @@ export default function useClearSelectedBlock( sidebarControl, popoverRef ) {
 					// 3. It should also not exist in the container, the popover, nor the dialog.
 					! container.contains( element ) &&
 					! popoverRef.current.contains( element ) &&
+					! element.closest( '[data-wp-compat-overlay-slot]' ) &&
 					! element.closest( '[role="dialog"]' ) &&
 					// 4. The inspector should not be opened.
 					! inspector.expanded()
