@@ -526,6 +526,12 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				}
 			}
 
+			// Sites can exclude emoji or limit reactions to the named list
+			// via `gutenberg_note_reaction_emoji_settings`.
+			if ( $is_hex_key ) {
+				$is_hex_key = gutenberg_is_note_reaction_hex_key_allowed( $emoji_key );
+			}
+
 			if ( ! $is_hex_key ) {
 				return new WP_Error(
 					'rest_comment_invalid_reaction',

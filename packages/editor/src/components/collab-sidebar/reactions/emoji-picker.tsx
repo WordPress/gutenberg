@@ -14,13 +14,20 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	detectLocale,
+	getOverrideLabel,
 	normalizeHexcode,
 	useEmojibaseConfig,
 	useEmojibaseData,
 } from './emojibase-data';
 import type { EmojibaseEntry } from './emojibase-data';
 import { useFrequentEmojis } from './frequent-emojis';
-import { getCuratedLabel } from './reaction-emojis';
+import {
+	getCuratedLabel,
+	getNamedHexKeys,
+	isReactionEmojiAllowed,
+	useReactionEmojiRules,
+	useReactionEmojis,
+} from './reaction-emojis';
 import SkinTonePicker, { applySkinTone } from './skin-tone-picker';
 
 /**
@@ -173,13 +180,15 @@ export function chunkRows< T >( emojis: T[] ): T[][] {
  * Case-insensitive search over emoji labels and Emojibase tags. Returns
  * the unfiltered list when the query is empty.
  *
- * @param emojis Emoji records.
- * @param query  Search query.
+ * @param emojis    Emoji records.
+ * @param query     Search query.
+ * @param overrides Map of `hexcode => translated label`.
  * @return Matching emoji records.
  */
 export function searchEmojis(
 	emojis: EmojibaseEntry[],
-	query: string
+	query: string,
+	overrides: Record< string, string > | null
 ): EmojibaseEntry[] {
 	const trimmed = query.trim().toLowerCase();
 	if ( ! trimmed ) {
@@ -187,11 +196,13 @@ export function searchEmojis(
 	}
 	return emojis.filter( ( entry ) => {
 		/*
-		 * Match both the curated and the Emojibase label, so searching
-		 * either name finds the emoji.
+		 * Match both the site's or curated label and the Emojibase one, so
+		 * searching either name finds the emoji.
 		 */
-		const curated = getCuratedLabel( normalizeHexcode( entry.hexcode ) );
-		if ( curated && curated.toLowerCase().includes( trimmed ) ) {
+		const named =
+			getOverrideLabel( overrides, entry.hexcode ) ||
+			getCuratedLabel( normalizeHexcode( entry.hexcode ) );
+		if ( named && named.toLowerCase().includes( trimmed ) ) {
 			return true;
 		}
 		if ( entry.label && entry.label.toLowerCase().includes( trimmed ) ) {
@@ -235,7 +246,7 @@ export default function EmojiPicker( {
 	 */
 	const [ isWarm, setIsWarm ] = useState( false );
 	const warm = () => setIsWarm( true );
-	const { baseUrl } = useEmojibaseConfig();
+	const { baseUrl, labelOverrides } = useEmojibaseConfig();
 	const [ locale ] = useState( detectLocale );
 	const {
 		data: dataset,
@@ -243,7 +254,22 @@ export default function EmojiPicker( {
 		error,
 		retry,
 	} = useEmojibaseData( isWarm ? baseUrl : null, locale );
-	const data = useMemo( () => dataset ?? [], [ dataset ] );
+	const namedEmojis = useReactionEmojis();
+	const rules = useReactionEmojiRules();
+	// Offer only what the REST API accepts under the site's emoji rules.
+	const data = useMemo( () => {
+		if ( ! dataset ) {
+			return [];
+		}
+		const namedKeys = getNamedHexKeys( namedEmojis );
+		return dataset.filter( ( entry ) =>
+			isReactionEmojiAllowed(
+				normalizeHexcode( entry.hexcode ),
+				rules,
+				namedKeys
+			)
+		);
+	}, [ dataset, namedEmojis, rules ] );
 	const [ query, setQuery ] = useState( '' );
 
 	/*
@@ -306,6 +332,7 @@ export default function EmojiPicker( {
 				key: `${ prefix }-${ entry.hexcode }`,
 				value: display.emoji,
 				label:
+					getOverrideLabel( labelOverrides, display.hexcode ) ||
 					getCuratedLabel( normalizeHexcode( display.hexcode ) ) ||
 					display.label ||
 					'',
@@ -320,7 +347,9 @@ export default function EmojiPicker( {
 			 * mostly-empty headers.
 			 */
 			return groups
-				.flatMap( ( group ) => searchEmojis( group.emojis, query ) )
+				.flatMap( ( group ) =>
+					searchEmojis( group.emojis, query, labelOverrides )
+				)
 				.map( ( entry ) => toOption( entry, 'search' ) );
 		}
 
@@ -345,7 +374,15 @@ export default function EmojiPicker( {
 				),
 			} ) ),
 		].filter( ( group ) => group.items.length > 0 );
-	}, [ groups, isSearching, query, frequentKeys, recordByHexKey, skinTone ] );
+	}, [
+		groups,
+		isSearching,
+		query,
+		labelOverrides,
+		frequentKeys,
+		recordByHexKey,
+		skinTone,
+	] );
 
 	/**
 	 * Render grid rows of emoji cells, recording usage on selection.
