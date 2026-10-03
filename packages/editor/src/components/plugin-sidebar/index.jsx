@@ -18,6 +18,8 @@ import { ComplementaryArea } from '@wordpress/interface';
  * @param {string}                props.title                           Title displayed at the top of the sidebar.
  * @param {boolean}               [props.isPinnable=true]               Whether to allow to pin sidebar to the toolbar. When set to `true` it also automatically renders a corresponding menu item.
  * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+ * @param {number}                [props.badge]                         A count rendered over the pinned toolbar toggle. Counts above 9 display as "9+"; pass `badgeLabel` so the exact number is still announced.
+ * @param {string}                [props.badgeLabel]                    Accessible label for the pinned toolbar toggle while a badge is shown, replacing `title` so the exact count is announced.
  *
  * @example
  * ```js

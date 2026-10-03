@@ -28,6 +28,16 @@ export type ComplementaryAreaFillProps = {
 
 export type ComplementaryAreaProps = {
 	/**
+	 * A count rendered over the pinned toolbar toggle. Counts above 9 display
+	 * as "9+"; pass `badgeLabel` so the exact number is still announced.
+	 */
+	badge?: number;
+	/**
+	 * Accessible label for the pinned toolbar toggle while a badge is shown,
+	 * replacing `title` so the exact count is announced.
+	 */
+	badgeLabel?: string;
+	/**
 	 * The content to be displayed within the complementary area.
 	 */
 	children?: ReactNode;

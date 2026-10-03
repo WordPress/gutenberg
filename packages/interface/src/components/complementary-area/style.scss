@@ -77,3 +77,39 @@
 .interface-complementary-area__fill {
 	height: 100%;
 }
+
+/*
+ * Count badge overlaid on a pinned toolbar toggle. The wrapper only exists when
+ * a badge is rendered, so no other pinned item is affected. `display: flex`
+ * keeps the wrapped button sized exactly as it is elsewhere in the row.
+ */
+.interface-complementary-area__pinned-toggle {
+	display: flex;
+	position: relative;
+}
+
+.interface-complementary-area__badge {
+	position: absolute;
+	top: -1px;
+	inset-inline-end: -1px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	// Circular for a single digit, growing into a pill for "9+".
+	min-width: $grid-unit-20;
+	height: $grid-unit-20;
+	padding: 0 3px;
+	// Larger than half the height, so the shape clamps to a circle or pill.
+	border-radius: $grid-unit-20;
+	// A ring in the header's own background colour, so the badge reads as a
+	// separate element where it overlaps the toggle's edge.
+	box-shadow: 0 0 0 2px $white;
+	background: var(--wp-admin-theme-color, #3858e9);
+	color: $white;
+	font-size: 10px;
+	font-weight: 600;
+	line-height: 1;
+	// The toggle underneath owns every interaction.
+	pointer-events: none;
+}
