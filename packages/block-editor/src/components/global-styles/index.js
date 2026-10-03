@@ -25,3 +25,4 @@ export {
 } from './background-panel';
 export { default as StateControl } from './state-control';
 export { default as StateControlBadges } from './state-control-badges';
+export { getElementLayers } from './inherited-value-context';
