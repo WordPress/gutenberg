@@ -124,7 +124,6 @@ Private exports:
 - `setBackgroundStyleDefaults`
 - `sectionRootClientIdKey`
 - `NoteIconSlotFill`
-- `NoteIconToolbarSlotFill`
 
 ### `core/block-editor` store
 
