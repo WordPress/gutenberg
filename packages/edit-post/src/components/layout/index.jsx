@@ -436,6 +436,19 @@ const MetaBoxesMain = forwardRef( ( _props, ref ) => {
 		}
 	}, [ applyHeight, getRenderValues, hasAnyVisible, isOpen, isShort, min ] );
 
+	// Keeps aria-valuenow in sync with the current constraints.
+	useLayoutEffect( () => {
+		const pane = metaBoxesMainRef.current;
+		const separator = separatorRef.current;
+		if ( ! pane || ! separator ) {
+			return;
+		}
+		const height = Math.min( max, heightRef.current ?? pane.offsetHeight );
+		separator.ariaValueNow = Math.round(
+			( ( height - min ) / ( max - min ) ) * 100
+		);
+	}, [ min, max ] );
+
 	if ( ! hasAnyVisible ) {
 		return;
 	}
