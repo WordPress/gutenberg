@@ -55,7 +55,7 @@ return array(
 		'label'       => _x( 'Audio', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/audio.svg',
 		'collections' => array( 'core' ),
-		'keywords'    => array( _x( 'music', 'icon keyword', 'gutenberg' ) ),
+		'keywords'    => array( _x( 'music', 'icon keyword', 'gutenberg' ), _x( 'note', 'icon keyword', 'gutenberg' ) ),
 	),
 	'bell'                => array(
 		'label'       => _x( 'Bell', 'icon label', 'gutenberg' ),
@@ -111,7 +111,7 @@ return array(
 		'label'       => _x( 'Caution', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/caution.svg',
 		'collections' => array( 'core' ),
-		'keywords'    => array( _x( 'alert', 'icon keyword', 'gutenberg' ), _x( 'warning', 'icon keyword', 'gutenberg' ) ),
+		'keywords'    => array( _x( 'alert', 'icon keyword', 'gutenberg' ), _x( 'exclamation', 'icon keyword', 'gutenberg' ), _x( 'warning', 'icon keyword', 'gutenberg' ) ),
 	),
 	'chart-bar'           => array(
 		'label'       => _x( 'Chart Bar', 'icon label', 'gutenberg' ),
@@ -213,13 +213,13 @@ return array(
 		'label'       => _x( 'Envelope', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/envelope.svg',
 		'collections' => array( 'core' ),
-		'keywords'    => array( _x( 'email', 'icon keyword', 'gutenberg' ) ),
+		'keywords'    => array( _x( 'email', 'icon keyword', 'gutenberg' ), _x( 'letter', 'icon keyword', 'gutenberg' ), _x( 'post', 'icon keyword', 'gutenberg' ) ),
 	),
 	'error'               => array(
 		'label'       => _x( 'Error', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/error.svg',
 		'collections' => array( 'core' ),
-		'keywords'    => array( _x( 'alert', 'icon keyword', 'gutenberg' ), _x( 'caution', 'icon keyword', 'gutenberg' ), _x( 'warning', 'icon keyword', 'gutenberg' ) ),
+		'keywords'    => array( _x( 'alert', 'icon keyword', 'gutenberg' ), _x( 'caution', 'icon keyword', 'gutenberg' ), _x( 'exclamation', 'icon keyword', 'gutenberg' ), _x( 'warning', 'icon keyword', 'gutenberg' ) ),
 	),
 	'external'            => array(
 		'label'       => _x( 'External', 'icon label', 'gutenberg' ),
@@ -230,7 +230,7 @@ return array(
 		'label'       => _x( 'File', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/file.svg',
 		'collections' => array( 'core' ),
-		'keywords'    => array( _x( 'folder', 'icon keyword', 'gutenberg' ) ),
+		'keywords'    => array( _x( 'archive', 'icon keyword', 'gutenberg' ), _x( 'document', 'icon keyword', 'gutenberg' ), _x( 'folder', 'icon keyword', 'gutenberg' ) ),
 	),
 	'gallery'             => array(
 		'label'       => _x( 'Gallery', 'icon label', 'gutenberg' ),
