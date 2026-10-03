@@ -472,7 +472,7 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	 * @param string $input    The icon content to sanitize.
 	 * @param string $expected The expected sanitized output.
 	 */
-	public function test_sanitize_inline_svg( $input, $expected ) {
+	public function test_sanitize_inline_svg( string $input, string $expected ) {
 		$sanitized = $this->sanitize_inline_svg( $input );
 		$this->assertSame( $expected, $sanitized );
 	}
