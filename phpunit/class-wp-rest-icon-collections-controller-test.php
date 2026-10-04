@@ -61,14 +61,6 @@ class WP_Test_REST_Icon_Collections_Controller extends WP_Test_REST_TestCase {
 	 */
 	public function set_up() {
 		parent::set_up();
-
-		/*
-		 * Other suites reset or clear registries. Re-register default icon
-		 * collections if not present so order-dependent tests pass cleanly.
-		 */
-		if ( ! WP_Icon_Collections_Registry::get_instance()->is_registered( 'core' ) ) {
-			gutenberg_register_default_icon_collections();
-		}
 	}
 
 	/**
