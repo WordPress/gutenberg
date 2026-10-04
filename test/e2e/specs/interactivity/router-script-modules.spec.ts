@@ -276,11 +276,13 @@ test.describe( 'Router script modules', () => {
 				for ( const block of [ 'alpha', 'bravo', 'charlie' ] ) {
 					await page.getByTestId( `link ${ block }` ).click();
 
-					await expect( csn ).toBeHidden();
 					await expect( page ).toHaveTitle(
 						`${ block } – gutenberg`
 					);
-					// Only visible again after a client-side navigation.
+					// Only visible after a client-side navigation: a full page
+					// reload hides it. It's also hidden while the navigation
+					// runs, but hovering the link prefetches the page, so that
+					// can be too short to check.
 					await expect( csn ).toBeVisible();
 
 					const element = page.getByTestId( `${ block }-block` );
