@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   Tabs: Do not render an unused Tabs block on the front end when every tab is empty, matching empty paragraphs and headings ([#84053](https://github.com/WordPress/gutenberg/pull/84053)).
 -   Query Loop: Show the taxonomy filter loading message in the same layout as the suggestions, with a smaller spinner ([#86501](https://github.com/WordPress/gutenberg/pull/86501)).
 -   Template Part: Show each template part's own description in the inserter, instead of discarding it ([#86102](https://github.com/WordPress/gutenberg/pull/86102)).
 -   Social Link: Stop automatically adding `noopener` to links ([#86494](https://github.com/WordPress/gutenberg/pull/86494)).
