@@ -16,6 +16,7 @@ import {
 	findAdditionRange,
 	removeInlineAdditionRange,
 	reviseOwnAddition,
+	deleteAcrossOwnMarkers,
 	acceptInlineFormat,
 	rejectInlineFormat,
 	insertInlineAddition,
@@ -1174,5 +1175,86 @@ describe( 'reviseOwnAddition', () => {
 				authorToken: '1',
 			} )
 		).toBeNull();
+	} );
+} );
+
+describe( 'deleteAcrossOwnMarkers', () => {
+	beforeAll( () => {
+		registerSuggestionFormat();
+	} );
+
+	afterAll( () => {
+		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
+			unregisterFormatType( SUGGESTION_FORMAT_NAME );
+		}
+	} );
+
+	const mark = ( id: number, type: string, author: number, text: string ) =>
+		`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="${ type }" data-author="${ author }">${ text }</mark>`;
+
+	it( 'removes own additions and keeps own deletions', () => {
+		// "Hi " (add) "Hello" (del) " there" (add).
+		const value = RichTextData.fromHTMLString(
+			`${ mark( 3, 'add', 1, 'Hi ' ) }${ mark(
+				2,
+				'del',
+				1,
+				'Hello'
+			) }${ mark( 4, 'add', 1, ' there' ) } world`
+		);
+		const result = deleteAcrossOwnMarkers( value, 0, 14, '1' );
+		expect( result!.deletion ).toBeNull();
+		expect( result!.value.text ).toBe( 'Hello world' );
+		expect( findSuggestionText( result!.value, 2, 'del' ) ).toBe( 'Hello' );
+		expect( result!.value.toHTMLString().match( /<mark/g ) ).toHaveLength(
+			1
+		);
+	} );
+
+	it( 'returns the original text left between them as one range', () => {
+		// "Hi " (add) "Hello" (del) " world" " NEW" (add).
+		const value = RichTextData.fromHTMLString(
+			`${ mark( 3, 'add', 1, 'Hi ' ) }${ mark(
+				2,
+				'del',
+				1,
+				'Hello'
+			) } world${ mark( 4, 'add', 1, ' NEW' ) }`
+		);
+		const result = deleteAcrossOwnMarkers( value, 0, 18, '1' );
+		expect( result!.value.text ).toBe( 'Hello world' );
+		expect( result!.deletion ).toEqual( { start: 5, end: 11 } );
+	} );
+
+	it( 'joins original text on both sides of a removed addition', () => {
+		const value = RichTextData.fromHTMLString(
+			`The quick${ mark( 4, 'add', 1, ' very' ) } brown fox`
+		);
+		// Select "quick very brown".
+		const result = deleteAcrossOwnMarkers( value, 4, 20, '1' );
+		expect( result!.value.text ).toBe( 'The quick brown fox' );
+		expect( result!.deletion ).toEqual( { start: 4, end: 15 } );
+	} );
+
+	it( 'declines when original text sits on both sides of a kept deletion', () => {
+		const value = RichTextData.fromHTMLString(
+			`ab${ mark( 2, 'del', 1, 'cd' ) }ef`
+		);
+		expect( deleteAcrossOwnMarkers( value, 1, 5, '1' ) ).toBeNull();
+	} );
+
+	it( 'declines a range with no marker, or with another author’s', () => {
+		const value = RichTextData.fromHTMLString(
+			`ab${ mark( 2, 'add', 9, 'cd' ) }ef`
+		);
+		expect( deleteAcrossOwnMarkers( value, 0, 2, '1' ) ).toBeNull();
+		expect( deleteAcrossOwnMarkers( value, 1, 5, '1' ) ).toBeNull();
+	} );
+
+	it( 'declines a range touching a format marker', () => {
+		const value = RichTextData.fromHTMLString(
+			`ab${ mark( 2, 'format', 1, '<strong>cd</strong>' ) }ef`
+		);
+		expect( deleteAcrossOwnMarkers( value, 1, 5, '1' ) ).toBeNull();
 	} );
 } );

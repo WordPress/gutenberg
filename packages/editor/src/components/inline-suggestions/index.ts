@@ -49,6 +49,7 @@ export {
 	insertInlineAddition,
 	removeInlineAdditionRange,
 	reviseOwnAddition,
+	deleteAcrossOwnMarkers,
 	findAdditionRange,
 	growInlineAddition,
 	buildSuggestionMarkerAttributes,

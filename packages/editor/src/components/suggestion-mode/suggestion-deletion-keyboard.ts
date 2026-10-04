@@ -15,6 +15,7 @@ import {
 	SUGGESTION_TYPE_DELETION,
 	buildSuggestionMarkerAttributes,
 	computeDeleteRange,
+	deleteAcrossOwnMarkers,
 	formatsRangeHasSuggestion,
 	removeInlineAdditionRange,
 	stripSuggestionMarkers,
@@ -625,6 +626,55 @@ export default function SuggestionDeletionKeyboard() {
 		]
 	);
 
+	/*
+	 * Delete a selection crossing the author's own markers: their additions
+	 * go, their deletions stay, and original text left between them becomes
+	 * a new deletion (#73411, B7). False when `deleteAcrossOwnMarkers`
+	 * declines, leaving the caller to mark or refuse the range.
+	 */
+	const deleteAcrossOwnSelection = useCallback(
+		( selection: {
+			clientId: string;
+			attributeKey: string;
+			start: number;
+			end: number;
+		} ) => {
+			const { clientId, attributeKey, start, end } = selection;
+			const plan = deleteAcrossOwnMarkers(
+				getBlockAttributes( clientId )?.[ attributeKey ],
+				start,
+				end,
+				authorId === null || authorId === undefined
+					? null
+					: String( authorId )
+			);
+			if ( ! plan ) {
+				return false;
+			}
+			resetRun();
+			requestInterceptorBypass( clientId );
+			updateBlockAttributes( clientId, { [ attributeKey ]: plan.value } );
+			selectionChange( clientId, attributeKey, start, start );
+			if ( plan.deletion ) {
+				deleteSelection( {
+					clientId,
+					attributeKey,
+					...plan.deletion,
+				} );
+			}
+			return true;
+		},
+		[
+			getBlockAttributes,
+			updateBlockAttributes,
+			selectionChange,
+			requestInterceptorBypass,
+			deleteSelection,
+			resetRun,
+			authorId,
+		]
+	);
+
 	// Collapsed-cursor delete: mark one character and grow on repeats. All
 	// range arithmetic snaps to grapheme boundaries so surrogate pairs, ZWJ
 	// sequences, and combining marks are marked whole — a code-unit step would
@@ -903,8 +953,19 @@ export default function SuggestionDeletionKeyboard() {
 					);
 					return;
 				}
-				// A selection overlapping an existing marker is declined; see
-				// `refuseDeletion`.
+				if (
+					deleteAcrossOwnSelection( {
+						clientId,
+						attributeKey,
+						start,
+						end,
+					} )
+				) {
+					event.preventDefault();
+					return;
+				}
+				// Any other selection overlapping an existing marker is
+				// declined; see `refuseDeletion`.
 				if (
 					valueRangeHasSuggestion(
 						getBlockAttributes( clientId )?.[ attributeKey ],
@@ -1044,11 +1105,68 @@ export default function SuggestionDeletionKeyboard() {
 			getBlockParents,
 			isDeferredInsertion,
 			deleteSelection,
+			deleteAcrossOwnSelection,
 			deleteCharacter,
 			refuseDeletion,
 			resetRun,
 			shrinkOwnAddition,
 			authorId,
+		]
+	);
+
+	/*
+	 * Rich text removes a selection covering all of its text itself, on
+	 * `keydown`, so no `beforeinput` follows. The store interceptor then sees
+	 * a removal that takes the author's own deletion with it and declines it,
+	 * which left a block made only of the author's own markers impossible to
+	 * clear (#73411, B7). Take that selection here first, before rich text
+	 * does; anything `deleteAcrossOwnMarkers` declines keeps today's path.
+	 */
+	const onKeyDown = useCallback(
+		( event: any ) => {
+			if (
+				event.defaultPrevented ||
+				( event.key !== 'Backspace' && event.key !== 'Delete' ) ||
+				! isEventTargetSelectedRichText( event, getSelectionStart() )
+			) {
+				return;
+			}
+			const anchor = readInlineCaret(
+				getSelectionStart,
+				getSelectionEnd
+			);
+			if (
+				! anchor ||
+				isDeferredInsertion( anchor.clientId ) ||
+				isPartOfPendingInsertion(
+					{ getBlockAttributes, getBlockParents },
+					anchor.clientId
+				)
+			) {
+				return;
+			}
+			const domRange = readEventRange( event );
+			const start = domRange ? domRange.start : anchor.start;
+			const end = domRange ? domRange.end : anchor.end;
+			if (
+				start !== end &&
+				deleteAcrossOwnSelection( {
+					clientId: anchor.clientId,
+					attributeKey: anchor.attributeKey,
+					start,
+					end,
+				} )
+			) {
+				event.preventDefault();
+			}
+		},
+		[
+			getSelectionStart,
+			getSelectionEnd,
+			getBlockAttributes,
+			getBlockParents,
+			isDeferredInsertion,
+			deleteAcrossOwnSelection,
 		]
 	);
 
@@ -1115,9 +1233,19 @@ export default function SuggestionDeletionKeyboard() {
 			}
 			event.preventDefault();
 			event.stopImmediatePropagation();
-			// A selection overlapping an existing marker is declined rather
-			// than nesting marks; see `refuseDeletion`. The `preventDefault`
-			// above already cancelled the removal.
+			if (
+				deleteAcrossOwnSelection( {
+					clientId,
+					attributeKey,
+					start,
+					end,
+				} )
+			) {
+				return;
+			}
+			// Any other selection overlapping an existing marker is declined
+			// rather than nesting marks; see `refuseDeletion`. The
+			// `preventDefault` above already cancelled the removal.
 			if ( formatsRangeHasSuggestion( formats, start, end ) ) {
 				resetRun();
 				notifyEditRefused( registry );
@@ -1130,6 +1258,7 @@ export default function SuggestionDeletionKeyboard() {
 			getSelectionEnd,
 			getBlockAttributes,
 			deleteSelection,
+			deleteAcrossOwnSelection,
 			registry,
 			resetRun,
 		]
@@ -1143,17 +1272,20 @@ export default function SuggestionDeletionKeyboard() {
 		const docs = getCandidateDocuments();
 		const listener = ( event: any ) => onBeforeInput( event );
 		const cutListener = ( event: any ) => onCut( event );
+		const keyDownListener = ( event: any ) => onKeyDown( event );
 		// Capture phase so we cancel the edit before RichText/the browser apply
 		// it. `selectedBlockClientId` is in the deps so the listener re-attaches
 		// once the canvas iframe (and its document) has mounted.
 		for ( const doc of docs ) {
 			doc.addEventListener( 'beforeinput', listener, true );
 			doc.addEventListener( 'cut', cutListener, true );
+			doc.addEventListener( 'keydown', keyDownListener, true );
 		}
 		return () => {
 			for ( const doc of docs ) {
 				doc.removeEventListener( 'beforeinput', listener, true );
 				doc.removeEventListener( 'cut', cutListener, true );
+				doc.removeEventListener( 'keydown', keyDownListener, true );
 			}
 		};
 	}, [
@@ -1161,6 +1293,7 @@ export default function SuggestionDeletionKeyboard() {
 		selectedBlockClientId,
 		onBeforeInput,
 		onCut,
+		onKeyDown,
 		resetRun,
 	] );
 
