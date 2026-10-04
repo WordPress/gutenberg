@@ -340,6 +340,12 @@ export interface RawHandlerOptions {
 	 * The tag into which the content will be inserted.
 	 */
 	tagName?: string;
+	/**
+	 * Whether plain text that looks like LaTeX may be converted to a Math
+	 * block. Defaults to true; pass false when the Math block can't be
+	 * inserted at the paste location (for example when it is disabled).
+	 */
+	convertLatexToMath?: boolean;
 }
 
 /**
