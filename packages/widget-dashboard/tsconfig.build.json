@@ -6,6 +6,7 @@
 		"checkJs": false
 	},
 	"references": [
+		{ "path": "../a11y/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../data" },
 		{ "path": "../dataviews/tsconfig.build.json" },
@@ -14,6 +15,7 @@
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
 		{ "path": "../private-apis" },
+		{ "path": "../react-inert-value/tsconfig.build.json" },
 		{ "path": "../style-runtime/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../viewport" },

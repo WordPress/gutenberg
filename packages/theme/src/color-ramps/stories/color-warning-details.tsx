@@ -1,14 +1,16 @@
 import type { ThemeProviderColorWarning } from '../../theme-provider-color-warnings';
 
 export function ColorWarningDetails( {
+	label,
 	warnings,
 }: {
+	label: string;
 	warnings: readonly ThemeProviderColorWarning[] | undefined;
 } ) {
 	if ( warnings === undefined ) {
 		return (
 			<section
-				aria-label="Color warning results"
+				aria-label={ `${ label } color warning results` }
 				style={ {
 					background: '#f6f7f7',
 					borderInlineStart: '4px solid #787c82',
@@ -23,7 +25,7 @@ export function ColorWarningDetails( {
 	if ( warnings.length === 0 ) {
 		return (
 			<section
-				aria-label="Color warning results"
+				aria-label={ `${ label } color warning results` }
 				style={ {
 					background: '#edfaef',
 					borderInlineStart: '4px solid #00a32a',
@@ -39,7 +41,7 @@ export function ColorWarningDetails( {
 
 	return (
 		<section
-			aria-label="Color warning results"
+			aria-label={ `${ label } color warning results` }
 			style={ {
 				background: '#fcf0f1',
 				borderInlineStart: '4px solid #d63638',

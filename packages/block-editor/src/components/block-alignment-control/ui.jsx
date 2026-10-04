@@ -27,17 +27,12 @@ function BlockAlignmentUI( {
 	const { enabled: enabledControls, unavailable: unavailableControls } =
 		useAlignmentMenu( controls );
 
-	if ( ! enabledControls.length && ! unavailableControls.length ) {
+	// A menu of nothing but unavailable options could never change anything.
+	if ( ! enabledControls.length ) {
 		return null;
 	}
 
-	/*
-	 * A block whose alignments are all unavailable still needs somewhere to
-	 * anchor them, and `None` is always a valid choice for it.
-	 */
-	const menuControls = enabledControls.length
-		? [ ...enabledControls ]
-		: [ { name: 'none' } ];
+	const menuControls = [ ...enabledControls ];
 	const enabledNames = menuControls.map( ( { name } ) => name );
 
 	// Unavailable alignments sit where they would have sat had they been

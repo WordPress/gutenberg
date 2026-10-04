@@ -8,7 +8,7 @@ import { useMenuItemHideOnClick } from './use-menu-item-hide-on-click';
 export const Item = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< ItemProps, 'div', false >
->( function Item(
+>( function UnforwardedItem(
 	{
 		prefix,
 		suffix,

@@ -431,6 +431,18 @@ _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/font-sizes/README.md>
 
+### getBackgroundClassesAndStyles
+
+Provides the CSS class names and inline styles for a block's background support attributes.
+
+_Parameters_
+
+- _attributes_ `Object`: Block attributes.
+
+_Returns_
+
+- `Object`: Background block support derived CSS classes & styles.
+
 ### getColorClassName
 
 Returns a class based on the context a color is being used and its slug.
@@ -617,6 +629,26 @@ _Parameters_
 _Returns_
 
 - `string | undefined`: CSS var string for given spacing preset value.
+
+### getStyleForState
+
+Returns the style object for the selected block style state.
+
+_Usage_
+
+```js
+const state = { viewport: '@mobile' };
+const stateStyle = getStyleForState( attributes.style, state ) || {};
+```
+
+_Parameters_
+
+- _style_ `Object`: The block style object.
+- _selectedState_ `Object`: Selected block style state.
+
+_Returns_
+
+- `Object`: The style object for the selected state, if found.
 
 ### getTypographyClassesAndStyles
 
@@ -884,6 +916,33 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+### setStyleForState
+
+Returns a style object with the selected block style state updated.
+
+_Usage_
+
+```js
+const state = { viewport: '@mobile' };
+const stateStyle = getStyleForState( attributes.style, state ) || {};
+setAttributes( {
+	style: setStyleForState( attributes.style, state, {
+		...stateStyle,
+		dimensions: { ...stateStyle.dimensions, minHeight: '50vh' },
+	} ),
+} );
+```
+
+_Parameters_
+
+- _style_ `Object`: The block style object.
+- _selectedState_ `Object`: Selected block style state.
+- _newStyle_ `Object`: New style for the selected state.
+
+_Returns_
+
+- `Object`: The updated style object.
+
 ### SETTINGS_DEFAULTS
 
 The default editor settings
@@ -985,6 +1044,20 @@ _Related_
 _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-popover/README.md>
+
+### useBackgroundProps
+
+Derives the background related props for a block from its background block support attributes.
+
+Prefer this in edit components so editor settings can be resolved later without a new API.
+
+_Parameters_
+
+- _attributes_ `Object`: Block attributes.
+
+_Returns_
+
+- `Object`: ClassName & style props from background block support.
 
 ### useBlockBindingsUtils
 
