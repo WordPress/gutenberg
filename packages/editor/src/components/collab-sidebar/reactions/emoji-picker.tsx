@@ -421,8 +421,6 @@ export default function EmojiPicker( {
 					if ( error ) {
 						retry();
 					}
-				} else {
-					highlightStore.set( undefined );
 				}
 			} }
 			// Start each opening from the full grid.
@@ -435,7 +433,9 @@ export default function EmojiPicker( {
 			filter={ null }
 			// Enter picks the top hit once the user has typed.
 			autoHighlight
-			// Every highlightable value is an `EmojiOption` cell.
+			// Every highlightable value is an `EmojiOption` cell. Base UI clears
+			// the highlight once the popup has closed, so the footer keeps its
+			// emoji through the exit animation.
 			onItemHighlighted={ ( option: unknown ) =>
 				highlightStore.set( option as EmojiOption | undefined )
 			}
@@ -532,7 +532,10 @@ export default function EmojiPicker( {
 								) }
 					</Autocomplete.List>
 				</div>
-				<EmojiPickerFooter store={ highlightStore } />
+				{ /* With no grid to highlight, an empty footer is just a stray border. */ }
+				{ ! isLoading && ! loadFailed && (
+					<EmojiPickerFooter store={ highlightStore } />
+				) }
 			</Autocomplete.Popup>
 		</Autocomplete.Root>
 	);
