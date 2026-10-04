@@ -606,6 +606,89 @@ function wasInsidePendingInsertion(
 	return false;
 }
 
+/**
+ * Whether a block that is new this fire only carries blocks that already
+ * existed into a container of the kind they left. Indenting a list item does
+ * this: it creates a nested list and moves the item into it in one update
+ * (#73411). The list has nothing of its own to propose, so it is not an
+ * insertion; the items it carries are moves.
+ *
+ * @param block New block, with its inner blocks.
+ * @param tree  Previous-tick tree snapshot.
+ * @return True when every child existed and left a parent of the same type.
+ */
+function isMoveCarrier(
+	block: any,
+	tree: ReturnType< typeof captureTreeSnapshot >
+): boolean {
+	const children = block?.innerBlocks ?? [];
+	return (
+		children.length > 0 &&
+		children.every( ( child: any ) => {
+			const oldParent = tree.parentByClientId.get( child.clientId );
+			return (
+				!! oldParent &&
+				tree.blocksByClientId.get( oldParent )?.name === block.name
+			);
+		} )
+	);
+}
+
+/**
+ * Whether a block gone from the live tree was only emptied by its children
+ * moving out to a container of the same type. Outdenting the last item of a
+ * nested list does this: the item moves up a level and the empty nested list
+ * is removed in the same update. The list goes with the move rather than
+ * being proposed as a removal of its own.
+ *
+ * @param clientId    Removed block client ID.
+ * @param tree        Previous-tick tree snapshot.
+ * @param blockEditor Block-editor selectors.
+ * @return True when every child is live in a parent of the same type.
+ */
+function isDissolvedByMove(
+	clientId: string,
+	tree: ReturnType< typeof captureTreeSnapshot >,
+	blockEditor: any
+): boolean {
+	const block = tree.blocksByClientId.get( clientId );
+	const children = block?.innerBlocks ?? [];
+	return (
+		children.length > 0 &&
+		! block.attributes?.metadata?.suggestion &&
+		children.every( ( child: any ) => {
+			const newParent = blockEditor.getBlockRootClientId?.(
+				child.clientId
+			);
+			return (
+				!! newParent &&
+				blockEditor.getBlockName?.( newParent ) === block.name
+			);
+		} )
+	);
+}
+
+/**
+ * A removed subtree without the descendants that are still live elsewhere,
+ * for re-inserting as a pending removal. Re-inserting a block that moved out
+ * would put a second copy of it, with the same client ID, in the tree.
+ *
+ * @param block Removed block from the previous-tick snapshot.
+ * @param live  Live client IDs.
+ * @return The block, pruned when needed.
+ */
+function withoutLiveDescendants( block: any, live: Set< unknown > ): any {
+	const innerBlocks = ( block.innerBlocks ?? [] )
+		.filter( ( child: any ) => ! live.has( child.clientId ) )
+		.map( ( child: any ) => withoutLiveDescendants( child, live ) );
+	const unchanged =
+		innerBlocks.length === ( block.innerBlocks ?? [] ).length &&
+		innerBlocks.every(
+			( child: any, i: number ) => child === block.innerBlocks[ i ]
+		);
+	return unchanged ? block : { ...block, innerBlocks };
+}
+
 /*
  * Blocks that are, or sit inside, a pending insertion, cached per block tree
  * version. The per-block overlay HOC asks this for every block on every store
@@ -1407,6 +1490,15 @@ export default function SuggestionStoreInterceptor() {
 						continue;
 					}
 
+					// A container created only to carry existing blocks (a
+					// list-item indent's nested list) is not proposed
+					// content; the move branch captures what it carries.
+					if ( isMoveCarrier( block, tree ) ) {
+						snapshot.set( clientId, current );
+						unmarkDeferredInsertion( clientId );
+						continue;
+					}
+
 					const previousSibling =
 						blockEditor.getPreviousBlockClientId?.( clientId );
 					if (
@@ -1744,6 +1836,33 @@ export default function SuggestionStoreInterceptor() {
 			// Apply leaves the block where it is; Reject dispatches
 			// `moveBlockToPosition` with the from-position.
 			const moves = detectMovedBlocks( liveClientIds, tree, blockEditor );
+
+			/*
+			 * Containers emptied by this fire's moves (an outdent's nested
+			 * list). They are dropped instead of proposed as removals, and the
+			 * move that emptied one records it so a reject can rebuild it.
+			 */
+			const dissolvedThisFire = new Set< string >();
+			if ( moves.length > 0 ) {
+				for ( const clientId of tree.blocksByClientId.keys() ) {
+					if (
+						! live.has( clientId ) &&
+						isDissolvedByMove( clientId, tree, blockEditor )
+					) {
+						dissolvedThisFire.add( clientId );
+					}
+				}
+			}
+			const dissolvedParentRecord = ( parentId: string | null ) => {
+				if ( ! parentId || ! dissolvedThisFire.has( parentId ) ) {
+					return undefined;
+				}
+				return {
+					parentClientId:
+						tree.parentByClientId.get( parentId ) ?? null,
+					index: tree.indexByClientId.get( parentId ) ?? 0,
+				};
+			};
 			for ( const move of moves ) {
 				const currentAttrs = blockEditor.getBlockAttributes?.(
 					move.clientId
@@ -1886,6 +2005,11 @@ export default function SuggestionStoreInterceptor() {
 				 * was itself only ever a pending suggestion.
 				 */
 				const existingMarker = currentAttrs.metadata?.suggestion;
+				const fromParentBlock =
+					existingMarker?.type === 'pending-move'
+						? entriesRef.current[ move.clientId ]?.structuralOp
+								?.fromParentBlock
+						: dissolvedParentRecord( move.fromParentClientId );
 				const from =
 					existingMarker?.type === 'pending-move'
 						? {
@@ -1931,6 +2055,7 @@ export default function SuggestionStoreInterceptor() {
 					...from,
 					toAnchorClientId: move.toAnchorClientId,
 					toParentClientId: move.toParentClientId,
+					...( fromParentBlock ? { fromParentBlock } : {} ),
 				} );
 			}
 
@@ -1987,6 +2112,7 @@ export default function SuggestionStoreInterceptor() {
 						trackedAttributes?.metadata?.suggestion?.type;
 					if (
 						trackedMarker === 'pending-insert' ||
+						dissolvedThisFire.has( clientId ) ||
 						wasInsidePendingInsertion( tree, clientId ) ||
 						isAppliedRemoval( coreSelect, trackedAttributes )
 					) {
@@ -2025,7 +2151,9 @@ export default function SuggestionStoreInterceptor() {
 				isDispatchingOwnWrite = true;
 				try {
 					for ( const clientId of tops ) {
-						const block = tree.blocksByClientId.get( clientId );
+						const tracked = tree.blocksByClientId.get( clientId );
+						const block =
+							tracked && withoutLiveDescendants( tracked, live );
 						const parent = tree.parentByClientId.get( clientId );
 						const index = tree.indexByClientId.get( clientId );
 						if ( ! block ) {
