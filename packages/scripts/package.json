@@ -86,7 +86,7 @@
 	},
 	"devDependencies": {
 		"rimraf": "^5.0.10",
-		"vitest": "^5.0.0"
+		"vitest": "^5.0.3"
 	},
 	"peerDependencies": {
 		"@playwright/test": ">=1",

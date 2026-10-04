@@ -31,7 +31,7 @@
 		"./package.json": "./package.json"
 	},
 	"devDependencies": {
-		"vitest": "^5.0.0"
+		"vitest": "^5.0.3"
 	},
 	"peerDependencies": {
 		"npm-package-json-lint": ">=6.0.0"
