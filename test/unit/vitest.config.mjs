@@ -1,10 +1,11 @@
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { playwright } from '@vitest/browser-playwright';
 import { globSync } from 'glob';
 import { defineConfig } from 'vitest/config';
 import { createVitePlugins } from './config/vite-plugins.mjs';
+import { createPlaywrightProvider } from './config/playwright-provider.mjs';
+import { createBrowserTraceArtifacts } from './config/browser-traces.mjs';
 import {
 	discoverTestFiles,
 	getVitestTestsByProject,
@@ -27,6 +28,14 @@ const styleMockAlias = {
 	replacement: path.join( ROOT_DIR, 'test/unit/config/style-mock.vitest.js' ),
 };
 const reporters = [ 'default' ];
+const browserTraces =
+	process.env.WP_VITEST_BROWSER_TRACE === '1'
+		? createBrowserTraceArtifacts( ROOT_DIR )
+		: undefined;
+
+if ( browserTraces ) {
+	reporters.push( browserTraces.reporter );
+}
 
 if ( process.env.GITHUB_ACTIONS === 'true' ) {
 	reporters.push( 'github-actions' );
@@ -128,6 +137,11 @@ export default defineConfig( {
 		],
 	},
 	test: {
+		// Vitest only reads attachmentsDir from the root configuration.
+		attachmentsDir: path.join(
+			ROOT_DIR,
+			'test-results/vitest-attachments'
+		),
 		projects: [
 			{
 				extends: true,
@@ -202,12 +216,16 @@ export default defineConfig( {
 				test: {
 					name: 'browser',
 					dir: ROOT_DIR,
-					attachmentsDir: path.join(
-						ROOT_DIR,
-						'test-results/vitest-browser-attachments'
-					),
 					include: vitestTests.browser,
 					setupFiles: [
+						...( browserTraces
+							? [
+									path.join(
+										CONFIG_DIR,
+										'config/browser-traces.vitest.js'
+									),
+								]
+							: [] ),
 						path.join(
 							ROOT_DIR,
 							'test/unit/config/browser.vitest.js'
@@ -226,7 +244,8 @@ export default defineConfig( {
 						enabled: true,
 						headless: true,
 						instances: [ { browser: 'chromium' } ],
-						provider: playwright(),
+						provider: createPlaywrightProvider(),
+						commands: browserTraces?.commands,
 						screenshotDirectory: path.join(
 							ROOT_DIR,
 							'test-results/vitest-browser-screenshots'

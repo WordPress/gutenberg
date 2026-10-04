@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
+import { Fragment } from '@wordpress/element';
 import { SearchableChipSelect } from '../';
 import {
 	GROUPED_ITEMS,
@@ -10,12 +11,17 @@ import { ITEMS } from './fixtures';
 
 const meta: Meta< typeof SearchableChipSelect > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/Primitives/SearchableChipSelect',
+	title: 'Components/@wordpress-ui/Form/Primitives/SearchableChipSelect',
+	id: 'design-system-components-form-primitives-searchablechipselect',
 	component: SearchableChipSelect,
 	subcomponents: {
 		'SearchableChipSelect.Group': SearchableChipSelect.Group,
 		'SearchableChipSelect.GroupLabel': SearchableChipSelect.GroupLabel,
+		'SearchableChipSelect.Separator': SearchableChipSelect.Separator,
 		'SearchableChipSelect.Item': SearchableChipSelect.Item,
+		'SearchableChipSelect.ItemLabel': SearchableChipSelect.ItemLabel,
+		'SearchableChipSelect.ItemDescription':
+			SearchableChipSelect.ItemDescription,
 		'SearchableChipSelect.ChipWithRemove':
 			SearchableChipSelect.ChipWithRemove,
 		'SearchableChipSelect.Collection': SearchableChipSelect.Collection,
@@ -44,8 +50,23 @@ export const Default: Story = {
 };
 
 /**
+ * Item descriptions supplement each popup item and are not copied to chips.
+ */
+export const WithItemDescriptions: Story = {
+	args: {
+		...Default.args,
+		defaultValue: [],
+		items: [
+			{ value: 'apple', label: 'Apple', description: 'A crisp fruit.' },
+			{ value: 'banana', label: 'Banana', description: 'A soft fruit.' },
+		],
+	},
+};
+
+/**
  * To customize what is rendered inside the chips, pass a
  * render function to the `chipsContent` prop that returns an array of `ChipWithRemove` subcomponents.
+ * The chip is named from its content. Pass `aria-label` when that content is not a usable name.
  *
  * The item list can be customized by passing a render function as `children`,
  * returning an `Item` subcomponent for each item.
@@ -70,7 +91,9 @@ export const WithCustomChipsAndItems: Story = {
 			) ),
 		children: ( item: ( typeof ITEMS )[ 0 ] ) => (
 			<SearchableChipSelect.Item key={ item.value } value={ item }>
-				😋 { item.label }
+				<SearchableChipSelect.ItemLabel>
+					😋 { item.label }
+				</SearchableChipSelect.ItemLabel>
 			</SearchableChipSelect.Item>
 		),
 	},
@@ -112,11 +135,35 @@ export const Grouped: Story = {
 							key={ item.value }
 							value={ item }
 						>
-							{ item.label }
+							<SearchableChipSelect.ItemLabel>
+								{ item.label }
+							</SearchableChipSelect.ItemLabel>
 						</SearchableChipSelect.Item>
 					) }
 				</SearchableChipSelect.Collection>
 			</SearchableChipSelect.Group>
+		),
+	},
+};
+
+/**
+ * Use `SearchableChipSelect.Separator` to set choices apart from each other.
+ */
+export const WithSeparator: Story = {
+	args: {
+		...Default.args,
+		items: [ ...ITEMS.slice( 0, 3 ), { value: 'other', label: 'Other' } ],
+		children: ( item: FixtureItem, index: number ) => (
+			<Fragment key={ item.value }>
+				{ item.value === 'other' && index > 0 && (
+					<SearchableChipSelect.Separator />
+				) }
+				<SearchableChipSelect.Item value={ item }>
+					<SearchableChipSelect.ItemLabel>
+						{ item.label }
+					</SearchableChipSelect.ItemLabel>
+				</SearchableChipSelect.Item>
+			</Fragment>
 		),
 	},
 };

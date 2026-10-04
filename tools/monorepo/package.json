@@ -21,6 +21,7 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"type": "module",
 	"exports": {
 		"./tsconfig/*": "./tsconfig/tsconfig.*"
 	},
@@ -28,13 +29,16 @@
 		"@testing-library/jest-dom": "^7.0.1",
 		"@types/node": "^24.13.3",
 		"@types/react": "^18.3.27",
+		"@wordpress/admin-ui": "file:../../packages/admin-ui",
 		"@wordpress/data": "file:../../packages/data",
-		"vitest": "^5.0.0"
+		"@wordpress/theme": "file:../../packages/theme",
+		"vitest": "^5.0.3"
 	},
 	"publishConfig": {
 		"access": "public"
 	},
 	"scripts": {
-		"list-experimental-apis": "node scripts/list-experimental-apis.mts"
+		"list-experimental-apis": "node scripts/list-experimental-apis.mts",
+		"wpds:admin-scheme-tokens": "node wpds/generate-admin-scheme-tokens.mjs"
 	}
 }

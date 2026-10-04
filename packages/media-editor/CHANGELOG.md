@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Stop a pan drag started just after a wheel zoom from recording one undo entry per frame. The drag now ends the pending wheel gesture instead of letting its debounce timer close the drag's gesture mid-drag ([#83558](https://github.com/WordPress/gutenberg/pull/83558)).
+-   Keep the editor open with an error notice when saving attachment details fails ([#83560](https://github.com/WordPress/gutenberg/pull/83560)).
+-   Stop the crop's source-pixel snap from recording its own undo entry. A handle crop that magnified the image past 1:1 added an undo step that changed nothing visible, and redoing back onto that crop cleared the rest of the redo history ([#83571](https://github.com/WordPress/gutenberg/pull/83571)).
+-   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+
+### Internal
+
+-   Show the selected crop aspect ratio in a menu in the compact image controls ([#82968](https://github.com/WordPress/gutenberg/pull/82968)).
+
+## 0.19.0 (2026-09-23)
+
+### Bug Fixes
+
+-   Stop mirroring the crop canvas in RTL. The camera and the resize maths address it in physical pixels, so a mirrored sheet left the handle drawn at the top right resizing the left edge, and pinned the image to the stage edge instead of centring it ([#83304](https://github.com/WordPress/gutenberg/pull/83304)).
+-   `RotationRuler`: keep the numerals reading left to right in RTL, matching a strip that already keeps negative degrees on the left ([#83304](https://github.com/WordPress/gutenberg/pull/83304)).
+
 ## 0.18.0 (2026-09-10)
 
 ### Internal
