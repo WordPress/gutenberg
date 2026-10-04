@@ -80,7 +80,7 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 			gap="md"
 			tabIndex={ 0 }
 			aria-label={ __( 'New note' ) }
-			role="treeitem"
+			role="listitem"
 			{ ...focusOutside }
 		>
 			<NoteCard>

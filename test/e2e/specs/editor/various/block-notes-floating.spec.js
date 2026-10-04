@@ -44,7 +44,7 @@ test.describe( 'Block Notes: floating sidebar', () => {
 	}
 
 	function getThread( page, content ) {
-		return getSidebar( page ).getByRole( 'treeitem', {
+		return getSidebar( page ).getByRole( 'listitem', {
 			name: `Note: ${ content }`,
 		} );
 	}
@@ -118,7 +118,7 @@ test.describe( 'Block Notes: floating sidebar', () => {
 
 		// Expand the top thread, so the one below stays within the viewport.
 		await editor.selectBlocks( getParagraph( editor, 'First noted' ) );
-		await expect( firstThread ).toHaveAttribute( 'aria-expanded', 'true' );
+		await expect( firstThread ).toHaveAttribute( 'aria-current', 'true' );
 
 		await expectAligned(
 			firstThread,
@@ -152,14 +152,14 @@ test.describe( 'Block Notes: floating sidebar', () => {
 		const bravoThread = getThread( page, 'Bravo note' );
 
 		// The last added note is selected; the one above moves up.
-		await expect( bravoThread ).toHaveAttribute( 'aria-expanded', 'true' );
+		await expect( bravoThread ).toHaveAttribute( 'aria-current', 'true' );
 		await expectAligned( bravoThread, getParagraph( editor, 'Bravo' ) );
 		await expectStacked( alphaThread, bravoThread );
 
 		// Selecting the other note anchors it instead; the one below moves
 		// down.
 		await editor.selectBlocks( getParagraph( editor, 'Alpha' ) );
-		await expect( alphaThread ).toHaveAttribute( 'aria-expanded', 'true' );
+		await expect( alphaThread ).toHaveAttribute( 'aria-current', 'true' );
 		await expectAligned( alphaThread, getParagraph( editor, 'Alpha' ) );
 		await expectStacked( alphaThread, bravoThread );
 	} );
@@ -183,7 +183,7 @@ test.describe( 'Block Notes: floating sidebar', () => {
 		const alphaThread = getThread( page, 'Alpha note' );
 		const bravoThread = getThread( page, 'Bravo note' );
 		await editor.selectBlocks( getParagraph( editor, 'Alpha' ) );
-		await expect( alphaThread ).toHaveAttribute( 'aria-expanded', 'true' );
+		await expect( alphaThread ).toHaveAttribute( 'aria-current', 'true' );
 		await expectStacked( alphaThread, bravoThread );
 		const { height: initialHeight } = await alphaThread.boundingBox();
 
@@ -337,7 +337,7 @@ test.describe( 'Block Notes: floating sidebar', () => {
 		// Focus the title first: deselecting the block collapses the thread,
 		// which re-measures on its own.
 		await title.click();
-		await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+		await expect( thread ).toHaveAttribute( 'aria-current', 'false' );
 		await expectAligned( thread, noted );
 		const { y: initialTop } = await noted.boundingBox();
 
@@ -514,7 +514,7 @@ test.describe( 'Block Notes: floating sidebar', () => {
 		} );
 
 		const thread = getThread( page, 'Low note' );
-		await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+		await expect( thread ).toHaveAttribute( 'aria-current', 'true' );
 		await expectAligned( thread, getParagraph( editor, 'Noted' ) );
 	} );
 
@@ -536,7 +536,7 @@ test.describe( 'Block Notes: floating sidebar', () => {
 
 		const threads = labels.map( ( label ) => getThread( page, label ) );
 		const selected = threads.at( -1 );
-		await expect( selected ).toHaveAttribute( 'aria-expanded', 'true' );
+		await expect( selected ).toHaveAttribute( 'aria-current', 'true' );
 		await expectAligned( selected, getParagraph( editor, 'Four' ) );
 		for ( let i = 1; i < threads.length; i++ ) {
 			await expectStacked( threads[ i - 1 ], threads[ i ] );
@@ -576,7 +576,7 @@ test.describe( 'Block Notes: floating sidebar', () => {
 		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.focus();
-		await expect( tallThread ).toHaveAttribute( 'aria-expanded', 'false' );
+		await expect( tallThread ).toHaveAttribute( 'aria-current', 'false' );
 
 		await expectAligned(
 			getThread( page, 'Alpha note' ),
@@ -638,10 +638,10 @@ test.describe( 'Block Notes: floating sidebar', () => {
 			await editor.canvas
 				.getByRole( 'textbox', { name: 'Add title' } )
 				.focus();
-			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+			await expect( thread ).toHaveAttribute( 'aria-current', 'false' );
 			await editor.selectBlocks( getParagraph( editor, 'Alpha' ) );
 
-			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+			await expect( thread ).toHaveAttribute( 'aria-current', 'true' );
 			await expect( thread ).toBeInViewport( { ratio: FULLY_VISIBLE } );
 		} );
 	} );
@@ -713,7 +713,7 @@ test.describe( 'Block Notes: floating sidebar', () => {
 
 			// There is no marker yet, so the form anchors to the selection the
 			// note will attach to. The canvas keeps it while the form has focus.
-			const form = getSidebar( page ).getByRole( 'treeitem', {
+			const form = getSidebar( page ).getByRole( 'listitem', {
 				name: 'New note',
 				exact: true,
 			} );
@@ -784,7 +784,7 @@ test.describe( 'Block Notes: floating sidebar', () => {
 				page.getByRole( 'textbox', { name: 'New note', exact: true } )
 			).toBeFocused();
 			await expect(
-				getSidebar( page ).getByRole( 'treeitem', {
+				getSidebar( page ).getByRole( 'listitem', {
 					name: 'New note',
 					exact: true,
 				} )

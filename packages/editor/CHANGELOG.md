@@ -16,6 +16,7 @@
 -   `PostURL`: Leaving the slug field without typing no longer saves the displayed fallback as the slug, so a new post no longer publishes with the `auto-draft` slug ([#83518](https://github.com/WordPress/gutenberg/pull/83518)).
 -   Notes: Keep the clicked thread selected on a block with several notes, instead of switching to the block's primary note ([#83528](https://github.com/WordPress/gutenberg/pull/83528)).
 -   Notes: Keep floating threads aligned with their blocks when an editor notice or the device preview moves the canvas ([#83485](https://github.com/WordPress/gutenberg/pull/83485)).
+-   Notes sidebar: Expose the note threads as a list instead of a tree. The tree roles put screen readers into focus mode, which handed the arrow keys to the sidebar's own thread navigation, so a note's text could not be read with the usual reading keys. The selected thread is marked with `aria-current`, which a list item supports, rather than `aria-expanded`, which it does not ([#82368](https://github.com/WordPress/gutenberg/pull/82368)).
 
 ### Internal
 
