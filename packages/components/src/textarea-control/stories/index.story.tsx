@@ -4,7 +4,7 @@ import TextareaControl from '..';
 
 const meta: Meta< typeof TextareaControl > = {
 	component: TextareaControl,
-	title: 'Components/Selection & Input/Common/TextareaControl',
+	title: 'Components/@wordpress-components/Selection & Input/Common/TextareaControl',
 	id: 'components-textareacontrol',
 	argTypes: {
 		onChange: { action: 'onChange' },

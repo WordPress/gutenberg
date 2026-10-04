@@ -115,7 +115,7 @@ const cloneRouterRegionContent = ( vdom: any ) => {
 		? createElement( vdom.type, {
 				...vdom.props,
 				priorityLevels,
-		  } )
+			} )
 		: vdom.props.element;
 };
 

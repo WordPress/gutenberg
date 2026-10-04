@@ -4,6 +4,27 @@
 
 ### Bug Fixes
 
+-   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+-   `MediaUpload`: Fix `allowedTypes` being ignored when `gallery` prop is `true` ([#78257](https://github.com/WordPress/gutenberg/pull/78257)).
+
+## 5.56.0 (2026-09-23)
+
+### New Features
+
+-   `MediaUpload`: Add a `featuredImageFlow` prop that opens the featured image media frame. ([#83439](https://github.com/WordPress/gutenberg/pull/83439))
+
+### Deprecations
+
+-   `MediaUpload`: Deprecate the `unstableFeaturedImageFlow` prop in favor of `featuredImageFlow`. ([#83439](https://github.com/WordPress/gutenberg/pull/83439))
+
+## 5.55.0 (2026-09-10)
+
+### New Features
+
+-   Media Library modal: Add an "Attached to" filter offering "Unattached" and an option for the post the modal was opened from, labelled with that post type's `uploaded_to_this_item` label as the classic media frame does. Adds `postId` and `postType` props supplying the post. The filter is not persisted with the rest of the view: it describes the task at hand rather than a standing preference ([#81974](https://github.com/WordPress/gutenberg/pull/81974)).
+
+### Bug Fixes
+
 -   Preserve array-valued fields in multipart form data so grouped image-size sideload requests reach the REST API as arrays ([#82353](https://github.com/WordPress/gutenberg/pull/82353)).
 
 ## 5.54.0 (2026-08-26)

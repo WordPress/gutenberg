@@ -816,7 +816,7 @@
 		"parent": "core-blocks-design"
 	},
 	{
-		"title": "Custom Link",
+		"title": "Navigation Link",
 		"slug": "core-block-navigation-link",
 		"markdown_source": "../packages/block-library/src/navigation-link/README.md",
 		"parent": "core-blocks-design"
@@ -2574,18 +2574,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/jest-console",
-		"slug": "packages-jest-console",
-		"markdown_source": "../packages/jest-console/README.md",
-		"parent": "packages"
-	},
-	{
-		"title": "@wordpress/jest-preset-default",
-		"slug": "packages-jest-preset-default",
-		"markdown_source": "../packages/jest-preset-default/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/kebab-case",
 		"slug": "packages-kebab-case",
 		"markdown_source": "../packages/kebab-case/README.md",
@@ -2733,6 +2721,12 @@
 		"title": "@wordpress/react-i18n",
 		"slug": "packages-react-i18n",
 		"markdown_source": "../packages/react-i18n/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/react-inert-value",
+		"slug": "packages-react-inert-value",
+		"markdown_source": "../packages/react-inert-value/README.md",
 		"parent": "packages"
 	},
 	{

@@ -12,21 +12,19 @@ export type PositionerProps = ComponentProps< typeof _Menu.Positioner >;
 
 // Keep the menu vertical, expose Escape bubbling only on SubmenuRoot, and omit
 // Base UI's detached-trigger handle and payload-rendering API.
-export interface RootProps
-	extends Pick<
-		_Menu.Root.Props,
-		| 'open'
-		| 'onOpenChange'
-		| 'onOpenChangeComplete'
-		| 'defaultOpen'
-		| 'modal'
-		| 'loopFocus'
-		| 'highlightItemOnHover'
-		| 'disabled'
-		| 'actionsRef'
-		| 'triggerId'
-		| 'defaultTriggerId'
-	> {
+export interface RootProps extends Pick<
+	_Menu.Root.Props,
+	| 'open'
+	| 'onOpenChange'
+	| 'onOpenChangeComplete'
+	| 'defaultOpen'
+	| 'modal'
+	| 'loopFocus'
+	| 'highlightItemOnHover'
+	| 'actionsRef'
+	| 'triggerId'
+	| 'defaultTriggerId'
+> {
 	/**
 	 * The menu subcomponents (`Menu.Trigger`, `Menu.Popup`, etc.).
 	 */
@@ -47,19 +45,17 @@ export type TriggerProps = Omit<
 
 // Keep submenus vertical; horizontal orientation is not supported by the
 // styled Menu layout.
-export interface SubmenuRootProps
-	extends Pick<
-		_Menu.SubmenuRoot.Props,
-		| 'open'
-		| 'onOpenChange'
-		| 'onOpenChangeComplete'
-		| 'defaultOpen'
-		| 'loopFocus'
-		| 'highlightItemOnHover'
-		| 'disabled'
-		| 'closeParentOnEsc'
-		| 'actionsRef'
-	> {
+export interface SubmenuRootProps extends Pick<
+	_Menu.SubmenuRoot.Props,
+	| 'open'
+	| 'onOpenChange'
+	| 'onOpenChangeComplete'
+	| 'defaultOpen'
+	| 'loopFocus'
+	| 'highlightItemOnHover'
+	| 'closeParentOnEsc'
+	| 'actionsRef'
+> {
 	/**
 	 * The submenu subcomponents (`Menu.SubmenuTrigger`, `Menu.Popup`, etc.).
 	 */
@@ -116,7 +112,7 @@ export interface PopupProps extends ComponentProps< typeof _Menu.Popup > {
 export interface MenuItemLayoutProps {
 	/**
 	 * Presentational content displayed before the item label.
-	 * Use `Menu.PrefixIcon` for an icon aligned with the label.
+	 * Use `Menu.PrefixIcon` for consistent icon sizing and alignment.
 	 */
 	prefix?: ReactNode;
 
@@ -157,10 +153,7 @@ type MenuItemChildren =
 	| [
 			ReactElement< ItemLabelProps >,
 			...(
-				| ReactElement< ItemDescriptionProps >
-				| false
-				| null
-				| undefined
+				ReactElement< ItemDescriptionProps > | false | null | undefined
 			)[],
 	  ];
 

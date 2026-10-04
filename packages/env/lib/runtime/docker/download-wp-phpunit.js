@@ -78,7 +78,7 @@ async function downloadTestSuite(
 		? ( message ) => {
 				spinner.info( `SimpleGit: ${ message }` );
 				spinner.start();
-		  }
+			}
 		: () => {};
 	onProgress( 0 );
 

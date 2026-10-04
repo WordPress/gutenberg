@@ -77,7 +77,6 @@ export default function SidebarBlockEditor( {
 			mediaUpload: mediaUploadBlockEditor,
 			hasFixedToolbar: isFixedToolbarActive || ! isMediumViewport,
 			keepCaretInsideBlock,
-			editorTool: 'edit',
 			__unstableHasCustomAppender: true,
 		};
 	}, [

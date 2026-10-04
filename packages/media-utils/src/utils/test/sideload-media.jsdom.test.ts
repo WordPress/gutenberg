@@ -1,8 +1,9 @@
+import { afterEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { sideloadMedia } from '../sideload-media';
 import { sideloadToServer } from '../sideload-to-server';
 
-jest.mock( '../sideload-to-server', () => ( {
-	sideloadToServer: jest.fn(),
+vi.mock( import( '../sideload-to-server' ), () => ( {
+	sideloadToServer: vi.fn(),
 } ) );
 
 const imageFile = new window.File( [ 'fake_file' ], 'test.jpeg', {
@@ -11,7 +12,7 @@ const imageFile = new window.File( [ 'fake_file' ], 'test.jpeg', {
 
 describe( 'sideloadMedia', () => {
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'should sideload to server and call onSuccess with sub-size data', async () => {
@@ -23,10 +24,10 @@ describe( 'sideloadMedia', () => {
 			mime_type: 'image/jpeg',
 			filesize: 5000,
 		};
-		( sideloadToServer as jest.Mock ).mockResolvedValue( mockSubSizeData );
+		( sideloadToServer as Mock ).mockResolvedValue( mockSubSizeData );
 
-		const onError = jest.fn();
-		const onSuccess = jest.fn();
+		const onError = vi.fn();
+		const onSuccess = vi.fn();
 		await sideloadMedia( {
 			file: imageFile,
 			attachmentId: 1,

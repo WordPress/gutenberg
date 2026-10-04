@@ -5,16 +5,24 @@ on:
     push:
         branches:
             - trunk
-            - 'release/**'
-            - 'wp/**'
+            - 'release/[0-9]+.[0-9]'
+            - 'wp/[0-9]+.[0-9]'
+            - wp/latest
+            - wp/next
     # Allow manually triggering the workflow.
     workflow_dispatch:
+        inputs:
+            browser-trace-file:
+                description: 'Optional repository-relative Browser test file to run with a failure trace'
+                type: string
+                default: ''
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
     # The concurrency group contains the workflow name and the branch name for pull requests
-    # or the commit hash for any other events.
-    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    # or the commit hash for any other events. Keep each focused trace run separate
+    # so it cannot cancel full test runs or other diagnostics for the same commit.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}${{ inputs.browser-trace-file && format('-browser-trace-{0}', github.run_id) || '' }}
     cancel-in-progress: true
 
 # Disable permissions for all available scopes by default.
@@ -56,6 +64,31 @@ jobs:
                           # Other workflows, and everything under .github that this one does not use.
                           - '!.github/{*,!(workflows|setup-node|setup-playwright)/**,workflows/!(unit-test.yml)}'
 
+    svn-release:
+        name: SVN release recovery
+        runs-on: 'ubuntu-24.04'
+        timeout-minutes: 5
+        needs: [detect-relevant-changes]
+        permissions:
+            contents: read
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+                  sparse-checkout: tools/release
+
+            - name: Install Subversion
+              run: sudo apt-get update -y && sudo apt-get install -y subversion
+
+            - name: Lint release scripts
+              run: shellcheck tools/release/*.sh tools/release/test/*.sh
+
+            - name: Test SVN publication and recovery
+              run: bash tools/release/test/publish-to-svn.sh
+
     unit-js:
         name: JavaScript (Node.js ${{ matrix.node }}) ${{ matrix.shard }}
         runs-on: 'ubuntu-24.04'
@@ -68,14 +101,8 @@ jobs:
             fail-fast: false
             matrix:
                 event: ['${{ github.event_name }}']
-                node: ['20', '22', '24']
+                node: ['24', '26']
                 shard: ['1/4', '2/4', '3/4', '4/4']
-                exclude:
-                    # On PRs: Only test Node 20
-                    - event: 'pull_request'
-                      node: '22'
-                    - event: 'pull_request'
-                      node: '24'
 
         steps:
             - name: Checkout repository
@@ -89,50 +116,88 @@ jobs:
               with:
                   node-version: ${{ matrix.node }}
 
-            - name: Detect Browser Mode tests
-              id: browser-tests
+            - name: Run build scripts
+              # It's not necessary to run the full build, since Vitest uses
+              # native Vite transforms. Some packages have their own custom
+              # build tasks, however. These must be run.
+              run: npm exec --no -- lerna run build
+
+            - name: Run the Vitest Node and jsdom projects
+              env:
+                  SHARD: ${{ matrix.shard }}
+                  # Keep a separate Flakiness.io history for each Node.js major.
+                  FK_ENV_NODEJS: ${{ matrix.node }}
               run: |
-                  FOUND="$(node test/unit/scripts/has-browser-tests-for-shard.mjs "${{ matrix.shard }}")"
-                  echo "found=$FOUND" >> "$GITHUB_OUTPUT"
+                  # New workflow runs vary the seed; reruns keep the original seed.
+                  echo "Reproduce with Node.js $FK_ENV_NODEJS: npm run test:unit:vitest:shuffled -- --sequence.seed=$GITHUB_RUN_NUMBER --project=node --project=jsdom --shard=$SHARD"
+                  npm run test:unit:vitest:shuffled -- \
+                    --sequence.seed="$GITHUB_RUN_NUMBER" \
+                    --project=node \
+                    --project=jsdom \
+                    --shard="$SHARD" \
+                    --passWithNoTests
+
+    unit-js-browser:
+        name: JavaScript Browser (Chromium, Node.js 24)
+        runs-on: 'ubuntu-24.04'
+        needs: [detect-relevant-changes]
+        permissions:
+            contents: read
+            id-token: write
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+              with:
+                  node-version: 24
 
             - name: Install Chromium for Browser Mode tests
-              if: ${{ steps.browser-tests.outputs.found == 'true' }}
               uses: ./.github/setup-playwright
               with:
                   workspace: '@wordpress/unit-tests'
                   browsers: chromium
 
             - name: Run build scripts
-              # It's not necessary to run the full build, since Jest can interpret
-              # source files with `babel-jest`. Some packages have their own custom
+              # It's not necessary to run the full build, since Vitest uses
+              # native Vite transforms. Some packages have their own custom
               # build tasks, however. These must be run.
               run: npm exec --no -- lerna run build
 
-            - name: Run the remaining Jest partition
+            - name: Run the Vitest Browser project
               env:
-                  SHARD: ${{ matrix.shard }}
-                  # Record the Node.js major as a custom flakiness environment
-                  # dimension so flakiness.io keeps a separate history per Node
-                  # version in the matrix.
-                  FK_ENV_NODEJS: ${{ matrix.node }}
+                  FK_ENV_NODEJS: '24'
+                  BROWSER_TRACE_FILE: ${{ inputs.browser-trace-file }}
               run: |
-                  npm run test:unit -- \
-                    --ci \
-                    --maxWorkers="$(nproc)" \
-                    --shard="$SHARD" \
-                    --cacheDirectory="$HOME/.jest-cache" \
-                    --passWithNoTests
+                  if [[ -n "$BROWSER_TRACE_FILE" ]]; then
+                    if [[ ! -f "$BROWSER_TRACE_FILE" ]] || [[ "$BROWSER_TRACE_FILE" != packages/*.browser.test.* && "$BROWSER_TRACE_FILE" != test/*.browser.test.* ]]; then
+                      echo "browser-trace-file must name an existing *.browser.test.* file under packages/ or test/."
+                      exit 1
+                    fi
+                    echo "Reproduce with Node.js $FK_ENV_NODEJS: WP_VITEST_BROWSER_TRACE=1 npm run test:unit:vitest:shuffled -- --sequence.seed=$GITHUB_RUN_NUMBER --project=browser \"$BROWSER_TRACE_FILE\""
+                    WP_VITEST_BROWSER_TRACE=1 npm run test:unit:vitest:shuffled -- --sequence.seed="$GITHUB_RUN_NUMBER" --project=browser "$BROWSER_TRACE_FILE"
+                  else
+                    echo "Reproduce with Node.js $FK_ENV_NODEJS: npm run test:unit:vitest:shuffled -- --sequence.seed=$GITHUB_RUN_NUMBER --project=browser"
+                    npm run test:unit:vitest:shuffled -- --sequence.seed="$GITHUB_RUN_NUMBER" --project=browser
+                  fi
 
-            - name: Run the migrated Vitest partition
-              env:
-                  SHARD: ${{ matrix.shard }}
-                  # Preserve the same Flakiness.io environment identity used
-                  # by the Jest partition.
-                  FK_ENV_NODEJS: ${{ matrix.node }}
-              run: |
-                  npm run test:unit:vitest -- \
-                    --shard="$SHARD" \
-                    --passWithNoTests
+            - name: Upload Browser Mode failure artifacts
+              if: ${{ failure() }}
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              with:
+                  name: vitest-browser-failures
+                  path: |
+                      test-results/vitest-attachments/failure-screenshots/
+                      test-results/vitest-browser-screenshots/
+                      test-results/vitest-browser-traces/**/*.trace.zip
+                  retention-days: 3
+                  if-no-files-found: ignore
 
     unit-js-date:
         name: JavaScript Date Tests (Node.js ${{ matrix.node }})
@@ -146,13 +211,7 @@ jobs:
             fail-fast: false
             matrix:
                 event: ['${{ github.event_name }}']
-                node: ['20', '22', '24']
-                exclude:
-                    # On PRs: Only test Node 20
-                    - event: 'pull_request'
-                      node: '22'
-                    - event: 'pull_request'
-                      node: '24'
+                node: ['24', '26']
 
         steps:
             - name: Checkout repository
@@ -167,8 +226,8 @@ jobs:
                   node-version: ${{ matrix.node }}
 
             - name: Run build scripts
-              # It's not necessary to run the full build, since Jest can interpret
-              # source files with `babel-jest`. Some packages have their own custom
+              # It's not necessary to run the full build, since Vitest uses
+              # native Vite transforms. Some packages have their own custom
               # build tasks, however. These must be run.
               run: npm exec --no -- lerna run build
 
@@ -178,7 +237,7 @@ jobs:
                   # dimension so flakiness.io keeps a separate history per Node
                   # version in the matrix.
                   FK_ENV_NODEJS: ${{ matrix.node }}
-              run: npm run test:unit:date -- --maxWorkers="$(nproc)"
+              run: npm run test:unit:date
 
     compute-previous-wordpress-version:
         name: Compute previous WordPress version
@@ -458,7 +517,16 @@ jobs:
         permissions:
             contents: read
             actions: read
-        needs: [detect-relevant-changes, unit-js, unit-js-date, test-php, phpcs]
+        needs:
+            [
+                detect-relevant-changes,
+                svn-release,
+                unit-js,
+                unit-js-browser,
+                unit-js-date,
+                test-php,
+                phpcs,
+            ]
         if: ${{ ! cancelled() && ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) }}
         steps:
             - name: Checkout repository

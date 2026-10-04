@@ -1,24 +1,32 @@
+import { describe, expect, it } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { useEffect, useState } from '@wordpress/element';
 import MediaEditorImageControls from '..';
 import type { MediaEditorImageControlsProps } from '..';
 import { MediaEditorStateProvider, useMediaEditor } from '../../../state';
-import type { CropperState } from '../../../image-editor';
 import { MAX_ZOOM } from '../../../image-editor/core/constants';
 
-function setup(
-	props: MediaEditorImageControlsProps = {},
-	initialCropperState?: Partial< CropperState >
-) {
+function setup( props: MediaEditorImageControlsProps = {}, zoom?: number ) {
 	render(
-		<MediaEditorStateProvider initialCropperState={ initialCropperState }>
+		<MediaEditorStateProvider>
 			<MediaEditorImageControls { ...props } />
-			<CurrentState />
+			<CurrentState zoom={ zoom } />
 		</MediaEditorStateProvider>
 	);
 }
 
-function CurrentState() {
-	const { state, cropOptions } = useMediaEditor();
+function CurrentState( { zoom }: { zoom?: number } ) {
+	const {
+		cropper: { state, setZoom },
+		cropOptions,
+	} = useMediaEditor();
+	// Start the cases that need it zoomed in. `setZoom` is a session edit,
+	// so these cases begin with one undo entry; none of them checks history.
+	useEffect( () => {
+		if ( zoom !== undefined ) {
+			setZoom( zoom );
+		}
+	}, [ setZoom, zoom ] );
 
 	return (
 		<>
@@ -70,7 +78,7 @@ describe( 'MediaEditorImageControls', () => {
 	} );
 
 	it( 'zoom in multiplies the zoom and zoom out divides it', () => {
-		setup( {}, { zoom: 2 } );
+		setup( {}, 2 );
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Zoom in' } ) );
 		const zoomedIn = Number(
@@ -85,7 +93,7 @@ describe( 'MediaEditorImageControls', () => {
 	} );
 
 	it( 'honors a custom zoomFactor', () => {
-		setup( { zoomFactor: 2 }, { zoom: 2 } );
+		setup( { zoomFactor: 2 }, 2 );
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Zoom in' } ) );
 
@@ -96,7 +104,7 @@ describe( 'MediaEditorImageControls', () => {
 	} );
 
 	it( 'disables Zoom in at the maximum zoom', () => {
-		setup( {}, { zoom: MAX_ZOOM } );
+		setup( {}, MAX_ZOOM );
 		// Buttons use `accessibleWhenDisabled`, so the disabled state is
 		// expressed via aria-disabled, not the `disabled` attribute.
 		expect(
@@ -127,6 +135,41 @@ describe( 'MediaEditorImageControls', () => {
 			expect(
 				screen.getByTestId( 'current-aspect-ratio' )
 			).toHaveTextContent( '1' )
+		);
+	} );
+
+	it( 'ignores an aspect ratio chosen from a menu left open when disabled', async () => {
+		function Harness() {
+			const [ locked, setLocked ] = useState( false );
+			return (
+				<MediaEditorStateProvider>
+					<MediaEditorImageControls
+						showAspectRatioControl
+						disabled={ locked }
+					/>
+					<button onClick={ () => setLocked( true ) }>lock</button>
+					<CurrentState />
+				</MediaEditorStateProvider>
+			);
+		}
+		render( <Harness /> );
+
+		fireEvent.click(
+			screen.getByRole( 'button', { name: 'Aspect ratio' } )
+		);
+		const before = screen.getByTestId( 'current-aspect-ratio' ).textContent;
+
+		// The popover stays mounted when the toggle becomes disabled, so
+		// the items have to refuse the change themselves.
+		fireEvent.click( screen.getByRole( 'button', { name: 'lock' } ) );
+		fireEvent.click(
+			screen.getByRole( 'menuitemradio', { name: 'Square (1:1)' } )
+		);
+
+		await waitFor( () =>
+			expect(
+				screen.getByTestId( 'current-aspect-ratio' )
+			).toHaveTextContent( before ?? '' )
 		);
 	} );
 

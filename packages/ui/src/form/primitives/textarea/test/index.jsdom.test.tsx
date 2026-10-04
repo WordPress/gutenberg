@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef, useState } from '@wordpress/element';
@@ -47,7 +48,7 @@ describe( 'Textarea', () => {
 	describe( 'onValueChange prop', () => {
 		it( 'calls onValueChange when user types', async () => {
 			const user = userEvent.setup();
-			const handleValueChange = jest.fn();
+			const handleValueChange = vi.fn();
 
 			render(
 				<Textarea defaultValue="" onValueChange={ handleValueChange } />
@@ -72,7 +73,7 @@ describe( 'Textarea', () => {
 
 		it( 'works with controlled component pattern', async () => {
 			const user = userEvent.setup();
-			const handleValueChange = jest.fn();
+			const handleValueChange = vi.fn();
 
 			const ControlledTextarea = () => {
 				const [ value, setValue ] = useState( 'Initial' );

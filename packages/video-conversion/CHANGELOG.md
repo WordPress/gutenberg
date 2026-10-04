@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.7.0 (2026-09-23)
+
+## 0.6.0 (2026-09-10)
+
 ### Internal
 
 -   Enforce NodeNext module resolution in the build project so future declaration imports are checked against the package's published ESM resolution rules. ([#82088](https://github.com/WordPress/gutenberg/pull/82088))

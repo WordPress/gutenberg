@@ -114,14 +114,14 @@ function Stage() {
 												? {
 														...search,
 														preview: 'stylebook',
-												  }
+													}
 												: ( () => {
 														const {
 															preview,
 															...restSearch
 														} = search;
 														return restSearch;
-												  } )(),
+													} )(),
 										} );
 									} }
 								/>

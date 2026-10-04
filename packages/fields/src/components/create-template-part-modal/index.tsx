@@ -170,7 +170,7 @@ export function CreateTemplatePartModalContents( {
 					? error.message
 					: __(
 							'An error occurred while creating the template part.'
-					  );
+						);
 
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 

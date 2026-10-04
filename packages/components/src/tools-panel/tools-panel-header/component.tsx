@@ -96,12 +96,12 @@ const OptionalControlsGroup = ( {
 							// translators: %s: The name of the control being hidden and reset e.g. "Padding".
 							__( 'Hide and reset %s' ),
 							label
-					  )
+						)
 					: sprintf(
 							// translators: %s: The name of the control to display e.g. "Padding".
 							_x( 'Show %s', 'input control' ),
 							label
-					  );
+						);
 
 				return (
 					<MenuItem

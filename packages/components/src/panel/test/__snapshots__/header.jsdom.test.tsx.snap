@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`PanelHeader basic rendering should render PanelHeader with empty div inside 1`] = `
+exports[`PanelHeader > basic rendering > should render PanelHeader with empty div inside 1`] = `
 <div>
   <div
     class="components-panel__header"

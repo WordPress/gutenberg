@@ -134,7 +134,7 @@ export default function PageTemplates() {
 						? () => {
 								resetToDefault();
 								history.invalidate();
-						  }
+							}
 						: false
 				}
 			/>

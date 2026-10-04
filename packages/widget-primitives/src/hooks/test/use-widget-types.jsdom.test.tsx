@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { createElement, isValidElement } from '@wordpress/element';
 import { registerFieldType, unregisterFieldType } from '../../field-types';
@@ -9,64 +10,13 @@ import { useWidgetTypes } from '../use-widget-types';
 import type { WidgetIcon, WidgetModuleRecord } from '../../types';
 
 const LocationControl = () => null;
-
-const mockModuleIcon = createElement( 'svg', {
-	viewBox: '0 0 24 24',
-} ) as WidgetIcon;
-
-jest.mock(
-	'test-widget/widget-module',
-	() => ( {
-		__esModule: true,
-		default: {
-			apiVersion: 1,
-			title: 'Store',
-			icon: mockModuleIcon,
-			attributes: [
-				{
-					id: 'location',
-					label: 'Location',
-					type: 'test/location',
-				},
-				{ id: 'label', label: 'Label', type: 'text' },
-			],
-			actions: [
-				{
-					id: 'module-action',
-					label: 'Module action',
-					href: 'https://example.com/module',
-					icon: mockModuleIcon,
-				},
-			],
-		},
-	} ),
-	{ virtual: true }
-);
-
-jest.mock(
-	'test-widget/string-icon-module',
-	() => ( {
-		__esModule: true,
-		default: {
-			title: 'String icon',
-			icon: 'wordpress',
-			actions: [
-				{
-					id: 'module-docs',
-					label: 'Docs',
-					href: 'https://example.com/docs',
-					icon: 'wordpress',
-				},
-			],
-		},
-	} ),
-	{ virtual: true }
-);
+const expectedModuleIcon = createElement( 'svg', { viewBox: '0 0 24 24' } );
 
 const records: WidgetModuleRecord[] = [
 	{
 		name: 'test/store',
-		widget_module: 'test-widget/widget-module',
+		widget_module:
+			'/packages/widget-primitives/src/hooks/test/fixtures/widget-module.mjs',
 		render_module: 'test-widget/render-module',
 	},
 ];
@@ -98,10 +48,40 @@ const moduleLessRecords: WidgetModuleRecord[] = [
 	},
 ];
 
+const recordAttributeRecords: WidgetModuleRecord[] = [
+	{
+		...moduleLessRecords[ 0 ],
+		attributes: [
+			{
+				id: 'location',
+				type: 'test/location',
+				label: 'Ubicación',
+				relevance: 'high',
+			},
+		],
+	},
+];
+
+const mergedAttributeRecords: WidgetModuleRecord[] = [
+	{
+		...records[ 0 ],
+		attributes: [
+			{
+				id: 'location',
+				label: 'Ubicación',
+				relevance: 'high',
+				isValid: { required: true },
+			},
+			{ id: 'extra', type: 'text', label: 'Extra' },
+		],
+	},
+];
+
 const stringIconRecords: WidgetModuleRecord[] = [
 	{
 		name: 'test/string-icon',
-		widget_module: 'test-widget/string-icon-module',
+		widget_module:
+			'/packages/widget-primitives/src/hooks/test/fixtures/string-icon-module.mjs',
 		render_module: 'test-widget/render-module',
 	},
 ];
@@ -192,6 +172,65 @@ describe( 'useWidgetTypes', () => {
 		);
 	} );
 
+	it( 'resolves record attributes without a metadata module', async () => {
+		registerFieldType( {
+			name: 'test/location',
+			baseType: 'text',
+			Edit: LocationControl,
+		} );
+
+		const { result } = renderHook( () =>
+			useWidgetTypes( recordAttributeRecords )
+		);
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+
+		expect( result.current[ 0 ][ 0 ].attributes ).toEqual( [
+			expect.objectContaining( {
+				id: 'location',
+				type: 'text',
+				label: 'Ubicación',
+				relevance: 'high',
+				Edit: LocationControl,
+			} ),
+		] );
+	} );
+
+	it( 'merges record attributes over the module by id', async () => {
+		registerFieldType( {
+			name: 'test/location',
+			baseType: 'text',
+			Edit: LocationControl,
+		} );
+
+		const { result } = renderHook( () =>
+			useWidgetTypes( mergedAttributeRecords )
+		);
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+
+		const attributes = result.current[ 0 ][ 0 ].attributes ?? [];
+
+		// Record entries lead and win shared keys; the module completes them
+		// (here the type, resolved through the registry) and adds its own.
+		expect( attributes.map( ( attribute ) => attribute.id ) ).toEqual( [
+			'location',
+			'extra',
+			'label',
+		] );
+		expect( attributes[ 0 ] ).toMatchObject( {
+			type: 'text',
+			label: 'Ubicación',
+			relevance: 'high',
+			Edit: LocationControl,
+		} );
+		// `isValid` merges rule by rule: the record's rules keep the
+		// module's custom validator.
+		expect( attributes[ 0 ].isValid ).toMatchObject( { required: true } );
+		expect( attributes[ 0 ].isValid?.custom ).toBeTypeOf( 'function' );
+		expect( attributes[ 2 ] ).toMatchObject( { label: 'Label' } );
+	} );
+
 	it( 'drops a record with neither metadata nor render module', async () => {
 		const { result } = renderHook( () => useWidgetTypes( emptyRecords ) );
 
@@ -227,7 +266,10 @@ describe( 'useWidgetTypes', () => {
 		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
 
 		expect( result.current[ 0 ] ).toHaveLength( 1 );
-		expect( result.current[ 0 ][ 0 ].icon ).toBe( mockModuleIcon );
+		expect( result.current[ 0 ][ 0 ].icon ).toEqual( expectedModuleIcon );
+		expect( result.current[ 0 ][ 0 ].icon ).toBe(
+			result.current[ 0 ][ 0 ].actions?.[ 0 ].icon
+		);
 	} );
 
 	it( 'keeps the module element when the reference does not resolve', async () => {
@@ -237,7 +279,10 @@ describe( 'useWidgetTypes', () => {
 
 		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
 
-		expect( result.current[ 0 ][ 0 ].icon ).toBe( mockModuleIcon );
+		expect( result.current[ 0 ][ 0 ].icon ).toEqual( expectedModuleIcon );
+		expect( result.current[ 0 ][ 0 ].icon ).toBe(
+			result.current[ 0 ][ 0 ].actions?.[ 0 ].icon
+		);
 	} );
 
 	it( 'holds the icon slot with a stand-in while the reference resolves', async () => {
@@ -331,8 +376,11 @@ describe( 'useWidgetTypes', () => {
 
 		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
 
+		expect( result.current[ 0 ][ 0 ].actions?.[ 0 ].icon ).toEqual(
+			expectedModuleIcon
+		);
 		expect( result.current[ 0 ][ 0 ].actions?.[ 0 ].icon ).toBe(
-			mockModuleIcon
+			result.current[ 0 ][ 0 ].icon
 		);
 	} );
 

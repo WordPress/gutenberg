@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import patternOverridesBindings from '../pattern-overrides';
 
 describe( 'pattern-overrides bindings', () => {

@@ -24,6 +24,7 @@ import {
 	convertGifToVideo,
 	terminateVideoConversionWorker,
 } from '../utils/video-conversion';
+import { canvasConvertToJpeg, HeicUnsupportedError } from '../../canvas-utils';
 
 // Mock @wordpress/blob
 vi.mock( import( '@wordpress/blob' ), () => ( {
@@ -45,6 +46,17 @@ vi.mock( import( '../utils' ), async ( importOriginal ) => {
 		cloneFile: actual.cloneFile,
 		convertBlobToFile: actual.convertBlobToFile,
 		renameFile: actual.renameFile,
+	};
+} );
+
+// Mock the HEIC conversion so prepareItem's failure branch can be driven.
+// HeicUnsupportedError is kept real: prepareItem tells the two failures apart
+// with instanceof, so a stubbed class would make the test pass vacuously.
+vi.mock( import( '../../canvas-utils' ), async ( importOriginal ) => {
+	const actual = await importOriginal();
+	return {
+		canvasConvertToJpeg: vi.fn(),
+		HeicUnsupportedError: actual.HeicUnsupportedError,
 	};
 } );
 
@@ -450,9 +462,6 @@ describe( 'private actions', () => {
 			const mediaFinalize = vi.fn().mockRejectedValue( restError );
 			const finishOperation = vi.fn();
 			const cancelItem = vi.fn();
-			const warnSpy = vi
-				.spyOn( console, 'warn' )
-				.mockImplementation( () => {} );
 			const file = new File( [ 'foo' ], 'foo.jpg', {
 				type: 'image/jpeg',
 			} );
@@ -470,7 +479,7 @@ describe( 'private actions', () => {
 			await thunk( { select, dispatch } );
 
 			expect( mediaFinalize ).toHaveBeenCalledWith( 42, mockSubSizes );
-			expect( warnSpy ).toHaveBeenCalledWith(
+			expect( console ).toHaveWarnedWith(
 				'Media finalization failed:',
 				restError
 			);
@@ -482,7 +491,6 @@ describe( 'private actions', () => {
 					file,
 				} )
 			);
-			warnSpy.mockRestore();
 		} );
 
 		it( 'should return early when item is not found', async () => {
@@ -711,6 +719,61 @@ describe( 'private actions', () => {
 		} );
 	} );
 
+	describe( 'prepareItem HEIC conversion failures', () => {
+		async function runPrepareItem() {
+			const file = new File( [ 'data' ], 'IMG_1982.heic', {
+				type: 'image/heic',
+			} );
+			const item = { id: 'heic-id', file, additionalData: {} };
+
+			const dispatch = () => {};
+			dispatch.cancelItem = vi.fn();
+			dispatch.finishOperation = vi.fn();
+
+			const select = {
+				getItem: () => item,
+				getSettings: () => ( {} ),
+			};
+
+			await prepareItem( 'heic-id' )( { select, dispatch } );
+
+			return dispatch;
+		}
+
+		it( 'reports a browser with no HEIC decoder as a decode error', async () => {
+			canvasConvertToJpeg.mockRejectedValue(
+				new HeicUnsupportedError( 'No decoder here' )
+			);
+
+			const dispatch = await runPrepareItem();
+
+			expect( dispatch.cancelItem ).toHaveBeenCalledWith(
+				'heic-id',
+				expect.objectContaining( {
+					code: ErrorCode.HEIC_DECODE_ERROR,
+				} )
+			);
+		} );
+
+		it( 'reports a failed decode as a processing error, not a missing decoder', async () => {
+			// A damaged file, an out-of-memory canvas and a null 2d context
+			// all land here. None of them says the browser cannot read HEIC,
+			// so none should send the user off to install another one.
+			const cause = new Error( 'Corrupt image data' );
+			canvasConvertToJpeg.mockRejectedValue( cause );
+
+			const dispatch = await runPrepareItem();
+
+			expect( dispatch.cancelItem ).toHaveBeenCalledWith(
+				'heic-id',
+				expect.objectContaining( {
+					code: ErrorCode.IMAGE_TRANSCODING_ERROR,
+					cause,
+				} )
+			);
+		} );
+	} );
+
 	describe( 'transcodeGifItem', () => {
 		const gifFile = new File( [ 'gif' ], 'animation.gif', {
 			type: 'image/gif',
@@ -733,22 +796,17 @@ describe( 'private actions', () => {
 			return { select, dispatch };
 		}
 
-		let consoleError;
 		let consoleDebug;
 
 		beforeEach( () => {
 			convertGifToVideo.mockReset();
 			createBlobURL.mockClear();
-			consoleError = vi
-				.spyOn( console, 'error' )
-				.mockImplementation( () => {} );
 			consoleDebug = vi
 				.spyOn( console, 'debug' )
 				.mockImplementation( () => {} );
 		} );
 
 		afterEach( () => {
-			consoleError.mockRestore();
 			consoleDebug.mockRestore();
 		} );
 
@@ -873,7 +931,7 @@ describe( 'private actions', () => {
 				dispatch.cancelItem.mock.calls[ 0 ];
 			expect( cancelledId ).toBe( 'gif-1' );
 			expect( silent ).toBe( true );
-			expect( consoleError ).not.toHaveBeenCalled();
+			expect( console ).not.toHaveErrored();
 			// No video means no poster: the sideload is never queued.
 			expect( dispatch.addSideloadItem ).not.toHaveBeenCalled();
 		} );
@@ -901,7 +959,7 @@ describe( 'private actions', () => {
 			expect( consoleDebug ).toHaveBeenCalledWith(
 				expect.stringContaining( 'exceeds maximum conversion size' )
 			);
-			expect( consoleError ).not.toHaveBeenCalled();
+			expect( console ).not.toHaveErrored();
 			expect( dispatch.addSideloadItem ).not.toHaveBeenCalled();
 		} );
 
@@ -926,7 +984,7 @@ describe( 'private actions', () => {
 			expect( consoleDebug ).toHaveBeenCalledWith(
 				expect.stringContaining( 'timed out' )
 			);
-			expect( consoleError ).not.toHaveBeenCalled();
+			expect( console ).not.toHaveErrored();
 			expect( dispatch.addSideloadItem ).not.toHaveBeenCalled();
 		} );
 
@@ -948,7 +1006,10 @@ describe( 'private actions', () => {
 			expect( error.code ).toBe( 'GIF_TRANSCODING_ERROR' );
 			expect( error.cause ).toBe( cause );
 			expect( silent ).toBe( true );
-			expect( consoleError ).toHaveBeenCalled();
+			expect( console ).toHaveErroredWith(
+				'[video-conversion] GIF to video conversion failed:',
+				cause
+			);
 			// No video means no poster: the sideload is never queued.
 			expect( dispatch.addSideloadItem ).not.toHaveBeenCalled();
 		} );
@@ -1476,9 +1537,6 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'continues thumbnail generation when rotation fails', async () => {
-			const warnSpy = vi
-				.spyOn( console, 'warn' )
-				.mockImplementation( () => {} );
 			vipsRotateImage.mockRejectedValue( new Error( 'decode failed' ) );
 
 			const item = makeItem( {
@@ -1487,21 +1545,17 @@ describe( 'private actions', () => {
 			} );
 			const { select, dispatch, addSideloadItem } = makeHarness( item );
 
-			try {
-				await generateThumbnails( item.id )( { select, dispatch } );
+			await generateThumbnails( item.id )( { select, dispatch } );
 
-				expect( warnSpy ).toHaveBeenCalledWith(
-					'Failed to rotate image, continuing with thumbnails'
-				);
-				expect(
-					sideloadedSize( addSideloadItem, 'original' )
-				).toBeUndefined();
-				expect(
-					sideloadedSize( addSideloadItem, 'thumbnail' )
-				).toBeDefined();
-			} finally {
-				warnSpy.mockRestore();
-			}
+			expect( console ).toHaveWarnedWith(
+				'Failed to rotate image, continuing with thumbnails'
+			);
+			expect(
+				sideloadedSize( addSideloadItem, 'original' )
+			).toBeUndefined();
+			expect(
+				sideloadedSize( addSideloadItem, 'thumbnail' )
+			).toBeDefined();
 		} );
 	} );
 

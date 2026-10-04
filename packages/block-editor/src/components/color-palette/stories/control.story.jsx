@@ -2,7 +2,8 @@ import { useState } from '@wordpress/element';
 import ColorPaletteControl from '../control';
 
 export default {
-	title: 'BlockEditor/ColorPaletteControl',
+	id: 'blockeditor-colorpalettecontrol',
+	title: 'Editor/Block Editor/ColorPaletteControl',
 	component: ColorPaletteControl,
 	parameters: {
 		controls: { expanded: true },

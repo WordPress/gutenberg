@@ -1039,8 +1039,8 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	 *
 	 * @covers ::gutenberg_render_layout_support_flag
 	 *
-	 * @param array $block_attrs     Dataset to test.
-	 * @param array $expected_class  Class generated for the passed dataset.
+	 * @param array $block_attrs    Dataset to test.
+	 * @param array $expected_class Class generated for the passed dataset.
 	 */
 	public function test_layout_support_flag_renders_consistent_container_hash( $block_attrs, $expected_class ) {
 		switch_theme( 'default' );
@@ -1078,7 +1078,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 			}
 		}
 
-		$this->assertEquals(
+		$this->assertSame(
 			$expected_class,
 			$actual_class,
 			'Expected class not found in the rendered output, probably because of a different hash.'

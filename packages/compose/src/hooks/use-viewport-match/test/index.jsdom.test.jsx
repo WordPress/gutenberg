@@ -1,9 +1,8 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import useViewportMatch from '../';
-jest.mock( '../../use-media-query', () => {
-	return jest.fn();
-} );
 import useMediaQueryMock from '../../use-media-query';
+vi.mock( import( '../../use-media-query' ), () => ( { default: vi.fn() } ) );
 
 describe( 'useViewportMatch', () => {
 	afterEach( () => {

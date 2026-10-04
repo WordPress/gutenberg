@@ -26,8 +26,8 @@ function gutenberg_initialize_experiments_settings() {
 				),
 				array(
 					'id'          => 'gutenberg-global-styles-inheritance-ui',
-					'label'       => __( 'Global Styles inheritance in the block inspector', 'gutenberg' ),
-					'description' => __( 'Shows the value a block inherits from Global Styles in the block inspector when nothing is set on the block itself, and adds a control to clear a value you set back to the inherited one.', 'gutenberg' ),
+					'label'       => __( 'Global Styles inheritance indicators in the block inspector', 'gutenberg' ),
+					'description' => __( 'Marks which block inspector controls show a value inherited from Global Styles, and adds a shortcut to clear a value you set back to the inherited one. Inherited values show in the inspector whether or not this is on.', 'gutenberg' ),
 				),
 				array(
 					'id'          => 'gutenberg-grid-interactivity',
@@ -56,11 +56,6 @@ function gutenberg_initialize_experiments_settings() {
 			'slug'  => 'data-views',
 			'label' => _x( 'Data Views', 'experiments group name', 'gutenberg' ),
 			'items' => array(
-				array(
-					'id'          => 'gutenberg-content-only-inspector-fields',
-					'label'       => __( 'Block fields: Show dataform driven inspector fields on blocks that support them', 'gutenberg' ),
-					'description' => __( 'Enables editable block inspector fields that are generated using a dataform.', 'gutenberg' ),
-				),
 				array(
 					'id'          => 'gutenberg-dataform-inspector',
 					'label'       => __( 'Editor Inspector: Use DataForm', 'gutenberg' ),
@@ -95,11 +90,6 @@ function gutenberg_initialize_experiments_settings() {
 			'label' => _x( 'Other', 'experiments group name', 'gutenberg' ),
 			'items' => array(
 				array(
-					'id'          => 'gutenberg-color-randomizer',
-					'label'       => __( 'Color randomizer', 'gutenberg' ),
-					'description' => __( 'Enables the Global Styles color randomizer in the Site Editor; a utility that lets you mix the current color palette pseudo-randomly.', 'gutenberg' ),
-				),
-				array(
 					'id'          => 'gutenberg-workflow-palette',
 					'label'       => __( 'Workflow Palette', 'gutenberg' ),
 					'description' => __( 'Enables the Workflow Palette for running workflows composed of abilities, from a unified interface.', 'gutenberg' ),
@@ -113,6 +103,11 @@ function gutenberg_initialize_experiments_settings() {
 					'id'          => 'gutenberg-guidelines',
 					'label'       => __( 'Guidelines', 'gutenberg' ),
 					'description' => __( 'Enables the Guidelines page under Settings and the experimental knowledge storage (wp_knowledge).', 'gutenberg' ),
+				),
+				array(
+					'id'          => 'gutenberg-wpds-admin-restyle',
+					'label'       => __( 'Admin design tokens', 'gutenberg' ),
+					'description' => __( 'Styles wp-admin from WordPress Design System tokens, so every admin screen reads as one product regardless of how it is rendered. No markup changes. (Warning: this can change how plugin styles apply to admin screens, and it loads admin stylesheets one by one instead of combined. Use it for testing, not on a live site.)', 'gutenberg' ),
 				),
 				array(
 					'id'          => 'gutenberg-dashboard-widgets',
