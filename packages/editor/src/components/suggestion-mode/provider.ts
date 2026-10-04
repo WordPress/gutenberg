@@ -1,7 +1,6 @@
 import { useCallback, useMemo } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { createBlock } from '@wordpress/blocks';
 // @ts-expect-error No exported types
 // prettier-ignore
 import { store as blockEditorStore, privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -13,7 +12,6 @@ import {
 	useSuggestionOverlay,
 	POST_TITLE_OVERLAY_KEY,
 } from './overlay-context';
-import type { SuggestionOperation } from './overlay-context';
 import {
 	addNoteIdToMetadata,
 	getNoteIdsFromMetadata,
@@ -31,461 +29,29 @@ import {
 	rejectInlineFormat,
 } from '../inline-suggestions';
 import { unlock } from '../../lock-unlock';
+import {
+	PAYLOAD_MAX_BYTES,
+	applyOperations,
+	applyPostOperations,
+	buildSuggestionPayload,
+	findBlockByNoteId,
+	findInlineOp,
+	findPostAttributeOps,
+	findStructuralOp,
+	parseSuggestionPayload,
+	payloadByteLength,
+	planStructuralApply,
+	planStructuralReject,
+	rollbackAttributesFor,
+} from './operations';
+import type {
+	BlockPlan,
+	PlanStep,
+	SuggestionOperation,
+	SuggestionPayload,
+} from './operations';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
-
-/**
- * A single suggestion operation.
- *
- * `type` is one of `attribute-set` / `inline-suggestion` (Phase 2) or the
- * structural variants `block-insert-after` / `block-remove` / `block-move`
- * (Phase 6, issue #77434). Other fields vary by type:
- *   - `attribute`      The attribute being changed (`attribute-set`) or
- *                      carrying the marker (`inline-suggestion`).
- *   - `suggestionType` Inline marker kind (`inline-suggestion` only): `del`
- *                      wraps existing text proposed for removal, `add` wraps
- *                      proposed new text, `format` wraps a run whose
- *                      formatting changed (text unchanged), `replace` owns
- *                      an `add` run and the `del` run after it.
- *   - `beforeHTML`     Original run HTML captured for a `format` suggestion,
- *                      so a reject can restore the pre-suggestion formatting.
- *   - `afterHTML`      Proposed run HTML for a `format` suggestion, used to
- *                      summarize which formats changed.
- *   - `before`/`after` The baseline and proposed values (`attribute-set`).
- */
-export type { SuggestionOperation };
-
-export interface SuggestionPayload {
-	/** Payload schema version. */
-	schemaVersion: number;
-	/** Block name at capture time. */
-	blockName: string;
-	/**
-	 * Post `modified_gmt` at capture, used by Phase 3 to detect stale
-	 * suggestions.
-	 */
-	baseRevision: string | null;
-	/** Ordered operations. */
-	operations: SuggestionOperation[];
-}
-
-/**
- * Suggestion payload schema version. v1 emitted only `attribute-set`
- * operations; v2 reserves the structural op types (`block-insert-after`,
- * `block-remove`, `block-move`) tracked in issue #77434.
- *
- * Reader rule:
- *   parsed < SCHEMA_VERSION → migrate forward, then apply.
- *   parsed === SCHEMA_VERSION → apply as-is.
- *   parsed > SCHEMA_VERSION → refuse (newer-editor notice; offer Reject only).
- *
- * Bumping this constant requires a corresponding migration step in
- * `parseSuggestionPayload`.
- */
-const SCHEMA_VERSION = 2;
-
-/**
- * Maximum byte length of a serialized suggestion payload. Mirrors
- * `GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES` in
- * `lib/compat/wordpress-7.1/block-suggestions.php`. The client checks before
- * submitting so a doomed request never leaves the browser; the REST
- * controller is the authoritative gate.
- */
-const PAYLOAD_MAX_BYTES = 65536;
-
-/**
- * Byte length of a serialized payload, measured the way PHP `strlen()`
- * counts (UTF-8 bytes, not chars).
- *
- * @param payload Payload to measure.
- * @return UTF-8 byte length of the serialized JSON.
- */
-function payloadByteLength( payload: SuggestionPayload ): number {
-	const serialized = JSON.stringify( payload );
-	if ( typeof TextEncoder !== 'undefined' ) {
-		return new TextEncoder().encode( serialized ).length;
-	}
-	// Conservative upper bound: 4 bytes per UTF-16 code unit covers all
-	// possible UTF-8 expansions. Used only in test/JSDOM environments
-	// without TextEncoder.
-	return serialized.length * 4;
-}
-
-/**
- * Build attribute-set operations by diffing an overlay entry against its
- * captured baseline. Attributes whose value differs are emitted; unchanged
- * or absent keys are skipped.
- *
- * @param baselineAttributes Attributes captured on first edit.
- * @param overlayAttributes  Pending attribute changes.
- * @return Operations describing the suggestion.
- */
-export function operationsFromOverlay(
-	baselineAttributes: Record< string, any > | null | undefined,
-	overlayAttributes: Record< string, any > | null | undefined
-): SuggestionOperation[] {
-	const operations: SuggestionOperation[] = [];
-	for ( const [ attribute, after ] of Object.entries(
-		overlayAttributes || {}
-	) ) {
-		const before = baselineAttributes?.[ attribute ];
-		if ( ! isAttributeEqual( before, after ) ) {
-			operations.push( {
-				type: 'attribute-set',
-				attribute,
-				before: before ?? null,
-				after,
-			} );
-		}
-	}
-	return operations;
-}
-
-/**
- * Structural equality for attribute values. Handles primitives, arrays, and
- * plain objects with arbitrary key order.
- *
- * `JSON.stringify` is order-sensitive ({a:1,b:2} ≠ {b:2,a:1}), so a stringify-
- * based compare produces spurious "changed" detections when block code re-
- * emits a `style` object with reordered keys. The recursive walk avoids that.
- *
- * @param a First value.
- * @param b Second value.
- * @return True when the values are structurally equal.
- */
-function isAttributeEqual( a: any, b: any ): boolean {
-	if ( a === b ) {
-		return true;
-	}
-	if ( a === null || a === undefined || b === null || b === undefined ) {
-		return false;
-	}
-	// One side is a primitive (typically a string from a JSON-deserialized
-	// suggestion payload) and the other is a wrapper object (typically a
-	// `RichTextData` instance from the live block-editor store). Compare
-	// their string representations so the same logical content reads as
-	// equal across the serialization boundary — otherwise `hasAttributeConflict`
-	// flags every content suggestion as stale and the apply flow short-
-	// circuits to a never-visible "stale" dialog.
-	const aIsObject = typeof a === 'object';
-	const bIsObject = typeof b === 'object';
-	if ( aIsObject !== bIsObject ) {
-		return String( a ) === String( b );
-	}
-	if ( ! aIsObject ) {
-		return false;
-	}
-	const aIsArray = Array.isArray( a );
-	const bIsArray = Array.isArray( b );
-	if ( aIsArray !== bIsArray ) {
-		return false;
-	}
-	if ( aIsArray ) {
-		if ( a.length !== b.length ) {
-			return false;
-		}
-		for ( let i = 0; i < a.length; i++ ) {
-			if ( ! isAttributeEqual( a[ i ], b[ i ] ) ) {
-				return false;
-			}
-		}
-		return true;
-	}
-	const aKeys = Object.keys( a );
-	const bKeys = Object.keys( b );
-	if ( aKeys.length !== bKeys.length ) {
-		return false;
-	}
-	// Wrapper objects like `RichTextData` hold their content in private
-	// class fields, so `Object.keys()` returns an empty array for any two
-	// instances regardless of the text they wrap. Fall back to a string
-	// compare so two wrappers with different content don't look equal.
-	if ( aKeys.length === 0 ) {
-		return String( a ) === String( b );
-	}
-	for ( const key of aKeys ) {
-		if ( ! Object.prototype.hasOwnProperty.call( b, key ) ) {
-			return false;
-		}
-		if ( ! isAttributeEqual( a[ key ], b[ key ] ) ) {
-			return false;
-		}
-	}
-	return true;
-}
-
-/**
- * Operation types that mutate the block tree's structure rather than a
- * single block's attributes. These flow through a different apply/reject
- * path than `attribute-set`: Apply dispatches the corresponding block-
- * editor action (`removeBlock`, `insertBlock`, `moveBlockToPosition`),
- * Reject just clears the `metadata.suggestion` marker.
- */
-const STRUCTURAL_OP_TYPES = new Set( [
-	'block-remove',
-	'block-insert-after',
-	'block-move',
-] );
-
-/**
- * Locate the structural operation in a suggestion payload. v2 payloads carry
- * at most one structural op per suggestion (the auto-save loop persists each
- * structural mutation as its own note); attribute-set ops can ride along
- * inside the same payload but the structural op leads.
- *
- * @param operations Payload operations.
- * @return Structural op, or null when none.
- */
-export function findStructuralOp(
-	operations: SuggestionOperation[] | null | undefined
-): SuggestionOperation | null {
-	if ( ! Array.isArray( operations ) ) {
-		return null;
-	}
-	for ( const op of operations ) {
-		if ( op && STRUCTURAL_OP_TYPES.has( op.type ) ) {
-			return op;
-		}
-	}
-	return null;
-}
-
-/**
- * Operation type for an inline suggestion: a `core/suggestion` marker anchored
- * in a single rich-text attribute. The marked range is never stored — it is
- * re-derived from the in-content marker by id (the comment id) on read — so the
- * op only records which attribute carries the marker and the marker kind.
- */
-export const INLINE_OP_TYPE = 'inline-suggestion';
-
-/**
- * Locate the inline-suggestion operation in a payload. A payload describes at
- * most one inline suggestion (each is its own note/comment), so the first match
- * is returned.
- *
- * @param operations Payload operations.
- * @return Inline op, or null when none.
- */
-export function findInlineOp(
-	operations: SuggestionOperation[] | null | undefined
-): SuggestionOperation | null {
-	if ( ! Array.isArray( operations ) ) {
-		return null;
-	}
-	return (
-		operations.find( ( op ) => op && op.type === INLINE_OP_TYPE ) ?? null
-	);
-}
-
-/**
- * Build attributes that clear the `metadata.suggestion` marker on a block
- * while preserving every other metadata field. Used by Apply (after the
- * mutation lands) and by Reject (to drop the pending state).
- *
- * @param currentAttributes Block's current attributes.
- * @return Partial attributes payload safe for `updateBlockAttributes`.
- */
-export function clearSuggestionMarkerAttributes(
-	currentAttributes: Record< string, any > | null | undefined
-): { metadata: Record< string, any > } | null {
-	const meta = currentAttributes?.metadata;
-	if ( ! meta || meta.suggestion === undefined ) {
-		return null;
-	}
-	const { suggestion: _drop, ...rest } = meta;
-	return { metadata: rest };
-}
-
-/**
- * Apply a suggestion payload's operations to a block's current attributes
- * to produce the new attributes. Pure function — no side effects.
- *
- * @param currentAttributes Block's current attributes.
- * @param operations        Operations from the payload.
- * @return Merged attributes with suggestions applied.
- */
-export function applyOperations(
-	currentAttributes: Record< string, any > | null | undefined,
-	operations: SuggestionOperation[]
-): Record< string, any > {
-	const result: Record< string, any > = { ...currentAttributes };
-	for ( const op of operations ) {
-		if ( op.type === 'attribute-set' ) {
-			result[ op.attribute ] = op.after;
-		}
-	}
-	return result;
-}
-
-/**
- * Op type for a change to a post field (today only the title) rather than a
- * block attribute. Its note has no block anchor.
- */
-export const POST_ATTRIBUTE_OP_TYPE = 'post-attribute-set';
-
-/**
- * Build `post-attribute-set` operations from a post-level overlay entry.
- *
- * @param baseline Post fields captured on first edit.
- * @param overlay  Proposed post fields.
- * @return Operations describing the suggestion.
- */
-export function postOperationsFromOverlay(
-	baseline: Record< string, any > | null | undefined,
-	overlay: Record< string, any > | null | undefined
-): SuggestionOperation[] {
-	return operationsFromOverlay( baseline, overlay ).map( ( op ) => ( {
-		...op,
-		type: POST_ATTRIBUTE_OP_TYPE,
-	} ) );
-}
-
-/**
- * The post-level operations in a payload.
- *
- * @param operations Operations from a payload.
- * @return The `post-attribute-set` operations, possibly empty.
- */
-export function findPostAttributeOps(
-	operations: SuggestionOperation[] | null | undefined
-): SuggestionOperation[] {
-	if ( ! Array.isArray( operations ) ) {
-		return [];
-	}
-	return operations.filter( ( op ) => op?.type === POST_ATTRIBUTE_OP_TYPE );
-}
-
-/**
- * The post edits that accepting post-level operations makes.
- *
- * @param operations Post-level operations.
- * @return Edits for `editPost`.
- */
-export function applyPostOperations(
-	operations: SuggestionOperation[]
-): Record< string, any > {
-	const edits: Record< string, any > = {};
-	for ( const op of findPostAttributeOps( operations ) ) {
-		edits[ op.attribute ] = op.after;
-	}
-	return edits;
-}
-
-/**
- * Report whether applying the suggestion's operations over the block's
- * current attributes would overwrite concurrent changes made by someone
- * else. A suggestion is considered conflicting only when the baseline
- * captured at suggest-time differs from the attribute's current value —
- * simply reopening the post after any auto-save doesn't qualify.
- *
- * @param currentAttributes Block's current attributes.
- * @param operations        Operations from the payload.
- * @return True if at least one targeted attribute has diverged.
- */
-export function hasAttributeConflict(
-	currentAttributes: Record< string, any > | null | undefined,
-	operations: SuggestionOperation[] | null | undefined
-): boolean {
-	if ( ! Array.isArray( operations ) ) {
-		return false;
-	}
-	// Inserted blocks have no pre-existing attributes — the overlay's
-	// baseline for a `block-insert-after` entry is `{}`, so every
-	// attribute-set op rides on `before: null`. Comparing that against the
-	// live (already-typed-into) block's attributes always reads as
-	// divergence, which falsely fires the staleness prompt on apply. The
-	// attribute-set ops describe the inserted block's content, not an
-	// overwrite of pre-existing data, so there is nothing to conflict with.
-	if ( findStructuralOp( operations )?.type === 'block-insert-after' ) {
-		return false;
-	}
-	for ( const op of operations ) {
-		// Post-level ops compare against the post's fields, which the caller
-		// passes as `currentAttributes` for such a payload.
-		if (
-			op.type !== 'attribute-set' &&
-			op.type !== POST_ATTRIBUTE_OP_TYPE
-		) {
-			continue;
-		}
-		if (
-			! isAttributeEqual(
-				op.before ?? null,
-				currentAttributes?.[ op.attribute ] ?? null
-			)
-		) {
-			return true;
-		}
-	}
-	return false;
-}
-
-/**
- * Migrate a payload emitted by an older `SCHEMA_VERSION` up to the current
- * shape. v1 → v2 is a pure additive change (structural op types reserved but
- * v1 payloads never used them), so the migration just stamps the version
- * field forward — no shape rewriting is needed.
- *
- * Add a new `case` per future bump; never remove old cases, since the
- * comment-meta store may contain payloads written by every prior version.
- *
- * @param parsed Parsed JSON payload of a known older version.
- * @return Payload upgraded to the current schema.
- */
-function migrateSuggestionPayload(
-	parsed: SuggestionPayload
-): SuggestionPayload {
-	let next = parsed;
-	if ( next.schemaVersion === 1 ) {
-		next = { ...next, schemaVersion: 2 };
-	}
-	return next;
-}
-
-/**
- * Parse a `_wp_suggestion` meta value into a typed payload. Refuses payloads
- * written by a newer editor (`schemaVersion > SCHEMA_VERSION`) so a partial
- * apply can't drop op types this consumer doesn't understand. Migrates
- * older payloads forward to the current shape.
- *
- * @param raw The raw JSON string from comment meta.
- * @return Parsed payload, or null when the input is
- * malformed or the payload was written by a newer editor.
- */
-export function parseSuggestionPayload(
-	raw: string | null | undefined
-): SuggestionPayload | null {
-	if ( ! raw ) {
-		return null;
-	}
-	let parsed: any;
-	try {
-		parsed = JSON.parse( raw );
-	} catch {
-		return null;
-	}
-	if (
-		typeof parsed !== 'object' ||
-		parsed === null ||
-		! Array.isArray( parsed.operations )
-	) {
-		return null;
-	}
-	// Pre-versioned payloads (schemaVersion missing) are treated as v1 — the
-	// only writer that emitted them was the v1 implementation.
-	const version =
-		typeof parsed.schemaVersion === 'number' ? parsed.schemaVersion : 1;
-	if ( version > SCHEMA_VERSION ) {
-		return null;
-	}
-	if ( version < SCHEMA_VERSION ) {
-		return migrateSuggestionPayload( {
-			...parsed,
-			schemaVersion: version,
-		} );
-	}
-	return parsed;
-}
 
 /*
  * Comment ids with an apply/reject decision currently in flight. Deciding a
@@ -648,12 +214,85 @@ export function useSuggestionsProvider() {
 	} = useDispatch( blockEditorStore );
 	const {
 		getBlockAttributes: selectBlockAttributes,
-		getBlockRootClientId: selectBlockRootClientId,
 		getClientIdsWithDescendants: selectClientIdsWithDescendants,
 	} = useSelect( blockEditorStore );
 	const { requestInterceptorBypass, clearOverlay, clearOverlayForComment } =
 		useSuggestionOverlay();
 	const registry = useRegistry();
+
+	/**
+	 * Dispatch a planned set of block-tree effects.
+	 *
+	 * @param plan The plan.
+	 */
+	const runPlan = useCallback(
+		( plan: BlockPlan ) => {
+			const run = ( step: PlanStep ) => {
+				switch ( step.step ) {
+					case 'bypass':
+						requestInterceptorBypass( step.clientId );
+						break;
+					case 'clearOverlay':
+						clearOverlay( step.clientId );
+						break;
+					case 'updateBlockAttributes':
+						updateBlockAttributes( step.clientId, step.attributes );
+						break;
+					case 'removeBlock':
+						removeBlock( step.clientId, step.selectPrevious );
+						break;
+					case 'insertBlock':
+						insertBlock(
+							step.block,
+							step.index,
+							step.rootClientId,
+							step.updateSelection
+						);
+						break;
+					case 'moveBlockToPosition':
+						moveBlockToPosition(
+							step.clientId,
+							step.fromRootClientId,
+							step.toRootClientId,
+							step.index
+						);
+						break;
+				}
+			};
+			plan.steps.forEach( run );
+			if ( plan.batched.length > 0 ) {
+				registry.batch( () => plan.batched.forEach( run ) );
+			}
+		},
+		[
+			requestInterceptorBypass,
+			clearOverlay,
+			updateBlockAttributes,
+			removeBlock,
+			insertBlock,
+			moveBlockToPosition,
+			registry,
+		]
+	);
+
+	/**
+	 * The block a note targets: the one the caller resolved, or the one whose
+	 * `metadata.noteId` links to the note.
+	 *
+	 * @param clientId  Block client id, if the caller resolved one.
+	 * @param commentId Comment id.
+	 * @return The target client id, or undefined.
+	 */
+	const resolveTarget = useCallback(
+		( clientId: string | undefined, commentId: number | string ) =>
+			clientId ||
+			findBlockByNoteId(
+				selectClientIdsWithDescendants?.() ?? [],
+				selectBlockAttributes,
+				commentId
+			),
+		[ selectClientIdsWithDescendants, selectBlockAttributes ]
+	);
 
 	const createSuggestion = useCallback(
 		async ( {
@@ -672,12 +311,11 @@ export function useSuggestionsProvider() {
 				return null;
 			}
 
-			const payload: SuggestionPayload = {
-				schemaVersion: SCHEMA_VERSION,
+			const payload = buildSuggestionPayload( {
 				blockName,
 				baseRevision: postModified,
 				operations,
-			};
+			} );
 
 			if ( payloadByteLength( payload ) > PAYLOAD_MAX_BYTES ) {
 				const error = new Error(
@@ -792,12 +430,11 @@ export function useSuggestionsProvider() {
 				throw new Error( 'No comment id for suggestion update.' );
 			}
 
-			const payload: SuggestionPayload = {
-				schemaVersion: SCHEMA_VERSION,
+			const payload = buildSuggestionPayload( {
 				blockName,
 				baseRevision: postModified,
 				operations,
-			};
+			} );
 
 			if ( payloadByteLength( payload ) > PAYLOAD_MAX_BYTES ) {
 				const error = new Error(
@@ -989,34 +626,7 @@ export function useSuggestionsProvider() {
 				return true;
 			}
 
-			// `thread.blockClientId` is derived by matching `metadata.noteId`
-			// on blocks currently in the editor. If the Suggest author never
-			// auto-saved the post after the comment was created — or the
-			// author reloaded before the save landed — the metadata linkage
-			// won't exist yet and the caller will pass `clientId: undefined`.
-			// Fall back to scanning the live block tree for a block whose
-			// `metadata.noteId` includes the comment id (the field is an
-			// array post-#75147 to support multiple notes per block, so use
-			// the shared normalization helper instead of strict equality).
-			let targetClientId = clientId;
-			if ( ! targetClientId ) {
-				const liveIds = selectClientIdsWithDescendants?.() ?? [];
-				const commentIdKey = String( commentId );
-				for ( const id of liveIds ) {
-					const ids = getNoteIdsFromMetadata(
-						selectBlockAttributes( id )?.metadata
-					);
-					if (
-						ids.some(
-							( n: number | string ) =>
-								String( n ) === commentIdKey
-						)
-					) {
-						targetClientId = id;
-						break;
-					}
-				}
-			}
+			const targetClientId = resolveTarget( clientId, commentId );
 
 			if ( ! targetClientId ) {
 				createNotice(
@@ -1113,12 +723,11 @@ export function useSuggestionsProvider() {
 				return true;
 			}
 
-			// Structural ops (block-remove, block-insert-after; block-move
-			// ships in a follow-up) can't ride the updateBlockAttributes
-			// path: their apply mutates the tree rather than a single
-			// block's attributes. Branch out, run the matching block-
-			// editor action, and short-circuit before the attribute-set
-			// rollback machinery below.
+			// Structural ops (block-remove, block-insert-after, block-move)
+			// can't ride the updateBlockAttributes path: their apply mutates
+			// the tree rather than a single block's attributes. Branch out,
+			// run the planned block-editor actions, and short-circuit before
+			// the attribute-set rollback machinery below.
 			const structuralOp = findStructuralOp( payload.operations );
 			if ( structuralOp ) {
 				try {
@@ -1144,59 +753,14 @@ export function useSuggestionsProvider() {
 						{ throwOnError: true }
 					);
 
-					if ( structuralOp.type === 'block-remove' ) {
-						// Bypass twice: the marker-clear dispatch lands
-						// first (so the live block ends without the
-						// pending-remove flag should the removeBlock fail),
-						// then the actual removal.
-						const clearAttrs = clearSuggestionMarkerAttributes(
-							selectBlockAttributes( targetClientId )
-						);
-						if ( clearAttrs ) {
-							requestInterceptorBypass( targetClientId );
-							updateBlockAttributes( targetClientId, clearAttrs );
-						}
-						requestInterceptorBypass( targetClientId );
-						clearOverlay( targetClientId );
-						removeBlock( targetClientId );
-					} else if (
-						structuralOp.type === 'block-insert-after' ||
-						structuralOp.type === 'block-move'
-					) {
-						// The block is already at its proposed location
-						// (the user inserted or moved it during Suggest
-						// mode); apply commits the captured edits onto the
-						// live block AND clears the pending marker so the
-						// block loses its dimmed/outlined treatment.
-						//
-						// Attribute-set ops in the same payload represent
-						// edits the user made between the structural
-						// change and auto-save. They never reach the live
-						// block on the suggester's side — the interceptor
-						// reverts them into the overlay — so collaborators
-						// (and the suggester after a reload) see the live
-						// block in the captured shape (typically empty
-						// content for a fresh paragraph). Apply must
-						// materialize those edits on the live block,
-						// otherwise the inserted/moved block ends up in
-						// the wrong shape after acceptance.
-						const currentAttributes =
-							selectBlockAttributes( targetClientId );
-						const withOpsApplied = applyOperations(
-							currentAttributes,
-							payload.operations
-						);
-						const markerCleared =
-							clearSuggestionMarkerAttributes( withOpsApplied );
-						const finalAttributes = markerCleared
-							? { ...withOpsApplied, ...markerCleared }
-							: withOpsApplied;
-						requestInterceptorBypass( targetClientId );
-						updateBlockAttributes(
-							targetClientId,
-							finalAttributes
-						);
-						clearOverlay( targetClientId );
+					const plan = planStructuralApply(
+						structuralOp,
+						payload.operations,
+						targetClientId,
+						registry.select( blockEditorStore )
+					);
+					if ( plan ) {
+						runPlan( plan );
 					}
 
 					if ( ! silent ) {
@@ -1222,28 +786,10 @@ export function useSuggestionsProvider() {
 				currentAttributes,
 				payload.operations
 			);
-
-			// Build a rollback payload that covers exactly the keys this
-			// apply touched. `updateBlockAttributes` is a partial merge —
-			// passing `currentAttributes` alone would leave keys that the
-			// apply newly added stuck on the block (set to their `after`
-			// value), since they have no entry in the original attributes
-			// to override them. Listing each touched key with its original
-			// value (or `undefined` when the key was added by this apply)
-			// restores the block cleanly.
-			const rollbackPayload: Record< string, any > = {};
-			for ( const op of payload.operations ) {
-				if ( op.type !== 'attribute-set' ) {
-					continue;
-				}
-				rollbackPayload[ op.attribute ] =
-					Object.prototype.hasOwnProperty.call(
-						currentAttributes ?? {},
-						op.attribute
-					)
-						? currentAttributes?.[ op.attribute ]
-						: undefined;
-			}
+			const rollbackPayload = rollbackAttributesFor(
+				currentAttributes,
+				payload.operations
+			);
 
 			try {
 				// Bypass the suggest-mode interceptor for this dispatch so
@@ -1294,9 +840,9 @@ export function useSuggestionsProvider() {
 		[
 			saveEntityRecord,
 			updateBlockAttributes,
-			removeBlock,
 			selectBlockAttributes,
-			selectClientIdsWithDescendants,
+			resolveTarget,
+			runPlan,
 			createNotice,
 			requestInterceptorBypass,
 			clearOverlay,
@@ -1378,25 +924,7 @@ export function useSuggestionsProvider() {
 			// change lands on the live block.
 			const inlineOp = findInlineOp( payload?.operations );
 			if ( inlineOp ) {
-				let targetClientId = clientId;
-				if ( ! targetClientId ) {
-					const liveIds = selectClientIdsWithDescendants?.() ?? [];
-					const commentIdKey = String( commentId );
-					for ( const id of liveIds ) {
-						const ids = getNoteIdsFromMetadata(
-							selectBlockAttributes( id )?.metadata
-						);
-						if (
-							ids.some(
-								( n: number | string ) =>
-									String( n ) === commentIdKey
-							)
-						) {
-							targetClientId = id;
-							break;
-						}
-					}
-				}
+				const targetClientId = resolveTarget( clientId, commentId );
 				if ( targetClientId ) {
 					const attributeKey = inlineOp.attribute;
 					const originalValue =
@@ -1481,16 +1009,10 @@ export function useSuggestionsProvider() {
 				}
 			}
 
-			// Reject behavior depends on the structural op type:
-			//   - block-remove: drop the marker (block stays).
-			//   - block-insert-after: dispatch removeBlock to undo the
-			//     suggested insertion. The marker on the live block goes
-			//     away with the block itself.
-			//   - block-move: clear the marker, then dispatch
-			//     moveBlockToPosition to put the block back at its
-			//     pre-move parent + index.
-			//   - attribute-set (no structural op): no live-block change; the
-			//     overlay entry holding the proposed value is cleared.
+			// A structural op undoes its live-block change (see
+			// `planStructuralReject`); an attribute-set payload made no
+			// live-block change, so only the overlay entry holding the
+			// proposed value is cleared.
 			const structuralOp = findStructuralOp( payload?.operations );
 
 			try {
@@ -1514,174 +1036,13 @@ export function useSuggestionsProvider() {
 				 * failed reject then leaves the editor exactly as it was.
 				 */
 				if ( structuralOp && clientId ) {
-					if ( structuralOp.type === 'block-insert-after' ) {
-						requestInterceptorBypass( clientId );
-						clearOverlay( clientId );
-						removeBlock( clientId );
-					} else if ( structuralOp.type === 'block-move' ) {
-						const clearAttrs = clearSuggestionMarkerAttributes(
-							selectBlockAttributes( clientId )
-						);
-						const liveParent =
-							selectBlockRootClientId( clientId ) ?? '';
-						/*
-						 * The recorded parents are session-local client ids,
-						 * regenerated whenever the post is parsed again. A move
-						 * within one parent needs no recorded id at all: the
-						 * block's live parent is the parent it came from. A move
-						 * across parents restores to the recorded parent only
-						 * while that block still exists; after a reload it
-						 * cannot be resolved, so the block is restored within
-						 * its current parent (a documented limitation).
-						 */
-						const recordedFrom =
-							structuralOp.fromParentClientId ?? '';
-						const recordedTo = structuralOp.toParentClientId ?? '';
-						let restoreParent = liveParent;
-						if (
-							recordedFrom !== recordedTo &&
-							( recordedFrom === '' ||
-								selectBlockAttributes( recordedFrom ) )
-						) {
-							restoreParent = recordedFrom;
-						}
-						/*
-						 * List indent and outdent create or empty a nested
-						 * list in the same update as the move (#73411). An
-						 * outdent's emptied list is gone, so it is rebuilt, or
-						 * reused when an earlier reject already rebuilt it; an
-						 * indent's list is removed once the item leaves it empty.
-						 * The rebuilt list copies the type and attributes of the
-						 * list the item sits in now, never the note payload: the
-						 * suggester writes the payload, and the reviewer's reject
-						 * would otherwise insert whatever block it names.
-						 */
-						const blockEditorSelect =
-							registry.select( blockEditorStore );
-						const dissolved = structuralOp.fromParentBlock;
-						const carrierName =
-							liveParent !== ''
-								? blockEditorSelect.getBlockName( liveParent )
-								: null;
-						let rebuiltParent: any = null;
-						if (
-							recordedFrom !== '' &&
-							carrierName &&
-							! selectBlockAttributes( recordedFrom ) &&
-							dissolved &&
-							( dissolved.parentClientId === null ||
-								selectBlockAttributes(
-									dissolved.parentClientId
-								) )
-						) {
-							const rebuilt = blockEditorSelect.getBlockOrder(
-								dissolved.parentClientId ?? ''
-							)[ dissolved.index ?? 0 ];
-							if (
-								rebuilt &&
-								rebuilt !== liveParent &&
-								blockEditorSelect.getBlockName( rebuilt ) ===
-									carrierName
-							) {
-								restoreParent = rebuilt;
-							} else {
-								const moved =
-									blockEditorSelect.getBlock( clientId );
-								const { metadata, ...carrierAttributes } =
-									selectBlockAttributes( liveParent ) ?? {};
-								rebuiltParent = createBlock(
-									carrierName,
-									carrierAttributes,
-									[
-										{
-											...moved,
-											attributes: {
-												...moved.attributes,
-												...clearAttrs,
-											},
-										},
-									]
-								);
-								requestInterceptorBypass(
-									rebuiltParent.clientId
-								);
-							}
-						}
-						const emptiedParent =
-							liveParent !== '' &&
-							( rebuiltParent || liveParent !== restoreParent ) &&
-							blockEditorSelect.getBlockOrder( liveParent )
-								.length === 1 &&
-							! selectBlockAttributes( liveParent )?.metadata
-								?.suggestion &&
-							blockEditorSelect.getBlockName( liveParent ) ===
-								( rebuiltParent
-									? carrierName
-									: blockEditorSelect.getBlockName(
-											restoreParent
-										) )
-								? liveParent
-								: null;
-						requestInterceptorBypass( clientId );
-						clearOverlay( clientId );
-						/*
-						 * Batch the marker-clear and the restoring move into ONE
-						 * store update. The interceptor recognizes a reject
-						 * landing by their combination — a block that moved in
-						 * the same tick its pending-move marker disappeared —
-						 * and adopts it instead of re-capturing the restore as
-						 * a fresh move suggestion (which is what happens when
-						 * the two dispatches fire the subscriber separately and
-						 * the reviewer is in Suggesting intent). This is also
-						 * the shape a remote reject arrives in through sync.
-						 */
-						registry.batch( () => {
-							if ( rebuiltParent ) {
-								removeBlock( clientId, false );
-								insertBlock(
-									rebuiltParent,
-									dissolved.index ?? 0,
-									dissolved.parentClientId ?? undefined,
-									false
-								);
-							} else {
-								if ( clearAttrs ) {
-									updateBlockAttributes(
-										clientId,
-										clearAttrs
-									);
-								}
-								moveBlockToPosition(
-									clientId,
-									/*
-									 * `fromRootClientId` must be the block's CURRENT
-									 * parent: after a cross-parent move the block lives
-									 * in the destination parent, and the reducer looks
-									 * the block up there. Passing the original parent
-									 * for both roots made cross-parent rejects silently
-									 * no-op. `moveBlockToPosition` expects '' (not null)
-									 * for the root.
-									 */
-									liveParent,
-									restoreParent,
-									structuralOp.fromIndex ?? 0
-								);
-							}
-							if ( emptiedParent ) {
-								requestInterceptorBypass( emptiedParent );
-								removeBlock( emptiedParent, false );
-							}
-						} );
-					} else {
-						const clearAttrs = clearSuggestionMarkerAttributes(
-							selectBlockAttributes( clientId )
-						);
-						if ( clearAttrs ) {
-							requestInterceptorBypass( clientId );
-							updateBlockAttributes( clientId, clearAttrs );
-						}
-						clearOverlay( clientId );
-					}
+					runPlan(
+						planStructuralReject(
+							structuralOp,
+							clientId,
+							registry.select( blockEditorStore )
+						)
+					);
 				} else if ( clientId ) {
 					/*
 					 * An attribute-only suggestion lives entirely in the
@@ -1714,14 +1075,10 @@ export function useSuggestionsProvider() {
 			saveEntityRecord,
 			createNotice,
 			selectBlockAttributes,
-			selectClientIdsWithDescendants,
-			selectBlockRootClientId,
+			resolveTarget,
+			runPlan,
 			updateBlockAttributes,
-			removeBlock,
-			insertBlock,
-			moveBlockToPosition,
 			requestInterceptorBypass,
-			clearOverlay,
 			clearOverlayForComment,
 			registry,
 		]
@@ -1877,5 +1234,3 @@ export function useSuggestionsProvider() {
 		rejectSuggestion: rejectSuggestionGuarded,
 	};
 }
-
-export { SCHEMA_VERSION, PAYLOAD_MAX_BYTES, payloadByteLength };

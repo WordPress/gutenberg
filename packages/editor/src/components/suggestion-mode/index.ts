@@ -39,8 +39,8 @@ export {
 	default as RevealSelectedSuggestion,
 	buildSelectedSuggestionCss,
 } from './reveal-selected-suggestion';
+export { useSuggestionsProvider } from './provider';
 export {
-	useSuggestionsProvider,
 	operationsFromOverlay,
 	applyOperations,
 	hasAttributeConflict,
@@ -52,7 +52,7 @@ export {
 	clearSuggestionMarkerAttributes,
 	PAYLOAD_MAX_BYTES,
 	SCHEMA_VERSION,
-} from './provider';
+} from './operations';
 export { wordDiff } from './word-diff';
 export {
 	default as SuggestionSummary,

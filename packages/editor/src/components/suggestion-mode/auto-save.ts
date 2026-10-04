@@ -42,11 +42,8 @@ import {
 	POST_TITLE_OVERLAY_KEY,
 } from './overlay-context';
 import type { OverlayEntry, SuggestionOperation } from './overlay-context';
-import {
-	operationsFromOverlay,
-	postOperationsFromOverlay,
-	useSuggestionsProvider,
-} from './provider';
+import { operationsFromOverlay, postOperationsFromOverlay } from './operations';
+import { useSuggestionsProvider } from './provider';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 

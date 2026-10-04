@@ -64,7 +64,8 @@ import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useSuggestionOverlay } from './overlay-context';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
-import { parseSuggestionPayload, rememberWithdrawnAnchor } from './provider';
+import { parseSuggestionPayload } from './operations';
+import { rememberWithdrawnAnchor } from './provider';
 import { createRevertGuard } from '../attribute-suggestions/revert-guard';
 import {
 	planStoreContentEdit,

@@ -12,8 +12,8 @@ import {
 	INLINE_OP_TYPE,
 	findInlineOp,
 	parseSuggestionPayload,
-	useSuggestionsProvider,
-} from './provider';
+} from './operations';
+import { useSuggestionsProvider } from './provider';
 import {
 	SUGGESTION_TYPE_FORMAT,
 	applyFormatPlan,
