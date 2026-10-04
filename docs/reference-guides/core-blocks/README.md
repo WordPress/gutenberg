@@ -35,7 +35,7 @@ Displays a heading that toggles the accordion panel.
 -	**Name:** [core/accordion-heading](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-accordion-heading/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/accordion-item
--	**Supports:** anchor, color (background, gradients, text), interactivity, shadow, spacing (padding), typography (fontSize), ~~align~~, ~~lock~~, ~~visibility~~
+-	**Supports:** anchor, color (background, gradients, text), interactivity, shadow, spacing (padding), typography (fontSize, lineHeight), ~~align~~, ~~lock~~, ~~visibility~~
 -	**Attributes:** iconPosition, level, openByDefault, showIcon, title
 
 ## Accordion Item
@@ -83,7 +83,7 @@ Add a user’s avatar.
 
 -	**Name:** [core/avatar](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-avatar/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** align, anchor, color (~~background~~, ~~text~~), filter (duotone), interactivity (clientNavigation), spacing (margin, padding), ~~alignWide~~, ~~html~~
+-	**Supports:** align, anchor, color (~~background~~, ~~text~~), filter (duotone), interactivity (clientNavigation), shadow, spacing (margin, padding), ~~alignWide~~, ~~html~~
 -	**Attributes:** isLink, linkTarget, size, userId
 
 ## Pattern
@@ -121,7 +121,7 @@ Prompt visitors to take action with a group of button-style links.
 -	**Name:** [core/buttons](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-buttons/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Allowed Blocks:** core/button
--	**Supports:** align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, ~~text~~), contentRole, interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), listView, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, ~~text~~), contentRole, dimensions (minHeight, minWidth), interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), listView, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 
 ## Calendar
 
@@ -167,7 +167,7 @@ Display content in multiple columns, with blocks added to each column.
 -	**Name:** [core/columns](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-columns/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Allowed Blocks:** core/column
--	**Supports:** align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, button, gradients, heading, link, text), interactivity (clientNavigation), layout (default, ~~allowEditing~~, ~~allowInheriting~~, ~~allowSwitching~~), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, button, gradients, heading, link, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), layout (default, ~~allowEditing~~, ~~allowInheriting~~, ~~allowSwitching~~), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** isStackedOnMobile, templateLock, verticalAlignment
 
 ## Comment Author Avatar (deprecated)
@@ -330,7 +330,7 @@ Add a link to a downloadable file.
 
 -	**Name:** [core/file](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-file/)
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
--	**Supports:** align, anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, ~~text~~), interactivity, spacing (margin, padding)
+-	**Supports:** align, anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, ~~text~~), interactivity, shadow, spacing (margin, padding)
 -	**Attributes:** blob, displayPreview, downloadButtonText, fileId, fileName, href, id, previewHeight, showDownloadButton, textLinkHref, textLinkTarget
 
 ## Footnotes
@@ -357,7 +357,7 @@ Display multiple images in a rich gallery.
 -	**Name:** [core/gallery](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-gallery/)
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
 -	**Allowed Blocks:** core/image
--	**Supports:** align, anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, ~~text~~), interactivity (clientNavigation), layout (allowEditing, allowSizingOnChildren, default, ~~allowInheriting~~, ~~allowJustification~~, ~~allowOrientation~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~, ~~allowWrap~~), listView, spacing (blockGap, margin, padding), units (em, px, rem, vh, vw), ~~html~~
+-	**Supports:** align, anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, ~~text~~), interactivity (clientNavigation), layout (allowEditing, allowSizingOnChildren, default, ~~allowInheriting~~, ~~allowJustification~~, ~~allowOrientation~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~, ~~allowWrap~~), listView, shadow, spacing (blockGap, margin, padding), units (em, px, rem, vh, vw), ~~html~~
 -	**Attributes:** allowResize, aspectRatio, caption, columns, dynamicContent, fixedHeight, ids, imageCrop, images, linkTarget, linkTo, navigationButtonType, randomOrder, shortCodeTransforms, sizeSlug
 
 ## Group
@@ -430,7 +430,7 @@ Display a list of your most recent posts.
 
 -	**Name:** [core/latest-posts](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-latest-posts/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
--	**Supports:** align, anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), interactivity (clientNavigation), layout, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align, anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), layout, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** addLinkToFeaturedImage, categories, displayAuthor, displayFeaturedImage, displayPostContent, displayPostContentRadio, displayPostDate, excerptLength, featuredImageAlign, featuredImageSizeHeight, featuredImageSizeSlug, featuredImageSizeWidth, order, orderBy, postsToShow, selectedAuthor
 
 ## List
@@ -440,7 +440,7 @@ An organized collection of items displayed in a specific order.
 -	**Name:** [core/list](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-list/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
 -	**Allowed Blocks:** core/list-item
--	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), listView, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), listView, shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** ordered, placeholder, reversed, start, type, values
 
 ## List Item
@@ -478,7 +478,7 @@ Set media and words side-by-side for a richer layout.
 
 -	**Name:** [core/media-text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-media-text/)
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
--	**Supports:** align (full, wide), allowedBlocks, anchor, color (background, button, gradients, heading, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), allowedBlocks, anchor, color (background, button, gradients, heading, link, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** align, focalPoint, href, imageFill, isStackedOnMobile, linkClass, linkDestination, linkTarget, mediaAlt, mediaId, mediaLink, mediaPosition, mediaSizeSlug, mediaType, mediaUrl, mediaWidth, rel, useFeaturedImage, verticalAlignment
 
 ## Unsupported
@@ -555,7 +555,7 @@ Display a list of all pages.
 -	**Name:** [core/page-list](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-page-list/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
 -	**Allowed Blocks:** core/page-list-item
--	**Supports:** anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), contentRole, interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), contentRole, dimensions (minHeight, minWidth), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** parentPageID
 
 ## Page List Item
@@ -574,7 +574,7 @@ Start with the basic building block of all narrative.
 
 -	**Name:** [core/paragraph](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-paragraph/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
--	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight, textAlign, textColumns, textIndent, textShadow), ~~className~~
+-	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), shadow, spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight, textAlign, textColumns, textIndent, textShadow), ~~className~~
 -	**Attributes:** content, direction, dropCap, placeholder
 
 ## Pattern Placeholder
@@ -841,7 +841,7 @@ Display the total number of results in a query.
 -	**Name:** [core/query-total](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query-total/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
 -	**Ancestor:** core/query
--	**Supports:** align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** displayType
 
 ## Quote
@@ -877,7 +877,7 @@ Help visitors find your content.
 
 -	**Name:** [core/search](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-search/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
--	**Supports:** align (center, left, right), anchor, color (background, gradients, text), interactivity, spacing (margin), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (center, left, right), anchor, color (background, gradients, text), interactivity, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** buttonPosition, buttonText, buttonUseIcon, label, placeholder, query, showLabel, tagName, width, widthUnit
 
 ## Separator
@@ -942,7 +942,7 @@ Display icons linking to your social profiles or sites.
 -	**Name:** [core/social-links](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-social-links/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
 -	**Allowed Blocks:** core/social-link
--	**Supports:** align (center, left, right), anchor, background (gradient), color (background, gradients, ~~enableContrastChecker~~, ~~text~~), contentRole, interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), listView, spacing (blockGap, margin, padding, units), ~~html~~
+-	**Supports:** align (center, left, right), anchor, background (gradient), color (background, gradients, ~~enableContrastChecker~~, ~~text~~), contentRole, interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), listView, shadow, spacing (blockGap, margin, padding, units), ~~html~~
 -	**Attributes:** customIconBackgroundColor, customIconColor, iconBackgroundColor, iconBackgroundColorValue, iconColor, iconColorValue, openInNewTab, showLabels, size
 
 ## Spacer
@@ -961,7 +961,7 @@ Display the tab buttons for a tabbed interface.
 -	**Name:** [core/tab-list](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab-list/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/tabs
--	**Supports:** ariaLabel, color (background, text), layout (default, ~~allowOrientation~~, ~~allowVerticalAlignment~~, ~~allowWrap~~), spacing (blockGap, padding), typography (fontSize), ~~html~~, ~~lock~~, ~~visibility~~
+-	**Supports:** ariaLabel, color (background, text), layout (default, ~~allowOrientation~~, ~~allowVerticalAlignment~~, ~~allowWrap~~), shadow, spacing (blockGap, padding), typography (fontSize), ~~html~~, ~~lock~~, ~~visibility~~
 -	**Attributes:** tabs
 
 ## Tab Panel
