@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { createBlock } from '@wordpress/blocks';
 // @ts-expect-error No exported types
 // prettier-ignore
 import { store as blockEditorStore, privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -641,6 +642,7 @@ export function useSuggestionsProvider() {
 	const {
 		updateBlockAttributes,
 		removeBlock,
+		insertBlock,
 		moveBlockToPosition,
 		__unstableMarkNextChangeAsNotPersistent: markNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
@@ -1543,6 +1545,83 @@ export function useSuggestionsProvider() {
 						) {
 							restoreParent = recordedFrom;
 						}
+						/*
+						 * List indent and outdent create or empty a nested
+						 * list in the same update as the move (#73411). An
+						 * outdent's emptied list is gone, so it is rebuilt, or
+						 * reused when an earlier reject already rebuilt it; an
+						 * indent's list is removed once the item leaves it empty.
+						 * The rebuilt list copies the type and attributes of the
+						 * list the item sits in now, never the note payload: the
+						 * suggester writes the payload, and the reviewer's reject
+						 * would otherwise insert whatever block it names.
+						 */
+						const blockEditorSelect =
+							registry.select( blockEditorStore );
+						const dissolved = structuralOp.fromParentBlock;
+						const carrierName =
+							liveParent !== ''
+								? blockEditorSelect.getBlockName( liveParent )
+								: null;
+						let rebuiltParent: any = null;
+						if (
+							recordedFrom !== '' &&
+							carrierName &&
+							! selectBlockAttributes( recordedFrom ) &&
+							dissolved &&
+							( dissolved.parentClientId === null ||
+								selectBlockAttributes(
+									dissolved.parentClientId
+								) )
+						) {
+							const rebuilt = blockEditorSelect.getBlockOrder(
+								dissolved.parentClientId ?? ''
+							)[ dissolved.index ?? 0 ];
+							if (
+								rebuilt &&
+								rebuilt !== liveParent &&
+								blockEditorSelect.getBlockName( rebuilt ) ===
+									carrierName
+							) {
+								restoreParent = rebuilt;
+							} else {
+								const moved =
+									blockEditorSelect.getBlock( clientId );
+								const { metadata, ...carrierAttributes } =
+									selectBlockAttributes( liveParent ) ?? {};
+								rebuiltParent = createBlock(
+									carrierName,
+									carrierAttributes,
+									[
+										{
+											...moved,
+											attributes: {
+												...moved.attributes,
+												...clearAttrs,
+											},
+										},
+									]
+								);
+								requestInterceptorBypass(
+									rebuiltParent.clientId
+								);
+							}
+						}
+						const emptiedParent =
+							liveParent !== '' &&
+							( rebuiltParent || liveParent !== restoreParent ) &&
+							blockEditorSelect.getBlockOrder( liveParent )
+								.length === 1 &&
+							! selectBlockAttributes( liveParent )?.metadata
+								?.suggestion &&
+							blockEditorSelect.getBlockName( liveParent ) ===
+								( rebuiltParent
+									? carrierName
+									: blockEditorSelect.getBlockName(
+											restoreParent
+										) )
+								? liveParent
+								: null;
 						requestInterceptorBypass( clientId );
 						clearOverlay( clientId );
 						/*
@@ -1557,24 +1636,41 @@ export function useSuggestionsProvider() {
 						 * the shape a remote reject arrives in through sync.
 						 */
 						registry.batch( () => {
-							if ( clearAttrs ) {
-								updateBlockAttributes( clientId, clearAttrs );
+							if ( rebuiltParent ) {
+								removeBlock( clientId, false );
+								insertBlock(
+									rebuiltParent,
+									dissolved.index ?? 0,
+									dissolved.parentClientId ?? undefined,
+									false
+								);
+							} else {
+								if ( clearAttrs ) {
+									updateBlockAttributes(
+										clientId,
+										clearAttrs
+									);
+								}
+								moveBlockToPosition(
+									clientId,
+									/*
+									 * `fromRootClientId` must be the block's CURRENT
+									 * parent: after a cross-parent move the block lives
+									 * in the destination parent, and the reducer looks
+									 * the block up there. Passing the original parent
+									 * for both roots made cross-parent rejects silently
+									 * no-op. `moveBlockToPosition` expects '' (not null)
+									 * for the root.
+									 */
+									liveParent,
+									restoreParent,
+									structuralOp.fromIndex ?? 0
+								);
 							}
-							moveBlockToPosition(
-								clientId,
-								/*
-								 * `fromRootClientId` must be the block's CURRENT
-								 * parent: after a cross-parent move the block lives
-								 * in the destination parent, and the reducer looks
-								 * the block up there. Passing the original parent
-								 * for both roots made cross-parent rejects silently
-								 * no-op. `moveBlockToPosition` expects '' (not null)
-								 * for the root.
-								 */
-								liveParent,
-								restoreParent,
-								structuralOp.fromIndex ?? 0
-							);
+							if ( emptiedParent ) {
+								requestInterceptorBypass( emptiedParent );
+								removeBlock( emptiedParent, false );
+							}
 						} );
 					} else {
 						const clearAttrs = clearSuggestionMarkerAttributes(
@@ -1622,6 +1718,7 @@ export function useSuggestionsProvider() {
 			selectBlockRootClientId,
 			updateBlockAttributes,
 			removeBlock,
+			insertBlock,
 			moveBlockToPosition,
 			requestInterceptorBypass,
 			clearOverlay,
