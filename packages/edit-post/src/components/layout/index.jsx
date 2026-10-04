@@ -344,9 +344,13 @@ const MetaBoxesMain = forwardRef( ( _props, ref ) => {
 			};
 			/** @param { WheelEvent } event */
 			const onWheel = ( event ) => {
-				const { deltaY, currentTarget, ctrlKey } = event;
+				const { deltaX, deltaY, currentTarget, ctrlKey } = event;
 				// Leaves Ctrl+wheel and pinch gestures to browser zoom.
 				if ( ctrlKey ) {
+					return;
+				}
+				// Leaves horizontal scrolling alone.
+				if ( Math.abs( deltaX ) >= Math.abs( deltaY ) ) {
 					return;
 				}
 				const { offsetHeight: canvasHeight, contentDocument } = iframe;
