@@ -4,17 +4,70 @@ import {
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import { privateApis as composePrivateApis } from '@wordpress/compose';
+import { ENTER } from '@wordpress/keycodes';
 import { unlock } from '../../../lock-unlock';
 
 const { subscribeOwnedListener, ownsSelection } = unlock( richTextPrivateApis );
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 export default ( props ) => ( element ) => {
+	// In desktop Safari Shift+Enter arrives as insertParagraph, the only
+	// input type that splits a block (#84047), and an input event has no
+	// shift key, so the keydown has to say it was Shift+Enter. The iOS
+	// keyboard sets the shift key on Return while it shows capitals and is
+	// not known to send a Shift key event then, so the shift key counts
+	// only after one was seen. There is no keyup listener: when the main
+	// thread is busy, Safari can send the keyup of a modifier before the
+	// keydown of the key it modifies,
+	// https://bugs.webkit.org/show_bug.cgi?id=307198.
+	let shiftPressed = false;
+	let shiftEnter = false;
+	let shiftEnterEvent;
+
+	function onKeyDown( event ) {
+		// True after a Shift key event, and for as long as the keys that
+		// follow keep the shift key. A Caps Lock key is not a Shift press.
+		shiftPressed =
+			event.key === 'Shift' ||
+			( shiftPressed && event.shiftKey && event.key !== 'CapsLock' );
+		// Every keydown replaces this, so it lasts until the next key.
+		shiftEnter = event.keyCode === ENTER && shiftPressed;
+	}
+
+	// Cancels the paragraph break of Shift+Enter before the listeners that
+	// would split the block can act on it. It is attached to the window in
+	// the capture phase so it runs before the owned listeners, whatever
+	// order they were attached in. It leaves the line break to
+	// onBeforeInput, which runs after the capture phase listener that
+	// syncs the selection with the value.
+	function onShiftEnterBeforeInput( event ) {
+		const { inputType } = event;
+		// Other input types can arrive between the keydown and the break.
+		if (
+			inputType !== 'insertParagraph' &&
+			inputType !== 'insertLineBreak'
+		) {
+			return;
+		}
+		const isShiftEnter = shiftEnter;
+		shiftEnter = false;
+		if (
+			isShiftEnter &&
+			inputType === 'insertParagraph' &&
+			! event.defaultPrevented &&
+			ownsSelection( element )
+		) {
+			shiftEnterEvent = event;
+			event.preventDefault();
+		}
+	}
+
 	// Enter is handled on beforeinput: the input type tells a paragraph
 	// break from a line break. The iOS keyboard sends Return with the
 	// shift key down while it shows capitals, so the key event cannot.
 	function onBeforeInput( event ) {
-		const { inputType } = event;
+		const inputType =
+			event === shiftEnterEvent ? 'insertLineBreak' : event.inputType;
 		if (
 			inputType !== 'insertParagraph' &&
 			inputType !== 'insertLineBreak'
@@ -101,6 +154,18 @@ export default ( props ) => ( element ) => {
 
 	const { defaultView } = element.ownerDocument;
 
+	const unsubscribeKeyDown = subscribeDelegatedListener(
+		defaultView,
+		'keydown',
+		onKeyDown,
+		true
+	);
+	const unsubscribeShiftEnterBeforeInput = subscribeDelegatedListener(
+		defaultView,
+		'beforeinput',
+		onShiftEnterBeforeInput,
+		true
+	);
 	// Attach the listener to the window so parent elements have the chance to
 	// prevent the default behavior.
 	const unsubscribeDefaultBeforeInput = subscribeDelegatedListener(
@@ -117,6 +182,8 @@ export default ( props ) => ( element ) => {
 		true
 	);
 	return () => {
+		unsubscribeKeyDown();
+		unsubscribeShiftEnterBeforeInput();
 		unsubscribeDefaultBeforeInput();
 		unsubscribeBeforeInput();
 	};
