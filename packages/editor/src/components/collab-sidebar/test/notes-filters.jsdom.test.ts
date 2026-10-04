@@ -1,13 +1,22 @@
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_NOTES_FILTERS, filterNotes } from '../notes-filters';
 
+type TestNote = {
+	id: number;
+	author: number;
+	author_name: string;
+	status: string;
+	content: { rendered: string };
+	reply: TestNote[];
+};
+
 const note = (
 	id: number,
 	author: number,
 	status: string,
 	text: string,
-	reply: ReturnType< typeof note >[] = []
-) => ( {
+	reply: TestNote[] = []
+): TestNote => ( {
 	id,
 	author,
 	author_name: `Author ${ author }`,
