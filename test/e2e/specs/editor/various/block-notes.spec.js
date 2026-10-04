@@ -1140,11 +1140,11 @@ test.describe( 'Block Notes', () => {
 				comment: 'Test comment for reactions',
 			} );
 
-			await blockNoteUtils.addReactionToComment( 'Heart' );
+			await blockNoteUtils.addReactionToComment( 'heart' );
 
 			// Verify the reaction button appears with count.
 			const reactionButton = page.getByRole( 'button', {
-				name: /Heart/,
+				name: /heart/,
 			} );
 			await expect( reactionButton ).toBeVisible();
 			await expect( reactionButton ).toContainText( '1' );
@@ -1160,9 +1160,9 @@ test.describe( 'Block Notes', () => {
 				comment: 'Re-add reaction',
 			} );
 
-			await blockNoteUtils.addReactionToComment( 'Heart' );
+			await blockNoteUtils.addReactionToComment( 'heart' );
 			const reactionButton = page.getByRole( 'button', {
-				name: /Heart/,
+				name: /heart/,
 			} );
 			await expect( reactionButton ).toBeVisible();
 			await expect( reactionButton ).toContainText( '1' );
@@ -1180,7 +1180,7 @@ test.describe( 'Block Notes', () => {
 			//    so the just-removed reaction blocked the re-add with
 			//    `rest_comment_duplicate_reaction` ("You have already
 			//    reacted with this emoji").
-			await blockNoteUtils.addReactionToComment( 'Heart' );
+			await blockNoteUtils.addReactionToComment( 'heart' );
 			await expect( reactionButton ).toBeVisible();
 			await expect( reactionButton ).toContainText( '❤' );
 			await expect( reactionButton ).toContainText( '1' );
@@ -1227,10 +1227,10 @@ test.describe( 'Block Notes', () => {
 					response.request().method() === 'GET' &&
 					singleNote.test( decodeURIComponent( response.url() ) )
 			);
-			await blockNoteUtils.addReactionToComment( 'Heart' );
+			await blockNoteUtils.addReactionToComment( 'heart' );
 			await refetch;
 			await expect(
-				page.getByRole( 'button', { name: /Heart/ } )
+				page.getByRole( 'button', { name: /heart/ } )
 			).toContainText( '1' );
 
 			// The post-toggle refetch must not replace the cached note's
@@ -1252,11 +1252,11 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			// Add a reaction.
-			await blockNoteUtils.addReactionToComment( 'Celebration' );
+			await blockNoteUtils.addReactionToComment( 'celebration' );
 
 			// Hover over the reaction button to trigger tooltip.
 			const reactionButton = page.getByRole( 'button', {
-				name: /Celebration/,
+				name: /celebration/,
 			} );
 			await expect( reactionButton ).toBeVisible();
 			await reactionButton.hover();
@@ -1265,7 +1265,7 @@ test.describe( 'Block Notes', () => {
 			// match its text. The pill's own label is an `aria-label`, not
 			// text, so this only matches the popup.
 			await expect(
-				page.getByText( /reacted with Celebration/ )
+				page.getByText( /reacted with celebration/ )
 			).toBeVisible();
 		} );
 
@@ -1352,9 +1352,9 @@ test.describe( 'Block Notes', () => {
 				comment: 'Test comment for deselected reactions',
 			} );
 
-			await blockNoteUtils.addReactionToComment( 'Heart' );
+			await blockNoteUtils.addReactionToComment( 'heart' );
 			const reactionButton = page.getByRole( 'button', {
-				name: /Heart/,
+				name: /heart/,
 			} );
 			await expect( reactionButton ).toBeVisible();
 
@@ -1392,9 +1392,9 @@ test.describe( 'Block Notes', () => {
 			await thread.click();
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 
-			await blockNoteUtils.addReactionToComment( 'Heart' );
+			await blockNoteUtils.addReactionToComment( 'heart' );
 			const reactionPill = sidebar.getByRole( 'button', {
-				name: /Heart/,
+				name: /heart/,
 			} );
 			await expect( reactionPill ).toBeVisible();
 
@@ -1443,7 +1443,7 @@ test.describe( 'Block Notes', () => {
 						decodeURIComponent( request.url() )
 					)
 			);
-			await blockNoteUtils.addReactionToComment( 'Heart' );
+			await blockNoteUtils.addReactionToComment( 'heart' );
 			expect( ( await created ).postDataJSON().content ).toBe( '2764' );
 
 			const reactionButton = page.locator(
@@ -1456,16 +1456,16 @@ test.describe( 'Block Notes', () => {
 			/*
 			 * Picking the same heart from the search results resolves to
 			 * the same key, so it toggles the existing reaction off rather
-			 * than adding a second pill. "Heart" is a curated label, so the
+			 * than adding a second pill. "heart" is a curated label, so the
 			 * exact match skips "smiling face with hearts".
 			 */
 			await page
 				.getByRole( 'combobox', { name: 'Add reaction' } )
 				.click();
 			await blockNoteUtils.waitForFullPicker();
-			await page.getByPlaceholder( 'Search emoji' ).fill( 'Heart' );
+			await page.getByPlaceholder( 'Search emoji' ).fill( 'heart' );
 			await page
-				.getByRole( 'gridcell', { name: 'Heart', exact: true } )
+				.getByRole( 'gridcell', { name: 'heart', exact: true } )
 				.click();
 			await expect( reactionButton ).toHaveCount( 0 );
 		} );
@@ -1570,7 +1570,7 @@ test.describe( 'Block Notes', () => {
 			).toHaveText( 'Frequently used' );
 			await expect(
 				frequentSection.getByRole( 'gridcell', {
-					name: 'Heart',
+					name: 'heart',
 					exact: true,
 				} )
 			).toBeVisible();
