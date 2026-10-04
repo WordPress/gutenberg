@@ -22,6 +22,7 @@ import type { EmojibaseEntry } from './emojibase-data';
 import { useFrequentEmojis } from './frequent-emojis';
 import { getCuratedLabel } from './reaction-emojis';
 import SkinTonePicker, { applySkinTone } from './skin-tone-picker';
+import EmojiPickerFooter, { createHighlightStore } from './emoji-picker-footer';
 
 /**
  * A category bucket of emoji records keyed by its Emojibase `group`.
@@ -245,6 +246,7 @@ export default function EmojiPicker( {
 	} = useEmojibaseData( isWarm ? baseUrl : null, locale );
 	const data = useMemo( () => dataset ?? [], [ dataset ] );
 	const [ query, setQuery ] = useState( '' );
+	const [ highlightStore ] = useState( createHighlightStore );
 
 	/*
 	 * Announce once when a pending load fills the grid. A cached dataset
@@ -419,6 +421,8 @@ export default function EmojiPicker( {
 					if ( error ) {
 						retry();
 					}
+				} else {
+					highlightStore.set( undefined );
 				}
 			} }
 			// Start each opening from the full grid.
@@ -431,6 +435,10 @@ export default function EmojiPicker( {
 			filter={ null }
 			// Enter picks the top hit once the user has typed.
 			autoHighlight
+			// Every highlightable value is an `EmojiOption` cell.
+			onItemHighlighted={ ( option: unknown ) =>
+				highlightStore.set( option as EmojiOption | undefined )
+			}
 			value={ query }
 			onValueChange={ ( value: string, { reason } ) => {
 				// Picking a cell would otherwise fill the search field.
@@ -524,6 +532,7 @@ export default function EmojiPicker( {
 								) }
 					</Autocomplete.List>
 				</div>
+				<EmojiPickerFooter store={ highlightStore } />
 			</Autocomplete.Popup>
 		</Autocomplete.Root>
 	);

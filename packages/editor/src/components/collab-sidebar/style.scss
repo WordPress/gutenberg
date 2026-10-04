@@ -487,6 +487,34 @@ mark.wp-note {
 	font-size: 24px;
 }
 
+// The highlighted emoji, enlarged, with its name. The height is fixed so the
+// grid doesn't resize while the footer is empty.
+.editor-collab-sidebar-panel__picker-footer {
+	display: flex;
+	flex-shrink: 0;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-sm);
+	box-sizing: border-box;
+	block-size: calc(var(--emoji-picker-cell-size) + var(--wpds-dimension-padding-sm) * 2);
+	padding: var(--wpds-dimension-padding-sm) var(--emoji-picker-padding);
+	border-block-start: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+	// Stretch to the grid's width rather than widening the picker.
+	contain: inline-size;
+}
+
+.editor-collab-sidebar-panel__picker-footer-emoji {
+	flex-shrink: 0;
+	font-size: 32px;
+	line-height: 1;
+}
+
+.editor-collab-sidebar-panel__picker-footer-name {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
 // Mention chips, both in the note input and the rendered note content. A
 // mention is a non-interactive `span` carrying the mentioned user's ID in a
 // `user-N` class, styled as a chip.
