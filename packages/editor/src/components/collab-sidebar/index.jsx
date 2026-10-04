@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
+import { useMemo, useRef, useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
@@ -15,6 +15,12 @@ import {
 } from './constants';
 import { Notes } from './notes';
 import { NotesDisplayModeMenu } from './notes-display-mode-menu';
+import {
+	DEFAULT_NOTES_FILTERS,
+	NotesFilters,
+	filterNotes,
+	hasActiveNotesFilters,
+} from './notes-filters';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
@@ -65,6 +71,11 @@ function NotesSidebar( { postId } ) {
 	);
 
 	const { notes, unresolvedNotes } = useNoteThreads( postId );
+	const [ filters, setFilters ] = useState( DEFAULT_NOTES_FILTERS );
+	const filteredNotes = useMemo(
+		() => filterNotes( notes, filters, selectedNoteId ),
+		[ notes, filters, selectedNoteId ]
+	);
 
 	// Only enable the floating sidebar for large viewports.
 	const showFloatingSidebar = isLargeViewport;
@@ -193,7 +204,18 @@ function NotesSidebar( { postId } ) {
 					icon={ commentIcon }
 					closeLabel={ __( 'Close Notes' ) }
 				>
-					<Notes notes={ notes } sidebarRef={ sidebarRef } />
+					{ notes.length > 0 && (
+						<NotesFilters
+							notes={ notes }
+							filters={ filters }
+							onChange={ setFilters }
+						/>
+					) }
+					<Notes
+						notes={ filteredNotes }
+						sidebarRef={ sidebarRef }
+						isFiltered={ hasActiveNotesFilters( filters ) }
+					/>
 				</PluginSidebar>
 			) }
 			{ isLargeViewport && (

@@ -15,7 +15,13 @@ import { store as editorStore } from '../../store';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
+export function Notes( {
+	notes,
+	sidebarRef,
+	isFloating = false,
+	isFiltered = false,
+	styles,
+} ) {
 	const {
 		onCreate: onAddReply,
 		onEdit: onEditNote,
@@ -197,6 +203,14 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 					thread.status === 'approved' && !! thread.blockClientId
 			);
 
+	// When filters hide every thread, say so instead of offering a new note.
+	const emptyState =
+		isFiltered && selectedNote !== 'new' ? (
+			<Text render={ <p /> }>{ __( 'No notes found.' ) }</Text>
+		) : (
+			<AddNote onSubmit={ onAddReply } sidebarRef={ sidebarRef } />
+		);
+
 	return (
 		<Stack
 			className="editor-collab-sidebar-panel"
@@ -217,7 +231,7 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 			}
 		>
 			{ ! hasThreads && ! isFloating ? (
-				<AddNote onSubmit={ onAddReply } sidebarRef={ sidebarRef } />
+				emptyState
 			) : (
 				<>
 					{ ! isFloating && selectedNote === 'new' && (

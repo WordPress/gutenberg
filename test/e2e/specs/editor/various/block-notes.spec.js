@@ -345,6 +345,66 @@ test.describe( 'Block Notes', () => {
 		] );
 	} );
 
+	test( 'can search and filter notes in the "All notes" sidebar', async ( {
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'First block.' },
+			comment: 'Fix the heading.',
+		} );
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Second block.' },
+			comment: 'Swap the image.',
+		} );
+
+		await blockNoteUtils.openBlockNoteSidebar();
+		const sidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const headingThread = sidebar.getByRole( 'treeitem', {
+			name: 'Note: Fix the heading.',
+		} );
+		const imageThread = sidebar.getByRole( 'treeitem', {
+			name: 'Note: Swap the image.',
+		} );
+
+		// Resolve the first note, then collapse it so it isn't kept visible
+		// as the selected thread.
+		await headingThread.click();
+		await page.getByRole( 'button', { name: 'Resolve' } ).click();
+		await expect(
+			sidebar.locator( '.editor-collab-sidebar-panel__status-separator' )
+		).toBeVisible();
+		await headingThread.focus();
+		await page.keyboard.press( 'Escape' );
+
+		const search = sidebar.getByRole( 'searchbox', {
+			name: 'Search notes',
+		} );
+		await search.fill( 'IMAGE' );
+		await expect( imageThread ).toBeVisible();
+		await expect( headingThread ).toBeHidden();
+
+		await search.fill( 'nothing matches' );
+		await expect( sidebar.getByText( 'No notes found.' ) ).toBeVisible();
+		await expect(
+			sidebar.getByRole( 'textbox', { name: 'New note', exact: true } )
+		).toBeHidden();
+
+		await search.fill( '' );
+		const status = sidebar.getByRole( 'combobox', { name: 'Status' } );
+		await status.selectOption( 'Resolved' );
+		await expect( headingThread ).toBeVisible();
+		await expect( imageThread ).toBeHidden();
+
+		await status.selectOption( 'Open' );
+		await expect( imageThread ).toBeVisible();
+		await expect( headingThread ).toBeHidden();
+	} );
+
 	test( 'clearing the block selection does not select an orphaned note', async ( {
 		editor,
 		page,
