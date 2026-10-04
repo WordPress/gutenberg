@@ -65,8 +65,20 @@
 
 .wp-block-icon__inserter-grid-icons-list-item-title {
 	font-size: $font-size-small;
-	padding: $grid-unit-05 $grid-unit-05 $grid-unit-10;
+	padding: $grid-unit-05;
 	overflow-wrap: break-word;
+}
+
+.wp-block-icon__inserter-grid-icons-list-item-collection {
+	font-size: $font-size-small;
+	font-weight: var(--wpds-typography-font-weight-default);
+	padding: 0 $grid-unit-05 $grid-unit-10;
+	overflow-wrap: break-word;
+}
+
+
+.wp-block-icon__inserter-grid-icons-list-item:not(.is-selected) .wp-block-icon__inserter-grid-icons-list-item-collection {
+	color: var(--wpds-color-foreground-content-neutral-weak);
 }
 
 .wp-block-icon__toolbar-content {

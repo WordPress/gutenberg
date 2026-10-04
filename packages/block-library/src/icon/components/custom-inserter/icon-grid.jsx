@@ -1,4 +1,5 @@
-import { __ } from '@wordpress/i18n';
+import clsx from 'clsx';
+import { __, sprintf } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { useAsyncList } from '@wordpress/compose';
 import { useRef, useLayoutEffect } from '@wordpress/element';
@@ -7,7 +8,7 @@ import HtmlRenderer from '../../../utils/html-renderer';
 
 const BATCH_SIZE = 20;
 
-export default function IconGrid( { icons, onChange, value } ) {
+export default function IconGrid( { icons, onChange, value, collections } ) {
 	const shownIcons = useAsyncList( icons, {
 		step: BATCH_SIZE,
 	} );
@@ -46,18 +47,30 @@ export default function IconGrid( { icons, onChange, value } ) {
 					aria-label={ __( 'Icon library' ) }
 				>
 					{ shownIcons.map( ( icon ) => {
+						const isSelected = icon.name === value;
+
+						const collectionLabel = collections?.find(
+							( { slug } ) => slug === icon.collection
+						)?.label;
 						return (
 							<Button
 								key={ icon.name }
-								ref={
-									icon.name === value
-										? selectedIconRef
-										: undefined
-								}
-								className="wp-block-icon__inserter-grid-icons-list-item"
+								ref={ isSelected ? selectedIconRef : undefined }
+								className={ clsx(
+									'wp-block-icon__inserter-grid-icons-list-item',
+									{ 'is-selected': isSelected }
+								) }
 								onClick={ () => onChange( icon.name ) }
-								variant={
-									icon.name === value ? 'primary' : undefined
+								variant={ isSelected ? 'primary' : undefined }
+								aria-label={
+									collectionLabel
+										? sprintf(
+												/* translators: 1: Icon label. 2: Icon collection label. */
+												__( '%1$s (%2$s)' ),
+												icon.label,
+												collectionLabel
+											)
+										: undefined
 								}
 								__next40pxDefaultSize
 							>
@@ -67,6 +80,11 @@ export default function IconGrid( { icons, onChange, value } ) {
 								<span className="wp-block-icon__inserter-grid-icons-list-item-title">
 									{ icon.label }
 								</span>
+								{ collectionLabel && (
+									<span className="wp-block-icon__inserter-grid-icons-list-item-collection">
+										{ collectionLabel }
+									</span>
+								) }
 							</Button>
 						);
 					} ) }

@@ -128,6 +128,11 @@ export default function CustomInserterModal( { onClose, value, onChange } ) {
 									icons={ filteredIcons }
 									onChange={ onChange }
 									value={ value }
+									collections={
+										collectionSlug === ''
+											? collections
+											: undefined
+									}
 								/>
 							) }
 						</Tabs.Panel>
