@@ -61,18 +61,23 @@ class WP_Test_REST_Icon_Collections_Controller extends WP_Test_REST_TestCase {
 	 */
 	public function set_up() {
 		parent::set_up();
+
+		wp_register_icon_collection( 'test-public', array( 'label' => 'Test Public' ) );
+		wp_register_icon_collection(
+			'test-private',
+			array(
+				'label'  => 'Test Private',
+				'public' => false,
+			)
+		);
 	}
 
 	/**
 	 * Cleans up the environment after each test method runs.
 	 */
 	public function tear_down() {
-		$registry = WP_Icon_Collections_Registry::get_instance();
-		foreach ( array( 'custom-collection', 'my-custom-collection', 'test-collection' ) as $slug ) {
-			if ( $registry->is_registered( $slug ) ) {
-				$registry->unregister( $slug );
-			}
-		}
+		wp_unregister_icon_collection( 'test-public' );
+		wp_unregister_icon_collection( 'test-private' );
 
 		parent::tear_down();
 	}
@@ -93,14 +98,6 @@ class WP_Test_REST_Icon_Collections_Controller extends WP_Test_REST_TestCase {
 	public function test_get_items_returns_registered_collections() {
 		wp_set_current_user( self::$editor_id );
 
-		WP_Icon_Collections_Registry::get_instance()->register(
-			'custom-collection',
-			array(
-				'label'       => 'Custom Collection',
-				'description' => 'A collection of custom icons.',
-			)
-		);
-
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/icon-collections' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
@@ -111,22 +108,39 @@ class WP_Test_REST_Icon_Collections_Controller extends WP_Test_REST_TestCase {
 
 		$slugs = wp_list_pluck( $data, 'slug' );
 		$this->assertContains( 'core', $slugs );
-		$this->assertContains( 'custom-collection', $slugs );
+		$this->assertContains( 'test-public', $slugs );
 
-		// Verify structure of the custom collection item.
-		$custom_items = array_values(
+		// Verify structure of the registered collection item.
+		$public_items = array_values(
 			array_filter(
 				$data,
 				static function ( $item ) {
-					return 'custom-collection' === $item['slug'];
+					return 'test-public' === $item['slug'];
 				}
 			)
 		);
 
-		$this->assertNotEmpty( $custom_items );
-		$this->assertSame( 'custom-collection', $custom_items[0]['slug'] );
-		$this->assertSame( 'Custom Collection', $custom_items[0]['label'] );
-		$this->assertSame( 'A collection of custom icons.', $custom_items[0]['description'] );
+		$this->assertNotEmpty( $public_items );
+		$this->assertSame( 'test-public', $public_items[0]['slug'] );
+		$this->assertSame( 'Test Public', $public_items[0]['label'] );
+		$this->assertSame( '', $public_items[0]['description'] );
+	}
+
+	/**
+	 * Tests that GET /wp/v2/icon-collections omits non-public collections.
+	 */
+	public function test_get_items_omits_non_public_collections() {
+		wp_set_current_user( self::$editor_id );
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/icon-collections' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+		$slugs = wp_list_pluck( $data, 'slug' );
+		$this->assertContains( 'test-public', $slugs );
+		$this->assertNotContains( 'test-private', $slugs );
+		$this->assertNotContains( 'core-admin', $slugs );
 	}
 
 	/**
@@ -222,22 +236,14 @@ class WP_Test_REST_Icon_Collections_Controller extends WP_Test_REST_TestCase {
 	public function test_get_item_custom_registered_collection() {
 		wp_set_current_user( self::$editor_id );
 
-		WP_Icon_Collections_Registry::get_instance()->register(
-			'my-custom-collection',
-			array(
-				'label'       => 'My Icons',
-				'description' => 'A custom pack.',
-			)
-		);
-
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/icon-collections/my-custom-collection' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/icon-collections/test-public' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
 		$this->assertSame( 200, $response->get_status() );
-		$this->assertSame( 'my-custom-collection', $data['slug'] );
-		$this->assertSame( 'My Icons', $data['label'] );
-		$this->assertSame( 'A custom pack.', $data['description'] );
+		$this->assertSame( 'test-public', $data['slug'] );
+		$this->assertSame( 'Test Public', $data['label'] );
+		$this->assertSame( '', $data['description'] );
 	}
 
 	/**
@@ -250,6 +256,34 @@ class WP_Test_REST_Icon_Collections_Controller extends WP_Test_REST_TestCase {
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertErrorResponse( 'rest_icon_collection_not_found', $response, 404 );
+	}
+
+	/**
+	 * Tests that GET /wp/v2/icon-collections/<slug> returns 404 for non-public collections.
+	 *
+	 * @dataProvider data_non_public_collections
+	 *
+	 * @param string $slug Icon collection slug.
+	 */
+	public function test_get_item_returns_404_for_non_public_collection( $slug ) {
+		wp_set_current_user( self::$editor_id );
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/icon-collections/' . $slug );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_icon_collection_not_found', $response, 404 );
+	}
+
+	/**
+	 * Data provider of non-public collection slugs.
+	 *
+	 * @return array[]
+	 */
+	public function data_non_public_collections() {
+		return array(
+			'custom non-public collection' => array( 'test-private' ),
+			'built-in core-admin'          => array( 'core-admin' ),
+		);
 	}
 
 	/**
