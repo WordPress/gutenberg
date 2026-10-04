@@ -569,6 +569,36 @@ export function pickPrimaryNote( threads ) {
 }
 
 /**
+ * Collects the distinct participants across a set of threads: each thread's
+ * author plus everyone who replied, in chronological order.
+ *
+ * @param {Array} threads Thread objects, each with a `reply` list.
+ * @return {Array} Participants as `{ id, name, avatar }`, first contribution first.
+ */
+export function getThreadParticipants( threads ) {
+	const entries = threads
+		.flatMap( ( thread ) => [ thread, ...thread.reply ] )
+		.sort( ( a, b ) => new Date( a.date ) - new Date( b.date ) );
+
+	const participantsMap = new Map();
+	for ( const entry of entries ) {
+		if ( ! entry.author_name || participantsMap.has( entry.author ) ) {
+			continue;
+		}
+
+		participantsMap.set( entry.author, {
+			id: entry.author,
+			name: entry.author_name,
+			avatar:
+				entry.author_avatar_urls?.[ '48' ] ||
+				entry.author_avatar_urls?.[ '96' ],
+		} );
+	}
+
+	return Array.from( participantsMap.values() );
+}
+
+/**
  * Removes a note ID from the metadata.
  *
  * @param {Object} metadata Existing block metadata
