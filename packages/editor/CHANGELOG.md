@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Notes: Support notes in the Style Book, stored against the user global styles post and anchored to a Style Book example ([#81554](https://github.com/WordPress/gutenberg/pull/81554)).
+
 ### Enhancements
 
 -   `PostAuthor`: The field renders with the `SearchableSelect` component of `@wordpress/ui` instead of `ComboboxControl` and `SelectControl` ([#83323](https://github.com/WordPress/gutenberg/pull/83323)).
