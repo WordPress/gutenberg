@@ -315,7 +315,7 @@ class WP_Test_REST_Icon_Collections_Controller extends WP_Test_REST_TestCase {
 	 * Tests that collection query parameters include context with view default.
 	 */
 	public function test_get_collection_params() {
-		$controller = new WP_REST_Icon_Collections_Controller();
+		$controller = new WP_REST_Icon_Collections_Controller_Gutenberg();
 		$params     = $controller->get_collection_params();
 
 		$this->assertArrayHasKey( 'context', $params );
