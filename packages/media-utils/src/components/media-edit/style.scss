@@ -1,5 +1,6 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/mixins";
 
 @mixin preview-overlay {
 	border-radius: $radius-small;
@@ -155,6 +156,7 @@ fieldset.media-edit {
 		aspect-ratio: 1 / 1;
 		flex-shrink: 0;
 		border-radius: $radius-small;
+		@include mixins.checkerboard-background( 4px );
 	}
 
 	.media-edit__expanded {
@@ -228,6 +230,7 @@ fieldset.media-edit {
 			height: 100%;
 			object-fit: cover;
 			object-position: 50% 50%;
+			@include mixins.checkerboard-background( 12px );
 		}
 
 		.media-edit__filename {
