@@ -1310,6 +1310,50 @@ test.describe( 'Block Notes', () => {
 			).toBeVisible();
 		} );
 
+		test( 'the emoji picker footer names the highlighted emoji', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing the picker footer' },
+				comment: 'Test comment for the picker footer',
+			} );
+
+			await page
+				.getByRole( 'combobox', { name: 'Add reaction' } )
+				.click();
+			await blockNoteUtils.waitForFullPicker();
+
+			// The footer is visual only, since the highlighted cell is
+			// already announced through `aria-activedescendant`.
+			const footer = page.locator(
+				'.editor-collab-sidebar-panel__picker-footer'
+			);
+			await expect( footer ).toHaveAttribute( 'aria-hidden', 'true' );
+			const footerName = footer.locator(
+				'.editor-collab-sidebar-panel__picker-footer-name'
+			);
+			const cells = page.getByRole( 'gridcell' );
+
+			// The arrow keys move the highlight from the search field.
+			await expect(
+				page.getByRole( 'combobox', { name: 'Search emoji' } )
+			).toBeFocused();
+			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'ArrowRight' );
+			await expect( footerName ).toHaveText(
+				await cells.nth( 1 ).getAttribute( 'aria-label' )
+			);
+
+			// Hovering a cell highlights it too.
+			const hoveredCell = cells.nth( 8 );
+			await hoveredCell.hover();
+			await expect( footerName ).toHaveText(
+				await hoveredCell.getAttribute( 'aria-label' )
+			);
+		} );
+
 		test( 'the add-reaction trigger is revealed on hover and focus', async ( {
 			page,
 			blockNoteUtils,
