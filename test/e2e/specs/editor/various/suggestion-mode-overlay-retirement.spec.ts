@@ -517,23 +517,31 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.first();
 		await paragraph.click();
+		// Bold "world": one `format` marker.
 		await page.keyboard.press( 'End' );
-		await page.keyboard.type( ' NEW' );
-		const addMarker = paragraph.locator(
-			`${ SUGGESTION_MARK }[data-suggestion-type="add"]`
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await pageUtils.pressKeys( 'primary+b' );
+		const formatMarker = paragraph.locator(
+			`${ SUGGESTION_MARK }[data-suggestion-type="format"]`
 		);
-		await expect( addMarker ).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		await expect( formatMarker ).toHaveAttribute(
+			'data-suggestion-id',
+			/\d/
+		);
 
 		/*
-		 * Select "ld NEW" — a range straddling the add marker's boundary —
+		 * Select "lo wor" — a range straddling the format marker's boundary —
 		 * and delete it. Neither representation fits: a `del` marker over the
 		 * range would re-attribute half of the existing marker to a new note,
 		 * and the whole-content overlay this used to fall through to renders a
 		 * marker-free snapshot, which hid every marker in the block while the
 		 * earlier note kept describing them (#73411, F-09). The gesture is
-		 * declined instead.
+		 * declined instead. (A range crossing only the author's own additions
+		 * and deletions is handled; see the test below.)
 		 */
-		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 6 } );
+		await page.keyboard.press( 'Home' );
+		await pageUtils.pressKeys( 'ArrowRight', { times: 3 } );
+		await pageUtils.pressKeys( 'shift+ArrowRight', { times: 6 } );
 		await page.keyboard.press( 'Backspace' );
 
 		// The user is told why the edit did not take.
@@ -554,16 +562,15 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 		await expect( paragraph ).not.toHaveClass( /is-suggestion-pending/ );
 		await expect( paragraph.locator( OVERLAY_ADD ) ).toHaveCount( 0 );
 		await expect( paragraph.locator( OVERLAY_DEL ) ).toHaveCount( 0 );
-		await expect( addMarker ).toBeVisible();
+		await expect( formatMarker ).toBeVisible();
 		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 1 );
 		// Nothing was removed, and the earlier suggestion survives verbatim.
 		await expect
 			.poll( () => paragraph.textContent() )
-			.toBe( 'Hello world NEW' );
+			.toBe( 'Hello world' );
 		const serialized = await editor.getEditedPostContent();
-		expect( serialized ).toContain( 'Hello world' );
-		expect( serialized ).toContain( 'data-suggestion-type="add"' );
-		expect( serialized ).toContain( 'NEW' );
+		expect( serialized ).toContain( 'data-suggestion-type="format"' );
+		expect( serialized ).toContain( '<strong>' );
 	} );
 
 	test( 'invariant: a second format toggle over a marked run extends the marker, never an overlay', async ( {
@@ -672,6 +679,93 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 		await expect
 			.poll( () => paragraph.textContent() )
 			.toBe( 'Hello world X' );
+	} );
+
+	test( 'invariant: deleting across your own pending markers removes your additions and keeps your deletions', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		const marks = ( type: string ) =>
+			paragraph.locator(
+				`${ SUGGESTION_MARK }[data-suggestion-type="${ type }"]`
+			);
+		await paragraph.click();
+
+		// Propose deleting "Hello", then add text on both sides of it.
+		await page.keyboard.press( 'Home' );
+		await pageUtils.pressKeys( 'shift+ArrowRight', { times: 5 } );
+		await page.keyboard.press( 'Backspace' );
+		await expect( marks( 'del' ) ).toHaveAttribute(
+			'data-suggestion-id',
+			/\d/
+		);
+		const deletionId =
+			await marks( 'del' ).getAttribute( 'data-suggestion-id' );
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' NEW' );
+		await expect( marks( 'add' ) ).toHaveAttribute(
+			'data-suggestion-id',
+			/\d/
+		);
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.type( 'Hi ' );
+		await expect( marks( 'add' ) ).toHaveCount( 2 );
+		await expect( marks( 'add' ).first() ).toHaveAttribute(
+			'data-suggestion-id',
+			/\d/
+		);
+		await expect( paragraph ).toHaveText( 'Hi Hello world NEW' );
+
+		/*
+		 * Select everything and delete it. The selection crosses both of the
+		 * author's additions, their own deletion, and original text. After a
+		 * few edits a block is mostly the author's own markers, and refusing
+		 * this as an overlap left the block impossible to edit (#73411, B7).
+		 * The additions were never in the post, so they go; the deletion is
+		 * already proposed, so it stays; the original text left between them
+		 * is proposed for deletion.
+		 */
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+Home' );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect( marks( 'add' ) ).toHaveCount( 0 );
+		await expect( marks( 'del' ) ).toHaveCount( 2 );
+		await expect( marks( 'del' ).first() ).toHaveText( 'Hello' );
+		await expect( marks( 'del' ).first() ).toHaveAttribute(
+			'data-suggestion-id',
+			deletionId!
+		);
+		await expect( marks( 'del' ).last() ).toHaveText( ' world' );
+		await expect( marks( 'del' ).last() ).toHaveAttribute(
+			'data-suggestion-id',
+			/\d/
+		);
+		await expect(
+			page
+				.locator( '.components-snackbar-list' )
+				.getByText( 'overlaps a pending suggestion' )
+		).toHaveCount( 0 );
+
+		await deselect( page );
+
+		await expect( paragraph ).not.toHaveClass( /is-suggestion-pending/ );
+		await expect( paragraph.locator( OVERLAY_ADD ) ).toHaveCount( 0 );
+		await expect( paragraph.locator( OVERLAY_DEL ) ).toHaveCount( 0 );
+		await expect
+			.poll( () => paragraph.textContent() )
+			.toBe( 'Hello world' );
 	} );
 
 	/*
