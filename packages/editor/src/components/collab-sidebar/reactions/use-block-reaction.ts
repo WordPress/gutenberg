@@ -173,10 +173,11 @@ export function useBlockReaction( clientId: string ) {
 				return;
 			}
 
-			invalidateReactionNames(
-				{ kind: 'block', postId, reactionsId: anchor },
-				hexKey
-			);
+			invalidateReactionNames( {
+				kind: 'block',
+				postId,
+				reactionsId: anchor,
+			} );
 
 			// Fold the known effect into the cached post record first, so
 			// the next toggle stays correct even if the refetch below fails.

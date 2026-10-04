@@ -169,23 +169,79 @@ async function fetchReactions(
 	return null;
 }
 
-// Module-level cache for reaction details: { "targetKey:hexKey": string[] }
-const reactionNamesCache: Record< string, string[] > = {};
+/*
+ * Module-level cache of reactor names per target, grouped by hex key. One
+ * fetch returns every emoji on the note or block, so all its pills share it,
+ * along with any request still in flight. Resolves to `null` when the target
+ * has more reactions than the walk will fetch.
+ */
+const reactionNamesCache = new Map<
+	string,
+	Promise< Record< string, string[] > | null >
+>();
 
 /**
- * Drop the cached reactor names for a target/hex key pair, so the next tooltip
- * refetches them.
+ * Groups reactor names by the hex key each reaction stores.
  *
- * @param target The note or block the reaction hangs off.
- * @param hexKey The reaction hex key.
+ * @param reactions Reaction comments on one target.
+ * @return Reactor names keyed by hex key.
  */
-export function invalidateReactionNames(
-	target: ReactionTarget,
-	hexKey: string
-): void {
-	delete reactionNamesCache[
-		`${ getReactionTargetKey( target ) }:${ hexKey }`
-	];
+function groupReactionNames(
+	reactions: ReactionComment[]
+): Record< string, string[] > {
+	const grouped: Record< string, string[] > = {};
+	for ( const reaction of reactions ) {
+		const content =
+			typeof reaction.content === 'object'
+				? reaction.content?.raw || reaction.content?.rendered
+				: reaction.content;
+		const hexKey = content?.replace?.( /<[^>]*>/g, '' )?.trim();
+		if ( hexKey ) {
+			grouped[ hexKey ] = [
+				...( grouped[ hexKey ] ?? [] ),
+				reaction.author_name,
+			];
+		}
+	}
+	return grouped;
+}
+
+/**
+ * Resolves the reactor names on a target, fetching them at most once.
+ *
+ * @param target The note or block the reactions hang off.
+ * @return Reactor names keyed by hex key, or `null` for a target too busy to
+ *         name every reactor.
+ */
+function getReactionNames(
+	target: ReactionTarget
+): Promise< Record< string, string[] > | null > {
+	const key = getReactionTargetKey( target );
+	let names = reactionNamesCache.get( key );
+	if ( ! names ) {
+		const request = fetchReactions( target ).then(
+			( reactions ) => reactions && groupReactionNames( reactions )
+		);
+		// A failed request is not worth keeping; let the next hover retry.
+		request.catch( () => {
+			if ( reactionNamesCache.get( key ) === request ) {
+				reactionNamesCache.delete( key );
+			}
+		} );
+		reactionNamesCache.set( key, request );
+		names = request;
+	}
+	return names;
+}
+
+/**
+ * Drop the cached reactor names for a target, so the next tooltip refetches
+ * them.
+ *
+ * @param target The note or block the reactions hang off.
+ */
+export function invalidateReactionNames( target: ReactionTarget ): void {
+	reactionNamesCache.delete( getReactionTargetKey( target ) );
 }
 
 interface ReactionButtonProps {
@@ -230,7 +286,6 @@ function ReactionButton( {
 	onRemoveLast,
 }: ReactionButtonProps ) {
 	const [ names, setNames ] = useState< string[] | null >( null );
-	const [ isFetching, setIsFetching ] = useState( false );
 	// Hover or keyboard focus, which gates the Emojibase fetch below.
 	const [ isReached, setIsReached ] = useState( false );
 	/*
@@ -248,54 +303,26 @@ function ReactionButton( {
 
 	const fetchReactionNames = useCallback( () => {
 		setIsReached( true );
-		const cacheKey = `${ getReactionTargetKey( target ) }:${ hexKey }`;
-		if ( reactionNamesCache[ cacheKey ] ) {
-			setNames( reactionNamesCache[ cacheKey ] );
-			return;
-		}
-
-		if ( isFetching ) {
-			return;
-		}
-
 		/*
 		 * A miss on a pill that already listed names means it was
 		 * invalidated; drop the stale list rather than show it against
 		 * the new count while refetching.
 		 */
-		setNames( null );
-		setIsFetching( true );
-		fetchReactions( target )
-			.then( ( reactions ) => {
+		if ( ! reactionNamesCache.has( getReactionTargetKey( target ) ) ) {
+			setNames( null );
+		}
+		getReactionNames( target )
+			.then( ( grouped ) => {
 				// A truncated walk would drop reactors, and a partial name
 				// list reads as complete. Keep the count-based label instead.
-				if ( ! reactions ) {
-					return;
+				if ( grouped ) {
+					setNames( grouped[ hexKey ] ?? [] );
 				}
-
-				const fetchedNames = reactions
-					.filter( ( r ) => {
-						const content =
-							typeof r.content === 'object'
-								? r.content?.raw || r.content?.rendered
-								: r.content;
-						const clean = content
-							?.replace?.( /<[^>]*>/g, '' )
-							?.trim();
-						return clean === hexKey;
-					} )
-					.map( ( r ) => r.author_name );
-
-				reactionNamesCache[ cacheKey ] = fetchedNames;
-				setNames( fetchedNames );
 			} )
 			.catch( () => {
 				// Silently fall back to count-based label.
-			} )
-			.finally( () => {
-				setIsFetching( false );
 			} );
-	}, [ target, hexKey, isFetching ] );
+	}, [ target, hexKey ] );
 
 	const defaultLabel = sprintf(
 		/* translators: 1: emoji label, 2: count of reactions */
