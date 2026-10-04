@@ -359,12 +359,15 @@ const MetaBoxesMain = forwardRef( ( _props, ref ) => {
 				const scrollMax = scrollHeight - canvasHeight;
 				const isCanvasScrolledToEnd = scrollMax - scrollTop < 1;
 				let shouldEngage = isCanvasScrolledToEnd;
-				// If wheeling over the pane and it’s maximized, don’t engage unless
-				// headed upward and already scrolled to the top.
-				if ( pane === currentTarget && canvasHeight === 0 ) {
-					shouldEngage =
-						Math.sign( deltaY ) === -1 &&
-						linerRef.current.scrollTop === 0;
+				// If wheeling upward over the pane, don’t engage until its contents
+				// are scrolled to the top. If it’s maximized, only engage upward.
+				if ( pane === currentTarget ) {
+					const isUpward = Math.sign( deltaY ) === -1;
+					if ( isUpward && linerRef.current.scrollTop > 0 ) {
+						shouldEngage = false;
+					} else if ( canvasHeight === 0 ) {
+						shouldEngage = isUpward;
+					}
 				}
 				if ( ! ( isEngaged || shouldEngage ) ) {
 					return;
