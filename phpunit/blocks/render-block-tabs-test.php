@@ -221,4 +221,127 @@ class Tests_Blocks_Render_Tabs extends WP_UnitTestCase {
 			);
 		}
 	}
+
+	/**
+	 * A newly inserted Tabs block saves empty tab buttons and empty panels.
+	 * Those should not appear on the front end, the same way as an unused
+	 * paragraph or heading.
+	 *
+	 * @covers ::block_core_tabs_render_block_callback
+	 * @covers ::block_core_tabs_content_is_empty
+	 */
+	public function test_should_not_render_an_empty_tabs_block(): void {
+		$tabs_block = <<<'BLOCK_CONTENT'
+			<!-- wp:tabs -->
+			<div class="wp-block-tabs"><!-- wp:tab-list -->
+			<div role="tablist" class="wp-block-tab-list"><button type="button" role="tab"></button><button type="button" role="tab"></button></div>
+			<!-- /wp:tab-list -->
+
+			<!-- wp:tab-panels -->
+			<div class="wp-block-tab-panels"><!-- wp:tab-panel -->
+			<section role="tabpanel" tabindex="0" class="wp-block-tab-panel"></section>
+			<!-- /wp:tab-panel -->
+
+			<!-- wp:tab-panel -->
+			<section role="tabpanel" tabindex="0" class="wp-block-tab-panel"></section>
+			<!-- /wp:tab-panel --></div>
+			<!-- /wp:tab-panels --></div>
+			<!-- /wp:tabs -->
+		BLOCK_CONTENT;
+
+		$this->assertSame( '', trim( do_blocks( $tabs_block ) ) );
+	}
+
+	/**
+	 * Labels alone are enough for a visitor to tell the tabs apart, even when
+	 * the panels have not been filled in yet.
+	 *
+	 * @covers ::block_core_tabs_render_block_callback
+	 * @covers ::block_core_tabs_content_is_empty
+	 */
+	public function test_should_render_tabs_when_a_tab_has_a_label(): void {
+		$tabs_block = <<<'BLOCK_CONTENT'
+			<!-- wp:tabs -->
+			<div class="wp-block-tabs"><!-- wp:tab-list -->
+			<div role="tablist" class="wp-block-tab-list"><button type="button" role="tab">Overview</button><button type="button" role="tab"></button></div>
+			<!-- /wp:tab-list -->
+
+			<!-- wp:tab-panels -->
+			<div class="wp-block-tab-panels"><!-- wp:tab-panel {"label":"Overview"} -->
+			<section role="tabpanel" tabindex="0" class="wp-block-tab-panel"></section>
+			<!-- /wp:tab-panel -->
+
+			<!-- wp:tab-panel -->
+			<section role="tabpanel" tabindex="0" class="wp-block-tab-panel"></section>
+			<!-- /wp:tab-panel --></div>
+			<!-- /wp:tab-panels --></div>
+			<!-- /wp:tabs -->
+		BLOCK_CONTENT;
+
+		$rendered_block = do_blocks( $tabs_block );
+		$processor      = new WP_HTML_Tag_Processor( $rendered_block );
+
+		$this->assertTrue( $processor->next_tag( array( 'class_name' => 'wp-block-tabs' ) ) );
+		$this->assertStringContainsString( 'Overview', $rendered_block );
+	}
+
+	/**
+	 * Panel copy should still reach the front end when the tab buttons have no
+	 * labels yet.
+	 *
+	 * @covers ::block_core_tabs_render_block_callback
+	 * @covers ::block_core_tabs_content_is_empty
+	 */
+	public function test_should_render_tabs_when_a_panel_has_content(): void {
+		$tabs_block = <<<'BLOCK_CONTENT'
+			<!-- wp:tabs -->
+			<div class="wp-block-tabs"><!-- wp:tab-list -->
+			<div role="tablist" class="wp-block-tab-list"><button type="button" role="tab"></button></div>
+			<!-- /wp:tab-list -->
+
+			<!-- wp:tab-panels -->
+			<div class="wp-block-tab-panels"><!-- wp:tab-panel -->
+			<section role="tabpanel" tabindex="0" class="wp-block-tab-panel"><!-- wp:paragraph -->
+			<p>Panel copy</p>
+			<!-- /wp:paragraph --></section>
+			<!-- /wp:tab-panel --></div>
+			<!-- /wp:tab-panels --></div>
+			<!-- /wp:tabs -->
+		BLOCK_CONTENT;
+
+		$rendered_block = do_blocks( $tabs_block );
+		$processor      = new WP_HTML_Tag_Processor( $rendered_block );
+
+		$this->assertTrue( $processor->next_tag( array( 'class_name' => 'wp-block-tabs' ) ) );
+		$this->assertStringContainsString( 'Panel copy', $rendered_block );
+	}
+
+	/**
+	 * A panel that only contains replaced media still has front-end content,
+	 * even though stripping tags would leave it looking empty.
+	 *
+	 * @covers ::block_core_tabs_render_block_callback
+	 * @covers ::block_core_tabs_content_is_empty
+	 */
+	public function test_should_render_tabs_when_a_panel_has_an_image(): void {
+		$tabs_block = <<<'BLOCK_CONTENT'
+			<!-- wp:tabs -->
+			<div class="wp-block-tabs"><!-- wp:tab-list -->
+			<div role="tablist" class="wp-block-tab-list"><button type="button" role="tab"></button></div>
+			<!-- /wp:tab-list -->
+
+			<!-- wp:tab-panels -->
+			<div class="wp-block-tab-panels"><!-- wp:tab-panel -->
+			<section role="tabpanel" tabindex="0" class="wp-block-tab-panel"><img src="https://example.com/photo.jpg" alt="" /></section>
+			<!-- /wp:tab-panel --></div>
+			<!-- /wp:tab-panels --></div>
+			<!-- /wp:tabs -->
+		BLOCK_CONTENT;
+
+		$rendered_block = do_blocks( $tabs_block );
+		$processor      = new WP_HTML_Tag_Processor( $rendered_block );
+
+		$this->assertTrue( $processor->next_tag( array( 'class_name' => 'wp-block-tabs' ) ) );
+		$this->assertTrue( $processor->next_tag( 'img' ) );
+	}
 }
