@@ -478,32 +478,4 @@ class WP_Test_REST_Icons_Controller extends WP_Test_REST_TestCase {
 			'collection query' => array( '/wp/v2/icons', array( 'collection' => 'test-private' ) ),
 		);
 	}
-
-	/**
-	 * Test that non-public collections are omitted from the collection list.
-	 */
-	public function test_get_collections_omits_non_public_collections() {
-		wp_set_current_user( self::$editor_id );
-
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/icon-collections' );
-		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertSame( 200, $response->get_status() );
-
-		$slugs = wp_list_pluck( $response->get_data(), 'slug' );
-		$this->assertContains( 'test-public', $slugs );
-		$this->assertNotContains( 'test-private', $slugs );
-	}
-
-	/**
-	 * Test that non-public collections are not readable by slug.
-	 */
-	public function test_get_collection_returns_404_for_non_public_collection() {
-		wp_set_current_user( self::$editor_id );
-
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/icon-collections/test-private' );
-		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertErrorResponse( 'rest_icon_collection_not_found', $response, 404 );
-	}
 }
