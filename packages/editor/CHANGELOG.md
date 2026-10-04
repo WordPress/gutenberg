@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Notes: Honour a per-action note lock. The notes sidebar now hides or disables the affordances the server reports as locked through the `lockedNoteActions` editor setting, and shows a notice on a fully locked post ([#81546](https://github.com/WordPress/gutenberg/pull/81546)).
+
 ### Enhancements
 
 -   `PostAuthor`: The field renders with the `SearchableSelect` component of `@wordpress/ui` instead of `ComboboxControl` and `SelectControl` ([#83323](https://github.com/WordPress/gutenberg/pull/83323)).
