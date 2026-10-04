@@ -39,6 +39,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import {
+	debounce,
 	useEvent,
 	useMediaQuery,
 	useMergeRefs,
@@ -313,6 +314,19 @@ const MetaBoxesMain = forwardRef( ( _props, ref ) => {
 			} );
 			iframeObserver.observe( iframe );
 
+			// Persists the height once wheeling settles. Like dragging, it’s only
+			// persisted if still open.
+			const persistHeight = debounce( () => {
+				const height = heightRef.current;
+				if ( height > getRenderValues().min ) {
+					setPreference(
+						'core/edit-post',
+						'metaBoxesMainOpenHeight',
+						height
+					);
+				}
+			}, 500 );
+
 			let disengage;
 			let isEngaged = false;
 			const engageUntilPointerMoves = () => {
@@ -389,6 +403,7 @@ const MetaBoxesMain = forwardRef( ( _props, ref ) => {
 					persistIsOpen( true );
 				}
 				applyHeight( nextHeight );
+				persistHeight();
 				// Wheeled downward – pane made taller.
 				if ( Math.sign( deltaY ) === 1 ) {
 					// Disengage if pane is maximized.
@@ -416,6 +431,7 @@ const MetaBoxesMain = forwardRef( ( _props, ref ) => {
 			pane.addEventListener( 'wheel', onWheel, { passive: false } );
 			return () => {
 				disengage?.();
+				persistHeight.flush();
 				iframeObserver.disconnect();
 				canvasDocument.removeEventListener( 'wheel', onWheel );
 				pane.removeEventListener( 'wheel', onWheel );
