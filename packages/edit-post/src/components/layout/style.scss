@@ -111,11 +111,6 @@
 	}
 }
 
-// In case the canvas is not iframe’d, the main meta boxes need to clear any floating content.
-.edit-post-layout__metaboxes {
-	clear: both;
-}
-
 // When split view is active the editors should allow shrinking so the meta box
 // pane remains visible and reachable. Apply common sizing to both editors, then
 // specialise overflow handling per editor so scroll behavior is correct.
