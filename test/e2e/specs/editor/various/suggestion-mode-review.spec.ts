@@ -789,6 +789,248 @@ test.describe( 'Suggestion mode review flows', () => {
 		).toBeVisible();
 	} );
 
+	// --- List indent / outdent -------------------------------------------------
+
+	/*
+	 * Indenting a list item with Tab creates the nested list and moves the
+	 * item into it in one update (#73411). The list exists only to hold the
+	 * item, so the change is one move, not an insertion the item is refused
+	 * entry to.
+	 */
+	async function insertShoppingList( editor: any, nested = false ) {
+		const item = ( content: string, innerBlocks: any[] = [] ) => ( {
+			name: 'core/list-item',
+			attributes: { content },
+			innerBlocks,
+		} );
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: nested
+				? [
+						item( 'Fresh apples', [
+							{
+								name: 'core/list',
+								innerBlocks: [ item( 'Whole wheat bread' ) ],
+							},
+						] ),
+						item( 'Coffee beans' ),
+					]
+				: [
+						item( 'Fresh apples' ),
+						item( 'Whole wheat bread' ),
+						item( 'Coffee beans' ),
+					],
+		} );
+	}
+
+	async function pressInListItem(
+		editor: any,
+		page: any,
+		text: string,
+		key: string
+	) {
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: List item' } )
+			.filter( { hasText: new RegExp( `^${ text }$` ) } )
+			.click();
+		await page.keyboard.press( 'Home' );
+		const suggestionSaved = suggestionSavedPromise( page );
+		await page.keyboard.press( key );
+		await suggestionSaved;
+	}
+
+	function listShape( page: any ) {
+		return page.evaluate( () => {
+			const map = ( block: any ): any => ( {
+				name: block.name,
+				content: String( block.attributes.content ?? '' ),
+				suggestion: block.attributes.metadata?.suggestion?.type,
+				innerBlocks: block.innerBlocks.map( map ),
+			} );
+			return ( window as any ).wp.data
+				.select( 'core/block-editor' )
+				.getBlocks()
+				.map( map );
+		} );
+	}
+
+	const flatList = ( suggestion?: string ) => [
+		{
+			name: 'core/list',
+			content: '',
+			suggestion: undefined,
+			innerBlocks: [
+				{
+					name: 'core/list-item',
+					content: 'Fresh apples',
+					suggestion: undefined,
+					innerBlocks: [],
+				},
+				{
+					name: 'core/list-item',
+					content: 'Whole wheat bread',
+					suggestion,
+					innerBlocks: [],
+				},
+				{
+					name: 'core/list-item',
+					content: 'Coffee beans',
+					suggestion: undefined,
+					innerBlocks: [],
+				},
+			],
+		},
+	];
+
+	const nestedList = ( suggestion?: string ) => [
+		{
+			name: 'core/list',
+			content: '',
+			suggestion: undefined,
+			innerBlocks: [
+				{
+					name: 'core/list-item',
+					content: 'Fresh apples',
+					suggestion: undefined,
+					innerBlocks: [
+						{
+							name: 'core/list',
+							content: '',
+							suggestion: undefined,
+							innerBlocks: [
+								{
+									name: 'core/list-item',
+									content: 'Whole wheat bread',
+									suggestion,
+									innerBlocks: [],
+								},
+							],
+						},
+					],
+				},
+				{
+					name: 'core/list-item',
+					content: 'Coffee beans',
+					suggestion: undefined,
+					innerBlocks: [],
+				},
+			],
+		},
+	];
+
+	test( 'indent — Tab on a list item suggests moving it into a nested list', async ( {
+		editor,
+		page,
+	} ) => {
+		await insertShoppingList( editor );
+		await switchIntent( page, 'Suggesting' );
+		await pressInListItem( editor, page, 'Whole wheat bread', 'Tab' );
+
+		await expect
+			.poll( () => listShape( page ) )
+			.toEqual( nestedList( 'pending-move' ) );
+		await expect(
+			page
+				.locator( '.components-snackbar-list' )
+				.getByText(
+					'Existing content can’t be moved into a suggested block.'
+				)
+		).toHaveCount( 0 );
+		const sidebar = await openNotesSidebar( page );
+		await expect(
+			sidebar.getByRole( 'button', { name: 'Reject suggestion' } )
+		).toHaveCount( 1 );
+	} );
+
+	test( 'reject — a rejected indent puts the item back and drops the nested list', async ( {
+		editor,
+		page,
+	} ) => {
+		await insertShoppingList( editor );
+		await switchIntent( page, 'Suggesting' );
+		await pressInListItem( editor, page, 'Whole wheat bread', 'Tab' );
+
+		await switchIntent( page, 'Editing' );
+		await decideSuggestion( page, 'Reject' );
+
+		await expect.poll( () => listShape( page ) ).toEqual( flatList() );
+	} );
+
+	test( 'accept — an accepted indent keeps the item nested', async ( {
+		editor,
+		page,
+	} ) => {
+		await insertShoppingList( editor );
+		await switchIntent( page, 'Suggesting' );
+		await pressInListItem( editor, page, 'Whole wheat bread', 'Tab' );
+
+		await switchIntent( page, 'Editing' );
+		await decideSuggestion( page, 'Accept' );
+
+		await expect.poll( () => listShape( page ) ).toEqual( nestedList() );
+	} );
+
+	test( 'outdent — Shift+Tab suggests moving a nested item up a level', async ( {
+		editor,
+		page,
+	} ) => {
+		await insertShoppingList( editor, true );
+		await switchIntent( page, 'Suggesting' );
+		await pressInListItem( editor, page, 'Whole wheat bread', 'Shift+Tab' );
+
+		await expect
+			.poll( () => listShape( page ) )
+			.toEqual( flatList( 'pending-move' ) );
+
+		await switchIntent( page, 'Editing' );
+		await decideSuggestion( page, 'Reject' );
+
+		await expect.poll( () => listShape( page ) ).toEqual( nestedList() );
+	} );
+
+	test( 'outdent — rejecting an outdent that carried the next item restores the nested list', async ( {
+		editor,
+		page,
+	} ) => {
+		const item = ( content: string, innerBlocks: any[] = [] ) => ( {
+			name: 'core/list-item',
+			attributes: { content },
+			innerBlocks,
+		} );
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				item( 'Fresh apples', [
+					{
+						name: 'core/list',
+						innerBlocks: [
+							item( 'Whole wheat bread' ),
+							item( 'Green tea' ),
+						],
+					},
+				] ),
+				item( 'Coffee beans' ),
+			],
+		} );
+		const original = await listShape( page );
+		await switchIntent( page, 'Suggesting' );
+		// Outdenting the first nested item nests the one after it under it.
+		await pressInListItem( editor, page, 'Whole wheat bread', 'Shift+Tab' );
+
+		await switchIntent( page, 'Editing' );
+		const sidebar = await openNotesSidebar( page );
+		const rejects = sidebar.getByRole( 'button', {
+			name: 'Reject suggestion',
+		} );
+		await expect( rejects ).toHaveCount( 2 );
+		for ( const remaining of [ 1, 0 ] ) {
+			await rejects.first().click();
+			await expect( rejects ).toHaveCount( remaining );
+		}
+
+		await expect.poll( () => listShape( page ) ).toEqual( original );
+	} );
+
 	// --- Review: inline markers (add / del / format) --------------------------
 
 	test( 'accept — an accepted addition unwraps the marker and keeps the text', async ( {
