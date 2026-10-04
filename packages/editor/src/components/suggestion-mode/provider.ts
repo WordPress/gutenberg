@@ -50,127 +50,9 @@ import type {
 	SuggestionOperation,
 	SuggestionPayload,
 } from './operations';
+import { withDecisionInFlight } from './decision-state';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
-
-/*
- * Comment ids with an apply/reject decision currently in flight. Deciding a
- * suggestion mutates block content (clears markers) BEFORE the comment's
- * lifecycle status lands on the server, so the note garbage collector (see
- * suggestion-note-gc.js) would briefly observe "marker gone, note still
- * pending" and trash a note that was just resolved. Module-scoped because
- * `useSuggestionsProvider` is instantiated once per consumer and the guard
- * must be shared across all of them.
- */
-const decisionsInFlight = new Set< string >();
-
-/**
- * Whether an apply/reject decision for the given comment is in flight.
- *
- * @param commentId Comment id to check.
- * @return True while a decision is being processed.
- */
-export function isSuggestionDecisionInFlight(
-	commentId: number | string
-): boolean {
-	return decisionsInFlight.has( String( commentId ) );
-}
-
-/**
- * Wrap a decision callback (apply/reject) so its comment id is registered as
- * in flight for the duration of the call.
- *
- * @param decide Decision callback taking `{ commentId, ... }`.
- * @return Wrapped callback.
- */
-function withDecisionInFlight< Args extends { commentId?: number | string } >(
-	decide: ( args: Args ) => Promise< unknown >
-) {
-	return async ( args: Args ) => {
-		const key = String( args?.commentId );
-		decisionsInFlight.add( key );
-		try {
-			return await decide( args );
-		} finally {
-			decisionsInFlight.delete( key );
-			resolvedThisSession.add( key );
-		}
-	};
-}
-
-/*
- * Suggestions this session has applied or rejected.
- *
- * A decision has two halves: the block change, which the undo stack holds, and
- * the comment's lifecycle status, which lives on the server and no keystroke
- * here can walk back. Undo therefore puts a marker back while its note stays
- * resolved, leaving a marked-up run with no Accept/Reject on it and no way to
- * clear it through the UI (issue #73411, F-18). The note collector watches this
- * set and reopens a note whose marker reappears, so the two halves travel
- * together again.
- *
- * Deliberately scoped to decisions made HERE rather than to every resolved note
- * that has a live marker: a peer's decision arriving through sync before this
- * session's content catches up looks identical from the outside, and reopening
- * that would undo their review.
- */
-const resolvedThisSession = new Set< string >();
-
-/**
- * Comment ids this session applied or rejected and has not yet reopened.
- *
- * @return Comment id keys.
- */
-export function getSuggestionsResolvedThisSession() {
-	return resolvedThisSession;
-}
-
-/**
- * Forget a decision, once its note has been reopened or is past reopening.
- *
- * @param commentId Comment id.
- */
-export function forgetResolvedSuggestion( commentId: number | string ) {
-	resolvedThisSession.delete( String( commentId ) );
-}
-
-/**
- * Record a decision again, so a failed reopen is retried on a later pass.
- *
- * @param commentId Comment id.
- */
-export function rememberResolvedSuggestion( commentId: number | string ) {
-	resolvedThisSession.add( String( commentId ) );
-}
-
-/*
- * Notes whose last inline marker an edit removed on purpose, such as a split
- * carrying the author's own proposed text into the new block (#73411, B8).
- * The note collector only trashes a note whose anchor it has seen, and a
- * quick edit can remove the marker before the thread list that would let it
- * see the anchor has loaded. Recording the withdrawal counts as having seen
- * it, so the note is still collected, behind the collector's reply guard.
- */
-const withdrawnAnchors = new Set< string >();
-
-/**
- * Record that an edit removed a note's last inline marker.
- *
- * @param commentId Comment id.
- */
-export function rememberWithdrawnAnchor( commentId: number | string ) {
-	withdrawnAnchors.add( String( commentId ) );
-}
-
-/**
- * Take a recorded withdrawal, so it is acted on once.
- *
- * @param commentId Comment id.
- * @return Whether a withdrawal was recorded for the note.
- */
-export function takeWithdrawnAnchor( commentId: number | string ) {
-	return withdrawnAnchors.delete( String( commentId ) );
-}
 
 /**
  * Comment-meta backed suggestions provider. The provider shape is stable so
@@ -1218,12 +1100,12 @@ export function useSuggestionsProvider() {
 	// user (undo, deleting the marked text). Wrapped here — not per-callback —
 	// so every consumer of the provider gets the guard.
 	const applySuggestionGuarded = useMemo(
-		() => withDecisionInFlight( applySuggestion ),
-		[ applySuggestion ]
+		() => withDecisionInFlight( registry, applySuggestion ),
+		[ registry, applySuggestion ]
 	);
 	const rejectSuggestionGuarded = useMemo(
-		() => withDecisionInFlight( rejectSuggestion ),
-		[ rejectSuggestion ]
+		() => withDecisionInFlight( registry, rejectSuggestion ),
+		[ registry, rejectSuggestion ]
 	);
 
 	return {

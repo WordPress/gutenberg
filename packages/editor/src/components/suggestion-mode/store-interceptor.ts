@@ -65,7 +65,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useSuggestionOverlay } from './overlay-context';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { parseSuggestionPayload } from './operations';
-import { rememberWithdrawnAnchor } from './provider';
+import { rememberWithdrawnAnchor } from './decision-state';
 import { createRevertGuard } from '../attribute-suggestions/revert-guard';
 import {
 	planStoreContentEdit,
@@ -1714,7 +1714,9 @@ export default function SuggestionStoreInterceptor() {
 					continue;
 				}
 				if ( removal ) {
-					removal.withdrawnIds.forEach( rememberWithdrawnAnchor );
+					removal.withdrawnIds.forEach( ( id: number | string ) =>
+						rememberWithdrawnAnchor( registry, id )
+					);
 					previous = removal.previous;
 					snapshot.set( clientId, previous );
 					delta = diffAttributes( previous, current );
