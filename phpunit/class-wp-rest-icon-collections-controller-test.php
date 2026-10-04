@@ -297,7 +297,7 @@ class WP_Test_REST_Icon_Collections_Controller extends WP_Test_REST_TestCase {
 	 * Tests that the item schema matches the expected specification.
 	 */
 	public function test_get_item_schema() {
-		$controller = new WP_REST_Icon_Collections_Controller();
+		$controller = new WP_REST_Icon_Collections_Controller_Gutenberg();
 		$schema     = $controller->get_item_schema();
 
 		$this->assertSame( 'icon-collection', $schema['title'] );
