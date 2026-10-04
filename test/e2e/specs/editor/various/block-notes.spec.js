@@ -1354,6 +1354,83 @@ test.describe( 'Block Notes', () => {
 			);
 		} );
 
+		test( 'the emoji picker footer follows search and reopening', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing the picker footer search' },
+				comment: 'Test comment for the picker footer search',
+			} );
+
+			const trigger = page.getByRole( 'combobox', {
+				name: 'Add reaction',
+			} );
+			await trigger.click();
+			await blockNoteUtils.waitForFullPicker();
+
+			const footerName = page.locator(
+				'.editor-collab-sidebar-panel__picker-footer-name'
+			);
+			const searchField = page.getByRole( 'combobox', {
+				name: 'Search emoji',
+			} );
+			const cells = page.getByRole( 'gridcell' );
+
+			// Nothing is highlighted until the user moves or types.
+			await expect( footerName ).toHaveCount( 0 );
+
+			// Typing highlights the top hit, which Enter would pick.
+			await searchField.fill( 'heart' );
+			await expect(
+				page.locator( '.editor-collab-sidebar-panel__picker-list' )
+			).toHaveClass( /is-searching/ );
+			await expect( cells.first() ).toHaveAttribute( 'data-highlighted' );
+			await expect( footerName ).toHaveText(
+				await cells.first().getAttribute( 'aria-label' )
+			);
+
+			// A search with no hits leaves nothing to name.
+			await searchField.fill( 'zzqqxxnotanemoji' );
+			await expect( page.getByText( 'No emoji found.' ) ).toBeVisible();
+			await expect( footerName ).toHaveCount( 0 );
+
+			// Highlight a cell, close, and reopen: the footer starts empty.
+			await searchField.fill( '' );
+			await page.keyboard.press( 'ArrowDown' );
+			await expect( footerName ).toHaveCount( 1 );
+			await page.keyboard.press( 'Escape' );
+			await expect( searchField ).toBeHidden();
+			await trigger.click();
+			await blockNoteUtils.waitForFullPicker();
+			await expect( footerName ).toHaveCount( 0 );
+		} );
+
+		test( 'the emoji picker footer is hidden when emojis fail to load', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await page.route( /\/data\.json(\?|$)/, ( route ) =>
+				route.abort()
+			);
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing the picker load failure' },
+				comment: 'Test comment for the picker load failure',
+			} );
+
+			await page
+				.getByRole( 'combobox', { name: 'Add reaction' } )
+				.click();
+			await expect(
+				page.getByText( 'Couldn’t load emojis.' )
+			).toBeVisible();
+			await expect(
+				page.locator( '.editor-collab-sidebar-panel__picker-footer' )
+			).toHaveCount( 0 );
+		} );
+
 		test( 'the add-reaction trigger is revealed on hover and focus', async ( {
 			page,
 			blockNoteUtils,
