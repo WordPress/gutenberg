@@ -902,6 +902,92 @@ export function reviseOwnAddition(
 }
 
 /**
+ * Delete a selection that crosses the editing author's own pending markers.
+ *
+ * After a few edits a block is mostly the author's own markers, so a selection
+ * over it nearly always touches several of them (#73411, B7). Each character
+ * is handled by what it already is:
+ *
+ * - In the author's own `add` marker: removed. It was never in the post.
+ * - In the author's own `del` marker: kept. It is already proposed for removal.
+ * - Unmarked: left for the caller to mark as a new deletion. After the
+ *   additions go, these characters must form one run.
+ *
+ * Declines (null) when the range touches no marker of the author's (the plain
+ * selection delete applies), touches any other marker (another author's, a
+ * `format` marker, nested markers), or leaves unmarked text on both sides of a
+ * kept deletion.
+ *
+ * @param value       Block attribute value (RichTextData or other).
+ * @param start       Selection start (inclusive).
+ * @param end         Selection end (exclusive).
+ * @param authorToken Id of the author deleting, as a string, or null.
+ * @return The value with the additions removed, and the range of original
+ *         text to mark as a deletion in that value (null when none is left);
+ *         or null.
+ */
+export function deleteAcrossOwnMarkers(
+	value: any,
+	start: number,
+	end: number,
+	authorToken: string | null
+): { value: any; deletion: { start: number; end: number } | null } | null {
+	if ( ! ( value instanceof RichTextData ) || start >= end ) {
+		return null;
+	}
+	const record = toRichTextRecord( value )!;
+	const { formats } = record;
+	const kinds: Array< 'plain' | 'add' | 'del' > = [];
+	for ( let i = start; i < end; i++ ) {
+		const markers = ( formats[ i ] ?? [] ).filter(
+			( f: any ) => f?.type === SUGGESTION_FORMAT_NAME
+		);
+		if ( markers.length === 0 ) {
+			kinds.push( 'plain' );
+			continue;
+		}
+		const attributes = markers[ 0 ].attributes ?? {};
+		const type = attributes[ SUGGESTION_TYPE_ATTRIBUTE ];
+		if (
+			markers.length > 1 ||
+			String( attributes[ SUGGESTION_AUTHOR_ATTRIBUTE ] ?? '' ) !==
+				( authorToken ?? '' ) ||
+			( type !== SUGGESTION_TYPE_ADDITION &&
+				type !== SUGGESTION_TYPE_DELETION )
+		) {
+			return null;
+		}
+		kinds.push( type === SUGGESTION_TYPE_ADDITION ? 'add' : 'del' );
+	}
+	if ( ! kinds.some( ( kind ) => kind !== 'plain' ) ) {
+		return null;
+	}
+	// Offsets of the characters that stay, in the value after removal.
+	const kept = kinds.filter( ( kind ) => kind !== 'add' );
+	const firstPlain = kept.indexOf( 'plain' );
+	const lastPlain = kept.lastIndexOf( 'plain' );
+	if (
+		firstPlain !== -1 &&
+		kept.slice( firstPlain, lastPlain + 1 ).includes( 'del' )
+	) {
+		return null;
+	}
+	let next: any = record;
+	for ( let i = kinds.length - 1; i >= 0; i-- ) {
+		if ( kinds[ i ] === 'add' ) {
+			next = remove( next, start + i, start + i + 1 );
+		}
+	}
+	return {
+		value: new RichTextData( next ),
+		deletion:
+			firstPlain === -1
+				? null
+				: { start: start + firstPlain, end: start + lastPlain + 1 },
+	};
+}
+
+/**
  * The span of the `add` run carrying a suggestion id. A replacement's id also
  * marks the `del` run after it, which `findSuggestionRange` would include;
  * growing that whole span would re-stamp the replaced text as proposed text.
