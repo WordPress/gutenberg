@@ -89,7 +89,7 @@ export type WordPressComponent<
 };
 
 type RefProps< ForwardsRef extends boolean > = ForwardsRef extends true
-	? React.RefAttributes< any >
+	? Pick< React.RefAttributes< any >, 'ref' >
 	: {};
 
 export type WordPressComponentFromProps<
