@@ -1,0 +1,55 @@
+name: Props Bot Label
+
+on:
+    # Removing the label is what lets it be added again to ask for another
+    # refresh, so it lives apart from the gather: that one cancels superseded
+    # runs, and a cancellation here would strand the label.
+    pull_request_target:
+        types:
+            - labeled
+            # A label added while the pull request could not be acted on is a
+            # request still waiting, so these consume it when it can be.
+            - ready_for_review
+            - reopened
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
+jobs:
+    remove-label:
+        name: Remove the props-bot label
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            pull-requests: write
+        timeout-minutes: 5
+        # Matches the gather's own guard: removing the label on a draft would
+        # take away the request without anything acting on it.
+        if: |
+            (
+              github.event.action == 'labeled' && 'props-bot' == github.event.label.name ||
+              github.event.action != 'labeled' && contains( github.event.pull_request.labels.*.name, 'props-bot' )
+            ) &&
+            ! github.event.pull_request.draft && github.event.pull_request.state == 'open'
+
+        steps:
+            - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+              env:
+                  ISSUE_NUMBER: ${{ github.event.number }}
+              with:
+                  retries: 2
+                  retry-exempt-status-codes: 418
+                  script: |
+                      try {
+                        await github.rest.issues.removeLabel( {
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          issue_number: process.env.ISSUE_NUMBER,
+                          name: 'props-bot',
+                        } );
+                      } catch ( error ) {
+                        // Someone removed it first, which is the same outcome.
+                        if ( error.status !== 404 ) {
+                          throw error;
+                        }
+                      }

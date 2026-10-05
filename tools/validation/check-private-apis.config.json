@@ -12,7 +12,7 @@
 			"via": "packages/ui/src/utils/theme-provider.ts"
 		},
 		{
-			"comment": "Depends on @wordpress/core-data, whose internals unlock private APIs across api-fetch, sync, blocks, block-editor, and global-styles-engine. Remove when the core-data dependency is dropped or those internals stop using private APIs.",
+			"comment": "Depends on @wordpress/core-data, whose internals unlock private APIs across api-fetch, blocks, block-editor, and global-styles-engine. Remove when the core-data dependency is dropped or those internals stop using private APIs.",
 			"package": "fields",
 			"via": "packages/core-data/src/index.js"
 		},
@@ -72,7 +72,7 @@
 			"via": "packages/global-styles-engine/src/index.ts"
 		},
 		{
-			"comment": "Depends on @wordpress/core-data, whose internals unlock private APIs across api-fetch, sync, blocks, block-editor, and global-styles-engine. Remove when the core-data dependency is dropped or those internals stop using private APIs.",
+			"comment": "Depends on @wordpress/core-data, whose internals unlock private APIs across api-fetch, blocks, block-editor, and global-styles-engine. Remove when the core-data dependency is dropped or those internals stop using private APIs.",
 			"package": "global-styles-ui",
 			"via": "packages/core-data/src/index.js"
 		},
@@ -97,7 +97,7 @@
 			"via": "packages/ui/src/utils/theme-provider.ts"
 		},
 		{
-			"comment": "Depends on @wordpress/core-data, whose internals unlock private APIs across api-fetch, sync, blocks, block-editor, and global-styles-engine. Remove when the core-data dependency is dropped or those internals stop using private APIs.",
+			"comment": "Depends on @wordpress/core-data, whose internals unlock private APIs across api-fetch, blocks, block-editor, and global-styles-engine. Remove when the core-data dependency is dropped or those internals stop using private APIs.",
 			"package": "media-editor",
 			"via": "packages/core-data/src/index.js"
 		},
@@ -117,9 +117,14 @@
 			"via": "packages/ui/src/utils/theme-provider.ts"
 		},
 		{
-			"comment": "Depends on @wordpress/core-data, whose internals unlock private APIs across api-fetch, sync, blocks, block-editor, and global-styles-engine. Remove when the core-data dependency is dropped or those internals stop using private APIs.",
+			"comment": "Depends on @wordpress/core-data, whose internals unlock private APIs across api-fetch, blocks, block-editor, and global-styles-engine. Remove when the core-data dependency is dropped or those internals stop using private APIs.",
 			"package": "media-fields",
 			"via": "packages/core-data/src/index.js"
+		},
+		{
+			"comment": "Depends on @wordpress/api-fetch, whose internals unlock private APIs. Remove when api-fetch no longer does.",
+			"package": "sync",
+			"via": "packages/api-fetch/src/index.ts"
 		},
 		{
 			"comment": "ThemeProvider falls back to the WP 7.2 theme/ui private APIs when the public API is unavailable. Remove when the fallback is deleted (scheduled for WP 7.3; see the TODO in the file).",
@@ -127,7 +132,7 @@
 			"via": "packages/ui/src/utils/theme-provider.ts"
 		},
 		{
-			"comment": "Depends on @wordpress/core-data, whose internals unlock private APIs across api-fetch, sync, blocks, block-editor, and global-styles-engine. Remove when the core-data dependency is dropped or those internals stop using private APIs.",
+			"comment": "Depends on @wordpress/core-data, whose internals unlock private APIs across api-fetch, blocks, block-editor, and global-styles-engine. Remove when the core-data dependency is dropped or those internals stop using private APIs.",
 			"package": "views",
 			"via": "packages/core-data/src/index.js"
 		},
