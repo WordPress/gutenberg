@@ -34,7 +34,7 @@ class DatabaseDowngradeError extends Error {
 	 */
 	constructor( environment, dataVersion, serverVersion ) {
 		super(
-			`The ${ environment } database could not start: it was last used by MariaDB ${ dataVersion }, and MariaDB ${ serverVersion } cannot run on data from a newer version. Use MariaDB ${ dataVersion } or newer, or run \`wp-env cleanup\` to delete the databases and create new ones.`
+			`The ${ environment } database could not start: it was last used by MariaDB ${ dataVersion }, and MariaDB ${ serverVersion } cannot run on data from a newer version. Use MariaDB ${ dataVersion } or newer, or run \`wp-env cleanup\` to start over. Cleanup removes the environment's Docker containers, volumes, and local files, not only the databases.`
 		);
 		this.name = 'DatabaseDowngradeError';
 	}
