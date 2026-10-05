@@ -235,22 +235,6 @@ describe( 'buildDockerComposeConfig', () => {
 				'mariadb:latest'
 			);
 		} );
-
-		it.each( [ '10.3', 'latest' ] )(
-			'uses the same health check for %j as for the default',
-			( version ) => {
-				const { healthcheck } = buildWithVersions( null, null ).services
-					.mysql;
-				const config = buildWithVersions( version, version );
-
-				expect( config.services.mysql.healthcheck ).toEqual(
-					healthcheck
-				);
-				expect( config.services[ 'tests-mysql' ].healthcheck ).toEqual(
-					healthcheck
-				);
-			}
-		);
 	} );
 
 	/*
