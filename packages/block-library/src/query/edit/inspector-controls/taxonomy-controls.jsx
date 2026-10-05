@@ -96,9 +96,10 @@ const termToItem = ( term ) => ( {
 
 /**
  * Turns the terms of a hierarchical taxonomy into items, keyed by term id.
+ * A nested term carries the terms it sits under as its description.
  *
  * @param {Array<{id: number, name: string, parent: number}>} terms All the terms of the taxonomy.
- * @return {Map<number, {value: string, label: string}>} The items, keyed by term id.
+ * @return {Map<number, {value: string, label: string, description?: string}>} The items, keyed by term id.
  */
 function getTreeItems( terms ) {
 	const termById = new Map( terms.map( ( term ) => [ term.id, term ] ) );
@@ -112,27 +113,54 @@ function getTreeItems( terms ) {
 			ancestors.unshift( decodeEntities( parent.name ) );
 			parent = termById.get( parent.parent );
 		}
-		const name = decodeEntities( term.name );
 		items.set( term.id, {
 			value: String( term.id ),
-			label: ancestors.length
-				? sprintf(
-						/* translators: 1: term name. 2: the terms it sits under, from the top level down. */
-						_x( '%1$s (%2$s)', 'term' ),
-						name,
-						ancestors.reduce( ( path, ancestor ) =>
-							sprintf(
-								/* translators: 1: a term. 2: the term it holds. */
-								_x( '%1$s › %2$s', 'term ancestors' ),
-								path,
-								ancestor
-							)
+			label: decodeEntities( term.name ),
+			description: ancestors.length
+				? ancestors.reduce( ( path, ancestor ) =>
+						sprintf(
+							/* translators: 1: a term. 2: the term it holds. */
+							_x( '%1$s › %2$s', 'term ancestors' ),
+							path,
+							ancestor
 						)
 					)
-				: name,
+				: undefined,
 		} );
 	}
 	return items;
+}
+
+/**
+ * Renders the selected terms of a hierarchical taxonomy as chips, showing the
+ * terms a nested term sits under in a quieter style than its name.
+ *
+ * @param {Array<{value: string, label: string, description?: string}>} selected The selected items.
+ * @return {React.JSX.Element[]} The chips.
+ */
+function renderTreeChips( selected ) {
+	return selected.map( ( item ) => (
+		<SearchableChipSelectControl.ChipWithRemove
+			key={ item.value }
+			aria-label={
+				item.description
+					? sprintf(
+							/* translators: 1: term name. 2: the terms it sits under, from the top level down. */
+							_x( '%1$s (%2$s)', 'term' ),
+							item.label,
+							item.description
+						)
+					: undefined
+			}
+		>
+			{ item.label }
+			{ item.description && (
+				<span className="block-library-query-inspector__taxonomy-control-path">
+					{ item.description }
+				</span>
+			) }
+		</SearchableChipSelectControl.ChipWithRemove>
+	) );
 }
 
 export function TaxonomyControls( { onChange, query } ) {
@@ -450,6 +478,7 @@ function TaxonomyItem( {
 				filter={ isHierarchical || isPending ? undefined : null }
 				autoHighlight={ inputValue ? 'always' : true }
 				isItemEqualToValue={ isItemEqualToValue }
+				chipsContent={ isHierarchical ? renderTreeChips : undefined }
 				statusContent={ statusContent }
 				emptyContent={ isPending ? null : undefined }
 			/>

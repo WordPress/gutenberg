@@ -331,7 +331,7 @@ test.describe( 'Query block', () => {
 			] );
 		} );
 
-		test( 'should name a nested term after the term it sits under', async ( {
+		test( 'should describe a nested term with the terms it sits under', async ( {
 			page,
 			editor,
 		} ) => {
@@ -340,68 +340,47 @@ test.describe( 'Query block', () => {
 				editor,
 			} );
 			await categoriesControl.click();
+			const getNestedOption = ( name, path ) =>
+				page
+					.getByRole( 'option', { name, exact: true } )
+					.filter( { has: page.getByText( path, { exact: true } ) } );
 
-			// Two terms share the name "News", so each is listed with the term
-			// it sits under. The option's accessible name carries it too.
+			// Two terms share the name "News", so each is described by the term
+			// it sits under. The option's accessible description carries it too.
+			await expect( getNestedOption( 'News', 'Sports' ) ).toBeVisible();
 			await expect(
-				page.getByRole( 'option', {
-					name: 'News (Sports)',
-					exact: true,
-				} )
-			).toBeVisible();
+				getNestedOption( 'News', 'Sports' )
+			).toHaveAccessibleDescription( 'Sports' );
 			await expect(
-				page.getByRole( 'option', {
-					name: 'News (Technology)',
-					exact: true,
-				} )
+				getNestedOption( 'News', 'Technology' )
 			).toBeVisible();
 
-			// A term is named after all the terms it sits under, so that terms
+			// A term is described by all the terms it sits under, so that terms
 			// whose parents share a name can be told apart too.
 			await expect(
-				page.getByRole( 'option', {
-					name: 'News (2023 › Sports)',
-					exact: true,
-				} )
+				getNestedOption( 'News', '2023 › Sports' )
 			).toBeVisible();
 			await expect(
-				page.getByRole( 'option', {
-					name: 'News (2024 › Sports)',
-					exact: true,
-				} )
+				getNestedOption( 'News', '2024 › Sports' )
 			).toBeVisible();
 
-			// A term at the top level keeps its bare name.
+			// A term at the top level has no description.
 			await expect(
 				page.getByRole( 'option', { name: 'Alpaca', exact: true } )
-			).toBeVisible();
+			).toHaveAccessibleDescription( '' );
 
 			// The context survives narrowing the list down.
 			await categoriesControl.fill( 'News' );
+			await expect( getNestedOption( 'News', 'Sports' ) ).toBeVisible();
 			await expect(
-				page.getByRole( 'option', {
-					name: 'News (Sports)',
-					exact: true,
-				} )
+				getNestedOption( 'News', 'Technology' )
 			).toBeVisible();
 			await expect(
-				page.getByRole( 'option', {
-					name: 'News (Technology)',
-					exact: true,
-				} )
+				getNestedOption( 'News', '2024 › Sports' )
 			).toBeVisible();
 
-			await expect(
-				page.getByRole( 'option', {
-					name: 'News (2024 › Sports)',
-					exact: true,
-				} )
-			).toBeVisible();
-
-			// The term behind the label is the one that gets stored.
-			await page
-				.getByRole( 'option', { name: 'News (Sports)', exact: true } )
-				.click();
+			// The term behind the option is the one that gets stored.
+			await getNestedOption( 'News', 'Sports' ).click();
 
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
@@ -417,6 +396,11 @@ test.describe( 'Query block', () => {
 					},
 				},
 			] );
+
+			// The chip is named after the term and the terms it sits under.
+			await expect(
+				page.getByRole( 'button', { name: 'Remove', exact: true } )
+			).toHaveAccessibleDescription( /News \(Sports\)/ );
 		} );
 
 		test( 'should select the first matching term on Enter', async ( {

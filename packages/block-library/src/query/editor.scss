@@ -57,3 +57,9 @@
 .wp-block-query > .block-editor-media-placeholder.is-small {
 	min-height: 60px;
 }
+
+.block-library-query-inspector__taxonomy-control-path {
+	margin-inline-start: var(--wpds-dimension-gap-xs);
+	font-size: var(--wpds-typography-font-size-sm);
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
