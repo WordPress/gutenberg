@@ -39,6 +39,8 @@
 
 ### Documentation
 
+-   `SearchableChipSelectControl`: Add an async example explaining limited browse and search results with visible status content.
+
 -   `Menu`: Explain when to disable triggers and items ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
 
 ## 0.23.0 (2026-09-23)
