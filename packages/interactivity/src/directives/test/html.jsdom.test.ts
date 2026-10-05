@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach } from 'vitest';
+import { afterEach, describe, expect, it, beforeEach, vi } from 'vitest';
 import { hydrate } from 'preact';
 import { act } from 'preact/test-utils';
 import '../index'; // Registers all core directives, including `html`.
@@ -26,6 +26,10 @@ describe( 'data-wp-html', () => {
 		document.body.innerHTML = '';
 		// @ts-expect-error `_values` is an internal property, accessed here for testing.
 		hydratedIslands._values = new WeakMap();
+	} );
+
+	afterEach( () => {
+		vi.unstubAllGlobals();
 	} );
 
 	it( 'renders trusted HTML from asDangerousHTML()', async () => {
@@ -61,6 +65,62 @@ describe( 'data-wp-html', () => {
 
 		const target = region.querySelector( 'div' )!;
 		expect( target.innerHTML ).toBe( '<p>Loading…</p>' );
+	} );
+
+	it( 'keeps the server-rendered nodes when they match the trusted HTML on hydration', async () => {
+		const html = '<p>Hi <strong>there</strong></p>';
+		const namespace = uniqueNamespace();
+		const { state } = store( namespace, {
+			state: { html: asDangerousHTML( html ) },
+		} );
+
+		const region = createRegion(
+			namespace,
+			`<div data-wp-html="state.html">${ html }</div>`
+		);
+		const target = region.querySelector( 'div' )!;
+		const serverNode = target.firstElementChild;
+
+		await act( () => hydrate( toVdom( region ), region.parentNode! ) );
+		expect( target.innerHTML ).toBe( html );
+		expect( target.firstElementChild ).toBe( serverNode );
+
+		// A new token with the same HTML doesn't replace them either.
+		await act( () => {
+			state.html = asDangerousHTML( html );
+		} );
+		expect( target.firstElementChild ).toBe( serverNode );
+
+		// Different HTML still renders.
+		await act( () => {
+			state.html = asDangerousHTML( '<em>Bye</em>' );
+		} );
+		expect( target.innerHTML ).toBe( '<em>Bye</em>' );
+	} );
+
+	it( 'keeps the server-rendered nodes when they match a TrustedHTML value on hydration', async () => {
+		const html = '<p>Trusted</p>';
+		// A minimal stand-in for a native `TrustedHTML` value, which
+		// stringifies to the HTML it holds.
+		const trustedValue = { toString: () => html, toJSON: () => html };
+		vi.stubGlobal( 'trustedTypes', {
+			isHTML: ( value: unknown ) => value === trustedValue,
+		} );
+
+		const namespace = uniqueNamespace();
+		store( namespace, {
+			state: { html: asDangerousHTML( trustedValue as never ) },
+		} );
+
+		const region = createRegion(
+			namespace,
+			`<div data-wp-html="state.html">${ html }</div>`
+		);
+		const target = region.querySelector( 'div' )!;
+		const serverNode = target.firstElementChild;
+
+		await act( () => hydrate( toVdom( region ), region.parentNode! ) );
+		expect( target.firstElementChild ).toBe( serverNode );
 	} );
 
 	it( 'does not render a plain string as HTML', async () => {

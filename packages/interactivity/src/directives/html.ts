@@ -82,6 +82,20 @@ directive(
 			}
 
 			const node = ( element.ref as RefObject< HTMLElement > ).current!;
+
+			// Before the first write, the element still holds its
+			// server-rendered content. If that already serializes to the
+			// same HTML, keep its nodes instead of replacing them with
+			// identical ones, which would lose focus, selection, form input,
+			// or embedded media state.
+			if (
+				lastWrittenKey.current === undefined &&
+				node.innerHTML === key
+			) {
+				lastWrittenKey.current = key;
+				return;
+			}
+
 			try {
 				// `resolvedValue` may be a native `TrustedHTML` value from a
 				// site-provided policy, which the DOM lib types this project
