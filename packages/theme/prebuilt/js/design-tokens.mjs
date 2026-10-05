@@ -739,6 +739,23 @@ export const tokens = {
 			},
 		},
 	},
+	'--wpds-color-background-thumb-neutral': {
+		$description:
+			'Background color for thumbs with a neutral tone and normal emphasis (eg. progressbar indicator).',
+		$type: 'color',
+		group: 'color',
+		modes: {
+			default: {
+				$value: {
+					colorSpace: 'srgb',
+					components: [ 0.118, 0.118, 0.118 ],
+					hex: '#1e1e1e',
+					alpha: 1,
+				},
+				css: '#1e1e1e',
+			},
+		},
+	},
 	'--wpds-color-background-thumb-neutral-weak': {
 		$description:
 			'Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb).',
@@ -2518,6 +2535,7 @@ export const groups = {
 		'--wpds-color-background-interactive-error-weak-disabled',
 		'--wpds-color-background-track-neutral-weak',
 		'--wpds-color-background-track-neutral',
+		'--wpds-color-background-thumb-neutral',
 		'--wpds-color-background-thumb-neutral-weak',
 		'--wpds-color-background-thumb-neutral-weak-active',
 		'--wpds-color-background-thumb-brand',

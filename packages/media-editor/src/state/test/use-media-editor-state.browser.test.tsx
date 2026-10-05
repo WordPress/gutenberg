@@ -6,10 +6,9 @@ import { useEffect } from '@wordpress/element';
 import { Cropper } from '../../image-editor';
 import {
 	useMediaEditorState,
-	type MediaEditorController,
+	type MediaEditorSession,
 } from '../use-media-editor-state';
 // Browser Mode needs the package's real styles for layout and transitions.
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '../../image-editor/style.scss';
 
 // Shown below 1:1 in the fixture, so pixel snapping stays off until a crop
@@ -23,15 +22,17 @@ const IMAGE = {
 function CropperWithHistory( {
 	onController,
 }: {
-	onController: ( controller: MediaEditorController ) => void;
+	onController: ( controller: MediaEditorSession ) => void;
 } ) {
-	const controller = useMediaEditorState( { cropper: { image: IMAGE } } );
+	const controller = useMediaEditorState();
+	const { setSourceImage } = controller;
+	useEffect( () => setSourceImage( IMAGE ), [ setSourceImage ] );
 	useEffect( () => onController( controller ), [ controller, onController ] );
 	return (
 		<div style={ { width: 648, height: 448 } }>
 			<Cropper
 				src={ IMAGE.src }
-				controller={ controller }
+				controller={ controller.cropper }
 				freeformCrop
 				onGestureStart={ controller.beginGesture }
 				onGestureEnd={ controller.endGesture }
@@ -42,8 +43,8 @@ function CropperWithHistory( {
 
 describe( 'useMediaEditorState with a Cropper', () => {
 	it( 'keeps redo steps after redoing a handle crop that turns on pixel snapping', async () => {
-		let controller!: MediaEditorController;
-		const onController = ( next: MediaEditorController ) => {
+		let controller!: MediaEditorSession;
+		const onController = ( next: MediaEditorSession ) => {
 			controller = next;
 		};
 		await render( <CropperWithHistory onController={ onController } /> );
@@ -61,11 +62,11 @@ describe( 'useMediaEditorState with a Cropper', () => {
 				'{/Shift}'
 		);
 		await waitFor( () =>
-			expect( controller.state.zoom ).toBeGreaterThan( 1 )
+			expect( controller.cropper.state.zoom ).toBeGreaterThan( 1 )
 		);
 
 		act( () =>
-			controller.setFlip( { horizontal: true, vertical: false } )
+			controller.cropper.setFlip( { horizontal: true, vertical: false } )
 		);
 
 		for ( let i = 0; i < 10 && controller.hasUndo; i++ ) {

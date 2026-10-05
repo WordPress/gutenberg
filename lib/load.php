@@ -68,6 +68,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.2/view-config-api.php';
 	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-view-config-controller-7-2.php';
 	require __DIR__ . '/compat/wordpress-7.2/rest-api.php';
+	require __DIR__ . '/compat/wordpress-7.2/edit-root-attachment.php';
 
 	// Real-time collaboration.
 	require __DIR__ . '/experimental/collaboration/class-gutenberg-rest-autosaves-controller.php';
@@ -133,6 +134,10 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-media-editor' ) ) {
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-workflow-palette' ) ) {
 	require __DIR__ . '/experimental/workflow-palette.php';
+}
+
+if ( gutenberg_is_experiment_enabled( 'gutenberg-wpds-admin-restyle' ) ) {
+	require __DIR__ . '/experimental/wpds-admin/load.php';
 }
 
 // Plugin specific code.

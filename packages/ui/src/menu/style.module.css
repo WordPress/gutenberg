@@ -11,7 +11,8 @@
 			--wp-ui-menu-min-width: 160px;
 			--wp-ui-menu-max-width: var(--wpds-dimension-surface-width-md);
 			--wp-ui-menu-item-padding-inline: var(--wpds-dimension-padding-md);
-			--wp-ui-menu-group-head-padding-inline: var(--wpds-dimension-padding-md);
+			--_wp-ui-menu-group-head-padding-base: var(--wpds-dimension-padding-md);
+			--wp-ui-menu-group-head-padding-inline: var(--_wp-ui-menu-group-head-padding-base);
 			--wp-ui-menu-selection-indicator-track-size: 0px;
 			--wp-ui-menu-selection-indicator-size: var(--wpds-dimension-size-sm);
 			--wp-ui-menu-selection-indicator-gap: 0px;
@@ -57,7 +58,8 @@
 		/*
 		 * The list is the implicit alignment group for direct items. Explicit
 		 * groups and radio groups each establish an independent prefix track while
-		 * inheriting the menu-wide selection tracks.
+		 * inheriting the menu-wide selection tracks. Group labels and separators
+		 * follow that shared selection track so they line up with item labels.
 		 */
 		.list,
 		.group,
@@ -88,13 +90,22 @@
 			--wp-ui-menu-group-prefix-gap: var(--wpds-dimension-gap-xs);
 		}
 
+		/*
+		 * Start after the selection track (`prefix-start`) and stop before the
+		 * trailing item padding (`content-end`). A zero-width prefix track keeps
+		 * this on the label line; a real prefix stays in its own column so one
+		 * group's icons do not shift every heading and divider.
+		 * `--wp-ui-menu-group-head-padding-inline` still nudges both edges. Its
+		 * default matches the item padding the grid already applies.
+		 */
 		.group-label {
-			grid-column: 1 / -1;
+			grid-column: prefix-start / content-end;
 			display: flex;
 			align-items: center;
+			min-width: 0;
 			min-height: var(--wpds-dimension-size-md);
 			padding-block: var(--wpds-dimension-padding-xs);
-			padding-inline: var(--wp-ui-menu-group-head-padding-inline);
+			margin-inline: calc(var(--wp-ui-menu-group-head-padding-inline) - var(--_wp-ui-menu-group-head-padding-base));
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-xs);
 			font-weight: var(--wpds-typography-font-weight-emphasis);
@@ -104,10 +115,10 @@
 		}
 
 		.separator {
-			grid-column: 1 / -1;
+			grid-column: prefix-start / content-end;
 			height: var(--wpds-border-width-xs);
 			margin-block: var(--wpds-dimension-gap-xs);
-			margin-inline: var(--wp-ui-menu-group-head-padding-inline);
+			margin-inline: calc(var(--wp-ui-menu-group-head-padding-inline) - var(--_wp-ui-menu-group-head-padding-base));
 			background-color: var(--wpds-color-stroke-surface-neutral-weak);
 
 			@media ( forced-colors: active ) {
