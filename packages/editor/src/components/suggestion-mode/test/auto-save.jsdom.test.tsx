@@ -1,15 +1,29 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+	afterEach,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
 import { render, act } from '@testing-library/react';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
-import SuggestionAutoSave, { operationsForEntry } from '../auto-save';
+// @ts-expect-error No exported types
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { createBlock, registerBlockType } from '@wordpress/blocks';
+import SuggestionAutoSave, {
+	operationsForBlock,
+	POST_TITLE_CLIENT_ID,
+} from '../auto-save';
 import {
 	SuggestionSessionProvider,
 	useSuggestionSession,
-	POST_TITLE_OVERLAY_KEY,
 } from '../suggestion-session';
+import { postOperationsFromTitle } from '../operations';
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -44,6 +58,24 @@ vi.mock( import( '../provider' ), async ( importOriginal ) => {
 	};
 } );
 
+const TEST_BLOCK = 'core/test-autosave-heading';
+
+beforeAll( () => {
+	registerBlockType( TEST_BLOCK, {
+		apiVersion: 3,
+		title: 'Test',
+		category: 'text',
+		attributes: {
+			content: { type: 'string', default: '' },
+			level: { type: 'number', default: 2 },
+			metadata: { type: 'object' },
+		},
+		save() {
+			return null;
+		},
+	} );
+} );
+
 beforeEach( () => {
 	createSuggestion.mockReset();
 	updateSuggestion.mockReset();
@@ -55,27 +87,44 @@ afterEach( () => {
 	vi.useRealTimers();
 } );
 
-function renderInSuggestMode( ui: React.ReactElement ) {
+function createTestRegistry( intent: string, blocks: any[] ) {
 	const registry = createRegistry();
 	registry.register( noticesStore );
 	registry.register( coreStore );
 	// `setEditorIntent` compares the editor mode across the change so it can
 	// announce a canvas swap, and `getEditorMode` reads the preferences store.
 	registry.register( preferencesStore );
+	registry.register( blockEditorStore );
 	registry.register( editorStore );
-	unlock( registry.dispatch( editorStore ) ).setEditorIntent( 'suggest' );
+	registry.dispatch( blockEditorStore ).resetBlocks( blocks );
+	unlock( registry.dispatch( editorStore ) ).setEditorIntent( intent );
+	return registry;
+}
 
+function renderWith( intent: string, blocks: any[] ) {
+	const registry = createTestRegistry( intent, blocks );
 	const wrapper = ( { children }: { children?: React.ReactNode } ) => (
 		<RegistryProvider value={ registry }>
 			<SuggestionSessionProvider>{ children }</SuggestionSessionProvider>
 		</RegistryProvider>
 	);
-
-	return { registry, ...render( ui, { wrapper } ) };
+	return {
+		registry,
+		...render(
+			<>
+				<CaptureSession />
+				<SuggestionAutoSave />
+			</>,
+			{ wrapper }
+		),
+	};
 }
 
+const heading = ( content = 'Hi', extra: Record< string, any > = {} ) =>
+	createBlock( TEST_BLOCK, { content, level: 2, ...extra } );
+
 // Seed a comment record so `getEntityRecord( 'root', 'comment', id )` resolves
-// without an HTTP fetch — mirrors what `useNoteThreads`'s entity query would
+// without an HTTP fetch, mirroring what `useNoteThreads`'s entity query would
 // have populated by the time a suggestion is in flight.
 function seedComment( registry: any, comment: any ) {
 	registry
@@ -83,11 +132,40 @@ function seedComment( registry: any, comment: any ) {
 		.receiveEntityRecords( 'root', 'comment', [ comment ] );
 }
 
-// Test harness exposes the overlay API via a render-prop ref so tests can
-// drive the reducer directly.
-let overlayHandle: ReturnType< typeof useSuggestionSession >;
-function CaptureOverlay() {
-	overlayHandle = useSuggestionSession();
+const markerOf = ( registry: any, clientId: string ) =>
+	registry.select( blockEditorStore ).getBlockAttributes( clientId )?.metadata
+		?.suggestion;
+
+// Write a proposal the way the HOC does: the whole marker, keeping what is
+// already on it (commentId, authorId).
+function propose(
+	registry: any,
+	clientId: string,
+	after: Record< string, any >,
+	marker: Record< string, any > = {}
+) {
+	act( () => {
+		const attributes = registry
+			.select( blockEditorStore )
+			.getBlockAttributes( clientId );
+		registry.dispatch( blockEditorStore ).updateBlockAttributes( clientId, {
+			metadata: {
+				...attributes.metadata,
+				suggestion: {
+					type: 'pending-attributes',
+					authorId: null,
+					...attributes.metadata?.suggestion,
+					...marker,
+					after,
+				},
+			},
+		} );
+	} );
+}
+
+let session: ReturnType< typeof useSuggestionSession >;
+function CaptureSession() {
+	session = useSuggestionSession();
 	return null;
 }
 
@@ -98,138 +176,102 @@ async function flushPromises() {
 	} );
 }
 
+async function pastDebounce() {
+	await act( async () => {
+		vi.advanceTimersByTime( 1500 );
+	} );
+	await flushPromises();
+	await flushPromises();
+}
+
 describe( 'SuggestionAutoSave', () => {
-	it( 'POSTs a new suggestion after the debounce window', async () => {
+	it( 'POSTs a new suggestion after the debounce window and writes the note id onto the marker', async () => {
 		createSuggestion.mockResolvedValue( { id: 42 } );
+		const block = heading();
+		const { registry } = renderWith( 'suggest', [ block ] );
 
-		renderInSuggestMode(
-			<>
-				<CaptureOverlay />
-				<SuggestionAutoSave />
-			</>
-		);
-
-		act( () => {
-			overlayHandle.captureBaseline( 'a', 'core/paragraph', {
-				content: 'Hi',
-			} );
-			overlayHandle.setOverlayAttributes( 'a', { content: 'Hello' } );
-		} );
+		propose( registry, block.clientId, { level: 3 } );
 
 		// Before the debounce window: no POST.
 		expect( createSuggestion ).not.toHaveBeenCalled();
 
-		await act( async () => {
-			vi.advanceTimersByTime( 1500 );
-		} );
-		await flushPromises();
-		await flushPromises();
+		await pastDebounce();
 
 		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
-		expect( createSuggestion ).toHaveBeenCalledWith(
-			expect.objectContaining( {
-				clientId: 'a',
-				blockName: 'core/paragraph',
-				operations: expect.arrayContaining( [
-					expect.objectContaining( { attribute: 'content' } ),
-				] ),
-			} )
-		);
+		expect( createSuggestion ).toHaveBeenCalledWith( {
+			clientId: block.clientId,
+			blockName: TEST_BLOCK,
+			operations: [
+				{
+					type: 'attribute-set',
+					attribute: 'level',
+					before: 2,
+					after: 3,
+				},
+			],
+		} );
+		expect( markerOf( registry, block.clientId ) ).toEqual( {
+			type: 'pending-attributes',
+			authorId: null,
+			after: { level: 3 },
+			commentId: 42,
+		} );
+		// The live block is untouched.
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( block.clientId ).level
+		).toBe( 2 );
 	} );
 
 	it( 'updates the same comment on subsequent edits', async () => {
 		createSuggestion.mockResolvedValue( { id: 42 } );
 		updateSuggestion.mockResolvedValue( { id: 42 } );
+		const block = heading();
+		const { registry } = renderWith( 'suggest', [ block ] );
 
-		renderInSuggestMode(
-			<>
-				<CaptureOverlay />
-				<SuggestionAutoSave />
-			</>
-		);
-
-		act( () => {
-			overlayHandle.captureBaseline( 'a', 'core/paragraph', {
-				content: 'Hi',
-			} );
-			overlayHandle.setOverlayAttributes( 'a', { content: 'Hello' } );
-		} );
-
-		await act( async () => {
-			vi.advanceTimersByTime( 1500 );
-		} );
-		await flushPromises();
-		await flushPromises();
-
+		propose( registry, block.clientId, { level: 3 } );
+		await pastDebounce();
 		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
 
-		// User keeps typing.
-		act( () => {
-			overlayHandle.setOverlayAttributes( 'a', {
-				content: 'Hello world',
-			} );
-		} );
-
-		await act( async () => {
-			vi.advanceTimersByTime( 1500 );
-		} );
-		await flushPromises();
-		await flushPromises();
+		// User keeps editing.
+		propose( registry, block.clientId, { level: 4 } );
+		await pastDebounce();
 
 		expect( updateSuggestion ).toHaveBeenCalledTimes( 1 );
 		expect( updateSuggestion ).toHaveBeenCalledWith(
 			expect.objectContaining( {
 				commentId: 42,
-				operations: expect.arrayContaining( [
-					expect.objectContaining( {
-						attribute: 'content',
-						after: 'Hello world',
-					} ),
-				] ),
+				operations: [
+					expect.objectContaining( { attribute: 'level', after: 4 } ),
+				],
 			} )
 		);
+		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'deletes the comment when the overlay returns to baseline', async () => {
+	it( 'trashes the note when the marker has nothing left to propose', async () => {
 		createSuggestion.mockResolvedValue( { id: 42 } );
 		deleteSuggestion.mockResolvedValue( undefined );
+		const block = heading();
+		const { registry } = renderWith( 'suggest', [ block ] );
 
-		renderInSuggestMode(
-			<>
-				<CaptureOverlay />
-				<SuggestionAutoSave />
-			</>
-		);
+		propose( registry, block.clientId, { level: 3 } );
+		await pastDebounce();
 
-		act( () => {
-			overlayHandle.captureBaseline( 'a', 'core/paragraph', {
-				content: 'Hi',
-			} );
-			overlayHandle.setOverlayAttributes( 'a', { content: 'Hello' } );
-		} );
-
-		await act( async () => {
-			vi.advanceTimersByTime( 1500 );
-		} );
-		await flushPromises();
-		await flushPromises();
-
-		// User reverts the overlay back to the baseline.
-		act( () => {
-			overlayHandle.setOverlayAttributes( 'a', { content: 'Hi' } );
-		} );
-
-		await act( async () => {
-			vi.advanceTimersByTime( 1500 );
-		} );
-		await flushPromises();
-		await flushPromises();
+		// The HOC never writes such a marker, but a peer or a stale sync
+		// could: a proposal equal to the live value is no suggestion.
+		propose( registry, block.clientId, { level: 2 } );
+		await pastDebounce();
 
 		expect( deleteSuggestion ).toHaveBeenCalledTimes( 1 );
 		expect( deleteSuggestion ).toHaveBeenCalledWith( {
 			commentId: 42,
-			clientId: 'a',
+			clientId: block.clientId,
 		} );
+		expect(
+			markerOf( registry, block.clientId ).commentId
+		).toBeUndefined();
 	} );
 
 	it( 'does not duplicate work when the user keeps typing during an in-flight save', async () => {
@@ -242,40 +284,24 @@ describe( 'SuggestionAutoSave', () => {
 				} )
 		);
 		updateSuggestion.mockResolvedValue( { id: 42 } );
+		const block = heading();
+		const { registry } = renderWith( 'suggest', [ block ] );
 
-		renderInSuggestMode(
-			<>
-				<CaptureOverlay />
-				<SuggestionAutoSave />
-			</>
-		);
-
-		act( () => {
-			overlayHandle.captureBaseline( 'a', 'core/paragraph', {
-				content: 'Hi',
-			} );
-			overlayHandle.setOverlayAttributes( 'a', { content: 'Hello' } );
-		} );
-
+		propose( registry, block.clientId, { level: 3 } );
 		await act( async () => {
 			vi.advanceTimersByTime( 1500 );
 		} );
 		await flushPromises();
 
-		// Save_A is in flight. User keeps typing.
-		act( () => {
-			overlayHandle.setOverlayAttributes( 'a', {
-				content: 'Hello world',
-			} );
-		} );
-
+		// Save_A is in flight. User keeps editing.
+		propose( registry, block.clientId, { level: 4 } );
 		await act( async () => {
 			vi.advanceTimersByTime( 1500 );
 		} );
 		await flushPromises();
 
-		// We must not have issued a duplicate create — the second sync is
-		// queued behind the in-flight create.
+		// No duplicate create: the second sync is queued behind the
+		// in-flight create.
 		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
 		expect( updateSuggestion ).toHaveBeenCalledTimes( 0 );
 
@@ -292,120 +318,59 @@ describe( 'SuggestionAutoSave', () => {
 		expect( updateSuggestion ).toHaveBeenCalledWith(
 			expect.objectContaining( {
 				commentId: 42,
-				operations: expect.arrayContaining( [
-					expect.objectContaining( {
-						after: 'Hello world',
-					} ),
-				] ),
+				operations: [ expect.objectContaining( { after: 4 } ) ],
 			} )
 		);
 	} );
 
 	it( 'creates a fresh suggestion when the linked note has been resolved', async () => {
-		// First create resolves; second create resolves with a different id so
-		// we can assert the overlay's commentId rotated.
 		createSuggestion
 			.mockResolvedValueOnce( { id: 42 } )
 			.mockResolvedValueOnce( { id: 43 } );
 		updateSuggestion.mockResolvedValue( { id: 42 } );
+		const block = heading();
+		const { registry } = renderWith( 'suggest', [ block ] );
 
-		const { registry } = renderInSuggestMode(
-			<>
-				<CaptureOverlay />
-				<SuggestionAutoSave />
-			</>
-		);
-
-		// User A's first edit: bold suggestion. Auto-save creates note 42.
-		act( () => {
-			overlayHandle.captureBaseline( 'a', 'core/paragraph', {
-				content: 'Hi',
-			} );
-			overlayHandle.setOverlayAttributes( 'a', { content: 'Hello' } );
-		} );
-
-		await act( async () => {
-			vi.advanceTimersByTime( 1500 );
-		} );
-		await flushPromises();
-		await flushPromises();
-
+		// User A's first edit. Auto-save creates note 42.
+		propose( registry, block.clientId, { level: 3 } );
+		await pastDebounce();
 		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
 
-		// User B accepts note 42 — server flips status to 'approved'. Seed
-		// the resolved comment in the registry so the next sync sees it.
+		// User B accepts note 42: the server flips status to 'approved'.
 		seedComment( registry, { id: 42, status: 'approved' } );
 
-		// User A keeps editing the same block (different attribute change).
-		act( () => {
-			overlayHandle.setOverlayAttributes( 'a', {
-				content: 'Hello world',
-			} );
-		} );
+		// User A keeps editing the same block.
+		propose( registry, block.clientId, { level: 4 } );
+		await pastDebounce();
 
-		await act( async () => {
-			vi.advanceTimersByTime( 1500 );
-		} );
-		await flushPromises();
-		await flushPromises();
-
-		// The new edit must NOT update the resolved note 42 — it must spawn
-		// a fresh note that coexists with the resolved one.
+		// The new edit must NOT update the resolved note 42; it spawns a
+		// fresh note that coexists with the resolved one.
 		expect( updateSuggestion ).not.toHaveBeenCalled();
 		expect( createSuggestion ).toHaveBeenCalledTimes( 2 );
 		expect( createSuggestion ).toHaveBeenLastCalledWith(
 			expect.objectContaining( {
-				clientId: 'a',
-				operations: expect.arrayContaining( [
-					expect.objectContaining( {
-						attribute: 'content',
-						after: 'Hello world',
-					} ),
-				] ),
+				clientId: block.clientId,
+				operations: [
+					expect.objectContaining( { attribute: 'level', after: 4 } ),
+				],
 			} )
 		);
+		expect( markerOf( registry, block.clientId ).commentId ).toBe( 43 );
 	} );
 
 	it( 'continues to update the linked note while it is still pending', async () => {
 		createSuggestion.mockResolvedValue( { id: 42 } );
 		updateSuggestion.mockResolvedValue( { id: 42 } );
+		const block = heading();
+		const { registry } = renderWith( 'suggest', [ block ] );
 
-		const { registry } = renderInSuggestMode(
-			<>
-				<CaptureOverlay />
-				<SuggestionAutoSave />
-			</>
-		);
+		propose( registry, block.clientId, { level: 3 } );
+		await pastDebounce();
 
-		act( () => {
-			overlayHandle.captureBaseline( 'a', 'core/paragraph', {
-				content: 'Hi',
-			} );
-			overlayHandle.setOverlayAttributes( 'a', { content: 'Hello' } );
-		} );
-
-		await act( async () => {
-			vi.advanceTimersByTime( 1500 );
-		} );
-		await flushPromises();
-		await flushPromises();
-
-		// Note exists in the cache but is still pending — same as the
-		// real-world case where the comments query has run but no one has
-		// resolved the note yet.
 		seedComment( registry, { id: 42, status: 'hold' } );
 
-		act( () => {
-			overlayHandle.setOverlayAttributes( 'a', {
-				content: 'Hello world',
-			} );
-		} );
-
-		await act( async () => {
-			vi.advanceTimersByTime( 1500 );
-		} );
-		await flushPromises();
-		await flushPromises();
+		propose( registry, block.clientId, { level: 4 } );
+		await pastDebounce();
 
 		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
 		expect( updateSuggestion ).toHaveBeenCalledTimes( 1 );
@@ -414,36 +379,78 @@ describe( 'SuggestionAutoSave', () => {
 		);
 	} );
 
-	it( 'does nothing when the editor is not in Suggest intent', async () => {
-		const registry = createRegistry();
-		registry.register( noticesStore );
-		registry.register( preferencesStore );
-		registry.register( editorStore );
-		unlock( registry.dispatch( editorStore ) ).setEditorIntent( 'edit' );
-
-		const wrapper = ( { children }: { children?: React.ReactNode } ) => (
-			<RegistryProvider value={ registry }>
-				<SuggestionSessionProvider>
-					{ children }
-				</SuggestionSessionProvider>
-			</RegistryProvider>
-		);
-
-		render(
-			<>
-				<CaptureOverlay />
-				<SuggestionAutoSave />
-			</>,
-			{ wrapper }
-		);
-
-		act( () => {
-			overlayHandle.captureBaseline( 'a', 'core/paragraph', {
-				content: 'Hi',
-			} );
-			overlayHandle.setOverlayAttributes( 'a', { content: 'Hello' } );
+	it( 'does not create a second note when the marker has no commentId but metadata.noteId links a pending attribute note', async () => {
+		updateSuggestion.mockResolvedValue( { id: 42 } );
+		// The editor was closed between the create and the commentId
+		// write-back; the link survives in `metadata.noteId`.
+		const block = heading( 'Hi', {
+			metadata: {
+				noteId: [ 42 ],
+				suggestion: { type: 'pending-attributes', after: { level: 3 } },
+			},
+		} );
+		const { registry } = renderWith( 'suggest', [ block ] );
+		seedComment( registry, {
+			id: 42,
+			status: 'hold',
+			meta: {
+				_wp_suggestion_status: 'pending',
+				_wp_suggestion: JSON.stringify( {
+					schemaVersion: 2,
+					blockName: TEST_BLOCK,
+					baseRevision: null,
+					operations: [
+						{
+							type: 'attribute-set',
+							attribute: 'level',
+							before: 2,
+							after: 3,
+						},
+					],
+				} ),
+			},
 		} );
 
+		propose( registry, block.clientId, { level: 4 } );
+		await pastDebounce();
+
+		expect( createSuggestion ).not.toHaveBeenCalled();
+		expect( updateSuggestion ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				commentId: 42,
+				operations: [
+					expect.objectContaining( { attribute: 'level', after: 4 } ),
+				],
+			} )
+		);
+	} );
+
+	it( 'leaves a proposal another author wrote to that author', async () => {
+		const block = heading( 'Hi', {
+			metadata: {
+				suggestion: {
+					type: 'pending-attributes',
+					authorId: 7,
+					after: { level: 3 },
+				},
+			},
+		} );
+		const { registry } = renderWith( 'suggest', [ block ] );
+		act( () => {
+			registry.dispatch( coreStore ).receiveCurrentUser( { id: 3 } );
+		} );
+
+		propose( registry, block.clientId, { level: 4 }, { authorId: 7 } );
+		await pastDebounce();
+
+		expect( createSuggestion ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does nothing when the editor is not in Suggest intent', async () => {
+		const block = heading();
+		const { registry } = renderWith( 'edit', [ block ] );
+
+		propose( registry, block.clientId, { level: 3 } );
 		await act( async () => {
 			vi.advanceTimersByTime( 5000 );
 		} );
@@ -454,20 +461,10 @@ describe( 'SuggestionAutoSave', () => {
 
 	it( 'saves a pending suggestion right away when the user leaves Suggest intent', async () => {
 		createSuggestion.mockResolvedValue( { id: 42 } );
+		const block = heading();
+		const { registry } = renderWith( 'suggest', [ block ] );
 
-		const { registry } = renderInSuggestMode(
-			<>
-				<CaptureOverlay />
-				<SuggestionAutoSave />
-			</>
-		);
-
-		act( () => {
-			overlayHandle.captureBaseline( 'a', 'core/paragraph', {
-				content: 'Hi',
-			} );
-			overlayHandle.setOverlayAttributes( 'a', { content: 'Hello' } );
-		} );
+		propose( registry, block.clientId, { level: 3 } );
 
 		// Leave Suggest mode mid-debounce. The suggestion was already made,
 		// so it must not wait for a return to Suggest intent to persist.
@@ -497,37 +494,21 @@ describe( 'SuggestionAutoSave', () => {
 
 		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
 	} );
-} );
 
-describe( 'operationsForEntry', () => {
 	it( "does not postpone one block's save while another keeps changing", async () => {
 		createSuggestion.mockImplementation( async ( { clientId } ) => ( {
 			id: clientId === 'a' ? 1 : 2,
 		} ) );
+		const a = heading( 'A' );
+		const b = heading( 'B' );
+		const { registry } = renderWith( 'suggest', [ a, b ] );
 
-		renderInSuggestMode(
-			<>
-				<CaptureOverlay />
-				<SuggestionAutoSave />
-			</>
-		);
+		propose( registry, a.clientId, { level: 3 } );
 
-		act( () => {
-			overlayHandle.captureBaseline( 'a', 'core/paragraph', {
-				content: 'A',
-			} );
-			overlayHandle.setOverlayAttributes( 'a', { content: 'A edited' } );
-			overlayHandle.captureBaseline( 'b', 'core/paragraph', {
-				content: 'B',
-			} );
-		} );
-
-		// Keep typing in B every 500ms, past A's debounce window.
+		// Keep editing B every 500ms, past A's debounce window.
 		for ( let i = 0; i < 4; i++ ) {
+			propose( registry, b.clientId, { level: 3 + i } );
 			await act( async () => {
-				overlayHandle.setOverlayAttributes( 'b', {
-					content: 'B' + 'x'.repeat( i + 1 ),
-				} );
 				vi.advanceTimersByTime( 500 );
 			} );
 		}
@@ -535,68 +516,124 @@ describe( 'operationsForEntry', () => {
 		await flushPromises();
 
 		expect( createSuggestion ).toHaveBeenCalledWith(
-			expect.objectContaining( { clientId: 'a' } )
+			expect.objectContaining( { clientId: a.clientId } )
 		);
 		expect( createSuggestion ).not.toHaveBeenCalledWith(
-			expect.objectContaining( { clientId: 'b' } )
+			expect.objectContaining( { clientId: b.clientId } )
 		);
 	} );
 
 	it( 'saves a pending suggestion when it unmounts', async () => {
 		createSuggestion.mockResolvedValue( { id: 42 } );
+		const block = heading();
+		const { registry, rerender } = renderWith( 'suggest', [ block ] );
 
-		const { rerender } = renderInSuggestMode(
-			<>
-				<CaptureOverlay />
-				<SuggestionAutoSave />
-			</>
-		);
+		propose( registry, block.clientId, { level: 3 } );
 
-		act( () => {
-			overlayHandle.captureBaseline( 'a', 'core/paragraph', {
-				content: 'Hi',
-			} );
-			overlayHandle.setOverlayAttributes( 'a', { content: 'Hello' } );
-		} );
-
-		rerender( <CaptureOverlay /> );
+		rerender( <CaptureSession /> );
 		await flushPromises();
 		await flushPromises();
 
 		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'derives attribute-set ops from baseline + overlay when no structural op is set', () => {
+	it( 'saves the post title proposal with no block to link', async () => {
+		createSuggestion.mockResolvedValue( { id: 9 } );
+		renderWith( 'suggest', [] );
+
+		act( () => {
+			session.setPostTitleProposal( {
+				baseline: 'Old',
+				proposed: 'New',
+			} );
+		} );
+		await pastDebounce();
+
+		expect( createSuggestion ).toHaveBeenCalledWith( {
+			clientId: undefined,
+			blockName: '',
+			operations: [
+				{
+					type: 'post-attribute-set',
+					attribute: 'title',
+					before: 'Old',
+					after: 'New',
+				},
+			],
+		} );
+		expect( POST_TITLE_CLIENT_ID ).toBe( '__post_title__' );
+	} );
+} );
+
+describe( 'operationsForBlock', () => {
+	const treeStub = {
+		getBlock: ( clientId: string ) => ( {
+			clientId,
+			name: 'core/paragraph',
+			attributes: {},
+			innerBlocks: [],
+		} ),
+		getBlockName: () => 'core/paragraph',
+		getBlockRootClientId: () => '',
+		getBlockOrder: () => [ 'a' ],
+		getBlockAttributes: () => ( {} ),
+	} as any;
+
+	it( 'derives attribute-set ops from live attributes and the marker after', () => {
 		expect(
-			operationsForEntry( {
-				blockName: 'core/paragraph',
-				baselineAttributes: { content: 'a' },
-				overlayAttributes: { content: 'b' },
-				commentId: null,
-				syncedOpsKey: null,
-			} )
+			operationsForBlock(
+				'a',
+				{
+					level: 2,
+					metadata: {
+						suggestion: {
+							type: 'pending-attributes',
+							after: { level: 3 },
+						},
+					},
+				},
+				{ type: 'pending-attributes', after: { level: 3 } },
+				undefined,
+				treeStub
+			)
 		).toEqual( [
-			{
-				type: 'attribute-set',
-				attribute: 'content',
-				before: 'a',
-				after: 'b',
-			},
+			{ type: 'attribute-set', attribute: 'level', before: 2, after: 3 },
 		] );
 	} );
 
-	it( 'derives post-attribute-set ops for the post title entry', () => {
+	it( 'emits the recorded structural op first, then attribute ops', () => {
+		const op = { type: 'block-move', clientId: 'a', fromIndex: 1 };
 		expect(
-			operationsForEntry(
-				{
-					blockName: '',
-					baselineAttributes: { title: 'Old' },
-					overlayAttributes: { title: 'New' },
-					commentId: null,
-					syncedOpsKey: null,
-				},
-				POST_TITLE_OVERLAY_KEY
+			operationsForBlock(
+				'a',
+				{ level: 2 },
+				{ type: 'pending-move', fromIndex: 1, after: { level: 3 } },
+				{ op, seq: 1, blockName: 'core/paragraph' },
+				treeStub
 			)
+		).toEqual( [
+			op,
+			{ type: 'attribute-set', attribute: 'level', before: 2, after: 3 },
+		] );
+	} );
+
+	it( 'derives the structural op from the marker when no capture was recorded', () => {
+		expect(
+			operationsForBlock(
+				'a',
+				{ level: 2 },
+				{ type: 'pending-remove' },
+				undefined,
+				treeStub
+			)
+		).toEqual( [
+			expect.objectContaining( { type: 'block-remove', clientId: 'a' } ),
+		] );
+	} );
+
+	it( 'derives post-attribute-set ops for the title proposal', () => {
+		expect(
+			postOperationsFromTitle( { baseline: 'Old', proposed: 'New' } )
 		).toEqual( [
 			{
 				type: 'post-attribute-set',
@@ -605,45 +642,8 @@ describe( 'operationsForEntry', () => {
 				after: 'New',
 			},
 		] );
-	} );
-
-	it( 'returns the structural op as a single-element array when present', () => {
-		const op = {
-			type: 'block-remove',
-			clientId: 'x',
-			blockName: 'core/paragraph',
-		};
 		expect(
-			operationsForEntry( {
-				blockName: 'core/paragraph',
-				baselineAttributes: {},
-				overlayAttributes: {},
-				structuralOp: op,
-				commentId: null,
-				syncedOpsKey: null,
-			} )
-		).toEqual( [ op ] );
-	} );
-
-	it( 'emits structural op first then attribute-set ops when both are present', () => {
-		const op = { type: 'block-remove', clientId: 'x' };
-		expect(
-			operationsForEntry( {
-				blockName: 'core/paragraph',
-				baselineAttributes: { content: 'a' },
-				overlayAttributes: { content: 'b' },
-				structuralOp: op,
-				commentId: null,
-				syncedOpsKey: null,
-			} )
-		).toEqual( [
-			op,
-			{
-				type: 'attribute-set',
-				attribute: 'content',
-				before: 'a',
-				after: 'b',
-			},
-		] );
+			postOperationsFromTitle( { baseline: 'Same', proposed: 'Same' } )
+		).toEqual( [] );
 	} );
 } );

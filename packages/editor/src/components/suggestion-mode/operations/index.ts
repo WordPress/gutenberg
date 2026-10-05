@@ -18,8 +18,8 @@ export {
 } from './locate';
 export {
 	isAttributeEqual,
-	operationsFromOverlay,
-	postOperationsFromOverlay,
+	operationsFromMarker,
+	postOperationsFromTitle,
 	clearSuggestionMarkerAttributes,
 	applyOperations,
 	rollbackAttributesFor,
@@ -29,3 +29,4 @@ export {
 export type { PlanStep, BlockPlan, BlockTreeReader } from './plan';
 export { planStructuralApply } from './structural-apply';
 export { planStructuralReject } from './structural-reject';
+export { structuralOpFromMarker } from './structural-from-marker';

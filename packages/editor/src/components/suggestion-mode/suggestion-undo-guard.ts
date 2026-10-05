@@ -60,7 +60,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSuggestionSession } from './suggestion-session';
 import type { OverlayEntry } from './suggestion-session';
-import { operationsFromOverlay } from './operations';
+import { operationsFromMarker } from './operations';
 import { removeNoteIdFromMetadata } from '../collab-sidebar/utils';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { store as editorStore } from '../../store';
@@ -129,7 +129,7 @@ export function findNewestPendingSuggestion(
 			entry.lastEditSeq &&
 			( ! newest || entry.lastEditSeq > newest.seq )
 		) {
-			const operations = operationsFromOverlay(
+			const operations = operationsFromMarker(
 				entry.baselineAttributes,
 				entry.overlayAttributes
 			);

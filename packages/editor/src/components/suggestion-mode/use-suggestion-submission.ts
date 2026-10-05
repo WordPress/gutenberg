@@ -15,7 +15,6 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { STORE_NAME } from '../../store/constants';
-import { POST_TITLE_OVERLAY_KEY } from './suggestion-session';
 import {
 	addNoteIdToMetadata,
 	getNoteIdsFromMetadata,
@@ -70,7 +69,7 @@ export function useSuggestionSubmission() {
 			blockName,
 			operations,
 		}: {
-			clientId: string;
+			clientId?: string;
 			blockName: string;
 			operations: SuggestionOperation[];
 		} ) => {
@@ -94,7 +93,7 @@ export function useSuggestionSubmission() {
 				);
 
 				// A post-level suggestion has no block to link.
-				if ( savedRecord?.id && clientId !== POST_TITLE_OVERLAY_KEY ) {
+				if ( savedRecord?.id && clientId ) {
 					// Append to the noteId array so a fresh suggestion on a
 					// block whose previous note(s) have been applied or
 					// rejected coexists with them rather than overwriting

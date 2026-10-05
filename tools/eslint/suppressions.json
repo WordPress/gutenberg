@@ -6985,7 +6985,7 @@
 	},
 	"packages/editor/src/components/suggestion-mode/auto-save.ts": {
 		"react-hooks/refs": {
-			"count": 6
+			"count": 4
 		}
 	},
 	"packages/editor/src/components/suggestion-mode/store-interceptor.ts": {
