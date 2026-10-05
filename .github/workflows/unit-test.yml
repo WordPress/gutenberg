@@ -111,6 +111,20 @@ jobs:
         chmod -R 767 ./ # TODO: Possibly integrate in wp-env
         npm run wp-env start
 
+    # PHP 5.6 and 7.0 run the PHPUnit bundled in their `phpunit` image, but the
+    # test bootstrap still loads `vendor/autoload.php`, and they can't parse the
+    # locked `phpunit/phpunit`, which needs a newer PHP. Removing it isn't
+    # enough once other packages require it, so these versions swap it for the
+    # newest release they support.
+    - name: Install a PHPUnit release this PHP version can load
+      if: ${{ matrix.php == '5.6' || matrix.php == '7.0' }}
+      env:
+        PLATFORM_PHP: ${{ matrix.php == '5.6' && '5.6.20' || '7.0.33' }}
+        PHPUNIT_VERSION: ${{ matrix.php == '5.6' && '^5.7.21' || '^6.5' }}
+      run: |
+        npm run wp-env run composer "config platform.php $PLATFORM_PHP"
+        npm run wp-env run composer "require --dev phpunit/phpunit:$PHPUNIT_VERSION --with-all-dependencies --no-interaction"
+
     - name: Running lint check
       run: npm run lint-php
 
