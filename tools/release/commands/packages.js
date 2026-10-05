@@ -804,11 +804,20 @@ async function runNpmPublishPreflight(
 			);
 		}
 
+		const [ registryPackage ] = registryPackages;
+		if ( ! registryPackage || typeof registryPackage !== 'object' ) {
+			throw new Error(
+				`Expected npm registry lookup for ${ name }@${ version } to return package metadata, got ${ JSON.stringify(
+					registryPackage
+				) }.`
+			);
+		}
+
 		const {
 			version: registryVersion,
 			gitHead: registryGitHead,
 			'dist-tags': distTags = {},
-		} = registryPackages[ 0 ];
+		} = registryPackage;
 		if ( registryVersion !== version ) {
 			throw new Error(
 				`Expected npm registry lookup for ${ name }@${ version } to return version ${ version }, got ${ registryVersion }.`

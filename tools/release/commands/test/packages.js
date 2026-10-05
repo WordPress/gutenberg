@@ -618,108 +618,148 @@ describe( 'runNpmPublishPreflight', () => {
 		}
 	);
 
-	it( 'fails when a published version came from another commit', async () => {
-		const commandFn = vi
-			.fn()
-			.mockResolvedValueOnce( WHOAMI )
-			.mockResolvedValueOnce( {
-				stdout: '{"version":"4.50.0","gitHead":"other-sha","dist-tags":{"latest":"4.50.0"}}',
-			} );
+	it.each( [ 'null', '[null]' ] )(
+		'fails when npm view returns %s',
+		async ( stdout ) => {
+			const commandFn = vi
+				.fn()
+				.mockResolvedValueOnce( WHOAMI )
+				.mockResolvedValueOnce( { stdout } );
 
-		await expect(
-			runNpmPublishPreflight(
-				{
-					distTag: 'latest',
-					gitWorkingDirectoryPath: '/repo',
-					publishCommit: 'publish-sha',
-					releasePackages: [
-						{ name: '@wordpress/a11y', version: '4.50.0' },
-					],
-				},
-				{ commandFn }
-			)
-		).rejects.toThrow(
-			'@wordpress/a11y@4.50.0 exists in the npm registry with gitHead other-sha, expected publish-sha.'
-		);
-		expect( console ).toHaveLogged();
-	} );
+			await expect(
+				runNpmPublishPreflight(
+					{
+						distTag: 'latest',
+						gitWorkingDirectoryPath: '/repo',
+						publishCommit: 'publish-sha',
+						releasePackages: [
+							{ name: '@wordpress/a11y', version: '4.50.0' },
+						],
+					},
+					{ commandFn }
+				)
+			).rejects.toThrow(
+				'Expected npm registry lookup for @wordpress/a11y@4.50.0 to return package metadata, got null.'
+			);
+			expect( console ).toHaveLogged();
+		}
+	);
 
-	it( 'fails with an actionable error when a published version has no gitHead', async () => {
-		const commandFn = vi
-			.fn()
-			.mockResolvedValueOnce( WHOAMI )
-			.mockResolvedValueOnce( {
-				stdout: '{"version":"4.50.0","dist-tags":{"latest":"4.50.0"}}',
-			} );
+	describe.each( [
+		[ 'an object, as npm v11 returns', ( json ) => json ],
+		[ 'an array, as npm v12 returns', ( json ) => `[${ json }]` ],
+	] )( 'when npm view returns %s', ( _description, toStdout ) => {
+		it( 'fails when a published version came from another commit', async () => {
+			const commandFn = vi
+				.fn()
+				.mockResolvedValueOnce( WHOAMI )
+				.mockResolvedValueOnce( {
+					stdout: toStdout(
+						'{"version":"4.50.0","gitHead":"other-sha","dist-tags":{"latest":"4.50.0"}}'
+					),
+				} );
 
-		await expect(
-			runNpmPublishPreflight(
-				{
-					distTag: 'latest',
-					gitWorkingDirectoryPath: '/repo',
-					publishCommit: 'publish-sha',
-					releasePackages: [
-						{ name: '@wordpress/a11y', version: '4.50.0' },
-					],
-				},
-				{ commandFn }
-			)
-		).rejects.toThrow(
-			'@wordpress/a11y@4.50.0 exists in the npm registry with gitHead nothing, expected publish-sha.'
-		);
-		expect( console ).toHaveLogged();
-	} );
+			await expect(
+				runNpmPublishPreflight(
+					{
+						distTag: 'latest',
+						gitWorkingDirectoryPath: '/repo',
+						publishCommit: 'publish-sha',
+						releasePackages: [
+							{ name: '@wordpress/a11y', version: '4.50.0' },
+						],
+					},
+					{ commandFn }
+				)
+			).rejects.toThrow(
+				'@wordpress/a11y@4.50.0 exists in the npm registry with gitHead other-sha, expected publish-sha.'
+			);
+			expect( console ).toHaveLogged();
+		} );
 
-	it( 'fails when a published version has the wrong dist-tag', async () => {
-		const commandFn = vi
-			.fn()
-			.mockResolvedValueOnce( WHOAMI )
-			.mockResolvedValueOnce( {
-				stdout: '{"version":"4.50.0","gitHead":"publish-sha","dist-tags":{"latest":"4.49.0"}}',
-			} );
+		it( 'fails with an actionable error when a published version has no gitHead', async () => {
+			const commandFn = vi
+				.fn()
+				.mockResolvedValueOnce( WHOAMI )
+				.mockResolvedValueOnce( {
+					stdout: toStdout(
+						'{"version":"4.50.0","dist-tags":{"latest":"4.50.0"}}'
+					),
+				} );
 
-		await expect(
-			runNpmPublishPreflight(
-				{
-					distTag: 'latest',
-					gitWorkingDirectoryPath: '/repo',
-					publishCommit: 'publish-sha',
-					releasePackages: [
-						{ name: '@wordpress/a11y', version: '4.50.0' },
-					],
-				},
-				{ commandFn }
-			)
-		).rejects.toThrow(
-			'@wordpress/a11y@4.50.0 exists in the npm registry, but dist-tag "latest" points to 4.49.0. If another release moved the dist-tag, this prepared release is not safe to resume.'
-		);
-		expect( console ).toHaveLogged();
-	} );
+			await expect(
+				runNpmPublishPreflight(
+					{
+						distTag: 'latest',
+						gitWorkingDirectoryPath: '/repo',
+						publishCommit: 'publish-sha',
+						releasePackages: [
+							{ name: '@wordpress/a11y', version: '4.50.0' },
+						],
+					},
+					{ commandFn }
+				)
+			).rejects.toThrow(
+				'@wordpress/a11y@4.50.0 exists in the npm registry with gitHead nothing, expected publish-sha.'
+			);
+			expect( console ).toHaveLogged();
+		} );
 
-	it( 'fails when the registry returns a different version', async () => {
-		const commandFn = vi
-			.fn()
-			.mockResolvedValueOnce( WHOAMI )
-			.mockResolvedValueOnce( {
-				stdout: '{"version":"4.49.0","gitHead":"publish-sha","dist-tags":{"latest":"4.49.0"}}',
-			} );
+		it( 'fails when a published version has the wrong dist-tag', async () => {
+			const commandFn = vi
+				.fn()
+				.mockResolvedValueOnce( WHOAMI )
+				.mockResolvedValueOnce( {
+					stdout: toStdout(
+						'{"version":"4.50.0","gitHead":"publish-sha","dist-tags":{"latest":"4.49.0"}}'
+					),
+				} );
 
-		await expect(
-			runNpmPublishPreflight(
-				{
-					distTag: 'latest',
-					gitWorkingDirectoryPath: '/repo',
-					publishCommit: 'publish-sha',
-					releasePackages: [
-						{ name: '@wordpress/a11y', version: '4.50.0' },
-					],
-				},
-				{ commandFn }
-			)
-		).rejects.toThrow(
-			'Expected npm registry lookup for @wordpress/a11y@4.50.0 to return version 4.50.0, got 4.49.0.'
-		);
-		expect( console ).toHaveLogged();
+			await expect(
+				runNpmPublishPreflight(
+					{
+						distTag: 'latest',
+						gitWorkingDirectoryPath: '/repo',
+						publishCommit: 'publish-sha',
+						releasePackages: [
+							{ name: '@wordpress/a11y', version: '4.50.0' },
+						],
+					},
+					{ commandFn }
+				)
+			).rejects.toThrow(
+				'@wordpress/a11y@4.50.0 exists in the npm registry, but dist-tag "latest" points to 4.49.0. If another release moved the dist-tag, this prepared release is not safe to resume.'
+			);
+			expect( console ).toHaveLogged();
+		} );
+
+		it( 'fails when the registry returns a different version', async () => {
+			const commandFn = vi
+				.fn()
+				.mockResolvedValueOnce( WHOAMI )
+				.mockResolvedValueOnce( {
+					stdout: toStdout(
+						'{"version":"4.49.0","gitHead":"publish-sha","dist-tags":{"latest":"4.49.0"}}'
+					),
+				} );
+
+			await expect(
+				runNpmPublishPreflight(
+					{
+						distTag: 'latest',
+						gitWorkingDirectoryPath: '/repo',
+						publishCommit: 'publish-sha',
+						releasePackages: [
+							{ name: '@wordpress/a11y', version: '4.50.0' },
+						],
+					},
+					{ commandFn }
+				)
+			).rejects.toThrow(
+				'Expected npm registry lookup for @wordpress/a11y@4.50.0 to return version 4.50.0, got 4.49.0.'
+			);
+			expect( console ).toHaveLogged();
+		} );
 	} );
 } );
 

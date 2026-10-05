@@ -24,5 +24,16 @@ export function readNpmPackResult( stdout, packageName ) {
 			`Expected one npm pack result for ${ packageName }, got ${ results.length }.`
 		);
 	}
-	return results[ 0 ];
+	const [ result ] = results;
+	if (
+		typeof result?.filename !== 'string' ||
+		! Array.isArray( result.files )
+	) {
+		throw new Error(
+			`Unexpected npm pack result for ${ packageName }: ${ JSON.stringify(
+				result
+			) }`
+		);
+	}
+	return result;
 }
