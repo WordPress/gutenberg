@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from '@wordpress/element';
-import { inertValue } from '@wordpress/ui';
 import { Spinner } from '@wordpress/components';
 import { useNavigate, useSearch } from '@wordpress/route';
 import { __ } from '@wordpress/i18n';
+import { inertValue } from '@wordpress/react-inert-value';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as bootStore } from '../../store';
