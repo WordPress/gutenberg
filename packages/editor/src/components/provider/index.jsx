@@ -43,7 +43,7 @@ import TemplatePartMenuItems from '../template-part-menu-items';
 import MediaEditorModalMount from '../media/media-editor-modal';
 import { getCanvasWidthByDeviceType } from '../../utils/device-type';
 import {
-	SuggestionOverlayProvider,
+	SuggestionSessionProvider,
 	SuggestionAutoSave,
 	SuggestionStoreInterceptor,
 	SuggestionUndoGuard,
@@ -96,8 +96,8 @@ const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
  * subscriptions) never mounts; consumers fall back to the context default,
  * which is inert.
  */
-const MaybeSuggestionOverlayProvider = isSuggestionModeEnabled()
-	? SuggestionOverlayProvider
+const MaybeSuggestionSessionProvider = isSuggestionModeEnabled()
+	? SuggestionSessionProvider
 	: Fragment;
 
 /*
@@ -517,7 +517,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							settings={ blockEditorSettings }
 							useSubRegistry={ false }
 						>
-							<MaybeSuggestionOverlayProvider>
+							<MaybeSuggestionSessionProvider>
 								<MaybeMoveGhostsProvider>
 									{ children }
 									{ ! settings.isPreviewMode && (
@@ -558,7 +558,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 										</>
 									) }
 								</MaybeMoveGhostsProvider>
-							</MaybeSuggestionOverlayProvider>
+							</MaybeSuggestionSessionProvider>
 						</BlockEditorProviderComponent>
 					</BlockContextProvider>
 				</EntityProvider>

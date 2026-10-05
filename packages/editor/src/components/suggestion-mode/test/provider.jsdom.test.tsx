@@ -26,7 +26,7 @@ import {
 	suggestionFormat,
 } from '../../inline-suggestions';
 import {
-	operationsFromOverlay,
+	operationsFromMarker,
 	applyOperations,
 	hasAttributeConflict,
 	parseSuggestionPayload,
@@ -35,17 +35,13 @@ import {
 	findStructuralOp,
 	findInlineOp,
 	clearSuggestionMarkerAttributes,
-	useSuggestionsProvider,
-	getSuggestionsResolvedThisSession,
-	forgetResolvedSuggestion,
 	findPostAttributeOps,
-	postOperationsFromOverlay,
+	postOperationsFromTitle,
 	applyPostOperations,
-} from '../provider';
-import {
-	SuggestionOverlayProvider,
-	useSuggestionOverlay,
-} from '../overlay-context';
+} from '../operations';
+import { useSuggestionsProvider } from '../provider';
+import { getSuggestionsResolvedThisSession } from '../decision-state';
+import { SuggestionSessionProvider } from '../suggestion-session';
 
 // The editor store pulls in `@wordpress/viewport`, which reads
 // `window.matchMedia` while loading.
@@ -53,9 +49,9 @@ vi.hoisted( () => {
 	globalThis.wpVitest.mockMatchMedia();
 } );
 
-describe( 'operationsFromOverlay', () => {
+describe( 'operationsFromMarker', () => {
 	it( 'emits one attribute-set op per changed key', () => {
-		const ops = operationsFromOverlay(
+		const ops = operationsFromMarker(
 			{ content: 'Hello', level: 2 },
 			{ content: 'Hi', level: 3 }
 		);
@@ -76,7 +72,7 @@ describe( 'operationsFromOverlay', () => {
 	} );
 
 	it( 'skips attributes that equal their baseline', () => {
-		const ops = operationsFromOverlay(
+		const ops = operationsFromMarker(
 			{ content: 'Same', level: 2 },
 			{ content: 'Same', level: 3 }
 		);
@@ -91,7 +87,7 @@ describe( 'operationsFromOverlay', () => {
 	} );
 
 	it( 'deep-compares object-valued attributes', () => {
-		const ops = operationsFromOverlay(
+		const ops = operationsFromMarker(
 			{ style: { typography: { fontSize: '16px' } } },
 			{ style: { typography: { fontSize: '16px' } } }
 		);
@@ -101,7 +97,7 @@ describe( 'operationsFromOverlay', () => {
 	it( 'is insensitive to key order in object-valued attributes', () => {
 		// `style` re-emitted with reordered keys must not appear as a
 		// changed attribute. A naive JSON.stringify compare would flag it.
-		const ops = operationsFromOverlay(
+		const ops = operationsFromMarker(
 			{ style: { typography: { fontSize: '16px' }, color: 'red' } },
 			{ style: { color: 'red', typography: { fontSize: '16px' } } }
 		);
@@ -110,12 +106,12 @@ describe( 'operationsFromOverlay', () => {
 
 	it( 'compares arrays element-wise', () => {
 		expect(
-			operationsFromOverlay(
+			operationsFromMarker(
 				{ classes: [ 'a', 'b' ] },
 				{ classes: [ 'a', 'b' ] }
 			)
 		).toEqual( [] );
-		const ops = operationsFromOverlay(
+		const ops = operationsFromMarker(
 			{ classes: [ 'a', 'b' ] },
 			{ classes: [ 'b', 'a' ] }
 		);
@@ -124,7 +120,7 @@ describe( 'operationsFromOverlay', () => {
 	} );
 
 	it( 'captures a null baseline when the attribute is new', () => {
-		const ops = operationsFromOverlay( {}, { url: 'https://x.test' } );
+		const ops = operationsFromMarker( {}, { url: 'https://x.test' } );
 		expect( ops ).toEqual( [
 			{
 				type: 'attribute-set',
@@ -135,9 +131,9 @@ describe( 'operationsFromOverlay', () => {
 		] );
 	} );
 
-	it( 'returns an empty array for an empty overlay', () => {
-		expect( operationsFromOverlay( { a: 1 }, {} ) ).toEqual( [] );
-		expect( operationsFromOverlay( { a: 1 }, null ) ).toEqual( [] );
+	it( 'returns an empty array for an empty proposal', () => {
+		expect( operationsFromMarker( { a: 1 }, {} ) ).toEqual( [] );
+		expect( operationsFromMarker( { a: 1 }, null ) ).toEqual( [] );
 	} );
 } );
 
@@ -149,13 +145,14 @@ describe( 'post attribute operations', () => {
 		after: 'New',
 	};
 
-	it( 'builds post-attribute-set ops from a title overlay', () => {
+	it( 'builds post-attribute-set ops from a title proposal', () => {
 		expect(
-			postOperationsFromOverlay( { title: 'Old' }, { title: 'New' } )
+			postOperationsFromTitle( { baseline: 'Old', proposed: 'New' } )
 		).toEqual( [ TITLE_OP ] );
 		expect(
-			postOperationsFromOverlay( { title: 'Same' }, { title: 'Same' } )
+			postOperationsFromTitle( { baseline: 'Same', proposed: 'Same' } )
 		).toEqual( [] );
+		expect( postOperationsFromTitle( null ) ).toEqual( [] );
 	} );
 
 	it( 'finds only the post attribute ops in a payload', () => {
@@ -579,6 +576,23 @@ describe( 'clearSuggestionMarkerAttributes', () => {
 			} )
 		).toEqual( { metadata: { noteId: 7 } } );
 	} );
+
+	it( 'drops a proposal riding on a structural marker: the one note carried both ops', () => {
+		expect(
+			clearSuggestionMarkerAttributes( {
+				metadata: {
+					noteId: [ 7 ],
+					suggestion: {
+						type: 'pending-move',
+						fromIndex: 1,
+						authorId: 4,
+						commentId: 7,
+						after: { level: 3 },
+					},
+				},
+			} )
+		).toEqual( { metadata: { noteId: [ 7 ] } } );
+	} );
 } );
 
 /*
@@ -803,24 +817,41 @@ describe( 'rejectSuggestion (block-move)', () => {
 	} );
 } );
 
-describe( 'rejectSuggestion (attribute-set)', () => {
-	const PARAGRAPH = 'core/test-reject-attribute-paragraph';
+describe( 'attribute proposals on the block marker', () => {
+	const PARAGRAPH = 'core/test-proposal-paragraph';
 
 	beforeAll( () => {
+		if (
+			! ( select( richTextStore as any ) as any ).getFormatType(
+				SUGGESTION_FORMAT_NAME
+			)
+		) {
+			registerFormatType(
+				SUGGESTION_FORMAT_NAME,
+				suggestionFormat as any
+			);
+		}
 		registerBlockType( PARAGRAPH, {
 			apiVersion: 3,
 			attributes: {
 				content: { type: 'string', default: '' },
-				align: { type: 'string' },
+				level: { type: 'number', default: 2 },
 				metadata: { type: 'object' },
 			},
 			save: () => null,
 			category: 'text',
-			title: 'Test Reject Attribute Paragraph',
+			title: 'Test Proposal Paragraph',
 		} );
 	} );
 
 	afterAll( () => {
+		if (
+			( select( richTextStore as any ) as any ).getFormatType(
+				SUGGESTION_FORMAT_NAME
+			)
+		) {
+			unregisterFormatType( SUGGESTION_FORMAT_NAME );
+		}
 		getBlockTypes().forEach( ( block ) =>
 			unregisterBlockType( block.name )
 		);
@@ -847,28 +878,26 @@ describe( 'rejectSuggestion (attribute-set)', () => {
 		registry.dispatch( blockEditorStore ).resetBlocks( initialBlocks );
 
 		let providerHandle: ReturnType< typeof useSuggestionsProvider >;
-		let overlayHandle: ReturnType< typeof useSuggestionOverlay >;
 		function Capture() {
 			providerHandle = useSuggestionsProvider();
-			overlayHandle = useSuggestionOverlay();
 			return null;
 		}
 
 		render(
 			<RegistryProvider value={ registry }>
-				<SuggestionOverlayProvider>
+				<SuggestionSessionProvider>
 					<Capture />
-				</SuggestionOverlayProvider>
+				</SuggestionSessionProvider>
 			</RegistryProvider>
 		);
 
-		return {
-			getProvider: () => providerHandle,
-			getOverlay: () => overlayHandle,
-		};
+		return { registry, getProvider: () => providerHandle };
 	}
 
-	function attributePayload() {
+	const attrs = ( registry: any, clientId: string ) =>
+		registry.select( blockEditorStore ).getBlockAttributes( clientId );
+
+	function levelPayload() {
 		return {
 			schemaVersion: 2,
 			blockName: PARAGRAPH,
@@ -876,61 +905,171 @@ describe( 'rejectSuggestion (attribute-set)', () => {
 			operations: [
 				{
 					type: 'attribute-set',
-					attribute: 'align',
-					before: null,
-					after: 'center',
+					attribute: 'level',
+					before: 2,
+					after: 3,
 				},
 			],
 		};
 	}
 
-	function proposeAlignment(
-		getOverlay: () => ReturnType< typeof useSuggestionOverlay >,
-		clientId: string,
-		commentId: number
-	) {
-		act( () => {
-			getOverlay().captureBaseline( clientId, PARAGRAPH, {
-				content: 'Hello',
-			} );
+	const proposedLevel = ( extra: Record< string, any > = {} ) =>
+		createBlock( PARAGRAPH, {
+			content: 'Hello',
+			level: 2,
+			metadata: {
+				noteId: [ 42 ],
+				suggestion: {
+					type: 'pending-attributes',
+					commentId: 42,
+					after: { level: 3 },
+				},
+				...extra,
+			},
 		} );
-		act( () => {
-			getOverlay().setOverlayAttributes( clientId, { align: 'center' } );
-			getOverlay().setCommentId( clientId, commentId );
-		} );
-	}
 
-	it( 'drops the overlay entry so the rejected value stops rendering', async () => {
-		const block = createBlock( PARAGRAPH, { content: 'Hello' } );
-		const { getProvider, getOverlay } = setup( [ block ] );
-		proposeAlignment( getOverlay, block.clientId, 7 );
-		expect( getOverlay().hasOverlay( block.clientId ) ).toBe( true );
+	it( 'apply lands the proposal on the block and clears the marker in one update', async () => {
+		const block = proposedLevel();
+		const { registry, getProvider } = setup( [ block ] );
 
 		await act( async () => {
-			await getProvider().rejectSuggestion( {
-				commentId: 7,
+			await getProvider().applySuggestion( {
+				commentId: 42,
 				clientId: block.clientId,
-				payload: attributePayload(),
+				payload: levelPayload(),
 			} );
 		} );
 
-		expect( getOverlay().hasOverlay( block.clientId ) ).toBe( false );
+		const after = attrs( registry, block.clientId );
+		expect( after.level ).toBe( 3 );
+		expect( after.metadata.suggestion ).toBeUndefined();
+		expect( after.metadata.noteId ).toEqual( [ 42 ] );
+		expect(
+			getSuggestionsResolvedThisSession( registry ).has( '42' )
+		).toBe( true );
 	} );
 
-	it( 'keeps an overlay entry that now belongs to another suggestion', async () => {
-		const block = createBlock( PARAGRAPH, { content: 'Hello' } );
-		const { getProvider, getOverlay } = setup( [ block ] );
-		proposeAlignment( getOverlay, block.clientId, 8 );
+	it( 'reject drops the proposal and leaves the live block alone', async () => {
+		const block = proposedLevel();
+		const { registry, getProvider } = setup( [ block ] );
 
 		await act( async () => {
 			await getProvider().rejectSuggestion( {
-				commentId: 7,
+				commentId: 42,
 				clientId: block.clientId,
-				payload: attributePayload(),
+				payload: levelPayload(),
 			} );
 		} );
 
-		expect( getOverlay().hasOverlay( block.clientId ) ).toBe( true );
+		const after = attrs( registry, block.clientId );
+		expect( after.level ).toBe( 2 );
+		expect( after.metadata.suggestion ).toBeUndefined();
+		expect(
+			getSuggestionsResolvedThisSession( registry ).has( '42' )
+		).toBe( true );
+	} );
+
+	it( 'an inline decision leaves a co-resident attribute proposal in place', async () => {
+		const block = createBlock( PARAGRAPH, {
+			level: 2,
+			metadata: {
+				noteId: [ 9, 42 ],
+				suggestion: {
+					type: 'pending-attributes',
+					commentId: 42,
+					after: { level: 3 },
+				},
+			},
+		} );
+		const { registry, getProvider } = setup( [ block ] );
+		// Write the marked value directly so the attribute is a real
+		// RichTextData (as in the editor), bypassing string sanitization.
+		act( () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( block.clientId, {
+					content: RichTextData.fromHTMLString(
+						'Hello <mark class="wp-suggestion" data-suggestion-id="9" data-suggestion-type="add">world</mark>'
+					),
+				} );
+		} );
+
+		await act( async () => {
+			await getProvider().applySuggestion( {
+				commentId: 9,
+				clientId: block.clientId,
+				payload: {
+					schemaVersion: 2,
+					blockName: PARAGRAPH,
+					baseRevision: null,
+					operations: [
+						{
+							type: 'inline-suggestion',
+							attribute: 'content',
+							suggestionType: 'add',
+						},
+					],
+				},
+			} );
+		} );
+
+		const after = attrs( registry, block.clientId );
+		expect( String( after.content ) ).toBe( 'Hello world' );
+		expect( after.metadata.suggestion.after ).toEqual( { level: 3 } );
+	} );
+
+	it( 'rejecting a move also drops the proposal that rode on it, since the note carried both', async () => {
+		const a = createBlock( PARAGRAPH, { content: 'A' } );
+		const moved = createBlock( PARAGRAPH, {
+			content: 'Moved',
+			level: 2,
+			metadata: {
+				noteId: [ 5 ],
+				suggestion: {
+					type: 'pending-move',
+					authorId: 4,
+					commentId: 5,
+					fromIndex: 0,
+					after: { level: 3 },
+				},
+			},
+		} );
+		// Current order: [A, Moved]; the block was moved from index 0.
+		const { registry, getProvider } = setup( [ a, moved ] );
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 5,
+				clientId: moved.clientId,
+				payload: {
+					schemaVersion: 2,
+					blockName: PARAGRAPH,
+					baseRevision: null,
+					operations: [
+						{
+							type: 'block-move',
+							clientId: moved.clientId,
+							blockName: PARAGRAPH,
+							fromParentClientId: null,
+							fromIndex: 0,
+							toParentClientId: null,
+						},
+						{
+							type: 'attribute-set',
+							attribute: 'level',
+							before: 2,
+							after: 3,
+						},
+					],
+				},
+			} );
+		} );
+
+		const blockEditor = registry.select( blockEditorStore );
+		expect( blockEditor.getBlockIndex( moved.clientId ) ).toBe( 0 );
+		const after = attrs( registry, moved.clientId );
+		expect( after.level ).toBe( 2 );
+		expect( after.metadata.suggestion ).toBeUndefined();
 	} );
 } );
 
@@ -1837,7 +1976,7 @@ describe( 'review decisions and undo history', () => {
 	} );
 
 	it( 'records a decided suggestion so its note can be reopened', async () => {
-		const { block, getProvider } = setup();
+		const { registry, block, getProvider } = setup();
 
 		await act( async () => {
 			await getProvider().applySuggestion( {
@@ -1848,8 +1987,9 @@ describe( 'review decisions and undo history', () => {
 		} );
 
 		// The note collector reads this to spot a marker an undo put back.
-		expect( getSuggestionsResolvedThisSession().has( '9' ) ).toBe( true );
-		forgetResolvedSuggestion( 9 );
+		expect( getSuggestionsResolvedThisSession( registry ).has( '9' ) ).toBe(
+			true
+		);
 	} );
 } );
 
@@ -1902,26 +2042,20 @@ describe( 'withdrawn suggestions and failed applies', () => {
 		registry.dispatch( blockEditorStore ).resetBlocks( initialBlocks );
 
 		let providerHandle: ReturnType< typeof useSuggestionsProvider >;
-		let overlayHandle: ReturnType< typeof useSuggestionOverlay >;
 		function Capture() {
 			providerHandle = useSuggestionsProvider();
-			overlayHandle = useSuggestionOverlay();
 			return null;
 		}
 
 		render(
 			<RegistryProvider value={ registry }>
-				<SuggestionOverlayProvider>
+				<SuggestionSessionProvider>
 					<Capture />
-				</SuggestionOverlayProvider>
+				</SuggestionSessionProvider>
 			</RegistryProvider>
 		);
 
-		return {
-			registry,
-			getProvider: () => providerHandle,
-			getOverlay: () => overlayHandle,
-		};
+		return { registry, getProvider: () => providerHandle };
 	}
 
 	it( 'unlinks a withdrawn suggestion from the block metadata', async () => {
@@ -1966,21 +2100,20 @@ describe( 'withdrawn suggestions and failed applies', () => {
 		).toBeUndefined();
 	} );
 
-	it( 'keeps the overlay entry when applying an attribute suggestion fails', async () => {
-		const block = createBlock( PARAGRAPH, { content: 'Hello' } );
-		const { registry, getProvider, getOverlay } = setup( [ block ], {
+	it( 'keeps the marker proposal when applying an attribute suggestion fails', async () => {
+		const block = createBlock( PARAGRAPH, {
+			content: 'Hello',
+			metadata: {
+				noteId: [ 7 ],
+				suggestion: {
+					type: 'pending-attributes',
+					commentId: 7,
+					after: { align: 'center' },
+				},
+			},
+		} );
+		const { registry, getProvider } = setup( [ block ], {
 			failSave: true,
-		} );
-		act( () => {
-			getOverlay().captureBaseline( block.clientId, PARAGRAPH, {
-				content: 'Hello',
-			} );
-		} );
-		act( () => {
-			getOverlay().setOverlayAttributes( block.clientId, {
-				align: 'center',
-			} );
-			getOverlay().setCommentId( block.clientId, 7 );
 		} );
 
 		await act( async () => {
@@ -2004,12 +2137,13 @@ describe( 'withdrawn suggestions and failed applies', () => {
 		} );
 
 		// The block rolls back and the proposal is still pending, so the
-		// suggester's overlay must survive for a retry.
-		expect(
-			registry
-				.select( blockEditorStore )
-				.getBlockAttributes( block.clientId )?.align
-		).toBeUndefined();
-		expect( getOverlay().hasOverlay( block.clientId ) ).toBe( true );
+		// marker must survive for a retry.
+		const attributes = registry
+			.select( blockEditorStore )
+			.getBlockAttributes( block.clientId );
+		expect( attributes?.align ).toBeUndefined();
+		expect( attributes?.metadata?.suggestion?.after ).toEqual( {
+			align: 'center',
+		} );
 	} );
 } );

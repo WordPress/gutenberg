@@ -5,9 +5,10 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
-import { useSuggestionOverlay } from './overlay-context';
+import { useSuggestionSession } from './suggestion-session';
 import useAbandonedNoteCleanup from './use-abandoned-note-cleanup';
-import { INLINE_OP_TYPE, useSuggestionsProvider } from './provider';
+import { INLINE_OP_TYPE } from './operations';
+import { useSuggestionsProvider } from './provider';
 import {
 	SUGGESTION_TYPE_ADDITION,
 	SUGGESTION_TYPE_DELETION,
@@ -79,7 +80,7 @@ export default function SuggestionContentReconciler() {
 		registerContentHandler,
 		requestInterceptorBypass,
 		enqueueSuggestionWrite,
-	} = useSuggestionOverlay();
+	} = useSuggestionSession();
 
 	// Trash notes created for a plan that was abandoned, and drop their ids
 	// from the block's note linkage.

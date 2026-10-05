@@ -46,7 +46,7 @@ export const getBlockPropertiesDescription = ( positionLabel, isLocked ) =>
  * @param {?Object} suggestion Value of the block's `metadata.suggestion`.
  * @return {?{className: string, label: string}} Row class and the sentence
  * appended to the row's accessible description, or undefined when the block
- * carries no structural suggestion.
+ * carries no pending suggestion.
  */
 export const getBlockSuggestionTreatment = ( suggestion ) => {
 	switch ( suggestion?.type ) {
@@ -66,6 +66,11 @@ export const getBlockSuggestionTreatment = ( suggestion ) => {
 				// Matches the canvas wording: the block sits at the position it
 				// is proposed to move to, not the one it came from.
 				label: __( 'Suggested move destination.' ),
+			};
+		case 'pending-attributes':
+			return {
+				className: 'is-suggestion-pending',
+				label: __( 'Suggested change.' ),
 			};
 		default:
 			return undefined;

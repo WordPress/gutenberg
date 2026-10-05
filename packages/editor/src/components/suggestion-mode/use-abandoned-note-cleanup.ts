@@ -8,7 +8,7 @@ import {
 import { unlock } from '../../lock-unlock';
 import { removeNoteIdFromMetadata } from '../collab-sidebar/utils';
 import { useSuggestionsProvider } from './provider';
-import { useSuggestionOverlay } from './overlay-context';
+import { useSuggestionSession } from './suggestion-session';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
@@ -35,7 +35,7 @@ export default function useAbandonedNoteCleanup() {
 		__unstableMarkNextChangeAsNotPersistent: markNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
 	const { deleteSuggestion } = useSuggestionsProvider();
-	const { requestInterceptorBypass } = useSuggestionOverlay();
+	const { requestInterceptorBypass } = useSuggestionSession();
 
 	return useCallback(
 		async ( clientId: string, ids: any[] ) => {

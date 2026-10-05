@@ -18,15 +18,12 @@ import { store as noticesStore } from '@wordpress/notices';
 import { createBlock, registerBlockType } from '@wordpress/blocks';
 import { RichTextData, store as richTextStore } from '@wordpress/rich-text';
 import SuggestionNoteGC from '../suggestion-note-gc';
-import { SuggestionOverlayProvider } from '../overlay-context';
+import { SuggestionSessionProvider } from '../suggestion-session';
 import {
 	registerSuggestionFormat,
 	SUGGESTION_FORMAT_NAME,
 } from '../../inline-suggestions';
-import {
-	getSuggestionsResolvedThisSession,
-	forgetResolvedSuggestion,
-} from '../provider';
+import { rememberResolvedSuggestion } from '../decision-state';
 import { store as editorStore } from '../../../store';
 
 // The editor store pulls in `@wordpress/viewport`, which reads
@@ -104,6 +101,32 @@ function reply() {
 	};
 }
 
+/*
+ * A pending attribute-set note (a heading level change). Its anchor is the
+ * block marker's proposal, not a mark in the content.
+ */
+function attributeNote() {
+	return {
+		id: NOTE_ID,
+		parent: 0,
+		status: 'hold',
+		meta: {
+			_wp_suggestion_status: 'pending',
+			_wp_suggestion: JSON.stringify( {
+				schemaVersion: 2,
+				operations: [
+					{
+						type: 'attribute-set',
+						attribute: 'level',
+						before: 2,
+						after: 3,
+					},
+				],
+			} ),
+		},
+	};
+}
+
 const MARKED = `Hello <mark class="wp-suggestion" data-suggestion-id="${ NOTE_ID }" data-suggestion-type="add" data-author="1">world</mark>`;
 
 beforeAll( () => {
@@ -126,7 +149,19 @@ beforeAll( () => {
 	}
 } );
 
-function setup( { content, threads }: { content: string; threads: any[] } ) {
+function setup( {
+	content,
+	threads,
+	resolved = false,
+	metadata = { noteId: [ NOTE_ID ] },
+}: {
+	content: string;
+	threads: any[];
+	/** Whether this session already applied or rejected the note. */
+	resolved?: boolean;
+	/** The block's metadata; defaults to the note link alone. */
+	metadata?: Record< string, any >;
+} ) {
 	serverThreads = threads;
 	serverReplies = threads.filter(
 		( thread: any ) => thread.parent === NOTE_ID
@@ -150,12 +185,15 @@ function setup( { content, threads }: { content: string; threads: any[] } ) {
 	registry.register( blockEditorStore );
 	registry.register( editorStore );
 	registry.register( noticesStore );
+	if ( resolved ) {
+		rememberResolvedSuggestion( registry, NOTE_ID );
+	}
 
 	registry.dispatch( editorStore ).setEditedPost( 'post', POST_ID as any );
 
 	const block = createBlock( TEST_BLOCK_NAME, {
 		content: RichTextData.fromHTMLString( content ),
-		metadata: { noteId: [ NOTE_ID ] },
+		metadata,
 	} );
 	registry.dispatch( blockEditorStore ).resetBlocks( [ block ] );
 	registry
@@ -168,9 +206,9 @@ function setup( { content, threads }: { content: string; threads: any[] } ) {
 
 	render(
 		<RegistryProvider value={ registry }>
-			<SuggestionOverlayProvider>
+			<SuggestionSessionProvider>
 				<SuggestionNoteGC />
-			</SuggestionOverlayProvider>
+			</SuggestionSessionProvider>
 		</RegistryProvider>
 	);
 
@@ -178,7 +216,6 @@ function setup( { content, threads }: { content: string; threads: any[] } ) {
 }
 
 afterEach( () => {
-	forgetResolvedSuggestion( NOTE_ID );
 	vi.restoreAllMocks();
 } );
 
@@ -190,13 +227,12 @@ describe( 'SuggestionNoteGC reopening an undone decision', () => {
 		 * server and no keystroke reached it. Without the reopen the run stays
 		 * marked with no Accept/Reject on it (#73411, F-18).
 		 */
-		getSuggestionsResolvedThisSession().add( String( NOTE_ID ) );
-
 		let saveEntityRecord;
 		await act( async () => {
 			( { saveEntityRecord } = setup( {
 				content: MARKED,
 				threads: [ note() ],
+				resolved: true,
 			} ) );
 		} );
 
@@ -214,13 +250,12 @@ describe( 'SuggestionNoteGC reopening an undone decision', () => {
 
 	it( 'leaves a resolved note alone while its marker is gone', async () => {
 		// The ordinary post-decision state: the decision stands.
-		getSuggestionsResolvedThisSession().add( String( NOTE_ID ) );
-
 		let saveEntityRecord;
 		await act( async () => {
 			( { saveEntityRecord } = setup( {
 				content: 'Hello world',
 				threads: [ note() ],
+				resolved: true,
 			} ) );
 		} );
 
@@ -426,5 +461,145 @@ describe( 'SuggestionNoteGC collecting a withdrawn suggestion', () => {
 		expect(
 			( registry.select( noticesStore ) as any ).getNotices()
 		).toHaveLength( 0 );
+	} );
+} );
+
+describe( 'SuggestionNoteGC collecting an attribute proposal', () => {
+	beforeEach( () => {
+		vi.useFakeTimers( { toFake: [ 'setTimeout', 'clearTimeout' ] } );
+	} );
+
+	afterEach( () => {
+		vi.useRealTimers();
+	} );
+
+	async function settle() {
+		await act( async () => {
+			vi.advanceTimersByTime( 1000 );
+		} );
+		for ( let round = 0; round < 3; round++ ) {
+			await act( async () => {
+				vi.runOnlyPendingTimers();
+			} );
+		}
+	}
+
+	it( 'trashes an attribute note once its marker proposal disappears', async () => {
+		let harness: any;
+		await act( async () => {
+			harness = setup( {
+				content: 'Hello world',
+				threads: [ attributeNote() ],
+				metadata: {
+					noteId: [ NOTE_ID ],
+					suggestion: {
+						type: 'pending-attributes',
+						after: { level: 3 },
+					},
+				},
+			} );
+		} );
+		expect( harness.saveEntityRecord ).not.toHaveBeenCalled();
+
+		// Undo pops the marker write; the note link alone is left.
+		await act( async () => {
+			harness.registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( harness.clientId, {
+					metadata: { noteId: [ NOTE_ID ] },
+				} );
+		} );
+		await settle();
+
+		expect( harness.saveEntityRecord ).toHaveBeenCalledWith(
+			'root',
+			'comment',
+			{ id: NOTE_ID, status: 'trash' },
+			expect.anything()
+		);
+	} );
+
+	it( 'restores the trashed note when redo brings the proposal back', async () => {
+		let harness: any;
+		const marker = {
+			noteId: [ NOTE_ID ],
+			suggestion: {
+				type: 'pending-attributes',
+				after: { level: 3 },
+			},
+		};
+		await act( async () => {
+			harness = setup( {
+				content: 'Hello world',
+				threads: [ attributeNote() ],
+				metadata: marker,
+			} );
+		} );
+		await act( async () => {
+			harness.registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( harness.clientId, {
+					metadata: { noteId: [ NOTE_ID ] },
+				} );
+		} );
+		await settle();
+		expect( harness.saveEntityRecord ).toHaveBeenCalledWith(
+			'root',
+			'comment',
+			{ id: NOTE_ID, status: 'trash' },
+			expect.anything()
+		);
+
+		await act( async () => {
+			harness.registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( harness.clientId, {
+					metadata: marker,
+				} );
+		} );
+		await settle();
+		expect( harness.saveEntityRecord ).toHaveBeenLastCalledWith(
+			'root',
+			'comment',
+			{ id: NOTE_ID, status: 'hold' },
+			expect.anything()
+		);
+	} );
+
+	it( 'keeps an attribute note whose proposal rides on a structural marker', async () => {
+		let harness: any;
+		await act( async () => {
+			harness = setup( {
+				content: 'Hello world',
+				threads: [ attributeNote() ],
+				metadata: {
+					noteId: [ NOTE_ID ],
+					suggestion: {
+						type: 'pending-attributes',
+						after: { level: 3 },
+					},
+				},
+			} );
+		} );
+
+		// The proposed block is then moved: the interceptor retypes the
+		// marker and keeps the proposal on it.
+		await act( async () => {
+			harness.registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( harness.clientId, {
+					metadata: {
+						noteId: [ NOTE_ID ],
+						suggestion: {
+							type: 'pending-move',
+							fromIndex: 0,
+							after: { level: 3 },
+						},
+					},
+				} );
+		} );
+		await settle();
+
+		expect( harness.saveEntityRecord ).not.toHaveBeenCalled();
 	} );
 } );

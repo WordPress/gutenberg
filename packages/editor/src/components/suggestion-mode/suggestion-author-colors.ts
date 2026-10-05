@@ -11,7 +11,7 @@ import {
 } from '../inline-suggestions';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import { useNoteThreads } from '../collab-sidebar/hooks';
-import { parseSuggestionPayload } from './provider';
+import { parseSuggestionPayload } from './operations';
 import { store as editorStore } from '../../store';
 
 /**
