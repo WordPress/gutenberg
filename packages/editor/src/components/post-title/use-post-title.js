@@ -5,11 +5,7 @@ import { store as editorStore } from '../../store';
 import { EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 import { diffRevisionHTML } from '../post-revisions-preview/block-diff';
-import {
-	POST_TITLE_OVERLAY_KEY,
-	useOverlayEntry,
-	useSuggestionSessionActions,
-} from '../suggestion-mode/suggestion-session';
+import { useSuggestionSession } from '../suggestion-mode/suggestion-session';
 
 /**
  * Custom hook for managing the post title in the editor.
@@ -59,18 +55,16 @@ export default function usePostTitle() {
 		postId
 	);
 
-	const suggestionEntry = useOverlayEntry( POST_TITLE_OVERLAY_KEY );
-	const { captureBaseline, setOverlayAttributes } =
-		useSuggestionSessionActions();
+	// The title is not a block, so its proposal has no marker to live in; it
+	// is the one proposal the session holds in memory.
+	const { postTitleProposal, setPostTitleProposal } = useSuggestionSession();
 	const proposedTitle =
-		isSuggesting &&
-		suggestionEntry &&
-		'title' in suggestionEntry.overlayAttributes
-			? suggestionEntry.overlayAttributes.title
+		isSuggesting && postTitleProposal
+			? postTitleProposal.proposed
 			: undefined;
 	const isSuggestionPending =
 		proposedTitle !== undefined &&
-		proposedTitle !== suggestionEntry.baselineAttributes.title;
+		proposedTitle !== postTitleProposal.baseline;
 
 	const setTitle = useCallback(
 		( newTitle ) => {
@@ -78,17 +72,17 @@ export default function usePostTitle() {
 				setEntityTitle( newTitle );
 				return;
 			}
-			// No-op when a baseline is already held for the title.
-			captureBaseline( POST_TITLE_OVERLAY_KEY, '', { title } );
-			setOverlayAttributes( POST_TITLE_OVERLAY_KEY, {
-				title: newTitle,
+			// The baseline is captured on the first edit and kept after.
+			setPostTitleProposal( {
+				baseline: postTitleProposal?.baseline ?? title,
+				proposed: newTitle,
 			} );
 		},
 		[
 			isSuggesting,
 			setEntityTitle,
-			captureBaseline,
-			setOverlayAttributes,
+			setPostTitleProposal,
+			postTitleProposal,
 			title,
 		]
 	);
