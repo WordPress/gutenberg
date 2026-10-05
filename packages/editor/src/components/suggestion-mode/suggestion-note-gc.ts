@@ -53,10 +53,12 @@ import { getBlockTreeVersion } from './block-tree-version';
 import {
 	findInlineOp,
 	findStructuralOp,
+	parseSuggestionPayload,
+} from './operations';
+import {
 	forgetResolvedSuggestion,
 	getSuggestionsResolvedThisSession,
 	isSuggestionDecisionInFlight,
-	parseSuggestionPayload,
 	rememberResolvedSuggestion,
 	takeWithdrawnAnchor,
 } from './provider';

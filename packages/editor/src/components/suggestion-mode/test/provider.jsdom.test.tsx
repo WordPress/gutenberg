@@ -35,12 +35,14 @@ import {
 	findStructuralOp,
 	findInlineOp,
 	clearSuggestionMarkerAttributes,
-	useSuggestionsProvider,
-	getSuggestionsResolvedThisSession,
-	forgetResolvedSuggestion,
 	findPostAttributeOps,
 	postOperationsFromOverlay,
 	applyPostOperations,
+} from '../operations';
+import {
+	useSuggestionsProvider,
+	getSuggestionsResolvedThisSession,
+	forgetResolvedSuggestion,
 } from '../provider';
 import {
 	SuggestionOverlayProvider,

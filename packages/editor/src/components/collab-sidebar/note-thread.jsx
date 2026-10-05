@@ -28,7 +28,7 @@ import { unlock } from '../../lock-unlock';
 import {
 	findPostAttributeOps,
 	parseSuggestionPayload,
-} from '../suggestion-mode/provider';
+} from '../suggestion-mode/operations';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
