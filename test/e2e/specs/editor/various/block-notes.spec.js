@@ -131,13 +131,22 @@ test.describe( 'Block Notes', () => {
 		await expect( replyTextbox ).not.toBeFocused();
 	} );
 
-	test( 'can edit a block note', async ( { page, blockNoteUtils } ) => {
+	test( 'can edit a block note @firefox @webkit', async ( {
+		page,
+		blockNoteUtils,
+	} ) => {
 		await blockNoteUtils.addBlockWithNote( {
 			type: 'core/heading',
 			attributes: { content: 'Testing block comments' },
 			comment: 'test comment before edit',
 		} );
 		await blockNoteUtils.clickBlockNoteActionMenuItem( 'Edit' );
+		await expect(
+			page.getByRole( 'menu', { name: 'Actions' } )
+		).toBeHidden();
+		await expect(
+			page.getByRole( 'textbox', { name: 'Edit note' } )
+		).toBeFocused();
 		await page
 			.getByRole( 'textbox', { name: 'Note' } )
 			.first()
@@ -949,7 +958,7 @@ test.describe( 'Block Notes', () => {
 			).toBeFocused();
 		} );
 
-		test( 'should focus action button when note editing is cancelled or note is updated', async ( {
+		test( 'should focus action button when note editing is cancelled or note is updated @firefox @webkit', async ( {
 			page,
 			blockNoteUtils,
 		} ) => {
@@ -973,8 +982,19 @@ test.describe( 'Block Notes', () => {
 					.getByRole( 'button', { name: 'Actions' } )
 			).toBeFocused();
 
-			// Test focus on action button when note is updated.
-			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Edit' );
+			// Reopen with the keyboard and move focus into the edit field.
+			await page
+				.getByRole( 'button', { name: 'Actions' } )
+				.press( 'ArrowDown' );
+			await page
+				.getByRole( 'menuitem', { name: 'Edit', exact: true } )
+				.press( 'Enter' );
+			await expect(
+				page.getByRole( 'menu', { name: 'Actions' } )
+			).toBeHidden();
+			await expect(
+				page.getByRole( 'textbox', { name: 'Edit note' } )
+			).toBeFocused();
 			await page
 				.getByRole( 'textbox', { name: 'Note' } )
 				.first()
@@ -1015,7 +1035,7 @@ test.describe( 'Block Notes', () => {
 			await pageUtils.pressKeys( 'primary+Enter' );
 			await expect(
 				textbox,
-				`doesn't sumbit an empty form and focus remains in the textbox`
+				`doesn't submit an empty form and focus remains in the textbox`
 			).toBeFocused();
 
 			await textbox.pressSequentially( 'A test comment' );

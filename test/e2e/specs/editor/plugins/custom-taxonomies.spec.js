@@ -34,14 +34,24 @@ test.describe( 'Custom Taxonomies labels are used', () => {
 			await modelPanel.click();
 		}
 
+		// A term left over from a previous run would be offered as a suggestion
+		// instead of being created.
+		const modelName = 'Model ' + Math.round( Math.random() * 1000000 );
+
 		// Check the add new button.
 		await editorSettings
 			.getByRole( 'combobox', { name: 'Add New Model' } )
-			.fill( 'Model 1' );
-		await page.keyboard.press( 'Enter' );
+			.fill( modelName );
+		// The create option is only offered once the search for the typed name
+		// comes back.
+		await page
+			.getByRole( 'option', { name: `Create: ${ modelName }` } )
+			.click();
 
 		await expect(
-			editorSettings.getByRole( 'button', { name: 'Remove Mode' } )
+			editorSettings.getByRole( 'button', {
+				name: `Remove ${ modelName }`,
+			} )
 		).toBeVisible();
 	} );
 } );

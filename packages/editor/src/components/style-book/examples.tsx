@@ -30,7 +30,7 @@ function getColorExamples( colors: MultiOriginPalettes ): BlockExample[] {
 		const paletteFiltered = Array.isArray( palette )
 			? palette.find(
 					( origin: ColorOrigin ) => origin.slug === group.origin
-			  )
+				)
 			: undefined;
 
 		if ( paletteFiltered?.[ group.type ] ) {
@@ -76,7 +76,7 @@ function getOverviewBlockExamples(
 	const themePalette = Array.isArray( colors?.colors )
 		? colors.colors.find(
 				( origin: ColorOrigin ) => origin.slug === 'theme'
-		  )
+			)
 		: undefined;
 
 	if ( themePalette ) {

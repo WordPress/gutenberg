@@ -254,7 +254,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 						? Math.max(
 								1,
 								Math.min( item.width, effectiveColumns )
-						  )
+							)
 						: 1;
 				const bounds = widthBoundsByKey.get( key );
 				map.set(
@@ -317,7 +317,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 										actionableArea?: React.ReactNode;
 									} >,
 									{ actionableArea: undefined }
-							  )
+								)
 							: ( child as React.ReactElement );
 
 					byKey.set( key, stripped );

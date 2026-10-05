@@ -173,7 +173,7 @@ export function getFontStylesAndWeights(
 							_x( '%1$s %2$s', 'font' ),
 							weightName ?? '',
 							styleName ?? ''
-					  );
+						);
 
 			combinedStyleAndWeightOptions.push( {
 				key: `${ styleValue }-${ weightValue }`,

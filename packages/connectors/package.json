@@ -37,7 +37,7 @@
 		"@wordpress/private-apis": "file:../private-apis"
 	},
 	"devDependencies": {
-		"@types/jest": "^30.0.0"
+		"vitest": "^5.0.0"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

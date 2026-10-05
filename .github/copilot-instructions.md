@@ -19,3 +19,10 @@ When reviewing pull requests:
 - Do not suggest replacing `@wordpress/data` selectors / actions with local React state — this is the project's intentional state pattern.
 - Do not suggest replacing `__()` / `_x()` / `_n()` calls with template literals — these are WordPress i18n functions.
 - Do not suggest moving code between `block-editor`, `editor`, and `edit-post` packages without considering the layering rule (`block-editor` is WordPress-agnostic; lower layers must not depend on higher ones).
+
+## Writing Markdown
+
+- Do not hard-wrap Markdown. Keep each paragraph, list item, and table row on a single line; there is no line length limit (`MD013` is disabled).
+- Hard wrapping is an accessibility problem: screen readers and braille displays read the source file line by line, so a wrapped sentence arrives as fragments.
+- Do not reflow lines a change does not otherwise touch, in either a suggestion or a commit.
+- This applies to `.md` files and to the Markdown in pull request descriptions and comments.

@@ -1,6 +1,6 @@
 import {
 	Button,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 	Dropdown,
 	__experimentalVStack as VStack,
 	RadioControl,
@@ -269,7 +269,7 @@ export default function PostStatus() {
 											spacing={ 4 }
 											className="editor-change-status__password-fieldset"
 										>
-											<CheckboxControl
+											<WCCheckboxControl
 												label={ __(
 													'Password protected'
 												) }

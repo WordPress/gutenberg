@@ -1,10 +1,9 @@
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-import { Spinner } from '@wordpress/components';
 import { Component, Suspense } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 // eslint-disable-next-line @wordpress/use-recommended-components
-import { Card, Notice, Stack, VisuallyHidden } from '@wordpress/ui';
+import { Card, Notice, Spinner, Stack, VisuallyHidden } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 import { splitWidgetActions } from '../../utils/split-widget-actions';
 import { WidgetFooter } from '../widget-footer';

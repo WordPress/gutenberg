@@ -51,7 +51,7 @@ The package follows [semantic versioning](https://semver.org/), and the followin
 
 -   Component definitions (e.g. removing a component)
 -   Component props (e.g. renaming, removing, or changing a props supported types such that existing usage would break in an update)
--   CSS properties prefixed with `--wp-ui-` (e.g. changing a CSS property such that it would negatively impact a user's experience)
+-   CSS properties prefixed with `--wp-ui-` (e.g. changing a CSS property such that it would negatively impact a user's experience). This surface is frozen: do not add new `--wp-ui-*` custom properties. See [Custom property names](#custom-property-names).
 
 ### Controlled and uncontrolled props
 
@@ -120,7 +120,8 @@ export const Button = Object.assign( _Button, {
 
 ```ts
 const meta: Meta< typeof Button > = {
-	title: 'Design System/Components/Button',
+	title: 'Components/@wordpress-ui/Button',
+	id: 'design-system-components-button',
 	component: Button,
 	subcomponents: {
 		'Button.Icon': Button.Icon,
@@ -345,15 +346,23 @@ When the override also `composes` the primitive it extends, keep the override in
 }
 ```
 
+### Custom property names
+
+Do not add new `--wp-ui-*` custom properties. Names in that prefix are public API. Existing ones remain supported; renaming or removing them is a breaking change.
+
+Private custom properties must use an underscore after `--`. New private variables should be `--_wp-ui-*` (for example `--_wp-ui-elevation-lg`). `--_gcd-*` is reserved for global CSS defense bridges. A shorter `--_*` name is fine when it only aliases an existing public `--wp-ui-*` value locally (for example `--_checkbox-input-size`).
+
+Style with semantic `--wpds-*` tokens, existing `--wp-ui-*` variables, props, or class composition. Do not introduce a new public CSS variable to make a value themeable.
+
 ### Custom Properties and State Styles
 
-When components expose CSS custom properties (variables) for theming or composition, care must be taken to separate **configurable values** from **state handling**. Getting this wrong can silently break styles when components are composed across CSS layers.
+When components use CSS custom properties (variables) for theming or composition, care must be taken to separate **configurable values** from **state handling**. Getting this wrong can silently break styles when components are composed across CSS layers.
 
 #### The rule
 
 > **Custom properties = configurable values. CSS properties = state machine.**
 
-Define custom properties for each visual "slot" (default, active/hover, disabled, etc.) and assign them to design tokens or other values. In state selectors (`:hover`, `:active`, `:focus`, `[data-disabled]`, etc.), set **CSS properties** (like `background-color`, `color`) to reference the appropriate custom property for that state — do **not** reassign the custom property itself.
+Define private `--_wp-ui-*` custom properties for each visual "slot" (default, active/hover, disabled, etc.) and assign them to design tokens or other values. In state selectors (`:hover`, `:active`, `:focus`, `[data-disabled]`, etc.), set **CSS properties** (like `background-color`, `color`) to reference the appropriate custom property for that state — do **not** reassign the custom property itself.
 
 In CSS cascade layers, a rule in a higher-priority layer always wins over a lower-priority layer regardless of selector specificity. If a component reassigns a custom property inside a state selector, a higher layer that overrides that same custom property will win unconditionally — the state-based reassignment in the lower layer becomes dead code.
 
@@ -363,12 +372,12 @@ Define a separate custom property per state, and use CSS property declarations i
 
 ```css
 .button {
-	--button-bg: blue;
-	--button-bg-hover: darkblue;
-	background-color: var( --button-bg );
+	--_wp-ui-button-bg: blue;
+	--_wp-ui-button-bg-hover: darkblue;
+	background-color: var( --_wp-ui-button-bg );
 
 	&:hover {
-		background-color: var( --button-bg-hover );
+		background-color: var( --_wp-ui-button-bg-hover );
 	}
 }
 ```
@@ -381,16 +390,16 @@ Do not reassign the same custom property in state selectors:
 
 ```css
 .button {
-	--button-bg: blue;
-	background-color: var( --button-bg );
+	--_wp-ui-button-bg: blue;
+	background-color: var( --_wp-ui-button-bg );
 
 	&:hover {
-		--button-bg: darkblue;
+		--_wp-ui-button-bg: darkblue;
 	}
 }
 ```
 
-If a higher layer sets `.special-button { --button-bg: red; }`, that override wins over the hover reassignment (layer precedence trumps specificity). The hover state will show `red` instead of `darkblue`, and there is no way for the lower layer to recover.
+If a higher layer sets `.special-button { --_wp-ui-button-bg: red; }`, that override wins over the hover reassignment (layer precedence trumps specificity). The hover state will show `red` instead of `darkblue`, and there is no way for the lower layer to recover.
 
 ### Disabled State Styling
 

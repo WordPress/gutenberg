@@ -30,11 +30,9 @@ links: {
 }
 ```
 
-`match` answers one question: does this href target one of the application's own routes? On a hit it returns the in-app route path, `'/reports'`, and the consumer mounts `Link` with it, so the navigation is client-side. On `null` the consumer falls back to a plain anchor.
+`match` answers one question: does this href target one of the application's own routes? On a hit it returns the in-app route, `'/sales?by=day'`, path and query as the router takes them, and the consumer mounts `Link` with it, so the navigation is client-side. On `null` the consumer falls back to a plain anchor.
 
-The action declaration does not change either way. A widget declares the portable URL of its target, `admin.php?page=analytics&p=/reports`; in the owning application that materializes as a router link, everywhere else as a plain anchor that full-loads to the same place. Recognition is the application's: reachability depends on the routes it registered, which change per application and over time.
-
-Only plain navigations are matched. `download` and `openInNewTab` keep the plain anchor: both mean a new document, so a router link buys nothing.
+The action declaration does not change either way. A widget declares the portable URL of its target, `admin.php?page=analytics&p=%2Fsales%3Fby%3Dday`, the route encoded inside `p` with its query; in the owning application that materializes as a router link, everywhere else as a plain anchor that full-loads to the same place. Recognition is the application's: reachability depends on the routes it registered, which change per application and over time.
 
 ## Providing it
 
@@ -66,5 +64,27 @@ render(
 
 expect( ref.current ).toBe( screen.getByRole( 'link', { name: 'Reports' } ) );
 ```
+
+## Consuming it
+
+Most consumers touch the seam here and nowhere else. `HostLink` reads the capability and decides: the host's `Link` on a match, a plain anchor otherwise. A new document never routes, because a router link buys nothing for it, and `HostLink` reads that off the anchor props: a `download` other than `false`, or the `_blank` target a UI link resolves `openInNewTab` into.
+
+It composes through the `render` prop of a UI link, which merges its own anchor props in:
+
+```tsx
+<Link
+	download={ action.download }
+	openInNewTab={ action.openInNewTab }
+	render={ <HostLink href={ action.href } /> }
+>
+	{ action.label }
+</Link>
+```
+
+`Link`, `LinkButton` and `Menu.LinkItem` take the same anchor props, so one composition serves all three. A consumer that needs the answer before it renders reads `match` itself.
+
+`useWidgetHost` stays available for a capability no component covers yet, or an answer a consumer needs before it renders.
+
+The **WithHostLink** story runs it against a demo router, with a toggle that removes the capability from the host bag.
 
 See the Actions page for the materialization rules this serves: the widget declares where to go, the host decides how to get there.

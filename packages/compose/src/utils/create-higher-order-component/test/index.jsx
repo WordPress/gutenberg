@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { Component } from '@wordpress/element';
 import { createHigherOrderComponent } from '../';
 

@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'node:url';
 import docgen from 'react-docgen-typescript';
-import glob from 'glob';
+import { globSync } from 'glob';
 import { generateMarkdownDocs } from './markdown/index.mjs';
 import { getDescriptionsForSubcomponents } from './get-subcomponent-descriptions.mjs';
 import { getTagsFromStorybook } from './get-tags-from-storybook.mjs';
@@ -72,7 +72,7 @@ async function parseManifest( manifestPath ) {
 	}
 }
 
-const manifests = glob.sync( MANIFEST_GLOB );
+const manifests = globSync( MANIFEST_GLOB ).sort();
 
 await Promise.all(
 	manifests.map( async ( manifestPath ) => {

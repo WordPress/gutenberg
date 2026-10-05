@@ -81,7 +81,7 @@ export function GridItem( {
 				: Math.min(
 						typeof item.width === 'number' ? item.width : 1,
 						maxColumns
-				  )
+					)
 		}`,
 		gridRowEnd: `span ${ item.height || 1 }`,
 	};
@@ -136,7 +136,7 @@ export function GridItem( {
 					height: verticalResizable
 						? initialContentSize.height + resizeDelta.height
 						: undefined,
-			  }
+				}
 			: undefined;
 
 	const previewOverlay = resizeSnapPreview ? (

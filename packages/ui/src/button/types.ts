@@ -5,8 +5,10 @@ import type { ComponentProps } from '../utils/types';
 
 type _ButtonProps = ComponentProps< typeof _Button >;
 
-export interface ButtonProps
-	extends Omit< _ButtonProps, 'disabled' | 'aria-pressed' > {
+export interface ButtonProps extends Omit<
+	_ButtonProps,
+	'disabled' | 'aria-pressed'
+> {
 	/**
 	 * The variant of the button. Variants describe the visual style treatment
 	 * of the button.

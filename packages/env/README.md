@@ -72,9 +72,9 @@ If your project already has a package.json, it's also possible to use `wp-env` a
 $ npm i @wordpress/env --save-dev
 ```
 
-If you have also installed `wp-env` globally, running it will automatically execute the local, project-level package. Alternatively, you can execute `wp-env` via [`npx`](https://www.npmjs.com/package/npx), a utility automatically installed with `npm`.`npx` finds binaries like `wp-env` installed through node modules. As an example: `npx wp-env start --update`.
+If you have also installed `wp-env` globally, running it will automatically execute the local, project-level package. Alternatively, you can execute the `wp-env` installed in your project with [`npm exec`](https://docs.npmjs.com/cli/commands/npm-exec). As an example: `npm exec --no -- wp-env start --update`. The `--no` flag keeps npm from downloading a package when `wp-env` is missing locally.
 
-If you don't wish to use the global installation or `npx`, modify your `package.json` and add an extra command to npm `scripts` (https://docs.npmjs.com/misc/scripts):
+If you don't wish to use the global installation or `npm exec`, modify your `package.json` and add an extra command to npm `scripts` (https://docs.npmjs.com/misc/scripts):
 
 ```json
 "scripts": {
@@ -250,8 +250,8 @@ When you're running `wp-env` using `npm run`, like when working in the Gutenberg
 
 ```sh
 npm run wp-env start -- --xdebug
-# Alternatively, use npx:
-npx wp-env start --xdebug
+# Alternatively, run the installed binary directly:
+npm exec --no -- wp-env start --xdebug
 ```
 
 If you forget about that, the `--xdebug` parameter will be passed to npm instead of the `wp-env start` command and it will be ignored.

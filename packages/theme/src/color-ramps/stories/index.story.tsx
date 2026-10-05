@@ -116,7 +116,7 @@ function ColorScaleCombination( {
 					ramp.name === 'background' ||
 					ramp.name === 'primary' ||
 					hasColorWarningForRamp( warnings ?? [], ramp.name )
-		  );
+			);
 
 	return (
 		<article

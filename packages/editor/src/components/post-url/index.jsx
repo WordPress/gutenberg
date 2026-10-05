@@ -113,7 +113,7 @@ export default function PostURL( { onClose } ) {
 											icon={ copySmall }
 											ref={ copyButtonRef }
 											size="small"
-											label="Copy"
+											label={ __( 'Copy' ) }
 										/>
 									</InputControlSuffixWrapper>
 								}

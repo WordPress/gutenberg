@@ -5,7 +5,7 @@ import GradientPicker from '..';
 
 const meta: Meta< typeof GradientPicker > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Selection & Input/Color/GradientPicker',
+	title: 'Components/@wordpress-components/Selection & Input/Color/GradientPicker',
 	id: 'components-gradientpicker',
 	component: GradientPicker,
 	parameters: {

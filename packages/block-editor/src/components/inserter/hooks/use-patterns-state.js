@@ -105,7 +105,7 @@ const usePatternsState = (
 				: getClosestAllowedInsertionPointForPattern(
 						pattern,
 						rootClientId
-				  );
+					);
 			if ( destinationRootClientId === null ) {
 				return;
 			}

@@ -295,8 +295,7 @@
 		line-height: normal;
 	}
 
-	// TODO: Align `checkbox-control` hover styles with the design system, then drop `[type="checkbox"]` exclusion.
-	&:hover:not(:disabled, [aria-disabled="true"], [type="checkbox"]) {
+	&:hover:not(:disabled, [aria-disabled="true"]) {
 		border-color: wpds.var("--wpds-color-stroke-interactive-neutral-active");
 	}
 
@@ -315,11 +314,15 @@
 }
 
 @mixin checkbox-control {
-	border: variables.$border-width solid colors.$gray-900;
+	border: wpds.var("--wpds-border-width-xs") solid wpds.var("--wpds-color-stroke-interactive-neutral");
 	margin-right: variables.$grid-unit-15;
 	transition: none;
 	border-radius: variables.$radius-small;
 	@include input-control;
+
+	&:hover:not(:disabled, [aria-disabled="true"]) {
+		background: wpds.var("--wpds-color-background-interactive-neutral-active");
+	}
 
 	&:focus {
 		box-shadow: 0 0 0 (variables.$border-width * 2) colors.$white, 0 0 0 (variables.$border-width * 2 + variables.$border-width-focus-fallback) var(--wp-admin-theme-color);
@@ -356,7 +359,7 @@
 			vertical-align: middle;
 			width: 16px;
 			/* stylelint-disable-next-line font-family-no-missing-generic-family-keyword -- dashicons don't need a generic family keyword. */
-			font: normal 30px/1 dashicons;
+			font: 400 30px/1 dashicons;
 			speak: none;
 			-webkit-font-smoothing: antialiased;
 			-moz-osx-font-smoothing: grayscale;
@@ -370,12 +373,18 @@
 
 	&[aria-disabled="true"],
 	&:disabled {
-		background: colors.$gray-100;
-		border-color: colors.$gray-300;
+		background: wpds.var("--wpds-color-background-interactive-neutral-disabled");
+		border-color: wpds.var("--wpds-color-stroke-interactive-neutral-disabled");
+		color: wpds.var("--wpds-color-foreground-interactive-neutral-disabled");
 		cursor: default;
 
 		// Override style inherited from wp-admin. Required to avoid degraded appearance on different backgrounds.
 		opacity: 1;
+
+		&:checked::before,
+		&[aria-checked="mixed"]::before {
+			color: wpds.var("--wpds-color-foreground-interactive-neutral-disabled");
+		}
 	}
 }
 

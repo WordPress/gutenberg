@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { ColorSpace, OKLCH } from 'colorjs.io/fn';
 import { buildBgRamp, buildAccentRamp } from '../index';
 import { buildRamp } from '../lib';

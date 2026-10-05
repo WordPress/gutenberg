@@ -5,6 +5,7 @@ import { useCallback, useMemo, useState } from '@wordpress/element';
 import { Card, Icon, Stack } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 import { WidgetInfotip } from './widget-header-infotip';
+import { useIsTruncated } from './use-is-truncated';
 import {
 	WidgetHeaderAvailableSizeProvider,
 	WidgetHeaderReserveProvider,
@@ -110,6 +111,25 @@ export function WidgetHeader( {
 		[ registerReserved, unregisterReserved ]
 	);
 
+	// A clipped title shows in the infotip, so it renders for a clip even
+	// without a help note. Then it is what the title reclaims once un-clipped.
+	const [ infotipReserve, setInfotipReserve ] = useState( 0 );
+	const infotipMeasureRef = useResizeObserver< HTMLButtonElement >(
+		( [ entry ] ) => {
+			const { columnGap } = getComputedStyle(
+				entry.target.parentElement as HTMLElement
+			);
+			setInfotipReserve(
+				entry.borderBoxSize[ 0 ].inlineSize +
+					( parseFloat( columnGap ) || 0 )
+			);
+		}
+	);
+	const [ titleMeasureRef, isTitleTruncated ] =
+		useIsTruncated< HTMLHeadingElement >(
+			widgetType?.help ? 0 : infotipReserve
+		);
+
 	const hasIdentity = showIdentity && !! widgetType?.title;
 	const totalReserved = Object.values( reserved ).reduce(
 		( sum, width ) => sum + width,
@@ -119,8 +139,8 @@ export function WidgetHeader( {
 	const availableSize =
 		headerWidth > 0
 			? headerWidth -
-			  ( hasIdentity ? identityReserve : 0 ) -
-			  totalReserved
+				( hasIdentity ? identityReserve : 0 ) -
+				totalReserved
 			: null;
 
 	return (
@@ -147,6 +167,7 @@ export function WidgetHeader( {
 					) }
 
 					<Card.Title
+						ref={ titleMeasureRef }
 						id={ titleId }
 						render={ <h2 /> }
 						className={ styles.title }
@@ -154,10 +175,13 @@ export function WidgetHeader( {
 						{ widgetType.title }
 					</Card.Title>
 
-					{ widgetType.help && (
+					{ ( widgetType.help || isTitleTruncated ) && (
 						<WidgetInfotip
-							content={ widgetType.help.content }
-							links={ widgetType.help.links }
+							ref={ infotipMeasureRef }
+							title={ widgetType.title }
+							showTitle={ isTitleTruncated }
+							content={ widgetType.help?.content }
+							links={ widgetType.help?.links }
 						/>
 					) }
 				</Stack>

@@ -214,7 +214,7 @@ test.describe( 'Buttons', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Edit link.
-		await page.getByRole( 'button', { name: 'Edit' } ).click();
+		await page.getByRole( 'button', { name: 'Edit link' } ).click();
 
 		// Open Advanced settings panel.
 		await page
@@ -261,7 +261,7 @@ test.describe( 'Buttons', () => {
 		] );
 
 		// Edit link again.
-		await page.getByRole( 'button', { name: 'Edit' } ).click();
+		await page.getByRole( 'button', { name: 'Edit link' } ).click();
 
 		// Navigate to and toggle the "nofollow" checkbox.
 		await noFollowCheckbox.click();
@@ -565,6 +565,66 @@ test.describe( 'Buttons', () => {
 						},
 					},
 				],
+			},
+		] );
+	} );
+
+	// Check for regression of https://github.com/WordPress/gutenberg/issues/64222.
+	test( 'shows the in-between inserter between buttons on a wrapped line', async ( {
+		editor,
+		page,
+	} ) => {
+		const texts = Array.from(
+			{ length: 9 },
+			( _, index ) => `Button number ${ index + 1 }`
+		);
+		await editor.insertBlock( {
+			name: 'core/buttons',
+			innerBlocks: texts.map( ( text ) => ( {
+				name: 'core/button',
+				attributes: { text },
+			} ) ),
+		} );
+
+		const buttons = editor.canvas.locator( '[data-type="core/button"]' );
+		const boxes = [];
+		for ( let index = 0; index < ( await buttons.count() ); index++ ) {
+			boxes.push( await buttons.nth( index ).boundingBox() );
+		}
+
+		// The buttons have to wrap for this test to mean anything.
+		const wrapIndex = boxes.findIndex( ( box ) => box.y > boxes[ 0 ].y );
+		expect( wrapIndex ).toBeGreaterThan( 0 );
+		expect( boxes.length ).toBeGreaterThan( wrapIndex + 1 );
+
+		// Hover over the gap between the first two buttons of the second row.
+		const before = boxes[ wrapIndex ];
+		const after = boxes[ wrapIndex + 1 ];
+		await page.mouse.move(
+			( before.x + before.width + after.x ) / 2,
+			after.y + after.height / 2,
+			// An arbitrary number of `steps` imitates cursor movement in the
+			// test environment, activating the in-between inserter.
+			{ steps: 10 }
+		);
+
+		// Only buttons are allowed here, so the inserter adds one directly.
+		await page
+			.locator( '.block-editor-block-list__insertion-point-inserter' )
+			.getByRole( 'button', { name: 'Add button' } )
+			.click();
+		await page.keyboard.type( 'New' );
+
+		const expectedTexts = [ ...texts ];
+		expectedTexts.splice( wrapIndex + 1, 0, 'New' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/buttons',
+				innerBlocks: expectedTexts.map( ( text ) => ( {
+					name: 'core/button',
+					attributes: { text },
+				} ) ),
 			},
 		] );
 	} );

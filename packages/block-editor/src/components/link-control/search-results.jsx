@@ -42,7 +42,7 @@ function LinkControlSearchResults( {
 				/* translators: %s: search term. */
 				__( 'Search results for "%s"' ),
 				currentInputValue
-		  );
+			);
 
 	return (
 		<div className="block-editor-link-control__search-results-wrapper">

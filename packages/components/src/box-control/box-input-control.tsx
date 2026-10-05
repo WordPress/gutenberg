@@ -187,7 +187,7 @@ export default function BoxInputControl( {
 					label: '',
 					tooltip: preset.name ?? preset.slug,
 				} ) ),
-		  ]
+			]
 		: [];
 
 	return (
@@ -266,7 +266,7 @@ export default function BoxInputControl( {
 										newIndex - 1,
 										presetKey,
 										presets
-								  );
+									);
 						handleRawOnValueChange( newValue );
 					} }
 					withInputField={ false }
