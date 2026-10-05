@@ -284,7 +284,7 @@ const DataViewsSubComponents = DataViews as typeof DataViews & {
 DataViewsSubComponents.BulkActionToolbar =
 	function DeprecatedBulkActionToolbar() {
 		deprecated( 'DataViews.BulkActionToolbar', {
-			alternative: 'DataViews.Layout',
+			hint: 'Remove this component from your composition. Built-in table and grid layouts render bulk actions automatically.',
 		} );
 		return <></>;
 	};

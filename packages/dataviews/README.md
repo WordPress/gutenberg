@@ -561,8 +561,10 @@ The following components are available directly under `DataViews`:
 -   `DataViews.Layout`
 -   `DataViews.LayoutSwitcher`
 -   `DataViews.Pagination`
--   `DataViews.BulkActionToolbar` (deprecated; renders nothing because `DataViews.Layout` includes bulk actions)
+-   `DataViews.BulkActionToolbar` (deprecated)
 -   `DataViews.ViewConfig`
+
+Bulk actions are now rendered within the built-in table and grid layouts ([#82730](https://github.com/WordPress/gutenberg/pull/82730)). `DataViews.BulkActionToolbar` remains available for compatibility but renders nothing, so you can remove it from custom compositions.
 
 #### example
 

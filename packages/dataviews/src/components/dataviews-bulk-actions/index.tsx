@@ -269,12 +269,7 @@ function renderBulkActionsContent< Item >(
 					) }
 				</span>
 			) }
-			<Stack
-				direction="row"
-				className="dataviews-bulk-actions__buttons"
-				gap="md"
-				justify="start"
-			>
+			<Stack direction="row" gap="md" justify="start">
 				{ isMobile
 					? actionsToShow.length > 0 && (
 							<Menu.Root>

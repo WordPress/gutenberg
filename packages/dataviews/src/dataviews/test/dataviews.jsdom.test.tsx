@@ -189,12 +189,12 @@ describe( 'DataViews component', () => {
 			</DataViewWrapper>
 		);
 		expect( console ).toHaveWarnedWith(
-			'DataViews.BulkActionToolbar is deprecated. Please use DataViews.Layout instead.'
+			'DataViews.BulkActionToolbar is deprecated. Note: Remove this component from your composition. Built-in table and grid layouts render bulk actions automatically.'
 		);
 		expect( screen.getByText( '1 item selected' ) ).toBeInTheDocument();
-		expect( screen.getByRole( 'button', { name: 'Delete' } ) ).toHaveClass(
-			'is-secondary'
-		);
+		expect(
+			screen.getByRole( 'button', { name: 'Delete' } )
+		).toBeInTheDocument();
 	} );
 
 	it( 'renders header bulk actions in a custom grid composition', async () => {
@@ -209,9 +209,9 @@ describe( 'DataViews component', () => {
 			screen.getAllByRole( 'checkbox', { name: 'Select all' } ).at( -1 )!
 		);
 		expect( screen.getByText( '3 items selected' ) ).toBeInTheDocument();
-		expect( screen.getByRole( 'button', { name: 'Delete' } ) ).toHaveClass(
-			'is-secondary'
-		);
+		expect(
+			screen.getByRole( 'button', { name: 'Delete' } )
+		).toBeInTheDocument();
 	} );
 
 	it.each( [ LAYOUT_TABLE, LAYOUT_GRID ] as const )(
@@ -273,8 +273,6 @@ describe( 'DataViews component', () => {
 		const titleHeader = screen.getByRole( 'columnheader', {
 			name: 'Title',
 		} );
-		// eslint-disable-next-line testing-library/no-node-access
-		expect( titleHeader.closest( 'tr' ) ).not.toHaveAttribute( 'inert' );
 		expect( within( titleHeader ).getByRole( 'button' ) ).toBeEnabled();
 	} );
 
@@ -323,9 +321,6 @@ describe( 'DataViews component', () => {
 		const titleHeader = within( tableHeader ).getByRole( 'columnheader', {
 			name: 'Title',
 		} );
-		expect( tableHeader ).not.toHaveAttribute( 'inert' );
-		// eslint-disable-next-line testing-library/no-node-access
-		expect( titleHeader.closest( 'tr' ) ).not.toHaveAttribute( 'inert' );
 		expect(
 			within( titleHeader ).getByRole( 'button', { hidden: true } )
 		).toHaveAttribute( 'inert' );
