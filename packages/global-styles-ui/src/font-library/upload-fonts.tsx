@@ -10,13 +10,13 @@ import {
 	ProgressBar,
 } from '@wordpress/components';
 import { useContext, useState } from '@wordpress/element';
+import type { FontFace } from '@wordpress/core-data';
 import { ALLOWED_FILE_EXTENSIONS } from './utils/constants';
 import { FontLibraryContext } from './context';
 import { Font } from './lib/lib-font.browser';
 import makeFamiliesFromFaces from './utils/make-families-from-faces';
 import { loadFontFaceInBrowser } from './utils';
 import { createCssString } from './utils/create-css-string';
-import type { FontFileMetadata } from './types';
 
 function UploadFonts() {
 	const { installFonts } = useContext( FontLibraryContext );
@@ -99,35 +99,31 @@ function UploadFonts() {
 	 * @return {void}
 	 */
 	const loadFiles = async ( files: File[] ) => {
-		const fontFacesLoaded = (
-			await Promise.all(
-				files.map< Promise< FontFileMetadata | null > >(
-					async ( fontFile: File ) => {
-						const fontFaceMetadata =
-							await getFontFaceMetadata( fontFile );
-						const { fontDisplayName, file, ...metadata } =
-							fontFaceMetadata;
-
-						// It's technically possible to use "" as a font's family name, but
-						// that's disallowed here.
-						if ( ! fontDisplayName ) {
-							return null;
-						}
-
-						loadFontFaceInBrowser(
-							{
-								...metadata,
-								fontFamily: createCssString( fontDisplayName ),
-							},
-							file,
-							'all'
-						);
-						return fontFaceMetadata;
-					}
-				)
+		const fontFacesLoaded = await Promise.all(
+			files.map( async ( fontFile: File ) => {
+				const fontFaceData = await getFontFaceMetadata( fontFile );
+				// It's technically possible to use "" as a font's family name, but
+				// that's disallowed here.
+				if ( fontFaceData.fontFamily ) {
+					loadFontFaceInBrowser(
+						{
+							...fontFaceData,
+							fontFamily: createCssString(
+								fontFaceData.fontFamily
+							),
+						},
+						fontFaceData.file,
+						'all'
+					);
+				}
+				return fontFaceData;
+			} )
+		);
+		handleInstall(
+			fontFacesLoaded.filter(
+				( fontFaceData ) => fontFaceData.fontFamily
 			)
-		).filter( ( nullableFontFace ) => !! nullableFontFace );
-		handleInstall( fontFacesLoaded );
+		);
 	};
 
 	/**
@@ -157,9 +153,7 @@ function UploadFonts() {
 		} );
 	}
 
-	const getFontFaceMetadata = async (
-		fontFile: File
-	): Promise< FontFileMetadata > => {
+	const getFontFaceMetadata = async ( fontFile: File ) => {
 		const buffer = await readFileAsArrayBuffer( fontFile );
 		const fontObj: Font & {
 			onload?: ( val: { detail: { font: any } } ) => void;
@@ -171,11 +165,7 @@ function UploadFonts() {
 		);
 		const font = onloadEvent.detail.font;
 		const { name } = font.opentype.tables;
-		const fontDisplayName = (
-			name.get( 16 ) ||
-			name.get( 1 ) ||
-			''
-		).trim();
+		const fontName = ( name.get( 16 ) || name.get( 1 ) || '' ).trim();
 		const isItalic = ( name.get( 2 ) || '' )
 			.toLowerCase()
 			.includes( 'italic' );
@@ -190,10 +180,9 @@ function UploadFonts() {
 		const weightRange = weightAxis
 			? `${ weightAxis.minValue } ${ weightAxis.maxValue }`
 			: null;
-
 		return {
 			file: fontFile,
-			fontDisplayName,
+			fontFamily: fontName,
 			fontStyle: isItalic ? 'italic' : 'normal',
 			fontWeight: weightRange || fontWeight,
 		};
@@ -205,7 +194,7 @@ function UploadFonts() {
 	 * @param {Array} fontFaces The font faces to be installed
 	 * @return {void}
 	 */
-	const handleInstall = async ( fontFaces: FontFileMetadata[] ) => {
+	const handleInstall = async ( fontFaces: FontFace[] ) => {
 		const fontFamilies = makeFamiliesFromFaces( fontFaces );
 
 		try {

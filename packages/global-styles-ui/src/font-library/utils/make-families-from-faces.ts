@@ -1,38 +1,27 @@
+import type { FontFamily, FontFace } from '@wordpress/core-data';
 import { kebabCase } from '@wordpress/kebab-case';
 import { createCssString } from './create-css-string';
-import type { FontFileMetadata, FontFamilyToUpload } from '../types';
 
 export default function makeFamiliesFromFaces(
-	faces: FontFileMetadata[]
-): FontFamilyToUpload[] {
-	const fontFamiliesObject = faces.reduce(
-		(
-			acc: Record<
-				string,
-				FontFamilyToUpload & {
-					fontFace: NonNullable< FontFamilyToUpload[ 'fontFace' ] >;
-				}
-			>,
-			item: FontFileMetadata
-		) => {
-			const cssFontFamily = createCssString( item.fontDisplayName );
-			if ( ! acc[ item.fontDisplayName ] ) {
-				acc[ item.fontDisplayName ] = {
-					name: item.fontDisplayName,
-					fontFamily: cssFontFamily,
-					slug: kebabCase( item.fontDisplayName.toLowerCase() ),
+	fontFaces: FontFace[]
+): FontFamily[] {
+	const fontFamiliesObject = fontFaces.reduce(
+		( acc: Record< string, FontFamily >, item: FontFace ) => {
+			// The REST API expects CSS text. The name from the font file is plain text.
+			const fontFamily = createCssString( item.fontFamily );
+			if ( ! acc[ item.fontFamily ] ) {
+				acc[ item.fontFamily ] = {
+					name: item.fontFamily,
+					fontFamily,
+					slug: kebabCase( item.fontFamily.toLowerCase() ),
 					fontFace: [],
 				};
 			}
-			acc[ item.fontDisplayName ].fontFace.push( {
-				fontFamily: cssFontFamily,
-				fontStyle: item.fontStyle,
-				fontWeight: item.fontWeight,
-				file: item.file,
-			} );
+			// @ts-expect-error `acc[ item.fontFamily ]` is possibly `undefined`.
+			acc[ item.fontFamily ].fontFace.push( { ...item, fontFamily } );
 			return acc;
 		},
 		{}
 	);
-	return Object.values( fontFamiliesObject );
+	return Object.values( fontFamiliesObject ) as FontFamily[];
 }
