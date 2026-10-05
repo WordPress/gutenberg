@@ -79,6 +79,16 @@ class Tests_Strip_Pending_Structural_Suggestions extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'pending-remove', $rendered );
 	}
 
+	public function test_pending_attributes_block_renders_its_live_attributes() {
+		$content  = '<!-- wp:heading {"level":2,"metadata":{"suggestion":{"type":"pending-attributes","authorId":2,"after":{"level":3}},"noteId":[7]}} --><h2 class="wp-block-heading">Proposed level change</h2><!-- /wp:heading -->';
+		$rendered = $this->render( $content );
+
+		// The proposal never reaches the front end: readers see the baseline.
+		$this->assertStringContainsString( '<h2', $rendered );
+		$this->assertStringNotContainsString( '<h3', $rendered );
+		$this->assertStringNotContainsString( 'pending-attributes', $rendered );
+	}
+
 	public function test_pending_move_block_still_renders() {
 		$content  = '<!-- wp:paragraph {"metadata":{"suggestion":{"type":"pending-move","authorId":2,"fromIndex":0}}} --><p>Moved content</p><!-- /wp:paragraph -->';
 		$rendered = $this->render( $content );

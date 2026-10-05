@@ -1017,10 +1017,15 @@ test.describe( 'Suggestion mode persistence', () => {
 		const sidebar = await openNotesSidebar( page );
 		await expect( sidebar.getByText( /heading level/ ) ).toBeVisible();
 
+		// The note collector trashes the note through core-data, which
+		// updates the comment to `status: 'trash'` (a PUT, not a DELETE).
 		const noteTrashed = page.waitForResponse(
 			( response: any ) =>
 				/\/wp\/v2\/comments\/\d+/.test( response.url() ) &&
-				response.request().method() === 'DELETE' &&
+				[ 'PUT', 'POST', 'DELETE' ].includes(
+					response.request().method()
+				) &&
+				response.request().postData()?.includes( '"trash"' ) &&
 				response.ok()
 		);
 		await pageUtils.pressKeys( 'primary+z' );
