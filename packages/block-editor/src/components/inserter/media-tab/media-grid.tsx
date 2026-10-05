@@ -15,7 +15,7 @@ type MediaType = 'image' | 'video' | 'audio';
  * the store actions). Core sources spread the attachment record in, so `date`
  * is present for them and absent for external sources.
  */
-export type MediaItem = {
+type MediaItem = {
 	id?: number;
 	sourceId?: number | string;
 	title?: string | { rendered?: string };
@@ -81,7 +81,6 @@ const GRID_LAYOUT = {
 } as const;
 const DEFAULT_LAYOUTS = { grid: { layout: GRID_LAYOUT } };
 
-const isItemClickable = () => true;
 const getTitle = ( item: MediaItem ) =>
 	typeof item.title === 'string'
 		? item.title
@@ -272,7 +271,6 @@ export default function MediaGrid( {
 			defaultLayouts={ DEFAULT_LAYOUTS }
 			getItemId={ getItemId }
 			onClickItem={ onClickItem }
-			isItemClickable={ isItemClickable }
 			empty={ empty }
 		>
 			<div className="block-editor-inserter__media-grid__search">
