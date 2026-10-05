@@ -4,11 +4,11 @@
 
 ### Breaking Changes
 
--   Item popup `sm`, `md`, and `lg` width presets now set a maximum width and size to content. To keep a fixed width, set it through `className` or `style`. Form popups retain their anchor-width minimum.
+-   Item popup `sm`, `md`, and `lg` width presets now set a maximum width and size to content. To keep a fixed width, set it through `className` or `style`. Form popups retain their anchor-width minimum ([#84086](https://github.com/WordPress/gutenberg/pull/84086)).
 
 ### New Features
 
--   `Menu.Popup`: Add width presets, with `sm` as the default to preserve the 320px maximum width.
+-   `Menu.Popup`: Add width presets, with `sm` as the default to preserve the 320px maximum width ([#84086](https://github.com/WordPress/gutenberg/pull/84086)).
 
 ### Enhancements
 
