@@ -338,7 +338,7 @@ export function useOpenImageMediaEditorModal( {
 	);
 
 	const handleMediaUpdate = useCallback(
-		async ( { id: newId, url: newUrl }, session ) => {
+		async ( { id: newId, url: newUrl }, undoState ) => {
 			if ( typeof newId !== 'number' ) {
 				return;
 			}
@@ -356,8 +356,8 @@ export function useOpenImageMediaEditorModal( {
 			if ( isNewAttachment ) {
 				// Capture the block's selected-size URL, not the attachment's
 				// full-size URL supplied by the modal's fallback Undo.
-				session.undoAttributes.id = currentBlockAttributes.id;
-				session.undoAttributes.url = currentBlockAttributes.url;
+				undoState.undoAttributes.id = currentBlockAttributes.id;
+				undoState.undoAttributes.url = currentBlockAttributes.url;
 				nextAttributes.id = newId;
 				nextAttributes.url = newUrl ?? currentBlockAttributes.url;
 				if ( nextAttributes.url !== currentBlockAttributes.url ) {
@@ -386,7 +386,7 @@ export function useOpenImageMediaEditorModal( {
 				// A newer update started while we were awaiting; discard
 				// this one.
 				if (
-					session.isUndone ||
+					undoState.isUndone ||
 					syncRequest !== mediaEditorMetadataSyncRequestRef.current
 				) {
 					return;
@@ -456,8 +456,8 @@ export function useOpenImageMediaEditorModal( {
 				// Only restore values this save changed. Block-specific
 				// metadata and unrelated edits must not be overwritten.
 				for ( const key of Object.keys( nextAttributes ) ) {
-					if ( ! Object.hasOwn( session.undoAttributes, key ) ) {
-						session.undoAttributes[ key ] =
+					if ( ! Object.hasOwn( undoState.undoAttributes, key ) ) {
+						undoState.undoAttributes[ key ] =
 							blockAttributesRef.current[ key ];
 					}
 				}
@@ -504,15 +504,15 @@ export function useOpenImageMediaEditorModal( {
 				: fallbackAttachmentRecord ) ||
 			cachedAttachmentRecord;
 
-		// Each opening owns its Undo snapshot, so a later session cannot
+		// Each opening owns its Undo snapshot, so a later opening cannot
 		// replace the values captured by an earlier snackbar.
-		const session = { undoAttributes: {}, isUndone: false };
+		const undoState = { undoAttributes: {}, isUndone: false };
 		openMediaEditorModal( {
 			id,
-			onUpdate: ( updated ) => handleMediaUpdate( updated, session ),
+			onUpdate: ( updated ) => handleMediaUpdate( updated, undoState ),
 			onUndo: () => {
-				session.isUndone = true;
-				const { undoAttributes } = session;
+				undoState.isUndone = true;
+				const { undoAttributes } = undoState;
 				if ( Object.hasOwn( undoAttributes, 'url' ) ) {
 					onUrlChange?.( undoAttributes.url );
 				}

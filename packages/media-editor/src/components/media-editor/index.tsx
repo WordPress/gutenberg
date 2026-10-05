@@ -312,7 +312,7 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 											isOriginalRestored || isSaving
 										}
 										info={ __(
-											'Discards all edits and loads the unedited file.'
+											'Discards unsaved changes and loads the original image.'
 										) }
 										onClick={ () => {
 											onRestoreOriginal();

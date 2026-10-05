@@ -93,7 +93,7 @@ export default function MediaEditorCanvas( {
 			naturalWidth: mediaWidth,
 			naturalHeight: mediaHeight,
 		} );
-	}, [ cropperImage, mediaUrl, mediaWidth, mediaHeight, setSourceImage ] );
+	}, [ mediaUrl, mediaWidth, mediaHeight, setSourceImage ] );
 
 	const isImage = mediaType.type === 'image';
 
