@@ -11,6 +11,8 @@ const DEFAULT_RENDER = ( props: React.ComponentProps< typeof Stack > ) => (
  * A low-level primitive that groups radio buttons so they share one selected
  * value.
  *
+ * Prefer `RadioGroupControl` for standard labeled radio groups.
+ *
  * Must wrap `Radio` items. For one labeled group, pass `RadioGroup` to
  * `Fieldset.Root`'s `render` prop. When a `Fieldset` contains multiple groups,
  * give each `RadioGroup` its own accessible name.
