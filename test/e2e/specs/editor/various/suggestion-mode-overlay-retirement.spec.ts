@@ -169,11 +169,19 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 		await deselect( page );
 
 		// The invariant: the block carries inline markers but no overlay
-		// `<ins>`/`<del>` diff.
+		// `<ins>`/`<del>` diff, and no whole-attribute proposal for the
+		// marked attribute in its `metadata.suggestion` marker either.
 		const overlayDiff =
 			( await paragraph.locator( OVERLAY_ADD ).count() ) +
 			( await paragraph.locator( OVERLAY_DEL ).count() );
 		expect( overlayDiff ).toBe( 0 );
+		const proposedContent = await page.evaluate( () => {
+			const [ block ] = window.wp.data
+				.select( 'core/block-editor' )
+				.getBlocks();
+			return block.attributes.metadata?.suggestion?.after?.content;
+		} );
+		expect( proposedContent ).toBeUndefined();
 	} );
 
 	/*
@@ -337,9 +345,9 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 		 * matching /[\r\n]/, so the editor's own paste pipeline handles it.
 		 * That pipeline commits the merged value to the block-editor store
 		 * directly (not through the block's `setAttributes` prop), so the
-		 * STORE INTERCEPTOR — not the content reconciler — captures it,
+		 * STORE INTERCEPTOR, not the content reconciler, captures it,
 		 * reverting the store to baseline and diverting the pasted value
-		 * into the attribute overlay as a whole-attribute suggestion.
+		 * into the block marker's proposal as a whole-attribute suggestion.
 		 * Converting that capture into inline markers is a possible
 		 * follow-up; what this safety net pins is that the paste is never
 		 * committed raw and never rendered as an overlay inline diff.
@@ -350,18 +358,19 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 		await waitForSuggestionSaved( page );
 		await deselect( page );
 
-		// The suggester sees their pasted text live (overlay merge)…
+		// The suggester sees their pasted text live (proposal merge)…
 		await expect( paragraph ).toContainText( 'one two' );
 		await expect( paragraph ).toContainText( 'three four' );
 		// …with the attribute-pending bracket treatment, not inline markers.
 		await expect( paragraph ).toHaveClass( /is-suggestion-pending/ );
 		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 0 );
-		// The store (and thus serialized content) stays at the baseline:
+		// The live block (and thus its markup) stays at the baseline:
 		// nothing from the paste is committed until the suggestion is
-		// accepted.
+		// accepted. The pasted value is only in the marker's proposal.
 		const serialized = await editor.getEditedPostContent();
 		expect( serialized ).toContain( '<p>Start</p>' );
-		expect( serialized ).not.toContain( 'one two' );
+		expect( serialized ).not.toMatch( /<p>[^<]*one two/ );
+		expect( serialized ).toContain( '"type":"pending-attributes"' );
 	} );
 
 	test( 'seam: an autocorrect-style replacement (insertReplacementText) becomes markers via the reconciler', async ( {
