@@ -68,13 +68,15 @@ export function NoteThread( {
 	}, [ relatedBlockElement, note.id, registerThread, unregisterThread ] );
 
 	// Scroll the thread into view when it becomes selected, and re-scroll
-	// when its floating position settles after `useFloatingBoard` recomputes.
+	// when its floating position or height settles after `useFloatingBoard`
+	// recomputes. The canvas room follows the height, so an expanding thread
+	// can only scroll fully into view once it's measured.
 	useEffect( () => {
 		if ( ! isSelected || note.id === 'new' ) {
 			return;
 		}
 		scrollNoteThreadIntoView( note.id, sidebarRef.current );
-	}, [ isSelected, floating?.y, note.id, sidebarRef ] );
+	}, [ isSelected, floating?.y, floating?.height, note.id, sidebarRef ] );
 
 	/*
 	 * Deselect the thread once focus leaves it. `useFocusOutside` keeps the
