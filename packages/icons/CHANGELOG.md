@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Stroke-based icons now scale their stroke width with their size. A 1.5-unit stroke renders at 1px for a 16px icon, 1.25px for a 20px icon, and 1.5px for a 24px icon.
+
 ### New Features
 
 -   Add the `justifySpaceAround` icon ([#83519](https://github.com/WordPress/gutenberg/pull/83519)).
