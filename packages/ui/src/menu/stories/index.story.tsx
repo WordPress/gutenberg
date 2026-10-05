@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import type { ComponentProps } from 'react';
 import { useState } from '@wordpress/element';
 import {
 	archive,
@@ -53,47 +52,6 @@ const meta: Meta< typeof Menu.Root > = {
 export default meta;
 
 type Story = StoryObj< typeof Menu.Root >;
-
-export const PopupWidths: StoryObj<
-	ComponentProps< typeof Menu.Popup > & { longLabels: boolean }
-> = {
-	args: { width: 'sm', longLabels: true },
-	argTypes: {
-		width: {
-			control: 'select',
-			options: [ 'anchor', 'content', 'sm', 'md', 'lg', 'available' ],
-		},
-		longLabels: { control: 'boolean' },
-	},
-	render: ( { longLabels, ...args } ) => (
-		<Menu.Root>
-			<Menu.Trigger>Open menu</Menu.Trigger>
-			<Menu.Popup { ...args }>
-				<Menu.Item>
-					<Menu.ItemLabel>
-						{ longLabels
-							? 'Save changes and publish the updated page to your site'
-							: 'Save' }
-					</Menu.ItemLabel>
-				</Menu.Item>
-				<Menu.SubmenuRoot>
-					<Menu.SubmenuTrigger>
-						<Menu.ItemLabel>More actions</Menu.ItemLabel>
-					</Menu.SubmenuTrigger>
-					<Menu.Popup width={ args.width }>
-						<Menu.Item>
-							<Menu.ItemLabel>
-								{ longLabels
-									? 'Download a copy of this page and all its content'
-									: 'Download' }
-							</Menu.ItemLabel>
-						</Menu.Item>
-					</Menu.Popup>
-				</Menu.SubmenuRoot>
-			</Menu.Popup>
-		</Menu.Root>
-	),
-};
 
 const SHORTCUTS = {
 	comfortableDensity: {
