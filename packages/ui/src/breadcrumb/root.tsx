@@ -12,12 +12,12 @@ import {
 } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import type { ReactElement, ReactNode } from 'react';
+import { inertValue } from '@wordpress/react-inert-value';
 import * as Menu from '../menu';
 import type { RootProps as MenuRootProps } from '../menu/types';
 import * as Tooltip from '../tooltip';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
 import resetStyles from '../utils/css/resets.module.css';
-import { inertValue } from '../utils/inert-value';
 import { BreadcrumbItemRenderContext } from './context';
 import { CurrentItem } from './current-item';
 import { enforceRenderProps } from './enforce-render-props';
