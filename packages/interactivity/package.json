@@ -37,7 +37,7 @@
 		"preact": "^10.29.1"
 	},
 	"devDependencies": {
-		"vitest": "^5.0.0"
+		"vitest": "^5.0.3"
 	},
 	"publishConfig": {
 		"access": "public"

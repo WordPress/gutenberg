@@ -20,7 +20,12 @@ import { VisuallyHidden } from '@wordpress/ui';
 import { isURL } from '@wordpress/url';
 import { LinkUIPageCreator } from './page-creator';
 import LinkUIBlockInserter from './block-inserter';
-import { useEntityBinding, useLinkPreview } from '../shared';
+import {
+	isBlockSuggestion,
+	useBlockSuggestions,
+	useEntityBinding,
+	useLinkPreview,
+} from '../shared';
 
 /**
  * Given the Link block's type attribute, return the query params for that one
@@ -187,6 +192,18 @@ function UnforwardedLinkUI( props, ref ) {
 	}, [ shouldFocusPane ] );
 
 	const blockEditingMode = useBlockEditingMode();
+	const canAddBlock = blockEditingMode !== 'disabled';
+
+	// Blocks are listed in the search results only when the "Add block"
+	// button would be shown: the link has no URL yet and the block is not
+	// locked.
+	const { transformSuggestions, insertBlockFromSuggestion } =
+		useBlockSuggestions( {
+			clientId,
+			isEnabled: canAddBlock && ! link?.url?.length,
+			onBlockInsert: props.onBlockInsert,
+			onClose: props.onClose,
+		} );
 
 	return (
 		<Popover
@@ -221,7 +238,17 @@ function UnforwardedLinkUI( props, ref ) {
 						noDirectEntry={ !! type }
 						noURLSuggestion={ !! type }
 						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
-						onChange={ props.onChange }
+						transformSuggestions={ transformSuggestions }
+						onChange={ ( updatedValue ) => {
+							if ( isBlockSuggestion( updatedValue ) ) {
+								insertBlockFromSuggestion(
+									updatedValue.blockItemId
+								);
+								return;
+							}
+
+							props.onChange( updatedValue );
+						} }
 						onInputChange={ ( value ) => {
 							// Observe the input value so we can pass the value to the page creator
 							// and restore it on back button click
@@ -253,9 +280,7 @@ function UnforwardedLinkUI( props, ref ) {
 										permissions?.canCreate &&
 										type === 'page'
 									}
-									canAddBlock={
-										blockEditingMode !== 'disabled'
-									}
+									canAddBlock={ canAddBlock }
 								/>
 							);
 						} }
