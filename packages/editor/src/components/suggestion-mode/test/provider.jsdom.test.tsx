@@ -39,11 +39,8 @@ import {
 	postOperationsFromOverlay,
 	applyPostOperations,
 } from '../operations';
-import {
-	useSuggestionsProvider,
-	getSuggestionsResolvedThisSession,
-	forgetResolvedSuggestion,
-} from '../provider';
+import { useSuggestionsProvider } from '../provider';
+import { getSuggestionsResolvedThisSession } from '../decision-state';
 import {
 	SuggestionOverlayProvider,
 	useSuggestionOverlay,
@@ -1839,7 +1836,7 @@ describe( 'review decisions and undo history', () => {
 	} );
 
 	it( 'records a decided suggestion so its note can be reopened', async () => {
-		const { block, getProvider } = setup();
+		const { registry, block, getProvider } = setup();
 
 		await act( async () => {
 			await getProvider().applySuggestion( {
@@ -1850,8 +1847,9 @@ describe( 'review decisions and undo history', () => {
 		} );
 
 		// The note collector reads this to spot a marker an undo put back.
-		expect( getSuggestionsResolvedThisSession().has( '9' ) ).toBe( true );
-		forgetResolvedSuggestion( 9 );
+		expect( getSuggestionsResolvedThisSession( registry ).has( '9' ) ).toBe(
+			true
+		);
 	} );
 } );
 
