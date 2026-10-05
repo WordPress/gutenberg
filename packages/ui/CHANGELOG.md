@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Item popup `sm`, `md`, and `lg` width presets now set a maximum width and size to content. To keep a fixed width, set it through `className` or `style`. Form popups retain their anchor-width minimum.
+
+### New Features
+
+-   `Menu.Popup`: Add width presets, with `sm` as the default to preserve the 320px maximum width.
+
 ### Enhancements
 
 -   `SelectControl`: Warn in development when an item has an empty string `value`, which shows the placeholder instead of the item's label when selected ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).

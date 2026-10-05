@@ -9,6 +9,12 @@ Choose between Menu, Select, and Autocomplete based on what the options represen
 
 > If the trigger represents a current value and opens choices for replacing that value, use Select. If the trigger opens commands, actions, or navigation destinations, use Menu. If users need to type to filter a menu-like list of commands or suggestions, use Autocomplete.
 
+## Popup widths
+
+`Menu.Popup` accepts the same `width` presets as Select, Combobox, and Autocomplete. The `sm`, `md`, and `lg` presets size the popup to its content up to the corresponding surface width token. Menu defaults to `sm`, which keeps its 320px maximum width. Submenus use their own `width` prop and also default to `sm`.
+
+Use `content` to let the popup grow up to the available viewport width, `anchor` to match the trigger width, or `available` to fill the available width. All presets respect Menu's minimum width, which defaults to 160px, and the existing `--wp-ui-menu-min-width` and `--wp-ui-menu-max-width` overrides. A consumer can still set a fixed width with `className` or `style`.
+
 ## Quick reference
 
 <Markdown>{ `
