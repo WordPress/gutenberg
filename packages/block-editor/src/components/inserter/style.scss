@@ -433,12 +433,12 @@ $block-inserter-tabs-height: 44px;
 // a short viewport it outgrows the tab panel, which scrolls.
 $media-panel-min-height: 320px;
 
-.block-editor-inserter__media-sources {
+.block-editor-inserter__media-category-list {
 	display: flex;
 	flex-direction: column;
 	flex: 1 0 auto;
 
-	.block-editor-inserter__media-sources__source {
+	.block-editor-inserter__media-category-list__category {
 		display: flex;
 		flex-direction: column;
 		flex-shrink: 0;
@@ -453,7 +453,7 @@ $media-panel-min-height: 320px;
 		}
 	}
 
-	.block-editor-inserter__media-sources__trigger {
+	.block-editor-inserter__media-category-list__trigger {
 		// Reset the native button so the header reads as a row in the column.
 		appearance: none;
 		border: 0;
@@ -476,14 +476,14 @@ $media-panel-min-height: 320px;
 		}
 	}
 
-	.block-editor-inserter__media-sources__panel {
+	.block-editor-inserter__media-category-list__panel {
 		display: flex;
 		flex-direction: column;
 		flex: 1;
 		min-height: 0;
 	}
 
-	.block-editor-inserter__media-sources__footer {
+	.block-editor-inserter__media-category-list__footer {
 		flex-shrink: 0;
 		// Pinned to the bottom of the sidebar even when every panel is
 		// collapsed and nothing above it grows.

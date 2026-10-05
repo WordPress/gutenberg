@@ -5,7 +5,7 @@ import MediaUploadCheck from '../../media-upload/check';
 import MediaUpload from '../../media-upload';
 import { useMediaCategories } from './hooks';
 import { getBlockAndPreviewFromMedia } from './utils';
-import MediaSources from './media-sources';
+import MediaCategoryList from './media-category-list';
 import InserterNoResults from '../no-results';
 
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
@@ -42,7 +42,7 @@ function MediaTab( { rootClientId, onInsert } ) {
 	}
 
 	return (
-		<MediaSources
+		<MediaCategoryList
 			categories={ categories }
 			onInsert={ onInsert }
 			footer={
