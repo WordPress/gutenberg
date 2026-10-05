@@ -63,6 +63,9 @@ import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useSuggestionOverlay } from './overlay-context';
+import { withSuggestionMarker } from './marker';
+import type { SuggestionMarker } from './marker';
+export type { SuggestionMarker };
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { parseSuggestionPayload } from './operations';
 import { rememberWithdrawnAnchor } from './decision-state';
@@ -465,36 +468,6 @@ export function isAppliedRemoval(
 }
 
 /**
- * Marker shape stored at `metadata.suggestion` on a block to indicate a
- * pending structural suggestion. The block stays in the live tree; the
- * marker drives the visual treatment and tells the auto-save loop to
- * persist the corresponding structural operation. Cleared on apply or
- * reject. See `docs/explanations/architecture/suggestions.md` for the
- * "apply-and-tag" rationale.
- *
- * The marker's `type` is the op type it represents; `groupId` is a shared id
- * linking the halves of a single replacement (a block-switcher transform is a
- * removal plus an insertion — present on every member, and the review layer
- * resolves the whole group with one decision); `commentId` is filled in by
- * auto-save once a note comment exists for the marker; `authorId` is the ID
- * of the user who proposed the suggestion, captured at marker-write time so
- * the rendering layer can tint the preview with the author's avatar color
- * (`null` when the current user can't be resolved, e.g. unit tests);
- * `crossedParents` (`pending-move` only) is true when the move changed
- * parents, which makes `fromIndex` meaningless to any consumer that only
- * sees the block's current sibling list (absent on markers written before
- * this field existed).
- */
-export interface SuggestionMarker {
-	type: 'pending-remove' | 'pending-insert' | 'pending-move';
-	groupId?: string;
-	commentId?: number;
-	authorId?: number | null;
-	crossedParents?: boolean;
-	[ key: string ]: any;
-}
-
-/**
  * Walk the live block-editor tree and capture the parent + index of every
  * block. Used by the removal-detection branch to re-insert a block at its
  * previous position when the live tree drops it.
@@ -527,25 +500,6 @@ function captureTreeSnapshot( blockEditor: any ) {
 	walk( blockEditor.getBlockOrder?.() ?? [], null );
 
 	return { blocksByClientId, parentByClientId, indexByClientId };
-}
-
-/**
- * Add or replace the `metadata.suggestion` marker on an attributes object,
- * leaving every other field untouched. Returns a new object — the caller
- * passes it to `updateBlockAttributes`, which performs its own merge.
- *
- * @param currentMetadata Current block metadata.
- * @param marker          Marker to write.
- * @return New metadata with the marker applied.
- */
-function withSuggestionMarker(
-	currentMetadata: Record< string, any > | null | undefined,
-	marker: SuggestionMarker
-): Record< string, any > {
-	return {
-		...( currentMetadata || {} ),
-		suggestion: marker,
-	};
 }
 
 /**
