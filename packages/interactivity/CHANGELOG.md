@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the `data-wp-html` directive and `asDangerousHTML()` for rendering explicitly trusted HTML from reactive state. ([#83092](https://github.com/WordPress/gutenberg/pull/83092))
+
 ### Enhancements
 
 -   `getConfig` accepts a type parameter describing the config it returns, like `getContext` does, so consumers can read typed config values. It defaults to `any`, so existing calls are unaffected ([#71692](https://github.com/WordPress/gutenberg/pull/71692)).
