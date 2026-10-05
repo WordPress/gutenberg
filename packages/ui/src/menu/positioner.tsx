@@ -70,20 +70,13 @@ const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
 		const [ measuredAnchor, setMeasuredAnchor ] =
 			useState< PositionerProps[ 'anchor' ] >();
 		const lastOffsetRef = useRef< number >();
-		const cachedOffsetRef = useRef< {
-			offset: number;
-			dimensions: Parameters< AlignOffsetFunction >[ 0 ];
-			positioner: HTMLDivElement;
-			trigger?: HTMLDivElement | null;
-		} >();
-		const cacheFrameRef = useRef< { window: Window; id: number } >();
 		const defaultProps = isSubmenu
 			? MENU_SUBMENU_POPUP_POSITIONER_PROPS
 			: ITEM_POPUP_POSITIONER_PROPS;
 
 		const alignOffset = useCallback< AlignOffsetFunction >(
 			( dimensions ) => {
-				const { side, align, anchor, positioner: size } = dimensions;
+				const { side, align } = dimensions;
 				if (
 					side === 'top' ||
 					side === 'bottom' ||
@@ -105,53 +98,12 @@ const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
 				const trigger = props.anchor
 					? undefined
 					: submenuTriggerRef?.current;
-				const cached = cachedOffsetRef.current;
-				if (
-					cached?.positioner === positioner &&
-					cached.trigger === trigger &&
-					cached.dimensions.anchor.width === anchor.width &&
-					cached.dimensions.anchor.height === anchor.height &&
-					cached.dimensions.positioner.width === size.width &&
-					cached.dimensions.positioner.height === size.height
-				) {
-					return cached.offset;
-				}
-
 				const offset = getSubmenuLabelOffset( positioner, trigger );
 				lastOffsetRef.current = offset;
-				cachedOffsetRef.current = {
-					offset,
-					dimensions,
-					positioner,
-					trigger,
-				};
-				const ownerWindow = positioner.ownerDocument.defaultView;
-				if ( ownerWindow && ! cacheFrameRef.current ) {
-					// Reuse reads during positioning resets, but refresh next frame
-					// even if styles moved the labels without resizing their boxes.
-					cacheFrameRef.current = {
-						window: ownerWindow,
-						id: ownerWindow.requestAnimationFrame( () => {
-							cachedOffsetRef.current = undefined;
-							cacheFrameRef.current = undefined;
-						} ),
-					};
-				}
 				return offset;
 			},
 			[ props.anchor, submenuTriggerRef ]
 		);
-
-		useIsomorphicLayoutEffect( () => {
-			return () => {
-				const frame = cacheFrameRef.current;
-				if ( frame ) {
-					frame.window.cancelAnimationFrame( frame.id );
-				}
-				cacheFrameRef.current = undefined;
-				cachedOffsetRef.current = undefined;
-			};
-		}, [] );
 
 		useIsomorphicLayoutEffect( () => {
 			if (
@@ -189,9 +141,6 @@ const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
 				const nextOffset = getSubmenuLabelOffset( positioner, trigger );
 				const previousOffset = lastOffsetRef.current;
 				lastOffsetRef.current = nextOffset;
-				if ( cachedOffsetRef.current ) {
-					cachedOffsetRef.current.offset = nextOffset;
-				}
 				if (
 					previousOffset !== undefined &&
 					Math.abs( nextOffset - previousOffset ) < 0.01
