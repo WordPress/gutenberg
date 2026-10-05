@@ -113,6 +113,16 @@ export default function MoreMenu( { isRevisionMode = false } ) {
 								'Spotlight mode deactivated.'
 							) }
 						/>
+						<MoreMenuPreferenceItem
+							scope="core"
+							name="showBlockBoundaries"
+							label={ __( 'Show block boundaries' ) }
+							info={ __( 'Show outlines around all blocks' ) }
+							messageActivated={ __( 'Block boundaries shown.' ) }
+							messageDeactivated={ __(
+								'Block boundaries hidden.'
+							) }
+						/>
 						<ViewMoreMenuGroup.Slot />
 					</MoreMenuSubmenu>
 					<NotesMoreMenuGroup.Slot />
