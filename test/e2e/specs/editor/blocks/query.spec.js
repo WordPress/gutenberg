@@ -611,5 +611,112 @@ test.describe( 'Query block', () => {
 				page.getByRole( 'option', { name: 'Alpaca' } )
 			).toBeHidden( { timeout: 1000 } );
 		} );
+
+		test.describe( 'With more tags than a search returns', () => {
+			let manyTagIds = [];
+
+			test.beforeAll( async ( { requestUtils } ) => {
+				// 25 tags match "Zebra", more than the 20 a search returns.
+				const tags = await Promise.all(
+					Array.from( { length: 25 }, ( _, index ) =>
+						requestUtils.rest( {
+							path: '/wp/v2/tags',
+							method: 'POST',
+							data: {
+								name: `Zebra ${ String( index + 1 ).padStart(
+									2,
+									'0'
+								) }`,
+							},
+						} )
+					)
+				);
+				manyTagIds = tags.map( ( { id } ) => id );
+			} );
+
+			test.afterAll( async ( { requestUtils } ) => {
+				for ( const id of manyTagIds ) {
+					await requestUtils.rest( {
+						path: `/wp/v2/tags/${ id }`,
+						method: 'DELETE',
+						params: { force: true },
+					} );
+				}
+			} );
+
+			test( 'should say when only some of the matching tags are listed', async ( {
+				page,
+				editor,
+			} ) => {
+				await addQueryWithTaxonomyFilters( { page, editor } );
+				const tagsControl = page.getByRole( 'combobox', {
+					name: 'Tags',
+					exact: true,
+				} );
+				await tagsControl.fill( 'Zebra' );
+				await expect( page.getByRole( 'option' ) ).toHaveCount( 20 );
+				await expect(
+					page.getByText(
+						'Showing 20 of 25 results. Refine your search to see more.'
+					)
+				).toBeVisible();
+
+				// When every match is listed, the count is not shown.
+				await tagsControl.fill( 'Zebra 25' );
+				await expect(
+					page.getByRole( 'option', { name: 'Zebra 25' } )
+				).toBeVisible();
+				await expect( page.getByRole( 'option' ) ).toHaveCount( 1 );
+				await expect( page.getByText( /^Showing/ ) ).toBeHidden();
+			} );
+
+			test( "should still list the matching tags when the other control's tags are hidden", async ( {
+				page,
+				editor,
+			} ) => {
+				await addQueryWithTaxonomyFilters( { page, editor } );
+				const tagsControl = page.getByRole( 'combobox', {
+					name: 'Tags',
+					exact: true,
+				} );
+				await tagsControl.fill( 'Zebra 01' );
+				await page
+					.getByRole( 'option', { name: 'Zebra 01', exact: true } )
+					.click();
+				await expect.poll( editor.getBlocks ).toMatchObject( [
+					{
+						name: 'core/query',
+						attributes: {
+							query: {
+								taxQuery: {
+									include: { post_tag: [ manyTagIds[ 0 ] ] },
+								},
+							},
+						},
+					},
+				] );
+
+				// "Zebra 01" is among the first 20 matches, but it is hidden
+				// here, so a 21st match takes its place.
+				await page
+					.getByRole( 'combobox', {
+						name: 'Exclude: Tags',
+						exact: true,
+					} )
+					.fill( 'Zebra' );
+				await expect(
+					page.getByText(
+						'Showing 20 of 24 results. Refine your search to see more.'
+					)
+				).toBeVisible();
+				await expect( page.getByRole( 'option' ) ).toHaveCount( 20 );
+				await expect(
+					page.getByRole( 'option', { name: 'Zebra 21' } )
+				).toBeVisible();
+				await expect(
+					page.getByRole( 'option', { name: 'Zebra 01' } )
+				).toBeHidden();
+			} );
+		} );
 	} );
 } );
