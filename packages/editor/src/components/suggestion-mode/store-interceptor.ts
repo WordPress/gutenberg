@@ -63,7 +63,13 @@ import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useSuggestionSession } from './suggestion-session';
-import { withProposedAttributes, withSuggestionMarker } from './marker';
+import {
+	mergeProposedAttributes,
+	proposedAttributes,
+	readSuggestionMarker,
+	withProposedAttributes,
+	withSuggestionMarker,
+} from './marker';
 import type { SuggestionMarker } from './marker';
 export type { SuggestionMarker };
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
@@ -1067,6 +1073,7 @@ export default function SuggestionStoreInterceptor() {
 		clearDeferredInsertions,
 		consumeUndoRedoAdoption,
 		requestContentSuggestion,
+		noteHistoryCapture,
 	} = useSuggestionSession();
 	const registry = useRegistry();
 
@@ -1520,11 +1527,33 @@ export default function SuggestionStoreInterceptor() {
 						 * levels: Ctrl+Z after a marker write would strip the
 						 * pending marker while the overlay still holds the op.
 						 */
+						/*
+						 * A copied block (a split tail, a Duplicate) brings
+						 * its source's proposal along. The new block is an
+						 * insertion: what was proposed on the source is
+						 * simply its content now, so the proposal is folded
+						 * into the live attributes and left off the marker.
+						 */
+						const copiedMarker = readSuggestionMarker( current );
+						const copiedAfter = proposedAttributes( copiedMarker );
+						const { suggestion: _copied, ...insertedMetadata } =
+							settled.metadata ?? current?.metadata ?? {};
 						blockEditorDispatch.__unstableMarkNextChangeAsNotPersistent();
 						blockEditorDispatch.updateBlockAttributes( clientId, {
 							...settled,
+							...( copiedAfter
+								? mergeProposedAttributes(
+										{ metadata: insertedMetadata },
+										copiedAfter
+									)
+								: {} ),
 							metadata: withSuggestionMarker(
-								settled.metadata ?? current?.metadata,
+								copiedAfter
+									? mergeProposedAttributes(
+											{ metadata: insertedMetadata },
+											copiedAfter
+										).metadata
+									: insertedMetadata,
 								{
 									type: 'pending-insert',
 									authorId: currentUserId,
@@ -1722,6 +1751,10 @@ export default function SuggestionStoreInterceptor() {
 						changes: overlayChanged,
 						authorId: currentUserId,
 					} );
+					// The user's dispatch took a history slot, so this
+					// proposal sorts above earlier structural captures for
+					// the undo guard, exactly like the HOC's write.
+					noteHistoryCapture();
 					isDispatchingOwnWrite = true;
 					try {
 						blockEditorDispatch.__unstableMarkNextChangeAsNotPersistent();
@@ -2294,6 +2327,7 @@ export default function SuggestionStoreInterceptor() {
 		isDeferredInsertion,
 		clearDeferredInsertions,
 		hasInterceptorBypass,
+		noteHistoryCapture,
 	] );
 
 	return null;

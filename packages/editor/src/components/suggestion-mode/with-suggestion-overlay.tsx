@@ -420,9 +420,13 @@ function SuggestingBlockEdit( {
 }
 
 /**
- * Render-only half of the HOC: a block that carries a proposal shows it in
- * every intent, exactly as a pending removal or an inline marker does.
- * Edits go to the real setter; the author's own edit moves the baseline.
+ * Render half of the HOC: a block that carries a proposal shows it in every
+ * intent, exactly as a pending removal or an inline marker does. Edits to
+ * attributes that are not proposed go to the real setter and move the
+ * baseline. An edit to a proposed attribute is declined: the canvas shows
+ * the proposal, so the write would land on a value the author cannot see,
+ * and a content proposal would be typed over into the live content. The
+ * author accepts or rejects the suggestion first.
  *
  * @param args           Arguments.
  * @param args.BlockEdit Wrapped edit component.
@@ -435,13 +439,47 @@ function ProposedBlockEdit( {
 	BlockEdit: any;
 	props: any;
 } ) {
-	const { attributes } = props;
+	const { attributes, setAttributes } = props;
+	const registry = useRegistry();
 	const after = proposedAttributes( readSuggestionMarker( attributes ) );
 	const mergedAttributes = useMemo(
 		() => mergeProposedAttributes( attributes, after ),
 		[ attributes, after ]
 	);
-	return <BlockEdit { ...props } attributes={ mergedAttributes } />;
+	const afterRef = useRef( after );
+	useEffect( () => {
+		afterRef.current = after;
+	}, [ after ] );
+	const guardedSetAttributes = useCallback(
+		(
+			nextAttributes:
+				| Record< string, any >
+				| ( (
+						current: Record< string, any >
+				  ) => Record< string, any > )
+		) => {
+			const proposed = afterRef.current;
+			if ( proposed && typeof nextAttributes === 'object' ) {
+				for ( const key of Object.keys( nextAttributes ) ) {
+					if (
+						Object.prototype.hasOwnProperty.call( proposed, key )
+					) {
+						notifyEditRefused( registry );
+						return;
+					}
+				}
+			}
+			setAttributes( nextAttributes );
+		},
+		[ registry, setAttributes ]
+	);
+	return (
+		<BlockEdit
+			{ ...props }
+			attributes={ mergedAttributes }
+			setAttributes={ guardedSetAttributes }
+		/>
+	);
 }
 
 /**

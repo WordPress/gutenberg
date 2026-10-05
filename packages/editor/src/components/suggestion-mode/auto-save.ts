@@ -131,16 +131,22 @@ interface Tracked {
  * post, so an id read from a marker or metadata.noteId is only a hint.
  * Act on it only when core-data shows a pending note on this very post.
  *
- * @param note   The core-data comment record, if resolved.
- * @param postId The current post id.
+ * @param note          The core-data comment record, if resolved.
+ * @param postId        The current post id.
+ * @param currentUserId The current user id, or null while unresolved.
  * @return Whether auto-save may update or trash the note.
  */
-function isActionableNote( note: any, postId: number | undefined ): boolean {
+function isActionableNote(
+	note: any,
+	postId: number | undefined,
+	currentUserId: number | null
+): boolean {
 	return (
 		!! note &&
 		note.status === 'hold' &&
 		note.type === 'note' &&
-		Number( note.post ) === Number( postId )
+		Number( note.post ) === Number( postId ) &&
+		( currentUserId === null || Number( note.author ) === currentUserId )
 	);
 }
 
@@ -153,13 +159,15 @@ function isActionableNote( note: any, postId: number | undefined ): boolean {
  * @param metadata      Block metadata.
  * @param hasStructural Whether the marker is a structural one.
  * @param postId        The current post id.
+ * @param currentUserId The current user id.
  * @return The linked pending note id, or null.
  */
 function findLinkedPendingNote(
 	coreSelect: any,
 	metadata: any,
 	hasStructural: boolean,
-	postId: number | undefined
+	postId: number | undefined,
+	currentUserId: number | null
 ): number | null {
 	for ( const noteId of getNoteIdsFromMetadata( metadata ) ) {
 		const note: any = coreSelect.getEntityRecord(
@@ -167,7 +175,7 @@ function findLinkedPendingNote(
 			'comment',
 			noteId
 		);
-		if ( ! isActionableNote( note, postId ) ) {
+		if ( ! isActionableNote( note, postId, currentUserId ) ) {
 			continue;
 		}
 		const payload = parseSuggestionPayload( note.meta?._wp_suggestion );
@@ -313,15 +321,19 @@ export default function SuggestionAutoSave() {
 			const postId: number | undefined = (
 				registry.select( STORE_NAME ) as any
 			 ).getCurrentPostId?.();
+			const userId: number | null =
+				coreSelect.getCurrentUser?.()?.id ?? null;
 			let commentId: number | null = tracked.commentId;
 			if ( ! commentId && marker ) {
 				/*
 				 * An id this session did not create is only a hint from
-				 * content (see `isActionableNote`). One that core-data has
-				 * not resolved yet, or that is not a pending note on this
-				 * post, is treated as no link: nothing is updated or
-				 * trashed on its account, and the fresh note written below
-				 * replaces it on the marker.
+				 * content (see `isActionableNote`). One that is not a
+				 * pending note of ours on this post is treated as no link:
+				 * nothing is updated or trashed on its account, and the
+				 * fresh note written below replaces it on the marker. One
+				 * that core-data has not resolved yet is neither trusted
+				 * nor replaced: this sync waits, and the next marker change
+				 * (or the notes arriving) retries.
 				 */
 				const hinted =
 					marker.commentId ??
@@ -329,16 +341,38 @@ export default function SuggestionAutoSave() {
 						coreSelect,
 						metadata,
 						marker.type !== 'pending-attributes',
-						postId
+						postId,
+						userId
 					);
-				if (
-					hinted &&
-					isActionableNote(
-						coreSelect.getEntityRecord( 'root', 'comment', hinted ),
-						postId
-					)
-				) {
-					commentId = hinted;
+				if ( hinted ) {
+					const record = coreSelect.getEntityRecord(
+						'root',
+						'comment',
+						hinted
+					);
+					if ( record === undefined ) {
+						return;
+					}
+					if ( isActionableNote( record, postId, userId ) ) {
+						commentId = hinted;
+						/*
+						 * A reloaded marker whose note already holds these
+						 * operations has nothing to save; without this every
+						 * pending note of ours would be rewritten on load.
+						 */
+						const payload = parseSuggestionPayload(
+							record.meta?._wp_suggestion
+						);
+						if (
+							payload &&
+							fingerprintOperations( payload.operations ) ===
+								fingerprint
+						) {
+							tracked.commentId = commentId;
+							tracked.syncedOpsKey = fingerprint;
+							return;
+						}
+					}
 				}
 			}
 			// The link can outlive the note it points at: another
@@ -488,6 +522,10 @@ export default function SuggestionAutoSave() {
 		for ( const clientId of scheduledRef.current.keys() ) {
 			if ( ! seen.has( clientId ) ) {
 				scheduledRef.current.delete( clientId );
+				// The marker left (undo, a decision, the block removed):
+				// a proposal that returns later is a new suggestion, so
+				// its fingerprint and note id must not be remembered.
+				trackedRef.current.delete( clientId );
 			}
 		}
 	}, [

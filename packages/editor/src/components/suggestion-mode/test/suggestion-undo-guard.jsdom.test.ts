@@ -293,6 +293,55 @@ describe( 'SuggestionUndoGuard', () => {
 		expect( editor.hasSuggestionUndo() ).toBe( false );
 	} );
 
+	it( 'withdrawing a move keeps the proposal that rode on it as its own marker', () => {
+		const anchor = createBlock( 'test/undo-guard' );
+		const block = createBlock( 'test/undo-guard', {
+			metadata: {
+				noteId: [ 9 ],
+				suggestion: {
+					type: 'pending-move',
+					authorId: 4,
+					commentId: 9,
+					fromAnchorClientId: null,
+					fromParentClientId: null,
+					fromIndex: 0,
+					after: { level: 3 },
+				},
+			},
+		} );
+		const { registry, overlay } = setup( { blocks: [ anchor, block ] } );
+		act( () => {
+			overlay.current.recordStructuralCapture(
+				block.clientId,
+				'test/undo-guard',
+				{
+					type: 'block-move',
+					clientId: block.clientId,
+					fromAnchorClientId: null,
+					fromParentClientId: null,
+					fromIndex: 0,
+				}
+			);
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( block.clientId, { level: 2 } );
+		} );
+		act( () => {
+			( registry.dispatch( 'core' ) as any ).undo();
+		} );
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( block.clientId )?.metadata
+		).toEqual( {
+			suggestion: {
+				type: 'pending-attributes',
+				authorId: 4,
+				after: { level: 3 },
+			},
+		} );
+	} );
+
 	it( 'stands aside when the newest capture is an attribute proposal (history-owned)', () => {
 		const block = createBlock( 'test/undo-guard', {
 			metadata: { suggestion: { type: 'pending-move', fromIndex: 0 } },

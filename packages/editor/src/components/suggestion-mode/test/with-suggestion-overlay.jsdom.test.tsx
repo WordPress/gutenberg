@@ -613,6 +613,45 @@ describe( 'withSuggestionOverlay', () => {
 		}
 	);
 
+	it( 'refuses an Edit-intent write to a proposed attribute and passes others through', () => {
+		const setAttributes = vi.fn();
+		const block = createBlock( HOC_BLOCK, {
+			content: 'Hello',
+			level: 2,
+			metadata: {
+				suggestion: { type: 'pending-attributes', after: { level: 3 } },
+			},
+		} );
+		const { registry } = renderWithProviders(
+			<Connected
+				clientId={ block.clientId }
+				setAttributes={ setAttributes }
+			/>,
+			{ intent: 'edit', blocks: [ block ] }
+		);
+
+		// The level is proposed: the author must decide the suggestion
+		// first, so the write is refused and explained.
+		fireEvent.click(
+			screen.getByRole( 'button', { name: 'reset level' } )
+		);
+		expect( setAttributes ).not.toHaveBeenCalled();
+		expect(
+			registry
+				.select( noticesStore )
+				.getNotices()
+				.some( ( notice ) =>
+					notice.content.includes( 'overlaps a pending suggestion' )
+				)
+		).toBe( true );
+
+		// Content is not proposed: the edit lands as usual.
+		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			content: 'proposed',
+		} );
+	} );
+
 	it( 'keeps the proposal on top when the live attributes change underneath it', () => {
 		const block = createBlock( HOC_BLOCK, { content: 'Hello', level: 2 } );
 		const { registry } = renderWithProviders(

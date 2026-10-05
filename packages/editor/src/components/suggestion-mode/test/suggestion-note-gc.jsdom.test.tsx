@@ -519,6 +519,53 @@ describe( 'SuggestionNoteGC collecting an attribute proposal', () => {
 		);
 	} );
 
+	it( 'restores the trashed note when redo brings the proposal back', async () => {
+		let harness: any;
+		const marker = {
+			noteId: [ NOTE_ID ],
+			suggestion: {
+				type: 'pending-attributes',
+				after: { level: 3 },
+			},
+		};
+		await act( async () => {
+			harness = setup( {
+				content: 'Hello world',
+				threads: [ attributeNote() ],
+				metadata: marker,
+			} );
+		} );
+		await act( async () => {
+			harness.registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( harness.clientId, {
+					metadata: { noteId: [ NOTE_ID ] },
+				} );
+		} );
+		await settle();
+		expect( harness.saveEntityRecord ).toHaveBeenCalledWith(
+			'root',
+			'comment',
+			{ id: NOTE_ID, status: 'trash' },
+			expect.anything()
+		);
+
+		await act( async () => {
+			harness.registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( harness.clientId, {
+					metadata: marker,
+				} );
+		} );
+		await settle();
+		expect( harness.saveEntityRecord ).toHaveBeenLastCalledWith(
+			'root',
+			'comment',
+			{ id: NOTE_ID, status: 'hold' },
+			expect.anything()
+		);
+	} );
+
 	it( 'keeps an attribute note whose proposal rides on a structural marker', async () => {
 		let harness: any;
 		await act( async () => {
