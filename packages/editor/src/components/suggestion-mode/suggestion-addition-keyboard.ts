@@ -4,7 +4,13 @@ import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { pasteHandler } from '@wordpress/blocks';
-import { create, concat, toHTMLString } from '@wordpress/rich-text';
+import {
+	applyFormat,
+	create,
+	concat,
+	toHTMLString,
+} from '@wordpress/rich-text';
+import { isURL } from '@wordpress/url';
 import { unlock } from '../../lock-unlock';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { INLINE_OP_TYPE, useSuggestionsProvider } from './provider';
@@ -137,6 +143,37 @@ function readInlinePasteHTML(
 	);
 	// Nothing to preserve: the plain-text path produces the same run.
 	return carriesFormats ? inline : null;
+}
+
+/**
+ * The URL a paste carries when the link format's paste rule would turn it into
+ * a link, or null. Mirrors `core/link`'s `__unstablePasteRule`: only a pasted
+ * http(s) URL counts.
+ *
+ * @param plainText The paste's plain-text flavour.
+ * @return The trimmed URL, or null.
+ */
+function readPastedLinkURL( plainText: string ): string | null {
+	const text = plainText.trim();
+	return isURL( text ) && /^https?:/.test( text ) ? text : null;
+}
+
+/**
+ * The pasted URL as linked inline HTML, matching what the link paste rule
+ * inserts at a collapsed caret outside Suggest mode.
+ *
+ * @param url       The pasted URL.
+ * @param plainText The paste's plain-text flavour.
+ * @return Inline HTML of the linked text.
+ */
+function toLinkedPasteHTML( url: string, plainText: string ): string {
+	const linked = applyFormat(
+		create( { text: plainText } ),
+		{ type: 'core/link', attributes: { url } },
+		0,
+		plainText.length
+	);
+	return toHTMLString( { value: linked } );
 }
 
 /**
@@ -878,11 +915,26 @@ export default function SuggestionAdditionKeyboard() {
 			 */
 			// A clipboard event exposes no target ranges; `readEventRange`
 			// falls back to the live DOM selection.
+			const range = readEventRange( event );
+			const url = readPastedLinkURL( plain );
+			if ( url && range && range.start !== range.end ) {
+				/*
+				 * A URL pasted over a selection links the selection, as it
+				 * does outside Suggest mode: leave it to the editor's paste
+				 * pipeline, whose link paste rule applies the format, so it
+				 * is proposed like a link added from the toolbar rather than
+				 * as a type-over replacing the selected words.
+				 */
+				resetRun();
+				return;
+			}
 			const segment = {
 				text: plain,
-				html: readInlinePasteHTML( event.clipboardData, plain ),
+				html: url
+					? toLinkedPasteHTML( url, plain )
+					: readInlinePasteHTML( event.clipboardData, plain ),
 			};
-			if ( insertText( segment, false, readEventRange( event ) ) ) {
+			if ( insertText( segment, false, range ) ) {
 				event.preventDefault();
 				event.stopImmediatePropagation();
 			}

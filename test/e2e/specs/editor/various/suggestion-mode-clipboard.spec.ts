@@ -105,4 +105,94 @@ test.describe( 'Suggestion mode clipboard', () => {
 			editor.canvas.locator( 'mark.wp-suggestion' )
 		).toHaveCount( 0 );
 	} );
+
+	/*
+	 * Outside Suggest mode, pasting a URL over a text selection links the
+	 * selection (the link format's paste rule). Suggest mode owns simple
+	 * inline paste so it can mark the addition, and used to treat the URL as a
+	 * type-over: the selected words were proposed for deletion and the URL
+	 * proposed as new text. The paste must propose a link instead.
+	 */
+	test( 'pasting a URL over a selection proposes a link, not a replacement', async ( {
+		admin,
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Read the docs today' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		// Select "today".
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+
+		pageUtils.setClipboardData( {
+			plainText: 'https://wordpress.org/',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		const formatMark = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="format"]'
+		);
+		await expect( formatMark ).toHaveText( 'today' );
+		await expect( formatMark ).toHaveAttribute(
+			'data-suggestion-id',
+			/\d/
+		);
+
+		// The words stay, linked; nothing is proposed for deletion or added.
+		await expect( paragraph ).toHaveText( 'Read the docs today' );
+		await expect(
+			paragraph.locator( 'a[href="https://wordpress.org/"]' )
+		).toHaveText( 'today' );
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion:is([data-suggestion-type="add"],[data-suggestion-type="del"])'
+			)
+		).toHaveCount( 0 );
+	} );
+
+	test( 'pasting a URL at a caret proposes linked text', async ( {
+		admin,
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'See ' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+
+		pageUtils.setClipboardData( {
+			plainText: 'https://wordpress.org/',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		const addMark = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="add"]'
+		);
+		await expect( addMark ).toHaveText( 'https://wordpress.org/' );
+		await expect( addMark ).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		await expect(
+			addMark.locator( 'a[href="https://wordpress.org/"]' )
+		).toHaveText( 'https://wordpress.org/' );
+	} );
 } );
