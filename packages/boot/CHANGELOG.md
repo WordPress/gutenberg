@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
+-   Show the mobile navigation drawer over a route's custom canvas when the route has no stage.
 
 ## 0.23.0 (2026-09-23)
 

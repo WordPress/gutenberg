@@ -109,7 +109,11 @@ test.describe( 'Template Revert', () => {
 			isOnlyCurrentEntityDirty: true,
 		} );
 		await templateRevertUtils.revertTemplate();
-		await admin.visitSiteEditor();
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 
 		// Poll: right after a load, the content selector can still return the
 		// raw stored string until it is derived from the parsed blocks, which
@@ -214,7 +218,11 @@ test.describe( 'Template Revert', () => {
 		await editor.saveSiteEditorEntities( {
 			isOnlyCurrentEntityDirty: true,
 		} );
-		await admin.visitSiteEditor();
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 
 		// Poll: right after a load, the content selector can still return the
 		// raw stored string until it is derived from the parsed blocks, which
