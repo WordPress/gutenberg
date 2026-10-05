@@ -63,7 +63,7 @@ const LinkControlSearchInput = forwardRef(
 		 * @param {Object} suggestion the suggestion object.
 		 */
 		const onInputChange = ( selection, suggestion ) => {
-			onChange( selection );
+			onChange( selection, suggestion );
 			setFocusedSuggestion( suggestion );
 		};
 
