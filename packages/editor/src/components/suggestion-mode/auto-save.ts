@@ -127,6 +127,24 @@ interface Tracked {
 }
 
 /**
+ * Content names the note, but content is editable by any author of the
+ * post, so an id read from a marker or metadata.noteId is only a hint.
+ * Act on it only when core-data shows a pending note on this very post.
+ *
+ * @param note   The core-data comment record, if resolved.
+ * @param postId The current post id.
+ * @return Whether auto-save may update or trash the note.
+ */
+function isActionableNote( note: any, postId: number | undefined ): boolean {
+	return (
+		!! note &&
+		note.status === 'hold' &&
+		note.type === 'note' &&
+		Number( note.post ) === Number( postId )
+	);
+}
+
+/**
  * A marker with no commentId can still have a note: the write-back after
  * create is best-effort, and a reload keeps `metadata.noteId`. Resolve the
  * block's pending note of the same shape so a second one is never opened.
@@ -134,12 +152,14 @@ interface Tracked {
  * @param coreSelect    Core-data selectors.
  * @param metadata      Block metadata.
  * @param hasStructural Whether the marker is a structural one.
+ * @param postId        The current post id.
  * @return The linked pending note id, or null.
  */
 function findLinkedPendingNote(
 	coreSelect: any,
 	metadata: any,
-	hasStructural: boolean
+	hasStructural: boolean,
+	postId: number | undefined
 ): number | null {
 	for ( const noteId of getNoteIdsFromMetadata( metadata ) ) {
 		const note: any = coreSelect.getEntityRecord(
@@ -147,7 +167,7 @@ function findLinkedPendingNote(
 			'comment',
 			noteId
 		);
-		if ( ! note || note.status !== 'hold' ) {
+		if ( ! isActionableNote( note, postId ) ) {
 			continue;
 		}
 		const payload = parseSuggestionPayload( note.meta?._wp_suggestion );
@@ -290,15 +310,36 @@ export default function SuggestionAutoSave() {
 			}
 
 			const coreSelect: any = registry.select( coreStore );
+			const postId: number | undefined = (
+				registry.select( STORE_NAME ) as any
+			 ).getCurrentPostId?.();
 			let commentId: number | null = tracked.commentId;
 			if ( ! commentId && marker ) {
-				commentId =
+				/*
+				 * An id this session did not create is only a hint from
+				 * content (see `isActionableNote`). One that core-data has
+				 * not resolved yet, or that is not a pending note on this
+				 * post, is treated as no link: nothing is updated or
+				 * trashed on its account, and the fresh note written below
+				 * replaces it on the marker.
+				 */
+				const hinted =
 					marker.commentId ??
 					findLinkedPendingNote(
 						coreSelect,
 						metadata,
-						marker.type !== 'pending-attributes'
+						marker.type !== 'pending-attributes',
+						postId
 					);
+				if (
+					hinted &&
+					isActionableNote(
+						coreSelect.getEntityRecord( 'root', 'comment', hinted ),
+						postId
+					)
+				) {
+					commentId = hinted;
+				}
 			}
 			// The link can outlive the note it points at: another
 			// collaborator may have accepted or rejected the suggestion
