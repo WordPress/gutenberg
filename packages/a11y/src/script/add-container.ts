@@ -23,7 +23,8 @@ export default function addContainer(
 			'clip-path:inset(50%);' +
 			'border:0;' +
 			'word-wrap:normal !important;' +
-			'word-break:normal !important;'
+			'word-break:normal !important;' +
+			'visibility:visible'
 	);
 	container.setAttribute( 'aria-live', ariaLive );
 	container.setAttribute( 'aria-relevant', 'additions text' );
