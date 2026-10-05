@@ -579,6 +579,21 @@
 		"filePath": "library/footer.svg"
 	},
 	{
+		"slug": "form-button",
+		"label": "Form Button",
+		"filePath": "library/form-button.svg"
+	},
+	{
+		"slug": "form-input",
+		"label": "Form Input",
+		"filePath": "library/form-input.svg"
+	},
+	{
+		"slug": "form-select",
+		"label": "Form Select",
+		"filePath": "library/form-select.svg"
+	},
+	{
 		"slug": "format-bold",
 		"label": "Format Bold",
 		"filePath": "library/format-bold.svg"
