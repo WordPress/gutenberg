@@ -23,20 +23,20 @@ const spawnSvn: Svn = ( args, options ) => spawnSync( 'svn', args, options );
  * contain the release credentials.
  *
  * @param args    SVN arguments.
- * @param timeout Optional read deadline, in milliseconds.
+ * @param options Subprocess options, including read deadlines or live output.
  * @param execute SVN subprocess launcher.
  * @return SVN's standard output.
  */
 function runSvn(
 	args: string[],
-	timeout: number | undefined,
+	options: Pick< SpawnSyncOptionsWithStringEncoding, 'timeout' | 'stdio' >,
 	execute: Svn
 ): string {
 	const result = execute( args, {
 		encoding: 'utf8',
-		timeout,
 		killSignal: 'SIGKILL',
 		maxBuffer: 16 * 1024 * 1024,
+		...options,
 	} );
 	if ( result.stderr ) {
 		console.error( result.stderr.trimEnd() );
@@ -47,7 +47,7 @@ function runSvn(
 	if ( result.status !== 0 ) {
 		throw new Error( 'SVN command failed.' );
 	}
-	return result.stdout;
+	return result.stdout ?? '';
 }
 
 /**
@@ -162,7 +162,7 @@ export async function publishToSvn(
 	const verifyTimeout = Number( timeout ) * 1000;
 	const retryInterval = Number( interval ) * 1000;
 	const svn = ( command: string[], readTimeout?: number ) =>
-		runSvn( command, readTimeout, execute );
+		runSvn( command, { timeout: readTimeout }, execute );
 	const sourceDir = fs.realpathSync( source );
 	if ( ! fs.statSync( sourceDir ).isDirectory() ) {
 		throw new Error( 'Expected a prepared release directory.' );
@@ -301,12 +301,14 @@ export async function publishToSvn(
 				];
 			}
 			try {
-				console.log(
-					svn( [
+				runSvn(
+					[
 						...command,
 						...svnArgs,
 						'--config-option=servers:global:http-timeout=600',
-					] )
+					],
+					{ stdio: 'inherit' },
+					execute
 				);
 			} catch {
 				console.log(
