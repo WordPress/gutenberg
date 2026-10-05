@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { ComponentProps } from 'react';
 import * as Select from '../';
 
 const meta: Meta< typeof Select.Root > = {
@@ -31,6 +32,36 @@ const meta: Meta< typeof Select.Root > = {
 export default meta;
 
 type Story = StoryObj< typeof Select.Root >;
+
+export const PopupWidths: StoryObj<
+	ComponentProps< typeof Select.Popup > & { longLabels: boolean }
+> = {
+	args: { width: 'sm', longLabels: true },
+	argTypes: {
+		width: {
+			control: 'select',
+			options: [ 'anchor', 'content', 'sm', 'md', 'lg', 'available' ],
+		},
+		longLabels: { control: 'boolean' },
+	},
+	render: ( { longLabels, ...args } ) => (
+		<Select.Root defaultValue="apple">
+			<Select.Trigger aria-label="Fruit">Choose fruit</Select.Trigger>
+			<Select.Popup { ...args }>
+				<Select.Item value="apple">
+					<Select.ItemLabel>
+						{ longLabels
+							? 'Apples harvested from the orchard and available for delivery to your home this week'
+							: 'Apple' }
+					</Select.ItemLabel>
+				</Select.Item>
+				<Select.Item value="banana">
+					<Select.ItemLabel>Banana</Select.ItemLabel>
+				</Select.Item>
+			</Select.Popup>
+		</Select.Root>
+	),
+};
 
 const defaultItems = Array.from( { length: 6 }, ( _, index ) => ( {
 	value: `item-${ index + 1 }`,
