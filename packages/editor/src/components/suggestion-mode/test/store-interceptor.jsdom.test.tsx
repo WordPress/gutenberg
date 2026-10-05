@@ -505,6 +505,53 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		} );
 	} );
 
+	it( 'stamps a store-level proposal above earlier structural captures', async () => {
+		const { registry, clientId, getOverlay } = setup();
+		const before = getOverlay().getLastContentCaptureSeq();
+
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( clientId, { content: 'Edited' } );
+		} );
+		await flushSubscribers();
+
+		expect( getOverlay().getLastContentCaptureSeq() ).toBeGreaterThan(
+			before
+		);
+	} );
+
+	it( 'folds a copied proposal into a new insertion instead of carrying it on the marker', async () => {
+		// A split tail or a Duplicate copies the source block's attributes,
+		// marker included. The new block is an insertion: what was proposed
+		// on the source is simply its content now.
+		const { registry } = setup();
+		const inserted = createBlock( TEST_BLOCK_NAME, {
+			content: 'Hello',
+			metadata: {
+				suggestion: {
+					type: 'pending-attributes',
+					after: { content: 'Proposed' },
+				},
+			},
+		} );
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.insertBlock( inserted, 1, undefined, false );
+		} );
+		await flushSubscribers();
+
+		const attrs = registry
+			.select( blockEditorStore )
+			.getBlockAttributes( inserted.clientId );
+		expect( attrs.content ).toBe( 'Proposed' );
+		expect( attrs.metadata.suggestion ).toEqual( {
+			type: 'pending-insert',
+			authorId: null,
+		} );
+	} );
+
 	it( 'a multi-selection attribute change becomes one marker per block', async () => {
 		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
 		const b = createBlock( TEST_BLOCK_NAME, { content: 'B' } );

@@ -58,7 +58,11 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSuggestionSession } from './suggestion-session';
 import type { StructuralCapture } from './suggestion-session';
-import { readSuggestionMarker } from './marker';
+import {
+	PENDING_ATTRIBUTES,
+	proposedAttributes,
+	readSuggestionMarker,
+} from './marker';
 import { removeNoteIdFromMetadata } from '../collab-sidebar/utils';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { store as editorStore } from '../../store';
@@ -160,10 +164,31 @@ function withdrawnMarkerAttributes(
 	if ( ! meta || meta.suggestion === undefined ) {
 		return null;
 	}
-	const { suggestion: _drop, ...rest } = meta;
+	const { suggestion, ...rest } = meta;
 	const metadata = commentId
 		? removeNoteIdFromMetadata( rest, commentId as any )
 		: rest;
+	/*
+	 * An attribute proposal that rode along on the structural marker is an
+	 * older suggestion than the structural one being withdrawn: it stays,
+	 * as its own marker. The withdrawn note is collected; auto-save opens a
+	 * fresh one for what is left.
+	 */
+	const after = proposedAttributes(
+		readSuggestionMarker( { metadata: meta } )
+	);
+	if ( after ) {
+		return {
+			metadata: {
+				...metadata,
+				suggestion: {
+					type: PENDING_ATTRIBUTES,
+					authorId: suggestion.authorId ?? null,
+					after,
+				},
+			},
+		};
+	}
 	return { metadata };
 }
 

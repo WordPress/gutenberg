@@ -577,7 +577,7 @@ describe( 'clearSuggestionMarkerAttributes', () => {
 		).toEqual( { metadata: { noteId: 7 } } );
 	} );
 
-	it( 'keeps a proposal riding on a structural marker as its own pending-attributes marker', () => {
+	it( 'drops a proposal riding on a structural marker: the one note carried both ops', () => {
 		expect(
 			clearSuggestionMarkerAttributes( {
 				metadata: {
@@ -591,16 +591,7 @@ describe( 'clearSuggestionMarkerAttributes', () => {
 					},
 				},
 			} )
-		).toEqual( {
-			metadata: {
-				noteId: [ 7 ],
-				suggestion: {
-					type: 'pending-attributes',
-					authorId: 4,
-					after: { level: 3 },
-				},
-			},
-		} );
+		).toEqual( { metadata: { noteId: [ 7 ] } } );
 	} );
 } );
 
@@ -1027,7 +1018,7 @@ describe( 'attribute proposals on the block marker', () => {
 		expect( after.metadata.suggestion.after ).toEqual( { level: 3 } );
 	} );
 
-	it( 'rejecting a move keeps a proposal that rides on it as a pending-attributes marker', async () => {
+	it( 'rejecting a move also drops the proposal that rode on it, since the note carried both', async () => {
 		const a = createBlock( PARAGRAPH, { content: 'A' } );
 		const moved = createBlock( PARAGRAPH, {
 			content: 'Moved',
@@ -1076,13 +1067,9 @@ describe( 'attribute proposals on the block marker', () => {
 
 		const blockEditor = registry.select( blockEditorStore );
 		expect( blockEditor.getBlockIndex( moved.clientId ) ).toBe( 0 );
-		expect( attrs( registry, moved.clientId ).metadata.suggestion ).toEqual(
-			{
-				type: 'pending-attributes',
-				authorId: 4,
-				after: { level: 3 },
-			}
-		);
+		const after = attrs( registry, moved.clientId );
+		expect( after.level ).toBe( 2 );
+		expect( after.metadata.suggestion ).toBeUndefined();
 	} );
 } );
 

@@ -145,7 +145,8 @@ export function mergeProposedAttributes(
 /**
  * Replace the marker on a metadata object. An `after` already on the block
  * survives a type change (an attribute edit on a block that is then moved),
- * unless the new marker carries its own.
+ * unless the new marker carries its own, and so does the note id: the one
+ * note for the block then carries the structural op and the attribute ops.
  *
  * @param currentMetadata Current block metadata.
  * @param marker          Marker to write.
@@ -155,13 +156,22 @@ export function withSuggestionMarker(
 	currentMetadata: Record< string, any > | null | undefined,
 	marker: SuggestionMarker
 ): Record< string, any > {
-	const existingAfter = proposedAttributes(
-		readSuggestionMarker( { metadata: currentMetadata } )
-	);
-	const next: SuggestionMarker =
-		existingAfter && marker.after === undefined
-			? { ...marker, after: existingAfter }
-			: marker;
+	const existing = readSuggestionMarker( { metadata: currentMetadata } );
+	const existingAfter = proposedAttributes( existing );
+	let next: SuggestionMarker = marker;
+	if ( existingAfter && marker.after === undefined ) {
+		next = { ...next, after: existingAfter };
+	}
+	// Only an attribute-only note joins the structural op; a structural
+	// marker being retyped keeps the replace semantics (its note describes
+	// a different change).
+	if (
+		existing?.type === PENDING_ATTRIBUTES &&
+		existing.commentId &&
+		next.commentId === undefined
+	) {
+		next = { ...next, commentId: existing.commentId };
+	}
 	return { ...( currentMetadata || {} ), suggestion: next };
 }
 

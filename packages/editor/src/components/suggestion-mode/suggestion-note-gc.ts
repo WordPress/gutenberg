@@ -533,7 +533,13 @@ export default function SuggestionNoteGC() {
 			)
 				.then( () => {
 					seenRef.current.delete( String( note.id ) );
-					if ( anchor.kind === 'inline' ) {
+					// Inline marks and attribute proposals live in block
+					// content, so redo can bring them back; the note then
+					// has to come back with them.
+					if (
+						anchor.kind === 'inline' ||
+						anchor.pendingType === PENDING_ATTRIBUTES
+					) {
 						trashedRef.current.set( String( note.id ), {
 							note,
 							anchor,

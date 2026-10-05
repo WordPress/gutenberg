@@ -194,6 +194,26 @@ describe( 'withSuggestionMarker', () => {
 			after: { level: 3 },
 		} );
 	} );
+	it( 'carries the note id across a type change so one note keeps both ops', () => {
+		const metadata = {
+			suggestion: {
+				type: PENDING_ATTRIBUTES,
+				commentId: 7,
+				after: { level: 3 },
+			},
+		};
+		expect(
+			withSuggestionMarker( metadata, {
+				type: 'pending-move',
+				fromIndex: 1,
+			} ).suggestion
+		).toEqual( {
+			type: 'pending-move',
+			fromIndex: 1,
+			commentId: 7,
+			after: { level: 3 },
+		} );
+	} );
 	it( 'lets an explicit after on the new marker win', () => {
 		const metadata = {
 			suggestion: { type: PENDING_ATTRIBUTES, after: { level: 3 } },

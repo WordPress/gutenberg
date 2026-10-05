@@ -459,7 +459,7 @@ describe( 'SuggestionAutoSave', () => {
 		expect( markerOf( registry, block.clientId ).commentId ).toBe( 43 );
 	} );
 
-	it( 'ignores a marker commentId whose note core-data has not resolved', async () => {
+	it( 'waits for a hinted note core-data has not resolved instead of opening a second one', async () => {
 		createSuggestion.mockResolvedValue( { id: 43 } );
 		const block = heading( 'Hi', {
 			metadata: {
@@ -477,7 +477,104 @@ describe( 'SuggestionAutoSave', () => {
 
 		expect( updateSuggestion ).not.toHaveBeenCalled();
 		expect( deleteSuggestion ).not.toHaveBeenCalled();
+		expect( createSuggestion ).not.toHaveBeenCalled();
+	} );
+
+	it( 'ignores a hinted note that belongs to another user', async () => {
+		createSuggestion.mockResolvedValue( { id: 43 } );
+		const block = heading( 'Hi', {
+			metadata: {
+				suggestion: {
+					type: 'pending-attributes',
+					after: { level: 3 },
+					commentId: 99,
+				},
+			},
+		} );
+		const { registry } = renderWith( 'suggest', [ block ] );
+		act( () => {
+			registry.dispatch( coreStore ).receiveCurrentUser( { id: 3 } );
+		} );
+		seedComment( registry, {
+			id: 99,
+			status: 'hold',
+			type: 'note',
+			post: POST_ID,
+			author: 8,
+		} );
+
+		propose( registry, block.clientId, { level: 4 } );
+		await pastDebounce();
+
+		expect( updateSuggestion ).not.toHaveBeenCalled();
+		expect( deleteSuggestion ).not.toHaveBeenCalled();
 		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'does not re-save a reloaded marker whose note already holds the same operations', async () => {
+		const block = heading( 'Hi', {
+			metadata: {
+				noteId: [ 42 ],
+				suggestion: {
+					type: 'pending-attributes',
+					after: { level: 3 },
+					commentId: 42,
+				},
+			},
+		} );
+		const { registry } = renderWith( 'suggest', [ block ] );
+		seedComment( registry, {
+			id: 42,
+			status: 'hold',
+			type: 'note',
+			post: POST_ID,
+			meta: {
+				_wp_suggestion_status: 'pending',
+				_wp_suggestion: JSON.stringify( {
+					schemaVersion: 2,
+					blockName: TEST_BLOCK,
+					baseRevision: null,
+					operations: [
+						{
+							type: 'attribute-set',
+							attribute: 'level',
+							before: 2,
+							after: 3,
+						},
+					],
+				} ),
+			},
+		} );
+		await pastDebounce();
+
+		expect( updateSuggestion ).not.toHaveBeenCalled();
+		expect( createSuggestion ).not.toHaveBeenCalled();
+	} );
+
+	it( 'opens a fresh note when the same proposal returns after its marker left', async () => {
+		createSuggestion
+			.mockResolvedValueOnce( { id: 42 } )
+			.mockResolvedValueOnce( { id: 43 } );
+		const block = heading();
+		const { registry } = renderWith( 'suggest', [ block ] );
+
+		propose( registry, block.clientId, { level: 3 } );
+		await pastDebounce();
+		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
+
+		// Undo pops the marker; the collector trashes note 42.
+		act( () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( block.clientId, { metadata: {} } );
+		} );
+		seedComment( registry, { id: 42, status: 'trash' } );
+		await pastDebounce();
+
+		// The same proposal again is a new suggestion, not a no-op.
+		propose( registry, block.clientId, { level: 3 } );
+		await pastDebounce();
+		expect( createSuggestion ).toHaveBeenCalledTimes( 2 );
 	} );
 
 	it( 'leaves a proposal another author wrote to that author', async () => {
