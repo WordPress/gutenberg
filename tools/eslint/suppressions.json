@@ -6990,7 +6990,7 @@
 	},
 	"packages/editor/src/components/suggestion-mode/store-interceptor.ts": {
 		"react-hooks/refs": {
-			"count": 7
+			"count": 6
 		}
 	},
 	"packages/editor/src/components/suggestion-mode/suggestion-note-gc.ts": {

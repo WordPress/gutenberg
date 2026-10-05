@@ -212,9 +212,12 @@ export function withProposedAttributes( {
 			};
 		}
 		value = toJsonSafeAttributeValue( value );
+		// A block with no `metadata` and one with an empty object are the
+		// same block; a marker clear that lands as `metadata: {}` must not
+		// read as a proposal to add nothing.
 		const live =
 			key === 'metadata'
-				? sanitizeProposedMetadata( liveAttributes[ key ] )
+				? sanitizeProposedMetadata( liveAttributes[ key ] ?? {} )
 				: liveAttributes[ key ];
 		if ( isAttributeEqual( live, value ) ) {
 			delete after[ key ];

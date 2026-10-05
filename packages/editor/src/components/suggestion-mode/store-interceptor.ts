@@ -63,7 +63,7 @@ import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useSuggestionSession } from './suggestion-session';
-import { withSuggestionMarker } from './marker';
+import { withProposedAttributes, withSuggestionMarker } from './marker';
 import type { SuggestionMarker } from './marker';
 export type { SuggestionMarker };
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
@@ -1047,8 +1047,8 @@ function detectMovedBlocks(
  * Strategy: snapshot every block's attributes when Suggest intent activates,
  * then on every block-editor state change diff the live tree against the
  * snapshot. Any block whose attributes drift from the snapshot has its
- * change re-routed into the overlay and the live attributes restored to the
- * snapshot. New blocks (no snapshot entry) are tracked but not intercepted —
+ * change re-routed into the block's `metadata.suggestion.after` proposal and
+ * the live attributes restored to the snapshot. New blocks (no snapshot entry) are tracked but not intercepted —
  * inserting a block in Suggest mode is currently a real edit, not a
  * suggestion. Removed blocks are dropped from the snapshot.
  *
@@ -1056,10 +1056,9 @@ function detectMovedBlocks(
  */
 export default function SuggestionStoreInterceptor() {
 	const {
-		entries,
-		captureBaseline,
-		setOverlayAttributes,
-		setStructuralOp,
+		recordStructuralCapture,
+		getStructuralCaptures,
+		clearStructuralCapture,
 		consumeInterceptorBypass,
 		hasInterceptorBypass,
 		markDeferredInsertion,
@@ -1080,18 +1079,15 @@ export default function SuggestionStoreInterceptor() {
 	);
 
 	// Mutable references read from inside the subscribe callback. Using refs
-	// avoids resubscribing on every entries / overlay change.
-	const entriesRef = useRef( entries );
-	entriesRef.current = entries;
+	// avoids resubscribing when the session value changes.
+	const recordStructuralCaptureRef = useRef( recordStructuralCapture );
+	recordStructuralCaptureRef.current = recordStructuralCapture;
 
-	const captureBaselineRef = useRef( captureBaseline );
-	captureBaselineRef.current = captureBaseline;
+	const getStructuralCapturesRef = useRef( getStructuralCaptures );
+	getStructuralCapturesRef.current = getStructuralCaptures;
 
-	const setOverlayAttributesRef = useRef( setOverlayAttributes );
-	setOverlayAttributesRef.current = setOverlayAttributes;
-
-	const setStructuralOpRef = useRef( setStructuralOp );
-	setStructuralOpRef.current = setStructuralOp;
+	const clearStructuralCaptureRef = useRef( clearStructuralCapture );
+	clearStructuralCaptureRef.current = clearStructuralCapture;
 
 	const consumeInterceptorBypassRef = useRef( consumeInterceptorBypass );
 	consumeInterceptorBypassRef.current = consumeInterceptorBypass;
@@ -1222,6 +1218,7 @@ export default function SuggestionStoreInterceptor() {
 			for ( const clientId of [ ...snapshot.keys() ] ) {
 				if ( ! live.has( clientId ) ) {
 					snapshot.delete( clientId );
+					clearStructuralCaptureRef.current( clientId );
 				}
 			}
 			for ( const clientId of liveClientIds ) {
@@ -1563,7 +1560,7 @@ export default function SuggestionStoreInterceptor() {
 							: null,
 						block: insertedBlock,
 					};
-					setStructuralOpRef.current?.(
+					recordStructuralCaptureRef.current(
 						clientId,
 						block.name,
 						insertOp
@@ -1702,32 +1699,39 @@ export default function SuggestionStoreInterceptor() {
 				);
 				const block = blockEditor.getBlock?.( clientId );
 
-				// Capture a baseline if one isn't already set (the HOC's own
-				// captureBaseline only fires for `setAttributes` calls; for
-				// store-level mutations we have to seed one here), then route
-				// the changes into the overlay so the user still sees their
-				// edit. The revert below restores the store so the post itself
-				// isn't actually modified.
-				const routeToOverlay = () => {
-					const overlayEntries = entriesRef.current;
-					if ( ! overlayEntries[ clientId ] ) {
-						captureBaselineRef.current(
-							clientId,
-							block?.name ?? '',
-							previous
-						);
+				/*
+				 * Store-level drift (block switcher, multi-select, plugin
+				 * dispatches) becomes a proposal on the block's own marker,
+				 * exactly as the HOC path does; the revert below keeps the
+				 * live attributes at the baseline. The marker write is not
+				 * a user edit here (the user's dispatch already took its
+				 * history slot), so it is kept off the undo stack. It runs
+				 * after the revert and reads the live metadata then: a
+				 * drift that touched `metadata` restores the snapshot's
+				 * metadata, which would otherwise clobber the marker.
+				 */
+				const routeToMarker = () => {
+					if ( Object.keys( overlayChanged ).length === 0 ) {
+						return;
 					}
-					if ( Object.keys( overlayChanged ).length > 0 ) {
-						setOverlayAttributesRef.current(
-							clientId,
-							overlayChanged
-						);
+					const { metadata } = withProposedAttributes( {
+						metadata:
+							blockEditor.getBlockAttributes( clientId )
+								?.metadata,
+						liveAttributes: previous,
+						changes: overlayChanged,
+						authorId: currentUserId,
+					} );
+					isDispatchingOwnWrite = true;
+					try {
+						blockEditorDispatch.__unstableMarkNextChangeAsNotPersistent();
+						blockEditorDispatch.updateBlockAttributes( clientId, {
+							metadata,
+						} );
+					} finally {
+						isDispatchingOwnWrite = false;
 					}
 				};
-
-				if ( ! markerPlan ) {
-					routeToOverlay();
-				}
 
 				// Record what this revert will make true, so its echo can be
 				// recognized per block even if the dispatch is batched past
@@ -1762,13 +1766,17 @@ export default function SuggestionStoreInterceptor() {
 					blockEditor.getBlockAttributes( clientId )
 				);
 
+				if ( ! markerPlan ) {
+					routeToMarker();
+				}
+
 				/*
 				 * Hand the marker plan over now that the block is back at the
 				 * value the plan was diffed from. The reconciler opens the
 				 * note(s) and writes the marked content through an interceptor
 				 * bypass. It returns a synchronous verdict, so a refusal (no
 				 * handler mounted, as in isolated unit tests) still lands in
-				 * the overlay exactly as it did before this branch existed.
+				 * the marker exactly as it did before this branch existed.
 				 */
 				if ( markerPlan ) {
 					const handed = requestContentSuggestionRef.current?.( {
@@ -1778,7 +1786,7 @@ export default function SuggestionStoreInterceptor() {
 						plan: markerPlan,
 					} );
 					if ( ! handed ) {
-						routeToOverlay();
+						routeToMarker();
 					}
 				}
 
@@ -1844,6 +1852,9 @@ export default function SuggestionStoreInterceptor() {
 					trackedMoveMarker === 'pending-move' &&
 					currentAttrs.metadata?.suggestion?.type !== 'pending-move'
 				) {
+					// The capture is resolved with the marker; a stale one
+					// must not be replayed by auto-save.
+					clearStructuralCaptureRef.current( move.clientId );
 					continue;
 				}
 				const block = blockEditor.getBlock?.( move.clientId );
@@ -1942,15 +1953,19 @@ export default function SuggestionStoreInterceptor() {
 						ownMarker === 'pending-insert'
 							? currentAttrs.metadata?.suggestion?.groupId
 							: undefined;
-					setStructuralOpRef.current?.( move.clientId, block.name, {
-						type: 'block-insert-after',
-						clientId: move.clientId,
-						blockName: block.name,
-						anchorClientId: move.toAnchorClientId,
-						parentClientId: move.toParentClientId,
-						block,
-						...( groupId ? { groupId } : {} ),
-					} );
+					recordStructuralCaptureRef.current(
+						move.clientId,
+						block.name,
+						{
+							type: 'block-insert-after',
+							clientId: move.clientId,
+							blockName: block.name,
+							anchorClientId: move.toAnchorClientId,
+							parentClientId: move.toParentClientId,
+							block,
+							...( groupId ? { groupId } : {} ),
+						}
+					);
 					continue;
 				}
 				/*
@@ -1964,8 +1979,9 @@ export default function SuggestionStoreInterceptor() {
 				const existingMarker = currentAttrs.metadata?.suggestion;
 				const fromParentBlock =
 					existingMarker?.type === 'pending-move'
-						? entriesRef.current[ move.clientId ]?.structuralOp
-								?.fromParentBlock
+						? getStructuralCapturesRef
+								.current()
+								.get( move.clientId )?.op?.fromParentBlock
 						: dissolvedParentRecord( move.fromParentClientId );
 				const from =
 					existingMarker?.type === 'pending-move'
@@ -2005,7 +2021,7 @@ export default function SuggestionStoreInterceptor() {
 				} finally {
 					isDispatchingOwnWrite = false;
 				}
-				setStructuralOpRef.current?.( move.clientId, block.name, {
+				recordStructuralCaptureRef.current( move.clientId, block.name, {
 					type: 'block-move',
 					clientId: move.clientId,
 					blockName: block.name,
@@ -2074,6 +2090,7 @@ export default function SuggestionStoreInterceptor() {
 						isAppliedRemoval( coreSelect, trackedAttributes )
 					) {
 						snapshot.delete( clientId );
+						clearStructuralCaptureRef.current( clientId );
 						continue;
 					}
 					removedIds.push( clientId );
@@ -2133,11 +2150,11 @@ export default function SuggestionStoreInterceptor() {
 				}
 
 				// Phase 2: tag each re-inserted block with the pending-
-				// remove marker AND record the structural operation in the
-				// overlay so auto-save can persist it as a `block-remove`
+				// remove marker AND record the structural operation on the
+				// session so auto-save can persist it as a `block-remove`
 				// op. `metadata.suggestion` is in SYSTEM_METADATA_KEYS, so
 				// subsequent fires fold the marker into the snapshot and
-				// don't route it to the user overlay.
+				// don't route it into a proposal.
 				for ( const clientId of tops ) {
 					const currentAttrs =
 						blockEditor.getBlockAttributes?.( clientId );
@@ -2168,26 +2185,31 @@ export default function SuggestionStoreInterceptor() {
 					// so "Remove block: paragraph" says which paragraph.
 					const removedParentClientId =
 						tree.parentByClientId.get( clientId ) ?? null;
-					setStructuralOpRef.current?.( clientId, block?.name ?? '', {
-						type: 'block-remove',
+					recordStructuralCaptureRef.current(
 						clientId,
-						blockName: block?.name ?? '',
-						parentBlockName: removedParentClientId
-							? ( tree.blocksByClientId.get(
-									removedParentClientId
-								)?.name ?? null )
-							: null,
-						...( groupId ? { groupId } : {} ),
-						block,
-					} );
+						block?.name ?? '',
+						{
+							type: 'block-remove',
+							clientId,
+							blockName: block?.name ?? '',
+							parentBlockName: removedParentClientId
+								? ( tree.blocksByClientId.get(
+										removedParentClientId
+									)?.name ?? null )
+								: null,
+							...( groupId ? { groupId } : {} ),
+							block,
+						}
+					);
 				}
 
 				/*
 				 * Re-stamp the insertion halves. Their markers and ops were
 				 * written earlier in this fire, before the removal that pairs
 				 * with them was known, so the group id has to be added after
-				 * the fact. `setStructuralOp` replaces the entry's op, and the
-				 * marker rewrite is system metadata the next diff folds in.
+				 * the fact. `recordStructuralCapture` replaces the block's
+				 * capture, and the marker rewrite is system metadata the next
+				 * diff folds in.
 				 */
 				for ( const insertion of insertionsThisFire ) {
 					const groupId = groupIds.get( insertion.clientId );
@@ -2220,7 +2242,7 @@ export default function SuggestionStoreInterceptor() {
 					} finally {
 						isDispatchingOwnWrite = false;
 					}
-					setStructuralOpRef.current?.(
+					recordStructuralCaptureRef.current(
 						insertion.clientId,
 						insertion.blockName,
 						{ ...insertion.op, groupId }

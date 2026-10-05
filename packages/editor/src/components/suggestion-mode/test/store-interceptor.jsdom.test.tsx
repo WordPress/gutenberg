@@ -269,6 +269,14 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		};
 	}
 
+	const markerOf = ( registry: any, clientId: string ) =>
+		registry.select( blockEditorStore ).getBlockAttributes( clientId )
+			?.metadata?.suggestion;
+	const proposalOf = ( registry: any, clientId: string ) =>
+		markerOf( registry, clientId )?.after;
+	const captureOf = ( getOverlay: () => any, clientId: string ) =>
+		getOverlay().getStructuralCaptures().get( clientId )?.op;
+
 	async function flushSubscribers() {
 		// `registry.subscribe` callbacks are scheduled asynchronously after
 		// dispatches; one microtask flush is enough for the interceptor's
@@ -323,7 +331,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		// `updateBlockAttributes(clientId, { metadata: { noteId } })` to
 		// link the block to its note. Without the fix, the interceptor
 		// reverted that update and the note appeared orphaned in the sidebar.
-		const { registry, clientId, getOverlay } = setup();
+		const { registry, clientId } = setup();
 
 		await act( async () => {
 			registry
@@ -340,13 +348,11 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 
 		expect( liveAttributes?.metadata?.noteId ).toBe( 42 );
 		// The system update must NOT leak into the overlay.
-		expect(
-			getOverlay().entries[ clientId ]?.overlayAttributes?.metadata
-		).toBeUndefined();
+		expect( proposalOf( registry, clientId )?.metadata ).toBeUndefined();
 	} );
 
 	it( 'preserves metadata.noteId while still intercepting other attribute changes', async () => {
-		const { registry, clientId, getOverlay } = setup();
+		const { registry, clientId } = setup();
 
 		// First, link the block to a note (as the suggestion provider would).
 		await act( async () => {
@@ -375,17 +381,13 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		// The user content edit is reverted to the baseline.
 		expect( liveAttributes?.content ).toBe( 'Hello' );
 		// The user content edit IS captured in the overlay.
-		expect(
-			getOverlay().entries[ clientId ]?.overlayAttributes?.content
-		).toBe( 'Edited' );
+		expect( proposalOf( registry, clientId )?.content ).toBe( 'Edited' );
 		// noteId never appears in the overlay.
-		expect(
-			getOverlay().entries[ clientId ]?.overlayAttributes?.metadata
-		).toBeUndefined();
+		expect( proposalOf( registry, clientId )?.metadata ).toBeUndefined();
 	} );
 
 	it( 'preserves metadata.noteId when reverting a same-tick combined mutation', async () => {
-		const { registry, clientId, getOverlay } = setup();
+		const { registry, clientId } = setup();
 
 		// A direct dispatch that touches both `content` (user-style) and
 		// `metadata.noteId` (system-style) at the same time. The interceptor
@@ -407,9 +409,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 
 		expect( liveAttributes?.metadata?.noteId ).toBe( 11 );
 		expect( liveAttributes?.content ).toBe( 'Hello' );
-		expect(
-			getOverlay().entries[ clientId ]?.overlayAttributes?.content
-		).toBe( 'Edited' );
+		expect( proposalOf( registry, clientId )?.content ).toBe( 'Edited' );
 	} );
 
 	it( 'lands an apply-style mutation on the live block when bypass is requested', async () => {
@@ -437,14 +437,20 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		).toBe( 'Hello' );
 
 		// Now run the apply path the way the provider will: ask the
-		// interceptor to bypass the next dispatch, drop the overlay, and
-		// write the applied attributes.
+		// interceptor to bypass the next dispatch, and write the applied
+		// attributes together with the cleared proposal.
 		await act( async () => {
+			const { suggestion, ...metadata } =
+				registry
+					.select( blockEditorStore )
+					.getBlockAttributes( clientId ).metadata ?? {};
 			getOverlay().requestInterceptorBypass( clientId );
-			getOverlay().clearOverlay( clientId );
 			registry
 				.dispatch( blockEditorStore )
-				.updateBlockAttributes( clientId, { content: 'Applied' } );
+				.updateBlockAttributes( clientId, {
+					content: 'Applied',
+					metadata,
+				} );
 		} );
 		await flushSubscribers();
 
@@ -457,7 +463,8 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		expect( liveAttributes?.content ).toBe( 'Applied' );
 		// The overlay entry is gone, so future edits start from a fresh
 		// baseline that reflects the applied state.
-		expect( getOverlay().entries[ clientId ] ).toBeUndefined();
+		expect( markerOf( registry, clientId ) ).toBeUndefined();
+		expect( captureOf( getOverlay, clientId ) ).toBeUndefined();
 
 		// A subsequent user-style edit is still intercepted normally and
 		// rebaselines against the post-apply attributes.
@@ -472,12 +479,60 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			registry.select( blockEditorStore ).getBlockAttributes( clientId )
 				?.content
 		).toBe( 'Applied' );
-		expect(
-			getOverlay().entries[ clientId ]?.overlayAttributes?.content
-		).toBe( 'After apply' );
+		expect( proposalOf( registry, clientId )?.content ).toBe(
+			'After apply'
+		);
 	} );
 
-	it( 'tags a removed block with metadata.suggestion = pending-remove and writes a block-remove op into the overlay', async () => {
+	it( 'turns a direct attribute dispatch into a pending-attributes marker on the live block', async () => {
+		const { registry, clientId } = setup();
+
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( clientId, { content: 'Edited' } );
+		} );
+		await flushSubscribers();
+
+		const attrs = registry
+			.select( blockEditorStore )
+			.getBlockAttributes( clientId );
+		expect( attrs.content ).toBe( 'Hello' );
+		expect( attrs.metadata.suggestion ).toEqual( {
+			type: 'pending-attributes',
+			authorId: null,
+			after: { content: 'Edited' },
+		} );
+	} );
+
+	it( 'a multi-selection attribute change becomes one marker per block', async () => {
+		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
+		const b = createBlock( TEST_BLOCK_NAME, { content: 'B' } );
+		const { registry } = setup( { initialBlocks: [ a, b ] } );
+
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( [ a.clientId, b.clientId ], {
+					content: 'Both',
+				} );
+		} );
+		await flushSubscribers();
+
+		for ( const block of [ a, b ] ) {
+			const attrs = registry
+				.select( blockEditorStore )
+				.getBlockAttributes( block.clientId );
+			expect( attrs.content ).toBe( block.attributes.content );
+			expect( attrs.metadata.suggestion ).toEqual( {
+				type: 'pending-attributes',
+				authorId: null,
+				after: { content: 'Both' },
+			} );
+		}
+	} );
+
+	it( 'tags a removed block with metadata.suggestion = pending-remove and records a block-remove capture', async () => {
 		// In Suggest mode a `removeBlock` dispatch must not actually remove
 		// the block — the apply-and-tag flow re-inserts the subtree at its
 		// previous position and marks it pending-remove. Auto-save reads
@@ -502,18 +557,14 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		// The marker is system metadata — it must NOT leak into the user
 		// overlay (the overlay represents user-pending edits, not provider-
 		// internal linkage).
-		expect(
-			getOverlay().entries[ clientId ]?.overlayAttributes?.metadata
-		).toBeUndefined();
+		expect( proposalOf( registry, clientId )?.metadata ).toBeUndefined();
 
 		// The structural op slot drives auto-save persistence.
-		expect( getOverlay().entries[ clientId ]?.structuralOp ).toMatchObject(
-			{
-				type: 'block-remove',
-				clientId,
-				blockName: TEST_BLOCK_NAME,
-			}
-		);
+		expect( captureOf( getOverlay, clientId ) ).toMatchObject( {
+			type: 'block-remove',
+			clientId,
+			blockName: TEST_BLOCK_NAME,
+		} );
 	} );
 
 	it( 'keeps the pending-remove marker after a follow-up dispatch fires the subscribe loop again', async () => {
@@ -541,7 +592,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			registry.select( blockEditorStore ).getBlockAttributes( b.clientId )
 				?.metadata?.suggestion?.type
 		).toBe( 'pending-remove' );
-		expect( getOverlay().entries[ b.clientId ]?.structuralOp?.type ).toBe(
+		expect( captureOf( getOverlay, b.clientId )?.type ).toBe(
 			'block-remove'
 		);
 
@@ -561,7 +612,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			registry.select( blockEditorStore ).getBlockAttributes( b.clientId )
 				?.metadata?.suggestion?.type
 		).toBe( 'pending-remove' );
-		expect( getOverlay().entries[ b.clientId ]?.structuralOp?.type ).toBe(
+		expect( captureOf( getOverlay, b.clientId )?.type ).toBe(
 			'block-remove'
 		);
 	} );
@@ -621,7 +672,8 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 
 		// The orphan overlay entry is cleaned up by the PRUNE_ORPHANS
 		// effect once the block leaves the live tree.
-		expect( getOverlay().entries[ b.clientId ] ).toBeUndefined();
+		expect( markerOf( registry, b.clientId ) ).toBeUndefined();
+		expect( captureOf( getOverlay, b.clientId ) ).toBeUndefined();
 	} );
 
 	it( 'adopts a local apply of a pending removal made while suggesting', async () => {
@@ -650,7 +702,6 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 				.dispatch( blockEditorStore )
 				.updateBlockAttributes( b.clientId, { metadata } );
 			getOverlay().requestInterceptorBypass( b.clientId );
-			getOverlay().clearOverlay( b.clientId );
 			registry.dispatch( blockEditorStore ).removeBlock( b.clientId );
 		} );
 		await flushSubscribers();
@@ -765,9 +816,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			authorId: null,
 		} );
 
-		expect(
-			getOverlay().entries[ inserted.clientId ]?.structuralOp
-		).toMatchObject( {
+		expect( captureOf( getOverlay, inserted.clientId ) ).toMatchObject( {
 			type: 'block-insert-after',
 			clientId: inserted.clientId,
 			blockName: TEST_BLOCK_NAME,
@@ -810,12 +859,11 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 
 		// The persisted ops carry the same id, so the linkage survives a
 		// reload where every captured clientId is stale.
-		const entries = getOverlay().entries;
-		expect( entries[ original.clientId ]?.structuralOp ).toMatchObject( {
+		expect( captureOf( getOverlay, original.clientId ) ).toMatchObject( {
 			type: 'block-remove',
 			groupId: removedMarker.groupId,
 		} );
-		expect( entries[ replacement.clientId ]?.structuralOp ).toMatchObject( {
+		expect( captureOf( getOverlay, replacement.clientId ) ).toMatchObject( {
 			type: 'block-insert-after',
 			groupId: removedMarker.groupId,
 		} );
@@ -871,14 +919,14 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 				( block: any ) => block.attributes?.metadata?.suggestion
 			)
 		).toEqual( [ undefined, undefined ] );
-		expect( Object.keys( getOverlay().entries ) ).toEqual( [] );
+		expect( getOverlay().getStructuralCaptures().size ).toBe( 0 );
 	} );
 
 	it( 'still captures an edit made after a resetBlocks', async () => {
 		// The adoption above must re-seed the baseline, not switch capture
 		// off: the next real edit — on a block that only exists because of
 		// the reset — is still a suggestion.
-		const { registry, getOverlay } = setup();
+		const { registry } = setup();
 
 		const incoming = [
 			createBlock( TEST_BLOCK_NAME, { content: 'From the server' } ),
@@ -905,9 +953,9 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 				.select( blockEditorStore )
 				.getBlockAttributes( incomingClientId )?.content
 		).toBe( 'From the server' );
-		expect(
-			getOverlay().entries[ incomingClientId ]?.overlayAttributes?.content
-		).toBe( 'Edited' );
+		expect( proposalOf( registry, incomingClientId )?.content ).toBe(
+			'Edited'
+		);
 	} );
 
 	it( 'does not leave an undo adoption token armed after a resetBlocks', async () => {
@@ -947,9 +995,9 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 				.select( blockEditorStore )
 				.getBlockAttributes( incomingClientId )?.content
 		).toBe( 'Undone' );
-		expect(
-			getOverlay().entries[ incomingClientId ]?.overlayAttributes?.content
-		).toBe( 'Undone and typed' );
+		expect( proposalOf( registry, incomingClientId )?.content ).toBe(
+			'Undone and typed'
+		);
 	} );
 
 	it( 'defers an empty default block, then registers a single insertion once it gains content', async () => {
@@ -977,7 +1025,8 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			.select( blockEditorStore )
 			.getBlockAttributes( inserted.clientId );
 		expect( attributes?.metadata?.suggestion ).toBeUndefined();
-		expect( getOverlay().entries[ inserted.clientId ] ).toBeUndefined();
+		expect( markerOf( registry, inserted.clientId ) ).toBeUndefined();
+		expect( captureOf( getOverlay, inserted.clientId ) ).toBeUndefined();
 		expect( getOverlay().isDeferredInsertion( inserted.clientId ) ).toBe(
 			true
 		);
@@ -1001,23 +1050,20 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			type: 'pending-insert',
 			authorId: null,
 		} );
-		expect(
-			getOverlay().entries[ inserted.clientId ]?.structuralOp
-		).toMatchObject( {
+		expect( captureOf( getOverlay, inserted.clientId ) ).toMatchObject( {
 			type: 'block-insert-after',
 			clientId: inserted.clientId,
 			blockName: TEST_BLOCK_NAME,
 		} );
 		expect(
-			getOverlay().entries[ inserted.clientId ]?.overlayAttributes
-				?.content
+			proposalOf( registry, inserted.clientId )?.content
 		).toBeUndefined();
 		expect( getOverlay().isDeferredInsertion( inserted.clientId ) ).toBe(
 			false
 		);
 	} );
 
-	it( 'adopts follow-up edits on a pending-insert block instead of reverting them into the overlay', async () => {
+	it( 'adopts follow-up edits on a pending-insert block instead of reverting them into a proposal', async () => {
 		// Continued typing inside a block that IS the insertion suggestion
 		// grows the insertion; it must not be reverted to the registration
 		// snapshot nor surface as a second (attribute/content) suggestion.
@@ -1050,12 +1096,11 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		expect( attributes?.metadata?.suggestion?.type ).toBe(
 			'pending-insert'
 		);
+		expect( captureOf( getOverlay, inserted.clientId )?.type ).toBe(
+			'block-insert-after'
+		);
 		expect(
-			getOverlay().entries[ inserted.clientId ]?.structuralOp?.type
-		).toBe( 'block-insert-after' );
-		expect(
-			getOverlay().entries[ inserted.clientId ]?.overlayAttributes
-				?.content
+			proposalOf( registry, inserted.clientId )?.content
 		).toBeUndefined();
 	} );
 
@@ -1090,7 +1135,8 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 				( block: any ) => block.clientId === inserted.clientId
 			)
 		).toBe( false );
-		expect( getOverlay().entries[ inserted.clientId ] ).toBeUndefined();
+		expect( markerOf( registry, inserted.clientId ) ).toBeUndefined();
+		expect( captureOf( getOverlay, inserted.clientId ) ).toBeUndefined();
 		expect( getOverlay().isDeferredInsertion( inserted.clientId ) ).toBe(
 			false
 		);
@@ -1148,7 +1194,8 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
 		expect( liveBlocks ).toHaveLength( 1 );
 		expect( liveBlocks[ 0 ].clientId ).toBe( a.clientId );
-		expect( getOverlay().entries[ inserted.clientId ] ).toBeUndefined();
+		expect( markerOf( registry, inserted.clientId ) ).toBeUndefined();
+		expect( captureOf( getOverlay, inserted.clientId ) ).toBeUndefined();
 	} );
 
 	it( 'records a null anchor when the inserted block lands at index 0 (no previous sibling)', async () => {
@@ -1167,9 +1214,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		expect( liveBlocks[ 0 ].attributes?.metadata?.suggestion?.type ).toBe(
 			'pending-insert'
 		);
-		expect(
-			getOverlay().entries[ inserted.clientId ]?.structuralOp
-		).toMatchObject( {
+		expect( captureOf( getOverlay, inserted.clientId ) ).toMatchObject( {
 			type: 'block-insert-after',
 			anchorClientId: null,
 			parentClientId: null,
@@ -1213,9 +1258,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			expect( bl.attributes?.metadata?.suggestion ).toBeUndefined();
 		}
 
-		expect(
-			getOverlay().entries[ b.clientId ]?.structuralOp
-		).toMatchObject( {
+		expect( captureOf( getOverlay, b.clientId ) ).toMatchObject( {
 			type: 'block-move',
 			clientId: b.clientId,
 			fromAnchorClientId: a.clientId,
@@ -1253,9 +1296,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 				.getBlockAttributes( inserted.clientId )?.metadata?.suggestion
 				?.type
 		).toBe( 'pending-insert' );
-		expect(
-			getOverlay().entries[ inserted.clientId ]?.structuralOp
-		).toMatchObject( {
+		expect( captureOf( getOverlay, inserted.clientId ) ).toMatchObject( {
 			type: 'block-insert-after',
 			anchorClientId: null,
 			parentClientId: null,
@@ -1286,9 +1327,10 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		} );
 		await flushSubscribers();
 
-		expect(
-			getOverlay().entries[ inserted.clientId ]?.structuralOp
-		).toMatchObject( { type: 'block-insert-after', groupId: 'g-1' } );
+		expect( captureOf( getOverlay, inserted.clientId ) ).toMatchObject( {
+			type: 'block-insert-after',
+			groupId: 'g-1',
+		} );
 	} );
 
 	it( 'tags a child moved out of a pending insertion as its own insertion', async () => {
@@ -1348,7 +1390,8 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		expect(
 			registry.select( blockEditorStore ).getBlockOrder( group.clientId )
 		).toEqual( [] );
-		expect( getOverlay().entries[ child.clientId ] ).toBeUndefined();
+		expect( markerOf( registry, child.clientId ) ).toBeUndefined();
+		expect( captureOf( getOverlay, child.clientId ) ).toBeUndefined();
 	} );
 
 	it( 'does not restore the children of a removed pending insertion', async () => {
@@ -1386,7 +1429,8 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 				.select( blockEditorStore )
 				.getBlockAttributes( added.clientId )?.metadata?.suggestion
 		).toBeUndefined();
-		expect( getOverlay().entries[ added.clientId ] ).toBeUndefined();
+		expect( markerOf( registry, added.clientId ) ).toBeUndefined();
+		expect( captureOf( getOverlay, added.clientId ) ).toBeUndefined();
 	} );
 
 	it( 'moves an existing block back out of a pending insertion', async () => {
@@ -1416,7 +1460,8 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		expect(
 			blockEditor.getBlockAttributes( a.clientId )?.metadata?.suggestion
 		).toBeUndefined();
-		expect( getOverlay().entries[ a.clientId ] ).toBeUndefined();
+		expect( markerOf( registry, a.clientId ) ).toBeUndefined();
+		expect( captureOf( getOverlay, a.clientId ) ).toBeUndefined();
 		expect( registry.select( noticesStore ).getNotices() ).toEqual(
 			expect.arrayContaining( [
 				expect.objectContaining( {
@@ -1467,9 +1512,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			fromParentClientId: null,
 		} );
 
-		expect(
-			getOverlay().entries[ b.clientId ]?.structuralOp
-		).toMatchObject( {
+		expect( captureOf( getOverlay, b.clientId ) ).toMatchObject( {
 			type: 'block-move',
 			clientId: b.clientId,
 			fromIndex: 1,
@@ -1517,10 +1560,9 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 				?.attributes?.metadata?.suggestion
 		).toBeUndefined();
 
-		expect( getOverlay().entries[ a.clientId ] ).toBeUndefined();
-		expect(
-			getOverlay().entries[ b.clientId ]?.structuralOp
-		).toMatchObject( {
+		expect( markerOf( registry, a.clientId ) ).toBeUndefined();
+		expect( captureOf( getOverlay, a.clientId ) ).toBeUndefined();
+		expect( captureOf( getOverlay, b.clientId ) ).toMatchObject( {
 			type: 'block-move',
 			clientId: b.clientId,
 			fromIndex: 1,
@@ -1572,11 +1614,11 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		} );
 
 		// Only the moved block has an overlay entry to auto-save.
-		expect( getOverlay().entries[ a.clientId ] ).toBeUndefined();
-		expect( getOverlay().entries[ b.clientId ] ).toBeUndefined();
-		expect(
-			getOverlay().entries[ c.clientId ]?.structuralOp
-		).toMatchObject( {
+		expect( markerOf( registry, a.clientId ) ).toBeUndefined();
+		expect( captureOf( getOverlay, a.clientId ) ).toBeUndefined();
+		expect( markerOf( registry, b.clientId ) ).toBeUndefined();
+		expect( captureOf( getOverlay, b.clientId ) ).toBeUndefined();
+		expect( captureOf( getOverlay, c.clientId ) ).toMatchObject( {
 			type: 'block-move',
 			clientId: c.clientId,
 			fromIndex: 2,
