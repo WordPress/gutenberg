@@ -113,6 +113,12 @@ jobs:
         chmod -R 767 ./ # TODO: Possibly integrate in wp-env
         npm run wp-env start
 
+    # PHPUnit 8.5 requires PHP 7.2+, so older versions use the PHPUnit in their `phpunit` image.
+    # `--no-update` isn't used because it would leave the locked package installed.
+    - name: Remove incompatible Composer packages
+      if: ${{ matrix.php < '7.2' }}
+      run: npm run wp-env run composer "remove phpunit/phpunit --dev"
+
     - name: Running lint check
       run: npm run lint-php
 
