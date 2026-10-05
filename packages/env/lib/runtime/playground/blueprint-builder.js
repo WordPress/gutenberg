@@ -1,5 +1,13 @@
 'use strict';
 
+const DATABASE_PATH_CONSTANTS = [
+	'DB_PATH',
+	'DB_DIR',
+	'DB_FILE',
+	'FQDBDIR',
+	'FQDB',
+];
+
 /**
  * Builds a Playground Blueprint from wp-env configuration.
  *
@@ -57,7 +65,7 @@ function buildBlueprint( config ) {
 	// Configure wp-config constants
 	const wpConfigConsts = {};
 	for ( const [ key, value ] of Object.entries( envConfig.config || {} ) ) {
-		if ( value !== null ) {
+		if ( value !== null && ! DATABASE_PATH_CONSTANTS.includes( key ) ) {
 			wpConfigConsts[ key ] = value;
 		}
 	}
@@ -76,6 +84,24 @@ function buildBlueprint( config ) {
 	}
 
 	return blueprint;
+}
+
+/**
+ * Get database constants that must be defined before WordPress installation.
+ *
+ * @param {Object} config The wp-env config object.
+ * @return {string[]} Playground CLI arguments.
+ */
+function getDatabaseConfigArgs( config ) {
+	const args = [];
+	for ( const [ key, value ] of Object.entries(
+		config.env.development.config || {}
+	) ) {
+		if ( value !== null && DATABASE_PATH_CONSTANTS.includes( key ) ) {
+			args.push( '--define', key, String( value ) );
+		}
+	}
+	return args;
 }
 
 /**
@@ -154,5 +180,6 @@ function getMountArgs( config ) {
 
 module.exports = {
 	buildBlueprint,
+	getDatabaseConfigArgs,
 	getMountArgs,
 };

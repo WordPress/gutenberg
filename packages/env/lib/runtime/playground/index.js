@@ -4,7 +4,11 @@ const http = require( 'http' );
 const path = require( 'path' );
 const spawn = require( 'cross-spawn' );
 const { rimraf } = require( 'rimraf' );
-const { buildBlueprint, getMountArgs } = require( './blueprint-builder' );
+const {
+	buildBlueprint,
+	getDatabaseConfigArgs,
+	getMountArgs,
+} = require( './blueprint-builder' );
 const { UnsupportedCommandError } = require( '../errors' );
 const { downloadSource } = require( '../../download-sources' );
 
@@ -148,6 +152,7 @@ class PlaygroundRuntime {
 			blueprintPath,
 			'--login',
 			'--experimental-multi-worker',
+			...getDatabaseConfigArgs( config ),
 			...mountArgs,
 		];
 

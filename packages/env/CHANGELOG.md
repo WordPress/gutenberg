@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Apply SQLite database path settings before WordPress installation in the Playground runtime so custom paths use the installed database ([#84109](https://github.com/WordPress/gutenberg/pull/84109)).
 -   Pass `-T` to `docker compose exec` when stdin is not a terminal, so commands run from a Git hook, which has a TTY on stdout but not on stdin, no longer fail with "cannot attach stdin to a TTY-enabled container" ([#78374](https://github.com/WordPress/gutenberg/pull/78374)).
 
 ### Internal
