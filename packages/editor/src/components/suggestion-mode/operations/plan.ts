@@ -1,5 +1,5 @@
 /**
- * A plan of block-editor and overlay effects, computed by the pure planners
+ * A plan of block-editor effects, computed by the pure planners
  * in this directory and dispatched by the decision hook. Keeping the planning
  * separate from dispatch lets the structural reject logic be unit tested
  * against a block tree without a registry.
@@ -8,8 +8,6 @@
 export type PlanStep =
 	/** Let the next write to this block past the Suggest mode interceptor. */
 	| { step: 'bypass'; clientId: string }
-	/** Drop the block's overlay entry. */
-	| { step: 'clearOverlay'; clientId: string }
 	| {
 			step: 'updateBlockAttributes';
 			clientId: string;

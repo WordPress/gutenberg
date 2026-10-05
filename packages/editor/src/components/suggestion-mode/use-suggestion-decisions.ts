@@ -12,10 +12,8 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { STORE_NAME } from '../../store/constants';
-import {
-	useSuggestionSession,
-	POST_TITLE_OVERLAY_KEY,
-} from './suggestion-session';
+import { useSuggestionSession } from './suggestion-session';
+import { withoutProposedAttributes } from './marker';
 import { getNoteIdsFromMetadata } from '../collab-sidebar/utils';
 import {
 	acceptInlineDeletion,
@@ -44,6 +42,21 @@ import { withDecisionInFlight } from './decision-state';
 import { useSuggestionStore } from './suggestion-store';
 
 /**
+ * The attribute update that drops a block's attribute proposal: the whole
+ * marker for a pending-attributes marker, only `after` on a structural one.
+ *
+ * @param currentAttributes Block's current attributes.
+ * @return Partial attributes for `updateBlockAttributes`, or null when the
+ * block proposes nothing.
+ */
+function clearProposedAttributes(
+	currentAttributes: Record< string, any > | null | undefined
+) {
+	const metadata = withoutProposedAttributes( currentAttributes?.metadata );
+	return metadata ? { metadata } : null;
+}
+
+/**
  * Apply/reject callbacks for the current editor.
  *
  * @return The decision callbacks.
@@ -56,12 +69,13 @@ export function useSuggestionDecisions() {
 		removeBlock,
 		insertBlock,
 		moveBlockToPosition,
+		__unstableMarkNextChangeAsNotPersistent: markNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
 	const {
 		getBlockAttributes: selectBlockAttributes,
 		getClientIdsWithDescendants: selectClientIdsWithDescendants,
 	} = useSelect( blockEditorStore );
-	const { requestInterceptorBypass, clearOverlay, clearOverlayForComment } =
+	const { requestInterceptorBypass, setPostTitleProposal } =
 		useSuggestionSession();
 	const registry = useRegistry();
 
@@ -76,9 +90,6 @@ export function useSuggestionDecisions() {
 				switch ( step.step ) {
 					case 'bypass':
 						requestInterceptorBypass( step.clientId );
-						break;
-					case 'clearOverlay':
-						clearOverlay( step.clientId );
 						break;
 					case 'updateBlockAttributes':
 						updateBlockAttributes( step.clientId, step.attributes );
@@ -111,7 +122,6 @@ export function useSuggestionDecisions() {
 		},
 		[
 			requestInterceptorBypass,
-			clearOverlay,
 			updateBlockAttributes,
 			removeBlock,
 			insertBlock,
@@ -196,7 +206,7 @@ export function useSuggestionDecisions() {
 				try {
 					editPost( applyPostOperations( postOps ) );
 					await store.setLifecycleStatus( commentId, 'applied' );
-					clearOverlayForComment( POST_TITLE_OVERLAY_KEY, commentId );
+					setPostTitleProposal( null );
 					if ( ! silent ) {
 						createNotice( 'success', __( 'Suggestion applied.' ), {
 							type: 'snackbar',
@@ -264,16 +274,10 @@ export function useSuggestionDecisions() {
 					);
 				}
 				try {
+					// The same block can hold a pending attribute proposal in
+					// its marker; this write touches only the marked
+					// attribute, so that proposal stays where it is (F-14).
 					requestInterceptorBypass( targetClientId );
-					/*
-					 * An inline suggestion never lives in the overlay, but the
-					 * same block can hold a pending attribute suggestion that
-					 * does. Clear only an entry this comment owns: the entry is
-					 * the attribute note's sole anchor, so an unconditional
-					 * clear here hands that note to the orphan collector and
-					 * wipes the proposed value off the canvas (F-14).
-					 */
-					clearOverlayForComment( targetClientId, commentId );
 					updateBlockAttributes( targetClientId, {
 						[ attributeKey ]: nextValue,
 					} );
@@ -354,31 +358,33 @@ export function useSuggestionDecisions() {
 			}
 
 			const currentAttributes = selectBlockAttributes( targetClientId );
-			const newAttributes = applyOperations(
-				currentAttributes,
-				payload.operations
-			);
-			const rollbackPayload = rollbackAttributesFor(
-				currentAttributes,
-				payload.operations
-			);
+			// One update lands the proposed values and drops the proposal.
+			const clearedProposal =
+				clearProposedAttributes( currentAttributes );
+			const newAttributes = {
+				...applyOperations( currentAttributes, payload.operations ),
+				...( clearedProposal ?? {} ),
+			};
+			// A failed save puts the proposal back along with the values.
+			const rollbackPayload = {
+				...rollbackAttributesFor(
+					currentAttributes,
+					payload.operations
+				),
+				...( clearedProposal
+					? { metadata: currentAttributes?.metadata }
+					: {} ),
+			};
 
 			try {
 				// Bypass the suggest-mode interceptor for this dispatch so
 				// the applied attributes actually land on the live block
-				// instead of being reverted into the overlay. Outside Suggest
+				// instead of being diverted into a proposal. Outside Suggest
 				// mode the interceptor isn't running and this is a no-op.
 				requestInterceptorBypass( targetClientId );
 				updateBlockAttributes( targetClientId, newAttributes );
 
 				await store.setLifecycleStatus( commentId, 'applied' );
-
-				// Reset the per-block suggestion tracking only once the
-				// decision is saved, so a failed save keeps the overlay
-				// entry and the suggestion can be applied again. The next
-				// edit then captures a fresh baseline from the post-apply
-				// attributes.
-				clearOverlay( targetClientId );
 
 				if ( ! silent ) {
 					createNotice( 'success', __( 'Suggestion applied.' ), {
@@ -408,8 +414,7 @@ export function useSuggestionDecisions() {
 			runPlan,
 			createNotice,
 			requestInterceptorBypass,
-			clearOverlay,
-			clearOverlayForComment,
+			setPostTitleProposal,
 			registry,
 		]
 	);
@@ -447,12 +452,12 @@ export function useSuggestionDecisions() {
 			/*
 			 * A post-level suggestion never touched the post: reject only
 			 * records the decision and drops the proposed value from the
-			 * overlay so the field shows the real title again.
+			 * session so the field shows the real title again.
 			 */
 			if ( findPostAttributeOps( payload?.operations ).length > 0 ) {
 				try {
 					await store.setLifecycleStatus( commentId, 'rejected' );
-					clearOverlayForComment( POST_TITLE_OVERLAY_KEY, commentId );
+					setPostTitleProposal( null );
 					if ( ! silent ) {
 						createNotice( 'success', __( 'Suggestion rejected.' ), {
 							type: 'snackbar',
@@ -515,11 +520,9 @@ export function useSuggestionDecisions() {
 						);
 					}
 					try {
+						// As on the apply path: a co-resident attribute
+						// proposal lives in the marker and survives this.
 						requestInterceptorBypass( targetClientId );
-						// Guarded for the same reason as the apply path above:
-						// a co-resident attribute suggestion owns this block's
-						// overlay entry and must survive an inline decision.
-						clearOverlayForComment( targetClientId, commentId );
 						updateBlockAttributes( targetClientId, {
 							[ attributeKey ]: nextValue,
 						} );
@@ -556,8 +559,8 @@ export function useSuggestionDecisions() {
 
 			// A structural op undoes its live-block change (see
 			// `planStructuralReject`); an attribute-set payload made no
-			// live-block change, so only the overlay entry holding the
-			// proposed value is cleared.
+			// live-block change, so only the proposal on the marker is
+			// dropped.
 			const structuralOp = findStructuralOp( payload?.operations );
 
 			try {
@@ -566,8 +569,8 @@ export function useSuggestionDecisions() {
 				/*
 				 * Undo the live-block change only once the decision is
 				 * persisted. A structural change can't be rolled back
-				 * faithfully (position, children, selection, and the
-				 * overlay entry would all have to be restored), so the
+				 * faithfully (position, children and selection would all
+				 * have to be restored), so the
 				 * tree is left untouched until the save succeeds — a
 				 * failed reject then leaves the editor exactly as it was.
 				 */
@@ -582,13 +585,22 @@ export function useSuggestionDecisions() {
 				} else if ( clientId ) {
 					/*
 					 * An attribute-only suggestion lives entirely in the
-					 * overlay: the live block never took the proposed value,
-					 * so there is nothing to roll back, but the overlay entry
-					 * must go or it keeps rendering the rejected value and
-					 * feeds it into the next proposal. Guarded, because the
-					 * entry may already belong to a newer suggestion.
+					 * marker's proposal: the live block never took the
+					 * proposed value, so there is nothing to roll back, but
+					 * the proposal must go or it keeps rendering the rejected
+					 * value. Dropping it is a decision, not an edit, so it
+					 * stays off the undo stack.
 					 */
-					clearOverlayForComment( clientId, commentId );
+					const clear = clearProposedAttributes(
+						selectBlockAttributes( clientId )
+					);
+					if ( clear ) {
+						requestInterceptorBypass( clientId );
+						markNextChangeAsNotPersistent?.( {
+							history: 'ignore',
+						} );
+						updateBlockAttributes( clientId, clear );
+					}
 				}
 
 				if ( ! silent ) {
@@ -614,8 +626,9 @@ export function useSuggestionDecisions() {
 			resolveTarget,
 			runPlan,
 			updateBlockAttributes,
+			markNextChangeAsNotPersistent,
 			requestInterceptorBypass,
-			clearOverlayForComment,
+			setPostTitleProposal,
 			registry,
 		]
 	);

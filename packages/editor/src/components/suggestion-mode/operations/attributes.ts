@@ -136,9 +136,15 @@ export function postOperationsFromTitle(
 }
 
 /**
- * Build attributes that clear the `metadata.suggestion` marker on a block
- * while preserving every other metadata field. Used by Apply (after the
- * mutation lands) and by Reject (to drop the pending state).
+ * Build attributes that clear a structural `metadata.suggestion` marker on
+ * a block while preserving every other metadata field. Used by Apply (after
+ * the mutation lands) and by Reject (to drop the pending state).
+ *
+ * An attribute proposal that rode along on the structural marker (a heading
+ * level changed on a block that was then moved) is a separate suggestion
+ * with its own note: it is kept as its own `pending-attributes` marker. This
+ * module cannot import `marker.ts` (which imports from here), so the shape
+ * is written out.
  *
  * @param currentAttributes Block's current attributes.
  * @return Partial attributes payload safe for `updateBlockAttributes`.
@@ -150,7 +156,25 @@ export function clearSuggestionMarkerAttributes(
 	if ( ! meta || meta.suggestion === undefined ) {
 		return null;
 	}
-	const { suggestion: _drop, ...rest } = meta;
+	const { suggestion, ...rest } = meta;
+	const after = suggestion?.after;
+	if (
+		after &&
+		typeof after === 'object' &&
+		! Array.isArray( after ) &&
+		Object.keys( after ).length > 0
+	) {
+		return {
+			metadata: {
+				...rest,
+				suggestion: {
+					type: 'pending-attributes',
+					authorId: suggestion.authorId ?? null,
+					after,
+				},
+			},
+		};
+	}
 	return { metadata: rest };
 }
 
