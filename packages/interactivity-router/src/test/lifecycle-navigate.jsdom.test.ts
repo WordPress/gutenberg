@@ -3,13 +3,13 @@
  * produced by `actions.navigate()`.
  *
  * The router registers global listeners when it loads, so it is imported once
- * and every test in this file shares its `core/router` store. The tests in the
- * first `describe` block rely on no navigation having happened yet, so they
- * must stay first.
+ * and every test in this file shares its `core/router` store. Tests run in
+ * random order, so none can assume no navigation has happened yet; those
+ * live in `lifecycle-initial.jsdom.test.ts`.
  */
 
 import { beforeAll, describe, expect, test, vi } from 'vitest';
-import { privateApis, store, watch } from '@wordpress/interactivity';
+import { store, watch } from '@wordpress/interactivity';
 import { importScriptModules } from '../assets/script-modules';
 import {
 	hydrateHtml,
@@ -35,63 +35,11 @@ vi.mock( import( '../assets/script-modules' ), async ( importOriginal ) => {
 	};
 } );
 
-const { populateServerData } = privateApis(
-	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
-);
-
 let state: ( typeof import( '../index' ) )[ 'state' ];
 let actions: ( typeof import( '../index' ) )[ 'actions' ];
 
-// Readings of `state.navigating` by a watcher subscribed before the router
-// loads.
-const runsBeforeLoad: Array< boolean | undefined > = [];
-
 beforeAll( async () => {
-	const { state: routerState } = store( 'core/router' ) as {
-		state: typeof state;
-	};
-	const stop = watch( () => {
-		runsBeforeLoad.push( routerState.navigating );
-	} );
 	( { state, actions } = await import( '../index' ) );
-	stop();
-} );
-
-describe( 'before the first navigation', () => {
-	test( 'the lifecycle keys are undefined, and loading the router does not re-run watchers that read them', () => {
-		expect( runsBeforeLoad ).toEqual( [ undefined ] );
-		expect( state.navigating ).toBeUndefined();
-		expect( state.initiator ).toBeUndefined();
-	} );
-
-	test( 'prefetch() does not change the lifecycle', async () => {
-		const { changes, stop } = recordLifecycle();
-
-		await actions.prefetch( 'http://localhost/prefetched', {
-			html: pageHtml( 'prefetched' ),
-		} );
-		stop();
-
-		expect( changes ).toEqual( [] );
-		expect( state.navigating ).toBeUndefined();
-	} );
-
-	test( 'a navigation that reloads because client-side navigation is disabled does not change the lifecycle', async () => {
-		populateServerData( {
-			config: { 'core/router': { clientNavigationDisabled: true } },
-		} );
-		const { changes, stop } = recordLifecycle();
-
-		void actions.navigate( 'http://localhost/disabled', quiet );
-		await nextFrames();
-		stop();
-		populateServerData();
-
-		expect( changes ).toEqual( [] );
-		expect( state.navigating ).toBeUndefined();
-		// jsdom reports the attempted full page load.
-		expect( console ).toHaveErrored();
-	} );
 } );
 
 describe( 'navigate()', () => {

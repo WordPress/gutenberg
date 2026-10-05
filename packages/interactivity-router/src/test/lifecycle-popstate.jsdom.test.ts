@@ -3,15 +3,15 @@
  * produced by back and forward traversals.
  *
  * The router registers global listeners when it loads, so it is imported once
- * and every test in this file shares its `core/router` store. The tests in the
- * first `describe` block rely on no navigation having happened yet, so they
- * must stay first.
+ * and every test in this file shares its `core/router` store. Tests run in
+ * random order, so none can assume no navigation has happened yet; those
+ * live in `lifecycle-initial.jsdom.test.ts` and
+ * `lifecycle-first-traversal.jsdom.test.ts`.
  */
 
 import { beforeAll, describe, expect, test, vi } from 'vitest';
 import { watch } from '@wordpress/interactivity';
 import {
-	hydrateNavigatingWatcher,
 	mockFetch,
 	mockFetchNotFound,
 	nextFrames,
@@ -85,42 +85,6 @@ function throwingWatcher( message: string ) {
 		stop();
 	};
 }
-
-describe( 'before the first navigation', () => {
-	test( 'an uncached traversal reloads the page without changing the lifecycle', async () => {
-		const { changes, stop } = recordLifecycle();
-
-		traverseTo( '/uncached-initial' );
-		await nextFrames();
-		stop();
-
-		expect( changes ).toEqual( [] );
-		expect( state.navigating ).toBeUndefined();
-		expect( state.initiator ).toBeUndefined();
-		// jsdom reports the attempted reload.
-		expect( console ).toHaveErrored();
-	} );
-
-	test( 'a cached traversal produces a full cycle with no initiator, observable by a `data-wp-watch` directive', async () => {
-		await actions.prefetch( 'http://localhost/cached-initial', {
-			html: pageHtml( 'cached-initial' ),
-		} );
-		const runs = hydrateNavigatingWatcher();
-		await nextFrames();
-		const { changes, stop } = recordLifecycle();
-
-		traverseTo( '/cached-initial' );
-		await nextFrames();
-		stop();
-
-		expect( changes ).toEqual( [
-			{ navigating: true, initiator: null },
-			{ navigating: false, initiator: null },
-		] );
-		expect( runs ).toEqual( [ undefined, true, false ] );
-		expect( state.url ).toBe( 'http://localhost/cached-initial' );
-	} );
-} );
 
 describe( 'popstate', () => {
 	test( 'a cached traversal clears the initiator of the previous navigation before its page is ready', async () => {
