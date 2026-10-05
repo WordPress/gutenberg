@@ -14,9 +14,9 @@ Tracking issue: [#73411](https://github.com/WordPress/gutenberg/issues/73411). T
 | --- | --- | --- | --- |
 | Example | Type, delete, paste, bold a word | Delete a block, add a block, drag a block | Change H2 to H3, align center |
 | Captured by | `beforeinput` / `cut` / `paste` "keyboards", plus a content reconciler for IME, autocorrect and drag-drop | Store interceptor (`registry.subscribe` diff) | `setAttributes` HOC, plus the store interceptor for direct dispatches |
-| Pending state lives in | A `<mark class="wp-suggestion">` in the block's content | `metadata.suggestion` marker on the block, saved in `post_content` | An in-memory overlay (being moved into `metadata.suggestion`, see [In-flight changes](#in-flight-changes)) |
+| Pending state lives in | A `<mark class="wp-suggestion">` in the block's content | `metadata.suggestion` marker on the block, saved in `post_content` | An in-memory overlay |
 | Note payload | `inline-suggestion` op | `block-insert-after` / `block-remove` / `block-move` op | `attribute-set` op |
-| Survives reload | Yes | Yes | The Note does; the in-canvas preview does not (yet) |
+| Survives reload | Yes | Yes | The Note does; the in-canvas preview does not |
 | Front end before accept | `add` text hidden, `del` text shown, `format` shows the original | Pending insert hidden, pending move shown in its original order | Unchanged, the live block was never touched |
 
 **Glossary**
@@ -243,8 +243,6 @@ sequenceDiagram
 ```
 
 Changes that skip `setAttributes` (for example the block switcher's variation picker dispatching `updateBlockAttributes` directly) are caught by the interceptor, reverted, and routed into the same overlay.
-
-This is the path being redesigned in [In-flight changes](#in-flight-changes).
 
 ## Review: accept and reject
 
