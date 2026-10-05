@@ -246,6 +246,8 @@ By default, files located in `build`, `node_modules`, and `vendor` folders are i
 
 It uses [ESLint](https://eslint.org/) with the set of recommended rules defined in [@wordpress/eslint-plugin](https://www.npmjs.com/package/@wordpress/eslint-plugin) npm package. It detects flat config files (`eslint.config.*`) first, falling back to legacy `.eslintrc.*` files if present. You can override default rules with your own as described in the [ESLint configuration docs](https://eslint.org/docs/latest/use/configure/). Learn more in the [Advanced Usage](#advanced-usage) section.
 
+The default unit-test rules use the `@wordpress/eslint-plugin` `test-unit` ruleset. See [unit-test assertion limitations](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/README.md#unit-test-assertion-limitations) for handling `vitest/require-awaited-expect-poll` reports on valid helpers and promise aggregation.
+
 **Breaking changes in ESLint v10:**
 
 - The default config path has changed from `config/.eslintrc.js` to `config/eslint.config.cjs`. If you were extending the default config, update your import path.

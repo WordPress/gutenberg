@@ -90,7 +90,7 @@ Alternatively, you can opt-in to only the more granular rulesets offered by the 
 - `jsx-a11y` – rules for accessibility in JSX.
 - `react` – rules for React components.
 - `test-e2e` – rules for end-to-end tests written in Puppeteer.
-- `test-unit` – Vitest's recommended rules with explicit imports, plus [`vitest/require-awaited-expect-poll`](https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/require-awaited-expect-poll.md) for awaited or explicitly returned `expect.poll()` and `expect.element()` assertions. Generated titles passed through variables are allowed. This changes from Jest at the 27.0.0 major release boundary. Jest consumers can configure `eslint-plugin-jest` directly. See the [migration guide](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/docs/vitest-migration.md).
+- `test-unit` – Vitest's recommended rules with explicit imports, plus [`vitest/require-awaited-expect-poll`](https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/require-awaited-expect-poll.md) for awaited or explicitly returned `expect.poll()` and `expect.element()` assertions. Generated titles passed through variables are allowed. See [assertion limitations](#unit-test-assertion-limitations) for valid patterns the rule reports. This changes from Jest at the 27.0.0 major release boundary. Jest consumers can configure `eslint-plugin-jest` directly. See the [migration guide](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/docs/vitest-migration.md).
 - `test-playwright` – rules for end-to-end tests written in Playwright.
 
 For example, if your project does not use React, you could use only the ESNext rules:
@@ -105,6 +105,10 @@ export default [ ...wordpress.configs.esnext ];
 These rules can be used additively, so you could spread both `esnext` and `custom` rulesets, but omit the `react` and `jsx-a11y` configurations.
 
 The granular rulesets will not define any environment globals. As such, if they are required for your project, you will need to define them yourself.
+
+### Unit-test assertion limitations
+
+`vitest/require-awaited-expect-poll` can report valid concise arrow helpers and assertions awaited through variables or `Promise.all()`. Use an explicit `return` in helpers. If an assertion's promise is already awaited elsewhere, preserve that behavior and use `// eslint-disable-next-line vitest/require-awaited-expect-poll` immediately before the reported line, or override the rule after the preset. The deprecated ESLint 9 eslintrc wrapper uses `@vitest/require-awaited-expect-poll` instead.
 
 ### Rules
 
