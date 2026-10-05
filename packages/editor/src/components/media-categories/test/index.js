@@ -305,11 +305,11 @@ describe( 'getInserterMediaCategories', () => {
 	} );
 
 	it( 'lists non-playable attachments under a Files source', async () => {
-		const getEntityRecords = jest.fn().mockResolvedValue( [] );
+		const getEntityRecords = vi.fn().mockResolvedValue( [] );
 		resolveSelect.mockReturnValue( { getEntityRecords } );
 		select.mockReturnValue( {
-			getEntityRecordsTotalItems: jest.fn().mockReturnValue( 0 ),
-			getEntityRecordsTotalPages: jest.fn().mockReturnValue( 0 ),
+			getEntityRecordsTotalItems: vi.fn().mockReturnValue( 0 ),
+			getEntityRecordsTotalPages: vi.fn().mockReturnValue( 0 ),
 		} );
 
 		const files = getInserterMediaCategories( 42, 'Post' ).find(
