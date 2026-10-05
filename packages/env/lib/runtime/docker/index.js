@@ -514,9 +514,9 @@ class DockerRuntime {
 
 		if ( environment === 'all' || environment === 'development' ) {
 			tasks.push(
-				resetDatabase( 'development', config )
-					.then( () => configureWordPress( 'development', config ) )
-					.catch( () => {} )
+				resetDatabase( 'development', config ).then( () =>
+					configureWordPress( 'development', config )
+				)
 			);
 		}
 
@@ -525,9 +525,9 @@ class DockerRuntime {
 			( environment === 'all' || environment === 'tests' )
 		) {
 			tasks.push(
-				resetDatabase( 'tests', config )
-					.then( () => configureWordPress( 'tests', config ) )
-					.catch( () => {} )
+				resetDatabase( 'tests', config ).then( () =>
+					configureWordPress( 'tests', config )
+				)
 			);
 		}
 

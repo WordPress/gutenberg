@@ -171,6 +171,22 @@ describe( 'env cli', () => {
 		expect( console ).toHaveErroredWith( { message: 'failure message' } );
 		expect( processExit ).toHaveBeenCalledWith( 1 );
 	} );
+	it.each( [ 'reset', 'clean' ] )(
+		'reports failed %s commands without reporting success',
+		async ( command ) => {
+			const error = new Error( 'Database reset failed.' );
+			env[ command ].mockRejectedValueOnce( error );
+			cli().parse( [ command ] );
+			const { spinner } = env[ command ].mock.calls[ 0 ][ 0 ];
+			await env[ command ].mock.results[ 0 ].value.catch( () => {} );
+
+			expect( spinner.fail ).toHaveBeenCalledWith( error.message );
+			expect( spinner.succeed ).not.toHaveBeenCalled();
+			expect( console ).toHaveErroredWith( error );
+			expect( processExit ).toHaveBeenCalledWith( 1 );
+		}
+	);
+
 	it( 'handles failed docker commands with errors.', async () => {
 		env.start.mockRejectedValueOnce( {
 			err: 'failure error',
