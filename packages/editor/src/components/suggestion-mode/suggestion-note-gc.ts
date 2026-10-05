@@ -3,8 +3,8 @@
  *
  * Every suggestion note is anchored to something the user can see: an inline
  * `<mark class="wp-suggestion">` marker in block content, a structural
- * `metadata.suggestion` marker on a block, or a pending attribute entry in
- * the suggestion overlay. When the anchor disappears without the note being
+ * `metadata.suggestion` marker on a block, or an attribute proposal carried
+ * in that marker's `after`. When the anchor disappears without the note being
  * resolved — the classic case is Ctrl+Z right after making the suggestion,
  * but deleting the marked text in Editing intent lands here too — the note
  * has nothing left to accept or reject. Leaving it behind produces the
@@ -48,8 +48,12 @@ import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 // @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useSuggestionSession } from './suggestion-session';
 import { getBlockTreeVersion } from './block-tree-version';
+import {
+	PENDING_ATTRIBUTES,
+	proposedAttributes,
+	readSuggestionMarker,
+} from './marker';
 import {
 	findInlineOp,
 	findStructuralOp,
@@ -124,11 +128,10 @@ function describeAnchor( note: any ) {
 	if ( inlineOp ) {
 		return { kind: 'inline', attribute: inlineOp.attribute };
 	}
-	// Attribute-set suggestions: anchored to their overlay entry. Their
-	// note lifecycle is normally owned by the auto-saver (which trashes a
-	// note when the overlay reverts to baseline); the collector only covers
-	// the entry being pruned wholesale (block deleted outside Suggest mode).
-	return { kind: 'attribute' };
+	// Attribute-set suggestions: anchored to the proposal on the block's
+	// marker, whatever the marker's type (an attribute edit on a moved
+	// block rides along on the move's marker).
+	return { kind: 'structural', pendingType: PENDING_ATTRIBUTES };
 }
 
 /**
@@ -157,12 +160,15 @@ function buildAnchorIndex(
 		if ( ! attributes ) {
 			continue;
 		}
-		const pendingType = attributes.metadata?.suggestion?.type;
-		if ( pendingType ) {
+		const marker = readSuggestionMarker( attributes );
+		if ( marker ) {
 			for ( const noteId of getNoteIdsFromMetadata(
 				attributes.metadata
 			) ) {
-				structural.add( `${ pendingType }:${ noteId }` );
+				structural.add( `${ marker.type }:${ noteId }` );
+				if ( proposedAttributes( marker ) ) {
+					structural.add( `${ PENDING_ATTRIBUTES }:${ noteId }` );
+				}
 			}
 		}
 		for ( const attribute of inlineAttributes ) {
@@ -263,27 +269,17 @@ function inlineAttributesOf(
 /**
  * Whether a note's anchor is currently present in the editor.
  *
- * @param note    Note comment record.
- * @param anchor  Anchor descriptor from `describeAnchor`.
- * @param index   Anchor index from `buildAnchorIndex`.
- * @param entries Suggestion overlay entries.
+ * @param note   Note comment record.
+ * @param anchor Anchor descriptor from `describeAnchor`.
+ * @param index  Anchor index from `buildAnchorIndex`.
  * @return True when the anchor exists.
  */
 function isAnchorPresent(
 	note: any,
 	anchor: any,
-	index: AnchorIndex,
-	entries: any
+	index: AnchorIndex
 ): boolean {
 	const idKey = String( note.id );
-	if ( anchor.kind === 'attribute' ) {
-		return Object.values( entries ?? {} ).some(
-			( entry: any ) =>
-				entry.commentId !== null &&
-				entry.commentId !== undefined &&
-				String( entry.commentId ) === idKey
-		);
-	}
 	if ( anchor.kind === 'structural' ) {
 		return index.structural.has( `${ anchor.pendingType }:${ idKey }` );
 	}
@@ -303,7 +299,6 @@ export default function SuggestionNoteGC() {
 		[]
 	);
 	const { notes } = useNoteThreads( postId );
-	const { entries, clearOverlay } = useSuggestionSession();
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createNotice } = useDispatch( noticesStore );
 	const registry = useRegistry();
@@ -347,13 +342,9 @@ export default function SuggestionNoteGC() {
 	 * every note or block edit. Written in an effect of their own, declared
 	 * first so the collector sees this render's values.
 	 */
-	const entriesRef = useRef( entries );
 	const resolvedNotesRef = useRef( resolvedNotes );
-	const clearOverlayRef = useRef( clearOverlay );
 	useEffect( () => {
-		entriesRef.current = entries;
 		resolvedNotesRef.current = resolvedNotes;
-		clearOverlayRef.current = clearOverlay;
 	} );
 
 	/*
@@ -385,35 +376,28 @@ export default function SuggestionNoteGC() {
 			for ( const { note, anchor } of suggestionNotes ) {
 				parts.push(
 					`${ note.id }:${
-						isAnchorPresent( note, anchor, index, entries ) ? 1 : 0
+						isAnchorPresent( note, anchor, index ) ? 1 : 0
 					}`
 				);
 			}
 			for ( const [ idKey, info ] of trashedRef.current ) {
 				parts.push(
 					`t${ idKey }:${
-						isAnchorPresent(
-							info.note,
-							info.anchor,
-							index,
-							entries
-						)
-							? 1
-							: 0
+						isAnchorPresent( info.note, info.anchor, index ) ? 1 : 0
 					}`
 				);
 			}
 			for ( const { note, anchor } of resolvedNotes ) {
 				parts.push(
 					`r${ note.id }:${
-						isAnchorPresent( note, anchor, index, entries ) ? 1 : 0
+						isAnchorPresent( note, anchor, index ) ? 1 : 0
 					}`
 				);
 			}
 			return parts.join( '|' );
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[ notes, entries, trashedVersion ]
+		[ notes, trashedVersion ]
 	);
 
 	// Anchors observed at least once this session, keyed by note id.
@@ -476,14 +460,7 @@ export default function SuggestionNoteGC() {
 		 * anchor back - or a peer decide the note - while it is in flight.
 		 */
 		const isWithdrawn = ( note: any, anchor: any ) => {
-			if (
-				isAnchorPresent(
-					note,
-					anchor,
-					indexAnchors(),
-					entriesRef.current
-				)
-			) {
+			if ( isAnchorPresent( note, anchor, indexAnchors() ) ) {
 				return false;
 			}
 			if ( isSuggestionDecisionInFlight( registry, note.id ) ) {
@@ -563,20 +540,6 @@ export default function SuggestionNoteGC() {
 						} );
 						setTrashedVersion( ( version ) => version + 1 );
 					}
-					// Drop the stale overlay entry (structural op or
-					// attribute baseline) so a later edit on the same block
-					// can't resurrect the withdrawn note's operations.
-					for ( const [ clientId, entry ] of Object.entries(
-						entriesRef.current
-					) ) {
-						if (
-							entry.commentId !== null &&
-							entry.commentId !== undefined &&
-							String( entry.commentId ) === String( note.id )
-						) {
-							clearOverlayRef.current( clientId );
-						}
-					}
 				} )
 				.catch( () => {
 					// A transient REST failure must not strand the note:
@@ -597,12 +560,7 @@ export default function SuggestionNoteGC() {
 
 		for ( const { note, anchor } of suggestionNotes ) {
 			const idKey = String( note.id );
-			const present = isAnchorPresent(
-				note,
-				anchor,
-				index,
-				entriesRef.current
-			);
+			const present = isAnchorPresent( note, anchor, index );
 			if ( present ) {
 				takeWithdrawnAnchor( registry, idKey );
 				seenRef.current.add( idKey );
@@ -633,14 +591,7 @@ export default function SuggestionNoteGC() {
 		// Redo: a previously collected inline marker is back — restore its
 		// note so the marker stays resolvable.
 		for ( const [ idKey, info ] of [ ...trashedRef.current ] ) {
-			if (
-				! isAnchorPresent(
-					info.note,
-					info.anchor,
-					index,
-					entriesRef.current
-				)
-			) {
+			if ( ! isAnchorPresent( info.note, info.anchor, index ) ) {
 				continue;
 			}
 			trashedRef.current.delete( idKey );
@@ -666,7 +617,7 @@ export default function SuggestionNoteGC() {
 		for ( const { note, anchor } of resolvedNotesRef.current ) {
 			if (
 				isSuggestionDecisionInFlight( registry, note.id ) ||
-				! isAnchorPresent( note, anchor, index, entriesRef.current )
+				! isAnchorPresent( note, anchor, index )
 			) {
 				continue;
 			}
