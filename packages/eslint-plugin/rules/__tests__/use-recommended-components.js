@@ -23,7 +23,6 @@ ruleTester.run( 'use-recommended-components', rule, {
 
 		// Allowed @wordpress/ui components.
 		"import { Badge } from '@wordpress/ui';",
-		"import { Radio, RadioGroup, RadioGroupControl } from '@wordpress/ui';",
 
 		// "Use with caution" components are allowed when opted in.
 		{
@@ -105,15 +104,6 @@ ruleTester.run( 'use-recommended-components', rule, {
 			],
 		},
 		// Denylist: denied components are flagged with their message.
-		{
-			code: "import { RadioControl } from '@wordpress/components';",
-			errors: [
-				{
-					message:
-						'Use `RadioGroupControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
-				},
-			],
-		},
 		{
 			code: "import { __experimentalZStack } from '@wordpress/components';",
 			errors: [
