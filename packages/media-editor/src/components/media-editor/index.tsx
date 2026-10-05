@@ -224,7 +224,7 @@ interface MediaEditorFrameContextValue {
 	 * When `true`, the original has already been loaded into the cropper this
 	 * session, so the menu item is disabled.
 	 */
-	isOriginalRestored: boolean;
+	isSourceRestored: boolean;
 	/** Load the lineage root into the cropper as a dirty preview. */
 	onRestoreOriginal: () => void;
 }
@@ -268,7 +268,7 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 		activePanel,
 		onTogglePanel,
 		canRestoreOriginal,
-		isOriginalRestored,
+		isSourceRestored,
 		onRestoreOriginal,
 	} = useMediaEditorFrameContext();
 	const isPanelOpen = !! activePanel;
@@ -309,7 +309,7 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 										icon={ backup }
 										iconPosition="left"
 										disabled={
-											isOriginalRestored || isSaving
+											isSourceRestored || isSaving
 										}
 										info={ __(
 											'Discards unsaved changes and loads the original image.'
@@ -573,7 +573,7 @@ function MediaEditorContent( {
 	// session. Stays a distinct flag (not derived from the cropper) so a bare
 	// restore counts as a change even though swapping the source resets the
 	// cropper's own dirty baseline.
-	const [ isOriginalRestored, setIsOriginalRestored ] = useState( false );
+	const [ isSourceRestored, setIsSourceRestored ] = useState( false );
 	const placementControlTimerRef =
 		useRef< ReturnType< typeof setTimeout > >();
 
@@ -601,7 +601,7 @@ function MediaEditorContent( {
 	useEffect( () => {
 		setIsPlacementActive( false );
 		setIsCanvasGestureActive( false );
-		setIsOriginalRestored( false );
+		setIsSourceRestored( false );
 	}, [ id ] );
 
 	// Restore-original: the edit root the edited attachment descends from,
@@ -641,7 +641,7 @@ function MediaEditorContent( {
 			: undefined;
 	const canRestoreOriginal = !! originalSource;
 	const restoredSource =
-		isOriginalRestored && originalSource
+		isSourceRestored && originalSource
 			? {
 					id: originalSource.id,
 					url: originalSource.url,
@@ -693,11 +693,11 @@ function MediaEditorContent( {
 		// Restoring discards every pending edit, as the menu item says, so
 		// nothing staged against the attachment being replaced reaches a save.
 		clearEntityRecordEdits( 'postType', 'attachment', id );
-		setIsOriginalRestored( true );
+		setIsSourceRestored( true );
 	}, [ clearEntityRecordEdits, id ] );
 
 	// A bare restore has no cropper diff, so OR the flag in explicitly.
-	const hasChanges = session.hasOutputEdits || hasEdits || isOriginalRestored;
+	const hasChanges = session.hasOutputEdits || hasEdits || isSourceRestored;
 
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type ).type;
 	const isImage = !! media && mediaType === 'image';
@@ -757,7 +757,7 @@ function MediaEditorContent( {
 	const discardAndClose = () => {
 		removeAllNotices( 'snackbar', MEDIA_EDITOR_NOTICES_CONTEXT );
 		clearEntityRecordEdits( 'postType', 'attachment', activeId );
-		setIsOriginalRestored( false );
+		setIsSourceRestored( false );
 		onClose?.();
 	};
 
@@ -985,7 +985,7 @@ function MediaEditorContent( {
 		onSave: saveMediaEditor,
 		onReset: resetCropOptions,
 		canRestoreOriginal,
-		isOriginalRestored,
+		isSourceRestored,
 		onRestoreOriginal: handleRestoreOriginal,
 	};
 
