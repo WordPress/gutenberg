@@ -141,11 +141,17 @@
 		"@wordpress/use-recommended-components": {
 			"count": 3
 		},
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-alignment-control/index.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -156,7 +162,15 @@
 		}
 	},
 	"packages/block-editor/src/components/block-alignment-control/ui.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-alignment-control/use-available-alignments.js": {
+		"import/no-cycle": {
 			"count": 1
 		}
 	},
@@ -215,6 +229,9 @@
 		}
 	},
 	"packages/block-editor/src/components/block-canvas/index.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -343,6 +360,12 @@
 		}
 	},
 	"packages/block-editor/src/components/block-inspector/index.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -353,6 +376,9 @@
 		}
 	},
 	"packages/block-editor/src/components/block-list-appender/index.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -373,6 +399,9 @@
 		}
 	},
 	"packages/block-editor/src/components/block-list/block.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react-hooks/immutability": {
 			"count": 2
 		},
@@ -381,11 +410,17 @@
 		}
 	},
 	"packages/block-editor/src/components/block-list/index.jsx": {
+		"import/no-cycle": {
+			"count": 3
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-list/layout.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -396,8 +431,21 @@
 		}
 	},
 	"packages/block-editor/src/components/block-list/use-block-props/index.js": {
+		"import/no-cycle": {
+			"count": 2
+		},
 		"react-hooks/immutability": {
 			"count": 2
+		}
+	},
+	"packages/block-editor/src/components/block-list/use-block-props/use-intersection-observer.js": {
+		"import/no-cycle": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-list/use-in-between-inserter.js": {
+		"import/no-cycle": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-list/zoom-out-separator.jsx": {
@@ -466,16 +514,25 @@
 		}
 	},
 	"packages/block-editor/src/components/block-navigation/dropdown.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-parent-selector/index.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-pattern-setup/index.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -487,6 +544,9 @@
 	},
 	"packages/block-editor/src/components/block-patterns-list/index.jsx": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"import/no-cycle": {
 			"count": 1
 		},
 		"react/jsx-filename-extension": {
@@ -532,11 +592,17 @@
 		}
 	},
 	"packages/block-editor/src/components/block-preview/auto.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-preview/index.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -562,15 +628,26 @@
 			"count": 1
 		}
 	},
+	"packages/block-editor/src/components/block-rename/index.js": {
+		"import/no-cycle": {
+			"count": 1
+		}
+	},
 	"packages/block-editor/src/components/block-rename/modal.jsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"import/no-cycle": {
+			"count": 1
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-rename/rename-control.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -586,6 +663,9 @@
 		}
 	},
 	"packages/block-editor/src/components/block-settings-menu-controls/index.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -606,11 +686,17 @@
 		}
 	},
 	"packages/block-editor/src/components/block-settings-menu/block-settings-dropdown.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-settings-menu/index.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -621,6 +707,9 @@
 		}
 	},
 	"packages/block-editor/src/components/block-styles/index.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -634,31 +723,49 @@
 		}
 	},
 	"packages/block-editor/src/components/block-switcher/block-styles-menu.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-switcher/block-transformations-menu.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-switcher/block-variation-transformations.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-switcher/index.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-switcher/pattern-transformations-menu.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-switcher/preview-block-popover.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -679,16 +786,25 @@
 		}
 	},
 	"packages/block-editor/src/components/block-toolbar/block-styles-dropdown.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-toolbar/block-toolbar-icon.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-toolbar/change-design.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -699,6 +815,9 @@
 		}
 	},
 	"packages/block-editor/src/components/block-toolbar/index.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -722,6 +841,9 @@
 		}
 	},
 	"packages/block-editor/src/components/block-tools/block-toolbar-popover.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react-hooks/refs": {
 			"count": 4
 		},
@@ -730,6 +852,9 @@
 		}
 	},
 	"packages/block-editor/src/components/block-tools/empty-block-inserter.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react-hooks/refs": {
 			"count": 2
 		},
@@ -738,12 +863,23 @@
 		}
 	},
 	"packages/block-editor/src/components/block-tools/index.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-tools/insertion-point.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-tools/use-block-toolbar-popover-props.js": {
+		"import/no-cycle": {
 			"count": 1
 		}
 	},
@@ -792,9 +928,17 @@
 			"count": 1
 		}
 	},
+	"packages/block-editor/src/components/block-visibility/index.js": {
+		"import/no-cycle": {
+			"count": 1
+		}
+	},
 	"packages/block-editor/src/components/block-visibility/modal.jsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"import/no-cycle": {
+			"count": 1
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -842,6 +986,9 @@
 		}
 	},
 	"packages/block-editor/src/components/button-block-appender/index.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -937,11 +1084,17 @@
 		}
 	},
 	"packages/block-editor/src/components/convert-to-group-buttons/index.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/convert-to-group-buttons/toolbar.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -965,6 +1118,9 @@
 		}
 	},
 	"packages/block-editor/src/components/default-block-appender/index.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1094,6 +1250,9 @@
 		}
 	},
 	"packages/block-editor/src/components/global-styles/background-panel.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1138,6 +1297,11 @@
 	},
 	"packages/block-editor/src/components/global-styles/inheritance/test/index.browser.test.jsx": {
 		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/global-styles/inherited-value-context.js": {
+		"import/no-cycle": {
 			"count": 1
 		}
 	},
@@ -1309,17 +1473,31 @@
 			"count": 1
 		}
 	},
+	"packages/block-editor/src/components/index.js": {
+		"import/no-cycle": {
+			"count": 5
+		}
+	},
 	"packages/block-editor/src/components/inner-blocks/button-block-appender.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/inner-blocks/default-block-appender.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/inner-blocks/index.jsx": {
+		"import/no-cycle": {
+			"count": 2
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1331,6 +1509,11 @@
 	},
 	"packages/block-editor/src/components/inner-blocks/test/index.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inner-blocks/use-nested-settings-update.js": {
+		"import/no-cycle": {
 			"count": 1
 		}
 	},
@@ -1375,6 +1558,9 @@
 		}
 	},
 	"packages/block-editor/src/components/inserter/block-patterns-explorer/index.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1385,11 +1571,17 @@
 		}
 	},
 	"packages/block-editor/src/components/inserter/block-patterns-explorer/pattern-list.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/inserter/block-patterns-tab/index.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1397,6 +1589,9 @@
 	"packages/block-editor/src/components/inserter/block-patterns-tab/pattern-category-previews.jsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 5
+		},
+		"import/no-cycle": {
+			"count": 1
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -1424,11 +1619,17 @@
 		}
 	},
 	"packages/block-editor/src/components/inserter/index.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/inserter/library.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1467,6 +1668,9 @@
 		}
 	},
 	"packages/block-editor/src/components/inserter/menu.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1490,16 +1694,25 @@
 		}
 	},
 	"packages/block-editor/src/components/inserter/preview-panel.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/inserter/quick-inserter.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/inserter/search-results.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1515,6 +1728,9 @@
 		}
 	},
 	"packages/block-editor/src/components/inspector-controls-tabs/advanced-controls-panel.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1528,22 +1744,39 @@
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		},
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/inspector-controls-tabs/position-controls-panel.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/inspector-controls-tabs/settings-tab.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/inspector-controls-tabs/styles-tab.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inspector-controls-tabs/use-inspector-controls-tabs.js": {
+		"import/no-cycle": {
 			"count": 1
 		}
 	},
@@ -1553,16 +1786,25 @@
 		}
 	},
 	"packages/block-editor/src/components/inspector-controls/block-support-tools-panel.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/inspector-controls/fill.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/inspector-controls/index.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1578,6 +1820,9 @@
 		}
 	},
 	"packages/block-editor/src/components/inspector-controls/slot.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1629,6 +1874,9 @@
 		"@wordpress/use-recommended-components": {
 			"count": 3
 		},
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1647,6 +1895,9 @@
 		}
 	},
 	"packages/block-editor/src/components/link-control/search-input.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1714,6 +1965,9 @@
 		}
 	},
 	"packages/block-editor/src/components/list-view/appender.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1734,11 +1988,17 @@
 		}
 	},
 	"packages/block-editor/src/components/list-view/block.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/list-view/branch.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1754,6 +2014,9 @@
 		}
 	},
 	"packages/block-editor/src/components/list-view/index.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1777,6 +2040,9 @@
 		}
 	},
 	"packages/block-editor/src/components/media-replace-flow/index.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1910,6 +2176,9 @@
 		}
 	},
 	"packages/block-editor/src/components/rich-text/content.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1935,6 +2204,9 @@
 		}
 	},
 	"packages/block-editor/src/components/rich-text/index.jsx": {
+		"import/no-cycle": {
+			"count": 2
+		},
 		"react-hooks/refs": {
 			"count": 1
 		},
@@ -1943,6 +2215,9 @@
 		}
 	},
 	"packages/block-editor/src/components/rich-text/multiline.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1953,6 +2228,9 @@
 		}
 	},
 	"packages/block-editor/src/components/rich-text/with-deprecations.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2192,6 +2470,9 @@
 		}
 	},
 	"packages/block-editor/src/hooks/background.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2209,13 +2490,26 @@
 			"count": 1
 		}
 	},
+	"packages/block-editor/src/hooks/block-style-state.js": {
+		"import/no-cycle": {
+			"count": 1
+		}
+	},
 	"packages/block-editor/src/hooks/block-style-variation.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/hooks/border.jsx": {
 		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/color.js": {
+		"import/no-cycle": {
 			"count": 1
 		}
 	},
@@ -2243,16 +2537,30 @@
 		}
 	},
 	"packages/block-editor/src/hooks/elements.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/hooks/fit-text.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
+	"packages/block-editor/src/hooks/font-family.js": {
+		"import/no-cycle": {
+			"count": 1
+		}
+	},
 	"packages/block-editor/src/hooks/font-size.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2273,6 +2581,9 @@
 		}
 	},
 	"packages/block-editor/src/hooks/line-height.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2283,6 +2594,9 @@
 		}
 	},
 	"packages/block-editor/src/hooks/position.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2338,21 +2652,33 @@
 		}
 	},
 	"packages/block-editor/src/hooks/text-align.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/hooks/typography.jsx": {
+		"import/no-cycle": {
+			"count": 4
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/hooks/utils.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/layouts/constrained.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2361,7 +2687,15 @@
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		},
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/layouts/flow.js": {
+		"import/no-cycle": {
 			"count": 1
 		}
 	},
@@ -2369,7 +2703,15 @@
 		"@wordpress/use-recommended-components": {
 			"count": 3
 		},
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/layouts/index.js": {
+		"import/no-cycle": {
 			"count": 1
 		}
 	},
@@ -2388,9 +2730,29 @@
 			"count": 1
 		}
 	},
+	"packages/block-editor/src/store/get-block-settings.js": {
+		"import/no-cycle": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/store/private-selectors.js": {
+		"import/no-cycle": {
+			"count": 2
+		}
+	},
+	"packages/block-editor/src/store/selectors.js": {
+		"import/no-cycle": {
+			"count": 2
+		}
+	},
 	"packages/block-editor/src/store/test/selectors.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
+		}
+	},
+	"packages/block-editor/src/store/utils.js": {
+		"import/no-cycle": {
+			"count": 2
 		}
 	},
 	"packages/block-editor/src/utils/test/dom.jsdom.test.jsx": {
@@ -2800,11 +3162,17 @@
 		}
 	},
 	"packages/block-library/src/file/edit.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/file/inspector.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2820,7 +3188,15 @@
 		}
 	},
 	"packages/block-library/src/footnotes/format.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/footnotes/index.js": {
+		"import/no-cycle": {
 			"count": 1
 		}
 	},
@@ -2991,6 +3367,9 @@
 		}
 	},
 	"packages/block-library/src/image/edit.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2998,6 +3377,9 @@
 	"packages/block-library/src/image/image.jsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
+		},
+		"import/no-cycle": {
+			"count": 1
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -3159,6 +3541,9 @@
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		},
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react-hooks/refs": {
 			"count": 4
 		},
@@ -3183,7 +3568,15 @@
 		"@wordpress/use-recommended-components": {
 			"count": 3
 		},
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation-link/shared/index.js": {
+		"import/no-cycle": {
 			"count": 1
 		}
 	},
@@ -5203,6 +5596,36 @@
 			"count": 2
 		}
 	},
+	"packages/dependency-extraction-webpack-plugin/test/fixtures/cyclic-dependency-graph/a.js": {
+		"import/no-cycle": {
+			"count": 1
+		}
+	},
+	"packages/dependency-extraction-webpack-plugin/test/fixtures/cyclic-dependency-graph/b.js": {
+		"import/no-cycle": {
+			"count": 1
+		}
+	},
+	"packages/dependency-extraction-webpack-plugin/test/fixtures/cyclic-dynamic-dependency-graph/a.js": {
+		"import/no-cycle": {
+			"count": 1
+		}
+	},
+	"packages/dependency-extraction-webpack-plugin/test/fixtures/cyclic-dynamic-dependency-graph/b.js": {
+		"import/no-cycle": {
+			"count": 1
+		}
+	},
+	"packages/dependency-extraction-webpack-plugin/test/fixtures/cyclic-external-deps/a.js": {
+		"import/no-cycle": {
+			"count": 1
+		}
+	},
+	"packages/dependency-extraction-webpack-plugin/test/fixtures/cyclic-external-deps/index.js": {
+		"import/no-cycle": {
+			"count": 1
+		}
+	},
 	"packages/edit-post/src/components/back-button/fullscreen-mode-close.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -5563,6 +5986,9 @@
 		}
 	},
 	"packages/edit-site/src/components/sidebar-navigation-screen-navigation-menu/index.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -5586,11 +6012,22 @@
 		}
 	},
 	"packages/edit-site/src/components/sidebar-navigation-screen-navigation-menu/single-navigation-menu.jsx": {
+		"import/no-cycle": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
+	"packages/edit-site/src/components/sidebar-navigation-screen-navigation-menu/use-navigation-menu-handlers.js": {
+		"import/no-cycle": {
+			"count": 1
+		}
+	},
 	"packages/edit-site/src/components/sidebar-navigation-screen-navigation-menus/index.jsx": {
+		"import/no-cycle": {
+			"count": 2
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -7100,6 +7537,11 @@
 			"count": 1
 		}
 	},
+	"packages/editor/src/dataviews/store/private-actions.ts": {
+		"import/no-cycle": {
+			"count": 1
+		}
+	},
 	"packages/editor/src/hooks/custom-sources-backwards-compatibility.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -7800,6 +8242,16 @@
 	},
 	"packages/private-apis/src/test/index.jsx": {
 		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/rich-text/src/concat.js": {
+		"import/no-cycle": {
+			"count": 1
+		}
+	},
+	"packages/rich-text/src/create.js": {
+		"import/no-cycle": {
 			"count": 1
 		}
 	},
