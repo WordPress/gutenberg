@@ -64,14 +64,6 @@ describe( 'MediaForm', () => {
 		expect( getFormFieldIds() ).toEqual( [ 'acme_credit', 'title' ] );
 	} );
 
-	it( 'prefers the form prop over the form of the provider settings', () => {
-		mockForm = { fields: [ 'acme_credit', 'title' ] };
-
-		render( <MediaForm form={ { fields: [ 'caption' ] } } /> );
-
-		expect( getFormFieldIds() ).toEqual( [ 'caption' ] );
-	} );
-
 	it( 'falls back to the default form whatever the order of the fields', () => {
 		mockFields = [
 			'caption',

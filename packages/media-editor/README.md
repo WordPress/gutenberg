@@ -95,8 +95,9 @@ Form for editing media metadata using `DataForm` from `@wordpress/dataviews`.
 
 **Props:**
 
-- `form`: Optional form configuration (uses `Form` type from `@wordpress/dataviews`). Takes precedence over `settings.form` of the provider.
 - `header`: Optional header content to display above the form
+
+The fields are laid out with `settings.form` of the provider, or with a default layout of the core attachment fields when the settings have none.
 
 ## TypeScript
 

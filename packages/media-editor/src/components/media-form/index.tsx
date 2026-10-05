@@ -38,7 +38,6 @@ const DEFAULT_FORM: Form = {
  * Props for MediaForm component.
  */
 export interface MediaFormProps {
-	form?: Form;
 	header?: ReactNode;
 }
 
@@ -46,18 +45,15 @@ export interface MediaFormProps {
  * MediaForm component for editing media metadata.
  *
  * Renders a DataForm with fields for editing media properties like
- * title, alt text, caption, description, etc.
+ * title, alt text, caption, description, etc. The fields are laid out with
+ * the form of the provider settings, or with the default form when the
+ * settings have none.
  *
  * @param props        - Component props.
- * @param props.form   - Optional form configuration. Takes precedence over
- *                     the form of the provider settings.
  * @param props.header - Optional header content to display above the form.
  * @return The MediaForm component.
  */
-export default function MediaForm( {
-	form: formOverrides,
-	header,
-}: MediaFormProps ) {
+export default function MediaForm( { header }: MediaFormProps ) {
 	const {
 		media,
 		fields,
@@ -73,7 +69,7 @@ export default function MediaForm( {
 		);
 	}
 
-	const form = formOverrides || settingsForm || DEFAULT_FORM;
+	const form = settingsForm || DEFAULT_FORM;
 
 	return (
 		<div className="media-editor-form">
