@@ -4,12 +4,7 @@ import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { pasteHandler } from '@wordpress/blocks';
-import {
-	applyFormat,
-	create,
-	concat,
-	toHTMLString,
-} from '@wordpress/rich-text';
+import { create, concat, toHTMLString } from '@wordpress/rich-text';
 import { isURL } from '@wordpress/url';
 import { unlock } from '../../lock-unlock';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
@@ -99,81 +94,85 @@ function mergeRunSegments( segments: RunSegment[] ): {
 }
 
 /**
- * The inline HTML a paste should propose, or null when it carries no formatting
- * worth keeping.
+ * Whether the editor's own paste pipeline would insert this paste as its exact
+ * plain text, with no formatting, links, or blocks.
  *
- * Externally copied markup runs through `pasteHandler` in `INLINE` mode — the
- * same sanitizer the editor's own paste pipeline uses — so a suggested paste
- * proposes exactly what a paste outside Suggest mode would have inserted.
- * Content copied from another rich text in this editor is already clean and is
- * used as-is, matching `RichText`'s own internal-paste shortcut.
+ * Only such a paste is owned by this keyboard. Anything the pipeline transforms
+ * is left to it, so a paste in Suggestion mode comes out the same as in
+ * Editing mode: Markdown and auto-linked emails gain their formatting, a block
+ * that only accepts plain text drops it, a pasted http(s) URL is linked by the
+ * link format's paste rule (or becomes an Embed block in an empty paragraph),
+ * and a paste that converts to a block such as Math replaces the paragraph.
+ * The content reconciler and the store interceptor then propose the result.
  *
  * @param clipboardData Clipboard payload from the paste event.
  * @param plainText     The paste's plain-text flavour.
- * @return Inline HTML to insert, or null to fall back to plain text.
+ * @return True when the paste would land verbatim as plain text.
  */
-function readInlinePasteHTML(
+function isVerbatimPlainPaste(
 	clipboardData: any,
 	plainText: string
-): string | null {
+): boolean {
+	const trimmed = plainText.trim();
+	// Mirrors `core/link`'s `__unstablePasteRule`, which runs ahead of the
+	// sanitizer and only links http(s) URLs.
+	if ( isURL( trimmed ) && /^https?:/.test( trimmed ) ) {
+		return false;
+	}
 	let html = '';
 	try {
 		html = clipboardData?.getData?.( 'text/html' ) ?? '';
 	} catch {
 		// Browsers that expose no clipboard flavours paste plain text anyway.
-		return null;
+		return true;
 	}
-	if ( ! html ) {
-		return null;
-	}
+	// Content copied from another rich text in this editor skips the
+	// sanitizer, matching `RichText`'s own internal-paste shortcut.
 	const isInternal = clipboardData?.getData?.( 'rich-text' ) === 'true';
-	const inline = isInternal
+	const content = isInternal
 		? html
 		: pasteHandler( { HTML: html, plainText, mode: 'INLINE' } );
-	if ( typeof inline !== 'string' || ! inline ) {
-		return null;
+	if ( typeof content !== 'string' ) {
+		return false;
 	}
-	const record = create( { html: inline } );
-	if ( ! record.text || /[\r\n]/.test( record.text ) ) {
-		// Only simple inline pastes are owned here; see `onPaste`.
-		return null;
-	}
-	const carriesFormats = Array.from( { length: record.text.length } ).some(
-		( _, index ) => record.formats[ index ]?.length
+	const record = create( { html: content } );
+	return (
+		record.text === plainText &&
+		! record.formats.some( ( formats ) => formats?.length ) &&
+		! record.replacements.some( Boolean )
 	);
-	// Nothing to preserve: the plain-text path produces the same run.
-	return carriesFormats ? inline : null;
 }
 
 /**
- * The URL a paste carries when the link format's paste rule would turn it into
- * a link, or null. Mirrors `core/link`'s `__unstablePasteRule`: only a pasted
- * http(s) URL counts.
+ * The blocks an http(s) URL pasted into an empty paragraph converts to, or null.
  *
- * @param plainText The paste's plain-text flavour.
- * @return The trimmed URL, or null.
- */
-function readPastedLinkURL( plainText: string ): string | null {
-	const text = plainText.trim();
-	return isURL( text ) && /^https?:/.test( text ) ? text : null;
-}
-
-/**
- * The pasted URL as linked inline HTML, matching what the link paste rule
- * inserts at a collapsed caret outside Suggest mode.
+ * Mirrors the paragraph's `__unstableEmbedURLOnPaste`: outside Suggestion mode
+ * the paste pipeline first inserts the URL as linked text (so one undo returns
+ * to it) and then replaces the paragraph with an Embed block. In Suggestion
+ * mode that intermediate text would be proposed as an addition of its own, so
+ * the replacement is dispatched directly instead.
  *
- * @param url       The pasted URL.
- * @param plainText The paste's plain-text flavour.
- * @return Inline HTML of the linked text.
+ * @param blockName  Name of the block holding the caret.
+ * @param attributes That block's attributes.
+ * @param plainText  The paste's plain-text flavour.
+ * @return The replacement blocks, or null when the paste is not an embed.
  */
-function toLinkedPasteHTML( url: string, plainText: string ): string {
-	const linked = applyFormat(
-		create( { text: plainText } ),
-		{ type: 'core/link', attributes: { url } },
-		0,
-		plainText.length
-	);
-	return toHTMLString( { value: linked } );
+function readEmbedPasteBlocks(
+	blockName: string | null,
+	attributes: any,
+	plainText: string
+): any[] | null {
+	const trimmed = plainText.trim();
+	if (
+		blockName !== 'core/paragraph' ||
+		String( attributes?.content ?? '' ) !== '' ||
+		! isURL( trimmed ) ||
+		! /^https?:/.test( trimmed )
+	) {
+		return null;
+	}
+	const blocks = pasteHandler( { plainText, mode: 'BLOCKS' } );
+	return Array.isArray( blocks ) && blocks.length ? blocks : null;
 }
 
 /**
@@ -200,13 +199,12 @@ function toLinkedPasteHTML( url: string, plainText: string ): string {
  *   then a `del` run over the selected text, both keyed to the same note.
  *   Over the author's own pending addition it revises that addition in place
  *   (`reviseOwnAddition`); over anyone else's marker it is refused.
- * - A simple single-line paste is handled on the `paste` event (capture phase,
- *   ahead of the editor's own paste pipeline) and inserted exactly like typed
- *   text; over a selection it is a type-over. Multi-line / block-level paste is
- *   left to the editor's paste pipeline. Inline formatting the paste carries
- *   (bold, links) survives: the clipboard HTML goes through the same
- *   `pasteHandler` sanitizer the editor uses outside Suggest mode, and the
- *   result is inserted inside the `add` marker instead of being flattened.
+ * - A single-line paste the editor would insert as its exact plain text is
+ *   handled on the `paste` event (capture phase, ahead of the editor's own
+ *   paste pipeline) and inserted exactly like typed text; over a selection it
+ *   is a type-over. Every other paste (multi-line, formatted, Markdown, a URL,
+ *   or one that converts to a block) is left to the editor's paste pipeline,
+ *   so it matches Editing mode; see `isVerbatimPlainPaste`.
  *
  * Out of scope for now (left to the existing overlay/diff path): IME
  * composition.
@@ -235,7 +233,7 @@ export default function SuggestionAdditionKeyboard() {
 		getBlockAttributes,
 		getBlockParents,
 	} = useSelect( blockEditorStore );
-	const { updateBlockAttributes, selectionChange } =
+	const { updateBlockAttributes, selectionChange, replaceBlocks } =
 		useDispatch( blockEditorStore );
 	const { createSuggestion, updateSuggestion } = useSuggestionsProvider();
 	const { getBlockName } = useSelect( blockEditorStore );
@@ -913,33 +911,47 @@ export default function SuggestionAdditionKeyboard() {
 			 * point — but only once the caret resolved to a valid anchor;
 			 * otherwise let the editor's paste pipeline have it.
 			 */
-			// A clipboard event exposes no target ranges; `readEventRange`
-			// falls back to the live DOM selection.
-			const range = readEventRange( event );
-			const url = readPastedLinkURL( plain );
-			if ( url && range && range.start !== range.end ) {
-				/*
-				 * A URL pasted over a selection links the selection, as it
-				 * does outside Suggest mode: leave it to the editor's paste
-				 * pipeline, whose link paste rule applies the format, so it
-				 * is proposed like a link added from the toolbar rather than
-				 * as a type-over replacing the selected words.
-				 */
+			const { clientId } = getSelectionStart();
+			const embedBlocks = readEmbedPasteBlocks(
+				getBlockName( clientId ),
+				getBlockAttributes( clientId ),
+				plain
+			);
+			if ( embedBlocks ) {
+				event.preventDefault();
+				event.stopImmediatePropagation();
+				resetRun();
+				// The store interceptor proposes the swap as a block
+				// replacement, as for any other `replaceBlocks`.
+				replaceBlocks(
+					clientId,
+					embedBlocks,
+					embedBlocks.length - 1,
+					-1
+				);
+				return;
+			}
+			if ( ! isVerbatimPlainPaste( event.clipboardData, plain ) ) {
 				resetRun();
 				return;
 			}
-			const segment = {
-				text: plain,
-				html: url
-					? toLinkedPasteHTML( url, plain )
-					: readInlinePasteHTML( event.clipboardData, plain ),
-			};
+			// A clipboard event exposes no target ranges; `readEventRange`
+			// falls back to the live DOM selection.
+			const range = readEventRange( event );
+			const segment = { text: plain, html: null };
 			if ( insertText( segment, false, range ) ) {
 				event.preventDefault();
 				event.stopImmediatePropagation();
 			}
 		},
-		[ getSelectionStart, insertText, resetRun ]
+		[
+			getSelectionStart,
+			getBlockName,
+			getBlockAttributes,
+			replaceBlocks,
+			insertText,
+			resetRun,
+		]
 	);
 
 	useEffect( () => {
