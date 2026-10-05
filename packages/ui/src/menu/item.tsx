@@ -107,7 +107,12 @@ function ItemContent( {
 	 */
 	return (
 		<>
-			<span className={ styles[ 'item-content' ] }>
+			<span
+				className={ clsx(
+					styles[ 'item-content' ],
+					hasPrefix && styles[ 'has-prefix' ]
+				) }
+			>
 				<span className={ styles[ 'item-children' ] }>{ label }</span>
 				{ hasSuffix && (
 					<span className={ styles[ 'item-suffix' ] }>
@@ -126,12 +131,7 @@ function ItemContent( {
 				) }
 			</span>
 			{ descriptions.length > 0 && (
-				<span
-					className={ clsx(
-						styles[ 'item-descriptions' ],
-						hasPrefix && styles[ 'has-prefix' ]
-					) }
-				>
+				<span className={ styles[ 'item-descriptions' ] }>
 					{ descriptions }
 				</span>
 			) }

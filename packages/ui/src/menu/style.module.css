@@ -250,8 +250,12 @@
 			margin-block-start: calc((var(--_wp-ui-menu-item-label-line-height) - var(--_wp-ui-menu-prefix-icon-size)) / 2);
 		}
 
+		/*
+		 * Without its own prefix, an item starts at the prefix column so its
+		 * label lines up with the icons of its siblings instead of their labels.
+		 */
 		.item-content {
-			grid-column: content-start / content-end;
+			grid-column: prefix-start / content-end;
 			/* Include the height of leading content when centering these slots. */
 			align-self: stretch;
 			/* Everything after the prefix is laid out independently per item. */
@@ -267,6 +271,10 @@
 			min-width: 0;
 			/* Keep clicks on presentational labels and suffixes routed to the menu item. */
 			pointer-events: none;
+
+			&.has-prefix {
+				grid-column: content-start / content-end;
+			}
 		}
 
 		.item-children {
@@ -277,21 +285,16 @@
 		}
 
 		/*
-		 * Descriptions take their own row so suffixes, shortcuts and chevrons
-		 * stay centered on the label line. An item's own prefix pulls them out
-		 * to the prefix column.
+		 * Descriptions take their own row, starting at the prefix column, so
+		 * suffixes, shortcuts and chevrons stay centered on the label line.
 		 */
 		.item-descriptions {
 			grid-row: 2;
-			grid-column: content-start / content-end;
+			grid-column: prefix-start / content-end;
 			display: flex;
 			flex-direction: column;
 			min-width: 0;
 			pointer-events: none;
-
-			&.has-prefix {
-				grid-column: prefix-start / content-end;
-			}
 		}
 
 		.item-label {
