@@ -294,6 +294,8 @@
 			display: flex;
 			flex-direction: column;
 			min-width: 0;
+			/* For better optical alignment and spacing */
+			padding-block-end: var(--wpds-dimension-padding-xs);
 			pointer-events: none;
 		}
 
@@ -312,8 +314,6 @@
 
 			color: var(--wpds-color-foreground-content-neutral-weak);
 			overflow-wrap: anywhere;
-			/* For better optical alignment and spacing */
-			padding-block-end: var(--wpds-dimension-padding-xs);
 		}
 
 		/* Match `Menu.ItemDescription`, which uses the `body-sm` text variant. */
