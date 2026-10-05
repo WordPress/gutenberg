@@ -1966,6 +1966,63 @@ test.describe( 'Block Notes', () => {
 			}
 		} );
 
+		test( 'tints and underlines each cell of an annotated table', async ( {
+			editor,
+			requestUtils,
+			blockNoteUtils,
+		} ) => {
+			const me = await requestUtils.rest( { path: '/wp/v2/users/me' } );
+			const rgb = hexToRgb(
+				AVATAR_BORDER_COLORS[ me.id % AVATAR_BORDER_COLORS.length ]
+			);
+
+			// A table's editables are its cells, nested in its own markup
+			// rather than in child blocks. It holds no media, so its text
+			// takes the same treatment as a paragraph, not the image overlay.
+			await editor.insertBlock( {
+				name: 'core/table',
+				attributes: {
+					body: [
+						{
+							cells: [
+								{ content: 'First cell', tag: 'td' },
+								{ content: 'Second cell', tag: 'td' },
+							],
+						},
+					],
+				},
+			} );
+			await blockNoteUtils.addNote( 'Whole table note' );
+
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.click();
+
+			const table = editor.canvas.getByRole( 'document', {
+				name: 'Block: Table',
+			} );
+			const cells = table.getByRole( 'textbox', {
+				name: 'Body cell text',
+			} );
+			await expect( cells ).toHaveCount( 2 );
+			for ( const cell of await cells.all() ) {
+				await expect.poll( () => readTint( cell, rgb ) ).toBe( 'tint' );
+				const decoration = await cell.evaluate( ( el ) => {
+					const style = window.getComputedStyle( el );
+					return {
+						line: style.textDecorationLine,
+						thickness: style.textDecorationThickness,
+					};
+				} );
+				expect( decoration.line ).toBe( 'underline' );
+				expect( decoration.thickness ).toBe( '1.5px' );
+			}
+			// The text carries the marking, so no overlay veils it.
+			expect( await readTint( table, rgb, '::after' ) ).not.toBe(
+				'tint'
+			);
+		} );
+
 		test( 'overlays a non-text block with the tint and an all-around rule, alongside the selection outline', async ( {
 			editor,
 			page,
