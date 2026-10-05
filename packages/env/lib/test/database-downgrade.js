@@ -76,6 +76,24 @@ describe( 'findDatabaseDowngrade', () => {
 		);
 	} );
 
+	it( 'checks every database and reports the first downgrade in order', async () => {
+		const run = vi.spyOn( dockerCompose, 'run' ).mockResolvedValue( {
+			out: '1:10.6.28+maria~ubu2004\n12.3.3-MariaDB',
+		} );
+
+		await expect(
+			findDatabaseDowngrade(
+				[ 'mysql', 'tests-mysql' ],
+				dockerComposeConfig
+			)
+		).resolves.toEqual( {
+			service: 'mysql',
+			dataVersion: '12.3.3',
+			serverVersion: '10.6.28',
+		} );
+		expect( run ).toHaveBeenCalledTimes( 2 );
+	} );
+
 	it( 'ignores a database last used by the same or an older version', async () => {
 		vi.spyOn( dockerCompose, 'run' ).mockResolvedValue( {
 			out: '1:12.3.3+maria~ubu2404\n10.6.28-MariaDB',

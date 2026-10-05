@@ -45,52 +45,65 @@ function isNewerVersion( version, compareVersion ) {
 }
 
 /**
+ * Checks whether a database service's data was last used by a newer MariaDB
+ * version than the one it is configured to run.
+ *
+ * @param {string} service             The database service to check.
+ * @param {Object} dockerComposeConfig Options for docker-compose.
+ *
+ * @return {Promise<{service: string, dataVersion: string, serverVersion: string}|null>} The downgrade, or null.
+ */
+async function checkDatabaseDowngrade( service, dockerComposeConfig ) {
+	let out;
+	try {
+		( { out } = await dockerCompose.run(
+			service,
+			[ '-c', READ_VERSIONS_SCRIPT ],
+			{
+				...dockerComposeConfig,
+				commandOptions: [ '--rm', '--no-deps', '--entrypoint', 'sh' ],
+			}
+		) );
+	} catch {
+		// The versions could not be read, so the start failure stays as is.
+		return null;
+	}
+
+	const [ imageLine, ...dataLines ] = out.split( '\n' );
+	const serverVersion = parseMariaDBVersion( imageLine );
+	const dataVersion = parseMariaDBVersion( dataLines.join( '\n' ) );
+
+	if (
+		serverVersion &&
+		dataVersion &&
+		isNewerVersion( dataVersion, serverVersion )
+	) {
+		return { service, dataVersion, serverVersion };
+	}
+
+	return null;
+}
+
+/**
  * Looks for a database service whose data was last used by a newer MariaDB
  * version than the one it is configured to run. MariaDB cannot downgrade, so
  * such a server fails to start, and Docker only reports that a dependency
- * failed. Called after a start fails, to explain why.
+ * failed. Called after a start fails, to explain why. The services are checked
+ * in parallel, since each check starts a container.
  *
  * @param {string[]} services            The database services to check.
  * @param {Object}   dockerComposeConfig Options for docker-compose.
  *
- * @return {Promise<{service: string, dataVersion: string, serverVersion: string}|null>} The first downgraded service, or null.
+ * @return {Promise<{service: string, dataVersion: string, serverVersion: string}|null>} The first downgraded service, in the order given, or null.
  */
 async function findDatabaseDowngrade( services, dockerComposeConfig ) {
-	for ( const service of services ) {
-		let out;
-		try {
-			( { out } = await dockerCompose.run(
-				service,
-				[ '-c', READ_VERSIONS_SCRIPT ],
-				{
-					...dockerComposeConfig,
-					commandOptions: [
-						'--rm',
-						'--no-deps',
-						'--entrypoint',
-						'sh',
-					],
-				}
-			) );
-		} catch {
-			// The versions could not be read, so the start failure stays as is.
-			continue;
-		}
+	const downgrades = await Promise.all(
+		services.map( ( service ) =>
+			checkDatabaseDowngrade( service, dockerComposeConfig )
+		)
+	);
 
-		const [ imageLine, ...dataLines ] = out.split( '\n' );
-		const serverVersion = parseMariaDBVersion( imageLine );
-		const dataVersion = parseMariaDBVersion( dataLines.join( '\n' ) );
-
-		if (
-			serverVersion &&
-			dataVersion &&
-			isNewerVersion( dataVersion, serverVersion )
-		) {
-			return { service, dataVersion, serverVersion };
-		}
-	}
-
-	return null;
+	return downgrades.find( Boolean ) ?? null;
 }
 
 module.exports = {
