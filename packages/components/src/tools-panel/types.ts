@@ -198,6 +198,10 @@ export type ToolsPanelItemProps = ToolsPanelItem & {
  */
 export type RegisteredToolsPanelItem = ToolsPanelItem & {
 	/**
+	 * Whether hiding the item can reset its value through `onDeselect`.
+	 */
+	canReset?: boolean;
+	/**
 	 * The item's `resetAllFilter`, collected at registration time so the panel
 	 * doesn't need a second round of effects to gather them.
 	 */
@@ -211,6 +215,10 @@ export type ToolsPanelMenuItems = {
 };
 
 export type ToolsPanelContext = {
+	/**
+	 * Labels of items with reset behaviour. Omitted by legacy providers.
+	 */
+	resettableItems?: string[];
 	panelId?: string | null;
 	menuItems: ToolsPanelMenuItems;
 	hasMenuItems: boolean;

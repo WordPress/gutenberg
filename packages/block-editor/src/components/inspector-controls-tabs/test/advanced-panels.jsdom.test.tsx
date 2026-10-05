@@ -60,12 +60,12 @@ describe( 'AdditionalStyles', () => {
 	it( 'renders nothing when the additional-styles group has no fills', () => {
 		render(
 			<SlotFillProvider>
-				<AdditionalStyles initialOpen />
+				<AdditionalStyles />
 			</SlotFillProvider>
 		);
 
 		expect(
-			screen.queryByRole( 'button', { name: 'Additional styles' } )
+			screen.queryByRole( 'heading', { name: 'Additional styles' } )
 		).not.toBeInTheDocument();
 	} );
 
@@ -75,12 +75,12 @@ describe( 'AdditionalStyles', () => {
 				<AdditionalStylesFill>
 					<span>Additional CSS</span>
 				</AdditionalStylesFill>
-				<AdditionalStyles initialOpen />
+				<AdditionalStyles />
 			</SlotFillProvider>
 		);
 
 		expect(
-			screen.getByRole( 'button', { name: 'Additional styles' } )
+			screen.getByRole( 'heading', { name: 'Additional styles' } )
 		).toBeVisible();
 		expect( screen.getByText( 'Additional CSS' ) ).toBeVisible();
 	} );
@@ -96,13 +96,13 @@ describe( 'Advanced and Additional styles together', () => {
 				<AdditionalStylesFill>
 					<span>Additional CSS</span>
 				</AdditionalStylesFill>
-				<AdditionalStyles initialOpen />
+				<AdditionalStyles />
 				<AdvancedControls initialOpen />
 			</SlotFillProvider>
 		);
 
 		expect(
-			screen.getByRole( 'button', { name: 'Additional styles' } )
+			screen.getByRole( 'heading', { name: 'Additional styles' } )
 		).toBeVisible();
 		expect(
 			screen.getByRole( 'button', { name: 'Advanced' } )

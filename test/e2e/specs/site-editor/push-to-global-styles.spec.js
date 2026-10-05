@@ -31,7 +31,7 @@ test.describe( 'Push to Global Styles button', () => {
 	}
 
 	/**
-	 * Adds a Heading block, opens its Additional styles panel and turns on
+	 * Adds a Heading block, opens the inspector and turns on
 	 * Letter case so there's a change to push.
 	 *
 	 * @param {Object} options        Playwright fixtures.
@@ -43,9 +43,19 @@ test.describe( 'Push to Global Styles button', () => {
 		await editor.insertBlock( { name: 'core/heading' } );
 		await page.keyboard.type( 'A heading' );
 
-		// Go to block settings and open the Additional styles panel.
+		// Open the block inspector and reveal the optional Apply globally action.
 		await editor.openDocumentSettingsSidebar();
-		await page.getByRole( 'button', { name: 'Additional styles' } ).click();
+		const additionalStylesOptions = page.getByRole( 'button', {
+			name: 'Additional styles options',
+		} );
+		await expect(
+			page.getByRole( 'button', { name: 'Apply globally', exact: true } )
+		).toHaveCount( 0 );
+		await additionalStylesOptions.click();
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'Show Apply globally' } )
+			.click();
+		await additionalStylesOptions.click();
 
 		// Push button should be disabled with no changes.
 		await expect(

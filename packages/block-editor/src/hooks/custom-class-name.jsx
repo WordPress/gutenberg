@@ -1,6 +1,9 @@
 import clsx from 'clsx';
 import { addFilter } from '@wordpress/hooks';
-import { TextControl } from '@wordpress/components';
+import {
+	TextControl,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { InspectorControls } from '../components';
@@ -27,7 +30,7 @@ export function addAttribute( settings ) {
 	return settings;
 }
 
-function CustomClassNameControlsPure( { className, setAttributes } ) {
+function CustomClassNameControlsPure( { className, clientId, setAttributes } ) {
 	const blockEditingMode = useBlockEditingMode();
 	if ( blockEditingMode !== 'default' ) {
 		return null;
@@ -35,17 +38,25 @@ function CustomClassNameControlsPure( { className, setAttributes } ) {
 
 	return (
 		<InspectorControls group="additional-styles">
-			<TextControl
-				autoComplete="off"
+			<ToolsPanelItem
 				label={ __( 'CSS class(es)' ) }
-				value={ className || '' }
-				onChange={ ( nextValue ) => {
-					setAttributes( {
-						className: nextValue !== '' ? nextValue : undefined,
-					} );
-				} }
-				help={ __( 'Separate multiple classes with spaces.' ) }
-			/>
+				panelId={ clientId }
+				hasValue={ () => !! className }
+				onDeselect={ () => setAttributes( { className: undefined } ) }
+				resetAllFilter={ () => ( { className: undefined } ) }
+			>
+				<TextControl
+					autoComplete="off"
+					label={ __( 'CSS class(es)' ) }
+					value={ className || '' }
+					onChange={ ( nextValue ) => {
+						setAttributes( {
+							className: nextValue !== '' ? nextValue : undefined,
+						} );
+					} }
+					help={ __( 'Separate multiple classes with spaces.' ) }
+				/>
+			</ToolsPanelItem>
 		</InspectorControls>
 	);
 }

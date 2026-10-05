@@ -5,6 +5,7 @@ import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import { processCSSNesting } from '@wordpress/global-styles-engine';
 import { store as noticesStore } from '@wordpress/notices';
+import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import InspectorControls from '../components/inspector-controls';
 import AdvancedPanel, {
@@ -22,12 +23,13 @@ const EMPTY_STYLE = {};
 /**
  * Inspector control for custom CSS.
  *
- * @param {Object}   props               Component props.
- * @param {string}   props.blockName     Block name.
- * @param {Function} props.setAttributes Function to set block attributes.
- * @param {Object}   props.style         Block style attribute.
+ * @param {Object}                       props               Component props.
+ * @param {string}                       props.blockName     Block name.
+ * @param {string}                       props.clientId      Block client ID.
+ * @param {(attributes: Object) => void} props.setAttributes Function to set block attributes.
+ * @param {Object}                       props.style         Block style attribute.
  */
-function CustomCSSControl( { blockName, setAttributes, style } ) {
+function CustomCSSControl( { blockName, clientId, setAttributes, style } ) {
 	const blockEditingMode = useBlockEditingMode();
 
 	if ( blockEditingMode !== 'default' ) {
@@ -53,12 +55,24 @@ function CustomCSSControl( { blockName, setAttributes, style } ) {
 
 	return (
 		<InspectorControls group="additional-styles">
-			<AdvancedPanel
-				value={ style }
-				onChange={ onChange }
-				inheritedValue={ style }
-				help={ cssHelpText }
-			/>
+			<ToolsPanelItem
+				label={ __( 'CSS' ) }
+				panelId={ clientId }
+				hasValue={ () =>
+					typeof style?.css === 'string' && !! style.css.trim()
+				}
+				onDeselect={ () => onChange( { ...style, css: undefined } ) }
+				resetAllFilter={ ( attributes ) => ( {
+					style: { ...attributes.style, css: undefined },
+				} ) }
+			>
+				<AdvancedPanel
+					value={ style }
+					onChange={ onChange }
+					inheritedValue={ style }
+					help={ cssHelpText }
+				/>
+			</ToolsPanelItem>
 		</InspectorControls>
 	);
 }
@@ -86,6 +100,7 @@ function CustomCSSEdit( { clientId, name, setAttributes } ) {
 	return (
 		<CustomCSSControl
 			blockName={ name }
+			clientId={ clientId }
 			setAttributes={ setAttributes }
 			style={ style }
 		/>

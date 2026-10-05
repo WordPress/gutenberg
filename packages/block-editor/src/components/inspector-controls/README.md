@@ -178,6 +178,12 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 } );
 ```
 
+## Additional styles
+
+Use `group="additional-styles"` to add controls to the block inspector's Additional styles panel. The panel appears in the Styles tab when that tab is present, or alongside the other inspector panels when there are no separate tabs.
+
+The group is rendered inside a ToolsPanel. Wrap editable controls in `__experimentalToolsPanelItem` from `@wordpress/components`, with a unique `label`, the block's `clientId` as `panelId`, a `hasValue` callback, and an `onDeselect` callback that resets the control. Controls are hidden when empty until selected from the panel's options menu. Supply a `resetAllFilter` that returns attribute updates based on its input attributes, preserving unrelated values, to participate in Reset all. Actions and explanatory content can render without a ToolsPanelItem, but do not participate in the menu or reset behaviour.
+
 ## InspectorAdvancedControls
 
 <img src="https://user-images.githubusercontent.com/150562/94028603-df90bf00-fdb3-11ea-9e6f-eb15c5631d85.png" width="280" alt="inspector-advanced-controls">

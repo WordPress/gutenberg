@@ -59,6 +59,8 @@ A panel item's `label` should be unique among all items within a single panel.
 Called when this item is deselected in the `ToolsPanel` menu. This is normally
 used to reset the panel item control's value.
 
+Optional items without this callback use “Hide” rather than “Hide and reset” in their menu item's accessible label and live announcement. This supports items that only toggle the visibility of an action or other content.
+
 -   Required: No
 
 ### `onSelect`: `() => void`

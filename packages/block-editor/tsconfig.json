@@ -127,6 +127,7 @@
 		"src/components/contrast-checker/stories/index.story.ts",
 		"src/components/inspector-controls-tabs/test/use-inspector-controls-tabs.jsdom.test.tsx",
 		"src/hooks/test/utils.jsdom.test.tsx",
-		"src/components/inspector-controls-tabs/test/advanced-panels.jsdom.test.tsx"
+		"src/components/inspector-controls-tabs/test/advanced-panels.jsdom.test.tsx",
+		"src/components/inspector-controls-tabs/test/additional-styles.jsdom.test.tsx"
 	]
 }
