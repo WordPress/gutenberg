@@ -2,6 +2,7 @@ import { Meter as _Meter } from '@base-ui/react/meter';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import type { TrackProps } from './types';
+import defenseStyles from '../utils/css/global-css-defense.module.css';
 import resetStyles from '../utils/css/resets.module.css';
 import styles from './style.module.css';
 
@@ -17,6 +18,7 @@ const Track = forwardRef< HTMLDivElement, TrackProps >( function MeterTrack(
 			ref={ ref }
 			className={ clsx(
 				resetStyles[ 'box-sizing' ],
+				defenseStyles.div,
 				styles.track,
 				className
 			) }

@@ -20,7 +20,7 @@
 			background-color: var(--wpds-color-background-track-neutral);
 
 			@media (forced-colors: active) {
-				outline: var(--wpds-border-width-xs) solid CanvasText;
+				--_gcd-div-outline: var(--wpds-border-width-xs) solid CanvasText;
 				outline-offset: var(--wpds-border-width-xs);
 			}
 		}
