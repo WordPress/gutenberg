@@ -144,6 +144,10 @@ function ensureTargetSheets(
  * Builds a CSSFontFaceRule from a FontFace descriptor by inserting into
  * a temporary stylesheet. Returns null if the CSS is invalid.
  *
+ * The font family is usually a CSS value, such as `"Open Sans"`. Older data
+ * and theme.json files can hold a plain name that is not valid CSS, such as
+ * `Exo 2`. For such a name, the function uses the name as a CSS string.
+ *
  * @param fontFace The font face descriptor to convert.
  * @param src      Optional URL to use as the font source.
  * @return The constructed rule, or null on invalid CSS.
@@ -153,7 +157,6 @@ function getCssFontFaceRule(
 	src?: string
 ): CSSFontFaceRule | null {
 	const declarations = [
-		`font-family: ${ fontFace.fontFamily }`,
 		`font-style: ${ fontFace.fontStyle || 'normal' }`,
 		`font-weight: ${ fontFace.fontWeight || '400' }`,
 	];
@@ -184,9 +187,39 @@ function getCssFontFaceRule(
 		declarations.push( `unicode-range: ${ fontFace.unicodeRange }` );
 	}
 
+	const rule = insertCssFontFaceRule( fontFace.fontFamily, declarations );
+	if ( rule ) {
+		return rule;
+	}
+
+	// Read the value as a plain name. Use the first name of a list, and remove the quotes.
+	const plainName = ( fontFace.fontFamily ?? '' )
+		.split( ',' )[ 0 ]
+		.trim()
+		.replace( /^["']|["']$/g, '' );
+	if ( ! plainName ) {
+		return null;
+	}
+	return insertCssFontFaceRule( createCssString( plainName ), declarations );
+}
+
+/**
+ * Inserts an `@font-face` rule into a temporary stylesheet.
+ *
+ * @param fontFamily   The CSS value of the font-family descriptor.
+ * @param declarations The other descriptors of the rule.
+ * @return The constructed rule, or null if the rule or its font family is invalid.
+ */
+function insertCssFontFaceRule(
+	fontFamily: string,
+	declarations: string[]
+): CSSFontFaceRule | null {
 	const ss = new CSSStyleSheet();
 
-	const cssText = `@font-face {\n\t${ declarations.join( ';\n\t' ) }\n}`;
+	const cssText = `@font-face {\n\t${ [
+		`font-family: ${ fontFamily }`,
+		...declarations,
+	].join( ';\n\t' ) }\n}`;
 	let ruleIndex: number;
 	try {
 		ruleIndex = ss.insertRule( cssText );
@@ -200,7 +233,10 @@ function getCssFontFaceRule(
 	}
 	const rule = ss.cssRules[ ruleIndex ];
 	if ( rule instanceof CSSFontFaceRule ) {
-		return rule;
+		// A browser removes an invalid font-family descriptor and keeps the rule.
+		// A rule without a font family must not be used, because unload would
+		// then match every font face with the same style and weight.
+		return rule.style.getPropertyValue( 'font-family' ) ? rule : null;
 	}
 	// Unexpected rule
 	if ( globalThis.SCRIPT_DEBUG ) {
