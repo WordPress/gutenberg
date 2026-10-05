@@ -73,7 +73,7 @@ function getMounts(
 }
 
 /**
- * Gets the database healthcheck.
+ * The database healthcheck, shared by the development and tests databases.
  *
  * MariaDB's `healthcheck.sh` runs when the image can use it: --connect
  * verifies a TCP connection and that the entrypoint has finished, and
@@ -84,30 +84,28 @@ function getMounts(
  *
  * Images for older MariaDB versions may predate that user or the script (the
  * script was added to the images in 2022 and the user in 2023, and older tags
- * were never rebuilt), so the script is used only when that file exists, and
- * the server is pinged over TCP otherwise, with `mariadb-admin` (11.0+ only
- * ships this name) or `mysqladmin` (versions before 10.4 only ship this name).
- * The image is checked at runtime rather than by its tag, so every version,
- * including `lts` and `latest`, uses the same check. Using 127.0.0.1 rather
- * than localhost avoids the Unix socket, which the temporary server used to
- * initialize a new volume answers before the real server is listening.
+ * were never rebuilt). The file is in the data volume and the script is in the
+ * image, so an older image can find a file a newer one left behind. The script
+ * is used only when both exist, and the server is pinged over TCP otherwise,
+ * with `mariadb-admin` (11.0+ only ships this name) or `mysqladmin` (versions
+ * before 10.4 only ship this name). The image is checked at runtime rather
+ * than by its tag, so every version, including `lts` and `latest`, uses the
+ * same check. Using 127.0.0.1 rather than localhost avoids the Unix socket,
+ * which the temporary server used to initialize a new volume answers before
+ * the real server is listening.
  *
  * Timing is generous to support slow CI environments.
- *
- * @return {Object} A docker-compose healthcheck object.
  */
-function getMariaDBHealthcheck() {
-	return {
-		test: [
-			'CMD-SHELL',
-			'if [ -f /var/lib/mysql/.my-healthcheck.cnf ]; then healthcheck.sh --connect --innodb_initialized; else "$$(command -v mariadb-admin || echo mysqladmin)" ping -h 127.0.0.1 --protocol=tcp -uroot -p"$$MYSQL_ROOT_PASSWORD"; fi',
-		],
-		interval: '5s',
-		timeout: '10s',
-		retries: 12,
-		start_period: '60s',
-	};
-}
+const MARIADB_HEALTHCHECK = {
+	test: [
+		'CMD-SHELL',
+		'if [ -f /var/lib/mysql/.my-healthcheck.cnf ] && command -v healthcheck.sh > /dev/null; then healthcheck.sh --connect --innodb_initialized; else "$$(command -v mariadb-admin || echo mysqladmin)" ping -h 127.0.0.1 --protocol=tcp -uroot -p"$$MYSQL_ROOT_PASSWORD"; fi',
+	],
+	interval: '5s',
+	timeout: '10s',
+	retries: 12,
+	start_period: '60s',
+};
 
 /**
  * Creates a docker-compose config object which, when serialized into a
@@ -224,7 +222,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				MARIADB_AUTO_UPGRADE: '1',
 			},
 			volumes: [ 'mysql:/var/lib/mysql' ],
-			healthcheck: getMariaDBHealthcheck(),
+			healthcheck: MARIADB_HEALTHCHECK,
 		},
 		wordpress: {
 			depends_on: {
@@ -302,7 +300,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				MARIADB_AUTO_UPGRADE: '1',
 			},
 			volumes: [ 'mysql-test:/var/lib/mysql' ],
-			healthcheck: getMariaDBHealthcheck(),
+			healthcheck: MARIADB_HEALTHCHECK,
 		};
 		services[ 'tests-wordpress' ] = {
 			depends_on: {

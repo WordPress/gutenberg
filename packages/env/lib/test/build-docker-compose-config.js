@@ -322,6 +322,18 @@ describe( 'buildDockerComposeConfig', () => {
 			}
 		);
 
+		it( 'pings instead when the healthcheck user exists but the image has no healthcheck.sh', () => {
+			fs.writeFileSync( configFile, '' );
+			addStub( 'mariadb-admin', 0 );
+
+			expect( runHealthcheck() ).toEqual( {
+				exitCode: 0,
+				calls: [
+					'mariadb-admin ping -h 127.0.0.1 --protocol=tcp -uroot -ppassword',
+				],
+			} );
+		} );
+
 		it.each( [ 0, 1 ] )(
 			'pings with mariadb-admin and returns its exit code %j without the healthcheck user',
 			( exitCode ) => {
