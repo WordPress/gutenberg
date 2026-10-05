@@ -65,8 +65,6 @@ export function MediaCategoryPanel( { onInsert, category } ) {
 	}, [] );
 	// Inserting lives here alongside attach and detach, so every operation on
 	// the panel's media — and every notice one raises — comes from one place.
-	// The grid is handed the result to render: a click to report, and the item
-	// whose upload is in flight.
 	const {
 		insert,
 		insertingId,

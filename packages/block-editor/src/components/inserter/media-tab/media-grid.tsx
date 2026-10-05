@@ -223,9 +223,8 @@ export default function MediaGrid( {
 		[ page, perPage, search ]
 	);
 
-	// The panel owns page and search; the view is derived from them, so a
-	// change coming back from DataViews (its search input, pager, or page
-	// clamp) is forwarded to the panel's setters rather than stored here.
+	// The panel owns page and search, so changes are forwarded to it rather
+	// than stored here.
 	const onChangeView = useCallback(
 		( nextView: View ) => {
 			const nextSearch = nextView.search ?? '';
@@ -248,8 +247,6 @@ export default function MediaGrid( {
 		[ totalItems, totalPages ]
 	);
 	const showPagination = paginationInfo.totalPages > 1;
-	// The footer, when present, supplies the breathing room beneath the grid,
-	// so the grid drops its own bottom gutter (see styles).
 	const hasFooter = showPagination || !! footer;
 	const itemRange = getItemRange( {
 		page,
