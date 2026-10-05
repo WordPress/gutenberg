@@ -25,6 +25,7 @@ require.cache[ getHostUserPath ].exports = getHostUser;
 const buildDockerComposeConfig = require( '../runtime/docker/build-docker-compose-config' );
 const {
 	wordpressDockerFileContents,
+	cliDockerFileContents,
 	getLoopbackPortConfig,
 } = require( '../runtime/docker/docker-config' );
 
@@ -511,4 +512,144 @@ describe( 'wordpressDockerFileContents', () => {
 		expect( dockerfile ).toContain( 'Listen 8889' );
 		expect( dockerfile ).not.toContain( 'Listen 8888' );
 	} );
+} );
+
+describe( 'cliDockerFileContents', () => {
+	const config = {
+		xdebug: 'off',
+		spx: 'off',
+		env: { development: { port: 8888, phpVersion: null } },
+	};
+
+	it( 'wraps the MariaDB clients to skip server certificate verification', () => {
+		expect( cliDockerFileContents( 'development', config ) ).toContain(
+			'RUN for bin in mariadb mariadb-check mariadb-dump mysql mysqlcheck mysqldump; do'
+		);
+	} );
+
+	/*
+	 * Runs the Dockerfile step that writes the wrappers in a shell, with
+	 * `/usr/bin` and `/usr/local/bin` replaced by temporary directories, and
+	 * stub clients that log how they were called. Skipped on Windows, which
+	 * has no `/bin/sh`; the step itself only ever runs in the Linux CLI image.
+	 */
+	describe.skipIf( process.platform === 'win32' )(
+		'MariaDB client wrappers',
+		() => {
+			let directory;
+			let clientDirectory;
+			let wrapperDirectory;
+			let logFile;
+
+			beforeEach( () => {
+				directory = fs.mkdtempSync(
+					path.join( os.tmpdir(), 'wp-env-client-wrappers-' )
+				);
+				clientDirectory = path.join( directory, 'usr-bin' );
+				wrapperDirectory = path.join( directory, 'usr-local-bin' );
+				logFile = path.join( directory, 'calls.log' );
+				fs.mkdirSync( clientDirectory );
+				fs.mkdirSync( wrapperDirectory );
+			} );
+
+			afterEach( () => {
+				fs.rmSync( directory, { recursive: true, force: true } );
+			} );
+
+			function addClient( name, exitCode ) {
+				const clientPath = path.join( clientDirectory, name );
+				fs.writeFileSync(
+					clientPath,
+					`#!/bin/sh\necho "\${0##*/} $*" >> "${ logFile }"\nexit ${ exitCode }\n`
+				);
+				fs.chmodSync( clientPath, 0o755 );
+			}
+
+			// Runs the Dockerfile step with the temporary directories in place.
+			function writeWrappers() {
+				const dockerfile = cliDockerFileContents(
+					'development',
+					config
+				);
+				const step = dockerfile
+					.slice(
+						dockerfile.indexOf( 'RUN for bin in mariadb' ) +
+							'RUN '.length,
+						dockerfile.indexOf(
+							'\ndone',
+							dockerfile.indexOf( 'RUN for bin in mariadb' )
+						) + '\ndone'.length
+					)
+					.replaceAll( '/usr/local/bin/', `${ wrapperDirectory }/` )
+					.replaceAll( '/usr/bin/', `${ clientDirectory }/` );
+
+				execFileSync( '/bin/sh', [ '-c', step ] );
+			}
+
+			function runWrapper( name, args ) {
+				let exitCode = 0;
+				try {
+					execFileSync( path.join( wrapperDirectory, name ), args, {
+						stdio: 'ignore',
+					} );
+				} catch ( error ) {
+					exitCode = error.status;
+				}
+
+				return {
+					exitCode,
+					calls: fs
+						.readFileSync( logFile, 'utf8' )
+						.trim()
+						.split( '\n' ),
+				};
+			}
+
+			it( 'adds the flag after --no-defaults, which has to stay first', () => {
+				addClient( 'mariadb-check', 0 );
+				writeWrappers();
+
+				expect(
+					runWrapper( 'mariadb-check', [
+						'--no-defaults',
+						'wordpress',
+						'--host=mysql',
+					] )
+				).toEqual( {
+					exitCode: 0,
+					calls: [
+						'mariadb-check --no-defaults --skip-ssl-verify-server-cert wordpress --host=mysql',
+					],
+				} );
+			} );
+
+			it( 'adds the flag first when there is no --no-defaults', () => {
+				addClient( 'mysql', 0 );
+				writeWrappers();
+
+				expect( runWrapper( 'mysql', [ '-e', 'SELECT 1' ] ) ).toEqual( {
+					exitCode: 0,
+					calls: [
+						'mysql --skip-ssl-verify-server-cert -e SELECT 1',
+					],
+				} );
+			} );
+
+			it( 'returns the client’s exit code', () => {
+				addClient( 'mariadb', 3 );
+				writeWrappers();
+
+				expect( runWrapper( 'mariadb', [] ).exitCode ).toBe( 3 );
+			} );
+
+			it( 'only wraps the clients the image has', () => {
+				addClient( 'mysql', 0 );
+				writeWrappers();
+
+				expect( fs.readdirSync( wrapperDirectory ) ).toEqual( [
+					'mysql',
+				] );
+			} );
+		}
+	);
 } );
