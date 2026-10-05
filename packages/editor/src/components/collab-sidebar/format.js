@@ -1,11 +1,17 @@
 import { __ } from '@wordpress/i18n';
-import { useEffect } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { useViewportMatch } from '@wordpress/compose';
+import { useEffect, useRef } from '@wordpress/element';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
+import { useEvent, useViewportMatch } from '@wordpress/compose';
+import {
+	store as blockEditorStore,
+	useBlockEditContext,
+} from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as editorStore } from '../../store';
 import { ALL_NOTES_SIDEBAR } from './constants';
+import { getNoteIdsFromMetadata, pickBlockLevelNote } from './utils';
 import { unlock } from '../../lock-unlock';
 
 /*
@@ -32,12 +38,31 @@ function NoteFormat( { isActive, activeAttributes } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
-	const noteId = activeAttributes?.[ 'data-id' ];
+	const noteId = isActive ? activeAttributes?.[ 'data-id' ] : undefined;
+	const previousNoteIdRef = useRef( noteId );
+	const { clientId } = useBlockEditContext();
+	const registry = useRegistry();
+
+	// Mirror the block-level sync's pick. The notes query already resolved
+	// each record, so reading them here doesn't fetch.
+	const getBlockLevelNoteId = useEvent( () => {
+		const attributes = registry
+			.select( blockEditorStore )
+			.getBlockAttributes( clientId );
+		const { getEntityRecord } = registry.select( coreStore );
+		const threads = getNoteIdsFromMetadata( attributes?.metadata )
+			.map( ( id ) => getEntityRecord( 'root', 'comment', id ) )
+			.filter(
+				( thread ) =>
+					thread?.status === 'hold' || thread?.status === 'approved'
+			)
+			.sort( ( a, b ) => a.id - b.id );
+		return pickBlockLevelNote( threads, attributes )?.id;
+	} );
 
 	useEffect( () => {
-		if ( ! isActive || ! noteId ) {
-			return;
-		}
+		const previousNoteId = previousNoteIdRef.current;
+		previousNoteIdRef.current = noteId;
 
 		// Sync visible notes to the marker under the caret. Read imperatively
 		// so it triggers on caret movement, not sidebar state.
@@ -51,21 +76,30 @@ function NoteFormat( { isActive, activeAttributes } ) {
 			return;
 		}
 
-		if ( String( getSelectedNote() ) === String( noteId ) ) {
+		const selectedNote = String( getSelectedNote() );
+
+		if ( noteId ) {
+			if ( selectedNote !== String( noteId ) ) {
+				selectNote( Number( noteId ) );
+			}
 			return;
 		}
 
-		// Select-only; no cleanup on leave. The block-level sync owns
-		// clearing/reverting, and deselecting here would drop the block's
-		// note while the caret is still inside the block.
-		selectNote( Number( noteId ) );
+		// The caret left a marker for plain text in the same block. If its
+		// note is still selected, fall back to what the block selects on its
+		// own, so the result depends only on where the caret is. Leaving the
+		// block unmounts this component instead, and the block-level sync
+		// owns that transition.
+		if ( previousNoteId && selectedNote === String( previousNoteId ) ) {
+			selectNote( getBlockLevelNoteId() );
+		}
 	}, [
-		isActive,
 		noteId,
 		isLargeViewport,
 		getActiveComplementaryArea,
 		getPreference,
 		getSelectedNote,
+		getBlockLevelNoteId,
 		selectNote,
 	] );
 

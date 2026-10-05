@@ -26,6 +26,7 @@ import {
 	addNoteIdToMetadata,
 	removeNoteIdFromMetadata,
 	calculateNotePositions,
+	pickBlockLevelNote,
 	pickPrimaryNote,
 	BLOCK_LEVEL_NOTE_START,
 	getInlineMarkerStart,
@@ -636,6 +637,31 @@ describe( 'findNoteRange', () => {
 	it( 'returns null when no marker is present', () => {
 		const value = RichTextData.fromHTMLString( 'hello world' );
 		expect( findNoteRange( value, 7 ) ).toBeNull();
+	} );
+
+	// Lives here to reuse the `core/note` format registration.
+	describe( 'pickBlockLevelNote', () => {
+		const attributes = {
+			content: RichTextData.fromHTMLString(
+				'hello <span class="wp-note" data-id="2">marked</span> world'
+			),
+		};
+
+		it( 'skips inline notes', () => {
+			const threads = [
+				{ id: 1, status: 'approved' },
+				{ id: 2, status: 'hold' },
+			];
+			expect( pickBlockLevelNote( threads, attributes ) ).toBe(
+				threads[ 0 ]
+			);
+		} );
+
+		it( 'returns null when the block has only inline notes', () => {
+			expect(
+				pickBlockLevelNote( [ { id: 2, status: 'hold' } ], attributes )
+			).toBeNull();
+		} );
 	} );
 
 	it( 'returns range for a marker matching the note id (RichTextData)', () => {

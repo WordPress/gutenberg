@@ -28,7 +28,7 @@ import {
 	getInlineMarkerStart,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
-	pickPrimaryNote,
+	pickBlockLevelNote,
 	readInlineSelection,
 	removeNoteFormat,
 	removeNoteIdFromMetadata,
@@ -527,7 +527,8 @@ export function useNoteSelection( { notes, sidebarRef } ) {
 		};
 	}, [] );
 
-	// Select the block's primary note, or clear the selection if it has none.
+	// Select the block's block-level note, or clear the selection if it has
+	// none. Inline notes are picked by the caret entering their marker.
 	const syncWithBlock = useEvent( ( clientId ) => {
 		const { getSelectedNote, isNoteFocused } = unlock(
 			registry.select( editorStore )
@@ -545,7 +546,14 @@ export function useNoteSelection( { notes, sidebarRef } ) {
 		if ( blockThreads.some( ( thread ) => thread.id === currentNoteId ) ) {
 			return;
 		}
-		selectNote( pickPrimaryNote( blockThreads )?.id );
+		selectNote(
+			pickBlockLevelNote(
+				blockThreads,
+				registry
+					.select( blockEditorStore )
+					.getBlockAttributes( clientId )
+			)?.id
+		);
 	} );
 
 	// Sync only on block transitions, so in-block changes (Escape, Cancel,

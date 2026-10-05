@@ -569,6 +569,24 @@ export function pickPrimaryNote( threads ) {
 }
 
 /**
+ * Pick the note a block selects when the caret isn't inside an inline note's
+ * marker: its primary block-level note, or null when it has none. Inline notes
+ * are selected only from inside their marker, so they never stand in for the
+ * block.
+ *
+ * @param {Array}   threads    The block's note threads.
+ * @param {?Object} attributes Block attributes, used to tell inline notes apart.
+ * @return {?Object} The block-level note to select, or null.
+ */
+export function pickBlockLevelNote( threads, attributes ) {
+	return pickPrimaryNote(
+		threads.filter(
+			( thread ) => ! findNoteInBlock( attributes, thread.id )
+		)
+	);
+}
+
+/**
  * Removes a note ID from the metadata.
  *
  * @param {Object} metadata Existing block metadata

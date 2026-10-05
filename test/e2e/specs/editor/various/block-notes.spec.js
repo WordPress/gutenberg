@@ -1731,52 +1731,137 @@ test.describe( 'Block Notes', () => {
 			);
 		} );
 
-		test( 'moving the caret out of a marker within the block deselects its note', async ( {
-			editor,
-			page,
-			blockNoteUtils,
-		} ) => {
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'Hello brave new world.' },
+		test.describe( 'Selection follows the caret', () => {
+			// Clicks plain text near the end of the paragraph, outside any
+			// marker, and waits for the caret to land in the block.
+			async function clickPlainText( editor, paragraph ) {
+				const box = await paragraph.boundingBox();
+				await paragraph.click( {
+					position: { x: box.width - 4, y: box.height / 2 },
+				} );
+				await expect(
+					editor.canvas.locator( ':focus' )
+				).toHaveAttribute( 'data-type', 'core/paragraph' );
+			}
+
+			test( 'selects no note outside the marker of a block with only an inline note', async ( {
+				editor,
+				page,
+				blockNoteUtils,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: { content: 'Hello brave new world.' },
+				} );
+
+				const paragraph = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+				await paragraph.click();
+				await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
+				await blockNoteUtils.addNote( 'Brave note' );
+
+				const thread = page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'treeitem', { name: 'Note: Brave note' } );
+				const mark = editor.canvas.locator( 'mark.wp-note' );
+				const title = editor.canvas.getByRole( 'textbox', {
+					name: 'Add title',
+				} );
+
+				// Entering the block outside the marker selects nothing.
+				await title.click();
+				await expect( thread ).toHaveAttribute(
+					'aria-expanded',
+					'false'
+				);
+				await clickPlainText( editor, paragraph );
+				await expect( thread ).toHaveAttribute(
+					'aria-expanded',
+					'false'
+				);
+
+				// The caret inside the marker selects its note...
+				await mark.click();
+				await expect( thread ).toHaveAttribute(
+					'aria-expanded',
+					'true'
+				);
+
+				// ...and moving it out within the block deselects it again.
+				await clickPlainText( editor, paragraph );
+				await expect( thread ).toHaveAttribute(
+					'aria-expanded',
+					'false'
+				);
 			} );
 
-			const paragraph = editor.canvas.getByRole( 'document', {
-				name: 'Block: Paragraph',
+			test( 'falls back to the block-level note when the caret leaves an inline marker', async ( {
+				editor,
+				page,
+				blockNoteUtils,
+			} ) => {
+				await blockNoteUtils.addBlockWithNote( {
+					type: 'core/paragraph',
+					attributes: { content: 'Hello brave new world.' },
+					comment: 'Block note',
+				} );
+
+				const paragraph = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+				await paragraph.click();
+				await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
+				await blockNoteUtils.addNote( 'Brave note' );
+
+				const settings = page.getByRole( 'region', {
+					name: 'Editor settings',
+				} );
+				const blockThread = settings.getByRole( 'treeitem', {
+					name: 'Note: Block note',
+				} );
+				const inlineThread = settings.getByRole( 'treeitem', {
+					name: 'Note: Brave note',
+				} );
+				const mark = editor.canvas.locator( 'mark.wp-note' );
+
+				// Entering the block outside the marker selects its
+				// block-level note.
+				await editor.canvas
+					.getByRole( 'textbox', { name: 'Add title' } )
+					.click();
+				await expect( blockThread ).toHaveAttribute(
+					'aria-expanded',
+					'false'
+				);
+				await clickPlainText( editor, paragraph );
+				await expect( blockThread ).toHaveAttribute(
+					'aria-expanded',
+					'true'
+				);
+
+				// The caret inside the marker selects the inline note.
+				await mark.click();
+				await expect( inlineThread ).toHaveAttribute(
+					'aria-expanded',
+					'true'
+				);
+				await expect( blockThread ).toHaveAttribute(
+					'aria-expanded',
+					'false'
+				);
+
+				// Moving it out within the block returns to the block-level note.
+				await clickPlainText( editor, paragraph );
+				await expect( blockThread ).toHaveAttribute(
+					'aria-expanded',
+					'true'
+				);
+				await expect( inlineThread ).toHaveAttribute(
+					'aria-expanded',
+					'false'
+				);
 			} );
-			await paragraph.click();
-			await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
-			await blockNoteUtils.addNote( 'Brave note' );
-
-			const thread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: 'Note: Brave note' } );
-			const mark = editor.canvas.locator( 'mark.wp-note' );
-
-			// Deselect the freshly added note, then place the caret inside the
-			// marker so it becomes the selected note.
-			await editor.canvas
-				.getByRole( 'textbox', { name: 'Add title' } )
-				.click();
-			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
-			await mark.click();
-			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
-
-			// Clicking elsewhere in the same block moves the caret out of the
-			// marker, which should deselect the note without leaving the block.
-			const box = await paragraph.boundingBox();
-			await paragraph.click( {
-				position: { x: box.width - 4, y: box.height / 2 },
-			} );
-			await expect( editor.canvas.locator( ':focus' ) ).toHaveAttribute(
-				'data-type',
-				'core/paragraph'
-			);
-			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
-
-			// Returning the caret to the marker selects the note again.
-			await mark.click();
-			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 		} );
 	} );
 
