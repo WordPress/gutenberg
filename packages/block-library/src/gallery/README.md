@@ -67,6 +67,8 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`allowWrap`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowwrap): `false`
   - [`allowSizingOnChildren`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowsizingonchildren): `true`
   - [`default`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-default): `{"type":"flex"}`
+- [`filter`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#filter):
+  - [`duotone`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#filter-duotone): `true`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
 - [`listView`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#listview): `true`
@@ -87,6 +89,13 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 - `imageCrop` → attribute `imageCrop`
 - `fixedHeight` → attribute `fixedHeight`
 - `navigationButtonType` → attribute `navigationButtonType`
+
+## CSS Selectors
+
+_Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
+
+- **filter**:
+  - duotone: `.wp-block-gallery :where(img)`
 
 ## Block Markup
 

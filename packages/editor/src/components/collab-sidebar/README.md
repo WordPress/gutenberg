@@ -74,7 +74,7 @@ Three layers cooperate:
 
 ### 1. `board-store.js` - DOM measurement
 
-A plain JS store created via `createBoardStore()` (one per mounted `Notes`). It is the only place that reads layout from the DOM. It holds:
+A plain JS store created via `createBoardStore()` (one per mounted `Notes`). It is the only place that reads layout for the thread positions; the scroll mirror in `useMirroredScroll` reads the canvas's scroll range separately. It holds:
 
 - `blockRefs: Map<noteId, HTMLElement>` - each note's associated block element.
 - `floatingRefs: Map<noteId, HTMLElement>` - each note's floating DOM node.
@@ -114,12 +114,14 @@ Lives inside `Notes`. Holds one store instance (`useState(createBoardStore)`) an
 1. Subscribes via `useSyncExternalStore` only while floating; otherwise it passes a no-op subscribe, so the store drops its observer.
 2. Requests a measurement whenever `threads` changes. `threads` is rebuilt on any block insert, removal or move, which can shift anchors without resizing the root.
 3. Derives `notePositions` during render with `useMemo( () => calculateNotePositions(...) )` from `threads`, `selectedNoteId` and the snapshot. There is no state, timer or rAF: React re-renders synchronously on a store change, so a resize reaches the screen in the same paint.
-4. In a layout effect keyed on `isFloating + sidebarRef + canvas`, attaches a capture-phase `scroll` listener on the canvas's `defaultView` that writes `--canvas-scroll` on the sidebar panel. (`window` capture catches scrolls on the document root, which don't bubble.) A second layout effect writes the snapshot's `frameOffset` as `--canvas-offset`.
-5. Returns `{ notePositions, registerThread, unregisterThread }` - the positions flow down as props; the two register callbacks flow to each `NoteThread`.
+4. `useCanvasRoom`: in a layout effect keyed on `isFloating + canvas + contentHeight`, writes the `contentHeight` from the same `calculateNotePositions` call as `--wp-editor-canvas-min-height` on the canvas root. The canvas margin's CSS (`getCanvasMarginCSS` in `visual-editor/canvas-margin.js`) applies it as the root's `min-height` inside its tiers, so a short post can always scroll to the lowest thread and the room goes away with the margin. The value changes at most twice per selection change (new positions, then the expanded thread's measured height), both before the next paint.
+5. `useMirroredScroll`: in a layout effect keyed on `isFloating + sidebarRef + canvas`, mirrors the panel and the canvas. The floating panel is a real scroller (`overflow-y: auto`, hidden scrollbar) whose `::before` spacer gives it the canvas's scroll range, written as `--canvas-scroll-range` from a `ResizeObserver` on the canvas root, its body and the panel. A `scroll` listener on each side scrolls the other to its position, and the canvas owns the position: when it can't follow the panel, the panel snaps back. The code comments cover the details (instant scrolls, the echo guard, why the observer never sets positions).
+6. `usePanelOffsets`: writes the snapshot's `frameOffset` as `--canvas-offset` and `scrollbarWidth` as `--canvas-scrollbar-width` on the panel.
+7. Returns `{ notePositions, heights, registerThread, unregisterThread }` - the positions and heights flow down as props; the two register callbacks flow to each `NoteThread`.
 
 ### 3. `calculateNotePositions` - pure layout math (in `utils.js`)
 
-Given the list of threads, the currently selected note id, the anchor rects, and the floating heights, returns `{ positions: { [noteId]: top } }` where `top` is the final canvas-space y-coordinate for each floating thread.
+Given the list of threads, the currently selected note id, the anchor rects, and the floating heights, returns `{ positions: { [noteId]: top }, contentHeight }` where `top` is the final canvas-space y-coordinate for each floating thread and `contentHeight` is the lowest measured thread's bottom plus a gap, in the same space.
 
 Algorithm, keyed on the selected note as an **anchor**:
 
@@ -131,7 +133,7 @@ Algorithm, keyed on the selected note as an **anchor**:
 
 ### 4. `FloatingContainer` - the render shell
 
-Renders a `Stack` with `top: floating.y` when in floating mode. CSS translates each thread by `--canvas-offset` plus `--canvas-scroll`, so it tracks the canvas frame and its scroll, so per-thread `top` values stay stable while scrolling. A `top` transition eases reflows (e.g. on selection change) unless the user prefers reduced motion; a thread's first positioning starts from `top: auto` and doesn't animate.
+Renders a `Stack` with `top: floating.y` when in floating mode. CSS translates each thread by `--canvas-offset`, so it tracks the canvas frame; the panel's own scroll, mirrored with the canvas, tracks the canvas scroll, so per-thread `top` values stay stable while scrolling. A `top` transition eases reflows (e.g. on selection change) unless the user prefers reduced motion; a thread's first positioning starts from `top: auto` and doesn't animate.
 
 ### Why this shape
 
@@ -141,4 +143,4 @@ Each layer has one job, so a new anchor type or layout rule touches only one of 
 - The snapshot is plain data compared by value, so unrelated resizes don't re-render `Notes`.
 - Observer lifetime follows subscriptions, so remounts (and StrictMode's double effects) rebuild it from the registered refs.
 - `calculateNotePositions` is pure and derived during render; anything computable from props, state and the snapshot should stay out of React state.
-- The scroll listener updates a CSS variable rather than React state, so scrolling doesn't re-render.
+- The scroll listeners mirror scroll positions and the range observer updates a CSS variable, never React state, so scrolling doesn't re-render.

@@ -50,6 +50,25 @@ class BlockNoteUtils {
 		} );
 	}
 
+	// Floating notes or the "All notes" sidebar.
+	#getNotesSurface() {
+		return this.#page.getByRole( 'region', {
+			name: /^(Notes|Editor settings)$/,
+		} );
+	}
+
+	// "All notes" has no toggle before the first note.
+	async showAllNotes() {
+		await this.#page.evaluate( () =>
+			window.wp.data
+				.dispatch( 'core/interface' )
+				.enableComplementaryArea(
+					'core',
+					'edit-post/collab-history-sidebar'
+				)
+		);
+	}
+
 	async openBlockNoteSidebar() {
 		const toggleButton = this.#page
 			.getByRole( 'region', { name: 'Editor top bar' } )
@@ -79,13 +98,20 @@ class BlockNoteUtils {
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Options' } )
 			.click();
-		await this.#page
-			.getByRole( 'menuitem', { name: 'Notes', exact: true } )
-			.click();
-		await this.#page
+		const notesItem = this.#page.getByRole( 'menuitem', {
+			name: 'Notes',
+			exact: true,
+		} );
+		await notesItem.click();
+		const item = this.#page
 			.getByRole( 'menuitemradio', { name } )
-			.or( this.#page.getByRole( 'menuitemcheckbox', { name } ) )
-			.click();
+			.or( this.#page.getByRole( 'menuitemcheckbox', { name } ) );
+		await item.click();
+		// Items keep the menu and its submenu open.
+		await this.#page.keyboard.press( 'Escape' );
+		await expect( item ).toBeHidden();
+		await this.#page.keyboard.press( 'Escape' );
+		await expect( notesItem ).toBeHidden();
 	}
 
 	async addBlockWithNote( { type, attributes = {}, comment } ) {
@@ -107,16 +133,33 @@ class BlockNoteUtils {
 		await this.#page
 			.getByRole( 'textbox', { name: 'New note', exact: true } )
 			.pressSequentially( content );
-		await this.#page
-			.getByRole( 'region', { name: 'Editor settings' } )
+		await this.#getNotesSurface()
 			.getByRole( 'button', { name: 'Add note', exact: true } )
 			.click();
 		// Wait for the new thread to appear before returning.
-		await expect(
-			this.#page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: `Note: ${ content }` } )
-		).toBeVisible();
+		await expect( this.getThread( content ) ).toBeVisible();
+	}
+
+	/**
+	 * Locates a note thread in the notes sidebar or floating notes.
+	 *
+	 * @param {string} content Text of the thread's root note.
+	 */
+	getThread( content ) {
+		return this.#getNotesSurface().getByRole( 'treeitem', {
+			name: `Note: ${ content }`,
+		} );
+	}
+
+	/**
+	 * Locates a snackbar notice.
+	 *
+	 * @param {string} text Text of the notice.
+	 */
+	getNotice( text ) {
+		return this.#page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: text } );
 	}
 
 	/**
@@ -125,9 +168,7 @@ class BlockNoteUtils {
 	 * @param {string} content Reply text.
 	 */
 	async addReply( content ) {
-		const sidebar = this.#page.getByRole( 'region', {
-			name: 'Editor settings',
-		} );
+		const sidebar = this.#getNotesSurface();
 		const replyForm = sidebar.getByRole( 'textbox', { name: 'Reply to' } );
 		// The reply form doesn't focus on mount.
 		await replyForm.click();
@@ -143,13 +184,13 @@ class BlockNoteUtils {
 	}
 
 	async clickBlockNoteActionMenuItem( actionName, index = 0 ) {
-		await this.#page
-			.getByRole( 'region', { name: 'Editor settings' } )
+		await this.#getNotesSurface()
 			.getByRole( 'button', { name: 'Actions' } )
 			.nth( index )
 			.click();
 		await this.#page.getByRole( 'menuitem', { name: actionName } ).click();
 	}
+
 	async addReactionToComment( emoji ) {
 		await this.#page
 			.getByRole( 'combobox', { name: 'Add reaction' } )
@@ -204,6 +245,21 @@ class BlockNoteUtils {
 			.first();
 		await expect( match ).toBeVisible();
 		await match.click();
+	}
+
+	/**
+	 * Deletes a note through its actions menu and waits for the delete to
+	 * finish.
+	 *
+	 * @param {number} [index] Index of the note's "Actions" button.
+	 */
+	async deleteNote( index = 0 ) {
+		await this.clickBlockNoteActionMenuItem( 'Delete', index );
+		await this.#page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Delete' } )
+			.click();
+		await expect( this.getNotice( 'Note deleted.' ) ).toBeVisible();
 	}
 }
 
