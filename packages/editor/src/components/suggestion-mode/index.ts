@@ -1,12 +1,9 @@
 export { isSuggestionModeEnabled, useCanSuggest } from './gate';
 export {
-	SuggestionOverlayProvider,
-	useSuggestionOverlay,
-	overlayReducer,
-	useOverlayEntry,
-	useSuggestionOverlayActions,
-	POST_TITLE_OVERLAY_KEY,
-} from './overlay-context';
+	SuggestionSessionProvider,
+	useSuggestionSession,
+	useSuggestionSessionActions,
+} from './suggestion-session';
 export {
 	default as withSuggestionOverlay,
 	registerSuggestionOverlayFilter,
