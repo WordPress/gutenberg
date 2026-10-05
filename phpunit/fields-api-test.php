@@ -1559,7 +1559,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertSame( array( 'color', 'size', 'weight' ), $registered, 'The field is registered anyway.' );
 		$this->assertCount( 1, $reported );
 		$this->assertStringContainsString( 'postType "page"', $reported[0], 'The notice names the entity.' );
-		$this->assertStringContainsString( ': size (interger).', $reported[0], 'The notice names the field and its type, not the others of the call.' );
+		$this->assertStringContainsString( ': size (type is not one of ', $reported[0], 'The notice names the field and the error of its type, not the others of the call.' );
 	}
 
 	/**

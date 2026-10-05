@@ -635,6 +635,7 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 		foreach ( array( 'id', 'origin', 'type', 'label', 'Edit', 'isValid', 'elements', 'filterBy', 'readOnly', 'format' ) as $property ) {
 			$this->assertArrayHasKey( $property, $field['properties'], "The `$property` field property should be described." );
 		}
+		$this->assertContains( 'text', $field['properties']['type']['enum'], 'The schema lists the field types DataViews provides.' );
 
 		$module = $schema['properties']['script_modules']['items'];
 		$this->assertSame( array( 'id', 'fields' ), array_keys( $module['properties'] ) );
