@@ -7,6 +7,7 @@ type StoryArgs = React.ComponentProps< typeof Progress.Root > &
 	Pick< React.ComponentProps< typeof Progress.Indicator >, 'color' >;
 
 const meta: Meta< StoryArgs > = {
+	tags: [ 'manifest' ],
 	title: 'Components/@wordpress-ui/Progress',
 	id: 'design-system-components-progress',
 	component: Progress.Root,

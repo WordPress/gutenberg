@@ -2,7 +2,6 @@ import type { Meta, StoryFn } from '@storybook/react-vite';
 import { ProgressBar } from '..';
 
 const meta: Meta< typeof ProgressBar > = {
-	tags: [ 'manifest' ],
 	component: ProgressBar,
 	title: 'Components/@wordpress-components/Feedback/ProgressBar',
 	id: 'components-progressbar',

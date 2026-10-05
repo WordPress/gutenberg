@@ -30,6 +30,33 @@ Pass `value={ null }` when the amount of completed work is unknown. Indeterminat
 
 <Canvas of={ ProgressStories.Indeterminate } />
 
+## Set the width for the layout
+
+`Progress.Track` fills the width of `Progress.Root`. Set a width or max-width on Root with `className` or `style` when the surrounding layout does not provide the intended width. Progress has no width presets.
+
+## Migrate from ProgressBar
+
+Replace `ProgressBar` from `@wordpress/components` with `Progress.Root`, `Progress.Track`, and `Progress.Indicator` from `@wordpress/ui`. Root requires a `value`. For indeterminate progress, pass `value={ null }` explicitly; ProgressBar allowed its value to be omitted.
+
+Give each task an accessible name with `Progress.Label`, `aria-label`, or `aria-labelledby`. Progress does not supply the generic loading label that ProgressBar used. To preserve ProgressBar's default 160px width, set that width on Root:
+
+```jsx
+import { Progress } from '@wordpress/ui';
+import { __ } from '@wordpress/i18n';
+
+<Progress.Root
+	value={ null }
+	aria-label={ __( 'Uploading files' ) }
+	style={ { width: '160px' } }
+>
+	<Progress.Track>
+		<Progress.Indicator />
+	</Progress.Track>
+</Progress.Root>;
+```
+
+Pass numeric values to Root for determinate progress. If an existing value can be `undefined`, convert it to `null` with `value={ value ?? null }`. Move any track styling to `Progress.Track`; `className` on Root styles the container. A ref on Root points to that container, a `div` by default, rather than ProgressBar's native `progress` element.
+
 ## Format values for the task
 
 `Progress.Value` displays a percentage by default. Use `format` and `locale` to change number formatting. For task-specific text, provide a child function to Value and use `getAriaValueText` on Root to give assistive technology the same information. Check whether the numeric value is `null` before displaying a completion amount.
