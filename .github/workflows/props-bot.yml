@@ -33,10 +33,11 @@ on:
 # is also what keeps two gathers from writing their lists out of order.
 concurrency:
     # Keyed by the pull request, which the four events carry in three different
-    # places. Two kinds of run stand apart, or they would cancel a refresh and
+    # places. Three kinds of run stand apart, or they would cancel a refresh and
     # then do nothing in its place: a label event that is not `props-bot`, whose
-    # jobs all skip, and a fork's review run, whose token cannot write.
-    group: ${{ github.workflow }}-${{ ( github.event.action != 'labeled' || github.event.label.name == 'props-bot' ) && ( ! startsWith( github.event_name, 'pull_request_review' ) || github.event.pull_request.head.repo.full_name == github.repository ) && ( github.event.number || github.event.issue.number || github.event.pull_request.number ) || github.run_id }}
+    # jobs all skip, a fork's review run, whose token cannot write, and a bare
+    # review, which arrives alongside the review comment that runs for it.
+    group: ${{ github.workflow }}-${{ ( github.event.action != 'labeled' || github.event.label.name == 'props-bot' ) && ( ! startsWith( github.event_name, 'pull_request_review' ) || github.event.pull_request.head.repo.full_name == github.repository ) && ( github.event_name != 'pull_request_review' || github.event.review.body || github.event.review.state != 'commented' ) && ( github.event.number || github.event.issue.number || github.event.pull_request.number ) || github.run_id }}
     cancel-in-progress: true
 
 # Disable permissions for all available scopes by default.
@@ -60,10 +61,13 @@ jobs:
         # - The `props-bot` label is added to the pull request.
         # A fork's review run is skipped rather than gathered and thrown away:
         # its token cannot write the comment at the end of it.
+        # A review with no body or verdict is skipped too: it only wraps inline
+        # comments, and each of those runs on its own.
         if: |
             (
               github.event_name == 'issue_comment' && github.event.issue.pull_request ||
-              contains( fromJSON( '["pull_request_review", "pull_request_review_comment"]' ), github.event_name ) && github.event.pull_request.head.repo.full_name == github.repository ||
+              github.event_name == 'pull_request_review_comment' && github.event.pull_request.head.repo.full_name == github.repository ||
+              github.event_name == 'pull_request_review' && github.event.pull_request.head.repo.full_name == github.repository && ( github.event.review.body || github.event.review.state != 'commented' ) ||
               github.event_name == 'pull_request_target' && github.event.action != 'labeled' ||
               'props-bot' == github.event.label.name
             ) &&
