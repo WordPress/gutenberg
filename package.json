@@ -110,6 +110,15 @@
 		},
 		"@y/websocket-server": {
 			"yjs": "npm:@y/y@^14.0.0-rc.7"
+		},
+		"eslint-plugin-import": {
+			"eslint": "^10.0.0"
+		},
+		"eslint-plugin-jsx-a11y": {
+			"eslint": "^10.0.0"
+		},
+		"eslint-plugin-react": {
+			"eslint": "^10.0.0"
 		}
 	},
 	"scripts": {
