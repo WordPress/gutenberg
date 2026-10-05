@@ -1,12 +1,12 @@
-# Suggestion Mode: Architecture Overview for Reviewers
+# Suggestion mode: Architecture Overview for Reviewers
 
-This page is the map. It explains how Suggestion Mode fits together across the whole nine-PR stack, which PR owns which part, and where the design is still moving. The detailed reference, with every module, payload field and known limitation, is [Suggestions Architecture](./suggestions.md).
+This page is the map. It explains how Suggestion mode fits together across the whole nine-PR stack, which PR owns which part, and where the design is still moving. The detailed reference, with every module, payload field and known limitation, is [Suggestions Architecture](./suggestions.md).
 
 Tracking issue: [#73411](https://github.com/WordPress/gutenberg/issues/73411). Try it: [Playground for the combined branch #78994](https://playground.wordpress.net/gutenberg.html?pr=78994).
 
 ## Short version
 
-**A suggestion is a pending change that lives in the post content, linked to a Note that carries its review thread.** A reviewer switches the editor to **Suggest**, edits normally, and every edit is captured as a suggestion instead of being applied. The post author **Accepts** or **Rejects** each one from the Notes sidebar.
+**A suggestion is a pending change that lives in the post content, linked to a Note that carries its review thread.** A reviewer switches the editor to **Suggesting** (Suggestion mode), edits normally, and every edit is captured as a suggestion instead of being applied. The post author **Accepts** or **Rejects** each one from the Notes sidebar.
 
 **There are three kinds of suggestion, and today each uses a different capture and storage path.** That split is the most important thing to understand before reading the code.
 
@@ -21,7 +21,7 @@ Tracking issue: [#73411](https://github.com/WordPress/gutenberg/issues/73411). T
 
 **Glossary**
 
-- **Intent**: Edit, Suggest or View. A session-only editor state, separate from the visual/code editor mode. Reloading always returns to Edit.
+- **Mode** (the `editorIntent` in code): Editing, Suggesting or Viewing, as in Google Docs. A session-only editor state, separate from the visual/code editor mode. Reloading always returns to Editing.
 - **Note**: a `note`-type comment (the Notes feature, GA in WordPress 6.9). A suggestion is a Note with a JSON payload in `_wp_suggestion` comment meta and a lifecycle in `_wp_suggestion_status`.
 - **Marker**: the in-content record of a pending suggestion. Inline markers are rich-text formats. Block markers live in `metadata.suggestion`. Both carry the Note's comment id.
 - **Overlay**: the in-memory store that holds attribute suggestions so they never touch the live block.
@@ -32,12 +32,12 @@ Tracking issue: [#73411](https://github.com/WordPress/gutenberg/issues/73411). T
 ```mermaid
 flowchart TB
     subgraph UI["Editor UI"]
-        Switcher["Intent switcher<br/>Edit / Suggest / View"]
+        Switcher["Mode switcher<br/>Editing / Suggesting / Viewing"]
         Canvas["Block canvas"]
         Sidebar["Notes sidebar<br/>summary + Accept / Reject"]
     end
 
-    subgraph Capture["Capture (Suggest intent only)"]
+    subgraph Capture["Capture (Suggestion mode only)"]
         Keyboards["Input keyboards<br/>beforeinput, cut, paste"]
         Reconciler["Content and format<br/>reconcilers"]
         HOC["withSuggestionOverlay<br/>setAttributes HOC"]
@@ -83,7 +83,7 @@ Nine PRs, each based on the one below it. Review bottom up, and comment on the P
 ```mermaid
 flowchart BT
     T["trunk"]
-    P1["1/9 #80427<br/>Editor intent + experiment gate"]
+    P1["1/9 #80427<br/>Editor mode + experiment gate"]
     P2["2/9 #80428<br/>Storage, REST, provider"]
     P3["3/9 #80429<br/>Block-level capture"]
     P4["4/9 #80430<br/>Inline marker primitive"]
@@ -97,7 +97,7 @@ flowchart BT
 
 | Layer | PR | What it owns | Where to look |
 | --- | --- | --- | --- |
-| 1 | [#80427](https://github.com/WordPress/gutenberg/pull/80427) Editor intent | Session-scoped `editorIntent` in `core/editor` (private `setEditorIntent` / `getEditorIntent`), the Edit / Suggest / View switcher in the Options menu, Google Docs shortcuts (Shift+Alt+Cmd+Z/X/C), View as read-only via `isPreviewMode`, the experiment gate `isSuggestionModeEnabled` / `useCanSuggest` | `editor/src/store/*`, `intent-switcher/`, `suggestion-mode/gate.ts` |
+| 1 | [#80427](https://github.com/WordPress/gutenberg/pull/80427) Editor mode (intent) | Session-scoped `editorIntent` in `core/editor` (private `setEditorIntent` / `getEditorIntent`), the Editing / Suggesting / Viewing switcher in the Options menu, Google Docs shortcuts (Shift+Alt+Cmd+Z/X/C), Viewing as read-only via `isPreviewMode`, the experiment gate `isSuggestionModeEnabled` / `useCanSuggest` | `editor/src/store/*`, `intent-switcher/`, `suggestion-mode/gate.ts` |
 | 2 | [#80428](https://github.com/WordPress/gutenberg/pull/80428) Storage, REST, provider | `_wp_suggestion` and `_wp_suggestion_status` meta (64 KB cap, KSES on block snapshots), the 7.1 REST comment controller subclass, the provider (create, update, apply, reject, schema versioning), the overlay store, the auto-save loop. No capture yet | `lib/compat/wordpress-7.1/block-suggestions.php`, `suggestion-mode/provider.ts`, `overlay-context.tsx`, `auto-save.ts` |
 | 3 | [#80429](https://github.com/WordPress/gutenberg/pull/80429) Block-level capture | Store interceptor (attribute drift and structural insert / remove / move, list indent and outdent), the `setAttributes` HOC, pending treatments and move ghosts, revert and undo guards, PHP structural strip and move-order restore | `suggestion-mode/store-interceptor.ts`, `with-suggestion-overlay.tsx`, `block-list/content-suggestion.scss` |
 | 4 | [#80430](https://github.com/WordPress/gutenberg/pull/80430) Inline marker primitive | Format-agnostic rich-text utilities shared with Notes: wrap a range, find a marker by id (the only offset resolver), read caret and selection, reconcile after edits, decorate via annotations | `editor/src/components/inline-markers/` |
@@ -160,7 +160,7 @@ The inline marker serializes as:
 
 ## Data flow: an inline text suggestion
 
-Typing in Suggest intent never lets the browser edit the text directly. The keyboard cancels the native input, opens a Note, then writes the marked text.
+Typing in Suggestion mode never lets the browser edit the text directly. The keyboard cancels the native input, opens a Note, then writes the marked text.
 
 ```mermaid
 sequenceDiagram
@@ -304,7 +304,7 @@ All of this lives in `lib/compat/wordpress-7.1/block-suggestions.php`. Permissio
 
 An architecture review on 2026-10-04 found the data model sound and the cost concentrated in the mechanism. Two changes from it are under way and will land in the owning layers:
 
-- **A2: attribute suggestions as content markers.** Approved design. The overlay stops being a persistence model. A new `pending-attributes` marker type stores the proposed values in `metadata.suggestion.after`, so attribute suggestions survive reload, sync over RTC and undo like the other two kinds. The table at the top becomes one column wide for storage. No schema, REST or PHP change. Visible change: the proposed value shows in Edit and View intent too.
+- **A2: attribute suggestions as content markers.** Approved design. The overlay stops being a persistence model. A new `pending-attributes` marker type stores the proposed values in `metadata.suggestion.after`, so attribute suggestions survive reload, sync over RTC and undo like the other two kinds. The table at the top becomes one column wide for storage. No schema, REST or PHP change. Visible change: the proposed value shows in Editing and Viewing modes too.
 - **A5: a real storage boundary.** `provider.ts` splits into a `SuggestionStore` (create, update, trash a Note, set its status: the swap point for a Yjs backend), a submission hook and a decision hook, with the pure operations in `operations/`.
 
 Other review findings are recorded but not scheduled:
