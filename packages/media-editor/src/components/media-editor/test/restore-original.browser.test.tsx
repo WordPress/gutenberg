@@ -5,11 +5,9 @@ import { cleanup, render } from 'vitest-browser-react';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '@wordpress/components/src/style.scss';
 import MediaEditor, { type MediaEditorFrameProps } from '../index';
 import type { Media } from '../../media-editor-provider';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '../../../style.scss';
 
 const original: Media = {
