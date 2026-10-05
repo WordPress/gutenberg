@@ -164,28 +164,6 @@ function getCssFontFaceRule(
 	if ( src ) {
 		declarations.push( `src: url( ${ createCssString( src.trim() ) } )` );
 	}
-	if ( fontFace.fontDisplay ) {
-		declarations.push( `font-display: ${ fontFace.fontDisplay }` );
-	}
-	if ( fontFace.fontStretch ) {
-		declarations.push( `font-stretch: ${ fontFace.fontStretch }` );
-	}
-	if ( fontFace.fontVariant ) {
-		declarations.push( `font-variant: ${ fontFace.fontVariant }` );
-	}
-	if ( fontFace.fontFeatureSettings ) {
-		declarations.push(
-			`font-feature-settings: ${ fontFace.fontFeatureSettings }`
-		);
-	}
-	if ( fontFace.fontVariationSettings ) {
-		declarations.push(
-			`font-variation-settings: ${ fontFace.fontVariationSettings }`
-		);
-	}
-	if ( fontFace.unicodeRange ) {
-		declarations.push( `unicode-range: ${ fontFace.unicodeRange }` );
-	}
 
 	const rule = insertCssFontFaceRule( fontFace.fontFamily, declarations );
 	if ( rule ) {
