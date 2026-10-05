@@ -2,8 +2,6 @@
  * Suggestion payload: the JSON stored in a note's `_wp_suggestion` meta.
  * Pure helpers to build, measure, parse and migrate it.
  */
-import type { SuggestionOperation } from '../suggestion-session';
-
 /**
  * A single suggestion operation.
  *
@@ -23,7 +21,10 @@ import type { SuggestionOperation } from '../suggestion-session';
  *                      summarize which formats changed.
  *   - `before`/`after` The baseline and proposed values (`attribute-set`).
  */
-export type { SuggestionOperation };
+export interface SuggestionOperation {
+	type: string;
+	[ key: string ]: any;
+}
 
 export interface SuggestionPayload {
 	/** Payload schema version. */

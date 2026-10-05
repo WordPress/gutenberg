@@ -31,7 +31,6 @@ export function planStructuralReject(
 		return {
 			steps: [
 				{ step: 'bypass', clientId },
-				{ step: 'clearOverlay', clientId },
 				{ step: 'removeBlock', clientId },
 			],
 			batched: [],
@@ -50,7 +49,6 @@ export function planStructuralReject(
 			{ step: 'updateBlockAttributes', clientId, attributes: clearAttrs }
 		);
 	}
-	steps.push( { step: 'clearOverlay', clientId } );
 	return { steps, batched: [] };
 }
 
@@ -146,10 +144,7 @@ function planMoveReject(
 				: reader.getBlockName( restoreParent ) )
 			? liveParent
 			: null;
-	steps.push(
-		{ step: 'bypass', clientId },
-		{ step: 'clearOverlay', clientId }
-	);
+	steps.push( { step: 'bypass', clientId } );
 	/*
 	 * Batch the marker-clear and the restoring move into ONE store update.
 	 * The interceptor recognizes a reject landing by their combination — a

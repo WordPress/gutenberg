@@ -98,7 +98,7 @@ export function useAnnotateSuggestionThreads( threads: any[] ) {
 	// which is why the strikethrough only appeared after toggling the code
 	// editor. Notes avoids this because it keeps a stored-offset fallback;
 	// suggestion markers are content-only, so the range must be re-derived
-	// reactively. Mirrors the `moveSignature` pattern in `overlay-context.js`.
+	// reactively. Mirrors the presence-signature pattern in `suggestion-note-gc.ts`.
 	const signature = useSelect(
 		( select ) =>
 			suggestionAnnotations(

@@ -42,7 +42,6 @@ export function planStructuralApply(
 		}
 		plan.steps.push(
 			{ step: 'bypass', clientId: targetClientId },
-			{ step: 'clearOverlay', clientId: targetClientId },
 			{ step: 'removeBlock', clientId: targetClientId }
 		);
 		return plan;
@@ -58,12 +57,11 @@ export function planStructuralApply(
 		//
 		// Attribute-set ops in the same payload represent edits the user
 		// made between the structural change and auto-save. They never
-		// reach the live block on the suggester's side — the interceptor
-		// reverts them into the overlay — so collaborators (and the
-		// suggester after a reload) see the live block in the captured
-		// shape (typically empty content for a fresh paragraph). Apply must
-		// materialize those edits on the live block, otherwise the
-		// inserted/moved block ends up in the wrong shape after acceptance.
+		// reach the live block on the suggester's side (the interceptor
+		// diverts them into the marker's proposal), so the live block is
+		// still in the captured shape. Apply must materialize those edits
+		// on the live block, otherwise the inserted/moved block ends up in
+		// the wrong shape after acceptance.
 		const withOpsApplied = applyOperations(
 			reader.getBlockAttributes( targetClientId ),
 			operations
@@ -77,8 +75,7 @@ export function planStructuralApply(
 				attributes: markerCleared
 					? { ...withOpsApplied, ...markerCleared }
 					: withOpsApplied,
-			},
-			{ step: 'clearOverlay', clientId: targetClientId }
+			}
 		);
 		return plan;
 	}
