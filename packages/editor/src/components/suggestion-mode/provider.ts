@@ -30,7 +30,6 @@ import {
 } from '../inline-suggestions';
 import { unlock } from '../../lock-unlock';
 import {
-	PAYLOAD_MAX_BYTES,
 	applyOperations,
 	applyPostOperations,
 	buildSuggestionPayload,
@@ -39,7 +38,6 @@ import {
 	findPostAttributeOps,
 	findStructuralOp,
 	parseSuggestionPayload,
-	payloadByteLength,
 	planStructuralApply,
 	planStructuralReject,
 	rollbackAttributesFor,
@@ -51,6 +49,7 @@ import type {
 	SuggestionPayload,
 } from './operations';
 import { withDecisionInFlight } from './decision-state';
+import { useSuggestionStore } from './suggestion-store';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
@@ -83,7 +82,7 @@ export function useSuggestionsProvider() {
 		};
 	}, [] );
 
-	const { saveEntityRecord } = useDispatch( coreStore );
+	const store = useSuggestionStore();
 	const { createNotice } = useDispatch( noticesStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
@@ -199,32 +198,10 @@ export function useSuggestionsProvider() {
 				operations,
 			} );
 
-			if ( payloadByteLength( payload ) > PAYLOAD_MAX_BYTES ) {
-				const error = new Error(
-					__( 'Suggestion is too large to save.' )
-				);
-				createNotice( 'error', error.message, {
-					type: 'snackbar',
-					isDismissible: true,
-				} );
-				throw error;
-			}
-
 			try {
-				const savedRecord: any = await saveEntityRecord(
-					'root',
-					'comment',
-					{
-						post: postId,
-						content: '',
-						status: 'hold',
-						type: 'note',
-						parent: 0,
-						meta: {
-							_wp_suggestion: JSON.stringify( payload ),
-						},
-					},
-					{ throwOnError: true }
+				const savedRecord: any = await store.createNote(
+					postId,
+					payload
 				);
 
 				// A post-level suggestion has no block to link.
@@ -276,7 +253,7 @@ export function useSuggestionsProvider() {
 		[
 			postId,
 			postModified,
-			saveEntityRecord,
+			store,
 			updateBlockAttributes,
 			markNextChangeAsNotPersistent,
 			selectBlockAttributes,
@@ -318,29 +295,8 @@ export function useSuggestionsProvider() {
 				operations,
 			} );
 
-			if ( payloadByteLength( payload ) > PAYLOAD_MAX_BYTES ) {
-				const error = new Error(
-					__( 'Suggestion is too large to save.' )
-				);
-				createNotice( 'error', error.message, {
-					type: 'snackbar',
-					isDismissible: true,
-				} );
-				throw error;
-			}
-
 			try {
-				return await saveEntityRecord(
-					'root',
-					'comment',
-					{
-						id: commentId,
-						meta: {
-							_wp_suggestion: JSON.stringify( payload ),
-						},
-					},
-					{ throwOnError: true }
-				);
+				return await store.updateNote( commentId, payload );
 			} catch ( error: any ) {
 				createNotice(
 					'error',
@@ -350,7 +306,7 @@ export function useSuggestionsProvider() {
 				throw error;
 			}
 		},
-		[ postModified, saveEntityRecord, createNotice ]
+		[ postModified, store, createNotice ]
 	);
 
 	/**
@@ -376,12 +332,7 @@ export function useSuggestionsProvider() {
 				return;
 			}
 			try {
-				await saveEntityRecord(
-					'root',
-					'comment',
-					{ id: commentId, status: 'trash' },
-					{ throwOnError: true }
-				);
+				await store.trashNote( commentId );
 
 				const metadata = clientId
 					? selectBlockAttributes( clientId )?.metadata
@@ -414,7 +365,7 @@ export function useSuggestionsProvider() {
 			}
 		},
 		[
-			saveEntityRecord,
+			store,
 			createNotice,
 			selectBlockAttributes,
 			updateBlockAttributes,
@@ -478,16 +429,7 @@ export function useSuggestionsProvider() {
 				}
 				try {
 					editPost( applyPostOperations( postOps ) );
-					await saveEntityRecord(
-						'root',
-						'comment',
-						{
-							id: commentId,
-							status: 'approved',
-							meta: { _wp_suggestion_status: 'applied' },
-						},
-						{ throwOnError: true }
-					);
+					await store.setLifecycleStatus( commentId, 'applied' );
 					clearOverlayForComment( POST_TITLE_OVERLAY_KEY, commentId );
 					if ( ! silent ) {
 						createNotice( 'success', __( 'Suggestion applied.' ), {
@@ -570,16 +512,7 @@ export function useSuggestionsProvider() {
 						[ attributeKey ]: nextValue,
 					} );
 
-					await saveEntityRecord(
-						'root',
-						'comment',
-						{
-							id: commentId,
-							status: 'approved',
-							meta: { _wp_suggestion_status: 'applied' },
-						},
-						{ throwOnError: true }
-					);
+					await store.setLifecycleStatus( commentId, 'applied' );
 
 					if ( ! silent ) {
 						createNotice( 'success', __( 'Suggestion applied.' ), {
@@ -624,16 +557,7 @@ export function useSuggestionsProvider() {
 					 * same invariant for free: a failed save leaves the
 					 * editor exactly as it was.
 					 */
-					await saveEntityRecord(
-						'root',
-						'comment',
-						{
-							id: commentId,
-							status: 'approved',
-							meta: { _wp_suggestion_status: 'applied' },
-						},
-						{ throwOnError: true }
-					);
+					await store.setLifecycleStatus( commentId, 'applied' );
 
 					const plan = planStructuralApply(
 						structuralOp,
@@ -681,16 +605,7 @@ export function useSuggestionsProvider() {
 				requestInterceptorBypass( targetClientId );
 				updateBlockAttributes( targetClientId, newAttributes );
 
-				await saveEntityRecord(
-					'root',
-					'comment',
-					{
-						id: commentId,
-						status: 'approved',
-						meta: { _wp_suggestion_status: 'applied' },
-					},
-					{ throwOnError: true }
-				);
+				await store.setLifecycleStatus( commentId, 'applied' );
 
 				// Reset the per-block suggestion tracking only once the
 				// decision is saved, so a failed save keeps the overlay
@@ -720,7 +635,7 @@ export function useSuggestionsProvider() {
 			return true;
 		},
 		[
-			saveEntityRecord,
+			store,
 			updateBlockAttributes,
 			selectBlockAttributes,
 			resolveTarget,
@@ -770,16 +685,7 @@ export function useSuggestionsProvider() {
 			 */
 			if ( findPostAttributeOps( payload?.operations ).length > 0 ) {
 				try {
-					await saveEntityRecord(
-						'root',
-						'comment',
-						{
-							id: commentId,
-							status: 'approved',
-							meta: { _wp_suggestion_status: 'rejected' },
-						},
-						{ throwOnError: true }
-					);
+					await store.setLifecycleStatus( commentId, 'rejected' );
 					clearOverlayForComment( POST_TITLE_OVERLAY_KEY, commentId );
 					if ( ! silent ) {
 						createNotice( 'success', __( 'Suggestion rejected.' ), {
@@ -852,16 +758,7 @@ export function useSuggestionsProvider() {
 							[ attributeKey ]: nextValue,
 						} );
 
-						await saveEntityRecord(
-							'root',
-							'comment',
-							{
-								id: commentId,
-								status: 'approved',
-								meta: { _wp_suggestion_status: 'rejected' },
-							},
-							{ throwOnError: true }
-						);
+						await store.setLifecycleStatus( commentId, 'rejected' );
 
 						if ( ! silent ) {
 							createNotice(
@@ -898,16 +795,7 @@ export function useSuggestionsProvider() {
 			const structuralOp = findStructuralOp( payload?.operations );
 
 			try {
-				await saveEntityRecord(
-					'root',
-					'comment',
-					{
-						id: commentId,
-						status: 'approved',
-						meta: { _wp_suggestion_status: 'rejected' },
-					},
-					{ throwOnError: true }
-				);
+				await store.setLifecycleStatus( commentId, 'rejected' );
 
 				/*
 				 * Undo the live-block change only once the decision is
@@ -954,7 +842,7 @@ export function useSuggestionsProvider() {
 			return true;
 		},
 		[
-			saveEntityRecord,
+			store,
 			createNotice,
 			selectBlockAttributes,
 			resolveTarget,
@@ -1015,9 +903,7 @@ export function useSuggestionsProvider() {
 						continue;
 					}
 					seen.add( String( noteId ) );
-					const comment: any = registry
-						.select( coreStore )
-						.getEntityRecord( 'root', 'comment', noteId );
+					const comment: any = store.getNote( noteId );
 					const status = comment?.meta?._wp_suggestion_status;
 					if ( status === 'applied' || status === 'rejected' ) {
 						continue;
@@ -1040,7 +926,7 @@ export function useSuggestionsProvider() {
 			}
 			return partners;
 		},
-		[ selectClientIdsWithDescendants, selectBlockAttributes, registry ]
+		[ selectClientIdsWithDescendants, selectBlockAttributes, store ]
 	);
 
 	/*
