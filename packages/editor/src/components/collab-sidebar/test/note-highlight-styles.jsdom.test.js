@@ -13,8 +13,9 @@ import {
 import { getAvatarBorderColor } from '../utils';
 
 const MARK_RESET = 'mark.wp-note{background-color:transparent;color:inherit;}';
-const FORCED_COLORS_RESET =
-	'@media (forced-colors: active){mark.wp-note{background-color:transparent;color:CanvasText;}}';
+const FORCED_COLORS_HIGHLIGHT =
+	'background-color:Mark;color:MarkText;text-decoration-color:MarkText;';
+const FORCED_COLORS_RESET = `@media (forced-colors: active){mark.wp-note{${ FORCED_COLORS_HIGHLIGHT }}}`;
 
 describe( 'buildHighlightCss', () => {
 	it( 'always emits the mark reset so the browser default yellow does not bleed through', () => {
@@ -22,31 +23,24 @@ describe( 'buildHighlightCss', () => {
 	} );
 
 	/*
-	 * Forced colors (e.g. Windows High Contrast) paints a `mark` with the
-	 * system highlight pair, which swamps the annotated text. Markers drop the
-	 * background there; `color` has to be restated because the forcing pins a
-	 * `mark` to `MarkText`, which is only legible against the background this
-	 * removes.
+	 * Forced colors (e.g. Windows High Contrast) drop the author tints, so a
+	 * marker falls back to the system `Mark`/`MarkText` pair. The base reset's
+	 * `transparent` survives the forcing, so the pair has to be restated.
 	 */
-	it( 'drops the marker background and restates the text color under forced colors', () => {
+	it( 'paints markers with the system highlight pair under forced colors', () => {
 		expect( buildHighlightCss( [] ) ).toContain( FORCED_COLORS_RESET );
-		expect( buildHighlightCss( [] ) ).not.toContain( 'MarkText' );
 	} );
 
 	/*
-	 * With the tint gone, something still has to say "this text carries a
-	 * note", and an outline is what survives the forcing - drawn in the system
-	 * text color, dashed to match the block-level fallback. Dropping the tint
-	 * belongs here rather than in the reset: the per-note rules outrank the
-	 * reset, so only a rule at their specificity, emitted after them, wins.
+	 * The per-note rules outrank the reset, so only a rule at their
+	 * specificity, emitted after them, swaps the tint for the system pair.
 	 */
-	it( 'drops the tint and marks each marker with a dashed outline under forced colors', () => {
+	it( 'swaps each marker tint for the system highlight pair under forced colors', () => {
 		const css = buildHighlightCss( [
 			{ id: 7, author: 1 },
 			{ id: 12, author: 3 },
 		] );
-		const forcedRule =
-			'@media (forced-colors: active){mark.wp-note[data-id="7"],mark.wp-note[data-id="12"]{background-color:transparent;text-decoration-color:CanvasText;outline:1.5px dashed;outline-offset:1px;}}';
+		const forcedRule = `@media (forced-colors: active){mark.wp-note[data-id="7"],mark.wp-note[data-id="12"]{${ FORCED_COLORS_HIGHLIGHT }}}`;
 		expect( css ).toContain( forcedRule );
 		// After the resting tint rules, which carry the same specificity.
 		expect( css.indexOf( forcedRule ) ).toBeGreaterThan(
@@ -59,7 +53,7 @@ describe( 'buildHighlightCss', () => {
 	} );
 
 	it( 'emits no per-marker forced-colors rule when there are no threads', () => {
-		expect( buildHighlightCss( [] ) ).not.toContain( 'outline' );
+		expect( buildHighlightCss( [] ) ).not.toContain( 'data-id' );
 	} );
 
 	it( 'tints each thread with its author color at the tint alpha (0x40)', () => {
@@ -318,8 +312,11 @@ describe( 'buildBlockHighlightCss', () => {
 		`[data-block="${ clientId }"].block-editor-rich-text__editable`;
 	const leafSelectorFor = ( clientId ) =>
 		`[data-block="${ clientId }"]:not(.block-editor-rich-text__editable):has(> [data-block]) .block-editor-rich-text__editable`;
+	const nestedSelectorFor = ( clientId ) =>
+		`[data-block="${ clientId }"]:not(.block-editor-rich-text__editable):not(:has(> [data-block])):not(:has(img,video,audio,iframe,canvas,object,embed)) .block-editor-rich-text__editable`;
 	const overlaySelectorFor = ( clientId ) =>
-		`[data-block="${ clientId }"]:not(.block-editor-rich-text__editable):not(.is-multi-selected):not(:has(> [data-block]))::after`;
+		`[data-block="${ clientId }"]:not(.block-editor-rich-text__editable):not(.is-multi-selected):not(:has(> [data-block])):not(:has(.block-editor-rich-text__editable))::after,` +
+		`[data-block="${ clientId }"]:not(.block-editor-rich-text__editable):not(.is-multi-selected):not(:has(> [data-block])):has(img,video,audio,iframe,canvas,object,embed)::after`;
 	const emptyContainerSelectorFor = ( clientId ) =>
 		`[data-block="${ clientId }"]:not(.block-editor-rich-text__editable):not(.is-multi-selected):has(> [data-block]):not(:has(.block-editor-rich-text__editable))::after`;
 
@@ -378,14 +375,31 @@ describe( 'buildBlockHighlightCss', () => {
 	} );
 
 	/*
+	 * Text blocks whose editables sit deeper in their own markup (a table's
+	 * cells, a code block's `<code>`) carry no media, so they get the text
+	 * treatment on those editables rather than the overlay an image gets.
+	 */
+	it( 'tints and underlines the nested editables of a media-free text block', () => {
+		const css = buildBlockHighlightCss( [
+			{ clientId: 'abc-1', id: 7, author: 1 },
+		] );
+		const color = getAvatarBorderColor( 1 );
+		expect( css ).toContain(
+			`${ nestedSelectorFor( 'abc-1' ) }{background-color:${ color }40;` +
+				'text-decoration-line:underline;'
+		);
+	} );
+
+	/*
 	 * A background behind a non-text block (an image, a container) is hidden by
 	 * the block's own content, so the same tint and rule are painted onto an
 	 * overlay above it instead - all the way around, since a non-text block has
 	 * no text baseline for a bottom edge to relate to. The overlay must ignore
 	 * pointer events or it would swallow every click on the block.
 	 *
-	 * A container with no editable text (a gallery, columns of images) has
-	 * nothing for the leaf rule to tint, so it takes the overlay too.
+	 * A block with no editable text, or with media beside its text (an image
+	 * and its caption), takes the overlay. So does a container with no editable
+	 * text (a gallery, columns of images), which the leaf rule cannot tint.
 	 *
 	 * The rule is a border, not a box-shadow: the editor's selection outline
 	 * sets `box-shadow` on the same `::after`, and the two must not compete.
@@ -404,15 +418,14 @@ describe( 'buildBlockHighlightCss', () => {
 	} );
 
 	/*
-	 * Forced colors strips background tints, which would leave an annotated
-	 * block with little marking. The dashed outline fallback survives (its
-	 * color is forced to the system text color), and dashed keeps it distinct
-	 * from the solid outline the editor draws on selection. The forcing already
-	 * paints the underline in the system text color; it is restated so the
-	 * intent is visible. The overlay's border is dropped so it does not become
-	 * a second, solid ring beside the dashed outline.
+	 * Forced colors strips background tints, so annotated text takes the
+	 * system `Mark`/`MarkText` pair and every annotated block gets a dashed
+	 * outline - the only marking an overlaid block has left, and dashed so it
+	 * stays distinct from the solid outline the editor draws on selection. The
+	 * overlay's border is dropped so it does not become a second, solid ring
+	 * beside the dashed outline.
 	 */
-	it( 'falls back to a dashed outline and a system-colored underline under forced colors', () => {
+	it( 'falls back to the system highlight pair and a dashed outline under forced colors', () => {
 		const css = buildBlockHighlightCss( [
 			{ clientId: 'abc-1', id: 7, author: 1 },
 			{ clientId: 'abc-2', id: 12, author: 3 },
@@ -421,9 +434,11 @@ describe( 'buildBlockHighlightCss', () => {
 			'@media (forced-colors: active){[data-block="abc-1"],[data-block="abc-2"]{outline:1.5px dashed;outline-offset:2px;}' +
 				`${ textSelectorFor( 'abc-1' ) },${ leafSelectorFor(
 					'abc-1'
-				) },${ textSelectorFor( 'abc-2' ) },${ leafSelectorFor(
+				) },${ nestedSelectorFor( 'abc-1' ) },${ textSelectorFor(
 					'abc-2'
-				) }{text-decoration-color:CanvasText;}` +
+				) },${ leafSelectorFor( 'abc-2' ) },${ nestedSelectorFor(
+					'abc-2'
+				) }{${ FORCED_COLORS_HIGHLIGHT }}` +
 				`${ overlaySelectorFor( 'abc-1' ) },${ emptyContainerSelectorFor(
 					'abc-1'
 				) },${ overlaySelectorFor(
@@ -450,9 +465,9 @@ describe( 'buildBlockHighlightCss', () => {
 		]
 			.map( ( [ , alpha ] ) => alpha )
 			.filter( Boolean );
-		// One tint per treatment (text root + container leaves + overlay) per
-		// block, all at 0x40.
-		expect( alphas ).toEqual( [ '40', '40', '40', '40', '40', '40' ] );
+		// One tint per treatment (text root + container leaves + nested
+		// editables + overlay) per block, all at 0x40.
+		expect( alphas ).toEqual( Array( 8 ).fill( '40' ) );
 	} );
 
 	it( 'escapes quotes and backslashes in the client id', () => {
