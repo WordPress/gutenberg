@@ -30,5 +30,8 @@
 		"@wordpress/views": "file:../../packages/views",
 		"change-case": "^4.1.2",
 		"clsx": "^2.1.1"
+	},
+	"devDependencies": {
+		"@types/react": "^18.3.27"
 	}
 }
