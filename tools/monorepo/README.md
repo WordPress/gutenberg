@@ -31,7 +31,7 @@ See the TypeScript section of [`packages/README.md`](../../packages/README.md) f
 
 ## VS Code settings
 
-`npm run --workspace @wordpress/monorepo-tools install-vscode-settings` copies `.vscode/settings.dist.jsonc` to `.vscode/settings.json`, unless that file no longer starts with the managed comments. A VS Code task runs it when the folder opens.
+`npm run --workspace @wordpress/monorepo-tools install-vscode-settings` copies `.vscode/settings.dist.jsonc` to `.vscode/settings.json`, unless that file no longer starts with `// This is a managed VS Code settings file.` A VS Code task runs it when the folder opens.
 
 ## Admin design tokens experiment
 

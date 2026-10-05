@@ -1,6 +1,6 @@
 // This is a managed VS Code settings file.
-// It is copied into place by `tools/monorepo/scripts/install-vscode-settings.mts`.
-// If you no longer want the settings managed, remove these comments.
+// While the first line is present, opening the folder replaces this file with `.vscode/settings.dist.jsonc`.
+// To customize these settings and keep your changes, delete the first line.
 {
 	// Define schema to allow auto-completion.
 	"$schema": "vscode://schemas/settings/workspace",
