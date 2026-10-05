@@ -29,11 +29,14 @@ on:
         types:
             - created
 
-# Cancels all previous workflow runs for pull requests that have not completed.
+# Cancels all previous runs for a pull request that have not completed, which
+# is also what keeps two gathers from writing their lists out of order.
 concurrency:
-    # The concurrency group contains the workflow name and the branch name for pull requests
-    # or the commit hash for any other events.
-    group: ${{ github.workflow }}-${{ contains( fromJSON( '["pull_request_target", "pull_request_review", "pull_request_review_comment"]' ), github.event_name ) && github.head_ref || github.sha }}
+    # Keyed by the pull request, which the four events carry in three different
+    # places. Two kinds of run stand apart, or they would cancel a refresh and
+    # then do nothing in its place: a label event that is not `props-bot`, whose
+    # jobs all skip, and a fork's review run, whose token cannot write.
+    group: ${{ github.workflow }}-${{ ( github.event.action != 'labeled' || github.event.label.name == 'props-bot' ) && ( ! startsWith( github.event_name, 'pull_request_review' ) || github.event.pull_request.head.repo.full_name == github.repository ) && ( github.event.number || github.event.issue.number || github.event.pull_request.number ) || github.run_id }}
     cancel-in-progress: true
 
 # Disable permissions for all available scopes by default.
@@ -41,50 +44,155 @@ concurrency:
 permissions: {}
 
 jobs:
-    # Compiles a list of props for a pull request.
-    #
-    # Performs the following steps:
-    # - Collects a list of contributor props and leaves a comment.
-    # - Removes the props-bot label, if necessary.
-    props-bot:
-        name: Generate a list of props
+    pull-request:
+        name: Resolve the pull request target
         runs-on: 'ubuntu-24.04'
         permissions:
-            # The action needs permission `write` permission for PRs in order to add a comment.
-            pull-requests: write
-            contents: read
-        timeout-minutes: 20
+            pull-requests: read
+        timeout-minutes: 5
+        outputs:
+            base-ref: ${{ steps.pull-request.outputs.result }}
         # The job will run when pull requests are open, ready for review and:
         #
         # - A comment is added to the pull request.
         # - A review is created or commented on.
         # - The pull request is opened, synchronized, marked ready for review, or reopened.
         # - The `props-bot` label is added to the pull request.
+        # A fork's review run is skipped rather than gathered and thrown away:
+        # its token cannot write the comment at the end of it.
         if: |
             (
               github.event_name == 'issue_comment' && github.event.issue.pull_request ||
-              contains( fromJSON( '["pull_request_review", "pull_request_review_comment"]' ), github.event_name ) ||
+              contains( fromJSON( '["pull_request_review", "pull_request_review_comment"]' ), github.event_name ) && github.event.pull_request.head.repo.full_name == github.repository ||
               github.event_name == 'pull_request_target' && github.event.action != 'labeled' ||
               'props-bot' == github.event.label.name
             ) &&
             ( ! github.event.pull_request.draft && github.event.pull_request.state == 'open' || ! github.event.issue.draft && github.event.issue.state == 'open' )
 
         steps:
-            - name: Gather a list of contributors
-              uses: WordPress/props-bot-action@trunk
-
-            - name: Remove the props-bot label
-              uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
-              if: ${{ github.event.action == 'labeled' && 'props-bot' == github.event.label.name }}
-              env:
-                  ISSUE_NUMBER: ${{ github.event.number }}
+            # issue_comment does not carry the target branch. Read the current
+            # target for every event so both writers use the same decision.
+            - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+              id: pull-request
               with:
-                  retries: 2
-                  retry-exempt-status-codes: 418
+                  result-encoding: string
                   script: |
-                      github.rest.issues.removeLabel({
-                        owner: context.repo.owner,
-                        repo: context.repo.repo,
-                        issue_number: process.env.ISSUE_NUMBER,
-                        name: 'props-bot'
-                      });
+                      const { data } = await github.rest.pulls.get( {
+                        ...context.repo,
+                        pull_number: context.issue.number,
+                      } );
+                      return data.base.ref;
+
+    # Collects a list of contributor props for the PR meta comment to post.
+    props-bot:
+        name: Generate a list of props
+        needs: pull-request
+        if: ${{ needs.pull-request.outputs.base-ref == github.event.repository.default_branch }}
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            # Read is enough: the action posts nothing, see `post-comment`.
+            pull-requests: read
+            contents: read
+        timeout-minutes: 20
+        outputs:
+            comment-body: ${{ steps.props.outputs.comment-body }}
+
+        steps:
+            - name: Gather a list of contributors
+              id: props
+              uses: WordPress/props-bot-action@6ff24f6b95fee6aeee3f49a8365cb62a525b2ce7 # trunk
+              with:
+                  # The PR meta comment carries the list, so the action renders
+                  # it to an output and posts nothing itself.
+                  post-comment: false
+
+    # Other branches retain standalone props until their shared writers have
+    # been updated. Otherwise the base gate would discard every fresh list.
+    standalone-props:
+        name: Update the standalone props comment
+        needs: pull-request
+        if: ${{ needs.pull-request.outputs.base-ref != github.event.repository.default_branch }}
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            pull-requests: write
+            contents: read
+        timeout-minutes: 20
+
+        steps:
+            - uses: WordPress/props-bot-action@6ff24f6b95fee6aeee3f49a8365cb62a525b2ce7 # trunk
+              with:
+                  post-comment: true
+
+    pr-meta:
+        name: Update PR meta comment
+        needs: props-bot
+        # Only when the list was gathered: an empty body from a failed run would
+        # clear a props list nothing had disproved.
+        if: ${{ needs.props-bot.result == 'success' }}
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+            pull-requests: write
+        timeout-minutes: 5
+        # Shared with every other writer of this comment. See bundle-size.yml.
+        # This workflow runs on four events, and only some of them carry the
+        # pull request at the same place in the payload.
+        concurrency:
+            group: pr-meta-${{ github.event.number || github.event.issue.number || github.event.pull_request.number }}
+            cancel-in-progress: false
+            queue: max
+
+        steps:
+            # This job holds a writable token, and the review events check out
+            # `refs/pull/N/merge` by default, which carries the pull request's
+            # own code. Pin the action to the default branch so a pull request
+            # cannot supply the code that runs here.
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  ref: ${{ github.event.repository.default_branch }}
+                  sparse-checkout: tools/pr-meta
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Render the props list
+              env:
+                  # Through the environment, never interpolated into the script.
+                  BODY: ${{ needs.props-bot.outputs.comment-body }}
+              run: |
+                  mkdir -p pr-meta
+                  : > pr-meta/body.md
+
+                  # No contributors, so an empty body clears the section rather
+                  # than leaving one that holds nothing but the note.
+                  if [ -z "$BODY" ]; then
+                    exit 0
+                  fi
+
+                  # Drop the intro wherever it sits: it is what the standalone
+                  # props bot searches for, and it would find this comment. Its
+                  # note about refreshing goes back in wording that will not.
+                  printf '%s\n' "$BODY" | sed '/^The following accounts have interacted/d' > pr-meta/body.md
+
+                  cat >> pr-meta/body.md <<'EOF'
+
+                  _Updated as activity occurs, without notifying anyone named here. Add the `props-bot` label to refresh._
+                  EOF
+
+            - uses: ./tools/pr-meta
+              with:
+                  repo-token: ${{ secrets.GITHUB_TOKEN }}
+                  section: props
+                  body-path: pr-meta/body.md
+                  # The action comes from the default branch, which need not
+                  # yet know where each of the four events carries this.
+                  pr-number: ${{ github.event.number || github.event.issue.number || github.event.pull_request.number }}
+                  # This workflow also runs from the default branch for a pull
+                  # request targeting a release branch, whose own writers are
+                  # older and would re-cut the section. They need the action
+                  # before this section may appear there.
+                  require-base: ${{ github.event.repository.default_branch }}
+                  # Retires the standalone comment on pull requests open before
+                  # this landed, so no one copies its list once it stops moving.
+                  # Editing a comment notifies nobody, so an unlinked
+                  # contributor is no longer pinged by this list.
+                  retire-comments-matching: 'The following accounts have interacted'
