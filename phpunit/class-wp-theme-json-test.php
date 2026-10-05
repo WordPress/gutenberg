@@ -4995,6 +4995,63 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameCSS( $expected, $root_rules . $style_rules );
 	}
 
+	/**
+	 * Root padding custom properties are used inside `clamp()` and `calc()`,
+	 * so a unitless zero must be output with a unit.
+	 *
+	 * @ticket https://github.com/WordPress/gutenberg/issues/67837
+	 *
+	 * @dataProvider data_root_padding_zero_values
+	 *
+	 * @param string|int $padding  Root padding value in theme.json.
+	 * @param string     $expected Expected value of the custom property.
+	 */
+	public function test_root_padding_custom_properties_always_have_a_unit( $padding, $expected ) {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'   => array(
+					'spacing' => array(
+						'padding' => array(
+							'top'    => $padding,
+							'right'  => $padding,
+							'bottom' => $padding,
+							'left'   => $padding,
+						),
+					),
+				),
+				'settings' => array(
+					'useRootPaddingAwareAlignments' => true,
+				),
+			)
+		);
+
+		$metadata = array(
+			'path'     => array( 'styles' ),
+			'selector' => 'body',
+		);
+
+		$styles = $theme_json->get_styles_for_block( $metadata );
+		foreach ( array( 'top', 'right', 'bottom', 'left' ) as $side ) {
+			$this->assertStringContainsString( "--wp--style--root--padding-$side: $expected;", $styles );
+		}
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_root_padding_zero_values() {
+		return array(
+			'unitless zero string' => array( '0', '0px' ),
+			'zero integer'         => array( 0, '0px' ),
+			'zero with a unit'     => array( '0px', '0px' ),
+			'non-zero with a unit' => array( '12px', '12px' ),
+			'preset reference'     => array( 'var:preset|spacing|50', 'var(--wp--preset--spacing--50)' ),
+		);
+	}
+
 	public function test_get_styles_for_block_without_padding_aware_alignments() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
