@@ -38,14 +38,14 @@ export {
 } from './reveal-selected-suggestion';
 export { useSuggestionsProvider } from './provider';
 export {
-	operationsFromOverlay,
+	operationsFromMarker,
 	applyOperations,
 	hasAttributeConflict,
 	parseSuggestionPayload,
 	payloadByteLength,
 	findStructuralOp,
 	findPostAttributeOps,
-	postOperationsFromOverlay,
+	postOperationsFromTitle,
 	clearSuggestionMarkerAttributes,
 	PAYLOAD_MAX_BYTES,
 	SCHEMA_VERSION,

@@ -1,5 +1,5 @@
 /**
- * Pure functions over block attributes: diffing an overlay into operations,
+ * Pure functions over block attributes: diffing a proposal into operations,
  * applying operations, detecting conflicts and clearing the pending marker.
  */
 import type { SuggestionOperation } from './payload';
@@ -83,29 +83,27 @@ export function isAttributeEqual( a: any, b: any ): boolean {
 }
 
 /**
- * Build attribute-set operations by diffing an overlay entry against its
- * captured baseline. Attributes whose value differs are emitted; unchanged
- * or absent keys are skipped.
+ * Build attribute-set operations from a block's proposal: one op per
+ * proposed attribute whose value differs from the live (baseline) value.
+ * Unchanged or absent keys are skipped.
  *
- * @param baselineAttributes Attributes captured on first edit.
- * @param overlayAttributes  Pending attribute changes.
+ * @param liveAttributes The block's live attributes (the baseline).
+ * @param after          The marker's proposed attributes.
  * @return Operations describing the suggestion.
  */
-export function operationsFromOverlay(
-	baselineAttributes: Record< string, any > | null | undefined,
-	overlayAttributes: Record< string, any > | null | undefined
+export function operationsFromMarker(
+	liveAttributes: Record< string, any > | null | undefined,
+	after: Record< string, any > | null | undefined
 ): SuggestionOperation[] {
 	const operations: SuggestionOperation[] = [];
-	for ( const [ attribute, after ] of Object.entries(
-		overlayAttributes || {}
-	) ) {
-		const before = baselineAttributes?.[ attribute ];
-		if ( ! isAttributeEqual( before, after ) ) {
+	for ( const [ attribute, proposed ] of Object.entries( after || {} ) ) {
+		const before = liveAttributes?.[ attribute ];
+		if ( ! isAttributeEqual( before, proposed ) ) {
 			operations.push( {
 				type: 'attribute-set',
 				attribute,
 				before: before ?? null,
-				after,
+				after: proposed,
 			} );
 		}
 	}
@@ -113,20 +111,28 @@ export function operationsFromOverlay(
 }
 
 /**
- * Build `post-attribute-set` operations from a post-level overlay entry.
+ * Build the `post-attribute-set` operation for a proposed post title.
  *
- * @param baseline Post fields captured on first edit.
- * @param overlay  Proposed post fields.
- * @return Operations describing the suggestion.
+ * @param proposal The session's title proposal.
+ * @return Operations describing the suggestion (empty when nothing changed).
  */
-export function postOperationsFromOverlay(
-	baseline: Record< string, any > | null | undefined,
-	overlay: Record< string, any > | null | undefined
+export function postOperationsFromTitle(
+	proposal: { baseline: string; proposed: string } | null | undefined
 ): SuggestionOperation[] {
-	return operationsFromOverlay( baseline, overlay ).map( ( op ) => ( {
-		...op,
-		type: POST_ATTRIBUTE_OP_TYPE,
-	} ) );
+	if (
+		! proposal ||
+		isAttributeEqual( proposal.baseline, proposal.proposed )
+	) {
+		return [];
+	}
+	return [
+		{
+			type: POST_ATTRIBUTE_OP_TYPE,
+			attribute: 'title',
+			before: proposal.baseline,
+			after: proposal.proposed,
+		},
+	];
 }
 
 /**
