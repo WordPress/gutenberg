@@ -723,7 +723,7 @@ function isNpmPackageVersionMissing( error ) {
 }
 
 /**
- * Parses npm JSON command output for a single package.
+ * Parses npm JSON command output.
  *
  * @param {string} output      Command stdout.
  * @param {string} description Output description for error messages.
@@ -731,16 +731,13 @@ function isNpmPackageVersionMissing( error ) {
  * @return {*} Parsed JSON output.
  */
 function parseNpmJsonOutput( output, description ) {
-	let parsed;
 	try {
-		parsed = JSON.parse( output );
+		return JSON.parse( output );
 	} catch {
 		throw new Error(
 			`Unable to parse npm registry ${ description }: ${ output }`
 		);
 	}
-	/* npm v12 always wraps `view --json` in an array; older versions return the object. */
-	return Array.isArray( parsed ) ? parsed[ 0 ] : parsed;
 }
 
 /**
@@ -777,7 +774,7 @@ async function runNpmPublishPreflight(
 	// TODO: Consider bounded concurrency here if this preflight becomes too slow.
 	// Keep registry checks sequential so errors stay easy to read.
 	for ( const { name, version } of releasePackages ) {
-		let registryPackage;
+		let registryOutput;
 		try {
 			const { stdout } = await commandFn(
 				`npm view ${ name }@${ version } version gitHead dist-tags --json`,
@@ -786,7 +783,7 @@ async function runNpmPublishPreflight(
 					stdio: 'pipe',
 				}
 			);
-			registryPackage = parseNpmJsonOutput(
+			registryOutput = parseNpmJsonOutput(
 				stdout,
 				`${ name }@${ version } metadata`
 			);
@@ -797,11 +794,21 @@ async function runNpmPublishPreflight(
 			throw error;
 		}
 
+		/* npm v12 always returns an array; older versions return an object for a single match. */
+		const registryPackages = Array.isArray( registryOutput )
+			? registryOutput
+			: [ registryOutput ];
+		if ( registryPackages.length !== 1 ) {
+			throw new Error(
+				`Expected npm registry lookup for ${ name }@${ version } to return one version, got ${ registryPackages.length }.`
+			);
+		}
+
 		const {
 			version: registryVersion,
 			gitHead: registryGitHead,
 			'dist-tags': distTags = {},
-		} = registryPackage;
+		} = registryPackages[ 0 ];
 		if ( registryVersion !== version ) {
 			throw new Error(
 				`Expected npm registry lookup for ${ name }@${ version } to return version ${ version }, got ${ registryVersion }.`

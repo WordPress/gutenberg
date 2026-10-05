@@ -15,6 +15,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
+import { readNpmPackResult } from './read-npm-pack-result.mjs';
 
 const { values } = parseArgs( {
 	options: {
@@ -45,7 +46,7 @@ const env = {
 delete env.NODE_OPTIONS;
 delete env.NODE_PATH;
 
-function run( command, args, cwd = consumer ) {
+function execute( command, args, cwd ) {
 	const result = spawnSync( command, args, {
 		cwd,
 		env,
@@ -62,6 +63,10 @@ function run( command, args, cwd = consumer ) {
 			result.stderr
 		}`
 	);
+	return result;
+}
+function run( command, args, cwd = consumer ) {
+	const result = execute( command, args, cwd );
 	return result.stdout + result.stderr;
 }
 function write( name, content ) {
@@ -104,24 +109,19 @@ function pack( name ) {
 		path.join( staging, 'package.json' ),
 		JSON.stringify( manifest )
 	);
-	const output = JSON.parse(
-		run(
-			'npm',
-			[
-				'pack',
-				staging,
-				'--json',
-				'--ignore-scripts',
-				'--pack-destination',
-				directory,
-			],
-			directory
-		)
+	const { stdout } = execute(
+		'npm',
+		[
+			'pack',
+			staging,
+			'--json',
+			'--ignore-scripts',
+			'--pack-destination',
+			directory,
+		],
+		directory
 	);
-	/* npm v12 keys `pack --json` output by package name; older versions return an array. */
-	const [ packed ] = Array.isArray( output )
-		? output
-		: Object.values( output );
+	const packed = readNpmPackResult( stdout, manifest.name );
 	return `file:${ path.join( directory, packed.filename ) }`;
 }
 const scripts = values.scripts ?? pack( 'scripts' );

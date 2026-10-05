@@ -584,6 +584,40 @@ describe( 'runNpmPublishPreflight', () => {
 		}
 	);
 
+	it.each( [
+		[ 'no versions', '[]', 0 ],
+		[
+			'more than one version',
+			'[{"version":"4.50.0","gitHead":"publish-sha"},{"version":"4.50.1","gitHead":"other-sha"}]',
+			2,
+		],
+	] )(
+		'fails when npm view returns %s',
+		async ( _description, stdout, count ) => {
+			const commandFn = vi
+				.fn()
+				.mockResolvedValueOnce( WHOAMI )
+				.mockResolvedValueOnce( { stdout } );
+
+			await expect(
+				runNpmPublishPreflight(
+					{
+						distTag: 'latest',
+						gitWorkingDirectoryPath: '/repo',
+						publishCommit: 'publish-sha',
+						releasePackages: [
+							{ name: '@wordpress/a11y', version: '4.50.0' },
+						],
+					},
+					{ commandFn }
+				)
+			).rejects.toThrow(
+				`Expected npm registry lookup for @wordpress/a11y@4.50.0 to return one version, got ${ count }.`
+			);
+			expect( console ).toHaveLogged();
+		}
+	);
+
 	it( 'fails when a published version came from another commit', async () => {
 		const commandFn = vi
 			.fn()
