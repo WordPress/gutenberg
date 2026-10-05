@@ -16,6 +16,8 @@
 
 ### Bug Fixes
 
+-   Keep `no-unknown-ds-tokens` compatible with theme versions that export a flat token list as well as versions that export token metadata ([#76604](https://github.com/WordPress/gutenberg/pull/76604)).
+
 -   Update `typescript-eslint` to `^8.70.1`, whose peer range includes TypeScript 6.0 ([#83754](https://github.com/WordPress/gutenberg/pull/83754)).
 
 ## 27.0.0 (2026-09-23)
