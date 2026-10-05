@@ -590,13 +590,13 @@ test.describe( 'Page List', () => {
 			// The extensible site editor keeps the selection in the URL, so
 			// the checkbox only flips once the route has re-rendered.
 			const bulkActions = table.getByRole( 'cell', {
-				name: /Items selected/,
+				name: /items selected/,
 			} );
 			await expect(
 				bulkActions.getByRole( 'checkbox', { name: 'Deselect all' } )
 			).toBeChecked();
 			await bulkActions
-				.getByRole( 'button', { name: 'Quick Edit' } )
+				.getByRole( 'button', { name: 'Bulk edit' } )
 				.click();
 
 			const modal = page.locator( '.dataviews-action-modal__quick-edit' );

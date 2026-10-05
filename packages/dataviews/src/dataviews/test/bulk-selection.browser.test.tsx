@@ -2,12 +2,10 @@ import { render } from 'vitest-browser-react';
 import { page, userEvent } from 'vitest/browser';
 import { afterEach, beforeEach, expect, it } from 'vitest';
 import { useState } from '@wordpress/element';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports -- This browser regression needs the real design tokens to render checkbox targets.
 import '@wordpress/theme/design-tokens.css';
 import DataViews from '../index';
 import type { Action, Field, View } from '../../types';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports -- Load the table overlay stylesheet to catch hidden column headers and obscured focus.
 import '../../style.scss';
 
 const initialViewport = {
