@@ -26,6 +26,8 @@ const TREE_QUERY = { ...BASE_QUERY, _fields: 'id,name,parent', per_page: -1 };
 
 const MAX_TERMS_TO_LIST = 100;
 const MAX_SEARCH_RESULTS = 20;
+// The largest `per_page` the REST API accepts.
+const MAX_PER_PAGE = 100;
 
 /**
  * Matches items by term id.
@@ -231,6 +233,7 @@ function TaxonomyItem( {
 		() => ( tree ? getTreeItems( tree ) : EMPTY_MAP ),
 		[ tree ]
 	);
+	const oppositeTermsCount = oppositeTermIds.length;
 	const { listedTerms, listHasResolved } = useSelect(
 		( select ) => {
 			if ( isHierarchical || ! hasOpened ) {
@@ -239,14 +242,20 @@ function TaxonomyItem( {
 			const { getEntityRecords, hasFinishedResolution } =
 				select( coreStore );
 
+			// The opposite control's terms are filtered out of the list
+			// below, so fetch as many more terms to make up for them.
+			const perPage = Math.min(
+				( search ? MAX_SEARCH_RESULTS : MAX_TERMS_TO_LIST ) +
+					oppositeTermsCount,
+				MAX_PER_PAGE
+			);
 			const selectorArgs = [
 				'taxonomy',
 				taxonomy.slug,
 				{
 					...FLAT_QUERY,
-					...( search
-						? { search, per_page: MAX_SEARCH_RESULTS }
-						: { per_page: MAX_TERMS_TO_LIST } ),
+					...( search && { search } ),
+					per_page: perPage,
 				},
 			];
 			return {
@@ -257,7 +266,7 @@ function TaxonomyItem( {
 				),
 			};
 		},
-		[ isHierarchical, hasOpened, search, taxonomy.slug ]
+		[ isHierarchical, hasOpened, search, taxonomy.slug, oppositeTermsCount ]
 	);
 	const [ lastListedTerms, setLastListedTerms ] = useState( EMPTY_ARRAY );
 	useEffect( () => {
