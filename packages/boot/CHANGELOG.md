@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Show the mobile navigation drawer over a route's custom canvas when the route has no stage.
+
 ## 0.25.0 (2026-10-20)
 
 ### Breaking Changes
