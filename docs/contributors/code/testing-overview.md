@@ -190,6 +190,8 @@ Vitest resets mock implementations and call history, restores spies, resets stub
 
 ### Expected console calls
 
+Gutenberg's internal Vitest setup clears `@wordpress/deprecated`'s logged-message history before each test. A message still logs only once within a test. Suites do not need their own deprecation-history cleanup. To suppress a known deprecation in behavior tests, set its `logged` entry in `beforeEach` and delete that entry in the test that asserts the warning.
+
 Gutenberg's internal Vitest setup fails a test when `console.error`, `console.warn`, `console.info`, or `console.log` has calls that the test did not explicitly expect. Use `toHaveErroredWith`, `toHaveWarnedWith`, `toHaveInformedWith`, or `toHaveLoggedWith` with specific arguments. Asymmetric matchers such as `expect.objectContaining` are supported.
 
 ```js
