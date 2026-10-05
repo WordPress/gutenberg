@@ -11,6 +11,8 @@ import { useEffect, useRef, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { __experimentalUseSlotFills as useSlotFills } from '@wordpress/components';
 import {
 	useMergeRefs,
 	useResizeObserver,
@@ -21,6 +23,7 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import EditTemplateBlocksNotification from './edit-template-blocks-notification';
 import ResizableEditor from '../resizable-editor';
+import { CanvasMargin, getCanvasMarginCSS } from './canvas-margin';
 import useSelectNearestEditableBlock from './use-select-nearest-editable-block';
 import {
 	NAVIGATION_POST_TYPE,
@@ -139,6 +142,7 @@ function VisualEditor( {
 		styles,
 		hasCanvasWidth,
 		canvasWidth,
+		areNotesMinimized,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
@@ -192,6 +196,9 @@ function VisualEditor( {
 			styles: editorSettings.styles,
 			hasCanvasWidth: _canvasWidth !== undefined,
 			canvasWidth: _canvasWidth,
+			areNotesMinimized:
+				select( preferencesStore ).get( 'core', 'notesDisplayMode' ) ===
+				'minimized',
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -397,6 +404,15 @@ function VisualEditor( {
 		? getCanvasHeight( canvasWidth, containerSize )
 		: '100%';
 
+	// A resizable canvas (device preview) or a scaled one (zoom out) has no
+	// margin.
+	const hasCanvasMargin = ! isPreview && ! isZoomedOut && ! enableResizing;
+	const hasCanvasMarginFill = !! useSlotFills( CanvasMargin.name )?.length;
+	const canvasMarginCSS =
+		hasCanvasMargin && hasCanvasMarginFill
+			? getCanvasMarginCSS( areNotesMinimized )
+			: '';
+
 	const centerContentCSS = `display:flex;align-items:center;justify-content:center;`;
 	const iframeBodyMinHeightCSS =
 		hasCanvasWidth && ! isResizablePostType ? 'min-height:100vh;' : '';
@@ -424,7 +440,7 @@ function VisualEditor( {
 					isNavigationPreview
 						? `.block-editor-iframe__body{${ centerContentCSS }padding:var(--wp--style--block-gap,2em);}`
 						: ''
-				}`,
+				}${ canvasMarginCSS }`,
 				// The CSS for enableResizing centers the body content vertically when resizing is enabled and applies a background
 				// color to the iframe HTML element to match the background color of the editor canvas.
 				// The CSS for isNavigationPreview centers the body content vertically and horizontally when the navigation is in preview mode.
@@ -437,6 +453,7 @@ function VisualEditor( {
 		iframeBodyMinHeightCSS,
 		isNavigationPreview,
 		paddingStyle,
+		canvasMarginCSS,
 	] );
 
 	const typewriterRef = useTypewriter();
@@ -475,6 +492,7 @@ function VisualEditor( {
 		>
 			<SyncConnectionErrorModal />
 			<ResizableEditor
+				className={ clsx( { 'has-canvas-margin': hasCanvasMargin } ) }
 				enableResizing={ enableResizing }
 				width={
 					enableResizing && canvasWidth ? canvasWidth + 'px' : '100%'
@@ -574,6 +592,12 @@ function VisualEditor( {
 						) }
 					</RecursionProvider>
 				</BlockCanvas>
+				{ ! isPreview && (
+					<CanvasMargin.Slot
+						bubblesVirtually
+						className="editor-visual-editor__canvas-margin"
+					/>
+				) }
 			</ResizableEditor>
 		</div>
 	);

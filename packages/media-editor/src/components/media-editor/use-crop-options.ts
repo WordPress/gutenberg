@@ -50,7 +50,7 @@ export function useCropOptions( {
 }: UseCropOptionsArgs = {} ): UseCropOptionsReturn {
 	const controller = useMediaEditor();
 	const { aspectRatioValue } = controller.cropOptions;
-	const cropperImage = controller.state.image;
+	const cropperImage = controller.cropper.state.image;
 
 	const aspectRatioOptions = useMemo(
 		() => getAspectRatioOptions( aspectRatioPresets ),

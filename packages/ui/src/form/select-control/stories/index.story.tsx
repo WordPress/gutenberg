@@ -9,19 +9,16 @@ import {
 
 const meta: Meta< typeof SelectControl > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/SelectControl',
+	title: 'Components/@wordpress-ui/Form/SelectControl',
+	id: 'design-system-components-form-selectcontrol',
 	component: SelectControl,
-	// Temporary: Due to an upstream bug, render the root explicitly so the
-	// components manifest extractor can resolve props from the JSX.
-	//
-	// See: https://github.com/storybookjs/storybook/issues/34877
-	render: ( args ) => <SelectControl { ...args } />,
 	subcomponents: {
 		'SelectControl.Group': SelectControl.Group,
 		'SelectControl.GroupLabel': SelectControl.GroupLabel,
 		'SelectControl.Item': SelectControl.Item,
 		'SelectControl.ItemLabel': SelectControl.ItemLabel,
 		'SelectControl.ItemDescription': SelectControl.ItemDescription,
+		'SelectControl.Separator': SelectControl.Separator,
 	},
 	argTypes: {
 		onValueChange: { action: 'onValueChange' },
@@ -56,6 +53,12 @@ export const Default: Story = {
 		description: 'This is the description.',
 	},
 };
+
+const separatorItems = [
+	{ value: 'apple', label: 'Apple' },
+	{ value: 'banana', label: 'Banana' },
+	{ value: 'other', label: 'Other' },
+];
 
 /**
  * When no value is selected, the trigger shows the default placeholder text.
@@ -197,6 +200,37 @@ export const Grouped: Story = {
 					) ) }
 				</SelectControl.Group>
 			) ),
+		],
+	},
+};
+
+/**
+ * Use `SelectControl.Separator` to set choices apart from each other.
+ */
+export const WithSeparator: Story = {
+	args: {
+		label: 'Fruit',
+		items: separatorItems,
+		children: [
+			...separatorItems.slice( 0, 2 ).map( ( item ) => (
+				<SelectControl.Item
+					key={ item.value }
+					value={ item }
+					label={ item.label }
+				>
+					<SelectControl.ItemLabel>
+						{ item.label }
+					</SelectControl.ItemLabel>
+				</SelectControl.Item>
+			) ),
+			<SelectControl.Separator key="separator" />,
+			<SelectControl.Item
+				key="other"
+				value={ separatorItems[ 2 ] }
+				label="Other"
+			>
+				<SelectControl.ItemLabel>Other</SelectControl.ItemLabel>
+			</SelectControl.Item>,
 		],
 	},
 };

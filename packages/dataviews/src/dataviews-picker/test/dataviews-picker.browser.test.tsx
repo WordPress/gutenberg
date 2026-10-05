@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { screen, within } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { page, userEvent } from 'vitest/browser';
@@ -114,6 +115,7 @@ function Picker( {
 	multiselect?: boolean;
 	layout?: PickerLayout;
 	fields?: Field< Data >[];
+	children?: ReactNode;
 } ) {
 	const [ view, setView ] = useState< View >( {
 		type: layout,
@@ -399,6 +401,46 @@ describe( 'DataViews Picker', () => {
 				] );
 			} );
 
+			it( 'honors `isEligible` in the footer action', async () => {
+				const callback = vi.fn();
+				const actions: ActionButton< Data >[] = [
+					{
+						id: 'confirm',
+						label: ( items ) => `Confirm ${ items.length }`,
+						supportsBulk: true,
+						isPrimary: true,
+						isEligible: ( item ) => item.id !== 1,
+						callback,
+					},
+				];
+				await render( <Picker actions={ actions } /> );
+
+				const user = userEvent.setup();
+				const options = screen.getAllByRole( 'option' );
+
+				// Only an ineligible item is selected: the button reflects the
+				// selection but cannot run on it.
+				await user.click( options[ 0 ] );
+				expect(
+					screen.getByRole( 'button', { name: 'Confirm 1' } )
+				).toHaveAttribute( 'aria-disabled', 'true' );
+
+				// An eligible item joins the selection: the label counts the
+				// whole selection, the callback receives the eligible part.
+				await user.click( options[ 1 ] );
+				const button = screen.getByRole( 'button', {
+					name: 'Confirm 2',
+				} );
+				expect( button ).not.toHaveAttribute( 'aria-disabled', 'true' );
+				await user.click( button );
+				expect( callback ).toHaveBeenCalledTimes( 1 );
+				expect(
+					callback.mock.calls[ 0 ][ 0 ].map(
+						( item: Data ) => item.id
+					)
+				).toEqual( [ 2 ] );
+			} );
+
 			it( 'calls the action callback when the action button is clicked', async () => {
 				await render( <Picker actions={ multiSelectActions } /> );
 
@@ -477,6 +519,11 @@ describe( 'DataViews Picker', () => {
 					name: /next/i,
 				} );
 				await user.click( nextButton );
+
+				// The selection lives on page 1; the action stays available.
+				expect(
+					screen.getByRole( 'button', { name: 'Confirm' } )
+				).not.toHaveAttribute( 'aria-disabled', 'true' );
 
 				// Page 2: Select another item
 				options = within( listbox ).getAllByRole( 'option' );
@@ -676,6 +723,108 @@ describe( 'DataViews Picker', () => {
 				data[ 0 ].id.toString(),
 				data[ 2 ].id.toString(),
 			] );
+		} );
+	} );
+
+	describe( 'Footer composition', () => {
+		it( 'renders the parts composed inside the footer and the pagination', async () => {
+			await render(
+				<Picker actions={ singleSelectActions } view={ { perPage: 2 } }>
+					<DataViewsPicker.Layout />
+					<DataViewsPicker.Footer>
+						<DataViewsPicker.Pagination>
+							<DataViewsPicker.PageSelect />
+						</DataViewsPicker.Pagination>
+						<DataViewsPicker.Actions />
+					</DataViewsPicker.Footer>
+				</Picker>
+			);
+
+			// The page select and the action render in place of the default
+			// footer parts: no selection info, no previous/next buttons.
+			const pageSelect = screen.getByRole( 'combobox', {
+				name: 'Current page',
+			} );
+			expect( pageSelect ).toHaveValue( '1' );
+			expect(
+				screen.getByRole( 'button', { name: 'Confirm' } )
+			).toBeInTheDocument();
+			expect(
+				screen.queryByText( '2 of 3 Items' )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', { name: 'Next page' } )
+			).not.toBeInTheDocument();
+
+			// The page select paginates on its own.
+			const user = userEvent.setup();
+			await user.selectOptions( pageSelect, '2' );
+			expect( pageSelect ).toHaveValue( '2' );
+			expect(
+				within( screen.getByRole( 'listbox' ) ).getAllByRole( 'option' )
+			).toHaveLength( 1 );
+		} );
+
+		it( 'renders the composed children when no default part has anything to show', async () => {
+			// Without actions and with every item on one page, the default
+			// selection info, pagination and actions all render nothing. The
+			// children belong to the consumer, so they render regardless.
+			await render(
+				<Picker>
+					<DataViewsPicker.Layout />
+					<DataViewsPicker.Footer>
+						<span>Upload status</span>
+					</DataViewsPicker.Footer>
+				</Picker>
+			);
+
+			expect( screen.getByText( 'Upload status' ) ).toBeInTheDocument();
+		} );
+
+		it( 'renders no footer at all when the default contents have nothing to show', async () => {
+			const { container } = await render( <Picker /> );
+
+			// Without actions and with every item on one page each default part
+			// renders nothing, so the row goes too rather than keep its border
+			// and padding. A row that is not there has nothing for a role or a
+			// text query to find.
+			// eslint-disable-next-line testing-library/no-node-access
+			const footer = container.querySelector( '.dataviews-footer' );
+			expect( footer ).toBeNull();
+		} );
+
+		it( "keeps a composed part's own className next to the built-in one", async () => {
+			// Placing a composed footer is the consumer's business, so each
+			// part takes a className rather than leaving them to wrap it or to
+			// lean on a rule over whichever part renders on its own.
+			const { container } = await render(
+				<Picker actions={ singleSelectActions } view={ { perPage: 2 } }>
+					<DataViewsPicker.Layout />
+					<DataViewsPicker.Footer className="my-footer">
+						<DataViewsPicker.Pagination className="my-pagination">
+							<DataViewsPicker.PageSelect className="my-page-select" />
+							<DataViewsPicker.PageNavigation className="my-page-navigation" />
+						</DataViewsPicker.Pagination>
+						<DataViewsPicker.Actions className="my-actions" />
+					</DataViewsPicker.Footer>
+				</Picker>
+			);
+
+			for ( const [ ownClass, builtInClass ] of [
+				[ 'my-footer', 'dataviews-footer' ],
+				[ 'my-pagination', 'dataviews-pagination' ],
+				[ 'my-page-select', 'dataviews-pagination__page-select' ],
+				[
+					'my-page-navigation',
+					'dataviews-pagination__page-navigation',
+				],
+				[ 'my-actions', 'dataviews-picker-footer__actions' ],
+			] ) {
+				// eslint-disable-next-line testing-library/no-node-access
+				const element = container.querySelector( `.${ ownClass }` );
+				expect( element ).not.toBeNull();
+				expect( element ).toHaveClass( builtInClass );
+			}
 		} );
 	} );
 

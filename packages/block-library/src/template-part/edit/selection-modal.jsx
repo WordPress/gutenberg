@@ -27,7 +27,7 @@ export default function TemplatePartSelectionModal( {
 		templatePartId
 	);
 
-	// We can map template parts to block patters to reuse the BlockPatternsList UI
+	// We can map template parts to block patterns to reuse the BlockPatternsList UI
 	const filteredTemplateParts = useMemo( () => {
 		const partsAsPatterns = templateParts.map( ( templatePart ) =>
 			mapTemplatePartToBlockPattern( templatePart )

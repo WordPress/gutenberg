@@ -1540,10 +1540,6 @@ describe( 'actions', () => {
 
 	describe( 'updateSettings', () => {
 		it( 'warns when setting the deprecated __unstableIsPreviewMode property and sets the stable property instead', () => {
-			const consoleWarn = vi
-				.spyOn( global.console, 'warn' )
-				.mockImplementation( () => {} );
-
 			const store = createRegistry().registerStore(
 				blockEditorStoreName,
 				{
@@ -1559,11 +1555,9 @@ describe( 'actions', () => {
 				} )
 			);
 
-			expect( consoleWarn ).toHaveBeenCalledWith(
+			expect( console ).toHaveWarnedWith(
 				"__unstableIsPreviewMode argument in wp.data.dispatch('core/block-editor').updateSettings is deprecated since version 6.8. Please use isPreviewMode instead."
 			);
-
-			consoleWarn.mockClear();
 
 			expect( store.getState().settings.__unstableIsPreviewMode ).toBe(
 				true
@@ -1571,11 +1565,9 @@ describe( 'actions', () => {
 
 			expect( store.getState().settings.isPreviewMode ).toBe( true );
 
-			expect( consoleWarn ).toHaveBeenCalledWith(
+			expect( console ).toHaveWarnedWith(
 				'__unstableIsPreviewMode is deprecated since version 6.8. Please use isPreviewMode instead.'
 			);
-
-			consoleWarn.mockRestore();
 		} );
 	} );
 

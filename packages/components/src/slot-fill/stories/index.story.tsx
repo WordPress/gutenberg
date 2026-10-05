@@ -31,7 +31,7 @@ function IframePortal( { children }: { children: ReactNode } ) {
 const meta: Meta< typeof Slot > = {
 	tags: [ 'manifest' ],
 	component: Slot,
-	title: 'Components/Utilities/SlotFill',
+	title: 'Components/@wordpress-components/Utilities/SlotFill',
 	id: 'components-slotfill',
 	subcomponents: { Fill, SlotFillProvider },
 	argTypes: {

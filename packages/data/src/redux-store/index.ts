@@ -45,6 +45,7 @@ interface SelectorLike {
 	hasResolver?: boolean;
 	isRegistrySelector?: boolean;
 	registry?: DataRegistry;
+	normalizeArgs?: ( args: unknown[] ) => unknown[];
 	__unstableNormalizeArgs?: ( args: unknown[] ) => unknown[];
 }
 
@@ -331,8 +332,7 @@ export default function createReduxStore< State, Actions, Selectors >(
 				// Expose normalization method on the bound selector
 				// in order that it can be called when fulfilling
 				// the resolver.
-				boundSelector.__unstableNormalizeArgs =
-					selector.__unstableNormalizeArgs;
+				boundSelector.normalizeArgs = getNormalizeArgs( selector );
 
 				const resolver = resolvers[ selectorName ];
 
@@ -847,8 +847,19 @@ function mapSelectorWithResolver(
 	selectorResolver.hasResolver = true;
 	// Forward the normalization method so `resolveSelect` can map its own
 	// arguments the same way.
-	selectorResolver.__unstableNormalizeArgs = selector.__unstableNormalizeArgs;
+	selectorResolver.normalizeArgs = selector.normalizeArgs;
 	return selectorResolver;
+}
+
+/**
+ * Returns the selector's normalization method, falling back to the legacy
+ * `__unstableNormalizeArgs` property.
+ *
+ * @param selector The selector potentially with a normalization method property.
+ * @return The normalization method, if any.
+ */
+function getNormalizeArgs( selector: SelectorLike ) {
+	return selector.normalizeArgs ?? selector.__unstableNormalizeArgs;
 }
 
 /**
@@ -860,12 +871,9 @@ function mapSelectorWithResolver(
  * @return Potentially normalized arguments.
  */
 function normalize( selector: SelectorLike, args: unknown[] ): unknown[] {
-	if (
-		selector.__unstableNormalizeArgs &&
-		typeof selector.__unstableNormalizeArgs === 'function' &&
-		args?.length
-	) {
-		return selector.__unstableNormalizeArgs( args );
+	const normalizeArgs = getNormalizeArgs( selector );
+	if ( typeof normalizeArgs === 'function' && args?.length ) {
+		return normalizeArgs( args );
 	}
 	return args;
 }
