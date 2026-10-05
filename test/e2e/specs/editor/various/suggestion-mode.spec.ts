@@ -1789,11 +1789,14 @@ test.describe( 'Suggestion mode', () => {
 		// check the tag name rather than `aria-level`.
 		await expect( heading ).toHaveJSProperty( 'tagName', 'H3' );
 
-		// But the serialized post still says level 2 — the interceptor
-		// reverted the underlying store and routed the change to the overlay.
+		// But the live heading is still an H2: the interceptor reverted the
+		// underlying store and wrote the change into the block's marker as
+		// a proposal, which is what serializes.
 		const serialized = await editor.getEditedPostContent();
 		expect( serialized ).toContain( '<!-- wp:heading' );
-		expect( serialized ).not.toContain( '"level":3' );
+		expect( serialized ).toContain( '<h2 ' );
+		expect( serialized ).not.toContain( '<h3' );
+		expect( serialized ).toContain( '"after":{"level":3}' );
 
 		// Auto-save persists the suggestion to a note comment.
 		await suggestionSaved;
