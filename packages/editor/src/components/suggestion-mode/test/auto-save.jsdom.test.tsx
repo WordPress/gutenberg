@@ -59,6 +59,7 @@ vi.mock( import( '../provider' ), async ( importOriginal ) => {
 } );
 
 const TEST_BLOCK = 'core/test-autosave-heading';
+const POST_ID = 7;
 
 beforeAll( () => {
 	registerBlockType( TEST_BLOCK, {
@@ -97,6 +98,7 @@ function createTestRegistry( intent: string, blocks: any[] ) {
 	registry.register( blockEditorStore );
 	registry.register( editorStore );
 	registry.dispatch( blockEditorStore ).resetBlocks( blocks );
+	registry.dispatch( editorStore ).setEditedPost( 'post', POST_ID as any );
 	unlock( registry.dispatch( editorStore ) ).setEditorIntent( intent );
 	return registry;
 }
@@ -393,6 +395,8 @@ describe( 'SuggestionAutoSave', () => {
 		seedComment( registry, {
 			id: 42,
 			status: 'hold',
+			type: 'note',
+			post: POST_ID,
 			meta: {
 				_wp_suggestion_status: 'pending',
 				_wp_suggestion: JSON.stringify( {
@@ -423,6 +427,57 @@ describe( 'SuggestionAutoSave', () => {
 				],
 			} )
 		);
+	} );
+
+	it( 'ignores a marker commentId that names a note on another post', async () => {
+		createSuggestion.mockResolvedValue( { id: 43 } );
+		// Content is editable by anyone who can edit the post, so an id read
+		// from it is only a hint: this one points at someone else's note.
+		const block = heading( 'Hi', {
+			metadata: {
+				suggestion: {
+					type: 'pending-attributes',
+					after: { level: 3 },
+					commentId: 99,
+				},
+			},
+		} );
+		const { registry } = renderWith( 'suggest', [ block ] );
+		seedComment( registry, {
+			id: 99,
+			status: 'hold',
+			type: 'note',
+			post: 123,
+		} );
+
+		propose( registry, block.clientId, { level: 4 } );
+		await pastDebounce();
+
+		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
+		expect( updateSuggestion ).not.toHaveBeenCalled();
+		expect( deleteSuggestion ).not.toHaveBeenCalled();
+		expect( markerOf( registry, block.clientId ).commentId ).toBe( 43 );
+	} );
+
+	it( 'ignores a marker commentId whose note core-data has not resolved', async () => {
+		createSuggestion.mockResolvedValue( { id: 43 } );
+		const block = heading( 'Hi', {
+			metadata: {
+				suggestion: {
+					type: 'pending-attributes',
+					after: { level: 3 },
+					commentId: 99,
+				},
+			},
+		} );
+		const { registry } = renderWith( 'suggest', [ block ] );
+
+		propose( registry, block.clientId, { level: 4 } );
+		await pastDebounce();
+
+		expect( updateSuggestion ).not.toHaveBeenCalled();
+		expect( deleteSuggestion ).not.toHaveBeenCalled();
+		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'leaves a proposal another author wrote to that author', async () => {
