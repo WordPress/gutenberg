@@ -549,30 +549,40 @@ describe( 'runNpmPublishPreflight', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'accepts a published version from the prepared commit with the expected dist-tag', async () => {
-		const commandFn = vi
-			.fn()
-			.mockResolvedValueOnce( WHOAMI )
-			.mockResolvedValueOnce( {
-				stdout: '{"version":"4.50.0","gitHead":"publish-sha","dist-tags":{"latest":"4.50.0"}}',
-			} );
+	it.each( [
+		[
+			'an object, as npm v11 returns',
+			'{"version":"4.50.0","gitHead":"publish-sha","dist-tags":{"latest":"4.50.0"}}',
+		],
+		[
+			'an array, as npm v12 returns',
+			'[{"version":"4.50.0","gitHead":"publish-sha","dist-tags":{"latest":"4.50.0"}}]',
+		],
+	] )(
+		'accepts a published version from the prepared commit with the expected dist-tag when npm view returns %s',
+		async ( _description, stdout ) => {
+			const commandFn = vi
+				.fn()
+				.mockResolvedValueOnce( WHOAMI )
+				.mockResolvedValueOnce( { stdout } );
 
-		await expect(
-			runNpmPublishPreflight(
-				{
-					distTag: 'latest',
-					gitWorkingDirectoryPath: '/repo',
-					publishCommit: 'publish-sha',
-					releasePackages: [
-						{ name: '@wordpress/a11y', version: '4.50.0' },
-					],
-				},
-				{ commandFn }
-			)
-		).resolves.toEqual( [ '@wordpress/a11y' ] );
-		expect( commandFn ).toHaveBeenCalledTimes( 2 );
-		expect( console ).toHaveLogged();
-	} );
+			await expect(
+				runNpmPublishPreflight(
+					{
+						distTag: 'latest',
+						gitWorkingDirectoryPath: '/repo',
+						publishCommit: 'publish-sha',
+						releasePackages: [
+							{ name: '@wordpress/a11y', version: '4.50.0' },
+						],
+					},
+					{ commandFn }
+				)
+			).resolves.toEqual( [ '@wordpress/a11y' ] );
+			expect( commandFn ).toHaveBeenCalledTimes( 2 );
+			expect( console ).toHaveLogged();
+		}
+	);
 
 	it( 'fails when a published version came from another commit', async () => {
 		const commandFn = vi

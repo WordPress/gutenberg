@@ -723,7 +723,7 @@ function isNpmPackageVersionMissing( error ) {
 }
 
 /**
- * Parses npm JSON command output.
+ * Parses npm JSON command output for a single package.
  *
  * @param {string} output      Command stdout.
  * @param {string} description Output description for error messages.
@@ -731,13 +731,16 @@ function isNpmPackageVersionMissing( error ) {
  * @return {*} Parsed JSON output.
  */
 function parseNpmJsonOutput( output, description ) {
+	let parsed;
 	try {
-		return JSON.parse( output );
+		parsed = JSON.parse( output );
 	} catch {
 		throw new Error(
 			`Unable to parse npm registry ${ description }: ${ output }`
 		);
 	}
+	/* npm v12 always wraps `view --json` in an array; older versions return the object. */
+	return Array.isArray( parsed ) ? parsed[ 0 ] : parsed;
 }
 
 /**

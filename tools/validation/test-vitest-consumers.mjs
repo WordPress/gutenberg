@@ -118,7 +118,11 @@ function pack( name ) {
 			directory
 		)
 	);
-	return `file:${ path.join( directory, output[ 0 ].filename ) }`;
+	/* npm v12 keys `pack --json` output by package name; older versions return an array. */
+	const [ packed ] = Array.isArray( output )
+		? output
+		: Object.values( output );
+	return `file:${ path.join( directory, packed.filename ) }`;
 }
 const scripts = values.scripts ?? pack( 'scripts' );
 const eslintPlugin = values[ 'eslint-plugin' ] ?? pack( 'eslint-plugin' );
