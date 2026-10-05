@@ -23,10 +23,7 @@ import {
 	registerSuggestionFormat,
 	SUGGESTION_FORMAT_NAME,
 } from '../../inline-suggestions';
-import {
-	getSuggestionsResolvedThisSession,
-	forgetResolvedSuggestion,
-} from '../provider';
+import { rememberResolvedSuggestion } from '../decision-state';
 import { store as editorStore } from '../../../store';
 
 // The editor store pulls in `@wordpress/viewport`, which reads
@@ -126,7 +123,16 @@ beforeAll( () => {
 	}
 } );
 
-function setup( { content, threads }: { content: string; threads: any[] } ) {
+function setup( {
+	content,
+	threads,
+	resolved = false,
+}: {
+	content: string;
+	threads: any[];
+	/** Whether this session already applied or rejected the note. */
+	resolved?: boolean;
+} ) {
 	serverThreads = threads;
 	serverReplies = threads.filter(
 		( thread: any ) => thread.parent === NOTE_ID
@@ -150,6 +156,9 @@ function setup( { content, threads }: { content: string; threads: any[] } ) {
 	registry.register( blockEditorStore );
 	registry.register( editorStore );
 	registry.register( noticesStore );
+	if ( resolved ) {
+		rememberResolvedSuggestion( registry, NOTE_ID );
+	}
 
 	registry.dispatch( editorStore ).setEditedPost( 'post', POST_ID as any );
 
@@ -178,7 +187,6 @@ function setup( { content, threads }: { content: string; threads: any[] } ) {
 }
 
 afterEach( () => {
-	forgetResolvedSuggestion( NOTE_ID );
 	vi.restoreAllMocks();
 } );
 
@@ -190,13 +198,12 @@ describe( 'SuggestionNoteGC reopening an undone decision', () => {
 		 * server and no keystroke reached it. Without the reopen the run stays
 		 * marked with no Accept/Reject on it (#73411, F-18).
 		 */
-		getSuggestionsResolvedThisSession().add( String( NOTE_ID ) );
-
 		let saveEntityRecord;
 		await act( async () => {
 			( { saveEntityRecord } = setup( {
 				content: MARKED,
 				threads: [ note() ],
+				resolved: true,
 			} ) );
 		} );
 
@@ -214,13 +221,12 @@ describe( 'SuggestionNoteGC reopening an undone decision', () => {
 
 	it( 'leaves a resolved note alone while its marker is gone', async () => {
 		// The ordinary post-decision state: the decision stands.
-		getSuggestionsResolvedThisSession().add( String( NOTE_ID ) );
-
 		let saveEntityRecord;
 		await act( async () => {
 			( { saveEntityRecord } = setup( {
 				content: 'Hello world',
 				threads: [ note() ],
+				resolved: true,
 			} ) );
 		} );
 

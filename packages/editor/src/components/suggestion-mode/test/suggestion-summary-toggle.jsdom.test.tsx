@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import SuggestionSummary, { summarizeOperations } from '../suggestion-summary';
-import type { SuggestionOperation } from '../provider';
+import type { SuggestionOperation } from '../operations';
 
 const OLD_TEXT =
 	'This original paragraph is long enough that the replaced side of the summary has to be cut short.';

@@ -21,7 +21,7 @@ import {
 	findSuggestionRange,
 	useAnnotateSuggestions,
 } from '../inline-suggestions';
-import { parseSuggestionPayload } from './provider';
+import { parseSuggestionPayload } from './operations';
 import { useNoteThreads } from '../collab-sidebar/hooks';
 import { store as editorStore } from '../../store';
 

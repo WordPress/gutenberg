@@ -53,13 +53,15 @@ import { getBlockTreeVersion } from './block-tree-version';
 import {
 	findInlineOp,
 	findStructuralOp,
+	parseSuggestionPayload,
+} from './operations';
+import {
 	forgetResolvedSuggestion,
 	getSuggestionsResolvedThisSession,
 	isSuggestionDecisionInFlight,
-	parseSuggestionPayload,
 	rememberResolvedSuggestion,
 	takeWithdrawnAnchor,
-} from './provider';
+} from './decision-state';
 import {
 	SUGGESTION_CLASS,
 	SUGGESTION_FORMAT_NAME,
@@ -315,7 +317,7 @@ export default function SuggestionNoteGC() {
 	 * note stayed resolved, and the note has to follow (#73411, F-18).
 	 */
 	const resolvedNotes: Array< { note: any; anchor: any } > = [];
-	const resolvedIds = getSuggestionsResolvedThisSession();
+	const resolvedIds = getSuggestionsResolvedThisSession( registry );
 	for ( const note of notes ?? [] ) {
 		if ( note.parent !== 0 ) {
 			continue;
@@ -484,7 +486,7 @@ export default function SuggestionNoteGC() {
 			) {
 				return false;
 			}
-			if ( isSuggestionDecisionInFlight( note.id ) ) {
+			if ( isSuggestionDecisionInFlight( registry, note.id ) ) {
 				return false;
 			}
 			const record: any = registry
@@ -602,7 +604,7 @@ export default function SuggestionNoteGC() {
 				entriesRef.current
 			);
 			if ( present ) {
-				takeWithdrawnAnchor( idKey );
+				takeWithdrawnAnchor( registry, idKey );
 				seenRef.current.add( idKey );
 				keptRef.current.delete( idKey );
 				if ( timers.has( idKey ) ) {
@@ -611,14 +613,14 @@ export default function SuggestionNoteGC() {
 				}
 				continue;
 			}
-			if ( takeWithdrawnAnchor( idKey ) ) {
+			if ( takeWithdrawnAnchor( registry, idKey ) ) {
 				seenRef.current.add( idKey );
 			}
 			if (
 				! seenRef.current.has( idKey ) ||
 				timers.has( idKey ) ||
 				keptRef.current.has( idKey ) ||
-				isSuggestionDecisionInFlight( note.id )
+				isSuggestionDecisionInFlight( registry, note.id )
 			) {
 				continue;
 			}
@@ -663,12 +665,12 @@ export default function SuggestionNoteGC() {
 		 */
 		for ( const { note, anchor } of resolvedNotesRef.current ) {
 			if (
-				isSuggestionDecisionInFlight( note.id ) ||
+				isSuggestionDecisionInFlight( registry, note.id ) ||
 				! isAnchorPresent( note, anchor, index, entriesRef.current )
 			) {
 				continue;
 			}
-			forgetResolvedSuggestion( note.id );
+			forgetResolvedSuggestion( registry, note.id );
 			saveEntityRecord(
 				'root',
 				'comment',
@@ -686,7 +688,7 @@ export default function SuggestionNoteGC() {
 				{ throwOnError: true }
 			).catch( () => {
 				// Reopen failed; leave it recorded so a later pass retries.
-				rememberResolvedSuggestion( note.id );
+				rememberResolvedSuggestion( registry, note.id );
 			} );
 		}
 

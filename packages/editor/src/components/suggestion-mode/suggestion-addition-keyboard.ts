@@ -13,7 +13,8 @@ import {
 import { isURL } from '@wordpress/url';
 import { unlock } from '../../lock-unlock';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
-import { INLINE_OP_TYPE, useSuggestionsProvider } from './provider';
+import { INLINE_OP_TYPE } from './operations';
+import { useSuggestionsProvider } from './provider';
 import { useSuggestionOverlay } from './overlay-context';
 import useAbandonedNoteCleanup from './use-abandoned-note-cleanup';
 import { readInlineCaret, wrapInlineMarker } from '../inline-markers';
