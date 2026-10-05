@@ -1985,6 +1985,13 @@
 								{ "type": "string" },
 								{ "$ref": "#/definitions/refComplete" }
 							]
+						},
+						"textWrap": {
+							"description": "Sets the `text-wrap` CSS property.",
+							"oneOf": [
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
+							]
 						}
 					},
 					"additionalProperties": false

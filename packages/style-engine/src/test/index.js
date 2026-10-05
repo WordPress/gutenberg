@@ -77,6 +77,7 @@ describe( 'generate', () => {
 						textShadow: '1px 1px 2px red',
 						letterSpacing: '12px',
 						textTransform: 'uppercase',
+						textWrap: 'pretty',
 					},
 					outline: {
 						offset: '2px',
@@ -90,7 +91,7 @@ describe( 'generate', () => {
 				}
 			)
 		).toEqual(
-			".some-selector { color: #cccccc; background: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%); background-color: #111111; min-height: 50vh; min-width: 25vw; object-fit: cover; outline-color: red; outline-style: dashed; outline-offset: 2px; outline-width: 4px; margin-top: 11px; margin-right: 12px; margin-bottom: 13px; margin-left: 14px; padding-top: 10px; padding-bottom: 5px; font-family: 'Helvetica Neue',sans-serif; font-size: 2.2rem; font-style: italic; font-weight: 800; letter-spacing: 12px; line-height: 3.3; column-count: 2; text-decoration: line-through; text-shadow: 1px 1px 2px red; text-transform: uppercase; }"
+			".some-selector { color: #cccccc; background: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%); background-color: #111111; min-height: 50vh; min-width: 25vw; object-fit: cover; outline-color: red; outline-style: dashed; outline-offset: 2px; outline-width: 4px; margin-top: 11px; margin-right: 12px; margin-bottom: 13px; margin-left: 14px; padding-top: 10px; padding-bottom: 5px; font-family: 'Helvetica Neue',sans-serif; font-size: 2.2rem; font-style: italic; font-weight: 800; letter-spacing: 12px; line-height: 3.3; column-count: 2; text-decoration: line-through; text-shadow: 1px 1px 2px red; text-transform: uppercase; text-wrap: pretty; }"
 		);
 	} );
 
@@ -259,6 +260,7 @@ describe( 'getCSSRules', () => {
 						textShadow: '1px 1px 2px red',
 						letterSpacing: '12px',
 						textTransform: 'uppercase',
+						textWrap: 'pretty',
 					},
 					outline: {
 						offset: '2px',
@@ -387,6 +389,11 @@ describe( 'getCSSRules', () => {
 				selector: '.some-selector',
 				key: 'textTransform',
 				value: 'uppercase',
+			},
+			{
+				selector: '.some-selector',
+				key: 'textWrap',
+				value: 'pretty',
 			},
 			{
 				selector: '.some-selector',
