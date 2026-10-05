@@ -170,6 +170,15 @@
 				grid-template-columns: subgrid;
 			}
 
+			&[data-popup-open]:not([data-disabled]) {
+				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+
+				@media ( forced-colors: active ) {
+					--_gcd-div-outline: var(--wpds-border-width-xs) solid GrayText;
+					--_gcd-a-outline: var(--wpds-border-width-xs) solid GrayText;
+				}
+			}
+
 			&[data-highlighted]:not([aria-disabled="true"]) {
 				background-color: var(--wpds-color-background-interactive-brand-weak-active);
 				color: var(--wpds-color-foreground-interactive-neutral);
