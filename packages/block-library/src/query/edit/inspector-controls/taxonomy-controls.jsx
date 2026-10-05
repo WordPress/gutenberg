@@ -61,6 +61,34 @@ function ListedTermCount() {
 	);
 }
 
+/**
+ * Explains that the server returned only part of the matching terms, and how to find more.
+ *
+ * @param {Object}  props
+ * @param {boolean} props.isSearch Whether the terms are search results.
+ * @param {number}  props.shown    The number of terms shown.
+ * @param {number}  props.total    The number of matching terms.
+ */
+function LimitedTermCount( { isSearch, shown, total } ) {
+	if ( ! isSearch ) {
+		return sprintf(
+			/* translators: %d: number of terms shown. */
+			__( 'Showing the first %d. Search to find more.' ),
+			shown
+		);
+	}
+	return sprintf(
+		/* translators: 1: number of terms shown. 2: number of matching terms. */
+		_n(
+			'Showing %1$d of %2$d result. Refine your search to see more.',
+			'Showing %1$d of %2$d results. Refine your search to see more.',
+			total
+		),
+		shown,
+		total
+	);
+}
+
 const termToItem = ( term ) => ( {
 	value: String( term.id ),
 	label: decodeEntities( term.name ),
@@ -234,13 +262,20 @@ function TaxonomyItem( {
 		[ tree ]
 	);
 	const oppositeTermsCount = oppositeTermIds.length;
-	const { listedTerms, listHasResolved } = useSelect(
+	const { listedTerms, listTotal, listHasResolved } = useSelect(
 		( select ) => {
 			if ( isHierarchical || ! hasOpened ) {
-				return { listedTerms: EMPTY_ARRAY, listHasResolved: false };
+				return {
+					listedTerms: EMPTY_ARRAY,
+					listTotal: null,
+					listHasResolved: false,
+				};
 			}
-			const { getEntityRecords, hasFinishedResolution } =
-				select( coreStore );
+			const {
+				getEntityRecords,
+				getEntityRecordsTotalItems,
+				hasFinishedResolution,
+			} = select( coreStore );
 
 			// The opposite control's terms are filtered out of the list
 			// below, so fetch as many more terms to make up for them.
@@ -260,6 +295,7 @@ function TaxonomyItem( {
 			];
 			return {
 				listedTerms: getEntityRecords( ...selectorArgs ) || EMPTY_ARRAY,
+				listTotal: getEntityRecordsTotalItems( ...selectorArgs ),
 				listHasResolved: hasFinishedResolution(
 					'getEntityRecords',
 					selectorArgs
@@ -362,6 +398,28 @@ function TaxonomyItem( {
 	const isPending = isHierarchical
 		? ! treeHasResolved
 		: isDebouncing || ! listHasResolved;
+	// The server limits how many terms of a flat taxonomy are listed. When
+	// there are more, say so. The total includes the opposite control's terms,
+	// which are filtered out of the list, so leave those out of it too.
+	const isLimited = ! isHierarchical && listTotal > shownTerms.length;
+	const matchingTotal = listTotal - ( shownTerms.length - items.length );
+	let statusContent = <ListedTermCount />;
+	if ( isPending ) {
+		statusContent = (
+			<Stack direction="row" gap="sm" align="center">
+				<Spinner />
+				{ __( 'Loading…' ) }
+			</Stack>
+		);
+	} else if ( isLimited ) {
+		statusContent = (
+			<LimitedTermCount
+				isSearch={ !! search }
+				shown={ items.length }
+				total={ matchingTotal }
+			/>
+		);
+	}
 	return (
 		<div
 			className="block-library-query-inspector__taxonomy-control"
@@ -392,16 +450,7 @@ function TaxonomyItem( {
 				filter={ isHierarchical || isPending ? undefined : null }
 				autoHighlight={ inputValue ? 'always' : true }
 				isItemEqualToValue={ isItemEqualToValue }
-				statusContent={
-					isPending ? (
-						<Stack direction="row" gap="sm" align="center">
-							<Spinner />
-							{ __( 'Loading…' ) }
-						</Stack>
-					) : (
-						<ListedTermCount />
-					)
-				}
+				statusContent={ statusContent }
 				emptyContent={ isPending ? null : undefined }
 			/>
 		</div>
