@@ -158,6 +158,15 @@ describe( 'withProposedAttributes', () => {
 			metadata: { name: 'New' },
 		} );
 	} );
+	it( 'treats an empty metadata change on a block without metadata as no proposal', () => {
+		const next = withProposedAttributes( {
+			metadata: undefined,
+			liveAttributes: { content: 'B' },
+			changes: { metadata: {} },
+			authorId: 1,
+		} );
+		expect( next ).toEqual( { metadata: {} } );
+	} );
 	it( 'stores string-like values as strings', () => {
 		const next = withProposedAttributes( {
 			metadata: undefined,
