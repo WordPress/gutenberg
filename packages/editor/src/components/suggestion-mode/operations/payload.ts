@@ -2,7 +2,7 @@
  * Suggestion payload: the JSON stored in a note's `_wp_suggestion` meta.
  * Pure helpers to build, measure, parse and migrate it.
  */
-import type { SuggestionOperation } from '../overlay-context';
+import type { SuggestionOperation } from '../suggestion-session';
 
 /**
  * A single suggestion operation.

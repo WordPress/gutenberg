@@ -48,7 +48,7 @@ import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 // @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useSuggestionOverlay } from './overlay-context';
+import { useSuggestionSession } from './suggestion-session';
 import { getBlockTreeVersion } from './block-tree-version';
 import {
 	findInlineOp,
@@ -303,7 +303,7 @@ export default function SuggestionNoteGC() {
 		[]
 	);
 	const { notes } = useNoteThreads( postId );
-	const { entries, clearOverlay } = useSuggestionOverlay();
+	const { entries, clearOverlay } = useSuggestionSession();
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createNotice } = useDispatch( noticesStore );
 	const registry = useRegistry();

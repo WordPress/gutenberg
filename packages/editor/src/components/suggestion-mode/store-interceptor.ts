@@ -62,7 +62,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { useSuggestionOverlay } from './overlay-context';
+import { useSuggestionSession } from './suggestion-session';
 import { withSuggestionMarker } from './marker';
 import type { SuggestionMarker } from './marker';
 export type { SuggestionMarker };
@@ -1068,7 +1068,7 @@ export default function SuggestionStoreInterceptor() {
 		clearDeferredInsertions,
 		consumeUndoRedoAdoption,
 		requestContentSuggestion,
-	} = useSuggestionOverlay();
+	} = useSuggestionSession();
 	const registry = useRegistry();
 
 	const isSuggestMode = useSelect(

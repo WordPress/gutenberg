@@ -8,8 +8,8 @@ import { diffRevisionHTML } from '../post-revisions-preview/block-diff';
 import {
 	POST_TITLE_OVERLAY_KEY,
 	useOverlayEntry,
-	useSuggestionOverlayActions,
-} from '../suggestion-mode/overlay-context';
+	useSuggestionSessionActions,
+} from '../suggestion-mode/suggestion-session';
 
 /**
  * Custom hook for managing the post title in the editor.
@@ -61,7 +61,7 @@ export default function usePostTitle() {
 
 	const suggestionEntry = useOverlayEntry( POST_TITLE_OVERLAY_KEY );
 	const { captureBaseline, setOverlayAttributes } =
-		useSuggestionOverlayActions();
+		useSuggestionSessionActions();
 	const proposedTitle =
 		isSuggesting &&
 		suggestionEntry &&

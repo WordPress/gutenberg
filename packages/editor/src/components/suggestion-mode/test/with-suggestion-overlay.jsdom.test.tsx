@@ -1,14 +1,14 @@
 /**
- * Tests for `with-suggestion-overlay.js`. Coverage falls into two groups:
+ * Tests for `with-suggestion-overlay.tsx`. Coverage falls into two groups:
  *
- * 1. `withSuggestionOverlay` HOC — pass-through outside Suggest intent;
- *    in Suggest intent, diversion of `setAttributes` into the overlay,
- *    rendering the merged overlay-on-baseline value, surviving an overlay
- *    clear-and-re-edit cycle, and handing text/format edits off to the
- *    marker path instead of the overlay.
- * 2. `mergeOverlayAttributes` — replace-vs-deep-merge contract for
- *    overlapping overlay keys, including the `metadata` deep merge
- *    that keeps untouched fields alive.
+ * 1. `withSuggestionOverlay` HOC: pass-through outside Suggest intent for a
+ *    block with no proposal; in Suggest intent, diversion of `setAttributes`
+ *    into the block's `metadata.suggestion.after`, rendering the proposal
+ *    merged over the live attributes in every intent, clearing the marker
+ *    when the proposal returns to the live value, and handing text/format
+ *    edits off to the marker path instead.
+ * 2. `withSuggestionBlockClassName`: the bracket class for a proposal and
+ *    the structural classes for structural markers.
  */
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { render, screen, act, fireEvent } from '@testing-library/react';
@@ -17,6 +17,7 @@ import {
 	RegistryProvider,
 	createReduxStore,
 	createRegistry,
+	useSelect,
 } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
@@ -26,15 +27,15 @@ import { createBlock, registerBlockType } from '@wordpress/blocks';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { RichTextData, unregisterFormatType } from '@wordpress/rich-text';
 import withSuggestionOverlay, {
-	mergeOverlayAttributes,
 	structuralMarkerClass,
 	withSuggestionBlockClassName,
 } from '../with-suggestion-overlay';
 import { MoveGhostsProvider } from '../use-move-ghosts';
 import {
-	SuggestionOverlayProvider,
-	useSuggestionOverlay,
-} from '../overlay-context';
+	SuggestionSessionProvider,
+	useSuggestionSession,
+	useSuggestionSessionActions,
+} from '../suggestion-session';
 import {
 	registerSuggestionFormat,
 	SUGGESTION_FORMAT_NAME,
@@ -48,6 +49,24 @@ vi.hoisted( () => {
 	globalThis.wpVitest.mockMatchMedia();
 } );
 
+const HOC_BLOCK = 'core/test-suggestion-hoc';
+
+beforeAll( () => {
+	registerBlockType( HOC_BLOCK, {
+		apiVersion: 3,
+		title: 'Test',
+		category: 'text',
+		attributes: {
+			content: { type: 'string', default: '' },
+			level: { type: 'number', default: 2 },
+			metadata: { type: 'object' },
+		},
+		save() {
+			return null;
+		},
+	} );
+} );
+
 /*
  * `setEditorIntent( 'suggest' )` reads the current post so it can discard a
  * staged status edit, and both reads go through `core`. These registries are
@@ -59,21 +78,16 @@ function createStubCoreStore() {
 		selectors: {
 			getRawEntityRecord: () => undefined,
 			getEntityRecordEdits: () => undefined,
+			getCurrentUser: () => undefined,
 		},
 	} );
 }
 
-function renderWithProviders(
-	ui: ReactElement,
-	{
-		intent = 'edit',
-		blocks = null,
-	}: { intent?: string; blocks?: any[] | null } = {}
-) {
+function createTestRegistry( intent: string, blocks: any[] ) {
 	const registry = createRegistry();
 	// `setEditorIntent` dispatches a snackbar via the notices store when
 	// the intent actually changes, so the store needs to be registered even
-	// in tests that only care about the overlay HOC.
+	// in tests that only care about the HOC.
 	registry.register( noticesStore );
 	// `setEditorIntent` compares the editor mode across the change so it can
 	// announce a canvas swap, and `getEditorMode` reads the preferences
@@ -81,26 +95,22 @@ function renderWithProviders(
 	registry.register( preferencesStore );
 	registry.register( editorStore );
 	registry.register( createStubCoreStore() );
-	// `blockEditorStore` is only registered when the test passes `blocks`.
-	// Registering it unconditionally activates the overlay provider's
-	// orphan-prune effect — it short-circuits when
-	// `getClientIdsWithDescendants` is unavailable — which would then
-	// prune any overlay entry whose `clientId` doesn't correspond to a
-	// real block. Most tests use a synthetic `clientId="a"` and never
-	// register a matching block, so the entry would be pruned the
-	// moment `captureBaseline` creates it.
-	if ( blocks ) {
-		registry.register( blockEditorStore );
-		registry.dispatch( blockEditorStore ).resetBlocks( blocks );
-	}
+	registry.register( blockEditorStore );
+	registry.dispatch( blockEditorStore ).resetBlocks( blocks );
 	unlock( registry.dispatch( editorStore ) ).setEditorIntent( intent );
+	return registry;
+}
 
+function renderWithProviders(
+	ui: ReactElement,
+	{ intent = 'edit', blocks = [] }: { intent?: string; blocks?: any[] } = {}
+) {
+	const registry = createTestRegistry( intent, blocks );
 	const wrapper = ( { children }: { children?: ReactNode } ) => (
 		<RegistryProvider value={ registry }>
-			<SuggestionOverlayProvider>{ children }</SuggestionOverlayProvider>
+			<SuggestionSessionProvider>{ children }</SuggestionSessionProvider>
 		</RegistryProvider>
 	);
-
 	return {
 		registry,
 		...render( ui, { wrapper } ),
@@ -108,7 +118,7 @@ function renderWithProviders(
 }
 
 // Minimal block component that exposes its received attributes and
-// calls setAttributes when its button is clicked.
+// calls setAttributes when its buttons are clicked.
 function FakeBlock( { attributes, setAttributes }: any ) {
 	return (
 		<>
@@ -128,22 +138,64 @@ function FakeBlock( { attributes, setAttributes }: any ) {
 			>
 				edit level
 			</button>
+			<button
+				type="button"
+				onClick={ () => setAttributes( { level: 2 } ) }
+			>
+				reset level
+			</button>
 		</>
 	);
 }
 
 const Wrapped = withSuggestionOverlay( FakeBlock );
 
+/*
+ * The editor hands `BlockEdit` the block's live attributes from the store;
+ * this harness does the same so a marker the HOC writes flows back in as a
+ * prop on the next render.
+ */
+function Connected( {
+	clientId,
+	setAttributes,
+	Component = Wrapped,
+}: {
+	clientId: string;
+	setAttributes: any;
+	Component?: any;
+} ) {
+	const { attributes, name } = useSelect(
+		( select ) => ( {
+			attributes:
+				select( blockEditorStore ).getBlockAttributes( clientId ),
+			name: select( blockEditorStore ).getBlockName( clientId ),
+		} ),
+		[ clientId ]
+	);
+	return (
+		<Component
+			clientId={ clientId }
+			name={ name }
+			attributes={ attributes }
+			setAttributes={ setAttributes }
+		/>
+	);
+}
+
+const markerOf = ( registry: any, clientId: string ) =>
+	registry.select( blockEditorStore ).getBlockAttributes( clientId )?.metadata
+		?.suggestion;
+
 describe( 'withSuggestionOverlay', () => {
 	it( 'passes through unchanged in Edit intent', () => {
 		const setAttributes = vi.fn();
+		const block = createBlock( HOC_BLOCK, { content: 'Hello' } );
 		renderWithProviders(
-			<Wrapped
-				clientId="a"
-				name="core/paragraph"
-				attributes={ { content: 'Hello' } }
+			<Connected
+				clientId={ block.clientId }
 				setAttributes={ setAttributes }
-			/>
+			/>,
+			{ blocks: [ block ] }
 		);
 
 		expect( screen.getByTestId( 'content' ) ).toHaveTextContent( 'Hello' );
@@ -155,35 +207,69 @@ describe( 'withSuggestionOverlay', () => {
 		} );
 	} );
 
-	it( 'diverts setAttributes into the overlay in Suggest intent', () => {
+	it( 'writes a proposal into the block marker in Suggest intent', () => {
 		const setAttributes = vi.fn();
-		renderWithProviders(
-			<Wrapped
-				clientId="a"
-				name="core/paragraph"
-				attributes={ { content: 'Hello' } }
+		const block = createBlock( HOC_BLOCK, { content: 'Hello', level: 2 } );
+		const { registry } = renderWithProviders(
+			<Connected
+				clientId={ block.clientId }
 				setAttributes={ setAttributes }
 			/>,
-			{ intent: 'suggest' }
+			{ intent: 'suggest', blocks: [ block ] }
 		);
 
-		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+		fireEvent.click( screen.getByRole( 'button', { name: 'edit level' } ) );
 
-		// Real setAttributes is never called; block renders merged value.
+		// The real setter is never called; the live block stays at the
+		// baseline and the proposal lives in its marker.
 		expect( setAttributes ).not.toHaveBeenCalled();
-		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
-			'proposed'
-		);
+		expect( markerOf( registry, block.clientId ) ).toEqual( {
+			type: 'pending-attributes',
+			authorId: null,
+			after: { level: 3 },
+		} );
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( block.clientId ).level
+		).toBe( 2 );
+		// The block renders the proposal.
+		expect( screen.getByTestId( 'level' ) ).toHaveTextContent( '3' );
 	} );
 
-	it( 'hands a text edit off to the content reconciler instead of the overlay', () => {
+	it( 'bumps the history capture stamp on a proposal write', () => {
+		let seq!: () => number;
+		function Probe() {
+			const { getLastContentCaptureSeq } = useSuggestionSessionActions();
+			useEffect( () => {
+				seq = getLastContentCaptureSeq;
+			}, [ getLastContentCaptureSeq ] );
+			return null;
+		}
+		const block = createBlock( HOC_BLOCK, { content: 'Hello', level: 2 } );
+		renderWithProviders(
+			<>
+				<Probe />
+				<Connected
+					clientId={ block.clientId }
+					setAttributes={ vi.fn() }
+				/>
+			</>,
+			{ intent: 'suggest', blocks: [ block ] }
+		);
+		const before = seq();
+		fireEvent.click( screen.getByRole( 'button', { name: 'edit level' } ) );
+		expect( seq() ).toBeGreaterThan( before );
+	} );
+
+	it( 'hands a text edit off to the content reconciler instead of the marker', () => {
 		const setAttributes = vi.fn();
 		const handler = vi.fn();
 
 		// Registers a content handler so `requestContentSuggestion` takes
 		// ownership of the edit, standing in for the mounted reconciler.
 		function RegisterContentHandler() {
-			const { registerContentHandler } = useSuggestionOverlay();
+			const { registerContentHandler } = useSuggestionSession();
 			useEffect(
 				() => registerContentHandler( handler ),
 				[ registerContentHandler ]
@@ -191,21 +277,27 @@ describe( 'withSuggestionOverlay', () => {
 			return null;
 		}
 
-		renderWithProviders(
-			<>
-				<RegisterContentHandler />
-				<Wrapped
-					clientId="a"
-					name="core/paragraph"
-					// Paragraph content is always `RichTextData` in the
-					// editor; the planner declines plain strings.
-					attributes={ {
-						content: RichTextData.fromHTMLString( 'Hello' ),
-					} }
-					setAttributes={ setAttributes }
-				/>
-			</>,
-			{ intent: 'suggest' }
+		// Paragraph content is always `RichTextData` in the editor; the
+		// planner declines plain strings. `createBlock` would sanitize the
+		// wrapper away for this test block's string attribute, so it is
+		// written to the store directly.
+		const block = createBlock( HOC_BLOCK, { content: 'Hello' } );
+		const registry = createTestRegistry( 'suggest', [ block ] );
+		registry
+			.dispatch( blockEditorStore )
+			.updateBlockAttributes( block.clientId, {
+				content: RichTextData.fromHTMLString( 'Hello' ),
+			} );
+		render(
+			<RegistryProvider value={ registry }>
+				<SuggestionSessionProvider>
+					<RegisterContentHandler />
+					<Connected
+						clientId={ block.clientId }
+						setAttributes={ setAttributes }
+					/>
+				</SuggestionSessionProvider>
+			</RegistryProvider>
 		);
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
@@ -216,8 +308,8 @@ describe( 'withSuggestionOverlay', () => {
 		const request = handler.mock.calls[ 0 ][ 0 ];
 		expect( request ).toEqual(
 			expect.objectContaining( {
-				clientId: 'a',
-				blockName: 'core/paragraph',
+				clientId: block.clientId,
+				blockName: HOC_BLOCK,
 			} )
 		);
 		expect( String( request.prevContent ) ).toBe( 'Hello' );
@@ -227,50 +319,38 @@ describe( 'withSuggestionOverlay', () => {
 		).toBe( true );
 
 		// The reconciler took ownership: the edit is neither written through
-		// nor diverted into the overlay, so the block still shows its original
+		// nor diverted into a proposal, so the block still shows its original
 		// value (the reconciler writes the marker itself, out of band).
 		expect( setAttributes ).not.toHaveBeenCalled();
+		expect( markerOf( registry, block.clientId ) ).toBeUndefined();
 		expect( screen.getByTestId( 'content' ) ).toHaveTextContent( 'Hello' );
 	} );
 
-	it( 'declines an edit that would bury a live marker under an overlay', () => {
-		// An overlay snapshot is marker-free by construction and renders in
-		// place of the block's live value, so capturing one for an attribute
-		// that still holds a marker hides that marker while its note keeps
+	it( 'declines an edit that would bury a live marker under a proposal', () => {
+		// A proposal is marker-free by construction and renders in place of
+		// the block's live value, so capturing one for an attribute that
+		// still holds a marker hides that marker while its note keeps
 		// describing it - the block would carry both representations of a
 		// pending change at once (#73411, F-09). The edit is declined instead.
 		registerSuggestionFormat();
 		try {
 			const marked =
 				'Hello <mark class="wp-suggestion" data-suggestion-id="9" data-suggestion-type="del">doomed</mark>';
-			let overlayHandle;
-			function CaptureOverlay() {
-				const overlay = useSuggestionOverlay();
-				useEffect( () => {
-					overlayHandle = overlay;
-				}, [ overlay ] );
-				return null;
-			}
-
 			const setAttributes = vi.fn();
+			const block = createBlock( HOC_BLOCK, { content: marked } );
 			const { registry } = renderWithProviders(
-				<>
-					<CaptureOverlay />
-					<Wrapped
-						clientId="a"
-						name="core/paragraph"
-						attributes={ { content: marked } }
-						setAttributes={ setAttributes }
-					/>
-				</>,
-				{ intent: 'suggest' }
+				<Connected
+					clientId={ block.clientId }
+					setAttributes={ setAttributes }
+				/>,
+				{ intent: 'suggest', blocks: [ block ] }
 			);
 
 			fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
 
-			// No overlay entry, and the block was not written through either:
+			// No proposal, and the block was not written through either:
 			// the marker and its note are left exactly as they were.
-			expect( overlayHandle!.entries.a ).toBeUndefined();
+			expect( markerOf( registry, block.clientId ) ).toBeUndefined();
 			expect( setAttributes ).not.toHaveBeenCalled();
 			// The user is told why, rather than the edit vanishing silently.
 			// (The intent switch itself announces a snackbar, hence the find.)
@@ -287,55 +367,37 @@ describe( 'withSuggestionOverlay', () => {
 		}
 	} );
 
-	it( 'strips live suggestion markers from an attribute-only overlay baseline', () => {
+	it( 'proposes only the changed attribute on a block whose content holds a marker', () => {
 		// An attribute suggestion that leaves the marked attribute alone (a
 		// heading level change on a block whose content holds someone's
-		// marker) still goes to the overlay - it neither hides the marker nor
-		// competes with it. The baseline snapshot must still be marker-free:
-		// replaying it on accept would otherwise resurrect a marker whose
-		// suggestion was resolved in the interim.
+		// marker) still becomes a proposal - it neither hides the marker nor
+		// competes with it - and the proposal names only that attribute, so
+		// the marked content is never replayed on accept.
 		registerSuggestionFormat();
 		try {
 			const marked =
 				'Hello <mark class="wp-suggestion" data-suggestion-id="9" data-suggestion-type="del">doomed</mark>';
-			let overlayHandle;
-			function CaptureOverlay() {
-				const overlay = useSuggestionOverlay();
-				useEffect( () => {
-					overlayHandle = overlay;
-				}, [ overlay ] );
-				return null;
-			}
-
-			renderWithProviders(
-				<>
-					<CaptureOverlay />
-					<Wrapped
-						clientId="a"
-						name="core/heading"
-						attributes={ { content: marked, level: 2 } }
-						setAttributes={ vi.fn() }
-					/>
-				</>,
-				{ intent: 'suggest' }
+			const block = createBlock( HOC_BLOCK, {
+				content: marked,
+				level: 2,
+			} );
+			const { registry } = renderWithProviders(
+				<Connected
+					clientId={ block.clientId }
+					setAttributes={ vi.fn() }
+				/>,
+				{ intent: 'suggest', blocks: [ block ] }
 			);
 
 			fireEvent.click(
 				screen.getByRole( 'button', { name: 'edit level' } )
 			);
 
-			const entry = overlayHandle!.entries.a;
-			expect( entry ).toBeDefined();
-			// Baseline keeps the marked run's text but not the marker.
-			expect( entry.baselineAttributes.content ).toBe( 'Hello doomed' );
-			expect( entry.baselineAttributes.content ).not.toContain(
-				'wp-suggestion'
-			);
-			// Only the attribute the user actually changed is proposed, so the
-			// marked content is never replayed on accept.
-			expect( entry.overlayAttributes ).toEqual( { level: 3 } );
+			expect( markerOf( registry, block.clientId ).after ).toEqual( {
+				level: 3,
+			} );
 			// The block renders the proposed level over its still-marked
-			// content: the overlay covers one attribute, not the whole block.
+			// content: the proposal covers one attribute, not the whole block.
 			expect( screen.getByTestId( 'level' ) ).toHaveTextContent( '3' );
 			expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
 				'wp-suggestion'
@@ -345,7 +407,7 @@ describe( 'withSuggestionOverlay', () => {
 		}
 	} );
 
-	it( 'evaluates updater functions against the overlay, including updates before a render', () => {
+	it( 'evaluates updater functions against the proposal, including updates before a render', () => {
 		function UpdaterBlock( { attributes, setAttributes }: any ) {
 			return (
 				<>
@@ -367,14 +429,14 @@ describe( 'withSuggestionOverlay', () => {
 		}
 		const WrappedUpdater = withSuggestionOverlay( UpdaterBlock );
 		const setAttributes = vi.fn();
+		const block = createBlock( HOC_BLOCK, { content: 'Hello' } );
 		renderWithProviders(
-			<WrappedUpdater
-				clientId="a"
-				name="core/paragraph"
-				attributes={ { content: 'Hello' } }
+			<Connected
+				clientId={ block.clientId }
 				setAttributes={ setAttributes }
+				Component={ WrappedUpdater }
 			/>,
-			{ intent: 'suggest' }
+			{ intent: 'suggest', blocks: [ block ] }
 		);
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
@@ -389,24 +451,13 @@ describe( 'withSuggestionOverlay', () => {
 	it( 'hands a multi-selection update to the real setter so every selected block changes', () => {
 		// The real setter applies the change to each selected block; the
 		// store interceptor then captures one suggestion per block.
-		registerBlockType( 'core/test-multi', {
-			apiVersion: 3,
-			title: 'Test',
-			category: 'text',
-			attributes: { content: { type: 'string', default: '' } },
-			save() {
-				return null;
-			},
-		} );
-		const first = createBlock( 'core/test-multi', { content: 'One' } );
-		const second = createBlock( 'core/test-multi', { content: 'Two' } );
+		const first = createBlock( HOC_BLOCK, { content: 'One' } );
+		const second = createBlock( HOC_BLOCK, { content: 'Two' } );
 
 		const setAttributes = vi.fn();
 		const { registry } = renderWithProviders(
-			<Wrapped
+			<Connected
 				clientId={ first.clientId }
-				name="core/test-multi"
-				attributes={ first.attributes }
 				setAttributes={ setAttributes }
 			/>,
 			{ intent: 'suggest', blocks: [ first, second ] }
@@ -424,36 +475,20 @@ describe( 'withSuggestionOverlay', () => {
 		} );
 	} );
 
-	it( 'writes setAttributes through (no overlay) for a pending-insert block in Suggest intent', () => {
-		// A pending-insert block has no "before" worth preserving — the
-		// block itself is the suggestion. Routing edits through the
-		// overlay would trap the suggester's typed content on the
-		// suggester's peer; the reviewer needs to see it as part of the
-		// preview, so the edit must hit the real attributes and sync via
-		// CRDT like any other block change.
-		registerBlockType( 'core/test-pending-insert', {
-			apiVersion: 3,
-			title: 'Test',
-			category: 'text',
-			attributes: {
-				content: { type: 'string', default: '' },
-				metadata: { type: 'object' },
-			},
-			save() {
-				return null;
-			},
-		} );
-		const block = createBlock( 'core/test-pending-insert', {
+	it( 'writes setAttributes through (no proposal) for a pending-insert block in Suggest intent', () => {
+		// A pending-insert block has no "before" worth preserving: the block
+		// itself is the suggestion. Diverting edits into a proposal would
+		// hide the suggester's typed content from the preview; the edit must
+		// hit the real attributes and sync via CRDT like any other change.
+		const block = createBlock( HOC_BLOCK, {
 			content: 'Hello',
 			metadata: { suggestion: { type: 'pending-insert' } },
 		} );
 
 		const setAttributes = vi.fn();
 		renderWithProviders(
-			<Wrapped
+			<Connected
 				clientId={ block.clientId }
-				name="core/test-pending-insert"
-				attributes={ block.attributes }
 				setAttributes={ setAttributes }
 			/>,
 			{ intent: 'suggest', blocks: [ block ] }
@@ -468,26 +503,12 @@ describe( 'withSuggestionOverlay', () => {
 
 	it( 'writes setAttributes through for a block nested inside a pending-insert block', () => {
 		// The children of a Group that is itself a suggested insertion are
-		// part of the Group's insertion — their edits must write through
+		// part of the Group's insertion: their edits must write through
 		// (and stay inside the single "Insert block" suggestion) rather
-		// than opening a separate overlay suggestion per child.
-		registerBlockType( 'core/test-insert-container', {
-			apiVersion: 3,
-			title: 'Test Container',
-			category: 'text',
-			attributes: {
-				content: { type: 'string', default: '' },
-				metadata: { type: 'object' },
-			},
-			save() {
-				return null;
-			},
-		} );
-		const child = createBlock( 'core/test-insert-container', {
-			content: 'Child',
-		} );
+		// than opening a separate proposal per child.
+		const child = createBlock( HOC_BLOCK, { content: 'Child' } );
 		const parent = createBlock(
-			'core/test-insert-container',
+			HOC_BLOCK,
 			{
 				content: 'Parent',
 				metadata: { suggestion: { type: 'pending-insert' } },
@@ -497,10 +518,8 @@ describe( 'withSuggestionOverlay', () => {
 
 		const setAttributes = vi.fn();
 		renderWithProviders(
-			<Wrapped
+			<Connected
 				clientId={ child.clientId }
-				name="core/test-insert-container"
-				attributes={ child.attributes }
 				setAttributes={ setAttributes }
 			/>,
 			{ intent: 'suggest', blocks: [ parent ] }
@@ -518,34 +537,33 @@ describe( 'withSuggestionOverlay', () => {
 		// as a suggestion until it gains content (the interceptor defers it
 		// and publishes the deferral). Its first edit must land on the real
 		// attributes so the interceptor can register the WHOLE block as one
-		// insertion — not divert into the overlay as a content suggestion.
-		let overlayHandle!: ReturnType< typeof useSuggestionOverlay >;
-		function CaptureOverlay() {
-			const overlay = useSuggestionOverlay();
+		// insertion, not divert into a proposal.
+		let session!: ReturnType< typeof useSuggestionSession >;
+		function CaptureSession() {
+			const value = useSuggestionSession();
 			// Assigned in an effect (not during render) to keep the harness
 			// compliant with the react-hooks purity rules.
 			useEffect( () => {
-				overlayHandle = overlay;
-			}, [ overlay ] );
+				session = value;
+			}, [ value ] );
 			return null;
 		}
 
+		const block = createBlock( HOC_BLOCK, { content: '' } );
 		const setAttributes = vi.fn();
-		renderWithProviders(
+		const { registry } = renderWithProviders(
 			<>
-				<CaptureOverlay />
-				<Wrapped
-					clientId="deferred"
-					name="core/paragraph"
-					attributes={ { content: '' } }
+				<CaptureSession />
+				<Connected
+					clientId={ block.clientId }
 					setAttributes={ setAttributes }
 				/>
 			</>,
-			{ intent: 'suggest' }
+			{ intent: 'suggest', blocks: [ block ] }
 		);
 
 		act( () => {
-			overlayHandle.markDeferredInsertion( 'deferred' );
+			session.markDeferredInsertion( block.clientId );
 		} );
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
@@ -554,27 +572,52 @@ describe( 'withSuggestionOverlay', () => {
 		} );
 
 		// Once the deferral is lifted (and absent a pending-insert marker),
-		// edits divert into the overlay again.
+		// edits become proposals again.
 		act( () => {
-			overlayHandle.unmarkDeferredInsertion( 'deferred' );
+			session.unmarkDeferredInsertion( block.clientId );
 		} );
 		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
 		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
+		expect( markerOf( registry, block.clientId ).after ).toEqual( {
+			content: 'proposed',
+		} );
 		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
 			'proposed'
 		);
 	} );
 
-	it( 'merges overlay on top of real attributes for rendering', () => {
-		const setAttributes = vi.fn();
-		const { rerender } = renderWithProviders(
-			<Wrapped
-				clientId="a"
-				name="core/paragraph"
-				attributes={ { content: 'Hello', level: 2 } }
-				setAttributes={ setAttributes }
-			/>,
-			{ intent: 'suggest' }
+	it.each( [ 'edit', 'suggest', 'view' ] )(
+		'merges the proposal over the live attributes for rendering in %s intent',
+		( intent ) => {
+			const block = createBlock( HOC_BLOCK, {
+				content: 'Hello',
+				level: 2,
+				metadata: {
+					suggestion: {
+						type: 'pending-attributes',
+						after: { level: 3 },
+					},
+				},
+			} );
+			renderWithProviders(
+				<Connected
+					clientId={ block.clientId }
+					setAttributes={ vi.fn() }
+				/>,
+				{ intent, blocks: [ block ] }
+			);
+			expect( screen.getByTestId( 'level' ) ).toHaveTextContent( '3' );
+			expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
+				'Hello'
+			);
+		}
+	);
+
+	it( 'keeps the proposal on top when the live attributes change underneath it', () => {
+		const block = createBlock( HOC_BLOCK, { content: 'Hello', level: 2 } );
+		const { registry } = renderWithProviders(
+			<Connected clientId={ block.clientId } setAttributes={ vi.fn() } />,
+			{ intent: 'suggest', blocks: [ block ] }
 		);
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
@@ -582,31 +625,31 @@ describe( 'withSuggestionOverlay', () => {
 			'proposed'
 		);
 
-		// Real attributes update (e.g., from RTC sync). Overlay wins on
-		// overlapping keys; non-overlapping keys reflect the new real value.
-		rerender(
-			<Wrapped
-				clientId="a"
-				name="core/paragraph"
-				attributes={ { content: 'UPSTREAM', level: 3 } }
-				setAttributes={ setAttributes }
-			/>
-		);
+		// Live attributes update (e.g. from RTC sync). The proposal wins on
+		// overlapping keys; non-overlapping keys reflect the new live value.
+		act( () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( block.clientId, {
+					content: 'UPSTREAM',
+					level: 4,
+				} );
+		} );
 		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
 			'proposed'
 		);
+		expect( screen.getByTestId( 'level' ) ).toHaveTextContent( '4' );
 	} );
 
-	it( 'passes through in View intent — no overlay, no diversion', () => {
+	it( 'passes through in View intent for a block with no proposal', () => {
 		const setAttributes = vi.fn();
+		const block = createBlock( HOC_BLOCK, { content: 'Untouched' } );
 		renderWithProviders(
-			<Wrapped
-				clientId="a"
-				name="core/paragraph"
-				attributes={ { content: 'Untouched' } }
+			<Connected
+				clientId={ block.clientId }
 				setAttributes={ setAttributes }
 			/>,
-			{ intent: 'view' }
+			{ intent: 'view', blocks: [ block ] }
 		);
 
 		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
@@ -616,127 +659,41 @@ describe( 'withSuggestionOverlay', () => {
 		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
 
 		// In view intent the HOC is a pass-through, so the real
-		// setAttributes is invoked and the overlay is never used.
+		// setAttributes is invoked and no proposal is written.
 		expect( setAttributes ).toHaveBeenCalledWith( {
 			content: 'proposed',
 		} );
 	} );
 
-	it( 're-captures baseline when overlay is cleared then re-edited', () => {
-		// Regression: after Submit/Discard clears the overlay entry, a
-		// later edit must create a new baseline + overlay rather than
-		// silently no-oping.
-		let clearOverlayHandle!: ReturnType<
-			typeof useSuggestionOverlay
-		>[ 'clearOverlay' ];
-		function Harness() {
-			const { clearOverlay } = useSuggestionOverlay();
-			useEffect( () => {
-				clearOverlayHandle = clearOverlay;
-			}, [ clearOverlay ] );
-			return null;
-		}
-
+	it( 'clears the marker when the proposal returns to the live value', () => {
 		const setAttributes = vi.fn();
-		renderWithProviders(
-			<>
-				<Harness />
-				<Wrapped
-					clientId="a"
-					name="core/paragraph"
-					attributes={ { content: 'Hello' } }
-					setAttributes={ setAttributes }
-				/>
-			</>,
-			{ intent: 'suggest' }
+		const block = createBlock( HOC_BLOCK, { content: 'Hello', level: 2 } );
+		const { registry } = renderWithProviders(
+			<Connected
+				clientId={ block.clientId }
+				setAttributes={ setAttributes }
+			/>,
+			{ intent: 'suggest', blocks: [ block ] }
 		);
 
-		// First edit — creates overlay.
-		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
-		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
-			'proposed'
-		);
-
-		// Simulate Submit/Discard clearing the overlay.
-		act( () => {
-			clearOverlayHandle( 'a' );
+		fireEvent.click( screen.getByRole( 'button', { name: 'edit level' } ) );
+		expect( markerOf( registry, block.clientId ).after ).toEqual( {
+			level: 3,
 		} );
-		expect( screen.getByTestId( 'content' ) ).toHaveTextContent( 'Hello' );
 
-		// Second edit — must capture a new baseline and record the
-		// overlay, not silently no-op.
-		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
-		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
-			'proposed'
+		// Back to the baseline: nothing is proposed, so nothing is pending.
+		fireEvent.click(
+			screen.getByRole( 'button', { name: 'reset level' } )
 		);
-		// The real setAttributes is still never invoked in suggest mode.
+		expect( markerOf( registry, block.clientId ) ).toBeUndefined();
+		expect( screen.getByTestId( 'level' ) ).toHaveTextContent( '2' );
+
+		// A later edit opens a fresh proposal rather than silently no-oping.
+		fireEvent.click( screen.getByRole( 'button', { name: 'edit level' } ) );
+		expect( markerOf( registry, block.clientId ).after ).toEqual( {
+			level: 3,
+		} );
 		expect( setAttributes ).not.toHaveBeenCalled();
-	} );
-} );
-
-describe( 'mergeOverlayAttributes', () => {
-	it( 'returns base unchanged when there is no overlay', () => {
-		const base = { content: 'Hello', level: 2 };
-		expect( mergeOverlayAttributes( base, null ) ).toBe( base );
-		expect( mergeOverlayAttributes( base, undefined ) ).toBe( base );
-	} );
-
-	it( 'replaces primitive overlay values wholesale', () => {
-		expect(
-			mergeOverlayAttributes(
-				{ content: 'Hello', level: 2 },
-				{ level: 3 }
-			)
-		).toEqual( { content: 'Hello', level: 3 } );
-	} );
-
-	it( 'replaces the style attribute wholesale, like setAttributes', () => {
-		// A reset sends a style object without the cleared fields; merging
-		// would bring them back.
-		expect(
-			mergeOverlayAttributes(
-				{
-					style: {
-						typography: { fontSize: '16px' },
-						color: { background: 'red' },
-					},
-				},
-				{ style: { color: { background: 'red' } } }
-			)
-		).toEqual( {
-			style: { color: { background: 'red' } },
-		} );
-	} );
-
-	it( 'one-level merges metadata so e.g. noteId survives a name change', () => {
-		expect(
-			mergeOverlayAttributes(
-				{ metadata: { name: 'Block A', noteId: 42 } },
-				{ metadata: { name: 'Block B' } }
-			)
-		).toEqual( {
-			metadata: { name: 'Block B', noteId: 42 },
-		} );
-	} );
-
-	it( 'replaces array-valued attributes wholesale (no merge)', () => {
-		expect(
-			mergeOverlayAttributes(
-				{ classes: [ 'a', 'b' ] },
-				{ classes: [ 'c' ] }
-			)
-		).toEqual( { classes: [ 'c' ] } );
-	} );
-
-	it( 'replaces non-deep-merge object attributes wholesale', () => {
-		// `metadata` is deep-merged; everything else is
-		// replaced even if it happens to be an object.
-		expect(
-			mergeOverlayAttributes(
-				{ custom: { nested: 'old' } },
-				{ custom: { other: 'new' } }
-			)
-		).toEqual( { custom: { other: 'new' } } );
 	} );
 } );
 
@@ -810,9 +767,9 @@ describe( 'withSuggestionBlockClassName', () => {
 
 		const wrapper = ( { children }: { children?: ReactNode } ) => (
 			<RegistryProvider value={ registry }>
-				<SuggestionOverlayProvider>
+				<SuggestionSessionProvider>
 					{ children }
-				</SuggestionOverlayProvider>
+				</SuggestionSessionProvider>
 			</RegistryProvider>
 		);
 
@@ -895,6 +852,37 @@ describe( 'withSuggestionBlockClassName', () => {
 		expect( node.className ).not.toMatch( /is-suggestion-pending/ );
 	} );
 
+	it( 'applies is-suggestion-pending for a marker with a proposal in Edit intent', () => {
+		const node = setup( {
+			intent: 'edit',
+			metadata: {
+				suggestion: { type: 'pending-attributes', after: { level: 3 } },
+			},
+		} );
+		expect( node.className ).toContain( 'is-suggestion-pending' );
+		expect( node.className ).not.toMatch( /is-suggestion-pending-/ );
+	} );
+
+	it( 'applies the bracket next to the structural class when a proposal rides on a move', () => {
+		const node = setup( {
+			intent: 'suggest',
+			metadata: {
+				suggestion: { type: 'pending-move', after: { level: 3 } },
+			},
+		} );
+		expect( node.className ).toContain( 'is-suggestion-pending ' );
+		expect( node.className ).toContain( 'is-suggestion-pending-move' );
+	} );
+
+	it( 'applies no bracket for a structural marker without a proposal', () => {
+		const node = setup( {
+			intent: 'suggest',
+			metadata: { suggestion: { type: 'pending-remove' } },
+		} );
+		expect( node.className ).not.toMatch( /is-suggestion-pending(\s|$)/ );
+		expect( node.className ).toContain( 'is-suggestion-pending-remove' );
+	} );
+
 	function setupMove( { withMove = true } = {} ) {
 		const registry = createRegistry();
 		registry.register( noticesStore );
@@ -922,9 +910,9 @@ describe( 'withSuggestionBlockClassName', () => {
 
 		const wrapper = ( { children }: { children?: ReactNode } ) => (
 			<RegistryProvider value={ registry }>
-				<SuggestionOverlayProvider>
+				<SuggestionSessionProvider>
 					<MoveGhostsProvider>{ children }</MoveGhostsProvider>
-				</SuggestionOverlayProvider>
+				</SuggestionSessionProvider>
 			</RegistryProvider>
 		);
 
@@ -976,9 +964,9 @@ describe( 'withSuggestionBlockClassName', () => {
 
 		const wrapper = ( { children }: { children?: ReactNode } ) => (
 			<RegistryProvider value={ registry }>
-				<SuggestionOverlayProvider>
+				<SuggestionSessionProvider>
 					<MoveGhostsProvider>{ children }</MoveGhostsProvider>
-				</SuggestionOverlayProvider>
+				</SuggestionSessionProvider>
 			</RegistryProvider>
 		);
 

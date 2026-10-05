@@ -15,7 +15,7 @@ import { unlock } from '../../lock-unlock';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { INLINE_OP_TYPE } from './operations';
 import { useSuggestionsProvider } from './provider';
-import { useSuggestionOverlay } from './overlay-context';
+import { useSuggestionSession } from './suggestion-session';
 import useAbandonedNoteCleanup from './use-abandoned-note-cleanup';
 import { readInlineCaret, wrapInlineMarker } from '../inline-markers';
 import {
@@ -241,7 +241,7 @@ export default function SuggestionAdditionKeyboard() {
 	const { createSuggestion, updateSuggestion } = useSuggestionsProvider();
 	const { getBlockName } = useSelect( blockEditorStore );
 	const { requestInterceptorBypass, isDeferredInsertion } =
-		useSuggestionOverlay();
+		useSuggestionSession();
 	const registry = useRegistry();
 	const cleanupAbandonedNotes = useAbandonedNoteCleanup();
 

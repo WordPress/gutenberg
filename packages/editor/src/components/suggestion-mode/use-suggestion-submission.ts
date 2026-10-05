@@ -15,7 +15,7 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { STORE_NAME } from '../../store/constants';
-import { POST_TITLE_OVERLAY_KEY } from './overlay-context';
+import { POST_TITLE_OVERLAY_KEY } from './suggestion-session';
 import {
 	addNoteIdToMetadata,
 	getNoteIdsFromMetadata,
