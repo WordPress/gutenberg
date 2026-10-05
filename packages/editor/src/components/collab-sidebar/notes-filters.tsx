@@ -43,6 +43,41 @@ export function hasActiveNotesFilters( filters: NotesFilterValues ) {
 }
 
 /**
+ * Maps each note author's ID to their display name.
+ *
+ * @param threads Note threads.
+ */
+export function getNoteAuthors( threads: Note[] ) {
+	const authors = new Map< string, string >();
+	for ( const thread of threads ) {
+		for ( const note of [ thread, ...( thread.reply ?? [] ) ] ) {
+			authors.set( String( note.author ), note.author_name );
+		}
+	}
+	return authors;
+}
+
+/**
+ * Drops an author filter whose author no longer has notes, for example after
+ * their last thread is deleted, so the list can't get stuck empty.
+ *
+ * @param threads Note threads.
+ * @param filters Filter values.
+ */
+export function sanitizeNotesFilters(
+	threads: Note[],
+	filters: NotesFilterValues
+): NotesFilterValues {
+	if (
+		filters.author === 'all' ||
+		getNoteAuthors( threads ).has( filters.author )
+	) {
+		return filters;
+	}
+	return { ...filters, author: 'all' };
+}
+
+/**
  * Returns the threads that match the filters. A thread matches the search
  * and author filters when its first note or any reply does.
  *
@@ -99,12 +134,7 @@ export function NotesFilters( {
 	filters,
 	onChange,
 }: NotesFiltersProps ) {
-	const authors = new Map< string, string >();
-	for ( const thread of notes ) {
-		for ( const note of [ thread, ...( thread.reply ?? [] ) ] ) {
-			authors.set( String( note.author ), note.author_name );
-		}
-	}
+	const authors = getNoteAuthors( notes );
 
 	return (
 		<Stack
@@ -130,7 +160,7 @@ export function NotesFilters( {
 						onChange( { ...filters, status } )
 					}
 				/>
-				{ authors.size > 1 && (
+				{ ( authors.size > 1 || filters.author !== 'all' ) && (
 					<WCSelectControl
 						label={ __( 'Author' ) }
 						value={ filters.author }

@@ -18,6 +18,7 @@ import {
 	NotesFilters,
 	filterNotes,
 	hasActiveNotesFilters,
+	sanitizeNotesFilters,
 } from './notes-filters';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
@@ -70,7 +71,11 @@ function NotesSidebar( { postId } ) {
 	);
 
 	const { notes, unresolvedNotes } = useNoteThreads( postId );
-	const [ filters, setFilters ] = useState( DEFAULT_NOTES_FILTERS );
+	const [ storedFilters, setFilters ] = useState( DEFAULT_NOTES_FILTERS );
+	const filters = useMemo(
+		() => sanitizeNotesFilters( notes, storedFilters ),
+		[ notes, storedFilters ]
+	);
 	const filteredNotes = useMemo(
 		() => filterNotes( notes, filters, selectedNoteId ),
 		[ notes, filters, selectedNoteId ]
