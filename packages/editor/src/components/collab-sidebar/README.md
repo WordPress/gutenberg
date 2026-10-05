@@ -12,7 +12,7 @@ Notes are stored as WordPress comments (`type: 'note'`) attached to the post. A 
 ```
 collab-sidebar/
 ├── README.md                       this file
-├── index.jsx                        NotesSidebarContainer → NotesSidebar (entry, toolbar slot fill)
+├── index.jsx                        NotesSidebarContainer → NotesSidebar (entry, toolbar slot fills)
 ├── notes.jsx                        Notes - coordinator (outer Stack, actions, keyboard nav)
 ├── note-thread.jsx                  NoteThread - per-thread (selection, floating registration, reply form)
 ├── note.jsx                         Note - per-card state (edit/delete mode, menu, dialog)
@@ -21,6 +21,7 @@ collab-sidebar/
 ├── note-form.jsx                    NoteForm - rich text input + submit/cancel
 ├── add-note.jsx                     AddNote - new-note surface (floating + template-locked cases)
 ├── add-note-menu-item.jsx           AddNoteMenuItem - block-toolbar "Add note" trigger
+├── note-toolbar-button.tsx          NoteToolbarButton - block-toolbar "View notes" trigger
 ├── floating-container.jsx           FloatingContainer - stack wrapper that applies `top` in floating mode
 │
 ├── hooks.js                        useNoteThreads, useNoteActions, useNoteSelection, useFloatingBoard, useEnableFloatingSidebar
@@ -38,6 +39,7 @@ collab-sidebar/
 NotesSidebarContainer (index.jsx)         - gates on post type support
  └── NotesSidebar (index.jsx)             - owns sidebarRef + useNoteThreads + sidebar registration
       ├── AddNoteMenuItem                - slot fill in the block toolbar
+      ├── NoteToolbarButton              - slot fill in the block toolbar (shown when the block has notes)
       ├── PluginSidebar (all-notes)      - full sidebar
       │    └── Notes (notes.jsx)          - owns outer Stack + aria-label + useNoteActions + keyboard nav
       │         ├── AddNote              - rendered when no threads (template-locked) or selectedNote === 'new'
