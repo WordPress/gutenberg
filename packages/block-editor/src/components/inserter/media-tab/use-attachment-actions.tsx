@@ -168,8 +168,6 @@ export function useAttachmentActions( { category, query } ) {
 					: __( 'Detach from post' ),
 				icon: linkOff,
 				modalHeader: __( 'Detach image' ),
-				// Detaching is confirmed in the action's modal before it takes
-				// effect.
 				RenderModal: ( { items, closeModal } ) => (
 					<DetachConfirmation
 						postTypeLabel={ category.postTypeLabel }

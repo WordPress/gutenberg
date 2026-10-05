@@ -60,8 +60,6 @@ export default function MediaCategoryList( {
 						key={ category.name }
 						open={ isOpen }
 						onOpenChange={ ( open ) => {
-							// Opening a panel closes the current one; closing
-							// the open one leaves every panel collapsed.
 							setOpenName( open ? category.name : undefined );
 						} }
 						className={ clsx(
