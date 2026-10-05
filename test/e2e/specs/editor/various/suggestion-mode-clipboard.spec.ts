@@ -195,4 +195,170 @@ test.describe( 'Suggestion mode clipboard', () => {
 			addMark.locator( 'a[href="https://wordpress.org/"]' )
 		).toHaveText( 'https://wordpress.org/' );
 	} );
+
+	/*
+	 * Suggestion mode only owns a paste the editor would insert as the exact
+	 * plain text. Anything the editor's paste pipeline transforms (Markdown,
+	 * auto-linked emails, plain-text-only blocks, pastes that become blocks)
+	 * must come out the same as in Editing mode, proposed as a suggestion.
+	 */
+	test.describe( 'pastes the editor transforms match Editing mode', () => {
+		async function pasteInto(
+			{ admin, editor, page, pageUtils }: any,
+			{
+				block = 'core/paragraph',
+				content,
+				select = 0,
+				clip,
+			}: {
+				block?: string;
+				content: string;
+				select?: number;
+				clip: { plainText: string; html?: string };
+			}
+		) {
+			await admin.createNewPost();
+			await editor.insertBlock( {
+				name: block,
+				attributes: { content },
+			} );
+			await switchIntent( page, 'Suggesting' );
+			const target = editor.canvas
+				.locator( `[data-type="${ block }"]` )
+				.first();
+			await target.click();
+			await page.keyboard.press( 'End' );
+			if ( select ) {
+				await pageUtils.pressKeys( 'shift+ArrowLeft', {
+					times: select,
+				} );
+			}
+			pageUtils.setClipboardData( clip );
+			await pageUtils.pressKeys( 'primary+v' );
+			return target;
+		}
+
+		test( 'single-line Markdown is proposed with its formatting', async ( {
+			admin,
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			const paragraph = await pasteInto(
+				{ admin, editor, page, pageUtils },
+				{
+					content: 'Start ',
+					clip: { plainText: 'some **bold** and `code` here' },
+				}
+			);
+			const addMark = paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="add"]'
+			);
+			await expect( addMark ).toHaveAttribute(
+				'data-suggestion-id',
+				/\d/
+			);
+			await expect( addMark ).toHaveText( 'some bold and code here' );
+			await expect( addMark.locator( 'strong' ) ).toHaveText( 'bold' );
+			await expect( addMark.locator( 'code' ) ).toHaveText( 'code' );
+		} );
+
+		test( 'formatted HTML pasted into a Code block is proposed as plain text', async ( {
+			admin,
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			const code = await pasteInto(
+				{ admin, editor, page, pageUtils },
+				{
+					block: 'core/code',
+					content: 'x ',
+					clip: { plainText: 'bold text', html: '<b>bold text</b>' },
+				}
+			);
+			const addMark = code.locator(
+				'mark.wp-suggestion[data-suggestion-type="add"]'
+			);
+			await expect( addMark ).toHaveAttribute(
+				'data-suggestion-id',
+				/\d/
+			);
+			await expect( addMark ).toHaveText( 'bold text' );
+			await expect( code.locator( 'strong, b' ) ).toHaveCount( 0 );
+		} );
+
+		test( 'an email pasted over a selection is proposed as a mailto link', async ( {
+			admin,
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			const paragraph = await pasteInto(
+				{ admin, editor, page, pageUtils },
+				{
+					content: 'Mail me now',
+					select: 3,
+					clip: { plainText: 'a@example.com' },
+				}
+			);
+			const addMark = paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="add"]'
+			);
+			await expect( addMark ).toHaveAttribute(
+				'data-suggestion-id',
+				/\d/
+			);
+			await expect(
+				addMark.locator( 'a[href="mailto:a@example.com"]' )
+			).toHaveText( 'a@example.com' );
+			await expect(
+				paragraph.locator(
+					'mark.wp-suggestion[data-suggestion-type="del"]'
+				)
+			).toHaveText( 'now' );
+		} );
+
+		for ( const { title, clip, blockName } of [
+			{
+				title: 'a URL pasted into an empty paragraph is proposed as an Embed block',
+				clip: {
+					plainText: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+				},
+				blockName: 'core/embed',
+			},
+			{
+				title: 'LaTeX pasted into an empty paragraph is proposed as a Math block',
+				clip: { plainText: '\\frac{a}{b}' },
+				blockName: 'core/math',
+			},
+		] ) {
+			test( title, async ( { admin, editor, page, pageUtils } ) => {
+				await pasteInto(
+					{ admin, editor, page, pageUtils },
+					{ content: '', clip }
+				);
+				// The paste is a block replacement: the paragraph is
+				// proposed for removal and the new block for insertion,
+				// as one suggestion group.
+				await expect
+					.poll( async () =>
+						( await editor.getBlocks() ).map( ( block: any ) => [
+							block.name,
+							block.attributes?.metadata?.suggestion?.type,
+						] )
+					)
+					.toEqual( [
+						[ 'core/paragraph', 'pending-remove' ],
+						[ blockName, 'pending-insert' ],
+					] );
+				const blocks = await editor.getBlocks();
+				expect(
+					blocks[ 0 ].attributes.metadata.suggestion.groupId
+				).toBe( blocks[ 1 ].attributes.metadata.suggestion.groupId );
+				// No intermediate text is proposed in the removed paragraph.
+				expect( String( blocks[ 0 ].attributes.content ) ).toBe( '' );
+			} );
+		}
+	} );
 } );
