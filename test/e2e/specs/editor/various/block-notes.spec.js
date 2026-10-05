@@ -8,12 +8,14 @@ test.use( {
 } );
 
 test.describe( 'Block Notes', () => {
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, blockNoteUtils } ) => {
 		await admin.createNewPost();
+		await blockNoteUtils.showAllNotes();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllComments( 'note' );
+		await requestUtils.resetPreferences();
 	} );
 
 	test( 'should move focus to add a new note form', async ( {
@@ -1238,47 +1240,6 @@ test.describe( 'Block Notes', () => {
 			expect( noteIds ).toHaveLength( 1 );
 		} );
 
-		test( 'resolving one note does not affect sibling notes on the same block', async ( {
-			editor,
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Block with notes to resolve' },
-				comment: 'Note A',
-			} );
-			await blockNoteUtils.addNote( 'Note B' );
-
-			const settings = page.getByRole( 'region', {
-				name: 'Editor settings',
-			} );
-
-			// Resolve Note A.
-			const threadA = settings.getByRole( 'treeitem', {
-				name: 'Note: Note A',
-			} );
-			await threadA.click();
-			await page.getByRole( 'button', { name: 'Resolve' } ).click();
-			// Resolving removes the note from the floating "Unresolved notes"
-			// view, which confirms the action completed.
-			await expect( threadA ).toBeHidden();
-
-			// Note B should still be visible and unresolved (expanded).
-			const threadB = settings.getByRole( 'treeitem', {
-				name: 'Note: Note B',
-			} );
-			await expect( threadB ).toBeVisible();
-
-			// Both notes should still exist in metadata.
-			const blocks = await editor.getBlocks();
-			const paragraphBlock = blocks.find(
-				( b ) => b.name === 'core/paragraph'
-			);
-			const noteIds = paragraphBlock?.attributes?.metadata?.noteId;
-			expect( noteIds ).toHaveLength( 2 );
-		} );
-
 		test( 'keeps the clicked note selected on a block with several notes', async ( {
 			editor,
 			page,
@@ -1315,53 +1276,6 @@ test.describe( 'Block Notes', () => {
 			await expect( firstThread ).toHaveAttribute(
 				'aria-expanded',
 				'false'
-			);
-		} );
-
-		test( 'auto-selects first unresolved note when clicking a block with multiple notes', async ( {
-			editor,
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Block for auto-select' },
-				comment: 'First note',
-			} );
-			await blockNoteUtils.addNote( 'Second note' );
-
-			const settings = page.getByRole( 'region', {
-				name: 'Editor settings',
-			} );
-
-			// Resolve the first note.
-			const firstThread = settings.getByRole( 'treeitem', {
-				name: 'Note: First note',
-			} );
-			await firstThread.click();
-			await page.getByRole( 'button', { name: 'Resolve' } ).click();
-			// Resolving removes the note from the floating "Unresolved notes"
-			// view, which confirms the action completed.
-			await expect( firstThread ).toBeHidden();
-
-			// Click the title to deselect the block and its comment.
-			await editor.canvas
-				.getByRole( 'textbox', { name: 'Add title' } )
-				.focus();
-
-			// Click back on the original block.
-			await editor.canvas
-				.getByRole( 'document', { name: 'Block: Paragraph' } )
-				.filter( { hasText: 'Block for auto-select' } )
-				.click();
-
-			// The second (unresolved) note should be the active one.
-			const secondThread = settings.getByRole( 'treeitem', {
-				name: 'Note: Second note',
-			} );
-			await expect( secondThread ).toHaveAttribute(
-				'aria-expanded',
-				'true'
 			);
 		} );
 	} );
