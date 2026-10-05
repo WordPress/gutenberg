@@ -61,24 +61,6 @@ function gutenberg_get_react_19_incompatible_plugins() {
 }
 
 /**
- * Whether the React 19 experiment is on for a site that has not made a choice
- * on the Experiments screen.
- *
- * @since 24.2.0
- *
- * @return bool True when React 19 is on by default.
- */
-function gutenberg_is_react_19_enabled_by_default() {
-	static $enabled = null;
-
-	if ( null === $enabled ) {
-		$enabled = ! gutenberg_has_react_19_incompatible_extension();
-	}
-
-	return $enabled;
-}
-
-/**
  * Whether the site runs a theme or plugin that is known to break under React 19.
  *
  * @since 24.2.0

@@ -63,7 +63,7 @@ function gutenberg_is_experiment_enabled( $name ) {
 function gutenberg_get_experiment_default( $name ) {
 	switch ( $name ) {
 		case 'gutenberg-react-19':
-			return gutenberg_is_react_19_enabled_by_default();
+			return ! gutenberg_has_react_19_incompatible_extension();
 
 		default:
 			return false;
