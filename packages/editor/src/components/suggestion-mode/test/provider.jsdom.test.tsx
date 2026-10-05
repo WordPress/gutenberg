@@ -42,9 +42,9 @@ import {
 import { useSuggestionsProvider } from '../provider';
 import { getSuggestionsResolvedThisSession } from '../decision-state';
 import {
-	SuggestionOverlayProvider,
-	useSuggestionOverlay,
-} from '../overlay-context';
+	SuggestionSessionProvider,
+	useSuggestionSession,
+} from '../suggestion-session';
 
 // The editor store pulls in `@wordpress/viewport`, which reads
 // `window.matchMedia` while loading.
@@ -846,18 +846,18 @@ describe( 'rejectSuggestion (attribute-set)', () => {
 		registry.dispatch( blockEditorStore ).resetBlocks( initialBlocks );
 
 		let providerHandle: ReturnType< typeof useSuggestionsProvider >;
-		let overlayHandle: ReturnType< typeof useSuggestionOverlay >;
+		let overlayHandle: ReturnType< typeof useSuggestionSession >;
 		function Capture() {
 			providerHandle = useSuggestionsProvider();
-			overlayHandle = useSuggestionOverlay();
+			overlayHandle = useSuggestionSession();
 			return null;
 		}
 
 		render(
 			<RegistryProvider value={ registry }>
-				<SuggestionOverlayProvider>
+				<SuggestionSessionProvider>
 					<Capture />
-				</SuggestionOverlayProvider>
+				</SuggestionSessionProvider>
 			</RegistryProvider>
 		);
 
@@ -884,7 +884,7 @@ describe( 'rejectSuggestion (attribute-set)', () => {
 	}
 
 	function proposeAlignment(
-		getOverlay: () => ReturnType< typeof useSuggestionOverlay >,
+		getOverlay: () => ReturnType< typeof useSuggestionSession >,
 		clientId: string,
 		commentId: number
 	) {
@@ -1902,18 +1902,18 @@ describe( 'withdrawn suggestions and failed applies', () => {
 		registry.dispatch( blockEditorStore ).resetBlocks( initialBlocks );
 
 		let providerHandle: ReturnType< typeof useSuggestionsProvider >;
-		let overlayHandle: ReturnType< typeof useSuggestionOverlay >;
+		let overlayHandle: ReturnType< typeof useSuggestionSession >;
 		function Capture() {
 			providerHandle = useSuggestionsProvider();
-			overlayHandle = useSuggestionOverlay();
+			overlayHandle = useSuggestionSession();
 			return null;
 		}
 
 		render(
 			<RegistryProvider value={ registry }>
-				<SuggestionOverlayProvider>
+				<SuggestionSessionProvider>
 					<Capture />
-				</SuggestionOverlayProvider>
+				</SuggestionSessionProvider>
 			</RegistryProvider>
 		);
 

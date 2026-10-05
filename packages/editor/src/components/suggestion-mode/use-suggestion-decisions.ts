@@ -13,9 +13,9 @@ import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { STORE_NAME } from '../../store/constants';
 import {
-	useSuggestionOverlay,
+	useSuggestionSession,
 	POST_TITLE_OVERLAY_KEY,
-} from './overlay-context';
+} from './suggestion-session';
 import { getNoteIdsFromMetadata } from '../collab-sidebar/utils';
 import {
 	acceptInlineDeletion,
@@ -62,7 +62,7 @@ export function useSuggestionDecisions() {
 		getClientIdsWithDescendants: selectClientIdsWithDescendants,
 	} = useSelect( blockEditorStore );
 	const { requestInterceptorBypass, clearOverlay, clearOverlayForComment } =
-		useSuggestionOverlay();
+		useSuggestionSession();
 	const registry = useRegistry();
 
 	/**

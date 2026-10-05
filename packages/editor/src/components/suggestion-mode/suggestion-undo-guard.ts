@@ -58,8 +58,8 @@ import { useEffect, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 // @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useSuggestionOverlay } from './overlay-context';
-import type { OverlayEntry } from './overlay-context';
+import { useSuggestionSession } from './suggestion-session';
+import type { OverlayEntry } from './suggestion-session';
 import { operationsFromOverlay } from './operations';
 import { removeNoteIdFromMetadata } from '../collab-sidebar/utils';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
@@ -207,7 +207,7 @@ export default function SuggestionUndoGuard() {
 		requestInterceptorBypass,
 		getLastContentCaptureSeq,
 		armUndoRedoAdoption,
-	} = useSuggestionOverlay();
+	} = useSuggestionSession();
 	const registry = useRegistry();
 
 	const isSuggestMode = useSelect(

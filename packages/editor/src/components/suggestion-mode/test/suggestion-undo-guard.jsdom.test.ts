@@ -15,9 +15,9 @@ import SuggestionUndoGuard, {
 	findNewestPendingSuggestion,
 } from '../suggestion-undo-guard';
 import {
-	SuggestionOverlayProvider,
-	useSuggestionOverlay,
-} from '../overlay-context';
+	SuggestionSessionProvider,
+	useSuggestionSession,
+} from '../suggestion-session';
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -274,7 +274,7 @@ describe( 'SuggestionUndoGuard', () => {
 
 		const overlay: { current: any } = { current: null };
 		function Probe() {
-			overlay.current = useSuggestionOverlay();
+			overlay.current = useSuggestionSession();
 			return null;
 		}
 		render(
@@ -282,7 +282,7 @@ describe( 'SuggestionUndoGuard', () => {
 				RegistryProvider,
 				{ value: registry },
 				createElement(
-					SuggestionOverlayProvider,
+					SuggestionSessionProvider,
 					null,
 					createElement( SuggestionUndoGuard ),
 					createElement( Probe )

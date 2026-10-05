@@ -38,10 +38,10 @@ import { useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 import {
-	useSuggestionOverlay,
+	useSuggestionSession,
 	POST_TITLE_OVERLAY_KEY,
-} from './overlay-context';
-import type { OverlayEntry, SuggestionOperation } from './overlay-context';
+} from './suggestion-session';
+import type { OverlayEntry, SuggestionOperation } from './suggestion-session';
 import { operationsFromOverlay, postOperationsFromOverlay } from './operations';
 import { useSuggestionsProvider } from './provider';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
@@ -119,7 +119,7 @@ export function operationsForEntry(
  * @return Renders nothing.
  */
 export default function SuggestionAutoSave() {
-	const { entries, setCommentId, setSyncedOpsKey } = useSuggestionOverlay();
+	const { entries, setCommentId, setSyncedOpsKey } = useSuggestionSession();
 	const { createSuggestion, updateSuggestion, deleteSuggestion } =
 		useSuggestionsProvider();
 	const registry = useRegistry();

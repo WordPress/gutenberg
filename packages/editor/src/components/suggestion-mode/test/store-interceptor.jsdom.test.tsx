@@ -38,9 +38,9 @@ import SuggestionStoreInterceptor, {
 	pairReplacedBlocks,
 } from '../store-interceptor';
 import {
-	SuggestionOverlayProvider,
-	useSuggestionOverlay,
-} from '../overlay-context';
+	SuggestionSessionProvider,
+	useSuggestionSession,
+} from '../suggestion-session';
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -240,17 +240,17 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		const blocks = initialBlocks ?? [ block ];
 		registry.dispatch( blockEditorStore ).resetBlocks( blocks );
 
-		let overlayHandle: ReturnType< typeof useSuggestionOverlay >;
+		let overlayHandle: ReturnType< typeof useSuggestionSession >;
 		function CaptureOverlay() {
-			overlayHandle = useSuggestionOverlay();
+			overlayHandle = useSuggestionSession();
 			return null;
 		}
 
 		const wrapper = ( { children }: { children?: React.ReactNode } ) => (
 			<RegistryProvider value={ registry }>
-				<SuggestionOverlayProvider>
+				<SuggestionSessionProvider>
 					{ children }
-				</SuggestionOverlayProvider>
+				</SuggestionSessionProvider>
 			</RegistryProvider>
 		);
 

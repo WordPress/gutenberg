@@ -6,10 +6,10 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
 import SuggestionAutoSave, { operationsForEntry } from '../auto-save';
 import {
-	SuggestionOverlayProvider,
-	useSuggestionOverlay,
+	SuggestionSessionProvider,
+	useSuggestionSession,
 	POST_TITLE_OVERLAY_KEY,
-} from '../overlay-context';
+} from '../suggestion-session';
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -67,7 +67,7 @@ function renderInSuggestMode( ui: React.ReactElement ) {
 
 	const wrapper = ( { children }: { children?: React.ReactNode } ) => (
 		<RegistryProvider value={ registry }>
-			<SuggestionOverlayProvider>{ children }</SuggestionOverlayProvider>
+			<SuggestionSessionProvider>{ children }</SuggestionSessionProvider>
 		</RegistryProvider>
 	);
 
@@ -85,9 +85,9 @@ function seedComment( registry: any, comment: any ) {
 
 // Test harness exposes the overlay API via a render-prop ref so tests can
 // drive the reducer directly.
-let overlayHandle: ReturnType< typeof useSuggestionOverlay >;
+let overlayHandle: ReturnType< typeof useSuggestionSession >;
 function CaptureOverlay() {
-	overlayHandle = useSuggestionOverlay();
+	overlayHandle = useSuggestionSession();
 	return null;
 }
 
@@ -423,9 +423,9 @@ describe( 'SuggestionAutoSave', () => {
 
 		const wrapper = ( { children }: { children?: React.ReactNode } ) => (
 			<RegistryProvider value={ registry }>
-				<SuggestionOverlayProvider>
+				<SuggestionSessionProvider>
 					{ children }
-				</SuggestionOverlayProvider>
+				</SuggestionSessionProvider>
 			</RegistryProvider>
 		);
 

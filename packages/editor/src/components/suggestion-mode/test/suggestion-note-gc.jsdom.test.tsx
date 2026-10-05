@@ -18,7 +18,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { createBlock, registerBlockType } from '@wordpress/blocks';
 import { RichTextData, store as richTextStore } from '@wordpress/rich-text';
 import SuggestionNoteGC from '../suggestion-note-gc';
-import { SuggestionOverlayProvider } from '../overlay-context';
+import { SuggestionSessionProvider } from '../suggestion-session';
 import {
 	registerSuggestionFormat,
 	SUGGESTION_FORMAT_NAME,
@@ -177,9 +177,9 @@ function setup( {
 
 	render(
 		<RegistryProvider value={ registry }>
-			<SuggestionOverlayProvider>
+			<SuggestionSessionProvider>
 				<SuggestionNoteGC />
-			</SuggestionOverlayProvider>
+			</SuggestionSessionProvider>
 		</RegistryProvider>
 	);
 
