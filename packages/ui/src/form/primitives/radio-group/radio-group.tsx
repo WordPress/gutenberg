@@ -17,11 +17,13 @@ const DEFAULT_RENDER = ( props: React.ComponentProps< typeof Stack > ) => (
  * `Fieldset.Root`'s `render` prop. When a `Fieldset` contains multiple groups,
  * give each `RadioGroup` its own accessible name.
  */
-export const RadioGroup = forwardRef< HTMLDivElement, RadioGroupProps >(
-	function UnforwardedRadioGroup(
-		{ render = DEFAULT_RENDER, ...restProps },
-		ref
-	) {
-		return <_RadioGroup ref={ ref } render={ render } { ...restProps } />;
-	}
-);
+export const RadioGroup = forwardRef( function UnforwardedRadioGroup< Value >(
+	{ render = DEFAULT_RENDER, ...restProps }: RadioGroupProps< Value >,
+	ref: React.ForwardedRef< HTMLDivElement >
+) {
+	return (
+		<_RadioGroup< Value > ref={ ref } render={ render } { ...restProps } />
+	);
+} ) as < Value = unknown >(
+	props: RadioGroupProps< Value > & React.RefAttributes< HTMLDivElement >
+) => React.JSX.Element;
