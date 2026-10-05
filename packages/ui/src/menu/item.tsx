@@ -16,6 +16,7 @@ import {
 	ItemDescription,
 } from './item-description';
 import { ItemLabel } from './item-label';
+import { Text } from '../text';
 import type { ItemProps } from './types';
 
 type ItemAriaProps = Pick<
@@ -113,16 +114,22 @@ function ItemContent( {
 					hasPrefix && styles[ 'has-prefix' ]
 				) }
 			>
-				<span className={ styles[ 'item-children' ] }>{ label }</span>
+				{ label }
 				{ hasSuffix && (
-					<span className={ styles[ 'item-suffix' ] }>
+					<Text
+						variant="body-sm"
+						className={ styles[ 'item-suffix' ] }
+					>
 						{ suffix }
-					</span>
+					</Text>
 				) }
 				{ shortcut && (
-					<span className={ styles[ 'item-shortcut' ] }>
+					<Text
+						variant="body-sm"
+						className={ styles[ 'item-shortcut' ] }
+					>
 						<KeyboardShortcutDisplay shortcut={ shortcut } />
-					</span>
+					</Text>
 				) }
 				{ hasTrailing && (
 					<span className={ styles[ 'item-trailing' ] }>

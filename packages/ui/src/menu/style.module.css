@@ -10,8 +10,12 @@
 			--wp-ui-menu-popup-padding: var(--wpds-dimension-padding-xs);
 			--wp-ui-menu-min-width: 160px;
 			--wp-ui-menu-max-width: var(--wpds-dimension-surface-width-sm);
-			--wp-ui-menu-item-padding-inline: var(--wpds-dimension-padding-sm);
-			--_wp-ui-menu-item-padding-inline-start: var(--wp-ui-menu-item-padding-inline);
+			/*
+			 * `--wp-ui-menu-item-padding-inline` is left unset so a consumer
+			 * override still sets both edges; these are the fallbacks.
+			 */
+			--_wp-ui-menu-item-padding-inline-start: var(--wpds-dimension-padding-sm);
+			--_wp-ui-menu-item-padding-inline-end: var(--wpds-dimension-padding-sm);
 			--_wp-ui-menu-group-head-padding-base: var(--wpds-dimension-padding-sm);
 			--wp-ui-menu-group-head-padding-inline: var(--_wp-ui-menu-group-head-padding-base);
 			--wp-ui-menu-selection-indicator-track-size: 0px;
@@ -69,13 +73,13 @@
 
 			display: grid;
 			grid-template-columns:
-				[item-padding-start] var(--_wp-ui-menu-item-padding-inline-start)
+				[item-padding-start] var(--wp-ui-menu-item-padding-inline, var(--_wp-ui-menu-item-padding-inline-start))
 				[selection-start] var(--wp-ui-menu-selection-indicator-track-size)
 				[selection-end] var(--wp-ui-menu-selection-indicator-gap)
 				[prefix-start] max-content
 				[prefix-end] var(--wp-ui-menu-group-prefix-gap)
 				[content-start] minmax(0, 1fr)
-				[content-end] var(--wp-ui-menu-item-padding-inline)
+				[content-end] var(--wp-ui-menu-item-padding-inline, var(--_wp-ui-menu-item-padding-inline-end))
 				[item-padding-end];
 			min-width: 0;
 		}
@@ -135,13 +139,13 @@
 			display: grid;
 			grid-column: 1 / -1;
 			grid-template-columns:
-				[item-padding-start] var(--_wp-ui-menu-item-padding-inline-start)
+				[item-padding-start] var(--wp-ui-menu-item-padding-inline, var(--_wp-ui-menu-item-padding-inline-start))
 				[selection-start] var(--wp-ui-menu-selection-indicator-track-size)
 				[selection-end] var(--wp-ui-menu-selection-indicator-gap)
 				[prefix-start] max-content
 				[prefix-end] var(--wp-ui-menu-group-prefix-gap)
 				[content-start] minmax(0, 1fr)
-				[content-end] var(--wp-ui-menu-item-padding-inline)
+				[content-end] var(--wp-ui-menu-item-padding-inline, var(--_wp-ui-menu-item-padding-inline-end))
 				[item-padding-end];
 			gap: 0;
 			/* Keep leading content at the top of the content row. */
@@ -277,13 +281,6 @@
 			}
 		}
 
-		.item-children {
-			grid-column: label-start / label-end;
-			display: inline-flex;
-			flex-direction: column;
-			min-width: 0;
-		}
-
 		/*
 		 * Descriptions take their own row, starting at the prefix column, so
 		 * suffixes, shortcuts and chevrons stay centered on the label line.
@@ -303,6 +300,7 @@
 			--_gcd-heading-color: currentColor;
 			--_gcd-p-line-height: var(--_wp-ui-menu-item-label-line-height);
 
+			grid-column: label-start / label-end;
 			min-width: 0;
 			overflow-wrap: anywhere;
 			color: inherit;
@@ -316,14 +314,8 @@
 			overflow-wrap: anywhere;
 		}
 
-		/* Match `Menu.ItemDescription`, which uses the `body-sm` text variant. */
-		.item-suffix,
-		.item-shortcut {
-			font-size: var(--wpds-typography-font-size-sm);
-			line-height: var(--wpds-typography-line-height-xs);
-		}
-
-		.item-suffix {
+		/* Outrank the `Text` margin reset, whose stylesheet may load after this one. */
+		.item-content > .item-suffix {
 			grid-column: suffix-start / suffix-end;
 			display: flex;
 			align-items: center;
@@ -332,7 +324,7 @@
 			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
-		.item-shortcut {
+		.item-content > .item-shortcut {
 			grid-column: shortcut-start / shortcut-end;
 			margin-inline-start: var(--wpds-dimension-gap-md);
 			color: var(--wpds-color-foreground-content-neutral-weak);
@@ -346,7 +338,7 @@
 			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
-		.item-children + :is(.item-suffix, .item-shortcut, .item-trailing) {
+		.item-label + :is(.item-suffix, .item-shortcut, .item-trailing) {
 			margin-inline-start: var(--wpds-dimension-gap-xl);
 		}
 
