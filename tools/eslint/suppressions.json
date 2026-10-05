@@ -2307,11 +2307,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/hooks/test/allowed-blocks.jsdom.test.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/hooks/test/background.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
