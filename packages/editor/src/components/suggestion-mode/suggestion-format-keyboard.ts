@@ -6,14 +6,14 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { create } from '@wordpress/rich-text';
 import { __ } from '@wordpress/i18n';
-import { useSuggestionOverlay } from './overlay-context';
+import { useSuggestionSession } from './suggestion-session';
 import useAbandonedNoteCleanup from './use-abandoned-note-cleanup';
 import {
 	INLINE_OP_TYPE,
 	findInlineOp,
 	parseSuggestionPayload,
-	useSuggestionsProvider,
-} from './provider';
+} from './operations';
+import { useSuggestionsProvider } from './provider';
 import {
 	SUGGESTION_TYPE_FORMAT,
 	applyFormatPlan,
@@ -72,7 +72,7 @@ export default function SuggestionFormatKeyboard() {
 		registerFormatHandler,
 		requestInterceptorBypass,
 		enqueueSuggestionWrite,
-	} = useSuggestionOverlay();
+	} = useSuggestionSession();
 
 	// Trash the note created for an abandoned plan and drop its id from the
 	// block's note linkage.

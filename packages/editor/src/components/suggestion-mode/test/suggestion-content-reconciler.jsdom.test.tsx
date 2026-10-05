@@ -25,9 +25,9 @@ import SuggestionContentReconciler, {
 	contentKey,
 } from '../suggestion-content-reconciler';
 import {
-	SuggestionOverlayProvider,
-	useSuggestionOverlay,
-} from '../overlay-context';
+	SuggestionSessionProvider,
+	useSuggestionSession,
+} from '../suggestion-session';
 import {
 	registerSuggestionFormat,
 	SUGGESTION_FORMAT_NAME,
@@ -98,7 +98,7 @@ beforeEach( () => {
 // call `requestContentSuggestion` the way the per-block HOC does.
 const overlayRef: { current: any } = { current: null };
 function CaptureOverlay() {
-	const overlay = useSuggestionOverlay();
+	const overlay = useSuggestionSession();
 	useEffect( () => {
 		overlayRef.current = overlay;
 	}, [ overlay ] );
@@ -124,7 +124,7 @@ function setup( { content = 'Hello' } = {} ) {
 
 	const wrapper = ( { children }: { children?: React.ReactNode } ) => (
 		<RegistryProvider value={ registry }>
-			<SuggestionOverlayProvider>{ children }</SuggestionOverlayProvider>
+			<SuggestionSessionProvider>{ children }</SuggestionSessionProvider>
 		</RegistryProvider>
 	);
 

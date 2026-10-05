@@ -61,7 +61,7 @@ import { useInstanceId } from '@wordpress/compose';
 import { __unstableStripHTML as wpStripHTML } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { wordDiff, MAX_DIFF_LENGTH } from './word-diff';
-import type { SuggestionOperation } from './provider';
+import type { SuggestionOperation } from './operations';
 import type { WordDiffSegment } from './word-diff';
 
 /**

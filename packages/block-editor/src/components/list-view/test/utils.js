@@ -12,6 +12,18 @@ describe( 'getBlockSuggestionTreatment', () => {
 		expect( getBlockSuggestionTreatment( {} ) ).toBe( undefined );
 	} );
 
+	it( 'labels a pending attribute change', () => {
+		expect(
+			getBlockSuggestionTreatment( {
+				type: 'pending-attributes',
+				after: { level: 3 },
+			} )
+		).toEqual( {
+			className: 'is-suggestion-pending',
+			label: 'Suggested change.',
+		} );
+	} );
+
 	it( 'ignores a marker type it does not recognize rather than inventing a class', () => {
 		expect( getBlockSuggestionTreatment( { type: 'pending-shrug' } ) ).toBe(
 			undefined
