@@ -60,7 +60,6 @@ const ALLOWLIST = {
 			'ValidatedTextareaControl',
 			'ValidityIndicator',
 			'VisuallyHidden',
-			'inertValue',
 			'useKeyboardShortcutProps',
 		],
 		caution: [
@@ -74,6 +73,7 @@ const ALLOWLIST = {
 			'IconButton',
 			'Menu',
 			'Popover',
+			'Progress',
 			'SearchableSelect',
 			'SearchableSelectControl',
 			'Switch',
