@@ -9,7 +9,7 @@ import type { SearchableChipSelectControlProps } from './types';
 export const SearchableChipSelectControl = forwardRef<
 	HTMLInputElement,
 	SearchableChipSelectControlProps
->( function SearchableChipSelectControl(
+>( function UnforwardedSearchableChipSelectControl(
 	{
 		className,
 		label,

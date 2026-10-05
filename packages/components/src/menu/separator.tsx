@@ -7,7 +7,7 @@ import * as Styled from './styles';
 export const Separator = forwardRef<
 	HTMLHRElement,
 	WordPressComponentProps< SeparatorProps, 'hr', false >
->( function Separator( props, ref ) {
+>( function UnforwardedSeparator( props, ref ) {
 	const menuContext = useContext( Context );
 
 	if ( ! menuContext?.store ) {

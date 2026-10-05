@@ -10,7 +10,10 @@ import type { CheckboxGroupNestedItemsProps } from './types';
 export const CheckboxGroupNestedItems = forwardRef<
 	HTMLDivElement,
 	CheckboxGroupNestedItemsProps
->( function CheckboxGroupNestedItems( { className, ...restProps }, ref ) {
+>( function UnforwardedCheckboxGroupNestedItems(
+	{ className, ...restProps },
+	ref
+) {
 	return (
 		<Stack
 			ref={ ref }

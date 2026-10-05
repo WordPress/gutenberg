@@ -4,15 +4,25 @@
 
 ### Enhancements
 
--   Notes: Highlight the whole text block when a note is attached at the block level, in the note author's color, and replace the spotlight dimming shown while a note is selected with the block's own outline ([#72860](https://github.com/WordPress/gutenberg/issues/72860)).
+-   Notes: Highlight the whole text block when a note is attached at the block level, in the note author's color, and replace the spotlight dimming shown while a note is selected with the block's own outline ([#80578](https://github.com/WordPress/gutenberg/pull/80578), closes [#72860](https://github.com/WordPress/gutenberg/issues/72860)).
 -   `PostAuthor`: The field renders with the `SearchableSelect` component of `@wordpress/ui` instead of `ComboboxControl` and `SelectControl` ([#83323](https://github.com/WordPress/gutenberg/pull/83323)).
+-   `DocumentOutline`: Show the outline items' focus ring with the design system's outline instead of a legacy box-shadow ([#83755](https://github.com/WordPress/gutenberg/pull/83755)).
+-   Notes: Add a "Notes" submenu to the View group of the Options menu ([#83768](https://github.com/WordPress/gutenberg/pull/83768)).
 
 ### Bug Fixes
 
--   Notes: Stop deepening a note's tint on hover, focus, and selection. The tint sits behind the text and is subtracted from whatever contrast the theme provides, so inline markers are emphasized with an author-tinted underline instead, and block-level notes by the block's own outline ([#80543](https://github.com/WordPress/gutenberg/issues/80543)).
+-   Keep post actions and note actions menus dismissible when their triggers become disabled. Close the View menu when it becomes unavailable ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
+-   Remove redundant menu groups from the mode switcher and preview menu, and associate the Editor label with its radio group ([#83792](https://github.com/WordPress/gutenberg/pull/83792)).
+-   Notes: Stop deepening a note's tint on hover, focus, and selection. The tint sits behind the text and is subtracted from whatever contrast the theme provides, so inline markers are emphasized with an author-tinted underline instead, and block-level notes by the block's own outline ([#80578](https://github.com/WordPress/gutenberg/pull/80578), fixes [#80543](https://github.com/WordPress/gutenberg/issues/80543)).
 -   Error boundary: Explicitly announce the error title and description, excluding action labels ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
 -   `PostURL`: Leaving the slug field without typing no longer saves the displayed fallback as the slug, so a new post no longer publishes with the `auto-draft` slug ([#83518](https://github.com/WordPress/gutenberg/pull/83518)).
 -   Notes: Keep the clicked thread selected on a block with several notes, instead of switching to the block's primary note ([#83528](https://github.com/WordPress/gutenberg/pull/83528)).
+-   Notes: Keep floating threads aligned with their blocks when an editor notice or the device preview moves the canvas ([#83485](https://github.com/WordPress/gutenberg/pull/83485)).
+-   Notes: Add an Undo action to the "Note deleted." snackbar, and stop the editor's undo from bringing back the highlight of a deleted note ([#83988](https://github.com/WordPress/gutenberg/pull/83988)).
+
+### Internal
+
+-   Template options: Use the public `Menu` from `@wordpress/ui` ([#82964](https://github.com/WordPress/gutenberg/pull/82964)).
 
 ## 15.1.0 (2026-09-23)
 

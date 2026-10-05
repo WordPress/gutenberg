@@ -118,7 +118,7 @@
 
 		// If a browser supports it, we will switch to using a circular SVG mask.
 		@supports (mask-image: none) or (-webkit-mask-image: none) {
-			mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="50"/></svg>');
+			mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='50'/%3E%3C/svg%3E");
 			mask-mode: alpha;
 			mask-repeat: no-repeat;
 			mask-size: contain;
@@ -305,6 +305,9 @@
 		width: var(--wp--lightbox-container-width);
 		height: var(--wp--lightbox-container-height);
 		z-index: 2000001;
+		// Clicking the image does not close the lightbox, so it should not
+		// appear clickable.
+		cursor: default;
 	}
 
 	.wp-block-image {
@@ -329,6 +332,11 @@
 		figcaption {
 			display: none;
 		}
+	}
+
+	.lightbox-thumbnail-container {
+		--wp--lightbox-image-width: var(--wp--lightbox-thumbnail-width);
+		--wp--lightbox-image-height: var(--wp--lightbox-thumbnail-height);
 	}
 
 	button {
@@ -445,9 +453,11 @@
 
 @keyframes lightbox-zoom-in {
 	0% {
+		clip-path: var(--wp--lightbox-initial-clip);
 		transform: translate(calc((-100vw + var(--wp--lightbox-scrollbar-width)) / 2 + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
 	}
 	100% {
+		clip-path: inset(0);
 		transform: translate(-50%, -50%) scale(1, 1);
 	}
 }
@@ -455,6 +465,7 @@
 @keyframes lightbox-zoom-out {
 	0% {
 		visibility: visible;
+		clip-path: inset(0);
 		transform: translate(-50%, -50%) scale(1, 1);
 	}
 	99% {
@@ -462,6 +473,7 @@
 	}
 	100% {
 		visibility: hidden;
+		clip-path: var(--wp--lightbox-initial-clip);
 		transform: translate(calc((-100vw + var(--wp--lightbox-scrollbar-width)) / 2 + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
 	}
 }

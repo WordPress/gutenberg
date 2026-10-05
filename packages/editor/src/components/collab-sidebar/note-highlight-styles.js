@@ -74,21 +74,23 @@ function underline( color, thickness ) {
 const BASE_RESET = 'mark.wp-note{background-color:transparent;color:inherit;}';
 
 /*
- * Forced-colors (e.g. Windows High Contrast) replaces the per-author tints with
- * a system palette, and browsers paint a `mark` with the system `Mark`/`MarkText`
- * pair: a solid highlight that swamps the annotated text and reads as nothing
- * the rest of the editor uses. Markers drop it - `transparent` keeps its alpha
- * through the forcing - and mark themselves with an outline instead, the way
- * core signals state in that mode.
- *
- * `color` has to be restated rather than left to inherit: a `mark` is forced to
- * `MarkText` even where the author asked to inherit, and `MarkText` is only
- * legible against the `Mark` background this rule just removed.
+ * Forced colors (e.g. Windows High Contrast) drop the per-author tints, so
+ * annotated text falls back to the system `Mark`/`MarkText` pair: the palette
+ * the user chose for highlighted text, legible by construction. The base reset
+ * above set the background to `transparent`, which survives the forcing, so
+ * the pair has to be restated here.
  */
-const FORCED_COLORS_RESET =
-	'@media (forced-colors: active){' +
-	'mark.wp-note{background-color:transparent;color:CanvasText;}' +
-	'}';
+const FORCED_COLORS_HIGHLIGHT =
+	'background-color:Mark;color:MarkText;text-decoration-color:MarkText;';
+
+const FORCED_COLORS_RESET = `@media (forced-colors: active){mark.wp-note{${ FORCED_COLORS_HIGHLIGHT }}}`;
+
+/*
+ * Elements that make a block media rather than text. A block holding any of
+ * them takes the overlay, since a tint behind its text would leave the media
+ * itself unmarked.
+ */
+const MEDIA_SELECTOR = 'img,video,audio,iframe,canvas,object,embed';
 
 /**
  * Derive the block-level highlights from the note threads: a thread marks its
@@ -143,10 +145,9 @@ export function getBlockLevelHighlights( threads, getBlockAttributes ) {
  * amount and never more. Hover changes nothing: it is decorative, and a
  * silhouette change there reads as noise.
  *
- * Under forced colors the tint is unavailable - the browser would paint the
- * marker with the system highlight pair instead - so a marker drops it and
- * carries a dashed outline in the system text color, the same fallback the
- * block-level highlights use.
+ * Under forced colors the tint is unavailable, so a marker is painted with the
+ * system `Mark`/`MarkText` pair instead, the highlight the user's palette
+ * defines for exactly this.
  *
  * @param {Array}       threads    Unresolved note threads (each with `id` and `author`).
  * @param {string|null} selectedId ID of the currently selected note, if any.
@@ -177,21 +178,16 @@ export function buildHighlightCss( threads, selectedId = null ) {
 		}
 	}
 	/*
-	 * The marking a forced-colors palette allows: no tint (the forcing turns
-	 * the author color into the system highlight, so it has to be dropped here
-	 * where the per-note rules can be outranked, not in the reset above), and a
-	 * dashed outline in the system text color instead - the same fallback the
-	 * block-level highlights use. The forcing already paints the underline in
-	 * that color; it is restated so the intent is visible.
-	 *
-	 * Emitted last and carrying the same specificity as the per-note rules, so
-	 * it is the cascade and not `!important` that settles which one applies.
+	 * Under forced colors the per-note tint gives way to the system highlight
+	 * pair. Emitted last and carrying the same specificity as the per-note
+	 * rules, so it is the cascade and not `!important` that settles which one
+	 * applies.
 	 */
 	if ( markerSelectors.length > 0 ) {
 		rules.push(
 			`@media (forced-colors: active){${ markerSelectors.join(
 				','
-			) }{background-color:transparent;text-decoration-color:CanvasText;outline:${ RULE_THICKNESS } dashed;outline-offset:1px;}}`
+			) }{${ FORCED_COLORS_HIGHLIGHT }}}`
 		);
 	}
 	return rules.join( '' );
@@ -212,13 +208,17 @@ export function buildHighlightCss( threads, selectedId = null ) {
  * each rich-text leaf inside them, so e.g. every list item is tinted and
  * underlined individually.
  *
- * Every other block (images, covers, other media whose editables are nested
- * inside non-block containers) paints the tint onto an `::after` overlay
- * instead - a tinted veil with the rule drawn all the way around - because a
- * background behind e.g. an image is hidden by the image itself. A container
- * holding no editable text at all (a group of images, a gallery) gets the
- * overlay too. A container mixing text and media only tints its text. The
- * overlay ignores pointer events, so the block stays editable through it.
+ * Text blocks whose editables sit deeper in their own markup (a table's cells,
+ * a code block's `<code>`, a button's link) get the same treatment on each of
+ * those editables, as long as the block holds no media.
+ *
+ * Every other block (images, media covers, anything with no editable text)
+ * paints the tint onto an `::after` overlay instead - a tinted veil with the
+ * rule drawn all the way around - because a background behind e.g. an image is
+ * hidden by the image itself. A container holding no editable text at all (a
+ * group of images, a gallery) gets the overlay too. A container mixing text
+ * and media only tints its text. The overlay ignores pointer events, so the
+ * block stays editable through it.
  *
  * Both are present at rest, with no hover or selected variant, so an annotated
  * block is legible as one without clicking anything. The tint covers a whole
@@ -227,9 +227,11 @@ export function buildHighlightCss( threads, selectedId = null ) {
  * draws the block's own outline instead, which is what already signals "this
  * block" everywhere else in the editor.
  *
- * Under forced colors the tints are stripped by the browser, so each annotated
- * block falls back to a dashed outline - dashed so it cannot be mistaken for
- * the solid outline the editor draws on the selected block.
+ * Under forced colors the tints are stripped by the browser, so annotated text
+ * takes the system `Mark`/`MarkText` pair, and each annotated block also gets a
+ * dashed outline - the only marking an overlaid block has left, and dashed so
+ * it cannot be mistaken for the solid outline the editor draws on the selected
+ * block.
  *
  * @param {Array} blockHighlights Block-level notes (each with `clientId`, `id` and `author`).
  * @return {string} A serialized CSS string targeting the blocks' wrapper elements.
@@ -261,16 +263,21 @@ export function buildBlockHighlightCss( blockHighlights ) {
 		// group) mark each of their rich-text leaves; a cover or image nests
 		// its editables inside non-block containers, so it won't match.
 		const leafSel = `${ blockSel }:not(.block-editor-rich-text__editable):has(> [data-block]) .block-editor-rich-text__editable`;
-		textSelectors.push( textSel, leafSel );
+		// Text blocks with their editables nested in their own markup (table,
+		// code, button). Any media in the block sends it to the overlay.
+		const nestedSel = `${ blockSel }:not(.block-editor-rich-text__editable):not(:has(> [data-block])):not(:has(${ MEDIA_SELECTOR })) .block-editor-rich-text__editable`;
+		textSelectors.push( textSel, leafSel, nestedSel );
 		rules.push( `${ textSel }{${ textDeclarations }}` );
 		rules.push( `${ leafSel }{${ textDeclarations }}` );
-		// Non-text blocks, plus containers with no text to tint (a group of
-		// images, a gallery, columns of media), which the leaf rule above
-		// cannot mark. A multi-selected block is left out so the editor's
-		// selection overlay owns the pseudo-element outright.
+		rules.push( `${ nestedSel }{${ textDeclarations }}` );
+		// Blocks with no text or with media, plus containers with no text to
+		// tint (a group of images, a gallery, columns of media), which the
+		// leaf rule above cannot mark. A multi-selected block is left out so
+		// the editor's selection overlay owns the pseudo-element outright.
 		const veilSel = `${ blockSel }:not(.block-editor-rich-text__editable):not(.is-multi-selected)`;
 		const veilSelectors = [
-			`${ veilSel }:not(:has(> [data-block]))::after`,
+			`${ veilSel }:not(:has(> [data-block])):not(:has(.block-editor-rich-text__editable))::after`,
+			`${ veilSel }:not(:has(> [data-block])):has(${ MEDIA_SELECTOR })::after`,
 			`${ veilSel }:has(> [data-block]):not(:has(.block-editor-rich-text__editable))::after`,
 		];
 		overlaySelectors.push( ...veilSelectors );
@@ -294,18 +301,17 @@ export function buildBlockHighlightCss( blockHighlights ) {
 	}
 	if ( blockSelectors.length > 0 ) {
 		/*
-		 * The forcing already paints the underline in the system text color;
-		 * it is restated so the intent is visible. The overlay's border is
-		 * dropped, since the forcing would turn it into a solid ring beside
-		 * the dashed outline. Same selectors as the resting rules, so it is
-		 * source order and not `!important` that settles the cascade.
+		 * The overlay's border is dropped, since the forcing would turn it
+		 * into a solid ring beside the dashed outline. Same selectors as the
+		 * resting rules, so it is source order and not `!important` that
+		 * settles the cascade.
 		 */
 		rules.push(
 			`@media (forced-colors: active){${ blockSelectors.join(
 				','
 			) }{outline:${ RULE_THICKNESS } dashed;outline-offset:2px;}${ textSelectors.join(
 				','
-			) }{text-decoration-color:CanvasText;}${ overlaySelectors.join(
+			) }{${ FORCED_COLORS_HIGHLIGHT }}${ overlaySelectors.join(
 				','
 			) }{border:none;}}`
 		);
