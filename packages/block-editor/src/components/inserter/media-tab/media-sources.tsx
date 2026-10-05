@@ -50,10 +50,9 @@ export default function MediaSources( {
 				) ?? categories[ 0 ]
 			)?.name
 	);
-	const baseCssClass = 'block-editor-inserter__media-sources';
 
 	return (
-		<div className={ baseCssClass }>
+		<div className="block-editor-inserter__media-sources">
 			{ categories.map( ( category ) => {
 				const isOpen = category.name === openName;
 				return (
@@ -65,21 +64,20 @@ export default function MediaSources( {
 							// the open one leaves every panel collapsed.
 							setOpenName( open ? category.name : undefined );
 						} }
-						className={ clsx( `${ baseCssClass }__source`, {
-							'is-open': isOpen,
-						} ) }
+						className={ clsx(
+							'block-editor-inserter__media-sources__source',
+							{
+								'is-open': isOpen,
+							}
+						) }
 					>
-						<Collapsible.Trigger
-							className={ `${ baseCssClass }__trigger` }
-						>
-							<span className={ `${ baseCssClass }__label` }>
+						<Collapsible.Trigger className="block-editor-inserter__media-sources__trigger">
+							<span className="block-editor-inserter__media-sources__label">
 								{ category.label }
 							</span>
 							<Icon icon={ isOpen ? chevronUp : chevronDown } />
 						</Collapsible.Trigger>
-						<Collapsible.Panel
-							className={ `${ baseCssClass }__panel` }
-						>
+						<Collapsible.Panel className="block-editor-inserter__media-sources__panel">
 							<MediaCategoryPanel
 								onInsert={ onInsert }
 								category={ category }
@@ -89,7 +87,9 @@ export default function MediaSources( {
 				);
 			} ) }
 			{ footer && (
-				<div className={ `${ baseCssClass }__footer` }>{ footer }</div>
+				<div className="block-editor-inserter__media-sources__footer">
+					{ footer }
+				</div>
 			) }
 		</div>
 	);
