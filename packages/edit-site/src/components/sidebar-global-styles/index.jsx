@@ -15,7 +15,13 @@ import { unlock } from '../../lock-unlock';
 const { GlobalStylesUIWrapper, GlobalStylesActionMenu } =
 	unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
-const { ToolsPanelLocationContext } = unlock( blockEditorPrivateApis );
+const { ToolsPanelPopoverPropsContext } = unlock( blockEditorPrivateApis );
+
+// Panel padding (16px) + screen padding (12px) + spacing (4px)
+const TOOLS_PANEL_POPOVER_PROPS = {
+	dropdown: { placement: 'right-start', offset: 32 },
+	item: { placement: 'right-start', offset: 32, shift: true },
+};
 
 const GlobalStylesPageActions = ( {
 	isStyleBookOpened,
@@ -101,13 +107,15 @@ export default function SidebarGlobalStyles() {
 			headingLevel={ 2 }
 		>
 			<div className="edit-site-styles__content">
-				<ToolsPanelLocationContext.Provider value="page">
+				<ToolsPanelPopoverPropsContext.Provider
+					value={ TOOLS_PANEL_POPOVER_PROPS }
+				>
 					<GlobalStylesUIWrapper
 						path={ section }
 						onPathChange={ onChangeSection }
 						settings={ settings }
 					/>
-				</ToolsPanelLocationContext.Provider>
+				</ToolsPanelPopoverPropsContext.Provider>
 			</div>
 		</Page>
 	);

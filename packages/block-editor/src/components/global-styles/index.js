@@ -1,6 +1,6 @@
 export { useSettingsForBlockElement } from './hooks';
 export {
-	ToolsPanelLocationContext,
+	ToolsPanelPopoverPropsContext,
 	useToolsPanelItemPopoverProps,
 } from './utils';
 export {

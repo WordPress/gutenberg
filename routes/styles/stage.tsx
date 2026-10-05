@@ -26,7 +26,13 @@ import './style.scss';
 
 const { GlobalStylesUIWrapper, GlobalStylesActionMenu } =
 	unlock( editorPrivateApis );
-const { ToolsPanelLocationContext } = unlock( blockEditorPrivateApis );
+const { ToolsPanelPopoverPropsContext } = unlock( blockEditorPrivateApis );
+
+// Panel padding (16px) + screen padding (12px) + spacing (4px)
+const TOOLS_PANEL_POPOVER_PROPS = {
+	dropdown: { placement: 'right-start', offset: 32 },
+	item: { placement: 'right-start', offset: 32, shift: true },
+};
 
 function Stage() {
 	const navigate = useNavigate();
@@ -172,13 +178,15 @@ function Stage() {
 			}
 		>
 			<div className="routes-styles__content">
-				<ToolsPanelLocationContext.Provider value="page">
+				<ToolsPanelPopoverPropsContext.Provider
+					value={ TOOLS_PANEL_POPOVER_PROPS }
+				>
 					<GlobalStylesUIWrapper
 						path={ section }
 						onPathChange={ onChangeSection }
 						settings={ editorSettings }
 					/>
-				</ToolsPanelLocationContext.Provider>
+				</ToolsPanelPopoverPropsContext.Provider>
 			</div>
 			{ isActivatePanelOpen && (
 				<Modal
