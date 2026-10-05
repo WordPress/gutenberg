@@ -17,7 +17,7 @@ _This package assumes that your code will run in an ES2015+ environment. If you'
 ## Prerequisites
 
 - The `/wp/v2/fields` REST API route and the `getFieldsConfig` selector of the `core` data store, which requests and caches the fields. The Gutenberg plugin provides both. On a WordPress version without them, `useFields` returns an error and `loadFields` rejects with one, so a plugin bundling this package can fall back to fields of its own.
-- The script modules registered along with the fields must be on the page's import map. On the editor screens WordPress adds them for you.
+- The script modules registered along with the fields must be on the page's import map. WordPress adds every registered module to the import map of a page that loads the `wp-editor` script, so on the editor screens there is nothing to do, and a plugin screen gets them by listing `wp-editor` among the dependencies of its own script.
 
 ## Usage
 
@@ -55,15 +55,57 @@ Load them ahead of time, in a route loader or any other code outside React, with
 
 ### Providing the JavaScript parts of a field
 
-Register the field in PHP along with a script module, then make the module's default export an object keyed by the ids of the fields it provides (the `FieldsScriptParts` shape):
+Register the field in PHP along with a script module, then make the module's default export an object keyed by the ids of the fields it provides (the `FieldsScriptParts` shape).
+
+A module runs on the screens that load the `wp-editor` script and may use any package that script loads: `@wordpress/element`, `@wordpress/data`, `@wordpress/core-data`, `@wordpress/components`, `@wordpress/i18n` and the rest of the editor's dependencies. These are classic scripts, so a module reaches them through the `wp.*` globals rather than by importing them.
+
+Built with [`@wordpress/build`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/wp-build/README.md), the module imports them as usual and the build rewrites each `@wordpress/*` import into a read of the matching global, as it does for a classic script:
 
 ```js
+import { createElement } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+
 export default {
 	'acme/reading-time': {
-		render: ( { item } ) => `${ item.reading_time } min`,
+		render: ( { item } ) =>
+			createElement(
+				'span',
+				{ className: 'acme-reading-time' },
+				sprintf(
+					/* translators: %d: Number of minutes. */
+					__( '%d min', 'acme' ),
+					item.reading_time
+				)
+			),
 	},
 };
 ```
+
+Built with `@wordpress/scripts`, which does not support these imports in a module yet, or written without a build step, the module reads the globals directly:
+
+```js
+const { createElement } = window.wp.element;
+const { __, sprintf } = window.wp.i18n;
+
+export default {
+	'acme/reading-time': {
+		render: ( { item } ) =>
+			createElement(
+				'span',
+				{ className: 'acme-reading-time' },
+				sprintf(
+					/* translators: %d: Number of minutes. */
+					__( '%d min', 'acme' ),
+					item.reading_time
+				)
+			),
+	},
+};
+```
+
+Either way, do not bundle a copy of these packages into the module. A second copy of `@wordpress/data`, for example, has its own store registry and cannot see the stores of the page.
+
+A module cannot declare a classic script as a dependency, so it may only count on what `wp-editor` loads. If it needs another script, one of the plugin's own for instance, the plugin enqueues that script on the same screens, with `wp-editor` among its dependencies, so it is loaded before the module is imported.
 
 A module only contributes to the fields the server lists for it: parts for any other id are ignored, so a module can hold fields that are not registered, or were unregistered. When several modules provide parts for the same field, they are applied in the order the server lists them, so the later registration wins no matter which module finishes loading first.
 
