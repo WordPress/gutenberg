@@ -24,18 +24,20 @@ function parseMariaDBVersion( text ) {
 }
 
 /**
- * Checks whether one `X.Y.Z` version is newer than another.
+ * Checks whether one `X.Y.Z` version is a newer major or minor release than
+ * another. Patch versions are ignored, since MariaDB supports downgrading
+ * within the same major and minor version.
  *
  * @param {string} version        The version to check.
  * @param {string} compareVersion The version to compare against.
  *
- * @return {boolean} True when `version` is newer than `compareVersion`.
+ * @return {boolean} True when `version` is a newer major or minor release than `compareVersion`.
  */
-function isNewerVersion( version, compareVersion ) {
+function isNewerMinorVersion( version, compareVersion ) {
 	const parts = version.split( '.' ).map( Number );
 	const compareParts = compareVersion.split( '.' ).map( Number );
 
-	for ( let i = 0; i < parts.length; i++ ) {
+	for ( let i = 0; i < 2; i++ ) {
 		if ( parts[ i ] !== compareParts[ i ] ) {
 			return parts[ i ] > compareParts[ i ];
 		}
@@ -76,7 +78,7 @@ async function checkDatabaseDowngrade( service, dockerComposeConfig ) {
 	if (
 		serverVersion &&
 		dataVersion &&
-		isNewerVersion( dataVersion, serverVersion )
+		isNewerMinorVersion( dataVersion, serverVersion )
 	) {
 		return { service, dataVersion, serverVersion };
 	}
@@ -85,11 +87,52 @@ async function checkDatabaseDowngrade( service, dockerComposeConfig ) {
 }
 
 /**
+ * Gets the services whose container has exited with an error, which is how a
+ * database that cannot start ends up.
+ *
+ * @param {string[]} services            The services to check.
+ * @param {Object}   dockerComposeConfig Options for docker-compose.
+ *
+ * @return {Promise<string[]>} The failed services, in the order given.
+ */
+async function getFailedServices( services, dockerComposeConfig ) {
+	let out;
+	try {
+		// `execCompose` returns the raw output; the library's `ps` parser fails
+		// on the JSON current Compose versions print.
+		( { out } = await dockerCompose.execCompose(
+			'ps',
+			[ '--all', '--format', 'json', ...services ],
+			dockerComposeConfig
+		) );
+	} catch {
+		return [];
+	}
+
+	// Compose prints one JSON object per line, or a single array in older versions.
+	const containers = out
+		.split( '\n' )
+		.filter( ( line ) => line.trim() )
+		.flatMap( ( line ) => JSON.parse( line ) );
+
+	return services.filter( ( service ) =>
+		containers.some(
+			( container ) =>
+				container.Service === service &&
+				container.State === 'exited' &&
+				container.ExitCode !== 0
+		)
+	);
+}
+
+/**
  * Looks for a database service whose data was last used by a newer MariaDB
  * version than the one it is configured to run. MariaDB cannot downgrade, so
  * such a server fails to start, and Docker only reports that a dependency
- * failed. Called after a start fails, to explain why. The services are checked
- * in parallel, since each check starts a container.
+ * failed. Called after a start fails, to explain why. Only database containers
+ * that exited with an error are checked, so a start that failed for another
+ * reason keeps its own error. They are checked in parallel, since each check
+ * starts a container.
  *
  * @param {string[]} services            The database services to check.
  * @param {Object}   dockerComposeConfig Options for docker-compose.
@@ -97,8 +140,13 @@ async function checkDatabaseDowngrade( service, dockerComposeConfig ) {
  * @return {Promise<{service: string, dataVersion: string, serverVersion: string}|null>} The first downgraded service, in the order given, or null.
  */
 async function findDatabaseDowngrade( services, dockerComposeConfig ) {
+	const failedServices = await getFailedServices(
+		services,
+		dockerComposeConfig
+	);
+
 	const downgrades = await Promise.all(
-		services.map( ( service ) =>
+		failedServices.map( ( service ) =>
 			checkDatabaseDowngrade( service, dockerComposeConfig )
 		)
 	);
@@ -108,6 +156,6 @@ async function findDatabaseDowngrade( services, dockerComposeConfig ) {
 
 module.exports = {
 	findDatabaseDowngrade,
-	isNewerVersion,
+	isNewerMinorVersion,
 	parseMariaDBVersion,
 };
