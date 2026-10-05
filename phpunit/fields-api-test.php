@@ -1532,6 +1532,37 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A field whose `type` DataViews does not provide renders without a
+	 * control, so it is reported, and registered anyway. A field without a
+	 * `type` is not reported.
+	 */
+	public function test_registering_a_field_with_an_unknown_type_is_reported() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::register' );
+		$reported   = &$this->record_notices( 'Gutenberg_Fields_Registry::register' );
+		$registered = $this->register_fields(
+			'postType',
+			'page',
+			array(
+				$this->field( 'color' ),
+				array(
+					'id'    => 'size',
+					'type'  => 'interger',
+					'label' => 'Size',
+				),
+				array(
+					'id'    => 'weight',
+					'label' => 'Weight',
+				),
+			)
+		);
+
+		$this->assertSame( array( 'color', 'size', 'weight' ), $registered, 'The field is registered anyway.' );
+		$this->assertCount( 1, $reported );
+		$this->assertStringContainsString( 'postType "page"', $reported[0], 'The notice names the entity.' );
+		$this->assertStringContainsString( ': size (interger).', $reported[0], 'The notice names the field and its type, not the others of the call.' );
+	}
+
+	/**
 	 * Only registered fields can be updated: a field that is not is skipped,
 	 * and the rest of the fields of the call are updated.
 	 */
