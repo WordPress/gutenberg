@@ -6,9 +6,7 @@ import type { Action, Field, View } from '@wordpress/dataviews';
 import { Spinner } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import InserterDraggableBlocks from '../../inserter-draggable-blocks';
-import { getBlockAndPreviewFromMedia } from './utils';
-import { useMediaInsert } from './use-media-insert';
-import InsertExternalImageModal from './insert-external-image-modal';
+import { getBlockAndPreviewFromMedia, getItemId } from './utils';
 
 type MediaType = 'image' | 'video' | 'audio';
 
@@ -51,9 +49,13 @@ type MediaGridProps = {
 	onChangeSearch: ( search: string ) => void;
 	category: MediaCategory;
 	/**
-	 * Called with the block to insert.
+	 * Called with the item the reader chose to insert.
 	 */
-	onInsert: ( block: unknown ) => void;
+	onClickItem: ( item: MediaItem ) => void;
+	/**
+	 * The item whose insert is in flight, shown with a spinner.
+	 */
+	insertingId?: string | number;
 	/**
 	 * Per-item actions, shown in each card's menu.
 	 */
@@ -79,7 +81,6 @@ const GRID_LAYOUT = {
 } as const;
 const DEFAULT_LAYOUTS = { grid: { layout: GRID_LAYOUT } };
 
-const getItemId = ( item: MediaItem ) => String( item.id ?? item.sourceId );
 const isItemClickable = () => true;
 const getTitle = ( item: MediaItem ) =>
 	typeof item.title === 'string'
@@ -168,19 +169,13 @@ export default function MediaGrid( {
 	search,
 	onChangeSearch,
 	category,
-	onInsert,
+	onClickItem,
+	insertingId,
 	actions,
 	searchLabel,
 	empty,
 	footer,
 }: MediaGridProps ) {
-	const {
-		insert,
-		insertingId,
-		pendingExternalBlock,
-		confirmExternalInsert,
-		cancelExternalInsert,
-	} = useMediaInsert( onInsert );
 	const { mediaType } = category;
 
 	const fields: Field< MediaItem >[] = useMemo(
@@ -246,14 +241,6 @@ export default function MediaGrid( {
 		[ search, page, onChangeSearch, onChangePage ]
 	);
 
-	const onClickItem = useCallback(
-		( item: MediaItem ) => {
-			const [ block ] = getBlockAndPreviewFromMedia( item, mediaType );
-			insert( block, getItemId( item ) );
-		},
-		[ insert, mediaType ]
-	);
-
 	const paginationInfo = useMemo(
 		() => ( {
 			totalItems: totalItems ?? 0,
@@ -272,56 +259,48 @@ export default function MediaGrid( {
 	} );
 
 	return (
-		<>
-			<DataViews
-				data={ mediaList ?? EMPTY_ARRAY }
-				fields={ fields }
-				view={ view }
-				onChangeView={ onChangeView }
-				actions={ actions }
-				// Until the first fetch resolves there is nothing to show, so
-				// count that as loading rather than as an empty result.
-				isLoading={ isLoading || mediaList === undefined }
-				paginationInfo={ paginationInfo }
-				defaultLayouts={ DEFAULT_LAYOUTS }
-				getItemId={ getItemId }
-				onClickItem={ onClickItem }
-				isItemClickable={ isItemClickable }
-				empty={ empty }
-			>
-				<div className="block-editor-inserter__media-grid__search">
-					<DataViews.Search label={ searchLabel } />
-				</div>
-				<DataViews.Layout className="block-editor-inserter__media-grid" />
-				{ hasFooter && (
-					<Stack
-						direction="column"
-						gap="sm"
-						className="block-editor-inserter__media-grid__footer"
-					>
-						{ showPagination && (
-							<Stack
-								direction="row"
-								justify="space-between"
-								align="center"
-								gap="sm"
-							>
-								<span className="block-editor-inserter__media-grid__range">
-									{ itemRange }
-								</span>
-								<DataViews.Pagination />
-							</Stack>
-						) }
-						{ footer }
-					</Stack>
-				) }
-			</DataViews>
-			{ pendingExternalBlock && (
-				<InsertExternalImageModal
-					onClose={ cancelExternalInsert }
-					onSubmit={ confirmExternalInsert }
-				/>
+		<DataViews
+			data={ mediaList ?? EMPTY_ARRAY }
+			fields={ fields }
+			view={ view }
+			onChangeView={ onChangeView }
+			actions={ actions }
+			// Until the first fetch resolves there is nothing to show, so
+			// count that as loading rather than as an empty result.
+			isLoading={ isLoading || mediaList === undefined }
+			paginationInfo={ paginationInfo }
+			defaultLayouts={ DEFAULT_LAYOUTS }
+			getItemId={ getItemId }
+			onClickItem={ onClickItem }
+			isItemClickable={ isItemClickable }
+			empty={ empty }
+		>
+			<div className="block-editor-inserter__media-grid__search">
+				<DataViews.Search label={ searchLabel } />
+			</div>
+			<DataViews.Layout className="block-editor-inserter__media-grid" />
+			{ hasFooter && (
+				<Stack
+					direction="column"
+					gap="sm"
+					className="block-editor-inserter__media-grid__footer"
+				>
+					{ showPagination && (
+						<Stack
+							direction="row"
+							justify="space-between"
+							align="center"
+							gap="sm"
+						>
+							<span className="block-editor-inserter__media-grid__range">
+								{ itemRange }
+							</span>
+							<DataViews.Pagination />
+						</Stack>
+					) }
+					{ footer }
+				</Stack>
 			) }
-		</>
+		</DataViews>
 	);
 }

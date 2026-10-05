@@ -6,6 +6,17 @@ const mediaTypeTag = { image: 'img', video: 'video', audio: 'audio' };
 /** @typedef {import('./hooks').InserterMediaItem} InserterMediaItem */
 
 /**
+ * A media item's id. Library items carry a numeric `id`; external ones (e.g.
+ * Openverse) carry a `sourceId` instead.
+ *
+ * @param {InserterMediaItem} media The media object.
+ * @return {string} The id, as a string.
+ */
+export function getItemId( media ) {
+	return String( media.id ?? media.sourceId );
+}
+
+/**
  * Creates a block and a preview element from a media object.
  *
  * @param {InserterMediaItem}         media     The media object to create the block from.
