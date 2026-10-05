@@ -1,6 +1,7 @@
-import { registerBlockType } from '@wordpress/blocks';
+import { createBlock, registerBlockType } from '@wordpress/blocks';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
-import { render } from '@testing-library/react';
+import { act, render } from '@testing-library/react';
+import { SelectionContext } from '../selection-context';
 import useBlockSync from '../use-block-sync';
 import withRegistryProvider from '../with-registry-provider';
 import * as blockEditorActions from '../../../store/actions';
@@ -211,6 +212,85 @@ describe( 'useBlockSync hook', () => {
 		// replaceInnerBlocks should not be called when the controlling
 		// block value is the same as what already exists in the store.
 		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
+	} );
+
+	it( 'adopts existing inner blocks and reports selection without replacing their IDs', () => {
+		const leaf = createBlock( 'test/test-block' );
+		const child = createBlock( 'test/test-block', {}, [ leaf ] );
+		const parent = createBlock( 'test/test-block', {}, [ child ] );
+		const onChange = vi.fn();
+		const onChangeSelection = vi.fn();
+		const selectionContext = {
+			getSelection: () => undefined,
+			onChangeSelection,
+		};
+		let registry;
+		const view = ( value ) => (
+			<SelectionContext.Provider value={ selectionContext }>
+				<TestWrapper
+					setRegistry={ ( reg ) => {
+						registry = reg;
+					} }
+					clientId={ parent.clientId }
+					value={ value }
+					onChange={ onChange }
+				/>
+			</SelectionContext.Provider>
+		);
+		const { rerender } = render( view( undefined ) );
+		act( () => {
+			registry.dispatch( blockEditorStore ).resetBlocks( [ parent ] );
+		} );
+		const blocks = registry
+			.select( blockEditorStore )
+			.getBlocks( parent.clientId );
+		blockEditorActions.replaceInnerBlocks.mockClear();
+		onChange.mockClear();
+
+		rerender( view( blocks ) );
+
+		expect(
+			registry
+				.select( blockEditorStore )
+				.areInnerBlocksControlled( parent.clientId )
+		).toBe( true );
+		expect(
+			registry.select( blockEditorStore ).getBlocks( parent.clientId )
+		).toEqual( blocks );
+		expect( blockEditorActions.replaceInnerBlocks ).toHaveBeenCalledWith(
+			parent.clientId,
+			blocks
+		);
+
+		act( () => {
+			registry.dispatch( blockEditorStore ).selectBlock( leaf.clientId );
+		} );
+		expect( onChangeSelection ).toHaveBeenLastCalledWith(
+			expect.objectContaining( {
+				selectionStart: expect.objectContaining( {
+					clientId: leaf.clientId,
+				} ),
+			} )
+		);
+		act( () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( leaf.clientId, { foo: 2 } );
+		} );
+		expect( onChange ).toHaveBeenLastCalledWith(
+			[
+				expect.objectContaining( {
+					clientId: child.clientId,
+					innerBlocks: [
+						expect.objectContaining( {
+							clientId: leaf.clientId,
+							attributes: { foo: 2 },
+						} ),
+					],
+				} ),
+			],
+			expect.any( Object )
+		);
 	} );
 
 	it( 'sets a block as an inner block controller if a clientId is provided', async () => {
