@@ -39,6 +39,35 @@ import { RadioGroupControl } from '@wordpress/ui';
 />;
 ```
 
+## TypeScript callbacks
+
+The legacy `onChange` callback receives a `string`, but `RadioGroupControl` types the `onValueChange` value as `unknown`. In TypeScript, narrow that value to a string before passing it to an existing string-valued state setter or callback:
+
+```tsx
+import { useState } from '@wordpress/element';
+import { RadioGroupControl } from '@wordpress/ui';
+
+function PostVisibilityControl() {
+	const [ visibility, setVisibility ] = useState( 'public' );
+
+	return (
+		<RadioGroupControl
+			label="Post visibility"
+			items={ [
+				{ label: 'Public', value: 'public' },
+				{ label: 'Private', value: 'private' },
+			] }
+			value={ visibility }
+			onValueChange={ ( nextValue ) => {
+				if ( typeof nextValue === 'string' ) {
+					setVisibility( nextValue );
+				}
+			} }
+		/>
+	);
+}
+```
+
 ## Prop mapping
 
 <Markdown>{ `
