@@ -51,6 +51,8 @@ fieldset.fields__media-edit {
 
 			&:focus-visible {
 				@include outset-ring__focus();
+				// The visible border belongs to the parent group, not the button,
+				// so offset by its width to keep the same gap as standalone buttons.
 				outline-offset: calc(var(--wpds-border-width-focus) + #{ $border-width });
 			}
 		}
