@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   `RequestUtils.setGutenbergExperiments()`: An experiment left out of the call now returns to its default rather than being switched off, and an experiment can default to on. Passing an empty array resets every experiment to its default instead of disabling all of them. To pin an experiment off regardless of its default, pass a map of flags to states (`{ 'gutenberg-react-19': false }`) in place of the array.
+-   `RequestUtils.setGutenbergExperiments()`: An experiment left out of the call now returns to its default rather than being switched off, and an experiment can default to on.To pin an experiment off regardless of its default, the function now supports an object argument with boolean values ([#83784](https://github.com/WordPress/gutenberg/pull/83784)).
 
 ### Bug Fixes
 
