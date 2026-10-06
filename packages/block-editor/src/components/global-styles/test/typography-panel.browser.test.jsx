@@ -1363,6 +1363,18 @@ describe( 'TypographyPanel text gradient', () => {
 			);
 		} );
 
+		it( 'says nothing once the breakpoint sets its own text color', async () => {
+			const { container } = await renderPanel( {
+				settings: gradientSettings,
+				blockName: TEST_BLOCK,
+				defaultControls: shownControls,
+				value: { color: { text: '#00ff00' } },
+				baseValue,
+			} );
+
+			expect( textGradientNotice( container ) ).not.toBeInTheDocument();
+		} );
+
 		it( 'clears a text gradient by writing the CSS initial clip', async () => {
 			const onChange = vi.fn();
 			await renderPanel( {

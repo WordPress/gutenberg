@@ -363,6 +363,11 @@ export default function TypographyPanel( {
 		( value?.background?.backgroundClip ?? baseClip ) === 'text';
 	// Only the Default state holds the gradient, so this one cannot change it.
 	const textGradientIsFromBase = clipsToTextHere && ! isTextGradient;
+	// A state that sets its own text color gets its fill back, so the color is
+	// painted and the gradient above has nothing left to replace.
+	const showsTextGradientNotice =
+		clipsToTextHere &&
+		! ( textGradientIsFromBase && !! value?.color?.text );
 	const textGradientNotice = textGradientIsFromBase
 		? __( 'The gradient set in the Default state replaces the text color.' )
 		: __( 'The gradient replaces the text color.' );
@@ -1374,7 +1379,7 @@ export default function TypographyPanel( {
 					) }
 				</InheritanceToolsPanelItem>
 			) }
-			{ hasTextColorEnabled && clipsToTextHere && (
+			{ hasTextColorEnabled && showsTextGradientNotice && (
 				<NoticeForControl
 					label={ __( 'Color' ) }
 					isShownByDefault={ defaultControls.textColor }
