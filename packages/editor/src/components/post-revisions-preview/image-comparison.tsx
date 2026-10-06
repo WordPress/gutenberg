@@ -8,7 +8,13 @@ import { __, sprintf } from '@wordpress/i18n';
 
 type ImageComparisonProps = { before: Block; after: Block };
 
-/** A read-only comparison of the image versions in two revisions. */
+/**
+ * A read-only comparison of the image versions in two revisions.
+ *
+ * @param {ImageComparisonProps} root0        Component props.
+ * @param {Block}                root0.before The block from the older revision.
+ * @param {Block}                root0.after  The block from the newer revision.
+ */
 function ImageComparison( { before, after }: ImageComparisonProps ) {
 	const [ position, setPosition ] = useState( 50 );
 	const [ unavailable, setUnavailable ] = useState< string[] >( [] );
