@@ -1,13 +1,9 @@
 import { __experimentalUseSlotFills as useSlotFills } from '@wordpress/components';
 import AdvancedControls from './advanced-controls-panel';
-import AdditionalStyles from './additional-styles-panel';
 import { default as InspectorControls } from '../inspector-controls';
 import groups from '../inspector-controls/groups';
 
-const SettingsTab = ( {
-	showAdvancedControls = false,
-	showAdditionalStyles = false,
-} ) => {
+const SettingsTab = ( { showAdvancedControls = false } ) => {
 	const defaultFills = useSlotFills( groups.default.name );
 	const bindingsFills = useSlotFills( groups.bindings.name );
 
@@ -22,13 +18,6 @@ const SettingsTab = ( {
 			{ showAdvancedControls && (
 				<div>
 					<AdvancedControls initialOpen={ ! hasOtherFills } />
-				</div>
-			) }
-			{ /* When there is no styles tab to host them, additional styling
-			     controls appear here as a separate panel. */ }
-			{ showAdditionalStyles && (
-				<div>
-					<AdditionalStyles />
 				</div>
 			) }
 		</>

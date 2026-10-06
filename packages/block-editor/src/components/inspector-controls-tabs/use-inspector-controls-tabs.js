@@ -57,6 +57,7 @@ export default function useInspectorControlsTabs(
 	// Styles Tab: Add this tab if there are any fills for block supports
 	// e.g. border, color, spacing, typography, etc.
 	const styleFills = [
+		...( useSlotFills( additionalStylesGroup.name ) || [] ),
 		...( useSlotFills( borderGroup.name ) || [] ),
 		...( useSlotFills( colorGroup.name ) || [] ),
 		...( useSlotFills( layoutGroup.name ) || [] ),
@@ -76,15 +77,7 @@ export default function useInspectorControlsTabs(
 		};
 	}, [] );
 
-	// Additional styling controls, e.g. Additional CSS, live in the Styles
-	// tab's own "Additional styles" panel. Fills for them alone don't warrant
-	// a Styles tab, as that tab would hold nothing but a collapsed panel.
-	// When there is no Styles tab they appear as a separate panel in the
-	// settings tab, so they have to be accounted for when deciding whether to
-	// show that tab.
 	const hasStylesTab = ! isPreviewMode && ( hasBlockStyles || hasStyleFills );
-	const additionalStylesFills =
-		useSlotFills( additionalStylesGroup.name ) || [];
 
 	// Settings Tab: If we don't have multiple tabs to display
 	// (i.e. both list view and styles), check only the default
@@ -98,7 +91,6 @@ export default function useInspectorControlsTabs(
 		...( useSlotFills( InspectorAdvancedControls.slotName ) || [] ),
 		...( useSlotFills( bindingsGroup.name ) || [] ),
 		...( useSlotFills( PrivateInspectorControlsAllowedBlocks.name ) || [] ),
-		...( hasStylesTab ? [] : additionalStylesFills ),
 	];
 
 	const settingsFills = [

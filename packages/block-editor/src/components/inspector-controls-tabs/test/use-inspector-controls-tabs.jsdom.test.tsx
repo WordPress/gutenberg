@@ -19,6 +19,41 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
 } );
 
 describe( 'useInspectorControlsTabs', () => {
+	it( 'includes Styles when Additional styles is the only group with controls', () => {
+		const AdditionalStylesFill = groups[ 'additional-styles' ].Fill;
+		const { result } = renderHook(
+			() => useInspectorControlsTabs( 'test/block', [], false, false ),
+			{
+				wrapper: ( { children }: { children: ReactNode } ) => (
+					<SlotFillProvider>
+						<AdditionalStylesFill>CSS</AdditionalStylesFill>
+						{ children }
+					</SlotFillProvider>
+				),
+			}
+		);
+
+		expect( result.current ).toEqual( [ TAB_STYLES ] );
+	} );
+
+	it( 'keeps Additional styles in Styles without adding Settings alongside List View', () => {
+		const AdditionalStylesFill = groups[ 'additional-styles' ].Fill;
+		const { result } = renderHook(
+			() => useInspectorControlsTabs( 'test/block', [], false, false ),
+			{
+				wrapper: ( { children }: { children: ReactNode } ) => (
+					<SlotFillProvider>
+						<groups.list.Fill>List View</groups.list.Fill>
+						<AdditionalStylesFill>CSS</AdditionalStylesFill>
+						{ children }
+					</SlotFillProvider>
+				),
+			}
+		);
+
+		expect( result.current ).toEqual( [ TAB_LIST_VIEW, TAB_STYLES ] );
+	} );
+
 	it( 'includes Settings when Allowed blocks is the only settings control', () => {
 		const { result } = renderHook(
 			() =>

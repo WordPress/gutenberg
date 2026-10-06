@@ -143,10 +143,6 @@ export default function InspectorControlsTabs( {
 		( tab ) => tab.name === TAB_LIST_VIEW.name
 	);
 
-	// Without a styles tab to host them, the additional styling controls are
-	// shown as a separate panel in the settings tab.
-	const hasStylesTab = tabs.some( ( tab ) => tab.name === TAB_STYLES.name );
-
 	const switchToListView = ( targetClientId ) => {
 		if ( hasListViewTab ) {
 			// Open only the target panel
@@ -198,10 +194,7 @@ export default function InspectorControlsTabs( {
 					<ListViewContentPopover listViewRef={ listViewRef } />
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ TAB_SETTINGS.name } focusable={ false }>
-					<SettingsTab
-						showAdvancedControls={ !! blockName }
-						showAdditionalStyles={ ! hasStylesTab }
-					/>
+					<SettingsTab showAdvancedControls={ !! blockName } />
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ TAB_STYLES.name } focusable={ false }>
 					<StylesTab
