@@ -8,7 +8,6 @@ import MenuItem from '../../menu-item';
 import { HStack } from '../../h-stack';
 import { Heading } from '../../heading';
 import { useToolsPanelHeader } from './hook';
-import { useToolsPanelContext } from '../context';
 import styles from '../style.module.scss';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
@@ -85,7 +84,6 @@ const OptionalControlsGroup = ( {
 	items,
 	toggleItem,
 }: ToolsPanelControlsGroupProps ) => {
-	const { resettableItems } = useToolsPanelContext();
 	if ( ! items.length ) {
 		return null;
 	}
@@ -93,28 +91,17 @@ const OptionalControlsGroup = ( {
 	return (
 		<>
 			{ items.map( ( [ label, isSelected ] ) => {
-				// Preserve reset wording for contexts supplied by legacy providers.
-				const canReset = resettableItems?.includes( label ) ?? true;
-				let itemLabel;
-				if ( ! isSelected ) {
-					itemLabel = sprintf(
-						// translators: %s: The name of the control to display e.g. "Padding".
-						_x( 'Show %s', 'input control' ),
-						label
-					);
-				} else if ( canReset ) {
-					itemLabel = sprintf(
-						// translators: %s: The name of the control being hidden and reset e.g. "Padding".
-						__( 'Hide and reset %s' ),
-						label
-					);
-				} else {
-					itemLabel = sprintf(
-						// translators: %s: The name of the item being hidden e.g. "Apply globally".
-						__( 'Hide %s' ),
-						label
-					);
-				}
+				const itemLabel = isSelected
+					? sprintf(
+							// translators: %s: The name of the control being hidden and reset e.g. "Padding".
+							__( 'Hide and reset %s' ),
+							label
+						)
+					: sprintf(
+							// translators: %s: The name of the control to display e.g. "Padding".
+							_x( 'Show %s', 'input control' ),
+							label
+						);
 
 				return (
 					<MenuItem
@@ -125,19 +112,11 @@ const OptionalControlsGroup = ( {
 						onClick={ () => {
 							if ( isSelected ) {
 								speak(
-									canReset
-										? sprintf(
-												// translators: %s: The name of the control being reset e.g. "Padding".
-												__(
-													'%s hidden and reset to default'
-												),
-												label
-											)
-										: sprintf(
-												// translators: %s: The name of the item being hidden e.g. "Apply globally".
-												__( '%s hidden' ),
-												label
-											),
+									sprintf(
+										// translators: %s: The name of the control being reset e.g. "Padding".
+										__( '%s hidden and reset to default' ),
+										label
+									),
 									'assertive'
 								);
 							} else {

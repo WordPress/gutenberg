@@ -6,11 +6,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
-import {
-	BaseControl,
-	Button,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
+import { BaseControl, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	__EXPERIMENTAL_STYLE_PROPERTY,
@@ -561,13 +557,7 @@ function PushChangesToGlobalStyles( props ) {
 
 	return (
 		<InspectorControls group="additional-styles">
-			<ToolsPanelItem
-				label={ __( 'Apply globally' ) }
-				panelId={ props.clientId }
-				hasValue={ () => false }
-			>
-				<PushChangesToGlobalStylesControl { ...props } />
-			</ToolsPanelItem>
+			<PushChangesToGlobalStylesControl { ...props } />
 		</InspectorControls>
 	);
 }

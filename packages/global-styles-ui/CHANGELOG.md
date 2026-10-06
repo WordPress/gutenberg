@@ -4,7 +4,6 @@
 
 ### Enhancements
 
--   Blocks screen: Use a ToolsPanel for Additional styles, with optional CSS controls and a reset that restores inherited CSS ([#83753](https://github.com/WordPress/gutenberg/pull/83753)).
 -   Blocks screen: add the hover, focus, focus-visible and active state controls for the Navigation Link block, which already supports those states in `theme.json` and in the block inspector ([#83451](https://github.com/WordPress/gutenberg/pull/83451)).
 
 ### Internal

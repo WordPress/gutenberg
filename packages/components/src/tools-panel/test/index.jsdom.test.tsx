@@ -374,40 +374,6 @@ describe( 'ToolsPanel', () => {
 			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
-		it( 'announces hiding a visibility-only item without claiming it was reset', async () => {
-			const user = userEvent.setup();
-			render(
-				<ToolsPanel { ...defaultProps }>
-					<ToolsPanelItem
-						label="Apply globally"
-						hasValue={ () => false }
-					>
-						<button>Apply globally</button>
-					</ToolsPanelItem>
-				</ToolsPanel>
-			);
-			await openDropdownMenu();
-			await user.click(
-				screen.getByRole( 'menuitemcheckbox', {
-					name: 'Show Apply globally',
-				} )
-			);
-			expect(
-				screen.getByRole( 'button', { name: 'Apply globally' } )
-			).toBeVisible();
-			await user.click(
-				screen.getByRole( 'menuitemcheckbox', {
-					name: 'Hide Apply globally',
-				} )
-			);
-			expect(
-				screen.queryByRole( 'button', { name: 'Apply globally' } )
-			).not.toBeInTheDocument();
-			expect(
-				screen.getByText( 'Apply globally hidden' )
-			).toHaveAttribute( 'aria-live', 'assertive' );
-		} );
-
 		it( 'should render optional panel item when value is updated externally and panel has an ID', async () => {
 			const ToolsPanelOptional = ( {
 				toolsPanelItemValue,

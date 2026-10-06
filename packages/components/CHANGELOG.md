@@ -28,7 +28,6 @@
 
 ### Bug Fixes
 
--   `ToolsPanel`: Describe hiding optional items without an `onDeselect` callback without claiming their values are reset ([#83753](https://github.com/WordPress/gutenberg/pull/83753)).
 -   `Popover`: Keep the `will-change: transform` hint only while the popover is moving, so its content is no longer left on a compositing layer that Chrome can render blurry ([#77359](https://github.com/WordPress/gutenberg/pull/77359)).
 -   `RadioControl`: Keep radio circles visually 16px at all viewport widths while retaining a 24px pointer target ([#83840](https://github.com/WordPress/gutenberg/pull/83840)).
 -   `Text`: Make single-line truncation and `isBlock` overrides consistent across the main document and iframes ([#82573](https://github.com/WordPress/gutenberg/pull/82573)).

@@ -73,7 +73,6 @@ export function useToolsPanelItem(
 	// `onShownChange` is a new function every render. `useEvent` gives the item
 	// a stable callback to register, while the panel still invokes the latest.
 	const onShownChangeCallback = useEvent( onShownChange );
-	const canReset = !! onDeselect;
 
 	// A panel spanning a multi-selection has no id of its own, so every item
 	// belongs to it.
@@ -90,7 +89,6 @@ export function useToolsPanelItem(
 		}
 
 		const item = {
-			canReset,
 			defaultShown: defaultShownRef.current,
 			hasValue: hasValueCallback,
 			isShownByDefault,
@@ -108,7 +106,6 @@ export function useToolsPanelItem(
 			deregisterPanelItem( label, item );
 		};
 	}, [
-		canReset,
 		deregisterPanelItem,
 		hasMatchingPanel,
 		hasValueCallback,

@@ -386,13 +386,6 @@ export function useToolsPanel(
 	);
 
 	const hasMenuItems = panelItems.length > 0;
-	const resettableItems = useMemo(
-		() =>
-			panelItems
-				.filter( ( item ) => item.canReset !== false )
-				.map( ( item ) => item.label ),
-		[ panelItems ]
-	);
 
 	const panelContext = useMemo(
 		() => ( {
@@ -408,7 +401,6 @@ export function useToolsPanel(
 			panelId,
 			registerPanelItem,
 			registerResetAllFilter,
-			resettableItems,
 			shouldRenderPlaceholderItems,
 			__experimentalFirstVisibleItemClass,
 			__experimentalLastVisibleItemClass,
@@ -426,7 +418,6 @@ export function useToolsPanel(
 			hasMenuItems,
 			registerResetAllFilter,
 			registerPanelItem,
-			resettableItems,
 			shouldRenderPlaceholderItems,
 			__experimentalFirstVisibleItemClass,
 			__experimentalLastVisibleItemClass,

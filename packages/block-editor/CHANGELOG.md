@@ -12,7 +12,7 @@
 -   State control badges: migrate from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Badge` ([#82608](https://github.com/WordPress/gutenberg/pull/82608)).
 -   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
 -   `LinkControl`: Add a `transformSuggestions` prop, so a consumer can filter, order or add to the search suggestions before they are shown ([#83652](https://github.com/WordPress/gutenberg/pull/83652)).
--   Block inspector: Move the Additional CSS and Additional CSS class(es) controls from the Advanced panel in the Settings tab to a new "Additional styles" ToolsPanel in the Styles tab, through a new `additional-styles` group for `InspectorControls`. The CSS controls are optional and hidden when empty. When the inspector renders no Styles tab, or a single tab, the two panels appear side by side instead of merging into one Advanced panel ([#83753](https://github.com/WordPress/gutenberg/pull/83753)).
+-   Block inspector: Move the Additional CSS and Additional CSS class(es) controls from the Advanced panel in the Settings tab to a new "Additional styles" panel in the Styles tab, through a new `additional-styles` group for `InspectorControls`. When the inspector renders no Styles tab, or a single tab, the two panels appear side by side instead of merging into one Advanced panel ([#83753](https://github.com/WordPress/gutenberg/pull/83753)).
 
 ### Bug Fixes
 

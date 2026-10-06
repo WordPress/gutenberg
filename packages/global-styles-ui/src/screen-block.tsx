@@ -5,8 +5,7 @@ import { useContext, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
+	PanelBody,
 	__experimentalVStack as VStack,
 	__experimentalHasSplitBorders as hasSplitBorders,
 } from '@wordpress/components';
@@ -462,35 +461,23 @@ function ScreenBlock( {
 			) }
 
 			{ canEditCSS && (
-				<ToolsPanel
-					key={ `${ name }:${ variation }:${ stateParam }` }
-					label={ __( 'Additional styles' ) }
-					resetAll={ () => setStyle( { ...style, css: undefined } ) }
+				<PanelBody
+					title={ __( 'Additional styles' ) }
+					initialOpen={ false }
 				>
-					<ToolsPanelItem
-						label={ __( 'CSS' ) }
-						hasValue={ () =>
-							typeof inheritedStyle?.css === 'string' &&
-							!! inheritedStyle.css.trim()
-						}
-						onDeselect={ () =>
-							setStyle( { ...style, css: undefined } )
-						}
-					>
-						<StylesAdvancedPanel
-							value={ style }
-							onChange={ setStyle }
-							inheritedValue={ inheritedStyle }
-							help={ sprintf(
-								// translators: %s: is the name of a block e.g., 'Image' or 'Table'.
-								__(
-									'Add your own CSS to customize the appearance of the %s block. You do not need to include a CSS selector, just add the property and value.'
-								),
-								blockType?.title!
-							) }
-						/>
-					</ToolsPanelItem>
-				</ToolsPanel>
+					<StylesAdvancedPanel
+						value={ style }
+						onChange={ setStyle }
+						inheritedValue={ inheritedStyle }
+						help={ sprintf(
+							// translators: %s: is the name of a block e.g., 'Image' or 'Table'.
+							__(
+								'Add your own CSS to customize the appearance of the %s block. You do not need to include a CSS selector, just add the property and value.'
+							),
+							blockType?.title!
+						) }
+					/>
+				</PanelBody>
 			) }
 		</>
 	);
