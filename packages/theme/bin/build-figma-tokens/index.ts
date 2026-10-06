@@ -15,7 +15,7 @@ const { resolver } = await parse( sources, { config } );
 
 for ( const file of generateFigmaFiles( resolver ) ) {
 	const filename = new URL(
-		`../../figma/${ file.filename }`,
+		`../../prebuilt/figma/${ file.filename }`,
 		import.meta.url
 	);
 	await mkdir( dirname( fileURLToPath( filename ) ), { recursive: true } );

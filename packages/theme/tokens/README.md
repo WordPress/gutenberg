@@ -74,28 +74,30 @@ The design tokens use [the `$extensions` feature](https://www.designtokens.org/t
 
 Figma can import supported DTCG token types as variables through its [built-in design token importer](https://help.figma.com/hc/en-us/articles/15343816063383-Modes-for-variables#h_01KAGYPSFC984XDB4YWBCNRZJ7). The resolver itself is not an import file. The files in `modes/` are partial resolver inputs, so they do not contain every variable needed to create a collection.
 
-#### Generate border collection samples
+#### Generate border collection files
 
-From the repository root, run:
+The normal theme build generates and formats the committed Figma files. To regenerate only those files, run from the repository root:
 
 ```sh
 npm run --workspace @wordpress/theme build:figma
 ```
 
-This command applies `wpds.resolver.json` to generate six complete DTCG files under `packages/theme/figma/`. Radius and width use separate collections so designers can choose corner radius and pixel density independently.
+This command applies `wpds.resolver.json` to generate six complete DTCG files under `packages/theme/prebuilt/figma/`. Radius and width use separate collections so designers can choose corner radius and pixel density independently.
 
-| Collection    | Files relative to `packages/theme/figma/`                                                  | Default mode | Variables                               |
+| Collection    | Files relative to `packages/theme/prebuilt/figma/`                                         | Default mode | Variables                               |
 | ------------- | ------------------------------------------------------------------------------------------ | ------------ | --------------------------------------- |
 | Border radius | `radius/none.json`, `radius/subtle.json`, `radius/moderate.json`, `radius/pronounced.json` | `subtle`     | `wpds-border/radius/{xs,sm,md,lg,xl}`   |
 | Border width  | `width/standard.json`, `width/high-dpi.json`                                               | `standard`   | `wpds-border/width/{xs,sm,md,lg,focus}` |
 
-Each file includes every token in its collection, including unchanged values, descriptions, types, and Figma scopes. The original hierarchy preserves variable names. Token aliases remain references instead of becoming literal values. The current border tokens contain no aliases; aliases within a collection have automated coverage, but Figma alias behavior still needs testing.
+Each file includes every token in its collection, including unchanged values, descriptions, types, and Figma scopes. The original hierarchy preserves variable names. Token aliases remain references instead of becoming literal values. The current border tokens contain no aliases. Aliases within a collection have automated coverage and were verified in Figma for both collection creation and mode updates.
 
-These files are local, ignored samples, generated on demand rather than during the package build. Do not edit them as sources. `wpds.resolver.json`, its base sources, and the tracked files in `modes/` remain canonical. Keep the tracked mode files until the Figma tests below establish a compatible replacement and the artifact policy is agreed in [#82561](https://github.com/WordPress/gutenberg/issues/82561).
+These generated files are committed under `prebuilt/figma` and included in the npm package. Do not edit them as sources. `wpds.resolver.json`, its base sources, and the tracked files in `modes/` remain canonical inputs for both CSS and Figma generation.
 
 #### Test in a Figma library branch
 
-This is a proposed workflow awaiting Figma validation. Record the results in #82561, including the library branch, tested revision, collection and mode names, and any importer differences.
+The theme library maintainer [tested this workflow in a Figma library branch](https://github.com/WordPress/gutenberg/pull/84035#issuecomment-6003936288) using the files from revision `0ca2ab2`. Collection creation preserved names, types, descriptions, scopes, values, and aliases. Radius and width modes switched independently. Existing-value updates preserved variable IDs and bindings. New variables required creation through the API/plugin before their values could be imported.
+
+Files imported together were ordered alphabetically, so set `subtle` and `standard` as the default modes explicitly. Rebinding a test component propagated to its instance, but the instance's existing `pronounced` selection remained attached to the old collection. Reapply mode selections from the new collections after rebinding. This test does not establish that the full library has been migrated. Use the following checks for future changes and record the results in [#82561](https://github.com/WordPress/gutenberg/issues/82561).
 
 Expected pixel values:
 
@@ -111,11 +113,11 @@ Expected pixel values:
 1. Create a branch of the theme library. In the Variables view, create the Border radius collection and drag in all four `radius/` files together. Repeat with the two `width/` files in Border width. Check mode names against the filenames, rename them if needed, and set `subtle` and `standard` as the defaults.
 2. Check that each collection has five Number variables with the names above. Radius variables must have the `CORNER_RADIUS` scope and width variables the `STROKE_FLOAT` scope. Check descriptions and the pixel values in the table.
 3. Bind a sample component's corner radius and stroke width to the new variables. Switch both collections' modes independently on an object or page. High-DPI is an explicit preview choice in Figma; the generated CSS selects it automatically through a resolution media query.
-4. Change one existing value in a local source, regenerate the samples, and right-click the corresponding Figma mode to select **Import mode**. Check that the matching variable updates and retains its bindings. Restore the source and import the original value again.
+4. Change one existing value in a local source, regenerate the files, and right-click the corresponding Figma mode to select **Import mode**. Check that the matching variable updates and retains its bindings. Restore the source and import the original value again.
 5. Add a temporary token to a local border source and regenerate. Confirm that importing into an existing mode does not create the new variable. Use the Figma API/plugin workflow to create it with the matching name, Number type, description, scope, and values for every mode, then verify later imports update it. Remove the temporary token after testing. This importer limitation was [reported by the theme library maintainer](https://github.com/WordPress/gutenberg/issues/82561#issuecomment-5799294192).
-6. Add a temporary alias to another token within the same collection, regenerate, and test both creating a collection and updating a mode. Confirm that Figma preserves the alias relationship, then remove the temporary alias. Cross-collection aliases are outside these samples; they need Figma's `com.figma.aliasData` extension and a separate validation.
-7. Inspect components bound to the existing combined Border collection. Record their variable IDs and bindings before testing the split. Verify a binding migration in the library branch, including component instances and existing mode selections. Matching names alone do not establish that bindings survive. Keep the existing collection until this migration is verified.
+6. Add a temporary alias to another token within the same collection, regenerate, and test both creating a collection and updating a mode. Confirm that Figma preserves the alias relationship, then remove the temporary alias. Cross-collection aliases are outside these files; they need Figma's `com.figma.aliasData` extension and a separate validation.
+7. Inspect components bound to the existing combined Border collection. Record their variable IDs and bindings before testing the split. Rebind components in the library branch and check that their instances use the new variables. Reapply existing mode selections from the new collections on affected objects and pages, then verify the intended values. Matching names alone do not preserve bindings or mode selections. Keep the existing collection until all affected bindings and mode selections have been checked.
 
-Figma creates new variables only for supported tokens present with the same type in every imported file. Importing an existing mode updates variables with matching names and types. See [Figma's import documentation](https://help.figma.com/hc/en-us/articles/15343816063383-Modes-for-variables#h_01KAGYPSFC984XDB4YWBCNRZJ7) for those constraints and [the separate typography issue](https://github.com/WordPress/gutenberg/issues/74620) for unsupported typography types. The generated samples cover only border radius and width.
+Figma creates new variables only for supported tokens present with the same type in every imported file. Importing an existing mode updates variables with matching names and types. See [Figma's import documentation](https://help.figma.com/hc/en-us/articles/15343816063383-Modes-for-variables#h_01KAGYPSFC984XDB4YWBCNRZJ7) for those constraints and [the separate typography issue](https://github.com/WordPress/gutenberg/issues/74620) for unsupported typography types. The generated files cover only border radius and width.
 
 Token definitions include Figma scopes to show variables in the relevant fields, such as corner radius. These use the `$extensions['com.figma.scopes']` extension. See [Figma's `VariableScope` developer documentation](https://developers.figma.com/docs/plugins/api/VariableScope/) for the supported scopes.
