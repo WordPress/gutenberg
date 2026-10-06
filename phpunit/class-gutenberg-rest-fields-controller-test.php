@@ -177,6 +177,7 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 		$this->assertArrayHasKey( self::ROUTE, $routes );
 		$this->assertCount( 1, $routes[ self::ROUTE ], 'The route should be registered once.' );
 		$this->assertInstanceOf( 'Gutenberg_REST_Fields_Controller_7_2', $routes[ self::ROUTE ][0]['callback'][0] );
+		$this->assertSame( PHP_INT_MAX, has_action( 'rest_api_init', 'gutenberg_register_fields_controller_endpoints' ), 'The route is registered after the routes of core, to override its controller.' );
 	}
 
 	/**
