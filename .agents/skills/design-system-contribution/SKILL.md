@@ -28,4 +28,6 @@ Keep product-specific behavior in the consuming package and use [design-system-u
 
 Start with existing tests and stories. Add coverage only for a concrete regression risk introduced by our code or integration that existing coverage does not address. Rely on dependency tests for behavior the dependency owns; avoid speculative edge cases and exhaustive combinations. Use the guide's [verification choices](../../../docs/contributors/design/design-system-packages.md#verify-the-affected-behavior) for checks that need a browser.
 
+When changing component recommendations, follow the [component status guidance](../../../packages/ui/CONTRIBUTING.md#component-status) to update Storybook status, curated `manifest` tags, ESLint recommendation lists, migration guidance, and generated manifest snapshots together.
+
 Follow the [completion checks](../../../docs/contributors/design/design-system-packages.md#change-a-package-safely) for affected exports, documentation, generated files, and changelogs, along with the repository's required checks. State any material verification gap without claiming visual parity from snapshots or class assertions.

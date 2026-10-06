@@ -11,6 +11,8 @@
 
 ### Enhancements
 
+-   `FormToggle`, `ToggleControl`: Mark as not recommended for use in a WordPress environment, in favour of `Switch` and `SwitchControl` from `@wordpress/ui` ([#84097](https://github.com/WordPress/gutenberg/pull/84097)).
+-   `ProgressBar`: Mark as not recommended and direct consumers to `Progress` from `@wordpress/ui` ([#84021](https://github.com/WordPress/gutenberg/pull/84021)).
 -   `CheckboxControl`: Mark as not recommended for use in a WordPress environment, in favour of `CheckboxControl` from `@wordpress/ui` ([#83771](https://github.com/WordPress/gutenberg/pull/83771)).
 -   `RadioControl`: Mark as not recommended for use in a WordPress environment, in favour of `RadioGroupControl` from `@wordpress/ui` ([#83872](https://github.com/WordPress/gutenberg/pull/83872)).
 -   `RadioControl`: Match the `@wordpress/ui` Radio colors ([#83270](https://github.com/WordPress/gutenberg/pull/83270)).
@@ -39,6 +41,7 @@
 -   `SandBox`: Send the page URL as the referrer from iframes inside `allowSameOrigin` sandboxes in Safari, fixing embed previews that require a referrer, such as YouTube's "Error 153" ([#84014](https://github.com/WordPress/gutenberg/pull/84014)).
 -   `PaletteEdit`: Keep an item's slug when it is renamed, so blocks and styles that reference the preset keep working ([#83750](https://github.com/WordPress/gutenberg/pull/83750)).
 -   `FocalPointPicker`: End a drag when the pointer is released outside the control, including over the editor canvas ([#83348](https://github.com/WordPress/gutenberg/pull/83348)).
+-   `ContentEditableControl`: Keep a disabled field focusable (out of the tab order), so a field disabled while it has focus keeps it instead of dropping focus on the body ([#84083](https://github.com/WordPress/gutenberg/pull/84083)).
 
 ### Internal
 
