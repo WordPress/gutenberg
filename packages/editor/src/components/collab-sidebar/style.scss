@@ -335,14 +335,6 @@ mark.wp-note {
 // radius, the neutral minimal treatment marks the trigger and reactions
 // left by others, and the brand outline marks the current user's own.
 // Only the row layout and the emoji's own metrics live here.
-.editor-collab-sidebar-panel__add-reaction {
-	// `Dropdown` wraps its trigger in an inline-block container. As a
-	// flex item that becomes a block, leaving the inline-flex trigger on
-	// a line box whose descender space makes the wrapper taller than the
-	// 24px button and stretches the pills beside it to match. A flex
-	// wrapper has no line box, so the whole row stays at button height.
-	display: flex;
-}
 
 // The note's text and, below it, the reaction row. Anchors the trigger while
 // it floats, so it lands on the note itself rather than on whatever else the
@@ -383,7 +375,7 @@ mark.wp-note {
 // with a control it has no way to reveal.
 @media (hover: hover) {
 	.editor-collab-sidebar-panel__reactions.is-floating
-	.editor-collab-sidebar-panel__add-reaction {
+	.editor-collab-sidebar-panel__add-reaction-button {
 		// Fading rather than removing keeps the button in the tab order and
 		// keeps the action row from reflowing as the pointer moves over it.
 		opacity: 0;
@@ -398,16 +390,16 @@ mark.wp-note {
 	// reaction belongs to one note, so a thread-wide reveal would offer the
 	// option on every note in it at once.
 	.editor-collab-sidebar-panel__note:hover
-	.editor-collab-sidebar-panel__add-reaction,
+	.editor-collab-sidebar-panel__add-reaction-button,
 	// Reveal on the trigger itself rather than on the thread: the thread is
 	// `tabIndex={ 0 }`, so a thread-level `:focus-within` would hold for as
 	// long as the note is selected and the fade would never take effect.
 	.editor-collab-sidebar-panel__reactions
-	.editor-collab-sidebar-panel__add-reaction:focus-within,
-	// While the picker is open the pointer is over the popover, not the
-	// thread, and focus has moved into the popover's own portal.
+	.editor-collab-sidebar-panel__add-reaction-button:focus,
+	// While the picker is open the pointer is over the popup, not the
+	// note, and focus has moved into the popup's own portal.
 	.editor-collab-sidebar-panel__reactions
-	.editor-collab-sidebar-panel__add-reaction:has([aria-expanded="true"]) {
+	.editor-collab-sidebar-panel__add-reaction-button[data-popup-open] {
 		opacity: 1;
 	}
 }
@@ -424,44 +416,20 @@ mark.wp-note {
 // Opening the picker with a pointer leaves DOM focus on the trigger once
 // it closes, parking a focus ring on the note at rest. Keep the ring for
 // keyboard focus and while the picker is open, and drop it otherwise.
-.editor-collab-sidebar-panel__add-reaction-button:focus:not(:focus-visible):not([aria-expanded="true"]) {
+.editor-collab-sidebar-panel__add-reaction-button:focus:not(:focus-visible):not([data-popup-open]) {
 	outline: none;
 }
 
-.editor-collab-sidebar-panel__reaction-button-emoji {
-	// Render the emoji glyph larger than the button's text size so it
-	// visually balances with the 24px reaction icon next to it.
+.editor-collab-sidebar-panel__reaction-button-emoji,
+.editor-collab-sidebar-panel__reaction-option-emoji {
+	// Render the emoji glyph larger than the text beside it so it visually
+	// balances with the add-reaction icon that trails the pills.
 	font-size: 16px;
 	line-height: 1;
 	// Forced colors repaint text in a system color, which turns color emoji
-	// into flat monochrome glyphs. Opt the glyph out, but not the pill
-	// around it, so its border still follows the system colors.
+	// into flat monochrome glyphs. Opt the glyph out, but not the pill or
+	// menu item around it, so its border still follows the system colors.
 	forced-color-adjust: none;
-}
-
-// Split the Dropdown's default 8px `.components-popover__content` padding
-// between the popover and the emoji group below, so the emoji buttons keep
-// the same breathing room around their focus ring.
-.editor-collab-sidebar-panel__add-reaction-popover .components-popover__content {
-	padding: $grid-unit-05;
-}
-
-.editor-collab-sidebar-panel__emoji-picker {
-	display: flex;
-	// `.components-popover__content` is `width: min-content`, which would
-	// otherwise squeeze this row down to one column per emoji.
-	width: max-content;
-	padding: $grid-unit-05;
-}
-
-.editor-collab-sidebar-panel__emoji-option {
-	// Pin each button to 32px; the compact Button's own padding and minimum
-	// size would otherwise widen the flex item.
-	flex: 0 0 32px;
-	min-width: 0;
-	padding: 0;
-	font-size: 18px;
-	justify-content: center;
 }
 
 // Mention chips, both in the note input and the rendered note content. A

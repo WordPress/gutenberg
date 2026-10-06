@@ -63,7 +63,7 @@ function NotesSidebar( { postId } ) {
 		[]
 	);
 
-	const { notes, unresolvedNotes, reactionsMap } = useNoteThreads( postId );
+	const { notes, unresolvedNotes } = useNoteThreads( postId );
 	const isAllNotesSidebarOpen = useSelect(
 		( select ) =>
 			select( interfaceStore ).getActiveComplementaryArea( 'core' ) ===
@@ -185,11 +185,7 @@ function NotesSidebar( { postId } ) {
 					icon={ commentIcon }
 					closeLabel={ __( 'Close Notes' ) }
 				>
-					<Notes
-						notes={ notes }
-						sidebarRef={ sidebarRef }
-						reactionsMap={ reactionsMap }
-					/>
+					<Notes notes={ notes } sidebarRef={ sidebarRef } />
 				</PluginSidebar>
 			) }
 			{ showFloatingNotes && (
@@ -204,7 +200,6 @@ function NotesSidebar( { postId } ) {
 						<Notes
 							notes={ unresolvedNotes }
 							sidebarRef={ sidebarRef }
-							reactionsMap={ reactionsMap }
 							isFloating
 						/>
 					</div>

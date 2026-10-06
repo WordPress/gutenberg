@@ -15,18 +15,12 @@ import { store as editorStore } from '../../store';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-export function Notes( {
-	notes,
-	sidebarRef,
-	isFloating = false,
-	reactionsMap,
-} ) {
+export function Notes( { notes, sidebarRef, isFloating = false } ) {
 	const {
 		onCreate: onAddReply,
 		onEdit: onEditNote,
 		onDelete,
-		onToggleReaction,
-	} = useNoteActions( reactionsMap );
+	} = useNoteActions();
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
@@ -238,8 +232,6 @@ export function Notes( {
 						onAddReply={ onAddReply }
 						onDeleteNote={ handleDelete }
 						onEditNote={ onEditNote }
-						onToggleReaction={ onToggleReaction }
-						reactionsMap={ reactionsMap }
 						isSelected={ selectedNote === thread.id }
 						sidebarRef={ sidebarRef }
 						floating={

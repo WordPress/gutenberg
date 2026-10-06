@@ -12,9 +12,10 @@ import { moreVertical, published } from '@wordpress/icons';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import ReactionDisplay, {
-	AddReactionButton,
-	getReactedSlugs,
-} from './reaction-display';
+	getReactedHexKeys,
+} from './reactions/reaction-display';
+import { AddReactionButton } from './reactions/add-reaction-button';
+import { useReaction } from './reactions/use-reaction';
 
 function NoteActionsMenu( { items, buttonRef } ) {
 	return (
@@ -55,10 +56,9 @@ export function Note( {
 	onEditNote,
 	onDeleteNote,
 	onResolve,
-	onToggleReaction,
-	reactions,
 	isThreadResolved = false,
 } ) {
+	const { reactions, toggleReaction } = useReaction( note );
 	const [ actionState, setActionState ] = useState( null );
 	const actionButtonRef = useRef( null );
 
@@ -85,11 +85,10 @@ export function Note( {
 	}, [ rawContent ] );
 
 	const canResolve = note.parent === 0;
-	const hasReactions = getReactedSlugs( reactions ).length > 0;
+	const hasReactions = getReactedHexKeys( reactions ).length > 0;
 	// Not while editing: the trigger floats over the note's corner, which
 	// during an edit is the form's own text field.
-	const canReact =
-		isSelected && !! onToggleReaction && actionState !== 'edit';
+	const canReact = isSelected && actionState !== 'edit';
 	const metaStatus = note.meta?._wp_note_status;
 	const isResolutionNote =
 		metaStatus === 'resolved' || metaStatus === 'reopen';
@@ -254,12 +253,7 @@ export function Note( {
 								noteId={ note.id }
 								reactions={ reactions }
 								disabled={ isThreadResolved }
-								onToggleReaction={ ( emoji ) =>
-									onToggleReaction?.( {
-										commentId: note.id,
-										emoji,
-									} )
-								}
+								onToggleReaction={ toggleReaction }
 							>
 								{ /*
 								 * Trails the pills, in the same tree position
@@ -270,14 +264,8 @@ export function Note( {
 								 */ }
 								{ canReact && (
 									<AddReactionButton
-										noteId={ note.id }
 										disabled={ isThreadResolved }
-										onToggleReaction={ ( emoji ) =>
-											onToggleReaction( {
-												commentId: note.id,
-												emoji,
-											} )
-										}
+										onToggleReaction={ toggleReaction }
 									/>
 								) }
 							</ReactionDisplay>
