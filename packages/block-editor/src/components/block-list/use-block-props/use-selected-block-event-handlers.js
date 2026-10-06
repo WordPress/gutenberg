@@ -83,11 +83,19 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			 * @param {DragEvent} event Drag event.
 			 */
 			function onDragStart( event ) {
+				const { target } = event;
+				// The drag may start on an image, which is draggable by
+				// default: it is the block's drag as long as no nested
+				// draggable, such as an inner block, is closer to the source.
+				// The data and the drag image set below replace the image's.
+				// A selection drag, whose source Firefox reports as the text
+				// node, is not the block's.
 				if (
-					node !== event.target ||
 					node.isContentEditable ||
 					node.ownerDocument.activeElement !== node ||
-					hasMultiSelection()
+					hasMultiSelection() ||
+					target.nodeType !== target.ELEMENT_NODE ||
+					target.closest( '[draggable="true"]' ) !== node
 				) {
 					event.preventDefault();
 					return;

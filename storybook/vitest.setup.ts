@@ -4,7 +4,7 @@
  * enough of them pile up it drops the page's connection to Vitest, which fails
  * the run with "Browser connection was closed while running tests". A full
  * garbage collection before each file keeps the page healthy. `gc` is exposed
- * by the `--js-flags=--expose-gc` launch argument in `vitest.config.ts`.
+ * by the `--js-flags=--expose-gc` launch argument in `vitest.config.mts`.
  */
 if ( typeof globalThis.gc !== 'function' ) {
 	throw new Error(

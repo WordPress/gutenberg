@@ -1,0 +1,13 @@
+import { expect, test } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import { styles } from './packages/fixture/build-module/index.mjs';
+
+test( 'opts into jsdom and consumer-owned React setup', () => {
+	render( <button className={ styles.fixture }>Save</button> );
+	expect( screen.getByRole( 'button', { name: 'Save' } ) ).toHaveClass(
+		styles.fixture
+	);
+	expect( styles.fixture ).toBeTruthy();
+	expect( document.head.querySelectorAll( 'style' ) ).toHaveLength( 0 );
+	expect( globalThis.wpVitest ).toBeUndefined();
+} );

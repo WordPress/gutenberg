@@ -1,6 +1,6 @@
 import { __, sprintf } from '@wordpress/i18n';
 import {
-	SelectControl,
+	SelectControl as WCSelectControl,
 	Notice,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -80,7 +80,7 @@ export default function HTMLElementControl( {
 
 	return (
 		<VStack spacing={ 2 } className="block-editor-html-element-control">
-			<SelectControl
+			<WCSelectControl
 				label={ __( 'HTML element' ) }
 				options={ modifiedOptions }
 				value={ tagName }

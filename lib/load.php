@@ -68,6 +68,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.2/view-config-api.php';
 	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-view-config-controller-7-2.php';
 	require __DIR__ . '/compat/wordpress-7.2/rest-api.php';
+	require __DIR__ . '/compat/wordpress-7.2/edit-root-attachment.php';
 
 	// Real-time collaboration.
 	require __DIR__ . '/experimental/collaboration/class-gutenberg-rest-autosaves-controller.php';
@@ -77,6 +78,8 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
 	require_once __DIR__ . '/class-wp-rest-edit-site-export-controller-gutenberg.php';
+	require_once __DIR__ . '/class-wp-icon-collections-registry-gutenberg.php';
+	require_once __DIR__ . '/class-wp-rest-icon-collections-controller-gutenberg.php';
 	require_once __DIR__ . '/class-wp-icons-registry-gutenberg.php';
 	require_once __DIR__ . '/class-wp-rest-icons-controller-gutenberg.php';
 	require_once __DIR__ . '/rest-api.php';
@@ -133,6 +136,10 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-workflow-palette' ) ) {
 	require __DIR__ . '/experimental/workflow-palette.php';
 }
 
+if ( gutenberg_is_experiment_enabled( 'gutenberg-wpds-admin-restyle' ) ) {
+	require __DIR__ . '/experimental/wpds-admin/load.php';
+}
+
 // Plugin specific code.
 require __DIR__ . '/script-loader.php';
 require __DIR__ . '/global-styles-and-settings.php';
@@ -147,7 +154,6 @@ require __DIR__ . '/client-assets.php';
 require __DIR__ . '/mathml-kses.php';
 require __DIR__ . '/demo.php';
 require __DIR__ . '/experimental/experiments/load.php';
-require __DIR__ . '/interactivity-api.php';
 require __DIR__ . '/block-template-utils.php';
 require __DIR__ . '/icons.php';
 

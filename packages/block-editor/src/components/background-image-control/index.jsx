@@ -160,7 +160,7 @@ function InspectorImagePreviewItem( {
 									/* translators: %s: file name */
 									__( 'Background image: %s' ),
 									filename || label
-							  )
+								)
 							: __( 'No background image selected' ) }
 					</VisuallyHidden>
 				</FlexBlock>

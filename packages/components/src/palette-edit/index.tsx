@@ -11,7 +11,6 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { lineSolid, moreVertical, plus } from '@wordpress/icons';
 import { useDebounce, useInstanceId } from '@wordpress/compose';
-import { kebabCase } from '@wordpress/kebab-case';
 import { Menu, Stack, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import Button from '../button';
 import { ColorPicker } from '../color-picker';
@@ -158,9 +157,9 @@ function getNameInputLabel( variant: PaletteVariant ) {
 function getRemoveLabelFormat( variant: PaletteVariant ) {
 	return variant === 'duotone'
 		? /* translators: %s is a duotone name, e.g. "Purple and yellow". */
-		  __( 'Remove duotone: %s' )
+			__( 'Remove duotone: %s' )
 		: /* translators: %s is a color or gradient name, e.g. "Red". */
-		  __( 'Remove color: %s' );
+			__( 'Remove color: %s' );
 }
 
 /**
@@ -302,12 +301,12 @@ export function getNameAndSlugForPosition(
 						/* translators: %d: is an id for a custom duotone */
 						__( 'Duotone %d' ),
 						position
-				  )
+					)
 				: sprintf(
 						/* translators: %d: is an id for a custom color */
 						__( 'Color %d' ),
 						position
-				  ),
+					),
 		slug: `${ slugPrefix }${ stem }-${ position }`,
 	};
 }
@@ -418,7 +417,6 @@ function Option< T extends PaletteElement >( {
 	onChange,
 	onRemove,
 	popoverProps: receivedPopoverProps,
-	slugPrefix,
 	variant,
 	colorPalette,
 }: OptionProps< T > ) {
@@ -463,9 +461,6 @@ function Option< T extends PaletteElement >( {
 								onChange( {
 									...element,
 									name: nextName,
-									slug:
-										slugPrefix +
-										kebabCase( nextName ?? '' ),
 								} )
 							}
 						/>
@@ -474,7 +469,7 @@ function Option< T extends PaletteElement >( {
 							{ element.name.trim().length
 								? element.name
 								: /* Fall back to non-breaking space to maintain height */
-								  '\u00A0' }
+									'\u00A0' }
 						</NameContainer>
 					) }
 				</FlexBlock>
@@ -512,7 +507,6 @@ function PaletteEditListView< T extends PaletteElement >( {
 	elements,
 	onChange,
 	canOnlyChangeValues,
-	slugPrefix,
 	variant,
 	colorPalette,
 	popoverProps,
@@ -566,7 +560,6 @@ function PaletteEditListView< T extends PaletteElement >( {
 							);
 							addColorRef.current?.focus();
 						} }
-						slugPrefix={ slugPrefix }
 						popoverProps={ popoverProps }
 					/>
 				) ) }
@@ -828,7 +821,6 @@ export function PaletteEdit( {
 							elements={ elements }
 							// @ts-expect-error TODO: Don't know how to resolve
 							onChange={ onChange }
-							slugPrefix={ slugPrefix }
 							variant={ variant }
 							colorPalette={ duotoneColorPalette }
 							popoverProps={ popoverProps }

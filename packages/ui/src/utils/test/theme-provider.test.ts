@@ -4,7 +4,7 @@ const consent =
 	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.';
 
 async function loadThemeProvider(
-	themeModule: Partial< typeof import('@wordpress/theme') >,
+	themeModule: Partial< typeof import( '@wordpress/theme' ) >,
 	privateApis: object = {}
 ) {
 	const unlockSpy = vi.fn();
@@ -14,7 +14,7 @@ async function loadThemeProvider(
 	};
 	vi.doMock(
 		import( '@wordpress/theme' ),
-		() => themeModule as typeof import('@wordpress/theme')
+		() => themeModule as typeof import( '@wordpress/theme' )
 	);
 	vi.doMock(
 		import( '@wordpress/private-apis' ),

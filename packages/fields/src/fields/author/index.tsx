@@ -3,6 +3,7 @@ import { __ } from '@wordpress/i18n';
 import { resolveSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import type { BasePostWithEmbeddedAuthor } from '../../types';
+import { hasActionLink } from '../utils';
 import AuthorView from './author-view';
 
 interface Author {
@@ -33,6 +34,7 @@ const authorField: Field< BasePostWithEmbeddedAuthor > = {
 	},
 	setValue: ( { value } ) => ( { author: Number( value ) } ),
 	render: AuthorView,
+	isVisible: ( item ) => hasActionLink( item, 'wp:action-assign-author' ),
 	filterBy: {
 		operators: [ 'isAny', 'isNone' ],
 	},

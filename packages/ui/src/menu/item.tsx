@@ -1,6 +1,7 @@
 import { Menu as _Menu } from '@base-ui/react/menu';
 import clsx from 'clsx';
 import { Children, forwardRef } from '@wordpress/element';
+import defenseStyles from '../utils/css/global-css-defense.module.css';
 import resetStyles from '../utils/css/resets.module.css';
 import {
 	KeyboardShortcutDescription,
@@ -176,6 +177,7 @@ const Item = forwardRef< HTMLDivElement, ItemProps >( function MenuItem(
 			ref={ ref }
 			{ ...itemAriaProps }
 			className={ clsx(
+				defenseStyles.div,
 				resetStyles[ 'box-sizing' ],
 				styles.item,
 				className

@@ -1093,15 +1093,15 @@ async function getReleaseChangelog( options ) {
 		milestone:
 			options.milestone === undefined
 				? // Disable reason: valid-sprintf applies to `@wordpress/i18n` where
-				  // strings are expected to need to be extracted, and thus variables are
-				  // not allowed. This string will not need to be extracted.
-				  // eslint-disable-next-line @wordpress/valid-sprintf
-				  sprintf( config.versionMilestoneFormat, {
+					// strings are expected to need to be extracted, and thus variables are
+					// not allowed. This string will not need to be extracted.
+					// eslint-disable-next-line @wordpress/valid-sprintf
+					sprintf( config.versionMilestoneFormat, {
 						...config,
 						...semver.parse(
 							getNextMajorVersion( manifest.version )
 						),
-				  } )
+					} )
 				: options.milestone,
 		unreleased: options.unreleased,
 	} );

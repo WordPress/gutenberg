@@ -20,6 +20,7 @@ let mockSaveResult: {
 	},
 };
 const mockOnUpdate = vi.fn();
+let mockOnUndo: ( () => void ) | undefined;
 const mockOnClose = vi.fn();
 const mockCloseMediaEditorModal = vi.fn();
 const mockCreateSuccessNotice = vi.fn();
@@ -30,7 +31,7 @@ vi.mock(
 		( {
 			useDispatch: vi.fn(),
 			useSelect: vi.fn(),
-		} ) as unknown as typeof import('@wordpress/data')
+		} ) as unknown as typeof import( '@wordpress/data' )
 );
 
 vi.mock(
@@ -38,7 +39,7 @@ vi.mock(
 	() =>
 		( {
 			Modal: ( { children }: { children: ReactNode } ) => children,
-		} ) as unknown as typeof import('@wordpress/components')
+		} ) as unknown as typeof import( '@wordpress/components' )
 );
 
 vi.mock(
@@ -47,7 +48,7 @@ vi.mock(
 		( {
 			ShortcutProvider: ( { children }: { children: ReactNode } ) =>
 				children,
-		} ) as unknown as typeof import('@wordpress/keyboard-shortcuts')
+		} ) as unknown as typeof import( '@wordpress/keyboard-shortcuts' )
 );
 
 vi.mock(
@@ -55,7 +56,7 @@ vi.mock(
 	() =>
 		( {
 			store: { name: 'notices' },
-		} ) as unknown as typeof import('@wordpress/notices')
+		} ) as unknown as typeof import( '@wordpress/notices' )
 );
 
 vi.mock(
@@ -63,12 +64,12 @@ vi.mock(
 	() =>
 		( {
 			store: { name: 'media-editor' },
-		} ) as unknown as typeof import('../../../store')
+		} ) as unknown as typeof import( '../../../store' )
 );
 
 vi.mock( import( '../../media-editor' ), async () => {
 	const { createElement } =
-		await vi.importActual< typeof import('@wordpress/element') >(
+		await vi.importActual< typeof import( '@wordpress/element' ) >(
 			'@wordpress/element'
 		);
 
@@ -80,12 +81,13 @@ vi.mock( import( '../../media-editor' ), async () => {
 				'Save result'
 			)
 		),
-	} as unknown as typeof import('../../media-editor');
+	} as unknown as typeof import( '../../media-editor' );
 } );
 
 describe( 'MediaEditorModal', () => {
 	beforeEach( () => {
 		vi.clearAllMocks();
+		mockOnUndo = undefined;
 		mockSaveResult = {
 			id: 11,
 			url: 'edited.jpg',
@@ -101,6 +103,7 @@ describe( 'MediaEditorModal', () => {
 				isOpen: () => true,
 				getId: () => 10,
 				getOnUpdate: () => mockOnUpdate,
+				getOnUndo: () => mockOnUndo,
 				getOnClose: () => mockOnClose,
 			} ) )
 		);
@@ -111,7 +114,7 @@ describe( 'MediaEditorModal', () => {
 		);
 	} );
 
-	it( 'shows an undo snackbar after saving dirty image editor state', () => {
+	it( 'restores the previous attachment when no Undo callback is supplied', () => {
 		render( <MediaEditorModal /> );
 
 		fireEvent.click(
@@ -146,6 +149,20 @@ describe( 'MediaEditorModal', () => {
 			id: 10,
 			url: 'original.jpg',
 		} );
+	} );
+
+	it( "uses the caller's Undo callback after saving an attachment change", () => {
+		mockOnUndo = vi.fn();
+		render( <MediaEditorModal /> );
+
+		fireEvent.click(
+			screen.getByRole( 'button', { name: 'Save result' } )
+		);
+		const noticeOptions = mockCreateSuccessNotice.mock.calls[ 0 ][ 1 ];
+		noticeOptions.actions[ 0 ].onClick();
+
+		expect( mockOnUndo ).toHaveBeenCalledTimes( 1 );
+		expect( mockOnUpdate ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'does not show the image edited snackbar for metadata-only saves', () => {

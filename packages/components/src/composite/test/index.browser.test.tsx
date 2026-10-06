@@ -98,7 +98,6 @@ describe( 'Composite', () => {
 	} );
 
 	test( 'Supports `activeId`', async () => {
-		/* eslint-disable no-restricted-syntax */
 		await renderAndValidate(
 			<>
 				<button>Before</button>
@@ -109,7 +108,6 @@ describe( 'Composite', () => {
 				</Composite>
 			</>
 		);
-		/* eslint-enable no-restricted-syntax */
 
 		const item2 = screen.getByRole( 'button', { name: 'Item 2' } );
 

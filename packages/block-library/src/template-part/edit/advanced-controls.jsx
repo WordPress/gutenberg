@@ -1,5 +1,8 @@
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { SelectControl, TextControl } from '@wordpress/components';
+import {
+	SelectControl as WCSelectControl,
+	TextControl,
+} from '@wordpress/components';
 import { sprintf, __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -57,7 +60,7 @@ export function TemplatePartAdvancedControls( {
 						} }
 						onFocus={ ( event ) => event.target.select() }
 					/>
-					<SelectControl
+					<WCSelectControl
 						label={ __( 'Area' ) }
 						labelPosition="top"
 						options={ areaOptions }

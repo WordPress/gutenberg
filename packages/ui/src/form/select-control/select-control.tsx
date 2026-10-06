@@ -9,7 +9,7 @@ import type { SelectControlProps } from './types';
 export const SelectControl = forwardRef<
 	HTMLButtonElement,
 	SelectControlProps
->( function SelectControl(
+>( function UnforwardedSelectControl(
 	{
 		className,
 		children,
@@ -58,7 +58,7 @@ export const SelectControl = forwardRef<
 										</Select.ItemDescription>
 									) : null }
 								</Item>
-						  ) ) }
+							) ) }
 				</Select.Popup>
 			</Select.Root>
 			{ description && (

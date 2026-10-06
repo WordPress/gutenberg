@@ -186,7 +186,7 @@ function DuotonePanelPure( { style, setAttributes, name, clientId } ) {
 							: getDuotonePresetFromColors(
 									newDuotone,
 									duotonePalette
-							  );
+								);
 
 						const newStyle = {
 							...style,
@@ -301,7 +301,7 @@ function useDuotoneStyles( {
 							? getDuotoneStylesheet( selector, filterId )
 							: getDuotoneUnsetStylesheet( selector ),
 					__unstableType: 'presets',
-			  }
+				}
 			: undefined
 	);
 	usePrivateStyleOverride(
@@ -312,7 +312,7 @@ function useDuotoneStyles( {
 							? getDuotoneFilter( filterId, colors )
 							: '',
 					__unstableType: 'svgs',
-			  }
+				}
 			: undefined
 	);
 

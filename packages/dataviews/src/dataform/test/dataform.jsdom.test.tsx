@@ -631,6 +631,40 @@ describe( 'DataForm component', () => {
 			expect( fieldsSelector.author.edit() ).toBeInTheDocument();
 		} );
 
+		it.each( [ 'dropdown', 'modal' ] as const )(
+			'renders a disabled field as text without an edit button (%s)',
+			( openAs ) => {
+				render(
+					<Dataform
+						onChange={ noop }
+						fields={ fields.map( ( field ) =>
+							field.id === 'title'
+								? {
+										...field,
+										isDisabled: ( {
+											item,
+										}: {
+											item: typeof data;
+										} ) => item.order === 1,
+									}
+								: field
+						) }
+						form={ {
+							...formPanelMode,
+							layout: { ...formPanelMode.layout, openAs },
+						} }
+						data={ data }
+					/>
+				);
+
+				expect( screen.getByText( 'Hello World' ) ).toBeInTheDocument();
+				expect(
+					screen.queryByRole( 'button', { name: /edit title/i } )
+				).not.toBeInTheDocument();
+				expect( fieldsSelector.order.view() ).toBeInTheDocument();
+			}
+		);
+
 		it( 'should render custom render component', async () => {
 			const fieldsWithCustomRenderFunction = fields.map( ( field ) => {
 				return {
@@ -1041,7 +1075,7 @@ describe( 'DataForm component', () => {
 										? null
 										: 'Title is not allowed for this order.',
 							},
-					  }
+						}
 					: field
 			);
 
