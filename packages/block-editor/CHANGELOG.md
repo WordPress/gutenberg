@@ -12,6 +12,9 @@
 -   State control badges: migrate from the private `@wordpress/components` `Badge` to `@wordpress/ui` `Badge` ([#82608](https://github.com/WordPress/gutenberg/pull/82608)).
 -   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
 -   `LinkControl`: Add a `transformSuggestions` prop, so a consumer can filter, order or add to the search suggestions before they are shown ([#83652](https://github.com/WordPress/gutenberg/pull/83652)).
+-   Inserter: Add a "Files" source to the Media tab, listing the documents, PDFs and archives in the Media Library and inserting the selected one as a File block. The tab is named after the Media Library but previously offered only images, video and audio, so anything else it held was unreachable from there ([#49697](https://github.com/WordPress/gutenberg/issues/49697)).
+-   Inserter: Widen the Media tab's "Open Media Library" picker to every type the tab can insert. It was silently filtered to playable media, so a document already in the library was invisible - and one uploaded through the picker's own "Upload files" tab succeeded but then vanished from the grid, with nothing on screen explaining why ([#49697](https://github.com/WordPress/gutenberg/issues/49697)).
+-   `registerInserterMediaCategory`: Accept `application` and `text` as a category `mediaType`, alongside `image`, `audio` and `video`. A category using one of the new types inserts its items as File blocks ([#49697](https://github.com/WordPress/gutenberg/issues/49697)).
 
 ### Bug Fixes
 

@@ -304,6 +304,35 @@ describe( 'getInserterMediaCategories', () => {
 		expect( openverse.subscribe ).toBeUndefined();
 	} );
 
+	it( 'lists non-playable attachments under a Files source', async () => {
+		const getEntityRecords = vi.fn().mockResolvedValue( [] );
+		resolveSelect.mockReturnValue( { getEntityRecords } );
+		select.mockReturnValue( {
+			getEntityRecordsTotalItems: vi.fn().mockReturnValue( 0 ),
+			getEntityRecordsTotalPages: vi.fn().mockReturnValue( 0 ),
+		} );
+
+		const files = getInserterMediaCategories( 42, 'Post' ).find(
+			( category ) => category.name === 'files'
+		);
+
+		// `application` is what routes the item to a File block rather than to
+		// an image/video/audio one.
+		expect( files.mediaType ).toBe( 'application' );
+
+		await files.fetch( { per_page: 20 } );
+
+		expect( getEntityRecords ).toHaveBeenCalledWith(
+			'postType',
+			'attachment',
+			{
+				per_page: 20,
+				media_type: 'application',
+				orderBy: 'date',
+			}
+		);
+	} );
+
 	it( 'words the empty state from the post type label', () => {
 		const [ attachedImagesCategory ] = getInserterMediaCategories(
 			42,

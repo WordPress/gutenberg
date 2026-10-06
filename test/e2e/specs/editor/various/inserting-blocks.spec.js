@@ -1057,6 +1057,66 @@ test.describe( 'Attached images media category', () => {
 	} );
 } );
 
+test.describe( 'Files media category', () => {
+	let uploadedFile;
+
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+		uploadedFile = await requestUtils.uploadMedia(
+			'./assets/e2e-test-document.pdf'
+		);
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await Promise.all( [
+			requestUtils.deleteAllMedia(),
+			requestUtils.deleteAllPosts(),
+		] );
+	} );
+
+	test( 'inserts a document from the Media tab as a File block', async ( {
+		admin,
+		page,
+		editor,
+	} ) => {
+		await admin.createNewPost();
+
+		await page.getByLabel( 'Block Inserter' ).click();
+		await page.getByRole( 'tab', { name: 'Media' } ).click();
+		await page.getByRole( 'tab', { name: 'Files' } ).click();
+
+		const mediaPanel = page.locator(
+			'.block-editor-inserter__media-panel'
+		);
+		const document = mediaPanel.getByRole( 'option', {
+			name: uploadedFile.title.raw,
+		} );
+		await expect( document ).toBeVisible();
+
+		// A document has nothing to render inline, so its tile names the file
+		// rather than previewing it - that label is what tells one file from
+		// the next in the grid.
+		await expect(
+			document.getByText( uploadedFile.title.raw )
+		).toBeVisible();
+
+		await document.click();
+
+		// Inserted straight from the library: no re-upload, so the block keeps
+		// the existing attachment's id rather than creating a second copy.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/file',
+				attributes: {
+					id: uploadedFile.id,
+					href: uploadedFile.source_url,
+					fileName: uploadedFile.title.raw,
+				},
+			},
+		] );
+	} );
+} );
+
 class InsertingBlocksUtils {
 	constructor( { page, editor } ) {
 		this.page = page;

@@ -7,6 +7,7 @@
 -   `PostAuthor`: The field renders with the `SearchableSelect` component of `@wordpress/ui` instead of `ComboboxControl` and `SelectControl` ([#83323](https://github.com/WordPress/gutenberg/pull/83323)).
 -   `DocumentOutline`: Show the outline items' focus ring with the design system's outline instead of a legacy box-shadow ([#83755](https://github.com/WordPress/gutenberg/pull/83755)).
 -   Notes: Add a "Notes" submenu to the View group of the Options menu ([#83768](https://github.com/WordPress/gutenberg/pull/83768)).
+-   Media categories: Add a "Files" inserter media category, listing Media Library attachments that are neither image, video nor audio - PDFs, documents and archives - so the inserter's Media tab covers them too ([#49697](https://github.com/WordPress/gutenberg/issues/49697)).
 
 ### Bug Fixes
 

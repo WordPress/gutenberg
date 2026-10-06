@@ -643,6 +643,33 @@ $block-inserter-tabs-height: 44px;
 			outline-offset: -$border-width;
 		}
 
+		// A file (PDF, document, archive) has nothing to render inline, so it
+		// gets a placeholder naming it instead - the filename is what tells one
+		// document apart from the next.
+		.block-editor-inserter__media-list__item-preview-placeholder {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			box-sizing: border-box;
+			width: 100%;
+			// Images render at their natural aspect ratio, so there is no tile
+			// shape to match. A square reads as a thumbnail among them, and
+			// matches the empty tile DataViews shows for a record with no image.
+			aspect-ratio: 1;
+			padding: $grid-unit-20;
+			background: $gray-100;
+			color: $gray-700;
+
+			> span {
+				display: -webkit-box;
+				-webkit-box-orient: vertical;
+				-webkit-line-clamp: 3;
+				overflow: hidden;
+				overflow-wrap: anywhere;
+				text-align: center;
+			}
+		}
+
 		.block-editor-inserter__media-list__item-preview-spinner {
 			display: flex;
 			height: 100%;

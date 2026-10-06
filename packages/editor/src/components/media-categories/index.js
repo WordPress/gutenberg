@@ -403,6 +403,20 @@ const inserterMediaCategories = [
 			`https://wordpress.org/openverse/image/${ sourceId }/report/`,
 		isExternalResource: true,
 	},
+	// Everything that isn't playable or viewable inline — PDFs, documents,
+	// archives — so the tab stops implying the Media Library holds images,
+	// video and audio only. `application` is the coarse MIME type covering
+	// those; plain-text attachments (`text/plain`, `text/csv`) are a separate
+	// REST `media_type` and so aren't listed here.
+	createCoreMediaCategory( {
+		name: 'files',
+		labels: {
+			name: __( 'Files' ),
+			search_items: __( 'Search files' ),
+		},
+		mediaType: 'application',
+		getQuery: ( query ) => ( { ...query, media_type: 'application' } ),
+	} ),
 ];
 
 /**

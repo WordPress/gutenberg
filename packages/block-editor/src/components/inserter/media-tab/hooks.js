@@ -146,26 +146,31 @@ export function useMediaCategories( rootClientId ) {
 			unlock( select( blockEditorStore ) ).getInserterMediaCategories(),
 		[]
 	);
-	const { canInsertImage, canInsertVideo, canInsertAudio } = useSelect(
-		( select ) => {
-			const { canInsertBlockType } = select( blockEditorStore );
-			return {
-				canInsertImage: canInsertBlockType(
-					'core/image',
-					rootClientId
-				),
-				canInsertVideo: canInsertBlockType(
-					'core/video',
-					rootClientId
-				),
-				canInsertAudio: canInsertBlockType(
-					'core/audio',
-					rootClientId
-				),
-			};
-		},
-		[ rootClientId ]
-	);
+	const { canInsertImage, canInsertVideo, canInsertAudio, canInsertFile } =
+		useSelect(
+			( select ) => {
+				const { canInsertBlockType } = select( blockEditorStore );
+				return {
+					canInsertImage: canInsertBlockType(
+						'core/image',
+						rootClientId
+					),
+					canInsertVideo: canInsertBlockType(
+						'core/video',
+						rootClientId
+					),
+					canInsertAudio: canInsertBlockType(
+						'core/audio',
+						rootClientId
+					),
+					canInsertFile: canInsertBlockType(
+						'core/file',
+						rootClientId
+					),
+				};
+			},
+			[ rootClientId ]
+		);
 	useEffect( () => {
 		( async () => {
 			const _categories = [];
@@ -205,6 +210,10 @@ export function useMediaCategories( rootClientId ) {
 				image: canInsertImage,
 				video: canInsertVideo,
 				audio: canInsertAudio,
+				// Everything else is inserted as a File block, so a single
+				// permission check gates every non-playable media type.
+				application: canInsertFile,
+				text: canInsertFile,
 			};
 			inserterMediaCategories.forEach( ( category ) => {
 				if (
@@ -223,6 +232,7 @@ export function useMediaCategories( rootClientId ) {
 		canInsertImage,
 		canInsertVideo,
 		canInsertAudio,
+		canInsertFile,
 		inserterMediaCategories,
 	] );
 	return categories;
