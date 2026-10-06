@@ -51,6 +51,8 @@ const ALLOWLIST = {
 			'Skeleton',
 			'Spinner',
 			'Stack',
+			'Switch',
+			'SwitchControl',
 			'Tabs',
 			'Text',
 			'Textarea',
@@ -77,8 +79,6 @@ const ALLOWLIST = {
 			'Progress',
 			'SearchableSelect',
 			'SearchableSelectControl',
-			'Switch',
-			'SwitchControl',
 		],
 		message:
 			'`{{ name }}` from `{{ source }}` is not yet recommended for use in a WordPress environment.',
@@ -132,6 +132,8 @@ const DENYLIST = {
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
 		FlexItem:
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
+		FormToggle:
+			'Use `Switch` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		__experimentalInputControl:
 			'Use `InputControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		Notice: 'Use `Notice` from `@wordpress/ui` instead.',
@@ -145,6 +147,8 @@ const DENYLIST = {
 			'Use `InputControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		TextareaControl:
 			'Use `TextareaControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
+		ToggleControl:
+			'Use `SwitchControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		Tooltip: 'Use `Tooltip` from `@wordpress/ui` instead.',
 		VisuallyHidden: 'Use `{{ name }}` from `@wordpress/ui` instead.',
 	},

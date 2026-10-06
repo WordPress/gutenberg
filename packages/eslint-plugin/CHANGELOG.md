@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   `use-recommended-components`: Recommend `Switch` and `SwitchControl` from `@wordpress/ui`, and flag `FormToggle` and `ToggleControl` from `@wordpress/components`.
 -   `use-recommended-components`: Recognize the new `@wordpress/ui` Meter as use-with-caution. ([#83855](https://github.com/WordPress/gutenberg/pull/83855))
 -   `use-recommended-components`: Recommend `Checkbox`, `CheckboxControl`, and `CheckboxGroup` from `@wordpress/ui`, and flag `CheckboxControl` from `@wordpress/components` ([#83771](https://github.com/WordPress/gutenberg/pull/83771)).
 -   `use-recommended-components`: Recommend `Radio`, `RadioGroup`, and `RadioGroupControl` from `@wordpress/ui`, and flag `RadioControl` from `@wordpress/components` ([#83872](https://github.com/WordPress/gutenberg/pull/83872)).

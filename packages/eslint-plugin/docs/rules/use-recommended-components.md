@@ -7,6 +7,8 @@ The rule checks named imports and direct destructuring from `unlock( privateApis
 ## Migration guides
 
 - `CheckboxControl` — [`CheckboxControl` migration guide][checkboxcontrol-migration-guide]
+- `FormToggle` — [`Toggle` family migration guide][togglecontrol-migration-guide]
+- `ToggleControl` — [`Toggle` family migration guide][togglecontrol-migration-guide]
 - `RadioControl` — [`RadioControl` migration guide][radiocontrol-migration-guide]
 - `__experimentalInputControl` — [`InputControl` migration guide][inputcontrol-migration-guide]
 - `TextControl` — [`InputControl` migration guide][inputcontrol-migration-guide]
@@ -15,6 +17,7 @@ The rule checks named imports and direct destructuring from `unlock( privateApis
 [checkboxcontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-checkboxcontrol--migration-guide
 [inputcontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-inputcontrol--migration-guide
 [radiocontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-radiocontrol--migration-guide
+[togglecontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-togglecontrol--migration-guide
 [textareacontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-textareacontrol--migration-guide
 
 ## Rule details
