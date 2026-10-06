@@ -1,8 +1,7 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/colors" as *;
 
-// A swatch showing which box the background is painted into. The fill is the
-// background being clipped, and the dashed edge marks where it stops.
+// Swatch: the fill is the background, the dashed edge the border.
 .block-editor-background-clip-control__option::before {
 	content: "";
 	flex-shrink: 0;
@@ -17,8 +16,7 @@
 	background-clip: border-box;
 }
 
-// Nothing is set, so there is no box to draw. The swatch keeps its space so
-// the label stays in line with the others.
+// Keeps the label aligned with the others.
 .block-editor-background-clip-control__option.is-default::before {
 	visibility: hidden;
 }
@@ -32,13 +30,9 @@
 	background-clip: content-box;
 }
 
-// Stripes stand in for lines of text. Letters would be folded into the
-// option's accessible name, so the swatch carries no text of its own.
+// Stripes stand in for text; real letters would join the accessible name.
 .block-editor-background-clip-control__option.is-text::before {
-	padding: 0;
 	border: none;
-	background-color: $medium-gray-placeholder;
-	background-clip: border-box;
 	mask-image: repeating-linear-gradient(to bottom, #000 0 5px, transparent 5px 9px);
 	-webkit-mask-image: repeating-linear-gradient(to bottom, #000 0 5px, transparent 5px 9px);
 }

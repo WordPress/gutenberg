@@ -8,8 +8,7 @@ import BackgroundClipControl from '..';
 /**
  * Opens the control and returns the labels it offers.
  *
- * The options only exist once the select is open, and the select needs real
- * focus, so this suite runs in a browser rather than jsdom.
+ * Runs in a browser: the select needs real focus to open its options.
  */
 async function openOptions() {
 	await userEvent.click( screen.getByRole( 'combobox', { name: 'Clip' } ) );
@@ -78,8 +77,7 @@ describe( 'BackgroundClipControl', () => {
 			/>
 		);
 
-		// `border-box` is what the block actually renders, and it is not in
-		// this theme's list, so no value may stand in for it.
+		// The block renders `border-box`, which this list leaves out.
 		expect(
 			await screen.findByRole( 'combobox', { name: 'Clip' } )
 		).toHaveTextContent( 'Default' );

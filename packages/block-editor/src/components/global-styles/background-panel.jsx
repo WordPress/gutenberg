@@ -73,6 +73,24 @@ export function hasBackgroundSizeValue( style ) {
 }
 
 /**
+ * Returns the `background-clip` values a theme allows.
+ *
+ * @param {Object} settings Block settings.
+ * @return {string[]} Allowed values.
+ */
+export function getAllowedBackgroundClipValues( settings ) {
+	const clipSetting = settings?.background?.backgroundClip;
+	if ( true === clipSetting ) {
+		return VALID_BACKGROUND_CLIP_VALUES;
+	}
+	return Array.isArray( clipSetting )
+		? clipSetting.filter( ( clipValue ) =>
+				VALID_BACKGROUND_CLIP_VALUES.includes( clipValue )
+			)
+		: [];
+}
+
+/**
  * Checks if there is a current value in the background image block support
  * attributes.
  *
@@ -162,9 +180,7 @@ export default function BackgroundImagePanel( {
 	value,
 	onChange,
 	inheritedValue = value,
-	// The block's own style for the Default state, passed only while another
-	// state is selected. That state layers over it, so a clip set there still
-	// governs what this one can paint.
+	// Default state style, set only while another state is selected.
 	baseValue,
 	settings,
 	panelId,
@@ -211,39 +227,19 @@ export default function BackgroundImagePanel( {
 		'backgroundImage'
 	);
 
-	// The clip control is only exposed when a theme opts in, either with
-	// `true` for every value or an array naming the ones it wants.
-	const clipSetting = settings?.background?.backgroundClip;
-	let allowedClipValues = [];
-	if ( true === clipSetting ) {
-		allowedClipValues = VALID_BACKGROUND_CLIP_VALUES;
-	} else if ( Array.isArray( clipSetting ) ) {
-		// A value the control has no option for would leave a labelled but
-		// empty row, so only the ones it knows count.
-		allowedClipValues = clipSetting.filter( ( clipValue ) =>
-			VALID_BACKGROUND_CLIP_VALUES.includes( clipValue )
-		);
-	}
-	// The Typography panel's gradient control already expresses the text
-	// value, so this control needs a box to choose between to be worth
-	// showing at all.
-	const hasBoxClipValue = allowedClipValues.some(
+	const allowedClipValues = getAllowedBackgroundClipValues( settings );
+	// `text` alone is the Typography panel's Gradient control, not this one.
+	const showBackgroundClipControl = allowedClipValues.some(
 		( clipValue ) => clipValue !== 'text'
 	);
-	const showBackgroundClipControl = hasBoxClipValue;
 
 	const localClip = value?.background?.backgroundClip;
 	const baseClip = baseValue?.background?.backgroundClip;
 	const inheritedClip = inheritedValue?.background?.backgroundClip;
-	// A gradient clipped to text is a text gradient, which the Typography
-	// panel owns. This panel only treats it as its own when the clip control
-	// has been opted into.
+	const hasLocalClip = localClip !== undefined;
+	// A text gradient belongs to the Typography panel.
 	const isTextGradient = localClip === 'text';
-	// The block's own clip outranks an inherited one, whichever state it was
-	// set in, so the Default state's value sits between the two.
 	const clipsToText = ( localClip ?? baseClip ?? inheritedClip ) === 'text';
-	// The Typography panel holds the gradient, but only in the Default state,
-	// so say so when this one cannot reach it.
 	const clipIsFromBase =
 		clipsToText && localClip === undefined && !! baseClip;
 	const clipsToTextNotice = clipIsFromBase
@@ -259,8 +255,7 @@ export default function BackgroundImagePanel( {
 			const clearsColorBackground = showBackgroundColorControl;
 			const clearsColorGradient =
 				hasBackgroundGradientControl || showLegacyColorGradientControl;
-			// Without the clip control, a text gradient belongs to the
-			// Typography panel and must survive a reset here.
+			// Without the clip control, keep the Typography panel's text gradient.
 			const prevClip = previousValue?.background?.backgroundClip;
 			const background =
 				! showBackgroundClipControl && 'text' === prevClip
@@ -316,8 +311,7 @@ export default function BackgroundImagePanel( {
 			undefined
 		);
 		newValue = setImmutably( newValue, [ 'color', 'gradient' ], undefined );
-		// Clearing the gradient behind a text clip would leave the text
-		// invisible, so drop the clip with it.
+		// A text clip without a gradient leaves the text invisible.
 		if ( isTextGradient ) {
 			newValue = setImmutably(
 				newValue,
@@ -422,10 +416,6 @@ export default function BackgroundImagePanel( {
 		},
 	} );
 	const hasLocalBackgroundImage = hasBackgroundImageValue( value );
-
-	const inheritedBackgroundClip = inheritedValue?.background?.backgroundClip;
-	const hasLocalBackgroundClip =
-		value?.background?.backgroundClip !== undefined;
 
 	return (
 		<Wrapper
@@ -604,29 +594,19 @@ export default function BackgroundImagePanel( {
 			{ showBackgroundClipControl && (
 				<InheritanceToolsPanelItem
 					{ ...inheritanceProps(
-						inheritedBackgroundClip && ! hasLocalBackgroundClip,
-						hasLocalBackgroundClip &&
-							inheritedBackgroundClip !== undefined,
+						!! inheritedClip && ! hasLocalClip,
+						hasLocalClip && inheritedClip !== undefined,
 						'block-editor-background-panel__clip-item'
 					) }
 					label={ __( 'Clip' ) }
-					// A text clip belongs to the Typography panel's gradient
-					// control, so it does not count as a value here. Without
-					// this the control would appear in this panel as a side
-					// effect of setting a text gradient elsewhere.
-					hasValue={ () =>
-						hasLocalBackgroundClip && ! isTextGradient
-					}
+					// Keeps a text gradient from surfacing this control.
+					hasValue={ () => hasLocalClip && ! isTextGradient }
 					onDeselect={ resetBackgroundClip }
 					isShownByDefault={ defaultControls.backgroundClip }
 					panelId={ panelId }
 				>
 					<BackgroundClipControl
-						value={
-							value?.background?.backgroundClip ??
-							baseClip ??
-							inheritedBackgroundClip
-						}
+						value={ localClip ?? baseClip ?? inheritedClip }
 						onChange={ ( newClip ) =>
 							onChange(
 								setImmutably(

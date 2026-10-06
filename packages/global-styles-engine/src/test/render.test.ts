@@ -1075,8 +1075,7 @@ describe( 'global styles renderer', () => {
 					minimalStyleOptions
 				);
 
-				// The breakpoint already escaped the clip, so the hover color
-				// is painted and needs no fill of its own.
+				// The breakpoint already escaped the clip, so no fill is needed.
 				expect( result ).toContain(
 					'@media (width <= 480px){:root :where(.wp-block-button:hover){color: #00ff00;}}'
 				);

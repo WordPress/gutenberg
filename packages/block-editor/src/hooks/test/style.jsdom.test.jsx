@@ -449,8 +449,7 @@ describe( 'getStateStylesCSS under a text clip', () => {
 			textClipBase
 		);
 
-		// The engine writes `transparent` for a text clip, so a second
-		// declaration here would fight it.
+		// The engine already writes `transparent` for a text clip.
 		expect( css ).not.toContain( 'currentColor' );
 	} );
 
@@ -464,8 +463,7 @@ describe( 'getStateStylesCSS under a text clip', () => {
 			textClipBase
 		);
 
-		// The inherited clip fills the text with this state's gradient, so
-		// `currentColor` would paint over it.
+		// `currentColor` would paint over this state's gradient.
 		expect( css ).not.toContain( 'currentColor' );
 	} );
 

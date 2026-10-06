@@ -156,8 +156,7 @@ function ScreenBlock( {
 		false,
 		hasSelectedState ? stateParam : undefined
 	);
-	// `useStyle` reads the selected state's own sub-path, so the panels need
-	// the Default state separately to know what still applies underneath it.
+	// The Default state a selected state layers over.
 	const [ baseStyle ] = useStyle( prefix, name, 'merged', false );
 	const baseValue = hasSelectedState ? baseStyle : undefined;
 	const inheritedStyleWithResolvedBackground =
@@ -402,7 +401,6 @@ function ScreenBlock( {
 					baseValue={ baseValue }
 					onChange={ onChangeTypography }
 					settings={ settings }
-					blockName={ name }
 					// Only expose global-settings controls (e.g. "Indent all
 					// paragraphs") when not editing a state-specific variation,
 					// because those settings are global and cannot be per-breakpoint.

@@ -258,15 +258,13 @@ describe( 'inspector hook wrappers thread inheritedValue into the panel', () => 
 		);
 
 		const [ , props ] = mockPanelRecorder.calls[ 0 ];
-		// What the panel writes when the Gradient control is reset.
 		props.onChange( {
 			typography: {},
 			color: {},
 			background: { gradient: undefined, backgroundClip: undefined },
 		} );
 
-		// Both halves go. Putting the gradient back would turn it into a
-		// background gradient the user never asked for.
+		// A lone gradient would become a background gradient.
 		const [ [ attributes ] ] = setAttributes.mock.calls;
 		expect( attributes.style?.background?.gradient ).toBeUndefined();
 		expect( attributes.style?.background?.backgroundClip ).toBeUndefined();
@@ -297,7 +295,6 @@ describe( 'inspector hook wrappers thread inheritedValue into the panel', () => 
 		const [ , props ] = mockPanelRecorder.calls[ 0 ];
 		props.onChange( { typography: {}, color: {}, background: {} } );
 
-		// The Background panel owns this one, so it survives untouched.
 		const [ [ attributes ] ] = setAttributes.mock.calls;
 		expect( attributes.style?.background?.gradient ).toBe(
 			'var:preset|gradient|purple-blue'
@@ -325,8 +322,6 @@ describe( 'inspector hook wrappers thread inheritedValue into the panel', () => 
 		);
 
 		const [ , props ] = mockPanelRecorder.calls[ 0 ];
-		// Shaped as `attributesToStyle` hands it to the panel, which always
-		// builds the `typography` and `color` objects.
 		props.onChange( {
 			typography: {},
 			color: {},
@@ -336,8 +331,7 @@ describe( 'inspector hook wrappers thread inheritedValue into the panel', () => 
 			},
 		} );
 
-		// The preset attribute paints the whole block through the `background`
-		// shorthand, which resets the clip the text gradient depends on.
+		// The preset's `background` shorthand would reset the text clip.
 		expect( setAttributes ).toHaveBeenCalledWith(
 			expect.objectContaining( { gradient: undefined } )
 		);
