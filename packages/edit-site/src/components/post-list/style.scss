@@ -98,3 +98,31 @@
 		transform: translateX(100%);
 	}
 }
+
+.page-ancestor-path {
+	display: flex;
+	align-items: center;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	max-width: 100%;
+	min-width: 0;
+	font-family: var(--wpds-typography-font-family-body);
+	font-size: var(--wpds-typography-font-size-sm);
+	line-height: var(--wpds-typography-line-height-xs);
+
+	> li {
+		flex-shrink: 1;
+		min-width: 0;
+		margin: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+}
+
+.page-ancestor-path__separator {
+	color: var(--wpds-color-stroke-surface-neutral);
+	margin: 0 var(--wpds-dimension-gap-sm);
+	user-select: none;
+}
