@@ -262,14 +262,12 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		rest_get_server()->dispatch( $request );
 
 		// Check the args were filtered as expected.
-		$this->assertContains(
-			array(
-				'timeout'             => 27,
-				'limit_response_size' => 153600,
-				'body'                => static::$url_placeholder,
-			),
-			static::$request_args
-		);
+		$this->assertArrayHasKey( 'timeout', static::$request_args, 'Request args do not contain a "timeout" key' );
+		$this->assertArrayHasKey( 'limit_response_size', static::$request_args, 'Request args do not contain a "limit_response_size" key' );
+		$this->assertArrayHasKey( 'body', static::$request_args, 'Request args do not contain a "body" key' );
+		$this->assertSame( 27, static::$request_args['timeout'], 'Request args "timeout" is not 27' );
+		$this->assertSame( 153600, static::$request_args['limit_response_size'], 'Request args "limit_response_size" is not 153600' );
+		$this->assertSame( static::$url_placeholder, static::$request_args['body'], 'Request args "body" is not "' . static::$url_placeholder . '"' );
 
 		remove_all_filters( 'rest_url_details_http_request_args' );
 	}
@@ -417,14 +415,9 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$endpoint = $data['endpoints'][0];
 
 		$this->assertArrayHasKey( 'url', $endpoint['args'] );
-		$this->assertContains(
-			array(
-				'type'     => 'string',
-				'required' => true,
-				'format'   => 'uri',
-			),
-			$endpoint['args']['url']
-		);
+		$this->assertSame( 'string', $endpoint['args']['url']['type'], 'Endpoint "[args][url][type]" is not "string"' );
+		$this->assertTrue( $endpoint['args']['url']['required'], 'Endpoint "[args][url][required]" is not true' );
+		$this->assertSame( 'uri', $endpoint['args']['url']['format'], 'Endpoint "[args][url][format]" is not "uri"' );
 	}
 
 	/**
