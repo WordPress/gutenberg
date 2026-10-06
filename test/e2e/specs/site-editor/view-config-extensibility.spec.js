@@ -4,8 +4,14 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 // renders the view list as tabs, the classic editor's as sidebar buttons.
 const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
 
+// v2 tabs trail the label with the view's item count, as in "Drafts 3", so
+// the count is optional in the name. Views without a count have none.
 const getViewItem = ( page, name ) =>
-	page.getByRole( isSiteEditorV2 ? 'tab' : 'button', { name, exact: true } );
+	isSiteEditorV2
+		? page.getByRole( 'tab', {
+				name: new RegExp( `^${ name }(?: [\\d,]+)?$` ),
+			} )
+		: page.getByRole( 'button', { name, exact: true } );
 
 const PLUGIN_SLUG = 'gutenberg-test-view-config-extensibility';
 const MATCHING_PAGE_TITLE = 'Published in 2021';
