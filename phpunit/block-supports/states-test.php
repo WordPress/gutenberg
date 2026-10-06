@@ -335,6 +335,179 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that a leading compound naming a different block is kept as an
+	 * ancestor, and the instance class goes on the block's own compound.
+	 *
+	 * @covers ::gutenberg_build_state_selector
+	 * @covers ::gutenberg_get_state_selector_ancestor
+	 *
+	 * @dataProvider data_build_state_selector_with_block_name
+	 *
+	 * @param string $block_name     Block name.
+	 * @param string $block_selector Block or feature selector.
+	 * @param string $expected       Expected scoped selector.
+	 */
+	public function test_build_state_selector_with_block_name( $block_name, $block_selector, $expected ) {
+		$this->assertSame(
+			$expected,
+			gutenberg_build_state_selector( '.wp-states-test', $block_selector, ':hover', $block_name )
+		);
+	}
+
+	/**
+	 * Tests that the selectors registered by core blocks scope to their own element.
+	 *
+	 * The cases above pass selectors as literals, so a change to a block's
+	 * `block.json` would not reach them. This one reads what the block actually
+	 * registers, and fails if a selector changes into a shape the scoping does
+	 * not handle.
+	 *
+	 * @covers ::gutenberg_build_state_selector
+	 * @covers ::gutenberg_get_state_selector_ancestor
+	 *
+	 * @dataProvider data_registered_block_selectors_scope_to_their_own_element
+	 *
+	 * @param string $block_name Block name.
+	 * @param string $feature    Key in the block's `selectors` metadata.
+	 */
+	public function test_registered_block_selectors_scope_to_their_own_element( $block_name, $feature ) {
+		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
+
+		if ( ! $block_type || empty( $block_type->selectors[ $feature ] ) ) {
+			$this->markTestSkipped( "$block_name does not register a '$feature' selector." );
+		}
+
+		$scoped = gutenberg_build_state_selector(
+			'.wp-states-test',
+			$block_type->selectors[ $feature ],
+			':hover',
+			$block_name
+		);
+
+		/*
+		 * The instance class sits on the block's own element, so the state
+		 * selector has to end on that class rather than describe a descendant
+		 * of it.
+		 */
+		$this->assertStringEndsWith(
+			'.wp-states-test:hover',
+			$scoped,
+			"The scoped '$feature' selector for $block_name does not land on the block's own element."
+		);
+	}
+
+	/**
+	 * Data provider for test_registered_block_selectors_scope_to_their_own_element().
+	 *
+	 * @return array<string, array<string, string>>
+	 */
+	public function data_registered_block_selectors_scope_to_their_own_element() {
+		// Only selectors that target the block's own element belong here. A
+		// feature selector for a descendant, such as a link inside the block,
+		// ends on that descendant by design.
+		return array(
+			'list item root'   => array(
+				'block_name' => 'core/list-item',
+				'feature'    => 'root',
+			),
+			'list item border' => array(
+				'block_name' => 'core/list-item',
+				'feature'    => 'border',
+			),
+		);
+	}
+
+	/**
+	 * Data provider for test_build_state_selector_with_block_name().
+	 *
+	 * @return array<string, array<string, string>>
+	 */
+	public function data_build_state_selector_with_block_name(): array {
+		return array(
+			'own class'                              => array(
+				'block_name'     => 'core/paragraph',
+				'block_selector' => '.wp-block-paragraph',
+				'expected'       => '.wp-states-test:hover',
+			),
+			'tag name'                               => array(
+				'block_name'     => 'core/paragraph',
+				'block_selector' => 'p',
+				'expected'       => '.wp-states-test:hover',
+			),
+			'own class with modifier'                => array(
+				'block_name'     => 'core/x',
+				'block_selector' => '.wp-block-x.is-style-y',
+				'expected'       => '.wp-states-test.is-style-y:hover',
+			),
+			'own class with descendant'              => array(
+				'block_name'     => 'core/search',
+				'block_selector' => '.wp-block-search .wp-block-search__input',
+				'expected'       => '.wp-states-test .wp-block-search__input:hover',
+			),
+			'ancestor block with child combinator'   => array(
+				'block_name'     => 'core/list-item',
+				'block_selector' => '.wp-block-list > li',
+				'expected'       => '.wp-block-list > .wp-states-test:hover',
+			),
+			'ancestor block with :not()'             => array(
+				'block_name'     => 'core/list-item',
+				'block_selector' => '.wp-block-list:not(.wp-block-list .wp-block-list) > li',
+				'expected'       => '.wp-block-list:not(.wp-block-list .wp-block-list) > .wp-states-test:hover',
+			),
+			'ancestor block with element descendant' => array(
+				'block_name'     => 'core/list-item',
+				'block_selector' => '.wp-block-list > li a',
+				'expected'       => '.wp-block-list > .wp-states-test a:hover',
+			),
+			'other block with nested block element'  => array(
+				'block_name'     => 'test/state-button',
+				'block_selector' => '.wp-block-button .wp-block-button__link',
+				'expected'       => '.wp-states-test .wp-block-button__link:hover',
+			),
+			'selector list'                          => array(
+				'block_name'     => 'core/list-item',
+				'block_selector' => '.wp-block-list > li, .wp-block-list-item .inner',
+				'expected'       => '.wp-block-list > .wp-states-test:hover, .wp-states-test .inner:hover',
+			),
+		);
+	}
+
+	/**
+	 * Tests that a List Item responsive value is scoped to the `li` itself.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_responsive_state_scopes_ancestor_root_selector_to_block_wrapper() {
+		$this->ensure_block_registered(
+			'core/list-item',
+			array( 'root' => '.wp-block-list > li' )
+		);
+
+		$block = array(
+			'blockName' => 'core/list-item',
+			'attrs'     => array(
+				'style' => array(
+					'@mobile' => array(
+						'color' => array(
+							'background' => '#ff00d0',
+						),
+					),
+				),
+			),
+		);
+
+		$actual = gutenberg_render_block_states_support( '<li>Item</li>', $block );
+
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){.wp-block-list > .' . $matches[0] . '{background-color:#ff00d0 !important;background-image:unset !important;}}',
+			$actual_stylesheet
+		);
+	}
+
+	/**
 	 * Tests that preset values are converted to CSS custom property references.
 	 *
 	 * @covers ::gutenberg_normalize_state_preset_vars
