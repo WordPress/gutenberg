@@ -365,7 +365,7 @@ test.describe( 'Image', () => {
 
 			await blockLibrary.getByRole( 'tab', { name: 'Media' } ).click();
 
-			// Each media source is a collapsible panel, and clicking the open
+			// Each media category is a collapsible panel, and clicking the open
 			// one closes it, so only click when it's collapsed.
 			const openverse = blockLibrary
 				.getByRole( 'tabpanel', { name: 'Media' } )
