@@ -60,48 +60,68 @@ function NoteFormat( { isActive, activeAttributes } ) {
 		return pickBlockLevelNote( threads, attributes )?.id;
 	} );
 
+	// Sync visible notes to the marker under the caret. Read imperatively so
+	// it triggers on caret movement, not sidebar state.
+	const canSyncNotes = useEvent( () => {
+		const canShowFloatingNotes =
+			isLargeViewport &&
+			getPreference( 'core', 'notesDisplayMode' ) !== 'hidden';
+		return (
+			canShowFloatingNotes ||
+			getActiveComplementaryArea( 'core' ) === ALL_NOTES_SIDEBAR
+		);
+	} );
+
+	// The caret left a marker but is still in the block. If the marker's note
+	// is still selected, fall back to what the block selects on its own, so
+	// the result depends only on where the caret is.
+	const leaveMarker = useEvent( ( markerNoteId ) => {
+		if (
+			markerNoteId &&
+			String( getSelectedNote() ) === String( markerNoteId )
+		) {
+			selectNote( getBlockLevelNoteId() );
+		}
+	} );
+
 	useEffect( () => {
 		const previousNoteId = previousNoteIdRef.current;
 		previousNoteIdRef.current = noteId;
 
-		// Sync visible notes to the marker under the caret. Read imperatively
-		// so it triggers on caret movement, not sidebar state.
-		const canShowFloatingNotes =
-			isLargeViewport &&
-			getPreference( 'core', 'notesDisplayMode' ) !== 'hidden';
-		if (
-			! canShowFloatingNotes &&
-			getActiveComplementaryArea( 'core' ) !== ALL_NOTES_SIDEBAR
-		) {
+		if ( ! canSyncNotes() ) {
 			return;
 		}
 
-		const selectedNote = String( getSelectedNote() );
-
-		if ( noteId ) {
-			if ( selectedNote !== String( noteId ) ) {
-				selectNote( Number( noteId ) );
-			}
-			return;
-		}
-
-		// The caret left a marker for plain text in the same block. If its
-		// note is still selected, fall back to what the block selects on its
-		// own, so the result depends only on where the caret is. Leaving the
-		// block unmounts this component instead, and the block-level sync
-		// owns that transition.
-		if ( previousNoteId && selectedNote === String( previousNoteId ) ) {
-			selectNote( getBlockLevelNoteId() );
+		if ( ! noteId ) {
+			leaveMarker( previousNoteId );
+		} else if ( String( getSelectedNote() ) !== String( noteId ) ) {
+			selectNote( Number( noteId ) );
 		}
 	}, [
 		noteId,
 		isLargeViewport,
-		getActiveComplementaryArea,
-		getPreference,
+		canSyncNotes,
+		leaveMarker,
 		getSelectedNote,
-		getBlockLevelNoteId,
 		selectNote,
 	] );
+
+	// This only renders for the field holding the caret, so moving the caret
+	// to another field in the block unmounts it without a caret change.
+	// Leaving the block is the block-level sync's transition, and picking a
+	// thread selects the block without a field, which keeps the pick.
+	const onUnmount = useEvent( () => {
+		const selectionStart = registry
+			.select( blockEditorStore )
+			.getSelectionStart();
+		const isCaretInBlock =
+			selectionStart.clientId === clientId &&
+			selectionStart.attributeKey !== undefined;
+		if ( isCaretInBlock && canSyncNotes() ) {
+			leaveMarker( previousNoteIdRef.current );
+		}
+	} );
+	useEffect( () => onUnmount, [ onUnmount ] );
 
 	return null;
 }

@@ -1862,6 +1862,64 @@ test.describe( 'Block Notes', () => {
 					'false'
 				);
 			} );
+
+			test( 'falls back to the block-level note when the caret moves to another field in the block', async ( {
+				editor,
+				page,
+				blockNoteUtils,
+			} ) => {
+				await blockNoteUtils.addBlockWithNote( {
+					type: 'core/pullquote',
+					attributes: {
+						value: 'Hello brave new world.',
+						citation: 'Someone',
+					},
+					comment: 'Block note',
+				} );
+
+				const quote = editor.canvas.getByRole( 'textbox', {
+					name: 'Pullquote text',
+				} );
+				const citation = editor.canvas.getByRole( 'textbox', {
+					name: 'Pullquote citation text',
+				} );
+				await quote.click();
+				await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
+				await blockNoteUtils.addNote( 'Brave note' );
+
+				const settings = page.getByRole( 'region', {
+					name: 'Editor settings',
+				} );
+				const blockThread = settings.getByRole( 'treeitem', {
+					name: 'Note: Block note',
+				} );
+				const inlineThread = settings.getByRole( 'treeitem', {
+					name: 'Note: Brave note',
+				} );
+
+				// The caret inside the marker selects the inline note.
+				await editor.canvas
+					.getByRole( 'textbox', { name: 'Add title' } )
+					.click();
+				await editor.canvas.locator( 'mark.wp-note' ).click();
+				await expect( inlineThread ).toHaveAttribute(
+					'aria-expanded',
+					'true'
+				);
+
+				// Moving it to the citation, a separate field in the same
+				// block, returns to the block-level note.
+				await citation.click();
+				await expect( citation ).toBeFocused();
+				await expect( blockThread ).toHaveAttribute(
+					'aria-expanded',
+					'true'
+				);
+				await expect( inlineThread ).toHaveAttribute(
+					'aria-expanded',
+					'false'
+				);
+			} );
 		} );
 	} );
 
