@@ -244,7 +244,7 @@ sequenceDiagram
     Note over M: The live level attribute stays 2. The proposal saves, syncs and undoes as content
 ```
 
-Changes that skip `setAttributes` (for example the block switcher's variation picker dispatching `updateBlockAttributes` directly) are caught by the interceptor, reverted, and written into the same proposal. Undo withdraws a proposal like any other edit, and the Note collector trashes its Note. A marker left proposing nothing trashes its Note too. Note ids read from content are only hints: auto-save acts on one only when core-data shows it as a pending Note on this post.
+Changes that skip `setAttributes` (for example the block switcher's variation picker dispatching `updateBlockAttributes` directly) are caught by the interceptor, reverted, and written into the same proposal. Undo withdraws a proposal like any other edit, and the Note collector trashes its Note. Redo puts the marker back, and because its Note is now in the trash, auto-save saves the returned proposal as a new Note. A marker left proposing nothing trashes its Note too. Note ids read from content are only hints: auto-save acts on one only when core-data shows it as a pending Note on this post.
 
 ## Review: accept and reject
 
@@ -298,7 +298,7 @@ All of this lives in `lib/compat/wordpress-7.1/block-suggestions.php`. Permissio
 ## Collaboration and undo
 
 - **RTC.** All markers, attribute proposals included, sync as ordinary content. When one peer accepts an attribute suggestion, the other peer's interceptor would see that change as drift and revert it. `isAcceptedSuggestionChange` checks the linked Notes' payloads and adopts the change instead. Locally, `requestInterceptorBypass` does the same for the accepting peer.
-- **Undo.** Undoing a suggestion edit removes its marker. `SuggestionNoteGC` notices the anchor is gone and trashes the Note, and restores it on redo. Notes with replies are spared. `suggestion-undo-guard.ts` handles adoption so undo and redo do not get captured as fresh suggestions.
+- **Undo.** Undoing a suggestion edit removes its marker. `SuggestionNoteGC` notices the anchor is gone and trashes the Note. On redo an inline marker gets its Note restored; a redone attribute proposal is saved as a new Note (see above). Notes with replies are spared. `suggestion-undo-guard.ts` handles adoption so undo and redo do not get captured as fresh suggestions.
 - **Concurrency.** Each block has a serial write queue, so the format keyboard and content reconciler cannot interleave their note-then-marker writes. A run whose surrounding text changed during the Note request is abandoned and its Note trashed.
 
 ## Open findings
