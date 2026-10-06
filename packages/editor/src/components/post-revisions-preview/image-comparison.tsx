@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { BlockPreview } from '@wordpress/block-editor';
 import { cloneBlock, type Block } from '@wordpress/blocks';
 import { Button } from '@wordpress/components';
-import { useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 type ImageComparisonProps = { before: Block; after: Block };
@@ -14,6 +14,7 @@ export default function ImageComparison( {
 	after,
 }: ImageComparisonProps ) {
 	const [ position, setPosition ] = useState( 50 );
+	const [ unavailable, setUnavailable ] = useState< string[] >( [] );
 	const previews = useMemo(
 		() => ( {
 			before: cloneBlock( before, { caption: '' } ),
@@ -22,14 +23,37 @@ export default function ImageComparison( {
 		[ before, after ]
 	);
 
+	useEffect( () => {
+		// BlockPreview renders into its own document. Check availability here
+		// so failed images can be described outside its inaccessible iframe.
+		const images = Object.entries( previews ).map(
+			( [ version, block ] ) => {
+				const image = new window.Image();
+				image.onerror = () =>
+					setUnavailable( ( versions ) => [ ...versions, version ] );
+				image.src = block.attributes.url as string;
+				return image;
+			}
+		);
+		return () => {
+			images.forEach( ( image ) => {
+				image.onerror = null;
+			} );
+		};
+	}, [ previews ] );
+
+	const hasUnavailableImage = unavailable.length > 0;
 	return (
 		<div className="editor-post-revisions-preview__image-comparison">
-			<p>{ __( 'Drag the slider to compare image versions.' ) }</p>
+			{ ! hasUnavailableImage && (
+				<p>{ __( 'Drag the slider to compare image versions.' ) }</p>
+			) }
 			<div className="editor-post-revisions-preview__image-controls">
 				<Button
 					variant="secondary"
 					accessibleWhenDisabled
 					size="compact"
+					disabled={ hasUnavailableImage }
 					onClick={ () => setPosition( 100 ) }
 				>
 					{ __( 'Show before' ) }
@@ -38,18 +62,28 @@ export default function ImageComparison( {
 					variant="secondary"
 					accessibleWhenDisabled
 					size="compact"
+					disabled={ hasUnavailableImage }
 					onClick={ () => setPosition( 0 ) }
 				>
 					{ __( 'Show after' ) }
 				</Button>
 			</div>
-			<div className="editor-post-revisions-preview__image-stage">
+			<div
+				className={ clsx(
+					'editor-post-revisions-preview__image-stage',
+					{ 'has-unavailable-image': hasUnavailableImage }
+				) }
+			>
 				{ Object.entries( previews )
 					.reverse()
 					.map( ( [ version, block ] ) => (
 						<div
 							key={ version }
-							role="img"
+							role={
+								unavailable.includes( version )
+									? undefined
+									: 'img'
+							}
 							aria-label={
 								version === 'before'
 									? sprintf(
@@ -74,7 +108,7 @@ export default function ImageComparison( {
 								`is-${ version }`
 							) }
 							style={
-								version === 'before'
+								version === 'before' && ! hasUnavailableImage
 									? {
 											clipPath: `inset(0 ${ 100 - position }% 0 0)`,
 										}
@@ -86,37 +120,51 @@ export default function ImageComparison( {
 									? __( 'Before' )
 									: __( 'After' ) }
 							</span>
-							<BlockPreview
-								blocks={ [ block ] }
-								viewportWidth={ 0 }
-							/>
+							{ unavailable.includes( version ) ? (
+								<p role="status">
+									{ version === 'before'
+										? __(
+												'The before image could not be loaded. Check that the image is still available.'
+											)
+										: __(
+												'The after image could not be loaded. Check that the image is still available.'
+											) }
+								</p>
+							) : (
+								<BlockPreview
+									blocks={ [ block ] }
+									viewportWidth={ 0 }
+								/>
+							) }
 						</div>
 					) ) }
-				<>
-					<span
-						aria-hidden="true"
-						className="editor-post-revisions-preview__image-divider"
-						style={ { left: `${ position }%` } }
-					/>
-					{ /* A native range keeps keyboard and touch behavior on the reveal handle. */ }
-					<input
-						className="editor-post-revisions-preview__image-slider"
-						type="range"
-						min={ 0 }
-						max={ 100 }
-						value={ position }
-						aria-label={ __( 'Image comparison' ) }
-						aria-valuetext={ sprintf(
-							/* translators: 1: percentage of the before image, 2: percentage of the after image. */
-							__( '%1$d%% before, %2$d%% after' ),
-							position,
-							100 - position
-						) }
-						onChange={ ( event ) =>
-							setPosition( Number( event.target.value ) )
-						}
-					/>
-				</>
+				{ ! hasUnavailableImage && (
+					<>
+						<span
+							aria-hidden="true"
+							className="editor-post-revisions-preview__image-divider"
+							style={ { left: `${ position }%` } }
+						/>
+						{ /* A native range keeps keyboard and touch behavior on the reveal handle. */ }
+						<input
+							className="editor-post-revisions-preview__image-slider"
+							type="range"
+							min={ 0 }
+							max={ 100 }
+							value={ position }
+							aria-label={ __( 'Image comparison' ) }
+							aria-valuetext={ sprintf(
+								/* translators: 1: percentage of the before image, 2: percentage of the after image. */
+								__( '%1$d%% before, %2$d%% after' ),
+								position,
+								100 - position
+							) }
+							onChange={ ( event ) =>
+								setPosition( Number( event.target.value ) )
+							}
+						/>
+					</>
+				) }
 			</div>
 		</div>
 	);
