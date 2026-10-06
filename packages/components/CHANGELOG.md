@@ -12,6 +12,7 @@
 ### Enhancements
 
 -   `CheckboxControl`: Mark as not recommended for use in a WordPress environment, in favour of `CheckboxControl` from `@wordpress/ui` ([#83771](https://github.com/WordPress/gutenberg/pull/83771)).
+-   `RadioControl`: Mark as not recommended for use in a WordPress environment, in favour of `RadioGroupControl` from `@wordpress/ui` ([#83872](https://github.com/WordPress/gutenberg/pull/83872)).
 -   `RadioControl`: Match the `@wordpress/ui` Radio colors ([#83270](https://github.com/WordPress/gutenberg/pull/83270)).
 -   `Notice`: Mark as not recommended in favor of `Notice` from `@wordpress/ui` ([#82685](https://github.com/WordPress/gutenberg/pull/82685)).
 -   `CheckboxControl`: Keep the default checkbox at 16px on narrow screens while retaining a 24px click target ([#83612](https://github.com/WordPress/gutenberg/pull/83612)).
@@ -28,6 +29,7 @@
 
 ### Bug Fixes
 
+-   `Popover`: Keep the `will-change: transform` hint only while the popover is moving, so its content is no longer left on a compositing layer that Chrome can render blurry ([#77359](https://github.com/WordPress/gutenberg/pull/77359)).
 -   `RadioControl`: Keep radio circles visually 16px at all viewport widths while retaining a 24px pointer target ([#83840](https://github.com/WordPress/gutenberg/pull/83840)).
 -   `Text`: Make single-line truncation and `isBlock` overrides consistent across the main document and iframes ([#82573](https://github.com/WordPress/gutenberg/pull/82573)).
 -   `CardDivider`: Apply the Card's width, display, and border color consistently inside iframes ([#82577](https://github.com/WordPress/gutenberg/pull/82577)).
@@ -40,6 +42,7 @@
 ### Internal
 
 -   `Menu`: Deprecate the private API while preserving it for older bundled consumers. Target removal for WordPress 7.3 after package compatibility checks pass ([#82947](https://github.com/WordPress/gutenberg/pull/82947)).
+-   `ProgressBar`: Use the WordPress Design System color tokens. ([#83779](https://github.com/WordPress/gutenberg/pull/83779)).
 
 ## 41.0.0 (2026-09-23)
 

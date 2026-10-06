@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { useEffect, useMemo, useRef } from '@wordpress/element';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import {
@@ -64,6 +64,8 @@ export function NoteThread( {
 	);
 	const floatingRef = useRef( null );
 	const isKeyboardTabbingRef = useRef( false );
+	// Minimized threads expand only while focused, not on block selection.
+	const [ hasFocus, setHasFocus ] = useState( false );
 
 	const registerThread = floating?.registerThread;
 	const unregisterThread = floating?.unregisterThread;
@@ -79,13 +81,15 @@ export function NoteThread( {
 	}, [ relatedBlockElement, note.id, registerThread, unregisterThread ] );
 
 	// Scroll the thread into view when it becomes selected, and re-scroll
-	// when its floating position settles after `useFloatingBoard` recomputes.
+	// when its floating position or height settles after `useFloatingBoard`
+	// recomputes. The canvas room follows the height, so an expanding thread
+	// can only scroll fully into view once it's measured.
 	useEffect( () => {
 		if ( ! isSelected || note.id === 'new' ) {
 			return;
 		}
 		scrollNoteThreadIntoView( note.id, sidebarRef.current );
-	}, [ isSelected, floating?.y, note.id, sidebarRef ] );
+	}, [ isSelected, floating?.y, floating?.height, note.id, sidebarRef ] );
 
 	/*
 	 * Deselect the thread once focus leaves it. `useFocusOutside` keeps the
@@ -95,6 +99,7 @@ export function NoteThread( {
 	 * React tree. It also ignores window/tab blur.
 	 */
 	const focusOutside = useFocusOutside( ( event ) => {
+		setHasFocus( false );
 		// When another note is clicked, do nothing because the current note is automatically closed.
 		const isNoteFocused = event.relatedTarget?.closest(
 			'.editor-collab-sidebar-panel__thread'
@@ -131,6 +136,7 @@ export function NoteThread( {
 	function onFocus( event ) {
 		// Cancel any pending deselect and highlight the related block.
 		focusOutside.onFocus( event );
+		setHasFocus( true );
 		debouncedToggleBlockHighlight.cancel();
 		toggleBlockHighlight( note.blockClientId, true );
 	}
@@ -155,7 +161,7 @@ export function NoteThread( {
 	}
 
 	function handleResolve() {
-		onEditNote( { id: note.id, status: 'approved' } );
+		onEditNote( note, { status: 'approved' } );
 		onDeselectNote();
 		if ( isFloating ) {
 			relatedBlockElement?.focus();
@@ -211,6 +217,7 @@ export function NoteThread( {
 			}
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
 				'is-selected': isSelected,
+				'has-focus': hasFocus,
 			} ) }
 			id={ `note-thread-${ note.id }` }
 			gap="md"
@@ -321,8 +328,7 @@ export function NoteThread( {
 						onSubmit={ ( inputComment ) => {
 							if ( 'approved' === note.status ) {
 								// For reopening, include the content in the reopen action.
-								return onEditNote( {
-									id: note.id,
+								return onEditNote( note, {
 									status: 'hold',
 									content: inputComment,
 								} );

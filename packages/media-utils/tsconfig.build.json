@@ -6,6 +6,7 @@
 		"checkJs": false
 	},
 	"references": [
+		{ "path": "../a11y/tsconfig.build.json" },
 		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../blob/tsconfig.build.json" },
 		{ "path": "../components/tsconfig.build.json" },
@@ -15,6 +16,7 @@
 		{ "path": "../deprecated/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
+		{ "path": "../html-entities/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
 		{ "path": "../media-fields/tsconfig.build.json" },
 		{ "path": "../notices/tsconfig.build.json" },

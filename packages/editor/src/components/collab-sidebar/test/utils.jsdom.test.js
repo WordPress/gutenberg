@@ -417,6 +417,26 @@ describe( 'calculateNotePositions', () => {
 		expect( positions ).toEqual( {} );
 	} );
 
+	it( 'returns the content height that fits the lowest measured thread', () => {
+		const getContentHeight = ( heights ) =>
+			calculateNotePositions( {
+				threads: [ { id: 1 }, { id: 2 }, { id: 3 } ],
+				selectedNoteId: undefined,
+				blockRects: {
+					1: makeRect( 100 ),
+					2: makeRect( 300 ),
+					3: makeRect( 500 ),
+				},
+				heights,
+				scrollTop: 0,
+			} ).contentHeight;
+
+		// 2: 284, plus its 16px margin, 50px height and a 16px gap. The
+		// unmeasured thread 3 doesn't count until it has a height.
+		expect( getContentHeight( { 1: 50, 2: 50 } ) ).toBe( 366 );
+		expect( getContentHeight( { 1: 50, 2: 50, 3: 50 } ) ).toBe( 566 );
+	} );
+
 	it( 'pushes an overlapping thread above the anchor upward', () => {
 		const threads = [ { id: 1 }, { id: 2 } ];
 		const blockRects = {
