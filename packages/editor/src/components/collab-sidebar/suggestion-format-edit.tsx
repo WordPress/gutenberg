@@ -2,7 +2,7 @@ import { useEffect, useRef } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as editorStore } from '../../store';
-import { SIDEBARS } from './constants';
+import { ALL_NOTES_SIDEBAR } from './constants';
 import { SUGGESTION_ID_ATTRIBUTE } from '../inline-suggestions';
 import { unlock } from '../../lock-unlock';
 
@@ -45,11 +45,7 @@ export default function SuggestionFormatEdit( {
 
 		// Sync an already-open sidebar to the marker under the caret. Read
 		// imperatively so it triggers on caret movement, not sidebar state.
-		if (
-			! SIDEBARS.includes(
-				getActiveComplementaryArea( 'core' ) as string
-			)
-		) {
+		if ( getActiveComplementaryArea( 'core' ) !== ALL_NOTES_SIDEBAR ) {
 			return;
 		}
 
