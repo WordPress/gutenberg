@@ -355,6 +355,69 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that the selectors registered by core blocks scope to their own element.
+	 *
+	 * The cases above pass selectors as literals, so a change to a block's
+	 * `block.json` would not reach them. This one reads what the block actually
+	 * registers, and fails if a selector changes into a shape the scoping does
+	 * not handle.
+	 *
+	 * @covers ::gutenberg_build_state_selector
+	 * @covers ::gutenberg_get_state_selector_ancestor
+	 *
+	 * @dataProvider data_registered_block_selectors_scope_to_their_own_element
+	 *
+	 * @param string $block_name Block name.
+	 * @param string $feature    Key in the block's `selectors` metadata.
+	 */
+	public function test_registered_block_selectors_scope_to_their_own_element( $block_name, $feature ) {
+		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
+
+		if ( ! $block_type || empty( $block_type->selectors[ $feature ] ) ) {
+			$this->markTestSkipped( "$block_name does not register a '$feature' selector." );
+		}
+
+		$scoped = gutenberg_build_state_selector(
+			'.wp-states-test',
+			$block_type->selectors[ $feature ],
+			':hover',
+			$block_name
+		);
+
+		/*
+		 * The instance class sits on the block's own element, so the state
+		 * selector has to end on that class rather than describe a descendant
+		 * of it.
+		 */
+		$this->assertStringEndsWith(
+			'.wp-states-test:hover',
+			$scoped,
+			"The scoped '$feature' selector for $block_name does not land on the block's own element."
+		);
+	}
+
+	/**
+	 * Data provider for test_registered_block_selectors_scope_to_their_own_element().
+	 *
+	 * @return array<string, array<string, string>>
+	 */
+	public function data_registered_block_selectors_scope_to_their_own_element() {
+		// Only selectors that target the block's own element belong here. A
+		// feature selector for a descendant, such as a link inside the block,
+		// ends on that descendant by design.
+		return array(
+			'list item root'   => array(
+				'block_name' => 'core/list-item',
+				'feature'    => 'root',
+			),
+			'list item border' => array(
+				'block_name' => 'core/list-item',
+				'feature'    => 'border',
+			),
+		);
+	}
+
+	/**
 	 * Data provider for test_build_state_selector_with_block_name().
 	 *
 	 * @return array<string, array<string, string>>
