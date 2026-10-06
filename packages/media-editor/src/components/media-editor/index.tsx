@@ -294,7 +294,7 @@ function HistoryActions() {
 	const { isImage, isUndoRedoDisabled, onReset, isWide, activePanel } =
 		useMediaEditorFrameContext();
 	const {
-		reset,
+		cropper: { reset },
 		isDirty,
 		hasUndo,
 		hasRedo,
@@ -435,7 +435,7 @@ function MediaEditorContent( {
 	noticesPortalElement,
 	shouldCloseOnEsc = false,
 }: MediaEditorProps ) {
-	const cropper = useMediaEditor();
+	const session = useMediaEditor();
 	// Width decides whether the settings panel docks beside the canvas or
 	// takes the whole body. It docks from `small` (600px): the modal is the
 	// viewport less a 16px margin either side, so a 320px panel and the
@@ -516,7 +516,7 @@ function MediaEditorContent( {
 		[ id ]
 	);
 
-	const hasChanges = cropper.isCropperDirty || hasEdits;
+	const hasChanges = session.hasOutputEdits || hasEdits;
 
 	const { clearEntityRecordEdits, editEntityRecord, invalidateResolution } =
 		useDispatch( coreStore );
@@ -602,7 +602,7 @@ function MediaEditorContent( {
 		resetCropOptions,
 	} = useCropOptions( { aspectRatioPresets } );
 	const { isSaving, save: saveMediaEditor } = useSaveMediaEditor( {
-		cropper,
+		session,
 		id,
 		isImage,
 		media,
@@ -656,9 +656,9 @@ function MediaEditorContent( {
 					return;
 				}
 				if ( isRedoShortcut ) {
-					cropper.redo();
+					session.redo();
 				} else {
-					cropper.undo();
+					session.undo();
 				}
 			}
 		}
@@ -717,7 +717,7 @@ function MediaEditorContent( {
 							/>
 						),
 					},
-			  ]
+				]
 			: [] ),
 		{
 			id: DETAILS_PANEL,
@@ -746,7 +746,7 @@ function MediaEditorContent( {
 					? fields.map( ( field ) => ( {
 							...field,
 							isDisabled: true,
-					  } ) )
+						} ) )
 					: fields,
 			} }
 		>

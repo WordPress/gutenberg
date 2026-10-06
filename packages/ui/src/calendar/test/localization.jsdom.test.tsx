@@ -1,16 +1,8 @@
-import {
-	afterAll,
-	beforeAll,
-	beforeEach,
-	describe,
-	expect,
-	it,
-	vi,
-} from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { startOfDay } from 'date-fns';
-import { ckb, faIR, ug } from 'date-fns/locale';
+import { faIR } from 'date-fns/locale';
 import { isRTL } from '@wordpress/i18n';
 import { Calendar, RangeCalendar } from '..';
 import * as Tooltip from '../../tooltip';
@@ -245,58 +237,6 @@ describe( 'Calendar locale inputs', () => {
 		);
 	} );
 
-	it( 'derives the week start from legacy browser week information', () => {
-		const IntlLocale = Intl.Locale;
-		const localeSpy = vi
-			.spyOn( Intl, 'Locale' )
-			.mockImplementation( function Locale( locale ) {
-				const intlLocale = new IntlLocale( locale );
-				Object.defineProperties( intlLocale, {
-					getWeekInfo: { value: undefined },
-					weekInfo: { value: { firstDay: 6 } },
-				} );
-				return intlLocale;
-			} );
-
-		try {
-			render( <Calendar defaultMonth={ TEST_DATE } locale="fa-IR" /> );
-
-			expect(
-				screen.getAllByRole( 'columnheader', { hidden: true } )[ 0 ]
-			).toHaveAccessibleName(
-				weekdayFormatter( 'fa-IR' ).format( new Date( 2026, 0, 10 ) )
-			);
-		} finally {
-			localeSpy.mockRestore();
-		}
-	} );
-
-	it( 'uses the existing default when browser week information is unavailable', () => {
-		const IntlLocale = Intl.Locale;
-		const localeSpy = vi
-			.spyOn( Intl, 'Locale' )
-			.mockImplementation( function Locale( locale ) {
-				const intlLocale = new IntlLocale( locale );
-				Object.defineProperties( intlLocale, {
-					getWeekInfo: { value: undefined },
-					weekInfo: { value: undefined },
-				} );
-				return intlLocale;
-			} );
-
-		try {
-			render( <Calendar defaultMonth={ TEST_DATE } locale="fa-IR" /> );
-
-			expect(
-				screen.getAllByRole( 'columnheader', { hidden: true } )[ 0 ]
-			).toHaveAccessibleName(
-				weekdayFormatter( 'fa-IR' ).format( new Date( 2026, 0, 11 ) )
-			);
-		} finally {
-			localeSpy.mockRestore();
-		}
-	} );
-
 	it( 'uses Intl week information for a date-fns locale object with a supported code', () => {
 		const locale = {
 			...faIR,
@@ -361,83 +301,4 @@ describe( 'Calendar day labels', () => {
 			screen.getByRole( 'button', { name: /^Today and selected:/ } )
 		).toBeVisible();
 	} );
-} );
-
-describe( 'Calendar text direction fallback', () => {
-	const original = {
-		getTextInfo: Object.getOwnPropertyDescriptor(
-			Intl.Locale.prototype,
-			'getTextInfo'
-		),
-		textInfo: Object.getOwnPropertyDescriptor(
-			Intl.Locale.prototype,
-			'textInfo'
-		),
-	};
-
-	// Engines that implement `getTextInfo()` have dropped the legacy `textInfo`
-	// getter, so serve its data through `textInfo` to emulate an engine that
-	// only has the legacy property.
-	beforeAll( () => {
-		const getTextInfo = original.getTextInfo!.value;
-
-		Object.defineProperty( Intl.Locale.prototype, 'getTextInfo', {
-			configurable: true,
-			value: undefined,
-		} );
-		Object.defineProperty( Intl.Locale.prototype, 'textInfo', {
-			configurable: true,
-			get() {
-				return getTextInfo.call( this );
-			},
-		} );
-	} );
-
-	afterAll( () => {
-		Object.defineProperty(
-			Intl.Locale.prototype,
-			'getTextInfo',
-			original.getTextInfo!
-		);
-
-		if ( original.textInfo ) {
-			Object.defineProperty(
-				Intl.Locale.prototype,
-				'textInfo',
-				original.textInfo
-			);
-		} else {
-			delete ( Intl.Locale.prototype as { textInfo?: unknown } ).textInfo;
-		}
-	} );
-
-	it.each( [
-		[ 'Sindhi', 'sd', 'rtl' ],
-		[ 'Latin-script Uyghur', 'ug-Latn', 'ltr' ],
-	] as const )(
-		'uses legacy Intl.Locale text information for %s',
-		( _, locale, direction ) => {
-			render( <Calendar locale={ locale } /> );
-
-			expect( screen.getByRole( 'application' ) ).toHaveAttribute(
-				'dir',
-				direction
-			);
-		}
-	);
-
-	it.each( [
-		[ 'Central Kurdish', ckb ],
-		[ 'Uyghur', ug ],
-	] )(
-		'should render %s right-to-left without Intl.Locale.getTextInfo',
-		( _, locale ) => {
-			render( <Calendar locale={ locale } /> );
-
-			expect( screen.getByRole( 'application' ) ).toHaveAttribute(
-				'dir',
-				'rtl'
-			);
-		}
-	);
 } );

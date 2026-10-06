@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Pass `-T` to `docker compose exec` when stdin is not a terminal, so commands run from a Git hook, which has a TTY on stdout but not on stdin, no longer fail with "cannot attach stdin to a TTY-enabled container" ([#78374](https://github.com/WordPress/gutenberg/pull/78374)).
+
+### Internal
+
+-   Update `@wp-playground/cli` to 3.1.56, which replaces the `fs-ext` optional dependency, compiled with `node-gyp` at install time, with `fs-ext-extra-prebuilt`, which ships prebuilt binaries and works without running install scripts ([#84012](https://github.com/WordPress/gutenberg/pull/84012)).
+
+## 11.16.0 (2026-09-23)
+
+### Bug Fixes
+
+-   Wait for lifecycle script output streams to close before reporting command failures, so their error output is not lost ([#82735](https://github.com/WordPress/gutenberg/pull/82735)).
+
 ## 11.15.0 (2026-09-10)
 
 ### Bug Fixes

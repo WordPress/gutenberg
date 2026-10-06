@@ -4,7 +4,6 @@ import {
 	createBlockSaveFilter,
 } from './utils';
 import './compat';
-import './cross-origin-isolation';
 import align from './align';
 import background from './background';
 import './lock';
@@ -92,6 +91,10 @@ createBlockSaveFilter( [
 ] );
 
 export { useCustomSides } from './dimensions';
+export {
+	getBackgroundClassesAndStyles,
+	useBackgroundProps,
+} from './use-background-props';
 export { getDimensionsClassesAndStyles } from './use-dimensions-props';
 export { useLayoutClasses, useLayoutStyles } from './layout';
 export { getBorderClassesAndStyles, useBorderProps } from './use-border-props';

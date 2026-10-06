@@ -255,7 +255,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 								'postType',
 								'wp_template_part',
 								postId
-						  )?.area === 'navigation-overlay'
+							)?.area === 'navigation-overlay'
 						: false,
 				isRevisionsMode: _isRevisionsMode(),
 			};

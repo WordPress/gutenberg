@@ -7,9 +7,11 @@ build-wp
 node_modules
 .wasm-vips-build
 gutenberg.zip
+/vendor/
 .content-entry.js
 coverage
 /.vitest-attachments/
+/test-results/
 **/__screenshots__/*.browser.test.*/
 .phpunit.result.cache
 .reassure

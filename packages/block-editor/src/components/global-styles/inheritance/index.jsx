@@ -8,11 +8,14 @@ import { reset as resetIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
- * Whether the inspector surfaces inherited Global Styles values.
+ * Whether the inspector marks up which controls are showing an inherited
+ * Global Styles value.
  *
- * Behind the `gutenberg-global-styles-inheritance-ui` Gutenberg experiment,
- * so the treatment is off unless someone opts in on the Experiments screen.
- * With it off, the panels show locally-set values alone.
+ * This gates the indicators only: the dotted underline on an inherited label
+ * and the blue dot that resets a local override. The inherited values
+ * themselves reach the controls either way. Behind the
+ * `gutenberg-global-styles-inheritance-ui` Gutenberg experiment, so the
+ * indicators are off unless someone opts in on the Experiments screen.
  *
  * Evaluated per call rather than once at module scope, so tests can toggle
  * the experiment and so a later move to a store-backed setting only has to
@@ -20,9 +23,9 @@ import { __ } from '@wordpress/i18n';
  * down as a prop, and `undefined` would trigger a receiving component's own
  * default parameter.
  *
- * @return {boolean} Whether the inherited-value treatment is enabled.
+ * @return {boolean} Whether the indicator treatment is enabled.
  */
-export const isGlobalStylesInheritanceEnabled = () =>
+export const isGlobalStylesInheritanceIndicatorUIEnabled = () =>
 	!! window.__experimentalGlobalStylesInheritanceUI;
 
 /**

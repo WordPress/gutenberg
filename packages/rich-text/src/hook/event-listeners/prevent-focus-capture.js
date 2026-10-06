@@ -27,15 +27,27 @@ export function preventFocusCapture() {
 			if ( ! event.target.contains( element ) ) {
 				return;
 			}
+			// Only relevant when a parent block is pressed.
+			if ( ! event.target.closest( '[data-block]' ) ) {
+				return;
+			}
 			value = element.getAttribute( 'contenteditable' );
-			element.setAttribute( 'contenteditable', 'false' );
 			defaultView.getSelection().removeAllRanges();
+			element.setAttribute( 'contenteditable', 'false' );
 		}
 
 		function onPointerUp() {
 			if ( value !== null ) {
 				element.setAttribute( 'contenteditable', value );
 				value = null;
+				// Safari may still have placed a caret in the element.
+				const selection = defaultView.getSelection();
+				if (
+					selection.isCollapsed &&
+					element.contains( selection.anchorNode )
+				) {
+					selection.removeAllRanges();
+				}
 			}
 		}
 

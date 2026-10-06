@@ -1,0 +1,44 @@
+{
+	"name": "@wordpress/monorepo-tools",
+	"version": "0.0.0",
+	"description": "Tools for maintaining the Gutenberg monorepo.",
+	"private": true,
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"monorepo",
+		"config",
+		"typescript"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/tools/monorepo",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "tools/monorepo"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"type": "module",
+	"exports": {
+		"./tsconfig/*": "./tsconfig/tsconfig.*"
+	},
+	"devDependencies": {
+		"@testing-library/jest-dom": "^7.0.1",
+		"@types/node": "^24.13.3",
+		"@types/react": "^18.3.27",
+		"@wordpress/admin-ui": "file:../../packages/admin-ui",
+		"@wordpress/data": "file:../../packages/data",
+		"@wordpress/theme": "file:../../packages/theme",
+		"vitest": "^5.0.3"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"list-experimental-apis": "node scripts/list-experimental-apis.mts",
+		"wpds:admin-scheme-tokens": "node wpds/generate-admin-scheme-tokens.mjs"
+	}
+}

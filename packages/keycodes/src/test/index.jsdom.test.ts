@@ -4,6 +4,7 @@ import {
 	displayShortcut,
 	rawShortcut,
 	ariaKeyShortcut,
+	keyboardShortcut,
 	shortcutAriaLabel,
 	isKeyboardEvent,
 } from '..';
@@ -851,6 +852,34 @@ describe( 'isKeyboardEvent', () => {
 				altKey: true,
 				key: 'm',
 			} );
+		} );
+	} );
+} );
+
+describe( 'keyboardShortcut', () => {
+	it( 'should output every representation on Windows', () => {
+		expect( keyboardShortcut.primaryShift( 'm', isAppleOSFalse ) ).toEqual(
+			{
+				displayShortcut: 'Ctrl+Shift+M',
+				ariaKeyShortcut: 'Control+Shift+M',
+				label: 'Control + Shift + M',
+			}
+		);
+	} );
+
+	it( 'should output every representation on MacOS', () => {
+		expect( keyboardShortcut.primaryShift( 'm', isAppleOSTrue ) ).toEqual( {
+			displayShortcut: '⇧⌘M',
+			ariaKeyShortcut: 'Shift+Meta+M',
+			label: 'Shift Command M',
+		} );
+	} );
+
+	it( 'should output every representation without a modifier', () => {
+		expect( keyboardShortcut.undefined( 'm', isAppleOSFalse ) ).toEqual( {
+			displayShortcut: 'M',
+			ariaKeyShortcut: 'M',
+			label: 'M',
 		} );
 	} );
 } );

@@ -265,6 +265,7 @@ class WP_Theme_JSON_Gutenberg {
 		'background-repeat'                 => array( 'background', 'backgroundRepeat' ),
 		'background-size'                   => array( 'background', 'backgroundSize' ),
 		'background-attachment'             => array( 'background', 'backgroundAttachment' ),
+		'background-clip'                   => array( 'background', 'backgroundClip' ),
 		'border-radius'                     => array( 'border', 'radius' ),
 		'border-top-left-radius'            => array( 'border', 'radius', 'topLeft' ),
 		'border-top-right-radius'           => array( 'border', 'radius', 'topRight' ),
@@ -411,6 +412,7 @@ class WP_Theme_JSON_Gutenberg {
 		'appearanceTools'               => null,
 		'useRootPaddingAwareAlignments' => null,
 		'background'                    => array(
+			'backgroundClip'  => null,
 			'backgroundImage' => null,
 			'backgroundSize'  => null,
 			'gradient'        => null,
@@ -552,6 +554,7 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	const VALID_STYLES = array(
 		'background' => array(
+			'backgroundClip'       => null,
 			'backgroundImage'      => null,
 			'backgroundAttachment' => null,
 			'backgroundPosition'   => null,
@@ -932,6 +935,8 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Processes pseudo-selectors for any node (block or variation).
 	 *
+	 * @since 7.0.0
+	 *
 	 * @param array      $node            The node data (block or variation).
 	 * @param string     $base_selector   The base selector.
 	 * @param array      $settings        The theme settings.
@@ -1246,6 +1251,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 5.8.0
 	 * @since 5.9.0 Added the `$valid_block_names` and `$valid_element_name` parameters.
 	 * @since 6.6.0 Extended schema definition to allow enhanced block style variations.
+	 * @since 7.1.1 Updated schema to allow responsive breakpoint states and pseudo-selectors
+	 *              at the top level of `styles` for block style variation partials.
 	 *
 	 * @param array $input               Structure to sanitize.
 	 * @param array $valid_block_names   List of valid block names.
@@ -1406,7 +1413,6 @@ class WP_Theme_JSON_Gutenberg {
 					foreach ( array_keys( $responsive_media_queries ) as $breakpoint_state ) {
 						$variation_schema[ $breakpoint_state ]             = $styles_non_top_level;
 						$variation_schema[ $breakpoint_state ]['elements'] = $schema_styles_elements;
-						$variation_schema[ $breakpoint_state ]['blocks']   = $schema_styles_blocks;
 
 						if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] ) ) {
 							foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] as $pseudo_selector ) {
@@ -1435,6 +1441,47 @@ class WP_Theme_JSON_Gutenberg {
 		$schema['settings']                               = static::VALID_SETTINGS;
 		$schema['settings']['blocks']                     = $schema_settings_blocks;
 		$schema['settings']['typography']['fontFamilies'] = static::schema_in_root_and_per_origin( static::FONT_FAMILY_SCHEMA );
+
+		/*
+		 * Add block style variation states to the top-level styles schema.
+		 *
+		 * Block style variations defined in a standalone JSON partial within a
+		 * theme's `styles` directory declare their styles at the root of the
+		 * `styles` object, so they are sanitized against the top-level schema.
+		 * It needs to allow the same states that are allowed for variations
+		 * declared inline in theme.json, otherwise those states are silently
+		 * removed as unknown keys.
+		 *
+		 * The `blockTypes` property is only present on block style variation
+		 * partials, so it both identifies the config as a variation and
+		 * determines which pseudo-selectors are valid for it. Regular
+		 * theme.json files are unaffected.
+		 */
+		if ( ! empty( $input['blockTypes'] ) && is_array( $input['blockTypes'] ) ) {
+			$variation_pseudo_selectors = array();
+			foreach ( $input['blockTypes'] as $variation_block_type ) {
+				if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $variation_block_type ] ) ) {
+					$variation_pseudo_selectors = array_merge(
+						$variation_pseudo_selectors,
+						static::VALID_BLOCK_PSEUDO_SELECTORS[ $variation_block_type ]
+					);
+				}
+			}
+			$variation_pseudo_selectors = array_unique( $variation_pseudo_selectors );
+
+			foreach ( $breakpoint_states as $breakpoint_state ) {
+				$schema['styles'][ $breakpoint_state ]             = $styles_non_top_level;
+				$schema['styles'][ $breakpoint_state ]['elements'] = $schema_styles_elements;
+
+				foreach ( $variation_pseudo_selectors as $pseudo_selector ) {
+					$schema['styles'][ $breakpoint_state ][ $pseudo_selector ] = $styles_non_top_level;
+				}
+			}
+
+			foreach ( $variation_pseudo_selectors as $pseudo_selector ) {
+				$schema['styles'][ $pseudo_selector ] = $styles_non_top_level;
+			}
+		}
 
 		// Remove anything that's not present in the schema.
 		foreach ( array( 'styles', 'settings' ) as $subtree ) {
@@ -3141,6 +3188,34 @@ class WP_Theme_JSON_Gutenberg {
 				'name'  => $css_property,
 				'value' => $value,
 			);
+
+			/*
+			 * When background-clip is set, add vendor-prefixed properties for
+			 * cross-browser support. For 'text', this clips the background to
+			 * the text and makes it visible via transparent fill. For box-model
+			 * values, only the fill color is reset, to cancel any inherited
+			 * text gradient. `-webkit-background-clip` is an alias of
+			 * `background-clip` in Chromium, so resetting it there would
+			 * discard the value set above. Values outside the set the style
+			 * engine accepts get neither, so a typo cannot reset the fill color.
+			 */
+			if ( 'background-clip' === $css_property ) {
+				if ( 'text' === $value ) {
+					$declarations[] = array(
+						'name'  => '-webkit-background-clip',
+						'value' => 'text',
+					);
+					$declarations[] = array(
+						'name'  => '-webkit-text-fill-color',
+						'value' => 'transparent',
+					);
+				} elseif ( in_array( $value, array( 'border-box', 'padding-box', 'content-box' ), true ) ) {
+					$declarations[] = array(
+						'name'  => '-webkit-text-fill-color',
+						'value' => 'currentColor',
+					);
+				}
+			}
 		}
 
 		// If a variable value is added to the root, the corresponding property should be removed.

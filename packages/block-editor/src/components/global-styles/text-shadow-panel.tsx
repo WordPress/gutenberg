@@ -3,7 +3,7 @@ import {
 	Button,
 	Composite,
 	Dropdown,
-	SelectControl,
+	SelectControl as WCSelectControl,
 } from '@wordpress/components';
 import { Stack, Text } from '@wordpress/ui';
 import { useRef, useMemo } from '@wordpress/element';
@@ -129,7 +129,7 @@ function TextShadowControl( { textShadow, onChange }: TextShadowProps ) {
 	const activeSlug = getTextShadowPresetSlug( textShadow );
 	const activeValue = activeSlug
 		? `var:preset|text-shadow|${ activeSlug }`
-		: textShadow ?? '';
+		: ( textShadow ?? '' );
 	const previewValue = activeSlug
 		? presets.find( ( preset ) => preset.slug === activeSlug )?.textShadow
 		: textShadow;
@@ -150,7 +150,7 @@ function TextShadowControl( { textShadow, onChange }: TextShadowProps ) {
 				{ __( 'Code is poetry' ) }
 			</div>
 			{ presets.length >= PRESETS_SELECT_THRESHOLD ? (
-				<SelectControl
+				<WCSelectControl
 					hideLabelFromVision
 					label={ __( 'Text shadow preset' ) }
 					value={ activeValue }

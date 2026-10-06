@@ -1,21 +1,19 @@
-import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { playwright } from '@vitest/browser-playwright';
-import react from '@vitejs/plugin-react-swc';
 import { globSync } from 'glob';
 import { defineConfig } from 'vitest/config';
+import { createVitePlugins } from './config/vite-plugins.mjs';
+import { createPlaywrightProvider } from './config/playwright-provider.mjs';
+import { createBrowserTraceArtifacts } from './config/browser-traces.mjs';
 import {
 	discoverTestFiles,
 	getVitestTestsByProject,
 } from './scripts/discover-test-files.mjs';
-import { compileInlineStyle } from '../../packages/wp-build/lib/compile-inline-style.mjs';
 
 const CONFIG_DIR = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT_DIR = path.resolve( CONFIG_DIR, '../..' );
 const nodeRequire = createRequire( import.meta.url );
-const emotionPlugin = nodeRequire.resolve( '@swc/plugin-emotion' );
 const gutenbergEnvSetupFile = path.join(
 	ROOT_DIR,
 	'test/unit/config/gutenberg-env.js'
@@ -24,69 +22,20 @@ const isolationSetupFile = path.join(
 	ROOT_DIR,
 	'test/unit/config/isolation.vitest.js'
 );
-const testMigration = JSON.parse(
-	readFileSync(
-		path.join( ROOT_DIR, 'test/unit/test-migration.json' ),
-		'utf8'
-	)
-);
-const vitestTests = getVitestTestsByProject(
-	discoverTestFiles( ROOT_DIR ),
-	testMigration
-);
+const vitestTests = getVitestTestsByProject( discoverTestFiles( ROOT_DIR ) );
 const styleMockAlias = {
 	find: /^.*\.(?:css|scss)$/,
 	replacement: path.join( ROOT_DIR, 'test/unit/config/style-mock.vitest.js' ),
 };
-const WP_BUILD_CSS_MODULE_STYLE_FIXTURE_ID = 'virtual:wp-build-style-injection';
-const WP_BUILD_ORDINARY_STYLE_FIXTURE_ID =
-	'virtual:wp-build-ordinary-style-injection';
-const wpBuildStyleFixtureSources = new Map( [
-	[
-		WP_BUILD_CSS_MODULE_STYLE_FIXTURE_ID,
-		await compileInlineStyle( {
-			cssModules: true,
-			minify: false,
-		} )(
-			`@layer wp-build-test {
-				.fixture {
-					--wp-build-style-injection-test: true;
-					color: rgb(1, 2, 3);
-				}
-			}`,
-			ROOT_DIR,
-			path.join(
-				ROOT_DIR,
-				'test/unit/config/wp-build-style-fixture.module.css'
-			)
-		),
-	],
-	[
-		WP_BUILD_ORDINARY_STYLE_FIXTURE_ID,
-		await compileInlineStyle( { minify: false } )(
-			`.ordinary-fixture {
-				background-color: rgb(4, 5, 6);
-			}`,
-			ROOT_DIR,
-			path.join(
-				ROOT_DIR,
-				'test/unit/config/wp-build-ordinary-style-fixture.css'
-			)
-		),
-	],
-] );
-const wpBuildStyleFixturePlugin = {
-	name: 'wp-build-style-injection-fixture',
-	resolveId( id ) {
-		return wpBuildStyleFixtureSources.has( id ) ? `\0${ id }` : null;
-	},
-	load( id ) {
-		return id.startsWith( '\0' )
-			? wpBuildStyleFixtureSources.get( id.slice( 1 ) ) ?? null
-			: null;
-	},
-};
 const reporters = [ 'default' ];
+const browserTraces =
+	process.env.WP_VITEST_BROWSER_TRACE === '1'
+		? createBrowserTraceArtifacts( ROOT_DIR )
+		: undefined;
+
+if ( browserTraces ) {
+	reporters.push( browserTraces.reporter );
+}
 
 if ( process.env.GITHUB_ACTIONS === 'true' ) {
 	reporters.push( 'github-actions' );
@@ -114,7 +63,7 @@ process.chdir( ROOT_DIR );
 process.env.TZ ||= 'UTC';
 
 const transpiledPackageNames = globSync(
-	'packages/*/src/index.{js,jsx,ts,tsx}',
+	'packages/*/src/index.{js,jsx,mjs,cjs,ts,tsx,mts,cts}',
 	{ cwd: ROOT_DIR, absolute: true }
 )
 	.sort()
@@ -130,20 +79,7 @@ export default defineConfig( {
 			runtime: 'automatic',
 		},
 	},
-	plugins: [
-		wpBuildStyleFixturePlugin,
-		react( {
-			plugins: [
-				[
-					emotionPlugin,
-					{
-						autoLabel: 'always',
-						labelFormat: '[local]',
-					},
-				],
-			],
-		} ),
-	],
+	plugins: await createVitePlugins( ROOT_DIR ),
 	resolve: {
 		alias: [
 			{
@@ -201,6 +137,11 @@ export default defineConfig( {
 		],
 	},
 	test: {
+		// Vitest only reads attachmentsDir from the root configuration.
+		attachmentsDir: path.join(
+			ROOT_DIR,
+			'test-results/vitest-attachments'
+		),
 		projects: [
 			{
 				extends: true,
@@ -267,11 +208,32 @@ export default defineConfig( {
 				 * dependencies are declared so resolution stays layout agnostic.
 				 */
 				root: CONFIG_DIR,
+				optimizeDeps: {
+					entries: vitestTests.browser.map( ( testPath ) =>
+						path.join( ROOT_DIR, testPath )
+					),
+				},
 				test: {
 					name: 'browser',
 					dir: ROOT_DIR,
 					include: vitestTests.browser,
 					setupFiles: [
+						...( browserTraces
+							? [
+									path.join(
+										CONFIG_DIR,
+										'config/browser-traces.vitest.js'
+									),
+								]
+							: [] ),
+						path.join(
+							ROOT_DIR,
+							'test/unit/config/browser.vitest.js'
+						),
+						path.join(
+							ROOT_DIR,
+							'test/unit/config/gutenberg-env.js'
+						),
 						path.join(
 							ROOT_DIR,
 							'test/unit/config/console.vitest.js'
@@ -282,7 +244,13 @@ export default defineConfig( {
 						enabled: true,
 						headless: true,
 						instances: [ { browser: 'chromium' } ],
-						provider: playwright(),
+						provider: createPlaywrightProvider(),
+						commands: browserTraces?.commands,
+						screenshotDirectory: path.join(
+							ROOT_DIR,
+							'test-results/vitest-browser-screenshots'
+						),
+						screenshotFailures: true,
 					},
 				},
 			},

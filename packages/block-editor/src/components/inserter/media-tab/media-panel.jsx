@@ -187,7 +187,7 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 								),
 								attachedCount,
 								category.postTypeLabel
-						  )
+							)
 						: sprintf(
 								/* translators: %d: Number of images attached to the post. */
 								_n(
@@ -196,7 +196,7 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 									attachedCount
 								),
 								attachedCount
-						  ),
+							),
 					{ type: 'snackbar', id: 'inserter-notice' }
 				);
 			} catch {
@@ -227,7 +227,7 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 								/* translators: %s: Name of the post type e.g: "Page". */
 								__( 'Image detached from %s.' ),
 								category.postTypeLabel
-						  )
+							)
 						: __( 'Image detached from post.' ),
 					{ type: 'snackbar', id: 'inserter-notice' }
 				);
@@ -277,10 +277,10 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 				<InserterNoResults>
 					{ category.emptyMessage && ! debouncedSearch
 						? // For a source with a custom empty message (e.g.
-						  // Attachments) and no active search, an empty result
-						  // means nothing is attached yet — clearer than the
-						  // generic "no results found".
-						  category.emptyMessage
+							// Attachments) and no active search, an empty result
+							// means nothing is attached yet — clearer than the
+							// generic "no results found".
+							category.emptyMessage
 						: __( 'No results found.' ) }
 				</InserterNoResults>
 			) }
@@ -346,10 +346,10 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 										'Detach this image from the current %s? The image will remain in the Media Library.'
 									),
 									category.postTypeLabel
-							  )
+								)
 							: __(
 									'Detach this image from the current post? The image will remain in the Media Library.'
-							  ) }
+								) }
 					</p>
 					<div className={ `${ baseCssClass }-detach-actions` }>
 						<Button

@@ -14,7 +14,7 @@
 
 /* eslint-disable no-unused-expressions -- the assertions below are expression statements. */
 /* eslint-disable @typescript-eslint/no-unused-vars -- the values exist only so their inferred types can be asserted. */
-/* eslint-disable jest/expect-expect -- these tests contain compile-time assertions only. */
+/* eslint-disable vitest/expect-expect -- these tests contain compile-time assertions only. */
 import { dispatch, select, resolveSelect } from '@wordpress/data';
 import { describe, it } from 'vitest';
 import { store as coreStore } from '../../index';
@@ -35,6 +35,7 @@ import type { Navigation } from '../navigation';
 import type { Page } from '../page';
 import type { Post } from '../post';
 import type { Term } from '../term';
+import type { User } from '../user';
 
 /**
  * Resolves to `true` only when `A` and `B` are mutually assignable, so a
@@ -402,6 +403,24 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
+	it( 'the save and delete shortcuts resolve with the REST response', () => {
+		async () => {
+			const actions = dispatch( coreStore );
+
+			const saved = await actions.saveUser( { id: 1, name: 'Name' } );
+			true satisfies Expect< typeof saved, User< 'edit' > | undefined >;
+
+			const deleted = await actions.deleteUser( 1, { force: true } );
+			true satisfies Expect<
+				typeof deleted,
+				| User< 'edit' >
+				| { deleted: true; previous: User< 'edit' > }
+				| false
+				| undefined
+			>;
+		};
+	} );
+
 	it( 'navigation embed fields follow the REST schema', () => {
 		() => {
 			const navigation = select( coreStore ).getEntityRecord(
@@ -430,8 +449,7 @@ describe( 'Entity record types', () => {
 			attachment?.filesize satisfies number | null | undefined;
 			attachment?.class_list satisfies string[] | undefined;
 			attachment?.media_details.sizes?.full?.source_url satisfies
-				| string
-				| undefined;
+				string | undefined;
 			// @ts-expect-error -- only edit responses contain the raw caption.
 			attachment?.caption.raw;
 			// @ts-expect-error -- Gutenberg's image-processing fields are edit-only.
@@ -447,8 +465,7 @@ describe( 'Entity record types', () => {
 			editable?.image_save_progressive satisfies boolean | undefined;
 			editable?.image_quality?.default satisfies number | undefined;
 			editable?.image_quality?.sizes.thumbnail satisfies
-				| number
-				| undefined;
+				number | undefined;
 
 			const embedded = select( coreStore ).getEntityRecord(
 				'postType',
@@ -878,6 +895,6 @@ describe( 'Entity record types', () => {
 	} );
 } );
 
-/* eslint-enable jest/expect-expect */
+/* eslint-enable vitest/expect-expect */
 /* eslint-enable no-unused-expressions */
 /* eslint-enable @typescript-eslint/no-unused-vars */

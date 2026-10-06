@@ -59,6 +59,7 @@ interface DirectiveArgs {
 		class?: string;
 		style?: string | Record< string, string | number >;
 		content?: ComponentChildren;
+		dangerouslySetInnerHTML?: { __html: string };
 	} >;
 	/**
 	 * The inherited context.
@@ -329,7 +330,7 @@ const Directives = ( {
 					element,
 					originalProps,
 					previousScope: scope,
-			  } )
+				} )
 			: element;
 
 	const props = { ...originalProps, children };

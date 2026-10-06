@@ -32,9 +32,8 @@ store( 'my-namespace/myblock', {
 
 			// We import the package dynamically to reduce the initial JS bundle size.
 			// Async actions are defined as generators so the import() must be called with `yield`.
-			const { actions } = yield import(
-				'@wordpress/interactivity-router'
-			);
+			const { actions } =
+				yield import( '@wordpress/interactivity-router' );
 			yield actions.navigate( e.target.href );
 		} ),
 	},
@@ -49,6 +48,9 @@ When loaded, this package [adds the following state and actions](https://github.
 const { state, actions } = store( 'core/router', {
 	state: {
 		url: window.location.href,
+		// `navigating` and `initiator` are also part of the store's state,
+		// but they are written by `navigate()` instead of being declared
+		// here, so both read `undefined` until the first navigation.
 	},
 	actions: {
 		*navigate(href, options) {...},
@@ -56,6 +58,8 @@ const { state, actions } = store( 'core/router', {
 	}
 })
 ```
+
+Beyond the current URL, the store's state describes the navigation itself: whether one is in flight (`state.navigating`) and who started it (`state.initiator`). See [State](#state) below.
 
 <div class="callout callout-tip">
     The core "Query Loop" block is <a href="https://github.com/WordPress/gutenberg/blob/cd701e94ceffea7ef2f423274a2f77025bcfa1a6/packages/block-library/src/query/view.js#L35">using this package</a> to provide the <a href="https://github.com/WordPress/gutenberg/blob/cd701e94ceffea7ef2f423274a2f77025bcfa1a6/packages/block-library/src/query/index.php#L33">region-based navigation</a>.
@@ -90,10 +94,10 @@ The `attachTo` property is a CSS selector that points to the parent element wher
 
 When navigating between pages:
 
--   If a region exists on both the current and the new page, its content is updated. `attachTo` is ignored in this case.
--   If a region without `attachTo` exists on the new page but not on the current one, it is not added to the DOM.
--   If a region with `attachTo` exists on the new page but not on the current one, it is created and appended to the parent element specified in `attachTo`.
--   If a region exists on the current page but not on the new one, it is removed from the DOM. `attachTo` is ignored in this case.
+- If a region exists on both the current and the new page, its content is updated. `attachTo` is ignored in this case.
+- If a region without `attachTo` exists on the new page but not on the current one, it is not added to the DOM.
+- If a region with `attachTo` exists on the new page but not on the current one, it is created and appended to the parent element specified in `attachTo`.
+- If a region exists on the current page but not on the new one, it is removed from the DOM. `attachTo` is ignored in this case.
 
 Example with `attachTo`:
 
@@ -120,14 +124,15 @@ This function normalizes the passed `href`, fetches the page HTML if needed, and
 navigate( href: string, options: NavigateOptions = {} )
 ```
 
--   `href`: The page `href`.
--   `options`: Options object.
-    -   `force`: If `true`, it forces re-fetching the URL. `navigate()` always caches the page, so if the page has been navigated to before, it will be used. Default is `false`.
-    -   `html`: HTML string to be used instead of fetching the requested URL.
-    -   `replace`: If `true`, it replaces the current entry in the browser session history. Default is `false`.
-    -   `timeout`: Time until the navigation is aborted, in milliseconds. Default is `10000`.
-    -   `loadingAnimation`: Whether an animation should be shown while navigating. Default to `true`.
-    -   `screenReaderAnnouncement`: Whether a message for screen readers should be announced while navigating. Default to `true`.
+- `href`: The page `href`.
+- `options`: Options object.
+    - `force`: If `true`, it forces re-fetching the URL. `navigate()` always caches the page, so if the page has been navigated to before, it will be used. Default is `false`.
+    - `html`: HTML string to be used instead of fetching the requested URL.
+    - `replace`: If `true`, it replaces the current entry in the browser session history. Default is `false`.
+    - `timeout`: Time until the navigation is aborted, in milliseconds. Default is `10000`.
+    - `loadingAnimation`: Whether an animation should be shown while navigating. Default to `true`.
+    - `screenReaderAnnouncement`: Whether a message for screen readers should be announced while navigating. Default to `true`.
+    - `initiator`: Identifies who initiated this navigation, published on `state.initiator` for as long as it is in flight. A nonempty string is used verbatim and always wins. `null` suppresses attribution, so `state.initiator` reads `null` throughout. If omitted (the default), the initiator is derived from the ambient directive scope: the id of the nearest `data-wp-router-region` enclosing the element whose directive called the action, including that element itself, or `null` when there is none. Any other value (an empty string, a number, an object, `false`) is treated as `null` and, with `SCRIPT_DEBUG` enabled, logs a warning; it never falls back to deriving the initiator.
 
 #### `prefetch`
 
@@ -141,15 +146,25 @@ The function normalizes the URL and stores internally the fetch promise, to avoi
 prefetch( url: string, options: PrefetchOptions = {} )
 ```
 
--   `url`: The page `url`.
--   `options`: Options object.
+- `url`: The page `url`.
+- `options`: Options object.
 
-    -   `force`: If `true`, forces fetching the URL again.
-    -   `html`: HTML string to be used instead of fetching the requested URL.
+    - `force`: If `true`, forces fetching the URL again.
+    - `html`: HTML string to be used instead of fetching the requested URL.
 
 ### State
 
-`state.url` is a reactive property synchronized with the current URL.
+All three properties are reactive, so reading them inside a directive or a `watch()` callback subscribes to their changes.
+
+-   `state.url` (`string`): Synchronized with the current URL.
+-   `state.navigating` (`boolean | undefined`): Truthy while a client-side navigation is in flight. The start is published as soon as the navigation enters the client-side pipeline, without waiting for the destination page; the end is published after the new content has been committed to the DOM, on a later frame, and the delay between the commit and the end is unbounded. A navigation that falls back to a full page load mid-flight keeps it truthy while the browser replaces the document, and resets it to `false` if the document is still there 10 seconds later; a navigation that throws while rendering ends normally, with the page possibly only partially updated. In both cases the end promises no new content. Neither the `loadingAnimation` nor the `screenReaderAnnouncement` option affects it: they change the built-in feedback, not this key.
+-   `state.initiator` (`string | null | undefined`): Identifies who started the navigation that is in flight — the value resolved from `navigate()`'s [`initiator` option](#navigate), or `null` when the navigation has no identifiable initiator, as is the case for back/forward traversals, for calls made with no directive scope, and for calls made from inside a `watch()` that reacts to `state.navigating`, `state.initiator` or `state.url` (such a call does not inherit the initiator of the navigation it reacts to). The end of a navigation does not clear it: it keeps that navigation's value until the next navigation starts, or until a back/forward traversal that reloads the document clears it to `null`.
+
+Neither `navigating` nor `initiator` is declared when the store is registered, so both read `undefined` until the first client-side navigation writes them, and on pages where the router module never loads. Consume them by truthiness — `if ( state.navigating )` and `state.initiator === myRegionId` — rather than comparing against `false` or `null`. Note that a binding such as `data-wp-bind--aria-busy="state.navigating"` renders no attribute at all while the value is `undefined`, rather than `aria-busy="false"`.
+
+A derived `state.initiator` carries the region's id, not the raw `data-wp-router-region` attribute text. For [the JSON object form](#data-wp-router-region) it is the value of the `id` property, a `namespace::` prefix is stripped, and an empty or non-string id reads `null` rather than an empty string. Compare against the id you gave the region, spelled exactly as you gave it.
+
+For the full semantics — which navigations are covered and which produce no transition at all, what overlapping navigations do to both readings, and which directive to read them from — see [Reacting to the navigation lifecycle](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/core-concepts/client-side-navigation/#reacting-to-the-navigation-lifecycle) in the Client-Side Navigation guide.
 
 ## Installation
 
