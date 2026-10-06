@@ -1062,10 +1062,44 @@
             - key
             - name
             - ref
-- name: ProgressBar
+- name: Progress.Root
   props:
+      - aria-valuetext
+      - children
       - className
+      - format
+      - getAriaValueText
+      - locale
+      - max
+      - min
+      - render
+      - style
       - value
+  subcomponents:
+      - name: Progress.Indicator
+        props:
+            - className
+            - color
+            - render
+            - style
+      - name: Progress.Label
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Progress.Track
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Progress.Value
+        props:
+            - children
+            - className
+            - render
+            - style
 - name: Radio
   props:
       - className
