@@ -535,7 +535,7 @@ test.describe( 'Query block', () => {
 			] );
 		} );
 
-		test( "should hide the other control's terms without refetching the list", async ( {
+		test( "should leave the other control's terms out of the list on the server", async ( {
 			page,
 			editor,
 		} ) => {
@@ -546,27 +546,31 @@ test.describe( 'Query block', () => {
 			await page.getByRole( 'option', { name: 'Alpaca' } ).click();
 			await page.keyboard.press( 'Escape' );
 
-			const listRequests = [];
-			page.on( 'request', ( request ) => {
-				const url = decodeURIComponent( request.url() );
-				if (
-					url.includes( '/wp/v2/tags' ) &&
-					! url.includes( 'include' )
-				) {
-					listRequests.push( url );
-				}
+			const listRequest = page.waitForRequest( ( request ) => {
+				const url = new URL( request.url() );
+				return (
+					(
+						url.searchParams.get( 'rest_route' ) ?? url.pathname
+					).includes( '/wp/v2/tags' ) &&
+					! url.search.includes( 'include' )
+				);
 			} );
-
 			await page
 				.getByRole( 'combobox', { name: 'Exclude: Tags', exact: true } )
 				.click();
+
+			const excluded = [
+				...new URL( ( await listRequest ).url() ).searchParams,
+			]
+				.filter( ( [ key ] ) => key.startsWith( 'exclude' ) )
+				.map( ( [ , id ] ) => Number( id ) );
+			expect( excluded ).toEqual( [ tagIds[ 0 ] ] );
 			await expect(
 				page.getByRole( 'option', { name: 'Capybara' } )
 			).toBeVisible();
 			await expect(
 				page.getByRole( 'option', { name: 'Alpaca' } )
 			).toBeHidden();
-			expect( listRequests ).toEqual( [] );
 		} );
 
 		test( 'should keep the matching tags listed while a search loads', async ( {

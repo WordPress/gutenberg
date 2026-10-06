@@ -26,8 +26,6 @@ const TREE_QUERY = { ...BASE_QUERY, _fields: 'id,name,parent', per_page: -1 };
 
 const MAX_TERMS_TO_LIST = 100;
 const MAX_SEARCH_RESULTS = 20;
-// The largest `per_page` the REST API accepts.
-const MAX_PER_PAGE = 100;
 
 /**
  * Matches items by term id.
@@ -289,7 +287,6 @@ function TaxonomyItem( {
 		() => ( tree ? getTreeItems( tree ) : EMPTY_MAP ),
 		[ tree ]
 	);
-	const oppositeTermsCount = oppositeTermIds.length;
 	const { listedTerms, listTotal, listHasResolved } = useSelect(
 		( select ) => {
 			if ( isHierarchical || ! hasOpened ) {
@@ -305,20 +302,18 @@ function TaxonomyItem( {
 				hasFinishedResolution,
 			} = select( coreStore );
 
-			// The opposite control's terms are filtered out of the list
-			// below, so fetch as many more terms to make up for them.
-			const perPage = Math.min(
-				( search ? MAX_SEARCH_RESULTS : MAX_TERMS_TO_LIST ) +
-					oppositeTermsCount,
-				MAX_PER_PAGE
-			);
 			const selectorArgs = [
 				'taxonomy',
 				taxonomy.slug,
 				{
 					...FLAT_QUERY,
 					...( search && { search } ),
-					per_page: perPage,
+					// Leave out the opposite control's terms on the server, so
+					// they don't use up places in the page.
+					...( oppositeTermIds.length && {
+						exclude: oppositeTermIds,
+					} ),
+					per_page: search ? MAX_SEARCH_RESULTS : MAX_TERMS_TO_LIST,
 				},
 			];
 			return {
@@ -330,7 +325,7 @@ function TaxonomyItem( {
 				),
 			};
 		},
-		[ isHierarchical, hasOpened, search, taxonomy.slug, oppositeTermsCount ]
+		[ isHierarchical, hasOpened, search, taxonomy.slug, oppositeTermIds ]
 	);
 	const [ lastListedTerms, setLastListedTerms ] = useState( EMPTY_ARRAY );
 	useEffect( () => {
@@ -385,6 +380,8 @@ function TaxonomyItem( {
 		);
 	}, [ termIds, selectedItemById ] );
 	const items = useMemo( () => {
+		// A flat taxonomy's list leaves out the opposite control's terms on the
+		// server, but the previous list stays on screen while the next loads.
 		const excludedIds = new Set( oppositeTermIds.map( String ) );
 		const listed = isHierarchical
 			? Array.from( treeItemById.values() )
@@ -427,10 +424,8 @@ function TaxonomyItem( {
 		? ! treeHasResolved
 		: isDebouncing || ! listHasResolved;
 	// The server limits how many terms of a flat taxonomy are listed. When
-	// there are more, say so. The total includes the opposite control's terms,
-	// which are filtered out of the list, so leave those out of it too.
+	// there are more, say so.
 	const isLimited = ! isHierarchical && listTotal > shownTerms.length;
-	const matchingTotal = listTotal - ( shownTerms.length - items.length );
 	let statusContent = <ListedTermCount />;
 	if ( isPending ) {
 		statusContent = (
@@ -444,7 +439,7 @@ function TaxonomyItem( {
 			<LimitedTermCount
 				isSearch={ !! search }
 				shown={ items.length }
-				total={ matchingTotal }
+				total={ listTotal }
 			/>
 		);
 	}
