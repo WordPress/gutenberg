@@ -21,6 +21,11 @@
 -   `Switch`, `SwitchControl`: Mark as recommended for use in a WordPress environment ([#84097](https://github.com/WordPress/gutenberg/pull/84097)).
 -   `Menu`: Keep parent items highlighted with a neutral background while their submenus are open ([#84031](https://github.com/WordPress/gutenberg/pull/84031)).
 -   `Menu`: Align group labels and separators with item labels when a radio or checkbox column indents those labels ([#83993](https://github.com/WordPress/gutenberg/pull/83993)).
+-   `Menu`: Tighten item spacing and cap menus at 320px wide ([#84028](https://github.com/WordPress/gutenberg/pull/84028)).
+-   `Menu`: Align items without a prefix, and descriptions, with the prefix column ([#84028](https://github.com/WordPress/gutenberg/pull/84028)).
+-   `Menu`: Size checkbox and radio indicators at 16px and show suffixes and shortcuts at the description text size ([#84028](https://github.com/WordPress/gutenberg/pull/84028)).
+-   `Menu`: Use the label color for prefixes ([#84028](https://github.com/WordPress/gutenberg/pull/84028)).
+-   `Menu.PrefixIcon`: Render at 16px by default instead of 24px ([#84028](https://github.com/WordPress/gutenberg/pull/84028)).
 -   `Checkbox`, `CheckboxControl`, `CheckboxGroup`: Mark as recommended for use in a WordPress environment ([#83771](https://github.com/WordPress/gutenberg/pull/83771)).
 -   `Radio`, `RadioGroup`, `RadioGroupControl`: Mark as recommended for use in a WordPress environment ([#83872](https://github.com/WordPress/gutenberg/pull/83872)).
 -   `Spinner`: Show a trackless half-circle like the `Button` loading indicator, with a `color` prop that accepts any CSS color value and defaults to weak neutral foreground. Keep the arc visible in forced-colors mode ([#83775](https://github.com/WordPress/gutenberg/pull/83775)).
