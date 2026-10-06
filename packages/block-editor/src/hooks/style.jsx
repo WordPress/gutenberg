@@ -198,6 +198,21 @@ function getStateBackgroundResetCSS( stateStyles, selector ) {
 }
 
 /**
+ * Whether a state paints a background of its own, which is then what the user
+ * asked for and not something to clear or override.
+ *
+ * @param {Object} stateStyles State style object.
+ * @return {boolean} Whether the state paints its own background.
+ */
+function paintsItsOwnBackground( stateStyles ) {
+	return (
+		!! stateStyles?.background?.gradient ||
+		!! stateStyles?.background?.backgroundImage ||
+		!! stateStyles?.color?.gradient
+	);
+}
+
+/**
  * Returns the CSS a state needs to escape a text clip it layers over.
  *
  * A state's declarations sit in a media query or a selector of their own, but
@@ -222,11 +237,7 @@ function getStateTextClipEscapeCSS( stateStyles, baseStyle, selector ) {
 		return undefined;
 	}
 
-	const paintsItsOwnBackground =
-		!! stateStyles?.background?.gradient ||
-		!! stateStyles?.background?.backgroundImage ||
-		!! stateStyles?.color?.gradient;
-	if ( paintsItsOwnBackground ) {
+	if ( paintsItsOwnBackground( stateStyles ) ) {
 		return undefined;
 	}
 
@@ -255,7 +266,8 @@ function getStateTextFillResetCSS( stateStyles, baseStyle, selector ) {
 
 	if (
 		! stateStyles?.color?.text ||
-		stateStyles?.background?.backgroundClip
+		stateStyles?.background?.backgroundClip ||
+		paintsItsOwnBackground( stateStyles )
 	) {
 		return undefined;
 	}
@@ -985,6 +997,10 @@ function BlockStyleControls( {
 		return getBlockStateStylesCSS( stateValue, {
 			name,
 			baseSelector: `[data-block="${ clientId }"]`,
+			baseStyle: getRootStateStyles( style, [
+				'elements',
+				...( VALID_BLOCK_PSEUDO_STATES[ name ] ?? [] ),
+			] ),
 		} );
 	}, [
 		showStateOnCanvas,

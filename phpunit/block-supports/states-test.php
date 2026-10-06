@@ -225,6 +225,26 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that the fill is left alone when the state paints its own gradient.
+	 *
+	 * @covers ::gutenberg_get_state_declarations_with_text_clip_escapes
+	 */
+	public function test_no_text_fill_reset_when_the_state_paints_its_own_gradient() {
+		$state_style = array(
+			'color'      => array( 'text' => '#ff0000' ),
+			'background' => array( 'gradient' => 'linear-gradient(135deg, #ff0000, #0000ff)' ),
+		);
+
+		$actual = gutenberg_get_state_declarations_with_text_clip_escapes(
+			array( 'color' => '#ff0000' ),
+			$state_style,
+			array( 'background' => array( 'backgroundClip' => 'text' ) )
+		);
+
+		$this->assertSame( array( 'color' => '#ff0000' ), $actual );
+	}
+
+	/**
 	 * Tests that the fill is left to the style engine when the state sets its own clip.
 	 *
 	 * @covers ::gutenberg_get_state_declarations_with_text_clip_escapes

@@ -190,12 +190,13 @@ function gutenberg_get_state_declarations_with_text_clip_escapes( $declarations,
 
 	$state_clip = $state_style['background']['backgroundClip'] ?? null;
 
-	if ( $state_clip && 'text' !== $state_clip ) {
-		$paints_its_own_background =
-			! empty( $state_style['background']['gradient'] ) ||
-			! empty( $state_style['background']['backgroundImage'] ) ||
-			! empty( $state_style['color']['gradient'] );
+	// A background the state paints itself is what the user asked for.
+	$paints_its_own_background =
+		! empty( $state_style['background']['gradient'] ) ||
+		! empty( $state_style['background']['backgroundImage'] ) ||
+		! empty( $state_style['color']['gradient'] );
 
+	if ( $state_clip && 'text' !== $state_clip ) {
 		if ( ! $paints_its_own_background ) {
 			$declarations['background-image'] = 'unset';
 		}
@@ -205,7 +206,7 @@ function gutenberg_get_state_declarations_with_text_clip_escapes( $declarations,
 
 	// A state that sets its own clip already gets the right fill from the
 	// style engine.
-	if ( ! $state_clip && ! empty( $state_style['color']['text'] ) ) {
+	if ( ! $state_clip && ! $paints_its_own_background && ! empty( $state_style['color']['text'] ) ) {
 		$declarations['-webkit-text-fill-color'] = 'currentColor';
 	}
 
