@@ -57,14 +57,14 @@ const FOREGROUND_PERCEPTUAL_TARGETS = {
 	// the hard gates for every surface on which a foreground can appear.
 	// Prefer strong normal text, but lower it when that is necessary to preserve
 	// a visible active state before the gamut endpoint.
-	normalContrast: 86,
-	// Let the interaction-state endpoint approach black or white when that makes
-	// the state change more visible. WCAG remains a hard floor.
+	normalContrast: 90,
+	// Let strong content and interaction states approach black or white.
+	// WCAG remains a hard floor.
 	endpointReserve: 1,
-	// Keep weak supporting content visibly separate from normal content, then
-	// reserve a larger interval for the interaction-state-only endpoint.
+	// Separate weak supporting content from normal content, while leaving a
+	// smaller interval for strong content and interaction states.
 	weakToNormal: 12,
-	normalToActive: 14,
+	normalToActive: 10,
 } as const;
 
 const FOREGROUND_SCALE_STEPS = [

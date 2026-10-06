@@ -4,6 +4,7 @@ export interface TextProps extends ComponentProps< 'span' > {
 	/**
 	 * The typographic variant to apply, controlling font family, size,
 	 * line height, and weight.
+	 * Heading variants also use the strong neutral content color.
 	 *
 	 * @default "body-md"
 	 */
