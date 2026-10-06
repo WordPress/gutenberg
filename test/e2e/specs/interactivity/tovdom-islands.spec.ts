@@ -36,12 +36,10 @@ test.describe( 'toVdom - islands', () => {
 		await expect( el ).toBeHidden();
 	} );
 
-	test( 'directives inside a data-wp-ignore element of an island should be hydrated', async ( {
+	test( 'directives inside an element with data-wp-ignore should be hydrated', async ( {
 		page,
 	} ) => {
-		const el = page.getByTestId(
-			'inside an inner block of an isolated island'
-		);
+		const el = page.getByTestId( 'inside an element with data-wp-ignore' );
 		await expect( el ).toBeHidden();
 	} );
 
@@ -53,11 +51,11 @@ test.describe( 'toVdom - islands', () => {
 		await expect( templates ).toHaveCount( 1 );
 	} );
 
-	test( 'islands inside inner blocks of isolated islands should be hydrated', async ( {
+	test( 'islands nested in inner elements of other islands should be hydrated', async ( {
 		page,
 	} ) => {
 		const el = page.getByTestId(
-			'island inside inner block of isolated island'
+			'island inside an inner element of another island'
 		);
 		await expect( el ).toBeHidden();
 	} );

@@ -32,13 +32,9 @@
 	<div data-wp-interactive="tovdom-islands">
 		<div data-wp-ignore>
 			<div data-wp-show-mock="state.falseValue">
-				<span
-					data-testid="inside an inner block of an isolated island"
-				>
-					This should be hidden because directives inside a
-					`data-wp-ignore` element of an island are hydrated, so
-					the `data-wp-show-mock="state.falseValue"` directive
-					wrapping it runs.
+				<span data-testid="inside an element with data-wp-ignore">
+					This should not be shown because data-wp-ignore no
+					longer prevents hydration.
 				</span>
 			</div>
 		</div>
@@ -65,11 +61,11 @@
 			>
 				<div data-wp-show-mock="state.falseValue">
 					<span
-						data-testid="island inside inner block of isolated island"
+						data-testid="island inside an inner element of another island"
 					>
-						This should not be shown because even though it
-						is inside an inner block of an isolated island,
-						it's inside an new island.
+						This should not be shown because it is inside a
+						new island nested in an inner element of another
+						island.
 					</span>
 				</div>
 			</div>
