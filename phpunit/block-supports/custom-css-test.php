@@ -476,6 +476,46 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that custom CSS is correctly scoped for style states.
+	 *
+	 * @covers ::gutenberg_process_custom_css_state_entries
+	 */
+	public function test_custom_css_processes_style_state_entries() {
+		$entries = array(
+			array(
+				'css'         => 'color: red;',
+				'pseudo'      => null,
+				'media_query' => null,
+			),
+			array(
+				'css'         => 'color: blue;',
+				'pseudo'      => ':hover',
+				'media_query' => null,
+			),
+			array(
+				'css'         => 'color: green;',
+				'pseudo'      => null,
+				'media_query' => '@media (width <= 480px)',
+			),
+			array(
+				'css'         => 'color: purple;',
+				'pseudo'      => ':focus',
+				'media_query' => '@media (width <= 480px)',
+			),
+		);
+
+		$result = gutenberg_process_custom_css_state_entries( $entries, '.test-block' );
+
+		$this->assertSame(
+			':root :where(.test-block){color: red;}' .
+			':root :where(.test-block:hover){color: blue;}' .
+			'@media (width <= 480px){:root :where(.test-block){color: green;}}' .
+			'@media (width <= 480px){:root :where(.test-block:focus){color: purple;}}',
+			$result
+		);
+	}
+
+	/**
 	 * Tests that valid CSS state entries are processed when another state contains HTML.
 	 *
 	 * @covers ::gutenberg_process_custom_css_state_entries
