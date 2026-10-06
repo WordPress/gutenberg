@@ -60,6 +60,8 @@ interface QuickEditModalProps {
 	postType: string;
 	postId: string[];
 	closeModal: () => void;
+	/** Called once the edits are saved, before the modal closes. */
+	onSave?: () => void;
 	quickEditForm: Form | undefined;
 }
 
@@ -67,6 +69,7 @@ export function QuickEditModal( {
 	postType,
 	postId,
 	closeModal,
+	onSave: onSaved,
 	quickEditForm,
 }: QuickEditModalProps ) {
 	const isBulk = postId.length > 1;
@@ -204,6 +207,7 @@ export function QuickEditModal( {
 		} else {
 			await saveEditedEntityRecord( 'postType', postType, postId[ 0 ] );
 		}
+		onSaved?.();
 		closeModal?.();
 	};
 

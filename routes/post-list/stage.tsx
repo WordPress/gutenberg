@@ -22,7 +22,7 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo, useCallback } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
@@ -47,6 +47,15 @@ const { Tabs } = unlock( componentsPrivateApis );
 import './style.scss';
 
 const LAYOUT_LIST = 'list';
+
+// Actions that add posts or move them between statuses, so change the totals
+// the status tabs show.
+const COUNT_CHANGING_ACTIONS = new Set( [
+	'move-to-trash',
+	'permanently-delete',
+	'restore',
+	'duplicate-post',
+] );
 
 function getItemId( item: Post ) {
 	return item.id.toString();
@@ -112,6 +121,7 @@ function PostListView( {
 } ) {
 	const invalidate = useInvalidate();
 	const navigate = useNavigate();
+	const { invalidateResolution } = unlock( useDispatch( coreStore ) );
 	const searchParams = useSearch( { from: '/types/$type/list/$slug' } );
 	const postTypeObject = useSelect(
 		( select ) => select( coreStore ).getPostType( postType ),
@@ -231,10 +241,20 @@ function PostListView( {
 		[ invalidate, searchParams, navigate ]
 	);
 
+	// The tab counts come with the view config, which is cached per post type.
+	// Fetching it again after a change updates the counts only: the user's
+	// view lives in preferences, which this does not touch.
+	const refreshViewCounts = useCallback( () => {
+		invalidateResolution( 'getViewConfig', [ 'postType', postType ] );
+	}, [ invalidateResolution, postType ] );
+
 	const postTypeActions: Action< Post >[] = usePostActions( {
 		postType,
 		context: 'list',
 		onActionPerformed: ( actionId: string, items: Post[] ) => {
+			if ( COUNT_CHANGING_ACTIONS.has( actionId ) ) {
+				refreshViewCounts();
+			}
 			// Clean up URL when delete actions are performed
 			if (
 				actionId === 'move-to-trash' ||
@@ -453,6 +473,7 @@ function PostListView( {
 						postType={ postType }
 						postId={ selection }
 						closeModal={ closeQuickEditModal }
+						onSave={ refreshViewCounts }
 						quickEditForm={ quickEditForm }
 					/>
 				) }
