@@ -285,6 +285,21 @@ export function canvasWidth( state = undefined, action ) {
 }
 
 /**
+ * Reducer for the calculated canvas height.
+ *
+ * @param {number|undefined} state  Current state.
+ * @param {Object}           action Dispatched action.
+ * @return {number|undefined} Updated state.
+ */
+export function canvasHeight( state = undefined, action ) {
+	switch ( action.type ) {
+		case 'SET_CANVAS_HEIGHT':
+			return action.height;
+	}
+	return state;
+}
+
+/**
  * Reducer storing the list of all programmatically removed panels.
  *
  * @param {Array}  state  Current state.
@@ -492,6 +507,7 @@ export default combineReducers( {
 	postAutosavingLock,
 	renderingMode,
 	canvasWidth,
+	canvasHeight,
 	removedPanels,
 	blockInserterPanel,
 	inserterSidebarToggleRef,

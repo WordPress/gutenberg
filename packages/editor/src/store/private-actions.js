@@ -494,6 +494,19 @@ export function setCanvasWidth( width ) {
 }
 
 /**
+ * Set the calculated canvas height for the footer viewport status.
+ *
+ * @param {number|undefined} height Canvas height in pixels, or undefined when unconstrained.
+ * @return {Object} Action object.
+ */
+export function setCanvasHeight( height ) {
+	return {
+		type: 'SET_CANVAS_HEIGHT',
+		height,
+	};
+}
+
+/**
  * Set the current revision ID for revisions preview mode.
  * Pass a revision ID to enter revisions mode, or null to exit.
  *
