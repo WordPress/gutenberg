@@ -60,7 +60,6 @@
 		<div>
 			<div
 				data-wp-interactive="tovdom-islands"
-				data-wp-ignore
 			>
 				<div data-wp-show-mock="state.falseValue">
 					<span
