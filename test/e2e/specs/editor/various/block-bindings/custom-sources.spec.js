@@ -1127,7 +1127,12 @@ test.describe( 'Registered sources', () => {
 			} );
 			await expect( iconAttribute ).toBeVisible();
 			await iconAttribute.click();
-			await page.getByRole( 'button', { name: 'icon' } ).click();
+			await page
+				.getByRole( 'button', {
+					name: 'icon Not connected',
+					exact: true,
+				} )
+				.click();
 			await page
 				.getByRole( 'menuitem', { name: 'Complete Source' } )
 				.click();
@@ -1136,7 +1141,10 @@ test.describe( 'Registered sources', () => {
 				.filter( { hasText: 'Icon Field Label' } )
 				.click();
 			await expect(
-				page.getByRole( 'button', { name: 'icon' } )
+				page.getByRole( 'button', {
+					name: 'icon Complete Source',
+					exact: true,
+				} )
 			).toContainText( 'Complete Source' );
 		} );
 
