@@ -568,12 +568,6 @@ test.describe( 'Style Revisions', () => {
 		await page.getByRole( 'option', { name: '2', exact: true } ).click();
 		await expect( currentPageSelect ).toHaveText( '2' );
 		// The theme defaults entry closes the last page.
-		await currentPageSelect.click();
-		await page
-			.getByRole( 'listbox', { name: '', exact: true } )
-			.getByRole( 'option' )
-			.last()
-			.click();
 		await expect(
 			page.getByRole( 'option', {
 				name: 'Reset the styles to the theme defaults',
