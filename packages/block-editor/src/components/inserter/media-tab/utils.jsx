@@ -6,14 +6,19 @@ const mediaTypeTag = { image: 'img', video: 'video', audio: 'audio' };
 /** @typedef {import('./hooks').InserterMediaItem} InserterMediaItem */
 
 /**
- * A media item's id. Library items carry a numeric `id`; external ones (e.g.
- * Openverse) carry a `sourceId` instead.
+ * A media item's id, used for item identity in the grid.
+ *
+ * Library items carry a numeric `id` and external ones (e.g. Openverse) carry
+ * a `sourceId`, but both are optional in `InserterMediaItem`, so a category
+ * registered through the public API may supply neither. `url` is required, so
+ * it serves as the fallback rather than stringifying `undefined` and giving
+ * every such item the same id.
  *
  * @param {InserterMediaItem} media The media object.
  * @return {string} The id, as a string.
  */
 export function getItemId( media ) {
-	return String( media.id ?? media.sourceId );
+	return String( media.id ?? media.sourceId ?? media.url );
 }
 
 /**
