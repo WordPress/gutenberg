@@ -1,4 +1,4 @@
-import type { AriaRole } from 'react';
+import type { AriaRole, MouseEvent } from 'react';
 import { Button } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { usePluginContext } from '@wordpress/plugins';
@@ -32,6 +32,7 @@ export default function ComplementaryAreaToggle( {
 	selectedIcon,
 	name,
 	shortcut,
+	'data-wp-complementary-area': isDefaultMenuItem,
 	...props
 }: ComplementaryAreaToggleProps ) {
 	const ComponentToUse = as;
@@ -56,9 +57,18 @@ export default function ComplementaryAreaToggle( {
 			aria-checked={
 				roleSupportsCheckedState( props.role ) ? isSelected : undefined
 			}
-			onClick={ () => {
+			data-wp-complementary-area={
+				isDefaultMenuItem ? identifier : undefined
+			}
+			{ ...( props.role === 'menuitemradio' && { value: identifier } ) }
+			onClick={ ( event?: MouseEvent< HTMLElement > ) => {
+				// The host menu can present a default panel toggle as a radio.
+				const role =
+					event?.currentTarget?.getAttribute( 'role' ) ?? props.role;
 				if ( isSelected ) {
-					disableComplementaryArea( scope );
+					if ( role !== 'menuitemradio' ) {
+						disableComplementaryArea( scope );
+					}
 				} else {
 					enableComplementaryArea( scope, identifier );
 				}

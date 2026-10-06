@@ -368,7 +368,6 @@ for ( const projectName of VITEST_PROJECT_NAMES ) {
 				[
 					'declare const global: typeof globalThis;',
 					"declare module '@wordpress/commands';",
-					"declare module '@wordpress/interface';",
 					"declare module 'deep-freeze' { export default function deepFreeze<T>(value: T): T; }",
 				].join( '\n' )
 			);
