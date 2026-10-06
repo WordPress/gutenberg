@@ -31,6 +31,7 @@
 
 ### Bug Fixes
 
+-   `Combobox.Root`: Preserve separate item and selected-value types for collections, including filtering callbacks ([#84094](https://github.com/WordPress/gutenberg/pull/84094)).
 -   `Autocomplete.Root`: Preserve item type inference in filtering, formatting, and highlight callbacks for flat and grouped items ([#84095](https://github.com/WordPress/gutenberg/pull/84095)).
 -   `Breadcrumb`: Keep a custom renderer's ref on the visible item ([#84069](https://github.com/WordPress/gutenberg/pull/84069)).
 -   `RadioGroup`: Preserve value type inference in callbacks. `RadioGroupControl`: Type selected values and callbacks as strings to match its items ([#83872](https://github.com/WordPress/gutenberg/pull/83872)).
