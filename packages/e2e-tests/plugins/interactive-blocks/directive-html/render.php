@@ -7,6 +7,11 @@
 ?>
 
 <div data-wp-interactive="directive-html">
+	<span data-wp-text="state.hydration" data-testid="hydration">not hydrated</span>
+	<button data-wp-on--click="actions.setTrustedHtml" data-testid="set trusted html">
+		Set Trusted HTML
+	</button>
+
 	<div data-wp-html="state.html" data-testid="show state html">
 		<p data-testid="fallback">Fallback content</p>
 	</div>
