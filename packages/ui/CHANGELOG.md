@@ -30,6 +30,7 @@
 
 ### Bug Fixes
 
+-   `Autocomplete.Root`: Preserve item type inference in filtering, formatting, and highlight callbacks for flat and grouped items ([#84095](https://github.com/WordPress/gutenberg/pull/84095)).
 -   `Breadcrumb`: Keep a custom renderer's ref on the visible item ([#84069](https://github.com/WordPress/gutenberg/pull/84069)).
 -   `RadioGroup`: Preserve value type inference in callbacks. `RadioGroupControl`: Type selected values and callbacks as strings to match its items ([#83872](https://github.com/WordPress/gutenberg/pull/83872)).
 -   `Menu`: Align the first submenu item's label with its parent label while preserving item centering, including when their heights differ ([#84031](https://github.com/WordPress/gutenberg/pull/84031)).
