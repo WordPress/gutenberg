@@ -219,6 +219,8 @@
 			justify-content: center;
 			width: var(--wp-ui-menu-selection-indicator-size);
 			height: var(--_wp-ui-menu-item-label-line-height);
+			/* Separate the indicator from the label without widening its track. */
+			margin-inline-end: var(--wpds-dimension-gap-xs);
 			color: var(--wpds-color-foreground-content-neutral-weak);
 			pointer-events: none;
 
