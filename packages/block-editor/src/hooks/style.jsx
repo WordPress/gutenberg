@@ -604,6 +604,9 @@ const skipSerializationPathsEdit = {
 	[ `${ SHADOW_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		SHADOW_SUPPORT_KEY,
 	],
+	[ `${ BACKGROUND_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
+		BACKGROUND_SUPPORT_KEY,
+	],
 };
 
 /**
