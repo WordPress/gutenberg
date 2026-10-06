@@ -203,6 +203,7 @@ export default function InspectorControlsTabs( {
 						hasBlockStyles={ hasBlockStyles }
 						isSectionBlock={ isSectionBlock }
 						contentClientIds={ contentClientIds }
+						showAdditionalStyles={ !! blockName }
 					/>
 				</Tabs.TabPanel>
 			</Tabs>

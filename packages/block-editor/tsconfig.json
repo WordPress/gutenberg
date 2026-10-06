@@ -5,51 +5,128 @@
 		"types": []
 	},
 	"references": [
-		{ "path": "./tsconfig.build.json" },
-		{ "path": "../a11y/tsconfig.build.json" },
-		{ "path": "../block-serialization-default-parser" },
-		{ "path": "../blob/tsconfig.build.json" },
-		{ "path": "../blocks" },
-		{ "path": "../components/tsconfig.build.json" },
-		{ "path": "../compose/tsconfig.build.json" },
-		{ "path": "../data" },
-		{ "path": "../dataviews/tsconfig.build.json" },
-		{ "path": "../date" },
-		{ "path": "../deprecated/tsconfig.build.json" },
-		{ "path": "../dom" },
-		{ "path": "../element/tsconfig.build.json" },
-		{ "path": "../preferences/tsconfig.build.json" },
-		{ "path": "../global-styles-engine/tsconfig.build.json" },
-		{ "path": "../priority-queue/tsconfig.build.json" },
-		{ "path": "../private-apis" },
-		{ "path": "../hooks" },
-		{ "path": "../html-entities/tsconfig.build.json" },
-		{ "path": "../i18n/tsconfig.build.json" },
-		{ "path": "../icons/tsconfig.build.json" },
-		{ "path": "../image-cropper/tsconfig.build.json" },
-		{ "path": "../interactivity/tsconfig.build.json" },
-		{ "path": "../is-shallow-equal/tsconfig.build.json" },
-		{ "path": "../kebab-case" },
-		{ "path": "../keycodes/tsconfig.build.json" },
-		{ "path": "../keyboard-shortcuts" },
-		{ "path": "../notices/tsconfig.build.json" },
-		{ "path": "../rich-text" },
-		{ "path": "../style-engine" },
-		{ "path": "../token-list/tsconfig.build.json" },
-		{ "path": "../ui/tsconfig.build.json" },
-		{ "path": "../url" },
-		{ "path": "../upload-media/tsconfig.build.json" },
-		{ "path": "../warning" }
+		{
+			"path": "./tsconfig.build.json"
+		},
+		{
+			"path": "../a11y/tsconfig.build.json"
+		},
+		{
+			"path": "../block-serialization-default-parser"
+		},
+		{
+			"path": "../blob/tsconfig.build.json"
+		},
+		{
+			"path": "../blocks"
+		},
+		{
+			"path": "../components/tsconfig.build.json"
+		},
+		{
+			"path": "../compose/tsconfig.build.json"
+		},
+		{
+			"path": "../data"
+		},
+		{
+			"path": "../dataviews/tsconfig.build.json"
+		},
+		{
+			"path": "../date"
+		},
+		{
+			"path": "../deprecated/tsconfig.build.json"
+		},
+		{
+			"path": "../dom"
+		},
+		{
+			"path": "../element/tsconfig.build.json"
+		},
+		{
+			"path": "../preferences/tsconfig.build.json"
+		},
+		{
+			"path": "../global-styles-engine/tsconfig.build.json"
+		},
+		{
+			"path": "../priority-queue/tsconfig.build.json"
+		},
+		{
+			"path": "../private-apis"
+		},
+		{
+			"path": "../hooks"
+		},
+		{
+			"path": "../html-entities/tsconfig.build.json"
+		},
+		{
+			"path": "../i18n/tsconfig.build.json"
+		},
+		{
+			"path": "../icons/tsconfig.build.json"
+		},
+		{
+			"path": "../image-cropper/tsconfig.build.json"
+		},
+		{
+			"path": "../interactivity/tsconfig.build.json"
+		},
+		{
+			"path": "../is-shallow-equal/tsconfig.build.json"
+		},
+		{
+			"path": "../kebab-case"
+		},
+		{
+			"path": "../keycodes/tsconfig.build.json"
+		},
+		{
+			"path": "../keyboard-shortcuts"
+		},
+		{
+			"path": "../notices/tsconfig.build.json"
+		},
+		{
+			"path": "../rich-text"
+		},
+		{
+			"path": "../style-engine"
+		},
+		{
+			"path": "../token-list/tsconfig.build.json"
+		},
+		{
+			"path": "../ui/tsconfig.build.json"
+		},
+		{
+			"path": "../url"
+		},
+		{
+			"path": "../upload-media/tsconfig.build.json"
+		},
+		{
+			"path": "../warning"
+		}
 	],
 	/*
 	 * These dev files import sources outside the build's TypeScript allowlist.
 	 * TypeScript unit tests are checked separately by test:unit:conventions.
+	 *
+	 * Each excluded file imports a component the build allowlist does not
+	 * type yet. A composite project has to resolve every relative import
+	 * within its own program, so including one of these would mean adding
+	 * the whole subgraph behind it. Drop an entry once the allowlist in
+	 * `tsconfig.build.json` covers what it imports.
 	 */
 	"exclude": [
 		"**/benchmark",
 		"src/components/block-icon/stories/index.story.ts",
 		"src/components/contrast-checker/stories/index.story.ts",
 		"src/components/inspector-controls-tabs/test/use-inspector-controls-tabs.jsdom.test.tsx",
-		"src/hooks/test/utils.jsdom.test.tsx"
+		"src/hooks/test/utils.jsdom.test.tsx",
+		"src/components/inspector-controls-tabs/test/advanced-panels.jsdom.test.tsx"
 	]
 }

@@ -92,7 +92,7 @@ export default function AdvancedPanel( {
 				</Notice>
 			) }
 			<WCTextareaControl
-				label={ __( 'Additional CSS' ) }
+				label={ __( 'CSS' ) }
 				value={ customCSS }
 				onChange={ ( newValue ) => handleOnChange( newValue ) }
 				onBlur={ handleOnBlur }

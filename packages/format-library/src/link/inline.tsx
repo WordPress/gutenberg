@@ -57,7 +57,7 @@ const LINK_SETTINGS = [
 	},
 	{
 		id: 'cssClasses',
-		title: __( 'Additional CSS class(es)' ),
+		title: __( 'CSS class(es)' ),
 		render: (
 			setting: CSSClassesSettingProps[ 'setting' ],
 			value: CSSClassesSettingProps[ 'value' ],
