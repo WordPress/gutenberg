@@ -32,7 +32,6 @@ export const rootEntitiesConfig = [
 		baseURL: '/',
 		baseURLParams: {
 			// Please also change the preload path when changing this.
-			// @see lib/compat/wordpress-7.1/preload.php
 			// @see lib/compat/wordpress-7.2/preload.php
 			_fields: [
 				'description',
