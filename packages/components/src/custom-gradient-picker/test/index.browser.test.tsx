@@ -3,8 +3,8 @@ import { userEvent } from 'vitest/browser';
 import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
-import '../style.scss';
 import '../../button/style.scss';
+import '../style.scss';
 import '../../dropdown/style.scss';
 import '../../popover/style.scss';
 import CustomGradientPicker from '../';
@@ -171,6 +171,90 @@ describe( 'CustomGradientBar', () => {
 		{ position: 100, color: 'rgb(255,255,255)' },
 	];
 
+	it.each( [ 'top', 'bottom' ] )(
+		'adds a control point from the %s of the gradient bar',
+		async ( edge ) => {
+			const onChange = vi.fn();
+			const { container } = await render(
+				<CustomGradientBar
+					background="linear-gradient(90deg, black, white)"
+					hasGradient
+					value={ POINTS }
+					onChange={ onChange }
+				/>
+			);
+			// eslint-disable-next-line testing-library/no-node-access -- The gradient background has no accessible role.
+			const bar = container.querySelector< HTMLElement >(
+				'.components-custom-gradient-picker__gradient-bar'
+			)!;
+			const bounds = bar.getBoundingClientRect();
+			const position = {
+				x: bounds.width / 2,
+				y: edge === 'top' ? 1 : bounds.height - 1,
+			};
+
+			await userEvent.hover( bar, { position } );
+			// eslint-disable-next-line testing-library/no-node-access -- The inserter has no accessible name.
+			const inserter = container.querySelector< HTMLElement >(
+				'.components-custom-gradient-picker__insert-point-dropdown'
+			)!;
+			expect( inserter ).toBeVisible();
+			await userEvent.click( bar, { position } );
+			expect( inserter ).toHaveAttribute( 'aria-expanded', 'true' );
+
+			await userEvent.click(
+				screen.getByRole( 'slider', { name: 'Color' } )
+			);
+			expect( onChange ).toHaveBeenCalledWith(
+				expect.arrayContaining( [
+					...POINTS,
+					{ position: 50, color: expect.any( String ) },
+				] )
+			);
+			await userEvent.keyboard( '{Escape}' );
+		}
+	);
+
+	it.each( [ 'top', 'bottom' ] )(
+		'opens neighboring control points from the %s of the gradient bar',
+		async ( edge ) => {
+			const { container } = await render(
+				<div style={ { width: 248 } }>
+					<CustomGradientBar
+						background="linear-gradient(90deg, black 40%, white 50%)"
+						hasGradient
+						value={ [
+							{ ...POINTS[ 0 ], position: 40 },
+							{ ...POINTS[ 1 ], position: 50 },
+						] }
+						onChange={ vi.fn() }
+					/>
+				</div>
+			);
+			// eslint-disable-next-line testing-library/no-node-access -- The gradient background has no accessible role.
+			const bar = container.querySelector< HTMLElement >(
+				'.components-custom-gradient-picker__gradient-bar'
+			)!;
+			const bounds = bar.getBoundingClientRect();
+			const points = screen.getAllByRole( 'button', {
+				name: /Gradient control point/,
+			} );
+
+			for ( const point of points ) {
+				const pointBounds = point.getBoundingClientRect();
+				await userEvent.click( bar, {
+					position: {
+						x: pointBounds.x - bounds.x + pointBounds.width / 2,
+						y: edge === 'top' ? 1 : bounds.height - 1,
+					},
+				} );
+				expect( point ).toHaveAttribute( 'aria-expanded', 'true' );
+				await userEvent.keyboard( '{Escape}' );
+				expect( point ).toHaveAttribute( 'aria-expanded', 'false' );
+			}
+		}
+	);
+
 	// The counterpart to the duotone bar's tests: positioning is on unless a
 	// consumer opts out, so arrow keys must still move a control point.
 	it( 'moves a control point with the arrow keys', async () => {
@@ -205,43 +289,57 @@ describe( 'CustomGradientBar', () => {
 		] );
 	} );
 
-	it( 'moves a control point when dragged', async () => {
-		const onChange = vi.fn();
+	it.each( [
+		[ 'top', 0 ],
+		[ 'middle', 0.5 ],
+		[ 'bottom', 1 ],
+	] as const )(
+		'moves a control point when dragged from the %s of the gradient bar',
+		async ( _edge, verticalPosition ) => {
+			const onChange = vi.fn();
 
-		const { container } = await render(
-			<CustomGradientBar
-				background="linear-gradient(90deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)"
-				hasGradient
-				value={ POINTS }
-				onChange={ onChange }
-			/>
-		);
+			const { container } = await render(
+				<CustomGradientBar
+					background="linear-gradient(90deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)"
+					hasGradient
+					value={ POINTS }
+					onChange={ onChange }
+				/>
+			);
 
-		// eslint-disable-next-line testing-library/no-node-access
-		const markers = container.querySelector(
-			'.components-custom-gradient-picker__markers-container'
-		) as HTMLElement;
-		expect( markers.getBoundingClientRect().width ).toBeGreaterThan( 0 );
-		// eslint-disable-next-line testing-library/no-node-access -- The gradient background has no accessible role.
-		const bar = markers.closest< HTMLElement >(
-			'.components-custom-gradient-picker__gradient-bar'
-		)!;
-		const bounds = bar.getBoundingClientRect();
+			// eslint-disable-next-line testing-library/no-node-access
+			const markers = container.querySelector(
+				'.components-custom-gradient-picker__markers-container'
+			) as HTMLElement;
+			expect( markers.getBoundingClientRect().width ).toBeGreaterThan(
+				0
+			);
+			// eslint-disable-next-line testing-library/no-node-access -- The gradient background has no accessible role.
+			const bar = markers.closest< HTMLElement >(
+				'.components-custom-gradient-picker__gradient-bar'
+			)!;
+			const bounds = bar.getBoundingClientRect();
 
-		const [ firstPoint ] = screen.getAllByRole( 'button', {
-			name: /Gradient control point/,
-		} );
+			const [ firstPoint ] = screen.getAllByRole( 'button', {
+				name: /Gradient control point/,
+			} );
 
-		await userEvent.dragAndDrop( firstPoint, bar, {
-			targetPosition: { x: bounds.width / 2, y: bounds.height / 2 },
-		} );
+			const pointBounds = firstPoint.getBoundingClientRect();
+			await userEvent.dragAndDrop( bar, bar, {
+				sourcePosition: {
+					x: pointBounds.x - bounds.x + pointBounds.width / 2,
+					y: 1 + ( bounds.height - 2 ) * verticalPosition,
+				},
+				targetPosition: { x: bounds.width / 2, y: bounds.height / 2 },
+			} );
 
-		// The midpoint of the rendered container is 50%.
-		expect( onChange ).toHaveBeenCalledWith( [
-			{ position: 50, color: 'rgb(0,0,0)' },
-			POINTS[ 1 ],
-		] );
-	} );
+			// The midpoint of the rendered container is 50%.
+			expect( onChange ).toHaveBeenCalledWith( [
+				{ position: 50, color: 'rgb(0,0,0)' },
+				POINTS[ 1 ],
+			] );
+		}
+	);
 
 	it( 'does not move a control point when dragged and positioning is disabled', async () => {
 		const onChange = vi.fn();
