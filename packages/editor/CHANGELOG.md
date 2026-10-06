@@ -17,6 +17,7 @@
 -   Notes: Keep the clicked thread selected on a block with several notes, instead of switching to the block's primary note ([#83528](https://github.com/WordPress/gutenberg/pull/83528)).
 -   Notes: Keep floating threads aligned with their blocks when an editor notice or the device preview moves the canvas ([#83485](https://github.com/WordPress/gutenberg/pull/83485)).
 -   Notes: Add an Undo action to the "Note deleted." snackbar, and stop the editor's undo from bringing back the highlight of a deleted note ([#83988](https://github.com/WordPress/gutenberg/pull/83988)).
+-   Notes: Stop the editor's undo from detaching a newly added note from its block, or bringing back the highlight of a resolved note ([#84079](https://github.com/WordPress/gutenberg/pull/84079)).
 
 ### Internal
 
