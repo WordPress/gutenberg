@@ -18,6 +18,7 @@ import { Note } from './note';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { FloatingContainer } from './floating-container';
+import { useNoteDraft } from './hooks';
 import {
 	focusNoteThread,
 	getNoteExcerpt,
@@ -29,6 +30,7 @@ import { unlock } from '../../lock-unlock';
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
 function NoteReply( { note, onEditNote, onAddReply, onCancel } ) {
+	const { initialValue, setDraft } = useNoteDraft( note.id );
 	return (
 		<NoteCard role="treeitem">
 			<NoteForm
@@ -46,7 +48,12 @@ function NoteReply( { note, onEditNote, onAddReply, onCancel } ) {
 						parent: note.id,
 					} );
 				} }
-				onCancel={ onCancel }
+				onCancel={ ( event ) => {
+					setDraft( '' );
+					onCancel( event );
+				} }
+				initialValue={ initialValue }
+				onChange={ setDraft }
 				labels={ {
 					submit:
 						'approved' === note.status
@@ -218,6 +225,7 @@ export function NoteThread( {
 	if ( isFloating && note.id === 'new' ) {
 		return (
 			<AddNote
+				key={ note.blockClientId }
 				clientId={ note.blockClientId }
 				onSubmit={ onAddReply }
 				sidebarRef={ sidebarRef }
