@@ -444,11 +444,16 @@ export function useNoteActions() {
 			// wrong block.
 			const clientId = ! note.parent ? note.blockClientId : null;
 
-			// Without `force`, this moves the note to the trash, so the
-			// snackbar's Undo can bring it back.
-			await deleteEntityRecord( 'root', 'comment', note.id, undefined, {
-				throwOnError: true,
-			} );
+			// Without the trash, the note can only be deleted permanently,
+			// and there's nothing for Undo to bring back.
+			const canMoveToTrash = !! note._links?.[ 'wp:action-trash' ];
+			await deleteEntityRecord(
+				'root',
+				'comment',
+				note.id,
+				canMoveToTrash ? undefined : { force: true },
+				{ throwOnError: true }
+			);
 
 			// What Undo needs to re-attach the note to its block.
 			let anchor = null;
@@ -483,12 +488,14 @@ export function useNoteActions() {
 			createNotice( 'snackbar', __( 'Note deleted.' ), {
 				type: 'snackbar',
 				isDismissible: true,
-				actions: [
-					{
-						label: __( 'Undo' ),
-						onClick: () => restoreNote( note.id, anchor ),
-					},
-				],
+				actions: canMoveToTrash
+					? [
+							{
+								label: __( 'Undo' ),
+								onClick: () => restoreNote( note.id, anchor ),
+							},
+						]
+					: [],
 			} );
 
 			return true;
