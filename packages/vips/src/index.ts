@@ -841,7 +841,21 @@ export async function resizeImage(
 			saveOptions.interframe_maxerror = 8;
 		}
 
-		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
+		let outBuffer;
+		try {
+			outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
+		} catch ( error ) {
+			// A frame that fails to decode only surfaces here, when the
+			// pipeline runs. Fall back to a first-frame sub-size, as for
+			// animations over the memory budget.
+			if ( ! strOptions || ! inProgressOperations.has( id ) ) {
+				throw error;
+			}
+			return resizeImage( id, buffer, type, resize, {
+				...options,
+				preserveAnimation: false,
+			} );
+		}
 
 		const result = {
 			buffer: outBuffer.buffer,
