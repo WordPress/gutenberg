@@ -2,14 +2,14 @@ import { fixCustomClassname } from './fix-custom-classname';
 import { fixGlobalAttribute } from './fix-global-attribute';
 import type { Block, BlockAttribute, BlockType } from '../../types';
 
-const ARIA_LABEL_ATTR_SCHEMA: BlockAttribute = {
+export const ARIA_LABEL_ATTR_SCHEMA: BlockAttribute = {
 	type: 'string',
 	source: 'attribute',
 	selector: '[data-aria-label] > *',
 	attribute: 'aria-label',
 };
 
-const ANCHOR_ATTR_SCHEMA: BlockAttribute = {
+export const ANCHOR_ATTR_SCHEMA: BlockAttribute = {
 	type: 'string',
 	source: 'attribute',
 	selector: '[data-anchor] > *',
