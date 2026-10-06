@@ -3,7 +3,7 @@
 
 	@layer components {
 		.root {
-			/* Match ProgressBar's default width to keep progress readable. */
+			/* Keep progress readable; consumers can override the width for their layout. */
 			width: 160px;
 		}
 
