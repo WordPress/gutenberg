@@ -2,17 +2,14 @@ import clsx from 'clsx';
 // @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { BlockPreview } from '@wordpress/block-editor';
 import { cloneBlock, type Block } from '@wordpress/blocks';
-import { Button } from '@wordpress/components';
+import { Button, Modal, PanelBody } from '@wordpress/components';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 type ImageComparisonProps = { before: Block; after: Block };
 
 /** A read-only comparison of the image versions in two revisions. */
-export default function ImageComparison( {
-	before,
-	after,
-}: ImageComparisonProps ) {
+function ImageComparison( { before, after }: ImageComparisonProps ) {
 	const [ position, setPosition ] = useState( 50 );
 	const [ unavailable, setUnavailable ] = useState< string[] >( [] );
 	const previews = useMemo(
@@ -167,5 +164,32 @@ export default function ImageComparison( {
 				) }
 			</div>
 		</div>
+	);
+}
+
+export default function ImageRevisionComparison( {
+	before,
+	after,
+}: ImageComparisonProps ) {
+	const [ isOpen, setIsOpen ] = useState( false );
+	return (
+		<PanelBody title={ __( 'Image changes' ) } initialOpen>
+			<Button
+				__next40pxDefaultSize
+				variant="secondary"
+				onClick={ () => setIsOpen( true ) }
+			>
+				{ __( 'Compare image' ) }
+			</Button>
+			{ isOpen && (
+				<Modal
+					title={ __( 'Compare image' ) }
+					size="large"
+					onRequestClose={ () => setIsOpen( false ) }
+				>
+					<ImageComparison before={ before } after={ after } />
+				</Modal>
+			) }
+		</PanelBody>
 	);
 }
