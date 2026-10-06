@@ -29,7 +29,7 @@
 
 ### Bug Fixes
 
--   `Autocomplete.Root`: Preserve item type inference in filtering, formatting, and highlight callbacks for flat and grouped items.
+-   `Autocomplete.Root`: Preserve item type inference in filtering, formatting, and highlight callbacks for flat and grouped items ([#84095](https://github.com/WordPress/gutenberg/pull/84095)).
 -   `Menu`: Align the first submenu item's label with its parent label while preserving item centering, including when their heights differ ([#84031](https://github.com/WordPress/gutenberg/pull/84031)).
 -   `Checkbox`: Prevent rounded themes from making checkboxes circular. ([#83526](https://github.com/WordPress/gutenberg/pull/83526))
 -   `Select`, `SelectControl`, `Combobox`, `SearchableSelect`, `SearchableChipSelect`, `SearchableChipSelectControl`: Align the selected-item checkmark with the first line of the item label while keeping single-line items vertically centered. ([#82942](https://github.com/WordPress/gutenberg/pull/82942))
