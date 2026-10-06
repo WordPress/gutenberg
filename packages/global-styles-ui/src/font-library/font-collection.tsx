@@ -17,11 +17,10 @@ import {
 	Flex,
 	Button,
 	SearchControl,
-	ProgressBar,
 	CheckboxControl as WCCheckboxControl,
 } from '@wordpress/components';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Menu } from '@wordpress/ui';
+import { Menu, Progress } from '@wordpress/ui';
 import { debounce } from '@wordpress/compose';
 import { sprintf, __, _x, isRTL } from '@wordpress/i18n';
 import {
@@ -263,7 +262,14 @@ function FontCollection( { slug }: { slug: string } ) {
 		<div className="font-library__tabpanel-layout">
 			{ isLoading && (
 				<div className="font-library__loading">
-					<ProgressBar />
+					<Progress.Root
+						value={ null }
+						aria-label={ __( 'Loading fonts' ) }
+					>
+						<Progress.Track>
+							<Progress.Indicator />
+						</Progress.Track>
+					</Progress.Root>
 				</div>
 			) }
 			{ ! isLoading && selectedCollection && (
