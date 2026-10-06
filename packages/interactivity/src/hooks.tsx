@@ -232,6 +232,9 @@ const resolve = ( path: string, namespace: string ) => {
 /**
  * Creates an evaluator bound to a directive scope.
  *
+ * Evaluation and returned functions restore the caller's scope even when they
+ * throw. Functions are resolved without being invoked.
+ *
  * @param args       Arguments used to bind the evaluator to a scope.
  * @param args.scope Scope used to resolve directive values.
  * @return An evaluator for directive entries.
@@ -247,36 +250,46 @@ export const getEvaluate: GetEvaluate =
 		const hasNegationOperator =
 			path[ 0 ] === '!' && !! ( path = path.slice( 1 ) );
 		setScope( scope );
-		const value = resolve( path, namespace );
-		// Functions are returned without invoking them.
-		if ( typeof value === 'function' ) {
-			if ( hasNegationOperator ) {
-				warn(
-					`The value of "${ path }" is a function and cannot be negated. Please use derived state instead.`
-				);
-				resetScope();
-				return undefined;
+		try {
+			const value = resolve( path, namespace );
+			// Functions are returned without invoking them.
+			if ( typeof value === 'function' ) {
+				if ( hasNegationOperator ) {
+					warn(
+						`The value of "${ path }" is a function and cannot be negated. Please use derived state instead.`
+					);
+					return undefined;
+				}
+				/**
+				 * Invokes the resolved function within its directive scope.
+				 *
+				 * @param functionArgs Arguments forwarded to the resolved function.
+				 * @return The resolved function's result.
+				 */
+				const wrappedFunction: Function = (
+					...functionArgs: any[]
+				) => {
+					setScope( scope );
+					try {
+						return value( ...functionArgs );
+					} finally {
+						resetScope();
+					}
+				};
+				// Preserve the sync property from the original function.
+				if ( value.sync ) {
+					const syncAwareFunction =
+						wrappedFunction as SyncAwareFunction;
+					syncAwareFunction.sync = true;
+				}
+				return wrappedFunction;
 			}
-			// Reset scope before return and wrap the function so it will still run within the correct scope.
+			return hasNegationOperator && value !== PENDING_GETTER
+				? ! value
+				: value;
+		} finally {
 			resetScope();
-			const wrappedFunction: Function = ( ...functionArgs: any[] ) => {
-				setScope( scope );
-				const functionResult = value( ...functionArgs );
-				resetScope();
-				return functionResult;
-			};
-			// Preserve the sync property from the original function
-			if ( value.sync ) {
-				const syncAwareFunction = wrappedFunction as SyncAwareFunction;
-				syncAwareFunction.sync = true;
-			}
-			return wrappedFunction;
 		}
-		const result = value;
-		resetScope();
-		return hasNegationOperator && value !== PENDING_GETTER
-			? ! result
-			: result;
 	};
 
 // Separate directives by priority. The resulting array contains objects

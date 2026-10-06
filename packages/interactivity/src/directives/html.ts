@@ -47,16 +47,17 @@ directive(
 				warnUniqueIdNotSupported( 'html', entry.uniqueId );
 			}
 		} else {
+			// A throwing getter or function supplies no new HTML value.
 			let result;
 			try {
 				result = evaluate( entry );
+				if ( typeof result === 'function' ) {
+					result = result();
+				}
 			} catch {
 				result = undefined;
 			}
 			if ( result !== PENDING_GETTER ) {
-				if ( typeof result === 'function' ) {
-					result = result();
-				}
 				if ( isDangerousHTML( result ) ) {
 					lastValue.current = getDangerousHTML( result );
 				}

@@ -13,6 +13,7 @@ import '../index'; // Registers all core directives, including `html`.
 import { hydratedIslands, toVdom } from '../../vdom';
 import { store } from '../../store';
 import { asDangerousHTML, type DangerousHTML } from '../../html';
+import { getScope, resetScope } from '../../scopes';
 
 let namespaceCount = 0;
 
@@ -203,6 +204,68 @@ describe( 'data-wp-html', () => {
 			state.isValid = false;
 		} );
 		expect( target.innerHTML ).toBe( '<strong>Hi</strong>' );
+	} );
+
+	it( 'keeps content and restores scope when a function value throws', async () => {
+		const namespace = uniqueNamespace();
+		const { state } = store( namespace, {
+			// Reactive values used by the HTML element and its sibling.
+			state: {
+				// Controls whether the HTML function can return a token.
+				fail: true,
+				// Text rendered independently of the HTML function.
+				label: 'Hello',
+				/**
+				 * Resolves trusted HTML, or throws while unavailable.
+				 *
+				 * @return The trusted HTML token.
+				 */
+				render(): DangerousHTML {
+					if ( state.fail ) {
+						throw new Error( 'HTML unavailable' );
+					}
+					return asDangerousHTML( '<b>ok</b>' );
+				},
+			},
+		} );
+		const region = createRegion(
+			namespace,
+			'<div data-wp-html="state.render"><p>fallback</p></div><span data-wp-text="state.label"></span>'
+		);
+		const target = region.querySelector( 'div' )!;
+		const sibling = region.querySelector( 'span' )!;
+		const warnings = vi.spyOn( console, 'warn' );
+		const errors = vi.spyOn( console, 'error' );
+
+		try {
+			await act( () => hydrate( toVdom( region ), region.parentNode! ) );
+			expect( target.innerHTML ).toBe( '<p>fallback</p>' );
+			expect( sibling ).toHaveTextContent( /^Hello$/ );
+			expect( getScope() ).toBeUndefined();
+
+			await act( () => {
+				state.fail = false;
+				state.label = 'Ready';
+			} );
+			expect( target.innerHTML ).toBe( '<b>ok</b>' );
+			expect( sibling ).toHaveTextContent( /^Ready$/ );
+			expect( getScope() ).toBeUndefined();
+
+			await act( () => {
+				state.fail = true;
+				state.label = 'Unavailable';
+			} );
+			expect( target.innerHTML ).toBe( '<b>ok</b>' );
+			expect( sibling ).toHaveTextContent( /^Unavailable$/ );
+			expect( getScope() ).toBeUndefined();
+			expect( warnings ).not.toHaveBeenCalled();
+			expect( errors ).not.toHaveBeenCalled();
+		} finally {
+			// Keep a regression's leaked frames from affecting other tests.
+			while ( getScope() ) {
+				resetScope();
+			}
+		}
 	} );
 
 	it( 'ignores suffixed and unique-ID variants', async () => {
