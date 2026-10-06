@@ -170,3 +170,36 @@ test( 'lifecycle directives skip suffixes and keep three-hyphen IDs', async () =
 		developmentRoot.parentElement?.remove();
 	}
 } );
+
+test( 'negated functions remain unresolved and warn about derived state', async () => {
+	const { privateApis, store } = await import( '../index' );
+	const { toVdom, getRegionRootFragment, afterNextFrame } = privateApis(
+		'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
+	);
+
+	/** Records invocations of the negated action. */
+	const isClosed = vi.fn();
+	store( 'test/negated-functions', {
+		actions: { isClosed },
+	} );
+
+	vi.stubGlobal( 'SCRIPT_DEBUG', true );
+	const root = hydrateHtml(
+		'<div data-wp-interactive="test/negated-functions"><span data-wp-bind--hidden="!actions.isClosed"></span></div>',
+		toVdom,
+		getRegionRootFragment
+	);
+	const boundElement = root.querySelector( 'span' )!;
+
+	try {
+		await afterNextFrame( () => undefined );
+
+		expect( isClosed ).not.toHaveBeenCalled();
+		expect( boundElement ).not.toHaveAttribute( 'hidden' );
+		expect( console ).toHaveWarnedWith(
+			'The value of "actions.isClosed" is a function and cannot be negated. Please use derived state instead.'
+		);
+	} finally {
+		root.parentElement?.remove();
+	}
+} );
