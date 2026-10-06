@@ -12,8 +12,8 @@ Tracking issue: [#73411](https://github.com/WordPress/gutenberg/issues/73411). T
 
 | | Inline text and formatting | Structural (insert, remove, move) | Block attributes (alignment, heading level, color) |
 | --- | --- | --- | --- |
-| Example | Type, delete, paste, bold a word | Delete a block, add a block, drag a block | Change H2 to H3, align center |
-| Captured by | `beforeinput` / `cut` / `paste` "keyboards", plus a content reconciler for IME, autocorrect and drag-drop | Store interceptor (`registry.subscribe` diff) | `setAttributes` HOC, plus the store interceptor for direct dispatches |
+| Example | Type, delete, paste, bold a word | Delete a block, add a block, drag a block, paste a URL that becomes an Embed | Change H2 to H3, align center |
+| Captured by | `beforeinput` / `cut` / plain-text `paste` "keyboards", plus a content reconciler for IME, autocorrect, drag-drop and pastes the editor transforms | Store interceptor (`registry.subscribe` diff) | `setAttributes` HOC, plus the store interceptor for direct dispatches |
 | Pending state lives in | A `<mark class="wp-suggestion">` in the block's content | `metadata.suggestion` marker on the block, saved in `post_content` | An in-memory overlay |
 | Note payload | `inline-suggestion` op | `block-insert-after` / `block-remove` / `block-move` op | `attribute-set` op |
 | Survives reload | Yes | Yes | The Note does; the in-canvas preview does not |
@@ -105,7 +105,7 @@ flowchart BT
 | 6 | [#80432](https://github.com/WordPress/gutenberg/pull/80432) Review UI | Accept / Reject in the note header, the Docs-style summary ("Add: ...", "Delete: ...", "Change: heading level 2 to 3") with a bounded word diff | `collab-sidebar/suggestion-actions.tsx`, `suggestion-mode/suggestion-summary.tsx` |
 | 7 | [#80433](https://github.com/WordPress/gutenberg/pull/80433) Inline live wiring | The addition, deletion and format keyboards, the content reconciler, author colors and marker reveal, Note garbage collection, post title suggestions, clipboard strip, refusals (post status, publish), List View labels, PHP inline strip, a `core-data` CRDT serializer fix | `suggestion-mode/suggestion-*-keyboard.ts`, `suggestion-content-reconciler.ts`, `suggestion-note-gc.ts` |
 | 8 | [#82047](https://github.com/WordPress/gutenberg/pull/82047) Docs | This page and [suggestions.md](./suggestions.md) | `docs/explanations/architecture/` |
-| 9 | [#82048](https://github.com/WordPress/gutenberg/pull/82048) E2E | 18 Playwright specs covering every path above, plus perf harness changes. No production code | `test/e2e/specs/editor/various/suggestion-mode*.spec.ts` |
+| 9 | [#82048](https://github.com/WordPress/gutenberg/pull/82048) E2E | 19 Playwright specs covering every path above, plus perf harness changes. No production code | `test/e2e/specs/editor/various/suggestion-mode*.spec.ts`, `test/e2e/specs/site-editor/suggestion-mode-intent-shortcuts.spec.ts` |
 
 Some files are deliberately split across layers: `with-suggestion-overlay.tsx` and `store-interceptor.ts` start in #80429 and gain inline hand-offs in #80433; `provider.ts` starts in #80428 and gains inline apply / reject in #80433; `block-suggestions.php` gains meta in #80428, the structural strip in #80429 and the inline strip in #80433.
 
@@ -186,7 +186,7 @@ sequenceDiagram
     Note over S: Later keystrokes in the same run grow the same marker and note
 ```
 
-Deletes work the same way, wrapping the removed range in a `del` marker. Type-over produces one `replace` note with a `del` and an `add` run. Bold, italic and links produce one `format` marker whose Note records the original run as `beforeHTML`. Edits that arrive only as a new `content` value (IME commit, autocorrect, drag-drop) are diffed by the content reconciler into the same markers.
+Deletes work the same way, wrapping the removed range in a `del` marker. Type-over produces one `replace` note with a `del` and an `add` run. Bold, italic and links produce one `format` marker whose Note records the original run as `beforeHTML`. Edits that arrive only as a new `content` value (IME commit, autocorrect, drag-drop) are diffed by the content reconciler into the same markers. The paste handler only takes a paste the editor would insert as exact plain text. Any paste the editor transforms (Markdown, a linked email, a URL over a selection, formatting a Code block drops) goes through the normal paste pipeline, so the result matches Editing mode, and the reconciler proposes it.
 
 An edit that would overlap someone else's marker is declined with a notice rather than nesting markers.
 
@@ -217,7 +217,7 @@ sequenceDiagram
     P->>S: Write metadata.noteId on the block
 ```
 
-Inserts keep the new block in place and tag it `pending-insert`. Moves keep the block at its new position, tag it `pending-move` with from and to anchors, and draw a ghost at the origin. A list indent or outdent is captured as a move of the item, not as an insert plus a remove.
+Inserts keep the new block in place and tag it `pending-insert`. Moves keep the block at its new position, tag it `pending-move` with from and to anchors, and draw a ghost at the origin. A list indent or outdent is captured as a move of the item, not as an insert plus a remove. A paste that converts to a block (a URL in an empty paragraph to an Embed, LaTeX to a Math block) is a block replacement: a `pending-remove` paragraph and a `pending-insert` block in one group.
 
 ## Data flow: a block attribute suggestion
 
