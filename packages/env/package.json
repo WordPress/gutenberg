@@ -53,7 +53,7 @@
 		"js-yaml": "^3.15.2",
 		"ora": "^4.0.2",
 		"rimraf": "^5.0.10",
-		"simple-git": "^3.32.3",
+		"simple-git": "^4.0.2",
 		"yargs": "^17.3.0"
 	},
 	"devDependencies": {
