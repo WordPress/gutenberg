@@ -148,7 +148,7 @@ export function NoteThread( {
 	}
 
 	function handleResolve() {
-		onEditNote( { id: note.id, status: 'approved' } );
+		onEditNote( note, { status: 'approved' } );
 		onDeselectNote();
 		if ( isFloating ) {
 			relatedBlockElement?.focus();
@@ -301,8 +301,7 @@ export function NoteThread( {
 						onSubmit={ ( inputComment ) => {
 							if ( 'approved' === note.status ) {
 								// For reopening, include the content in the reopen action.
-								return onEditNote( {
-									id: note.id,
+								return onEditNote( note, {
 									status: 'hold',
 									content: inputComment,
 								} );
