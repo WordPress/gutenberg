@@ -72,6 +72,7 @@ const ALLOWLIST = {
 			'Drawer',
 			'IconButton',
 			'Menu',
+			'Meter',
 			'Popover',
 			'Progress',
 			'SearchableSelect',

@@ -321,7 +321,7 @@ Add a block that displays content pulled from other sites, like Twitter or YouTu
 
 -	**Name:** [core/embed](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-embed/core-block-embed/)
 -	**Category:** [embed](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-embed/)
--	**Supports:** align, anchor, interactivity (clientNavigation), spacing (margin)
+-	**Supports:** align, anchor, interactivity (clientNavigation), spacing (margin, padding)
 -	**Attributes:** allowResponsive, caption, previewable, providerNameSlug, responsive, type, url
 
 ## File
@@ -440,7 +440,7 @@ An organized collection of items displayed in a specific order.
 -	**Name:** [core/list](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-list/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
 -	**Allowed Blocks:** core/list-item
--	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), listView, shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), interactivity (clientNavigation), listView, shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** ordered, placeholder, reversed, start, type, values
 
 ## List Item
@@ -451,7 +451,7 @@ An individual item within a list.
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
 -	**Parent:** core/list
 -	**Allowed Blocks:** core/list
--	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight), ~~className~~, ~~html~~
+-	**Supports:** anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight), ~~className~~, ~~html~~
 -	**Attributes:** content, placeholder
 
 ## Login/out
@@ -478,7 +478,7 @@ Set media and words side-by-side for a richer layout.
 
 -	**Name:** [core/media-text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-media-text/)
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
--	**Supports:** align (full, wide), allowedBlocks, anchor, color (background, button, gradients, heading, link, text), dimensions (minHeight, minWidth), filter (duotone), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), allowedBlocks, anchor, color (background, button, gradients, heading, link, text), dimensions (minHeight, minWidth), filter (duotone), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** align, focalPoint, href, imageFill, isStackedOnMobile, linkClass, linkDestination, linkTarget, mediaAlt, mediaId, mediaLink, mediaPosition, mediaSizeSlug, mediaType, mediaUrl, mediaWidth, rel, useFeaturedImage, verticalAlignment
 
 ## Unsupported
