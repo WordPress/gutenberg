@@ -32,16 +32,12 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			'additionalProperties' => array(
 				'type'       => 'object',
 				'properties' => array(
-					'count'          => array(
+					'count'                 => array(
 						'description' => __( 'Total number of reactions with this emoji.', 'gutenberg' ),
 						'type'        => 'integer',
 					),
-					'reacted'        => array(
-						'description' => __( 'Whether the current user reacted with this emoji.', 'gutenberg' ),
-						'type'        => 'boolean',
-					),
-					'my_reaction_id' => array(
-						'description' => __( 'The current user\'s reaction comment ID, or 0 if not reacted.', 'gutenberg' ),
+					'current_user_reaction' => array(
+						'description' => __( 'The current user\'s reaction comment ID for this emoji, or 0 if they have not reacted.', 'gutenberg' ),
 						'type'        => 'integer',
 					),
 				),
@@ -906,15 +902,13 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		}
 
 		foreach ( $counts as $row ) {
-			$note_id        = (int) $row->comment_parent;
-			$slug           = wp_strip_all_tags( $row->comment_content );
-			$key            = $note_id . ':' . $slug;
-			$my_reaction_id = $my_reactions[ $key ] ?? 0;
+			$note_id = (int) $row->comment_parent;
+			$slug    = wp_strip_all_tags( $row->comment_content );
+			$key     = $note_id . ':' . $slug;
 
 			$this->reaction_summaries[ $note_id ][ $slug ] = array(
-				'count'          => (int) $row->reaction_count,
-				'reacted'        => $my_reaction_id > 0,
-				'my_reaction_id' => $my_reaction_id,
+				'count'                 => (int) $row->reaction_count,
+				'current_user_reaction' => $my_reactions[ $key ] ?? 0,
 			);
 		}
 	}

@@ -1175,7 +1175,7 @@ test.describe( 'Block Notes', () => {
 
 			// Add the same reaction again. This used to fail two ways:
 			// 1) the parent note's cached `reaction_summary` still
-			//    reported the removed heart as `reacted`, so the toggle
+			//    carried the removed heart's `current_user_reaction`, so the toggle
 			//    attempted to delete a now-missing comment record
 			//    instead of routing to add; and 2) the server's
 			//    duplicate-reaction guard included trashed comments,

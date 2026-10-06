@@ -14,9 +14,9 @@ import { useEmojiLabel } from './emojibase-data';
 
 interface ReactionSummaryEntry {
 	count: number;
-	reacted?: boolean;
-	// The current user's reaction comment ID, used to delete it again.
-	my_reaction_id?: number;
+	// The current user's reaction comment ID, used to delete it again;
+	// 0 when they have not reacted with this emoji.
+	current_user_reaction: number;
 }
 
 /**
@@ -57,7 +57,7 @@ function hasUserReacted(
 	reactions: ReactionSummary | null | undefined,
 	hexKey: string
 ): boolean {
-	return reactions?.[ hexKey ]?.reacted || false;
+	return ( reactions?.[ hexKey ]?.current_user_reaction ?? 0 ) > 0;
 }
 
 /**

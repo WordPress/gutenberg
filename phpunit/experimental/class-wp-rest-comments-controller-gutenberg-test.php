@@ -973,8 +973,9 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$this->assertArrayHasKey( 'reaction_summary', $data );
 		$this->assertArrayHasKey( '2764', $data['reaction_summary'] );
 		$this->assertSame( 1, $data['reaction_summary']['2764']['count'] );
-		$this->assertTrue( $data['reaction_summary']['2764']['reacted'] );
-		$this->assertSame( $reaction_id, $data['reaction_summary']['2764']['my_reaction_id'] );
+		$this->assertSame( $reaction_id, $data['reaction_summary']['2764']['current_user_reaction'] );
+		$this->assertArrayNotHasKey( 'reacted', $data['reaction_summary']['2764'] );
+		$this->assertArrayNotHasKey( 'my_reaction_id', $data['reaction_summary']['2764'] );
 	}
 
 	public function test_reaction_summary_shows_not_reacted_for_other_user() {
@@ -1004,8 +1005,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 
 		$this->assertArrayHasKey( 'reaction_summary', $data );
 		$this->assertSame( 1, $data['reaction_summary']['2764']['count'] );
-		$this->assertFalse( $data['reaction_summary']['2764']['reacted'] );
-		$this->assertSame( 0, $data['reaction_summary']['2764']['my_reaction_id'] );
+		$this->assertSame( 0, $data['reaction_summary']['2764']['current_user_reaction'] );
 	}
 
 	/**
@@ -1047,7 +1047,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$this->assertCount( 2, $data );
 		foreach ( $data as $note ) {
 			$this->assertSame( 1, $note['reaction_summary']['2764']['count'] );
-			$this->assertTrue( $note['reaction_summary']['2764']['reacted'] );
+			$this->assertGreaterThan( 0, $note['reaction_summary']['2764']['current_user_reaction'] );
 		}
 		// One counts query and one current-user query for the whole page.
 		$this->assertSame( 2, $summary_queries );

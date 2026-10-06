@@ -23,7 +23,7 @@ export interface ReactionTarget {
  *
  * Used to keep `reaction_summary` usable when the refetch that would
  * normally replace it fails: without it, the next toggle reads a stale
- * `reacted` / `my_reaction_id` pair and takes the wrong branch.
+ * `current_user_reaction` and takes the wrong branch.
  *
  * @param note            The cached note record.
  * @param hexKey          The reaction hex key that changed.
@@ -42,18 +42,17 @@ export function applyReactionDelta< T extends ReactionTarget >(
 	if ( addedReactionId ) {
 		// Concurrent adds converge server-side on one surviving row, so a
 		// repeated ID is already counted.
-		if ( entry?.my_reaction_id === addedReactionId ) {
+		if ( entry?.current_user_reaction === addedReactionId ) {
 			return note;
 		}
 		summary[ hexKey ] = {
 			count: ( entry?.count || 0 ) + 1,
-			reacted: true,
-			my_reaction_id: addedReactionId,
+			current_user_reaction: addedReactionId,
 		};
 	} else if ( entry ) {
 		const count = entry.count - 1;
 		if ( count > 0 ) {
-			summary[ hexKey ] = { count, reacted: false };
+			summary[ hexKey ] = { count, current_user_reaction: 0 };
 		} else {
 			delete summary[ hexKey ];
 		}
@@ -91,9 +90,7 @@ export function useReaction( note: ReactionTarget ) {
 	const toggleReaction = useCallback(
 		async ( hexKey: string ) => {
 			const entry = reactions?.[ hexKey ];
-			const myReactionId = entry?.reacted
-				? entry.my_reaction_id
-				: undefined;
+			const myReactionId = entry?.current_user_reaction || undefined;
 			const isRemoving = !! myReactionId;
 			let addedReactionId: number | undefined;
 
@@ -147,7 +144,7 @@ export function useReaction( note: ReactionTarget ) {
 
 			// Mutating a reaction comment doesn't invalidate the cached
 			// `reaction_summary`, so a subsequent toggle would read stale
-			// `reacted` / `my_reaction_id` data and route into the wrong
+			// `current_user_reaction` data and route into the wrong
 			// branch (deleting an already-removed comment).
 			//
 			// The mutation has landed, so fold its known effect into the

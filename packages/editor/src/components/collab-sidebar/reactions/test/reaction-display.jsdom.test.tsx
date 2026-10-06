@@ -18,8 +18,8 @@ function renderPills() {
 		<ReactionDisplay
 			noteId={ NOTE_ID }
 			reactions={ {
-				2764: { count: 2 },
-				'1f44d': { count: 1 },
+				2764: { count: 2, current_user_reaction: 0 },
+				'1f44d': { count: 1, current_user_reaction: 42 },
 			} }
 			onToggleReaction={ () => {} }
 		/>
@@ -32,6 +32,13 @@ describe( 'ReactionDisplay', () => {
 		invalidateReactionNames( NOTE_ID );
 		vi.mocked( apiFetch ).mockReset();
 		vi.mocked( apiFetch ).mockResolvedValue( REACTIONS );
+	} );
+
+	it( 'marks a pill pressed only when the current user reacted with it', () => {
+		const [ heart, thumbsUp ] = renderPills();
+
+		expect( heart ).toHaveAttribute( 'aria-pressed', 'false' );
+		expect( thumbsUp ).toHaveAttribute( 'aria-pressed', 'true' );
 	} );
 
 	it( 'fetches the reactions on a note once for all of its pills', async () => {
