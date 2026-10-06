@@ -55,7 +55,7 @@ type MediaGridProps = {
 	/**
 	 * The item whose insert is in flight, shown with a spinner.
 	 */
-	insertingId?: string | number;
+	insertingId?: string;
 	/**
 	 * Per-item actions, shown in each card's menu.
 	 */
@@ -187,10 +187,7 @@ export default function MediaGrid( {
 					<MediaGridPreview
 						item={ item }
 						mediaType={ mediaType }
-						isInserting={
-							insertingId !== undefined &&
-							getItemId( item ) === String( insertingId )
-						}
+						isInserting={ getItemId( item ) === insertingId }
 					/>
 				),
 			},

@@ -18,10 +18,14 @@ const ALLOWED_MEDIA_TYPES = [ 'image' ];
  * happen (no permission, or the host blocks the fetch) the caller is handed a
  * `pendingExternalBlock` to confirm inserting as an external image.
  *
+ * `insert` takes the item's id alongside the block: it marks which item is
+ * uploading and doubles as the guard against a second insert starting while
+ * one is in flight, so callers always pass one.
+ *
  * @param {Function} onInsert Called with the block to insert.
  * @return {{
- *   insert: (block: Object, itemId?: string|number) => void,
- *   insertingId: string|number|undefined,
+ *   insert: (block: Object, itemId: string) => void,
+ *   insertingId: string|undefined,
  *   pendingExternalBlock: Object|undefined,
  *   confirmExternalInsert: () => void,
  *   cancelExternalInsert: () => void,
@@ -60,7 +64,7 @@ export function useMediaInsert( onInsert ) {
 				return;
 			}
 
-			setInsertingId( itemId ?? url );
+			setInsertingId( itemId );
 			// Media item does not exist in library, so try to upload it.
 			// Fist fetch the image data. This may fail if the image host
 			// doesn't allow CORS with the domain.
