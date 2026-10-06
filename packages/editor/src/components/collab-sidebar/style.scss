@@ -278,40 +278,6 @@
 	bottom: $grid-unit-10;
 }
 
-.editor-note-indicator__avatar {
-	width: $icon-size;
-	border-radius: $radius-round;
-	margin-left: -12px;
-	border-width: var(--wp-admin-border-width-focus);
-	border-style: solid;
-	padding: var(--wp-admin-border-width-focus);
-	background: $white;
-	box-sizing: border-box;
-
-	&:first-child {
-		margin-left: 0;
-	}
-}
-
-.editor-note-indicator__overflow {
-	font-weight: var(--wpds-typography-font-weight-emphasis);
-}
-
-.show-icon-labels {
-	.editor-note-indicator {
-		width: auto;
-		// Hide the user avatars container when labels are set to display...
-		div {
-			display: none;
-		}
-		// ... and display labels.
-		&::after {
-			content: attr(aria-label);
-			font-size: $helptext-font-size;
-		}
-	}
-}
-
 // Inline-note highlight applied to the `core/note` marker (`mark.wp-note`).
 // Each marker is tinted by `<NoteHighlightStyles>` using the note author's
 // color from `AVATAR_BORDER_COLORS`; this base rule only provides shared
