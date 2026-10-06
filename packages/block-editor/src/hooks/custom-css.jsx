@@ -97,12 +97,16 @@ function getCustomCSSStateEntries( style, blockName, viewportSettings ) {
  *
  * @param {Object[]} entries      Entries from `getCustomCSSStateEntries()`.
  * @param {string}   baseSelector Selector scoping this block instance.
- * @return {string|undefined} Generated CSS, or undefined if there is none.
+ * @return {string|undefined} Generated CSS, or undefined if there are no rules.
  */
-function renderCustomCSSStateEntries( entries, baseSelector ) {
+export function processCustomCSSStateEntries( entries, baseSelector ) {
 	const rules = [];
 
 	entries.forEach( ( { css, pseudoState, mediaQuery } ) => {
+		if ( ! validateCSS( css ) ) {
+			return;
+		}
+
 		const selector = pseudoState
 			? `${ baseSelector }${ pseudoState }`
 			: baseSelector;
@@ -116,16 +120,6 @@ function renderCustomCSSStateEntries( entries, baseSelector ) {
 	} );
 
 	return rules.length ? rules.join( '\n' ) : undefined;
-}
-
-/**
- * Filters custom CSS state entries that contain HTML markup.
- *
- * @param {Object[]} entries Custom CSS state entries.
- * @return {Object[]} Valid custom CSS state entries.
- */
-export function getValidCustomCSSStateEntries( entries ) {
-	return entries.filter( ( { css } ) => validateCSS( css ) );
 }
 
 /**
@@ -249,12 +243,6 @@ function useBlockProps( { style, clientId, name } ) {
 	// Keep valid CSS states even when another state contains HTML markup,
 	// matching the server-side rendering in
 	// gutenberg_render_custom_css_support_styles().
-	const validCustomCSSStateEntries = useMemo(
-		() => getValidCustomCSSStateEntries( customCSSStateEntries ),
-		[ customCSSStateEntries ]
-	);
-	const hasValidCSS = validCustomCSSStateEntries.length > 0;
-
 	const canEditCSS = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().canEditCSS,
 		[]
@@ -289,15 +277,14 @@ function useBlockProps( { style, clientId, name } ) {
 
 	// Transform the custom CSS using the same logic as global styles.
 	// Only process CSS states that don't contain HTML markup.
-	const transformedCSS = useMemo( () => {
-		if ( ! hasValidCSS ) {
-			return undefined;
-		}
-		return renderCustomCSSStateEntries(
-			validCustomCSSStateEntries,
-			customCSSSelector
-		);
-	}, [ hasValidCSS, validCustomCSSStateEntries, customCSSSelector ] );
+	const transformedCSS = useMemo(
+		() =>
+			processCustomCSSStateEntries(
+				customCSSStateEntries,
+				customCSSSelector
+			),
+		[ customCSSStateEntries, customCSSSelector ]
+	);
 
 	// Inject the CSS via style override. The type makes EditorStyles print
 	// it after all other overrides (e.g. block style variations), matching
@@ -310,8 +297,8 @@ function useBlockProps( { style, clientId, name } ) {
 		__unstableType: 'custom-css',
 	} );
 
-	// Only add the class if there's valid custom CSS.
-	if ( ! hasValidCSS ) {
+	// Only add the class if custom CSS produced rules.
+	if ( ! transformedCSS ) {
 		return {};
 	}
 
@@ -333,8 +320,15 @@ function addSaveProps( props, blockType, attributes ) {
 		return props;
 	}
 
+	const customCSSStateEntries = getCustomCSSStateEntries(
+		attributes?.style,
+		blockType.name
+	);
 	if (
-		! getCustomCSSStateEntries( attributes?.style, blockType.name ).length
+		! processCustomCSSStateEntries(
+			customCSSStateEntries,
+			'.wp-custom-css'
+		)
 	) {
 		return props;
 	}

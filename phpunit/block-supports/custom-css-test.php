@@ -76,6 +76,31 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that custom CSS which produces no rules does not add a class name.
+	 *
+	 * @covers ::gutenberg_render_custom_css_support_styles
+	 */
+	public function test_custom_css_support_does_not_add_class_name_when_processing_produces_no_css() {
+		$this->register_custom_css_block_with_support(
+			'test/custom-css-empty-output',
+			array( 'customCSS' => true )
+		);
+
+		$parsed_block = array(
+			'blockName' => 'test/custom-css-empty-output',
+			'attrs'     => array(
+				'style' => array(
+					'css' => '&',
+				),
+			),
+		);
+
+		$result = gutenberg_render_custom_css_support_styles( $parsed_block );
+
+		$this->assertArrayNotHasKey( 'className', $result['attrs'] );
+	}
+
+	/**
 	 * Tests that custom CSS support preserves existing className.
 	 *
 	 * @covers ::gutenberg_render_custom_css_support_styles
@@ -451,11 +476,11 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that valid CSS state entries are preserved when another state contains HTML.
+	 * Tests that valid CSS state entries are processed when another state contains HTML.
 	 *
-	 * @covers ::gutenberg_get_valid_custom_css_state_entries
+	 * @covers ::gutenberg_process_custom_css_state_entries
 	 */
-	public function test_custom_css_keeps_valid_state_entries_when_filtering_invalid_css() {
+	public function test_custom_css_processes_valid_state_entries_when_another_state_contains_html() {
 		$valid_entry = array(
 			'css'         => 'color: red;',
 			'pseudo'      => null,
@@ -471,7 +496,10 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$this->assertSame( array( $valid_entry ), gutenberg_get_valid_custom_css_state_entries( $entries ) );
+		$result = gutenberg_process_custom_css_state_entries( $entries, '.test-block' );
+
+		$this->assertStringContainsString( 'color: red', $result );
+		$this->assertStringNotContainsString( '<script>', $result );
 	}
 
 	/**

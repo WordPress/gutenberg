@@ -75,20 +75,33 @@ function gutenberg_get_custom_css_state_entries( $style, $block_name ) {
 }
 
 /**
- * Filters custom CSS state entries that contain HTML markup.
+ * Validates and processes custom CSS state entries.
  *
  * @param array[] $state_entries Custom CSS state entries.
- * @return array[] Valid custom CSS state entries.
+ * @param string  $selector      Selector scoping the block instance.
+ * @return string Processed CSS.
  */
-function gutenberg_get_valid_custom_css_state_entries( $state_entries ) {
-	return array_values(
-		array_filter(
-			$state_entries,
-			static function ( $entry ) {
-				return ! preg_match( '#</?\w+#', $entry['css'] );
-			}
-		)
-	);
+function gutenberg_process_custom_css_state_entries( $state_entries, $selector ) {
+	$processed_css = '';
+
+	foreach ( $state_entries as $entry ) {
+		if ( preg_match( '#</?\w+#', $entry['css'] ) ) {
+			continue;
+		}
+
+		$entry_selector = null !== $entry['pseudo'] ? $selector . $entry['pseudo'] : $selector;
+		$entry_css      = WP_Theme_JSON_Gutenberg::process_blocks_custom_css( $entry['css'], $entry_selector );
+
+		if ( empty( $entry_css ) ) {
+			continue;
+		}
+
+		$processed_css .= null !== $entry['media_query']
+			? $entry['media_query'] . '{' . $entry_css . '}'
+			: $entry_css;
+	}
+
+	return $processed_css;
 }
 
 /**
@@ -128,55 +141,35 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 		return $parsed_block;
 	}
 
-	// Skip CSS containing HTML markup, matching global styles REST API validation.
-	$state_entries = gutenberg_get_valid_custom_css_state_entries( $state_entries );
-	if ( empty( $state_entries ) ) {
+	// Generate a unique class name for this block instance.
+	$class_name    = wp_unique_id_from_values( $parsed_block, 'wp-custom-css-' );
+	$processed_css = gutenberg_process_custom_css_state_entries( $state_entries, '.' . $class_name );
+	if ( '' === $processed_css ) {
 		return $parsed_block;
 	}
 
-	// Generate a unique class name for this block instance.
-	$class_name          = wp_unique_id_from_values( $parsed_block, 'wp-custom-css-' );
-	$existing_class_name = $parsed_block['attrs']['className'] ?? null;
-	$updated_class_name  = is_string( $existing_class_name )
+	$existing_class_name                = $parsed_block['attrs']['className'] ?? null;
+	$updated_class_name                 = is_string( $existing_class_name )
 		? "$existing_class_name $class_name"
 		: $class_name;
-
 	$parsed_block['attrs']['className'] = $updated_class_name;
 
-	// Process the custom CSS using the same method as global styles, for every state.
-	$selector      = '.' . $class_name;
-	$processed_css = '';
-	foreach ( $state_entries as $entry ) {
-		$entry_selector = null !== $entry['pseudo'] ? $selector . $entry['pseudo'] : $selector;
-		$entry_css      = WP_Theme_JSON_Gutenberg::process_blocks_custom_css( $entry['css'], $entry_selector );
-
-		if ( empty( $entry_css ) ) {
-			continue;
-		}
-
-		$processed_css .= null !== $entry['media_query']
-			? $entry['media_query'] . '{' . $entry_css . '}'
-			: $entry_css;
+	/**
+	 * Reuse one handle so identical custom CSS is enqueued only once via
+	 * {@see wp_unique_id_from_values()}. Explicitly declare the `wp-block-library`
+	 * dependency so `global-styles` is guaranteed to print after it, preventing
+	 * block default styles from unintentionally overriding global styles.
+	 */
+	$handle = 'wp-block-custom-css';
+	if ( ! wp_style_is( $handle, 'registered' ) ) {
+		wp_register_style( $handle, false, array( 'wp-block-library', 'global-styles' ) );
 	}
-
-	if ( ! empty( $processed_css ) ) {
-		/**
-		 * Reuse one handle so identical custom CSS is enqueued only once via
-		 * {@see wp_unique_id_from_values()}. Explicitly declare the `wp-block-library`
-		 * dependency so `global-styles` is guaranteed to print after it, preventing
-		 * block default styles from unintentionally overriding global styles.
-		 */
-		$handle = 'wp-block-custom-css';
-		if ( ! wp_style_is( $handle, 'registered' ) ) {
-			wp_register_style( $handle, false, array( 'wp-block-library', 'global-styles' ) );
-		}
-		$after_styles = wp_styles()->get_data( $handle, 'after' );
-		if ( ! is_array( $after_styles ) ) {
-			$after_styles = array();
-		}
-		if ( ! in_array( $processed_css, $after_styles, true ) ) {
-			wp_add_inline_style( $handle, $processed_css );
-		}
+	$after_styles = wp_styles()->get_data( $handle, 'after' );
+	if ( ! is_array( $after_styles ) ) {
+		$after_styles = array();
+	}
+	if ( ! in_array( $processed_css, $after_styles, true ) ) {
+		wp_add_inline_style( $handle, $processed_css );
 	}
 
 	return $parsed_block;
