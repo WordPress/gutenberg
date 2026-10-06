@@ -1,7 +1,6 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { parseSync, traverse } from '@babel/core';
-import type { Node, ObjectExpression } from '@babel/types';
+import { loadCsf } from 'storybook/internal/csf-tools';
 import { describe, expect, it } from 'vitest';
 import { storyGlobs } from '../story-globs';
 
@@ -69,73 +68,6 @@ function findStoryFiles() {
 }
 
 /**
- * Unwraps the `as`/`satisfies` assertions Storybook metas are often written
- * with, returning the object expression underneath.
- *
- * @param node The default export, or a variable's initializer.
- * @return The object expression, or `undefined` for anything else.
- */
-function toObjectExpression(
-	node: Node | null | undefined
-): ObjectExpression | undefined {
-	let current = node;
-	while (
-		current?.type === 'TSAsExpression' ||
-		current?.type === 'TSSatisfiesExpression'
-	) {
-		current = current.expression;
-	}
-	return current?.type === 'ObjectExpression' ? current : undefined;
-}
-
-/**
- * Finds the meta object a CSF file exports by default, whether it is written
- * inline (`export default { ... }`) or through a variable
- * (`const meta = { ... }`).
- *
- * @param source The file's contents.
- * @return The meta object, or `undefined` when there is no object to find.
- */
-function findMeta( source: string ): ObjectExpression | undefined {
-	const ast = parseSync( source, {
-		babelrc: false,
-		configFile: false,
-		filename: 'story.tsx',
-		parserOpts: { plugins: [ 'typescript', 'jsx' ] },
-	} );
-	if ( ! ast ) {
-		return undefined;
-	}
-
-	let meta: ObjectExpression | undefined;
-	let metaName: string | undefined;
-
-	traverse( ast, {
-		ExportDefaultDeclaration( { node } ) {
-			meta = toObjectExpression( node.declaration );
-			if ( ! meta && node.declaration.type === 'Identifier' ) {
-				metaName = node.declaration.name;
-			}
-		},
-	} );
-
-	if ( ! meta && metaName ) {
-		traverse( ast, {
-			VariableDeclarator( { node } ) {
-				if (
-					node.id.type === 'Identifier' &&
-					node.id.name === metaName
-				) {
-					meta = toObjectExpression( node.init );
-				}
-			},
-		} );
-	}
-
-	return meta;
-}
-
-/**
  * Whether a story or doc pins its own URL with an `id`.
  *
  * An MDX doc attached to a CSF file with `of={ ... }` inherits that file's ID,
@@ -152,14 +84,12 @@ function hasStableId( file: string ) {
 		return /\bid=/.test( tag ) || /\bof=/.test( tag );
 	}
 
-	return Boolean(
-		findMeta( source )?.properties.some(
-			( property ) =>
-				property.type === 'ObjectProperty' &&
-				property.key.type === 'Identifier' &&
-				property.key.name === 'id'
-		)
-	);
+	// Storybook's own CSF parser only fills in `id` when the meta declares one.
+	const csf = loadCsf( source, {
+		fileName: file,
+		makeTitle: ( title ) => title,
+	} ).parse();
+	return Boolean( csf._meta?.id );
 }
 
 describe( 'story IDs', () => {
