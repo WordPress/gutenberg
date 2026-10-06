@@ -114,7 +114,7 @@
 	/*
 	 * These dev files import sources outside the build's TypeScript allowlist.
 	 * TypeScript unit tests are checked separately by test:unit:conventions.
-   *
+	 *
 	 * Each excluded file imports a component the build allowlist does not
 	 * type yet. A composite project has to resolve every relative import
 	 * within its own program, so including one of these would mean adding
@@ -127,7 +127,6 @@
 		"src/components/contrast-checker/stories/index.story.ts",
 		"src/components/inspector-controls-tabs/test/use-inspector-controls-tabs.jsdom.test.tsx",
 		"src/hooks/test/utils.jsdom.test.tsx",
-		"src/components/inspector-controls-tabs/test/advanced-panels.jsdom.test.tsx",
-		"src/components/inspector-controls-tabs/test/additional-styles.jsdom.test.tsx"
+		"src/components/inspector-controls-tabs/test/advanced-panels.jsdom.test.tsx"
 	]
 }
