@@ -828,53 +828,6 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		return $data;
 	}
 
-	public function test_reaction_emojis_filter_affects_validation() {
-		$custom_emoji = array(
-			array(
-				'emoji' => '👍',
-				'label' => 'Thumbs Up',
-				'value' => 'thumbsup',
-			),
-		);
-
-		$filter = function () use ( $custom_emoji ) {
-			return $custom_emoji;
-		};
-		add_filter( 'gutenberg_note_reaction_emojis', $filter );
-
-		try {
-			wp_set_current_user( self::$editor_id );
-			$post_id = self::factory()->post->create();
-			$note_id = $this->create_note( $post_id, self::$editor_id );
-
-			// The custom emoji should be accepted.
-			$params  = array(
-				'post'    => $post_id,
-				'type'    => 'reaction',
-				'parent'  => $note_id,
-				'content' => 'thumbsup',
-				'author'  => self::$editor_id,
-			);
-			$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
-			$request->add_header( 'Content-Type', 'application/json' );
-			$request->set_body( wp_json_encode( $params ) );
-			$response = rest_get_server()->dispatch( $request );
-			$this->assertSame( 201, $response->get_status() );
-
-			// A previously-default emoji should now be rejected.
-			$params['content'] = 'heart';
-			$request           = new WP_REST_Request( 'POST', '/wp/v2/comments' );
-			$request->add_header( 'Content-Type', 'application/json' );
-			$request->set_body( wp_json_encode( $params ) );
-			$response = rest_get_server()->dispatch( $request );
-			$this->assertErrorResponse( 'rest_comment_invalid_reaction', $response, 400 );
-		} finally {
-			// Always remove the filter so a failed assertion above does not
-			// leak it into the rest of the suite.
-			remove_filter( 'gutenberg_note_reaction_emojis', $filter );
-		}
-	}
-
 	public function test_schema_includes_reaction_summary() {
 		$controller = new Gutenberg_REST_Comment_Controller_7_2();
 		$schema     = $controller->get_item_schema();

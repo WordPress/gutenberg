@@ -9,13 +9,14 @@ import { Dropdown } from '@wordpress/components';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Button, IconButton, Stack, Tooltip } from '@wordpress/ui';
 import { reaction as reactionIcon } from '@wordpress/icons';
-import { useState, useCallback, useMemo } from '@wordpress/element';
+import { useState, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import ReactionEmojiPicker, {
 	buildEmojiBySlugMap,
-	useReactionEmojis,
 } from './reaction-emoji-picker';
+
+const EMOJI_BY_SLUG = buildEmojiBySlugMap();
 
 interface ReactionSummaryEntry {
 	count: number;
@@ -360,13 +361,6 @@ export default function ReactionDisplay( {
 	onToggleReaction,
 	children,
 }: ReactionDisplayProps ) {
-	// The list is filterable server-side (and static per page load),
-	// so index it once per list identity.
-	const emojis = useReactionEmojis();
-	const emojiBySlug = useMemo(
-		() => buildEmojiBySlugMap( emojis ),
-		[ emojis ]
-	);
 	const reactedSlugs = getReactedSlugs( reactions );
 
 	if ( reactedSlugs.length === 0 && ! children ) {
@@ -385,7 +379,7 @@ export default function ReactionDisplay( {
 			{ reactedSlugs.map( ( slug ) => {
 				const count = getReactionCount( reactions, slug );
 				const isActive = hasUserReacted( reactions, slug );
-				const entry = emojiBySlug.get( slug );
+				const entry = EMOJI_BY_SLUG.get( slug );
 
 				return (
 					<ReactionButton

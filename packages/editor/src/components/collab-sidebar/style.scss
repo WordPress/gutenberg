@@ -436,36 +436,23 @@ mark.wp-note {
 }
 
 // Split the Dropdown's default 8px `.components-popover__content` padding
-// between the popover and the scrolling emoji group below, so the emoji buttons
-// keep the same breathing room while their focus ring stays inside the
-// scroll container instead of being clipped by it.
+// between the popover and the emoji group below, so the emoji buttons keep
+// the same breathing room around their focus ring.
 .editor-collab-sidebar-panel__add-reaction-popover .components-popover__content {
 	padding: $grid-unit-05;
 }
 
 .editor-collab-sidebar-panel__emoji-picker {
 	display: flex;
-	// The emoji list is filterable server-side, so it can grow well
-	// beyond the 5 defaults. Wrap into rows of 8 (32px compact
-	// buttons) and scroll past 6 rows instead of letting the popover
-	// grow unbounded.
-	flex-wrap: wrap;
 	// `.components-popover__content` is `width: min-content`, which would
-	// otherwise squeeze this wrapping row down to one column per emoji.
+	// otherwise squeeze this row down to one column per emoji.
 	width: max-content;
-	// Scrolling clips on both axes, so leave room for the focus ring of
-	// the buttons on the edges. The padding is added to the row and column
-	// caps below, which are border-box measurements.
 	padding: $grid-unit-05;
-	max-width: 8 * 32px + 2 * $grid-unit-05;
-	max-height: 6 * 32px + 2 * $grid-unit-05;
-	overflow-y: auto;
 }
 
 .editor-collab-sidebar-panel__emoji-option {
-	// Pin the track to 32px so the `max-width` above lands exactly 8 emoji
-	// per row; the compact Button's own padding and minimum size would
-	// otherwise widen the flex item past the 32px width.
+	// Pin each button to 32px; the compact Button's own padding and minimum
+	// size would otherwise widen the flex item.
 	flex: 0 0 32px;
 	min-width: 0;
 	padding: 0;

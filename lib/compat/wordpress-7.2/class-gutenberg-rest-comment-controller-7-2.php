@@ -470,10 +470,9 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				);
 			}
 
-			// Validate the reaction content against the allowed emoji list
-			// (filterable via `gutenberg_note_reaction_emojis`). Only a slug
-			// from that list is accepted: it is the one value the picker can
-			// render back as an emoji and label. Raw emoji bytes are rejected
+			// Validate the reaction content against the allowed emoji list.
+			// Only a slug from that list is accepted: it is the one value the
+			// picker can render back as an emoji and label. Raw emoji bytes are rejected
 			// because the comments table is not guaranteed to be utf8mb4
 			// across all WordPress installs; clients submit the slug instead.
 			$emojis      = gutenberg_get_note_reaction_emojis();

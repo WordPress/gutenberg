@@ -181,7 +181,7 @@ add_filter( 'pre_wp_update_comment_count_now', 'gutenberg_exclude_notes_from_com
  * @return array[] List of emoji definitions.
  */
 function gutenberg_get_note_reaction_emojis() {
-	$default_emojis = array(
+	return array(
 		array(
 			'emoji' => '❤️',
 			'label' => _x( 'Heart', 'emoji reaction', 'gutenberg' ),
@@ -208,32 +208,7 @@ function gutenberg_get_note_reaction_emojis() {
 			'value' => 'rocket',
 		),
 	);
-
-	/**
-	 * Filters the list of allowed emojis for note reactions.
-	 *
-	 * @since 7.2.0
-	 *
-	 * @param array[] $emojis List of emoji definitions. Each item has
-	 *                        `emoji`, `label`, and `value` keys.
-	 */
-	return apply_filters( 'gutenberg_note_reaction_emojis', $default_emojis );
 }
-
-/**
- * Injects the note reaction emoji list into block editor settings so the
- * reaction picker offers the same (filterable) set the REST API accepts.
- *
- * @since 7.2.0
- *
- * @param array $settings Existing block editor settings.
- * @return array Updated block editor settings.
- */
-function gutenberg_add_note_reaction_emojis_setting( $settings ) {
-	$settings['noteReactionEmojis'] = gutenberg_get_note_reaction_emojis();
-	return $settings;
-}
-add_filter( 'block_editor_settings_all', 'gutenberg_add_note_reaction_emojis_setting' );
 
 /**
  * Returns the reaction children of a note.

@@ -1,9 +1,6 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { act, render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { dispatch } from '@wordpress/data';
-// @ts-expect-error - No type declarations available for @wordpress/block-editor.
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import ReactionEmojiPicker, {
 	REACTION_EMOJIS,
 	buildEmojiBySlugMap,
@@ -59,49 +56,5 @@ describe( 'ReactionEmojiPicker', () => {
 
 		expect( onSelect ).toHaveBeenCalledTimes( 1 );
 		expect( onSelect ).toHaveBeenCalledWith( 'smile' );
-	} );
-
-	describe( 'settings-provided emoji list', () => {
-		afterEach( () => {
-			// The picker may still be mounted when the settings reset
-			// lands, so the resulting re-render must be act()-wrapped.
-			act( () => {
-				dispatch( blockEditorStore ).updateSettings( {
-					noteReactionEmojis: undefined,
-				} );
-			} );
-		} );
-
-		it( 'renders the list from editor settings when present', async () => {
-			dispatch( blockEditorStore ).updateSettings( {
-				noteReactionEmojis: [
-					...REACTION_EMOJIS,
-					{ emoji: '👍', label: 'Thumbs up', value: 'thumbs-up' },
-				],
-			} );
-			render( <ReactionEmojiPicker onSelect={ () => {} } /> );
-
-			expect( await screen.findAllByRole( 'button' ) ).toHaveLength(
-				REACTION_EMOJIS.length + 1
-			);
-			expect(
-				screen.getByRole( 'button', { name: 'Thumbs up' } )
-			).toBeVisible();
-		} );
-
-		it( 'drops malformed entries and falls back to defaults when none survive', async () => {
-			dispatch( blockEditorStore ).updateSettings( {
-				noteReactionEmojis: [
-					null,
-					{ emoji: '👍' },
-					{ label: 'No emoji', value: 'no-emoji' },
-				],
-			} );
-			render( <ReactionEmojiPicker onSelect={ () => {} } /> );
-
-			expect( await screen.findAllByRole( 'button' ) ).toHaveLength(
-				REACTION_EMOJIS.length
-			);
-		} );
 	} );
 } );
