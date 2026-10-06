@@ -405,8 +405,20 @@ export const trashPost =
 				method: 'DELETE',
 			} );
 
-			// A permanently deleted post has nothing left to save.
-			if ( ! force ) {
+			if ( force ) {
+				// Receiving no records only invalidates this post type's list
+				// queries. `deleteEntityRecord` would also remove the current
+				// post, which the redirect still needs.
+				registry
+					.dispatch( coreStore )
+					.receiveEntityRecords(
+						'postType',
+						postTypeSlug,
+						[],
+						undefined,
+						true
+					);
+			} else {
 				await dispatch.savePost();
 			}
 		} catch ( error ) {
