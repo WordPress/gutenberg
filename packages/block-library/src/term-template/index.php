@@ -85,9 +85,10 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 		$term_id  = $term->term_id;
 		$taxonomy = $term->taxonomy;
 
-		$filter_block_context = static function ( $context ) use ( $term_id, $taxonomy ) {
+		$filter_block_context = static function ( $context ) use ( $term_id, $taxonomy, $term ) {
 			$context['termId']   = $term_id;
 			$context['taxonomy'] = $taxonomy;
+			$context['termData'] = $term;
 			return $context;
 		};
 
