@@ -25,14 +25,10 @@
 		min-width: 320px;
 		padding: $grid-unit-20;
 	}
+}
 
-	.editor-change-status__password-legend {
-		padding: 0;
-		margin-bottom: $grid-unit-10;
-	}
-
-	p.components-base-control__help:has(.components-checkbox-control__help) {
-		margin-top: $grid-unit-05;
-	}
-
+.editor-change-status__password-help {
+	margin: 0;
+	color: $gray-700;
+	font-size: $helptext-font-size;
 }

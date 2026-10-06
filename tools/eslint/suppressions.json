@@ -6627,6 +6627,16 @@
 			"count": 1
 		}
 	},
+	"packages/editor/src/components/post-status/post-password-modal.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-status/test/post-password-modal.jsdom.test.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/editor/src/components/post-sticky/index.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1

@@ -1,17 +1,15 @@
 import {
 	Button,
-	CheckboxControl as WCCheckboxControl,
 	Dropdown,
 	__experimentalVStack as VStack,
 	RadioControl,
 } from '@wordpress/components';
-import { ValidatedInputControl } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState, useMemo, useRef, useEffect } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
-import { useInstanceId } from '@wordpress/compose';
 import {
 	drafts,
 	published,
@@ -24,6 +22,7 @@ import PostPanelRow from '../post-panel-row';
 import PostSticky from '../post-sticky';
 import { PrivatePostSchedule } from '../post-schedule';
 import { store as editorStore } from '../../store';
+import PostPasswordModal from './post-password-modal';
 
 const postStatusesInfo = {
 	'auto-draft': { label: __( 'Draft' ), icon: drafts },
@@ -83,42 +82,22 @@ export default function PostStatus() {
 		},
 		[]
 	);
-	const [ showPassword, setShowPassword ] = useState( !! password );
-	const passwordInputId = useInstanceId(
-		PostStatus,
-		'editor-change-status__password-input'
-	);
+	const [ isPasswordModalOpen, setIsPasswordModalOpen ] = useState( false );
+	const wasPasswordModalOpenRef = useRef( false );
+	const statusToggleRef = useRef( null );
+
+	useEffect( () => {
+		if ( wasPasswordModalOpenRef.current && ! isPasswordModalOpen ) {
+			statusToggleRef.current?.focus();
+		}
+		wasPasswordModalOpenRef.current = isPasswordModalOpen;
+	}, [ isPasswordModalOpen ] );
+
 	const { editEntityRecord } = useDispatch( coreStore );
-	const { lockPostSaving, unlockPostSaving } = useDispatch( editorStore );
-	const [ isStatusPopoverOpen, setIsStatusPopoverOpen ] = useState( false );
-	const passwordInputRef = useRef( null );
-	const isPasswordInvalid = password && password.length > 255;
-
-	useEffect( () => {
-		if ( isPasswordInvalid ) {
-			lockPostSaving( 'post-status-password-length' );
-		} else {
-			unlockPostSaving( 'post-status-password-length' );
-		}
-		return () => {
-			if ( ! isPasswordInvalid ) {
-				unlockPostSaving( 'post-status-password-length' );
-			}
-		};
-	}, [ isPasswordInvalid, lockPostSaving, unlockPostSaving ] );
-
-	// Reveal the inline error immediately when the limit is breached,
-	// following the Storybook "Showing Errors Without Moving Focus" pattern.
-	// This ensures the user sees the error before potentially clicking a block
-	// and unmounting the popover.
-	useEffect( () => {
-		if ( isPasswordInvalid && passwordInputRef.current ) {
-			passwordInputRef.current.dispatchEvent(
-				new window.Event( 'invalid', { cancelable: true } )
-			);
-		}
-	}, [ isPasswordInvalid ] );
-
+	const passwordHelpId = useInstanceId(
+		PostStatus,
+		'editor-change-status__password-help'
+	);
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 	// Memoize popoverProps to avoid returning a new object every time.
 	const popoverProps = useMemo(
@@ -151,13 +130,6 @@ export default function PostStatus() {
 		} );
 	};
 
-	const handleTogglePassword = ( value ) => {
-		setShowPassword( value );
-		if ( ! value ) {
-			updatePost( { password: '' } );
-		}
-	};
-
 	const handleStatus = ( value ) => {
 		let newDate = date;
 		let newPassword = password;
@@ -174,156 +146,124 @@ export default function PostStatus() {
 		} );
 	};
 
-	const attemptClosePanel = () => {
-		if (
-			showPassword &&
-			passwordInputRef.current &&
-			! passwordInputRef.current.reportValidity()
-		) {
-			passwordInputRef.current.focus?.();
-			return false;
-		}
-
-		if ( ! password || password.trim() === '' ) {
-			setShowPassword( false );
-		}
-
-		setIsStatusPopoverOpen( false );
-		return true;
-	};
-
-	const handleToggle = ( willOpen ) => {
-		if ( willOpen ) {
-			setIsStatusPopoverOpen( true );
-		} else {
-			attemptClosePanel();
-		}
-	};
-
 	return (
 		<PostPanelRow label={ __( 'Status' ) } ref={ setPopoverAnchor }>
 			{ canEdit ? (
-				<Dropdown
-					className="editor-post-status"
-					contentClassName="editor-change-status__content"
-					popoverProps={ popoverProps }
-					focusOnMount
-					open={ isStatusPopoverOpen }
-					onToggle={ handleToggle }
-					onClose={ attemptClosePanel }
-					renderToggle={ ( { onToggle, isOpen } ) => (
-						<Button
-							className="editor-post-status__toggle"
-							variant="tertiary"
-							size="compact"
-							onClick={ onToggle }
-							icon={ postStatusesInfo[ status ]?.icon }
-							aria-label={ sprintf(
-								// translators: %s: Current post status.
-								__( 'Change status: %s' ),
-								postStatusesInfo[ status ]?.label
-							) }
-							aria-expanded={ isOpen }
-						>
-							{ postStatusesInfo[ status ]?.label }
-						</Button>
-					) }
-					renderContent={ () => (
-						<>
-							<InspectorPopoverHeader
-								title={ __( 'Status & visibility' ) }
-								onClose={ attemptClosePanel }
-							/>
-							<form
-								onSubmit={ ( event ) => {
-									event.preventDefault();
-									attemptClosePanel();
-								} }
+				<>
+					<Dropdown
+						className="editor-post-status"
+						contentClassName="editor-change-status__content"
+						popoverProps={ popoverProps }
+						focusOnMount
+						renderToggle={ ( { onToggle, isOpen } ) => (
+							<Button
+								ref={ statusToggleRef }
+								className="editor-post-status__toggle"
+								variant="tertiary"
+								size="compact"
+								onClick={ onToggle }
+								icon={ postStatusesInfo[ status ]?.icon }
+								aria-label={ sprintf(
+									// translators: %s: Current post status.
+									__( 'Change status: %s' ),
+									postStatusesInfo[ status ]?.label
+								) }
+								aria-expanded={ isOpen }
 							>
-								<VStack spacing={ 4 }>
-									<RadioControl
-										className="editor-change-status__options"
-										hideLabelFromVision
-										label={ __( 'Status' ) }
-										options={ STATUS_OPTIONS }
-										onChange={ handleStatus }
-										selected={
-											status === 'auto-draft'
-												? 'draft'
-												: status
-										}
-									/>
-									{ status === 'future' && (
-										<div className="editor-change-status__publish-date-wrapper">
-											<PrivatePostSchedule
-												showPopoverHeaderActions={
-													false
-												}
-												isCompact
-											/>
-										</div>
-									) }
-									{ status !== 'private' && (
-										<VStack
-											as="fieldset"
-											spacing={ 4 }
-											className="editor-change-status__password-fieldset"
-										>
-											<WCCheckboxControl
-												label={ __(
-													'Password protected'
-												) }
-												help={ __(
-													'Only visible to those who know the password.'
-												) }
-												checked={ showPassword }
-												onChange={
-													handleTogglePassword
-												}
-											/>
-											{ showPassword && (
-												<div className="editor-change-status__password-input">
-													<ValidatedInputControl
-														ref={ passwordInputRef }
-														label={ __(
-															'Password'
-														) }
-														onValueChange={ (
-															value
-														) =>
-															updatePost( {
-																password:
-																	value ?? '',
-															} )
-														}
-														value={ password }
-														placeholder={ __(
-															'Use a secure password'
-														) }
-														type="text"
-														id={ passwordInputId }
-														customValidity={
-															isPasswordInvalid
-																? {
-																		type: 'invalid',
-																		message:
-																			__(
-																				'Password cannot exceed 255 characters.'
-																			),
-																  }
-																: undefined
-														}
-													/>
-												</div>
-											) }
-										</VStack>
-									) }
-									<PostSticky />
-								</VStack>
-							</form>
-						</>
+								{ postStatusesInfo[ status ]?.label }
+							</Button>
+						) }
+						renderContent={ ( { onClose } ) => (
+							<>
+								<InspectorPopoverHeader
+									title={ __( 'Status & visibility' ) }
+									onClose={ onClose }
+								/>
+								<form
+									onSubmit={ ( event ) => {
+										event.preventDefault();
+										onClose();
+									} }
+								>
+									<VStack spacing={ 4 }>
+										<RadioControl
+											className="editor-change-status__options"
+											hideLabelFromVision
+											label={ __( 'Status' ) }
+											options={ STATUS_OPTIONS }
+											onChange={ handleStatus }
+											selected={
+												status === 'auto-draft'
+													? 'draft'
+													: status
+											}
+										/>
+										{ status === 'future' && (
+											<div className="editor-change-status__publish-date-wrapper">
+												<PrivatePostSchedule
+													showPopoverHeaderActions={
+														false
+													}
+													isCompact
+												/>
+											</div>
+										) }
+										{ status !== 'private' && (
+											<VStack
+												as="div"
+												spacing={ 2 }
+												className="editor-change-status__password-fieldset"
+											>
+												<Button
+													__next40pxDefaultSize
+													variant="secondary"
+													aria-describedby={
+														passwordHelpId
+													}
+													onClick={ () => {
+														onClose();
+														setIsPasswordModalOpen(
+															true
+														);
+													} }
+												>
+													{ password
+														? __( 'Edit password' )
+														: __( 'Set password' ) }
+												</Button>
+												<p
+													id={ passwordHelpId }
+													className="editor-change-status__password-help"
+												>
+													{ __(
+														'Only visible to those who know the password.'
+													) }
+												</p>
+											</VStack>
+										) }
+										<PostSticky />
+									</VStack>
+								</form>
+							</>
+						) }
+					/>
+					{ isPasswordModalOpen && (
+						<PostPasswordModal
+							initialPassword={ password }
+							onSave={ ( newPassword ) => {
+								updatePost( { password: newPassword } );
+								setIsPasswordModalOpen( false );
+							} }
+							onRemove={ () => {
+								updatePost( { password: '' } );
+								setIsPasswordModalOpen( false );
+							} }
+							onClose={ () => {
+								setIsPasswordModalOpen( false );
+							} }
+						/>
 					) }
-				/>
+				</>
 			) : (
 				<div className="editor-post-status is-read-only">
 					{ postStatusesInfo[ status ]?.label }

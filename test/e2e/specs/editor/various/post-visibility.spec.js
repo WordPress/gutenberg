@@ -77,4 +77,121 @@ test.describe( 'Post visibility', () => {
 
 		expect( currentStatus ).toBe( 'private' );
 	} );
+
+	test( 'can set, edit, and remove a password', async ( {
+		page,
+		admin,
+		editor,
+	} ) => {
+		await admin.createNewPost();
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.type( 'Password Protected Post' );
+
+		await editor.openDocumentSettingsSidebar();
+
+		const changeStatusButton = page.getByRole( 'button', {
+			name: /^Change status:/,
+		} );
+		await changeStatusButton.click();
+
+		await page.getByRole( 'button', { name: 'Set password' } ).click();
+
+		const modal = page.getByRole( 'dialog', { name: 'Set password' } );
+		await expect( modal ).toBeVisible();
+
+		await modal
+			.getByRole( 'textbox', { name: 'Password' } )
+			.fill( 'secret123' );
+		await modal.getByRole( 'button', { name: 'Save password' } ).click();
+
+		await expect( modal ).toBeHidden();
+
+		await changeStatusButton.click();
+		await expect(
+			page.getByRole( 'button', { name: 'Edit password' } )
+		).toBeVisible();
+		await page.keyboard.press( 'Escape' );
+
+		await editor.saveDraft();
+		await page.reload();
+		await editor.openDocumentSettingsSidebar();
+
+		await changeStatusButton.click();
+		await expect(
+			page.getByRole( 'button', { name: 'Edit password' } )
+		).toBeVisible();
+
+		await page.getByRole( 'button', { name: 'Edit password' } ).click();
+		const editModal = page.getByRole( 'dialog', { name: 'Edit password' } );
+		await expect( editModal ).toBeVisible();
+		await expect(
+			editModal.getByRole( 'textbox', { name: 'Password' } )
+		).toHaveValue( 'secret123' );
+
+		await editModal
+			.getByRole( 'button', { name: 'Remove password' } )
+			.click();
+		await expect( editModal ).toBeHidden();
+
+		await changeStatusButton.click();
+		await expect(
+			page.getByRole( 'button', { name: 'Set password' } )
+		).toBeVisible();
+	} );
+
+	test( 'validates password length and restores focus on cancel and esc', async ( {
+		page,
+		admin,
+		editor,
+	} ) => {
+		await admin.createNewPost();
+		await editor.openDocumentSettingsSidebar();
+
+		const changeStatusButton = page.getByRole( 'button', {
+			name: /^Change status:/,
+		} );
+		await changeStatusButton.click();
+
+		await page.getByRole( 'button', { name: 'Set password' } ).click();
+		const modal = page.getByRole( 'dialog', { name: 'Set password' } );
+		await expect( modal ).toBeVisible();
+
+		// Test Cancel focus restoration
+		await modal.getByRole( 'button', { name: 'Cancel' } ).click();
+		await expect( modal ).toBeHidden();
+		await expect( changeStatusButton ).toBeFocused();
+
+		// Open again and test Esc focus restoration
+		await changeStatusButton.click();
+		await page.getByRole( 'button', { name: 'Set password' } ).click();
+		await expect( modal ).toBeVisible();
+		await page.keyboard.press( 'Escape' );
+		await expect( modal ).toBeHidden();
+		await expect( changeStatusButton ).toBeFocused();
+
+		// Open again and test 256 char validation
+		await changeStatusButton.click();
+		await page.getByRole( 'button', { name: 'Set password' } ).click();
+		await expect( modal ).toBeVisible();
+
+		await modal
+			.getByRole( 'textbox', { name: 'Password' } )
+			.fill( 'a'.repeat( 256 ) );
+		await modal.getByRole( 'button', { name: 'Save password' } ).click();
+
+		await expect(
+			modal.getByText( "Password can't exceed 255 characters." )
+		).toBeVisible();
+		await expect( modal ).toBeVisible();
+
+		await modal.getByRole( 'button', { name: 'Cancel' } ).click();
+		await expect( modal ).toBeHidden();
+		await expect( changeStatusButton ).toBeFocused();
+
+		await changeStatusButton.click();
+		await expect(
+			page.getByRole( 'button', { name: 'Set password' } )
+		).toBeVisible();
+	} );
 } );
