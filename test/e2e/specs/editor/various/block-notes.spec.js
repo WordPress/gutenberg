@@ -2182,6 +2182,73 @@ test.describe( 'Block Notes', () => {
 				.poll( backgroundOf )
 				.toMatch( /rgba\(0,\s*0,\s*0,\s*0\)|transparent/ );
 		} );
+
+		test( 'hides the highlights along with the notes', async ( {
+			editor,
+			requestUtils,
+			blockNoteUtils,
+		} ) => {
+			const me = await requestUtils.rest( { path: '/wp/v2/users/me' } );
+			const rgb = hexToRgb(
+				AVATAR_BORDER_COLORS[ me.id % AVATAR_BORDER_COLORS.length ]
+			);
+
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Note the whole block.' },
+			} );
+			await blockNoteUtils.addNote( 'Block-level note' );
+			const blockNoted = editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.first();
+
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Note these words.' },
+			} );
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.last()
+				.click();
+			await blockNoteUtils.selectBlockText();
+			await blockNoteUtils.addNote( 'Inline note' );
+			const marker = editor.canvas.locator( 'mark.wp-note' );
+
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.click();
+			await expect
+				.poll( () => readTint( blockNoted, rgb ) )
+				.toBe( 'tint' );
+			await expect.poll( () => readTint( marker, rgb ) ).toBe( 'tint' );
+
+			// "All notes" is still a view of the notes, so the highlights
+			// stay while it's open.
+			await blockNoteUtils.clickNotesMenuItem( 'Hide notes' );
+			expect( await readTint( marker, rgb ) ).toBe( 'tint' );
+
+			// With no notes left on screen, the canvas carries no marking.
+			await blockNoteUtils.clickNotesMenuItem( 'Show all notes' );
+			const isUnmarked = ( locator ) =>
+				locator.evaluate( ( el ) => {
+					const style = window.getComputedStyle( el );
+					return (
+						/rgba\(0,\s*0,\s*0,\s*0\)|transparent/.test(
+							style.backgroundColor
+						) && style.textDecorationLine === 'none'
+					);
+				} );
+			await expect.poll( () => isUnmarked( blockNoted ) ).toBe( true );
+			await expect.poll( () => isUnmarked( marker ) ).toBe( true );
+			// The marker stays in the content, it just isn't painted.
+			await expect( marker ).toHaveText( 'Note these words.' );
+
+			await blockNoteUtils.clickNotesMenuItem( 'Expand notes' );
+			await expect
+				.poll( () => readTint( blockNoted, rgb ) )
+				.toBe( 'tint' );
+			await expect.poll( () => readTint( marker, rgb ) ).toBe( 'tint' );
+		} );
 	} );
 
 	test( 'keeps note anchors out of the undo history', async ( {

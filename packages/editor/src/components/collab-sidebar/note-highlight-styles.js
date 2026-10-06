@@ -335,18 +335,25 @@ export function buildBlockHighlightCss( blockHighlights ) {
  * underline when the matching thread is selected; block-level tints stay flat
  * and let the block's own outline carry that state.
  *
+ * While the notes are hidden only the `<mark>` reset is kept, so the canvas
+ * shows no trace of them, the same as hiding comments in a word processor.
+ *
  * @param {Object}      props
  * @param {Array}       props.threads      Unresolved note threads.
  * @param {string|null} [props.selectedId] ID of the currently selected note.
+ * @param {boolean}     [props.isHidden]   Whether the notes are hidden.
  * @return {null} Renders nothing; styles are applied via `useStyleOverride`.
  */
-export function NoteHighlightStyles( { threads, selectedId } ) {
+export function NoteHighlightStyles( { threads, selectedId, isHidden } ) {
 	// Which threads are block-level depends on block attributes (a thread is
 	// inline iff its marker exists in the block), so the CSS is derived in
 	// `useSelect` to track attribute edits. It returns the finished string:
 	// strict-equality on a primitive keeps re-renders to actual changes.
 	const css = useSelect(
 		( select ) => {
+			if ( isHidden ) {
+				return BASE_RESET;
+			}
 			const { getBlockAttributes } = select( blockEditorStore );
 			return (
 				buildHighlightCss( threads, selectedId ) +
@@ -355,7 +362,7 @@ export function NoteHighlightStyles( { threads, selectedId } ) {
 				)
 			);
 		},
-		[ threads, selectedId ]
+		[ threads, selectedId, isHidden ]
 	);
 	useStyleOverride( { id: 'core-note-highlights', css } );
 	return null;

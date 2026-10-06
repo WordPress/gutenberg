@@ -155,6 +155,7 @@ function NotesSidebar( { postId } ) {
 			<NoteHighlightStyles
 				threads={ unresolvedNotes }
 				selectedId={ selectedNoteId }
+				isHidden={ areNotesHidden && ! isAllNotesSidebarOpen }
 			/>
 			{ !! currentThread && (
 				<NoteAvatarIndicator

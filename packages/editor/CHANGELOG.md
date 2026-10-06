@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Notes: Highlight the whole text block when a note is attached at the block level, in the note author's color, and replace the spotlight dimming shown while a note is selected with the block's own outline ([#80578](https://github.com/WordPress/gutenberg/pull/80578), closes [#72860](https://github.com/WordPress/gutenberg/issues/72860)).
+-   Notes: Highlight the whole text block when a note is attached at the block level, in the note author's color, and replace the spotlight dimming shown while a note is selected with the block's own outline. Hiding notes hides the highlights too ([#80578](https://github.com/WordPress/gutenberg/pull/80578), closes [#72860](https://github.com/WordPress/gutenberg/issues/72860)).
 -   `trashPost`: Accept a `force` option to delete the post permanently instead of moving it to the trash ([#84045](https://github.com/WordPress/gutenberg/pull/84045)).
 -   `PostAuthor`: The field renders with the `SearchableSelect` component of `@wordpress/ui` instead of `ComboboxControl` and `SelectControl` ([#83323](https://github.com/WordPress/gutenberg/pull/83323)).
 -   `DocumentOutline`: Show the outline items' focus ring with the design system's outline instead of a legacy box-shadow ([#83755](https://github.com/WordPress/gutenberg/pull/83755)).
