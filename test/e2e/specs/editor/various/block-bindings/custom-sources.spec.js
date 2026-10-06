@@ -1142,10 +1142,10 @@ test.describe( 'Registered sources', () => {
 				.click();
 			await expect(
 				page.getByRole( 'button', {
-					name: 'icon Complete Source',
+					name: 'icon Icon Field Label',
 					exact: true,
 				} )
-			).toContainText( 'Complete Source' );
+			).toContainText( 'Icon Field Label' );
 		} );
 
 		test( 'should be possible to connect the button supported attributes', async ( {
