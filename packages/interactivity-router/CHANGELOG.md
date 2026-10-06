@@ -15,6 +15,9 @@
 ### Bug Fixes
 
 -   Match, update, and attach `data-wp-router-region` values with a `namespace::` prefix or a JSON scalar under the id registered by the directive runtime, using one shared directive-value interpretation exposed through `@wordpress/interactivity`'s private API. Previously, navigation keyed those regions under a different id or `undefined` and never updated them. ([#83280](https://github.com/WordPress/gutenberg/pull/83280))
+-   Ignore router regions inside content owned by `data-wp-html`, both on the initial page and on pages loaded by navigation. Such a region is no longer updated during navigation, and an `attachTo` region inside it no longer counts as already present on the initial page. A region that carries `data-wp-html` on the same element, and regions nested inside other router regions, are unchanged. ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
+-   Never attach a router region to an `attachTo` target that is an active `data-wp-html` element or sits inside one. The router now uses the first matching element in document order that is outside `data-wp-html` content. See [Adding new regions on navigation](https://github.com/WordPress/gutenberg/blob/HEAD/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#adding-new-regions-on-navigation) for the full rule. ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
+-   Skip a region whose `attachTo` selector has no eligible target, whether nothing matches or every match is inside `data-wp-html` content, instead of aborting the navigation update. The other regions of the page are still updated. ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
 
 ## 2.56.0 (2026-09-23)
 
