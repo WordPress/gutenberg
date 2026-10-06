@@ -25,7 +25,6 @@ import { unlock } from '../../lock-unlock';
 import { createBoardStore } from './board-store';
 import {
 	calculateNotePositions,
-	clearInlineNoteMarker,
 	findNoteInBlock,
 	focusNoteThread,
 	getInlineMarkerStart,
@@ -33,7 +32,7 @@ import {
 	addNoteIdToMetadata,
 	pickPrimaryNote,
 	readInlineSelection,
-	removeNoteFormat,
+	removeInlineNote,
 	removeNoteIdFromMetadata,
 	wrapInlineNote,
 } from './utils';
@@ -234,7 +233,6 @@ export function useNoteActions( reactionsMap = {} ) {
 	const { getCurrentPostId } = useSelect( editorStore );
 	const {
 		getBlockAttributes,
-		getClientIdsWithDescendants,
 		getSelectedBlockClientId,
 		getSelectionStart,
 		getSelectionEnd,
@@ -254,6 +252,17 @@ export function useNoteActions( reactionsMap = {} ) {
 			type: 'snackbar',
 			isDismissible: true,
 		} );
+	};
+
+	/*
+	 * Update a note's anchor without an undo step, since undo can't bring the
+	 * note back with it. The last call flags the post as changed, so "Save
+	 * draft" turns on.
+	 */
+	const updateNoteAnchor = ( clientId, attributes ) => {
+		__unstableMarkNextChangeAsNotPersistent( { history: 'ignore' } );
+		updateBlockAttributes( clientId, attributes );
+		__unstableMarkLastChangeAsPersistent();
 	};
 
 	const onCreate = async ( { content, parent } ) => {
@@ -314,7 +323,7 @@ export function useNoteActions( reactionsMap = {} ) {
 					}
 				}
 
-				updateBlockAttributes( clientId, newAttributes );
+				updateNoteAnchor( clientId, newAttributes );
 			}
 
 			createNotice(
@@ -331,7 +340,8 @@ export function useNoteActions( reactionsMap = {} ) {
 		}
 	};
 
-	const onEdit = async ( { id, content, status } ) => {
+	const onEdit = async ( note, { content, status } ) => {
+		const { id } = note;
 		try {
 			// For resolution or reopen actions, create a new note with metadata.
 			if ( status === 'approved' || status === 'hold' ) {
@@ -372,13 +382,17 @@ export function useNoteActions( reactionsMap = {} ) {
 
 				// Resolving a note drops its inline highlight: strip the marker
 				// so the note falls back to a block-level note in the content.
-				if ( status === 'approved' ) {
-					clearInlineNoteMarker(
-						id,
-						getClientIdsWithDescendants,
-						getBlockAttributes,
-						updateBlockAttributes
+				const removed =
+					status === 'approved' &&
+					note.blockClientId &&
+					removeInlineNote(
+						getBlockAttributes( note.blockClientId ),
+						id
 					);
+				if ( removed ) {
+					updateNoteAnchor( note.blockClientId, {
+						[ removed.attributeKey ]: removed.value,
+					} );
 				}
 
 				// The note visibly updates in place, so there is no snackbar,
@@ -416,17 +430,6 @@ export function useNoteActions( reactionsMap = {} ) {
 		} catch ( error ) {
 			onError( error );
 		}
-	};
-
-	/*
-	 * Update a note's anchor without an undo step, since undo can't bring the
-	 * note back with it. The last call flags the post as changed, so "Save
-	 * draft" turns on.
-	 */
-	const updateNoteAnchor = ( clientId, attributes ) => {
-		__unstableMarkNextChangeAsNotPersistent( { history: 'ignore' } );
-		updateBlockAttributes( clientId, attributes );
-		__unstableMarkLastChangeAsPersistent();
 	};
 
 	const restoreNote = async ( noteId, anchor ) => {
@@ -496,15 +499,18 @@ export function useNoteActions( reactionsMap = {} ) {
 			// Capture the target block *before* the async delete: selection may
 			// shift during the round-trip, pointing the attribute cleanup at the
 			// wrong block.
-			const clientId = ! note.parent
-				? note.blockClientId || getSelectedBlockClientId()
-				: null;
+			const clientId = ! note.parent ? note.blockClientId : null;
 
-			// Without `force`, this moves the note to the trash, so the
-			// snackbar's Undo can bring it back.
-			await deleteEntityRecord( 'root', 'comment', note.id, undefined, {
-				throwOnError: true,
-			} );
+			// Without the trash, the note can only be deleted permanently,
+			// and there's nothing for Undo to bring back.
+			const canMoveToTrash = !! note._links?.[ 'wp:action-trash' ];
+			await deleteEntityRecord(
+				'root',
+				'comment',
+				note.id,
+				canMoveToTrash ? undefined : { force: true },
+				{ throwOnError: true }
+			);
 
 			// What Undo needs to re-attach the note to its block.
 			let anchor = null;
@@ -522,19 +528,16 @@ export function useNoteActions( reactionsMap = {} ) {
 				};
 				// Strip the inline marker too (if any) so the deleted note's
 				// highlight doesn't linger in the content.
-				const found = findNoteInBlock( attributes, note.id );
-				if ( found ) {
-					const next = removeNoteFormat(
-						attributes[ found.attributeKey ],
-						note.id
-					);
-					if ( next ) {
-						newAttributes[ found.attributeKey ] = next;
-						anchor.inline = {
-							...found,
-							text: next.text.slice( found.start, found.end ),
-						};
-					}
+				const removed = removeInlineNote( attributes, note.id );
+				if ( removed ) {
+					const { attributeKey, start, end, value } = removed;
+					newAttributes[ attributeKey ] = value;
+					anchor.inline = {
+						attributeKey,
+						start,
+						end,
+						text: value.text.slice( start, end ),
+					};
 				}
 				updateNoteAnchor( clientId, newAttributes );
 			}
@@ -542,12 +545,14 @@ export function useNoteActions( reactionsMap = {} ) {
 			createNotice( 'snackbar', __( 'Note deleted.' ), {
 				type: 'snackbar',
 				isDismissible: true,
-				actions: [
-					{
-						label: __( 'Undo' ),
-						onClick: () => restoreNote( note.id, anchor ),
-					},
-				],
+				actions: canMoveToTrash
+					? [
+							{
+								label: __( 'Undo' ),
+								onClick: () => restoreNote( note.id, anchor ),
+							},
+						]
+					: [],
 			} );
 
 			return true;
