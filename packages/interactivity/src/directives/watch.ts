@@ -1,14 +1,15 @@
 import { directive } from '../hooks';
 import { useWatch } from '../utils';
-import { warnUniqueIdWithTwoHyphens } from './utils/warnings';
+import { warnSuffixNotSupported } from './utils/warnings';
 
-// data-wp-watch---[unique-id] — Reactive effect.
+// data-wp-watch---[unique-id] — Reactive effect; suffixes are unsupported.
 directive( 'watch', ( { directives: { watch }, evaluate } ) => {
 	watch.forEach( ( entry ) => {
-		if ( globalThis.SCRIPT_DEBUG ) {
-			if ( entry.suffix ) {
-				warnUniqueIdWithTwoHyphens( 'watch', entry.suffix );
+		if ( entry.suffix !== null ) {
+			if ( globalThis.SCRIPT_DEBUG ) {
+				warnSuffixNotSupported( 'watch', entry.suffix );
 			}
+			return;
 		}
 		useWatch( () => {
 			let start;

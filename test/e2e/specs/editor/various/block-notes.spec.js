@@ -2184,6 +2184,45 @@ test.describe( 'Block Notes', () => {
 		} );
 	} );
 
+	test( 'keeps note anchors out of the undo history', async ( {
+		editor,
+		page,
+		pageUtils,
+		blockNoteUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Keep my anchor.' },
+		} );
+		// Start with an empty undo stack, so the shortcut can only reach the
+		// note's anchor.
+		await editor.saveDraft();
+		await page.reload();
+		await blockNoteUtils.showAllNotes();
+
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await paragraph.click();
+		await blockNoteUtils.selectBlockText();
+		await blockNoteUtils.addNote( 'Stay attached' );
+		const marker = editor.canvas.locator( 'mark.wp-note' );
+
+		// Undo doesn't detach the new note from its block.
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( marker ).toHaveText( 'Keep my anchor.' );
+		const [ block ] = await editor.getBlocks();
+		expect( block.attributes.metadata?.noteId ).toHaveLength( 1 );
+
+		// Undo doesn't bring back the marker of a resolved note.
+		await blockNoteUtils.getThread( 'Stay attached' ).click();
+		await page.getByRole( 'button', { name: 'Resolve' } ).click();
+		await expect( marker ).toHaveCount( 0 );
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( marker ).toHaveCount( 0 );
+		await expect( paragraph ).toHaveText( 'Keep my anchor.' );
+	} );
+
 	test.describe( 'Restoring a deleted note', () => {
 		async function addInlineNote( { editor, blockNoteUtils }, note ) {
 			const paragraph = editor.canvas.getByRole( 'document', {
@@ -2273,6 +2312,11 @@ test.describe( 'Block Notes', () => {
 				name: 'core/paragraph',
 				attributes: { content: 'Undo after delete.' },
 			} );
+			// Start with an empty undo stack, so the shortcut can't undo the
+			// block insertion instead.
+			await editor.saveDraft();
+			await page.reload();
+			await blockNoteUtils.showAllNotes();
 			await addInlineNote( { editor, blockNoteUtils }, 'Stay deleted' );
 
 			await blockNoteUtils.deleteNote();

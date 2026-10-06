@@ -42,14 +42,14 @@ NotesSidebarContainer (index.jsx)         - gates on post type support
       ├── NoteAvatarIndicator            - slot fill in the block toolbar (per-thread avatars)
       ├── PluginSidebar (all-notes)      - full sidebar
       │    └── Notes (notes.jsx)          - owns outer Stack + aria-label + useNoteActions + keyboard nav
-      │         ├── AddNote              - rendered when no threads (template-locked) or selectedNote === 'new'
+      │         ├── AddNote              - new note form for the selected block, rendered when selectedNote === 'new'
       │         └── NoteThread[]         - per thread
       │              └── <FloatingContainer>
       │                   ├── Note       - top-level note (own state: edit/delete/dialog)
       │                   │    └── NoteCard
       │                   │         └── NoteByline + actions slot + body children
       │                   ├── Note[]     - replies (when selected)
-      │                   └── NoteCard + NoteForm - inline reply form (when selected)
+      │                   └── NoteReply  - inline reply form (when selected)
       └── PluginSidebar (floating)       - floating sidebar (large viewport, unresolved notes)
            └── Notes (same)              - isFloating
 ```

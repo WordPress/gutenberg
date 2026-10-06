@@ -15,17 +15,7 @@ import { unlock } from '../../lock-unlock';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-export function AddNote( { onSubmit, sidebarRef, floating } ) {
-	const { clientId } = useSelect( ( select ) => {
-		const { getSelectedBlockClientId } = select( blockEditorStore );
-		return {
-			clientId: getSelectedBlockClientId(),
-		};
-	}, [] );
-	const selectedNote = useSelect(
-		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
-		[]
-	);
+export function AddNote( { clientId, onSubmit, sidebarRef, floating } ) {
 	const blockElement = useBlockElement( clientId );
 	const { toggleBlockHighlight } = unlock( useDispatch( blockEditorStore ) );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
@@ -68,10 +58,6 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 		blockElement?.focus();
 		toggleBlockHighlight( clientId, false );
 	};
-
-	if ( selectedNote !== 'new' || ! clientId ) {
-		return null;
-	}
 
 	return (
 		<FloatingContainer
