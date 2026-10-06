@@ -8,7 +8,6 @@
  */
 
 // The following filter can be removed once the minimum required WordPress version is 7.1 or newer.
-
 add_filter(
 	'block_bindings_supported_attributes',
 	function ( $attributes, $block_type ) {
