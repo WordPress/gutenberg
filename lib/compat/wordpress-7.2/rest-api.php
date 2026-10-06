@@ -91,3 +91,111 @@ function gutenberg_restrict_privacy_policy_page_setting_update( $updated, $name 
 	return $updated;
 }
 add_filter( 'rest_pre_update_setting', 'gutenberg_restrict_privacy_policy_page_setting_update', 10, 2 );
+
+/**
+ * Adds the `action-trash` link to a REST response.
+ *
+ * Targets the `self` link, so responses whose `_fields` leave out `_links`
+ * are skipped. Attachments run `rest_prepare_attachment` twice, so an
+ * existing link is kept.
+ *
+ * @param WP_REST_Response $response The response object.
+ */
+function gutenberg_add_trash_action_link( $response ) {
+	$links = $response->get_links();
+	if (
+		empty( $links['self'][0]['href'] ) ||
+		isset( $links['https://api.w.org/action-trash'] )
+	) {
+		return;
+	}
+
+	$response->add_link( 'https://api.w.org/action-trash', $links['self'][0]['href'] );
+}
+
+/**
+ * Adds the `action-trash` link to posts the current user can move to the trash.
+ *
+ * Without the link, deleting the post is permanent.
+ *
+ * @param WP_REST_Response $response The response object.
+ * @param WP_Post          $post     Post object.
+ * @param WP_REST_Request  $request  Request object.
+ * @return WP_REST_Response The response object.
+ */
+function gutenberg_add_post_trash_action_link( $response, $post, $request ) {
+	if (
+		! $post instanceof WP_Post ||
+		'edit' !== $request['context'] ||
+		'trash' === $post->post_status ||
+		! current_user_can( 'delete_post', $post->ID )
+	) {
+		return $response;
+	}
+
+	// Mirrors `WP_REST_Posts_Controller::delete_item()`.
+	$supports_trash = ( EMPTY_TRASH_DAYS > 0 );
+	if ( 'attachment' === $post->post_type ) {
+		$supports_trash = $supports_trash && MEDIA_TRASH;
+	}
+
+	/** This filter is documented in wp-includes/rest-api/endpoints/class-wp-rest-posts-controller.php */
+	$supports_trash = apply_filters( "rest_{$post->post_type}_trashable", $supports_trash, $post );
+	if ( $supports_trash ) {
+		gutenberg_add_trash_action_link( $response );
+	}
+
+	return $response;
+}
+
+/**
+ * Adds the `action-trash` link to comments the current user can move to the trash.
+ *
+ * Without the link, deleting the comment is permanent.
+ *
+ * @param WP_REST_Response $response The response object.
+ * @param WP_Comment       $comment  Comment object.
+ * @param WP_REST_Request  $request  Request object.
+ * @return WP_REST_Response The response object.
+ */
+function gutenberg_add_comment_trash_action_link( $response, $comment, $request ) {
+	if (
+		'edit' !== $request['context'] ||
+		'trash' === $comment->comment_approved ||
+		(
+			! current_user_can( 'moderate_comments' ) &&
+			! current_user_can( 'edit_comment', $comment->comment_ID )
+		)
+	) {
+		return $response;
+	}
+
+	/** This filter is documented in wp-includes/rest-api/endpoints/class-wp-rest-comments-controller.php */
+	$supports_trash = apply_filters( 'rest_comment_trashable', ( EMPTY_TRASH_DAYS > 0 ), $comment );
+	if ( $supports_trash ) {
+		gutenberg_add_trash_action_link( $response );
+	}
+
+	return $response;
+}
+add_filter( 'rest_prepare_comment', 'gutenberg_add_comment_trash_action_link', 10, 3 );
+
+/**
+ * Registers the `action-trash` link filter for post types shown in REST.
+ *
+ * Menu items and fonts can only be deleted permanently, so they're skipped.
+ *
+ * @param string       $post_type        Post type slug.
+ * @param WP_Post_Type $post_type_object Post type object.
+ */
+function gutenberg_register_post_trash_action_link( $post_type, $post_type_object ) {
+	if (
+		! $post_type_object->show_in_rest ||
+		in_array( $post_type, array( 'nav_menu_item', 'wp_font_family', 'wp_font_face' ), true )
+	) {
+		return;
+	}
+
+	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_post_trash_action_link', 10, 3 );
+}
+add_action( 'registered_post_type', 'gutenberg_register_post_trash_action_link', 10, 2 );
