@@ -3,13 +3,7 @@ import { __experimentalTruncate as Truncate } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
-import {
-	Icon,
-	lockSmall as lock,
-	pinSmall,
-	symbol,
-	unseen,
-} from '@wordpress/icons';
+import { Icon, pinSmall, symbol, unseen } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
 import { Stack, Tooltip } from '@wordpress/ui';
 import BlockIcon from '../block-icon';
@@ -44,14 +38,13 @@ function ListViewBlockSelectButton(
 		clientId,
 		context: 'list-view',
 	} );
-	const { icon, anchor, isSticky, isLocked } = useSelect(
+	const { icon, anchor, isSticky } = useSelect(
 		( select ) => {
 			const {
 				getBlockName,
 				getBlockAttributes,
 				getBlock,
 				isSectionBlock,
-				isLockedBlock,
 			} = unlock( select( blockEditorStore ) );
 			const { getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
@@ -79,13 +72,11 @@ function ListViewBlockSelectButton(
 				icon: blockIcon,
 				anchor: attributes?.anchor,
 				isSticky: attributes?.style?.position?.type === 'sticky',
-				isLocked: isLockedBlock( clientId ),
 			};
 		},
 		[ clientId ]
 	);
 
-	const shouldShowLockIcon = isLocked;
 	const images = useListViewImages( { clientId, isExpanded } );
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
@@ -193,11 +184,6 @@ function ListViewBlockSelectButton(
 						/>
 						<Tooltip.Popup>{ visibilityLabel }</Tooltip.Popup>
 					</Tooltip.Root>
-				) }
-				{ shouldShowLockIcon && (
-					<span className="block-editor-list-view-block-select-button__lock">
-						<Icon icon={ lock } />
-					</span>
 				) }
 			</Stack>
 		</a>
