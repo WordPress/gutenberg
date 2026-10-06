@@ -39,10 +39,12 @@
 -   `ResizableBox`: Update `re-resizable` to `6.11.2`, which supports React 18 and renders the top and left handles before the content so focus order matches visual order ([#83754](https://github.com/WordPress/gutenberg/pull/83754)).
 -   `PaletteEdit`: Keep an item's slug when it is renamed, so blocks and styles that reference the preset keep working ([#83750](https://github.com/WordPress/gutenberg/pull/83750)).
 -   `FocalPointPicker`: End a drag when the pointer is released outside the control, including over the editor canvas ([#83348](https://github.com/WordPress/gutenberg/pull/83348)).
+-   `ContentEditableControl`: Keep a disabled field focusable (out of the tab order), so a field disabled while it has focus keeps it instead of dropping focus on the body ([#84083](https://github.com/WordPress/gutenberg/pull/84083)).
 
 ### Internal
 
 -   `Menu`: Deprecate the private API while preserving it for older bundled consumers. Target removal for WordPress 7.3 after package compatibility checks pass ([#82947](https://github.com/WordPress/gutenberg/pull/82947)).
+-   `ProgressBar`: Use the WordPress Design System color tokens. ([#83779](https://github.com/WordPress/gutenberg/pull/83779)).
 
 ## 41.0.0 (2026-09-23)
 

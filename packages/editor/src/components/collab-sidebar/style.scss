@@ -161,6 +161,10 @@
 .editor-collab-sidebar-panel__note-content {
 	overflow-wrap: break-word;
 
+	p {
+		margin-top: 0;
+	}
+
 	p:last-child {
 		margin-bottom: 0;
 	}
