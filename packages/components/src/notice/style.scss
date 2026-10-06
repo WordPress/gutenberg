@@ -68,6 +68,7 @@
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
 	&:not(:disabled):not([aria-disabled="true"]):focus {
 		color: var(--wpds-color-foreground-interactive-neutral-active);
+		background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 	}
 }
 

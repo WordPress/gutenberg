@@ -61,8 +61,8 @@
 		 * `<h2>` rendered via `Text`.
 		 */
 		.title {
-			color: var(--wpds-color-foreground-content-neutral);
-			--_gcd-heading-color: var(--wpds-color-foreground-content-neutral);
+			color: var(--wpds-color-foreground-content-neutral-strong);
+			--_gcd-heading-color: var(--wpds-color-foreground-content-neutral-strong);
 
 			margin-inline-end: auto;
 			--_gcd-heading-margin: 0 auto 0 0;

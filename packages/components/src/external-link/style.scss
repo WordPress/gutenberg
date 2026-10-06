@@ -9,8 +9,13 @@
 	}
 
 	&:hover,
-	&:active {
+	&:active,
+	&:focus-visible {
 		color: var(--wpds-color-foreground-interactive-brand-active);
+
+		.components-external-link__contents {
+			text-decoration-thickness: max(0.12em, var(--wpds-border-width-sm));
+		}
 	}
 
 	&:focus {

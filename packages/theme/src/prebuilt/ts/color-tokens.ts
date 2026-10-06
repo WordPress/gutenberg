@@ -140,6 +140,7 @@ export default {
 		'foreground-interactive-neutral',
 	],
 	'bg-fgSurface5': [
+		'foreground-content-neutral-strong',
 		'foreground-interactive-neutral-active',
 		'foreground-interactive-neutral-weak-active',
 	],

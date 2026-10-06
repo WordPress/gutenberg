@@ -10,6 +10,7 @@
 
 ### New Features
 
+-   Add `--wpds-color-foreground-content-neutral-strong` for headings and other content with strong emphasis. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 -   Add `--wpds-color-background-thumb-neutral` for neutral progress indicators. ([#83781](https://github.com/WordPress/gutenberg/pull/83781))
 
 ### Bug Fixes
@@ -21,7 +22,7 @@
 
 ### Enhancements
 
--   Generate perception-aware color ramps with ordered surface and stroke progressions, preserve available surface spacing near black and white, align normal content with resting interactive colors, reserve the fifth foreground step for interaction states, and keep WCAG contrast floors unchanged. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
+-   Generate perception-aware color ramps with ordered surface and stroke progressions, preserve available surface spacing near black and white, align normal content with resting interactive colors, use the fifth foreground step for strong content and interaction states, and keep WCAG contrast floors unchanged. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 
 ### Internal
 

@@ -41,6 +41,18 @@ export const SEMANTIC_COLOR_CONTRAST_PAIRS = [
 	},
 	{
 		background: 'background.surface.neutral',
+		foreground: 'foreground.content.neutral-strong',
+	},
+	{
+		background: 'background.surface.neutral-strong',
+		foreground: 'foreground.content.neutral-strong',
+	},
+	{
+		background: 'background.surface.neutral-weak',
+		foreground: 'foreground.content.neutral-strong',
+	},
+	{
+		background: 'background.surface.neutral',
 		foreground: 'foreground.content.neutral-weak',
 	},
 	{

@@ -29,7 +29,7 @@ Perceptual spacing is a preference; configured WCAG contrast floors take priorit
 4. **Place foregrounds.** [`buildForegroundScale`](./lib/build-foreground-scale.ts) uses APCA, which treats light-on-dark and dark-on-light contrast differently. It compares foregrounds to the background ramp's reference. Neutral foregrounds retain tapering; accents preserve the seed's share of available chroma. WCAG floors apply to configured surfaces in both ramps. If the preferred gaps cannot fit, FGS4 moves toward its WCAG floor to leave range for FGS5. Rounded hex output is checked and corrected where possible.
 5. **Build accents, then map tokens.** Accents run the same passes, inheriting the completed background's direction and a bounded version of its SF2 lightness. [`use-theme-provider-styles.ts`](../use-theme-provider-styles.ts) maps the results to semantic CSS properties using the generated alias map.
 
-Surface foregrounds use FGS2 for disabled controls, FGS3 for weak emphasis, FGS4 for normal content and resting controls, and FGS5 for interaction states. FGS5 can approach black or white at the expense of chroma. FGS1 is no longer generated. Strong fills use separate foregrounds. See [`tokens/color.json`](../../tokens/color.json) for exact mappings.
+Surface foregrounds use FGS2 for disabled controls, FGS3 for weak emphasis, FGS4 for normal content and resting controls, and FGS5 for strong neutral content and interaction states. FGS5 can approach black or white at the expense of chroma. FGS1 is no longer generated. Strong fills use separate foregrounds. See [`tokens/color.json`](../../tokens/color.json) for exact mappings.
 
 ## Checks and generated files
 
