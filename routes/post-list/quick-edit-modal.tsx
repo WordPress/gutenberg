@@ -11,6 +11,7 @@ import {
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { loadEditorAssets } from '@wordpress/lazy-editor';
+import { inertValue } from '@wordpress/react-inert-value';
 import { unlock } from '@wordpress/routes-lock-unlock';
 
 const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
@@ -45,7 +46,7 @@ function withEditorAssets( FieldEdit: any ) {
 				aria-busy={ ! isReady || undefined }
 				style={ ! isReady ? { opacity: 0.6 } : undefined }
 				// @ts-expect-error inert not typed properly
-				inert={ ! isReady ? 'true' : undefined }
+				inert={ inertValue( ! isReady ) }
 			>
 				<FieldEdit { ...props } />
 			</div>

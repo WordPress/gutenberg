@@ -80,14 +80,19 @@
 	"devDependencies": {
 		"@types/react-is": "^18.3.1",
 		"deep-freeze": "^0.0.1",
-		"vitest": "^5.0.0"
+		"vitest": "^5.0.3"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",
-		"react": "^18 || ^19"
+		"@types/react-dom": "^18 || ^19",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
 	},
 	"peerDependenciesMeta": {
 		"@types/react": {
+			"optional": true
+		},
+		"@types/react-dom": {
 			"optional": true
 		}
 	},

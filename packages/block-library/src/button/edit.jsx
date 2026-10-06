@@ -27,7 +27,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
-import { link, linkOff } from '@wordpress/icons';
+import { link } from '@wordpress/icons';
 import {
 	createBlock,
 	cloneBlock,
@@ -377,64 +377,55 @@ function ButtonEdit( props ) {
 					{ isLinkTag && ! lockUrlControls && (
 						<ToolbarButton
 							name="link"
-							icon={ ! isURLSet ? link : linkOff }
-							title={ ! isURLSet ? __( 'Link' ) : __( 'Unlink' ) }
-							shortcut={
-								! isURLSet
-									? displayShortcut.primary( 'k' )
-									: displayShortcut.primaryShift( 'k' )
-							}
-							onClick={ ! isURLSet ? startEditing : unlink }
+							icon={ link }
+							title={ __( 'Link' ) }
+							shortcut={ displayShortcut.primary( 'k' ) }
+							onClick={ () => setIsEditingURL( ! isEditingURL ) }
 							isActive={ isURLSet }
 						/>
 					) }
 				</BlockControls>
 			) }
-			{ isLinkTag &&
-				isSelected &&
-				( isEditingURL || isURLSet ) &&
-				! lockUrlControls && (
-					<Popover
-						placement="bottom"
-						onClose={ () => {
-							setIsEditingURL( false );
+			{ isLinkTag && isSelected && isEditingURL && ! lockUrlControls && (
+				<Popover
+					placement="bottom"
+					onClose={ () => {
+						setIsEditingURL( false );
+						richTextRef.current?.focus();
+					} }
+					anchor={ popoverAnchor }
+					focusOnMount={ isEditingURL ? 'firstElement' : false }
+					__unstableSlotName="__unstable-block-tools-after"
+					shift
+				>
+					<LinkControl
+						value={ linkValue }
+						onChange={ ( {
+							url: newURL,
+							opensInNewTab: newOpensInNewTab,
+							nofollow: newNofollow,
+						} ) =>
+							setAttributes(
+								getUpdatedLinkAttributes( {
+									rel,
+									url: newURL,
+									opensInNewTab: newOpensInNewTab,
+									nofollow: newNofollow,
+								} )
+							)
+						}
+						onRemove={ () => {
+							unlink();
 							richTextRef.current?.focus();
 						} }
-						anchor={ popoverAnchor }
-						focusOnMount={ isEditingURL ? 'firstElement' : false }
-						__unstableSlotName="__unstable-block-tools-after"
-						shift
-					>
-						<LinkControl
-							value={ linkValue }
-							onChange={ ( {
-								url: newURL,
-								opensInNewTab: newOpensInNewTab,
-								nofollow: newNofollow,
-							} ) =>
-								setAttributes(
-									getUpdatedLinkAttributes( {
-										rel,
-										url: newURL,
-										opensInNewTab: newOpensInNewTab,
-										nofollow: newNofollow,
-									} )
-								)
-							}
-							onRemove={ () => {
-								unlink();
-								richTextRef.current?.focus();
-							} }
-							forceIsEditingLink={ isEditingURL }
-							settings={ LINK_SETTINGS }
-							createSuggestion={
-								createPageEntity && handleCreate
-							}
-							withCreateSuggestion={ userCanCreatePages }
-							createSuggestionButtonText={ createButtonText }
-						/>
-					</Popover>
-				) }
+						forceIsEditingLink={ ! isURLSet }
+						settings={ LINK_SETTINGS }
+						createSuggestion={ createPageEntity && handleCreate }
+						withCreateSuggestion={ userCanCreatePages }
+						createSuggestionButtonText={ createButtonText }
+					/>
+				</Popover>
+			) }
 			<InspectorControls group="advanced">
 				<HTMLElementControl
 					tagName={ tagName }
