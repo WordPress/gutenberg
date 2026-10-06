@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
-import { useDebouncedInput, usePrevious } from '@wordpress/compose';
+import { usePrevious } from '@wordpress/compose';
 import MediaGrid from './media-grid';
 import { useMediaResults } from './hooks';
 import { useMediaInsert } from './use-media-insert';
@@ -15,9 +15,7 @@ import InserterNoResults from '../no-results';
 const MEDIA_ITEMS_PER_PAGE = 8;
 
 export function MediaCategoryPanel( { onInsert, category } ) {
-	// The grid's search input debounces on its own, so the panel queries with
-	// the value it hands over as-is.
-	const [ search, setSearch ] = useDebouncedInput();
+	const [ search, setSearch ] = useState( '' );
 	const [ page, setPage ] = useState( 1 );
 	// Reset paging whenever the source category or the search term changes.
 	// Adjusting state during render (rather than in an effect) keeps the query
