@@ -152,10 +152,12 @@ export type BlockSelectors = Record<
  * - `layoutHasBlockGapSupport`: optional block gap support override for layout styles.
  * - `name`: block name used by block-specific declaration adjustments.
  * - `elementName`: element name used to resolve valid pseudo selectors.
+ * - `baseStyles`: for a state node, the styles it layers over, nearest first.
  */
 interface StylesNode {
 	styles: any;
 	selector: string;
+	baseStyles?: any[];
 	selectorSuffix?: string;
 	mediaQuery?: string;
 	skipSelectorWrapper?: boolean;
@@ -569,6 +571,56 @@ const getFeatureDeclarations = (
 };
 
 /**
+ * Adds the declarations a state needs to escape a text clip set below it.
+ *
+ * Mirror of `getStateTextClipEscapeCSS` and `getStateTextFillResetCSS` in
+ * packages/block-editor/src/hooks/style.jsx, which do this for a block's own
+ * state styles.
+ *
+ * @param declarations Declarations generated for the state.
+ * @param stateStyles  State style object.
+ * @param baseStyles   Styles the state layers over, nearest first.
+ * @return Declarations with the escapes applied where needed.
+ */
+function getStateDeclarationsWithTextClipEscapes(
+	declarations: string[],
+	stateStyles: any,
+	baseStyles?: any[]
+): string[] {
+	const baseClip = baseStyles?.find(
+		( baseStyle ) => baseStyle?.background?.backgroundClip
+	)?.background?.backgroundClip;
+
+	if ( 'text' !== baseClip ) {
+		return declarations;
+	}
+
+	const stateClip = stateStyles?.background?.backgroundClip;
+	// A background the state paints itself is what the user asked for.
+	const paintsItsOwnBackground =
+		!! stateStyles?.background?.gradient ||
+		!! stateStyles?.background?.backgroundImage ||
+		!! stateStyles?.color?.gradient;
+
+	if ( stateClip && 'text' !== stateClip ) {
+		return paintsItsOwnBackground
+			? declarations
+			: [ ...declarations, 'background-image: unset' ];
+	}
+
+	// A state that sets its own clip already gets the right fill above.
+	if (
+		! stateClip &&
+		! paintsItsOwnBackground &&
+		!! stateStyles?.color?.text
+	) {
+		return [ ...declarations, '-webkit-text-fill-color: currentColor' ];
+	}
+
+	return declarations;
+}
+
+/**
  * Transform given style tree into a set of style declarations.
  *
  * @param blockStyles         Block styles
@@ -958,6 +1010,7 @@ function pickStyleAndPseudoKeys(
 function getPseudoStyleNodes( node: StylesNode ): StylesNode[] {
 	const {
 		styles,
+		baseStyles,
 		selector,
 		featureSelectors,
 		name,
@@ -982,6 +1035,7 @@ function getPseudoStyleNodes( node: StylesNode ): StylesNode[] {
 		return [
 			{
 				styles: JSON.parse( JSON.stringify( pseudoStyles ) ),
+				baseStyles: [ styles, ...( baseStyles ?? [] ) ],
 				selector,
 				selectorSuffix: pseudoSelector,
 				mediaQuery,
@@ -1013,6 +1067,7 @@ function getResponsiveStyleNodes(
 ): StylesNode[] {
 	const {
 		styles,
+		baseStyles,
 		selector,
 		fallbackGapValue,
 		featureSelectors,
@@ -1039,6 +1094,7 @@ function getResponsiveStyleNodes(
 			return [
 				{
 					styles: JSON.parse( JSON.stringify( breakpointStyles ) ),
+					baseStyles: [ styles, ...( baseStyles ?? [] ) ],
 					selector,
 					mediaQuery,
 					featureSelectors:
@@ -1167,6 +1223,7 @@ export const getNodesWithStyles = (
 							const blockSelector = blockSelectors[ blockName ];
 							variationStyleNodesToAdd.push( {
 								styles: variationStyles,
+								baseStyles: [ typedNode ],
 								selector: variationSelector,
 								featureSelectors:
 									blockSelector?.featureSelectors,
@@ -1622,6 +1679,7 @@ function renderStylesNode(
 		mediaQuery,
 		duotoneSelector,
 		styles,
+		baseStyles,
 		fallbackGapValue,
 		hasLayoutSupport,
 		featureSelectors,
@@ -1709,12 +1767,17 @@ function renderStylesNode(
 	}
 
 	// Process the remaining block styles (they use either normal block class or __experimentalSelector).
-	const styleDeclarations = getStylesDeclarations(
+	const declarations = getStylesDeclarations(
 		styles,
 		effectiveSelector,
 		useRootPaddingAlign,
 		tree,
 		disableRootPadding
+	);
+	const styleDeclarations = getStateDeclarationsWithTextClipEscapes(
+		declarations,
+		styles,
+		baseStyles
 	);
 	if ( styleDeclarations?.length ) {
 		const generalSelector = skipSelectorWrapper

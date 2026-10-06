@@ -851,6 +851,238 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		describe( 'state styles under a text clip', () => {
+			const textGradient = {
+				background: {
+					gradient: 'linear-gradient(135deg,#ff0000,#0000ff)',
+					backgroundClip: 'text',
+				},
+			};
+			const blockSelectors = {
+				'core/paragraph': { selector: '.wp-block-paragraph' },
+			};
+
+			const render = ( paragraphStyles: object ) =>
+				transformToStyles(
+					Object.freeze( {
+						styles: {
+							blocks: { 'core/paragraph': paragraphStyles },
+						},
+					} as unknown as GlobalStylesConfig ),
+					blockSelectors,
+					false,
+					false,
+					true,
+					true,
+					minimalStyleOptions
+				);
+
+			it( 'clears the inherited gradient when a breakpoint escapes the clip', () => {
+				const result = render( {
+					...textGradient,
+					'@mobile': {
+						background: { backgroundClip: 'border-box' },
+					},
+				} );
+
+				expect( result ).toContain(
+					'@media (width <= 480px){:root :where(.wp-block-paragraph){background-clip: border-box;-webkit-text-fill-color: currentColor;background-image: unset;}}'
+				);
+			} );
+
+			it( 'leaves a background the breakpoint paints itself', () => {
+				const result = render( {
+					...textGradient,
+					'@mobile': {
+						background: {
+							gradient: 'linear-gradient(135deg,#00ff00,#ffff00)',
+							backgroundClip: 'border-box',
+						},
+					},
+				} );
+
+				expect( result ).not.toContain( 'background-image: unset' );
+			} );
+
+			it( 'restores the fill for a breakpoint text color', () => {
+				const result = render( {
+					...textGradient,
+					'@mobile': { color: { text: '#00ff00' } },
+				} );
+
+				expect( result ).toContain(
+					'@media (width <= 480px){:root :where(.wp-block-paragraph){color: #00ff00;-webkit-text-fill-color: currentColor;}}'
+				);
+			} );
+
+			it( 'adds nothing when the breakpoint keeps the text clip', () => {
+				const result = render( {
+					...textGradient,
+					'@mobile': {
+						background: {
+							gradient: 'linear-gradient(135deg,#00ff00,#ffff00)',
+							backgroundClip: 'text',
+						},
+					},
+				} );
+
+				expect( result ).not.toContain( 'background-image: unset' );
+				expect( result ).not.toContain(
+					'-webkit-text-fill-color: currentColor'
+				);
+			} );
+
+			it( 'reads the clip the breakpoint sets for itself', () => {
+				const result = transformToStyles(
+					Object.freeze( {
+						styles: {
+							blocks: {
+								'core/button': {
+									background: {
+										backgroundClip: 'border-box',
+									},
+									'@mobile': {
+										background: {
+											gradient:
+												'linear-gradient(135deg,#ff0000,#0000ff)',
+											backgroundClip: 'text',
+										},
+										':hover': {
+											color: { text: '#00ff00' },
+										},
+									},
+								},
+							},
+						},
+					} as unknown as GlobalStylesConfig ),
+					{ 'core/button': { selector: '.wp-block-button' } },
+					false,
+					false,
+					true,
+					true,
+					minimalStyleOptions
+				);
+
+				expect( result ).toContain(
+					'@media (width <= 480px){:root :where(.wp-block-button:hover){color: #00ff00;-webkit-text-fill-color: currentColor;}}'
+				);
+			} );
+
+			it( 'reads the variation clip for a breakpoint inside it', () => {
+				const result = transformToStyles(
+					Object.freeze( {
+						styles: {
+							blocks: {
+								'core/group': {
+									variations: {
+										flashy: {
+											...textGradient,
+											'@mobile': {
+												background: {
+													backgroundClip:
+														'border-box',
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					} as unknown as GlobalStylesConfig ),
+					{
+						'core/group': {
+							selector: '.wp-block-group',
+							styleVariationSelectors: {
+								flashy: '.is-style-flashy.wp-block-group',
+							},
+						},
+					},
+					false,
+					false,
+					true,
+					true,
+					{ ...minimalStyleOptions, variationStyles: true }
+				);
+
+				expect( result ).toContain( 'background-image: unset' );
+			} );
+
+			it( 'reads the block clip for a breakpoint inside a variation', () => {
+				const result = transformToStyles(
+					Object.freeze( {
+						styles: {
+							blocks: {
+								'core/group': {
+									...textGradient,
+									variations: {
+										flashy: {
+											'@mobile': {
+												background: {
+													backgroundClip:
+														'border-box',
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					} as unknown as GlobalStylesConfig ),
+					{
+						'core/group': {
+							selector: '.wp-block-group',
+							styleVariationSelectors: {
+								flashy: '.is-style-flashy.wp-block-group',
+							},
+						},
+					},
+					false,
+					false,
+					true,
+					true,
+					{ ...minimalStyleOptions, variationStyles: true }
+				);
+
+				expect( result ).toContain(
+					'@media (width <= 480px){:root :where(.is-style-flashy.wp-block-group){background-clip: border-box;-webkit-text-fill-color: currentColor;background-image: unset;}}'
+				);
+			} );
+
+			it( 'reads the breakpoint clip for a pseudo state inside it', () => {
+				const result = transformToStyles(
+					Object.freeze( {
+						styles: {
+							blocks: {
+								'core/button': {
+									...textGradient,
+									'@mobile': {
+										background: {
+											backgroundClip: 'border-box',
+										},
+										':hover': {
+											color: { text: '#00ff00' },
+										},
+									},
+								},
+							},
+						},
+					} as unknown as GlobalStylesConfig ),
+					{ 'core/button': { selector: '.wp-block-button' } },
+					false,
+					false,
+					true,
+					true,
+					minimalStyleOptions
+				);
+
+				// The breakpoint already escaped the clip, so the hover color
+				// is painted and needs no fill of its own.
+				expect( result ).toContain(
+					'@media (width <= 480px){:root :where(.wp-block-button:hover){color: #00ff00;}}'
+				);
+			} );
+		} );
+
 		it( 'ignores root-level state styles', () => {
 			const tree = {
 				styles: {
