@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove three behaviors whose deprecation warnings named WordPress versions that have already shipped. Use the replacement for each: (1) The `data-wp-ignore` directive is gone, and an element carrying it now hydrates like any other element, so drop the attribute and expect ordinary hydration. (2) Two-hyphen unique IDs, such as `data-wp-on--click--id`, are no longer recognized on `data-wp-watch`, `data-wp-init`, `data-wp-run`, `data-wp-on`, `data-wp-on-window`, and `data-wp-on-document`; use the three-hyphen form, such as `data-wp-on--click---id`. On `data-wp-watch`, `data-wp-init`, and `data-wp-run`, a suffix now makes the directive skipped, with a warning in development mode, and on the `data-wp-on` family the text after `on--` is now read whole as the event name instead of being cut at `--`. (3) Applying `!` to a function in a directive value, such as `data-wp-bind--hidden="!state.isOpen"` when `isOpen` is a function, now leaves the value unresolved, with a warning in development mode; use derived state, such as a getter, instead. Negating a non-function value or a getter is unchanged ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
+
 ### New Features
 
 -   Add the `data-wp-html` directive and `asDangerousHTML()` for rendering explicitly trusted HTML from reactive state. ([#83092](https://github.com/WordPress/gutenberg/pull/83092))
