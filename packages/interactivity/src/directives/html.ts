@@ -6,16 +6,6 @@ import { PENDING_GETTER } from '../proxies/state';
 import { warnUniqueIdNotSupported } from './utils/warnings';
 import { isDangerousHTML, getDangerousHTML } from '../html';
 
-// A single, frozen object reused for every render of every `data-wp-html`
-// element. Preact only writes `dangerouslySetInnerHTML` to the DOM itself
-// when the `__html` value it's given differs from the previous render's; by
-// never changing it, Preact's own diffing never touches this element's
-// content, leaving that entirely to the `useLayoutEffect` below. This also
-// keeps Preact from clearing the element when a render doesn't resolve to
-// trusted HTML, which it would otherwise do for an element that previously
-// had `dangerouslySetInnerHTML` but no longer does.
-const STABLE_EMPTY_HTML = Object.freeze( { __html: '' } );
-
 // data-wp-html — Inner HTML binding, for content explicitly trusted via `asDangerousHTML()`.
 directive(
 	'html',
@@ -35,6 +25,10 @@ directive(
 		// object returned fresh from a getter on every render wouldn't
 		// otherwise compare equal to the previous render's by reference.
 		const lastWrittenKey = useRef< string | undefined >( undefined );
+		// The fallback object supplied by toVdom() before trusted HTML resolves.
+		// Keeping its __html unchanged thereafter prevents Preact from writing
+		// content, leaving all trusted HTML writes to the layout effect.
+		const fallbackHtml = useRef( element.props.dangerouslySetInnerHTML );
 
 		if ( ! entry ) {
 			if ( globalThis.SCRIPT_DEBUG ) {
@@ -119,12 +113,13 @@ directive(
 		}, [ resolvedValue, element.ref ] );
 
 		if ( resolvedValue === undefined ) {
-			// Nothing has ever resolved to trusted HTML for this element:
-			// leave the pre-existing (usually server-rendered) content as is.
+			// Until a token resolves, Preact uses the current fallback, including
+			// on created elements or when navigation supplies a new fallback.
+			fallbackHtml.current = element.props.dangerouslySetInnerHTML;
 			return;
 		}
 
-		element.props.dangerouslySetInnerHTML = STABLE_EMPTY_HTML;
+		element.props.dangerouslySetInnerHTML = fallbackHtml.current;
 		element.props.children = undefined;
 	}
 );

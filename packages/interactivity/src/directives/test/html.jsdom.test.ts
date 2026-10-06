@@ -11,7 +11,7 @@ import { hydrate, options } from 'preact';
 import { act } from 'preact/test-utils';
 import '../index'; // Registers all core directives, including `html`.
 import { hydratedIslands, toVdom } from '../../vdom';
-import { store } from '../../store';
+import { populateServerData, store } from '../../store';
 import { asDangerousHTML, type DangerousHTML } from '../../html';
 import { getScope, resetScope } from '../../scopes';
 
@@ -28,6 +28,42 @@ function createRegion( namespace: string, innerHtml: string ): HTMLElement {
 	container.innerHTML = `<div data-wp-interactive='{ "namespace": "${ namespace }" }'>${ innerHtml }</div>`;
 	document.body.appendChild( container );
 	return container.firstElementChild as HTMLElement;
+}
+
+/**
+ * Records content writes while preserving the element's native DOM behavior.
+ *
+ * @param target The element whose content writes should be observed.
+ * @return The HTML values written to the element, in order.
+ */
+function recordHtmlWrites( target: HTMLElement ): string[] {
+	// Native accessors retain serialization and node replacement behavior.
+	const descriptor = Object.getOwnPropertyDescriptor(
+		Element.prototype,
+		'innerHTML'
+	)!;
+	// Writes are observed from before hydration through subsequent updates.
+	const writes: string[] = [];
+	Object.defineProperty( target, 'innerHTML', {
+		// Allow the accessor to be removed with the test element.
+		configurable: true,
+		/**
+		 * Serializes the element's current content.
+		 *
+		 * @return The native HTML serialization.
+		 */
+		get: () => descriptor.get!.call( target ),
+		/**
+		 * Records a write and applies it with the native setter.
+		 *
+		 * @param value The HTML assigned to the element.
+		 */
+		set: ( value: string ) => {
+			writes.push( value );
+			descriptor.set!.call( target, value );
+		},
+	} );
+	return writes;
 }
 
 describe( 'data-wp-html', () => {
@@ -130,6 +166,144 @@ describe( 'data-wp-html', () => {
 
 		await act( () => hydrate( toVdom( region ), region.parentNode! ) );
 		expect( target.firstElementChild ).toBe( serverNode );
+	} );
+
+	it( 'keeps matching server nodes without writing when null resolves to trusted HTML later', async () => {
+		const namespace = uniqueNamespace();
+		const { state } = store( namespace, {
+			// HTML is unavailable until the later reactive update.
+			state: {
+				// The trusted value bound to the element.
+				html: null as DangerousHTML | null,
+			},
+		} );
+		const region = createRegion(
+			namespace,
+			'<div data-wp-html="state.html"><p>Same</p></div>'
+		);
+		const target = region.querySelector( 'div' )!;
+		const serverNode = target.firstElementChild;
+		const writes = recordHtmlWrites( target );
+
+		await act( () => hydrate( toVdom( region ), region.parentNode! ) );
+		expect( writes ).toEqual( [] );
+		expect( target.firstElementChild ).toBe( serverNode );
+		await act( () => {
+			state.html = asDangerousHTML( '<p>Same</p>' );
+		} );
+		expect( writes ).toEqual( [] );
+		expect( target.firstElementChild ).toBe( serverNode );
+		expect( target.innerHTML ).toBe( '<p>Same</p>' );
+	} );
+
+	it.each( [ '<p>Same</p>', '<p>Client</p>' ] )(
+		'writes only differing trusted HTML when a pending getter registers later: %s',
+		async ( html ) => {
+			const namespace = uniqueNamespace();
+			populateServerData( {
+				// Server state identifies the getter without its client implementation.
+				state: { [ namespace ]: { html: {} } },
+				// Marks HTML as a derived value pending store registration.
+				derivedStateClosures: { [ namespace ]: [ 'state.html' ] },
+			} );
+			const region = createRegion(
+				namespace,
+				'<div data-wp-html="state.html"><p>Same</p></div>'
+			);
+			const target = region.querySelector( 'div' )!;
+			const serverNode = target.firstElementChild;
+			const writes = recordHtmlWrites( target );
+			await act( () => hydrate( toVdom( region ), region.parentNode! ) );
+			expect( writes ).toEqual( [] );
+			expect( target.firstElementChild ).toBe( serverNode );
+
+			// Reactive source populated by the late store registration.
+			let state!: {
+				// HTML source exposed by the registered store.
+				markup: string;
+			};
+			await act( async () => {
+				( { state } = store( namespace, {
+					// Registers the previously pending getter and its reactive input.
+					state: {
+						// HTML source used to produce the trusted token.
+						markup: html,
+						/**
+						 * Resolves the current markup as explicitly trusted HTML.
+						 *
+						 * @return The trusted HTML token.
+						 */
+						get html(): DangerousHTML {
+							return asDangerousHTML( state.markup );
+						},
+					},
+				} ) );
+			} );
+			expect( target.innerHTML ).toBe( html );
+			const expectedWrites = html === '<p>Same</p>' ? [] : [ html ];
+			expect( writes ).toEqual( expectedWrites );
+			expect( target.firstElementChild === serverNode ).toBe(
+				html === '<p>Same</p>'
+			);
+
+			await act( () => {
+				state.markup = '<p>Other</p>';
+			} );
+			expect( writes ).toEqual( [ ...expectedWrites, '<p>Other</p>' ] );
+			expect( target.innerHTML ).toBe( '<p>Other</p>' );
+		}
+	);
+
+	it( 'shows fallback before HTML resolves and trusted HTML in existing and newly added list items', async () => {
+		const namespace = uniqueNamespace();
+		const { state } = store( namespace, {
+			// Reactive list and HTML shared by all item elements.
+			state: {
+				// Items rendered from the template.
+				list: [ 'a' ],
+				// Trusted HTML remains unavailable during initial item creation.
+				html: null as DangerousHTML | null,
+			},
+		} );
+		const region = createRegion(
+			namespace,
+			'<ul><template data-wp-each="state.list"><li><div data-wp-html="state.html"><i>loading</i></div></li></template></ul>'
+		);
+		await act( () => hydrate( toVdom( region ), region.parentNode! ) );
+		expect( region.querySelectorAll( 'li' ) ).toHaveLength( 1 );
+		expect( region.querySelector( 'li div' )!.innerHTML ).toBe(
+			'<i>loading</i>'
+		);
+
+		await act( () => {
+			state.list = [ 'a', 'b' ];
+		} );
+		expect(
+			Array.from(
+				region.querySelectorAll( 'li div' ),
+				( item ) => item.innerHTML
+			)
+		).toEqual( [ '<i>loading</i>', '<i>loading</i>' ] );
+
+		await act( () => {
+			state.html = asDangerousHTML( '<b>Ready</b>' );
+		} );
+		expect(
+			Array.from(
+				region.querySelectorAll( 'li div' ),
+				( item ) => item.innerHTML
+			)
+		).toEqual( [ '<b>Ready</b>', '<b>Ready</b>' ] );
+
+		await act( () => {
+			state.list = [ 'a', 'b', 'c' ];
+		} );
+		expect(
+			Array.from(
+				region.querySelectorAll( 'li div' ),
+				( item ) => item.innerHTML
+			)
+		).toEqual( [ '<b>Ready</b>', '<b>Ready</b>', '<b>Ready</b>' ] );
 	} );
 
 	it( 'does not render a plain string as HTML', async () => {
