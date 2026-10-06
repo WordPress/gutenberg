@@ -76,11 +76,10 @@ Figma can import supported DTCG token types as variables through its [built-in d
 
 #### Generate border collection files
 
-The normal theme build generates the committed Figma files and formats all generated artifacts in the shared `postbuild` step. For targeted Figma generation, run the generator followed by that formatting step from the repository root:
+Run the theme build from the repository root to generate and format the committed artifacts, including the Figma files:
 
 ```sh
-npm run --workspace @wordpress/theme build:figma
-npm run --workspace @wordpress/theme postbuild
+npm run --workspace @wordpress/theme build
 ```
 
 The generator applies `wpds.resolver.json` to produce six complete DTCG files under `packages/theme/prebuilt/figma/`. Radius and width use separate collections so designers can choose corner radius and pixel density independently.
