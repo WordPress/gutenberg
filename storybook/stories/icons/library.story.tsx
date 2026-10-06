@@ -62,6 +62,8 @@ function nameToSlug( name: string ): string {
 
 const meta: Meta = {
 	component: Icon,
+	// Shares its `id` and `title` with `packages/icons/src/icon/stories/index.story.tsx`
+	// so both files merge into one entry. Change them together.
 	id: 'icons-icon',
 	title: 'Design System/Icons/Icon',
 	tags: [ '!autodocs' ],
