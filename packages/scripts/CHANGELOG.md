@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-### Breaking Changes
+### Enhancements
 
--   `lint-js`: Report `expect.poll()` and `expect.element()` assertions that are neither awaited nor explicitly returned in the default unit-test configuration, following the updated `@wordpress/eslint-plugin` `test-unit` defaults. See the [migration notes](https://github.com/WordPress/gutenberg/pull/83995#migration-notes) ([#83995](https://github.com/WordPress/gutenberg/pull/83995)).
+-   `lint-js`: Allow unit-test titles passed through variables ([#83995](https://github.com/WordPress/gutenberg/pull/83995)).
 
 ### Bug Fixes
 

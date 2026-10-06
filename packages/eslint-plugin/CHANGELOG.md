@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Breaking Changes
-
--   `test-unit`: Report `expect.poll()` and `expect.element()` assertions that are neither awaited nor explicitly returned with `vitest/require-awaited-expect-poll`. This also affects the default `wp-scripts lint-js` unit-test configuration. See the [migration notes](https://github.com/WordPress/gutenberg/pull/83995#migration-notes) ([#83995](https://github.com/WordPress/gutenberg/pull/83995)).
-
 ### New Features
 
 -   `use-recommended-components`: Add an `allowUseWithCaution` option that allows `@wordpress/ui` components marked "Use with caution" ([#83536](https://github.com/WordPress/gutenberg/pull/83536)).

@@ -608,6 +608,7 @@ export default dedupePlugins( [
 		ignores: vitestLintIgnores,
 		rules: {
 			...config.rules,
+			'vitest/require-awaited-expect-poll': 'error',
 			// These checks were enabled by Jest's baseline but are not recommended
 			// Vitest rules. Keep their existing enforcement during the switch.
 			'vitest/no-alias-methods': 'error',
