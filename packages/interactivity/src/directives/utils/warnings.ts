@@ -1,18 +1,10 @@
 import { warn } from '../../utils';
 
-/**
- * Warns that suffixes are not supported for a lifecycle directive.
- *
- * @param prefix Directive name.
- * @param suffix Unsupported suffix.
- */
-export const warnSuffixNotSupported = (
-	prefix: string,
-	suffix: string
-): void => {
+// Warns that suffixes are not supported for a given directive.
+export const warnSuffixNotSupported = ( prefix: string, suffix: string ) => {
 	if ( globalThis.SCRIPT_DEBUG ) {
 		warn(
-			`Suffixes are not supported for the data-wp-${ prefix } directive. Ignoring the directive with suffix "${ suffix }".`
+			`Suffixes for the data-wp-${ prefix } directive are not supported. Ignoring the directive with suffix "${ suffix }".`
 		);
 	}
 };
