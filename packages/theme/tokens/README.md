@@ -17,7 +17,7 @@ The design system follows the [Design Tokens Format Module](https://www.designto
 | `motion.json`     | Animation durations and easing curves                                                                                            |
 | `cursor.json`     | Cursor values for interactive controls                                                                                           |
 
-Each JSON file contains both primitive and semantic token definitions in a hierarchical structure. `wpds.resolver.json` composes those base sources with the contextual values in `/modes`. These files are the source of truth for the design system and are processed during the build step to generate published assets in `/prebuilt` and internal TypeScript sources in `/src/prebuilt`.
+Each JSON file contains both primitive and semantic token definitions in a hierarchical structure. `wpds.resolver.json` composes those base sources with inline corner-radius and pixel-density overrides. The default `subtle` and `standard` contexts are empty, so their values come from `border.json`. These files are the source of truth for the design system and are processed during the build step to generate published assets in `/prebuilt` and internal TypeScript sources in `/src/prebuilt`.
 
 ## Token Naming
 
@@ -72,7 +72,7 @@ The design tokens use [the `$extensions` feature](https://www.designtokens.org/t
 
 ### Figma Support
 
-Figma can import supported DTCG token types as variables through its [built-in design token importer](https://help.figma.com/hc/en-us/articles/15343816063383-Modes-for-variables#h_01KAGYPSFC984XDB4YWBCNRZJ7). The resolver itself is not an import file. The files in `modes/` are partial resolver inputs, so they do not contain every variable needed to create a collection.
+Figma can import supported DTCG token types as variables through its [built-in design token importer](https://help.figma.com/hc/en-us/articles/15343816063383-Modes-for-variables#h_01KAGYPSFC984XDB4YWBCNRZJ7). The resolver itself is not an import file. Its inline contexts contain only value overrides; use the complete generated files below to create collections or update modes.
 
 #### Generate border collection files
 
@@ -91,7 +91,7 @@ The generator applies `wpds.resolver.json` to produce six complete DTCG files un
 
 Each file includes every token in its collection, including unchanged values, descriptions, types, and Figma scopes. The original hierarchy preserves variable names. Token aliases remain references instead of becoming literal values. The current border tokens contain no aliases. Aliases within a collection were verified in Figma for both collection creation and mode updates.
 
-These generated files are committed under `prebuilt/figma` and included in the npm package. Do not edit them as sources. `wpds.resolver.json`, its base sources, and the tracked files in `modes/` remain canonical inputs for both CSS and Figma generation.
+These generated files are committed under `prebuilt/figma` and included in the npm package. Do not edit them as sources. `wpds.resolver.json` and its base sources remain canonical inputs for both CSS and Figma generation. Edit default values and metadata in `border.json`, and mode-specific value overrides in the resolver.
 
 #### Test in a Figma library branch
 
