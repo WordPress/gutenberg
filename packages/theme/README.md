@@ -20,7 +20,7 @@ This README is the entry point for package consumers. It covers how to load desi
 | Entrypoint | Supported use |
 | --- | --- |
 | `@wordpress/theme` | `ThemeProvider`, `generateColorTokens` and its types, and the generated token scale types, such as `PaddingSize` and `GapSize`. Derive provider props and callback types from the component as shown below. |
-| `@wordpress/theme/colors` | `generateColorTokens` without React, for Node scripts and build tools. See [Generating Colors Outside React](#generating-colors-outside-react). |
+| `@wordpress/theme/colors` | `generateColorTokens` without loading React. See [Generating Colors Outside React](#generating-colors-outside-react). |
 | `@wordpress/theme/design-tokens.css` | Default semantic `--wpds-*` custom properties. Load once per document. |
 | `@wordpress/theme/design-tokens.js` | Default export containing the list of semantic CSS custom property names. It contains names, not token values, and does not load styles. |
 | Build plugin subpaths | The four public integrations listed under [Build Plugins](#build-plugins). |
@@ -310,7 +310,7 @@ The result describes custom property names and values only. Where they apply, wh
 const styles = { ...tokens, ...compatibility };
 ```
 
-Node scripts and build tools can import the same function from `@wordpress/theme/colors`, which pulls in no React dependency. In a script built for WordPress, import it from `@wordpress/theme` instead: WordPress provides the package as the `wp.theme` global, and a subpath import has no matching global.
+To use it where React may not be installed, import it from `@wordpress/theme/colors`, which does not load React. In a script built for WordPress, import it from `@wordpress/theme`: WordPress provides the package as the `wp.theme` global, and a subpath import has no matching global.
 
 ## Stylelint Plugins
 
