@@ -1669,6 +1669,11 @@ Action that toggles the Top Toolbar view option.
 
 Action for trashing the current post in the editor.
 
+_Parameters_
+
+- _options_ `[Object]`: Options.
+- _options.force_ `[boolean]`: Whether to delete the post permanently instead of moving it to the trash.
+
 ### undo
 
 Action that pops a record from undo history and undoes the edit.
