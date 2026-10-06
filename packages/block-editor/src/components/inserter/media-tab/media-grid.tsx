@@ -5,10 +5,25 @@ import { DataViews } from '@wordpress/dataviews';
 import type { Action, Field, View } from '@wordpress/dataviews';
 import { Spinner } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-import InserterDraggableBlocks from '../../inserter-draggable-blocks';
+import UntypedInserterDraggableBlocks from '../../inserter-draggable-blocks';
 import { getBlockAndPreviewFromMedia, getItemId } from './utils';
 
 type MediaType = 'image' | 'video' | 'audio';
+
+// `inserter-draggable-blocks` is untyped JS, so TypeScript infers every
+// destructured prop as required. Narrow it to what this file passes and
+// what the render prop hands back.
+// TODO: drop this once the component declares its own props.
+const InserterDraggableBlocks =
+	UntypedInserterDraggableBlocks as React.ComponentType< {
+		isEnabled: boolean;
+		blocks: unknown[];
+		children: ( props: {
+			draggable: boolean;
+			onDragStart: React.DragEventHandler;
+			onDragEnd: React.DragEventHandler;
+		} ) => React.ReactElement;
+	} >;
 
 /**
  * An `InserterMediaItem` (see the `registerInserterMediaCategory` typedef in
