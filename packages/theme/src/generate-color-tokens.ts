@@ -41,16 +41,6 @@ export type CustomProperties = Record< CustomPropertyName, string >;
 
 type Entry = [ CustomPropertyName, string ];
 
-function toCustomProperties( entries: Entry[] ): CustomProperties {
-	const properties: CustomProperties = {};
-
-	for ( const [ name, value ] of entries ) {
-		properties[ name ] = value;
-	}
-
-	return properties;
-}
-
 // `getCachedAccentRamp` includes the `bgRamp` object reference in its cache key.
 // Without memoizing background ramps, accent ramp memoization would not work at all.
 const getCachedBgRamp = memoize( buildBgRamp, { maxSize: 10 } );
@@ -258,8 +248,8 @@ export function generateColorTokens(
 	const colorEntries = colorTokensCSS( computedColorRamps );
 
 	return {
-		tokens: toCustomProperties( colorEntries ),
-		compatibility: toCustomProperties( [
+		tokens: Object.fromEntries( colorEntries ),
+		compatibility: Object.fromEntries( [
 			...legacyWpAdminThemeOverridesCSS( resolvedSeeds.primary ),
 			...legacyWpComponentsOverridesCSS,
 		] ),
