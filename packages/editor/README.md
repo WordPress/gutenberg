@@ -1560,11 +1560,11 @@ _Parameters_
 
 ### registerEntityField
 
-> **Deprecated** since Gutenberg 24.2. Register the field in PHP on the `fields_api_init` action instead, with a script module for its JavaScript parts.
+> **Deprecated** since Gutenberg 24.2. Register the field in PHP on the `wp_fields_api_init` action instead, with a script module for its JavaScript parts.
 
 Has no effect: every field of an entity is registered on the server.
 
-Register the field in PHP on the `fields_api_init` action instead, with a script module for the parts PHP cannot serialize (`render`, `Edit`, `getElements`…).
+Register the field in PHP on the `wp_fields_api_init` action instead, with a script module for the parts PHP cannot serialize (`render`, `Edit`, `getElements`…).
 
 _Parameters_
 
@@ -1669,11 +1669,11 @@ _Parameters_
 
 ### unregisterEntityField
 
-> **Deprecated** since Gutenberg 24.2. Unregister the field in PHP on the `fields_api_init` action instead.
+> **Deprecated** since Gutenberg 24.2. Unregister the field in PHP on the `wp_fields_api_init` action instead.
 
 Has no effect: every field of an entity is registered on the server.
 
-Unregister the field in PHP on the `fields_api_init` action instead.
+Unregister the field in PHP on the `wp_fields_api_init` action instead.
 
 _Parameters_
 

@@ -55,7 +55,7 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
-	 * The callbacks a test hooked to `fields_api_init`, removed on tear
+	 * The callbacks a test hooked to `wp_fields_api_init`, removed on tear
 	 * down.
 	 *
 	 * @var callable[]
@@ -66,12 +66,12 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	 * Tears down each test.
 	 *
 	 * Resetting the registry drops the fields a test registered along with
-	 * the defaults; the next read fires `fields_api_init` again and
+	 * the defaults; the next read fires `wp_fields_api_init` again and
 	 * registers the defaults anew.
 	 */
 	public function tear_down() {
 		foreach ( $this->callbacks as $callback ) {
-			remove_action( 'fields_api_init', $callback );
+			remove_action( 'wp_fields_api_init', $callback );
 		}
 		$this->callbacks = array();
 		self::reset_registry();
@@ -82,7 +82,7 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	/**
 	 * Resets the registry: drops the singleton instance, so the next
 	 * get_instance() creates an empty registry and its first read fires
-	 * `fields_api_init` again.
+	 * `wp_fields_api_init` again.
 	 */
 	private static function reset_registry() {
 		$instance = new ReflectionProperty( Gutenberg_Fields_Registry::class, 'instance' );
@@ -93,7 +93,7 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
-	 * Registers fields on `fields_api_init` for the duration of the test,
+	 * Registers fields on `wp_fields_api_init` for the duration of the test,
 	 * with the `test-plugin` origin: the registry is reset on tear down.
 	 *
 	 * Registering only runs on the action, so the registration is hooked to
@@ -112,7 +112,7 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 		$callback   = static function ( $registry ) use ( &$registered, $kind, $name, $fields, $module ) {
 			$registered = $registry->register( 'test-plugin', $kind, $name, $fields, $module );
 		};
-		add_action( 'fields_api_init', $callback );
+		add_action( 'wp_fields_api_init', $callback );
 		$this->callbacks[] = $callback;
 
 		self::reset_registry();
@@ -123,7 +123,7 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
-	 * Updates registered fields on `fields_api_init` for the duration of the
+	 * Updates registered fields on `wp_fields_api_init` for the duration of the
 	 * test, with the `test-plugin` origin, the way register_fields() registers
 	 * them.
 	 *
@@ -138,7 +138,7 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 		$callback = static function ( $registry ) use ( &$updated, $kind, $name, $fields, $module ) {
 			$updated = $registry->update( 'test-plugin', $kind, $name, $fields, $module );
 		};
-		add_action( 'fields_api_init', $callback );
+		add_action( 'wp_fields_api_init', $callback );
 		$this->callbacks[] = $callback;
 
 		self::reset_registry();

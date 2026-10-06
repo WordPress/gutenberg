@@ -7,7 +7,7 @@
 -   Every field of a post type now comes from the server: `registerPostTypeSchema()` registers the fields the `wp/v2/fields` route returns and adds none of its own. The featured image field is the last one it registered, and it is now registered in PHP for the post types supporting `thumbnail` when the theme supports post thumbnails for them ([#83368](https://github.com/WordPress/gutenberg/pull/83368)).
 -   The template field comes from the server, for every post type but the design ones. Whether a post can be assigned a template still depends on the theme and on the post resolving to a template, which the field's control and view check as before ([#83368](https://github.com/WordPress/gutenberg/pull/83368)).
 -   The format field comes from the server, which offers it when the post type supports `post-formats` and the theme supports post formats. The editor no longer registers it from the `disablePostFormats` editor setting, which only the post editor screen sets, so the field is now hidden consistently in the site editor views of a theme without post formats ([#83368](https://github.com/WordPress/gutenberg/pull/83368)).
--   `registerEntityField` and `unregisterEntityField`, only available in the Gutenberg plugin, have no effect. They still warn, and they no longer register or unregister anything: every field of an entity is registered on the server. Register and unregister fields in PHP on the `fields_api_init` action instead, with a script module for their JavaScript parts ([#83368](https://github.com/WordPress/gutenberg/pull/83368)).
+-   `registerEntityField` and `unregisterEntityField`, only available in the Gutenberg plugin, have no effect. They still warn, and they no longer register or unregister anything: every field of an entity is registered on the server. Register and unregister fields in PHP on the `wp_fields_api_init` action instead, with a script module for their JavaScript parts ([#83368](https://github.com/WordPress/gutenberg/pull/83368)).
 -   The `content-preview` field is no longer registered for the post types supporting the editor. No view referenced it: the post and page views show the featured image as their media field, and the template, template part, and pattern views add their own preview field. A view that wants a content preview declares it in its own field list, as those views do ([#83368](https://github.com/WordPress/gutenberg/pull/83368)).
 
 ### Enhancements
@@ -19,7 +19,7 @@
 
 ### Deprecations
 
--   `registerEntityField` and `unregisterEntityField`, only available in the Gutenberg plugin, are deprecated. Register and unregister fields in PHP on the `fields_api_init` action instead, with a script module for their JavaScript parts ([#83368](https://github.com/WordPress/gutenberg/pull/83368)).
+-   `registerEntityField` and `unregisterEntityField`, only available in the Gutenberg plugin, are deprecated. Register and unregister fields in PHP on the `wp_fields_api_init` action instead, with a script module for their JavaScript parts ([#83368](https://github.com/WordPress/gutenberg/pull/83368)).
 
 ### Bug Fixes
 

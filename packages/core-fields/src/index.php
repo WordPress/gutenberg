@@ -97,7 +97,7 @@ function register_core_post_type_supports_fields( $registry ) {
  * ones the core post types do not get, then the collections of single post
  * types, then the collection of the site.
  *
- * Hooked at priority 0, so a plugin hooking `fields_api_init` at the
+ * Hooked at priority 0, so a plugin hooking `wp_fields_api_init` at the
  * default priority sees the core fields registered, and can update or
  * unregister them.
  *
@@ -135,4 +135,4 @@ function register_core_field_collections( $registry ) {
 	// Register fields for root/site (entity/kind).
 	wp_register_field_collection( $registry, __DIR__ . '/root_site' );
 }
-add_action( 'fields_api_init', 'register_core_field_collections', 0 );
+add_action( 'wp_fields_api_init', 'register_core_field_collections', 0 );

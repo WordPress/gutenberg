@@ -17,7 +17,7 @@ describe( 'registerEntityField', () => {
 		registerEntityField( 'postType', 'post', { id: 'acme/rating' } );
 
 		expect( console ).toHaveWarnedWith(
-			'wp.editor.registerEntityField is deprecated since version 24.2. Please use the `fields_api_init` PHP action instead.'
+			'wp.editor.registerEntityField is deprecated since version 24.2. Please use the `wp_fields_api_init` PHP action instead.'
 		);
 		expect( actions.registerEntityField ).not.toHaveBeenCalled();
 	} );
@@ -28,7 +28,7 @@ describe( 'unregisterEntityField', () => {
 		unregisterEntityField( 'postType', 'post', 'acme/rating' );
 
 		expect( console ).toHaveWarnedWith(
-			'wp.editor.unregisterEntityField is deprecated since version 24.2. Please use the `fields_api_init` PHP action instead.'
+			'wp.editor.unregisterEntityField is deprecated since version 24.2. Please use the `wp_fields_api_init` PHP action instead.'
 		);
 		expect( actions.unregisterEntityField ).not.toHaveBeenCalled();
 	} );

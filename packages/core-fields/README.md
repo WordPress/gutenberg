@@ -85,7 +85,7 @@ There is no precedence between collections: the registry skips a field already r
 
 ### Loading
 
-`src/index.php` registers the core fields through the public Fields API, exactly as a plugin registers its own. `register_core_field_collections()` runs on the `fields_api_init` action at priority 0: it registers the defaults first, unregisters the ones the core post types do not get, then calls `wp_register_field_collection()` for each collection, listed explicitly. The action fires once `init` has completed, when the supports of the post types are final, and a plugin hooking it at the default priority sees the core fields registered, and can update or unregister them.
+`src/index.php` registers the core fields through the public Fields API, exactly as a plugin registers its own. `register_core_field_collections()` runs on the `wp_fields_api_init` action at priority 0: it registers the defaults first, unregisters the ones the core post types do not get, then calls `wp_register_field_collection()` for each collection, listed explicitly. The action fires once `init` has completed, when the supports of the post types are final, and a plugin hooking it at the default priority sees the core fields registered, and can update or unregister them.
 
 `wp_register_field_collection( $registry, $directory )` reads one collection and registers its fields on the registry the action passes, after the fields registered on the entity before, in the alphabetical order of their folders. Like the registry, it does not check that the entity exists: the `/wp/v2/fields` route only serves the fields of the entities the REST API exposes. It returns whether the collection is valid and the registry accepted all of its fields.
 
@@ -93,7 +93,7 @@ A plugin does the same with its own collections. With the Gutenberg plugin, the 
 
 ```php
 add_action(
-	'fields_api_init',
+	'wp_fields_api_init',
 	function ( $registry ) {
 		// Books do not get the default comment status.
 		$registry->unregister( 'postType', 'book', array( 'comment_status' ) );

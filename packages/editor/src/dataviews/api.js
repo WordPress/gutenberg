@@ -58,12 +58,12 @@ export function unregisterEntityAction( kind, name, actionId ) {
 /**
  * Has no effect: every field of an entity is registered on the server.
  *
- * Register the field in PHP on the `fields_api_init` action instead, with a
+ * Register the field in PHP on the `wp_fields_api_init` action instead, with a
  * script module for the parts PHP cannot serialize (`render`, `Edit`,
  * `getElements`…).
  *
  * @deprecated since Gutenberg 24.2. Register the field in PHP on the
- *             `fields_api_init` action instead, with a script module for its
+ *             `wp_fields_api_init` action instead, with a script module for its
  *             JavaScript parts.
  *
  * @param {string} kind   Entity kind.
@@ -74,17 +74,17 @@ export function registerEntityField( kind, name, config ) {
 	deprecated( 'wp.editor.registerEntityField', {
 		since: '24.2',
 		plugin: 'Gutenberg',
-		alternative: 'the `fields_api_init` PHP action',
+		alternative: 'the `wp_fields_api_init` PHP action',
 	} );
 }
 
 /**
  * Has no effect: every field of an entity is registered on the server.
  *
- * Unregister the field in PHP on the `fields_api_init` action instead.
+ * Unregister the field in PHP on the `wp_fields_api_init` action instead.
  *
  * @deprecated since Gutenberg 24.2. Unregister the field in PHP on the
- *             `fields_api_init` action instead.
+ *             `wp_fields_api_init` action instead.
  *
  * @param {string} kind    Entity kind.
  * @param {string} name    Entity name.
@@ -94,7 +94,7 @@ export function unregisterEntityField( kind, name, fieldId ) {
 	deprecated( 'wp.editor.unregisterEntityField', {
 		since: '24.2',
 		plugin: 'Gutenberg',
-		alternative: 'the `fields_api_init` PHP action',
+		alternative: 'the `wp_fields_api_init` PHP action',
 	} );
 }
 
