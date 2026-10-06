@@ -75,19 +75,22 @@ When the label text is already visible elsewhere, pass a descriptive string and 
 />
 ```
 
-For a custom layout, such as placing the label before the switch, compose `Switch` with [`Field`](?path=/docs/design-system-components-form-primitives-field--docs):
+To customize the label typography, compose `Switch` with [`Field`](?path=/docs/design-system-components-form-primitives-field--docs):
 
 ```jsx
 import { Field, Stack, Switch } from '@wordpress/ui';
 
-<Field.Root
-	render={ <Stack gap="sm" align="center" justify="space-between" /> }
->
-	<Field.Label variant="plain">Fixed background</Field.Label>
+<Field.Root render={ <Stack gap="sm" align="start" /> }>
 	<Switch
 		checked={ hasFixedBackground }
 		onCheckedChange={ setHasFixedBackground }
 	/>
+	<Field.Label
+		variant="plain"
+		style={ { fontFamily: 'var(--wpds-typography-font-family-mono)' } }
+	>
+		Fixed background
+	</Field.Label>
 </Field.Root>;
 ```
 
