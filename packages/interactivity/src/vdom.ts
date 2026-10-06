@@ -155,6 +155,13 @@ export function toVdom( root: Node ): ComponentChild {
 				attributeName.slice( 0, directivePrefix.length ) ===
 					directivePrefix
 			) {
+				if ( globalThis.SCRIPT_DEBUG ) {
+					if ( attributeName === 'data-wp-ignore' ) {
+						warn(
+							'The data-wp-ignore directive has been removed. The element and its descendants are now hydrated like any other element. Please remove the attribute.'
+						);
+					}
+				}
 				const { namespace, value } =
 					parseDirectiveValue( attributeValue );
 				if ( attributeName === 'data-wp-interactive' ) {
