@@ -126,9 +126,7 @@ export function useBlockReaction( clientId: string ) {
 				] );
 
 			const entry = readSummary()[ anchor ]?.[ hexKey ];
-			const myReactionId = entry?.reacted
-				? entry.my_reaction_id
-				: undefined;
+			const myReactionId = entry?.current_user_reaction || undefined;
 			let addedReactionId: number | undefined;
 
 			try {

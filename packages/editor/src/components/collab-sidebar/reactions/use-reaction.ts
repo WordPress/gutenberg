@@ -26,7 +26,7 @@ export interface ReactableNote {
  *
  * Used to keep `reaction_summary` usable when the refetch that would
  * normally replace it fails: without it, the next toggle reads a stale
- * `reacted` / `my_reaction_id` pair and takes the wrong branch.
+ * `current_user_reaction` and takes the wrong branch.
  *
  * @param note            The cached note record.
  * @param hexKey          The reaction hex key that changed.
@@ -39,14 +39,14 @@ export function applyReactionDelta< T extends ReactableNote >(
 	hexKey: string,
 	addedReactionId?: number
 ): T {
-	return {
-		...note,
-		reaction_summary: applyReactionSummaryDelta(
-			note.reaction_summary,
-			hexKey,
-			addedReactionId
-		),
-	};
+	const summary = applyReactionSummaryDelta(
+		note.reaction_summary,
+		hexKey,
+		addedReactionId
+	);
+	return summary === note.reaction_summary
+		? note
+		: { ...note, reaction_summary: summary };
 }
 
 /*
@@ -78,9 +78,7 @@ export function useReaction( note: ReactableNote ) {
 	const toggleReaction = useCallback(
 		async ( hexKey: string ) => {
 			const entry = reactions?.[ hexKey ];
-			const myReactionId = entry?.reacted
-				? entry.my_reaction_id
-				: undefined;
+			const myReactionId = entry?.current_user_reaction || undefined;
 			const isRemoving = !! myReactionId;
 			let addedReactionId: number | undefined;
 
@@ -134,7 +132,7 @@ export function useReaction( note: ReactableNote ) {
 
 			// Mutating a reaction comment doesn't invalidate the cached
 			// `reaction_summary`, so a subsequent toggle would read stale
-			// `reacted` / `my_reaction_id` data and route into the wrong
+			// `current_user_reaction` data and route into the wrong
 			// branch (deleting an already-removed comment).
 			//
 			// The mutation has landed, so fold its known effect into the

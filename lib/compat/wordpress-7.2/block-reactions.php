@@ -161,7 +161,7 @@ function gutenberg_resolve_reaction_target( array $args ) {
 			);
 		}
 
-		// A reaction under a hidden note would escape the trash/restore cascade.
+		// A reaction under a hidden note would escape the trash cascade.
 		if ( in_array( $parent_comment->comment_approved, array( 'trash', 'spam' ), true ) ) {
 			return new WP_Error(
 				'rest_comment_invalid_parent',
@@ -298,22 +298,18 @@ add_filter( 'rest_comment_query', 'gutenberg_filter_rest_comment_query_by_block'
  *
  * @since 7.2.0
  *
- * @return array JSON Schema for `{ count, reacted, my_reaction_id }`.
+ * @return array JSON Schema for `{ count, current_user_reaction }`.
  */
 function gutenberg_get_reaction_summary_entry_schema() {
 	return array(
 		'type'       => 'object',
 		'properties' => array(
-			'count'          => array(
+			'count'                 => array(
 				'description' => __( 'Total number of reactions with this emoji.', 'gutenberg' ),
 				'type'        => 'integer',
 			),
-			'reacted'        => array(
-				'description' => __( 'Whether the current user reacted with this emoji.', 'gutenberg' ),
-				'type'        => 'boolean',
-			),
-			'my_reaction_id' => array(
-				'description' => __( 'The current user\'s reaction comment ID, or 0 if not reacted.', 'gutenberg' ),
+			'current_user_reaction' => array(
+				'description' => __( 'The current user\'s reaction comment ID for this emoji, or 0 if they have not reacted.', 'gutenberg' ),
 				'type'        => 'integer',
 			),
 		),
@@ -329,7 +325,7 @@ function gutenberg_get_reaction_summary_entry_schema() {
  *
  * @param int $post_id Post ID.
  * @param int $user_id User whose own reactions are flagged. Default 0.
- * @return array `{ anchor: { hex_key: { count, reacted, my_reaction_id } } }`.
+ * @return array `{ anchor: { hex_key: { count, current_user_reaction } } }`.
  */
 function gutenberg_get_block_reaction_summary( $post_id, $user_id = 0 ) {
 	global $wpdb;
@@ -338,7 +334,7 @@ function gutenberg_get_block_reaction_summary( $post_id, $user_id = 0 ) {
 	$rows = $wpdb->get_results(
 		$wpdb->prepare(
 			"SELECT m.meta_value AS block, c.comment_content AS hex_key, COUNT(*) AS reaction_count,
-				MIN( CASE WHEN c.user_id = %d THEN c.comment_ID ELSE NULL END ) AS my_reaction_id
+				MIN( CASE WHEN c.user_id = %d THEN c.comment_ID ELSE NULL END ) AS current_user_reaction
 			FROM {$wpdb->comments} c
 			INNER JOIN {$wpdb->commentmeta} m ON m.comment_id = c.comment_ID AND m.meta_key = %s
 			WHERE c.comment_post_ID = %d
@@ -355,14 +351,12 @@ function gutenberg_get_block_reaction_summary( $post_id, $user_id = 0 ) {
 
 	$summary = array();
 	foreach ( (array) $rows as $row ) {
-		$anchor         = (string) $row->block;
-		$hex_key        = wp_strip_all_tags( $row->hex_key );
-		$my_reaction_id = (int) $row->my_reaction_id;
+		$anchor  = (string) $row->block;
+		$hex_key = wp_strip_all_tags( $row->hex_key );
 
 		$summary[ $anchor ][ $hex_key ] = array(
-			'count'          => (int) $row->reaction_count,
-			'reacted'        => $my_reaction_id > 0,
-			'my_reaction_id' => $my_reaction_id,
+			'count'                 => (int) $row->reaction_count,
+			'current_user_reaction' => (int) $row->current_user_reaction,
 		);
 	}
 

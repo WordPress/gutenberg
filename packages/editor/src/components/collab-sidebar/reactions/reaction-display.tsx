@@ -51,7 +51,7 @@ function hasUserReacted(
 	reactions: ReactionSummary | null | undefined,
 	hexKey: string
 ): boolean {
-	return reactions?.[ hexKey ]?.reacted || false;
+	return ( reactions?.[ hexKey ]?.current_user_reaction ?? 0 ) > 0;
 }
 
 /**

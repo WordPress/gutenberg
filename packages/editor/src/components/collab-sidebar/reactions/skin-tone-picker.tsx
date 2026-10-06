@@ -1,7 +1,7 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Menu } from '@wordpress/ui';
+import { Menu, Tooltip } from '@wordpress/ui';
 import type { EmojibaseEntry, EmojibaseSkin } from './emojibase-data';
 
 /**
@@ -67,25 +67,41 @@ export default function SkinTonePicker( {
 	const current =
 		SKIN_TONES.find( ( option ) => option.tone === value ) ||
 		SKIN_TONES[ 0 ];
+	const triggerLabel = sprintf(
+		// translators: %s: the selected skin tone, e.g. "Medium skin tone".
+		__( 'Skin tone: %s' ),
+		current.label
+	);
 
 	return (
 		<Menu.Root>
-			<Menu.Trigger
-				render={
-					<Button
-						__next40pxDefaultSize
-						className="editor-collab-sidebar-panel__skin-tone-toggle"
-						label={ sprintf(
-							// translators: %s: the selected skin tone, e.g. "Medium skin tone".
-							__( 'Skin tone: %s' ),
-							current.label
-						) }
-						showTooltip
-					/>
-				}
-			>
-				{ current.emoji }
-			</Menu.Trigger>
+			{ /*
+			 * A `@wordpress/components` tooltip renders behind this
+			 * `@wordpress/ui` popover, so the toggle uses the ui Tooltip.
+			 */ }
+			<Tooltip.Root>
+				<Menu.Trigger
+					render={
+						<Tooltip.Trigger
+							render={
+								<Button
+									__next40pxDefaultSize
+									className="editor-collab-sidebar-panel__skin-tone-toggle"
+									aria-label={ triggerLabel }
+								/>
+							}
+						/>
+					}
+				>
+					<span
+						className="editor-collab-sidebar-panel__skin-tone-toggle-emoji"
+						aria-hidden="true"
+					>
+						{ current.emoji }
+					</span>
+				</Menu.Trigger>
+				<Tooltip.Popup>{ triggerLabel }</Tooltip.Popup>
+			</Tooltip.Root>
 			<Menu.Popup
 				positioner={ <Menu.Positioner side="bottom" align="end" /> }
 			>

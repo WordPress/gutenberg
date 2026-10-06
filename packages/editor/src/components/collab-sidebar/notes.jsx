@@ -17,7 +17,7 @@ import { store as editorStore } from '../../store';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
+export function Notes( { notes, sidebarRef, isFloating = false } ) {
 	const {
 		onCreate: onAddReply,
 		onEdit: onEditNote,
@@ -117,7 +117,7 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 		}
 	};
 
-	const { notePositions, registerThread, unregisterThread } =
+	const { notePositions, heights, registerThread, unregisterThread } =
 		useFloatingBoard( {
 			threads,
 			selectedNoteId: selectedNote,
@@ -159,31 +159,21 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 				toggleBlockSpotlight( thread.blockClientId, false );
 			}
 			focusNoteThread( thread.id, sidebarRef.current );
-		} else if (
-			event.key === 'ArrowDown' &&
-			currentIndex < threads.length - 1 &&
-			isSelfTarget
-		) {
-			focusNoteThread(
-				threads[ currentIndex + 1 ].id,
-				sidebarRef.current
-			);
-		} else if (
-			event.key === 'ArrowUp' &&
-			currentIndex > 0 &&
-			isSelfTarget
-		) {
-			focusNoteThread(
-				threads[ currentIndex - 1 ].id,
-				sidebarRef.current
-			);
-		} else if ( event.key === 'Home' && isSelfTarget ) {
-			focusNoteThread( threads[ 0 ].id, sidebarRef.current );
-		} else if ( event.key === 'End' && isSelfTarget ) {
-			focusNoteThread(
-				threads[ threads.length - 1 ].id,
-				sidebarRef.current
-			);
+		} else if ( isSelfTarget ) {
+			const targetIndex = {
+				ArrowDown: Math.min( currentIndex + 1, threads.length - 1 ),
+				ArrowUp: Math.max( currentIndex - 1, 0 ),
+				Home: 0,
+				End: threads.length - 1,
+			}[ event.key ];
+			if ( targetIndex !== undefined ) {
+				// The floating panel scrolls; keep the key from scrolling it too.
+				event.preventDefault();
+				focusNoteThread(
+					threads[ targetIndex ].id,
+					sidebarRef.current
+				);
+			}
 		}
 	};
 
@@ -202,7 +192,6 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 	return (
 		<Stack
 			className="editor-collab-sidebar-panel"
-			style={ styles }
 			role="tree"
 			direction="column"
 			gap="md"
@@ -254,6 +243,7 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 									isFloating
 										? {
 												y: notePositions[ thread.id ],
+												height: heights[ thread.id ],
 												registerThread,
 												unregisterThread,
 											}

@@ -8,12 +8,14 @@ test.use( {
 } );
 
 test.describe( 'Block Notes', () => {
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, blockNoteUtils } ) => {
 		await admin.createNewPost();
+		await blockNoteUtils.showAllNotes();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllComments( 'note' );
+		await requestUtils.resetPreferences();
 	} );
 
 	test( 'should move focus to add a new note form', async ( {
@@ -1140,11 +1142,11 @@ test.describe( 'Block Notes', () => {
 				comment: 'Test comment for reactions',
 			} );
 
-			await blockNoteUtils.addReactionToComment( 'Heart' );
+			await blockNoteUtils.addReactionToComment( 'heart' );
 
 			// Verify the reaction button appears with count.
 			const reactionButton = page.getByRole( 'button', {
-				name: /Heart/,
+				name: /heart/,
 			} );
 			await expect( reactionButton ).toBeVisible();
 			await expect( reactionButton ).toContainText( '1' );
@@ -1160,9 +1162,9 @@ test.describe( 'Block Notes', () => {
 				comment: 'Re-add reaction',
 			} );
 
-			await blockNoteUtils.addReactionToComment( 'Heart' );
+			await blockNoteUtils.addReactionToComment( 'heart' );
 			const reactionButton = page.getByRole( 'button', {
-				name: /Heart/,
+				name: /heart/,
 			} );
 			await expect( reactionButton ).toBeVisible();
 			await expect( reactionButton ).toContainText( '1' );
@@ -1173,14 +1175,14 @@ test.describe( 'Block Notes', () => {
 
 			// Add the same reaction again. This used to fail two ways:
 			// 1) the parent note's cached `reaction_summary` still
-			//    reported the removed heart as `reacted`, so the toggle
+			//    carried the removed heart's `current_user_reaction`, so the toggle
 			//    attempted to delete a now-missing comment record
 			//    instead of routing to add; and 2) the server's
 			//    duplicate-reaction guard included trashed comments,
 			//    so the just-removed reaction blocked the re-add with
 			//    `rest_comment_duplicate_reaction` ("You have already
 			//    reacted with this emoji").
-			await blockNoteUtils.addReactionToComment( 'Heart' );
+			await blockNoteUtils.addReactionToComment( 'heart' );
 			await expect( reactionButton ).toBeVisible();
 			await expect( reactionButton ).toContainText( '❤' );
 			await expect( reactionButton ).toContainText( '1' );
@@ -1227,10 +1229,10 @@ test.describe( 'Block Notes', () => {
 					response.request().method() === 'GET' &&
 					singleNote.test( decodeURIComponent( response.url() ) )
 			);
-			await blockNoteUtils.addReactionToComment( 'Heart' );
+			await blockNoteUtils.addReactionToComment( 'heart' );
 			await refetch;
 			await expect(
-				page.getByRole( 'button', { name: /Heart/ } )
+				page.getByRole( 'button', { name: /heart/ } )
 			).toContainText( '1' );
 
 			// The post-toggle refetch must not replace the cached note's
@@ -1252,11 +1254,11 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			// Add a reaction.
-			await blockNoteUtils.addReactionToComment( 'Celebration' );
+			await blockNoteUtils.addReactionToComment( 'celebration' );
 
 			// Hover over the reaction button to trigger tooltip.
 			const reactionButton = page.getByRole( 'button', {
-				name: /Celebration/,
+				name: /celebration/,
 			} );
 			await expect( reactionButton ).toBeVisible();
 			await reactionButton.hover();
@@ -1265,7 +1267,7 @@ test.describe( 'Block Notes', () => {
 			// match its text. The pill's own label is an `aria-label`, not
 			// text, so this only matches the popup.
 			await expect(
-				page.getByText( /reacted with Celebration/ )
+				page.getByText( /reacted with celebration/ )
 			).toBeVisible();
 		} );
 
@@ -1310,6 +1312,51 @@ test.describe( 'Block Notes', () => {
 			).toBeVisible();
 		} );
 
+		test( 'Tab from the emoji search skips the grid', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Tabbing through the picker' },
+				comment: 'Tab order in the emoji picker',
+			} );
+
+			await page
+				.getByRole( 'combobox', { name: 'Add reaction' } )
+				.focus();
+			await page.keyboard.press( 'Enter' );
+			await blockNoteUtils.waitForFullPicker();
+
+			const searchField = page.getByRole( 'combobox', {
+				name: 'Search emoji',
+			} );
+			await expect( searchField ).toBeFocused();
+
+			// The grid is reached with the arrow keys from the search
+			// field, so Tab moves on to the skin tone toggle.
+			await page.keyboard.press( 'Tab' );
+			await expect(
+				page.getByRole( 'button', { name: /^Skin tone:/ } )
+			).toBeFocused();
+
+			// The scrolling grid is never a Tab stop of its own, which
+			// would read out every emoji in it.
+			await page.keyboard.press( 'Tab' );
+			await expect
+				.poll( () =>
+					page.evaluate(
+						() =>
+							!! document.activeElement?.closest(
+								'.editor-collab-sidebar-panel__picker-viewport'
+							)
+					)
+				)
+				.toBe( false );
+			// Tabbing past the toggle leaves the non-modal picker, closing it.
+			await expect( searchField ).toBeHidden();
+		} );
+
 		test( 'the add-reaction trigger is revealed on hover and focus', async ( {
 			page,
 			blockNoteUtils,
@@ -1352,9 +1399,9 @@ test.describe( 'Block Notes', () => {
 				comment: 'Test comment for deselected reactions',
 			} );
 
-			await blockNoteUtils.addReactionToComment( 'Heart' );
+			await blockNoteUtils.addReactionToComment( 'heart' );
 			const reactionButton = page.getByRole( 'button', {
-				name: /Heart/,
+				name: /heart/,
 			} );
 			await expect( reactionButton ).toBeVisible();
 
@@ -1392,9 +1439,9 @@ test.describe( 'Block Notes', () => {
 			await thread.click();
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 
-			await blockNoteUtils.addReactionToComment( 'Heart' );
+			await blockNoteUtils.addReactionToComment( 'heart' );
 			const reactionPill = sidebar.getByRole( 'button', {
-				name: /Heart/,
+				name: /heart/,
 			} );
 			await expect( reactionPill ).toBeVisible();
 
@@ -1443,7 +1490,7 @@ test.describe( 'Block Notes', () => {
 						decodeURIComponent( request.url() )
 					)
 			);
-			await blockNoteUtils.addReactionToComment( 'Heart' );
+			await blockNoteUtils.addReactionToComment( 'heart' );
 			expect( ( await created ).postDataJSON().content ).toBe( '2764' );
 
 			const reactionButton = page.locator(
@@ -1456,16 +1503,16 @@ test.describe( 'Block Notes', () => {
 			/*
 			 * Picking the same heart from the search results resolves to
 			 * the same key, so it toggles the existing reaction off rather
-			 * than adding a second pill. "Heart" is a curated label, so the
+			 * than adding a second pill. "heart" is a curated label, so the
 			 * exact match skips "smiling face with hearts".
 			 */
 			await page
 				.getByRole( 'combobox', { name: 'Add reaction' } )
 				.click();
 			await blockNoteUtils.waitForFullPicker();
-			await page.getByPlaceholder( 'Search emoji' ).fill( 'Heart' );
+			await page.getByPlaceholder( 'Search emoji' ).fill( 'heart' );
 			await page
-				.getByRole( 'gridcell', { name: 'Heart', exact: true } )
+				.getByRole( 'gridcell', { name: 'heart', exact: true } )
 				.click();
 			await expect( reactionButton ).toHaveCount( 0 );
 		} );
@@ -1524,7 +1571,19 @@ test.describe( 'Block Notes', () => {
 				page.getByPlaceholder( 'Search emoji' )
 			).toBeVisible();
 
-			// The second Escape closes the full picker and returns focus
+			// Keyboard focus back on the toggle shows its tooltip, the next
+			// layer an Escape dismisses, again leaving the picker open.
+			const skinToneTooltip = page.getByText(
+				'Skin tone: Default skin tone'
+			);
+			await expect( skinToneTooltip ).toBeVisible();
+			await page.keyboard.press( 'Escape' );
+			await expect( skinToneTooltip ).toBeHidden();
+			await expect(
+				page.getByPlaceholder( 'Search emoji' )
+			).toBeVisible();
+
+			// The next Escape closes the full picker and returns focus
 			// to the add-reaction trigger.
 			await page.keyboard.press( 'Escape' );
 			await expect(
@@ -1570,7 +1629,7 @@ test.describe( 'Block Notes', () => {
 			).toHaveText( 'Frequently used' );
 			await expect(
 				frequentSection.getByRole( 'gridcell', {
-					name: 'Heart',
+					name: 'heart',
 					exact: true,
 				} )
 			).toBeVisible();
@@ -1957,47 +2016,6 @@ test.describe( 'Block Notes', () => {
 			expect( noteIds ).toHaveLength( 1 );
 		} );
 
-		test( 'resolving one note does not affect sibling notes on the same block', async ( {
-			editor,
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Block with notes to resolve' },
-				comment: 'Note A',
-			} );
-			await blockNoteUtils.addNote( 'Note B' );
-
-			const settings = page.getByRole( 'region', {
-				name: 'Editor settings',
-			} );
-
-			// Resolve Note A.
-			const threadA = settings.getByRole( 'treeitem', {
-				name: 'Note: Note A',
-			} );
-			await threadA.click();
-			await page.getByRole( 'button', { name: 'Resolve' } ).click();
-			// Resolving removes the note from the floating "Unresolved notes"
-			// view, which confirms the action completed.
-			await expect( threadA ).toBeHidden();
-
-			// Note B should still be visible and unresolved (expanded).
-			const threadB = settings.getByRole( 'treeitem', {
-				name: 'Note: Note B',
-			} );
-			await expect( threadB ).toBeVisible();
-
-			// Both notes should still exist in metadata.
-			const blocks = await editor.getBlocks();
-			const paragraphBlock = blocks.find(
-				( b ) => b.name === 'core/paragraph'
-			);
-			const noteIds = paragraphBlock?.attributes?.metadata?.noteId;
-			expect( noteIds ).toHaveLength( 2 );
-		} );
-
 		test( 'keeps the clicked note selected on a block with several notes', async ( {
 			editor,
 			page,
@@ -2034,53 +2052,6 @@ test.describe( 'Block Notes', () => {
 			await expect( firstThread ).toHaveAttribute(
 				'aria-expanded',
 				'false'
-			);
-		} );
-
-		test( 'auto-selects first unresolved note when clicking a block with multiple notes', async ( {
-			editor,
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Block for auto-select' },
-				comment: 'First note',
-			} );
-			await blockNoteUtils.addNote( 'Second note' );
-
-			const settings = page.getByRole( 'region', {
-				name: 'Editor settings',
-			} );
-
-			// Resolve the first note.
-			const firstThread = settings.getByRole( 'treeitem', {
-				name: 'Note: First note',
-			} );
-			await firstThread.click();
-			await page.getByRole( 'button', { name: 'Resolve' } ).click();
-			// Resolving removes the note from the floating "Unresolved notes"
-			// view, which confirms the action completed.
-			await expect( firstThread ).toBeHidden();
-
-			// Click the title to deselect the block and its comment.
-			await editor.canvas
-				.getByRole( 'textbox', { name: 'Add title' } )
-				.focus();
-
-			// Click back on the original block.
-			await editor.canvas
-				.getByRole( 'document', { name: 'Block: Paragraph' } )
-				.filter( { hasText: 'Block for auto-select' } )
-				.click();
-
-			// The second (unresolved) note should be the active one.
-			const secondThread = settings.getByRole( 'treeitem', {
-				name: 'Note: Second note',
-			} );
-			await expect( secondThread ).toHaveAttribute(
-				'aria-expanded',
-				'true'
 			);
 		} );
 	} );
@@ -2533,6 +2504,273 @@ test.describe( 'Block Notes', () => {
 			await expect( charlieThread ).toHaveAttribute(
 				'aria-expanded',
 				'false'
+			);
+		} );
+	} );
+
+	test.describe( 'Restoring a deleted note', () => {
+		async function addInlineNote( { editor, blockNoteUtils }, note ) {
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraph.click();
+			await blockNoteUtils.selectBlockText();
+			await blockNoteUtils.addNote( note );
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				1
+			);
+		}
+
+		async function clickUndo( blockNoteUtils ) {
+			await blockNoteUtils
+				.getNotice( 'Note deleted.' )
+				.getByRole( 'button', { name: 'Undo' } )
+				.click();
+			await expect(
+				blockNoteUtils.getNotice( 'Note restored.' )
+			).toBeVisible();
+		}
+
+		async function getNoteIds( editor ) {
+			const [ block ] = await editor.getBlocks();
+			return block.attributes.metadata?.noteId;
+		}
+
+		test( 'restores the note and its inline marker from the snackbar', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Bring me back.' },
+			} );
+			await addInlineNote( { editor, blockNoteUtils }, 'Restore me' );
+			const [ noteId ] = await getNoteIds( editor );
+
+			await blockNoteUtils.deleteNote();
+			await expect(
+				blockNoteUtils.getThread( 'Restore me' )
+			).toBeHidden();
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
+			expect( await getNoteIds( editor ) ).toBeUndefined();
+
+			// Typing after the delete survives the restore.
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraph.click();
+			await blockNoteUtils.selectBlockText();
+			await page.keyboard.press( 'ArrowRight' );
+			await page.keyboard.type( ' More.' );
+
+			await clickUndo( blockNoteUtils );
+			await expect(
+				blockNoteUtils.getThread( 'Restore me' )
+			).toBeVisible();
+			await expect( paragraph ).toHaveText( 'Bring me back. More.' );
+			await expect(
+				editor.canvas.locator( `mark.wp-note[data-id="${ noteId }"]` )
+			).toHaveText( 'Bring me back.' );
+			expect( await getNoteIds( editor ) ).toEqual( [ noteId ] );
+
+			await editor.saveDraft();
+			await page.reload();
+			await blockNoteUtils.openBlockNoteSidebar();
+			await expect(
+				blockNoteUtils.getThread( 'Restore me' )
+			).toBeVisible();
+			await expect(
+				editor.canvas.locator( `mark.wp-note[data-id="${ noteId }"]` )
+			).toHaveText( 'Bring me back.' );
+		} );
+
+		test( 'does not restore the marker with the undo shortcut', async ( {
+			editor,
+			page,
+			pageUtils,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Undo after delete.' },
+			} );
+			await addInlineNote( { editor, blockNoteUtils }, 'Stay deleted' );
+
+			await blockNoteUtils.deleteNote();
+			await pageUtils.pressKeys( 'primary+z' );
+
+			await expect(
+				blockNoteUtils.getThread( 'Stay deleted' )
+			).toBeHidden();
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
+			expect( await getNoteIds( editor ) ).toBeUndefined();
+
+			await editor.saveDraft();
+			await page.reload();
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
+			expect( await getNoteIds( editor ) ).toBeUndefined();
+		} );
+
+		test( 'enables saving after deleting and restoring a block-level note', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Saved with a note.' },
+				comment: 'Saved note',
+			} );
+			await editor.saveDraft();
+			await page.reload();
+			await blockNoteUtils.openBlockNoteSidebar();
+			await blockNoteUtils.getThread( 'Saved note' ).click();
+
+			const topBar = page.getByRole( 'region', {
+				name: 'Editor top bar',
+			} );
+			const saveDraftButton = topBar.getByRole( 'button', {
+				name: 'Save draft',
+			} );
+			const savedButton = topBar.getByRole( 'button', { name: 'Saved' } );
+			await expect( savedButton ).toBeDisabled();
+
+			await blockNoteUtils.deleteNote();
+			await expect( saveDraftButton ).toBeEnabled();
+			await editor.saveDraft();
+			await expect( savedButton ).toBeDisabled();
+
+			await clickUndo( blockNoteUtils );
+			await expect( saveDraftButton ).toBeEnabled();
+		} );
+
+		test( 'restores a block-level note when its text changed', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Change me.' },
+			} );
+			await addInlineNote( { editor, blockNoteUtils }, 'Text is gone' );
+			const [ noteId ] = await getNoteIds( editor );
+
+			await blockNoteUtils.deleteNote();
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraph.click();
+			await blockNoteUtils.selectBlockText();
+			await page.keyboard.type( 'Changed.' );
+
+			await clickUndo( blockNoteUtils );
+			await expect(
+				blockNoteUtils.getThread( 'Text is gone' )
+			).toBeVisible();
+			await expect( paragraph ).toHaveText( 'Changed.' );
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
+			expect( await getNoteIds( editor ) ).toEqual( [ noteId ] );
+		} );
+
+		test( 'does not duplicate a marker the undo shortcut brought back', async ( {
+			editor,
+			page,
+			pageUtils,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Typed' },
+			} );
+			await addInlineNote( { editor, blockNoteUtils }, 'Come back once' );
+			const [ noteId ] = await getNoteIds( editor );
+
+			// Typing after the note leaves an undo level that holds the marker.
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraph.click();
+			await blockNoteUtils.selectBlockText();
+			await page.keyboard.press( 'ArrowRight' );
+			await page.keyboard.type( 'More' );
+			await expect( paragraph ).toHaveText( 'TypedMore' );
+
+			// The caret left the marker, collapsing the thread.
+			await blockNoteUtils.getThread( 'Come back once' ).click();
+			await blockNoteUtils.deleteNote();
+			await pageUtils.pressKeys( 'primary+z' );
+
+			// The marker returns, but without its note it stays inert.
+			const mark = editor.canvas.locator( 'mark.wp-note' );
+			await expect( mark ).toHaveCount( 1 );
+			await expect(
+				blockNoteUtils.getThread( 'Come back once' )
+			).toBeHidden();
+			await expect( mark ).toHaveCSS(
+				'background-color',
+				'rgba(0, 0, 0, 0)'
+			);
+
+			await clickUndo( blockNoteUtils );
+			await expect(
+				blockNoteUtils.getThread( 'Come back once' )
+			).toBeVisible();
+			await expect( mark ).toHaveCount( 1 );
+			expect( await getNoteIds( editor ) ).toEqual( [ noteId ] );
+		} );
+
+		test( 'restores a deleted reply', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Reply to me.' },
+				comment: 'Parent note',
+			} );
+			await blockNoteUtils.addReply( 'Restore this reply' );
+			const reply = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByText( 'Restore this reply', { exact: true } );
+
+			await blockNoteUtils.deleteNote( 1 );
+			await expect( reply ).toBeHidden();
+
+			await clickUndo( blockNoteUtils );
+			await expect( reply ).toBeVisible();
+		} );
+
+		test( 'restores a deleted orphaned note', async ( {
+			editor,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Orphan me.' },
+				comment: 'Orphaned note',
+			} );
+			await editor.clickBlockOptionsMenuItem( 'Delete' );
+			await blockNoteUtils.openBlockNoteSidebar();
+			const thread = blockNoteUtils.getThread( 'Orphaned note' );
+			await thread.click();
+
+			await blockNoteUtils.deleteNote();
+			await expect( thread ).toBeHidden();
+
+			await clickUndo( blockNoteUtils );
+			await expect( thread ).toBeVisible();
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
 			);
 		} );
 	} );

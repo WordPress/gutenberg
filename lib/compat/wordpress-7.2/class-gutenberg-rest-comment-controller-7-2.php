@@ -922,15 +922,13 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		}
 
 		foreach ( $counts as $row ) {
-			$note_id        = (int) $row->comment_parent;
-			$slug           = wp_strip_all_tags( $row->comment_content );
-			$key            = $note_id . ':' . $slug;
-			$my_reaction_id = $my_reactions[ $key ] ?? 0;
+			$note_id = (int) $row->comment_parent;
+			$slug    = wp_strip_all_tags( $row->comment_content );
+			$key     = $note_id . ':' . $slug;
 
 			$this->reaction_summaries[ $note_id ][ $slug ] = array(
-				'count'          => (int) $row->reaction_count,
-				'reacted'        => $my_reaction_id > 0,
-				'my_reaction_id' => $my_reaction_id,
+				'count'                 => (int) $row->reaction_count,
+				'current_user_reaction' => $my_reactions[ $key ] ?? 0,
 			);
 		}
 	}

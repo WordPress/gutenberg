@@ -198,16 +198,14 @@ class Block_Reactions_Test extends WP_Test_REST_TestCase {
 			array(
 				'blockaaa' => array(
 					'2764' => array(
-						'count'          => 2,
-						'reacted'        => true,
-						'my_reaction_id' => $mine,
+						'count'                 => 2,
+						'current_user_reaction' => $mine,
 					),
 				),
 				'blockbbb' => array(
 					'rocket' => array(
-						'count'          => 1,
-						'reacted'        => false,
-						'my_reaction_id' => 0,
+						'count'                 => 1,
+						'current_user_reaction' => 0,
 					),
 				),
 			),
@@ -261,9 +259,8 @@ class Block_Reactions_Test extends WP_Test_REST_TestCase {
 			array(
 				'blockaaa' => array(
 					'2764' => array(
-						'count'          => 1,
-						'reacted'        => true,
-						'my_reaction_id' => $mine,
+						'count'                 => 1,
+						'current_user_reaction' => $mine,
 					),
 				),
 			),

@@ -256,6 +256,10 @@ add_action( 'delete_comment', 'gutenberg_delete_note_reactions', 10, 2 );
  * would otherwise stay approved under a trashed note. Replies are covered
  * because core trashes each one, which fires this action again.
  *
+ * Restoring the note does not bring its reactions back: core's
+ * `wp_untrash_comment()` restores no children of any type, so restoring
+ * children is left to a cascade that covers every child type together.
+ *
  * @since 7.2.0
  *
  * @param string     $comment_id The comment ID as a numeric string.
@@ -266,55 +270,8 @@ function gutenberg_trash_note_reactions( $comment_id, $comment ) {
 		return;
 	}
 
-	// Flag each one so restoring the note brings back only these, not
-	// reactions already in the trash (a REST delete without `force`).
 	foreach ( gutenberg_get_note_reaction_ids( $comment, 'approve' ) as $reaction_id ) {
-		if ( wp_trash_comment( $reaction_id ) ) {
-			add_comment_meta( $reaction_id, '_wp_trash_meta_with_note', '1', true );
-		}
+		wp_trash_comment( $reaction_id );
 	}
 }
 add_action( 'trashed_comment', 'gutenberg_trash_note_reactions', 10, 2 );
-
-/**
- * Restores a note's reactions along with the note.
- *
- * The counterpart to gutenberg_trash_note_reactions(): only reactions
- * flagged as trashed along with the note come back. Ones already in the
- * trash beforehand stay there.
- *
- * @since 7.2.0
- *
- * @param string     $comment_id The comment ID as a numeric string.
- * @param WP_Comment $comment    The untrashed comment.
- */
-function gutenberg_untrash_note_reactions( $comment_id, $comment ) {
-	if ( ! $comment instanceof WP_Comment || 'note' !== $comment->comment_type ) {
-		return;
-	}
-
-	foreach ( gutenberg_get_note_reaction_ids( $comment, 'trash' ) as $reaction_id ) {
-		if ( get_comment_meta( $reaction_id, '_wp_trash_meta_with_note', true ) ) {
-			wp_untrash_comment( $reaction_id );
-		}
-	}
-}
-add_action( 'untrashed_comment', 'gutenberg_untrash_note_reactions', 10, 2 );
-
-/**
- * Clears the flag gutenberg_trash_note_reactions() sets, however a comment
- * leaves the trash, so a later note restore can't resurrect it.
- *
- * @since 7.2.0
- *
- * @param string     $comment_id The comment ID as a numeric string.
- * @param WP_Comment $comment    The untrashed comment.
- */
-function gutenberg_clear_note_reaction_trash_flag( $comment_id, $comment ) {
-	if ( ! $comment instanceof WP_Comment || 'reaction' !== $comment->comment_type ) {
-		return;
-	}
-
-	delete_comment_meta( $comment_id, '_wp_trash_meta_with_note' );
-}
-add_action( 'untrashed_comment', 'gutenberg_clear_note_reaction_trash_flag', 5, 2 );

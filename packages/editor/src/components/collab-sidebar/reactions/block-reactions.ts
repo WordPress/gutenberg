@@ -18,9 +18,9 @@ export type ReactionTarget =
 
 export interface ReactionSummaryEntry {
 	count: number;
-	reacted?: boolean;
-	// The current user's reaction comment ID, used to delete it again.
-	my_reaction_id?: number;
+	// The current user's reaction comment ID, used to delete it again;
+	// 0 when they have not reacted with this emoji.
+	current_user_reaction: number;
 }
 
 /**
@@ -74,38 +74,37 @@ export function getBlockReactionsId(
  * Folds a completed reaction toggle into a summary.
  *
  * Keeps a cached summary usable when the refetch that would normally
- * replace it fails: without it, the next toggle reads a stale `reacted` /
- * `my_reaction_id` pair and takes the wrong branch.
+ * replace it fails: without it, the next toggle reads a stale
+ * `current_user_reaction` and takes the wrong branch.
  *
  * @param summary         The cached summary.
  * @param hexKey          The reaction hex key that changed.
  * @param addedReactionId The new reaction's comment ID when one was added;
  *                        omitted when one was removed.
- * @return A new summary.
+ * @return A new summary, or the given one when nothing changed.
  */
 export function applyReactionSummaryDelta(
 	summary: ReactionSummary | null | undefined,
 	hexKey: string,
 	addedReactionId?: number
 ): ReactionSummary {
-	const next = { ...( summary || {} ) };
-	const entry = next[ hexKey ];
+	const entry = summary?.[ hexKey ];
+	// Concurrent adds converge server-side on one surviving row, so a
+	// repeated ID is already counted.
+	if ( addedReactionId && entry?.current_user_reaction === addedReactionId ) {
+		return summary as ReactionSummary;
+	}
 
+	const next = { ...( summary || {} ) };
 	if ( addedReactionId ) {
-		// Concurrent adds converge server-side on one surviving row, so a
-		// repeated ID is already counted.
-		if ( entry?.my_reaction_id === addedReactionId ) {
-			return next;
-		}
 		next[ hexKey ] = {
 			count: ( entry?.count || 0 ) + 1,
-			reacted: true,
-			my_reaction_id: addedReactionId,
+			current_user_reaction: addedReactionId,
 		};
 	} else if ( entry ) {
 		const count = entry.count - 1;
 		if ( count > 0 ) {
-			next[ hexKey ] = { count, reacted: false };
+			next[ hexKey ] = { count, current_user_reaction: 0 };
 		} else {
 			delete next[ hexKey ];
 		}
