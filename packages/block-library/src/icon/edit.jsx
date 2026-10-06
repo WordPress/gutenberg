@@ -22,6 +22,7 @@ import {
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	getDimensionsClassesAndStyles as useDimensionsProps,
 } from '@wordpress/block-editor';
+import { getBlockBindingsSource } from '@wordpress/blocks';
 import { useState } from '@wordpress/element';
 import { SVG, Rect, Path } from '@wordpress/primitives';
 import { useSelect } from '@wordpress/data';
@@ -50,13 +51,36 @@ const IconPlaceholder = ( { className, style } ) => (
 	</SVG>
 );
 
-export function Edit( { attributes, setAttributes } ) {
+export function Edit( { attributes, setAttributes, isSelected, context } ) {
 	const { icon, ariaLabel, flipHorizontal, flipVertical, rotation } =
 		attributes;
+	const { metadata } = attributes;
 
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
 
 	const isContentOnlyMode = useBlockEditingMode() === 'contentOnly';
+	const isIconBindingReadOnly = useSelect(
+		( select ) => {
+			if ( ! isSelected ) {
+				return false;
+			}
+
+			const iconBinding = metadata?.bindings?.icon;
+			const blockBindingsSource = getBlockBindingsSource(
+				iconBinding?.source
+			);
+
+			return (
+				!! iconBinding &&
+				! blockBindingsSource?.canUserEditValue?.( {
+					select,
+					context,
+					args: iconBinding.args,
+				} )
+			);
+		},
+		[ context, isSelected, metadata?.bindings?.icon ]
+	);
 
 	const colorProps = useColorProps( attributes );
 	// Only padding is applied to the inner SVG element, matching the front
@@ -125,6 +149,7 @@ export function Edit( { attributes, setAttributes } ) {
 			) }
 			<BlockControls group="other">
 				<ToolbarButton
+					disabled={ isIconBindingReadOnly }
 					onClick={ () => {
 						setInserterOpen( true );
 					} }
