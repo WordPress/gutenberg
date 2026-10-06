@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Respect configured WordPress and PHP versions in the Playground runtime by keeping runtime selection and login in CLI arguments and removing duplicate Blueprint configuration and the deprecated worker flag ([#82948](https://github.com/WordPress/gutenberg/pull/82948)).
 -   Pass `-T` to `docker compose exec` when stdin is not a terminal, so commands run from a Git hook, which has a TTY on stdout but not on stdin, no longer fail with "cannot attach stdin to a TTY-enabled container" ([#78374](https://github.com/WordPress/gutenberg/pull/78374)).
 
 ### Internal

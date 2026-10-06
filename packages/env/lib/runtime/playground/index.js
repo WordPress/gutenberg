@@ -4,7 +4,8 @@ const http = require( 'http' );
 const path = require( 'path' );
 const spawn = require( 'cross-spawn' );
 const { rimraf } = require( 'rimraf' );
-const { buildBlueprint, getMountArgs } = require( './blueprint-builder' );
+const { buildBlueprint } = require( './blueprint-builder' );
+const { getCliArgs } = require( './cli-args' );
 const { UnsupportedCommandError } = require( '../errors' );
 const { downloadSource } = require( '../../download-sources' );
 
@@ -131,37 +132,8 @@ class PlaygroundRuntime {
 			JSON.stringify( blueprint, null, 2 )
 		);
 
-		// Get mount arguments
-		const mountArgs = getMountArgs( config );
-
 		const port = envConfig.port || 8888;
-		const phpVersion = envConfig.phpVersion || '8.2';
-
-		// Build command arguments for direct execution
-		const cliArgs = [
-			'server',
-			'--port',
-			String( port ),
-			'--php',
-			phpVersion,
-			'--blueprint',
-			blueprintPath,
-			'--login',
-			'--experimental-multi-worker',
-			...mountArgs,
-		];
-
-		if ( config.debug ) {
-			cliArgs.push( '--verbosity', 'debug' );
-		}
-
-		if ( envConfig.phpmyadmin ) {
-			cliArgs.push( '--phpmyadmin' );
-		}
-
-		if ( config.xdebug && config.xdebug !== 'off' ) {
-			cliArgs.push( '--xdebug' );
-		}
+		const cliArgs = getCliArgs( config, blueprintPath );
 
 		spinner.text = `Starting Playground on port ${ port }...`;
 
