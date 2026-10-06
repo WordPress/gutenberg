@@ -450,11 +450,11 @@ assert.match(
 rmSync( path.join( consumer, 'legacy.test.js' ) );
 rmSync( path.join( consumer, 'jest.config.cjs' ) );
 // Inspect the actual fallback lint config, including TS and spec discovery.
+const lintSource =
+	"import { test, expect } from 'vitest'; const title = 'focused'; test.only( title, () => expect( true ).toBe( true ) );\n" +
+	'test( 42, () => expect( true ).toBe( true ) );';
 for ( const name of [ 'example.test.js', 'example.spec.ts' ] ) {
-	write(
-		name,
-		"import { test, expect } from 'vitest'; test.only( 'fails lint', () => expect( true ).toBe( true ) );"
-	);
+	write( name, lintSource );
 	const output = JSON.parse(
 		run( values.node, [
 			path.join( consumer, 'node_modules/eslint/bin/eslint.js' ),
@@ -476,27 +476,34 @@ for ( const name of [ 'example.test.js', 'example.spec.ts' ] ) {
 		{ cwd: consumer, env, encoding: 'utf8', timeout: 30_000 }
 	);
 	assert.equal( result.status, 1, result.stderr );
-	assert.ok(
-		JSON.parse( result.stdout )[ 0 ].messages.some(
-			( message ) => message.ruleId === 'vitest/no-focused-tests'
-		)
-	);
+	const rules = JSON.parse( result.stdout )[ 0 ]
+		.messages.map( ( { ruleId } ) => ruleId )
+		.filter( ( rule ) => rule?.startsWith( 'vitest/' ) );
+	assert.ok( rules.includes( 'vitest/no-focused-tests' ) );
+	if ( ! values[ 'eslint-plugin' ] ) {
+		assert.deepEqual( rules, [
+			'vitest/no-focused-tests',
+			'vitest/valid-title',
+		] );
+	}
 }
 // The deprecated eslintrc entry still works on ESLint 9 during its transition.
 write(
 	'lint-legacy.cjs',
 	`const { LegacyESLint } = require('eslint9/use-at-your-own-risk');
 const config = require('@wordpress/eslint-plugin/eslintrc').configs['test-unit'];
-new LegacyESLint({ useEslintrc: false, overrideConfig: config }).lintText("import { test, expect } from 'vitest'; test.only('focused', () => expect(true).toBe(true));").then(results => console.log(JSON.stringify(results[0].messages)));`
+new LegacyESLint({ useEslintrc: false, overrideConfig: config }).lintText(${ JSON.stringify( lintSource ) }).then(results => console.log(JSON.stringify(results[0].messages)));`
 );
-const legacyMessages = run( values.node, [ 'lint-legacy.cjs' ] ).split(
-	'\n'
-)[ 0 ];
-assert.ok(
-	JSON.parse( legacyMessages ).some(
-		( message ) => message.ruleId === '@vitest/no-focused-tests'
-	)
-);
+const legacyRules = JSON.parse(
+	run( values.node, [ 'lint-legacy.cjs' ] ).split( '\n' )[ 0 ]
+).map( ( { ruleId } ) => ruleId );
+assert.ok( legacyRules.includes( '@vitest/no-focused-tests' ) );
+if ( ! values[ 'eslint-plugin' ] ) {
+	assert.deepEqual( legacyRules, [
+		'@vitest/no-focused-tests',
+		'@vitest/valid-title',
+	] );
+}
 console.log(
 	'Passed consumer commands, config discovery, jsdom, generated CSS, Jest compatibility, and lint defaults.'
 );

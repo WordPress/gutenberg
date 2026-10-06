@@ -1071,15 +1071,51 @@
   props:
       - className
       - value
-- name: RadioControl
+- name: Radio
   props:
+      - className
       - disabled
-      - help
+      - inputRef
+      - nativeButton
+      - readOnly
+      - render
+      - required
+      - style
+      - value
+- name: RadioGroup
+  props:
+      - children
+      - className
+      - defaultValue
+      - disabled
+      - form
+      - inputRef
+      - name
+      - onValueChange
+      - readOnly
+      - render
+      - required
+      - style
+      - value
+- name: RadioGroupControl
+  props:
+      - className
+      - defaultValue
+      - description
+      - details
+      - disabled
+      - form
       - hideLabelFromVision
+      - inputRef
+      - items
       - label
-      - onChange
-      - options
-      - selected
+      - name
+      - onValueChange
+      - readOnly
+      - render
+      - required
+      - style
+      - value
 - name: RangeCalendar
   props:
       - autoFocus

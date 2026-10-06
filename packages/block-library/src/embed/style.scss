@@ -17,7 +17,9 @@
 }
 
 // Supply a min-width when inside a cover block, to prevent it from collapsing.
-.wp-block-cover .wp-block-embed {
+// :root :where() matches Global Styles specificity so a minimum set there can
+// win, since block library styles load first.
+:root :where(.wp-block-cover .wp-block-embed) {
 	min-width: 320px;
 	min-height: 240px;
 }
@@ -25,6 +27,10 @@
 // Allow embeds to grow and shrink inside flex group blocks (Stack/Row), preventing collapse while fitting available space.
 .wp-block-group.is-layout-flex .wp-block-embed {
 	flex: 1 1 0%;
+}
+
+// Lowered like the cover minimums above.
+:root :where(.wp-block-group.is-layout-flex .wp-block-embed) {
 	min-width: 0;
 }
 
