@@ -378,8 +378,8 @@ export default function TypographyPanel( {
 			inheritedValue?.background?.backgroundClip ) === 'text';
 	const hasBlockBackground =
 		! clipsToText && !! ( backgroundGradient || backgroundColor );
-	// Said before the gradient is chosen rather than after, because this is
-	// the state the control used to be disabled in.
+	// Said before the gradient is chosen, while the block still has the
+	// background it would take over.
 	const backgroundOverrideNotice = backgroundGradient
 		? __( 'Setting a text gradient replaces the background gradient.' )
 		: __(
@@ -400,14 +400,9 @@ export default function TypographyPanel( {
 				? encodeGradientValue( newGradient, newSlug )
 				: undefined
 		);
-		/*
-		 * Clearing has to say `border-box` rather than nothing while the
-		 * Default state clips to the text, because that state's declarations
-		 * are not in a media query and would otherwise keep applying here.
-		 * `border-box` is the CSS initial value, and the style engine pairs it
-		 * with `-webkit-text-fill-color: currentColor`, which paints the text
-		 * again.
-		 */
+		// Clearing says `border-box`, the CSS initial value, rather than
+		// nothing, because the Default state's clip would otherwise keep
+		// applying here.
 		const clearedClip = 'text' === baseClip ? 'border-box' : undefined;
 		changedObject = setImmutably(
 			changedObject,
