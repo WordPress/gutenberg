@@ -1019,7 +1019,7 @@ This approach enables some functionalities that make directives flexible and pow
 
 #### On the client side
 
-_In the `view.js` file of each block_ the developer can define both the state and the elements of the store referencing functions like actions, side effects or derived state.
+*In the `view.js` file of each block* the developer can define both the state and the elements of the store referencing functions like actions, side effects or derived state.
 
 The `store` method used to set the store in JavaScript can be imported from `@wordpress/interactivity`.
 
@@ -1052,7 +1052,7 @@ The state defined on the server with `wp_interactivity_state()` gets merged with
 
 The `wp_interactivity_state` function receives two arguments, a `string` with the namespace that will be used as a reference and an [associative array](https://www.php.net/manual/en/language.types.array.php) containing the values.
 
-_Example of store initialized from the server with a `state` = `{ someValue: 123 }`_
+*Example of store initialized from the server with a `state` = `{ someValue: 123 }`*
 
 ```php
 // render.php
