@@ -16,6 +16,7 @@ import { reset as resetIcon } from '@wordpress/icons';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
 import {
 	useToolsPanelDropdownMenuProps,
+	useToolsPanelItemPopoverProps,
 	getDuotoneSlugFromPreset,
 } from './utils';
 import { setImmutably } from '../../utils/object';
@@ -87,14 +88,6 @@ function FiltersToolsPanel( {
 
 const DEFAULT_CONTROLS = {
 	duotone: true,
-};
-
-const popoverProps = {
-	placement: 'left-start',
-	offset: 36,
-	shift: true,
-	className: 'block-editor-duotone-control__popover',
-	headerTitle: __( 'Duotone' ),
 };
 
 const LabeledColorIndicator = ( { indicator, label } ) => (
@@ -180,6 +173,11 @@ export default function FiltersPanel( {
 	defaultControls = DEFAULT_CONTROLS,
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
 } ) {
+	const popoverProps = {
+		...useToolsPanelItemPopoverProps(),
+		className: 'block-editor-duotone-control__popover',
+		headerTitle: __( 'Duotone' ),
+	};
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
 	// Always keep the layout className (e.g. `single-column`); only the
