@@ -36,13 +36,13 @@ test.describe( 'toVdom - islands', () => {
 		await expect( el ).toBeHidden();
 	} );
 
-	test( 'directives that are inside inner blocks of isolated islands should not be hydrated', async ( {
+	test( 'directives inside a data-wp-ignore element of an island should be hydrated', async ( {
 		page,
 	} ) => {
 		const el = page.getByTestId(
 			'inside an inner block of an isolated island'
 		);
-		await expect( el ).toBeVisible();
+		await expect( el ).toBeHidden();
 	} );
 
 	test( 'directives inside islands should not be hydrated twice', async ( {

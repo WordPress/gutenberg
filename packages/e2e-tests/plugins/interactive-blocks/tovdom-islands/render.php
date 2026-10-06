@@ -35,8 +35,8 @@
 				<span
 					data-testid="inside an inner block of an isolated island"
 				>
-					This should be shown because it is inside an inner
-					block of an isolated island.
+					This should be hidden because it is inside a data-wp-ignore
+					element of an island.
 				</span>
 			</div>
 		</div>
