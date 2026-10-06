@@ -1186,18 +1186,18 @@ The reconciliation algorithm relies on heuristics that can fail when elements sh
 
 **Scenario 2: Region exists only on the target page with `attachTo` (create)**
 
-Sometimes a page contains a region that doesn't exist on the current page — for example, a modal dialog that only appears on certain pages. If this region has the `attachTo` property specified, the router will dynamically create it.
+Sometimes a page contains a region that doesn't exist on the current page — for example, a modal dialog that only appears on certain pages. If this region has the `attachTo` property specified, the router can create it, provided the current page already has an element to attach it to.
 
-The `attachTo` property contains a CSS selector that identifies where in the current page the new region should be appended. When the router encounters such a region, it:
+The `attachTo` property contains a CSS selector that identifies that element: the attachment target. The target must already exist in the current page, because the router only looks for it there and never creates it. The region is the part navigation can create. When the router encounters such a region, it:
 
-1. Chooses the target: the first element in the current page that matches the `attachTo` selector and is eligible to receive the region. [Adding new regions on navigation](#adding-new-regions-on-navigation) describes which elements are eligible.
+1. Looks in the current page for the attachment target. [Adding new regions on navigation](#adding-new-regions-on-navigation) describes which element is chosen and what happens when there is none.
 2. Creates new DOM elements for the region
 3. Appends these elements to the chosen target
 4. Renders the region's virtual DOM into the newly created elements
 
-Steps 2 to 4 only happen when step 1 finds a target. When there is none, the router skips that region and carries on: the other regions are still updated.
+Steps 2 to 4 only happen when step 1 finds a target.
 
-This allows content that exists on one page but not another to appear smoothly during navigation, without requiring the target element to exist in advance.
+This allows content that exists on one page but not another to appear smoothly during navigation, as long as the page being left already contains an element matching `attachTo`.
 
 **Scenario 3: Region exists only on the current page (remove)**
 
