@@ -30,7 +30,7 @@ exports[`MenuItem > should match snapshot when all props provided 1`] = `
     xmlns="http://www.w3.org/2000/svg"
   >
     <path
-      d="M4 10H20M4 14H8M10 14H14M16 14H20"
+      d="M2 9.5H22M2 14.5H7M9.5 14.5H14.5M17 14.5H22"
     />
   </svg>
 </button>
@@ -92,7 +92,7 @@ exports[`MenuItem > should match snapshot when isSelected and role are optionall
     xmlns="http://www.w3.org/2000/svg"
   >
     <path
-      d="M4 10H20M4 14H8M10 14H14M16 14H20"
+      d="M2 9.5H22M2 14.5H7M9.5 14.5H14.5M17 14.5H22"
     />
   </svg>
 </button>

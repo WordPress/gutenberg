@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Enhancements
+
+-   Scale icon artwork by up to 1.25× so icons better fill their 24×24 canvas. `*-small` variants and the WordPress mark are unchanged.
+
 ## 18.0.0 (2026-10-07)
 
 ### Breaking Changes
@@ -18,6 +22,7 @@
 -   Add the `justifySpaceAround` icon ([#83519](https://github.com/WordPress/gutenberg/pull/83519)).
 
 ### Enhancements
+
 -   Add initial search keywords to the icon manifest to improve icon discoverability ([#83884](https://github.com/WordPress/gutenberg/pull/83884)).
 -   `formatBold`: draw the B with heavier vertical strokes so it reads as bold at a glance ([#83321](https://github.com/WordPress/gutenberg/pull/83321)).
 -   `justifySpaceBetween` and `justifySpaceEvenly`: redraw so the two icons share one construction with the new `justifySpaceAround`, differing only in where the blocks sit ([#83519](https://github.com/WordPress/gutenberg/pull/83519)).
