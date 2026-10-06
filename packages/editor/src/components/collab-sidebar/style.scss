@@ -433,6 +433,10 @@ mark.wp-note {
 	// visually balances with the 24px reaction icon next to it.
 	font-size: 16px;
 	line-height: 1;
+	// Forced colors repaint text in a system color, which turns color emoji
+	// into flat monochrome glyphs. Opt the glyph out, but not the pill
+	// around it, so its border still follows the system colors.
+	forced-color-adjust: none;
 }
 
 // Split the Dropdown's default 8px `.components-popover__content` padding
