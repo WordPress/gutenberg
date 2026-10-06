@@ -193,14 +193,6 @@ export interface SaveOptions< T extends string > {
 	 */
 	interframe_maxerror?: number;
 	/**
-	 * Maximum inter-palette error for palette reuse.
-	 *
-	 * Frames whose palette is within this distance of the previous frame's
-	 * reuse it, avoiding a costly palette recomputation per frame.
-	 * Only used by gifsave; do not provide for any other type!
-	 */
-	interpalette_maxerror?: number;
-	/**
 	 * Quantise to an 8bpp palette. Only supported by PNG.
 	 * Do not provide for any other type!
 	 *

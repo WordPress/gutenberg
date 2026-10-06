@@ -607,8 +607,8 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 			);
 
 			// Not an exact match against the source: the sub-size is written
-			// by cgifsave with inter-frame and inter-palette error tolerances,
-			// which are free to coalesce frames. Keeping the animation is what
+			// by cgifsave with an inter-frame error tolerance, which is free
+			// to coalesce frames. Keeping the animation is what
 			// the opt-in promises, not reproducing the frame count.
 			expect( frameCounts.full ).toBeGreaterThan( 1 );
 			expect( frameCounts.medium ).toBeGreaterThan( 1 );
