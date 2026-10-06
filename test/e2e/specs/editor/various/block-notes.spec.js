@@ -1526,7 +1526,19 @@ test.describe( 'Block Notes', () => {
 				page.getByPlaceholder( 'Search emoji' )
 			).toBeVisible();
 
-			// The second Escape closes the full picker and returns focus
+			// Keyboard focus back on the toggle shows its tooltip, the next
+			// layer an Escape dismisses, again leaving the picker open.
+			const skinToneTooltip = page.getByText(
+				'Skin tone: Default skin tone'
+			);
+			await expect( skinToneTooltip ).toBeVisible();
+			await page.keyboard.press( 'Escape' );
+			await expect( skinToneTooltip ).toBeHidden();
+			await expect(
+				page.getByPlaceholder( 'Search emoji' )
+			).toBeVisible();
+
+			// The next Escape closes the full picker and returns focus
 			// to the add-reaction trigger.
 			await page.keyboard.press( 'Escape' );
 			await expect(
