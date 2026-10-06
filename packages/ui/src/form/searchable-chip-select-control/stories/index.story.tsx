@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useRef, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { fn } from 'storybook/test';
 import { Spinner } from '../../../spinner';
 import { Stack } from '../../../stack';
@@ -259,6 +259,83 @@ export const AsyncItems: Story = {
 						setLoading( false );
 					}, 500 );
 				} }
+			/>
+		);
+	},
+};
+
+/**
+ * When a server returns only part of a result set, use visible `statusContent`
+ * to explain the limit and how to find more items. Use the total from the
+ * response metadata for searches, rather than the length of the returned list.
+ * If the total is unknown, state how many items are shown and how to find more.
+ * This example simulates server filtering. Pass `filter={ null }` so the
+ * component does not filter the response again in the browser.
+ * Keep complete result counts visually hidden, and let `emptyContent` announce
+ * searches with no matches. The limits here are small to make them easy to try.
+ * Search for `berry` to see capped results, then `blue` to see a complete result.
+ */
+export const LimitedResults: Story = {
+	args: {
+		label: 'Fruit',
+		description: 'Choose your favorite fruits.',
+		popupWidth: 'sm',
+	},
+	render: function Template( args ) {
+		const [ inputValue, setInputValue ] = useState( '' );
+		const search = inputValue.trim().toLowerCase();
+		const [ result, setResult ] = useState< {
+			search: string;
+			items: typeof ITEMS;
+			total: number;
+		} | null >( null );
+
+		useEffect( () => {
+			const timeout = setTimeout( () => {
+				const matches = ITEMS.filter( ( item ) =>
+					item.label.toLowerCase().includes( search )
+				);
+				setResult( {
+					search,
+					items: matches.slice( 0, search ? 5 : 10 ),
+					total: matches.length,
+				} );
+			}, 500 );
+
+			return () => clearTimeout( timeout );
+		}, [ search ] );
+
+		const loading = ! result || result.search !== search;
+		const items = loading ? [] : result.items;
+		const hasMore = ! loading && items.length < result.total;
+
+		let statusContent = <HiddenResultCount />;
+		if ( loading ) {
+			statusContent = (
+				<Stack direction="row" gap="sm" align="center">
+					<Spinner />
+					Loading…
+				</Stack>
+			);
+		} else if ( hasMore ) {
+			statusContent = (
+				<>
+					{ search
+						? `Showing ${ items.length } of ${ result.total } matching fruits. Refine your search to see more.`
+						: `Showing ${ items.length } fruits. Search to find more.` }
+				</>
+			);
+		}
+
+		return (
+			<SearchableChipSelectControl
+				{ ...args }
+				items={ items }
+				filter={ null }
+				inputValue={ inputValue }
+				onInputValueChange={ setInputValue }
+				statusContent={ statusContent }
+				emptyContent={ loading ? null : undefined }
 			/>
 		);
 	},
