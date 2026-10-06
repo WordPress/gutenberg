@@ -335,8 +335,8 @@ HTML;
 		$block_content = <<<HTML
 <!-- wp:icon {"icon":"core/plus","metadata":{"bindings":{"icon":{"source":"test/source"}}}} /-->
 HTML;
-		$parsed_blocks  = parse_blocks( $block_content );
-		$block          = new WP_Block( $parsed_blocks[0] );
+		$parsed_blocks = parse_blocks( $block_content );
+		$block         = new WP_Block( $parsed_blocks[0] );
 		$block->render();
 
 		$this->assertSame(
