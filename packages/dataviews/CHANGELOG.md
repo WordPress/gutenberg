@@ -20,6 +20,7 @@
 ### Internal
 
 -   Remove the `use-memo-one` dependency, which the `./wp` bundle no longer imports ([#83952](https://github.com/WordPress/gutenberg/pull/83952)).
+-   Keep popover `placement` values as string literals so they remain valid after stricter component prop types ([#82704](https://github.com/WordPress/gutenberg/pull/82704)).
 
 ### Documentation
 
