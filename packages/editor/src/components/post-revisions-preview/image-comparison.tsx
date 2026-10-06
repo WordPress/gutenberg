@@ -4,7 +4,7 @@ import { BlockPreview } from '@wordpress/block-editor';
 import { cloneBlock, type Block } from '@wordpress/blocks';
 import { Button } from '@wordpress/components';
 import { useMemo, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 type ImageComparisonProps = { before: Block; after: Block };
 
@@ -49,6 +49,26 @@ export default function ImageComparison( {
 					.map( ( [ version, block ] ) => (
 						<div
 							key={ version }
+							role="img"
+							aria-label={
+								version === 'before'
+									? sprintf(
+											/* translators: %s: image alternative text. */
+											__( 'Before image: %s' ),
+											typeof block.attributes.alt ===
+												'string'
+												? block.attributes.alt
+												: ''
+										)
+									: sprintf(
+											/* translators: %s: image alternative text. */
+											__( 'After image: %s' ),
+											typeof block.attributes.alt ===
+												'string'
+												? block.attributes.alt
+												: ''
+										)
+							}
 							className={ clsx(
 								'editor-post-revisions-preview__image-version',
 								`is-${ version }`
@@ -61,6 +81,11 @@ export default function ImageComparison( {
 									: undefined
 							}
 						>
+							<span className="editor-post-revisions-preview__image-label">
+								{ version === 'before'
+									? __( 'Before' )
+									: __( 'After' ) }
+							</span>
 							<BlockPreview
 								blocks={ [ block ] }
 								viewportWidth={ 0 }
@@ -81,6 +106,12 @@ export default function ImageComparison( {
 						max={ 100 }
 						value={ position }
 						aria-label={ __( 'Image comparison' ) }
+						aria-valuetext={ sprintf(
+							/* translators: 1: percentage of the before image, 2: percentage of the after image. */
+							__( '%1$d%% before, %2$d%% after' ),
+							position,
+							100 - position
+						) }
 						onChange={ ( event ) =>
 							setPosition( Number( event.target.value ) )
 						}
