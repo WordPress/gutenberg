@@ -1,7 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ExternalLink, Notice, TabPanel } from '@wordpress/components';
 import { ThemeProvider } from '@wordpress/theme';
-import { Button, Link, Stack, Tabs, Text } from '@wordpress/ui';
+import {
+	Button,
+	Link,
+	Notice as UINotice,
+	Stack,
+	Tabs,
+	Text,
+} from '@wordpress/ui';
 
 const meta: Meta = {
 	title: 'Design System/Theme/Foreground Emphasis',
@@ -14,6 +21,8 @@ const themes = [
 	{ name: 'Dark', background: '#1e1e1e', primary: '#3858e9' },
 	{ name: 'Ectoplasm', background: '#4f386e', primary: '#646c3e' },
 ];
+
+const noticeIntents = [ 'info', 'success', 'warning', 'error' ] as const;
 
 /**
  * Compare content emphasis and interaction cues across light, dark, and tinted
@@ -102,6 +111,17 @@ export const Comparison: StoryObj = {
 							)
 						) }
 						<Stack direction="column" gap="sm">
+							<Text variant="heading-sm">Notices</Text>
+							{ noticeIntents.map( ( intent ) => (
+								<UINotice.Root key={ intent } intent={ intent }>
+									<UINotice.Description>
+										{ intent } notice
+									</UINotice.Description>
+									<UINotice.CloseIconButton />
+								</UINotice.Root>
+							) ) }
+						</Stack>
+						<Stack direction="column" gap="sm">
 							<Text variant="heading-sm">Legacy components</Text>
 							<TabPanel
 								tabs={ [
@@ -119,9 +139,15 @@ export const Comparison: StoryObj = {
 							<ExternalLink href="https://wordpress.org">
 								Visit WordPress.org
 							</ExternalLink>
-							<Notice status="info" onRemove={ () => {} }>
-								Changes saved.
-							</Notice>
+							{ noticeIntents.map( ( status ) => (
+								<Notice
+									key={ status }
+									status={ status }
+									onRemove={ () => {} }
+								>
+									{ status } notice
+								</Notice>
+							) ) }
 						</Stack>
 					</Stack>
 				</ThemeProvider>

@@ -29,7 +29,7 @@
 
 ### Enhancements
 
--   Use strong neutral text for headings and overlay titles, highlight tabs within their focus-ring bounds on interaction, and thicken link underlines on hover, press, and keyboard focus. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
+-   Use strong neutral text for headings and overlay titles, highlight tabs within their focus-ring bounds on interaction, match Notice dismiss controls to the notice's tone, and thicken link underlines on hover, press, and keyboard focus. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 -   `Switch`, `SwitchControl`: Mark as recommended for use in a WordPress environment ([#84097](https://github.com/WordPress/gutenberg/pull/84097)).
 -   `Progress`: Default to a 160px width, overridable through `className` or `style` ([#84021](https://github.com/WordPress/gutenberg/pull/84021)).
 -   `Progress`: Mark as recommended for use in a WordPress environment. ([#84021](https://github.com/WordPress/gutenberg/pull/84021))
