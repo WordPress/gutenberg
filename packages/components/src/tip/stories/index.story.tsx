@@ -1,5 +1,6 @@
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import Tip from '..';
+import ExternalLink from '../../external-link';
 
 const meta: Meta< typeof Tip > = {
 	component: Tip,
@@ -28,4 +29,17 @@ const Template: StoryFn< typeof Tip > = ( args ) => {
 export const Default: StoryFn< typeof Tip > = Template.bind( {} );
 Default.args = {
 	children: 'An example tip',
+};
+
+export const WithExternalLink: StoryFn< typeof Tip > = Template.bind( {} );
+WithExternalLink.args = {
+	children: (
+		<>
+			Interested in creating your own block?
+			<br />
+			<ExternalLink href="https://developer.wordpress.org/block-editor/">
+				Get started here.
+			</ExternalLink>
+		</>
+	),
 };
