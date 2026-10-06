@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
+import { PanelBody } from '@wordpress/components';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -178,13 +179,7 @@ function CustomCSSControl( {
 
 	return (
 		<InspectorControls group={ inspectorGroup }>
-			{ isStateSelected ? (
-				<div className="block-editor-hooks-custom-css__state-panel">
-					{ panel }
-				</div>
-			) : (
-				panel
-			) }
+			{ isStateSelected ? <PanelBody>{ panel }</PanelBody> : panel }
 		</InspectorControls>
 	);
 }
