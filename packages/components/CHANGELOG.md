@@ -12,6 +12,7 @@
 ### Enhancements
 
 -   `FormToggle`, `ToggleControl`: Mark as not recommended for use in a WordPress environment, in favour of `Switch` and `SwitchControl` from `@wordpress/ui` ([#84097](https://github.com/WordPress/gutenberg/pull/84097)).
+-   `ProgressBar`: Mark as not recommended and direct consumers to `Progress` from `@wordpress/ui` ([#84021](https://github.com/WordPress/gutenberg/pull/84021)).
 -   `CheckboxControl`: Mark as not recommended for use in a WordPress environment, in favour of `CheckboxControl` from `@wordpress/ui` ([#83771](https://github.com/WordPress/gutenberg/pull/83771)).
 -   `RadioControl`: Mark as not recommended for use in a WordPress environment, in favour of `RadioGroupControl` from `@wordpress/ui` ([#83872](https://github.com/WordPress/gutenberg/pull/83872)).
 -   `RadioControl`: Match the `@wordpress/ui` Radio colors ([#83270](https://github.com/WordPress/gutenberg/pull/83270)).
@@ -44,6 +45,7 @@
 ### Internal
 
 -   `Menu`: Deprecate the private API while preserving it for older bundled consumers. Target removal for WordPress 7.3 after package compatibility checks pass ([#82947](https://github.com/WordPress/gutenberg/pull/82947)).
+-   Fix internal `WordPressComponent` polymorphic typings to avoid unsupported `as` props unintentionally surfacing ([#82704](https://github.com/WordPress/gutenberg/pull/82704)).
 -   `ProgressBar`: Use the WordPress Design System color tokens. ([#83779](https://github.com/WordPress/gutenberg/pull/83779)).
 
 ## 41.0.0 (2026-09-23)

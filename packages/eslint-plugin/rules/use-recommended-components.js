@@ -40,6 +40,7 @@ const ALLOWLIST = {
 			'KeyboardShortcutDisplay',
 			'Link',
 			'Notice',
+			'Progress',
 			'Radio',
 			'RadioGroup',
 			'RadioGroupControl',
@@ -76,7 +77,6 @@ const ALLOWLIST = {
 			'Menu',
 			'Meter',
 			'Popover',
-			'Progress',
 			'SearchableSelect',
 			'SearchableSelectControl',
 		],
@@ -137,6 +137,7 @@ const DENYLIST = {
 		__experimentalInputControl:
 			'Use `InputControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		Notice: 'Use `Notice` from `@wordpress/ui` instead.',
+		ProgressBar: 'Use `Progress` from `@wordpress/ui` instead.',
 		RadioControl:
 			'Use `RadioGroupControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		ResponsiveWrapper: 'Use the CSS `aspect-ratio` property instead.',
