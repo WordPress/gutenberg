@@ -7,7 +7,7 @@ import {
 } from '@wordpress/route';
 import { useView, useViewConfig } from '@wordpress/views';
 import { DataViews } from '@wordpress/dataviews';
-import { BreadcrumbPath, Page } from '@wordpress/admin-ui';
+import { Page } from '@wordpress/admin-ui';
 import type {
 	View,
 	Action,
@@ -37,6 +37,7 @@ import {
 } from './view-utils';
 import { QuickEditModal } from './quick-edit-modal';
 import usePageHierarchy from './use-page-hierarchy';
+import PageAncestorPath from './page-ancestor-path';
 // Unlock WordPress private APIs
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const { usePostActions, usePostFields, usePageAncestorPaths } =
@@ -295,11 +296,7 @@ function PostListView( {
 					const path: string[] | undefined =
 						ancestors.paths[ item.id ];
 					if ( path?.length ) {
-						return (
-							<BreadcrumbPath
-								items={ path.map( ( label ) => ( { label } ) ) }
-							/>
-						);
+						return <PageAncestorPath labels={ path } />;
 					}
 					return !! getPageParentId( item ) && ! ancestors.loading ? (
 						<small>

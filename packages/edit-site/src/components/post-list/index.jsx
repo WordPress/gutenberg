@@ -1,4 +1,4 @@
-import { BreadcrumbPath, Page } from '@wordpress/admin-ui';
+import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import {
@@ -14,6 +14,7 @@ import { useEvent, usePrevious } from '@wordpress/compose';
 import { addQueryArgs } from '@wordpress/url';
 import { useView, useViewConfig } from '@wordpress/views';
 import usePageHierarchy from './use-page-hierarchy';
+import PageAncestorPath from './page-ancestor-path';
 import {
 	OPERATOR_IS_ANY,
 	OPERATOR_IS_NONE,
@@ -267,13 +268,7 @@ export default function PostList( { postType } ) {
 				render: ( { item } ) => {
 					const ancestorPath = ancestors.paths[ item.id ];
 					if ( ancestorPath?.length ) {
-						return (
-							<BreadcrumbPath
-								items={ ancestorPath.map( ( label ) => ( {
-									label,
-								} ) ) }
-							/>
-						);
+						return <PageAncestorPath labels={ ancestorPath } />;
 					}
 					return !! item.parent && ! ancestors.loading ? (
 						<small>

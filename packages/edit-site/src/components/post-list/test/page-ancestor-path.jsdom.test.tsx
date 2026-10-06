@@ -1,14 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { BreadcrumbPath } from '../..';
+import PageAncestorPath from '../page-ancestor-path';
 
-describe( 'BreadcrumbPath', () => {
+describe( 'PageAncestorPath', () => {
 	it( 'shows ancestor labels without links, a navigation landmark or a heading', () => {
-		render(
-			<BreadcrumbPath
-				items={ [ { label: 'North' }, { label: 'East' } ] }
-			/>
-		);
+		render( <PageAncestorPath labels={ [ 'North', 'East' ] } /> );
 
 		expect(
 			screen.getByRole( 'group', { name: 'Breadcrumbs' } )
@@ -19,7 +15,7 @@ describe( 'BreadcrumbPath', () => {
 	} );
 
 	it( 'renders nothing without ancestors', () => {
-		const { container } = render( <BreadcrumbPath items={ [] } /> );
+		const { container } = render( <PageAncestorPath labels={ [] } /> );
 		expect( container ).toBeEmptyDOMElement();
 	} );
 } );
