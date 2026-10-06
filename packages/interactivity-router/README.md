@@ -69,7 +69,7 @@ Beyond the current URL, the store's state describes the navigation itself: wheth
 
 #### `data-wp-router-region`
 
-It defines a region that is updated on navigation. It requires a unique ID as the value and must be used alongside `data-wp-interactive` to receive the proper namespace. Router regions can be placed anywhere within interactive regions, including nested interactive elements.
+It defines a region that is updated on navigation. It requires a unique ID as the value and must be used alongside `data-wp-interactive` to receive the proper namespace. Router regions can be placed anywhere within interactive regions, including nested interactive elements, except inside the content of an element that uses `data-wp-html`. The router ignores a region there, as if its `data-wp-router-region` attribute were absent. A region that carries `data-wp-html` on the same element isn't affected, because `data-wp-html` yields to it. See [`wp-html` content ownership](/docs/reference-guides/interactivity-api/directives-and-store.md#content-ownership) for the full rules.
 
 <div class="callout callout-warning">
 When adding <code>data-wp-router-region</code> to a child element inside a parent with <code>data-wp-interactive</code>, always include <code>data-wp-interactive</code> on the child element as well. This is required for the router region to function correctly.
@@ -96,8 +96,9 @@ When navigating between pages:
 
 - If a region exists on both the current and the new page, its content is updated. `attachTo` is ignored in this case.
 - If a region without `attachTo` exists on the new page but not on the current one, it is not added to the DOM.
-- If a region with `attachTo` exists on the new page but not on the current one, it is created and appended to the parent element specified in `attachTo`.
+- If a region with `attachTo` exists on the new page but not on the current one, it is created and appended to the first element matching `attachTo` that can receive it. If no element can, the region is skipped and the other regions are still updated. See [Adding new regions on navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#adding-new-regions-on-navigation) for which elements are eligible.
 - If a region exists on the current page but not on the new one, it is removed from the DOM. `attachTo` is ignored in this case.
+- A region inside `data-wp-html` content doesn't take part in any of these cases, on either page. It is handled as if its `data-wp-router-region` attribute were absent.
 
 Example with `attachTo`:
 

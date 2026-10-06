@@ -149,7 +149,7 @@ Here's a basic router region:
 
 #### Where to place router regions
 
-Router regions can be placed anywhere on the page. Their behavior depends on where they sit relative to other interactive elements and other router regions:
+Router regions can be placed anywhere on the page, except inside the content of an element that uses `data-wp-html`. Their behavior depends on where they sit relative to other interactive elements and other router regions:
 
 -   **As a standalone element** — When a router region is not inside any existing `data-wp-interactive` element, it serves a dual role: it is the interactive boundary (since it also contains `data-wp-interactive`) _and_ its content is updated during navigation:
 
@@ -193,6 +193,8 @@ Router regions can be placed anywhere on the page. Their behavior depends on whe
     	</div>
     </div>
     ```
+
+-   **Inside `data-wp-html` content** — A router region inside the content of an element that uses `data-wp-html` isn't part of any region: the router ignores it, as if its `data-wp-router-region` attribute were absent. That differs from a nested region, which is still updated as part of its parent region, and from a region that carries `data-wp-html` on the same element, where `data-wp-html` yields and the region works as usual. See [Content ownership](/docs/reference-guides/interactivity-api/directives-and-store.md#content-ownership) and [Conflicts with other directives](/docs/reference-guides/interactivity-api/directives-and-store.md#conflicts-with-other-directives) for the full rules.
 
 ### Implementing navigation
 
@@ -405,7 +407,13 @@ Sometimes you need UI elements — like modals, sidebars, or notification panels
 </div>
 ```
 
-The `attachTo` value is a CSS selector. When navigating to this page from a page without this region, the region will be created and appended to the element matching the selector.
+The `attachTo` value is a CSS selector. When navigating to this page from a page without this region, the router looks in the current document, in document order, for the first element matching the selector that can receive the region, and appends the region to it. This is how the target is chosen:
+
+-   **Eligible targets.** An element can't receive the region if it has a `data-wp-html` attribute or sits inside an element that has one, because navigation never writes into [`data-wp-html` content](/docs/reference-guides/interactivity-api/directives-and-store.md#content-ownership). An element that also carries `data-wp-text`, `data-wp-each` or `data-wp-router-region` doesn't count as such an element, because `data-wp-html` [yields](/docs/reference-guides/interactivity-api/directives-and-store.md#conflicts-with-other-directives) to them. Every other match is eligible.
+-   **First eligible match wins.** Matches that aren't eligible are passed over, so a later match in document order is used when there is one.
+-   **No eligible match.** When no element matches, or every match is ineligible, the region isn't created on that navigation. The navigation doesn't fail, nothing is logged, and the other regions of the destination page are updated as usual.
+
+The target is chosen again on every navigation to a page that has the region. The region definition itself must also sit outside `data-wp-html` content: a region defined inside it is never discovered, so its `attachTo` is never used.
 
 **Example: Modal that appears on navigation**
 
@@ -1077,7 +1085,7 @@ The cache uses a normalized version of the URL as its key. This normalization st
 
 Each entry in the cache stores not just the fetched HTML, but a fully processed page representation containing:
 
--   **Virtual DOM trees** for each router region found in the page
+-   **Virtual DOM trees** for each router region the router discovers in the page, which excludes regions inside [`data-wp-html` content](/docs/reference-guides/interactivity-api/directives-and-store.md#content-ownership)
 -   **Style sheet references** needed by the page
 -   **Script module information** for JavaScript that should be loaded
 -   **The page title** for updating the document title
@@ -1148,11 +1156,11 @@ The region ID must be unique within a single page and consistent across pages th
 
 **How regions are processed during page fetch**
 
-When the router fetches a new page (either through `prefetch()` or as part of `navigate()`), it processes the HTML to extract and prepare all router regions. This happens in several steps:
+When the router fetches a new page (either through `prefetch()` or as part of `navigate()`), it processes the HTML to extract and prepare its router regions. This happens in several steps:
 
 First, the router parses the fetched HTML into a document structure using the browser's built-in HTML parser. This gives it a complete DOM tree to work with, just as if the page had been loaded normally.
 
-Next, the router scans this document for all elements that have both `data-wp-interactive` and `data-wp-router-region` attributes. For each region found, it extracts the region ID and checks whether the region is nested inside another region. Only top-level regions are processed directly; nested regions are handled as part of their parent's content.
+Next, the router scans this document for elements that have both `data-wp-interactive` and `data-wp-router-region` attributes, leaving out any that sit inside [`data-wp-html` content](/docs/reference-guides/interactivity-api/directives-and-store.md#content-ownership). An excluded region is handled as if its `data-wp-router-region` attribute were absent (a region that itself carries `data-wp-html` isn't excluded, because the directive yields to it): it contributes nothing to the cache entry, so a region ID that only appears there counts as missing from the page. This applies to every page the router prepares, including the initial one. For each region found, the router extracts the region ID and checks whether the region is nested inside another region. Only top-level regions are processed directly; nested regions are handled as part of their parent's content.
 
 For each top-level region, the router converts the HTML into a virtual DOM (vDOM) representation. The virtual DOM is a lightweight JavaScript object structure that mirrors the actual DOM but can be compared and manipulated much more efficiently by the Interactivity API. Importantly, the region element itself is included in this conversion — not just its children. This means that attributes on the region element, such as `data-wp-context`, will also be processed and updated during navigation.
 
@@ -1182,10 +1190,12 @@ Sometimes a page contains a region that doesn't exist on the current page — fo
 
 The `attachTo` property contains a CSS selector that identifies where in the current page the new region should be appended. When the router encounters such a region, it:
 
-1. Finds the element matching the `attachTo` selector in the current page
+1. Chooses the target: the first element in the current page that matches the `attachTo` selector and is eligible to receive the region. [Adding new regions on navigation](#adding-new-regions-on-navigation) describes which elements are eligible.
 2. Creates new DOM elements for the region
-3. Appends these elements to the matched parent
+3. Appends these elements to the chosen target
 4. Renders the region's virtual DOM into the newly created elements
+
+Steps 2 to 4 only happen when step 1 finds a target. When there is none, the router skips that region and carries on: the other regions are still updated.
 
 This allows content that exists on one page but not another to appear smoothly during navigation, without requiring the target element to exist in advance.
 
@@ -1486,7 +1496,7 @@ When `prefetch()` is called (for example, on link hover):
 1. The router normalizes the URL and checks the page cache.
 2. If not cached, it begins fetching the HTML.
 3. The fetched HTML is parsed into a document.
-4. Router regions are extracted and converted to virtual DOM.
+4. Router regions outside [`data-wp-html` content](/docs/reference-guides/interactivity-api/directives-and-store.md#content-ownership) are extracted and converted to virtual DOM.
 5. Style sheets are compared with the previously loaded ones; new ones are added with `media="preload"`.
 6. Script modules are identified and compared with the previously loaded ones; new ones have their dependencies resolved and source code fetched.
 7. Server state is extracted.
@@ -1508,7 +1518,7 @@ When `navigate()` is called (for example, on link click):
     - In a batch for efficiency:
         - Server state is merged with client state.
         - Each router region is updated with its new virtual DOM.
-        - Regions with `attachTo` that don't exist are created and appended.
+        - Regions with `attachTo` that don't exist are created and appended to an eligible target, or skipped when there is none (see [Adding new regions on navigation](#adding-new-regions-on-navigation)).
     - The document title is updated.
 7. Browser history is updated (pushState or replaceState).
 8. Screen reader announcement is made for accessibility.
