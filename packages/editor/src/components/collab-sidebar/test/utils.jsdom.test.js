@@ -399,10 +399,10 @@ describe( 'calculateNotePositions', () => {
 		expect( positions ).toEqual( { 1: 84, 3: 284 } );
 	} );
 
-	it( 'holds every position back until the cards have been measured', () => {
+	it( 'leaves an unmeasured card unplaced', () => {
 		// Sweeping with an unmeasured card treats it as zero-height, so the
 		// card after it lands on its anchor — on top of the card it was
-		// supposed to clear.
+		// supposed to clear. The measured neighbours still get a position.
 		const threads = [ { id: 1 }, { id: 2 } ];
 		const blockRects = { 1: makeRect( 100 ), 2: makeRect( 140 ) };
 
@@ -414,7 +414,7 @@ describe( 'calculateNotePositions', () => {
 			scrollTop: 0,
 		} );
 
-		expect( positions ).toEqual( {} );
+		expect( positions ).toEqual( { 1: 84 } );
 	} );
 
 	it( 'returns the content height that fits the lowest measured thread', () => {

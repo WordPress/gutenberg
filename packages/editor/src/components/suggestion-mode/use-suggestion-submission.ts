@@ -20,7 +20,7 @@ import {
 	getNoteIdsFromMetadata,
 	removeNoteIdFromMetadata,
 } from '../collab-sidebar/utils';
-import { ALL_NOTES_SIDEBAR, SIDEBARS } from '../collab-sidebar/constants';
+import { ALL_NOTES_SIDEBAR } from '../collab-sidebar/constants';
 import { unlock } from '../../lock-unlock';
 import { buildSuggestionPayload } from './operations';
 import type { SuggestionOperation } from './operations';
@@ -123,7 +123,7 @@ export function useSuggestionSubmission() {
 					// notes sidebar so the suggestion is immediately
 					// visible. A closed sidebar stays closed.
 					const activeArea = getActiveComplementaryArea( 'core' );
-					if ( activeArea && ! SIDEBARS.includes( activeArea ) ) {
+					if ( activeArea && activeArea !== ALL_NOTES_SIDEBAR ) {
 						enableComplementaryArea( 'core', ALL_NOTES_SIDEBAR );
 					}
 				}

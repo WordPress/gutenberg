@@ -577,7 +577,11 @@ export function calculateNotePositions( {
 	// above notes that precede it in the list. Sort by measured top so the
 	// sweep's assumption holds and cards never displace past their markers.
 	// Threads without a rect keep their relative order; they are skipped
-	// below and never receive a position.
+	// below and never receive a position. So is a thread whose card has not
+	// been measured yet: sweeping it as zero-height would drop the card after
+	// it onto its anchor, on top of the card it was supposed to clear, and an
+	// unplaced card sits out the hit test (see `FloatingContainer`) until the
+	// ResizeObserver reports and the next sweep places it.
 	const orderedThreads = [ ...threads ].sort(
 		( a, b ) =>
 			( blockRects[ a.id ]?.top ?? Number.MAX_VALUE ) -
@@ -608,19 +612,6 @@ export function calculateNotePositions( {
 		return { positions: {}, contentHeight: 0 };
 	}
 
-	// Where a card lands depends on the measured height of the cards it has to
-	// clear, so sweeping before the ResizeObserver has reported treats every
-	// card as zero-height and drops them all on their anchors, on top of each
-	// other. Hold the positions back for that frame: an unplaced card sits out
-	// the hit test (see `FloatingContainer`) rather than landing in the wrong
-	// place and taking its neighbour's clicks.
-	const placeable = orderedThreads.filter(
-		( thread ) => !! blockRects[ thread.id ]
-	);
-	if ( placeable.some( ( thread ) => heights[ thread.id ] === undefined ) ) {
-		return { positions: {}, contentHeight: 0 };
-	}
-
 	const anchorRect = blockRects[ anchorThread.id ];
 	const anchorTop = anchorRect.top || 0;
 	const anchorHeight = heights[ anchorThread.id ] || 0;
@@ -634,7 +625,7 @@ export function calculateNotePositions( {
 	for ( let i = anchorIndex + 1; i < orderedThreads.length; i++ ) {
 		const thread = orderedThreads[ i ];
 		const threadRect = blockRects[ thread.id ];
-		if ( ! threadRect ) {
+		if ( ! threadRect || heights[ thread.id ] === undefined ) {
 			continue;
 		}
 
@@ -660,7 +651,7 @@ export function calculateNotePositions( {
 	for ( let i = anchorIndex - 1; i >= 0; i-- ) {
 		const thread = orderedThreads[ i ];
 		const threadRect = blockRects[ thread.id ];
-		if ( ! threadRect ) {
+		if ( ! threadRect || heights[ thread.id ] === undefined ) {
 			continue;
 		}
 
