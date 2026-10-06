@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { act, render } from '@testing-library/react';
 import {
 	createReduxStore,
@@ -10,7 +10,11 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
 // @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { createBlock, registerBlockType } from '@wordpress/blocks';
+import {
+	createBlock,
+	registerBlockType,
+	unregisterBlockType,
+} from '@wordpress/blocks';
 import SuggestionUndoGuard, {
 	findNewestPendingSuggestion,
 } from '../suggestion-undo-guard';
@@ -221,7 +225,9 @@ describe( 'SuggestionUndoGuard', () => {
 		expect( overlay.current.consumeUndoRedoAdoption() ).toBe( false );
 	} );
 
-	function registerGuardBlock() {
+	// Registered once for the whole suite: tests run in a shuffled order
+	// in CI, so no test may depend on an earlier one having registered it.
+	beforeAll( () => {
 		registerBlockType( 'test/undo-guard', {
 			apiVersion: 3,
 			title: 'Test',
@@ -232,10 +238,13 @@ describe( 'SuggestionUndoGuard', () => {
 			},
 			save: () => null,
 		} );
-	}
+	} );
+
+	afterAll( () => {
+		unregisterBlockType( 'test/undo-guard' );
+	} );
 
 	it( 'reports a withdrawable structural suggestion so Undo is offered without core history', () => {
-		registerGuardBlock();
 		const anchor = createBlock( 'test/undo-guard' );
 		const block = createBlock( 'test/undo-guard', {
 			metadata: {
