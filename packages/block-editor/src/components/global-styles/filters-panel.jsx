@@ -1,24 +1,22 @@
 import clsx from 'clsx';
 import {
 	__experimentalToolsPanel as ToolsPanel,
-	__experimentalHStack as HStack, // eslint-disable-line @wordpress/use-recommended-components
-	__experimentalZStack as ZStack, // eslint-disable-line @wordpress/use-recommended-components
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	MenuGroup,
 	ColorIndicator,
 	DuotonePicker,
 	DuotoneSwatch,
 	Dropdown,
-	Flex,
-	FlexItem,
 	Button,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { __, _x } from '@wordpress/i18n';
 import { useCallback, useMemo, useRef } from '@wordpress/element';
 import { reset as resetIcon } from '@wordpress/icons';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
 import {
 	useToolsPanelDropdownMenuProps,
+	useToolsPanelItemPopoverProps,
 	getDuotoneSlugFromPreset,
 } from './utils';
 import { setImmutably } from '../../utils/object';
@@ -26,7 +24,7 @@ import {
 	getInheritanceProps,
 	InheritanceToolsPanelItem,
 	InheritanceResetButton,
-	isGlobalStylesInheritanceEnabled,
+	isGlobalStylesInheritanceIndicatorUIEnabled,
 } from './inheritance';
 
 const EMPTY_ARRAY = [];
@@ -92,32 +90,26 @@ const DEFAULT_CONTROLS = {
 	duotone: true,
 };
 
-const popoverProps = {
-	placement: 'left-start',
-	offset: 36,
-	shift: true,
-	className: 'block-editor-duotone-control__popover',
-	headerTitle: __( 'Duotone' ),
-};
-
 const LabeledColorIndicator = ( { indicator, label } ) => (
-	<HStack justify="flex-start">
-		<ZStack isLayered={ false } offset={ -8 }>
-			<Flex expanded={ false }>
-				{ indicator === 'unset' || ! indicator ? (
-					<ColorIndicator className="block-editor-duotone-control__unset-indicator" />
-				) : (
-					<DuotoneSwatch values={ indicator } />
-				) }
-			</Flex>
-		</ZStack>
-		<FlexItem
+	<Stack
+		className="block-editor-panel-duotone-settings__label-row"
+		direction="row"
+		align="center"
+		justify="flex-start"
+		gap="sm"
+	>
+		{ indicator === 'unset' || ! indicator ? (
+			<ColorIndicator className="block-editor-duotone-control__unset-indicator" />
+		) : (
+			<DuotoneSwatch values={ indicator } />
+		) }
+		<span
 			className="block-editor-panel-duotone-settings__label"
 			title={ label }
 		>
 			{ label }
-		</FlexItem>
-	</HStack>
+		</span>
+	</Stack>
 );
 
 const renderToggle = ( duotone, resetConfig ) =>
@@ -179,8 +171,13 @@ export default function FiltersPanel( {
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
+	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
 } ) {
+	const popoverProps = {
+		...useToolsPanelItemPopoverProps(),
+		className: 'block-editor-duotone-control__popover',
+		headerTitle: __( 'Duotone' ),
+	};
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
 	// Always keep the layout className (e.g. `single-column`); only the

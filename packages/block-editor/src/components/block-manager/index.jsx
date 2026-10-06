@@ -2,7 +2,7 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import {
 	SearchControl,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -71,7 +71,7 @@ export default function BlockManager( {
 				className="block-editor-block-manager__search"
 			/>
 			{ showSelectAll && (
-				<CheckboxControl
+				<WCCheckboxControl
 					className="block-editor-block-manager__select-all"
 					label={ __( 'Select all' ) }
 					checked={ isAllChecked }

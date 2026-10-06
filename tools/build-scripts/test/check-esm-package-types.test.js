@@ -1,6 +1,7 @@
 import { access, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import { afterEach, expect, test, vi } from 'vitest';
 import {
 	classifyTypeScriptDiagnostics,
 	getCssEntrypoints,
@@ -12,6 +13,9 @@ import { checkNodeNextTypes } from '../packages/check-esm-package-types.mjs';
 let fixtureDirectory;
 let packageDirectory;
 let packDestination;
+
+// Spawning `npm pack` and `tsc` can exceed the default timeout on busy CI runners.
+vi.setConfig( { testTimeout: 10000 } ); // 10 seconds
 
 afterEach( async () => {
 	if ( fixtureDirectory ) {
@@ -85,7 +89,7 @@ test( 'continues package packing after a failure', () => {
 		{ packageJson: { name: 'second' } },
 	];
 	const failure = new Error( 'Inspection failed' );
-	const inspectPackage = jest
+	const inspectPackage = vi
 		.fn()
 		.mockImplementationOnce( () => {
 			throw failure;

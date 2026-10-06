@@ -30,8 +30,9 @@ import { getResolvedValue } from '@wordpress/global-styles-engine';
 import { hasBackgroundImageValue } from '../global-styles/background-panel';
 import {
 	InheritanceResetButton,
-	isGlobalStylesInheritanceEnabled,
+	isGlobalStylesInheritanceIndicatorUIEnabled,
 } from '../global-styles/inheritance';
+import { useToolsPanelItemPopoverProps } from '../global-styles/utils';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
@@ -42,12 +43,6 @@ import {
 
 const IMAGE_BACKGROUND_TYPE = 'image';
 
-const BACKGROUND_POPOVER_PROPS = {
-	placement: 'left-start',
-	offset: 36,
-	shift: true,
-	className: 'block-editor-global-styles-background-panel__popover',
-};
 const noop = () => {};
 
 /**
@@ -160,7 +155,7 @@ function InspectorImagePreviewItem( {
 									/* translators: %s: file name */
 									__( 'Background image: %s' ),
 									filename || label
-							  )
+								)
 							: __( 'No background image selected' ) }
 					</VisuallyHidden>
 				</FlexBlock>
@@ -188,6 +183,11 @@ function BackgroundControlsPanel( {
 	hasLocalOverride,
 	containerRef,
 } ) {
+	const popoverProps = {
+		...useToolsPanelItemPopoverProps(),
+		className: 'block-editor-global-styles-background-panel__popover',
+	};
+
 	if ( ! hasImageValue ) {
 		return;
 	}
@@ -196,7 +196,7 @@ function BackgroundControlsPanel( {
 
 	return (
 		<Dropdown
-			popoverProps={ BACKGROUND_POPOVER_PROPS }
+			popoverProps={ popoverProps }
 			renderToggle={ ( { onToggle, isOpen } ) => {
 				const toggleProps = {
 					onClick: onToggle,
@@ -360,6 +360,25 @@ function BackgroundImageControls( {
 		focusToggleButton( containerRef );
 	};
 
+	/*
+	 * Sets an image entered as a direct URL. There is no attachment `id`:
+	 * `source: 'url'` records that the image is externally hosted.
+	 */
+	const onSelectURL = ( newURL ) => {
+		if ( ! newURL || newURL === url ) {
+			return;
+		}
+		onChange(
+			setImmutably( style, [ 'background' ], {
+				...style?.background,
+				backgroundImage: {
+					url: newURL,
+					source: 'url',
+				},
+			} )
+		);
+	};
+
 	// Drag and drop callback, restricting image to one.
 	const onFilesDrop = ( filesList ) => {
 		getSettings().mediaUpload( {
@@ -382,6 +401,17 @@ function BackgroundImageControls( {
 			} )
 		);
 	const canRemove = ! hasValue && hasBackgroundImageValue( inheritedValue );
+	// theme.json accepts a plain string for `backgroundImage`; the editor
+	// stores an object with a `url`. Resolve either for the URL field.
+	const rawURL =
+		typeof style?.background?.backgroundImage === 'string'
+			? style.background.backgroundImage
+			: url;
+	// Offer only absolute `http(s)` addresses to the URL field. A theme.json
+	// value can be theme-relative (`file:./…`), which the field could neither
+	// display usefully nor re-apply without breaking the image, and removing
+	// an inherited image stores the `'none'` sentinel string.
+	const currentURL = /^https?:\/\//.test( rawURL ?? '' ) ? rawURL : undefined;
 	const imgLabel = title || getFilename( url ) || __( 'Image' );
 
 	return (
@@ -389,10 +419,11 @@ function BackgroundImageControls( {
 			{ isUploading && <LoadingSpinner /> }
 			<MediaReplaceFlow
 				mediaId={ id }
-				mediaURL={ url }
+				mediaURL={ currentURL }
 				allowedTypes={ [ IMAGE_BACKGROUND_TYPE ] }
 				accept="image/*"
 				onSelect={ onSelectMedia }
+				onSelectURL={ onSelectURL }
 				popoverProps={ {
 					className: clsx( {
 						'block-editor-global-styles-background-panel__media-replace-popover':
@@ -656,7 +687,7 @@ export default function BackgroundImagePanel( {
 	inheritedValue = value,
 	settings,
 	defaultValues = {},
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
+	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
 } ) {
 	/*
 	 * Resolve inherited `ref` pointers for background controls.

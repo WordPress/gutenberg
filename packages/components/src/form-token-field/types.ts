@@ -51,11 +51,10 @@ export interface TokenItem {
 	onMouseLeave?: MouseEventHandler< HTMLSpanElement >;
 }
 
-export interface FormTokenFieldProps
-	extends Pick<
-		ComponentPropsWithRef< 'input' >,
-		'autoCapitalize' | 'autoComplete' | 'className'
-	> {
+export interface FormTokenFieldProps extends Pick<
+	ComponentPropsWithRef< 'input' >,
+	'autoCapitalize' | 'autoComplete' | 'className'
+> {
 	label?: string;
 	/**
 	 * An array of strings to present to the user as suggested tokens.

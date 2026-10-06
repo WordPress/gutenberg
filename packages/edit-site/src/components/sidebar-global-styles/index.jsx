@@ -4,6 +4,7 @@ import { useMemo, useState } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useViewportMatch } from '@wordpress/compose';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { Button, __experimentalHStack as HStack } from '@wordpress/components';
 import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
@@ -14,6 +15,13 @@ import { unlock } from '../../lock-unlock';
 const { GlobalStylesUIWrapper, GlobalStylesActionMenu } =
 	unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
+const { ToolsPanelPopoverPropsContext } = unlock( blockEditorPrivateApis );
+
+// Panel padding (16px) + screen padding (12px) + spacing (4px)
+const TOOLS_PANEL_POPOVER_PROPS = {
+	dropdown: { placement: 'right-start', offset: 32 },
+	item: { placement: 'right-start', offset: 32, shift: true },
+};
 
 const GlobalStylesPageActions = ( {
 	isStyleBookOpened,
@@ -98,11 +106,17 @@ export default function SidebarGlobalStyles() {
 			title={ __( 'Styles' ) }
 			headingLevel={ 2 }
 		>
-			<GlobalStylesUIWrapper
-				path={ section }
-				onPathChange={ onChangeSection }
-				settings={ settings }
-			/>
+			<div className="edit-site-styles__content">
+				<ToolsPanelPopoverPropsContext.Provider
+					value={ TOOLS_PANEL_POPOVER_PROPS }
+				>
+					<GlobalStylesUIWrapper
+						path={ section }
+						onPathChange={ onChangeSection }
+						settings={ settings }
+					/>
+				</ToolsPanelPopoverPropsContext.Provider>
+			</div>
 		</Page>
 	);
 }

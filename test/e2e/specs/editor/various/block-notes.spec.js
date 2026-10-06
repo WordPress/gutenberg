@@ -1,4 +1,5 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const { BlockNoteUtils } = require( './block-notes-utils' );
 
 test.use( {
 	blockNoteUtils: async ( { page, editor, pageUtils }, use ) => {
@@ -7,12 +8,14 @@ test.use( {
 } );
 
 test.describe( 'Block Notes', () => {
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, blockNoteUtils } ) => {
 		await admin.createNewPost();
+		await blockNoteUtils.showAllNotes();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllComments( 'note' );
+		await requestUtils.resetPreferences();
 	} );
 
 	test( 'should move focus to add a new note form', async ( {
@@ -131,13 +134,22 @@ test.describe( 'Block Notes', () => {
 		await expect( replyTextbox ).not.toBeFocused();
 	} );
 
-	test( 'can edit a block note', async ( { page, blockNoteUtils } ) => {
+	test( 'can edit a block note @firefox @webkit', async ( {
+		page,
+		blockNoteUtils,
+	} ) => {
 		await blockNoteUtils.addBlockWithNote( {
 			type: 'core/heading',
 			attributes: { content: 'Testing block comments' },
 			comment: 'test comment before edit',
 		} );
 		await blockNoteUtils.clickBlockNoteActionMenuItem( 'Edit' );
+		await expect(
+			page.getByRole( 'menu', { name: 'Actions' } )
+		).toBeHidden();
+		await expect(
+			page.getByRole( 'textbox', { name: 'Edit note' } )
+		).toBeFocused();
 		await page
 			.getByRole( 'textbox', { name: 'Note' } )
 			.first()
@@ -333,6 +345,51 @@ test.describe( 'Block Notes', () => {
 			'Resolved',
 			'Note to resolve.',
 		] );
+	} );
+
+	test( 'clearing the block selection does not select an orphaned note', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Another block' },
+		} );
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Orphan me.' },
+			comment: 'Orphaned note.',
+		} );
+
+		// Delete the noted block, orphaning its note.
+		await editor.clickBlockOptionsMenuItem( 'Delete' );
+
+		// Only the "All notes" sidebar lists orphaned notes.
+		await blockNoteUtils.openBlockNoteSidebar();
+		const sidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await expect(
+			sidebar.getByRole( 'treeitem', {
+				name: 'Original block deleted. Note: Orphaned note.',
+			} )
+		).toBeVisible();
+
+		const anotherBlock = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Another block' } );
+		await anotherBlock.click();
+		await expect( anotherBlock ).toHaveClass( /is-selected/ );
+
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.click();
+		await expect( anotherBlock ).not.toHaveClass( /is-selected/ );
+
+		await expect(
+			sidebar.getByRole( 'treeitem', { expanded: true } )
+		).toHaveCount( 0 );
 	} );
 
 	test( 'selecting a block or note marks it as an active', async ( {
@@ -797,6 +854,12 @@ test.describe( 'Block Notes', () => {
 					name: 'Note: Third block comment',
 				} );
 
+			const secondBlock = editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+				.nth( 1 );
+
 			await firstThread.click();
 			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete' );
 			await page
@@ -807,6 +870,10 @@ test.describe( 'Block Notes', () => {
 				secondThread,
 				'focus should move to the next note if there is one'
 			).toBeFocused();
+			await expect(
+				secondBlock,
+				"the next note's block should be selected"
+			).toHaveClass( /is-selected/ );
 
 			await thirdThread.click();
 			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete' );
@@ -818,6 +885,10 @@ test.describe( 'Block Notes', () => {
 				secondThread,
 				"focus should move to the previous note if there isn't a next one"
 			).toBeFocused();
+			await expect(
+				secondBlock,
+				"the previous note's block should be selected"
+			).toHaveClass( /is-selected/ );
 
 			await secondThread.click();
 			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete' );
@@ -825,11 +896,6 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'dialog' )
 				.getByRole( 'button', { name: 'Delete' } )
 				.click();
-			const secondBlock = editor.canvas
-				.getByRole( 'document', {
-					name: 'Block: Paragraph',
-				} )
-				.nth( 1 );
 			await expect
 				.poll(
 					() => editor.ownsSelection( secondBlock ),
@@ -949,7 +1015,7 @@ test.describe( 'Block Notes', () => {
 			).toBeFocused();
 		} );
 
-		test( 'should focus action button when note editing is cancelled or note is updated', async ( {
+		test( 'should focus action button when note editing is cancelled or note is updated @firefox @webkit', async ( {
 			page,
 			blockNoteUtils,
 		} ) => {
@@ -973,8 +1039,19 @@ test.describe( 'Block Notes', () => {
 					.getByRole( 'button', { name: 'Actions' } )
 			).toBeFocused();
 
-			// Test focus on action button when note is updated.
-			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Edit' );
+			// Reopen with the keyboard and move focus into the edit field.
+			await page
+				.getByRole( 'button', { name: 'Actions' } )
+				.press( 'ArrowDown' );
+			await page
+				.getByRole( 'menuitem', { name: 'Edit', exact: true } )
+				.press( 'Enter' );
+			await expect(
+				page.getByRole( 'menu', { name: 'Actions' } )
+			).toBeHidden();
+			await expect(
+				page.getByRole( 'textbox', { name: 'Edit note' } )
+			).toBeFocused();
 			await page
 				.getByRole( 'textbox', { name: 'Note' } )
 				.first()
@@ -1015,7 +1092,7 @@ test.describe( 'Block Notes', () => {
 			await pageUtils.pressKeys( 'primary+Enter' );
 			await expect(
 				textbox,
-				`doesn't sumbit an empty form and focus remains in the textbox`
+				`doesn't submit an empty form and focus remains in the textbox`
 			).toBeFocused();
 
 			await textbox.pressSequentially( 'A test comment' );
@@ -1163,91 +1240,42 @@ test.describe( 'Block Notes', () => {
 			expect( noteIds ).toHaveLength( 1 );
 		} );
 
-		test( 'resolving one note does not affect sibling notes on the same block', async ( {
+		test( 'keeps the clicked note selected on a block with several notes', async ( {
 			editor,
 			page,
 			blockNoteUtils,
 		} ) => {
 			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/paragraph',
-				attributes: { content: 'Block with notes to resolve' },
-				comment: 'Note A',
-			} );
-			await blockNoteUtils.addNote( 'Note B' );
-
-			const settings = page.getByRole( 'region', {
-				name: 'Editor settings',
-			} );
-
-			// Resolve Note A.
-			const threadA = settings.getByRole( 'treeitem', {
-				name: 'Note: Note A',
-			} );
-			await threadA.click();
-			await page.getByRole( 'button', { name: 'Resolve' } ).click();
-			// Resolving removes the note from the floating "Unresolved notes"
-			// view, which confirms the action completed.
-			await expect( threadA ).toBeHidden();
-
-			// Note B should still be visible and unresolved (expanded).
-			const threadB = settings.getByRole( 'treeitem', {
-				name: 'Note: Note B',
-			} );
-			await expect( threadB ).toBeVisible();
-
-			// Both notes should still exist in metadata.
-			const blocks = await editor.getBlocks();
-			const paragraphBlock = blocks.find(
-				( b ) => b.name === 'core/paragraph'
-			);
-			const noteIds = paragraphBlock?.attributes?.metadata?.noteId;
-			expect( noteIds ).toHaveLength( 2 );
-		} );
-
-		test( 'auto-selects first unresolved note when clicking a block with multiple notes', async ( {
-			editor,
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Block for auto-select' },
+				attributes: { content: 'Block with notes' },
 				comment: 'First note',
 			} );
 			await blockNoteUtils.addNote( 'Second note' );
+			// Move the block selection away, so clicking a thread also selects its block.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Another block' },
+			} );
 
 			const settings = page.getByRole( 'region', {
 				name: 'Editor settings',
 			} );
-
-			// Resolve the first note.
 			const firstThread = settings.getByRole( 'treeitem', {
 				name: 'Note: First note',
 			} );
-			await firstThread.click();
-			await page.getByRole( 'button', { name: 'Resolve' } ).click();
-			// Resolving removes the note from the floating "Unresolved notes"
-			// view, which confirms the action completed.
-			await expect( firstThread ).toBeHidden();
-
-			// Click the title to deselect the block and its comment.
-			await editor.canvas
-				.getByRole( 'textbox', { name: 'Add title' } )
-				.focus();
-
-			// Click back on the original block.
-			await editor.canvas
-				.getByRole( 'document', { name: 'Block: Paragraph' } )
-				.filter( { hasText: 'Block for auto-select' } )
-				.click();
-
-			// The second (unresolved) note should be the active one.
 			const secondThread = settings.getByRole( 'treeitem', {
 				name: 'Note: Second note',
 			} );
+
+			await secondThread.click();
+
 			await expect( secondThread ).toHaveAttribute(
 				'aria-expanded',
 				'true'
+			);
+			await expect( firstThread ).toHaveAttribute(
+				'aria-expanded',
+				'false'
 			);
 		} );
 	} );
@@ -1702,441 +1730,316 @@ test.describe( 'Block Notes', () => {
 				'false'
 			);
 		} );
+	} );
 
-		test.describe( 'Floating alignment', () => {
-			// Tall enough that the floating form/thread anchored at the last
-			// line still fits fully within the viewport: a thread extending
-			// below the fold gets scrolled into view by the browser on focus,
-			// which scrolls the floating panel and shifts every thread off
-			// its anchor (tracked as a follow-up; the alignment contract only
-			// holds while the panel is unscrolled).
-			test.use( { viewport: { width: 1280, height: 900 } } );
+	test( 'keeps note anchors out of the undo history', async ( {
+		editor,
+		page,
+		pageUtils,
+		blockNoteUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Keep my anchor.' },
+		} );
+		// Start with an empty undo stack, so the shortcut can only reach the
+		// note's anchor.
+		await editor.saveDraft();
+		await page.reload();
+		await blockNoteUtils.showAllNotes();
 
-			// A paragraph long enough that its last line sits well below the
-			// block top, so marker alignment is distinguishable from the old
-			// block-top alignment (#79875).
-			const LONG_TEXT =
-				'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. '.repeat(
-					3
-				) + 'The final anchor';
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await paragraph.click();
+		await blockNoteUtils.selectBlockText();
+		await blockNoteUtils.addNote( 'Stay attached' );
+		const marker = editor.canvas.locator( 'mark.wp-note' );
 
-			async function selectTrailingWord( { editor, blockNoteUtils } ) {
-				await editor.insertBlock( {
-					name: 'core/paragraph',
-					attributes: { content: LONG_TEXT },
-				} );
+		// Undo doesn't detach the new note from its block.
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( marker ).toHaveText( 'Keep my anchor.' );
+		const [ block ] = await editor.getBlocks();
+		expect( block.attributes.metadata?.noteId ).toHaveLength( 1 );
 
-				const paragraph = editor.canvas.getByRole( 'document', {
-					name: 'Block: Paragraph',
-				} );
+		// Undo doesn't bring back the marker of a resolved note.
+		await blockNoteUtils.getThread( 'Stay attached' ).click();
+		await page.getByRole( 'button', { name: 'Resolve' } ).click();
+		await expect( marker ).toHaveCount( 0 );
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( marker ).toHaveCount( 0 );
+		await expect( paragraph ).toHaveText( 'Keep my anchor.' );
+	} );
 
-				// Select the trailing word "anchor".
-				await paragraph.click();
-				await blockNoteUtils.selectBlockText( {
-					length: 'anchor'.length,
-					fromEnd: true,
-				} );
-
-				return paragraph;
-			}
-
-			test( 'aligns the floating thread with its inline marker', async ( {
-				editor,
-				page,
-				blockNoteUtils,
-			} ) => {
-				const paragraph = await selectTrailingWord( {
-					editor,
-					blockNoteUtils,
-				} );
-
-				await editor.clickBlockOptionsMenuItem( 'Add note' );
-				await page
-					.getByRole( 'textbox', { name: 'New note', exact: true } )
-					.fill( 'Align me' );
-				await page
-					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'button', { name: 'Add note', exact: true } )
-					.click();
-
-				const mark = editor.canvas.locator( 'mark.wp-note' );
-				await expect( mark ).toHaveText( 'anchor' );
-
-				// The inline "Add note" flow activates the floating notes
-				// sidebar, so the saved thread renders as a floating panel.
-				const thread = page.getByRole( 'treeitem', {
-					name: 'Note: Align me',
-				} );
-				await expect( thread ).toHaveClass( /is-floating/ );
-
-				const markBox = await mark.boundingBox();
-				const paragraphBox = await paragraph.boundingBox();
-				expect( markBox.y - paragraphBox.y ).toBeGreaterThan( 100 );
-
-				// The thread tops out at the marker's line, not the block
-				// top: the -16px thread align offset is cancelled by the
-				// floating panel's 16px margin, so the boxes line up.
-				await expect
-					.poll( async () => {
-						const threadBox = await thread.boundingBox();
-						const currentMarkBox = await mark.boundingBox();
-						return Math.abs( threadBox.y - currentMarkBox.y );
-					} )
-					.toBeLessThan( 12 );
+	test.describe( 'Restoring a deleted note', () => {
+		async function addInlineNote( { editor, blockNoteUtils }, note ) {
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
 			} );
+			await paragraph.click();
+			await blockNoteUtils.selectBlockText();
+			await blockNoteUtils.addNote( note );
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				1
+			);
+		}
 
-			test( 'aligns the pending new-note form with the text selection', async ( {
-				editor,
-				page,
-				blockNoteUtils,
-			} ) => {
-				const paragraph = await selectTrailingWord( {
-					editor,
-					blockNoteUtils,
-				} );
+		async function clickUndo( blockNoteUtils ) {
+			await blockNoteUtils
+				.getNotice( 'Note deleted.' )
+				.getByRole( 'button', { name: 'Undo' } )
+				.click();
+			await expect(
+				blockNoteUtils.getNotice( 'Note restored.' )
+			).toBeVisible();
+		}
 
-				await editor.clickBlockOptionsMenuItem( 'Add note' );
-				// The pending form floats next to the canvas while composing;
-				// there is no marker yet, so it anchors to the selection the
-				// note will attach to (the canvas keeps its selection while
-				// focus is in the form).
-				const form = page.locator(
-					'.editor-collab-sidebar-panel__add-note.is-floating'
-				);
-				await expect( form ).toBeVisible();
+		async function getNoteIds( editor ) {
+			const [ block ] = await editor.getBlocks();
+			return block.attributes.metadata?.noteId;
+		}
 
-				// Selection top in top-level page coordinates, whether or not
-				// the canvas is iframed.
-				const selectionTop = await editor.canvas
-					.locator( 'body' )
-					.evaluate( () => {
-						const selection = window.getSelection();
-						if ( ! selection.rangeCount ) {
-							return null;
-						}
-						const rect = selection
-							.getRangeAt( 0 )
-							.getBoundingClientRect();
-						let top = rect.top;
-						let win = window;
-						while ( win !== win.parent ) {
-							top += win.frameElement.getBoundingClientRect().top;
-							win = win.parent;
-						}
-						return top;
-					} );
-
-				expect( selectionTop ).not.toBeNull();
-
-				const paragraphBox = await paragraph.boundingBox();
-				expect( selectionTop - paragraphBox.y ).toBeGreaterThan( 100 );
-
-				await expect
-					.poll( async () => {
-						const formBox = await form.boundingBox();
-						return Math.abs( formBox.y - selectionTop );
-					} )
-					.toBeLessThan( 12 );
+		test( 'restores the note and its inline marker from the snackbar', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Bring me back.' },
 			} );
+			await addInlineNote( { editor, blockNoteUtils }, 'Restore me' );
+			const [ noteId ] = await getNoteIds( editor );
 
-			// A block hidden at the current viewport unmounts as soon as it is
-			// deselected, leaving its thread without an anchor element. The
-			// thread has to hold the place the block would occupy rather than
-			// collapse to the top of the notes panel (#73565).
-			const FILLER_TEXT =
-				'Filler paragraph. ' +
-				'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. '.repeat(
-					3
-				);
+			await blockNoteUtils.deleteNote();
+			await expect(
+				blockNoteUtils.getThread( 'Restore me' )
+			).toBeHidden();
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
+			expect( await getNoteIds( editor ) ).toBeUndefined();
 
-			/**
-			 * Sets the selected block's Desktop visibility through the block
-			 * options menu. 'Hide' and 'Show' open the same dialog.
-			 *
-			 * @param {Object}  utils
-			 * @param {Object}  utils.editor Editor utils.
-			 * @param {Object}  utils.page   Playwright page.
-			 * @param {string}  utils.item   Options menu item to click.
-			 * @param {boolean} utils.hide   Whether the block ends up hidden.
-			 */
-			async function setDesktopVisibility( {
-				editor,
-				page,
-				item,
-				hide,
-			} ) {
-				await editor.clickBlockOptionsMenuItem( item );
-				const dialog = page.getByRole( 'dialog', {
-					name: 'Hide block',
-				} );
-				const checkbox = dialog.getByRole( 'checkbox', {
-					name: 'Hide on Desktop',
-				} );
-				if ( hide ) {
-					await checkbox.check();
-				} else {
-					await checkbox.uncheck();
-				}
-				await dialog.getByRole( 'button', { name: 'Apply' } ).click();
-				// Applying leaves the options dropdown open, where it would
-				// swallow the next click on the canvas.
-				await page.keyboard.press( 'Escape' );
-			}
-
-			/**
-			 * Distance between a thread's top and the centre of the gap its
-			 * hidden block left between its neighbours - which is also where
-			 * the block itself sits while selected, collapsed to zero height.
-			 *
-			 * @param {Object} locators
-			 * @param {Object} locators.thread   Floating thread.
-			 * @param {Object} locators.filler   Block before the hidden one.
-			 * @param {Object} locators.trailing Block after the hidden one.
-			 */
-			async function distanceFromGapCentre( {
-				thread,
-				filler,
-				trailing,
-			} ) {
-				const threadBox = await thread.boundingBox();
-				const fillerBox = await filler.boundingBox();
-				const trailingBox = await trailing.boundingBox();
-				const centre =
-					( fillerBox.y + fillerBox.height + trailingBox.y ) / 2;
-				return Math.abs( threadBox.y - centre );
-			}
-
-			/**
-			 * Builds a filler / noted / trailing paragraph stack with a block
-			 * note on the middle paragraph. The noted block is deliberately
-			 * not the first one: a thread that lost its anchor parks at the
-			 * top of the panel, which is coincidentally the right answer for
-			 * a first block.
-			 *
-			 * @param {Object} utils
-			 * @param {Object} utils.editor         Editor utils.
-			 * @param {Object} utils.page           Playwright page.
-			 * @param {Object} utils.blockNoteUtils Block note utils.
-			 * @param {string} utils.comment        Note content.
-			 */
-			async function setUpNotedMiddleBlock( {
-				editor,
-				page,
-				blockNoteUtils,
-				comment,
-			} ) {
-				for ( const content of [
-					FILLER_TEXT,
-					'Noted paragraph',
-					'Trailing paragraph',
-				] ) {
-					await editor.insertBlock( {
-						name: 'core/paragraph',
-						attributes: { content },
-					} );
-				}
-
-				// Text locators rather than positional ones: the noted block
-				// unmounts when hidden, which would shift an `nth()` index
-				// onto the trailing paragraph.
-				const filler = editor.canvas.getByText( 'Filler paragraph.' );
-				const noted = editor.canvas.getByText( 'Noted paragraph' );
-				const trailing =
-					editor.canvas.getByText( 'Trailing paragraph' );
-
-				await editor.selectBlocks( noted );
-				await blockNoteUtils.addNote( comment );
-
-				// Located by content, not by accessible name: the name gains a
-				// hidden-block prefix partway through these tests.
-				const thread = page
-					.getByRole( 'treeitem' )
-					.filter( { hasText: comment } );
-				await expect( thread ).toHaveClass( /is-floating/ );
-
-				// Baseline: the thread lines up with its block.
-				await expect
-					.poll( async () => {
-						const threadBox = await thread.boundingBox();
-						const notedBox = await noted.boundingBox();
-						return Math.abs( threadBox.y - notedBox.y );
-					} )
-					.toBeLessThan( 12 );
-
-				return { filler, noted, trailing, thread };
-			}
-
-			test( "anchors a hidden block's thread where the block would be", async ( {
-				editor,
-				page,
-				blockNoteUtils,
-			} ) => {
-				const { filler, noted, trailing, thread } =
-					await setUpNotedMiddleBlock( {
-						editor,
-						page,
-						blockNoteUtils,
-						comment: 'Hidden host note',
-					} );
-
-				await editor.selectBlocks( noted );
-				await setDesktopVisibility( {
-					editor,
-					page,
-					item: 'Hide',
-					hide: true,
-				} );
-
-				// A hidden block stays rendered while it is selected; clicking
-				// away unmounts it and forces the board to recalculate.
-				await editor.selectBlocks( filler );
-				await expect( noted ).toBeHidden();
-
-				// The thread holds the gap the hidden block left behind. Boxes
-				// are re-read each round, since the canvas reflows as the
-				// block unmounts.
-				await expect
-					.poll( () =>
-						distanceFromGapCentre( { thread, filler, trailing } )
-					)
-					.toBeLessThan( 12 );
-
-				const fillerBox = await filler.boundingBox();
-				const panelBox = await page
-					.getByRole( 'region', { name: 'Editor settings' } )
-					.boundingBox();
-				const threadBox = await thread.boundingBox();
-				expect( threadBox.y ).toBeGreaterThan(
-					fillerBox.y + fillerBox.height
-				);
-				// The regression signature: parked at the top of the panel.
-				expect( threadBox.y ).toBeGreaterThan( panelBox.y + 200 );
-
-				// The thread explains why nothing is highlighted.
-				await expect(
-					thread.getByText( 'Block is hidden.' )
-				).toBeVisible();
-				await expect(
-					page.getByRole( 'treeitem', {
-						name: 'Note on hidden block: Hidden host note',
-					} )
-				).toBeVisible();
+			// Typing after the delete survives the restore.
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
 			} );
+			await paragraph.click();
+			await blockNoteUtils.selectBlockText();
+			await page.keyboard.press( 'ArrowRight' );
+			await page.keyboard.type( ' More.' );
 
-			test( 'keeps a hidden thread in place while selected, and realigns on unhide', async ( {
-				editor,
-				page,
-				blockNoteUtils,
-			} ) => {
-				const { filler, noted, trailing, thread } =
-					await setUpNotedMiddleBlock( {
-						editor,
-						page,
-						blockNoteUtils,
-						comment: 'Reveal me',
-					} );
+			await clickUndo( blockNoteUtils );
+			await expect(
+				blockNoteUtils.getThread( 'Restore me' )
+			).toBeVisible();
+			await expect( paragraph ).toHaveText( 'Bring me back. More.' );
+			await expect(
+				editor.canvas.locator( `mark.wp-note[data-id="${ noteId }"]` )
+			).toHaveText( 'Bring me back.' );
+			expect( await getNoteIds( editor ) ).toEqual( [ noteId ] );
 
-				await editor.selectBlocks( noted );
-				await setDesktopVisibility( {
-					editor,
-					page,
-					item: 'Hide',
-					hide: true,
-				} );
-				await editor.selectBlocks( filler );
-				await expect( noted ).toBeHidden();
+			await editor.saveDraft();
+			await page.reload();
+			await blockNoteUtils.openBlockNoteSidebar();
+			await expect(
+				blockNoteUtils.getThread( 'Restore me' )
+			).toBeVisible();
+			await expect(
+				editor.canvas.locator( `mark.wp-note[data-id="${ noteId }"]` )
+			).toHaveText( 'Bring me back.' );
+		} );
 
-				/*
-				 * Selecting the thread selects the block, which puts it back
-				 * in the DOM collapsed to zero height so the block toolbar
-				 * works - it is still invisible. The thread expands in place
-				 * and keeps saying so.
-				 */
-				await thread.click();
-				await expect( thread ).toHaveAttribute(
-					'aria-expanded',
-					'true'
-				);
-				await expect( noted ).toBeHidden();
-				await expect(
-					thread.getByText( 'Block is hidden.' )
-				).toBeVisible();
-				await expect
-					.poll( () =>
-						distanceFromGapCentre( { thread, filler, trailing } )
-					)
-					.toBeLessThan( 12 );
-
-				// Unhiding restores alignment for good: the block keeps
-				// rendering once it is deselected.
-				await editor.selectBlocks( noted );
-				await setDesktopVisibility( {
-					editor,
-					page,
-					item: 'Show',
-					hide: false,
-				} );
-				await editor.selectBlocks( filler );
-				await expect( noted ).toBeVisible();
-				await expect(
-					thread.getByText( 'Block is hidden.' )
-				).toBeHidden();
-				await expect
-					.poll( async () => {
-						const threadBox = await thread.boundingBox();
-						const notedBox = await noted.boundingBox();
-						return Math.abs( threadBox.y - notedBox.y );
-					} )
-					.toBeLessThan( 12 );
+		test( 'does not restore the marker with the undo shortcut', async ( {
+			editor,
+			page,
+			pageUtils,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Undo after delete.' },
 			} );
+			// Start with an empty undo stack, so the shortcut can't undo the
+			// block insertion instead.
+			await editor.saveDraft();
+			await page.reload();
+			await blockNoteUtils.showAllNotes();
+			await addInlineNote( { editor, blockNoteUtils }, 'Stay deleted' );
 
-			test( "anchors a hidden last block's thread below the previous block", async ( {
-				editor,
-				page,
-				blockNoteUtils,
-			} ) => {
-				await editor.insertBlock( {
-					name: 'core/paragraph',
-					attributes: { content: FILLER_TEXT },
-				} );
-				await editor.insertBlock( {
-					name: 'core/paragraph',
-					attributes: { content: 'Last paragraph' },
-				} );
+			await blockNoteUtils.deleteNote();
+			await pageUtils.pressKeys( 'primary+z' );
 
-				const filler = editor.canvas.getByText( 'Filler paragraph.' );
-				const last = editor.canvas.getByText( 'Last paragraph' );
+			await expect(
+				blockNoteUtils.getThread( 'Stay deleted' )
+			).toBeHidden();
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
+			expect( await getNoteIds( editor ) ).toBeUndefined();
 
-				await editor.selectBlocks( last );
-				await blockNoteUtils.addNote( 'Last block note' );
+			await editor.saveDraft();
+			await page.reload();
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
+			expect( await getNoteIds( editor ) ).toBeUndefined();
+		} );
 
-				const thread = page
-					.getByRole( 'treeitem' )
-					.filter( { hasText: 'Last block note' } );
-				await expect( thread ).toHaveClass( /is-floating/ );
-
-				await editor.selectBlocks( last );
-				await setDesktopVisibility( {
-					editor,
-					page,
-					item: 'Hide',
-					hide: true,
-				} );
-				await editor.selectBlocks( filler );
-				await expect( last ).toBeHidden();
-
-				// Nothing follows the hidden block, so the thread falls back
-				// to the bottom of the preceding block.
-				await expect
-					.poll( async () => {
-						const threadBox = await thread.boundingBox();
-						const fillerBox = await filler.boundingBox();
-						return Math.abs(
-							threadBox.y - ( fillerBox.y + fillerBox.height )
-						);
-					} )
-					.toBeLessThan( 24 );
+		test( 'enables saving after deleting and restoring a block-level note', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Saved with a note.' },
+				comment: 'Saved note',
 			} );
+			await editor.saveDraft();
+			await page.reload();
+			await blockNoteUtils.openBlockNoteSidebar();
+			await blockNoteUtils.getThread( 'Saved note' ).click();
+
+			const topBar = page.getByRole( 'region', {
+				name: 'Editor top bar',
+			} );
+			const saveDraftButton = topBar.getByRole( 'button', {
+				name: 'Save draft',
+			} );
+			const savedButton = topBar.getByRole( 'button', { name: 'Saved' } );
+			await expect( savedButton ).toBeDisabled();
+
+			await blockNoteUtils.deleteNote();
+			await expect( saveDraftButton ).toBeEnabled();
+			await editor.saveDraft();
+			await expect( savedButton ).toBeDisabled();
+
+			await clickUndo( blockNoteUtils );
+			await expect( saveDraftButton ).toBeEnabled();
+		} );
+
+		test( 'restores a block-level note when its text changed', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Change me.' },
+			} );
+			await addInlineNote( { editor, blockNoteUtils }, 'Text is gone' );
+			const [ noteId ] = await getNoteIds( editor );
+
+			await blockNoteUtils.deleteNote();
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraph.click();
+			await blockNoteUtils.selectBlockText();
+			await page.keyboard.type( 'Changed.' );
+
+			await clickUndo( blockNoteUtils );
+			await expect(
+				blockNoteUtils.getThread( 'Text is gone' )
+			).toBeVisible();
+			await expect( paragraph ).toHaveText( 'Changed.' );
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
+			expect( await getNoteIds( editor ) ).toEqual( [ noteId ] );
+		} );
+
+		test( 'does not duplicate a marker the undo shortcut brought back', async ( {
+			editor,
+			page,
+			pageUtils,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Typed' },
+			} );
+			await addInlineNote( { editor, blockNoteUtils }, 'Come back once' );
+			const [ noteId ] = await getNoteIds( editor );
+
+			// Typing after the note leaves an undo level that holds the marker.
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraph.click();
+			await blockNoteUtils.selectBlockText();
+			await page.keyboard.press( 'ArrowRight' );
+			await page.keyboard.type( 'More' );
+			await expect( paragraph ).toHaveText( 'TypedMore' );
+
+			// The caret left the marker, collapsing the thread.
+			await blockNoteUtils.getThread( 'Come back once' ).click();
+			await blockNoteUtils.deleteNote();
+			await pageUtils.pressKeys( 'primary+z' );
+
+			// The marker returns, but without its note it stays inert.
+			const mark = editor.canvas.locator( 'mark.wp-note' );
+			await expect( mark ).toHaveCount( 1 );
+			await expect(
+				blockNoteUtils.getThread( 'Come back once' )
+			).toBeHidden();
+			await expect( mark ).toHaveCSS(
+				'background-color',
+				'rgba(0, 0, 0, 0)'
+			);
+
+			await clickUndo( blockNoteUtils );
+			await expect(
+				blockNoteUtils.getThread( 'Come back once' )
+			).toBeVisible();
+			await expect( mark ).toHaveCount( 1 );
+			expect( await getNoteIds( editor ) ).toEqual( [ noteId ] );
+		} );
+
+		test( 'restores a deleted reply', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Reply to me.' },
+				comment: 'Parent note',
+			} );
+			await blockNoteUtils.addReply( 'Restore this reply' );
+			const reply = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByText( 'Restore this reply', { exact: true } );
+
+			await blockNoteUtils.deleteNote( 1 );
+			await expect( reply ).toBeHidden();
+
+			await clickUndo( blockNoteUtils );
+			await expect( reply ).toBeVisible();
+		} );
+
+		test( 'restores a deleted orphaned note', async ( {
+			editor,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Orphan me.' },
+				comment: 'Orphaned note',
+			} );
+			await editor.clickBlockOptionsMenuItem( 'Delete' );
+			await blockNoteUtils.openBlockNoteSidebar();
+			const thread = blockNoteUtils.getThread( 'Orphaned note' );
+			await thread.click();
+
+			await blockNoteUtils.deleteNote();
+			await expect( thread ).toBeHidden();
+
+			await clickUndo( blockNoteUtils );
+			await expect( thread ).toBeVisible();
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
 		} );
 	} );
 
@@ -2396,113 +2299,3 @@ test.describe( 'Block Notes', () => {
 		} );
 	} );
 } );
-
-class BlockNoteUtils {
-	/** @type {import('@playwright/test').Page} */
-	#page;
-	/** @type {import('@wordpress/e2e-test-utils-playwright').Editor} */
-	#editor;
-	/** @type {import('@wordpress/e2e-test-utils-playwright').PageUtils} */
-	#pageUtils;
-
-	constructor( { page, editor, pageUtils } ) {
-		this.#page = page;
-		this.#editor = editor;
-		this.#pageUtils = pageUtils;
-	}
-
-	/**
-	 * Selects text inside the focused block, replacing the noisy select-all +
-	 * arrow-key dance the inline-note tests use to anchor a marker. The caller
-	 * still focuses the block (e.g. by clicking it) first.
-	 *
-	 * @param {Object}  [range]         Range to select. Omit to select the whole block.
-	 * @param {number}  [range.start]   Characters to skip from the block start.
-	 * @param {number}  [range.length]  Characters to select. Omit to select all.
-	 * @param {boolean} [range.fromEnd] Anchor `length` at the block end instead of `start`.
-	 */
-	async selectBlockText( { start = 0, length, fromEnd = false } = {} ) {
-		// The first `primary+a` selects the block's text.
-		await this.#pageUtils.pressKeys( 'primary+a' );
-		if ( length === undefined ) {
-			return;
-		}
-
-		// ArrowLeft/Right collapse the select-all to an edge (cross-platform;
-		// `Home`/`End` don't move the caret on macOS) to anchor from there.
-		if ( fromEnd ) {
-			await this.#pageUtils.pressKeys( 'ArrowRight' );
-			await this.#pageUtils.pressKeys( 'Shift+ArrowLeft', {
-				times: length,
-			} );
-			return;
-		}
-
-		await this.#pageUtils.pressKeys( 'ArrowLeft' );
-		if ( start > 0 ) {
-			await this.#pageUtils.pressKeys( 'ArrowRight', { times: start } );
-		}
-		await this.#pageUtils.pressKeys( 'Shift+ArrowRight', {
-			times: length,
-		} );
-	}
-
-	async openBlockNoteSidebar() {
-		const toggleButton = this.#page
-			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'All notes', exact: true } );
-
-		const isClosed =
-			( await toggleButton.getAttribute( 'aria-expanded' ) ) === 'false';
-
-		if ( isClosed ) {
-			await toggleButton.click();
-			await this.#page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Close Notes' } )
-				.waitFor();
-		}
-
-		return toggleButton;
-	}
-
-	async addBlockWithNote( { type, attributes = {}, comment } ) {
-		await test.step(
-			`Insert a ${ type } block with a note`,
-			async () => {
-				await this.#editor.insertBlock( {
-					name: type,
-					attributes,
-				} );
-				await this.addNote( comment );
-			},
-			{ box: true }
-		);
-	}
-
-	async addNote( content ) {
-		await this.#editor.clickBlockOptionsMenuItem( 'Add note' );
-		await this.#page
-			.getByRole( 'textbox', { name: 'New note', exact: true } )
-			.pressSequentially( content );
-		await this.#page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Add note', exact: true } )
-			.click();
-		// Wait for the new thread to appear before returning.
-		await expect(
-			this.#page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: `Note: ${ content }` } )
-		).toBeVisible();
-	}
-
-	async clickBlockNoteActionMenuItem( actionName, index = 0 ) {
-		await this.#page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Actions' } )
-			.nth( index )
-			.click();
-		await this.#page.getByRole( 'menuitem', { name: actionName } ).click();
-	}
-}

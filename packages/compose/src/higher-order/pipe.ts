@@ -49,7 +49,7 @@
  */
 const basePipe =
 	( reverse: boolean = false ) =>
-	( ...funcs: Function[] ) =>
+	( ...funcs: ( Function | Function[] )[] ) =>
 	( ...args: unknown[] ) => {
 		const functions = funcs.flat();
 		if ( reverse ) {

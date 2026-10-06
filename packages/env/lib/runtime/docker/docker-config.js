@@ -95,6 +95,13 @@ RUN sed -i 's|deb.debian.org/debian buster|archive.debian.org/debian buster|g' /
 RUN sed -i 's|security.debian.org/debian-security buster/updates|archive.debian.org/debian-security buster/updates|g' /etc/apt/sources.list
 RUN sed -i '/buster-updates/d' /etc/apt/sources.list
 
+# bullseye (https://www.debian.org/News/2026/20260831)
+# The security suite is not on archive.debian.org yet, so it is dropped rather
+# than rewritten.
+RUN sed -i 's|deb.debian.org/debian bullseye|archive.debian.org/debian bullseye|g' /etc/apt/sources.list
+RUN sed -i '/bullseye-security/d' /etc/apt/sources.list
+RUN sed -i '/bullseye-updates/d' /etc/apt/sources.list
+
 # Create the host's user so that we can match ownership in the container.
 ARG HOST_USERNAME
 ARG HOST_UID
@@ -187,7 +194,21 @@ RUN apk --no-cache add $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
 
 # Set up sudo so they can have root access.
 RUN apk --no-cache add sudo linux-headers
-RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
+RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# The MariaDB 11.4+ client requires TLS by default, which MariaDB servers
+# before 11.4 do not offer, so every \`wp db\` command fails against them. WP-CLI
+# runs the client with --no-defaults, which ignores option files, so wrap each
+# client to skip server certificate verification instead, which lets it fall
+# back to an unencrypted connection when the server has no TLS. This is the same
+# flag WP-CLI adds from db-command 3.0, so these wrappers can be removed once a
+# WP-CLI release with it is in the image. --no-defaults has to stay the first
+# argument.
+RUN for bin in mariadb mariadb-check mariadb-dump mysql mysqlcheck mysqldump; do \\
+	[ -x /usr/bin/$bin ] || continue; \\
+	printf '#!/bin/sh\\nif [ "$1" = "--no-defaults" ]; then\\n\\tshift\\n\\texec /usr/bin/%s --no-defaults --skip-ssl-verify-server-cert "$@"\\nfi\\nexec /usr/bin/%s --skip-ssl-verify-server-cert "$@"\\n' "$bin" "$bin" > /usr/local/bin/$bin; \\
+	chmod +x /usr/local/bin/$bin; \\
+done`;
 			break;
 		}
 		default: {
@@ -359,5 +380,6 @@ module.exports = {
 	ensureDockerInitialized,
 	// Exported for testing.
 	wordpressDockerFileContents,
+	cliDockerFileContents,
 	getLoopbackPortConfig,
 };

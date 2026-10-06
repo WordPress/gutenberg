@@ -33,9 +33,7 @@ export default function Root() {
 	const location = useLocation();
 	const currentMatch = matches[ matches.length - 1 ];
 	const canvas = ( currentMatch?.loaderData as any )?.canvas as
-		| CanvasData
-		| null
-		| undefined;
+		CanvasData | null | undefined;
 	const routeContentModule = ( currentMatch?.loaderData as any )
 		?.routeContentModule as string | undefined;
 	const isFullScreen = canvas && ! canvas.isPreview;
@@ -161,7 +159,8 @@ export default function Root() {
 								<ThemeProvider
 									color={ {
 										...themeColors,
-										background: '#ffffff',
+										// Reset to the default background color.
+										background: '#fcfcfc',
 									} }
 								>
 									<Outlet />

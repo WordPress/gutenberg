@@ -6,12 +6,7 @@
  * Value that can be resolved from various sources (direct value, reference, or URL)
  */
 export type UnresolvedValue =
-	| string
-	| number
-	| { ref: string }
-	| { url: string }
-	| undefined
-	| null;
+	string | number | { ref: string } | { url: string } | undefined | null;
 
 /**
  * Origin of a preset (theme, user customizations, or WordPress defaults)
@@ -156,11 +151,19 @@ export interface FluidTypographySettings {
 /**
  * Typography settings collection
  */
+export interface TextShadowPreset extends BasePreset {
+	textShadow: string;
+}
+
 export interface TypographySettings {
 	fluid?: boolean | FluidTypographySettings;
 	fontSizes?: TypographyPreset[] | Record< string, TypographyPreset[] >;
 	fontFamilies?: Record< string, FontFamilyPreset[] >;
 	defaultFontSizes?: boolean;
+	textShadow?: boolean;
+	textShadowPresets?:
+		TextShadowPreset[] | Record< string, TextShadowPreset[] >;
+	defaultTextShadowPresets?: boolean;
 }
 
 // =============================================================================

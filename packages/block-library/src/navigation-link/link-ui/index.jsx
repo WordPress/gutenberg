@@ -20,7 +20,44 @@ import { VisuallyHidden } from '@wordpress/ui';
 import { isURL } from '@wordpress/url';
 import { LinkUIPageCreator } from './page-creator';
 import LinkUIBlockInserter from './block-inserter';
-import { useEntityBinding, useLinkPreview } from '../shared';
+import {
+	isBlockSuggestion,
+	useBlockSuggestions,
+	useEntityBinding,
+	useLinkPreview,
+} from '../shared';
+
+/**
+ * Given the Link block's type attribute, return the query params for that one
+ * entity type.
+ *
+ * @param {string} type Link block's type attribute.
+ * @param {string} kind Link block's entity of kind (post-type|taxonomy)
+ * @return {{ type: string, subtype?: string }} Search query params.
+ */
+function getOwnTypeSearchOptions( type, kind ) {
+	switch ( type ) {
+		case 'post':
+		case 'page':
+			return { type: 'post', subtype: type };
+		case 'category':
+			return { type: 'term', subtype: 'category' };
+		case 'tag':
+			return { type: 'term', subtype: 'post_tag' };
+		case 'post_format':
+			return { type: 'post-format' };
+		default:
+			if ( kind === 'taxonomy' ) {
+				return { type: 'term', subtype: type };
+			}
+			if ( kind === 'post-type' ) {
+				return { type: 'post', subtype: type };
+			}
+			// for custom link which has no type
+			// always show pages as initial suggestions
+			return { type: 'post', subtype: 'page' };
+	}
+}
 
 /**
  * Given the Link block's type attribute, return the query params to give to
@@ -28,39 +65,15 @@ import { useEntityBinding, useLinkPreview } from '../shared';
  *
  * @param {string} type Link block's type attribute.
  * @param {string} kind Link block's entity of kind (post-type|taxonomy)
- * @return {{ type?: string, subtype?: string }} Search query params.
+ * @return {Object} Search query params.
  */
 export function getSuggestionsQuery( type, kind ) {
-	// How many results to show initially and per search.
-	const perPage = 20;
+	const ownType = getOwnTypeSearchOptions( type, kind );
 
-	switch ( type ) {
-		case 'post':
-		case 'page':
-			return { type: 'post', subtype: type, perPage };
-		case 'category':
-			return { type: 'term', subtype: 'category', perPage };
-		case 'tag':
-			return { type: 'term', subtype: 'post_tag', perPage };
-		case 'post_format':
-			return { type: 'post-format', perPage };
-		default:
-			if ( kind === 'taxonomy' ) {
-				return { type: 'term', subtype: type, perPage };
-			}
-			if ( kind === 'post-type' ) {
-				return { type: 'post', subtype: type, perPage };
-			}
-			return {
-				// for custom link which has no type
-				// always show pages as initial suggestions
-				initialSuggestionsSearchOptions: {
-					type: 'post',
-					subtype: 'page',
-					perPage,
-				},
-			};
-	}
+	return {
+		preferTypes: [ ownType.subtype ? ownType : ownType.type ],
+		initialSuggestionsSearchOptions: { ...ownType, perPage: 20 },
+	};
 }
 
 function UnforwardedLinkUI( props, ref ) {
@@ -179,6 +192,18 @@ function UnforwardedLinkUI( props, ref ) {
 	}, [ shouldFocusPane ] );
 
 	const blockEditingMode = useBlockEditingMode();
+	const canAddBlock = blockEditingMode !== 'disabled';
+
+	// Blocks are listed in the search results only when the "Add block"
+	// button would be shown: the link has no URL yet and the block is not
+	// locked.
+	const { transformSuggestions, insertBlockFromSuggestion } =
+		useBlockSuggestions( {
+			clientId,
+			isEnabled: canAddBlock && ! link?.url?.length,
+			onBlockInsert: props.onBlockInsert,
+			onClose: props.onClose,
+		} );
 
 	return (
 		<Popover
@@ -213,7 +238,17 @@ function UnforwardedLinkUI( props, ref ) {
 						noDirectEntry={ !! type }
 						noURLSuggestion={ !! type }
 						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
-						onChange={ props.onChange }
+						transformSuggestions={ transformSuggestions }
+						onChange={ ( updatedValue ) => {
+							if ( isBlockSuggestion( updatedValue ) ) {
+								insertBlockFromSuggestion(
+									updatedValue.blockItemId
+								);
+								return;
+							}
+
+							props.onChange( updatedValue );
+						} }
 						onInputChange={ ( value ) => {
 							// Observe the input value so we can pass the value to the page creator
 							// and restore it on back button click
@@ -245,9 +280,7 @@ function UnforwardedLinkUI( props, ref ) {
 										permissions?.canCreate &&
 										type === 'page'
 									}
-									canAddBlock={
-										blockEditingMode !== 'disabled'
-									}
+									canAddBlock={ canAddBlock }
 								/>
 							);
 						} }

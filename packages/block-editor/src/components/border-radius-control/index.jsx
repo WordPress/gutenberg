@@ -40,7 +40,7 @@ function useBorderRadiusSizes( presets ) {
 						size: undefined,
 					},
 					...sizes,
-			  ]
+				]
 			: sizes;
 	}, [ customSizes, themeSizes, defaultSizes ] );
 }
@@ -110,7 +110,7 @@ function createCornerChangeHandler( corner, values, onChange ) {
 							topRight: values,
 							bottomLeft: values,
 							bottomRight: values,
-					  };
+						};
 
 			onChange( {
 				...currentValues,

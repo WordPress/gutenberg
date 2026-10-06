@@ -88,17 +88,23 @@ import normalizeUrl from './normalize-url';
  * @property {boolean=}                   forceIsEditingLink         If passed as either `true` or `false`, controls the
  *                                                                   internal editing state of the component to respective
  *                                                                   show or not show the URL input field.
+ * @property {string=}                    searchInputPlaceholder     Placeholder text for the search input.
  * @property {WPLinkControlValue=}        value                      Current link value.
  * @property {WPLinkControlOnChangeProp=} onChange                   Value change handler, called with the updated value if
  *                                                                   the user selects a new link or updates settings.
  * @property {Function=}                  onInputChange              Callback fired when the search input value changes.
  *                                                                   Use this for observation only (e.g., to track search state).
+ * @property {Function=}                  onRemove                   Callback invoked when the link is removed.
+ * @property {Function=}                  onCancel                   Callback invoked when editing is cancelled.
  * @property {string=}                    inputValue                 Initial value for the search input (uncontrolled).
  * @property {boolean=}                   noDirectEntry              Whether to allow turning a URL-like search query directly into a link.
  * @property {boolean=}                   showSuggestions            Whether to present suggestions when typing the URL.
  * @property {boolean=}                   showInitialSuggestions     Whether to present initial suggestions immediately.
  * @property {boolean=}                   withCreateSuggestion       Whether to allow creation of link value from suggestion.
  * @property {Object=}                    suggestionsQuery           Query parameters to pass along to wp.blockEditor.__experimentalFetchLinkSuggestions.
+ * @property {Function=}                  transformSuggestions       Changes the search suggestions before they are shown. Called
+ *                                                                   with the suggestions and `{ searchTerm, isInitialSuggestions }`,
+ *                                                                   and returns the suggestions to show or a Promise of them.
  * @property {boolean=}                   noURLSuggestion            Whether to add a fallback suggestion which treats the search query as a URL.
  * @property {boolean=}                   hasTextControl             Whether to add a text field to the UI to update the value.title.
  * @property {string|Function|undefined}  createSuggestionButtonText The text to use in the button that calls createSuggestion.
@@ -165,6 +171,7 @@ function LinkControl( {
 	withCreateSuggestion,
 	inputValue: propInputValue = '',
 	suggestionsQuery = {},
+	transformSuggestions,
 	noURLSuggestion = false,
 	createSuggestionButtonText,
 	hasRichPreviews = false,
@@ -687,6 +694,7 @@ function LinkControl( {
 							allowDirectEntry={ ! noDirectEntry }
 							showSuggestions={ showSuggestions }
 							suggestionsQuery={ suggestionsQuery }
+							transformSuggestions={ transformSuggestions }
 							withURLSuggestion={ ! noURLSuggestion }
 							createSuggestionButtonText={
 								createSuggestionButtonText

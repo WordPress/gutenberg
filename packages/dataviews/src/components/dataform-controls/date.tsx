@@ -264,7 +264,7 @@ function ValidatedDateControl< Item >( {
 	};
 
 	return (
-		<div onBlur={ onBlur }>
+		<Stack direction="column" gap="sm" onBlur={ onBlur }>
 			{ children }
 			{ customValidity && (
 				<ValidityIndicator
@@ -272,7 +272,7 @@ function ValidatedDateControl< Item >( {
 					message={ customValidity.message }
 				/>
 			) }
-		</div>
+		</Stack>
 	);
 }
 
@@ -550,11 +550,11 @@ function CalendarDateRangeControl< Item >( {
 								end: endOfMonth( currentMonth ),
 							},
 							{ inclusive: true }
-					  )
+						)
 					: [ from, to ].some(
 							( date ) =>
 								date && isSameMonth( date, currentMonth )
-					  );
+						);
 			return targetMonth && ! isRangeVisible ? targetMonth : currentMonth;
 		} );
 	}, [ fromValue, toValue ] );
