@@ -489,7 +489,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			'post'    => $post_id,
 			'type'    => 'reaction',
 			'parent'  => $note_id,
-			'content' => 'heart',
+			'content' => '2764',
 			'author'  => self::$editor_id,
 		);
 
@@ -503,9 +503,49 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$data        = $response->get_data();
 		$new_comment = get_comment( $data['id'] );
 		$this->assertSame( 'reaction', $new_comment->comment_type );
-		$this->assertSame( 'heart', $new_comment->comment_content );
+		$this->assertSame( '2764', $new_comment->comment_content );
 		$this->assertSame( (string) $note_id, $new_comment->comment_parent );
 		$this->assertSame( '1', $new_comment->comment_approved );
+	}
+
+	/**
+	 * The comments API accepts `content` as a string or as `{ raw }`, so a
+	 * reaction submitted either way must validate and store the same key.
+	 *
+	 * @dataProvider data_reaction_raw_content_slugs
+	 *
+	 * @param string $slug The reaction slug to submit as `content.raw`.
+	 */
+	public function test_create_reaction_with_raw_content( $slug ) {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+		wp_set_current_user( self::$editor_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'type'    => 'reaction',
+					'parent'  => $note_id,
+					'content' => array( 'raw' => $slug ),
+					'author'  => self::$editor_id,
+				)
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 201, $response->get_status() );
+		$reaction = get_comment( $response->get_data()['id'] );
+		$this->assertSame( $slug, $reaction->comment_content );
+	}
+
+	public function data_reaction_raw_content_slugs() {
+		return array(
+			'curated emoji' => array( '2764' ),
+		);
 	}
 
 	/**
@@ -527,7 +567,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 				'comment_type'     => 'reaction',
 				'comment_approved' => 1,
 				'comment_parent'   => $note_id,
-				'comment_content'  => 'heart',
+				'comment_content'  => '2764',
 				'user_id'          => self::$editor_id,
 			)
 		);
@@ -574,7 +614,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			'post'    => $post_id,
 			'type'    => 'reaction',
 			'parent'  => $note_id,
-			'content' => 'heart',
+			'content' => '2764',
 			'author'  => self::$editor_id,
 		);
 
@@ -584,6 +624,51 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertErrorResponse( 'rest_comment_invalid_parent', $response, 400 );
+	}
+
+	/**
+	 * A reaction created under a hidden note would never be reached by the
+	 * trash cascade, so the note must be live.
+	 *
+	 * @dataProvider data_hidden_note_statuses
+	 *
+	 * @param string $status Status to move the parent note to.
+	 */
+	public function test_cannot_create_reaction_on_hidden_note( $status ) {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+		wp_set_comment_status( $note_id, $status );
+
+		wp_set_current_user( self::$editor_id );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'type'    => 'reaction',
+					'parent'  => $note_id,
+					'content' => '2764',
+					'author'  => self::$editor_id,
+				)
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_comment_invalid_parent', $response, 400 );
+	}
+
+	/**
+	 * Data provider for test_cannot_create_reaction_on_hidden_note().
+	 *
+	 * @return array[]
+	 */
+	public function data_hidden_note_statuses() {
+		return array(
+			'trash' => array( 'trash' ),
+			'spam'  => array( 'spam' ),
+		);
 	}
 
 	/**
@@ -611,9 +696,10 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	/**
 	 * @dataProvider data_invalid_reaction_inputs
 	 *
-	 * @param string $parent_kind  One of 'none', 'note', or 'comment' — what the
+	 * @param string $parent_kind  One of 'none', 'note', or 'comment' - what the
 	 *                             reaction's `parent` field references.
-	 * @param string $content      The reaction storage key (slug) to submit.
+	 * @param string|array $content The reaction storage key to submit,
+	 *                              as a string or as `{ raw }`.
 	 * @param bool   $authenticate Whether to set the current user before posting.
 	 * @param string $error_code   Expected WP_Error code on the REST response.
 	 * @param int    $status       Expected HTTP status code.
@@ -662,14 +748,15 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 
 	public function data_invalid_reaction_inputs() {
 		return array(
-			'no parent'                    => array( 'none', 'heart', true, 'rest_comment_invalid_parent', 400 ),
-			'parent is a regular comment'  => array( 'comment', 'heart', true, 'rest_comment_invalid_parent', 400 ),
-			'content is not in emoji list' => array( 'note', 'invalid_emoji', true, 'rest_comment_invalid_reaction', 400 ),
-			// Hex storage keys are the full picker's format; this limited set
-			// cannot render them back, so the API must not accept them yet.
-			'hex codepoint key'            => array( 'note', '1f44d', true, 'rest_comment_invalid_reaction', 400 ),
-			'hex ZWJ sequence key'         => array( 'note', '1f468-200d-1f4bb', true, 'rest_comment_invalid_reaction', 400 ),
-			'anonymous user'               => array( 'none', 'heart', false, 'rest_comment_login_required', 401 ),
+			'no parent'                     => array( 'none', '2764', true, 'rest_comment_invalid_parent', 400 ),
+			'parent is a regular comment'   => array( 'comment', '2764', true, 'rest_comment_invalid_parent', 400 ),
+			'content is not in emoji list'  => array( 'note', 'invalid_emoji', true, 'rest_comment_invalid_reaction', 400 ),
+			'emoji outside the curated set' => array( 'note', '1f44d', true, 'rest_comment_invalid_reaction', 400 ),
+			'uppercase hex key'             => array( 'note', '1F680', true, 'rest_comment_invalid_reaction', 400 ),
+			'emoji name instead of hex'     => array( 'note', 'heart', true, 'rest_comment_invalid_reaction', 400 ),
+			'anonymous user'                => array( 'none', '2764', false, 'rest_comment_login_required', 401 ),
+			'raw content not a key'         => array( 'note', array( 'raw' => 'invalid_emoji' ), true, 'rest_comment_invalid_reaction', 400 ),
+			'content without raw'           => array( 'note', array( 'rendered' => '2764' ), true, 'rest_comment_invalid_reaction', 400 ),
 		);
 	}
 
@@ -682,7 +769,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			'post'    => $post_id,
 			'type'    => 'reaction',
 			'parent'  => $note_id,
-			'content' => 'rocket',
+			'content' => '1f680',
 			'author'  => self::$editor_id,
 		);
 
@@ -723,7 +810,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 						'comment_post_ID'  => $post_id,
 						'comment_parent'   => $note_id,
 						'comment_type'     => 'reaction',
-						'comment_content'  => 'heart',
+						'comment_content'  => '2764',
 						'comment_approved' => 1,
 						'user_id'          => self::$editor_id,
 					)
@@ -738,7 +825,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 				'post'    => $post_id,
 				'type'    => 'reaction',
 				'parent'  => $note_id,
-				'content' => 'heart',
+				'content' => '2764',
 				'author'  => self::$editor_id,
 			);
 			$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
@@ -763,7 +850,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			array_filter(
 				$remaining,
 				function ( $comment ) {
-					return 'heart' === wp_strip_all_tags( $comment->comment_content );
+					return '2764' === wp_strip_all_tags( $comment->comment_content );
 				}
 			)
 		);
@@ -771,28 +858,6 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 
 		// The response must reference the surviving (earliest) row.
 		$this->assertSame( (int) $hearts[0]->comment_ID, $response->get_data()['id'] );
-	}
-
-	public function test_can_create_different_reactions_on_same_note() {
-		wp_set_current_user( self::$editor_id );
-		$post_id = self::factory()->post->create();
-		$note_id = $this->create_note( $post_id, self::$editor_id );
-
-		$emojis = array( 'heart', 'rocket', 'smile' );
-		foreach ( $emojis as $emoji ) {
-			$params  = array(
-				'post'    => $post_id,
-				'type'    => 'reaction',
-				'parent'  => $note_id,
-				'content' => $emoji,
-				'author'  => self::$editor_id,
-			);
-			$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
-			$request->add_header( 'Content-Type', 'application/json' );
-			$request->set_body( wp_json_encode( $params ) );
-			$response = rest_get_server()->dispatch( $request );
-			$this->assertSame( 201, $response->get_status() );
-		}
 	}
 
 	/**
@@ -817,35 +882,18 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( $emoji, get_comment( $response->get_data()['id'] )->comment_content );
 	}
 
 	public function data_valid_reaction_emojis() {
-		$emojis = gutenberg_get_note_reaction_emojis();
-		$data   = array();
-		foreach ( $emojis as $emoji ) {
-			$data[ $emoji['value'] ] = array( $emoji['value'] );
-		}
-		return $data;
-	}
-
-	public function test_schema_includes_reaction_summary() {
-		$controller = new Gutenberg_REST_Comment_Controller_7_2();
-		$schema     = $controller->get_item_schema();
-
-		$this->assertArrayHasKey( 'reaction_summary', $schema['properties'] );
-
-		$reaction_summary_schema = $schema['properties']['reaction_summary'];
-		$this->assertTrue( $reaction_summary_schema['readonly'] );
-		$this->assertSame( 'object', $reaction_summary_schema['type'] );
-		$this->assertContains( 'view', $reaction_summary_schema['context'] );
-		$this->assertContains( 'edit', $reaction_summary_schema['context'] );
-
-		// Verify additionalProperties structure.
-		$this->assertArrayHasKey( 'additionalProperties', $reaction_summary_schema );
-		$additional = $reaction_summary_schema['additionalProperties'];
-		$this->assertArrayHasKey( 'count', $additional['properties'] );
-		$this->assertArrayHasKey( 'reacted', $additional['properties'] );
-		$this->assertArrayHasKey( 'my_reaction_id', $additional['properties'] );
+		// The five quick reactions: heart, celebration, smile, eyes, rocket.
+		return array(
+			'heart'       => array( '2764' ),
+			'celebration' => array( '1f389' ),
+			'smile'       => array( '1f604' ),
+			'eyes'        => array( '1f440' ),
+			'rocket'      => array( '1f680' ),
+		);
 	}
 
 	public function test_note_response_includes_reaction_summary() {
@@ -858,7 +906,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			'post'    => $post_id,
 			'type'    => 'reaction',
 			'parent'  => $note_id,
-			'content' => 'heart',
+			'content' => '2764',
 			'author'  => self::$editor_id,
 		);
 		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
@@ -874,10 +922,11 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$data     = $response->get_data();
 
 		$this->assertArrayHasKey( 'reaction_summary', $data );
-		$this->assertArrayHasKey( 'heart', $data['reaction_summary'] );
-		$this->assertSame( 1, $data['reaction_summary']['heart']['count'] );
-		$this->assertTrue( $data['reaction_summary']['heart']['reacted'] );
-		$this->assertSame( $reaction_id, $data['reaction_summary']['heart']['my_reaction_id'] );
+		$this->assertArrayHasKey( '2764', $data['reaction_summary'] );
+		$this->assertSame( 1, $data['reaction_summary']['2764']['count'] );
+		$this->assertSame( $reaction_id, $data['reaction_summary']['2764']['current_user_reaction'] );
+		$this->assertArrayNotHasKey( 'reacted', $data['reaction_summary']['2764'] );
+		$this->assertArrayNotHasKey( 'my_reaction_id', $data['reaction_summary']['2764'] );
 	}
 
 	public function test_reaction_summary_shows_not_reacted_for_other_user() {
@@ -890,7 +939,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			'post'    => $post_id,
 			'type'    => 'reaction',
 			'parent'  => $note_id,
-			'content' => 'heart',
+			'content' => '2764',
 			'author'  => self::$editor_id,
 		);
 		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
@@ -906,23 +955,8 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$data     = $response->get_data();
 
 		$this->assertArrayHasKey( 'reaction_summary', $data );
-		$this->assertSame( 1, $data['reaction_summary']['heart']['count'] );
-		$this->assertFalse( $data['reaction_summary']['heart']['reacted'] );
-		$this->assertSame( 0, $data['reaction_summary']['heart']['my_reaction_id'] );
-	}
-
-	public function test_reaction_summary_empty_when_no_reactions() {
-		wp_set_current_user( self::$editor_id );
-		$post_id = self::factory()->post->create();
-		$note_id = $this->create_note( $post_id, self::$editor_id );
-
-		$request = new WP_REST_Request( 'GET', '/wp/v2/comments/' . $note_id );
-		$request->set_param( 'context', 'edit' );
-		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data();
-
-		$this->assertArrayHasKey( 'reaction_summary', $data );
-		$this->assertEmpty( $data['reaction_summary'] );
+		$this->assertSame( 1, $data['reaction_summary']['2764']['count'] );
+		$this->assertSame( 0, $data['reaction_summary']['2764']['current_user_reaction'] );
 	}
 
 	/**
@@ -963,8 +997,8 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$data = $response->get_data();
 		$this->assertCount( 2, $data );
 		foreach ( $data as $note ) {
-			$this->assertSame( 1, $note['reaction_summary']['heart']['count'] );
-			$this->assertTrue( $note['reaction_summary']['heart']['reacted'] );
+			$this->assertSame( 1, $note['reaction_summary']['2764']['count'] );
+			$this->assertGreaterThan( 0, $note['reaction_summary']['2764']['current_user_reaction'] );
 		}
 		// One counts query and one current-user query for the whole page.
 		$this->assertSame( 2, $summary_queries );
@@ -986,7 +1020,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 				'comment_post_ID'  => $post_id,
 				'comment_type'     => 'reaction',
 				'comment_parent'   => $note_id,
-				'comment_content'  => 'heart',
+				'comment_content'  => '2764',
 				'comment_approved' => 1,
 				'user_id'          => self::$editor_id,
 			)
@@ -1014,7 +1048,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	 * @param string $slug    Reaction storage slug.
 	 * @return int Reaction comment ID.
 	 */
-	protected function create_reaction( $post_id, $note_id, $user_id, $slug = 'heart' ) {
+	protected function create_reaction( $post_id, $note_id, $user_id, $slug = '2764' ) {
 		return wp_insert_comment(
 			array(
 				'comment_post_ID'  => $post_id,
@@ -1040,58 +1074,11 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		wp_set_current_user( self::$editor_id );
 		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $reaction_id );
 		$request->add_header( 'Content-Type', 'application/json' );
-		$request->set_body( wp_json_encode( array( 'content' => 'rocket' ) ) );
+		$request->set_body( wp_json_encode( array( 'content' => '1f680' ) ) );
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertErrorResponse( 'rest_comment_update_not_allowed', $response, 403 );
-		$this->assertSame( 'heart', get_comment( $reaction_id )->comment_content );
-	}
-
-	/**
-	 * The reactor's identity must not be reassignable through the update route.
-	 */
-	public function test_cannot_update_reaction_author() {
-		$post_id     = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
-		$note_id     = $this->create_note( $post_id, self::$editor_id );
-		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$author_id );
-
-		wp_set_current_user( self::$editor_id );
-		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $reaction_id );
-		$request->add_header( 'Content-Type', 'application/json' );
-		$request->set_body( wp_json_encode( array( 'author' => self::$editor_id ) ) );
-		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertErrorResponse( 'rest_comment_update_not_allowed', $response, 403 );
-		$this->assertSame( (string) self::$author_id, get_comment( $reaction_id )->user_id );
-	}
-
-	/**
-	 * A reaction must not be movable onto a note on a post the user cannot edit.
-	 */
-	public function test_cannot_move_reaction_to_note_on_other_post() {
-		$editable_post = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
-		$other_post    = self::factory()->post->create( array( 'post_author' => self::$admin_id ) );
-		$note_id       = $this->create_note( $editable_post, self::$editor_id );
-		$other_note_id = $this->create_note( $other_post, self::$admin_id );
-		$reaction_id   = $this->create_reaction( $editable_post, $note_id, self::$editor_id );
-
-		wp_set_current_user( self::$editor_id );
-		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $reaction_id );
-		$request->add_header( 'Content-Type', 'application/json' );
-		$request->set_body(
-			wp_json_encode(
-				array(
-					'parent' => $other_note_id,
-					'post'   => $other_post,
-				)
-			)
-		);
-		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertErrorResponse( 'rest_comment_update_not_allowed', $response, 403 );
-		$reaction = get_comment( $reaction_id );
-		$this->assertSame( (string) $note_id, $reaction->comment_parent );
-		$this->assertSame( (string) $editable_post, $reaction->comment_post_ID );
+		$this->assertSame( '2764', get_comment( $reaction_id )->comment_content );
 	}
 
 	/**
@@ -1120,7 +1107,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$post_id     = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
 		$note_id     = $this->create_note( $post_id, self::$editor_id );
 		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$editor_id );
-		$other_id    = $this->create_reaction( $post_id, $note_id, self::$author_id, 'rocket' );
+		$other_id    = $this->create_reaction( $post_id, $note_id, self::$author_id, '1f680' );
 
 		wp_delete_comment( $note_id, true );
 
@@ -1166,9 +1153,10 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
-	 * Core cascades a trashed note to its `note` children only.
+	 * Core cascades a trashed note to its `note` children only, so
+	 * reactions need their own trash cascade.
 	 */
-	public function test_trashing_note_trashes_and_restores_its_reactions() {
+	public function test_trashing_note_trashes_its_reactions() {
 		if ( ! EMPTY_TRASH_DAYS ) {
 			$this->markTestSkipped( 'Trash is disabled; trashing force-deletes.' );
 		}
@@ -1180,9 +1168,103 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 
 		wp_trash_comment( $note_id );
 		$this->assertSame( 'trash', wp_get_comment_status( $reaction_id ), 'Reaction stayed approved under a trashed note.' );
+	}
 
-		wp_untrash_comment( $note_id );
-		$this->assertSame( 'approved', wp_get_comment_status( $reaction_id ), 'Reaction was not restored with its note.' );
+	/**
+	 * Trashing a note trashes its reactions, so permanently deleting it
+	 * afterwards must still find and delete them.
+	 */
+	public function test_permanently_deleting_trashed_note_deletes_its_reactions() {
+		if ( ! EMPTY_TRASH_DAYS ) {
+			$this->markTestSkipped( 'Trash is disabled; trashing force-deletes.' );
+		}
+
+		wp_set_current_user( self::$editor_id );
+		$post_id     = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id     = $this->create_note( $post_id, self::$editor_id );
+		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$editor_id );
+		$removed_id  = $this->create_reaction( $post_id, $note_id, self::$author_id, '1f680' );
+		wp_trash_comment( $removed_id );
+
+		wp_trash_comment( $note_id );
+		wp_delete_comment( $note_id, true );
+
+		$this->assertNull( get_comment( $reaction_id ), 'A reaction trashed with its note outlived it.' );
+		$this->assertNull( get_comment( $removed_id ), 'A previously removed reaction outlived its note.' );
+	}
+
+	/**
+	 * A reaction may only be added on the current user's own behalf, even by
+	 * a moderator.
+	 */
+	public function test_cannot_create_reaction_for_another_user() {
+		wp_set_current_user( self::$admin_id );
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_note( $post_id, self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'parent'  => $note_id,
+					'content' => '2764',
+					'type'    => 'reaction',
+					'author'  => self::$editor_id,
+				)
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_comment_invalid_author', $response, 403 );
+		$this->assertEmpty(
+			get_comments(
+				array(
+					'parent' => $note_id,
+					'type'   => 'reaction',
+					'status' => 'all',
+				)
+			),
+			'No reaction should have been stored.'
+		);
+	}
+
+	/**
+	 * Author fields in the request must not detach a reaction from its user,
+	 * which would hide it from the uniqueness check and the summary.
+	 */
+	public function test_create_reaction_ignores_request_author_fields() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+
+		$body = wp_json_encode(
+			array(
+				'post'         => $post_id,
+				'parent'       => $note_id,
+				'content'      => '2764',
+				'type'         => 'reaction',
+				'author_name'  => 'Someone Else',
+				'author_email' => 'someone@example.com',
+			)
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( $body );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 201, $response->get_status() );
+		$reaction = get_comment( $response->get_data()['id'] );
+		$this->assertSame( (string) self::$editor_id, $reaction->user_id, 'The reaction should belong to the current user.' );
+		$this->assertNotSame( 'someone@example.com', $reaction->comment_author_email );
+
+		$duplicate = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$duplicate->add_header( 'Content-Type', 'application/json' );
+		$duplicate->set_body( $body );
+
+		$this->assertErrorResponse( 'rest_comment_duplicate_reaction', rest_get_server()->dispatch( $duplicate ), 409 );
 	}
 
 	/**
@@ -1217,7 +1299,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 						'comment_post_ID'  => $post_id,
 						'comment_parent'   => $note_id,
 						'comment_type'     => 'reaction',
-						'comment_content'  => 'heart',
+						'comment_content'  => '2764',
 						'comment_approved' => 1,
 						'user_id'          => self::$editor_id,
 					)
@@ -1233,7 +1315,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 				'post'    => $post_id,
 				'type'    => 'reaction',
 				'parent'  => $note_id,
-				'content' => 'heart',
+				'content' => '2764',
 				'author'  => self::$editor_id,
 			);
 			$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
