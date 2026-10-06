@@ -51,6 +51,7 @@ fieldset.fields__media-edit {
 
 			&:focus-visible {
 				@include outset-ring__focus();
+				outline-offset: calc(var(--wpds-border-width-focus) + #{ $border-width });
 			}
 		}
 
