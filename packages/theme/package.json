@@ -81,6 +81,9 @@
 		"./package.json": "./package.json"
 	},
 	"wpScript": true,
+	"wpScriptModuleExports": {
+		"./colors": "./build-module/generate-color-tokens.mjs"
+	},
 	"sideEffects": [
 		"prebuilt/css/design-tokens.css"
 	],
