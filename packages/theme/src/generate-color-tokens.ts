@@ -1,10 +1,5 @@
 /**
- * Derives design token values from a set of seed colors, without React.
- *
- * `ThemeProvider` applies the result as inline custom properties on its
- * wrapper. Consumers that render outside React (build scripts, wp-admin
- * screens with no provider) need the same values as plain data, so this module
- * owns the derivation and the provider is one of its callers.
+ * Color token derivation shared by `ThemeProvider` and non-React consumers.
  */
 
 import {
