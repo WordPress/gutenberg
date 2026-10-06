@@ -12,6 +12,7 @@ import {
 } from '@wordpress/components';
 import type { Action } from '@wordpress/dataviews';
 import { getItemTitle } from './utils';
+import { hasActionLink } from '../fields/utils';
 import type { CoreDataError, PostWithPermissions } from '../types';
 
 const trashPost: Action< PostWithPermissions > = {
@@ -33,7 +34,7 @@ const trashPost: Action< PostWithPermissions > = {
 			!! item.status &&
 			! [ 'auto-draft', 'trash' ].includes( item.status ) &&
 			item.permissions?.delete &&
-			!! item._links?.[ 'wp:action-trash' ]
+			hasActionLink( item, 'wp:action-trash' )
 		);
 	},
 	supportsBulk: true,
