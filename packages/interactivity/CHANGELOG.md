@@ -34,10 +34,15 @@
 ### Bug Fixes
 
 -   Run `watch()` callbacks without a directive scope. A callback passed to `watch()` no longer inherits the scope of the action or callback that called `watch()`, so `getContext()` and `getElement()` throw inside it, as they already did when `watch()` was called outside any scope. ([#83280](https://github.com/WordPress/gutenberg/pull/83280))
+-   `data-wp-html` now yields deterministically to `data-wp-text`, `data-wp-each`, and `data-wp-router-region` on the same element. The decision depends only on which attributes are present, including their suffixed and unique-ID spellings, so it no longer varies with attribute order or resolved values. `data-wp-html` then writes nothing, the element behaves as it does without it, and `SCRIPT_DEBUG` shows a warning. ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
+-   Content owned by `data-wp-html` is now inert for interactive islands and router regions as well as directives. Elements with `data-wp-interactive` inside the fallback or inserted HTML are no longer hydrated, even when the `data-wp-html` element sits outside every interactive region, and router regions inside it are skipped during navigation and are never used as attachment targets. ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
+-   A getter or function referenced by `data-wp-html` that throws no longer escapes the directive: the element keeps its current content. Evaluating a directive value also restores the caller's scope when the value's getter or function throws, so a failure in one directive no longer leaves a stale scope for the code that runs next. ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
+-   `data-wp-html` keeps its content when a trusted value arrives late or the element persists across navigation. The first trusted value after hydration is written once without emptying the element, an element whose `innerHTML` already equals the HTML keeps its nodes, and a kept element retains its last trusted HTML on navigation until a new trusted value resolves. This doesn't add sanitization or a new token API, and doesn't extend Trusted Types support to elements the runtime creates. ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
 
 ### Internal
 
 -   Add `afterNextFrame`, `getScope`, and `parseDirectiveValue` to the `privateApis` bundle. `@wordpress/interactivity-router` uses the scheduling and scope seams to publish navigation lifecycle state, while the shared directive-value interpretation keeps the directive runtime, page preparation, and initiator attribution consistent. ([#83280](https://github.com/WordPress/gutenberg/pull/83280))
+-   Add `closestHtmlDirectiveElement` to the `privateApis` bundle. It lets `@wordpress/interactivity-router` use the same markup-based rule as the runtime to find content owned by `data-wp-html`. It is not a public API. ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
 
 ## 6.56.0 (2026-09-23)
 
