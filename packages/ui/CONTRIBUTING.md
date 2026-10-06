@@ -318,9 +318,9 @@ High-level wrappers that hide `Popup` (for example `IconButton`, which renders a
 
 ### CSS Layers
 
-We use [CSS cascade layers](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Cascade_layers) to ensure an expected order of precedence in style resolution. All component stylesheets must follow this layering approach to maintain consistency and prevent specificity conflicts.
+We use [CSS cascade layers](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Cascade_layers) to ensure an expected order of precedence in style resolution. Component stylesheets follow this layering approach to maintain consistency and prevent specificity conflicts. `VisuallyHidden` is an exception: its styles are unlayered so global element styles cannot override its hiding behavior solely through cascade layer precedence.
 
-Every component stylesheet must include the layer definition in the top-level `wp-ui` layer and wrap all styles within the appropriate layer:
+Layered component stylesheets must include the layer definition in the top-level `wp-ui` layer and wrap all styles within the appropriate layer:
 
 ```css
 @layer wp-ui {
