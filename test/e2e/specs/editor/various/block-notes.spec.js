@@ -1770,7 +1770,7 @@ test.describe( 'Block Notes', () => {
 				attributes: { content: 'Testing block reactions' },
 			} );
 
-			await blockNoteUtils.addReactionToBlock( 'Heart' );
+			await blockNoteUtils.addReactionToBlock( 'heart' );
 
 			// The first reaction on a block writes a durable anchor to the
 			// block's metadata, which is how reaction rows find it again.
@@ -1780,12 +1780,12 @@ test.describe( 'Block Notes', () => {
 			const firstId = await blockNoteUtils.getReactionsId();
 
 			const entry = blockNoteUtils.blockReactionsEntry( 'Paragraph' );
-			const heart = blockNoteUtils.blockReactionPill( 'Heart' );
+			const heart = blockNoteUtils.blockReactionPill( 'heart' );
 			await expect( heart ).toContainText( '1' );
 
 			// A second reaction reuses the anchor.
-			await blockNoteUtils.addReactionToBlock( 'Rocket' );
-			const rocket = blockNoteUtils.blockReactionPill( 'Rocket' );
+			await blockNoteUtils.addReactionToBlock( 'rocket' );
+			const rocket = blockNoteUtils.blockReactionPill( 'rocket' );
 			await expect( rocket ).toBeVisible();
 			expect( await blockNoteUtils.getReactionsId() ).toBe( firstId );
 
@@ -1814,8 +1814,8 @@ test.describe( 'Block Notes', () => {
 				attributes: { content: 'Testing block reaction persistence' },
 			} );
 
-			await blockNoteUtils.addReactionToBlock( 'Heart' );
-			const pill = blockNoteUtils.blockReactionPill( 'Heart' );
+			await blockNoteUtils.addReactionToBlock( 'heart' );
+			const pill = blockNoteUtils.blockReactionPill( 'heart' );
 			await expect( pill ).toBeVisible();
 
 			await editor.saveDraft();
@@ -1834,7 +1834,7 @@ test.describe( 'Block Notes', () => {
 				name: 'core/paragraph',
 				attributes: { content: 'Reacted paragraph' },
 			} );
-			await blockNoteUtils.addReactionToBlock( 'Heart' );
+			await blockNoteUtils.addReactionToBlock( 'heart' );
 
 			// Move the selection elsewhere so clicking the entry has work to do.
 			await editor.insertBlock( {
@@ -1864,7 +1864,7 @@ test.describe( 'Block Notes', () => {
 				name: 'core/paragraph',
 				attributes: { content: 'Testing block deletion' },
 			} );
-			await blockNoteUtils.addReactionToBlock( 'Heart' );
+			await blockNoteUtils.addReactionToBlock( 'heart' );
 			const entry = blockNoteUtils.blockReactionsEntry( 'Paragraph' );
 			await expect( entry ).toBeVisible();
 
@@ -1887,7 +1887,7 @@ test.describe( 'Block Notes', () => {
 				comment: 'Note beside block reactions',
 			} );
 
-			await blockNoteUtils.addReactionToBlock( 'Heart' );
+			await blockNoteUtils.addReactionToBlock( 'heart' );
 
 			// The row leads the block's thread rather than a standalone entry.
 			await expect(
@@ -1902,7 +1902,7 @@ test.describe( 'Block Notes', () => {
 				thread.getByRole( 'group', { name: 'Reactions on Paragraph' } )
 			).toBeVisible();
 			await expect(
-				blockNoteUtils.blockReactionPill( 'Heart' )
+				blockNoteUtils.blockReactionPill( 'heart' )
 			).toBeVisible();
 		} );
 	} );

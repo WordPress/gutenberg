@@ -267,7 +267,7 @@ class BlockNoteUtils {
 	 * reactions into the sidebar and focuses their trigger, which opens the
 	 * picker. Picks an emoji by its exact label.
 	 *
-	 * @param {string} emoji Exact emoji label, e.g. "Heart".
+	 * @param {string} emoji Exact emoji label, e.g. "heart".
 	 */
 	async addReactionToBlock( emoji ) {
 		await this.#editor.clickBlockOptionsMenuItem( 'Add reaction' );
@@ -301,7 +301,7 @@ class BlockNoteUtils {
 	 * A reaction pill in a block's reactions row, whether the row stands on
 	 * its own or leads the block's note thread.
 	 *
-	 * @param {string} emoji      Emoji label, e.g. "Heart".
+	 * @param {string} emoji      Emoji label, e.g. "heart".
 	 * @param {string} blockTitle The block's display title.
 	 * @return {import('@playwright/test').Locator} The pill.
 	 */
