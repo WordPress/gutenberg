@@ -487,8 +487,6 @@ It runs a callback **when the node is created and runs it again when the state o
 
 You can attach several side effects to the same DOM element by using the syntax `data-wp-watch---[unique-id]` (note the three hyphens before the unique ID).
 
-> **Deprecation notice:** The two-hyphen syntax `data-wp-watch--[unique-id]` is deprecated and will stop working in WordPress 7.1. Use three hyphens (`---`) for unique IDs.
-
 The `unique-id` doesn't need to be unique globally. It just needs to be different from the other unique IDs of the `wp-watch` directives of that DOM element.
 
 ```html
@@ -547,8 +545,6 @@ This directive runs a callback **only when the node is created**.
 
 You can attach several `wp-init` to the same DOM element by using the syntax `data-wp-init---[unique-id]` (note the three hyphens before the unique ID).
 
-> **Deprecation notice:** The two-hyphen syntax `data-wp-init--[unique-id]` is deprecated and will stop working in WordPress 7.1. Use three hyphens (`---`) for unique IDs.
-
 The `unique-id` doesn't need to be unique globally. It just needs to be different from the other unique IDs of the `wp-init` directives of that DOM element.
 
 ```html
@@ -596,8 +592,6 @@ This directive runs the passed callback **during the node's render execution**.
 You can use and compose hooks like `useState`, `useWatch`, or `useEffect` inside the passed callback and create your own logic, providing more flexibility than previous directives.
 
 You can attach several `wp-run` to the same DOM element by using the syntax `data-wp-run---[unique-id]` (note the three hyphens before the unique ID).
-
-> **Deprecation notice:** The two-hyphen syntax `data-wp-run--[unique-id]` is deprecated and will stop working in WordPress 7.1. Use three hyphens (`---`) for unique IDs.
 
 The `unique-id` doesn't need to be unique globally. It just needs to be different from the other unique IDs of the `wp-run` directives of that DOM element.
 
