@@ -174,6 +174,8 @@ export const hydratedIslands = new WeakSet();
  * Directive attributes are interpreted with {@link parseDirectiveValue}.
  * Default HTML directives yield to content-owning directives on the same
  * element, using the markup rule shared with {@link closestHtmlDirectiveElement}.
+ * Eligible HTML content stays opaque; only islands visited by the walk are
+ * recorded as hydrated.
  *
  * @param root The root element or node to start traversing on.
  * @return The resulting vDOM tree.
@@ -336,17 +338,8 @@ export function toVdom( root: Node ): ComponentChild {
 			// than through Preact's own props diffing (see
 			// `directives/html.ts`).
 			//
-			// Any interactive islands inside are marked as already hydrated
-			// so `hydrateRegions()` doesn't also initialize them
-			// independently; nested router regions aren't excluded yet and
-			// may still process on their own.
-			if ( hasDefaultHtmlDirective ) {
-				elementNode
-					.querySelectorAll( '[data-wp-interactive]' )
-					.forEach( ( islandNode ) => {
-						hydratedIslands.add( islandNode );
-					} );
-			}
+			// `hydrateRegions()` excludes islands inside HTML content from
+			// its snapshot before hydration starts, so they need no marking.
 			props.dangerouslySetInnerHTML = {
 				__html: elementNode.innerHTML,
 			};

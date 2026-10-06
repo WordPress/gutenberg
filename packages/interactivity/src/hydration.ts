@@ -1,5 +1,5 @@
 import { hydrate, type ContainerNode, type ComponentChild } from 'preact';
-import { toVdom, hydratedIslands } from './vdom';
+import { toVdom, hydratedIslands, closestHtmlDirectiveElement } from './vdom';
 import { createRootFragment, splitTask } from './utils';
 
 // Keep the same root fragment for each interactive region node.
@@ -31,9 +31,21 @@ export const initialVdomPromise = new Promise<
 	resolveInitialVdom = resolve;
 } );
 
-// Initialize the router with the initial DOM.
+/**
+ * Hydrates interactive islands outside HTML directive content and initializes
+ * the router's initial vDOM. Content membership is checked for the full snapshot
+ * before hydration can detach any fallback islands.
+ *
+ * @return A promise that resolves once all eligible islands are hydrated.
+ */
 export const hydrateRegions = async () => {
-	const nodes = document.querySelectorAll( `[data-wp-interactive]` );
+	const nodes = [
+		...document.querySelectorAll( `[data-wp-interactive]` ),
+	].filter(
+		( node ) =>
+			! node.parentElement ||
+			! closestHtmlDirectiveElement( node.parentElement )
+	);
 
 	for ( const node of nodes ) {
 		if ( ! hydratedIslands.has( node ) ) {

@@ -288,25 +288,6 @@ describe( 'data-wp-html', () => {
 		} );
 		expect( attempts ).toBe( 1 );
 	} );
-
-	it( 'marks interactive islands inside the fallback content as already hydrated', () => {
-		const namespace = uniqueNamespace();
-		const nestedNamespace = `${ namespace }/nested`;
-		const region = createRegion(
-			namespace,
-			`<div data-wp-html="state.html">` +
-				`<div data-wp-interactive="${ nestedNamespace }"><p>Nested</p></div>` +
-				`</div>`
-		);
-
-		toVdom( region );
-
-		const nestedIsland = region.querySelector(
-			'[data-wp-interactive]'
-		) as HTMLElement;
-		expect( nestedIsland ).not.toBeNull();
-		expect( hydratedIslands.has( nestedIsland ) ).toBe( true );
-	} );
 } );
 
 /**
