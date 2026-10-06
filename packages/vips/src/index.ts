@@ -851,6 +851,11 @@ export async function resizeImage(
 			if ( ! strOptions || ! inProgressOperations.has( id ) ) {
 				throw error;
 			}
+			// eslint-disable-next-line no-console -- Deliberately log the degradation.
+			console.warn(
+				'[vips] Generating a static sub-size from the first frame: a later frame of this animation could not be decoded.',
+				error
+			);
 			return resizeImage( id, buffer, type, resize, {
 				...options,
 				preserveAnimation: false,

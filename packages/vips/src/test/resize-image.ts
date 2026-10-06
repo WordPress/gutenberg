@@ -337,6 +337,74 @@ describe( 'resizeImage', () => {
 			);
 		} );
 
+		it( 'falls back to the first frame when a later frame fails to decode', async () => {
+			const gifFile = new File( [ '<BLOB>' ], 'example.gif', {
+				lastModified: 1234567891,
+				type: 'image/gif',
+			} );
+			const buffer = await gifFile.arrayBuffer();
+
+			mockState.height = 100 * 4;
+			const decodeError = new Error(
+				'unable to call VipsForeignSaveCgifTarget'
+			);
+			mockWriteToBuffer.mockImplementationOnce( () => {
+				throw decodeError;
+			} );
+
+			await resizeImage(
+				'itemId',
+				buffer,
+				'image/gif',
+				{
+					width: 100,
+					height: 100,
+				},
+				{ preserveAnimation: true }
+			);
+
+			// The retry loads the first frame only, with gifsave defaults.
+			expect( mockThumbnailBuffer ).toHaveBeenLastCalledWith(
+				buffer,
+				100,
+				{
+					height: 100,
+					size: 'down',
+				}
+			);
+			expect( mockWriteToBuffer ).toHaveBeenCalledTimes( 2 );
+			expect( mockWriteToBuffer ).toHaveBeenLastCalledWith(
+				'.gif',
+				expect.not.objectContaining( {
+					interframe_maxerror: expect.anything(),
+				} )
+			);
+			expect( console ).toHaveWarnedWith(
+				expect.stringContaining( 'could not be decoded' ),
+				decodeError
+			);
+		} );
+
+		it( 'rethrows encoder errors when not preserving animation', async () => {
+			const gifFile = new File( [ '<BLOB>' ], 'example.gif', {
+				lastModified: 1234567891,
+				type: 'image/gif',
+			} );
+			const buffer = await gifFile.arrayBuffer();
+
+			mockWriteToBuffer.mockImplementationOnce( () => {
+				throw new Error( 'encode failed' );
+			} );
+
+			await expect(
+				resizeImage( 'itemId', buffer, 'image/gif', {
+					width: 100,
+					height: 100,
+				} )
+			).rejects.toThrow( 'encode failed' );
+			expect( mockWriteToBuffer ).toHaveBeenCalledTimes( 1 );
+		} );
+
 		it( 'has no effect on still image formats', async () => {
 			const jpegFile = new File( [ '<BLOB>' ], 'example.jpg', {
 				lastModified: 1234567891,
