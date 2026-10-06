@@ -10,7 +10,7 @@ import DataViews from '../index';
 import { LAYOUT_TABLE } from '../../constants';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { View } from '../../types';
-import { data as allData, fields } from './fixtures';
+import { actions, data as allData, fields } from './fixtures';
 
 const ROOT_KEY = 'root';
 const ROOT_BATCH_SIZE = 1;
@@ -168,6 +168,7 @@ const HierarchicalLevelsComponent = ( {
 				},
 				onLoadMore,
 			} }
+			actions={ actions }
 			data={ data }
 			paginationInfo={ {
 				totalItems: data.length,

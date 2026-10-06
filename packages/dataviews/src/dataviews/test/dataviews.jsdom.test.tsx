@@ -399,6 +399,16 @@ describe( 'DataViews component', () => {
 		expect( rows[ 5 ] ).toHaveTextContent( 'Load more' );
 		expect( rows[ 6 ] ).toHaveTextContent( 'Root D' );
 		expect( rows[ 7 ] ).toHaveTextContent( 'Load more' );
+		for ( const row of [ rows[ 4 ], rows[ 5 ], rows[ 7 ] ] ) {
+			const cells = within( row ).getAllByRole( 'cell' );
+			expect( cells ).toHaveLength( 1 );
+			expect( cells[ 0 ] ).toHaveAttribute(
+				'colspan',
+				String(
+					within( rows[ 0 ] ).getAllByRole( 'columnheader' ).length
+				)
+			);
+		}
 
 		const childContinuation = screen.getByRole( 'button', {
 			name: 'Loading children of Child B',
@@ -528,6 +538,93 @@ describe( 'DataViews component', () => {
 
 		expect( screen.getByText( '—' ) ).toBeInTheDocument();
 	} );
+
+	it.each( [ true, false ] )(
+		'keeps hierarchy selection beside its item with a primary column: %s',
+		async ( hasPrimaryColumn ) => {
+			const user = userEvent.setup();
+			const onChangeSelection = vi.fn();
+			const onChangeExpandedItemIds = vi.fn();
+			const props = {
+				data: [
+					{ id: 1, title: 'Parent' },
+					{ id: 2, title: 'Child' },
+					{ id: 3, title: 'Grandchild' },
+				],
+				getItemParentId: ( item: Data ) =>
+					item.id === 1 ? undefined : item.id - 1,
+				getItemHasChildren: ( item: Data ) => item.id !== 3,
+				expandedItemIds: [ '1', '2' ],
+				onChangeExpandedItemIds,
+				actions,
+				selection: [],
+				onChangeSelection,
+				view: {
+					...DEFAULT_VIEW,
+					fields: hasPrimaryColumn ? [] : [ 'title' ],
+					showLevels: true,
+					titleField: hasPrimaryColumn ? 'title' : undefined,
+				},
+			};
+			const { rerender } = render( <DataViewWrapper { ...props } /> );
+
+			const rowFor = ( title: string ) =>
+				screen.getByRole( 'row', {
+					name: new RegExp( `\\b${ title }\\b` ),
+				} );
+			for ( const title of [ 'Parent', 'Child', 'Grandchild' ] ) {
+				const cell = within( rowFor( title ) )
+					.getAllByRole( 'cell' )
+					.find( ( candidate ) =>
+						within( candidate ).queryByText( title )
+					)!;
+				expect( within( cell ).getByRole( 'checkbox' ) ).toBeVisible();
+			}
+			for ( const title of [ 'Parent', 'Child' ] ) {
+				const cell = within( rowFor( title ) )
+					.getAllByRole( 'cell' )
+					.find( ( candidate ) =>
+						within( candidate ).queryByText( title )
+					)!;
+				expect(
+					within( cell ).getByRole( 'button', { name: /^Collapse / } )
+				).toBeVisible();
+			}
+			const headerCell = within(
+				screen.getAllByRole( 'row' )[ 0 ]
+			).getAllByRole( 'columnheader' )[ 0 ];
+			expect(
+				within( headerCell ).getByRole( 'checkbox' )
+			).toBeVisible();
+			expect(
+				within( headerCell ).getByRole( 'button', {
+					name: 'Collapse all',
+				} )
+			).toBeVisible();
+			await user.click(
+				within( rowFor( 'Parent' ) ).getByRole( 'checkbox' )
+			);
+			expect( onChangeSelection ).toHaveBeenCalledWith( [ '1' ] );
+			expect( onChangeExpandedItemIds ).not.toHaveBeenCalled();
+
+			rerender(
+				<DataViewWrapper
+					key="flat"
+					{ ...props }
+					view={ { ...props.view, showLevels: false } }
+				/>
+			);
+			const flatCheckboxCell = within( rowFor( 'Parent' ) ).getAllByRole(
+				'cell'
+			)[ 0 ];
+			expect(
+				within( flatCheckboxCell ).getByRole( 'checkbox' )
+			).toBeVisible();
+			expect(
+				within( flatCheckboxCell ).queryByText( 'Parent' )
+			).not.toBeInTheDocument();
+		}
+	);
 
 	it( 'should filter results by "search" text, if field has enableGlobalSearch set to true', async () => {
 		const fieldsWithSearch = [
