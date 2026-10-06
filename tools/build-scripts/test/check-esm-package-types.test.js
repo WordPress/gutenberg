@@ -14,6 +14,9 @@ let fixtureDirectory;
 let packageDirectory;
 let packDestination;
 
+// Spawning `npm pack` and `tsc` can exceed the default timeout on busy CI runners.
+vi.setConfig( { testTimeout: 10000 } ); // 10 seconds
+
 afterEach( async () => {
 	if ( fixtureDirectory ) {
 		await rm( fixtureDirectory, { recursive: true, force: true } );

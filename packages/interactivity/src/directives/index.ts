@@ -9,6 +9,7 @@ import './bind';
 import './class';
 import './context';
 import './each';
+import './html';
 import './ignore';
 import './init';
 import './on';
