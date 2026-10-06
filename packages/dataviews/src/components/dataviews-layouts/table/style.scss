@@ -289,7 +289,7 @@
 		padding-inline-start: var(--wpds-dimension-padding-2xl);
 	}
 
-	tbody .dataviews-view-table__hierarchy-content-column {
+	tbody tr td.dataviews-view-table__hierarchy-content-column {
 		padding-inline-start:
 			calc(var(--wpds-dimension-padding-2xl) +
 			var(--wp-dataviews-table-hierarchy-level, 0) *
