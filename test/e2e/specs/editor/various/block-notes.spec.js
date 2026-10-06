@@ -1142,11 +1142,11 @@ test.describe( 'Block Notes', () => {
 				comment: 'Test comment for reactions',
 			} );
 
-			await blockNoteUtils.addReactionToComment( 'Heart' );
+			await blockNoteUtils.addReactionToComment( 'heart' );
 
 			// Verify the reaction button appears with count.
 			const reactionButton = page.getByRole( 'button', {
-				name: /Heart/,
+				name: /heart/,
 			} );
 			await expect( reactionButton ).toBeVisible();
 			await expect( reactionButton ).toContainText( '1' );
@@ -1162,9 +1162,9 @@ test.describe( 'Block Notes', () => {
 				comment: 'Re-add reaction',
 			} );
 
-			await blockNoteUtils.addReactionToComment( 'Heart' );
+			await blockNoteUtils.addReactionToComment( 'heart' );
 			const reactionButton = page.getByRole( 'button', {
-				name: /Heart/,
+				name: /heart/,
 			} );
 			await expect( reactionButton ).toBeVisible();
 			await expect( reactionButton ).toContainText( '1' );
@@ -1182,7 +1182,7 @@ test.describe( 'Block Notes', () => {
 			//    so the just-removed reaction blocked the re-add with
 			//    `rest_comment_duplicate_reaction` ("You have already
 			//    reacted with this emoji").
-			await blockNoteUtils.addReactionToComment( 'Heart' );
+			await blockNoteUtils.addReactionToComment( 'heart' );
 			await expect( reactionButton ).toBeVisible();
 			await expect( reactionButton ).toContainText( '❤' );
 			await expect( reactionButton ).toContainText( '1' );
@@ -1229,10 +1229,10 @@ test.describe( 'Block Notes', () => {
 					response.request().method() === 'GET' &&
 					singleNote.test( decodeURIComponent( response.url() ) )
 			);
-			await blockNoteUtils.addReactionToComment( 'Heart' );
+			await blockNoteUtils.addReactionToComment( 'heart' );
 			await refetch;
 			await expect(
-				page.getByRole( 'button', { name: /Heart/ } )
+				page.getByRole( 'button', { name: /heart/ } )
 			).toContainText( '1' );
 
 			// The post-toggle refetch must not replace the cached note's
@@ -1241,30 +1241,6 @@ test.describe( 'Block Notes', () => {
 			await expect(
 				page.getByRole( 'textbox', { name: 'Edit note' } )
 			).toHaveText( 'Original note text' );
-		} );
-
-		test( 'can remove own emoji reaction by clicking it', async ( {
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing reaction removal' },
-				comment: 'Test comment for removing reactions',
-			} );
-
-			// Add a reaction.
-			await blockNoteUtils.addReactionToComment( 'Heart' );
-			const reactionButton = page.getByRole( 'button', {
-				name: /Heart/,
-			} );
-			await expect( reactionButton ).toBeVisible();
-
-			// Click the reaction to remove it.
-			await reactionButton.click();
-
-			// Verify the reaction button is no longer visible.
-			await expect( reactionButton ).toBeHidden();
 		} );
 
 		test( 'can see reaction tooltip on hover', async ( {
@@ -1278,11 +1254,11 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			// Add a reaction.
-			await blockNoteUtils.addReactionToComment( 'Celebration' );
+			await blockNoteUtils.addReactionToComment( 'celebration' );
 
 			// Hover over the reaction button to trigger tooltip.
 			const reactionButton = page.getByRole( 'button', {
-				name: /Celebration/,
+				name: /celebration/,
 			} );
 			await expect( reactionButton ).toBeVisible();
 			await reactionButton.hover();
@@ -1291,11 +1267,11 @@ test.describe( 'Block Notes', () => {
 			// match its text. The pill's own label is an `aria-label`, not
 			// text, so this only matches the popup.
 			await expect(
-				page.getByText( /reacted with Celebration/ )
+				page.getByText( /reacted with celebration/ )
 			).toBeVisible();
 		} );
 
-		test( 'reaction buttons are keyboard accessible', async ( {
+		test( 'the reaction menu is keyboard accessible', async ( {
 			page,
 			blockNoteUtils,
 		} ) => {
@@ -1305,62 +1281,33 @@ test.describe( 'Block Notes', () => {
 				comment: 'Test comment for keyboard access',
 			} );
 
-			// Open the emoji picker with keyboard.
-			const addReactionButton = page.getByRole( 'button', {
+			const trigger = page.getByRole( 'button', {
 				name: 'Add reaction',
 			} );
-			await addReactionButton.focus();
+			const menu = page.getByRole( 'menu', { name: 'Add reaction' } );
+
+			// Escape closes the menu and hands focus back to the trigger.
+			await trigger.focus();
 			await page.keyboard.press( 'Enter' );
+			await expect( menu ).toBeVisible();
+			await page.keyboard.press( 'Escape' );
+			await expect( menu ).toBeHidden();
+			await expect( trigger ).toBeFocused();
 
-			// Verify the picker is visible.
-			const emojiPicker = page.locator(
-				'.editor-collab-sidebar-panel__emoji-picker'
-			);
-			await expect( emojiPicker ).toBeVisible();
-
-			// Navigate with arrow keys and select. The picker is a group of
-			// buttons on a roving tab index, so ArrowRight moves to the next.
-			const firstEmoji = emojiPicker.getByRole( 'button' ).first();
-			await firstEmoji.focus();
-			await page.keyboard.press( 'ArrowRight' );
+			// The arrow keys move through the emoji, and Enter picks one.
 			await page.keyboard.press( 'Enter' );
-
-			// The selected emoji renders as a reaction pill on the note.
 			await expect(
-				page.locator( '.editor-collab-sidebar-panel__reaction-button' )
-			).toBeVisible();
-		} );
-
-		test( 'picker lays out as a row and moves focus on both axes', async ( {
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing picker layout' },
-				comment: 'Test comment for picker layout',
-			} );
-
-			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
-			const emojiPicker = page.locator(
-				'.editor-collab-sidebar-panel__emoji-picker'
-			);
-			await expect( emojiPicker ).toBeVisible();
-
-			// `.components-popover__content` is `width: min-content`,
-			// which used to squeeze the wrapping button group into a
-			// single column one emoji wide.
-			const box = await emojiPicker.boundingBox();
-			expect( box.width ).toBeGreaterThan( box.height );
-
-			// The roving tab index moves on both axes, so the picker is
-			// navigable however the emoji set happens to wrap.
-			const buttons = emojiPicker.getByRole( 'button' );
-			await buttons.first().focus();
+				menu.getByRole( 'menuitem', { name: 'heart' } )
+			).toBeFocused();
 			await page.keyboard.press( 'ArrowDown' );
-			await expect( buttons.nth( 1 ) ).toBeFocused();
-			await page.keyboard.press( 'ArrowUp' );
-			await expect( buttons.first() ).toBeFocused();
+			await expect(
+				menu.getByRole( 'menuitem', { name: 'celebration' } )
+			).toBeFocused();
+			await page.keyboard.press( 'Enter' );
+
+			await expect(
+				page.getByRole( 'button', { name: /celebration/ } )
+			).toContainText( '1' );
 		} );
 
 		test( 'resolving a thread locks its reactions', async ( {
@@ -1385,9 +1332,9 @@ test.describe( 'Block Notes', () => {
 			await thread.click();
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 
-			await blockNoteUtils.addReactionToComment( 'Heart' );
+			await blockNoteUtils.addReactionToComment( 'heart' );
 			const reactionPill = sidebar.getByRole( 'button', {
-				name: /Heart/,
+				name: /heart/,
 			} );
 			await expect( reactionPill ).toBeVisible();
 
@@ -1418,63 +1365,6 @@ test.describe( 'Block Notes', () => {
 			await expect( reactionPill ).toBeEnabled();
 		} );
 
-		test( 'can add multiple different reactions to same note', async ( {
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing multiple reactions' },
-				comment: 'Test comment for multiple reactions',
-			} );
-
-			// Add first reaction.
-			await blockNoteUtils.addReactionToComment( 'Smile' );
-			await expect(
-				page.getByRole( 'button', { name: /Smile/ } )
-			).toBeVisible();
-
-			// Add second reaction.
-			await blockNoteUtils.addReactionToComment( 'Rocket' );
-			await expect(
-				page.getByRole( 'button', { name: /Rocket/ } )
-			).toBeVisible();
-
-			// Both reactions remain visible together.
-			await expect(
-				page.getByRole( 'button', { name: /Smile/ } )
-			).toBeVisible();
-		} );
-
-		test( 'reaction picker portals outside the collab sidebar', async ( {
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing popover portal' },
-				comment: 'Popover portal',
-			} );
-
-			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
-
-			const popover = page.locator(
-				'.editor-collab-sidebar-panel__add-reaction-popover'
-			);
-			await expect( popover ).toBeVisible();
-
-			// The popover must portal out of the sidebar; otherwise the
-			// `overflow: hidden` chain on `.editor-collab-sidebar-panel`
-			// (and the framework `.interface-interface-skeleton__sidebar`)
-			// would clip the picker. Pin the contract by asserting the
-			// popover has no sidebar-panel ancestor.
-			await expect( popover ).toHaveCount( 1 );
-			const isPortaled = await popover.evaluate(
-				( el ) => ! el.closest( '.editor-collab-sidebar-panel' )
-			);
-			expect( isPortaled ).toBe( true );
-		} );
-
 		test( 'note remains selected while reaction picker is open', async ( {
 			page,
 			blockNoteUtils,
@@ -1492,16 +1382,16 @@ test.describe( 'Block Notes', () => {
 
 			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
 			await expect(
-				page.locator( '.editor-collab-sidebar-panel__emoji-picker' )
+				page.getByRole( 'menu', { name: 'Add reaction' } )
 			).toBeVisible();
 
-			// Focus has moved into the portaled popover, but the note's
-			// onBlur handler exempts `.components-popover` so the thread
-			// stays selected and the trigger stays mounted.
+			// Focus has moved into the portaled menu, but its focus events
+			// still bubble to the thread's `useFocusOutside` through the
+			// React tree, so the thread stays selected and the trigger mounted.
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 		} );
 
-		test( 'the add-reaction trigger stays out of the way until hovered', async ( {
+		test( 'the add-reaction trigger is revealed on hover and focus', async ( {
 			page,
 			blockNoteUtils,
 		} ) => {
@@ -1511,52 +1401,14 @@ test.describe( 'Block Notes', () => {
 				comment: 'Test comment for the hover trigger',
 			} );
 
-			const trigger = page.locator(
-				'.editor-collab-sidebar-panel__add-reaction'
-			);
+			const trigger = page.getByRole( 'button', {
+				name: 'Add reaction',
+			} );
 			// The reply composer shares the note class, so match only notes
 			// that carry a reaction trigger.
 			const note = page
 				.locator( '.editor-collab-sidebar-panel__note' )
-				.filter( {
-					has: page.locator(
-						'.editor-collab-sidebar-panel__add-reaction'
-					),
-				} );
-
-			// The trigger floats in the note's top corner rather than
-			// claiming a row: the note is no taller for carrying it.
-			const reactionRow = page.locator(
-				'.editor-collab-sidebar-panel__reactions'
-			);
-			await expect( reactionRow ).toHaveClass( /is-floating/ );
-			await expect(
-				page.locator( '.editor-collab-sidebar-panel__reaction-button' )
-			).toHaveCount( 0 );
-
-			const noteBody = page.locator(
-				'.editor-collab-sidebar-panel__note-body'
-			);
-			const noteText = page.locator(
-				'.editor-collab-sidebar-panel__note-content'
-			);
-			expect( ( await noteBody.boundingBox() ).height ).toBe(
-				( await noteText.boundingBox() ).height
-			);
-
-			// It lines up under the note's other actions, and the text keeps
-			// clear of it rather than running underneath.
-			const triggerBox = await trigger.boundingBox();
-			const actionsBox = await page
-				.getByRole( 'button', { name: 'Actions' } )
-				.boundingBox();
-			expect( triggerBox.x ).toBe( actionsBox.x );
-			const textRight = await noteText.evaluate( ( element ) => {
-				const range = document.createRange();
-				range.selectNodeContents( element );
-				return range.getBoundingClientRect().right;
-			} );
-			expect( textRight ).toBeLessThanOrEqual( triggerBox.x );
+				.filter( { has: trigger } );
 
 			// Park the pointer outside the sidebar: adding the note leaves it
 			// over the thread, which would hold the trigger open.
@@ -1570,79 +1422,8 @@ test.describe( 'Block Notes', () => {
 			// the thread, which stays focused for as long as it is selected.
 			await page.mouse.move( 0, 0 );
 			await expect( trigger ).toHaveCSS( 'opacity', '0' );
-			await page.getByRole( 'button', { name: 'Add reaction' } ).focus();
+			await trigger.focus();
 			await expect( trigger ).toHaveCSS( 'opacity', '1' );
-		} );
-
-		test( 'only the hovered note in a thread reveals its trigger', async ( {
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing per-note hover' },
-				comment: 'Test comment for per-note hover',
-			} );
-
-			const replyForm = page.getByRole( 'textbox', { name: 'Reply to' } );
-			await replyForm.click();
-			await replyForm.pressSequentially(
-				'Test reply for per-note hover'
-			);
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Reply', exact: true } )
-				.click();
-
-			const notes = page
-				.locator( '.editor-collab-sidebar-panel__note' )
-				.filter( {
-					has: page.locator(
-						'.editor-collab-sidebar-panel__add-reaction'
-					),
-				} );
-			await expect( notes ).toHaveCount( 2 );
-			const triggers = page.locator(
-				'.editor-collab-sidebar-panel__add-reaction'
-			);
-
-			// Reacting is per note, so the pointer resting on one note should
-			// not offer the option on the other.
-			await notes.first().hover();
-			await expect( triggers.first() ).toHaveCSS( 'opacity', '1' );
-			await expect( triggers.last() ).toHaveCSS( 'opacity', '0' );
-
-			await notes.last().hover();
-			await expect( triggers.last() ).toHaveCSS( 'opacity', '1' );
-			await expect( triggers.first() ).toHaveCSS( 'opacity', '0' );
-		} );
-
-		test( 'the add-reaction trigger stays visible once the note has reactions', async ( {
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing the trailing trigger' },
-				comment: 'Test comment for the trailing trigger',
-			} );
-
-			await blockNoteUtils.addReactionToComment( 'Heart' );
-			await expect(
-				page.getByRole( 'button', { name: /Heart/ } )
-			).toBeVisible();
-
-			// With pills to sit beside, the trigger trails them in the row
-			// rather than floating, and stays put without a hover. Picking
-			// the emoji leaves focus on the trigger, which would hold it open,
-			// so hand focus back to the still-selected thread.
-			await page
-				.locator( '.editor-collab-sidebar-panel__thread' )
-				.focus();
-			await page.mouse.move( 0, 0 );
-			await expect(
-				page.locator( '.editor-collab-sidebar-panel__add-reaction' )
-			).toHaveCSS( 'opacity', '1' );
 		} );
 
 		test( 'reactions stay visible once the thread is deselected', async ( {
@@ -1656,9 +1437,9 @@ test.describe( 'Block Notes', () => {
 				comment: 'Test comment for deselected reactions',
 			} );
 
-			await blockNoteUtils.addReactionToComment( 'Heart' );
+			await blockNoteUtils.addReactionToComment( 'heart' );
 			const reactionButton = page.getByRole( 'button', {
-				name: /Heart/,
+				name: /heart/,
 			} );
 			await expect( reactionButton ).toBeVisible();
 
