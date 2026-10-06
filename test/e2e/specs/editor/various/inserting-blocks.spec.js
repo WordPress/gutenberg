@@ -965,15 +965,18 @@ test.describe( 'insert media from inserter', () => {
 
 		await page.getByLabel( 'Block Inserter' ).click();
 		await page.getByRole( 'tab', { name: 'Media' } ).click();
-		// Each media source is a collapsible panel. `exact` so this matches only
-		// the "Images" source and not the "Attached images" source, which also
-		// contains "Images". It is the first source, so it is already open;
-		// clicking it keeps it open.
-		const imagesSource = page.getByRole( 'button', {
+		// Each media category is a collapsible panel. `exact` so this matches
+		// only "Images" and not "Attached images", which also contains the
+		// word. "Images" is the category that opens on mount; "Attached
+		// images" is listed above it but starts collapsed.
+		const imagesCategory = page.getByRole( 'button', {
 			name: 'Images',
 			exact: true,
 		} );
-		await expect( imagesSource ).toHaveAttribute( 'aria-expanded', 'true' );
+		await expect( imagesCategory ).toHaveAttribute(
+			'aria-expanded',
+			'true'
+		);
 		// The card's preview is the click-to-insert target, named by the
 		// item's title.
 		await page
@@ -1015,7 +1018,7 @@ test.describe( 'Attached images media category', () => {
 			'./assets/10x10_e2e_test_image_z9T8jK.png'
 		);
 		// Re-parent the uploaded image to the post so it appears in the
-		// "Attached images" source, which filters by the attachment's parent.
+		// "Attached images" category, which filters by the attachment's parent.
 		await requestUtils.rest( {
 			method: 'POST',
 			path: `/wp/v2/media/${ media.id }`,
@@ -1026,7 +1029,7 @@ test.describe( 'Attached images media category', () => {
 
 		await page.getByLabel( 'Block Inserter' ).click();
 		await page.getByRole( 'tab', { name: 'Media' } ).click();
-		// Each media source is a collapsible panel; open the attached images one.
+		// Each media category is a collapsible panel; open the attached images one.
 		await page
 			.getByRole( 'tabpanel', { name: 'Media' } )
 			.getByRole( 'button', { name: 'Attached images', exact: true } )
@@ -1064,7 +1067,7 @@ test.describe( 'Attached images media category', () => {
 				.filter( { hasText: 'Image detached from' } )
 		).toBeVisible();
 
-		// With its only attachment removed, the source falls back to its empty
+		// With its only attachment removed, the category falls back to its empty
 		// state rather than dropping out of the tab list.
 		await expect( attachedImage ).toBeHidden();
 		await expect(
