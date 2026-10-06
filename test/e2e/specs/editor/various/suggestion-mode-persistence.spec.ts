@@ -1035,4 +1035,75 @@ test.describe( 'Suggestion mode persistence', () => {
 		await noteTrashed;
 		await expect( sidebar.getByText( /heading level/ ) ).toBeHidden();
 	} );
+
+	test( 'redo restores an attribute suggestion and its note', async ( {
+		editor,
+		page,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { level: 2, content: 'Redo me' },
+		} );
+		await switchIntent( page, 'Suggesting' );
+		const heading = editor.canvas.getByRole( 'document', {
+			name: 'Block: Heading',
+		} );
+		await editor.selectBlocks( heading );
+		const suggestionSaved = suggestionSavedPromise( page );
+		await suggestHeadingLevelThree( page );
+		await expect( heading ).toHaveClass( /is-suggestion-pending/ );
+		await suggestionSaved;
+
+		const sidebar = await openNotesSidebar( page );
+		await expect( sidebar.getByText( /heading level/ ) ).toBeVisible();
+
+		const noteTrashed = page.waitForResponse(
+			( response: any ) =>
+				/\/wp\/v2\/comments\/\d+/.test( response.url() ) &&
+				[ 'PUT', 'POST', 'DELETE' ].includes(
+					response.request().method()
+				) &&
+				response.request().postData()?.includes( '"trash"' ) &&
+				response.ok()
+		);
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( heading ).not.toHaveClass( /is-suggestion-pending/ );
+		await noteTrashed;
+		await expect( sidebar.getByText( /heading level/ ) ).toBeHidden();
+
+		/*
+		 * The marker is one undo level, so redo puts it back, and the restored
+		 * proposal is saved to a note again. Exactly one pending note must
+		 * come out of it: the note the undo trashed must not be joined by a
+		 * second live one, and the marker must not come back note-less.
+		 */
+		const noteSaved = suggestionSavedPromise( page );
+		await pageUtils.pressKeys( 'primary+shift+z' );
+		await expect( heading ).toHaveClass( /is-suggestion-pending/ );
+		await expect( heading ).toHaveJSProperty( 'tagName', 'H3' );
+		await expect( heading ).toHaveText( 'Redo me' );
+		await noteSaved;
+		await expect( sidebar.getByText( /heading level/ ) ).toHaveCount( 1 );
+
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( '"type":"pending-attributes"' );
+		expect( serialized ).toContain( '"after":{"level":3}' );
+		expect( serialized ).toMatch( /"commentId":\d+/ );
+
+		const postId = await page.evaluate( () =>
+			( window as any ).wp.data.select( 'core/editor' ).getCurrentPostId()
+		);
+		const pendingNotes: any = await requestUtils.rest( {
+			path: '/wp/v2/comments',
+			params: {
+				post: postId,
+				type: 'note',
+				status: 'hold',
+				context: 'edit',
+			},
+		} );
+		expect( pendingNotes ).toHaveLength( 1 );
+	} );
 } );
