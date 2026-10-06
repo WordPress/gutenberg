@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { __experimentalUseSlot as useSlot } from '@wordpress/components';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -17,13 +17,13 @@ import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { NoteHighlightStyles } from './note-highlight-styles';
-import { useNoteThreads } from './hooks';
+import { NoteDraftsContext, useNoteThreads } from './hooks';
 import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { CanvasMargin } from '../visual-editor/canvas-margin';
 import { unlock } from '../../lock-unlock';
 
-function NotesSidebar( { postId } ) {
+function NotesSidebar( { postId, drafts } ) {
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const { toggleBlockSpotlight, selectBlock } = unlock(
@@ -185,7 +185,9 @@ function NotesSidebar( { postId } ) {
 					icon={ commentIcon }
 					closeLabel={ __( 'Close Notes' ) }
 				>
-					<Notes notes={ notes } sidebarRef={ sidebarRef } />
+					<NoteDraftsContext.Provider value={ drafts }>
+						<Notes notes={ notes } sidebarRef={ sidebarRef } />
+					</NoteDraftsContext.Provider>
 				</PluginSidebar>
 			) }
 			{ showFloatingNotes && (
@@ -197,11 +199,13 @@ function NotesSidebar( { postId } ) {
 							'is-minimized': notesDisplayMode === 'minimized',
 						} ) }
 					>
-						<Notes
-							notes={ unresolvedNotes }
-							sidebarRef={ sidebarRef }
-							isFloating
-						/>
+						<NoteDraftsContext.Provider value={ drafts }>
+							<Notes
+								notes={ unresolvedNotes }
+								sidebarRef={ sidebarRef }
+								isFloating
+							/>
+						</NoteDraftsContext.Provider>
 					</div>
 				</CanvasMargin.Fill>
 			) }
@@ -210,6 +214,7 @@ function NotesSidebar( { postId } ) {
 }
 
 export default function NotesSidebarContainer() {
+	const [ drafts ] = useState( () => new Map() );
 	const { postId, editorMode, revisionsMode } = useSelect( ( select ) => {
 		const { getCurrentPostId, getEditorMode, isRevisionsMode } = unlock(
 			select( editorStore )
@@ -232,7 +237,7 @@ export default function NotesSidebarContainer() {
 
 	return (
 		<PostTypeSupportCheck supportKeys="editor.notes">
-			<NotesSidebar postId={ postId } />
+			<NotesSidebar postId={ postId } drafts={ drafts } />
 		</PostTypeSupportCheck>
 	);
 }
