@@ -4,9 +4,7 @@
 	}
 }
 
-/* The notice speaks for the whole panel, so it spans both columns of the
-   grid rather than sitting in one. Two selectors because the panel is named
-   by its group in the block inspector and by its own class in Global Styles. */
+// Inspector and Global Styles class respectively.
 .typography-block-support-panel,
 .block-editor-typography-panel--flush-color-items {
 	.block-editor-typography-panel__text-gradient-notice {

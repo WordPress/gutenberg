@@ -198,8 +198,7 @@ function getStateBackgroundResetCSS( stateStyles, selector ) {
 }
 
 /**
- * Whether a state paints a background of its own, which is then what the user
- * asked for and not something to clear or override.
+ * Whether a state paints its own background, which escapes must leave alone.
  *
  * @param {Object} stateStyles State style object.
  * @return {boolean} Whether the state paints its own background.
@@ -213,14 +212,8 @@ function paintsItsOwnBackground( stateStyles ) {
 }
 
 /**
- * Returns the CSS a state needs to escape a text clip it layers over.
- *
- * A state's declarations sit in a media query or a selector of their own, but
- * the styles it layers over do not, so they keep applying until the state says
- * otherwise. Setting a box clip restores the text through the style engine's
- * `-webkit-text-fill-color: currentColor`, but the gradient underneath carries
- * on painting as a block background. A state that paints a background of its
- * own is left alone, since that background is what the user asked for.
+ * Returns the CSS that stops a text gradient from below painting as a block
+ * background once a state switches to a box clip.
  *
  * @param {Object}  stateStyles State style object.
  * @param {Object=} baseStyle   Styles the state layers over.
@@ -248,11 +241,8 @@ function getStateTextClipEscapeCSS( stateStyles, baseStyle, selector ) {
 }
 
 /**
- * Returns the fill reset a state needs when it sets a text color under a clip.
- *
- * A text clip paints the glyphs with `-webkit-text-fill-color: transparent`, so
- * a color set by a state that does not also set its own clip is never painted.
- * A state that sets a clip gets the right fill from the style engine already.
+ * Returns the CSS that shows a state's text color under a text clip from below,
+ * which otherwise leaves the fill `transparent`.
  *
  * @param {Object}  stateStyles State style object.
  * @param {Object=} baseStyle   Styles the state layers over.
@@ -344,9 +334,7 @@ function getStateTextAlignCSS( stateStyles, selector ) {
  *
  * @param {Object}  stateStyles State style object.
  * @param {string}  selector    CSS selector for the generated style.
- * @param {Object=} baseStyle   Styles the state layers over, so a rule can tell
- *                              what it has to override. Undefined for the
- *                              Default state, which layers over nothing.
+ * @param {Object=} baseStyle   Styles the state layers over, if any.
  * @return {string} Generated stylesheet.
  */
 export function getStateStylesCSS( stateStyles, selector, baseStyle ) {
@@ -624,8 +612,6 @@ export function getResponsiveStateCSSRules(
 					viewportStyles,
 					name,
 					baseSelector,
-					// A pseudo state here sits under both the Default state
-					// and this viewport's own styles.
 					mergeStyleObjects( defaultRootStyles, viewportRootStyles )
 				)
 			);
@@ -1173,8 +1159,6 @@ function useBlockProps( { clientId, name, style } ) {
 				style,
 				name,
 				baseElementSelector,
-				// A pseudo state at the Default viewport layers over the
-				// block's own styles.
 				getRootStateStyles( style, [
 					'elements',
 					...( VALID_BLOCK_PSEUDO_STATES[ name ] ?? [] ),

@@ -92,9 +92,7 @@ function styleToAttributes( style ) {
 	updatedStyle.color = {
 		...updatedStyle.color,
 		text: textColorSlug ? undefined : textColorValue,
-		// The Background panel owns this. A preset lives in the
-		// `backgroundColor` attribute, so writing it here too would store it
-		// twice; a custom color already lives here and is left alone.
+		// Read only (see `attributesToStyle`). A preset stays in its attribute.
 		background: backgroundColorSlug ? undefined : backgroundColorValue,
 	};
 	return {
@@ -121,11 +119,8 @@ function attributesToStyle( attributes ) {
 				? 'var:preset|text-shadow|' + attributes.textShadow
 				: attributes.style?.typography?.textShadow,
 		},
-		// Read only, so the panel can tell a text gradient would clip the
-		// block's background away. A gradient has three homes: the `gradient`
-		// attribute for a preset, `color.gradient` for a custom one set before
-		// the background support existed, and `background.gradient` since.
-		// `onChange` puts back whatever the block actually had.
+		// Read only, for the notice about clipping the block's background.
+		// `onChange` restores whatever gradient the block actually had.
 		background: {
 			...attributes.style?.background,
 			gradient: attributes.gradient
@@ -138,7 +133,6 @@ function attributesToStyle( attributes ) {
 			text: attributes.textColor
 				? 'var:preset|color|' + attributes.textColor
 				: attributes.style?.color?.text,
-			// Read only. `styleToAttributes` folds it back out.
 			background: attributes.backgroundColor
 				? 'var:preset|color|' + attributes.backgroundColor
 				: attributes.style?.color?.background,
@@ -232,7 +226,6 @@ export function TypographyPanel( {
 		selectedState
 	);
 
-	// The block's Default state, which every other state layers over.
 	const baseValue = useMemo(
 		() =>
 			attributesToStyle( {
@@ -277,10 +270,8 @@ export function TypographyPanel( {
 				const hadTextGradient =
 					'text' === style?.background?.backgroundClip;
 
-				// Only a text gradient belongs to this panel, so any other
-				// gradient goes back exactly as the block had it. A block that
-				// already had one is this panel clearing its own value, which
-				// is not a gradient to put back.
+				// Only a text gradient belongs to this panel. Put any other
+				// gradient back as the block had it.
 				if ( ! setsTextGradient && ! hadTextGradient ) {
 					newAttributes.style = cleanEmptyObject( {
 						...newAttributes.style,
@@ -294,9 +285,7 @@ export function TypographyPanel( {
 						},
 					} );
 				} else if ( setsTextGradient && gradient ) {
-					// A preset gradient paints the whole block through the
-					// `background` shorthand, which resets the clip the text
-					// gradient depends on. The text gradient replaces it.
+					// A preset gradient's `background` shorthand resets the clip.
 					newAttributes.gradient = undefined;
 				}
 
@@ -354,7 +343,6 @@ export function TypographyPanel( {
 			as={ Wrapper }
 			panelId={ clientId }
 			settings={ settings }
-			blockName={ name }
 			value={ value }
 			baseValue={ isStateSelected ? baseValue : undefined }
 			onChange={ onChange }

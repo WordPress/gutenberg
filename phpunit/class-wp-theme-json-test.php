@@ -1311,8 +1311,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Builds a stylesheet for a Paragraph with a text gradient plus the given
-	 * state styles, for the text-clip escape tests below.
+	 * Builds a Paragraph stylesheet with a text gradient and the given states.
 	 *
 	 * @param array $state_styles State styles to merge into the block styles.
 	 * @return string Generated stylesheet.
@@ -1683,7 +1682,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
 
-		// The breakpoint's own clip wins over the Default state's box value.
 		$this->assertStringContainsString(
 			'@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link:hover){color: #00ff00;-webkit-text-fill-color: currentColor;}}',
 			$stylesheet
@@ -1714,8 +1712,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
 
-		// The breakpoint already escaped the clip, so the hover color is
-		// painted and needs no fill of its own.
+		// The breakpoint already escaped the clip, so no fill is needed.
 		$this->assertStringContainsString(
 			'@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link:hover){color: #00ff00;}}',
 			$stylesheet

@@ -574,8 +574,7 @@ const getFeatureDeclarations = (
  * Adds the declarations a state needs to escape a text clip set below it.
  *
  * Mirror of `getStateTextClipEscapeCSS` and `getStateTextFillResetCSS` in
- * packages/block-editor/src/hooks/style.jsx, which do this for a block's own
- * state styles.
+ * packages/block-editor/src/hooks/style.jsx.
  *
  * @param declarations Declarations generated for the state.
  * @param stateStyles  State style object.
@@ -596,7 +595,6 @@ function getStateDeclarationsWithTextClipEscapes(
 	}
 
 	const stateClip = stateStyles?.background?.backgroundClip;
-	// A background the state paints itself is what the user asked for.
 	const paintsItsOwnBackground =
 		!! stateStyles?.background?.gradient ||
 		!! stateStyles?.background?.backgroundImage ||
@@ -608,7 +606,6 @@ function getStateDeclarationsWithTextClipEscapes(
 			: [ ...declarations, 'background-image: unset' ];
 	}
 
-	// A state that sets its own clip already gets the right fill above.
 	if (
 		! stateClip &&
 		! paintsItsOwnBackground &&

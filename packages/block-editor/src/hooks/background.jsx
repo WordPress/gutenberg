@@ -129,8 +129,7 @@ export function getBackgroundImageClasses( style ) {
 	const hasBackground =
 		hasBackgroundImageValue( style ) || hasBackgroundGradientValue( style );
 
-	// A background clipped to the text paints the glyphs, not the block's box,
-	// so there is no block background to announce. Mirror of the check in
+	// A text clip paints the glyphs, not the block. Mirror of
 	// `gutenberg_render_background_support()`.
 	if ( ! hasBackground || 'text' === style?.background?.backgroundClip ) {
 		return '';
@@ -143,8 +142,8 @@ export function getBackgroundImageClasses( style ) {
 // background color, and the gradient. The Background panel owns the gradient
 // control for both the newer `background.gradient` support and the legacy
 // `color.gradient` path, so "Reset all" clears the legacy value too,
-// regardless of which path stored it. `panelResetAllFilter` lets the panel
-// keep the parts of `style.background` it doesn't own, like a text gradient.
+// regardless of which path stored it. `panelResetAllFilter` keeps what the
+// panel does not own, like a text gradient.
 export function backgroundResetAllFilter( attributes, panelResetAllFilter ) {
 	const updatedClassName = attributes.className?.includes( 'has-background' )
 		? attributes.className
@@ -411,8 +410,6 @@ export function BackgroundImagePanel( {
 					? getStyleForState( style, selectedState )
 					: styleValue
 			}
-			// The selected state layers over the block's Default state, so
-			// the panel needs that value to know what still applies here.
 			baseValue={ isStateSelected ? styleValue : undefined }
 			contrastWarning={ contrastWarning }
 			inheritedValue={ inheritedValue }

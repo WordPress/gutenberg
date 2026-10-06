@@ -966,8 +966,7 @@ class WP_Theme_JSON_Gutenberg {
 			return $pseudo_declarations;
 		}
 
-		// A pseudo state layers over this node, then over whatever the node
-		// itself sits on: a variation sits on its block.
+		// Nearest first: this node, then its variation's block.
 		$base_styles = array( $node );
 		foreach ( array( $style_variation['path'] ?? null, $block_metadata['path'] ?? null ) as $path ) {
 			$layer = $path ? _wp_array_get( $this->theme_json, $path ) : null;
@@ -3948,12 +3947,9 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Returns the style objects a state node layers over, nearest first, or an
-	 * empty array when the path is not a state node's.
+	 * Returns the style objects a state node layers over, nearest first.
 	 *
-	 * The path carries one key per state, such as the `@mobile` in
-	 * `styles.blocks.core/paragraph.@mobile.elements.link`. Dropping them from the
-	 * innermost outward gives the layers below it.
+	 * Drops the path's state keys (e.g. `@mobile`) from the innermost outward.
 	 *
 	 * @since 7.2.0
 	 *
@@ -3989,8 +3985,7 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Adds the declarations a state needs to escape a text clip set below it.
 	 *
-	 * Mirror of `gutenberg_get_state_declarations_with_text_clip_escapes()` in
-	 * lib/block-supports/states.php, which does this for a block's own styles.
+	 * Mirror of `gutenberg_get_state_declarations_with_text_clip_escapes()`.
 	 *
 	 * @since 7.2.0
 	 *
@@ -4018,7 +4013,6 @@ class WP_Theme_JSON_Gutenberg {
 
 		$state_clip = $state_style['background']['backgroundClip'] ?? null;
 
-		// A background the state paints itself is what the user asked for.
 		$paints_its_own_background =
 			! empty( $state_style['background']['gradient'] ) ||
 			! empty( $state_style['background']['backgroundImage'] ) ||
@@ -4035,7 +4029,6 @@ class WP_Theme_JSON_Gutenberg {
 			return $declarations;
 		}
 
-		// A state that sets its own clip already gets the right fill above.
 		if ( ! $state_clip && ! $paints_its_own_background && ! empty( $state_style['color']['text'] ) ) {
 			$declarations[] = array(
 				'name'  => '-webkit-text-fill-color',
@@ -4163,7 +4156,6 @@ class WP_Theme_JSON_Gutenberg {
 
 					// Process base properties for this breakpoint.
 					$breakpoint_declarations = static::compute_style_properties( $breakpoint_node, $settings, null, $this->theme_json );
-					// A variation breakpoint layers over the variation, then the block.
 					$breakpoint_declarations = static::get_state_declarations_with_text_clip_escapes(
 						$breakpoint_declarations,
 						$breakpoint_node,

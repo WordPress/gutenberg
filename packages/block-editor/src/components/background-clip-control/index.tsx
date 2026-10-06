@@ -27,7 +27,6 @@ export default function BackgroundClipControl( {
 			: BACKGROUND_CLIP_OPTIONS
 	).map( ( option ) => ( {
 		...option,
-		// The preview swatch for each value is drawn from this modifier.
 		className: `block-editor-background-clip-control__option is-${ option.key }`,
 	} ) );
 
@@ -35,9 +34,7 @@ export default function BackgroundClipControl( {
 		return null;
 	}
 
-	// Nothing set is its own state. The first allowed value is not necessarily
-	// `border-box`, so standing it in would report a clip the block is not
-	// using.
+	// Unset is its own option, not the first allowed value.
 	const defaultOption = {
 		key: 'default',
 		name: __( 'Default' ),
