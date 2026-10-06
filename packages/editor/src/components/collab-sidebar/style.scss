@@ -545,6 +545,16 @@ mark.wp-note {
 	font-size: 24px;
 }
 
+// Forced colors repaint text in a system color, which turns color emoji into
+// flat monochrome glyphs and drops skin tones. Opt the glyphs out, but not
+// the buttons around them, so their borders still follow the system colors.
+.editor-collab-sidebar-panel__picker-emoji-label,
+.editor-collab-sidebar-panel__skin-tone-toggle-emoji,
+.editor-collab-sidebar-panel__skin-tone-swatch,
+.editor-collab-sidebar-panel__reaction-button-emoji {
+	forced-color-adjust: none;
+}
+
 // Mention chips, both in the note input and the rendered note content. A
 // mention is a non-interactive `span` carrying the mentioned user's ID in a
 // `user-N` class, styled as a chip.

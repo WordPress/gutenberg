@@ -93,7 +93,12 @@ export default function SkinTonePicker( {
 						/>
 					}
 				>
-					{ current.emoji }
+					<span
+						className="editor-collab-sidebar-panel__skin-tone-toggle-emoji"
+						aria-hidden="true"
+					>
+						{ current.emoji }
+					</span>
 				</Menu.Trigger>
 				<Tooltip.Popup>{ triggerLabel }</Tooltip.Popup>
 			</Tooltip.Root>
