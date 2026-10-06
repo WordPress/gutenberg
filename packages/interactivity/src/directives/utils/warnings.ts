@@ -17,6 +17,22 @@ export const warnSuffixNotSupported = (
 	}
 };
 
+// Warns that an event name contains `--`, which is most likely a leftover of
+// the removed two-hyphen unique ID syntax.
+export const warnEventNameWithTwoHyphens = (
+	prefix: string,
+	eventName: string
+) => {
+	if ( globalThis.SCRIPT_DEBUG ) {
+		const [ event, ...rest ] = eventName.split( '--' );
+		warn(
+			`The data-wp-${ prefix }--${ eventName } directive listens for an event named "${ eventName }". Two-hyphen unique IDs are no longer supported. If you meant to add a unique ID, please use data-wp-${ prefix }--${ event }---${ rest.join(
+				'--'
+			) } instead.`
+		);
+	}
+};
+
 // Warns that unique IDs are not supported for a given directive.
 export const warnUniqueIdNotSupported = (
 	prefix: string,

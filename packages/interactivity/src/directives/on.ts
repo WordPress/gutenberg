@@ -5,7 +5,10 @@ import {
 	type DirectiveCallback,
 	type DirectiveEntry,
 } from '../hooks';
-import { warnWithSyncEvent } from './utils/warnings';
+import {
+	warnEventNameWithTwoHyphens,
+	warnWithSyncEvent,
+} from './utils/warnings';
 
 /**
  * Wraps event object to warn about access of synchronous properties and methods.
@@ -74,6 +77,14 @@ const getGlobalEventDirective = (
 			.filter( isNonDefaultDirectiveSuffix )
 			.forEach( ( entry ) => {
 				const eventName = entry.suffix;
+				if ( globalThis.SCRIPT_DEBUG ) {
+					if ( eventName.includes( '--' ) ) {
+						warnEventNameWithTwoHyphens(
+							`on-${ type }`,
+							eventName
+						);
+					}
+				}
 				useInit( () => {
 					const cb = ( event: Event ) => {
 						const result = evaluate( entry );
@@ -95,6 +106,11 @@ const getGlobalEventDirective = (
 /**
  * Creates a directive that adds an async event listener to the global window or
  * document object.
+ *
+ * Unlike the synchronous directives, the deprecated async directives still cut
+ * the event name at `--`, so the legacy two-hyphen unique ID syntax keeps
+ * working until they are removed.
+ *
  * @param type 'window' or 'document'
  */
 const getGlobalAsyncEventDirective = (
@@ -126,13 +142,16 @@ const getGlobalAsyncEventDirective = (
 	};
 };
 
-/**
- * Registers element event handlers using the full directive suffix as the event name.
- */
+// data-wp-on--[event]---[unique-id]
 directive( 'on', ( { directives: { on }, element, evaluate } ) => {
 	const events = new Map< string, Set< DirectiveEntry > >();
 	on.filter( isNonDefaultDirectiveSuffix ).forEach( ( entry ) => {
 		const eventType = entry.suffix;
+		if ( globalThis.SCRIPT_DEBUG ) {
+			if ( eventType.includes( '--' ) ) {
+				warnEventNameWithTwoHyphens( 'on', eventType );
+			}
+		}
 		if ( ! events.has( eventType ) ) {
 			events.set( eventType, new Set< DirectiveEntry >() );
 		}
@@ -180,7 +199,8 @@ directive( 'on', ( { directives: { on }, element, evaluate } ) => {
 	} );
 } );
 
-// data-wp-on-async--[event] (deprecated)
+// data-wp-on-async--[event] (deprecated). The event name is still cut at `--`
+// to keep the legacy two-hyphen unique ID syntax working until removal.
 directive(
 	'on-async',
 	( { directives: { 'on-async': onAsync }, element, evaluate } ) => {
