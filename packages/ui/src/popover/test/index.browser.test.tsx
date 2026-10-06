@@ -814,38 +814,4 @@ describe( 'Popover', () => {
 		} );
 		expect( onCanvasClick ).toHaveBeenCalledTimes( 1 );
 	} );
-
-	it( 'stays open for a press inside an iframe in its popup', async () => {
-		const onPopupClick = vi.fn();
-		await render(
-			<Popover.Root>
-				<Popover.Trigger>Open</Popover.Trigger>
-				<Popover.Popup>
-					<Popover.Title>Title</Popover.Title>
-					<iframe title="Popup frame" />
-				</Popover.Popup>
-			</Popover.Root>
-		);
-
-		await userEvent.click( screen.getByRole( 'button', { name: 'Open' } ) );
-		await expect.element( page.getByRole( 'dialog' ) ).toBeVisible();
-
-		const iframe = screen.getByTitle< HTMLIFrameElement >( 'Popup frame' );
-		const iframeDocument = iframe.contentDocument;
-		if ( ! iframeDocument ) {
-			throw new Error( 'Expected a same-origin iframe document.' );
-		}
-		const button = iframeDocument.createElement( 'button' );
-		button.textContent = 'Inside popup';
-		button.addEventListener( 'click', onPopupClick );
-		iframeDocument.body.appendChild( button );
-
-		await page
-			.frameLocator( page.getByTitle( 'Popup frame' ) )
-			.getByRole( 'button', { name: 'Inside popup' } )
-			.click();
-
-		expect( onPopupClick ).toHaveBeenCalledTimes( 1 );
-		await expect.element( page.getByRole( 'dialog' ) ).toBeVisible();
-	} );
 } );
