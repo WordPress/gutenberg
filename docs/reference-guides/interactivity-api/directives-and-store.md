@@ -415,6 +415,17 @@ The `wp-on` directive is executed each time the associated event is triggered.
 
 The callback passed as the reference receives [the event](https://developer.mozilla.org/en-US/docs/Web/API/Event) (`event`), and the returned value by this callback is ignored.
 
+You can attach several callbacks to the same event of a DOM element by using the syntax `data-wp-on--[event]---[unique-id]` (note the three hyphens before the unique ID). Everything between `data-wp-on--` and the three hyphens is used as the event name, so `data-wp-on--click--counter` listens for an event named `click--counter`, not for `click`.
+
+```html
+<button
+	data-wp-on--click="actions.logTime"
+	data-wp-on--click---counter="actions.countClick"
+>
+	Click Me!
+</button>
+```
+
 ### `wp-on-window`
 
 <div class="callout callout-info">
@@ -448,6 +459,8 @@ store( 'myPlugin', {
 
 The callback passed as the reference receives [the event](https://developer.mozilla.org/en-US/docs/Web/API/Event) (`event`), and the returned value by this callback is ignored. When the element is removed from the DOM, the event listener is also removed.
 
+You can attach several callbacks to the same window event by using the syntax `data-wp-on-window--[window-event]---[unique-id]` (note the three hyphens before the unique ID), like `data-wp-on-window--resize---log-width`.
+
 ### `wp-on-document`
 
 <div class="callout callout-info">
@@ -480,6 +493,8 @@ store( 'myPlugin', {
 </details>
 
 The callback passed as the reference receives [the event](https://developer.mozilla.org/en-US/docs/Web/API/Event) (`event`), and the returned value by this callback is ignored. When the element is removed from the DOM, the event listener is also removed.
+
+You can attach several callbacks to the same document event by using the syntax `data-wp-on-document--[document-event]---[unique-id]` (note the three hyphens before the unique ID), like `data-wp-on-document--keydown---log-key`.
 
 ### `wp-watch`
 
@@ -769,6 +784,8 @@ And then, the string value `"state.isPlaying"` is used to assign the result of t
 	<iframe ...></iframe>
 </div>
 ```
+
+The `!` operator negates the referenced value. It only works with values, such as state, context, or derived state defined with a getter. If the reference points to a function, such as an action or a callback, the function is not called and the directive receives `undefined` instead (with a warning when `SCRIPT_DEBUG` is enabled). To negate the result of a computation, define it as derived state with a getter and negate that.
 
 These values assigned to directives are **references** to a particular property in the store. They are wired to the directives automatically so that each directive “knows” what store element refers to, without any additional configuration.
 
