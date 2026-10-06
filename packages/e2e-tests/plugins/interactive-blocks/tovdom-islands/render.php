@@ -35,8 +35,10 @@
 				<span
 					data-testid="inside an inner block of an isolated island"
 				>
-					This should be hidden because it is inside a data-wp-ignore
-					element of an island.
+					This should be hidden because directives inside a
+					`data-wp-ignore` element of an island are hydrated, so
+					the `data-wp-show-mock="state.falseValue"` directive
+					wrapping it runs.
 				</span>
 			</div>
 		</div>
