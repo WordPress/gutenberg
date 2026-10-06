@@ -46,9 +46,8 @@ const EMPTY_STYLE = {};
  * @param {Object} [viewportSettings] Viewport breakpoint settings. When
  *                                    omitted (e.g. from `addSaveProps`, which
  *                                    runs outside any block context),
- *                                    default responsive aliases are used and
- *                                    entries are returned without a
- *                                    `mediaQuery`.
+ *                                    the default responsive breakpoints and
+ *                                    their media queries are used.
  * @return {Object[]} Entries with `css`, `pseudoState` (string|undefined),
  *                     and `mediaQuery` (string|undefined) keys.
  */
@@ -67,11 +66,9 @@ function getCustomCSSStateEntries( style, blockName, viewportSettings ) {
 		addEntry( style?.[ pseudoState ], pseudoState )
 	);
 
-	const breakpoints = viewportSettings
-		? Object.entries( getResponsiveMediaQueries( viewportSettings ) )
-		: Object.keys( getResponsiveMediaQueries() ).map( ( breakpoint ) => [
-				breakpoint,
-			] );
+	const breakpoints = Object.entries(
+		getResponsiveMediaQueries( viewportSettings )
+	);
 
 	breakpoints.forEach( ( [ breakpoint, mediaQuery ] ) => {
 		const breakpointStyle = style?.[ breakpoint ];
