@@ -2,11 +2,9 @@
 
 ## Unreleased
 
-### Breaking Changes
-
--   The `design-tokens.js` export now provides `tokens` (keyed by variable name, with `$description`, `$type`, `group`, and `modes.default` containing `$value` and `css`) and `groups` (keyed by source group) named exports, replacing the previous flat array default export ([#76604](https://github.com/WordPress/gutenberg/pull/76604)).
-
 ### New Features
+
+-   Add `tokens` and `groups` named exports to `design-tokens.js`, exposing descriptions, types, groups, and default DTCG and CSS values for every semantic token while retaining the default token-name list ([#76604](https://github.com/WordPress/gutenberg/pull/76604)).
 
 -   Add `--wpds-color-background-thumb-neutral` for neutral progress indicators. ([#83781](https://github.com/WordPress/gutenberg/pull/83781))
 
