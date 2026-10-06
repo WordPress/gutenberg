@@ -454,6 +454,21 @@ describe( 'getStateStylesCSS under a text clip', () => {
 		expect( css ).not.toContain( 'currentColor' );
 	} );
 
+	it( 'leaves the fill alone when the state paints its own gradient', () => {
+		const css = getStateStylesCSS(
+			{
+				color: { text: '#ff0000' },
+				background: { gradient: 'linear-gradient(red,blue)' },
+			},
+			'.wp-block-test',
+			textClipBase
+		);
+
+		// The inherited clip fills the text with this state's gradient, so
+		// `currentColor` would paint over it.
+		expect( css ).not.toContain( 'currentColor' );
+	} );
+
 	it( 'says nothing without a clip to escape', () => {
 		expect(
 			getStateStylesCSS(

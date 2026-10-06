@@ -17,6 +17,12 @@
 	background-clip: border-box;
 }
 
+// Nothing is set, so there is no box to draw. The swatch keeps its space so
+// the label stays in line with the others.
+.block-editor-background-clip-control__option.is-default::before {
+	visibility: hidden;
+}
+
 .block-editor-background-clip-control__option.is-padding-box::before {
 	background-clip: padding-box;
 }
