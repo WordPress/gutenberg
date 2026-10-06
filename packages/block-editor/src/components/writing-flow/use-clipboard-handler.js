@@ -234,13 +234,23 @@ export default function useClipboardHandler() {
 					return;
 				}
 
+				const [ firstSelectedClientId ] = selectedBlockClientIds;
+				const rootClientId = getBlockRootClientId(
+					firstSelectedClientId
+				);
+
 				// Pasting over an entirely selected block replaces it, the
-				// equivalent of pasting into an empty block.
+				// equivalent of pasting into an empty block. Blocks that
+				// cannot be inserted in its place, like a list in a list, are
+				// converted below instead.
 				if (
 					! hasMultiSelection() &&
 					isBlockEntirelySelected(
 						event.target.ownerDocument,
-						selectedBlockClientIds[ 0 ]
+						firstSelectedClientId
+					) &&
+					blocks.every( ( block ) =>
+						canInsertBlockType( block.name, rootClientId )
 					)
 				) {
 					replaceBlocks(
@@ -266,11 +276,6 @@ export default function useClipboardHandler() {
 				) {
 					return;
 				}
-
-				const [ firstSelectedClientId ] = selectedBlockClientIds;
-				const rootClientId = getBlockRootClientId(
-					firstSelectedClientId
-				);
 
 				const newBlocks = [];
 
