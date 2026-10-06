@@ -12,12 +12,13 @@
  *
  * @since 7.1.0
  *
- * @param array  $style      The block's `style` attribute.
- * @param string $block_name Block name.
+ * @param array  $style                    The block's `style` attribute.
+ * @param string $block_name               Block name.
+ * @param array  $responsive_media_queries Media queries keyed by viewport state name (e.g. `@mobile`).
  * @return array[] List of entries, each with `css`, `pseudo` (string|null),
  *                 and `media_query` (string|null) keys.
  */
-function gutenberg_get_custom_css_state_entries( $style, $block_name ) {
+function gutenberg_get_custom_css_state_entries( $style, $block_name, $responsive_media_queries ) {
 	$entries = array();
 	if ( empty( $style ) || ! is_array( $style ) ) {
 		return $entries;
@@ -34,15 +35,6 @@ function gutenberg_get_custom_css_state_entries( $style, $block_name ) {
 	};
 
 	$supported_pseudo_states = WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ?? array();
-
-	static $responsive_media_queries = null;
-	if ( null === $responsive_media_queries ) {
-		// Viewport settings are request-wide, not per-block; compute once and
-		// reuse across every block instance rendered in the request.
-		$responsive_media_queries = WP_Theme_JSON_Gutenberg::get_viewport_media_queries(
-			gutenberg_get_global_settings( array( 'viewport' ) )
-		);
-	}
 
 	$add_entry( $style['css'] ?? null, null, null );
 
@@ -136,7 +128,10 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 		return $parsed_block;
 	}
 
-	$state_entries = gutenberg_get_custom_css_state_entries( $style, $parsed_block['blockName'] );
+	$viewport_settings        = gutenberg_get_global_settings( array( 'viewport' ) );
+	$responsive_media_queries = WP_Theme_JSON_Gutenberg::get_viewport_media_queries( $viewport_settings );
+
+	$state_entries = gutenberg_get_custom_css_state_entries( $style, $parsed_block['blockName'], $responsive_media_queries );
 	if ( empty( $state_entries ) ) {
 		return $parsed_block;
 	}
