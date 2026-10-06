@@ -10,7 +10,7 @@ export default function LinkedButton( { isLinked, ...props } ) {
 			{ ...props }
 			size="small"
 			icon={ isLinked ? link : linkOff }
-			iconSize={ 24 }
+			iconSize={ 20 }
 			label={ label }
 		/>
 	);

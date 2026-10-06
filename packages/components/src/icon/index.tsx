@@ -46,9 +46,7 @@ export type Props = {
 	/**
 	 * The size (width and height) of the icon.
 	 *
-	 * Defaults to `20` when `icon` is a string (i.e. a Dashicon id), otherwise `24`.
-	 *
-	 * @default `'string' === typeof icon ? 20 : 24`.
+	 * @default 20
 	 */
 	size?: number;
 } & AdditionalProps< IconType >;
@@ -62,11 +60,7 @@ export type Props = {
  * <Icon icon={ wordpress } />
  * ```
  */
-function Icon( {
-	icon = null,
-	size = 'string' === typeof icon ? 20 : 24,
-	...additionalProps
-}: Props ) {
+function Icon( { icon = null, size = 20, ...additionalProps }: Props ) {
 	if ( 'string' === typeof icon ) {
 		return (
 			<Dashicon

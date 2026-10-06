@@ -14,7 +14,7 @@ export default function LinkedButton( {
 			className="component-box-control__linked-button"
 			size="small"
 			icon={ isLinked ? link : linkOff }
-			iconSize={ 24 }
+			iconSize={ 20 }
 			label={ label }
 		/>
 	);

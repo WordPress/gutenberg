@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `$icon-size` is now `20px` (previously `24px`) ([#84105](https://github.com/WordPress/gutenberg/pull/84105)).
+
 ## 13.3.0 (2026-10-07)
 
 ### Enhancements

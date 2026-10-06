@@ -67,7 +67,7 @@ const SubmenuTrigger = forwardRef< HTMLDivElement, SubmenuTriggerProps >(
 							<Icon
 								className={ styles[ 'submenu-chevron' ] }
 								icon={ chevronRightSmall }
-								size={ 24 }
+								size={ 20 }
 								aria-hidden="true"
 							/>
 						}

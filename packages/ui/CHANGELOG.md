@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `Icon` now renders at 20px by default (previously 24px) ([#84105](https://github.com/WordPress/gutenberg/pull/84105)).
+
 ### Bug Fixes
 
 -   `Menu`, `Popover`: Keep popups open when the user interacts with an iframe inside the popup. ([#83870](https://github.com/WordPress/gutenberg/pull/83870))

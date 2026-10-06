@@ -194,7 +194,7 @@ function renderShadowToggle( shadow, onShadowChange, resetConfig ) {
 						<Icon
 							className="block-editor-global-styles__toggle-icon"
 							icon={ shadowIcon }
-							size={ 24 }
+							size={ 20 }
 						/>
 						<FlexItem>{ __( 'Drop shadow' ) }</FlexItem>
 					</HStack>

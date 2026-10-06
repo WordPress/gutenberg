@@ -2,7 +2,7 @@
 
 // For vertical flex containers, a 100% width ensures correct alignment.
 .is-vertical .block-list-appender {
-	width: $icon-size;
+	width: $button-size-small;
 	margin-right: auto;
 	margin-top: $grid-unit-15;
 	margin-left: $grid-unit-15;

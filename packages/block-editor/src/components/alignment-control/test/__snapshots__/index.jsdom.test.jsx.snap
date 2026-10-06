@@ -19,12 +19,12 @@ exports[`AlignmentUI > should allow custom alignment controls to be specified 1`
         <svg
           aria-hidden="true"
           focusable="false"
-          height="24"
+          height="20"
           stroke="currentColor"
           stroke-width="1.5"
           style="fill: none;"
           viewBox="0 0 24 24"
-          width="24"
+          width="20"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
@@ -45,12 +45,12 @@ exports[`AlignmentUI > should allow custom alignment controls to be specified 1`
         <svg
           aria-hidden="true"
           focusable="false"
-          height="24"
+          height="20"
           stroke="currentColor"
           stroke-width="1.5"
           style="fill: none;"
           viewBox="0 0 24 24"
-          width="24"
+          width="20"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
@@ -80,12 +80,12 @@ exports[`AlignmentUI > should match snapshot when controls are hidden 1`] = `
       <svg
         aria-hidden="true"
         focusable="false"
-        height="24"
+        height="20"
         stroke="currentColor"
         stroke-width="1.5"
         style="fill: none;"
         viewBox="0 0 24 24"
-        width="24"
+        width="20"
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
@@ -116,12 +116,12 @@ exports[`AlignmentUI > should match snapshot when controls are visible 1`] = `
         <svg
           aria-hidden="true"
           focusable="false"
-          height="24"
+          height="20"
           stroke="currentColor"
           stroke-width="1.5"
           style="fill: none;"
           viewBox="0 0 24 24"
-          width="24"
+          width="20"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
@@ -142,12 +142,12 @@ exports[`AlignmentUI > should match snapshot when controls are visible 1`] = `
         <svg
           aria-hidden="true"
           focusable="false"
-          height="24"
+          height="20"
           stroke="currentColor"
           stroke-width="1.5"
           style="fill: none;"
           viewBox="0 0 24 24"
-          width="24"
+          width="20"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
@@ -168,12 +168,12 @@ exports[`AlignmentUI > should match snapshot when controls are visible 1`] = `
         <svg
           aria-hidden="true"
           focusable="false"
-          height="24"
+          height="20"
           stroke="currentColor"
           stroke-width="1.5"
           style="fill: none;"
           viewBox="0 0 24 24"
-          width="24"
+          width="20"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path

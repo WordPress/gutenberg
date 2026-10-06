@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `Icon` now renders at 20px by default (previously 24px) ([#84105](https://github.com/WordPress/gutenberg/pull/84105)).
+
 ### Enhancements
 
 -   Scale icon artwork by up to 1.25× so icons better fill their 24×24 canvas. `*-small` variants and the WordPress mark are unchanged.

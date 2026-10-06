@@ -64,7 +64,7 @@ export function CollaboratorsList( {
 						<Button
 							__next40pxDefaultSize
 							icon={ closeSmall }
-							iconSize={ 24 }
+							iconSize={ 20 }
 							label={ __( 'Close Collaborators List' ) }
 							onClick={ () => setIsPopoverVisible( false ) }
 						/>
