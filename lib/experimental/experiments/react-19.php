@@ -79,22 +79,8 @@ function gutenberg_has_react_19_incompatible_extension() {
 		}
 	}
 
-	/*
-	 * Scripts are registered on the front end too, where `is_plugin_active()`
-	 * and `get_plugin_data()` are not loaded, so read the option and the plugin
-	 * header directly.
-	 */
-	$active_plugins = (array) get_option( 'active_plugins', array() );
-
-	if ( is_multisite() ) {
-		$network_plugins = (array) get_site_option( 'active_sitewide_plugins', array() );
-		$active_plugins  = array_merge( $active_plugins, array_keys( $network_plugins ) );
-	}
-
-	$plugins = gutenberg_get_react_19_incompatible_plugins();
-
-	foreach ( $active_plugins as $plugin_file ) {
-		if ( ! is_string( $plugin_file ) || ! array_key_exists( $plugin_file, $plugins ) ) {
+	foreach ( gutenberg_get_react_19_incompatible_plugins() as $plugin_file => $fixed_in ) {
+		if ( ! is_plugin_active( $plugin_file ) ) {
 			continue;
 		}
 
@@ -106,9 +92,9 @@ function gutenberg_has_react_19_incompatible_extension() {
 			continue;
 		}
 
-		$data = get_file_data( $path, array( 'Version' => 'Version' ) );
+		$data = get_plugin_data( $path, false, false );
 
-		if ( gutenberg_is_react_19_incompatible_version( (string) $data['Version'], $plugins[ $plugin_file ] ) ) {
+		if ( gutenberg_is_react_19_incompatible_version( (string) $data['Version'], $fixed_in ) ) {
 			return true;
 		}
 	}
