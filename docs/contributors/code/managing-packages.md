@@ -16,7 +16,7 @@ The repository also contains internal workspaces under `tools/` and `test/` for 
 
 Install scripts are opt-in: every dependency that ships one is recorded in `allowScripts` in the root `package.json`, and `strict-allow-scripts` fails the install with `ESTRICTALLOWSCRIPTS` on anything missing from that list. Every entry is `false`, so nothing compiles on install. `test/ai-development` installs with `--prefix`, so it carries its own copy of the policy.
 
-`allowScripts` covers dependencies only. Once it is set, workspace lifecycle scripts are skipped under `install-strategy=linked` with no error ([npm/cli#9982](https://github.com/npm/cli/issues/9982)), so a workspace that must run on install is invoked from the root `postinstall` instead, as `@wordpress/icons` is.
+`allowScripts` covers dependencies only, so workspace lifecycle scripts such as the `@wordpress/icons` `prepare` still run. npm v12 skips them under `install-strategy=linked` with no error ([npm/cli#9982](https://github.com/npm/cli/issues/9982)), so moving to npm v12 means invoking them from the root `postinstall` instead.
 
 When an install fails that way, read the script, then edit `allowScripts` by hand and commit the `package.json` change. Use the package name on its own to cover every version, or `name@version` to pin an approval to the version you reviewed:
 
