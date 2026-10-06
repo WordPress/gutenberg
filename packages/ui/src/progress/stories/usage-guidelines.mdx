@@ -34,6 +34,8 @@ Pass `value={ null }` when the amount of completed work is unknown. Indeterminat
 
 `Progress.Root` has a default width of 160px, and `Progress.Track` fills that width. Override the width on Root with `className` or `style` when the layout needs a different size. For example, use `style={ { width: '100%' } }` to fill the container.
 
+Prefer the default width. A wider bar can suit some layouts, but avoid making it so narrow that progress is hard to read. Use a spinner when you need a more compact loading indicator.
+
 ## Migrate from ProgressBar
 
 Replace `ProgressBar` from `@wordpress/components` with `Progress.Root`, `Progress.Track`, and `Progress.Indicator` from `@wordpress/ui`. Root requires a `value`. For indeterminate progress, pass `value={ null }` explicitly; ProgressBar allowed its value to be omitted.

@@ -23,7 +23,6 @@ export default function CanvasLoader( { id } ) {
 		<div className="edit-site-canvas-loader">
 			<Progress.Root
 				id={ id }
-				className="edit-site-canvas-loader__progress"
 				aria-label={ __( 'Loading editor' ) }
 				max={ total }
 				value={ elapsed }
