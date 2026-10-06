@@ -221,10 +221,11 @@ interface MediaEditorFrameContextValue {
 	 */
 	canRestoreOriginal: boolean;
 	/**
-	 * When `true`, the original has already been loaded into the cropper this
-	 * session, so the menu item is disabled.
+	 * When `true`, another attachment has replaced the edited one in the
+	 * cropper this session (today, only the original), so the menu item is
+	 * disabled.
 	 */
-	isSourceRestored: boolean;
+	isSourceReplaced: boolean;
 	/** Load the lineage root into the cropper as a dirty preview. */
 	onRestoreOriginal: () => void;
 }
@@ -268,7 +269,7 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 		activePanel,
 		onTogglePanel,
 		canRestoreOriginal,
-		isSourceRestored,
+		isSourceReplaced,
 		onRestoreOriginal,
 	} = useMediaEditorFrameContext();
 	const isPanelOpen = !! activePanel;
@@ -309,7 +310,7 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 										icon={ backup }
 										iconPosition="left"
 										disabled={
-											isSourceRestored || isSaving
+											isSourceReplaced || isSaving
 										}
 										info={ __(
 											'Discards unsaved changes and loads the original image.'
@@ -569,11 +570,12 @@ function MediaEditorContent( {
 	const [ isPlacementActive, setIsPlacementActive ] = useState( false );
 	const [ isCanvasGestureActive, setIsCanvasGestureActive ] =
 		useState( false );
-	// Whether the user has loaded the lineage root into the cropper this
-	// session. Stays a distinct flag (not derived from the cropper) so a bare
-	// restore counts as a change even though swapping the source resets the
+	// Whether another attachment has replaced `id` in the cropper this
+	// session (today, the original via "Restore original image"). Stays a
+	// distinct flag (not derived from the cropper) so a bare replacement
+	// counts as a change even though swapping the source resets the
 	// cropper's own dirty baseline.
-	const [ isSourceRestored, setIsSourceRestored ] = useState( false );
+	const [ isSourceReplaced, setIsSourceReplaced ] = useState( false );
 	const placementControlTimerRef =
 		useRef< ReturnType< typeof setTimeout > >();
 
@@ -601,7 +603,7 @@ function MediaEditorContent( {
 	useEffect( () => {
 		setIsPlacementActive( false );
 		setIsCanvasGestureActive( false );
-		setIsSourceRestored( false );
+		setIsSourceReplaced( false );
 	}, [ id ] );
 
 	// Restore-original: the edit root the edited attachment descends from,
@@ -640,8 +642,8 @@ function MediaEditorContent( {
 				}
 			: undefined;
 	const canRestoreOriginal = !! originalSource;
-	const restoredSource =
-		isSourceRestored && originalSource
+	const replacementSource =
+		isSourceReplaced && originalSource
 			? {
 					id: originalSource.id,
 					url: originalSource.url,
@@ -650,7 +652,7 @@ function MediaEditorContent( {
 			: undefined;
 	// Details and pending edits follow the attachment shown on the canvas.
 	// Keep `sourceMedia` separate for the snackbar's previous attachment.
-	const activeId = restoredSource?.id ?? id;
+	const activeId = replacementSource?.id ?? id;
 	const { media, hasEdits } = useSelect(
 		( select ) => {
 			const {
@@ -693,11 +695,11 @@ function MediaEditorContent( {
 		// Restoring discards every pending edit, as the menu item says, so
 		// nothing staged against the attachment being replaced reaches a save.
 		clearEntityRecordEdits( 'postType', 'attachment', id );
-		setIsSourceRestored( true );
+		setIsSourceReplaced( true );
 	}, [ clearEntityRecordEdits, id ] );
 
-	// A bare restore has no cropper diff, so OR the flag in explicitly.
-	const hasChanges = session.hasOutputEdits || hasEdits || isSourceRestored;
+	// A bare replacement has no cropper diff, so OR the flag in explicitly.
+	const hasChanges = session.hasOutputEdits || hasEdits || isSourceReplaced;
 
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type ).type;
 	const isImage = !! media && mediaType === 'image';
@@ -739,7 +741,7 @@ function MediaEditorContent( {
 		isImage,
 		media: sourceMedia,
 		onSaved,
-		restoredSource,
+		replacementSource,
 	} );
 
 	const handleChange = ( updates: Partial< Media > ) => {
@@ -757,7 +759,7 @@ function MediaEditorContent( {
 	const discardAndClose = () => {
 		removeAllNotices( 'snackbar', MEDIA_EDITOR_NOTICES_CONTEXT );
 		clearEntityRecordEdits( 'postType', 'attachment', activeId );
-		setIsSourceRestored( false );
+		setIsSourceReplaced( false );
 		onClose?.();
 	};
 
@@ -985,7 +987,7 @@ function MediaEditorContent( {
 		onSave: saveMediaEditor,
 		onReset: resetCropOptions,
 		canRestoreOriginal,
-		isSourceRestored,
+		isSourceReplaced,
 		onRestoreOriginal: handleRestoreOriginal,
 	};
 

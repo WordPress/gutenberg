@@ -43,13 +43,13 @@ interface UseSaveMediaEditorArgs {
 	media?: Media | null;
 	onSaved?: ( result: MediaEditorSaveResult ) => void;
 	/**
-	 * When the user has restored the lineage root, the save targets that
-	 * original attachment instead of the currently-edited one:
-	 * - with no fresh crop, the block is repointed at the original and any
+	 * When another attachment has replaced the edited one (today, the original
+	 * via "Restore original image"), the save targets the replacement:
+	 * - with no fresh crop, the block is repointed at the replacement and any
 	 *   changed details are saved there (no `/edit`);
-	 * - with a fresh crop, `/edit` runs against the original's id and url.
+	 * - with a fresh crop, `/edit` runs against the replacement's id and url.
 	 */
-	restoredSource?: {
+	replacementSource?: {
 		id: number;
 		url?: string;
 		media: Media;
@@ -98,7 +98,7 @@ export function useSaveMediaEditor( {
 	isImage,
 	media,
 	onSaved,
-	restoredSource,
+	replacementSource,
 }: UseSaveMediaEditorArgs ): UseSaveMediaEditorReturn {
 	const registry = useRegistry();
 	const {
@@ -116,16 +116,16 @@ export function useSaveMediaEditor( {
 			let saved: Media | null | undefined;
 			const modifiers = getCropModifiers( session );
 
-			// A restore retargets the save at the lineage root; without one the
-			// current attachment is both source and target as before.
-			const targetId = restoredSource?.id ?? id;
-			const targetUrl = restoredSource?.url ?? media?.source_url;
-			const targetMedia = restoredSource?.media ?? media;
+			// A replacement retargets the save; without one the current
+			// attachment is both source and target as before.
+			const targetId = replacementSource?.id ?? id;
+			const targetUrl = replacementSource?.url ?? media?.source_url;
+			const targetMedia = replacementSource?.media ?? media;
 
-			// Both a fresh crop and a bare restore swap the block's image, so
-			// both offer an Undo back to the current attachment.
+			// Both a fresh crop and a bare replacement swap the block's image,
+			// so both offer an Undo back to the current attachment.
 			const previous =
-				( modifiers.length > 0 || restoredSource ) && media
+				( modifiers.length > 0 || replacementSource ) && media
 					? {
 							id,
 							url: media.source_url,
@@ -165,7 +165,7 @@ export function useSaveMediaEditor( {
 					);
 				}
 			} else if (
-				restoredSource &&
+				replacementSource &&
 				! registry
 					.select( coreStore )
 					.hasEditsForEntityRecord(
@@ -174,9 +174,9 @@ export function useSaveMediaEditor( {
 						targetId
 					)
 			) {
-				// A bare restore only repoints the block. The original already
-				// exists and has no changes to persist.
-				saved = restoredSource.media;
+				// A bare replacement only repoints the block. The replacement
+				// already exists and has no changes to persist.
+				saved = replacementSource.media;
 			} else {
 				saved = ( await saveEditedEntityRecord(
 					'postType',
@@ -239,7 +239,7 @@ export function useSaveMediaEditor( {
 		receiveEntityRecords,
 		registry,
 		removeAllNotices,
-		restoredSource,
+		replacementSource,
 		saveEditedEntityRecord,
 		session,
 	] );
