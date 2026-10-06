@@ -1688,6 +1688,31 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Unregistering with an entity kind or name that is not a non-empty
+	 * string is refused with a notice rather than a fatal error, and the
+	 * registry is left untouched.
+	 */
+	public function test_unregistering_with_an_invalid_entity_is_refused() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::unregister' );
+		$results = array();
+		$this->on_fields_api_init(
+			static function ( $registry ) use ( &$results ) {
+				$results['no name']    = $registry->unregister( 'postType', array( 'author' ) );
+				$results['empty kind'] = $registry->unregister( '', 'page', array( 'author' ) );
+			}
+		);
+
+		$this->assertSame(
+			array(
+				'no name'    => array(),
+				'empty kind' => array(),
+			),
+			$results
+		);
+		$this->assertContains( 'author', array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' ), 'The default field is kept.' );
+	}
+
+	/**
 	 * Registering only runs on the action: elsewhere it is refused and the
 	 * registry is left untouched. Before the action a registration would
 	 * keep the defaults from being registered; after it the fields have been read and
