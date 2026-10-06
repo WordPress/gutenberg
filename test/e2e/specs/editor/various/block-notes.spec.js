@@ -1514,7 +1514,15 @@ test.describe( 'Block Notes', () => {
 			const trigger = page.locator(
 				'.editor-collab-sidebar-panel__add-reaction'
 			);
-			const note = page.locator( '.editor-collab-sidebar-panel__note' );
+			// The reply composer shares the note class, so match only notes
+			// that carry a reaction trigger.
+			const note = page
+				.locator( '.editor-collab-sidebar-panel__note' )
+				.filter( {
+					has: page.locator(
+						'.editor-collab-sidebar-panel__add-reaction'
+					),
+				} );
 
 			// The trigger floats in the note's top corner rather than
 			// claiming a row: the note is no taller for carrying it.
@@ -1586,7 +1594,13 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'button', { name: 'Reply', exact: true } )
 				.click();
 
-			const notes = page.locator( '.editor-collab-sidebar-panel__note' );
+			const notes = page
+				.locator( '.editor-collab-sidebar-panel__note' )
+				.filter( {
+					has: page.locator(
+						'.editor-collab-sidebar-panel__add-reaction'
+					),
+				} );
 			await expect( notes ).toHaveCount( 2 );
 			const triggers = page.locator(
 				'.editor-collab-sidebar-panel__add-reaction'
