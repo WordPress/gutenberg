@@ -1603,6 +1603,59 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A definition that is not an array with a non-empty string `id` is
+	 * reported by its position and skipped, like a duplicated field: the
+	 * rest of the fields of the call are registered, or updated.
+	 */
+	public function test_an_invalid_definition_is_skipped() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::register' );
+		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::update' );
+		$reported   = &$this->record_notices( 'Gutenberg_Fields_Registry::register' );
+		$registered = null;
+		$updated    = null;
+		$this->on_fields_api_init(
+			function ( $registry ) use ( &$registered, &$updated ) {
+				$registered = $registry->register(
+					'test-plugin',
+					'postType',
+					'page',
+					array(
+						$this->field( 'color' ),
+						'size',
+						array( 'label' => 'No id' ),
+						array(
+							'id'    => 7,
+							'label' => 'Numeric id',
+						),
+						$this->field( 'weight' ),
+					)
+				);
+				$updated    = $registry->update(
+					'test-plugin',
+					'postType',
+					'page',
+					array(
+						array( 'label' => 'No id' ),
+						array(
+							'id'    => 'color',
+							'label' => 'Colour',
+						),
+					)
+				);
+			}
+		);
+
+		$this->assertSame( array( 'color', 'weight' ), $registered, 'The valid definitions are registered.' );
+		$this->assertSame( array( 'color' ), $updated, 'The valid definitions are updated.' );
+		$fields = array_column( gutenberg_get_registered_fields( 'postType', 'page' ), null, 'id' );
+		$this->assertSame( 'Colour', $fields['color']['label'] );
+		$this->assertArrayHasKey( 'weight', $fields );
+		$this->assertCount( 1, $reported );
+		$this->assertStringContainsString( 'postType "page"', $reported[0], 'The notice names the entity.' );
+		$this->assertStringContainsString( 'skipped: #2, #3, #4', $reported[0], 'The notice names the positions of the invalid definitions.' );
+	}
+
+	/**
 	 * An origin that is not a non-empty string is refused.
 	 */
 	public function test_registering_with_an_invalid_origin_is_refused() {
