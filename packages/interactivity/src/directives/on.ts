@@ -5,10 +5,7 @@ import {
 	type DirectiveCallback,
 	type DirectiveEntry,
 } from '../hooks';
-import {
-	warnUniqueIdWithTwoHyphens,
-	warnWithSyncEvent,
-} from './utils/warnings';
+import { warnWithSyncEvent } from './utils/warnings';
 
 /**
  * Wraps event object to warn about access of synchronous properties and methods.
@@ -64,9 +61,10 @@ function wrapEventAsync( event: Event ) {
 
 /**
  * Creates a directive that adds an event listener to the global window or
- * document object.
+ * document object using the full directive suffix as its event name.
  *
  * @param type 'window' or 'document'
+ * @return Directive callback that manages the global event listener.
  */
 const getGlobalEventDirective = (
 	type: 'window' | 'document'
@@ -75,17 +73,7 @@ const getGlobalEventDirective = (
 		directives[ `on-${ type }` ]
 			.filter( isNonDefaultDirectiveSuffix )
 			.forEach( ( entry ) => {
-				const suffixParts = entry.suffix.split( '--', 2 );
-				const eventName = suffixParts[ 0 ];
-				if ( globalThis.SCRIPT_DEBUG ) {
-					if ( suffixParts[ 1 ] ) {
-						warnUniqueIdWithTwoHyphens(
-							`on-${ type }`,
-							suffixParts[ 0 ],
-							suffixParts[ 1 ]
-						);
-					}
-				}
+				const eventName = entry.suffix;
 				useInit( () => {
 					const cb = ( event: Event ) => {
 						const result = evaluate( entry );
@@ -138,24 +126,17 @@ const getGlobalAsyncEventDirective = (
 	};
 };
 
-// data-wp-on--[event]---[unique-id]
+/**
+ * Registers element event handlers using the full directive suffix as the event name.
+ */
 directive( 'on', ( { directives: { on }, element, evaluate } ) => {
 	const events = new Map< string, Set< DirectiveEntry > >();
 	on.filter( isNonDefaultDirectiveSuffix ).forEach( ( entry ) => {
-		const suffixParts = entry.suffix.split( '--', 2 );
-		if ( globalThis.SCRIPT_DEBUG ) {
-			if ( suffixParts[ 1 ] ) {
-				warnUniqueIdWithTwoHyphens(
-					'on',
-					suffixParts[ 0 ],
-					suffixParts[ 1 ]
-				);
-			}
+		const eventType = entry.suffix;
+		if ( ! events.has( eventType ) ) {
+			events.set( eventType, new Set< DirectiveEntry >() );
 		}
-		if ( ! events.has( suffixParts[ 0 ] ) ) {
-			events.set( suffixParts[ 0 ], new Set< DirectiveEntry >() );
-		}
-		events.get( suffixParts[ 0 ] )!.add( entry );
+		events.get( eventType )!.add( entry );
 	} );
 
 	events.forEach( ( entries, eventType ) => {
