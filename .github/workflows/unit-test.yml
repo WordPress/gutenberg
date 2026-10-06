@@ -17,6 +17,10 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
     cancel-in-progress: true
 
+# Pins the MariaDB version used by `wp-env`, through Docker Compose variable substitution.
+env:
+  WP_ENV_MARIADB_VERSION: '10.5'
+
 jobs:
   unit-js:
     name: JavaScript
