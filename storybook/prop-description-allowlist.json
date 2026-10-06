@@ -113,8 +113,6 @@
 	"SelectControl>SelectControl.Item",
 	"Slot>Fill",
 	"Slot>SlotFillProvider",
-	"ToggleControl:className",
-	"ToggleControl:help",
 	"ToggleGroupControl>ToggleGroupControlOption:value",
 	"ToggleGroupControl>ToggleGroupControlOptionIcon:value",
 	"Tooltip.Root>Tooltip.Popup",

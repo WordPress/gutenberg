@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   `use-recommended-components`: Recommend `Switch` and `SwitchControl` from `@wordpress/ui`, and flag `FormToggle` and `ToggleControl` from `@wordpress/components` ([#84097](https://github.com/WordPress/gutenberg/pull/84097)).
 -   `test-unit`: Allow generated titles passed through variables with `vitest/valid-title`'s `allowArguments` option ([#83995](https://github.com/WordPress/gutenberg/pull/83995)).
 -   `use-recommended-components`: Recognize the new `@wordpress/ui` Meter as use-with-caution. ([#83855](https://github.com/WordPress/gutenberg/pull/83855))
 -   `use-recommended-components`: Recommend `Checkbox`, `CheckboxControl`, and `CheckboxGroup` from `@wordpress/ui`, and flag `CheckboxControl` from `@wordpress/components` ([#83771](https://github.com/WordPress/gutenberg/pull/83771)).

@@ -742,11 +742,6 @@
       - onChange
       - onClick
       - render
-- name: FormToggle
-  props:
-      - checked
-      - disabled
-      - onChange
 - name: FormTokenField
   props:
       - __experimentalAutoSelectFirstMatch
@@ -1798,6 +1793,46 @@
       - render
       - style
       - wrap
+- name: Switch
+  props:
+      - checked
+      - className
+      - defaultChecked
+      - disabled
+      - form
+      - id
+      - inputRef
+      - name
+      - nativeButton
+      - onCheckedChange
+      - readOnly
+      - render
+      - required
+      - style
+      - uncheckedValue
+      - value
+- name: SwitchControl
+  props:
+      - checked
+      - className
+      - defaultChecked
+      - description
+      - details
+      - disabled
+      - form
+      - hideLabelFromVision
+      - id
+      - inputRef
+      - label
+      - name
+      - nativeButton
+      - onCheckedChange
+      - readOnly
+      - render
+      - required
+      - style
+      - uncheckedValue
+      - value
 - name: Tabs.Root
   props:
       - children
@@ -1870,15 +1905,6 @@
   props:
       - highlight
       - text
-- name: ToggleControl
-  props:
-      - __nextHasNoMarginBottom
-      - checked
-      - className
-      - disabled
-      - help
-      - label
-      - onChange
 - name: ToggleGroupControl
   props:
       - __next40pxDefaultSize
