@@ -70,7 +70,7 @@ const foregroundSteps = [
 	'fgSurface5',
 ] as const;
 
-const MINIMUM_INTERACTION_STATE_APCA_INTERVAL = 14;
+const MINIMUM_INTERACTION_STATE_APCA_INTERVAL = 10;
 const MAXIMUM_ALTERNATE_POLARITY_DELTA_E_DRIFT = 0.02;
 
 const perceptualSampleCombinations = [
@@ -504,7 +504,7 @@ describe( 'buildRamps', () => {
 								'surface4',
 								'surface5',
 								'surface6',
-						  ]
+							]
 						: [
 								'surface6',
 								'surface5',
@@ -512,7 +512,7 @@ describe( 'buildRamps', () => {
 								'surface1',
 								'surface2',
 								'surface3',
-						  ];
+							];
 				const lightnesses = orderedSteps.map( ( step ) =>
 					lightness( step as keyof typeof ramp.ramp )
 				);

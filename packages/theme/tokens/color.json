@@ -139,8 +139,8 @@
 				"fgSurface4": {
 					"$value": {
 						"colorSpace": "srgb",
-						"components": [ 0.133, 0.18, 0.855 ],
-						"hex": "#222eda"
+						"components": [ 0.114, 0.153, 0.749 ],
+						"hex": "#1d27bf"
 					}
 				},
 				"fgSurface5": {
@@ -281,8 +281,8 @@
 				"fgSurface4": {
 					"$value": {
 						"colorSpace": "srgb",
-						"components": [ 0, 0.314, 0.573 ],
-						"hex": "#005092"
+						"components": [ 0, 0.271, 0.502 ],
+						"hex": "#004580"
 					}
 				},
 				"fgSurface5": {
@@ -423,8 +423,8 @@
 				"fgSurface4": {
 					"$value": {
 						"colorSpace": "srgb",
-						"components": [ 0.129, 0.357, 0.184 ],
-						"hex": "#215b2f"
+						"components": [ 0.106, 0.31, 0.161 ],
+						"hex": "#1b4f29"
 					}
 				},
 				"fgSurface5": {
@@ -565,8 +565,8 @@
 				"fgSurface4": {
 					"$value": {
 						"colorSpace": "srgb",
-						"components": [ 0.396, 0.298, 0.098 ],
-						"hex": "#654c19"
+						"components": [ 0.349, 0.259, 0.082 ],
+						"hex": "#594215"
 					}
 				},
 				"fgSurface5": {
@@ -707,8 +707,8 @@
 				"fgSurface4": {
 					"$value": {
 						"colorSpace": "srgb",
-						"components": [ 0.596, 0.059, 0.059 ],
-						"hex": "#980f0f"
+						"components": [ 0.522, 0.047, 0.047 ],
+						"hex": "#850c0c"
 					}
 				},
 				"fgSurface5": {
@@ -849,8 +849,8 @@
 				"fgSurface4": {
 					"$value": {
 						"colorSpace": "srgb",
-						"components": [ 0.314, 0.314, 0.314 ],
-						"hex": "#505050"
+						"components": [ 0.275, 0.275, 0.275 ],
+						"hex": "#464646"
 					}
 				},
 				"fgSurface5": {
@@ -991,8 +991,8 @@
 				"fgSurface4": {
 					"$value": {
 						"colorSpace": "srgb",
-						"components": [ 0.361, 0.31, 0.086 ],
-						"hex": "#5c4f16"
+						"components": [ 0.318, 0.271, 0.075 ],
+						"hex": "#514513"
 					}
 				},
 				"fgSurface5": {
@@ -1210,6 +1210,10 @@
 				"neutral": {
 					"$value": "{wpds-color.primitive.bg.fgSurface4}",
 					"$description": "Foreground color for content like text with normal emphasis."
+				},
+				"neutral-strong": {
+					"$value": "{wpds-color.primitive.bg.fgSurface5}",
+					"$description": "Foreground color for content like headings with strong emphasis."
 				},
 				"neutral-weak": {
 					"$value": "{wpds-color.primitive.bg.fgSurface3}",

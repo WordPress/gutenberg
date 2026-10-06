@@ -28,8 +28,9 @@
 		color: var(--wpds-color-foreground-interactive-neutral-disabled);
 	}
 
-	&:not(:disabled, [aria-disabled="true"]):is(:hover, :focus-visible) {
+	&:not(:disabled, [aria-disabled="true"]):is(:hover, :active, :focus-visible) {
 		color: var(--wpds-color-foreground-interactive-neutral-active);
+		background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 	}
 
 	&:focus:not(:disabled) {

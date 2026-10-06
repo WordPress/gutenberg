@@ -57,7 +57,8 @@ const CONFIG = [
 		rtl: [ componentsRtl, editSiteRtl ],
 	},
 	{
-		componentIdMatcher: /^components-/,
+		componentIdMatcher:
+			/^(components-|design-system-theme-foreground-emphasis$)/,
 		ltr: [ componentsLtr ],
 		rtl: [ componentsRtl ],
 	},
