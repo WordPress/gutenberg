@@ -1003,7 +1003,6 @@ describe( 'decision failures leave the block tree untouched', () => {
 describe( 'createSuggestion (notes sidebar switch)', () => {
 	const PARAGRAPH = 'core/test-sidebar-paragraph';
 	const ALL_NOTES_SIDEBAR = 'edit-post/collab-history-sidebar';
-	const FLOATING_NOTES_SIDEBAR = 'edit-post/collab-sidebar';
 
 	beforeAll( () => {
 		registerBlockType( PARAGRAPH, {
@@ -1133,7 +1132,7 @@ describe( 'createSuggestion (notes sidebar switch)', () => {
 
 	it( 'leaves an already-open notes sidebar in place', async () => {
 		const { registry, block, getProvider } = setup( {
-			activeArea: FLOATING_NOTES_SIDEBAR,
+			activeArea: ALL_NOTES_SIDEBAR,
 		} );
 
 		await createAttributeSuggestion( getProvider, block );
@@ -1142,7 +1141,7 @@ describe( 'createSuggestion (notes sidebar switch)', () => {
 			registry
 				.select( 'core/interface' )
 				.getActiveComplementaryArea( 'core' )
-		).toBe( FLOATING_NOTES_SIDEBAR );
+		).toBe( ALL_NOTES_SIDEBAR );
 	} );
 } );
 
