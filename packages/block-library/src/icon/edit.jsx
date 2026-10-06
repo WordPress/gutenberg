@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	DropdownMenu,
 	TextControl,
@@ -59,28 +59,37 @@ export function Edit( { attributes, setAttributes, isSelected, context } ) {
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
 
 	const isContentOnlyMode = useBlockEditingMode() === 'contentOnly';
-	const isIconBindingReadOnly = useSelect(
-		( select ) => {
-			if ( ! isSelected ) {
-				return false;
-			}
+	const { isIconBindingReadOnly = false, iconBindingReadOnlyMessage } =
+		useSelect(
+			( select ) => {
+				if ( ! isSelected ) {
+					return {};
+				}
 
-			const iconBinding = metadata?.bindings?.icon;
-			const blockBindingsSource = getBlockBindingsSource(
-				iconBinding?.source
-			);
+				const iconBinding = metadata?.bindings?.icon;
+				const blockBindingsSource = getBlockBindingsSource(
+					iconBinding?.source
+				);
 
-			return (
-				!! iconBinding &&
-				! blockBindingsSource?.canUserEditValue?.( {
-					select,
-					context,
-					args: iconBinding.args,
-				} )
-			);
-		},
-		[ context, isSelected, metadata?.bindings?.icon ]
-	);
+				return {
+					isIconBindingReadOnly:
+						!! iconBinding &&
+						! blockBindingsSource?.canUserEditValue?.( {
+							select,
+							context,
+							args: iconBinding.args,
+						} ),
+					iconBindingReadOnlyMessage: blockBindingsSource?.label
+						? sprintf(
+								/* translators: %s: Label of the bindings source. */
+								__( 'Connected to %s' ),
+								blockBindingsSource.label
+							)
+						: __( 'Connected to dynamic data' ),
+				};
+			},
+			[ context, isSelected, metadata?.bindings?.icon ]
+		);
 
 	const colorProps = useColorProps( attributes );
 	// Only padding is applied to the inner SVG element, matching the front
@@ -111,6 +120,7 @@ export function Edit( { attributes, setAttributes, isSelected, context } ) {
 	};
 
 	const rotationStyle = rotation ? { rotate: `${ rotation }deg` } : {};
+	const iconToolbarButtonLabel = icon ? __( 'Replace' ) : __( 'Choose icon' );
 
 	const blockControls = (
 		<>
@@ -150,11 +160,22 @@ export function Edit( { attributes, setAttributes, isSelected, context } ) {
 			<BlockControls group="other">
 				<ToolbarButton
 					disabled={ isIconBindingReadOnly }
+					label={
+						isIconBindingReadOnly
+							? iconBindingReadOnlyMessage
+							: undefined
+					}
+					showTooltip={ isIconBindingReadOnly }
+					aria-label={
+						isIconBindingReadOnly
+							? iconToolbarButtonLabel
+							: undefined
+					}
 					onClick={ () => {
 						setInserterOpen( true );
 					} }
 				>
-					{ icon ? __( 'Replace' ) : __( 'Choose icon' ) }
+					{ iconToolbarButtonLabel }
 				</ToolbarButton>
 				{ isContentOnlyMode && icon && (
 					// Add some extra controls for content attributes when content only mode is active.
