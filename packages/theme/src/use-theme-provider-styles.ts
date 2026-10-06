@@ -3,7 +3,6 @@ import { useMemo, useContext } from '@wordpress/element';
 import { ThemeContext } from './context.ts';
 import { DEFAULT_SEED_COLORS } from './color-ramps/index.ts';
 import { generateColorTokens } from './generate-color-tokens.ts';
-import type { ThemeProviderColorWarning } from './theme-provider-color-warnings.ts';
 import type { ThemeProviderProps } from './types.ts';
 
 export function useThemeProviderStyles( {
@@ -60,10 +59,7 @@ export function useThemeProviderStyles( {
 
 	// The provider applies both groups: its subtree contains design system
 	// components and older styles that still read the compatibility properties.
-	const generatedColors = useMemo< {
-		styles: CSSProperties;
-		warnings: ThemeProviderColorWarning[] | undefined;
-	} >( () => {
+	const generatedColors = useMemo( () => {
 		if ( primary === undefined || background === undefined ) {
 			return {
 				styles: {},
