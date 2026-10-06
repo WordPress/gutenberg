@@ -89,7 +89,7 @@ This command applies `wpds.resolver.json` to generate six complete DTCG files un
 | Border radius | `radius/none.json`, `radius/subtle.json`, `radius/moderate.json`, `radius/pronounced.json` | `subtle`     | `wpds-border/radius/{xs,sm,md,lg,xl}`   |
 | Border width  | `width/standard.json`, `width/high-dpi.json`                                               | `standard`   | `wpds-border/width/{xs,sm,md,lg,focus}` |
 
-Each file includes every token in its collection, including unchanged values, descriptions, types, and Figma scopes. The original hierarchy preserves variable names. Token aliases remain references instead of becoming literal values. The current border tokens contain no aliases. Aliases within a collection have automated coverage and were verified in Figma for both collection creation and mode updates.
+Each file includes every token in its collection, including unchanged values, descriptions, types, and Figma scopes. The original hierarchy preserves variable names. Token aliases remain references instead of becoming literal values. The current border tokens contain no aliases. Aliases within a collection were verified in Figma for both collection creation and mode updates.
 
 These generated files are committed under `prebuilt/figma` and included in the npm package. Do not edit them as sources. `wpds.resolver.json`, its base sources, and the tracked files in `modes/` remain canonical inputs for both CSS and Figma generation.
 
