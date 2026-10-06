@@ -56,7 +56,7 @@ export const RadioItem = forwardRef<
 				// Override some ariakit inline styles
 				style={ { width: 'auto', height: 'auto' } }
 			>
-				<Icon icon={ radioCheck } size={ 24 } />
+				<Icon icon={ radioCheck } size={ 20 } />
 			</Ariakit.MenuItemCheck>
 
 			<div className={ styles[ 'item-content-wrapper' ] }>

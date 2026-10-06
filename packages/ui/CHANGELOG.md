@@ -11,6 +11,7 @@
 -   The `actionsRef` types for these components now require `close()`. Add it to manually constructed action objects and ref stubs. See [Base UI #5734](https://github.com/mui/base-ui/pull/5734) ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
 -   `Autocomplete`, `Combobox`, and the searchable selects and controls: `onItemHighlighted` now receives native events. Accept `MouseEvent | PointerEvent` for pointer highlights, handle `none` when typing or clearing and `pointer` when hovering after keyboard navigation, and avoid canceling or stopping the event unless intended. See [Base UI #5838](https://github.com/mui/base-ui/pull/5838) ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+-   `Icon` now renders at 20px by default (previously 24px) ([#84105](https://github.com/WordPress/gutenberg/pull/84105)).
 
 ### New Features
 

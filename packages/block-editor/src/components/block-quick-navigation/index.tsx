@@ -147,7 +147,7 @@ function BlockQuickNavigationItem( {
 				</FlexBlock>
 				{ canNavigateToListView && (
 					<FlexItem>
-						<Icon icon={ chevronRight } size={ 24 } />
+						<Icon icon={ chevronRight } size={ 20 } />
 					</FlexItem>
 				) }
 			</Flex>

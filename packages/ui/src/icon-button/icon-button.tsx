@@ -64,7 +64,7 @@ export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
 					}
 					className={ classes }
 				>
-					<Icon icon={ icon } size={ 24 } className={ styles.icon } />
+					<Icon icon={ icon } size={ 20 } className={ styles.icon } />
 					{ shortcut && descriptionId && (
 						<KeyboardShortcutDescription
 							descriptionId={ descriptionId }
