@@ -2,9 +2,8 @@ import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import { Notice } from '@wordpress/ui';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import BackgroundClipControl, {
-	ALL_BACKGROUND_CLIP_VALUES,
-} from '../background-clip-control';
+import { VALID_BACKGROUND_CLIP_VALUES } from '@wordpress/style-engine';
+import BackgroundClipControl from '../background-clip-control';
 import BackgroundImageControl from '../background-image-control';
 import ColorGradientDropdownItem from './color-gradient-dropdown-item';
 import { useHasBackgroundColorPanel } from './color-panel';
@@ -167,7 +166,6 @@ export default function BackgroundImagePanel( {
 	// state is selected. That state layers over it, so a clip set there still
 	// governs what this one can paint.
 	baseValue,
-	// The selected style state, so a viewport can be told from a pseudo state.
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
@@ -218,12 +216,12 @@ export default function BackgroundImagePanel( {
 	const clipSetting = settings?.background?.backgroundClip;
 	let allowedClipValues = [];
 	if ( true === clipSetting ) {
-		allowedClipValues = ALL_BACKGROUND_CLIP_VALUES;
+		allowedClipValues = VALID_BACKGROUND_CLIP_VALUES;
 	} else if ( Array.isArray( clipSetting ) ) {
 		// A value the control has no option for would leave a labelled but
 		// empty row, so only the ones it knows count.
 		allowedClipValues = clipSetting.filter( ( clipValue ) =>
-			ALL_BACKGROUND_CLIP_VALUES.includes( clipValue )
+			VALID_BACKGROUND_CLIP_VALUES.includes( clipValue )
 		);
 	}
 	// The Typography panel's gradient control already expresses the text
@@ -241,10 +239,6 @@ export default function BackgroundImagePanel( {
 	// panel owns. This panel only treats it as its own when the clip control
 	// has been opted into.
 	const isTextGradient = localClip === 'text';
-	// `background-clip` clips every background layer at once, including the
-	// color, so a block paints its own background or a text gradient, never
-	// both. While it clips to the text the Typography panel owns that value
-	// and holds it in an editable control, so this panel shows neither.
 	// The block's own clip outranks an inherited one, whichever state it was
 	// set in, so the Default state's value sits between the two.
 	const clipsToText = ( localClip ?? baseClip ?? inheritedClip ) === 'text';
@@ -390,8 +384,6 @@ export default function BackgroundImagePanel( {
 	// Fall back to color.gradient for legacy blocks that haven't migrated
 	// to background.gradient yet (mirrors block inspector fallback in
 	// packages/block-editor/src/hooks/background.jsx).
-	// A text gradient is left out so it does not appear to be this panel's
-	// gradient.
 	const currentGradient = isTextGradient
 		? undefined
 		: decodeValue( value?.background?.gradient ?? value?.color?.gradient );

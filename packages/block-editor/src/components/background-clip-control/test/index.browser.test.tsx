@@ -2,7 +2,8 @@ import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
-import BackgroundClipControl, { ALL_BACKGROUND_CLIP_VALUES } from '..';
+import { VALID_BACKGROUND_CLIP_VALUES } from '@wordpress/style-engine';
+import BackgroundClipControl from '..';
 
 /**
  * Opens the control and returns the labels it offers.
@@ -26,7 +27,7 @@ describe( 'BackgroundClipControl', () => {
 		await render(
 			<BackgroundClipControl
 				onChange={ vi.fn() }
-				allowedValues={ ALL_BACKGROUND_CLIP_VALUES }
+				allowedValues={ VALID_BACKGROUND_CLIP_VALUES }
 			/>
 		);
 
@@ -59,7 +60,7 @@ describe( 'BackgroundClipControl', () => {
 		await render(
 			<BackgroundClipControl
 				onChange={ onChange }
-				allowedValues={ ALL_BACKGROUND_CLIP_VALUES }
+				allowedValues={ VALID_BACKGROUND_CLIP_VALUES }
 			/>
 		);
 
@@ -90,7 +91,7 @@ describe( 'BackgroundClipControl', () => {
 			<BackgroundClipControl
 				value="text"
 				onChange={ onChange }
-				allowedValues={ ALL_BACKGROUND_CLIP_VALUES }
+				allowedValues={ VALID_BACKGROUND_CLIP_VALUES }
 			/>
 		);
 
@@ -107,7 +108,7 @@ describe( 'BackgroundClipControl', () => {
 			<BackgroundClipControl
 				value="text"
 				onChange={ vi.fn() }
-				allowedValues={ ALL_BACKGROUND_CLIP_VALUES }
+				allowedValues={ VALID_BACKGROUND_CLIP_VALUES }
 			/>
 		);
 
