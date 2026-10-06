@@ -20,6 +20,8 @@
 -   Notes: Keep floating threads aligned with their blocks when an editor notice or the device preview moves the canvas ([#83485](https://github.com/WordPress/gutenberg/pull/83485)).
 -   Notes: Add an Undo action to the "Note deleted." snackbar, and stop the editor's undo from bringing back the highlight of a deleted note ([#83988](https://github.com/WordPress/gutenberg/pull/83988)).
 -   Notes: Stop the editor's undo from detaching a newly added note from its block, or bringing back the highlight of a resolved note ([#84079](https://github.com/WordPress/gutenberg/pull/84079)).
+-   Notes: Delete notes permanently when they can't be moved to the trash, instead of failing with an error ([#84102](https://github.com/WordPress/gutenberg/pull/84102)).
+-   Notes: Disable the note form field while a note or reply is being sent, instead of accepting text the save would not include ([#84083](https://github.com/WordPress/gutenberg/pull/84083)).
 
 ### Internal
 

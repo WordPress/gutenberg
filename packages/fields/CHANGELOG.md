@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `MediaEdit`: Use design system's outine focus ring instead of previous box-shadow based implementation. ([#83854](https://github.com/WordPress/gutenberg/pull/83854))
+
 ### Bug Fixes
 
 -   `trashPost`, `permanentlyDeletePost`: Offer "Permanently delete" instead of "Trash" for posts without the `wp:action-trash` REST link. Requires WordPress 7.2 or the Gutenberg plugin ([#84045](https://github.com/WordPress/gutenberg/pull/84045)).
