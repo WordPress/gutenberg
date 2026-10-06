@@ -12,7 +12,7 @@ export type IconProps = React.ComponentProps< 'svg' > & {
 	icon: React.ReactElement< React.ComponentProps< 'svg' > >;
 	/**
 	 * The size (width and height) of the icon.
-	 * @default 24
+	 * @default 20
 	 */
 	size?: number;
 };

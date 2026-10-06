@@ -8,7 +8,7 @@ const BASE_ICON_SIZE = 24;
 
 export default function BoxControlIcon( {
 	as = 'span',
-	size = 24,
+	size = 20,
 	side = 'all',
 	sides,
 	className,

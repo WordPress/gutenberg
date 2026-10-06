@@ -19,7 +19,7 @@ const BorderBoxControlLinkedButton = (
 			{ ...buttonProps }
 			size="small"
 			icon={ isLinked ? link : linkOff }
-			iconSize={ 24 }
+			iconSize={ 20 }
 			label={ label }
 			ref={ forwardedRef }
 			className={ className }

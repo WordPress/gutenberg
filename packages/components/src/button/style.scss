@@ -303,7 +303,7 @@
 	}
 
 	&.has-icon {
-		padding: 6px; // Works for 24px icons. Smaller icons are vertically centered by flex alignments.
+		padding: 6px; // Works for 20px icons. Smaller icons are vertically centered by flex alignments.
 
 		// Icon buttons are square.
 		min-width: $button-size;

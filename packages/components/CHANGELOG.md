@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   `Icon` now renders at 20px by default for all icon types, including SVG icons (previously 24px except Dashicons) ([#84105](https://github.com/WordPress/gutenberg/pull/84105)).
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
     -   `Navigator` ([#84565](https://github.com/WordPress/gutenberg/pull/84565))
     -   `UnitControl` ([#84561](https://github.com/WordPress/gutenberg/pull/84561))

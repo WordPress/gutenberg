@@ -38,7 +38,7 @@ export const CheckboxItem = forwardRef<
 				// Override some ariakit inline styles
 				style={ { width: 'auto', height: 'auto' } }
 			>
-				<Icon icon={ check } size={ 24 } />
+				<Icon icon={ check } size={ 20 } />
 			</Ariakit.MenuItemCheck>
 
 			<Styled.ItemContentWrapper>

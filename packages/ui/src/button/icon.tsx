@@ -11,7 +11,7 @@ export const ButtonIcon = forwardRef< SVGSVGElement, ButtonIconProps >(
 				ref={ ref }
 				icon={ icon }
 				className={ clsx( styles.icon, className ) }
-				size={ 24 }
+				size={ 20 }
 				{ ...props }
 			/>
 		);
