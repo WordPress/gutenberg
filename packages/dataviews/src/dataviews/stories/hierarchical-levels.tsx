@@ -3,7 +3,7 @@ import DataViews from '../index';
 import { LAYOUT_TABLE } from '../../constants';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { View } from '../../types';
-import { data as allData, fields } from './fixtures';
+import { actions, data as allData, fields } from './fixtures';
 
 const HierarchicalLevelsComponent = ( {
 	showLevels = true,
@@ -55,6 +55,7 @@ const HierarchicalLevelsComponent = ( {
 			getItemHasChildren={ ( item ) => parentIds.has( item.id ) }
 			expandedItemIds={ expandedItemIds }
 			onChangeExpandedItemIds={ setExpandedItemIds }
+			actions={ actions }
 			data={ data }
 			paginationInfo={ paginationInfo }
 			view={ view }
