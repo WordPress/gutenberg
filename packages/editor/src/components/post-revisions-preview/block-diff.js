@@ -821,7 +821,18 @@ function applyDiffRecursively( parsedBlock, rawBlock ) {
 			if ( previousParsed ) {
 				// Keep clean image versions before adding inline caption diffs.
 				// Non-visual changes still use the text/attribute comparison.
-				const visualAttributes = [ 'url' ];
+				const visualAttributes = [
+					'url',
+					'width',
+					'height',
+					'aspectRatio',
+					'scale',
+					'focalPoint',
+					'sizeSlug',
+					'align',
+					'style',
+					'className',
+				];
 				if (
 					parsedBlock.name === 'core/image' &&
 					typeof parsedBlock.attributes.url === 'string' &&
