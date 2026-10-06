@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `--wpds-color-background-thumb-neutral` for neutral progress indicators. ([#83781](https://github.com/WordPress/gutenberg/pull/83781))
+
 ### Bug Fixes
 
 -   Avoid intercepting esbuild virtual modules, preserve root custom-property priorities on cleanup, and reject non-finite RGB seed channels while treating missing (`none`) RGB channels as zero. ([#83355](https://github.com/WordPress/gutenberg/pull/83355))
@@ -11,6 +15,7 @@
 
 ### Internal
 
+-   Update the Vite development dependency to 8.3.2 ([#83992](https://github.com/WordPress/gutenberg/pull/83992)).
 -   Update the Vite development dependency to 8.3.1. ([#83569](https://github.com/WordPress/gutenberg/pull/83569))
 -   Restore color-scale Storybook accessibility checks with labeled color samples, readable seed labels, and keyboard scrolling ([#83358](https://github.com/WordPress/gutenberg/pull/83358)).
 

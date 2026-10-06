@@ -50,7 +50,7 @@
 		"@wordpress/npm-package-json-lint-config": "file:../npm-package-json-lint-config",
 		"stylelint": "^17.14.1",
 		"stylelint-scss": "^7.2.0",
-		"vitest": "^5.0.0"
+		"vitest": "^5.0.3"
 	},
 	"peerDependencies": {
 		"stylelint": "^17.14.1",

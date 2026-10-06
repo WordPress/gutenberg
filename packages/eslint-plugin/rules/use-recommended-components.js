@@ -40,6 +40,9 @@ const ALLOWLIST = {
 			'KeyboardShortcutDisplay',
 			'Link',
 			'Notice',
+			'Radio',
+			'RadioGroup',
+			'RadioGroupControl',
 			'RangeCalendar',
 			'SearchableChipSelect',
 			'SearchableChipSelectControl',
@@ -57,7 +60,6 @@ const ALLOWLIST = {
 			'ValidatedTextareaControl',
 			'ValidityIndicator',
 			'VisuallyHidden',
-			'inertValue',
 			'useKeyboardShortcutProps',
 		],
 		caution: [
@@ -70,9 +72,9 @@ const ALLOWLIST = {
 			'Drawer',
 			'IconButton',
 			'Menu',
+			'Meter',
 			'Popover',
-			'Radio',
-			'RadioGroup',
+			'Progress',
 			'SearchableSelect',
 			'SearchableSelectControl',
 			'Switch',
@@ -133,6 +135,8 @@ const DENYLIST = {
 		__experimentalInputControl:
 			'Use `InputControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		Notice: 'Use `Notice` from `@wordpress/ui` instead.',
+		RadioControl:
+			'Use `RadioGroupControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		ResponsiveWrapper: 'Use the CSS `aspect-ratio` property instead.',
 		TabPanel: 'Use `Tabs` from `@wordpress/ui` instead.',
 		TabbableContainer: '{{ name }} is planned for deprecation.',
