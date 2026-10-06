@@ -43,7 +43,7 @@
 		data-watch=""
 	>
 		<div
-			data-wp-run--mounted="callbacks.updateIsMounted"
+			data-wp-run---mounted="callbacks.updateIsMounted"
 			data-wp-run---hooks="callbacks.useHooks"
 		>
 			Element with wp-run using hooks

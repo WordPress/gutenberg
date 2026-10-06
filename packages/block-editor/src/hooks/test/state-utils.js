@@ -116,6 +116,53 @@ describe( 'buildScopedBlockSelector', () => {
 	} );
 } );
 
+describe( 'buildScopedBlockSelector with a block name', () => {
+	const BASE = '.wp-elements-abc123';
+
+	it.each( [
+		[ 'core/paragraph', '.wp-block-paragraph', `${ BASE }:hover` ],
+		[ 'core/paragraph', 'p', `${ BASE }:hover` ],
+		[ 'core/x', '.wp-block-x.is-style-y', `${ BASE }.is-style-y:hover` ],
+		[
+			'core/search',
+			'.wp-block-search .wp-block-search__input',
+			`${ BASE } .wp-block-search__input:hover`,
+		],
+		[
+			'core/list-item',
+			'.wp-block-list > li',
+			`.wp-block-list > ${ BASE }:hover`,
+		],
+		[
+			'core/list-item',
+			'.wp-block-list:not(.wp-block-list .wp-block-list) > li',
+			`.wp-block-list:not(.wp-block-list .wp-block-list) > ${ BASE }:hover`,
+		],
+		[
+			'core/list-item',
+			'.wp-block-list > li a',
+			`.wp-block-list > ${ BASE } a:hover`,
+		],
+		[
+			'test/state-button',
+			'.wp-block-button .wp-block-button__link',
+			`${ BASE } .wp-block-button__link:hover`,
+		],
+		[
+			'core/list-item',
+			'.wp-block-list > li, .wp-block-list-item .inner',
+			`.wp-block-list > ${ BASE }:hover, ${ BASE } .inner:hover`,
+		],
+	] )(
+		'scopes %s selector %s to the block wrapper',
+		( name, blockSelector, expected ) => {
+			expect(
+				buildScopedBlockSelector( BASE, blockSelector, ':hover', name )
+			).toBe( expected );
+		}
+	);
+} );
+
 describe( 'state selector builders', () => {
 	const BASE = '.wp-elements-abc123';
 
