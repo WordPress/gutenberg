@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseSync, traverse } from '@babel/core';
 import type { Node, ObjectExpression } from '@babel/types';
+import { describe, expect, it } from 'vitest';
 import { storyGlobs } from '../story-globs';
 
 const CONFIG_DIR = path.join( __dirname, '..' );
