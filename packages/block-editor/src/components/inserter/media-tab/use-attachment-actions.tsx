@@ -5,6 +5,23 @@ import { store as noticesStore } from '@wordpress/notices';
 import { external, linkOff } from '@wordpress/icons';
 import DetachConfirmation from './detach-confirmation';
 
+type InserterMediaCategory =
+	import( '../../../store/actions' ).InserterMediaCategory;
+
+type MediaItem = { id?: number; sourceId?: number | string };
+
+/**
+ * A core media category: the public interface plus the private capabilities
+ * core's own categories add for managing a post's attachments.
+ */
+type AttachmentCategory = InserterMediaCategory & {
+	postTypeLabel?: string;
+	attach?: ( media: unknown ) => Promise< number >;
+	detach?: ( media: MediaItem ) => Promise< void >;
+	invalidate?: ( query: object ) => void;
+	subscribe?: ( onChange: () => void, query: object ) => () => void;
+};
+
 /**
  * The attach/detach workflow for a media source.
  *
@@ -16,7 +33,13 @@ import DetachConfirmation from './detach-confirmation';
  * Sources without these capabilities (Openverse, anything registered through
  * the public API) get an empty action list and an inert refresh key.
  */
-export function useAttachmentActions( { category, query } ) {
+export function useAttachmentActions( {
+	category,
+	query,
+}: {
+	category: AttachmentCategory;
+	query: object;
+} ) {
 	// Private to core's media categories, these capabilities act on WordPress
 	// attachments:
 	// - `attach`/`detach`/`invalidate` manage the images attached to this post.
@@ -55,7 +78,10 @@ export function useAttachmentActions( { category, query } ) {
 	}, [ subscribe, query ] );
 
 	const handleAttach = useCallback(
-		async ( selectedMedia ) => {
+		async ( selectedMedia: unknown ) => {
+			if ( ! attach ) {
+				return;
+			}
 			try {
 				const attachedCount = await attach( selectedMedia );
 
@@ -112,7 +138,10 @@ export function useAttachmentActions( { category, query } ) {
 	);
 
 	const handleDetach = useCallback(
-		async ( media ) => {
+		async ( media: MediaItem ) => {
+			if ( ! detach ) {
+				return;
+			}
 			try {
 				await detach( media );
 				refresh();
@@ -149,10 +178,11 @@ export function useAttachmentActions( { category, query } ) {
 					category.mediaType
 				),
 				icon: external,
-				callback: ( [ media ] ) => {
+				callback: ( [ media ]: MediaItem[] ) => {
+					// `open` returns null when a popup blocker steps in.
 					window
-						.open( category.getReportUrl( media ), '_blank' )
-						.focus();
+						.open( category.getReportUrl?.( media ), '_blank' )
+						?.focus();
 				},
 			} );
 		}
@@ -168,10 +198,16 @@ export function useAttachmentActions( { category, query } ) {
 					: __( 'Detach from post' ),
 				icon: linkOff,
 				modalHeader: __( 'Detach image' ),
-				RenderModal: ( { items, closeModal } ) => (
+				RenderModal: ( {
+					items,
+					closeModal,
+				}: {
+					items: MediaItem[];
+					closeModal?: () => void;
+				} ) => (
 					<DetachConfirmation
 						postTypeLabel={ category.postTypeLabel }
-						onCancel={ closeModal }
+						onCancel={ () => closeModal?.() }
 						onConfirm={ () => {
 							closeModal?.();
 							handleDetach( items[ 0 ] );

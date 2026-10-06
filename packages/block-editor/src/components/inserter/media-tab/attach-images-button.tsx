@@ -1,7 +1,18 @@
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import MediaUpload from '../../media-upload';
+import UntypedMediaUpload from '../../media-upload';
 import MediaUploadCheck from '../../media-upload/check';
+
+// `media-upload` exports a placeholder behind `withFilters`, so its real
+// props arrive from whatever replaces it and TypeScript infers none.
+// TODO: drop this once the component declares its own props.
+const MediaUpload = UntypedMediaUpload as unknown as React.ComponentType< {
+	multiple?: boolean | string;
+	onSelect?: ( media: unknown ) => void;
+	allowedTypes?: string[];
+	title?: string;
+	render: ( props: { open: () => void } ) => React.ReactElement;
+} >;
 
 // The attach flow is image-only, so the picker is constrained to images.
 const ATTACH_ALLOWED_TYPES = [ 'image' ];
