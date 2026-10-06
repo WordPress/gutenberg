@@ -186,7 +186,7 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 										`${ face.fontStyle ?? '' }${
 											face.fontWeight ?? ''
 										}`
-							  )
+								)
 							: [ 'normal400' ]; // If the font doesn't have fontFace, we assume it is a system font and we add the defaults: normal 400
 
 					acc[ font.slug ] = availableFontFaces;
@@ -265,7 +265,7 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 									( face: CollectionFontFace ) =>
 										face.font_face_settings
 								) || [],
-					  }
+						}
 					: null;
 
 				// Otherwise create it.
@@ -289,7 +289,7 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 										fontFaceToInstall,
 										fontFamilyToInstall.fontFace
 									)
-						  )
+							)
 						: [];
 
 				// Filter out Font Faces that have already been installed (so that they are not re-installed)
@@ -476,7 +476,7 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 						fontFace: fontFace.map(
 							( { id: _faceDbId, ...face } ) => face
 						),
-				  }
+					}
 				: {} ),
 		} ) );
 	};

@@ -13,8 +13,13 @@ import {
 	useMemo,
 	useState,
 } from '@wordpress/element';
-import { chartBar, download, trendingUp } from '@wordpress/icons';
-import { WidgetHostProvider } from '@wordpress/widget-primitives';
+import { chartBar, download, shield, trendingUp } from '@wordpress/icons';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Button } from '@wordpress/ui';
+import {
+	WidgetHostProvider,
+	useWidgetActions,
+} from '@wordpress/widget-primitives';
 import type {
 	ResolveWidgetModule,
 	WidgetAction,
@@ -305,6 +310,189 @@ const goalProgressWidgetType: WidgetType = {
 	},
 };
 
+/*
+ * A widget whose actions come from what it loads and from two components:
+ * once the check settles, the widget takes the declared "Details" action's
+ * place with a counted link, and its export section declares the download.
+ */
+interface SiteCheck {
+	id: number;
+	label: string;
+	status: 'critical' | 'recommended';
+}
+
+const SITE_CHECKS: SiteCheck[] = [
+	{ id: 1, label: 'Background updates', status: 'critical' },
+	{ id: 2, label: 'HTTPS status', status: 'recommended' },
+	{ id: 3, label: 'Page cache', status: 'recommended' },
+];
+
+const wait = ( ms: number ) =>
+	new Promise< void >( ( resolve ) => setTimeout( resolve, ms ) );
+
+function downloadChecks( checks: SiteCheck[] ) {
+	const rows = [
+		'Check,Status',
+		...checks.map( ( check ) => `${ check.label },${ check.status }` ),
+	];
+	const url = URL.createObjectURL(
+		new Blob( [ rows.join( '\n' ) ], { type: 'text/csv' } )
+	);
+	const anchor = document.createElement( 'a' );
+	anchor.href = url;
+	anchor.download = 'site-checks.csv';
+	anchor.click();
+	URL.revokeObjectURL( url );
+}
+
+function ChecksExportSection( { checks }: { checks: SiteCheck[] } ) {
+	const [ exported, setExported ] = useState( 0 );
+
+	useWidgetActions( [
+		{
+			id: 'export',
+			label: 'Download CSV',
+			icon: download,
+			relevance: 'medium',
+			callback: async () => {
+				// A slow export, so the pending state is visible.
+				await wait( 1500 );
+				downloadChecks( checks );
+				setExported( checks.length );
+			},
+		},
+	] );
+
+	return (
+		<span
+			style={ {
+				color: 'var(--wpds-color-foreground-content-neutral-weak)',
+				fontSize: 'var(--wpds-typography-font-size-sm)',
+			} }
+		>
+			{ exported > 0
+				? `Exported ${ exported } checks.`
+				: `Export ready for ${ checks.length } checks.` }
+		</span>
+	);
+}
+
+function SiteStatusWidget() {
+	const [ checks, setChecks ] = useState< SiteCheck[] | null >( null );
+	const [ hasExport, setHasExport ] = useState( true );
+
+	useEffect( () => {
+		const timer = setTimeout( () => setChecks( SITE_CHECKS ), 1500 );
+		return () => clearTimeout( timer );
+	}, [] );
+
+	useWidgetActions(
+		checks?.length
+			? [
+					{
+						id: 'details',
+						label: `Review ${ checks.length } items`,
+						relevance: 'high',
+						href: 'admin.php?page=demo-dashboard&p=/status?filter=issues',
+					},
+				]
+			: []
+	);
+
+	let status = 'Checking the site…';
+	if ( checks ) {
+		status =
+			checks.length > 0
+				? `${ checks.length } checks need attention.`
+				: 'Every check passes.';
+	}
+
+	return (
+		<div
+			style={ {
+				display: 'grid',
+				gap: 'var(--wpds-dimension-gap-sm)',
+				alignContent: 'start',
+				color: 'var(--wpds-color-foreground-content-neutral)',
+			} }
+		>
+			<strong>{ status }</strong>
+			{ checks && checks.length > 0 && (
+				<ul style={ { margin: 0, paddingInlineStart: '1.25em' } }>
+					{ checks.map( ( check ) => (
+						<li key={ check.id }>
+							{ `${ check.label } (${ check.status })` }
+						</li>
+					) ) }
+				</ul>
+			) }
+			{ checks && checks.length > 0 && hasExport && (
+				<ChecksExportSection checks={ checks } />
+			) }
+			{ checks && (
+				<div
+					style={ {
+						display: 'flex',
+						gap: 'var(--wpds-dimension-gap-xs)',
+					} }
+				>
+					<Button
+						variant="outline"
+						tone="neutral"
+						size="compact"
+						onClick={ () =>
+							setChecks(
+								checks.length > 0
+									? checks.slice( 1 )
+									: SITE_CHECKS
+							)
+						}
+					>
+						{ checks.length > 0 ? 'Resolve one' : 'Reset' }
+					</Button>
+					{ checks.length > 0 && (
+						<Button
+							variant="outline"
+							tone="neutral"
+							size="compact"
+							onClick={ () => setHasExport( ! hasExport ) }
+						>
+							{ hasExport ? 'Hide export' : 'Show export' }
+						</Button>
+					) }
+				</div>
+			) }
+		</div>
+	);
+}
+
+const siteStatusWidgetType: WidgetType = {
+	apiVersion: 1,
+	name: 'demo/site-status',
+	title: 'Site Status',
+	description: 'Checks the site and declares what to do next.',
+	help: {
+		content:
+			'The declared <strong>Details</strong> action shows while the check runs. Then the widget declares <strong>Review N items</strong> in its place, and its export section declares <strong>Download CSV</strong>.',
+	},
+	icon: shield,
+	renderModule: 'demo/widgets/site-status/render',
+	actions: [
+		{
+			id: 'details',
+			label: 'Details',
+			relevance: 'high',
+			href: 'admin.php?page=demo-dashboard&p=/status',
+		},
+		{
+			id: 'about',
+			label: 'About site health',
+			href: 'https://wordpress.org/documentation/article/site-health-screen/',
+			openInNewTab: true,
+		},
+	],
+};
+
 // What `import( widget.renderModule )` resolves to in a real host.
 const resolveDemoModule: ResolveWidgetModule = async ( moduleId ) => {
 	let component: ComponentType< WidgetRenderProps< unknown > >;
@@ -312,6 +500,8 @@ const resolveDemoModule: ResolveWidgetModule = async ( moduleId ) => {
 		component = GoalProgressWidget as ComponentType<
 			WidgetRenderProps< unknown >
 		>;
+	} else if ( moduleId === siteStatusWidgetType.renderModule ) {
+		component = SiteStatusWidget;
 	} else {
 		component = TrafficSnapshotWidget as ComponentType<
 			WidgetRenderProps< unknown >
@@ -345,7 +535,8 @@ const INITIAL_LAYOUT: DashboardWidget[] = [
 ];
 
 const meta: Meta< typeof WidgetDashboard > = {
-	title: 'Widget Dashboard/Playground',
+	id: 'widget-dashboard-playground',
+	title: 'Widgets/Dashboard/Playground',
 	component: WidgetDashboard,
 	tags: [ 'status-experimental' ],
 	parameters: {
@@ -484,7 +675,10 @@ const DEMO_NAVIGATE_EVENT = 'widget-dashboard-demo-navigate';
 const DemoRouteLink = forwardRef<
 	HTMLAnchorElement,
 	{ path: string } & Omit< ComponentPropsWithoutRef< 'a' >, 'href' >
->( function DemoRouteLink( { path, onClick, children, ...props }, ref ) {
+>( function UnforwardedDemoRouteLink(
+	{ path, onClick, children, ...props },
+	ref
+) {
 	return (
 		<a
 			ref={ ref }
@@ -630,6 +824,52 @@ The footer shows the three materializations side by side:
 - "Export progress" is a download: downloads always keep the plain anchor.
 
 Without the provider the same declarations still work; every action falls back to a plain anchor. Real hosts implement the capability at their route layer with their actual router.
+`,
+			},
+		},
+	},
+};
+
+const RUNTIME_ACTIONS_LAYOUT: DashboardWidget[] = [
+	{
+		uuid: 'site-status',
+		type: 'demo/site-status',
+		attributes: {},
+		placement: { width: 2, height: 1, order: 1 },
+	},
+];
+
+function RuntimeActionsStory() {
+	const [ layout, setLayout ] = useState< DashboardWidget[] >(
+		RUNTIME_ACTIONS_LAYOUT
+	);
+
+	return (
+		<WidgetHostProvider value={ demoHost }>
+			<WidgetDashboard
+				widgetTypes={ [ siteStatusWidgetType ] }
+				layout={ layout }
+				onLayoutChange={ setLayout }
+				resolveWidgetModule={ resolveDemoModule }
+				gridSettings={ { model: 'grid', rowHeight: 260 } }
+			>
+				<WidgetDashboard.Widgets />
+			</WidgetDashboard>
+		</WidgetHostProvider>
+	);
+}
+
+export const RuntimeActions: StoryObj = {
+	render: () => <RuntimeActionsStory />,
+	parameters: {
+		docs: {
+			description: {
+				story: `
+A widget declares actions from what its render knows, through \`useWidgetActions\`, and from more than one component.
+
+The footer starts with the declared "Details" link. Once the check settles, the widget declares "Review 3 items" with the same \`id\`, and it takes that place. Its export section, a child component, declares "Download CSV": a \`callback\` action, disabled while the export runs. \`WidgetRender\` joins both declarations, so the host receives one list.
+
+"Hide export" unmounts the section and withdraws only its action. "Resolve one" shrinks the list; once nothing is left, "Details" returns.
 `,
 			},
 		},
@@ -907,7 +1147,7 @@ function GridSettingsStory( {
 						model,
 						columns,
 						rowHeight: ROW_HEIGHT_PRESETS[ rowHeight ],
-				  },
+					},
 		[ model, columns, flowTolerance, rowHeight ]
 	);
 

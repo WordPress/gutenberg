@@ -158,11 +158,10 @@ export type OnValueChangeHandler< T > = (
 	e: React.MouseEvent | React.KeyboardEvent
 ) => void;
 
-export interface BaseProps
-	extends Omit<
-		ComponentProps< 'div' >,
-		'onSelect' | 'defaultValue' | 'role'
-	> {
+export interface BaseProps extends Omit<
+	ComponentProps< 'div' >,
+	'onSelect' | 'defaultValue' | 'role'
+> {
 	/**
 	 * The ARIA role for the calendar's root element.
 	 *

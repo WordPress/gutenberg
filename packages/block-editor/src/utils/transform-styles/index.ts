@@ -136,7 +136,7 @@ function transformStyle(
 						},
 					} ),
 				baseURL && rebaseUrl( { rootUrl: baseURL } ),
-			].filter( Boolean ) as import('postcss').AcceptedPlugin[]
+			].filter( Boolean ) as import( 'postcss' ).AcceptedPlugin[]
 		).process( css, {} ).css; // use sync PostCSS API
 	} catch ( error ) {
 		if ( error instanceof CssSyntaxError ) {

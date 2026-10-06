@@ -2,7 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import * as Select from '../';
 
 const meta: Meta< typeof Select.Root > = {
-	title: 'Design System/Components/Form/Primitives/Select',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-ui/Form/Primitives/Select',
+	id: 'design-system-components-form-primitives-select',
 	component: Select.Root,
 	subcomponents: {
 		'Select.Trigger': Select.Trigger,
@@ -14,12 +16,15 @@ const meta: Meta< typeof Select.Root > = {
 		'Select.Item': Select.Item,
 		'Select.ItemLabel': Select.ItemLabel,
 		'Select.ItemDescription': Select.ItemDescription,
+		'Select.Separator': Select.Separator,
+	},
+	argTypes: {
+		onValueChange: { action: 'onValueChange' },
 	},
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`, overlays compatibility, and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
@@ -31,6 +36,12 @@ const defaultItems = Array.from( { length: 6 }, ( _, index ) => ( {
 	value: `item-${ index + 1 }`,
 	label: `Item ${ index + 1 }`,
 } ) );
+
+const separatorItems = [
+	{ value: 'apple', label: 'Apple' },
+	{ value: 'banana', label: 'Banana' },
+	{ value: 'other', label: 'Other' },
+];
 
 export const Default: Story = {
 	args: {
@@ -149,6 +160,29 @@ export const Grouped: Story = {
 						) ) }
 					</Select.Group>
 				) ) }
+			</Select.Popup>,
+		],
+	},
+};
+
+/**
+ * Use `Select.Separator` to set choices apart from each other.
+ */
+export const WithSeparator: Story = {
+	args: {
+		items: separatorItems,
+		children: [
+			<Select.Trigger aria-label="Fruit" key="trigger" />,
+			<Select.Popup key="popup">
+				{ separatorItems.slice( 0, 2 ).map( ( item ) => (
+					<Select.Item key={ item.value } value={ item }>
+						<Select.ItemLabel>{ item.label }</Select.ItemLabel>
+					</Select.Item>
+				) ) }
+				<Select.Separator />
+				<Select.Item value={ separatorItems[ 2 ] }>
+					<Select.ItemLabel>Other</Select.ItemLabel>
+				</Select.Item>
 			</Select.Popup>,
 		],
 	},

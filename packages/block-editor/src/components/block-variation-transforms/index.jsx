@@ -38,7 +38,7 @@ function VariationsButtons( {
 									/* translators: %s: Block or block variation name. */
 									__( 'Transform to %s' ),
 									variation.title
-							  )
+								)
 					}
 					onClick={ () => onSelectVariation( variation.name ) }
 					aria-label={ variation.title }
@@ -128,7 +128,7 @@ function VariationsToggleGroupControl( {
 										/* translators: %s: Block or block variation name. */
 										__( 'Transform to %s' ),
 										variation.title
-								  )
+									)
 						}
 					/>
 				) ) }

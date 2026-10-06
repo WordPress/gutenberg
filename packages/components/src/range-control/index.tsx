@@ -179,7 +179,7 @@ function UnforwardedRangeControl(
 		// the value to be reset to the `initialPosition` prop if defined.
 		const resetValue = Number.isNaN( resetFallbackValue )
 			? null
-			: resetFallbackValue ?? null;
+			: ( resetFallbackValue ?? null );
 
 		setValue( resetValue );
 

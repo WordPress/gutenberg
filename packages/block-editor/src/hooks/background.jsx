@@ -49,7 +49,8 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
 			!! support?.backgroundImage ||
 			!! support?.backgroundSize ||
 			!! support?.backgroundRepeat ||
-			!! support?.gradient
+			!! support?.gradient ||
+			!! support?.backgroundClip
 		);
 	}
 
@@ -86,6 +87,19 @@ function useBlockProps( { name, style } ) {
 	if (
 		! hasBackgroundSupport( name ) ||
 		! style?.background?.backgroundImage
+	) {
+		return;
+	}
+
+	// An opted-in block applies the background, defaults included, itself.
+	const skipSerialization = getBlockSupport( name, [
+		BACKGROUND_SUPPORT_KEY,
+		'__experimentalSkipSerialization',
+	] );
+	if (
+		skipSerialization === true ||
+		( Array.isArray( skipSerialization ) &&
+			skipSerialization.includes( 'backgroundImage' ) )
 	) {
 		return;
 	}
@@ -219,7 +233,7 @@ export function BackgroundImagePanel( {
 				...style?.background,
 				gradient: gradient
 					? 'var:preset|gradient|' + gradient
-					: style?.background?.gradient ?? style?.color?.gradient,
+					: ( style?.background?.gradient ?? style?.color?.gradient ),
 			},
 		} ),
 	};

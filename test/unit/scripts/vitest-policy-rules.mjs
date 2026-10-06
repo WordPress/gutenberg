@@ -965,7 +965,7 @@ function getBranchPath( node, useNode, parentNodes ) {
 	}
 
 	const branches = [];
-	for ( let child = node; parentNodes.has( child );  ) {
+	for ( let child = node; parentNodes.has( child ); ) {
 		const parent = parentNodes.get( child );
 		if ( useAncestors.has( parent ) ) {
 			break;
@@ -1107,7 +1107,7 @@ function getReachableWrites(
 							useNode,
 							identifierVariables,
 							parentNodes
-					  );
+						);
 			return executionNodes.map( ( executionNode ) => ( {
 				expression: reference.writeExpr,
 				node: executionNode,
@@ -1161,7 +1161,7 @@ function getReachableMemberWrites(
 						useNode,
 						identifierVariables,
 						parentNodes
-				  );
+					);
 		return executionNodes
 			.filter(
 				( executionNode ) => executionNode.range[ 0 ] < usePosition
@@ -1394,7 +1394,7 @@ function getReachableLocalFunctions( node, identifierVariables, parentNodes ) {
 						type: 'BoundFunction',
 						functionNode: value,
 						boundArgumentCount: 0,
-				  }
+					}
 				: [];
 		} )
 	);
@@ -1813,7 +1813,7 @@ export function validateVitestPolicy( {
 							node.arguments[ 0 ],
 							identifierVariables,
 							parentNodes
-					  )
+						)
 					: new Set();
 			if (
 				node.type === 'CallExpression' &&
@@ -2093,7 +2093,7 @@ export function validateVitestPolicy( {
 					? getObjectPatternPropertyIdentifiers(
 							target,
 							'getComputedStyle'
-					  )
+						)
 					: [] ),
 			];
 			for ( const identifier of computedStyleTargets ) {
@@ -2248,6 +2248,23 @@ export function validateVitestPolicy( {
 			report( 'commonjs-import', 'CommonJS import', node );
 		}
 
+		// Preserve jest/no-export for suites. Vitest has no equivalent rule;
+		// shared helpers and setup modules must remain able to export.
+		if (
+			isVitestTest &&
+			[
+				'ExportNamedDeclaration',
+				'ExportDefaultDeclaration',
+				'ExportAllDeclaration',
+			].includes( node.type )
+		) {
+			report(
+				'test-export',
+				'Do not export from a test file. Move shared helpers to a separate module',
+				node
+			);
+		}
+
 		if (
 			node.type === 'TSExportAssignment' ||
 			( node.type === 'AssignmentExpression' &&
@@ -2264,7 +2281,7 @@ export function validateVitestPolicy( {
 		}
 
 		if (
-			/\.tsx?$/.test( file ) &&
+			/\.[cm]?tsx?$/.test( file ) &&
 			node.type === 'CallExpression' &&
 			node.callee?.type === 'MemberExpression' &&
 			isImportedApiReference(

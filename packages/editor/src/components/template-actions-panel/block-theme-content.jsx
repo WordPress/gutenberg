@@ -81,7 +81,7 @@ export default function TemplateActionsPanelContent() {
 					onClick: () =>
 						getEditorSettings().onNavigateToPreviousEntityRecord(),
 				},
-		  ]
+			]
 		: undefined;
 
 	const mayShowTemplateEditNotice = () => {

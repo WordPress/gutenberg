@@ -3,7 +3,7 @@ import {
 	Button,
 	Composite,
 	Dropdown,
-	SelectControl,
+	SelectControl as WCSelectControl,
 } from '@wordpress/components';
 import { Stack, Text } from '@wordpress/ui';
 import { useRef, useMemo } from '@wordpress/element';
@@ -11,6 +11,7 @@ import { shadow as textShadowIcon, Icon, check, reset } from '@wordpress/icons';
 import type { TextShadowPreset } from '@wordpress/global-styles-engine';
 import clsx from 'clsx';
 import { useSettings } from '../use-settings';
+import { useToolsPanelItemPopoverProps } from './utils';
 
 type TextShadowValue = string | undefined;
 
@@ -63,9 +64,7 @@ function getTextShadowPresetSlug( rawValue: TextShadowValue ) {
 
 export function TextShadowPopover( { textShadow, onChange }: TextShadowProps ) {
 	const popoverProps = {
-		placement: 'left-start' as const,
-		offset: 36,
-		shift: true,
+		...useToolsPanelItemPopoverProps(),
 		className: 'block-editor-global-styles__text-shadow-popover',
 	};
 
@@ -129,7 +128,7 @@ function TextShadowControl( { textShadow, onChange }: TextShadowProps ) {
 	const activeSlug = getTextShadowPresetSlug( textShadow );
 	const activeValue = activeSlug
 		? `var:preset|text-shadow|${ activeSlug }`
-		: textShadow ?? '';
+		: ( textShadow ?? '' );
 	const previewValue = activeSlug
 		? presets.find( ( preset ) => preset.slug === activeSlug )?.textShadow
 		: textShadow;
@@ -150,7 +149,7 @@ function TextShadowControl( { textShadow, onChange }: TextShadowProps ) {
 				{ __( 'Code is poetry' ) }
 			</div>
 			{ presets.length >= PRESETS_SELECT_THRESHOLD ? (
-				<SelectControl
+				<WCSelectControl
 					hideLabelFromVision
 					label={ __( 'Text shadow preset' ) }
 					value={ activeValue }

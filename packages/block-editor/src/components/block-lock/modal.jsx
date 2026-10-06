@@ -2,7 +2,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
 import {
 	Button,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 	Flex,
 	FlexItem,
 	Icon as WCIcon,
@@ -52,9 +52,8 @@ export default function BlockLockModal( { clientId, onClose } ) {
 		},
 		[ clientId ]
 	);
-	const [ applyTemplateLock, setApplyTemplateLock ] = useState(
-		!! templateLock
-	);
+	const [ applyTemplateLock, setApplyTemplateLock ] =
+		useState( !! templateLock );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const blockInformation = useBlockDisplayInformation( clientId );
 
@@ -115,7 +114,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 						className="block-editor-block-lock-modal__checklist"
 					>
 						<li>
-							<CheckboxControl
+							<WCCheckboxControl
 								className="block-editor-block-lock-modal__options-all"
 								label={ __( 'Lock all' ) }
 								checked={ isAllChecked }
@@ -136,7 +135,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 							>
 								{ allowsEditLocking && (
 									<li className="block-editor-block-lock-modal__checklist-item">
-										<CheckboxControl
+										<WCCheckboxControl
 											label={ __( 'Lock editing' ) }
 											checked={ !! lock.edit }
 											onChange={ ( edit ) =>
@@ -157,7 +156,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 									</li>
 								) }
 								<li className="block-editor-block-lock-modal__checklist-item">
-									<CheckboxControl
+									<WCCheckboxControl
 										label={ __( 'Lock movement' ) }
 										checked={ lock.move }
 										onChange={ ( move ) =>
@@ -175,7 +174,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 									/>
 								</li>
 								<li className="block-editor-block-lock-modal__checklist-item">
-									<CheckboxControl
+									<WCCheckboxControl
 										label={ __( 'Lock removal' ) }
 										checked={ lock.remove }
 										onChange={ ( remove ) =>

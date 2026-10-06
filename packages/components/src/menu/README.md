@@ -15,14 +15,9 @@ It is responsible for managing the state of the menu and its items, and for
 rendering the `Menu.TriggerButton` (or the `Menu.SubmenuTriggerItem`)
 component, and the `Menu.Popover` component.
 
+This component is deprecated. When building for the Gutenberg repo, use `Menu` from `@wordpress/ui` instead. Otherwise, continue using `DropdownMenu` for now.
+
 ## Props
-
-### `as`
-
- - Type: `any`
- - Required: No
-
-The HTML element or React component to render the component as.
 
 ### `children`
 
@@ -64,7 +59,7 @@ A callback that gets called when the `open` state changes.
 
 ### `placement`
 
- - Type: `"left" | "right" | "top" | "bottom" | "left-start" | "right-start" | "top-start" | "bottom-start" | "left-end" | "right-end" | ...`
+ - Type: `"top" | "bottom" | "left" | "right" | "top-start" | "bottom-start" | "left-start" | "right-start" | "top-end" | "bottom-end" | ...`
  - Required: No
  - Default: `'bottom-start' for root-level menus, 'right-start' for submenus`
 

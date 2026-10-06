@@ -87,16 +87,16 @@ selectorNames.forEach( ( name ) => {
 			hasUndo() {
 				return Boolean(
 					state.editor &&
-						state.editor.past &&
-						state.editor.past.length
+					state.editor.past &&
+					state.editor.past.length
 				);
 			},
 
 			hasRedo() {
 				return Boolean(
 					state.editor &&
-						state.editor.future &&
-						state.editor.future.length
+					state.editor.future &&
+					state.editor.future.length
 				);
 			},
 
@@ -2796,7 +2796,7 @@ describe( 'selectors', () => {
 			};
 			expect( canUserUseUnfilteredHTML( state ) ).toBe( true );
 		} );
-		it( 'should return false if the _links object doesnt contain the property wp:action-unfiltered-html', () => {
+		it( "should return false if the _links object doesn't contain the property wp:action-unfiltered-html", () => {
 			const state = {
 				currentPost: {
 					_links: {},
