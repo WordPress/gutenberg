@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { dispatch, select } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blocksStore } from '../store';
 import type { BlockCategory } from '../types';
 

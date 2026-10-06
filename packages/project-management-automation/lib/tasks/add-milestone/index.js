@@ -1,12 +1,8 @@
-/**
- * Internal dependencies
- */
-const debug = require( '../../debug' );
-const getAssociatedPullRequest = require( '../../get-associated-pull-request' );
+import debug from '../../debug.js';
+import getAssociatedPullRequest from '../../get-associated-pull-request.js';
 
-/** @typedef {import('@octokit/request-error').RequestError} RequestError */
 /** @typedef {ReturnType<typeof import('@actions/github').getOctokit>} GitHub */
-/** @typedef {import('@octokit/webhooks-types').EventPayloadMap['push']} WebhookPayloadPush */
+/** @typedef {import('@octokit/openapi-webhooks-types').components['schemas']['webhook-push']} WebhookPayloadPush */
 
 /**
  * Number of expected days elapsed between releases.
@@ -87,9 +83,15 @@ async function addMilestone( payload, octokit ) {
 		return;
 	}
 
-	debug( 'add-milestone: Fetching current milestone' );
-	const owner = payload.repository.owner.login;
+	const owner = payload.repository.owner?.login;
+	if ( ! owner ) {
+		debug(
+			'add-milestone: Push payload is missing a repository owner. Aborting'
+		);
+		return;
+	}
 	const repo = payload.repository.name;
+	debug( 'add-milestone: Fetching current milestone' );
 
 	const {
 		data: { milestone: pullMilestone },
@@ -111,7 +113,7 @@ async function addMilestone( payload, octokit ) {
 	const {
 		// The types for the `getContent` response are incorrect.
 		// see https://github.com/octokit/rest.js/issues/32
-		// @ts-ignore
+		// @ts-expect-error The `getContent` response is a union that may be a directory listing.
 		data: { content, encoding },
 	} = await octokit.rest.repos.getContent( {
 		owner,
@@ -179,12 +181,7 @@ async function addMilestone( payload, octokit ) {
 
 	const title = `Gutenberg ${ major }.${ minor }`;
 
-	const milestone = await getMilestoneByTitle(
-		octokit,
-		payload.repository.owner.login,
-		payload.repository.name,
-		title
-	);
+	const milestone = await getMilestoneByTitle( octokit, owner, repo, title );
 
 	if ( ! milestone ) {
 		throw new Error( 'Could not rediscover milestone by title: ' + title );
@@ -202,4 +199,4 @@ async function addMilestone( payload, octokit ) {
 	} );
 }
 
-module.exports = addMilestone;
+export default addMilestone;

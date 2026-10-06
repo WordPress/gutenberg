@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Middleware } from 'redux';
-
-/**
- * Internal dependencies
- */
 import type { DataRegistry } from './types';
 
 /**

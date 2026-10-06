@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { store as coreDataStore } from '@wordpress/core-data';
 import type {
@@ -24,7 +21,7 @@ function invalidateFontFamilyCache( registry: DataRegistry ) {
 
 	// Invalidate all font family queries
 	// Ideally there should be a dedicated action to do this
-	// "invalide all cacches for this entity type"
+	// "invalid all caches for this entity type"
 	receiveEntityRecords(
 		'postType',
 		'wp_font_family',

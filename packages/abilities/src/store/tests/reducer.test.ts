@@ -2,9 +2,7 @@
  * Tests for store reducer.
  */
 
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import reducer from '../reducer';
 import {
 	REGISTER_ABILITY,
@@ -23,16 +21,20 @@ describe( 'Store Reducer', () => {
 					name: 'test/ability',
 					label: 'Test Ability',
 					description: 'Test ability',
+					category: 'test-category',
 					callback: () => Promise.resolve( {} ),
 				};
 
 				const action = {
 					type: REGISTER_ABILITY,
 					ability,
-				};
+				} as const;
 
 				const state = reducer(
-					{ abilitiesByName: defaultState },
+					{
+						abilitiesByName: defaultState,
+						categoriesBySlug: {},
+					},
 					action
 				);
 
@@ -49,6 +51,7 @@ describe( 'Store Reducer', () => {
 					name: 'test/ability',
 					label: 'Test Ability',
 					description: 'Test ability',
+					category: 'test-category',
 					callback: () => Promise.resolve( {} ),
 					// Extra properties that should be filtered out
 					_links: { self: { href: '/test' } },
@@ -58,10 +61,13 @@ describe( 'Store Reducer', () => {
 				const action = {
 					type: REGISTER_ABILITY,
 					ability,
-				};
+				} as const;
 
 				const state = reducer(
-					{ abilitiesByName: defaultState },
+					{
+						abilitiesByName: defaultState,
+						categoriesBySlug: {},
+					},
 					action
 				);
 				const registeredAbility =
@@ -84,6 +90,7 @@ describe( 'Store Reducer', () => {
 						name: 'test/ability',
 						label: 'Old Label',
 						description: 'Old description',
+						category: 'test-category',
 					},
 				};
 
@@ -91,16 +98,20 @@ describe( 'Store Reducer', () => {
 					name: 'test/ability',
 					label: 'New Label',
 					description: 'New description',
+					category: 'test-category',
 					input_schema: { type: 'string' },
 				};
 
 				const action = {
 					type: REGISTER_ABILITY,
 					ability,
-				};
+				} as const;
 
 				const state = reducer(
-					{ abilitiesByName: initialState },
+					{
+						abilitiesByName: initialState,
+						categoriesBySlug: {},
+					},
 					action
 				);
 
@@ -123,21 +134,26 @@ describe( 'Store Reducer', () => {
 						name: 'test/ability1',
 						label: 'Test Ability 1',
 						description: 'First test ability',
+						category: 'test-category',
 					},
 					'test/ability2': {
 						name: 'test/ability2',
 						label: 'Test Ability 2',
 						description: 'Second test ability',
+						category: 'test-category',
 					},
 				};
 
 				const action = {
 					type: UNREGISTER_ABILITY,
 					name: 'test/ability1',
-				};
+				} as const;
 
 				const state = reducer(
-					{ abilitiesByName: initialState },
+					{
+						abilitiesByName: initialState,
+						categoriesBySlug: {},
+					},
 					action
 				);
 
@@ -157,16 +173,20 @@ describe( 'Store Reducer', () => {
 						name: 'test/ability',
 						label: 'Test Ability',
 						description: 'Test ability',
+						category: 'test-category',
 					},
 				};
 
 				const action = {
 					type: UNREGISTER_ABILITY,
 					name: 'test/non-existent',
-				};
+				} as const;
 
 				const state = reducer(
-					{ abilitiesByName: initialState },
+					{
+						abilitiesByName: initialState,
+						categoriesBySlug: {},
+					},
 					action
 				);
 
@@ -180,8 +200,13 @@ describe( 'Store Reducer', () => {
 				};
 
 				const state = reducer(
-					{ abilitiesByName: defaultState },
-					action
+					{
+						abilitiesByName: defaultState,
+						categoriesBySlug: {},
+					},
+					// Intentionally bypass the static contract to cover the
+					// reducer's defensive handling of invalid runtime input.
+					action as never
 				);
 
 				expect( state.abilitiesByName ).toEqual( defaultState );
@@ -203,7 +228,7 @@ describe( 'Store Reducer', () => {
 				const action = {
 					type: REGISTER_ABILITY_CATEGORY,
 					category,
-				};
+				} as const;
 
 				const state = reducer(
 					{ categoriesBySlug: defaultState, abilitiesByName: {} },
@@ -229,7 +254,7 @@ describe( 'Store Reducer', () => {
 				const action = {
 					type: REGISTER_ABILITY_CATEGORY,
 					category,
-				};
+				} as const;
 
 				const state = reducer(
 					{ categoriesBySlug: defaultState, abilitiesByName: {} },
@@ -255,7 +280,7 @@ describe( 'Store Reducer', () => {
 				const action = {
 					type: REGISTER_ABILITY_CATEGORY,
 					category,
-				};
+				} as const;
 
 				const state = reducer(
 					{ categoriesBySlug: defaultState, abilitiesByName: {} },
@@ -298,7 +323,7 @@ describe( 'Store Reducer', () => {
 				const action = {
 					type: REGISTER_ABILITY_CATEGORY,
 					category,
-				};
+				} as const;
 
 				const state = reducer(
 					{ categoriesBySlug: initialState, abilitiesByName: {} },
@@ -324,7 +349,9 @@ describe( 'Store Reducer', () => {
 
 				const state = reducer(
 					{ categoriesBySlug: defaultState, abilitiesByName: {} },
-					action
+					// Intentionally bypass the static contract to cover the
+					// reducer's defensive handling of invalid runtime input.
+					action as never
 				);
 
 				expect( state.categoriesBySlug ).toEqual( defaultState );
@@ -349,7 +376,7 @@ describe( 'Store Reducer', () => {
 				const action = {
 					type: UNREGISTER_ABILITY_CATEGORY,
 					slug: 'category1',
-				};
+				} as const;
 
 				const state = reducer(
 					{ categoriesBySlug: initialState, abilitiesByName: {} },
@@ -374,7 +401,7 @@ describe( 'Store Reducer', () => {
 				const action = {
 					type: UNREGISTER_ABILITY_CATEGORY,
 					slug: 'non-existent',
-				};
+				} as const;
 
 				const state = reducer(
 					{ categoriesBySlug: initialState, abilitiesByName: {} },
@@ -400,7 +427,9 @@ describe( 'Store Reducer', () => {
 
 				const state = reducer(
 					{ categoriesBySlug: initialState, abilitiesByName: {} },
-					action
+					// Intentionally bypass the static contract to cover the
+					// reducer's defensive handling of invalid runtime input.
+					action as never
 				);
 
 				expect( state.categoriesBySlug ).toEqual( initialState );

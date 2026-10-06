@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { ServerSideRenderWithPostId } from './server-side-render';
 import { useServerSideRender } from './hook';
 

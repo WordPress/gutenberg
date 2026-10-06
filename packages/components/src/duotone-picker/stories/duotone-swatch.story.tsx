@@ -1,15 +1,9 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { DuotoneSwatch } from '..';
 
 const meta: Meta< typeof DuotoneSwatch > = {
-	title: 'Components/DuotoneSwatch',
+	id: 'components-duotoneswatch',
+	title: 'Components/@wordpress-components/DuotoneSwatch',
 	component: DuotoneSwatch,
 	parameters: {
 		controls: { expanded: true },

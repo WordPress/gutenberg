@@ -1,0 +1,63 @@
+import { useId, useMemo } from '@wordpress/element';
+import { inertValue } from '@wordpress/react-inert-value';
+import { Card } from '@wordpress/ui';
+import type { WidgetType } from '@wordpress/widget-primitives';
+import { WidgetContextProvider } from '../../context/widget-context';
+import { WidgetFrame } from '../widget-frame';
+import styles from './widget-preview-chrome.module.css';
+import type { DashboardWidget } from '../../types';
+
+export interface WidgetPreviewChromeProps {
+	widget: DashboardWidget< unknown >;
+	widgetType: WidgetType;
+	index?: number;
+}
+
+/**
+ * Catalog host-chrome: the faithful `WidgetFrame` in a viewport that scales the
+ * card to fill the tile at any zoom; inert so the picker owns selection.
+ *
+ * @param {WidgetPreviewChromeProps} props Component props.
+ */
+export function WidgetPreviewChrome( {
+	widget,
+	widgetType,
+	index = 0,
+}: WidgetPreviewChromeProps ) {
+	const titleId = useId();
+
+	const contextValue = useMemo(
+		() => ( {
+			uuid: widget.uuid,
+			name: widget.type,
+			index,
+		} ),
+		[ widget.uuid, widget.type, index ]
+	);
+
+	return (
+		<WidgetContextProvider value={ contextValue }>
+			<div
+				className={ styles.viewport }
+				// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+				inert={ inertValue( true ) }
+			>
+				<div className={ styles.canvas }>
+					<Card.Root
+						render={ <section /> }
+						className={ styles.card }
+						aria-labelledby={
+							widgetType.title ? titleId : undefined
+						}
+					>
+						<WidgetFrame
+							widget={ widget }
+							widgetType={ widgetType }
+							titleId={ titleId }
+						/>
+					</Card.Root>
+				</div>
+			</div>
+		</WidgetContextProvider>
+	);
+}

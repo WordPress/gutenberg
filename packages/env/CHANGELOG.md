@@ -2,6 +2,54 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a `mariadbVersion` option and `WP_ENV_MARIADB_VERSION` environment variable to choose the MariaDB version used by the Docker runtime, including versions older than 10.4 ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
+-   Explain why `wp-env start` fails when a database was last used by a newer MariaDB version, which MariaDB cannot downgrade from ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
+-   Stop `wp-env start` with an error naming the image when an image cannot be pulled and is not available locally, such as a `mariadbVersion` that does not exist, instead of reporting that cached images will be used ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
+-   Make `wp db` commands, and so `wp-env reset`, work with a `mariadbVersion` older than 11.4. The MariaDB client in the CLI image requires TLS, which those servers do not offer, so the CLI image now runs the client without verifying the server certificate, as WP-CLI does from db-command 3.0 ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
+
+### Bug Fixes
+
+-   Reject a `phpVersion` or `WP_ENV_PHP_VERSION` that is not only a version number, such as `8.2-apache` or `abc8`, instead of failing later because the Docker image does not exist ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
+-   Pass `-T` to `docker compose exec` when stdin is not a terminal, so commands run from a Git hook, which has a TTY on stdout but not on stdin, no longer fail with "cannot attach stdin to a TTY-enabled container" ([#78374](https://github.com/WordPress/gutenberg/pull/78374)).
+
+### Internal
+
+-   Update `@wp-playground/cli` to 3.1.56, which replaces the `fs-ext` optional dependency, compiled with `node-gyp` at install time, with `fs-ext-extra-prebuilt`, which ships prebuilt binaries and works without running install scripts ([#84012](https://github.com/WordPress/gutenberg/pull/84012)).
+
+## 11.16.0 (2026-09-23)
+
+### Bug Fixes
+
+-   Wait for lifecycle script output streams to close before reporting command failures, so their error output is not lost ([#82735](https://github.com/WordPress/gutenberg/pull/82735)).
+
+## 11.15.0 (2026-09-10)
+
+### Bug Fixes
+
+-   Point the apt sources of the bullseye-based WordPress images (PHP 7.4 and 8.0) at `archive.debian.org`, so building them no longer fails now that Debian 11 has reached end-of-life and left the regular mirrors ([#82478](https://github.com/WordPress/gutenberg/pull/82478)).
+
+## 11.14.0 (2026-08-26)
+
+### Bug Fixes
+
+-   Update git sources to the latest commit when `--update` is passed. Previously, a source pointing at a branch (such as `"core": "WordPress/WordPress"`) stayed at the commit it was first cloned at, no matter how many times it was updated.
+-   Do not fail `wp-env start` when Docker images cannot be pulled (e.g., the Docker registry is unreachable); fall back to locally cached images and show a notice instead. ([#81631](https://github.com/WordPress/gutenberg/issues/81631))
+
+## 11.13.0 (2026-08-12)
+
+
+## 11.12.0 (2026-07-29)
+
+## 11.11.0 (2026-07-14)
+
+## 11.10.0 (2026-07-01)
+
+## 11.9.0 (2026-06-24)
+
+## 11.8.1 (2026-06-16)
+
 ## 11.8.0 (2026-06-10)
 
 ### Enhancements

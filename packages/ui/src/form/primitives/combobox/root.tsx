@@ -1,5 +1,6 @@
 import { Combobox as _Combobox } from '@base-ui/react/combobox';
 import type { ComboboxRootProps } from './types';
+import { DirectionProvider } from '../../../utils/direction-provider';
 
 /**
  * Low-level primitive for a combobox that has an associated selection state.
@@ -7,8 +8,14 @@ import type { ComboboxRootProps } from './types';
  * See `SearchableSelectControl` and `SearchableChipSelectControl` for standard
  * implementations of a single and multiple selection combobox.
  */
-export function Root< Value, Multiple extends boolean | undefined = false >(
-	props: ComboboxRootProps< Value, Multiple >
-) {
-	return <_Combobox.Root { ...props } />;
+export function Root<
+	Value,
+	Multiple extends boolean | undefined = false,
+	Item = Value,
+>( props: ComboboxRootProps< Value, Multiple, Item > ) {
+	return (
+		<DirectionProvider>
+			<_Combobox.Root { ...props } />
+		</DirectionProvider>
+	);
 }

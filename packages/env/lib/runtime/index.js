@@ -1,13 +1,11 @@
 'use strict';
-
-/**
- * Internal dependencies
- */
 const DockerRuntime = require( './docker' );
 const PlaygroundRuntime = require( './playground' );
 const {
 	UnsupportedCommandError,
 	EnvironmentNotInitializedError,
+	DatabaseDowngradeError,
+	MissingImageError,
 } = require( './errors' );
 const { setCache, getCache } = require( '../cache' );
 
@@ -88,4 +86,6 @@ module.exports = {
 	PlaygroundRuntime,
 	UnsupportedCommandError,
 	EnvironmentNotInitializedError,
+	DatabaseDowngradeError,
+	MissingImageError,
 };

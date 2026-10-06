@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import {
 	useContext,
 	useMemo,
 	forwardRef,
 	useCallback,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import type { PopoverProps } from './types';
 import * as Styled from './styles';
@@ -24,7 +13,10 @@ import { Context } from './context';
 export const Popover = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< PopoverProps, 'div', false >
->( function Popover( { gutter, shift, modal = true, ...otherProps }, ref ) {
+>( function UnforwardedPopover(
+	{ gutter, shift, modal = true, ...otherProps },
+	ref
+) {
 	const menuContext = useContext( Context );
 
 	// Extract the side from the applied placement — useful for animations.

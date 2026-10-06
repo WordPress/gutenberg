@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { beforeEach, describe, expect, it } from 'vitest';
 import type { CropperState, TransformOperation } from '../../types';
 import { DEFAULT_STATE } from '../../constants';
 import { applyOperationToState, stateFromPipeline } from '../pipeline';

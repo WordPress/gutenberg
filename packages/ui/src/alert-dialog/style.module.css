@@ -32,8 +32,10 @@
 		.irreversible-action {
 			--wp-ui-button-background-color: var(--wpds-color-background-interactive-error-strong);
 			--wp-ui-button-background-color-active: var(--wpds-color-background-interactive-error-strong-active);
+			--wp-ui-button-background-color-disabled: var(--wpds-color-background-interactive-error-strong-disabled);
 			--wp-ui-button-foreground-color: var(--wpds-color-foreground-interactive-error-strong);
 			--wp-ui-button-foreground-color-active: var(--wpds-color-foreground-interactive-error-strong-active);
+			--wp-ui-button-foreground-color-disabled: var(--wpds-color-foreground-interactive-error-strong-disabled);
 		}
 	}
 }

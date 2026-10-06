@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useState } from '@wordpress/element';
 
 export type ImageLoadingStatus = 'idle' | 'loading' | 'loaded' | 'error';

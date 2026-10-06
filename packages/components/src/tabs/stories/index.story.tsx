@@ -9,7 +9,7 @@ import Tooltip from '../../tooltip';
 import Icon from '../../icon';
 
 const meta: Meta< typeof Tabs > = {
-	title: 'Components/Containers/Tabs',
+	title: 'Components/@wordpress-components/Containers/Tabs',
 	id: 'components-tabs',
 	component: Tabs,
 	subcomponents: {
@@ -26,7 +26,7 @@ const meta: Meta< typeof Tabs > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Use `Tabs` from `@wordpress/ui` instead.',
+			notes: 'Use [`Tabs`](?path=/docs/design-system-components-tabs--docs) from `@wordpress/ui` instead.',
 		},
 	},
 	args: {

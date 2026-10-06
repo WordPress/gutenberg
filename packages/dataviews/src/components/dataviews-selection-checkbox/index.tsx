@@ -1,14 +1,10 @@
-/**
- * WordPress dependencies
- */
-import { CheckboxControl } from '@wordpress/components';
+import { CheckboxControl as WCCheckboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { SetSelection } from '../../types/private';
 import type { NormalizedField } from '../../types';
+
+// This class is also used elsewhere to detect the selection checkbox.
+export const SELECTION_CHECKBOX_CLASS = 'dataviews-selection-checkbox';
 
 interface DataViewsSelectionCheckboxProps< Item > {
 	selection: string[];
@@ -38,8 +34,8 @@ export default function DataViewsSelectionCheckbox< Item >( {
 		titleField?.getValue?.( { item } ) || __( '(no title)' );
 
 	return (
-		<CheckboxControl
-			className="dataviews-selection-checkbox"
+		<WCCheckboxControl
+			className={ SELECTION_CHECKBOX_CLASS }
 			aria-label={ selectionLabel }
 			aria-disabled={ disabled }
 			checked={ checked }

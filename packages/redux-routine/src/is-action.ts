@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { isPlainObject } from 'is-plain-object';
 import type { Action } from 'redux';
 

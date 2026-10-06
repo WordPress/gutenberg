@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { selectorArgsToStateKey } from '../utils';
 
 describe( 'selectorArgsToStateKey', () => {

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { processBlockType } from './process-block-type';
 import type {
 	BlockType,

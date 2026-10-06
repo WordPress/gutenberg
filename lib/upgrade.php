@@ -7,7 +7,7 @@
 
 if ( ! defined( '_GUTENBERG_VERSION_MIGRATION' ) ) {
 	// It's necessary to update this version every time a new migration is needed.
-	define( '_GUTENBERG_VERSION_MIGRATION', '22.8.0' );
+	define( '_GUTENBERG_VERSION_MIGRATION', '23.9.0' );
 }
 
 /**
@@ -25,8 +25,12 @@ function _gutenberg_migrate_database() {
 			_gutenberg_migrate_remove_fse_drafts();
 		}
 
-		if ( version_compare( $gutenberg_installed_version, '22.8.0', '<' ) ) {
-			_gutenberg_migrate_enable_real_time_collaboration();
+		if ( version_compare( $gutenberg_installed_version, '23.8.0', '<' ) ) {
+			_gutenberg_migrate_remove_legacy_collaboration_options();
+		}
+
+		if ( version_compare( $gutenberg_installed_version, '23.9.0', '<' ) ) {
+			_gutenberg_migrate_active_templates();
 		}
 
 		update_option( 'gutenberg_version_migration', _GUTENBERG_VERSION_MIGRATION );
@@ -64,22 +68,83 @@ function _gutenberg_migrate_remove_fse_drafts() {
 }
 
 /**
- * Update RTC option name.
+ * Removes collaboration options replaced by the Real-Time Collaboration experiment.
  *
- * @since 22.8.0
+ * The previous values are intentionally not migrated to the experiment. Real-time
+ * collaboration is now opt-in, so existing sites must explicitly enable the
+ * experiment instead of being opted in by a legacy setting.
+ *
+ * @since 23.8.0
  */
-function _gutenberg_migrate_enable_real_time_collaboration() {
-	$value1 = get_option( 'enable_real_time_collaboration', '1' );
-	$value2 = get_option( 'wp_enable_real_time_collaboration', '1' );
-
-	// RTC is enabled by default in the plugin, so only set the value if it was
-	// previously disabled. Otherwise rely on the default value.
-	if ( ! $value1 || ! $value2 ) {
-		update_option( 'wp_collaboration_enabled', '0' );
-	}
-
+function _gutenberg_migrate_remove_legacy_collaboration_options() {
 	delete_option( 'enable_real_time_collaboration' );
 	delete_option( 'wp_enable_real_time_collaboration' );
+	delete_option( 'wp_collaboration_enabled' );
+}
+
+/**
+ * Migrates templates created by the removed template activation experiment.
+ *
+ * The experiment allowed multiple templates with the same slug, with the
+ * `active_templates` option deciding which one renders. Without the
+ * experiment, WordPress expects at most one template per slug, so an inactive
+ * duplicate could take over rendering. Move every template the experiment did
+ * not treat as active out of the template hierarchy by renaming it to a
+ * `custom-{slug}` slug; it remains available as a custom template.
+ *
+ * Only runs on sites where the `active_templates` option exists, which means
+ * the experiment was enabled at some point.
+ *
+ * @since 23.9.0
+ *
+ * @access private
+ * @internal
+ */
+function _gutenberg_migrate_active_templates() {
+	$active_templates = get_option( 'active_templates' );
+
+	if ( ! is_array( $active_templates ) ) {
+		// The template activation experiment was never enabled on this site.
+		return;
+	}
+
+	$template_query = new WP_Query(
+		array(
+			'post_type'      => 'wp_template',
+			'post_status'    => array( 'publish', 'draft', 'auto-draft' ),
+			'posts_per_page' => -1,
+			'no_found_rows'  => true,
+		)
+	);
+
+	foreach ( $template_query->posts as $post ) {
+		$slug = $post->post_name;
+
+		// The active template keeps its slug, so it continues to override the
+		// theme's template as it did under the experiment.
+		if ( isset( $active_templates[ $slug ] ) && absint( $active_templates[ $slug ] ) === $post->ID ) {
+			continue;
+		}
+
+		$template = _build_block_template_result_from_post( $post );
+
+		// Custom templates never needed activation; leave them untouched.
+		if ( is_wp_error( $template ) || $template->is_custom ) {
+			continue;
+		}
+
+		wp_update_post(
+			array(
+				'ID'        => $post->ID,
+				'post_name' => 'custom-' . $slug,
+			)
+		);
+		// The template is a plain custom template from now on.
+		delete_post_meta( $post->ID, 'is_wp_suggestion' );
+		delete_post_meta( $post->ID, 'is_inactive_by_default' );
+	}
+
+	delete_option( 'active_templates' );
 }
 
 // Deletion of the `_wp_file_based` term (in _gutenberg_migrate_remove_fse_drafts) must happen

@@ -1,16 +1,9 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import Tip from '..';
 
 const meta: Meta< typeof Tip > = {
 	component: Tip,
-	title: 'Components/Feedback/Tip',
+	title: 'Components/@wordpress-components/Feedback/Tip',
 	id: 'components-tip',
 	argTypes: {
 		children: { control: { type: 'text' } },

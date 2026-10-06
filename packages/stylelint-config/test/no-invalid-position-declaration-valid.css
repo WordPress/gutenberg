@@ -1,0 +1,21 @@
+.class {
+	background: #fff;
+}
+
+.class2 {
+	--foo: #fff;
+}
+
+@media all {
+
+	.class3 {
+		background: #fff;
+	}
+}
+
+.class4 {
+
+	@media all {
+		background: #fff;
+	}
+}
