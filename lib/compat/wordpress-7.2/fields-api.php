@@ -12,7 +12,7 @@
  * entity can have several modules. Each module applies to the fields it was
  * registered with, see {@see gutenberg_get_registered_field_modules()}.
  *
- * Fields are registered on the `fields_api_init` action, and only there, on the
+ * Fields are registered on the `wp_fields_api_init` action, and only there, on the
  * registry its callbacks receive, see
  * {@see Gutenberg_Fields_Registry::register()},
  * {@see Gutenberg_Fields_Registry::update()}, and
@@ -20,7 +20,7 @@
  * registry.
  *
  * Fields can also be declared as files, grouped in a field collection, which
- * a `fields_api_init` callback registers with
+ * a `wp_fields_api_init` callback registers with
  * {@see gutenberg_register_field_collection()}. A collection is for a single
  * entity. WordPress core registers its own fields this way, from
  * packages/core-fields: the defaults every post type derives from its
@@ -82,7 +82,7 @@ function gutenberg_get_all_registered_field_modules() {
  * prerequisites depend on it. A dynamic dependency is only listed in the
  * import map; the module is fetched when it is imported.
  *
- * Reading the registry fires `fields_api_init`, so the fields and their
+ * Reading the registry fires `wp_fields_api_init`, so the fields and their
  * script modules are registered on demand. It only reads the registry on the
  * pages that load the editor script, not on every admin request (heartbeat,
  * Ajax, other screens). It runs on `admin_footer`, the last action before the
@@ -143,6 +143,7 @@ function _gutenberg_add_field_modules_to_editor_script( $scripts = null ) {
 		$scripts->add_data( 'wp-editor', 'module_dependencies', $dependencies );
 	}
 }
+remove_action( 'admin_footer', '_wp_add_field_modules_to_editor_script' );
 add_action( 'admin_footer', '_gutenberg_add_field_modules_to_editor_script' );
 
 /**
@@ -255,18 +256,18 @@ function _gutenberg_get_field_collection( $directory ) {
  *
  * Fields that apply to several entities, such as the defaults every post
  * type derives from its supports, are registered in code: a
- * `fields_api_init` callback can read their definitions from files with
+ * `wp_fields_api_init` callback can read their definitions from files with
  * {@see gutenberg_get_field_collection_fields()} and register them on each
  * entity with {@see Gutenberg_Fields_Registry::register()}.
  *
- * It must be called on the `fields_api_init` action, with the registry its
+ * It must be called on the `wp_fields_api_init` action, with the registry its
  * callbacks receive. An invalid configuration is reported with
  * _doing_it_wrong() and skipped.
  *
  * @since 7.2.0
  *
  * @param Gutenberg_Fields_Registry $registry  The registry, as received by
- *                                             the `fields_api_init` action.
+ *                                             the `wp_fields_api_init` action.
  * @param string                    $directory The directory of the
  *                                             collection.
  * @return bool Whether the collection is valid and the registry accepted
@@ -276,7 +277,7 @@ function gutenberg_register_field_collection( $registry, $directory ) {
 	if ( ! $registry instanceof Gutenberg_Fields_Registry ) {
 		_doing_it_wrong(
 			__FUNCTION__,
-			__( 'Field collections are registered on the registry the `fields_api_init` action passes to its callbacks.', 'gutenberg' ),
+			__( 'Field collections are registered on the registry the `wp_fields_api_init` action passes to its callbacks.', 'gutenberg' ),
 			'7.2.0'
 		);
 		return false;
