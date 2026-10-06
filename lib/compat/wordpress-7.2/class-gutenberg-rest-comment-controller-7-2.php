@@ -475,7 +475,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				);
 			}
 
-			// A reaction under a hidden note would escape the trash/restore cascade.
+			// A reaction under a hidden note would escape the trash cascade.
 			if ( in_array( $parent_comment->comment_approved, array( 'trash', 'spam' ), true ) ) {
 				return new WP_Error(
 					'rest_comment_invalid_parent',

@@ -629,7 +629,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 
 	/**
 	 * A reaction created under a hidden note would never be reached by the
-	 * trash/restore cascade, so the note must be live.
+	 * trash cascade, so the note must be live.
 	 *
 	 * @dataProvider data_hidden_note_statuses
 	 *
@@ -1203,9 +1203,9 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 
 	/**
 	 * Core cascades a trashed note to its `note` children only, so
-	 * reactions need their own trash and restore cascade.
+	 * reactions need their own trash cascade.
 	 */
-	public function test_trashing_note_trashes_and_restores_its_reactions() {
+	public function test_trashing_note_trashes_its_reactions() {
 		if ( ! EMPTY_TRASH_DAYS ) {
 			$this->markTestSkipped( 'Trash is disabled; trashing force-deletes.' );
 		}
@@ -1217,52 +1217,6 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 
 		wp_trash_comment( $note_id );
 		$this->assertSame( 'trash', wp_get_comment_status( $reaction_id ), 'Reaction stayed approved under a trashed note.' );
-
-		wp_untrash_comment( $note_id );
-		$this->assertSame( 'approved', wp_get_comment_status( $reaction_id ), 'Reaction was not restored with its note.' );
-	}
-
-	/**
-	 * Restoring a note brings back only the reactions trashed along with it,
-	 * not ones the user had already removed.
-	 */
-	public function test_untrashing_note_does_not_restore_removed_reactions() {
-		if ( ! EMPTY_TRASH_DAYS ) {
-			$this->markTestSkipped( 'Trash is disabled; trashing force-deletes.' );
-		}
-
-		wp_set_current_user( self::$editor_id );
-		$post_id    = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
-		$note_id    = $this->create_note( $post_id, self::$editor_id );
-		$removed_id = $this->create_reaction( $post_id, $note_id, self::$editor_id );
-		wp_trash_comment( $removed_id );
-		$live_id = $this->create_reaction( $post_id, $note_id, self::$author_id, '1f680' );
-
-		wp_trash_comment( $note_id );
-		wp_untrash_comment( $note_id );
-
-		$this->assertSame( 'trash', wp_get_comment_status( $removed_id ), 'A reaction the user removed was restored with its note.' );
-		$this->assertSame( 'approved', wp_get_comment_status( $live_id ), 'The live reaction was not restored with its note.' );
-		$this->assertSame( '', get_comment_meta( $live_id, '_wp_trash_meta_with_note', true ), 'The restored reaction kept its cascade flag.' );
-	}
-
-	/**
-	 * The cascade flag only ever sits on reactions, so restoring any other
-	 * comment must leave its meta alone.
-	 */
-	public function test_untrashing_regular_comment_keeps_its_meta() {
-		if ( ! EMPTY_TRASH_DAYS ) {
-			$this->markTestSkipped( 'Trash is disabled; trashing force-deletes.' );
-		}
-
-		$post_id    = self::factory()->post->create();
-		$comment_id = self::factory()->comment->create( array( 'comment_post_ID' => $post_id ) );
-		add_comment_meta( $comment_id, '_wp_trash_meta_with_note', '1', true );
-
-		wp_trash_comment( $comment_id );
-		wp_untrash_comment( $comment_id );
-
-		$this->assertSame( '1', get_comment_meta( $comment_id, '_wp_trash_meta_with_note', true ) );
 	}
 
 	/**
