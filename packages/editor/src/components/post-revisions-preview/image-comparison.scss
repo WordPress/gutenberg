@@ -1,65 +1,75 @@
 .editor-post-revisions-preview__image-controls {
-	display: flex;
-	flex-wrap: wrap;
-	gap: var(--wpds-dimension-gap-sm);
 	margin-bottom: var(--wpds-dimension-gap-md);
+
+	> [role="tab"] {
+		height: var(--wpds-dimension-size-lg);
+		padding-inline: var(--wpds-dimension-padding-md);
+		font-size: var(--wpds-typography-font-size-sm);
+	}
+}
+
+.editor-post-revisions-preview__image-labels {
+	display: flex;
+	justify-content: space-between;
+	gap: var(--wpds-dimension-gap-md);
+	margin-bottom: var(--wpds-dimension-gap-sm);
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	font-size: var(--wpds-typography-font-size-sm);
+
+	> :last-child {
+		text-align: end;
+	}
+}
+
+.editor-post-revisions-preview__image-dimensions {
+	display: block;
 }
 
 .editor-post-revisions-preview__image-stage {
 	position: relative;
-	display: grid;
+	height: 400px;
+	min-height: 44px;
+	// Reserve space for the title, tabs, labels, and help within the modal.
+	max-height: min(400px, max(44px, calc(70dvh - 240px)));
 	isolation: isolate;
 	background: var(--wpds-color-background-surface-neutral-weak);
 
-	&.has-unavailable-image {
-		display: block;
-
-		.editor-post-revisions-preview__image-label {
-			position: static;
-			display: block;
-		}
+	@media (max-width: 600px) {
+		max-height: min(240px, max(44px, calc(70dvh - 240px)));
 	}
 }
 
 .editor-post-revisions-preview__image-version {
-	position: relative;
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
 	z-index: 0;
-	grid-area: 1 / 1;
-	min-width: 0;
 	background: var(--wpds-color-background-surface-neutral-weak);
-
-	// Revisions need the entire image, including images taller than the
-	// pattern thumbnail limit applied by BlockPreview's inline styles.
-	.block-editor-block-preview__content,
-	iframe {
-		max-height: none !important;
-	}
 
 	&.is-before {
 		z-index: 1;
 	}
 }
 
-.editor-post-revisions-preview__image-label {
+.editor-post-revisions-preview__image-preview {
 	position: absolute;
-	z-index: 2;
-	top: var(--wpds-dimension-padding-sm);
-	padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-sm);
-	border-radius: var(--wpds-border-radius-sm);
-	background: var(--wpds-color-background-surface-neutral-strong);
-	color: var(--wpds-color-foreground-content-neutral);
+	top: 50%;
+	/*rtl:ignore*/
+	left: 50%;
+	width: 100%;
+
+	// BlockPreview has no public prop to lift its pattern-thumbnail cap.
+	// Remove only those two caps; measure this wrapper before outer scaling.
+	.block-editor-block-preview__content,
+	.block-editor-block-preview__content > iframe {
+		max-height: none !important;
+	}
+}
+
+.editor-post-revisions-preview__image-help {
+	margin-bottom: 0;
+	color: var(--wpds-color-foreground-content-neutral-weak);
 	font-size: var(--wpds-typography-font-size-sm);
-	pointer-events: none;
-
-	.is-before > & {
-		/*rtl:ignore*/
-		left: var(--wpds-dimension-padding-sm);
-	}
-
-	.is-after > & {
-		/*rtl:ignore*/
-		right: var(--wpds-dimension-padding-sm);
-	}
 }
 
 .editor-post-revisions-preview__image-divider {
@@ -68,20 +78,36 @@
 	top: 0;
 	bottom: 0;
 	width: 2px;
-	background: var(--wpds-color-background-surface-neutral-strong);
-	box-shadow: 0 0 0 1px var(--wpds-color-stroke-surface-neutral);
+	background: var(--wpds-color-background-interactive-neutral);
+	box-shadow: 0 0 0 1px var(--wpds-color-stroke-interactive-neutral-strong);
+	pointer-events: none;
+}
+
+.editor-post-revisions-preview__image-handle {
+	position: absolute;
+	z-index: 4;
+	top: 50%;
+	width: 24px;
+	height: 24px;
+	box-sizing: border-box;
+	transform: translate(-50%, -50%);
+	border: 2px solid var(--wpds-color-stroke-interactive-neutral-strong);
+	border-radius: 50%;
+	background: var(--wpds-color-background-interactive-neutral);
+	box-shadow: 0 0 0 2px var(--wpds-color-background-interactive-neutral);
 	pointer-events: none;
 }
 
 .editor-post-revisions-preview__image-slider {
 	position: absolute;
 	z-index: 3;
-	top: 0;
-	// Extend by half a thumb on either side so its center follows the divider.
+	top: 50%;
+	// Extend by half a touch target so its center follows the divider.
 	/*rtl:ignore*/
 	left: -22px;
 	width: calc(100% + 44px);
-	height: 100%;
+	height: 44px;
+	transform: translateY(-50%);
 	margin: 0;
 	padding: 0;
 	appearance: none;
@@ -105,22 +131,26 @@
 		width: 44px;
 		height: 44px;
 		appearance: none;
-		border: 2px solid var(--wpds-color-stroke-surface-neutral);
-		border-radius: 50%;
-		background: var(--wpds-color-background-surface-neutral-strong);
+		border: 0;
+		background: transparent;
 	}
 
 	&::-moz-range-thumb {
-		width: 40px;
-		height: 40px;
-		border: 2px solid var(--wpds-color-stroke-surface-neutral);
-		border-radius: 50%;
-		background: var(--wpds-color-background-surface-neutral-strong);
+		width: 44px;
+		height: 44px;
+		border: 0;
+		background: transparent;
 	}
 
 	&:focus-visible {
 		outline: var(--wpds-border-width-focus) solid;
 		outline-color: var(--wpds-color-stroke-focus);
 		outline-offset: 2px;
+	}
+
+	&:focus-visible ~ .editor-post-revisions-preview__image-handle {
+		outline: var(--wpds-border-width-focus) solid;
+		outline-color: var(--wpds-color-stroke-focus);
+		outline-offset: 4px;
 	}
 }
