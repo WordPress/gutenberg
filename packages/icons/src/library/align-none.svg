@@ -1,4 +1,4 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="fill: none" stroke="currentColor" stroke-width="1.5">
-	<path d="M5 5H19M5 19H19" />
-	<rect x="5" y="9" width="14" height="6" fill="currentColor" stroke="none" />
+	<path d="M3.25 3.25H20.75M3.25 20.75H20.75" />
+	<rect x="3.25" y="8.25" width="17.5" height="7.5" fill="currentColor" stroke="none" />
 </svg>

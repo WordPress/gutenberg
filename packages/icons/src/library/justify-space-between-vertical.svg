@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="fill: none" stroke="currentColor" stroke-width="1.5">
-	<path d="M4 12H20" />
-	<path d="M17 20H7V16H17V20Z" fill="currentColor" stroke="none" />
-	<path d="M17 8H7V4H17V8Z" fill="currentColor" stroke="none" />
+	<path d="M2 12H22" />
+	<path d="M18.25 22H5.75V17H18.25V22Z" fill="currentColor" stroke="none" />
+	<path d="M18.25 7H5.75V2H18.25V7Z" fill="currentColor" stroke="none" />
 </svg>

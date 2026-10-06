@@ -28,7 +28,7 @@ exports[`AlignmentUI > should allow custom alignment controls to be specified 1`
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M4 5H13M4 12H20M4 19H13"
+            d="M2 3.25H13.25M2 12H22M2 20.75H13.25"
           />
         </svg>
       </button>
@@ -54,7 +54,7 @@ exports[`AlignmentUI > should allow custom alignment controls to be specified 1`
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M7.5 5H16.5M4 12H20M7.5 19H16.5"
+            d="M6.25 3.25H17.75M2 12H22M6.25 20.75H17.75"
           />
         </svg>
       </button>
@@ -89,7 +89,7 @@ exports[`AlignmentUI > should match snapshot when controls are hidden 1`] = `
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M4 5H13M4 12H20M4 19H13"
+          d="M2 3.25H13.25M2 12H22M2 20.75H13.25"
         />
       </svg>
     </button>
@@ -125,7 +125,7 @@ exports[`AlignmentUI > should match snapshot when controls are visible 1`] = `
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M4 5H13M4 12H20M4 19H13"
+            d="M2 3.25H13.25M2 12H22M2 20.75H13.25"
           />
         </svg>
       </button>
@@ -151,7 +151,7 @@ exports[`AlignmentUI > should match snapshot when controls are visible 1`] = `
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M7.5 5H16.5M4 12H20M7.5 19H16.5"
+            d="M6.25 3.25H17.75M2 12H22M6.25 20.75H17.75"
           />
         </svg>
       </button>
@@ -177,7 +177,7 @@ exports[`AlignmentUI > should match snapshot when controls are visible 1`] = `
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M11 5H20M4 12H20M11 19H20"
+            d="M10.75 3.25H22M2 12H22M10.75 20.75H22"
           />
         </svg>
       </button>
