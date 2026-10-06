@@ -49,6 +49,7 @@
 		"**/benchmark",
 		"src/components/block-icon/stories/index.story.ts",
 		"src/components/contrast-checker/stories/index.story.ts",
-		"src/hooks/test/allowed-blocks.jsdom.test.tsx"
+		"src/components/inspector-controls-tabs/test/use-inspector-controls-tabs.jsdom.test.tsx",
+		"src/hooks/test/utils.jsdom.test.tsx"
 	]
 }
