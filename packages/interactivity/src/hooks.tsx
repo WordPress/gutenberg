@@ -86,12 +86,6 @@ interface DirectiveOptions {
 	priority?: number;
 }
 
-/**
- * Resolves a directive entry's value in the current scope.
- *
- * @param entry The directive entry whose value should be resolved.
- * @return The resolved value.
- */
 export interface Evaluate {
 	( entry: DirectiveEntry ): any;
 }
