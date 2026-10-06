@@ -18,7 +18,7 @@
 	"config": {
 		"process-timeout": 0,
 		"platform": {
-			"php": "7.4"
+			"php": "5.6.20"
 		},
 		"allow-plugins": {
 			"dealerdirect/phpcodesniffer-composer-installer": true,
@@ -47,6 +47,7 @@
 		"yoast/phpunit-polyfills": "^1.0"
 	},
 	"require": {
+		"php": ">=5.6.20",
 		"composer/installers": "~1.0"
 	},
 	"scripts": {
