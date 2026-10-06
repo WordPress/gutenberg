@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   `test-unit`: Allow generated titles passed through variables with `vitest/valid-title`'s `allowArguments` option ([#83995](https://github.com/WordPress/gutenberg/pull/83995)).
 -   `use-recommended-components`: Recognize the new `@wordpress/ui` Meter as use-with-caution. ([#83855](https://github.com/WordPress/gutenberg/pull/83855))
 -   `use-recommended-components`: Recommend `Checkbox`, `CheckboxControl`, and `CheckboxGroup` from `@wordpress/ui`, and flag `CheckboxControl` from `@wordpress/components` ([#83771](https://github.com/WordPress/gutenberg/pull/83771)).
 -   `use-recommended-components`: Recommend `Radio`, `RadioGroup`, and `RadioGroupControl` from `@wordpress/ui`, and flag `RadioControl` from `@wordpress/components` ([#83872](https://github.com/WordPress/gutenberg/pull/83872)).
