@@ -2,6 +2,7 @@ import clsx from 'clsx';
 // @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { BlockPreview } from '@wordpress/block-editor';
 import { cloneBlock, type Block } from '@wordpress/blocks';
+import { Button } from '@wordpress/components';
 import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -24,6 +25,24 @@ export default function ImageComparison( {
 	return (
 		<div className="editor-post-revisions-preview__image-comparison">
 			<p>{ __( 'Drag the slider to compare image versions.' ) }</p>
+			<div className="editor-post-revisions-preview__image-controls">
+				<Button
+					variant="secondary"
+					accessibleWhenDisabled
+					size="compact"
+					onClick={ () => setPosition( 100 ) }
+				>
+					{ __( 'Show before' ) }
+				</Button>
+				<Button
+					variant="secondary"
+					accessibleWhenDisabled
+					size="compact"
+					onClick={ () => setPosition( 0 ) }
+				>
+					{ __( 'Show after' ) }
+				</Button>
+			</div>
 			<div className="editor-post-revisions-preview__image-stage">
 				{ Object.entries( previews )
 					.reverse()
