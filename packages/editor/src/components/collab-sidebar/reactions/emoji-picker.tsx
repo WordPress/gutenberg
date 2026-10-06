@@ -494,7 +494,16 @@ export default function EmojiPicker( {
 						}
 					/>
 				</div>
-				<div className="editor-collab-sidebar-panel__picker-viewport">
+				{ /*
+				 * The arrow keys in the search field drive the grid, so
+				 * keep its scroller out of the Tab order. Browsers would
+				 * otherwise make it a Tab stop, since none of the cells are
+				 * tabbable, and a screen reader would read out every emoji.
+				 */ }
+				<div
+					className="editor-collab-sidebar-panel__picker-viewport"
+					tabIndex={ -1 }
+				>
 					<Autocomplete.Status>{ status }</Autocomplete.Status>
 					<Autocomplete.Empty>
 						{ isLoading || loadFailed

@@ -1312,6 +1312,51 @@ test.describe( 'Block Notes', () => {
 			).toBeVisible();
 		} );
 
+		test( 'Tab from the emoji search skips the grid', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Tabbing through the picker' },
+				comment: 'Tab order in the emoji picker',
+			} );
+
+			await page
+				.getByRole( 'combobox', { name: 'Add reaction' } )
+				.focus();
+			await page.keyboard.press( 'Enter' );
+			await blockNoteUtils.waitForFullPicker();
+
+			const searchField = page.getByRole( 'combobox', {
+				name: 'Search emoji',
+			} );
+			await expect( searchField ).toBeFocused();
+
+			// The grid is reached with the arrow keys from the search
+			// field, so Tab moves on to the skin tone toggle.
+			await page.keyboard.press( 'Tab' );
+			await expect(
+				page.getByRole( 'button', { name: /^Skin tone:/ } )
+			).toBeFocused();
+
+			// The scrolling grid is never a Tab stop of its own, which
+			// would read out every emoji in it.
+			await page.keyboard.press( 'Tab' );
+			await expect
+				.poll( () =>
+					page.evaluate(
+						() =>
+							!! document.activeElement?.closest(
+								'.editor-collab-sidebar-panel__picker-viewport'
+							)
+					)
+				)
+				.toBe( false );
+			// Tabbing past the toggle leaves the non-modal picker, closing it.
+			await expect( searchField ).toBeHidden();
+		} );
+
 		test( 'the add-reaction trigger is revealed on hover and focus', async ( {
 			page,
 			blockNoteUtils,
