@@ -119,6 +119,10 @@ interface BlockNode {
 	[ key: string ]: any; // For additional style properties
 }
 
+type FeatureSelectorObject = Record< string, string >;
+type FeatureSelector = string | FeatureSelectorObject;
+type FeatureSelectors = string | Record< string, FeatureSelector >;
+
 export type BlockSelectors = Record<
 	string,
 	{
@@ -126,8 +130,7 @@ export type BlockSelectors = Record<
 		selector: string;
 		fallbackGapValue?: string;
 		hasLayoutSupport?: boolean;
-		featureSelectors?:
-			string | Record< string, string | Record< string, string > >;
+		featureSelectors?: FeatureSelectors;
 		name?: string;
 		styleVariationSelectors?: Record< string, string >;
 	}
@@ -160,8 +163,7 @@ interface StylesNode {
 	mediaQuery?: string;
 	skipSelectorWrapper?: boolean;
 	duotoneSelector?: string;
-	featureSelectors?:
-		string | Record< string, string | Record< string, string > >;
+	featureSelectors?: FeatureSelectors;
 	fallbackGapValue?: string;
 	hasLayoutSupport?: boolean;
 	isStyleVariation?: boolean;
@@ -1401,8 +1403,7 @@ export const getNodesWithSettings = (
 		duotoneSelector?: string;
 		fallbackGapValue?: string;
 		hasLayoutSupport?: boolean;
-		featureSelectors?:
-			string | Record< string, string | Record< string, string > >;
+		featureSelectors?: FeatureSelectors;
 		styleVariationSelectors?: Record< string, string >;
 	}[] = [];
 
@@ -1465,16 +1466,13 @@ export const getNodesWithSettings = (
  * with a `root` key), that selector is returned. Otherwise the fallback
  * selector is used.
  *
- * @param {string|Record<string,string|Record<string,string>>|undefined} featureSelectors The block's feature selectors.
- * @param {string}                                                       featureKey       The feature key to resolve.
- * @param {string}                                                       fallback         The default selector.
+ * @param {FeatureSelectors|undefined} featureSelectors The block's feature selectors.
+ * @param {string}                     featureKey       The feature key to resolve.
+ * @param {string}                     fallback         The default selector.
  * @return {string} The resolved selector.
  */
 function resolveFeatureSelector(
-	featureSelectors:
-		| string
-		| Record< string, string | Record< string, string > >
-		| undefined,
+	featureSelectors: FeatureSelectors | undefined,
 	featureKey: string,
 	fallback: string
 ): string {
@@ -1486,7 +1484,11 @@ function resolveFeatureSelector(
 	if ( typeof feature === 'string' ) {
 		return feature;
 	}
-	if ( typeof feature === 'object' && feature.root ) {
+	if (
+		feature &&
+		typeof feature === 'object' &&
+		typeof feature.root === 'string'
+	) {
 		return feature.root;
 	}
 	return fallback;
@@ -1743,17 +1745,18 @@ function renderStylesNode(
 		// this node's own selector otherwise. Mirrors the PHP renderer.
 		const cssFeatureSelector =
 			featureSelectors && typeof featureSelectors === 'object'
-				? ( featureSelectors as Record< string, unknown > ).css
+				? featureSelectors.css
 				: undefined;
 		let resolvedCssSelector: string | undefined;
 		if ( typeof cssFeatureSelector === 'string' ) {
 			resolvedCssSelector = cssFeatureSelector;
 		} else if (
 			cssFeatureSelector &&
-			typeof cssFeatureSelector === 'object'
+			typeof cssFeatureSelector === 'object' &&
+			'root' in cssFeatureSelector &&
+			typeof cssFeatureSelector.root === 'string'
 		) {
-			resolvedCssSelector = ( cssFeatureSelector as { root?: string } )
-				.root;
+			resolvedCssSelector = cssFeatureSelector.root;
 		}
 		// A variation's dedicated custom-CSS selector is defined on the base
 		// block and targets its feature element; scope it to this specific
