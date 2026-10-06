@@ -1,14 +1,14 @@
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
+import { speak } from '@wordpress/a11y';
 import { Component, Suspense } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-// eslint-disable-next-line @wordpress/use-recommended-components
+import { inertValue } from '@wordpress/react-inert-value';
 import { Card, Notice, Spinner, Stack, VisuallyHidden } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
-import { splitWidgetActions } from '../../utils/split-widget-actions';
-import { WidgetFooter } from '../widget-footer';
 import { WidgetHeader } from '../widget-header';
 import { WidgetRender } from '../widget-render';
+import { WidgetFrameFooter } from './widget-frame-footer';
 import styles from './widget-frame.module.css';
 import type { DashboardWidget } from '../../types';
 
@@ -28,6 +28,10 @@ class WidgetErrorBoundary extends Component<
 
 	static getDerivedStateFromError(): ErrorBoundaryState {
 		return { hasError: true };
+	}
+
+	componentDidCatch() {
+		speak( __( 'This widget encountered an error.' ), 'polite' );
 	}
 
 	render() {
@@ -89,8 +93,6 @@ export function WidgetFrame( {
 	const isBodyBleeding =
 		presentation === 'full-bleed' || presentation === 'content-bleed';
 
-	const { footer: footerActions } = splitWidgetActions( widgetType );
-
 	const body = (
 		<WidgetErrorBoundary>
 			<Suspense fallback={ <LoadingOverlay /> }>
@@ -117,7 +119,8 @@ export function WidgetFrame( {
 					styles.content,
 					isBodyBleeding && styles[ 'bleed-content' ]
 				) }
-				{ ...( editMode ? { inert: 'true' } : {} ) }
+				// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+				inert={ inertValue( editMode ) }
 			>
 				{ isHeaderHidden && widgetType.title && (
 					<VisuallyHidden render={ <h2 id={ titleId } /> }>
@@ -127,9 +130,11 @@ export function WidgetFrame( {
 				{ body }
 			</Card.Content>
 
-			{ footerActions.length > 0 && (
-				<WidgetFooter actions={ footerActions } editMode={ editMode } />
-			) }
+			<WidgetFrameFooter
+				widget={ widget }
+				widgetType={ widgetType }
+				editMode={ editMode }
+			/>
 		</>
 	);
 }

@@ -16,6 +16,7 @@ import {
 	InheritanceToolsPanelItem,
 	isGlobalStylesInheritanceIndicatorUIEnabled,
 } from './inheritance';
+import { useToolsPanelItemPopoverProps } from './utils';
 
 /**
  * @typedef {Object} DropdownContentProps
@@ -89,12 +90,6 @@ function DropdownContent( {
 		</DropdownContentWrapper>
 	);
 }
-
-const popoverProps = {
-	placement: 'left-start',
-	offset: 36,
-	shift: true,
-};
 
 const LabeledColorIndicators = ( { indicators, label } ) => (
 	<Stack
@@ -202,6 +197,7 @@ export default function ColorGradientDropdownItem( {
 	hasInheritedValue = false,
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
 } ) {
+	const popoverProps = useToolsPanelItemPopoverProps();
 	const colorGradientDropdownButtonRef = useRef( undefined );
 	const itemClassName = clsx( 'block-editor-color-gradient-item', className );
 	// A local override exists when the user has set a value that shadows an

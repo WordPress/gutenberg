@@ -7,7 +7,7 @@ import * as Styled from './styles';
 export const Group = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< GroupProps, 'div', false >
->( function Group( props, ref ) {
+>( function UnforwardedGroup( props, ref ) {
 	const menuContext = useContext( Context );
 
 	if ( ! menuContext?.store ) {

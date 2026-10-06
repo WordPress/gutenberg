@@ -25,7 +25,13 @@ const field = {
 	} ),
 } as any;
 
-const postType = { slug: 'post' };
+const postType = {
+	slug: 'post',
+	labels: {
+		featured_image: 'Cover image',
+		set_featured_image: 'Set cover image',
+	},
+};
 const attachments = [
 	{
 		id: 42,
@@ -77,13 +83,28 @@ const withMarker =
 		</>
 	);
 
+// Appends a marker to the media picker, like the plugins that extend it do.
+const withPickerMarker =
+	( MediaUpload: React.ComponentType< any > ) => ( props: any ) => (
+		<>
+			<MediaUpload { ...props } />
+			<p>{ `Picker extended: ${ props.title }` }</p>
+		</>
+	);
+
 describe( 'FeaturedImageEdit', () => {
 	afterEach( () => {
 		removeFilter( 'editor.PostFeaturedImage', 'test/with-marker' );
+		removeFilter( 'editor.MediaUpload', 'test/with-picker-marker' );
 	} );
 
-	it( 'applies the editor.PostFeaturedImage filter with the classic props when the item is the post in context', () => {
+	it( 'applies the editor.PostFeaturedImage and editor.MediaUpload filters when the item is the post in context', () => {
 		addFilter( 'editor.PostFeaturedImage', 'test/with-marker', withMarker );
+		addFilter(
+			'editor.MediaUpload',
+			'test/with-picker-marker',
+			withPickerMarker
+		);
 		render(
 			<RegistryProvider value={ createTestRegistry() }>
 				<EntityProvider kind="postType" type="post" id={ 5 }>
@@ -105,10 +126,18 @@ describe( 'FeaturedImageEdit', () => {
 		expect(
 			screen.getByRole( 'button', { name: 'Remove' } )
 		).toBeInTheDocument();
+		expect(
+			screen.getByText( 'Picker extended: Cover image' )
+		).toBeInTheDocument();
 	} );
 
-	it( 'renders the media control directly outside the post context', () => {
+	it( 'renders the media control directly, with the plain picker, outside the post context', () => {
 		addFilter( 'editor.PostFeaturedImage', 'test/with-marker', withMarker );
+		addFilter(
+			'editor.MediaUpload',
+			'test/with-picker-marker',
+			withPickerMarker
+		);
 		render(
 			<RegistryProvider value={ createTestRegistry() }>
 				<FeaturedImageEdit
@@ -120,7 +149,10 @@ describe( 'FeaturedImageEdit', () => {
 		);
 		expect( screen.queryByText( /^Extended:/ ) ).not.toBeInTheDocument();
 		expect(
-			screen.getByRole( 'button', { name: 'Set featured image' } )
+			screen.queryByText( /^Picker extended/ )
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Set cover image' } )
 		).toBeInTheDocument();
 	} );
 
@@ -141,7 +173,7 @@ describe( 'FeaturedImageEdit', () => {
 		);
 		expect( screen.queryByText( /^Extended:/ ) ).not.toBeInTheDocument();
 		expect(
-			screen.getByRole( 'button', { name: 'Set featured image' } )
+			screen.getByRole( 'button', { name: 'Set cover image' } )
 		).toBeInTheDocument();
 	} );
 } );

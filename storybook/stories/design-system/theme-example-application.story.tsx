@@ -279,7 +279,7 @@ export const ExampleApplication: StoryObj< typeof meta > = {
 											<Dialog.Title>
 												Site details
 											</Dialog.Title>
-											<Dialog.CloseIcon />
+											<Dialog.CloseIconButton />
 										</Dialog.Header>
 										<Dialog.Content>
 											<Stack direction="column" gap="sm">

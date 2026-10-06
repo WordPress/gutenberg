@@ -34,3 +34,9 @@ class MyClass {
 
 function foo() {
 }
+
+$object = new class() {
+	// Represents a non-prefixed method within an anonymous class.
+	public function some_non_prefixed_anonymous_class_method() {
+	}
+};

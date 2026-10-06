@@ -30,4 +30,27 @@ describe( '.wp-env.json schema', () => {
 
 		expect( result ).toBe( true );
 	} );
+
+	test.each( [ 'lts', 'latest', '10', '10.11', '10.3.39', null ] )(
+		'accepts mariadbVersion %j at the root and in an environment',
+		( mariadbVersion ) => {
+			expect( ajv.validate( wpEnvSchema, { mariadbVersion } ) ).toBe(
+				true
+			);
+			expect(
+				ajv.validate( wpEnvSchema, {
+					env: { tests: { mariadbVersion } },
+				} )
+			).toBe( true );
+		}
+	);
+
+	test.each( [ 'LTS', 'lts-10', '11-noble', '', 10.11 ] )(
+		'rejects mariadbVersion %j',
+		( mariadbVersion ) => {
+			expect( ajv.validate( wpEnvSchema, { mariadbVersion } ) ).toBe(
+				false
+			);
+		}
+	);
 } );
