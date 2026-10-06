@@ -1,18 +1,18 @@
 import { warn } from '../../utils';
 
-// Warns about the deprecated two-hyphen unique ID syntax.
-export const warnUniqueIdWithTwoHyphens = (
+/**
+ * Warns that suffixes are not supported for a lifecycle directive.
+ *
+ * @param prefix Directive name.
+ * @param suffix Unsupported suffix.
+ */
+export const warnSuffixNotSupported = (
 	prefix: string,
-	suffix: string,
-	uniqueId?: string
-) => {
+	suffix: string
+): void => {
 	if ( globalThis.SCRIPT_DEBUG ) {
 		warn(
-			`The usage of data-wp-${ prefix }--${ suffix }${
-				uniqueId ? `--${ uniqueId }` : ''
-			} (two hyphens for unique ID) is deprecated and will stop working in WordPress 7.1. Please use data-wp-${ prefix }${
-				uniqueId ? `--${ suffix }---${ uniqueId }` : `---${ suffix }`
-			} (three hyphens for unique ID) from now on.`
+			`Suffixes are not supported for the data-wp-${ prefix } directive. Ignoring the directive with suffix "${ suffix }".`
 		);
 	}
 };

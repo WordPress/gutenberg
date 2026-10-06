@@ -91,3 +91,82 @@ test( 'event directives listen for the complete suffix', async () => {
 		root.parentElement?.remove();
 	}
 } );
+
+test( 'lifecycle directives skip suffixes and keep three-hyphen IDs', async () => {
+	const { privateApis, store } = await import( '../index' );
+	const { toVdom, getRegionRootFragment, afterNextFrame } = privateApis(
+		'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
+	);
+
+	/** Records invocations of suffixed lifecycle callbacks. */
+	const unsupportedCallbacks = {
+		watch: vi.fn(),
+		watchWithUniqueId: vi.fn(),
+		init: vi.fn(),
+		run: vi.fn(),
+	};
+	/** Records invocations of lifecycle callbacks with supported unique IDs. */
+	const uniqueIdCallbacks = {
+		watchOne: vi.fn(),
+		watchTwo: vi.fn(),
+		initOne: vi.fn(),
+		initTwo: vi.fn(),
+		runOne: vi.fn(),
+		runTwo: vi.fn(),
+	};
+	store( 'test/lifecycle-directives', {
+		callbacks: {
+			watch: unsupportedCallbacks.watch,
+			watchWithUniqueId: unsupportedCallbacks.watchWithUniqueId,
+			init: unsupportedCallbacks.init,
+			run: unsupportedCallbacks.run,
+			...uniqueIdCallbacks,
+		},
+	} );
+
+	vi.stubGlobal( 'SCRIPT_DEBUG', false );
+	const productionRoot = hydrateHtml(
+		'<div data-wp-interactive="test/lifecycle-directives"><span data-wp-watch--one="callbacks.watch"></span><span data-wp-watch--one---two="callbacks.watchWithUniqueId"></span><span data-wp-init--one="callbacks.init"></span><span data-wp-run--one="callbacks.run"></span></div>',
+		toVdom,
+		getRegionRootFragment
+	);
+	try {
+		await afterNextFrame( () => undefined );
+		expect( unsupportedCallbacks.watch ).not.toHaveBeenCalled();
+		expect( unsupportedCallbacks.watchWithUniqueId ).not.toHaveBeenCalled();
+		expect( unsupportedCallbacks.init ).not.toHaveBeenCalled();
+		expect( unsupportedCallbacks.run ).not.toHaveBeenCalled();
+		expect( console ).not.toHaveWarned();
+	} finally {
+		productionRoot.parentElement?.remove();
+	}
+
+	vi.stubGlobal( 'SCRIPT_DEBUG', true );
+	const developmentRoot = hydrateHtml(
+		'<div data-wp-interactive="test/lifecycle-directives"><span data-wp-watch--one="callbacks.watch"></span><span data-wp-watch--one---two="callbacks.watchWithUniqueId"></span><span data-wp-watch---one="callbacks.watchOne"></span><span data-wp-watch---two="callbacks.watchTwo"></span><span data-wp-init--one="callbacks.init"></span><span data-wp-init---one="callbacks.initOne"></span><span data-wp-init---two="callbacks.initTwo"></span><span data-wp-run--one="callbacks.run"></span><span data-wp-run---one="callbacks.runOne"></span><span data-wp-run---two="callbacks.runTwo"></span></div>',
+		toVdom,
+		getRegionRootFragment
+	);
+	try {
+		await afterNextFrame( () => undefined );
+
+		expect( unsupportedCallbacks.watch ).not.toHaveBeenCalled();
+		expect( unsupportedCallbacks.watchWithUniqueId ).not.toHaveBeenCalled();
+		expect( unsupportedCallbacks.init ).not.toHaveBeenCalled();
+		expect( unsupportedCallbacks.run ).not.toHaveBeenCalled();
+		Object.values( uniqueIdCallbacks ).forEach( ( callback ) =>
+			expect( callback ).toHaveBeenCalledTimes( 1 )
+		);
+		expect( console ).toHaveWarnedWith(
+			'Suffixes are not supported for the data-wp-watch directive. Ignoring the directive with suffix "one".'
+		);
+		expect( console ).toHaveWarnedWith(
+			'Suffixes are not supported for the data-wp-init directive. Ignoring the directive with suffix "one".'
+		);
+		expect( console ).toHaveWarnedWith(
+			'Suffixes are not supported for the data-wp-run directive. Ignoring the directive with suffix "one".'
+		);
+	} finally {
+		developmentRoot.parentElement?.remove();
+	}
+} );
