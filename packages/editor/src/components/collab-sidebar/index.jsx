@@ -1,27 +1,26 @@
+import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
+import { __experimentalUseSlot as useSlot } from '@wordpress/components';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import PluginSidebar from '../plugin-sidebar';
-import {
-	ALL_NOTES_SIDEBAR,
-	FLOATING_NOTES_SIDEBAR,
-	SIDEBARS,
-} from './constants';
+import { ALL_NOTES_SIDEBAR } from './constants';
 import { Notes } from './notes';
+import { NotesDisplayModeMenu } from './notes-display-mode-menu';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { NoteHighlightStyles } from './note-highlight-styles';
-import { useGlobalStyles } from '../global-styles';
-import { useEnableFloatingSidebar, useNoteThreads } from './hooks';
+import { useNoteThreads } from './hooks';
 import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
+import { CanvasMargin } from '../visual-editor/canvas-margin';
 import { unlock } from '../../lock-unlock';
 
 function NotesSidebar( { postId } ) {
@@ -50,51 +49,55 @@ function NotesSidebar( { postId } ) {
 	}, [] );
 
 	const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
-	const { isDistractionFree } = useSelect( ( select ) => {
+	const { isDistractionFree, notesDisplayMode } = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		return {
 			isDistractionFree: get( 'core', 'distractionFree' ),
+			notesDisplayMode: get( 'core', 'notesDisplayMode' ),
 		};
 	}, [] );
+	const areNotesHidden = notesDisplayMode === 'hidden';
+	const { set: setPreference } = useDispatch( preferencesStore );
 	const selectedNoteId = useSelect(
 		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
 		[]
 	);
 
 	const { notes, unresolvedNotes, reactionsMap } = useNoteThreads( postId );
-
-	// Only enable the floating sidebar for large viewports.
-	const showFloatingSidebar = isLargeViewport;
-	// Fallback to "All notes" sidebar on smaller viewports.
-	const showAllNotesSidebar = notes.length > 0 || ! showFloatingSidebar;
-	useEnableFloatingSidebar(
-		showFloatingSidebar &&
-			( unresolvedNotes.length > 0 || selectedNoteId !== undefined )
+	const isAllNotesSidebarOpen = useSelect(
+		( select ) =>
+			select( interfaceStore ).getActiveComplementaryArea( 'core' ) ===
+			ALL_NOTES_SIDEBAR,
+		[]
 	);
+	const { ref: canvasMarginRef } = useSlot( CanvasMargin.name );
 
-	async function focusNote( {
-		targetClientId,
-		noteId: targetNoteId,
-		isApproved,
-	} ) {
+	// Fallback to "All notes" sidebar on smaller viewports or a narrow canvas.
+	const showAllNotesSidebar =
+		notes.length > 0 || ! isLargeViewport || isAllNotesSidebarOpen;
+	const hasFloatingNotes =
+		isLargeViewport &&
+		( unresolvedNotes.length > 0 || selectedNoteId !== undefined );
+	// "All notes" lists the same threads, so floating notes yield to it.
+	const showFloatingNotes =
+		hasFloatingNotes && ! areNotesHidden && ! isAllNotesSidebarOpen;
+
+	function focusNote( { targetClientId, noteId: targetNoteId, isApproved } ) {
 		if ( ! targetClientId ) {
 			return;
 		}
 
-		const prevArea = await getActiveComplementaryArea( 'core' );
-		if ( isApproved ) {
+		// The margin hides on a narrow, resizable or zoomed-out canvas.
+		const hasCanvasMargin =
+			isLargeViewport && !! canvasMarginRef?.current?.checkVisibility();
+		if ( isApproved || ! hasCanvasMargin ) {
 			enableComplementaryArea( 'core', ALL_NOTES_SIDEBAR );
-		} else if ( ! SIDEBARS.includes( prevArea ) || ! showAllNotesSidebar ) {
-			enableComplementaryArea(
-				'core',
-				showFloatingSidebar ? FLOATING_NOTES_SIDEBAR : ALL_NOTES_SIDEBAR
-			);
-		}
-
-		const currentArea = await getActiveComplementaryArea( 'core' );
-		// Bail out if the current active area is not one of note sidebars.
-		if ( ! SIDEBARS.includes( currentArea ) ) {
-			return;
+		} else if (
+			areNotesHidden &&
+			getActiveComplementaryArea( 'core' ) !== ALL_NOTES_SIDEBAR
+		) {
+			// Acting on a note brings hidden notes back.
+			setPreference( 'core', 'notesDisplayMode', 'full' );
 		}
 
 		// A special case for the List View, where block selection isn't required to trigger an action.
@@ -136,10 +139,6 @@ function NotesSidebar( { postId } ) {
 		}
 	);
 
-	// Get the global styles to set the background color of the sidebar.
-	const { merged: GlobalStyles } = useGlobalStyles();
-	const backgroundColor = GlobalStyles?.styles?.color?.background;
-
 	// Surface one thread for the avatar indicator.
 	const currentThreads =
 		blockNoteIds.length > 0
@@ -168,10 +167,15 @@ function NotesSidebar( { postId } ) {
 					addNewNoteForBlock( menuClientId )
 				}
 			/>
+			<NotesDisplayModeMenu
+				hasFloatingNotes={ hasFloatingNotes }
+				hasAllNotes={ showAllNotesSidebar }
+			/>
 			{ showAllNotesSidebar && (
+				// No `name`, so the sidebar doesn't add itself to the "Panels"
+				// menu; the "Notes" submenu toggles it instead.
 				<PluginSidebar
 					identifier={ ALL_NOTES_SIDEBAR }
-					name={ ALL_NOTES_SIDEBAR }
 					title={ __( 'All notes' ) }
 					header={
 						<h2 className="interface-complementary-area-header__title">
@@ -188,23 +192,23 @@ function NotesSidebar( { postId } ) {
 					/>
 				</PluginSidebar>
 			) }
-			{ isLargeViewport && (
-				<PluginSidebar
-					isPinnable={ false }
-					header={ false }
-					identifier={ FLOATING_NOTES_SIDEBAR }
-					className="editor-collab-sidebar"
-					headerClassName="editor-collab-sidebar__header"
-					backgroundColor={ backgroundColor }
-				>
-					<Notes
-						notes={ unresolvedNotes }
-						sidebarRef={ sidebarRef }
-						styles={ { backgroundColor } }
-						reactionsMap={ reactionsMap }
-						isFloating
-					/>
-				</PluginSidebar>
+			{ showFloatingNotes && (
+				<CanvasMargin.Fill>
+					<div
+						role="region"
+						aria-label={ __( 'Notes' ) }
+						className={ clsx( 'editor-collab-sidebar-overlay', {
+							'is-minimized': notesDisplayMode === 'minimized',
+						} ) }
+					>
+						<Notes
+							notes={ unresolvedNotes }
+							sidebarRef={ sidebarRef }
+							reactionsMap={ reactionsMap }
+							isFloating
+						/>
+					</div>
+				</CanvasMargin.Fill>
 			) }
 		</>
 	);

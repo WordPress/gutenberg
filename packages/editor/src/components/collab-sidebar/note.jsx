@@ -22,16 +22,15 @@ function NoteActionsMenu( { items, buttonRef } ) {
 			// Let outside interactions reach the note thread's focus-out
 			// handling so it can clear the selection.
 			modal={ false }
-			disabled={ ! items.length }
 		>
 			<Menu.Trigger
+				disabled={ ! items.length }
 				render={
 					<Button
 						ref={ buttonRef }
 						size="small"
 						icon={ moreVertical }
 						label={ __( 'Actions' ) }
-						disabled={ ! items.length }
 						accessibleWhenDisabled
 					/>
 				}
@@ -91,36 +90,41 @@ export function Note( {
 	// during an edit is the form's own text field.
 	const canReact =
 		isSelected && !! onToggleReaction && actionState !== 'edit';
+	const metaStatus = note.meta?._wp_note_status;
 	const isResolutionNote =
-		note.type === 'note' &&
-		note.meta &&
-		( note.meta._wp_note_status === 'resolved' ||
-			note.meta._wp_note_status === 'reopen' );
+		metaStatus === 'resolved' || metaStatus === 'reopen';
+	const hasUserText =
+		typeof rawContent === 'string' && rawContent.trim() !== '';
+
+	const hasResolved = ( status ) =>
+		status === 'approved' || parentNote?.status === 'approved';
 
 	const menuItems = [
 		{
 			id: 'edit',
 			title: __( 'Edit' ),
-			isEligible: ( { status } ) => status !== 'approved',
+			isEligible: ( { status } ) =>
+				( ! isResolutionNote || hasUserText ) &&
+				! hasResolved( status ),
 			onClick: () => setActionState( 'edit' ),
 		},
 		{
 			id: 'reopen',
 			title: _x( 'Reopen', 'Reopen note' ),
-			isEligible: ( { status } ) => status === 'approved',
+			isEligible: ( { status } ) => canResolve && hasResolved( status ),
 			onClick: () => onEditNote( { id: note.id, status: 'hold' } ),
 		},
 		{
 			id: 'delete',
 			title: __( 'Delete' ),
-			isEligible: () => true,
+			isEligible: ( { status } ) =>
+				canResolve || ( ! isResolutionNote && ! hasResolved( status ) ),
 			onClick: () => setActionState( 'delete' ),
 		},
 	];
-	const availableItems =
-		parentNote?.status !== 'approved'
-			? menuItems.filter( ( item ) => item.isEligible( note ) )
-			: [];
+	const availableItems = menuItems.filter( ( item ) =>
+		item.isEligible( note )
+	);
 
 	const deleteConfirmMessage =
 		note.parent === 0

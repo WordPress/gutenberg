@@ -166,8 +166,8 @@ class WP_REST_Icons_Controller_Gutenberg extends WP_REST_Icons_Controller {
 	/**
 	 * Prepare a raw icon before it gets output in a REST API response.
 	 *
-	 * Adds a `collection` field to the base response while keeping the
-	 * namespaced icon name (e.g. `core/arrow-left`) as the `name` field.
+	 * Adds `collection` and `keywords` fields to the base response while keeping
+	 * the namespaced icon name (e.g. `core/arrow-left`) as the `name` field.
 	 *
 	 * @param array           $item    Raw icon as registered.
 	 * @param WP_REST_Request $request Request object.
@@ -180,6 +180,12 @@ class WP_REST_Icons_Controller_Gutenberg extends WP_REST_Icons_Controller {
 		if ( rest_is_field_included( 'collection', $fields ) && isset( $item['collection'] ) ) {
 			$data               = $response->get_data();
 			$data['collection'] = $item['collection'];
+			$response->set_data( $data );
+		}
+
+		if ( rest_is_field_included( 'keywords', $fields ) ) {
+			$data             = $response->get_data();
+			$data['keywords'] = isset( $item['keywords'] ) ? array_values( $item['keywords'] ) : array();
 			$response->set_data( $data );
 		}
 
@@ -201,6 +207,14 @@ class WP_REST_Icons_Controller_Gutenberg extends WP_REST_Icons_Controller {
 		$schema['properties']['collection'] = array(
 			'description' => __( 'The slug of the collection this icon belongs to.', 'gutenberg' ),
 			'type'        => 'string',
+			'readonly'    => true,
+			'context'     => array( 'view', 'edit', 'embed' ),
+		);
+
+		$schema['properties']['keywords'] = array(
+			'description' => __( 'Additional search terms for the icon.', 'gutenberg' ),
+			'type'        => 'array',
+			'items'       => array( 'type' => 'string' ),
 			'readonly'    => true,
 			'context'     => array( 'view', 'edit', 'embed' ),
 		);
