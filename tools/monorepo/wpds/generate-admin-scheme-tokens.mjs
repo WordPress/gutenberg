@@ -25,7 +25,7 @@
  * because reading it needs no DOM but the package exports only the DOM-reading
  * `getAdminThemeColors`.
  *
- * Usage: npm run wpds:admin-scheme-tokens --workspace @wordpress/monorepo-tools
+ * Usage: `npm run wpds:admin-scheme-tokens --workspace @wordpress/monorepo-tools`
  */
 
 import { writeFileSync } from 'node:fs';
