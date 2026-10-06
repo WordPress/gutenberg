@@ -27,14 +27,14 @@ exports[`BlockVerticalAlignmentUI > should match snapshot when controls are hidd
       >
         <rect
           fill="currentColor"
-          height="11"
+          height="13.75"
           stroke="none"
-          width="6"
-          x="9"
-          y="9"
+          width="7.5"
+          x="8.25"
+          y="8.25"
         />
         <path
-          d="M4 4.75H20"
+          d="M2 3H22"
         />
       </svg>
     </button>
@@ -70,14 +70,14 @@ exports[`BlockVerticalAlignmentUI > should match snapshot when controls are visi
         >
           <rect
             fill="currentColor"
-            height="11"
+            height="13.75"
             stroke="none"
-            width="6"
-            x="9"
-            y="9"
+            width="7.5"
+            x="8.25"
+            y="8.25"
           />
           <path
-            d="M4 4.75H20"
+            d="M2 3H22"
           />
         </svg>
       </button>
@@ -102,15 +102,15 @@ exports[`BlockVerticalAlignmentUI > should match snapshot when controls are visi
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M4 12H20"
+            d="M2 12H22"
           />
           <rect
             fill="currentColor"
-            height="16"
+            height="20"
             stroke="none"
-            width="6"
-            x="9"
-            y="4"
+            width="7.5"
+            x="8.25"
+            y="2"
           />
         </svg>
       </button>
@@ -135,15 +135,15 @@ exports[`BlockVerticalAlignmentUI > should match snapshot when controls are visi
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M4 19.25H20"
+            d="M2 21H22"
           />
           <rect
             fill="currentColor"
-            height="11"
+            height="13.75"
             stroke="none"
-            width="6"
-            x="9"
-            y="4"
+            width="7.5"
+            x="8.25"
+            y="2"
           />
         </svg>
       </button>
