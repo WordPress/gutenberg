@@ -12,6 +12,7 @@
 -   `justifySpaceBetween` and `justifySpaceEvenly`: redraw so the two icons share one construction with the new `justifySpaceAround`, differing only in where the blocks sit ([#83519](https://github.com/WordPress/gutenberg/pull/83519)).
 -   `headingLevel1` to `headingLevel6`: enlarge the drawings to improve their optical balance with the rest of the set ([#83268](https://github.com/WordPress/gutenberg/pull/83268)).
 -   `manifest.json`: Add optional `keywords` property to improve discoverability. ([#82367](https://github.com/WordPress/gutenberg/pull/82367))
+-   `blockDefault` and `typography`: redraw. `blockDefault` outlines its two tabs rather than filling them, and `typography` redraws the lowercase "a" ([#84073](https://github.com/WordPress/gutenberg/pull/84073)).
 
 ### Bug Fixes
 
