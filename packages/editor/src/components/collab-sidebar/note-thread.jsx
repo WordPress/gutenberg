@@ -76,6 +76,7 @@ export function NoteThread( {
 	note,
 	onEditNote,
 	onAddReply,
+	onDiscard,
 	onDeleteNote,
 	isSelected,
 	sidebarRef,
@@ -228,6 +229,7 @@ export function NoteThread( {
 				key={ note.blockClientId }
 				clientId={ note.blockClientId }
 				onSubmit={ onAddReply }
+				onDiscard={ onDiscard }
 				sidebarRef={ sidebarRef }
 				floating={ { y: floating.y, ref: floatingRef } }
 			/>
