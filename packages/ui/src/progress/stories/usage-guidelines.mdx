@@ -32,23 +32,19 @@ Pass `value={ null }` when the amount of completed work is unknown. Indeterminat
 
 ## Set the width for the layout
 
-`Progress.Track` fills the width of `Progress.Root`. Set a width or max-width on Root with `className` or `style` when the surrounding layout does not provide the intended width. Progress has no width presets.
+`Progress.Root` has a default width of 160px, and `Progress.Track` fills that width. Override the width on Root with `className` or `style` when the layout needs a different size. For example, use `style={ { width: '100%' } }` to fill the container.
 
 ## Migrate from ProgressBar
 
 Replace `ProgressBar` from `@wordpress/components` with `Progress.Root`, `Progress.Track`, and `Progress.Indicator` from `@wordpress/ui`. Root requires a `value`. For indeterminate progress, pass `value={ null }` explicitly; ProgressBar allowed its value to be omitted.
 
-Give each task an accessible name with `Progress.Label`, `aria-label`, or `aria-labelledby`. Progress does not supply the generic loading label that ProgressBar used. To preserve ProgressBar's default 160px width, set that width on Root:
+Give each task an accessible name with `Progress.Label`, `aria-label`, or `aria-labelledby`. Progress does not supply the generic loading label that ProgressBar used. Both components have a default width of 160px:
 
 ```jsx
 import { Progress } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 
-<Progress.Root
-	value={ null }
-	aria-label={ __( 'Uploading files' ) }
-	style={ { width: '160px' } }
->
+<Progress.Root value={ null } aria-label={ __( 'Uploading files' ) }>
 	<Progress.Track>
 		<Progress.Indicator />
 	</Progress.Track>

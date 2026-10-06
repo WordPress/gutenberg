@@ -225,7 +225,6 @@ function UploadFonts() {
 					<FlexItem>
 						<div className="font-library__upload-area">
 							<Progress.Root
-								className="font-library__progress"
 								value={ null }
 								aria-label={ __( 'Uploading fonts' ) }
 							>

@@ -263,7 +263,6 @@ function FontCollection( { slug }: { slug: string } ) {
 			{ isLoading && (
 				<div className="font-library__loading">
 					<Progress.Root
-						className="font-library__progress"
 						value={ null }
 						aria-label={ __( 'Loading fonts' ) }
 					>

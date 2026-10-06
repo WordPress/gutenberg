@@ -273,7 +273,6 @@ function InstalledFonts() {
 			{ isResolvingLibrary && (
 				<div className="font-library__loading">
 					<Progress.Root
-						className="font-library__progress"
 						value={ null }
 						aria-label={ __( 'Loading fonts' ) }
 					>
@@ -498,7 +497,6 @@ function InstalledFonts() {
 					<HStack justify="flex-end" className="font-library__footer">
 						{ isInstalling && (
 							<Progress.Root
-								className="font-library__progress"
 								value={ null }
 								aria-label={ __( 'Installing fonts' ) }
 							>
