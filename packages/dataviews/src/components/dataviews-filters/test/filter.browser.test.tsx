@@ -7,7 +7,6 @@ import type { Field, View } from '../../../types';
 import filterSortAndPaginate from '../../../utils/filter-sort-and-paginate';
 // The truncation under test is defined in the filters stylesheet, so the chip
 // has to be rendered with it.
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '../style.scss';
 
 type Post = {
