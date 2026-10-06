@@ -131,10 +131,21 @@ export function NoteThread( {
 	useEffect( () => {
 		const floatingEl = floatingRef.current;
 		if ( floatingEl && registerThread ) {
-			registerThread( note.id, relatedBlockElement, floatingEl );
+			registerThread(
+				note.id,
+				relatedBlockElement,
+				floatingEl,
+				note.blockClientId
+			);
 		}
 		return () => unregisterThread?.( note.id );
-	}, [ relatedBlockElement, note.id, registerThread, unregisterThread ] );
+	}, [
+		relatedBlockElement,
+		note.id,
+		note.blockClientId,
+		registerThread,
+		unregisterThread,
+	] );
 
 	// Scroll the thread into view when it becomes selected, and re-scroll
 	// when its floating position or height settles after `useFloatingBoard`

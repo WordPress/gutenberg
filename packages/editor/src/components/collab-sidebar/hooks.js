@@ -756,6 +756,7 @@ export function useFloatingBoard( {
 	selectedNoteId,
 	isFloating,
 	sidebarRef,
+	orderedBlockIds,
 } ) {
 	const [ store ] = useState( createBoardStore );
 
@@ -771,6 +772,10 @@ export function useFloatingBoard( {
 	useLayoutEffect( () => {
 		store.requestMeasure();
 	}, [ store, threads ] );
+
+	useLayoutEffect( () => {
+		store.setBlockOrder( orderedBlockIds );
+	}, [ store, orderedBlockIds ] );
 
 	// Derived during render, so a resize reaches the screen in the same paint.
 	const { positions: notePositions, contentHeight } = useMemo(

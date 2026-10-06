@@ -749,6 +749,27 @@ describe( 'getHiddenBlockAnchorRect', () => {
 		} );
 	} );
 
+	it( 'skips blocks inside collapsed content', () => {
+		// 'b' sits in a closed Details, which still reports its expanded box.
+		const lookup = makeLookup( {
+			a: rect( 100 ),
+			b: rect( 200 ),
+			d: rect( 400 ),
+		} );
+		const result = getHiddenBlockAnchorRect(
+			'c',
+			[ 'a', 'b', 'c', 'd' ],
+			( clientId ) => {
+				const element = lookup( clientId );
+				return element && clientId === 'b'
+					? { ...element, checkVisibility: () => false }
+					: element;
+			}
+		);
+
+		expect( result.top ).toBe( 300 );
+	} );
+
 	it( 'returns null when no block in the document is rendered', () => {
 		expect(
 			getHiddenBlockAnchorRect( 'b', [ 'a', 'b', 'c' ], makeLookup( {} ) )

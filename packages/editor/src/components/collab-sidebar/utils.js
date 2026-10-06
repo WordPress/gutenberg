@@ -577,9 +577,9 @@ export function removeNoteIdFromMetadata( metadata, noteId ) {
  *
  * The element lookup is injected to keep this testable without a DOM.
  *
- * @param {string}   clientId         Client ID of the block with no element.
- * @param {string[]} orderedClientIds Client IDs in document order.
- * @param {Function} getBlockElement  Resolves a client ID to its element, or null.
+ * @param {string}                             clientId         Client ID of the block with no element.
+ * @param {string[]}                           orderedClientIds Client IDs in document order.
+ * @param {(clientId: string) => ?HTMLElement} getBlockElement  Resolves a client ID to its element, or null.
  * @return {?{top: number, left: number, width: number, height: number}} Zero-height
  *         boundary rect, or `null` when no block in the document is rendered.
  */
@@ -595,13 +595,13 @@ export function getHiddenBlockAnchorRect(
 
 	// Blocks nested inside a hidden block have no element either, so both
 	// walks skip whole hidden subtrees on their way to a rendered block.
+	// Collapsed content (e.g. a closed Details) still reports the box it
+	// would have when expanded, so skip it as well.
 	const findRect = ( from, step ) => {
 		for ( let i = from; i >= 0 && i < orderedClientIds.length; i += step ) {
-			const rect = getBlockElement(
-				orderedClientIds[ i ]
-			)?.getBoundingClientRect();
-			if ( rect ) {
-				return rect;
+			const element = getBlockElement( orderedClientIds[ i ] );
+			if ( element && element.checkVisibility?.() !== false ) {
+				return element.getBoundingClientRect();
 			}
 		}
 		return null;
