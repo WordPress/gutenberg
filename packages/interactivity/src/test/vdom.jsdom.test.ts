@@ -1,7 +1,12 @@
-import { h } from 'preact';
+import { h, options } from 'preact';
 import type { ComponentChild } from 'preact';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { parseDirectiveValue, toVdom, hydratedIslands } from '../vdom';
+import {
+	parseDirectiveValue,
+	toVdom,
+	hydratedIslands,
+	closestHtmlDirectiveElement,
+} from '../vdom';
 
 declare module 'vitest' {
 	// Must match Vitest's generic declaration for module augmentation.
@@ -32,6 +37,105 @@ expect.extend( {
 				pass ? "Expected VNodes don't match" : 'Expected VNode match',
 		};
 	},
+} );
+
+describe( 'closestHtmlDirectiveElement', () => {
+	it.each( [
+		'data-wp-html',
+		'data-wp-html--',
+		'data-wp-html---',
+		'data-wp-html---id',
+	] )(
+		'finds an inclusive ancestor with %s, independently of its value',
+		( attribute ) => {
+			const outer = createElementFromHTML(
+				`<div ${ attribute }="missing::state.html"><span></span></div>`
+			);
+			const child = outer.firstElementChild!;
+			expect( closestHtmlDirectiveElement( outer ) ).toBe( outer );
+			expect( closestHtmlDirectiveElement( child ) ).toBe( outer );
+			expect( closestHtmlDirectiveElement( child.parentElement! ) ).toBe(
+				outer
+			);
+			expect(
+				closestHtmlDirectiveElement( outer.parentElement! )
+			).toBeNull();
+		}
+	);
+	it.each(
+		[ 'text', 'each', 'router-region' ].flatMap( ( prefix ) =>
+			[
+				'',
+				'--',
+				'---',
+				'--x',
+				'---id',
+				'--x---id',
+				'----',
+				'------',
+			].map( ( suffix ) => `data-wp-${ prefix }${ suffix }` )
+		)
+	)( 'excludes an element with the conflict %s', ( attribute ) => {
+		const outer = createElementFromHTML(
+			`<div data-wp-html ${ attribute }="null"><span></span></div>`
+		);
+		expect( closestHtmlDirectiveElement( outer ) ).toBeNull();
+		expect(
+			closestHtmlDirectiveElement( outer.firstElementChild! )
+		).toBeNull();
+	} );
+	it.each( [
+		'',
+		'data-wp-html--suffix',
+		'data-wp-html----',
+		'data-wp-html[name]',
+		'other-data-wp-html',
+	] )( 'does not treat %s as a default HTML directive', ( attribute ) => {
+		const element = createElementFromHTML(
+			`<div ${ attribute }><span></span></div>`
+		);
+		expect(
+			closestHtmlDirectiveElement( element.firstElementChild! )
+		).toBeNull();
+	} );
+	it( 'finds the nearest eligible ancestor through a conflicting element', () => {
+		const outer = createElementFromHTML(
+			'<div data-wp-html><section data-wp-html><div data-wp-html data-wp-text><span></span></div></section></div>'
+		);
+		const inner = outer.firstElementChild!;
+		expect(
+			closestHtmlDirectiveElement( outer.querySelector( 'span' )! )
+		).toBe( inner );
+		expect( closestHtmlDirectiveElement( inner ) ).toBe( inner );
+		expect( closestHtmlDirectiveElement( inner.parentElement! ) ).toBe(
+			outer
+		);
+	} );
+	it( 'ignores attributes that do not parse to a conflicting directive', () => {
+		const element = createElementFromHTML(
+			'<div data-wp-html data-wp-interactive="ns" data-wp-textual data-wp-each-child data-wp-text[x]></div>'
+		);
+		expect( closestHtmlDirectiveElement( element ) ).toBe( element );
+	} );
+	it( 'exposes the ancestor lookup through the private API', async () => {
+		document.body.innerHTML = '';
+		// jsdom has no navigation timing entry. Keep automatic hydration pending.
+		vi.spyOn( performance, 'getEntriesByType' ).mockReturnValue( [
+			{ domContentLoadedEventStart: 0 } as PerformanceNavigationTiming,
+		] );
+		// Runtime registration wraps vnodes; restore the converter-only renderer.
+		const originalVNodeHook = options.vnode;
+		try {
+			const { privateApis } = await import( '../index' );
+			expect(
+				privateApis(
+					'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
+				).closestHtmlDirectiveElement
+			).toBe( closestHtmlDirectiveElement );
+		} finally {
+			options.vnode = originalVNodeHook;
+		}
+	} );
 } );
 
 describe( 'toVdom', () => {

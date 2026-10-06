@@ -68,6 +68,71 @@ function parseDirectiveName( directiveName: string ): {
 	return { prefix, suffix: suffix || null, uniqueId: null };
 }
 
+/** Directive prefixes that take precedence over `html`, in warning order. */
+const htmlConflictingPrefixes = [ 'text', 'each', 'router-region' ];
+
+/**
+ * Classifies an element's HTML directive solely from parsed attribute names.
+ *
+ * @param element Element whose attributes are inspected.
+ * @return Whether HTML owns the content and the prefixes it yields to otherwise.
+ */
+function getHtmlDirectiveStatus( element: Element ): {
+	/** Whether a default HTML directive owns this element's content. */
+	isHtmlDirectiveElement: boolean;
+	/** Prefixes a default HTML directive yields to, in warning order. */
+	conflictingPrefixes: string[];
+} {
+	// Presence, not attribute values, determines ownership of the content.
+	const prefixes = new Set< string >();
+	let hasDefaultHtmlDirective = false;
+	for ( const { name } of element.attributes ) {
+		if (
+			! name.startsWith( directivePrefix ) ||
+			name === 'data-wp-interactive'
+		) {
+			continue;
+		}
+		const parsed = parseDirectiveName( name );
+		if ( parsed ) {
+			prefixes.add( parsed.prefix );
+			if ( parsed.prefix === 'html' && parsed.suffix === null ) {
+				hasDefaultHtmlDirective = true;
+			}
+		}
+	}
+	const conflictingPrefixes = htmlConflictingPrefixes.filter( ( prefix ) =>
+		prefixes.has( prefix )
+	);
+	return {
+		isHtmlDirectiveElement:
+			hasDefaultHtmlDirective && ! conflictingPrefixes.length,
+		conflictingPrefixes: hasDefaultHtmlDirective ? conflictingPrefixes : [],
+	};
+}
+
+/**
+ * Finds the nearest inclusive ancestor whose HTML directive owns its content.
+ * A default `html` attribute qualifies only without `text`, `each` or
+ * `router-region` attributes, regardless of their suffixes, IDs or values.
+ *
+ * @param element Element at which to begin the inclusive ancestor walk. Pass
+ *                a node's parent element to test strict content membership.
+ * @return The nearest eligible HTML directive element, or `null`.
+ */
+export function closestHtmlDirectiveElement(
+	element: Element
+): Element | null {
+	let current: Element | null = element;
+	while ( current ) {
+		if ( getHtmlDirectiveStatus( current ).isHtmlDirectiveElement ) {
+			return current;
+		}
+		current = current.parentElement;
+	}
+	return null;
+}
+
 // Regular expression for reference parsing. It can contain a namespace before
 // the reference, separated by `::`, like `some-namespace::state.somePath`.
 // Namespaces can contain any alphanumeric characters, hyphens, underscores or
@@ -107,6 +172,8 @@ export const hydratedIslands = new WeakSet();
 /**
  * Recursive function that transforms a DOM tree into vDOM.
  * Directive attributes are interpreted with {@link parseDirectiveValue}.
+ * Default HTML directives yield to content-owning directives on the same
+ * element, using the markup rule shared with {@link closestHtmlDirectiveElement}.
  *
  * @param root The root element or node to start traversing on.
  * @return The resulting vDOM tree.
@@ -244,9 +311,21 @@ export function toVdom( root: Node ): ComponentChild {
 			}
 		}
 
-		const hasDefaultHtmlDirective = props.__directives?.html?.some(
-			( { suffix }: DirectiveEntry ) => suffix === null
-		);
+		const {
+			isHtmlDirectiveElement: hasDefaultHtmlDirective,
+			conflictingPrefixes,
+		} = getHtmlDirectiveStatus( elementNode );
+		if ( conflictingPrefixes.length ) {
+			warn(
+				`The data-wp-html directive was ignored because it conflicts with ${ conflictingPrefixes.map( ( prefix ) => `data-wp-${ prefix }` ).join( ', ' ) }.`
+			);
+			props.__directives.html = props.__directives.html.filter(
+				( { suffix }: DirectiveEntry ) => suffix !== null
+			);
+			if ( ! props.__directives.html.length ) {
+				delete props.__directives.html;
+			}
+		}
 
 		if ( props.__directives?.[ 'each-child' ] || hasDefaultHtmlDirective ) {
 			// `data-wp-html` owns this element's content entirely — whether
