@@ -12,13 +12,19 @@ The repository also contains internal workspaces under `tools/` and `test/` for 
 
 ## Supply chain policy
 
-`.npmrc` opts in to the npm hardening that becomes the default in npm v12.
+`.npmrc` opts in to the npm v12 defaults that refuse git references (`EALLOWGIT`) and tarball URLs (`EALLOWREMOTE`), and extends that to local tarball files (`EALLOWFILE`). Local directories stay at the npm default, which gates nothing here: the `file:` links between workspaces resolve as workspaces rather than directory dependencies.
 
-Dependencies must resolve from the registry. Git references (`EALLOWGIT`), tarball URLs (`EALLOWREMOTE`) and local tarball files (`EALLOWFILE`) are refused. Local directories are allowed only where the root or a workspace `package.json` declares them, which covers the `file:` workspace links.
+Install scripts are opt-in: every dependency that ships one is recorded in `allowScripts` in the root `package.json`, and `strict-allow-scripts` fails the install with `ESTRICTALLOWSCRIPTS` on anything missing from that list. Every entry is `false`, so nothing compiles on install. `test/ai-development` installs with `--prefix`, so it carries its own copy of the policy.
 
-Install scripts are denied by default: every dependency that ships one is listed in `allowScripts` in the root `package.json`, and anything missing from that list fails the install with `ESTRICTALLOWSCRIPTS`. When that happens, read the script, then record the decision and commit the `package.json` change:
+`allowScripts` covers dependencies only. Once it is set, workspace lifecycle scripts are skipped under `install-strategy=linked` with no error ([npm/cli#9982](https://github.com/npm/cli/issues/9982)), so a workspace that must run on install is invoked from the root `postinstall` instead, as `@wordpress/icons` is.
 
-```bash
-npm install-scripts deny <pkg>     # the package works without its install script
-npm install-scripts approve <pkg>  # the script is required; approval is pinned to the reviewed version
+When an install fails that way, read the script, then edit `allowScripts` by hand and commit the `package.json` change. Use the package name on its own to cover every version, or `name@version` to pin an approval to the version you reviewed:
+
+```json
+"allowScripts": {
+	"some-package": false,
+	"another-package@1.2.3": true
+}
 ```
+
+Do not use the `npm install-scripts` subcommands until an npm release ships [npm/cli#9941](https://github.com/npm/cli/pull/9941). All of them read the hoisted layout, so under `install-strategy=linked` they misbehave: `ls` reports covered packages as uncovered, `prune` deletes every entry as unused, and `approve` and `deny` write unusable `node_modules/.store` paths instead of the package name.
