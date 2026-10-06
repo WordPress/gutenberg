@@ -5,5 +5,4 @@ export type {
 	ColorTokenSeeds,
 	ColorTokenResult,
 } from './generate-color-tokens.ts';
-export type { ThemeProviderColorWarning } from './theme-provider-color-warnings.ts';
 export type * from './prebuilt/ts/token-types.ts';
