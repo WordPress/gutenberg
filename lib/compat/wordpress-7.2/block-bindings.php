@@ -7,6 +7,7 @@
  * @subpackage Block Bindings
  */
 
+// The following filter can be removed once the minimum required WordPress version is 7.2 or newer.
 add_filter(
 	'block_bindings_supported_attributes_core/icon',
 	function ( $supported_attributes ) {
