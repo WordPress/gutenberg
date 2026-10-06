@@ -2,12 +2,40 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { applyFilters, removeFilter } from '@wordpress/hooks';
 import type { ComponentType } from 'react';
-import { createBlockEditFilter } from '../utils';
+import { cleanEmptyObject, createBlockEditFilter } from '../utils';
 import {
 	BlockEditContextProvider,
 	mayDisplayControlsKey,
 	mayDisplayPatternEditingControlsKey,
 } from '../../components/block-edit/context';
+
+describe( 'cleanEmptyObject', () => {
+	it( 'removes nested keys', () => {
+		expect( cleanEmptyObject( { color: { text: undefined } } ) ).toEqual(
+			undefined
+		);
+	} );
+
+	it( 'removes partial nested keys', () => {
+		expect(
+			cleanEmptyObject( {
+				color: { text: undefined },
+				typography: { fontSize: '10px' },
+			} )
+		).toEqual( {
+			typography: { fontSize: '10px' },
+		} );
+	} );
+
+	it( 'preserves falsy nested keys', () => {
+		expect( cleanEmptyObject( { color: { text: false } } ) ).not.toEqual(
+			undefined
+		);
+		expect( cleanEmptyObject( { color: { text: '' } } ) ).not.toEqual(
+			undefined
+		);
+	} );
+} );
 
 describe( 'createBlockEditFilter', () => {
 	afterEach( () => {
