@@ -6,8 +6,9 @@ import { store as coreStore } from '@wordpress/core-data';
 import { RichTextData, create, slice } from '@wordpress/rich-text';
 import { unlock } from '../../lock-unlock';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
-import { INLINE_OP_TYPE, useSuggestionsProvider } from './provider';
-import { useSuggestionOverlay } from './overlay-context';
+import { INLINE_OP_TYPE } from './operations';
+import { useSuggestionsProvider } from './provider';
+import { useSuggestionSession } from './suggestion-session';
 import useAbandonedNoteCleanup from './use-abandoned-note-cleanup';
 import { wrapInlineMarker, readInlineCaret } from '../inline-markers';
 import {
@@ -455,7 +456,7 @@ export default function SuggestionDeletionKeyboard() {
 		useDispatch( blockEditorStore );
 	const { createSuggestion } = useSuggestionsProvider();
 	const { requestInterceptorBypass, isDeferredInsertion } =
-		useSuggestionOverlay();
+		useSuggestionSession();
 	const registry = useRegistry();
 	const cleanupAbandonedNotes = useAbandonedNoteCleanup();
 

@@ -6,6 +6,10 @@
 
 -   Mark the `@types/node` peer dependency as optional, since it is only needed for type checking ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
 
+### Internal
+
+-   Declare the `@typescript/native` dev dependency used by the `build` script, which previously resolved `tsc` from the repository root ([#84027](https://github.com/WordPress/gutenberg/pull/84027)).
+
 ## 2.1.0 (2026-09-23)
 
 ## 2.0.0 (2026-09-10)

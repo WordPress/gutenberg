@@ -505,38 +505,17 @@ export function removeNoteFormat( value, noteId ) {
 }
 
 /**
- * Strip a note's inline `core/note` marker from whichever block holds it, if
- * any, so a deleted or resolved note's highlight does not linger in the content.
- * No-op for block-level notes (those carry no marker). Used by the resolve path,
- * which only knows the note id; the delete path strips the marker inline since
- * it already has the block.
+ * Remove a note's inline `core/note` marker from block attributes.
  *
- * @param {number}                                         noteId                      Note id whose marker to remove.
- * @param {() => string[]}                                 getClientIdsWithDescendants Block-editor selector.
- * @param {(clientId: string) => Record<string, unknown>}  getBlockAttributes          Block-editor selector.
- * @param {(clientId: string, attributes: Object) => void} updateBlockAttributes       Block-editor action.
+ * @param {?Object}       attributes Block attributes.
+ * @param {number|string} noteId     Note id whose marker to remove.
+ * @return {?{attributeKey: string, start: number, end: number, value: RichTextData}} Marker range and the new attribute value, or null when no marker.
  */
-export function clearInlineNoteMarker(
-	noteId,
-	getClientIdsWithDescendants,
-	getBlockAttributes,
-	updateBlockAttributes
-) {
-	for ( const clientId of getClientIdsWithDescendants() ) {
-		const attributes = getBlockAttributes( clientId );
-		const found = findNoteInBlock( attributes, noteId );
-		if ( ! found ) {
-			continue;
-		}
-		const next = removeNoteFormat(
-			attributes[ found.attributeKey ],
-			noteId
-		);
-		if ( next ) {
-			updateBlockAttributes( clientId, { [ found.attributeKey ]: next } );
-		}
-		return;
-	}
+export function removeInlineNote( attributes, noteId ) {
+	const found = findNoteInBlock( attributes, noteId );
+	const value =
+		found && removeNoteFormat( attributes[ found.attributeKey ], noteId );
+	return value ? { ...found, value } : null;
 }
 
 /**
@@ -580,7 +559,7 @@ export function removeNoteIdFromMetadata( metadata, noteId ) {
  * @param {Object<string,Object>}   params.blockRects     Anchor rects (`{ top }`) keyed by thread ID.
  * @param {Object<string,number>}   params.heights        Rendered heights keyed by thread ID.
  * @param {number}                  params.scrollTop      Current scroll offset of the editor content.
- * @return {{ positions: Object<string,number> }} Computed top positions.
+ * @return {{ positions: Object<string,number>, contentHeight: number }} Computed top positions, and the content height that fits every measured thread.
  */
 export function calculateNotePositions( {
 	threads,
@@ -626,7 +605,7 @@ export function calculateNotePositions( {
 	const anchorThread = orderedThreads[ anchorIndex ];
 
 	if ( ! anchorThread ) {
-		return { positions: {} };
+		return { positions: {}, contentHeight: 0 };
 	}
 
 	// Where a card lands depends on the measured height of the cards it has to
@@ -639,7 +618,7 @@ export function calculateNotePositions( {
 		( thread ) => !! blockRects[ thread.id ]
 	);
 	if ( placeable.some( ( thread ) => heights[ thread.id ] === undefined ) ) {
-		return { positions: {} };
+		return { positions: {}, contentHeight: 0 };
 	}
 
 	const anchorRect = blockRects[ anchorThread.id ];
@@ -703,17 +682,26 @@ export function calculateNotePositions( {
 	}
 
 	// blockRect.top + scrollTop is the block's absolute y within the editor's
-	// scroll content; CSS translates each thread by -scrollTop at render time.
+	// scroll content. The content height reaches a gap past the lowest
+	// measured thread's box, which starts a THREAD_GAP (its top margin, the
+	// one THREAD_ALIGN_OFFSET cancels) below its position.
 	const positions = {};
+	let contentHeight = 0;
 	for ( const thread of orderedThreads ) {
 		const blockRect = blockRects[ thread.id ];
 		if ( blockRect && offsets[ thread.id ] !== undefined ) {
-			positions[ thread.id ] =
-				blockRect.top + scrollTop + offsets[ thread.id ];
+			const top = blockRect.top + scrollTop + offsets[ thread.id ];
+			positions[ thread.id ] = top;
+			if ( heights[ thread.id ] ) {
+				contentHeight = Math.max(
+					contentHeight,
+					top + THREAD_GAP + heights[ thread.id ] + THREAD_GAP
+				);
+			}
 		}
 	}
 
-	return { positions };
+	return { positions, contentHeight };
 }
 
 /**

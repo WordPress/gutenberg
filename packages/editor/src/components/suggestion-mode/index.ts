@@ -1,12 +1,9 @@
 export { isSuggestionModeEnabled, useCanSuggest } from './gate';
 export {
-	SuggestionOverlayProvider,
-	useSuggestionOverlay,
-	overlayReducer,
-	useOverlayEntry,
-	useSuggestionOverlayActions,
-	POST_TITLE_OVERLAY_KEY,
-} from './overlay-context';
+	SuggestionSessionProvider,
+	useSuggestionSession,
+	useSuggestionSessionActions,
+} from './suggestion-session';
 export {
 	default as withSuggestionOverlay,
 	registerSuggestionOverlayFilter,
@@ -39,20 +36,20 @@ export {
 	default as RevealSelectedSuggestion,
 	buildSelectedSuggestionCss,
 } from './reveal-selected-suggestion';
+export { useSuggestionsProvider } from './provider';
 export {
-	useSuggestionsProvider,
-	operationsFromOverlay,
+	operationsFromMarker,
 	applyOperations,
 	hasAttributeConflict,
 	parseSuggestionPayload,
 	payloadByteLength,
 	findStructuralOp,
 	findPostAttributeOps,
-	postOperationsFromOverlay,
+	postOperationsFromTitle,
 	clearSuggestionMarkerAttributes,
 	PAYLOAD_MAX_BYTES,
 	SCHEMA_VERSION,
-} from './provider';
+} from './operations';
 export { wordDiff } from './word-diff';
 export {
 	default as SuggestionSummary,

@@ -352,7 +352,7 @@ test.describe( 'Suggestion mode clipboard', () => {
 						[ 'core/paragraph', 'pending-remove' ],
 						[ blockName, 'pending-insert' ],
 					] );
-				const blocks = await editor.getBlocks();
+				const blocks: any[] = await editor.getBlocks();
 				expect(
 					blocks[ 0 ].attributes.metadata.suggestion.groupId
 				).toBe( blocks[ 1 ].attributes.metadata.suggestion.groupId );

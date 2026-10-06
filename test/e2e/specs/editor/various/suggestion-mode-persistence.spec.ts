@@ -897,4 +897,142 @@ test.describe( 'Suggestion mode persistence', () => {
 				/Picture here<img [^>]*src="[^"]+10x10_e2e_test_image_z9T8jK[^"]*\.png"/
 			);
 	} );
+
+	/*
+	 * Changes a selected heading from H2 to H3 through the block switcher,
+	 * the way a suggester does it: the switcher's accessible name is the
+	 * active variation ("Heading 2"), and picking "Heading 3" dispatches a
+	 * store-level attribute update the interceptor turns into a suggestion.
+	 */
+	async function suggestHeadingLevelThree( page: any ) {
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: /^Heading 2$/ } )
+			.click();
+		await page.getByRole( 'menuitem', { name: /^Heading 3/ } ).click();
+	}
+
+	test( 'an attribute suggestion survives a reload and can still be accepted', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { level: 2, content: 'Durable heading' },
+		} );
+		await switchIntent( page, 'Suggesting' );
+
+		const heading = editor.canvas.getByRole( 'document', {
+			name: 'Block: Heading',
+		} );
+		await editor.selectBlocks( heading );
+		const suggestionSaved = suggestionSavedPromise( page );
+		await suggestHeadingLevelThree( page );
+		await expect( heading ).toHaveClass( /is-suggestion-pending/ );
+		await suggestionSaved;
+
+		// The proposal is in content now, so the live block still saves at
+		// its baseline (level 2 is the default, so the markup is the tell)
+		// while the marker carries the proposed level.
+		await editor.saveDraft();
+		const saved = await editor.getEditedPostContent();
+		expect( saved ).toContain( '<h2 ' );
+		expect( saved ).not.toContain( '<h3' );
+		expect( saved ).toContain( '"type":"pending-attributes"' );
+		expect( saved ).toContain( '"after":{"level":3}' );
+
+		await page.reload();
+		await editor.canvas.locator( 'body' ).waitFor();
+
+		// The heading block renders its level as the `h{n}` element itself,
+		// so the tag name is the proposed level.
+		const reloaded = editor.canvas.getByRole( 'document', {
+			name: 'Block: Heading',
+		} );
+		await expect( reloaded ).toHaveClass( /is-suggestion-pending/ );
+		await expect( reloaded ).toHaveJSProperty( 'tagName', 'H3' );
+		await expect( reloaded ).toHaveText( 'Durable heading' );
+
+		await decideSuggestion( page, 'Accept' );
+		await expect( reloaded ).not.toHaveClass( /is-suggestion-pending/ );
+		await expect( reloaded ).toHaveJSProperty( 'tagName', 'H3' );
+		const applied = await editor.getEditedPostContent();
+		expect( applied ).toContain( '"level":3' );
+		expect( applied ).toContain( '<h3 ' );
+		expect( applied ).not.toContain( 'pending-attributes' );
+	} );
+
+	test( 'the author sees a pending attribute suggestion in Editing intent, and the front end shows the baseline', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { level: 2, content: 'Visible to the author' },
+		} );
+		await switchIntent( page, 'Suggesting' );
+		const heading = editor.canvas.getByRole( 'document', {
+			name: 'Block: Heading',
+		} );
+		await editor.selectBlocks( heading );
+		const suggestionSaved = suggestionSavedPromise( page );
+		await suggestHeadingLevelThree( page );
+		await suggestionSaved;
+
+		await switchIntent( page, 'Editing' );
+		await expect( heading ).toHaveClass( /is-suggestion-pending/ );
+		await expect( heading ).toHaveJSProperty( 'tagName', 'H3' );
+		await expect( heading ).toHaveText( 'Visible to the author' );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+		const body = page.locator( 'body' );
+		await expect(
+			body.locator( 'h2' ).filter( { hasText: 'Visible to the author' } )
+		).toBeVisible();
+		await expect(
+			body.locator( 'h3' ).filter( { hasText: 'Visible to the author' } )
+		).toHaveCount( 0 );
+	} );
+
+	test( 'undo withdraws an attribute suggestion and its note', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { level: 2, content: 'Undo me' },
+		} );
+		await switchIntent( page, 'Suggesting' );
+		const heading = editor.canvas.getByRole( 'document', {
+			name: 'Block: Heading',
+		} );
+		await editor.selectBlocks( heading );
+		const suggestionSaved = suggestionSavedPromise( page );
+		await suggestHeadingLevelThree( page );
+		await expect( heading ).toHaveClass( /is-suggestion-pending/ );
+		await suggestionSaved;
+
+		const sidebar = await openNotesSidebar( page );
+		await expect( sidebar.getByText( /heading level/ ) ).toBeVisible();
+
+		// The note collector trashes the note through core-data, which
+		// updates the comment to `status: 'trash'` (a PUT, not a DELETE).
+		const noteTrashed = page.waitForResponse(
+			( response: any ) =>
+				/\/wp\/v2\/comments\/\d+/.test( response.url() ) &&
+				[ 'PUT', 'POST', 'DELETE' ].includes(
+					response.request().method()
+				) &&
+				response.request().postData()?.includes( '"trash"' ) &&
+				response.ok()
+		);
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( heading ).not.toHaveClass( /is-suggestion-pending/ );
+		await expect( heading ).toHaveJSProperty( 'tagName', 'H2' );
+		await expect( heading ).toHaveText( 'Undo me' );
+		await noteTrashed;
+		await expect( sidebar.getByText( /heading level/ ) ).toBeHidden();
+	} );
 } );
