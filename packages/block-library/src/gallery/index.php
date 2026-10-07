@@ -470,11 +470,9 @@ function block_core_gallery_render_dynamic_image( $attachment_id, $attributes, $
  */
 function block_core_gallery_render( $attributes, $content, $block ) {
 	/*
-	 * Reads global styles once per request. The Gutenberg plugin caches the
-	 * merged theme.json data in the resolver, so this static is redundant there
-	 * but harmless. In WordPress Core it avoids a full merge per gallery until
-	 * the resolver cache from https://github.com/WordPress/gutenberg/pull/81979
-	 * is backported.
+	 * Reads global styles once per request. wp_get_global_styles() has no cache
+	 * of its own, so without this static each gallery would merge the theme.json
+	 * data again wherever the resolver does not cache the merged result.
 	 */
 	static $global_styles = null;
 
