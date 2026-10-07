@@ -21,5 +21,8 @@
 		"@wordpress/routes-lock-unlock": "file:../lock-unlock",
 		"@wordpress/route": "file:../../packages/route",
 		"@wordpress/views": "file:../../packages/views"
+	},
+	"devDependencies": {
+		"@types/react": "^18.3.27"
 	}
 }

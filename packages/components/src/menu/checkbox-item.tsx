@@ -10,7 +10,7 @@ import { useMenuItemHideOnClick } from './use-menu-item-hide-on-click';
 export const CheckboxItem = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< CheckboxItemProps, 'div', false >
->( function CheckboxItem(
+>( function UnforwardedCheckboxItem(
 	{ suffix, children, disabled = false, hideOnClick = false, ...props },
 	ref
 ) {

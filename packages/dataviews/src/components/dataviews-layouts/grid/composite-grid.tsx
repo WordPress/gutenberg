@@ -15,6 +15,7 @@ import {
 	useRef,
 	forwardRef,
 } from '@wordpress/element';
+import { inertValue } from '@wordpress/react-inert-value';
 import { MEDIA_ASPECT_RATIOS } from '../../../constants';
 import ItemActions from '../../dataviews-item-actions';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
@@ -74,7 +75,7 @@ interface GridItemProps< Item > extends HTMLAttributes< HTMLDivElement > {
 }
 
 const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
-	function GridItem(
+	function UnforwardedGridItem(
 		{
 			view,
 			selection,
@@ -120,7 +121,7 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 			[ forwardedRef ]
 		);
 		useIntersectionObserver( elementRef, posinset );
-		const instanceId = useInstanceId( GridItem );
+		const instanceId = useInstanceId( UnforwardedGridItem );
 
 		const isSelected = selection.includes( id );
 
@@ -321,7 +322,7 @@ interface CompositeGridProps< Item > {
 	data: Item[];
 	isInfiniteScroll: boolean;
 	className?: string;
-	inert?: string;
+	inert?: boolean;
 	isLoading?: boolean;
 	view: ViewGridType;
 	fields: NormalizedField< Item >[];
@@ -343,7 +344,7 @@ export default function CompositeGrid< Item >( {
 	data,
 	isInfiniteScroll,
 	className,
-	inert,
+	inert = false,
 	isLoading,
 	view,
 	fields,
@@ -453,7 +454,7 @@ export default function CompositeGrid< Item >( {
 						role="feed"
 						focusWrap
 						// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
-						inert={ inert }
+						inert={ inertValue( inert ) }
 					>
 						{ /* Render placeholders for unloaded items in first row */ }
 						{ Array.from( { length: placeholdersNeeded } ).map(
@@ -551,7 +552,7 @@ export default function CompositeGrid< Item >( {
 						aria-rowcount={ totalRows }
 						ref={ resizeObserverRef }
 						// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
-						inert={ inert }
+						inert={ inertValue( inert ) }
 					>
 						{ chunk( data, gridColumns ).map( ( row, i ) => (
 							<Composite.Row
