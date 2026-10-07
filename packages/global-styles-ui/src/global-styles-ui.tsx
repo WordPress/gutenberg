@@ -28,6 +28,8 @@ import ScreenCSS from './screen-css';
 import ScreenRevisions from './screen-revisions';
 import FontSizes from './font-sizes/font-sizes';
 import FontSize from './font-sizes/font-size';
+import Spacing from './spacing/spacing';
+import Spacings from './spacing/spacings';
 interface BlockStylesNavigationScreensProps {
 	parentMenu: string;
 	blockStyles: any[];
@@ -214,6 +216,12 @@ export function GlobalStylesUI( {
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/layout">
 						<ScreenLayout />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/layout/spacing">
+						<Spacings />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/layout/spacing/:origin/:slug">
+						<Spacing />
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/colors/palette">
 						<ScreenColorPalette />
