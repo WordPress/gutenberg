@@ -27,5 +27,8 @@ export function renderSlotWithChildren(
 	defaultSlot: ReactElement,
 	children: ReactNode
 ): ReactElement {
-	return cloneElement( slot ?? defaultSlot, { children } );
+	return cloneElement(
+		( slot ?? defaultSlot ) as ReactElement< { children?: ReactNode } >,
+		{ children }
+	);
 }

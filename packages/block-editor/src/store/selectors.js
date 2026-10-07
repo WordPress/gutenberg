@@ -3629,8 +3629,8 @@ export function __unstableGetTemporarilyEditingAsBlocks( state ) {
 export const getSelectedBlockStyleState = createSelector(
 	( state, clientId ) => {
 		const perBlockState =
-			state.selectedBlockStyleState?.clientId === clientId
-				? ( state.selectedBlockStyleState.value ??
+			clientId && state.selectedBlockStyleState?.clientId === clientId
+				? ( state.selectedBlockStyleState?.value ??
 					DEFAULT_BLOCK_STYLE_STATE )
 				: DEFAULT_BLOCK_STYLE_STATE;
 
