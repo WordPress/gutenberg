@@ -533,14 +533,37 @@ describe( 'Breadcrumb', () => {
 			).toThrow( /only accepts/ );
 		} );
 
-		it( 'requires at least one ancestor link', () => {
-			expect( () =>
-				render(
-					<Breadcrumb.Root>
-						<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
-					</Breadcrumb.Root>
-				)
-			).toThrow( /at least one/ );
+		it( 'displays the current item when there are no ancestor links', () => {
+			render(
+				<Breadcrumb.Root>
+					<Breadcrumb.CurrentItem>Document</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
+			);
+			expect(
+				screen.getByText( 'Document', {
+					selector: '[aria-current="page"]',
+				} )
+			).toBeVisible();
+			expect( screen.queryByRole( 'link' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'marks an in-document item as current without identifying it as a page', () => {
+			render(
+				<Breadcrumb.Root>
+					<Breadcrumb.LinkItem href="#">Document</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem
+						aria-current="true"
+						render={ <span aria-current="page" /> }
+					>
+						Paragraph
+					</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
+			);
+			expect(
+				screen.getByText( 'Paragraph', {
+					selector: '[aria-current="true"]',
+				} )
+			).toBeVisible();
 		} );
 
 		it( 'requires exactly one final current item', () => {
