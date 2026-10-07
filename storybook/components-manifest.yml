@@ -429,7 +429,6 @@
       - value
 - name: ColorPicker
   props:
-      - as
       - color
       - copyFormat
       - defaultValue
@@ -473,7 +472,9 @@
       - virtualFocus
   subcomponents:
       - name: Composite.Context
-        props: []
+        props:
+            - children
+            - value
       - name: Composite.Group
         props:
             - children
@@ -587,7 +588,6 @@
       - isDisabled
 - name: Dropdown
   props:
-      - as
       - className
       - contentClassName
       - defaultOpen
@@ -599,6 +599,7 @@
       - open
       - popoverProps
       - position
+      - ref
       - renderContent
       - renderToggle
       - style
@@ -1037,7 +1038,6 @@
       - anchorRect
       - anchorRef
       - animate
-      - as
       - children
       - constrainTabbing
       - expandOnMobile
@@ -1062,10 +1062,44 @@
             - key
             - name
             - ref
-- name: ProgressBar
+- name: Progress.Root
   props:
+      - aria-valuetext
+      - children
       - className
+      - format
+      - getAriaValueText
+      - locale
+      - max
+      - min
+      - render
+      - style
       - value
+  subcomponents:
+      - name: Progress.Indicator
+        props:
+            - className
+            - color
+            - render
+            - style
+      - name: Progress.Label
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Progress.Track
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Progress.Value
+        props:
+            - children
+            - className
+            - render
+            - style
 - name: Radio
   props:
       - className
