@@ -163,6 +163,42 @@ describe( 'validateChangelog', () => {
 		] );
 	} );
 
+	test( 'rejects blank lines between top-level entries', () => {
+		const errors = validateChangelog(
+			changelog( `### Bug Fixes
+
+-   First ([#1](https://github.com/WordPress/gutenberg/pull/1)).
+
+-   Second ([#2](https://github.com/WordPress/gutenberg/pull/2)).
+-   Third ([#3](https://github.com/WordPress/gutenberg/pull/3)).
+
+### Internal
+
+-   Fourth ([#4](https://github.com/WordPress/gutenberg/pull/4)).
+` ),
+			{ filePath: 'packages/ui/CHANGELOG.md' }
+		);
+		expect( errors ).toEqual( [
+			'packages/ui/CHANGELOG.md:8: remove the blank line between Unreleased entries.',
+		] );
+	} );
+
+	test( 'rejects a blank line between a nested list and the next entry', () => {
+		const errors = validateChangelog(
+			changelog( `### Breaking Changes
+
+-   Parent description:
+    -   \`Child\` ([#1](https://github.com/WordPress/gutenberg/pull/1))
+
+-   Next ([#2](https://github.com/WordPress/gutenberg/pull/2)).
+` ),
+			{ filePath: 'packages/ui/CHANGELOG.md' }
+		);
+		expect( errors ).toEqual( [
+			'packages/ui/CHANGELOG.md:9: remove the blank line between Unreleased entries.',
+		] );
+	} );
+
 	test( 'requirePr checks for this pull request link under Unreleased', () => {
 		const content = changelog( `### Internal
 
