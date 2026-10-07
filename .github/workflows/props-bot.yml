@@ -104,6 +104,10 @@ jobs:
                   # The PR meta comment carries the list, so the action renders
                   # it to an output and posts nothing itself.
                   post-comment: false
+                  # The intro is what an older standalone props bot searches
+                  # for, and it would find this comment. Our own note about
+                  # refreshing replaces it, worded so that it will not.
+                  include-intro: false
 
     # Other branches retain standalone props until their shared writers have
     # been updated. Otherwise the base gate would discard every fresh list.
@@ -167,10 +171,7 @@ jobs:
                     exit 0
                   fi
 
-                  # Drop the intro wherever it sits: it is what the standalone
-                  # props bot searches for, and it would find this comment. Its
-                  # note about refreshing goes back in wording that will not.
-                  printf '%s\n' "$BODY" | sed '/^The following accounts have interacted/d' > pr-meta/body.md
+                  printf '%s\n' "$BODY" > pr-meta/body.md
 
                   cat >> pr-meta/body.md <<'EOF'
 
