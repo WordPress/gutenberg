@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   In-between inserter: Limit title-gap (`is-before-first-block`) hit-testing to the "+" so the overlay no longer steals clicks on the first block (fixes WebKit shift+click multi-selection inside a Group) ([#82301](https://github.com/WordPress/gutenberg/pull/82301)).
+
 ## 18.1.0 (2026-10-07)
 
 ### New Features

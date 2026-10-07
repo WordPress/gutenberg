@@ -45,6 +45,23 @@
 			pointer-events: all;
 		}
 	}
+
+	// Title-gap (before first block): only the "+" is interactive. The full
+	// overlay must not steal clicks on the first block — that breaks WebKit
+	// shift+click multi-selection inside a Group that is the first root block.
+	// Higher specificity than `.is-with-inserter` above is required.
+	.is-with-inserter.is-before-first-block {
+		pointer-events: none;
+
+		* {
+			pointer-events: none;
+		}
+
+		.block-editor-block-list__insertion-point-inserter,
+		.block-editor-block-list__insertion-point-inserter * {
+			pointer-events: all;
+		}
+	}
 }
 
 

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Post editor: Show the inline inserter in the gap between the post title and the first block ([#82301](https://github.com/WordPress/gutenberg/pull/82301)).
+
 ## 15.2.0 (2026-10-07)
 
 ### Enhancements
