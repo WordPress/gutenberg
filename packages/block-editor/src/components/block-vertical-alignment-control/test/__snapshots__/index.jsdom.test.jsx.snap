@@ -35,7 +35,6 @@ exports[`BlockVerticalAlignmentUI > should match snapshot when controls are hidd
         />
         <path
           d="M4 4.75H20"
-          vector-effect="non-scaling-stroke"
         />
       </svg>
     </button>
@@ -79,7 +78,6 @@ exports[`BlockVerticalAlignmentUI > should match snapshot when controls are visi
           />
           <path
             d="M4 4.75H20"
-            vector-effect="non-scaling-stroke"
           />
         </svg>
       </button>
@@ -105,7 +103,6 @@ exports[`BlockVerticalAlignmentUI > should match snapshot when controls are visi
         >
           <path
             d="M4 12H20"
-            vector-effect="non-scaling-stroke"
           />
           <rect
             fill="currentColor"
@@ -139,7 +136,6 @@ exports[`BlockVerticalAlignmentUI > should match snapshot when controls are visi
         >
           <path
             d="M4 19.25H20"
-            vector-effect="non-scaling-stroke"
           />
           <rect
             fill="currentColor"
