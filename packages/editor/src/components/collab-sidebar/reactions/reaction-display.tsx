@@ -365,7 +365,7 @@ function ReactionButton( {
 				<span className="editor-collab-sidebar-panel__reaction-button-emoji">
 					{ emoji }
 				</span>
-				<span>{ count }</span>
+				<span>{ count.toLocaleString() }</span>
 			</Tooltip.Trigger>
 			<Tooltip.Popup>{ accessibleLabel }</Tooltip.Popup>
 		</Tooltip.Root>
