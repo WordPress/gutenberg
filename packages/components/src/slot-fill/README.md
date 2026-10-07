@@ -57,9 +57,24 @@ const Toolbar = () => (
 );
 ```
 
+`createSlotFill` only gives the `Slot` and `Fill` the same name. It doesn't render a provider, so they still need a `SlotFillProvider` above them, and it must be the same one: a `Fill` only renders into a `Slot` registered with the same provider. Without a provider, nothing is rendered and a "Components must be wrapped within `SlotFillProvider`" warning is logged.
+
+```jsx
+const App = () => (
+	<SlotFillProvider>
+		<Toolbar />
+		<ToolbarItem />
+	</SlotFillProvider>
+);
+```
+
+### Inside the WordPress editor
+
+The block editor screens in WordPress already render a `SlotFillProvider`. Code that runs inside them, such as a plugin registered with `registerPlugin()`, doesn't need its own provider. Adding another one would keep its `Fill`s away from the editor's `Slot`s. If a component may be rendered either inside or outside an existing provider, use the `passthrough` prop, described below.
+
 ## Props
 
-The `SlotFillProvider` component does not accept any props (except `children`).
+`SlotFillProvider` accepts `children` and an optional `passthrough` boolean. With `passthrough`, it uses the closest parent `SlotFillProvider` when there is one, and only creates its own when there isn't.
 
 Both `Slot` and `Fill` accept a `name` string prop, where a `Slot` with a given `name` will render the `children` of any associated `Fill`s.
 
@@ -108,9 +123,9 @@ const { Fill, Slot } = createSlotFill( 'Toolbar' );
 
 const ToolbarItem = () => (
 	<Fill>
-		{ ( { hideToolbar } ) => {
-			<Button onClick={ hideToolbar }>Hide</Button>;
-		} }
+		{ ( { hideToolbar } ) => (
+			<Button onClick={ hideToolbar }>Hide</Button>
+		) }
 	</Fill>
 );
 
