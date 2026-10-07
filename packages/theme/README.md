@@ -313,7 +313,7 @@ Reports manual fallbacks that can drift from the generated values.
 
 ## Build Plugins
 
-The build plugins inject generated fallbacks into bare `var(--wpds-*)` references so components still render when the design tokens stylesheet is unavailable. For example, `var(--wpds-color-foreground-content-neutral)` becomes `var(--wpds-color-foreground-content-neutral, #505050)` with the default theme.
+The build plugins inject generated fallbacks into bare `var(--wpds-*)` references so components still render when the design tokens stylesheet is unavailable. For example, `var(--wpds-color-foreground-content-neutral)` becomes `var(--wpds-color-foreground-content-neutral, #464646)` with the default theme.
 
 `@wordpress/build` already applies these plugins automatically when `@wordpress/theme` is installed. You only need to configure them manually for custom build setups.
 
