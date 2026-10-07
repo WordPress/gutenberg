@@ -31,6 +31,10 @@ import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
 import { CustomInserterModal } from './components';
 
+// Matches the icon name pattern accepted by /wp/v2/icons/<name> REST route.
+const ICON_NAME_REGEX =
+	/^[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?\/[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?$/;
+
 const IconPlaceholder = ( { className, style } ) => (
 	<SVG
 		xmlns="http://www.w3.org/2000/svg"
@@ -106,8 +110,14 @@ export function Edit( { attributes, setAttributes, isSelected, context } ) {
 
 	const selectedIcon = useSelect(
 		( select ) => {
-			const { getEntityRecord } = select( coreDataStore );
-			return icon ? getEntityRecord( 'root', 'icon', icon ) : null;
+			if ( typeof icon !== 'string' || ! ICON_NAME_REGEX.test( icon ) ) {
+				return null;
+			}
+			return select( coreDataStore ).getEntityRecord(
+				'root',
+				'icon',
+				icon
+			);
 		},
 		[ icon ]
 	);
