@@ -299,6 +299,7 @@ function isInsertionPoint( targetToCheck, ownerDocument ) {
  * A React hook that can be used to make a block list handle drag and drop.
  *
  * @param {WPBlockDropZoneConfig} dropZoneConfig configuration data for the drop zone.
+ * @return {import('react').RefCallback<HTMLElement>} Ref callback for the drop zone element.
  */
 export default function useBlockDropZone( {
 	dropZoneElement,
