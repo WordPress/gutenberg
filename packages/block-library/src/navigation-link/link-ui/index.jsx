@@ -5,7 +5,12 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { LinkControl, useBlockEditingMode } from '@wordpress/block-editor';
+import {
+	LinkControl,
+	useBlockEditingMode,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 import {
 	useMemo,
 	useState,
@@ -77,9 +82,28 @@ export function getSuggestionsQuery( type, kind ) {
 }
 
 function UnforwardedLinkUI( props, ref ) {
-	const { label, url, opensInNewTab, type, kind, id } = props.link;
+	const { label, opensInNewTab, type, kind, id } = props.link;
 
 	const { entityRecord, hasBinding, isEntityAvailable } = props.entity || {};
+
+	const { clientId } = props;
+
+	// Use the entity binding hook to get binding status
+	const { isBoundEntityAvailable, isBoundEntityPending } = useEntityBinding( {
+		clientId,
+		attributes: props.link,
+	} );
+
+	// The bound URL is empty until the entity record loads, so fall back to
+	// the URL stored on the block in the meantime.
+	const storedUrl = useSelect(
+		( select ) =>
+			isBoundEntityPending
+				? select( blockEditorStore ).getBlockAttributes( clientId )?.url
+				: undefined,
+		[ isBoundEntityPending, clientId ]
+	);
+	const url = props.link.url || storedUrl;
 
 	const { image, badges } = useLinkPreview( {
 		url,
@@ -89,7 +113,6 @@ function UnforwardedLinkUI( props, ref ) {
 		isEntityAvailable,
 	} );
 
-	const { clientId } = props;
 	const postType = type || 'page';
 
 	const [ addingBlock, setAddingBlock ] = useState( false );
@@ -117,12 +140,6 @@ function UnforwardedLinkUI( props, ref ) {
 		name: postType,
 	} );
 
-	// Use the entity binding hook to get binding status
-	const { isBoundEntityAvailable } = useEntityBinding( {
-		clientId,
-		attributes: props.link,
-	} );
-
 	// Memoize link value to avoid overriding the LinkControl's internal state.
 	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/50976#issuecomment-1568226407.
 	const link = useMemo(
@@ -130,7 +147,14 @@ function UnforwardedLinkUI( props, ref ) {
 			url,
 			opensInNewTab,
 			title: label && stripHTML( label ),
-			entityTitle: entityRecord?.title?.rendered || entityRecord?.name,
+			// Until the entity record loads, use the label so the rich
+			// preview's page title doesn't show in its place.
+			entityTitle:
+				entityRecord?.title?.rendered ||
+				entityRecord?.name ||
+				( isBoundEntityPending && label
+					? stripHTML( label )
+					: undefined ),
 			kind,
 			type,
 			id,
@@ -147,6 +171,7 @@ function UnforwardedLinkUI( props, ref ) {
 			image,
 			badges,
 			entityRecord,
+			isBoundEntityPending,
 		]
 	);
 
