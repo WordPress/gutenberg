@@ -1968,6 +1968,70 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 				] );
 		} );
 
+		test( 'should extend the text selection within a block edited as HTML', async ( {
+			page,
+			editor,
+			multiBlockSelectionUtils,
+		} ) => {
+			for ( const content of [ '1', '2', '3' ] ) {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: { content },
+				} );
+			}
+
+			const paragraphs = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await editor.selectBlocks( paragraphs.nth( 1 ) );
+			await editor.clickBlockOptionsMenuItem( 'Edit as HTML' );
+
+			const textarea = paragraphs.nth( 1 ).getByRole( 'textbox' );
+			await textarea.click();
+			// Home and End do not move the caret within a line on macOS.
+			await textarea.evaluate( ( element ) =>
+				element.setSelectionRange(
+					element.value.length,
+					element.value.length
+				)
+			);
+			await page.keyboard.type( '<b' );
+
+			// The selection extends natively within the textarea, rather than
+			// multi-selecting the adjacent block.
+			await page.keyboard.press( 'Shift+ArrowLeft' );
+			await page.keyboard.press( 'Shift+ArrowLeft' );
+			await expect( textarea ).toBeFocused();
+			await expect
+				.poll( () =>
+					textarea.evaluate( ( element ) => [
+						element.selectionStart,
+						element.selectionEnd,
+					] )
+				)
+				.toEqual( [ 8, 10 ] );
+			await expect
+				.poll( multiBlockSelectionUtils.getSelectedBlocks )
+				.toMatchObject( [ { name: 'core/paragraph' } ] );
+
+			await textarea.evaluate( ( element ) =>
+				element.setSelectionRange( 0, 0 )
+			);
+			await page.keyboard.press( 'Shift+ArrowRight' );
+			await expect( textarea ).toBeFocused();
+			await expect
+				.poll( () =>
+					textarea.evaluate( ( element ) => [
+						element.selectionStart,
+						element.selectionEnd,
+					] )
+				)
+				.toEqual( [ 0, 1 ] );
+			await expect
+				.poll( multiBlockSelectionUtils.getSelectedBlocks )
+				.toMatchObject( [ { name: 'core/paragraph' } ] );
+		} );
+
 		test( 'should not scroll the canvas when the selection spans a scrolled page', async ( {
 			editor,
 			page,
