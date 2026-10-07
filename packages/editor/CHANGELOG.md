@@ -25,6 +25,7 @@
 -   `ErrorBoundary`: Make "Copy contents" on the crash screen copy the post content, including unsaved changes, instead of an empty string ([#87421](https://github.com/WordPress/gutenberg/pull/87421)).
 -   Sidebar: Make the tab bar 48px tall, like the inserter's, with the selected tab's indicator over its bottom border ([#87333](https://github.com/WordPress/gutenberg/pull/87333)).
 -   `DocumentOutline`: Render the outline items as buttons instead of links, so selecting one no longer changes the page URL or adds a browser history entry ([#87483](https://github.com/WordPress/gutenberg/pull/87483)).
+-   `DocumentTools`: Fix arrow key navigation in the toolbar below the medium breakpoint ([#84175](https://github.com/WordPress/gutenberg/pull/84175)).
 
 ### Internal
 
@@ -151,7 +152,6 @@
 
 ### Bug Fixes
 
--   `DocumentTools`: Stop rendering the undo and redo buttons below the medium breakpoint instead of hiding them with CSS. They were still registered as toolbar items while invisible, so arrow key presses moved the roving tabindex onto a button that cannot receive focus and appeared to do nothing ([#84175](https://github.com/WordPress/gutenberg/pull/84175)).
 -   `PostTrash`: Offer "Delete permanently" instead of "Move to trash" when the post can't be moved to the trash, based on the new `wp:action-trash` REST link ([#84045](https://github.com/WordPress/gutenberg/pull/84045)).
 -   Keep post actions and note actions menus dismissible when their triggers become disabled. Close the View menu when it becomes unavailable ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
 -   Remove redundant menu groups from the mode switcher and preview menu, and associate the Editor label with its radio group ([#83792](https://github.com/WordPress/gutenberg/pull/83792)).
