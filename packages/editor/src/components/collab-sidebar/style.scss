@@ -424,8 +424,7 @@ mark.wp-note {
 .editor-collab-sidebar-panel__reaction-option-emoji {
 	// Render the emoji glyph larger than the text beside it so it visually
 	// balances with the add-reaction icon that trails the pills.
-	font-size: 16px;
-	line-height: 1;
+	font-size: var(--wpds-typography-font-size-lg);
 }
 
 // Mention chips, both in the note input and the rendered note content. A
