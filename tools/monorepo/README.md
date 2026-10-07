@@ -29,6 +29,10 @@ See the TypeScript section of [`packages/README.md`](../../packages/README.md) f
 
 `npm run --workspace @wordpress/monorepo-tools list-experimental-apis` prints a Markdown list of every `__experimental` API in `packages/` and `lib/`, each linked to a GitHub search for it. Release leads run it to audit experimental APIs ahead of a major WordPress release, as in [the WordPress 6.2 audit](https://github.com/WordPress/gutenberg/issues/47196).
 
+## VS Code settings
+
+`npm run --workspace @wordpress/monorepo-tools install-vscode-settings` copies `.vscode/settings.dist.jsonc` to `.vscode/settings.json`, unless that file no longer starts with `// This is a managed VS Code settings file.` A VS Code task runs it when the folder opens.
+
 ## Admin design tokens experiment
 
 `wpds/generate-admin-scheme-tokens.mjs` writes the per-colour-scheme design token stylesheet for the admin design tokens experiment, `lib/experimental/wpds-admin/css/05-scheme-tokens.css`. Run it with `npm run wpds:admin-scheme-tokens --workspace @wordpress/monorepo-tools` after changing the theme's colour ramps or the admin colour schemes. It is temporary; the generated file's header says what replaces it.

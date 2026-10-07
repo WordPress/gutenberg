@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
+
 ### Internal
 
 -   Keep `@wordpress/sync` in the list of core modules allowed to use private APIs for backward compatibility only. The package no longer uses private APIs, but copies published to npm before that change opt in at module load, so a plugin bundling one of those copies would throw at load time without this entry ([#81999](https://github.com/WordPress/gutenberg/pull/81999)).
