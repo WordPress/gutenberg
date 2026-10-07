@@ -151,3 +151,64 @@ test.describe( 'Meta boxes', () => {
 		).toHaveAttribute( 'content', 'Explicitly set excerpt.' );
 	} );
 } );
+
+test.describe( 'Meta boxes in the sidebar only', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		// Earlier tests may have saved the pane as open.
+		await Promise.all( [
+			requestUtils.activatePlugin(
+				'gutenberg-test-plugin-side-meta-box'
+			),
+			requestUtils.resetPreferences(),
+		] );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await Promise.all( [
+			requestUtils.deactivatePlugin(
+				'gutenberg-test-plugin-side-meta-box'
+			),
+			requestUtils.resetPreferences(),
+		] );
+	} );
+
+	test( 'should not show the empty meta boxes pane when it is closed', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await editor.openDocumentSettingsSidebar();
+
+		// Waits for the side meta box so the pane has had a chance to render.
+		await expect(
+			page.getByRole( 'heading', {
+				name: 'Gutenberg Test Side Meta Box',
+			} )
+		).toBeVisible();
+		await expect(
+			page.getByRole( 'button', { name: 'Meta Boxes', exact: true } )
+		).toBeHidden();
+	} );
+
+	test( 'should keep the meta boxes pane when it is open', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		await requestUtils.setPreferences( 'core/edit-post', {
+			metaBoxesMainIsOpen: true,
+		} );
+		await admin.createNewPost();
+
+		const toggle = page.getByRole( 'button', {
+			name: 'Meta Boxes',
+			exact: true,
+		} );
+		await expect( toggle ).toHaveAttribute( 'aria-expanded', 'true' );
+
+		// Collapsing keeps the pane around until the next load.
+		await toggle.click( { position: { x: 40, y: 10 } } );
+		await expect( toggle ).toHaveAttribute( 'aria-expanded', 'false' );
+	} );
+} );

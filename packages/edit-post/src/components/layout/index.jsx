@@ -118,18 +118,28 @@ function useEditorStyles( settings ) {
 }
 
 function MetaBoxesMain() {
-	const [ isOpen, openHeight, hasAnyVisible ] = useSelect( ( select ) => {
-		const { get } = select( preferencesStore );
-		const { isMetaBoxLocationVisible } = select( editPostStore );
-		return [
-			!! get( 'core/edit-post', 'metaBoxesMainIsOpen' ),
-			get( 'core/edit-post', 'metaBoxesMainOpenHeight' ),
-			isMetaBoxLocationVisible( 'normal' ) ||
-				isMetaBoxLocationVisible( 'advanced' ) ||
+	const [ isOpen, openHeight, hasMainVisible, hasSideVisible ] = useSelect(
+		( select ) => {
+			const { get } = select( preferencesStore );
+			const { isMetaBoxLocationVisible } = select( editPostStore );
+			return [
+				!! get( 'core/edit-post', 'metaBoxesMainIsOpen' ),
+				get( 'core/edit-post', 'metaBoxesMainOpenHeight' ),
+				isMetaBoxLocationVisible( 'normal' ) ||
+					isMetaBoxLocationVisible( 'advanced' ),
 				isMetaBoxLocationVisible( 'side' ),
-		];
-	}, [] );
+			];
+		},
+		[]
+	);
 	const { set: setPreference } = useDispatch( preferencesStore );
+
+	// With only side meta boxes, the empty pane is kept so they can be moved
+	// back into it. That only works while it's open, so it's skipped when it
+	// starts closed. Uses the state on mount so collapsing doesn't remove it.
+	const [ wasOpenOnMount ] = useState( isOpen );
+	const hasAnyVisible =
+		hasMainVisible || ( hasSideVisible && wasOpenOnMount );
 
 	const isShort = useMediaQuery( '(max-height: 549px)' );
 
