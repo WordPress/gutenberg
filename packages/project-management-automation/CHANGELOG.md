@@ -4,7 +4,7 @@
 
 ### Internal
 
--   Publish only runtime files, dropping `tsconfig.json` and `tsconfig.tsbuildinfo` from the package.
+-   Publish only runtime files, dropping `tsconfig.json` and `tsconfig.tsbuildinfo` from the package ([#84164](https://github.com/WordPress/gutenberg/pull/84164)).
 
 ## 3.2.0 (2026-10-07)
 
