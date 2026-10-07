@@ -7,9 +7,11 @@ import { __ } from '@wordpress/i18n';
 import { IconButton, Menu } from '@wordpress/ui';
 import { reaction as reactionIcon } from '@wordpress/icons';
 import { REACTION_EMOJIS } from './reaction-emojis';
+import { hasUserReacted } from './reaction-display';
+import type { ReactionSummary } from './reaction-display';
 
 interface AddReactionButtonProps {
-	disabled?: boolean;
+	reactions?: ReactionSummary | null;
 	onToggleReaction: ( hexKey: string ) => void;
 }
 
@@ -17,18 +19,17 @@ interface AddReactionButtonProps {
  * The add-reaction button, opening a menu of the reaction emoji.
  *
  * @param props                  Component props.
- * @param props.disabled         Whether the button is disabled (e.g. on a
- *                               resolved note thread).
+ * @param props.reactions        The note's reaction summary, used to mark the
+ *                               emoji the current user has already reacted with.
  * @param props.onToggleReaction Callback to toggle a reaction.
  */
 export function AddReactionButton( {
-	disabled = false,
+	reactions,
 	onToggleReaction,
 }: AddReactionButtonProps ) {
 	return (
 		<Menu.Root>
 			<Menu.Trigger
-				disabled={ disabled }
 				render={
 					<IconButton
 						size="small"
@@ -46,19 +47,19 @@ export function AddReactionButton( {
 				positioner={ <Menu.Positioner side="bottom" align="end" /> }
 			>
 				{ REACTION_EMOJIS.map( ( { emoji, hexKey, label } ) => (
-					<Menu.Item
+					<Menu.CheckboxItem
 						key={ hexKey }
-						onClick={ () => onToggleReaction( hexKey ) }
+						checked={ hasUserReacted( reactions, hexKey ) }
+						onCheckedChange={ () => onToggleReaction( hexKey ) }
+						closeOnClick
 						prefix={
-							<span
-								className="editor-collab-sidebar-panel__reaction-option-emoji"
-							>
+							<span className="editor-collab-sidebar-panel__reaction-option-emoji">
 								{ emoji }
 							</span>
 						}
 					>
 						<Menu.ItemLabel>{ label }</Menu.ItemLabel>
-					</Menu.Item>
+					</Menu.CheckboxItem>
 				) ) }
 			</Menu.Popup>
 		</Menu.Root>

@@ -1297,17 +1297,26 @@ test.describe( 'Block Notes', () => {
 			// The arrow keys move through the emoji, and Enter picks one.
 			await page.keyboard.press( 'Enter' );
 			await expect(
-				menu.getByRole( 'menuitem', { name: 'heart' } )
+				menu.getByRole( 'menuitemcheckbox', { name: 'heart' } )
 			).toBeFocused();
 			await page.keyboard.press( 'ArrowDown' );
 			await expect(
-				menu.getByRole( 'menuitem', { name: 'celebration' } )
+				menu.getByRole( 'menuitemcheckbox', { name: 'celebration' } )
 			).toBeFocused();
 			await page.keyboard.press( 'Enter' );
 
 			await expect(
 				page.getByRole( 'button', { name: /celebration/ } )
 			).toContainText( '1' );
+
+			// The menu marks the emoji the user has already reacted with.
+			await trigger.click();
+			await expect(
+				menu.getByRole( 'menuitemcheckbox', { name: 'celebration' } )
+			).toBeChecked();
+			await expect(
+				menu.getByRole( 'menuitemcheckbox', { name: 'heart' } )
+			).not.toBeChecked();
 		} );
 
 		test( 'resolving a thread locks its reactions', async ( {
@@ -1338,11 +1347,9 @@ test.describe( 'Block Notes', () => {
 			} );
 			await expect( reactionPill ).toBeVisible();
 
-			// Resolving posts a "Marked as resolved" reply that carries its
-			// own add trigger, so the root note's is the first of the two.
-			const addReaction = sidebar
-				.getByRole( 'button', { name: 'Add reaction' } )
-				.first();
+			const addReaction = sidebar.getByRole( 'button', {
+				name: 'Add reaction',
+			} );
 			const resolveButton = sidebar.getByRole( 'button', {
 				name: 'Resolve',
 			} );
@@ -1353,15 +1360,15 @@ test.describe( 'Block Notes', () => {
 			await thread.click();
 			await expect( resolveButton ).toBeDisabled();
 
-			// A resolved thread is an archived conversation, so neither the
-			// add trigger nor the existing pill may still mutate reactions.
-			await expect( addReaction ).toBeDisabled();
+			// A resolved thread is an archived conversation: the add trigger
+			// is gone and the existing pill can no longer mutate reactions.
+			await expect( addReaction ).toHaveCount( 0 );
 			await expect( reactionPill ).toBeDisabled();
 
 			// Reopening the thread unlocks them again.
 			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Reopen' );
 			await expect( resolveButton ).toBeEnabled();
-			await expect( addReaction ).toBeEnabled();
+			await expect( addReaction.first() ).toBeEnabled();
 			await expect( reactionPill ).toBeEnabled();
 		} );
 

@@ -197,7 +197,7 @@ class BlockNoteUtils {
 			.click();
 		await this.#page
 			.getByRole( 'menu', { name: 'Add reaction' } )
-			.getByRole( 'menuitem', { name: emoji, exact: true } )
+			.getByRole( 'menuitemcheckbox', { name: emoji, exact: true } )
 			.click();
 	}
 

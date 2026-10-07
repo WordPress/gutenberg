@@ -52,7 +52,7 @@ function getReactionCount(
  * @param hexKey    The reaction hex key to check.
  * @return Whether the user has reacted.
  */
-function hasUserReacted(
+export function hasUserReacted(
 	reactions: ReactionSummary | null | undefined,
 	hexKey: string
 ): boolean {
