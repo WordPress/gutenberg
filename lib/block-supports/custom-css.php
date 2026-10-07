@@ -77,6 +77,7 @@ function gutenberg_process_custom_css_state_entries( $state_entries, $selector )
 	$processed_css = '';
 
 	foreach ( $state_entries as $entry ) {
+        // Validate CSS doesn't contain HTML markup (same validation as global styles REST API).
 		if ( preg_match( '#</?\w+#', $entry['css'] ) ) {
 			continue;
 		}
