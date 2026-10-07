@@ -44,3 +44,22 @@ export function collectCanvases( blocks ) {
 	walk( blocks );
 	return canvases;
 }
+
+/**
+ * Whether a container's own layout is open enough to become a canvas.
+ *
+ * Some blocks exist precisely to arrange their children — Columns, Buttons,
+ * Navigation, Gallery, the paginations — and every one of them says so with
+ * `allowSwitching: false`. Turning those into a canvas would throw away the
+ * arrangement the block is for. Everything else that supports layout is fair
+ * game: a Group, a Column, a Cover all simply hold whatever you put in them.
+ *
+ * @param {boolean|Object|undefined} layoutSupport The block's `layout` support.
+ * @return {boolean} Whether blocks inside it can be placed by dragging.
+ */
+export function canHoldACanvas( layoutSupport ) {
+	if ( ! layoutSupport ) {
+		return false;
+	}
+	return layoutSupport?.allowSwitching !== false;
+}

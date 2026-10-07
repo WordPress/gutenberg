@@ -1,23 +1,22 @@
 import { useSelect } from '@wordpress/data';
+import { getBlockSupport } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import FreeformCanvas from './freeform-canvas';
 import FreeformStyles from './freeform-styles';
+import { canHoldACanvas } from './canvases';
 
 /**
  * Mounts the freeform canvas editing surface for whichever section the current
  * selection sits in.
  *
- * A canvas is a section — a top-level block, which is what the editor already
- * treats as one — or any Group at any depth inside one, so blocks in a nested
- * Group drag just like blocks in the section itself. It is a canvas whether or
- * not it has been converted yet: the first drag converts it, in place and at
- * the layout it already had.
+ * A canvas is any container that holds blocks without insisting on how they are
+ * arranged — a Group, a Column, a Cover — at any depth. Blocks inside a column
+ * therefore drag exactly like blocks in the section around it. It is a canvas
+ * whether or not it has been converted yet: the first drag converts it, in
+ * place and at the layout it already had.
  *
- * Containers are limited to sections and Groups on purpose. Converting rewrites
- * the container's layout and every child's position, which is fair game for
- * something whose whole job is holding a layout, and a surprise inside, say, a
- * Buttons block, where it would break the block's own arrangement.
+ * Blocks that arrange their own children are left alone; see `canHoldACanvas`.
  *
  * This is anchored on the editor rather than on a block because it has to
  * outlive any one selection: a group drag needs the surface to still be there
@@ -35,7 +34,6 @@ export default function FreeformCanvasTools() {
 				getBlockOrder,
 				getTemplateLock,
 				getSettings,
-				getSectionRootClientId,
 			} = unlock( select( blockEditorStore ) );
 
 			const selected = getSelectedBlockClientIds();
@@ -43,28 +41,37 @@ export default function FreeformCanvasTools() {
 				return {};
 			}
 
-			const sectionRoot = getSectionRootClientId() ?? '';
-			const hasChildren = ( clientId ) =>
-				getBlockOrder( clientId ).length > 0;
 			const isFreeform = ( clientId ) =>
 				!! clientId &&
 				getBlockAttributes( clientId )?.layout?.type === 'freeform';
-			// A section, or a Group nested anywhere inside the content.
-			const canHoldACanvas = ( clientId ) =>
-				!! clientId &&
-				hasChildren( clientId ) &&
-				( getBlockRootClientId( clientId ) === sectionRoot ||
-					getBlockName( clientId ) === 'core/group' );
+			const isOpenContainer = ( clientId ) => {
+				if ( ! clientId || ! getBlockOrder( clientId ).length ) {
+					return false;
+				}
+				const name = getBlockName( clientId );
+				return canHoldACanvas(
+					getBlockSupport( name, 'layout' ) ??
+						getBlockSupport( name, '__experimentalLayout' )
+				);
+			};
 			const isCanvasContainer = ( clientId ) =>
-				isFreeform( clientId ) || canHoldACanvas( clientId );
+				isFreeform( clientId ) || isOpenContainer( clientId );
 
-			// Either the container itself is selected, or something inside it.
+			// The container around the selection is the canvas, and the
+			// selection is something on it. That order matters: a Group is
+			// both a container and a block you want to drag, and checking it
+			// first made selecting one show its own empty surface instead of
+			// a grip, so Groups could never be moved.
+			//
+			// Only when nothing above the selection can hold a canvas is the
+			// selection itself the canvas — that is a section selected on its
+			// own, which shows the whole layout with nothing picked up.
 			const root = getBlockRootClientId( selected[ 0 ] );
 			let canvas = null;
-			if ( isCanvasContainer( selected[ 0 ] ) ) {
-				canvas = selected[ 0 ];
-			} else if ( isCanvasContainer( root ) ) {
+			if ( isCanvasContainer( root ) ) {
 				canvas = root;
+			} else if ( isCanvasContainer( selected[ 0 ] ) ) {
+				canvas = selected[ 0 ];
 			}
 
 			if (

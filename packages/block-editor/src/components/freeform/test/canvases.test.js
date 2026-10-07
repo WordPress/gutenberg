@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { collectCanvases } from '../canvases';
+import { canHoldACanvas, collectCanvases } from '../canvases';
 import { DEFAULT_CANVAS_HEIGHT } from '../constants';
 
 const block = ( clientId, attributes = {}, innerBlocks = [] ) => ( {
@@ -80,5 +80,44 @@ describe( 'collectCanvases', () => {
 				] ),
 			] )
 		).toEqual( [] );
+	} );
+} );
+
+describe( 'canHoldACanvas', () => {
+	it( 'accepts a container that leaves its layout open', () => {
+		// Group, and anything else that lets you choose a layout.
+		expect( canHoldACanvas( { allowSizingOnChildren: true } ) ).toBe(
+			true
+		);
+		expect( canHoldACanvas( { allowJustification: false } ) ).toBe( true );
+	} );
+
+	it( 'accepts plain layout support', () => {
+		// core/column declares `"layout": true`.
+		expect( canHoldACanvas( true ) ).toBe( true );
+	} );
+
+	it( 'refuses a block that arranges its own children', () => {
+		// Columns, Buttons, Navigation, Gallery and the paginations all say
+		// `allowSwitching: false`. Repositioning their children would break
+		// the arrangement the block exists to provide.
+		expect(
+			canHoldACanvas( {
+				allowSwitching: false,
+				default: { type: 'flex' },
+			} )
+		).toBe( false );
+		expect(
+			canHoldACanvas( {
+				allowSwitching: false,
+				allowEditing: false,
+				default: { type: 'flex', flexWrap: 'nowrap' },
+			} )
+		).toBe( false );
+	} );
+
+	it( 'refuses a block with no layout support at all', () => {
+		expect( canHoldACanvas( undefined ) ).toBe( false );
+		expect( canHoldACanvas( false ) ).toBe( false );
 	} );
 } );
