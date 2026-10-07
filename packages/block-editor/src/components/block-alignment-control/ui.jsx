@@ -9,6 +9,12 @@ import {
 import { useAlignmentMenu } from './use-available-alignments';
 import { BLOCK_ALIGNMENTS_CONTROLS, DEFAULT_CONTROL } from './constants';
 
+function getUnavailableInfo( isSelected ) {
+	// A withheld alignment that is also the value is set but has no effect,
+	// which is a different thing to tell the user than that it can't be picked.
+	return isSelected ? __( 'Not applied here' ) : __( 'Not available' );
+}
+
 function BlockAlignmentUI( {
 	value,
 	onChange,
@@ -27,12 +33,24 @@ function BlockAlignmentUI( {
 	const { enabled: enabledControls, unavailable: unavailableControls } =
 		useAlignmentMenu( controls );
 
-	// A menu of nothing but unavailable options could never change anything.
-	if ( ! enabledControls.length ) {
+	/*
+	 * The saved alignment can be one the parent layout withholds, typically a
+	 * full-width pattern inserted into a layout that offers no full width. The
+	 * block then renders unaligned in the editor while its saved markup keeps
+	 * the class, so the menu has to stay reachable to show that and to clear it.
+	 */
+	const isValueUnavailable =
+		!! value && unavailableControls.includes( value );
+
+	// A menu of nothing but unavailable options could never change anything,
+	// unless one of them is the value and `none` is there to remove it.
+	if ( ! enabledControls.length && ( isToolbar || ! isValueUnavailable ) ) {
 		return null;
 	}
 
-	const menuControls = [ ...enabledControls ];
+	const menuControls = enabledControls.length
+		? [ ...enabledControls ]
+		: [ { name: 'none' } ];
 	const enabledNames = menuControls.map( ( { name } ) => name );
 
 	// Unavailable alignments sit where they would have sat had they been
@@ -53,6 +71,14 @@ function BlockAlignmentUI( {
 	const activeAlignmentControl = BLOCK_ALIGNMENTS_CONTROLS[ value ];
 	const defaultAlignmentControl =
 		BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
+
+	const toggleDescription =
+		description ??
+		( isValueUnavailable
+			? __(
+					'The surrounding layout stops this alignment from taking effect. Choose None to remove it.'
+				)
+			: undefined );
 
 	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
 	const commonProps = {
@@ -76,7 +102,9 @@ function BlockAlignmentUI( {
 				} ),
 			}
 		: {
-				toggleProps: description ? { description } : {},
+				toggleProps: toggleDescription
+					? { description: toggleDescription }
+					: {},
 				children: ( { onClose } ) => {
 					return (
 						<>
@@ -121,7 +149,9 @@ function BlockAlignmentUI( {
 												role="menuitemradio"
 												info={
 													isUnavailable
-														? __( 'Not available' )
+														? getUnavailableInfo(
+																isSelected
+															)
 														: info
 												}
 											>
