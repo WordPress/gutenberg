@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 16.2.0 (2026-10-07)
+
 ### Bug Fixes
 
 -   `pasteHandler`: Give each pasted data-URI image a unique filename, so uploading several images pasted at once (for example from Google Docs) no longer collides server-side and overwrites images with each other ([#79480](https://github.com/WordPress/gutenberg/pull/79480)).

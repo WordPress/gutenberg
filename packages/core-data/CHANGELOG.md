@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.2.0 (2026-10-07)
+
 ### Enhancements
 
 -   Add the root-level `edit_root` field to the `Attachment` entity type — the edit root attachment's id, or `0` when the attachment was not created by editing another one; embeddable via the `wp:edit-root` link, exposed in the `edit` context ([#81803](https://github.com/WordPress/gutenberg/pull/81803)).

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.3.0 (2026-10-07)
+
 ### New Features
 
 -   Add `--wpds-color-background-thumb-neutral` for neutral progress indicators. ([#83781](https://github.com/WordPress/gutenberg/pull/83781))
