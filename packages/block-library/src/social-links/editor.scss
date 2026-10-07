@@ -49,9 +49,14 @@
 	}
 
 	.block-editor-button-block-appender {
+		background: $gray-900;
 		height: 1.5em;
 		width: 1.5em;
 		font-size: inherit;
 		padding: 0;
+
+		svg {
+			color: $white;
+		}
 	}
 }
