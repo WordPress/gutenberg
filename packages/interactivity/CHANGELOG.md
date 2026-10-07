@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.0.0 (2026-10-07)
+
 ### Breaking Changes
 
 -   Remove the `data-wp-ignore` directive. An element carrying it is now hydrated like any other element, and a warning is shown in development mode. Remove the attribute. ([#84098](https://github.com/WordPress/gutenberg/pull/84098))
