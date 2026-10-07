@@ -426,10 +426,6 @@ mark.wp-note {
 	// balances with the add-reaction icon that trails the pills.
 	font-size: 16px;
 	line-height: 1;
-	// Forced colors repaint text in a system color, which turns color emoji
-	// into flat monochrome glyphs. Opt the glyph out, but not the pill or
-	// menu item around it, so its border still follows the system colors.
-	forced-color-adjust: none;
 }
 
 // Mention chips, both in the note input and the rendered note content. A
