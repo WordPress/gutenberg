@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.0.0 (2026-10-07)
+
 ### Breaking Changes
 
 -   Stop registering the package as a WordPress script. `@wordpress/sync` is now bundled into its consumers, so the `wp-sync` script handle and the `wp.sync` global are no longer exposed ([#81999](https://github.com/WordPress/gutenberg/pull/81999)).

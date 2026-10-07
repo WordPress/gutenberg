@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Invalidate the memoized block insertion selectors when `isPreviewMode` changes, and refuse the writing flow's cross-block input handling while the canvas is a preview. Preview mode already refused insertion, but nothing recomputed when it was turned on after the editor had booted, so an editor switched into a read-only preview at runtime went on believing it could insert: Enter split a paragraph and the block library listed every type ([#80427](https://github.com/WordPress/gutenberg/pull/80427), [#81661](https://github.com/WordPress/gutenberg/pull/81661)).
+
+## 18.1.0 (2026-10-07)
+
 ### New Features
 
 -   Add `useBackgroundProps` and `getBackgroundClassesAndStyles`, and honour `background.__experimentalSkipSerialization` in the editor ([#83943](https://github.com/WordPress/gutenberg/pull/83943)).
@@ -16,11 +22,11 @@
 
 ### Bug Fixes
 
+-   Block Mover: Restrict button sizing styles to the mover buttons so visually hidden descriptions do not overflow the block toolbar ([#84114](https://github.com/WordPress/gutenberg/pull/84114)).
 -   Block inspector: Restore the Settings tab for a block whose only advanced tool is "Allowed blocks" (e.g. a container with `allowedBlocks` and no anchor), by counting the allowed-blocks fills when deciding whether to show the tab. The control is also now hidden while editing a section (pattern) block, matching the other inspector controls ([#84067](https://github.com/WordPress/gutenberg/pull/84067)).
 -   Fix the translator comments for the "blocks moved" and "blocks added" screen reader messages, which described the count as a block name ([#83555](https://github.com/WordPress/gutenberg/pull/83555)).
 -   `BlockCompare`: Show whitespace differences in the Resolve Block dialog. The markup's spaces and blank lines are kept instead of collapsed by the browser, and each added or removed line break gets a visible marker, so a diff made only of whitespace no longer looks identical on both sides. The dialog also shows the markup of a converted Custom HTML block, which is kept in its `innerContent` rather than produced by `save`, instead of an empty diff ([#82397](https://github.com/WordPress/gutenberg/pull/82397)).
 -   Inserter: Stop re-rendering the block list when the block selection changes while the inserter is open ([#83284](https://github.com/WordPress/gutenberg/pull/83284)).
--   Invalidate the memoized block insertion selectors when `isPreviewMode` changes, and refuse the writing flow's cross-block input handling while the canvas is a preview. Preview mode already refused insertion, but nothing recomputed when it was turned on after the editor had booted, so an editor switched into a read-only preview at runtime went on believing it could insert: Enter split a paragraph and the block library listed every type ([#80427](https://github.com/WordPress/gutenberg/pull/80427), [#81661](https://github.com/WordPress/gutenberg/pull/81661)).
 -   Fix style edits applied to a multi-block selection overwriting each block's other styles. Only the changed values are now applied to every selected block, so distinct styles are preserved and resets propagate to the whole selection ([#80070](https://github.com/WordPress/gutenberg/pull/80070)).
 -   Fix exception thrown by `getSelectedBlockStyleState` when an `undefined` `clientId` is passed as an argument. ([#84140](https://github.com/WordPress/gutenberg/pull/84140))
 

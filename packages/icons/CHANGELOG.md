@@ -2,8 +2,11 @@
 
 ## Unreleased
 
+## 18.0.0 (2026-10-07)
+
 ### Breaking Changes
 
+-   Stroke-based icons now scale their stroke width with their size. A 1.5-unit stroke renders at 1px for a 16px icon, 1.25px for a 20px icon, and 1.5px for a 24px icon ([#84081](https://github.com/WordPress/gutenberg/pull/84081)).
 -   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
 
 ### New Features
