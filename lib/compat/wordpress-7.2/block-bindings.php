@@ -11,7 +11,9 @@
 add_filter(
 	'block_bindings_supported_attributes_core/icon',
 	function ( $supported_attributes ) {
-		$supported_attributes[] = 'icon';
+		if ( ! in_array( 'icon', $supported_attributes, true ) ) {
+			$supported_attributes[] = 'icon';
+		}
 		return $supported_attributes;
 	}
 );
