@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Convert to blocks: Skip block types that are not allowed, so converting Custom HTML or an invalid block no longer does nothing when the content would create a disallowed block ([#84183](https://github.com/WordPress/gutenberg/pull/84183)).
+
 ## 18.1.0 (2026-10-07)
 
 ### New Features
