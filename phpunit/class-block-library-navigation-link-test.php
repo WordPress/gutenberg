@@ -119,7 +119,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		);
 		$this->assertEquals( 1, count( $parsed_blocks ) );
 
-		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
+		$navigation_link_block = new WP_Block( $parsed_blocks[0], array( 'showSubmenuIcon' => false ) );
 		$this->assertEquals(
 			true,
 			strpos(
@@ -141,7 +141,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		);
 		$this->assertEquals( 1, count( $parsed_blocks ) );
 
-		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
+		$navigation_link_block = new WP_Block( $parsed_blocks[0], array( 'showSubmenuIcon' => false ) );
 		$this->assertEquals(
 			'',
 			gutenberg_render_block_core_navigation_link(
@@ -160,7 +160,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		);
 		$this->assertEquals( 1, count( $parsed_blocks ) );
 
-		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
+		$navigation_link_block = new WP_Block( $parsed_blocks[0], array( 'showSubmenuIcon' => false ) );
 
 		$this->assertEquals(
 			'',
@@ -180,7 +180,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		);
 		$this->assertEquals( 1, count( $parsed_blocks ) );
 
-		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
+		$navigation_link_block = new WP_Block( $parsed_blocks[0], array( 'showSubmenuIcon' => false ) );
 		$this->assertEquals(
 			true,
 			strpos(
@@ -200,7 +200,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		);
 		$this->assertEquals( 1, count( $parsed_blocks ) );
 
-		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
+		$navigation_link_block = new WP_Block( $parsed_blocks[0], array( 'showSubmenuIcon' => false ) );
 		$this->assertEquals(
 			true,
 			strpos(
@@ -222,7 +222,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		);
 		$this->assertEquals( 1, count( $parsed_blocks ) );
 
-		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
+		$navigation_link_block = new WP_Block( $parsed_blocks[0], array( 'showSubmenuIcon' => false ) );
 
 		$this->assertEquals(
 			'',
@@ -242,7 +242,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		);
 		$this->assertEquals( 1, count( $parsed_blocks ) );
 
-		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
+		$navigation_link_block = new WP_Block( $parsed_blocks[0], array( 'showSubmenuIcon' => false ) );
 		$this->assertEquals(
 			true,
 			strpos(
