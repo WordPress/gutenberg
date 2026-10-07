@@ -12,6 +12,7 @@
 ### New Features
 
 -   Add the `justifySpaceAround` icon ([#83519](https://github.com/WordPress/gutenberg/pull/83519)).
+-   Add the `formButton`, `formInput` and `formSelect` icons ([#84074](https://github.com/WordPress/gutenberg/pull/84074)).
 
 ### Enhancements
 -   Add initial search keywords to the icon manifest to improve icon discoverability ([#83884](https://github.com/WordPress/gutenberg/pull/83884)).
