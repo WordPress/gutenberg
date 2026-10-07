@@ -139,7 +139,7 @@
 	},
 	"packages/block-editor/src/components/background-image-control/index.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 3
+			"count": 4
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -412,7 +412,7 @@
 	},
 	"packages/block-editor/src/components/block-lock/modal.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 3
+			"count": 4
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -953,7 +953,7 @@
 	},
 	"packages/block-editor/src/components/date-format-picker/index.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 3
+			"count": 4
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -1127,6 +1127,9 @@
 		}
 	},
 	"packages/block-editor/src/components/global-styles/image-settings-panel.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1206,7 +1209,7 @@
 	},
 	"packages/block-editor/src/components/global-styles/typography-panel.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
+			"count": 2
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -1895,6 +1898,9 @@
 		}
 	},
 	"packages/block-editor/src/components/responsive-block-control/index.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2091,7 +2097,7 @@
 	},
 	"packages/block-editor/src/components/url-popover/image-url-input-ui.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 3
+			"count": 4
 		},
 		"react-hooks/refs": {
 			"count": 1
@@ -2124,6 +2130,9 @@
 		}
 	},
 	"packages/block-editor/src/components/url-popover/stories/index.story.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2205,6 +2214,9 @@
 		}
 	},
 	"packages/block-editor/src/hooks/block-hooks.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2248,6 +2260,9 @@
 		}
 	},
 	"packages/block-editor/src/hooks/fit-text.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2268,6 +2283,9 @@
 		}
 	},
 	"packages/block-editor/src/hooks/layout.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2359,7 +2377,7 @@
 	},
 	"packages/block-editor/src/layouts/flex.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
+			"count": 2
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -2367,7 +2385,7 @@
 	},
 	"packages/block-editor/src/layouts/grid.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 3
+			"count": 4
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -2414,6 +2432,9 @@
 		}
 	},
 	"packages/block-library/src/accordion-item/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2434,6 +2455,9 @@
 		}
 	},
 	"packages/block-library/src/accordion/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2444,6 +2468,9 @@
 		}
 	},
 	"packages/block-library/src/archives/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2454,6 +2481,9 @@
 		}
 	},
 	"packages/block-library/src/audio/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2464,6 +2494,9 @@
 		}
 	},
 	"packages/block-library/src/avatar/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2480,7 +2513,7 @@
 	},
 	"packages/block-library/src/breadcrumbs/edit.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 3
 		},
 		"react-hooks/refs": {
 			"count": 2
@@ -2528,6 +2561,9 @@
 		}
 	},
 	"packages/block-library/src/categories/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2563,6 +2599,9 @@
 		}
 	},
 	"packages/block-library/src/columns/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2583,6 +2622,9 @@
 		}
 	},
 	"packages/block-library/src/comment-author-name/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2593,11 +2635,17 @@
 		}
 	},
 	"packages/block-library/src/comment-date/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/comment-edit-link/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2648,6 +2696,9 @@
 		}
 	},
 	"packages/block-library/src/comments-title/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2712,7 +2763,7 @@
 	},
 	"packages/block-library/src/cover/edit/inspector-controls.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
+			"count": 2
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -2730,7 +2781,7 @@
 	},
 	"packages/block-library/src/details/edit.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
+			"count": 2
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -2752,6 +2803,9 @@
 		}
 	},
 	"packages/block-library/src/embed/embed-controls.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2805,6 +2859,9 @@
 		}
 	},
 	"packages/block-library/src/file/inspector.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2861,6 +2918,9 @@
 		}
 	},
 	"packages/block-library/src/gallery/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react-hooks/immutability": {
 			"count": 1
 		},
@@ -3019,13 +3079,16 @@
 		}
 	},
 	"packages/block-library/src/latest-comments/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/latest-posts/edit.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
+			"count": 2
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -3053,7 +3116,7 @@
 	},
 	"packages/block-library/src/list/ordered-list-settings.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
+			"count": 2
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -3070,6 +3133,9 @@
 		}
 	},
 	"packages/block-library/src/loginout/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -3096,7 +3162,7 @@
 	},
 	"packages/block-library/src/media-text/edit.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 3
 		},
 		"react-hooks/immutability": {
 			"count": 1
@@ -3126,6 +3192,9 @@
 		}
 	},
 	"packages/block-library/src/more/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -3258,7 +3327,7 @@
 	},
 	"packages/block-library/src/navigation/edit/index.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
+			"count": 2
 		},
 		"react-hooks/immutability": {
 			"count": 3
@@ -3336,13 +3405,16 @@
 	},
 	"packages/block-library/src/navigation/edit/overlay-menu-preview-controls.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
+			"count": 2
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/navigation/edit/overlay-menu-preview.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -3445,6 +3517,9 @@
 		}
 	},
 	"packages/block-library/src/paragraph/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -3478,6 +3553,9 @@
 		}
 	},
 	"packages/block-library/src/playlist/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -3498,13 +3576,16 @@
 		}
 	},
 	"packages/block-library/src/post-author-name/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/post-author/edit.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 3
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -3549,11 +3630,17 @@
 		}
 	},
 	"packages/block-library/src/post-date/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/post-excerpt/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -3565,7 +3652,7 @@
 	},
 	"packages/block-library/src/post-featured-image/edit.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 3
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -3582,6 +3669,9 @@
 		}
 	},
 	"packages/block-library/src/post-navigation-link/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -3605,13 +3695,16 @@
 		}
 	},
 	"packages/block-library/src/post-time-to-read/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/post-title/edit.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 3
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -3683,6 +3776,9 @@
 		}
 	},
 	"packages/block-library/src/query-pagination/query-pagination-label-control.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -3693,6 +3789,9 @@
 		}
 	},
 	"packages/block-library/src/query-title/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -3723,6 +3822,9 @@
 		}
 	},
 	"packages/block-library/src/query/edit/inspector-controls/enhanced-pagination-control.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -3734,7 +3836,7 @@
 	},
 	"packages/block-library/src/query/edit/inspector-controls/index.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 3
+			"count": 4
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -3824,13 +3926,16 @@
 		}
 	},
 	"packages/block-library/src/read-more/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/rss/edit.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 3
+			"count": 4
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -3838,7 +3943,7 @@
 	},
 	"packages/block-library/src/search/edit.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
+			"count": 2
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -3875,6 +3980,9 @@
 		}
 	},
 	"packages/block-library/src/site-logo/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -3890,6 +3998,9 @@
 		}
 	},
 	"packages/block-library/src/site-title/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -4148,6 +4259,9 @@
 		}
 	},
 	"packages/block-library/src/social-links/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -4229,6 +4343,9 @@
 		}
 	},
 	"packages/block-library/src/table-of-contents/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -4240,7 +4357,7 @@
 	},
 	"packages/block-library/src/table/edit.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
+			"count": 2
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -4268,7 +4385,7 @@
 	},
 	"packages/block-library/src/tag-cloud/edit.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 3
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -4337,6 +4454,9 @@
 		}
 	},
 	"packages/block-library/src/term-name/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -4362,6 +4482,9 @@
 		}
 	},
 	"packages/block-library/src/terms-query/edit/inspector-controls/empty-terms-control.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -4387,6 +4510,9 @@
 		}
 	},
 	"packages/block-library/src/terms-query/edit/inspector-controls/nested-terms-control.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -4488,6 +4614,9 @@
 		}
 	},
 	"packages/block-library/src/video/edit-common-settings.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -4504,7 +4633,7 @@
 	},
 	"packages/block-library/src/video/tracks-editor.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 4
+			"count": 5
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -5151,6 +5280,11 @@
 			"count": 1
 		}
 	},
+	"packages/dataviews/src/components/dataviews-layouts/utils/media-fit-control.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
 	"packages/dataviews/src/components/dataviews-picker-footer/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -5166,6 +5300,11 @@
 			"count": 1
 		}
 	},
+	"packages/dataviews/src/components/dataviews-view-config/infinite-scroll-toggle.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
 	"packages/dataviews/src/components/dataviews-view-config/properties-section.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -5177,6 +5316,11 @@
 		}
 	},
 	"packages/dataviews/src/components/validated-form-controls/radio-control.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
+	"packages/dataviews/src/components/validated-form-controls/toggle-control.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
@@ -5233,7 +5377,7 @@
 	},
 	"packages/edit-post/src/components/init-pattern-modal/index.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
+			"count": 2
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -7462,7 +7606,7 @@
 	},
 	"packages/global-styles-ui/src/font-sizes/font-size.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 3
+			"count": 4
 		}
 	},
 	"packages/global-styles-ui/src/font-sizes/font-sizes-count.tsx": {
@@ -7695,7 +7839,7 @@
 	},
 	"packages/media-editor/src/image-editor/stories/rectangle-crop.story.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 3
 		}
 	},
 	"packages/media-editor/src/lock-unlock.ts": {
@@ -7759,7 +7903,7 @@
 	},
 	"packages/patterns/src/components/create-pattern-modal.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
+			"count": 2
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -7821,6 +7965,16 @@
 	},
 	"packages/plugins/src/components/test/plugin-area.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/preferences/src/components/preference-base-option/index.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
+	"packages/preferences/src/components/preference-base-option/types.ts": {
+		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
 	},

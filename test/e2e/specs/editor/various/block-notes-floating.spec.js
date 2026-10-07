@@ -813,9 +813,13 @@ test.describe( 'Block Notes: floating notes', () => {
 			);
 
 			await addTallThread( { blockNoteUtils } );
+			// Without content below, the canvas can start at its bottom.
+			await addSpacerParagraphs( editor );
+			await editor.selectBlocks( getParagraph( editor, 'Alpha' ) );
 
 			// Adding the replies scrolled the thread to its reply form.
 			const thread = getThread( page, 'Tall note' );
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 			await thread.evaluate( ( element ) => {
 				element.scrollTop = 0;
 			} );
