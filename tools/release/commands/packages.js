@@ -774,7 +774,7 @@ async function runNpmPublishPreflight(
 	// TODO: Consider bounded concurrency here if this preflight becomes too slow.
 	// Keep registry checks sequential so errors stay easy to read.
 	for ( const { name, version } of releasePackages ) {
-		let registryPackage;
+		let registryOutput;
 		try {
 			const { stdout } = await commandFn(
 				`npm view ${ name }@${ version } version gitHead dist-tags --json`,
@@ -783,7 +783,7 @@ async function runNpmPublishPreflight(
 					stdio: 'pipe',
 				}
 			);
-			registryPackage = parseNpmJsonOutput(
+			registryOutput = parseNpmJsonOutput(
 				stdout,
 				`${ name }@${ version } metadata`
 			);
@@ -792,6 +792,25 @@ async function runNpmPublishPreflight(
 				continue;
 			}
 			throw error;
+		}
+
+		/* npm v12 always returns an array; older versions return an object for a single match. */
+		const registryPackages = Array.isArray( registryOutput )
+			? registryOutput
+			: [ registryOutput ];
+		if ( registryPackages.length !== 1 ) {
+			throw new Error(
+				`Expected npm registry lookup for ${ name }@${ version } to return one version, got ${ registryPackages.length }.`
+			);
+		}
+
+		const [ registryPackage ] = registryPackages;
+		if ( ! registryPackage || typeof registryPackage !== 'object' ) {
+			throw new Error(
+				`Expected npm registry lookup for ${ name }@${ version } to return package metadata, got ${ JSON.stringify(
+					registryPackage
+				) }.`
+			);
 		}
 
 		const {

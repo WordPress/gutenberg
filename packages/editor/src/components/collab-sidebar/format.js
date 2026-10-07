@@ -1,9 +1,11 @@
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useViewportMatch } from '@wordpress/compose';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 import { store as editorStore } from '../../store';
-import { SIDEBARS } from './constants';
+import { ALL_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
 
 /*
@@ -26,6 +28,8 @@ export const noteFormat = {
 
 function NoteFormat( { isActive, activeAttributes } ) {
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
+	const { get: getPreference } = useSelect( preferencesStore );
+	const isLargeViewport = useViewportMatch( 'medium' );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const noteId = activeAttributes?.[ 'data-id' ];
@@ -35,9 +39,15 @@ function NoteFormat( { isActive, activeAttributes } ) {
 			return;
 		}
 
-		// Sync an already-open sidebar to the marker under the caret. Read
-		// imperatively so it triggers on caret movement, not sidebar state.
-		if ( ! SIDEBARS.includes( getActiveComplementaryArea( 'core' ) ) ) {
+		// Sync visible notes to the marker under the caret. Read imperatively
+		// so it triggers on caret movement, not sidebar state.
+		const canShowFloatingNotes =
+			isLargeViewport &&
+			getPreference( 'core', 'notesDisplayMode' ) !== 'hidden';
+		if (
+			! canShowFloatingNotes &&
+			getActiveComplementaryArea( 'core' ) !== ALL_NOTES_SIDEBAR
+		) {
 			return;
 		}
 
@@ -52,7 +62,9 @@ function NoteFormat( { isActive, activeAttributes } ) {
 	}, [
 		isActive,
 		noteId,
+		isLargeViewport,
 		getActiveComplementaryArea,
+		getPreference,
 		getSelectedNote,
 		selectNote,
 	] );
