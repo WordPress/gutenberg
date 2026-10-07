@@ -21,7 +21,7 @@ This README is the entry point for package consumers. It covers how to load desi
 | --- | --- |
 | `@wordpress/theme` | `ThemeProvider` and the generated token scale types, such as `PaddingSize` and `GapSize`. Derive provider props and callback types from the component as shown below. |
 | `@wordpress/theme/design-tokens.css` | Default semantic `--wpds-*` custom properties. Load once per document. |
-| `@wordpress/theme/design-tokens.js` | Default export containing the list of semantic CSS custom property names, plus named exports `tokens` and `groups` with metadata and default values. This module does not load styles. |
+| `@wordpress/theme/design-tokens.js` | Default export containing the list of semantic CSS custom property names, plus named exports `tokens` and `groups` with metadata, default values, and build-plugin fallback expressions. This module does not load styles. |
 | Build plugin subpaths | The four public integrations listed under [Build Plugins](#build-plugins). |
 | Stylelint plugin subpaths | The three public rules listed under [Stylelint Plugins](#stylelint-plugins). |
 
@@ -48,16 +48,33 @@ const radius = tokens[ '--wpds-border-radius-md' ];
 // radius.group: 'border'
 // radius.modes.default.$value: { value: 4, unit: 'px' }
 // radius.modes.default.css: '4px'
+// radius.fallback: '4px'
 
 const brand = tokens[ '--wpds-color-background-interactive-brand-strong' ];
 // brand.modes.default.css: '#3858e9'
+// brand.fallback: 'var(--wp-admin-theme-color, #3858e9)'
 
 const borderTokenNames = groups.border;
 ```
 
-`tokens` is keyed by semantic CSS custom property name. Each entry has `$description`, `$type`, `group`, and `modes.default`, which contains the resolved DTCG `$value` and its CSS string representation, `css`. `groups` lists token names by namespace, such as `border`, `color`, or `typography`.
+`tokens` is keyed by semantic CSS custom property name. Each entry has `$description`, `$type`, `group`, `fallback`, and `modes.default`, which contains the resolved DTCG `$value` and its CSS string representation, `css`. `groups` lists token names by namespace, such as `border`, `color`, or `typography`.
 
-These values describe the default stylesheet generated from the token sources, including brand colors. They do not reflect a mounted `ThemeProvider`, inherited custom properties, corner-radius presets, or pixel-density overrides. Use CSS custom properties when values need to follow the current theme. The build plugins' fallback expressions are separate: brand fallbacks can reference `--wp-admin-theme-color` and approximate derived shades, while `modes.default.css` is the concrete default color. Literal token types are preserved in the generated TypeScript declarations, so consumers can narrow a token union by `$type`.
+These values describe the default stylesheet generated from the token sources, including brand colors. They do not reflect a mounted `ThemeProvider`, inherited custom properties, corner-radius presets, or pixel-density overrides. Use CSS custom properties when values need to follow the current theme. Literal token types are preserved in the generated TypeScript declarations, so consumers can narrow a token union by `$type`.
+
+`fallback` is the CSS expression injected by the build plugins when a token variable is unavailable. It can differ from `modes.default.css`: brand fallbacks can reference `--wp-admin-theme-color` and approximate derived shades, strong brand foregrounds use `#fff`, and the focus border width can reference `--wp-admin-border-width-focus`. The metadata and existing fallback artifacts are generated together from the same fallback policy.
+
+To build a fallback map for a custom plugin:
+
+```js
+import { tokens } from '@wordpress/theme/design-tokens.js';
+
+const tokenFallbacks = Object.fromEntries(
+	Object.entries( tokens ).map( ( [ name, token ] ) => [
+		name,
+		token.fallback,
+	] )
+);
+```
 
 ## Design Tokens
 

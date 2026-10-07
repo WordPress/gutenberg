@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add `tokens` and `groups` named exports to `design-tokens.js`, exposing descriptions, types, groups, and default DTCG and CSS values for every semantic token while retaining the default token-name list ([#76604](https://github.com/WordPress/gutenberg/pull/76604)).
+-   Add `tokens` and `groups` named exports to `design-tokens.js`, exposing descriptions, types, groups, default DTCG and CSS values, and build-plugin fallback expressions for every semantic token while retaining the default token-name list ([#76604](https://github.com/WordPress/gutenberg/pull/76604)).
 
 -   Add `--wpds-color-background-thumb-neutral` for neutral progress indicators. ([#83781](https://github.com/WordPress/gutenberg/pull/83781))
 
