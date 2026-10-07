@@ -245,6 +245,12 @@ jobs:
               with:
                   node-version-file: '.nvmrc'
                   check-latest: true
+                  package-manager-cache: false
+
+            - name: Set up npm
+              uses: ./.github/setup-npm
+              with:
+                  cache: false
 
             - name: Configure build for wordpress-develop
               if: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}

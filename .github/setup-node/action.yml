@@ -1,36 +1,33 @@
 name: 'Setup Node.js and install npm dependencies'
-description: 'Configure Node.js and install npm dependencies while managing all aspects of caching.'
+description: 'Configure Node.js and install npm dependencies.'
 inputs:
     node-version:
         description: 'Optional. The Node.js version to use. When not specified, the version specified in .nvmrc will be used.'
         required: false
+    cache:
+        description: 'Optional. Whether to restore and save the npm cache. Set to false in workflows that publish built assets, so a poisoned cache cannot reach a release.'
+        required: false
+        default: 'true'
 
 runs:
     using: 'composite'
     steps:
         - name: Use desired version of Node.js
-          uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+          uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
           with:
               node-version-file: ${{ inputs.node-version == '' && '.nvmrc' || '' }}
               node-version: ${{ inputs.node-version }}
               check-latest: true
-              cache: npm
+              package-manager-cache: false
 
-        - name: Get Node.js and npm version
-          id: node-version
-          run: |
-              echo "NODE_VERSION=$(node -v)" >> "$GITHUB_OUTPUT"
-          shell: bash
-
-        - name: Cache node_modules
-          id: cache-node_modules
-          uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        - name: Set up npm
+          uses: ./.github/setup-npm
           with:
-              path: '**/node_modules'
-              key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-${{ hashFiles('package-lock.json', 'patches/**') }}
+              cache: ${{ inputs.cache }}
 
+        # No node_modules cache on release branches: its cache-hit path replays postinstall
+        # scripts that older branches cannot run, so every branch installs the same way.
         - name: Install npm dependencies
-          if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' }}
           run: |
               npm ci
           shell: bash
@@ -40,14 +37,3 @@ runs:
           with:
               name: npm-logs
               path: C:\npm\cache\_logs
-
-        # On cache hit, we run the post-install script to match the native `npm ci` behavior.
-        # An example of this is to patch `node_modules` using patch-package.
-        - name: Post-install
-          if: ${{ steps.cache-node_modules.outputs.cache-hit == 'true' }}
-          run: |
-              # Run the post-install script for the root project.
-              npm run postinstall
-              # Run the post-install scripts for workspaces.
-              npx lerna run postinstall
-          shell: bash
