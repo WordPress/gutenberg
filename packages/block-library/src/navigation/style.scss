@@ -39,6 +39,10 @@ $navigation-icon-size: 24px;
 		.wp-block-navigation__submenu-container:empty {
 			display: none;
 		}
+
+		&.wp-block-navigation-item__wrapper {
+			display: contents;
+		}
 	}
 
 	// Menu item link.
