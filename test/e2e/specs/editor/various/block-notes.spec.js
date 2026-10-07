@@ -1370,7 +1370,11 @@ test.describe( 'Block Notes', () => {
 			const trigger = page.getByRole( 'combobox', {
 				name: 'Add reaction',
 			} );
-			const note = page.locator( '.editor-collab-sidebar-panel__note' );
+			// The reply composer shares the note class, so match only the
+			// note that carries the trigger.
+			const note = page
+				.locator( '.editor-collab-sidebar-panel__note' )
+				.filter( { has: trigger } );
 
 			// Park the pointer outside the sidebar: adding the note leaves it
 			// over the thread, which would hold the trigger open.
