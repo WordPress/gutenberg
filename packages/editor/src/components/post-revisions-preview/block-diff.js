@@ -830,6 +830,7 @@ function applyDiffRecursively( parsedBlock, rawBlock ) {
 					'focalPoint',
 					'sizeSlug',
 					'align',
+					'borderColor',
 					'style',
 					'className',
 				];
