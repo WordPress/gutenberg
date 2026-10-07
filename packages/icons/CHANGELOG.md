@@ -5,13 +5,14 @@
 ### Breaking Changes
 
 -   Stroke-based icons now scale their stroke width with their size. A 1.5-unit stroke renders at 1px for a 16px icon, 1.25px for a 20px icon, and 1.5px for a 24px icon ([#84081](https://github.com/WordPress/gutenberg/pull/84081)).
+-   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
 
 ### New Features
 
 -   Add the `justifySpaceAround` icon ([#83519](https://github.com/WordPress/gutenberg/pull/83519)).
 
 ### Enhancements
-
+-   Add initial search keywords to the icon manifest to improve icon discoverability ([#83884](https://github.com/WordPress/gutenberg/pull/83884)).
 -   `formatBold`: draw the B with heavier vertical strokes so it reads as bold at a glance ([#83321](https://github.com/WordPress/gutenberg/pull/83321)).
 -   `justifySpaceBetween` and `justifySpaceEvenly`: redraw so the two icons share one construction with the new `justifySpaceAround`, differing only in where the blocks sit ([#83519](https://github.com/WordPress/gutenberg/pull/83519)).
 -   `headingLevel1` to `headingLevel6`: enlarge the drawings to improve their optical balance with the rest of the set ([#83268](https://github.com/WordPress/gutenberg/pull/83268)).

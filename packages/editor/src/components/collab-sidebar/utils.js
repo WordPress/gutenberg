@@ -520,38 +520,17 @@ export function removeNoteFormat( value, noteId ) {
 }
 
 /**
- * Strip a note's inline `core/note` marker from whichever block holds it, if
- * any, so a deleted or resolved note's highlight does not linger in the content.
- * No-op for block-level notes (those carry no marker). Used by the resolve path,
- * which only knows the note id; the delete path strips the marker inline since
- * it already has the block.
+ * Remove a note's inline `core/note` marker from block attributes.
  *
- * @param {number}                                         noteId                      Note id whose marker to remove.
- * @param {() => string[]}                                 getClientIdsWithDescendants Block-editor selector.
- * @param {(clientId: string) => Record<string, unknown>}  getBlockAttributes          Block-editor selector.
- * @param {(clientId: string, attributes: Object) => void} updateBlockAttributes       Block-editor action.
+ * @param {?Object}       attributes Block attributes.
+ * @param {number|string} noteId     Note id whose marker to remove.
+ * @return {?{attributeKey: string, start: number, end: number, value: RichTextData}} Marker range and the new attribute value, or null when no marker.
  */
-export function clearInlineNoteMarker(
-	noteId,
-	getClientIdsWithDescendants,
-	getBlockAttributes,
-	updateBlockAttributes
-) {
-	for ( const clientId of getClientIdsWithDescendants() ) {
-		const attributes = getBlockAttributes( clientId );
-		const found = findNoteInBlock( attributes, noteId );
-		if ( ! found ) {
-			continue;
-		}
-		const next = removeNoteFormat(
-			attributes[ found.attributeKey ],
-			noteId
-		);
-		if ( next ) {
-			updateBlockAttributes( clientId, { [ found.attributeKey ]: next } );
-		}
-		return;
-	}
+export function removeInlineNote( attributes, noteId ) {
+	const found = findNoteInBlock( attributes, noteId );
+	const value =
+		found && removeNoteFormat( attributes[ found.attributeKey ], noteId );
+	return value ? { ...found, value } : null;
 }
 
 /**

@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
     -   `CustomGradientPicker` ([#82576](https://github.com/WordPress/gutenberg/pull/82576))
     -   `Text` ([#82573](https://github.com/WordPress/gutenberg/pull/82573))
@@ -11,7 +12,10 @@
 
 ### Enhancements
 
+-   `FormToggle`, `ToggleControl`: Mark as not recommended for use in a WordPress environment, in favour of `Switch` and `SwitchControl` from `@wordpress/ui` ([#84097](https://github.com/WordPress/gutenberg/pull/84097)).
+-   `ProgressBar`: Mark as not recommended and direct consumers to `Progress` from `@wordpress/ui` ([#84021](https://github.com/WordPress/gutenberg/pull/84021)).
 -   `CheckboxControl`: Mark as not recommended for use in a WordPress environment, in favour of `CheckboxControl` from `@wordpress/ui` ([#83771](https://github.com/WordPress/gutenberg/pull/83771)).
+-   `RadioControl`: Mark as not recommended for use in a WordPress environment, in favour of `RadioGroupControl` from `@wordpress/ui` ([#83872](https://github.com/WordPress/gutenberg/pull/83872)).
 -   `RadioControl`: Match the `@wordpress/ui` Radio colors ([#83270](https://github.com/WordPress/gutenberg/pull/83270)).
 -   `Notice`: Mark as not recommended in favor of `Notice` from `@wordpress/ui` ([#82685](https://github.com/WordPress/gutenberg/pull/82685)).
 -   `CheckboxControl`: Keep the default checkbox at 16px on narrow screens while retaining a 24px click target ([#83612](https://github.com/WordPress/gutenberg/pull/83612)).
@@ -35,12 +39,16 @@
 -   `BorderControl`, `BorderBoxControl`: Stop offering `%` as a width unit, since `border-width` does not accept percentages. A width already set in `%` keeps showing its unit ([#83492](https://github.com/WordPress/gutenberg/pull/83492)).
 -   `UnitControl`: After clearing a value whose unit is not in `units`, give the next typed value the unit shown in the select instead of the cleared one ([#83492](https://github.com/WordPress/gutenberg/pull/83492)).
 -   `ResizableBox`: Update `re-resizable` to `6.11.2`, which supports React 18 and renders the top and left handles before the content so focus order matches visual order ([#83754](https://github.com/WordPress/gutenberg/pull/83754)).
+-   `SandBox`: Send the page URL as the referrer from iframes inside `allowSameOrigin` sandboxes in Safari, fixing embed previews that require a referrer, such as YouTube's "Error 153" ([#84014](https://github.com/WordPress/gutenberg/pull/84014)).
 -   `PaletteEdit`: Keep an item's slug when it is renamed, so blocks and styles that reference the preset keep working ([#83750](https://github.com/WordPress/gutenberg/pull/83750)).
 -   `FocalPointPicker`: End a drag when the pointer is released outside the control, including over the editor canvas ([#83348](https://github.com/WordPress/gutenberg/pull/83348)).
+-   `ContentEditableControl`: Keep a disabled field focusable (out of the tab order), so a field disabled while it has focus keeps it instead of dropping focus on the body ([#84083](https://github.com/WordPress/gutenberg/pull/84083)).
 
 ### Internal
 
 -   `Menu`: Deprecate the private API while preserving it for older bundled consumers. Target removal for WordPress 7.3 after package compatibility checks pass ([#82947](https://github.com/WordPress/gutenberg/pull/82947)).
+-   Fix internal `WordPressComponent` polymorphic typings to avoid unsupported `as` props unintentionally surfacing ([#82704](https://github.com/WordPress/gutenberg/pull/82704)).
+-   `ProgressBar`: Use the WordPress Design System color tokens. ([#83779](https://github.com/WordPress/gutenberg/pull/83779)).
 
 ## 41.0.0 (2026-09-23)
 
