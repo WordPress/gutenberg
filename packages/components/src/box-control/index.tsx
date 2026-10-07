@@ -86,10 +86,12 @@ function BoxControl( {
 	// only values from being saved while maintaining preexisting unit selection
 	// behaviour. Filtering CSS only values prevents invalid style values.
 	const [ selectedUnits, setSelectedUnits ] = useState< BoxControlValue >( {
-		top: parseQuantityAndUnitFromRawValue( valuesProp?.top )[ 1 ],
-		right: parseQuantityAndUnitFromRawValue( valuesProp?.right )[ 1 ],
-		bottom: parseQuantityAndUnitFromRawValue( valuesProp?.bottom )[ 1 ],
-		left: parseQuantityAndUnitFromRawValue( valuesProp?.left )[ 1 ],
+		top: parseQuantityAndUnitFromRawValue( valuesProp?.top )[ 1 ] ?? 'px',
+		right:
+			parseQuantityAndUnitFromRawValue( valuesProp?.right )[ 1 ] ?? 'px',
+		bottom:
+			parseQuantityAndUnitFromRawValue( valuesProp?.bottom )[ 1 ] ?? 'px',
+		left: parseQuantityAndUnitFromRawValue( valuesProp?.left )[ 1 ] ?? 'px',
 	} );
 
 	const id = useUniqueId( idProp );
