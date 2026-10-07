@@ -4810,11 +4810,6 @@
 			"count": 2
 		}
 	},
-	"packages/components/src/palette-edit/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/panel/body.tsx": {
 		"react-hooks/refs": {
 			"count": 1
