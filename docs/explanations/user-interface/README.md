@@ -1,5 +1,9 @@
 # User Interface
 
+<div class="callout callout-info">
+  This page is currently experiencing an issue causing images to appear stretched. <a href="https://github.com/WordPress/gutenberg/blob/trunk/docs/explanations/user-interface/README.md">You can also view this content on Github</a>. 
+</div>
+
 ## The Block Editor
 
 The block editor’s general layout uses a bar at the top, with content below.
