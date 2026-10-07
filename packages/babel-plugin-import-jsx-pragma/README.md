@@ -1,6 +1,6 @@
 # Babel Plugin Import JSX Pragma
 
-Babel transform plugin for automatically injecting an import to be used as the pragma for the [React JSX Transform plugin](http://babeljs.io/docs/en/babel-plugin-transform-react-jsx).
+Babel transform plugin for automatically injecting an import to be used as the pragma for the [React JSX Transform plugin](https://babeljs.io/docs/babel-plugin-transform-react-jsx).
 
 [JSX](https://reactjs.org/docs/jsx-in-depth.html) is merely a syntactic sugar for a function call, typically to `React.createElement` when used with [React](https://reactjs.org/). As such, it requires that the function referenced by this transform be within the scope of the file where the JSX occurs. In a typical React project, this means React must be imported in any file where JSX exists.
 
@@ -18,9 +18,9 @@ npm install @wordpress/babel-plugin-import-jsx-pragma
 
 ## Usage
 
-Refer to the [Babel Plugins documentation](http://babeljs.io/docs/en/plugins) if you don't yet have experience working with Babel plugins.
+Refer to the [Babel Plugins documentation](https://babeljs.io/docs/plugins) if you don't yet have experience working with Babel plugins.
 
-Include `@wordpress/babel-plugin-import-jsx-pragma` (and [@babel/plugin-transform-react-jsx](https://babeljs.io/docs/en/babel-plugin-transform-react-jsx/)) as plugins in your Babel configuration. If you don't include both you will receive errors when encountering JSX tokens.
+Include `@wordpress/babel-plugin-import-jsx-pragma` (and [@babel/plugin-transform-react-jsx](https://babeljs.io/docs/babel-plugin-transform-react-jsx/)) as plugins in your Babel configuration. If you don't include both you will receive errors when encountering JSX tokens.
 
 ```js
 // .babelrc.js

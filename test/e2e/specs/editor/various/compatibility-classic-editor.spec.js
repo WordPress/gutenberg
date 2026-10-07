@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Compatibility with classic editor', () => {
@@ -17,16 +14,21 @@ test.describe( 'Compatibility with classic editor', () => {
 		editor,
 	} ) => {
 		await editor.insertBlock( { name: 'core/html' } );
-		await editor.canvas.locator( 'role=textbox[name="HTML"i]' ).focus();
+		await editor.canvas
+			.getByRole( 'button', { name: 'Edit HTML' } )
+			.click();
+		await page.getByRole( 'dialog' ).getByRole( 'textbox' ).click();
 		await page.keyboard.type( '<a>' );
 		await page.keyboard.type( 'Random Link' );
 		await page.keyboard.type( '</a> ' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Update' } )
+			.click();
 		// Publish Post
-		await editor.publishPost();
+		const postId = await editor.publishPost();
 		// View Post
-		await page.click(
-			'role=region[name="Editor publish"i] >> role=link[name="View post"i]'
-		);
+		await page.goto( `/?p=${ postId }` );
 
 		// Check the content doesn't contain <p> tags.
 		// No accessible selector for now.

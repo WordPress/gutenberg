@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="fill: none" stroke="currentColor" stroke-width="1.5">
+	<path d="M19.25 8.25V7C19.25 6.30964 18.6904 5.75 18 5.75H17M7 5.75H6C5.30964 5.75 4.75 6.30964 4.75 7V8.25L4.75 19C4.75 19.6904 5.30964 20.25 6 20.25H18C18.6904 20.25 19.25 19.6904 19.25 19V8.25M19.25 8.25H4.75M7.25 11.75H9.25M11 11.75H13M14.75 11.75H16.75M7 5.75V3M7 5.75H17M17 5.75V3" vector-effect="non-scaling-stroke" />
+	<path d="M18 5.75H6C5.30964 5.75 4.75 6.30964 4.75 7V8.25H19.25V7C19.25 6.30964 18.6904 5.75 18 5.75Z" fill="currentColor" vector-effect="non-scaling-stroke" />
+</svg>

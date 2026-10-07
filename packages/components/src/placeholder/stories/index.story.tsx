@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { starEmpty, starFilled, styles, wordpress } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Placeholder from '../';
 import TextControl from '../../text-control';
 
@@ -19,11 +8,12 @@ const ICONS = { starEmpty, starFilled, styles, wordpress };
 
 const meta: Meta< typeof Placeholder > = {
 	component: Placeholder,
-	title: 'Components/Placeholder',
+	id: 'components-placeholder',
+	title: 'Components/@wordpress-components/Placeholder',
 	argTypes: {
-		children: { control: { type: null } },
-		notices: { control: { type: null } },
-		preview: { control: { type: null } },
+		children: { control: false },
+		notices: { control: false },
+		preview: { control: false },
 		icon: {
 			control: { type: 'select' },
 			options: Object.keys( ICONS ),
@@ -33,6 +23,10 @@ const meta: Meta< typeof Placeholder > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'editor',
+		},
 	},
 };
 export default meta;
@@ -44,7 +38,6 @@ const Template: StoryFn< typeof Placeholder > = ( args ) => {
 		<Placeholder { ...args }>
 			<div>
 				<TextControl
-					__nextHasNoMarginBottom
 					label="Sample Field"
 					placeholder="Enter something here"
 					value={ value }

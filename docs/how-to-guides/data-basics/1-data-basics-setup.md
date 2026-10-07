@@ -10,7 +10,7 @@ We'll do all the development inside of a WordPress plugin. Let's start by creati
 
 -   my-first-gutenberg-app.php – to create a new admin page
 -   src/index.js – for our JavaScript application
--   style.css – for the minimal stylesheet
+-   src/style.css – for the minimal stylesheet
 -   package.json – for the build process
 
 Go ahead and create these files using the following snippets:
@@ -19,6 +19,7 @@ Go ahead and create these files using the following snippets:
 
 ```js
 import { createRoot } from 'react-dom';
+import './style.css';
 
 function MyFirstApp() {
 	return <span>Hello from JavaScript!</span>;
@@ -36,7 +37,7 @@ window.addEventListener(
 );
 ```
 
-**style.css:**
+**src/style.css:**
 
 ```css
 .toplevel_page_my-first-gutenberg-app #wpcontent {
@@ -149,7 +150,7 @@ function load_custom_wp_admin_scripts( $hook ) {
 	// Load our style.css.
 	wp_register_style(
 		'my-first-gutenberg-app',
-		plugins_url( 'style.css', __FILE__ ),
+		plugins_url( 'build/style-index.css', __FILE__ ),
 		array(),
 		$asset_file['version']
 	);
@@ -194,7 +195,7 @@ add_action( 'admin_enqueue_scripts', 'load_custom_wp_admin_scripts' );
 
 ## Setting up the build pipeline
 
-This tutorial will proceed assuming the reader is familiar with ESNext syntax and the concept of build tools (like webpack). If that sounds confusing, you may want to review the [Getting started with JavaScript Build Setup](/docs/how-to-guides/javascript/js-build-setup.md) first.
+This tutorial will proceed assuming the reader is familiar with ESNext syntax and the concept of build tools (like webpack). If that sounds confusing, you may want to review the [Working with JavaScript for the Block Editor](/docs/getting-started/fundamentals/javascript-in-the-block-editor.md) guide first.
 
 To install the build tool, navigate to the plugin directory using your terminal and run `npm install`.
 
@@ -204,7 +205,7 @@ Once all the dependencies are in place, all that's left is to run `npm start` an
 
 If you now go to the Plugins page, you should see a plugin called **My first Gutenberg App**. Go ahead and activate it. A new menu item labeled _My first Gutenberg app_ should show up. Once you click it, you will see a page that says _Hello from JavaScript!_:
 
-![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/setup/hello-from-js.jpg)
+![](https://developer.wordpress.org/files/2026/06/hello-from-js.jpg)
 
 Congratulations! You are now ready to start building the app!
 

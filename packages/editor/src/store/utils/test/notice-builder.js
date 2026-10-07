@@ -1,12 +1,9 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import {
 	getNotificationArgumentsForSaveSuccess,
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from '../notice-builder';
-import { SAVE_POST_NOTICE_ID, TRASH_POST_NOTICE_ID } from '../../constants';
 
 describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 	const postType = {
@@ -27,7 +24,7 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 	};
 	const post = { ...previousPost };
 	const defaultExpectedAction = {
-		id: SAVE_POST_NOTICE_ID,
+		id: 'editor-save',
 		actions: [],
 		type: 'snackbar',
 	};
@@ -71,7 +68,9 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 				'updated',
 				{
 					...defaultExpectedAction,
-					actions: [ { label: 'view', url: 'some_link' } ],
+					actions: [
+						{ label: 'view', openInNewTab: true, url: 'some_link' },
+					],
 				},
 			],
 		],
@@ -86,7 +85,6 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 			[ previousPostStatus, postStatus, isViewable ],
 			expectedValue,
 		] ) => {
-			// eslint-disable-next-line jest/valid-title
 			it( description, () => {
 				previousPost.status = previousPostStatus;
 				post.status = postStatus;
@@ -106,7 +104,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 	const error = { code: '42', message: 'Something went wrong.' };
 	const post = { status: 'publish' };
 	const edits = { status: 'publish' };
-	const defaultExpectedAction = { id: SAVE_POST_NOTICE_ID };
+	const defaultExpectedAction = { id: 'editor-save' };
 	[
 		[
 			'when error code is `rest_autosave_no_changes`',
@@ -119,7 +117,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			'',
 			[ 'draft', 'publish' ],
 			[
-				'Publishing failed. Something went wrong.',
+				'Publishing failed. We’ll try to save a backup in this browser. Please try publishing again.',
 				defaultExpectedAction,
 			],
 		],
@@ -128,7 +126,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			'',
 			[ 'draft', 'private' ],
 			[
-				'Publishing failed. Something went wrong.',
+				'Publishing failed. We’ll try to save a backup in this browser. Please try publishing again.',
 				defaultExpectedAction,
 			],
 		],
@@ -137,7 +135,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			'',
 			[ 'draft', 'future' ],
 			[
-				'Scheduling failed. Something went wrong.',
+				'Scheduling failed. We’ll try to save a backup in this browser. Please try scheduling again.',
 				defaultExpectedAction,
 			],
 		],
@@ -145,7 +143,20 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			'when post is published and edits is published',
 			'',
 			[ 'publish', 'publish' ],
-			[ 'Updating failed. Something went wrong.', defaultExpectedAction ],
+			[
+				'Updating failed. We’ll try to save a backup in this browser. Please try updating again.',
+				defaultExpectedAction,
+			],
+		],
+		[
+			'when the save is an autosave',
+			'',
+			[ 'publish', 'publish' ],
+			[
+				'Auto-save failed. We’ll try to save a backup in this browser. You can also save manually.',
+				defaultExpectedAction,
+			],
+			{ isAutosave: true },
 		],
 	].forEach(
 		( [
@@ -153,8 +164,8 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			errorCode,
 			[ postStatus, editsStatus ],
 			expectedValue,
+			options = {},
 		] ) => {
-			// eslint-disable-next-line jest/valid-title
 			it( description, () => {
 				post.status = postStatus;
 				error.code = errorCode;
@@ -164,6 +175,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 						post,
 						edits,
 						error,
+						options,
 					} )
 				).toEqual( expectedValue );
 			} );
@@ -188,9 +200,8 @@ describe( 'getNotificationArgumentsForTrashFail()', () => {
 			'Trashing failed',
 		],
 	].forEach( ( [ description, error, message ] ) => {
-		// eslint-disable-next-line jest/valid-title
 		it( description, () => {
-			const expectedValue = [ message, { id: TRASH_POST_NOTICE_ID } ];
+			const expectedValue = [ message, { id: 'editor-trash-fail' } ];
 			expect( getNotificationArgumentsForTrashFail( { error } ) ).toEqual(
 				expectedValue
 			);

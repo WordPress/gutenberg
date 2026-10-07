@@ -1,5 +1,7 @@
 # ButtonGroup
 
+<p class="callout callout-alert">This component is deprecated. Use `ToggleGroupControl` instead.</p>
+
 ButtonGroup can be used to group any related buttons together. To emphasize related buttons, a group should share a common container.
 
 ![ButtonGroup component](https://wordpress.org/gutenberg/files/2018/12/s_96EC471FE9C9D91A996770229947AAB54A03351BDE98F444FD3C1BF0CED365EA_1541792995815_ButtonGroup.png)

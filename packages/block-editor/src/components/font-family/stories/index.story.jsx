@@ -1,0 +1,47 @@
+import { useState } from '@wordpress/element';
+import FontFamilyControl from '..';
+
+export default {
+	component: FontFamilyControl,
+	id: 'blockeditor-fontfamilycontrol',
+	title: 'Editor/Block Editor/FontFamilyControl',
+};
+
+export const Default = {
+	render: function Template( props ) {
+		const [ value, setValue ] = useState();
+		return (
+			<FontFamilyControl
+				onChange={ setValue }
+				value={ value }
+				{ ...props }
+			/>
+		);
+	},
+	args: {
+		fontFamilies: [
+			{
+				fontFace: [
+					{
+						fontFamily: 'Inter',
+						fontStretch: 'normal',
+						fontStyle: 'normal',
+						fontWeight: '200 900',
+						src: [
+							'file:./assets/fonts/inter/Inter-VariableFont_slnt,wght.ttf',
+						],
+					},
+				],
+				fontFamily: '"Inter", sans-serif',
+				name: 'Inter',
+				slug: 'inter',
+			},
+			{
+				fontFamily:
+					'-apple-system,system-ui,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
+				name: 'System Font',
+				slug: 'system-font',
+			},
+		],
+	},
+};

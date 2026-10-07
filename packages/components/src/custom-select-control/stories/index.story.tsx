@@ -1,30 +1,29 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import CustomSelectControl from '..';
 
 const meta: Meta< typeof CustomSelectControl > = {
-	title: 'Components/CustomSelectControl',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-components/Selection & Input/Common/CustomSelectControl',
 	component: CustomSelectControl,
+	id: 'components-customselectcontrol',
 	argTypes: {
-		onChange: { control: { type: null } },
-		value: { control: { type: null } },
+		onChange: { control: false },
+		value: { control: false },
+	},
+	args: {
+		onChange: fn(),
 	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: {
 			source: { excludeDecorators: true },
+		},
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Will be superseded by [`SelectControl`](?path=/docs/design-system-components-form-selectcontrol--docs) in `@wordpress/ui`, but continue using for now.',
 		},
 	},
 	decorators: [

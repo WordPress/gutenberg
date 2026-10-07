@@ -1,7 +1,21 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+
+/**
+ * Opens the "Panels" submenu of the editor's Options menu, which lists the
+ * sidebars plugins register.
+ *
+ * @param {import('@playwright/test').Page} page
+ */
+async function openPanelsMenu( page ) {
+	await page
+		.getByRole( 'region', { name: 'Editor top bar' } )
+		.getByRole( 'button', { name: 'Options' } )
+		.click();
+	await page
+		.getByRole( 'menu', { name: 'Options' } )
+		.getByRole( 'menuitem', { name: 'Panels', exact: true } )
+		.click();
+}
 
 test.describe( 'Plugins API', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
@@ -78,10 +92,7 @@ test.describe( 'Plugins API', () => {
 		test( 'Should open plugins sidebar using More Menu item and render content', async ( {
 			page,
 		} ) => {
-			await page
-				.getByRole( 'region', { name: 'Editor top bar' } )
-				.getByRole( 'button', { name: 'Options' } )
-				.click();
+			await openPanelsMenu( page );
 			await page
 				.getByRole( 'menuitemcheckbox', {
 					name: 'Plugin more menu title',
@@ -102,6 +113,35 @@ test.describe( 'Plugins API', () => {
 					name: 'Reset',
 				} )
 			).toBeVisible();
+		} );
+
+		test( 'Should render a single More Menu item for a sidebar that renders one of its own', async ( {
+			page,
+		} ) => {
+			await openPanelsMenu( page );
+
+			// The menu item PluginSidebar injects is labelled with the sidebar
+			// title, the one the plugin renders with its own children.
+			await expect(
+				page.getByRole( 'menuitemcheckbox', {
+					name: 'Plugin more menu title',
+				} )
+			).toHaveCount( 1 );
+			await expect(
+				page.getByRole( 'menuitemcheckbox', { name: 'Plugin title' } )
+			).toBeHidden();
+
+			// Both are labelled the same here, so a duplicate shows up as a count.
+			await expect(
+				page.getByRole( 'menuitemcheckbox', { name: 'Annotations' } )
+			).toHaveCount( 1 );
+
+			// A sidebar that renders no menu item of its own still gets one.
+			await expect(
+				page.getByRole( 'menuitemcheckbox', {
+					name: 'Injected menu item',
+				} )
+			).toHaveCount( 1 );
 		} );
 
 		test( 'Should be pinned by default and can be opened and closed using pinned items', async ( {
@@ -142,10 +182,7 @@ test.describe( 'Plugins API', () => {
 
 			await expect( pinnedButton ).toBeHidden();
 
-			await page
-				.getByRole( 'region', { name: 'Editor top bar' } )
-				.getByRole( 'button', { name: 'Options' } )
-				.click();
+			await openPanelsMenu( page );
 			await page
 				.getByRole( 'menuitemcheckbox', {
 					name: 'Plugin more menu title',
@@ -163,9 +200,6 @@ test.describe( 'Plugins API', () => {
 		test( 'Should close plugins sidebar using More Menu item', async ( {
 			page,
 		} ) => {
-			const options = page
-				.getByRole( 'region', { name: 'Editor top bar' } )
-				.getByRole( 'button', { name: 'Options' } );
 			const moreMenuItem = page.getByRole( 'menuitemcheckbox', {
 				name: 'Plugin more menu title',
 			} );
@@ -177,11 +211,11 @@ test.describe( 'Plugins API', () => {
 					name: 'Title',
 				} );
 
-			await options.click();
+			await openPanelsMenu( page );
 			await moreMenuItem.click();
 			await expect( pluginField ).toBeVisible();
 
-			await options.click();
+			await openPanelsMenu( page );
 			await moreMenuItem.click();
 			await expect( pluginField ).toBeHidden();
 		} );
@@ -192,10 +226,7 @@ test.describe( 'Plugins API', () => {
 		} ) => {
 			await pageUtils.setBrowserViewport( 'medium' );
 
-			await page
-				.getByRole( 'region', { name: 'Editor top bar' } )
-				.getByRole( 'button', { name: 'Options' } )
-				.click();
+			await openPanelsMenu( page );
 			await page
 				.getByRole( 'menuitemcheckbox', {
 					name: 'Plugin more menu title',

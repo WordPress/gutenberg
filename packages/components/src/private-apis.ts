@@ -1,22 +1,37 @@
-/**
- * Internal dependencies
- */
+import { useDrag } from '@use-gesture/react';
+import deprecated from '@wordpress/deprecated';
 import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
-import { createPrivateSlotFill } from './slot-fill';
-import { DropdownMenuV2 } from './dropdown-menu-v2';
+import { Menu } from './menu';
 import { ComponentsContext } from './context/context-system-provider';
-import Theme from './theme';
-import Tabs from './tabs';
-import { kebabCase } from './utils/strings';
+import { Tabs } from './tabs';
 import { lock } from './lock-unlock';
+import Badge from './badge';
+import {
+	ValidatedInputControl,
+	ValidatedContentEditableControl,
+	ValidatedTextareaControl,
+} from './validated-form-controls';
+import ContentEditableControl from './content-editable-control';
 
 export const privateApis = {};
 lock( privateApis, {
+	ContentEditableControl,
 	__experimentalPopoverLegacyPositionToPlacement,
-	createPrivateSlotFill,
 	ComponentsContext,
 	Tabs,
-	Theme,
-	DropdownMenuV2,
-	kebabCase,
+	// Retained for older bundled consumers. Check compatibility before removal.
+	get Menu() {
+		deprecated( '`privateApis.Menu` from `@wordpress/components`', {
+			since: '7.2',
+			version: '7.3',
+			alternative: '`DropdownMenu` from `@wordpress/components`',
+			hint: 'When building for the Gutenberg repo, use `Menu` from `@wordpress/ui` instead.',
+		} );
+		return Menu;
+	},
+	Badge,
+	useDrag,
+	ValidatedInputControl,
+	ValidatedContentEditableControl,
+	ValidatedTextareaControl,
 } );

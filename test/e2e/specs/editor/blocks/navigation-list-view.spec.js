@@ -1,9 +1,9 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Navigation block - List view editing', () => {
+	// WordPress always has this category, so nothing needs creating or removing.
+	const DEFAULT_CATEGORY_NAME = 'Uncategorized';
+
 	const navMenuBlocksFixture = {
 		title: 'Test Menu',
 		content: `<!-- wp:navigation-link {"label":"Top Level Item 1","type":"page","id":250,"url":"http://localhost:8888/quod-error-esse-nemo-corporis-rerum-repellendus/","kind":"post-type"} /-->
@@ -24,6 +24,10 @@ test.describe( 'Navigation block - List view editing', () => {
 		} );
 		await requestUtils.createPage( {
 			title: 'Test Page 3',
+			status: 'publish',
+		} );
+		await requestUtils.createPost( {
+			title: 'Test Post 1',
 			status: 'publish',
 		} );
 	} );
@@ -133,6 +137,7 @@ test.describe( 'Navigation block - List view editing', () => {
 
 	test( `can add new menu items`, async ( {
 		page,
+		pageUtils,
 		editor,
 		requestUtils,
 		linkControl,
@@ -164,38 +169,15 @@ test.describe( 'Navigation block - List view editing', () => {
 		} );
 
 		const appender = listView.getByRole( 'button', {
-			name: 'Add block',
+			name: 'Add page',
 		} );
 
 		await expect( appender ).toBeVisible();
 
 		await appender.click();
 
-		// Expect to see the block inserter.
-		await expect(
-			page.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
-			} )
-		).toBeFocused();
-
-		const blockResults = page.getByRole( 'listbox', {
-			name: 'Blocks',
-		} );
-
-		await expect( blockResults ).toBeVisible();
-
-		const blockResultOptions = blockResults.getByRole( 'option' );
-
-		// Expect to see the Page Link and Custom Link blocks as the nth(0) and nth(1) results.
-		// This is important for usability as the Page Link block is the most likely to be used.
-		await expect( blockResultOptions.nth( 0 ) ).toHaveText( 'Page Link' );
-		await expect( blockResultOptions.nth( 1 ) ).toHaveText( 'Custom Link' );
-
-		// Select the Page Link option.
-		const customLinkResult = blockResultOptions.nth( 1 );
-		await customLinkResult.click();
-
-		// Expect to see the Link creation UI be focused.
+		// Expect a Navigation Link block to be inserted
+		// and immediately trigger its Link UI.
 		const linkUIInput = linkControl.getSearchInput();
 
 		// Coverage for bug whereby Link UI input would be incorrectly prepopulated.
@@ -206,43 +188,141 @@ test.describe( 'Navigation block - List view editing', () => {
 		await expect( linkUIInput ).toBeFocused();
 		await expect( linkUIInput ).toBeEmpty();
 
-		// Provides test coverage for feature whereby Custom Link type
-		// should default to `Pages` when displaying the "initial suggestions"
-		// in the Link UI.
-		// See https://github.com/WordPress/gutenberg/pull/54622.
-		const firstResult = await linkControl.getNthSearchResult( 0 );
-		const secondResult = await linkControl.getNthSearchResult( 1 );
-		const thirdResult = await linkControl.getNthSearchResult( 2 );
+		await test.step( 'default initial suggestions are all page type', async () => {
+			// Provides test coverage for feature whereby Custom Link type
+			// should default to `Pages` when displaying the "initial
+			// suggestions" in the Link UI.
+			// See https://github.com/WordPress/gutenberg/pull/54622.
+			const firstResult = await linkControl.getNthSearchResult( 0 );
+			const secondResult = await linkControl.getNthSearchResult( 1 );
+			const thirdResult = await linkControl.getNthSearchResult( 2 );
 
-		const firstResultType =
-			await linkControl.getSearchResultType( firstResult );
+			const firstResultType =
+				await linkControl.getSearchResultType( firstResult );
 
-		const secondResultType =
-			await linkControl.getSearchResultType( secondResult );
+			const secondResultType =
+				await linkControl.getSearchResultType( secondResult );
 
-		const thirdResultType =
-			await linkControl.getSearchResultType( thirdResult );
+			const thirdResultType =
+				await linkControl.getSearchResultType( thirdResult );
 
-		expect( firstResultType ).toBe( 'Page' );
-		expect( secondResultType ).toBe( 'Page' );
-		expect( thirdResultType ).toBe( 'Page' );
+			expect( firstResultType ).toBe( 'Page' );
+			expect( secondResultType ).toBe( 'Page' );
+			expect( thirdResultType ).toBe( 'Page' );
+		} );
 
-		// Grab the text from the first result so we can check (later on) that it was inserted.
-		const firstResultText =
-			await linkControl.getSearchResultText( firstResult );
+		await test.step( 'search from default link returns best page type matches first', async () => {
+			// Search for a string that is the start of a page title
+			await page.keyboard.type( 'Test', { delay: 50 } );
 
-		// Create the link.
-		await firstResult.click();
+			const searchedResults = await linkControl.getSearchResults();
 
-		// Check the new menu item was inserted at the end of the existing menu.
+			// The initial suggestions are pages, so wait for a result that can only
+			// come from the typed search before asserting on the order.
+			await expect(
+				searchedResults.filter( { hasText: 'Test Post 1' } )
+			).toBeVisible();
+
+			// The appended item is a Page Link, so first results should be pages
+			const types = await Promise.all(
+				[ 0, 1, 2 ].map( async ( index ) =>
+					linkControl.getSearchResultType(
+						await linkControl.getNthSearchResult( index )
+					)
+				)
+			);
+			expect( types ).toEqual( [ 'Page', 'Page', 'Page' ] );
+		} );
+
+		await test.step( 'can find taxonomy results via default link search', async () => {
+			// Replace the search text with a category name.
+			await pageUtils.pressKeys( 'primary+a' );
+			await page.keyboard.type( DEFAULT_CATEGORY_NAME, { delay: 50 } );
+
+			const searchedResults = await linkControl.getSearchResults();
+			const categoryResult = searchedResults.filter( {
+				hasText: DEFAULT_CATEGORY_NAME,
+			} );
+
+			await expect( categoryResult ).toBeVisible();
+
+			// Nothing else on the site holds the word, so the term leads.
+			expect(
+				await linkControl.getSearchResultType( searchedResults.first() )
+			).toBe( 'Category' );
+		} );
+
+		await test.step( 'can create a taxonomy result via default link search', async () => {
+			// select it with the keyboard
+			await pageUtils.pressKeys( 'ArrowDown' );
+
+			const categoryResult = (
+				await linkControl.getSearchResults()
+			).filter( { hasText: DEFAULT_CATEGORY_NAME } );
+
+			// URLInput is a combobox: focus stays on the input and the
+			// highlighted option carries `aria-selected`.
+			await expect( categoryResult ).toHaveAttribute(
+				'aria-selected',
+				'true'
+			);
+
+			// Submit the link.
+			await pageUtils.pressKeys( 'Enter' );
+
+			// Check the new menu item was inserted at the end of the existing menu.
+			await expect(
+				listView
+					.getByRole( 'gridcell', {
+						name: DEFAULT_CATEGORY_NAME,
+					} )
+					.filter( {
+						hasText: 'Block 3 of 3, Level 1.', // proxy for filtering by description.
+					} )
+			).toBeVisible();
+		} );
+	} );
+
+	// See https://github.com/WordPress/gutenberg/issues/76803.
+	test( `can add a block from the link search results`, async ( {
+		page,
+		editor,
+		requestUtils,
+		linkControl,
+	} ) => {
+		const { id: menuId } =
+			await requestUtils.createNavigationMenu( navMenuBlocksFixture );
+
+		await editor.insertBlock( {
+			name: 'core/navigation',
+			attributes: {
+				ref: menuId,
+			},
+		} );
+
+		await editor.openDocumentSettingsSidebar();
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+			description: 'Structure for navigation menu: Test Menu',
+		} );
+
+		await listView.getByRole( 'button', { name: 'Add page' } ).click();
+
+		await expect( linkControl.getSearchInput() ).toBeFocused();
+		await page.keyboard.type( 'Home', { delay: 50 } );
+
+		await page
+			.getByRole( 'listbox', { name: /Search results/ } )
+			.getByRole( 'option', { name: /Home Link/ } )
+			.click();
+
+		// The block takes the new link's place at the end of the menu. Being
+		// the third of three shows the new link was not left behind.
 		await expect(
 			listView
-				.getByRole( 'gridcell', {
-					name: firstResultText,
-				} )
-				.filter( {
-					hasText: 'Block 3 of 3, Level 1.', // proxy for filtering by description.
-				} )
+				.getByRole( 'gridcell', { name: 'Home Link' } )
+				.filter( { hasText: 'Block 3 of 3, Level 1.' } )
 		).toBeVisible();
 	} );
 
@@ -333,7 +413,7 @@ test.describe( 'Navigation block - List view editing', () => {
 
 		await expect(
 			blockSettings.getByRole( 'tab', {
-				name: 'Settings',
+				name: 'Content',
 				selected: true,
 			} )
 		).toBeVisible();
@@ -341,7 +421,7 @@ test.describe( 'Navigation block - List view editing', () => {
 		await expect(
 			blockSettings
 				.getByRole( 'tabpanel', {
-					name: 'Settings',
+					name: 'Content',
 				} )
 				.getByRole( 'heading', {
 					name: 'Settings',
@@ -361,7 +441,7 @@ test.describe( 'Navigation block - List view editing', () => {
 		// Click the back button to go back to the Nav block.
 		await blockSettings
 			.getByRole( 'button', {
-				name: 'Go to parent Navigation block',
+				name: 'Go to "Navigation" block',
 			} )
 			.click();
 
@@ -499,20 +579,12 @@ test.describe( 'Navigation block - List view editing', () => {
 
 		await listView
 			.getByRole( 'button', {
-				name: 'Add block',
+				name: 'Add page',
 			} )
 			.click();
 
-		const blockResults = page.getByRole( 'listbox', {
-			name: 'Blocks',
-		} );
-
-		await expect( blockResults ).toBeVisible();
-
-		const blockResultOptions = blockResults.getByRole( 'option' );
-
-		// Select the Page Link option.
-		await blockResultOptions.nth( 0 ).click();
+		// Expect the Link UI to be focused.
+		await expect( linkControl.getSearchInput() ).toBeFocused();
 
 		// Immediately dismiss the Link UI thereby not populating the `url` attribute
 		// of the block.
@@ -555,7 +627,10 @@ test.describe( 'Navigation block - List view editing', () => {
 
 		await editor.openDocumentSettingsSidebar();
 
-		await page.getByLabel( 'Test Menu' ).click();
+		await page
+			.getByRole( 'tabpanel' )
+			.getByRole( 'button', { name: 'Test Menu' } )
+			.click();
 
 		await page.keyboard.press( 'ArrowUp' );
 
@@ -576,8 +651,57 @@ test.describe( 'Navigation block - List view editing', () => {
 				.getByRole( 'document', {
 					name: 'Block: Navigation',
 				} )
-				.getByLabel( 'Add block' )
+				.getByLabel( 'Add page' )
 		).toBeFocused();
+	} );
+
+	test( 'displays custom menu name in List View tab header in contentOnly mode', async ( {
+		page,
+		editor,
+		requestUtils,
+		pageUtils,
+	} ) => {
+		// Create a navigation menu with a custom name.
+		const headerMenu = await requestUtils.createNavigationMenu( {
+			title: 'Header Menu',
+			content: navMenuBlocksFixture.content,
+		} );
+
+		// Use the code editor to insert a contentOnly-locked group containing
+		// the navigation block. This triggers contentOnly mode where
+		// isSelectionWithinCurrentSection is true.
+		await pageUtils.pressKeys( 'secondary+M' );
+		await page
+			.getByPlaceholder( 'Start writing with text or HTML' )
+			.fill(
+				`<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->` +
+					`<div class="wp-block-group">` +
+					`<!-- wp:navigation {"ref":${ headerMenu.id }} /-->` +
+					`</div>` +
+					`<!-- /wp:group -->`
+			);
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		// Select the navigation block inside the contentOnly group.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Navigation' } )
+			.click();
+
+		await editor.openDocumentSettingsSidebar();
+
+		// Click the List View tab.
+		const listViewTab = page.getByRole( 'tab', { name: 'List View' } );
+		await listViewTab.click();
+
+		const listViewPanel = page.getByRole( 'tabpanel', {
+			name: 'List View',
+		} );
+
+		// In contentOnly mode, the PanelBody title should show the custom
+		// menu name as a collapsible panel button.
+		await expect(
+			listViewPanel.getByRole( 'button', { name: 'Header Menu' } )
+		).toBeVisible();
 	} );
 } );
 
@@ -588,7 +712,7 @@ class LinkControl {
 
 	getSearchInput() {
 		return this.page.getByRole( 'combobox', {
-			name: 'Link',
+			name: 'Search or type URL',
 		} );
 	}
 
@@ -626,14 +750,15 @@ class LinkControl {
 
 		return result
 			.locator( '.components-menu-item__item' ) // this is the only way to get the label text without the URL.
+			.last()
 			.innerText();
 	}
 
 	async getSearchResultType( result ) {
 		await expect( result ).toBeVisible();
 
-		return result
-			.locator( '.components-menu-item__shortcut' ) // this is the only way to get the type text.
-			.innerText();
+		// The entity type renders as a sibling of the label, so it is not part
+		// of the text returned by getSearchResultText.
+		return result.locator( '.components-menu-item__shortcut' ).innerText();
 	}
 }

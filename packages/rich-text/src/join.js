@@ -1,7 +1,3 @@
-/**
- * Internal dependencies
- */
-
 import { create } from './create';
 import { normaliseFormats } from './normalise-formats';
 
@@ -23,13 +19,13 @@ export function join( values, separator = '' ) {
 	}
 
 	return normaliseFormats(
-		values.reduce( ( accumlator, { formats, replacements, text } ) => ( {
-			formats: accumlator.formats.concat( separator.formats, formats ),
-			replacements: accumlator.replacements.concat(
+		values.reduce( ( accumulator, { formats, replacements, text } ) => ( {
+			formats: accumulator.formats.concat( separator.formats, formats ),
+			replacements: accumulator.replacements.concat(
 				separator.replacements,
 				replacements
 			),
-			text: accumlator.text + separator.text + text,
+			text: accumulator.text + separator.text + text,
 		} ) )
 	);
 }

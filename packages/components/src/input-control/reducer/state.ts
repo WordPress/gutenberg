@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Reducer, SyntheticEvent } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { Action, InputAction } from './actions';
 
 export interface InputState {

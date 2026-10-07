@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { cloneBlock } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { getMatchingBlockByName, getRetainedBlockAttributes } from './utils';
 
 /**
@@ -72,7 +65,7 @@ export const getPatternTransformedBlocks = (
 			// No need to loop through other pattern's blocks.
 			break;
 		}
-		// Bail eary if a selected block has not been matched.
+		// Bail early if a selected block has not been matched.
 		if ( ! isMatch ) {
 			return;
 		}

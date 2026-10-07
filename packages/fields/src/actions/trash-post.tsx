@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { trash } from '@wordpress/icons';
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -9,36 +6,40 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useState } from '@wordpress/element';
 import {
 	Button,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import type { Action } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
-import { getItemTitle, isTemplateOrTemplatePart } from './utils';
+import { getItemTitle } from './utils';
+import { hasActionLink } from '../fields/utils';
 import type { CoreDataError, PostWithPermissions } from '../types';
 
 const trashPost: Action< PostWithPermissions > = {
 	id: 'move-to-trash',
-	label: __( 'Move to trash' ),
+	label: _x( 'Trash…', 'verb' ),
 	isPrimary: true,
 	icon: trash,
 	isEligible( item ) {
-		if ( isTemplateOrTemplatePart( item ) || item.type === 'wp_block' ) {
+		if ( item.type === 'wp_template_part' || item.type === 'wp_block' ) {
+			return false;
+		}
+
+		// Non-database template cannot be trashed.
+		if ( item.type === 'wp_template' && typeof item.id === 'string' ) {
 			return false;
 		}
 
 		return (
 			!! item.status &&
 			! [ 'auto-draft', 'trash' ].includes( item.status ) &&
-			item.permissions?.delete
+			item.permissions?.delete &&
+			hasActionLink( item, 'wp:action-trash' )
 		);
 	},
 	supportsBulk: true,
 	hideModalHeader: true,
+	modalFocusOnMount: 'firstContentElement',
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ isBusy, setIsBusy ] = useState( false );
 		const { createSuccessNotice, createErrorNotice } =
@@ -46,7 +47,7 @@ const trashPost: Action< PostWithPermissions > = {
 		const { deleteEntityRecord } = useDispatch( coreStore );
 		return (
 			<VStack spacing="5">
-				<Text>
+				<WCText>
 					{ items.length === 1
 						? sprintf(
 								// translators: %s: The item's title.
@@ -54,7 +55,7 @@ const trashPost: Action< PostWithPermissions > = {
 									'Are you sure you want to move "%s" to the trash?'
 								),
 								getItemTitle( items[ 0 ] )
-						  )
+							)
 						: sprintf(
 								// translators: %d: The number of items (2 or more).
 								_n(
@@ -63,8 +64,8 @@ const trashPost: Action< PostWithPermissions > = {
 									items.length
 								),
 								items.length
-						  ) }
-				</Text>
+							) }
+				</WCText>
 				<HStack justify="right">
 					<Button
 						__next40pxDefaultSize
@@ -100,16 +101,16 @@ const trashPost: Action< PostWithPermissions > = {
 								let successMessage;
 								if ( promiseResult.length === 1 ) {
 									successMessage = sprintf(
-										/* translators: The item's title. */
+										/* translators: %s: The item's title. */
 										__( '"%s" moved to the trash.' ),
 										getItemTitle( items[ 0 ] )
 									);
 								} else {
 									successMessage = sprintf(
-										/* translators: The number of items. */
+										/* translators: %d: The number of items. */
 										_n(
-											'%s item moved to the trash.',
-											'%s items moved to the trash.',
+											'%d item moved to the trash.',
+											'%d items moved to the trash.',
 											items.length
 										),
 										items.length
@@ -137,7 +138,7 @@ const trashPost: Action< PostWithPermissions > = {
 									}
 									// If we were trying to delete multiple items.
 								} else {
-									const errorMessages = new Set();
+									const errorMessages = new Set< string >();
 									const failedPromises = promiseResult.filter(
 										( { status } ) => status === 'rejected'
 									);
@@ -195,4 +196,7 @@ const trashPost: Action< PostWithPermissions > = {
 	},
 };
 
+/**
+ * Trash action for PostWithPermissions.
+ */
 export default trashPost;

@@ -1,29 +1,22 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import SnackbarList from '../list';
 
 const meta: Meta< typeof SnackbarList > = {
-	title: 'Components/SnackbarList',
+	title: 'Components/@wordpress-components/Feedback/SnackbarList',
+	id: 'components-snackbarlist',
 	component: SnackbarList,
 	argTypes: {
-		as: { control: { type: null } },
+		as: { control: false },
 		onRemove: {
 			action: 'onRemove',
-			control: { type: null },
+			control: false,
 		},
 	},
 	parameters: {
+		// FIXME: Snackbars with actions nest interactive elements (nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
 		controls: {
 			expanded: true,
 		},

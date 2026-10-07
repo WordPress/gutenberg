@@ -54,6 +54,8 @@ export type AlignmentMatrixControlIconProps = Pick<
 	 * component instead_
 	 *
 	 * The size of the icon.
+	 *
+	 * @deprecated
 	 * @ignore
 	 * @default 24
 	 */

@@ -1,0 +1,67 @@
+[
+	{
+		"blockName": "core/button",
+		"attrs": {
+			"width": 25
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<div class=\"wp-block-button has-custom-width wp-block-button__width-25\">\n\t<a class=\"wp-block-button__link wp-element-button\">Button 25%</a>\n</div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-button has-custom-width wp-block-button__width-25\">\n\t<a class=\"wp-block-button__link wp-element-button\">Button 25%</a>\n</div>\n"
+		]
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
+	},
+	{
+		"blockName": "core/button",
+		"attrs": {
+			"width": 50
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<div class=\"wp-block-button has-custom-width wp-block-button__width-50\">\n\t<a class=\"wp-block-button__link wp-element-button\">Button 50%</a>\n</div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-button has-custom-width wp-block-button__width-50\">\n\t<a class=\"wp-block-button__link wp-element-button\">Button 50%</a>\n</div>\n"
+		]
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
+	},
+	{
+		"blockName": "core/button",
+		"attrs": {
+			"width": 75
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<div class=\"wp-block-button has-custom-width wp-block-button__width-75\">\n\t<a class=\"wp-block-button__link wp-element-button\">Button 75%</a>\n</div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-button has-custom-width wp-block-button__width-75\">\n\t<a class=\"wp-block-button__link wp-element-button\">Button 75%</a>\n</div>\n"
+		]
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
+	},
+	{
+		"blockName": "core/button",
+		"attrs": {
+			"width": 100
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<div class=\"wp-block-button has-custom-width wp-block-button__width-100\">\n\t<a class=\"wp-block-button__link wp-element-button\">Button 100%</a>\n</div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-button has-custom-width wp-block-button__width-100\">\n\t<a class=\"wp-block-button__link wp-element-button\">Button 100%</a>\n</div>\n"
+		]
+	}
+]

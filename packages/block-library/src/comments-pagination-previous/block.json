@@ -12,15 +12,17 @@
 			"type": "string"
 		}
 	},
-	"example": {
-		"attributes": {
-			"label": "Comments Previous Page"
-		}
-	},
 	"usesContext": [ "postId", "comments/paginationArrow" ],
 	"supports": {
+		"anchor": true,
 		"reusable": false,
 		"html": false,
+		"background": {
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"gradient": true
+			}
+		},
 		"color": {
 			"gradients": true,
 			"text": false,

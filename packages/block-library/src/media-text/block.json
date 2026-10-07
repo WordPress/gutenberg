@@ -90,9 +90,6 @@
 		"focalPoint": {
 			"type": "object"
 		},
-		"allowedBlocks": {
-			"type": "array"
-		},
 		"useFeaturedImage": {
 			"type": "boolean",
 			"default": false
@@ -103,6 +100,11 @@
 		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true
+		},
 		"__experimentalBorder": {
 			"color": true,
 			"radius": true,
@@ -119,15 +121,21 @@
 			"gradients": true,
 			"heading": true,
 			"link": true,
+			"button": true,
 			"__experimentalDefaultControls": {
 				"background": true,
 				"text": true
 			}
 		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
+		},
 		"spacing": {
 			"margin": true,
 			"padding": true
 		},
+		"shadow": true,
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
@@ -141,8 +149,17 @@
 				"fontSize": true
 			}
 		},
+		"filter": {
+			"duotone": true
+		},
 		"interactivity": {
 			"clientNavigation": true
+		},
+		"allowedBlocks": true
+	},
+	"selectors": {
+		"filter": {
+			"duotone": ".wp-block-media-text > .wp-block-media-text__media img, .wp-block-media-text > .wp-block-media-text__media video"
 		}
 	},
 	"editorStyle": "wp-block-media-text-editor",

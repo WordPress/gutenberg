@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Editing Navigation Menus', () => {
@@ -40,6 +37,10 @@ test.describe( 'Editing Navigation Menus', () => {
 				canvas: 'edit',
 			} );
 
+			await expect(
+				page.getByRole( 'button', { name: 'Document Overview' } )
+			).toBeVisible();
+
 			// Open List View.
 			await pageUtils.pressKeys( 'access+o' );
 
@@ -54,7 +55,7 @@ test.describe( 'Editing Navigation Menus', () => {
 			await expect( listView ).toBeVisible();
 
 			const navBlockNode = listView.getByRole( 'link', {
-				name: 'Navigation',
+				name: 'Primary Menu',
 				exact: true,
 			} );
 
@@ -89,19 +90,24 @@ test.describe( 'Editing Navigation Menus', () => {
 
 			await expect( sidebar ).toBeVisible();
 
-			// Check that the `Menu` control is visible.
-			// This is effectively the contents of the "List View" tab.
+			// Check that the `Navigation` heading is visible.
+			// This is the BlockCard title in the sidebar.
 			await expect(
-				sidebar.getByRole( 'heading', { name: 'Menu', exact: true } )
+				sidebar.getByRole( 'heading', {
+					name: 'Navigation',
+					exact: true,
+				} )
 			).toBeVisible();
 
-			// Check the standard tabs are not present.
+			// Check the Document Overview tab is not present.
 			await expect(
 				sidebar.getByRole( 'tab', { name: 'Document Overview' } )
 			).toBeHidden();
+
 			await expect(
 				sidebar.getByRole( 'tab', { name: 'Settings' } )
 			).toBeHidden();
+
 			await expect(
 				sidebar.getByRole( 'tab', { name: 'Styles' } )
 			).toBeHidden();

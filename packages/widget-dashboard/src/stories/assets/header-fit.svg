@@ -1,0 +1,55 @@
+<svg viewBox="0 0 860 196" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="How the header row adapts to width. In a wide tile the attributes render as inline fields. In a narrow tile they fold into a single dropdown, while the identity holds its readable floor and the actions menu stays.">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <rect x="6" y="6" width="848" height="184" rx="12" fill="#ffffff"/>
+
+  <text x="430" y="34" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="11.5" font-weight="700" fill="#64748b">how the row adapts</text>
+
+  <!-- Wide tile -->
+  <rect x="40" y="56" width="356" height="50" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.6"/>
+  <rect x="52" y="68" width="24" height="24" rx="6" fill="#e2ecfd" stroke="#2f54a5" stroke-width="1.3"/>
+  <text x="82" y="85" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1e3a8a">Traffic Snapshot</text>
+  <circle cx="200" cy="81" r="7" fill="#eef4fe" stroke="#7f9cd8" stroke-width="1.1"/>
+  <text x="200" y="84.5" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="9" font-weight="700" font-style="italic" fill="#3b62b0">i</text>
+  <rect x="220" y="72" width="66" height="20" rx="5" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.1"/>
+  <text x="229" y="86" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#475569">Metric</text>
+  <rect x="292" y="72" width="66" height="20" rx="5" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.1"/>
+  <text x="301" y="86" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#475569">Period</text>
+  <rect x="364" y="72" width="26" height="20" rx="5" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.1"/>
+  <circle cx="377" cy="78" r="1.5" fill="#475569"/>
+  <circle cx="377" cy="82" r="1.5" fill="#475569"/>
+  <circle cx="377" cy="86" r="1.5" fill="#475569"/>
+  <text x="218" y="130" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="11" font-weight="700" fill="#334155">wide tile</text>
+  <text x="218" y="146" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#94a3b8">attributes inline</text>
+
+  <!-- Transition -->
+  <text x="458" y="80" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="9" fill="#94a3b8">less room</text>
+  <line x1="406" y1="88" x2="510" y2="88" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#arrow)"/>
+
+  <!-- Narrow tile -->
+  <rect x="520" y="56" width="260" height="50" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.6"/>
+  <rect x="532" y="68" width="24" height="24" rx="6" fill="#e2ecfd" stroke="#2f54a5" stroke-width="1.3"/>
+  <text x="562" y="85" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1e3a8a">Traffic…</text>
+  <circle cx="636" cy="81" r="7" fill="#eef4fe" stroke="#7f9cd8" stroke-width="1.1"/>
+  <text x="636" y="84.5" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="9" font-weight="700" font-style="italic" fill="#3b62b0">i</text>
+  <!-- Folded attributes: compact settings icon button -->
+  <rect x="688" y="72" width="26" height="20" rx="5" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.1"/>
+  <line x1="694" y1="79" x2="708" y2="79" stroke="#475569" stroke-width="1.3"/>
+  <circle cx="703" cy="79" r="2.1" fill="#ffffff" stroke="#475569" stroke-width="1.3"/>
+  <line x1="694" y1="85" x2="708" y2="85" stroke="#475569" stroke-width="1.3"/>
+  <circle cx="699" cy="85" r="2.1" fill="#ffffff" stroke="#475569" stroke-width="1.3"/>
+  <!-- More -->
+  <rect x="722" y="72" width="26" height="20" rx="5" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.1"/>
+  <circle cx="735" cy="78" r="1.5" fill="#475569"/>
+  <circle cx="735" cy="82" r="1.5" fill="#475569"/>
+  <circle cx="735" cy="86" r="1.5" fill="#475569"/>
+  <text x="650" y="130" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="11" font-weight="700" fill="#334155">narrow tile</text>
+  <text x="650" y="146" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#94a3b8">attributes fold into a dropdown</text>
+
+  <!-- Caption -->
+  <text x="430" y="176" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#64748b">identity keeps a readable floor · the actions menu stays · only the attributes fold</text>
+</svg>

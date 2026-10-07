@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	sidesAll,
@@ -11,10 +8,13 @@ import {
 	sidesTop,
 	sidesVertical,
 } from '@wordpress/icons';
+import { getPresetSlug, isValuePreset } from '../preset-input-control/utils';
+
+const SPACING_PRESET_TYPE = 'spacing';
 
 export const RANGE_CONTROL_MAX_SIZE = 8;
 
-export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
+export const ALL_SIDES = [ 'top', 'bottom', 'left', 'right' ];
 
 export const DEFAULT_VALUES = {
 	top: undefined,
@@ -64,10 +64,7 @@ export const VIEWS = {
  * @return {boolean} Return true if value is string in format var:preset|spacing|.
  */
 export function isValueSpacingPreset( value ) {
-	if ( ! value?.includes ) {
-		return false;
-	}
-	return value === '0' || value.includes( 'var:preset|spacing|' );
+	return isValuePreset( value, SPACING_PRESET_TYPE );
 }
 
 /**
@@ -83,7 +80,7 @@ export function getCustomValueFromPreset( value, spacingSizes ) {
 		return value;
 	}
 
-	const slug = getSpacingPresetSlug( value );
+	const slug = getPresetSlug( value, SPACING_PRESET_TYPE );
 	const spacingSize = spacingSizes.find(
 		( size ) => String( size.slug ) === slug
 	);
@@ -126,7 +123,7 @@ export function getPresetValueFromCustomValue( value, spacingSizes ) {
  * @return {string | undefined} CSS var string for given spacing preset value.
  */
 export function getSpacingPresetCssVar( value ) {
-	if ( ! value ) {
+	if ( ! value || typeof value !== 'string' ) {
 		return;
 	}
 
@@ -137,27 +134,6 @@ export function getSpacingPresetCssVar( value ) {
 	}
 
 	return `var(--wp--preset--spacing--${ slug[ 1 ] })`;
-}
-
-/**
- * Returns the slug section of the given spacing preset string.
- *
- * @param {string} value Value to extract slug from.
- *
- * @return {string|undefined} The int value of the slug from given spacing preset.
- */
-export function getSpacingPresetSlug( value ) {
-	if ( ! value ) {
-		return;
-	}
-
-	if ( value === '0' || value === 'default' ) {
-		return value;
-	}
-
-	const slug = value.match( /var:preset\|spacing\|(.+)/ );
-
-	return slug ? slug[ 1 ] : undefined;
 }
 
 /**
@@ -175,71 +151,13 @@ export function getSliderValueFromPreset( presetValue, spacingSizes ) {
 	const slug =
 		parseFloat( presetValue, 10 ) === 0
 			? '0'
-			: getSpacingPresetSlug( presetValue );
+			: getPresetSlug( presetValue, SPACING_PRESET_TYPE );
 	const sliderValue = spacingSizes.findIndex( ( spacingSize ) => {
 		return String( spacingSize.slug ) === slug;
 	} );
 
 	// Returning NaN rather than undefined as undefined makes range control thumb sit in center
 	return sliderValue !== -1 ? sliderValue : NaN;
-}
-
-/**
- * Gets an items with the most occurrence within an array
- * https://stackoverflow.com/a/20762713
- *
- * @param {Array<any>} arr Array of items to check.
- * @return {any} The item with the most occurrences.
- */
-function mode( arr ) {
-	return arr
-		.sort(
-			( a, b ) =>
-				arr.filter( ( v ) => v === a ).length -
-				arr.filter( ( v ) => v === b ).length
-		)
-		.pop();
-}
-
-/**
- * Gets the 'all' input value from values data.
- *
- * @param {Object} values Box spacing values
- *
- * @return {string} The most common value from all sides of box.
- */
-export function getAllRawValue( values = {} ) {
-	return mode( Object.values( values ) );
-}
-
-/**
- * Checks to determine if values are mixed.
- *
- * @param {Object} values Box values.
- * @param {Array}  sides  Sides that values relate to.
- *
- * @return {boolean} Whether values are mixed.
- */
-export function isValuesMixed( values = {}, sides = ALL_SIDES ) {
-	return (
-		( Object.values( values ).length >= 1 &&
-			Object.values( values ).length < sides.length ) ||
-		new Set( Object.values( values ) ).size > 1
-	);
-}
-
-/**
- * Checks to determine if values are defined.
- *
- * @param {Object} values Box values.
- *
- * @return {boolean} Whether values are defined.
- */
-export function isValuesDefined( values ) {
-	if ( values === undefined || values === null ) {
-		return false;
-	}
-	return Object.values( values ).filter( ( value ) => !! value ).length > 0;
 }
 
 /**
@@ -273,54 +191,6 @@ export function hasAxisSupport( sides, axis ) {
 	}
 
 	return hasHorizontalSupport || hasVerticalSupport;
-}
-
-/**
- * Determines which menu options should be included in the SidePicker.
- *
- * @param {Array} sides Supported sides.
- *
- * @return {Object} Menu options with each option containing label & icon.
- */
-export function getSupportedMenuItems( sides ) {
-	if ( ! sides || ! sides.length ) {
-		return {};
-	}
-
-	const menuItems = {};
-
-	// Determine the primary "side" menu options.
-	const hasHorizontalSupport = hasAxisSupport( sides, 'horizontal' );
-	const hasVerticalSupport = hasAxisSupport( sides, 'vertical' );
-
-	if ( hasHorizontalSupport && hasVerticalSupport ) {
-		menuItems.axial = { label: LABELS.axial, icon: ICONS.axial };
-	} else if ( hasHorizontalSupport ) {
-		menuItems.axial = { label: LABELS.horizontal, icon: ICONS.horizontal };
-	} else if ( hasVerticalSupport ) {
-		menuItems.axial = { label: LABELS.vertical, icon: ICONS.vertical };
-	}
-
-	// Track whether we have any individual sides so we can omit the custom
-	// option if required.
-	let numberOfIndividualSides = 0;
-
-	ALL_SIDES.forEach( ( side ) => {
-		if ( sides.includes( side ) ) {
-			numberOfIndividualSides += 1;
-			menuItems[ side ] = {
-				label: LABELS[ side ],
-				icon: ICONS[ side ],
-			};
-		}
-	} );
-
-	// Add custom item if there are enough sides to warrant a separated view.
-	if ( numberOfIndividualSides > 1 ) {
-		menuItems.custom = { label: LABELS.custom, icon: ICONS.custom };
-	}
-
-	return menuItems;
 }
 
 /**

@@ -1,6 +1,8 @@
-.wp-block-latest-comments {
-	// This block has customizable border, border-box makes that more predictable.
-	box-sizing: border-box;
+// Reset the browser's default `padding-inline-start: 40px` on `<ol>`.
+// Using `:where` keeps specificity at 0 so global styles, theme.json,
+// and inspector controls can override it without difficulty.
+:where(.wp-block-latest-comments) {
+	padding-left: 0;
 }
 
 // Lower specificity - target list element.
@@ -10,7 +12,7 @@ ol.wp-block-latest-comments {
 	// by default wp-block layout styles in the Post/Site editor
 	margin-left: 0;
 
-	// This block has customizable padding, border-box makes that more predictable.
+	// This block has customizable padding and border, border-box makes that more predictable.
 	box-sizing: border-box;
 }
 

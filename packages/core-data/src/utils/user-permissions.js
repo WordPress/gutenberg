@@ -7,18 +7,17 @@ export const ALLOWED_RESOURCE_ACTIONS = [
 
 export function getUserPermissionsFromAllowHeader( allowedMethods ) {
 	const permissions = {};
-	if ( ! allowedMethods ) {
-		return permissions;
-	}
-
 	const methods = {
 		create: 'POST',
 		read: 'GET',
 		update: 'PUT',
 		delete: 'DELETE',
 	};
+
 	for ( const [ actionName, methodName ] of Object.entries( methods ) ) {
-		permissions[ actionName ] = allowedMethods.includes( methodName );
+		permissions[ actionName ] = allowedMethods
+			? allowedMethods.includes( methodName )
+			: false;
 	}
 
 	return permissions;

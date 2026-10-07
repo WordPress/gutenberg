@@ -1,33 +1,20 @@
-/**
- * WordPress dependencies
- */
 import { backup } from '@wordpress/icons';
 import { dispatch, select, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useState } from '@wordpress/element';
-// @ts-ignore
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import {
 	Button,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import type { Action } from '@wordpress/dataviews';
 import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
-import {
-	getItemTitle,
-	isTemplateOrTemplatePart,
-	TEMPLATE_ORIGINS,
-	TEMPLATE_POST_TYPE,
-} from './utils';
+import { getItemTitle, isTemplateOrTemplatePart } from './utils';
 import type { CoreDataError, Template, TemplatePart } from '../types';
 
 const isTemplateRevertable = (
@@ -38,7 +25,7 @@ const isTemplateRevertable = (
 	}
 
 	return (
-		templateOrTemplatePart.source === TEMPLATE_ORIGINS.custom &&
+		templateOrTemplatePart.source === 'custom' &&
 		( Boolean( templateOrTemplatePart?.plugin ) ||
 			templateOrTemplatePart?.has_theme_file )
 	);
@@ -182,11 +169,11 @@ const revertTemplate = async (
 
 const resetPostAction: Action< Template | TemplatePart > = {
 	id: 'reset-post',
-	label: __( 'Reset' ),
+	label: __( 'Reset…' ),
 	isEligible: ( item ) => {
 		return (
 			isTemplateOrTemplatePart( item ) &&
-			item?.source === TEMPLATE_ORIGINS.custom &&
+			item?.source === 'custom' &&
 			( Boolean( item.type === 'wp_template' && item?.plugin ) ||
 				item?.has_theme_file )
 		);
@@ -194,6 +181,7 @@ const resetPostAction: Action< Template | TemplatePart > = {
 	icon: backup,
 	supportsBulk: true,
 	hideModalHeader: true,
+	modalFocusOnMount: 'firstContentElement',
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ isBusy, setIsBusy ] = useState( false );
 
@@ -215,15 +203,15 @@ const resetPostAction: Action< Template | TemplatePart > = {
 				createSuccessNotice(
 					items.length > 1
 						? sprintf(
-								/* translators: The number of items. */
-								__( '%s items reset.' ),
+								/* translators: %d: The number of items. */
+								__( '%d items reset.' ),
 								items.length
-						  )
+							)
 						: sprintf(
-								/* translators: The template/part's name. */
+								/* translators: %s: The template/part's name. */
 								__( '"%s" reset.' ),
 								getItemTitle( items[ 0 ] )
-						  ),
+							),
 					{
 						type: 'snackbar',
 						id: 'revert-template-action',
@@ -231,24 +219,24 @@ const resetPostAction: Action< Template | TemplatePart > = {
 				);
 			} catch ( error ) {
 				let fallbackErrorMessage;
-				if ( items[ 0 ].type === TEMPLATE_POST_TYPE ) {
+				if ( items[ 0 ].type === 'wp_template' ) {
 					fallbackErrorMessage =
 						items.length === 1
 							? __(
 									'An error occurred while reverting the template.'
-							  )
+								)
 							: __(
 									'An error occurred while reverting the templates.'
-							  );
+								);
 				} else {
 					fallbackErrorMessage =
 						items.length === 1
 							? __(
 									'An error occurred while reverting the template part.'
-							  )
+								)
 							: __(
 									'An error occurred while reverting the template parts.'
-							  );
+								);
 				}
 
 				const typedError = error as CoreDataError;
@@ -262,9 +250,9 @@ const resetPostAction: Action< Template | TemplatePart > = {
 		};
 		return (
 			<VStack spacing="5">
-				<Text>
+				<WCText>
 					{ __( 'Reset to default and clear all customizations?' ) }
-				</Text>
+				</WCText>
 				<HStack justify="right">
 					<Button
 						__next40pxDefaultSize
@@ -297,4 +285,7 @@ const resetPostAction: Action< Template | TemplatePart > = {
 	},
 };
 
+/**
+ * Reset action for Template and TemplatePart.
+ */
 export default resetPostAction;

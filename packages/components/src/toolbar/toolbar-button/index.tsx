@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ForwardedRef, MouseEvent as ReactMouseEvent } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useContext, forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import ToolbarItem from '../toolbar-item';
 import ToolbarContext from '../toolbar-context';
@@ -54,6 +43,7 @@ function UnforwardedToolbarButton(
 				<Button
 					ref={ ref }
 					icon={ restProps.icon }
+					size="compact"
 					label={ title }
 					shortcut={ restProps.shortcut }
 					data-subscript={ restProps.subscript }
@@ -97,6 +87,7 @@ function UnforwardedToolbarButton(
 		>
 			{ ( toolbarItemProps ) => (
 				<Button
+					size="compact"
 					label={ title }
 					isPressed={ isActive }
 					{ ...toolbarItemProps }
@@ -114,13 +105,13 @@ function UnforwardedToolbarButton(
  *
  * ```jsx
  * import { Toolbar, ToolbarButton } from '@wordpress/components';
- * import { edit } from '@wordpress/icons';
+ * import { pencil } from '@wordpress/icons';
  *
  * function MyToolbar() {
  *   return (
  *		<Toolbar label="Options">
  *			<ToolbarButton
- *				icon={ edit }
+ *				icon={ pencil }
  *				label="Edit"
  *				onClick={ () => alert( 'Editing' ) }
  *			/>
@@ -130,4 +121,5 @@ function UnforwardedToolbarButton(
  * ```
  */
 export const ToolbarButton = forwardRef( UnforwardedToolbarButton );
+ToolbarButton.displayName = 'ToolbarButton';
 export default ToolbarButton;

@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 const minimist = require( 'minimist' );
 const spawn = require( 'cross-spawn' );
-
-/**
- * Internal dependencies
- */
 const { fromScriptsRoot, hasScriptFile, getScripts } = require( './file' );
 const { exit, getArgsFromCLI } = require( './process' );
 
@@ -21,7 +14,19 @@ const getArgFromCLI = ( arg ) => {
 
 const hasArgInCLI = ( arg ) => getArgFromCLI( arg ) !== undefined;
 
-const getFileArgsFromCLI = () => minimist( getArgsFromCLI() )._;
+// Flags that never take a value, so `--fix file.js` isn't read as `--fix=file.js`.
+// stylelint's `--fix` does take an optional mode though, so drop that first.
+const getFileArgsFromCLI = () => {
+	const args = getArgsFromCLI().filter(
+		( arg, index, all ) =>
+			! (
+				all[ index - 1 ] === '--fix' &&
+				[ 'strict', 'lax' ].includes( arg )
+			)
+	);
+
+	return minimist( args, { boolean: [ 'fix', 'require-pragma' ] } )._;
+};
 
 const getNodeArgsFromCLI = () => {
 	const args = getArgsFromCLI();
@@ -38,14 +43,12 @@ const hasFileArgInCLI = () => getFileArgsFromCLI().length > 0;
 
 const handleSignal = ( signal ) => {
 	if ( signal === 'SIGKILL' ) {
-		// eslint-disable-next-line no-console
 		console.log(
 			'The script failed because the process exited too early. ' +
 				'This probably means the system ran out of memory or someone called ' +
 				'`kill -9` on the process.'
 		);
 	} else if ( signal === 'SIGTERM' ) {
-		// eslint-disable-next-line no-console
 		console.log(
 			'The script failed because the process exited too early. ' +
 				'Someone might have called `kill` or `killall`, or the system could ' +
@@ -57,13 +60,11 @@ const handleSignal = ( signal ) => {
 
 const spawnScript = ( scriptName, args = [], nodeArgs = [] ) => {
 	if ( ! scriptName ) {
-		// eslint-disable-next-line no-console
 		console.log( 'Script name is missing.' );
 		exit( 1 );
 	}
 
 	if ( ! hasScriptFile( scriptName ) ) {
-		// eslint-disable-next-line no-console
 		console.log(
 			'Unknown script "' +
 				scriptName +

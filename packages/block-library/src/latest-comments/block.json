@@ -22,13 +22,24 @@
 			"type": "boolean",
 			"default": true
 		},
-		"displayExcerpt": {
-			"type": "boolean",
-			"default": true
+		"displayContent": {
+			"type": "string",
+			"default": "excerpt",
+			"enum": [ "none", "excerpt", "full" ]
 		}
 	},
 	"supports": {
+		"anchor": true,
 		"align": true,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true,
+				"gradient": true
+			}
+		},
 		"color": {
 			"gradients": true,
 			"link": true,
@@ -38,11 +49,16 @@
 				"link": true
 			}
 		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
+		},
 		"html": false,
 		"spacing": {
 			"margin": true,
 			"padding": true
 		},
+		"shadow": true,
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
@@ -72,6 +88,5 @@
 			}
 		}
 	},
-	"editorStyle": "wp-block-latest-comments-editor",
 	"style": "wp-block-latest-comments"
 }

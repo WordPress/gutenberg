@@ -65,9 +65,22 @@
 	"supports": {
 		"anchor": true,
 		"align": true,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true,
+				"gradient": true
+			}
+		},
 		"spacing": {
 			"margin": true,
 			"padding": true
+		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
 		},
 		"color": {
 			"gradients": true,
@@ -90,6 +103,7 @@
 				"style": true
 			}
 		},
+		"shadow": true,
 		"interactivity": true
 	},
 	"editorStyle": "wp-block-file-editor",

@@ -1,7 +1,6 @@
-'use strict';
-/**
- * Internal dependencies
- */
+import { createRequire } from 'node:module';
+import { describe, expect, it } from 'vitest';
+const require = createRequire( import.meta.url );
 const {
 	ValidationError,
 	checkString,
@@ -9,6 +8,7 @@ const {
 	checkStringArray,
 	checkObjectWithValues,
 	checkVersion,
+	checkMariaDBVersion,
 	checkValidURL,
 } = require( '../validate-config' );
 
@@ -286,6 +286,27 @@ describe( 'validate-config', () => {
 			);
 		} );
 
+		it.each( [
+			'abc8',
+			'8.2-apache',
+			'8.5-fpm',
+			'php8.2',
+			'8.x',
+			'8.2 ',
+			'',
+		] )(
+			'throws for a value that is not only a version number: %j',
+			( version ) => {
+				expect( () =>
+					checkVersion( 'test.json', 'test', version )
+				).toThrow(
+					new ValidationError(
+						'Invalid test.json: "test" must be a string of the format "X", "X.X", or "X.X.X".'
+					)
+				);
+			}
+		);
+
 		it( 'passes for different version formats', () => {
 			expect( () =>
 				checkVersion( 'test.json', 'test', '1' )
@@ -305,8 +326,42 @@ describe( 'validate-config', () => {
 		} );
 	} );
 
+	describe( 'checkMariaDBVersion', () => {
+		it( 'throws for non-string', () => {
+			expect( () =>
+				checkMariaDBVersion( 'test.json', 'test', 10.11 )
+			).toThrow(
+				new ValidationError(
+					'Invalid test.json: "test" must be a string.'
+				)
+			);
+		} );
+
+		it.each( [ 'LTS', 'Latest', '11-noble', 'lts-10', '10.x', '' ] )(
+			'throws for invalid value %j',
+			( version ) => {
+				expect( () =>
+					checkMariaDBVersion( 'test.json', 'test', version )
+				).toThrow(
+					new ValidationError(
+						'Invalid test.json: "test" must be "lts", "latest", or a version such as "10.11" or "11.4.2".'
+					)
+				);
+			}
+		);
+
+		it.each( [ 'lts', 'latest', '5', '10', '10.11', '10.3.39', '11.4.2' ] )(
+			'passes for %j',
+			( version ) => {
+				expect( () =>
+					checkMariaDBVersion( 'test.json', 'test', version )
+				).not.toThrow();
+			}
+		);
+	} );
+
 	describe( 'checkValidURL', () => {
-		it( 'throws for invaid URLs', () => {
+		it( 'throws for invalid URLs', () => {
 			expect( () =>
 				checkValidURL( 'test.json', 'test', 'localhost' )
 			).toThrow(
@@ -330,10 +385,10 @@ describe( 'validate-config', () => {
 
 		it( 'passes for valid URLs', () => {
 			expect( () =>
-				checkValidURL( 'test.json', 'test', 'http://test.com' )
+				checkValidURL( 'test.json', 'test', 'http://example.com' )
 			).not.toThrow();
 			expect( () =>
-				checkValidURL( 'test.json', 'test', 'https://test.com' )
+				checkValidURL( 'test.json', 'test', 'https://example.com' )
 			).not.toThrow();
 			expect( () =>
 				checkValidURL( 'test.json', 'test', 'http://test' )
@@ -346,16 +401,13 @@ describe( 'validate-config', () => {
 				)
 			).not.toThrow();
 			expect( () =>
-				checkValidURL( 'test.json', 'test', 'http://test.co.uk' )
-			).not.toThrow();
-			expect( () =>
-				checkValidURL( 'test.json', 'test', 'https://test.co.uk:8888' )
+				checkValidURL( 'test.json', 'test', 'https://example.org:8888' )
 			).not.toThrow();
 			expect( () =>
 				checkValidURL(
 					'test.json',
 					'test',
-					'http://test.co.uk:8888/test?test=test#test'
+					'http://example.org:8888/test?test=test#test'
 				)
 			).not.toThrow();
 		} );

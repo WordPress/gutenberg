@@ -1,4 +1,3 @@
-/* eslint-disable jsdoc/valid-types */
 /**
  * Determines if a value is null or undefined.
  *
@@ -10,9 +9,7 @@
 export function isValueDefined( value ) {
 	return value !== undefined && value !== null;
 }
-/* eslint-enable jsdoc/valid-types */
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Determines if a value is empty, null, or undefined.
  *
@@ -24,7 +21,6 @@ export function isValueEmpty( value ) {
 
 	return ! isValueDefined( value ) || isEmptyString;
 }
-/* eslint-enable jsdoc/valid-types */
 
 /**
  * Get the first defined/non-null value from an array.

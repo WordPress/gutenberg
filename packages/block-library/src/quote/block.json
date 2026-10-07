@@ -33,8 +33,10 @@
 		"background": {
 			"backgroundImage": true,
 			"backgroundSize": true,
+			"gradient": true,
 			"__experimentalDefaultControls": {
-				"backgroundImage": true
+				"backgroundImage": true,
+				"gradient": true
 			}
 		},
 		"__experimentalBorder": {
@@ -51,6 +53,7 @@
 		},
 		"dimensions": {
 			"minHeight": true,
+			"minWidth": true,
 			"__experimentalDefaultControls": {
 				"minHeight": false
 			}
@@ -74,11 +77,13 @@
 			"gradients": true,
 			"heading": true,
 			"link": true,
+			"button": true,
 			"__experimentalDefaultControls": {
 				"background": true,
 				"text": true
 			}
 		},
+		"shadow": true,
 		"layout": {
 			"allowEditing": false
 		},
@@ -89,7 +94,8 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
-		}
+		},
+		"allowedBlocks": true
 	},
 	"styles": [
 		{

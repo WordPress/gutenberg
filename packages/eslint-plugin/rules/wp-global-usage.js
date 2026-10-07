@@ -25,7 +25,7 @@ function isUsedInConditional( node ) {
 	/** @type {import('estree').Node|undefined} */
 	let current = node;
 
-	// Simple negation is the only expresion allowed in the conditional:
+	// Simple negation is the only expression allowed in the conditional:
 	// if ( ! globalThis.SCRIPT_DEBUG ) {}
 	// const D = ! globalThis.SCRIPT_DEBUG ? 'yes' : 'no';
 	if (

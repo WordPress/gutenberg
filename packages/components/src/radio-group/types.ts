@@ -29,6 +29,13 @@ export type RadioGroupProps = {
 
 export type RadioProps = {
 	/**
+	 * Start opting into the larger default height that will become the default size in a future version.
+	 *
+	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+	 * @ignore
+	 */
+	__next40pxDefaultSize?: boolean;
+	/**
 	 * The actual value of the radio element.
 	 */
 	value: string | number;

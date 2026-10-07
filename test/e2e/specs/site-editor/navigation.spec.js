@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -18,7 +15,11 @@ test.describe( 'Site editor navigation', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'Can use keyboard to navigate the site editor', async ( {
+	// The extensible site editor has its own navigation shell (sidebar links
+	// without the drilldown frames, Saved button, or focusable view-mode
+	// iframe this test drives), so this scenario only applies to the classic
+	// site editor.
+	test( 'Can use keyboard to navigate the site editor @site-editor-v1-only', async ( {
 		admin,
 		editorNavigationUtils,
 		page,
@@ -45,20 +46,23 @@ test.describe( 'Site editor navigation', () => {
 			page.getByRole( 'button', { name: 'Pages' } )
 		).toBeFocused();
 
-		// Navigate to the Saved button first, as it precedes the editor iframe.
-		await editorNavigationUtils.tabToLabel( 'Saved' );
-		const savedButton = page.getByRole( 'button', {
-			name: 'Saved',
-		} );
-		await expect( savedButton ).toBeFocused();
-
 		// Get the iframe when it has a role=button and Edit label.
 		const editorCanvasRegion = page.getByRole( 'region', {
 			name: 'Editor content',
 		} );
 		const editorCanvasButton = editorCanvasRegion.getByRole( 'button', {
 			name: 'Edit',
+			exact: true,
 		} );
+
+		await expect( editorCanvasButton ).toBeVisible();
+
+		// Navigate to the Saved button first, as it precedes the editor iframe.
+		await editorNavigationUtils.tabToLabel( 'Saved' );
+		const savedButton = page.getByRole( 'button', {
+			name: 'Saved',
+		} );
+		await expect( savedButton ).toBeFocused();
 
 		// Test that there are no tab stops between the Saved button and the
 		// focusable iframe with role=button.
@@ -104,6 +108,23 @@ test.describe( 'Site editor navigation', () => {
 		// We should have our editor canvas button back
 		await expect( editorCanvasButton ).toBeVisible();
 	} );
+
+	test( 'Should show 404 page when navigating to non-existent template', async ( {
+		admin,
+		page,
+	} ) => {
+		// Navigate to a non-existent template.
+		await admin.visitAdminPage( 'site-editor.php', 'p=/template-foo-bar' );
+
+		// Verify the 404 error notice is displayed with the correct message.
+		await expect(
+			page.locator(
+				'.edit-site-layout__area .components-notice__content'
+			)
+		).toHaveText(
+			'The requested page could not be found. Please check the URL.'
+		);
+	} );
 } );
 
 class EditorNavigationUtils {
@@ -112,7 +133,7 @@ class EditorNavigationUtils {
 		this.pageUtils = pageUtils;
 	}
 
-	async tabToLabel( label, times = 10 ) {
+	async tabToLabel( label, times = 20 ) {
 		for ( let i = 0; i < times; i++ ) {
 			await this.pageUtils.pressKeys( 'Tab' );
 			const activeLabel = await this.page.evaluate( () => {

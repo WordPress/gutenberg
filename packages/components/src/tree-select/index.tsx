@@ -1,24 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import { SelectControl } from '../select-control';
 import type { TreeSelectProps, Tree, Truthy } from './types';
-import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
-import { ContextSystemProvider } from '../context';
-
-const CONTEXT_VALUE = {
-	BaseControl: {
-		// Temporary during deprecation grace period: Overrides the underlying `__associatedWPComponentName`
-		// via the context system to override the value set by SelectControl.
-		_overrides: { __associatedWPComponentName: 'TreeSelect' },
-	},
-};
 
 function getSelectOptions(
 	tree: Tree[],
@@ -35,18 +18,17 @@ function getSelectOptions(
 }
 
 /**
- * TreeSelect component is used to generate select input fields.
+ * Generates a hierarchical select input.
  *
  * ```jsx
+ * import { useState } from 'react';
  * import { TreeSelect } from '@wordpress/components';
- * import { useState } from '@wordpress/element';
  *
  * const MyTreeSelect = () => {
  * 	const [ page, setPage ] = useState( 'p21' );
  *
  * 	return (
  * 		<TreeSelect
- * 			__nextHasNoMarginBottom
  * 			label="Parent page"
  * 			noOptionLabel="No parent page"
  * 			onChange={ ( newPage ) => setPage( newPage ) }
@@ -84,13 +66,16 @@ function getSelectOptions(
  */
 export function TreeSelect( props: TreeSelectProps ) {
 	const {
+		// Prevent passing legacy props to internal component.
+		__nextHasNoMarginBottom: _,
+		__next40pxDefaultSize: _next40pxDefaultSize,
 		label,
 		noOptionLabel,
 		onChange,
 		selectedId,
 		tree = [],
 		...restProps
-	} = useDeprecated36pxDefaultSizeProp( props );
+	} = props;
 
 	const options = useMemo( () => {
 		return [
@@ -100,13 +85,11 @@ export function TreeSelect( props: TreeSelectProps ) {
 	}, [ noOptionLabel, tree ] );
 
 	return (
-		<ContextSystemProvider value={ CONTEXT_VALUE }>
-			<SelectControl
-				{ ...{ label, options, onChange } }
-				value={ selectedId }
-				{ ...restProps }
-			/>
-		</ContextSystemProvider>
+		<SelectControl
+			{ ...{ label, options, onChange } }
+			value={ selectedId }
+			{ ...restProps }
+		/>
 	);
 }
 

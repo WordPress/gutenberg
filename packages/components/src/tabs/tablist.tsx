@@ -1,92 +1,102 @@
-/**
- * External dependencies
- */
-import * as Ariakit from '@ariakit/react';
 import { useStoreState } from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
+import clsx from 'clsx';
 import warning from '@wordpress/warning';
 import { forwardRef, useLayoutEffect, useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
+import type { TabListProps } from './types';
+import type { WordPressComponentProps } from '../context';
+import type { ElementOffsetRect } from '../utils/element-rect';
+import { useTabsContext } from './context';
+import { StyledTabList } from './styles';
+import { useTrackElementOffsetRect } from '../utils/element-rect';
+import { useTrackOverflow } from './use-track-overflow';
+import { useAnimatedOffsetRect } from '../utils/hooks/use-animated-offset-rect';
+
+const DEFAULT_SCROLL_MARGIN = 24;
 
 /**
- * Internal dependencies
+ * Scrolls a given parent element so that a given rect is visible.
+ *
+ * The scroll is updated initially and whenever the rect changes.
  */
-import type { TabListProps } from './types';
-import { useTabsContext } from './context';
-import { TabListWrapper } from './styles';
-import type { WordPressComponentProps } from '../context';
-import clsx from 'clsx';
-import { useTrackElementOffsetRect } from '../utils/element-rect';
-import { useOnValueUpdate } from '../utils/hooks/use-on-value-update';
-import { useTrackOverflow } from './use-track-overflow';
-
-const SCROLL_MARGIN = 24;
-
-export const TabList = forwardRef<
-	HTMLDivElement,
-	WordPressComponentProps< TabListProps, 'div', false >
->( function TabList( { children, ...otherProps }, ref ) {
-	const { store } = useTabsContext() ?? {};
-
-	const selectedId = useStoreState( store, 'selectedId' );
-	const activeId = useStoreState( store, 'activeId' );
-	const selectOnMove = useStoreState( store, 'selectOnMove' );
-	const items = useStoreState( store, 'items' );
-	const [ parent, setParent ] = useState< HTMLElement | null >();
-	const refs = useMergeRefs( [ ref, setParent ] );
-	const overflow = useTrackOverflow( parent, {
-		first: items?.at( 0 )?.element,
-		last: items?.at( -1 )?.element,
-	} );
-
-	const selectedTabPosition = useTrackElementOffsetRect(
-		store?.item( selectedId )?.element
-	);
-
-	const [ animationEnabled, setAnimationEnabled ] = useState( false );
-	useOnValueUpdate( selectedId, ( { previousValue } ) => {
-		if ( previousValue ) {
-			setAnimationEnabled( true );
-		}
-	} );
-
-	// Make sure selected tab is scrolled into view.
+function useScrollRectIntoView(
+	parent: HTMLElement | undefined,
+	rect: ElementOffsetRect,
+	{ margin = DEFAULT_SCROLL_MARGIN } = {}
+) {
 	useLayoutEffect( () => {
-		if ( ! parent || ! selectedTabPosition ) {
+		if ( ! parent || ! rect ) {
 			return;
 		}
 
 		const { scrollLeft: parentScroll } = parent;
 		const parentWidth = parent.getBoundingClientRect().width;
-		const { left: childLeft, width: childWidth } = selectedTabPosition;
+		const { left: childLeft, width: childWidth } = rect;
 
 		const parentRightEdge = parentScroll + parentWidth;
 		const childRightEdge = childLeft + childWidth;
-		const rightOverflow = childRightEdge + SCROLL_MARGIN - parentRightEdge;
-		const leftOverflow = parentScroll - ( childLeft - SCROLL_MARGIN );
+		const rightOverflow = childRightEdge + margin - parentRightEdge;
+		const leftOverflow = parentScroll - ( childLeft - margin );
+
+		let scrollLeft = null;
 		if ( leftOverflow > 0 ) {
-			parent.scrollLeft = parentScroll - leftOverflow;
+			scrollLeft = parentScroll - leftOverflow;
 		} else if ( rightOverflow > 0 ) {
-			parent.scrollLeft = parentScroll + rightOverflow;
-		}
-	}, [ parent, selectedTabPosition ] );
-
-	const onBlur = () => {
-		if ( ! selectOnMove ) {
-			return;
+			scrollLeft = parentScroll + rightOverflow;
 		}
 
-		// When automatic tab selection is on, make sure that the active tab is up
-		// to date with the selected tab when leaving the tablist. This makes sure
-		// that the selected tab will receive keyboard focus when tabbing back into
-		// the tablist.
-		if ( selectedId !== activeId ) {
-			store?.setActiveId( selectedId );
+		if ( scrollLeft !== null ) {
+			/**
+			 * The optional chaining is used here to avoid unit test failures.
+			 * It can be removed when JSDOM supports `Element` scroll methods.
+			 * See: https://github.com/WordPress/gutenberg/pull/66498#issuecomment-2441146096
+			 */
+			parent.scroll?.( { left: scrollLeft } );
 		}
-	};
+	}, [ margin, parent, rect ] );
+}
+
+export const TabList = forwardRef<
+	HTMLDivElement,
+	WordPressComponentProps< TabListProps, 'div', false >
+>( function UnforwardedTabList( { children, ...otherProps }, ref ) {
+	const { store } = useTabsContext() ?? {};
+
+	const selectedId = useStoreState( store, 'selectedId' );
+	const selectOnMove = useStoreState( store, 'selectOnMove' );
+	const items = useStoreState( store, 'items' );
+	const [ parent, setParent ] = useState< HTMLElement >();
+	const refs = useMergeRefs( [ ref, setParent ] );
+
+	const selectedItem = store?.item( selectedId );
+	const renderedItems = useStoreState( store, 'renderedItems' );
+
+	const selectedItemIndex =
+		renderedItems && selectedItem
+			? renderedItems.indexOf( selectedItem )
+			: -1;
+	// Use selectedItemIndex as a dependency to force recalculation when the
+	// selected item index changes (elements are swapped / added / removed).
+	const selectedRect = useTrackElementOffsetRect( selectedItem?.element, [
+		selectedItemIndex,
+	] );
+
+	// Track overflow to show scroll hints.
+	const overflow = useTrackOverflow( parent, {
+		first: items?.at( 0 )?.element,
+		last: items?.at( -1 )?.element,
+	} );
+
+	// Size, position, and animate the indicator.
+	useAnimatedOffsetRect( parent, selectedRect, {
+		prefix: 'selected',
+		dataAttribute: 'indicator-animated',
+		transitionEndFilter: ( event ) => event.pseudoElement === '::before',
+		roundRect: true,
+	} );
+
+	// Make sure selected tab is scrolled into view.
+	useScrollRectIntoView( parent, selectedRect );
 
 	if ( ! store ) {
 		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
@@ -94,37 +104,26 @@ export const TabList = forwardRef<
 	}
 
 	return (
-		<Ariakit.TabList
+		<StyledTabList
 			ref={ refs }
 			store={ store }
-			render={
-				<TabListWrapper
-					onTransitionEnd={ ( event ) => {
-						if ( event.pseudoElement === '::before' ) {
-							setAnimationEnabled( false );
-						}
-					} }
+			render={ ( props ) => (
+				<div
+					{ ...props }
+					// Fallback to -1 to prevent browsers from making the tablist
+					// tabbable when it is a scrolling container.
+					tabIndex={ props.tabIndex ?? -1 }
 				/>
-			}
-			onBlur={ onBlur }
-			tabIndex={ -1 }
+			) }
+			data-select-on-move={ selectOnMove ? 'true' : 'false' }
 			{ ...otherProps }
-			style={ {
-				'--indicator-top': selectedTabPosition.top,
-				'--indicator-right': selectedTabPosition.right,
-				'--indicator-left': selectedTabPosition.left,
-				'--indicator-width': selectedTabPosition.width,
-				'--indicator-height': selectedTabPosition.height,
-				...otherProps.style,
-			} }
 			className={ clsx(
 				overflow.first && 'is-overflowing-first',
 				overflow.last && 'is-overflowing-last',
-				animationEnabled && 'is-animation-enabled',
 				otherProps.className
 			) }
 		>
 			{ children }
-		</Ariakit.TabList>
+		</StyledTabList>
 	);
 } );

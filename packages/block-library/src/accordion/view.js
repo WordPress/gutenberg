@@ -1,0 +1,123 @@
+import { store, getContext } from '@wordpress/interactivity';
+
+// Whether the hash has been handled for the current page load.
+// This is used to prevent the hash from being handled multiple times.
+let hashHandled = false;
+
+const { actions } = store(
+	'core/accordion',
+	{
+		state: {
+			get isOpen() {
+				const { id, accordionItems } = getContext();
+				const accordionItem = accordionItems.find(
+					( item ) => item.id === id
+				);
+				return accordionItem ? accordionItem.isOpen : false;
+			},
+			get isHidden() {
+				const { id, accordionItems } = getContext();
+				const accordionItem = accordionItems.find(
+					( item ) => item.id === id
+				);
+				return accordionItem?.isOpen ? null : 'until-found';
+			},
+		},
+		actions: {
+			toggle: () => {
+				const context = getContext();
+				const { id, autoclose, accordionItems } = context;
+				const accordionItem = accordionItems.find(
+					( item ) => item.id === id
+				);
+
+				if ( autoclose ) {
+					accordionItems.forEach( ( item ) => {
+						item.isOpen =
+							item.id === id ? ! accordionItem.isOpen : false;
+					} );
+				} else {
+					accordionItem.isOpen = ! accordionItem.isOpen;
+				}
+			},
+			openPanelByHash: () => {
+				if ( hashHandled ) {
+					return;
+				}
+
+				const context = getContext();
+				const { id, accordionItems, autoclose } = context;
+				const targetElement = document.querySelector( ':target' );
+
+				if ( ! targetElement ) {
+					return;
+				}
+
+				const panelElement = window.document.querySelector(
+					'.wp-block-accordion-panel[aria-labelledby="' + id + '"]'
+				);
+
+				if (
+					! panelElement ||
+					! panelElement.contains( targetElement )
+				) {
+					return;
+				}
+
+				hashHandled = true;
+
+				if ( autoclose ) {
+					accordionItems.forEach( ( item ) => {
+						item.isOpen = item.id === id;
+					} );
+				} else {
+					const targetItem = accordionItems.find(
+						( item ) => item.id === id
+					);
+
+					if ( targetItem ) {
+						targetItem.isOpen = true;
+					}
+				}
+
+				// Wait for the panel to be opened before scrolling to it.
+				window.setTimeout( () => {
+					targetElement.scrollIntoView();
+				}, 0 );
+			},
+			handleBeforeMatch: () => {
+				const context = getContext();
+				const { id, autoclose, accordionItems } = context;
+				const accordionItem = accordionItems.find(
+					( item ) => item.id === id
+				);
+
+				if ( accordionItem ) {
+					if ( autoclose ) {
+						accordionItems.forEach( ( item ) => {
+							item.isOpen = item.id === id;
+						} );
+					} else {
+						accordionItem.isOpen = true;
+					}
+				}
+			},
+		},
+		callbacks: {
+			initAccordionItems: () => {
+				const context = getContext();
+				const { id, openByDefault, accordionItems } = context;
+				accordionItems.push( {
+					id,
+					isOpen: openByDefault,
+				} );
+				actions.openPanelByHash();
+			},
+			hashChange: () => {
+				hashHandled = false;
+				actions.openPanelByHash();
+			},
+		},
+	},
+	{ lock: true }
+);

@@ -1,8 +1,6 @@
 # Text
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
+<p class="callout callout-alert">This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.</p>
 
 `Text` is a core component that renders text in the library, using the library's typography system.
 
@@ -156,7 +154,7 @@ Adjusts all text line-height based on the typography system.
 
 **Type**: `number`
 
-Clamps the text content to the specifiec `numberOfLines`, adding the `ellipsis` at the end.
+Clamps the text content to the specific `numberOfLines`, adding the `ellipsis` at the end.
 
 ### optimizeReadabilityFor
 
@@ -171,7 +169,7 @@ function Example() {
 	const backgroundColor = 'blue';
 
 	return (
-		<View css={ { backgroundColor } }>
+		<View style={ { backgroundColor } }>
 			<Text optimizeReadabilityFor={ backgroundColor }>
 				Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 			</Text>

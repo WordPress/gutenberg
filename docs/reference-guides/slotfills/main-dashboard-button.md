@@ -33,7 +33,7 @@ registerPlugin( 'main-dashboard-button-test', {
 
 ### Change the icon and link
 
-This example will change the icon in the header to indicate an external link that will take the user to http://wordpress.org when clicked.
+This example will change the icon in the header to indicate an external link that will take the user to https://wordpress.org when clicked.
 
 ```js
 import { registerPlugin } from '@wordpress/plugins';
@@ -45,7 +45,7 @@ import { external } from '@wordpress/icons';
 
 const MainDashboardButtonIconTest = () => (
 	<MainDashboardButton>
-		<FullscreenModeClose icon={ external } href="http://wordpress.org" />
+		<FullscreenModeClose icon={ external } href="https://wordpress.org" />
 	</MainDashboardButton>
 );
 
@@ -54,4 +54,4 @@ registerPlugin( 'main-dashboard-button-icon-test', {
 } );
 ```
 
-![The edit post screen in fullscreen mode displaying an external link icon instead of the default W](https://developer.wordpress.org/files/2024/08/main-dashboard-button-external-link-example.png 'Change the icon in the header to indicate an external link that will take the user to http://wordpress.org when clicked')
+![The edit post screen in fullscreen mode displaying an external link icon instead of the default W](https://developer.wordpress.org/files/2024/08/main-dashboard-button-external-link-example.png 'Change the icon in the header to indicate an external link that will take the user to https://wordpress.org when clicked')

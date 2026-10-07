@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Disabled from '../';
 import SelectControl from '../../select-control/';
 import TextControl from '../../text-control/';
@@ -18,17 +7,23 @@ import TextareaControl from '../../textarea-control/';
 import { VStack } from '../../v-stack/';
 
 const meta: Meta< typeof Disabled > = {
-	title: 'Components/Disabled',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-components/Utilities/Disabled',
+	id: 'components-disabled',
 	component: Disabled,
 	argTypes: {
-		as: { control: { type: null } },
-		children: { control: { type: null } },
+		as: { control: false },
+		children: { control: false },
 	},
 	parameters: {
 		controls: {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 
@@ -40,19 +35,16 @@ const Form = () => {
 	return (
 		<VStack>
 			<TextControl
-				__nextHasNoMarginBottom
 				label="Text Control"
 				value={ textControlValue }
 				onChange={ setTextControlValue }
 			/>
 			<TextareaControl
-				__nextHasNoMarginBottom
 				label="TextArea Control"
 				value={ textAreaValue }
 				onChange={ setTextAreaValue }
 			/>
 			<SelectControl
-				__nextHasNoMarginBottom
 				label="Select Control"
 				onChange={ () => {} }
 				options={ [
@@ -80,7 +72,7 @@ Default.args = {
 export const ContentEditable: StoryFn< typeof Disabled > = ( args ) => {
 	return (
 		<Disabled { ...args }>
-			<div contentEditable tabIndex={ 0 }>
+			<div contentEditable tabIndex={ 0 } suppressContentEditableWarning>
 				contentEditable
 			</div>
 		</Disabled>

@@ -1,21 +1,15 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { View } from '../../view';
 import { Grid } from '..';
 
 const meta: Meta< typeof Grid > = {
 	component: Grid,
-	title: 'Components (Experimental)/Grid',
+	id: 'components-grid',
+	title: 'Components/@wordpress-components/Grid',
 	argTypes: {
 		as: { control: { type: 'text' } },
 		align: { control: { type: 'text' } },
-		children: { control: { type: null } },
+		children: { control: false },
 		columnGap: { control: { type: 'text' } },
 		columns: {
 			table: { type: { summary: 'number' } },
@@ -30,11 +24,17 @@ const meta: Meta< typeof Grid > = {
 		templateColumns: { control: { type: 'text' } },
 		templateRows: { control: { type: 'text' } },
 	},
+	tags: [ 'status-experimental' ],
 	parameters: {
 		controls: {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Planned for deprecation. Write your own CSS instead.',
+		},
 	},
 };
 export default meta;

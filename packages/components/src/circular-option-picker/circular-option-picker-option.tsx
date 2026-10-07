@@ -1,23 +1,11 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef, useContext, useEffect } from '@wordpress/element';
 import { Icon, check } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { CircularOptionPickerContext } from './circular-option-picker-context';
 import Button from '../button';
 import { Composite } from '../composite';
-import Tooltip from '../tooltip';
 import type { OptionProps } from './types';
 
 function UnforwardedOptionAsButton(
@@ -25,15 +13,18 @@ function UnforwardedOptionAsButton(
 		id?: string;
 		className?: string;
 		isPressed?: boolean;
+		label?: string;
 	},
 	forwardedRef: ForwardedRef< any >
 ) {
-	const { isPressed, ...additionalProps } = props;
+	const { isPressed, label, ...additionalProps } = props;
 	return (
 		<Button
+			__next40pxDefaultSize
 			{ ...additionalProps }
 			aria-pressed={ isPressed }
 			ref={ forwardedRef }
+			label={ label }
 		/>
 	);
 }
@@ -45,10 +36,11 @@ function UnforwardedOptionAsOption(
 		id: string;
 		className?: string;
 		isSelected?: boolean;
+		label?: string;
 	},
 	forwardedRef: ForwardedRef< any >
 ) {
-	const { id, isSelected, ...additionalProps } = props;
+	const { id, isSelected, label, ...additionalProps } = props;
 
 	const { setActiveId, activeId } = useContext( CircularOptionPickerContext );
 
@@ -65,10 +57,12 @@ function UnforwardedOptionAsOption(
 		<Composite.Item
 			render={
 				<Button
+					__next40pxDefaultSize
 					{ ...additionalProps }
 					role="option"
 					aria-selected={ !! isSelected }
 					ref={ forwardedRef }
+					label={ label }
 				/>
 			}
 			id={ id }
@@ -85,7 +79,11 @@ export function Option( {
 	tooltipText,
 	...additionalProps
 }: OptionProps ) {
-	const { baseId, setActiveId } = useContext( CircularOptionPickerContext );
+	// Preserve the historical toggle-button fallback when this public
+	// subcomponent is rendered without a parent picker.
+	const { baseId, presentation = 'toggle-buttons' } = useContext(
+		CircularOptionPickerContext
+	);
 	const id = useInstanceId(
 		Option,
 		baseId || 'components-circular-option-picker__option'
@@ -97,12 +95,24 @@ export function Option( {
 		...additionalProps,
 	};
 
-	const isListbox = setActiveId !== undefined;
-	const optionControl = isListbox ? (
-		<OptionAsOption { ...commonProps } isSelected={ isSelected } />
-	) : (
-		<OptionAsButton { ...commonProps } isPressed={ isSelected } />
-	);
+	const optionControl =
+		presentation === 'listbox' ? (
+			<OptionAsOption
+				{ ...commonProps }
+				label={ tooltipText }
+				isSelected={ isSelected }
+			/>
+		) : (
+			<OptionAsButton
+				{ ...commonProps }
+				label={ tooltipText }
+				isPressed={
+					presentation === 'toggle-buttons'
+						? !! isSelected
+						: undefined
+				}
+			/>
+		);
 
 	return (
 		<div
@@ -111,12 +121,10 @@ export function Option( {
 				'components-circular-option-picker__option-wrapper'
 			) }
 		>
-			{ tooltipText ? (
-				<Tooltip text={ tooltipText }>{ optionControl }</Tooltip>
-			) : (
-				optionControl
+			{ optionControl }
+			{ presentation !== 'command-buttons' && isSelected && (
+				<Icon icon={ check } { ...selectedIconProps } />
 			) }
-			{ isSelected && <Icon icon={ check } { ...selectedIconProps } /> }
 		</div>
 	);
 }

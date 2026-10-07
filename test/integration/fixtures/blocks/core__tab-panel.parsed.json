@@ -1,0 +1,23 @@
+[
+	{
+		"blockName": "core/tab-panel",
+		"attrs": {
+			"label": "Tab 1"
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/paragraph",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n<p>Panel 1</p>\n",
+				"innerContent": [ "\n<p>Panel 1</p>\n" ]
+			}
+		],
+		"innerHTML": "\n<section role=\"tabpanel\" tabindex=\"0\" class=\"wp-block-tab-panel\"></section>\n",
+		"innerContent": [
+			"\n<section role=\"tabpanel\" tabindex=\"0\" class=\"wp-block-tab-panel\">",
+			null,
+			"</section>\n"
+		]
+	}
+]

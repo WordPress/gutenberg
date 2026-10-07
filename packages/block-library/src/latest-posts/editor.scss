@@ -18,14 +18,3 @@
 		padding-left: 0;
 	}
 }
-
-// Apply the same styles that would be applied to
-// ".block-editor-block-inspector .components-base-control"
-// (see packages/block-editor/src/components/block-inspector/style.scss)
-.wp-block-latest-posts__post-content-radio {
-	margin-bottom: #{ $grid-unit-30 };
-
-	&:last-child {
-		margin-bottom: $grid-unit-10;
-	}
-}

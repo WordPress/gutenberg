@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { Props as IconProps } from '../icon';
 import type { PopoverProps } from '../popover/types';
 import type { WordPressComponentProps } from '../context/wordpress-component';
@@ -111,11 +104,13 @@ type BaseButtonProps = {
 	tooltipPosition?: PopoverProps[ 'position' ];
 	/**
 	 * Specifies the button's style.
+	 *
 	 * The accepted values are:
-	 * 'primary' (the primary button styles)
-	 * 'secondary' (the default button styles)
-	 * 'tertiary' (the text-based button styles)
-	 * 'link' (the link button styles)
+	 *
+	 * 1. `'primary'` (the primary button styles)
+	 * 2. `'secondary'` (the default button styles)
+	 * 3. `'tertiary'` (the text-based button styles)
+	 * 4. `'link'` (the link button styles)
 	 */
 	variant?: 'primary' | 'secondary' | 'tertiary' | 'link';
 };

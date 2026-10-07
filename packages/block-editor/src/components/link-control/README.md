@@ -50,7 +50,7 @@ Consumers who which to take advantage of this functionality should ensure that t
 When creating links the `LinkControl` component will handle two kinds of input from users:
 
 1. Entity searches - the user may input free-text based search queries for entities retrieved from remote data sources (in the context of WordPress these are post-type entities). For example, a user might search for a `Page` they have just created by name (eg: About) and the UI will return a matching result if found.
-2. Direct entry - the user may also enter any arbitrary URL-like text. This includes full URLs (https://), URL fragements (eg: `#myinternallink`), `tel` protocol links (eg: `tel: 0800 1234`) and `mailto` protocol links (eg: `mailto: hello@wordpress.org`).
+2. Direct entry - the user may also enter any arbitrary URL-like text. This includes full URLs (https://), URL fragments (eg: `#myinternallink`), `tel` protocol links (eg: `tel: 0800 1234`) and `mailto` protocol links (eg: `mailto: hello@wordpress.org`).
 
 In addition, `<LinkControl>` also allows for on the fly creation of links based on the **current content of the `<input>` element**. When enabled, a default "Create new" search suggestion is appended to all non-URL-like search results.
 
@@ -79,7 +79,7 @@ The resulting default properties of `value` include:
 -   `title` (`string`, optional): Link title.
 -   `opensInNewTab` (`boolean`, optional): Whether link should open in a new browser tab. This value is only assigned when not providing a custom `settings` prop.
 
-Note: `<LinkControl>` maintains an internal state tracking temporary user edits to the link `value` prior to submission. To avoid unwanted synchronization of this internal value, it is advised that the `value` prop is stablized (likely via memozation) before it is passed to the component. This will avoid unwanted loss of any changes users have may made whilst interacting with the control.
+Note: `<LinkControl>` maintains an internal state tracking temporary user edits to the link `value` prior to submission. To avoid unwanted synchronization of this internal value, it is advised that the `value` prop is stabilized (likely via memozation) before it is passed to the component. This will avoid unwanted loss of any changes users have may made whilst interacting with the control.
 
 ```jsx
 const memoizedValue = useMemo(
@@ -170,6 +170,84 @@ Controls the query parameters used to search for suggestions. For example, to li
 		subtype: 'page',
 	} }
 />
+```
+
+### transformSuggestions
+
+-   Type: `Function`
+-   Required: No
+
+Changes the search suggestions before they are shown. It can filter them, reorder them, or add new ones.
+
+It is called with the suggestions and an object with two properties:
+
+-   `searchTerm`: what the user typed.
+-   `isInitialSuggestions`: `true` for the suggestions shown before anything is typed.
+
+Return the suggestions to show, as an array or a Promise that resolves to one. It is not called when the user types a URL.
+
+Each suggestion is an object. These are the properties `LinkControl` reads:
+
+-   `id` (`string|number`): identifies the suggestion, together with its `type`. A suggestion without one is treated as a typed URL, and its `url` must be valid.
+-   `title` (`string`): the text shown for the suggestion.
+-   `type` (`string`): what kind of result it is, such as `page` or `post`. It is shown beside the title, unless `typeLabel` is set.
+-   `url` (`string`, optional): shown under the title, and used as the link's URL when the suggestion is chosen.
+-   `typeLabel` (`string`, optional): the label shown beside the title, in place of `type`.
+-   `icon` (`Element`, optional): the icon shown before the title, such as one from `@wordpress/icons`. Without it, a known `type` shows its own icon.
+
+Choosing a suggestion calls `onChange` with it, including any properties of your own. To act on a suggestion that is not a link, give it a property only your suggestions have and check for that in `onChange`. Don't rely on `type` alone: a site can register a post type with the same name, and its results will arrive with that `type`.
+
+Leave out media results:
+
+```jsx
+<LinkControl
+	transformSuggestions={ ( suggestions ) =>
+		suggestions.filter( ( suggestion ) => suggestion.kind !== 'media' )
+	}
+/>
+```
+
+Add a suggestion that runs an action instead of setting a link:
+
+```jsx
+import { __ } from '@wordpress/i18n';
+import { plus } from '@wordpress/icons';
+
+function MyLinkControl( { link, setLink, openNewPageForm } ) {
+	return (
+		<LinkControl
+			value={ link }
+			transformSuggestions={ (
+				suggestions,
+				{ searchTerm, isInitialSuggestions }
+			) => {
+				if ( isInitialSuggestions ) {
+					return suggestions;
+				}
+
+				return [
+					...suggestions,
+					{
+						id: 'new-page',
+						type: 'action',
+						title: searchTerm,
+						typeLabel: __( 'New page' ),
+						icon: plus,
+						isNewPageAction: true,
+					},
+				];
+			} }
+			onChange={ ( nextValue ) => {
+				if ( nextValue.isNewPageAction ) {
+					openNewPageForm( nextValue.title );
+					return;
+				}
+
+				setLink( nextValue );
+			} }
+		/>
+	);
+}
 ```
 
 ### forceIsEditingLink
@@ -275,14 +353,14 @@ If passed, children are rendered after the input.
 
 ```jsx
 <LinkControlSearchInput>
-	<HStack justify="right">
+	<Stack justify="flex-end">
 		<Button
 			type="submit"
 			label={ __( 'Submit' ) }
 			icon={ keyboardReturn }
 			className="block-editor-link-control__search-submit"
 		/>
-	</HStack>
+	</Stack>
 </LinkControlSearchInput>
 ```
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Editing modes (visual/HTML)', () => {
@@ -115,7 +112,7 @@ test.describe( 'Editing modes (visual/HTML)', () => {
 		await expect(
 			page
 				.getByRole( 'toolbar', { name: 'Document tools' } )
-				.getByRole( 'button', { name: 'Toggle block inserter' } )
+				.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 		).toBeDisabled();
 
 		// Go back to the visual editor.

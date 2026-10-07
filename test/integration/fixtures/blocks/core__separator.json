@@ -3,7 +3,8 @@
 		"name": "core/separator",
 		"isValid": true,
 		"attributes": {
-			"opacity": "alpha-channel"
+			"opacity": "alpha-channel",
+			"tagName": "hr"
 		},
 		"innerBlocks": []
 	}

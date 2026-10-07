@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { external } from '@wordpress/icons';
 import { _x } from '@wordpress/i18n';
 import type { Action } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import type { BasePost } from '../types';
 
 const viewPost: Action< BasePost > = {
@@ -27,4 +20,7 @@ const viewPost: Action< BasePost > = {
 	},
 };
 
+/**
+ * View post action for BasePost.
+ */
 export default viewPost;

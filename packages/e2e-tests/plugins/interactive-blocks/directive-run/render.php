@@ -16,8 +16,8 @@
 	<div data-testid="navigated">no</div>
 
 	<div
-		data-wp-run--hydrated="callbacks.updateIsHydrated"
-		data-wp-run--renderCount="callbacks.updateRenderCount"
+		data-wp-run---hydrated="callbacks.updateIsHydrated"
+		data-wp-run---renderCount="callbacks.updateRenderCount"
 		data-wp-text="state.clickCount"
 	></div>
 </div>
@@ -43,8 +43,8 @@
 		data-watch=""
 	>
 		<div
-			data-wp-run--mounted="callbacks.updateIsMounted"
-			data-wp-run--hooks="callbacks.useHooks"
+			data-wp-run---mounted="callbacks.updateIsMounted"
+			data-wp-run---hooks="callbacks.useHooks"
 		>
 			Element with wp-run using hooks
 		</div>

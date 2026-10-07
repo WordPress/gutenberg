@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { FocusEventHandler, MouseEventHandler } from 'react';
 
 /**
@@ -89,7 +86,7 @@ export type CustomSelectProps< T extends CustomSelectOption > = {
 	 *
 	 * @default 'default'
 	 */
-	size?: 'default' | 'small' | '__unstable-large';
+	size?: 'default' | 'small';
 	/**
 	 * Can be used to externally control the value of the control.
 	 */
@@ -117,7 +114,8 @@ export type CustomSelectProps< T extends CustomSelectOption > = {
 	/**
 	 * Start opting into the larger default height that will become the default size in a future version.
 	 *
-	 * @default false
+	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+	 * @ignore
 	 */
 	__next40pxDefaultSize?: boolean;
 };

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useState } from '@wordpress/element';
 
 /**
@@ -56,7 +53,7 @@ export default function useGetNewImages( images, imageData ) {
 						currentImage.clientId === image.clientId
 				) &&
 				imageData?.find( ( img ) => img.id === image.id ) &&
-				! image.fromSavedConent
+				! image.fromSavedContent
 		);
 
 		if ( imagesUpdated || newImages?.length > 0 ) {

@@ -38,10 +38,13 @@ const contextHandlers: ProxyHandler< object > = {
 	getOwnPropertyDescriptor: ( target, key ) =>
 		descriptor( target, key ) ||
 		descriptor( contextObjectToFallback.get( target ), key ),
+	has: ( target, key ) =>
+		Reflect.has( target, key ) ||
+		Reflect.has( contextObjectToFallback.get( target ), key ),
 };
 
 /**
- * Wrap a context object with a proxy to reproduce the context stack. The proxy
+ * Wraps a context object with a proxy to reproduce the context stack. The proxy
  * uses the passed `inherited` context as a fallback to look up for properties
  * that don't exist in the given context. Also, updated properties are modified
  * where they are defined, or added to the main context when they don't exist.

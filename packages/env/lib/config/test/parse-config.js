@@ -1,19 +1,41 @@
-'use strict';
-/**
- * Internal dependencies
- */
+import { createRequire } from 'node:module';
+import {
+	afterAll,
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
+const require = createRequire( import.meta.url );
+const gotPath = require.resolve( 'got' );
+const originalGot = require( gotPath );
+require.cache[ gotPath ].exports = vi.fn();
+const readRawConfigFilePath = require.resolve( '../read-raw-config-file' );
+const originalReadRawConfigFile = require( readRawConfigFilePath );
+const readRawConfigFile = vi.fn();
+require.cache[ readRawConfigFilePath ].exports = readRawConfigFile;
+const detectDirectoryTypePath = require.resolve( '../detect-directory-type' );
+const originalDetectDirectoryType = require( detectDirectoryTypePath );
+const detectDirectoryType = vi.fn();
+require.cache[ detectDirectoryTypePath ].exports = detectDirectoryType;
+const wordpressModule = require( '../../wordpress' );
+const originalGetLatestWordPressVersion =
+	wordpressModule.getLatestWordPressVersion;
+const getLatestWordPressVersion = vi.fn();
+wordpressModule.getLatestWordPressVersion = getLatestWordPressVersion;
 const { parseConfig } = require( '../parse-config' );
-const readRawConfigFile = require( '../read-raw-config-file' );
-const { getLatestWordPressVersion } = require( '../../wordpress' );
 const { ValidationError } = require( '../validate-config' );
-const detectDirectoryType = require( '../detect-directory-type' );
-
-jest.mock( 'got', () => jest.fn() );
-jest.mock( '../read-raw-config-file', () => jest.fn() );
-jest.mock( '../detect-directory-type', () => jest.fn() );
-jest.mock( '../../wordpress', () => ( {
-	getLatestWordPressVersion: jest.fn(),
-} ) );
+afterAll( () => {
+	require.cache[ gotPath ].exports = originalGot;
+	require.cache[ readRawConfigFilePath ].exports = originalReadRawConfigFile;
+	require.cache[ detectDirectoryTypePath ].exports =
+		originalDetectDirectoryType;
+	wordpressModule.getLatestWordPressVersion =
+		originalGetLatestWordPressVersion;
+	delete require.cache[ require.resolve( '../parse-config' ) ];
+} );
 
 /**
  * Since our configurations are merged, we will want to refer to the parsed default config frequently.
@@ -21,8 +43,13 @@ jest.mock( '../../wordpress', () => ( {
 const DEFAULT_CONFIG = {
 	port: 8888,
 	testsPort: 8889,
+	autoPort: false,
 	mysqlPort: null,
+	phpmyadmin: false,
+	phpmyadminPort: null,
+	multisite: false,
 	phpVersion: null,
+	mariadbVersion: null,
 	coreSource: {
 		type: 'git',
 		url: 'https://github.com/WordPress/WordPress.git',
@@ -50,6 +77,8 @@ const DEFAULT_CONFIG = {
 	lifecycleScripts: {
 		afterStart: null,
 		afterClean: null,
+		afterReset: null,
+		afterCleanup: null,
 		afterDestroy: null,
 	},
 	env: {
@@ -71,11 +100,12 @@ describe( 'parseConfig', () => {
 	} );
 
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 		delete process.env.WP_ENV_PORT;
 		delete process.env.WP_ENV_TESTS_PORT;
 		delete process.env.WP_ENV_CORE;
 		delete process.env.WP_ENV_PHP_VERSION;
+		delete process.env.WP_ENV_MARIADB_VERSION;
 		delete process.env.WP_ENV_LIFECYCLE_SCRIPT_AFTER_START;
 	} );
 
@@ -185,6 +215,19 @@ describe( 'parseConfig', () => {
 			},
 		};
 		expect( parsed ).toEqual( expected );
+	} );
+
+	it( 'should accept autoPort as a boolean', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					autoPort: true,
+				};
+			}
+		} );
+
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+		expect( parsed.autoPort ).toEqual( true );
 	} );
 
 	it( 'should parse core, plugin, theme, and mapping sources', async () => {
@@ -372,6 +415,24 @@ describe( 'parseConfig', () => {
 		);
 	} );
 
+	it( 'throws for non-boolean autoPort', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					autoPort: 'true',
+				};
+			}
+		} );
+
+		await expect(
+			parseConfig( '/test/gutenberg', '/cache' )
+		).rejects.toEqual(
+			new ValidationError(
+				`Invalid /test/gutenberg/.wp-env.json: "autoPort" must be a boolean.`
+			)
+		);
+	} );
+
 	it( 'throws for root-only config options', async () => {
 		readRawConfigFile.mockImplementation( async ( configFile ) => {
 			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
@@ -397,6 +458,261 @@ describe( 'parseConfig', () => {
 		).rejects.toEqual(
 			new ValidationError(
 				`Invalid /test/gutenberg/.wp-env.json: "development.env" is not a configuration option.`
+			)
+		);
+	} );
+
+	it( 'throws when port is null', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					port: null,
+				};
+			}
+		} );
+
+		await expect(
+			parseConfig( '/test/gutenberg', '/cache' )
+		).rejects.toEqual(
+			new ValidationError(
+				`Invalid /test/gutenberg/.wp-env.json: "port" must be an integer.`
+			)
+		);
+	} );
+
+	it( 'throws when testsPort is null', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					testsPort: null,
+				};
+			}
+		} );
+
+		await expect(
+			parseConfig( '/test/gutenberg', '/cache' )
+		).rejects.toEqual(
+			new ValidationError(
+				`Invalid /test/gutenberg/.wp-env.json: "testsPort" must be an integer.`
+			)
+		);
+	} );
+
+	it( 'should parse phpmyadmin configuration for a given environment', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					core: 'WordPress/WordPress#Test',
+					phpVersion: '1.0',
+					lifecycleScripts: {
+						afterStart: 'test',
+					},
+					env: {
+						development: {
+							phpmyadmin: true,
+							phpmyadminPort: 9001,
+						},
+					},
+				};
+			}
+		} );
+
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+
+		const expected = {
+			development: {
+				...DEFAULT_CONFIG.env.development,
+				phpmyadmin: true,
+				phpmyadminPort: 9001,
+			},
+			tests: DEFAULT_CONFIG.env.tests,
+		};
+		expect( parsed.env ).toEqual( expected );
+	} );
+
+	it( 'should infer phpmyadmin: true when phpmyadminPort is set', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					core: 'WordPress/WordPress#Test',
+					phpVersion: '1.0',
+					lifecycleScripts: {
+						afterStart: 'test',
+					},
+					env: {
+						development: {
+							phpmyadminPort: 9001,
+						},
+					},
+				};
+			}
+		} );
+
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+
+		const expected = {
+			development: {
+				...DEFAULT_CONFIG.env.development,
+				phpmyadmin: true,
+				phpmyadminPort: 9001,
+			},
+			tests: DEFAULT_CONFIG.env.tests,
+		};
+		expect( parsed.env ).toEqual( expected );
+	} );
+
+	it( 'should ignore root-level configuration for phpmyadmin', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					core: 'WordPress/WordPress#Test',
+					phpVersion: '1.0',
+					lifecycleScripts: {
+						afterStart: 'test',
+					},
+					phpmyadminPort: 9001,
+				};
+			}
+		} );
+
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+
+		const expected = {
+			development: DEFAULT_CONFIG.env.development,
+			tests: DEFAULT_CONFIG.env.tests,
+		};
+		expect( parsed.env ).toEqual( expected );
+	} );
+
+	it( 'should accept testsEnvironment as a boolean', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					testsEnvironment: false,
+				};
+			}
+		} );
+
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+		expect( parsed.testsEnvironment ).toEqual( false );
+	} );
+
+	it( 'throws for non-boolean testsEnvironment', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					testsEnvironment: 'false',
+				};
+			}
+		} );
+
+		await expect(
+			parseConfig( '/test/gutenberg', '/cache' )
+		).rejects.toEqual(
+			new ValidationError(
+				`Invalid /test/gutenberg/.wp-env.json: "testsEnvironment" must be a boolean.`
+			)
+		);
+	} );
+
+	it( 'should parse mariadbVersion at the root and per environment', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					mariadbVersion: '10.11',
+					env: {
+						tests: {
+							mariadbVersion: 'latest',
+						},
+					},
+				};
+			}
+
+			if ( configFile === '/test/gutenberg/.wp-env.override.json' ) {
+				return {};
+			}
+
+			throw new Error( 'Invalid File: ' + configFile );
+		} );
+
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+
+		expect( parsed.mariadbVersion ).toBe( '10.11' );
+		expect( parsed.env.tests.mariadbVersion ).toBe( 'latest' );
+	} );
+
+	it( 'should accept a null mariadbVersion', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return { mariadbVersion: null };
+			}
+
+			if ( configFile === '/test/gutenberg/.wp-env.override.json' ) {
+				return {};
+			}
+
+			throw new Error( 'Invalid File: ' + configFile );
+		} );
+
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+
+		expect( parsed.mariadbVersion ).toBeNull();
+	} );
+
+	it( 'should throw for an invalid mariadbVersion', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return { env: { tests: { mariadbVersion: 'LTS' } } };
+			}
+
+			if ( configFile === '/test/gutenberg/.wp-env.override.json' ) {
+				return {};
+			}
+
+			throw new Error( 'Invalid File: ' + configFile );
+		} );
+
+		await expect(
+			parseConfig( '/test/gutenberg', '/cache' )
+		).rejects.toEqual(
+			new ValidationError(
+				'Invalid /test/gutenberg/.wp-env.json: "tests.mariadbVersion" must be "lts", "latest", or a version such as "10.11" or "11.4.2".'
+			)
+		);
+	} );
+
+	it( 'should override mariadbVersion in every environment with WP_ENV_MARIADB_VERSION', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					mariadbVersion: '10.11',
+					env: { tests: { mariadbVersion: 'latest' } },
+				};
+			}
+
+			if ( configFile === '/test/gutenberg/.wp-env.override.json' ) {
+				return {};
+			}
+
+			throw new Error( 'Invalid File: ' + configFile );
+		} );
+		process.env.WP_ENV_MARIADB_VERSION = '10.3';
+
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+
+		expect( parsed.mariadbVersion ).toBe( '10.3' );
+		expect( parsed.env.development.mariadbVersion ).toBe( '10.3' );
+		expect( parsed.env.tests.mariadbVersion ).toBe( '10.3' );
+	} );
+
+	it( 'should throw for an invalid WP_ENV_MARIADB_VERSION', async () => {
+		process.env.WP_ENV_MARIADB_VERSION = 'LTS';
+
+		await expect(
+			parseConfig( '/test/gutenberg', '/cache' )
+		).rejects.toEqual(
+			new ValidationError(
+				'Invalid environment variable: "WP_ENV_MARIADB_VERSION" must be "lts", "latest", or a version such as "10.11" or "11.4.2".'
 			)
 		);
 	} );

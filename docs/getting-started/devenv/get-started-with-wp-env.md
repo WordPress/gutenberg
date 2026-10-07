@@ -47,7 +47,7 @@ wp-env start
 Once the script completes, you can access the local environment at: <code>http://localhost:8888</code>. Log into the WordPress dashboard using username `admin` and password `password`.
 
 <div class="callout callout-tip">
-    Some projects, like Gutenberg, include their own specific <code>wp-env</code> configurations, and the documentation might prompt you to run <code>npm run start wp-env</code> instead.
+    Some projects, like Gutenberg, include their own specific <code>wp-env</code> configurations, and the documentation might prompt you to run <code>npm run wp-env start</code> instead.
 </div>
 
 For more information on controlling the Docker environment, see the [@wordpress/env package](/packages/env/README.md) readme.

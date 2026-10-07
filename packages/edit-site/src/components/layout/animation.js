@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { Controller, easings } from '@react-spring/web';
-
-/**
- * WordPress dependencies
- */
 import { useLayoutEffect, useMemo, useRef } from '@wordpress/element';
 
 function getAbsolutePosition( element ) {
@@ -41,7 +34,6 @@ function useMovingAnimation( { triggerAnimationOnChange } ) {
 			previous: ref.current && getAbsolutePosition( ref.current ),
 			prevRect: ref.current && ref.current.getBoundingClientRect(),
 		} ),
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[ triggerAnimationOnChange ]
 	);
 

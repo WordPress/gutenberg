@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Parsing patterns', () => {
@@ -15,7 +12,7 @@ test.describe( 'Parsing patterns', () => {
 			innerBlocks: [ { name: 'core/button', attributes: { text: 'a' } } ],
 		} );
 		await page.keyboard.press( 'ArrowDown' );
-		await page.getByLabel( 'Toggle block inserter' ).click();
+		await page.getByLabel( 'Block Inserter' ).click();
 
 		await page.getByRole( 'tab', { name: 'Patterns' } ).click();
 		await page.evaluate( () => {
@@ -36,14 +33,21 @@ test.describe( 'Parsing patterns', () => {
 				],
 			} );
 		} );
-		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
-			'whitespace'
+
+		// Select the inner buttons block to ensure
+		// the correct insertion point is selected.
+		await editor.selectBlocks(
+			editor.canvas.locator( 'role=document[name="Block: Button"i]' )
 		);
+
+		await page
+			.getByRole( 'region', { name: 'Block Library' } )
+			.getByRole( 'searchbox', { name: 'Search' } )
+			.fill( 'whitespace' );
 		await page
 			.locator( 'role=option[name="Pattern with top-level whitespace"i]' )
 			.click();
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/buttons',
 				innerBlocks: [

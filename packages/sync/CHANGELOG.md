@@ -2,6 +2,122 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Stop registering the package as a WordPress script. `@wordpress/sync` is now bundled into its consumers, so the `wp-sync` script handle and the `wp.sync` global are no longer exposed ([#81999](https://github.com/WordPress/gutenberg/pull/81999)).
+-   Remove the `privateApis` export. `ConnectionErrorCode`, `createSyncManager`, `Delta`, `CRDT_DOC_META_PERSISTENCE_KEY`, `CRDT_RECORD_MAP_KEY`, `LOCAL_EDITOR_ORIGIN`, `LOCAL_UNDO_IGNORED_ORIGIN`, and `retrySyncConnection` are now regular exports, and the package no longer depends on `@wordpress/private-apis` ([#81999](https://github.com/WordPress/gutenberg/pull/81999)).
+
+### Bug Fixes
+
+-   The sync manager's undo manager no longer stands in for the editor's undo manager. It is the undo history of the loaded entities only: it reports each level Yjs opens through the new `onUndoLevelOpened` record handler (replacing `onUndoStackChange`), and `undo()` and `redo()` take the entity whose level to move and return whether a level was moved. Each entity has its own Yjs undo manager, which replaces the copied `YMultiDocUndoManager`. `stopCapturing()` and `clearRedo()` let the consumer keep its own history in step. The manager exposes `isLoaded()`, and its undo manager exists from creation instead of from the first load. Together with the `core-data` change, undo and redo keep working for entities collaboration does not sync ([#83888](https://github.com/WordPress/gutenberg/pull/83888)).
+
+## 1.56.0 (2026-09-23)
+
+### New Features
+
+-   Pass the Yjs module to sync provider creators as the `Y` property of the provider creator options. Providers should use it instead of the `window.wp.sync.Y` global, which will be removed in a future release ([#82621](https://github.com/WordPress/gutenberg/pull/82621)).
+
+## 1.55.0 (2026-09-10)
+
+## 1.54.0 (2026-08-26)
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+-   Provide the default HTTP polling provider only when the Real-Time Collaboration experiment sets `window.__experimentalEnableRealTimeCollaboration`, replacing the `window._wpCollaborationEnabled` option flag ([#80658](https://github.com/WordPress/gutenberg/pull/80658)).
+
+## 1.53.0 (2026-08-12)
+
+## 1.52.0 (2026-07-29)
+
+## 1.51.0 (2026-07-14)
+
+## 1.50.0 (2026-07-01)
+
+## 1.49.0 (2026-06-24)
+
+## 1.48.1 (2026-06-16)
+
+## 1.48.0 (2026-06-10)
+
+-   Prevent RTC polling interval filters from slowing active HTTP polling.
+
+## 1.47.0 (2026-05-27)
+
+## 1.46.0 (2026-05-14)
+
+## 1.45.0 (2026-04-29)
+
+## 1.44.0 (2026-04-15)
+
+## 1.43.0 (2026-04-01)
+
+## 1.42.0 (2026-03-18)
+
+## 1.41.0 (2026-03-04)
+
+## 1.40.0 (2026-02-18)
+
+## 1.39.0 (2026-01-29)
+
+## 1.38.0 (2026-01-16)
+
+## 1.36.0 (2025-11-26)
+
+## 1.35.0 (2025-11-12)
+
+## 1.34.0 (2025-10-29)
+
+## 1.33.0 (2025-10-17)
+
+## 1.32.0 (2025-10-01)
+
+## 1.31.0 (2025-09-17)
+
+## 1.30.0 (2025-09-03)
+
+## 1.29.0 (2025-08-20)
+
+## 1.28.0 (2025-08-07)
+
+## 1.27.0 (2025-07-23)
+
+## 1.26.0 (2025-06-25)
+
+## 1.25.0 (2025-06-04)
+
+## 1.24.0 (2025-05-22)
+
+## 1.23.0 (2025-05-07)
+
+## 1.22.0 (2025-04-11)
+
+## 1.21.0 (2025-03-27)
+
+## 1.20.0 (2025-03-13)
+
+## 1.19.0 (2025-02-28)
+
+## 1.18.0 (2025-02-12)
+
+## 1.17.0 (2025-01-29)
+
+## 1.16.0 (2025-01-15)
+
+## 1.15.0 (2025-01-02)
+
+## 1.14.0 (2024-12-11)
+
+## 1.13.0 (2024-11-27)
+
+## 1.12.0 (2024-11-16)
+
+## 1.11.0 (2024-10-30)
+
+## 1.10.0 (2024-10-16)
+
+## 1.9.0 (2024-10-03)
+
 ## 1.8.0 (2024-09-19)
 
 ## 1.7.0 (2024-09-05)

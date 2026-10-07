@@ -2,7 +2,7 @@
 /**
  * Unit tests covering the version checks in the plugin file.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 class Test_PluginMetaData_Test extends WP_UnitTestCase {
 	/**
