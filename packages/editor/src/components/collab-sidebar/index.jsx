@@ -22,7 +22,7 @@ import {
 	isBlockReactionsEntry,
 } from './reactions/block-reactions';
 import { NoteHighlightStyles } from './note-highlight-styles';
-import { useNoteThreads } from './hooks';
+import { NoteDraftsContext, useNoteThreads } from './hooks';
 import {
 	focusNoteThread,
 	getNoteIdsFromMetadata,
@@ -32,7 +32,7 @@ import PostTypeSupportCheck from '../post-type-support-check';
 import { CanvasMargin } from '../visual-editor/canvas-margin';
 import { unlock } from '../../lock-unlock';
 
-function NotesSidebar( { postId } ) {
+function NotesSidebar( { postId, drafts } ) {
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const { toggleBlockSpotlight, selectBlock } = unlock(
@@ -242,7 +242,9 @@ function NotesSidebar( { postId } ) {
 					icon={ commentIcon }
 					closeLabel={ __( 'Close Notes' ) }
 				>
-					<Notes notes={ notes } sidebarRef={ sidebarRef } />
+					<NoteDraftsContext.Provider value={ drafts }>
+						<Notes notes={ notes } sidebarRef={ sidebarRef } />
+					</NoteDraftsContext.Provider>
 				</PluginSidebar>
 			) }
 			{ showFloatingNotes && (
@@ -254,11 +256,13 @@ function NotesSidebar( { postId } ) {
 							'is-minimized': notesDisplayMode === 'minimized',
 						} ) }
 					>
-						<Notes
-							notes={ unresolvedNotes }
-							sidebarRef={ sidebarRef }
-							isFloating
-						/>
+						<NoteDraftsContext.Provider value={ drafts }>
+							<Notes
+								notes={ unresolvedNotes }
+								sidebarRef={ sidebarRef }
+								isFloating
+							/>
+						</NoteDraftsContext.Provider>
 					</div>
 				</CanvasMargin.Fill>
 			) }
@@ -267,6 +271,7 @@ function NotesSidebar( { postId } ) {
 }
 
 export default function NotesSidebarContainer() {
+	const [ drafts ] = useState( () => new Map() );
 	const { postId, editorMode, revisionsMode } = useSelect( ( select ) => {
 		const { getCurrentPostId, getEditorMode, isRevisionsMode } = unlock(
 			select( editorStore )
@@ -289,7 +294,7 @@ export default function NotesSidebarContainer() {
 
 	return (
 		<PostTypeSupportCheck supportKeys="editor.notes">
-			<NotesSidebar postId={ postId } />
+			<NotesSidebar postId={ postId } drafts={ drafts } />
 		</PostTypeSupportCheck>
 	);
 }

@@ -53,14 +53,14 @@ collab-sidebar/
 ## Component hierarchy
 
 ```
-NotesSidebarContainer (index.jsx)         - gates on post type support
+NotesSidebarContainer (index.jsx)         - gates on post type support, owns the unsent drafts Map
  └── NotesSidebar (index.jsx)             - owns sidebarRef + useNoteThreads + sidebar registration
       ├── AddNoteMenuItem                - slot fill in the block toolbar
       ├── NoteAvatarIndicator            - slot fill in the block toolbar (per-thread avatars)
       ├── BlockReactionsMenuItem         - slot fill in the block options menu ("Add reaction")
       ├── PluginSidebar (all-notes)      - full sidebar
       │    └── Notes (notes.jsx)          - owns outer Stack + aria-label + useNoteActions + keyboard nav
-      │         ├── AddNote              - rendered when no threads (template-locked) or selectedNote === 'new'
+      │         ├── AddNote              - new note form for the selected block, rendered when selectedNote === 'new'
       │         ├── BlockReactionsEntry[] - a block with reactions but no note (same shell as a thread)
       │         │    └── BlockReactionsRow
       │         └── NoteThread[]         - per thread
@@ -70,12 +70,14 @@ NotesSidebarContainer (index.jsx)         - gates on post type support
       │                   │    └── NoteCard
       │                   │         └── NoteByline + actions slot + body children
       │                   ├── Note[]     - replies (when selected)
-      │                   └── NoteCard + NoteForm - inline reply form (when selected)
+      │                   └── NoteReply  - inline reply form (when selected)
       └── PluginSidebar (floating)       - floating sidebar (large viewport, unresolved notes)
            └── Notes (same)              - isFloating
 ```
 
 `Notes` is reused for both sidebar surfaces. The only visual difference is driven by `isFloating` (whether to layer threads over the canvas or stack them in a panel).
+
+Unsent note and reply text lives in a `Map` owned by `NotesSidebarContainer`, keyed by block client ID or note ID, so it survives the forms unmounting. It is a cache, not state: `useNoteDraft` reads it on mount and writes it on change, so typing doesn't re-render the sidebar. Slot fills don't inherit context, so `NotesSidebar` provides it inside each fill.
 
 ## Block reactions
 
