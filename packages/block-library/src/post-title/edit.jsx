@@ -5,6 +5,7 @@ import {
 	PlainText,
 	HeadingLevelDropdown,
 	useBlockEditingMode,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	ToggleControl,
@@ -54,6 +55,10 @@ export default function PostTitleEdit( {
 		postId
 	);
 	const [ link ] = useEntityProp( 'postType', postType, 'link', postId );
+	const isPreviewMode = useSelect(
+		( select ) => select( blockEditorStore ).getSettings().isPreviewMode,
+		[]
+	);
 	const blockProps = useBlockProps();
 	const blockEditingMode = useBlockEditingMode();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -111,6 +116,23 @@ export default function PostTitleEdit( {
 						__html: fullTitle?.rendered || __( '(no title)' ),
 					} }
 				/>
+			</TagName>
+		);
+	}
+
+	// RichText drops its placeholder in block previews (e.g. the pattern
+	// inserter), so an empty title would render blank. Show the default
+	// text "No title" ( same as document title bar ).
+	if ( isPreviewMode && postType && postId && ! rawTitle ) {
+		titleElement = (
+			<TagName { ...blockProps }>
+				{ isLink ? (
+					<a href={ link } target={ linkTarget } rel={ rel }>
+						{ __( 'No title' ) }
+					</a>
+				) : (
+					__( 'No title' )
+				) }
 			</TagName>
 		);
 	}
