@@ -33,6 +33,7 @@ import {
 	resolveResize,
 } from './snapping';
 import { getCanvasConversion, measureSection } from './conversion';
+import { getGrownCanvasLayout } from './canvases';
 
 /**
  * How far the pointer has to travel before a press becomes a drag. Below this a
@@ -214,7 +215,7 @@ export default function FreeformCanvas( {
 			if ( required > canvasHeight ) {
 				__unstableMarkNextChangeAsNotPersistent();
 				updateBlockAttributes( canvasClientId, {
-					layout: { ...canvasLayout, canvasHeight: required },
+					layout: getGrownCanvasLayout( canvasLayout, required ),
 				} );
 			}
 		},

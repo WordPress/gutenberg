@@ -2,7 +2,7 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { useStyleOverride } from '../../hooks/utils';
 import { collectCanvases } from './canvases';
-import { getCanvasOverrideCss } from './override-css';
+import { getCanvasesCss } from './override-css';
 
 /**
  * Styles every canvas in the post, all the time.
@@ -16,9 +16,7 @@ import { getCanvasOverrideCss } from './override-css';
 export default function FreeformStyles() {
 	const css = useSelect( ( select ) => {
 		const { getBlocks } = select( blockEditorStore );
-		return collectCanvases( getBlocks() )
-			.map( ( canvas ) => getCanvasOverrideCss( canvas ) )
-			.join( '\n' );
+		return getCanvasesCss( collectCanvases( getBlocks() ) );
 	}, [] );
 
 	useStyleOverride( { id: 'freeform-canvases', css } );

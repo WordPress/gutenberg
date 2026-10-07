@@ -63,3 +63,25 @@ export function canHoldACanvas( layoutSupport ) {
 	}
 	return layoutSupport?.allowSwitching !== false;
 }
+
+/**
+ * The layout a canvas should have once it has grown to fit its contents.
+ *
+ * `type` is set rather than merged. Growing happens when a gesture ends, and
+ * the layout it merges into may be the one captured before that very gesture
+ * converted the container — spreading it would write the old type back, the
+ * canvas would stop being a canvas, and its blocks would drop into flow while
+ * their stored coordinates, and so the editing surface, stayed where they were
+ * put. That reads as the outline moving while the content does not.
+ *
+ * @param {Object|undefined} layout         The container's layout attribute.
+ * @param {number}           requiredHeight The height it needs, in design units.
+ * @return {Object} The layout to write.
+ */
+export function getGrownCanvasLayout( layout, requiredHeight ) {
+	return {
+		...layout,
+		type: 'freeform',
+		canvasHeight: requiredHeight,
+	};
+}

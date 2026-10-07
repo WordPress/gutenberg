@@ -98,6 +98,13 @@ export default function FreeformCanvasTools() {
 			<FreeformStyles />
 			{ canvasClientId && (
 				<FreeformCanvas
+					// Keyed so moving to another canvas starts clean. The
+					// component remembers that it converted its canvas, and
+					// carrying that memory to the next one made it skip the
+					// conversion entirely: the blocks got coordinates that
+					// nothing was positioning them by, so the editing surface
+					// moved and the content stayed put.
+					key={ canvasClientId }
 					canvasClientId={ canvasClientId }
 					selectedClientIds={ selectedClientIds }
 					isCanvas={ isCanvas }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getCanvasOverrideCss } from '../override-css';
+import { getCanvasOverrideCss, getCanvasesCss } from '../override-css';
 
 const squash = ( css ) => css.replace( /\s+/g, ' ' ).trim();
 
@@ -18,16 +18,16 @@ describe( 'getCanvasOverrideCss', () => {
 		expect( css ).toContain( 'aspect-ratio: 1200 / 600' );
 	} );
 
-	it( 'takes every child out of flow', () => {
+	it( 'takes every placed block out of flow', () => {
 		const css = squash(
 			getCanvasOverrideCss( {
 				canvasClientId: 'abc',
 				canvasHeight: 600,
-				rects: {},
+				rects: { def: { x: 0, y: 0, width: 100, height: 10 } },
 			} )
 		);
 
-		expect( css ).toContain( '#block-abc > * { position: absolute' );
+		expect( css ).toContain( '#block-def { position: absolute' );
 	} );
 
 	it( 'places each child as a percentage of the canvas', () => {
@@ -81,5 +81,59 @@ describe( 'getCanvasOverrideCss', () => {
 				rects: {},
 			} )
 		).toBe( '' );
+	} );
+} );
+
+describe( 'getCanvasesCss', () => {
+	const outer = {
+		clientId: 'outer',
+		canvasHeight: 600,
+		rects: { inner: { x: 0, y: 120, width: 600, height: 300 } },
+	};
+	const inner = {
+		clientId: 'inner',
+		canvasHeight: 300,
+		rects: { leaf: { x: 0, y: 60, width: 600, height: 60 } },
+	};
+
+	it( 'places a nested canvas after it has been made one', () => {
+		// A canvas that is also a block on another canvas gets `position:
+		// relative` for being a canvas and `position: absolute` for being
+		// placed. Both are id selectors, so the one written last wins — and it
+		// has to be the placement, or the nested canvas ignores the
+		// coordinates its parent gave it and sits wherever flow leaves it.
+		const css = getCanvasesCss( [ outer, inner ] );
+		const becameACanvas = css.indexOf( 'aspect-ratio: 1200 / 300' );
+		const wasPlaced = css.indexOf( '#block-inner {\n\tposition: absolute' );
+
+		expect( becameACanvas ).toBeGreaterThan( -1 );
+		expect( wasPlaced ).toBeGreaterThan( becameACanvas );
+	} );
+
+	it( 'gives every placed block its own position', () => {
+		const css = getCanvasesCss( [ outer, inner ] );
+		expect( css ).toContain( '#block-leaf' );
+		expect( ( css.match( /position: absolute/g ) || [] ).length ).toBe( 2 );
+	} );
+
+	it( 'is empty for no canvases', () => {
+		expect( getCanvasesCss( [] ) ).toBe( '' );
+	} );
+} );
+
+describe( 'placing a block whose height is not known', () => {
+	it( 'omits min-height rather than emitting NaN', () => {
+		// A drag writes x and y; a block that had no stored height until then
+		// has none afterwards either. `min-height: NaN%` is dropped by the
+		// browser, but it has no business being written.
+		const css = getCanvasOverrideCss( {
+			canvasClientId: 'abc',
+			canvasHeight: 600,
+			rects: { def: { x: 0, y: 60, width: 600 } },
+		} );
+
+		expect( css ).not.toContain( 'NaN' );
+		expect( css ).not.toContain( 'min-height' );
+		expect( css ).toContain( 'top: 10%' );
 	} );
 } );

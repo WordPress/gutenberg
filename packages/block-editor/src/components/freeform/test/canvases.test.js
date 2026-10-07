@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { canHoldACanvas, collectCanvases } from '../canvases';
+import {
+	canHoldACanvas,
+	collectCanvases,
+	getGrownCanvasLayout,
+} from '../canvases';
 import { DEFAULT_CANVAS_HEIGHT } from '../constants';
 
 const block = ( clientId, attributes = {}, innerBlocks = [] ) => ( {
@@ -119,5 +123,44 @@ describe( 'canHoldACanvas', () => {
 	it( 'refuses a block with no layout support at all', () => {
 		expect( canHoldACanvas( undefined ) ).toBe( false );
 		expect( canHoldACanvas( false ) ).toBe( false );
+	} );
+} );
+
+describe( 'getGrownCanvasLayout', () => {
+	it( 'raises the canvas height', () => {
+		expect(
+			getGrownCanvasLayout( { type: 'freeform', canvasHeight: 400 }, 900 )
+		).toEqual( { type: 'freeform', canvasHeight: 900 } );
+	} );
+
+	it( 'insists the canvas is still a canvas', () => {
+		// Growing happens when a gesture ends, and the layout it merges into
+		// can be the one captured before the gesture converted the container.
+		// Letting that through writes the old type back and the canvas stops
+		// being a canvas: the blocks fall back into flow while their stored
+		// coordinates, and so the editing surface, stay where they were put.
+		expect( getGrownCanvasLayout( { type: 'constrained' }, 700 ) ).toEqual(
+			{ type: 'freeform', canvasHeight: 700 }
+		);
+	} );
+
+	it( 'keeps everything else the container had', () => {
+		expect(
+			getGrownCanvasLayout(
+				{ type: 'constrained', contentSize: '800px' },
+				500
+			)
+		).toEqual( {
+			type: 'freeform',
+			contentSize: '800px',
+			canvasHeight: 500,
+		} );
+	} );
+
+	it( 'copes with a container that had no layout at all', () => {
+		expect( getGrownCanvasLayout( undefined, 300 ) ).toEqual( {
+			type: 'freeform',
+			canvasHeight: 300,
+		} );
 	} );
 } );
