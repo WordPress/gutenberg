@@ -210,7 +210,7 @@ You can also test Storybook for the current `trunk` branch on GitHub Pages: [htt
 
 ## Developer tools
 
-We recommend configuring your editor to automatically check for syntax and lint errors. The repository includes managed settings for Visual Studio Code, Cursor, and Zed. Dependency installation generates each editor's local settings from [the shared editor configuration](https://github.com/WordPress/gutenberg/blob/HEAD/tools/monorepo/scripts/editor-settings.mts). Other editors can use the same root formatting and lint configuration files.
+We recommend configuring your editor to automatically check for syntax and lint errors. The repository includes managed settings for Visual Studio Code, Cursor, and Zed. Running `npm install` or `npm ci` generates each editor's local settings from [the shared editor configuration](https://github.com/WordPress/gutenberg/blob/HEAD/tools/monorepo/scripts/editor-settings.mts) through the automatic `prepare` hook. This does not build Gutenberg. With install scripts enabled, no separate editor setup command is needed. Other editors can use the same root formatting and lint configuration files.
 
 ### Visual Studio Code
 
@@ -226,7 +226,7 @@ Zed uses `.zed/settings.json`, which dependency installation generates for each 
 
 The settings use the repository's native TypeScript language server, WordPress Prettier, ESLint, Stylelint, and Composer-installed PHPCS and PHPCBF. Run `composer install` before editing PHP. Intelephense uses the same PHP version and exclusions as Visual Studio Code. Saving JavaScript and TypeScript runs ESLint fixes and Prettier; saving CSS or SCSS runs Stylelint fixes; saving PHP runs PHPCS fixes.
 
-To refresh Zed settings, use **task: spawn → Install Zed settings**, or run:
+If you pulled editor configuration changes into an existing checkout without reinstalling dependencies, refresh Zed settings with **task: spawn → Install Zed settings**, or run:
 
 ```bash
 npm run install-zed-settings --workspace @wordpress/monorepo-tools

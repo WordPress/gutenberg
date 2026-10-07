@@ -33,7 +33,7 @@ See the TypeScript section of [`packages/README.md`](../../packages/README.md) f
 
 `scripts/editor-settings.mts` holds shared tool paths, generated-file exclusions, PHP settings, and ESLint suppression settings, together with their VS Code and Zed translations. Formatting and lint rules remain in the root `.editorconfig`, `prettier.config.mjs`, `eslint.config.mjs`, `.stylelintrc.mjs`, and `phpcs.xml.dist` files.
 
-`npm run --workspace @wordpress/monorepo-tools install-editor-settings` generates `.vscode/settings.json` and `.zed/settings.json`. The root `prepare` script runs it after dependency installation. To refresh only one editor, use `install-vscode-settings` or `install-zed-settings`; both editors also have an **Install settings** task.
+`npm run --workspace @wordpress/monorepo-tools install-editor-settings` generates `.vscode/settings.json` and `.zed/settings.json`. Both `npm install` and `npm ci` run it automatically through the root `prepare` hook, without building Gutenberg. If you skip install scripts or pull editor configuration changes without reinstalling dependencies, run the installer directly. To refresh only one editor, use `install-vscode-settings` or `install-zed-settings`; both editors also have an **Install settings** task.
 
 The installer replaces a settings file only while its first line is the managed comment for that editor. Remove that line to preserve customizations. Generated settings are ignored by Git. Zed settings contain local absolute paths so language servers and formatters use the installed workspace tools across platforms; re-run the installer after moving a checkout or changing the Node executable.
 
