@@ -77,29 +77,35 @@ export function getBlockReactionsId(
  * replace it fails: without it, the next toggle reads a stale
  * `current_user_reaction` and takes the wrong branch.
  *
- * @param summary         The cached summary.
- * @param hexKey          The reaction hex key that changed.
- * @param addedReactionId The new reaction's comment ID when one was added;
- *                        omitted when one was removed.
+ * @param summary The cached summary.
+ * @param hexKey  The reaction hex key that changed.
+ * @param change  The comment ID of the current user's reaction that was
+ *                added or removed.
  * @return A new summary, or the given one when nothing changed.
  */
 export function applyReactionSummaryDelta(
 	summary: ReactionSummary | null | undefined,
 	hexKey: string,
-	addedReactionId?: number
+	change: { added: number } | { removed: number }
 ): ReactionSummary {
 	const entry = summary?.[ hexKey ];
-	// Concurrent adds converge server-side on one surviving row, so a
-	// repeated ID is already counted.
-	if ( addedReactionId && entry?.current_user_reaction === addedReactionId ) {
-		return summary as ReactionSummary;
+	if ( 'added' in change ) {
+		// Concurrent adds converge server-side on one surviving row, so a
+		// repeated ID is already counted.
+		if ( entry?.current_user_reaction === change.added ) {
+			return summary as ReactionSummary;
+		}
+	} else if ( entry?.current_user_reaction !== change.removed ) {
+		// Another toggle's refresh may already have dropped the reaction;
+		// decrementing again would hide someone else's.
+		return ( summary || {} ) as ReactionSummary;
 	}
 
 	const next = { ...( summary || {} ) };
-	if ( addedReactionId ) {
+	if ( 'added' in change ) {
 		next[ hexKey ] = {
 			count: ( entry?.count || 0 ) + 1,
-			current_user_reaction: addedReactionId,
+			current_user_reaction: change.added,
 		};
 	} else if ( entry ) {
 		const count = entry.count - 1;

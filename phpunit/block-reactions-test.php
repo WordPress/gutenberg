@@ -91,26 +91,36 @@ class Block_Reactions_Test extends WP_Test_REST_TestCase {
 		wp_set_current_user( self::$editor_id );
 		$post_id       = self::factory()->post->create();
 		$other_post_id = self::factory()->post->create();
-		$note_id       = self::factory()->comment->create(
+		// Open notes: an approved note is a resolved thread.
+		$note_id          = self::factory()->comment->create(
 			array(
-				'comment_post_ID' => $post_id,
-				'comment_type'    => 'note',
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'note',
+				'comment_approved' => 0,
 			)
 		);
-		$comment_id    = self::factory()->comment->create(
+		$resolved_note_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'note',
+				'comment_approved' => 1,
+			)
+		);
+		$comment_id       = self::factory()->comment->create(
 			array(
 				'comment_post_ID' => $post_id,
 				'comment_type'    => 'comment',
 			)
 		);
-		$other_note_id = self::factory()->comment->create(
+		$other_note_id    = self::factory()->comment->create(
 			array(
-				'comment_post_ID' => $other_post_id,
-				'comment_type'    => 'note',
+				'comment_post_ID'  => $other_post_id,
+				'comment_type'     => 'note',
+				'comment_approved' => 0,
 			)
 		);
 
-		$ids = compact( 'post_id', 'note_id', 'comment_id', 'other_note_id' );
+		$ids = compact( 'post_id', 'note_id', 'resolved_note_id', 'comment_id', 'other_note_id' );
 		foreach ( $args as $key => $value ) {
 			if ( is_string( $value ) && isset( $ids[ $value ] ) ) {
 				$args[ $key ] = $ids[ $value ];
@@ -152,6 +162,7 @@ class Block_Reactions_Test extends WP_Test_REST_TestCase {
 			'neither'               => array( array(), 'rest_comment_invalid_reaction_target' ),
 			'parent is a comment'   => array( array( 'parent' => 'comment_id' ), 'rest_comment_invalid_parent' ),
 			'parent on other post'  => array( array( 'parent' => 'other_note_id' ), 'rest_comment_invalid_parent' ),
+			'resolved note'         => array( array( 'parent' => 'resolved_note_id' ), 'rest_comment_invalid_parent' ),
 			'bad anchor'            => array( array( 'block' => 'NOPE' ), 'rest_comment_invalid_block' ),
 		);
 	}

@@ -27,6 +27,12 @@ const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 const EMPTY_SUMMARY: BlockReactionSummary = {};
 
+/*
+ * Block reaction toggles still in flight, keyed by post, anchor and emoji.
+ * Module-level so every `useBlockReaction` instance shares it.
+ */
+const pendingToggles = new Set< string >();
+
 /**
  * Every block's reaction summary on the current post, keyed by anchor.
  *
@@ -125,6 +131,15 @@ export function useBlockReaction( clientId: string ) {
 					{ id: postId, block_reaction_summary: next },
 				] );
 
+			// A second click while a toggle is in flight reads the same
+			// summary and would repeat the request; ignore it until the
+			// first one lands.
+			const toggleKey = `${ postId }:${ anchor }:${ hexKey }`;
+			if ( pendingToggles.has( toggleKey ) ) {
+				return;
+			}
+			pendingToggles.add( toggleKey );
+
 			const entry = readSummary()[ anchor ]?.[ hexKey ];
 			const myReactionId = entry?.current_user_reaction || undefined;
 			let addedReactionId: number | undefined;
@@ -168,6 +183,7 @@ export function useBlockReaction( clientId: string ) {
 						: __( 'An error occurred while performing an update.' ),
 					{ type: 'snackbar', isDismissible: true }
 				);
+				pendingToggles.delete( toggleKey );
 				return;
 			}
 
@@ -181,18 +197,26 @@ export function useBlockReaction( clientId: string ) {
 			// the next toggle stays correct even if the refetch below fails.
 			// A partial record merges over the cached one and leaves unsaved
 			// edits alone.
-			const current = readSummary();
-			const next = applyReactionSummaryDelta(
-				current[ anchor ],
-				hexKey,
-				myReactionId ? undefined : addedReactionId
-			);
-			const { [ anchor ]: _previous, ...others } = current;
-			writeSummary(
-				Object.keys( next ).length
-					? { ...others, [ anchor ]: next }
-					: others
-			);
+			const change = myReactionId
+				? { removed: myReactionId }
+				: addedReactionId && { added: addedReactionId };
+			if ( change ) {
+				const current = readSummary();
+				const next = applyReactionSummaryDelta(
+					current[ anchor ],
+					hexKey,
+					change
+				);
+				const { [ anchor ]: _previous, ...others } = current;
+				writeSummary(
+					Object.keys( next ).length
+						? { ...others, [ anchor ]: next }
+						: others
+				);
+			}
+			// The cached summary now reflects this toggle, so the next one
+			// reads the right state.
+			pendingToggles.delete( toggleKey );
 
 			// Then refetch just the summary for the authoritative counts,
 			// which also picks up other users' reactions. Not through
