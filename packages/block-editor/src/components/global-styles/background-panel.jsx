@@ -91,6 +91,30 @@ export function getAllowedBackgroundClipValues( settings ) {
 }
 
 /**
+ * Resolves the `background-clip` values a panel reads, and what they mean for
+ * a text gradient. Shared by the Typography and Background panels.
+ *
+ * @param {Object}  value          Style being edited.
+ * @param {Object=} baseValue      Default state style, set only while another state is selected.
+ * @param {Object=} inheritedValue Style the block inherits.
+ * @return {Object} The clips, and which of them clips to the text.
+ */
+export function getBackgroundClipState( value, baseValue, inheritedValue ) {
+	const localClip = value?.background?.backgroundClip;
+	const baseClip = baseValue?.background?.backgroundClip;
+	const inheritedClip = inheritedValue?.background?.backgroundClip;
+
+	return {
+		localClip,
+		baseClip,
+		inheritedClip,
+		isTextGradient: 'text' === localClip,
+		isTextGradientFromBase: undefined === localClip && 'text' === baseClip,
+		clipsToText: 'text' === ( localClip ?? baseClip ?? inheritedClip ),
+	};
+}
+
+/**
  * Checks if there is a current value in the background image block support
  * attributes.
  *
@@ -233,16 +257,17 @@ export default function BackgroundImagePanel( {
 		( clipValue ) => clipValue !== 'text'
 	);
 
-	const localClip = value?.background?.backgroundClip;
-	const baseClip = baseValue?.background?.backgroundClip;
-	const inheritedClip = inheritedValue?.background?.backgroundClip;
-	const hasLocalClip = localClip !== undefined;
 	// A text gradient belongs to the Typography panel.
-	const isTextGradient = localClip === 'text';
-	const clipsToText = ( localClip ?? baseClip ?? inheritedClip ) === 'text';
-	const clipIsFromBase =
-		clipsToText && localClip === undefined && !! baseClip;
-	const clipsToTextNotice = clipIsFromBase
+	const {
+		localClip,
+		baseClip,
+		inheritedClip,
+		isTextGradient,
+		isTextGradientFromBase,
+		clipsToText,
+	} = getBackgroundClipState( value, baseValue, inheritedValue );
+	const hasLocalClip = localClip !== undefined;
+	const clipsToTextNotice = isTextGradientFromBase
 		? __(
 				'The gradient set in the Default state clips the background to the text, including any color or image.'
 			)
@@ -311,14 +336,6 @@ export default function BackgroundImagePanel( {
 			undefined
 		);
 		newValue = setImmutably( newValue, [ 'color', 'gradient' ], undefined );
-		// A text clip without a gradient leaves the text invisible.
-		if ( isTextGradient ) {
-			newValue = setImmutably(
-				newValue,
-				[ 'background', 'backgroundClip' ],
-				undefined
-			);
-		}
 		onChange( newValue );
 	};
 
@@ -378,16 +395,18 @@ export default function BackgroundImagePanel( {
 	// Fall back to color.gradient for legacy blocks that haven't migrated
 	// to background.gradient yet (mirrors block inspector fallback in
 	// packages/block-editor/src/hooks/background.jsx).
-	const currentGradient = isTextGradient
+	// A text gradient belongs to the Typography panel, so neither the value
+	// nor its slug is shown here.
+	const currentGradientValue = isTextGradient
 		? undefined
-		: decodeValue( value?.background?.gradient ?? value?.color?.gradient );
-	const inheritedGradient =
+		: ( value?.background?.gradient ?? value?.color?.gradient );
+	const inheritedGradientValue =
 		inheritedClip === 'text'
 			? undefined
-			: decodeValue(
-					inheritedValue?.background?.gradient ??
-						inheritedValue?.color?.gradient
-				);
+			: ( inheritedValue?.background?.gradient ??
+				inheritedValue?.color?.gradient );
+	const currentGradient = decodeValue( currentGradientValue );
+	const inheritedGradient = decodeValue( inheritedGradientValue );
 
 	// Set gradient value, encoding preset matches as slug references.
 	// Also clear color.gradient to migrate from the legacy location,
@@ -399,6 +418,14 @@ export default function BackgroundImagePanel( {
 			encodeGradientValue( newGradient, newSlug )
 		);
 		newValue = setImmutably( newValue, [ 'color', 'gradient' ], undefined );
+		// A text clip without a gradient leaves the text invisible.
+		if ( ! newGradient && isTextGradient ) {
+			newValue = setImmutably(
+				newValue,
+				[ 'background', 'backgroundClip' ],
+				undefined
+			);
+		}
 		onChange( newValue );
 	};
 
@@ -522,13 +549,11 @@ export default function BackgroundImagePanel( {
 							label: __( 'Gradient' ),
 							inheritedValue: inheritedGradient,
 							inheritedSlug: extractPresetSlug(
-								inheritedValue?.background?.gradient ??
-									inheritedValue?.color?.gradient,
+								inheritedGradientValue,
 								'gradient'
 							),
 							userSlug: extractPresetSlug(
-								value?.background?.gradient ??
-									value?.color?.gradient,
+								currentGradientValue,
 								'gradient'
 							),
 							setValue: setGradient,

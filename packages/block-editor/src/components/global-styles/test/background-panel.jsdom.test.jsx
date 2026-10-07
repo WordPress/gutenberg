@@ -564,6 +564,32 @@ describe( 'BackgroundPanel text gradient ownership', () => {
 		).not.toBeInTheDocument();
 	} );
 
+	it( 'does not mark the text gradient as selected in the gradient picker', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render(
+			<BackgroundPanel
+				value={ {
+					background: {
+						gradient: TEXT_GRADIENT,
+						backgroundClip: 'text',
+					},
+				} }
+				settings={ baseSettings }
+				onChange={ onChange }
+				defaultControls={ { gradient: true } }
+				panelId="test-panel"
+			/>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Gradient' } ) );
+
+		// Clicking a selected swatch clears it, leaving the clip with nothing to paint.
+		expect(
+			screen.getByRole( 'option', { name: /purple/i } )
+		).toHaveAttribute( 'aria-selected', 'false' );
+	} );
+
 	it( 'says the background clips to the text, leaving every control usable', () => {
 		const { container } = render(
 			<BackgroundPanel

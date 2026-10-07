@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/variables" as *;
+
 .typography-block-support-panel {
 	.single-column {
 		grid-column: span 1;
@@ -7,6 +9,12 @@
 // Inspector and Global Styles class respectively.
 .typography-block-support-panel,
 .block-editor-typography-panel--flush-color-items {
+	// Join adjacent color items, as the Color and Background panels do with a
+	// zero row-gap wrapper.
+	.block-editor-color-gradient-item + .block-editor-color-gradient-item {
+		margin-top: -$grid-unit-20;
+	}
+
 	.block-editor-typography-panel__text-gradient-notice {
 		grid-column: 1 / -1;
 	}

@@ -123,15 +123,6 @@ $swatch-gap: 12px;
 	}
 }
 
-// Join adjacent color items, as the Color and Background panels do with a
-// zero row-gap wrapper. Inspector and Global Styles class respectively.
-.typography-block-support-panel,
-.block-editor-typography-panel--flush-color-items {
-	.block-editor-color-gradient-item + .block-editor-color-gradient-item {
-		margin-top: -$grid-unit-20;
-	}
-}
-
 .block-editor-tools-panel-color-gradient-settings__dropdown {
 	display: block;
 	padding: 0;

@@ -21,7 +21,11 @@ import WritingModeControl from '../writing-mode-control';
 import { TextShadowPopover } from './text-shadow-panel';
 import ColorGradientDropdownItem from './color-gradient-dropdown-item';
 import { useHasTextPanel } from './color-panel';
-import { getAllowedBackgroundClipValues } from './background-panel';
+import {
+	getAllowedBackgroundClipValues,
+	getBackgroundClipState,
+	hasBackgroundImageValue,
+} from './background-panel';
 import { useColorGradientSettings } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
@@ -322,10 +326,13 @@ export default function TypographyPanel( {
 		!! settings?.background?.gradient &&
 		hasGradientColors;
 
-	const localClip = value?.background?.backgroundClip;
-	const baseClip = baseValue?.background?.backgroundClip;
-	const inheritedClip = inheritedValue?.background?.backgroundClip;
-	const isTextGradient = localClip === 'text';
+	const {
+		baseClip,
+		inheritedClip,
+		isTextGradient,
+		isTextGradientFromBase,
+		clipsToText,
+	} = getBackgroundClipState( value, baseValue, inheritedValue );
 	const userTextGradientValue = isTextGradient
 		? value?.background?.gradient
 		: undefined;
@@ -339,25 +346,25 @@ export default function TypographyPanel( {
 		userTextGradient === undefined && inheritedTextGradient !== undefined;
 	const hasTextGradientValue = () => userTextGradient !== undefined;
 
-	// The block's own clip, including one set in the Default state.
-	const blockClipsToText = ( localClip ?? baseClip ) === 'text';
-	const clipsToText = ( localClip ?? baseClip ?? inheritedClip ) === 'text';
-	const textGradientIsFromBase = blockClipsToText && ! isTextGradient;
 	// A state's own text color gets its fill back, so nothing is replaced.
 	const showsTextGradientNotice =
-		blockClipsToText &&
-		! ( textGradientIsFromBase && !! value?.color?.text );
-	const textGradientNotice = textGradientIsFromBase
+		isTextGradient || ( isTextGradientFromBase && ! value?.color?.text );
+	const textGradientNotice = isTextGradientFromBase
 		? __( 'The gradient set in the Default state replaces the text color.' )
 		: __( 'The gradient replaces the text color.' );
 	// Only the block's own background counts, not an inherited one.
 	const backgroundGradient = value?.background?.gradient;
 	const hasBlockBackground =
-		! clipsToText && !! ( backgroundGradient || value?.color?.background );
+		! clipsToText &&
+		!! (
+			backgroundGradient ||
+			hasBackgroundImageValue( value ) ||
+			value?.color?.background
+		);
 	const backgroundOverrideNotice = backgroundGradient
 		? __( 'Setting a text gradient replaces the background gradient.' )
 		: __(
-				'Setting a text gradient clips the background color to the text.'
+				'Setting a text gradient clips the background to the text, including any color or image.'
 			);
 	const setTextGradient = ( newGradient, newSlug ) => {
 		let changedObject = setImmutably(
