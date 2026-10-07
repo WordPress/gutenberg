@@ -11,6 +11,7 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import InspectorControls from '../components/inspector-controls';
+import { PrivateInspectorControlsStyleStatesAdvanced } from '../components/inspector-controls/groups';
 import AdvancedPanel, {
 	validateCSS,
 } from '../components/global-styles/advanced-panel';
@@ -150,7 +151,6 @@ function CustomCSSControl( {
 	const stateStyle = isStateSelected
 		? getStyleForState( style, selectedState ) || {}
 		: style;
-	const inspectorGroup = isStateSelected ? 'styleStates' : 'advanced';
 
 	function onChange( newStyle ) {
 		// Normalize whitespace-only CSS to undefined so it gets cleaned up.
@@ -179,11 +179,15 @@ function CustomCSSControl( {
 		/>
 	);
 
-	return (
-		<InspectorControls group={ inspectorGroup }>
-			{ isStateSelected ? <PanelBody>{ panel }</PanelBody> : panel }
-		</InspectorControls>
-	);
+	if ( isStateSelected ) {
+		return (
+			<PrivateInspectorControlsStyleStatesAdvanced.Fill>
+				<PanelBody title={ __( 'Advanced' ) }>{ panel }</PanelBody>
+			</PrivateInspectorControlsStyleStatesAdvanced.Fill>
+		);
+	}
+
+	return <InspectorControls group="advanced">{ panel }</InspectorControls>;
 }
 
 const CUSTOM_CSS_WARNING_NOTICE_ID = 'custom-css-edit-warning';
