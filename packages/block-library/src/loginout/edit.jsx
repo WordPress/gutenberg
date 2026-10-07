@@ -4,11 +4,13 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { InputControl } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function LoginOutEdit( { attributes, setAttributes } ) {
-	const { displayLoginAsForm, redirectToCurrent } = attributes;
+	const { displayLoginAsForm, redirectToCurrent, loginText, logoutText } =
+		attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	return (
@@ -20,6 +22,8 @@ export default function LoginOutEdit( { attributes, setAttributes } ) {
 						setAttributes( {
 							displayLoginAsForm: false,
 							redirectToCurrent: true,
+							loginText: undefined,
+							logoutText: undefined,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -60,6 +64,46 @@ export default function LoginOutEdit( { attributes, setAttributes } ) {
 							}
 						/>
 					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Login Text' ) }
+						isShownByDefault
+						hasValue={ () => !! loginText }
+						onDeselect={ () =>
+							setAttributes( { loginText: undefined } )
+						}
+					>
+						<InputControl
+							label={ __( 'Login Text' ) }
+							value={ loginText }
+							onValueChange={ ( value ) =>
+								setAttributes( { loginText: value } )
+							}
+							placeholder={ __( 'Enter login text' ) }
+							description={ __(
+								'Customize the text for the login.'
+							) }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Logout Text' ) }
+						isShownByDefault
+						hasValue={ () => !! logoutText }
+						onDeselect={ () =>
+							setAttributes( { logoutText: undefined } )
+						}
+					>
+						<InputControl
+							label={ __( 'Logout Text' ) }
+							value={ logoutText }
+							onValueChange={ ( value ) =>
+								setAttributes( { logoutText: value } )
+							}
+							placeholder={ __( 'Enter logout text' ) }
+							description={ __(
+								'Customize the text for the logout.'
+							) }
+						/>
+					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
 			<div
@@ -67,7 +111,9 @@ export default function LoginOutEdit( { attributes, setAttributes } ) {
 					className: 'logged-in',
 				} ) }
 			>
-				<a href="#login-pseudo-link">{ __( 'Log out' ) }</a>
+				<a href="#login-pseudo-link">
+					{ logoutText || __( 'Log out' ) }
+				</a>
 			</div>
 		</>
 	);
