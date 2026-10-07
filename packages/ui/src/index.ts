@@ -4,6 +4,7 @@ export * from './button';
 export * from './button-link';
 export * from './calendar';
 export * as Card from './card';
+export * from './clipboard-button';
 export * as Collapsible from './collapsible';
 export * as CollapsibleCard from './collapsible-card';
 export * as AlertDialog from './alert-dialog';
