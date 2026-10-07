@@ -1,19 +1,13 @@
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import {
-	PanelBody,
-	PanelRow,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { PanelBody, PanelRow } from '@wordpress/components';
+import { Badge } from '@wordpress/ui';
 import {
 	getGlobalStylesChangeGroups,
 	getGlobalStylesChangeGroupSummary,
 } from '@wordpress/global-styles-engine';
 import EntityRecordItem from './entity-record-item';
 import { STORE_NAME } from '../../name';
-import { unlock } from '../../lock-unlock';
-
-const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 function getEntityDescription( entity, count ) {
 	switch ( entity ) {
@@ -39,13 +33,12 @@ function ChangeStates( { states } ) {
 	return (
 		<span className="entities-saved-states__change-states">
 			{ states.map( ( state ) => (
-				<WCBadge
+				<Badge
 					key={ state }
 					className="entities-saved-states__change-state"
-					intent="info"
 				>
 					{ state }
-				</WCBadge>
+				</Badge>
 			) ) }
 		</span>
 	);
