@@ -564,12 +564,13 @@ mark.wp-note {
 }
 
 // Forced colors repaint text in a system color, which turns color emoji into
-// flat monochrome glyphs and drops skin tones. Opt the glyphs out, but not
-// the buttons around them, so their borders still follow the system colors.
+// flat monochrome glyphs and drops skin tones. Opt the picker glyphs out, but
+// not the buttons around them, so their borders still follow the system
+// colors; skin tones can't be told apart by shape. Reaction pills keep the
+// user's preference.
 .editor-collab-sidebar-panel__picker-emoji-label,
 .editor-collab-sidebar-panel__skin-tone-toggle-emoji,
-.editor-collab-sidebar-panel__skin-tone-swatch,
-.editor-collab-sidebar-panel__reaction-button-emoji {
+.editor-collab-sidebar-panel__skin-tone-swatch {
 	forced-color-adjust: none;
 }
 
