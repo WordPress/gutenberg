@@ -61,7 +61,7 @@ describe( 'surface spacing at lightness endpoints', () => {
 								'surface4',
 								'surface5',
 								'surface6',
-						  ] as const )
+							] as const )
 						: ( [
 								'surface6',
 								'surface5',
@@ -69,7 +69,7 @@ describe( 'surface spacing at lightness endpoints', () => {
 								'surface1',
 								'surface2',
 								'surface3',
-						  ] as const );
+							] as const );
 				const lightnesses = orderedSteps.map( ( step ) =>
 					get( ramp[ step ], [ OKLrab, 'l' ] )
 				);

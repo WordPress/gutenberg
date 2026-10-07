@@ -25,23 +25,21 @@ describe( 'color-space registration', () => {
 			// Do not let an import-time registration satisfy the utility's needs.
 			ColorSpace.registry = {};
 
-			switch ( name ) {
-				case 'parseSeedColor':
+			const assertions = {
+				parseSeedColor: () =>
 					expect( () =>
 						utils.parseSeedColor( '#3858e9' )
-					).not.toThrow();
-					break;
-				case 'getColorString':
+					).not.toThrow(),
+				getColorString: () =>
 					expect( utils.getColorString( '#3858e9' ) ).toBe(
 						'#3858e9'
-					);
-					break;
-				case 'getContrast':
+					),
+				getContrast: () =>
 					expect(
 						utils.getContrast( '#000000', '#ffffff' )
-					).toBeCloseTo( 21 );
-					break;
-			}
+					).toBeCloseTo( 21 ),
+			};
+			assertions[ name ]();
 		}
 	);
 
@@ -57,9 +55,8 @@ describe( 'color-space registration', () => {
 
 	it( 'rebuilds surfaces and strokes without prior registration', async () => {
 		const { buildBgRamp } = await import( '..' );
-		const { buildPerceptualSteps } = await import(
-			'../lib/build-perceptual-steps'
-		);
+		const { buildPerceptualSteps } =
+			await import( '../lib/build-perceptual-steps' );
 		const background = buildBgRamp( '#fcfcfc' );
 		ColorSpace.registry = {};
 

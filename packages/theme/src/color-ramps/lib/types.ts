@@ -83,10 +83,7 @@ export type RampStepConfig = {
 export type RampStepsConfig = Record< BaseRampStep, RampStepConfig >;
 
 export type ForegroundRampStep =
-	| 'fgSurface2'
-	| 'fgSurface3'
-	| 'fgSurface4'
-	| 'fgSurface5';
+	'fgSurface2' | 'fgSurface3' | 'fgSurface4' | 'fgSurface5';
 
 export type ForegroundScaleConfig = {
 	/** Ramp step whose hue and chroma define the foreground scale. */
