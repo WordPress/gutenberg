@@ -28,7 +28,7 @@
 
 ### Enhancements
 
--   Add interaction backgrounds within `TabPanel` tabs' focus-ring bounds, match `Notice` dismiss controls to the notice's tone with a tinted interaction background, and make `ExternalLink` underlines follow the text color and thicken on hover, press, and keyboard focus. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
+-   Add interaction backgrounds within `TabPanel` tabs' focus-ring bounds and match their indicators to the text color, match `Notice` dismiss controls to the notice's tone with a tinted interaction background, and make `ExternalLink` underlines follow the text color and thicken on hover, press, and keyboard focus. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 -   `FormToggle`, `ToggleControl`: Mark as not recommended for use in a WordPress environment, in favour of `Switch` and `SwitchControl` from `@wordpress/ui` ([#84097](https://github.com/WordPress/gutenberg/pull/84097)).
 -   `ProgressBar`: Mark as not recommended and direct consumers to `Progress` from `@wordpress/ui` ([#84021](https://github.com/WordPress/gutenberg/pull/84021)).
 -   `CheckboxControl`: Mark as not recommended for use in a WordPress environment, in favour of `CheckboxControl` from `@wordpress/ui` ([#83771](https://github.com/WordPress/gutenberg/pull/83771)).

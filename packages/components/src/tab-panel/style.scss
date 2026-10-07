@@ -52,7 +52,7 @@
 		pointer-events: none;
 
 		// Draw the indicator.
-		background: var(--wpds-color-stroke-interactive-neutral-strong);
+		background: currentColor;
 		height: calc(0 * var(--wpds-border-width-focus));
 		border-radius: 0;
 
