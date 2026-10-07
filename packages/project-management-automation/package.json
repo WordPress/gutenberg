@@ -31,7 +31,10 @@
 	"type": "module",
 	"main": "lib/index.js",
 	"exports": {
-		".": "./lib/index.js",
+		".": {
+			"types": "./build-types/index.d.ts",
+			"default": "./lib/index.js"
+		},
 		"./package.json": "./package.json"
 	},
 	"types": "build-types",

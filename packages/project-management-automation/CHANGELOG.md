@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Add a `types` condition to the `.` export, so TypeScript resolves the published declarations under `node16` and `bundler` module resolution ([#84164](https://github.com/WordPress/gutenberg/pull/84164)).
+
 ### Internal
 
 -   Publish only runtime files, dropping `tsconfig.json` and `tsconfig.tsbuildinfo` from the package ([#84164](https://github.com/WordPress/gutenberg/pull/84164)).

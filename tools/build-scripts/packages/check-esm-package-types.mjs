@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import {
 	copyFile,
 	mkdir,
@@ -24,7 +25,11 @@ const rootDirectory = path.resolve(
 const packagesDirectory = path.join( rootDirectory, 'packages' );
 
 function getPackageTypeOptions( { directory, packageJson } ) {
-	const tsconfigPath = path.join( directory, 'tsconfig.build.json' );
+	// Split packages build from tsconfig.build.json, unsplit ones from tsconfig.json.
+	let tsconfigPath = path.join( directory, 'tsconfig.build.json' );
+	if ( ! existsSync( tsconfigPath ) ) {
+		tsconfigPath = path.join( directory, 'tsconfig.json' );
+	}
 	const result = spawn.sync(
 		'tsc',
 		[ '--showConfig', '--project', tsconfigPath ],
