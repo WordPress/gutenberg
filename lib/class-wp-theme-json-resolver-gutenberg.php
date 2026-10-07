@@ -27,14 +27,11 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @var array
 	 */
 	protected static $blocks_cache = array(
-		'core'           => array(),
-		'blocks'         => array(),
-		'theme'          => array(),
-		'user'           => array(),
-		'merged_default' => array(),
-		'merged_blocks'  => array(),
-		'merged_theme'   => array(),
-		'merged_custom'  => array(),
+		'core'   => array(),
+		'blocks' => array(),
+		'theme'  => array(),
+		'user'   => array(),
+		'merged' => array(),
 	);
 
 	/**
@@ -196,8 +193,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 * @param string $origin Data source for which to cache the blocks.
 	 *                       Valid values are 'core', 'blocks', 'theme', 'user',
-	 *                       'merged_default', 'merged_blocks', 'merged_theme',
-	 *                       and 'merged_custom'.
+	 *                       and 'merged'.
 	 * @return bool True on success, false otherwise.
 	 */
 	protected static function has_same_registered_blocks( $origin ) {
@@ -613,15 +609,15 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		}
 
 		/*
-		 * Check block registration before isset() to record blocks on the first call.
+		 * Discard the merged data when blocks were registered after the last merge.
 		 *
 		 * This check detects new blocks, not theme support changes. Call
 		 * clean_cached_data() after changing theme supports to refresh the merged data.
 		 */
-		if (
-			static::has_same_registered_blocks( 'merged_' . $origin ) &&
-			isset( static::$merged[ $origin ] )
-		) {
+		if ( ! static::has_same_registered_blocks( 'merged' ) ) {
+			static::$merged = array();
+		}
+		if ( isset( static::$merged[ $origin ] ) ) {
 			return clone static::$merged[ $origin ];
 		}
 
@@ -730,16 +726,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	public static function clean_cached_data() {
 		static::$core                     = null;
 		static::$blocks                   = null;
-		static::$blocks_cache             = array(
-			'core'           => array(),
-			'blocks'         => array(),
-			'theme'          => array(),
-			'user'           => array(),
-			'merged_default' => array(),
-			'merged_blocks'  => array(),
-			'merged_theme'   => array(),
-			'merged_custom'  => array(),
-		);
+		static::$blocks_cache             = array_fill_keys( array_keys( static::$blocks_cache ), array() );
 		static::$merged                   = array();
 		static::$theme                    = null;
 		static::$user                     = null;
