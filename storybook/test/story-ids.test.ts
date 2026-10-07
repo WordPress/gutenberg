@@ -1,5 +1,6 @@
 import { globSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+import { analyzeMdx } from 'storybook/internal/core-server';
 import { loadCsf } from 'storybook/internal/csf-tools';
 import { describe, expect, it } from 'vitest';
 import { storyGlobs } from '../story-globs';
@@ -22,14 +23,15 @@ function findStoryFiles() {
  * so it has nothing of its own to declare.
  *
  * @param file Path to the story or doc, relative to the Storybook config.
- * @return `true` when the file's URL cannot move with its title.
+ * @return Resolves to `true` when the file's URL cannot move with its title.
  */
-function hasStableId( file: string ) {
+async function hasStableId( file: string ) {
 	const source = readFileSync( path.join( CONFIG_DIR, file ), 'utf8' );
 
 	if ( file.endsWith( '.mdx' ) ) {
-		const tag = source.match( /<Meta\b[\s\S]*?\/>/ )?.[ 0 ] ?? '';
-		return /\bid=/.test( tag ) || /\bof=/.test( tag );
+		// Storybook's own MDX analyzer, which the indexer builds docs IDs from.
+		const { id, of } = await analyzeMdx( source );
+		return Boolean( id || of );
 	}
 
 	// Storybook's own CSF parser only fills in `id` when the meta declares one.
@@ -51,7 +53,7 @@ describe( 'story IDs', () => {
 
 	// A story's URL is built from its `id`, falling back to its `title`. Only a
 	// declared `id` keeps the URL from moving when the story does.
-	it.each( files )( '%s declares an id', ( file ) => {
-		expect( hasStableId( file ) ).toBe( true );
+	it.each( files )( '%s declares an id', async ( file ) => {
+		expect( await hasStableId( file ) ).toBe( true );
 	} );
 } );
