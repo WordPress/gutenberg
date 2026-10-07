@@ -64,6 +64,53 @@ test.describe( 'HTML block', () => {
 		).toContainText( '1 < 2' );
 	} );
 
+	test( 'shows a selectable marker when the markup renders nothing', async ( {
+		editor,
+	} ) => {
+		// The canvas strips scripts, so a script-only block renders nothing.
+		await editor.setContent( `<!-- wp:paragraph -->
+<p>Before</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<script>window.__customHtmlBlock = true;</script>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>After</p>
+<!-- /wp:paragraph -->` );
+
+		const block = editor.canvas.locator( '[data-type="core/html"]' );
+		const marker = block.locator( '.block-library-html__no-output-marker' );
+
+		// The block takes no space, as on the front end, and a marker floats
+		// over its position instead.
+		await expect( marker ).toBeVisible();
+		expect(
+			await block.evaluate(
+				( element ) => element.getBoundingClientRect().height
+			)
+		).toBe( 0 );
+
+		await marker.click();
+		await expect( block ).toHaveClass( /is-selected/ );
+		await expect( block ).toBeFocused();
+	} );
+
+	test( 'shows no marker when the markup renders content', async ( {
+		editor,
+	} ) => {
+		await editor.setContent( `<!-- wp:html -->
+<p>Hello</p>
+<!-- /wp:html -->` );
+
+		const block = editor.canvas.locator( '[data-type="core/html"]' );
+		await expect( block ).toContainText( 'Hello' );
+		await expect(
+			block.locator( '.block-library-html__no-output-marker' )
+		).toHaveCount( 0 );
+	} );
+
 	test( 'supports editable inner blocks within static HTML', async ( {
 		editor,
 		page,

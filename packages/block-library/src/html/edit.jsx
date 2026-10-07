@@ -10,6 +10,7 @@ import {
 } from '@wordpress/block-editor';
 import { parse, serialize, getBlockContent } from '@wordpress/blocks';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { useResizeObserver } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
 import {
 	ToolbarButton,
@@ -18,7 +19,7 @@ import {
 	Button,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { code } from '@wordpress/icons';
+import { Icon, code, html } from '@wordpress/icons';
 import { unlock } from '../lock-unlock';
 import HTMLEditModal from './modal';
 
@@ -35,7 +36,17 @@ export default function HTMLEdit( { clientId, attributes } ) {
 		},
 		[ clientId ]
 	);
+	// Markup with no visible output in the canvas (scripts, which the canvas
+	// strips, styles, or an empty container a third-party script fills in on
+	// the front end) leaves the block without a size. Track that so the block
+	// can show a marker instead of reserving space the front end won't have.
+	const [ hasNoRenderedSize, setHasNoRenderedSize ] = useState( false );
+	const resizeObserverRef = useResizeObserver( ( [ entry ] ) => {
+		const [ box ] = entry.borderBoxSize;
+		setHasNoRenderedSize( ! box.inlineSize || ! box.blockSize );
+	} );
 	const blockProps = useBlockProps( {
+		ref: resizeObserverRef,
 		className: 'block-library-html__edit',
 	} );
 
@@ -150,6 +161,17 @@ export default function HTMLEdit( { clientId, attributes } ) {
 				</VStack>
 			</InspectorControls>
 			<InnerContent clientId={ clientId } />
+			{ hasNoRenderedSize && (
+				// Floats over the block's position without affecting the
+				// layout. A click focuses, and thereby selects, the block,
+				// which stays reachable by keyboard and in the List View.
+				<div
+					className="block-library-html__no-output-marker"
+					aria-hidden="true"
+				>
+					<Icon icon={ html } size={ 20 } />
+				</div>
+			) }
 			{ isModalOpen && (
 				<HTMLEditModal
 					onRequestClose={ () => setIsModalOpen( false ) }
