@@ -6,7 +6,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
-import { BaseControl, Button } from '@wordpress/components';
+import { BaseControl, Button, RadioControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	__EXPERIMENTAL_STYLE_PROPERTY,
@@ -15,13 +15,23 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { useMemo, useCallback, useState } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { unlock } from '../../lock-unlock';
 import setNestedValue from '../../utils/set-nested-value';
 import { useGlobalStyles } from '../../components/global-styles/hooks';
 import ApplyGloballyModal from './apply-globally-modal';
+import {
+	STYLE_PATH_TO_CSS_VAR_INFIX,
+	STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE,
+	getValueFromObjectPath,
+} from './style-paths';
+import {
+	SCOPE_GLOBAL,
+	SCOPE_SIBLINGS,
+	getSiblingStylesUpdate,
+} from './sibling-styles';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
@@ -33,78 +43,7 @@ const STYLE_PROPERTY = {
 	blockGap: { value: [ 'spacing', 'blockGap' ] },
 };
 
-// TODO: Temporary duplication of constant in @wordpress/block-editor. Can be
-// removed by moving PushChangesToGlobalStylesControl to
-// @wordpress/block-editor.
-const STYLE_PATH_TO_CSS_VAR_INFIX = {
-	'border.color': 'color',
-	'color.background': 'color',
-	'color.text': 'color',
-	'elements.link.color.text': 'color',
-	'elements.link.:hover.color.text': 'color',
-	'elements.link.typography.fontFamily': 'font-family',
-	'elements.link.typography.fontSize': 'font-size',
-	'elements.button.color.text': 'color',
-	'elements.button.color.background': 'color',
-	'elements.button.typography.fontFamily': 'font-family',
-	'elements.button.typography.fontSize': 'font-size',
-	'elements.caption.color.text': 'color',
-	'elements.heading.color': 'color',
-	'elements.heading.color.background': 'color',
-	'elements.heading.typography.fontFamily': 'font-family',
-	'elements.heading.gradient': 'gradient',
-	'elements.heading.color.gradient': 'gradient',
-	'elements.h1.color': 'color',
-	'elements.h1.color.background': 'color',
-	'elements.h1.typography.fontFamily': 'font-family',
-	'elements.h1.color.gradient': 'gradient',
-	'elements.h2.color': 'color',
-	'elements.h2.color.background': 'color',
-	'elements.h2.typography.fontFamily': 'font-family',
-	'elements.h2.color.gradient': 'gradient',
-	'elements.h3.color': 'color',
-	'elements.h3.color.background': 'color',
-	'elements.h3.typography.fontFamily': 'font-family',
-	'elements.h3.color.gradient': 'gradient',
-	'elements.h4.color': 'color',
-	'elements.h4.color.background': 'color',
-	'elements.h4.typography.fontFamily': 'font-family',
-	'elements.h4.color.gradient': 'gradient',
-	'elements.h5.color': 'color',
-	'elements.h5.color.background': 'color',
-	'elements.h5.typography.fontFamily': 'font-family',
-	'elements.h5.color.gradient': 'gradient',
-	'elements.h6.color': 'color',
-	'elements.h6.color.background': 'color',
-	'elements.h6.typography.fontFamily': 'font-family',
-	'elements.h6.color.gradient': 'gradient',
-	'color.gradient': 'gradient',
-	blockGap: 'spacing',
-	'typography.fontSize': 'font-size',
-	'typography.fontFamily': 'font-family',
-};
-
-// TODO: Temporary duplication of constant in @wordpress/block-editor. Can be
-// removed by moving PushChangesToGlobalStylesControl to
-// @wordpress/block-editor.
-const STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE = {
-	'border.color': 'borderColor',
-	'color.background': 'backgroundColor',
-	'color.text': 'textColor',
-	'color.gradient': 'gradient',
-	'typography.fontSize': 'fontSize',
-	'typography.fontFamily': 'fontFamily',
-};
-
 const SUPPORTED_STYLES = [ 'border', 'color', 'spacing', 'typography' ];
-
-const getValueFromObjectPath = ( object, path ) => {
-	let value = object;
-	path.forEach( ( fieldName ) => {
-		value = value?.[ fieldName ];
-	} );
-	return value;
-};
 
 const sides = [ 'top', 'right', 'bottom', 'left' ];
 
@@ -120,6 +59,74 @@ const sides = [ 'top', 'right', 'bottom', 'left' ];
  * @property {*}                                 newValue         Value shown in the "New" column.
  * @property {string}                            [format]         How to display the value (`border`, `borderRadius`, `spacing`).
  */
+
+/**
+ * Finds the nearest ancestor holding more than one block of this type, and the
+ * other blocks of that type inside it.
+ *
+ * That ancestor is the scope the styles get applied to: for a Button it's the
+ * Buttons block, for an Accordion Heading it's the Accordion. Blocks of the
+ * same type anywhere inside it count, not only immediate children, because the
+ * blocks that should match are often a level or two down, as an Accordion
+ * Heading is.
+ *
+ * @param {string} blockName The block's name.
+ * @param {string} clientId  The block's clientId.
+ *
+ * @return {{scopeBlockTitle: ?string, siblingClientIds: string[]}} The
+ *   ancestor's title, and the clientIds to apply styles to.
+ */
+function useSiblingScope( blockName, clientId ) {
+	// Kept separate from the clientIds below: `useSelect` compares its result
+	// shallowly, so an object wrapping an array re-renders on every store
+	// change while an array of strings doesn't.
+	const { parentClientId, scopeBlockTitle } = useSelect(
+		( select ) => {
+			const { getBlockParents, getBlockName, getClientIdsOfDescendants } =
+				select( blockEditorStore );
+
+			for ( const parentId of getBlockParents( clientId, true ) ) {
+				const hasSibling = getClientIdsOfDescendants( parentId ).some(
+					( descendantId ) =>
+						descendantId !== clientId &&
+						getBlockName( descendantId ) === blockName
+				);
+
+				if ( hasSibling ) {
+					return {
+						parentClientId: parentId,
+						scopeBlockTitle:
+							getBlockType( getBlockName( parentId ) )?.title ??
+							null,
+					};
+				}
+			}
+
+			return { parentClientId: null, scopeBlockTitle: null };
+		},
+		[ blockName, clientId ]
+	);
+
+	const siblingClientIds = useSelect(
+		( select ) => {
+			if ( ! parentClientId ) {
+				return [];
+			}
+
+			const { getBlockName, getClientIdsOfDescendants } =
+				select( blockEditorStore );
+
+			return getClientIdsOfDescendants( parentClientId ).filter(
+				( descendantId ) =>
+					descendantId !== clientId &&
+					getBlockName( descendantId ) === blockName
+			);
+		},
+		[ parentClientId, blockName, clientId ]
+	);
+
+	return { scopeBlockTitle, siblingClientIds };
+}
 
 // Builds the border rows, grouped so each one reads as a single CSS `border`
 // value (all sides, one side, and radius) instead of a row per property.
@@ -437,6 +444,8 @@ function PushChangesToGlobalStylesControl( {
 	name,
 	attributes,
 	setAttributes,
+	clientId,
+	isBlockBasedTheme,
 } ) {
 	const { user: userConfig, setUser: setUserConfig } = useGlobalStyles();
 
@@ -444,9 +453,30 @@ function PushChangesToGlobalStylesControl( {
 
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 
-	const { __unstableMarkNextChangeAsNotPersistent } =
+	const { scopeBlockTitle, siblingClientIds } = useSiblingScope(
+		name,
+		clientId
+	);
+
+	const registry = useRegistry();
+	const { __unstableMarkNextChangeAsNotPersistent, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
+
+	const hasSiblingScope = siblingClientIds.length > 0;
+	// Global Styles has nowhere to write to without a block theme, but the
+	// siblings are in the content, so that scope works either way.
+	const hasGlobalScope = !! isBlockBasedTheme;
+
+	const [ selectedScope, setSelectedScope ] = useState( SCOPE_GLOBAL );
+	// The sibling scope comes and goes with the selected block, so fall back to
+	// whichever scope the block actually has.
+	let scope = selectedScope;
+	if ( ! hasSiblingScope ) {
+		scope = SCOPE_GLOBAL;
+	} else if ( ! hasGlobalScope ) {
+		scope = SCOPE_SIBLINGS;
+	}
 
 	const pushChanges = useCallback(
 		( rowsToPush ) => {
@@ -504,20 +534,110 @@ function PushChangesToGlobalStylesControl( {
 		]
 	);
 
+	const applyToSiblings = useCallback(
+		( rowsToApply ) => {
+			const { getBlockAttributes } = registry.select( blockEditorStore );
+			const siblings = siblingClientIds.map( ( siblingClientId ) => ( {
+				clientId: siblingClientId,
+				attributes: getBlockAttributes( siblingClientId ),
+			} ) );
+
+			const updates = getSiblingStylesUpdate( {
+				rowsToApply,
+				attributes,
+				siblings,
+			} );
+
+			if ( ! updates ) {
+				return;
+			}
+
+			// Only blocks change here, so the editor's own undo covers it and
+			// there's no need for the custom Undo that `pushChanges` adds.
+			updateBlockAttributes( Object.keys( updates ), updates, {
+				uniqueByBlock: true,
+			} );
+
+			createSuccessNotice(
+				sprintf(
+					// translators: 1: Title of the block e.g. 'Button'. 2: Title of the parent block e.g. 'Buttons'.
+					__( '%1$s styles applied in this %2$s.' ),
+					getBlockType( name ).title,
+					scopeBlockTitle
+				),
+				{ type: 'snackbar' }
+			);
+		},
+		[
+			attributes,
+			createSuccessNotice,
+			name,
+			registry,
+			scopeBlockTitle,
+			siblingClientIds,
+			updateBlockAttributes,
+		]
+	);
+
+	// Nothing to apply to: a classic theme, and no siblings to match.
+	if ( ! hasSiblingScope && ! hasGlobalScope ) {
+		return null;
+	}
+
+	const blockTitle = getBlockType( name ).title;
+	const isSiblingScope = scope === SCOPE_SIBLINGS;
+
 	return (
 		<BaseControl
 			className="editor-push-changes-to-global-styles-control"
-			help={ sprintf(
-				// translators: %s: Title of the block e.g. 'Heading'.
-				__(
-					'Review and apply this block’s typography, spacing, dimensions, and color styles to all %s blocks.'
-				),
-				getBlockType( name ).title
-			) }
+			help={
+				isSiblingScope
+					? sprintf(
+							// translators: 1: Title of the block e.g. 'Button'. 2: Title of the parent block e.g. 'Buttons'.
+							__(
+								'Review and copy this block’s typography, spacing, dimensions, and color styles to every other %1$s block in this %2$s.'
+							),
+							blockTitle,
+							scopeBlockTitle
+						)
+					: sprintf(
+							// translators: %s: Title of the block e.g. 'Heading'.
+							__(
+								'Review and apply this block’s typography, spacing, dimensions, and color styles to all %s blocks.'
+							),
+							blockTitle
+						)
+			}
 		>
 			<BaseControl.VisualLabel>
 				{ __( 'Styles' ) }
 			</BaseControl.VisualLabel>
+			{ hasSiblingScope && hasGlobalScope && (
+				<RadioControl
+					label={ __( 'Apply styles to' ) }
+					selected={ scope }
+					options={ [
+						{
+							label: sprintf(
+								// translators: %s: Title of the block e.g. 'Heading'.
+								__( 'All %s blocks on the site' ),
+								blockTitle
+							),
+							value: SCOPE_GLOBAL,
+						},
+						{
+							label: sprintf(
+								// translators: 1: Title of the block e.g. 'Button'. 2: Title of the parent block e.g. 'Buttons'.
+								__( 'All %1$s blocks in this %2$s' ),
+								blockTitle,
+								scopeBlockTitle
+							),
+							value: SCOPE_SIBLINGS,
+						},
+					] }
+					onChange={ setSelectedScope }
+				/>
+			) }
 			<Button
 				__next40pxDefaultSize
 				variant="secondary"
@@ -525,13 +645,18 @@ function PushChangesToGlobalStylesControl( {
 				disabled={ rows.length === 0 }
 				onClick={ () => setIsModalOpen( true ) }
 			>
-				{ __( 'Apply globally' ) }
+				{ hasSiblingScope
+					? __( 'Review and apply' )
+					: __( 'Apply globally' ) }
 			</Button>
 			{ isModalOpen && (
 				<ApplyGloballyModal
 					name={ name }
 					rows={ rows }
-					onApply={ pushChanges }
+					scope={ scope }
+					scopeBlockTitle={ scopeBlockTitle }
+					siblingClientIds={ siblingClientIds }
+					onApply={ isSiblingScope ? applyToSiblings : pushChanges }
 					onRequestClose={ () => setIsModalOpen( false ) }
 				/>
 			) }
@@ -548,16 +673,21 @@ function PushChangesToGlobalStyles( props ) {
 	const supportsStyles = SUPPORTED_STYLES.some( ( feature ) =>
 		hasBlockSupport( props.name, feature )
 	);
-	const isDisplayed =
-		blockEditingMode === 'default' && supportsStyles && isBlockBasedTheme;
 
-	if ( ! isDisplayed ) {
+	// `isBlockBasedTheme` is no longer part of this gate: the sibling scope
+	// writes to the content rather than to Global Styles, so it works on a
+	// classic theme too. The control itself bows out when neither scope
+	// applies.
+	if ( blockEditingMode !== 'default' || ! supportsStyles ) {
 		return null;
 	}
 
 	return (
 		<InspectorAdvancedControls>
-			<PushChangesToGlobalStylesControl { ...props } />
+			<PushChangesToGlobalStylesControl
+				{ ...props }
+				isBlockBasedTheme={ isBlockBasedTheme }
+			/>
 		</InspectorAdvancedControls>
 	);
 }
