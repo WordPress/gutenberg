@@ -133,7 +133,8 @@ export default function CustomInserterModal( { onClose, value, onChange } ) {
 									onChange={ onChange }
 									value={ value }
 									collections={
-										collectionSlug === ''
+										collectionSlug === '' &&
+										collections?.length > 1
 											? collections
 											: undefined
 									}

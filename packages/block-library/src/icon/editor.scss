@@ -65,20 +65,20 @@
 
 .wp-block-icon__inserter-grid-icons-list-item-title {
 	font-size: $font-size-small;
-	padding: $grid-unit-05;
+	padding: $grid-unit-05 $grid-unit-05 $grid-unit-10;
 	overflow-wrap: break-word;
 }
 
-.wp-block-icon__inserter-grid-icons-list-item-collection {
-	font-size: $font-size-small;
-	font-weight: var(--wpds-typography-font-weight-default);
-	padding: 0 $grid-unit-05 $grid-unit-10;
-	overflow-wrap: break-word;
-}
-
-
-.wp-block-icon__inserter-grid-icons-list-item:not(.is-selected) .wp-block-icon__inserter-grid-icons-list-item-collection {
+.wp-block-icon__inserter-modal .wp-block-icon__inserter-grid-group-title {
+	position: sticky;
+	top: -$grid-unit-05;
+	z-index: 1;
+	padding: $grid-unit-15 $grid-unit-05;
+	margin: 0;
 	color: var(--wpds-color-foreground-content-neutral-weak);
+	text-transform: uppercase;
+	font-size: var(--wpds-typography-font-size-sm);
+	background-color: $white;
 }
 
 .wp-block-icon__toolbar-content {

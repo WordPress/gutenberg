@@ -1,15 +1,31 @@
-import clsx from 'clsx';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { useAsyncList } from '@wordpress/compose';
-import { useRef, useLayoutEffect } from '@wordpress/element';
+import { useAsyncList, useInstanceId } from '@wordpress/compose';
+import { useRef, useLayoutEffect, useMemo } from '@wordpress/element';
 import { getScrollContainer } from '@wordpress/dom';
 import HtmlRenderer from '../../../utils/html-renderer';
+import { groupIconsByCollection } from './utils';
 
 const BATCH_SIZE = 20;
 
 export default function IconGrid( { icons, onChange, value, collections } ) {
-	const shownIcons = useAsyncList( icons, {
+	const instanceId = useInstanceId(
+		IconGrid,
+		'wp-block-icon__inserter-grid'
+	);
+
+	const { groups, orderedIcons } = useMemo( () => {
+		if ( ! icons?.length || ! collections ) {
+			return { groups: null, orderedIcons: icons };
+		}
+		const iconGroups = groupIconsByCollection( icons, collections );
+		return {
+			groups: iconGroups,
+			orderedIcons: iconGroups.flatMap( ( group ) => group.icons ),
+		};
+	}, [ icons, collections ] );
+
+	const shownIcons = useAsyncList( orderedIcons, {
 		step: BATCH_SIZE,
 	} );
 
@@ -18,11 +34,11 @@ export default function IconGrid( { icons, onChange, value, collections } ) {
 	// if the user has already scrolled the list.
 	const selectedIconRef = useRef();
 	const selectedIndex =
-		icons?.findIndex( ( icon ) => icon.name === value ) ?? -1;
+		orderedIcons?.findIndex( ( icon ) => icon.name === value ) ?? -1;
 	const isReadyToScroll =
 		selectedIndex >= 0 &&
 		( shownIcons.length >= selectedIndex + BATCH_SIZE ||
-			shownIcons.length === icons.length );
+			shownIcons.length === orderedIcons.length );
 
 	useLayoutEffect( () => {
 		const node = selectedIconRef.current;
@@ -35,60 +51,81 @@ export default function IconGrid( { icons, onChange, value, collections } ) {
 		node.scrollIntoView( { block: 'center' } );
 	}, [ isReadyToScroll ] );
 
-	return (
-		<div className="wp-block-icon__inserter-grid">
-			{ ! icons?.length ? (
+	const renderIcons = ( iconsToRender, label ) => (
+		<div
+			className="wp-block-icon__inserter-grid-icons-list"
+			aria-label={ label }
+		>
+			{ iconsToRender.map( ( icon ) => (
+				<Button
+					key={ icon.name }
+					ref={ icon.name === value ? selectedIconRef : undefined }
+					className="wp-block-icon__inserter-grid-icons-list-item"
+					onClick={ () => onChange( icon.name ) }
+					variant={ icon.name === value ? 'primary' : undefined }
+					__next40pxDefaultSize
+				>
+					<span className="wp-block-icon__inserter-grid-icons-list-item-icon">
+						<HtmlRenderer html={ icon.content } />
+					</span>
+					<span className="wp-block-icon__inserter-grid-icons-list-item-title">
+						{ icon.label }
+					</span>
+				</Button>
+			) ) }
+		</div>
+	);
+
+	const renderGroups = () => {
+		let offset = 0;
+		return groups.map( ( group ) => {
+			const start = offset;
+			offset += group.icons.length;
+			// Show this group's icons, as many as have loaded so far.
+			const shownGroupIcons = group.icons.slice(
+				0,
+				Math.max( 0, shownIcons.length - start )
+			);
+			if ( ! shownGroupIcons.length ) {
+				return null;
+			}
+			const headingId = `${ instanceId }-${ group.slug }`;
+			return (
+				<div
+					key={ group.slug }
+					role="group"
+					aria-labelledby={ headingId }
+				>
+					<h2
+						id={ headingId }
+						className="wp-block-icon__inserter-grid-group-title"
+					>
+						{ group.label }
+					</h2>
+					{ renderIcons( shownGroupIcons ) }
+				</div>
+			);
+		} );
+	};
+
+	if ( ! icons?.length ) {
+		return (
+			<div className="wp-block-icon__inserter-grid">
 				<div className="wp-block-icon__inserter-grid-no-results">
 					<p>{ __( 'No results found.' ) }</p>
 				</div>
-			) : (
-				<div
-					className="wp-block-icon__inserter-grid-icons-list"
-					aria-label={ __( 'Icon library' ) }
-				>
-					{ shownIcons.map( ( icon ) => {
-						const isSelected = icon.name === value;
+			</div>
+		);
+	}
 
-						const collectionLabel = collections?.find(
-							( { slug } ) => slug === icon.collection
-						)?.label;
-						return (
-							<Button
-								key={ icon.name }
-								ref={ isSelected ? selectedIconRef : undefined }
-								className={ clsx(
-									'wp-block-icon__inserter-grid-icons-list-item',
-									{ 'is-selected': isSelected }
-								) }
-								onClick={ () => onChange( icon.name ) }
-								variant={ isSelected ? 'primary' : undefined }
-								aria-label={
-									collectionLabel
-										? sprintf(
-												/* translators: 1: Icon label. 2: Icon collection label. */
-												__( '%1$s (%2$s)' ),
-												icon.label,
-												collectionLabel
-											)
-										: undefined
-								}
-								__next40pxDefaultSize
-							>
-								<span className="wp-block-icon__inserter-grid-icons-list-item-icon">
-									<HtmlRenderer html={ icon.content } />
-								</span>
-								<span className="wp-block-icon__inserter-grid-icons-list-item-title">
-									{ icon.label }
-								</span>
-								{ collectionLabel && (
-									<span className="wp-block-icon__inserter-grid-icons-list-item-collection">
-										{ collectionLabel }
-									</span>
-								) }
-							</Button>
-						);
-					} ) }
+	return (
+		<div className="wp-block-icon__inserter-grid">
+			{ groups ? (
+				<div aria-label={ __( 'Icon library' ) }>
+					{ renderGroups() }
 				</div>
+			) : (
+				renderIcons( shownIcons, __( 'Icon library' ) )
 			) }
 		</div>
 	);
