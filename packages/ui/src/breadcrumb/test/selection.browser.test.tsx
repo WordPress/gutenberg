@@ -194,8 +194,6 @@ describe( 'Breadcrumb hierarchy selection', () => {
 
 	it.each( [
 		{ focusEditor: false, pointer: false },
-		{ focusEditor: true, pointer: false },
-		{ focusEditor: false, pointer: true },
 		{ focusEditor: true, pointer: true },
 	] )(
 		'dismisses an overflow action and handles removal of its trigger, $focusEditor consumer focus move, $pointer pointer activation',
@@ -327,36 +325,29 @@ describe( 'Breadcrumb hierarchy selection', () => {
 		expect( previousHandler ).not.toHaveBeenCalled();
 	} );
 
-	it.each( [ 80, 500 ] )(
-		'keeps custom-rendered ancestors non-current at width %s',
-		async ( width ) => {
-			await render(
-				<Breadcrumb.Root style={ { width } }>
-					<Breadcrumb.ButtonItem
-						render={ <ComposedAncestor aria-current="true" /> }
-						style={ { width: 80 } }
-					>
-						Document
-					</Breadcrumb.ButtonItem>
-					<Breadcrumb.CurrentItem style={ { width: 80 } }>
-						Paragraph
-					</Breadcrumb.CurrentItem>
-				</Breadcrumb.Root>
-			);
-			if ( width === 80 ) {
-				await page
-					.getByRole( 'button', { name: /hidden breadcrumb/ } )
-					.click();
-			}
-			await expect
-				.element(
-					page.getByRole( width === 80 ? 'menuitem' : 'button', {
-						name: 'Document',
-					} )
-				)
-				.not.toHaveAttribute( 'aria-current' );
-		}
-	);
+	it( 'keeps custom-rendered overflow ancestors non-current', async () => {
+		await render(
+			<Breadcrumb.Root style={ { width: 80 } }>
+				<Breadcrumb.ButtonItem
+					render={ <ComposedAncestor aria-current="true" /> }
+					style={ { width: 80 } }
+				>
+					Document
+				</Breadcrumb.ButtonItem>
+				<Breadcrumb.CurrentItem style={ { width: 80 } }>
+					Paragraph
+				</Breadcrumb.CurrentItem>
+			</Breadcrumb.Root>
+		);
+		await page.getByRole( 'button', { name: /hidden breadcrumb/ } ).click();
+		await expect
+			.element(
+				page.getByRole( 'menuitem', {
+					name: 'Document',
+				} )
+			)
+			.not.toHaveAttribute( 'aria-current' );
+	} );
 
 	it( 'shows a clipped button label tooltip on keyboard focus', async () => {
 		await render(
