@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 3.0.0 (2026-10-07)
+
+### Breaking Changes
+
+-   `RequestUtils.setGutenbergExperiments()`: An experiment left out of the call now returns to its default rather than being switched off, and an experiment can default to on.To pin an experiment off regardless of its default, the function now supports an object argument with boolean values ([#83784](https://github.com/WordPress/gutenberg/pull/83784)).
+
 ### Bug Fixes
 
 -   Mark the `@types/node` peer dependency as optional, since it is only needed for type checking ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
