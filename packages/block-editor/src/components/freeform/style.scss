@@ -4,15 +4,27 @@
 // The freeform canvas editing surface. It covers the canvas block exactly, so
 // everything inside is positioned in the canvas's own pixels.
 .block-editor-freeform-canvas {
-	// The surface itself must never swallow a click: only the grips and the
-	// handles are interactive, so clicking a block still selects it and
-	// clicking into text still places the caret.
-	pointer-events: none;
+	// Doubled for specificity, the way the grid visualizer does it, because
+	// `.components-popover` and its content set pointer-events themselves and
+	// re-enable them on everything inside. Left alone, the surface covers the
+	// whole canvas and swallows every click, so no other block can be selected.
+	&.block-editor-freeform-canvas.block-editor-freeform-canvas {
+		.components-popover__content * {
+			pointer-events: none;
+		}
 
-	&.is-gesturing {
-		// While a gesture is live nothing underneath should react to the
-		// pointer — a drag that crosses another block must not select it.
-		pointer-events: auto;
+		// Only the grips and the handles are interactive. Clicking a block
+		// still selects it and clicking into text still places the caret.
+		.block-editor-freeform-canvas__grip,
+		.block-editor-freeform-canvas__handle {
+			pointer-events: auto;
+		}
+
+		// While a gesture is live the surface does take the pointer, so a drag
+		// crossing another block does not select it on the way past.
+		&.is-gesturing .block-editor-freeform-canvas__surface {
+			pointer-events: auto;
+		}
 	}
 }
 
