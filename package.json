@@ -83,8 +83,8 @@
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.63.0",
-		"@types/react": "^18.3.27",
-		"@types/react-dom": "^18.3.1",
+		"@types/react": "^19.3.0",
+		"@types/react-dom": "^19.3.0",
 		"@wordpress/env": "file:./packages/env",
 		"@wordpress/eslint-tools": "file:./tools/eslint",
 		"@wordpress/monorepo-tools": "file:./tools/monorepo",
@@ -93,9 +93,12 @@
 		"@wordpress/stylelint-tools": "file:./tools/stylelint",
 		"concurrently": "^9.2.1",
 		"cross-env": "^7.0.3",
+		"eslint": "^10.0.0",
 		"husky": "^7.0.0",
 		"lerna": "^10.0.1",
 		"lint-staged": "^16.4.0",
+		"prettier": "npm:wp-prettier@^3.9.6",
+		"stylelint": "^17.14.1",
 		"syncpack": "^15.3.1",
 		"wait-on": "^8.0.1"
 	},
