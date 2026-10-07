@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { Stack } from '../stack';
 import type { RootProps } from './types';
 import resetStyles from '../utils/css/resets.module.css';
+import styles from './style.module.css';
 
 const DEFAULT_RENDER = ( props: React.ComponentProps< typeof Stack > ) => (
 	<Stack { ...props } direction="column" gap="sm" />
@@ -26,7 +27,11 @@ const Root = forwardRef< HTMLDivElement, RootProps >( function ProgressRoot(
 			getAriaValueText={ ( formattedValue ) =>
 				formattedValue || __( 'In progress' )
 			}
-			className={ clsx( resetStyles[ 'box-sizing' ], className ) }
+			className={ clsx(
+				resetStyles[ 'box-sizing' ],
+				styles.root,
+				className
+			) }
 			{ ...props }
 		/>
 	);
