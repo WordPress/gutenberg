@@ -1,0 +1,13 @@
+[
+	{
+		"label": "Install Zed settings",
+		"command": "npm",
+		"args": [
+			"run",
+			"install-zed-settings",
+			"--workspace",
+			"@wordpress/monorepo-tools"
+		],
+		"cwd": "$ZED_WORKTREE_ROOT"
+	}
+]

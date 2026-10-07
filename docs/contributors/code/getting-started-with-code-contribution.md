@@ -210,15 +210,29 @@ You can also test Storybook for the current `trunk` branch on GitHub Pages: [htt
 
 ## Developer tools
 
-We recommend configuring your editor to automatically check for syntax and lint errors. This will help you save time as you develop by automatically fixing minor formatting issues. Here are some directions for setting up Visual Studio Code, a popular editor used by many of the core developers, these tools are also available for other editors.
+We recommend configuring your editor to automatically check for syntax and lint errors. The repository includes managed settings for Visual Studio Code, Cursor, and Zed. Dependency installation generates each editor's local settings from [the shared editor configuration](https://github.com/WordPress/gutenberg/blob/HEAD/tools/monorepo/scripts/editor-settings.mts). Other editors can use the same root formatting and lint configuration files.
 
 ### Visual Studio Code
 
-If you use Visual Studio Code, the repository ships a managed workspace configuration so the editor uses the same linting, formatting, PHP, and TypeScript tooling as the Gutenberg repository. The first time you open the folder, VS Code prompts you to install the [recommended extensions](https://github.com/WordPress/gutenberg/blob/HEAD/.vscode/extensions.json) and to allow an automatic task that copies [`.vscode/settings.dist.jsonc`](https://github.com/WordPress/gutenberg/blob/HEAD/.vscode/settings.dist.jsonc) to `.vscode/settings.json`. Allow both. When the TypeScript 7 extension then asks whether to use the TypeScript 7 tsdk this workspace configures, choose **Allow**; otherwise it keeps using its bundled version.
+Visual Studio Code and Cursor use `.vscode/settings.json`. Install the [recommended extensions](https://github.com/WordPress/gutenberg/blob/HEAD/.vscode/extensions.json) and allow the automatic task that refreshes the managed settings when the folder opens. When the TypeScript 7 extension asks whether to use the TypeScript 7 tsdk this workspace configures, choose **Allow**; otherwise it keeps using its bundled version.
 
 The installer replaces `settings.json` whenever its first line is `// This is a managed VS Code settings file.`, so edits made there are lost the next time the folder opens or the installer runs. To keep your own settings, delete that line; the installer then leaves the file alone. You can re-run it at any time from the Command Palette via **Tasks: Run Task → Install VS Code settings**.
 
-The settings point the TypeScript extension at the workspace that installs TypeScript 7, because it is not installed in the root `node_modules`. If you maintain your own settings, copy `js/ts.tsdk.path` and `js/ts.experimental.useTsgo` from the template.
+The settings point the TypeScript, ESLint, Prettier, and Stylelint extensions at the workspaces that install them, because those tools are not installed in the root `node_modules`. If you maintain your own settings, copy those paths from the shared editor configuration.
+
+### Zed
+
+Zed uses `.zed/settings.json`, which dependency installation generates for each checkout. Install the **TypeScript Language Server** (`tsgo`), **PHP** (`php`), **PHPCS** (`phpcs`), **Stylelint** (`stylelint`), and **SCSS & SASS** (`scss`) extensions through **zed: extensions** in the Command Palette. JavaScript, JSX, TypeScript, TSX, CSS, and ESLint support are built in. Zed reads `.editorconfig` without an extension.
+
+The settings use the repository's native TypeScript language server, WordPress Prettier, ESLint, Stylelint, and Composer-installed PHPCS and PHPCBF. Run `composer install` before editing PHP. Intelephense uses the same PHP version and exclusions as Visual Studio Code. Saving JavaScript and TypeScript runs ESLint fixes and Prettier; saving CSS or SCSS runs Stylelint fixes; saving PHP runs PHPCS fixes.
+
+To refresh Zed settings, use **task: spawn → Install Zed settings**, or run:
+
+```bash
+npm run install-zed-settings --workspace @wordpress/monorepo-tools
+```
+
+The installer replaces `.zed/settings.json` while its first line is `// This is a managed Zed settings file.` Remove that line to preserve your custom settings. Managed Zed settings contain local absolute paths; refresh them after moving the checkout or changing the Node executable. If you installed dependencies with `--ignore-scripts`, run `npm run prepare` to install the managed editor settings and Git hooks.
 
 ### EditorConfig
 
@@ -228,13 +242,13 @@ The settings point the TypeScript extension at the workspace that installs TypeS
 
 [ESLint](https://eslint.org/) statically analyzes the code to find problems. The lint rules are integrated in the continuous integration process and must pass to be able to commit. With an editor integration enabled, ESLint will use the [eslint.config.mjs](https://github.com/WordPress/gutenberg/blob/HEAD/eslint.config.mjs) file in the root of the Gutenberg repository to highlight issues as you develop.
 
-If you use Visual Studio Code, use the extension and settings listed in the [Visual Studio Code](#visual-studio-code) section above. For other editors, see the [ESLint editor integration docs](https://eslint.org/docs/user-guide/integrations).
+If you use Visual Studio Code, Cursor, or Zed, use the setup instructions above. For other editors, see the [ESLint editor integration docs](https://eslint.org/docs/user-guide/integrations).
 
 ### Prettier
 
 [Prettier](https://prettier.io/) is a tool that allows you to define an opinionated format, and automate fixing the code to match that format. Prettier and ESLint are similar, Prettier is more about formatting and style, while ESLint is for detecting coding errors.
 
-Editor integrations use the `prettier.config.mjs` file included in the root of the Gutenberg repository. The config is included from the [@wordpress/prettier-config](/packages/prettier-config/README.md) package. If you use Visual Studio Code, use the extension and settings listed in the [Visual Studio Code](#visual-studio-code) section above.
+Editor integrations use the `prettier.config.mjs` file included in the root of the Gutenberg repository. The config is included from the [@wordpress/prettier-config](/packages/prettier-config/README.md) package. If you use Visual Studio Code, Cursor, or Zed, use the setup instructions above.
 
 For other editors, see [Prettier's Editor Integration docs](https://prettier.io/docs/en/editors.html).
 

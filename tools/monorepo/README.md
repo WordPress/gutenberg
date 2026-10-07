@@ -29,9 +29,13 @@ See the TypeScript section of [`packages/README.md`](../../packages/README.md) f
 
 `npm run --workspace @wordpress/monorepo-tools list-experimental-apis` prints a Markdown list of every `__experimental` API in `packages/` and `lib/`, each linked to a GitHub search for it. Release leads run it to audit experimental APIs ahead of a major WordPress release, as in [the WordPress 6.2 audit](https://github.com/WordPress/gutenberg/issues/47196).
 
-## VS Code settings
+## Editor settings
 
-`npm run --workspace @wordpress/monorepo-tools install-vscode-settings` copies `.vscode/settings.dist.jsonc` to `.vscode/settings.json`, unless that file no longer starts with `// This is a managed VS Code settings file.` A VS Code task runs it when the folder opens.
+`scripts/editor-settings.mts` holds shared tool paths, generated-file exclusions, PHP settings, and ESLint suppression settings, together with their VS Code and Zed translations. Formatting and lint rules remain in the root `.editorconfig`, `prettier.config.mjs`, `eslint.config.mjs`, `.stylelintrc.mjs`, and `phpcs.xml.dist` files.
+
+`npm run --workspace @wordpress/monorepo-tools install-editor-settings` generates `.vscode/settings.json` and `.zed/settings.json`. The root `prepare` script runs it after dependency installation. To refresh only one editor, use `install-vscode-settings` or `install-zed-settings`; both editors also have an **Install settings** task.
+
+The installer replaces a settings file only while its first line is the managed comment for that editor. Remove that line to preserve customizations. Generated settings are ignored by Git. Zed settings contain local absolute paths so language servers and formatters use the installed workspace tools across platforms; re-run the installer after moving a checkout or changing the Node executable.
 
 ## Admin design tokens experiment
 
