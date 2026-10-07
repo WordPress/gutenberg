@@ -42,7 +42,7 @@ collab-sidebar/
 ## Component hierarchy
 
 ```
-NotesSidebarContainer (index.jsx)         - gates on post type support
+NotesSidebarContainer (index.jsx)         - gates on post type support, owns the unsent drafts Map
  └── NotesSidebar (index.jsx)             - owns sidebarRef + useNoteThreads + sidebar registration
       ├── AddNoteMenuItem                - slot fill in the block toolbar
       ├── NoteAvatarIndicator            - slot fill in the block toolbar (per-thread avatars)
@@ -61,6 +61,8 @@ NotesSidebarContainer (index.jsx)         - gates on post type support
 ```
 
 `Notes` is reused for both sidebar surfaces. The only visual difference is driven by `isFloating` (whether to layer threads over the canvas or stack them in a panel).
+
+Unsent note and reply text lives in a `Map` owned by `NotesSidebarContainer`, keyed by block client ID or note ID, so it survives the forms unmounting. It is a cache, not state: `useNoteDraft` reads it on mount and writes it on change, so typing doesn't re-render the sidebar. Slot fills don't inherit context, so `NotesSidebar` provides it inside each fill.
 
 ## Floating board
 

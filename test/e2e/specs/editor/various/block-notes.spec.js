@@ -1605,6 +1605,155 @@ test.describe( 'Block Notes', () => {
 		} );
 	} );
 
+	test.describe( 'Draft persistence', () => {
+		test.beforeEach( async ( { editor } ) => {
+			/*
+			 * The middle block keeps the selected block's toolbar from covering
+			 * the other block's click target.
+			 */
+			for ( const content of [
+				'First block',
+				'Middle block',
+				'Second block',
+			] ) {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: { content },
+				} );
+			}
+		} );
+
+		test( 'preserves an unsent draft per block when switching blocks', async ( {
+			editor,
+			page,
+		} ) => {
+			const newNoteForm = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+
+			await editor.canvas.getByText( 'First block' ).click();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await newNoteForm.pressSequentially( 'First draft' );
+
+			await editor.canvas.getByText( 'Second block' ).click();
+			await expect( newNoteForm ).toBeHidden();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect( newNoteForm ).toHaveText( '' );
+			await newNoteForm.pressSequentially( 'Second draft' );
+
+			await editor.canvas.getByText( 'First block' ).click();
+			await expect( newNoteForm ).toHaveText( 'First draft' );
+			await editor.canvas.getByText( 'Second block' ).click();
+			await expect( newNoteForm ).toHaveText( 'Second draft' );
+
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+			await expect(
+				page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'treeitem', { name: 'Note: Second draft' } )
+			).toBeVisible();
+		} );
+
+		test( 'preserves an unsent draft across the code editor', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			const newNoteForm = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+
+			await editor.canvas.getByText( 'First block' ).click();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await newNoteForm.pressSequentially( 'Unsent draft' );
+
+			await pageUtils.pressKeys( 'secondary+m' );
+			await expect( newNoteForm ).toBeHidden();
+			await pageUtils.pressKeys( 'secondary+m' );
+
+			await editor.canvas.getByText( 'Second block' ).click();
+			await editor.canvas.getByText( 'First block' ).click();
+			await expect( newNoteForm ).toHaveText( 'Unsent draft' );
+		} );
+
+		test( 'closes the new note form on focus-out only when empty', async ( {
+			editor,
+			page,
+		} ) => {
+			const newNoteForm = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+
+			await editor.canvas.getByText( 'First block' ).click();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect( newNoteForm ).toBeFocused();
+			await editor.canvas.getByText( 'First block' ).click();
+			await expect( newNoteForm ).toBeHidden();
+
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await newNoteForm.pressSequentially( 'Unsent draft' );
+			await editor.canvas.getByText( 'First block' ).click();
+			await expect( newNoteForm ).toHaveText( 'Unsent draft' );
+		} );
+
+		test( 'discards a draft when the form is cancelled', async ( {
+			editor,
+			page,
+		} ) => {
+			const newNoteForm = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+
+			await editor.canvas.getByText( 'First block' ).click();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await newNoteForm.pressSequentially( 'Discarded draft' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Cancel' } )
+				.click();
+			await expect( newNoteForm ).toBeHidden();
+
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect( newNoteForm ).toHaveText( '' );
+		} );
+
+		test( 'preserves an unsent reply draft when the thread is deselected', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Noted block' },
+				comment: 'Test comment',
+			} );
+
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Test comment' } );
+			const replyForm = page.getByRole( 'textbox', {
+				name: 'Reply to',
+			} );
+
+			await thread.click();
+			await replyForm.click();
+			await replyForm.pressSequentially( 'Unsent reply' );
+
+			await editor.canvas.getByText( 'First block' ).click();
+			await expect( replyForm ).toBeHidden();
+
+			await editor.canvas.getByText( 'Noted block' ).click();
+			await expect( replyForm ).toHaveText( 'Unsent reply' );
+		} );
+	} );
+
 	test.describe( 'Inline notes', () => {
 		// Mirrors AVATAR_BORDER_COLORS in packages/editor/src/components/
 		// collab-sidebar/utils.js. Duplicated so the test fails loudly if the
