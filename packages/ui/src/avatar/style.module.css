@@ -44,6 +44,16 @@
 		.image {
 			object-fit: cover;
 
+			@media not (prefers-reduced-motion) {
+				transition: opacity var(--wpds-motion-duration-sm) var(--wpds-motion-easing-subtle);
+
+				&[data-starting-style],
+				&[data-loading],
+				&[data-error] {
+					opacity: 0;
+				}
+			}
+
 			/* Keep a layout box so lazy images can intersect the viewport. */
 			&[data-loading],
 			&[data-error] {

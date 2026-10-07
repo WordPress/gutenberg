@@ -17,7 +17,7 @@ import styles from './style.module.css';
  * ```jsx
  * <Avatar.Root role="img" aria-label="Alex Morgan">
  * 	<Avatar.Image src="/alex.jpg" alt="" />
- * 	<Avatar.Fallback>AM</Avatar.Fallback>
+ * 	<Avatar.Fallback delay={300}>AM</Avatar.Fallback>
  * </Avatar.Root>
  * ```
  */
