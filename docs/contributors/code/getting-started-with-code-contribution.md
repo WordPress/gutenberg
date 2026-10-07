@@ -218,7 +218,7 @@ If you use Visual Studio Code, the repository ships a managed workspace configur
 
 The installer replaces `settings.json` whenever its first line is `// This is a managed VS Code settings file.`, so edits made there are lost the next time the folder opens or the installer runs. To keep your own settings, delete that line; the installer then leaves the file alone. You can re-run it at any time from the Command Palette via **Tasks: Run Task → Install VS Code settings**.
 
-The settings point the TypeScript, ESLint, Prettier, and Stylelint extensions at the workspaces that install them, because those tools are not installed in the root `node_modules`. If you maintain your own settings, copy those paths from the template.
+The settings point the TypeScript extension at the workspace that installs TypeScript 7, because it is not installed in the root `node_modules`. If you maintain your own settings, copy `js/ts.tsdk.path` and `js/ts.experimental.useTsgo` from the template.
 
 ### EditorConfig
 
