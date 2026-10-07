@@ -11,6 +11,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
+	privateApis as globalStylesEnginePrivateApis,
 	setStyle as setStyleHelper,
 	setSetting as setSettingHelper,
 } from '@wordpress/global-styles-engine';
@@ -85,7 +86,54 @@ const {
 	FiltersPanel: StylesFiltersPanel,
 	ImageSettingsPanel,
 	AdvancedPanel: StylesAdvancedPanel,
+	getElementLayers,
 } = unlock( blockEditorPrivateApis );
+
+const { resolveStyle } = unlock( globalStylesEnginePrivateApis );
+
+/**
+ * Adds the font family a block inherits to the style the typography panel
+ * reads its inherited values from.
+ *
+ * The block's merged style only holds a font family the block sets itself.
+ * Without one, the block renders in the family it inherits from the root or
+ * element styles, so resolve it the way the block inspector does. The panel
+ * needs it to offer the weights and styles that font provides.
+ *
+ * @param mergedConfig          Merged Global Styles config.
+ * @param inheritedStyle        The block's merged style for the selected state.
+ * @param context               Block, variation and state to resolve.
+ * @param context.blockName     Block name.
+ * @param context.variationName Block style variation slug, if any.
+ * @param context.viewport      Selected viewport state, if any.
+ * @param context.pseudoState   Selected pseudo state, if any.
+ * @return The inherited style, with the resolved font family when it differs.
+ */
+export function getInheritedTypographyStyle(
+	mergedConfig: GlobalStylesConfig,
+	inheritedStyle: any,
+	context: {
+		blockName: string;
+		variationName?: string;
+		viewport?: string;
+		pseudoState?: string;
+	}
+) {
+	const fontFamily = resolveStyle( mergedConfig, {
+		...context,
+		elements: getElementLayers( context.blockName ),
+	} ).value?.typography?.fontFamily;
+	if (
+		! fontFamily ||
+		fontFamily === inheritedStyle?.typography?.fontFamily
+	) {
+		return inheritedStyle;
+	}
+	return {
+		...inheritedStyle,
+		typography: { ...inheritedStyle?.typography, fontFamily },
+	};
+}
 
 interface ScreenBlockProps {
 	name: string;
@@ -158,6 +206,23 @@ function ScreenBlock( {
 	);
 	const inheritedStyleWithResolvedBackground =
 		useStyleWithResolvedBackground( inheritedStyle );
+	const inheritedTypographyStyle = useMemo(
+		() =>
+			getInheritedTypographyStyle( mergedConfig, inheritedStyle, {
+				blockName: name,
+				variationName: variation,
+				viewport: effectiveSelectedViewport,
+				pseudoState: selectedPseudoState,
+			} ),
+		[
+			mergedConfig,
+			inheritedStyle,
+			name,
+			variation,
+			effectiveSelectedViewport,
+			selectedPseudoState,
+		]
+	);
 
 	const [ userSettings ] = useSetting( '', name, 'user' );
 	const [ rawSettings, setSettings ] = useSetting( '', name );
@@ -393,7 +458,7 @@ function ScreenBlock( {
 			) }
 			{ hasTypographyPanel && (
 				<StylesTypographyPanel
-					inheritedValue={ inheritedStyle }
+					inheritedValue={ inheritedTypographyStyle }
 					value={ style }
 					onChange={ onChangeTypography }
 					settings={ settings }

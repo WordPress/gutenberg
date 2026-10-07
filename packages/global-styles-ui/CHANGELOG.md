@@ -6,6 +6,10 @@
 
 -   Blocks screen: add the hover, focus, focus-visible and active state controls for the Navigation Link block, which already supports those states in `theme.json` and in the block inspector ([#83451](https://github.com/WordPress/gutenberg/pull/83451)).
 
+### Bug Fixes
+
+-   Blocks screen: resolve the font family a block inherits from the root or element styles, so the Typography panel's Appearance control offers only the weights and styles that font provides ([#83946](https://github.com/WordPress/gutenberg/pull/83946)).
+
 ### Internal
 
 -   Font Library: Replace `ProgressBar` with `Progress` from `@wordpress/ui`. ([#84021](https://github.com/WordPress/gutenberg/pull/84021))
