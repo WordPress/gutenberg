@@ -33,6 +33,10 @@ const CUSTOM_CSS_INSTANCE_REFERENCE = {};
 // Stable empty object reference for useSelect.
 const EMPTY_STYLE = {};
 
+function hasCustomCSSString( node ) {
+	return typeof node?.css === 'string' && node.css.trim() !== '';
+}
+
 /**
  * Collects every custom CSS state entry defined for a block instance, across
  * the default state, pseudo-states, and viewport states (including
@@ -55,35 +59,36 @@ function getCustomCSSStateEntries( style, blockName, viewportSettings ) {
 	const entries = [];
 	const pseudoStates = VALID_BLOCK_PSEUDO_STATES[ blockName ] ?? [];
 
-	const addEntry = ( node, pseudoState, mediaQuery ) => {
-		if ( typeof node?.css === 'string' && node.css.trim() ) {
-			entries.push( { css: node.css, pseudoState, mediaQuery } );
+	if ( hasCustomCSSString( style ) ) {
+		entries.push( { css: style.css } );
+	}
+
+	for ( const pseudoState of pseudoStates ) {
+		const pseudoStyle = style?.[ pseudoState ];
+		if ( hasCustomCSSString( pseudoStyle ) ) {
+			entries.push( { css: pseudoStyle.css, pseudoState } );
 		}
-	};
+	}
 
-	addEntry( style );
-	pseudoStates.forEach( ( pseudoState ) =>
-		addEntry( style?.[ pseudoState ], pseudoState )
-	);
-
-	const breakpoints = Object.entries(
+	for ( const [ breakpoint, mediaQuery ] of Object.entries(
 		getResponsiveMediaQueries( viewportSettings )
-	);
-
-	breakpoints.forEach( ( [ breakpoint, mediaQuery ] ) => {
+	) ) {
 		const breakpointStyle = style?.[ breakpoint ];
-		if ( ! breakpointStyle ) {
-			return;
+		if ( hasCustomCSSString( breakpointStyle ) ) {
+			entries.push( { css: breakpointStyle.css, mediaQuery } );
 		}
-		addEntry( breakpointStyle, undefined, mediaQuery );
-		pseudoStates.forEach( ( pseudoState ) =>
-			addEntry(
-				breakpointStyle?.[ pseudoState ],
-				pseudoState,
-				mediaQuery
-			)
-		);
-	} );
+
+		for ( const pseudoState of pseudoStates ) {
+			const breakpointPseudoStyle = breakpointStyle?.[ pseudoState ];
+			if ( hasCustomCSSString( breakpointPseudoStyle ) ) {
+				entries.push( {
+					css: breakpointPseudoStyle.css,
+					pseudoState,
+					mediaQuery,
+				} );
+			}
+		}
+	}
 
 	return entries;
 }
