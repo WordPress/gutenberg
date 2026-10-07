@@ -1110,6 +1110,19 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The files of a collection run in a scope of their own: an `index.php`
+	 * or a `field.php` using the variables of the loader as locals, e.g.
+	 * `$fields` to build its elements, changes nothing the loader read.
+	 */
+	public function test_the_files_of_a_collection_have_their_own_scope() {
+		$this->assertSame( array( 'scoped' => true ), $this->register_fixture_collections( 'valid', array( 'scoped' ) ) );
+
+		$fields = gutenberg_get_registered_fields( 'postType', 'gutenberg_scoped' );
+		$this->assertSame( array( 'plain', 'scoped' ), array_column( $fields, 'id' ), 'The index reusing `$directory` still reads its folder; the field reusing `$fields` and `$file` keeps the field read before it and the name of its folder.' );
+		$this->assertSame( array( 'draft', 'publish' ), array_column( $fields[1]['elements'], 'value' ) );
+	}
+
+	/**
 	 * There is no precedence between collections: a field of a collection
 	 * that redefines a field registered before it is skipped by the registry,
 	 * like a plugin registering it twice.
