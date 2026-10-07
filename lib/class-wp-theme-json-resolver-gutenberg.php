@@ -24,6 +24,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * Container for keep track of registered blocks.
 	 *
 	 * @since 6.1.0
+	 * @since 7.2.0 Added the `merged` entry.
 	 * @var array
 	 */
 	protected static $blocks_cache = array(
@@ -37,6 +38,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	/**
 	 * Merged data keyed by origin.
 	 *
+	 * @since 7.2.0
 	 * @var array
 	 */
 	protected static $merged = array();
@@ -190,6 +192,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * Checks whether the registered blocks were already processed for this origin.
 	 *
 	 * @since 6.1.0
+	 * @since 7.2.0 Added the 'merged' origin.
 	 *
 	 * @param string $origin Data source for which to cache the blocks.
 	 *                       Valid values are 'core', 'blocks', 'theme', 'user',
@@ -593,6 +596,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @since 5.9.0 Added user data, removed the `$settings` parameter,
 	 *              added the `$origin` parameter.
 	 * @since 6.1.0 Added block data and generation of spacingSizes array.
+	 * @since 7.2.0 Caches the merged data per origin for the request and returns a copy of it.
 	 *
 	 * @param string $origin Optional. To what level should we merge data:'default', 'blocks', 'theme' or 'custom'.
 	 *                       'custom' is used as default value as well as fallback value if the origin is unknown.
@@ -705,6 +709,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *              and `$i18n_schema` variables to reset.
 	 * @since 6.1.0 Added the `$blocks` and `$blocks_cache` variables
 	 *              to reset.
+	 * @since 7.2.0 Added the `$merged` variable to reset.
 	 */
 	public static function clean_cached_data() {
 		static::$core                     = null;
