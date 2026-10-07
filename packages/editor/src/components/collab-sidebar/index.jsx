@@ -216,17 +216,19 @@ function NotesSidebar( { postId, drafts } ) {
 export default function NotesSidebarContainer() {
 	const [ drafts ] = useState( () => new Map() );
 	const { postId, editorMode, revisionsMode } = useSelect( ( select ) => {
-		const { getCurrentPostId, getEditorMode, isRevisionsMode } = unlock(
+		const { getNotesPostId, getEditorMode, isRevisionsMode } = unlock(
 			select( editorStore )
 		);
 		return {
-			postId: getCurrentPostId(),
+			postId: getNotesPostId(),
 			editorMode: getEditorMode(),
 			revisionsMode: isRevisionsMode(),
 		};
 	}, [] );
 
-	if ( ! postId || typeof postId !== 'number' ) {
+	// Notes need a numeric post to attach to. Templates that only exist as
+	// theme files don't have one until they're saved.
+	if ( postId === undefined ) {
 		return null;
 	}
 
