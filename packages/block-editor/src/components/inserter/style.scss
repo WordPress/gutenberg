@@ -8,6 +8,14 @@ $block-inserter-preview-height: 350px;
 $block-quick-inserter-width: 350px;
 $block-inserter-tabs-height: 44px;
 
+.block-editor-inserter__tip kbd {
+	padding: 0 $grid-unit-05;
+	border: 1px solid var(--wpds-color-stroke-surface-neutral-strong);
+	border-radius: var(--wpds-border-radius-xs);
+	font-family: var(--wpds-typography-font-family-mono);
+	white-space: nowrap;
+}
+
 .block-editor-inserter {
 	display: inline-block;
 	background: none;

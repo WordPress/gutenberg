@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Inserter: Replace random tips with info notices using the same light-bulb icon ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
+-   Inserter: Replace random tips with info notices using the same light-bulb icon and style keyboard hints as keys ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
 
 ## 18.1.0 (2026-10-07)
 

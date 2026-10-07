@@ -1,14 +1,25 @@
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { createInterpolateElement, useState } from '@wordpress/element';
 import { tip } from '@wordpress/icons';
-import { Notice } from '@wordpress/ui';
+import { Notice, VisuallyHidden } from '@wordpress/ui';
+
+function SlashKey( { children } ) {
+	return (
+		<>
+			<kbd aria-hidden="true">{ children }</kbd>
+			<VisuallyHidden render={ <span /> }>
+				{ _x( 'Forward slash', 'keyboard key' ) }
+			</VisuallyHidden>
+		</>
+	);
+}
 
 const globalTips = [
 	createInterpolateElement(
 		__(
 			'While writing, you can press <kbd>/</kbd> to quickly insert new blocks.'
 		),
-		{ kbd: <kbd /> }
+		{ kbd: <SlashKey /> }
 	),
 	createInterpolateElement(
 		__(
@@ -32,7 +43,11 @@ function Tips() {
 	);
 
 	return (
-		<Notice.Root intent="info" icon={ tip }>
+		<Notice.Root
+			className="block-editor-inserter__tip"
+			intent="info"
+			icon={ tip }
+		>
 			<Notice.Description>
 				{ globalTips[ randomIndex ] }
 			</Notice.Description>
