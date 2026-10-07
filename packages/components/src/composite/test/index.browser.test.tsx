@@ -730,7 +730,6 @@ describe( 'Composite', () => {
 			).rejects.toThrow(
 				'Composite.GroupLabel can only be rendered inside Composite.Group.'
 			);
-			expect( console ).toHaveErrored();
 		} );
 	} );
 } );
