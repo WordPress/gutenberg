@@ -29,6 +29,7 @@
 -   Template Part: Fall back to the theme's template part file and report the error with `wp_trigger_error()` when the customized template part can't be loaded, instead of rendering nothing and logging an `Undefined property: WP_Error::$content` warning ([#83809](https://github.com/WordPress/gutenberg/pull/83809)).
 -   Post Featured Image: Do not wrap the media placeholder in a post link when `isLink` comes from the template, so adding a featured image no longer crashes the editor ([#81584](https://github.com/WordPress/gutenberg/pull/81584)).
 -   Image: Percent-encode the inline SVG in the circle-mask style's `mask-image`, and drop the malformed `;utf8` media type parameter, so audit tools no longer report the data URI as an invalid `url()` value ([#82333](https://github.com/WordPress/gutenberg/pull/82333)).
+-   Image: Reserve less vertical space for the lightbox close and navigation buttons on viewports 500px tall or shorter. The reservation was picked by viewport width alone, so a phone rotated to landscape kept the amount meant for a tall portrait screen and rendered the enlarged image smaller than it had been before the rotation ([#82825](https://github.com/WordPress/gutenberg/pull/82825)).
 
 ### Internal
 
