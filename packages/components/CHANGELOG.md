@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+    -   `DateTimePicker` ([#84129](https://github.com/WordPress/gutenberg/pull/84129))
+
 ## 42.0.0 (2026-10-07)
 
 ### Breaking Changes
