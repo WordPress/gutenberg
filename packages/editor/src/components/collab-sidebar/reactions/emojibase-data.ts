@@ -1,4 +1,4 @@
-import { useEffect, useState } from '@wordpress/element';
+import { useCallback, useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 // @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -78,6 +78,11 @@ export interface EmojibaseDataState {
 	data: EmojibaseEntry[] | null;
 	isLoading: boolean;
 	error: Error | null;
+}
+
+export interface EmojibaseDataResult extends EmojibaseDataState {
+	// Refetch after a failed load.
+	retry: () => void;
 }
 
 /*
@@ -192,10 +197,16 @@ export function loadEmojibaseData(
 			if ( ! r.ok ) {
 				throw new Error( `Failed to load ${ locale }/data.json` );
 			}
-			return r.json() as Promise< EmojibaseEntry[] >;
+			return r.json();
 		} )
-		.then( ( data ) => {
-			const value: EmojibaseDataset = { data };
+		.then( ( data: unknown ) => {
+			// Anything but an array would throw in the picker's render.
+			if ( ! Array.isArray( data ) ) {
+				throw new Error( `Invalid ${ locale }/data.json` );
+			}
+			const value: EmojibaseDataset = {
+				data: data as EmojibaseEntry[],
+			};
 			dataCache.set( cacheKey, value );
 			inflight.delete( cacheKey );
 			return value;
@@ -218,7 +229,9 @@ export function loadEmojibaseData(
 export function useEmojibaseData(
 	baseUrl: string | null,
 	locale: string
-): EmojibaseDataState {
+): EmojibaseDataResult {
+	const [ attempt, setAttempt ] = useState( 0 );
+	const retry = useCallback( () => setAttempt( ( n ) => n + 1 ), [] );
 	const [ state, setState ] = useState< EmojibaseDataState >( () => {
 		const cached = dataCache.get( `${ baseUrl }|${ locale }` );
 		return {
@@ -268,9 +281,9 @@ export function useEmojibaseData(
 		return () => {
 			cancelled = true;
 		};
-	}, [ baseUrl, locale ] );
+	}, [ baseUrl, locale, attempt ] );
 
-	return state;
+	return { ...state, retry };
 }
 
 /**

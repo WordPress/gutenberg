@@ -14,14 +14,16 @@ export interface CuratedEmoji {
 
 /**
  * Curated emoji set for reactions, seeding "Frequently used" and naming
- * these emoji with their own translated labels.
+ * these emoji with their own translated labels. Lowercase, like the
+ * Emojibase names around them, since they also appear mid-sentence
+ * ("Adam reacted with heart").
  */
 export const REACTION_EMOJIS: CuratedEmoji[] = [
-	{ emoji: '❤️', label: _x( 'Heart', 'emoji reaction' ) },
-	{ emoji: '🎉', label: _x( 'Celebration', 'emoji reaction' ) },
-	{ emoji: '😄', label: _x( 'Smile', 'emoji reaction' ) },
-	{ emoji: '👀', label: _x( 'Eyes', 'emoji reaction' ) },
-	{ emoji: '🚀', label: _x( 'Rocket', 'emoji reaction' ) },
+	{ emoji: '❤️', label: _x( 'heart', 'emoji reaction' ) },
+	{ emoji: '🎉', label: _x( 'celebration', 'emoji reaction' ) },
+	{ emoji: '😄', label: _x( 'smile', 'emoji reaction' ) },
+	{ emoji: '👀', label: _x( 'eyes', 'emoji reaction' ) },
+	{ emoji: '🚀', label: _x( 'rocket', 'emoji reaction' ) },
 ];
 
 /**
