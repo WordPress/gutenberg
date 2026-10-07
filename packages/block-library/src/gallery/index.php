@@ -469,6 +469,15 @@ function block_core_gallery_render_dynamic_image( $attachment_id, $attributes, $
  * @return string The content of the block being rendered.
  */
 function block_core_gallery_render( $attributes, $content, $block ) {
+	/*
+	 * Reads global styles once per request. The Gutenberg plugin caches the
+	 * merged theme.json data in the resolver, so this static is redundant there
+	 * but harmless. It avoids a full merge per gallery in WordPress Core until
+	 * the resolver cache from https://github.com/WordPress/gutenberg/pull/81979
+	 * ships in Core (WordPress 7.2); remove it after that release.
+	 */
+	static $global_styles = null;
+
 	// Gallery blocks created before layout variations existed do not have an
 	// explicit layout attribute. Missing and malformed layout data therefore
 	// falls back to Flex so existing galleries retain their current appearance.
@@ -607,7 +616,9 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 			// gap on the gallery.
 			$fallback_gap = 'var( --wp--style--gallery-gap-default, var( --gallery-block--gutter-size, var( --wp--style--block-gap, 0.5em ) ) )';
 
-			$global_styles = function_exists( 'wp_get_global_styles' ) ? wp_get_global_styles() : array();
+			if ( null === $global_styles ) {
+				$global_styles = function_exists( 'wp_get_global_styles' ) ? wp_get_global_styles() : array();
+			}
 
 			$global_gallery_styles = $global_styles['blocks']['core/gallery'] ?? array();
 			$global_gallery_gap    = $global_gallery_styles['spacing']['blockGap'] ?? $fallback_gap;
