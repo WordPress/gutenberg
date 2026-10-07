@@ -472,9 +472,9 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 	/*
 	 * Reads global styles once per request. The Gutenberg plugin caches the
 	 * merged theme.json data in the resolver, so this static is redundant there
-	 * but harmless. It avoids a full merge per gallery in WordPress Core until
+	 * but harmless. In WordPress Core it avoids a full merge per gallery until
 	 * the resolver cache from https://github.com/WordPress/gutenberg/pull/81979
-	 * ships in Core (WordPress 7.2); remove it after that release.
+	 * is backported.
 	 */
 	static $global_styles = null;
 
