@@ -56,9 +56,14 @@ const IconPlaceholder = ( { className, style } ) => (
 );
 
 export function Edit( { attributes, setAttributes, isSelected, context } ) {
-	const { icon, ariaLabel, flipHorizontal, flipVertical, rotation } =
-		attributes;
-	const { metadata } = attributes;
+	const {
+		icon,
+		ariaLabel,
+		flipHorizontal,
+		flipVertical,
+		rotation,
+		metadata,
+	} = attributes;
 
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
 
