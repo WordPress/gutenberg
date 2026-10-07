@@ -294,4 +294,104 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 			) !== false
 		);
 	}
+
+	/**
+	 * Focus states are generated against the block's style root, the `<li>`
+	 * wrapper, which never receives focus. They need rules of their own,
+	 * scoped to the link inside the item.
+	 */
+	public function test_focus_state_styles_are_scoped_to_the_link() {
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+
+		$class_name = gutenberg_block_core_navigation_link_get_focus_state_class(
+			array(
+				'style' => array(
+					':focus' => array( 'color' => array( 'text' => '#0000ff' ) ),
+				),
+			)
+		);
+
+		$this->assertNotEmpty( $class_name, 'A focus state should produce an instance class.' );
+
+		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context(
+			'block-supports',
+			array( 'prettify' => false )
+		);
+		$this->assertStringContainsString(
+			".$class_name > .wp-block-navigation-item__content:focus{color:#0000ff !important;}",
+			$stylesheet
+		);
+	}
+
+	/**
+	 * `:hover` and `:active` already match while a descendant of the wrapper is
+	 * hovered or activated, so they must not gain a second rule.
+	 */
+	public function test_hover_state_styles_are_left_to_the_states_block_support() {
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+
+		$class_name = gutenberg_block_core_navigation_link_get_focus_state_class(
+			array(
+				'style' => array(
+					':hover'  => array( 'color' => array( 'text' => '#ff0000' ) ),
+					':active' => array( 'color' => array( 'text' => '#00ff00' ) ),
+				),
+			)
+		);
+
+		$this->assertSame( '', $class_name );
+		$this->assertSame(
+			'',
+			gutenberg_style_engine_get_stylesheet_from_context(
+				'block-supports',
+				array( 'prettify' => false )
+			)
+		);
+	}
+
+	/**
+	 * Focus styles nested under a viewport state are wrapped in that
+	 * breakpoint's media query.
+	 */
+	public function test_responsive_focus_state_styles_are_wrapped_in_a_media_query() {
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+
+		$class_name = gutenberg_block_core_navigation_link_get_focus_state_class(
+			array(
+				'style' => array(
+					'@mobile' => array(
+						':focus' => array( 'color' => array( 'text' => '#0000ff' ) ),
+					),
+				),
+			)
+		);
+
+		$this->assertNotEmpty( $class_name );
+		$this->assertStringContainsString(
+			'{.' . $class_name . ' > .wp-block-navigation-item__content:focus{color:#0000ff !important;}}',
+			gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) )
+		);
+	}
+
+	/**
+	 * Preset references cannot rely on preset classnames once emitted as a CSS
+	 * rule, so they resolve to the preset custom property.
+	 */
+	public function test_focus_state_preset_values_resolve_to_custom_properties() {
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+
+		$class_name = gutenberg_block_core_navigation_link_get_focus_state_class(
+			array(
+				'style' => array(
+					':focus' => array( 'color' => array( 'text' => 'var:preset|color|accent-1' ) ),
+				),
+			)
+		);
+
+		$this->assertStringContainsString(
+			'color:var(--wp--preset--color--accent-1) !important;',
+			gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) )
+		);
+		$this->assertNotEmpty( $class_name );
+	}
 }
