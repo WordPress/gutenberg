@@ -1726,6 +1726,25 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * An id that is not a non-empty string is reported and skipped: the
+	 * other ids of the call are unregistered.
+	 */
+	public function test_unregistering_with_an_invalid_id_skips_it() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::unregister' );
+		$unregistered = null;
+		$this->on_fields_api_init(
+			static function ( $registry ) use ( &$unregistered ) {
+				$unregistered = $registry->unregister( 'postType', 'page', array( array( 'id' => 'author' ), '', 'date' ) );
+			}
+		);
+
+		$this->assertSame( array( 'date' ), array_column( $unregistered, 'id' ) );
+		$ids = array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' );
+		$this->assertContains( 'author', $ids, 'A definition in place of an id is skipped, not matched.' );
+		$this->assertNotContains( 'date', $ids );
+	}
+
+	/**
 	 * Registering only runs on the action: elsewhere it is refused and the
 	 * registry is left untouched. Before the action a registration would
 	 * keep the defaults from being registered; after it the fields have been read and
