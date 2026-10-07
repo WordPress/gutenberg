@@ -145,4 +145,30 @@ test.describe( 'Page List status tab counts', () => {
 		await expectCounts( page, { 'All Pages': 2, Published: 0, Drafts: 2 } );
 		await expect( page.getByRole( 'table' ) ).toBeVisible();
 	} );
+
+	test( 'updates the counts after publishing a draft in the editor', async ( {
+		page,
+	} ) => {
+		// The row links both the thumbnail and the title to the editor.
+		await page
+			.getByRole( 'row', { name: /Draft Page/ } )
+			.getByRole( 'link', { name: 'Draft Page' } )
+			.last()
+			.click();
+		// The v2 editor publishes from the header, without a pre-publish panel.
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Publish', exact: true } )
+			.click();
+		await expect(
+			page.getByRole( 'button', { name: 'Dismiss this notice' } )
+		).toContainText( 'published' );
+
+		// Go back within the app, so the counts come from the store rather
+		// than a fresh page load.
+		await page.goBack();
+
+		await expectCounts( page, { 'All Pages': 2, Published: 2, Drafts: 0 } );
+		await expect( page.getByRole( 'table' ) ).toBeVisible();
+	} );
 } );

@@ -23,7 +23,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useMemo, useCallback } from '@wordpress/element';
+import { useCallback, useEffect, useMemo } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { drawerRight } from '@wordpress/icons';
@@ -247,6 +247,11 @@ function PostListView( {
 	const refreshViewCounts = useCallback( () => {
 		invalidateResolution( 'getViewConfig', [ 'postType', postType ] );
 	}, [ invalidateResolution, postType ] );
+
+	// Leaving the list, such as to publish a draft in the editor, can change
+	// the totals without any action here to report it. Marking the counts stale
+	// on the way out makes the route loader fetch them again on the way back.
+	useEffect( () => refreshViewCounts, [ refreshViewCounts ] );
 
 	const postTypeActions: Action< Post >[] = usePostActions( {
 		postType,
