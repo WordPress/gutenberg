@@ -133,6 +133,7 @@ export function PrivateBlockToolbar( {
 				isBlockHiddenAtViewport( id, _currentDeviceType )
 			);
 		const _isEditingResponsiveStyleState =
+			!! selectedBlockClientId &&
 			isResponsiveEditing() &&
 			hasViewportBlockStyleState(
 				getSelectedBlockStyleState( selectedBlockClientId )
