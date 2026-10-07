@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-### Bug Fixes
+### Enhancements
 
 -   In-between inserter: Limit title-gap (`is-before-first-block`) hit-testing to the "+" so the overlay no longer steals clicks on the first block (fixes WebKit shift+click multi-selection inside a Group) ([#82301](https://github.com/WordPress/gutenberg/pull/82301)).
 
@@ -19,7 +19,6 @@
 -   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
 -   `LinkControl`: Add a `transformSuggestions` prop, so a consumer can filter, order or add to the search suggestions before they are shown ([#83652](https://github.com/WordPress/gutenberg/pull/83652)).
 -   Block Switcher: Show the pattern previews' focus and hover rings with the design system's outline instead of a legacy box-shadow ([#83933](https://github.com/WordPress/gutenberg/pull/83933)).
--   In-between inserter: Opt-in `placeBeforeFirstBlock` places the before-first (title-gap) insertion popover above the first block so the "+" does not overlap it ([#82301](https://github.com/WordPress/gutenberg/pull/82301)).
 
 ### Bug Fixes
 
