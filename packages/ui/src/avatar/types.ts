@@ -3,11 +3,12 @@ import type { ComponentProps } from '../utils/types';
 
 export type RootProps = ComponentProps< typeof _Avatar.Root > & {
 	/**
-	 * The size of the avatar.
+	 * The size of the avatar: `xs` (16px), `sm` (24px), `md` (32px),
+	 * `lg` (40px), or `xl` (64px) with the default design tokens.
 	 *
 	 * @default "md"
 	 */
-	size?: 'sm' | 'md' | 'lg';
+	size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 	/**
 	 * The avatar image, fallback, and any custom decorations.
 	 */
