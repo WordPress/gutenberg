@@ -60,16 +60,6 @@ const ControlledColorPicker = ( {
 	);
 };
 
-async function selectColorFormat(
-	user: ReturnType< typeof userEvent.setup >,
-	format: 'Hex' | 'RGB' | 'HSL'
-) {
-	await user.click(
-		screen.getByRole( 'combobox', { name: 'Color format' } )
-	);
-	await user.click( screen.getByRole( 'option', { name: format } ) );
-}
-
 describe( 'ColorPicker', () => {
 	describe( 'legacy props', () => {
 		it( 'should fire onChangeComplete with the legacy color format', async () => {
@@ -90,7 +80,8 @@ describe( 'ColorPicker', () => {
 			} );
 			expect( formatSelector ).toBeVisible();
 
-			await selectColorFormat( user, 'Hex' );
+			await user.click( formatSelector );
+			await user.click( screen.getByRole( 'option', { name: 'Hex' } ) );
 
 			const hexInput = screen.getByRole( 'textbox' );
 			expect( hexInput ).toBeVisible();
@@ -127,7 +118,8 @@ describe( 'ColorPicker', () => {
 			} );
 			expect( formatSelector ).toBeVisible();
 
-			await selectColorFormat( user, 'Hex' );
+			await user.click( formatSelector );
+			await user.click( screen.getByRole( 'option', { name: 'Hex' } ) );
 
 			const hexInput = screen.getByRole( 'textbox' );
 			expect( hexInput ).toBeVisible();
@@ -156,7 +148,10 @@ describe( 'ColorPicker', () => {
 				/>
 			);
 
-			await selectColorFormat( user, 'Hex' );
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Color format' } )
+			);
+			await user.click( screen.getByRole( 'option', { name: 'Hex' } ) );
 
 			const hexInput = screen.getByRole( 'textbox' );
 			await user.clear( hexInput );
@@ -188,7 +183,8 @@ describe( 'ColorPicker', () => {
 			} );
 			expect( formatSelector ).toBeVisible();
 
-			await selectColorFormat( user, 'RGB' );
+			await user.click( formatSelector );
+			await user.click( screen.getByRole( 'option', { name: 'RGB' } ) );
 
 			const inputElement = screen.getByRole( 'spinbutton', {
 				name: inputLabel,
@@ -224,7 +220,8 @@ describe( 'ColorPicker', () => {
 			} );
 			expect( formatSelector ).toBeVisible();
 
-			await selectColorFormat( user, 'HSL' );
+			await user.click( formatSelector );
+			await user.click( screen.getByRole( 'option', { name: 'HSL' } ) );
 
 			const hueSliders = screen.getAllByRole( 'slider', {
 				name: 'Hue',
@@ -364,7 +361,10 @@ describe( 'ColorPicker', () => {
 				/>
 			);
 
-			await selectColorFormat( user, 'HSL' );
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Color format' } )
+			);
+			await user.click( screen.getByRole( 'option', { name: 'HSL' } ) );
 
 			const hueSliders = screen.getAllByRole( 'slider', { name: 'Hue' } );
 			const hueSlider = hueSliders.at( -1 )!;
@@ -415,7 +415,12 @@ describe( 'ColorPicker', () => {
 				);
 
 				const user = userEvent.setup();
-				await selectColorFormat( user, 'HSL' );
+				await user.click(
+					screen.getByRole( 'combobox', { name: 'Color format' } )
+				);
+				await user.click(
+					screen.getByRole( 'option', { name: 'HSL' } )
+				);
 
 				const hueSlider = screen
 					.getAllByRole( 'slider', { name: 'Hue' } )
@@ -462,7 +467,10 @@ describe( 'ColorPicker', () => {
 				/>
 			);
 
-			await selectColorFormat( user, 'HSL' );
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Color format' } )
+			);
+			await user.click( screen.getByRole( 'option', { name: 'HSL' } ) );
 
 			const lightnessSlider = screen.getByRole( 'slider', {
 				name: 'Lightness',
@@ -503,13 +511,19 @@ describe( 'ColorPicker', () => {
 			);
 
 			// Start in hex mode and enter a mid-gray.
-			await selectColorFormat( user, 'Hex' );
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Color format' } )
+			);
+			await user.click( screen.getByRole( 'option', { name: 'Hex' } ) );
 			const hexInput = screen.getByRole( 'textbox' );
 			await userEvent.fill( hexInput, '808080' );
 			await waitFor( () => expect( hexInput ).toHaveValue( '808080' ) );
 
 			// Switch to HSL to inspect the values.
-			await selectColorFormat( user, 'HSL' );
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Color format' } )
+			);
+			await user.click( screen.getByRole( 'option', { name: 'HSL' } ) );
 
 			const saturationSlider = screen.getByRole( 'slider', {
 				name: 'Saturation',
@@ -539,7 +553,10 @@ describe( 'ColorPicker', () => {
 				/>
 			);
 
-			await selectColorFormat( user, 'HSL' );
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Color format' } )
+			);
+			await user.click( screen.getByRole( 'option', { name: 'HSL' } ) );
 
 			const hueSliders = screen.getAllByRole( 'slider', { name: 'Hue' } );
 			const hueSlider = hueSliders.at( -1 )!;
@@ -599,7 +616,10 @@ describe( 'ColorPicker', () => {
 				} );
 				expect( formatSelector ).toBeVisible();
 
-				await selectColorFormat( user, 'HSL' );
+				await user.click( formatSelector );
+				await user.click(
+					screen.getByRole( 'option', { name: 'HSL' } )
+				);
 
 				const inputElement = screen.getByRole( 'spinbutton', {
 					name: inputLabel,
@@ -753,7 +773,10 @@ describe( 'ColorPicker', () => {
 			expect( onChange ).toHaveBeenLastCalledWith( '#000000' );
 			const { left: leftAfterDrag } = getPointerPosition( pointer );
 
-			await selectColorFormat( user, 'HSL' );
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Color format' } )
+			);
+			await user.click( screen.getByRole( 'option', { name: 'HSL' } ) );
 
 			const hueSlider = screen
 				.getAllByRole( 'slider', { name: 'Hue' } )
@@ -781,7 +804,10 @@ describe( 'ColorPicker', () => {
 				/>
 			);
 
-			await selectColorFormat( user, 'HSL' );
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Color format' } )
+			);
+			await user.click( screen.getByRole( 'option', { name: 'HSL' } ) );
 
 			const lightnessSlider = screen.getByRole( 'slider', {
 				name: 'Lightness',
@@ -818,7 +844,10 @@ describe( 'ColorPicker', () => {
 				/>
 			);
 
-			await selectColorFormat( user, 'HSL' );
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Color format' } )
+			);
+			await user.click( screen.getByRole( 'option', { name: 'HSL' } ) );
 
 			const lightnessSlider = screen.getByRole( 'slider', {
 				name: 'Lightness',
@@ -856,7 +885,10 @@ describe( 'ColorPicker', () => {
 				/>
 			);
 
-			await selectColorFormat( user, 'HSL' );
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Color format' } )
+			);
+			await user.click( screen.getByRole( 'option', { name: 'HSL' } ) );
 
 			const lightnessSlider = screen.getByRole( 'slider', {
 				name: 'Lightness',
@@ -893,7 +925,10 @@ describe( 'ColorPicker', () => {
 				/>
 			);
 
-			await selectColorFormat( user, 'HSL' );
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Color format' } )
+			);
+			await user.click( screen.getByRole( 'option', { name: 'HSL' } ) );
 			const lightnessSlider = screen.getByRole( 'slider', {
 				name: 'Lightness',
 			} );
@@ -926,7 +961,10 @@ describe( 'ColorPicker', () => {
 				/>
 			);
 
-			await selectColorFormat( user, 'HSL' );
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Color format' } )
+			);
+			await user.click( screen.getByRole( 'option', { name: 'HSL' } ) );
 			const hueSlider = screen
 				.getAllByRole( 'slider', { name: 'Hue' } )
 				.at( -1 )!;
@@ -952,7 +990,10 @@ describe( 'ColorPicker', () => {
 				/>
 			);
 
-			await selectColorFormat( user, 'HSL' );
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Color format' } )
+			);
+			await user.click( screen.getByRole( 'option', { name: 'HSL' } ) );
 
 			const lightnessSlider = screen.getByRole( 'slider', {
 				name: 'Lightness',
@@ -999,7 +1040,10 @@ describe( 'ColorPicker', () => {
 				name: 'Color format',
 			} );
 			expect( formatSelector ).toBeVisible();
-			await selectColorFormat( user, formatLabel );
+			await user.click( formatSelector );
+			await user.click(
+				screen.getByRole( 'option', { name: formatLabel } )
+			);
 
 			const alphaInput = screen.getByRole( 'spinbutton', {
 				name: 'Alpha',
