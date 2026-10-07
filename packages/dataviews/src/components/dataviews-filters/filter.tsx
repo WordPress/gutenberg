@@ -157,17 +157,7 @@ function OperatorSelector( {
 							)?.label
 						}
 					</Select.Trigger>
-					<Select.Popup
-						width="content"
-						portal={
-							<Select.Portal
-								style={ {
-									// Sit above `.components-popover` (1000000). The native select painted over the filter dropdown; the Select popup is portaled to the document and needs this to do the same.
-									'--wp-ui-select-z-index': '1000001',
-								} }
-							/>
-						}
-					>
+					<Select.Popup width="content">
 						{ operatorOptions.map( ( option ) => (
 							<Select.Item
 								key={ option.value }
