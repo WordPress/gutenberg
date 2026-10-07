@@ -14,15 +14,15 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
+	const clientId = clientIds?.[ 0 ];
 	const { isBlockBasedTheme, canCreate } = useSelect(
 		( select ) => {
 			const { getBlockRootClientId, canInsertBlockType } =
 				select( blockEditorStore );
 
-			const rootClientId =
-				clientIds?.length > 0
-					? getBlockRootClientId( clientIds[ 0 ] )
-					: undefined;
+			const rootClientId = clientId
+				? getBlockRootClientId( clientId )
+				: undefined;
 
 			return {
 				isBlockBasedTheme:
@@ -33,7 +33,7 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 				),
 			};
 		},
-		[ clientIds ]
+		[ clientId ]
 	);
 
 	if ( ! isBlockBasedTheme || ! canCreate ) {
