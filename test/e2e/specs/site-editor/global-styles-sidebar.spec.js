@@ -64,6 +64,44 @@ test.describe( 'Global styles sidebar', () => {
 		).toHaveAttribute( 'aria-pressed', 'false' );
 	} );
 
+	test( 'should offer typography controls on the Button block but not on Buttons', async ( {
+		page,
+	} ) => {
+		const panel = ( scope, name ) =>
+			scope
+				.getByRole( 'heading', { name, exact: true } )
+				.or( scope.getByRole( 'button', { name, exact: true } ) );
+
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Styles' } )
+			.click();
+
+		const settings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+
+		await settings.getByRole( 'button', { name: 'Blocks' } ).click();
+		await settings
+			.getByRole( 'searchbox', { name: 'Search' } )
+			.fill( 'button' );
+
+		await settings
+			.getByRole( 'button', { name: 'Buttons', exact: true } )
+			.click();
+		await expect( panel( settings, 'Color' ) ).toBeVisible();
+		await expect( panel( settings, 'Typography' ) ).toBeHidden();
+
+		await settings
+			.getByRole( 'button', { name: 'Back', exact: true } )
+			.click();
+
+		await settings
+			.getByRole( 'button', { name: 'Button', exact: true } )
+			.click();
+		await expect( panel( settings, 'Typography' ) ).toBeVisible();
+	} );
+
 	test( 'should filter blocks list results', async ( { page } ) => {
 		// Navigate to Styles -> Blocks.
 		await page
