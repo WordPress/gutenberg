@@ -62,7 +62,10 @@ test.describe( 'React 18 compatibility block (React 19 runtime)', () => {
 
 test.describe( 'React 18 compatibility block (React 18 runtime)', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.setGutenbergExperiments( [] );
+		// React 19 is on by default, so this runtime has to be asked for.
+		await requestUtils.setGutenbergExperiments( {
+			'gutenberg-react-19': false,
+		} );
 		await requestUtils.activatePlugin(
 			'gutenberg-test-react-18-compat-block'
 		);
@@ -76,6 +79,7 @@ test.describe( 'React 18 compatibility block (React 18 runtime)', () => {
 		await requestUtils.deactivatePlugin(
 			'gutenberg-test-react-18-compat-block'
 		);
+		await requestUtils.setGutenbergExperiments( [] );
 	} );
 
 	test( 'renders a React 19 boolean inert attribute with React 18 runtime', async ( {

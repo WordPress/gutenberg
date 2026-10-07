@@ -43,9 +43,7 @@
 		@include minimized-threads;
 	}
 
-	// The canvas draws the divider.
 	.editor-collab-sidebar-panel {
-		border-left: 0;
 		// A real scroller, mirrored with the canvas by `useFloatingBoard`.
 		// No anchoring, so a thread that grows doesn't move the panel.
 		overflow-y: auto;
@@ -79,7 +77,6 @@
 	padding: $grid-unit-20 $grid-unit-20 $grid-unit-30;
 	height: 100%;
 	overflow: hidden;
-	border-left: $border-width solid color-mix(in srgb, currentColor 10%, transparent);
 }
 
 .editor-collab-sidebar-panel__thread,
@@ -160,6 +157,10 @@
 
 .editor-collab-sidebar-panel__note-content {
 	overflow-wrap: break-word;
+
+	p {
+		margin-top: 0;
+	}
 
 	p:last-child {
 		margin-bottom: 0;
