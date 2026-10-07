@@ -2,10 +2,14 @@
 
 ## Unreleased
 
+## 42.0.0 (2026-10-07)
+
 ### Breaking Changes
 
 -   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+    -   `FontSizePicker` ([#84126](https://github.com/WordPress/gutenberg/pull/84126))
+    -   `PaletteEdit` ([#84130](https://github.com/WordPress/gutenberg/pull/84130)).
     -   `CustomGradientPicker` ([#82576](https://github.com/WordPress/gutenberg/pull/82576))
     -   `Text` ([#82573](https://github.com/WordPress/gutenberg/pull/82573))
     -   `Card`, `CardBody`, `CardHeader`, `CardFooter`, `CardMedia`, `CardDivider` ([#82577](https://github.com/WordPress/gutenberg/pull/82577))
@@ -31,6 +35,8 @@
 -   Deprecate `Badge` in the private APIs; use `Badge` from `@wordpress/ui` instead. ([#82379](https://github.com/WordPress/gutenberg/pull/82379)).
 
 ### Bug Fixes
+
+-   `CustomGradientPicker`: Extend the clickable area of control points and the plus button to the full height of the gradient bar ([#84124](https://github.com/WordPress/gutenberg/pull/84124)).
 
 -   `Popover`: Keep the `will-change: transform` hint only while the popover is moving, so its content is no longer left on a compositing layer that Chrome can render blurry ([#77359](https://github.com/WordPress/gutenberg/pull/77359)).
 -   `RadioControl`: Keep radio circles visually 16px at all viewport widths while retaining a 24px pointer target ([#83840](https://github.com/WordPress/gutenberg/pull/83840)).
