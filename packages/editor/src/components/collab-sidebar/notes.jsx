@@ -207,6 +207,7 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 		>
 			{ isAddingNote && (
 				<AddNote
+					key={ selectedBlockClientId }
 					clientId={ selectedBlockClientId }
 					onSubmit={ onAddReply }
 					sidebarRef={ sidebarRef }

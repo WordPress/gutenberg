@@ -95,6 +95,8 @@ When designing props for a new component:
 
 When you change a component's Storybook `parameters.componentStatus.status` or its public export, check the `@wordpress/ui` entry in the [`use-recommended-components`](../eslint-plugin/docs/rules/use-recommended-components.md) ESLint rule. `recommended` components belong in `allowed`, `use-with-caution` components in `caution`, and other statuses in neither.
 
+The Design System MCP catalog uses a curated Storybook manifest. Add `tags: [ 'manifest' ]` to a recommended component's story metadata, and remove the tag from the component it replaces. The tag is independent of `componentStatus`, so update both when changing the recommendation. Update the ESLint rule's replacement guidance and any migration documentation as needed. Run `npm run storybook:build` and `npm run storybook:manifest-snapshot`, then review and commit the generated snapshot and any allowlist reductions. See [Manifest snapshot regression testing](../../storybook/README.md#manifest-snapshot-regression-testing).
+
 ## Compound Components
 
 This package follows the [compound component approach outlined in the `@wordpress/components` contributing guidelines](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/CONTRIBUTING.md#compound-components).
