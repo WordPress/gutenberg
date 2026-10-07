@@ -234,5 +234,16 @@
 		"tools/*",
 		"widgets/*",
 		"!test/ai-development"
-	]
+	],
+	"allowScripts": {
+		"@parcel/watcher": false,
+		"@swc/core": false,
+		"core-js": false,
+		"core-js-pure": false,
+		"esbuild": false,
+		"fs-ext-extra-prebuilt": false,
+		"fsevents": false,
+		"nx": false,
+		"unrs-resolver": false
+	}
 }
