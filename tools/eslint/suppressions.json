@@ -4775,11 +4775,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/font-size-picker/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/form-file-upload/index.tsx": {
 		"react-hooks/refs": {
 			"count": 1
@@ -4813,11 +4808,6 @@
 	"packages/components/src/number-control/styles/number-control-styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
-		}
-	},
-	"packages/components/src/palette-edit/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
 		}
 	},
 	"packages/components/src/panel/body.tsx": {
