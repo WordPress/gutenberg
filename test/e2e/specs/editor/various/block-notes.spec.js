@@ -397,10 +397,14 @@ test.describe( 'Block Notes', () => {
 		).toBeHidden();
 
 		await search.fill( '' );
+		await sidebar.getByRole( 'button', { name: 'Filter' } ).click();
 		const status = sidebar.getByRole( 'combobox', { name: 'Status' } );
 		await status.selectOption( 'Resolved' );
 		await expect( headingThread ).toBeVisible();
 		await expect( imageThread ).toBeHidden();
+		await expect(
+			sidebar.getByRole( 'button', { name: 'Filter (1 applied)' } )
+		).toBeVisible();
 
 		await status.selectOption( 'Open' );
 		await expect( imageThread ).toBeVisible();

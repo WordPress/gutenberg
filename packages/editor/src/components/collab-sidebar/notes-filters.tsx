@@ -1,9 +1,12 @@
 import {
+	Button,
 	SearchControl,
 	SelectControl as WCSelectControl,
 } from '@wordpress/components';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { __ } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
+import { __, _n, _x, sprintf } from '@wordpress/i18n';
+import { funnel } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
 
 type NoteStatusFilter = 'all' | 'hold' | 'approved';
@@ -39,6 +42,18 @@ export function hasActiveNotesFilters( filters: NotesFilterValues ) {
 		filters.search.trim() !== '' ||
 		filters.status !== 'all' ||
 		filters.author !== 'all'
+	);
+}
+
+/**
+ * Counts the filters set in the collapsible panel. Search is left out since
+ * its field is always shown.
+ *
+ * @param filters Filter values.
+ */
+export function countPanelFilters( filters: NotesFilterValues ) {
+	return (
+		Number( filters.status !== 'all' ) + Number( filters.author !== 'all' )
 	);
 }
 
@@ -135,6 +150,9 @@ export function NotesFilters( {
 	onChange,
 }: NotesFiltersProps ) {
 	const authors = getNoteAuthors( notes );
+	const panelFilterCount = countPanelFilters( filters );
+	// Start open when filters are already set, e.g. after reopening the sidebar.
+	const [ isPanelOpen, setIsPanelOpen ] = useState( panelFilterCount > 0 );
 
 	return (
 		<Stack
@@ -142,41 +160,81 @@ export function NotesFilters( {
 			direction="column"
 			gap="sm"
 		>
-			<SearchControl
-				label={ __( 'Search notes' ) }
-				value={ filters.search }
-				onChange={ ( search ) => onChange( { ...filters, search } ) }
-			/>
-			<Stack direction="row" gap="sm" align="flex-start">
-				<WCSelectControl
-					label={ __( 'Status' ) }
-					value={ filters.status }
-					options={ [
-						{ label: __( 'All' ), value: 'all' },
-						{ label: __( 'Open' ), value: 'hold' },
-						{ label: __( 'Resolved' ), value: 'approved' },
-					] }
-					onChange={ ( status ) =>
-						onChange( { ...filters, status } )
+			<Stack direction="row" gap="sm" align="center">
+				<SearchControl
+					className="editor-collab-sidebar-filters__search"
+					label={ __( 'Search notes' ) }
+					value={ filters.search }
+					onChange={ ( search ) =>
+						onChange( { ...filters, search } )
 					}
 				/>
-				{ ( authors.size > 1 || filters.author !== 'all' ) && (
+				<div className="editor-collab-sidebar-filters__toggle">
+					<Button
+						__next40pxDefaultSize
+						icon={ funnel }
+						label={
+							panelFilterCount
+								? sprintf(
+										/* translators: %d: Number of filters applied. */
+										_n(
+											'Filter (%d applied)',
+											'Filter (%d applied)',
+											panelFilterCount
+										),
+										panelFilterCount
+									)
+								: _x( 'Filter', 'verb' )
+						}
+						aria-expanded={ isPanelOpen }
+						isPressed={ isPanelOpen }
+						onClick={ () => setIsPanelOpen( ! isPanelOpen ) }
+					/>
+					{ panelFilterCount > 0 && (
+						<span
+							className="editor-collab-sidebar-filters__count"
+							aria-hidden="true"
+						>
+							{ panelFilterCount }
+						</span>
+					) }
+				</div>
+			</Stack>
+			{ isPanelOpen && (
+				<Stack direction="row" gap="sm" align="flex-start">
 					<WCSelectControl
-						label={ __( 'Author' ) }
-						value={ filters.author }
+						label={ __( 'Status' ) }
+						value={ filters.status }
 						options={ [
 							{ label: __( 'All' ), value: 'all' },
-							...Array.from( authors, ( [ value, label ] ) => ( {
-								label,
-								value,
-							} ) ),
+							{ label: __( 'Open' ), value: 'hold' },
+							{ label: __( 'Resolved' ), value: 'approved' },
 						] }
-						onChange={ ( author ) =>
-							onChange( { ...filters, author } )
+						onChange={ ( status ) =>
+							onChange( { ...filters, status } )
 						}
 					/>
-				) }
-			</Stack>
+					{ ( authors.size > 1 || filters.author !== 'all' ) && (
+						<WCSelectControl
+							label={ __( 'Author' ) }
+							value={ filters.author }
+							options={ [
+								{ label: __( 'All' ), value: 'all' },
+								...Array.from(
+									authors,
+									( [ value, label ] ) => ( {
+										label,
+										value,
+									} )
+								),
+							] }
+							onChange={ ( author ) =>
+								onChange( { ...filters, author } )
+							}
+						/>
+					) }
+				</Stack>
+			) }
 		</Stack>
 	);
 }
