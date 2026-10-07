@@ -5612,6 +5612,15 @@ describe( 'getBlockEditingMode', () => {
 	} );
 
 	describe( 'getSelectedBlockStyleState', () => {
+		it( 'returns default when no clientId is passed', () => {
+			const state = {};
+
+			expect( getSelectedBlockStyleState( state, undefined ) ).toEqual( {
+				viewport: 'default',
+				pseudo: 'default',
+			} );
+		} );
+
 		it( 'returns default when the block has no selected state', () => {
 			const state = {};
 
