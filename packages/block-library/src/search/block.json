@@ -25,7 +25,8 @@
 			"type": "number"
 		},
 		"widthUnit": {
-			"type": "string"
+			"type": "string",
+			"default": "px"
 		},
 		"buttonText": {
 			"type": "string",
