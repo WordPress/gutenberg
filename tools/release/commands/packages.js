@@ -45,6 +45,66 @@ const NPM_RELEASE_PREPARED_REF_PREFIX = 'refs/npm-release';
 class NpmReleaseVerificationPendingError extends Error {}
 
 /**
+ * Drops the `npm_config_*` variables that `npm exec` exported from the release
+ * tool's `.npmrc`. They outrank a project `.npmrc`, so a `wp/X.Y` branch would
+ * otherwise install with trunk's settings.
+ *
+ * Only exact copies of the tool's `.npmrc` values are dropped, so settings from
+ * the user config, the environment or the command line still apply.
+ *
+ * @param {Object} env Environment to filter.
+ *
+ * @return {Object} Filtered environment.
+ */
+function getRepositoryCommandEnv( env = process.env ) {
+	const toolPrefix = env.npm_config_local_prefix;
+	if ( ! toolPrefix ) {
+		return env;
+	}
+
+	let npmrc = '';
+	try {
+		npmrc = fs.readFileSync( join( toolPrefix, '.npmrc' ), 'utf8' );
+	} catch {}
+	const toolConfig = new Map( [ [ 'local_prefix', toolPrefix ] ] );
+	for ( const line of npmrc.split( /\r?\n/ ) ) {
+		const match = line.match( /^\s*([^#;=\s][^=]*?)\s*=\s*(.*?)\s*$/ );
+		if ( match ) {
+			toolConfig.set(
+				match[ 1 ].replace( /-/g, '_' ).toLowerCase(),
+				match[ 2 ].replace( /^(["'])(.*)\1$/, '$2' )
+			);
+		}
+	}
+
+	return Object.fromEntries(
+		Object.entries( env ).filter( ( [ name, value ] ) => {
+			const match = name.match( /^npm_config_(.+)$/i );
+			return (
+				! match || toolConfig.get( match[ 1 ].toLowerCase() ) !== value
+			);
+		} )
+	);
+}
+
+/**
+ * Runs a command in the release repository with that repository's own npm
+ * configuration.
+ *
+ * @param {string} commandString Command to run.
+ * @param {Object} options       execa options.
+ *
+ * @return {Promise<Object>} execa result.
+ */
+function commandInRepository( commandString, options = {} ) {
+	return command( commandString, {
+		...options,
+		env: getRepositoryCommandEnv(),
+		extendEnv: false,
+	} );
+}
+
+/**
  * Release type names.
  *
  * @typedef {('latest'|'bugfix'|'patch'|'next')} ReleaseType
@@ -757,7 +817,7 @@ async function runNpmPublishPreflight(
 	{ distTag, gitWorkingDirectoryPath, publishCommit, releasePackages },
 	deps = {}
 ) {
-	const { commandFn = command } = deps;
+	const { commandFn = commandInRepository } = deps;
 	/*
 	 * `npm whoami` fails for every credential problem that happens in practice:
 	 * a missing, expired, or revoked auth token, or an unreachable registry.
@@ -1327,7 +1387,7 @@ async function installNpmReleaseDependencies(
 	{ gitWorkingDirectoryPath },
 	deps = {}
 ) {
-	const { commandFn = command } = deps;
+	const { commandFn = commandInRepository } = deps;
 	log( '>> Installing npm packages.' );
 	await commandFn( 'npm ci', {
 		cwd: gitWorkingDirectoryPath,
@@ -1398,7 +1458,7 @@ function getNpmReleasePreparedPluginBranch(
  */
 async function resumePreparedNpmRelease( config, deps = {} ) {
 	const {
-		commandFn = command,
+		commandFn = commandInRepository,
 		deletePreparedCommitFn = deleteNpmReleasePreparedCommit,
 		getPreparedChangelogCommitFn = getNpmReleasePreparedChangelogCommit,
 		getPreparedCommitFn = getNpmReleasePreparedCommit,
@@ -1547,7 +1607,7 @@ async function publishVersionedPackagesToNpm(
 	deps = {}
 ) {
 	const {
-		commandFn = command,
+		commandFn = commandInRepository,
 		git = simpleGit( gitWorkingDirectoryPath ),
 		getNpmReleasePackagesFn = getNpmReleasePackages,
 		pushNpmReleaseGitMetadataFn = pushNpmReleaseGitMetadata,
@@ -1703,7 +1763,7 @@ async function publishPackagesToNpm(
 	deps = {}
 ) {
 	const {
-		commandFn = command,
+		commandFn = commandInRepository,
 		git = simpleGit( gitWorkingDirectoryPath ),
 		publishVersionedPackagesToNpmFn = publishVersionedPackagesToNpm,
 	} = deps;
@@ -2129,6 +2189,7 @@ module.exports = {
 	getNpmReleasePackages,
 	getNpmReleaseGitRecoveryCommands,
 	getRemoteBranchSha,
+	getRepositoryCommandEnv,
 	getRemoteTagShas,
 	getTagPushCommands,
 	getTagRefspec,
