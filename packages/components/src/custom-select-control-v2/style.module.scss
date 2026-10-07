@@ -8,8 +8,7 @@
 	background-color: $components-color-background;
 	border: none;
 	color: $components-color-foreground;
-	/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Preserve the existing cursor during this style-only migration. */
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	font-family: inherit;
 	text-align: start;
 	user-select: none;
@@ -39,7 +38,10 @@
 // The 6px correction aligns the item's checkmark with that chevron.
 $sizes: (default, 40px, 12px), (compact, 32px, 8px), (small, 24px, 8px);
 @each $size, $height, $padding in $sizes {
-	$variant: if($size == default, "", ":where(.is-#{$size})");
+	$variant: "";
+	@if $size != default {
+		$variant: ":where(.is-#{$size})";
+	}
 
 	.select#{$variant} {
 		padding-inline-start: $padding;
@@ -95,10 +97,9 @@ $sizes: (default, 40px, 12px), (compact, 32px, 8px), (small, 24px, 8px);
 
 	&[data-open] {
 		@media not (prefers-reduced-motion) {
-			// Keep these values in sync with utils/dropdown-motion.ts.
 			animation-name: slide-down, fade-in;
-			animation-duration: 200ms, 100ms;
-			animation-timing-function: cubic-bezier(0.25, 0, 0, 1), linear;
+			animation-duration: var(--wpds-motion-duration-md), var(--wpds-motion-duration-sm);
+			animation-timing-function: var(--wpds-motion-easing-expressive), linear;
 			will-change: transform, opacity;
 		}
 	}
