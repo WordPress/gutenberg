@@ -53,3 +53,9 @@ export default groups;
 export const PrivateInspectorControlsAllowedBlocks = createSlotFill(
 	Symbol( 'PrivateInspectorControlsAllowedBlocks' )
 );
+
+// Private slot for the "Advanced" panel shown while editing a style state, so
+// it always renders after every other style state panel.
+export const PrivateInspectorControlsStyleStatesAdvanced = createSlotFill(
+	Symbol( 'PrivateInspectorControlsStyleStatesAdvanced' )
+);
