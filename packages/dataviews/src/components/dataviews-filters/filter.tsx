@@ -4,13 +4,7 @@ import { Dropdown, FlexItem, Icon as WCIcon } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useRef } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
-import {
-	Select,
-	Stack,
-	Tooltip,
-	// eslint-disable-next-line @wordpress/use-recommended-components -- Required for mixed overlays in hosts that bundle DataViews without WordPress globals.
-	useEnableWpCompatOverlaySlot,
-} from '@wordpress/ui';
+import { Select, Stack, Tooltip } from '@wordpress/ui';
 import SearchWidget from './search-widget';
 import InputWidget from './input-widget';
 import { getOperatorByName } from '../../utils/operators';
@@ -188,7 +182,6 @@ export default function Filter( {
 	fields,
 	...commonProps
 }: FilterProps ) {
-	useEnableWpCompatOverlaySlot();
 	const toggleRef = useRef< HTMLDivElement >( null );
 	const { filter, view, onChangeView } = commonProps;
 	const filterInView = view.filters?.find(
