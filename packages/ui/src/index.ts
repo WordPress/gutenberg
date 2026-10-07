@@ -15,8 +15,10 @@ export * from './icon';
 export * from './icon-button';
 export * from './link';
 export * as Menu from './menu';
+export * as Meter from './meter';
 export * as Notice from './notice';
 export * as Popover from './popover';
+export * as Progress from './progress';
 export * from './skeleton';
 export * from './spinner';
 export * from './stack';
@@ -28,7 +30,6 @@ export {
 	KeyboardShortcutDisplay,
 	useKeyboardShortcutProps,
 } from './utils/keyboard-shortcut';
-export { inertValue } from './utils/inert-value';
 export { getWpCompatOverlaySlot } from './utils/wp-compat-overlay-slot';
 export { useEnableWpCompatOverlaySlot } from './utils/use-enable-wp-compat-overlay-slot';
 export * from './visually-hidden';
