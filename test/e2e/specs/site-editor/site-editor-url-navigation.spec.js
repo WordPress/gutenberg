@@ -45,7 +45,7 @@ test.describe( 'Site editor url navigation', () => {
 		await admin.visitSiteEditor( { postType: 'wp_template' } );
 		await page.getByRole( 'button', { name: 'Add Template' } ).click();
 		const singleItemPost = page.getByRole( 'button', {
-			name: 'Single item: Post',
+			name: 'Single Posts',
 		} );
 		await expect( singleItemPost ).toBeEnabled();
 		await singleItemPost.click();
