@@ -70,6 +70,39 @@ function block_core_tabs_provide_context( array $context, array $parsed_block ):
 add_filter( 'render_block_context', 'block_core_tabs_provide_context', 10, 2 );
 
 /**
+ * Whether Tabs markup has anything a visitor would see: tab labels, panel
+ * text, or replaced media. An unused Tabs block saves empty tab buttons and
+ * empty panels; that should not appear on the front end.
+ *
+ * @since 7.1.0
+ *
+ * @param string $content Rendered Tabs HTML, including inner blocks.
+ * @return bool True when there is no front-end content.
+ */
+function block_core_tabs_content_is_empty( string $content ): bool {
+	if ( '' === $content ) {
+		return true;
+	}
+
+	$processor    = new WP_HTML_Tag_Processor( $content );
+	$content_tags = array( 'IMG', 'VIDEO', 'AUDIO', 'IFRAME', 'SVG', 'FIGURE', 'CANVAS', 'HR', 'PICTURE', 'EMBED', 'OBJECT' );
+
+	while ( $processor->next_token() ) {
+		$token_type = $processor->get_token_type();
+
+		if ( '#text' === $token_type && '' !== trim( (string) $processor->get_modifiable_text() ) ) {
+			return false;
+		}
+
+		if ( '#tag' === $token_type && in_array( $processor->get_tag(), $content_tags, true ) ) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+/**
  * Render callback for core/tabs.
  *
  * @since 7.1.0
@@ -81,6 +114,10 @@ add_filter( 'render_block_context', 'block_core_tabs_provide_context', 10, 2 );
  * @return string Updated HTML.
  */
 function block_core_tabs_render_block_callback( array $attributes, string $content, \WP_Block $block ): string {
+	if ( block_core_tabs_content_is_empty( $content ) ) {
+		return '';
+	}
+
 	$active_tab_index = $attributes['activeTabIndex'] ?? 0;
 	$tabs_list        = $block->context['core/tabs-list'] ?? array();
 	$tabs_id          = $block->context['core/tabs-id'] ?? null;
