@@ -114,11 +114,10 @@ jobs:
             issues: write
             pull-requests: write
         steps:
-            # Checkout defaults to using the branch which triggered the event, which
-            # isn't necessarily `trunk` (e.g. in the case of a merge).
+            # Use this branch's own report-flaky-tests: trunk's version takes
+            # different inputs and fails this workflow.
             - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
               with:
-                  ref: trunk
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
 
