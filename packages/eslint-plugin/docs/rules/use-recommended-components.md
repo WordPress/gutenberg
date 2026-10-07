@@ -13,12 +13,14 @@ The rule checks named imports and direct destructuring from `unlock( privateApis
 - `__experimentalInputControl` — [`InputControl` migration guide][inputcontrol-migration-guide]
 - `TextControl` — [`InputControl` migration guide][inputcontrol-migration-guide]
 - `TextareaControl` — [`TextareaControl` migration guide][textareacontrol-migration-guide]
+- `Tip` — [`Tip` migration guide][tip-migration-guide]
 
 [checkboxcontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-checkboxcontrol--migration-guide
 [inputcontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-inputcontrol--migration-guide
 [radiocontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-radiocontrol--migration-guide
 [togglecontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-togglecontrol--migration-guide
 [textareacontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-textareacontrol--migration-guide
+[tip-migration-guide]: https://github.com/WordPress/gutenberg/blob/HEAD/packages/components/src/tip/README.md#migration-to-notice
 
 ## Rule details
 

@@ -1,0 +1,26 @@
+# Tip
+
+<p class="callout callout-alert">This component is deprecated. Use <code>Notice</code> from <code>@wordpress/ui</code> instead.</p>
+
+Tip displays contextual guidance with a decorative light-bulb icon. Its export, props, markup, and styles remain available for existing consumers.
+
+## Migration to Notice
+
+Use `Notice.Root` with `intent="info"` and `Notice.Description` for the content. Pass the `tip` icon from `@wordpress/icons` to retain the light-bulb icon. The notice uses the design system's info colors, border, and padding.
+
+```jsx
+import { tip } from '@wordpress/icons';
+import { Notice } from '@wordpress/ui';
+
+const MyTip = ( { children } ) => (
+	<Notice.Root intent="info" icon={ tip }>
+		<Notice.Description>{ children }</Notice.Description>
+	</Notice.Root>
+);
+```
+
+For a call to action, use `Notice.Actions` and `Notice.ActionLink`. Pass `openInNewTab` to retain an external link's new-tab indicator and accessible notice. Add `Notice.CloseIconButton` only if the consuming interface supports dismissal.
+
+Like Tip, Notice does not announce its content automatically. Consumers must announce dynamic updates when needed. See the [Notice announcement guidance](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-notice-announcements--docs).
+
+The `.components-tip` selector belongs to the legacy component. Update custom consumer styles when migrating to Notice rather than carrying this class name into the new composition.
