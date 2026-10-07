@@ -6,6 +6,8 @@
 
 -   Notes: allow reacting to a note with an emoji. Reactions display as pill buttons on the note with per-emoji counts, backed by a new `reaction` comment type. The add-reaction trigger fades in on hover or focus in the note's top corner, so a note with no reactions costs no vertical space for the option ([#76767](https://github.com/WordPress/gutenberg/pull/76767)).
 
+## 15.2.0 (2026-10-07)
+
 ### Enhancements
 
 -   `trashPost`: Accept a `force` option to delete the post permanently instead of moving it to the trash ([#84045](https://github.com/WordPress/gutenberg/pull/84045)).
