@@ -1415,3 +1415,24 @@ export function isSelectedBlockStyleStateShownOnCanvas( state, clientId ) {
 
 	return state.selectedBlockStyleState.showStateOnCanvas ?? true;
 }
+
+/**
+ * Returns the ancestor whose List View panel in the block inspector lists the
+ * given block, if any. When supported blocks are nested, only the outermost
+ * has a panel, as in `ListViewPanel`.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Block client ID.
+ *
+ * @return {?string} Client ID of the ancestor, or null.
+ */
+export function getListViewSupportAncestor( state, clientId ) {
+	if ( ! clientId ) {
+		return null;
+	}
+	return (
+		getBlockParents( state, clientId ).find( ( parentId ) =>
+			shouldRenderBlockListView( state, parentId )
+		) ?? null
+	);
+}
