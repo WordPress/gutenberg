@@ -117,7 +117,7 @@ function gutenberg_initialize_experiments_settings() {
 				array(
 					'id'          => 'gutenberg-react-19',
 					'label'       => __( 'React 19', 'gutenberg' ),
-					'description' => __( 'Registers React 19 as the bundled React version, replacing the default React 18 scripts.', 'gutenberg' ),
+					'description' => __( 'Uses React 19 for the registered React scripts, instead of the legacy React 18 version. Can be disabled when the new React 19 script cause compatibility issues with plugins and themes.', 'gutenberg' ),
 				),
 			),
 		),
@@ -133,6 +133,7 @@ function gutenberg_initialize_experiments_settings() {
 				'description' => $experiment['description'],
 				'group'       => $group['slug'],
 				'group_label' => $group['label'],
+				'default'     => gutenberg_get_experiment_default( $experiment['id'] ),
 			);
 
 			$properties[ $experiment['id'] ] = $property;
