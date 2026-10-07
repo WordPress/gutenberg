@@ -15,8 +15,19 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=20.10.0",
-		"npm": ">=10.2.3"
+		"node": ">=24.18.0",
+		"npm": ">=11.18.0"
+	},
+	"devEngines": {
+		"runtime": {
+			"name": "node",
+			"version": ">=24.18.0"
+		},
+		"packageManager": {
+			"name": "npm",
+			"version": ">=11.18.0",
+			"onFail": "error"
+		}
 	},
 	"wpPlugin": {
 		"name": "gutenberg",
@@ -247,5 +258,16 @@
 		"routes/*",
 		"storybook",
 		"!packages/react-native-*"
-	]
+	],
+	"allowScripts": {
+		"@parcel/watcher": false,
+		"core-js": false,
+		"core-js-pure": false,
+		"esbuild": false,
+		"fs-ext": false,
+		"fsevents": false,
+		"husky": false,
+		"nx": false,
+		"unrs-resolver": false
+	}
 }
