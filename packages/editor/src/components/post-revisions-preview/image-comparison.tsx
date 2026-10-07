@@ -20,7 +20,12 @@ const IMAGE_PREVIEW_STYLES = [
 	{ css: 'html, body { background: transparent; padding: 0; }' },
 ];
 
-/** Keep historical attributes independent of current binding sources. */
+/**
+ * Keep historical attributes independent of current binding sources.
+ *
+ * @param {Block} block The image block to clone for comparison.
+ * @return {Block} A clean clone with caption and bindings removed.
+ */
 function cloneImagePreview( block: Block ) {
 	const originalMetadata = block.attributes.metadata;
 	const metadata: Record< string, unknown > =
@@ -34,7 +39,14 @@ function cloneImagePreview( block: Block ) {
 	return cloneBlock( block, { caption: '', metadata } );
 }
 
-/** Measure layout before transforming, so fitting cannot change the extent. */
+/**
+ * Renders an image block preview scaled to fit within a fixed-height frame.
+ *
+ * @param {Object}                root0                Component props.
+ * @param {Block}                 root0.block          The image block to preview.
+ * @param {number}                root0.frameHeight    The available height to scale into.
+ * @param {(height:number)=>void} root0.onHeightChange Callback fired with the block's natural rendered height.
+ */
 function FittedImagePreview( {
 	block,
 	frameHeight,
