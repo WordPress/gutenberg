@@ -83,13 +83,6 @@ $footer-height: 90px;
 	font-size: 11px;
 	font-weight: var(--wpds-typography-font-weight-emphasis);
 	text-transform: uppercase;
-
-	@include mixins.break-small() {
-		.components-select-control__input {
-			font-size: 11px !important;
-			font-weight: var(--wpds-typography-font-weight-emphasis);
-		}
-	}
 }
 
 .font-library__search {

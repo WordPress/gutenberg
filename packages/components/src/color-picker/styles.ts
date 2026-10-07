@@ -1,6 +1,5 @@
 import styled from '@emotion/styled';
 import NumberControl from '../number-control';
-import InnerSelectControl from '../select-control';
 import InnerRangeControl from '../range-control';
 import { space } from '../utils/space';
 import { boxSizingReset } from '../utils';
@@ -12,7 +11,7 @@ export const NumberControlWrapper = styled( NumberControl )`
 	width: ${ space( 24 ) };
 `;
 
-export const SelectControl = styled( InnerSelectControl )`
+export const ColorFormatSelect = styled.div`
 	margin-left: ${ space( -2 ) };
 `;
 

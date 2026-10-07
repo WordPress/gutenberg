@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Font Library: Use `Select` from `@wordpress/ui` for the pagination page selector ([#83035](https://github.com/WordPress/gutenberg/pull/83035)).
+
 ## 1.24.0 (2026-10-07)
 
 ### Enhancements

@@ -560,10 +560,13 @@ test.describe( 'Style Revisions', () => {
 		await userGlobalStylesRevisions.openStylesPanel();
 		await page.getByRole( 'button', { name: 'Revisions' } ).click();
 		// The page select is the screen's only pagination control.
-		const currentPageSelect = page.getByLabel( 'Current page' );
-		await expect( currentPageSelect ).toHaveValue( '1' );
-		await currentPageSelect.selectOption( '2' );
-		await expect( currentPageSelect ).toHaveValue( '2' );
+		const currentPageSelect = page.getByRole( 'combobox', {
+			name: 'Current page',
+		} );
+		await expect( currentPageSelect ).toHaveText( '1' );
+		await currentPageSelect.click();
+		await page.getByRole( 'option', { name: '2', exact: true } ).click();
+		await expect( currentPageSelect ).toHaveText( '2' );
 		// The theme defaults entry closes the last page.
 		await expect(
 			page.getByRole( 'option', {
