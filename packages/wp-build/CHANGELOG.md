@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Publish only runtime files, dropping `tsconfig.json` and the TypeScript build cache (`.cache`) from the package.
+
 ## 0.25.0 (2026-10-07)
 
 ### Bug Fixes

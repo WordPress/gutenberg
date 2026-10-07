@@ -21,6 +21,12 @@
 	"engines": {
 		"node": ">=18.12.0"
 	},
+	"files": [
+		"build-module",
+		"build-types",
+		"src",
+		"*.md"
+	],
 	"module": "build-module/index.mjs",
 	"exports": {
 		".": {

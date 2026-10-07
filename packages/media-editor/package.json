@@ -23,6 +23,15 @@
 	"engines": {
 		"node": ">=18.12.0"
 	},
+	"files": [
+		"build",
+		"build-module",
+		"build-style",
+		"build-types",
+		"global.d.ts",
+		"src",
+		"*.md"
+	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
 	"exports": {

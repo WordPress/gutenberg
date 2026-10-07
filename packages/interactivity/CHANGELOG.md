@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Publish only runtime files, dropping `tsconfig.json`, `tsconfig.build.json` and `tsconfig.build.tsbuildinfo` from the package.
+
 ## 7.0.0 (2026-10-07)
 
 ### Breaking Changes
