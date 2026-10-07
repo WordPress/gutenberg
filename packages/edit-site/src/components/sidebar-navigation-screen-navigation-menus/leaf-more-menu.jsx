@@ -13,12 +13,23 @@ import { unlock } from '../../lock-unlock';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 
+// Blocks whose content controls open in the List View popover.
+const BLOCKS_WITH_CONTENT_POPOVER = [
+	'core/navigation-link',
+	'core/navigation-submenu',
+];
+
 export default function LeafMoreMenu( props ) {
 	const history = useHistory();
 	const { path } = useLocation();
 	const { clientId } = props;
-	const { moveBlocksDown, moveBlocksUp, removeBlocks } =
-		useDispatch( blockEditorStore );
+	const {
+		moveBlocksDown,
+		moveBlocksUp,
+		removeBlocks,
+		selectBlock,
+		openListViewContentPanel,
+	} = unlock( useDispatch( blockEditorStore ) );
 
 	const removeLabel = sprintf(
 		/* translators: %s: block name */
@@ -79,6 +90,17 @@ export default function LeafMoreMenu( props ) {
 			{ ( { onClose } ) => (
 				<>
 					<MenuGroup>
+						{ BLOCKS_WITH_CONTENT_POPOVER.includes( blockName ) && (
+							<MenuItem
+								onClick={ () => {
+									selectBlock( clientId );
+									openListViewContentPanel();
+									onClose();
+								} }
+							>
+								{ __( 'Edit' ) }
+							</MenuItem>
+						) }
 						<MenuItem
 							icon={ chevronUp }
 							onClick={ () => {
