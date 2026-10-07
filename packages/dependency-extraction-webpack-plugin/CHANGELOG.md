@@ -6,6 +6,10 @@
 
 -   Add `@wordpress/sync` as a bundled package, so consumer builds bundle it instead of externalizing it to the removed `wp-sync` script ([#81999](https://github.com/WordPress/gutenberg/pull/81999)).
 
+### Bug Fixes
+
+-   Externalize `@wordpress/dataviews/wp` as `wp-dataviews` instead of bundling it, so WordPress-script consumers get the shared runtime handle and its translations. [#80986](https://github.com/WordPress/gutenberg/pull/80986)
+
 ## 6.56.0 (2026-09-23)
 
 ### Enhancements
