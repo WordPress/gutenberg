@@ -226,7 +226,7 @@ Open a JavaScript or TypeScript file to activate the extension, then choose **Al
 
 ### Zed
 
-Open the repository root in Zed after installing dependencies with `npm install` and `composer install`. The checked-in [`.zed/settings.json`](https://github.com/WordPress/gutenberg/blob/HEAD/.zed/settings.json) applies automatically. No settings generation or refresh task is needed.
+Install dependencies with `npm install` and `composer install`, then open the repository root in Zed. Copy the optional [`.zed/settings.dist.json`](https://github.com/WordPress/gutenberg/blob/HEAD/.zed/settings.dist.json) template to `.zed/settings.json`, or merge its entries into your existing project settings. Like the VS Code template, it takes effect only after you copy or merge it. The local settings file is ignored by Git, and the repository does not install or update it automatically.
 
 Install **TypeScript Language Server** (`tsgo`), **PHP** (`php`), **PHPCS** (`phpcs`), **Stylelint** (`stylelint`), and **SCSS & SASS** (`scss`) through **zed: extensions** in the Command Palette. Zed includes ESLint support and reads `.editorconfig` without an extension. Make sure `node` and `php` are available on your `PATH`.
 
