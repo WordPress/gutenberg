@@ -558,7 +558,7 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 	}, [ applyPendingResponsiveState ] );
 
 	const displayedItems =
-		( menuOpen || isOverflowTriggerFocused ) && ! selectionChanged
+		variant !== 'selection' && ( menuOpen || isOverflowTriggerFocused )
 			? frozenItemsRef.current
 			: items;
 	const displayedAncestors = displayedItems.filter(
@@ -629,7 +629,6 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 					{ visiblePosition++ > 0 && <Separator /> }
 					<Menu.Root
 						open={ menuOpen }
-
 						onOpenChange={ handleMenuOpenChange }
 					>
 						<Tooltip.Root disabled={ menuOpen }>

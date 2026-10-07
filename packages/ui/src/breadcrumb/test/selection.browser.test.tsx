@@ -301,6 +301,63 @@ describe( 'Breadcrumb hierarchy selection', () => {
 		await expect.element( trigger ).toHaveFocus();
 	} );
 
+	it( 'uses updated activation handlers while overflow remains open', async () => {
+		const previousHandler = vi.fn();
+		const currentHandler = vi.fn();
+		const view = await render(
+			<SelectionTrail
+				width={ 280 }
+				keepSelection
+				onActivate={ previousHandler }
+			/>
+		);
+		await page.getByRole( 'button', { name: /hidden breadcrumb/ } ).click();
+		await expect
+			.element( page.getByRole( 'menuitem', { name: 'Outer group' } ) )
+			.toBeVisible();
+		await view.rerender(
+			<SelectionTrail
+				width={ 280 }
+				keepSelection
+				onActivate={ currentHandler }
+			/>
+		);
+		await page.getByRole( 'menuitem', { name: 'Outer group' } ).click();
+		expect( currentHandler ).toHaveBeenCalledTimes( 1 );
+		expect( previousHandler ).not.toHaveBeenCalled();
+	} );
+
+	it.each( [ 80, 500 ] )(
+		'keeps custom-rendered ancestors non-current at width %s',
+		async ( width ) => {
+			await render(
+				<Breadcrumb.Root style={ { width } }>
+					<Breadcrumb.ButtonItem
+						render={ <ComposedAncestor aria-current="true" /> }
+						style={ { width: 80 } }
+					>
+						Document
+					</Breadcrumb.ButtonItem>
+					<Breadcrumb.CurrentItem style={ { width: 80 } }>
+						Paragraph
+					</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
+			);
+			if ( width === 80 ) {
+				await page
+					.getByRole( 'button', { name: /hidden breadcrumb/ } )
+					.click();
+			}
+			await expect
+				.element(
+					page.getByRole( width === 80 ? 'menuitem' : 'button', {
+						name: 'Document',
+					} )
+				)
+				.not.toHaveAttribute( 'aria-current' );
+		}
+	);
+
 	it( 'shows a clipped button label tooltip on keyboard focus', async () => {
 		await render(
 			<Breadcrumb.Root aria-label="Block hierarchy">

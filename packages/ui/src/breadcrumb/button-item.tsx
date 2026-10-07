@@ -54,6 +54,7 @@ function TrailButtonItem( {
 						onBlur: () => onLinkBlur( itemKey ),
 						onFocus: () => onLinkFocus( itemKey ),
 					} ) ) }
+			aria-current={ undefined }
 			ref={ isMeasurement ? undefined : mergedRef }
 			className={ clsx(
 				styles.label,
@@ -111,12 +112,19 @@ function TrailButtonItem( {
  * refer to an HTMLButtonElement in the trail and an HTMLDivElement in the menu.
  */
 const ButtonItem = forwardRef< ButtonItemElement, ButtonItemProps >(
-	function BreadcrumbButtonItem( { children, onClick, ...props }, ref ) {
+	function BreadcrumbButtonItem(
+		{ children, onClick, render, ...props },
+		ref
+	) {
 		const { mode, onButtonActivate } = useBreadcrumbItemRenderContext();
 		if ( mode === 'overflow' ) {
 			return (
 				<Menu.Item
 					{ ...props }
+					aria-current={ undefined }
+					render={ enforceRenderProps( render, {
+						'aria-current': undefined,
+					} ) }
 					onClick={ ( event ) => {
 						const ownerDocument = event.currentTarget.ownerDocument;
 						onClick?.( event );
@@ -141,6 +149,7 @@ const ButtonItem = forwardRef< ButtonItemElement, ButtonItemProps >(
 			<TrailButtonItem
 				{ ...props }
 				onClick={ onClick }
+				render={ render }
 				forwardedRef={ ref }
 			>
 				{ children }
