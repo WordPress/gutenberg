@@ -3,7 +3,7 @@ import type { ReactNode, RefObject } from 'react';
 
 type MenuContextValue = {
 	isSubmenu: boolean;
-	submenuTriggerRef?: RefObject< HTMLDivElement >;
+	submenuTriggerRef?: RefObject< HTMLDivElement | null >;
 };
 
 const MenuContext = createContext< MenuContextValue >( {
