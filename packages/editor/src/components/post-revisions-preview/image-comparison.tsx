@@ -56,6 +56,7 @@ function FittedImagePreview( {
 				visibility: scale > 0 ? undefined : 'hidden',
 			} }
 		>
+			{ /* Match the preview viewport to its container; fit the whole block above. */ }
 			<BlockPreview blocks={ [ block ] } viewportWidth={ 0 } />
 		</div>
 	);
