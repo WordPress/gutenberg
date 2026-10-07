@@ -25,40 +25,6 @@
  */
 
 /**
- * Returns the list of internal comment types used by core features.
- *
- * Internal comment types (currently 'note' and 'reaction') back editor
- * functionality such as block notes and emoji reactions, and should be
- * excluded from front-end comment listings, counts, and similar contexts
- * that target user discussion. Centralizing the list keeps every guard
- * in sync when new internal types are added.
- *
- * Mirrors the planned `wp_get_internal_comment_types()` core helper
- * (see https://github.com/WordPress/wordpress-develop/pull/10930).
- *
- * @since 7.2.0
- *
- * @return string[] List of internal comment type slugs.
- */
-function gutenberg_get_internal_comment_types() {
-	/**
-	 * Filters the list of internal comment types.
-	 *
-	 * @since 7.2.0
-	 *
-	 * @param string[] $types List of internal comment type slugs.
-	 */
-	$types = apply_filters( 'gutenberg_internal_comment_types', array( 'note', 'reaction' ) );
-
-	// Callers build `NOT IN ( ... )` from this list, which is invalid SQL when empty.
-	if ( ! is_array( $types ) || empty( $types ) ) {
-		return array( 'note', 'reaction' );
-	}
-
-	return array_values( $types );
-}
-
-/**
  * Updates the comment type for avatars to include internal comment types.
  *
  * Adds the 'reaction' type to core's default 'comment' and 'note' avatar
@@ -68,7 +34,7 @@ function gutenberg_get_internal_comment_types() {
  * @return array The updated array of comment types.
  */
 function gutenberg_update_get_avatar_comment_type_7_2( $comment_type ) {
-	return array_values( array_unique( array_merge( $comment_type, gutenberg_get_internal_comment_types() ) ) );
+	return array_values( array_unique( array_merge( $comment_type, array( 'note', 'reaction' ) ) ) );
 }
 add_filter( 'get_avatar_comment_types', 'gutenberg_update_get_avatar_comment_type_7_2' );
 
@@ -91,7 +57,7 @@ function gutenberg_exclude_block_comments_from_admin_7_2( $clauses, $query ) {
 		$query->set( 'type', '' );
 
 		global $wpdb;
-		$internal_types    = gutenberg_get_internal_comment_types();
+		$internal_types    = array( 'note', 'reaction' );
 		$type_placeholders = implode( ', ', array_fill( 0, count( $internal_types ), '%s' ) );
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 		$clauses['where'] .= ' AND ' . $wpdb->prepare( "{$wpdb->comments}.comment_type NOT IN ( $type_placeholders )", $internal_types );
@@ -115,7 +81,7 @@ add_action( 'comments_clauses', 'gutenberg_exclude_block_comments_from_admin_7_2
  */
 function gutenberg_exclude_internal_comment_types_from_feed_7_2( $cwhere ) {
 	global $wpdb;
-	$internal_types    = gutenberg_get_internal_comment_types();
+	$internal_types    = array( 'note', 'reaction' );
 	$type_placeholders = implode( ', ', array_fill( 0, count( $internal_types ), '%s' ) );
 	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 	return $cwhere . ' AND ' . $wpdb->prepare( "{$wpdb->comments}.comment_type NOT IN ( $type_placeholders )", $internal_types );
@@ -139,7 +105,7 @@ function gutenberg_filter_comment_count_query_exclude_block_comments_7_2( $query
 		// reactions are excluded too and keeps the filter idempotent if it
 		// runs more than once.
 		$type_clauses = array();
-		foreach ( gutenberg_get_internal_comment_types() as $internal_type ) {
+		foreach ( array( 'note', 'reaction' ) as $internal_type ) {
 			$clause = "comment_type != '" . esc_sql( $internal_type ) . "'";
 			if ( ! str_contains( $query, $clause ) ) {
 				$type_clauses[] = $clause;
@@ -163,7 +129,7 @@ add_filter( 'query', 'gutenberg_filter_comment_count_query_exclude_block_comment
  * @return array Possibly modified arguments for get_comments().
  */
 function gutenberg_hide_note_from_comment_list_table_7_2( $args ) {
-	if ( ! empty( $_REQUEST['comment_type'] ) && in_array( $_REQUEST['comment_type'], gutenberg_get_internal_comment_types(), true ) ) {
+	if ( ! empty( $_REQUEST['comment_type'] ) && in_array( $_REQUEST['comment_type'], array( 'note', 'reaction' ), true ) ) {
 		unset( $args['type'] );
 	}
 	return $args;
@@ -185,7 +151,7 @@ function gutenberg_exclude_notes_from_comment_count_7_2( $new_count, $old_count,
 	if ( null !== $new_count ) {
 		return $new_count;
 	}
-	$internal_types    = gutenberg_get_internal_comment_types();
+	$internal_types    = array( 'note', 'reaction' );
 	$type_placeholders = implode( ', ', array_fill( 0, count( $internal_types ), '%s' ) );
 	$new_count         = (int) $wpdb->get_var(
 		$wpdb->prepare(

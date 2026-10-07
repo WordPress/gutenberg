@@ -72,13 +72,4 @@ class Tests_Note_Reactions_Feed extends WP_UnitTestCase {
 		$this->assertContains( self::$comment_id, $ids );
 		$this->assertNotContains( self::$reaction_id, $ids );
 	}
-
-	public function test_feed_query_survives_empty_internal_types_filter() {
-		add_filter( 'gutenberg_internal_comment_types', '__return_empty_array' );
-		$this->go_to( '/?feed=comments-rss2' );
-
-		$ids = $this->get_feed_comment_ids();
-		$this->assertContains( self::$comment_id, $ids );
-		$this->assertNotContains( self::$reaction_id, $ids );
-	}
 }
