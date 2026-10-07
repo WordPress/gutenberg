@@ -42,6 +42,21 @@
 		background: var(--wp-admin-theme-color);
 		color: $white;
 	}
+
+	// In a flex layout, margins don't collapse and the gap surrounds the block,
+	// so the marker is centered on it: vertically, and in a row, where the
+	// start gutter would overlap the previous item, horizontally too.
+	.is-layout-flex > .block-library-html__edit > & {
+		top: 50%;
+		transform: translateY(-50%);
+	}
+
+	.is-layout-flex:not(.is-vertical) > .block-library-html__edit > & {
+		right: auto;
+		left: 50%;
+		margin: 0;
+		transform: translate(-50%, -50%);
+	}
 }
 
 // The "Edit code" button in the inspector renders inside the tabs panel, so
