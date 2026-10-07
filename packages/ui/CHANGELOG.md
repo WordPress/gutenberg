@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
 -   Rename `LinkButton` to `ButtonLink`, including `LinkButton.Icon` to `ButtonLink.Icon`, `LinkButtonProps` to `ButtonLinkProps`, and `LinkButtonIconProps` to `ButtonLinkIconProps`. Rename `Dialog.CloseIcon`, `Drawer.CloseIcon`, and `Notice.CloseIcon` to `CloseIconButton` within each component. Update imports and JSX to use the new names; props and behavior are unchanged. If you use the `use-recommended-components` rule, also update `@wordpress/eslint-plugin` to a version that recognizes `ButtonLink` ([#83789](https://github.com/WordPress/gutenberg/pull/83789)).
 -   `Menu.Root`, `Menu.SubmenuRoot`: Remove the `disabled` prop. Disable `Menu.Trigger`, `Menu.SubmenuTrigger`, or individual items instead ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
 -   `Autocomplete.Item`, `Combobox.Item`, `SearchableSelect.Item`, `SearchableChipSelect.Item`, `SearchableSelectControl.Item`, and `SearchableChipSelectControl.Item` now require an `ItemLabel` as their first direct child, followed only by optional `ItemDescription` components. Wrap existing text children in `ItemLabel` ([#83493](https://github.com/WordPress/gutenberg/pull/83493)).

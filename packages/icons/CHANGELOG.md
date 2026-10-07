@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
+
 ### New Features
 
 -   Add the `justifySpaceAround` icon ([#83519](https://github.com/WordPress/gutenberg/pull/83519)).
