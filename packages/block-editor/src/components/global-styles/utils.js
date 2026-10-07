@@ -26,6 +26,18 @@ export function useToolsPanelDropdownMenuProps() {
 	return ! isMobile ? { popoverProps: dropdown } : {};
 }
 
+/**
+ * @typedef {Pick<
+ *   NonNullable<import('react').ComponentProps<import('@wordpress/components').Dropdown>['popoverProps']>,
+ *   'placement' | 'offset' | 'shift'
+ * >} ToolsPanelPopoverProps
+ */
+
+/**
+ * Popover props for a tools panel item.
+ *
+ * @return {ToolsPanelPopoverProps} Popover props for a tools panel item.
+ */
 export function useToolsPanelItemPopoverProps() {
 	return useContext( ToolsPanelPopoverPropsContext ).item;
 }

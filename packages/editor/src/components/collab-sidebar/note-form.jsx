@@ -32,11 +32,21 @@ const ALLOWED_NOTE_FORMATS = [
 
 const NOTE_COMPLETERS = [ noteMentionCompleter ];
 
-export function NoteForm( { onSubmit, onCancel, note, labels } ) {
-	const [ inputComment, setInputComment ] = useState(
-		note?.content?.raw ?? ''
-	);
+export function NoteForm( {
+	onSubmit,
+	onCancel,
+	onChange,
+	note,
+	labels,
+	initialValue = note?.content?.raw ?? '',
+} ) {
+	const [ inputComment, setInputComment ] = useState( initialValue );
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
+
+	function updateComment( value ) {
+		setInputComment( value );
+		onChange?.( value );
+	}
 
 	const inputId = useInstanceId( NoteForm, 'comment-input' );
 	const trimmedPlainText = sanitizeNoteContent( stripHTML( inputComment ) );
@@ -58,7 +68,7 @@ export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 		 */
 		const result = await onSubmit( inputComment );
 		if ( result ) {
-			setInputComment( '' );
+			updateComment( '' );
 		}
 
 		setIsSubmitting( false );
@@ -93,7 +103,7 @@ export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 				label={ labels?.input ?? __( 'Note' ) }
 				hideLabelFromVision
 				value={ inputComment }
-				onChange={ setInputComment }
+				onChange={ updateComment }
 				disabled={ isSubmitting }
 				placeholder={ labels?.placeholder }
 				allowedFormats={ ALLOWED_NOTE_FORMATS }
