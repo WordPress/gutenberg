@@ -5,7 +5,7 @@
 	"title": "Button",
 	"category": "design",
 	"parent": [ "core/buttons" ],
-	"description": "Prompt visitors to take action with a button-style link.",
+	"description": "Prompts visitors to take action with a button-style link.",
 	"keywords": [ "link" ],
 	"textdomain": "default",
 	"attributes": {

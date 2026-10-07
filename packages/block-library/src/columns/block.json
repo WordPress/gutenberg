@@ -5,7 +5,7 @@
 	"title": "Columns",
 	"category": "design",
 	"allowedBlocks": [ "core/column" ],
-	"description": "Display content in multiple columns, with blocks added to each column.",
+	"description": "Displays content in multiple columns, with blocks added to each column.",
 	"textdomain": "default",
 	"attributes": {
 		"verticalAlignment": {

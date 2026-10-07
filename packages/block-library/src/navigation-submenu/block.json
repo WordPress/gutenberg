@@ -5,7 +5,7 @@
 	"title": "Submenu",
 	"category": "design",
 	"parent": [ "core/navigation" ],
-	"description": "Add a submenu to your navigation.",
+	"description": "Adds a submenu to your navigation.",
 	"textdomain": "default",
 	"attributes": {
 		"label": {
