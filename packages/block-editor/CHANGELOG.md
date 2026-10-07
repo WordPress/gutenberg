@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 18.1.0 (2026-10-07)
+
 ### New Features
 
 -   Add `useBackgroundProps` and `getBackgroundClassesAndStyles`, and honour `background.__experimentalSkipSerialization` in the editor ([#83943](https://github.com/WordPress/gutenberg/pull/83943)).

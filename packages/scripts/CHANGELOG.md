@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 36.1.0 (2026-10-07)
+
 ### Enhancements
 
 -   `lint-js`: Allow unit-test titles passed through variables ([#83995](https://github.com/WordPress/gutenberg/pull/83995)).
