@@ -24,7 +24,7 @@ const rootDirectory = path.resolve(
 const packagesDirectory = path.join( rootDirectory, 'packages' );
 const buildSolutionPath = path.join( rootDirectory, 'tsconfig.build.json' );
 
-function showConfig( tsconfigPath, packageJson ) {
+function showConfig( tsconfigPath, name ) {
 	const result = spawn.sync(
 		'tsc',
 		[ '--showConfig', '--project', tsconfigPath ],
@@ -38,13 +38,13 @@ function showConfig( tsconfigPath, packageJson ) {
 	}
 	if ( result.signal ) {
 		throw new Error(
-			`TypeScript config inspection terminated by ${ result.signal } for ${ packageJson.name }`
+			`TypeScript config inspection terminated by ${ result.signal } for ${ name }`
 		);
 	}
 	if ( result.status !== 0 ) {
 		const output = `${ result.stdout }\n${ result.stderr }`.trim();
 		throw new Error(
-			`Could not inspect TypeScript config for ${ packageJson.name }:\n${
+			`Could not inspect TypeScript config for ${ name }:\n${
 				output || `tsc exited with status ${ result.status }.`
 			}`
 		);
@@ -53,51 +53,48 @@ function showConfig( tsconfigPath, packageJson ) {
 	try {
 		return JSON.parse( result.stdout );
 	} catch {
-		throw new Error(
-			`Could not parse TypeScript config for ${ packageJson.name }.`
-		);
+		throw new Error( `Could not parse TypeScript config for ${ name }.` );
 	}
 }
 
-let buildProjects;
+let buildSolutionProjects;
 
 /**
  * Lists the build solution projects that emit this package's declarations.
  * The dev project is never one of them: its test type packages would mask a
  * declaration that only resolves with them.
  *
- * @param {Object} packageData
- * @param {string} packageData.directory   Package directory.
- * @param {Object} packageData.packageJson Package manifest.
+ * @param {string} directory Package directory.
  * @return {string[]} Project paths, as referenced by `tsconfig.build.json`.
  */
-function getBuildProjects( { directory, packageJson } ) {
-	buildProjects ??= (
-		showConfig( buildSolutionPath, packageJson ).references ?? []
+function getBuildProjects( directory ) {
+	buildSolutionProjects ??= (
+		showConfig( buildSolutionPath, 'tsconfig.build.json' ).references ?? []
 	).map( ( reference ) => path.resolve( rootDirectory, reference.path ) );
-	return buildProjects.filter(
+	return buildSolutionProjects.filter(
 		( projectPath ) =>
 			projectPath === directory ||
 			projectPath.startsWith( directory + path.sep )
 	);
 }
 
-function getPackageTypeOptions( packageData ) {
-	const { packageJson } = packageData;
-	const projectPaths = getBuildProjects( packageData );
-	if ( projectPaths.length === 0 ) {
+function getPackageTypeOptions( { buildProjects = [], packageJson } ) {
+	if ( buildProjects.length === 0 ) {
 		throw new Error(
 			`No build project for ${ packageJson.name } in tsconfig.build.json.`
 		);
 	}
 	const typeRoots = new Set();
 	const types = new Set();
-	for ( const projectPath of projectPaths ) {
+	for ( const projectPath of buildProjects ) {
 		const projectDirectory =
 			path.extname( projectPath ) === '.json'
 				? path.dirname( projectPath )
 				: projectPath;
-		const { compilerOptions = {} } = showConfig( projectPath, packageJson );
+		const { compilerOptions = {} } = showConfig(
+			projectPath,
+			packageJson.name
+		);
 		for ( const typeRoot of compilerOptions.typeRoots ?? [] ) {
 			typeRoots.add( path.resolve( projectDirectory, typeRoot ) );
 		}
@@ -112,7 +109,7 @@ function getPackageTypeOptions( packageData ) {
 }
 
 export async function checkNodeNextTypes(
-	{ directory, packageJson },
+	{ directory, packageJson, buildProjects },
 	packedPackage
 ) {
 	const { declarations, files } = packedPackage;
@@ -145,7 +142,7 @@ export async function checkNodeNextTypes(
 			tsconfigPath,
 			JSON.stringify( {
 				compilerOptions: {
-					...getPackageTypeOptions( { directory, packageJson } ),
+					...getPackageTypeOptions( { buildProjects, packageJson } ),
 					target: 'esnext',
 					module: 'nodenext',
 					moduleResolution: 'nodenext',
@@ -237,12 +234,17 @@ async function getPublishedEsmPackages( packDestination ) {
 			} )
 	);
 
-	const publishedEsmPackages = packages.filter(
-		( packageData ) =>
-			packageData &&
-			! packageData.packageJson.private &&
-			packageData.packageJson.type === 'module'
-	);
+	const publishedEsmPackages = packages
+		.filter(
+			( packageData ) =>
+				packageData &&
+				! packageData.packageJson.private &&
+				packageData.packageJson.type === 'module'
+		)
+		.map( ( packageData ) => ( {
+			...packageData,
+			buildProjects: getBuildProjects( packageData.directory ),
+		} ) );
 	const packagePublications = inspectPackagePublications(
 		publishedEsmPackages.sort( ( a, b ) =>
 			a.packageJson.name.localeCompare( b.packageJson.name )
