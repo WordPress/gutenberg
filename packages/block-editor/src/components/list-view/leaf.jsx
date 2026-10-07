@@ -4,6 +4,8 @@ import { __experimentalTreeGridRow as TreeGridRow } from '@wordpress/components'
 import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
 import useMovingAnimation from '../use-moving-animation';
+import { useListViewContext } from './context';
+import { getDragChipId } from './drag-chip';
 
 const AnimatedTreeGridRow = animated( TreeGridRow );
 
@@ -22,10 +24,21 @@ const ListViewLeaf = forwardRef(
 		},
 		ref
 	) => {
+		const { listViewInstanceId } = useListViewContext();
+
+		// When a dragged row is dropped, animate it from the drag chip.
+		const getPreviousRect = isDragged
+			? ( element ) =>
+					element.ownerDocument
+						.getElementById( getDragChipId( listViewInstanceId ) )
+						?.getBoundingClientRect()
+			: undefined;
+
 		const animationRef = useMovingAnimation( {
 			clientId: props[ 'data-block' ],
 			enableAnimation: true,
 			triggerAnimationOnChange: path,
+			getPreviousRect,
 		} );
 
 		const mergedRef = useMergeRefs( [ ref, animationRef ] );

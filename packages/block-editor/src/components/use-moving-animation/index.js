@@ -28,11 +28,19 @@ function getAbsolutePosition( element ) {
  *  - It uses the "resetAnimation" flag to reset the animation
  *    from the beginning in order to animate to the new destination point.
  *
- * @param {Object} $1                          Options
- * @param {*}      $1.triggerAnimationOnChange Variable used to trigger the animation if it changes.
- * @param {string} $1.clientId
+ * @param {Object}                                    $1                          Options
+ * @param {*}                                         $1.triggerAnimationOnChange Variable used to trigger the animation if it changes.
+ * @param {string}                                    $1.clientId
+ * @param {(element: Element) => DOMRect | undefined} [$1.getPreviousRect]        Returns the rect of an element to animate from instead
+ *                                                                                of the element's own previous position, for example a
+ *                                                                                drag chip. Positions are then compared in viewport
+ *                                                                                coordinates.
  */
-function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
+function useMovingAnimation( {
+	triggerAnimationOnChange,
+	clientId,
+	getPreviousRect,
+} ) {
 	const ref = useRef();
 	const {
 		isTyping,
@@ -46,11 +54,14 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 
 	// Whenever the trigger changes, we need to take a snapshot of the current
 	// position of the block to use it as a destination point for the animation.
-	const { previous, prevRect } = useMemo(
+	const { previous, prevRect, fromRect } = useMemo(
 		() => ( {
 			previous: ref.current && getAbsolutePosition( ref.current ),
 			prevRect: ref.current && ref.current.getBoundingClientRect(),
+			fromRect: ref.current && getPreviousRect?.( ref.current ),
 		} ),
+		// Only take a new snapshot when the trigger changes.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[ triggerAnimationOnChange ]
 	);
 
@@ -105,8 +116,9 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 			isAncestorMultiSelected( clientId );
 
 		// The user already dragged the blocks to the new position, so don't
-		// animate the dragged blocks.
-		if ( isPartOfSelection && isDragging ) {
+		// animate the dragged blocks, unless there's an element to animate
+		// them from.
+		if ( isPartOfSelection && isDragging && ! fromRect ) {
 			return;
 		}
 
@@ -114,7 +126,7 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 		// clear the in-block UI of the blocks being moved past (z-index 1 and 2),
 		// which a plain `1` ties with and loses to on DOM order. Matches
 		// `.block-editor-block-list__block.is-selected`.
-		const zIndex = isPartOfSelection ? '20' : '';
+		const zIndex = isPartOfSelection || fromRect ? '20' : '';
 
 		const controller = new Controller( {
 			x: 0,
@@ -141,10 +153,13 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 		} );
 
 		ref.current.style.transform = undefined;
-		const destination = getAbsolutePosition( ref.current );
+		const origin = fromRect ?? previous;
+		const destination = fromRect
+			? ref.current.getBoundingClientRect()
+			: getAbsolutePosition( ref.current );
 
-		const x = Math.round( previous.left - destination.left );
-		const y = Math.round( previous.top - destination.top );
+		const x = Math.round( origin.left - destination.left );
+		const y = Math.round( origin.top - destination.top );
 
 		controller.start( { x: 0, y: 0, from: { x, y } } );
 
@@ -155,6 +170,7 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 	}, [
 		previous,
 		prevRect,
+		fromRect,
 		clientId,
 		isTyping,
 		getGlobalBlockCount,

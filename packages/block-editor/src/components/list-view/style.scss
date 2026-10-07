@@ -502,8 +502,62 @@
 // Indent is a full icon size, plus 4px which optically aligns child icons to the text label above.
 $block-navigation-max-indent: 8;
 
-.block-editor-list-view-draggable-chip {
-	opacity: 0.8;
+// The colors, padding, and radius are copied from the dragged row at drag
+// start, see `drag-chip.tsx`.
+.block-editor-list-view-drag-chip {
+	--focus-color: var(--wp-admin-theme-color);
+	color: var(--block-editor-list-view-drag-chip-color, inherit);
+	background: var(--block-editor-list-view-drag-chip-background, $white);
+	border-radius: var(--block-editor-list-view-drag-chip-radius, #{$radius-small});
+	// Match the row's focus ring: an outline just outside the row, with the
+	// gap filled in by the background color.
+	@include outset-ring__focus();
+	outline-offset: 1px;
+	box-shadow:
+		0 0 0 calc(var(--wpds-border-width-focus) + 2px)
+		var(--block-editor-list-view-drag-chip-background, #{$white}),
+		$elevation-small;
+
+	.block-editor-list-view-leaf {
+		display: flex;
+		align-items: center;
+		height: 100%;
+	}
+
+	.block-editor-list-view-block-contents {
+		flex: 1;
+		min-width: 0;
+		max-width: var(--block-editor-list-view-drag-chip-contents-width, none);
+		height: 100%;
+		padding: var(--block-editor-list-view-drag-chip-padding);
+		border-radius: inherit;
+	}
+}
+
+.block-editor-list-view-drag-chip__menu {
+	position: absolute;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	svg {
+		fill: currentColor;
+	}
+}
+
+// Sits on the corner, so it doesn't take space from the row's contents.
+.block-editor-list-view-drag-chip__count {
+	position: absolute;
+	inset-block-start: -$grid-unit-10;
+	inset-inline-end: -$grid-unit-10;
+	min-width: $grid-unit-20;
+	padding: 0 $grid-unit-05;
+	border-radius: $radius-small;
+	background: var(--wp-admin-theme-color);
+	color: $white;
+	font-size: 11px;
+	line-height: $grid-unit-20;
+	text-align: center;
 }
 
 .block-editor-list-view-block__contents-cell,
