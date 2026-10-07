@@ -34,6 +34,7 @@ function myguten_block_init() {
 }
 add_action( 'init', 'myguten_block_init' );
 ```
+You can skip this step if you use [create-block](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/).
 
 In your code, you can include the i18n functions. The most common function is **\_\_** (a double underscore) which provides translation of a simple string. Here is a basic block example:
 
@@ -211,7 +212,8 @@ The final part is to tell WordPress where it can look to find the translation fi
 ```php
 <?php
 	function myguten_set_script_translations() {
-		wp_set_script_translations( 'myguten-script', 'myguten', plugin_dir_path( __FILE__ ) . 'languages' );
+		$block_handle = generate_block_asset_handle("myguten/simple", "editorScript");
+		wp_set_script_translations( $block_handle, 'myguten', plugin_dir_path( __FILE__ ) . 'languages' );
 	}
 	add_action( 'init', 'myguten_set_script_translations' );
 ```
