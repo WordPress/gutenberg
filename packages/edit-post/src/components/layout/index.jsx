@@ -125,8 +125,7 @@ function MetaBoxesMain() {
 			!! get( 'core/edit-post', 'metaBoxesMainIsOpen' ),
 			get( 'core/edit-post', 'metaBoxesMainOpenHeight' ),
 			isMetaBoxLocationVisible( 'normal' ) ||
-				isMetaBoxLocationVisible( 'advanced' ) ||
-				isMetaBoxLocationVisible( 'side' ),
+				isMetaBoxLocationVisible( 'advanced' ),
 		];
 	}, [] );
 	const { set: setPreference } = useDispatch( preferencesStore );
