@@ -277,7 +277,7 @@ function validateListSpacing(
 	for ( let i = 1; i < unreleased.lines.length; i++ ) {
 		const line = unreleased.lines[ i ];
 		if ( /^-\s+/.test( line ) ) {
-			if ( inList && unreleased.lines[ i - 1 ] === '' ) {
+			if ( inList && unreleased.lines[ i - 1 ].trim() === '' ) {
 				errors.push(
 					`${ filePath }:${
 						unreleased.start + i

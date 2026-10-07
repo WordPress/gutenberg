@@ -183,6 +183,29 @@ describe( 'validateChangelog', () => {
 		] );
 	} );
 
+	test.each( [
+		[ 'spaces', '    ' ],
+		[ 'tabs', '\t\t' ],
+	] )(
+		'rejects a line of only %s between top-level entries',
+		( _, whitespace ) => {
+			const errors = validateChangelog(
+				changelog(
+					`### Bug Fixes
+
+-   First ([#1](https://github.com/WordPress/gutenberg/pull/1)).
+${ whitespace }
+-   Second ([#2](https://github.com/WordPress/gutenberg/pull/2)).
+`
+				),
+				{ filePath: 'packages/ui/CHANGELOG.md' }
+			);
+			expect( errors ).toEqual( [
+				'packages/ui/CHANGELOG.md:8: remove the blank line between Unreleased entries.',
+			] );
+		}
+	);
+
 	test( 'rejects a blank line between a nested list and the next entry', () => {
 		const errors = validateChangelog(
 			changelog( `### Breaking Changes
