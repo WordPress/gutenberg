@@ -247,7 +247,6 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 		className,
 		render,
 		role: _role,
-		variant: currentOnlyVariant = 'navigation',
 		...props
 	},
 	forwardedRef
@@ -257,10 +256,8 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 		() => items.filter( ( item ) => item.kind !== 'current' ),
 		[ items ]
 	);
-	const ancestorVariant =
-		ancestorItems[ 0 ]?.kind === 'button' ? 'selection' : 'navigation';
 	const variant =
-		ancestorItems.length > 0 ? ancestorVariant : currentOnlyVariant;
+		ancestorItems[ 0 ]?.kind === 'button' ? 'selection' : 'navigation';
 	const currentItem = useMemo(
 		() => items.find( ( item ) => item.kind === 'current' ),
 		[ items ]
@@ -295,7 +292,10 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 	const focusOverflowAfterLayoutRef = useRef( false );
 	const menuOpenRef = useRef( false );
 	const selectionChanged =
-		variant === 'selection' &&
+		( variant === 'selection' ||
+			frozenItemsRef.current.some(
+				( item ) => item.kind === 'button'
+			) ) &&
 		! itemKeysAreEqual( frozenItemsRef.current, items );
 
 	const focusCurrentItem = useCallback( () => {
@@ -558,7 +558,9 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 	}, [ applyPendingResponsiveState ] );
 
 	const displayedItems =
-		variant !== 'selection' && ( menuOpen || isOverflowTriggerFocused )
+		variant !== 'selection' &&
+		! selectionChanged &&
+		( menuOpen || isOverflowTriggerFocused )
 			? frozenItemsRef.current
 			: items;
 	const displayedAncestors = displayedItems.filter(

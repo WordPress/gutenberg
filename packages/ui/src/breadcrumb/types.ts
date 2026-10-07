@@ -7,12 +7,6 @@ export interface RootProps extends Omit< ComponentProps< 'nav' >, 'children' > {
 	 * `Breadcrumb.ButtonItem`, followed by exactly one `Breadcrumb.CurrentItem`.
 	 */
 	children: ReactNode;
-
-	/**
-	 * The semantics to use when there are no ancestors. Ancestors determine
-	 * the variant when present. Navigation is the default for current-only trails.
-	 */
-	variant?: 'navigation' | 'selection';
 }
 
 export interface LinkItemProps extends Omit<
@@ -40,8 +34,14 @@ export interface LinkItemProps extends Omit<
 
 export interface CurrentItemProps extends Omit<
 	ComponentProps< 'span' >,
-	'aria-current' | 'children' | 'tabIndex'
+	'children' | 'tabIndex'
 > {
+	/**
+	 * How this item represents the current location. Defaults to `true` for
+	 * button ancestors and `page` for links or a current-only trail.
+	 */
+	'aria-current'?: ComponentProps< 'span' >[ 'aria-current' ];
+
 	/**
 	 * The plain-text label for the current item.
 	 */

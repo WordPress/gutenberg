@@ -26,6 +26,7 @@ type CurrentItemImplementationProps = CurrentItemProps & {
 const MEASUREMENT_RENDER = <span />;
 
 function VisibleCurrentItem( {
+	'aria-current': ariaCurrent,
 	children,
 	className,
 	forwardedRef,
@@ -50,8 +51,10 @@ function VisibleCurrentItem( {
 	] );
 	const isTruncated = useIsTruncated( element, measurementVersion );
 	const tabIndex = isTruncated || isFocusPinned ? 0 : undefined;
+	const resolvedAriaCurrent =
+		ariaCurrent ?? ( variant === 'selection' ? 'true' : 'page' );
 	const enforcedRender = enforceRenderProps( render, {
-		'aria-current': variant === 'selection' ? 'true' : 'page',
+		'aria-current': resolvedAriaCurrent,
 		href: undefined,
 		tabIndex,
 	} );
@@ -62,7 +65,7 @@ function VisibleCurrentItem( {
 		props: mergeProps< 'span' >(
 			{ ...props, onBlur, onFocus },
 			{
-				'aria-current': variant === 'selection' ? 'true' : 'page',
+				'aria-current': resolvedAriaCurrent,
 				children,
 				className: clsx(
 					defenseStyles.div,
@@ -103,6 +106,7 @@ function VisibleCurrentItem( {
 }
 
 function MeasurementCurrentItem( {
+	'aria-current': _ariaCurrent,
 	children,
 	className,
 	render,

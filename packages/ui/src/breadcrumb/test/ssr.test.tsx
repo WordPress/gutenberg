@@ -21,23 +21,24 @@ describe( 'Breadcrumb server rendering', () => {
 		expect( view ).toContain( 'aria-current="page"' );
 		expect( view ).not.toContain( 'aria-haspopup="menu"' );
 	} );
-	it.each( [ 'navigation', 'selection' ] as const )(
-		'renders current-only %s semantics on the server',
-		( variant ) => {
+	it.each( [ undefined, true, false ] as const )(
+		'renders a current-only navigation trail with aria-current=%s on the server',
+		( ariaCurrent ) => {
 			const view = renderToStaticMarkup(
-				<Breadcrumb.Root variant={ variant } aria-label="Hierarchy">
-					<Breadcrumb.CurrentItem>Document</Breadcrumb.CurrentItem>
+				<Breadcrumb.Root aria-label="Hierarchy">
+					<Breadcrumb.CurrentItem
+						aria-current={ ariaCurrent }
+						render={ <span aria-current="step" /> }
+					>
+						Document
+					</Breadcrumb.CurrentItem>
 				</Breadcrumb.Root>
 			);
+			expect( view ).toContain( 'role="navigation"' );
 			expect( view ).toContain(
-				variant === 'selection' ? '<div' : '<nav'
+				`aria-current="${ ariaCurrent ?? 'page' }"`
 			);
-			expect( view ).toContain(
-				`role="${ variant === 'selection' ? 'group' : 'navigation' }"`
-			);
-			expect( view ).toContain(
-				`aria-current="${ variant === 'selection' ? 'true' : 'page' }"`
-			);
+			expect( view.match( /aria-current=/g ) ).toHaveLength( 1 );
 		}
 	);
 

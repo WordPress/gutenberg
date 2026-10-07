@@ -45,11 +45,7 @@ function SelectionTrail( {
 	const editorRef = useRef< HTMLTextAreaElement >( null );
 	return (
 		<>
-			<Breadcrumb.Root
-				aria-label="Block hierarchy"
-				variant="selection"
-				style={ { width } }
-			>
+			<Breadcrumb.Root aria-label="Block hierarchy" style={ { width } }>
 				{ LABELS.slice( 0, depth ).map( ( label, index ) => (
 					<Breadcrumb.ButtonItem
 						key={ label }
@@ -76,6 +72,7 @@ function SelectionTrail( {
 					</Breadcrumb.ButtonItem>
 				) ) }
 				<Breadcrumb.CurrentItem
+					aria-current="true"
 					key={ LABELS[ depth ] }
 					style={ { width: 80 } }
 				>
@@ -175,12 +172,12 @@ describe( 'Breadcrumb hierarchy selection', () => {
 			await render( <SelectionTrail focusEditor={ focusEditor } /> );
 			await userEvent.tab();
 			await userEvent.keyboard( '{Enter}' );
-			const group = page.getByRole( 'group', {
+			const navigation = page.getByRole( 'navigation', {
 				name: 'Block hierarchy',
 			} );
-			await expect.element( group ).toBeVisible();
+			await expect.element( navigation ).toBeVisible();
 			await expect
-				.element( page.getByRole( 'navigation' ) )
+				.element( page.getByRole( 'group' ) )
 				.not.toBeInTheDocument();
 			const current = screen.getByText( 'Document', {
 				selector: '[aria-current="true"]',
@@ -193,31 +190,40 @@ describe( 'Breadcrumb hierarchy selection', () => {
 	);
 
 	it.each( [
-		{ focusEditor: false, pointer: false },
-		{ focusEditor: true, pointer: true },
+		{
+			focusEditor: false,
+			pointer: false,
+			width: 280,
+			ancestor: 'Outer group',
+		},
+		{
+			focusEditor: true,
+			pointer: true,
+			width: 280,
+			ancestor: 'Outer group',
+		},
+		{ focusEditor: false, pointer: false, width: 80, ancestor: 'Document' },
 	] )(
-		'dismisses an overflow action and handles removal of its trigger, $focusEditor consumer focus move, $pointer pointer activation',
-		async ( { focusEditor, pointer } ) => {
+		'dismisses an overflow action and handles removal of its trigger, $focusEditor consumer focus move, $pointer pointer activation, $ancestor',
+		async ( { focusEditor, pointer, width, ancestor } ) => {
 			await render(
-				<SelectionTrail width={ 280 } focusEditor={ focusEditor } />
+				<SelectionTrail width={ width } focusEditor={ focusEditor } />
 			);
 			const trigger = page.getByRole( 'button', {
 				name: /hidden breadcrumb/,
 			} );
 			await expect.element( trigger ).toBeVisible();
 			await userEvent.tab();
-			await userEvent.tab();
+			if ( width === 280 ) {
+				await userEvent.tab();
+			}
 			await expect.element( trigger ).toHaveFocus();
 			await userEvent.keyboard( '{Enter}' );
 			await expect
-				.element(
-					page.getByRole( 'menuitem', { name: 'Outer group' } )
-				)
+				.element( page.getByRole( 'menuitem', { name: ancestor } ) )
 				.toHaveFocus();
 			if ( pointer ) {
-				await page
-					.getByRole( 'menuitem', { name: 'Outer group' } )
-					.click();
+				await page.getByRole( 'menuitem', { name: ancestor } ).click();
 			} else {
 				await userEvent.keyboard( '{Enter}' );
 			}
@@ -231,7 +237,7 @@ describe( 'Breadcrumb hierarchy selection', () => {
 				.not.toBeInTheDocument();
 			const focusTarget = focusEditor
 				? screen.getByRole( 'textbox', { name: 'Editor' } )
-				: screen.getByText( 'Outer group', {
+				: screen.getByText( ancestor, {
 						selector: '[aria-current="true"]',
 					} );
 			await expect.element( focusTarget ).toHaveFocus();

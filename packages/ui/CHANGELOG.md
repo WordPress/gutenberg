@@ -23,7 +23,7 @@
 
 ### New Features
 
--   `Breadcrumb`: Add `ButtonItem` ancestors for hierarchy selection and support current-only selection trails ([#84156](https://github.com/WordPress/gutenberg/pull/84156)).
+-   `Breadcrumb`: Add `ButtonItem` ancestors for hierarchy selection, current-only trails, and customizable `CurrentItem` `aria-current` ([#84156](https://github.com/WordPress/gutenberg/pull/84156)).
 
 -   Add `Meter` with an 8px track, neutral and brand tones. ([#83855](https://github.com/WordPress/gutenberg/pull/83855))
 -   `Autocomplete`, `Combobox`, `Select`, `SearchableSelect`, `SearchableChipSelect`, and the select controls: Add `Separator` subcomponents for dividing popup items and groups ([#83776](https://github.com/WordPress/gutenberg/pull/83776)).

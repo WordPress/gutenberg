@@ -170,8 +170,8 @@ export const RouterLinkComposition: Story = {
 
 /**
  * Button ancestors select a position within one hierarchy. The consumer owns
- * selection and intentional focus moves. Keep variant="selection" when the
- * trail can become current-only, including its initial server render.
+ * selection and intentional focus moves. Set aria-current on CurrentItem when
+ * its value should stay the same after the final ancestor is removed.
  */
 export const HierarchySelection: Story = {
 	render: function SelectionExample() {
@@ -218,7 +218,6 @@ export const HierarchySelection: Story = {
 				</label>
 				<Breadcrumb.Root
 					aria-label="Block hierarchy"
-					variant="selection"
 					style={ { width, maxWidth: '100%' } }
 				>
 					{ labels
@@ -236,7 +235,10 @@ export const HierarchySelection: Story = {
 								{ label }
 							</Breadcrumb.ButtonItem>
 						) ) }
-					<Breadcrumb.CurrentItem key={ labels[ selectedIndex ] }>
+					<Breadcrumb.CurrentItem
+						aria-current="true"
+						key={ labels[ selectedIndex ] }
+					>
 						{ labels[ selectedIndex ] }
 					</Breadcrumb.CurrentItem>
 				</Breadcrumb.Root>
@@ -262,8 +264,10 @@ export const CurrentOnly: Story = {
 			<Breadcrumb.Root aria-label="Page hierarchy">
 				<Breadcrumb.CurrentItem>Dashboard</Breadcrumb.CurrentItem>
 			</Breadcrumb.Root>
-			<Breadcrumb.Root aria-label="Block hierarchy" variant="selection">
-				<Breadcrumb.CurrentItem>Document</Breadcrumb.CurrentItem>
+			<Breadcrumb.Root aria-label="Block hierarchy">
+				<Breadcrumb.CurrentItem aria-current="true">
+					Document
+				</Breadcrumb.CurrentItem>
 			</Breadcrumb.Root>
 		</>
 	),

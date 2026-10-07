@@ -9,7 +9,7 @@ Use Breadcrumb to show a hierarchical path to the current page or selected item.
 
 ## Page navigation
 
-Use `LinkItem` ancestors with meaningful destinations followed by exactly one `CurrentItem`. The root is a named navigation landmark containing an ordered list, and the non-activatable current item has `aria-current="page"`. This follows the [APG breadcrumb pattern](https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/).
+Use `LinkItem` ancestors with meaningful destinations followed by exactly one `CurrentItem`. The root is a named navigation landmark containing an ordered list, and the non-activatable current item defaults to `aria-current="page"`. This follows the [APG breadcrumb pattern](https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/).
 
 <Canvas of={ BreadcrumbStories.Default } />
 
@@ -17,7 +17,7 @@ Use `LinkItem` ancestors with meaningful destinations followed by exactly one `C
 
 Use `ButtonItem` ancestors followed by exactly one `CurrentItem` when ancestors select or activate a position in the hierarchy. For example, a block editor trail can show Document, Group, and Paragraph. Group selects the ancestor block; Document clears selection. Breadcrumb owns ordering, overflow, tooltips, and responsive focus handling. The consumer owns selection state and intentional focus moves into the editor.
 
-The root is a named group containing an ordered list. Visible ancestors are native buttons with `type="button"`; collapsed ancestors are menu actions. The current item is non-activatable and has `aria-current="true"`. This selection variant extends beyond the APG breadcrumb pattern, which describes links to ancestor pages.
+The root is a named group containing an ordered list. Visible ancestors are native buttons with `type="button"`; collapsed ancestors are menu actions. The current item is non-activatable and defaults to `aria-current="true"`. This selection variant extends beyond the APG breadcrumb pattern, which describes links to ancestor pages.
 
 <Canvas of={ BreadcrumbStories.HierarchySelection } />
 
@@ -27,7 +27,9 @@ Activating an overflow action closes the menu. If selection removes the focused 
 
 ## Current-only trails
 
-A single `CurrentItem` is supported. Ancestors determine the semantics when present. Without ancestors, the default is page navigation. Set `variant="selection"` on Root when the trail represents selection and can become current-only. This preserves group semantics when Document is the sole item and works on the initial server render.
+A single `CurrentItem` is supported, including truncation when its label does not fit. Root infers its semantics from the complete ancestor collection. With no ancestors, it defaults to a navigation landmark on both the server and client. Removing the final button ancestor therefore changes the root from a group to a navigation landmark.
+
+Use `aria-current` on `CurrentItem` to override its inferred value. For example, `<Breadcrumb.CurrentItem aria-current="true">Document</Breadcrumb.CurrentItem>` keeps an in-document current marker even when the trail becomes current-only. This changes the current marker, not the root role. The prop takes precedence over a custom `render` element and is omitted from hidden measurement copies.
 
 <Canvas of={ BreadcrumbStories.CurrentOnly } />
 
