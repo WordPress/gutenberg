@@ -11,6 +11,7 @@ import { shadow as textShadowIcon, Icon, check, reset } from '@wordpress/icons';
 import type { TextShadowPreset } from '@wordpress/global-styles-engine';
 import clsx from 'clsx';
 import { useSettings } from '../use-settings';
+import { useToolsPanelItemPopoverProps } from './utils';
 
 type TextShadowValue = string | undefined;
 
@@ -63,9 +64,7 @@ function getTextShadowPresetSlug( rawValue: TextShadowValue ) {
 
 export function TextShadowPopover( { textShadow, onChange }: TextShadowProps ) {
 	const popoverProps = {
-		placement: 'left-start' as const,
-		offset: 36,
-		shift: true,
+		...useToolsPanelItemPopoverProps(),
 		className: 'block-editor-global-styles__text-shadow-popover',
 	};
 

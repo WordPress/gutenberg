@@ -44,11 +44,17 @@
 	},
 	"devDependencies": {
 		"@types/mime": "^2.0.3",
-		"@types/node": "^24.13.3"
+		"@types/node": "^24.13.3",
+		"@typescript/native": "npm:typescript@^7.0.2"
 	},
 	"peerDependencies": {
 		"@playwright/test": ">=1",
 		"@types/node": ">=20"
+	},
+	"peerDependenciesMeta": {
+		"@types/node": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

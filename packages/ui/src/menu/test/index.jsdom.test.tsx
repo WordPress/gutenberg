@@ -71,12 +71,12 @@ function queryExternalLinkIndicator( item: HTMLElement ) {
 }
 
 describe( 'Menu', () => {
-	it( 'renders prefix icons at 24px by default', () => {
+	it( 'renders prefix icons at 16px by default', () => {
 		render( <Menu.PrefixIcon icon={ <svg /> } role="img" /> );
 
 		const icon = screen.getByRole( 'img', { hidden: true } );
-		expect( icon ).toHaveAttribute( 'width', '24' );
-		expect( icon ).toHaveAttribute( 'height', '24' );
+		expect( icon ).toHaveAttribute( 'width', '16' );
+		expect( icon ).toHaveAttribute( 'height', '16' );
 	} );
 
 	it( 'supports custom icon sizes and forwards SVG props and refs', () => {
@@ -122,6 +122,16 @@ describe( 'Menu', () => {
 
 		const trigger = screen.getByRole( 'button', { name: 'Actions' } );
 		expect( trigger.tagName ).toBe( 'DIV' );
+	} );
+
+	it( 'does not expose disabled on menu roots', () => {
+		// @ts-expect-error Disable Menu.Trigger or individual items instead.
+		const root = <Menu.Root disabled />;
+		// @ts-expect-error Disable Menu.SubmenuTrigger or individual items instead.
+		const submenuRoot = <Menu.SubmenuRoot disabled />;
+
+		expect( root ).toBeDefined();
+		expect( submenuRoot ).toBeDefined();
 	} );
 
 	it( 'does not expose detached trigger props', () => {
@@ -205,21 +215,20 @@ describe( 'Menu', () => {
 		}
 	} );
 
-	it( 'does not close a disabled non-modal menu on iframe pointerdown', async () => {
+	it( 'closes a non-modal menu on iframe pointerdown after its trigger becomes disabled', async () => {
 		const user = userEvent.setup();
 
-		function MenuDisabledWhileOpen() {
+		function MenuTriggerDisabledWhileOpen() {
 			const [ open, setOpen ] = useState( false );
 
 			return (
 				<>
 					<Menu.Root
-						disabled={ open }
 						modal={ false }
 						onOpenChange={ setOpen }
 						open={ open }
 					>
-						<Menu.Trigger>Actions</Menu.Trigger>
+						<Menu.Trigger disabled={ open }>Actions</Menu.Trigger>
 						<Menu.Popup>
 							<Menu.Item>
 								<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
@@ -231,7 +240,7 @@ describe( 'Menu', () => {
 			);
 		}
 
-		render( <MenuDisabledWhileOpen /> );
+		render( <MenuTriggerDisabledWhileOpen /> );
 		const iframe = screen.getByTitle( 'Editor canvas' );
 		const iframeDocument = document.implementation.createHTMLDocument();
 		Object.defineProperty( iframe, 'contentDocument', {
@@ -247,7 +256,9 @@ describe( 'Menu', () => {
 				new MouseEvent( 'pointerdown', { bubbles: true } )
 			);
 		} );
-		expect( screen.getByRole( 'menu' ) ).toBeVisible();
+		await waitFor( () => {
+			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+		} );
 	} );
 
 	it( 'reattaches the iframe listener after reload and removes it when closed', async () => {
@@ -431,6 +442,149 @@ describe( 'Menu', () => {
 		await waitFor( () => {
 			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
 		} );
+	} );
+
+	describe( 'group composition', () => {
+		const nestingCases = [
+			{
+				Parent: Menu.Group,
+				Child: Menu.RadioGroup,
+				description: 'RadioGroup inside Group',
+				message: 'Menu.RadioGroup: Cannot be nested inside Menu.Group.',
+			},
+			{
+				Parent: Menu.RadioGroup,
+				Child: Menu.Group,
+				description: 'Group inside RadioGroup',
+				message: 'Menu.Group: Cannot be nested inside Menu.RadioGroup.',
+			},
+		];
+
+		it.each( nestingCases )(
+			'rejects $description through a wrapper component',
+			( { Parent, Child, message } ) => {
+				function WrappedGroup() {
+					return (
+						<div>
+							<Child />
+						</div>
+					);
+				}
+
+				expect( () =>
+					render(
+						<Parent>
+							<WrappedGroup />
+						</Parent>
+					)
+				).toThrow( message );
+				expect( console ).toHaveErrored();
+			}
+		);
+
+		it( 'labels sibling groups independently', () => {
+			render(
+				<Menu.Root defaultOpen>
+					<Menu.Trigger>Options</Menu.Trigger>
+					<Menu.Popup>
+						<Menu.Group>
+							<Menu.GroupLabel>Actions</Menu.GroupLabel>
+							<Menu.Item>
+								<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+							</Menu.Item>
+						</Menu.Group>
+						<Menu.RadioGroup defaultValue="compact">
+							<Menu.GroupLabel>Density</Menu.GroupLabel>
+							<Menu.RadioItem value="compact">
+								<Menu.ItemLabel>Compact</Menu.ItemLabel>
+							</Menu.RadioItem>
+						</Menu.RadioGroup>
+					</Menu.Popup>
+				</Menu.Root>
+			);
+
+			expect( screen.getAllByRole( 'group' ) ).toHaveLength( 2 );
+			expect(
+				within(
+					screen.getByRole( 'group', { name: 'Actions' } )
+				).getByRole( 'menuitem', { name: 'Duplicate' } )
+			).toBeInTheDocument();
+			expect(
+				within(
+					screen.getByRole( 'group', { name: 'Density' } )
+				).getByRole( 'menuitemradio', { name: 'Compact' } )
+			).toBeChecked();
+		} );
+
+		it.each( nestingCases )(
+			'allows $description across a separate root menu',
+			( { Parent, Child } ) => {
+				render(
+					<Parent>
+						<Menu.Root defaultOpen>
+							<Menu.Trigger>Options</Menu.Trigger>
+							<Menu.Popup>
+								<Child>
+									<Menu.GroupLabel>
+										Inner group
+									</Menu.GroupLabel>
+								</Child>
+							</Menu.Popup>
+						</Menu.Root>
+					</Parent>
+				);
+				expect(
+					screen.getByRole( 'group', { name: 'Inner group' } )
+				).toBeInTheDocument();
+			}
+		);
+
+		it.each( nestingCases )(
+			'allows $description across a submenu',
+			( { Parent, Child } ) => {
+				render(
+					<Menu.Root defaultOpen>
+						<Menu.Trigger>Options</Menu.Trigger>
+						<Menu.Popup>
+							<Parent>
+								<Menu.SubmenuRoot defaultOpen>
+									<Menu.SubmenuTrigger>
+										<Menu.ItemLabel>More</Menu.ItemLabel>
+									</Menu.SubmenuTrigger>
+									<Menu.Popup>
+										<Child>
+											<Menu.GroupLabel>
+												Inner group
+											</Menu.GroupLabel>
+										</Child>
+									</Menu.Popup>
+								</Menu.SubmenuRoot>
+							</Parent>
+						</Menu.Popup>
+					</Menu.Root>
+				);
+				expect(
+					screen.getByRole( 'group', { name: 'Inner group' } )
+				).toBeInTheDocument();
+			}
+		);
+
+		it.each( nestingCases )(
+			'preserves production rendering of $description',
+			( { Parent, Child } ) => {
+				vi.stubEnv( 'NODE_ENV', 'production' );
+				try {
+					render(
+						<Parent>
+							<Child />
+						</Parent>
+					);
+					expect( screen.getAllByRole( 'group' ) ).toHaveLength( 2 );
+				} finally {
+					vi.unstubAllEnvs();
+				}
+			}
+		);
 	} );
 
 	it( 'throws when ItemDescription is outside a menu item', () => {

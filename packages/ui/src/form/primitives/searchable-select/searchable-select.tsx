@@ -65,7 +65,7 @@ function warnSearchableSelectProps(
 export const SearchableSelect = forwardRef<
 	HTMLButtonElement,
 	SearchableSelectProps
->( function SearchableSelect(
+>( function UnforwardedSearchableSelect(
 	{
 		children,
 		emptyContent = __( 'No results found.' ),

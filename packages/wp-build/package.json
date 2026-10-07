@@ -34,6 +34,7 @@
 		"wp-build": "./lib/build.mjs"
 	},
 	"dependencies": {
+		"@babel/core": "^7.25.7",
 		"@emotion/babel-plugin": "^11.13.5",
 		"@wordpress/browserslist-config": "file:../browserslist-config",
 		"@wordpress/style-runtime": "file:../style-runtime",
@@ -56,24 +57,12 @@
 	"devDependencies": {
 		"@types/node": "^24.13.3",
 		"@wordpress/theme": "file:../theme",
-		"vitest": "^5.0.0"
+		"vitest": "^5.0.3"
 	},
 	"peerDependencies": {
-		"@wordpress/boot": ">=0.3.0 <1.0.0",
-		"@wordpress/private-apis": "^1.0.0",
-		"@wordpress/route": ">=0.2.0 <1.0.0",
 		"@wordpress/theme": ">=0.8.0 <3.0.0"
 	},
 	"peerDependenciesMeta": {
-		"@wordpress/boot": {
-			"optional": true
-		},
-		"@wordpress/private-apis": {
-			"optional": true
-		},
-		"@wordpress/route": {
-			"optional": true
-		},
 		"@wordpress/theme": {
 			"optional": true
 		}

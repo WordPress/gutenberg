@@ -16,7 +16,9 @@ import {
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
 import { useRef, useEffect, useState } from '@wordpress/element';
+import { useReducedMotion } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
+import { inertValue } from '@wordpress/react-inert-value';
 import { useDispatch } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -73,6 +75,7 @@ function VideoEdit( {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const blockEditingMode = useBlockEditingMode();
 	const hasNonContentControls = blockEditingMode === 'default';
+	const prefersReducedMotion = useReducedMotion();
 
 	useUploadMediaFromBlobURL( {
 		url: temporaryURL,
@@ -87,6 +90,14 @@ function VideoEdit( {
 			videoPlayer.current.load();
 		}
 	}, [ poster ] );
+
+	// `autoPlay` only applies when the video loads, so pause a video that is
+	// already playing when the user turns on reduced motion.
+	useEffect( () => {
+		if ( prefersReducedMotion ) {
+			videoPlayer.current?.pause();
+		}
+	}, [ prefersReducedMotion ] );
 	// TODO: Whether the video was obtained from the media library or was provided by URL, obtain the `videoWidth` and `videoHeight` of the video once its metadata has loaded and persist in the block attributes.
 	function onSelectVideo( media ) {
 		if ( ! media || ! media.url ) {
@@ -250,11 +261,11 @@ function VideoEdit( {
 			<figure { ...blockProps }>
 				<video
 					controls={ controls }
-					inert={ ! isSingleSelected ? 'true' : undefined }
+					inert={ inertValue( ! isSingleSelected ) }
 					poster={ poster }
 					src={ src || temporaryURL }
 					ref={ videoPlayer }
-					autoPlay={ autoplay }
+					autoPlay={ autoplay && ! prefersReducedMotion }
 					loop={ loop }
 					muted={ muted }
 					playsInline={ playsInline }

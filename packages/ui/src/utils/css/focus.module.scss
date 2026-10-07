@@ -10,8 +10,7 @@
 		 */
 		.outset-ring--focus:focus,
 		.outset-ring--focus-visible:focus-visible,
-		.outset-ring--focus-within:focus-within,
-		:focus-visible .outset-ring--focus-parent-visible {
+		.outset-ring--focus-within:focus-within {
 			@include mixins.focus-ring();
 		}
 

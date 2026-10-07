@@ -2,6 +2,29 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove the `data-wp-ignore` directive. An element carrying it is now hydrated like any other element, and a warning is shown in development mode. Remove the attribute. ([#84098](https://github.com/WordPress/gutenberg/pull/84098))
+-   Remove support for two-hyphen unique IDs, such as `data-wp-watch--id` or `data-wp-on--click--id`. Use three hyphens instead, such as `data-wp-watch---id` or `data-wp-on--click---id`. `data-wp-watch`, `data-wp-init`, and `data-wp-run` now skip directives with a suffix, and `data-wp-on`, `data-wp-on-window`, and `data-wp-on-document` now use the whole text after `--` as the event name. Both show a warning in development mode. The deprecated `data-wp-on-async` directives are unchanged. ([#84098](https://github.com/WordPress/gutenberg/pull/84098))
+-   Applying `!` to a function in a directive value, such as `data-wp-bind--hidden="!actions.isOpen"`, no longer calls the function: the value resolves to `undefined`, with a warning in development mode. Use derived state defined with a getter instead. Negating values and getters is unchanged. ([#84098](https://github.com/WordPress/gutenberg/pull/84098))
+-   The `evaluate` function passed to directive callbacks now accepts only the directive entry. Additional arguments, which were only forwarded to negated functions, are no longer accepted. ([#84098](https://github.com/WordPress/gutenberg/pull/84098))
+
+### New Features
+
+-   Add the `data-wp-html` directive and `asDangerousHTML()` for rendering explicitly trusted HTML from reactive state. ([#83092](https://github.com/WordPress/gutenberg/pull/83092))
+
+### Enhancements
+
+-   `getConfig` accepts a type parameter describing the config it returns, like `getContext` does, so consumers can read typed config values. It defaults to `any`, so existing calls are unaffected ([#71692](https://github.com/WordPress/gutenberg/pull/71692)).
+
+### Bug Fixes
+
+-   Run `watch()` callbacks without a directive scope. A callback passed to `watch()` no longer inherits the scope of the action or callback that called `watch()`, so `getContext()` and `getElement()` throw inside it, as they already did when `watch()` was called outside any scope. ([#83280](https://github.com/WordPress/gutenberg/pull/83280))
+
+### Internal
+
+-   Add `afterNextFrame`, `getScope`, and `parseDirectiveValue` to the `privateApis` bundle. `@wordpress/interactivity-router` uses the scheduling and scope seams to publish navigation lifecycle state, while the shared directive-value interpretation keeps the directive runtime, page preparation, and initiator attribution consistent. ([#83280](https://github.com/WordPress/gutenberg/pull/83280))
+
 ## 6.56.0 (2026-09-23)
 
 ## 6.55.0 (2026-09-10)

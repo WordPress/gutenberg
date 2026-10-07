@@ -15,18 +15,27 @@ export interface MediaEditorModalUpdate {
 interface OpenMediaEditorModalArgs {
 	id: number;
 	onUpdate?: ( updated: MediaEditorModalUpdate ) => void;
+	/**
+	 * Restore the caller's state after a saved attachment change. May run
+	 * before an asynchronous `onUpdate` finishes; the caller should cancel
+	 * that update. Without this callback, Undo calls `onUpdate` with the
+	 * previous attachment's id and URL.
+	 */
+	onUndo?: () => void;
 	onClose?: () => void;
 }
 
 export function openMediaEditorModal( {
 	id,
 	onUpdate,
+	onUndo,
 	onClose,
 }: OpenMediaEditorModalArgs ) {
 	return {
 		type: 'OPEN_MEDIA_EDITOR_MODAL' as const,
 		id,
 		onUpdate: onUpdate ?? null,
+		onUndo: onUndo ?? null,
 		onClose: onClose ?? null,
 	};
 }

@@ -6,6 +6,14 @@
 
 -   Include viewport and pseudo style states in global styles save confirmation labels, grouping each block/element once with its state labels (e.g. Default, Mobile, Tablet), and export `getGlobalStylesChangeGroups` and `getGlobalStylesChangeGroupSummary` so UIs can render structured change summaries ([#81027](https://github.com/WordPress/gutenberg/pull/81027)).
 
+### New Features
+
+-   Accept `background.backgroundClip` as a valid theme.json setting ([#77141](https://github.com/WordPress/gutenberg/pull/77141)).
+
+### Bug Fixes
+
+-   Declare `react`, `react-dom`, and their types as peer dependencies, forwarding the peers of `@wordpress/data`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+
 ## 1.23.0 (2026-09-23)
 
 ### New Features

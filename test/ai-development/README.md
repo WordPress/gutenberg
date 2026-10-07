@@ -96,8 +96,8 @@ This package is deliberately not one of the root workspaces: Promptfoo's
 dependency tree is large and only needed by people running evals, so it keeps
 its own lockfile and install step.
 
-Promptfoo is pinned to `0.122.1` because `0.122.2` adds a dependency affected
-by [GHSA-jmr9-qjv8-65gv](https://github.com/advisories/GHSA-jmr9-qjv8-65gv).
+Promptfoo is pinned to `0.123.1`. The scoped `get-uri` override uses `basic-ftp@6.2.1` to fix the directory-listing denial of service in [GHSA-c475-qrg2-pj4r](https://github.com/advisories/GHSA-c475-qrg2-pj4r). `get-uri` still requests version 5, so the override is needed until its dependency range includes the patched release.
+
 The package overrides also update two optional local-transformer dependencies to
 releases that fix [GHSA-xcpc-8h2w-3j85](https://github.com/advisories/GHSA-xcpc-8h2w-3j85),
 [GHSA-vwc7-r8mq-g2x9](https://github.com/advisories/GHSA-vwc7-r8mq-g2x9),
