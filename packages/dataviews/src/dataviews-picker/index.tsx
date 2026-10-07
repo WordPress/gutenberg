@@ -7,7 +7,11 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { Stack } from '@wordpress/ui';
+import {
+	Stack,
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Mixed overlays also need compatibility in directly bundled hosts without WordPress globals.
+	useEnableWpCompatOverlaySlot,
+} from '@wordpress/ui';
 import DataViewsContext from '../components/dataviews-context';
 import { VIEW_LAYOUTS } from '../components/dataviews-layouts';
 import {
@@ -249,6 +253,7 @@ function DataViewsPicker< Item >( {
 	empty,
 	onReset,
 }: DataViewsPickerProps< Item > ) {
+	useEnableWpCompatOverlaySlot();
 	// useData ensures data loading is correct whether infinite scroll is enabled or pagination is used.
 	const { data: displayData, setVisibleEntries } = useData( {
 		view,

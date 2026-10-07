@@ -38,6 +38,10 @@ import '@wordpress/dataviews/build-style/style.css';
 
 RTL versions of the stylesheets are available in the same paths, but with `-rtl` appended to the filename (`style-rtl.css`). The design tokens stylesheet is universal and does not have a separate RTL version.
 
+### Overlay compatibility
+
+`DataViews` and `DataViewsPicker` mix overlays from `@wordpress/ui` and `@wordpress/components`. Both roots enable the shared compatibility overlay slot before rendering their children, so directly bundled applications do not need to enable it separately for these components. Standard WordPress screens already enable the slot through `window.wp.components`. The opt-in is shared by `@wordpress/ui` instances in the same window and remains enabled after the components unmount. Explicit portal containers still take precedence. Other mixed-library compositions should follow the [overlay setup guidance](../ui/README.md#mixing-with-wordpresscomponents).
+
 ## `DataViews`
 
 <div class="callout callout-info">At <a href="https://wordpress.github.io/gutenberg/">WordPress Gutenberg's Storybook</a> there's an <a href="https://wordpress.github.io/gutenberg/?path=/docs/dataviews-dataviews--docs">example implementation of the Dataviews component</a>.</div>
