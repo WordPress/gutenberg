@@ -81,8 +81,10 @@ function gutenberg_media_editor_get_url( $post_id, $separator = '&' ) {
  * Points every "edit this attachment" link at the media editor.
  *
  * Filtering here rather than redirecting means the Media Library list table,
- * the media modal's "Edit more details" and "Edit Image" links, and the admin
- * bar all navigate straight to the media editor with no redirect hop.
+ * the media modal's "Edit more details" link, and the admin bar all navigate
+ * straight to the media editor with no redirect hop. It also feeds the
+ * `editLink` that `wp_prepare_attachment_for_js()` hands to the media grid,
+ * which the grid script below navigates to.
  *
  * @param string|null $link    The edit link, or null when the user cannot edit the post.
  * @param int         $post_id Post ID.
@@ -154,3 +156,89 @@ function gutenberg_media_editor_redirect_classic_screen() {
 }
 
 add_action( 'load-post.php', 'gutenberg_media_editor_redirect_classic_screen' );
+
+/**
+ * Redirects Media Library grid deep links to the media editor.
+ *
+ * The grid's Backbone router turns `upload.php?item=<id>` (and `&mode=edit`)
+ * into the attachment details modal on load. Catching those URLs here sends
+ * bookmarks and reloads straight to the media editor without booting the grid
+ * first. Clicks within an already-loaded grid never reach the server, so they
+ * are handled by the inline script below.
+ */
+function gutenberg_media_editor_redirect_grid_item() {
+	if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'GET' !== strtoupper( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) ) ) {
+		return;
+	}
+
+	// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Reading the same unauthenticated query arg the grid router itself reads to decide what to open.
+	// Guard against `?item[]=1`, where an array casts to int 1 without warning.
+	$post_id = isset( $_GET['item'] ) && is_scalar( $_GET['item'] ) ? (int) $_GET['item'] : 0;
+	// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+	if ( ! $post_id || 'attachment' !== get_post_type( $post_id ) ) {
+		return;
+	}
+
+	// Let the grid own these: it renders its own read-only or missing states.
+	if ( ! current_user_can( 'edit_post', $post_id ) || 'trash' === get_post_status( $post_id ) ) {
+		return;
+	}
+
+	// The media editor page requires `upload_files`, which `edit_post` does not
+	// imply. See gutenberg_media_editor_redirect_classic_screen().
+	if ( ! current_user_can( 'upload_files' ) ) {
+		return;
+	}
+
+	wp_safe_redirect( gutenberg_media_editor_get_url( $post_id ) );
+	exit;
+}
+
+add_action( 'load-upload.php', 'gutenberg_media_editor_redirect_grid_item' );
+
+/**
+ * Makes clicking a Media Library grid item open the media editor.
+ *
+ * In the grid, editing is not a link: activating an item fires a frame-level
+ * `edit:attachment` event, which `wp.media.view.MediaFrame.Manage` turns into
+ * the attachment details modal via `openEditAttachmentModal()`. No PHP hook
+ * reaches that path, so this overrides the method before `wp-admin/js/media.js`
+ * instantiates the frame on DOM ready. That covers pointer and keyboard
+ * activation as well as the grid router's in-page `?item=<id>` navigation.
+ *
+ * Bulk select mode is unaffected: it never triggers `edit:attachment`.
+ *
+ * `editLink` is only present when the user can edit the attachment, and is
+ * already the media editor URL courtesy of the `get_edit_post_link` filter
+ * above. Without it, the core modal is kept so the item can still be viewed.
+ *
+ * @param string $hook_suffix The current admin page.
+ */
+function gutenberg_media_editor_enqueue_grid_script( $hook_suffix ) {
+	// `media-grid` is only enqueued by upload.php in grid mode.
+	if ( 'upload.php' !== $hook_suffix || ! wp_script_is( 'media-grid', 'enqueued' ) ) {
+		return;
+	}
+
+	$script = <<<'JS'
+( function () {
+	var Manage = window.wp && wp.media && wp.media.view && wp.media.view.MediaFrame && wp.media.view.MediaFrame.Manage;
+	if ( ! Manage ) {
+		return;
+	}
+	var openEditAttachmentModal = Manage.prototype.openEditAttachmentModal;
+	Manage.prototype.openEditAttachmentModal = function ( model ) {
+		var editLink = model && model.get( 'editLink' );
+		if ( ! editLink ) {
+			return openEditAttachmentModal.apply( this, arguments );
+		}
+		window.location.assign( editLink );
+	};
+} )();
+JS;
+
+	wp_add_inline_script( 'media-grid', $script );
+}
+
+add_action( 'admin_enqueue_scripts', 'gutenberg_media_editor_enqueue_grid_script' );
