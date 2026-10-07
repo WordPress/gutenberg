@@ -299,9 +299,19 @@ export default function NavigationLinkEdit( {
 
 	const instanceId = useInstanceId( NavigationLinkEdit );
 	const hasMissingEntity = hasUrlBinding && ! isBoundEntityAvailable;
-	const missingEntityDescriptionId = hasMissingEntity
+
+	const needsValidLink =
+		( ! url && ! ( hasUrlBinding && isBoundEntityAvailable ) ) ||
+		isInvalid ||
+		isDraft ||
+		hasMissingEntity;
+
+	const invalidDescriptionId = needsValidLink
 		? sprintf( 'navigation-link-edit-%d-desc', instanceId )
 		: undefined;
+
+	const missingText = getMissingText( type );
+	const invalidLinkHelpText = getInvalidLinkHelpText();
 
 	const blockProps = useBlockProps( {
 		ref: useMergeRefs( [ setPopoverAnchor, listItemRef ] ),
@@ -316,8 +326,8 @@ export default function NavigationLinkEdit( {
 			[ getColorClassName( 'background-color', backgroundColor ) ]:
 				!! backgroundColor,
 		} ),
-		'aria-describedby': missingEntityDescriptionId,
-		'aria-invalid': hasMissingEntity,
+		'aria-describedby': invalidDescriptionId,
+		'aria-invalid': needsValidLink,
 		style: {
 			color: ! textColor && customTextColor,
 			backgroundColor: ! backgroundColor && customBackgroundColor,
@@ -336,12 +346,6 @@ export default function NavigationLinkEdit( {
 		}
 	);
 
-	const needsValidLink =
-		( ! url && ! ( hasUrlBinding && isBoundEntityAvailable ) ) ||
-		isInvalid ||
-		isDraft ||
-		( hasUrlBinding && ! isBoundEntityAvailable );
-
 	if ( needsValidLink ) {
 		blockProps.onClick = () => {
 			setIsLinkOpen( true );
@@ -352,8 +356,16 @@ export default function NavigationLinkEdit( {
 		'wp-block-navigation-link__placeholder': needsValidLink,
 	} );
 
-	const missingText = getMissingText( type );
-	const invalidLinkHelpText = getInvalidLinkHelpText();
+	let screenReaderDescription = '';
+	if ( hasMissingEntity ) {
+		screenReaderDescription = invalidLinkHelpText;
+	} else if ( isInvalid ) {
+		screenReaderDescription = __( 'Invalid link' );
+	} else if ( isDraft ) {
+		screenReaderDescription = __( 'Draft link' );
+	} else if ( ! url ) {
+		screenReaderDescription = missingText;
+	}
 
 	return (
 		<>
@@ -386,9 +398,9 @@ export default function NavigationLinkEdit( {
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
-				{ hasMissingEntity && (
-					<VisuallyHidden id={ missingEntityDescriptionId }>
-						{ invalidLinkHelpText }
+				{ needsValidLink && (
+					<VisuallyHidden id={ invalidDescriptionId }>
+						{ screenReaderDescription }
 					</VisuallyHidden>
 				) }
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
