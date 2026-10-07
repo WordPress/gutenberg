@@ -5,6 +5,7 @@
 ### Breaking Changes
 
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+    -   `ColorPicker` ([#84128](https://github.com/WordPress/gutenberg/pull/84128))
     -   `DateTimePicker` ([#84129](https://github.com/WordPress/gutenberg/pull/84129))
 
 ## 42.0.0 (2026-10-07)
@@ -13,7 +14,6 @@
 
 -   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
-    -   `ColorPicker` ([#84128](https://github.com/WordPress/gutenberg/pull/84128))
     -   `FontSizePicker` ([#84126](https://github.com/WordPress/gutenberg/pull/84126))
     -   `PaletteEdit` ([#84130](https://github.com/WordPress/gutenberg/pull/84130)).
     -   `CustomGradientPicker` ([#82576](https://github.com/WordPress/gutenberg/pull/82576))
