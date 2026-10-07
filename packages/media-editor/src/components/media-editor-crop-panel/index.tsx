@@ -1,9 +1,11 @@
 import { SelectControl as WCSelectControl } from '@wordpress/components';
 import { Stack, VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
+import { resolveAspectRatio, useMediaEditor } from '../../state';
 import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
 import MediaEditorImageControls from '../media-editor-image-controls';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
+import CropAdvancedPanel from './crop-advanced-panel';
 
 export interface MediaEditorCropPanelProps {
 	/**
@@ -14,6 +16,8 @@ export interface MediaEditorCropPanelProps {
 	aspectRatioValue: string;
 	/** Setter for the aspect-ratio preset value. */
 	onAspectRatioChange: ( value: string ) => void;
+	/** Signal that a placement-oriented control is being adjusted. */
+	onPlacementControlInteraction?: () => void;
 	/** Aspect-ratio presets to display in the selector. */
 	aspectRatioOptions: AspectRatioPreset[];
 	/** Disable every control in the panel while the edit is saving. */
@@ -27,15 +31,23 @@ export interface MediaEditorCropPanelProps {
  * @param props
  * @param props.aspectRatioValue
  * @param props.onAspectRatioChange
+ * @param props.onPlacementControlInteraction
  * @param props.aspectRatioOptions
  * @param props.disabled
  */
 export default function MediaEditorCropPanel( {
 	aspectRatioValue,
 	onAspectRatioChange,
+	onPlacementControlInteraction,
 	aspectRatioOptions,
 	disabled = false,
 }: MediaEditorCropPanelProps ) {
+	const { state } = useMediaEditor().cropper;
+	const resolvedAspectRatio = resolveAspectRatio(
+		aspectRatioValue,
+		state.image
+	);
+
 	return (
 		// Tag the whole panel as a crop-control region so the modal's
 		// Cmd+Z handler doesn't mistake the SelectControl input for a
@@ -58,6 +70,12 @@ export default function MediaEditorCropPanel( {
 					label: preset.label,
 					value: preset.value.toString(),
 				} ) ) }
+			/>
+			<CropAdvancedPanel
+				aspectRatio={ resolvedAspectRatio }
+				freeformCrop
+				onPlacementControlInteraction={ onPlacementControlInteraction }
+				disabled={ disabled }
 			/>
 		</Stack>
 	);

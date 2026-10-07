@@ -54,6 +54,7 @@ import MediaForm from '../media-form';
 import { getMediaTypeFromMimeType } from '../../utils';
 import { MediaEditorStateProvider, useMediaEditor } from '../../state';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
+import { CropperProvider } from '../../image-editor';
 import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
 import MediaEditorKeyboardShortcutsModal from '../media-editor-keyboard-shortcuts-modal';
 import {
@@ -853,6 +854,9 @@ function MediaEditorContent( {
 							<MediaEditorCropPanel
 								aspectRatioValue={ aspectRatioValue }
 								onAspectRatioChange={ setAspectRatioValue }
+								onPlacementControlInteraction={
+									signalPlacementControlInteraction
+								}
 								aspectRatioOptions={ aspectRatioOptions }
 								disabled={ isSaving }
 							/>
@@ -1016,8 +1020,18 @@ function MediaEditorContent( {
 export function MediaEditor( props: MediaEditorProps ) {
 	return (
 		<MediaEditorStateProvider key={ props.id }>
-			<MediaEditorContent { ...props } />
+			<MediaEditorWithCropperProvider { ...props } />
 		</MediaEditorStateProvider>
+	);
+}
+
+function MediaEditorWithCropperProvider( props: MediaEditorProps ) {
+	const { cropper } = useMediaEditor();
+
+	return (
+		<CropperProvider controller={ cropper }>
+			<MediaEditorContent { ...props } />
+		</CropperProvider>
 	);
 }
 
