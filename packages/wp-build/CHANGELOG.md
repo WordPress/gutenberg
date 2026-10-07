@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Add `generate_animated_image_subsizes` to the page template `/?_fields=` preload path, keeping it in sync with the `_fields` list in `@wordpress/core-data` ([#80385](https://github.com/WordPress/gutenberg/pull/80385)).
+
 ## 0.25.0 (2026-10-07)
 
 ### Bug Fixes

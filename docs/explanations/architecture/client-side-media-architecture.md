@@ -146,6 +146,7 @@ Because encoding happens in the browser, several image-processing filters are no
 | `image_save_progressive` | Read at upload time; the client applies progressive/interlaced encoding accordingly. |
 | `image_strip_meta` | Exported on the REST index; when it returns `false`, the client keeps all metadata on generated images. |
 | `image_max_bit_depth` | Exported on the REST index; the client caps the output bit depth of generated images accordingly. |
+| `wp_generate_animated_image_subsizes` | Exported on the REST index; when it returns `true`, uncropped sub-sizes of animated images keep their animation instead of flattening to the first frame. |
 | `intermediate_image_sizes` / `intermediate_image_sizes_advanced` | Consumed when computing registered sizes and `missing_image_sizes`. |
 
 Callbacks on these filters keep working, but they run at settings-computation time instead of once per encode, so they may see different argument values or invocation counts than on the server path.
@@ -257,7 +258,7 @@ The following formats are processed in the WASM/vips pipeline (`CLIENT_SIDE_SUPP
 Notes:
 -   AVIF encoding uses `effort: 2` to balance encoding speed with quality.
 -   High-bit-depth AVIF sources (10- or 12-bit, common for HDR photos) keep their bit depth in generated sub-sizes instead of being silently truncated to 8-bit.
--   Animated GIF and WebP images preserve all frames during processing in the vips pipeline.
+-   Animated GIF and WebP images preserve all frames when the full-size image is compressed or converted to a format that supports animation. Sub-sizes are generated from the first frame only by default, matching core's server-side behavior; the `wp_generate_animated_image_subsizes` filter opts a site into animated (uncropped) sub-sizes.
 -   Opaque animated GIFs are additionally converted to a companion video (MP4/WebM) outside the vips pipeline — see [Animated GIF to video conversion](#animated-gif-to-video-conversion) below.
 -   PNG-to-JPEG conversion is skipped when the PNG has transparency.
 -   AVIF uploads bypass the server's `wp_prevent_unsupported_mime_type_uploads` check when `generate_sub_sizes=false`, so a host without server-side AVIF support can still accept client-processed AVIF files.
@@ -403,6 +404,7 @@ When client-side processing is enabled, the REST API root index (`GET /`) is aug
 -   `image_size_threshold` — The current `big_image_size_threshold` filter value.
 -   `image_strip_meta` — The current `image_strip_meta` filter value. When `false`, the client keeps all metadata (EXIF, XMP, IPTC) on generated images instead of stripping everything but color profiles (and HDR gain maps).
 -   `image_max_bit_depth` — The current `image_max_bit_depth` filter value. Caps the bit depth of client-generated images; relevant for high-bit-depth AVIF sources.
+-   `generate_animated_image_subsizes` — The current `wp_generate_animated_image_subsizes` filter value. When `true`, uncropped sub-sizes of animated images keep their animation instead of flattening to the first frame.
 
 Other server-side filters (`image_editor_output_format`, `image_save_progressive`) are read at upload time on the server rather than exposed via the index. The set of MIME types eligible for client-side processing is fixed at `CLIENT_SIDE_SUPPORTED_MIME_TYPES` (JPEG, PNG, GIF, WebP, AVIF) — there is no public filter for this list.
 

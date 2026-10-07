@@ -57,6 +57,11 @@ interface VipsResizeOptions {
 	 * Maximum output bit depth.
 	 */
 	maxBitdepth?: number;
+	/**
+	 * Whether animated images should keep their animation when resized.
+	 * Only applies to uncropped resizes.
+	 */
+	preserveAnimation?: boolean;
 }
 
 /**
@@ -208,6 +213,7 @@ export async function vipsResizeImage(
 		quality,
 		stripMeta,
 		maxBitdepth,
+		preserveAnimation,
 	} = options;
 
 	if ( signal?.aborted ) {
@@ -221,6 +227,7 @@ export async function vipsResizeImage(
 			quality,
 			stripMeta,
 			maxBitdepth,
+			preserveAnimation,
 		} );
 
 	let fileName = file.name;

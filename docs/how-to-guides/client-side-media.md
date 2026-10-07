@@ -138,6 +138,17 @@ add_filter( 'image_max_bit_depth', function () {
 
 The client snaps the cap to the depths the AVIF encoder supports (8, 10, or 12 bits).
 
+### Animated image sub-sizes
+
+The `wp_generate_animated_image_subsizes` filter controls whether sub-sizes of animated images (such as GIFs) keep their animation. By default, sub-sizes are generated from the first frame only, matching WordPress core's server-side behavior. Returning `true` opts the site into animated sub-sizes:
+
+```php
+// Generate animated sub-sizes for animated images.
+add_filter( 'wp_generate_animated_image_subsizes', '__return_true' );
+```
+
+Only uncropped sub-sizes keep their animation; cropped sizes (such as `thumbnail`) are always generated from the first frame. Animated sub-sizes take longer to encode and produce larger files than static ones — for long animations, each sub-size can approach the original file's size. Uploads that take the server-side path also still produce static sub-sizes, as core has no animated resize support.
+
 ## Supported file formats
 
 Client-side processing handles the following MIME types in the WASM/vips pipeline: `image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/avif`. Files outside this set fall through to one of two paths depending on type:

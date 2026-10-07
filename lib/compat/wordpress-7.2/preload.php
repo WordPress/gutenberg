@@ -8,17 +8,19 @@
 /**
  * Filters the block editor preload paths.
  *
- * @since 20.1.0
+ * @since 7.2.0
  *
  * @param array                   $paths   REST API paths to preload.
  * @param WP_Block_Editor_Context $context Block editor context.
  * @return array Filtered preload paths.
  */
-function gutenberg_block_editor_preload_paths_7_1( $paths, $context ) {
+function gutenberg_block_editor_preload_paths_7_2( $paths, $context ) {
 	// Complete list of fields expected by packages/core-data/src/entities.js.
-	// This must match exactly for preloading to work (same fields, same order).
+	// The preloaded list must match entities.js exactly (same fields, same
+	// order) or the browser discards the preloaded response, so any field
+	// added to entities.js has to be reflected here too.
 	// @see packages/core-data/src/entities.js rootEntitiesConfig.__unstableBase
-	$root_fields = 'description,gmt_offset,home,image_max_bit_depth,image_sizes,image_size_threshold,image_strip_meta,name,site_icon,site_icon_url,site_logo,timezone_string,url,page_for_posts,page_on_front,show_on_front';
+	$root_fields = 'description,generate_animated_image_subsizes,gmt_offset,home,image_max_bit_depth,image_sizes,image_size_threshold,image_strip_meta,name,site_icon,site_icon_url,site_logo,timezone_string,url,page_for_posts,page_on_front,show_on_front';
 
 	foreach ( $paths as $key => $path ) {
 		if ( is_string( $path ) && str_starts_with( $path, '/?_fields=' ) ) {
@@ -44,4 +46,4 @@ function gutenberg_block_editor_preload_paths_7_1( $paths, $context ) {
 
 	return $paths;
 }
-add_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_block_editor_preload_paths_7_1', 10, 2 );
+add_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_block_editor_preload_paths_7_2', 10, 2 );
