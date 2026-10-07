@@ -12,13 +12,22 @@ const ConvertToBlocksButton = ( { clientId } ) => {
 		},
 		[ clientId ]
 	);
+	const { canInsertBlockType, getBlockRootClientId } =
+		useSelect( blockEditorStore );
 
 	return (
 		<ToolbarButton
 			onClick={ () =>
 				replaceBlocks(
 					block.clientId,
-					rawHandler( { HTML: serialize( block ) } )
+					rawHandler( {
+						HTML: serialize( block ),
+						isBlockTypeAllowed: ( name ) =>
+							canInsertBlockType(
+								name,
+								getBlockRootClientId( clientId )
+							),
+					} )
 				)
 			}
 		>
