@@ -1,0 +1,141 @@
+{
+	"languages": {
+		"JavaScript": {
+			"language_servers": [
+				"typescript-ls",
+				"eslint",
+				"!vtsls",
+				"!typescript-language-server",
+				"..."
+			],
+			"format_on_save": "on",
+			"code_actions_on_format": {
+				"source.fixAll.eslint": true
+			}
+		},
+		"JSX": {
+			"language_servers": [
+				"typescript-ls",
+				"eslint",
+				"!vtsls",
+				"!typescript-language-server",
+				"..."
+			],
+			"format_on_save": "on",
+			"code_actions_on_format": {
+				"source.fixAll.eslint": true
+			}
+		},
+		"TypeScript": {
+			"language_servers": [
+				"typescript-ls",
+				"eslint",
+				"!vtsls",
+				"!typescript-language-server",
+				"..."
+			],
+			"format_on_save": "on",
+			"code_actions_on_format": {
+				"source.fixAll.eslint": true
+			}
+		},
+		"TSX": {
+			"language_servers": [
+				"typescript-ls",
+				"eslint",
+				"!vtsls",
+				"!typescript-language-server",
+				"..."
+			],
+			"format_on_save": "on",
+			"code_actions_on_format": {
+				"source.fixAll.eslint": true
+			}
+		},
+		"CSS": {
+			"language_servers": [ "stylelint-lsp", "..." ],
+			"format_on_save": "on",
+			"formatter": [
+				{
+					"code_action": "source.fixAll.stylelint"
+				}
+			]
+		},
+		"SCSS": {
+			"language_servers": [ "stylelint-lsp", "..." ],
+			"format_on_save": "on",
+			"formatter": [
+				{
+					"code_action": "source.fixAll.stylelint"
+				}
+			]
+		},
+		"PHP": {
+			"language_servers": [
+				"intelephense",
+				"phpcs",
+				"!phpactor",
+				"!phptools",
+				"!phpantom",
+				"..."
+			],
+			"format_on_save": "on",
+			"formatter": [
+				{
+					"code_action": "source.fixAll.phpcs"
+				}
+			]
+		}
+	},
+	"lsp": {
+		"typescript-ls": {
+			"binary": {
+				"path": "node",
+				"arguments": [
+					"tools/build-scripts/node_modules/@typescript/native/bin/tsc",
+					"--lsp",
+					"--stdio"
+				]
+			}
+		},
+		"eslint": {
+			"settings": {
+				"workingDirectory": {
+					"mode": "location"
+				},
+				"bulkSuppression": {
+					"enable": true,
+					"location": "tools/eslint/suppressions.json",
+					"severity": "hint"
+				}
+			}
+		},
+		"stylelint-lsp": {
+			"settings": {
+				"stylelint": {
+					"validate": [ "css", "postcss", "scss" ]
+				}
+			}
+		},
+		"intelephense": {
+			"settings": {
+				"environment": {
+					"phpVersion": "7.4.0"
+				},
+				"files": {
+					"exclude": [
+						"**/.cache/**",
+						"**/.git/**",
+						"**/.history/**",
+						"**/build/**",
+						"**/build-module/**",
+						"**/build-types/**",
+						"**/build-style/**",
+						"**/node_modules/**",
+						"**/vendor/**"
+					]
+				}
+			}
+		}
+	}
+}

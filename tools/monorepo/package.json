@@ -38,9 +38,7 @@
 		"access": "public"
 	},
 	"scripts": {
-		"install-editor-settings": "node scripts/install-editor-settings.mts",
-		"install-vscode-settings": "node scripts/install-editor-settings.mts vscode",
-		"install-zed-settings": "node scripts/install-editor-settings.mts zed",
+		"install-vscode-settings": "node scripts/install-vscode-settings.mts",
 		"list-experimental-apis": "node scripts/list-experimental-apis.mts",
 		"wpds:admin-scheme-tokens": "node wpds/generate-admin-scheme-tokens.mjs"
 	}
