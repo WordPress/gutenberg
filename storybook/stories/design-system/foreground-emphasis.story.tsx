@@ -1,13 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ExternalLink, Notice, TabPanel } from '@wordpress/components';
+import { cog, pencil, trash } from '@wordpress/icons';
 import { ThemeProvider } from '@wordpress/theme';
 import {
 	Button,
+	IconButton,
 	Link,
 	Notice as UINotice,
 	Stack,
 	Tabs,
 	Text,
+	Tooltip,
 } from '@wordpress/ui';
 
 const meta: Meta = {
@@ -67,6 +70,28 @@ export const Comparison: StoryObj = {
 								Supporting text uses weak emphasis.
 							</Text>
 						</Stack>
+						<Tooltip.Provider>
+							<Stack direction="row" gap="sm">
+								<IconButton
+									variant="minimal"
+									tone="neutral"
+									icon={ pencil }
+									label="Edit"
+								/>
+								<IconButton
+									variant="minimal"
+									icon={ cog }
+									label="Settings"
+								/>
+								<IconButton
+									variant="minimal"
+									tone="neutral"
+									icon={ trash }
+									label="Delete"
+									disabled
+								/>
+							</Stack>
+						</Tooltip.Provider>
 						<Stack direction="row" gap="sm">
 							<Button variant="minimal" tone="neutral">
 								Edit
@@ -106,6 +131,9 @@ export const Comparison: StoryObj = {
 									</Tabs.Panel>
 									<Tabs.Panel value="settings">
 										<Text>Settings panel</Text>
+									</Tabs.Panel>
+									<Tabs.Panel value="disabled">
+										<Text>Disabled panel</Text>
 									</Tabs.Panel>
 								</Tabs.Root>
 							)
@@ -152,6 +180,51 @@ export const Comparison: StoryObj = {
 					</Stack>
 				</ThemeProvider>
 			) ) }
+		</div>
+	),
+};
+
+/**
+ * Resize the container to compare painted tab padding with actual overflow.
+ */
+export const MinimalTabsOverflow: StoryObj = {
+	render: () => (
+		<div
+			style={ {
+				width: 140,
+				padding: 16,
+				resize: 'horizontal',
+				overflow: 'auto',
+				boxSizing: 'content-box',
+			} }
+		>
+			<ThemeProvider
+				color={ {
+					background: themes[ 0 ].background,
+					primary: themes[ 0 ].primary,
+				} }
+			>
+				<Tabs.Root defaultValue="Content">
+					<Tabs.List
+						variant="minimal"
+						aria-label="Resizable minimal tabs"
+						style={ { maxWidth: '100%' } }
+					>
+						{ [ 'Content', 'Settings', 'Preview' ].map(
+							( label ) => (
+								<Tabs.Tab key={ label } value={ label }>
+									{ label }
+								</Tabs.Tab>
+							)
+						) }
+					</Tabs.List>
+					{ [ 'Content', 'Settings', 'Preview' ].map( ( label ) => (
+						<Tabs.Panel key={ label } value={ label }>
+							<Text>{ label } panel</Text>
+						</Tabs.Panel>
+					) ) }
+				</Tabs.Root>
+			</ThemeProvider>
 		</div>
 	),
 };
