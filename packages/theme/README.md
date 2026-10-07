@@ -286,7 +286,7 @@ After the prebuild step, the package will be built into its final form via the r
 
 ## Generating Colors Outside React
 
-`ThemeProvider` derives color token values from seed colors and applies them to its subtree. Where a provider cannot run, `generateColorTokens` performs the same derivation and returns the values as plain data:
+For environments that do not use React, `generateColorTokens` is available as a plain JavaScript function that generates color token values from seed colors, producing the same values as `ThemeProvider`. It can be used to generate token values as plain data:
 
 ```js
 import { generateColorTokens } from '@wordpress/theme';
@@ -296,15 +296,13 @@ const { tokens, compatibility, warnings } = generateColorTokens( {
 } );
 ```
 
-Use it in a build step that emits a stylesheet, or on a screen that renders without React. Seeds accept the same values as the `ThemeProvider` `color` prop, and an omitted seed uses the design system's default.
-
 The result has three parts:
 
 - `tokens`: design token values, keyed by custom property name (for example `--wpds-color-background-surface-neutral`).
 - `compatibility`: the transitional [legacy compatibility](#legacy-compatibility) values, keyed the same way. These are not design tokens. Apply them only where older styles are in play, and only where nothing else already defines them.
 - `warnings`: the same contrast warnings that `onColorWarnings` reports.
 
-The result describes custom property names and values only. Where they apply, whether that is a selector, a cascade layer, or an inline style, is left to you. To apply both groups, as `ThemeProvider` does, merge them:
+The function does not apply any styles. You choose where to use the values, for example in a stylesheet rule or as inline styles. To use both groups, as `ThemeProvider` does, merge them:
 
 ```js
 const styles = { ...tokens, ...compatibility };
