@@ -70,17 +70,9 @@ export interface WidgetHelp {
 export type WidgetRelevance = 'high' | 'medium' | 'low';
 
 /**
- * A user-triggerable verb a widget type declares. The declaration is
- * serializable data: an envelope (`id`, `label`, optional `icon` and
- * `relevance`) plus exactly one fulfillment, named by the key carrying it.
- * Today the only key is `href`, so the only fulfillment is a link.
- *
- * The host owns what follows: which primitive materializes the fulfillment,
- * and where the affordance is placed. For a link that means mounting a real
- * link primitive wherever the surface allows one, so middle-click, copy
- * address, and the anchor role survive.
+ * The identity every action shares, whatever fulfills it.
  */
-export interface WidgetAction {
+export interface WidgetActionEnvelope {
 	/**
 	 * Stable identifier, local to the widget type.
 	 */
@@ -103,7 +95,17 @@ export interface WidgetAction {
 	 * How relevant the action is among the widget's actions.
 	 */
 	relevance?: WidgetRelevance;
+}
 
+/**
+ * A verb a widget type declares: serializable data with an envelope and one
+ * fulfillment, named by the key carrying it. Today the only key is `href`,
+ * a link.
+ *
+ * The host picks the primitive and the placement. A link mounts a real
+ * anchor wherever the surface allows one.
+ */
+export interface WidgetAction extends WidgetActionEnvelope {
 	/**
 	 * Link fulfillment: the destination. A URL, an admin path, or a
 	 * widget-local file.
@@ -122,6 +124,20 @@ export interface WidgetAction {
 	 */
 	openInNewTab?: boolean;
 }
+
+/**
+ * An action fulfilled by a function. It does not serialize, so only a
+ * mounted widget declares it, through `useWidgetActions`. A returned
+ * promise keeps the affordance pending until it settles.
+ */
+export interface WidgetCallbackAction extends WidgetActionEnvelope {
+	callback: () => void | Promise< void >;
+}
+
+/**
+ * An action as hosts materialize it: a link or a callback.
+ */
+export type WidgetRuntimeAction = WidgetAction | WidgetCallbackAction;
 
 /**
  * Wire form of a `WidgetAction`, as carried by a `WidgetModuleRecord`:

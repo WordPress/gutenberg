@@ -317,6 +317,36 @@ HTML;
 	}
 
 	/**
+	 * Tests if the Icon block's icon attribute is updated with the value returned by the source.
+	 *
+	 * @covers ::register_block_bindings_source
+	 */
+	public function test_update_icon_block_with_value_from_source() {
+		register_block_bindings_source(
+			self::SOURCE_NAME,
+			array(
+				'label'              => self::SOURCE_LABEL,
+				'get_value_callback' => function () {
+					return 'core/arrow-right';
+				},
+			)
+		);
+
+		$block_content = <<<HTML
+<!-- wp:icon {"icon":"core/plus","metadata":{"bindings":{"icon":{"source":"test/source"}}}} /-->
+HTML;
+		$parsed_blocks = parse_blocks( $block_content );
+		$block         = new WP_Block( $parsed_blocks[0] );
+		$block->render();
+
+		$this->assertSame(
+			'core/arrow-right',
+			$block->attributes['icon'],
+			"The 'icon' attribute should be updated with the value returned by the source."
+		);
+	}
+
+	/**
 	 * Tests if the `__default` attribute is replaced with real attributes for
 	 * pattern overrides.
 	 *

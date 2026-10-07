@@ -30,6 +30,9 @@
 	},
 	"overrides": {
 		"sharp": "0.35.4",
+		"get-uri": {
+			"basic-ftp": "6.2.1"
+		},
 		"onnxruntime-node": {
 			"adm-zip": "0.6.1"
 		}
@@ -42,5 +45,13 @@
 		"test:utils": "node --test \"lib/test/*.mjs\" \"utils/test/*.mjs\"",
 		"eval": "node lib/run-configs.mjs eval",
 		"view": "node lib/run-configs.mjs view"
+	},
+	"allowScripts": {
+		"@playwright/browser-chromium": false,
+		"@swc/core": false,
+		"esbuild": false,
+		"fsevents": false,
+		"onnxruntime-node": false,
+		"protobufjs": false
 	}
 }

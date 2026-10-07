@@ -77,7 +77,7 @@ export default function MediaEditorImageControls( {
 	zoomFactor = DEFAULT_ZOOM_FACTOR,
 	disabled = false,
 }: MediaEditorImageControlsProps ) {
-	const { state, setFlip, snapRotate90, setZoom } = useMediaEditor();
+	const { state, setFlip, snapRotate90, setZoom } = useMediaEditor().cropper;
 	const { aspectRatioValue, setAspectRatioValue, aspectRatioOptions } =
 		useCropOptions( { aspectRatioPresets } );
 	const hasAspectRatioControl = ! withLabels && showAspectRatioControl;

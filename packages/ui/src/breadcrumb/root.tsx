@@ -12,6 +12,7 @@ import {
 } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import type { ReactElement, ReactNode } from 'react';
+import { inertValue } from '@wordpress/react-inert-value';
 import * as Menu from '../menu';
 import type { RootProps as MenuRootProps } from '../menu/types';
 import * as Tooltip from '../tooltip';
@@ -582,7 +583,6 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 				renderVisibleItem( displayedCurrentItem ) }
 		</>
 	);
-	const inertProps = { inert: '' } as Record< string, string >;
 	const componentContent = (
 		<>
 			<ol
@@ -592,7 +592,7 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 				{ visibleListContent }
 			</ol>
 			<div
-				{ ...inertProps }
+				inert={ inertValue( true ) }
 				aria-hidden="true"
 				className={ styles.measurement }
 			>

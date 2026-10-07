@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/boot",
-	"version": "0.23.0",
+	"version": "0.24.0",
 	"description": "Minimal boot package for WordPress admin pages.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -59,6 +59,7 @@
 		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/react-inert-value": "file:../react-inert-value",
 		"@wordpress/route": "file:../route",
 		"@wordpress/style-runtime": "file:../style-runtime",
 		"@wordpress/theme": "file:../theme",
