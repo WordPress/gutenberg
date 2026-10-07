@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `lint-js`: Allow unit-test titles passed through variables ([#83995](https://github.com/WordPress/gutenberg/pull/83995)).
+
 ### Bug Fixes
 
 -   Add the `stylelint-scss` dependency, a peer of `@wordpress/stylelint-config` ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
