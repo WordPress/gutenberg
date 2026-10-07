@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `DocumentTools`: Stop rendering the undo and redo buttons below the medium breakpoint instead of hiding them with CSS. They were still registered as toolbar items while invisible, so arrow key presses moved the roving tabindex onto a button that cannot receive focus and appeared to do nothing ([#84175](https://github.com/WordPress/gutenberg/pull/84175)).
+
 ## 15.2.0 (2026-10-07)
 
 ### Enhancements
@@ -13,7 +17,6 @@
 
 ### Bug Fixes
 
--   `DocumentTools`: Stop rendering the undo and redo buttons below the medium breakpoint instead of hiding them with CSS. They were still registered as toolbar items while invisible, so arrow key presses moved the roving tabindex onto a button that cannot receive focus and appeared to do nothing ([#84175](https://github.com/WordPress/gutenberg/pull/84175)).
 -   `PostTrash`: Offer "Delete permanently" instead of "Move to trash" when the post can't be moved to the trash, based on the new `wp:action-trash` REST link ([#84045](https://github.com/WordPress/gutenberg/pull/84045)).
 -   Keep post actions and note actions menus dismissible when their triggers become disabled. Close the View menu when it becomes unavailable ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
 -   Remove redundant menu groups from the mode switcher and preview menu, and associate the Editor label with its radio group ([#83792](https://github.com/WordPress/gutenberg/pull/83792)).
