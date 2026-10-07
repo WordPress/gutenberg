@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 42.0.0 (2026-10-07)
+
 ### Breaking Changes
 
 -   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
