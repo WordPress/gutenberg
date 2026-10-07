@@ -15,6 +15,10 @@ type ImageSize = { width: number; height: number };
 type ImageAvailability = Partial< Record< Version, ImageSize | null > >;
 const MODES: Mode[] = [ 'before', 'compare', 'after' ];
 const VERSIONS: Version[] = [ 'before', 'after' ];
+// Remove page decoration while preserving the Image block's own theme styles.
+const IMAGE_PREVIEW_STYLES = [
+	{ css: 'html, body { background: transparent; padding: 0; }' },
+];
 
 /** Keep historical attributes independent of current binding sources. */
 function cloneImagePreview( block: Block ) {
@@ -57,7 +61,11 @@ function FittedImagePreview( {
 			} }
 		>
 			{ /* Match the preview viewport to its container; fit the whole block above. */ }
-			<BlockPreview blocks={ [ block ] } viewportWidth={ 0 } />
+			<BlockPreview
+				blocks={ [ block ] }
+				viewportWidth={ 0 }
+				additionalStyles={ IMAGE_PREVIEW_STYLES }
+			/>
 		</div>
 	);
 }
