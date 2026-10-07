@@ -23,3 +23,26 @@
 	display: inline-block;
 }
 
+// Ensure typography set on the block is not overridden by global paragraph styles.
+.wp-block-post-excerpt {
+	&[style*="font-weight"] :where(p) {
+		font-weight: inherit;
+	}
+	&[class*="-font-family"] :where(p),
+	&[style*="font-family"] :where(p) {
+		font-family: inherit;
+	}
+	&[class*="-font-size"] :where(p),
+	&[style*="font-size"] :where(p) {
+		font-size: inherit;
+	}
+	&[style*="line-height"] :where(p) {
+		line-height: inherit;
+	}
+	&[style*="font-style"] :where(p) {
+		font-style: inherit;
+	}
+	&[style*="letter-spacing"] :where(p) {
+		letter-spacing: inherit;
+	}
+}
