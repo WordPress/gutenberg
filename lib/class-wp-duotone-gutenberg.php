@@ -172,10 +172,8 @@ class WP_Duotone_Gutenberg {
 			'rad'  => 360 / ( M_PI * 2 ),
 		);
 
-		$factor = $angle_units[ $unit ];
-		if ( ! $factor ) {
-			$factor = 1;
-		}
+		// If the unit is not recognized, default to degrees.
+		$factor = $angle_units[ $unit ] ?? 1;
 
 		return (float) $value * $factor;
 	}
