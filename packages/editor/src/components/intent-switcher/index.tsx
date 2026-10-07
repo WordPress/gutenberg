@@ -134,22 +134,20 @@ function IntentSwitcher() {
 				value={ intent }
 				onValueChange={ ( value ) => setEditorIntent( value ) }
 			>
-				<Menu.Group>
-					<Menu.GroupLabel>{ __( 'Mode' ) }</Menu.GroupLabel>
-					{ choices.map( ( choice ) => (
-						<Menu.RadioItem
-							key={ choice.value }
-							value={ choice.value }
-							disabled={ choice.disabled }
-							shortcut={ choice.shortcut ?? undefined }
-						>
-							<Menu.ItemLabel>{ choice.label }</Menu.ItemLabel>
-							<Menu.ItemDescription>
-								{ choice.info }
-							</Menu.ItemDescription>
-						</Menu.RadioItem>
-					) ) }
-				</Menu.Group>
+				<Menu.GroupLabel>{ __( 'Mode' ) }</Menu.GroupLabel>
+				{ choices.map( ( choice ) => (
+					<Menu.RadioItem
+						key={ choice.value }
+						value={ choice.value }
+						disabled={ choice.disabled }
+						shortcut={ choice.shortcut ?? undefined }
+					>
+						<Menu.ItemLabel>{ choice.label }</Menu.ItemLabel>
+						<Menu.ItemDescription>
+							{ choice.info }
+						</Menu.ItemDescription>
+					</Menu.RadioItem>
+				) ) }
 			</Menu.RadioGroup>
 			<Menu.Separator />
 		</PostTypeSupportCheck>
