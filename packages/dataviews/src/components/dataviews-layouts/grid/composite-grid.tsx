@@ -453,7 +453,6 @@ export default function CompositeGrid< Item >( {
 						}
 						role="feed"
 						focusWrap
-						// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
 						inert={ inertValue( inert ) }
 					>
 						{ /* Render placeholders for unloaded items in first row */ }
@@ -551,7 +550,6 @@ export default function CompositeGrid< Item >( {
 						aria-busy={ isLoading }
 						aria-rowcount={ totalRows }
 						ref={ resizeObserverRef }
-						// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
 						inert={ inertValue( inert ) }
 					>
 						{ chunk( data, gridColumns ).map( ( row, i ) => (
