@@ -100,15 +100,20 @@ export function FlatTermSelector( { slug } ) {
 				select( coreStore );
 			const post = getCurrentPost();
 			const _taxonomy = getEntityRecord( 'root', 'taxonomy', slug );
-			const _termIds = _taxonomy
-				? getEditedPostAttribute( _taxonomy.rest_base )
-				: EMPTY_ARRAY;
 			const canCreate =
 				!! _taxonomy &&
 				!! post._links?.[ 'wp:action-create-' + _taxonomy.rest_base ];
 			const canAssign =
 				!! _taxonomy &&
 				!! post._links?.[ 'wp:action-assign-' + _taxonomy.rest_base ];
+
+			const editedTermIds =
+				_taxonomy && canAssign
+					? getEditedPostAttribute( _taxonomy.rest_base )
+					: EMPTY_ARRAY;
+			const _termIds = Array.isArray( editedTermIds )
+				? editedTermIds
+				: EMPTY_ARRAY;
 
 			// If the user can't assign terms, there's no need to fetch them.
 			if ( ! canAssign ) {
