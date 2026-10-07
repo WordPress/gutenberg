@@ -134,17 +134,10 @@ class WP_Theme_Json_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * gutenberg_get_global_styles() must read the merged data through
-	 * WP_Theme_JSON_Resolver_Gutenberg::get_merged_data() on every call instead of
-	 * keeping a copy of its own. The resolver rebuilds its data when the registered
-	 * blocks change; a cache in front of it does not, so a block registered after
-	 * the first call would stay invisible to this accessor for the rest of the
-	 * request while every other consumer of the merged data sees it.
-	 *
-	 * The suite runs with WP_DEBUG on, and the object cache this replaced
-	 * (WordPress/gutenberg#81889) recomputed under WP_DEBUG, so the late
-	 * registration on its own cannot see that cache. The cache was written on every
-	 * call whatever WP_DEBUG said, so the assertions on its four keys can.
+	 * The suite runs with WP_DEBUG on, and a cache with a WP_DEBUG bypass returns
+	 * fresh data on every call, so the late-registration assertion alone cannot
+	 * detect the accessor cache this replaced (WordPress/gutenberg#81889) being
+	 * reinstated. The assertions on its keys can.
 	 *
 	 * @covers gutenberg_get_global_styles
 	 */

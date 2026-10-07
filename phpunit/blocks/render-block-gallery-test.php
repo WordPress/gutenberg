@@ -519,7 +519,7 @@ class Tests_Blocks_Render_Gallery extends WP_UnitTestCase {
 		$this->assertStringNotContainsString(
 			$gap_var,
 			gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) ),
-			'The gap should not be set before global styles define it, otherwise this test asserts nothing.'
+			'Expected no gap before global styles define one.'
 		);
 
 		$filter = static function ( $theme_json ) {

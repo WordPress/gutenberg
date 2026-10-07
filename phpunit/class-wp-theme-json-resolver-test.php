@@ -1524,13 +1524,16 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @dataProvider data_merged_data_origins
 	 * @covers WP_Theme_JSON_Resolver_Gutenberg::get_merged_data
+	 *
+	 * @param string $origin Origin to request.
 	 */
-	public function test_get_merged_data_returns_the_memoized_data() {
-		WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
+	public function test_get_merged_data_returns_the_memoized_data( $origin ) {
+		WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin );
 
-		$sentinel = $this->replace_merged_data_with_sentinel( 'custom' );
-		$result   = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
+		$sentinel = $this->replace_merged_data_with_sentinel( $origin );
+		$result   = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin );
 
 		$this->assertSame(
 			'sentinel',
@@ -1547,12 +1550,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	 * @covers WP_Theme_JSON_Resolver_Gutenberg::get_merged_data
 	 */
 	public function test_get_merged_data_is_not_affected_by_modifying_the_result() {
-		/*
-		 * Styles that reference a preset are required: resolving variables
-		 * changes nothing otherwise, which would leave this test asserting
-		 * nothing. None of the bundled theme fixtures reference a preset that
-		 * resolves to a value, so one is added through the theme data filter.
-		 */
+		// A style referencing a preset is injected because no bundled theme fixture has one that resolves.
 		$filter = static function ( $theme_json ) {
 			return $theme_json->update_with(
 				array(
@@ -1589,7 +1587,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		}
 
 		$this->assertSame( 'var(--wp--preset--font-family--test-font)', $before, 'The theme data should reference a preset.' );
-		$this->assertSame( 'Test Font, sans-serif', $resolved, 'Resolving variables should replace the reference with the preset value, otherwise this test asserts nothing.' );
+		$this->assertSame( 'Test Font, sans-serif', $resolved, 'Expected the preset reference to resolve.' );
 		$this->assertSame( $before, $after, 'Resolving variables should not affect subsequent calls.' );
 	}
 
@@ -1624,18 +1622,35 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @dataProvider data_merged_data_origins
 	 * @covers WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data
+	 *
+	 * @param string $origin Origin to request.
 	 */
-	public function test_clean_cached_data_refreshes_merged_data() {
-		WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
-		$this->replace_merged_data_with_sentinel( 'custom' );
+	public function test_clean_cached_data_refreshes_merged_data( $origin ) {
+		WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin );
+		$this->replace_merged_data_with_sentinel( $origin );
 
 		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
 
 		$this->assertNotSame(
 			'sentinel',
-			WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_raw_data()['styles']['color']['text'] ?? null,
+			WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin )->get_raw_data()['styles']['color']['text'] ?? null,
 			'Cleaning the cached data should discard the memoized merged data.'
+		);
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_merged_data_origins() {
+		return array(
+			'default' => array( 'default' ),
+			'blocks'  => array( 'blocks' ),
+			'theme'   => array( 'theme' ),
+			'custom'  => array( 'custom' ),
 		);
 	}
 
@@ -1644,12 +1659,13 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	public function test_switching_theme_refreshes_merged_data() {
 		switch_theme( 'block-theme' );
-		$before = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_raw_data();
+		$before = wp_list_pluck( WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_settings()['color']['palette']['theme'] ?? array(), 'slug' );
 
 		switch_theme( 'default' );
-		$after = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_raw_data();
+		$after = wp_list_pluck( WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_settings()['color']['palette']['theme'] ?? array(), 'slug' );
 
-		$this->assertNotEquals( $before, $after, 'Switching themes should refresh the merged data.' );
+		$this->assertContains( 'light', $before, 'The block theme palette should be present while it is active.' );
+		$this->assertNotContains( 'light', $after, 'Switching themes should refresh the merged data.' );
 	}
 
 	/**
