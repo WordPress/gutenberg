@@ -22,6 +22,6 @@
 		"@wordpress/private-apis": "file:../../packages/private-apis"
 	},
 	"devDependencies": {
-		"@types/react": "^18.3.27"
+		"@types/react": "^19.3.0"
 	}
 }

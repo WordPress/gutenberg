@@ -16,6 +16,7 @@ import {
 	LinkControl,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
+	useBackgroundProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	__experimentalGetShadowClassesAndStyles as useShadowProps,
 	__experimentalGetDimensionsClassesAndStyles as useDimensionsProps,
@@ -166,6 +167,7 @@ function ButtonEdit( props ) {
 	const colorProps = useColorProps( attributes );
 	const spacingProps = useSpacingProps( attributes );
 	const shadowProps = useShadowProps( attributes );
+	const backgroundProps = useBackgroundProps( attributes );
 	const dimensionsProps = useDimensionsProps( attributes );
 	const ref = useRef();
 	const richTextRef = useRef();
@@ -348,6 +350,7 @@ function ButtonEdit( props ) {
 						className,
 						'wp-block-button__link',
 						colorProps.className,
+						backgroundProps.className,
 						borderProps.className,
 						typographyProps.className,
 						{
@@ -362,6 +365,7 @@ function ButtonEdit( props ) {
 					style={ {
 						...borderProps.style,
 						...colorProps.style,
+						...backgroundProps.style,
 						...spacingProps.style,
 						...shadowProps.style,
 						...typographyProps.style,
