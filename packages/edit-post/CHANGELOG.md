@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Meta Boxes: Don't render an empty "Meta Boxes" panel when the only registered meta boxes are in the side location ([#84194](https://github.com/WordPress/gutenberg/pull/84194)).
+-   Meta Boxes: Don't render an empty "Meta Boxes" panel when the only registered meta boxes are in the side location ([#84196](https://github.com/WordPress/gutenberg/pull/84196)).
 
 ## 8.57.0 (2026-10-07)
 
