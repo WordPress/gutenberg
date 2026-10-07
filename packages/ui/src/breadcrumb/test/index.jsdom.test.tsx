@@ -531,7 +531,6 @@ describe( 'Breadcrumb', () => {
 					</Breadcrumb.Root>
 				)
 			).toThrow( /only accepts/ );
-			expect( console ).toHaveErrored();
 		} );
 
 		it( 'requires at least one ancestor link', () => {
@@ -542,7 +541,6 @@ describe( 'Breadcrumb', () => {
 					</Breadcrumb.Root>
 				)
 			).toThrow( /at least one/ );
-			expect( console ).toHaveErrored();
 		} );
 
 		it( 'requires exactly one final current item', () => {
@@ -572,7 +570,6 @@ describe( 'Breadcrumb', () => {
 					</Breadcrumb.Root>
 				)
 			).toThrow( /must be the final child/ );
-			expect( console ).toHaveErrored();
 		} );
 
 		it( 'requires usable href and text labels', () => {
@@ -593,7 +590,6 @@ describe( 'Breadcrumb', () => {
 					</Breadcrumb.Root>
 				)
 			).toThrow( /non-empty text label/ );
-			expect( console ).toHaveErrored();
 		} );
 
 		it( 'requires stable keys for items rendered from a nested array', () => {
@@ -610,7 +606,6 @@ describe( 'Breadcrumb', () => {
 					</Breadcrumb.Root>
 				)
 			).toThrow( /stable React keys/ );
-			expect( console ).toHaveErrored();
 		} );
 	} );
 

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 15.2.0 (2026-10-07)
+
 ### Enhancements
 
 -   `trashPost`: Accept a `force` option to delete the post permanently instead of moving it to the trash ([#84045](https://github.com/WordPress/gutenberg/pull/84045)).

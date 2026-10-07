@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 20.0.0 (2026-10-07)
+
+### Breaking Changes
+
+-   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
+
 ### Enhancements
 
 -   List the fields the user can show or hide alphabetically by label in the view config's properties section and in the table's insert column submenus, instead of in the order the consumer declared them ([#83947](https://github.com/WordPress/gutenberg/pull/83947)).
@@ -20,6 +26,7 @@
 ### Internal
 
 -   Remove the `use-memo-one` dependency, which the `./wp` bundle no longer imports ([#83952](https://github.com/WordPress/gutenberg/pull/83952)).
+-   Keep popover `placement` values as string literals so they remain valid after stricter component prop types ([#82704](https://github.com/WordPress/gutenberg/pull/82704)).
 
 ### Documentation
 

@@ -45,6 +45,13 @@ const env = {
 // Do not inherit repository-specific runner options in the isolated consumer.
 delete env.NODE_OPTIONS;
 delete env.NODE_PATH;
+/* npm exports every resolved config as npm_config_*, so the repository supply
+   chain policy would otherwise reject the consumer's own tarball install. */
+for ( const key of Object.keys( env ) ) {
+	if ( key.toLowerCase().startsWith( 'npm_config_' ) ) {
+		delete env[ key ];
+	}
+}
 
 function execute( command, args, cwd ) {
 	const result = spawnSync( command, args, {
