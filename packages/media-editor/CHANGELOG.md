@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.20.0 (2026-10-07)
+
 ### Enhancements
 
 -   Restore an image's original attachment and editable details from the media editor's More options menu ([#81805](https://github.com/WordPress/gutenberg/pull/81805)).

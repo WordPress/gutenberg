@@ -158,7 +158,6 @@ export default function Canvas( { canvas }: CanvasProps ) {
 		<div style={ { height: '100%', position: 'relative' } }>
 			<div
 				style={ { height: '100%' } }
-				// @ts-expect-error inert not typed properly
 				inert={ inertValue( canvas.isPreview ) }
 			>
 				<Editor

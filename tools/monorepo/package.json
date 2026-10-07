@@ -28,7 +28,7 @@
 	"devDependencies": {
 		"@testing-library/jest-dom": "^7.0.1",
 		"@types/node": "^24.13.3",
-		"@types/react": "^18.3.27",
+		"@types/react": "^19.3.0",
 		"@wordpress/admin-ui": "file:../../packages/admin-ui",
 		"@wordpress/data": "file:../../packages/data",
 		"@wordpress/theme": "file:../../packages/theme",
@@ -38,7 +38,6 @@
 		"access": "public"
 	},
 	"scripts": {
-		"install-vscode-settings": "node scripts/install-vscode-settings.mts",
 		"list-experimental-apis": "node scripts/list-experimental-apis.mts",
 		"wpds:admin-scheme-tokens": "node wpds/generate-admin-scheme-tokens.mjs"
 	}

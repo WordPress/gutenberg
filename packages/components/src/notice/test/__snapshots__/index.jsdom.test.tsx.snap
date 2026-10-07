@@ -59,7 +59,6 @@ exports[`Notice > should match snapshot 1`] = `
       >
         <path
           d="M7.75 16.25L16.25 7.75M16.25 16.25L7.75 7.75"
-          vector-effect="non-scaling-stroke"
         />
       </svg>
     </button>
