@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Meta Boxes: Hide the empty Meta Boxes pane when only side meta boxes are present and the pane is closed ([#84194](https://github.com/WordPress/gutenberg/pull/84194)).
+
 ## 8.57.0 (2026-10-07)
 
 ## 8.56.0 (2026-09-23)
