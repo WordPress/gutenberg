@@ -300,13 +300,25 @@ test.describe( 'Router styles', () => {
 		await expect( red ).toHaveCSS( 'color', COLOR_WRAPPER );
 		await expect( redBlock ).toBeHidden();
 
-		// Setup a route handler to make requests to the red stylesheet fail.
-		// The route handler is removed after navigation to simulate a
-		// temporary error.
+		/*
+		 * Set up a route handler to make requests to the red stylesheet fail.
+		 * The route handler only aborts the request the first time to simulate
+		 * a temporary error. It is later removed at the end of the test.
+		 *
+		 * This approach uses a variable to determine whether to abort or continue
+		 * the request. Other approaches, like removing the route handler during
+		 * execution or using the `times` option, proved unreliable and made the
+		 * test flaky.
+		 */
+		let intercepted = false;
 		const linkPattern = '**/router-styles-red/style-from-link.css*';
 		await page.route( linkPattern, async ( route ) => {
-			await route.abort( 'failed' );
-			await page.unrouteAll( { behavior: 'ignoreErrors' } );
+			if ( ! intercepted ) {
+				intercepted = true;
+				await route.abort( 'failed' );
+			} else {
+				await route.continue();
+			}
 		} );
 
 		// Navigate to the page with the Red block
@@ -315,6 +327,8 @@ test.describe( 'Router styles', () => {
 		await expect( csn ).toBeHidden();
 		await expect( red ).toHaveCSS( 'color', COLOR_RED );
 		await expect( redBlock ).toBeVisible();
+
+		await page.unroute( linkPattern );
 	} );
 
 	test( 'should not apply preloaded styles in current page', async ( {
