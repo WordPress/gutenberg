@@ -34,5 +34,10 @@ export type LabelProps = ComponentProps< typeof _Progress.Label > & {
 	children?: React.ReactNode;
 };
 
-export type ValueProps = ComponentProps< typeof _Progress.Value > &
-	Pick< React.ComponentProps< typeof _Progress.Value >, 'children' >;
+export type ValueProps = ComponentProps< typeof _Progress.Value > & {
+	/**
+	 * A function that receives the formatted and numeric progress values and
+	 * returns the content to display. The numeric value is null for indeterminate progress.
+	 */
+	children?: React.ComponentProps< typeof _Progress.Value >[ 'children' ];
+};

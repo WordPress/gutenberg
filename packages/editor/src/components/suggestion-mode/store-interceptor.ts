@@ -1381,6 +1381,47 @@ export default function SuggestionStoreInterceptor() {
 				} );
 
 			/*
+			 * Adopt a new block that proposes nothing of its own: a block
+			 * inside a pending insertion, or a list indent's nested list. A
+			 * list indent clones the source list for the nested one, so the
+			 * clone arrives with the source's marker and note link: a second
+			 * anchor for the same note, which loses the source's summary and
+			 * leaves a decision that can't resolve (#73411). The inherited
+			 * suggestion state is dropped before the block is adopted.
+			 */
+			const adoptInheritedBlock = (
+				clientId: string,
+				attributes: Record< string, any >
+			) => {
+				const settled = settleInsertedBlock(
+					clientId,
+					attributes,
+					liveClientIds
+				);
+				const { suggestion, ...metadata } =
+					settled.metadata ?? attributes?.metadata ?? {};
+				if ( suggestion || Object.keys( settled ).length > 0 ) {
+					isDispatchingOwnWrite = true;
+					try {
+						blockEditorDispatch.__unstableMarkNextChangeAsNotPersistent();
+						blockEditorDispatch.updateBlockAttributes( clientId, {
+							...settled,
+							metadata: Object.keys( metadata ).length
+								? metadata
+								: undefined,
+						} );
+					} finally {
+						isDispatchingOwnWrite = false;
+					}
+				}
+				snapshot.set(
+					clientId,
+					blockEditor.getBlockAttributes( clientId )
+				);
+				unmarkDeferredInsertion( clientId );
+			};
+
+			/*
 			 * Blocks whose content change was declined this fire. A split
 			 * dispatches the head's truncation and the new tail block
 			 * together, and the head is visited first (document order), so
@@ -1444,8 +1485,7 @@ export default function SuggestionStoreInterceptor() {
 						parentClientId !== null &&
 						isPartOfPendingInsertion( blockEditor, parentClientId )
 					) {
-						snapshot.set( clientId, current );
-						unmarkDeferredInsertion( clientId );
+						adoptInheritedBlock( clientId, current );
 						continue;
 					}
 
@@ -1453,8 +1493,7 @@ export default function SuggestionStoreInterceptor() {
 					// list-item indent's nested list) is not proposed
 					// content; the move branch captures what it carries.
 					if ( isMoveCarrier( block, tree ) ) {
-						snapshot.set( clientId, current );
-						unmarkDeferredInsertion( clientId );
+						adoptInheritedBlock( clientId, current );
 						continue;
 					}
 

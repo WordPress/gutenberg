@@ -134,7 +134,9 @@ export function RectangleStencil( {
 		} ),
 		[ boundsMinX, boundsMinY, boundsMaxX, boundsMaxY ]
 	);
-	const keyboardSettleTimerRef = useRef< ReturnType< typeof setTimeout > >();
+	const keyboardSettleTimerRef = useRef<
+		ReturnType< typeof setTimeout > | undefined
+	>( undefined );
 	const keyboardResizeActiveRef = useRef( false );
 	const resizeHandleDescriptionId = useId();
 	const hasLockedRatio = !! ( aspectRatio && aspectRatio > 0 );

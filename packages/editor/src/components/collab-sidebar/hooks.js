@@ -1,6 +1,8 @@
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import {
+	createContext,
+	useContext,
 	useState,
 	useEffect,
 	useLayoutEffect,
@@ -35,6 +37,11 @@ import {
 } from './utils';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
+
+/**
+ * Unsent note drafts, keyed by block client ID for new notes and note ID for replies.
+ */
+export const NoteDraftsContext = createContext();
 
 /**
  * Query that loads every note thread on a post, replies included. Exported so
@@ -521,6 +528,26 @@ export function useNoteActions() {
 }
 
 /**
+ * Keeps a note form's unsent content, so it survives the form unmounting.
+ *
+ * @param {string|number} key The block client ID for a new note, or the note ID for a reply.
+ * @return {Object} The draft stored when the form mounted, its setter, and a check for a stored draft.
+ */
+export function useNoteDraft( key ) {
+	const drafts = useContext( NoteDraftsContext );
+	const [ initialValue ] = useState( () => drafts.get( key ) ?? '' );
+	const setDraft = ( content ) => {
+		if ( content ) {
+			drafts.set( key, content );
+		} else {
+			drafts.delete( key );
+		}
+	};
+	const hasDraft = () => drafts.has( key );
+	return { initialValue, setDraft, hasDraft };
+}
+
+/**
  * Keeps the selected note in step with the selected block, and focuses the
  * selected note's thread when the selection asks for it.
  *
@@ -530,6 +557,7 @@ export function useNoteActions() {
  */
 export function useNoteSelection( { notes, sidebarRef } ) {
 	const registry = useRegistry();
+	const drafts = useContext( NoteDraftsContext );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const selectedBlockClientId = useSelect(
 		( select ) => select( blockEditorStore ).getSelectedBlockClientId(),
@@ -545,7 +573,6 @@ export function useNoteSelection( { notes, sidebarRef } ) {
 		};
 	}, [] );
 
-	// Select the block's primary note, or clear the selection if it has none.
 	const syncWithBlock = useEvent( ( clientId ) => {
 		const { getSelectedNote, isNoteFocused } = unlock(
 			registry.select( editorStore )
@@ -563,7 +590,8 @@ export function useNoteSelection( { notes, sidebarRef } ) {
 		if ( blockThreads.some( ( thread ) => thread.id === currentNoteId ) ) {
 			return;
 		}
-		selectNote( pickPrimaryNote( blockThreads )?.id );
+		const draftNoteId = drafts.has( clientId ) ? 'new' : undefined;
+		selectNote( pickPrimaryNote( blockThreads )?.id ?? draftNoteId );
 	} );
 
 	// Sync only on block transitions, so in-block changes (Escape, Cancel,
