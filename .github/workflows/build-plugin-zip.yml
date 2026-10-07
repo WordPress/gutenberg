@@ -598,10 +598,11 @@ jobs:
                   working-directory: main
                   cache: false
 
+            # Not `npm exec`: it exports the tool's .npmrc as npm_config_* variables, which override the release branch's own .npmrc.
             - name: Publish packages to npm ("latest" dist-tag)
               run: |
                   cd main
                   npm ci
-                  npm exec --no release-cli -- npm-latest --semver minor --ci --repository-path ../publish
+                  node tools/release/cli.js npm-latest --semver minor --ci --repository-path ../publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

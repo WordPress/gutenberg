@@ -14,7 +14,6 @@ let {
 	getNpmReleaseGitRecoveryCommands,
 	getRemoteBranchSha,
 	getRemoteTagShas,
-	getRepositoryCommandEnv,
 	getTagPushCommands,
 	getTagRefspec,
 	prepareNpmRelease,
@@ -44,7 +43,6 @@ beforeAll( () => {
 		getNpmReleaseGitRecoveryCommands,
 		getRemoteBranchSha,
 		getRemoteTagShas,
-		getRepositoryCommandEnv,
 		getTagPushCommands,
 		getTagRefspec,
 		prepareNpmRelease,
@@ -63,52 +61,6 @@ beforeAll( () => {
 		resumePreparedNpmRelease,
 		verifyRemotePackageTags,
 	} = require( '../packages' ) );
-} );
-
-describe( 'getRepositoryCommandEnv', () => {
-	it( "drops only the values copied from the release tool's .npmrc", async () => {
-		const toolPrefix = await mkdtemp(
-			join( tmpdir(), 'npm-release-tool-' )
-		);
-		try {
-			await writeFile(
-				join( toolPrefix, '.npmrc' ),
-				[
-					'install-strategy = "linked"',
-					'# strict-allow-scripts = true',
-					'strict-peer-deps=true',
-					'min-release-age = 1',
-				].join( '\n' )
-			);
-
-			expect(
-				getRepositoryCommandEnv( {
-					PATH: '/bin',
-					NPM_CONFIG_USERCONFIG: '/runner/.npmrc',
-					npm_config_install_strategy: 'linked',
-					npm_config_local_prefix: toolPrefix,
-					npm_config_registry: 'https://registry.npmjs.org/',
-					npm_config_strict_allow_scripts: 'true',
-					npm_config_strict_peer_deps: 'true',
-					NPM_CONFIG_MIN_RELEASE_AGE: '0',
-				} )
-			).toEqual( {
-				PATH: '/bin',
-				NPM_CONFIG_USERCONFIG: '/runner/.npmrc',
-				npm_config_registry: 'https://registry.npmjs.org/',
-				npm_config_strict_allow_scripts: 'true',
-				NPM_CONFIG_MIN_RELEASE_AGE: '0',
-			} );
-		} finally {
-			await rm( toolPrefix, { recursive: true, force: true } );
-		}
-	} );
-
-	it( 'keeps the environment when not run through npm', () => {
-		const env = { PATH: '/bin', npm_config_install_strategy: 'linked' };
-
-		expect( getRepositoryCommandEnv( env ) ).toBe( env );
-	} );
 } );
 
 describe( 'prepareNpmRelease', () => {
