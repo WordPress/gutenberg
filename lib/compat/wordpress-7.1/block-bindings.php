@@ -14,6 +14,14 @@ add_filter(
 		if ( 'core/list-item' === $block_type && ! in_array( 'content', $attributes, true ) ) {
 			$attributes[] = 'content';
 		}
+
+		$registered_block = WP_Block_Type_Registry::get_instance()->get_registered( $block_type );
+		if ( $registered_block && block_has_support( $registered_block, 'visibility', true ) ) {
+			if ( ! in_array( 'visibility', $attributes, true ) ) {
+				$attributes[] = 'visibility';
+			}
+		}
+
 		return $attributes;
 	},
 	10,
