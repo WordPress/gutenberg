@@ -14,9 +14,14 @@ describe( '.wp-env.json schema', () => {
 		// because validateSchema only checks syntax, whereas, compile checks
 		// if the schema is semantically correct with strict mode.
 		// See https://github.com/ajv-validator/ajv/issues/1434#issuecomment-822982571
-		const result = ajv.compile( wpEnvSchema );
+		// Use a fresh instance so the result doesn't depend on errors left
+		// over from other tests validating against the shared compiled schema.
+		const strictAjv = new Ajv( {
+			allowMatchingProperties: true,
+			allowUnionTypes: true,
+		} );
 
-		expect( result.errors ).toBe( null );
+		expect( () => strictAjv.compile( wpEnvSchema ) ).not.toThrow();
 	} );
 
 	test( 'validates schema for .wp-env.json', () => {
