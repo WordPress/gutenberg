@@ -1,0 +1,62 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.root {
+			--_wp-ui-avatar-size: var(--wpds-dimension-size-md);
+
+			position: relative;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			flex-shrink: 0;
+			inline-size: var(--_wp-ui-avatar-size);
+			block-size: var(--_wp-ui-avatar-size);
+			border-radius: 50%;
+			background-color: var(--wpds-color-background-surface-neutral-weak);
+			color: var(--wpds-color-foreground-content-neutral);
+			font-family: var(--wpds-typography-font-family-body);
+			font-size: var(--wpds-typography-font-size-sm);
+			font-weight: var(--wpds-typography-font-weight-emphasis);
+			line-height: 1;
+			vertical-align: middle;
+		}
+
+		.is-sm {
+			--_wp-ui-avatar-size: var(--wpds-dimension-size-sm);
+			font-size: var(--wpds-typography-font-size-xs);
+		}
+
+		.is-lg {
+			--_wp-ui-avatar-size: var(--wpds-dimension-size-lg);
+			font-size: var(--wpds-typography-font-size-md);
+		}
+
+		.image,
+		.fallback {
+			position: absolute;
+			inset: 0;
+			inline-size: 100%;
+			block-size: 100%;
+			border-radius: inherit;
+		}
+
+		.image {
+			object-fit: cover;
+
+			/* Keep a layout box so lazy images can intersect the viewport. */
+			&[data-loading],
+			&[data-error] {
+				visibility: hidden;
+			}
+		}
+
+		.fallback {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			overflow: hidden;
+			white-space: nowrap;
+		}
+	}
+}
