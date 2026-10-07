@@ -202,7 +202,7 @@ function PickerActivityGroup< Item >( {
 							__( '%1$s: %2$s' ),
 							groupField.label,
 							groupName
-					  )
+						)
 					: groupName }
 			</h3>
 			{ children }
@@ -335,7 +335,7 @@ export default function ViewPickerActivity< Item >( {
 									{ groupItems.map( renderItem ) }
 								</PickerActivityGroup>
 							)
-					  )
+						)
 					: data.map( renderItem ) }
 			</Composite>
 			{ isLoading && (

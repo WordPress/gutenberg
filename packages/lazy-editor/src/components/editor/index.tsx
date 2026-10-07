@@ -13,6 +13,8 @@ const {
 	Editor: PrivateEditor,
 	BackButton,
 	PreferencesModal,
+	ToolsMoreMenuGroup,
+	SiteExport,
 } = unlock( editorPrivateApis );
 
 interface EditorProps {
@@ -22,6 +24,7 @@ interface EditorProps {
 	backButton?: ReactNode;
 	onActionPerformed?: ( actionId: string, items: any[] ) => void;
 	initialViewport?: string;
+	renderingMode?: string;
 }
 
 /**
@@ -34,6 +37,7 @@ interface EditorProps {
  * @param {ReactNode} props.backButton        Optional back button to render in editor header
  * @param {Function}  props.onActionPerformed Optional callback run after a post action
  * @param {string}    props.initialViewport   Optional device type the entity opens at
+ * @param {string}    props.renderingMode     Optional rendering mode the editor stays in, for a route that shows the site rather than one piece of content
  * @return The editor component with loading states
  */
 export function Editor( {
@@ -43,6 +47,7 @@ export function Editor( {
 	backButton,
 	onActionPerformed,
 	initialViewport,
+	renderingMode,
 }: EditorProps ) {
 	// Resolve homepage when no postType/postId provided
 	const homePage = useSelect(
@@ -131,6 +136,7 @@ export function Editor( {
 			styles={ finalSettings.styles }
 			onActionPerformed={ onActionPerformed }
 			initialViewport={ initialViewport }
+			renderingMode={ renderingMode }
 		>
 			{ backButton && <BackButton>{ backButton }</BackButton> }
 			{ /*
@@ -139,6 +145,13 @@ export function Editor( {
 			   nothing until one of them opens it.
 			 */ }
 			<PreferencesModal />
+			{ /*
+			   Self-gated: renders only while editing a template or template
+			   part, the entities the exported theme is made of.
+			 */ }
+			<ToolsMoreMenuGroup>
+				<SiteExport />
+			</ToolsMoreMenuGroup>
 		</PrivateEditor>
 	);
 }

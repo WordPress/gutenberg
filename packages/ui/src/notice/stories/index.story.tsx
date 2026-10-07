@@ -1,22 +1,30 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { unseen } from '@wordpress/icons';
 import * as Notice from '../index';
 
 const meta: Meta< typeof Notice.Root > = {
-	title: 'Design System/Components/Notice',
+	title: 'Components/@wordpress-ui/Notice',
+	id: 'design-system-components-notice',
 	component: Notice.Root,
+	tags: [ 'manifest' ],
 	subcomponents: {
 		'Notice.Title': Notice.Title,
 		'Notice.Description': Notice.Description,
 		'Notice.Actions': Notice.Actions,
-		'Notice.CloseIcon': Notice.CloseIcon,
+		'Notice.CloseIconButton': Notice.CloseIconButton,
 		'Notice.ActionButton': Notice.ActionButton,
 		'Notice.ActionLink': Notice.ActionLink,
 	},
 	parameters: {
+		docs: {
+			description: {
+				component:
+					'Notice does not announce its content automatically. See [Notice announcements](?path=/docs/design-system-components-notice-announcements--docs) for announcement examples and migration from `spokenMessage` and `politeness`.',
+			},
+		},
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
@@ -38,7 +46,7 @@ export const Default: Story = {
 				</Notice.ActionButton>
 				<Notice.ActionLink href="#">Link</Notice.ActionLink>
 			</Notice.Actions>,
-			<Notice.CloseIcon key="closeIcon" />,
+			<Notice.CloseIconButton key="closeIconButton" />,
 		],
 	},
 };
@@ -76,7 +84,7 @@ export const Error: Story = {
 };
 
 /**
- * Omit Notice.CloseIcon to make the notice non-dismissable.
+ * Omit Notice.CloseIconButton to make the notice non-dismissable.
  */
 export const NonDismissible: Story = {
 	args: {
@@ -106,7 +114,7 @@ export const WithoutIcon: Story = {
 			<Notice.Description key="description">
 				This notice has no decorative icon displayed.
 			</Notice.Description>,
-			<Notice.CloseIcon key="closeIcon" />,
+			<Notice.CloseIconButton key="closeIconButton" />,
 		],
 	},
 };
@@ -119,7 +127,7 @@ export const WithoutActions: Story = {
 			<Notice.Description key="description">
 				A dismissable notice without any action buttons or links.
 			</Notice.Description>,
-			<Notice.CloseIcon key="closeIcon" />,
+			<Notice.CloseIconButton key="closeIconButton" />,
 		],
 	},
 };
@@ -131,7 +139,7 @@ export const TitleOnly: Story = {
 	args: {
 		children: [
 			<Notice.Title key="title">Just a title</Notice.Title>,
-			<Notice.CloseIcon key="closeIcon" />,
+			<Notice.CloseIconButton key="closeIconButton" />,
 		],
 	},
 };
@@ -146,7 +154,22 @@ export const DescriptionOnly: Story = {
 			<Notice.Description key="description">
 				Just a description without title or actions.
 			</Notice.Description>,
-			<Notice.CloseIcon key="closeIcon" />,
+			<Notice.CloseIconButton key="closeIconButton" />,
+		],
+	},
+};
+
+/**
+ * Pass a custom icon via the `icon` prop to override the default intent icon.
+ */
+export const CustomIcon: Story = {
+	args: {
+		intent: 'info',
+		icon: unseen,
+		children: [
+			<Notice.Description key="description">
+				Parent block is hidden on Desktop
+			</Notice.Description>,
 		],
 	},
 };

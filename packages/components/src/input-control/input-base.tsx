@@ -1,8 +1,10 @@
 import type { ForwardedRef } from 'react';
+import clsx from 'clsx';
 import { useInstanceId } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
 import Backdrop from './backdrop';
 import Label from './label';
+import styles from './style.module.scss';
 import { Container, Root, Prefix, Suffix } from './styles/input-control-styles';
 import type { InputBaseProps, LabelPosition } from './types';
 import type { WordPressComponentProps } from '../context';
@@ -11,6 +13,7 @@ import {
 	contextConnect,
 	useContextSystem,
 } from '../context';
+import type { FlexDirection } from '../flex/types';
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( InputBase );
@@ -22,7 +25,7 @@ function useUniqueId( idProp?: string ) {
 // Adapter to map props for the new ui/flex component.
 function getUIFlexProps( labelPosition?: LabelPosition ) {
 	const props: {
-		direction?: string;
+		direction?: FlexDirection;
 		gap?: number;
 		justify?: string;
 		expanded?: boolean;
@@ -77,7 +80,6 @@ function InputBase(
 	}, [ size ] );
 
 	return (
-		// @ts-expect-error The `direction` prop from Flex (FlexDirection) conflicts with legacy SVGAttributes `direction` (string) that come from React intrinsic prop definitions.
 		<Root
 			{ ...restProps }
 			{ ...getUIFlexProps( labelPosition ) }
@@ -95,7 +97,10 @@ function InputBase(
 			</Label>
 			<Container
 				__unstableInputWidth={ __unstableInputWidth }
-				className="components-input-control__container"
+				className={ clsx(
+					'components-input-control__container',
+					styles.container
+				) }
 				disabled={ disabled }
 				hideLabel={ hideLabel }
 				labelPosition={ labelPosition }

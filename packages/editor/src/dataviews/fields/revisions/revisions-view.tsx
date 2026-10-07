@@ -28,7 +28,7 @@ export default function RevisionsView() {
 				href: addQueryArgs( 'revision.php', {
 					revision: lastRevisionId,
 				} ),
-		  }
+			}
 		: { onClick: () => setCurrentRevisionId( lastRevisionId ) };
 
 	return (

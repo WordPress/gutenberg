@@ -37,6 +37,7 @@
 			"style": true,
 			"width": true
 		},
+		"shadow": true,
 		"color": {
 			"gradients": true,
 			"link": true,
@@ -66,6 +67,7 @@
 			"__experimentalLetterSpacing": true,
 			"__experimentalTextTransform": true,
 			"__experimentalWritingMode": true,
+			"textShadow": true,
 			"fitText": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true

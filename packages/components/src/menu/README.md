@@ -15,14 +15,9 @@ It is responsible for managing the state of the menu and its items, and for
 rendering the `Menu.TriggerButton` (or the `Menu.SubmenuTriggerItem`)
 component, and the `Menu.Popover` component.
 
+This component is deprecated. When building for the Gutenberg repo, use `Menu` from `@wordpress/ui` instead. Otherwise, continue using `DropdownMenu` for now.
+
 ## Props
-
-### `as`
-
- - Type: `any`
- - Required: No
-
-The HTML element or React component to render the component as.
 
 ### `children`
 
@@ -64,7 +59,7 @@ A callback that gets called when the `open` state changes.
 
 ### `placement`
 
- - Type: `"left" | "right" | "top" | "bottom" | "left-start" | "right-start" | "top-start" | "bottom-start" | "left-end" | "right-end" | ...`
+ - Type: `"top" | "bottom" | "left" | "right" | "top-start" | "bottom-start" | "left-start" | "right-start" | "top-end" | "bottom-end" | ...`
  - Required: No
  - Default: `'bottom-start' for root-level menus, 'right-start' for submenus`
 
@@ -120,7 +115,7 @@ make disabled elements still accessible via keyboard.
 
 ##### `render`
 
- - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+ - Type: `ReactElement<unknown, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
  - Required: No
 
 Allows the component to be rendered as a different HTML element or React
@@ -245,7 +240,7 @@ The contents of the menu item's prefix, such as an icon.
 
 ##### `render`
 
- - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+ - Type: `ReactElement<unknown, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
  - Required: No
 
 Allows the component to be rendered as a different HTML element or React
@@ -329,14 +324,14 @@ The radio item's name.
 
 ##### `onChange`
 
- - Type: `BivariantCallback<(event: ChangeEvent<HTMLInputElement>) => void>`
+ - Type: `BivariantCallback<(event: ChangeEvent<HTMLInputElement, Element>) => void>`
  - Required: No
 
 A function that is called when the checkbox's checked state changes.
 
 ##### `render`
 
- - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+ - Type: `ReactElement<unknown, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
  - Required: No
 
 Allows the component to be rendered as a different HTML element or React
@@ -427,14 +422,14 @@ The checkbox menu item's name.
 
 ##### `onChange`
 
- - Type: `ChangeEventHandler<HTMLInputElement>`
+ - Type: `ChangeEventHandler<HTMLInputElement, HTMLInputElement>`
  - Required: No
 
 A function that is called when the checkbox's checked state changes.
 
 ##### `render`
 
- - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+ - Type: `ReactElement<unknown, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
  - Required: No
 
 Allows the component to be rendered as a different HTML element or React
@@ -575,7 +570,7 @@ The contents of the menu item's prefix, such as an icon.
 
 ##### `render`
 
- - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+ - Type: `ReactElement<unknown, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
  - Required: No
 
 Allows the component to be rendered as a different HTML element or React

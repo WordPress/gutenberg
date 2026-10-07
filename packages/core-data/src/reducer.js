@@ -79,10 +79,10 @@ export function currentTheme( state = undefined, action ) {
 /**
  * Reducer managing the current global styles id.
  *
- * @param {string|undefined} state  Current state.
+ * @param {number|undefined} state  Current state.
  * @param {Object}           action Dispatched action.
  *
- * @return {string|undefined} Updated state.
+ * @return {number|undefined} Updated state.
  */
 export function currentGlobalStylesId( state = undefined, action ) {
 	switch ( action.type ) {
@@ -453,18 +453,14 @@ export function undoManager( state = createUndoManager() ) {
 	return state;
 }
 
-// Stores a snapshot of the sync undo manager's undo/redo availability so
-// core-data selectors can react to undo stack changes.
-export function syncUndoManagerState(
-	state = { hasRedo: false, hasUndo: false },
-	action
-) {
+// The undo manager above is a mutable object, so changes to it do not change
+// state on their own. Entity edits, undo, and redo are store actions already.
+// A level the entity sync manager adds to it arrives outside of one, so this
+// reference changes then, and selectors reading the undo manager run again.
+export function undoManagerReference( state = {}, action ) {
 	switch ( action.type ) {
-		case 'SYNC_UNDO_MANAGER_CHANGE':
-			return {
-				hasRedo: action.hasRedo,
-				hasUndo: action.hasUndo,
-			};
+		case 'RECORD_SYNC_UNDO_LEVEL':
+			return {};
 	}
 	return state;
 }
@@ -585,10 +581,10 @@ export function navigationFallbackId( state = null, action ) {
 /**
  * Reducer managing the theme global styles revisions.
  *
- * @param {Record<string, object>} state  Current state.
- * @param {Object}                 action Dispatched action.
+ * @param {Record<number, Array<object>>} state  Current state.
+ * @param {Object}                        action Dispatched action.
  *
- * @return {Record<string, object>} Updated state.
+ * @return {Record<number, Array<object>>} Updated state.
  */
 export function themeGlobalStyleRevisions( state = {}, action ) {
 	switch ( action.type ) {
@@ -766,7 +762,7 @@ export default combineReducers( {
 	themeGlobalStyleRevisions,
 	entities,
 	editsReference,
-	syncUndoManagerState,
+	undoManagerReference,
 	undoManager,
 	embedPreviews,
 	userPermissions,

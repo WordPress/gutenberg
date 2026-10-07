@@ -67,9 +67,22 @@
 	}
 }
 
+.dataviews-filters__summary {
+	width: fit-content;
+	max-width: 100%;
+}
+
+// The `Dropdown` wrapper around each chip is a flex item of the row above, and
+// has to shrink for the chip to truncate.
+.dataviews-filters__summary-chip-dropdown {
+	min-width: 0;
+}
+
 .dataviews-filters__summary-chip-container {
 	position: relative;
-	white-space: pre-wrap;
+	// Not `nowrap`: the space that ends the filter name ("Status includes: ")
+	// is a trailing space, which only `pre` preserves.
+	white-space: pre;
 
 	.dataviews-filters__summary-chip {
 		border-radius: var(--wpds-border-radius-lg);
@@ -119,8 +132,13 @@
 				var(--wpds-color-stroke-focus);
 		}
 
-		.dataviews-filters-__summary-filter-text-name {
+		.dataviews-filters__summary-filter-text-name {
 			font-weight: var(--wpds-typography-font-weight-emphasis);
+		}
+
+		.dataviews-filters__summary-filter-text-value {
+			overflow: hidden;
+			text-overflow: ellipsis;
 		}
 	}
 
@@ -141,20 +159,20 @@
 		cursor: var(--wpds-cursor-control);
 
 		svg {
-			fill: var(--wpds-color-foreground-interactive-neutral);
+			color: var(--wpds-color-foreground-interactive-neutral);
 		}
 
 		&:hover,
 		&:focus {
 			background: var(--wpds-color-background-interactive-neutral-weak-active);
 			svg {
-				fill: var(--wpds-color-foreground-interactive-neutral-active);
+				color: var(--wpds-color-foreground-interactive-neutral-active);
 			}
 		}
 
 		&.has-values {
 			svg {
-				fill: var(--wpds-color-foreground-interactive-brand);
+				color: var(--wpds-color-foreground-interactive-brand);
 			}
 			&:hover {
 				background: var(--wpds-color-background-interactive-brand-weak-active);
@@ -220,8 +238,9 @@
 		}
 
 		.dataviews-filters__search-widget-listitem-multi-selection {
+			/* stylelint-disable-next-line plugin-wpds/no-token-fallback-values -- Preserve custom background theming with older @wordpress/theme runtimes that do not set this token. */
+			background-color: var(--wpds-color-background-interactive-neutral, var(--wpds-color-background-surface-neutral-strong));
 			border-color: var(--wpds-color-stroke-interactive-brand-active);
-			background: var(--wpds-color-background-surface-neutral-strong);
 
 			&.is-selected {
 				border-color: var(--wpds-color-stroke-interactive-brand-active);
@@ -263,8 +282,8 @@
 				content: "";
 				border-radius: 50%;
 				box-sizing: inherit;
-				width: vars.$radio-input-size-sm * 0.5;
-				height: vars.$radio-input-size-sm * 0.5;
+				width: vars.$radio-input-size * 0.5;
+				height: vars.$radio-input-size * 0.5;
 				position: absolute;
 				top: 50%;
 				left: 50%;
@@ -275,10 +294,6 @@
 				// This border serves as a background color in Windows High Contrast mode.
 				border: 4px solid var(--wpds-color-foreground-interactive-brand-strong);
 
-				@include break-small() {
-					width: vars.$radio-input-size * 0.5;
-					height: vars.$radio-input-size * 0.5;
-				}
 			}
 		}
 	}
@@ -289,7 +304,8 @@
 
 		@include checkbox-control;
 		position: relative;
-		background: var(--wpds-color-background-interactive-neutral-weak);
+		/* stylelint-disable-next-line plugin-wpds/no-token-fallback-values -- Preserve custom background theming with older @wordpress/theme runtimes that do not set this token. */
+		background: var(--wpds-color-background-interactive-neutral, var(--wpds-color-background-surface-neutral-strong));
 		color: var(--wpds-color-foreground-content-neutral);
 		margin: 0;
 		padding: 0;
@@ -311,7 +327,7 @@
 			svg {
 				--checkmark-size: var(--checkbox-size);
 
-				fill: var(--wpds-color-foreground-interactive-neutral-strong);
+				color: var(--wpds-color-foreground-interactive-neutral-strong);
 				position: absolute;
 				left: 50%;
 				top: 50%;
@@ -401,11 +417,6 @@
 	outline: var(--wpds-border-width-focus) solid var(--wpds-color-background-surface-neutral-strong);
 	color: var(--wpds-color-foreground-interactive-neutral-strong);
 	box-sizing: border-box;
-}
-
-.dataviews-search {
-	// Fixed width to ensure the control doesn't resize with the reset button.
-	flex-basis: 210px;
 }
 
 .dataviews-filters__user-input-widget {

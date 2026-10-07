@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from '@wordpress/element';
 import { fn } from 'storybook/test';
+import { Fragment } from '@wordpress/element';
 import { SearchableChipSelect } from '../';
 import {
 	GROUPED_ITEMS,
@@ -10,12 +10,18 @@ import {
 import { ITEMS } from './fixtures';
 
 const meta: Meta< typeof SearchableChipSelect > = {
-	title: 'Design System/Components/Form/Primitives/SearchableChipSelect',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-ui/Form/Primitives/SearchableChipSelect',
+	id: 'design-system-components-form-primitives-searchablechipselect',
 	component: SearchableChipSelect,
 	subcomponents: {
 		'SearchableChipSelect.Group': SearchableChipSelect.Group,
 		'SearchableChipSelect.GroupLabel': SearchableChipSelect.GroupLabel,
+		'SearchableChipSelect.Separator': SearchableChipSelect.Separator,
 		'SearchableChipSelect.Item': SearchableChipSelect.Item,
+		'SearchableChipSelect.ItemLabel': SearchableChipSelect.ItemLabel,
+		'SearchableChipSelect.ItemDescription':
+			SearchableChipSelect.ItemDescription,
 		'SearchableChipSelect.ChipWithRemove':
 			SearchableChipSelect.ChipWithRemove,
 		'SearchableChipSelect.Collection': SearchableChipSelect.Collection,
@@ -26,9 +32,8 @@ const meta: Meta< typeof SearchableChipSelect > = {
 	},
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`, overlays compatibility, and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
@@ -40,64 +45,28 @@ export const Default: Story = {
 	args: {
 		defaultValue: [ ITEMS[ 0 ], ITEMS[ 1 ] ],
 		items: ITEMS,
+		'aria-label': 'Fruit',
 	},
 };
 
 /**
- * Mark a creatable action with `creatable: true` on an item in `items`.
- * It renders in the list footer and is excluded from the main list
- * automatically. Handle creation in `onValueChange`.
+ * Item descriptions supplement each popup item and are not copied to chips.
  */
-export const Creatable: Story = {
+export const WithItemDescriptions: Story = {
 	args: {
 		...Default.args,
-	},
-	render: function Template( args ) {
-		const [ inputValue, setInputValue ] = useState( '' );
-		const [ value, setValue ] = useState< typeof ITEMS >( [
-			ITEMS[ 0 ],
-			ITEMS[ 1 ],
-		] );
-		const creatableItem = {
-			value: '__create__',
-			label:
-				'Create new item' + ( inputValue ? `: ${ inputValue }` : '' ),
-			creatable: true,
-		};
-
-		return (
-			<SearchableChipSelect
-				{ ...args }
-				items={ [ ...ITEMS, creatableItem ] }
-				inputValue={ inputValue }
-				onInputValueChange={ setInputValue }
-				value={ value }
-				onValueChange={ ( values: typeof ITEMS, event ) => {
-					if (
-						values.some(
-							( item ) => item.value === creatableItem.value
-						)
-					) {
-						// eslint-disable-next-line no-alert
-						alert( `Create new item: '${ inputValue }'` );
-						setValue(
-							values.filter(
-								( item ) => item.value !== creatableItem.value
-							)
-						);
-					} else {
-						setValue( values );
-					}
-					args.onValueChange?.( values, event );
-				} }
-			/>
-		);
+		defaultValue: [],
+		items: [
+			{ value: 'apple', label: 'Apple', description: 'A crisp fruit.' },
+			{ value: 'banana', label: 'Banana', description: 'A soft fruit.' },
+		],
 	},
 };
 
 /**
  * To customize what is rendered inside the chips, pass a
  * render function to the `chipsContent` prop that returns an array of `ChipWithRemove` subcomponents.
+ * The chip is named from its content. Pass `aria-label` when that content is not a usable name.
  *
  * The item list can be customized by passing a render function as `children`,
  * returning an `Item` subcomponent for each item.
@@ -122,7 +91,9 @@ export const WithCustomChipsAndItems: Story = {
 			) ),
 		children: ( item: ( typeof ITEMS )[ 0 ] ) => (
 			<SearchableChipSelect.Item key={ item.value } value={ item }>
-				😋 { item.label }
+				<SearchableChipSelect.ItemLabel>
+					😋 { item.label }
+				</SearchableChipSelect.ItemLabel>
 			</SearchableChipSelect.Item>
 		),
 	},
@@ -148,6 +119,7 @@ export const WithCustomEmptyContent: Story = {
  */
 export const Grouped: Story = {
 	args: {
+		'aria-label': 'Fruit',
 		items: GROUPED_ITEMS,
 		children: ( group: FixtureGroup ) => (
 			<SearchableChipSelect.Group
@@ -163,7 +135,9 @@ export const Grouped: Story = {
 							key={ item.value }
 							value={ item }
 						>
-							{ item.label }
+							<SearchableChipSelect.ItemLabel>
+								{ item.label }
+							</SearchableChipSelect.ItemLabel>
 						</SearchableChipSelect.Item>
 					) }
 				</SearchableChipSelect.Collection>
@@ -173,74 +147,24 @@ export const Grouped: Story = {
 };
 
 /**
- * Grouped items with a creatable footer item. Include the creatable item in
- * `items` as a creatable-only group and handle creation in `onValueChange`.
+ * Use `SearchableChipSelect.Separator` to set choices apart from each other.
  */
-export const GroupedCreatable: Story = {
-	render: function Template( args ) {
-		const [ inputValue, setInputValue ] = useState( '' );
-		const [ value, setValue ] = useState< FixtureItem[] >( [
-			GROUPED_ITEMS[ 0 ].items[ 0 ],
-			GROUPED_ITEMS[ 1 ].items[ 0 ],
-		] );
-		const creatableItem = {
-			value: '__create__',
-			label:
-				'Create new item' + ( inputValue ? `: ${ inputValue }` : '' ),
-			creatable: true,
-		};
-		const items = [
-			...GROUPED_ITEMS,
-			{ label: '', items: [ creatableItem ] },
-		];
-
-		return (
-			<SearchableChipSelect
-				{ ...args }
-				items={ items }
-				inputValue={ inputValue }
-				onInputValueChange={ setInputValue }
-				value={ value }
-				onValueChange={ ( values: FixtureItem[], event ) => {
-					if (
-						values.some(
-							( item ) => item.value === creatableItem.value
-						)
-					) {
-						// eslint-disable-next-line no-alert
-						alert( `Create new item: '${ inputValue }'` );
-						setValue(
-							values.filter(
-								( item ) => item.value !== creatableItem.value
-							)
-						);
-					} else {
-						setValue( values );
-					}
-					args.onValueChange?.( values, event );
-				} }
-				children={ ( group: FixtureGroup ) => (
-					<SearchableChipSelect.Group
-						key={ group.label }
-						items={ group.items }
-					>
-						<SearchableChipSelect.GroupLabel>
-							{ group.label }
-						</SearchableChipSelect.GroupLabel>
-						<SearchableChipSelect.Collection>
-							{ ( item: FixtureItem ) => (
-								<SearchableChipSelect.Item
-									key={ item.value }
-									value={ item }
-								>
-									{ item.label }
-								</SearchableChipSelect.Item>
-							) }
-						</SearchableChipSelect.Collection>
-					</SearchableChipSelect.Group>
+export const WithSeparator: Story = {
+	args: {
+		...Default.args,
+		items: [ ...ITEMS.slice( 0, 3 ), { value: 'other', label: 'Other' } ],
+		children: ( item: FixtureItem, index: number ) => (
+			<Fragment key={ item.value }>
+				{ item.value === 'other' && index > 0 && (
+					<SearchableChipSelect.Separator />
 				) }
-			/>
-		);
+				<SearchableChipSelect.Item value={ item }>
+					<SearchableChipSelect.ItemLabel>
+						{ item.label }
+					</SearchableChipSelect.ItemLabel>
+				</SearchableChipSelect.Item>
+			</Fragment>
+		),
 	},
 };
 

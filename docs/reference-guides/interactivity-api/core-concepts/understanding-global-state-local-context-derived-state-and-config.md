@@ -747,7 +747,7 @@ By using derived state, you create a more maintainable and less error-prone code
 
 ## Subscribing to Server State and Context
 
-Interactivity API offers a region-based navigation feature that dynamically replaces a part of the page without a full page reload. The [Query block](/docs/reference-guides/core-blocks.md#query-loop) natively supports this feature when the `Force page reload` toggle is disabled. Developers can use the same functionality in custom blocks by calling [`actions.navigate()`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/#actions) from the [`@wordpress/interactivity-router`](https://github.com/WordPress/gutenberg/tree/trunk/packages/interactivity-router) script module.
+Interactivity API offers a region-based navigation feature that dynamically replaces a part of the page without a full page reload. The [Query block](/docs/reference-guides/core-blocks/README.md#query-loop) natively supports this feature when the `Force page reload` toggle is disabled. Developers can use the same functionality in custom blocks by calling [`actions.navigate()`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/#actions) from the [`@wordpress/interactivity-router`](https://github.com/WordPress/gutenberg/tree/trunk/packages/interactivity-router) script module.
 
 _Please, visit the [Client-Side Navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md) guide to learn more about how to use the Interactivity Router and implement client-side navigation in your blocks._
 

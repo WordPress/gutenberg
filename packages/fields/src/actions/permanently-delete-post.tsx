@@ -13,11 +13,12 @@ import {
 } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
 import { getItemTitle, isTemplateOrTemplatePart } from './utils';
+import { hasActionLink } from '../fields/utils';
 import type { CoreDataError, PostWithPermissions } from '../types';
 
 const permanentlyDeletePost: Action< PostWithPermissions > = {
 	id: 'permanently-delete',
-	label: __( 'Permanently delete' ),
+	label: __( 'Permanently delete…' ),
 	supportsBulk: true,
 	icon: trash,
 	isEligible( item ) {
@@ -25,7 +26,12 @@ const permanentlyDeletePost: Action< PostWithPermissions > = {
 			return false;
 		}
 		const { status, permissions } = item;
-		return status === 'trash' && permissions?.delete;
+		if ( ! status || status === 'auto-draft' || ! permissions?.delete ) {
+			return false;
+		}
+
+		// Without the trash link, deleting is permanent.
+		return status === 'trash' || ! hasActionLink( item, 'wp:action-trash' );
 	},
 	hideModalHeader: true,
 	modalFocusOnMount: 'firstContentElement',
@@ -47,14 +53,14 @@ const permanentlyDeletePost: Action< PostWithPermissions > = {
 									items.length
 								),
 								items.length
-						  )
+							)
 						: sprintf(
 								// translators: %s: The post's title
 								__(
 									'Are you sure you want to permanently delete "%s"?'
 								),
 								decodeEntities( getItemTitle( items[ 0 ] ) )
-						  ) }
+							) }
 				</WCText>
 				<HStack justify="right">
 					<Button

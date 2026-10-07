@@ -1,3 +1,4 @@
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { getPatternBlocksForInsertion } from '../use-patterns-state';
 import { INSERTER_PATTERN_TYPES } from '../../block-patterns-tab/utils';

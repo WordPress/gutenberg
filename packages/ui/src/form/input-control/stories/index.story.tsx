@@ -6,8 +6,8 @@ import { IconButton } from '../../../icon-button';
 import { InputLayout } from '../../primitives/input-layout';
 import { Stack } from '../../../stack';
 import {
-	WithPrefix,
-	WithSuffixControl,
+	WithPrefix as InputWithPrefix,
+	WithSuffixControl as InputWithSuffixControl,
 } from '../../primitives/input/stories/index.story';
 import {
 	WITH_DETAILS_DESCRIPTION,
@@ -16,7 +16,8 @@ import {
 
 const meta: Meta< typeof InputControl > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/InputControl',
+	title: 'Components/@wordpress-ui/Form/InputControl',
+	id: 'design-system-components-form-inputcontrol',
 	component: InputControl,
 	argTypes: {
 		defaultValue: { control: false },
@@ -61,15 +62,24 @@ export const WithDetails: Story = {
 	},
 };
 
-WithPrefix.args = {
-	...WithPrefix.args,
-	...Default.args,
+export const WithPrefix: Story = {
+	args: {
+		...InputWithPrefix.args,
+		ref: undefined,
+		...Default.args,
+	},
 };
-WithSuffixControl.args = {
-	...WithSuffixControl.args,
-	...Default.args,
+
+export const WithSuffixControl: Story = {
+	args: {
+		...InputWithSuffixControl.args,
+		ref: undefined,
+		...Default.args,
+	},
+	parameters: {
+		a11y: { test: 'error' },
+	},
 };
-export { WithPrefix, WithSuffixControl };
 
 export const Password: Story = {
 	render: function Template( args ) {

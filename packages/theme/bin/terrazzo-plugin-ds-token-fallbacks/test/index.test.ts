@@ -1,8 +1,17 @@
-import { computeBrandFallback, formatDesignTokenFallbacksScss } from '../index';
-
-jest.mock( '@terrazzo/plugin-css', () => ( { FORMAT_ID: 'css/value' } ) );
+import { describe, expect, it } from 'vitest';
+import {
+	computeBrandFallback,
+	formatDesignTokenFallbacksScss,
+} from '../index.ts';
+import { DEFAULT_SEED_COLORS } from '../../../src/color-ramps/lib/constants.ts';
 
 describe( 'computeBrandFallback', () => {
+	it( 'returns the admin theme color for the primary seed', () => {
+		expect( computeBrandFallback( DEFAULT_SEED_COLORS.primary ) ).toBe(
+			`var(--wp-admin-theme-color, ${ DEFAULT_SEED_COLORS.primary })`
+		);
+	} );
+
 	it( 'throws on colors with alpha (8-digit hex)', () => {
 		expect( () => computeBrandFallback( '#3858e980' ) ).toThrow(
 			/does not support colors with alpha/

@@ -1,34 +1,19 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useRef, useState } from '@wordpress/element';
 import { ControlWithError } from '../index';
-import { Button } from '../../../../button';
 import { InputControl } from '../../../input-control';
+import { formDecorator } from '../../../stories/shared';
 
 const meta: Meta< typeof ControlWithError > = {
-	title: 'Design System/Components/Form/Primitives/ControlWithError',
+	title: 'Components/@wordpress-ui/Form/Primitives/ControlWithError',
+	id: 'design-system-components-form-primitives-controlwitherror',
 	component: ControlWithError,
 	argTypes: {
 		children: { control: false },
 		getValidityTarget: { control: false },
 		customValidity: { control: false },
 	},
-	decorators: [
-		( Story ) => (
-			<form
-				style={ {
-					display: 'flex',
-					flexDirection: 'column',
-					gap: 16,
-					alignItems: 'flex-start',
-					width: 300,
-				} }
-				onSubmit={ ( event ) => event.preventDefault() }
-			>
-				<Story />
-				<Button type="submit">Submit</Button>
-			</form>
-		),
-	],
+	decorators: [ formDecorator ],
 	parameters: {
 		componentStatus: {
 			status: 'use-with-caution',
@@ -86,7 +71,7 @@ export const WithCustomValidity: Story = {
 						? {
 								type: 'invalid',
 								message: 'The word "error" is not allowed.',
-						  }
+							}
 						: undefined
 				}
 				getValidityTarget={ () => inputRef.current }

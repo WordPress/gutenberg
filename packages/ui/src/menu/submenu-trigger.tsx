@@ -1,11 +1,13 @@
 import { Menu as _Menu } from '@base-ui/react/menu';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 import { chevronRightSmall } from '@wordpress/icons';
 import { Icon } from '../icon';
+import defenseStyles from '../utils/css/global-css-defense.module.css';
 import resetStyles from '../utils/css/resets.module.css';
 import styles from './style.module.css';
-import { MenuItemContentContext } from './context';
+import { MenuItemContentContext, useMenuContext } from './context';
 import { ItemContent, useItemContent } from './item';
 import type { SubmenuTriggerProps } from './types';
 
@@ -28,20 +30,27 @@ const SubmenuTrigger = forwardRef< HTMLDivElement, SubmenuTriggerProps >(
 		},
 		ref
 	) {
-		const { contentContextValue, itemAriaProps, shortcutDescriptionId } =
-			useItemContent( children, {
-				'aria-describedby': ariaDescribedBy,
-				'aria-keyshortcuts': ariaKeyShortcuts,
-				'aria-label': ariaLabel,
-				'aria-labelledby': ariaLabelledBy,
-				shortcut,
-			} );
+		const { submenuTriggerRef } = useMenuContext();
+		const mergedRef = useMergeRefs( [ ref, submenuTriggerRef ?? null ] );
+		const {
+			contentChildren,
+			contentContextValue,
+			itemAriaProps,
+			shortcutDescriptionId,
+		} = useItemContent( children, {
+			'aria-describedby': ariaDescribedBy,
+			'aria-keyshortcuts': ariaKeyShortcuts,
+			'aria-label': ariaLabel,
+			'aria-labelledby': ariaLabelledBy,
+			shortcut,
+		} );
 
 		return (
 			<_Menu.SubmenuTrigger
-				ref={ ref }
+				ref={ mergedRef }
 				{ ...itemAriaProps }
 				className={ clsx(
+					defenseStyles.div,
 					resetStyles[ 'box-sizing' ],
 					styles.item,
 					className
@@ -63,7 +72,7 @@ const SubmenuTrigger = forwardRef< HTMLDivElement, SubmenuTriggerProps >(
 							/>
 						}
 					>
-						{ children }
+						{ contentChildren }
 					</ItemContent>
 				</MenuItemContentContext.Provider>
 			</_Menu.SubmenuTrigger>

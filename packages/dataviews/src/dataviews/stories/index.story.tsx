@@ -5,17 +5,18 @@ import LayoutTableComponent from './layout-table';
 import LayoutGridComponent from './layout-grid';
 import LayoutListComponent from './layout-list';
 import LayoutCustomComponent from './layout-custom';
+import HierarchicalLevelsComponent from './hierarchical-levels';
 import InfiniteScrollComponent from './infinite-scroll';
 import AsyncInfiniteScrollComponent from './async-infinite-scroll';
 import WithCardComponent from './with-card';
 import FreeCompositionComponent from './free-composition';
 import MinimalUIComponent from './minimal-ui';
 import EmptyComponent from './empty';
-import './style.css';
 
 const meta = {
 	tags: [ 'manifest' ],
-	title: 'DataViews/DataViews',
+	id: 'dataviews-dataviews',
+	title: 'Design System/DataViews/DataViews',
 	component: DataViews,
 	args: {
 		containerHeight: 'auto',
@@ -91,11 +92,18 @@ export const LayoutTable = {
 };
 
 export const LayoutGrid = {
+	parameters: {
+		// FIXME: Grid media buttons lack names (button-name).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: LayoutGridComponent,
 	args: {
 		groupBy: false,
 		groupByLabel: true,
 		hasClickableItems: true,
+		mediaFit: 'cover',
+		mediaFitControl: true,
 		perPageSizes: [ 10, 25, 50, 100 ],
 		showMedia: true,
 	},
@@ -116,6 +124,17 @@ export const LayoutGrid = {
 		hasClickableItems: {
 			control: 'boolean',
 			description: 'Are the items clickable',
+		},
+		mediaFit: {
+			control: 'select',
+			options: [ 'cover', 'contain' ],
+			description:
+				'How the media field fills the preview box: cropped to fill it ("cover") or fitted inside it ("contain"), letterboxing the media so its own aspect ratio stays visible',
+		},
+		mediaFitControl: {
+			control: 'boolean',
+			description:
+				'Whether the view options offer the "Original aspect ratio" toggle, letting users switch the media fit themselves',
 		},
 		perPageSizes: {
 			control: 'object',
@@ -220,6 +239,20 @@ export const LayoutCustom = {
 	render: LayoutCustomComponent,
 };
 
+export const HierarchicalLevels = {
+	render: HierarchicalLevelsComponent,
+	args: {
+		showLevels: true,
+	},
+	argTypes: {
+		showLevels: {
+			control: 'boolean',
+			description:
+				'Whether the table indents each item by its level (`view.showLevels`). When enabled, each item is placed below its parent; when disabled, items follow the sort order only',
+		},
+	},
+};
+
 export const Empty = {
 	render: EmptyComponent,
 	args: {
@@ -239,6 +272,11 @@ export const Empty = {
 };
 
 export const MinimalUI = {
+	parameters: {
+		// FIXME: Scroll region is not keyboard-accessible (scrollable-region-focusable).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: MinimalUIComponent,
 	argTypes: {
 		layout: {
@@ -280,6 +318,9 @@ export const InfiniteScroll = {
 export const AsyncInfiniteScroll = {
 	render: AsyncInfiniteScrollComponent,
 	parameters: {
+		// FIXME: List items lack a required parent (aria-required-parent).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
 		// Fill the viewport so the list bottom is the window bottom.
 		containerHeight: 'calc(100vh - 2rem)',
 	},

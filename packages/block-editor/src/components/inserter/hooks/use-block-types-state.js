@@ -5,13 +5,17 @@ import {
 	store as blocksStore,
 	parse,
 } from '@wordpress/blocks';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback, useMemo } from '@wordpress/element';
-import { store as noticesStore } from '@wordpress/notices';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '../../../store';
-import { isFiltered } from '../../../store/utils';
 import { unlock } from '../../../lock-unlock';
+import { isFiltered } from '../../../store/utils';
+
+// Shared so the selector cache survives the inserter closing and reopening.
+const FILTERED_OPTIONS = { [ isFiltered ]: true };
+const UNFILTERED_OPTIONS = { [ isFiltered ]: false };
 
 /**
  * Retrieves the block types inserter state.
@@ -22,28 +26,25 @@ import { unlock } from '../../../lock-unlock';
  * @return {Array} Returns the block types state. (block types, categories, collections, onSelect handler)
  */
 const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
-	const options = useMemo(
-		() => ( { [ isFiltered ]: !! isQuick } ),
-		[ isQuick ]
-	);
-	const [ items ] = useSelect(
-		( select ) => [
+	const options = isQuick ? FILTERED_OPTIONS : UNFILTERED_OPTIONS;
+	// Not wrapped in a tuple, so `useSelect` can return the previous array when the items match.
+	const items = useSelect(
+		( select ) =>
 			select( blockEditorStore ).getInserterItems(
 				rootClientId,
 				options
 			),
-		],
 		[ rootClientId, options ]
 	);
-	const { getClosestAllowedInsertionPoint } = unlock(
-		useSelect( blockEditorStore )
-	);
-	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const [ categories, collections ] = useSelect( ( select ) => {
 		const { getCategories, getCollections } = select( blocksStore );
 		return [ getCategories(), getCollections() ];
 	}, [] );
+	const { getClosestAllowedInsertionPoint } = unlock(
+		useSelect( blockEditorStore )
+	);
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const onSelectItem = useCallback(
 		(

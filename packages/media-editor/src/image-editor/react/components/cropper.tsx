@@ -92,6 +92,13 @@ export interface CropperProps {
 	freeformCrop?: boolean;
 	/** Focus the crop area when the cropper mounts. */
 	focusOnMount?: boolean;
+	/**
+	 * Ignore all crop interaction: pointer drags, wheel zoom, keyboard
+	 * pan/zoom and the stencil's resize handles. Any gesture already in
+	 * flight is cancelled. Used while the edit is being saved, so the
+	 * modifiers sent to the server cannot change after the request starts.
+	 */
+	disabled?: boolean;
 	/** Callback fired when the image is loaded. */
 	onImageLoaded?: ( size: Size ) => void;
 	/**
@@ -136,6 +143,7 @@ export interface CropperProps {
  * @param root0.aspectRatio       Fixed aspect ratio (width/height).
  * @param root0.freeformCrop      Enable resize handles.
  * @param root0.focusOnMount      Focus the crop area on mount.
+ * @param root0.disabled          Ignore all crop interaction.
  * @param root0.onImageLoaded     Image load callback.
  * @param root0.onStateChange     Every-frame state callback.
  * @param root0.onGestureStart    Gesture boundary start.
@@ -157,6 +165,7 @@ function CropperInner(
 		aspectRatio,
 		freeformCrop = false,
 		focusOnMount = false,
+		disabled = false,
 		onImageLoaded,
 		onStateChange,
 		onGestureStart,
@@ -562,14 +571,17 @@ function CropperInner(
 			return;
 		}
 
-		setCropRect( snappedCropRect );
+		// The display scale crossing the threshold is not an edit, so the
+		// snap must not record an undo entry. Recording it here would also
+		// clear the redo stack whenever an undo or redo crosses it.
+		adjustCropRectForViewport( snappedCropRect );
 	}, [
+		adjustCropRectForViewport,
 		aspectRatio,
 		displayScale,
 		freeformCrop,
 		naturalWidth,
 		naturalHeight,
-		setCropRect,
 		state,
 	] );
 
@@ -585,6 +597,7 @@ function CropperInner(
 		maxZoom,
 		onGestureStart,
 		onGestureEnd,
+		disabled,
 	} );
 
 	// Compose focus-visibility tracking into the canvas event handlers.
@@ -632,6 +645,7 @@ function CropperInner(
 		},
 		onPointerDown: ( event: React.PointerEvent< HTMLDivElement > ) => {
 			if (
+				disabled ||
 				isResizingRef.current ||
 				isTouchPinchingRef.current ||
 				( event.pointerType === 'touch' && event.isPrimary === false )
@@ -749,7 +763,9 @@ function CropperInner(
 
 	// Settling animation: brief transition after resize end.
 	const [ settling, setSettling ] = useState( false );
-	const settleTimerRef = useRef< ReturnType< typeof setTimeout > >();
+	const settleTimerRef = useRef<
+		ReturnType< typeof setTimeout > | undefined
+	>( undefined );
 	const finishSettling = useCallback( () => {
 		clearTimeout( settleTimerRef.current );
 		isSettlingRef.current = false;
@@ -1067,7 +1083,7 @@ function CropperInner(
 						onEscape={ handleEscape }
 						aspectRatio={ aspectRatio }
 						freeformCrop={ freeformCrop }
-						isResizeDisabled={ isTouchPinching }
+						isResizeDisabled={ isTouchPinching || disabled }
 						stencilTransition={ settleStencilTransition }
 						cropBounds={ cropBounds }
 						minCropSize={ minCropSize }
