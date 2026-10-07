@@ -512,12 +512,15 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			// Resolving a thread approves its root note, and the editor
 			// disables reactions from then on; hold stale tabs to that too.
 			$thread_root = $parent_comment;
+			$visited     = array( (int) $thread_root->comment_ID => true );
 			while ( $thread_root->comment_parent ) {
 				$ancestor = get_comment( $thread_root->comment_parent );
-				if ( ! $ancestor ) {
+				// Stop at a missing ancestor or a corrupt, cyclic chain.
+				if ( ! $ancestor || isset( $visited[ (int) $ancestor->comment_ID ] ) ) {
 					break;
 				}
-				$thread_root = $ancestor;
+				$visited[ (int) $ancestor->comment_ID ] = true;
+				$thread_root                            = $ancestor;
 			}
 			if ( '1' === $thread_root->comment_approved ) {
 				return new WP_Error(
