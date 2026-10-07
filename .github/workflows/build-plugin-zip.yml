@@ -206,6 +206,12 @@ jobs:
               with:
                   node-version-file: '.nvmrc'
                   check-latest: true
+                  package-manager-cache: false
+
+            - name: Set up npm
+              uses: ./.github/setup-npm
+              with:
+                  cache: false
 
             - name: Build Gutenberg plugin ZIP file
               run: ./bin/build-plugin-zip.sh
