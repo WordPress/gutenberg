@@ -6,11 +6,26 @@
  */
 
 /**
+ * Checks whether a style node has a non-empty custom CSS string.
+ *
+ * @since 7.2.0
+ *
+ * @param mixed $style_node A style node, possibly containing a `css` key.
+ * @return bool Whether the node has a non-empty custom CSS string.
+ */
+function gutenberg_has_custom_css( $style_node ) {
+	return is_array( $style_node )
+		&& isset( $style_node['css'] )
+		&& is_string( $style_node['css'] )
+		&& '' !== trim( $style_node['css'] );
+}
+
+/**
  * Collects the raw custom CSS strings defined for a block instance, across the
  * default state, pseudo-states (e.g. `:hover`), and viewport states (e.g.
  * `@mobile`), including combinations of the two.
  *
- * @since 7.1.0
+ * @since 7.2.0
  *
  * @param array  $style                    The block's `style` attribute.
  * @param string $block_name               Block name.
@@ -24,26 +39,25 @@ function gutenberg_get_custom_css_state_entries( $style, $block_name, $responsiv
 		return $entries;
 	}
 
-	$add_entry = function ( $css, $pseudo, $media_query ) use ( &$entries ) {
-		if ( is_string( $css ) && '' !== trim( $css ) ) {
-			$entries[] = array(
-				'css'         => $css,
-				'pseudo'      => $pseudo,
-				'media_query' => $media_query,
-			);
-		}
-	};
-
 	$supported_pseudo_states = WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ?? array();
 
-	$add_entry( $style['css'] ?? null, null, null );
+	if ( gutenberg_has_custom_css( $style ) ) {
+		$entries[] = array(
+			'css'         => $style['css'],
+			'pseudo'      => null,
+			'media_query' => null,
+		);
+	}
 
 	foreach ( $supported_pseudo_states as $pseudo_state ) {
 		$pseudo_style = $style[ $pseudo_state ] ?? null;
-		if ( ! is_array( $pseudo_style ) ) {
-			continue;
+		if ( gutenberg_has_custom_css( $pseudo_style ) ) {
+			$entries[] = array(
+				'css'         => $pseudo_style['css'],
+				'pseudo'      => $pseudo_state,
+				'media_query' => null,
+			);
 		}
-		$add_entry( $pseudo_style['css'] ?? null, $pseudo_state, null );
 	}
 
 	foreach ( $responsive_media_queries as $breakpoint => $media_query ) {
@@ -52,14 +66,23 @@ function gutenberg_get_custom_css_state_entries( $style, $block_name, $responsiv
 			continue;
 		}
 
-		$add_entry( $breakpoint_style['css'] ?? null, null, $media_query );
+		if ( gutenberg_has_custom_css( $breakpoint_style ) ) {
+			$entries[] = array(
+				'css'         => $breakpoint_style['css'],
+				'pseudo'      => null,
+				'media_query' => $media_query,
+			);
+		}
 
 		foreach ( $supported_pseudo_states as $pseudo_state ) {
 			$breakpoint_pseudo_style = $breakpoint_style[ $pseudo_state ] ?? null;
-			if ( ! is_array( $breakpoint_pseudo_style ) ) {
-				continue;
+			if ( gutenberg_has_custom_css( $breakpoint_pseudo_style ) ) {
+				$entries[] = array(
+					'css'         => $breakpoint_pseudo_style['css'],
+					'pseudo'      => $pseudo_state,
+					'media_query' => $media_query,
+				);
 			}
-			$add_entry( $breakpoint_pseudo_style['css'] ?? null, $pseudo_state, $media_query );
 		}
 	}
 
@@ -68,6 +91,8 @@ function gutenberg_get_custom_css_state_entries( $style, $block_name, $responsiv
 
 /**
  * Validates and processes custom CSS state entries.
+ *
+ * @since 7.2.0
  *
  * @param array[] $state_entries Custom CSS state entries.
  * @param string  $selector      Selector scoping the block instance.
