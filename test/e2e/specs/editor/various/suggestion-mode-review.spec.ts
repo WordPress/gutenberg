@@ -1031,6 +1031,89 @@ test.describe( 'Suggestion mode review flows', () => {
 		await expect.poll( () => listShape( page ) ).toEqual( original );
 	} );
 
+	test( 'indent — a nested list inside a suggested list stays part of the one insertion', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Shopping' },
+		} );
+		await switchIntent( page, 'Suggesting' );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+		await page.keyboard.press( 'End' );
+		const insertionSaved = suggestionSavedPromise( page );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '* Fresh apples' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Whole wheat bread' );
+		await insertionSaved;
+
+		// The indent clones the suggested list for the nested one; the clone
+		// must not carry the list's marker and note link along with it.
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.press( 'Tab' );
+		await expect
+			.poll( () => listShape( page ) )
+			.toEqual( [
+				{
+					name: 'core/paragraph',
+					content: 'Shopping',
+					suggestion: undefined,
+					innerBlocks: [],
+				},
+				{
+					name: 'core/list',
+					content: '',
+					suggestion: 'pending-insert',
+					innerBlocks: [
+						{
+							name: 'core/list-item',
+							content: 'Fresh apples',
+							suggestion: undefined,
+							innerBlocks: [
+								{
+									name: 'core/list',
+									content: '',
+									suggestion: undefined,
+									innerBlocks: [
+										{
+											name: 'core/list-item',
+											content: 'Whole wheat bread',
+											suggestion: undefined,
+											innerBlocks: [],
+										},
+									],
+								},
+							],
+						},
+					],
+				},
+			] );
+
+		await switchIntent( page, 'Editing' );
+		const sidebar = await openNotesSidebar( page );
+		await expect(
+			sidebar.locator(
+				'.editor-collab-sidebar-panel__suggestion-summary'
+			)
+		).toHaveText( [ /^Insert block: list$/ ] );
+
+		await decideSuggestion( page, 'Reject' );
+		await expect
+			.poll( () => listShape( page ) )
+			.toEqual( [
+				{
+					name: 'core/paragraph',
+					content: 'Shopping',
+					suggestion: undefined,
+					innerBlocks: [],
+				},
+			] );
+	} );
+
 	// --- Review: inline markers (add / del / format) --------------------------
 
 	test( 'accept — an accepted addition unwraps the marker and keeps the text', async ( {
