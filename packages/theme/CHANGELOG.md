@@ -22,6 +22,7 @@
 
 ### Enhancements
 
+-   Swap resting and active backgrounds for strong neutral controls. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 -   Generate perception-aware color ramps with ordered surface and stroke progressions, preserve available surface spacing near black and white, align normal content with resting interactive colors, use the fifth foreground step for strong content and interaction states, and keep WCAG contrast floors unchanged. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 
 ### Internal

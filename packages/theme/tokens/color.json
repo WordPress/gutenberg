@@ -1077,11 +1077,11 @@
 					"$description": "Solid background color for neutral interactive controls in their disabled state."
 				},
 				"neutral-strong": {
-					"$value": "{wpds-color.primitive.bg.bgFillInverted1}",
+					"$value": "{wpds-color.primitive.bg.bgFillInverted2}",
 					"$description": "Background color for interactive elements with neutral tone and strong emphasis."
 				},
 				"neutral-strong-active": {
-					"$value": "{wpds-color.primitive.bg.bgFillInverted2}",
+					"$value": "{wpds-color.primitive.bg.bgFillInverted1}",
 					"$description": "Background color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active."
 				},
 				"neutral-strong-disabled": {
