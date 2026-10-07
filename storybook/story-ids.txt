@@ -1126,6 +1126,7 @@ icons-icon--current-color
 icons-icon--default
 icons-icon--docs
 icons-icon--library
+icons-icon--stroke-scaling
 imagecropper-imagecropper--default
 imagecropper-imagecropper--docs
 imagecropper-imagecropper--with-controls
