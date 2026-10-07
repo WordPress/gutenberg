@@ -1,6 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { createInterpolateElement, useState } from '@wordpress/element';
-import { Tip } from '@wordpress/components';
+import { tip } from '@wordpress/icons';
+import { Notice } from '@wordpress/ui';
 
 const globalTips = [
 	createInterpolateElement(
@@ -30,7 +31,13 @@ function Tips() {
 		Math.floor( Math.random() * globalTips.length )
 	);
 
-	return <Tip>{ globalTips[ randomIndex ] }</Tip>;
+	return (
+		<Notice.Root intent="info" icon={ tip }>
+			<Notice.Description>
+				{ globalTips[ randomIndex ] }
+			</Notice.Description>
+		</Notice.Root>
+	);
 }
 
 export default Tips;
