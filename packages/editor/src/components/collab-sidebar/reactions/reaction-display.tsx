@@ -314,9 +314,9 @@ function ReactionButton( {
 
 	const defaultLabel = sprintf(
 		/* translators: 1: emoji label, 2: count of reactions */
-		_n( '%1$s, %2$d reaction', '%1$s, %2$d reactions', count ),
+		_n( '%1$s, %2$s reaction', '%1$s, %2$s reactions', count ),
 		label,
-		count
+		count.toLocaleString()
 	);
 
 	const accessibleLabel = tooltipText || defaultLabel;
