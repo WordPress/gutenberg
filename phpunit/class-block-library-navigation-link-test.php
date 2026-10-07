@@ -19,6 +19,27 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 	private static $pages;
 	private static $terms;
 
+	/**
+	 * @var array|null
+	 */
+	private $original_block_supports;
+
+	public function setUp() {
+		parent::setUp();
+
+		$this->original_block_supports      = WP_Block_Supports::$block_to_render;
+		WP_Block_Supports::$block_to_render = array(
+			'attrs'     => array(),
+			'blockName' => '',
+		);
+	}
+
+	public function tearDown() {
+		WP_Block_Supports::$block_to_render = $this->original_block_supports;
+
+		parent::tearDown();
+	}
+
 	public static function wpSetUpBeforeClass() {
 
 		self::$draft   = self::factory()->post->create_and_get(
