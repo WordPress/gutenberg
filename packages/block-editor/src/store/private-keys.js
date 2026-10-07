@@ -1,5 +1,6 @@
 export const globalStylesDataKey = Symbol( 'globalStylesDataKey' );
 export const globalStylesLinksDataKey = Symbol( 'globalStylesLinks' );
+export const globalStylesUserDataKey = Symbol( 'globalStylesUserData' );
 export const selectBlockPatternsKey = Symbol( 'selectBlockPatternsKey' );
 export const reusableBlocksSelectKey = Symbol( 'reusableBlocksSelect' );
 export const userPatternCategoriesSelectKey = Symbol(
