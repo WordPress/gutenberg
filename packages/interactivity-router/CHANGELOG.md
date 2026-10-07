@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.57.0 (2026-10-07)
+
 ### New Features
 
 -   Add `state.navigating` and `state.initiator` to the public `core/router` store, and an optional `initiator` field to `actions.navigate()`'s options, so consumers can react to a navigation's lifecycle and to who started it (by default, the id of the nearest enclosing router region). Both keys read `undefined` before the first navigation and on pages where the router never loads. ([#83280](https://github.com/WordPress/gutenberg/pull/83280))
