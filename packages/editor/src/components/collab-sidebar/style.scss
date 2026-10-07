@@ -168,6 +168,10 @@
 	// reaction.
 	padding-right: $button-size-small + $grid-unit-10;
 
+	p {
+		margin-top: 0;
+	}
+
 	p:last-child {
 		margin-bottom: 0;
 	}

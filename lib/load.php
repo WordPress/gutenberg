@@ -39,7 +39,35 @@ if ( file_exists( $constants_file ) && ! defined( 'GUTENBERG_VERSION' ) ) {
  */
 function gutenberg_is_experiment_enabled( $name ) {
 	$experiments = get_option( 'gutenberg-experiments' );
-	return ! empty( $experiments[ $name ] );
+
+	if ( is_array( $experiments ) && array_key_exists( $name, $experiments ) ) {
+		return ! empty( $experiments[ $name ] );
+	}
+
+	return gutenberg_get_experiment_default( $name );
+}
+
+/**
+ * Returns the state of an experiment on a site that has not made a choice about
+ * it on the Experiments screen.
+ *
+ * Experiments start out off. One that is being rolled out to every site is on
+ * by default instead, and unticking its checkbox turns it back off.
+ *
+ * @since 24.2.0
+ *
+ * @param string $name The name of the experiment.
+ *
+ * @return bool True when the experiment is on by default.
+ */
+function gutenberg_get_experiment_default( $name ) {
+	switch ( $name ) {
+		case 'gutenberg-react-19':
+			return ! gutenberg_has_react_19_incompatible_extension();
+
+		default:
+			return false;
+	}
 }
 
 // These files only need to be loaded if within a rest server instance.
@@ -72,6 +100,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-comment-controller-7-2.php';
 	require __DIR__ . '/compat/wordpress-7.2/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.2/edit-root-attachment.php';
+	require __DIR__ . '/compat/wordpress-7.2/notes.php';
 
 	// Real-time collaboration.
 	require __DIR__ . '/experimental/collaboration/class-gutenberg-rest-autosaves-controller.php';
@@ -122,6 +151,9 @@ require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/script-modules.php';
 require __DIR__ . '/experimental/pages/site-editor.php';
 require __DIR__ . '/experimental/collaboration/meta-box-rtc-compat.php';
+
+// Experiment defaults, which `gutenberg_get_experiment_default()` reads below.
+require __DIR__ . '/experimental/experiments/react-19.php';
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-extensible-site-editor' ) ) {
 	require __DIR__ . '/experimental/extensible-site-editor.php';
