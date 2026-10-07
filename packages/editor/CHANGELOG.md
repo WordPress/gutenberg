@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `DocumentTools`: Stop rendering the undo and redo buttons below the medium breakpoint instead of hiding them with CSS. They were still registered as toolbar items while invisible, so arrow key presses moved the roving tabindex onto a button that cannot receive focus and appeared to do nothing ([#84175](https://github.com/WordPress/gutenberg/pull/84175)).
+
 ## 15.2.0 (2026-10-07)
 
 ### Enhancements
