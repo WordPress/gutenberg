@@ -25,31 +25,36 @@ export interface ReactionTarget {
  * normally replace it fails: without it, the next toggle reads a stale
  * `current_user_reaction` and takes the wrong branch.
  *
- * @param note            The cached note record.
- * @param hexKey          The reaction hex key that changed.
- * @param addedReactionId The new reaction's comment ID when one was added;
- *                        omitted when one was removed.
+ * @param note   The cached note record.
+ * @param hexKey The reaction hex key that changed.
+ * @param change The comment ID of the current user's reaction that was
+ *               added or removed.
  * @return The note with an updated `reaction_summary`.
  */
 export function applyReactionDelta< T extends ReactionTarget >(
 	note: T,
 	hexKey: string,
-	addedReactionId?: number
+	change: { added: number } | { removed: number }
 ): T {
 	const summary: ReactionSummary = { ...( note.reaction_summary || {} ) };
 	const entry = summary[ hexKey ];
 
-	if ( addedReactionId ) {
+	if ( 'added' in change ) {
 		// Concurrent adds converge server-side on one surviving row, so a
 		// repeated ID is already counted.
-		if ( entry?.current_user_reaction === addedReactionId ) {
+		if ( entry?.current_user_reaction === change.added ) {
 			return note;
 		}
 		summary[ hexKey ] = {
 			count: ( entry?.count || 0 ) + 1,
-			current_user_reaction: addedReactionId,
+			current_user_reaction: change.added,
 		};
-	} else if ( entry ) {
+	} else {
+		// Another toggle's refresh may already have dropped the reaction;
+		// decrementing again would hide someone else's.
+		if ( entry?.current_user_reaction !== change.removed ) {
+			return note;
+		}
 		const count = entry.count - 1;
 		if ( count > 0 ) {
 			summary[ hexKey ] = { count, current_user_reaction: 0 };
@@ -68,6 +73,13 @@ export function applyReactionDelta< T extends ReactionTarget >(
  * Module-level so every `useReaction` instance shares it.
  */
 const reactionMutationCounts = new Map< number, number >();
+
+/*
+ * Toggles still in flight, keyed by note and emoji. A second click reads
+ * the same summary snapshot and would repeat the request, so it is
+ * ignored until the first one lands. Shared by the picker and the pills.
+ */
+const pendingToggles = new Set< string >();
 
 /**
  * A note's reactions and a callback to toggle one.
@@ -89,9 +101,14 @@ export function useReaction( note: ReactionTarget ) {
 
 	const toggleReaction = useCallback(
 		async ( hexKey: string ) => {
+			const toggleKey = `${ noteId }:${ hexKey }`;
+			if ( pendingToggles.has( toggleKey ) ) {
+				return;
+			}
+			pendingToggles.add( toggleKey );
+
 			const entry = reactions?.[ hexKey ];
 			const myReactionId = entry?.current_user_reaction || undefined;
-			const isRemoving = !! myReactionId;
 			let addedReactionId: number | undefined;
 
 			try {
@@ -136,6 +153,7 @@ export function useReaction( note: ReactionTarget ) {
 						: __( 'An error occurred while performing an update.' ),
 					{ type: 'snackbar', isDismissible: true }
 				);
+				pendingToggles.delete( toggleKey );
 				return;
 			}
 
@@ -156,15 +174,17 @@ export function useReaction( note: ReactionTarget ) {
 
 			const cached = getEntityRecord( 'root', 'comment', noteId ) as
 				ReactionTarget | undefined;
-			if ( cached ) {
+			const change = myReactionId
+				? { removed: myReactionId }
+				: addedReactionId && { added: addedReactionId };
+			if ( cached && change ) {
 				receiveEntityRecords( 'root', 'comment', [
-					applyReactionDelta(
-						cached,
-						hexKey,
-						isRemoving ? undefined : addedReactionId
-					),
+					applyReactionDelta( cached, hexKey, change ),
 				] );
 			}
+			// The cached summary now reflects this toggle, so the next one
+			// reads the right state.
+			pendingToggles.delete( toggleKey );
 
 			// Then refetch the parent note (1 record) for the authoritative
 			// summary, which also picks up other users' reactions.
