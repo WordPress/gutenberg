@@ -734,3 +734,10 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 .wp-block-audio__autoplay-help-text {
 	grid-column: 1/-1;
 }
+
+.wp-block-navigation__draft-inline-label {
+	color: inherit;
+	font-style: italic;
+	font-size: 0.9em;
+	padding-inline: $grid-unit-10;
+}
