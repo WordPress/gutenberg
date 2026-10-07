@@ -38,7 +38,7 @@
 -   Template Part: Fall back to the theme's template part file and report the error with `wp_trigger_error()` when the customized template part can't be loaded, instead of rendering nothing and logging an `Undefined property: WP_Error::$content` warning ([#83809](https://github.com/WordPress/gutenberg/pull/83809)).
 -   Post Featured Image: Do not wrap the media placeholder in a post link when `isLink` comes from the template, so adding a featured image no longer crashes the editor ([#81584](https://github.com/WordPress/gutenberg/pull/81584)).
 -   Image: Percent-encode the inline SVG in the circle-mask style's `mask-image`, and drop the malformed `;utf8` media type parameter, so audit tools no longer report the data URI as an invalid `url()` value ([#82333](https://github.com/WordPress/gutenberg/pull/82333)).
--   Gallery: Read the global gap from the plugin's theme.json data when the plugin is active, and read it on every render instead of once per request, so a gap set after the first gallery renders applies to the next ([#81979](https://github.com/WordPress/gutenberg/pull/81979)).
+-   Gallery: Read the global gap on every render instead of once per request, so a gap set after the first gallery renders applies to the next ([#81979](https://github.com/WordPress/gutenberg/pull/81979)).
 
 ### Internal
 
