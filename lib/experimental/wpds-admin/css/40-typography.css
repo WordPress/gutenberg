@@ -430,19 +430,62 @@
 	   restating any of WordPress's values, so About keeps whatever it is designed to
 	   have, now and after it is redesigned. Once this styling lives in WordPress's own stylesheets there
 	   are no layers, About's specificity works again, and this block goes.
+
+	   The whole subtree, not a list of headings. An earlier version named only
+	   `h1` to `h6`, which left About's paragraphs to the bare `p` rule above:
+	   its introduction dropped from 24px to 14px and its section text from 18px
+	   to 14px. About sizes paragraphs by inheritance — `.about__container p` is
+	   `font-size: inherit` and the size sits on the container, 1.5rem for
+	   `.is-subheading` and 1.125rem for `.about__section` — so a bare `p`
+	   declaration in this layer cuts the chain rather than changing one value.
+	   Reverting everything inside the wrapper is both the fix and the honest
+	   expression of "About is exempt": it needs no updating when About is
+	   redesigned, and it cannot miss an element the way a list can.
+
+	   The class is repeated to raise specificity to (0,2,0). `.about__container`
+	   also carries `.wrap`, so `.wrap h1` above — (0,1,1) — would otherwise
+	   outrank a single-class subtree selector and shrink the hero heading back to
+	   20px. This is the same reason the earlier version had to name
+	   `.about__header-title h1` separately.
 	   ----------------------------------------------------------------------- */
 
-	.about__container h1,
-	.about__container h2,
-	.about__container h3,
-	.about__container h4,
-	.about__container h5,
-	.about__container h6,
-	.about__header-title h1 {
+	/*
+	 * `body` is reverted too, through `:has()`, because it sits outside the
+	 * wrapper. About sizes several things in `em` — the release tabs at 1.4em,
+	 * one section paragraph at 1.6em — and an em resolves against the inherited
+	 * size, so reverting the wrapper alone left those computing against this
+	 * file's 14px floor instead of WordPress's 13px. Measured, that was the
+	 * difference between 18.2px and 19.6px tabs.
+	 */
+	body:has(.about__container),
+	body:has(.about-wrap),
+	.about__container.about__container,
+	.about__container.about__container *,
+	.about-wrap.about-wrap,
+	.about-wrap.about-wrap * {
 		font-family: revert-layer;
 		font-size: revert-layer;
 		font-weight: revert-layer;
 		line-height: revert-layer;
 		margin-block: revert-layer;
+	}
+
+	/*
+	 * STOPGAP, and an admission that exemption-by-specificity cannot be airtight.
+	 * 90-exceptions.css sizes `.wp-core-ui .button.button-hero` at (0,3,0), which
+	 * outranks the (0,2,0) above, so About's own 1.5rem hero button rendered at
+	 * 14px. This rule is (0,4,0) and wins it back.
+	 *
+	 * The real fix is structural: an exemption should not compete on specificity
+	 * at all. A layer declared after `wpds` would beat every rule in it whatever
+	 * the selector, which is exactly what "About is exempt" means. That is a
+	 * change to the layer order in load.php rather than to this file.
+	 * DELETE WHEN: the exemption moves to its own layer, or this styling moves
+	 * into WordPress's own stylesheets and the whole block goes.
+	 */
+	.about__container.about__container .button.button-hero,
+	.about-wrap.about-wrap .button.button-hero {
+		font-size: revert-layer;
+		line-height: revert-layer;
 	}
 }
