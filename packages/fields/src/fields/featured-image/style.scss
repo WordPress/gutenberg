@@ -13,3 +13,18 @@
 	box-shadow: none;
 	background: $gray-100;
 }
+span.fields-controls__featured-image-no-image{
+	background-image: url('/wp-content/plugins/gutenberg/packages/fields/src/fields/featured-image/no-pictures.png');
+	position: absolute;
+    left: 0;
+    right: 0;
+    display: block;
+    z-index: 999;
+    height: 50%;
+    width: 50%;
+    background-repeat: no-repeat;
+    background-size: contain;
+    transform: translateY(-50%);
+    top: 50%;
+    margin: 0 auto;
+}
