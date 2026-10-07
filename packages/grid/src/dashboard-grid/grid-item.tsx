@@ -158,7 +158,6 @@ export function GridItem( {
 				>
 					<div
 						style={ { display: 'contents' } }
-						// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
 						inert={ inertValue( dragging ) }
 					>
 						{ actionableArea }
