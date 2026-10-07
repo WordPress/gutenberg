@@ -1,0 +1,80 @@
+// This is a managed VS Code settings file.
+// While the first line is present, opening the folder replaces this file with `.vscode/settings.dist.jsonc`.
+// To customize these settings and keep your changes, delete the first line.
+{
+	// Define schema to allow auto-completion.
+	"$schema": "vscode://schemas/settings/workspace",
+	// Don't show these files in VS Code.
+	"files.exclude": {
+		"**/.DS_Store/**": true,
+	},
+	// Don't search these files in VS Code.
+	"search.exclude": {
+		"**/.cache/**": true,
+		"**/build/**": true,
+		"**/build-module/**": true,
+		"**/build-types/**": true,
+		"**/build-style/**": true,
+		"**/node_modules/**": true,
+		"**/vendor/**": true,
+	},
+	// Use TypeScript from the workspace instead of VS Code's built-in TypeScript version.
+	"js/ts.tsdk.path": "tools/build-scripts/node_modules/@typescript/native/lib",
+	// Use Native TypeScript.
+	"js/ts.experimental.useTsgo": true,
+	// Use ESLint, Prettier and Stylelint from the workspaces that declare them.
+	"eslint.nodePath": "tools/eslint/node_modules",
+	"prettier.prettierPath": "packages/prettier-config/node_modules/prettier",
+	"stylelint.stylelintPath": "tools/stylelint/node_modules/stylelint",
+	// Show suppressed ESLint violations as hints.
+	"eslint.bulkSuppression.enable": true,
+	"eslint.bulkSuppression.location": "tools/eslint/suppressions.json",
+	"eslint.bulkSuppression.severity": "hint",
+	// Custom settings for PHP files.
+	"[php]": {
+		// Ensure that PHP files are formatted with PHPCS.
+		"editor.formatOnSave": true,
+		"editor.defaultFormatter": "obliviousharmony.vscode-php-codesniffer",
+	},
+	"intelephense.environment.phpVersion": "7.4.0",
+	// Don't run Intelephense on these files.
+	"intelephense.files.exclude": [
+		"**/.cache/**",
+		"**/.git/**",
+		"**/.history/**",
+		"**/build/**",
+		"**/build-module/**",
+		"**/build-types/**",
+		"**/build-style/**",
+		"**/node_modules/**",
+		"**/vendor/**",
+	],
+	"phpCodeSniffer.autoExecutable": true,
+	"phpCodeSniffer.standard": "Automatic",
+	// Have PHPCS ignore these files.
+	"phpCodeSniffer.exclude": [
+		"**/.git/**",
+		"**/.svn/**",
+		"**/.hg/**",
+		"**/.cache/**",
+		"**/build/**",
+		"**/node_modules/**",
+		"**/vendor/**",
+	],
+	// Custom settings for JavaScript and TypeScript files.
+	"[javascript][javascriptreact][typescript][typescriptreact]": {
+		"editor.formatOnSave": false,
+		"editor.defaultFormatter": "esbenp.prettier-vscode",
+	},
+	// Run Code Actions for the editor.
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": "explicit",
+		"source.fixAll.stylelint": "explicit",
+	},
+	// Custom settings for CSS, SCSS, and SASS files.
+	"[css][scss][sass]": {
+		"editor.formatOnSave": false,
+		"editor.defaultFormatter": "stylelint.vscode-stylelint",
+	},
+	"stylelint.validate": [ "css", "postcss", "scss" ],
+}

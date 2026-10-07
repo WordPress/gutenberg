@@ -83,8 +83,8 @@
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.63.0",
-		"@types/react": "^18.3.27",
-		"@types/react-dom": "^18.3.1",
+		"@types/react": "^19.3.0",
+		"@types/react-dom": "^19.3.0",
 		"@wordpress/env": "file:./packages/env",
 		"@wordpress/eslint-tools": "file:./tools/eslint",
 		"@wordpress/monorepo-tools": "file:./tools/monorepo",
@@ -234,5 +234,16 @@
 		"tools/*",
 		"widgets/*",
 		"!test/ai-development"
-	]
+	],
+	"allowScripts": {
+		"@parcel/watcher": false,
+		"@swc/core": false,
+		"core-js": false,
+		"core-js-pure": false,
+		"esbuild": false,
+		"fs-ext-extra-prebuilt": false,
+		"fsevents": false,
+		"nx": false,
+		"unrs-resolver": false
+	}
 }

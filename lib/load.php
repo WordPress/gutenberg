@@ -98,6 +98,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-view-config-controller-7-2.php';
 	require __DIR__ . '/compat/wordpress-7.2/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.2/edit-root-attachment.php';
+	require __DIR__ . '/compat/wordpress-7.2/notes.php';
 
 	// Real-time collaboration.
 	require __DIR__ . '/experimental/collaboration/class-gutenberg-rest-autosaves-controller.php';
