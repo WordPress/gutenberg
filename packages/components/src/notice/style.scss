@@ -68,7 +68,6 @@
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
 	&:not(:disabled):not([aria-disabled="true"]):focus {
 		color: var(--wp-components-notice-text-color);
-		border-color: var(--wp-components-notice-border-color);
 		background-color: color-mix(in srgb, var(--wp-components-notice-text-color) 10%, transparent);
 	}
 }

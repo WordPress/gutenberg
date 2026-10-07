@@ -129,7 +129,7 @@
 		.close-icon {
 			--wp-ui-button-foreground-color: var(--wp-ui-notice-text-color);
 			--wp-ui-button-foreground-color-active: var(--wp-ui-notice-text-color);
-			--wp-ui-button-border-color-active: var(--wp-ui-notice-border-color);
+			--wp-ui-button-border-color-active: transparent;
 			--wp-ui-button-background-color-active: color-mix(in srgb, var(--wp-ui-notice-text-color) 10%, transparent);
 		}
 
