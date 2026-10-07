@@ -184,6 +184,33 @@ test.describe( 'Document tools roving tabindex', () => {
 				.toBe( 0 );
 		}
 	} );
+
+	test( 'stays reachable with Shift+Tab and Alt+F10 after an arrow key press', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.pressKeys( 'alt+F10' );
+		await page.keyboard.press( 'ArrowRight' );
+
+		// The toolbar has one tab stop. If the arrow key handed it to a hidden
+		// button, the toolbar has no visible tab stop: Shift+Tab skips it and
+		// Alt+F10 finds nothing to focus.
+		await page.keyboard.press( 'Tab' );
+		await expect
+			.poll( () => editor.getFocusOwnerLabel() )
+			.not.toBe( 'Document Overview' );
+		await pageUtils.pressKeys( 'shift+Tab' );
+		await expect
+			.poll( () => editor.getFocusOwnerLabel() )
+			.toBe( 'Document Overview' );
+
+		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'alt+F10' );
+		await expect
+			.poll( () => editor.getFocusOwnerLabel() )
+			.toBe( 'Document Overview' );
+	} );
 } );
 
 class ToolbarRovingTabindexUtils {
