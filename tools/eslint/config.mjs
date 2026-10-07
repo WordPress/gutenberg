@@ -7,7 +7,6 @@ import storybookPlugin from 'eslint-plugin-storybook';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import jestDomPlugin from 'eslint-plugin-jest-dom';
 import testingLibraryPlugin from 'eslint-plugin-testing-library';
-import jestPlugin from 'eslint-plugin-jest';
 import tseslint from 'typescript-eslint';
 import wpBuildConfig from '../../packages/wp-build/eslint-overrides.cjs';
 import {
@@ -71,6 +70,21 @@ function dedupePlugins( configs ) {
 const SCRIPT_EXT = '@([cm]js|[cm]ts|js|jsx|ts|tsx)';
 const TS_EXT = '@([cm]ts|ts|tsx)';
 const SCRIPT_EXT_NO_JSX = '@([cm]js|[cm]ts|js|ts)';
+
+const vitestLintFiles = [
+	...vitestTestPatterns,
+	`**/test/**/*.${ SCRIPT_EXT }`,
+	`**/__tests__/**/*.${ SCRIPT_EXT }`,
+	`test/unit/config/**/*.${ SCRIPT_EXT }`,
+	'packages/block-serialization-spec-parser/shared-tests.js',
+];
+const vitestLintIgnores = [
+	'test/e2e/**',
+	'test/performance/**',
+	'test/storybook-playwright/**',
+	'test/ai-development/**',
+	'**/fixtures/**',
+];
 
 /**
  * The list of patterns matching files used only for development purposes.
@@ -535,6 +549,8 @@ export default dedupePlugins( [
 			`routes/**/*.${ SCRIPT_EXT }`,
 			`widgets/**/*.${ SCRIPT_EXT }`,
 		],
+		// Tests load styles directly instead of using WordPress's enqueue path.
+		ignores: vitestLintFiles,
 		rules: {
 			'@wordpress/no-non-module-stylesheet-imports': 'error',
 		},
@@ -585,29 +601,96 @@ export default dedupePlugins( [
 			...vitestTestPatterns,
 		],
 	} ) ),
-	// The Jest plugin also supports Vitest. Keep these active rules until the
-	// separate suite-wide migration to the public Vitest lint configuration.
-	{
-		plugins: jestPlugin.configs[ 'flat/recommended' ].plugins,
-		files: vitestTestPatterns,
-		settings: {
-			jest: {
-				globalPackage: 'vitest',
-			},
-		},
+	// Use the public Vitest baseline for suites and shared unit-test helpers.
+	...wpPlugin.configs[ 'test-unit' ].map( ( config ) => ( {
+		...config,
+		files: vitestLintFiles,
+		ignores: vitestLintIgnores,
 		rules: {
-			...jestPlugin.configs[ 'flat/recommended' ].rules,
-			// Preserve existing test patterns while changing runners. These rules
-			// newly flag valid patterns once the globals are imported from Vitest.
-			'jest/no-conditional-expect': 'off',
-			// Jest release deprecations do not apply to Vitest.
-			'jest/no-deprecated-functions': 'off',
-			'jest/valid-describe-callback': 'off',
-			'jest/valid-expect-in-promise': 'off',
-			'jest/valid-title': 'off',
+			...config.rules,
+			'vitest/require-awaited-expect-poll': 'error',
+			// These checks were enabled by Jest's baseline but are not recommended
+			// Vitest rules. Keep their existing enforcement during the switch.
+			'vitest/no-alias-methods': 'error',
+			'vitest/no-done-callback': 'error',
+			'vitest/no-test-prefixes': 'error',
+			// Vitest has no no-jasmine-globals equivalent.
+			'no-restricted-globals': [
+				'error',
+				{
+					name: 'jasmine',
+					message: 'Use the vi and expect APIs from Vitest instead.',
+				},
+				{
+					name: 'spyOn',
+					message: 'Use vi.spyOn() from Vitest instead.',
+				},
+				{
+					name: 'spyOnProperty',
+					message:
+						'Use vi.spyOn() from Vitest with a get or set accessor instead.',
+				},
+				{
+					name: 'fail',
+					message: 'Use expect.fail() from Vitest instead.',
+				},
+				{
+					name: 'pending',
+					message:
+						'Use the Vitest test context skip() method instead.',
+				},
+			],
+		},
+	} ) ),
+	{
+		// Dynamic imports let import/no-unresolved check JavaScript mock paths.
+		// TypeScript mock imports remain owned by validateVitestPolicy.
+		files: vitestLintFiles.map( ( pattern ) => [
+			pattern,
+			'**/*.{js,jsx,mjs,cjs}',
+		] ),
+		ignores: vitestLintIgnores,
+		rules: {
+			'vitest/prefer-import-in-mock': 'error',
 		},
 	},
-
+	// Recognize only the assertion helpers used by these files. Avoid a global
+	// expect* wildcard, which would also accept unrelated function calls.
+	...[
+		[
+			'packages/components/src/flex/test/index.browser.test.tsx',
+			[ 'expectCustomProperty' ],
+		],
+		[
+			'packages/components/src/spacer/test/index.browser.test.tsx',
+			[ 'expectCustomProperties' ],
+		],
+		[
+			'packages/components/src/form-token-field/test/index.jsdom.test.tsx',
+			[
+				'expectTokensToBeInTheDocument',
+				'expectTokensNotToBeInTheDocument',
+				'expectEscapedProperly',
+				'expectVisibleSuggestionsToBe',
+			],
+		],
+		[
+			'packages/block-editor/src/components/global-styles/test/dimensions-panel.jsdom.test.jsx',
+			[ 'expectPlaceholderState' ],
+		],
+		[
+			'test/unit/scripts/test/vitest-policy-rules.test.js',
+			[ 'expectValid', 'expectViolation' ],
+		],
+	].map( ( [ file, helpers ] ) => ( {
+		files: [ file ],
+		rules: {
+			'vitest/expect-expect': [
+				'error',
+				{ assertFunctionNames: [ 'expect', 'assert', ...helpers ] },
+			],
+		},
+	} ) ),
 	// This compilation fixture is transformed as source, not run as a test.
 	{
 		files: [ 'packages/babel-preset-default/test/fixtures/input.js' ],
@@ -963,6 +1046,37 @@ export default dedupePlugins( [
 		},
 	},
 
+	// Override: block-library — the waveform player's default entry initializes
+	// every `[data-waveform-player]` element on the page when it is imported.
+	{
+		files: [ 'packages/block-library/**' ],
+		rules: {
+			'no-restricted-imports': [
+				'error',
+				{
+					paths: [
+						...restrictedImports,
+						{
+							name: '@arraypress/waveform-player',
+							message:
+								'This entry initializes every `[data-waveform-player]` element on the page, including markup the Playlist block does not own. Import `@arraypress/waveform-player/no-autoinit` instead.',
+						},
+					],
+					patterns: [
+						{
+							group: [
+								'@arraypress/waveform-player/*',
+								'!@arraypress/waveform-player/no-autoinit',
+							],
+							message:
+								'Only `@arraypress/waveform-player/no-autoinit` skips the scan that initializes every `[data-waveform-player]` element on the page.',
+						},
+					],
+				},
+			],
+		},
+	},
+
 	// Override: bundled packages — restrict private-apis imports, both direct
 	// and via each package's local `lock-unlock` wrapper module.
 	// `packages/ui` is excluded because this entry would replace its more
@@ -1055,20 +1169,6 @@ export default dedupePlugins( [
 	},
 
 	// --- Merged package-level configs ---
-
-	// From packages/block-serialization-spec-parser/.eslintrc.json:
-	// Add test-unit config for shared-tests.js with jest/no-export off.
-	{
-		...jestPlugin.configs[ 'flat/recommended' ],
-		files: [ 'packages/block-serialization-spec-parser/shared-tests.js' ],
-	},
-	{
-		files: [ 'packages/block-serialization-spec-parser/shared-tests.js' ],
-		rules: {
-			'jest/no-deprecated-functions': 'off',
-			'jest/no-export': 'off',
-		},
-	},
 
 	// From packages/dependency-extraction-webpack-plugin/lib/.eslintrc.json:
 	// Add Node.js globals for the lib directory.

@@ -9,7 +9,7 @@ import type { WordPressComponentProps } from '../context';
 export const TabPanel = forwardRef<
 	HTMLDivElement,
 	Omit< WordPressComponentProps< TabPanelProps, 'div', false >, 'id' >
->( function TabPanel(
+>( function UnforwardedTabPanel(
 	{ children, tabId, focusable = true, ...otherProps },
 	ref
 ) {

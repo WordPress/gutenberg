@@ -1,6 +1,9 @@
 import clsx from 'clsx';
 import {
 	Button,
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
 	Spinner,
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
@@ -19,7 +22,15 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { close, drawerRight, keyboard, redo, undo } from '@wordpress/icons';
+import {
+	backup,
+	close,
+	drawerRight,
+	keyboard,
+	moreVertical,
+	redo,
+	undo,
+} from '@wordpress/icons';
 import {
 	displayShortcut,
 	isAppleOS,
@@ -204,6 +215,19 @@ interface MediaEditorFrameContextValue {
 	onCancel: () => void;
 	onSave: () => void;
 	onReset: () => void;
+	/**
+	 * When `true`, the media has a lineage root to restore to, so the
+	 * "Restore original image" menu item is shown.
+	 */
+	canRestoreOriginal: boolean;
+	/**
+	 * When `true`, another attachment has replaced the edited one in the
+	 * cropper this session (today, only the original), so the menu item is
+	 * disabled.
+	 */
+	isSourceReplaced: boolean;
+	/** Load the lineage root into the cropper as a dirty preview. */
+	onRestoreOriginal: () => void;
 }
 
 const MediaEditorFrameContext =
@@ -237,8 +261,17 @@ export interface HeaderActionsProps {
 }
 
 function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
-	const { isImage, isSaving, onCancel, isWide, activePanel, onTogglePanel } =
-		useMediaEditorFrameContext();
+	const {
+		isImage,
+		isSaving,
+		onCancel,
+		isWide,
+		activePanel,
+		onTogglePanel,
+		canRestoreOriginal,
+		isSourceReplaced,
+		onRestoreOriginal,
+	} = useMediaEditorFrameContext();
 	const isPanelOpen = !! activePanel;
 	const [ isShortcutsModalOpen, setIsShortcutsModalOpen ] = useState( false );
 	return (
@@ -248,14 +281,6 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 			align="center"
 			gap="sm"
 		>
-			{ isImage && (
-				<Button
-					size="compact"
-					icon={ keyboard }
-					label={ __( 'Keyboard shortcuts' ) }
-					onClick={ () => setIsShortcutsModalOpen( true ) }
-				/>
-			) }
 			{ /* The sidebar holds more than one panel, so this opens and
 			     closes the sidebar rather than naming a panel: reopening
 			     returns to whichever tab was last showing, and the tab strip
@@ -271,6 +296,50 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 				aria-expanded={ isWide ? isPanelOpen : undefined }
 				onClick={ onTogglePanel }
 			/>
+			{ isImage && (
+				<DropdownMenu
+					icon={ moreVertical }
+					label={ __( 'More options' ) }
+					toggleProps={ { size: 'compact' } }
+				>
+					{ ( { onClose: closeMenu } ) => (
+						<>
+							{ canRestoreOriginal && (
+								<MenuGroup>
+									<MenuItem
+										icon={ backup }
+										iconPosition="left"
+										disabled={
+											isSourceReplaced || isSaving
+										}
+										info={ __(
+											'Discards unsaved changes and loads the original image.'
+										) }
+										onClick={ () => {
+											onRestoreOriginal();
+											closeMenu();
+										} }
+									>
+										{ __( 'Restore original image' ) }
+									</MenuItem>
+								</MenuGroup>
+							) }
+							<MenuGroup>
+								<MenuItem
+									icon={ keyboard }
+									iconPosition="left"
+									onClick={ () => {
+										setIsShortcutsModalOpen( true );
+										closeMenu();
+									} }
+								>
+									{ __( 'Keyboard shortcuts' ) }
+								</MenuItem>
+							</MenuGroup>
+						</>
+					) }
+				</DropdownMenu>
+			) }
 			{ showCloseButton && (
 				<Button
 					size="compact"
@@ -294,7 +363,7 @@ function HistoryActions() {
 	const { isImage, isUndoRedoDisabled, onReset, isWide, activePanel } =
 		useMediaEditorFrameContext();
 	const {
-		reset,
+		cropper: { reset },
 		isDirty,
 		hasUndo,
 		hasRedo,
@@ -435,7 +504,7 @@ function MediaEditorContent( {
 	noticesPortalElement,
 	shouldCloseOnEsc = false,
 }: MediaEditorProps ) {
-	const cropper = useMediaEditor();
+	const session = useMediaEditor();
 	// Width decides whether the settings panel docks beside the canvas or
 	// takes the whole body. It docks from `small` (600px): the modal is the
 	// viewport less a 16px margin either side, so a 320px panel and the
@@ -483,40 +552,15 @@ function MediaEditorContent( {
 	// its own controls, so it moves that cluster elsewhere. The same width
 	// undocks the panel, so this is `isWide` rather than a second query.
 	const layout: 'wide' | 'narrow' = isWide ? 'wide' : 'narrow';
-	const { media, hasEdits } = useSelect(
-		( select ) => {
-			const {
-				getEditedEntityRecord,
-				getEntityRecord,
-				hasEditsForEntityRecord,
-			} = select( coreStore );
-			// Trigger an _embed fetch so `_embedded.author` and
-			// `_embedded['wp:attached-to']` land on the record for the Details
-			// fields to read. `getEditedEntityRecord` doesn't formally accept a
-			// query, so we can't embed via that selector directly.
-			getEntityRecord(
+	const sourceMedia = useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecord(
 				'postType',
 				'attachment',
-				id,
-				ATTACHMENT_EMBED_QUERY
-			);
-			return {
-				media: getEditedEntityRecord(
-					'postType',
-					'attachment',
-					id
-				) as Media,
-				hasEdits: hasEditsForEntityRecord(
-					'postType',
-					'attachment',
-					id
-				),
-			};
-		},
+				id
+			) as Media,
 		[ id ]
 	);
-
-	const hasChanges = cropper.isCropperDirty || hasEdits;
 
 	const { clearEntityRecordEdits, editEntityRecord, invalidateResolution } =
 		useDispatch( coreStore );
@@ -526,6 +570,12 @@ function MediaEditorContent( {
 	const [ isPlacementActive, setIsPlacementActive ] = useState( false );
 	const [ isCanvasGestureActive, setIsCanvasGestureActive ] =
 		useState( false );
+	// Whether another attachment has replaced `id` in the cropper this
+	// session (today, the original via "Restore original image"). Stays a
+	// distinct flag (not derived from the cropper) so a bare replacement
+	// counts as a change even though swapping the source resets the
+	// cropper's own dirty baseline.
+	const [ isSourceReplaced, setIsSourceReplaced ] = useState( false );
 	const placementControlTimerRef =
 		useRef< ReturnType< typeof setTimeout > >();
 
@@ -553,19 +603,103 @@ function MediaEditorContent( {
 	useEffect( () => {
 		setIsPlacementActive( false );
 		setIsCanvasGestureActive( false );
+		setIsSourceReplaced( false );
 	}, [ id ] );
 
-	// Bust the cached `_embed` resolution each time the editor mounts (or the
-	// id changes) so embedded data such as the attached post's title or the
-	// author's name reflects any edits made elsewhere since the last open.
+	// Restore-original: the edit root the edited attachment descends from,
+	// exposed by the server as the root-level `edit_root` id on the
+	// attachment (edit context, embeddable via the `wp:edit-root` link).
+	// Fetch the original's record for the URL and natural dimensions the
+	// cropper needs to seed itself.
+	const originalId: number | undefined = sourceMedia?.edit_root;
+	const originalRecord = useSelect(
+		( select ) =>
+			originalId
+				? ( select( coreStore ).getEntityRecord(
+						'postType',
+						'attachment',
+						originalId
+					) as Media | undefined )
+				: undefined,
+		[ originalId ]
+	);
+	const originalWidth = Number( originalRecord?.media_details?.width );
+	const originalHeight = Number( originalRecord?.media_details?.height );
+	const originalUrl = originalRecord?.source_url;
+	const originalSource =
+		originalId &&
+		originalRecord &&
+		typeof originalUrl === 'string' &&
+		originalUrl.length > 0 &&
+		Number.isFinite( originalWidth ) &&
+		originalWidth > 0 &&
+		Number.isFinite( originalHeight ) &&
+		originalHeight > 0
+			? {
+					id: originalId,
+					url: originalUrl,
+					media: originalRecord,
+				}
+			: undefined;
+	const canRestoreOriginal = !! originalSource;
+	const replacementSource =
+		isSourceReplaced && originalSource
+			? {
+					id: originalSource.id,
+					url: originalSource.url,
+					media: originalSource.media,
+				}
+			: undefined;
+	// Details and pending edits follow the attachment shown on the canvas.
+	// Keep `sourceMedia` separate for the snackbar's previous attachment.
+	const activeId = replacementSource?.id ?? id;
+	const { media, hasEdits } = useSelect(
+		( select ) => {
+			const {
+				getEditedEntityRecord,
+				getEntityRecord,
+				hasEditsForEntityRecord,
+			} = select( coreStore );
+			// Fetch embedded author and attached-post data for Details.
+			getEntityRecord(
+				'postType',
+				'attachment',
+				activeId,
+				ATTACHMENT_EMBED_QUERY
+			);
+			return {
+				media: getEditedEntityRecord(
+					'postType',
+					'attachment',
+					activeId
+				) as Media,
+				hasEdits: hasEditsForEntityRecord(
+					'postType',
+					'attachment',
+					activeId
+				),
+			};
+		},
+		[ activeId ]
+	);
+	// Refresh embedded data on opening or switching to the original.
 	useEffect( () => {
 		invalidateResolution( 'getEntityRecord', [
 			'postType',
 			'attachment',
-			id,
+			activeId,
 			ATTACHMENT_EMBED_QUERY,
 		] );
-	}, [ id, invalidateResolution ] );
+	}, [ activeId, invalidateResolution ] );
+	const handleRestoreOriginal = useCallback( () => {
+		// Restoring discards every pending edit, as the menu item says, so
+		// nothing staged against the attachment being replaced reaches a save.
+		clearEntityRecordEdits( 'postType', 'attachment', id );
+		setIsSourceReplaced( true );
+	}, [ clearEntityRecordEdits, id ] );
+
+	// A bare replacement has no cropper diff, so OR the flag in explicitly.
+	const hasChanges = session.hasOutputEdits || hasEdits || isSourceReplaced;
 
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type ).type;
 	const isImage = !! media && mediaType === 'image';
@@ -602,11 +736,12 @@ function MediaEditorContent( {
 		resetCropOptions,
 	} = useCropOptions( { aspectRatioPresets } );
 	const { isSaving, save: saveMediaEditor } = useSaveMediaEditor( {
-		cropper,
+		session,
 		id,
 		isImage,
-		media,
+		media: sourceMedia,
 		onSaved,
+		replacementSource,
 	} );
 
 	const handleChange = ( updates: Partial< Media > ) => {
@@ -618,12 +753,13 @@ function MediaEditorContent( {
 		if ( isSaving ) {
 			return;
 		}
-		editEntityRecord( 'postType', 'attachment', id, updates );
+		editEntityRecord( 'postType', 'attachment', activeId, updates );
 	};
 
 	const discardAndClose = () => {
 		removeAllNotices( 'snackbar', MEDIA_EDITOR_NOTICES_CONTEXT );
-		clearEntityRecordEdits( 'postType', 'attachment', id );
+		clearEntityRecordEdits( 'postType', 'attachment', activeId );
+		setIsSourceReplaced( false );
 		onClose?.();
 	};
 
@@ -656,9 +792,9 @@ function MediaEditorContent( {
 					return;
 				}
 				if ( isRedoShortcut ) {
-					cropper.redo();
+					session.redo();
 				} else {
-					cropper.undo();
+					session.undo();
 				}
 			}
 		}
@@ -850,6 +986,9 @@ function MediaEditorContent( {
 		onCancel: handleRequestClose,
 		onSave: saveMediaEditor,
 		onReset: resetCropOptions,
+		canRestoreOriginal,
+		isSourceReplaced,
+		onRestoreOriginal: handleRestoreOriginal,
 	};
 
 	return (

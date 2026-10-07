@@ -14,11 +14,14 @@ function resolvePrNumber(): number | undefined {
 
 	/*
 	 * `number` covers pull_request and pull_request_target, `issue` covers
-	 * issue_comment. A push carries no pull request, so those callers have to
-	 * pass `pr-number` themselves.
+	 * issue_comment, and `pull_request` covers the review events, which carry
+	 * no number of their own. A push has no pull request at all, so those
+	 * callers have to pass `pr-number` themselves.
 	 */
 	const payload = getEventPayload();
-	return payload.number ?? payload.issue?.number;
+	return (
+		payload.number ?? payload.issue?.number ?? payload.pull_request?.number
+	);
 }
 
 export function resolveBody(): string {
@@ -66,7 +69,11 @@ async function run() {
 	}
 
 	const api = new GitHubAPI( token, getRepo() );
-	const existing = await api.findComment( prNumber );
+	const retire = getInput( 'retire-comments-matching' );
+	const { comment: existing, retirable } = await api.findComments(
+		prNumber,
+		retire
+	);
 
 	if ( existing && ! isParseable( existing.body ) ) {
 		setFailed(
@@ -75,8 +82,6 @@ async function run() {
 		return;
 	}
 
-	const body = resolveBody();
-
 	/*
 	 * Every write re-renders every section, including the footers marking a
 	 * commit-scoped result as no longer current, so the head is needed
@@ -84,7 +89,22 @@ async function run() {
 	 * outer handler skips the write: rendering without it would present every
 	 * stale result as current.
 	 */
-	const headSha = await api.getHeadSha( prNumber );
+	const pullRequest = await api.getPullRequest( prNumber );
+
+	/*
+	 * A `pull_request_target` workflow comes from the default branch whatever
+	 * a pull request targets, so a caller can reach a branch whose own writers
+	 * are older than this and would re-cut the section on their next write.
+	 */
+	const requireBase = getInput( 'require-base' );
+	if ( requireBase && pullRequest.baseRef !== requireBase ) {
+		info(
+			`Skipped the "${ section }" section: this pull request targets ${ pullRequest.baseRef }, not ${ requireBase }.`
+		);
+		return;
+	}
+
+	const body = resolveBody();
 
 	const {
 		body: merged,
@@ -98,7 +118,7 @@ async function run() {
 			sha: getInput( 'commit-sha' ) || undefined,
 			runUrl: getInput( 'run-url' ) || undefined,
 		},
-		headSha
+		pullRequest.headSha
 	);
 
 	if ( rejected ) {
@@ -106,14 +126,34 @@ async function run() {
 		return;
 	}
 
+	/*
+	 * Once the section says what it should, including saying nothing, the
+	 * standalone comment it replaced is only a second and drifting copy.
+	 */
+	const retireStandalone = async () => {
+		for ( const id of retirable ) {
+			await api.deleteComment( id );
+			info( `Retired the standalone comment ${ id }.` );
+		}
+	};
+
 	if ( remove && existing ) {
 		await api.deleteComment( existing.id );
 		info( 'Removed the comment, its last section having gone.' );
+		await retireStandalone();
 		return;
 	}
 
 	if ( ! merged ) {
 		info( `Nothing to report for the "${ section }" section.` );
+		await retireStandalone();
+		return;
+	}
+
+	/* Props runs on every comment, so most writes change nothing. */
+	if ( existing?.body === merged ) {
+		info( `The "${ section }" section is already up to date.` );
+		await retireStandalone();
 		return;
 	}
 
@@ -122,6 +162,7 @@ async function run() {
 		: await api.createComment( prNumber, merged );
 
 	info( `Wrote the "${ section }" section to ${ url }` );
+	await retireStandalone();
 }
 
 export { run };
