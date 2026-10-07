@@ -6,28 +6,28 @@
 
 .select {
 	/* stylelint-disable-next-line logical-css/require-logical-properties -- Keep the existing physical offset in both LTR and RTL. */
-	margin-left: -8px;
+	margin-left: -$grid-unit-10;
 }
 
 .range {
 	flex: 1;
 	/* stylelint-disable-next-line logical-css/require-logical-properties -- Keep the existing physical gap in both LTR and RTL. */
-	margin-right: 8px;
+	margin-right: $grid-unit-10;
 }
 
 .auxiliary {
-	padding: 8px 0 0;
+	padding: $grid-unit-10 0 0;
 }
 
 .header {
-	padding-inline: 16px;
+	padding-inline: $grid-unit-20;
 }
 
 .color-input {
-	padding-block: 16px 20px;
+	padding-block: $grid-unit-20 20px;
 	/* stylelint-disable logical-css/require-logical-properties -- Preserve the asymmetric physical padding in both directions. */
-	padding-left: 16px;
-	padding-right: 12px;
+	padding-left: $grid-unit-20;
+	padding-right: $grid-unit-15;
 	/* stylelint-enable logical-css/require-logical-properties */
 }
 
@@ -54,21 +54,21 @@
 		width: 100%;
 		border-radius: 0;
 		height: 216px;
-		margin-bottom: 16px;
+		margin-bottom: $grid-unit-20;
 		border-bottom: none;
 	}
 
 	:global(.react-colorful__hue),
 	:global(.react-colorful__alpha) {
 		width: 184px;
-		height: 16px;
+		height: $grid-unit-20;
 		border-radius: $radius-full;
-		margin-bottom: 8px;
+		margin-bottom: $grid-unit-10;
 	}
 
 	:global(.react-colorful__pointer) {
-		height: 16px;
-		width: 16px;
+		height: $grid-unit-20;
+		width: $grid-unit-20;
 		border: none;
 		box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.25);
 
@@ -94,8 +94,8 @@
 
 	// Make the hue circle picker stay inside the bar.
 	:global(.react-colorful__interactive) {
-		width: calc(100% - 8px);
+		width: calc(100% - #{ $grid-unit-10 });
 		/* stylelint-disable-next-line logical-css/require-logical-properties -- Keep the physical inset paired with the picker's physical positioning. */
-		margin-left: 4px;
+		margin-left: $grid-unit-05;
 	}
 }
