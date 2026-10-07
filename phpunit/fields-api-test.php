@@ -480,6 +480,19 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The files of a collection run in a scope of their own: an `index.php`
+	 * or a `field.php` using the variables of the loader as locals, e.g.
+	 * `$fields` to build its elements, changes nothing the loader read.
+	 */
+	public function test_the_files_of_a_collection_have_their_own_scope() {
+		$this->assertSame( array( 'scoped' => true ), $this->register_fixture_collections( 'valid', array( 'scoped' ) ) );
+
+		$fields = gutenberg_get_registered_fields( 'postType', 'gutenberg_scoped' );
+		$this->assertSame( array( 'plain', 'scoped' ), array_column( $fields, 'id' ), 'The index reusing `$directory` still reads its folder; the field reusing `$fields` and `$file` keeps the field read before it and the name of its folder.' );
+		$this->assertSame( array( 'draft', 'publish' ), array_column( $fields[1]['elements'], 'value' ) );
+	}
+
+	/**
 	 * There is no precedence between collections: a field of a collection
 	 * that redefines a field registered before it is skipped by the registry,
 	 * like a plugin registering it twice.
@@ -1078,6 +1091,25 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			$results
 		);
 		$this->assertContains( 'author', array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' ), 'The default field is kept.' );
+	}
+
+	/**
+	 * An id that is not a non-empty string is reported and skipped: the
+	 * other ids of the call are unregistered.
+	 */
+	public function test_unregistering_with_an_invalid_id_skips_it() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::unregister' );
+		$unregistered = null;
+		$this->on_fields_api_init(
+			static function ( $registry ) use ( &$unregistered ) {
+				$unregistered = $registry->unregister( 'postType', 'page', array( array( 'id' => 'author' ), '', 'comment_status' ) );
+			}
+		);
+
+		$this->assertSame( array( 'comment_status' ), array_column( $unregistered, 'id' ) );
+		$ids = array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' );
+		$this->assertContains( 'author', $ids, 'A definition in place of an id is skipped, not matched.' );
+		$this->assertNotContains( 'comment_status', $ids );
 	}
 
 	/**

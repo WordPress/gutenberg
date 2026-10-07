@@ -276,7 +276,9 @@ final class Gutenberg_Fields_Registry {
 	 * its registered fields and script modules.
 	 *
 	 * Like register(), it only runs on the `wp_fields_api_init` action, and an
-	 * invalid entity is reported and unregisters nothing.
+	 * invalid entity is reported and unregisters nothing. An id that is not a
+	 * non-empty string is reported and skipped, like a definition register()
+	 * cannot store.
 	 *
 	 * @param string        $kind The entity kind (e.g. `postType`).
 	 * @param string        $name The entity name (e.g. `page`).
@@ -300,7 +302,12 @@ final class Gutenberg_Fields_Registry {
 			return $unregistered;
 		}
 
-		$unregistered = array_intersect_key( $this->fields[ $kind ][ $name ] ?? array(), array_flip( (array) $ids ) );
+		$ids = $this->skip_invalid_ids( __METHOD__, $kind, $name, (array) $ids );
+		if ( ! $ids ) {
+			return array();
+		}
+
+		$unregistered = array_intersect_key( $this->fields[ $kind ][ $name ] ?? array(), array_flip( $ids ) );
 		if ( empty( $unregistered ) ) {
 			return array();
 		}
@@ -606,6 +613,45 @@ final class Gutenberg_Fields_Registry {
 				sprintf(
 					/* translators: 1: Entity kind, e.g. postType. 2: Entity name, e.g. page. 3: Comma-separated list of positions, e.g. #2, #4. */
 					__( 'Every field definition must be an array with a non-empty string `id`. These definitions of %1$s "%2$s" are skipped: %3$s. The rest of the fields of the call are stored.', 'gutenberg' ),
+					$kind,
+					$name,
+					implode( ', ', $invalid )
+				),
+				'7.2.0'
+			);
+		}
+
+		return $valid;
+	}
+
+	/**
+	 * Drops the ids that are not a non-empty string, reporting their
+	 * positions in the call with _doing_it_wrong(): like an invalid
+	 * definition, an invalid id does not cost the call its other ids.
+	 *
+	 * @param string $method The calling method, for the notice.
+	 * @param string $kind   The entity kind.
+	 * @param string $name   The entity name.
+	 * @param array  $ids    The ids of the fields.
+	 * @return string[] The valid ids, in the order of the call.
+	 */
+	private function skip_invalid_ids( $method, $kind, $name, $ids ) {
+		$valid   = array();
+		$invalid = array();
+		foreach ( array_values( $ids ) as $position => $id ) {
+			if ( is_string( $id ) && '' !== $id ) {
+				$valid[] = $id;
+			} else {
+				$invalid[] = '#' . ( $position + 1 );
+			}
+		}
+
+		if ( $invalid ) {
+			_doing_it_wrong(
+				$method,
+				sprintf(
+					/* translators: 1: Entity kind, e.g. postType. 2: Entity name, e.g. page. 3: Comma-separated list of positions, e.g. #2, #4. */
+					__( 'Every field id must be a non-empty string. These ids of %1$s "%2$s" are skipped: %3$s. The rest of the fields of the call are unregistered.', 'gutenberg' ),
 					$kind,
 					$name,
 					implode( ', ', $invalid )

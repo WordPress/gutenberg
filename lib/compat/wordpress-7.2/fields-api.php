@@ -147,6 +147,16 @@ remove_action( 'admin_footer', '_wp_add_field_modules_to_editor_script' );
 add_action( 'admin_footer', '_gutenberg_add_field_modules_to_editor_script' );
 
 /**
+ * Requires a file in a scope of its own, and returns what it returns.
+ *
+ * @param string $file The path of the file.
+ * @return mixed What the file returns.
+ */
+function _gutenberg_require_file( $file ) {
+	return require $file;
+}
+
+/**
  * Returns the fields of a field collection.
  *
  * A collection holds a folder per field, whose `field.php` returns the
@@ -169,7 +179,7 @@ function gutenberg_get_field_collection_fields( $directory ) {
 
 	$fields = array();
 	foreach ( $files as $file ) {
-		$field = require $file;
+		$field = _gutenberg_require_file( $file );
 		if ( ! is_array( $field ) ) {
 			continue;
 		}
@@ -196,7 +206,7 @@ function gutenberg_get_field_collection_fields( $directory ) {
 function _gutenberg_get_field_collection( $directory ) {
 	$slug   = basename( $directory );
 	$file   = $directory . '/index.php';
-	$config = is_file( $file ) ? require $file : null;
+	$config = is_file( $file ) ? _gutenberg_require_file( $file ) : null;
 	$error  = null;
 
 	if ( ! is_array( $config ) ) {
@@ -235,7 +245,8 @@ function _gutenberg_get_field_collection( $directory ) {
  *
  * A collection is a folder whose `index.php` returns its configuration, with
  * a folder per field whose `field.php` returns the serializable part of the
- * field (see {@see gutenberg_get_field_collection_fields()}). The
+ * field (see {@see gutenberg_get_field_collection_fields()}). Each file
+ * runs in a scope of its own. The
  * JavaScript parts of the fields, if any, ship in the script module of the
  * collection. The configuration is an array with these keys:
  *
