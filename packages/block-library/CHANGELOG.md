@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 11.2.0 (2026-10-07)
+
 ### Enhancements
 
 -   Navigation Link: Search every entity type from the link UI instead of only the link's own type; so a category, tag or post can be added without needing to add that specific type's navigation link block ([#83408](https://github.com/WordPress/gutenberg/pull/83408)).
@@ -14,6 +16,7 @@
 -   Icon: Match an icon's keywords as well as its name and label when searching the icon library ([#82367](https://github.com/WordPress/gutenberg/pull/82367)).
 -   Button: Only open the link popover from the toolbar button or keyboard shortcut instead of whenever a linked button is selected. The toolbar button now shows a pressed state when a link is set ([#30166](https://github.com/WordPress/gutenberg/pull/30166)).
 -   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
+-   Image, Cover: Restore the previous attachment with snackbar Undo, including attachment-derived Image attributes while preserving Cover settings ([#81805](https://github.com/WordPress/gutenberg/pull/81805)).
 
 ### Bug Fixes
 

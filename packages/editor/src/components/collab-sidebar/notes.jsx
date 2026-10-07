@@ -128,8 +128,6 @@ export function Notes( {
 			sidebarRef,
 		} );
 
-	const hasThreads = Array.isArray( threads ) && threads.length > 0;
-
 	const navigate = ( event, thread, isSelected ) => {
 		if ( event.defaultPrevented ) {
 			return;
@@ -191,14 +189,11 @@ export function Notes( {
 				( thread ) =>
 					thread.status === 'approved' && !! thread.blockClientId
 			);
+	const isAddingNote =
+		! isFloating && selectedNote === 'new' && !! selectedBlockClientId;
 
-	// When filters hide every thread, say so instead of offering a new note.
-	const emptyState =
-		isFiltered && selectedNote !== 'new' ? (
-			<Text render={ <p /> }>{ __( 'No notes found.' ) }</Text>
-		) : (
-			<AddNote onSubmit={ onAddReply } sidebarRef={ sidebarRef } />
-		);
+	// When filters hide every thread, say so instead of an empty list.
+	const showNoResults = isFiltered && ! isAddingNote && ! threads.length;
 
 	return (
 		<Stack
@@ -218,60 +213,59 @@ export function Notes( {
 				isFloating ? __( 'Unresolved notes' ) : __( 'All notes' )
 			}
 		>
-			{ ! hasThreads && ! isFloating ? (
-				emptyState
-			) : (
-				<>
-					{ ! isFloating && selectedNote === 'new' && (
-						<AddNote
-							onSubmit={ onAddReply }
-							sidebarRef={ sidebarRef }
-						/>
-					) }
-					{ threads.map( ( thread, index ) => (
-						<Fragment key={ thread.id }>
-							{ index === firstResolvedIndex && (
-								<Stack
-									direction="row"
-									align="center"
-									justify="center"
-									gap="sm"
-									className="editor-collab-sidebar-panel__status-separator"
-								>
-									<Text variant="heading-sm" render={ <p /> }>
-										{ __( 'Resolved' ) }
-									</Text>
-								</Stack>
-							) }
-							<NoteThread
-								note={ thread }
-								onAddReply={ onAddReply }
-								onDeleteNote={ handleDelete }
-								onEditNote={ onEditNote }
-								isSelected={ selectedNote === thread.id }
-								sidebarRef={ sidebarRef }
-								floating={
-									isFloating
-										? {
-												y: notePositions[ thread.id ],
-												height: heights[ thread.id ],
-												registerThread,
-												unregisterThread,
-											}
-										: undefined
-								}
-								onKeyDown={ ( event ) =>
-									navigate(
-										event,
-										thread,
-										selectedNote === thread.id
-									)
-								}
-							/>
-						</Fragment>
-					) ) }
-				</>
+			{ showNoResults && (
+				<Text render={ <p /> }>{ __( 'No notes found.' ) }</Text>
 			) }
+			{ isAddingNote && (
+				<AddNote
+					key={ selectedBlockClientId }
+					clientId={ selectedBlockClientId }
+					onSubmit={ onAddReply }
+					sidebarRef={ sidebarRef }
+				/>
+			) }
+			{ threads.map( ( thread, index ) => (
+				<Fragment key={ thread.id }>
+					{ index === firstResolvedIndex && (
+						<Stack
+							direction="row"
+							align="center"
+							justify="center"
+							gap="sm"
+							className="editor-collab-sidebar-panel__status-separator"
+						>
+							<Text variant="heading-sm" render={ <p /> }>
+								{ __( 'Resolved' ) }
+							</Text>
+						</Stack>
+					) }
+					<NoteThread
+						note={ thread }
+						onAddReply={ onAddReply }
+						onDeleteNote={ handleDelete }
+						onEditNote={ onEditNote }
+						isSelected={ selectedNote === thread.id }
+						sidebarRef={ sidebarRef }
+						floating={
+							isFloating
+								? {
+										y: notePositions[ thread.id ],
+										height: heights[ thread.id ],
+										registerThread,
+										unregisterThread,
+									}
+								: undefined
+						}
+						onKeyDown={ ( event ) =>
+							navigate(
+								event,
+								thread,
+								selectedNote === thread.id
+							)
+						}
+					/>
+				</Fragment>
+			) ) }
 		</Stack>
 	);
 }
