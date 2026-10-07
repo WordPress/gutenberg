@@ -6,11 +6,23 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### New Features
+
+-   Add `--wpds-color-foreground-content-neutral-strong` for headings and other content with strong emphasis. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
+
+### Enhancements
+
+-   Swap resting and active backgrounds for strong neutral controls. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
+-   Generate perception-aware color ramps with ordered surface and stroke progressions, preserve available surface spacing near black and white, align normal content with resting interactive colors, use the fifth foreground step for strong content and interaction states, and keep WCAG contrast floors unchanged. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
+
+### Internal
+
+-   Register color spaces only when calculating colors, avoiding module-import side effects. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
+
 ## 2.3.0 (2026-10-07)
 
 ### New Features
 
--   Add `--wpds-color-foreground-content-neutral-strong` for headings and other content with strong emphasis. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 -   Add `--wpds-color-background-thumb-neutral` for neutral progress indicators. ([#83781](https://github.com/WordPress/gutenberg/pull/83781))
 
 ### Bug Fixes
@@ -20,15 +32,9 @@
 -   Preserve Lightning CSS `from global` references and keep nested fallback variables global when injecting design token fallbacks ([#83359](https://github.com/WordPress/gutenberg/pull/83359)).
 -   Mark the `react` and `react-dom` peer dependencies as optional, since the design tokens and build tool plugins do not need them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
 
-### Enhancements
-
--   Swap resting and active backgrounds for strong neutral controls. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
--   Generate perception-aware color ramps with ordered surface and stroke progressions, preserve available surface spacing near black and white, align normal content with resting interactive colors, use the fifth foreground step for strong content and interaction states, and keep WCAG contrast floors unchanged. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
-
 ### Internal
 
 -   Generate and commit complete border radius and width tokens for Figma mode imports during the theme build. ([#84035](https://github.com/WordPress/gutenberg/pull/84035))
--   Register color spaces only when calculating colors, avoiding module-import side effects. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 -   Update the Vite development dependency to 8.3.2 ([#83992](https://github.com/WordPress/gutenberg/pull/83992)).
 -   Update the Vite development dependency to 8.3.1. ([#83569](https://github.com/WordPress/gutenberg/pull/83569))
 -   Restore color-scale Storybook accessibility checks with labeled color samples, readable seed labels, and keyboard scrolling ([#83358](https://github.com/WordPress/gutenberg/pull/83358)).
