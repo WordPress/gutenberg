@@ -8,6 +8,7 @@ import {
 	vi,
 } from 'vitest';
 import { render, act } from '@testing-library/react';
+import apiFetch from '@wordpress/api-fetch';
 import { useEffect } from '@wordpress/element';
 import { createRegistry, RegistryProvider, select } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -65,6 +66,10 @@ vi.mock( import( '../provider' ), async ( importOriginal ) => {
 const TEST_BLOCK_NAME = 'core/test-content-reconciler';
 
 beforeAll( () => {
+	// The real core-data store resolves selectors over REST, and jsdom has no
+	// server: a failed request can reject after its test ends and fail the run.
+	// Leave requests pending so the records each test seeds are the only data.
+	apiFetch.setFetchHandler( () => new Promise( () => {} ) );
 	registerSuggestionFormat();
 	registerBlockType( TEST_BLOCK_NAME, {
 		apiVersion: 3,
