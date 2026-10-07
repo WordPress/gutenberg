@@ -214,11 +214,17 @@ We recommend configuring your editor to automatically check for syntax and lint 
 
 ### Visual Studio Code
 
-If you use Visual Studio Code or Cursor, the repository ships a managed workspace configuration so the editor uses the same linting, formatting, PHP, and TypeScript tooling as the Gutenberg repository. The first time you open the folder, VS Code prompts you to install the [recommended extensions](https://github.com/WordPress/gutenberg/blob/HEAD/.vscode/extensions.json) and to allow an automatic task that copies [`.vscode/settings.dist.jsonc`](https://github.com/WordPress/gutenberg/blob/HEAD/.vscode/settings.dist.jsonc) to `.vscode/settings.json`. Allow both. When the TypeScript 7 extension then asks whether to use the TypeScript 7 tsdk this workspace configures, choose **Allow**; otherwise it keeps using its bundled version.
+If you use Visual Studio Code, the repository ships a managed workspace configuration so the editor uses the same linting, formatting, PHP, and TypeScript tooling as the Gutenberg repository. The first time you open the folder, VS Code prompts you to install the [recommended extensions](https://github.com/WordPress/gutenberg/blob/HEAD/.vscode/extensions.json) and to allow an automatic task that copies [`.vscode/settings.dist.jsonc`](https://github.com/WordPress/gutenberg/blob/HEAD/.vscode/settings.dist.jsonc) to `.vscode/settings.json`. Allow both. When the TypeScript 7 extension then asks whether to use the TypeScript 7 tsdk this workspace configures, choose **Allow**; otherwise it keeps using its bundled version.
 
 The installer replaces `settings.json` whenever its first line is `// This is a managed VS Code settings file.`, so edits made there are lost the next time the folder opens or the installer runs. To keep your own settings, delete that line; the installer then leaves the file alone. You can re-run it at any time from the Command Palette via **Tasks: Run Task → Install VS Code settings**.
 
 The settings point the TypeScript extension at the workspace that installs TypeScript 7, because it is not installed in the root `node_modules`. If you maintain your own settings, copy `js/ts.tsdk.path` and `js/ts.experimental.useTsgo` from the template.
+
+### Cursor
+
+Cursor uses the same `.vscode` settings and recommendations. Follow the [Visual Studio Code setup](#visual-studio-code) above. In Cursor's Extensions view, search for `@id:TypeScriptTeam.native-preview` and make sure the **TypeScript 7** extension is installed and enabled. [Cursor uses its own marketplace proxy](https://cursor.com/help/customization/extensions), where extension availability can differ from Open VSX.
+
+Open a JavaScript or TypeScript file to activate the extension, then choose **Allow** if it prompts you to use the workspace TypeScript 7 version. If the prompt does not appear, run **TypeScript: Select TypeScript Version...** from the Command Palette and select **Use Workspace Version** with the path `tools/build-scripts/node_modules/@typescript/native/lib`.
 
 ### Zed
 
