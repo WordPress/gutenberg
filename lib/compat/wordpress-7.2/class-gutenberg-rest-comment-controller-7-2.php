@@ -270,6 +270,35 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		return parent::update_item_permissions_check( $request );
 	}
 
+	/**
+	 * Checks if a given request has access to delete a comment.
+	 *
+	 * Anyone who can edit a note's post can edit the note, and core's delete
+	 * check follows that, but a reaction belongs to the user who added it:
+	 * only they can take it back.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has access to delete the item, error object otherwise.
+	 */
+	public function delete_item_permissions_check( $request ) {
+		$comment = $this->get_comment( $request['id'] );
+		if ( is_wp_error( $comment ) ) {
+			return $comment;
+		}
+
+		if ( 'reaction' === $comment->comment_type && get_current_user_id() !== (int) $comment->user_id ) {
+			return new WP_Error(
+				'rest_cannot_delete',
+				__( 'Sorry, you can only remove your own reactions.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		return parent::delete_item_permissions_check( $request );
+	}
+
 	public function create_item_permissions_check( $request ) {
 		$is_note = ! empty( $request['type'] ) && $this->is_note_or_reaction( $request['type'] );
 
@@ -476,6 +505,24 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				return new WP_Error(
 					'rest_comment_invalid_parent',
 					__( 'A reaction cannot be added to a trashed or spam note.', 'gutenberg' ),
+					array( 'status' => 400 )
+				);
+			}
+
+			// Resolving a thread approves its root note, and the editor
+			// disables reactions from then on; hold stale tabs to that too.
+			$thread_root = $parent_comment;
+			while ( $thread_root->comment_parent ) {
+				$ancestor = get_comment( $thread_root->comment_parent );
+				if ( ! $ancestor ) {
+					break;
+				}
+				$thread_root = $ancestor;
+			}
+			if ( '1' === $thread_root->comment_approved ) {
+				return new WP_Error(
+					'rest_comment_invalid_parent',
+					__( 'A reaction cannot be added to a resolved note.', 'gutenberg' ),
 					array( 'status' => 400 )
 				);
 			}
