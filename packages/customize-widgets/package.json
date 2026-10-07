@@ -38,6 +38,7 @@
 	},
 	"wpScript": true,
 	"dependencies": {
+		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/admin-ui": "file:../admin-ui",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/block-editor": "file:../block-editor",
@@ -68,7 +69,7 @@
 		"@testing-library/dom": "^10.4.2",
 		"@testing-library/react": "^16.3.3",
 		"@testing-library/user-event": "^14.6.1",
-		"vitest": "^5.0.0"
+		"vitest": "^5.0.3"
 	},
 	"peerDependencies": {
 		"react": "^18 || ^19",
