@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
+
 ### Enhancements
 
 -   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
