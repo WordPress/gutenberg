@@ -23,14 +23,13 @@ export default function RevisionBlockDiffPanel() {
 	const changedAttributes =
 		block.attributes?.__revisionDiffStatus?.changedAttributes;
 	const imageComparison =
-		block.name === 'core/image' &&
 		block.attributes?.__revisionDiffStatus?.imageComparison;
 
 	return (
 		<>
 			{ imageComparison && (
 				<ImageRevisionComparison
-					key={ `${ imageComparison.before.clientId }:${ imageComparison.after.clientId }` }
+					key="image-comparison"
 					{ ...imageComparison }
 				/>
 			) }
