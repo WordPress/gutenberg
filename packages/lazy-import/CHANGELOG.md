@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Restore the package entry point. The TypeScript migration ([#70475](https://github.com/WordPress/gutenberg/pull/70475)) left `main` pointing at a `lib/index.js` that was no longer built, so the package could not be required. It now compiles to `build/index.cjs` like the other packages, and the `.` export gains a `types` condition ([#84164](https://github.com/WordPress/gutenberg/pull/84164)).
+-   Restore the package entry point. The TypeScript migration ([#70475](https://github.com/WordPress/gutenberg/pull/70475)) left `main` pointing at a `lib/index.js` that was no longer built, so the package could not be required. It now compiles to `build/index.cjs` like the other packages, `require()` still returns the function itself, and the `.` export gains a `types` condition ([#84164](https://github.com/WordPress/gutenberg/pull/84164)).
 
 ### Internal
 
