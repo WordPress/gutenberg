@@ -623,37 +623,20 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 		$result = new WP_Theme_JSON_Gutenberg();
 		$result->merge( static::get_core_data() );
-		if ( 'default' === $origin ) {
-			return static::cache_merged_data( $origin, $result );
+		if ( 'default' !== $origin ) {
+			$result->merge( static::get_block_data() );
+		}
+		if ( 'theme' === $origin || 'custom' === $origin ) {
+			$result->merge( static::get_theme_data() );
+		}
+		if ( 'custom' === $origin ) {
+			$result->merge( static::get_user_data() );
 		}
 
-		$result->merge( static::get_block_data() );
-		if ( 'blocks' === $origin ) {
-			return static::cache_merged_data( $origin, $result );
-		}
+		static::$merged[ $origin ] = $result;
 
-		$result->merge( static::get_theme_data() );
-		if ( 'theme' === $origin ) {
-			return static::cache_merged_data( $origin, $result );
-		}
-
-		$result->merge( static::get_user_data() );
-		return static::cache_merged_data( $origin, $result );
-	}
-
-	/**
-	 * Stores the merged data for an origin and returns a copy of it.
-	 *
-	 * Return a clone so callers can modify the result without changing the cache.
-	 *
-	 * @param string                 $origin     Origin the data was merged for.
-	 * @param WP_Theme_JSON_Gutenberg $theme_json Merged data.
-	 * @return WP_Theme_JSON_Gutenberg Copy of the merged data.
-	 */
-	protected static function cache_merged_data( $origin, $theme_json ) {
-		static::$merged[ $origin ] = $theme_json;
-
-		return clone $theme_json;
+		// Return a clone so callers can modify the result without changing the cache.
+		return clone $result;
 	}
 
 	/**
