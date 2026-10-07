@@ -1123,7 +1123,7 @@ describe( 'TypographyPanel text gradient', () => {
 		} );
 
 		expect( backgroundOverrideNotice( container ) ).toHaveTextContent(
-			'Setting a text gradient clips the background color to the text.'
+			'Setting a text gradient clips the background to the text, including any color or image.'
 		);
 	} );
 
@@ -1135,7 +1135,23 @@ describe( 'TypographyPanel text gradient', () => {
 		} );
 
 		expect( backgroundOverrideNotice( container ) ).toHaveTextContent(
-			'Setting a text gradient clips the background color to the text.'
+			'Setting a text gradient clips the background to the text, including any color or image.'
+		);
+	} );
+
+	it( 'warns that a background image will be clipped to the text the same way', async () => {
+		const { container } = await renderPanel( {
+			settings: gradientSettings,
+			defaultControls: shownControls,
+			value: {
+				background: {
+					backgroundImage: { url: 'https://example.com/image.jpg' },
+				},
+			},
+		} );
+
+		expect( backgroundOverrideNotice( container ) ).toHaveTextContent(
+			'Setting a text gradient clips the background to the text, including any color or image.'
 		);
 	} );
 

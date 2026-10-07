@@ -3963,17 +3963,17 @@ class WP_Theme_JSON_Gutenberg {
 			return array();
 		}
 
-		$state_keys = static::get_style_state_keys( $settings );
-		$positions  = array();
-		foreach ( $path as $index => $segment ) {
-			if ( in_array( $segment, $state_keys, true ) ) {
-				$positions[] = $index;
-			}
-		}
-
+		$state_keys  = static::get_style_state_keys( $settings );
+		$base_path   = $path;
 		$base_styles = array();
-		for ( $drop = 1, $total = count( $positions ); $drop <= $total; $drop++ ) {
-			$layer = _wp_array_get( $tree, array_values( array_diff_key( $path, array_flip( array_slice( $positions, -$drop ) ) ) ) );
+
+		foreach ( array_reverse( array_keys( $path ) ) as $index ) {
+			if ( ! in_array( $path[ $index ], $state_keys, true ) ) {
+				continue;
+			}
+
+			unset( $base_path[ $index ] );
+			$layer = _wp_array_get( $tree, array_values( $base_path ) );
 			if ( is_array( $layer ) ) {
 				$base_styles[] = $layer;
 			}
