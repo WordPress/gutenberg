@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.24.0 (2026-10-07)
+
 ### New Features
 
 -   Accept `background.backgroundClip` as a valid theme.json setting ([#77141](https://github.com/WordPress/gutenberg/pull/77141)).

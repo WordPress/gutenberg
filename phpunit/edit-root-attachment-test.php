@@ -56,9 +56,9 @@ class Gutenberg_Edit_Root_Attachment_Test extends WP_UnitTestCase {
 		return $response->get_data();
 	}
 
-	public function test_get_edit_root_attachment_id_returns_self_without_lineage() {
+	public function test_get_edit_root_attachment_id_returns_zero_without_lineage() {
 		$id = $this->make_attachment();
-		$this->assertSame( $id, gutenberg_get_edit_root_attachment_id( $id ) );
+		$this->assertSame( 0, gutenberg_get_edit_root_attachment_id( $id ) );
 	}
 
 	public function test_get_edit_root_attachment_id_returns_recorded_edit_root() {
@@ -73,10 +73,11 @@ class Gutenberg_Edit_Root_Attachment_Test extends WP_UnitTestCase {
 		$request->set_param( 'context', 'edit' );
 		$response = rest_do_request( $request );
 
-		$this->assertSame( 0, $response->get_data()['edit_root'] );
+		$this->assertSame( 0, $response->get_data()['edit_root'], 'An uploaded image should report no edit root.' );
 		$this->assertArrayNotHasKey(
 			'https://api.w.org/edit-root',
-			$response->get_links()
+			$response->get_links(),
+			'An uploaded image should carry no edit root link.'
 		);
 	}
 
@@ -87,9 +88,9 @@ class Gutenberg_Edit_Root_Attachment_Test extends WP_UnitTestCase {
 		$controller = new WP_REST_Attachments_Controller( 'attachment' );
 		$properties = $controller->get_item_schema()['properties'];
 
-		$this->assertArrayHasKey( 'edit_root', $properties );
-		$this->assertSame( 'integer', $properties['edit_root']['type'] );
-		$this->assertSame( array( 'edit' ), $properties['edit_root']['context'] );
+		$this->assertArrayHasKey( 'edit_root', $properties, 'The edit root should be registered in the schema.' );
+		$this->assertSame( 'integer', $properties['edit_root']['type'], 'The edit root should be typed as an integer.' );
+		$this->assertSame( array( 'edit' ), $properties['edit_root']['context'], 'The edit root should be exposed in the edit context only.' );
 	}
 
 	public function test_recorded_edit_root_id_surfaces_in_response() {
@@ -97,8 +98,8 @@ class Gutenberg_Edit_Root_Attachment_Test extends WP_UnitTestCase {
 		$child     = $this->make_attachment( $edit_root );
 
 		$data = $this->get_response_data( $child );
-		$this->assertArrayHasKey( 'edit_root', $data );
-		$this->assertSame( $edit_root, $data['edit_root'] );
+		$this->assertArrayHasKey( 'edit_root', $data, 'An edited image should report an edit root.' );
+		$this->assertSame( $edit_root, $data['edit_root'], 'The edit root should be the recorded attachment.' );
 	}
 
 	public function test_edit_root_link_is_embeddable() {
@@ -110,21 +111,22 @@ class Gutenberg_Edit_Root_Attachment_Test extends WP_UnitTestCase {
 		$response = rest_do_request( $request );
 
 		$links = $response->get_links();
-		$this->assertArrayHasKey( 'https://api.w.org/edit-root', $links );
+		$this->assertArrayHasKey( 'https://api.w.org/edit-root', $links, 'An edited image should carry an edit root link.' );
 		// `rest_prepare_attachment` fires twice per attachment; the
 		// filter must not add the link twice.
-		$this->assertCount( 1, $links['https://api.w.org/edit-root'] );
+		$this->assertCount( 1, $links['https://api.w.org/edit-root'], 'The edit root link should be added only once.' );
 
 		$link = $links['https://api.w.org/edit-root'][0];
-		$this->assertStringEndsWith( '/wp/v2/media/' . $edit_root, $link['href'] );
-		$this->assertTrue( $link['attributes']['embeddable'] );
+		$this->assertStringEndsWith( '/wp/v2/media/' . $edit_root, $link['href'], 'The link should point at the edit root.' );
+		$this->assertTrue( $link['attributes']['embeddable'], 'The link should be embeddable.' );
 
 		// The curie-compacted rel hydrates under `_embedded` with `?_embed`.
 		$embedded = rest_get_server()->response_to_data( $response, true );
-		$this->assertCount( 1, $embedded['_embedded']['wp:edit-root'] );
+		$this->assertCount( 1, $embedded['_embedded']['wp:edit-root'], 'Embedding should hydrate exactly one edit root.' );
 		$this->assertSame(
 			$edit_root,
-			$embedded['_embedded']['wp:edit-root'][0]['id']
+			$embedded['_embedded']['wp:edit-root'][0]['id'],
+			'Embedding should hydrate the edit root alongside the edited image.'
 		);
 	}
 
@@ -142,10 +144,15 @@ class Gutenberg_Edit_Root_Attachment_Test extends WP_UnitTestCase {
 
 		// The field trusts the stored meta; the link is only advertised
 		// when the target exists and is readable.
-		$this->assertSame( 123456789, $response->get_data()['edit_root'] );
+		$this->assertSame(
+			123456789,
+			$response->get_data()['edit_root'],
+			'The field should report the recorded ID even when the edit root is gone.'
+		);
 		$this->assertArrayNotHasKey(
 			'https://api.w.org/edit-root',
-			$response->get_links()
+			$response->get_links(),
+			'The link should be omitted when the edit root is gone.'
 		);
 	}
 
@@ -187,10 +194,11 @@ class Gutenberg_Edit_Root_Attachment_Test extends WP_UnitTestCase {
 		$request->set_param( 'context', 'view' );
 		$response = rest_do_request( $request );
 
-		$this->assertArrayNotHasKey( 'edit_root', $response->get_data() );
+		$this->assertArrayNotHasKey( 'edit_root', $response->get_data(), 'The field should be omitted in the view context.' );
 		$this->assertArrayNotHasKey(
 			'https://api.w.org/edit-root',
-			$response->get_links()
+			$response->get_links(),
+			'The link should be omitted in the view context.'
 		);
 	}
 
@@ -199,7 +207,12 @@ class Gutenberg_Edit_Root_Attachment_Test extends WP_UnitTestCase {
 		update_post_meta( $id, GUTENBERG_EDIT_ROOT_ATTACHMENT_ID_META_KEY, $id );
 
 		$data = $this->get_response_data( $id );
-		$this->assertSame( 0, $data['edit_root'] );
+		$this->assertSame(
+			0,
+			gutenberg_get_edit_root_attachment_id( $id ),
+			'A record pointing at the attachment itself should resolve to no edit root.'
+		);
+		$this->assertSame( 0, $data['edit_root'], 'The field should report no edit root.' );
 	}
 
 	public function test_edit_hook_inherits_grandparent_edit_root() {
@@ -253,7 +266,8 @@ class Gutenberg_Edit_Root_Attachment_Test extends WP_UnitTestCase {
 				$child,
 				GUTENBERG_EDIT_ROOT_ATTACHMENT_ID_META_KEY,
 				true
-			)
+			),
+			'The child should point at its edit root before the delete.'
 		);
 
 		wp_delete_attachment( $edit_root, true );
@@ -261,7 +275,8 @@ class Gutenberg_Edit_Root_Attachment_Test extends WP_UnitTestCase {
 
 		$this->assertSame(
 			'',
-			get_post_meta( $child, GUTENBERG_EDIT_ROOT_ATTACHMENT_ID_META_KEY, true )
+			get_post_meta( $child, GUTENBERG_EDIT_ROOT_ATTACHMENT_ID_META_KEY, true ),
+			'Deleting the edit root should clear the record on the child.'
 		);
 	}
 
@@ -282,13 +297,15 @@ class Gutenberg_Edit_Root_Attachment_Test extends WP_UnitTestCase {
 				$child_b,
 				GUTENBERG_EDIT_ROOT_ATTACHMENT_ID_META_KEY,
 				true
-			)
+			),
+			'Deleting an unrelated edit root should leave the record alone.'
 		);
 
 		// child_a's pointer cleared.
 		$this->assertSame(
 			'',
-			get_post_meta( $child_a, GUTENBERG_EDIT_ROOT_ATTACHMENT_ID_META_KEY, true )
+			get_post_meta( $child_a, GUTENBERG_EDIT_ROOT_ATTACHMENT_ID_META_KEY, true ),
+			'Deleting the edit root should clear the record on its child.'
 		);
 	}
 }
