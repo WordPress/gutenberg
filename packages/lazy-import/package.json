@@ -22,16 +22,20 @@
 		"node": ">=18.12.0"
 	},
 	"files": [
+		"build",
 		"build-types",
-		"lib",
+		"src",
 		"*.md"
 	],
-	"main": "lib/index.js",
+	"main": "build/index.cjs",
 	"exports": {
-		".": "./lib/index.js",
+		".": {
+			"types": "./build-types/index.d.ts",
+			"default": "./build/index.cjs"
+		},
 		"./package.json": "./package.json"
 	},
-	"types": "build-types",
+	"types": "build-types/index.d.ts",
 	"dependencies": {
 		"execa": "^4.0.2",
 		"npm-package-arg": "^8.1.5",
