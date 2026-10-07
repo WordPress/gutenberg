@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 11.2.0 (2026-10-07)
+
 ### Enhancements
 
 -   Navigation Link: Search every entity type from the link UI instead of only the link's own type; so a category, tag or post can be added without needing to add that specific type's navigation link block ([#83408](https://github.com/WordPress/gutenberg/pull/83408)).
