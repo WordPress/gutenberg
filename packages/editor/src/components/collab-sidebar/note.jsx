@@ -17,16 +17,15 @@ function NoteActionsMenu( { items, buttonRef } ) {
 			// Let outside interactions reach the note thread's focus-out
 			// handling so it can clear the selection.
 			modal={ false }
-			disabled={ ! items.length }
 		>
 			<Menu.Trigger
+				disabled={ ! items.length }
 				render={
 					<Button
 						ref={ buttonRef }
 						size="small"
 						icon={ moreVertical }
 						label={ __( 'Actions' ) }
-						disabled={ ! items.length }
 						accessibleWhenDisabled
 					/>
 				}
@@ -100,7 +99,7 @@ export function Note( {
 			id: 'reopen',
 			title: _x( 'Reopen', 'Reopen note' ),
 			isEligible: ( { status } ) => canResolve && hasResolved( status ),
-			onClick: () => onEditNote( { id: note.id, status: 'hold' } ),
+			onClick: () => onEditNote( note, { status: 'hold' } ),
 		},
 		{
 			id: 'delete',
@@ -131,8 +130,7 @@ export function Note( {
 		body = (
 			<NoteForm
 				onSubmit={ async ( value ) => {
-					const saved = await onEditNote( {
-						id: note.id,
+					const saved = await onEditNote( note, {
 						content: value,
 					} );
 					// Keep the form open on failure so the edit isn't lost.

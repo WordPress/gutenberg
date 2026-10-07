@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { Spinner } from '@wordpress/components';
+import { inertValue } from '@wordpress/react-inert-value';
 import { Stack } from '@wordpress/ui';
 import type { ViewActivityProps } from '../../../types';
 import getDataByGroup from '../utils/get-data-by-group';
@@ -53,7 +54,7 @@ export default function ViewActivity< Item >(
 				gap="sm"
 				className={ wrapperClassName }
 				// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
-				inert={ isInert ? 'true' : undefined }
+				inert={ inertValue( isInert ) }
 			>
 				{ groupedEntries.map(
 					( [ groupName, groupData ]: [ string, Item[] ] ) => (
@@ -82,7 +83,7 @@ export default function ViewActivity< Item >(
 				className={ wrapperClassName }
 				role={ view.infiniteScrollEnabled ? 'feed' : undefined }
 				// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
-				inert={ isInert ? 'true' : undefined }
+				inert={ inertValue( isInert ) }
 			>
 				<ActivityItems< Item > { ...props } />
 			</div>
