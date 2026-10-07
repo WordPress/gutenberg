@@ -58,7 +58,7 @@ interface EmojiPickerProps {
 	 * The button that opens the picker, passed to `Autocomplete.Trigger`
 	 * as its `render` element.
 	 */
-	trigger: ReactElement;
+	trigger: ReactElement< Record< string, unknown > >;
 	/**
 	 * Whether the trigger is disabled.
 	 */
@@ -452,7 +452,9 @@ export default function EmojiPicker( {
 					setQuery( '' );
 				}
 			} }
-			items={ items }
+			// Groups while browsing, a flat list while searching. Base UI takes
+			// either at runtime, but its overloads can't take the union.
+			items={ items as readonly EmojiOption[] }
 			filter={ null }
 			// Enter picks the top hit once the user has typed.
 			autoHighlight
