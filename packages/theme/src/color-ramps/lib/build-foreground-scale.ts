@@ -466,7 +466,7 @@ export function buildForegroundScale(
 						strongColor: strongEndpoint,
 						references: references[ step.name ],
 						target: step.contrast.target,
-				  } )
+					} )
 		);
 	}
 
