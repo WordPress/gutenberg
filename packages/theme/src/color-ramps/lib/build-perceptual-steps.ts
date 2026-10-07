@@ -116,7 +116,7 @@ function createAnchoredColorForStepAtPerceptualLightness( {
 				? 1
 				: clampUnitInterval(
 						( perceptualLightness - startLightness ) / distance
-				  );
+					);
 
 		return clampToGamut( {
 			space: OKLCH,
@@ -318,11 +318,11 @@ function rebuildSurfaces( ramp: BaseRampResult ) {
 			? Math.max(
 					evenlySpacedSurface4Lightness,
 					minimumSurface4Lightness
-			  )
+				)
 			: Math.min(
 					evenlySpacedSurface4Lightness,
 					minimumSurface4Lightness
-			  );
+				);
 	const surface5Lightness =
 		surface4Lightness + ( surface6Lightness - surface4Lightness ) / 2;
 	const targetLightnesses = {
