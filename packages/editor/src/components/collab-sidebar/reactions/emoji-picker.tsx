@@ -20,7 +20,7 @@ import {
 } from './emojibase-data';
 import type { EmojibaseEntry } from './emojibase-data';
 import { useFrequentEmojis } from './frequent-emojis';
-import { getCuratedLabel } from './reaction-emojis';
+import { emojiToHexKey, getCuratedLabel } from './reaction-emojis';
 import SkinTonePicker, { applySkinTone } from './skin-tone-picker';
 
 /**
@@ -67,6 +67,11 @@ interface EmojiPickerProps {
 	 * Accessible name for the picker popup.
 	 */
 	label: string;
+	/**
+	 * Hex keys of the emoji the current user has already reacted with,
+	 * marked in the grid.
+	 */
+	reactedHexKeys?: string[];
 	onSelect: ( emoji: string ) => void;
 }
 
@@ -78,6 +83,8 @@ interface EmojiPickerProps {
 export const SKIN_TONE_PREFERENCE_KEY = 'emojiPickerSkinTone';
 
 const COLUMNS = 6;
+
+const EMPTY_HEX_KEYS: string[] = [];
 
 /*
  * Unicode's Component group holds the skin-tone swatches and hair
@@ -215,16 +222,18 @@ export function searchEmojis(
  * strings go through `@wordpress/i18n`. Without a dataset (no URL
  * configured, or the fetch failed) the popup shows an error message.
  *
- * @param props          Component props.
- * @param props.trigger  The button that opens the picker.
- * @param props.disabled Whether the trigger is disabled.
- * @param props.label    Accessible name for the popup.
- * @param props.onSelect Called with the selected emoji character.
+ * @param props                Component props.
+ * @param props.trigger        The button that opens the picker.
+ * @param props.disabled       Whether the trigger is disabled.
+ * @param props.label          Accessible name for the popup.
+ * @param props.reactedHexKeys Hex keys of the user's own reactions.
+ * @param props.onSelect       Called with the selected emoji character.
  */
 export default function EmojiPicker( {
 	trigger,
 	disabled = false,
 	label,
+	reactedHexKeys = EMPTY_HEX_KEYS,
 	onSelect,
 }: EmojiPickerProps ) {
 	const [ isOpen, setIsOpen ] = useState( false );
@@ -359,24 +368,40 @@ export default function EmojiPicker( {
 				key={ rowIndex }
 				className="editor-collab-sidebar-panel__picker-row"
 			>
-				{ row.map( ( option ) => (
-					<Autocomplete.Item
-						key={ option.key }
-						value={ option }
-						className="editor-collab-sidebar-panel__picker-emoji"
-						aria-label={ option.label }
-						// Enter on the highlighted cell clicks it too.
-						onClick={ () => {
-							recordUse( option.hexKey );
-							setIsOpen( false );
-							onSelect( option.value );
-						} }
-					>
-						<Autocomplete.ItemLabel className="editor-collab-sidebar-panel__picker-emoji-label">
-							<span aria-hidden="true">{ option.value }</span>
-						</Autocomplete.ItemLabel>
-					</Autocomplete.Item>
-				) ) }
+				{ row.map( ( option ) => {
+					const isReacted = reactedHexKeys.includes(
+						emojiToHexKey( option.value )
+					);
+					return (
+						<Autocomplete.Item
+							key={ option.key }
+							value={ option }
+							className={ clsx(
+								'editor-collab-sidebar-panel__picker-emoji',
+								{ 'is-reacted': isReacted }
+							) }
+							aria-label={
+								isReacted
+									? sprintf(
+											/* translators: %s: emoji name. */
+											__( '%s, your reaction' ),
+											option.label
+										)
+									: option.label
+							}
+							// Enter on the highlighted cell clicks it too.
+							onClick={ () => {
+								recordUse( option.hexKey );
+								setIsOpen( false );
+								onSelect( option.value );
+							} }
+						>
+							<Autocomplete.ItemLabel className="editor-collab-sidebar-panel__picker-emoji-label">
+								<span aria-hidden="true">{ option.value }</span>
+							</Autocomplete.ItemLabel>
+						</Autocomplete.Item>
+					);
+				} ) }
 			</Autocomplete.Row>
 		) );
 

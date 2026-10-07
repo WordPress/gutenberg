@@ -87,8 +87,9 @@ export function Note( {
 	const canResolve = note.parent === 0;
 	const hasReactions = getReactedHexKeys( reactions ).length > 0;
 	// Not while editing: the trigger floats over the note's corner, which
-	// during an edit is the form's own text field.
-	const canReact = isSelected && actionState !== 'edit';
+	// during an edit is the form's own text field. Not on a resolved thread
+	// either, where reactions can no longer be toggled.
+	const canReact = isSelected && actionState !== 'edit' && ! isThreadResolved;
 	const metaStatus = note.meta?._wp_note_status;
 	const isResolutionNote =
 		metaStatus === 'resolved' || metaStatus === 'reopen';
@@ -264,7 +265,7 @@ export function Note( {
 								 */ }
 								{ canReact && (
 									<AddReactionButton
-										disabled={ isThreadResolved }
+										reactions={ reactions }
 										onToggleReaction={ toggleReaction }
 									/>
 								) }

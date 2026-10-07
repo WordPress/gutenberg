@@ -1449,11 +1449,9 @@ test.describe( 'Block Notes', () => {
 			} );
 			await expect( reactionPill ).toBeVisible();
 
-			// Resolving posts a "Marked as resolved" reply that carries its
-			// own add trigger, so the root note's is the first of the two.
-			const addReaction = sidebar
-				.getByRole( 'combobox', { name: 'Add reaction' } )
-				.first();
+			const addReaction = sidebar.getByRole( 'combobox', {
+				name: 'Add reaction',
+			} );
 			const resolveButton = sidebar.getByRole( 'button', {
 				name: 'Resolve',
 			} );
@@ -1464,15 +1462,15 @@ test.describe( 'Block Notes', () => {
 			await thread.click();
 			await expect( resolveButton ).toBeDisabled();
 
-			// A resolved thread is an archived conversation, so neither the
-			// add trigger nor the existing pill may still mutate reactions.
-			await expect( addReaction ).toBeDisabled();
+			// A resolved thread is an archived conversation: the add trigger
+			// is gone and the existing pill can no longer mutate reactions.
+			await expect( addReaction ).toHaveCount( 0 );
 			await expect( reactionPill ).toBeDisabled();
 
 			// Reopening the thread unlocks them again.
 			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Reopen' );
 			await expect( resolveButton ).toBeEnabled();
-			await expect( addReaction ).toBeEnabled();
+			await expect( addReaction.first() ).toBeEnabled();
 			await expect( reactionPill ).toBeEnabled();
 		} );
 
@@ -1508,7 +1506,8 @@ test.describe( 'Block Notes', () => {
 			 * Picking the same heart from the search results resolves to
 			 * the same key, so it toggles the existing reaction off rather
 			 * than adding a second pill. "heart" is a curated label, so the
-			 * exact match skips "smiling face with hearts".
+			 * exact match skips "smiling face with hearts", and the cell is
+			 * marked as the user's own reaction.
 			 */
 			await page
 				.getByRole( 'combobox', { name: 'Add reaction' } )
@@ -1516,7 +1515,10 @@ test.describe( 'Block Notes', () => {
 			await blockNoteUtils.waitForFullPicker();
 			await page.getByPlaceholder( 'Search emoji' ).fill( 'heart' );
 			await page
-				.getByRole( 'gridcell', { name: 'heart', exact: true } )
+				.getByRole( 'gridcell', {
+					name: 'heart, your reaction',
+					exact: true,
+				} )
 				.click();
 			await expect( reactionButton ).toHaveCount( 0 );
 		} );
@@ -1654,14 +1656,15 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'gridcell', { name: 'avocado', exact: true } )
 				.click();
 
-			// On reopening, the pick has joined the Frequently used section.
+			// On reopening, the pick has joined the Frequently used section,
+			// marked as the user's own reaction.
 			await page
 				.getByRole( 'combobox', { name: 'Add reaction' } )
 				.click();
 			await blockNoteUtils.waitForFullPicker();
 			await expect(
 				frequentSection.getByRole( 'gridcell', {
-					name: 'avocado',
+					name: 'avocado, your reaction',
 					exact: true,
 				} )
 			).toBeVisible();
