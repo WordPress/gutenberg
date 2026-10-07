@@ -165,6 +165,203 @@ function gutenberg_exclude_notes_from_comment_count_7_2( $new_count, $old_count,
 add_filter( 'pre_wp_update_comment_count_now', 'gutenberg_exclude_notes_from_comment_count_7_2', 10, 3 );
 
 /**
+ * Formats an emoji hex key in the reaction storage form: lowercase, each
+ * code point padded to four digits, U+FE0F stripped. Accepts Emojibase
+ * hexcodes (`2764-FE0F`) and stored keys.
+ *
+ * @since 7.2.0
+ *
+ * @param string $hex_key Hex code points joined by `-`.
+ * @return string The formatted hex key, or empty string when invalid.
+ */
+function gutenberg_format_note_reaction_hex_key( $hex_key ) {
+	if ( ! is_string( $hex_key ) || ! preg_match( '/^[0-9a-f]{1,6}(-[0-9a-f]{1,6})*$/i', $hex_key ) ) {
+		return '';
+	}
+	$parts = array();
+	foreach ( explode( '-', strtolower( $hex_key ) ) as $part ) {
+		if ( 0xFE0F === hexdec( $part ) ) {
+			continue;
+		}
+		$parts[] = str_pad( $part, 4, '0', STR_PAD_LEFT );
+	}
+	return implode( '-', $parts );
+}
+
+/**
+ * Reduces an emoji hex key to its base emoji: formatted as in
+ * gutenberg_format_note_reaction_hex_key(), with skin-tone modifiers
+ * stripped, so a rule for an emoji covers its skin-tone variants.
+ *
+ * @since 7.2.0
+ *
+ * @param string $hex_key Hex code points joined by `-`.
+ * @return string The base emoji's hex key, or empty string when invalid.
+ */
+function gutenberg_normalize_note_reaction_hex_key( $hex_key ) {
+	$formatted = gutenberg_format_note_reaction_hex_key( $hex_key );
+	if ( '' === $formatted ) {
+		return '';
+	}
+	$parts = array();
+	foreach ( explode( '-', $formatted ) as $part ) {
+		$value = hexdec( $part );
+		// The five Fitzpatrick skin-tone modifiers.
+		if ( $value >= 0x1F3FB && $value <= 0x1F3FF ) {
+			continue;
+		}
+		$parts[] = $part;
+	}
+	return implode( '-', $parts );
+}
+
+/**
+ * Returns the note reaction emoji settings: the named emoji list plus the
+ * rules for which other emoji the picker offers and the REST API accepts.
+ *
+ * @since 7.2.0
+ *
+ * @return array {
+ *     @type array[]  $emojis         Named emoji, each with a `hexcode` key
+ *                                    in storage form and a `label`.
+ *     @type bool     $allow_unlisted Whether emoji outside the named list are accepted.
+ *     @type string[] $exclude        Base hex keys that are never accepted.
+ * }
+ */
+function gutenberg_get_note_reaction_emoji_settings() {
+	$default_emojis = array(
+		array(
+			'hexcode' => '2764',
+			'label'   => _x( 'Heart', 'emoji reaction', 'gutenberg' ),
+		),
+		array(
+			'hexcode' => '1F389',
+			'label'   => _x( 'Celebration', 'emoji reaction', 'gutenberg' ),
+		),
+		array(
+			'hexcode' => '1F604',
+			'label'   => _x( 'Smile', 'emoji reaction', 'gutenberg' ),
+		),
+		array(
+			'hexcode' => '1F440',
+			'label'   => _x( 'Eyes', 'emoji reaction', 'gutenberg' ),
+		),
+		array(
+			'hexcode' => '1F680',
+			'label'   => _x( 'Rocket', 'emoji reaction', 'gutenberg' ),
+		),
+	);
+
+	/**
+	 * Filters which emoji note reactions offer and accept.
+	 *
+	 * Named emoji seed the picker's "Frequently used" section, carry their
+	 * own labels, and are always accepted. `allow_unlisted` and `exclude`
+	 * apply to every other emoji in the picker.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param array $settings {
+	 *     @type array[]  $emojis         Named emoji. Each item has a `hexcode`
+	 *                                    (Emojibase form, such as `1F984`) and
+	 *                                    a `label`.
+	 *     @type bool     $allow_unlisted Whether any emoji from the picker is
+	 *                                    accepted. False limits reactions to the
+	 *                                    named list. Default true.
+	 *     @type string[] $exclude        Emojibase hexcodes to reject, such as
+	 *                                    `1F595`. Excluding an emoji also excludes
+	 *                                    its skin-tone variants. Default empty.
+	 * }
+	 */
+	$defaults = array(
+		'emojis'         => $default_emojis,
+		'allow_unlisted' => true,
+		'exclude'        => array(),
+	);
+	$settings = apply_filters( 'gutenberg_note_reaction_emoji_settings', $defaults );
+	// Keys a callback leaves out keep their defaults.
+	$settings = is_array( $settings ) ? wp_parse_args( $settings, $defaults ) : $defaults;
+
+	$emojis = array();
+	if ( is_array( $settings['emojis'] ) ) {
+		foreach ( $settings['emojis'] as $entry ) {
+			if ( ! is_array( $entry ) || ! isset( $entry['hexcode'], $entry['label'] ) || ! is_string( $entry['label'] ) ) {
+				continue;
+			}
+			$hex_key = gutenberg_format_note_reaction_hex_key( $entry['hexcode'] );
+			if ( '' !== $hex_key ) {
+				$emojis[] = array(
+					'hexcode' => $hex_key,
+					'label'   => $entry['label'],
+				);
+			}
+		}
+	}
+
+	$exclude = array();
+	if ( is_array( $settings['exclude'] ) ) {
+		foreach ( $settings['exclude'] as $hexcode ) {
+			$hex_key = gutenberg_normalize_note_reaction_hex_key( $hexcode );
+			if ( '' !== $hex_key ) {
+				$exclude[] = $hex_key;
+			}
+		}
+	}
+
+	return array(
+		'emojis'         => $emojis,
+		'allow_unlisted' => (bool) $settings['allow_unlisted'],
+		'exclude'        => array_values( array_unique( $exclude ) ),
+	);
+}
+
+/**
+ * Injects the note reaction emoji settings into the block editor settings
+ * so the picker offers the same set the REST API accepts.
+ *
+ * @since 7.2.0
+ *
+ * @param array $settings Existing block editor settings.
+ * @return array Updated block editor settings.
+ */
+function gutenberg_add_note_reaction_emojis_setting( $settings ) {
+	$emoji_settings = gutenberg_get_note_reaction_emoji_settings();
+
+	$settings['noteReactionEmojis']     = $emoji_settings['emojis'];
+	$settings['noteReactionEmojiRules'] = array(
+		'allowUnlisted' => $emoji_settings['allow_unlisted'],
+		'exclude'       => $emoji_settings['exclude'],
+	);
+	return $settings;
+}
+add_filter( 'block_editor_settings_all', 'gutenberg_add_note_reaction_emojis_setting' );
+
+/**
+ * Whether a reaction hex key is accepted under the emoji rules. An emoji
+ * from the named list is always accepted, including its skin-tone variants.
+ *
+ * @since 7.2.0
+ *
+ * @param string $hex_key The submitted hex key.
+ * @return bool Whether the reaction is allowed.
+ */
+function gutenberg_is_note_reaction_hex_key_allowed( $hex_key ) {
+	$base = gutenberg_normalize_note_reaction_hex_key( $hex_key );
+	if ( '' === $base ) {
+		return false;
+	}
+
+	$settings = gutenberg_get_note_reaction_emoji_settings();
+	foreach ( $settings['emojis'] as $entry ) {
+		if ( gutenberg_normalize_note_reaction_hex_key( $entry['hexcode'] ) === $base ) {
+			return true;
+		}
+	}
+
+	return $settings['allow_unlisted'] && ! in_array( $base, $settings['exclude'], true );
+}
+
+/**
  * Returns the reaction children of a note.
  *
  * @since 7.2.0

@@ -15,26 +15,29 @@ import { getCuratedLabel } from './reaction-emojis';
 export interface EmojibaseConfig {
 	// Null when the site serves no dataset.
 	baseUrl: string | null;
+	labelOverrides: Record< string, string > | null;
 }
 
 /**
  * Read the Emojibase configuration from the block editor settings. The
- * plugin sets it server-side; npm consumers supply it themselves.
+ * plugin sets these server-side; npm consumers supply them themselves.
  *
- * @return The Emojibase base URL.
+ * @return The Emojibase base URL and label overrides.
  */
 export function useEmojibaseConfig(): EmojibaseConfig {
-	const baseUrl = useSelect(
-		( select ) =>
-			(
-				select( blockEditorStore ).getSettings() as Record<
-					string,
-					unknown
-				>
-			 ).noteEmojibaseUrl,
-		[]
-	);
-	return { baseUrl: typeof baseUrl === 'string' && baseUrl ? baseUrl : null };
+	return useSelect( ( select ) => {
+		const settings: Record< string, unknown > =
+			select( blockEditorStore ).getSettings();
+		const baseUrl = settings.noteEmojibaseUrl;
+		const labelOverrides = settings.noteEmojiLabelOverrides;
+		return {
+			baseUrl: typeof baseUrl === 'string' && baseUrl ? baseUrl : null,
+			labelOverrides:
+				labelOverrides && typeof labelOverrides === 'object'
+					? ( labelOverrides as Record< string, string > )
+					: null,
+		};
+	}, [] );
 }
 
 /**
@@ -304,16 +307,44 @@ export function normalizeHexcode( hexcode: string ): string {
 const labelMapCache = new Map< string, Map< string, string > >();
 
 /**
- * Build (and cache) a normalized-hex-key to label Map for a dataset, with
- * the curated reactions keeping their own labels.
+ * Look up a site's label override for an emoji.
  *
- * @param cacheKey `baseUrl|locale` cache key.
- * @param data     Emojibase emoji records.
+ * Emojibase hexcodes may keep U+FE0F (`2764-FE0F-200D-1F525`) while the
+ * server writes keys normalized without it, so try the raw hexcode first
+ * and the normalized form second.
+ *
+ * @param overrides Map of `hexcode => translated label`, or null.
+ * @param hexcode   An Emojibase hexcode or a stored hex key.
+ * @return The override label, or undefined when there is none.
+ */
+export function getOverrideLabel(
+	overrides: Record< string, string > | null,
+	hexcode: string
+): string | undefined {
+	if ( ! overrides ) {
+		return undefined;
+	}
+	return (
+		overrides[ hexcode ] ??
+		overrides[ normalizeHexcode( hexcode ).toUpperCase() ]
+	);
+}
+
+/**
+ * Build (and cache) a normalized-hex-key to label Map for a dataset, with
+ * per-site overrides first and the curated labels next. Overrides come
+ * from editor settings and are page-static, so the cache is keyed by
+ * dataset alone.
+ *
+ * @param cacheKey  `baseUrl|locale` cache key.
+ * @param data      Emojibase emoji records.
+ * @param overrides Map of `hexcode => translated label`, or null.
  * @return Map from hex key to label.
  */
 function buildLabelMap(
 	cacheKey: string,
-	data: EmojibaseEntry[]
+	data: EmojibaseEntry[],
+	overrides: Record< string, string > | null
 ): Map< string, string > {
 	const existing = labelMapCache.get( cacheKey );
 	if ( existing ) {
@@ -322,7 +353,12 @@ function buildLabelMap(
 	const map = new Map< string, string >();
 	const indexEntry = ( hexcode: string, label: string ) => {
 		const hexKey = normalizeHexcode( hexcode );
-		map.set( hexKey, getCuratedLabel( hexKey ) || label );
+		map.set(
+			hexKey,
+			getOverrideLabel( overrides, hexcode ) ||
+				getCuratedLabel( hexKey ) ||
+				label
+		);
 	};
 	for ( const entry of data ) {
 		if ( ! entry.hexcode || ! entry.label ) {
@@ -346,13 +382,15 @@ function buildLabelMap(
  * Look up the label for a stored hex-key reaction from the already
  * loaded dataset, without triggering a fetch.
  *
- * @param hexKey  Normalized reaction hex key, e.g. `1f44d`.
- * @param baseUrl Same-origin URL of the Emojibase dataset directory.
+ * @param hexKey    Normalized reaction hex key, e.g. `1f44d`.
+ * @param baseUrl   Same-origin URL of the Emojibase dataset directory.
+ * @param overrides Map of `hexcode => translated label`, or null.
  * @return The label, or null when unknown/not loaded.
  */
 export function getCachedEmojiLabel(
 	hexKey: string,
-	baseUrl: string | null
+	baseUrl: string | null,
+	overrides: Record< string, string > | null
 ): string | null {
 	if ( ! baseUrl ) {
 		return null;
@@ -362,7 +400,9 @@ export function getCachedEmojiLabel(
 	if ( ! cached ) {
 		return null;
 	}
-	return buildLabelMap( cacheKey, cached.data ).get( hexKey ) || null;
+	return (
+		buildLabelMap( cacheKey, cached.data, overrides ).get( hexKey ) || null
+	);
 }
 
 /**
@@ -384,9 +424,9 @@ export function useEmojiLabel(
 	enabled: boolean,
 	load: boolean
 ): string | null {
-	const { baseUrl } = useEmojibaseConfig();
+	const { baseUrl, labelOverrides } = useEmojibaseConfig();
 	const [ label, setLabel ] = useState< string | null >( () =>
-		enabled ? getCachedEmojiLabel( hexKey, baseUrl ) : null
+		enabled ? getCachedEmojiLabel( hexKey, baseUrl, labelOverrides ) : null
 	);
 
 	useEffect( () => {
@@ -402,7 +442,8 @@ export function useEmojiLabel(
 				}
 				const resolved = buildLabelMap(
 					`${ baseUrl }|${ locale }`,
-					data
+					data,
+					labelOverrides
 				).get( hexKey );
 				if ( resolved ) {
 					setLabel( resolved );
@@ -414,7 +455,7 @@ export function useEmojiLabel(
 		return () => {
 			cancelled = true;
 		};
-	}, [ hexKey, enabled, load, label, baseUrl ] );
+	}, [ hexKey, enabled, load, label, baseUrl, labelOverrides ] );
 
 	return label;
 }

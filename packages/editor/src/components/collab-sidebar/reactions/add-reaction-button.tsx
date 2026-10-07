@@ -7,7 +7,11 @@ import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/ui';
 import { reaction as reactionIcon } from '@wordpress/icons';
 import EmojiPicker from './emoji-picker';
-import { emojiToHexKey } from './reaction-emojis';
+import {
+	emojiToHexKey,
+	useReactionEmojiRules,
+	useReactionEmojis,
+} from './reaction-emojis';
 import { hasUserReacted } from './reaction-display';
 import type { ReactionSummary } from './reaction-display';
 
@@ -18,7 +22,7 @@ interface AddReactionButtonProps {
 
 /**
  * Standalone add-reaction button, opening the searchable emoji picker
- * with its "Frequently used" section seeded from the curated set.
+ * with its "Frequently used" section seeded from the named set.
  *
  * @param props                  Component props.
  * @param props.reactions        The note's reaction summary, used to mark the
@@ -29,6 +33,15 @@ export function AddReactionButton( {
 	reactions,
 	onToggleReaction,
 }: AddReactionButtonProps ) {
+	const emojis = useReactionEmojis();
+	const rules = useReactionEmojiRules();
+
+	// A site that empties the named list and allows nothing else leaves
+	// nothing to pick.
+	if ( ! emojis.length && ! rules.allowUnlisted ) {
+		return null;
+	}
+
 	const reactedHexKeys = Object.keys( reactions ?? {} ).filter( ( hexKey ) =>
 		hasUserReacted( reactions, hexKey )
 	);
