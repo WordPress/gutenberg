@@ -11,6 +11,8 @@ import {
 	detectUltraHdr,
 	removeItem,
 	uploadItem,
+	addPosterForItem,
+	uploadPosterForItem,
 } from '../private-actions';
 import { OperationType, Type } from '../types';
 import { ErrorCode } from '../../upload-error';
@@ -25,11 +27,18 @@ import {
 	terminateVideoConversionWorker,
 } from '../utils/video-conversion';
 import { canvasConvertToJpeg, HeicUnsupportedError } from '../../canvas-utils';
+import { getPosterFromVideo } from '../../poster-utils';
 
 // Mock @wordpress/blob
 vi.mock( import( '@wordpress/blob' ), () => ( {
 	createBlobURL: vi.fn( () => 'blob:mock-url' ),
 	revokeBlobURL: vi.fn(),
+	isBlobURL: vi.fn( ( url ) => String( url ).startsWith( 'blob:' ) ),
+} ) );
+
+// Mock poster generation (relies on browser video/canvas APIs).
+vi.mock( import( '../../poster-utils' ), () => ( {
+	getPosterFromVideo: vi.fn(),
 } ) );
 
 // Mock vips utilities. The real isAnimatedGif() is needed by prepareItem
@@ -1588,6 +1597,207 @@ describe( 'private actions', () => {
 					isTransportOnly: true,
 				} )
 			);
+		} );
+	} );
+
+	describe( 'prepareItem video poster', () => {
+		beforeEach( () => {
+			vi.clearAllMocks();
+		} );
+
+		it( 'queues AddPoster, Upload and UploadPoster for a video file', async () => {
+			const file = new File( [ 'test' ], 'movie.mp4', {
+				type: 'video/mp4',
+			} );
+			const select = {
+				getItem: () => ( { id: 'v1', file, additionalData: {} } ),
+				getSettings: () => ( {} ),
+			};
+			// prepareItem uses both `dispatch( action )` and
+			// `dispatch.finishOperation()`, so dispatch must be callable.
+			const dispatch = Object.assign( vi.fn(), {
+				finishOperation: vi.fn(),
+			} );
+
+			await prepareItem( 'v1' )( { select, dispatch } );
+
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: Type.AddOperations,
+				id: 'v1',
+				operations: [
+					OperationType.AddPoster,
+					OperationType.Upload,
+					OperationType.UploadPoster,
+				],
+			} );
+			// Server still generates sub-sizes / handles conversion for video.
+			expect( dispatch.finishOperation ).toHaveBeenCalledWith( 'v1', {
+				additionalData: {
+					generate_sub_sizes: true,
+					convert_format: true,
+				},
+			} );
+		} );
+	} );
+
+	describe( 'addPosterForItem', () => {
+		beforeEach( () => {
+			vi.clearAllMocks();
+		} );
+
+		it( 'generates a poster from the first frame and stashes it', async () => {
+			const posterFile = new File( [ 'p' ], 'movie-poster.jpeg', {
+				type: 'image/jpeg',
+			} );
+			getPosterFromVideo.mockResolvedValue( posterFile );
+			const file = new File( [ 'v' ], 'movie.mp4', {
+				type: 'video/mp4',
+			} );
+			const finishOperation = vi.fn();
+			const select = { getItem: () => ( { id: 'v1', file } ) };
+			const dispatch = { finishOperation };
+
+			await addPosterForItem( 'v1' )( { select, dispatch } );
+
+			expect( getPosterFromVideo ).toHaveBeenCalledWith(
+				'blob:mock-url',
+				'movie-poster'
+			);
+			expect( finishOperation ).toHaveBeenCalledWith( 'v1', {
+				poster: posterFile,
+			} );
+			// The temporary blob URL is always revoked.
+			expect( revokeBlobURL ).toHaveBeenCalledWith( 'blob:mock-url' );
+		} );
+
+		it( 'skips generation when a poster already exists', async () => {
+			const finishOperation = vi.fn();
+			const select = {
+				getItem: () => ( {
+					id: 'v1',
+					file: new File( [ 'v' ], 'movie.mp4', {
+						type: 'video/mp4',
+					} ),
+					poster: new File( [ 'p' ], 'p.jpg', {
+						type: 'image/jpeg',
+					} ),
+				} ),
+			};
+			const dispatch = { finishOperation };
+
+			await addPosterForItem( 'v1' )( { select, dispatch } );
+
+			expect( getPosterFromVideo ).not.toHaveBeenCalled();
+			expect( finishOperation ).toHaveBeenCalledWith( 'v1', {} );
+		} );
+
+		it( 'finishes without a poster when extraction fails', async () => {
+			getPosterFromVideo.mockRejectedValue( new Error( 'no codec' ) );
+			const finishOperation = vi.fn();
+			const select = {
+				getItem: () => ( {
+					id: 'v1',
+					file: new File( [ 'v' ], 'movie.mp4', {
+						type: 'video/mp4',
+					} ),
+				} ),
+			};
+			const dispatch = { finishOperation };
+
+			await addPosterForItem( 'v1' )( { select, dispatch } );
+
+			expect( finishOperation ).toHaveBeenCalledWith( 'v1', {} );
+			expect( revokeBlobURL ).toHaveBeenCalledWith( 'blob:mock-url' );
+		} );
+
+		it( 'does nothing when the item is missing', async () => {
+			const finishOperation = vi.fn();
+			const select = { getItem: () => undefined };
+			const dispatch = { finishOperation };
+
+			await addPosterForItem( 'v1' )( { select, dispatch } );
+
+			expect( finishOperation ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'uploadPosterForItem', () => {
+		beforeEach( () => {
+			vi.clearAllMocks();
+		} );
+
+		it( 'finishes without uploading when there is no poster', async () => {
+			const finishOperation = vi.fn();
+			const addItem = vi.fn();
+			const select = {
+				getItem: () => ( { id: 'v1', attachment: { id: 9 } } ),
+			};
+			const dispatch = { finishOperation, addItem };
+
+			await uploadPosterForItem( 'v1' )( { select, dispatch } );
+
+			expect( addItem ).not.toHaveBeenCalled();
+			expect( finishOperation ).toHaveBeenCalledWith( 'v1', {} );
+		} );
+
+		it( 'finishes without uploading when the video is not a real attachment', async () => {
+			const finishOperation = vi.fn();
+			const addItem = vi.fn();
+			const poster = new File( [ 'p' ], 'p.jpg', {
+				type: 'image/jpeg',
+			} );
+			const select = {
+				getItem: () => ( { id: 'v1', poster, attachment: {} } ),
+			};
+			const dispatch = { finishOperation, addItem };
+
+			await uploadPosterForItem( 'v1' )( { select, dispatch } );
+
+			expect( addItem ).not.toHaveBeenCalled();
+			expect( finishOperation ).toHaveBeenCalledWith( 'v1', {} );
+		} );
+
+		it( 'uploads the poster and applies it to the block', async () => {
+			const finishOperation = vi.fn();
+			const addItem = vi.fn();
+			const onChange = vi.fn();
+			const poster = new File( [ 'p' ], 'p.jpg', {
+				type: 'image/jpeg',
+			} );
+			const attachment = { id: 9, url: 'http://example.com/movie.mp4' };
+			const select = {
+				getItem: () => ( {
+					id: 'v1',
+					poster,
+					attachment,
+					onChange,
+					additionalData: { post: 5 },
+				} ),
+			};
+			const dispatch = { finishOperation, addItem };
+
+			await uploadPosterForItem( 'v1' )( { select, dispatch } );
+
+			// The video item completes immediately; the poster uploads
+			// independently.
+			expect( finishOperation ).toHaveBeenCalledWith( 'v1', {} );
+			expect( addItem ).toHaveBeenCalledTimes( 1 );
+
+			const args = addItem.mock.calls[ 0 ][ 0 ];
+			expect( args.file ).toBe( poster );
+			expect( args.additionalData ).toEqual( { post: 5 } );
+
+			// Blob URLs (the provisional poster) are ignored.
+			args.onChange( [ { url: 'blob:xyz' } ] );
+			expect( onChange ).not.toHaveBeenCalled();
+
+			// A real poster URL is applied to the original video block.
+			args.onChange( [
+				{ id: 12, url: 'http://example.com/poster.jpg' },
+			] );
+			expect( onChange ).toHaveBeenCalledWith( [
+				{ ...attachment, poster: 'http://example.com/poster.jpg' },
+			] );
 		} );
 	} );
 
