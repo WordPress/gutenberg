@@ -60,6 +60,22 @@
 	}
 }
 
+// Consecutive blocks without output share the same position, so each marker
+// after the first in a run moves one step further into the gutter, and the
+// markers line up side by side instead of covering each other. Past five
+// blocks, the remaining markers share the last step; those blocks stay
+// reachable with the arrow keys and from the List View.
+$no-output-block: ".block-library-html__edit.has-no-output";
+$no-output-run: $no-output-block;
+
+@for $index from 1 through 4 {
+	$no-output-run: "#{$no-output-run} + #{$no-output-block}";
+
+	#{$no-output-run} > .block-library-html__no-output-marker {
+		margin-right: $grid-unit-05 + $index * ($grid-unit-30 + $grid-unit-05);
+	}
+}
+
 // The "Edit code" button in the inspector renders inside the tabs panel, so
 // it needs spacing on all sides, including against the tab list above it.
 .block-library-html__edit-code {

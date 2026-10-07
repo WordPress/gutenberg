@@ -97,6 +97,37 @@ test.describe( 'HTML block', () => {
 		await expect( block ).toBeFocused();
 	} );
 
+	test( 'keeps the markers of consecutive blocks apart', async ( {
+		editor,
+	} ) => {
+		await editor.setContent( `<!-- wp:paragraph -->
+<p>Before</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<script>window.__first = true;</script>
+<!-- /wp:html -->
+
+<!-- wp:html -->
+<style>.second { color: red; }</style>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>After</p>
+<!-- /wp:paragraph -->` );
+
+		// Both blocks sit at the same position, so their markers must not
+		// cover each other: a click on each one selects its own block.
+		const blocks = editor.canvas.locator( '[data-type="core/html"]' );
+		for ( const index of [ 0, 1 ] ) {
+			const block = blocks.nth( index );
+			await block
+				.locator( '.block-library-html__no-output-marker' )
+				.click();
+			await expect( block ).toHaveClass( /is-selected/ );
+		}
+	} );
+
 	test( 'shows no marker when the markup renders content', async ( {
 		editor,
 	} ) => {

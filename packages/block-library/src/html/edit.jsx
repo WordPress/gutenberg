@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
 import {
@@ -47,7 +48,9 @@ export default function HTMLEdit( { clientId, attributes } ) {
 	} );
 	const blockProps = useBlockProps( {
 		ref: resizeObserverRef,
-		className: 'block-library-html__edit',
+		className: clsx( 'block-library-html__edit', {
+			'has-no-output': hasNoRenderedSize,
+		} ),
 	} );
 
 	// Re-parse the edited content: static HTML becomes the block's
