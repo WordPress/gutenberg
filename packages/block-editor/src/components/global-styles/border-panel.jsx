@@ -10,7 +10,10 @@ import { __ } from '@wordpress/i18n';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
 import BorderRadiusControl from '../border-radius-control';
 import { useColorsPerOrigin } from './hooks';
-import { useToolsPanelDropdownMenuProps } from './utils';
+import {
+	useToolsPanelDropdownMenuProps,
+	useToolsPanelItemPopoverProps,
+} from './utils';
 import { setImmutably } from '../../utils/object';
 import { ShadowPopover, useShadowPresets } from './shadow-panel-components';
 import {
@@ -101,6 +104,7 @@ export default function BorderPanel( {
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
 } ) {
 	const colors = useColorsPerOrigin( settings );
+	const itemPopoverProps = useToolsPanelItemPopoverProps();
 	const areCustomSolidsEnabled = settings?.color?.custom;
 	const decodeValue = useCallback(
 		( rawValue ) => getValueFromVariable( { settings }, '', rawValue ),
@@ -405,8 +409,8 @@ export default function BorderPanel( {
 						enableStyle={ showBorderStyle }
 						label={ __( 'Border' ) }
 						onChange={ onBorderChange }
-						popoverOffset={ 40 }
-						popoverPlacement="left-start"
+						popoverOffset={ itemPopoverProps.offset }
+						popoverPlacement={ itemPopoverProps.placement }
 						value={ border }
 						__experimentalIsRenderedInSidebar
 					/>

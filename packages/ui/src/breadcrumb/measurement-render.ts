@@ -6,7 +6,6 @@ const EVENT_HANDLER_PATTERN = /^on[A-Z]/;
 function isBehaviorProp( propName: string ) {
 	return (
 		propName === 'id' ||
-		propName === 'ref' ||
 		propName === 'tabIndex' ||
 		EVENT_HANDLER_PATTERN.test( propName )
 	);
@@ -15,7 +14,8 @@ function isBehaviorProp( propName: string ) {
 function getMeasurementProps( props: Record< string, unknown > ) {
 	return Object.fromEntries(
 		Object.entries( props ).filter(
-			( [ propName ] ) => ! isBehaviorProp( propName )
+			( [ propName ] ) =>
+				! isBehaviorProp( propName ) && propName !== 'ref'
 		)
 	);
 }

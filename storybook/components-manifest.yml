@@ -429,7 +429,6 @@
       - value
 - name: ColorPicker
   props:
-      - as
       - color
       - copyFormat
       - defaultValue
@@ -587,7 +586,6 @@
       - isDisabled
 - name: Dropdown
   props:
-      - as
       - className
       - contentClassName
       - defaultOpen
@@ -599,6 +597,7 @@
       - open
       - popoverProps
       - position
+      - ref
       - renderContent
       - renderToggle
       - style
@@ -742,11 +741,6 @@
       - onChange
       - onClick
       - render
-- name: FormToggle
-  props:
-      - checked
-      - disabled
-      - onChange
 - name: FormTokenField
   props:
       - __experimentalAutoSelectFirstMatch
@@ -1042,7 +1036,6 @@
       - anchorRect
       - anchorRef
       - animate
-      - as
       - children
       - constrainTabbing
       - expandOnMobile
@@ -1067,19 +1060,89 @@
             - key
             - name
             - ref
-- name: ProgressBar
+- name: Progress.Root
+  props:
+      - aria-valuetext
+      - children
+      - className
+      - format
+      - getAriaValueText
+      - locale
+      - max
+      - min
+      - render
+      - style
+      - value
+  subcomponents:
+      - name: Progress.Indicator
+        props:
+            - className
+            - color
+            - render
+            - style
+      - name: Progress.Label
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Progress.Track
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Progress.Value
+        props:
+            - children
+            - className
+            - render
+            - style
+- name: Radio
   props:
       - className
-      - value
-- name: RadioControl
-  props:
       - disabled
-      - help
+      - inputRef
+      - nativeButton
+      - readOnly
+      - render
+      - required
+      - style
+      - value
+- name: RadioGroup
+  props:
+      - children
+      - className
+      - defaultValue
+      - disabled
+      - form
+      - inputRef
+      - name
+      - onValueChange
+      - readOnly
+      - render
+      - required
+      - style
+      - value
+- name: RadioGroupControl
+  props:
+      - className
+      - defaultValue
+      - description
+      - details
+      - disabled
+      - form
       - hideLabelFromVision
+      - inputRef
+      - items
       - label
-      - onChange
-      - options
-      - selected
+      - name
+      - onValueChange
+      - readOnly
+      - render
+      - required
+      - style
+      - value
 - name: RangeCalendar
   props:
       - autoFocus
@@ -1762,6 +1825,46 @@
       - render
       - style
       - wrap
+- name: Switch
+  props:
+      - checked
+      - className
+      - defaultChecked
+      - disabled
+      - form
+      - id
+      - inputRef
+      - name
+      - nativeButton
+      - onCheckedChange
+      - readOnly
+      - render
+      - required
+      - style
+      - uncheckedValue
+      - value
+- name: SwitchControl
+  props:
+      - checked
+      - className
+      - defaultChecked
+      - description
+      - details
+      - disabled
+      - form
+      - hideLabelFromVision
+      - id
+      - inputRef
+      - label
+      - name
+      - nativeButton
+      - onCheckedChange
+      - readOnly
+      - render
+      - required
+      - style
+      - uncheckedValue
+      - value
 - name: Tabs.Root
   props:
       - children
@@ -1834,15 +1937,6 @@
   props:
       - highlight
       - text
-- name: ToggleControl
-  props:
-      - __nextHasNoMarginBottom
-      - checked
-      - className
-      - disabled
-      - help
-      - label
-      - onChange
 - name: ToggleGroupControl
   props:
       - __next40pxDefaultSize

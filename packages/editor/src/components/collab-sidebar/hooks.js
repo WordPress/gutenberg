@@ -1,6 +1,8 @@
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import {
+	createContext,
+	useContext,
 	useState,
 	useEffect,
 	useLayoutEffect,
@@ -17,14 +19,11 @@ import {
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
-import { store as interfaceStore } from '@wordpress/interface';
 import { store as editorStore } from '../../store';
-import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
 import { createBoardStore } from './board-store';
 import {
 	calculateNotePositions,
-	clearInlineNoteMarker,
 	findNoteInBlock,
 	focusNoteThread,
 	getInlineMarkerStart,
@@ -32,12 +31,17 @@ import {
 	addNoteIdToMetadata,
 	pickPrimaryNote,
 	readInlineSelection,
-	removeNoteFormat,
+	removeInlineNote,
 	removeNoteIdFromMetadata,
 	wrapInlineNote,
 } from './utils';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
+
+/**
+ * Unsent note drafts, keyed by block client ID for new notes and note ID for replies.
+ */
+export const NoteDraftsContext = createContext();
 
 export function useNoteThreads( postId ) {
 	const queryArgs = {
@@ -179,12 +183,15 @@ export function useNoteActions() {
 	const { getCurrentPostId } = useSelect( editorStore );
 	const {
 		getBlockAttributes,
-		getClientIdsWithDescendants,
 		getSelectedBlockClientId,
 		getSelectionStart,
 		getSelectionEnd,
 	} = useSelect( blockEditorStore );
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const {
+		updateBlockAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+		__unstableMarkLastChangeAsPersistent,
+	} = useDispatch( blockEditorStore );
 
 	const onError = ( error ) => {
 		const errorMessage =
@@ -195,6 +202,17 @@ export function useNoteActions() {
 			type: 'snackbar',
 			isDismissible: true,
 		} );
+	};
+
+	/*
+	 * Update a note's anchor without an undo step, since undo can't bring the
+	 * note back with it. The last call flags the post as changed, so "Save
+	 * draft" turns on.
+	 */
+	const updateNoteAnchor = ( clientId, attributes ) => {
+		__unstableMarkNextChangeAsNotPersistent( { history: 'ignore' } );
+		updateBlockAttributes( clientId, attributes );
+		__unstableMarkLastChangeAsPersistent();
 	};
 
 	const onCreate = async ( { content, parent } ) => {
@@ -255,7 +273,7 @@ export function useNoteActions() {
 					}
 				}
 
-				updateBlockAttributes( clientId, newAttributes );
+				updateNoteAnchor( clientId, newAttributes );
 			}
 
 			createNotice(
@@ -272,7 +290,8 @@ export function useNoteActions() {
 		}
 	};
 
-	const onEdit = async ( { id, content, status } ) => {
+	const onEdit = async ( note, { content, status } ) => {
+		const { id } = note;
 		try {
 			// For resolution or reopen actions, create a new note with metadata.
 			if ( status === 'approved' || status === 'hold' ) {
@@ -313,13 +332,17 @@ export function useNoteActions() {
 
 				// Resolving a note drops its inline highlight: strip the marker
 				// so the note falls back to a block-level note in the content.
-				if ( status === 'approved' ) {
-					clearInlineNoteMarker(
-						id,
-						getClientIdsWithDescendants,
-						getBlockAttributes,
-						updateBlockAttributes
+				const removed =
+					status === 'approved' &&
+					note.blockClientId &&
+					removeInlineNote(
+						getBlockAttributes( note.blockClientId ),
+						id
 					);
+				if ( removed ) {
+					updateNoteAnchor( note.blockClientId, {
+						[ removed.attributeKey ]: removed.value,
+					} );
 				}
 
 				// The note visibly updates in place, so there is no snackbar,
@@ -359,48 +382,127 @@ export function useNoteActions() {
 		}
 	};
 
+	const restoreNote = async ( noteId, anchor ) => {
+		try {
+			// Untrash first, so a failure doesn't leave an anchor without a note.
+			await saveEntityRecord(
+				'root',
+				'comment',
+				{ id: noteId, status: 'untrash' },
+				{ throwOnError: true }
+			);
+
+			// No anchor (a reply or an orphan), or its block is gone: the
+			// note comes back on its own.
+			const attributes = anchor
+				? getBlockAttributes( anchor.clientId )
+				: null;
+			if ( attributes ) {
+				const newAttributes = {};
+				// The editor's undo may have brought the anchor back already.
+				if (
+					! getNoteIdsFromMetadata( attributes.metadata ).includes(
+						noteId
+					)
+				) {
+					newAttributes.metadata = addNoteIdToMetadata(
+						attributes.metadata,
+						noteId
+					);
+				}
+				const { inline } = anchor;
+				const value = inline && attributes[ inline.attributeKey ];
+				// Re-wrap only text that hasn't changed since the delete;
+				// otherwise the note comes back as a block-level note.
+				if (
+					inline &&
+					! findNoteInBlock( attributes, noteId ) &&
+					value?.text?.slice( inline.start, inline.end ) ===
+						inline.text
+				) {
+					const wrapped = wrapInlineNote(
+						value,
+						noteId,
+						inline.start,
+						inline.end
+					);
+					if ( wrapped ) {
+						newAttributes[ inline.attributeKey ] = wrapped;
+					}
+				}
+				if ( Object.keys( newAttributes ).length > 0 ) {
+					updateNoteAnchor( anchor.clientId, newAttributes );
+				}
+			}
+
+			createNotice( 'snackbar', __( 'Note restored.' ), {
+				type: 'snackbar',
+				isDismissible: true,
+			} );
+		} catch ( error ) {
+			onError( error );
+		}
+	};
+
 	const onDelete = async ( note ) => {
 		try {
 			// Capture the target block *before* the async delete: selection may
 			// shift during the round-trip, pointing the attribute cleanup at the
 			// wrong block.
-			const clientId = ! note.parent
-				? note.blockClientId || getSelectedBlockClientId()
-				: null;
+			const clientId = ! note.parent ? note.blockClientId : null;
 
-			await deleteEntityRecord( 'root', 'comment', note.id, undefined, {
-				throwOnError: true,
-			} );
+			// Without the trash, the note can only be deleted permanently,
+			// and there's nothing for Undo to bring back.
+			const canMoveToTrash = !! note._links?.[ 'wp:action-trash' ];
+			await deleteEntityRecord(
+				'root',
+				'comment',
+				note.id,
+				canMoveToTrash ? undefined : { force: true },
+				{ throwOnError: true }
+			);
 
-			if ( clientId ) {
-				const attributes = getBlockAttributes( clientId );
+			// What Undo needs to re-attach the note to its block.
+			let anchor = null;
+			const attributes = clientId ? getBlockAttributes( clientId ) : null;
+			if (
+				getNoteIdsFromMetadata( attributes?.metadata ).includes(
+					note.id
+				)
+			) {
+				anchor = { clientId };
 				const newAttributes = {
 					metadata: cleanEmptyObject(
-						removeNoteIdFromMetadata(
-							attributes?.metadata,
-							note.id
-						)
+						removeNoteIdFromMetadata( attributes.metadata, note.id )
 					),
 				};
 				// Strip the inline marker too (if any) so the deleted note's
-				// highlight doesn't linger in the content. Folded into the same
-				// attribute update so it's a single undo step.
-				const found = findNoteInBlock( attributes, note.id );
-				if ( found ) {
-					const next = removeNoteFormat(
-						attributes[ found.attributeKey ],
-						note.id
-					);
-					if ( next ) {
-						newAttributes[ found.attributeKey ] = next;
-					}
+				// highlight doesn't linger in the content.
+				const removed = removeInlineNote( attributes, note.id );
+				if ( removed ) {
+					const { attributeKey, start, end, value } = removed;
+					newAttributes[ attributeKey ] = value;
+					anchor.inline = {
+						attributeKey,
+						start,
+						end,
+						text: value.text.slice( start, end ),
+					};
 				}
-				updateBlockAttributes( clientId, newAttributes );
+				updateNoteAnchor( clientId, newAttributes );
 			}
 
 			createNotice( 'snackbar', __( 'Note deleted.' ), {
 				type: 'snackbar',
 				isDismissible: true,
+				actions: canMoveToTrash
+					? [
+							{
+								label: __( 'Undo' ),
+								onClick: () => restoreNote( note.id, anchor ),
+							},
+						]
+					: [],
 			} );
 
 			return true;
@@ -412,35 +514,24 @@ export function useNoteActions() {
 	return { onCreate, onEdit, onDelete };
 }
 
-export function useEnableFloatingSidebar( enabled = false ) {
-	const registry = useRegistry();
-	useEffect( () => {
-		if ( ! enabled ) {
-			return;
+/**
+ * Keeps a note form's unsent content, so it survives the form unmounting.
+ *
+ * @param {string|number} key The block client ID for a new note, or the note ID for a reply.
+ * @return {Object} The draft stored when the form mounted, its setter, and a check for a stored draft.
+ */
+export function useNoteDraft( key ) {
+	const drafts = useContext( NoteDraftsContext );
+	const [ initialValue ] = useState( () => drafts.get( key ) ?? '' );
+	const setDraft = ( content ) => {
+		if ( content ) {
+			drafts.set( key, content );
+		} else {
+			drafts.delete( key );
 		}
-
-		const { getActiveComplementaryArea } =
-			registry.select( interfaceStore );
-		const { disableComplementaryArea, enableComplementaryArea } =
-			registry.dispatch( interfaceStore );
-
-		// Hiding the complementary area only changes the preferences store.
-		const unsubscribe = registry.subscribe( () => {
-			// Return `null` to indicate the user hid the complementary area.
-			if ( getActiveComplementaryArea( 'core' ) === null ) {
-				enableComplementaryArea( 'core', FLOATING_NOTES_SIDEBAR );
-			}
-		} );
-
-		return () => {
-			unsubscribe();
-			if (
-				getActiveComplementaryArea( 'core' ) === FLOATING_NOTES_SIDEBAR
-			) {
-				disableComplementaryArea( 'core' );
-			}
-		};
-	}, [ enabled, registry ] );
+	};
+	const hasDraft = () => drafts.has( key );
+	return { initialValue, setDraft, hasDraft };
 }
 
 /**
@@ -453,6 +544,7 @@ export function useEnableFloatingSidebar( enabled = false ) {
  */
 export function useNoteSelection( { notes, sidebarRef } ) {
 	const registry = useRegistry();
+	const drafts = useContext( NoteDraftsContext );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const selectedBlockClientId = useSelect(
 		( select ) => select( blockEditorStore ).getSelectedBlockClientId(),
@@ -468,7 +560,6 @@ export function useNoteSelection( { notes, sidebarRef } ) {
 		};
 	}, [] );
 
-	// Select the block's primary note, or clear the selection if it has none.
 	const syncWithBlock = useEvent( ( clientId ) => {
 		const { getSelectedNote, isNoteFocused } = unlock(
 			registry.select( editorStore )
@@ -486,7 +577,8 @@ export function useNoteSelection( { notes, sidebarRef } ) {
 		if ( blockThreads.some( ( thread ) => thread.id === currentNoteId ) ) {
 			return;
 		}
-		selectNote( pickPrimaryNote( blockThreads )?.id );
+		const draftNoteId = drafts.has( clientId ) ? 'new' : undefined;
+		selectNote( pickPrimaryNote( blockThreads )?.id ?? draftNoteId );
 	} );
 
 	// Sync only on block transitions, so in-block changes (Escape, Cancel,
@@ -517,6 +609,176 @@ export function useNoteSelection( { notes, sidebarRef } ) {
 
 const subscribeNoop = () => () => {};
 
+/**
+ * Extends the canvas past the lowest thread, or a short post can't scroll it
+ * into view. The canvas margin's CSS applies the property as the root's
+ * `min-height` (see `getCanvasMarginCSS`), so the room goes away with the
+ * margin. Keyed on the canvas, since a new document starts without it.
+ *
+ * @param {Object}       props
+ * @param {?HTMLElement} props.canvas        Canvas scroll container.
+ * @param {number}       props.contentHeight Content height that fits every thread.
+ * @param {boolean}      props.isFloating    Whether the notes float over the canvas.
+ */
+function useCanvasRoom( { canvas, contentHeight, isFloating } ) {
+	useLayoutEffect( () => {
+		if ( ! isFloating || ! canvas || ! contentHeight ) {
+			return;
+		}
+		// On the root element, where the margin's rule reads it, whichever
+		// element scrolls.
+		const root = canvas.ownerDocument.documentElement;
+		root.style.setProperty(
+			'--wp-editor-canvas-min-height',
+			`${ contentHeight }px`
+		);
+		return () => {
+			root.style.removeProperty( '--wp-editor-canvas-min-height' );
+		};
+	}, [ isFloating, canvas, contentHeight ] );
+}
+
+/**
+ * Mirrors the floating panel's scroll position with the canvas's. The panel
+ * is a real scroller with the canvas's scroll range, and notes are positioned
+ * in canvas content-space, so the panel's own scroll moves them with the
+ * canvas, and wheel, keys, focus and `scrollIntoView()` all work natively.
+ *
+ * @param {Object}       props
+ * @param {Object}       props.sidebarRef Ref to the floating panel.
+ * @param {?HTMLElement} props.canvas     Canvas scroll container.
+ * @param {boolean}      props.isFloating Whether the notes float over the canvas.
+ */
+function useMirroredScroll( { sidebarRef, canvas, isFloating } ) {
+	useLayoutEffect( () => {
+		const panel = sidebarRef?.current;
+		if ( ! isFloating || ! panel || ! canvas ) {
+			return;
+		}
+
+		const isNear = ( a, b ) => Math.abs( a - b ) < 1;
+
+		let range;
+		const syncRange = () => {
+			const next = canvas.scrollHeight - canvas.clientHeight;
+			if ( next !== range ) {
+				range = next;
+				panel.style.setProperty(
+					'--canvas-scroll-range',
+					`${ next }px`
+				);
+			}
+		};
+
+		// A programmatic scroll fires its own `scroll` event a frame later,
+		// by which time the other side may have scrolled on (the compositor
+		// scrolls ahead of the main thread). Each side remembers where it was
+		// scrolled to and ignores that echo, or it would drag the other side
+		// back on every frame.
+		let panelEcho = -1;
+		let canvasEcho = -1;
+
+		// `instant` overrides a theme's `scroll-behavior: smooth`, which
+		// would animate every sync.
+		const scrollPanelTo = ( top ) => {
+			panel.scrollTo( { top, behavior: 'instant' } );
+			panelEcho = panel.scrollTop;
+		};
+		const fromCanvas = () => {
+			const top = canvas.scrollTop;
+			const isEcho = isNear( top, canvasEcho );
+			canvasEcho = -1;
+			if ( ! isEcho && ! isNear( panel.scrollTop, top ) ) {
+				scrollPanelTo( top );
+			}
+		};
+		// The canvas owns the position: when it can't follow (its room for
+		// a newly expanded thread isn't there yet), the panel snaps back.
+		const fromPanel = () => {
+			const top = panel.scrollTop;
+			const isEcho = isNear( top, panelEcho );
+			panelEcho = -1;
+			if ( isEcho || isNear( canvas.scrollTop, top ) ) {
+				return;
+			}
+			canvas.scrollTo( { top, behavior: 'instant' } );
+			canvasEcho = canvas.scrollTop;
+			if ( ! isNear( canvasEcho, top ) ) {
+				scrollPanelTo( canvasEcho );
+			}
+		};
+		syncRange();
+		fromCanvas();
+
+		// Range only: a clamped scroller fires its own scroll event, and
+		// syncing positions here would undo a panel scroll whose event is
+		// still pending. The body is observed too, since a theme's
+		// `html { height: 100% }` keeps the root box fixed as content grows.
+		const { body, defaultView: view } = canvas.ownerDocument;
+		const resizeObserver = new window.ResizeObserver( syncRange );
+		resizeObserver.observe( canvas );
+		resizeObserver.observe( body );
+		resizeObserver.observe( panel );
+
+		// Root scrolling elements (documentElement/body) don't fire scroll
+		// on themselves; capture on the window catches them in either canvas.
+		// Scrollable blocks fire there too, and are skipped.
+		const onCanvasScroll = ( event ) => {
+			if (
+				event.target === canvas ||
+				event.target === canvas.ownerDocument
+			) {
+				fromCanvas();
+			}
+		};
+		const listenerOptions = { passive: true, capture: true };
+		view.addEventListener( 'scroll', onCanvasScroll, listenerOptions );
+		panel.addEventListener( 'scroll', fromPanel, { passive: true } );
+		return () => {
+			resizeObserver.disconnect();
+			view.removeEventListener(
+				'scroll',
+				onCanvasScroll,
+				listenerOptions
+			);
+			panel.removeEventListener( 'scroll', fromPanel );
+			panel.style.removeProperty( '--canvas-scroll-range' );
+		};
+	}, [ sidebarRef, isFloating, canvas ] );
+}
+
+/**
+ * Offsets the threads by the canvas frame and its scrollbar.
+ *
+ * @param {Object}  props
+ * @param {Object}  props.sidebarRef     Ref to the floating panel.
+ * @param {number}  props.frameOffset    Canvas frame top, relative to the panel.
+ * @param {number}  props.scrollbarWidth Width of the canvas scrollbar.
+ * @param {boolean} props.isFloating     Whether the notes float over the canvas.
+ */
+function usePanelOffsets( {
+	sidebarRef,
+	frameOffset,
+	scrollbarWidth,
+	isFloating,
+} ) {
+	useLayoutEffect( () => {
+		const panel = sidebarRef?.current;
+		if ( ! isFloating || ! panel ) {
+			return;
+		}
+		panel.style.setProperty( '--canvas-offset', `${ frameOffset }px` );
+		panel.style.setProperty(
+			'--canvas-scrollbar-width',
+			`${ scrollbarWidth }px`
+		);
+		return () => {
+			panel.style.removeProperty( '--canvas-offset' );
+			panel.style.removeProperty( '--canvas-scrollbar-width' );
+		};
+	}, [ sidebarRef, isFloating, frameOffset, scrollbarWidth ] );
+}
+
 export function useFloatingBoard( {
 	threads,
 	selectedNoteId,
@@ -527,10 +789,11 @@ export function useFloatingBoard( {
 
 	// Only floating mode needs measurements; without a subscriber the store
 	// drops its observer.
-	const { heights, anchorRects, canvas, frameOffset } = useSyncExternalStore(
-		isFloating ? store.subscribe : subscribeNoop,
-		store.getSnapshot
-	);
+	const { heights, anchorRects, canvas, frameOffset, scrollbarWidth } =
+		useSyncExternalStore(
+			isFloating ? store.subscribe : subscribeNoop,
+			store.getSnapshot
+		);
 
 	// Moving blocks shifts anchors without resizing anything or re-registering.
 	useLayoutEffect( () => {
@@ -538,58 +801,24 @@ export function useFloatingBoard( {
 	}, [ store, threads ] );
 
 	// Derived during render, so a resize reaches the screen in the same paint.
-	const notePositions = useMemo(
+	const { positions: notePositions, contentHeight } = useMemo(
 		() =>
 			calculateNotePositions( {
 				threads,
 				selectedNoteId,
 				blockRects: anchorRects,
 				heights,
-			} ).positions,
+			} ),
 		[ threads, selectedNoteId, anchorRects, heights ]
 	);
 
-	// Notes are positioned in canvas content-space; CSS inherits
-	// `--canvas-scroll` to translate each thread in sync with the canvas,
-	// so scrolling never re-renders. A layout effect, so the offset is in
-	// place before the first positions paint.
-	useLayoutEffect( () => {
-		const panel = sidebarRef?.current;
-		if ( ! isFloating || ! panel || ! canvas ) {
-			return;
-		}
-
-		const applyScroll = () => {
-			panel.style.setProperty(
-				'--canvas-scroll',
-				`${ -canvas.scrollTop }px`
-			);
-		};
-		applyScroll();
-
-		// Root scrolling elements (documentElement/body) don't fire scroll
-		// on themselves; capture on the window catches them in either canvas.
-		const view = canvas.ownerDocument.defaultView;
-		const listenerOptions = { passive: true, capture: true };
-		view.addEventListener( 'scroll', applyScroll, listenerOptions );
-		return () => {
-			view.removeEventListener( 'scroll', applyScroll, listenerOptions );
-			panel.style.removeProperty( '--canvas-scroll' );
-		};
-	}, [ sidebarRef, isFloating, canvas ] );
-
-	// Shifts the threads by the canvas frame's offset from the panel.
-	useLayoutEffect( () => {
-		const panel = sidebarRef?.current;
-		if ( ! isFloating || ! panel ) {
-			return;
-		}
-		panel.style.setProperty( '--canvas-offset', `${ frameOffset }px` );
-		return () => panel.style.removeProperty( '--canvas-offset' );
-	}, [ sidebarRef, isFloating, frameOffset ] );
+	useCanvasRoom( { canvas, contentHeight, isFloating } );
+	useMirroredScroll( { sidebarRef, canvas, isFloating } );
+	usePanelOffsets( { sidebarRef, frameOffset, scrollbarWidth, isFloating } );
 
 	return {
 		notePositions,
+		heights,
 		registerThread: store.registerThread,
 		unregisterThread: store.unregisterThread,
 	};
