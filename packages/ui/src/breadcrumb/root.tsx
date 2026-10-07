@@ -256,12 +256,21 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 		() => items.filter( ( item ) => item.kind !== 'current' ),
 		[ items ]
 	);
-	const variant =
-		ancestorItems[ 0 ]?.kind === 'button' ? 'selection' : 'navigation';
 	const currentItem = useMemo(
 		() => items.find( ( item ) => item.kind === 'current' ),
 		[ items ]
 	);
+	const currentAriaCurrent =
+		currentItem && 'aria-current' in currentItem.element.props
+			? currentItem.element.props[ 'aria-current' ]
+			: undefined;
+	const variant =
+		ancestorItems[ 0 ]?.kind === 'button' ||
+		( ancestorItems.length === 0 &&
+			( currentAriaCurrent === true || currentAriaCurrent === 'true' ) )
+			? 'selection'
+			: 'navigation';
+
 	const [ rootElement, setRootElement ] = useState< HTMLElement | null >(
 		null
 	);

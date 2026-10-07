@@ -27,9 +27,9 @@ Activating an overflow action closes the menu. If selection removes the focused 
 
 ## Current-only trails
 
-A single `CurrentItem` is supported, including truncation when its label does not fit. Root infers its semantics from the complete ancestor collection. With no ancestors, it defaults to a navigation landmark on both the server and client. Removing the final button ancestor therefore changes the root from a group to a navigation landmark.
+A single `CurrentItem` is supported, including truncation when its label does not fit. Root infers its semantics from the complete ancestor collection. With no ancestors, an explicit `aria-current={true}` or `aria-current="true"` on `CurrentItem` selects group semantics. Otherwise, Root defaults to a navigation landmark. This inference works on both the server and client.
 
-Use `aria-current` on `CurrentItem` to override its inferred value. For example, `<Breadcrumb.CurrentItem aria-current="true">Document</Breadcrumb.CurrentItem>` keeps an in-document current marker even when the trail becomes current-only. This changes the current marker, not the root role. The prop takes precedence over a custom `render` element and is omitted from hidden measurement copies.
+Use `aria-current` on `CurrentItem` to override its inferred value. For example, `<Breadcrumb.CurrentItem aria-current="true">Document</Breadcrumb.CurrentItem>` keeps both the group role and in-document current marker when the final button ancestor is removed. Ancestor links or buttons take precedence over this hint when present. The prop takes precedence over a custom `render` element and is omitted from hidden measurement copies.
 
 <Canvas of={ BreadcrumbStories.CurrentOnly } />
 

@@ -10,7 +10,9 @@ describe( 'Breadcrumb server rendering', () => {
 				<Breadcrumb.LinkItem href="/section?view=all#latest">
 					Section
 				</Breadcrumb.LinkItem>
-				<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+				<Breadcrumb.CurrentItem aria-current="true">
+					Current
+				</Breadcrumb.CurrentItem>
 			</Breadcrumb.Root>
 		);
 
@@ -18,12 +20,18 @@ describe( 'Breadcrumb server rendering', () => {
 		expect( view ).toContain( '<ol' );
 		expect( view ).toContain( 'href="/"' );
 		expect( view ).toContain( 'href="/section?view=all#latest"' );
-		expect( view ).toContain( 'aria-current="page"' );
+		expect( view ).toContain( 'aria-current="true"' );
 		expect( view ).not.toContain( 'aria-haspopup="menu"' );
 	} );
-	it.each( [ undefined, true, false ] as const )(
-		'renders a current-only navigation trail with aria-current=%s on the server',
-		( ariaCurrent ) => {
+	it.each( [
+		[ undefined, 'navigation', 'page' ],
+		[ true, 'group', 'true' ],
+		[ 'true', 'group', 'true' ],
+		[ 'page', 'navigation', 'page' ],
+		[ false, 'navigation', 'false' ],
+	] as const )(
+		'renders a current-only trail with aria-current=%j and role=%s on the server',
+		( ariaCurrent, role, renderedAriaCurrent ) => {
 			const view = renderToStaticMarkup(
 				<Breadcrumb.Root aria-label="Hierarchy">
 					<Breadcrumb.CurrentItem
@@ -34,9 +42,9 @@ describe( 'Breadcrumb server rendering', () => {
 					</Breadcrumb.CurrentItem>
 				</Breadcrumb.Root>
 			);
-			expect( view ).toContain( 'role="navigation"' );
+			expect( view ).toContain( `role="${ role }"` );
 			expect( view ).toContain(
-				`aria-current="${ ariaCurrent ?? 'page' }"`
+				`aria-current="${ renderedAriaCurrent }"`
 			);
 			expect( view.match( /aria-current=/g ) ).toHaveLength( 1 );
 		}

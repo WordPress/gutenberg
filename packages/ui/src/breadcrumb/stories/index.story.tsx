@@ -170,8 +170,8 @@ export const RouterLinkComposition: Story = {
 
 /**
  * Button ancestors select a position within one hierarchy. The consumer owns
- * selection and intentional focus moves. Set aria-current on CurrentItem when
- * its value should stay the same after the final ancestor is removed.
+ * selection and intentional focus moves. Set aria-current="true" on CurrentItem
+ * to preserve group semantics after the final ancestor is removed.
  */
 export const HierarchySelection: Story = {
 	render: function SelectionExample() {

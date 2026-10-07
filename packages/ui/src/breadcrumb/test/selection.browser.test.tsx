@@ -167,17 +167,17 @@ describe( 'Breadcrumb hierarchy selection', () => {
 	} );
 
 	it.each( [ false, true ] )(
-		'keeps deliberate focus after clearing selection, consumer focus move: %s',
+		'preserves selection semantics and deliberate focus after clearing selection, consumer focus move: %s',
 		async ( focusEditor ) => {
 			await render( <SelectionTrail focusEditor={ focusEditor } /> );
 			await userEvent.tab();
 			await userEvent.keyboard( '{Enter}' );
-			const navigation = page.getByRole( 'navigation', {
+			const group = page.getByRole( 'group', {
 				name: 'Block hierarchy',
 			} );
-			await expect.element( navigation ).toBeVisible();
+			await expect.element( group ).toBeVisible();
 			await expect
-				.element( page.getByRole( 'group' ) )
+				.element( page.getByRole( 'navigation' ) )
 				.not.toBeInTheDocument();
 			const current = screen.getByText( 'Document', {
 				selector: '[aria-current="true"]',
@@ -235,6 +235,11 @@ describe( 'Breadcrumb hierarchy selection', () => {
 					page.getByRole( 'button', { name: /hidden breadcrumb/ } )
 				)
 				.not.toBeInTheDocument();
+			await expect
+				.element(
+					page.getByRole( 'group', { name: 'Block hierarchy' } )
+				)
+				.toBeVisible();
 			const focusTarget = focusEditor
 				? screen.getByRole( 'textbox', { name: 'Editor' } )
 				: screen.getByText( ancestor, {
