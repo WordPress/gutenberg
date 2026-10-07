@@ -171,4 +171,21 @@ export const LAYOUT_DEFINITIONS = {
 			},
 		],
 	},
+	freeform: {
+		name: 'freeform',
+		slug: 'freeform',
+		className: 'is-layout-freeform',
+		baseStyles: [
+			{
+				selector: ' > :is(*, div)', // :is(*, div) instead of just * increases the specificity by 001.
+				rules: {
+					position: 'absolute',
+					margin: '0',
+				},
+			},
+		],
+		// A canvas has no block gap: the gap between two blocks is wherever
+		// they were put.
+		spacingStyles: [],
+	},
 };

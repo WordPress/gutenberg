@@ -21,6 +21,10 @@ import {
 	hasViewportBlockStyleState,
 	setStyleForState,
 } from './block-style-state';
+import {
+	DEFAULT_CANVAS_HEIGHT,
+	DESIGN_WIDTH,
+} from '../components/freeform/constants';
 
 const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
@@ -53,6 +57,63 @@ function serializeRule( { selector, declarations } ) {
 	}`;
 }
 
+/**
+ * A rounded percentage, with no trailing zeroes.
+ *
+ * @param {number} value  Value in design units.
+ * @param {number} extent The design-space extent it is measured against.
+ * @return {string} A CSS percentage.
+ */
+function toCanvasPercentage( value, extent ) {
+	return `${ parseFloat( ( ( value / extent ) * 100 ).toFixed( 2 ) ) }%`;
+}
+
+/**
+ * The declarations that place one block on a freeform canvas.
+ *
+ * Coordinates are stored in design units and emitted as percentages, so the
+ * canvas and everything on it scale together as the rendered width changes.
+ *
+ * Height becomes `min-height` rather than `height`: a block whose content grows
+ * taller than the box it was drawn in should push past it rather than clip, and
+ * the editor measures what actually rendered back into the stored height.
+ *
+ * @param {Object} layout       The child's layout attributes.
+ * @param {Object} parentLayout The canvas layout attributes.
+ * @return {Object} CSS declarations.
+ */
+function getFreeformChildDeclarations( layout, parentLayout ) {
+	const { x, y, width, height } = layout;
+
+	if (
+		x === undefined &&
+		y === undefined &&
+		width === undefined &&
+		height === undefined
+	) {
+		return {};
+	}
+
+	const canvasHeight = parentLayout.canvasHeight ?? DEFAULT_CANVAS_HEIGHT;
+	const declarations = {
+		left: toCanvasPercentage( x ?? 0, DESIGN_WIDTH ),
+		top: toCanvasPercentage( y ?? 0, canvasHeight ),
+	};
+
+	if ( width !== undefined ) {
+		declarations.width = toCanvasPercentage( width, DESIGN_WIDTH );
+	}
+	if ( height !== undefined ) {
+		declarations[ 'min-height' ] = toCanvasPercentage(
+			height,
+			canvasHeight
+		);
+	}
+	declarations[ 'box-sizing' ] = 'border-box';
+
+	return declarations;
+}
+
 export function getChildLayoutStyleRules( {
 	selector,
 	layout = {},
@@ -80,6 +141,18 @@ export function getChildLayoutStyleRules( {
 	const baseSelfStretch = layout.selfStretch;
 	const { columnCount, minimumColumnWidth } = parentLayout;
 	const rules = [];
+
+	// A freeform canvas places its children itself, so none of the flex or grid
+	// child rules below apply: the whole child layout is four coordinates.
+	if ( parentLayout.type === 'freeform' ) {
+		const freeformDeclarations = getFreeformChildDeclarations(
+			effectiveLayout,
+			parentLayout
+		);
+		return Object.keys( freeformDeclarations ).length
+			? [ { selector, declarations: freeformDeclarations } ]
+			: [];
+	}
 
 	const declarations = {};
 	if (

@@ -212,6 +212,23 @@ function gutenberg_get_layout_definitions() {
 				),
 			),
 		),
+		'freeform'    => array(
+			'name'          => 'freeform',
+			'slug'          => 'freeform',
+			'className'     => 'is-layout-freeform',
+			'baseStyles'    => array(
+				array(
+					'selector' => ' > :is(*, div)',  // :is(*, div) instead of just * increases the specificity by 001.
+					'rules'    => array(
+						'position' => 'absolute',
+						'margin'   => '0',
+					),
+				),
+			),
+			// A canvas has no block gap: the gap between two blocks is wherever
+			// they were put.
+			'spacingStyles' => array(),
+		),
 	);
 
 	return $layout_definitions;
@@ -254,7 +271,7 @@ function gutenberg_get_layout_child_values( $layout ) {
 	return array_intersect_key(
 		$layout,
 		array_flip(
-			array( 'selfStretch', 'flexSize', 'columnStart', 'columnSpan', 'rowStart', 'rowSpan' )
+			array( 'selfStretch', 'flexSize', 'columnStart', 'columnSpan', 'rowStart', 'rowSpan', 'x', 'y', 'width', 'height' )
 		)
 	);
 }
@@ -273,7 +290,7 @@ function gutenberg_get_layout_container_values( $layout ) {
 	return array_diff_key(
 		$layout,
 		array_flip(
-			array( 'selfStretch', 'flexSize', 'columnStart', 'columnSpan', 'rowStart', 'rowSpan' )
+			array( 'selfStretch', 'flexSize', 'columnStart', 'columnSpan', 'rowStart', 'rowSpan', 'x', 'y', 'width', 'height' )
 		)
 	);
 }
@@ -319,6 +336,66 @@ function gutenberg_sanitize_block_gap_value( $gap_value ) {
 }
 
 /**
+ * The width of the freeform canvas design space, in design units.
+ *
+ * Positions are authored against this width and emitted as percentages, so a
+ * canvas keeps its proportions at whatever width it is rendered.
+ */
+const GUTENBERG_FREEFORM_DESIGN_WIDTH = 1200;
+
+/**
+ * The design height a freeform canvas has when it does not say otherwise.
+ */
+const GUTENBERG_FREEFORM_DEFAULT_CANVAS_HEIGHT = 576;
+
+/**
+ * Returns the declarations that place one block on a freeform canvas.
+ *
+ * Height becomes `min-height` rather than `height`: a block whose content grows
+ * taller than the box it was drawn in should push past it rather than clip.
+ *
+ * @param array $child_layout  Child layout values.
+ * @param array $parent_layout Canvas layout values.
+ * @return array CSS declarations, or an empty array when the block is unplaced.
+ */
+function gutenberg_get_freeform_child_declarations( $child_layout, $parent_layout ) {
+	$to_percentage = static function ( $value, $extent ) {
+		if ( ! $extent ) {
+			return '0%';
+		}
+		return rtrim( rtrim( number_format( ( (float) $value / $extent ) * 100, 2, '.', '' ), '0' ), '.' ) . '%';
+	};
+
+	$x      = isset( $child_layout['x'] ) && is_numeric( $child_layout['x'] ) ? (float) $child_layout['x'] : null;
+	$y      = isset( $child_layout['y'] ) && is_numeric( $child_layout['y'] ) ? (float) $child_layout['y'] : null;
+	$width  = isset( $child_layout['width'] ) && is_numeric( $child_layout['width'] ) ? (float) $child_layout['width'] : null;
+	$height = isset( $child_layout['height'] ) && is_numeric( $child_layout['height'] ) ? (float) $child_layout['height'] : null;
+
+	if ( null === $x && null === $y && null === $width && null === $height ) {
+		return array();
+	}
+
+	$canvas_height = isset( $parent_layout['canvasHeight'] ) && is_numeric( $parent_layout['canvasHeight'] )
+		? (float) $parent_layout['canvasHeight']
+		: GUTENBERG_FREEFORM_DEFAULT_CANVAS_HEIGHT;
+
+	$declarations = array(
+		'left' => $to_percentage( null === $x ? 0 : $x, GUTENBERG_FREEFORM_DESIGN_WIDTH ),
+		'top'  => $to_percentage( null === $y ? 0 : $y, $canvas_height ),
+	);
+
+	if ( null !== $width ) {
+		$declarations['width'] = $to_percentage( $width, GUTENBERG_FREEFORM_DESIGN_WIDTH );
+	}
+	if ( null !== $height ) {
+		$declarations['min-height'] = $to_percentage( $height, $canvas_height );
+	}
+	$declarations['box-sizing'] = 'border-box';
+
+	return $declarations;
+}
+
+/**
  * Returns child layout styles for a block affected by its parent's layout.
  *
  * @param string     $selector           CSS selector.
@@ -336,6 +413,25 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 	$has_viewport_property_override = static function ( $property ) use ( $viewport_overrides ) {
 		return array_key_exists( $property, $viewport_overrides );
 	};
+
+	/*
+	 * A freeform canvas places its children itself, so none of the flex or grid
+	 * child rules below apply: the whole child layout is four coordinates in the
+	 * canvas's design space, emitted as percentages so the canvas and everything
+	 * on it scale together.
+	 */
+	if ( isset( $parent_layout['type'] ) && 'freeform' === $parent_layout['type'] ) {
+		$freeform_declarations = gutenberg_get_freeform_child_declarations( $child_layout, $parent_layout );
+		if ( empty( $freeform_declarations ) ) {
+			return array();
+		}
+		return array(
+			array(
+				'selector'     => $selector,
+				'declarations' => $freeform_declarations,
+			),
+		);
+	}
 
 	$self_stretch      = $child_layout['selfStretch'] ?? null;
 	$base_self_stretch = $base_child_layout['selfStretch'] ?? null;
@@ -949,6 +1045,23 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				'declarations' => array( 'gap' => $gap_value ),
 			);
 		}
+	} elseif ( 'freeform' === $layout_type ) {
+		/*
+		 * The canvas is sized by ratio rather than by a fixed height, so a layout
+		 * authored at the design width keeps its proportions at every rendered
+		 * width. Its children are positioned in percentages of this box, which
+		 * means one rule scales the whole canvas.
+		 */
+		$canvas_height_attr = $layout_for_styles['canvasHeight'] ?? null;
+		$canvas_height      = is_numeric( $canvas_height_attr ) ? (float) $canvas_height_attr : GUTENBERG_FREEFORM_DEFAULT_CANVAS_HEIGHT;
+
+		$layout_styles[] = array(
+			'selector'     => $selector,
+			'declarations' => array(
+				'position'     => 'relative',
+				'aspect-ratio' => GUTENBERG_FREEFORM_DESIGN_WIDTH . ' / ' . $canvas_height,
+			),
+		);
 	}
 
 	if ( ! empty( $layout_styles ) ) {

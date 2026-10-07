@@ -15,6 +15,7 @@ function BlockMover( { clientIds, hideDragHandle } ) {
 		isLast,
 		orientation,
 		isManualGrid,
+		isFreeformCanvas,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -47,6 +48,9 @@ function BlockMover( { clientIds, hideDragHandle } ) {
 					layout.type === 'grid' &&
 					layout.isManualPlacement &&
 					window.__experimentalEnableGridInteractivity,
+				isFreeformCanvas:
+					layout.type === 'freeform' &&
+					window.__experimentalEnableFreeformCanvas,
 			};
 		},
 		[ clientIds ]
@@ -60,13 +64,18 @@ function BlockMover( { clientIds, hideDragHandle } ) {
 		return null;
 	}
 
+	// On a freeform canvas, dragging means moving a block to a position rather
+	// than reordering it, and the canvas provides its own grip for that. Two
+	// drag affordances on one block, doing different things, is worse than one.
+	const showDragHandle = ! hideDragHandle && ! isFreeformCanvas;
+
 	return (
 		<ToolbarGroup
 			className={ clsx( 'block-editor-block-mover', {
 				'is-horizontal': orientation === 'horizontal',
 			} ) }
 		>
-			{ ! hideDragHandle && (
+			{ showDragHandle && (
 				<BlockDraggable clientIds={ clientIds } fadeWhenDisabled>
 					{ ( draggableProps ) => (
 						<Button

@@ -22,6 +22,7 @@ import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
 import { BlockRenameModal, useBlockRename } from '../block-rename';
 import { BlockVisibilityModal } from '../block-visibility';
+import { FreeformCanvasTools } from '../freeform';
 
 function selector( select ) {
 	const {
@@ -324,6 +325,8 @@ export default function BlockTools( {
 					name="__unstable-block-tools-after"
 					ref={ blockToolbarAfterRef }
 				/>
+				{ window.__experimentalEnableFreeformCanvas &&
+					! isZoomOutMode && <FreeformCanvasTools /> }
 				{ isZoomOutMode && ! isDragging && (
 					<ZoomOutModeInserters
 						__unstableContentRef={ __unstableContentRef }
