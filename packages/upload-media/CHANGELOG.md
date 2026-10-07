@@ -12,6 +12,7 @@
 
 -   Detect HEIC uploads from the file header rather than the file name, so a HEIC file with a wrong extension or an empty MIME type is converted instead of leaving the upload stuck, and abandon a stalled `ImageDecoder` decode after a timeout instead of hanging the upload ([#81737](https://github.com/WordPress/gutenberg/pull/81737)).
 -   An upload step is no longer silently skipped when the same queue item is processed twice. `processItem` started the next operation without checking whether one was already running, so a re-entrant dispatch (a finishing child sideload pinging its parent, or `resumeQueue` walking the whole queue) ran the same handler a second time, and each run finished the operation, shifting two steps off the item's pipeline ([#83031](https://github.com/WordPress/gutenberg/pull/83031)).
+-   Fixed an endless sideload loop when the browser can't decode an image that wasm-vips could still generate thumbnails for. The big image size threshold check called `createImageBitmap()` without a fallback; when it rejected, `generateThumbnails` threw before finishing the operation, leaving the item stuck in `THUMBNAIL_GENERATION` and repeatedly re-queuing its sub-sizes ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
 
 ## 0.40.0 (2026-09-10)
 
