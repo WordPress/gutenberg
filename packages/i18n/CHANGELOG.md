@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `numberFormatI18n`, a port of the PHP `number_format_i18n()` function that formats a number for the current locale. ([#71214](https://github.com/WordPress/gutenberg/pull/71214))
+
 ## 6.29.0 (2026-09-23)
 
 ## 6.28.0 (2026-09-10)
