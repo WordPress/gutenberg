@@ -533,14 +533,122 @@ describe( 'Breadcrumb', () => {
 			).toThrow( /only accepts/ );
 		} );
 
-		it( 'requires at least one ancestor link', () => {
+		it( 'supports a current-only navigation trail by default', () => {
+			render(
+				<Breadcrumb.Root>
+					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
+			);
+			expect( screen.getByRole( 'navigation' ) ).toHaveAccessibleName(
+				'Breadcrumbs'
+			);
+			expect(
+				screen.getByText( 'Current', {
+					selector: '[aria-current="page"]',
+				} )
+			).toBeVisible();
+		} );
+
+		it( 'supports a current-only selection group', () => {
+			render(
+				<Breadcrumb.Root
+					variant="selection"
+					aria-label="Block hierarchy"
+				>
+					<Breadcrumb.CurrentItem>Document</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
+			);
+			expect(
+				screen.getByRole( 'group', { name: 'Block hierarchy' } )
+			).toBeVisible();
+			expect(
+				screen.getByText( 'Document', {
+					selector: '[aria-current="true"]',
+				} )
+			).not.toHaveAttribute( 'tabindex' );
+			expect(
+				screen.queryByRole( 'navigation' )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'enforces selection semantics in composed roots and current items', () => {
+			render(
+				<Breadcrumb.Root
+					aria-label="Block hierarchy"
+					render={ <div role="navigation" /> }
+				>
+					<Breadcrumb.ButtonItem
+						render={ <button type="submit" aria-current="page" /> }
+					>
+						Document
+					</Breadcrumb.ButtonItem>
+					<Breadcrumb.CurrentItem
+						render={ <span aria-current="page" /> }
+					>
+						Paragraph
+					</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
+			);
+			expect(
+				screen.getByRole( 'group', { name: 'Block hierarchy' } )
+			).toBeVisible();
+			expect(
+				screen.queryByRole( 'navigation' )
+			).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', { name: 'Document' } )
+			).toHaveAttribute( 'type', 'button' );
+			expect(
+				screen.getByRole( 'button', { name: 'Document' } )
+			).not.toHaveAttribute( 'aria-current' );
+			expect(
+				screen.getByText( 'Paragraph', {
+					selector: '[aria-current="true"]',
+				} )
+			).toBeVisible();
+		} );
+
+		it( 'rejects mixed link and button ancestors', () => {
 			expect( () =>
 				render(
 					<Breadcrumb.Root>
+						<Breadcrumb.LinkItem href="/">Home</Breadcrumb.LinkItem>
+						<Breadcrumb.ButtonItem>Group</Breadcrumb.ButtonItem>
 						<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
 					</Breadcrumb.Root>
 				)
-			).toThrow( /at least one/ );
+			).toThrow( /Mixed trails/ );
+		} );
+
+		it( 'keeps button measurement copies inert without event handlers or public refs', () => {
+			const onClick = vi.fn();
+			const ref = vi.fn();
+			const renderRef = vi.fn();
+			const renderClick = vi.fn();
+			const { container } = render(
+				<Breadcrumb.Root aria-label="Block hierarchy">
+					<Breadcrumb.ButtonItem
+						ref={ ref }
+						onClick={ onClick }
+						render={
+							<button ref={ renderRef } onClick={ renderClick } />
+						}
+					>
+						Document
+					</Breadcrumb.ButtonItem>
+					<Breadcrumb.CurrentItem>Paragraph</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
+			);
+			const button = screen.getByRole( 'button', { name: 'Document' } );
+			expect( button ).toHaveAttribute( 'type', 'button' );
+			expect( ref ).toHaveBeenLastCalledWith( button );
+			expect( renderRef ).toHaveBeenLastCalledWith( button );
+			const measurement =
+				container.querySelector< HTMLElement >( '[inert]' )!;
+			expect( measurement ).toHaveAttribute( 'aria-hidden', 'true' );
+			measurement.querySelector< HTMLElement >( 'button' )!.click();
+			expect( onClick ).not.toHaveBeenCalled();
+			expect( renderClick ).not.toHaveBeenCalled();
 		} );
 
 		it( 'requires exactly one final current item', () => {

@@ -34,15 +34,24 @@ function VisibleCurrentItem( {
 	render,
 	...props
 }: CurrentItemImplementationProps ) {
-	const { measurementVersion, showSeparator, shouldTruncateCurrent } =
-		useBreadcrumbItemRenderContext();
+	const {
+		currentRef,
+		variant,
+		measurementVersion,
+		showSeparator,
+		shouldTruncateCurrent,
+	} = useBreadcrumbItemRenderContext();
 	const [ element, setElement ] = useState< HTMLSpanElement | null >( null );
 	const [ isFocusPinned, setIsFocusPinned ] = useState( false );
-	const mergedRef = useMergeRefs( [ forwardedRef, setElement ] );
+	const mergedRef = useMergeRefs( [
+		forwardedRef,
+		setElement,
+		currentRef ?? null,
+	] );
 	const isTruncated = useIsTruncated( element, measurementVersion );
 	const tabIndex = isTruncated || isFocusPinned ? 0 : undefined;
 	const enforcedRender = enforceRenderProps( render, {
-		'aria-current': 'page',
+		'aria-current': variant === 'selection' ? 'true' : 'page',
 		href: undefined,
 		tabIndex,
 	} );
@@ -53,7 +62,7 @@ function VisibleCurrentItem( {
 		props: mergeProps< 'span' >(
 			{ ...props, onBlur, onFocus },
 			{
-				'aria-current': 'page',
+				'aria-current': variant === 'selection' ? 'true' : 'page',
 				children,
 				className: clsx(
 					defenseStyles.div,
@@ -66,9 +75,7 @@ function VisibleCurrentItem( {
 				),
 				onBlur: () => setIsFocusPinned( false ),
 				onFocus: () => {
-					if ( isTruncated ) {
-						setIsFocusPinned( true );
-					}
+					setIsFocusPinned( true );
 				},
 				tabIndex,
 			}
@@ -144,7 +151,7 @@ function MeasurementCurrentItem( {
 }
 
 /**
- * Renders the current, non-navigable page in a breadcrumb trail.
+ * Renders the current, non-activatable item in a breadcrumb trail.
  */
 const CurrentItem = forwardRef< HTMLSpanElement, CurrentItemProps >(
 	function BreadcrumbCurrentItem( props, ref ) {

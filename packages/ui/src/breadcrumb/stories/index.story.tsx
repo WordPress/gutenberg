@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, waitFor } from 'storybook/test';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useRef, useState } from '@wordpress/element';
 import type { ComponentProps } from 'react';
 import * as Breadcrumb from '../';
 
@@ -10,6 +10,7 @@ const meta: Meta< typeof Breadcrumb.Root > = {
 	component: Breadcrumb.Root,
 	subcomponents: {
 		'Breadcrumb.LinkItem': Breadcrumb.LinkItem,
+		'Breadcrumb.ButtonItem': Breadcrumb.ButtonItem,
 		'Breadcrumb.CurrentItem': Breadcrumb.CurrentItem,
 	},
 	argTypes: {
@@ -164,5 +165,106 @@ export const RouterLinkComposition: Story = {
 			</Breadcrumb.LinkItem>
 			<Breadcrumb.CurrentItem>Defaults</Breadcrumb.CurrentItem>
 		</Breadcrumb.Root>
+	),
+};
+
+/**
+ * Button ancestors select a position within one hierarchy. The consumer owns
+ * selection and intentional focus moves. Keep variant="selection" when the
+ * trail can become current-only, including its initial server render.
+ */
+export const HierarchySelection: Story = {
+	render: function SelectionExample() {
+		const [ selectedIndex, setSelectedIndex ] = useState( 3 );
+		const [ width, setWidth ] = useState( 420 );
+		const [ focusEditor, setFocusEditor ] = useState( false );
+		const editorRef = useRef< HTMLTextAreaElement >( null );
+		const labels = [
+			'Document',
+			'Outer group',
+			'Inner group',
+			'Paragraph',
+		];
+		return (
+			<div
+				style={ {
+					display: 'grid',
+					gap: 'var(--wpds-dimension-gap-md)',
+				} }
+			>
+				<label htmlFor="breadcrumb-width">
+					Trail width
+					<input
+						id="breadcrumb-width"
+						type="range"
+						min={ 80 }
+						max={ 600 }
+						value={ width }
+						onChange={ ( event ) =>
+							setWidth( Number( event.target.value ) )
+						}
+					/>
+				</label>
+				<label htmlFor="breadcrumb-focus-editor">
+					<input
+						id="breadcrumb-focus-editor"
+						type="checkbox"
+						checked={ focusEditor }
+						onChange={ ( event ) =>
+							setFocusEditor( event.target.checked )
+						}
+					/>
+					Focus the editor on selection
+				</label>
+				<Breadcrumb.Root
+					aria-label="Block hierarchy"
+					variant="selection"
+					style={ { width, maxWidth: '100%' } }
+				>
+					{ labels
+						.slice( 0, selectedIndex )
+						.map( ( label, index ) => (
+							<Breadcrumb.ButtonItem
+								key={ label }
+								onClick={ () => {
+									setSelectedIndex( index );
+									if ( focusEditor ) {
+										editorRef.current?.focus();
+									}
+								} }
+							>
+								{ label }
+							</Breadcrumb.ButtonItem>
+						) ) }
+					<Breadcrumb.CurrentItem key={ labels[ selectedIndex ] }>
+						{ labels[ selectedIndex ] }
+					</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
+				<label htmlFor="breadcrumb-editor">
+					Editor
+					<textarea
+						id="breadcrumb-editor"
+						ref={ editorRef }
+						defaultValue="Select an ancestor, or clear selection by choosing Document."
+					/>
+				</label>
+				<button onClick={ () => setSelectedIndex( 3 ) }>
+					Select Paragraph
+				</button>
+			</div>
+		);
+	},
+};
+
+export const CurrentOnly: Story = {
+	render: () => (
+		<>
+			<Breadcrumb.Root aria-label="Page hierarchy">
+				<Breadcrumb.CurrentItem>Dashboard</Breadcrumb.CurrentItem>
+			</Breadcrumb.Root>
+			<Breadcrumb.Root aria-label="Block hierarchy" variant="selection">
+				<Breadcrumb.CurrentItem>Document</Breadcrumb.CurrentItem>
+			</Breadcrumb.Root>
+		</>
 	),
 };

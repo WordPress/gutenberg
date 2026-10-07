@@ -1,0 +1,38 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as BreadcrumbStories from './index.story';
+
+<Meta of={ BreadcrumbStories } />
+
+# Breadcrumb usage guidelines
+
+Use Breadcrumb to show a hierarchical path to the current page or selected item. Every ancestor must belong to that hierarchy. Commands such as Delete and Duplicate belong in a separate menu.
+
+## Page navigation
+
+Use `LinkItem` ancestors with meaningful destinations followed by exactly one `CurrentItem`. The root is a named navigation landmark containing an ordered list, and the non-activatable current item has `aria-current="page"`. This follows the [APG breadcrumb pattern](https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/).
+
+<Canvas of={ BreadcrumbStories.Default } />
+
+## Hierarchy selection
+
+Use `ButtonItem` ancestors followed by exactly one `CurrentItem` when ancestors select or activate a position in the hierarchy. For example, a block editor trail can show Document, Group, and Paragraph. Group selects the ancestor block; Document clears selection. Breadcrumb owns ordering, overflow, tooltips, and responsive focus handling. The consumer owns selection state and intentional focus moves into the editor.
+
+The root is a named group containing an ordered list. Visible ancestors are native buttons with `type="button"`; collapsed ancestors are menu actions. The current item is non-activatable and has `aria-current="true"`. This selection variant extends beyond the APG breadcrumb pattern, which describes links to ancestor pages.
+
+<Canvas of={ BreadcrumbStories.HierarchySelection } />
+
+Use `onClick` to activate an ancestor. Breadcrumb forwards refs and event handlers to an `HTMLButtonElement` in the visible trail and an `HTMLDivElement` in the overflow menu. Type refs and event `currentTarget` for both targets. A custom `render` must support both button and menu-item composition. Measurement copies receive neither public refs nor event handlers.
+
+Activating an overflow action closes the menu. If selection removes the focused item or the overflow trigger, Breadcrumb focuses the current item when focus would otherwise fall back to the document body. A consumer focus move into the editor takes precedence. A focused ancestor stays visible during resize where space permits; if it no longer fits, focus moves to the overflow trigger.
+
+## Current-only trails
+
+A single `CurrentItem` is supported. Ancestors determine the semantics when present. Without ancestors, the default is page navigation. Set `variant="selection"` on Root when the trail represents selection and can become current-only. This preserves group semantics when Document is the sole item and works on the initial server render.
+
+<Canvas of={ BreadcrumbStories.CurrentOnly } />
+
+## Supported collections
+
+All ancestors must be links or all must be buttons. Mixed link/button collections produce a development validation error. Keep one final `CurrentItem`, use non-empty text labels, and give items generated from arrays stable React keys. The internal overflow trigger does not change the trail's variant.
+
+A truncated current label remains accessible from the keyboard through its tooltip. It does not become an activation control.
