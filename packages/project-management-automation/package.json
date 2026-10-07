@@ -26,7 +26,8 @@
 		"action.yml",
 		"build-types",
 		"lib",
-		"*.md"
+		"*.md",
+		"!**/test/**"
 	],
 	"type": "module",
 	"main": "lib/index.js",
@@ -37,13 +38,13 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"types": "build-types",
+	"types": "build-types/index.d.ts",
 	"dependencies": {
 		"@actions/core": "^3.0.1",
-		"@actions/github": "^9.1.1"
+		"@actions/github": "^9.1.1",
+		"@octokit/openapi-webhooks-types": "^12.1.0"
 	},
 	"devDependencies": {
-		"@octokit/openapi-webhooks-types": "^12.1.0",
 		"@types/node": "^24.13.3",
 		"vitest": "^5.0.3"
 	},

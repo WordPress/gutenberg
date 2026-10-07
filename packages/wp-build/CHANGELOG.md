@@ -4,7 +4,7 @@
 
 ### Internal
 
--   Publish only runtime files, dropping `tsconfig.json` and the TypeScript build cache (`.cache`) from the package ([#84164](https://github.com/WordPress/gutenberg/pull/84164)).
+-   Publish only runtime files, dropping `tsconfig.json`, the TypeScript build cache (`.cache`) and the test files from the package ([#84164](https://github.com/WordPress/gutenberg/pull/84164)).
 
 ## 0.25.0 (2026-10-07)
 

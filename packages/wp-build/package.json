@@ -26,7 +26,8 @@
 		"eslint-overrides.cjs",
 		"lib",
 		"templates",
-		"*.md"
+		"*.md",
+		"!**/test/**"
 	],
 	"type": "module",
 	"module": "./lib/build.mjs",

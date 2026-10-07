@@ -28,9 +28,10 @@
 		"build-module",
 		"build-style",
 		"build-types",
-		"global.d.ts",
 		"src",
-		"*.md"
+		"*.md",
+		"!**/stories/**",
+		"!**/test/**"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
@@ -42,7 +43,7 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"types": "build-types",
+	"types": "build-types/index.d.ts",
 	"sideEffects": [
 		"build-style/**",
 		"src/**/*.scss",

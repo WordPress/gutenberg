@@ -1,4 +1,3 @@
-import { existsSync } from 'node:fs';
 import {
 	copyFile,
 	mkdir,
@@ -23,13 +22,9 @@ const rootDirectory = path.resolve(
 	'../../..'
 );
 const packagesDirectory = path.join( rootDirectory, 'packages' );
+const buildSolutionPath = path.join( rootDirectory, 'tsconfig.build.json' );
 
-function getPackageTypeOptions( { directory, packageJson } ) {
-	// Split packages build from tsconfig.build.json, unsplit ones from tsconfig.json.
-	let tsconfigPath = path.join( directory, 'tsconfig.build.json' );
-	if ( ! existsSync( tsconfigPath ) ) {
-		tsconfigPath = path.join( directory, 'tsconfig.json' );
-	}
+function showConfig( tsconfigPath, packageJson ) {
 	const result = spawn.sync(
 		'tsc',
 		[ '--showConfig', '--project', tsconfigPath ],
@@ -56,19 +51,64 @@ function getPackageTypeOptions( { directory, packageJson } ) {
 	}
 
 	try {
-		const { typeRoots, types = [] } =
-			JSON.parse( result.stdout ).compilerOptions ?? {};
-		return {
-			typeRoots: typeRoots?.map( ( typeRoot ) =>
-				path.resolve( directory, typeRoot )
-			),
-			types,
-		};
+		return JSON.parse( result.stdout );
 	} catch {
 		throw new Error(
 			`Could not parse TypeScript config for ${ packageJson.name }.`
 		);
 	}
+}
+
+let buildProjects;
+
+/**
+ * Lists the build solution projects that emit this package's declarations.
+ * The dev project is never one of them: its test type packages would mask a
+ * declaration that only resolves with them.
+ *
+ * @param {Object} packageData
+ * @param {string} packageData.directory   Package directory.
+ * @param {Object} packageData.packageJson Package manifest.
+ * @return {string[]} Project paths, as referenced by `tsconfig.build.json`.
+ */
+function getBuildProjects( { directory, packageJson } ) {
+	buildProjects ??= (
+		showConfig( buildSolutionPath, packageJson ).references ?? []
+	).map( ( reference ) => path.resolve( rootDirectory, reference.path ) );
+	return buildProjects.filter(
+		( projectPath ) =>
+			projectPath === directory ||
+			projectPath.startsWith( directory + path.sep )
+	);
+}
+
+function getPackageTypeOptions( packageData ) {
+	const { packageJson } = packageData;
+	const projectPaths = getBuildProjects( packageData );
+	if ( projectPaths.length === 0 ) {
+		throw new Error(
+			`No build project for ${ packageJson.name } in tsconfig.build.json.`
+		);
+	}
+	const typeRoots = new Set();
+	const types = new Set();
+	for ( const projectPath of projectPaths ) {
+		const projectDirectory =
+			path.extname( projectPath ) === '.json'
+				? path.dirname( projectPath )
+				: projectPath;
+		const { compilerOptions = {} } = showConfig( projectPath, packageJson );
+		for ( const typeRoot of compilerOptions.typeRoots ?? [] ) {
+			typeRoots.add( path.resolve( projectDirectory, typeRoot ) );
+		}
+		for ( const type of compilerOptions.types ?? [] ) {
+			types.add( type );
+		}
+	}
+	return {
+		typeRoots: typeRoots.size > 0 ? [ ...typeRoots ] : undefined,
+		types: [ ...types ],
+	};
 }
 
 export async function checkNodeNextTypes(
