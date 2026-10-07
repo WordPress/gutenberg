@@ -184,4 +184,54 @@ class WP_Theme_Json_Test extends WP_UnitTestCase {
 			'Styles for a block registered after a previous call should be present.'
 		);
 	}
+
+	/**
+	 * Same guard as the styles test: the settings accessor cache this replaced had
+	 * a WP_DEBUG bypass too, so only the key assertions can detect its return.
+	 *
+	 * @covers gutenberg_get_global_settings
+	 */
+	public function test_gutenberg_get_global_settings_reads_through_to_the_resolver() {
+		$contexts = array(
+			'gutenberg_get_global_settings_custom' => array(),
+			'gutenberg_get_global_settings_theme'  => array( 'origin' => 'base' ),
+		);
+
+		foreach ( $contexts as $context ) {
+			gutenberg_get_global_settings( array(), $context );
+		}
+
+		foreach ( array_keys( $contexts ) as $cache_key ) {
+			$this->assertFalse(
+				wp_cache_get( $cache_key, 'theme_json' ),
+				"The merged settings should not be cached under $cache_key."
+			);
+		}
+
+		// Block registration adds no settings, so inject one through the theme data
+		// filter: registering a block refreshes the theme data, which reapplies the filter.
+		$filter = static function ( $theme_json ) {
+			return $theme_json->update_with(
+				array(
+					'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'settings' => array(
+						'custom' => array( 'cacheProbe' => 'fresh' ),
+					),
+				)
+			);
+		};
+		add_filter( 'wp_theme_json_data_theme', $filter );
+		register_block_type( 'test/block-settings' );
+
+		$settings = gutenberg_get_global_settings();
+
+		unregister_block_type( 'test/block-settings' );
+		remove_filter( 'wp_theme_json_data_theme', $filter );
+
+		$this->assertSame(
+			'fresh',
+			$settings['custom']['cacheProbe'] ?? null,
+			'Settings changed after a block registration should be present on the next call.'
+		);
+	}
 }
