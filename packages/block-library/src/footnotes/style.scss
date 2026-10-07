@@ -19,3 +19,9 @@ a[data-fn].fn::after {
 	text-indent: 0;
 	float: left;
 }
+
+sup[data-fn].fn {
+	vertical-align: baseline;
+	position: relative;
+	top: -0.4em;
+}
