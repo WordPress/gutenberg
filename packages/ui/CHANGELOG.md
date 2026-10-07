@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.24.0 (2026-10-07)
+
 ### Breaking Changes
 
 -   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
@@ -39,6 +41,7 @@
 
 ### Bug Fixes
 
+-   `VisuallyHidden`: Move hiding styles outside CSS cascade layers to prevent overrides by global element styles ([#84114](https://github.com/WordPress/gutenberg/pull/84114)).
 -   `Combobox.Root`: Preserve separate item and selected-value types for collections, including filtering callbacks ([#84094](https://github.com/WordPress/gutenberg/pull/84094)).
 -   `Autocomplete.Root`: Preserve item type inference in filtering, formatting, and highlight callbacks for flat and grouped items ([#84095](https://github.com/WordPress/gutenberg/pull/84095)).
 -   `Breadcrumb`: Keep a custom renderer's ref on the visible item ([#84069](https://github.com/WordPress/gutenberg/pull/84069)).
