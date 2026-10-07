@@ -164,7 +164,7 @@ class WP_Theme_Json_Test extends WP_UnitTestCase {
 	/**
 	 * @covers gutenberg_get_global_settings
 	 */
-	public function test_gutenberg_get_global_settings_reflects_theme_data_changed_after_a_previous_call() {
+	public function test_gutenberg_get_global_settings_has_no_cache_in_front_of_the_resolver() {
 		gutenberg_get_global_settings();
 
 		// Block registration adds no settings, so inject one through the theme data
@@ -190,7 +190,7 @@ class WP_Theme_Json_Test extends WP_UnitTestCase {
 		$this->assertSame(
 			'fresh',
 			$settings['custom']['cacheProbe'] ?? null,
-			'Settings changed after a block registration should be present on the next call.'
+			'The accessor should read through to the resolver instead of caching its own copy.'
 		);
 	}
 }
