@@ -10,8 +10,8 @@
  * view configuration for a given entity type.
  *
  * Extends the 7.1 controller to describe the table column styles in the
- * item schema and to add the `showPlaceholderIfEmpty` option of the panel
- * form layout.
+ * item schema, to add the `showPlaceholderIfEmpty` option of the panel
+ * form layout, and to add the item count of each view in the `page` view list.
  *
  * @since 7.2.0
  *
@@ -74,10 +74,37 @@ class Gutenberg_REST_View_Config_Controller_7_2 extends Gutenberg_REST_View_Conf
 	}
 
 	/**
+	 * Returns the view configuration for the given entity type.
+	 *
+	 * Adds the item count of each view in the `page` view list. The counts are
+	 * added here rather than through the view config filter, so that they are
+	 * computed from the view list after every filter has changed it.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function get_items( $request ) {
+		$response = parent::get_items( $request );
+		if ( is_wp_error( $response ) || 'postType' !== $request->get_param( 'kind' ) || 'page' !== $request->get_param( 'name' ) ) {
+			return $response;
+		}
+
+		$data = $response->get_data();
+		if ( is_array( $data['view_list'] ) ) {
+			$data['view_list'] = _gutenberg_add_counts_to_view_list( 'page', $data['view_list'] );
+			$response->set_data( $data );
+		}
+
+		return $response;
+	}
+
+	/**
 	 * Retrieves the view configuration schema, conforming to JSON Schema.
 	 *
-	 * Adds the `count` of each entry in the view list, which is provided by
-	 * _gutenberg_add_counts_to_page_view_config().
+	 * Adds the `count` of each entry in the view list, which get_items()
+	 * provides.
 	 *
 	 * @since 7.2.0
 	 *

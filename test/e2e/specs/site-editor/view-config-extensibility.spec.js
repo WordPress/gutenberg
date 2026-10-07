@@ -84,6 +84,17 @@ test.describe( 'View config extensibility', () => {
 		await expect( getViewItem( page, 'Scheduled' ) ).toHaveCount( 0 );
 		await expect( getViewItem( page, 'Pending' ) ).toBeVisible();
 
+		// A view narrowed by more than its status gets no count, since a
+		// status total would not describe it: "In progress" holds only the
+		// drafts after its date, and "Published after 2020" only some of the
+		// published pages.
+		await expect( getViewItem( page, 'In progress' ) ).toHaveAccessibleName(
+			'In progress'
+		);
+		await expect(
+			getViewItem( page, 'Published after 2020' )
+		).toHaveAccessibleName( 'Published after 2020' );
+
 		// The default view and the only allowed layout reach DataViews.
 		const table = page.getByRole( 'table' );
 		await expect( table ).toBeVisible();

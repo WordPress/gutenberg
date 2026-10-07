@@ -232,54 +232,91 @@ function gutenberg_register_default_posttype_form_summaries_7_2( $post_type ) {
 add_action( 'registered_post_type', 'gutenberg_register_default_posttype_form_summaries_7_2' );
 
 /**
- * Adds the item count of each view to the `page` view list.
+ * Adds the item count of each view to a post type's view list.
  *
- * The counts say how many items each status view holds, so they are totals for
- * the post type rather than for any one page of results. `wp_count_posts()`
- * answers all of them from a single cached query, and its `readable` permission
- * argument keeps private posts the current user cannot read out of the totals.
+ * Runs on the view list as the client receives it, after every view config
+ * filter, so a count always describes the view it sits on. Only a view whose
+ * total a status count answers gets one: a view without filters, which lists
+ * every status but trash, and a view whose only filter is on the status. A view
+ * narrowed by anything else, such as a date filter a plugin added, is left
+ * without a count rather than showing a total it does not hold.
  *
- * The counts are merged in by slug, so the views themselves stay defined in
- * _gutenberg_get_entity_view_config_posttype_page(), and the base "All items"
- * view keeps its post-type-specific title. Its total leaves out trashed posts,
- * matching the statuses that view queries.
+ * `wp_count_posts()` answers every view from one cached query, and its
+ * `readable` permission argument keeps private posts the current user cannot
+ * read out of the totals.
  *
- * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
- * @return Gutenberg_View_Config_Data The updated view configuration container.
+ * @param string $post_type The post type the view list belongs to.
+ * @param array  $view_list The view list.
+ * @return array The view list, with a count on each view a status total answers.
  */
-function _gutenberg_add_counts_to_page_view_config( $data ) {
-	$counts = wp_count_posts( 'page', 'readable' );
+function _gutenberg_add_counts_to_view_list( $post_type, $view_list ) {
+	$counts = (array) wp_count_posts( $post_type, 'readable' );
 
-	$status_of_view = array(
-		'published' => 'publish',
-		'future'    => 'future',
-		'drafts'    => 'draft',
-		'pending'   => 'pending',
-		'private'   => 'private',
-		'trash'     => 'trash',
-	);
+	foreach ( $view_list as $index => $entry ) {
+		$statuses = _gutenberg_get_view_list_entry_statuses( $entry );
+		if ( null === $statuses ) {
+			continue;
+		}
 
-	$all       = 0;
-	$view_list = array();
-	foreach ( $status_of_view as $slug => $status ) {
-		$count       = isset( $counts->$status ) ? (int) $counts->$status : 0;
-		$view_list[] = array(
-			'slug'  => $slug,
-			'count' => $count,
-		);
-		if ( 'trash' !== $status ) {
-			$all += $count;
+		$count = 0;
+		foreach ( $statuses as $status ) {
+			$count += isset( $counts[ $status ] ) ? (int) $counts[ $status ] : 0;
+		}
+		$view_list[ $index ]['count'] = $count;
+	}
+
+	return $view_list;
+}
+
+/**
+ * Returns the statuses a view list entry lists, when the status is all it
+ * filters by.
+ *
+ * The entry comes from view config filters, so its shape is not trusted.
+ *
+ * @param mixed $entry A view list entry.
+ * @return string[]|null The statuses, or null when the view filters by anything
+ *                       else or its shape is not recognized.
+ */
+function _gutenberg_get_view_list_entry_statuses( $entry ) {
+	if ( ! is_array( $entry ) ) {
+		return null;
+	}
+
+	$view = isset( $entry['view'] ) ? (array) $entry['view'] : array();
+	if ( ! empty( $view['search'] ) ) {
+		return null;
+	}
+
+	$filters = isset( $view['filters'] ) ? $view['filters'] : array();
+	if ( ! is_array( $filters ) ) {
+		return null;
+	}
+	if ( empty( $filters ) ) {
+		// Every status but trash, matching what a view without filters queries.
+		return array( 'publish', 'future', 'draft', 'pending', 'private' );
+	}
+	if ( 1 !== count( $filters ) ) {
+		return null;
+	}
+
+	$filter = (array) reset( $filters );
+	if (
+		! isset( $filter['field'], $filter['operator'], $filter['value'] ) ||
+		'status' !== $filter['field'] ||
+		! in_array( $filter['operator'], array( 'is', 'isAny' ), true )
+	) {
+		return null;
+	}
+
+	$statuses = is_array( $filter['value'] ) ? $filter['value'] : array( $filter['value'] );
+	foreach ( $statuses as $status ) {
+		if ( ! is_string( $status ) ) {
+			return null;
 		}
 	}
-	array_unshift(
-		$view_list,
-		array(
-			'slug'  => 'all',
-			'count' => $all,
-		)
-	);
 
-	return $data->merge( array( 'view_list' => $view_list ), 1 );
+	return $statuses;
 }
 
 /**
@@ -310,12 +347,6 @@ function gutenberg_register_entity_view_config_filters_7_2() {
 	add_filter(
 		gutenberg_get_entity_view_config_hook_name( 'postType', 'wp_template' ),
 		'_gutenberg_remove_stale_fields_from_wp_template_view_config',
-		6,
-		1
-	);
-	add_filter(
-		gutenberg_get_entity_view_config_hook_name( 'postType', 'page' ),
-		'_gutenberg_add_counts_to_page_view_config',
 		6,
 		1
 	);
