@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { globSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { loadCsf } from 'storybook/internal/csf-tools';
 import { describe, expect, it } from 'vitest';
@@ -7,64 +7,12 @@ import { storyGlobs } from '../story-globs';
 const CONFIG_DIR = path.join( __dirname, '..' );
 
 /**
- * Turns one of Storybook's `stories` globs into an equivalent regular
- * expression. Only the syntax those globs use is supported: `**`, `*` and
- * `@(a|b)`.
+ * Lists every story and doc Storybook indexes.
  *
- * @param glob A glob relative to the Storybook config directory.
- * @return A pattern matching the paths the glob covers.
- */
-function globToRegExp( glob: string ) {
-	const escape = ( value: string ) =>
-		value.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' );
-	const tokens = glob.match( /@\([^)]+\)|\*\*\/|\*|[^*@]+|./g ) ?? [];
-
-	const pattern = tokens
-		.map( ( token ) => {
-			if ( token.startsWith( '@(' ) ) {
-				const alternatives = token.slice( 2, -1 ).split( '|' );
-				return `(?:${ alternatives.map( escape ).join( '|' ) })`;
-			}
-			if ( token === '**/' ) {
-				return '(?:[^/]+/)*';
-			}
-			if ( token === '*' ) {
-				return '[^/]*';
-			}
-			return escape( token );
-		} )
-		.join( '' );
-
-	return new RegExp( `^${ pattern }$` );
-}
-
-/**
- * Lists every story and doc Storybook indexes, by walking the directories the
- * `stories` globs point at and keeping the paths those globs match.
- *
- * @return Paths relative to the Storybook config directory, written the same
- *         way the globs are so they can be matched against them.
+ * @return Paths relative to the Storybook config directory.
  */
 function findStoryFiles() {
-	const files = new Set< string >();
-
-	for ( const glob of storyGlobs ) {
-		const prefix = glob.slice( 0, glob.indexOf( '*' ) );
-		const walked = readdirSync( path.join( CONFIG_DIR, prefix ), {
-			recursive: true,
-		} );
-		const matches = globToRegExp( glob );
-
-		for ( const entry of walked ) {
-			const file =
-				prefix + entry.toString().split( path.sep ).join( '/' );
-			if ( matches.test( file ) ) {
-				files.add( file );
-			}
-		}
-	}
-
-	return [ ...files ].sort();
+	return globSync( storyGlobs, { cwd: CONFIG_DIR } ).sort();
 }
 
 /**
