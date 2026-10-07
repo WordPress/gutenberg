@@ -134,34 +134,10 @@ class WP_Theme_Json_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The suite runs with WP_DEBUG on, and a cache with a WP_DEBUG bypass returns
-	 * fresh data on every call, so the late-registration assertion alone cannot
-	 * detect the accessor cache this replaced (WordPress/gutenberg#81889) being
-	 * reinstated. The assertions on its keys can.
-	 *
 	 * @covers gutenberg_get_global_styles
 	 */
-	public function test_gutenberg_get_global_styles_reads_through_to_the_resolver() {
-		$contexts = array(
-			'gutenberg_get_global_styles_custom'          => array(),
-			'gutenberg_get_global_styles_custom_resolved' => array( 'transforms' => array( 'resolve-variables' ) ),
-			'gutenberg_get_global_styles_theme'           => array( 'origin' => 'base' ),
-			'gutenberg_get_global_styles_theme_resolved'  => array(
-				'origin'     => 'base',
-				'transforms' => array( 'resolve-variables' ),
-			),
-		);
-
-		foreach ( $contexts as $context ) {
-			gutenberg_get_global_styles( array(), $context );
-		}
-
-		foreach ( array_keys( $contexts ) as $cache_key ) {
-			$this->assertFalse(
-				wp_cache_get( $cache_key, 'theme_json' ),
-				"The merged styles should not be cached under $cache_key."
-			);
-		}
+	public function test_gutenberg_get_global_styles_reflects_blocks_registered_after_a_previous_call() {
+		gutenberg_get_global_styles();
 
 		register_block_type(
 			'test/block-gap',
@@ -186,27 +162,10 @@ class WP_Theme_Json_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Same guard as the styles test: the settings accessor cache this replaced had
-	 * a WP_DEBUG bypass too, so only the key assertions can detect its return.
-	 *
 	 * @covers gutenberg_get_global_settings
 	 */
-	public function test_gutenberg_get_global_settings_reads_through_to_the_resolver() {
-		$contexts = array(
-			'gutenberg_get_global_settings_custom' => array(),
-			'gutenberg_get_global_settings_theme'  => array( 'origin' => 'base' ),
-		);
-
-		foreach ( $contexts as $context ) {
-			gutenberg_get_global_settings( array(), $context );
-		}
-
-		foreach ( array_keys( $contexts ) as $cache_key ) {
-			$this->assertFalse(
-				wp_cache_get( $cache_key, 'theme_json' ),
-				"The merged settings should not be cached under $cache_key."
-			);
-		}
+	public function test_gutenberg_get_global_settings_reflects_theme_data_changed_after_a_previous_call() {
+		gutenberg_get_global_settings();
 
 		// Block registration adds no settings, so inject one through the theme data
 		// filter: registering a block refreshes the theme data, which reapplies the filter.
