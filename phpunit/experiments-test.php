@@ -140,7 +140,7 @@ class Experiments_Test extends WP_UnitTestCase {
 	}
 
 	public function test_an_unrelated_active_plugin_is_not_detected() {
-		$this->activate_mock_plugin( 'akismet/akismet.php', '1.0.0' );
+		$this->activate_mock_plugin( 'mock-unrelated-plugin/mock-unrelated-plugin.php', '1.0.0' );
 
 		$this->assertFalse( gutenberg_has_react_19_incompatible_extension() );
 	}
