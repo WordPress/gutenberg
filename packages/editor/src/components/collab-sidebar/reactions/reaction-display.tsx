@@ -9,7 +9,11 @@ import { Button, Stack, Tooltip } from '@wordpress/ui';
 import { useState, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-import { getReactionEmoji } from './reaction-emojis';
+import {
+	getReactionEmoji,
+	hexKeyToEmoji,
+	useReactionEmojis,
+} from './reaction-emojis';
 
 interface ReactionSummaryEntry {
 	count: number;
@@ -400,6 +404,7 @@ export default function ReactionDisplay( {
 	onToggleReaction,
 	children,
 }: ReactionDisplayProps ) {
+	const emojis = useReactionEmojis();
 	const reactedHexKeys = getReactedHexKeys( reactions );
 
 	if ( reactedHexKeys.length === 0 && ! children ) {
@@ -418,6 +423,9 @@ export default function ReactionDisplay( {
 			{ reactedHexKeys.map( ( hexKey ) => {
 				const count = getReactionCount( reactions, hexKey );
 				const isActive = hasUserReacted( reactions, hexKey );
+				// An emoji the site no longer offers keeps its pill, which
+				// can still remove the user's own reaction but not add one.
+				const entry = getReactionEmoji( emojis, hexKey );
 
 				return (
 					<ReactionButton
@@ -426,9 +434,11 @@ export default function ReactionDisplay( {
 						hexKey={ hexKey }
 						count={ count }
 						isActive={ isActive }
-						emoji={ getReactionEmoji( hexKey )?.emoji ?? hexKey }
-						emojiLabel={ getReactionEmoji( hexKey )?.label }
-						disabled={ disabled }
+						emoji={
+							entry?.emoji || hexKeyToEmoji( hexKey ) || hexKey
+						}
+						emojiLabel={ entry?.label }
+						disabled={ disabled || ( ! entry && ! isActive ) }
 						onToggleReaction={ onToggleReaction }
 					/>
 				);

@@ -16,6 +16,7 @@ import ReactionDisplay, {
 } from './reactions/reaction-display';
 import { AddReactionButton } from './reactions/add-reaction-button';
 import { useReaction } from './reactions/use-reaction';
+import { useReactionEmojis } from './reactions/reaction-emojis';
 
 function NoteActionsMenu( { items, buttonRef } ) {
 	return (
@@ -59,6 +60,7 @@ export function Note( {
 	isThreadResolved = false,
 } ) {
 	const { reactions, toggleReaction } = useReaction( note );
+	const reactionEmojis = useReactionEmojis();
 	const [ actionState, setActionState ] = useState( null );
 	const actionButtonRef = useRef( null );
 
@@ -88,8 +90,13 @@ export function Note( {
 	const hasReactions = getReactedHexKeys( reactions ).length > 0;
 	// Not while editing: the trigger floats over the note's corner, which
 	// during an edit is the form's own text field. Not on a resolved thread
-	// either, where reactions can no longer be toggled.
-	const canReact = isSelected && actionState !== 'edit' && ! isThreadResolved;
+	// either, where reactions can no longer be toggled. Nor when the site
+	// has filtered the reaction emoji down to none.
+	const canReact =
+		isSelected &&
+		actionState !== 'edit' &&
+		! isThreadResolved &&
+		reactionEmojis.length > 0;
 	const metaStatus = note.meta?._wp_note_status;
 	const isResolutionNote =
 		metaStatus === 'resolved' || metaStatus === 'reopen';

@@ -41,6 +41,28 @@ describe( 'ReactionDisplay', () => {
 		expect( thumbsUp ).toHaveAttribute( 'aria-pressed', 'true' );
 	} );
 
+	it( 'keeps the pill of an emoji the site no longer offers, for removal only', () => {
+		render(
+			<ReactionDisplay
+				noteId={ NOTE_ID }
+				reactions={ {
+					'1f984': { count: 1, current_user_reaction: 0 },
+					'1f44d': { count: 1, current_user_reaction: 42 },
+				} }
+				onToggleReaction={ () => {} }
+			/>
+		);
+		const [ unicorn, thumbsUp ] = screen.getAllByRole( 'button' );
+
+		// Neither is a default, so each renders from its hex key.
+		expect( unicorn ).toHaveTextContent( '🦄' );
+		expect( thumbsUp ).toHaveTextContent( '👍' );
+		// Someone else's reaction cannot be joined; your own can be removed.
+		// The Design System Button stays focusable when disabled.
+		expect( unicorn ).toHaveAttribute( 'aria-disabled', 'true' );
+		expect( thumbsUp ).toHaveAttribute( 'aria-disabled', 'false' );
+	} );
+
 	it( 'fetches the reactions on a note once for all of its pills', async () => {
 		const [ heart, thumbsUp ] = renderPills();
 

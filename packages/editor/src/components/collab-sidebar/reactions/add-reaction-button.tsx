@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
 import { IconButton, Menu } from '@wordpress/ui';
 import { reaction as reactionIcon } from '@wordpress/icons';
-import { REACTION_EMOJIS } from './reaction-emojis';
+import { useReactionEmojis } from './reaction-emojis';
 import { hasUserReacted } from './reaction-display';
 import type { ReactionSummary } from './reaction-display';
 
@@ -16,7 +16,8 @@ interface AddReactionButtonProps {
 }
 
 /**
- * The add-reaction button, opening a menu of the reaction emoji.
+ * The add-reaction button, opening a menu of the reaction emoji. Render it
+ * only when `useReactionEmojis()` returns at least one emoji.
  *
  * @param props                  Component props.
  * @param props.reactions        The note's reaction summary, used to mark the
@@ -27,6 +28,8 @@ export function AddReactionButton( {
 	reactions,
 	onToggleReaction,
 }: AddReactionButtonProps ) {
+	const emojis = useReactionEmojis();
+
 	return (
 		<Menu.Root>
 			<Menu.Trigger
@@ -46,7 +49,7 @@ export function AddReactionButton( {
 				aria-label={ __( 'Add reaction' ) }
 				positioner={ <Menu.Positioner side="bottom" align="end" /> }
 			>
-				{ REACTION_EMOJIS.map( ( { emoji, hexKey, label } ) => (
+				{ emojis.map( ( { emoji, hexKey, label } ) => (
 					<Menu.CheckboxItem
 						key={ hexKey }
 						checked={ hasUserReacted( reactions, hexKey ) }
