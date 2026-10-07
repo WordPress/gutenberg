@@ -12,6 +12,7 @@
 
 ### Bug Fixes
 
+-   Title-gap inserter: Hide the insertion cue while multi-selecting so the overlay cannot intercept shift+click on the first block ([#82301](https://github.com/WordPress/gutenberg/pull/82301)).
 -   `PostTrash`: Offer "Delete permanently" instead of "Move to trash" when the post can't be moved to the trash, based on the new `wp:action-trash` REST link ([#84045](https://github.com/WordPress/gutenberg/pull/84045)).
 -   Keep post actions and note actions menus dismissible when their triggers become disabled. Close the View menu when it becomes unavailable ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
 -   Remove redundant menu groups from the mode switcher and preview menu, and associate the Editor label with its radio group ([#83792](https://github.com/WordPress/gutenberg/pull/83792)).

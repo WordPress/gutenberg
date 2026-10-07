@@ -17,6 +17,7 @@
 
 ### Bug Fixes
 
+-   In-between inserter: Limit title-gap (`is-before-first-block`) hit-testing to the "+" so the overlay no longer steals clicks on the first block (fixes WebKit shift+click multi-selection inside a Group) ([#82301](https://github.com/WordPress/gutenberg/pull/82301)).
 -   Block inspector: Restore the Settings tab for a block whose only advanced tool is "Allowed blocks" (e.g. a container with `allowedBlocks` and no anchor), by counting the allowed-blocks fills when deciding whether to show the tab. The control is also now hidden while editing a section (pattern) block, matching the other inspector controls ([#84067](https://github.com/WordPress/gutenberg/pull/84067)).
 -   Fix the translator comments for the "blocks moved" and "blocks added" screen reader messages, which described the count as a block name ([#83555](https://github.com/WordPress/gutenberg/pull/83555)).
 -   `BlockCompare`: Show whitespace differences in the Resolve Block dialog. The markup's spaces and blank lines are kept instead of collapsed by the browser, and each added or removed line break gets a visible marker, so a diff made only of whitespace no longer looks identical on both sides. The dialog also shows the markup of a converted Custom HTML block, which is kept in its `innerContent` rather than produced by `save`, instead of an empty diff ([#82397](https://github.com/WordPress/gutenberg/pull/82397)).

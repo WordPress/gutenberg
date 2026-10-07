@@ -92,6 +92,9 @@ export function useTitleGapInserter( enabled ) {
 					registry.dispatch( blockEditorStore );
 
 				if ( isMultiSelecting() ) {
+					// Clear a stuck title-gap overlay so it cannot intercept
+					// shift+click multi-selection on the first block.
+					hideTitleGapInsertionPoint( registry );
 					return;
 				}
 
