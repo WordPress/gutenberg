@@ -7,11 +7,7 @@
 				"!vtsls",
 				"!typescript-language-server",
 				"..."
-			],
-			"format_on_save": "on",
-			"code_actions_on_format": {
-				"source.fixAll.eslint": true
-			}
+			]
 		},
 		"JSX": {
 			"language_servers": [
@@ -20,11 +16,7 @@
 				"!vtsls",
 				"!typescript-language-server",
 				"..."
-			],
-			"format_on_save": "on",
-			"code_actions_on_format": {
-				"source.fixAll.eslint": true
-			}
+			]
 		},
 		"TypeScript": {
 			"language_servers": [
@@ -33,11 +25,7 @@
 				"!vtsls",
 				"!typescript-language-server",
 				"..."
-			],
-			"format_on_save": "on",
-			"code_actions_on_format": {
-				"source.fixAll.eslint": true
-			}
+			]
 		},
 		"TSX": {
 			"language_servers": [
@@ -46,15 +34,10 @@
 				"!vtsls",
 				"!typescript-language-server",
 				"..."
-			],
-			"format_on_save": "on",
-			"code_actions_on_format": {
-				"source.fixAll.eslint": true
-			}
+			]
 		},
 		"CSS": {
 			"language_servers": [ "stylelint-lsp", "..." ],
-			"format_on_save": "on",
 			"formatter": [
 				{
 					"code_action": "source.fixAll.stylelint"
@@ -63,7 +46,6 @@
 		},
 		"SCSS": {
 			"language_servers": [ "stylelint-lsp", "..." ],
-			"format_on_save": "on",
 			"formatter": [
 				{
 					"code_action": "source.fixAll.stylelint"
@@ -79,7 +61,6 @@
 				"!phpantom",
 				"..."
 			],
-			"format_on_save": "on",
 			"formatter": [
 				{
 					"code_action": "source.fixAll.phpcs"
@@ -98,18 +79,6 @@
 				]
 			}
 		},
-		"eslint": {
-			"settings": {
-				"workingDirectory": {
-					"mode": "location"
-				},
-				"bulkSuppression": {
-					"enable": true,
-					"location": "tools/eslint/suppressions.json",
-					"severity": "hint"
-				}
-			}
-		},
 		"stylelint-lsp": {
 			"settings": {
 				"stylelint": {
@@ -121,19 +90,6 @@
 			"settings": {
 				"environment": {
 					"phpVersion": "7.4.0"
-				},
-				"files": {
-					"exclude": [
-						"**/.cache/**",
-						"**/.git/**",
-						"**/.history/**",
-						"**/build/**",
-						"**/build-module/**",
-						"**/build-types/**",
-						"**/build-style/**",
-						"**/node_modules/**",
-						"**/vendor/**"
-					]
 				}
 			}
 		}
