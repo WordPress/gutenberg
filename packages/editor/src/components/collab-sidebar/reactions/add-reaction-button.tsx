@@ -52,7 +52,6 @@ export function AddReactionButton( {
 						prefix={
 							<span
 								className="editor-collab-sidebar-panel__reaction-option-emoji"
-								aria-hidden="true"
 							>
 								{ emoji }
 							</span>
