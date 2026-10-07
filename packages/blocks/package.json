@@ -72,13 +72,13 @@
 		"is-plain-object": "^5.1.0",
 		"marked": "^18.0.3",
 		"memize": "^2.1.1",
-		"react-is": "^18.3.0",
+		"react-is": "^19.3.0",
 		"remove-accents": "^0.5.0",
 		"simple-html-tokenizer": "^0.5.7",
 		"uuid": "^14.0.0"
 	},
 	"devDependencies": {
-		"@types/react-is": "^18.3.1",
+		"@types/react-is": "^19.3.0",
 		"deep-freeze": "^0.0.1",
 		"vitest": "^5.0.3"
 	},
