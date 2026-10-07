@@ -81,7 +81,7 @@ function ControlsWithStoreSubscription( props ) {
 	const hasPatternBindings =
 		!! bindings &&
 		Object.values( bindings ).some(
-			( binding ) => binding.source === 'core/pattern-overrides'
+			( binding ) => binding?.source === 'core/pattern-overrides'
 		);
 
 	const shouldShowPatternOverridesControls =

@@ -10,7 +10,7 @@ export function isOverridableBlock( block ) {
 		!! block.attributes.metadata?.name &&
 		!! block.attributes.metadata?.bindings &&
 		Object.values( block.attributes.metadata.bindings ).some(
-			( binding ) => binding.source === 'core/pattern-overrides'
+			( binding ) => binding?.source === 'core/pattern-overrides'
 		)
 	);
 }
