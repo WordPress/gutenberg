@@ -55,6 +55,24 @@ describe( 'getLayoutStyle', () => {
 
 		const result = grid.getLayoutStyle( {
 			selector: '.my-container',
+			layout: { columnCount: 3, rowCount: 2 },
+			style: {},
+			blockName: 'test-block',
+			hasBlockGapSupport: false,
+			layoutDefinitions: undefined,
+		} );
+
+		expect( result ).toBe( expected );
+	} );
+	it( 'should size manual placement grids by their width and make images cover their cells', () => {
+		const expected =
+			`.my-container { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(1rem, 1fr)); grid-auto-rows: minmax(1rem, 1fr); aspect-ratio: 3 / 2; min-height: 0; }` +
+			`.my-container > .wp-block-image { display: flex; flex-direction: column; }` +
+			`.my-container > .wp-block-image > :is(img, a) { flex: 1 1 0; min-height: 0; }` +
+			`.my-container > .wp-block-image img { width: 100%; height: 100%; object-fit: cover; }`;
+
+		const result = grid.getLayoutStyle( {
+			selector: '.my-container',
 			layout: { columnCount: 3, rowCount: 2, isManualPlacement: true },
 			style: {},
 			blockName: 'test-block',
@@ -63,6 +81,20 @@ describe( 'getLayoutStyle', () => {
 		} );
 
 		expect( result ).toBe( expected );
+	} );
+	it( 'should update the aspect ratio of manual placement grids when a viewport changes the column count', () => {
+		const result = grid.getLayoutStyle( {
+			selector: '.my-container',
+			layout: { columnCount: 3, rowCount: 2, isManualPlacement: true },
+			viewportOverrides: { columnCount: 1 },
+			style: {},
+			blockName: 'test-block',
+			hasBlockGapSupport: false,
+			layoutDefinitions: undefined,
+		} );
+
+		expect( result ).toContain( 'aspect-ratio: 1 / 2' );
+		expect( result ).not.toContain( '.wp-block-image' );
 	} );
 	it( 'should return `grid-template-columns` with max() function if both minimumColumnWidth and columnCount are provided', () => {
 		const expected = `.my-container { grid-template-columns: repeat(auto-fill, minmax(max(min( 12rem, 100%), ( 100% - (1.2rem*2) ) / 3), 1fr)); container-type: inline-size; }`;

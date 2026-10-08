@@ -935,7 +935,8 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$should_output_grid_columns = true;
 		}
 
-		$should_output_grid_rows = ( null === $viewport_overrides || $has_viewport_property_override( 'rowCount' ) ) && ! empty( $column_count ) && ! empty( $row_count );
+		$is_manual_placement     = ! empty( $layout_for_styles['isManualPlacement'] );
+		$should_output_grid_rows = ( null === $viewport_overrides || $has_viewport_property_override( 'rowCount' ) || ( $is_manual_placement && $has_viewport_property_override( 'columnCount' ) ) ) && ! empty( $column_count ) && ! empty( $row_count );
 		$grid_declarations       = array();
 
 		/* When enabled, columns stretch to fill the available space using
@@ -972,11 +973,47 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		 * stacking on mobile, match them.
 		 */
 		if ( $should_output_grid_rows ) {
+			$grid_row_declarations = array(
+				'grid-template-rows' => 'repeat(' . $row_count . ', minmax(1rem, 1fr))',
+				'grid-auto-rows'     => 'minmax(1rem, 1fr)',
+			);
+			/*
+			 * Manual grids take their height from their width, so that cells are close to
+			 * square and content never makes them bigger. The gaps keep them from being
+			 * exactly square.
+			 */
+			if ( $is_manual_placement ) {
+				$grid_row_declarations['aspect-ratio'] = $column_count . ' / ' . $row_count;
+				$grid_row_declarations['min-height']   = '0';
+			}
 			$layout_styles[] = array(
 				'selector'     => $selector,
+				'declarations' => $grid_row_declarations,
+			);
+		}
+
+		// Images in a manual grid cover their cells, below any caption.
+		if ( null === $viewport_overrides && $is_manual_placement ) {
+			$layout_styles[] = array(
+				'selector'     => "$selector > .wp-block-image",
 				'declarations' => array(
-					'grid-template-rows' => 'repeat(' . $row_count . ', minmax(1rem, 1fr))',
-					'grid-auto-rows'     => 'minmax(1rem, 1fr)',
+					'display'        => 'flex',
+					'flex-direction' => 'column',
+				),
+			);
+			$layout_styles[] = array(
+				'selector'     => "$selector > .wp-block-image > :is(img, a)",
+				'declarations' => array(
+					'flex'       => '1 1 0',
+					'min-height' => '0',
+				),
+			);
+			$layout_styles[] = array(
+				'selector'     => "$selector > .wp-block-image img",
+				'declarations' => array(
+					'width'      => '100%',
+					'height'     => '100%',
+					'object-fit' => 'cover',
 				),
 			);
 		}
@@ -1433,8 +1470,18 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			! empty( $used_layout['isManualPlacement'] ) &&
 			false !== ( $mobile_layout['stackOnMobile'] ?? true )
 		) {
+			// Stacked blocks are sized by their content again, images included.
 			$stacking_styles = gutenberg_style_engine_get_stylesheet_from_css_rules(
 				array(
+					array(
+						'rules_group'  => $mobile_media_query,
+						'selector'     => ".$container_class.$container_class",
+						'declarations' => array(
+							'aspect-ratio'       => 'auto',
+							'grid-template-rows' => 'none',
+							'grid-auto-rows'     => 'auto',
+						),
+					),
 					array(
 						'rules_group'  => $mobile_media_query,
 						'selector'     => ".$container_class.$container_class > *",
@@ -1443,6 +1490,16 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 							'grid-row'    => 'span var(--wp--grid-item--row-span, 1)',
 							'rotate'      => 'none',
 						),
+					),
+					array(
+						'rules_group'  => $mobile_media_query,
+						'selector'     => ".$container_class.$container_class > .wp-block-image",
+						'declarations' => array( 'display' => 'block' ),
+					),
+					array(
+						'rules_group'  => $mobile_media_query,
+						'selector'     => ".$container_class.$container_class > .wp-block-image img",
+						'declarations' => array( 'height' => 'auto' ),
 					),
 				),
 				array(

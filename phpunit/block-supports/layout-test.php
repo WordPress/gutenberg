@@ -897,12 +897,43 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 
 		$stylesheet    = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
 		$stacking_rule = ".$container_class.$container_class > *{grid-column:1 / -1;grid-row:span var(--wp--grid-item--row-span, 1);rotate:none;}";
+		$sizing_rule   = ".$container_class.$container_class{aspect-ratio:auto;grid-template-rows:none;grid-auto-rows:auto;}";
+		$image_rule    = ".$container_class.$container_class > .wp-block-image img{height:auto;}";
 
 		if ( $should_stack ) {
 			$this->assertStringContainsString( '@media (width <= 480px){' . $stacking_rule, $stylesheet );
+			$this->assertStringContainsString( '@media (width <= 480px){' . $sizing_rule, $stylesheet, 'A stacked grid should be sized by its content.' );
+			$this->assertStringContainsString( '@media (width <= 480px){' . $image_rule, $stylesheet, 'Images in a stacked grid should keep their own height.' );
 		} else {
 			$this->assertStringNotContainsString( $stacking_rule, $stylesheet );
+			$this->assertStringNotContainsString( $sizing_rule, $stylesheet );
 		}
+	}
+
+	/**
+	 * Check that manual placement grids take their height from their width, and that
+	 * their images cover their cells.
+	 *
+	 * @covers ::gutenberg_get_layout_style
+	 */
+	public function test_gutenberg_get_layout_style_sizes_manual_grids_by_width() {
+		$layout_styles = gutenberg_get_layout_style(
+			'.wp-layout',
+			array(
+				'type'              => 'grid',
+				'columnCount'       => 3,
+				'rowCount'          => 2,
+				'isManualPlacement' => true,
+			)
+		);
+
+		$this->assertSame(
+			'.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);aspect-ratio:3 / 2;min-height:0;}' .
+			'.wp-layout > .wp-block-image{display:flex;flex-direction:column;}' .
+			'.wp-layout > .wp-block-image > :is(img, a){flex:1 1 0;min-height:0;}' .
+			'.wp-layout > .wp-block-image img{width:100%;height:100%;object-fit:cover;}',
+			$layout_styles
+		);
 	}
 
 	/**

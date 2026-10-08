@@ -476,6 +476,10 @@ export function ImageEdit( {
 					clientId={ clientId }
 					blockEditingMode={ blockEditingMode }
 					parentLayoutType={ layoutType }
+					isInManualGrid={
+						layoutType === 'grid' &&
+						!! parentLayout?.isManualPlacement
+					}
 					maxContentWidth={ maxContentWidth }
 				/>
 				<MediaPlaceholder

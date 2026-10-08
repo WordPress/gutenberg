@@ -250,6 +250,7 @@ export default {
 			columnCount = null,
 			rowCount = null,
 			autoFit = false,
+			isManualPlacement = false,
 		} = effectiveLayout;
 
 		// When enabled, columns stretch to fill the available space using
@@ -308,7 +309,10 @@ export default {
 			hasViewportOverride( 'autoFit' ) ||
 			( hasBlockGapOverride && minimumColumnWidth && columnCount > 0 );
 		const shouldOutputGridRows =
-			( ! hasViewportOverrides || hasViewportOverride( 'rowCount' ) ) &&
+			( ! hasViewportOverrides ||
+				hasViewportOverride( 'rowCount' ) ||
+				( isManualPlacement &&
+					hasViewportOverride( 'columnCount' ) ) ) &&
 			columnCount &&
 			rowCount;
 
@@ -366,12 +370,37 @@ export default {
 				`grid-template-rows: repeat(${ rowCount }, minmax(1rem, 1fr))`,
 				'grid-auto-rows: minmax(1rem, 1fr)'
 			);
+			// Manual grids take their height from their width, so that cells
+			// are close to square and content never makes them bigger. The
+			// gaps keep them from being exactly square.
+			if ( isManualPlacement ) {
+				rules.push(
+					`aspect-ratio: ${ columnCount } / ${ rowCount }`,
+					'min-height: 0'
+				);
+			}
 		}
 
 		if ( rules.length ) {
 			output = `${ appendSelectors( selector ) } { ${ rules.join(
 				'; '
 			) }; }`;
+		}
+
+		// Images in a manual grid cover their cells, below any caption.
+		if ( ! hasViewportOverrides && isManualPlacement ) {
+			output += `${ appendSelectors(
+				selector,
+				'> .wp-block-image'
+			) } { display: flex; flex-direction: column; }`;
+			output += `${ appendSelectors(
+				selector,
+				'> .wp-block-image > :is(img, a)'
+			) } { flex: 1 1 0; min-height: 0; }`;
+			output += `${ appendSelectors(
+				selector,
+				'> .wp-block-image img'
+			) } { width: 100%; height: 100%; object-fit: cover; }`;
 		}
 
 		// Output blockGap styles based on rules contained in layout definitions in theme.json.
@@ -407,7 +436,23 @@ export default {
 			.split( ',' )
 			.map( ( subselector ) => `${ subselector }${ subselector } > *` )
 			.join( ',' );
-		return `${ childSelector } { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); rotate: none; }`;
+		const gridSelector = selector
+			.split( ',' )
+			.map( ( subselector ) => `${ subselector }${ subselector }` )
+			.join( ',' );
+		// Stacked blocks are sized by their content again, images included.
+		return (
+			`${ gridSelector } { aspect-ratio: auto; grid-template-rows: none; grid-auto-rows: auto; }` +
+			`${ childSelector } { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); rotate: none; }` +
+			`${ appendSelectors(
+				gridSelector,
+				'> .wp-block-image'
+			) } { display: block; }` +
+			`${ appendSelectors(
+				gridSelector,
+				'> .wp-block-image img'
+			) } { height: auto; }`
+		);
 	},
 	getOrientation() {
 		return 'horizontal';

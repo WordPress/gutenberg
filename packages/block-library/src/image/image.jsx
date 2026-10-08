@@ -276,6 +276,7 @@ export default function Image( {
 	clientId,
 	blockEditingMode,
 	parentLayoutType,
+	isInManualGrid,
 	maxContentWidth,
 } ) {
 	const {
@@ -320,6 +321,8 @@ export default function Image( {
 	// own CSS. Grid galleries and standalone images keep the baseline
 	// `height: auto` so a theme can't squish them.
 	const isCroppedGalleryImage = imageCrop && parentLayoutType === 'flex';
+	// A manual placement grid sizes its images to cover their cells.
+	const hasHeightFromLayout = isCroppedGalleryImage || isInManualGrid;
 
 	const { image, attachmentResolutionError } = useSelect(
 		( select ) => {
@@ -1235,12 +1238,13 @@ export default function Image( {
 												typeof height === 'number'
 													? `${ height }px`
 													: height;
-										} else if ( ! isCroppedGalleryImage ) {
+										} else if ( ! hasHeightFromLayout ) {
 											// Default to `height: auto` so a
 											// theme that sets an explicit height
 											// on images can't squish them. Inside
-											// a cropped gallery the gallery's own
-											// CSS controls the height instead.
+											// a cropped gallery or a manual grid,
+											// the layout's CSS controls the
+											// height instead.
 											style.height = 'auto';
 										}
 										return style;
