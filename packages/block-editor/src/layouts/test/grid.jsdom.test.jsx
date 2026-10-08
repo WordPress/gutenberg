@@ -50,6 +50,20 @@ describe( 'getLayoutStyle', () => {
 
 		expect( result ).toBe( expected );
 	} );
+	it( 'should give every row the same height if columnCount and rowCount are provided', () => {
+		const expected = `.my-container { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(1rem, 1fr)); grid-auto-rows: minmax(1rem, 1fr); }`;
+
+		const result = grid.getLayoutStyle( {
+			selector: '.my-container',
+			layout: { columnCount: 3, rowCount: 2, isManualPlacement: true },
+			style: {},
+			blockName: 'test-block',
+			hasBlockGapSupport: false,
+			layoutDefinitions: undefined,
+		} );
+
+		expect( result ).toBe( expected );
+	} );
 	it( 'should return `grid-template-columns` with max() function if both minimumColumnWidth and columnCount are provided', () => {
 		const expected = `.my-container { grid-template-columns: repeat(auto-fill, minmax(max(min( 12rem, 100%), ( 100% - (1.2rem*2) ) / 3), 1fr)); container-type: inline-size; }`;
 

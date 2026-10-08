@@ -359,8 +359,12 @@ export default {
 		}
 
 		if ( shouldOutputGridRows ) {
+			// Every row gets the same height, the height of the tallest one, so
+			// that all the grid's cells are the same size. Rows added outside
+			// the row count, such as by stacking on mobile, match them.
 			rules.push(
-				`grid-template-rows: repeat(${ rowCount }, minmax(1rem, auto))`
+				`grid-template-rows: repeat(${ rowCount }, minmax(1rem, 1fr))`,
+				'grid-auto-rows: minmax(1rem, 1fr)'
 			);
 		}
 

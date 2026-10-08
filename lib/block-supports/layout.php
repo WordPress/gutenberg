@@ -966,10 +966,18 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			);
 		}
 
+		/*
+		 * Every row gets the same height, the height of the tallest one, so that all the
+		 * grid's cells are the same size. Rows added outside the row count, such as by
+		 * stacking on mobile, match them.
+		 */
 		if ( $should_output_grid_rows ) {
 			$layout_styles[] = array(
 				'selector'     => $selector,
-				'declarations' => array( 'grid-template-rows' => 'repeat(' . $row_count . ', minmax(1rem, auto))' ),
+				'declarations' => array(
+					'grid-template-rows' => 'repeat(' . $row_count . ', minmax(1rem, 1fr))',
+					'grid-auto-rows'     => 'minmax(1rem, 1fr)',
+				),
 			);
 		}
 
