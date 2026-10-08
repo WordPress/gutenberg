@@ -323,6 +323,21 @@ export const getCanvasWidth = createRegistrySelector(
 );
 
 /**
+ * Get the calculated canvas height published by the visual editor.
+ *
+ * @param {Object} state Global application state.
+ * @return {number|undefined} Canvas height in pixels, or undefined when unconstrained or zoomed out.
+ */
+export const getCanvasHeight = createRegistrySelector(
+	( select ) => ( state ) => {
+		if ( unlock( select( blockEditorStore ) ).isZoomOut() ) {
+			return undefined;
+		}
+		return state.canvasHeight;
+	}
+);
+
+/**
  * Returns the current revisions page number.
  *
  * @param {Object} state Global application state.

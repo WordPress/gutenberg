@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Show viewport dimensions and responsive editing status in the footer, and use the existing breadcrumb preference to show or hide the entire footer ([#84146](https://github.com/WordPress/gutenberg/pull/84146)).
+
 ## 15.2.0 (2026-10-07)
 
 ### Enhancements

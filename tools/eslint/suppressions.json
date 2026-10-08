@@ -7217,6 +7217,16 @@
 			"count": 1
 		}
 	},
+	"packages/editor/src/components/viewport-status/index.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/viewport-status/test/index.browser.test.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/editor/src/components/visual-editor/edit-template-blocks-notification.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
