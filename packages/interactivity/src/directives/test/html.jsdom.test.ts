@@ -15,6 +15,21 @@ import { populateServerData, store } from '../../store';
 import { asDangerousHTML, type DangerousHTML } from '../../html';
 import { getScope, resetScope } from '../../scopes';
 
+/** Preserves the renderer's directive registry between isolated runtimes. */
+let originalVNodeHook: typeof options.vnode;
+
+beforeEach( () => {
+	originalVNodeHook = options.vnode;
+	document.body.innerHTML = '';
+	// @ts-expect-error `_values` is an internal property, accessed here for testing.
+	hydratedIslands._values = new WeakMap();
+} );
+
+afterEach( () => {
+	options.vnode = originalVNodeHook;
+	vi.unstubAllGlobals();
+} );
+
 let namespaceCount = 0;
 
 // Each test gets its own store namespace: the store registry is a module
@@ -67,16 +82,6 @@ function recordHtmlWrites( target: HTMLElement ): string[] {
 }
 
 describe( 'data-wp-html', () => {
-	beforeEach( () => {
-		document.body.innerHTML = '';
-		// @ts-expect-error `_values` is an internal property, accessed here for testing.
-		hydratedIslands._values = new WeakMap();
-	} );
-
-	afterEach( () => {
-		vi.unstubAllGlobals();
-	} );
-
 	it( 'renders trusted HTML from asDangerousHTML()', async () => {
 		const namespace = uniqueNamespace();
 		const { state } = store( namespace, {
@@ -275,13 +280,14 @@ describe( 'data-wp-html', () => {
 	);
 
 	it( 'shows pending fallback and follows resolved values in existing and added list items', async () => {
+		const runtime = await loadConflictRuntime();
 		const warnings = vi.spyOn( console, 'warn' );
 		const namespace = uniqueNamespace();
-		populateServerData( {
+		runtime.populateServerData( {
 			state: { [ namespace ]: { html: {} } },
 			derivedStateClosures: { [ namespace ]: [ 'state.html' ] },
 		} );
-		const { state } = store( namespace, {
+		const { state } = runtime.store( namespace, {
 			// Reactive list and HTML shared by all item elements.
 			state: {
 				// Items rendered from the template.
@@ -292,13 +298,15 @@ describe( 'data-wp-html', () => {
 			namespace,
 			'<ul><template data-wp-each="state.list"><li><div data-wp-html="state.html"><i>loading</i></div></li></template></ul>'
 		);
-		await act( () => hydrate( toVdom( region ), region.parentNode! ) );
+		await runtime.act( () =>
+			runtime.hydrate( runtime.toVdom( region ), region.parentNode! )
+		);
 		expect( region.querySelectorAll( 'li' ) ).toHaveLength( 1 );
 		expect( region.querySelector( 'li div' )!.innerHTML ).toBe(
 			'<i>loading</i>'
 		);
 
-		await act( () => {
+		await runtime.act( () => {
 			state.list = [ 'a', 'b' ];
 		} );
 		expect(
@@ -308,9 +316,9 @@ describe( 'data-wp-html', () => {
 			)
 		).toEqual( [ '<i>loading</i>', '<i>loading</i>' ] );
 
-		await act( async () => {
-			store( namespace, {
-				state: { html: asDangerousHTML( '<b>Ready</b>' ) },
+		await runtime.act( async () => {
+			runtime.store( namespace, {
+				state: { html: runtime.asDangerousHTML( '<b>Ready</b>' ) },
 			} );
 		} );
 		expect(
@@ -320,7 +328,7 @@ describe( 'data-wp-html', () => {
 			)
 		).toEqual( [ '<b>Ready</b>', '<b>Ready</b>' ] );
 
-		await act( () => {
+		await runtime.act( () => {
 			state.list = [ 'a', 'b', 'c' ];
 		} );
 		expect(
@@ -329,8 +337,8 @@ describe( 'data-wp-html', () => {
 				( item ) => item.innerHTML
 			)
 		).toEqual( [ '<b>Ready</b>', '<b>Ready</b>', '<b>Ready</b>' ] );
-		await act( () => {
-			store( namespace, { state: { html: null } } );
+		await runtime.act( () => {
+			runtime.store( namespace, { state: { html: null } } );
 			state.list = [ 'a', 'b', 'c', 'd' ];
 		} );
 		expect(
@@ -340,8 +348,8 @@ describe( 'data-wp-html', () => {
 			)
 		).toEqual( [ '', '', '', '' ] );
 		expect( warnings ).not.toHaveBeenCalled();
-		await act( () => {
-			store( namespace, { state: { html: '<b>x</b>' } } );
+		await runtime.act( () => {
+			runtime.store( namespace, { state: { html: '<b>x</b>' } } );
 			state.list = [ 'a', 'b', 'c', 'd', 'e' ];
 		} );
 		expect(
@@ -357,17 +365,25 @@ describe( 'data-wp-html', () => {
 	} );
 
 	it( 'does not render a plain string as HTML', async () => {
+		const runtime = await loadConflictRuntime();
 		const namespace = uniqueNamespace();
-		store( namespace, { state: { html: '<strong>Not safe</strong>' } } );
+		runtime.store( namespace, {
+			state: { html: '<strong>Not safe</strong>' },
+		} );
 
 		const region = createRegion(
 			namespace,
 			'<div data-wp-html="state.html"><p>fallback</p></div>'
 		);
-		await act( () => hydrate( toVdom( region ), region.parentNode! ) );
+		await runtime.act( () =>
+			runtime.hydrate( runtime.toVdom( region ), region.parentNode! )
+		);
 
 		const target = region.querySelector( 'div' )!;
 		expect( target ).toBeEmptyDOMElement();
+		expect( console ).toHaveWarnedWith(
+			expect.stringMatching( /not.*trusted HTML/ )
+		);
 	} );
 
 	it( 'empties trusted content when the value becomes null', async () => {
@@ -606,6 +622,7 @@ describe( 'data-wp-html', () => {
 
 /**
  * Loads an isolated runtime so each test can observe deduplicated warnings.
+ * Its renderer hook is restored by the file's afterEach cleanup.
  *
  * @return The directive runtime and its matching Preact renderer.
  */
@@ -637,17 +654,9 @@ async function loadConflictRuntime() {
 describe( 'data-wp-html conflicts', () => {
 	/** Captures the full warning sequence for the current test. */
 	let conflictWarningSpy: MockInstance< typeof console.warn >;
-	/** Preserves the renderer's directive registry between isolated runtimes. */
-	let originalVNodeHook: typeof options.vnode;
 
 	beforeEach( () => {
-		document.body.innerHTML = '';
 		conflictWarningSpy = vi.spyOn( console, 'warn' );
-		originalVNodeHook = options.vnode;
-	} );
-
-	afterEach( () => {
-		options.vnode = originalVNodeHook;
 	} );
 
 	/**
@@ -1041,8 +1050,6 @@ describe( 'data-wp-html conflicts', () => {
 } );
 
 describe( 'data-wp-html value contract', () => {
-	afterEach( () => vi.unstubAllGlobals() );
-
 	it.each(
 		[ true, false ].flatMap( ( debug ) =>
 			[
