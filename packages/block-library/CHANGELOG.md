@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Video: Don't autoplay on the front end when the visitor prefers reduced motion ([#PRNUMBER](https://github.com/WordPress/gutenberg/pull/PRNUMBER)).
+-   Video: Don't autoplay on the front end when the visitor prefers reduced motion ([#84308](https://github.com/WordPress/gutenberg/pull/84308)).
 
 ## 11.2.0 (2026-10-07)
 
