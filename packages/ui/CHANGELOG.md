@@ -17,6 +17,7 @@
 
 ### Enhancements
 
+-   `Menu`, `Select`, `Combobox`, `Autocomplete`, and searchable select controls: Use neutral highlights and a zero-offset ring for keyboard-focused items. Keep open submenu parents highlighted with the same neutral colors ([#84087](https://github.com/WordPress/gutenberg/pull/84087)).
 -   `Link`: Use a small border radius for consistent focus rings in the default variant ([#84697](https://github.com/WordPress/gutenberg/pull/84697)).
 -   `Tabs`: Add interaction backgrounds to unselected tabs, preserve keyboard focus rings, and replace vertical chevrons with content-height selection lines without widening minimal tab lists ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
 -   `Dialog`: Use the WordPress compatibility overlay slot as the default portal container when available, preserving explicit container overrides, including null to delay rendering ([#84379](https://github.com/WordPress/gutenberg/pull/84379)).
@@ -49,10 +50,6 @@
 -   Document accessible naming for Combobox popups ([#84551](https://github.com/WordPress/gutenberg/pull/84551)).
 -   Add popup width stories for Autocomplete, Combobox, Select, SearchableSelect, and SearchableChipSelect ([#84320](https://github.com/WordPress/gutenberg/pull/84320)).
 -   `Menu`: Clarify icon and description usage, document mixed icon alignment and current layout defaults, and favor short, clear labels ([#84020](https://github.com/WordPress/gutenberg/pull/84020)).
-
-### Enhancements
-
--   `Menu`, `Select`, `Combobox`, `Autocomplete`, and searchable select controls: Use neutral highlights and a zero-offset ring for keyboard-focused items. Keep open submenu parents highlighted with the same neutral colors. ([#84087](https://github.com/WordPress/gutenberg/pull/84087))
 
 ## 0.24.0 (2026-10-07)
 
