@@ -116,28 +116,31 @@ function gutenberg_render_background_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$background_styles = array();
+	$attributes = $block_attributes;
 
-	if ( ! $skip_background_image ) {
-		$background_styles['backgroundImage']      = $block_attributes['style']['background']['backgroundImage'] ?? null;
-		$background_styles['backgroundSize']       = $block_attributes['style']['background']['backgroundSize'] ?? null;
-		$background_styles['backgroundPosition']   = $block_attributes['style']['background']['backgroundPosition'] ?? null;
-		$background_styles['backgroundRepeat']     = $block_attributes['style']['background']['backgroundRepeat'] ?? null;
-		$background_styles['backgroundAttachment'] = $block_attributes['style']['background']['backgroundAttachment'] ?? null;
+	// The helper returns nothing for a non-array background, so only an array needs filtering.
+	if ( is_array( $attributes['style']['background'] ) ) {
+		if ( $skip_background_image ) {
+			unset(
+				$attributes['style']['background']['backgroundImage'],
+				$attributes['style']['background']['backgroundSize'],
+				$attributes['style']['background']['backgroundPosition'],
+				$attributes['style']['background']['backgroundRepeat'],
+				$attributes['style']['background']['backgroundAttachment']
+			);
+		}
+
+		if ( $skip_background_gradient ) {
+			unset( $attributes['style']['background']['gradient'] );
+		}
+
+		// Serialized values only, so a skipped clip cannot drop `has-background`.
+		if ( $skip_background_clip ) {
+			unset( $attributes['style']['background']['backgroundClip'] );
+		}
 	}
 
-	if ( ! $skip_background_gradient ) {
-		$background_styles['gradient'] = $block_attributes['style']['background']['gradient'] ?? null;
-	}
-
-	if ( ! $skip_background_clip ) {
-		$background_styles['backgroundClip'] = $block_attributes['style']['background']['backgroundClip'] ?? null;
-	}
-
-	// Serialized values only, so a skipped clip cannot drop `has-background`.
-	$styles = gutenberg_get_background_classes_and_styles(
-		array( 'style' => array( 'background' => $background_styles ) )
-	);
+	$styles = gutenberg_get_background_classes_and_styles( $attributes );
 
 	if ( ! empty( $styles['style'] ) ) {
 		// Inject background styles to the first element, presuming it's the wrapper, if it exists.
