@@ -59,10 +59,15 @@
 	// Embed, Latest Posts, Author Biography, Verse, Columns, …) override the
 	// inherited anywhere and let long unbroken text inflate the content
 	// column's min-content size (horizontal page scroll). Re-assert anywhere on
-	// all descendants; Search's button opts out via
-	// `.wp-block-search__button { overflow-wrap: normal }`.
+	// all descendants; Search's button and its formatted label (e.g. strong/em)
+	// opt out via search/style.scss and the override below.
 	*:not(.wp-block-search__button) {
 		overflow-wrap: anywhere;
+	}
+
+	.wp-block-search__button,
+	.wp-block-search__button * {
+		overflow-wrap: normal;
 	}
 }
 
