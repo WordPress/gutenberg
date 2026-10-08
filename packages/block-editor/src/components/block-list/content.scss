@@ -516,3 +516,14 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		user-select: text;
 	}
 }
+
+// And it says so with the cursor. The layout class is doubled to get past the
+// editor's own `.block-editor-block-list__layout
+// .block-editor-block-list__block[contenteditable] { cursor: text }`, which is
+// 0-3-0 and catches a locked block as well as an editable one: that attribute
+// selector matches `contenteditable="false"` just as happily. An entered block
+// is excluded rather than reset, so the editor goes on saying what the cursor
+// over its own text should be.
+.is-layout-freeform.block-editor-block-list__layout.block-editor-block-list__layout > :is(*, div):not([contenteditable="true"]) {
+	cursor: move;
+}

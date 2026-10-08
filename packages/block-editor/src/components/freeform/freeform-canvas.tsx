@@ -779,11 +779,15 @@ export default function FreeformCanvas( {
 	);
 	const leadClientId = placedSelection[ 0 ];
 	const isGesturing = !! feedback;
+	// The surface carries the cursor for the whole gesture, so it has to know
+	// which one: a resize keeps its handle's directional cursor, not `move`.
+	const isDragging = feedback?.kind === 'drag';
 
 	return (
 		<BlockPopoverCover
 			className={ clsx( 'block-editor-freeform-canvas', {
 				'is-gesturing': isGesturing,
+				'is-dragging': isDragging,
 			} ) }
 			clientId={ canvasClientId }
 			__unstablePopoverSlot="__unstable-block-tools-after"

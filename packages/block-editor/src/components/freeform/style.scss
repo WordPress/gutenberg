@@ -24,6 +24,14 @@
 		&.is-gesturing .block-editor-freeform-canvas__surface {
 			pointer-events: auto;
 		}
+
+		// The surface is then the element under the pointer for the rest of the
+		// gesture, so it has to carry the cursor: without this the move cursor
+		// drops the moment the block starts travelling. Only for a move — a
+		// resize keeps the directional cursor of the handle it started from.
+		&.is-dragging .block-editor-freeform-canvas__surface {
+			cursor: move;
+		}
 	}
 }
 
