@@ -181,7 +181,7 @@ function render_block_core_cover( $attributes, $content ) {
 			)
 		) ) {
 			$processor->set_attribute( 'data-wp-interactive', 'core/cover' );
-			$processor->set_attribute( 'data-wp-init--reduced-motion', 'callbacks.stopBackgroundVideo' );
+			$processor->set_attribute( 'data-wp-init', 'callbacks.stopBackgroundVideo' );
 
 			$content = $processor->get_updated_html();
 		}

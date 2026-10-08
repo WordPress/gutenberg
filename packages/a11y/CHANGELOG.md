@@ -10,7 +10,6 @@
 
 ### New Features
 
--   Add `onReducedMotionChange`, which calls a listener whenever the user's reduce motion preference changes and returns a function that removes it ([#83853](https://github.com/WordPress/gutenberg/pull/83853)).
 -   Add `prefersReducedMotion`, which reports whether the user has asked their operating system to reduce motion. It is the counterpart to the `useReducedMotion` hook in `@wordpress/compose`, for code that runs outside React such as block view scripts ([#83452](https://github.com/WordPress/gutenberg/pull/83452)).
 
 ## 4.56.0 (2026-09-23)

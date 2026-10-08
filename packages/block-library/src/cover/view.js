@@ -1,5 +1,8 @@
-import { getContext, store } from '@wordpress/interactivity';
-import { prefersReducedMotion } from '../utils/reduced-motion';
+import { getContext, getElement, store } from '@wordpress/interactivity';
+import {
+	onReducedMotionChange,
+	prefersReducedMotion,
+} from '../utils/reduced-motion';
 
 store(
 	'core/cover',
