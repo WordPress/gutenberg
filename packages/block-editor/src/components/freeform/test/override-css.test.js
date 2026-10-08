@@ -243,3 +243,24 @@ describe( 'placing blocks on a canvas', () => {
 		);
 	} );
 } );
+
+describe( 'a block that is all one thing', () => {
+	// A Buttons block is its buttons. The only pixels you can press belong to a
+	// button's label, so the label has to say move as well — otherwise the
+	// block is movable but every part of it you can reach looks like text.
+	it( 'puts the move cursor on what is inside it', () => {
+		const css = getMoveModeCss( [ 'buttons' ], [ 'buttons' ] );
+		const insideRule = css.slice(
+			css.indexOf( '#block-buttons:not([contenteditable="true"]) *' )
+		);
+		expect( insideRule ).toContain( 'cursor: move' );
+	} );
+
+	it( 'leaves an ordinary block’s contents saying text', () => {
+		const css = getMoveModeCss( [ 'card' ] );
+		const insideRule = css.slice(
+			css.indexOf( '#block-card:not([contenteditable="true"]) *' )
+		);
+		expect( insideRule ).not.toContain( 'cursor' );
+	} );
+} );

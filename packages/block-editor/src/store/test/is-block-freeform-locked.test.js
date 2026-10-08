@@ -36,6 +36,8 @@ const ALL_TYPES = {
 	'core/paragraph': {},
 	'core/heading': {},
 	'core/post-content': { layout: true },
+	'core/buttons': { layout: { allowSwitching: false } },
+	'core/button': {},
 	'core/template-part': {},
 };
 
@@ -356,5 +358,71 @@ describe( 'isBlockFreeformLocked, where sections are not top-level', () => {
 		expect(
 			isBlockFreeformLocked( treeState( unconverted, 'item' ), 'item' )
 		).toBe( false );
+	} );
+} );
+
+describe( 'isBlockFreeformLocked, inside a block that arranges its children', () => {
+	// A Buttons block moves as one piece: it is what the canvas places, and
+	// what a press anywhere on it picks up. But every pixel you can press
+	// belongs to a Button's label, so if that label stays editable the press
+	// puts a caret in it and no move ever starts. The same goes for a Gallery's
+	// images and a Navigation's links.
+	const inButtons = ( sectionLayout ) => [
+		{
+			clientId: 'sec',
+			name: 'core/group',
+			attributes: { layout: sectionLayout },
+		},
+		{ clientId: 'buttons', name: 'core/buttons', parent: 'sec' },
+		{ clientId: 'button', name: 'core/button', parent: 'buttons' },
+	];
+
+	it( 'locks the button inside it, not just the Buttons block', () => {
+		const withButtons = treeState( inButtons( { type: 'freeform' } ) );
+		expect( isBlockFreeformLocked( withButtons, 'buttons' ) ).toBe( true );
+		expect( isBlockFreeformLocked( withButtons, 'button' ) ).toBe( true );
+	} );
+
+	it( 'does the same before the section has been converted', () => {
+		expect(
+			isBlockFreeformLocked(
+				treeState( inButtons( { type: 'constrained' } ) ),
+				'button'
+			)
+		).toBe( true );
+	} );
+
+	it( 'still unlocks the button once you have entered it', () => {
+		expect(
+			isBlockFreeformLocked(
+				treeState( inButtons( { type: 'freeform' } ), 'button' ),
+				'button'
+			)
+		).toBe( false );
+	} );
+
+	it( 'leaves a card’s contents alone, which is a different thing', () => {
+		// A Group with padding is a box on the canvas, not an arrangement of
+		// its children: the paragraph inside it is an ordinary block and its
+		// words are ordinary words.
+		const nodes = [
+			{
+				clientId: 'sec',
+				name: 'core/group',
+				attributes: { layout: { type: 'freeform' } },
+			},
+			{
+				clientId: 'card',
+				name: 'core/group',
+				parent: 'sec',
+				attributes: {
+					style: { spacing: { padding: { top: '2rem' } } },
+				},
+			},
+			{ clientId: 'inside', name: 'core/paragraph', parent: 'card' },
+		];
+		expect( isBlockFreeformLocked( treeState( nodes ), 'inside' ) ).toBe(
+			false
+		);
 	} );
 } );

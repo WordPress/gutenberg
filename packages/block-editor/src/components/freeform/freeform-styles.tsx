@@ -50,17 +50,33 @@ export default function FreeformStyles() {
 				getBlockEditingMode( clientId ) === 'default'
 		);
 
-		const movable = sections.flatMap(
+		// What is inside a block that arranges its own children — a Button in a
+		// Buttons, an image in a Gallery — is part of it: the canvas places the
+		// whole thing and a press anywhere on it picks the whole thing up. So
+		// those contents are in move mode too, or the only pixels you can
+		// actually press would still look and behave like text.
+		const arrangesItsChildren = ( clientId ) =>
+			getLayoutSupport( getBlockName( clientId ) )?.allowSwitching ===
+			false;
+		const descendants = ( clientId ) =>
+			getBlockOrder( clientId ).flatMap( ( child ) => [
+				child,
+				...descendants( child ),
+			] );
+
+		const citizens = sections.flatMap(
 			( clientId ) =>
 				planSectionFlatten(
 					getBlock( clientId ),
 					canDissolveIntoCanvas
 				).citizens
 		);
+		const arrangements = citizens.filter( arrangesItsChildren );
+		const movable = [ ...citizens, ...arrangements.flatMap( descendants ) ];
 
 		return [
 			getCanvasesCss( collectCanvases( getBlocks() ) ),
-			getMoveModeCss( movable ),
+			getMoveModeCss( movable, arrangements ),
 		]
 			.filter( Boolean )
 			.join( '\n' );

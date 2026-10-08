@@ -80,8 +80,11 @@ function getCanvasRules( {
  * inserted, or anything in a section nobody has dragged in — is still a block
  * you can pick up, so the two cannot be decided by the same rule.
  *
- * Nothing here is a descendant selector: a Group kept whole on a canvas
- * travels as one piece, and the words inside it are still words. The entered
+ * The cursor stops at the block, with one exception. A block that arranges its
+ * own children is all one thing — a Buttons block is its buttons — and the only
+ * pixels you can press belong to a button's label, so those say move too.
+ * Elsewhere it stops: a Group kept whole on a canvas travels as one piece, and
+ * the words inside it are still words. The entered
  * block is excluded rather than reset, so the editor goes on saying what the
  * cursor over real text is.
  *
@@ -105,22 +108,27 @@ function getCanvasRules( {
  * where the canvas is mounted and the gesture is ready — and that is the case
  * where the image was being carried off mid-drag.
  *
- * @param {string[]} clientIds Every block the canvas can move.
+ * @param {string[]} clientIds      Every block the canvas can move.
+ * @param {string[]} wholeClientIds Those of them that are all one thing, whose
+ *                                  contents show the move cursor as well.
  * @return {string} CSS for the editor canvas.
  */
-export function getMoveModeCss( clientIds ) {
+export function getMoveModeCss( clientIds, wholeClientIds = [] ) {
+	const whole = new Set( wholeClientIds );
 	return clientIds
-		.map(
-			(
-				clientId
-			) => `#block-${ clientId }:not([contenteditable="true"]) {
+		.map( ( clientId ) => {
+			const insideDeclarations = [ '-webkit-user-drag: none' ];
+			if ( whole.has( clientId ) ) {
+				insideDeclarations.push( 'cursor: move' );
+			}
+			return `#block-${ clientId }:not([contenteditable="true"]) {
 	cursor: move;
 	user-select: none;
 }
 #block-${ clientId }:not([contenteditable="true"]) * {
-	-webkit-user-drag: none;
-}`
-		)
+	${ insideDeclarations.join( ';\n\t' ) };
+}`;
+		} )
 		.join( '\n' );
 }
 

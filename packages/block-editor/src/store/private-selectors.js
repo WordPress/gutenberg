@@ -1457,7 +1457,8 @@ export function isBlockFreeformLocked( state, clientId ) {
 	while (
 		rootClientId &&
 		! isSection( state, rootClientId ) &&
-		isAbsorbedByCanvas( state, rootClientId )
+		( isAbsorbedByCanvas( state, rootClientId ) ||
+			arrangesItsChildren( state, rootClientId ) )
 	) {
 		rootClientId = state.blocks.parents.get( rootClientId );
 	}
@@ -1520,6 +1521,30 @@ function isSection( state, clientId ) {
 	return sectionRootClientId
 		? parentClientId === sectionRootClientId
 		: ! parentClientId;
+}
+
+/**
+ * Whether a block exists to arrange its own children.
+ *
+ * Buttons, Gallery, Navigation and the paginations all say so with
+ * `allowSwitching: false`. The canvas places such a block whole and a press
+ * anywhere on it picks the whole thing up — so what is inside it is part of it,
+ * and is held still with it. Otherwise every pixel you could press would belong
+ * to a Button's label, the press would put a caret in that label, and no move
+ * would ever start.
+ *
+ * This is not the same as a Group with a background, which is a box holding
+ * ordinary blocks: those are edited as usual.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId A block's client id.
+ *
+ * @return {boolean} Whether its children are part of it.
+ */
+function arrangesItsChildren( state, clientId ) {
+	return (
+		getLayoutSupport( nameOf( state, clientId ) )?.allowSwitching === false
+	);
 }
 
 /**
