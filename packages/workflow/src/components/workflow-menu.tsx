@@ -10,12 +10,15 @@ import {
 import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import { search as inputIcon } from '@wordpress/icons';
 import { executeAbility, store as abilitiesStore } from '@wordpress/abilities';
+import type { Ability } from '@wordpress/abilities';
+import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
+import type { AbilityOutput } from './types';
 import './workflow-menu.scss';
 
 /**
  * Constants
  */
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY: Ability[] = [];
 const inputLabel = __( 'Run abilities and workflows' );
 
 /**
@@ -25,10 +28,11 @@ export function WorkflowMenu() {
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	const [ search, setSearch ] = useState( '' );
 	const [ isOpen, setIsOpen ] = useState( false );
-	const [ abilityOutput, setAbilityOutput ] = useState( null );
+	const [ abilityOutput, setAbilityOutput ] =
+		useState< AbilityOutput | null >( null );
 	const [ isExecuting, setIsExecuting ] = useState( false );
-	const containerRef = useRef();
-	const inputRef = useRef();
+	const containerRef = useRef< HTMLDivElement >( null );
+	const inputRef = useRef< HTMLInputElement >( null );
 
 	const abilities = useSelect( ( select ) => {
 		const allAbilities = select( abilitiesStore ).getAbilities();
@@ -74,8 +78,7 @@ export function WorkflowMenu() {
 
 	useShortcut(
 		'core/workflows',
-		/** @type {React.KeyboardEventHandler} */
-		withIgnoreIMEEvents( ( event ) => {
+		withIgnoreIMEEvents( ( event: KeyboardEvent ) => {
 			// Bails to avoid obscuring the effect of the preceding handler(s).
 			if ( event.defaultPrevented ) {
 				return;
@@ -83,10 +86,7 @@ export function WorkflowMenu() {
 
 			event.preventDefault();
 			setIsOpen( ! isOpen );
-		} ),
-		{
-			bindGlobal: true,
-		}
+		} )
 	);
 
 	useEffect( () => {
@@ -110,7 +110,7 @@ export function WorkflowMenu() {
 		setSearch( '' );
 	};
 
-	const handleExecuteAbility = async ( ability ) => {
+	const handleExecuteAbility = async ( ability: Ability ) => {
 		setIsExecuting( true );
 		try {
 			const result = await executeAbility( ability.name );
@@ -127,14 +127,16 @@ export function WorkflowMenu() {
 				label: ability?.label || ability.name,
 				description: ability?.description || '',
 				success: false,
-				error: error.message || String( error ),
+				error:
+					( error as { message?: string } ).message ||
+					String( error ),
 			} );
 		} finally {
 			setIsExecuting( false );
 		}
 	};
 
-	const onContainerKeyDown = ( event ) => {
+	const onContainerKeyDown = ( event: ReactKeyboardEvent ) => {
 		// Handle going back when viewing output
 		if (
 			abilityOutput &&

@@ -95,6 +95,7 @@
 		{ "path": "packages/widget-primitives/tsconfig.build.json" },
 		{ "path": "packages/wordcount/tsconfig.build.json" },
 		{ "path": "packages/worker-threads/tsconfig.build.json" },
+		{ "path": "packages/workflow" },
 		{ "path": "packages/wp-build" }
 	],
 	"files": []
