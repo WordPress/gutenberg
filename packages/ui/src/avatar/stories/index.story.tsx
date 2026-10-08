@@ -6,8 +6,9 @@ import { Icon } from '../../icon';
 import { Stack } from '../../stack';
 import { Text } from '../../text';
 
+// Profile illustration by Boxicons: https://unsplash.com/illustrations/simple-black-outline-of-a-person-icon-s4_txsqJZ7M
 const IMAGE_SRC =
-	'https://images.unsplash.com/photo-1543610892-0b1f7e6d8ac1?w=128&h=128&fit=crop';
+	'https://images.unsplash.com/vector-1776244476031-db2aa624a2a0?w=128&h=128&fit=crop&fm=jpg';
 
 const meta: Meta< typeof Avatar.Root > = {
 	title: 'Components/@wordpress-ui/Avatar',
