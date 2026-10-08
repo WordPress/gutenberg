@@ -136,7 +136,8 @@ jobs:
                     -H "Accept: application/json" \
                     -o versions.json \
                     "http://api.wordpress.org/core/stable-check/1.0/"
-                  LATEST_WP_VERSION="$(jq --raw-output 'with_entries(select(.value=="latest"))|keys[]' versions.json)"
+                  # Count back from this branch's release, not the newest WordPress release.
+                  LATEST_WP_VERSION='7.0'
                   # shellcheck disable=SC2034
                   IFS='.' read -r LATEST_WP_MAJOR LATEST_WP_MINOR LATEST_WP_PATCH <<< "${LATEST_WP_VERSION}"
                   if [[ "${LATEST_WP_MINOR}" == "0" ]]; then
@@ -209,7 +210,7 @@ jobs:
 
         env:
             WP_ENV_PHP_VERSION: ${{ matrix.php }}
-            WP_ENV_CORE: ${{ matrix.wordpress == '' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', needs.compute-previous-wordpress-version.outputs.previous-wordpress-version ) }}
+            WP_ENV_CORE: ${{ matrix.wordpress == '' && 'WordPress/WordPress#7.0-branch' || format( 'https://wordpress.org/wordpress-{0}.zip', needs.compute-previous-wordpress-version.outputs.previous-wordpress-version ) }}
 
         steps:
             - name: Checkout repository
