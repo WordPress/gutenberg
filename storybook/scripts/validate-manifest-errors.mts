@@ -26,6 +26,16 @@ for ( const component of Object.values( components ) ) {
 		errors.push( `${ component.name }\n${ component.error.message }` );
 	}
 
+	for ( const subcomponent of Object.values(
+		component.subcomponents ?? {}
+	) ) {
+		if ( subcomponent.error ) {
+			errors.push(
+				`${ component.name } > ${ subcomponent.name }\n${ subcomponent.error.message }`
+			);
+		}
+	}
+
 	for ( const story of component.stories ) {
 		if ( story.error ) {
 			errors.push(
