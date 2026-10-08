@@ -1,14 +1,12 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it, vi } from 'vitest';
 import {
 	default as fetchLinkSuggestions,
 	sortResults,
 	tokenize,
 } from '../__experimental-fetch-link-suggestions';
 
-jest.mock( '@wordpress/api-fetch', () =>
-	jest.fn( ( { path } ) => {
+vi.mock( import( '@wordpress/api-fetch' ), () => ( {
+	default: vi.fn( ( { path } ) => {
 		switch ( path ) {
 			case '/wp/v2/search?search=&per_page=20&type=post':
 			case '/wp/v2/search?search=Contact&per_page=20&type=post&subtype=page':
@@ -74,6 +72,67 @@ jest.mock( '@wordpress/api-fetch', () =>
 						subtype: 'page',
 					},
 				] );
+			case '/wp/v2/search?search=few%20notes&per_page=20&type=post':
+				return Promise.resolve( [
+					...Array.from( { length: 5 }, ( _, index ) => ( {
+						id: 600 + index,
+						title: `Few Notes ${ index }`,
+						url: `http://wordpress.local/few-notes-${ index }/`,
+						type: 'post',
+						subtype: 'page',
+					} ) ),
+					// Holds neither word; WordPress matched a body.
+					...Array.from( { length: 30 }, ( _, index ) => ( {
+						id: 800 + index,
+						title: `Unrelated ${ index }`,
+						url: `http://wordpress.local/unrelated-${ index }/`,
+						type: 'post',
+						subtype: 'page',
+					} ) ),
+				] );
+			case '/wp/v2/search?search=few%20notes&per_page=20&type=term':
+				return Promise.resolve(
+					Array.from( { length: 5 }, ( _, index ) => ( {
+						// Holds "notes" but not "few".
+						id: 700 + index,
+						title: `Notes ${ index }`,
+						url: `http://wordpress.local/notes-${ index }/`,
+						type: 'category',
+					} ) )
+				);
+			case '/wp/v2/search?search=few%20notes&per_page=20&type=post-format':
+			case '/wp/v2/media?search=few%20notes&per_page=20':
+				return Promise.resolve( [] );
+			case '/wp/v2/search?search=&per_page=3&type=post':
+				return Promise.resolve(
+					Array.from( { length: 3 }, ( _, index ) => ( {
+						id: 500 + index,
+						title: `Initial Page ${ index }`,
+						url: `http://wordpress.local/initial-page-${ index }/`,
+						type: 'post',
+						subtype: 'page',
+					} ) )
+				);
+			case '/wp/v2/search?search=&per_page=3&type=term':
+				return Promise.resolve(
+					Array.from( { length: 3 }, ( _, index ) => ( {
+						id: 510 + index,
+						title: `Initial Category ${ index }`,
+						url: `http://wordpress.local/initial-category-${ index }/`,
+						type: 'category',
+					} ) )
+				);
+			case '/wp/v2/search?search=&per_page=3&type=post-format':
+				return Promise.resolve(
+					Array.from( { length: 3 }, ( _, index ) => ( {
+						id: 520 + index,
+						title: `Initial Format ${ index }`,
+						url: `http://wordpress.local/initial-format-${ index }/`,
+						type: 'post-format',
+					} ) )
+				);
+			case '/wp/v2/media?search=&per_page=3':
+				return Promise.resolve( [] );
 			case '/wp/v2/media?search=&per_page=20':
 				return Promise.resolve( [
 					{
@@ -96,8 +155,8 @@ jest.mock( '@wordpress/api-fetch', () =>
 					},
 				] );
 		}
-	} )
-);
+	} ),
+} ) );
 
 describe( 'fetchLinkSuggestions', () => {
 	it( 'filters suggestions by post-type', () => {
@@ -235,7 +294,61 @@ describe( 'fetchLinkSuggestions', () => {
 			] )
 		);
 	} );
+
+	it( 'ranks titles by how much of the search they hold, content matches last', () => {
+		// 5 titles hold both words typed, 5 hold one of them, and 30 hold
+		// neither because WordPress matched their body. All are offered, in
+		// that order.
+		const startsWith = ( titles, prefix ) =>
+			titles.every( ( title ) => title.startsWith( prefix ) );
+
+		return fetchLinkSuggestions( 'few notes', {} ).then(
+			( suggestions ) => {
+				const titles = suggestions.map( ( { title } ) => title );
+
+				expect( titles ).toHaveLength( 40 );
+				expect( startsWith( titles.slice( 0, 5 ), 'Few Notes' ) ).toBe(
+					true
+				);
+				expect( startsWith( titles.slice( 5, 10 ), 'Notes' ) ).toBe(
+					true
+				);
+				expect( startsWith( titles.slice( 10 ), 'Unrelated' ) ).toBe(
+					true
+				);
+			}
+		);
+	} );
+
 	describe( 'Initial search suggestions', () => {
+		it( 'asks every type for its own initial suggestions', () => {
+			// `perPage` is per type, so the default of 3 for initial
+			// suggestions asks each of them for 3. Media has none here.
+			return fetchLinkSuggestions( '', {
+				isInitialSuggestions: true,
+			} ).then( ( suggestions ) =>
+				expect( suggestions ).toHaveLength( 9 )
+			);
+		} );
+
+		it( 'orders initial suggestions by the types a caller prefers', () => {
+			// Nothing is typed, so the type is all there is to order them by.
+			// Without a preference the usual order leads with the page.
+			return fetchLinkSuggestions( '', {
+				isInitialSuggestions: true,
+				preferTypes: [ { type: 'term', subtype: 'category' } ],
+			} ).then( ( suggestions ) => {
+				const titles = suggestions.map( ( { title } ) => title );
+
+				expect( titles ).toHaveLength( 9 );
+				expect( titles.slice( 0, 3 ) ).toEqual( [
+					'Initial Category 0',
+					'Initial Category 1',
+					'Initial Category 2',
+				] );
+			} );
+		} );
+
 		it( 'initial search suggestions limits results', () => {
 			return fetchLinkSuggestions( '', {
 				type: 'post',
@@ -324,7 +437,7 @@ describe( 'fetchLinkSuggestions', () => {
 
 describe( 'sortResults', () => {
 	it( 'returns empty array for empty results', () => {
-		expect( sortResults( [], '' ) ).toEqual( [] );
+		expect( sortResults( { results: [], search: '' } ) ).toEqual( [] );
 	} );
 
 	it( 'orders results', () => {
@@ -379,11 +492,11 @@ describe( 'sortResults', () => {
 				kind: 'taxonomy',
 			},
 		];
-		const order = sortResults( results, 'travel tips' ).map(
+		const order = sortResults( { results, search: 'travel tips' } ).map(
 			( result ) => result.id
 		);
 		expect( order ).toEqual( [
-			7, // exact match
+			7, // begins with "travel tips"
 			4, // contains: travel, tips
 			3, // contains: travel
 			// same order as input:
@@ -391,6 +504,45 @@ describe( 'sortResults', () => {
 			2,
 			5,
 			6,
+		] );
+	} );
+
+	it( 'scores results that share an id separately', () => {
+		// Posts, terms and media are separate tables, so ids repeat across
+		// them. On a fresh site the post "Hello world!" and the category
+		// "Uncategorized" are both id 1.
+		const results = [
+			{
+				id: 1,
+				title: 'Hello world!',
+				type: 'post',
+				kind: 'post-type',
+				url: 'http://wordpress.local/hello-world/',
+			},
+			{
+				id: 1,
+				title: 'Contact',
+				type: 'category',
+				kind: 'taxonomy',
+				url: 'http://wordpress.local/category/contact/',
+			},
+			{
+				id: 2,
+				title: 'Contact us today',
+				type: 'page',
+				kind: 'post-type',
+				url: 'http://wordpress.local/contact-us-today/',
+			},
+		];
+
+		expect(
+			sortResults( { results, search: 'contact' } ).map(
+				( { title } ) => title
+			)
+		).toEqual( [
+			'Contact us today', // begins with the search and is content (page)
+			'Contact', // begins with the search and is a taxonomy term
+			'Hello world!', // does not contain the search
 		] );
 	} );
 
@@ -425,10 +577,369 @@ describe( 'sortResults', () => {
 				kind: 'post-type',
 			},
 		];
-		const order = sortResults( results, 'News' ).map(
-			( result ) => result.id
+		const order = sortResults( { results, search: 'News' } ).map(
+			( result ) => result.title
 		);
-		expect( order ).toEqual( [ 1, 4, 3, 2 ] );
+		expect( order ).toEqual( [
+			'News', // begins with 'News', and has the word whole
+			'News Flash News', // same as above, repeating the word does not increase the ranking
+			'News', // Same as the above, ordered by original order since it ranks the same
+			'Newspaper', // has the word inside a longer one, not the full word
+		] );
+	} );
+
+	it( 'orders by the start of a title from the first character typed', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Tips for travel with a young baby',
+				url: 'http://wordpress.local/young-baby-tips/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'A day trip from Stockholm to Swedish countryside towns',
+				url: 'http://wordpress.local/day-trip-stockholm/',
+				type: 'page',
+				kind: 'post-type',
+			},
+		];
+
+		expect(
+			sortResults( { results, search: 'a' } ).map(
+				( { title } ) => title
+			)
+		).toEqual( [
+			'A day trip from Stockholm to Swedish countryside towns', // begins with it
+			'Tips for travel with a young baby', // only contains it
+		] );
+	} );
+
+	it( 'ranks a page above an attachment named after a file that begins with the search', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'coffee-beans',
+				url: 'http://wordpress.local/wp-content/uploads/coffee-beans.jpg',
+				type: 'attachment',
+				kind: 'media',
+			},
+			{
+				id: 2,
+				title: 'Our Coffee',
+				url: 'http://wordpress.local/our-coffee/',
+				type: 'page',
+				kind: 'post-type',
+			},
+		];
+
+		// It's more common to link to content over attachments, so pages with a
+		// matching word in the title should rank above attachments, even if the
+		// attachment begins with the word.
+		expect(
+			sortResults( { results, search: 'coffee' } ).map(
+				( { title } ) => title
+			)
+		).toEqual( [
+			'Our Coffee', // a page, which the type ranks first
+			'coffee-beans', // begins with it, but that cannot lift an attachment
+		] );
+	} );
+
+	it( 'matches the search as a string, not as whole words', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Coffeehouse Rules',
+				url: 'http://wordpress.local/coffeehouse-rules/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'Notes On Coffee',
+				url: 'http://wordpress.local/category/notes-on-coffee/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 3,
+				title: 'Coffee of the World',
+				url: 'http://wordpress.local/category/notes-on-coffee/',
+				type: 'page',
+				kind: 'post-type',
+			},
+		];
+
+		// "Coffeehouse Rules" begins with the string that was typed, so it
+		// outranks a title that contains the same string further in.
+		expect(
+			sortResults( { results, search: 'coffee' } ).map(
+				( { title } ) => title
+			)
+		).toEqual( [
+			'Coffee of the World', // begins with the string, full word
+			'Coffeehouse Rules', // begins with the string, inside a longer word
+			'Notes On Coffee', // contains the string, further in
+		] );
+	} );
+
+	it( 'ranks matches with all the words above partial matches', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Coffee',
+				url: 'http://wordpress.local/coffee/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'Our Coffee is a Guide',
+				url: 'http://wordpress.local/category/our-coffee-guide/',
+				type: 'category',
+				kind: 'taxonomy',
+			},
+			{
+				id: 1,
+				title: 'Our Coffee Guide',
+				url: 'http://wordpress.local/attachment/our-coffee-is-a-guide',
+				type: 'attachment',
+				kind: 'media',
+			},
+		];
+
+		// The page has only one of the two words typed.
+		expect(
+			sortResults( { results, search: 'coffee guide' } ).map(
+				( { title } ) => title
+			)
+		).toEqual( [
+			'Our Coffee Guide', // contains "coffee guide" as a string
+			'Our Coffee is a Guide', // contains "coffee" and "guide" strings
+			'Coffee', // has only one of the two words typed
+		] );
+	} );
+
+	it( 'ranks content, then taxonomies, then post formats, then attachments', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Coffee Format',
+				url: 'http://wordpress.local/1/',
+				type: 'post-format',
+				kind: 'taxonomy',
+			},
+			{
+				id: 2,
+				title: 'Coffee Photo',
+				url: 'http://wordpress.local/2/',
+				type: 'attachment',
+				kind: 'media',
+			},
+			{
+				id: 3,
+				title: 'Coffee Tag',
+				url: 'http://wordpress.local/3/',
+				type: 'post_tag',
+				kind: 'taxonomy',
+			},
+			{
+				id: 4,
+				title: 'Coffee Post',
+				url: 'http://wordpress.local/4/',
+				type: 'post',
+				kind: 'post-type',
+			},
+			{
+				id: 5,
+				title: 'Coffee Category',
+				url: 'http://wordpress.local/5/',
+				type: 'category',
+				kind: 'taxonomy',
+			},
+			{
+				id: 6,
+				title: 'Coffee Page',
+				url: 'http://wordpress.local/6/',
+				type: 'page',
+				kind: 'post-type',
+			},
+		];
+
+		// Ranked by search type, so a page and a post are worth the same, as are
+		// a category and a tag. Within a band the order they arrived in stands.
+		expect(
+			sortResults( { results, search: 'coffee' } ).map(
+				( { type } ) => type
+			)
+		).toEqual( [
+			'post', // content, in the order they arrived
+			'page',
+			'post_tag', // then taxonomies, likewise
+			'category',
+			'post-format',
+			'attachment',
+		] );
+	} );
+
+	it( 'handles curly quotes and quotes in searches', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Barista S Best Coffee',
+				url: 'http://wordpress.local/barista-s-best-coffee/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				// `get_the_title()` runs `wptexturize`, so a title written with
+				// straight quotes comes back with curly ones.
+				id: 2,
+				title: 'Barista\u2019s \u201cBest\u201d Coffee',
+				url: 'http://wordpress.local/baristas-best-coffee/',
+				type: 'page',
+				kind: 'post-type',
+			},
+		];
+
+		// Typed with the straight quotes that are the only ones on a keyboard.
+		expect(
+			sortResults( { results, search: 'barista\'s "best" coffee' } ).map(
+				( { title } ) => title
+			)
+		).toEqual( [
+			'Barista\u2019s \u201cBest\u201d Coffee', // the same string, once the quotes match
+			'Barista S Best Coffee', // has the words, but not as one string
+		] );
+	} );
+
+	it( 'ranks a title holding both words typed above one holding a single word whole', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Coffee Beans',
+				url: 'http://wordpress.local/coffee-beans/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'Coffeehouse Guidebook',
+				url: 'http://wordpress.local/coffeehouse-guidebook/',
+				type: 'page',
+				kind: 'post-type',
+			},
+		];
+
+		// How many of the words typed a title holds is compared before how well
+		// it holds them. Both are pages, so nothing else separates them.
+		expect(
+			sortResults( { results, search: 'coffee guide' } ).map(
+				( { title } ) => title
+			)
+		).toEqual( [
+			'Coffeehouse Guidebook', // holds both, each inside a longer word
+			'Coffee Beans', // holds "coffee" whole, and no "guide" at all
+		] );
+	} );
+
+	it( 'ranks a word found in a longer one by how much of it that word is', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Caterpillar',
+				url: 'http://wordpress.local/caterpillar/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'Catering',
+				url: 'http://wordpress.local/catering/',
+				type: 'page',
+				kind: 'post-type',
+			},
+		];
+
+		// "cater" is five of the eight letters of "catering" and five of the
+		// eleven of "caterpillar", so it answers the shorter word better.
+		expect(
+			sortResults( { results, search: 'cater' } ).map(
+				( { title } ) => title
+			)
+		).toEqual( [ 'Catering', 'Caterpillar' ] );
+	} );
+
+	it( 'leads with the preferred subtype and keeps the usual order below the preferred type', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Coffee Photo',
+				url: 'http://wordpress.local/coffee-photo.jpg',
+				type: 'attachment',
+				kind: 'media',
+			},
+			{
+				id: 2,
+				title: 'Coffee Page',
+				url: 'http://wordpress.local/coffee-page/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 3,
+				title: 'Coffee Tag',
+				url: 'http://wordpress.local/tag/coffee-tag/',
+				type: 'post_tag',
+				kind: 'taxonomy',
+			},
+			{
+				id: 4,
+				title: 'Coffee Category',
+				url: 'http://wordpress.local/category/coffee-category/',
+				type: 'category',
+				kind: 'taxonomy',
+			},
+		];
+
+		// Tags lead; the rest keep their usual places behind them.
+		expect(
+			sortResults( {
+				results,
+				search: 'coffee',
+				preferTypes: [ { type: 'term', subtype: 'post_tag' } ],
+			} ).map( ( { type } ) => type )
+		).toEqual( [ 'post_tag', 'page', 'category', 'attachment' ] );
+	} );
+
+	it( 'prefers a whole search type when no subtype is named', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Coffee Page',
+				url: 'http://wordpress.local/coffee-page/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'Coffee Genre',
+				url: 'http://wordpress.local/genre/coffee-genre/',
+				type: 'genre',
+				kind: 'taxonomy',
+			},
+		];
+
+		// A custom taxonomy is covered by the bare entry, without being named.
+		expect(
+			sortResults( {
+				results,
+				search: 'coffee',
+				preferTypes: [ 'term' ],
+			} ).map( ( { type } ) => type )
+		).toEqual( [ 'genre', 'page' ] );
 	} );
 } );
 

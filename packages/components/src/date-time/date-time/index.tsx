@@ -1,20 +1,11 @@
-/**
- * External dependencies
- */
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { default as DatePicker } from '../date-picker';
 import { default as TimePicker } from '../time-picker';
 import type { DateTimePickerProps } from '../types';
-import { Wrapper } from './styles';
+import { VStack } from '../../v-stack';
+import styles from './style.module.scss';
 
 export { DatePicker, TimePicker };
 
@@ -34,7 +25,11 @@ function UnforwardedDateTimePicker(
 	ref: ForwardedRef< any >
 ) {
 	return (
-		<Wrapper ref={ ref } className="components-datetime" spacing={ 4 }>
+		<VStack
+			ref={ ref }
+			className={ clsx( 'components-datetime', styles.wrapper ) }
+			spacing={ 4 }
+		>
 			<>
 				<TimePicker
 					currentTime={ currentDate }
@@ -51,7 +46,7 @@ function UnforwardedDateTimePicker(
 					startOfWeek={ startOfWeek }
 				/>
 			</>
-		</Wrapper>
+		</VStack>
 	);
 }
 

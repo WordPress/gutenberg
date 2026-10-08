@@ -1,8 +1,8 @@
 .dataviews-bulk-actions-footer__item-count {
-	color: var(--wpds-color-fg-content-neutral);
+	color: var(--wpds-color-foreground-content-neutral);
 }
 
 .dataviews-bulk-actions-footer__container {
 	margin-right: auto;
-	min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+	min-height: var(--wpds-dimension-size-md);
 }

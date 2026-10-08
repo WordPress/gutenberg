@@ -7,7 +7,13 @@
 		}
 
 		.popup {
-			background-color: var(--wpds-color-bg-surface-neutral-strong);
+			--_wp-ui-elevation-sm:
+				0 1px 2px rgba(0, 0, 0, 0.05),
+				0 2px 3px rgba(0, 0, 0, 0.04),
+				0 6px 6px rgba(0, 0, 0, 0.03),
+				0 8px 8px rgba(0, 0, 0, 0.02);
+
+			background-color: var(--wpds-color-background-surface-neutral-strong);
 			padding:
 				var(--wpds-dimension-padding-xs)
 				var(--wpds-dimension-padding-sm);
@@ -15,8 +21,8 @@
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-sm);
 			line-height: 1.4; /* TODO: use DS token for line height */
-			color: var(--wpds-color-fg-content-neutral);
-			box-shadow: var(--wpds-elevation-sm);
+			color: var(--wpds-color-foreground-content-neutral);
+			box-shadow: var(--_wp-ui-elevation-sm);
 
 			/*
 			 * Forced-colors mode strips `box-shadow` and replaces the

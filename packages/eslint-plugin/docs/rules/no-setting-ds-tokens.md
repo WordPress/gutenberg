@@ -9,19 +9,19 @@ This rule lints object property keys as well as CSS declaration strings and temp
 Examples of **incorrect** code for this rule:
 
 ```jsx
-<div style={ { '--wpds-color-fg-content-neutral': 'red' } } />
+<div style={ { '--wpds-color-foreground-content-neutral': 'red' } } />
 ```
 
 ```js
-const styles = { '--wpds-color-fg-content-neutral': 'red' };
+const styles = { '--wpds-color-foreground-content-neutral': 'red' };
 ```
 
 ```js
-const css = '--wpds-color-fg-content-neutral: red;';
+const css = '--wpds-color-foreground-content-neutral: red;';
 ```
 
 ```js
-const css = `--wpds-color-fg-content-neutral: ${ value };`;
+const css = `--wpds-color-foreground-content-neutral: ${ value };`;
 ```
 
 ```js
@@ -35,7 +35,7 @@ const css = `--wpds-color-${ suffix }: red;`;
 Examples of **correct** code for this rule:
 
 ```jsx
-<div style={ { color: 'var(--wpds-color-fg-content-neutral)' } } />
+<div style={ { color: 'var(--wpds-color-foreground-content-neutral)' } } />
 ```
 
 ```js

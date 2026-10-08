@@ -1,30 +1,14 @@
-/**
- * External dependencies
- */
 import type { MouseEventHandler } from 'react';
-
-/**
- * WordPress dependencies
- */
-import {
-	Button,
-	Modal,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { Button, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
-import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../lock-unlock';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { Menu, Stack } from '@wordpress/ui';
+import { kebabCase } from '@wordpress/kebab-case';
 import type { Action, ActionModal as ActionModalType } from '../../types';
-
-const { Menu, kebabCase } = unlock( componentsPrivateApis );
 
 export interface ActionTriggerProps< Item > {
 	action: Action< Item >;
@@ -250,28 +234,28 @@ function CompactItemActions< Item >( {
 	);
 	return (
 		<>
-			<Menu placement="bottom-end">
-				<Menu.TriggerButton
+			<Menu.Root>
+				<Menu.Trigger
+					disabled={ ! actions.length }
 					render={
 						<Button
 							size={ isSmall ? 'small' : 'compact' }
 							icon={ moreVertical }
 							label={ __( 'Actions' ) }
 							accessibleWhenDisabled
-							disabled={ ! actions.length }
 							className="dataviews-all-actions-button"
 						/>
 					}
 				/>
-				<Menu.Popover>
+				<Menu.Popup positioner={ <Menu.Positioner align="end" /> }>
 					<ActionsMenuGroup
 						actions={ actions }
 						item={ item }
 						registry={ registry }
 						setActiveModalAction={ setActiveModalAction }
 					/>
-				</Menu.Popover>
-			</Menu>
+				</Menu.Popup>
+			</Menu.Root>
 			{ !! activeModalAction && (
 				<ActionModal
 					action={ activeModalAction }

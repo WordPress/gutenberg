@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { VisuallyHidden } from '../visually-hidden';
 import type { BaseControlProps, BaseControlVisualLabelProps } from './types';
 import {

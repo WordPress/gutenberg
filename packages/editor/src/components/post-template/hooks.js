@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 
 export function useEditedPostContext() {
@@ -41,7 +34,7 @@ export function useAllowSwitchingTemplates() {
 			const templates = isFrontPage
 				? getEntityRecords( 'postType', 'wp_template', {
 						per_page: -1,
-				  } )
+					} )
 				: [];
 			const hasFrontPage =
 				isFrontPage &&
@@ -163,13 +156,7 @@ export function usePostTemplatePanelMode() {
 					name: 'wp_template',
 				} ) ?? false;
 		}
-		const canViewTemplates = isVisible
-			? !! canUser( 'read', {
-					kind: 'postType',
-					name: 'wp_template',
-			  } )
-			: false;
-		if ( ( ! isBlockTheme || ! canViewTemplates ) && isVisible ) {
+		if ( ! isBlockTheme && isVisible ) {
 			return 'classic';
 		}
 		if ( isBlockTheme && !! getCurrentTemplateId() ) {

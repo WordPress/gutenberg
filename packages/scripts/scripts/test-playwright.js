@@ -8,16 +8,8 @@ process.env.NODE_ENV = 'test';
 process.on( 'unhandledRejection', ( err ) => {
 	throw err;
 } );
-
-/**
- * External dependencies
- */
 const { resolve } = require( 'node:path' );
 const { sync: spawn } = require( 'cross-spawn' );
-
-/**
- * Internal dependencies
- */
 const {
 	fromConfigRoot,
 	hasProjectFile,
@@ -47,9 +39,11 @@ try {
 }
 
 if ( ! getAsBooleanFromENV( 'PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD' ) ) {
-	const result = spawn( 'npx', [ 'playwright', 'install' ], {
-		stdio: 'inherit',
-	} );
+	const result = spawn(
+		'node',
+		[ require.resolve( '@playwright/test/cli' ), 'install' ],
+		{ stdio: 'inherit' }
+	);
 
 	if ( result.status > 0 ) {
 		process.exit( result.status );

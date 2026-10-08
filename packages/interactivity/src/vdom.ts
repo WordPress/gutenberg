@@ -1,10 +1,4 @@
-/**
- * External dependencies
- */
 import { h, type ComponentChild, type JSX } from 'preact';
-/**
- * Internal dependencies
- */
 import { warn } from './utils';
 import { type DirectiveEntry } from './hooks';
 
@@ -76,10 +70,39 @@ function parseDirectiveName( directiveName: string ): {
 // forward slashes. References don't have any restrictions.
 const nsPathRegExp = /^([\w_\/-]+)::(.+)$/;
 
+/**
+ * Parses the namespace and value from a directive attribute value.
+ *
+ * JSON is retained only when it produces a plain object. All other values use
+ * the raw value after any namespace prefix has been removed.
+ *
+ * @param rawValue The raw directive attribute value.
+ * @return An object with the optional `namespace` and interpreted `value`.
+ */
+export function parseDirectiveValue( rawValue: string ): {
+	namespace: string | null;
+	value: string | Record< string, unknown >;
+} {
+	const regexResult = nsPathRegExp.exec( rawValue );
+	const namespace = regexResult?.[ 1 ] ?? null;
+	const rawDirectiveValue = regexResult?.[ 2 ] ?? rawValue;
+	let value: string | Record< string, unknown > = rawDirectiveValue;
+
+	try {
+		const parsedValue: unknown = JSON.parse( rawDirectiveValue );
+		if ( isObject( parsedValue ) ) {
+			value = parsedValue;
+		}
+	} catch {}
+
+	return { namespace, value };
+}
+
 export const hydratedIslands = new WeakSet();
 
 /**
  * Recursive function that transforms a DOM tree into vDOM.
+ * Directive attributes are interpreted with {@link parseDirectiveValue}.
  *
  * @param root The root element or node to start traversing on.
  * @return The resulting vDOM tree.
@@ -122,7 +145,6 @@ export function toVdom( root: Node ): ComponentChild {
 		const directives: Array<
 			[ name: string, namespace: string | null, value: unknown ]
 		> = [];
-		let ignore = false;
 		let island = false;
 
 		for ( let i = 0; i < attributes.length; i++ ) {
@@ -133,29 +155,27 @@ export function toVdom( root: Node ): ComponentChild {
 				attributeName.slice( 0, directivePrefix.length ) ===
 					directivePrefix
 			) {
-				if ( attributeName === 'data-wp-ignore' ) {
-					ignore = true;
-				} else {
-					const regexResult = nsPathRegExp.exec( attributeValue );
-					const namespace = regexResult?.[ 1 ] ?? null;
-					let value: any = regexResult?.[ 2 ] ?? attributeValue;
-					try {
-						const parsedValue = JSON.parse( value );
-						value = isObject( parsedValue ) ? parsedValue : value;
-					} catch {}
-					if ( attributeName === 'data-wp-interactive' ) {
-						island = true;
-						const islandNamespace =
-							// eslint-disable-next-line no-nested-ternary
-							typeof value === 'string'
-								? value
-								: typeof value?.namespace === 'string'
+				if ( globalThis.SCRIPT_DEBUG ) {
+					if ( attributeName === 'data-wp-ignore' ) {
+						warn(
+							'The data-wp-ignore directive has been removed. The element and its descendants are now hydrated like any other element. Please remove the attribute.'
+						);
+					}
+				}
+				const { namespace, value } =
+					parseDirectiveValue( attributeValue );
+				if ( attributeName === 'data-wp-interactive' ) {
+					island = true;
+					const islandNamespace =
+						// eslint-disable-next-line no-nested-ternary
+						typeof value === 'string'
+							? value
+							: typeof value?.namespace === 'string'
 								? value.namespace
 								: null;
-						namespaces.push( islandNamespace );
-					} else {
-						directives.push( [ attributeName, namespace, value ] );
-					}
+					namespaces.push( islandNamespace );
+				} else {
+					directives.push( [ attributeName, namespace, value ] );
 				}
 			} else if ( attributeName === 'ref' ) {
 				continue;
@@ -175,15 +195,6 @@ export function toVdom( root: Node ): ComponentChild {
 			}
 		}
 
-		if ( ignore && ! island ) {
-			return [
-				h< any, any >( localName, {
-					...props,
-					innerHTML: elementNode.innerHTML,
-					__directives: { ignore: true },
-				} ),
-			];
-		}
 		if ( island ) {
 			hydratedIslands.add( elementNode );
 		}
@@ -229,7 +240,30 @@ export function toVdom( root: Node ): ComponentChild {
 			}
 		}
 
-		if ( props.__directives?.[ 'each-child' ] ) {
+		const hasDefaultHtmlDirective = props.__directives?.html?.some(
+			( { suffix }: DirectiveEntry ) => suffix === null
+		);
+
+		if ( props.__directives?.[ 'each-child' ] || hasDefaultHtmlDirective ) {
+			// `data-wp-html` owns this element's content entirely — whether
+			// that's still the server-rendered fallback or HTML the
+			// directive has since applied — so it's treated as opaque here,
+			// the same way `each-child` is: don't walk its children into
+			// vnodes, since the directive writes to the DOM directly rather
+			// than through Preact's own props diffing (see
+			// `directives/html.ts`).
+			//
+			// Any interactive islands inside are marked as already hydrated
+			// so `hydrateRegions()` doesn't also initialize them
+			// independently; nested router regions aren't excluded yet and
+			// may still process on their own.
+			if ( hasDefaultHtmlDirective ) {
+				elementNode
+					.querySelectorAll( '[data-wp-interactive]' )
+					.forEach( ( islandNode ) => {
+						hydratedIslands.add( islandNode );
+					} );
+			}
 			props.dangerouslySetInnerHTML = {
 				__html: elementNode.innerHTML,
 			};

@@ -5,9 +5,9 @@ The following guide is for setting up your local environment to contribute to th
 ## Prerequisites
 
 -   Node.js
-    Gutenberg is a JavaScript project that requires [Node.js](https://nodejs.org/). The project is currently built using Node.js v20 and npm v10. Though best efforts are made to always use the Active LTS version of Node.js, this will not always be the case. For more details, please refer to the [Node.js release schedule](https://github.com/nodejs/Release#release-schedule).
+    Gutenberg is a JavaScript project that requires [Node.js](https://nodejs.org/). The project is currently built using Node.js v24 and npm v11. Though best efforts are made to always use the Active LTS version of Node.js, this will not always be the case. For more details, please refer to the [Node.js release schedule](https://github.com/nodejs/Release#release-schedule).
 
-We recommend using the [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm) since it is the easiest way to install and manage node for macOS, Linux, and Windows 10 using WSL2. See [our Development Tools guide](/docs/getting-started/devenv/README.md#development-tools) or the Nodejs site for additional installation instructions.
+We recommend using the [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm) since it is the easiest way to install and manage node for macOS, Linux, and Windows 10 using WSL2. See [our Development Tools guide](/docs/getting-started/devenv/README.md#node-js-development-tools) or the Nodejs site for additional installation instructions.
 
 -   Git
     Gutenberg is using git for source control. Make sure you have an updated version of git installed on your computer, as well as a GitHub account. You can read the [Git Workflow](/docs/contributors/code/git-workflow.md) to learn more about using git and GitHub with Gutenberg
@@ -40,7 +40,11 @@ npm install
 npm run dev
 ```
 
-> Note: The install scripts require [Python](https://www.python.org/) to be installed and in the path of the local system. This might be installed by default for your operating system, or require downloading and installing.
+### Set up each worktree
+
+Install dependencies in each fresh Git worktree before you build, test, lint, or commit. Do not reuse `node_modules` or generated package files from a worktree whose `package-lock.json` is at a different revision. Results from that setup might not match the current checkout.
+
+If you install dependencies with `--ignore-scripts`, run `npm run prepare` before committing so Husky installs the repository Git hooks. If a focused command needs generated package files, build the affected package in the current worktree before you interpret its result.
 
 There are two ways to build your code. While developing, you probably will want to use `npm run dev` to run continuous builds automatically as source files change. The dev build also includes additional warnings and errors to help troubleshoot while developing. Once you are happy with your changes, you can run `npm run build` to create optimized production build.
 
@@ -192,7 +196,7 @@ To build: open a terminal (or if on Windows, a command prompt) and navigate to t
 
 After building the cloned gutenberg directory contains the complete plugin, you can upload the entire repository to your `wp-content/plugins` directory and activate the plugin from the WordPress admin.
 
-Another way to upload after building is to run `npm run build:plugin-zip` to create a plugin zip file — this requires `bash` and `php` to run. The script creates `gutenberg.zip` that you can use to install Gutenberg through the WordPress admin.
+Another way to upload after building is to run `npm run build:plugin-zip`, which creates a `gutenberg.zip` that you can use to install Gutenberg through the WordPress admin.
 
 ## Storybook
 
@@ -206,7 +210,27 @@ You can also test Storybook for the current `trunk` branch on GitHub Pages: [htt
 
 ## Developer tools
 
-We recommend configuring your editor to automatically check for syntax and lint errors. This will help you save time as you develop by automatically fixing minor formatting issues. Here are some directions for setting up Visual Studio Code, a popular editor used by many of the core developers, these tools are also available for other editors.
+We recommend configuring your editor to automatically check for syntax and lint errors. This will help you save time as you develop by automatically fixing minor formatting issues. The repository includes settings for Visual Studio Code, Cursor, and Zed. Other editors can use the same root formatting and lint configuration files. Formatting on save and automatic fixes are personal preferences; configure them in your editor's user settings if you want them.
+
+### Visual Studio Code
+
+Install the [recommended extensions](https://github.com/WordPress/gutenberg/blob/HEAD/.vscode/extensions.json). The optional [`.vscode/settings.dist.jsonc`](https://github.com/WordPress/gutenberg/blob/HEAD/.vscode/settings.dist.jsonc) template selects the repository's native TypeScript and formatting tools, configures ESLint suppression hints, and targets PHP 7.4. Copy it to `.vscode/settings.json`, or merge its entries into your existing workspace settings. The repository does not install or update that file automatically. If you previously used the managed settings, replace that copy with the new template to remove its old save and exclusion defaults.
+
+Open a JavaScript or TypeScript file to activate the TypeScript 7 extension. When it asks whether to use the workspace TypeScript version, choose **Allow**; otherwise it keeps using its bundled version.
+
+### Cursor
+
+Cursor supports the same `.vscode` settings template and extension recommendations. Follow the [Visual Studio Code setup](#visual-studio-code) above. In Cursor's Extensions view, search for `@id:TypeScriptTeam.native-preview` and make sure the **TypeScript 7** extension is installed and enabled. [Cursor uses its own marketplace proxy](https://cursor.com/help/customization/extensions), where extension availability can differ from Open VSX.
+
+Open a JavaScript or TypeScript file to activate the extension, then choose **Allow** if it prompts you to use the workspace TypeScript 7 version.
+
+### Zed
+
+Install dependencies with `npm install` and `composer install`, then open the repository root in Zed. Copy the optional [`.zed/settings.dist.json`](https://github.com/WordPress/gutenberg/blob/HEAD/.zed/settings.dist.json) template to `.zed/settings.json`, or merge its entries into your existing project settings. Like the VS Code template, it takes effect only after you copy or merge it. The local settings file is ignored by Git, and the repository does not install or update it automatically.
+
+Install **TypeScript Language Server** (`tsgo`), **PHP** (`php`), **PHPCS** (`phpcs`), **Stylelint** (`stylelint`), and **SCSS & SASS** (`scss`) through **zed: extensions** in the Command Palette. Zed includes ESLint support and reads `.editorconfig` without an extension. Make sure `node` and `php` are available on your `PATH`.
+
+The settings select the repository's native TypeScript language server and target PHP 7.4. Use **editor: format** to format JavaScript and TypeScript with WordPress Prettier, CSS and SCSS with Stylelint, and PHP with PHPCS. The integrations discover the root npm tools and Composer's `vendor/bin` executables automatically. Zed's bundled ESLint server does not support suppression hints; use `npm run lint:js` for the repository's suppression-aware results.
 
 ### EditorConfig
 
@@ -214,41 +238,18 @@ We recommend configuring your editor to automatically check for syntax and lint 
 
 ### ESLint
 
-[ESLint](https://eslint.org/) statically analyzes the code to find problems. The lint rules are integrated in the continuous integration process and must pass to be able to commit. You should install the [ESLint Extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) for Visual Studio Code, see eslint docs for [more editor integrations](https://eslint.org/docs/user-guide/integrations).
+[ESLint](https://eslint.org/) statically analyzes the code to find problems. The lint rules are integrated in the continuous integration process and must pass to be able to commit. With an editor integration enabled, ESLint will use the [eslint.config.mjs](https://github.com/WordPress/gutenberg/blob/HEAD/eslint.config.mjs) file in the root of the Gutenberg repository to highlight issues as you develop.
 
-With the extension installed, ESLint will use the [eslint.config.cjs](https://github.com/WordPress/gutenberg/blob/HEAD/eslint.config.cjs) file in the root of the Gutenberg repository for formatting rules. It will highlight issues as you develop, you can also set the following preference to fix lint rules on save.
-
-```json
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": "explicit"
-    },
-```
+If you use Visual Studio Code, use the extension and settings listed in the [Visual Studio Code](#visual-studio-code) section above. For other editors, see the [ESLint editor integration docs](https://eslint.org/docs/user-guide/integrations).
 
 ### Prettier
 
-[Prettier](https://prettier.io/) is a tool that allows you to define an opinionated format, and automate fixing the code to match that format. Prettier and ESlint are similar, Prettier is more about formatting and style, while ESlint is for detecting coding errors.
+[Prettier](https://prettier.io/) is a tool that allows you to define an opinionated format, and automate fixing the code to match that format. Prettier and ESLint are similar, Prettier is more about formatting and style, while ESLint is for detecting coding errors.
 
-To use Prettier with Visual Studio Code, you should install the [Prettier - Code formatter extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode). You can then configure it to be the default formatter and to automatically fix issues on save, by adding the following to your settings. **_Note_: depending on where you are viewing this document, the brackets may show as double, the proper format is just a single bracket.**
+Editor integrations use the `prettier.config.mjs` file included in the root of the Gutenberg repository. The config is included from the [@wordpress/prettier-config](/packages/prettier-config/README.md) package. If you use Visual Studio Code, use the extension and settings listed in the [Visual Studio Code](#visual-studio-code) section above.
 
-```json
-"[[javascript]]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
-},
-"[[markdown]]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
-},
-```
-
-This will use the `.prettierrc.js` file included in the root of the Gutenberg repository. The config is included from the [@wordpress/prettier-config](/packages/prettier-config/README.md) package.
-
-If you only want to use this configuration with the Gutenberg project, create a directory called `.vscode` at the top-level of Gutenberg (if it doesn't exist yet), and place your settings in a `settings.json` there. Visual Studio Code refers to this as Workspace Settings, and only apply to the project.
-
-After you create a `.vscode/settings.json` file in your repository, you probably want to add it to your [global gitignore file](https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files#configuring-ignored-files-for-all-repositories-on-your-computer) so that it stays private for you and is not committed to the repository.
-
-For other editors, see [Prettier's Editor Integration docs](https://prettier.io/docs/en/editors.html)
+For other editors, see [Prettier's Editor Integration docs](https://prettier.io/docs/en/editors.html).
 
 ### TypeScript
 
-**TypeScript** is a typed superset of JavaScript language. The Gutenberg project uses TypeScript via JSDoc to [type check JavaScript files](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html). If you use Visual Studio Code, TypeScript support is built-in, otherwise see [TypeScript Editor Support](https://github.com/Microsoft/TypeScript/wiki/TypeScript-Editor-Support) for editor integrations.
+[**TypeScript**](https://www.typescriptlang.org/) is a typed superset of JavaScript language. The Gutenberg project uses TypeScript to detect type-based errors and improve developer experience through editor integrations. If you use Visual Studio Code, TypeScript support is built-in, otherwise see [TypeScript Editor Support](https://github.com/Microsoft/TypeScript/wiki/TypeScript-Editor-Support) for editor integrations.

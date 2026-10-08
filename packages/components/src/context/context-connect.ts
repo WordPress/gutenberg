@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef, ReactElement, ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
 import warn from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import { CONNECT_STATIC_NAMESPACE } from './constants';
 import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
 import type { WordPressComponentFromProps } from '.';
@@ -122,15 +111,15 @@ export function getConnectNamespace(
 
 	let namespaces = [];
 
-	// @ts-ignore internal property
+	// @ts-expect-error `Component` is a union that has no index signature.
 	if ( Component[ CONNECT_STATIC_NAMESPACE ] ) {
-		// @ts-ignore internal property
+		// @ts-expect-error `Component` is a union that has no index signature.
 		namespaces = Component[ CONNECT_STATIC_NAMESPACE ];
 	}
 
-	// @ts-ignore
+	// @ts-expect-error `type` does not exist on every member of the `Component` union.
 	if ( Component.type && Component.type[ CONNECT_STATIC_NAMESPACE ] ) {
-		// @ts-ignore
+		// @ts-expect-error `type` does not exist on every member of the `Component` union.
 		namespaces = Component.type[ CONNECT_STATIC_NAMESPACE ];
 	}
 

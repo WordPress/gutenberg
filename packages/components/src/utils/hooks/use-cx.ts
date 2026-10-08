@@ -1,16 +1,9 @@
-/**
- * External dependencies
- */
 import { __unsafe_useEmotionCache as useEmotionCache } from '@emotion/react';
 import type { SerializedStyles } from '@emotion/serialize';
 import { insertStyles } from '@emotion/utils';
 import type { ClassNamesArg } from '@emotion/css/create-instance';
 // eslint-disable-next-line no-restricted-imports
 import { cx as innerCx } from '@emotion/css';
-
-/**
- * WordPress dependencies
- */
 import { useCallback } from '@wordpress/element';
 
 const isSerializedStyles = ( o: any ): o is SerializedStyles =>
@@ -23,6 +16,10 @@ const isSerializedStyles = ( o: any ): o is SerializedStyles =>
  * returned by the `@emotion/react` `css` function in addition to what
  * `cx` normally knows how to handle. It also hooks into the Emotion
  * Cache, allowing `css` calls to work inside iframes.
+ *
+ * Passing multiple `SerializedStyles` arguments emits multiple classes. When
+ * fragments rely on source-order overrides, compose them in a single `css()`
+ * call before passing them to `cx`.
  *
  * ```jsx
  * import { css } from '@emotion/react';

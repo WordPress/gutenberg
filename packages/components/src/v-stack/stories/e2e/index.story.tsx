@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { StoryFn, Meta } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { View } from '../../../view';
 import { VStack } from '../..';
 

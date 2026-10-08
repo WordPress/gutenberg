@@ -1,7 +1,3 @@
-/**
- * Internal dependencies
- */
-
 import { create } from './create';
 import { normaliseFormats } from './normalise-formats';
 

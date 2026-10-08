@@ -10,32 +10,32 @@
 		/* Brand tone */
 		.is-brand,
 		.is-brand:visited {
-			--_gcd-a-color: var(--wpds-color-fg-interactive-brand);
+			--_gcd-a-color: var(--wpds-color-foreground-interactive-brand);
 
-			color: var(--wpds-color-fg-interactive-brand);
+			color: var(--wpds-color-foreground-interactive-brand);
 		}
 
 		.is-brand:hover,
 		.is-brand:active {
-			--_gcd-a-color: var(--wpds-color-fg-interactive-brand-active);
+			--_gcd-a-color: var(--wpds-color-foreground-interactive-brand-active);
 
-			color: var(--wpds-color-fg-interactive-brand-active);
+			color: var(--wpds-color-foreground-interactive-brand-active);
 		}
 
 		/* Neutral tone */
 		.is-neutral,
 		.is-neutral:visited {
-			--_gcd-a-color: var(--wpds-color-fg-interactive-neutral);
+			--_gcd-a-color: var(--wpds-color-foreground-interactive-neutral);
 
-			color: var(--wpds-color-fg-interactive-neutral);
+			color: var(--wpds-color-foreground-interactive-neutral);
 			text-decoration-color: var(--wpds-color-stroke-interactive-neutral);
 		}
 
 		.is-neutral:hover,
 		.is-neutral:active {
-			--_gcd-a-color: var(--wpds-color-fg-interactive-neutral-active);
+			--_gcd-a-color: var(--wpds-color-foreground-interactive-neutral-active);
 
-			color: var(--wpds-color-fg-interactive-neutral-active);
+			color: var(--wpds-color-foreground-interactive-neutral-active);
 		}
 
 		/* Unstyled variant */
@@ -54,7 +54,7 @@
 			line-height: 1;
 			display: inline-block;
 			margin-inline-start: var(--wpds-dimension-padding-xs);
-			font-weight: var(--wpds-typography-font-weight-regular);
+			font-weight: var(--wpds-typography-font-weight-default);
 			text-decoration: none;
 		}
 

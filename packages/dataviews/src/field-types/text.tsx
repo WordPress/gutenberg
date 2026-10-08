@@ -1,11 +1,7 @@
-/**
- * Internal dependencies
- */
 import type { FieldType } from '../types/private';
 import {
 	OPERATOR_CONTAINS,
 	OPERATOR_IS,
-	OPERATOR_IS_ALL,
 	OPERATOR_IS_ANY,
 	OPERATOR_IS_NONE,
 	OPERATOR_IS_NOT,
@@ -40,7 +36,6 @@ export default {
 		// Multiple selection
 		OPERATOR_IS_ANY,
 		OPERATOR_IS_NONE,
-		OPERATOR_IS_ALL,
 		OPERATOR_IS_NOT_ALL,
 	],
 	format: {},

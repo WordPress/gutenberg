@@ -42,6 +42,10 @@
 		"query": {
 			"type": "object",
 			"default": {}
+		},
+		"tagName": {
+			"type": "string",
+			"default": ""
 		}
 	},
 	"supports": {
@@ -83,7 +87,8 @@
 			}
 		},
 		"spacing": {
-			"margin": true
+			"margin": true,
+			"padding": true
 		},
 		"html": false
 	},

@@ -2,6 +2,35 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Restore the package entry point. The TypeScript migration ([#70475](https://github.com/WordPress/gutenberg/pull/70475)) left `main` pointing at a `lib/index.js` that was no longer built, so the package could not be required. It now compiles to `build/index.cjs` like the other packages, `require()` still returns the function itself, and the `.` export gains a `types` condition ([#84164](https://github.com/WordPress/gutenberg/pull/84164)).
+
+### Internal
+
+-   Publish only runtime files, dropping `tsconfig.json` and `tsconfig.tsbuildinfo` from the package ([#84164](https://github.com/WordPress/gutenberg/pull/84164)).
+
+## 2.57.0 (2026-10-07)
+
+## 2.56.0 (2026-09-23)
+
+## 2.55.0 (2026-09-10)
+
+## 2.54.0 (2026-08-26)
+
+## 2.53.0 (2026-08-12)
+
+
+## 2.52.0 (2026-07-29)
+
+## 2.51.0 (2026-07-14)
+
+## 2.50.0 (2026-07-01)
+
+## 2.49.0 (2026-06-24)
+
+## 2.48.1 (2026-06-16)
+
 ## 2.48.0 (2026-06-10)
 
 ### Documentation

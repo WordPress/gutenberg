@@ -47,7 +47,8 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 					),
 				),
 				'schema' => array( $this, 'get_public_item_schema' ),
-			)
+			),
+			true // override existing route defined by core, if it exists
 		);
 	}
 
@@ -57,11 +58,21 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	public function get_items_permissions_check(
-		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-		$request
-	) {
-		if ( ! current_user_can( 'edit_posts' ) ) {
+	public function get_items_permissions_check( $request ) {
+		$kind = $request->get_param( 'kind' );
+		$name = $request->get_param( 'name' );
+
+		$capability = $this->get_required_capability( $kind, $name );
+
+		if ( null === $capability ) {
+			return new WP_Error(
+				'rest_view_config_invalid_entity',
+				__( 'Invalid entity kind or name.', 'gutenberg' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		if ( ! current_user_can( $capability ) ) {
 			return new WP_Error(
 				'rest_cannot_read',
 				__( 'Sorry, you are not allowed to read view config.', 'gutenberg' ),
@@ -70,6 +81,48 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Resolves the capability required to read the view config for an entity.
+	 *
+	 * Known kinds map to the capability that gates managing that entity's list:
+	 * post types use their own `edit_posts` capability (which honors custom
+	 * `capability_type` registrations), taxonomies use `manage_terms`, and
+	 * root-level entities use `manage_options`. A post type or taxonomy that is
+	 * not registered, or not exposed to the REST API, resolves to `null` so the
+	 * request is treated as referencing an unknown entity.
+	 *
+	 * Any other kind falls back to `edit_posts`. This keeps entities registered
+	 * through the `get_entity_view_config_{$kind}_{$name}` filter readable behind
+	 * a baseline capability.
+	 *
+	 * @param string $kind The entity kind (e.g. `postType`).
+	 * @param string $name The entity name (e.g. `page`).
+	 * @return string|null Capability required to read the config, or null if the
+	 *                     entity is not registered.
+	 */
+	protected function get_required_capability( $kind, $name ) {
+		switch ( $kind ) {
+			case 'postType':
+				$post_type = get_post_type_object( $name );
+				if ( $post_type && $post_type->show_in_rest ) {
+					return $post_type->cap->edit_posts;
+				}
+				return null;
+
+			case 'taxonomy':
+				$taxonomy = get_taxonomy( $name );
+				if ( $taxonomy && $taxonomy->show_in_rest ) {
+					return $taxonomy->cap->manage_terms;
+				}
+				return null;
+
+			case 'root':
+				return 'manage_options';
+		}
+
+		return 'edit_posts';
 	}
 
 	/**
@@ -83,14 +136,16 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 		$name = $request->get_param( 'name' );
 
 		$config = gutenberg_get_entity_view_config( $kind, $name );
+		$schema = $this->get_item_schema();
 
 		$response = array(
 			'kind'            => $kind,
 			'name'            => $name,
-			'default_view'    => $config['default_view'],
-			'default_layouts' => $config['default_layouts'],
-			'view_list'       => $config['view_list'],
-			'form'            => $config['form'],
+			'version'         => Gutenberg_View_Config_Data::LATEST_VERSION,
+			'default_view'    => gutenberg_rest_cast_empty_objects_from_schema( $config['default_view'], $schema['properties']['default_view'] ),
+			'default_layouts' => gutenberg_rest_cast_empty_objects_from_schema( $config['default_layouts'], $schema['properties']['default_layouts'] ),
+			'view_list'       => gutenberg_rest_cast_empty_objects_from_schema( $config['view_list'], $schema['properties']['view_list'] ),
+			'form'            => gutenberg_rest_cast_empty_objects_from_schema( $config['form'], $schema['properties']['form'] ),
 		);
 
 		return rest_ensure_response( $response );
@@ -123,15 +178,21 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 					'type'        => 'string',
 					'readonly'    => true,
 				),
+				'version'         => array(
+					'description' => __( 'The schema version of the configuration.', 'gutenberg' ),
+					'type'        => 'integer',
+					'readonly'    => true,
+				),
 				'default_view'    => array(
 					'description' => __( 'Default view configuration.', 'gutenberg' ),
 					'type'        => 'object',
 					'readonly'    => true,
 					'properties'  => array_merge(
 						array(
-							'type' => array(
+							'type'   => array(
 								'type' => 'string',
 							),
+							'layout' => $this->get_combined_layout_schema(),
 						),
 						$view_base_properties
 					),
@@ -240,13 +301,13 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	/**
 	 * Returns the schema properties shared by all view types (ViewBase), excluding 'type'.
 	 *
+	 * Note that `search` and `page` are not part of the schema: they are managed
+	 * via the URL, which is their only source of truth.
+	 *
 	 * @return array Schema properties for the base view configuration.
 	 */
-	private function get_view_base_schema() {
+	protected function get_view_base_schema() {
 		return array(
-			'search'                => array(
-				'type' => 'string',
-			),
 			'filters'               => array(
 				'type'  => 'array',
 				'items' => array(
@@ -290,9 +351,6 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 						'enum' => array( 'asc', 'desc' ),
 					),
 				),
-			),
-			'page'                  => array(
-				'type' => 'integer',
 			),
 			'perPage'               => array(
 				'type' => 'integer',
@@ -351,7 +409,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 *
 	 * @return array Schema for a column style object.
 	 */
-	private function get_column_style_schema() {
+	protected function get_column_style_schema() {
 		return array(
 			'type'       => 'object',
 			'properties' => array(
@@ -377,7 +435,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 *
 	 * @return array Schema for a table layout object.
 	 */
-	private function get_table_layout_schema() {
+	protected function get_table_layout_schema() {
 		return array(
 			'type'       => 'object',
 			'properties' => array(
@@ -401,7 +459,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 *
 	 * @return array Schema for a list layout object.
 	 */
-	private function get_list_layout_schema() {
+	protected function get_list_layout_schema() {
 		return array(
 			'type'       => 'object',
 			'properties' => array(
@@ -422,12 +480,13 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 *
 	 * @return array Schema for a combined layout object.
 	 */
-	private function get_combined_layout_schema() {
+	protected function get_combined_layout_schema() {
 		return array(
 			'type'       => 'object',
 			'properties' => array_merge(
 				$this->get_table_layout_schema()['properties'],
-				$this->get_grid_layout_schema()['properties']
+				$this->get_grid_layout_schema()['properties'],
+				$this->get_list_layout_schema()['properties']
 			),
 		);
 	}
@@ -437,7 +496,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 *
 	 * @return array Schema for a grid layout object.
 	 */
-	private function get_grid_layout_schema() {
+	protected function get_grid_layout_schema() {
 		return array(
 			'type'       => 'object',
 			'properties' => array(
@@ -466,7 +525,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 *
 	 * @return array Schema for a form layout object.
 	 */
-	private function get_form_layout_schema() {
+	protected function get_form_layout_schema() {
 		return array(
 			'oneOf' => array(
 				// RegularLayout.
@@ -626,7 +685,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 *
 	 * @return array Schema for a form field.
 	 */
-	private function get_form_field_schema() {
+	protected function get_form_field_schema() {
 		return array(
 			'oneOf' => array(
 				array( 'type' => 'string' ),
@@ -667,7 +726,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 	 *
 	 * @return array Schema properties for the form configuration.
 	 */
-	private function get_form_schema() {
+	protected function get_form_schema() {
 		return array(
 			'layout' => $this->get_form_layout_schema(),
 			'fields' => array(

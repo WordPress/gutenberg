@@ -27,18 +27,14 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		// Setup an empty testing instance of `WP_Navigation_Block_Renderer` and save the original.
 		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer_Gutenberg' );
 		$method     = $reflection->getMethod( 'get_markup_for_inner_block' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
 		// Invoke the private method.
 		$result = $method->invoke( $reflection, $navigation_link_block );
 
-		if ( is_wp_version_compatible( '7.0' ) ) {
-			$expected = '<li class="wp-block-navigation-item wp-block-navigation-link"><a class="wp-block-navigation-item__content"  href="/hello-world"><span class="wp-block-navigation-item__label">Sample Page</span></a></li>';
-		} else {
-			// Block markup for WP 6.9 (space before wp-block-navigation-item class)
-			// TODO: Remove the second expected markup after WP 6.9 support is dropped and the old markup is no longer generated.
-			$expected = '<li class=" wp-block-navigation-item wp-block-navigation-link"><a class="wp-block-navigation-item__content"  href="/hello-world"><span class="wp-block-navigation-item__label">Sample Page</span></a></li>';
-			$this->assertEquals( $expected, $result );
-		}
+		$expected = '<li class="wp-block-navigation-item wp-block-navigation-link"><a class="wp-block-navigation-item__content"  href="/hello-world"><span class="wp-block-navigation-item__label">Sample Page</span></a></li>';
+		$this->assertEqualHTML( $expected, $result );
 	}
 
 	/**
@@ -61,7 +57,9 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		// Setup an empty testing instance of `WP_Navigation_Block_Renderer` and save the original.
 		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer_Gutenberg' );
 		$method     = $reflection->getMethod( 'get_markup_for_inner_block' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
 		// Invoke the private method.
 		$result = $method->invoke( $reflection, $site_title_block );
 
@@ -99,7 +97,9 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		// Setup an empty testing instance of `WP_Navigation_Block_Renderer` and save the original.
 		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer_Gutenberg' );
 		$method     = $reflection->getMethod( 'get_markup_for_inner_block' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
 		// Invoke the private method.
 		$result = $method->invoke( $reflection, $heading_block );
 
@@ -153,7 +153,9 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		// Setup an empty testing instance of `WP_Navigation_Block_Renderer` and save the original.
 		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer_Gutenberg' );
 		$method     = $reflection->getMethod( 'get_markup_for_inner_block' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
 		// Invoke the private method.
 		$result = $method->invoke( $reflection, $heading_block );
 
@@ -175,7 +177,9 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 	public function test_gutenberg_get_inner_blocks_from_navigation_post_returns_empty_block_list() {
 		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer_Gutenberg' );
 		$method     = $reflection->getMethod( 'get_inner_blocks_from_navigation_post' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
 		$attributes = array( 'ref' => 0 );
 
 		$actual   = $method->invoke( $reflection, $attributes );
@@ -423,6 +427,32 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Creates a Navigation Overlay template part for the active theme.
+	 *
+	 * @param string $slug    The template part slug.
+	 * @param string $content The template part content.
+	 * @return int The template part post ID.
+	 */
+	private function create_navigation_overlay_template_part( $slug, $content ) {
+		$template_part_id = wp_insert_post(
+			array(
+				'post_type'    => 'wp_template_part',
+				'post_status'  => 'publish',
+				'post_title'   => 'Test Overlay',
+				'post_name'    => $slug,
+				'post_content' => $content,
+			),
+			true
+		);
+		$this->assertNotWPError( $template_part_id );
+
+		wp_set_post_terms( $template_part_id, array( get_stylesheet() ), 'wp_theme' );
+		wp_set_post_terms( $template_part_id, array( 'navigation-overlay' ), 'wp_template_part_area' );
+
+		return $template_part_id;
+	}
+
+	/**
 	 * Test that a Navigation block inside a custom overlay inherits text and
 	 * typography styles from the parent Navigation block when it does not set
 	 * its own values.
@@ -432,23 +462,11 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 	 * @covers WP_Navigation_Block_Renderer::get_responsive_container_markup
 	 */
 	public function test_navigation_block_in_custom_overlay_inherits_parent_text_and_typography_styles() {
-		$current_theme = get_stylesheet();
-		$slug          = 'test-overlay-with-navigation-styles';
-
-		$template_part_id = wp_insert_post(
-			array(
-				'post_type'    => 'wp_template_part',
-				'post_status'  => 'publish',
-				'post_title'   => 'Test Overlay With Navigation Styles',
-				'post_name'    => $slug,
-				'post_content' => '<!-- wp:group --><div class="wp-block-group"><!-- wp:navigation {"layout":{"type":"flex","orientation":"vertical"}} --><!-- wp:navigation-link {"label":"About","url":"/about"} /--><!-- /wp:navigation --></div><!-- /wp:group -->',
-			),
-			true
+		$slug = 'test-overlay-with-navigation-styles';
+		$this->create_navigation_overlay_template_part(
+			$slug,
+			'<!-- wp:group --><div class="wp-block-group"><!-- wp:navigation {"layout":{"type":"flex","orientation":"vertical"}} --><!-- wp:navigation-link {"label":"About","url":"/about"} /--><!-- /wp:navigation --></div><!-- /wp:group -->'
 		);
-		$this->assertNotWPError( $template_part_id );
-
-		wp_set_post_terms( $template_part_id, array( $current_theme ), 'wp_theme' );
-		wp_set_post_terms( $template_part_id, array( 'navigation-overlay' ), 'wp_template_part_area' );
 
 		$output = do_blocks(
 			'<!-- wp:navigation {"overlay":"' . $slug . '","overlayMenu":"always","customTextColor":"#123456","customFontSize":32,"fontFamily":"heading","style":{"typography":{"fontStyle":"italic","fontWeight":"700","lineHeight":"1.2","textTransform":"uppercase","letterSpacing":"0.08em","textDecoration":"underline"}}} /-->'
@@ -489,23 +507,11 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 	 * @covers WP_Navigation_Block_Renderer::get_responsive_container_markup
 	 */
 	public function test_navigation_block_in_custom_overlay_preserves_explicit_text_and_typography_styles() {
-		$current_theme = get_stylesheet();
-		$slug          = 'test-overlay-with-explicit-navigation-styles';
-
-		$template_part_id = wp_insert_post(
-			array(
-				'post_type'    => 'wp_template_part',
-				'post_status'  => 'publish',
-				'post_title'   => 'Test Overlay With Explicit Navigation Styles',
-				'post_name'    => $slug,
-				'post_content' => '<!-- wp:group --><div class="wp-block-group"><!-- wp:navigation {"customTextColor":"#654321","customFontSize":20,"fontFamily":"body","style":{"typography":{"fontWeight":"400"}},"layout":{"type":"flex","orientation":"vertical"}} --><!-- wp:navigation-link {"label":"About","url":"/about"} /--><!-- /wp:navigation --></div><!-- /wp:group -->',
-			),
-			true
+		$slug = 'test-overlay-with-explicit-navigation-styles';
+		$this->create_navigation_overlay_template_part(
+			$slug,
+			'<!-- wp:group --><div class="wp-block-group"><!-- wp:navigation {"customTextColor":"#654321","customFontSize":20,"fontFamily":"body","style":{"typography":{"fontWeight":"400"}},"layout":{"type":"flex","orientation":"vertical"}} --><!-- wp:navigation-link {"label":"About","url":"/about"} /--><!-- /wp:navigation --></div><!-- /wp:group -->'
 		);
-		$this->assertNotWPError( $template_part_id );
-
-		wp_set_post_terms( $template_part_id, array( $current_theme ), 'wp_theme' );
-		wp_set_post_terms( $template_part_id, array( 'navigation-overlay' ), 'wp_template_part_area' );
 
 		$output = do_blocks(
 			'<!-- wp:navigation {"overlay":"' . $slug . '","overlayMenu":"always","customTextColor":"#123456","customFontSize":32,"fontFamily":"heading","style":{"typography":{"fontWeight":"700","textTransform":"uppercase"}}} /-->'
@@ -534,5 +540,86 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'color: #123456;', $style );
 		$this->assertStringNotContainsString( 'font-size: 32px', $style );
 		$this->assertStringNotContainsString( 'font-weight:700', $style );
+	}
+
+	/**
+	 * The default overlay expands every submenu it contains through the styles
+	 * scoped to `:not(.disable-default-overlay)`, so the context must not claim
+	 * a custom overlay when none is rendered.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::get_responsive_container_markup
+	 */
+	public function test_default_overlay_does_not_flag_the_context_as_a_custom_overlay() {
+		$output = do_blocks( '<!-- wp:navigation {"overlayMenu":"always"} /-->' );
+
+		$this->assertStringNotContainsString( 'disable-default-overlay', $output, 'The default overlay should not disable the default overlay styles.' );
+		$this->assertStringNotContainsString( '"hasCustomOverlay":true', $output, 'The default overlay should not flag the context as a custom overlay.' );
+	}
+
+	/**
+	 * A custom overlay opts out of the styles that expand every submenu, so the
+	 * context must tell submenus they are not inside the default overlay.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::get_responsive_container_markup
+	 */
+	public function test_custom_overlay_flags_the_context_as_a_custom_overlay() {
+		$slug = 'test-overlay-with-content';
+		$this->create_navigation_overlay_template_part( $slug, '<!-- wp:paragraph --><p>Overlay content</p><!-- /wp:paragraph -->' );
+
+		$output = do_blocks( '<!-- wp:navigation {"overlay":"' . $slug . '","overlayMenu":"always"} /-->' );
+
+		$this->assertStringContainsString( 'disable-default-overlay', $output, 'A custom overlay should disable the default overlay styles.' );
+		$this->assertStringContainsString( '"hasCustomOverlay":true', $output, 'A custom overlay should flag the context as a custom overlay.' );
+	}
+
+	/**
+	 * An overlay template part that renders nothing - it was deleted, or it
+	 * belongs to a theme that is no longer active - falls back to the default
+	 * overlay, so the context has to fall back with it.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::get_responsive_container_markup
+	 */
+	public function test_overlay_template_part_that_renders_nothing_falls_back_to_the_default_overlay() {
+		$output = do_blocks( '<!-- wp:navigation {"overlay":"test-overlay-that-does-not-exist","overlayMenu":"always"} /-->' );
+
+		$this->assertStringNotContainsString( 'disable-default-overlay', $output, 'An overlay that renders nothing should keep the default overlay styles.' );
+		$this->assertStringNotContainsString( '"hasCustomOverlay":true', $output, 'An overlay that renders nothing should not flag the context as a custom overlay.' );
+	}
+
+	/**
+	 * Test that the submenu detection of one navigation block is not reused for the
+	 * next navigation block rendered in the same request.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::render
+	 *
+	 * @see https://github.com/WordPress/gutenberg/issues/82288
+	 */
+	public function test_submenu_detection_is_not_shared_between_navigation_blocks() {
+		$view_module = '@wordpress/block-library/navigation/view';
+		wp_dequeue_script_module( $view_module );
+
+		// A navigation with a submenu that is not interactive by itself.
+		do_blocks(
+			'<!-- wp:navigation {"showSubmenuIcon":false,"openSubmenusOnClick":false,"overlayMenu":"never"} -->' .
+			'<!-- wp:navigation-submenu {"label":"More","url":"/more"} --><!-- wp:navigation-link {"label":"Deep","url":"/deep"} /--><!-- /wp:navigation-submenu -->' .
+			'<!-- /wp:navigation -->'
+		);
+		$this->assertNotContains( $view_module, wp_script_modules()->get_queue(), 'A non-interactive navigation with a submenu should not enqueue the view module.' );
+
+		// A navigation without submenus rendered afterwards in the same request.
+		do_blocks(
+			'<!-- wp:navigation {"showSubmenuIcon":true,"overlayMenu":"never"} -->' .
+			'<!-- wp:navigation-link {"label":"Home","url":"/"} /-->' .
+			'<!-- /wp:navigation -->'
+		);
+		$this->assertNotContains( $view_module, wp_script_modules()->get_queue(), 'A navigation without submenus should not enqueue the view module because a previous navigation had a submenu.' );
 	}
 }

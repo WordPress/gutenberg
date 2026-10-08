@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import normaliseBlocks from './normalise-blocks';
 
 type Options = Record< string, unknown >;

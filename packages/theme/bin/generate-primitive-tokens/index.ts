@@ -6,8 +6,8 @@ import {
 	DEFAULT_SEED_COLORS,
 	buildBgRamp,
 	buildAccentRamp,
-} from '../../src/color-ramps/index';
-import { getColorString } from '../../src/color-ramps/lib/color-utils';
+} from '../../src/color-ramps/index.ts';
+import { getColorString } from '../../src/color-ramps/lib/color-utils.ts';
 
 const __filename = fileURLToPath( import.meta.url );
 const __dirname = path.dirname( __filename );
@@ -54,8 +54,9 @@ function generatePrimitiveColorTokens() {
 			} ) );
 
 		// Convert the ramp values in a DTCG compatible format.
-		// Note: the background seed maps to the `bg` design token group. The
-		// design system token naming intentionally keeps the `bg` convention.
+		// Note: the background seed maps to the `bg` primitive ramp group,
+		// whose name is kept abbreviated even though the semantic tokens it
+		// feeds are exposed under the spelled-out `background` group.
 		[
 			{
 				scaleName: 'bg',

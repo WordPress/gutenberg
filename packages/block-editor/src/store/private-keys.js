@@ -10,10 +10,10 @@ export const mediaEditKey = Symbol( 'mediaEditKey' );
 export const getMediaSelectKey = Symbol( 'getMediaSelect' );
 export const isIsolatedEditorKey = Symbol( 'isIsolatedEditor' );
 export const deviceTypeKey = Symbol( 'deviceTypeKey' );
-export const onViewportStateChangeKey = Symbol( 'onViewportStateChangeKey' );
 export const isNavigationOverlayContextKey = Symbol(
 	'isNavigationOverlayContext'
 );
 export const isNavigationPostEditorKey = Symbol( 'isNavigationPostEditor' );
 export const mediaUploadOnSuccessKey = Symbol( 'mediaUploadOnSuccess' );
+export const mediaSideloadFromUrlKey = Symbol( 'mediaSideloadFromUrl' );
 export const openMediaEditorModalKey = Symbol( 'openMediaEditorModal' );
