@@ -6,7 +6,7 @@ import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useBlockElementRef } from '../block-list/use-block-props/use-block-refs';
 import getEditorRegion from '../../utils/get-editor-region';
-import getBlockDisplayTitle from '../block-title/get-block-display-title';
+import { getBlockDisplayTitle } from '../block-title/use-block-display-title';
 
 /**
  * Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
@@ -58,11 +58,11 @@ function BlockBreadcrumb( { rootLabelText } ) {
 						className="block-editor-block-breadcrumb__button"
 						onClick={ ( event ) => {
 							event.preventDefault();
-							const blockEditor = blockRef.current?.closest(
-								'.editor-styles-wrapper'
+							const editorRegion = getEditorRegion(
+								blockRef.current
 							);
 							clearSelectedBlock();
-							getEditorRegion( blockEditor )?.focus();
+							editorRegion?.focus();
 						} }
 					>
 						{ rootLabel }

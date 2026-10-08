@@ -53,26 +53,12 @@ beforeEach( async () => {
 
 afterEach( () => unregisterBlockType( 'test/breadcrumb' ) );
 
-it( 'selects an ancestor from its fragment link and clears selection from the document link', async () => {
-	// Supply block DOM refs so the document link can find and focus the editor canvas.
-	const refsMap = observableMap();
+it( 'selects an ancestor from its fragment link', async () => {
 	await render(
 		<RegistryProvider value={ registry }>
-			<BlockRefs.Provider value={ { refsMap, eventHandlers: new Map() } }>
-				<div role="region" aria-label="Editor canvas" tabIndex={ -1 }>
-					<div
-						className="editor-styles-wrapper"
-						ref={ ( element ) => {
-							for ( const block of blocks ) {
-								refsMap.set( block.clientId, element );
-							}
-						} }
-					/>
-				</div>
-				<div style={ { width: 1500 } }>
-					<BlockBreadcrumb />
-				</div>
-			</BlockRefs.Provider>
+			<div style={ { width: 1500 } }>
+				<BlockBreadcrumb />
+			</div>
 		</RegistryProvider>
 	);
 
@@ -91,6 +77,29 @@ it( 'selects an ancestor from its fragment link and clears selection from the do
 	expect(
 		registry.select( blockEditorStore ).getSelectedBlockClientId()
 	).toBe( blocks[ 3 ].clientId );
+} );
+
+it( 'clears selection and focuses the editor canvas from the document link', async () => {
+	// Supply block DOM refs so the document link can find and focus the editor canvas.
+	const refsMap = observableMap();
+	await render(
+		<RegistryProvider value={ registry }>
+			<BlockRefs.Provider value={ { refsMap, eventHandlers: new Map() } }>
+				<div role="region" aria-label="Editor canvas" tabIndex={ -1 }>
+					<div
+						ref={ ( element ) => {
+							for ( const block of blocks ) {
+								refsMap.set( block.clientId, element );
+							}
+						} }
+					/>
+				</div>
+				<div style={ { width: 1500 } }>
+					<BlockBreadcrumb />
+				</div>
+			</BlockRefs.Provider>
+		</RegistryProvider>
+	);
 
 	// Activating the document link clears the block selection.
 	await page.getByRole( 'link', { name: 'Document', exact: true } ).click();
