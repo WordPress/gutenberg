@@ -18,6 +18,8 @@ import {
 	removeNoteIdFromMetadata,
 	calculateNotePositions,
 	pickPrimaryNote,
+	getNoteAtCaret,
+	pickNoteForCaret,
 	BLOCK_LEVEL_NOTE_START,
 	getInlineMarkerStart,
 	getNoteMarkerSelector,
@@ -331,6 +333,120 @@ describe( 'pickPrimaryNote', () => {
 			{ id: 2, status: 'approved' },
 		];
 		expect( pickPrimaryNote( threads ) ).toBe( threads[ 0 ] );
+	} );
+} );
+
+describe( 'pickNoteForCaret', () => {
+	const FORMAT_NAME = 'core/note';
+	const isRegistered = () =>
+		!! select( richTextStore ).getFormatType( FORMAT_NAME );
+
+	// "Alpha" is wrapped by note 7 (offsets 0-5), "charlie" by the draft
+	// marker (12-19); note 3 is block-level. Parsed once the format exists.
+	let attributes;
+
+	beforeAll( () => {
+		if ( ! isRegistered() ) {
+			registerFormatType( FORMAT_NAME, noteFormat );
+		}
+		attributes = {
+			content: RichTextData.fromHTMLString(
+				'<mark class="wp-note" data-id="7">Alpha</mark> bravo <mark class="wp-note" data-id="new">charlie</mark> delta.'
+			),
+			metadata: { noteId: [ 3, 7 ] },
+		};
+	} );
+
+	afterAll( () => {
+		if ( isRegistered() ) {
+			unregisterFormatType( FORMAT_NAME );
+		}
+	} );
+	const notes = [
+		{ id: 3, status: 'hold', blockClientId: 'b' },
+		{ id: 7, status: 'hold', blockClientId: 'b' },
+	];
+	const caret = ( offset, end = offset ) => ( {
+		selectionStart: { attributeKey: 'content', offset },
+		selectionEnd: { attributeKey: 'content', offset: end },
+	} );
+	const noCaret = { selectionStart: {}, selectionEnd: {} };
+	const pick = (
+		{ selectionStart, selectionEnd },
+		{ attributes: blockAttributes = attributes, ...overrides } = {}
+	) =>
+		pickNoteForCaret( {
+			noteAtCaret: getNoteAtCaret(
+				blockAttributes,
+				selectionStart,
+				selectionEnd
+			),
+			attributes: blockAttributes,
+			blockThreads: notes,
+			hasDraft: false,
+			selectedNoteId: undefined,
+			isBlockChange: true,
+			...overrides,
+		} );
+
+	it( 'enters a marker: selects that note', () => {
+		expect( pick( caret( 2 ) ) ).toBe( 7 );
+		expect( pick( caret( 14 ) ) ).toBe( 'new' );
+		expect( pick( caret( 2 ), { hasDraft: true } ) ).toBe( 7 );
+	} );
+
+	it( "enters another block: selects the block's note", () => {
+		expect( pick( caret( 8 ) ) ).toBe( 3 );
+		expect( pick( noCaret ) ).toBe( 3 );
+		expect( pick( caret( 8 ), { hasDraft: true } ) ).toBe( 'new' );
+		expect(
+			pick( caret( 8 ), {
+				blockThreads: [ { id: 7, status: 'hold', blockClientId: 'b' } ],
+			} )
+		).toBeUndefined();
+	} );
+
+	it( 'enters another block: keeps the selected block-level note among several, else the primary', () => {
+		const several = [
+			{ id: 3, status: 'hold', blockClientId: 'b' },
+			{ id: 9, status: 'hold', blockClientId: 'b' },
+		];
+		expect(
+			pick( caret( 8 ), { blockThreads: several, selectedNoteId: 9 } )
+		).toBe( 9 );
+		expect(
+			pick( caret( 8 ), { blockThreads: several, selectedNoteId: 7 } )
+		).toBe( 3 );
+	} );
+
+	it( "leaves the selected note's marker: selects the block's note", () => {
+		const inBlock = { isBlockChange: false };
+		expect( pick( caret( 8 ), { ...inBlock, selectedNoteId: 7 } ) ).toBe(
+			3
+		);
+		expect(
+			pick( caret( 8 ), { ...inBlock, selectedNoteId: 'new' } )
+		).toBe( 3 );
+	} );
+
+	it( 'anything else: keeps the selection', () => {
+		const inBlock = { isBlockChange: false };
+		expect( pick( caret( 8 ), inBlock ) ).toBeUndefined();
+		expect( pick( caret( 8 ), { ...inBlock, selectedNoteId: 3 } ) ).toBe(
+			3
+		);
+		expect( pick( noCaret, { ...inBlock, selectedNoteId: 7 } ) ).toBe( 7 );
+	} );
+
+	it( 'reads markers from a string attribute', () => {
+		expect(
+			pick( caret( 2 ), {
+				attributes: {
+					content:
+						'<mark class="wp-note" data-id="7">Alpha</mark> bravo',
+				},
+			} )
+		).toBe( 7 );
 	} );
 } );
 
