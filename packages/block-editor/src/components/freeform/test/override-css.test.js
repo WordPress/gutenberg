@@ -163,6 +163,33 @@ describe( 'the rules that say a block is in move mode', () => {
 		expect( css ).toContain( 'user-select: none' );
 	} );
 
+	it( 'stops the browser dragging the image inside it off by itself', () => {
+		// An image is draggable by default, and that native drag swallows the
+		// pointer stream the moment it starts: the press arrives, `dragstart`
+		// fires, and no further move or up is ever seen, so the block is left
+		// where it was. The image is inside the Image block rather than being
+		// it, and the property is not inherited, so this is the one thing said
+		// about a block's contents.
+		expect( getMoveModeCss( [ 'a' ] ) ).toContain(
+			'#block-a:not([contenteditable="true"]) * {\n\t-webkit-user-drag: none;'
+		);
+	} );
+
+	it( 'stops the browser dragging the block off either', () => {
+		// On a canvas the block itself is the drag handle, so the browser's own
+		// dragging of it has nothing left to do — and this has to be CSS rather
+		// than a cancelled `dragstart`, because with nothing selected yet there
+		// is no canvas mounted and so no listener to cancel anything. The very
+		// first press on an image was being carried off before the editor had
+		// even selected it.
+		const css = getMoveModeCss( [ 'a' ] );
+		const ownRule = css.slice(
+			0,
+			css.indexOf( '#block-a:not([contenteditable="true"]) *' )
+		);
+		expect( ownRule ).toContain( '-webkit-user-drag: none' );
+	} );
+
 	it( 'excludes a block that has been entered for editing', () => {
 		// Entered, it is text again: the caret belongs in it and the words are
 		// selectable, so neither rule may reach it.

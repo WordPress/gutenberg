@@ -707,9 +707,27 @@ export default function FreeformCanvas( {
 				target: event.target,
 			};
 		};
+		// The browser drags images and links off by itself, and that native
+		// drag swallows the pointer stream the instant it starts: the press
+		// arrives, `dragstart` fires, and no further move or release is ever
+		// seen, so the gesture never finishes and the block stays put. CSS says
+		// so too, but only Blink and WebKit listen to it.
+		//
+		// Scoped to a press that has already been taken for this canvas, so the
+		// editor's own block dragging — which starts from the toolbar, not from
+		// the block — is left alone.
+		const onDragStart = ( event ) => {
+			if ( pendingRef.current || gestureRef.current ) {
+				event.preventDefault();
+			}
+		};
+
 		canvasElement.addEventListener( 'pointerdown', onPointerDown );
-		return () =>
+		canvasElement.addEventListener( 'dragstart', onDragStart );
+		return () => {
 			canvasElement.removeEventListener( 'pointerdown', onPointerDown );
+			canvasElement.removeEventListener( 'dragstart', onDragStart );
+		};
 	}, [ canvasElement, enteredClientId, selectedClientIds, isAbsorbed ] );
 
 	// The gesture is followed on the document so it survives the pointer

@@ -85,6 +85,27 @@ function getCanvasRules( {
  * block is excluded rather than reset, so the editor goes on saying what the
  * cursor over real text is.
  *
+ * `-webkit-user-drag` is what stops an image being carried off by the browser
+ * instead of moved on the canvas. An image is draggable by default, and that
+ * native drag swallows the pointer stream the instant it starts: the press
+ * arrives, `dragstart` fires, and no further move or release is ever seen, so
+ * the gesture never finishes and the block stays where it was.
+ *
+ * It is the one thing said about what is inside a block, because the image is
+ * inside the Image block rather than being it, and the property is not
+ * inherited. It only governs the browser's own dragging, so it takes nothing
+ * away from the text in a block that is kept whole.
+ *
+ * It has to be CSS rather than a cancelled `dragstart`, because the canvas is
+ * mounted by the selection: with nothing selected yet there is no listener to
+ * cancel anything, and the very first press on an image is carried off before
+ * the editor has even selected it. That is the case this started from.
+ *
+ * It covers the block as well as its contents. On a canvas the block itself is
+ * the drag handle, so the browser's own dragging of it has nothing left to do.
+ * The toolbar's handle and the List View are unaffected: both spread their
+ * draggable props onto their own elements, which are not the block.
+ *
  * @param {string[]} clientIds Every block the canvas can move.
  * @return {string} CSS for the editor canvas.
  */
@@ -96,6 +117,10 @@ export function getMoveModeCss( clientIds ) {
 			) => `#block-${ clientId }:not([contenteditable="true"]) {
 	cursor: move;
 	user-select: none;
+	-webkit-user-drag: none;
+}
+#block-${ clientId }:not([contenteditable="true"]) * {
+	-webkit-user-drag: none;
 }`
 		)
 		.join( '\n' );
