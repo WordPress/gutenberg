@@ -10,6 +10,7 @@
 
 -   Notes: Highlight the text an unsent note is about, and keep the note anchored to it when the selection changes or the text is edited before the note is sent ([#84125](https://github.com/WordPress/gutenberg/pull/84125)).
 -   Notes: Select the note under the caret: an inline note while the caret is inside its highlight, otherwise the block's unsent draft or block-level note, instead of an inline note on any click in the block ([#84147](https://github.com/WordPress/gutenberg/pull/84147)).
+-   Notes: Add an inline note, instead of a block-level note, when the selected text is stored in a `string` attribute or nested in another attribute, such as a Navigation Link label or a Table cell ([#84337](https://github.com/WordPress/gutenberg/pull/84337)).
 
 ## 15.2.0 (2026-10-07)
 
