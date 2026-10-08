@@ -13,7 +13,7 @@ import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
-import { DEFAULT_CANVAS_HEIGHT } from './constants';
+import { DEFAULT_CANVAS_HEIGHT, DESIGN_WIDTH } from './constants';
 import {
 	toDesignUnits,
 	toOverlayPx,
@@ -32,7 +32,11 @@ import {
 	resolveDragPosition,
 	resolveResize,
 } from './snapping';
-import { getCanvasConversion, measureSection } from './conversion';
+import {
+	getCanvasConversion,
+	getRepairedRect,
+	measureSection,
+} from './conversion';
 import { getCanvasChild } from './canvas-child';
 import { getGrownCanvasLayout } from './canvases';
 import {
@@ -472,6 +476,27 @@ export default function FreeformCanvas( {
 		[ registry ]
 	);
 
+	// The rect of what you can actually see inside each of these blocks, in
+	// design units. Shares the conversion's measuring so that both answer in
+	// the same space.
+	const measureVisibleRects = useCallback(
+		( clientIds ) => {
+			const measured =
+				canvasElement &&
+				measureSection( canvasElement, clientIds, () => true );
+			const conversion = measured && getCanvasConversion( measured );
+			if ( ! conversion ) {
+				return {};
+			}
+			const rectByClientId = {};
+			measured.clientIds.forEach( ( clientId, index ) => {
+				rectByClientId[ clientId ] = conversion.rects[ index ];
+			} );
+			return rectByClientId;
+		},
+		[ canvasElement ]
+	);
+
 	// Measures the section and freezes its current layout as coordinates, so a
 	// block can be picked up out of normal flow without the rest of the section
 	// collapsing onto the same spot. The rects are kept locally as well as
@@ -623,16 +648,54 @@ export default function FreeformCanvas( {
 				duplicateBlocks( clientIds, false );
 			}
 
+			// A section converted before blocks were measured by their
+			// contents still holds them at the full width of the canvas, and
+			// such a block cannot move sideways at all. Picking one up is the
+			// moment to give it the size of the thing you can see. Only a
+			// move does this: a resize is the one gesture that is about the
+			// width, and silently changing it under the hand would fight the
+			// person doing it.
+			const visibleRects =
+				kind === 'drag' ? measureVisibleRects( clientIds ) : {};
+
 			const startRects = {};
 			const startStyles = {};
+			const repairs = {};
 			for ( const clientId of clientIds ) {
-				startRects[ clientId ] = liveRects[ clientId ];
-				startStyles[ clientId ] = conversion
-					? mergeChildLayout(
-							childStyles[ clientId ],
-							liveRects[ clientId ]
+				const stored = liveRects[ clientId ];
+				const repaired = getRepairedRect(
+					stored,
+					visibleRects[ clientId ],
+					DESIGN_WIDTH
+				);
+				startRects[ clientId ] = repaired;
+				if ( repaired !== stored ) {
+					repairs[ clientId ] = repaired;
+				}
+				startStyles[ clientId ] = mergeChildLayout(
+					childStyles[ clientId ],
+					repaired
+				);
+			}
+			// Write the new size straight away: the stylesheet places the
+			// block from the stored rect, so without this the block would be
+			// dragged by one width and drawn at another.
+			if ( Object.keys( repairs ).length ) {
+				writeLayouts(
+					Object.fromEntries(
+						Object.entries( repairs ).map(
+							( [ clientId, rect ] ) => [
+								clientId,
+								{
+									style: mergeChildLayout(
+										childStyles[ clientId ],
+										rect
+									),
+								},
+							]
 						)
-					: childStyles[ clientId ];
+					)
+				);
 			}
 			const dragged = clientIds;
 

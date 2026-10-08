@@ -175,17 +175,17 @@ describe( 'the rules that say a block is in move mode', () => {
 		);
 	} );
 
-	it( 'leaves the block itself draggable', () => {
-		// A press on a block that is not selected has no canvas to take it —
-		// the canvas is mounted by the selection — so it falls back to the
-		// editor's own block dragging. Refusing that here left such a press
-		// doing nothing at all: no drag of either kind.
+	it( 'refuses the browser’s drag on the block itself', () => {
+		// Cancelling the drag once it has started is too late: the editor
+		// hides the block it thinks is being dragged, and a cancelled drag
+		// never reports an end, so the block is left with `display: none` and
+		// nothing inside it.
 		const css = getMoveModeCss( [ 'a' ] );
 		const ownRule = css.slice(
 			0,
 			css.indexOf( '#block-a:not([contenteditable="true"]) *' )
 		);
-		expect( ownRule ).not.toContain( '-webkit-user-drag' );
+		expect( ownRule ).toContain( '-webkit-user-drag: none' );
 	} );
 
 	it( 'excludes a block that has been entered for editing', () => {

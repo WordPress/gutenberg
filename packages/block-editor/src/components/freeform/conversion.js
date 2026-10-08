@@ -237,3 +237,35 @@ export function isEditorFurniture( className ) {
 				name.startsWith( 'block-editor-' )
 		);
 }
+
+/**
+ * A stored rect, with a canvas-wide block cut down to what you can see.
+ *
+ * Conversion happens once. A section converted before blocks were measured by
+ * their contents still holds blocks the full width of the canvas, and such a
+ * block can never move sideways however it is dragged: there is nowhere for it
+ * to go, so x stays 0 and everything is stacked against the left edge. Picking
+ * one up is the moment to give it the size of the thing you can see.
+ *
+ * Only the sideways pinning is repaired. Moving a block up or down under the
+ * hand, or changing its height as it is picked up, would be a surprise.
+ *
+ * @param {Object} [storedRect]  The rect the block is placed by.
+ * @param {Object} [visibleRect] The rect of what is inside it.
+ * @param {number} designWidth   The canvas width, in design units.
+ * @return {Object|undefined} The rect to drag by.
+ */
+export function getRepairedRect( storedRect, visibleRect, designWidth ) {
+	if ( ! storedRect || ! visibleRect ) {
+		return storedRect;
+	}
+
+	const fillsTheCanvas = storedRect.x <= 0 && storedRect.width >= designWidth;
+	const isNarrower =
+		visibleRect.width > 0 && visibleRect.width < storedRect.width;
+	if ( ! fillsTheCanvas || ! isNarrower ) {
+		return storedRect;
+	}
+
+	return { ...storedRect, x: visibleRect.x, width: visibleRect.width };
+}

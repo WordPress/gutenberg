@@ -99,14 +99,16 @@ function getCanvasRules( {
  * inherited. It only governs the browser's own dragging, so it takes nothing
  * away from the text in a block that is kept whole.
  *
- * It stops at the block's contents and does not touch the block itself. The
- * editor marks a block `draggable`, and that is what a press on an unselected
- * block falls back to: the canvas is mounted by the selection, so on a cold
- * press there is no canvas to take the gesture, and refusing the browser's
- * drag as well left such a press doing nothing whatsoever. Suppressing the
- * image alone is enough for the case this came from — a block already selected,
- * where the canvas is mounted and the gesture is ready — and that is the case
- * where the image was being carried off mid-drag.
+ * The block says it too, not just its contents. Cancelling the drag once it
+ * has started is too late: the editor hides the block it thinks is being
+ * dragged, and a cancelled drag never reports an end, so the block is left
+ * with `display: none` and nothing inside it. Refusing the drag outright keeps
+ * that from ever happening.
+ *
+ * The editor only marks a block `draggable` while it is selected, and a
+ * selected block on a canvas is exactly the one whose press the canvas should
+ * own. The toolbar's handle and the List View both put their draggable props
+ * on their own elements, so neither is affected.
  *
  * @param {string[]} clientIds      Every block the canvas can move.
  * @param {string[]} wholeClientIds Those of them that are all one thing, whose
@@ -124,6 +126,7 @@ export function getMoveModeCss( clientIds, wholeClientIds = [] ) {
 			return `#block-${ clientId }:not([contenteditable="true"]) {
 	cursor: move;
 	user-select: none;
+	-webkit-user-drag: none;
 }
 #block-${ clientId }:not([contenteditable="true"]) * {
 	${ insideDeclarations.join( ';\n\t' ) };

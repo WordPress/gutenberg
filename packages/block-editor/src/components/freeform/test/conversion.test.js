@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
 	getCanvasConversion,
+	getRepairedRect,
 	getVisibleBox,
 	isEditorFurniture,
 } from '../conversion';
@@ -163,5 +164,68 @@ describe( 'isEditorFurniture', () => {
 
 	it( 'copes with a node that has no class at all', () => {
 		expect( isEditorFurniture( undefined ) ).toBe( false );
+	} );
+} );
+
+describe( 'getRepairedRect', () => {
+	// Conversion happens once. A section converted before blocks were measured
+	// by their contents still holds blocks the full width of the canvas, and
+	// such a block can never move sideways however it is dragged — x is pinned
+	// at 0 and everything stays stacked against the left edge. Picking one up
+	// is the moment to give it the size of what you can see.
+	const full = { x: 0, y: 100, width: DESIGN_WIDTH, height: 200 };
+
+	it( 'gives a canvas-wide block the size of its contents', () => {
+		expect(
+			getRepairedRect(
+				full,
+				{ x: 300, y: 100, width: 335, height: 200 },
+				DESIGN_WIDTH
+			)
+		).toEqual( { x: 300, y: 100, width: 335, height: 200 } );
+	} );
+
+	it( 'leaves the height and vertical position alone', () => {
+		// Only the sideways pinning is being repaired; moving the block up or
+		// down under the hand would be a surprise.
+		expect(
+			getRepairedRect(
+				full,
+				{ x: 300, y: 999, width: 335, height: 20 },
+				DESIGN_WIDTH
+			)
+		).toEqual( { x: 300, y: 100, width: 335, height: 200 } );
+	} );
+
+	it( 'leaves a block that is not canvas-wide exactly as it is', () => {
+		const placed = { x: 200, y: 100, width: 400, height: 200 };
+		expect(
+			getRepairedRect(
+				placed,
+				{ x: 250, y: 100, width: 100, height: 200 },
+				DESIGN_WIDTH
+			)
+		).toEqual( placed );
+	} );
+
+	it( 'leaves it alone when its contents fill the canvas too', () => {
+		// A long paragraph really is the full width, and shrinking it would
+		// rewrap the text under the hand.
+		expect(
+			getRepairedRect(
+				full,
+				{ x: 0, y: 100, width: DESIGN_WIDTH, height: 200 },
+				DESIGN_WIDTH
+			)
+		).toEqual( full );
+	} );
+
+	it( 'copes with nothing to measure', () => {
+		expect( getRepairedRect( full, undefined, DESIGN_WIDTH ) ).toEqual(
+			full
+		);
+		expect( getRepairedRect( undefined, full, DESIGN_WIDTH ) ).toBe(
+			undefined
+		);
 	} );
 } );
