@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add `@wordpress/fields-loader` as a bundled package, so consumer builds bundle it instead of externalizing it to a nonexistent `wp-fields-loader` script ([#84323](https://github.com/WordPress/gutenberg/pull/84323)).
+
 ## 6.57.0 (2026-10-07)
 
 ### Enhancements
