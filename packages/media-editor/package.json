@@ -23,6 +23,16 @@
 	"engines": {
 		"node": ">=18.12.0"
 	},
+	"files": [
+		"build",
+		"build-module",
+		"build-style",
+		"build-types",
+		"src",
+		"*.md",
+		"!**/stories/**",
+		"!**/test/**"
+	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
 	"exports": {
@@ -33,7 +43,7 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"types": "build-types",
+	"types": "build-types/index.d.ts",
 	"sideEffects": [
 		"build-style/**",
 		"src/**/*.scss",
