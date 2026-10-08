@@ -1,8 +1,5 @@
 import { getContext, getElement, store } from '@wordpress/interactivity';
-import {
-	onReducedMotionChange,
-	prefersReducedMotion,
-} from '../utils/reduced-motion';
+import { prefersReducedMotion } from '../utils/reduced-motion';
 
 store(
 	'core/cover',
@@ -22,21 +19,16 @@ store(
 		},
 		callbacks: {
 			stopBackgroundVideo() {
-				const { ref } = getElement();
+				if ( ! prefersReducedMotion() ) {
+					return;
+				}
 
 				// The video is saved with `autoplay`, so it is stopped here
 				// rather than never started. Clearing the attribute as well
 				// keeps it from playing again if the source reloads.
-				const stopIfPreferred = ( prefersReduced ) => {
-					if ( prefersReduced ) {
-						ref.autoplay = false;
-						ref.pause();
-					}
-				};
-
-				stopIfPreferred( prefersReducedMotion() );
-
-				return onReducedMotionChange( stopIfPreferred );
+				const { ref } = getElement();
+				ref.autoplay = false;
+				ref.pause();
 			},
 		},
 	},

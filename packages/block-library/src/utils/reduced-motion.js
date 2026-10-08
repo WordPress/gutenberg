@@ -14,27 +14,3 @@ export function prefersReducedMotion() {
 		true
 	);
 }
-
-/**
- * Calls a listener whenever the user's reduce motion preference changes.
- *
- * The listener is not called for the preference as it stands; read that with
- * `prefersReducedMotion`.
- *
- * @param {(prefersReducedMotion: boolean) => void} listener Called with the new preference whenever it changes.
- *
- * @return {() => void} A function that removes the listener.
- */
-export function onReducedMotionChange( listener ) {
-	const query = window.matchMedia?.( '(prefers-reduced-motion: reduce)' );
-
-	if ( ! query?.addEventListener ) {
-		return () => {};
-	}
-
-	const handleChange = ( event ) => listener( event.matches );
-
-	query.addEventListener( 'change', handleChange );
-
-	return () => query.removeEventListener( 'change', handleChange );
-}
