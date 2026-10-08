@@ -20,6 +20,7 @@ import {
 	getBlockAttributes,
 } from './selectors';
 import { getLayoutSupport, isAbsorbable } from '../components/freeform/flatten';
+import { canHoldACanvas } from '../components/freeform/canvases';
 import {
 	checkAllowListRecursive,
 	getAllPatternsDependants,
@@ -1431,6 +1432,16 @@ export function isSelectedBlockStyleStateShownOnCanvas( state, clientId ) {
  * @return {boolean} Whether the block is locked.
  */
 export function isBlockFreeformLocked( state, clientId ) {
+	// Behind the experiment. Without this guard every Group in every post would
+	// need two clicks before you could type in it. Selectors run where there is
+	// no window, so this cannot read one blindly.
+	if (
+		typeof window === 'undefined' ||
+		! window.__experimentalEnableFreeformCanvas
+	) {
+		return false;
+	}
+
 	if ( state.freeformEnteredBlock === clientId ) {
 		return false;
 	}
@@ -1458,9 +1469,32 @@ export function isBlockFreeformLocked( state, clientId ) {
 		return false;
 	}
 
+	// A section that could be a canvas holds its blocks still from the start,
+	// not from its first drag. Waiting meant an untouched section looked like
+	// ordinary text and gave no sign it could be rearranged — no move cursor,
+	// and a caret where a drag was about to start.
+	//
+	// Normal editing has to stay normal where the canvas has no business: a
+	// content-only or disabled section, or one a template has locked down, is
+	// not the canvas's to arrange, and holding its text still would stop it
+	// being edited at all.
 	return (
-		state.blocks.attributes.get( rootClientId )?.layout?.type === 'freeform'
+		canHoldACanvas( getLayoutSupport( nameOf( state, rootClientId ) ) ) &&
+		! getTemplateLock( state, rootClientId ) &&
+		getBlockEditingMode( state, rootClientId ) === 'default'
 	);
+}
+
+/**
+ * A block's name, straight off the state.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId A block's client id.
+ *
+ * @return {string|undefined} The block name.
+ */
+function nameOf( state, clientId ) {
+	return state.blocks.byClientId.get( clientId )?.name;
 }
 
 /**

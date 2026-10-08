@@ -63,7 +63,44 @@ function getCanvasRules( {
 }
 #block-${ canvasClientId } > * {
 	margin: 0;
+}
+${ getMoveModeRules( canvasClientId ) }`;
+}
+
+/**
+ * The rules that say the blocks on a canvas are moved rather than typed into.
+ *
+ * One rule for the canvas rather than one per block, because every child is in
+ * move mode whether or not it has coordinates yet — a block just inserted, or
+ * every block in a section nobody has dragged in.
+ *
+ * `> *` is deliberate: a Group kept whole on a canvas travels as one piece, and
+ * the words inside it are still words. The entered block is excluded rather
+ * than reset, so the editor goes on saying what the cursor over real text is.
+ *
+ * @param {string} canvasClientId The canvas block.
+ * @return {string} CSS.
+ */
+function getMoveModeRules( canvasClientId ) {
+	return `#block-${ canvasClientId } > *:not([contenteditable="true"]) {
+	cursor: move;
+	user-select: none;
 }`;
+}
+
+/**
+ * The stylesheet for a section that is a canvas waiting to happen.
+ *
+ * Its blocks are already held still — RichText sees to that — so they must
+ * already say they can be moved. Nothing is positioned: the section is still
+ * laying itself out, and coordinates it has not been measured for would
+ * collapse it onto a single spot.
+ *
+ * @param {string[]} clientIds Sections that could become canvases.
+ * @return {string} CSS for the editor canvas.
+ */
+export function getPendingCanvasCss( clientIds ) {
+	return clientIds.map( getMoveModeRules ).join( '\n' );
 }
 
 /**
@@ -121,11 +158,7 @@ function getPlacementRules( {
 			declarations.push( 'z-index: 1' );
 			return `#block-${ childClientId } {\n\t${ declarations.join(
 				';\n\t'
-			) };\n}
-#block-${ childClientId }:not([contenteditable="true"]) {
-	cursor: move;
-	user-select: none;
-}`;
+			) };\n}`;
 		} )
 		.join( '\n' );
 }

@@ -3,7 +3,45 @@ import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { isBlockFreeformLocked } from '../private-selectors';
 import { sectionRootClientIdKey } from '../private-keys';
 
+// The feature is behind an experiment, which the selector reads off `window`.
+// This suite runs in the node environment, so there is no window to read until
+// one is put there.
+beforeAll( () => {
+	globalThis.window = globalThis.window ?? {};
+	globalThis.window.__experimentalEnableFreeformCanvas = true;
+	for ( const [ name, supports ] of Object.entries( ALL_TYPES ) ) {
+		registerBlockType( name, {
+			apiVersion: 3,
+			title: name,
+			category: 'text',
+			supports,
+			save: () => null,
+		} );
+	}
+} );
+
+afterAll( () => {
+	delete globalThis.window.__experimentalEnableFreeformCanvas;
+	for ( const name of Object.keys( ALL_TYPES ) ) {
+		unregisterBlockType( name );
+	}
+} );
+
+// Every block type these tests mention, with the layout support that decides
+// whether a section can be a canvas.
+const ALL_TYPES = {
+	'core/group': { layout: { allowSizingOnChildren: true } },
+	'core/column': { layout: true },
+	'core/columns': { layout: { allowSwitching: false } },
+	'core/paragraph': {},
+	'core/heading': {},
+	'core/post-content': { layout: true },
+	'core/template-part': {},
+};
+
 const state = ( { parentLayout, entered = null } ) => ( {
+	blockListSettings: new Map(),
+	settings: {},
 	blocks: {
 		parents: new Map( [ [ 'child', 'canvas' ] ] ),
 		order: new Map( [
@@ -19,6 +57,7 @@ const state = ( { parentLayout, entered = null } ) => ( {
 			[ 'canvas', { layout: parentLayout } ],
 			[ 'child', {} ],
 		] ),
+		blockEditingModes: new Map(),
 	},
 	freeformEnteredBlock: entered,
 } );
@@ -57,13 +96,17 @@ describe( 'isBlockFreeformLocked', () => {
 		).toBe( true );
 	} );
 
-	it( 'leaves blocks that are not on a canvas alone', () => {
+	it( 'locks a block in a section that could be a canvas but is not one yet', () => {
+		// A Group laid out `constrained` has not been dragged in, but it can
+		// hold a canvas, so its blocks are held still from the start: that is
+		// what gives them the move cursor and makes the whole block the drag
+		// handle before anything has been converted.
 		expect(
 			isBlockFreeformLocked(
 				state( { parentLayout: { type: 'constrained' } } ),
 				'child'
 			)
-		).toBe( false );
+		).toBe( true );
 	} );
 
 	it( 'leaves a top-level block alone', () => {
@@ -88,6 +131,7 @@ const TYPES = {
 };
 
 const treeState = ( nodes, entered = null, sectionRoot = undefined ) => ( {
+	blockListSettings: new Map(),
 	settings: sectionRoot ? { [ sectionRootClientIdKey ]: sectionRoot } : {},
 	blocks: {
 		parents: new Map(
@@ -112,6 +156,7 @@ const treeState = ( nodes, entered = null, sectionRoot = undefined ) => ( {
 				attributes ?? {},
 			] )
 		),
+		blockEditingModes: new Map(),
 	},
 	freeformEnteredBlock: entered,
 } );
@@ -128,24 +173,6 @@ const inColumns = ( sectionLayout ) => [
 ];
 
 describe( 'isBlockFreeformLocked, through what the canvas absorbs', () => {
-	beforeAll( () => {
-		for ( const [ name, supports ] of Object.entries( TYPES ) ) {
-			registerBlockType( name, {
-				apiVersion: 3,
-				title: name,
-				category: 'text',
-				supports,
-				save: () => null,
-			} );
-		}
-	} );
-
-	afterAll( () => {
-		for ( const name of Object.keys( TYPES ) ) {
-			unregisterBlockType( name );
-		}
-	} );
-
 	const PADDED = { style: { spacing: { padding: { top: '2rem' } } } };
 
 	it( 'locks an item in a column of a section that is a canvas', () => {
@@ -157,13 +184,13 @@ describe( 'isBlockFreeformLocked, through what the canvas absorbs', () => {
 		).toBe( true );
 	} );
 
-	it( 'leaves it alone when the section is not a canvas', () => {
+	it( 'locks it even before the section has been converted', () => {
 		expect(
 			isBlockFreeformLocked(
 				treeState( inColumns( { type: 'constrained' } ) ),
 				'item'
 			)
-		).toBe( false );
+		).toBe( true );
 	} );
 
 	it( 'unlocks the item you have entered', () => {
@@ -261,124 +288,75 @@ describe( 'isBlockFreeformLocked, through what the canvas absorbs', () => {
 } );
 
 describe( 'isBlockFreeformLocked, where sections are not top-level', () => {
-	beforeAll( () => {
-		for ( const [ name, supports ] of Object.entries( TYPES ) ) {
-			registerBlockType( name, {
-				apiVersion: 3,
-				title: name,
-				category: 'text',
-				supports,
-				save: () => null,
-			} );
-		}
-		registerBlockType( 'core/post-content', {
-			apiVersion: 3,
-			title: 'Content',
-			category: 'theme',
-			supports: { layout: true },
-			save: () => null,
-		} );
-		registerBlockType( 'core/template-part', {
-			apiVersion: 3,
-			title: 'Template Part',
-			category: 'theme',
-			supports: {},
-			save: () => null,
-		} );
-	} );
-
-	afterAll( () => {
-		for ( const name of Object.keys( TYPES ) ) {
-			unregisterBlockType( name );
-		}
-		unregisterBlockType( 'core/post-content' );
-		unregisterBlockType( 'core/template-part' );
-	} );
-
-	// What the site editor actually renders for a page: the template's parts
-	// and wrapper are the top-level blocks, and the page's sections are the
-	// children of the Post Content block, which the editor names as the
-	// section root.
-	const siteEditorTree = ( sectionLayout ) => [
-		{ clientId: 'header', name: 'core/template-part' },
-		{ clientId: 'wrapper', name: 'core/group' },
-		{ clientId: 'content', name: 'core/post-content', parent: 'wrapper' },
+	// A section that could be a canvas holds its blocks still from the start,
+	// so they show the move cursor and take one press to select and another to
+	// type in. Waiting for the first drag meant an untouched section looked
+	// like ordinary text and gave no sign it could be rearranged.
+	const unconverted = [
 		{
 			clientId: 'sec',
 			name: 'core/group',
-			parent: 'content',
-			attributes: { layout: sectionLayout },
+			attributes: { layout: { type: 'constrained' } },
 		},
 		{ clientId: 'item', name: 'core/paragraph', parent: 'sec' },
 	];
 
-	it( 'locks a block in a section inside the Post Content', () => {
-		// The section is two levels down, so "top-level" would never find it
-		// and nothing in a site-editor page would be draggable at all.
-		expect(
-			isBlockFreeformLocked(
-				treeState(
-					siteEditorTree( { type: 'freeform' } ),
-					null,
-					'content'
-				),
-				'item'
-			)
-		).toBe( true );
+	it( 'locks a block in a section that has not been converted', () => {
+		expect( isBlockFreeformLocked( treeState( unconverted ), 'item' ) ).toBe(
+			true
+		);
 	} );
 
-	it( 'leaves it alone when that section is not a canvas', () => {
-		expect(
-			isBlockFreeformLocked(
-				treeState(
-					siteEditorTree( { type: 'constrained' } ),
-					null,
-					'content'
-				),
-				'item'
-			)
-		).toBe( false );
-	} );
-
-	it( 'does not treat the template wrapper as a section', () => {
-		// The wrapper is top-level and holds blocks, so without the section
-		// root it looks exactly like a section — and converting it would take
-		// the header and footer with it.
+	it( 'locks one in a section with no layout attribute at all', () => {
 		const nodes = [
-			{
-				clientId: 'wrapper',
-				name: 'core/group',
-				attributes: { layout: { type: 'freeform' } },
-			},
-			{
-				clientId: 'content',
-				name: 'core/post-content',
-				parent: 'wrapper',
-			},
-			{ clientId: 'loose', name: 'core/paragraph', parent: 'wrapper' },
-		];
-
-		expect(
-			isBlockFreeformLocked(
-				treeState( nodes, null, 'content' ),
-				'loose'
-			)
-		).toBe( false );
-	} );
-
-	it( 'still treats a top-level block as the section with no section root', () => {
-		// The post editor, where the section root is simply not set.
-		const nodes = [
-			{
-				clientId: 'sec',
-				name: 'core/group',
-				attributes: { layout: { type: 'freeform' } },
-			},
+			{ clientId: 'sec', name: 'core/group' },
 			{ clientId: 'item', name: 'core/paragraph', parent: 'sec' },
 		];
-
 		expect( isBlockFreeformLocked( treeState( nodes ), 'item' ) ).toBe(
 			true
 		);
+	} );
+
+	it( 'leaves a section alone that arranges its own children', () => {
+		// A top-level Columns is not a canvas — it exists to arrange things —
+		// so its columns are ordinary blocks and the text in them is text.
+		const nodes = [
+			{ clientId: 'sec', name: 'core/columns' },
+			{ clientId: 'col', name: 'core/column', parent: 'sec' },
+		];
+		expect( isBlockFreeformLocked( treeState( nodes ), 'col' ) ).toBe(
+			false
+		);
+	} );
+
+	it( 'does nothing at all when the experiment is off', () => {
+		// Without this guard every Group in every post would need two clicks
+		// before you could type in it.
+		delete globalThis.window.__experimentalEnableFreeformCanvas;
+		const locked = isBlockFreeformLocked( treeState( unconverted ), 'item' );
+		globalThis.window.__experimentalEnableFreeformCanvas = true;
+		expect( locked ).toBe( false );
+	} );
+
+	it( 'leaves a section alone that cannot be edited normally', () => {
+		// Content-only and disabled sections are not the canvas's to rearrange,
+		// and holding their text still would stop it being edited at all.
+		const state = treeState( unconverted );
+		state.blocks.blockEditingModes = new Map( [ [ 'sec', 'contentOnly' ] ] );
+		expect( isBlockFreeformLocked( state, 'item' ) ).toBe( false );
+	} );
+
+	it( 'leaves a locked-down template section alone', () => {
+		const state = treeState( unconverted );
+		state.blockListSettings = new Map( [
+			[ 'sec', { templateLock: 'all' } ],
+		] );
+		expect( isBlockFreeformLocked( state, 'item' ) ).toBe( false );
+	} );
+
+	it( 'still unlocks the block you have entered', () => {
+		expect(
+			isBlockFreeformLocked( treeState( unconverted, 'item' ), 'item' )
+		).toBe( false );
 	} );
 } );

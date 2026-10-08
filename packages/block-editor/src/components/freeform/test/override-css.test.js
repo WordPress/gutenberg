@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { getCanvasOverrideCss, getCanvasesCss } from '../override-css';
+import {
+	getCanvasOverrideCss,
+	getCanvasesCss,
+	getPendingCanvasCss,
+} from '../override-css';
 
 const squash = ( css ) => css.replace( /\s+/g, ' ' ).trim();
 
@@ -153,13 +157,23 @@ describe( 'the rules that say a block is in move mode', () => {
 		rects: { a: { x: 0, y: 0, width: 600, height: 60 } },
 	};
 
-	it( 'gives a block on the canvas the move cursor', () => {
+	it( 'gives every block on the canvas the move cursor', () => {
 		expect( getCanvasOverrideCss( canvas ) ).toContain( 'cursor: move' );
 	} );
 
-	it( 'stops a block on the canvas looking like text to sweep over', () => {
+	it( 'stops them looking like text to sweep over', () => {
 		expect( getCanvasOverrideCss( canvas ) ).toContain(
 			'user-select: none'
+		);
+	} );
+
+	it( 'says it once for the canvas rather than once per block', () => {
+		// Every child is in move mode, placed or not, so this is a rule about
+		// the canvas. Writing it per block missed the ones with no coordinates
+		// yet — a freshly inserted block, or a whole section nobody has dragged
+		// in.
+		expect( getCanvasOverrideCss( canvas ) ).toContain(
+			'#block-sec > *:not([contenteditable="true"])'
 		);
 	} );
 
@@ -167,7 +181,15 @@ describe( 'the rules that say a block is in move mode', () => {
 		// Entered, it is text again: the caret belongs in it and the words are
 		// selectable, so neither rule may reach it.
 		expect( getCanvasOverrideCss( canvas ) ).toContain(
-			'#block-a:not([contenteditable="true"])'
+			':not([contenteditable="true"])'
+		);
+	} );
+
+	it( 'leaves what is inside a block alone', () => {
+		// `> *` is deliberate. A Group kept whole on the canvas travels as one
+		// piece, and the words inside it are still words.
+		expect( getCanvasOverrideCss( canvas ) ).not.toContain(
+			'#block-sec *:not'
 		);
 	} );
 
@@ -178,7 +200,7 @@ describe( 'the rules that say a block is in move mode', () => {
 		// `contenteditable="false"` just as happily.
 		const css = getCanvasOverrideCss( canvas );
 		expect( css ).not.toContain( '.is-layout-freeform' );
-		expect( css ).toContain( '#block-a' );
+		expect( css ).toContain( '#block-sec' );
 	} );
 
 	it( 'keeps blocks above the lattice', () => {
@@ -186,11 +208,37 @@ describe( 'the rules that say a block is in move mode', () => {
 	} );
 
 	it( 'makes the canvas a container so the lattice can measure itself', () => {
-		// The lattice is drawn in `cqw`, so one design unit is the same
-		// distance on both axes whatever the canvas is rendered at. That needs
-		// a container, and the class that used to declare one is not there.
 		expect( getCanvasOverrideCss( canvas ) ).toContain(
 			'container-type: inline-size'
 		);
+	} );
+} );
+
+describe( 'a section nobody has dragged in yet', () => {
+	// It is a canvas waiting to happen: the first drag converts it. Its blocks
+	// are already held still, so they must already say they can be moved — but
+	// nothing may be positioned, because the section is still laying itself out
+	// and coordinates would collapse it.
+	it( 'says its blocks are in move mode', () => {
+		const css = getPendingCanvasCss( [ 'sec-a', 'sec-b' ] );
+		expect( css ).toContain(
+			'#block-sec-a > *:not([contenteditable="true"])'
+		);
+		expect( css ).toContain(
+			'#block-sec-b > *:not([contenteditable="true"])'
+		);
+		expect( css ).toContain( 'cursor: move' );
+		expect( css ).toContain( 'user-select: none' );
+	} );
+
+	it( 'positions nothing at all', () => {
+		const css = getPendingCanvasCss( [ 'sec-a' ] );
+		expect( css ).not.toContain( 'position: absolute' );
+		expect( css ).not.toContain( 'aspect-ratio' );
+		expect( css ).not.toContain( 'left:' );
+	} );
+
+	it( 'is empty for no sections', () => {
+		expect( getPendingCanvasCss( [] ) ).toBe( '' );
 	} );
 } );
