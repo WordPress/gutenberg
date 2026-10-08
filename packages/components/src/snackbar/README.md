@@ -99,4 +99,5 @@ Used to provide a custom spoken message.
 
 ## Related components
 
+-   Use SnackbarList to display multiple snackbars. When a user dismisses a snackbar, focus moves to the list. For a standalone snackbar, focus moves to the preceding tabbable element if focus is inside the snackbar and that element exists.
 -   To create a prominent message that requires a higher-level of attention, use a Notice.

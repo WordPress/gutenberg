@@ -3,6 +3,7 @@ import { userEvent } from 'vitest/browser';
 import { act, screen, within } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { speak } from '@wordpress/a11y';
+import { useState } from '@wordpress/element';
 import { SVG, Path } from '@wordpress/primitives';
 import Snackbar from '../index';
 
@@ -153,6 +154,112 @@ describe( 'Snackbar', () => {
 
 		expect( onRemove ).toHaveBeenCalledTimes( 1 );
 		expect( onDismiss ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	describe( 'standalone focus restoration', () => {
+		function DismissibleSnackbar(
+			props: Omit<
+				React.ComponentProps< typeof Snackbar >,
+				'children' | 'onRemove'
+			>
+		) {
+			const [ isVisible, setIsVisible ] = useState( true );
+			return (
+				isVisible && (
+					<Snackbar
+						{ ...props }
+						onRemove={ () => setIsVisible( false ) }
+					>
+						Message
+					</Snackbar>
+				)
+			);
+		}
+
+		it.each( [ '{Enter}', ' ' ] )(
+			'returns focus to the preceding control after keyboard dismissal with %s',
+			async ( key ) => {
+				await render(
+					<>
+						<button>Previous control</button>
+						<DismissibleSnackbar />
+					</>
+				);
+				const previousControl = screen.getByRole( 'button', {
+					name: 'Previous control',
+				} );
+				await userEvent.click( previousControl );
+				await userEvent.tab();
+				expect( screen.getByTestId( testId ) ).toHaveFocus();
+
+				await userEvent.keyboard( key );
+
+				expect(
+					screen.queryByTestId( testId )
+				).not.toBeInTheDocument();
+				expect( previousControl ).toHaveFocus();
+			}
+		);
+
+		it( 'returns focus outside the snackbar after explicit dismissal with an action', async () => {
+			await render(
+				<>
+					<button>Previous control</button>
+					<DismissibleSnackbar
+						explicitDismiss
+						actions={ [ { label: 'View post', onClick: vi.fn() } ] }
+					/>
+				</>
+			);
+			const previousControl = screen.getByRole( 'button', {
+				name: 'Previous control',
+			} );
+			await userEvent.click(
+				screen.getByRole( 'button', { name: 'Dismiss this notice' } )
+			);
+
+			expect( screen.queryByTestId( testId ) ).not.toBeInTheDocument();
+			expect( previousControl ).toHaveFocus();
+		} );
+
+		it( 'dismisses safely when no preceding tabbable control exists', async () => {
+			const onDismiss = vi.fn();
+			await render( <DismissibleSnackbar onDismiss={ onDismiss } /> );
+			await userEvent.tab();
+			expect( screen.getByTestId( testId ) ).toHaveFocus();
+
+			await userEvent.keyboard( '{Enter}' );
+
+			expect( onDismiss ).toHaveBeenCalledTimes( 1 );
+			expect( screen.queryByTestId( testId ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'preserves focus outside the snackbar when dismissing it', async () => {
+			await render(
+				<>
+					<button>Previous control</button>
+					<div
+						role="presentation"
+						onMouseDown={ ( event ) => event.preventDefault() }
+					>
+						<DismissibleSnackbar explicitDismiss />
+					</div>
+					<button>Current control</button>
+				</>
+			);
+			const currentControl = screen.getByRole( 'button', {
+				name: 'Current control',
+			} );
+			await userEvent.click( currentControl );
+
+			// The consumer prevents pointer activation from moving focus.
+			await userEvent.click(
+				screen.getByRole( 'button', { name: 'Dismiss this notice' } )
+			);
+
+			expect( screen.queryByTestId( testId ) ).not.toBeInTheDocument();
+			expect( currentControl ).toHaveFocus();
+		} );
 	} );
 
 	describe( 'actions', () => {

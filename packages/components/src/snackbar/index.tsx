@@ -2,6 +2,8 @@ import type { ForwardedRef, KeyboardEvent, MouseEvent } from 'react';
 import clsx from 'clsx';
 import { useIsPresent } from 'framer-motion';
 import { speak } from '@wordpress/a11y';
+import { useMergeRefs } from '@wordpress/compose';
+import { focus } from '@wordpress/dom';
 import {
 	useEffect,
 	useLayoutEffect,
@@ -59,14 +61,25 @@ function UnforwardedSnackbar(
 	ref: ForwardedRef< any >
 ) {
 	const isPresent = useIsPresent();
+	const snackbarRef = useRef< HTMLDivElement >( null );
+	const mergedRef = useMergeRefs( [ snackbarRef, ref ] );
 
 	function dismissMe( event: KeyboardEvent | MouseEvent ) {
 		if ( event && event.preventDefault ) {
 			event.preventDefault();
 		}
 
-		// Prevent focus loss by moving it to the list element.
-		listRef?.current?.focus();
+		if ( listRef?.current ) {
+			// Prevent focus loss by moving it to the list element.
+			listRef.current.focus();
+		} else if (
+			snackbarRef.current?.contains(
+				snackbarRef.current.ownerDocument.activeElement
+			)
+		) {
+			// Search from the snackbar root to avoid its own action controls.
+			focus.tabbable.findPrevious( snackbarRef.current )?.focus();
+		}
 
 		onDismiss?.();
 		onRemove?.();
@@ -125,7 +138,7 @@ function UnforwardedSnackbar(
 
 	return (
 		<div
-			ref={ ref }
+			ref={ mergedRef }
 			className={ classes }
 			onClick={ ! explicitDismiss ? dismissMe : undefined }
 			tabIndex={ 0 }
