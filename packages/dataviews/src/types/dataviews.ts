@@ -24,6 +24,9 @@ export interface HierarchyPaginationInfo {
 	/** Whether another batch is available. */
 	hasMore: boolean;
 
+	/** Total remaining items at this level, not the next batch size. */
+	remainingItems?: number;
+
 	/** Whether the next batch is loading. */
 	isLoading?: boolean;
 

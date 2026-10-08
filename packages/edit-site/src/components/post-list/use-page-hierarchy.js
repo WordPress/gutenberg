@@ -87,6 +87,8 @@ export default function usePageHierarchy( enabled, query, queryKey ) {
 				const totalPages = Number(
 					response.headers.get( 'X-WP-TotalPages' )
 				);
+				const totalHeader = response.headers.get( 'X-WP-Total' );
+				const total = totalHeader?.trim() ? Number( totalHeader ) : NaN;
 				const ids = new Set(
 					current.records.map( ( record ) => record.id )
 				);
@@ -97,6 +99,10 @@ export default function usePageHierarchy( enabled, query, queryKey ) {
 							( record ) => ! ids.has( record.id )
 						),
 					],
+					totalItems:
+						Number.isInteger( total ) && total >= 0
+							? total
+							: undefined,
 					page,
 					isLoading: false,
 					hasMore: totalPages
@@ -156,6 +162,18 @@ export default function usePageHierarchy( enabled, query, queryKey ) {
 			return level
 				? {
 						hasMore: level.hasMore,
+						remainingItems:
+							level.totalItems === undefined
+								? undefined
+								: Math.max(
+										0,
+										level.totalItems -
+											new Set(
+												level.records.map(
+													( record ) => record.id
+												)
+											).size
+									),
 						isLoading: level.isLoading,
 						error: level.error,
 					}

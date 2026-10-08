@@ -338,6 +338,66 @@ describe( 'DataViews component', () => {
 		] );
 	} );
 
+	it( 'shows remaining counts with accessible branch labels and preserves loading and retry states', () => {
+		const renderView = ( isLoading = false, error?: string ) => (
+			<DataViewWrapper
+				data={ [
+					{ id: 1, title: 'Parent' },
+					{ id: 2, title: 'Child' },
+					{ id: 3, title: 'Sibling' },
+				] }
+				getItemParentId={ ( item ) =>
+					item.id === 2 ? 1 : undefined
+				}
+				getItemHasChildren={ ( item ) => item.id === 1 }
+				expandedItemIds={ [ '1' ] }
+				onChangeExpandedItemIds={ vi.fn() }
+				hierarchyPagination={ {
+					getPaginationInfo: ( id ) => ( {
+						hasMore: true,
+						remainingItems: id === '1' ? 27 : 1,
+						isLoading,
+						error,
+					} ),
+					onLoadMore: vi.fn(),
+				} }
+				view={ {
+					...DEFAULT_VIEW,
+					fields: [],
+					titleField: 'title',
+					showLevels: true,
+					layout: { density: 'compact' },
+				} }
+			/>
+		);
+		const { rerender } = render( renderView() );
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Show 27 more children of Parent',
+			} )
+		).toHaveTextContent( 'Show 27 more' );
+		expect(
+			screen.getByRole( 'button', { name: 'Show 1 more item' } )
+		).toHaveTextContent( 'Show 1 more' );
+		const rows = screen.getAllByRole( 'row' );
+		expect( rows[ 2 ] ).toHaveTextContent( 'Child' );
+		expect( rows[ 3 ] ).toHaveTextContent( 'Show 27 more' );
+		expect( rows[ 4 ] ).toHaveTextContent( 'Sibling' );
+		rerender( renderView( true ) );
+		expect(
+			screen.getByRole( 'button', { name: 'Loading children of Parent' } )
+		).toHaveTextContent( 'Loading…' );
+		expect(
+			screen.getByRole( 'button', { name: 'Loading children of Parent' } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+		rerender( renderView( false, 'Failed' ) );
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Retry loading children of Parent',
+			} )
+		).toHaveTextContent( 'Retry' );
+	} );
+
 	it( 'renders independent continuations after loaded subtrees', async () => {
 		const user = userEvent.setup();
 		const onLoadMore = vi.fn();
