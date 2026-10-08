@@ -1,11 +1,37 @@
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { useAsyncList } from '@wordpress/compose';
-import { useRef, useLayoutEffect } from '@wordpress/element';
+import { forwardRef, memo, useRef, useLayoutEffect } from '@wordpress/element';
 import { getScrollContainer } from '@wordpress/dom';
-import HtmlRenderer from '../../../utils/html-renderer';
 
 const BATCH_SIZE = 20;
+
+// Memoized so each async batch renders only the newly added icons.
+const IconGridItem = memo(
+	forwardRef( function IconGridItemContent(
+		{ icon, isSelected, onChange },
+		ref
+	) {
+		return (
+			<Button
+				ref={ ref }
+				className="wp-block-icon__inserter-grid-icons-list-item"
+				onClick={ () => onChange( icon.name ) }
+				variant={ isSelected ? 'primary' : undefined }
+				__next40pxDefaultSize
+			>
+				<span
+					className="wp-block-icon__inserter-grid-icons-list-item-icon"
+					// Icons come from the icon registry, which sanitizes them on the server.
+					dangerouslySetInnerHTML={ { __html: icon.content } }
+				/>
+				<span className="wp-block-icon__inserter-grid-icons-list-item-title">
+					{ icon.label }
+				</span>
+			</Button>
+		);
+	} )
+);
 
 export default function IconGrid( { icons, onChange, value } ) {
 	const shownIcons = useAsyncList( icons, {
@@ -45,31 +71,19 @@ export default function IconGrid( { icons, onChange, value } ) {
 					className="wp-block-icon__inserter-grid-icons-list"
 					aria-label={ __( 'Icon library' ) }
 				>
-					{ shownIcons.map( ( icon ) => {
-						return (
-							<Button
-								key={ icon.name }
-								ref={
-									icon.name === value
-										? selectedIconRef
-										: undefined
-								}
-								className="wp-block-icon__inserter-grid-icons-list-item"
-								onClick={ () => onChange( icon.name ) }
-								variant={
-									icon.name === value ? 'primary' : undefined
-								}
-								__next40pxDefaultSize
-							>
-								<span className="wp-block-icon__inserter-grid-icons-list-item-icon">
-									<HtmlRenderer html={ icon.content } />
-								</span>
-								<span className="wp-block-icon__inserter-grid-icons-list-item-title">
-									{ icon.label }
-								</span>
-							</Button>
-						);
-					} ) }
+					{ shownIcons.map( ( icon ) => (
+						<IconGridItem
+							key={ icon.name }
+							ref={
+								icon.name === value
+									? selectedIconRef
+									: undefined
+							}
+							icon={ icon }
+							isSelected={ icon.name === value }
+							onChange={ onChange }
+						/>
+					) ) }
 				</div>
 			) }
 		</div>
