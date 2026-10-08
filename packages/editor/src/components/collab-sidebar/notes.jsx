@@ -9,7 +9,7 @@ import {
 import { unlock } from '../../lock-unlock';
 import { NoteThread } from './note-thread';
 import { focusNoteThread } from './utils';
-import { useFloatingBoard, useNoteActions, useNoteSelection } from './hooks';
+import { useFloatingBoard, useNoteActions, useNoteFocus } from './hooks';
 import { AddNote } from './add-note';
 import { store as editorStore } from '../../store';
 
@@ -18,6 +18,7 @@ const { useBlockElement } = unlock( blockEditorPrivateApis );
 export function Notes( { notes, sidebarRef, isFloating = false } ) {
 	const {
 		onCreate: onAddReply,
+		onDiscard,
 		onEdit: onEditNote,
 		onDelete,
 	} = useNoteActions();
@@ -25,6 +26,7 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 	const { selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
 	);
+	useNoteFocus( { sidebarRef } );
 
 	const { selectedBlockClientId, orderedBlockIds } = useSelect(
 		( select ) => {
@@ -41,8 +43,6 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
 		[]
 	);
-
-	useNoteSelection( { notes, sidebarRef } );
 
 	const relatedBlockElement = useBlockElement( selectedBlockClientId );
 
@@ -210,6 +210,7 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 					key={ selectedBlockClientId }
 					clientId={ selectedBlockClientId }
 					onSubmit={ onAddReply }
+					onDiscard={ onDiscard }
 					sidebarRef={ sidebarRef }
 				/>
 			) }
@@ -231,6 +232,7 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 					<NoteThread
 						note={ thread }
 						onAddReply={ onAddReply }
+						onDiscard={ onDiscard }
 						onDeleteNote={ handleDelete }
 						onEditNote={ onEditNote }
 						isSelected={ selectedNote === thread.id }

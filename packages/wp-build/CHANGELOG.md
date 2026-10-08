@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Check that `SCRIPT_DEBUG` is defined before reading it in the generated `build/scripts.php` and `build/styles.php`, like the other generated files, so they no longer throw an `Error` when loaded without WordPress defining the constant ([#83633](https://github.com/WordPress/gutenberg/pull/83633)).
+
 ### Internal
 
 -   Publish only runtime files, dropping `tsconfig.json`, the TypeScript build cache (`.cache`) and the test files from the package ([#84164](https://github.com/WordPress/gutenberg/pull/84164)).
