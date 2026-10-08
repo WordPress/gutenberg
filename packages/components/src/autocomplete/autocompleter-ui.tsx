@@ -6,7 +6,10 @@ import {
 	useEffect,
 	useState,
 } from '@wordpress/element';
-import { useAnchor } from '@wordpress/rich-text';
+import {
+	useAnchor,
+	privateApis as richTextPrivateApis,
+} from '@wordpress/rich-text';
 import { useDebounce, useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -16,6 +19,9 @@ import Popover from '../popover';
 import { VisuallyHidden } from '../visually-hidden';
 import type { AutocompleterUIProps, KeyedOption } from './types';
 import { useKeyboardNavigation } from '../utils/hooks/use-keyboard-navigation';
+import { unlock } from '../lock-unlock';
+
+const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
 type ListBoxProps = {
 	items: KeyedOption[];
@@ -89,10 +95,16 @@ export function AutocompleterUI( {
 		if ( ! content ) {
 			return;
 		}
-		content.addEventListener( 'keydown', onKeyDown );
+		// The canvas editing host can receive keys while the selection is inside content.
+		const unsubscribeKeyDown = subscribeOwnedListener(
+			content,
+			'keydown',
+			onKeyDown,
+			true
+		);
 		content.addEventListener( 'pointerdown', onPointer );
 		return () => {
-			content.removeEventListener( 'keydown', onKeyDown );
+			unsubscribeKeyDown();
 			content.removeEventListener( 'pointerdown', onPointer );
 		};
 	}, [ contentRef, onKeyDown, onPointer ] );
