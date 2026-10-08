@@ -35,6 +35,9 @@ describe( 'isValidHref', () => {
 			expect(
 				isValidHref( 'http://example.org/with?query=string&params' )
 			).toBe( true );
+			expect(
+				isValidHref( 'http://example.org#path/after/fragment' )
+			).toBe( true );
 		} );
 
 		it( 'returns false for invalid urls', () => {
@@ -54,9 +57,6 @@ describe( 'isValidHref', () => {
 			);
 			expect(
 				isValidHref( 'http://example.org?path/after/params' )
-			).toBe( false );
-			expect(
-				isValidHref( 'http://example.org#path/after/fragment' )
 			).toBe( false );
 		} );
 
@@ -82,15 +82,15 @@ describe( 'isValidHref', () => {
 			expect( isValidHref( '#yes_it_is' ) ).toBe( true );
 			expect( isValidHref( '#yes~it~is' ) ).toBe( true );
 			expect( isValidHref( '#yes-it-is' ) ).toBe( true );
+			expect( isValidHref( '#yes-it-is?' ) ).toBe( true );
+			expect( isValidHref( '#yes-it-is/' ) ).toBe( true );
 		} );
 
 		it( 'returns false for invalid anchor links', () => {
 			expect( isValidHref( '' ) ).toBe( false );
 			expect( isValidHref( '#no-it-isnt#' ) ).toBe( false );
 			expect( isValidHref( '#no-it-#isnt' ) ).toBe( false );
-			expect( isValidHref( '#no-it-isnt?' ) ).toBe( false );
 			expect( isValidHref( '#no-it isnt' ) ).toBe( false );
-			expect( isValidHref( '#no-it-isnt/' ) ).toBe( false );
 		} );
 	} );
 } );
