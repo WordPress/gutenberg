@@ -56,33 +56,6 @@ function render_block_core_icon( $attributes ) {
 		}
 	}
 
-	// Border.
-	$border_styles = array();
-	$sides         = array( 'top', 'right', 'bottom', 'left' );
-
-	if ( isset( $attributes['style']['border']['radius'] ) ) {
-		$border_styles['radius'] = $attributes['style']['border']['radius'];
-	}
-	if ( isset( $attributes['style']['border']['style'] ) ) {
-		$border_styles['style'] = $attributes['style']['border']['style'];
-	}
-	if ( isset( $attributes['style']['border']['width'] ) ) {
-		$border_styles['width'] = $attributes['style']['border']['width'];
-	}
-
-	$preset_color           = array_key_exists( 'borderColor', $attributes ) ? "var:preset|color|{$attributes['borderColor']}" : null;
-	$custom_color           = $attributes['style']['border']['color'] ?? null;
-	$border_styles['color'] = $preset_color ? $preset_color : $custom_color;
-
-	foreach ( $sides as $side ) {
-		$border                 = $attributes['style']['border'][ $side ] ?? null;
-		$border_styles[ $side ] = array(
-			'color' => $border['color'] ?? null,
-			'style' => $border['style'] ?? null,
-			'width' => $border['width'] ?? null,
-		);
-	}
-
 	// Shadow.
 	$shadow_styles = $attributes['style']['shadow'] ?? null;
 
@@ -100,16 +73,24 @@ function render_block_core_icon( $attributes ) {
 		}
 	}
 
-	// Generate styles and classes.
-	$styles = wp_style_engine_get_styles(
+	// Generate styles and classes in the style engine's group order: background, color, border, shadow, dimensions, spacing.
+	$color_result      = wp_style_engine_get_styles(
 		array(
-			'color'      => $color_styles,
 			'background' => $background_styles,
-			'border'     => $border_styles,
+			'color'      => $color_styles,
+		)
+	);
+	$border_result     = wp_get_border_classes_and_styles( $attributes );
+	$dimensions_result = wp_style_engine_get_styles(
+		array(
 			'shadow'     => $shadow_styles,
 			'spacing'    => $spacing_styles,
 			'dimensions' => $dimensions_styles,
-		),
+		)
+	);
+	$styles            = array(
+		'classnames' => implode( ' ', array_filter( array( $color_result['classnames'] ?? '', $border_result['class'] ?? '', $dimensions_result['classnames'] ?? '' ) ) ),
+		'css'        => ( $color_result['css'] ?? '' ) . ( $border_result['style'] ?? '' ) . ( $dimensions_result['css'] ?? '' ),
 	);
 
 	$svg = wp_get_icon(
