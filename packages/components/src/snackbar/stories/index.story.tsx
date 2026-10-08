@@ -1,5 +1,4 @@
 import type { Meta, StoryFn } from '@storybook/react-vite';
-import { useState } from '@wordpress/element';
 import { wordpress } from '@wordpress/icons';
 import Button from '../../button';
 import Icon from '../../icon';
@@ -96,28 +95,12 @@ WithActionAndExplicitDismiss.args = {
 	explicitDismiss: true,
 };
 
-export const WithFocusReturn: StoryFn< typeof Snackbar > = ( args ) => {
-	const [ isVisible, setIsVisible ] = useState( true );
-
-	return (
-		<>
-			<Button
-				__next40pxDefaultSize
-				variant="secondary"
-				onClick={ () => setIsVisible( true ) }
-			>
-				Show snackbar
-			</Button>
-			{ isVisible && (
-				<Snackbar
-					{ ...args }
-					onRemove={ () => {
-						setIsVisible( false );
-						args.onRemove?.();
-					} }
-				/>
-			) }
-		</>
-	);
-};
+export const WithFocusReturn: StoryFn< typeof Snackbar > = ( args ) => (
+	<>
+		<Button __next40pxDefaultSize variant="secondary">
+			Previous control
+		</Button>
+		<Snackbar { ...args } />
+	</>
+);
 WithFocusReturn.args = WithActionAndExplicitDismiss.args;
