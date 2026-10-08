@@ -20,8 +20,15 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=20.10.0"
+		"node": ">=22.13.0"
 	},
+	"files": [
+		"eslint-overrides.cjs",
+		"lib",
+		"templates",
+		"*.md",
+		"!**/test/**"
+	],
 	"type": "module",
 	"module": "./lib/build.mjs",
 	"exports": {
