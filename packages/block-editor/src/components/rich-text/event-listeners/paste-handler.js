@@ -3,6 +3,7 @@ import {
 	isEmpty,
 	insert,
 	create,
+	getActiveFormats,
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import { isURL } from '@wordpress/url';
@@ -98,7 +99,7 @@ export default ( props ) => ( element ) => {
 				onChange( transformed );
 			} else {
 				const valueToInsert = create( { html: content } );
-				addActiveFormats( valueToInsert, value.activeFormats );
+				addActiveFormats( valueToInsert, getActiveFormats( value ) );
 				onChange( insert( value, valueToInsert ) );
 			}
 		}
@@ -112,7 +113,9 @@ export default ( props ) => ( element ) => {
 		}
 
 		if ( pastePlainText ) {
-			onChange( insert( value, create( { text: plainText } ) ) );
+			const valueToInsert = create( { text: plainText } );
+			addActiveFormats( valueToInsert, getActiveFormats( value ) );
+			onChange( insert( value, valueToInsert ) );
 			return;
 		}
 

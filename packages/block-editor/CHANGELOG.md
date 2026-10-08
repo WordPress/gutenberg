@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `RichText`: Apply the formats at the caret to pasted text after a previous paste or undo, and when pasting plain text with `__unstablePastePlainText`, instead of splitting the format around it ([#84303](https://github.com/WordPress/gutenberg/pull/84303)).
+
 ## 18.1.0 (2026-10-07)
 
 ### New Features

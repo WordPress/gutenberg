@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `useRichText`: Keep the formats at the caret for text typed after a paste or undo, instead of splitting the format around it ([#84303](https://github.com/WordPress/gutenberg/pull/84303)).
+
 ## 7.57.0 (2026-10-07)
 
 ### Bug Fixes
