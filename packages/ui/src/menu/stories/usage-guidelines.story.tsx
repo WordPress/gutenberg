@@ -18,7 +18,7 @@ export default meta;
 type Story = StoryObj;
 
 /**
- * Use prefix icons on every item in a group, or omit them from the whole group.
+ * Prefer prefix icons on every item in a group, or omit them from the whole group.
  * Each group makes this choice independently and keeps its item labels aligned.
  */
 export const ConsistentPrefixIconsWithinGroups: Story = {
@@ -44,6 +44,32 @@ export const ConsistentPrefixIconsWithinGroups: Story = {
 					<Menu.LinkItem href="https://wordpress.org">
 						<Menu.ItemLabel>WordPress.org</Menu.ItemLabel>
 					</Menu.LinkItem>
+				</Menu.Group>
+			</Menu.Popup>
+		</Menu.Root>
+	),
+};
+
+/**
+ * Items without a prefix start at the icon column instead of leaving an empty
+ * icon space. This layout is supported when a group needs mixed icon usage.
+ */
+export const MixedPrefixIcons: Story = {
+	render: () => (
+		<Menu.Root>
+			<Menu.Trigger>Mixed item options</Menu.Trigger>
+			<Menu.Popup>
+				<Menu.Group>
+					<Menu.GroupLabel>Actions</Menu.GroupLabel>
+					<Menu.Item prefix={ <Menu.PrefixIcon icon={ copy } /> }>
+						<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+					</Menu.Item>
+					<Menu.Item>
+						<Menu.ItemLabel>Rename…</Menu.ItemLabel>
+					</Menu.Item>
+					<Menu.Item prefix={ <Menu.PrefixIcon icon={ archive } /> }>
+						<Menu.ItemLabel>Archive</Menu.ItemLabel>
+					</Menu.Item>
 				</Menu.Group>
 			</Menu.Popup>
 		</Menu.Root>

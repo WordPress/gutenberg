@@ -12,7 +12,8 @@ type InternalItemDescriptionProps = ItemDescriptionProps & {
 
 /**
  * Renders supplementary text below a menu item label. Use it as a direct child
- * alongside `Menu.ItemLabel`.
+ * after `Menu.ItemLabel`. Descriptions start at the prefix column, including
+ * when the item has an icon. Suffixes and shortcuts stay alongside the label.
  *
  * Keep labels short and clear so most items do not need a description. Add
  * descriptions sparingly, only for essential context that the label cannot
