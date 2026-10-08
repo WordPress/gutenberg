@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove `prefersReducedMotion`, added in 4.57.0. The reduce motion preference is not specific to accessibility, so it is no longer part of this package. The block library keeps it as a private helper instead ([#84297](https://github.com/WordPress/gutenberg/pull/84297)).
+
 ## 4.57.0 (2026-10-07)
 
 ### New Features
