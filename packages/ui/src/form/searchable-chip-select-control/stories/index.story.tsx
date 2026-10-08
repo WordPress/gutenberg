@@ -17,6 +17,7 @@ import {
 	DETAILS_EXAMPLE,
 	longLabelPopupItems,
 	narrowContainerDecorator,
+	popupWidthControl,
 } from '../../stories/shared';
 
 const meta: Meta< typeof SearchableChipSelectControl > = {
@@ -394,6 +395,7 @@ export const GroupedCreatable: Story = {
 export const PopupWidth: Story = {
 	...Creatable,
 	decorators: [ narrowContainerDecorator ],
+	argTypes: { popupWidth: popupWidthControl },
 	args: {
 		...Creatable.args,
 		label: 'Tags',

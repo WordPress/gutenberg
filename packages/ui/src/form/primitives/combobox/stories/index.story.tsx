@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { ComponentProps } from 'react';
 import { Fragment, useRef, useState } from '@wordpress/element';
 import * as Combobox from '../index';
 import { Spinner } from '../../../../spinner';
@@ -10,6 +11,11 @@ import {
 	type FixtureGroup,
 	type FixtureItem,
 } from './fixtures';
+import {
+	longLabelPopupItems,
+	narrowContainerDecorator,
+	popupWidthControl,
+} from '../../../stories/shared';
 
 const meta: Meta< typeof Combobox.Root > = {
 	title: 'Components/@wordpress-ui/Form/Primitives/Combobox',
@@ -559,4 +565,47 @@ export const WithCustomZIndex: Story = {
 			</Combobox.Popup>,
 		],
 	},
+};
+
+/**
+ * Use `width` on `Combobox.Popup` to constrain the popup relative to a narrow anchor.
+ */
+export const PopupWidth: StoryObj<
+	ComponentProps< typeof Combobox.Root > &
+		Pick< ComponentProps< typeof Combobox.Popup >, 'width' >
+> = {
+	decorators: [ narrowContainerDecorator ],
+	argTypes: { width: popupWidthControl },
+	args: {
+		items: longLabelPopupItems,
+		width: 'sm',
+	},
+	render: ( { width, ...args } ) => (
+		<Combobox.Root { ...args }>
+			<Combobox.Trigger aria-label="Label" />
+			<Combobox.Popup width={ width }>
+				<div style={ inputWrapperStyle }>
+					<Combobox.Input aria-label="Search" placeholder="Search" />
+				</div>
+				<Combobox.List>
+					<Combobox.ListBody>
+						<Combobox.Collection>
+							{ (
+								item: ( typeof longLabelPopupItems )[ number ]
+							) => (
+								<Combobox.Item
+									key={ item.value }
+									value={ item }
+								>
+									<Combobox.ItemLabel>
+										{ item.label }
+									</Combobox.ItemLabel>
+								</Combobox.Item>
+							) }
+						</Combobox.Collection>
+					</Combobox.ListBody>
+				</Combobox.List>
+			</Combobox.Popup>
+		</Combobox.Root>
+	),
 };

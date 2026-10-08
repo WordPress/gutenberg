@@ -71,3 +71,8 @@ export const longLabelPopupItems = [
 		label: 'Hippopotomonstrosesquipedaliophobia',
 	},
 ];
+
+export const popupWidthControl = {
+	control: { type: 'select' as const },
+	options: [ 'anchor', 'content', 'sm', 'md', 'lg', 'available' ],
+};
