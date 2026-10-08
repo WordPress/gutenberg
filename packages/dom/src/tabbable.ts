@@ -1,3 +1,4 @@
+import type { MaybeHTMLInputElement, ObjectTabbable } from './types';
 import { find as findFocusable } from './focusable';
 
 /**
@@ -8,11 +9,11 @@ import { find as findFocusable } from './focusable';
  *
  * @see https://bugzilla.mozilla.org/show_bug.cgi?id=1190261
  *
- * @param {Element} element Element from which to retrieve.
+ * @param element Element from which to retrieve.
  *
- * @return {number} Tab index of element (default 0).
+ * @return Tab index of element (default 0).
  */
-function getTabIndex( element ) {
+function getTabIndex( element: Element ): number {
 	const tabIndex = element.getAttribute( 'tabindex' );
 	return tabIndex === null ? 0 : parseInt( tabIndex, 10 );
 }
@@ -20,15 +21,13 @@ function getTabIndex( element ) {
 /**
  * Returns true if the specified element is tabbable, or false otherwise.
  *
- * @param {Element} element Element to test.
+ * @param element Element to test.
  *
- * @return {boolean} Whether element is tabbable.
+ * @return Whether element is tabbable.
  */
-export function isTabbableIndex( element ) {
+export function isTabbableIndex( element: Element ): boolean {
 	return getTabIndex( element ) !== -1;
 }
-
-/** @typedef {HTMLElement & { type?: string, checked?: boolean, name?: string }} MaybeHTMLInputElement */
 
 /**
  * Returns a stateful reducer function which constructs a filtered array of
@@ -36,15 +35,17 @@ export function isTabbableIndex( element ) {
  * name, giving priority to checked input, falling back to the first
  * encountered.
  *
- * @return {(acc: MaybeHTMLInputElement[], el: MaybeHTMLInputElement) => MaybeHTMLInputElement[]} Radio group collapse reducer.
+ * @return Radio group collapse reducer.
  */
-function createStatefulCollapseRadioGroup() {
-	/** @type {Record<string, MaybeHTMLInputElement>} */
-	const CHOSEN_RADIO_BY_NAME = {};
+function createStatefulCollapseRadioGroup(): (
+	acc: MaybeHTMLInputElement[],
+	el: MaybeHTMLInputElement
+) => MaybeHTMLInputElement[] {
+	const CHOSEN_RADIO_BY_NAME: Record< string, MaybeHTMLInputElement > = {};
 
 	return function collapseRadioGroup(
-		/** @type {MaybeHTMLInputElement[]} */ result,
-		/** @type {MaybeHTMLInputElement} */ element
+		result: MaybeHTMLInputElement[],
+		element: MaybeHTMLInputElement
 	) {
 		const { nodeName, type, checked, name } = element;
 
@@ -81,12 +82,15 @@ function createStatefulCollapseRadioGroup() {
  * sort where equal tabIndex should be left in order of their occurrence in the
  * document.
  *
- * @param {HTMLElement} element Element.
- * @param {number}      index   Array index of element.
+ * @param element Element.
+ * @param index   Array index of element.
  *
- * @return {{ element: HTMLElement, index: number }} Mapped object with element, index.
+ * @return Mapped object with element, index.
  */
-function mapElementToObjectTabbable( element, index ) {
+function mapElementToObjectTabbable(
+	element: HTMLElement,
+	index: number
+): ObjectTabbable {
 	return { element, index };
 }
 
@@ -94,11 +98,13 @@ function mapElementToObjectTabbable( element, index ) {
  * An array map callback, returning an element of the given mapped object's
  * element value.
  *
- * @param {{ element: HTMLElement }} object Mapped object with element.
+ * @param object Mapped object with element.
  *
- * @return {HTMLElement} Mapped object element.
+ * @return Mapped object element.
  */
-function mapObjectTabbableToElement( object ) {
+function mapObjectTabbableToElement(
+	object: Pick< ObjectTabbable, 'element' >
+): HTMLElement {
 	return object.element;
 }
 
@@ -107,12 +113,15 @@ function mapObjectTabbableToElement( object ) {
  *
  * @see mapElementToObjectTabbable
  *
- * @param {{ element: HTMLElement, index: number }} a First object to compare.
- * @param {{ element: HTMLElement, index: number }} b Second object to compare.
+ * @param a First object to compare.
+ * @param b Second object to compare.
  *
- * @return {number} Comparator result.
+ * @return Comparator result.
  */
-function compareObjectTabbables( a, b ) {
+function compareObjectTabbables(
+	a: ObjectTabbable,
+	b: ObjectTabbable
+): number {
 	const aTabIndex = getTabIndex( a.element );
 	const bTabIndex = getTabIndex( b.element );
 
@@ -126,11 +135,11 @@ function compareObjectTabbables( a, b ) {
 /**
  * Given focusable elements, filters out tabbable element.
  *
- * @param {HTMLElement[]} focusables Focusable elements to filter.
+ * @param focusables Focusable elements to filter.
  *
- * @return {HTMLElement[]} Tabbable elements.
+ * @return Tabbable elements.
  */
-function filterTabbable( focusables ) {
+function filterTabbable( focusables: HTMLElement[] ): HTMLElement[] {
 	return focusables
 		.filter( isTabbableIndex )
 		.map( mapElementToObjectTabbable )
@@ -140,22 +149,22 @@ function filterTabbable( focusables ) {
 }
 
 /**
- * @param {Element} context
- * @return {HTMLElement[]} Tabbable elements within the context.
+ * @param context
+ * @return Tabbable elements within the context.
  */
-export function find( context ) {
+export function find( context: Element ): HTMLElement[] {
 	return filterTabbable( findFocusable( context ) );
 }
 
 /**
  * Given a focusable element, find the preceding tabbable element.
  *
- * @param {Element} element The focusable element before which to look. Defaults
- *                          to the active element.
+ * @param element The focusable element before which to look. Defaults
+ *                to the active element.
  *
- * @return {HTMLElement|undefined} Preceding tabbable element.
+ * @return Preceding tabbable element.
  */
-export function findPrevious( element ) {
+export function findPrevious( element: Element ): HTMLElement | undefined {
 	return filterTabbable( findFocusable( element.ownerDocument.body ) )
 		.reverse()
 		.find(
@@ -169,12 +178,12 @@ export function findPrevious( element ) {
 /**
  * Given a focusable element, find the next tabbable element.
  *
- * @param {Element} element The focusable element after which to look. Defaults
- *                          to the active element.
+ * @param element The focusable element after which to look. Defaults
+ *                to the active element.
  *
- * @return {HTMLElement|undefined} Next tabbable element.
+ * @return Next tabbable element.
  */
-export function findNext( element ) {
+export function findNext( element: Element ): HTMLElement | undefined {
 	return filterTabbable( findFocusable( element.ownerDocument.body ) ).find(
 		( focusable ) =>
 			// eslint-disable-next-line no-bitwise

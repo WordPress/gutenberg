@@ -8,7 +8,7 @@
 
 ### Internal
 
--   Refactor the `dom/*` utilities to TypeScript ([#84317](https://github.com/WordPress/gutenberg/pull/84317)).
+-   Refactor to TypeScript ([#84317](https://github.com/WordPress/gutenberg/pull/84317)).
 
 ## 4.57.0 (2026-10-07)
 

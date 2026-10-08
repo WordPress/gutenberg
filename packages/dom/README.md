@@ -110,7 +110,7 @@ _Parameters_
 
 _Returns_
 
-- `Partial<ContentSchema>`: Schema.
+- `Partial< ContentSchema >`: Schema.
 
 ### getRectangleFromRange
 

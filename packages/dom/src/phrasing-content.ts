@@ -1,3 +1,5 @@
+import type { ContentSchema } from './types';
+
 /**
  * All phrasing content elements.
  *
@@ -5,23 +7,11 @@
  */
 
 /**
- * @typedef {Record<string,SemanticElementDefinition>} ContentSchema
- */
-
-/**
- * @typedef SemanticElementDefinition
- * @property {string[]}          [attributes] Content attributes
- * @property {ContentSchema|'*'} [children]   Content attributes
- */
-
-/**
  * All text-level semantic elements.
  *
  * @see https://html.spec.whatwg.org/multipage/text-level-semantics.html
- *
- * @type {ContentSchema}
  */
-const textContentSchema = {
+const textContentSchema: ContentSchema = {
 	strong: {},
 	em: {},
 	s: {},
@@ -60,10 +50,8 @@ const textContentSchema = {
  * Embedded content elements.
  *
  * @see https://www.w3.org/TR/2011/WD-html5-20110525/content-models.html#embedded-content-0
- *
- * @type {ContentSchema}
  */
-const embeddedContentSchema = {
+const embeddedContentSchema: ContentSchema = {
 	audio: {
 		attributes: [
 			'src',
@@ -150,19 +138,18 @@ const phrasingContentSchema = {
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content
  *
- * @param {string} [context] Set to "paste" to exclude invisible elements and
- *                           sensitive data.
+ * @param [context] Set to "paste" to exclude invisible elements and
+ *                  sensitive data.
  *
- * @return {Partial<ContentSchema>} Schema.
+ * @return Schema.
  */
-export function getPhrasingContentSchema( context ) {
+export function getPhrasingContentSchema(
+	context?: string
+): Partial< ContentSchema > {
 	if ( context !== 'paste' ) {
 		return phrasingContentSchema;
 	}
 
-	/**
-	 * @type {Partial<ContentSchema>}
-	 */
 	const {
 		u, // Used to mark misspelling. Shouldn't be pasted.
 		abbr, // Invisible.
@@ -172,7 +159,7 @@ export function getPhrasingContentSchema( context ) {
 		bdi, // Invisible.
 		bdo, // Invisible.
 		...remainingContentSchema
-	} = {
+	}: Partial< ContentSchema > = {
 		...phrasingContentSchema,
 		// We shouldn't paste potentially sensitive information which is not
 		// visible to the user when pasted, so strip the attributes.
@@ -188,20 +175,20 @@ export function getPhrasingContentSchema( context ) {
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content
  *
- * @param {Node} node The node to test.
+ * @param node The node to test.
  *
- * @return {boolean} True if phrasing content, false if not.
+ * @return True if phrasing content, false if not.
  */
-export function isPhrasingContent( node ) {
+export function isPhrasingContent( node: Node ): boolean {
 	const tag = node.nodeName.toLowerCase();
 	return getPhrasingContentSchema().hasOwnProperty( tag ) || tag === 'span';
 }
 
 /**
- * @param {Node} node
- * @return {boolean} Node is text content
+ * @param node
+ * @return Node is text content
  */
-export function isTextContent( node ) {
+export function isTextContent( node: Node ): boolean {
 	const tag = node.nodeName.toLowerCase();
 	return textContentSchema.hasOwnProperty( tag ) || tag === 'span';
 }

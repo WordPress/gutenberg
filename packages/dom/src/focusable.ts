@@ -1,3 +1,5 @@
+import type { FindFocusableOptions } from './types';
+
 /**
  * References:
  *
@@ -20,15 +22,15 @@
 /**
  * Returns a CSS selector used to query for focusable elements.
  *
- * @param {boolean} sequential If set, only query elements that are sequentially
- *                             focusable. Non-interactive elements with a
- *                             negative `tabindex` are focusable but not
- *                             sequentially focusable.
- *                             https://html.spec.whatwg.org/multipage/interaction.html#the-tabindex-attribute
+ * @param sequential If set, only query elements that are sequentially
+ *                   focusable. Non-interactive elements with a
+ *                   negative `tabindex` are focusable but not
+ *                   sequentially focusable.
+ *                   https://html.spec.whatwg.org/multipage/interaction.html#the-tabindex-attribute
  *
- * @return {string} CSS selector.
+ * @return CSS selector.
  */
-function buildSelector( sequential ) {
+function buildSelector( sequential: boolean ): string {
 	return [
 		sequential ? '[tabindex]:not([tabindex^="-"])' : '[tabindex]',
 		'a[href]',
@@ -49,11 +51,11 @@ function buildSelector( sequential ) {
  * Returns true if the specified element has a layout box and is not hidden by
  * CSS visibility or content visibility.
  *
- * @param {HTMLElement} element DOM element to test.
+ * @param element DOM element to test.
  *
- * @return {boolean} Whether element is visible.
+ * @return Whether element is visible.
  */
-function isVisible( element ) {
+function isVisible( element: HTMLElement ): boolean {
 	if ( typeof element.checkVisibility === 'function' ) {
 		if ( ! element.checkVisibility( { visibilityProperty: true } ) ) {
 			return false;
@@ -80,19 +82,17 @@ function isVisible( element ) {
  * false otherwise. Area is only focusable if within a map where a named map
  * referenced by an image somewhere in the document.
  *
- * @param {HTMLAreaElement} element DOM area element to test.
+ * @param element DOM area element to test.
  *
- * @return {boolean} Whether area element is valid for focus.
+ * @return Whether area element is valid for focus.
  */
-function isValidFocusableArea( element ) {
-	/** @type {HTMLMapElement | null} */
-	const map = element.closest( 'map[name]' );
+function isValidFocusableArea( element: HTMLAreaElement ): boolean {
+	const map: HTMLMapElement | null = element.closest( 'map[name]' );
 	if ( ! map ) {
 		return false;
 	}
 
-	/** @type {HTMLImageElement | null} */
-	const img = element.ownerDocument.querySelector(
+	const img: HTMLImageElement | null = element.ownerDocument.querySelector(
 		'img[usemap="#' + map.name + '"]'
 	);
 	return !! img && ! img.closest( '[inert]' ) && isVisible( img );
@@ -101,28 +101,30 @@ function isValidFocusableArea( element ) {
 /**
  * Returns all focusable elements within a given context.
  *
- * @param {Element} context              Element in which to search.
- * @param {Object}  options
- * @param {boolean} [options.sequential] If set, only return elements that are
- *                                       sequentially focusable.
- *                                       Non-interactive elements with a
- *                                       negative `tabindex` are focusable but
- *                                       not sequentially focusable.
- *                                       https://html.spec.whatwg.org/multipage/interaction.html#the-tabindex-attribute
+ * @param context              Element in which to search.
+ * @param options
+ * @param [options.sequential] If set, only return elements that are
+ *                             sequentially focusable.
+ *                             Non-interactive elements with a
+ *                             negative `tabindex` are focusable but
+ *                             not sequentially focusable.
+ *                             https://html.spec.whatwg.org/multipage/interaction.html#the-tabindex-attribute
  *
- * @return {HTMLElement[]} Focusable elements.
+ * @return Focusable elements.
  */
-export function find( context, { sequential = false } = {} ) {
-	/** @type {NodeListOf<HTMLElement>} */
-	const elements = context.querySelectorAll( buildSelector( sequential ) );
+export function find(
+	context: Element,
+	{ sequential = false }: FindFocusableOptions = {}
+): HTMLElement[] {
+	const elements: NodeListOf< HTMLElement > = context.querySelectorAll(
+		buildSelector( sequential )
+	);
 
 	return Array.from( elements ).filter( ( element ) => {
 		const { nodeName } = element;
 		if ( 'AREA' === nodeName ) {
 			// The mapped image determines whether this region is visible or inert.
-			return isValidFocusableArea(
-				/** @type {HTMLAreaElement} */ ( element )
-			);
+			return isValidFocusableArea( element as HTMLAreaElement );
 		}
 
 		// Elements inside an inert subtree are not focusable.
