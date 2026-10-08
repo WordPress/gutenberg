@@ -6,10 +6,6 @@
 
 -   `Menu`, `Popover`: Keep popups open when the user interacts with an iframe inside the popup. ([#83870](https://github.com/WordPress/gutenberg/pull/83870))
 
-### Internal
-
--   Consolidate shared iframe dismissal test coverage.
-
 ## 0.24.0 (2026-10-07)
 
 ### Breaking Changes
