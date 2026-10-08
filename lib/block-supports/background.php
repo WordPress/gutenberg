@@ -116,31 +116,29 @@ function gutenberg_render_background_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$attributes = $block_attributes;
-
-	// The helper returns nothing for a non-array background, so only an array needs filtering.
-	if ( is_array( $attributes['style']['background'] ) ) {
+	// The helper ignores a non-array background, so only an array needs filtering.
+	if ( is_array( $block_attributes['style']['background'] ) ) {
 		if ( $skip_background_image ) {
 			unset(
-				$attributes['style']['background']['backgroundImage'],
-				$attributes['style']['background']['backgroundSize'],
-				$attributes['style']['background']['backgroundPosition'],
-				$attributes['style']['background']['backgroundRepeat'],
-				$attributes['style']['background']['backgroundAttachment']
+				$block_attributes['style']['background']['backgroundImage'],
+				$block_attributes['style']['background']['backgroundSize'],
+				$block_attributes['style']['background']['backgroundPosition'],
+				$block_attributes['style']['background']['backgroundRepeat'],
+				$block_attributes['style']['background']['backgroundAttachment']
 			);
 		}
 
 		if ( $skip_background_gradient ) {
-			unset( $attributes['style']['background']['gradient'] );
+			unset( $block_attributes['style']['background']['gradient'] );
 		}
 
 		// Serialized values only, so a skipped clip cannot drop `has-background`.
 		if ( $skip_background_clip ) {
-			unset( $attributes['style']['background']['backgroundClip'] );
+			unset( $block_attributes['style']['background']['backgroundClip'] );
 		}
 	}
 
-	$styles = gutenberg_get_background_classes_and_styles( $attributes );
+	$styles = gutenberg_get_background_classes_and_styles( $block_attributes );
 
 	if ( ! empty( $styles['style'] ) ) {
 		// Inject background styles to the first element, presuming it's the wrapper, if it exists.
