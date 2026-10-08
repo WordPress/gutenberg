@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import type { ComponentPropsWithoutRef, ForwardedRef, JSX } from 'react';
+import type { ComponentPropsWithoutRef, ForwardedRef } from 'react';
 import { createElement, forwardRef } from '@wordpress/element';
 import type { SVGProps } from './types';
 
@@ -10,16 +10,15 @@ export type { SVGProps } from './types';
  *
  * @return Circle component
  */
-export const Circle = (
-	props: ComponentPropsWithoutRef< 'circle' >
-): JSX.Element => createElement( 'circle', props );
+export const Circle = ( props: ComponentPropsWithoutRef< 'circle' > ) =>
+	createElement( 'circle', props );
 
 /**
  * @param props
  *
  * @return G component
  */
-export const G = ( props: ComponentPropsWithoutRef< 'g' > ): JSX.Element =>
+export const G = ( props: ComponentPropsWithoutRef< 'g' > ) =>
 	createElement( 'g', props );
 
 /**
@@ -27,45 +26,40 @@ export const G = ( props: ComponentPropsWithoutRef< 'g' > ): JSX.Element =>
  *
  * @return Path component
  */
-export const Line = (
-	props: ComponentPropsWithoutRef< 'line' >
-): JSX.Element => createElement( 'line', props );
+export const Line = ( props: ComponentPropsWithoutRef< 'line' > ) =>
+	createElement( 'line', props );
 
 /**
  * @param props
  *
  * @return Path component
  */
-export const Path = (
-	props: ComponentPropsWithoutRef< 'path' >
-): JSX.Element => createElement( 'path', props );
+export const Path = ( props: ComponentPropsWithoutRef< 'path' > ) =>
+	createElement( 'path', props );
 
 /**
  * @param props
  *
  * @return Polygon component
  */
-export const Polygon = (
-	props: ComponentPropsWithoutRef< 'polygon' >
-): JSX.Element => createElement( 'polygon', props );
+export const Polygon = ( props: ComponentPropsWithoutRef< 'polygon' > ) =>
+	createElement( 'polygon', props );
 
 /**
  * @param props
  *
  * @return Rect component
  */
-export const Rect = (
-	props: ComponentPropsWithoutRef< 'rect' >
-): JSX.Element => createElement( 'rect', props );
+export const Rect = ( props: ComponentPropsWithoutRef< 'rect' > ) =>
+	createElement( 'rect', props );
 
 /**
  * @param props
  *
  * @return Defs component
  */
-export const Defs = (
-	props: ComponentPropsWithoutRef< 'defs' >
-): JSX.Element => createElement( 'defs', props );
+export const Defs = ( props: ComponentPropsWithoutRef< 'defs' > ) =>
+	createElement( 'defs', props );
 
 /**
  * @param props
@@ -74,7 +68,7 @@ export const Defs = (
  */
 export const RadialGradient = (
 	props: ComponentPropsWithoutRef< 'radialGradient' >
-): JSX.Element => createElement( 'radialGradient', props );
+) => createElement( 'radialGradient', props );
 
 /**
  * @param props
@@ -83,16 +77,15 @@ export const RadialGradient = (
  */
 export const LinearGradient = (
 	props: ComponentPropsWithoutRef< 'linearGradient' >
-): JSX.Element => createElement( 'linearGradient', props );
+) => createElement( 'linearGradient', props );
 
 /**
  * @param props
  *
  * @return Stop component
  */
-export const Stop = (
-	props: ComponentPropsWithoutRef< 'stop' >
-): JSX.Element => createElement( 'stop', props );
+export const Stop = ( props: ComponentPropsWithoutRef< 'stop' > ) =>
+	createElement( 'stop', props );
 
 export const SVG = forwardRef(
 	/**
@@ -106,7 +99,7 @@ export const SVG = forwardRef(
 	(
 		{ className, isPressed, ...props }: SVGProps,
 		ref: ForwardedRef< SVGSVGElement >
-	): JSX.Element => {
+	) => {
 		const appliedProps = {
 			...props,
 			className:
