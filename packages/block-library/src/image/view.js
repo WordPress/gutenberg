@@ -42,22 +42,31 @@ let inertElements = [];
 /**
  * Per-gesture state for the in-progress horizontal drag on the lightbox.
  *
- * `direction` latches to 'horizontal' or 'vertical' once the gesture exceeds a
- * small disambiguation threshold; vertical gestures bypass the drag-tracking
- * path so native scroll suppression keeps working unchanged.
+ * `direction` is null until the gesture exceeds a small disambiguation
+ * threshold, then latches to 'horizontal' or 'vertical' for the rest of it;
+ * vertical gestures bypass the drag-tracking path so native scroll suppression
+ * keeps working unchanged.
  */
 const touchDrag = {
 	isDragging: false,
-	direction: 'unknown',
+	direction: null,
 	overlayEl: null,
-	// Pending id for the post-commit slide timer, so a rapid follow-up gesture
-	// can cancel it before it resets the offset mid-swipe.
+	// Pending id for the post-commit slide timer, and the callback it will run,
+	// so a rapid follow-up gesture can finish the slide early instead of
+	// stranding the image at its slide offset.
 	slideTimeout: 0,
+	pendingAdvance: null,
+	// Pending id for the timer that takes the fade-in class back off.
+	fadeTimeout: 0,
 };
 
 // Duration of the commit slide, in milliseconds. Must stay in sync with the
 // `transition: transform` duration on `.is-animating-slide` in `style.scss`.
 const SLIDE_TRANSITION_MS = 220;
+
+// Duration of the fade applied to the image that slides in. Must stay in sync
+// with the `lightbox-image-fade-in` duration in `style.scss`.
+const FADE_TRANSITION_MS = 150;
 
 // Movement (px) needed before a gesture latches to horizontal or vertical.
 const DIRECTION_LATCH_THRESHOLD_PX = 10;
@@ -71,6 +80,52 @@ const COMMIT_DISTANCE_RATIO = 0.2;
 // A short, fast horizontal flick commits even below the distance threshold.
 const FLICK_DISTANCE_PX = 50;
 const FLICK_MAX_DURATION_MS = 300;
+
+/**
+ * Clears the per-gesture drag state.
+ *
+ * A pending slide is left alone: it is scheduled as a gesture ends and still
+ * has to run. `flushPendingSlide()` deals with that side.
+ */
+function resetTouchDrag() {
+	touchDrag.isDragging = false;
+	touchDrag.direction = null;
+	touchDrag.overlayEl = null;
+}
+
+/**
+ * Returns the overlay to its resting position.
+ *
+ * For a gesture that is abandoned rather than finished, where no slide
+ * animation will run to put the image back.
+ *
+ * @param {Element|null} overlayEl The lightbox overlay, if a drag reached it.
+ */
+function clearDragStyles( overlayEl ) {
+	if ( ! overlayEl ) {
+		return;
+	}
+	overlayEl.classList.remove( 'is-animating-slide', 'is-fading-in' );
+	overlayEl.style.removeProperty( '--wp--lightbox-drag-offset' );
+}
+
+/**
+ * Runs a committed slide that has not yet waited out its animation.
+ *
+ * A new gesture must not leave the previous one half-applied: cancelling the
+ * timer on its own would strand the image off-screen at its slide offset and
+ * never swap it for the next one.
+ */
+function flushPendingSlide() {
+	if ( ! touchDrag.slideTimeout ) {
+		return;
+	}
+	clearTimeout( touchDrag.slideTimeout );
+	const pending = touchDrag.pendingAdvance;
+	touchDrag.slideTimeout = 0;
+	touchDrag.pendingAdvance = null;
+	pending?.();
+}
 
 const focusableSelectors = [
 	'.wp-lightbox-close-button',
@@ -351,7 +406,7 @@ const { state, actions, callbacks } = store(
 				// disambiguation threshold, then sticks with that decision for the
 				// rest of the gesture.
 				if (
-					touchDrag.direction === 'unknown' &&
+					! touchDrag.direction &&
 					( absDeltaX > DIRECTION_LATCH_THRESHOLD_PX ||
 						absDeltaY > DIRECTION_LATCH_THRESHOLD_PX )
 				) {
@@ -382,15 +437,21 @@ const { state, actions, callbacks } = store(
 					touchStartEvent.startY = t.clientY;
 					touchStartEvent.startTime = Date.now();
 				}
-				// Cancels a still-pending slide from the previous gesture so it
-				// can't reset the offset in the middle of this new one.
-				if ( touchDrag.slideTimeout ) {
-					clearTimeout( touchDrag.slideTimeout );
-					touchDrag.slideTimeout = 0;
-				}
-				touchDrag.isDragging = false;
-				touchDrag.direction = 'unknown';
-				touchDrag.overlayEl = null;
+				// Settles a slide left over from the previous gesture, so this one
+				// starts from an image at rest rather than mid-animation.
+				flushPendingSlide();
+				resetTouchDrag();
+			},
+			handleTouchCancel() {
+				// The gesture was interrupted — the browser cancelled the drag,
+				// or a system gesture took over — so no `touchend` will arrive to
+				// settle the image. Abandon the drag rather than committing it,
+				// otherwise the offset sticks to the overlay, which outlives the
+				// lightbox being closed and reopened.
+				clearDragStyles( touchDrag.overlayEl );
+				resetTouchDrag();
+				lastTouchTime = Date.now();
+				isTouching = false;
 			},
 			handleTouchEnd: withSyncEvent( ( event ) => {
 				const touchEndEvent =
@@ -425,10 +486,10 @@ const { state, actions, callbacks } = store(
 
 						const advance = () => {
 							touchDrag.slideTimeout = 0;
+							touchDrag.pendingAdvance = null;
 							overlayEl.classList.remove( 'is-animating-slide' );
-							overlayEl.style.setProperty(
-								'--wp--lightbox-drag-offset',
-								'0px'
+							overlayEl.style.removeProperty(
+								'--wp--lightbox-drag-offset'
 							);
 							if ( shouldCommit ) {
 								if ( direction === 'next' ) {
@@ -437,12 +498,25 @@ const { state, actions, callbacks } = store(
 									actions.showPreviousImage( event );
 								}
 								// Re-triggers the fade-in animation on rapid
-								// successive swipes by toggling the class with a
-								// forced reflow in between.
+								// successive swipes by dropping any pending
+								// clean-up and toggling the class with a forced
+								// reflow in between.
+								clearTimeout( touchDrag.fadeTimeout );
 								overlayEl.classList.remove( 'is-fading-in' );
 								// eslint-disable-next-line no-unused-expressions
 								overlayEl.offsetWidth;
 								overlayEl.classList.add( 'is-fading-in' );
+								// The class has to come back off once the fade is
+								// over. It outranks the `.zoom.active` rule that
+								// animates the image in, so left on it would
+								// replace the zoom the next time the lightbox is
+								// opened.
+								touchDrag.fadeTimeout = setTimeout( () => {
+									touchDrag.fadeTimeout = 0;
+									overlayEl.classList.remove(
+										'is-fading-in'
+									);
+								}, FADE_TRANSITION_MS );
 							}
 						};
 
@@ -461,8 +535,10 @@ const { state, actions, callbacks } = store(
 								'--wp--lightbox-drag-offset',
 								`${ commitOffset }px`
 							);
+							const scopedAdvance = withScope( advance );
+							touchDrag.pendingAdvance = scopedAdvance;
 							touchDrag.slideTimeout = setTimeout(
-								withScope( advance ),
+								scopedAdvance,
 								SLIDE_TRANSITION_MS
 							);
 						}
@@ -471,9 +547,7 @@ const { state, actions, callbacks } = store(
 
 				lastTouchTime = now;
 				isTouching = false;
-				touchDrag.isDragging = false;
-				touchDrag.direction = 'unknown';
-				touchDrag.overlayEl = null;
+				resetTouchDrag();
 			} ),
 			handleScroll() {
 				// Prevents scrolling behaviors that trigger content shift while the
