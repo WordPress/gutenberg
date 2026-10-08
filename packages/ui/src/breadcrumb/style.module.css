@@ -116,6 +116,10 @@
 	}
 
 	@layer compositions {
+		.button-item {
+			--wp-ui-button-font-weight: var(--wpds-typography-font-weight-default);
+		}
+
 		.overflow-trigger {
 			--wp-ui-button-min-width: unset;
 		}

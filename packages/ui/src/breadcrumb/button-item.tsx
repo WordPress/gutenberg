@@ -59,6 +59,7 @@ function TrailButtonItem( {
 			className={ clsx(
 				styles.label,
 				styles.link,
+				styles[ 'button-item' ],
 				isMeasurement && styles[ 'measurement-label' ],
 				className
 			) }
