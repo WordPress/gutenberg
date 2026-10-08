@@ -64,7 +64,7 @@ function render_block_core_button( $attributes, $content ) {
 	$background = $attributes['style']['background'] ?? null;
 
 	if ( is_array( $background ) ) {
-		// Button does not support the clip.
+		// Button has no clip support, so ignore a stale value.
 		unset( $background['backgroundClip'] );
 		$styles = wp_get_background_classes_and_styles( array( 'style' => array( 'background' => $background ) ) );
 
