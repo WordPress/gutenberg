@@ -35,6 +35,16 @@ export type PaletteVariant = 'color' | 'gradient' | 'duotone';
 
 export type BasePaletteEdit = {
 	/**
+	 * Called before the first value edit in a picker session.
+	 * Use this to capture consumer state that must be restored on cancellation.
+	 */
+	onChangeStart?: () => void;
+	/**
+	 * Restores consumer state when Escape cancels a picker session that updated
+	 * the palette. If omitted, `onChange` restores the opening palette value.
+	 */
+	onChangeCancel?: () => void;
+	/**
 	 * Whether the user can only change the color or gradient values.
 	 * If true, they cannot change names or delete values.
 	 *
@@ -129,7 +139,10 @@ export type PaletteEditProps = BasePaletteEdit &
 
 type EditingElement = number | null;
 
-export type ColorPickerPopoverProps< T extends PaletteElement > = {
+export type ColorPickerPopoverProps< T extends PaletteElement > = Pick<
+	BasePaletteEdit,
+	'onChangeStart' | 'onChangeCancel'
+> & {
 	element: T;
 	onChange: ( newElement: T ) => void;
 	variant: PaletteVariant;
@@ -144,7 +157,10 @@ export type NameInputProps = {
 	value: PaletteElement[ 'name' ];
 };
 
-export type OptionProps< T extends PaletteElement > = {
+export type OptionProps< T extends PaletteElement > = Pick<
+	BasePaletteEdit,
+	'onChangeStart' | 'onChangeCancel'
+> & {
 	element: T;
 	onChange: ( newElement: T ) => void;
 	variant: PaletteVariant;
@@ -155,7 +171,10 @@ export type OptionProps< T extends PaletteElement > = {
 	popoverProps?: PaletteEditProps[ 'popoverProps' ];
 };
 
-export type PaletteEditListViewProps< T extends PaletteElement > = {
+export type PaletteEditListViewProps< T extends PaletteElement > = Pick<
+	BasePaletteEdit,
+	'onChangeStart' | 'onChangeCancel'
+> & {
 	elements: T[];
 	onChange: ( newElements?: T[] ) => void;
 	variant: PaletteVariant;

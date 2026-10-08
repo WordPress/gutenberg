@@ -226,13 +226,13 @@ describe( 'PaletteEdit', () => {
 
 	it.each(
 		[ 'swatches', 'details' ].flatMap( ( view ) =>
-			[ 'Escape', 'Cancel', 'Apply' ].map( ( action ) => ( {
+			[ 'Escape', 'Enter', 'outside click' ].map( ( action ) => ( {
 				view,
 				action,
 			} ) )
 		)
 	)(
-		'keeps color edits local until Apply and closes with $action in $view',
+		'updates colors live and closes with $action in $view',
 		async ( { view, action } ) => {
 			const onChange = vi.fn();
 			function ControlledPalette() {
@@ -269,36 +269,40 @@ describe( 'PaletteEdit', () => {
 			} );
 			await userEvent.fill( input, 'ff0000' );
 			await waitFor( () => expect( input ).toHaveValue( 'ff0000' ) );
-			expect( onChange ).not.toHaveBeenCalled();
-			if ( action === 'Escape' ) {
-				await userEvent.keyboard( '{Escape}' );
-			} else if ( action === 'Cancel' ) {
-				await userEvent.click(
-					screen.getByRole( 'button', { name: action } )
-				);
-			} else {
-				const button = screen.getByRole( 'button', { name: action } );
-				button.focus();
-				await userEvent.keyboard( '{Enter}' );
-			}
 			await waitFor( () =>
-				expect( onChange ).toHaveBeenCalledTimes(
-					action === 'Apply' ? 1 : 0
-				)
+				expect( onChange ).toHaveBeenCalledWith( [
+					{ ...colors[ 0 ], color: '#ff0000' },
+					colors[ 1 ],
+				] )
 			);
+			expect(
+				screen.queryByRole( 'button', { name: 'Apply' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', { name: 'Cancel' } )
+			).not.toBeInTheDocument();
+			if ( action === 'Escape' || action === 'Enter' ) {
+				await userEvent.keyboard( `{${ action }}` );
+			} else {
+				await userEvent.click(
+					screen.getByRole( 'heading', { name: 'Test label' } )
+				);
+			}
 			expect( onChange.mock.lastCall?.[ 0 ] ).toEqual(
-				action === 'Apply'
-					? [ { ...colors[ 0 ], color: '#ff0000' }, colors[ 1 ] ]
-					: undefined
+				action === 'Escape'
+					? colors
+					: [ { ...colors[ 0 ], color: '#ff0000' }, colors[ 1 ] ]
 			);
 			expect(
 				screen.queryByRole( 'textbox', { name: 'Hex color' } )
 			).not.toBeInTheDocument();
-			expect( swatch ).toHaveFocus();
-			await userEvent.keyboard( '{Enter}' );
+			expect(
+				action === 'outside click' ? document.body : swatch
+			).toHaveFocus();
+			await userEvent.click( swatch );
 			expect(
 				await screen.findByRole( 'textbox', { name: 'Hex color' } )
-			).toHaveValue( action === 'Apply' ? 'FF0000' : '1A4548' );
+			).toHaveValue( action === 'Escape' ? '1A4548' : 'FF0000' );
 		}
 	);
 
@@ -323,7 +327,7 @@ describe( 'PaletteEdit', () => {
 		try {
 			await userEvent.fill( input, 'ff0000' );
 			await act( async () => {
-				vi.advanceTimersByTime( 100 );
+				vi.advanceTimersByTime( 0 );
 			} );
 			expect( onChange ).not.toHaveBeenCalled();
 			await userEvent.keyboard( '{Escape}' );
@@ -331,6 +335,131 @@ describe( 'PaletteEdit', () => {
 				vi.advanceTimersByTime( 100 );
 			} );
 			expect( onChange ).not.toHaveBeenCalled();
+		} finally {
+			vi.useRealTimers();
+		}
+	} );
+
+	it.each( [ 'swatches', 'details' ] )(
+		'lets the consumer restore its state on Escape in %s',
+		async ( view ) => {
+			const onChange = vi.fn();
+			const onChangeStart = vi.fn();
+			const onChangeCancel = vi.fn();
+			await render(
+				<PaletteEdit
+					{ ...defaultProps }
+					colors={ colors }
+					onChange={ onChange }
+					onChangeStart={ onChangeStart }
+					onChangeCancel={ onChangeCancel }
+				/>
+			);
+			if ( view === 'details' ) {
+				await userEvent.click(
+					screen.getByRole( 'button', { name: 'Color options' } )
+				);
+				await userEvent.click(
+					await screen.findByRole( 'menuitem', {
+						name: 'Show details',
+					} )
+				);
+			}
+			await userEvent.click(
+				screen.getByRole( 'button', {
+					name: view === 'details' ? 'Edit: Primary' : 'Primary',
+				} )
+			);
+			const input = await screen.findByRole( 'textbox', {
+				name: 'Hex color',
+			} );
+			await userEvent.fill( input, 'ff0000' );
+			await waitFor( () =>
+				expect( onChange ).toHaveBeenCalledTimes( 1 )
+			);
+			await userEvent.fill( input, '0000ff' );
+			await waitFor( () =>
+				expect( onChange ).toHaveBeenCalledTimes( 2 )
+			);
+			expect( onChangeStart ).toHaveBeenCalledTimes( 1 );
+			expect( onChangeStart.mock.invocationCallOrder[ 0 ] ).toBeLessThan(
+				onChange.mock.invocationCallOrder[ 0 ]
+			);
+			await userEvent.keyboard( '{Escape}' );
+			expect( onChangeCancel ).toHaveBeenCalledTimes( 1 );
+			expect( onChange ).toHaveBeenCalledTimes( 2 );
+		}
+	);
+
+	it( 'does not reapply a pending color after Escape restores an earlier live edit', async () => {
+		const onChange = vi.fn();
+		await render(
+			<PaletteEdit
+				{ ...defaultProps }
+				colors={ colors }
+				onChange={ onChange }
+			/>
+		);
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Primary' } )
+		);
+		const input = await screen.findByRole( 'textbox', {
+			name: 'Hex color',
+		} );
+		await userEvent.fill( input, 'ff0000' );
+		await waitFor( () => expect( onChange ).toHaveBeenCalledTimes( 1 ) );
+		vi.useFakeTimers( {
+			toFake: [ 'setTimeout', 'clearTimeout', 'Date' ],
+		} );
+		try {
+			await userEvent.fill( input, '0000ff' );
+			await act( async () => {
+				vi.advanceTimersByTime( 0 );
+			} );
+			await userEvent.keyboard( '{Escape}' );
+			await act( async () => {
+				vi.advanceTimersByTime( 100 );
+			} );
+			expect( onChange ).toHaveBeenCalledTimes( 2 );
+			expect( onChange.mock.lastCall?.[ 0 ] ).toEqual( colors );
+		} finally {
+			vi.useRealTimers();
+		}
+	} );
+
+	it( 'keeps the latest pending color when Enter accepts the edit', async () => {
+		const onChange = vi.fn();
+		await render(
+			<PaletteEdit
+				{ ...defaultProps }
+				colors={ colors }
+				onChange={ onChange }
+			/>
+		);
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Primary' } )
+		);
+		const input = await screen.findByRole( 'textbox', {
+			name: 'Hex color',
+		} );
+		vi.useFakeTimers( {
+			toFake: [ 'setTimeout', 'clearTimeout', 'Date' ],
+		} );
+		try {
+			await userEvent.fill( input, 'ff0000' );
+			await act( async () => {
+				vi.advanceTimersByTime( 0 );
+			} );
+			expect( onChange ).not.toHaveBeenCalled();
+			await userEvent.keyboard( '{Enter}' );
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
+			expect( onChange.mock.lastCall?.[ 0 ] ).toEqual( [
+				{ ...colors[ 0 ], color: '#ff0000' },
+				colors[ 1 ],
+			] );
+			expect(
+				screen.queryByRole( 'textbox', { name: 'Hex color' } )
+			).not.toBeInTheDocument();
 		} finally {
 			vi.useRealTimers();
 		}
@@ -901,10 +1030,6 @@ describe( 'PaletteEdit', () => {
 
 		await userEvent.keyboard( '000000' );
 
-		await userEvent.click(
-			screen.getByRole( 'button', { name: 'Apply' } )
-		);
-
 		await waitFor( () => {
 			expect( onChange ).toHaveBeenCalledWith( [
 				{
@@ -916,8 +1041,8 @@ describe( 'PaletteEdit', () => {
 		} );
 	} );
 
-	it.each( [ 'Apply', 'Escape' ] )(
-		'keeps gradient edits local until Apply and closes with %s',
+	it.each( [ 'outside click', 'Escape' ] )(
+		'updates gradients live and closes with %s',
 		async ( action ) => {
 			const onChange = vi.fn();
 
@@ -939,22 +1064,21 @@ describe( 'PaletteEdit', () => {
 				'radial-gradient'
 			);
 
-			expect( onChange ).not.toHaveBeenCalled();
+			await waitFor( () =>
+				expect( onChange ).toHaveBeenCalledTimes( 1 )
+			);
 			if ( action === 'Escape' ) {
 				await userEvent.keyboard( '{Escape}' );
 			} else {
 				await userEvent.click(
-					screen.getByRole( 'button', { name: 'Apply' } )
+					screen.getByRole( 'heading', { name: 'Test label' } )
 				);
 			}
-
-			await waitFor( () =>
-				expect( onChange ).toHaveBeenCalledTimes(
-					action === 'Apply' ? 1 : 0
-				)
+			expect( onChange ).toHaveBeenCalledTimes(
+				action === 'Escape' ? 2 : 1
 			);
 			expect( onChange.mock.lastCall?.[ 0 ] ).toEqual(
-				action === 'Apply'
+				action !== 'Escape'
 					? [
 							{
 								...gradients[ 0 ],
@@ -963,13 +1087,13 @@ describe( 'PaletteEdit', () => {
 							},
 							gradients[ 1 ],
 						]
-					: undefined
+					: gradients
 			);
 		}
 	);
 
-	it.each( [ 'Apply', 'Escape' ] )(
-		'keeps duotone edits local until Apply and closes with %s',
+	it.each( [ 'outside click', 'Escape' ] )(
+		'updates duotones live and closes with %s',
 		async ( action ) => {
 			const onChange = vi.fn();
 
@@ -992,22 +1116,21 @@ describe( 'PaletteEdit', () => {
 				screen.getByRole( 'option', { name: 'Primary' } )
 			);
 
-			expect( onChange ).not.toHaveBeenCalled();
+			await waitFor( () =>
+				expect( onChange ).toHaveBeenCalledTimes( 1 )
+			);
 			if ( action === 'Escape' ) {
 				await userEvent.keyboard( '{Escape}' );
 			} else {
 				await userEvent.click(
-					screen.getByRole( 'button', { name: 'Apply' } )
+					screen.getByRole( 'heading', { name: 'Test label' } )
 				);
 			}
-
-			await waitFor( () =>
-				expect( onChange ).toHaveBeenCalledTimes(
-					action === 'Apply' ? 1 : 0
-				)
+			expect( onChange ).toHaveBeenCalledTimes(
+				action === 'Escape' ? 2 : 1
 			);
 			expect( onChange.mock.lastCall?.[ 0 ] ).toEqual(
-				action === 'Apply'
+				action !== 'Escape'
 					? [
 							duotones[ 0 ],
 							{
@@ -1018,7 +1141,7 @@ describe( 'PaletteEdit', () => {
 								],
 							},
 						]
-					: undefined
+					: duotones
 			);
 		}
 	);
@@ -1065,10 +1188,6 @@ describe( 'PaletteEdit', () => {
 			screen.getByRole( 'option', { name: 'Named black' } )
 		);
 
-		await userEvent.click(
-			screen.getByRole( 'button', { name: 'Apply' } )
-		);
-
 		await waitFor( () => {
 			expect( onChange ).toHaveBeenCalledWith( [
 				duotones[ 0 ],
@@ -1110,10 +1229,6 @@ describe( 'PaletteEdit', () => {
 		);
 		await userEvent.click(
 			screen.getByRole( 'option', { name: 'Primary' } )
-		);
-
-		await userEvent.click(
-			screen.getByRole( 'button', { name: 'Apply' } )
 		);
 
 		await waitFor( () => {

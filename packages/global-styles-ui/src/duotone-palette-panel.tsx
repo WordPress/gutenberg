@@ -5,6 +5,7 @@ import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import type { Color, Duotone } from '@wordpress/global-styles-engine';
 import { useSetting } from './hooks';
+import { usePaletteSetting } from './use-palette-setting';
 
 const mobilePopoverProps = { placement: 'bottom-start' as const, offset: 8 };
 
@@ -19,28 +20,22 @@ interface DuotonePalettePanelProps {
 export default function DuotonePalettePanel( {
 	name,
 }: DuotonePalettePanelProps ) {
-	const [ themeDuotone, setThemeDuotone ] = useSetting< Duotone[] >(
-		'color.duotone.theme',
-		name
-	);
+	const [ themeDuotone, setThemeDuotone, themeDuotoneEditProps ] =
+		usePaletteSetting< Duotone[] >( 'color.duotone.theme', name );
 	const [ baseThemeDuotone ] = useSetting< Duotone[] >(
 		'color.duotone.theme',
 		name,
 		'base'
 	);
-	const [ defaultDuotone, setDefaultDuotone ] = useSetting< Duotone[] >(
-		'color.duotone.default',
-		name
-	);
+	const [ defaultDuotone, setDefaultDuotone, defaultDuotoneEditProps ] =
+		usePaletteSetting< Duotone[] >( 'color.duotone.default', name );
 	const [ baseDefaultDuotone ] = useSetting< Duotone[] >(
 		'color.duotone.default',
 		name,
 		'base'
 	);
-	const [ customDuotone, setCustomDuotone ] = useSetting< Duotone[] >(
-		'color.duotone.custom',
-		name
-	);
+	const [ customDuotone, setCustomDuotone, customDuotoneEditProps ] =
+		usePaletteSetting< Duotone[] >( 'color.duotone.custom', name );
 
 	const [ defaultDuotoneEnabled ] = useSetting< boolean >(
 		'color.defaultDuotone',
@@ -94,6 +89,7 @@ export default function DuotonePalettePanel( {
 					duotones={ asArray( themeDuotone ) }
 					colorPalette={ colorPalette }
 					onChange={ setThemeDuotone }
+					{ ...themeDuotoneEditProps }
 					paletteLabel={ __( 'Theme' ) }
 					paletteLabelHeadingLevel={ 3 }
 					popoverProps={ popoverProps }
@@ -107,6 +103,7 @@ export default function DuotonePalettePanel( {
 						duotones={ asArray( defaultDuotone ) }
 						colorPalette={ colorPalette }
 						onChange={ setDefaultDuotone }
+						{ ...defaultDuotoneEditProps }
 						paletteLabel={ __( 'Default' ) }
 						paletteLabelHeadingLevel={ 3 }
 						popoverProps={ popoverProps }
@@ -116,6 +113,7 @@ export default function DuotonePalettePanel( {
 				duotones={ asArray( customDuotone ) }
 				colorPalette={ colorPalette }
 				onChange={ setCustomDuotone }
+				{ ...customDuotoneEditProps }
 				paletteLabel={ __( 'Custom' ) }
 				paletteLabelHeadingLevel={ 3 }
 				slugPrefix="custom-"
