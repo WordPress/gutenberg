@@ -103,21 +103,20 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 				! ( $has_background_gradient_support && $has_background_gradient_value ),
 		),
 	);
-	$color_attributes = array();
+	$attributes       = $block_attributes;
+	$has_color_styles = isset( $attributes['style']['color'] ) && is_array( $attributes['style']['color'] );
 
 	foreach ( $features as $feature => list( $preset_attribute, $is_allowed ) ) {
-		if ( ! $is_allowed ) {
+		if ( $is_allowed ) {
 			continue;
 		}
-		if ( array_key_exists( $preset_attribute, $block_attributes ) ) {
-			$color_attributes[ $preset_attribute ] = $block_attributes[ $preset_attribute ];
-		}
-		if ( isset( $block_attributes['style']['color'][ $feature ] ) ) {
-			$color_attributes['style']['color'][ $feature ] = $block_attributes['style']['color'][ $feature ];
+		unset( $attributes[ $preset_attribute ] );
+		if ( $has_color_styles ) {
+			unset( $attributes['style']['color'][ $feature ] );
 		}
 	}
 
-	$attributes = gutenberg_get_color_classes_and_styles( $color_attributes );
+	$classes_and_styles = gutenberg_get_color_classes_and_styles( $attributes );
 
 	/*
 	 * Mirror of the background support: a color clipped to the text paints the
@@ -126,18 +125,18 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 	$clips_to_text = 'text' === ( $block_attributes['style']['background']['backgroundClip'] ?? null ) &&
 		block_has_support( $block_type, array( 'background', 'backgroundClip' ), false ) &&
 		! wp_should_skip_block_supports_serialization( $block_type, 'background', 'backgroundClip' );
-	$has_gradient  = ! empty( $color_attributes['gradient'] ) || ! empty( $color_attributes['style']['color']['gradient'] );
+	$has_gradient  = ! empty( $attributes['gradient'] ) || ! empty( $attributes['style']['color']['gradient'] );
 
-	if ( $clips_to_text && ! $has_gradient && ! empty( $attributes['class'] ) ) {
-		$classes = array_diff( explode( ' ', $attributes['class'] ), array( 'has-background' ) );
+	if ( $clips_to_text && ! $has_gradient && ! empty( $classes_and_styles['class'] ) ) {
+		$classes = array_diff( explode( ' ', $classes_and_styles['class'] ), array( 'has-background' ) );
 		if ( empty( $classes ) ) {
-			unset( $attributes['class'] );
+			unset( $classes_and_styles['class'] );
 		} else {
-			$attributes['class'] = implode( ' ', $classes );
+			$classes_and_styles['class'] = implode( ' ', $classes );
 		}
 	}
 
-	return $attributes;
+	return $classes_and_styles;
 }
 
 /**
