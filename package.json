@@ -15,8 +15,19 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=20.10.0",
-		"npm": ">=10.2.3"
+		"node": ">=24.18.0",
+		"npm": ">=11.18.0"
+	},
+	"devEngines": {
+		"runtime": {
+			"name": "node",
+			"version": ">=24.18.0"
+		},
+		"packageManager": {
+			"name": "npm",
+			"version": ">=11.18.0",
+			"onFail": "error"
+		}
 	},
 	"config": {
 		"IS_GUTENBERG_PLUGIN": true
@@ -33,7 +44,6 @@
 		"@emotion/babel-plugin": "11.11.0",
 		"@emotion/is-prop-valid": "1.2.2",
 		"@emotion/jest": "11.7.1",
-		"@emotion/native": "11.0.0",
 		"@geometricpanda/storybook-addon-badges": "2.0.5",
 		"@inquirer/prompts": "7.2.0",
 		"@octokit/rest": "16.26.0",
@@ -41,9 +51,6 @@
 		"@octokit/webhooks-types": "5.8.0",
 		"@playwright/test": "1.55.0",
 		"@pmmmwh/react-refresh-webpack-plugin": "0.5.11",
-		"@react-native/babel-preset": "0.73.10",
-		"@react-native/metro-babel-transformer": "0.73.10",
-		"@react-native/metro-config": "0.73.4",
 		"@storybook/addon-a11y": "8.4.7",
 		"@storybook/addon-actions": "8.4.7",
 		"@storybook/addon-controls": "8.4.7",
@@ -60,7 +67,6 @@
 		"@storybook/types": "8.4.7",
 		"@testing-library/jest-dom": "5.16.5",
 		"@testing-library/react": "14.3.0",
-		"@testing-library/react-native": "12.4.3",
 		"@testing-library/user-event": "14.4.3",
 		"@types/eslint": "8.56.9",
 		"@types/estree": "1.0.5",
@@ -78,13 +84,10 @@
 		"@types/sprintf-js": "1.1.2",
 		"@types/uuid": "8.3.1",
 		"ajv": "8.7.1",
-		"appium": "2.0.0",
 		"autoprefixer": "10.4.21",
 		"babel-jest": "29.7.0",
 		"babel-loader": "9.2.1",
 		"babel-plugin-inline-json-import": "0.3.2",
-		"babel-plugin-react-native-classname-to-style": "1.2.2",
-		"babel-plugin-react-native-platform-specific-extensions": "1.1.1",
 		"babel-plugin-transform-remove-console": "6.9.4",
 		"benchmark": "2.1.4",
 		"browserslist": "4.25.1",
@@ -147,11 +150,8 @@
 		"react": "18.3.1",
 		"react-docgen-typescript": "2.2.2",
 		"react-dom": "18.3.1",
-		"react-native": "0.73.3",
-		"react-native-url-polyfill": "1.1.2",
 		"react-refresh": "0.14.0",
 		"react-scanner": "1.2.0",
-		"reassure": "0.7.1",
 		"redux": "5.0.1",
 		"resize-observer-polyfill": "1.5.1",
 		"rimraf": "5.0.10",
@@ -173,7 +173,6 @@
 		"toposort": "2.0.2",
 		"typescript": "5.7.2",
 		"uuid": "9.0.1",
-		"webdriverio": "8.16.20",
 		"webpack": "5.97.0",
 		"webpack-bundle-analyzer": "4.9.1"
 	},
@@ -214,7 +213,6 @@
 		"prelint:php": "npm run other:update-packages:php",
 		"lint:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script lint",
 		"lint:pkg-json": "wp-scripts lint-pkg-json . 'packages/*/package.json'",
-		"native": "npm run --prefix packages/react-native-editor",
 		"other:changelog": "node ./bin/plugin/cli.js changelog",
 		"other:check-licenses": "concurrently \"node ./bin/check-licenses.mjs\" \"wp-scripts check-licenses --dev\"",
 		"preother:check-local-changes": "npm run docs:build",
@@ -222,7 +220,7 @@
 		"other:cherry-pick": "node ./bin/cherry-pick.mjs",
 		"other:generate-php-sync-issue": "node ./bin/generate-php-sync-issue.mjs",
 		"other:update-packages:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer update --no-interaction",
-		"postinstall": "patch-package && node ./patches/patch-xcode.js",
+		"postinstall": "patch-package",
 		"prepare": "husky install",
 		"prepublishOnly": "npm run build",
 		"start": "npm run dev",
@@ -239,13 +237,6 @@
 		"test:e2e:playwright:debug": "npm run test:e2e:debug",
 		"test:e2e:storybook": "playwright test --config test/storybook-playwright/playwright.config.ts",
 		"test:e2e:watch": "npm run test:e2e -- --watch",
-		"test:native": "cross-env NODE_ENV=test jest --config test/native/jest.config.js",
-		"test:native:watch": "npm run test:native -- --watch",
-		"test:native:clean": "jest --clearCache --config test/native/jest.config.js; rm -rf $TMPDIR/jest_*",
-		"test:native:debug": "cross-env NODE_ENV=test node --inspect-brk node_modules/.bin/jest --runInBand --verbose --config test/native/jest.config.js",
-		"test:native:perf": "cross-env TEST_RUNNER_ARGS='--runInBand --config test/native/jest.config.js --testMatch \"**/performance/*.native.[jt]s?(x)\"' reassure",
-		"test:native:perf:baseline": "cross-env TEST_RUNNER_ARGS='--runInBand --config test/native/jest.config.js --testMatch \"**/performance/*.native.[jt]s?(x)\"' reassure --baseline",
-		"test:native:update": "npm run test:native -- --updateSnapshot",
 		"test:performance": "wp-scripts test-playwright --config test/performance/playwright.config.ts",
 		"test:performance:debug": "wp-scripts test-playwright --config test/performance/playwright.config.ts --debug",
 		"test:php": "npm-run-all lint:php test:unit:php",
@@ -301,6 +292,16 @@
 		]
 	},
 	"workspaces": [
-		"packages/*"
-	]
+		"packages/*",
+		"!packages/react-native-*"
+	],
+	"allowScripts": {
+		"@parcel/watcher": false,
+		"@swc/core": false,
+		"core-js": false,
+		"core-js-pure": false,
+		"esbuild": false,
+		"fsevents": false,
+		"nx": false
+	}
 }
