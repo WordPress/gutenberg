@@ -59,6 +59,7 @@ import {
 	filesizeField,
 	mediaDimensionsField,
 	mimeTypeField,
+	usedField,
 } from '@wordpress/media-fields';
 import { store as editorStore } from '../../store';
 import { ATTACHMENT_POST_TYPE, DESIGN_POST_TYPES } from '../../store/constants';
@@ -157,6 +158,7 @@ const ORDERED_MEDIA_FIELDS = [
 	filesizeField,
 	mediaDimensionsField,
 	attachedToField,
+	usedField,
 	// Regular layout fields (always visible).
 	titleField,
 	altTextField,

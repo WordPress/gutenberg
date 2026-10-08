@@ -16,6 +16,7 @@ This package exports field definitions for common media attachment properties:
 - `mediaDimensionsField` - Image dimensions (width × height)
 - `mediaThumbnailField` - Thumbnail preview
 - `mimeTypeField` - MIME type display
+- `usedField` - Whether the attachment is referenced somewhere on the site
 
 ### Using Media Fields in DataViews
 
