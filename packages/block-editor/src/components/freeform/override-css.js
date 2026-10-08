@@ -96,15 +96,14 @@ function getCanvasRules( {
  * inherited. It only governs the browser's own dragging, so it takes nothing
  * away from the text in a block that is kept whole.
  *
- * It has to be CSS rather than a cancelled `dragstart`, because the canvas is
- * mounted by the selection: with nothing selected yet there is no listener to
- * cancel anything, and the very first press on an image is carried off before
- * the editor has even selected it. That is the case this started from.
- *
- * It covers the block as well as its contents. On a canvas the block itself is
- * the drag handle, so the browser's own dragging of it has nothing left to do.
- * The toolbar's handle and the List View are unaffected: both spread their
- * draggable props onto their own elements, which are not the block.
+ * It stops at the block's contents and does not touch the block itself. The
+ * editor marks a block `draggable`, and that is what a press on an unselected
+ * block falls back to: the canvas is mounted by the selection, so on a cold
+ * press there is no canvas to take the gesture, and refusing the browser's
+ * drag as well left such a press doing nothing whatsoever. Suppressing the
+ * image alone is enough for the case this came from — a block already selected,
+ * where the canvas is mounted and the gesture is ready — and that is the case
+ * where the image was being carried off mid-drag.
  *
  * @param {string[]} clientIds Every block the canvas can move.
  * @return {string} CSS for the editor canvas.
@@ -117,7 +116,6 @@ export function getMoveModeCss( clientIds ) {
 			) => `#block-${ clientId }:not([contenteditable="true"]) {
 	cursor: move;
 	user-select: none;
-	-webkit-user-drag: none;
 }
 #block-${ clientId }:not([contenteditable="true"]) * {
 	-webkit-user-drag: none;
