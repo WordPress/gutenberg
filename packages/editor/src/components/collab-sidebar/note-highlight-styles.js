@@ -1,5 +1,7 @@
 import { useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import { useStyleOverride } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 import { getAvatarBorderColor, getNoteMarkerSelector } from './utils';
 
 // Hex alpha suffixes for the rest / active states. Kept low so the marker
@@ -63,9 +65,18 @@ export function buildHighlightCss( threads, selectedId = null ) {
  * @return {null} Renders nothing; styles are applied via `useStyleOverride`.
  */
 export function NoteHighlightStyles( { threads, selectedId } ) {
+	const currentUserId = useSelect(
+		( select ) => select( coreStore ).getCurrentUser()?.id,
+		[]
+	);
+	// An unsent note's draft marker is tinted like a thread of its author.
 	const css = useMemo(
-		() => buildHighlightCss( threads, selectedId ),
-		[ threads, selectedId ]
+		() =>
+			buildHighlightCss(
+				[ ...threads, { id: 'new', author: currentUserId } ],
+				selectedId
+			),
+		[ threads, selectedId, currentUserId ]
 	);
 	useStyleOverride( { id: 'core-note-highlights', css } );
 	return null;
