@@ -113,8 +113,8 @@ html.interface-interface-skeleton__html-container {
 	top: 0;
 	left: 0;
 	bottom: 0;
-	background: $white;
-	color: $gray-900;
+	background: var(--wpds-color-background-surface-neutral-strong);
+	color: var(--wpds-color-foreground-content-neutral);
 	width: auto; // Keep the sidebar width flexible.
 
 	// On Mobile the header is fixed to keep HTML as scrollable.
@@ -124,7 +124,7 @@ html.interface-interface-skeleton__html-container {
 }
 
 .interface-interface-skeleton__sidebar {
-	border-top: $border-width solid $gray-200;
+	border-top: $border-width solid var(--wpds-color-stroke-surface-neutral);
 	overflow: hidden;
 
 	@include break-medium() {
@@ -134,7 +134,7 @@ html.interface-interface-skeleton__html-container {
 }
 
 .interface-interface-skeleton__secondary-sidebar {
-	border-top: $border-width solid $gray-200;
+	border-top: $border-width solid var(--wpds-color-stroke-surface-neutral);
 	right: 0;
 
 	@include break-medium() {
