@@ -138,24 +138,18 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 						continue;
 					}
 
-					const attributes = getBlockAttributes( clientId );
-					const {
-						columnStart,
-						rowStart,
-						columnSpan,
-						rowSpan,
-						...layout
-					} = attributes.style?.layout ?? {};
+					const { style } = getBlockAttributes( clientId );
+					const nextStyle = removeRotation(
+						removeLayoutValues( style, [
+							'columnStart',
+							'rowStart',
+							'columnSpan',
+							'rowSpan',
+						] )
+					);
 
-					if ( columnStart || rowStart || columnSpan || rowSpan ) {
-						const hasEmptyLayoutAttribute =
-							Object.keys( layout ).length === 0;
-
-						updates[ clientId ] = setImmutably(
-							attributes,
-							[ 'style', 'layout' ],
-							hasEmptyLayoutAttribute ? undefined : layout
-						);
+					if ( nextStyle !== style ) {
+						updates[ clientId ] = { style: nextStyle };
 					}
 				}
 			}
@@ -163,20 +157,17 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 			// Remove all of the columnStart and rowStart values
 			// when switching from manual to auto mode,
 			if ( previousIsManualPlacement === true ) {
+				// Rotation is only available in manual mode, so it is removed too.
 				for ( const clientId of blockOrder ) {
-					const attributes = getBlockAttributes( clientId );
-					const { columnStart, rowStart, ...layout } =
-						attributes.style?.layout ?? {};
-					// Only update attributes if columnStart or rowStart are set.
-					if ( columnStart || rowStart ) {
-						const hasEmptyLayoutAttribute =
-							Object.keys( layout ).length === 0;
-
-						updates[ clientId ] = setImmutably(
-							attributes,
-							[ 'style', 'layout' ],
-							hasEmptyLayoutAttribute ? undefined : layout
-						);
+					const { style } = getBlockAttributes( clientId );
+					const nextStyle = removeRotation(
+						removeLayoutValues( style, [
+							'columnStart',
+							'rowStart',
+						] )
+					);
+					if ( nextStyle !== style ) {
+						updates[ clientId ] = { style: nextStyle };
 					}
 				}
 			}
@@ -214,6 +205,56 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 		getBlockRootClientId,
 		updateBlockAttributes,
 	] );
+}
+
+/**
+ * Removes child layout values from the default state of a block's style.
+ *
+ * @param {Object|undefined} style Block style attribute.
+ * @param {string[]}         keys  Child layout keys to remove.
+ *
+ * @return {Object|undefined} The updated style, or the same object if nothing was removed.
+ */
+export function removeLayoutValues( style, keys ) {
+	const layout = style?.layout;
+	if ( ! layout || ! keys.some( ( key ) => layout[ key ] !== undefined ) ) {
+		return style;
+	}
+	const nextLayout = Object.fromEntries(
+		Object.entries( layout ).filter( ( [ key ] ) => ! keys.includes( key ) )
+	);
+	return setImmutably(
+		style,
+		[ 'layout' ],
+		Object.keys( nextLayout ).length ? nextLayout : undefined
+	);
+}
+
+/**
+ * Removes rotation from a block's style, including any viewport overrides
+ * such as `style['@mobile'].layout.rotate`.
+ *
+ * @param {Object|undefined} style Block style attribute.
+ *
+ * @return {Object|undefined} The updated style, or the same object if there was no rotation.
+ */
+export function removeRotation( style ) {
+	if ( ! style ) {
+		return style;
+	}
+	let nextStyle = removeLayoutValues( style, [ 'rotate' ] );
+	for ( const state of Object.keys( style ) ) {
+		if ( ! state.startsWith( '@' ) ) {
+			continue;
+		}
+		const nextStateStyle = removeLayoutValues( style[ state ], [
+			'rotate',
+		] );
+		if ( nextStateStyle !== style[ state ] ) {
+			nextStyle = setImmutably( nextStyle, [ state ], nextStateStyle );
+		}
+	}
+	return nextStyle;
 }
 
 /**

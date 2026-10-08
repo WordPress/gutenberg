@@ -47,6 +47,7 @@ const CHILD_LAYOUT_KEYS = [
 	'columnSpan',
 	'rowStart',
 	'rowSpan',
+	'rotate',
 ];
 const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
@@ -288,24 +289,37 @@ export function getResponsiveLayoutStyles( {
 			const hasViewportPadding =
 				viewportStyle?.spacing &&
 				Object.hasOwn( viewportStyle.spacing, 'padding' );
+			const layoutType = getLayoutType( layout?.type || 'default' );
+			const stackingCSS =
+				viewport === '@mobile'
+					? layoutType?.getMobileStackingStyle?.( {
+							selector,
+							layout,
+						} )
+					: '';
 			if (
 				! hasViewportLayout &&
 				! hasViewportBlockGap &&
-				! hasViewportPadding
+				! hasViewportPadding &&
+				! stackingCSS
 			) {
 				return '';
 			}
 
-			const layoutType = getLayoutType( layout?.type || 'default' );
-			const viewportCSS = layoutType?.getLayoutStyle?.( {
-				blockName,
-				selector,
-				layout,
-				viewportOverrides: viewportLayout,
-				style: viewportStyle,
-				hasBlockGapSupport,
-				globalBlockGapValue,
-			} );
+			const viewportCSS = [
+				layoutType?.getLayoutStyle?.( {
+					blockName,
+					selector,
+					layout,
+					viewportOverrides: viewportLayout,
+					style: viewportStyle,
+					hasBlockGapSupport,
+					globalBlockGapValue,
+				} ),
+				stackingCSS,
+			]
+				.filter( Boolean )
+				.join( '' );
 
 			return viewportCSS ? `${ mediaQuery }{${ viewportCSS }}` : '';
 		} )

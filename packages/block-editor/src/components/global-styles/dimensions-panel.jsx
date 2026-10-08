@@ -407,6 +407,7 @@ export default function DimensionsPanel( {
 				rowStart: undefined,
 				columnSpan: undefined,
 				rowSpan: undefined,
+				rotate: undefined,
 			} ),
 			spacing: {
 				...previousValue?.spacing,
@@ -727,7 +728,7 @@ export default function DimensionsPanel( {
 
 	// Child Layout. There is no Global Styles inheritance model for the
 	// child-layout sub-keys (`selfStretch`, `flexSize`, `columnStart`,
-	// `rowStart`, `columnSpan`, `rowSpan`); they are per-block attributes
+	// `rowStart`, `columnSpan`, `rowSpan`, `rotate`); they are per-block attributes
 	// only. Render the local value directly so user-set overrides are
 	// reflected in the control rather than washed out by a misshapen
 	// inherited layout payload.

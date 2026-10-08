@@ -229,6 +229,75 @@ describe( 'layout', () => {
 			);
 		} );
 
+		it( 'stacks the children of a manual placement grid on mobile', () => {
+			expect(
+				getResponsiveLayoutStyles( {
+					attributes: {},
+					blockName: 'core/group',
+					selector: '.wp-container-test',
+					layout: {
+						type: 'grid',
+						isManualPlacement: true,
+						columnCount: 3,
+					},
+					hasBlockGapSupport: true,
+				} )
+			).toBe(
+				'@media (width <= 480px){.wp-container-test.wp-container-test > * { grid-column: 1 / -1; grid-row: auto; rotate: none; }}'
+			);
+		} );
+
+		it( 'combines mobile stacking with mobile layout overrides', () => {
+			expect(
+				getResponsiveLayoutStyles( {
+					attributes: {
+						style: {
+							'@mobile': { layout: { columnCount: 2 } },
+						},
+					},
+					blockName: 'core/group',
+					selector: '.wp-container-test',
+					layout: {
+						type: 'grid',
+						isManualPlacement: true,
+						columnCount: 3,
+					},
+					hasBlockGapSupport: true,
+				} )
+			).toBe(
+				'@media (width <= 480px){.wp-container-test { grid-template-columns: repeat(2, minmax(0, 1fr)); }.wp-container-test.wp-container-test > * { grid-column: 1 / -1; grid-row: auto; rotate: none; }}'
+			);
+		} );
+
+		it( 'does not stack a manual placement grid when stacking is turned off', () => {
+			expect(
+				getResponsiveLayoutStyles( {
+					attributes: {},
+					blockName: 'core/group',
+					selector: '.wp-container-test',
+					layout: {
+						type: 'grid',
+						isManualPlacement: true,
+						columnCount: 3,
+						stackOnMobile: false,
+					},
+					hasBlockGapSupport: true,
+				} )
+			).toBe( '' );
+		} );
+
+		it( 'does not stack auto placement grids', () => {
+			expect(
+				getResponsiveLayoutStyles( {
+					attributes: {},
+					blockName: 'core/group',
+					selector: '.wp-container-test',
+					layout: { type: 'grid', columnCount: 3 },
+					hasBlockGapSupport: true,
+				} )
+			).toBe( '' );
+		} );
+
 		it( 'generates responsive auto grid columns when column count is unset', () => {
 			expect(
 				getResponsiveLayoutStyles( {

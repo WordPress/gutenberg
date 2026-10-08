@@ -254,7 +254,7 @@ function gutenberg_get_layout_child_values( $layout ) {
 	return array_intersect_key(
 		$layout,
 		array_flip(
-			array( 'selfStretch', 'flexSize', 'columnStart', 'columnSpan', 'rowStart', 'rowSpan' )
+			array( 'selfStretch', 'flexSize', 'columnStart', 'columnSpan', 'rowStart', 'rowSpan', 'rotate' )
 		)
 	);
 }
@@ -273,7 +273,7 @@ function gutenberg_get_layout_container_values( $layout ) {
 	return array_diff_key(
 		$layout,
 		array_flip(
-			array( 'selfStretch', 'flexSize', 'columnStart', 'columnSpan', 'rowStart', 'rowSpan' )
+			array( 'selfStretch', 'flexSize', 'columnStart', 'columnSpan', 'rowStart', 'rowSpan', 'rotate' )
 		)
 	);
 }
@@ -413,6 +413,27 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 		} elseif ( $row_span ) {
 			$child_layout_declarations['grid-row'] = "span $row_span";
 		}
+	}
+
+	/*
+	 * Rotation is a number of degrees, wrapped into the (-180, 180] range. It uses the
+	 * `rotate` property rather than `transform` so that it combines with any transforms a
+	 * theme or block applies. In a viewport override, 0 undoes the default rotation.
+	 */
+	$rotate_attr = $child_layout['rotate'] ?? null;
+	$rotate      = null;
+	if ( is_numeric( $rotate_attr ) ) {
+		$rotate = round( fmod( fmod( (float) $rotate_attr, 360 ) + 360, 360 ), 2 );
+		if ( $rotate > 180 ) {
+			$rotate -= 360;
+		}
+	}
+	if ( null === $viewport_overrides ) {
+		if ( $rotate ) {
+			$child_layout_declarations['rotate'] = $rotate . 'deg';
+		}
+	} elseif ( $has_viewport_property_override( 'rotate' ) && null !== $rotate ) {
+		$child_layout_declarations['rotate'] = $rotate ? $rotate . 'deg' : 'none';
 	}
 
 	if ( ! empty( $child_layout_declarations ) ) {
@@ -1373,6 +1394,42 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			);
 
 			if ( ! empty( $viewport_styles ) && ! in_array( $container_class, $class_names, true ) ) {
+				$class_names[] = $container_class;
+			}
+		}
+
+		/*
+		 * Manual placement grids stack their children on mobile unless they opt out with
+		 * `stackOnMobile: false`: each child becomes full width, in block order, and unrotated.
+		 * The selector is repeated so that the rule beats each child's own placement rule,
+		 * whatever order the stylesheets end up in.
+		 */
+		$mobile_media_query = $responsive_media_queries['@mobile'] ?? null;
+		if (
+			$mobile_media_query &&
+			'grid' === ( $used_layout['type'] ?? null ) &&
+			! empty( $used_layout['isManualPlacement'] ) &&
+			false !== ( $used_layout['stackOnMobile'] ?? true )
+		) {
+			$stacking_styles = gutenberg_style_engine_get_stylesheet_from_css_rules(
+				array(
+					array(
+						'rules_group'  => $mobile_media_query,
+						'selector'     => ".$container_class.$container_class > *",
+						'declarations' => array(
+							'grid-column' => '1 / -1',
+							'grid-row'    => 'auto',
+							'rotate'      => 'none',
+						),
+					),
+				),
+				array(
+					'context'  => 'block-supports',
+					'prettify' => false,
+				)
+			);
+
+			if ( ! empty( $stacking_styles ) && ! in_array( $container_class, $class_names, true ) ) {
 				$class_names[] = $container_class;
 			}
 		}

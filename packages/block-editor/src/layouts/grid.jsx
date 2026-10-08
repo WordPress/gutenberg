@@ -340,6 +340,29 @@ export default {
 		}
 		return output;
 	},
+	/**
+	 * Gets the CSS that stacks the children of a manual placement grid on
+	 * mobile, unless the grid has opted out with `stackOnMobile: false`. Each
+	 * child becomes full width, in block order, and unrotated.
+	 *
+	 * @param {Object} options
+	 * @param {string} options.selector The grid's CSS selector.
+	 * @param {Object} options.layout   The grid's layout attribute.
+	 *
+	 * @return {string} CSS rule, without the media query.
+	 */
+	getMobileStackingStyle( { selector, layout = {} } ) {
+		if ( ! layout.isManualPlacement || layout.stackOnMobile === false ) {
+			return '';
+		}
+		// The selector is repeated so that the rule beats each child's own
+		// placement rule, whatever order the stylesheets end up in.
+		const childSelector = selector
+			.split( ',' )
+			.map( ( subselector ) => `${ subselector }${ subselector } > *` )
+			.join( ',' );
+		return `${ childSelector } { grid-column: 1 / -1; grid-row: auto; rotate: none; }`;
+	},
 	getOrientation() {
 		return 'horizontal';
 	},

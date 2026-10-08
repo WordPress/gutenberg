@@ -76,6 +76,7 @@ export function getChildLayoutStyleRules( {
 		rowStart,
 		columnSpan,
 		rowSpan,
+		rotate,
 	} = effectiveLayout;
 	const baseSelfStretch = layout.selfStretch;
 	const { columnCount, minimumColumnWidth } = parentLayout;
@@ -142,6 +143,15 @@ export function getChildLayoutStyleRules( {
 		} else if ( rowSpan ) {
 			declarations[ 'grid-row' ] = `span ${ rowSpan }`;
 		}
+	}
+
+	// The `rotate` property is used rather than `transform` so that it doesn't
+	// clash with the transforms the editor applies to animate block moves.
+	if ( ! hasViewportOverrides && rotate ) {
+		declarations.rotate = `${ rotate }deg`;
+	} else if ( hasViewportOverride( 'rotate' ) ) {
+		// In a viewport override, 0 undoes the rotation of the default state.
+		declarations.rotate = rotate ? `${ rotate }deg` : 'none';
 	}
 
 	if ( Object.keys( declarations ).length ) {
@@ -319,7 +329,7 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 		}
 	);
 	const layout = style?.layout ?? {};
-	const { columnStart, rowStart, columnSpan, rowSpan } = layout;
+	const { columnStart, rowStart, columnSpan, rowSpan, rotate } = layout;
 	const parentLayout = useLayout() || {};
 	const id = useInstanceId( LAYOUT_CHILD_BLOCK_PROPS_REFERENCE );
 	const selector = `.wp-container-content-${ id }`;
@@ -338,6 +348,9 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 		}
 		if ( rowSpan && typeof rowSpan !== 'number' ) {
 			throw new Error( 'rowSpan must be a number' );
+		}
+		if ( rotate && typeof rotate !== 'number' ) {
+			throw new Error( 'rotate must be a number' );
 		}
 	}
 

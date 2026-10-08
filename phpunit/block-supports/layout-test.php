@@ -745,6 +745,206 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Check that gutenberg_get_child_layout_style_rules() renders grid child rotation.
+	 *
+	 * @dataProvider data_gutenberg_get_child_layout_style_rules_rotation
+	 *
+	 * @covers ::gutenberg_get_child_layout_style_rules
+	 *
+	 * @param array      $child_layout       Child layout values.
+	 * @param array|null $viewport_overrides Optional child viewport layout overrides.
+	 * @param array      $expected_output    The expected output.
+	 */
+	public function test_gutenberg_get_child_layout_style_rules_rotation( $child_layout, $viewport_overrides, $expected_output ) {
+		$actual_output = gutenberg_get_child_layout_style_rules(
+			'.wp-container-content-test',
+			$child_layout,
+			array( 'columnCount' => 3 ),
+			$viewport_overrides
+		);
+
+		$this->assertSame( $expected_output, $actual_output );
+	}
+
+	/**
+	 * Data provider for test_gutenberg_get_child_layout_style_rules_rotation().
+	 *
+	 * @return array
+	 */
+	public function data_gutenberg_get_child_layout_style_rules_rotation() {
+		return array(
+			'rotation is output with grid placement'     => array(
+				'child_layout'       => array(
+					'columnStart' => 2,
+					'rowStart'    => 1,
+					'rotate'      => -15,
+				),
+				'viewport_overrides' => null,
+				'expected_output'    => array(
+					array(
+						'selector'     => '.wp-container-content-test',
+						'declarations' => array(
+							'grid-column' => '2',
+							'grid-row'    => '1',
+							'rotate'      => '-15deg',
+						),
+					),
+				),
+			),
+			'zero rotation is not output'                => array(
+				'child_layout'       => array( 'rotate' => 0 ),
+				'viewport_overrides' => null,
+				'expected_output'    => array(),
+			),
+			'rotation is wrapped into the stored range'  => array(
+				'child_layout'       => array( 'rotate' => 270 ),
+				'viewport_overrides' => null,
+				'expected_output'    => array(
+					array(
+						'selector'     => '.wp-container-content-test',
+						'declarations' => array(
+							'rotate' => '-90deg',
+						),
+					),
+				),
+			),
+			'numeric string rotation is accepted'        => array(
+				'child_layout'       => array( 'rotate' => '12.5' ),
+				'viewport_overrides' => null,
+				'expected_output'    => array(
+					array(
+						'selector'     => '.wp-container-content-test',
+						'declarations' => array(
+							'rotate' => '12.5deg',
+						),
+					),
+				),
+			),
+			'non-numeric rotation is ignored'            => array(
+				'child_layout'       => array( 'rotate' => '45deg; color: red' ),
+				'viewport_overrides' => null,
+				'expected_output'    => array(),
+			),
+			'viewport override changes the rotation'     => array(
+				'child_layout'       => array( 'rotate' => 30 ),
+				'viewport_overrides' => array( 'rotate' => 10 ),
+				'expected_output'    => array(
+					array(
+						'selector'     => '.wp-container-content-test',
+						'declarations' => array(
+							'rotate' => '10deg',
+						),
+					),
+				),
+			),
+			'viewport override of 0 resets the rotation' => array(
+				'child_layout'       => array( 'rotate' => 30 ),
+				'viewport_overrides' => array( 'rotate' => 0 ),
+				'expected_output'    => array(
+					array(
+						'selector'     => '.wp-container-content-test',
+						'declarations' => array(
+							'rotate' => 'none',
+						),
+					),
+				),
+			),
+			'viewport override without rotation leaves it alone' => array(
+				'child_layout'       => array( 'rotate' => 30 ),
+				'viewport_overrides' => array( 'columnStart' => 1 ),
+				'expected_output'    => array(
+					array(
+						'selector'     => '.wp-container-content-test',
+						'declarations' => array(
+							'grid-column' => '1',
+						),
+					),
+				),
+			),
+		);
+	}
+
+	/**
+	 * Check that manual placement grids stack their children on mobile, unless they opt out.
+	 *
+	 * @dataProvider data_layout_support_flag_stacks_manual_grids_on_mobile
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 *
+	 * @param array $layout         Grid layout attribute.
+	 * @param bool  $should_stack   Whether a stacking rule is expected.
+	 */
+	public function test_layout_support_flag_stacks_manual_grids_on_mobile( $layout, $should_stack ) {
+		switch_theme( 'default' );
+
+		$block_content = '<div class="wp-block-group"></div>';
+		$block         = array(
+			'blockName'    => 'core/group',
+			'attrs'        => array( 'layout' => $layout ),
+			'innerBlocks'  => array(),
+			'innerHTML'    => $block_content,
+			'innerContent' => array( $block_content ),
+		);
+
+		$output = gutenberg_render_layout_support_flag( $block_content, $block );
+		preg_match( '/wp-container-core-group-is-layout-[a-z0-9]+/', $output, $matches );
+		$this->assertNotEmpty( $matches, 'The grid should get a container class.' );
+		$container_class = $matches[0];
+
+		$stylesheet    = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+		$stacking_rule = ".$container_class.$container_class > *{grid-column:1 / -1;grid-row:auto;rotate:none;}";
+
+		if ( $should_stack ) {
+			$this->assertStringContainsString( '@media (width <= 480px){' . $stacking_rule, $stylesheet );
+		} else {
+			$this->assertStringNotContainsString( $stacking_rule, $stylesheet );
+		}
+	}
+
+	/**
+	 * Data provider for test_layout_support_flag_stacks_manual_grids_on_mobile().
+	 *
+	 * @return array
+	 */
+	public function data_layout_support_flag_stacks_manual_grids_on_mobile() {
+		return array(
+			'manual placement grid stacks by default' => array(
+				'layout'       => array(
+					'type'              => 'grid',
+					'isManualPlacement' => true,
+					'columnCount'       => 3,
+				),
+				'should_stack' => true,
+			),
+			'manual placement grid can opt out'       => array(
+				'layout'       => array(
+					'type'              => 'grid',
+					'isManualPlacement' => true,
+					'columnCount'       => 4,
+					'stackOnMobile'     => false,
+				),
+				'should_stack' => false,
+			),
+			'auto placement grid does not stack'      => array(
+				'layout'       => array(
+					'type'        => 'grid',
+					'columnCount' => 5,
+				),
+				'should_stack' => false,
+			),
+		);
+	}
+
+	/**
+	 * Check that the `rotate` declaration survives CSS sanitization.
+	 *
+	 * @covers ::gutenberg_add_rotate_to_safe_style_css
+	 */
+	public function test_rotate_is_a_safe_style_css_property() {
+		$this->assertSame( 'rotate:-15deg', safecss_filter_attr( 'rotate:-15deg' ) );
+	}
+
+	/**
 	 * Check that gutenberg_render_layout_support_flag() renders the correct classnames on the wrapper.
 	 *
 	 * @dataProvider data_layout_support_flag_renders_classnames_on_wrapper

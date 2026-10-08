@@ -166,6 +166,64 @@ describe( 'layout child', () => {
 		} );
 	} );
 
+	describe( 'rotation', () => {
+		it( 'outputs a rotate declaration for a rotated grid child', () => {
+			expect(
+				getChildLayoutStyleRules( {
+					selector: '.wp-container-content-test',
+					layout: { columnStart: 2, rowStart: 1, rotate: -15 },
+					parentLayout: { columnCount: 3 },
+				} )
+			).toEqual( [
+				{
+					selector: '.wp-container-content-test',
+					declarations: {
+						'grid-column': '2',
+						'grid-row': '1',
+						rotate: '-15deg',
+					},
+				},
+			] );
+		} );
+
+		it( 'does not output rotation of 0 in the default state', () => {
+			expect(
+				getChildLayoutStyleRules( {
+					selector: '.wp-container-content-test',
+					layout: { rotate: 0 },
+				} )
+			).toEqual( [] );
+		} );
+
+		it( 'resets rotation when a viewport override sets it to 0', () => {
+			expect(
+				getChildLayoutStyleRules( {
+					selector: '.wp-container-content-test',
+					layout: { columnStart: 2, rotate: 30 },
+					viewportOverrides: { rotate: 0 },
+				} )
+			).toEqual( [
+				{
+					selector: '.wp-container-content-test',
+					declarations: { rotate: 'none' },
+				},
+			] );
+		} );
+
+		it( 'outputs viewport rotation overrides in media queries', () => {
+			const css = getResponsiveChildLayoutStyles( {
+				style: {
+					layout: { rotate: 30 },
+					'@tablet': { layout: { rotate: 10 } },
+				},
+				selector: '.wp-container-content-test',
+			} );
+			expect( css ).toContain( '@media' );
+			expect( css ).toContain( 'rotate: 10deg' );
+			expect( css ).not.toContain( 'rotate: 30deg' );
+		} );
+	} );
+
 	describe( 'getUpdatedChildLayoutStyle()', () => {
 		it( 'stores resizer changes in the selected viewport when no default child layout exists', () => {
 			const style = getUpdatedChildLayoutStyle(
