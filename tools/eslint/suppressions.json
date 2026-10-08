@@ -4740,11 +4740,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/custom-select-control-v2/styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
 	"packages/components/src/date-time/date-picker/styles.ts": {
 		"no-restricted-imports": {
 			"count": 1
