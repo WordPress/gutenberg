@@ -47,6 +47,14 @@ export const SUGGESTION_TYPE_DELETION = 'del';
 export const SUGGESTION_TYPE_ADDITION = 'add';
 
 /**
+ * Suggested replacement: a note kind, not a marker kind. Typing over a
+ * selection writes an `add` run for the new text followed by a `del` run over
+ * the replaced text, both carrying the same note id, so the two halves are
+ * one suggestion that is accepted or rejected together.
+ */
+export const SUGGESTION_TYPE_REPLACEMENT = 'replace';
+
+/**
  * Suggested formatting change: the wrapped run's *text* is unchanged, but its
  * formatting (bold/italic/link/...) is proposed to change. The marked run holds
  * the proposed formatting so the editor shows it in place (single run, no
@@ -333,15 +341,24 @@ export function findSuggestionRange(
  * suggestion proposes to add or remove (e.g. `Add: "new text"` in the sidebar)
  * without storing the text in the suggestion payload.
  *
- * @param value Block attribute value (RichTextData, string, or other).
- * @param id    Suggestion id to search for.
+ * A replacement keeps its replaced text and its new text under one id; pass
+ * `type` to quote one side.
+ *
+ * @param value  Block attribute value (RichTextData, string, or other).
+ * @param id     Suggestion id to search for.
+ * @param [type] Only quote runs whose marker has this type.
  * @return The marked text, or '' when no marker is found.
  */
-export function findSuggestionText( value: any, id: number | string ): string {
+export function findSuggestionText(
+	value: any,
+	id: number | string,
+	type?: string
+): string {
 	return findMarkerText( value, {
 		formatType: SUGGESTION_FORMAT_NAME,
 		idAttribute: SUGGESTION_ID_ATTRIBUTE,
 		id,
 		quickReject: SUGGESTION_CLASS,
+		...( type && { match: { [ SUGGESTION_TYPE_ATTRIBUTE ]: type } } ),
 	} );
 }

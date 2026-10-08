@@ -8,6 +8,9 @@
  * - `add` (addition): proposed new text. Front-end strips the wrapper *and* the
  *   text until the suggestion is accepted.
  *
+ * A replacement (typing over a selection) is one note whose id is carried by an
+ * `add` run and the `del` run right after it.
+ *
  * The render-time strip (keep del-text, drop add-text, remove all wrappers) is
  * handled server-side by `gutenberg_strip_inline_suggestion_markers`
  * (`lib/compat/wordpress-7.1/block-suggestions.php`).
@@ -24,6 +27,7 @@ export {
 	SUGGESTION_TYPE_DELETION,
 	SUGGESTION_TYPE_ADDITION,
 	SUGGESTION_TYPE_FORMAT,
+	SUGGESTION_TYPE_REPLACEMENT,
 	suggestionFormat,
 	suggestionA11yFormat,
 	addSuggestionRoleFormats,
@@ -38,9 +42,15 @@ export {
 	rejectInlineDeletion,
 	acceptInlineAddition,
 	rejectInlineAddition,
+	acceptInlineReplacement,
+	rejectInlineReplacement,
 	acceptInlineFormat,
 	rejectInlineFormat,
 	insertInlineAddition,
+	removeInlineAdditionRange,
+	reviseOwnAddition,
+	deleteAcrossOwnMarkers,
+	findAdditionRange,
 	growInlineAddition,
 	buildSuggestionMarkerAttributes,
 	formatsRangeHasSuggestion,
@@ -63,4 +73,5 @@ export {
 	hasSuggestionMarkers,
 	stripSuggestionMarkers,
 	stripSuggestionMarkersFromAttributes,
+	settleInsertedSuggestionMarkers,
 } from './strip-markers';

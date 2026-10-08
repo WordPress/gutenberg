@@ -1,32 +1,29 @@
 /**
  * Suggestion-aware undo/redo for Suggest mode.
  *
- * Undoing right after making a suggestion must withdraw the suggestion —
- * not mangle it. Three problems stand in the way:
+ * Undoing right after making a suggestion must withdraw the suggestion, not
+ * mangle it. Two problems stand in the way:
  *
  *   1. The store interceptor can't tell an undo-induced tree change from a
  *      fresh user edit, so a plain Ctrl+Z would be re-captured as a brand-new
- *      suggestion (undoing a typed addition would spawn an attribute-set
- *      note; undoing a suggested insertion would spawn a removal note).
- *   2. Attribute suggestions never touch the undo stack at all: the proposed
- *      value lives in the suggestion overlay while the real store sits at
- *      baseline, so core undo has nothing to revert.
- *   3. Structural suggestions are compound state: the user's dispatch plus
+ *      suggestion (undoing a suggested insertion would spawn a removal note).
+ *   2. Structural suggestions are compound state: the user's dispatch plus
  *      the interceptor's compensating writes plus the async note linkage,
  *      spread across undo-history transactions that can't be guaranteed to
- *      merge (the linkage lands after the auto-save debounce, well past any
- *      history coalescing window). Leaving them to the undo stack withdraws
- *      the suggestion piecemeal — or resurrects the marker.
+ *      merge. Leaving them to the undo stack withdraws the suggestion
+ *      piecemeal, or resurrects the marker.
+ *
+ * Attribute proposals need neither: the HOC writes them into the block's
+ * marker as a persistent change, so Ctrl+Z pops the marker and the note
+ * collector trashes the note. They are history-owned, and they stamp the
+ * session's "last history-owned capture" sequence like inline markers do.
  *
  * This component wraps the core-data `undo` / `redo` actions while Suggest
- * intent is active. On undo it finds the most recently captured pending
- * suggestion held by the overlay and compares it against the newest inline
- * (marker) capture:
+ * intent is active. On undo it finds the most recent structural capture the
+ * session recorded and compares it against the newest history-owned
+ * capture:
  *
- *   - Newest is an attribute suggestion → the undo is consumed by reverting
- *     that overlay entry back to its baseline. The auto-saver then observes
- *     an empty operation set and trashes the linked note.
- *   - Newest is a structural move or insertion → the undo is consumed by
+ *   - Newest is a structural move or insertion: the undo is consumed by
  *     withdrawing it the way Reject restores the block (remove a suggested
  *     insertion; move a suggested move back to its origin, clearing its
  *     marker), as history-ignored writes so the withdrawal can't itself be
@@ -35,11 +32,12 @@
  *     revert cleanly through the real undo stack (see HISTORY_OWNED_OPS), and
  *     while one is pending and newest the guard stands aside entirely so undo
  *     keeps running newest-first.
- *   - Otherwise (inline text/format markers live in block content and undo
- *     cleanly) it arms an "adoption token" (see overlay-context) and lets
- *     the real undo run. The store interceptor consumes the token when the
- *     resulting block change lands and adopts it as the new baseline instead
- *     of capturing it; note cleanup again falls to `SuggestionNoteGC`.
+ *   - Otherwise (inline markers and attribute proposals live in block
+ *     content and undo cleanly) it arms an "adoption token" (see
+ *     suggestion-session) and lets the real undo run. The store interceptor
+ *     consumes the token when the resulting block change lands and adopts it
+ *     as the new baseline instead of capturing it; note cleanup again falls
+ *     to `SuggestionNoteGC`.
  *
  * The wrap targets `registry.dispatch( coreStore )`: the `core/editor` undo
  * and redo actions are thunks that resolve `dispatch( coreStore ).undo()` at
@@ -50,17 +48,21 @@
  * Known limitation: a swallowed undo doesn't consume the underlying history
  * item of the original structural dispatch; a follow-up Ctrl+Z replays that
  * item, which is a no-op against the already-withdrawn state. Redo cannot
- * re-open a withdrawn attribute or structural suggestion; an inline marker
- * restored by redo gets its note back via `SuggestionNoteGC`.
+ * re-open a withdrawn structural suggestion; an inline marker or attribute
+ * proposal restored by redo gets its note back via `SuggestionNoteGC`.
  */
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 // @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useSuggestionOverlay } from './overlay-context';
-import type { OverlayEntry } from './overlay-context';
-import { operationsFromOverlay } from './provider';
+import { useSuggestionSession } from './suggestion-session';
+import type { StructuralCapture } from './suggestion-session';
+import {
+	PENDING_ATTRIBUTES,
+	proposedAttributes,
+	readSuggestionMarker,
+} from './marker';
 import { removeNoteIdFromMetadata } from '../collab-sidebar/utils';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { store as editorStore } from '../../store';
@@ -68,7 +70,7 @@ import { unlock } from '../../lock-unlock';
 
 /*
  * The pending marker each structural op leaves on its block. A candidate whose
- * marker is gone has already been resolved or withdrawn, so the overlay entry
+ * marker is gone has already been resolved or withdrawn, so the capture
  * behind it is stale.
  */
 const PENDING_MARKER_BY_OP: Record< string, string > = {
@@ -94,75 +96,51 @@ const PENDING_MARKER_BY_OP: Record< string, string > = {
 const HISTORY_OWNED_OPS = new Set( [ 'block-remove' ] );
 
 /**
- * Find the newest pending suggestion the overlay is holding: the entry
- * (attribute edit or structural op) with the highest capture sequence.
- * Attribute candidates need a pending baseline-vs-overlay diff; structural
- * candidates need their pending marker still live on the block.
+ * Find the newest structural suggestion the session captured: the capture
+ * with the highest sequence whose pending marker is still live on the block.
  *
- * The `kind` says who reverts it. `attribute` and `structural` are withdrawn by
- * the guard; `history` means the newest suggestion belongs to the real undo
- * stack, so the guard must stand aside rather than reach past it for an older
- * one it could withdraw.
+ * The `kind` says who reverts it. `structural` is withdrawn by the guard;
+ * `history` means the newest suggestion belongs to the real undo stack, so
+ * the guard must stand aside rather than reach past it for an older one it
+ * could withdraw.
  *
- * @param entries     Overlay entries keyed by clientId.
+ * @param captures    Structural captures keyed by clientId.
  * @param blockEditor Block-editor selectors; without them (unit tests,
- *                    standalone) structural candidates are skipped.
+ *                    standalone) every candidate is skipped.
  * @return Newest pending suggestion, or null.
  */
 export function findNewestPendingSuggestion(
-	entries: Record< string, any > | null | undefined,
+	captures: ReadonlyMap< string, StructuralCapture > | null | undefined,
 	blockEditor: any
 ): {
-	kind: 'attribute' | 'structural' | 'history';
+	kind: 'structural' | 'history';
 	clientId: string;
-	entry: any;
+	capture: StructuralCapture;
 	seq: number;
 } | null {
 	let newest: {
-		kind: 'attribute' | 'structural' | 'history';
+		kind: 'structural' | 'history';
 		clientId: string;
-		entry: any;
+		capture: StructuralCapture;
 		seq: number;
 	} | null = null;
-	for ( const [ clientId, entry ] of Object.entries( entries ?? {} ) ) {
-		if (
-			entry.lastEditSeq &&
-			( ! newest || entry.lastEditSeq > newest.seq )
-		) {
-			const operations = operationsFromOverlay(
-				entry.baselineAttributes,
-				entry.overlayAttributes
-			);
-			if ( operations.length > 0 ) {
-				newest = {
-					kind: 'attribute',
-					clientId,
-					entry,
-					seq: entry.lastEditSeq,
-				};
-			}
+	for ( const [ clientId, capture ] of captures ?? [] ) {
+		const pendingType = PENDING_MARKER_BY_OP[ capture.op.type ];
+		if ( ! pendingType || ( newest && capture.seq <= newest.seq ) ) {
+			continue;
 		}
-		if (
-			entry.structuralOp &&
-			entry.structuralOpSeq &&
-			PENDING_MARKER_BY_OP[ entry.structuralOp.type ] &&
-			( ! newest || entry.structuralOpSeq > newest.seq )
-		) {
-			const markerType =
-				blockEditor?.getBlockAttributes?.( clientId )?.metadata
-					?.suggestion?.type;
-			if (
-				markerType === PENDING_MARKER_BY_OP[ entry.structuralOp.type ]
-			) {
-				newest = {
-					kind: HISTORY_OWNED_OPS.has( entry.structuralOp.type )
-						? 'history'
-						: 'structural',
-					clientId,
-					entry,
-					seq: entry.structuralOpSeq,
-				};
-			}
+		const markerType = readSuggestionMarker(
+			blockEditor?.getBlockAttributes?.( clientId )
+		)?.type;
+		if ( markerType === pendingType ) {
+			newest = {
+				kind: HISTORY_OWNED_OPS.has( capture.op.type )
+					? 'history'
+					: 'structural',
+				clientId,
+				capture,
+				seq: capture.seq,
+			};
 		}
 	}
 	return newest;
@@ -186,10 +164,31 @@ function withdrawnMarkerAttributes(
 	if ( ! meta || meta.suggestion === undefined ) {
 		return null;
 	}
-	const { suggestion: _drop, ...rest } = meta;
+	const { suggestion, ...rest } = meta;
 	const metadata = commentId
 		? removeNoteIdFromMetadata( rest, commentId as any )
 		: rest;
+	/*
+	 * An attribute proposal that rode along on the structural marker is an
+	 * older suggestion than the structural one being withdrawn: it stays,
+	 * as its own marker. The withdrawn note is collected; auto-save opens a
+	 * fresh one for what is left.
+	 */
+	const after = proposedAttributes(
+		readSuggestionMarker( { metadata: meta } )
+	);
+	if ( after ) {
+		return {
+			metadata: {
+				...metadata,
+				suggestion: {
+					type: PENDING_ATTRIBUTES,
+					authorId: suggestion.authorId ?? null,
+					after,
+				},
+			},
+		};
+	}
 	return { metadata };
 }
 
@@ -201,13 +200,12 @@ function withdrawnMarkerAttributes(
  */
 export default function SuggestionUndoGuard() {
 	const {
-		entries,
-		setOverlayAttributes,
-		clearOverlay,
+		getStructuralCaptures,
+		clearStructuralCapture,
 		requestInterceptorBypass,
 		getLastContentCaptureSeq,
 		armUndoRedoAdoption,
-	} = useSuggestionOverlay();
+	} = useSuggestionSession();
 	const registry = useRegistry();
 
 	const isSuggestMode = useSelect(
@@ -219,23 +217,19 @@ export default function SuggestionUndoGuard() {
 	);
 
 	// Read from inside the wrapped dispatch, which outlives any single render.
-	const entriesRef = useRef( entries );
-	entriesRef.current = entries;
-
-	const setOverlayAttributesRef = useRef( setOverlayAttributes );
-	setOverlayAttributesRef.current = setOverlayAttributes;
-
-	const clearOverlayRef = useRef( clearOverlay );
-	clearOverlayRef.current = clearOverlay;
+	const clearStructuralCaptureRef = useRef( clearStructuralCapture );
+	clearStructuralCaptureRef.current = clearStructuralCapture;
 
 	const requestInterceptorBypassRef = useRef( requestInterceptorBypass );
 	requestInterceptorBypassRef.current = requestInterceptorBypass;
 
 	/*
-	 * Tell the Undo button when there is a suggestion to withdraw. An
-	 * attribute suggestion leaves no core-data history, so without this the
-	 * button stays inert and never reaches the wrapped `undo` below. A
-	 * `history` candidate is left to the real stack, which already reports it.
+	 * Tell the Undo button when there is a suggestion to withdraw. A
+	 * structural capture's compensating writes are history-ignored, so
+	 * without this the button can stay inert and never reach the wrapped
+	 * `undo` below. A `history` candidate is left to the real stack, which
+	 * already reports it. Captures live in a ref; every capture comes with a
+	 * marker write to the block-editor store, which is what re-runs this.
 	 */
 	const hasWithdrawableSuggestion = useSelect(
 		( select ) => {
@@ -243,12 +237,12 @@ export default function SuggestionUndoGuard() {
 				return false;
 			}
 			const newest = findNewestPendingSuggestion(
-				entries,
+				getStructuralCaptures(),
 				select( blockEditorStore )
 			);
 			return !! newest && newest.kind !== 'history';
 		},
-		[ isSuggestMode, entries ]
+		[ isSuggestMode, getStructuralCaptures ]
 	);
 	const { setHasSuggestionUndo } = unlock( useDispatch( editorStore ) );
 	useEffect( () => {
@@ -270,23 +264,6 @@ export default function SuggestionUndoGuard() {
 		}
 
 		/*
-		 * Revert the entry to its baseline (rather than clearing it): the
-		 * auto-saver's own lifecycle then observes an empty operation set for
-		 * the entry and trashes the linked note, correctly serialized behind
-		 * any in-flight create for the same block.
-		 */
-		const cancelAttributeSuggestion = (
-			clientId: string,
-			entry: OverlayEntry
-		) => {
-			const revert: Record< string, any > = {};
-			for ( const key of Object.keys( entry.overlayAttributes ) ) {
-				revert[ key ] = entry.baselineAttributes?.[ key ];
-			}
-			setOverlayAttributesRef.current( clientId, revert );
-		};
-
-		/*
 		 * Withdraw a structural suggestion the way Reject restores the block.
 		 * The writes are marked `history: 'ignore'`: the withdrawal resolves
 		 * a suggestion, it is not an edit — recording it would let a later
@@ -296,7 +273,7 @@ export default function SuggestionUndoGuard() {
 		 */
 		const withdrawStructuralSuggestion = (
 			clientId: string,
-			entry: OverlayEntry
+			capture: StructuralCapture
 		) => {
 			const blockEditor = registry.select( blockEditorStore );
 			const {
@@ -305,12 +282,11 @@ export default function SuggestionUndoGuard() {
 				updateBlockAttributes,
 				__unstableMarkNextChangeAsNotPersistent: markIgnored,
 			} = registry.dispatch( blockEditorStore );
-			// Only ever called for a structural candidate, which requires a
-			// captured structural op.
-			const op = entry.structuralOp!;
+			const op = capture.op;
+			const attributes = blockEditor.getBlockAttributes( clientId );
 			const clearAttrs = withdrawnMarkerAttributes(
-				blockEditor.getBlockAttributes( clientId ),
-				entry.commentId
+				attributes,
+				readSuggestionMarker( attributes )?.commentId ?? null
 			);
 
 			requestInterceptorBypassRef.current( clientId );
@@ -335,20 +311,20 @@ export default function SuggestionUndoGuard() {
 					);
 				} );
 			}
-			clearOverlayRef.current( clientId );
+			clearStructuralCaptureRef.current( clientId );
 		};
 
 		/*
-		 * Consume the undo when the most recent capture is an overlay-held
-		 * suggestion newer than the last inline (marker) capture; inline
-		 * markers live in block content and are correctly reverted by the
-		 * real undo stack.
+		 * Consume the undo when the most recent capture is a structural one
+		 * newer than the last history-owned capture; inline markers and
+		 * attribute proposals live in block content and are correctly
+		 * reverted by the real undo stack.
 		 *
 		 * @return {boolean} True when the undo was consumed.
 		 */
 		const withdrawNewestSuggestion = () => {
 			const newest = findNewestPendingSuggestion(
-				entriesRef.current,
+				getStructuralCaptures(),
 				registry.select( blockEditorStore )
 			);
 			/*
@@ -364,11 +340,7 @@ export default function SuggestionUndoGuard() {
 			) {
 				return false;
 			}
-			if ( newest.kind === 'structural' ) {
-				withdrawStructuralSuggestion( newest.clientId, newest.entry );
-			} else {
-				cancelAttributeSuggestion( newest.clientId, newest.entry );
-			}
+			withdrawStructuralSuggestion( newest.clientId, newest.capture );
 			return true;
 		};
 
@@ -407,6 +379,7 @@ export default function SuggestionUndoGuard() {
 		isSuggestMode,
 		registry,
 		getLastContentCaptureSeq,
+		getStructuralCaptures,
 		armUndoRedoAdoption,
 	] );
 

@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { act, render } from '@testing-library/react';
 import {
 	createReduxStore,
@@ -10,14 +10,18 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
 // @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { createBlock, registerBlockType } from '@wordpress/blocks';
+import {
+	createBlock,
+	registerBlockType,
+	unregisterBlockType,
+} from '@wordpress/blocks';
 import SuggestionUndoGuard, {
 	findNewestPendingSuggestion,
 } from '../suggestion-undo-guard';
 import {
-	SuggestionOverlayProvider,
-	useSuggestionOverlay,
-} from '../overlay-context';
+	SuggestionSessionProvider,
+	useSuggestionSession,
+} from '../suggestion-session';
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -27,119 +31,76 @@ vi.hoisted( () => {
 	globalThis.wpVitest.mockMatchMedia();
 } );
 
+const captures = ( entries: Record< string, any > ) =>
+	new Map( Object.entries( entries ) );
+
 describe( 'findNewestPendingSuggestion', () => {
 	it( 'returns null when nothing is pending', () => {
-		expect( findNewestPendingSuggestion( {}, null ) ).toBeNull();
+		expect( findNewestPendingSuggestion( new Map(), null ) ).toBeNull();
 		expect( findNewestPendingSuggestion( undefined, null ) ).toBeNull();
 	} );
 
-	it( 'ignores entries whose overlay equals their baseline', () => {
-		const entries = {
+	it( 'includes a structural capture only while its pending marker is live', () => {
+		const recorded = captures( {
 			'block-1': {
-				baselineAttributes: { level: 2 },
-				overlayAttributes: { level: 2 },
-				lastEditSeq: 5,
+				op: { type: 'block-move' },
+				blockName: 'core/paragraph',
+				seq: 9,
 			},
-		};
-		expect( findNewestPendingSuggestion( entries, null ) ).toBeNull();
-	} );
-
-	it( 'ignores unstamped attribute entries', () => {
-		const entries = {
-			'block-1': {
-				baselineAttributes: { level: 2 },
-				overlayAttributes: { level: 3 },
-			},
-		};
-		expect( findNewestPendingSuggestion( entries, null ) ).toBeNull();
-	} );
-
-	it( 'picks the most recently edited pending attribute entry', () => {
-		const entries = {
-			'block-1': {
-				baselineAttributes: { level: 2 },
-				overlayAttributes: { level: 3 },
-				lastEditSeq: 4,
-			},
-			'block-2': {
-				baselineAttributes: { content: 'A' },
-				overlayAttributes: { content: 'B' },
-				lastEditSeq: 8,
-			},
-		};
-		expect( findNewestPendingSuggestion( entries, null ) ).toEqual( {
-			kind: 'attribute',
-			clientId: 'block-2',
-			entry: entries[ 'block-2' ],
-			seq: 8,
 		} );
-	} );
-
-	it( 'includes a structural entry only while its pending marker is live', () => {
-		const entries = {
-			'block-1': {
-				baselineAttributes: {},
-				overlayAttributes: {},
-				structuralOp: { type: 'block-move' },
-				structuralOpSeq: 9,
-			},
-		};
 		const withMarker = {
 			getBlockAttributes: () => ( {
 				metadata: { suggestion: { type: 'pending-move' } },
 			} ),
 		};
-		expect( findNewestPendingSuggestion( entries, withMarker ) ).toEqual( {
+		expect( findNewestPendingSuggestion( recorded, withMarker ) ).toEqual( {
 			kind: 'structural',
 			clientId: 'block-1',
-			entry: entries[ 'block-1' ],
+			capture: recorded.get( 'block-1' ),
 			seq: 9,
 		} );
 
-		// Marker gone (already resolved or withdrawn): stale overlay state,
-		// not a candidate.
+		// Marker gone (already resolved or withdrawn): a stale capture, not
+		// a candidate.
 		const withoutMarker = {
 			getBlockAttributes: () => ( { metadata: {} } ),
 		};
 		expect(
-			findNewestPendingSuggestion( entries, withoutMarker )
+			findNewestPendingSuggestion( recorded, withoutMarker )
 		).toBeNull();
 	} );
 
 	it( 'marks a block-remove as owned by the real undo stack', () => {
-		const entries = {
+		const recorded = captures( {
 			'block-1': {
-				baselineAttributes: {},
-				overlayAttributes: {},
-				structuralOp: { type: 'block-remove' },
-				structuralOpSeq: 9,
+				op: { type: 'block-remove' },
+				blockName: 'core/paragraph',
+				seq: 9,
 			},
-		};
+		} );
 		const blockEditor = {
 			getBlockAttributes: () => ( {
 				metadata: { suggestion: { type: 'pending-remove' } },
 			} ),
 		};
 		expect(
-			findNewestPendingSuggestion( entries, blockEditor )
+			findNewestPendingSuggestion( recorded, blockEditor )
 		).toMatchObject( { kind: 'history', clientId: 'block-1', seq: 9 } );
 	} );
 
 	it( 'lets a stale block-remove fall away once its marker is gone', () => {
-		const entries = {
+		const recorded = captures( {
 			'block-1': {
-				baselineAttributes: {},
-				overlayAttributes: {},
-				structuralOp: { type: 'block-remove' },
-				structuralOpSeq: 9,
+				op: { type: 'block-remove' },
+				blockName: 'core/paragraph',
+				seq: 9,
 			},
 			'block-2': {
-				baselineAttributes: {},
-				overlayAttributes: {},
-				structuralOp: { type: 'block-insert-after' },
-				structuralOpSeq: 4,
+				op: { type: 'block-insert-after' },
+				blockName: 'core/paragraph',
+				seq: 4,
 			},
-		};
+		} );
 		// The removal has already been reverted through history; only the
 		// insertion still carries a live marker.
 		const blockEditor = {
@@ -153,49 +114,23 @@ describe( 'findNewestPendingSuggestion', () => {
 					: { metadata: {} },
 		};
 		expect(
-			findNewestPendingSuggestion( entries, blockEditor )
+			findNewestPendingSuggestion( recorded, blockEditor )
 		).toMatchObject( { kind: 'structural', clientId: 'block-2', seq: 4 } );
 	} );
 
-	it( 'orders attribute and structural candidates by capture sequence', () => {
-		const entries = {
-			'block-1': {
-				baselineAttributes: { level: 2 },
-				overlayAttributes: { level: 3 },
-				lastEditSeq: 12,
-			},
-			'block-2': {
-				baselineAttributes: {},
-				overlayAttributes: {},
-				structuralOp: { type: 'block-move' },
-				structuralOpSeq: 7,
-			},
-		};
-		const blockEditor = {
-			getBlockAttributes: () => ( {
-				metadata: { suggestion: { type: 'pending-move' } },
-			} ),
-		};
-		expect(
-			findNewestPendingSuggestion( entries, blockEditor )
-		).toMatchObject( { kind: 'attribute', clientId: 'block-1' } );
-	} );
-
 	it( 'lets a newer block-remove shadow an older withdrawable suggestion', () => {
-		const entries = {
+		const recorded = captures( {
 			'inserted-block': {
-				baselineAttributes: {},
-				overlayAttributes: {},
-				structuralOp: { type: 'block-insert-after' },
-				structuralOpSeq: 4,
+				op: { type: 'block-insert-after' },
+				blockName: 'core/paragraph',
+				seq: 4,
 			},
 			'doomed-block': {
-				baselineAttributes: {},
-				overlayAttributes: {},
-				structuralOp: { type: 'block-remove' },
-				structuralOpSeq: 5,
+				op: { type: 'block-remove' },
+				blockName: 'core/paragraph',
+				seq: 5,
 			},
-		};
+		} );
 		const blockEditor = {
 			getBlockAttributes: ( clientId: string ) => ( {
 				metadata: {
@@ -211,36 +146,12 @@ describe( 'findNewestPendingSuggestion', () => {
 		// Newest-first: the removal is the newer action, so the guard must
 		// report it rather than the insertion it could withdraw itself.
 		expect(
-			findNewestPendingSuggestion( entries, blockEditor )
+			findNewestPendingSuggestion( recorded, blockEditor )
 		).toMatchObject( {
 			kind: 'history',
 			clientId: 'doomed-block',
 			seq: 5,
 		} );
-	} );
-
-	it( 'lets a newer block-remove shadow an older attribute suggestion', () => {
-		const entries = {
-			'heading-block': {
-				baselineAttributes: { level: 2 },
-				overlayAttributes: { level: 3 },
-				lastEditSeq: 4,
-			},
-			'doomed-block': {
-				baselineAttributes: {},
-				overlayAttributes: {},
-				structuralOp: { type: 'block-remove' },
-				structuralOpSeq: 5,
-			},
-		};
-		const blockEditor = {
-			getBlockAttributes: () => ( {
-				metadata: { suggestion: { type: 'pending-remove' } },
-			} ),
-		};
-		expect(
-			findNewestPendingSuggestion( entries, blockEditor )
-		).toMatchObject( { kind: 'history', clientId: 'doomed-block' } );
 	} );
 } );
 
@@ -274,7 +185,7 @@ describe( 'SuggestionUndoGuard', () => {
 
 		const overlay: { current: any } = { current: null };
 		function Probe() {
-			overlay.current = useSuggestionOverlay();
+			overlay.current = useSuggestionSession();
 			return null;
 		}
 		render(
@@ -282,7 +193,7 @@ describe( 'SuggestionUndoGuard', () => {
 				RegistryProvider,
 				{ value: registry },
 				createElement(
-					SuggestionOverlayProvider,
+					SuggestionSessionProvider,
 					null,
 					createElement( SuggestionUndoGuard ),
 					createElement( Probe )
@@ -314,36 +225,162 @@ describe( 'SuggestionUndoGuard', () => {
 		expect( overlay.current.consumeUndoRedoAdoption() ).toBe( false );
 	} );
 
-	it( 'reports a withdrawable suggestion so Undo is offered without core history', () => {
+	// Registered once for the whole suite: tests run in a shuffled order
+	// in CI, so no test may depend on an earlier one having registered it.
+	beforeAll( () => {
 		registerBlockType( 'test/undo-guard', {
 			apiVersion: 3,
 			title: 'Test',
 			category: 'text',
-			attributes: { level: { type: 'number', default: 2 } },
+			attributes: {
+				level: { type: 'number', default: 2 },
+				metadata: { type: 'object' },
+			},
 			save: () => null,
 		} );
-		const block = createBlock( 'test/undo-guard' );
-		const { registry, overlay } = setup( { blocks: [ block ] } );
+	} );
+
+	afterAll( () => {
+		unregisterBlockType( 'test/undo-guard' );
+	} );
+
+	it( 'reports a withdrawable structural suggestion so Undo is offered without core history', () => {
+		const anchor = createBlock( 'test/undo-guard' );
+		const block = createBlock( 'test/undo-guard', {
+			metadata: {
+				suggestion: {
+					type: 'pending-move',
+					fromAnchorClientId: null,
+					fromParentClientId: null,
+					fromIndex: 0,
+				},
+			},
+		} );
+		const { registry, overlay } = setup( { blocks: [ anchor, block ] } );
 		const editor = unlock( registry.select( editorStore ) );
 		expect( editor.hasSuggestionUndo() ).toBe( false );
 
 		act( () => {
-			overlay.current.captureBaseline(
+			overlay.current.recordStructuralCapture(
 				block.clientId,
 				'test/undo-guard',
 				{
-					level: 2,
+					type: 'block-move',
+					clientId: block.clientId,
+					fromAnchorClientId: null,
+					fromParentClientId: null,
+					fromIndex: 0,
 				}
 			);
-			overlay.current.setOverlayAttributes( block.clientId, {
-				level: 3,
-			} );
+			// The capture is a ref; the marker write is what re-renders.
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( block.clientId, { level: 3 } );
 		} );
 		expect( editor.hasSuggestionUndo() ).toBe( true );
 
 		act( () => {
 			( registry.dispatch( 'core' ) as any ).undo();
 		} );
+		// Withdrawn the way Reject does it: marker gone, block back at its
+		// origin, capture dropped, real undo untouched.
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( block.clientId )?.metadata?.suggestion
+		).toBeUndefined();
+		expect( registry.select( blockEditorStore ).getBlockOrder() ).toEqual( [
+			block.clientId,
+			anchor.clientId,
+		] );
+		expect(
+			overlay.current.getStructuralCaptures().has( block.clientId )
+		).toBe( false );
+		expect( ( registry.dispatch( 'core' ) as any ).undo ).not.toBe(
+			undefined
+		);
 		expect( editor.hasSuggestionUndo() ).toBe( false );
+	} );
+
+	it( 'withdrawing a move keeps the proposal that rode on it as its own marker', () => {
+		const anchor = createBlock( 'test/undo-guard' );
+		const block = createBlock( 'test/undo-guard', {
+			metadata: {
+				noteId: [ 9 ],
+				suggestion: {
+					type: 'pending-move',
+					authorId: 4,
+					commentId: 9,
+					fromAnchorClientId: null,
+					fromParentClientId: null,
+					fromIndex: 0,
+					after: { level: 3 },
+				},
+			},
+		} );
+		const { registry, overlay } = setup( { blocks: [ anchor, block ] } );
+		act( () => {
+			overlay.current.recordStructuralCapture(
+				block.clientId,
+				'test/undo-guard',
+				{
+					type: 'block-move',
+					clientId: block.clientId,
+					fromAnchorClientId: null,
+					fromParentClientId: null,
+					fromIndex: 0,
+				}
+			);
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( block.clientId, { level: 2 } );
+		} );
+		act( () => {
+			( registry.dispatch( 'core' ) as any ).undo();
+		} );
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( block.clientId )?.metadata
+		).toEqual( {
+			suggestion: {
+				type: 'pending-attributes',
+				authorId: 4,
+				after: { level: 3 },
+			},
+		} );
+	} );
+
+	it( 'stands aside when the newest capture is an attribute proposal (history-owned)', () => {
+		const block = createBlock( 'test/undo-guard', {
+			metadata: { suggestion: { type: 'pending-move', fromIndex: 0 } },
+		} );
+		const { registry, overlay } = setup( {
+			hasUndo: true,
+			blocks: [ block ],
+		} );
+		const core: any = registry.dispatch( 'core' );
+
+		act( () => {
+			overlay.current.recordStructuralCapture(
+				block.clientId,
+				'test/undo-guard',
+				{ type: 'block-move', clientId: block.clientId, fromIndex: 0 }
+			);
+			// The HOC stamps its proposal write above the structural capture.
+			overlay.current.noteHistoryCapture();
+		} );
+
+		act( () => {
+			core.undo();
+		} );
+		// The real undo ran (and armed an adoption); the move stays pending.
+		expect( overlay.current.consumeUndoRedoAdoption() ).toBe( true );
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( block.clientId )?.metadata?.suggestion
+				?.type
+		).toBe( 'pending-move' );
 	} );
 } );
