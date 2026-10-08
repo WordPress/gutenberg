@@ -75,6 +75,8 @@ export type FormatType = {
 	contentEditable?: boolean;
 	__experimentalCreatePrepareEditableTree?: Function;
 	__experimentalCreateOnChangeEditableValue?: Function;
+	__experimentalGetPropsForEditableTreePreparation?: Function;
+	__experimentalGetPropsForEditableTreeChangeHandler?: Function;
 };
 
 /**
