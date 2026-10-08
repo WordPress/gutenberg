@@ -16,7 +16,7 @@
 
 ### Bug Fixes
 
--   `Modal`: Keep focus inside the dialog when `focusOnMount="firstContentElement"` finds no tabbable elements in the content.
+-   `Modal`: Keep focus inside the dialog when `focusOnMount="firstContentElement"` finds no tabbable elements in the content ([#84344](https://github.com/WordPress/gutenberg/pull/84344)).
 
 ## 42.0.0 (2026-10-07)
 
