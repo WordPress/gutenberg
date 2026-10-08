@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/vips",
-	"version": "4.2.0",
+	"version": "4.3.0",
 	"description": "Utils for working with libvips.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -24,8 +24,7 @@
 	"files": [
 		"src",
 		"build-module",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"type": "module",
 	"module": "build-module/index.mjs",

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/icons",
-	"version": "17.0.0",
+	"version": "18.0.0",
 	"description": "WordPress Icons package, based on dashicon.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -26,8 +26,7 @@
 		"src",
 		"build",
 		"build-module",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",

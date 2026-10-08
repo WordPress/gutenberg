@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "18.0.0",
+	"version": "18.1.0",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -27,8 +27,7 @@
 		"build",
 		"build-module",
 		"build-style",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",

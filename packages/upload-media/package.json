@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/upload-media",
-	"version": "0.41.0",
+	"version": "0.42.0",
 	"description": "Core media upload logic.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -24,8 +24,7 @@
 		"src",
 		"build",
 		"build-module",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/keyboard-shortcuts",
-	"version": "5.56.0",
+	"version": "5.57.0",
 	"description": "Handling keyboard shortcuts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -25,8 +25,7 @@
 		"src",
 		"build",
 		"build-module",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",

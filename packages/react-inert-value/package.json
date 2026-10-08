@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/react-inert-value",
-	"version": "1.0.0-prerelease",
+	"version": "1.0.0",
 	"description": "Return a React `inert` prop value that works under both React 18 and React 19.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -26,8 +26,7 @@
 		"src",
 		"build",
 		"build-module",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",

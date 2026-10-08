@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/i18n",
-	"version": "6.29.0",
+	"version": "6.30.0",
 	"description": "WordPress internationalization (i18n) library.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -25,8 +25,7 @@
 		"src",
 		"build",
 		"build-module",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",

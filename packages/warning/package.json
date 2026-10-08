@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/warning",
-	"version": "3.56.0",
+	"version": "3.57.0",
 	"description": "Warning utility for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -26,7 +26,6 @@
 		"build",
 		"build-module",
 		"build-types",
-		"*.md",
 		"babel-plugin.cjs"
 	],
 	"main": "build/index.cjs",

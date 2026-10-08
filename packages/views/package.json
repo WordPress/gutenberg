@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/views",
-	"version": "1.23.0",
+	"version": "2.0.0",
 	"description": "View persistence and management for WordPress DataViews.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -25,8 +25,7 @@
 		"src",
 		"build",
 		"build-module",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
@@ -50,8 +49,8 @@
 	},
 	"devDependencies": {
 		"@testing-library/react": "^16.3.3",
-		"react": "^18.3.1",
-		"react-dom": "^18.3.1",
+		"react": "^19.3.0",
+		"react-dom": "^19.3.0",
 		"vitest": "^5.0.3"
 	},
 	"peerDependencies": {

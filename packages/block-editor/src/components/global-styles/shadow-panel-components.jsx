@@ -14,6 +14,7 @@ import { shadow as shadowIcon, Icon, check, reset } from '@wordpress/icons';
 import clsx from 'clsx';
 import { Tooltip } from '@wordpress/ui';
 import { InheritanceResetButton } from './inheritance';
+import { useToolsPanelItemPopoverProps } from './utils';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -135,11 +136,7 @@ export function ShadowPopover( {
 	hasLocalOverride = false,
 	onReset,
 } ) {
-	const popoverProps = {
-		placement: 'left-start',
-		offset: 36,
-		shift: true,
-	};
+	const popoverProps = useToolsPanelItemPopoverProps();
 
 	return (
 		<Dropdown

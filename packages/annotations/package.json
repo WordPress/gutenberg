@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/annotations",
-	"version": "3.56.0",
+	"version": "3.57.0",
 	"description": "Annotate content in the Gutenberg editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -25,8 +25,7 @@
 		"src",
 		"build",
 		"build-module",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
@@ -48,7 +47,7 @@
 		"uuid": "^14.0.0"
 	},
 	"devDependencies": {
-		"@types/react": "^18.3.27",
+		"@types/react": "^19.3.0",
 		"vitest": "^5.0.3"
 	},
 	"peerDependencies": {

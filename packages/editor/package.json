@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "15.1.0",
+	"version": "15.2.0",
 	"description": "Enhanced block editor for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -26,8 +26,7 @@
 		"build",
 		"build-module",
 		"build-style",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",

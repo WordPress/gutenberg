@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/escape-html",
-	"version": "3.56.0",
+	"version": "3.57.0",
 	"description": "Escape HTML utils.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -24,8 +24,7 @@
 	"files": [
 		"build",
 		"build-module",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",

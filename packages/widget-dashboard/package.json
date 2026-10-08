@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/widget-dashboard",
-	"version": "0.8.0",
+	"version": "0.9.0",
 	"description": "Stateless rendering engine for widget dashboards: the WidgetDashboard compound component and its grid-settings kit.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -27,8 +27,7 @@
 		"src",
 		"build",
 		"build-module",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
