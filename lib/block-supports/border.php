@@ -46,48 +46,51 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 
 	$has_border_color_support = gutenberg_has_border_feature_support( $block_type, 'color' );
 	$has_border_width_support = gutenberg_has_border_feature_support( $block_type, 'width' );
-	$border                   = isset( $block_attributes['style']['border'] ) && is_array( $block_attributes['style']['border'] )
-		? $block_attributes['style']['border']
-		: array();
-	$border_attributes        = array();
-	$border_styles            = array();
+	$attributes               = $block_attributes;
+
+	if ( ! isset( $attributes['style']['border'] ) || ! is_array( $attributes['style']['border'] ) ) {
+		unset( $attributes['style'] );
+	}
 
 	foreach ( array( 'radius', 'style', 'width', 'color' ) as $feature ) {
 		if (
-			isset( $border[ $feature ] ) &&
-			gutenberg_has_border_feature_support( $block_type, $feature ) &&
-			! wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', $feature )
+			! gutenberg_has_border_feature_support( $block_type, $feature ) ||
+			wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', $feature )
 		) {
-			$border_styles[ $feature ] = $border[ $feature ];
+			unset( $attributes['style']['border'][ $feature ] );
 		}
 	}
 
 	if (
-		$has_border_color_support &&
-		array_key_exists( 'borderColor', $block_attributes ) &&
-		! wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'color' )
+		! $has_border_color_support ||
+		wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'color' )
 	) {
-		$border_attributes['borderColor'] = $block_attributes['borderColor'];
+		unset( $attributes['borderColor'] );
 	}
 
 	// Sides are filtered by skipped serialization only, not by feature support.
-	if ( $has_border_color_support || $has_border_width_support ) {
-		$skipped_side_features = array();
-		foreach ( array( 'width', 'color', 'style' ) as $feature ) {
-			if ( wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', $feature ) ) {
-				$skipped_side_features[ $feature ] = true;
-			}
-		}
-		foreach ( array( 'top', 'right', 'bottom', 'left' ) as $side ) {
-			if ( isset( $border[ $side ] ) && is_array( $border[ $side ] ) ) {
-				$border_styles[ $side ] = array_diff_key( $border[ $side ], $skipped_side_features );
-			}
+	$skipped_side_features = array();
+	foreach ( array( 'width', 'color', 'style' ) as $feature ) {
+		if ( wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', $feature ) ) {
+			$skipped_side_features[] = $feature;
 		}
 	}
 
-	$border_attributes['style'] = array( 'border' => $border_styles );
+	foreach ( array( 'top', 'right', 'bottom', 'left' ) as $side ) {
+		if (
+			! ( $has_border_color_support || $has_border_width_support ) ||
+			! isset( $attributes['style']['border'][ $side ] ) ||
+			! is_array( $attributes['style']['border'][ $side ] )
+		) {
+			unset( $attributes['style']['border'][ $side ] );
+			continue;
+		}
+		foreach ( $skipped_side_features as $feature ) {
+			unset( $attributes['style']['border'][ $side ][ $feature ] );
+		}
+	}
 
-	return gutenberg_get_border_classes_and_styles( $border_attributes );
+	return gutenberg_get_border_classes_and_styles( $attributes );
 }
 
 /**
