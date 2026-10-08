@@ -500,9 +500,10 @@ HTML;
 			$block_content
 		);
 
-		$this->assertMatchesRegularExpression(
-			'#<li>Bound <img[^>]*class="wp-image-42"[^>]*src="https://example\.com/inline-image\.jpg"[^>]*alt="Inline image"[^>]*/?></li>#',
+		$this->assertEqualHTML(
+			'<li>Bound <img class="wp-image-42" src="https://example.com/inline-image.jpg" alt="Inline image"></li>',
 			$result,
+			'<body>',
 			'The source image should render in the list item content after sanitization.'
 		);
 	}
@@ -519,7 +520,7 @@ HTML;
 <!-- /wp:list-item -->
 HTML;
 		$result        = $this->render_list_item_with_source_value(
-			'Bound <img src="https://example.com/inline-image.jpg" alt="Inline image" onerror="alert(1)" /> <script>alert("Unsafe HTML")</script>',
+			'Bound <img src="https://example.com/inline-image.jpg" alt="Inline image" onerror="alert(1)" /><script>alert("Unsafe HTML")</script>',
 			$block_content
 		);
 
@@ -533,9 +534,10 @@ HTML;
 			$result,
 			'Event handler attributes should be stripped from list item source content.'
 		);
-		$this->assertMatchesRegularExpression(
-			'#<img[^>]*src="https://example\.com/inline-image\.jpg"[^>]*alt="Inline image"[^>]*/?>#',
+		$this->assertEqualHTML(
+			'<li>Bound <img src="https://example.com/inline-image.jpg" alt="Inline image"></li>',
 			$result,
+			'<body>',
 			'Safe image markup should remain after sanitization.'
 		);
 	}
