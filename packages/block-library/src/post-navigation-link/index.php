@@ -165,39 +165,9 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
  */
 function block_core_post_navigation_link_get_support_styles( $attributes ) {
 	$block_styles  = $attributes['style'] ?? array();
-	$border        = $block_styles['border'] ?? array();
-	$border_styles = array();
-
-	// Border radius and width accept unitless numbers from the original implementation.
-	if ( isset( $border['radius'] ) ) {
-		$border_styles['radius'] = is_numeric( $border['radius'] ) ? "{$border['radius']}px" : $border['radius'];
-	}
-
-	if ( isset( $border['width'] ) ) {
-		$border_styles['width'] = is_numeric( $border['width'] ) ? "{$border['width']}px" : $border['width'];
-	}
-
-	if ( isset( $border['style'] ) ) {
-		$border_styles['style'] = $border['style'];
-	}
-
-	// A preset border color is stored in its own attribute rather than under `style`.
-	$border_styles['color'] = isset( $attributes['borderColor'] )
-		? "var:preset|color|{$attributes['borderColor']}"
-		: ( $border['color'] ?? null );
-
-	// Individual border sides e.g. top, left etc.
-	foreach ( array( 'top', 'right', 'bottom', 'left' ) as $side ) {
-		$border_styles[ $side ] = array(
-			'width' => $border[ $side ]['width'] ?? null,
-			'color' => $border[ $side ]['color'] ?? null,
-			'style' => $border[ $side ]['style'] ?? null,
-		);
-	}
-
-	$styles = wp_style_engine_get_styles(
+	$border_styles = wp_get_border_classes_and_styles( $attributes );
+	$styles        = wp_style_engine_get_styles(
 		array(
-			'border'  => $border_styles,
 			'shadow'  => $block_styles['shadow'] ?? null,
 			'spacing' => array(
 				'margin'  => $block_styles['spacing']['margin'] ?? null,
@@ -207,8 +177,8 @@ function block_core_post_navigation_link_get_support_styles( $attributes ) {
 	);
 
 	return array(
-		'class' => $styles['classnames'] ?? '',
-		'style' => $styles['css'] ?? '',
+		'class' => implode( ' ', array_filter( array( $border_styles['class'] ?? '', $styles['classnames'] ?? '' ) ) ),
+		'style' => ( $border_styles['style'] ?? '' ) . ( $styles['css'] ?? '' ),
 	);
 }
 
