@@ -66,14 +66,14 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 }
 
 /**
- * Gets the spacing CSS classes and inline styles for the given block
- * attributes. The PHP twin of the JS `getSpacingClassesAndStyles()`.
+ * Returns spacing classes and inline styles for block attributes, like the JS
+ * `getSpacingClassesAndStyles()`. Does not check block support or skipped
+ * serialization.
  *
  * @since 7.2.0
  *
  * @param array $block_attributes Block attributes.
- *
- * @return array Spacing CSS classes and inline styles.
+ * @return array Array with `class` and `style` keys, each present only when non-empty.
  */
 function gutenberg_get_spacing_classes_and_styles( $block_attributes ) {
 	$spacing = $block_attributes['style']['spacing'] ?? null;

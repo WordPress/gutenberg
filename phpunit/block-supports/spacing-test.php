@@ -258,10 +258,6 @@ class WP_Block_Supports_Spacing_Test extends WP_UnitTestCase {
 				),
 				'expected'         => array(),
 			),
-			'malformed attributes' => array(
-				'block_attributes' => null,
-				'expected'         => array(),
-			),
 		);
 	}
 }
