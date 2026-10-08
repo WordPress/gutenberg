@@ -85,19 +85,19 @@ _This package requires the following stylesheets to be included for proper styli
 
 ### CommandCategory
 
-Undocumented declaration.
+The category of a command: `command`, `view`, `edit`, `action` or `workflow`.
 
 ### CommandConfig
 
-Undocumented declaration.
+Configuration of a command registered with `useCommand` or `useCommands`.
 
 ### CommandLoaderConfig
 
-Undocumented declaration.
+Configuration of a command loader registered with `useCommandLoader`.
 
 ### CommandLoaderHook
 
-Undocumented declaration.
+A hook that receives the search term and returns the matching commands and whether they are still loading.
 
 ### store
 
