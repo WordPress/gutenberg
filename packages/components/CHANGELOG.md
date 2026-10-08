@@ -9,6 +9,10 @@
     -   `DateTimePicker` ([#84129](https://github.com/WordPress/gutenberg/pull/84129))
     -   `ColorPicker` ([#84128](https://github.com/WordPress/gutenberg/pull/84128))
 
+### Deprecations
+
+-   `Tip`: Deprecate in favor of `Notice` from `@wordpress/ui`, preserving the legacy component for existing consumers ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
+
 ## 42.0.0 (2026-10-07)
 
 ### Breaking Changes
