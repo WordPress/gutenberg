@@ -5,7 +5,7 @@ import type {
 	ReactElement,
 	ReactNode,
 } from 'react';
-import { __, sprintf, isRTL } from '@wordpress/i18n';
+import { __, _n, sprintf, isRTL } from '@wordpress/i18n';
 import { Button, Spinner, Popover } from '@wordpress/components';
 import { VisuallyHidden } from '@wordpress/ui';
 import {
@@ -227,6 +227,11 @@ function HierarchyPaginationRow( {
 		},
 		[]
 	);
+	const remainingItems = paginationInfo.remainingItems;
+	const hasRemainingItems =
+		typeof remainingItems === 'number' &&
+		Number.isInteger( remainingItems ) &&
+		remainingItems >= 0;
 	let buttonLabel;
 	if ( paginationInfo.isLoading ) {
 		buttonLabel = parentLabel
@@ -236,6 +241,27 @@ function HierarchyPaginationRow( {
 					parentLabel
 				)
 			: __( 'Loading items' );
+	} else if ( hasRemainingItems && ! isRetry ) {
+		buttonLabel = parentLabel
+			? sprintf(
+					/* translators: 1: Number of remaining children, 2: The parent item title. */
+					_n(
+						'Show %1$d more child of %2$s',
+						'Show %1$d more children of %2$s',
+						remainingItems
+					),
+					remainingItems,
+					parentLabel
+				)
+			: sprintf(
+					/* translators: %d: Number of remaining items. */
+					_n(
+						'Show %d more item',
+						'Show %d more items',
+						remainingItems
+					),
+					remainingItems
+				);
 	} else if ( parentLabel ) {
 		buttonLabel = isRetry
 			? sprintf(
@@ -258,6 +284,12 @@ function HierarchyPaginationRow( {
 		buttonText = __( 'Loading…' );
 	} else if ( isRetry ) {
 		buttonText = __( 'Retry' );
+	} else if ( hasRemainingItems ) {
+		buttonText = sprintf(
+			/* translators: %d: Total number of remaining items at this level. */
+			_n( 'Show %d more', 'Show %d more', remainingItems ),
+			remainingItems
+		);
 	}
 	const content = (
 		<div className="dataviews-view-table__hierarchy-pagination-content">

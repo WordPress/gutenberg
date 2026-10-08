@@ -162,6 +162,10 @@ const HierarchicalLevelsComponent = ( {
 						childrenByParentId.get( key )?.length ?? 0;
 					return {
 						hasMore: getLoadedCount( parentId ) < totalItems,
+						remainingItems: Math.max(
+							0,
+							totalItems - getLoadedCount( parentId )
+						),
 						isLoading: loadingKeys.has( key ),
 						error: errors[ key ],
 					};

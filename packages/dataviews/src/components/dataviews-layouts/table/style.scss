@@ -247,6 +247,8 @@
 	}
 
 	.dataviews-view-table__hierarchy-pagination-content {
+		// Align the minimal button label with the children's selection controls.
+		padding-inline-start: var(--wpds-dimension-size-md);
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
