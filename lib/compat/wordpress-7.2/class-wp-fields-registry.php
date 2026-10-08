@@ -344,9 +344,10 @@ if ( ! class_exists( 'WP_Fields_Registry' ) ) {
 		 *
 		 * A collection is a folder whose `index.php` returns its configuration, with
 		 * a folder per field whose `field.php` returns the serializable part of the
-		 * field (see get_collection_fields()). Each file runs in a scope of its
-		 * own. The JavaScript parts of the fields, if any, ship in the script
-		 * module of the collection. The configuration is an array with these keys:
+		 * field (see get_collection_fields()). Each file is required without
+		 * sharing the variables of the caller, see require_file(). The JavaScript
+		 * parts of the fields, if any, ship in the script module of the
+		 * collection. The configuration is an array with these keys:
 		 *
 		 * - `origin` (required): who registers the fields: `core`, or the slug of
 		 *   the plugin or theme. See register().
@@ -421,7 +422,7 @@ if ( ! class_exists( 'WP_Fields_Registry' ) ) {
 
 			$fields = array();
 			foreach ( $files as $file ) {
-				$field = _wp_require_file( $file );
+				$field = self::require_file( $file );
 				if ( ! is_array( $field ) ) {
 					continue;
 				}
@@ -777,7 +778,7 @@ if ( ! class_exists( 'WP_Fields_Registry' ) ) {
 		protected function get_collection( $method, $directory ) {
 			$slug   = basename( $directory );
 			$file   = $directory . '/index.php';
-			$config = is_file( $file ) ? _wp_require_file( $file ) : null;
+			$config = is_file( $file ) ? self::require_file( $file ) : null;
 			$error  = null;
 
 			if ( ! is_array( $config ) ) {
@@ -809,6 +810,17 @@ if ( ! class_exists( 'WP_Fields_Registry' ) ) {
 					'fields' => array_values( $this->get_collection_fields( $directory ) ),
 				)
 			);
+		}
+
+		/**
+		 * Requires a file without sharing the variables of the caller: this is
+		 * about variable scope.
+		 *
+		 * @param string $file The path of the file.
+		 * @return mixed The return value of the file.
+		 */
+		protected static function require_file( $file ) {
+			return require $file;
 		}
 
 		/**

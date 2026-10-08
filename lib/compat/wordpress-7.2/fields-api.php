@@ -224,19 +224,6 @@ if ( ! function_exists( '_wp_add_field_modules_to_editor_script' ) ) {
 	add_action( 'admin_footer', '_wp_add_field_modules_to_editor_script' );
 }
 
-if ( ! function_exists( '_wp_require_file' ) ) {
-	/**
-	 * Requires a file without sharing the variables of the caller: this is about
-	 * variable scope.
-	 *
-	 * @param string $file The path of the file.
-	 * @return mixed The return value of the file.
-	 */
-	function _wp_require_file( $file ) {
-		return require $file;
-	}
-}
-
 if ( ! function_exists( 'wp_get_field_collection_fields' ) ) {
 	/**
 	 * Returns the fields of a field collection, see
