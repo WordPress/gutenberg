@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Support responsive block breadcrumbs in the editor footer.
+
 ## 10.3.0 (2026-10-07)
 
 ## 10.2.0 (2026-09-23)
