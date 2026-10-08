@@ -44,53 +44,59 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 		return array();
 	}
 
-	$has_border_color_support = gutenberg_has_border_feature_support( $block_type, 'color' );
-	$has_border_width_support = gutenberg_has_border_feature_support( $block_type, 'width' );
-	$attributes               = $block_attributes;
+	$has_border_color_support  = gutenberg_has_border_feature_support( $block_type, 'color' );
+	$has_border_radius_support = gutenberg_has_border_feature_support( $block_type, 'radius' );
+	$has_border_style_support  = gutenberg_has_border_feature_support( $block_type, 'style' );
+	$has_border_width_support  = gutenberg_has_border_feature_support( $block_type, 'width' );
+	$skip_color                = wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'color' );
+	$skip_radius               = wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'radius' );
+	$skip_style                = wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'style' );
+	$skip_width                = wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'width' );
 
-	if ( ! isset( $attributes['style']['border'] ) || ! is_array( $attributes['style']['border'] ) ) {
-		unset( $attributes['style'] );
+	// The helper reads only `style.border`, so a non-array value counts as no border styles.
+	if ( ! isset( $block_attributes['style']['border'] ) || ! is_array( $block_attributes['style']['border'] ) ) {
+		unset( $block_attributes['style'] );
 	}
 
-	foreach ( array( 'radius', 'style', 'width', 'color' ) as $feature ) {
-		if (
-			! gutenberg_has_border_feature_support( $block_type, $feature ) ||
-			wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', $feature )
-		) {
-			unset( $attributes['style']['border'][ $feature ] );
-		}
+	if ( ! $has_border_radius_support || $skip_radius ) {
+		unset( $block_attributes['style']['border']['radius'] );
 	}
 
-	if (
-		! $has_border_color_support ||
-		wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'color' )
-	) {
-		unset( $attributes['borderColor'] );
+	if ( ! $has_border_style_support || $skip_style ) {
+		unset( $block_attributes['style']['border']['style'] );
+	}
+
+	if ( ! $has_border_width_support || $skip_width ) {
+		unset( $block_attributes['style']['border']['width'] );
+	}
+
+	if ( ! $has_border_color_support || $skip_color ) {
+		unset( $block_attributes['style']['border']['color'], $block_attributes['borderColor'] );
 	}
 
 	// Sides are filtered by skipped serialization only, not by feature support.
-	$skipped_side_features = array();
-	foreach ( array( 'width', 'color', 'style' ) as $feature ) {
-		if ( wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', $feature ) ) {
-			$skipped_side_features[] = $feature;
-		}
-	}
-
 	foreach ( array( 'top', 'right', 'bottom', 'left' ) as $side ) {
-		if (
-			! ( $has_border_color_support || $has_border_width_support ) ||
-			! isset( $attributes['style']['border'][ $side ] ) ||
-			! is_array( $attributes['style']['border'][ $side ] )
-		) {
-			unset( $attributes['style']['border'][ $side ] );
+		$has_side = isset( $block_attributes['style']['border'][ $side ] ) && is_array( $block_attributes['style']['border'][ $side ] );
+
+		if ( ! $has_side || ( ! $has_border_color_support && ! $has_border_width_support ) ) {
+			unset( $block_attributes['style']['border'][ $side ] );
 			continue;
 		}
-		foreach ( $skipped_side_features as $feature ) {
-			unset( $attributes['style']['border'][ $side ][ $feature ] );
+
+		if ( $skip_width ) {
+			unset( $block_attributes['style']['border'][ $side ]['width'] );
+		}
+
+		if ( $skip_color ) {
+			unset( $block_attributes['style']['border'][ $side ]['color'] );
+		}
+
+		if ( $skip_style ) {
+			unset( $block_attributes['style']['border'][ $side ]['style'] );
 		}
 	}
 
-	return gutenberg_get_border_classes_and_styles( $attributes );
+	return gutenberg_get_border_classes_and_styles( $block_attributes );
 }
 
 /**
