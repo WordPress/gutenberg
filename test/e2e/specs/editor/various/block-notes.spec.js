@@ -1842,12 +1842,20 @@ test.describe( 'Block Notes', () => {
 
 			// Tone-capable emoji in the grid now carry the chosen tone.
 			await page.getByPlaceholder( 'Search emoji' ).fill( 'thumbs up' );
-			await page
-				.getByRole( 'gridcell', {
-					name: 'thumbs up: dark skin tone',
-					exact: true,
-				} )
-				.click();
+			const tonedCell = page.getByRole( 'gridcell', {
+				name: 'thumbs up: dark skin tone',
+				exact: true,
+			} );
+
+			// The footer leaves out the tone, which the emoji already shows.
+			await tonedCell.hover();
+			await expect(
+				page.locator(
+					'.editor-collab-sidebar-panel__picker-footer-name'
+				)
+			).toHaveText( 'thumbs up' );
+
+			await tonedCell.click();
 
 			// The stored reaction renders the toned emoji.
 			const reactionButton = page.locator(

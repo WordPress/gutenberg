@@ -7,7 +7,8 @@ import { useSyncExternalStore } from '@wordpress/element';
 export interface HighlightedEmoji {
 	// The emoji character.
 	value: string;
-	label: string;
+	// Its name, without the skin tone the character already shows.
+	name: string;
 }
 
 /**
@@ -50,8 +51,8 @@ export function createHighlightStore(): HighlightStore {
 }
 
 /**
- * Footer under the emoji grid showing the highlighted emoji, enlarged, with
- * its name. It follows the highlight for both the pointer and the arrow
+ * Footer under the emoji grid showing the highlighted emoji with its name.
+ * It follows the highlight for both the pointer and the arrow
  * keys. It is hidden from assistive technology, since the search field
  * already announces the highlighted cell through `aria-activedescendant`.
  *
@@ -78,7 +79,7 @@ export default function EmojiPickerFooter( {
 						variant="body-md"
 						className="editor-collab-sidebar-panel__picker-footer-name"
 					>
-						{ highlighted.label }
+						{ highlighted.name }
 					</Text>
 				</>
 			) }

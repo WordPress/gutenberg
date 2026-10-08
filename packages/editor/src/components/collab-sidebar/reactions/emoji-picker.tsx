@@ -41,6 +41,9 @@ interface EmojiOption {
 	// The emoji character, with the user's skin tone applied.
 	value: string;
 	label: string;
+	// The base record's label, for the footer: the cell already shows the
+	// skin tone, so its name doesn't need to spell it out.
+	name: string;
 	// Normalized hexcode of the base record, used for usage tracking.
 	hexKey: string;
 }
@@ -313,14 +316,22 @@ export default function EmojiPicker( {
 			 * drives search, usage, and the grid key.
 			 */
 			const display = applySkinTone( entry, skinTone );
+			const hexKey = normalizeHexcode( entry.hexcode );
+			const displayLabel =
+				getCuratedLabel( normalizeHexcode( display.hexcode ) ) ||
+				display.label ||
+				'';
 			return {
 				key: `${ prefix }-${ entry.hexcode }`,
 				value: display.emoji,
-				label:
-					getCuratedLabel( normalizeHexcode( display.hexcode ) ) ||
-					display.label ||
-					'',
-				hexKey: normalizeHexcode( entry.hexcode ),
+				label: displayLabel,
+				name:
+					display === entry
+						? displayLabel
+						: getCuratedLabel( hexKey ) ||
+							entry.label ||
+							displayLabel,
+				hexKey,
 			};
 		};
 
