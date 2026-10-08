@@ -3,7 +3,7 @@ import type { ComponentProps } from '../utils/types';
 
 export interface RootProps extends Omit< ComponentProps< 'nav' >, 'children' > {
 	/**
-	 * `Breadcrumb.LinkItem` elements followed by one
+	 * Optional `Breadcrumb.LinkItem` elements followed by one
 	 * `Breadcrumb.CurrentItem`.
 	 */
 	children: ReactNode;
@@ -34,10 +34,21 @@ export interface LinkItemProps extends Omit<
 
 export interface CurrentItemProps extends Omit<
 	ComponentProps< 'span' >,
-	'aria-current' | 'children' | 'tabIndex'
+	'children' | 'tabIndex'
 > {
 	/**
-	 * The plain-text label for the current page.
+	 * How the item represents the current location in the hierarchy.
+	 * Use `true` for an in-document item, such as a selected block.
+	 *
+	 * @default 'page'
+	 */
+	'aria-current'?: Exclude<
+		ComponentProps< 'span' >[ 'aria-current' ],
+		false | 'false'
+	>;
+
+	/**
+	 * The plain-text label for the current item.
 	 */
 	children: string;
 }

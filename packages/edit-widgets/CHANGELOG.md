@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Own the footer-specific block breadcrumb layout styles.
+
 ## 6.57.0 (2026-10-07)
 
 ### Bug Fixes

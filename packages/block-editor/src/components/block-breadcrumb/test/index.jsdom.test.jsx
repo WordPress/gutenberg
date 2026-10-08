@@ -3,25 +3,35 @@ import { render, screen } from '@testing-library/react';
 import BlockBreadcrumb from '../';
 
 describe( 'BlockBreadcrumb', () => {
-	it( 'should render correctly', () => {
-		const { container } = render( <BlockBreadcrumb /> );
-
-		expect( container ).toMatchSnapshot();
+	it( 'displays the document breadcrumb when no block is selected', () => {
+		render( <BlockBreadcrumb /> );
+		expect(
+			screen.getByRole( 'navigation', { name: 'Block breadcrumb' } )
+		).toBeVisible();
+		expect(
+			screen.getByText( 'Document', {
+				selector: '[aria-current="true"]',
+			} )
+		).toBeVisible();
 	} );
 
 	describe( 'Root label text', () => {
-		test( 'should display default label of "Document"', () => {
+		test( 'displays the default document label', () => {
 			render( <BlockBreadcrumb /> );
 
-			const rootLabelTextDefault = screen.getByText( 'Document' );
+			const rootLabelTextDefault = screen.getByText( 'Document', {
+				selector: '[aria-current="true"]',
+			} );
 
 			expect( rootLabelTextDefault ).toBeInTheDocument();
 		} );
 
-		test( 'should display `rootLabelText` value', () => {
+		test( 'displays the supplied document label', () => {
 			render( <BlockBreadcrumb rootLabelText="Tuhinga" /> );
 
-			const rootLabelText = screen.getByText( 'Tuhinga' );
+			const rootLabelText = screen.getByText( 'Tuhinga', {
+				selector: '[aria-current="true"]',
+			} );
 			const rootLabelTextDefault = screen.queryByText( 'Document' );
 
 			expect( rootLabelTextDefault ).not.toBeInTheDocument();

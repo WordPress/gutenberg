@@ -10,6 +10,17 @@ const BASE_METRICS = {
 };
 
 describe( 'Breadcrumb responsive layout', () => {
+	it( 'shortens a long current item when there are no ancestors and it exceeds the available space', () => {
+		expect(
+			getCollapsedLayout( {
+				...BASE_METRICS,
+				linkItemWidths: [],
+				availableWidth: 100,
+				currentItemWidth: 200,
+			} ).shouldTruncateCurrent
+		).toBe( true );
+	} );
+
 	it( 'shows every item when the complete trail fits', () => {
 		expect( getCollapsedLayout( BASE_METRICS ) ).toEqual( {
 			collapsedIndices: [],

@@ -133,16 +133,10 @@ function getBreadcrumbItems( children: ReactNode ) {
 	} );
 
 	if ( process.env.NODE_ENV !== 'production' ) {
-		const linkItems = items.filter( ( item ) => item.kind === 'link' );
 		const currentItems = items.filter(
 			( item ) => item.kind === 'current'
 		);
 
-		if ( linkItems.length === 0 ) {
-			throw new Error(
-				'Breadcrumb: <Breadcrumb.Root> requires at least one <Breadcrumb.LinkItem>.'
-			);
-		}
 		if ( currentItems.length === 0 ) {
 			throw new Error(
 				'Breadcrumb: <Breadcrumb.Root> requires one final <Breadcrumb.CurrentItem>.'

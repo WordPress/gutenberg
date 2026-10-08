@@ -24,6 +24,7 @@
 -   `Switch`, `SwitchControl`: Mark as recommended for use in a WordPress environment ([#84097](https://github.com/WordPress/gutenberg/pull/84097)).
 -   `Progress`: Default to a 160px width, overridable through `className` or `style` ([#84021](https://github.com/WordPress/gutenberg/pull/84021)).
 -   `Progress`: Mark as recommended for use in a WordPress environment. ([#84021](https://github.com/WordPress/gutenberg/pull/84021))
+-   `Breadcrumb`: Allow a trail containing only the current item, and let `CurrentItem` customize `aria-current` for in-document hierarchies while retaining `page` as the default.
 -   `Menu`: Keep parent items highlighted with a neutral background while their submenus are open ([#84031](https://github.com/WordPress/gutenberg/pull/84031)).
 -   `Menu`: Align group labels and separators with item labels when a radio or checkbox column indents those labels ([#83993](https://github.com/WordPress/gutenberg/pull/83993)).
 -   `Menu`: Tighten item spacing and cap menus at 320px wide ([#84028](https://github.com/WordPress/gutenberg/pull/84028)).

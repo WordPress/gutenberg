@@ -26,6 +26,7 @@ type CurrentItemImplementationProps = CurrentItemProps & {
 const MEASUREMENT_RENDER = <span />;
 
 function VisibleCurrentItem( {
+	'aria-current': ariaCurrent = 'page',
 	children,
 	className,
 	forwardedRef,
@@ -42,7 +43,7 @@ function VisibleCurrentItem( {
 	const isTruncated = useIsTruncated( element, measurementVersion );
 	const tabIndex = isTruncated || isFocusPinned ? 0 : undefined;
 	const enforcedRender = enforceRenderProps( render, {
-		'aria-current': 'page',
+		'aria-current': ariaCurrent,
 		href: undefined,
 		tabIndex,
 	} );
@@ -53,7 +54,7 @@ function VisibleCurrentItem( {
 		props: mergeProps< 'span' >(
 			{ ...props, onBlur, onFocus },
 			{
-				'aria-current': 'page',
+				'aria-current': ariaCurrent,
 				children,
 				className: clsx(
 					defenseStyles.div,
@@ -96,6 +97,7 @@ function VisibleCurrentItem( {
 }
 
 function MeasurementCurrentItem( {
+	'aria-current': _ariaCurrent,
 	children,
 	className,
 	render,
@@ -144,7 +146,7 @@ function MeasurementCurrentItem( {
 }
 
 /**
- * Renders the current, non-navigable page in a breadcrumb trail.
+ * Renders the current, non-navigable item in a breadcrumb trail.
  */
 const CurrentItem = forwardRef< HTMLSpanElement, CurrentItemProps >(
 	function BreadcrumbCurrentItem( props, ref ) {

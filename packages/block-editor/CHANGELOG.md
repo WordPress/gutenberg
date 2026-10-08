@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `BlockBreadcrumb`: Use responsive breadcrumbs that collapse overflowing ancestors into a menu while preserving block selection and document-root activation. Accept a `className` for consumer-specific layout.
+
 ## 18.1.0 (2026-10-07)
 
 ### New Features
