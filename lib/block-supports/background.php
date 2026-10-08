@@ -31,6 +31,62 @@ function gutenberg_register_background_support( $block_type ) {
 }
 
 /**
+ * Gets the background classes and styles for a block's attributes.
+ *
+ * @since 7.2.0
+ *
+ * @param array $block_attributes Block attributes.
+ * @return array Background `class` and `style` strings, each present only when non-empty.
+ */
+function gutenberg_get_background_classes_and_styles( $block_attributes ) {
+	$background = $block_attributes['style']['background'] ?? null;
+
+	if ( ! is_array( $background ) ) {
+		return array();
+	}
+
+	$background_styles = array(
+		'backgroundImage'      => $background['backgroundImage'] ?? null,
+		'backgroundSize'       => $background['backgroundSize'] ?? null,
+		'backgroundPosition'   => $background['backgroundPosition'] ?? null,
+		'backgroundRepeat'     => $background['backgroundRepeat'] ?? null,
+		'backgroundAttachment' => $background['backgroundAttachment'] ?? null,
+		'gradient'             => $background['gradient'] ?? null,
+		'backgroundClip'       => $background['backgroundClip'] ?? null,
+	);
+
+	if ( ! empty( $background_styles['backgroundImage'] ) ) {
+		$background_styles['backgroundSize'] = $background_styles['backgroundSize'] ?? 'cover';
+		// If the background size is set to `contain` and no position is set, set the position to `center`.
+		if ( 'contain' === $background_styles['backgroundSize'] && ! $background_styles['backgroundPosition'] ) {
+			$background_styles['backgroundPosition'] = '50% 50%';
+		}
+	}
+
+	$styles = gutenberg_style_engine_get_styles( array( 'background' => $background_styles ) );
+
+	if ( empty( $styles['css'] ) ) {
+		return array();
+	}
+
+	$attributes = array();
+
+	/*
+	 * A background clipped to the text paints the glyphs rather than the
+	 * block's box, so there is no block background to announce.
+	 */
+	$has_background = ! empty( $background_styles['backgroundImage'] ) || ! empty( $background_styles['gradient'] );
+
+	if ( $has_background && 'text' !== $background_styles['backgroundClip'] ) {
+		$attributes['class'] = 'has-background';
+	}
+
+	$attributes['style'] = $styles['css'];
+
+	return $attributes;
+}
+
+/**
  * Renders the background styles to the block wrapper.
  * This block support uses the `render_block` hook to ensure that
  * it is also applied to non-server-rendered blocks.
@@ -70,13 +126,6 @@ function gutenberg_render_background_support( $block_content, $block ) {
 		$background_styles['backgroundPosition']   = $block_attributes['style']['background']['backgroundPosition'] ?? null;
 		$background_styles['backgroundRepeat']     = $block_attributes['style']['background']['backgroundRepeat'] ?? null;
 		$background_styles['backgroundAttachment'] = $block_attributes['style']['background']['backgroundAttachment'] ?? null;
-		if ( ! empty( $background_styles['backgroundImage'] ) ) {
-			$background_styles['backgroundSize'] = $background_styles['backgroundSize'] ?? 'cover';
-			// If the background size is set to `contain` and no position is set, set the position to `center`.
-			if ( 'contain' === $background_styles['backgroundSize'] && ! $background_styles['backgroundPosition'] ) {
-				$background_styles['backgroundPosition'] = '50% 50%';
-			}
-		}
 	}
 
 	if ( ! $skip_background_gradient ) {
@@ -87,9 +136,12 @@ function gutenberg_render_background_support( $block_content, $block ) {
 		$background_styles['backgroundClip'] = $block_attributes['style']['background']['backgroundClip'] ?? null;
 	}
 
-	$styles = gutenberg_style_engine_get_styles( array( 'background' => $background_styles ) );
+	// Pass only serialized values, so a skipped or unsupported clip cannot suppress `has-background`.
+	$styles = gutenberg_get_background_classes_and_styles(
+		array( 'style' => array( 'background' => $background_styles ) )
+	);
 
-	if ( ! empty( $styles['css'] ) ) {
+	if ( ! empty( $styles['style'] ) ) {
 		// Inject background styles to the first element, presuming it's the wrapper, if it exists.
 		$tags = new WP_HTML_Tag_Processor( $block_content );
 
@@ -97,24 +149,15 @@ function gutenberg_render_background_support( $block_content, $block ) {
 			$existing_style = $tags->get_attribute( 'style' );
 			if ( is_string( $existing_style ) && '' !== $existing_style ) {
 				$separator     = str_ends_with( $existing_style, ';' ) ? '' : ';';
-				$updated_style = "{$existing_style}{$separator}{$styles['css']}";
+				$updated_style = "{$existing_style}{$separator}{$styles['style']}";
 			} else {
-				$updated_style = $styles['css'];
+				$updated_style = $styles['style'];
 			}
 
 			$tags->set_attribute( 'style', $updated_style );
 
-			/*
-			 * A background clipped to the text paints the glyphs rather than the
-			 * block's box, so there is no block background to announce. Read the
-			 * clip from the serialized styles so an unsupported or skipped value
-			 * left in the block's attributes cannot suppress the class.
-			 */
-			$background_clip = $background_styles['backgroundClip'] ?? null;
-			$has_background  = ! empty( $background_styles['backgroundImage'] ) || ! empty( $background_styles['gradient'] );
-
-			if ( $has_background && 'text' !== $background_clip ) {
-				$tags->add_class( 'has-background' );
+			if ( ! empty( $styles['class'] ) ) {
+				$tags->add_class( $styles['class'] );
 			}
 		}
 
