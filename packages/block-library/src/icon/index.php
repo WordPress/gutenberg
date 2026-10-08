@@ -73,7 +73,7 @@ function render_block_core_icon( $attributes ) {
 		}
 	}
 
-	// Generate styles and classes in the style engine's group order: background, color, border, shadow, dimensions, spacing.
+	// Separate calls, concatenated in the style engine's group order.
 	$color_result      = wp_style_engine_get_styles(
 		array(
 			'background' => $background_styles,
@@ -84,8 +84,8 @@ function render_block_core_icon( $attributes ) {
 	$dimensions_result = wp_style_engine_get_styles(
 		array(
 			'shadow'     => $shadow_styles,
-			'spacing'    => $spacing_styles,
 			'dimensions' => $dimensions_styles,
+			'spacing'    => $spacing_styles,
 		)
 	);
 	$styles            = array(
