@@ -168,6 +168,23 @@ export function viewToQuery( view: View, postType: string ) {
 		}
 	}
 
+	// The `used` field is computed server-side: the attachment collection
+	// exposes `used` to filter and `include_used` to ask for the value. The
+	// value is only computed when requested, because detecting usage scans the
+	// site content.
+	const usedFilter = view.filters?.find(
+		( filter ) => filter.field === 'used'
+	);
+	if ( usedFilter && usedFilter.value !== undefined ) {
+		result.used =
+			usedFilter.operator === 'isNot'
+				? ! usedFilter.value
+				: usedFilter.value;
+	}
+	if ( usedFilter || view.fields?.includes( 'used' ) ) {
+		result.include_used = true;
+	}
+
 	// For attachments, we need to embed the parent (attached to) post to get its title.
 	if ( postType === 'attachment' ) {
 		result._embed = 'wp:attached-to';
