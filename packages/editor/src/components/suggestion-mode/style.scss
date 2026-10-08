@@ -1,0 +1,49 @@
+// Sidebar/chrome styles for the suggestion-mode UI. The canvas-targeted
+// visual treatments for `.block-editor-block-list__block.is-suggestion-*`
+// live in `block-editor/src/components/block-list/content-suggestion.scss`
+// because the editor canvas iframe loads `wp-block-editor-content` (compiled
+// from block-editor) but does NOT load the editor-package chrome stylesheet
+// — keeping the canvas rules over there is what makes them apply inside the
+// iframe.
+
+.editor-collab-sidebar-panel__suggestion-summary {
+	em {
+		font-style: italic;
+		color: var(--wpds-color-foreground-content-neutral-weak);
+		// Proposed text is quoted verbatim, so the runs of spaces a
+		// suggestion adds or removes have to survive rendering; the default
+		// HTML collapse makes one space and three look identical. Wrapping
+		// stays on so a long quote (or a link URL) still breaks inside the
+		// sidebar instead of forcing it to scroll sideways.
+		white-space: pre-wrap;
+		overflow-wrap: break-word;
+	}
+}
+
+// Secondary status lines under a suggestion summary (resolved state, grouped
+// change hint, disabled-apply reason) read as muted metadata.
+.editor-collab-sidebar-panel__suggestion-status {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+// Inline diff colors for the suggestion preview. Pulled from the design
+// system fallbacks so the rendering still degrades gracefully on themes
+// without `--wp-admin-theme-color` defined.
+.editor-collab-sidebar-panel__suggestion-text-diff {
+	del {
+		color: var(--wp-block-synced-color, #cc1818);
+		text-decoration: line-through;
+	}
+
+	ins {
+		color: var(--wp-admin-theme-color, #007017);
+		text-decoration: underline;
+	}
+}
+
+// Inline accept/reject buttons live in the note header, right-aligned next
+// to the author info. They use the same small icon buttons as the note's
+// Resolve and actions menu so the header reads as one row of controls.
+.editor-collab-sidebar-panel__suggestion-header-actions {
+	margin-left: auto;
+}

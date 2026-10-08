@@ -1,5 +1,6 @@
 import { _x } from '@wordpress/i18n';
 import { create, getActiveFormat, RichTextData } from '@wordpress/rich-text';
+import { getMarkerSelector } from '../inline-markers/marker-selector';
 import { NOTE_FORMAT_NAME } from './constants';
 
 /**
@@ -212,23 +213,7 @@ export function findNoteInBlock( attributes, noteId ) {
  * @return {string} Selector for the note's marker element(s).
  */
 export function getNoteMarkerSelector( noteId ) {
-	/*
-	 * `noteId` is a server comment ID (always a positive integer), but the
-	 * value composes a selector from stored data, so escape it defensively.
-	 *
-	 * Deliberately not `CSS.escape`: that escapes for *identifier* context,
-	 * where a leading digit is illegal, so it renders the id 7 as `\37 `.
-	 * That is valid, and matches, but it makes every rule
-	 * `buildHighlightCss` generates unreadable. Inside a quoted attribute
-	 * value the only characters that need escaping are the quote, the
-	 * backslash, and raw line breaks (a parse error in a CSS string).
-	 */
-	const escapedId = String( noteId ).replace( /["\\\n\r\f]/g, ( char ) =>
-		char === '"' || char === '\\'
-			? `\\${ char }`
-			: `\\${ char.codePointAt( 0 ).toString( 16 ) } `
-	);
-	return `mark.wp-note[data-id="${ escapedId }"]`;
+	return getMarkerSelector( 'wp-note', 'data-id', noteId );
 }
 
 /**
@@ -731,21 +716,38 @@ export function calculateNotePositions( {
 	// above notes that precede it in the list. Sort by measured top so the
 	// sweep's assumption holds and cards never displace past their markers.
 	// Threads without a rect keep their relative order; they are skipped
-	// below and never receive a position.
+	// below and never receive a position. So is a thread whose card has not
+	// been measured yet: sweeping it as zero-height would drop the card after
+	// it onto its anchor, on top of the card it was supposed to clear, and an
+	// unplaced card sits out the hit test (see `FloatingContainer`) until the
+	// ResizeObserver reports and the next sweep places it.
 	const orderedThreads = [ ...threads ].sort(
 		( a, b ) =>
 			( blockRects[ a.id ]?.top ?? Number.MAX_VALUE ) -
 			( blockRects[ b.id ]?.top ?? Number.MAX_VALUE )
 	);
 
-	const anchorIndex = Math.max(
-		0,
-		orderedThreads.findIndex( ( thread ) => thread.id === selectedNoteId )
+	// The sweep runs outward from the selected thread so its card stays put
+	// while its neighbours give way. A thread whose anchor has not been
+	// measured yet cannot hold that role: rect-less threads sort last, so
+	// fall back to the first thread that does have a rect rather than
+	// abandoning the whole board — leaving every card unpositioned stacks
+	// them all at the panel's origin.
+	let anchorIndex = orderedThreads.findIndex(
+		( thread ) => thread.id === selectedNoteId
 	);
+	if (
+		anchorIndex < 0 ||
+		! blockRects[ orderedThreads[ anchorIndex ]?.id ]
+	) {
+		anchorIndex = orderedThreads.findIndex(
+			( thread ) => !! blockRects[ thread.id ]
+		);
+	}
 
 	const anchorThread = orderedThreads[ anchorIndex ];
 
-	if ( ! anchorThread || ! blockRects[ anchorThread.id ] ) {
+	if ( ! anchorThread ) {
 		return { positions: {}, contentHeight: 0 };
 	}
 
@@ -762,7 +764,7 @@ export function calculateNotePositions( {
 	for ( let i = anchorIndex + 1; i < orderedThreads.length; i++ ) {
 		const thread = orderedThreads[ i ];
 		const threadRect = blockRects[ thread.id ];
-		if ( ! threadRect ) {
+		if ( ! threadRect || heights[ thread.id ] === undefined ) {
 			continue;
 		}
 
@@ -788,7 +790,7 @@ export function calculateNotePositions( {
 	for ( let i = anchorIndex - 1; i >= 0; i-- ) {
 		const thread = orderedThreads[ i ];
 		const threadRect = blockRects[ thread.id ];
-		if ( ! threadRect ) {
+		if ( ! threadRect || heights[ thread.id ] === undefined ) {
 			continue;
 		}
 
