@@ -89,31 +89,26 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 		( is_array( $color_support ) && ! isset( $color_support['background'] ) );
 	$has_gradients_support         = $color_support['gradients'] ?? false;
 
-	// Suppress color.gradient CSS when background.gradient is supported and
-	// explicitly set. background.php owns CSS generation in that case, and
-	// emitting the background shorthand here would conflict with it.
+	// background.php owns the CSS when a background gradient is set, so skip color.gradient.
 	$has_background_gradient_support = block_has_support( $block_type, array( 'background', 'gradient' ), false );
 	$has_background_gradient_value   = ! empty( $block_attributes['style']['background']['gradient'] );
 
-	$allowed_features  = array(
-		'text'       => $has_text_colors_support && ! wp_should_skip_block_supports_serialization( $block_type, 'color', 'text' ),
-		'background' => $has_background_colors_support && ! wp_should_skip_block_supports_serialization( $block_type, 'color', 'background' ),
-		'gradient'   => $has_gradients_support &&
-			! wp_should_skip_block_supports_serialization( $block_type, 'color', 'gradients' ) &&
-			! ( $has_background_gradient_support && $has_background_gradient_value ),
+	$features         = array(
+		'text'       => array( 'textColor', $has_text_colors_support && ! wp_should_skip_block_supports_serialization( $block_type, 'color', 'text' ) ),
+		'background' => array( 'backgroundColor', $has_background_colors_support && ! wp_should_skip_block_supports_serialization( $block_type, 'color', 'background' ) ),
+		'gradient'   => array(
+			'gradient',
+			$has_gradients_support &&
+				! wp_should_skip_block_supports_serialization( $block_type, 'color', 'gradients' ) &&
+				! ( $has_background_gradient_support && $has_background_gradient_value ),
+		),
 	);
-	$preset_attributes = array(
-		'text'       => 'textColor',
-		'background' => 'backgroundColor',
-		'gradient'   => 'gradient',
-	);
-	$color_attributes  = array();
+	$color_attributes = array();
 
-	foreach ( $allowed_features as $feature => $is_allowed ) {
+	foreach ( $features as $feature => list( $preset_attribute, $is_allowed ) ) {
 		if ( ! $is_allowed ) {
 			continue;
 		}
-		$preset_attribute = $preset_attributes[ $feature ];
 		if ( array_key_exists( $preset_attribute, $block_attributes ) ) {
 			$color_attributes[ $preset_attribute ] = $block_attributes[ $preset_attribute ];
 		}
@@ -126,16 +121,14 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 }
 
 /**
- * Generates color CSS classes and inline styles from block attributes.
- *
- * The PHP counterpart of `getColorClassesAndStyles()` in the block editor.
- * Support and serialization checks are left to the caller.
+ * Returns color classes and inline styles for block attributes, like the JS
+ * `getColorClassesAndStyles()`. Does not check block support or skipped
+ * serialization.
  *
  * @since 7.2.0
  *
  * @param array $block_attributes Block attributes.
- *
- * @return array Colors CSS classes and inline styles.
+ * @return array Array with `class` and `style` keys, each present only when non-empty.
  */
 function gutenberg_get_color_classes_and_styles( $block_attributes ) {
 	if ( ! is_array( $block_attributes ) ) {
@@ -152,7 +145,7 @@ function gutenberg_get_color_classes_and_styles( $block_attributes ) {
 	foreach ( $preset_attributes as $feature => list( $preset_attribute, $preset_type ) ) {
 		$preset_value                   = array_key_exists( $preset_attribute, $block_attributes ) ? "var:preset|{$preset_type}|{$block_attributes[ $preset_attribute ]}" : null;
 		$custom_value                   = $block_attributes['style']['color'][ $feature ] ?? null;
-		$color_block_styles[ $feature ] = $preset_value ? $preset_value : $custom_value;
+		$color_block_styles[ $feature ] = $preset_value ?? $custom_value;
 	}
 
 	$attributes = array();
