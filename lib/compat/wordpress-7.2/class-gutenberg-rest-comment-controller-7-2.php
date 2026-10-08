@@ -83,21 +83,25 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		return false;
 	}
 
+	/**
+	 * Checks if a given request has access to read comments.
+	 *
+	 * Mirrors core's check, extended to the 'reaction' type.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has read access, error object otherwise.
+	 */
 	public function get_items_permissions_check( $request ) {
-		$is_note         = $this->is_note_or_reaction( $request['type'] );
-		$is_edit_context = 'edit' === $request['context'];
+		$is_note          = $this->is_note_or_reaction( $request['type'] );
+		$is_edit_context  = 'edit' === $request['context'];
+		$protected_params = array( 'author', 'author_exclude', 'author_email', 'type', 'status' );
+		$forbidden_params = array();
 
 		if ( ! empty( $request['post'] ) ) {
 			foreach ( (array) $request['post'] as $post_id ) {
 				$post = get_post( $post_id );
-
-				if ( $post && $is_note && ! $this->check_post_type_supports_notes( $post->post_type ) ) {
-					return new WP_Error(
-						'rest_comment_not_supported_post_type',
-						__( 'Sorry, this post type does not support notes.', 'gutenberg' ),
-						array( 'status' => 403 )
-					);
-				}
 
 				if ( ! empty( $post_id ) && $post && ! $this->check_read_post_permission( $post, $request ) ) {
 					return new WP_Error(
@@ -112,9 +116,40 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 						array( 'status' => rest_authorization_required_code() )
 					);
 				}
+
+				if ( $post && $is_note && ! $this->check_post_type_supports_notes( $post->post_type ) ) {
+					if ( current_user_can( 'edit_post', $post->ID ) ) {
+						return new WP_Error(
+							'rest_comment_not_supported_post_type',
+							__( 'Sorry, this post type does not support notes.', 'gutenberg' ),
+							array( 'status' => 403 )
+						);
+					}
+
+					foreach ( $protected_params as $param ) {
+						if ( 'status' === $param ) {
+							if ( 'approve' !== $request[ $param ] ) {
+								$forbidden_params[] = $param;
+							}
+						} elseif ( 'type' === $param ) {
+							if ( 'comment' !== $request[ $param ] ) {
+								$forbidden_params[] = $param;
+							}
+						} elseif ( ! empty( $request[ $param ] ) ) {
+							$forbidden_params[] = $param;
+						}
+					}
+					return new WP_Error(
+						'rest_forbidden_param',
+						/* translators: %s: List of forbidden parameters. */
+						sprintf( __( 'Query parameter not permitted: %s', 'gutenberg' ), implode( ', ', $forbidden_params ) ),
+						array( 'status' => rest_authorization_required_code() )
+					);
+				}
 			}
 		}
 
+		// Re-map edit context capabilities when requesting `note` for a post.
 		if ( $is_edit_context && $is_note && ! empty( $request['post'] ) ) {
 			foreach ( (array) $request['post'] as $post_id ) {
 				if ( ! current_user_can( 'edit_post', $post_id ) ) {
@@ -134,9 +169,6 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		}
 
 		if ( ! current_user_can( 'edit_posts' ) ) {
-			$protected_params = array( 'author', 'author_exclude', 'author_email', 'type', 'status' );
-			$forbidden_params = array();
-
 			foreach ( $protected_params as $param ) {
 				if ( 'status' === $param ) {
 					if ( 'approve' !== $request[ $param ] ) {
@@ -547,21 +579,33 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			// because the comments table is not guaranteed to be utf8mb4
 			// across all WordPress installs; clients normalize before
 			// submitting.
-			$emoji_key = '';
+			$raw_content = '';
 
 			// Accept `content` as a string or `{ raw }`, like prepare_item_for_database().
 			if ( isset( $request['content'] ) && is_string( $request['content'] ) ) {
-				$emoji_key = wp_strip_all_tags( $request['content'] );
+				$raw_content = $request['content'];
 			} elseif ( isset( $request['content']['raw'] ) && is_string( $request['content']['raw'] ) ) {
-				$emoji_key = wp_strip_all_tags( $request['content']['raw'] );
+				$raw_content = $request['content']['raw'];
 			}
 
-			$is_hex_key = in_array( $emoji_key, gutenberg_get_note_reaction_keys(), true );
+			$emoji_key = trim( wp_strip_all_tags( $raw_content ) );
 
-			if ( ! $is_hex_key ) {
+			if ( ! in_array( $emoji_key, gutenberg_get_note_reaction_keys(), true ) ) {
 				return new WP_Error(
 					'rest_comment_invalid_reaction',
 					__( 'Invalid reaction emoji.', 'gutenberg' ),
+					array( 'status' => 400 )
+				);
+			}
+
+			// A reaction is always approved. The uniqueness check, the race
+			// cleanup below and the reaction summary only see approved rows, so
+			// a reaction created in any other status could never be counted,
+			// deduplicated or, since reactions cannot be updated, fixed.
+			if ( isset( $request['status'] ) && ! in_array( $request['status'], array( 'approve', 'approved', '1' ), true ) ) {
+				return new WP_Error(
+					'rest_comment_invalid_status',
+					__( 'A reaction cannot be created with that status.', 'gutenberg' ),
 					array( 'status' => 400 )
 				);
 			}
@@ -771,7 +815,10 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			}
 		}
 
-		if ( isset( $request['status'] ) ) {
+		// Reactions are inserted approved and their status was validated above.
+		// Skipping them here also keeps a request from changing the status of a
+		// row that the race cleanup above may have handed it from another request.
+		if ( isset( $request['status'] ) && null === $reaction_key ) {
 			$this->handle_status_param( $request['status'], $comment_id );
 		}
 
@@ -981,6 +1028,40 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		}
 
 		return $response;
+	}
+
+	/**
+	 * Prepares links for the request.
+	 *
+	 * Core counts every child type when deciding whether to add a `children`
+	 * link. Reactions are left out: they are summarized in `reaction_summary`,
+	 * and counting them would advertise a `children` link on a note that has
+	 * no replies.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param WP_Comment $comment Comment object.
+	 * @return array Links for the given comment.
+	 */
+	protected function prepare_links( $comment ) {
+		$links = parent::prepare_links( $comment );
+
+		if ( isset( $links['children'] ) ) {
+			$comment_children = $comment->get_children(
+				array(
+					'count'        => true,
+					'orderby'      => 'none',
+					'type'         => 'all',
+					'type__not_in' => array( 'reaction' ),
+				)
+			);
+
+			if ( empty( $comment_children ) ) {
+				unset( $links['children'] );
+			}
+		}
+
+		return $links;
 	}
 
 	/**

@@ -39,11 +39,10 @@ function gutenberg_update_get_avatar_comment_type_7_2( $comment_type ) {
 add_filter( 'get_avatar_comment_types', 'gutenberg_update_get_avatar_comment_type_7_2' );
 
 /**
- * Excludes notes and reactions from comment queries that request no
- * specific type.
+ * Excludes reactions from comment queries unless they are requested.
  *
- * Core's WP_Comment_Query already excludes 'note'; this also excludes
- * 'reaction'.
+ * Core's WP_Comment_Query already excludes 'note' unless 'all' or 'note' is
+ * requested; this applies the same rule to 'reaction'.
  *
  * @global wpdb $wpdb WordPress database abstraction object.
  *
@@ -53,15 +52,19 @@ add_filter( 'get_avatar_comment_types', 'gutenberg_update_get_avatar_comment_typ
  * @return string[] The modified SQL clauses for the comments query.
  */
 function gutenberg_exclude_block_comments_from_admin_7_2( $clauses, $query ) {
-	if ( isset( $query->query_vars['type'] ) && '' === $query->query_vars['type'] ) {
-		$query->set( 'type', '' );
+	$types_in     = array_merge( (array) $query->query_vars['type'], (array) $query->query_vars['type__in'] );
+	$types_not_in = (array) $query->query_vars['type__not_in'];
 
-		global $wpdb;
-		$internal_types    = array( 'note', 'reaction' );
-		$type_placeholders = implode( ', ', array_fill( 0, count( $internal_types ), '%s' ) );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-		$clauses['where'] .= ' AND ' . $wpdb->prepare( "{$wpdb->comments}.comment_type NOT IN ( $type_placeholders )", $internal_types );
+	if (
+		in_array( 'all', $types_in, true ) ||
+		in_array( 'reaction', $types_in, true ) ||
+		in_array( 'reaction', $types_not_in, true )
+	) {
+		return $clauses;
 	}
+
+	global $wpdb;
+	$clauses['where'] .= $wpdb->prepare( " AND {$wpdb->comments}.comment_type != %s", 'reaction' );
 
 	return $clauses;
 }
@@ -118,6 +121,35 @@ function gutenberg_filter_comment_count_query_exclude_block_comments_7_2( $query
 	return $query;
 }
 add_filter( 'query', 'gutenberg_filter_comment_count_query_exclude_block_comments_7_2' );
+
+/**
+ * Excludes notes and reactions from the last comment modified lookup.
+ *
+ * Both are stored approved, so get_lastcommentmodified() would otherwise
+ * report a note or reaction as the site's latest comment, for example in
+ * the comment feed's Last-Modified header.
+ *
+ * @global wpdb $wpdb WordPress database abstraction object.
+ *
+ * @param string $query The SQL query string.
+ * @return string The modified SQL query string.
+ */
+function gutenberg_exclude_internal_comment_types_from_lastcommentmodified_7_2( $query ) {
+	global $wpdb;
+
+	$needle = "FROM $wpdb->comments WHERE comment_approved = '1' ORDER BY comment_date_gmt DESC LIMIT 1";
+	if ( ! str_starts_with( $query, 'SELECT ' ) || ! str_ends_with( $query, $needle ) ) {
+		return $query;
+	}
+
+	$internal_types    = array( 'note', 'reaction' );
+	$type_placeholders = implode( ', ', array_fill( 0, count( $internal_types ), '%s' ) );
+	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+	$type_not_in = $wpdb->prepare( " AND comment_type NOT IN ( $type_placeholders )", $internal_types );
+
+	return str_replace( "comment_approved = '1' ORDER BY", "comment_approved = '1'{$type_not_in} ORDER BY", $query );
+}
+add_filter( 'query', 'gutenberg_exclude_internal_comment_types_from_lastcommentmodified_7_2' );
 
 /**
  * Adjusts the comments list table query so notes and reactions never display.
@@ -288,6 +320,8 @@ function gutenberg_get_note_reaction_emojis() {
  * @since 7.2.0
  *
  * @return string[] The keys of the emoji from `gutenberg_get_note_reaction_emojis()`.
+ *
+ * @phpstan-return list<lowercase-string&non-falsy-string>
  */
 function gutenberg_get_note_reaction_keys() {
 	return wp_list_pluck( gutenberg_get_note_reaction_emojis(), 'hexKey' );
@@ -319,7 +353,7 @@ add_filter( 'block_editor_settings_all', 'gutenberg_add_note_reaction_emojis_set
  * @param WP_Comment $note   The note whose reactions to fetch.
  * @param string     $status Comment status to match. Default 'any', which
  *                           includes trashed reactions.
- * @return int[] Reaction comment IDs.
+ * @return int[] Reaction comment IDs, oldest first.
  */
 function gutenberg_get_note_reaction_ids( $note, $status = 'any' ) {
 	return get_comments(
@@ -329,6 +363,7 @@ function gutenberg_get_note_reaction_ids( $note, $status = 'any' ) {
 			'status'  => $status,
 			'fields'  => 'ids',
 			'orderby' => 'comment_ID',
+			'order'   => 'ASC',
 		)
 	);
 }

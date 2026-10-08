@@ -1548,4 +1548,138 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$this->assertSame( 201, $response->get_status() );
 		$this->assertSame( $survivor_id, $response->get_data()['id'], 'Response did not repoint to the surviving row.' );
 	}
+
+	/**
+	 * Whitespace around the reaction key is trimmed before it is validated
+	 * and stored.
+	 */
+	public function test_create_reaction_trims_key() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'type'    => 'reaction',
+					'parent'  => $note_id,
+					'content' => " 2764\n",
+				)
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( '2764', get_comment( $response->get_data()['id'] )->comment_content );
+	}
+
+	/**
+	 * A reaction can only be created approved.
+	 *
+	 * Held, spammed or trashed reactions are invisible to the uniqueness check
+	 * and the reaction summary, so repeated requests could pile them up.
+	 *
+	 * @dataProvider data_create_reaction_status
+	 *
+	 * @param string $status          Requested status.
+	 * @param int    $expected_status Expected HTTP status.
+	 */
+	public function test_create_reaction_only_allows_approved_status( $status, $expected_status ) {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'type'    => 'reaction',
+					'parent'  => $note_id,
+					'content' => '2764',
+					'status'  => $status,
+				)
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+
+		if ( 201 === $expected_status ) {
+			$this->assertSame( 201, $response->get_status() );
+			$this->assertSame( '1', get_comment( $response->get_data()['id'] )->comment_approved );
+			return;
+		}
+
+		$this->assertErrorResponse( 'rest_comment_invalid_status', $response, $expected_status );
+		$this->assertSame(
+			array(),
+			get_comments(
+				array(
+					'parent' => $note_id,
+					'type'   => 'reaction',
+					'status' => 'any',
+					'fields' => 'ids',
+				)
+			),
+			'No reaction should have been stored.'
+		);
+	}
+
+	public function data_create_reaction_status() {
+		return array(
+			'approve' => array( 'approve', 201 ),
+			'hold'    => array( 'hold', 400 ),
+			'spam'    => array( 'spam', 400 ),
+			'trash'   => array( 'trash', 400 ),
+		);
+	}
+
+	/**
+	 * A note's `children` link keeps targeting its reply notes once reactions
+	 * exist, and a note with only reactions does not advertise one.
+	 */
+	public function test_note_children_link_ignores_reactions() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+
+		self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'reaction',
+				'comment_parent'   => $note_id,
+				'comment_approved' => 1,
+				'user_id'          => self::$editor_id,
+				'comment_content'  => '2764',
+			)
+		);
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/comments/' . $note_id );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertArrayNotHasKey( 'children', $response->get_links(), 'A note with only reactions should not advertise children.' );
+
+		self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'note',
+				'comment_parent'   => $note_id,
+				'comment_approved' => 1,
+				'user_id'          => self::$editor_id,
+				'comment_content'  => 'Reply note',
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$links    = $response->get_links();
+
+		$this->assertArrayHasKey( 'children', $links, 'A note with a reply should advertise children.' );
+		$href = $links['children'][0]['href'];
+		$this->assertStringContainsString( 'type=note', $href );
+		$this->assertStringNotContainsString( 'type=reaction', $href );
+	}
 }
