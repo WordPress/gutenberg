@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Meta Boxes: Hide the empty Meta Boxes pane below the editor when there are no `normal` or `advanced` meta boxes, such as when only `side` meta boxes are present.
+
 ## 8.57.0 (2026-10-07)
 
 ## 8.56.0 (2026-09-23)

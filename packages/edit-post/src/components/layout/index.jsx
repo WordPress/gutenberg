@@ -124,9 +124,9 @@ function MetaBoxesMain() {
 		return [
 			!! get( 'core/edit-post', 'metaBoxesMainIsOpen' ),
 			get( 'core/edit-post', 'metaBoxesMainOpenHeight' ),
+			// The side location is rendered in the sidebar, not in this pane.
 			isMetaBoxLocationVisible( 'normal' ) ||
-				isMetaBoxLocationVisible( 'advanced' ) ||
-				isMetaBoxLocationVisible( 'side' ),
+				isMetaBoxLocationVisible( 'advanced' ),
 		];
 	}, [] );
 	const { set: setPreference } = useDispatch( preferencesStore );
