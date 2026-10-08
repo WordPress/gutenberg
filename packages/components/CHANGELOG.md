@@ -14,6 +14,10 @@
 
 -   `Tip`: Deprecate in favor of `Notice` from `@wordpress/ui`, preserving the legacy component for existing consumers ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
 
+### Bug Fixes
+
+-   `navigateRegions`: Only outline the Publish and Save controls when their region has focus ([#84343](https://github.com/WordPress/gutenberg/pull/84343)).
+
 ## 42.0.0 (2026-10-07)
 
 ### Breaking Changes
