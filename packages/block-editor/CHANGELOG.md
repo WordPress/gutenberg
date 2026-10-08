@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Grid: In manual placement grids (behind the `gutenberg-grid-interactivity` experiment), dragging a block shows the cells it will land in, any blocks it will overlap, and alignment guides to the container and nearby blocks. A grip and a rotate handle sit on the selected block, the block settings gain a Rotation control stored as `style.layout.rotate`, and the grid stacks its blocks on mobile unless "Stack on mobile" is turned off (`layout.stackOnMobile`).
+
 ## 18.1.0 (2026-10-07)
 
 ### New Features
