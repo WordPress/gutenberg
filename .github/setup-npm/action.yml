@@ -32,7 +32,9 @@ runs:
               # actions/setup-node cannot restore the npm cache: it locates the
               # directory with `npm config get cache`, which runs before this step
               # and fails the devEngines check under the bundled npm.
-              echo "cache-dir=$(npm config get cache | tr -d '\r')" >> "$GITHUB_OUTPUT"
+              # Assign first: pipefail then fails here, not later with an empty path.
+              CACHE_DIR="$(npm config get cache | tr -d '\r')"
+              echo "cache-dir=$CACHE_DIR" >> "$GITHUB_OUTPUT"
 
               # Keep the hashFiles patterns workspace-relative and free of a "./"
               # prefix, so they match the same files as every other cache key.
