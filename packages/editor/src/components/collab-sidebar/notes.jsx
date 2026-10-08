@@ -122,6 +122,7 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 			selectedNoteId: selectedNote,
 			isFloating,
 			sidebarRef,
+			orderedBlockIds,
 		} );
 
 	const navigate = ( event, thread, isSelected ) => {
