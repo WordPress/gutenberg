@@ -82,10 +82,18 @@
  * Count badge overlaid on a pinned toolbar toggle. The wrapper only exists when
  * a badge is rendered, so no other pinned item is affected. `display: flex`
  * keeps the wrapped button sized exactly as it is elsewhere in the row.
+ *
+ * Pinned toggles are hidden on mobile (see `.interface-pinned-items`), so the
+ * wrapper hides with them: otherwise the badge would stay on screen with no
+ * button under it to open the sidebar.
  */
 .interface-complementary-area__pinned-toggle {
-	display: flex;
+	display: none;
 	position: relative;
+
+	@include break-small() {
+		display: flex;
+	}
 }
 
 .interface-complementary-area__badge {
