@@ -504,3 +504,15 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		z-index: 1;
 	}
 }
+
+// A block on a canvas is its own drag handle, so it must not look like text
+// you can sweep over. It is genuinely not editable until it has been entered —
+// RichText sees to that — and this stops the words highlighting in the
+// meantime. The entered block gets its selection back.
+.is-layout-freeform.block-editor-block-list__layout > :is(*, div) {
+	user-select: none;
+
+	&:is([contenteditable="true"]) {
+		user-select: text;
+	}
+}

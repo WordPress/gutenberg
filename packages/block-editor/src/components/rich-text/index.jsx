@@ -228,8 +228,22 @@ function RichTextWrapper(
 	const shouldDisableForPattern =
 		isInsidePatternOverrides && ! hasOverrideEnabled;
 
+	// A block on a freeform canvas is not editable until it has been entered,
+	// so that pressing on its words starts a move rather than a caret. The
+	// second click on a selected block enters it.
+	const isFreeformLocked = useSelect(
+		( select ) =>
+			unlock( select( blockEditorStore ) ).isBlockFreeformLocked(
+				clientId
+			),
+		[ clientId ]
+	);
+
 	const shouldDisableEditing =
-		readOnly || disableBoundBlock || shouldDisableForPattern;
+		readOnly ||
+		disableBoundBlock ||
+		shouldDisableForPattern ||
+		isFreeformLocked;
 
 	// Whether the wrapper is the editing host, which depends on the selected
 	// block, not necessarily this one. Only the selected, default-mode block

@@ -2411,6 +2411,35 @@ export function styleStateViewport( state = 'default', action ) {
  *
  * @return {boolean} Updated state.
  */
+/**
+ * Which block on a freeform canvas you have entered to edit its text.
+ *
+ * A block on a canvas is not editable until you click it a second time, which
+ * is what lets the whole block be its own drag handle: a press on its words
+ * moves it rather than placing a caret. Entering one block leaves any other,
+ * and moving the selection elsewhere leaves it too.
+ *
+ * @param {?string} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {?string} Updated state.
+ */
+export function freeformEnteredBlock( state = null, action ) {
+	switch ( action.type ) {
+		case 'SET_FREEFORM_ENTERED_BLOCK':
+			return action.clientId ?? null;
+		case 'SELECT_BLOCK':
+			return action.clientId === state ? state : null;
+		// Deliberately not SELECTION_CHANGE: that fires for the caret moving
+		// inside a block, which is exactly what entering one is for.
+		case 'CLEAR_SELECTED_BLOCK':
+		case 'MULTI_SELECT':
+			return null;
+	}
+
+	return state;
+}
+
 export function isResponsiveEditing( state = false, action ) {
 	if ( action.type === 'SET_RESPONSIVE_EDITING' ) {
 		return action.enabled;
@@ -2457,6 +2486,7 @@ const combinedReducers = combineReducers( {
 	selectedBlockStyleState,
 	styleStateViewport,
 	isResponsiveEditing,
+	freeformEnteredBlock,
 } );
 
 /**

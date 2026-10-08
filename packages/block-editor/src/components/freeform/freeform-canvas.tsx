@@ -33,13 +33,15 @@ import {
 	resolveResize,
 } from './snapping';
 import { getCanvasConversion, measureSection } from './conversion';
+import { getCanvasChild } from './canvas-child';
 import { getGrownCanvasLayout } from './canvases';
 
 /**
  * How far the pointer has to travel before a press becomes a drag. Below this a
  * press is a click, and a block whose grip was merely clicked must not move.
  */
-const DRAG_THRESHOLD = 3;
+const DRAG_THRESHOLD = 4;
+const TOUCH_DRAG_THRESHOLD = 10;
 
 /**
  * The resize handles, in the order they are drawn.
@@ -54,9 +56,10 @@ function mergeChildLayout( style, layout ) {
 }
 
 /**
- * The editing surface for a freeform canvas: the grips that move blocks, the
- * handles that resize them, and the guides and measurements that say what the
- * magnets are doing.
+ * The editing surface for a freeform canvas: the outlines around what is
+ * selected, the handles that resize it, and the guides and measurements that
+ * say what the magnets are doing. Moving a block is not done from here — the
+ * block itself is its own drag handle.
  *
  * @param {Object}   props
  * @param {string}   props.canvasClientId    The section acting as the canvas.
@@ -72,6 +75,12 @@ export default function FreeformCanvas( {
 	const canvasElement = useBlockElement( canvasClientId );
 	const [ overlayElement, setOverlayElement ] = useState( null );
 	const geometry = useCanvasGeometry( canvasElement, overlayElement );
+
+	const enteredClientId = useSelect(
+		( select ) =>
+			unlock( select( blockEditorStore ) ).getFreeformEnteredBlock(),
+		[]
+	);
 
 	const { childClientIds, childStyles, canvasLayout } = useSelect(
 		( select ) => {
@@ -92,7 +101,8 @@ export default function FreeformCanvas( {
 		duplicateBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 		__unstableMarkLastChangeAsPersistent,
-	} = useDispatch( blockEditorStore );
+		setFreeformEnteredBlock,
+	} = unlock( useDispatch( blockEditorStore ) );
 
 	// Set the moment a section is converted, so the stylesheet below is correct
 	// immediately rather than after the store has made its way back through a
@@ -167,6 +177,8 @@ export default function FreeformCanvas( {
 	// Everything a live gesture needs, kept out of state so that a pointermove
 	// does not re-render the whole canvas to read it back.
 	const gestureRef = useRef( null );
+	// A press waiting to become either a drag or a click.
+	const pendingRef = useRef( null );
 	// What the gesture is currently claiming, which is what gets drawn.
 	const [ feedback, setFeedback ] = useState( null );
 
@@ -559,10 +571,85 @@ export default function FreeformCanvas( {
 		]
 	);
 
+	// The whole block is the drag handle, the way gogh does it. A press
+	// anywhere on a block starts a pending drag; a few pixels of travel
+	// promotes it to a real one, and a press that never moves is a click.
+	//
+	// Nothing is preventDefault-ed here, deliberately — gogh's comment says
+	// doing so stops the frame taking focus and breaks keyboard nudging and
+	// undo, and it also stops the editor selecting the block at all. It does
+	// not need to: a block on a canvas is not editable until it is entered, so
+	// the browser puts no caret in it and a drag across its words selects
+	// nothing.
+	useEffect( () => {
+		if ( ! canvasElement ) {
+			return;
+		}
+		const onPointerDown = ( event ) => {
+			if ( event.button !== 0 || gestureRef.current ) {
+				return;
+			}
+			const clientId = getCanvasChild( event.target, canvasElement );
+			// Already typing in this block: the caret and the selection are
+			// the browser's business.
+			if ( ! clientId || clientId === enteredClientId ) {
+				return;
+			}
+			pendingRef.current = {
+				clientId,
+				wasSelected: selectedClientIds.includes( clientId ),
+				x: event.clientX,
+				y: event.clientY,
+				pointerId: event.pointerId,
+				altKey: event.altKey,
+				target: event.target,
+			};
+		};
+		canvasElement.addEventListener( 'pointerdown', onPointerDown );
+		return () =>
+			canvasElement.removeEventListener( 'pointerdown', onPointerDown );
+	}, [ canvasElement, enteredClientId, selectedClientIds ] );
+
 	// The gesture is followed on the document so it survives the pointer
-	// leaving the handle it started on.
+	// leaving the block it started on.
 	useEffect( () => {
 		const onPointerMove = ( event ) => {
+			const pending = pendingRef.current;
+			if ( pending && ! gestureRef.current ) {
+				const threshold =
+					event.pointerType === 'touch'
+						? TOUCH_DRAG_THRESHOLD
+						: DRAG_THRESHOLD;
+				if (
+					Math.abs( event.clientX - pending.x ) +
+						Math.abs( event.clientY - pending.y ) >=
+					threshold
+				) {
+					pendingRef.current = null;
+					beginGesture(
+						{
+							clientX: pending.x,
+							clientY: pending.y,
+							altKey: pending.altKey,
+							pointerId: pending.pointerId,
+							target: pending.target,
+							preventDefault() {},
+							stopPropagation() {},
+						},
+						{
+							kind: 'drag',
+							clientIds: selectedClientIds.includes(
+								pending.clientId
+							)
+								? selectedClientIds
+								: [ pending.clientId ],
+							leadClientId: pending.clientId,
+						}
+					);
+				}
+				return;
+			}
+
 			const gesture = gestureRef.current;
 			if ( ! gesture ) {
 				return;
@@ -573,7 +660,20 @@ export default function FreeformCanvas( {
 				applyResize( event );
 			}
 		};
-		const onPointerUp = () => endGesture();
+		const onPointerUp = () => {
+			const pending = pendingRef.current;
+			pendingRef.current = null;
+			// A press that never moved, on a block that was already selected:
+			// that is the "let me edit the words" gesture, so the block is
+			// entered and becomes editable.
+			if ( pending && ! gestureRef.current ) {
+				if ( pending.wasSelected ) {
+					setFreeformEnteredBlock( pending.clientId );
+				}
+				return;
+			}
+			endGesture();
+		};
 		const onKeyDown = ( event ) => {
 			if ( gestureRef.current && event.keyCode === ESCAPE ) {
 				const gesture = gestureRef.current;
@@ -591,17 +691,39 @@ export default function FreeformCanvas( {
 			}
 		};
 
-		document.addEventListener( 'pointermove', onPointerMove );
-		document.addEventListener( 'pointerup', onPointerUp );
-		document.addEventListener( 'pointercancel', onPointerUp );
-		document.addEventListener( 'keydown', onKeyDown );
+		// Both documents. A gesture that starts on a block starts inside the
+		// editor's iframe, and those events never reach the document this
+		// overlay lives in; one that starts on a resize handle is the other way
+		// round. Listening to only one of them leaves a drag that can begin and
+		// never end.
+		const documents = new Set( [ document ] );
+		if ( canvasElement?.ownerDocument ) {
+			documents.add( canvasElement.ownerDocument );
+		}
+		for ( const doc of documents ) {
+			doc.addEventListener( 'pointermove', onPointerMove );
+			doc.addEventListener( 'pointerup', onPointerUp );
+			doc.addEventListener( 'pointercancel', onPointerUp );
+			doc.addEventListener( 'keydown', onKeyDown );
+		}
 		return () => {
-			document.removeEventListener( 'pointermove', onPointerMove );
-			document.removeEventListener( 'pointerup', onPointerUp );
-			document.removeEventListener( 'pointercancel', onPointerUp );
-			document.removeEventListener( 'keydown', onKeyDown );
+			for ( const doc of documents ) {
+				doc.removeEventListener( 'pointermove', onPointerMove );
+				doc.removeEventListener( 'pointerup', onPointerUp );
+				doc.removeEventListener( 'pointercancel', onPointerUp );
+				doc.removeEventListener( 'keydown', onKeyDown );
+			}
 		};
-	}, [ applyDrag, applyResize, endGesture, writeLayouts ] );
+	}, [
+		applyDrag,
+		applyResize,
+		beginGesture,
+		canvasElement,
+		endGesture,
+		selectedClientIds,
+		setFreeformEnteredBlock,
+		writeLayouts,
+	] );
 
 	const nudge = useCallback(
 		( event, clientIds ) => {
@@ -680,13 +802,6 @@ export default function FreeformCanvas( {
 								geometry={ geometry }
 								isLead={ clientId === leadClientId }
 								showHandles={ placedSelection.length === 1 }
-								onGripPointerDown={ ( event ) =>
-									beginGesture( event, {
-										kind: 'drag',
-										clientIds: placedSelection,
-										leadClientId: clientId,
-									} )
-								}
 								onHandlePointerDown={ ( event, direction ) =>
 									beginGesture( event, {
 										kind: 'resize',
@@ -695,7 +810,7 @@ export default function FreeformCanvas( {
 										direction,
 									} )
 								}
-								onGripKeyDown={ ( event ) =>
+								onKeyDown={ ( event ) =>
 									nudge( event, placedSelection )
 								}
 							/>
@@ -718,9 +833,8 @@ function FreeformItem( {
 	geometry,
 	isLead,
 	showHandles,
-	onGripPointerDown,
 	onHandlePointerDown,
-	onGripKeyDown,
+	onKeyDown,
 } ) {
 	// The canvas keeps the design aspect ratio, so one design unit is the same
 	// number of pixels on both axes and a single conversion covers the lot.
@@ -737,16 +851,10 @@ function FreeformItem( {
 				'is-lead': isLead,
 			} ) }
 			style={ style }
+			onKeyDown={ onKeyDown }
+			tabIndex={ -1 }
+			role="presentation"
 		>
-			<button
-				type="button"
-				className="block-editor-freeform-canvas__grip"
-				onPointerDown={ onGripPointerDown }
-				onKeyDown={ onGripKeyDown }
-				aria-label={ __( 'Move block on the canvas' ) }
-			>
-				<span aria-hidden="true" />
-			</button>
 			{ showHandles &&
 				HANDLES.map( ( direction ) => (
 					<button

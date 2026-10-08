@@ -13,9 +13,8 @@
 			pointer-events: none;
 		}
 
-		// Only the grips and the handles are interactive. Clicking a block
-		// still selects it and clicking into text still places the caret.
-		.block-editor-freeform-canvas__grip,
+		// Only the resize handles are interactive out here. Moving a block is
+		// done by pressing the block itself, which is in the canvas.
 		.block-editor-freeform-canvas__handle {
 			pointer-events: auto;
 		}
@@ -47,35 +46,6 @@ body.is-freeform-canvas-gesturing .block-editor-block-contextual-toolbar {
 
 	&.is-lead {
 		z-index: 1;
-	}
-}
-
-.block-editor-freeform-canvas__grip {
-	position: absolute;
-	bottom: calc(100% + 4px);
-	left: 0;
-	display: block;
-	width: $grid-unit-30;
-	height: $grid-unit-20;
-	padding: 0;
-	border: none;
-	border-radius: $radius-small;
-	background: var(--wp-admin-theme-color);
-	cursor: grab;
-	pointer-events: auto;
-
-	span {
-		display: block;
-		width: $grid-unit-10;
-		height: 2px;
-		margin: 0 auto;
-		border-top: 2px solid #fff;
-		border-bottom: 2px solid #fff;
-	}
-
-	&:focus-visible {
-		outline: 2px solid var(--wp-admin-theme-color);
-		outline-offset: 2px;
 	}
 }
 

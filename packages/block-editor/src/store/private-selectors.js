@@ -1415,3 +1415,40 @@ export function isSelectedBlockStyleStateShownOnCanvas( state, clientId ) {
 
 	return state.selectedBlockStyleState.showStateOnCanvas ?? true;
 }
+
+/**
+ * Whether a block is on a freeform canvas and has not been entered for editing.
+ *
+ * A locked block is not editable, which is what lets the whole block be its own
+ * drag handle: pressing on its words starts a move instead of placing a caret,
+ * and dragging across them selects nothing because there is nothing selectable.
+ * Clicking a selected block a second time enters it and unlocks it.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId The block to check.
+ *
+ * @return {boolean} Whether the block is locked.
+ */
+export function isBlockFreeformLocked( state, clientId ) {
+	const rootClientId = state.blocks.parents.get( clientId );
+	if ( ! rootClientId ) {
+		return false;
+	}
+	if ( state.freeformEnteredBlock === clientId ) {
+		return false;
+	}
+	return (
+		state.blocks.attributes.get( rootClientId )?.layout?.type === 'freeform'
+	);
+}
+
+/**
+ * The block on a freeform canvas that has been entered for text editing.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {?string} The entered block's client id.
+ */
+export function getFreeformEnteredBlock( state ) {
+	return state.freeformEnteredBlock;
+}
