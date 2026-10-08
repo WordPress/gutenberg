@@ -1475,7 +1475,7 @@ test.describe( 'Block Notes', () => {
 				);
 			} );
 
-			test( 'offers the emoji from the gutenberg_note_reaction_emojis filter', async ( {
+			test( 'offers the emoji from the wp_note_reaction_emojis filter', async ( {
 				page,
 				blockNoteUtils,
 			} ) => {

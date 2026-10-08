@@ -1172,7 +1172,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
-	 * The `gutenberg_note_reaction_emojis` filter decides which emoji the
+	 * The `wp_note_reaction_emojis` filter decides which emoji the
 	 * REST API accepts: an added emoji is accepted and a removed one is not.
 	 */
 	public function test_reaction_emojis_filter_affects_validation() {
@@ -1185,7 +1185,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			);
 			return $emojis;
 		};
-		add_filter( 'gutenberg_note_reaction_emojis', $filter );
+		add_filter( 'wp_note_reaction_emojis', $filter );
 
 		try {
 			wp_set_current_user( self::$editor_id );
@@ -1212,7 +1212,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			$this->assertErrorResponse( 'rest_comment_invalid_reaction', $response, 400 );
 		} finally {
 			// Never leak the filter into the rest of the suite.
-			remove_filter( 'gutenberg_note_reaction_emojis', $filter );
+			remove_filter( 'wp_note_reaction_emojis', $filter );
 		}
 	}
 
@@ -1226,7 +1226,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$note_id     = $this->create_note( $post_id, self::$editor_id );
 		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$editor_id );
 
-		add_filter( 'gutenberg_note_reaction_emojis', '__return_empty_array' );
+		add_filter( 'wp_note_reaction_emojis', '__return_empty_array' );
 
 		try {
 			wp_set_current_user( self::$editor_id );
@@ -1237,7 +1237,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			$this->assertSame( 200, $response->get_status() );
 			$this->assertNull( get_comment( $reaction_id ) );
 		} finally {
-			remove_filter( 'gutenberg_note_reaction_emojis', '__return_empty_array' );
+			remove_filter( 'wp_note_reaction_emojis', '__return_empty_array' );
 		}
 	}
 

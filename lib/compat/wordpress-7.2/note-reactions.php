@@ -252,7 +252,7 @@ function gutenberg_get_note_reaction_emojis() {
 	 *     @type string $label  The emoji's name, lowercase, eg. `unicorn`.
 	 * }
 	 */
-	$emojis = apply_filters( 'gutenberg_note_reaction_emojis', $default_emojis );
+	$emojis = apply_filters( 'wp_note_reaction_emojis', $default_emojis );
 
 	if ( ! is_array( $emojis ) ) {
 		return $default_emojis;

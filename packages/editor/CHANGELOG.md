@@ -9,7 +9,7 @@
 ### New Features
 
 -   Notes: allow reacting to a note with an emoji. Reactions display as pill buttons on the note with per-emoji counts, backed by a new `reaction` comment type. The add-reaction trigger fades in on hover or focus in the note's top corner, so a note with no reactions costs no vertical space for the option ([#76767](https://github.com/WordPress/gutenberg/pull/76767)).
--   Notes: Offer the reaction emoji from the `gutenberg_note_reaction_emojis` filter, which lets a site add or remove emoji ([#84200](https://github.com/WordPress/gutenberg/pull/84200)).
+-   Notes: Offer the reaction emoji from the `wp_note_reaction_emojis` filter, which lets a site add or remove emoji ([#84200](https://github.com/WordPress/gutenberg/pull/84200)).
 
 ### Bug Fixes
 

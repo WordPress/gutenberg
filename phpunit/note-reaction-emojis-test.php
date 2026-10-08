@@ -7,7 +7,7 @@
 class Tests_Note_Reaction_Emojis extends WP_UnitTestCase {
 
 	public function tear_down() {
-		remove_all_filters( 'gutenberg_note_reaction_emojis' );
+		remove_all_filters( 'wp_note_reaction_emojis' );
 		parent::tear_down();
 	}
 
@@ -20,7 +20,7 @@ class Tests_Note_Reaction_Emojis extends WP_UnitTestCase {
 
 	public function test_filter_can_add_and_remove_emoji() {
 		add_filter(
-			'gutenberg_note_reaction_emojis',
+			'wp_note_reaction_emojis',
 			static function ( $emojis ) {
 				$emojis[] = array(
 					'hexKey' => '1f984',
@@ -37,20 +37,20 @@ class Tests_Note_Reaction_Emojis extends WP_UnitTestCase {
 	}
 
 	public function test_filter_can_remove_every_emoji() {
-		add_filter( 'gutenberg_note_reaction_emojis', '__return_empty_array' );
+		add_filter( 'wp_note_reaction_emojis', '__return_empty_array' );
 
 		$this->assertSame( array(), gutenberg_get_note_reaction_emojis() );
 	}
 
 	public function test_falls_back_to_the_defaults_when_the_filter_returns_no_list() {
-		add_filter( 'gutenberg_note_reaction_emojis', '__return_null' );
+		add_filter( 'wp_note_reaction_emojis', '__return_null' );
 
 		$this->assertCount( 5, gutenberg_get_note_reaction_emojis() );
 	}
 
 	public function test_drops_malformed_and_duplicate_entries() {
 		add_filter(
-			'gutenberg_note_reaction_emojis',
+			'wp_note_reaction_emojis',
 			static function () {
 				return array(
 					// Normalized: lowercase, padded, U+FE0F dropped.

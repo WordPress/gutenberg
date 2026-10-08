@@ -61,7 +61,7 @@ export function hexKeyToEmoji( hexKey: string ): string {
 
 /**
  * The reaction emoji the editor offers: the `noteReactionEmojis` editor
- * setting, which the server builds from the `gutenberg_note_reaction_emojis`
+ * setting, which the server builds from the `wp_note_reaction_emojis`
  * filter so the menu offers the same emoji the REST API accepts. Falls back
  * to the default emoji when the setting is missing.
  *
