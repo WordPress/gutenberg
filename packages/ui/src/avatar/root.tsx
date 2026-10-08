@@ -22,7 +22,10 @@ import styles from './style.module.css';
  * ```
  */
 export const Root = forwardRef< HTMLSpanElement, RootProps >(
-	function AvatarRoot( { size = 'md', className, ...props }, ref ) {
+	function AvatarRoot(
+		{ size = 'md', shape = 'circle', className, ...props },
+		ref
+	) {
 		return (
 			<_Avatar.Root
 				ref={ ref }
@@ -30,6 +33,7 @@ export const Root = forwardRef< HTMLSpanElement, RootProps >(
 					resetStyles[ 'box-sizing' ],
 					styles.root,
 					styles[ `is-${ size }` ],
+					shape === 'square' && styles[ 'is-square' ],
 					className
 				) }
 				{ ...props }

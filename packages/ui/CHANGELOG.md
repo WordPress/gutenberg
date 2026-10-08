@@ -8,6 +8,7 @@
 
 ### New Features
 
+-   Add `Avatar.Root`, `Avatar.Image`, and `Avatar.Fallback` for profile images with customizable fallbacks, circle and square shapes, five sizes from 16px to 64px, and a reduced-motion-aware image fade. ([#84145](https://github.com/WordPress/gutenberg/pull/84145))
 -   `Breadcrumb`: Add `ButtonItem` ancestors for hierarchy selection, current-only trails, and customizable `CurrentItem` `aria-current` ([#84156](https://github.com/WordPress/gutenberg/pull/84156)).
 
 ### Bug Fixes
@@ -27,7 +28,6 @@
 
 ### New Features
 
--   Add `Avatar.Root`, `Avatar.Image`, and `Avatar.Fallback` for profile images with customizable fallbacks, five sizes from 16px to 64px, and a reduced-motion-aware image fade. ([#84145](https://github.com/WordPress/gutenberg/pull/84145))
 -   Add `Meter` with an 8px track, neutral and brand tones. ([#83855](https://github.com/WordPress/gutenberg/pull/83855))
 -   `Autocomplete`, `Combobox`, `Select`, `SearchableSelect`, `SearchableChipSelect`, and the select controls: Add `Separator` subcomponents for dividing popup items and groups ([#83776](https://github.com/WordPress/gutenberg/pull/83776)).
 -   `Progress`: Add a compound progress component with a track, indicator, accessible label, and formatted value. ([#83781](https://github.com/WordPress/gutenberg/pull/83781))

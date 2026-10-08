@@ -10,6 +10,10 @@
 
 -   `use-recommended-components`: Recommend `Notice` from `@wordpress/ui` instead of `Tip` from `@wordpress/components` ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
 
+### Enhancements
+
+-   `use-recommended-components`: Recognize `Avatar` from `@wordpress/ui` as use-with-caution. ([#84145](https://github.com/WordPress/gutenberg/pull/84145))
+
 ### Bug Fixes
 
 -   `use-recommended-components`: Require `allowUseWithCaution` for `ControlWithError`, `ValidatedInputControl`, and `ValidatedTextareaControl` from `@wordpress/ui`, matching their Storybook status ([#84319](https://github.com/WordPress/gutenberg/pull/84319)).
@@ -22,7 +26,6 @@
 
 ### Enhancements
 
--   `use-recommended-components`: Recognize `Avatar` from `@wordpress/ui` as use-with-caution. ([#84145](https://github.com/WordPress/gutenberg/pull/84145))
 -   `use-recommended-components`: Recommend `Switch` and `SwitchControl` from `@wordpress/ui`, and flag `FormToggle` and `ToggleControl` from `@wordpress/components` ([#84097](https://github.com/WordPress/gutenberg/pull/84097)).
 -   `test-unit`: Allow generated titles passed through variables with `vitest/valid-title`'s `allowArguments` option ([#83995](https://github.com/WordPress/gutenberg/pull/83995)).
 -   `use-recommended-components`: Recommend `Progress` from `@wordpress/ui` and flag `ProgressBar` from `@wordpress/components`. ([#84021](https://github.com/WordPress/gutenberg/pull/84021))

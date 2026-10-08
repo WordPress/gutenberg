@@ -22,6 +22,10 @@
 			vertical-align: middle;
 		}
 
+		.is-square {
+			border-radius: var(--wpds-border-radius-sm);
+		}
+
 		.is-xs {
 			--_wp-ui-avatar-size: var(--wpds-dimension-size-2xs);
 			font-size: calc(var(--_wp-ui-avatar-size) / 2);

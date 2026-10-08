@@ -10,6 +10,13 @@ export type RootProps = ComponentProps< typeof _Avatar.Root > & {
 	 */
 	size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 	/**
+	 * The shape of the avatar. Square avatars use the theme's corner radius
+	 * for buttons and controls. Circles keep their shape in every theme.
+	 *
+	 * @default "circle"
+	 */
+	shape?: 'circle' | 'square';
+	/**
 	 * The avatar image, fallback, and any custom decorations.
 	 */
 	children?: React.ReactNode;
