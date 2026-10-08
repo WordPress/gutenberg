@@ -436,11 +436,13 @@ function TaxonomyItem( {
 		);
 	} else if ( isLimited ) {
 		statusContent = (
-			<LimitedTermCount
-				isSearch={ !! search }
-				shown={ items.length }
-				total={ listTotal }
-			/>
+			<div className="block-library-query-inspector__taxonomy-control-limited-count">
+				<LimitedTermCount
+					isSearch={ !! search }
+					shown={ items.length }
+					total={ listTotal }
+				/>
+			</div>
 		);
 	}
 	return (
