@@ -18,7 +18,9 @@ class WP_Block_Supports_Shadow_Test extends WP_UnitTestCase {
 	}
 
 	public function tear_down() {
-		unregister_block_type( $this->test_block_name );
+		if ( $this->test_block_name ) {
+			unregister_block_type( $this->test_block_name );
+		}
 		$this->test_block_name = null;
 		parent::tear_down();
 	}
@@ -110,8 +112,6 @@ class WP_Block_Supports_Shadow_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that shadow classes and styles are generated from block attributes.
-	 *
 	 * @covers ::gutenberg_get_shadow_classes_and_styles
 	 *
 	 * @dataProvider data_get_shadow_classes_and_styles
@@ -130,39 +130,39 @@ class WP_Block_Supports_Shadow_Test extends WP_UnitTestCase {
 	 */
 	public function data_get_shadow_classes_and_styles() {
 		return array(
-			'custom shadow'          => array(
+			'custom shadow'        => array(
 				'block_attributes' => array( 'style' => array( 'shadow' => '1px 1px 1px #000' ) ),
 				'expected'         => array( 'style' => 'box-shadow:1px 1px 1px #000;' ),
 			),
-			'preset shadow'          => array(
+			'preset shadow'        => array(
 				'block_attributes' => array( 'style' => array( 'shadow' => 'var:preset|shadow|natural' ) ),
 				'expected'         => array( 'style' => 'box-shadow:var(--wp--preset--shadow--natural);' ),
 			),
-			'numeric shadow'         => array(
+			'numeric shadow'       => array(
 				'block_attributes' => array( 'style' => array( 'shadow' => 5 ) ),
 				'expected'         => array(),
 			),
-			'zero shadow'            => array(
+			'zero shadow'          => array(
 				'block_attributes' => array( 'style' => array( 'shadow' => 0 ) ),
 				'expected'         => array(),
 			),
-			'empty shadow'           => array(
+			'empty shadow'         => array(
 				'block_attributes' => array( 'style' => array( 'shadow' => '' ) ),
 				'expected'         => array(),
 			),
-			'no style attribute'     => array(
+			'no style attribute'   => array(
 				'block_attributes' => array(),
 				'expected'         => array(),
 			),
-			'non-array style'        => array(
+			'non-array style'      => array(
 				'block_attributes' => array( 'style' => 'box-shadow:1px 1px 1px #000' ),
 				'expected'         => array(),
 			),
-			'non-array shadow value' => array(
+			'array shadow'         => array(
 				'block_attributes' => array( 'style' => array( 'shadow' => array( '1px 1px 1px #000' ) ) ),
 				'expected'         => array(),
 			),
-			'non-array attributes'   => array(
+			'non-array attributes' => array(
 				'block_attributes' => null,
 				'expected'         => array(),
 			),
