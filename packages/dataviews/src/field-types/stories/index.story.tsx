@@ -1,10 +1,5 @@
 import { useState, useMemo } from '@wordpress/element';
-import {
-	Icon as WCIcon,
-	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
-	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
-} from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Icon, Stack } from '@wordpress/ui';
 import { starFilled } from '@wordpress/icons';
 import DataViews from '../../dataviews/index';
 import DataForm from '../../dataform/index';
@@ -82,26 +77,10 @@ const meta = {
 };
 export default meta;
 
-const DollarPrefix = () => (
-	<InputControlPrefixWrapper>
-		<span>$</span>
-	</InputControlPrefixWrapper>
-);
-const StarIconPrefix = () => (
-	<InputControlPrefixWrapper variant="icon">
-		<WCIcon icon={ starFilled } />
-	</InputControlPrefixWrapper>
-);
-const PercentSuffix = () => (
-	<InputControlSuffixWrapper>
-		<span>%</span>
-	</InputControlSuffixWrapper>
-);
-const USDSuffix = () => (
-	<InputControlSuffixWrapper>
-		<span>USD</span>
-	</InputControlSuffixWrapper>
-);
+const DollarPrefix = () => <span>$</span>;
+const StarIconPrefix = () => <Icon icon={ starFilled } />;
+const PercentSuffix = () => <span>%</span>;
+const USDSuffix = () => <span>USD</span>;
 type DataType = {
 	id: number;
 	text: string;

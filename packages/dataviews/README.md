@@ -1607,6 +1607,8 @@ Additionally, some of the bundled Edit controls are configurable via a config ob
 }
 ```
 
+The `prefix` and `suffix` components render inside the input's prefix and suffix slots, which handle padding and vertical alignment, so they should contain only the content (for example, `() => <span>$</span>`).
+
 -   `datetime` configuration:
 
 ```js
