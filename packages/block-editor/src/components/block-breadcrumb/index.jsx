@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
@@ -13,9 +14,10 @@ import { getBlockDisplayTitle } from '../block-title/use-block-display-title';
  *
  * @param {Object} props               Component props.
  * @param {string} props.rootLabelText Translated label for the root element of the breadcrumb trail.
+ * @param {string} props.className     Additional class name for the breadcrumb navigation.
  * @return {Element}                   Block Breadcrumb.
  */
-function BlockBreadcrumb( { rootLabelText } ) {
+function BlockBreadcrumb( { rootLabelText, className } ) {
 	const { selectBlock, clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { clientId, parents, currentTitle } = useSelect( ( select ) => {
 		const { getSelectedBlockClientId, getEnabledBlockParents } = unlock(
@@ -47,7 +49,7 @@ function BlockBreadcrumb( { rootLabelText } ) {
 
 	return (
 		<Breadcrumb.Root
-			className="block-editor-block-breadcrumb"
+			className={ clsx( 'block-editor-block-breadcrumb', className ) }
 			aria-label={ __( 'Block breadcrumb' ) }
 		>
 			{ !! clientId &&
