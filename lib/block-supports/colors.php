@@ -88,44 +88,43 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 		( isset( $color_support['background'] ) && $color_support['background'] ) ||
 		( is_array( $color_support ) && ! isset( $color_support['background'] ) );
 	$has_gradients_support         = $color_support['gradients'] ?? false;
+	$skip_text                     = wp_should_skip_block_supports_serialization( $block_type, 'color', 'text' );
+	$skip_background               = wp_should_skip_block_supports_serialization( $block_type, 'color', 'background' );
+	$skip_gradients                = wp_should_skip_block_supports_serialization( $block_type, 'color', 'gradients' );
 
 	// background.php owns the CSS when a background gradient is set, so skip color.gradient.
 	$has_background_gradient_support = block_has_support( $block_type, array( 'background', 'gradient' ), false );
 	$has_background_gradient_value   = ! empty( $block_attributes['style']['background']['gradient'] );
-
-	$features         = array(
-		'text'       => array( 'textColor', $has_text_colors_support && ! wp_should_skip_block_supports_serialization( $block_type, 'color', 'text' ) ),
-		'background' => array( 'backgroundColor', $has_background_colors_support && ! wp_should_skip_block_supports_serialization( $block_type, 'color', 'background' ) ),
-		'gradient'   => array(
-			'gradient',
-			$has_gradients_support &&
-				! wp_should_skip_block_supports_serialization( $block_type, 'color', 'gradients' ) &&
-				! ( $has_background_gradient_support && $has_background_gradient_value ),
-		),
-	);
-	$attributes       = $block_attributes;
-	$has_color_styles = isset( $attributes['style']['color'] ) && is_array( $attributes['style']['color'] );
-
-	foreach ( $features as $feature => list( $preset_attribute, $is_allowed ) ) {
-		if ( $is_allowed ) {
-			continue;
-		}
-		unset( $attributes[ $preset_attribute ] );
-		if ( $has_color_styles ) {
-			unset( $attributes['style']['color'][ $feature ] );
-		}
-	}
-
-	$classes_and_styles = gutenberg_get_color_classes_and_styles( $attributes );
+	$has_background_gradient         = $has_background_gradient_support && $has_background_gradient_value;
 
 	/*
 	 * Mirror of the background support: a color clipped to the text paints the
 	 * glyphs, not the box, so only a gradient still adds `has-background`.
+	 * Read before the attributes are filtered for the helper.
 	 */
 	$clips_to_text = 'text' === ( $block_attributes['style']['background']['backgroundClip'] ?? null ) &&
 		block_has_support( $block_type, array( 'background', 'backgroundClip' ), false ) &&
 		! wp_should_skip_block_supports_serialization( $block_type, 'background', 'backgroundClip' );
-	$has_gradient  = ! empty( $attributes['gradient'] ) || ! empty( $attributes['style']['color']['gradient'] );
+
+	// The helper reads only `style.color`, so a non-array value counts as no color styles.
+	if ( ! isset( $block_attributes['style']['color'] ) || ! is_array( $block_attributes['style']['color'] ) ) {
+		unset( $block_attributes['style'] );
+	}
+
+	if ( ! $has_text_colors_support || $skip_text ) {
+		unset( $block_attributes['textColor'], $block_attributes['style']['color']['text'] );
+	}
+
+	if ( ! $has_background_colors_support || $skip_background ) {
+		unset( $block_attributes['backgroundColor'], $block_attributes['style']['color']['background'] );
+	}
+
+	if ( ! $has_gradients_support || $skip_gradients || $has_background_gradient ) {
+		unset( $block_attributes['gradient'], $block_attributes['style']['color']['gradient'] );
+	}
+
+	$classes_and_styles = gutenberg_get_color_classes_and_styles( $block_attributes );
+	$has_gradient       = ! empty( $block_attributes['gradient'] ) || ! empty( $block_attributes['style']['color']['gradient'] );
 
 	if ( $clips_to_text && ! $has_gradient && ! empty( $classes_and_styles['class'] ) ) {
 		$classes = array_diff( explode( ' ', $classes_and_styles['class'] ), array( 'has-background' ) );
