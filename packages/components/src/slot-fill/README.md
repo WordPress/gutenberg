@@ -57,7 +57,7 @@ const Toolbar = () => (
 );
 ```
 
-`createSlotFill` only gives the `Slot` and `Fill` the same name. It doesn't render a provider, so they still need a `SlotFillProvider` above them, and it must be the same one: a `Fill` only renders into a `Slot` registered with the same provider. Without a provider, nothing is rendered and a "Components must be wrapped within `SlotFillProvider`" warning is logged.
+`createSlotFill` only gives the `Slot` and `Fill` the same name. It doesn't render a provider, so they still need a `SlotFillProvider` above them, and it must be the same one: a `Fill` only renders into a `Slot` registered with the same provider. Without a provider, the `Fill` content isn't rendered. When `SCRIPT_DEBUG` is `true`, a "Components must be wrapped within `SlotFillProvider`" warning is also logged; otherwise nothing is logged.
 
 ```jsx
 const App = () => (
