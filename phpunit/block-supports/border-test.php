@@ -537,6 +537,61 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		$this->assertSame( $expected, $actual );
 	}
 
+	public function test_split_borders_without_color_or_width_support_are_dropped() {
+		$block_type  = self::register_bordered_block_with_support(
+			'test/split-borders-without-color-or-width-support',
+			array(
+				'__experimentalBorder' => array(
+					'radius' => true,
+					'style'  => true,
+				),
+			)
+		);
+		$block_attrs = array(
+			'style' => array(
+				'border' => array(
+					'radius' => '5px',
+					'top'    => array(
+						'style' => 'dashed',
+						'width' => '2px',
+					),
+				),
+			),
+		);
+		$actual      = gutenberg_apply_border_support( $block_type, $block_attrs );
+		$expected    = array(
+			'style' => 'border-radius:5px;',
+		);
+
+		$this->assertSame( $expected, $actual );
+	}
+
+	public function test_non_array_border_and_sides_are_ignored() {
+		$block_type = self::register_bordered_block_with_support(
+			'test/non-array-border-and-sides',
+			array(
+				'__experimentalBorder' => true,
+			)
+		);
+
+		$this->assertSame( array(), gutenberg_apply_border_support( $block_type, array( 'style' => 'invalid' ) ) );
+		$this->assertSame( array(), gutenberg_apply_border_support( $block_type, array( 'style' => array( 'border' => 'invalid' ) ) ) );
+		$this->assertSame(
+			array( 'style' => 'border-bottom-width:1px;' ),
+			gutenberg_apply_border_support(
+				$block_type,
+				array(
+					'style' => array(
+						'border' => array(
+							'top'    => 'invalid',
+							'bottom' => array( 'width' => '1px' ),
+						),
+					),
+				)
+			)
+		);
+	}
+
 	/**
 	 * @dataProvider data_get_border_classes_and_styles
 	 *
