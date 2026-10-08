@@ -453,7 +453,8 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 // 1cqw is 12 design units of the 1200-unit design space. Keep these in step
 // with `LATTICE` in `components/freeform/snapping.js`, which is what makes the
 // drawn lines snap.
-.is-layout-freeform {
+.is-layout-freeform,
+.is-freeform-gesturing {
 	container-type: inline-size;
 
 	$lattice-cell: rgba(var(--wp-admin-theme-color--rgb), 0.07);
@@ -505,25 +506,17 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	}
 }
 
-// A block on a canvas is its own drag handle, so it must not look like text
-// you can sweep over. It is genuinely not editable until it has been entered —
-// RichText sees to that — and this stops the words highlighting in the
-// meantime. The entered block gets its selection back.
-.is-layout-freeform.block-editor-block-list__layout > :is(*, div) {
-	user-select: none;
-
-	&:is([contenteditable="true"]) {
-		user-select: text;
-	}
-}
-
-// And it says so with the cursor. The layout class is doubled to get past the
-// editor's own `.block-editor-block-list__layout
-// .block-editor-block-list__block[contenteditable] { cursor: text }`, which is
-// 0-3-0 and catches a locked block as well as an editable one: that attribute
-// selector matches `contenteditable="false"` just as happily. An entered block
-// is excluded rather than reset, so the editor goes on saying what the cursor
-// over its own text should be.
-.is-layout-freeform.block-editor-block-list__layout.block-editor-block-list__layout > :is(*, div):not([contenteditable="true"]) {
-	cursor: move;
+// A block on a canvas is its own drag handle, so it shows the move cursor and
+// must not look like text you can sweep over. Both of those are said in the
+// canvas's own stylesheet rather than here — see `freeform/override-css.js` —
+// because a section that has just become a canvas has not re-rendered, so its
+// element does not carry `is-layout-freeform` and a rule written here would
+// wait for a reload to take effect.
+//
+// This is the companion to it: wherever text really is editable, it is
+// selectable. Suppressing selection on a block that is moved as one piece
+// inherits into everything inside it, and a Group kept whole on a canvas still
+// has words in it that can be typed into.
+.block-editor-block-list__block[contenteditable="true"] {
+	user-select: text;
 }

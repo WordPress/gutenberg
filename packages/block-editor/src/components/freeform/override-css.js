@@ -13,7 +13,16 @@ import { DESIGN_WIDTH } from './constants';
  *
  * Blocks are addressed by id. `#block-…` is 1-0-0, which outranks the editor's
  * `.block-editor-block-list__layout .block-editor-block-list__block` at 0-2-0 —
- * the rule that otherwise keeps every block `position: relative`.
+ * the rule that otherwise keeps every block `position: relative` — and its
+ * `…__block[contenteditable]` at 0-3-0, which otherwise puts a text cursor on a
+ * block that is in move mode, since that attribute selector matches
+ * `contenteditable="false"` just as happily as `"true"`.
+ *
+ * Saying a block is in move mode belongs here for the same reason its position
+ * does: a section that has just become a canvas has not re-rendered, so its
+ * element does not carry `is-layout-freeform` and nothing keyed on that class
+ * applies. The cursor and the suppressed text selection would both wait for a
+ * reload.
  *
  * Block attributes are still written, because they are what gets saved and what
  * the front end renders from. They are just not what the editor leans on.
@@ -50,6 +59,7 @@ function getCanvasRules( {
 	return `#block-${ canvasClientId } {
 	position: relative;
 	aspect-ratio: ${ DESIGN_WIDTH } / ${ canvasHeight };
+	container-type: inline-size;
 }
 #block-${ canvasClientId } > * {
 	margin: 0;
@@ -57,7 +67,7 @@ function getCanvasRules( {
 }
 
 /**
- * The rules that place each block on a canvas.
+ * The rules that place each block on a canvas, and say it can be moved.
  *
  * `position` is set here, on the block itself, rather than on the canvas's
  * children collectively. A canvas nested on another canvas is both a container
@@ -107,9 +117,15 @@ function getPlacementRules( {
 				);
 			}
 			declarations.push( 'box-sizing: border-box' );
+			// Above the lattice, which is painted at z-index 0.
+			declarations.push( 'z-index: 1' );
 			return `#block-${ childClientId } {\n\t${ declarations.join(
 				';\n\t'
-			) };\n}`;
+			) };\n}
+#block-${ childClientId }:not([contenteditable="true"]) {
+	cursor: move;
+	user-select: none;
+}`;
 		} )
 		.join( '\n' );
 }

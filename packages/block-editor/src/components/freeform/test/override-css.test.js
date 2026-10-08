@@ -56,7 +56,10 @@ describe( 'getCanvasOverrideCss', () => {
 		} );
 
 		expect( css ).not.toContain( '.block-editor' );
-		expect( css.match( /#block-/g ) ).toHaveLength( 3 );
+		// Two for the canvas — the positioning context and its children's
+		// margins — then two for the child: where it sits, and that it is in
+		// move mode.
+		expect( css.match( /#block-/g ) ).toHaveLength( 4 );
 	} );
 
 	it( 'emits one rule per child', () => {
@@ -135,5 +138,59 @@ describe( 'placing a block whose height is not known', () => {
 		expect( css ).not.toContain( 'NaN' );
 		expect( css ).not.toContain( 'min-height' );
 		expect( css ).toContain( 'top: 10%' );
+	} );
+} );
+
+describe( 'the rules that say a block is in move mode', () => {
+	// The editor does not re-render a section when it becomes a canvas, so the
+	// section's element never gains `is-layout-freeform` and CSS keyed on that
+	// class does nothing until something else forces a render. These rules
+	// therefore come from the canvas's own stylesheet, addressed by id, for the
+	// same reason the positioning does.
+	const canvas = {
+		clientId: 'sec',
+		canvasHeight: 600,
+		rects: { a: { x: 0, y: 0, width: 600, height: 60 } },
+	};
+
+	it( 'gives a block on the canvas the move cursor', () => {
+		expect( getCanvasOverrideCss( canvas ) ).toContain( 'cursor: move' );
+	} );
+
+	it( 'stops a block on the canvas looking like text to sweep over', () => {
+		expect( getCanvasOverrideCss( canvas ) ).toContain(
+			'user-select: none'
+		);
+	} );
+
+	it( 'excludes a block that has been entered for editing', () => {
+		// Entered, it is text again: the caret belongs in it and the words are
+		// selectable, so neither rule may reach it.
+		expect( getCanvasOverrideCss( canvas ) ).toContain(
+			'#block-a:not([contenteditable="true"])'
+		);
+	} );
+
+	it( 'addresses move mode by id, which outranks the editor’s text cursor', () => {
+		// `.block-editor-block-list__layout .block-editor-block-list__block
+		// [contenteditable]` sets `cursor: text` at 0-3-0 — and that attribute
+		// selector catches a locked block too, because it matches
+		// `contenteditable="false"` just as happily.
+		const css = getCanvasOverrideCss( canvas );
+		expect( css ).not.toContain( '.is-layout-freeform' );
+		expect( css ).toContain( '#block-a' );
+	} );
+
+	it( 'keeps blocks above the lattice', () => {
+		expect( getCanvasOverrideCss( canvas ) ).toContain( 'z-index: 1' );
+	} );
+
+	it( 'makes the canvas a container so the lattice can measure itself', () => {
+		// The lattice is drawn in `cqw`, so one design unit is the same
+		// distance on both axes whatever the canvas is rendered at. That needs
+		// a container, and the class that used to declare one is not there.
+		expect( getCanvasOverrideCss( canvas ) ).toContain(
+			'container-type: inline-size'
+		);
 	} );
 } );
