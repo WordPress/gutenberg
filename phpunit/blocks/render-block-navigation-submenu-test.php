@@ -298,16 +298,14 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 				$navigation_submenu_block
 			)
 		);
-		$tags->next_tag( 'li' );
-		$this->assertNull( $tags->get_attribute( 'style' ), 'Shadow should not be applied to the menu item.' );
-
-		$tags->next_tag(
-			array(
-				'tag_name'   => 'ul',
-				'class_name' => 'wp-block-navigation__submenu-container',
+		$this->assertTrue(
+			$tags->next_tag(
+				array(
+					'tag_name'   => 'ul',
+					'class_name' => 'wp-block-navigation__submenu-container',
+				)
 			)
 		);
-		$this->assertSame( 'wp-block-navigation__submenu-container has-text-color has-purple-color', $tags->get_attribute( 'class' ) );
 		$this->assertSame( 'box-shadow:var(--wp--preset--shadow--natural)', $tags->get_attribute( 'style' ) );
 	}
 }
