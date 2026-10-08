@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `DataViews.BulkActionToolbar` now renders nothing; built-in table and grid layouts include bulk actions automatically ([#82730](https://github.com/WordPress/gutenberg/pull/82730)).
+
+### Enhancements
+
+-   Show bulk actions in table and grid headers, with a labeled action menu on mobile ([#82730](https://github.com/WordPress/gutenberg/pull/82730)).
+
 ## 20.0.0 (2026-10-07)
 
 ### Breaking Changes
@@ -11,8 +19,6 @@
 ### Enhancements
 
 -   List the fields the user can show or hide alphabetically by label in the view config's properties section and in the table's insert column submenus, instead of in the order the consumer declared them ([#83947](https://github.com/WordPress/gutenberg/pull/83947)).
--   DataViews: show bulk actions in table and grid headers. On mobile, group eligible actions—including those without icons—in a labeled menu. `DataViews.BulkActionToolbar` is deprecated and renders nothing; built-in layouts own placement in custom compositions too. ([#82730](https://github.com/WordPress/gutenberg/pull/82730))
-
 -   Single-selection filter radio indicators stay visually 16px on narrow screens ([#83840](https://github.com/WordPress/gutenberg/pull/83840)).
 -   Filters: a filter chip now grows to at most the width of the filters row and truncates its values with an ellipsis, instead of wrapping onto several lines ([#83879](https://github.com/WordPress/gutenberg/pull/83879)).
 -   Selection checkboxes stay visually 16px on narrow screens while retaining a 24px click target ([#83612](https://github.com/WordPress/gutenberg/pull/83612)).
@@ -22,8 +28,6 @@
 
 -   Grid layout: Apply `inert` through `inertValue` so the attribute works reliably ([#84072](https://github.com/WordPress/gutenberg/pull/84072)).
 -   Filters: show the filter name in a chip in the emphasis font weight ([#83879](https://github.com/WordPress/gutenberg/pull/83879)).
--   Preserve accessible table column names and sort information during bulk selection, keep focused grid items clear of the sticky bulk toolbar, and use lowercase item counts ([#82730](https://github.com/WordPress/gutenberg/pull/82730)).
-
 -   Keep filter and item actions menus dismissible when their triggers become disabled ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
 -   Grid layout: measure the container as the grid attaches rather than waiting for the resize observer's first report, so the grid no longer renders a frame with every item in a full-width column of its own before snapping to its real column count ([#83752](https://github.com/WordPress/gutenberg/pull/83752)).
 
