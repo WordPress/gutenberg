@@ -70,6 +70,9 @@ jobs:
 
             - name: Set up npm
               uses: ./.github/setup-npm
+              with:
+                  # compressed-size-action checks out the base branch, and the cache post step then runs that branch's copy of this action.
+                  cache: 'false'
 
             - uses: preactjs/compressed-size-action@f322c295dde06a1cb7ccaef105732dd8a726d1d9 # v2.10.0
               id: size
