@@ -1,3 +1,5 @@
+import type { LegacyData } from './types';
+
 /**
  * The interface package previously had a public API that could be used by
  * plugins to set persisted boolean 'feature' preferences.
@@ -34,12 +36,14 @@
  * }
  * ```
  *
- * @param {Object} state The local storage state
+ * @param state The local storage state
  *
- * @return {Object} The state with third party preferences moved to the
- *                  preferences data structure.
+ * @return The state with third party preferences moved to the
+ *         preferences data structure.
  */
-export default function moveThirdPartyFeaturePreferencesToPreferences( state ) {
+export default function moveThirdPartyFeaturePreferencesToPreferences(
+	state: LegacyData
+): LegacyData {
 	const interfaceStoreName = 'core/interface';
 	const preferencesStoreName = 'core/preferences';
 

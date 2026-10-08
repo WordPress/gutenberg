@@ -62,6 +62,7 @@
 		{ "path": "packages/notices/tsconfig.build.json" },
 		{ "path": "packages/plugins" },
 		{ "path": "packages/preferences/tsconfig.build.json" },
+		{ "path": "packages/preferences-persistence" },
 		{ "path": "packages/prettier-config" },
 		{ "path": "packages/primitives" },
 		{ "path": "packages/priority-queue/tsconfig.build.json" },

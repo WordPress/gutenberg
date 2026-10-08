@@ -1,6 +1,11 @@
 import create from './create';
 import convertLegacyLocalStorageData from './migrations/legacy-local-storage-data';
 import convertPreferencesPackageData from './migrations/preferences-package-data';
+import type {
+	PersistenceLayer,
+	PreferencesData,
+	ScopedPreferences,
+} from './types';
 
 export { create };
 
@@ -13,28 +18,36 @@ export { create };
  * This function is used internally by WordPress in an inline script, so
  * prefixed with `__unstable`.
  *
- * @param {Object} serverData Preferences data preloaded from the server.
- * @param {string} userId     The user id.
+ * @param serverData Preferences data preloaded from the server.
+ * @param userId     The user id.
  *
- * @return {Object} The persistence layer initialized with the preloaded data.
+ * @return The persistence layer initialized with the preloaded data.
  */
-export function __unstableCreatePersistenceLayer( serverData, userId ) {
+export function __unstableCreatePersistenceLayer(
+	serverData: PreferencesData,
+	userId: string
+): PersistenceLayer {
 	const localStorageRestoreKey = `WP_PREFERENCES_USER_${ userId }`;
-	const localData = JSON.parse(
-		window.localStorage.getItem( localStorageRestoreKey )
+	const localData: PreferencesData | null = JSON.parse(
+		window.localStorage.getItem( localStorageRestoreKey ) as string
 	);
 
 	// Date parse returns NaN for invalid input. Coerce anything invalid
 	// into a conveniently comparable zero.
 	const serverModified =
-		Date.parse( serverData && serverData._modified ) || 0;
-	const localModified = Date.parse( localData && localData._modified ) || 0;
+		Date.parse( ( serverData && serverData._modified ) as string ) || 0;
+	const localModified =
+		Date.parse( ( localData && localData._modified ) as string ) || 0;
 
 	let preloadedData;
 	if ( serverData && serverModified >= localModified ) {
-		preloadedData = convertPreferencesPackageData( serverData );
+		preloadedData = convertPreferencesPackageData(
+			serverData as ScopedPreferences
+		);
 	} else if ( localData ) {
-		preloadedData = convertPreferencesPackageData( localData );
+		preloadedData = convertPreferencesPackageData(
+			localData as ScopedPreferences
+		);
 	} else {
 		// Check if there is data in the legacy format from the old persistence system.
 		preloadedData = convertLegacyLocalStorageData( userId );

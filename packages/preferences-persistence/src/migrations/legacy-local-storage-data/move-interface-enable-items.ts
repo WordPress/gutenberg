@@ -1,3 +1,5 @@
+import type { LegacyData } from './types';
+
 /**
  * Migrates interface 'enableItems' data to the preferences store.
  *
@@ -43,9 +45,11 @@
  * }
  * ```
  *
- * @param {Object} state The local storage state.
+ * @param state The local storage state.
  */
-export default function moveInterfaceEnableItems( state ) {
+export default function moveInterfaceEnableItems(
+	state: LegacyData
+): LegacyData {
 	const interfaceStoreName = 'core/interface';
 	const preferencesStoreName = 'core/preferences';
 	const sourceEnableItems = state?.[ interfaceStoreName ]?.enableItems;

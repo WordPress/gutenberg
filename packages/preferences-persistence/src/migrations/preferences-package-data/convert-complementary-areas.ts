@@ -1,4 +1,6 @@
-export default function convertComplementaryAreas( state ) {
+import type { ScopedPreferences } from '../../types';
+
+export default function convertComplementaryAreas( state: ScopedPreferences ) {
 	return Object.keys( state ).reduce( ( stateAccumulator, scope ) => {
 		const scopeData = state[ scope ];
 

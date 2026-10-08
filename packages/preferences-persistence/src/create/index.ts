@@ -1,31 +1,36 @@
 import apiFetch from '@wordpress/api-fetch';
 import debounceAsync from './debounce-async';
+import type {
+	CreateOptions,
+	PersistenceLayer,
+	PreferencesData,
+} from '../types';
 
-const EMPTY_OBJECT = {};
+const EMPTY_OBJECT: PreferencesData = {};
 const localStorage = window.localStorage;
 
 /**
  * Creates a persistence layer that stores data in WordPress user meta via the
  * REST API.
  *
- * @param {Object}  options
- * @param {?Object} options.preloadedData          Any persisted preferences data that should be preloaded.
- *                                                 When set, the persistence layer will avoid fetching data
- *                                                 from the REST API.
- * @param {?string} options.localStorageRestoreKey The key to use for restoring the localStorage backup, used
- *                                                 when the persistence layer calls `localStorage.getItem` or
- *                                                 `localStorage.setItem`.
- * @param {?number} options.requestDebounceMS      Debounce requests to the API so that they only occur at
- *                                                 minimum every `requestDebounceMS` milliseconds, and don't
- *                                                 swamp the server. Defaults to 2500ms.
+ * @param options
+ * @param options.preloadedData          Any persisted preferences data that should be preloaded.
+ *                                       When set, the persistence layer will avoid fetching data
+ *                                       from the REST API.
+ * @param options.localStorageRestoreKey The key to use for restoring the localStorage backup, used
+ *                                       when the persistence layer calls `localStorage.getItem` or
+ *                                       `localStorage.setItem`.
+ * @param options.requestDebounceMS      Debounce requests to the API so that they only occur at
+ *                                       minimum every `requestDebounceMS` milliseconds, and don't
+ *                                       swamp the server. Defaults to 2500ms.
  *
- * @return {Object} A persistence layer for WordPress user meta.
+ * @return A persistence layer for WordPress user meta.
  */
 export default function create( {
 	preloadedData,
 	localStorageRestoreKey = 'WP_PREFERENCES_RESTORE_DATA',
 	requestDebounceMS = 2500,
-} = {} ) {
+}: CreateOptions = {} ): PersistenceLayer {
 	let cache = preloadedData;
 	const debouncedApiFetch = debounceAsync( apiFetch, requestDebounceMS );
 
@@ -34,19 +39,23 @@ export default function create( {
 			return cache;
 		}
 
-		const user = await apiFetch( {
+		const user = await apiFetch< {
+			meta?: { persisted_preferences?: PreferencesData };
+		} >( {
 			path: '/wp/v2/users/me?context=edit',
 		} );
 
 		const serverData = user?.meta?.persisted_preferences;
-		const localData = JSON.parse(
-			localStorage.getItem( localStorageRestoreKey )
+		const localData: PreferencesData | null = JSON.parse(
+			localStorage.getItem( localStorageRestoreKey ) as string
 		);
 
 		// Date parse returns NaN for invalid input. Coerce anything invalid
 		// into a conveniently comparable zero.
-		const serverTimestamp = Date.parse( serverData?._modified ) || 0;
-		const localTimestamp = Date.parse( localData?._modified ) || 0;
+		const serverTimestamp =
+			Date.parse( serverData?._modified as string ) || 0;
+		const localTimestamp =
+			Date.parse( localData?._modified as string ) || 0;
 
 		// Prefer server data if it exists and is more recent.
 		// Otherwise fallback to localStorage data.
@@ -61,7 +70,7 @@ export default function create( {
 		return cache;
 	}
 
-	function set( newData ) {
+	function set( newData: PreferencesData ) {
 		const dataWithTimestamp = {
 			...newData,
 			_modified: new Date().toISOString(),

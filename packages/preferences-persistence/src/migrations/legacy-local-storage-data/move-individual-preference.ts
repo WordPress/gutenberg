@@ -1,4 +1,7 @@
-const identity = ( arg ) => arg;
+import type { ScopePreferences } from '../../types';
+import type { LegacyData } from './types';
+
+const identity = < T >( arg: T ) => arg;
 
 /**
  * Migrates an individual item inside the `preferences` object for a package's store.
@@ -28,19 +31,19 @@ const identity = ( arg ) => arg;
  *
  * ```
  *
- * @param {Object}    state        The original state.
- * @param {Object}    migrate      An options object that contains details of the migration.
- * @param {string}    migrate.from The name of the store to migrate from.
- * @param {string}    migrate.to   The scope in the preferences store to migrate to.
- * @param {string}    key          The key in the preferences object to migrate.
- * @param {?Function} convert      A function that converts preferences from one format to another.
+ * @param state        The original state.
+ * @param migrate      An options object that contains details of the migration.
+ * @param migrate.from The name of the store to migrate from.
+ * @param migrate.to   The scope in the preferences store to migrate to.
+ * @param key          The key in the preferences object to migrate.
+ * @param convert      A function that converts preferences from one format to another.
  */
 export default function moveIndividualPreferenceToPreferences(
-	state,
-	{ from: sourceStoreName, to: scope },
-	key,
-	convert = identity
-) {
+	state: LegacyData,
+	{ from: sourceStoreName, to: scope }: { from: string; to: string },
+	key: string,
+	convert: ( preferences: ScopePreferences ) => object = identity
+): LegacyData {
 	const preferencesStoreName = 'core/preferences';
 	const sourcePreference = state?.[ sourceStoreName ]?.preferences?.[ key ];
 

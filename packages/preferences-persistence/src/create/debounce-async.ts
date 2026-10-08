@@ -9,21 +9,24 @@
  * This is distinct from `{ debounce } from @wordpress/compose` in that it
  * waits for promise resolution.
  *
- * @param {Function} func    A function that returns a promise.
- * @param {number}   delayMS A delay in milliseconds.
+ * @param func    A function that returns a promise.
+ * @param delayMS A delay in milliseconds.
  *
- * @return {Function} A function that debounce whatever function is passed
- *                    to it.
+ * @return A function that debounce whatever function is passed
+ *         to it.
  */
-export default function debounceAsync( func, delayMS ) {
-	let timeoutId;
-	let activePromise;
+export default function debounceAsync< Args extends unknown[], Result >(
+	func: ( ...args: Args ) => Promise< Result >,
+	delayMS: number
+): ( ...args: Args ) => Promise< Result > {
+	let timeoutId: ReturnType< typeof setTimeout > | null | undefined;
+	let activePromise: Promise< void > | null | undefined;
 
-	return async function debounced( ...args ) {
+	return async function debounced( ...args: Args ) {
 		// This is a leading edge debounce. If there's no promise or timeout
 		// in progress, call the debounced function immediately.
 		if ( ! activePromise && ! timeoutId ) {
-			return new Promise( ( resolve, reject ) => {
+			return new Promise< Result >( ( resolve, reject ) => {
 				// Keep a reference to the promise.
 				activePromise = func( ...args )
 					.then( ( ...thenArgs ) => {
@@ -53,7 +56,7 @@ export default function debounceAsync( func, delayMS ) {
 		}
 
 		// Trigger any trailing edge calls to the function.
-		return new Promise( ( resolve, reject ) => {
+		return new Promise< Result >( ( resolve, reject ) => {
 			// Schedule the next request but with a delay.
 			timeoutId = setTimeout( () => {
 				activePromise = func( ...args )
