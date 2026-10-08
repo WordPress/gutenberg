@@ -14,7 +14,7 @@ function usePopoverScroll( contentRef ) {
 	const effect = useRefEffect(
 		( node ) => {
 			function onWheel( event ) {
-				const { deltaX, deltaY, target } = event;
+				const { deltaX, deltaY, target, ctrlKey } = event;
 				const contentEl = contentRef.current;
 				let scrollContainer = scrollContainerCache.get( contentEl );
 				if ( ! scrollContainer ) {
@@ -28,7 +28,21 @@ function usePopoverScroll( contentRef ) {
 				// Scrolls “through” the popover only if another contained scrollable area isn’t
 				// in front of it. This is to avoid scrolling both containers simultaneously.
 				if ( ! node.contains( eventScrollContainer ) ) {
-					scrollContainer.scrollBy( deltaX, deltaY );
+					// Dispatching the event won’t cause scrolling but it does make the event
+					// available to edit-post’s meta box pane’s height adjustment effect.
+					// TODO: something more tailored/explicit seems appealing - like a custom event.
+					const isNotPrevented = scrollContainer.dispatchEvent(
+						new window.WheelEvent( 'wheel', {
+							deltaX,
+							deltaY,
+							ctrlKey,
+							bubbles: true,
+							cancelable: true,
+						} )
+					);
+					if ( isNotPrevented ) {
+						scrollContainer.scrollBy( deltaX, deltaY );
+					}
 				}
 			}
 			// Tell the browser that we do not call event.preventDefault
