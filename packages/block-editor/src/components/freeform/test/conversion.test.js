@@ -229,3 +229,29 @@ describe( 'getRepairedRect', () => {
 		);
 	} );
 } );
+
+describe( 'a block whose content is only text', () => {
+	// It keeps its own box. Measuring a paragraph by its words would make it
+	// as wide as its text, and so placeable anywhere — but it would also mean
+	// a paragraph changed width the moment it was dragged, and a block should
+	// be the size it was before you picked it up.
+	const blockBox = { left: 100, top: 50, width: 600, height: 120 };
+
+	it( 'is left at the width it is laid out at', () => {
+		expect( getVisibleBox( blockBox, [] ) ).toEqual( blockBox );
+	} );
+
+	it( 'is therefore never repaired on being picked up', () => {
+		// Its visible box is its own box, so there is nothing narrower to
+		// shrink it to and `getRepairedRect` hands the stored rect straight
+		// back.
+		const stored = { x: 0, y: 100, width: DESIGN_WIDTH, height: 200 };
+		expect(
+			getRepairedRect(
+				stored,
+				{ x: 0, y: 100, width: DESIGN_WIDTH, height: 200 },
+				DESIGN_WIDTH
+			)
+		).toBe( stored );
+	} );
+} );

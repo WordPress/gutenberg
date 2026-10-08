@@ -123,9 +123,10 @@ export function getVisibleBox( blockBox, contentBoxes ) {
  * afterwards — the other way round, the column has already reflowed and the
  * position is gone.
  *
- * A block with no styling of its own is measured by what is inside it rather
- * than by its own box; see `getVisibleBox` for why. One that has a background
- * or padding is measured whole, because that box is the thing you can see.
+ * A block with no styling of its own is measured by the elements inside it
+ * rather than by its own box; see `getVisibleBox` for why. One that has a
+ * background or padding is measured whole, because that box is the thing you
+ * can see, and so is one whose content is only text — see `getContentBoxes`.
  *
  * @param {Element}  element           The section's element, inside the editor
  *                                     canvas.
@@ -188,14 +189,18 @@ function toBox( rect ) {
 }
 
 /**
- * The boxes of everything inside a block.
+ * The boxes of the elements inside a block.
  *
- * Elements first; a block with none of those is text, which is measured with a
- * range over its contents — otherwise a paragraph would have nothing to be
- * measured by and would keep the full width it is laid out at.
+ * Text is deliberately not measured. A paragraph could be measured with a
+ * range over its words, which would make it as wide as its text and so
+ * placeable anywhere — but it would also mean a paragraph changed width the
+ * moment it was dragged, and a block should be the size it was before you
+ * picked it up. A block with nothing but text in it therefore keeps its own
+ * box, and is resized with the handles like anything else.
  *
  * @param {Element} element A block's element.
- * @return {Object[]} The boxes, in viewport pixels.
+ * @return {Object[]} The boxes, in viewport pixels. Empty for a block whose
+ *         content is text, which leaves its own box as the measurement.
  */
 function getContentBoxes( element ) {
 	const boxes = [];
@@ -205,13 +210,7 @@ function getContentBoxes( element ) {
 		}
 		boxes.push( toBox( child.getBoundingClientRect() ) );
 	}
-	if ( boxes.length ) {
-		return boxes;
-	}
-
-	const range = element.ownerDocument.createRange();
-	range.selectNodeContents( element );
-	return [ toBox( range.getBoundingClientRect() ) ];
+	return boxes;
 }
 
 /**
