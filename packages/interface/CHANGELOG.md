@@ -6,9 +6,9 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
-### Enhancements
+### Internal
 
--   Support responsive block breadcrumbs in the editor footer.
+-   Move block breadcrumb styles to the block-editor package.
 
 ## 10.3.0 (2026-10-07)
 
