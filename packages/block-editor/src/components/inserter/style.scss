@@ -53,21 +53,21 @@ $block-inserter-tabs-height: 44px;
 		box-shadow: $elevation-x-small;
 
 		.block-editor-inserter__quick-inserter > * {
-			border-left: $border-width solid $gray-400;
-			border-right: $border-width solid $gray-400;
+			border-left: $border-width solid var(--wpds-color-stroke-surface-neutral);
+			border-right: $border-width solid var(--wpds-color-stroke-surface-neutral);
 
 			&:first-child {
-				border-top: $border-width solid $gray-400;
+				border-top: $border-width solid var(--wpds-color-stroke-surface-neutral);
 				border-radius: $radius-medium $radius-medium 0 0;
 			}
 
 			&:last-child {
-				border-bottom: $border-width solid $gray-400;
+				border-bottom: $border-width solid var(--wpds-color-stroke-surface-neutral);
 				border-radius: 0 0 $radius-medium $radius-medium;
 			}
 
 			&.components-button {
-				border: $border-width solid $gray-900;
+				border: $border-width solid var(--wpds-color-stroke-interactive-neutral-strong);
 			}
 		}
 	}
@@ -103,6 +103,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__menu {
+	color: var(--wpds-color-foreground-content-neutral);
 	height: 100%;
 	position: relative;
 	overflow: visible;
@@ -119,7 +120,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__menu.is-bottom::after {
-	border-bottom-color: $white;
+	border-bottom-color: var(--wpds-color-background-surface-neutral-strong);
 }
 
 .components-popover.block-editor-inserter__popover {
@@ -131,13 +132,13 @@ $block-inserter-tabs-height: 44px;
 	position: sticky;
 	top: 0;
 	z-index: 2;
-	background-color: $white;
+	background-color: var(--wpds-color-background-surface-neutral-strong);
 	border-bottom: 1px solid transparent;
 	@media not ( prefers-reduced-motion ) {
 		transition: border-bottom-color 0.1s linear;
 	}
 	&.is-scrolled {
-		border-bottom-color: $gray-200;
+		border-bottom-color: var(--wpds-color-stroke-surface-neutral);
 	}
 }
 
@@ -167,10 +168,22 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__panel-title,
 .block-editor-inserter__panel-title button {
 	margin: 0 $grid-unit-15 0 0;
-	color: $gray-700;
+	color: var(--wpds-color-foreground-content-neutral-weak);
 	text-transform: uppercase;
 	font-size: 11px;
 	font-weight: var(--wpds-typography-font-weight-emphasis);
+}
+
+.block-editor-inserter__panel-title button {
+	color: var(--wpds-color-foreground-interactive-neutral);
+
+	&:not(:disabled, [aria-disabled="true"]):is(
+		:hover,
+		:active,
+		:focus-visible
+	) {
+		color: var(--wpds-color-foreground-interactive-neutral-active);
+	}
 }
 
 .block-editor-inserter__panel-dropdown select.components-select-control__input.components-select-control__input.components-select-control__input {
@@ -233,7 +246,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__insertable-blocks-at-selection:not(:empty) + .block-editor-inserter__all-blocks:not(:empty) {
-	border-top: $border-width solid $gray-200;
+	border-top: $border-width solid var(--wpds-color-stroke-surface-neutral);
 }
 
 .block-editor-inserter__media-tabs-container,
@@ -260,15 +273,15 @@ $block-inserter-tabs-height: 44px;
 	padding: 0 $grid-unit-20;
 
 	@include break-medium {
-		border-left: $border-width solid $gray-200;
+		border-left: $border-width solid var(--wpds-color-stroke-surface-neutral);
 		padding: 0;
 		left: $secondary-sidebar-width;
 		width: $sidebar-width;
 		position: absolute;
 		top: -$border-width;
 		height: calc(100% + #{$border-width});
-		background: $gray-100;
-		border-top: $border-width solid $gray-200;
+		background: var(--wpds-color-background-surface-neutral-weak);
+		border-top: $border-width solid var(--wpds-color-stroke-surface-neutral);
 
 		.block-editor-inserter__media-list,
 		.block-editor-block-patterns-list {
@@ -290,8 +303,8 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__patterns-filter-help {
 	padding: $grid-unit-20;
-	border-top: $border-width solid $gray-300;
-	color: $gray-700;
+	border-top: $border-width solid var(--wpds-color-stroke-surface-neutral);
+	color: var(--wpds-color-foreground-content-neutral-weak);
 	min-width: 280px;
 }
 
@@ -303,7 +316,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__preview-content {
-	background: $gray-100;
+	background: var(--wpds-color-background-surface-neutral-weak);
 	display: grid;
 	flex-grow: 1;
 	align-items: center;
@@ -315,13 +328,13 @@ $block-inserter-tabs-height: 44px;
 	justify-content: center;
 	align-items: center;
 	min-height: $grid-unit-60 * 3;
-	color: $gray-700;
-	background: $gray-100;
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	background: var(--wpds-color-background-surface-neutral-weak);
 	border-radius: $radius-small;
 }
 
 .block-editor-inserter__tips {
-	border-top: $border-width solid $gray-300;
+	border-top: $border-width solid var(--wpds-color-stroke-surface-neutral);
 	padding: $grid-unit-20;
 	flex-shrink: 0;
 	position: relative; // prevents overscroll when block library is open
@@ -365,7 +378,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__quick-inserter-separator {
-	border-top: $border-width solid $gray-300;
+	border-top: $border-width solid var(--wpds-color-stroke-surface-neutral);
 }
 
 .block-editor-inserter__popover.is-quick > .components-popover__content {
@@ -622,7 +635,7 @@ $block-inserter-tabs-height: 44px;
 		top: $grid-unit-10;
 
 		> button {
-			background: $white;
+			background: var(--wpds-color-background-surface-neutral-strong);
 			display: none;
 
 			// These styles are important so as focus isn't lost
@@ -657,7 +670,7 @@ $block-inserter-tabs-height: 44px;
 			width: 100%;
 			position: absolute;
 			justify-content: center;
-			background: rgba($white, 0.7);
+			background: color-mix(in srgb, var(--wpds-color-background-surface-neutral-strong) 70%, transparent);
 			align-items: center;
 			pointer-events: none;
 		}
