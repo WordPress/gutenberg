@@ -21,7 +21,7 @@
 
 -   `InputControl`, `NumberControl`, `UnitControl`: Ignore the drag gesture for touch input, where it has no cursor affordance and is easy to trigger by accident ([#38865](https://github.com/WordPress/gutenberg/issues/38865), [#81519](https://github.com/WordPress/gutenberg/pull/81519)).
 -   `navigateRegions`: Only outline the Publish and Save controls when their region has focus ([#84343](https://github.com/WordPress/gutenberg/pull/84343)).
--   `ToolsPanel`: Show explicit reset, show, and hide actions in the options menu, with accessible names matching the visible labels ([#84341](https://github.com/WordPress/gutenberg/pull/84341)).
+-   `ToolsPanel`: Show explicit reset, show, and hide actions in the options menu, with accessible names matching the visible labels and long action text wrapping in narrow viewports ([#84341](https://github.com/WordPress/gutenberg/pull/84341)).
 
 ## 42.0.0 (2026-10-07)
 
