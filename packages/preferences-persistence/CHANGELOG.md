@@ -8,11 +8,11 @@
 
 ### Enhancements
 
--   The package now bundles TypeScript types.
+-   The package now bundles TypeScript types ([#84312](https://github.com/WordPress/gutenberg/pull/84312)).
 
 ### Internal
 
--   Refactor to TypeScript.
+-   Refactor to TypeScript ([#84312](https://github.com/WordPress/gutenberg/pull/84312)).
 
 ## 2.57.0 (2026-10-07)
 
