@@ -43,26 +43,29 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 		return array();
 	}
 
-	$attributes          = array();
-	$has_padding_support = block_has_support( $block_type, array( 'spacing', 'padding' ), false );
-	$has_margin_support  = block_has_support( $block_type, array( 'spacing', 'margin' ), false );
-	$block_styles        = $block_attributes['style'] ?? null;
-
-	if ( ! $block_styles ) {
-		return $attributes;
+	if ( empty( $block_attributes['style'] ) ) {
+		return array();
 	}
 
-	$skip_padding         = wp_should_skip_block_supports_serialization( $block_type, 'spacing', 'padding' );
-	$skip_margin          = wp_should_skip_block_supports_serialization( $block_type, 'spacing', 'margin' );
-	$spacing_block_styles = array();
-	if ( $has_padding_support && ! $skip_padding ) {
-		$spacing_block_styles['padding'] = $block_styles['spacing']['padding'] ?? null;
-	}
-	if ( $has_margin_support && ! $skip_margin ) {
-		$spacing_block_styles['margin'] = $block_styles['spacing']['margin'] ?? null;
+	$attributes = $block_attributes;
+	if ( ! is_array( $attributes['style']['spacing'] ?? null ) ) {
+		return array();
 	}
 
-	return gutenberg_get_spacing_classes_and_styles( array( 'style' => array( 'spacing' => $spacing_block_styles ) ) );
+	if (
+		! block_has_support( $block_type, array( 'spacing', 'padding' ), false ) ||
+		wp_should_skip_block_supports_serialization( $block_type, 'spacing', 'padding' )
+	) {
+		unset( $attributes['style']['spacing']['padding'] );
+	}
+	if (
+		! block_has_support( $block_type, array( 'spacing', 'margin' ), false ) ||
+		wp_should_skip_block_supports_serialization( $block_type, 'spacing', 'margin' )
+	) {
+		unset( $attributes['style']['spacing']['margin'] );
+	}
+
+	return gutenberg_get_spacing_classes_and_styles( $attributes );
 }
 
 /**
