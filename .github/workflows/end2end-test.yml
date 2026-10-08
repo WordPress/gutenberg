@@ -82,8 +82,6 @@ jobs:
         needs: [e2e-playwright]
         runs-on: 'ubuntu-24.04'
         permissions: {}
-        outputs:
-            has-flaky-test-report: ${{ !!steps.merge-flaky-tests-reports.outputs.artifact-id }}
         steps:
             - name: Merge failures artifacts
               uses: actions/upload-artifact/merge@v4
@@ -104,39 +102,3 @@ jobs:
                   pattern: flaky-tests-report*
                   delete-merged: true
 
-    report-to-issues:
-        name: Report to GitHub
-        needs: [merge-artifacts]
-        if: ${{ needs.merge-artifacts.outputs.has-flaky-test-report == 'true' }}
-        runs-on: 'ubuntu-24.04'
-        permissions:
-            contents: read
-            issues: write
-            pull-requests: write
-        steps:
-            # Use this branch's own report-flaky-tests: trunk's version takes
-            # different inputs and fails this workflow.
-            - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-              with:
-                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
-                  persist-credentials: false
-
-            - uses: actions/download-artifact@v5.0.0
-              # Don't fail the job if there isn't any flaky tests report.
-              continue-on-error: true
-              with:
-                  name: flaky-tests-report
-                  path: flaky-tests
-
-            - name: Setup Node.js and install dependencies
-              uses: ./.github/setup-node
-
-            - name: Npm build
-              run: npm run build
-
-            - name: Report flaky tests
-              uses: ./packages/report-flaky-tests
-              with:
-                  repo-token: '${{ secrets.GITHUB_TOKEN }}'
-                  label: '[Type] Flaky Test'
-                  artifact-path: flaky-tests
