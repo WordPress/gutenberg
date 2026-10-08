@@ -25,7 +25,8 @@
 		"build",
 		"build-types",
 		"src",
-		"*.md"
+		"*.md",
+		"!**/test/**"
 	],
 	"main": "build/index.cjs",
 	"exports": {
