@@ -21,14 +21,13 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": "^20.19.0 || >=22.13.0"
+		"node": ">=22.13.0"
 	},
 	"files": [
 		"build-module",
 		"build-types",
 		"*-plugins/**",
 		"prebuilt",
-		"*.md",
 		"!build-types/**/*.d.mts.map",
 		"!build-types/**/*.d.ts.map",
 		"!**/stories/**",
