@@ -797,6 +797,7 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 			className: clsx(
 				resetStyles[ 'box-sizing' ],
 				styles.root,
+				variant === 'selection' && styles[ 'root--selection' ],
 				className
 			),
 			role: variant === 'selection' ? 'group' : 'navigation',
