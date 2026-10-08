@@ -58,7 +58,8 @@ function NoteFormat( { isActive, activeAttributes } ) {
 		// Select-only; no cleanup on leave. The block-level sync owns
 		// clearing/reverting, and deselecting here would drop the block's
 		// note while the caret is still inside the block.
-		selectNote( Number( noteId ) );
+		// The draft marker of an unsent note carries the form's own id.
+		selectNote( noteId === 'new' ? noteId : Number( noteId ) );
 	}, [
 		isActive,
 		noteId,

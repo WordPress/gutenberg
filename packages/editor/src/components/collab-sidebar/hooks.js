@@ -215,17 +215,51 @@ export function useNoteActions() {
 		__unstableMarkLastChangeAsPersistent();
 	};
 
+	const removeNoteMarker = ( clientId, noteId ) => {
+		const removed = removeInlineNote(
+			getBlockAttributes( clientId ),
+			noteId
+		);
+		if ( removed ) {
+			updateNoteAnchor( clientId, {
+				[ removed.attributeKey ]: removed.value,
+			} );
+		}
+	};
+
+	// The draft marker (id `new`) wraps the text an unsent note is about, so
+	// the anchor follows edits until the note is sent.
+	const onDiscard = ( clientId ) => removeNoteMarker( clientId, 'new' );
+
+	// Starting again from another selection moves the marker; a collapsed
+	// selection keeps it.
+	const onStart = ( clientId ) => {
+		const selection = readInlineSelection(
+			getSelectionStart,
+			getSelectionEnd
+		);
+		if ( selection?.clientId !== clientId ) {
+			return;
+		}
+		onDiscard( clientId );
+		const wrapped = wrapInlineNote(
+			getBlockAttributes( clientId )?.[ selection.attributeKey ],
+			'new',
+			selection.start,
+			selection.end
+		);
+		if ( wrapped ) {
+			updateNoteAnchor( clientId, {
+				[ selection.attributeKey ]: wrapped,
+			} );
+		}
+	};
+
 	const onCreate = async ( { content, parent } ) => {
 		try {
-			// Capture the target block and inline selection *before* the async
-			// save: selection may shift during the round-trip, attaching the
-			// note to the wrong block or collapsing its inline anchor.
-			const inlineSelection = ! parent
-				? readInlineSelection( getSelectionStart, getSelectionEnd )
-				: null;
-			const clientId = ! parent
-				? inlineSelection?.clientId || getSelectedBlockClientId()
-				: null;
+			// Capture the target block *before* the async save: selection may
+			// shift during the round-trip, attaching the note to the wrong block.
+			const clientId = ! parent ? getSelectedBlockClientId() : null;
 
 			const savedRecord = await saveEntityRecord(
 				'root',
@@ -259,18 +293,15 @@ export function useNoteActions() {
 					metadata: cleanEmptyObject( updatedMetadata ),
 				};
 
-				// Inline path: also wrap the selected text with a core/note
-				// marker so the anchor survives later edits.
-				if ( inlineSelection ) {
-					const wrapped = wrapInlineNote(
-						attributes?.[ inlineSelection.attributeKey ],
+				// Inline path: the draft marker becomes the note's marker.
+				const draft = removeInlineNote( attributes, 'new' );
+				if ( draft ) {
+					newAttributes[ draft.attributeKey ] = wrapInlineNote(
+						draft.value,
 						savedRecord.id,
-						inlineSelection.start,
-						inlineSelection.end
+						draft.start,
+						draft.end
 					);
-					if ( wrapped ) {
-						newAttributes[ inlineSelection.attributeKey ] = wrapped;
-					}
 				}
 
 				updateNoteAnchor( clientId, newAttributes );
@@ -332,17 +363,8 @@ export function useNoteActions() {
 
 				// Resolving a note drops its inline highlight: strip the marker
 				// so the note falls back to a block-level note in the content.
-				const removed =
-					status === 'approved' &&
-					note.blockClientId &&
-					removeInlineNote(
-						getBlockAttributes( note.blockClientId ),
-						id
-					);
-				if ( removed ) {
-					updateNoteAnchor( note.blockClientId, {
-						[ removed.attributeKey ]: removed.value,
-					} );
+				if ( status === 'approved' && note.blockClientId ) {
+					removeNoteMarker( note.blockClientId, id );
 				}
 
 				// The note visibly updates in place, so there is no snackbar,
@@ -511,7 +533,7 @@ export function useNoteActions() {
 		}
 	};
 
-	return { onCreate, onEdit, onDelete };
+	return { onStart, onDiscard, onCreate, onEdit, onDelete };
 }
 
 /**
@@ -535,35 +557,35 @@ export function useNoteDraft( key ) {
 }
 
 /**
- * Keeps the selected note in step with the selected block, and focuses the
- * selected note's thread when the selection asks for it.
+ * Keeps the selected note in step with the selected block.
  *
- * @param {Object} props
- * @param {Array}  props.notes      Threads shown in the sidebar.
- * @param {Object} props.sidebarRef Ref to the sidebar element.
+ * @param {Object}                     props
+ * @param {Array}                      props.notes     Threads shown in the sidebar.
+ * @param {Map}                        props.drafts    Unsent note drafts, see `NoteDraftsContext`.
+ * @param {(clientId: string) => void} props.onDiscard Drops a block's draft marker.
  */
-export function useNoteSelection( { notes, sidebarRef } ) {
+export function useNoteSelection( { notes, drafts, onDiscard } ) {
 	const registry = useRegistry();
-	const drafts = useContext( NoteDraftsContext );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const selectedBlockClientId = useSelect(
 		( select ) => select( blockEditorStore ).getSelectedBlockClientId(),
 		[]
 	);
-	const { selectedNote, noteFocused } = useSelect( ( select ) => {
-		const { getSelectedNote, isNoteFocused } = unlock(
-			select( editorStore )
-		);
-		return {
-			selectedNote: getSelectedNote(),
-			noteFocused: isNoteFocused(),
-		};
-	}, [] );
 
-	const syncWithBlock = useEvent( ( clientId ) => {
+	const syncWithBlock = useEvent( ( clientId, previousClientId ) => {
 		const { getSelectedNote, isNoteFocused } = unlock(
 			registry.select( editorStore )
 		);
+		// Leaving the new note form without a draft closes it for good, so
+		// its marker goes too. The form's own focus-out can't: the block
+		// change unmounts it first.
+		if (
+			getSelectedNote() === 'new' &&
+			previousClientId &&
+			! drafts.has( previousClientId )
+		) {
+			onDiscard( previousClientId );
+		}
 		// A pending focus request is an explicit pick; leave it alone.
 		if ( isNoteFocused() ) {
 			return;
@@ -582,17 +604,38 @@ export function useNoteSelection( { notes, sidebarRef } ) {
 	} );
 
 	// Sync only on block transitions, so in-block changes (Escape, Cancel,
-	// the new note form) are left alone.
+	// the new note form) are left alone. A layout effect, so it reads the
+	// focus flag before `useNoteFocus` clears it.
 	const prevBlockIdRef = useRef( selectedBlockClientId );
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if ( prevBlockIdRef.current === selectedBlockClientId ) {
 			return;
 		}
+		const previousClientId = prevBlockIdRef.current;
 		prevBlockIdRef.current = selectedBlockClientId;
-		syncWithBlock( selectedBlockClientId );
+		syncWithBlock( selectedBlockClientId, previousClientId );
 	}, [ selectedBlockClientId, syncWithBlock ] );
+}
 
-	// Must run after the sync above, which reads the focus flag this clears.
+/**
+ * Focuses the selected note's thread when the selection asks for it. Lives
+ * with the threads' DOM: the sidebar ref is only set once they render.
+ *
+ * @param {Object} props
+ * @param {Object} props.sidebarRef Ref to the sidebar element.
+ */
+export function useNoteFocus( { sidebarRef } ) {
+	const { selectNote } = unlock( useDispatch( editorStore ) );
+	const { selectedNote, noteFocused } = useSelect( ( select ) => {
+		const { getSelectedNote, isNoteFocused } = unlock(
+			select( editorStore )
+		);
+		return {
+			selectedNote: getSelectedNote(),
+			noteFocused: isNoteFocused(),
+		};
+	}, [] );
+
 	useEffect( () => {
 		if ( ! noteFocused || ! selectedNote ) {
 			return;

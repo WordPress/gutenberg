@@ -1,6 +1,5 @@
 import { _x } from '@wordpress/i18n';
 import { create, RichTextData } from '@wordpress/rich-text';
-import { getRectangleFromRange } from '@wordpress/dom';
 import { NOTE_FORMAT_NAME } from './constants';
 
 /**
@@ -233,52 +232,14 @@ export function getNoteMarkerSelector( noteId ) {
 }
 
 /**
- * Measure the bounding rect of the current text selection within a block
- * element, or return null when there is no usable selection (collapsed, or
- * not fully inside the block). A pending new note has no in-content marker
- * yet, so the selection it will attach to is the only anchor available for
- * positioning its floating form.
- *
- * @param {HTMLElement} blockEl Block DOM element to resolve the selection in.
- * @return {?DOMRect} Selection rect, or null.
- */
-export function getSelectionRect( blockEl ) {
-	const selection = blockEl.ownerDocument.defaultView?.getSelection();
-	if ( ! selection || selection.rangeCount === 0 || selection.isCollapsed ) {
-		return null;
-	}
-	const range = selection.getRangeAt( 0 );
-	// `isCollapsed` can be false with a collapsed first range, and
-	// `getRectangleFromRange` measures those by inserting a temporary node.
-	if ( range.collapsed ) {
-		return null;
-	}
-	if ( ! blockEl.contains( range.commonAncestorContainer ) ) {
-		return null;
-	}
-	// `getRectangleFromRange` over `Range.getBoundingClientRect()`: it drops
-	// the hairline rects a selection picks up at a line's edge, so a
-	// selection starting at the end of one line aligns to the line that
-	// actually holds the text rather than to the line above it.
-	const rect = getRectangleFromRange( range );
-	// A range with no rendered client rects still yields an all-zero rect
-	// rather than null, which would pin the thread to the top of the canvas.
-	// Treat it as "no usable selection" so callers fall back to the block.
-	if ( ! rect || ( rect.width === 0 && rect.height === 0 ) ) {
-		return null;
-	}
-	return rect;
-}
-
-/**
  * Measure where a note's floating thread should line up in the canvas.
  *
  * An inline note anchors to its in-content marker, so the thread aligns with
- * the noted text rather than the block. A marker split into several runs
- * (crossing overlaps) resolves to its first run. The pending new note has no
- * marker yet, so it anchors to the text selection it will attach to. Anything
- * else falls back to the block itself. An anchor inside collapsed content
- * (e.g. a closed Details) falls back to the closest visible block.
+ * the noted text rather than the block, and so does a pending new note through
+ * its draft marker. A marker split into several runs (crossing overlaps)
+ * resolves to its first run. Anything else falls back to the block itself. An
+ * anchor inside collapsed content (e.g. a closed Details) falls back to the
+ * closest visible block.
  *
  * Resolved at read time, because rich-text re-renders replace the marker.
  *
@@ -287,9 +248,6 @@ export function getSelectionRect( blockEl ) {
  * @return {DOMRect} Anchor rect, in viewport coordinates.
  */
 export function getNoteAnchorRect( noteId, blockEl ) {
-	if ( noteId === 'new' ) {
-		return getSelectionRect( blockEl ) ?? blockEl.getBoundingClientRect();
-	}
 	let anchor =
 		blockEl.querySelector( getNoteMarkerSelector( noteId ) ) ?? blockEl;
 	// Collapsed content still reports the box it would have when expanded,

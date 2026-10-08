@@ -16,7 +16,13 @@ import { unlock } from '../../lock-unlock';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-export function AddNote( { clientId, onSubmit, sidebarRef, floating } ) {
+export function AddNote( {
+	clientId,
+	onSubmit,
+	onDiscard,
+	sidebarRef,
+	floating,
+} ) {
 	const blockElement = useBlockElement( clientId );
 	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
@@ -50,6 +56,7 @@ export function AddNote( { clientId, onSubmit, sidebarRef, floating } ) {
 		 * newly selected note.
 		 */
 		if ( getSelectedNote() === 'new' && ! hasDraft() ) {
+			onDiscard( clientId );
 			toggleBlockSpotlight( clientId, false );
 			selectNote( undefined );
 		}
@@ -57,6 +64,7 @@ export function AddNote( { clientId, onSubmit, sidebarRef, floating } ) {
 
 	const unselectNote = () => {
 		setDraft( '' );
+		onDiscard( clientId );
 		selectNote( undefined );
 		blockElement?.focus();
 		toggleBlockSpotlight( clientId, false );
