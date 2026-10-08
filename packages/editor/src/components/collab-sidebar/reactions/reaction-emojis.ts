@@ -1,7 +1,5 @@
-import { _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-// @ts-expect-error - No type declarations available for @wordpress/block-editor.
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as editorStore } from '../../../store';
 
 /**
  * A reaction emoji.
@@ -15,22 +13,6 @@ export interface ReactionEmoji {
 	hexKey: string;
 	label: string;
 }
-
-/**
- * The emoji a note can be reacted with by default. Labels are lowercase
- * since they also appear mid-sentence ("Adam reacted with heart").
- */
-export const REACTION_EMOJIS: ReactionEmoji[] = [
-	{ emoji: '❤️', hexKey: '2764', label: _x( 'heart', 'emoji reaction' ) },
-	{
-		emoji: '🎉',
-		hexKey: '1f389',
-		label: _x( 'celebration', 'emoji reaction' ),
-	},
-	{ emoji: '😄', hexKey: '1f604', label: _x( 'smile', 'emoji reaction' ) },
-	{ emoji: '👀', hexKey: '1f440', label: _x( 'eyes', 'emoji reaction' ) },
-	{ emoji: '🚀', hexKey: '1f680', label: _x( 'rocket', 'emoji reaction' ) },
-];
 
 const HEX_KEY_PATTERN = /^[0-9a-f]{4,6}(?:-[0-9a-f]{4,6})*$/;
 
@@ -62,19 +44,22 @@ export function hexKeyToEmoji( hexKey: string ): string {
 /**
  * The reaction emoji the editor offers: the `noteReactionEmojis` editor
  * setting, which the server builds from the `wp_note_reaction_emojis`
- * filter so the menu offers the same emoji the REST API accepts. Falls back
- * to the default emoji when the setting is missing.
+ * filter so the menu offers the same emoji the REST API accepts. Offers none
+ * when the setting is missing, since the accepted emoji are then unknown.
  *
  * @return The reaction emoji, in display order.
  */
 export function useReactionEmojis(): ReactionEmoji[] {
 	const setting: unknown = useSelect(
 		( select ) =>
-			select( blockEditorStore ).getSettings().noteReactionEmojis,
+			// @ts-expect-error Editor settings are typed as a bare `Object`.
+			select( editorStore ).getEditorSettings().noteReactionEmojis,
 		[]
 	);
 	return getReactionEmojisFromSetting( setting );
 }
+
+const NO_EMOJIS: ReactionEmoji[] = [];
 
 const settingCache = new WeakMap< object, ReactionEmoji[] >();
 
@@ -83,13 +68,13 @@ const settingCache = new WeakMap< object, ReactionEmoji[] >();
  * dropping malformed entries.
  *
  * @param setting The setting's value.
- * @return The reaction emoji, or the defaults when the setting is not a list.
+ * @return The reaction emoji, or none when the setting is not a list.
  */
 export function getReactionEmojisFromSetting(
 	setting: unknown
 ): ReactionEmoji[] {
 	if ( ! Array.isArray( setting ) ) {
-		return REACTION_EMOJIS;
+		return NO_EMOJIS;
 	}
 	// The setting keeps its identity between renders, so the list does too.
 	let emojis = settingCache.get( setting );

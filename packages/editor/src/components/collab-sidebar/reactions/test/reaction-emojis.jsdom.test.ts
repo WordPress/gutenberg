@@ -1,9 +1,10 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
-	REACTION_EMOJIS,
 	getReactionEmojisFromSetting,
 	hexKeyToEmoji,
 } from '../reaction-emojis';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 describe( 'hexKeyToEmoji', () => {
 	it( 'adds U+FE0F back to a single code point', () => {
@@ -24,10 +25,8 @@ describe( 'hexKeyToEmoji', () => {
 } );
 
 describe( 'getReactionEmojisFromSetting', () => {
-	it( 'falls back to the defaults when the setting is missing', () => {
-		expect( getReactionEmojisFromSetting( undefined ) ).toBe(
-			REACTION_EMOJIS
-		);
+	it( 'offers no emoji when the setting is missing', () => {
+		expect( getReactionEmojisFromSetting( undefined ) ).toEqual( [] );
 	} );
 
 	it( 'keeps an empty list, which turns adding reactions off', () => {

@@ -3,6 +3,8 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import apiFetch from '@wordpress/api-fetch';
 import ReactionDisplay, { invalidateReactionNames } from '../reaction-display';
 
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
 vi.mock( import( '@wordpress/api-fetch' ) );
 
 const NOTE_ID = 7;
