@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/eslint-plugin",
-	"version": "27.0.0",
+	"version": "27.1.0",
 	"description": "ESLint plugin for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -58,15 +58,15 @@
 		"eslint-plugin-react-hooks": "^7.1.1",
 		"globals": "^16.0.0",
 		"requireindex": "^1.2.0",
-		"typescript-eslint": "^8.57.1"
+		"typescript-eslint": "^8.70.1"
 	},
 	"devDependencies": {
 		"@types/eslint": "^9",
 		"@types/estree": "^1.0.8",
-		"@typescript-eslint/parser": "^8.68.0",
+		"@typescript-eslint/parser": "^8.70.1",
 		"eslint": "^10.0.0",
 		"typescript": "npm:@typescript/typescript6@^6.0.2",
-		"vitest": "^5.0.0"
+		"vitest": "^5.0.3"
 	},
 	"peerDependencies": {
 		"eslint": "^9.0.0 || ^10.0.0",

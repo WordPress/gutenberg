@@ -4,7 +4,7 @@ import { updateFootnotesFromMeta } from '../';
 
 // The real implementation logs once per distinct message, which would make
 // per-case assertions depend on the order the cases run in.
-vi.mock( '@wordpress/warning' );
+vi.mock( import( '@wordpress/warning' ) );
 
 describe( 'updateFootnotesFromMeta', () => {
 	const blocks = [];

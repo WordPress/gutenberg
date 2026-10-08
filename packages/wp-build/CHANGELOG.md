@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+## 0.25.0 (2026-10-07)
+
+### Bug Fixes
+
+-   Add the `@babel/core` dependency, a peer of `esbuild-plugin-babel` ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+-   Keep the build machine's absolute paths out of worker source maps when `wpWorkers` redirects a module with `resolve`, so the output is reproducible across checkouts ([#84163](https://github.com/WordPress/gutenberg/pull/84163)).
+
+### Internal
+
+-   Drop the optional `@wordpress/boot`, `@wordpress/private-apis`, and `@wordpress/route` peer dependencies, unused since they are no longer bundled ([#83601](https://github.com/WordPress/gutenberg/pull/83601)).
+
 ## 0.24.0 (2026-09-23)
 
 ### Enhancements

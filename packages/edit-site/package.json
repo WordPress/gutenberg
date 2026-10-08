@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-site",
-	"version": "7.5.0",
+	"version": "7.6.0",
 	"description": "Edit Site Page module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -45,7 +45,7 @@
 		"wp-dom-ready"
 	],
 	"dependencies": {
-		"@react-spring/web": "^9.4.5",
+		"@react-spring/web": "^10.1.2",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/admin-ui": "file:../admin-ui",
 		"@wordpress/api-fetch": "file:../api-fetch",
@@ -86,7 +86,7 @@
 		"clsx": "^2.1.1"
 	},
 	"devDependencies": {
-		"vitest": "^5.0.0"
+		"vitest": "^5.0.3"
 	},
 	"peerDependencies": {
 		"react": "^18 || ^19",
