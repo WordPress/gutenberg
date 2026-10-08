@@ -247,7 +247,7 @@ _Returns_
 
 ### useDebounce
 
-Debounces a function similar to Lodash's `debounce`. A new debounced function will be returned and any scheduled calls cancelled if any of the arguments change, including the function to debounce, so please wrap functions created on render in components in `useCallback`.
+Debounces a function similar to Lodash's `debounce`. The latest version of the function is always called, so it doesn't need to be wrapped in `useCallback`. A new debounced function will be returned and any scheduled calls cancelled if `wait` or `options` change.
 
 _Related_
 

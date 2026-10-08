@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `useDebounce`: Call the latest function instead of cancelling scheduled calls when the function changes ([#84192](https://github.com/WordPress/gutenberg/pull/84192)).
+
 ## 8.10.0 (2026-10-07)
 
 ### Bug Fixes
