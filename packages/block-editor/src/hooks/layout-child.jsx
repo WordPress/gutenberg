@@ -81,7 +81,7 @@ export function getChildLayoutStyleRules( {
 		rotate,
 	} = effectiveLayout;
 	const baseSelfStretch = layout.selfStretch;
-	const { columnCount, minimumColumnWidth } = parentLayout;
+	const { columnCount, minimumColumnWidth, isManualPlacement } = parentLayout;
 	const rules = [];
 
 	const declarations = {};
@@ -145,6 +145,14 @@ export function getChildLayoutStyleRules( {
 		} else if ( rowSpan ) {
 			declarations[ 'grid-row' ] = `span ${ rowSpan }`;
 		}
+	}
+
+	// Manual grids stack their children on mobile with a rule on the grid,
+	// which reads each child's row span from this custom property so that
+	// tall blocks stay tall. It is always set, so that a child doesn't
+	// inherit the row span of a grid it is nested in.
+	if ( ! hasViewportOverrides && isManualPlacement ) {
+		declarations[ '--wp--grid-item--row-span' ] = `${ rowSpan || 1 }`;
 	}
 
 	// The `rotate` property is used rather than `transform` so that it doesn't

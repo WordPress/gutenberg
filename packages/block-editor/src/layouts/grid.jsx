@@ -384,7 +384,8 @@ export default {
 	/**
 	 * Gets the CSS that stacks the children of a manual placement grid on
 	 * mobile, unless the grid has opted out with `stackOnMobile: false`. Each
-	 * child becomes full width, in block order, and unrotated.
+	 * child becomes full width, in block order, and unrotated, and keeps its
+	 * row span, which it publishes as `--wp--grid-item--row-span`.
 	 *
 	 * @param {Object} options
 	 * @param {string} options.selector The grid's CSS selector.
@@ -402,7 +403,7 @@ export default {
 			.split( ',' )
 			.map( ( subselector ) => `${ subselector }${ subselector } > *` )
 			.join( ',' );
-		return `${ childSelector } { grid-column: 1 / -1; grid-row: auto; rotate: none; }`;
+		return `${ childSelector } { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); rotate: none; }`;
 	},
 	getOrientation() {
 		return 'horizontal';

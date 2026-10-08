@@ -416,6 +416,15 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 	}
 
 	/*
+	 * Manual grids stack their children on mobile with a rule on the grid, which reads each
+	 * child's row span from this custom property so that tall blocks stay tall. It is always
+	 * set, so that a child doesn't inherit the row span of a grid it is nested in.
+	 */
+	if ( null === $viewport_overrides && ! empty( $parent_layout['isManualPlacement'] ) ) {
+		$child_layout_declarations['--wp--grid-item--row-span'] = (string) ( $row_span ? $row_span : 1 );
+	}
+
+	/*
 	 * Rotation is a number of degrees, wrapped into the (-180, 180] range. It uses the
 	 * `rotate` property rather than `transform` so that it combines with any transforms a
 	 * theme or block applies. In a viewport override, 0 undoes the default rotation.
@@ -1109,7 +1118,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			'layout'       => $base_child_layout,
 			'parentLayout' => array_intersect_key(
 				$parent_layout,
-				array_flip( array( 'minimumColumnWidth', 'columnCount' ) )
+				array_flip( array( 'minimumColumnWidth', 'columnCount', 'isManualPlacement' ) )
 			),
 		);
 		foreach ( $viewport_child_layouts as $breakpoint => $viewport_data ) {
@@ -1400,7 +1409,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 		/*
 		 * Manual placement grids stack their children on mobile unless they opt out with
-		 * `stackOnMobile: false`: each child becomes full width, in block order, and unrotated.
+		 * `stackOnMobile: false`: each child becomes full width, in block order, and unrotated,
+		 * and keeps the row span it publishes as `--wp--grid-item--row-span`.
 		 * The selector is repeated so that the rule beats each child's own placement rule,
 		 * whatever order the stylesheets end up in.
 		 */
@@ -1422,7 +1432,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 						'selector'     => ".$container_class.$container_class > *",
 						'declarations' => array(
 							'grid-column' => '1 / -1',
-							'grid-row'    => 'auto',
+							'grid-row'    => 'span var(--wp--grid-item--row-span, 1)',
 							'rotate'      => 'none',
 						),
 					),

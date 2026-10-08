@@ -224,6 +224,47 @@ describe( 'layout child', () => {
 		} );
 	} );
 
+	describe( 'row span for mobile stacking', () => {
+		it( 'publishes the row span of a manual grid child', () => {
+			expect(
+				getChildLayoutStyleRules( {
+					selector: '.wp-container-content-test',
+					layout: { columnStart: 1, rowStart: 1, rowSpan: 2 },
+					parentLayout: { isManualPlacement: true, columnCount: 3 },
+				} )
+			).toEqual( [
+				{
+					selector: '.wp-container-content-test',
+					declarations: {
+						'grid-column': '1',
+						'grid-row': '1 / span 2',
+						'--wp--grid-item--row-span': '2',
+					},
+				},
+			] );
+		} );
+
+		it( 'publishes a row span of 1 so nested grids do not inherit one', () => {
+			expect(
+				getChildLayoutStyleRules( {
+					selector: '.wp-container-content-test',
+					layout: { columnStart: 2, rowStart: 1 },
+					parentLayout: { isManualPlacement: true, columnCount: 3 },
+				} )[ 0 ].declarations[ '--wp--grid-item--row-span' ]
+			).toBe( '1' );
+		} );
+
+		it( 'does not publish the row span in auto placement grids', () => {
+			expect(
+				getChildLayoutStyleRules( {
+					selector: '.wp-container-content-test',
+					layout: { rowSpan: 2 },
+					parentLayout: { columnCount: 3 },
+				} )[ 0 ].declarations
+			).toEqual( { 'grid-row': 'span 2' } );
+		} );
+	} );
+
 	describe( 'getUpdatedChildLayoutStyle()', () => {
 		it( 'stores resizer changes in the selected viewport when no default child layout exists', () => {
 			const style = getUpdatedChildLayoutStyle(

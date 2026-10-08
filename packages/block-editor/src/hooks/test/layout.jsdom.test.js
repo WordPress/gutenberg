@@ -243,7 +243,7 @@ describe( 'layout', () => {
 					hasBlockGapSupport: true,
 				} )
 			).toBe(
-				'@media (width <= 480px){.wp-container-test.wp-container-test > * { grid-column: 1 / -1; grid-row: auto; rotate: none; }}'
+				'@media (width <= 480px){.wp-container-test.wp-container-test > * { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); rotate: none; }}'
 			);
 		} );
 
@@ -265,7 +265,7 @@ describe( 'layout', () => {
 					hasBlockGapSupport: true,
 				} )
 			).toBe(
-				'@media (width <= 480px){.wp-container-test { grid-template-columns: repeat(2, minmax(0, 1fr)); }.wp-container-test.wp-container-test > * { grid-column: 1 / -1; grid-row: auto; rotate: none; }}'
+				'@media (width <= 480px){.wp-container-test { grid-template-columns: repeat(2, minmax(0, 1fr)); }.wp-container-test.wp-container-test > * { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); rotate: none; }}'
 			);
 		} );
 

@@ -896,7 +896,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		$container_class = $matches[0];
 
 		$stylesheet    = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
-		$stacking_rule = ".$container_class.$container_class > *{grid-column:1 / -1;grid-row:auto;rotate:none;}";
+		$stacking_rule = ".$container_class.$container_class > *{grid-column:1 / -1;grid-row:span var(--wp--grid-item--row-span, 1);rotate:none;}";
 
 		if ( $should_stack ) {
 			$this->assertStringContainsString( '@media (width <= 480px){' . $stacking_rule, $stylesheet );
@@ -950,6 +950,64 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				'should_stack' => false,
 			),
 		);
+	}
+
+	/**
+	 * Check that children of manual placement grids publish their row span for mobile stacking.
+	 *
+	 * @covers ::gutenberg_get_child_layout_style_rules
+	 */
+	public function test_gutenberg_get_child_layout_style_rules_publishes_row_span_in_manual_grids() {
+		$manual_grid = array(
+			'isManualPlacement' => true,
+			'columnCount'       => 3,
+		);
+
+		$this->assertSame(
+			array(
+				array(
+					'selector'     => '.wp-container-content-test',
+					'declarations' => array(
+						'grid-column'               => '1',
+						'grid-row'                  => '1 / span 2',
+						'--wp--grid-item--row-span' => '2',
+					),
+				),
+			),
+			gutenberg_get_child_layout_style_rules(
+				'.wp-container-content-test',
+				array(
+					'columnStart' => 1,
+					'rowStart'    => 1,
+					'rowSpan'     => 2,
+				),
+				$manual_grid
+			)
+		);
+
+		$single_row_rules = gutenberg_get_child_layout_style_rules(
+			'.wp-container-content-test',
+			array( 'columnStart' => 2 ),
+			$manual_grid
+		);
+		$this->assertSame( '1', $single_row_rules[0]['declarations']['--wp--grid-item--row-span'], 'A child without a row span should publish 1.' );
+
+		$auto_grid_rules = gutenberg_get_child_layout_style_rules(
+			'.wp-container-content-test',
+			array( 'rowSpan' => 2 ),
+			array( 'columnCount' => 3 )
+		);
+		$this->assertArrayNotHasKey( '--wp--grid-item--row-span', $auto_grid_rules[0]['declarations'], 'Auto placement grid children should not publish a row span.' );
+	}
+
+	/**
+	 * Check that the row span custom property and the stacking rule survive CSS sanitization.
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 */
+	public function test_row_span_declarations_survive_sanitization() {
+		$this->assertSame( '--wp--grid-item--row-span:2', safecss_filter_attr( '--wp--grid-item--row-span:2' ) );
+		$this->assertSame( 'grid-row:span var(--wp--grid-item--row-span, 1)', safecss_filter_attr( 'grid-row:span var(--wp--grid-item--row-span, 1)' ) );
 	}
 
 	/**
