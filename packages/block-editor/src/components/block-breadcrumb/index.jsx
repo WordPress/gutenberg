@@ -50,41 +50,40 @@ function BlockBreadcrumb( { rootLabelText } ) {
 			className="block-editor-block-breadcrumb"
 			aria-label={ __( 'Block breadcrumb' ) }
 		>
-			{ !! clientId && !! currentTitle && (
-				<Breadcrumb.LinkItem
-					href="#"
-					key="document"
-					className="block-editor-block-breadcrumb__button"
-					onClick={ ( event ) => {
-						event.preventDefault();
-						const blockEditor = blockRef.current?.closest(
-							'.editor-styles-wrapper'
-						);
-						clearSelectedBlock();
-						getEditorRegion( blockEditor )?.focus();
-					} }
-				>
-					{ rootLabel }
-				</Breadcrumb.LinkItem>
-			) }
 			{ !! clientId &&
-				!! currentTitle &&
-				parents.map(
-					( parentClientId, index ) =>
-						parentTitles[ index ] && (
-							<Breadcrumb.LinkItem
-								key={ parentClientId }
-								className="block-editor-block-breadcrumb__button"
-								href={ `#block-${ parentClientId }` }
-								onClick={ ( event ) => {
-									event.preventDefault();
-									selectBlock( parentClientId );
-								} }
-							>
-								{ parentTitles[ index ] }
-							</Breadcrumb.LinkItem>
-						)
-				) }
+				!! currentTitle && [
+					<Breadcrumb.LinkItem
+						href="#"
+						key="document"
+						className="block-editor-block-breadcrumb__button"
+						onClick={ ( event ) => {
+							event.preventDefault();
+							const blockEditor = blockRef.current?.closest(
+								'.editor-styles-wrapper'
+							);
+							clearSelectedBlock();
+							getEditorRegion( blockEditor )?.focus();
+						} }
+					>
+						{ rootLabel }
+					</Breadcrumb.LinkItem>,
+					parents.map(
+						( parentClientId, index ) =>
+							parentTitles[ index ] && (
+								<Breadcrumb.LinkItem
+									key={ parentClientId }
+									className="block-editor-block-breadcrumb__button"
+									href={ `#block-${ parentClientId }` }
+									onClick={ ( event ) => {
+										event.preventDefault();
+										selectBlock( parentClientId );
+									} }
+								>
+									{ parentTitles[ index ] }
+								</Breadcrumb.LinkItem>
+							)
+					),
+				] }
 			<Breadcrumb.CurrentItem
 				key={ clientId || 'document' }
 				className="block-editor-block-breadcrumb__current"
