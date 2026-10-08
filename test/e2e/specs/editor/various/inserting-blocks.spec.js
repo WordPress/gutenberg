@@ -965,11 +965,12 @@ test.describe( 'insert media from inserter', () => {
 
 		await page.getByLabel( 'Block Inserter' ).click();
 		await page.getByRole( 'tab', { name: 'Media' } ).click();
-		// The tab opens on the media library's images, so the Images tab is
-		// already selected and its grid is showing.
+		// The tab opens on the media library's images. Asserted through the
+		// search field's label rather than the media-type tabs, which are not
+		// rendered when the library holds only one type.
 		await expect(
-			page.getByRole( 'tab', { name: 'Images' } )
-		).toHaveAttribute( 'aria-selected', 'true' );
+			page.getByRole( 'searchbox', { name: 'Search images' } )
+		).toBeVisible();
 		// The card's preview is the click-to-insert target, named by the
 		// item's title.
 		await page
