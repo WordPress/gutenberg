@@ -6,6 +6,7 @@ import {
 	withSyncEvent,
 	withScope,
 } from '@wordpress/interactivity';
+import { prefersReducedMotion } from '../utils/reduced-motion';
 import { IMAGE_PRELOAD_DELAY } from './constants';
 
 /**
@@ -420,9 +421,6 @@ const { state, actions, callbacks } = store(
 					if ( touchDrag.isDragging ) {
 						event.preventDefault();
 						const overlayEl = touchDrag.overlayEl;
-						const prefersReducedMotion = window.matchMedia(
-							'(prefers-reduced-motion: reduce)'
-						).matches;
 						const direction = deltaX < 0 ? 'next' : 'previous';
 
 						const advance = () => {
@@ -448,7 +446,7 @@ const { state, actions, callbacks } = store(
 							}
 						};
 
-						if ( prefersReducedMotion ) {
+						if ( prefersReducedMotion() ) {
 							advance();
 						} else {
 							overlayEl.classList.add( 'is-animating-slide' );
