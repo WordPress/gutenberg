@@ -42,7 +42,10 @@ export interface CurrentItemProps extends Omit<
 	 * With no ancestors, an explicit `true` or `"true"` also makes Root a
 	 * selection group. Ancestor links or buttons take precedence when present.
 	 */
-	'aria-current'?: ComponentProps< 'span' >[ 'aria-current' ];
+	'aria-current'?: Exclude<
+		ComponentProps< 'span' >[ 'aria-current' ],
+		false | 'false'
+	>;
 
 	/**
 	 * The plain-text label for the current item.
