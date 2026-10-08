@@ -167,36 +167,6 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
  */
 function block_core_post_navigation_link_get_support_styles( $attributes ) {
 	$block_styles  = $attributes['style'] ?? array();
-	$border        = $block_styles['border'] ?? array();
-	$border_styles = array();
-
-	// Border radius and width accept unitless numbers from the original implementation.
-	if ( isset( $border['radius'] ) ) {
-		$border_styles['radius'] = is_numeric( $border['radius'] ) ? "{$border['radius']}px" : $border['radius'];
-	}
-
-	if ( isset( $border['width'] ) ) {
-		$border_styles['width'] = is_numeric( $border['width'] ) ? "{$border['width']}px" : $border['width'];
-	}
-
-	if ( isset( $border['style'] ) ) {
-		$border_styles['style'] = $border['style'];
-	}
-
-	// A preset border color is stored in its own attribute rather than under `style`.
-	$border_styles['color'] = isset( $attributes['borderColor'] )
-		? "var:preset|color|{$attributes['borderColor']}"
-		: ( $border['color'] ?? null );
-
-	// Individual border sides e.g. top, left etc.
-	foreach ( array( 'top', 'right', 'bottom', 'left' ) as $side ) {
-		$border_styles[ $side ] = array(
-			'width' => $border[ $side ]['width'] ?? null,
-			'color' => $border[ $side ]['color'] ?? null,
-			'style' => $border[ $side ]['style'] ?? null,
-		);
-	}
-
 	$background        = $block_styles['background'] ?? array();
 	$background_styles = array(
 		'backgroundImage'      => $background['backgroundImage'] ?? null,
@@ -215,10 +185,10 @@ function block_core_post_navigation_link_get_support_styles( $attributes ) {
 		}
 	}
 
-	$styles = wp_style_engine_get_styles(
+	$background_output = wp_style_engine_get_styles( array( 'background' => $background_styles ) );
+	$border_styles     = wp_get_border_classes_and_styles( $attributes );
+	$styles            = wp_style_engine_get_styles(
 		array(
-			'background' => $background_styles,
-			'border'     => $border_styles,
 			'dimensions' => array(
 				'minHeight' => $block_styles['dimensions']['minHeight'] ?? null,
 				'minWidth'  => $block_styles['dimensions']['minWidth'] ?? null,
@@ -231,7 +201,16 @@ function block_core_post_navigation_link_get_support_styles( $attributes ) {
 		)
 	);
 
-	$class_names = $styles['classnames'] ?? '';
+	$class_names = implode(
+		' ',
+		array_filter(
+			array(
+				$background_output['classnames'] ?? '',
+				$border_styles['class'] ?? '',
+				$styles['classnames'] ?? '',
+			)
+		)
+	);
 
 	// The style engine only adds `has-background` for a gradient, the background block support adds it for an image too.
 	if ( ! empty( $background_styles['backgroundImage'] ) && ! in_array( 'has-background', explode( ' ', $class_names ), true ) ) {
@@ -240,7 +219,7 @@ function block_core_post_navigation_link_get_support_styles( $attributes ) {
 
 	return array(
 		'class' => $class_names,
-		'style' => $styles['css'] ?? '',
+		'style' => ( $background_output['css'] ?? '' ) . ( $border_styles['style'] ?? '' ) . ( $styles['css'] ?? '' ),
 	);
 }
 
