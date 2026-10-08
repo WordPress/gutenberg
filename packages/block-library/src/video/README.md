@@ -43,6 +43,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - `padding`: `true`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
+  - `interactive`: `true`
 - [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
 
 ## CSS Selectors
