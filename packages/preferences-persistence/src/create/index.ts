@@ -40,7 +40,7 @@ export default function create( {
 		}
 
 		const user = await apiFetch< {
-			meta?: { persisted_preferences?: PreferencesData };
+			meta?: { persisted_preferences?: PreferencesData | null };
 		} >( {
 			path: '/wp/v2/users/me?context=edit',
 		} );
