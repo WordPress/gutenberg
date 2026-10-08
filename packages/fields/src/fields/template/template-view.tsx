@@ -1,11 +1,8 @@
-import { useSelect } from '@wordpress/data';
-import type { WpTemplate } from '@wordpress/core-data';
-import { store as coreStore } from '@wordpress/core-data';
 import type { DataViewRenderFieldProps } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
 import { getItemTitle } from '../../actions/utils';
 import type { BasePost } from '../../types';
-import { useDefaultTemplateLabel, useTemplateFieldMode } from './hooks';
+import { usePostTemplate, useTemplateFieldMode } from './hooks';
 
 function ClassicTemplateView( {
 	item,
@@ -25,40 +22,14 @@ function ClassicTemplateView( {
 
 function BlockThemeTemplateView( {
 	item,
-	field,
 }: DataViewRenderFieldProps< BasePost > ) {
 	const postType = item.type;
 	const slug = item.slug;
 	const postId = item.id;
-	const templateSlug = field.getValue( { item } );
-
-	const defaultTemplateLabel = useDefaultTemplateLabel(
-		postType,
-		postId,
-		slug
+	const { currentTemplate } = usePostTemplate( postType, postId, slug );
+	return (
+		<>{ currentTemplate ? getItemTitle( currentTemplate ) : undefined }</>
 	);
-
-	const templateLabel = useSelect(
-		( select ) => {
-			if ( ! templateSlug ) {
-				return;
-			}
-
-			const allTemplates = select(
-				coreStore
-			).getEntityRecords< WpTemplate >( 'postType', 'wp_template', {
-				per_page: -1,
-				post_type: postType,
-			} );
-			const match = allTemplates?.find(
-				( t ) => t.slug === templateSlug
-			);
-			return match ? getItemTitle( match ) : undefined;
-		},
-		[ postType, templateSlug ]
-	);
-
-	return <>{ templateLabel ?? defaultTemplateLabel }</>;
 }
 
 export const TemplateView = ( {

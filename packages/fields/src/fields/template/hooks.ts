@@ -1,9 +1,10 @@
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { WpTemplate } from '@wordpress/core-data';
-import { getItemTitle } from '../../actions/utils';
 import { unlock } from '../../lock-unlock';
 import type { BasePost } from '../../types';
+
+const EMPTY_TEMPLATES: WpTemplate[] = [];
 
 /**
  * Hook that determines the template field rendering mode for a post.
@@ -42,110 +43,54 @@ export function useTemplateFieldMode(
 }
 
 /**
- * Compute the template slug to look up in the template hierarchy.
- *
- * In `draft` status we might not have a slug available, so we use the
- * `single` post type template slug (e.g. page, single-post,
- * single-product, etc.). Pages do not need the `single` prefix to be
- * prioritised through template hierarchy.
- *
- * @param postType The post type.
- * @param slug     The post slug.
- */
-function getTemplateSlugToCheck(
-	postType: string,
-	slug: string | undefined
-): string {
-	if ( slug ) {
-		return postType === 'page'
-			? `${ postType }-${ slug }`
-			: `single-${ postType }-${ slug }`;
-	}
-	return postType === 'page' ? 'page' : `single-${ postType }`;
-}
-
-const NAME_NOT_FOUND = '';
-
-/**
- * Hook that resolves the human-readable label for the default template
- * that would apply to a post, given its type, ID and slug.
+ * Resolves the active template and available choices using core-data.
  *
  * @param postType The post type.
  * @param postId   The post ID.
- * @param slug     The post slug.
+ * @param slug     The edited post slug.
  */
-export function useDefaultTemplateLabel(
-	postType: string | undefined,
-	postId: string | number | undefined,
+export function usePostTemplate(
+	postType: string,
+	postId: string | number,
 	slug: string | undefined
-): string {
+) {
 	return useSelect(
 		( select ) => {
-			if ( ! postType || ! postId ) {
-				return NAME_NOT_FOUND;
-			}
-
-			const postIdStr = String( postId );
-
-			// Check if the current page is the front page.
-			const homePage = unlock( select( coreStore ) ).getHomePage();
-			if (
-				postType === 'page' &&
-				homePage?.postType === 'page' &&
-				homePage?.postId === postIdStr
-			) {
-				const templates = select(
-					coreStore
-				).getEntityRecords< WpTemplate >( 'postType', 'wp_template', {
-					per_page: -1,
-				} );
-				const frontPage = templates?.find(
-					( t ) => t.slug === 'front-page'
-				);
-				if ( frontPage ) {
-					return getItemTitle( frontPage );
-				}
-
-				// If no front page template is found, fall back to the page template.
-				// See @getTemplateId private selector in core-data package.
-			}
-
-			// Check if the current page is the posts page.
-			const postsPageId = unlock( select( coreStore ) ).getPostsPageId();
-			if ( postType === 'page' && postsPageId === postIdStr ) {
-				const templateId = select( coreStore ).getDefaultTemplateId( {
-					slug: 'home',
-				} );
-				if ( ! templateId ) {
-					return NAME_NOT_FOUND;
-				}
-
-				const template = select(
-					coreStore
-				).getEntityRecord< WpTemplate >(
-					'postType',
-					'wp_template',
-					templateId
-				);
-				return template ? getItemTitle( template ) : NAME_NOT_FOUND;
-			}
-
-			// Check any other case.
-			const slugToCheck = getTemplateSlugToCheck( postType, slug );
-			const templateId = select( coreStore ).getDefaultTemplateId( {
-				slug: slugToCheck,
+			const core = select( coreStore );
+			const { getTemplateId } = unlock( core );
+			const base = postType === 'page' ? 'page' : `single-${ postType }`;
+			const defaultTemplateId = core.getDefaultTemplateId( {
+				slug: slug ? `${ base }-${ slug }` : base,
 			} );
-			if ( ! templateId ) {
-				return NAME_NOT_FOUND;
-			}
-
-			const template = select( coreStore ).getEntityRecord< WpTemplate >(
+			const currentTemplateId = getTemplateId( postType, postId );
+			const templates = core.getEntityRecords< WpTemplate >(
 				'postType',
 				'wp_template',
-				templateId
+				{
+					per_page: -1,
+					post_type: postType,
+					post_id: postId,
+					slug: slug || undefined,
+				}
 			);
-			return template ? getItemTitle( template ) : NAME_NOT_FOUND;
+			return {
+				currentTemplate: currentTemplateId
+					? core.getEntityRecord< WpTemplate >(
+							'postType',
+							'wp_template',
+							currentTemplateId
+						)
+					: undefined,
+				defaultTemplate: defaultTemplateId
+					? core.getEntityRecord< WpTemplate >(
+							'postType',
+							'wp_template',
+							defaultTemplateId
+						)
+					: undefined,
+				templates: templates ?? EMPTY_TEMPLATES,
+			};
 		},
-		[ postType, postId, slug ]
+		[ postId, postType, slug ]
 	);
 }

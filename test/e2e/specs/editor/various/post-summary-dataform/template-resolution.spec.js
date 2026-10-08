@@ -3,7 +3,7 @@ const {
 	expect,
 	Editor,
 } = require( '@wordpress/e2e-test-utils-playwright' );
-const { EXPERIMENTS, openPostSummary } = require( './utils' );
+const { EXPERIMENTS, EDITOR_CONTEXTS, openPostSummary } = require( './utils' );
 
 /*
  * Mirrors the '`page_for_posts` setting' tests of
@@ -174,4 +174,105 @@ test.describe( 'Template resolution (DataForm inspector)', () => {
 			).toHaveAccessibleDescription( 'Index' );
 		} );
 	} );
+} );
+
+test.describe( 'Filtered template choices (DataForm inspector)', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'emptytheme' );
+		await requestUtils.activatePlugin(
+			'gutenberg-test-post-template-choices'
+		);
+	} );
+
+	test.beforeEach( async ( { requestUtils } ) => {
+		await requestUtils.setGutenbergExperiments( EXPERIMENTS );
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.setGutenbergExperiments( [] );
+		await requestUtils.deleteAllPages();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-post-template-choices'
+		);
+		await requestUtils.activateTheme( 'twentytwentyone' );
+	} );
+
+	for ( const context of EDITOR_CONTEXTS ) {
+		test( `shows only the extension template for the restricted page slug in the ${ context.name }`, async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const post = await requestUtils.createPage( {
+				title: 'Landing page',
+				slug: 'landing-page',
+				status: 'publish',
+			} );
+			await context.open(
+				{ admin },
+				{ postId: post.id, postType: 'page' }
+			);
+			const summary = await openPostSummary( { editor, page } );
+			const control = summary.getByRole( 'button', {
+				name: 'Edit Template',
+			} );
+			await expect( control ).toHaveAccessibleDescription(
+				'Landing page'
+			);
+			await control.click();
+			const select = page.getByRole( 'combobox', { name: 'Template' } );
+			await expect( select ).toHaveValue( 'landing-page' );
+			await expect( select.getByRole( 'option' ) ).toHaveText( [
+				'Landing page',
+			] );
+			await expect( select ).toBeDisabled();
+		} );
+
+		test( `switches from the assigned template when the page slug becomes restricted in the ${ context.name }`, async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const post = await requestUtils.createPage( {
+				title: 'Regular page',
+				slug: 'regular-page',
+				status: 'publish',
+				template: 'standard-page',
+			} );
+			await context.open(
+				{ admin },
+				{ postId: post.id, postType: 'page' }
+			);
+			const summary = await openPostSummary( { editor, page } );
+			const control = summary.getByRole( 'button', {
+				name: 'Edit Template',
+			} );
+			await expect( control ).toHaveAccessibleDescription(
+				'Standard page'
+			);
+
+			await summary.getByRole( 'button', { name: 'Edit Slug' } ).click();
+			await page
+				.getByRole( 'textbox', { name: 'Link', exact: true } )
+				.fill( 'landing-page' );
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'Escape' );
+
+			await expect( control ).toHaveAccessibleDescription(
+				'Landing page'
+			);
+			await control.click();
+			const select = page.getByRole( 'combobox', { name: 'Template' } );
+			await expect( select ).toHaveValue( 'landing-page' );
+			await expect( select.getByRole( 'option' ) ).toHaveText( [
+				'Landing page',
+			] );
+			await expect( select ).toBeDisabled();
+		} );
+	}
 } );

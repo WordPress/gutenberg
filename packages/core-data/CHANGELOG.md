@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Resolve templates from the choices for the post ID, edited slug, and post type, keeping the assigned template when available and otherwise using the first choice ([#83083](https://github.com/WordPress/gutenberg/pull/83083)).
+
 ## 8.2.0 (2026-10-07)
 
 ### Enhancements
@@ -390,8 +394,8 @@
 
 ### Breaking Changes
 
--   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
--   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at https://nodejs.org/en/about/releases/.
+-   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at <https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/>.
+-   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at <https://nodejs.org/en/about/releases/>.
 
 ### Enhancements
 

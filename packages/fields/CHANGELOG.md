@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Filter template choices by post ID and edited slug, sharing active-template resolution with the editor and falling back to the first choice when the assignment is unavailable ([#83083](https://github.com/WordPress/gutenberg/pull/83083)).
+
 ## 0.49.0 (2026-10-07)
 
 ### Breaking Changes
