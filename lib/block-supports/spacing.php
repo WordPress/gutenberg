@@ -43,29 +43,24 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 		return array();
 	}
 
-	if ( empty( $block_attributes['style'] ) ) {
+	if ( ! isset( $block_attributes['style']['spacing'] ) || ! is_array( $block_attributes['style']['spacing'] ) ) {
 		return array();
 	}
 
-	$attributes = $block_attributes;
-	if ( ! is_array( $attributes['style']['spacing'] ?? null ) ) {
-		return array();
+	$has_padding_support = block_has_support( $block_type, array( 'spacing', 'padding' ), false );
+	$has_margin_support  = block_has_support( $block_type, array( 'spacing', 'margin' ), false );
+	$skip_padding        = wp_should_skip_block_supports_serialization( $block_type, 'spacing', 'padding' );
+	$skip_margin         = wp_should_skip_block_supports_serialization( $block_type, 'spacing', 'margin' );
+
+	if ( ! $has_padding_support || $skip_padding ) {
+		unset( $block_attributes['style']['spacing']['padding'] );
 	}
 
-	if (
-		! block_has_support( $block_type, array( 'spacing', 'padding' ), false ) ||
-		wp_should_skip_block_supports_serialization( $block_type, 'spacing', 'padding' )
-	) {
-		unset( $attributes['style']['spacing']['padding'] );
-	}
-	if (
-		! block_has_support( $block_type, array( 'spacing', 'margin' ), false ) ||
-		wp_should_skip_block_supports_serialization( $block_type, 'spacing', 'margin' )
-	) {
-		unset( $attributes['style']['spacing']['margin'] );
+	if ( ! $has_margin_support || $skip_margin ) {
+		unset( $block_attributes['style']['spacing']['margin'] );
 	}
 
-	return gutenberg_get_spacing_classes_and_styles( $attributes );
+	return gutenberg_get_spacing_classes_and_styles( $block_attributes );
 }
 
 /**
