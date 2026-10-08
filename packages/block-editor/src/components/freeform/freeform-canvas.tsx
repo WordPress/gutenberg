@@ -38,6 +38,7 @@ import { getGrownCanvasLayout } from './canvases';
 import {
 	canDissolveIntoCanvas,
 	getLayoutSupport,
+	hasVisualStyling,
 	isAbsorbable,
 	planSectionFlatten,
 } from './flatten';
@@ -489,7 +490,16 @@ export default function FreeformCanvas( {
 			section && planSectionFlatten( section, canDissolveIntoCanvas );
 		const measured =
 			plan && canvasElement
-				? measureSection( canvasElement, plan.citizens )
+				? measureSection(
+						canvasElement,
+						plan.citizens,
+						( clientId ) =>
+							! hasVisualStyling(
+								registry
+									.select( blockEditorStore )
+									.getBlockAttributes( clientId )
+							)
+					)
 				: null;
 		const conversion = measured && getCanvasConversion( measured );
 		if ( ! conversion ) {
