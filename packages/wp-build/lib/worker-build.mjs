@@ -55,11 +55,20 @@ function createModuleRedirectPlugin( resolveMap ) {
 					matchedKey,
 					resolveMap[ matchedKey ]
 				);
+				const resolveDir = path.dirname( args.path );
+				// A relative specifier keeps the checkout path out of the source map.
+				const specifier =
+					'./' +
+					path
+						.relative( resolveDir, targetPath )
+						.split( path.sep )
+						.join( '/' );
 				return {
 					contents: `export { default } from ${ JSON.stringify(
-						targetPath
+						specifier
 					) };`,
 					loader: 'js',
+					resolveDir,
 				};
 			} );
 		},

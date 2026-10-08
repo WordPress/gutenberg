@@ -9,7 +9,7 @@ import './bind';
 import './class';
 import './context';
 import './each';
-import './ignore';
+import './html';
 import './init';
 import './on';
 import './router-region';
