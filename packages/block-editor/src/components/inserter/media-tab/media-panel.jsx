@@ -14,8 +14,17 @@ import InserterNoResults from '../no-results';
 // so a page is browsed with little scrolling and the pager does the rest.
 const MEDIA_ITEMS_PER_PAGE = 8;
 
-export function MediaCategoryPanel( { onInsert, category } ) {
-	const [ search, setSearch ] = useState( '' );
+export function MediaCategoryPanel( {
+	onInsert,
+	category,
+	search,
+	onChangeSearch,
+	mediaTypes,
+	mediaType,
+	onChangeMediaType,
+	sourceMenu,
+	footer,
+} ) {
 	const [ page, setPage ] = useState( 1 );
 	// Reset paging whenever the source category or the search term changes.
 	// Adjusting state during render (rather than in an effect) keeps the query
@@ -101,7 +110,7 @@ export function MediaCategoryPanel( { onInsert, category } ) {
 				perPage={ MEDIA_ITEMS_PER_PAGE }
 				onChangePage={ changePage }
 				search={ search }
-				onChangeSearch={ setSearch }
+				onChangeSearch={ onChangeSearch }
 				category={ category }
 				onClickItem={ handleClickItem }
 				insertingId={ insertingId }
@@ -110,8 +119,18 @@ export function MediaCategoryPanel( { onInsert, category } ) {
 				empty={
 					<InserterNoResults>{ emptyMessage }</InserterNoResults>
 				}
+				sourceMenu={ sourceMenu }
+				mediaTypes={ mediaTypes }
+				mediaType={ mediaType }
+				onChangeMediaType={ onChangeMediaType }
+				// A source that owns the post's attachments offers its own
+				// footer action, in place of the shared one.
 				footer={
-					attach && <AttachImagesButton onSelect={ handleAttach } />
+					attach ? (
+						<AttachImagesButton onSelect={ handleAttach } />
+					) : (
+						footer
+					)
 				}
 			/>
 			{ pendingExternalBlock && (

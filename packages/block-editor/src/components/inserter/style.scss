@@ -426,79 +426,17 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-// The Media tab is a single column: every source is a collapsible panel, and
-// the open one takes the height left beneath the other panels' headers so its
-// results scroll internally. The column is at least as tall as its content
-// (the headers plus the open panel's minimum height), so with many sources or
-// a short viewport it outgrows the tab panel, which scrolls.
+// Roughly the search field, a tab bar, two rows of cards and the pager.
+// Above this the panel fills the tab and the results scroll internally;
+// below it the panel keeps this height and the tab panel scrolls instead,
+// rather than everything collapsing.
 $media-panel-min-height: 320px;
-
-.block-editor-inserter__media-category-list {
-	display: flex;
-	flex-direction: column;
-	flex: 1 0 auto;
-
-	.block-editor-inserter__media-category-list__category {
-		display: flex;
-		flex-direction: column;
-		flex-shrink: 0;
-		border-bottom: $border-width solid $gray-200;
-
-		// The open panel grows to fill the column but never below a usable
-		// height (roughly the search field, two rows of cards and the pager).
-		// Below that the column outgrows the tab panel, which scrolls.
-		&.is-open {
-			flex: 1;
-			min-height: $media-panel-min-height;
-		}
-	}
-
-	.block-editor-inserter__media-category-list__trigger {
-		// Reset the native button so the header reads as a row in the column.
-		appearance: none;
-		border: 0;
-		background: none;
-		color: inherit;
-		font: inherit;
-		cursor: var(--wpds-cursor-control);
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: $grid-unit-10;
-		width: 100%;
-		padding: $grid-unit-15 $grid-unit-20;
-		font-weight: 500;
-		text-align: start;
-		flex-shrink: 0;
-
-		&:focus-visible {
-			@include outset-ring__focus();
-		}
-	}
-
-	.block-editor-inserter__media-category-list__panel {
-		display: flex;
-		flex-direction: column;
-		flex: 1;
-		min-height: 0;
-	}
-
-	.block-editor-inserter__media-category-list__footer {
-		flex-shrink: 0;
-		// Pinned to the bottom of the sidebar even when every panel is
-		// collapsed and nothing above it grows.
-		margin-top: auto;
-		padding: 0 $grid-unit-20 $grid-unit-20;
-	}
-}
 
 .block-editor-inserter__media-panel {
 	display: flex;
 	flex-direction: column;
-	// Fill the height of the open source panel so the results scroll
-	// internally and the footer stays on-screen.
-	flex: 1;
-	min-height: 0;
+	flex: 1 0 auto;
+	min-height: $media-panel-min-height;
 
 	// The panel body is a DataViews grid composed from its sub-components.
 	// Strip the surface colour DataViews brings for full-page use, and let its
@@ -511,11 +449,45 @@ $media-panel-min-height: 320px;
 
 	.block-editor-inserter__media-grid__search {
 		flex-shrink: 0;
-		padding: 0 $grid-unit-20 $grid-unit-20;
+		// Matches `.block-editor-inserter__search`, so the field sits where
+		// it does on the other tabs.
+		padding: $grid-unit-20;
 
-		.dataviews-search {
-			width: 100%;
+		// A tab bar below supplies its own separation, so the field sits
+		// closer to it than it would to the grid.
+		&:has(+ .block-editor-inserter__media-grid__tabs) {
+			padding-bottom: 0;
 		}
+
+		// Takes the room left beside the source menu.
+		.block-editor-inserter__media-grid__search-control {
+			flex: 1;
+			min-width: 0;
+		}
+	}
+
+	.block-editor-inserter__media-grid__tabs {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-height: 0;
+	}
+
+	// `Tabs.List` is only as wide as its tabs, so this wrapper carries the
+	// column gutter and the space beneath.
+	.block-editor-inserter__media-grid__tablist {
+		flex-shrink: 0;
+		padding: 0 $grid-unit-20;
+		margin-bottom: $grid-unit-15;
+	}
+
+	// The selected tab panel is the grid, so it carries the same fill as
+	// the untabbed layout would.
+	.block-editor-inserter__media-grid__tabs [role="tabpanel"] {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-height: 0;
 	}
 
 	.dataviews-view-grid {
@@ -531,10 +503,16 @@ $media-panel-min-height: 320px;
 		// Keeps the footer at its natural height rather than collapsing to make
 		// room for the scrolling grid above.
 		flex-shrink: 0;
-		// Matches the rule and the padding of the source panel headers, so the
-		// footer reads as the same kind of band rather than a taller one.
 		border-top: $border-width solid $gray-200;
-		padding: $grid-unit-15 $grid-unit-20;
+		// The button sits 16px clear top and bottom, as the "Explore all
+		// patterns" button does in the Patterns tab.
+		padding: $grid-unit-15 $grid-unit-20 $grid-unit-20;
+
+		// That spacing comes from the stack gap here, so drop the top margin
+		// the shared button rule adds for the Patterns tab.
+		.block-editor-inserter__media-library-button.components-button {
+			margin-top: 0;
+		}
 	}
 
 	.block-editor-inserter__media-grid__range {

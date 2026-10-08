@@ -15,7 +15,7 @@
 -   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
 -   `LinkControl`: Add a `transformSuggestions` prop, so a consumer can filter, order or add to the search suggestions before they are shown ([#83652](https://github.com/WordPress/gutenberg/pull/83652)).
 -   Block Switcher: Show the pattern previews' focus and hover rings with the design system's outline instead of a legacy box-shadow ([#83933](https://github.com/WordPress/gutenberg/pull/83933)).
--   Inserter: Redesign the Media tab as a single column of collapsible panels, one per media source, with the first open, in place of the category list and flyout panel. Each source renders as a DataViews grid with search, per-item actions and a pager labelled with the range of items shown ([#82749](https://github.com/WordPress/gutenberg/pull/82749)).
+-   Inserter: Redesign the Media tab around a single DataViews grid, in place of the category list and flyout panel. One search covers the tab, media types are tabs, and other sources (the post's attached images, Openverse, anything registered through the public API) are chosen from a menu beside the search ([#82749](https://github.com/WordPress/gutenberg/pull/82749)).
 
 ### Bug Fixes
 

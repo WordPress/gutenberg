@@ -4,8 +4,9 @@ import { __, sprintf } from '@wordpress/i18n';
 import { DataViews } from '@wordpress/dataviews';
 import type { Action, Field, View } from '@wordpress/dataviews';
 import { Spinner } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Stack, Tabs } from '@wordpress/ui';
 import UntypedInserterDraggableBlocks from '../../inserter-draggable-blocks';
+import MediaSearch from './media-search';
 import { getBlockAndPreviewFromMedia, getItemId } from './utils';
 
 type MediaType = 'image' | 'video' | 'audio';
@@ -84,6 +85,17 @@ type MediaGridProps = {
 	 * Rendered beneath the pager (e.g. the attach button).
 	 */
 	footer?: ReactNode;
+	/**
+	 * Rendered beside the search input (the source menu).
+	 */
+	sourceMenu?: ReactNode;
+	/**
+	 * The media types to offer as tabs. Fewer than two renders no tab
+	 * bar, since there is nothing to switch between.
+	 */
+	mediaTypes?: { value: string; label: string }[];
+	mediaType?: string;
+	onChangeMediaType?: ( mediaType: string ) => void;
 };
 
 const EMPTY_ARRAY: MediaItem[] = [];
@@ -189,6 +201,10 @@ export default function MediaGrid( {
 	searchLabel,
 	empty,
 	footer,
+	sourceMenu,
+	mediaTypes,
+	mediaType: selectedMediaType,
+	onChangeMediaType,
 }: MediaGridProps ) {
 	const { mediaType } = category;
 
@@ -259,6 +275,9 @@ export default function MediaGrid( {
 		[ totalItems, totalPages ]
 	);
 	const showPagination = paginationInfo.totalPages > 1;
+	// A single media type has nothing to switch between, so the bar is
+	// left out rather than showing one lone tab.
+	const hasTabs = !! mediaTypes && mediaTypes.length > 1;
 	const hasFooter = showPagination || !! footer;
 	const itemRange = getItemRange( {
 		page,
@@ -282,14 +301,52 @@ export default function MediaGrid( {
 			onClickItem={ onClickItem }
 			empty={ empty }
 		>
-			<div className="block-editor-inserter__media-grid__search">
-				<DataViews.Search label={ searchLabel } />
-			</div>
-			<DataViews.Layout className="block-editor-inserter__media-grid" />
+			<Stack
+				direction="row"
+				align="center"
+				gap="sm"
+				className="block-editor-inserter__media-grid__search"
+			>
+				<MediaSearch
+					label={ searchLabel }
+					value={ search }
+					onChange={ onChangeSearch }
+				/>
+				{ sourceMenu }
+			</Stack>
+			{ hasTabs ? (
+				<Tabs.Root
+					value={ selectedMediaType }
+					onValueChange={ onChangeMediaType }
+					className="block-editor-inserter__media-grid__tabs"
+				>
+					<div className="block-editor-inserter__media-grid__tablist">
+						<Tabs.List variant="minimal">
+							{ mediaTypes.map( ( type ) => (
+								<Tabs.Tab
+									key={ type.value }
+									value={ type.value }
+								>
+									{ type.label }
+								</Tabs.Tab>
+							) ) }
+						</Tabs.List>
+					</div>
+					{ /* One panel per tab, as `Tabs` requires the counts to match.
+					   Only the selected one mounts, so a single grid renders. */ }
+					{ mediaTypes.map( ( type ) => (
+						<Tabs.Panel key={ type.value } value={ type.value }>
+							<DataViews.Layout className="block-editor-inserter__media-grid" />
+						</Tabs.Panel>
+					) ) }
+				</Tabs.Root>
+			) : (
+				<DataViews.Layout className="block-editor-inserter__media-grid" />
+			) }
 			{ hasFooter && (
 				<Stack
 					direction="column"
-					gap="sm"
+					gap="lg"
 					className="block-editor-inserter__media-grid__footer"
 				>
 					{ showPagination && (
