@@ -29,6 +29,7 @@
 -   Block Toolbar: Show a generic icon and accessible name on the phone placeholder's block button when no default block type is registered ([#84533](https://github.com/WordPress/gutenberg/pull/84533)).
 -   Fix pasting multi-line text into an empty Preformatted or Poetry block, which replaced the block with Paragraph blocks instead of keeping the text inside it ([#83552](https://github.com/WordPress/gutenberg/pull/83552)).
 -   `BlockCard`: Size the icon container to the 20px icon ([#84105](https://github.com/WordPress/gutenberg/pull/84105)).
+-   `PresetInputControl`: Render icons at 20px ([#84105](https://github.com/WordPress/gutenberg/pull/84105)).
 
 ## 18.1.0 (2026-10-07)
 
