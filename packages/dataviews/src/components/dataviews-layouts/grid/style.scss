@@ -283,3 +283,8 @@
 	flex-shrink: 0;
 	margin-bottom: var(--wpds-dimension-gap-lg);
 }
+
+.dataviews-view-grid__bulk-actions-header ~ * :focus {
+	// Keep focused cards and their controls below the sticky bulk toolbar.
+	scroll-margin-top: 52px;
+}

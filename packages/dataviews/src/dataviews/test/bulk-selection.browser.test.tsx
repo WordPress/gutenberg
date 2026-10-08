@@ -124,3 +124,44 @@ it( 'keeps column names and sorting accessible during selection, skips covered c
 		.element( page.getByRole( 'columnheader', { name: /Author/ } ) )
 		.not.toHaveAttribute( 'aria-sort' );
 } );
+
+it( 'keeps a grid item checkbox below the sticky toolbar after arrow navigation and Tab', async () => {
+	const data = Array.from( { length: 8 }, ( _, index ) => ( {
+		...posts[ 0 ],
+		id: String( index ),
+		title: `Post ${ index }`,
+	} ) );
+	await render(
+		<div style={ { height: 300, width: 400, overflow: 'auto' } }>
+			<DataViews
+				data={ data }
+				fields={ [ fields[ 0 ] ] }
+				view={ { type: 'grid', titleField: 'title', fields: [] } }
+				onChangeView={ () => {} }
+				onClickItem={ () => {} }
+				actions={ actions }
+				paginationInfo={ { totalItems: data.length, totalPages: 1 } }
+				defaultLayouts={ { grid: true } }
+			/>
+		</div>
+	);
+	const user = userEvent.setup();
+	page.getByRole( 'gridcell' ).first().element().focus();
+	await user.keyboard( '{ArrowDown}{ArrowDown}{ArrowUp}{Tab}{Tab}' );
+	const checkbox = page.getByRole( 'checkbox', {
+		name: 'Post 1',
+		exact: true,
+	} );
+	await expect.element( checkbox ).toHaveFocus();
+	await expect
+		.poll( () => {
+			const header = document.querySelector(
+				'.dataviews-view-grid__bulk-actions-header'
+			)!;
+			return (
+				checkbox.element().getBoundingClientRect().top >=
+				header.getBoundingClientRect().bottom
+			);
+		} )
+		.toBe( true );
+} );

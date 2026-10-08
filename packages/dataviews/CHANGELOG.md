@@ -22,7 +22,7 @@
 
 -   Grid layout: Apply `inert` through `inertValue` so the attribute works reliably ([#84072](https://github.com/WordPress/gutenberg/pull/84072)).
 -   Filters: show the filter name in a chip in the emphasis font weight ([#83879](https://github.com/WordPress/gutenberg/pull/83879)).
--   Preserve accessible table column names and sort information during bulk selection, and use lowercase item counts ([#82730](https://github.com/WordPress/gutenberg/pull/82730)).
+-   Preserve accessible table column names and sort information during bulk selection, keep focused grid items clear of the sticky bulk toolbar, and use lowercase item counts ([#82730](https://github.com/WordPress/gutenberg/pull/82730)).
 
 -   Keep filter and item actions menus dismissible when their triggers become disabled ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
 -   Grid layout: measure the container as the grid attaches rather than waiting for the resize observer's first report, so the grid no longer renders a frame with every item in a full-width column of its own before snapping to its real column count ([#83752](https://github.com/WordPress/gutenberg/pull/83752)).
