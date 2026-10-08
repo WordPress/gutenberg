@@ -311,6 +311,44 @@ function _gutenberg_get_entity_view_config_posttype_page( $data ) {
 }
 
 /**
+ * Provides the view configuration for the `attachment` post type.
+ *
+ * Adds an "Unused" view on top of the generic "all items" one. The view locks a
+ * filter on the `used` field (exposed by the media usage detection) so the list
+ * shows only the attachments that are not referenced anywhere and can be
+ * cleaned up. The rest of the view configuration is left to the default, as the
+ * Media Library list already relies on it.
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function _gutenberg_get_entity_view_config_posttype_attachment( $data ) {
+	$data->merge(
+		array(
+			'view_list' => array(
+				array(
+					'title' => __( 'Unused', 'gutenberg' ),
+					'slug'  => 'unused',
+					'view'  => array(
+						'filters' => array(
+							array(
+								'field'    => 'used',
+								'operator' => 'is',
+								'value'    => false,
+								'isLocked' => true,
+							),
+						),
+					),
+				),
+			),
+		),
+		1
+	);
+
+	return $data;
+}
+
+/**
  * Provides the view configuration for the `wp_block` post type.
  *
  * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
@@ -758,7 +796,7 @@ function _gutenberg_get_entity_view_config_posttype_wp_template( $data ) {
  * registers them at include time or lazily on a hook.
  */
 function gutenberg_register_entity_view_config_filters() {
-	$post_types = array( 'page', 'post', 'wp_block', 'wp_template_part', 'wp_template' );
+	$post_types = array( 'page', 'post', 'wp_block', 'wp_template_part', 'wp_template', 'attachment' );
 
 	foreach ( $post_types as $post_type ) {
 		$hook        = gutenberg_get_entity_view_config_hook_name( 'postType', $post_type );

@@ -12,6 +12,10 @@ export interface MediaType {
 export interface MediaItem extends Attachment< 'edit' > {
 	// featured_media is not in the Attachment type. See https://github.com/WordPress/gutenberg/blob/trunk/packages/core-data/src/entity-types/attachment.ts#L10
 	featured_media: number;
+	// `used` is registered by the media usage detection, not part of the
+	// attachment schema in core-data. It is `null` when the request did not ask
+	// for it, because detecting usage scans the site content.
+	used?: boolean | null;
 	_embedded?: {
 		// TODO: Include wp:attached-to properly, and backport PHP changes from wordpress-develop to support this.
 		'wp:attached-to'?: Post[] | Partial< Post >[];

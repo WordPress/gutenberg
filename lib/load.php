@@ -226,6 +226,9 @@ require __DIR__ . '/block-supports/states.php';
 // Client-side media processing.
 require_once __DIR__ . '/media/load.php';
 
+// Media usage detection for the Media Library cleanup tools.
+require_once __DIR__ . '/media/class-gutenberg-media-usage.php';
+
 // Interactivity API full-page client-side navigation.
 if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigation' ) ) {
 	require __DIR__ . '/experimental/interactivity-api/class-gutenberg-interactivity-api-full-page-navigation.php';

@@ -26,6 +26,7 @@
 		"@wordpress/views": "file:../../packages/views"
 	},
 	"devDependencies": {
+		"vitest": "^5.0.0",
 		"@types/react": "^19.3.0"
 	}
 }

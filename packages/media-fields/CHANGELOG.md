@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add `usedField`, a read-only field that reports whether an attachment is referenced somewhere on the site, for use in Media Library cleanup views.
+
 ## 0.22.0 (2026-10-07)
 
 ### Bug Fixes
