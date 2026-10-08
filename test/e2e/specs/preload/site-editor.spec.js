@@ -87,7 +87,7 @@ test.describe( 'Preload', () => {
 				`GET /wp/v2/pages/${ pageId }/autosaves?context=edit`,
 				'GET /wp/v2/taxonomies?context=edit',
 				'GET /wp/v2/templates/lookup?slug=front-page',
-				`GET /wp/v2/templates?context=edit&per_page=100&post_type=page&slug=${ pageSlug }`,
+				`GET /wp/v2/templates?context=edit&per_page=100&post_type=page&post_id=${ pageId }&slug=${ pageSlug }`,
 				'GET /wp/v2/types/page?context=edit',
 				'GET /wp/v2/users/1?context=view&_fields=id%2Cname',
 				'GET /wp/v2/users/me',

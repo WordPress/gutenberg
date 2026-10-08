@@ -22,19 +22,11 @@ function ClassicTemplateView( {
 
 function BlockThemeTemplateView( {
 	item,
-	field,
 }: DataViewRenderFieldProps< BasePost > ) {
 	const postType = item.type;
 	const slug = item.slug;
 	const postId = item.id;
-	const templateSlug = field.getValue( { item } );
-
-	const { currentTemplate } = usePostTemplate(
-		postType,
-		postId,
-		slug,
-		templateSlug
-	);
+	const { currentTemplate } = usePostTemplate( postType, postId, slug );
 	return (
 		<>{ currentTemplate ? getItemTitle( currentTemplate ) : undefined }</>
 	);

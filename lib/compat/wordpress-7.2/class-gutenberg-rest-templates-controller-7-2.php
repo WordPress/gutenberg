@@ -17,14 +17,30 @@
  */
 class Gutenberg_REST_Templates_Controller_7_2 extends WP_REST_Templates_Controller {
 	/**
-	 * Adds the edited post slug to template collection queries.
+	 * Adds the post ID and edited slug to template collection queries.
 	 *
 	 * @return array Collection parameters.
 	 */
 	public function get_collection_params() {
 		$params = parent::get_collection_params();
 		if ( 'wp_template' === $this->post_type ) {
-			$params['slug'] = array(
+			$params['post_id'] = array(
+				'description'       => __( 'ID of the post to get available templates for.', 'gutenberg' ),
+				'type'              => 'integer',
+				'minimum'           => 1,
+				'validate_callback' => static function ( $value, $request, $param ) {
+					$valid = rest_validate_request_arg( $value, $request, $param );
+					if ( is_wp_error( $valid ) ) {
+						return $valid;
+					}
+					$post = get_post( (int) $value );
+					if ( ! $post || $post->post_type !== $request['post_type'] ) {
+						return new WP_Error( 'rest_invalid_param', __( 'Provide a post ID that matches the requested post type.', 'gutenberg' ) );
+					}
+					return true;
+				},
+			);
+			$params['slug']    = array(
 				'description'       => __( 'Slug of the post to get available templates for.', 'gutenberg' ),
 				'type'              => 'string',
 				'sanitize_callback' => static function ( $value ) {
@@ -61,6 +77,9 @@ class Gutenberg_REST_Templates_Controller_7_2 extends WP_REST_Templates_Controll
 			'slug'      => isset( $request['slug'] ) ? $request['slug'] : '',
 			'post_type' => $request['post_type'],
 		);
+		if ( isset( $request['post_id'] ) ) {
+			$query['post_id'] = $request['post_id'];
+		}
 		if ( isset( $request['wp_id'] ) ) {
 			$query['wp_id'] = $request['wp_id'];
 		}

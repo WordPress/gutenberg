@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Template choices: Resolve the active template from the choices for the edited post slug and post type, keeping the assignment when available and otherwise using the first choice ([#83083](https://github.com/WordPress/gutenberg/pull/83083)).
+-   Filter template choices by post ID and edited slug, sharing active-template resolution with the editor and falling back to the first choice when the assignment is unavailable ([#83083](https://github.com/WordPress/gutenberg/pull/83083)).
 
 ## 0.49.0 (2026-10-07)
 

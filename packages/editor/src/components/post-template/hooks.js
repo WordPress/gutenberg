@@ -46,15 +46,16 @@ export function useAllowSwitchingTemplates() {
 	);
 }
 
-function useTemplates( postType, postSlug ) {
+function useTemplates( postType, postId, postSlug ) {
 	return useSelect(
 		( select ) =>
 			select( coreStore ).getEntityRecords( 'postType', 'wp_template', {
 				per_page: -1,
 				post_type: postType,
+				post_id: postId,
 				slug: postSlug || undefined,
 			} ),
-		[ postType, postSlug ]
+		[ postType, postId, postSlug ]
 	);
 }
 
@@ -76,8 +77,7 @@ export function useAvailableTemplates() {
 		[ postType, postId ]
 	);
 
-	const allowSwitchingTemplate = useAllowSwitchingTemplates();
-	const templates = useTemplates( postType, postSlug );
+	const templates = useTemplates( postType, postId, postSlug );
 	// The filtered order does not define the hierarchy default.
 	const defaultTemplateId = useSelect(
 		( select ) => {
@@ -89,7 +89,7 @@ export function useAvailableTemplates() {
 		[ postType, postSlug ]
 	);
 	return useMemo( () => {
-		if ( ! allowSwitchingTemplate || defaultTemplateId === undefined ) {
+		if ( defaultTemplateId === undefined || templateId === undefined ) {
 			return [];
 		}
 		return ( templates || [] )
@@ -114,13 +114,7 @@ export function useAvailableTemplates() {
 						}
 					: { ...template, isDefault: false }
 			);
-	}, [
-		allowSwitchingTemplate,
-		defaultTemplateId,
-		templates,
-		currentTemplateSlug,
-		templateId,
-	] );
+	}, [ defaultTemplateId, templates, currentTemplateSlug, templateId ] );
 }
 
 export function usePostTemplatePanelMode() {

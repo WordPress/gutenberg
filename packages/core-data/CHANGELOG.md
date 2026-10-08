@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Resolve templates from the choices for the edited post slug and post type, keeping the assigned template when available and otherwise using the first choice ([#83083](https://github.com/WordPress/gutenberg/pull/83083)).
+-   Resolve templates from the choices for the post ID, edited slug, and post type, keeping the assigned template when available and otherwise using the first choice ([#83083](https://github.com/WordPress/gutenberg/pull/83083)).
 
 ## 8.2.0 (2026-10-07)
 

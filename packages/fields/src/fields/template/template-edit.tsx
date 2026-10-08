@@ -63,16 +63,16 @@ function ClassicTemplateEdit( {
 
 function BlockThemeTemplateEdit( {
 	data,
-	field,
 	onChange,
 }: TemplateEditComponentProps ) {
 	const postType = data.type;
 	const postId =
 		typeof data.id === 'number' ? data.id : parseInt( data.id, 10 );
-	const slug = data.slug;
-	const assignedSlug = field.getValue( { item: data } );
-	const { currentTemplate, defaultTemplate, canSwitchTemplate, templates } =
-		usePostTemplate( postType, postId, slug, assignedSlug );
+	const { currentTemplate, defaultTemplate, templates } = usePostTemplate(
+		postType,
+		postId,
+		data.slug
+	);
 	const value =
 		currentTemplate && currentTemplate.id !== defaultTemplate?.id
 			? currentTemplate.slug
@@ -110,9 +110,7 @@ function BlockThemeTemplateEdit( {
 			value={ value }
 			options={ options }
 			onChange={ onChange }
-			disabled={
-				! canSwitchTemplate || ! defaultTemplate || ! hasAlternative
-			}
+			disabled={ ! defaultTemplate || ! hasAlternative }
 		/>
 	);
 }

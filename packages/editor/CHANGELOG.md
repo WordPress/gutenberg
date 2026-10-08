@@ -2,11 +2,14 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Filter template choices by post ID and edited slug, using the same choices pipeline for Core’s fixed pages and plugins ([#83083](https://github.com/WordPress/gutenberg/pull/83083)).
+
 ## 15.2.0 (2026-10-07)
 
 ### Enhancements
 
--   Template choices: Support filtering by the edited post slug, keeping the assigned template when available and otherwise using the first choice without changing the saved assignment ([#83083](https://github.com/WordPress/gutenberg/pull/83083)).
 -   `trashPost`: Accept a `force` option to delete the post permanently instead of moving it to the trash ([#84045](https://github.com/WordPress/gutenberg/pull/84045)).
 -   `PostAuthor`: The field renders with the `SearchableSelect` component of `@wordpress/ui` instead of `ComboboxControl` and `SelectControl` ([#83323](https://github.com/WordPress/gutenberg/pull/83323)).
 -   `DocumentOutline`: Show the outline items' focus ring with the design system's outline instead of a legacy box-shadow ([#83755](https://github.com/WordPress/gutenberg/pull/83755)).

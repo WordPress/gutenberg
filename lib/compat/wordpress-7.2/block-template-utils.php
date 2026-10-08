@@ -8,8 +8,8 @@
 /**
  * Includes the hierarchy default before plugins filter the available choices.
  *
- * Runs before the usual filter priority. The editor uses the first choice when
- * the assigned template is unavailable, without changing the saved assignment.
+ * Runs before the usual filter priority. Core and plugins restrict choices in
+ * this pipeline, independently of the template used to render the post.
  * When merged to Core, this preparation belongs in get_block_templates().
  *
  * @param WP_Block_Template[] $templates     Available templates.
@@ -28,8 +28,21 @@ function gutenberg_prepare_post_template_choices( $templates, $query, $template_
 		return $templates;
 	}
 
-	$slug = sanitize_title( $query['slug'] );
-	if ( '' !== $slug ) {
+	$slug    = sanitize_title( $query['slug'] );
+	$post_id = isset( $query['post_id'] ) && is_numeric( $query['post_id'] ) ? (int) $query['post_id'] : 0;
+	if ( 'page' === $query['post_type'] && $post_id && 'page' === get_option( 'show_on_front' ) ) {
+		$fixed_template = null;
+		if ( (int) get_option( 'page_on_front' ) === $post_id ) {
+			$fixed_template = get_block_template( get_stylesheet() . '//front-page' );
+		}
+		if ( ! $fixed_template && (int) get_option( 'page_for_posts' ) === $post_id ) {
+			$fixed_template = resolve_block_template( 'home', get_template_hierarchy( 'home' ), '' );
+		}
+		if ( $fixed_template ) {
+			return ! isset( $query['wp_id'] ) || (int) $fixed_template->wp_id === $query['wp_id'] ? array( $fixed_template ) : array();
+		}
+	}
+	if ( '' !== $slug && ! $post_id ) {
 		$posts = get_posts(
 			array(
 				'name'           => $slug,

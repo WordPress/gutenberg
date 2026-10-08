@@ -246,6 +246,7 @@ export const getTemplateId = createRegistrySelector(
 			{
 				per_page: -1,
 				post_type: postType,
+				post_id: postId,
 				slug: editedEntity.slug || undefined,
 			}
 		);
@@ -261,16 +262,17 @@ export const getTemplateId = createRegistrySelector(
 			return currentTemplate.id;
 		}
 		// If no templates are available, use the hierarchy default.
+		const postSlug = editedEntity.slug;
 		let slugToCheck;
 		// In `draft` status we might not have a slug available, so we use the `single`
 		// post type templates slug(ex page, single-post, single-product etc..).
 		// Pages do not need the `single` prefix in the slug to be prioritized
 		// through template hierarchy.
-		if ( editedEntity.slug ) {
+		if ( postSlug ) {
 			slugToCheck =
 				postType === 'page'
-					? `${ postType }-${ editedEntity.slug }`
-					: `single-${ postType }-${ editedEntity.slug }`;
+					? `${ postType }-${ postSlug }`
+					: `single-${ postType }-${ postSlug }`;
 		} else {
 			slugToCheck = postType === 'page' ? 'page' : `single-${ postType }`;
 		}
