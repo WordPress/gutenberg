@@ -1532,16 +1532,17 @@ function isSection( state, clientId ) {
  */
 function isAbsorbedByCanvas( state, clientId ) {
 	const parentClientId = state.blocks.parents.get( clientId );
-	const nameOf = ( id ) => state.blocks.byClientId.get( id )?.name;
 	return isAbsorbable(
 		{
-			name: nameOf( clientId ),
+			name: nameOf( state, clientId ),
 			attributes: state.blocks.attributes.get( clientId ),
 			innerBlocks: getBlockOrder( state, clientId ).map( ( id ) => ( {
-				name: nameOf( id ),
+				name: nameOf( state, id ),
 			} ) ),
 		},
-		{ name: parentClientId ? nameOf( parentClientId ) : undefined },
+		{
+			name: parentClientId ? nameOf( state, parentClientId ) : undefined,
+		},
 		getLayoutSupport
 	);
 }

@@ -123,13 +123,6 @@ describe( 'isBlockFreeformLocked', () => {
 // first drag dissolves the grid into the section. So the walk up to the canvas
 // steps over the cells of a grid, and these are the block types it reads to
 // know one when it sees it.
-const TYPES = {
-	'core/group': { layout: { allowSizingOnChildren: true } },
-	'core/column': { layout: true },
-	'core/columns': { layout: { allowSwitching: false } },
-	'core/paragraph': {},
-};
-
 const treeState = ( nodes, entered = null, sectionRoot = undefined ) => ( {
 	blockListSettings: new Map(),
 	settings: sectionRoot ? { [ sectionRootClientIdKey ]: sectionRoot } : {},
@@ -302,9 +295,9 @@ describe( 'isBlockFreeformLocked, where sections are not top-level', () => {
 	];
 
 	it( 'locks a block in a section that has not been converted', () => {
-		expect( isBlockFreeformLocked( treeState( unconverted ), 'item' ) ).toBe(
-			true
-		);
+		expect(
+			isBlockFreeformLocked( treeState( unconverted ), 'item' )
+		).toBe( true );
 	} );
 
 	it( 'locks one in a section with no layout attribute at all', () => {
@@ -333,7 +326,10 @@ describe( 'isBlockFreeformLocked, where sections are not top-level', () => {
 		// Without this guard every Group in every post would need two clicks
 		// before you could type in it.
 		delete globalThis.window.__experimentalEnableFreeformCanvas;
-		const locked = isBlockFreeformLocked( treeState( unconverted ), 'item' );
+		const locked = isBlockFreeformLocked(
+			treeState( unconverted ),
+			'item'
+		);
 		globalThis.window.__experimentalEnableFreeformCanvas = true;
 		expect( locked ).toBe( false );
 	} );
@@ -341,17 +337,19 @@ describe( 'isBlockFreeformLocked, where sections are not top-level', () => {
 	it( 'leaves a section alone that cannot be edited normally', () => {
 		// Content-only and disabled sections are not the canvas's to rearrange,
 		// and holding their text still would stop it being edited at all.
-		const state = treeState( unconverted );
-		state.blocks.blockEditingModes = new Map( [ [ 'sec', 'contentOnly' ] ] );
-		expect( isBlockFreeformLocked( state, 'item' ) ).toBe( false );
+		const contentOnly = treeState( unconverted );
+		contentOnly.blocks.blockEditingModes = new Map( [
+			[ 'sec', 'contentOnly' ],
+		] );
+		expect( isBlockFreeformLocked( contentOnly, 'item' ) ).toBe( false );
 	} );
 
 	it( 'leaves a locked-down template section alone', () => {
-		const state = treeState( unconverted );
-		state.blockListSettings = new Map( [
+		const lockedDown = treeState( unconverted );
+		lockedDown.blockListSettings = new Map( [
 			[ 'sec', { templateLock: 'all' } ],
 		] );
-		expect( isBlockFreeformLocked( state, 'item' ) ).toBe( false );
+		expect( isBlockFreeformLocked( lockedDown, 'item' ) ).toBe( false );
 	} );
 
 	it( 'still unlocks the block you have entered', () => {
