@@ -8,7 +8,6 @@ import MenuItem from '../../menu-item';
 import { HStack } from '../../h-stack';
 import { Heading } from '../../heading';
 import { useToolsPanelHeader } from './hook';
-import styles from '../style.module.scss';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import type {
@@ -25,57 +24,33 @@ const DefaultControlsGroup = ( {
 		return null;
 	}
 
-	const resetSuffix = (
-		<span aria-hidden className={ styles[ 'reset-label' ] }>
-			{ __( 'Reset' ) }
-		</span>
-	);
-
 	return (
 		<>
-			{ items.map( ( [ label, hasValue ] ) => {
-				if ( hasValue ) {
-					return (
-						<MenuItem
-							key={ label }
-							className={ itemClassName }
-							role="menuitem"
-							label={ sprintf(
+			{ items.map( ( [ label, hasValue ] ) => (
+				<MenuItem
+					key={ label }
+					className={ itemClassName }
+					role="menuitem"
+					disabled={ ! hasValue }
+					onClick={ () => {
+						toggleItem( label );
+						speak(
+							sprintf(
 								// translators: %s: The name of the control being reset e.g. "Padding".
-								__( 'Reset %s' ),
+								__( '%s reset to default' ),
 								label
-							) }
-							onClick={ () => {
-								toggleItem( label );
-								speak(
-									sprintf(
-										// translators: %s: The name of the control being reset e.g. "Padding".
-										__( '%s reset to default' ),
-										label
-									),
-									'assertive'
-								);
-							} }
-							suffix={ resetSuffix }
-						>
-							{ label }
-						</MenuItem>
-					);
-				}
-
-				return (
-					<MenuItem
-						key={ label }
-						icon={ check }
-						className={ itemClassName }
-						role="menuitemcheckbox"
-						isSelected
-						aria-disabled
-					>
-						{ label }
-					</MenuItem>
-				);
-			} ) }
+							),
+							'assertive'
+						);
+					} }
+				>
+					{ sprintf(
+						// translators: %s: The name of the control being reset e.g. "Padding".
+						__( 'Reset %s' ),
+						label
+					) }
+				</MenuItem>
+			) ) }
 		</>
 	);
 };
@@ -108,7 +83,6 @@ const OptionalControlsGroup = ( {
 						key={ label }
 						icon={ isSelected ? check : null }
 						isSelected={ isSelected }
-						label={ itemLabel }
 						onClick={ () => {
 							if ( isSelected ) {
 								speak(
@@ -133,7 +107,7 @@ const OptionalControlsGroup = ( {
 						} }
 						role="menuitemcheckbox"
 					>
-						{ label }
+						{ itemLabel }
 					</MenuItem>
 				);
 			} ) }
