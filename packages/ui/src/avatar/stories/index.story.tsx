@@ -89,27 +89,44 @@ export const FailedImage: Story = {
 };
 
 export const Sizes: Story = {
+	name: 'Sizes and shapes',
 	render: ( args ) => (
-		<Stack direction="column" gap="md">
-			<Stack gap="md" align="center">
-				{ ( [ 'xs', 'sm', 'md', 'lg', 'xl' ] as const ).map(
-					( size ) => (
-						<Avatar.Root { ...args } key={ size } size={ size }>
-							<Avatar.Fallback delay={ 300 }>AM</Avatar.Fallback>
-							<Avatar.Image src={ IMAGE_SRC } alt="" />
-						</Avatar.Root>
-					)
-				) }
-			</Stack>
-			<Stack gap="md" align="center">
-				{ ( [ 'xs', 'sm', 'md', 'lg', 'xl' ] as const ).map(
-					( size ) => (
-						<Avatar.Root { ...args } key={ size } size={ size }>
-							<Avatar.Fallback>AM</Avatar.Fallback>
-						</Avatar.Root>
-					)
-				) }
-			</Stack>
+		<Stack direction="column" gap="lg">
+			{ ( [ 'circle', 'square' ] as const ).map( ( shape ) => (
+				<Stack key={ shape } direction="column" gap="md">
+					<Stack gap="md" align="center">
+						{ ( [ 'xs', 'sm', 'md', 'lg', 'xl' ] as const ).map(
+							( size ) => (
+								<Avatar.Root
+									{ ...args }
+									key={ size }
+									size={ size }
+									shape={ shape }
+								>
+									<Avatar.Fallback delay={ 300 }>
+										AM
+									</Avatar.Fallback>
+									<Avatar.Image src={ IMAGE_SRC } alt="" />
+								</Avatar.Root>
+							)
+						) }
+					</Stack>
+					<Stack gap="md" align="center">
+						{ ( [ 'xs', 'sm', 'md', 'lg', 'xl' ] as const ).map(
+							( size ) => (
+								<Avatar.Root
+									{ ...args }
+									key={ size }
+									size={ size }
+									shape={ shape }
+								>
+									<Avatar.Fallback>AM</Avatar.Fallback>
+								</Avatar.Root>
+							)
+						) }
+					</Stack>
+				</Stack>
+			) ) }
 		</Stack>
 	),
 };
