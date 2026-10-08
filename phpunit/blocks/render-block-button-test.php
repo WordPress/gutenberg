@@ -203,7 +203,7 @@ class Render_Block_Button_Test extends WP_UnitTestCase {
 	/**
 	 * @covers ::gutenberg_render_block_core_button
 	 */
-	public function test_background_image_and_gradient_full_markup() {
+	public function test_background_ignores_clip_and_applies_contain_defaults() {
 		$attributes = array(
 			'style' => array(
 				'background' => array(
@@ -219,8 +219,7 @@ class Render_Block_Button_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$result = gutenberg_render_block_core_button( $attributes, self::$button_content );
-		// WP 6.9+ encodes the apostrophe as &apos;, earlier versions as &#039;.
+		$result     = gutenberg_render_block_core_button( $attributes, self::$button_content );
 		$apostrophe = function_exists( 'get_block_bindings_supported_attributes' ) ? '&apos;' : '&#039;';
 
 		$this->assertSame(

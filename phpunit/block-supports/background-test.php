@@ -271,6 +271,23 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				'expected_wrapper'    => '<div class="has-background" style="background-image:linear-gradient(135deg,hsl(0,100%,50%) 0%,hsl(240,100%,50%) 100%), url(' . $apos . 'https://example.com/image.jpg' . $apos . ');background-size:cover;">Content</div>',
 				'wrapper'             => '<div>Content</div>',
 			),
+			'background gradient is applied without the image when the image skips serialization' => array(
+				'theme_name'          => 'block-theme-child-with-fluid-typography',
+				'block_name'          => 'test/background-image-skipped-gradient-applied',
+				'background_settings' => array(
+					'backgroundImage'                 => true,
+					'gradient'                        => true,
+					'__experimentalSkipSerialization' => array( 'backgroundImage' ),
+				),
+				'background_style'    => array(
+					'backgroundImage' => array(
+						'url' => 'https://example.com/image.jpg',
+					),
+					'gradient'        => 'linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)',
+				),
+				'expected_wrapper'    => '<div class="has-background" style="background-image:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%);">Content</div>',
+				'wrapper'             => '<div>Content</div>',
+			),
 			'background image style is not applied if the block does not support background image' => array(
 				'theme_name'          => 'block-theme-child-with-fluid-typography',
 				'block_name'          => 'test/background-rules-are-not-output',
@@ -476,6 +493,32 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				),
 				'expected'         => array(
 					'style' => 'background-clip:padding-box;-webkit-text-fill-color:currentColor;',
+				),
+			),
+			'image clipped to text has no class'    => array(
+				'block_attributes' => array(
+					'style' => array(
+						'background' => array(
+							'backgroundImage' => array( 'url' => 'https://example.com/image.jpg' ),
+							'backgroundClip'  => 'text',
+						),
+					),
+				),
+				'expected'         => array(
+					'style' => "background-image:url('https://example.com/image.jpg');background-size:cover;background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;",
+				),
+			),
+			'image without url gets default size'   => array(
+				'block_attributes' => array(
+					'style' => array(
+						'background' => array(
+							'backgroundImage' => array( 'id' => 1 ),
+						),
+					),
+				),
+				'expected'         => array(
+					'class' => 'has-background',
+					'style' => 'background-size:cover;',
 				),
 			),
 			'numeric position is not output'        => array(
