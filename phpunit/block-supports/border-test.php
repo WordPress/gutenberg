@@ -184,6 +184,28 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		$this->assertSame( $expected, $actual );
 	}
 
+	public function test_border_color_preset_with_skipped_color_serialization() {
+		$block_type  = self::register_bordered_block_with_support(
+			'test/border-color-preset-with-skipped-color-serialization',
+			array(
+				'__experimentalBorder' => array(
+					'color'                           => true,
+					'width'                           => true,
+					'__experimentalSkipSerialization' => array( 'color' ),
+				),
+			)
+		);
+		$block_attrs = array(
+			'borderColor' => 'red',
+			'style'       => array( 'border' => array( 'width' => '1px' ) ),
+		);
+
+		$this->assertSame(
+			array( 'style' => 'border-width:1px;' ),
+			gutenberg_apply_border_support( $block_type, $block_attrs )
+		);
+	}
+
 	public function test_split_border_radius() {
 		$block_type  = self::register_bordered_block_with_support(
 			'test/split-border-radius',
@@ -459,7 +481,7 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		$this->assertSame( $expected, $actual );
 	}
 
-	public function test_split_borders_with_color_support_only_keep_side_style() {
+	public function test_split_borders_with_color_support_only_keeps_side_style() {
 		$block_type  = self::register_bordered_block_with_support(
 			'test/split-borders-with-color-support-only',
 			array(
@@ -487,7 +509,7 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		$this->assertSame( $expected, $actual );
 	}
 
-	public function test_split_borders_with_width_support_only_keep_side_color() {
+	public function test_split_borders_with_width_support_only_keeps_side_color() {
 		$block_type  = self::register_bordered_block_with_support(
 			'test/split-borders-with-width-support-only',
 			array(
@@ -532,7 +554,7 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 	 */
 	public function data_get_border_classes_and_styles() {
 		return array(
-			'custom'              => array(
+			'custom'                  => array(
 				'block_attributes' => array(
 					'style' => array(
 						'border' => array(
@@ -553,7 +575,7 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 					'style' => 'border-color:#ff0000;border-radius:10px;border-style:solid;border-width:2px;border-top-width:3px;border-top-color:#00ff00;border-top-style:dashed;',
 				),
 			),
-			'preset'              => array(
+			'preset wins over custom' => array(
 				'block_attributes' => array(
 					'borderColor' => 'red',
 					'style'       => array(
@@ -566,7 +588,7 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 					'class' => 'has-border-color has-red-border-color',
 				),
 			),
-			'preset only'         => array(
+			'preset only'             => array(
 				'block_attributes' => array(
 					'borderColor' => 'red',
 				),
@@ -574,7 +596,7 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 					'class' => 'has-border-color has-red-border-color',
 				),
 			),
-			'numeric'             => array(
+			'numeric'                 => array(
 				'block_attributes' => array(
 					'style' => array(
 						'border' => array(
@@ -587,7 +609,7 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 					'style' => 'border-radius:5px;border-width:2px;',
 				),
 			),
-			'zero'                => array(
+			'zero'                    => array(
 				'block_attributes' => array(
 					'style' => array(
 						'border' => array(
@@ -600,11 +622,11 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 					'style' => 'border-radius:0px;border-width:0px;',
 				),
 			),
-			'empty'               => array(
+			'empty'                   => array(
 				'block_attributes' => array(),
 				'expected'         => array(),
 			),
-			'malformed border'    => array(
+			'malformed border'        => array(
 				'block_attributes' => array(
 					'style' => array(
 						'border' => 'solid',
@@ -612,7 +634,7 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 				),
 				'expected'         => array(),
 			),
-			'malformed side'      => array(
+			'malformed side'          => array(
 				'block_attributes' => array(
 					'style' => array(
 						'border' => array(
@@ -622,13 +644,13 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 				),
 				'expected'         => array(),
 			),
-			'malformed style'     => array(
+			'malformed style'         => array(
 				'block_attributes' => array(
 					'style' => 'border:1px solid',
 				),
 				'expected'         => array(),
 			),
-			'malformed non-array' => array(
+			'malformed non-array'     => array(
 				'block_attributes' => 'border',
 				'expected'         => array(),
 			),
