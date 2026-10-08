@@ -1,4 +1,4 @@
-import type { MinutesInput } from './time-picker/styles';
+import type { MinutesInput } from './time-picker/minutes-input';
 
 export type TimePickerProps = {
 	/**

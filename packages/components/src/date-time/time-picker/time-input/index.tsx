@@ -1,13 +1,9 @@
 import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
-import {
-	TimeWrapper,
-	TimeSeparator,
-	HoursInput,
-	MinutesInput,
-	Fieldset,
-} from '../styles';
+import NumberControl from '../../../number-control';
+import { MinutesInput } from '../minutes-input';
+import styles from '../style.module.scss';
 import { HStack } from '../../../h-stack';
 import {
 	from12hTo24h,
@@ -84,10 +80,10 @@ export function TimeInput( {
 		return _hours < 12 ? 'AM' : 'PM';
 	}
 
-	const Wrapper = label ? Fieldset : Fragment;
+	const Wrapper = label ? 'fieldset' : Fragment;
 
 	return (
-		<Wrapper>
+		<Wrapper { ...( label ? { className: styles.fieldset } : {} ) }>
 			{ label && (
 				<BaseControl.VisualLabel as="legend">
 					{ label }
@@ -95,11 +91,17 @@ export function TimeInput( {
 			) }
 
 			<HStack alignment="left" expanded={ false }>
-				<TimeWrapper
-					className="components-datetime__time-field components-datetime__time-field-time" // Unused, for backwards compatibility.
+				<div
+					className={ clsx(
+						'components-datetime__time-field components-datetime__time-field-time',
+						styles[ 'time-wrapper' ]
+					) } // Unused, for backwards compatibility.
 				>
-					<HoursInput
-						className="components-datetime__time-field-hours-input" // Unused, for backwards compatibility.
+					<NumberControl
+						className={ clsx(
+							'components-datetime__time-field-hours-input',
+							styles[ 'hours-input' ]
+						) } // Unused, for backwards compatibility.
 						label={ __( 'Hours' ) }
 						hideLabelFromVision
 						value={ String(
@@ -118,12 +120,15 @@ export function TimeInput( {
 							2
 						) }
 					/>
-					<TimeSeparator
-						className="components-datetime__time-separator" // Unused, for backwards compatibility.
+					<span
+						className={ clsx(
+							'components-datetime__time-separator',
+							styles[ 'time-separator' ]
+						) } // Unused, for backwards compatibility.
 						aria-hidden="true"
 					>
 						:
-					</TimeSeparator>
+					</span>
 					<MinutesInput
 						className={ clsx(
 							'components-datetime__time-field-minutes-input', // Unused, for backwards compatibility.
@@ -151,7 +156,7 @@ export function TimeInput( {
 						) }
 						{ ...minutesProps }
 					/>
-				</TimeWrapper>
+				</div>
 				{ is12Hour && (
 					<ToggleGroupControl
 						isBlock
