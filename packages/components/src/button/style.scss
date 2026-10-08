@@ -346,19 +346,18 @@
 	&.is-pressed {
 		&,
 		&:hover {
-			color: $components-color-foreground-inverted;
+			color: var(--wpds-color-foreground-interactive-neutral-strong-active);
 			&:not(:disabled, [aria-disabled="true"]) {
-				background: $components-color-foreground;
+				background: var(--wpds-color-background-interactive-neutral-strong-active);
 			}
 		}
 
 		&:disabled,
 		&[aria-disabled="true"] {
-			color: $gray-600;
+			color: var(--wpds-color-foreground-interactive-neutral-strong-disabled);
 
 			&:not(.is-primary):not(.is-secondary):not(.is-tertiary) {
-				color: $components-color-foreground-inverted;
-				background: $gray-600;
+				background: var(--wpds-color-background-interactive-neutral-strong-disabled);
 			}
 		}
 

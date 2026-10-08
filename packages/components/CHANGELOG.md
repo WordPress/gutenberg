@@ -20,6 +20,7 @@
 
 ### Bug Fixes
 
+-   Align pressed `Button` colors and legacy `Tabs` interaction states with the semantic design tokens. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 -   Keep JavaScript color fallbacks in sync with the generated design tokens. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 
 ## 42.0.0 (2026-10-07)

@@ -90,9 +90,19 @@ export const StyledTabList = styled( Ariakit.TabList )`
 					)
 				);
 			border-bottom: var( --wp-admin-border-width-focus ) solid
-				${ COLORS.theme.gray[ 700 ] };
+				${ COLORS.ui.text };
 		}
 	}
+	&[aria-orientation='horizontal']:has(
+			[aria-selected='true']:not( [aria-disabled='true'] ):is(
+					:hover,
+					:active,
+					[data-focus-visible]
+				)
+		)::before {
+		border-bottom-color: ${ COLORS.ui.textActive };
+	}
+
 	&[aria-orientation='vertical'] {
 		&::before {
 			/* Adjusting the border radius to match the scaling in the y axis. */
@@ -115,7 +125,7 @@ export const StyledTabList = styled( Ariakit.TabList )`
 							var( --antialiasing-factor )
 					)
 				);
-			background-color: ${ COLORS.theme.gray[ 100 ] };
+			background-color: ${ COLORS.ui.backgroundActive };
 		}
 		&[data-select-on-move='true']:has(
 				:is( :focus-visible, [data-focus-visible] )
@@ -152,15 +162,24 @@ export const Tab = styled( Ariakit.Tab )`
 		font-family: ${ font( 'default.fontFamily' ) };
 		font-weight: 400;
 		font-size: ${ font( 'default.fontSize' ) };
-		color: ${ COLORS.theme.foreground };
+		color: ${ COLORS.ui.text };
 
 		&[aria-disabled='true'] {
 			cursor: default;
 			color: ${ COLORS.ui.textDisabled };
 		}
 
-		&:not( [aria-disabled='true'] ):is( :hover, [data-focus-visible] ) {
-			color: ${ COLORS.theme.foreground };
+		&:not( [aria-disabled='true'] ):is(
+				:hover,
+				:active,
+				[data-focus-visible]
+			) {
+			color: ${ COLORS.ui.textActive };
+
+			&::after {
+				background-color: ${ COLORS.ui.backgroundActive };
+				opacity: 1;
+			}
 		}
 
 		&:focus:not( :disabled ) {
@@ -168,10 +187,12 @@ export const Tab = styled( Ariakit.Tab )`
 			outline: none;
 		}
 
-		// Focus indicator.
+		// Interaction background and focus indicator.
 		position: relative;
+		isolation: isolate;
 		&::after {
 			position: absolute;
+			z-index: -1;
 			pointer-events: none;
 
 			// Draw the indicator.
