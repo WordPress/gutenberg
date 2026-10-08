@@ -12,6 +12,7 @@
 			flex-shrink: 0;
 			inline-size: var(--_wp-ui-avatar-size);
 			block-size: var(--_wp-ui-avatar-size);
+			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
 			border-radius: 50%;
 			background-color: var(--wpds-color-background-surface-neutral-weak);
 			color: var(--wpds-color-foreground-content-neutral);

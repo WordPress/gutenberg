@@ -57,7 +57,7 @@ export const FallbackOnly: Story = {
 	),
 };
 
-/** Supply an icon as fallback content. */
+/** Supply a profile icon from `@wordpress/icons` as fallback content. */
 export const IconFallback: Story = {
 	render: ( args ) => (
 		<Avatar.Root { ...args }>
@@ -67,7 +67,6 @@ export const IconFallback: Story = {
 					style={ {
 						inlineSize: '75%',
 						blockSize: '75%',
-						fill: 'currentColor',
 					} }
 				/>
 			</Avatar.Fallback>
