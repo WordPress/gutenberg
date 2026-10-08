@@ -54,17 +54,46 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 
 	$skip_padding         = wp_should_skip_block_supports_serialization( $block_type, 'spacing', 'padding' );
 	$skip_margin          = wp_should_skip_block_supports_serialization( $block_type, 'spacing', 'margin' );
-	$spacing_block_styles = array(
-		'padding' => null,
-		'margin'  => null,
-	);
+	$spacing_block_styles = array();
 	if ( $has_padding_support && ! $skip_padding ) {
 		$spacing_block_styles['padding'] = $block_styles['spacing']['padding'] ?? null;
 	}
 	if ( $has_margin_support && ! $skip_margin ) {
 		$spacing_block_styles['margin'] = $block_styles['spacing']['margin'] ?? null;
 	}
-	$styles = gutenberg_style_engine_get_styles( array( 'spacing' => $spacing_block_styles ) );
+
+	return gutenberg_get_spacing_classes_and_styles( array( 'style' => array( 'spacing' => $spacing_block_styles ) ) );
+}
+
+/**
+ * Gets the spacing CSS classes and inline styles for the given block
+ * attributes. The PHP twin of the JS `getSpacingClassesAndStyles()`.
+ *
+ * @since 7.2.0
+ *
+ * @param array $block_attributes Block attributes.
+ *
+ * @return array Spacing CSS classes and inline styles.
+ */
+function gutenberg_get_spacing_classes_and_styles( $block_attributes ) {
+	$spacing = $block_attributes['style']['spacing'] ?? null;
+	if ( ! is_array( $spacing ) ) {
+		return array();
+	}
+
+	$styles     = gutenberg_style_engine_get_styles(
+		array(
+			'spacing' => array(
+				'padding' => $spacing['padding'] ?? null,
+				'margin'  => $spacing['margin'] ?? null,
+			),
+		)
+	);
+	$attributes = array();
+
+	if ( ! empty( $styles['classnames'] ) ) {
+		$attributes['class'] = $styles['classnames'];
+	}
 
 	if ( ! empty( $styles['css'] ) ) {
 		$attributes['style'] = $styles['css'];
