@@ -6,95 +6,94 @@ import type { SVGProps } from './types';
 export type { SVGProps } from './types';
 
 /**
- * @param props
+ * @param {React.ComponentPropsWithoutRef<'circle'>} props
  *
- * @return Circle component
+ * @return {React.JSX.Element} Circle component
  */
 export const Circle = ( props: ComponentPropsWithoutRef< 'circle' > ) =>
 	createElement( 'circle', props );
 
 /**
- * @param props
+ * @param {React.ComponentPropsWithoutRef<'g'>} props
  *
- * @return G component
+ * @return {React.JSX.Element} G component
  */
 export const G = ( props: ComponentPropsWithoutRef< 'g' > ) =>
 	createElement( 'g', props );
 
 /**
- * @param props
+ * @param {React.ComponentPropsWithoutRef<'line'>} props
  *
- * @return Path component
+ * @return {React.JSX.Element} Path component
  */
 export const Line = ( props: ComponentPropsWithoutRef< 'line' > ) =>
 	createElement( 'line', props );
 
 /**
- * @param props
+ * @param {React.ComponentPropsWithoutRef<'path'>} props
  *
- * @return Path component
+ * @return {React.JSX.Element} Path component
  */
 export const Path = ( props: ComponentPropsWithoutRef< 'path' > ) =>
 	createElement( 'path', props );
 
 /**
- * @param props
+ * @param {React.ComponentPropsWithoutRef<'polygon'>} props
  *
- * @return Polygon component
+ * @return {React.JSX.Element} Polygon component
  */
 export const Polygon = ( props: ComponentPropsWithoutRef< 'polygon' > ) =>
 	createElement( 'polygon', props );
 
 /**
- * @param props
+ * @param {React.ComponentPropsWithoutRef<'rect'>} props
  *
- * @return Rect component
+ * @return {React.JSX.Element} Rect component
  */
 export const Rect = ( props: ComponentPropsWithoutRef< 'rect' > ) =>
 	createElement( 'rect', props );
 
 /**
- * @param props
+ * @param {React.ComponentPropsWithoutRef<'defs'>} props
  *
- * @return Defs component
+ * @return {React.JSX.Element} Defs component
  */
 export const Defs = ( props: ComponentPropsWithoutRef< 'defs' > ) =>
 	createElement( 'defs', props );
 
 /**
- * @param props
+ * @param {React.ComponentPropsWithoutRef<'radialGradient'>} props
  *
- * @return RadialGradient component
+ * @return {React.JSX.Element} RadialGradient component
  */
 export const RadialGradient = (
 	props: ComponentPropsWithoutRef< 'radialGradient' >
 ) => createElement( 'radialGradient', props );
 
 /**
- * @param props
+ * @param {React.ComponentPropsWithoutRef<'linearGradient'>} props
  *
- * @return LinearGradient component
+ * @return {React.JSX.Element} LinearGradient component
  */
 export const LinearGradient = (
 	props: ComponentPropsWithoutRef< 'linearGradient' >
 ) => createElement( 'linearGradient', props );
 
 /**
- * @param props
+ * @param {React.ComponentPropsWithoutRef<'stop'>} props
  *
- * @return Stop component
+ * @return {React.JSX.Element} Stop component
  */
 export const Stop = ( props: ComponentPropsWithoutRef< 'stop' > ) =>
 	createElement( 'stop', props );
 
 export const SVG = forwardRef(
 	/**
-	 * @param props           Other props will be passed through to svg component.
-	 * @param props.className Class name of the svg component.
-	 * @param props.isPressed Indicates whether the SVG should appear as pressed.
-	 * @param ref             The forwarded ref to the SVG element.
+	 * @param {SVGProps}                          props isPressed indicates whether the SVG should appear as pressed.
+	 *                                                  Other props will be passed through to svg component.
+	 * @param {React.ForwardedRef<SVGSVGElement>} ref   The forwarded ref to the SVG element.
 	 *
-	 * @return Stop component
+	 * @return {React.JSX.Element} Stop component
 	 */
 	(
 		{ className, isPressed, ...props }: SVGProps,
