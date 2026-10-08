@@ -23,6 +23,7 @@
 
 ### Bug Fixes
 
+-   Align pressed `Button` colors and legacy `Tabs` interaction states with the semantic design tokens. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 -   Keep JavaScript color fallbacks in sync with the generated design tokens. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 -   `InputControl`, `NumberControl`, `UnitControl`: Ignore the drag gesture for touch input, where it has no cursor affordance and is easy to trigger by accident ([#38865](https://github.com/WordPress/gutenberg/issues/38865), [#81519](https://github.com/WordPress/gutenberg/pull/81519)).
 -   `navigateRegions`: Only outline the Publish and Save controls when their region has focus ([#84343](https://github.com/WordPress/gutenberg/pull/84343)).

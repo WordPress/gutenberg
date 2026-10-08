@@ -72,9 +72,15 @@
 				scaleX(calc(var(--selected-width, 0) / var(--antialiasing-factor)));
 			border-bottom:
 				var(--wp-admin-border-width-focus) solid
-				$components-color-gray-700;
+				var(--wpds-color-foreground-interactive-neutral);
 		}
 	}
+	&[aria-orientation="horizontal"]:has(
+		[aria-selected="true"]:not([aria-disabled="true"]):is(:hover, :active, [data-focus-visible])
+	)::before {
+		border-bottom-color: var(--wpds-color-foreground-interactive-neutral-active);
+	}
+
 	&[aria-orientation="vertical"] {
 		&::before {
 			/* Adjusting the border radius to match the scaling in the y axis. */
@@ -89,7 +95,7 @@
 			transform:
 				translateY(calc(var(--selected-top, 0) * 1px))
 				scaleY(calc(var(--selected-height, 0) / var(--antialiasing-factor)));
-			background-color: $components-color-gray-100;
+			background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 		}
 		&[data-select-on-move="true"]:has(
 			:is(:focus-visible, [data-focus-visible])
@@ -124,15 +130,20 @@
 		font-family: $font-family-body;
 		font-weight: 400;
 		font-size: $font-size-medium;
-		color: $components-color-foreground;
+		color: var(--wpds-color-foreground-interactive-neutral);
 
 		&[aria-disabled="true"] {
 			cursor: default;
 			color: var(--wpds-color-foreground-interactive-neutral-disabled);
 		}
 
-		&:not([aria-disabled="true"]):is(:hover, [data-focus-visible]) {
-			color: $components-color-foreground;
+		&:not([aria-disabled="true"]):is(:hover, :active, [data-focus-visible]) {
+			color: var(--wpds-color-foreground-interactive-neutral-active);
+
+			&::after {
+				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+				opacity: 1;
+			}
 		}
 
 		&:focus:not(:disabled) {
@@ -140,10 +151,12 @@
 			outline: none;
 		}
 
-		// Focus indicator.
+		// Interaction background and focus indicator.
 		position: relative;
+		isolation: isolate;
 		&::after {
 			position: absolute;
+			z-index: -1;
 			pointer-events: none;
 
 			// Draw the indicator.
