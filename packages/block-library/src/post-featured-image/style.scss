@@ -45,4 +45,19 @@
 	&:where(.alignleft, .alignright) {
 		width: 100%;
 	}
+
+	// Align the image when it's narrower than its container, e.g. with a custom width.
+	&.aligncenter {
+		text-align: center;
+	}
+
+	&.alignleft {
+		/*rtl:ignore*/
+		text-align: left;
+	}
+
+	&.alignright {
+		/*rtl:ignore*/
+		text-align: right;
+	}
 }
