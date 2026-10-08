@@ -25,8 +25,7 @@
 		"src",
 		"build",
 		"build-module",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",

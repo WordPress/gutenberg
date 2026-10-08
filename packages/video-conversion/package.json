@@ -26,8 +26,7 @@
 	"files": [
 		"src",
 		"build-module",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"type": "module",
 	"module": "build-module/index.mjs",
