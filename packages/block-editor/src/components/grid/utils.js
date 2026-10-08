@@ -196,3 +196,83 @@ export function getGridInfo( gridElement ) {
 		},
 	};
 }
+
+/**
+ * Gets the start and end position in pixels of each column and row track of a
+ * grid, relative to the grid's content box.
+ *
+ * @param {HTMLElement} gridElement The grid element.
+ *
+ * @return {{columnTracks: Array<{start: number, end: number}>, rowTracks: Array<{start: number, end: number}>}} The grid tracks.
+ */
+export function getGridTrackPositions( gridElement ) {
+	return {
+		columnTracks: getGridTracks(
+			getComputedCSS( gridElement, 'grid-template-columns' ),
+			parseFloat( getComputedCSS( gridElement, 'column-gap' ) ) || 0
+		),
+		rowTracks: getGridTracks(
+			getComputedCSS( gridElement, 'grid-template-rows' ),
+			parseFloat( getComputedCSS( gridElement, 'row-gap' ) ) || 0
+		),
+	};
+}
+
+/**
+ * Gets the position of a grid item in pixels, relative to the grid's content
+ * box. Offsets ignore CSS transforms and the `rotate` property, so a rotated
+ * item is measured by the area it takes up in the grid.
+ *
+ * @param {HTMLElement} gridItemElement The grid item element.
+ *
+ * @return {{left: number, top: number, right: number, bottom: number}} The item's position.
+ */
+export function getGridItemPixelRect( gridItemElement ) {
+	const gridElement = gridItemElement.parentElement;
+	let left = gridItemElement.offsetLeft;
+	let top = gridItemElement.offsetTop;
+	if ( gridItemElement.offsetParent !== gridElement ) {
+		left -= gridElement.offsetLeft + gridElement.clientLeft;
+		top -= gridElement.offsetTop + gridElement.clientTop;
+	}
+	left -= parseFloat( getComputedCSS( gridElement, 'padding-left' ) ) || 0;
+	top -= parseFloat( getComputedCSS( gridElement, 'padding-top' ) ) || 0;
+	return {
+		left,
+		top,
+		right: left + gridItemElement.offsetWidth,
+		bottom: top + gridItemElement.offsetHeight,
+	};
+}
+
+/**
+ * Gets the grid cells that a rectangle in pixels covers, snapping its edges to
+ * the closest tracks.
+ *
+ * @param {{left: number, top: number, right: number, bottom: number}} rect         Rectangle relative to the grid's content box.
+ * @param {Array<{start: number, end: number}>}                        columnTracks Column tracks.
+ * @param {Array<{start: number, end: number}>}                        rowTracks    Row tracks.
+ *
+ * @return {GridRect} The grid cells.
+ */
+export function getGridRectFromPixelRect( rect, columnTracks, rowTracks ) {
+	return new GridRect( {
+		columnStart: getClosestTrack( columnTracks, rect.left ) + 1,
+		rowStart: getClosestTrack( rowTracks, rect.top ) + 1,
+		columnEnd: getClosestTrack( columnTracks, rect.right, 'end' ) + 1,
+		rowEnd: getClosestTrack( rowTracks, rect.bottom, 'end' ) + 1,
+	} );
+}
+
+/**
+ * Sets an inline style on an element, or removes it when the value is empty.
+ * Used for previews that should not go through block attributes, such as the
+ * rotation while the rotate handle is dragged.
+ *
+ * @param {HTMLElement} element  The element.
+ * @param {string}      property The CSS property, in camel case.
+ * @param {string}      value    The value, or an empty string to remove it.
+ */
+export function setInlineStyle( element, property, value ) {
+	element.style[ property ] = value;
+}

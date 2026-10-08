@@ -871,16 +871,20 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	 *
 	 * @covers ::gutenberg_render_layout_support_flag
 	 *
-	 * @param array $layout         Grid layout attribute.
-	 * @param bool  $should_stack   Whether a stacking rule is expected.
+	 * @param array $layout       Grid layout attribute.
+	 * @param bool  $should_stack Whether a stacking rule is expected.
+	 * @param array $style        Optional. Grid style attribute.
 	 */
-	public function test_layout_support_flag_stacks_manual_grids_on_mobile( $layout, $should_stack ) {
+	public function test_layout_support_flag_stacks_manual_grids_on_mobile( $layout, $should_stack, $style = array() ) {
 		switch_theme( 'default' );
 
 		$block_content = '<div class="wp-block-group"></div>';
 		$block         = array(
 			'blockName'    => 'core/group',
-			'attrs'        => array( 'layout' => $layout ),
+			'attrs'        => array(
+				'layout' => $layout,
+				'style'  => $style,
+			),
 			'innerBlocks'  => array(),
 			'innerHTML'    => $block_content,
 			'innerContent' => array( $block_content ),
@@ -908,7 +912,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	 */
 	public function data_layout_support_flag_stacks_manual_grids_on_mobile() {
 		return array(
-			'manual placement grid stacks by default' => array(
+			'manual placement grid stacks by default'     => array(
 				'layout'       => array(
 					'type'              => 'grid',
 					'isManualPlacement' => true,
@@ -916,7 +920,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				),
 				'should_stack' => true,
 			),
-			'manual placement grid can opt out'       => array(
+			'manual placement grid can opt out'           => array(
 				'layout'       => array(
 					'type'              => 'grid',
 					'isManualPlacement' => true,
@@ -925,7 +929,20 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				),
 				'should_stack' => false,
 			),
-			'auto placement grid does not stack'      => array(
+			'manual placement grid can opt out on mobile' => array(
+				'layout'       => array(
+					'type'              => 'grid',
+					'isManualPlacement' => true,
+					'columnCount'       => 6,
+				),
+				'should_stack' => false,
+				'style'        => array(
+					'@mobile' => array(
+						'layout' => array( 'stackOnMobile' => false ),
+					),
+				),
+			),
+			'auto placement grid does not stack'          => array(
 				'layout'       => array(
 					'type'        => 'grid',
 					'columnCount' => 5,

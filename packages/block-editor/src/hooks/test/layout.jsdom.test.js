@@ -286,6 +286,26 @@ describe( 'layout', () => {
 			).toBe( '' );
 		} );
 
+		it( 'does not stack a manual placement grid when stacking is turned off on mobile', () => {
+			expect(
+				getResponsiveLayoutStyles( {
+					attributes: {
+						style: {
+							'@mobile': { layout: { stackOnMobile: false } },
+						},
+					},
+					blockName: 'core/group',
+					selector: '.wp-container-test',
+					layout: {
+						type: 'grid',
+						isManualPlacement: true,
+						columnCount: 3,
+					},
+					hasBlockGapSupport: true,
+				} )
+			).toBe( '' );
+		} );
+
 		it( 'does not stack auto placement grids', () => {
 			expect(
 				getResponsiveLayoutStyles( {

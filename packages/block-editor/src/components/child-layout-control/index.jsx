@@ -6,6 +6,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUseCustomUnits as useCustomUnits,
+	AnglePickerControl,
 	Flex,
 	FlexItem,
 } from '@wordpress/components';
@@ -15,6 +16,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useGetNumberOfBlocksBeforeCell } from '../grid/use-get-number-of-blocks-before-cell';
 import { store as blockEditorStore } from '../../store';
 import { useSettings } from '../use-settings';
+import { fromPickerAngle, toPickerAngle } from '../grid/rotation';
 
 // These are the serialized `selfStretch` values. `max` used to be called
 // "Fixed" in the UI, but was renamed and replaced by `fixedNoShrink`.
@@ -77,6 +79,7 @@ function helpText( flexControlValue, parentLayout ) {
  * @param {boolean}  props.isShownByDefault     Whether the control is shown by default.
  * @param {string}   props.panelId              The panel ID.
  * @param {boolean}  props.showGridSpanDefaults Whether unset grid span controls should show default values.
+ * @param {boolean}  props.isViewportState      Whether a viewport style state, such as mobile, is being edited.
  * @return {Element} child layout edit element.
  */
 export default function ChildLayoutControl( {
@@ -86,6 +89,7 @@ export default function ChildLayoutControl( {
 	isShownByDefault,
 	panelId,
 	showGridSpanDefaults = true,
+	isViewportState = false,
 } ) {
 	const {
 		type: parentType,
@@ -112,6 +116,7 @@ export default function ChildLayoutControl( {
 				isShownByDefault={ isShownByDefault }
 				panelId={ panelId }
 				showGridSpanDefaults={ showGridSpanDefaults }
+				isViewportState={ isViewportState }
 			/>
 		);
 	}
@@ -246,9 +251,12 @@ function GridControls( {
 	isShownByDefault,
 	panelId,
 	showGridSpanDefaults,
+	isViewportState,
 } ) {
-	const { columnStart, rowStart, columnSpan, rowSpan } = childLayout;
-	const { columnCount, rowCount } = parentLayout ?? {};
+	const { columnStart, rowStart, columnSpan, rowSpan, rotate } = childLayout;
+	const { columnCount, rowCount, isManualPlacement } = parentLayout ?? {};
+	const isManualGrid =
+		isManualPlacement && window.__experimentalEnableGridInteractivity;
 	const rootClientId = useSelect( ( select ) =>
 		select( blockEditorStore ).getBlockRootClientId( panelId )
 	);
@@ -271,6 +279,10 @@ function GridControls( {
 			columnSpan: undefined,
 			rowSpan: undefined,
 		} );
+	};
+	const hasRotateValue = () => rotate !== undefined;
+	const resetRotate = () => {
+		onChange( { rotate: undefined } );
 	};
 
 	// Calculate max column span based on current position and grid width
@@ -427,6 +439,32 @@ function GridControls( {
 						/>
 					</FlexItem>
 				</Flex>
+			) }
+			{ isManualGrid && (
+				<ToolsPanelItem
+					hasValue={ hasRotateValue }
+					label={ __( 'Rotation' ) }
+					onDeselect={ resetRotate }
+					isShownByDefault={ false }
+					panelId={ panelId }
+				>
+					<AnglePickerControl
+						label={ __( 'Rotation' ) }
+						value={ toPickerAngle( rotate ) }
+						onChange={ ( value ) => {
+							const nextRotate = fromPickerAngle( value );
+							onChange( {
+								// In the default state, no rotation is stored as
+								// no value. In a viewport state, 0 is kept so it
+								// overrides the default rotation.
+								rotate:
+									nextRotate || isViewportState
+										? nextRotate
+										: undefined,
+							} );
+						} }
+					/>
+				</ToolsPanelItem>
 			) }
 		</>
 	);

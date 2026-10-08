@@ -13,7 +13,7 @@
 		}
 
 		&.is-dropping-allowed {
-			.block-editor-grid-visualizer__drop-zone {
+			.block-editor-grid-visualizer__drop-layer {
 				pointer-events: all;
 			}
 		}
@@ -54,13 +54,6 @@
 
 	}
 
-	&.is-highlighted {
-		.block-editor-inserter,
-		.block-editor-grid-visualizer__drop-zone {
-			background: var(--wp-admin-theme-color);
-		}
-	}
-
 	&:hover .block-editor-grid-visualizer__appender,
 	.block-editor-grid-visualizer__appender:focus {
 		opacity: 1;
@@ -68,16 +61,114 @@
 	}
 }
 
-.block-editor-grid-visualizer__drop-zone {
-	background: rgba($gray-400, 0.1);
-	width: 100%;
-	height: 100%;
-	grid-column: 1;
-	grid-row: 1;
+// Covers the whole grid so that one drop zone can work out the landing cells
+// from the pointer position. It only takes pointer events while dragging.
+.block-editor-grid-visualizer__drop-layer {
+	position: absolute;
+	inset: 0;
+	z-index: 33;
+}
 
-	// Make drop zone 8x8 at minimum so that it's easier to drag into. This will overflow the parent.
-	min-width: $grid-unit-10;
-	min-height: $grid-unit-10;
+.block-editor-grid-visualizer__drop-indicator {
+	position: absolute;
+	inset: 0;
+	z-index: 34;
+}
+
+.block-editor-grid-visualizer__landing,
+.block-editor-grid-visualizer__overlap,
+.block-editor-grid-visualizer__guide {
+	position: absolute;
+}
+
+.block-editor-grid-visualizer__landing {
+	border-radius: $radius-small;
+	box-shadow: inset 0 0 0 $border-width-focus-fallback var(--wp-admin-theme-color);
+	background: color-mix(in srgb, var(--wp-admin-theme-color) 12%, transparent);
+}
+
+// Where the landing cells cover another block. Overlap is allowed, so this is
+// a warning tint rather than an error.
+.block-editor-grid-visualizer__overlap {
+	background: repeating-linear-gradient(-45deg, color-mix(in srgb, var(--wp-admin-theme-color) 35%, transparent) 0 $grid-unit-05, transparent $grid-unit-05 $grid-unit-10);
+}
+
+.block-editor-grid-visualizer__guide {
+	background: var(--wp-admin-theme-color);
+
+	&.is-vertical {
+		width: $border-width;
+		margin-left: -0.5px;
+	}
+
+	&.is-horizontal {
+		height: $border-width;
+		margin-top: -0.5px;
+	}
+
+	// Short ticks at both ends of a guide between two blocks.
+	&.is-sibling::before,
+	&.is-sibling::after {
+		content: "";
+		position: absolute;
+		background: inherit;
+	}
+
+	&.is-sibling.is-vertical::before,
+	&.is-sibling.is-vertical::after {
+		left: -2px;
+		width: 5px;
+		height: $border-width;
+	}
+
+	&.is-sibling.is-vertical::before {
+		top: 0;
+	}
+
+	&.is-sibling.is-vertical::after {
+		bottom: 0;
+	}
+
+	&.is-sibling.is-horizontal::before,
+	&.is-sibling.is-horizontal::after {
+		top: -2px;
+		width: $border-width;
+		height: 5px;
+	}
+
+	&.is-sibling.is-horizontal::before {
+		left: 0;
+	}
+
+	&.is-sibling.is-horizontal::after {
+		right: 0;
+	}
+
+	&.is-container-centre {
+		background: none;
+
+		&.is-vertical {
+			border-left: $border-width dashed var(--wp-admin-theme-color);
+		}
+
+		&.is-horizontal {
+			border-top: $border-width dashed var(--wp-admin-theme-color);
+		}
+	}
+}
+
+.block-editor-grid-visualizer__guide-label {
+	position: absolute;
+	top: $grid-unit-05;
+	left: $grid-unit-05;
+	padding: 0 $grid-unit-05;
+	border-radius: $radius-x-small;
+	background: var(--wp-admin-theme-color);
+	color: $white;
+	font-family: $default-font;
+	font-size: $helptext-font-size;
+	line-height: $default-line-height;
+	white-space: nowrap;
 }
 
 .block-editor-grid-item-resizer {
@@ -258,3 +349,91 @@
 	}
 }
 
+
+.block-editor-grid-item-handles {
+	// Specificity to override the z-index and pointer-events set by .components-popover.
+	&.block-editor-grid-item-handles.block-editor-grid-item-handles {
+		z-index: z-index(".block-editor-grid-visualizer");
+
+		.components-popover__content * {
+			pointer-events: none;
+		}
+
+		.block-editor-grid-item-handles__grip,
+		.block-editor-grid-item-handles__grip *,
+		.block-editor-grid-item-handles__rotate,
+		.block-editor-grid-item-handles__rotate * {
+			pointer-events: all;
+		}
+	}
+}
+
+.block-editor-grid-item-handles__box {
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+
+.block-editor-grid-item-handles__grip,
+.block-editor-grid-item-handles__rotate {
+	position: absolute;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	background: $white;
+	color: $gray-900;
+	box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color), $elevation-x-small;
+}
+
+.block-editor-grid-item-handles__grip {
+	top: -$grid-unit-15;
+	left: -$grid-unit-15;
+	width: $grid-unit-30;
+	height: $grid-unit-30;
+	cursor: grab;
+
+	&:active {
+		cursor: grabbing;
+	}
+}
+
+.block-editor-grid-item-handles__rotate {
+	bottom: -$grid-unit-40;
+	left: 50%;
+	width: $grid-unit-30;
+	height: $grid-unit-30;
+	margin-left: -$grid-unit-15;
+	cursor: grab;
+	touch-action: none;
+
+	&:active {
+		cursor: grabbing;
+	}
+
+	// Connects the handle to the block.
+	&::before {
+		content: "";
+		position: absolute;
+		bottom: 100%;
+		left: 50%;
+		width: $border-width;
+		height: $grid-unit-10;
+		background: var(--wp-admin-theme-color);
+	}
+}
+
+.block-editor-grid-item-handles__angle {
+	position: absolute;
+	bottom: -$grid-unit-80;
+	left: 50%;
+	margin-left: -$grid-unit-30;
+	width: $grid-unit-60;
+	padding: 2px 0;
+	border-radius: $radius-small;
+	background: $gray-900;
+	color: $white;
+	font-family: $default-font;
+	font-size: $helptext-font-size;
+	text-align: center;
+}

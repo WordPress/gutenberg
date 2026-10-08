@@ -294,7 +294,8 @@ export function getResponsiveLayoutStyles( {
 				viewport === '@mobile'
 					? layoutType?.getMobileStackingStyle?.( {
 							selector,
-							layout,
+							// Stacking can be turned off from the mobile state too.
+							layout: { ...layout, ...viewportLayout },
 						} )
 					: '';
 			if (

@@ -26,6 +26,7 @@ export function useEventHandlers( { clientId, isSelected } ) {
 		isSectionBlock,
 		editedContentOnlySection,
 		getBlock,
+		getBlockAttributes,
 	} = unlock( useSelect( blockEditorStore ) );
 	const {
 		removeBlock,
@@ -127,6 +128,52 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				dragElement.style.visibility = 'hidden';
 				ownerDocument.body.appendChild( dragElement );
 				event.dataTransfer.setDragImage( dragElement, 0, 0 );
+
+				// In a manual placement grid, the grid shows the cells the
+				// block will land in, so the block stays in place, dimmed,
+				// instead of following the pointer.
+				const rootLayout = getBlockAttributes(
+					getBlockRootClientId( clientId )
+				)?.layout;
+				if (
+					rootLayout?.type === 'grid' &&
+					rootLayout.isManualPlacement &&
+					window.__experimentalEnableGridInteractivity
+				) {
+					const originalOpacity = node.style.opacity;
+					node.style.opacity = '0.5';
+
+					function endGridDrag() {
+						ownerDocument.removeEventListener(
+							'dragend',
+							endGridDrag
+						);
+						ownerDocument.removeEventListener(
+							'drop',
+							endGridDrag
+						);
+						node.style.opacity = originalOpacity;
+						dragElement.remove();
+						stopDraggingBlocks();
+						document.body.classList.remove(
+							'is-dragging-components-draggable'
+						);
+						ownerDocument.documentElement.classList.remove(
+							'is-dragging'
+						);
+					}
+
+					ownerDocument.addEventListener( 'dragend', endGridDrag );
+					ownerDocument.addEventListener( 'drop', endGridDrag );
+					startDraggingBlocks( [ clientId ] );
+					document.body.classList.add(
+						'is-dragging-components-draggable'
+					);
+					ownerDocument.documentElement.classList.add(
+						'is-dragging'
+					);
+					return;
+				}
 
 				const rect = node.getBoundingClientRect();
 

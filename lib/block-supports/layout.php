@@ -1405,11 +1405,15 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		 * whatever order the stylesheets end up in.
 		 */
 		$mobile_media_query = $responsive_media_queries['@mobile'] ?? null;
+		$mobile_layout      = array_replace(
+			is_array( $used_layout ) ? $used_layout : array(),
+			gutenberg_get_layout_container_values( $style_attr['@mobile']['layout'] ?? null )
+		);
 		if (
 			$mobile_media_query &&
 			'grid' === ( $used_layout['type'] ?? null ) &&
 			! empty( $used_layout['isManualPlacement'] ) &&
-			false !== ( $used_layout['stackOnMobile'] ?? true )
+			false !== ( $mobile_layout['stackOnMobile'] ?? true )
 		) {
 			$stacking_styles = gutenberg_style_engine_get_stylesheet_from_css_rules(
 				array(

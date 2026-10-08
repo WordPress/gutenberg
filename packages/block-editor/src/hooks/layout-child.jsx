@@ -10,6 +10,8 @@ import {
 	GridVisualizer,
 	GridItemResizer,
 	GridItemMovers,
+	GridItemGrip,
+	GridItemRotator,
 } from '../components/grid';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import useBlockVisibility from '../components/block-visibility/use-block-visibility';
@@ -423,6 +425,7 @@ function GridTools( {
 		viewportSettings,
 		isChildBlockAGrid,
 		selectedState,
+		parentMobileLayout,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -464,6 +467,8 @@ function GridTools( {
 				// Check if the selected child block is itself a grid.
 				isChildBlockAGrid: blockAttributes?.layout?.type === 'grid',
 				selectedState: getSelectedBlockStyleState( clientId ),
+				parentMobileLayout:
+					parentAttributes?.style?.[ '@mobile' ]?.layout,
 			};
 		},
 		[ clientId ]
@@ -514,6 +519,8 @@ function GridTools( {
 
 	// Use useState() instead of useRef() so that GridItemResizer updates when ref is set.
 	const [ resizerBounds, setResizerBounds ] = useState();
+	// The angle shown while the rotate handle is being dragged.
+	const [ previewRotate, setPreviewRotate ] = useState( null );
 
 	const childGridClientId = isChildBlockAGrid ? clientId : undefined;
 
@@ -521,7 +528,30 @@ function GridTools( {
 		return null;
 	}
 
-	const showResizer = allowSizingOnChildren && ! isBlockItselfCurrentlyHidden;
+	const isManualGrid =
+		isManualPlacement && window.__experimentalEnableGridInteractivity;
+	// Manual grids stack their children on mobile unless they opt out. While
+	// stacked, placement and rotation have no effect, so the tools are hidden.
+	const isStacked =
+		isManualGrid &&
+		{ ...parentLayout, ...parentMobileLayout }.stackOnMobile !== false &&
+		selectedState?.viewport === '@mobile';
+	const showResizer =
+		allowSizingOnChildren && ! isBlockItselfCurrentlyHidden && ! isStacked;
+	const showManualGridTools =
+		isManualGrid && ! isBlockItselfCurrentlyHidden && ! isStacked;
+	const isViewportState = hasViewportBlockStyleState( selectedState );
+	const stateLayout = isViewportState
+		? getStyleForState( style, {
+				viewport: selectedState.viewport,
+				pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
+			} )?.layout
+		: undefined;
+	const rotate =
+		stateLayout && Object.hasOwn( stateLayout, 'rotate' )
+			? stateLayout.rotate
+			: style?.layout?.rotate;
+	const angle = previewRotate ?? rotate ?? 0;
 
 	function updateLayout( layout ) {
 		setAttributes( {
@@ -536,6 +566,7 @@ function GridTools( {
 				contentRef={ setResizerBounds }
 				parentLayout={ parentLayout }
 				childGridClientId={ childGridClientId }
+				isStacked={ isStacked }
 			/>
 			{ showResizer && (
 				<GridItemResizer
@@ -544,18 +575,39 @@ function GridTools( {
 					bounds={ resizerBounds }
 					onChange={ updateLayout }
 					parentLayout={ parentLayout }
+					angle={ angle }
 				/>
 			) }
-			{ isManualPlacement &&
-				window.__experimentalEnableGridInteractivity && (
-					<GridItemMovers
-						layout={ style?.layout }
-						parentLayout={ parentLayout }
-						onChange={ updateLayout }
-						gridClientId={ rootClientId }
-						blockClientId={ clientId }
+			{ showManualGridTools && (
+				<>
+					<GridItemGrip clientId={ clientId } angle={ angle } />
+					<GridItemRotator
+						clientId={ clientId }
+						angle={ rotate ?? 0 }
+						onPreview={ setPreviewRotate }
+						onChange={ ( nextRotate ) =>
+							updateLayout( {
+								// In the default state, no rotation is stored as
+								// no value. In a viewport state, 0 is kept so it
+								// overrides the default rotation.
+								rotate:
+									nextRotate || isViewportState
+										? nextRotate
+										: undefined,
+							} )
+						}
 					/>
-				) }
+				</>
+			) }
+			{ isManualGrid && ! isStacked && (
+				<GridItemMovers
+					layout={ style?.layout }
+					parentLayout={ parentLayout }
+					onChange={ updateLayout }
+					gridClientId={ rootClientId }
+					blockClientId={ clientId }
+				/>
+			) }
 		</>
 	);
 }

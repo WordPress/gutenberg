@@ -92,6 +92,11 @@ export default {
 		const hasMinimumColumnWidthValue = () =>
 			hasLayoutValue( 'minimumColumnWidth' );
 		const hasFillValue = () => hasLayoutValue( 'autoFit', false );
+		const showStackOnMobileControl =
+			layout?.isManualPlacement &&
+			window.__experimentalEnableGridInteractivity;
+		const hasStackOnMobileValue = () =>
+			hasLayoutValue( 'stackOnMobile', true );
 		const resetGridType = () =>
 			onChange(
 				cleanEmptyObject( {
@@ -121,6 +126,13 @@ export default {
 				cleanEmptyObject( {
 					...layout,
 					autoFit: resetLayout?.autoFit,
+				} )
+			);
+		const resetStackOnMobile = () =>
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					stackOnMobile: resetLayout?.stackOnMobile,
 				} )
 			);
 
@@ -179,6 +191,35 @@ export default {
 						<GridLayoutFillControl
 							layout={ layout }
 							onChange={ onChange }
+						/>
+					</ToolsPanelItem>
+				) }
+				{ showStackOnMobileControl && (
+					<ToolsPanelItem
+						label={ __( 'Stack on mobile' ) }
+						hasValue={ hasStackOnMobileValue }
+						onDeselect={ resetStackOnMobile }
+						isShownByDefault
+						panelId={ clientId }
+					>
+						<ToggleControl
+							label={ __( 'Stack on mobile' ) }
+							help={ __(
+								'On small screens, show each block full width, one after another.'
+							) }
+							checked={ layout?.stackOnMobile !== false }
+							onChange={ ( value ) =>
+								onChange(
+									cleanEmptyObject( {
+										...layout,
+										// Stacking is on by default, so only
+										// turning it off is stored.
+										stackOnMobile: value
+											? undefined
+											: false,
+									} )
+								)
+							}
 						/>
 					</ToolsPanelItem>
 				) }

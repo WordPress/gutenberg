@@ -1036,6 +1036,7 @@ export default function DimensionsPanel( {
 					showGridSpanDefaults={
 						! hasViewportBlockStyleState( styleState )
 					}
+					isViewportState={ hasViewportBlockStyleState( styleState ) }
 					isShownByDefault={
 						defaultControls.childLayout ??
 						DEFAULT_CONTROLS.childLayout
