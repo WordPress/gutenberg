@@ -2,9 +2,15 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
 ### Enhancements
 
 -   `ComplementaryArea`: Add `badge` and `badgeLabel` props, rendering a count over the pinned toolbar toggle ([#81951](https://github.com/WordPress/gutenberg/pull/81951)).
+
+## 10.3.0 (2026-10-07)
 
 ## 10.2.0 (2026-09-23)
 

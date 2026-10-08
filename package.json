@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "24.1.0",
+	"version": "24.2.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -83,9 +83,8 @@
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.63.0",
-		"@types/react": "^18.3.27",
-		"@types/react-dom": "^18.3.1",
-		"@typescript/native": "npm:typescript@^7.0.2",
+		"@types/react": "^19.3.0",
+		"@types/react-dom": "^19.3.0",
 		"@wordpress/env": "file:./packages/env",
 		"@wordpress/eslint-tools": "file:./tools/eslint",
 		"@wordpress/monorepo-tools": "file:./tools/monorepo",
@@ -94,9 +93,12 @@
 		"@wordpress/stylelint-tools": "file:./tools/stylelint",
 		"concurrently": "^9.2.1",
 		"cross-env": "^7.0.3",
+		"eslint": "^10.0.0",
 		"husky": "^7.0.0",
 		"lerna": "^10.0.1",
 		"lint-staged": "^16.4.0",
+		"prettier": "npm:wp-prettier@^3.9.6",
+		"stylelint": "^17.14.1",
 		"syncpack": "^15.3.1",
 		"wait-on": "^8.0.1"
 	},
@@ -108,6 +110,18 @@
 		"lerna": {
 			"js-yaml": "4.3.2",
 			"pacote": "21.5.1"
+		},
+		"@y/websocket-server": {
+			"yjs": "npm:@y/y@^14.0.0-rc.7"
+		},
+		"eslint-plugin-import": {
+			"eslint": "^10.0.0"
+		},
+		"eslint-plugin-jsx-a11y": {
+			"eslint": "^10.0.0"
+		},
+		"eslint-plugin-react": {
+			"eslint": "^10.0.0"
 		}
 	},
 	"scripts": {
@@ -223,5 +237,16 @@
 		"tools/*",
 		"widgets/*",
 		"!test/ai-development"
-	]
+	],
+	"allowScripts": {
+		"@parcel/watcher": false,
+		"@swc/core": false,
+		"core-js": false,
+		"core-js-pure": false,
+		"esbuild": false,
+		"fs-ext-extra-prebuilt": false,
+		"fsevents": false,
+		"nx": false,
+		"unrs-resolver": false
+	}
 }

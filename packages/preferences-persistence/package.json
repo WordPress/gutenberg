@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/preferences-persistence",
-	"version": "2.56.0",
+	"version": "2.57.0",
 	"description": "Persistence utilities for `wordpress/preferences`.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,14 +20,13 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0"
+		"node": ">=22.13.0"
 	},
 	"files": [
 		"src",
 		"build",
 		"build-module",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
@@ -45,7 +44,7 @@
 		"@wordpress/api-fetch": "file:../api-fetch"
 	},
 	"devDependencies": {
-		"vitest": "^5.0.0"
+		"vitest": "^5.0.3"
 	},
 	"publishConfig": {
 		"access": "public"
