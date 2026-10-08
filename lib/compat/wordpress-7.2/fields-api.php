@@ -226,10 +226,11 @@ if ( ! function_exists( '_wp_add_field_modules_to_editor_script' ) ) {
 
 if ( ! function_exists( '_wp_require_file' ) ) {
 	/**
-	 * Requires a file in a scope of its own, and returns what it returns.
+	 * Requires a file without sharing the variables of the caller: this is about
+	 * variable scope.
 	 *
 	 * @param string $file The path of the file.
-	 * @return mixed What the file returns.
+	 * @return mixed The return value of the file.
 	 */
 	function _wp_require_file( $file ) {
 		return require $file;
