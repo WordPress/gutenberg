@@ -13,6 +13,7 @@
 ### Bug Fixes
 
 -   Inserter: Only show the block-section separator when both sections contain blocks, avoiding a double border above the tip ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
+-   Invalidate the memoized block insertion selectors when `isPreviewMode` changes, and refuse the writing flow's cross-block input handling while the canvas is a preview. Preview mode already refused insertion, but nothing recomputed when it was turned on after the editor had booted, so an editor switched into a read-only preview at runtime went on believing it could insert: Enter split a paragraph and the block library listed every type ([#80427](https://github.com/WordPress/gutenberg/pull/80427), [#81661](https://github.com/WordPress/gutenberg/pull/81661)).
 
 ## 18.1.0 (2026-10-07)
 

@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### New Features
+
+-   Add a session-scoped editor intent (`edit`, `suggest`, `view`), with a private `setEditorIntent` action and `getEditorIntent` selector - the intent API stays private while Suggest mode is experimental. It is surfaced as an Edit / Suggest / View menu in the editor options for post types that support notes, and announced on change with a snackbar. Keyboard shortcuts follow the Google Docs convention: Ctrl+Alt+Shift+Z (Edit), +X (Suggest), +C (View) on Windows, ⌘⌥⇧Z/X/C on macOS ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
+
 ### Bug Fixes
 
 -   Notes: Highlight the text an unsent note is about, and keep the note anchored to it when the selection changes or the text is edited before the note is sent ([#84125](https://github.com/WordPress/gutenberg/pull/84125)).

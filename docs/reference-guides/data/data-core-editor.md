@@ -1393,6 +1393,8 @@ _Related_
 
 Action that restores last popped state in undo history.
 
+Refused in the read-only `view` intent: undo and redo rewrite the post the same way a keystroke does, and the header buttons stay mounted there.
+
 ### refreshPost
 
 > **Deprecated** Since WordPress 6.0.
@@ -1675,6 +1677,8 @@ _Parameters_
 ### undo
 
 Action that pops a record from undo history and undoes the edit.
+
+Refused in the read-only `view` intent — see `redo`.
 
 ### unlockPostAutosaving
 
