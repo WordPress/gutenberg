@@ -15,10 +15,11 @@ import {
 	useFocusOnMount,
 	useConstrainedTabbing,
 	useMergeRefs,
+	useRefEffect,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { close } from '@wordpress/icons';
-import { getScrollContainer } from '@wordpress/dom';
+import { focus, getScrollContainer } from '@wordpress/dom';
 import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import * as ariaHelper from './aria-helper';
 import Button from '../button';
@@ -70,21 +71,38 @@ function UnforwardedModal(
 		? `components-modal-header-${ instanceId }`
 		: aria.labelledby;
 
-	// The focus hook does not support 'firstContentElement' but this is a valid
-	// value for the Modal's focusOnMount prop. The following code ensures the focus
-	// hook will focus the first focusable node within the element to which it is applied.
-	// When `firstContentElement` is passed as the value of the focusOnMount prop,
-	// the focus hook is applied to the Modal's content element.
-	// Otherwise, the focus hook is applied to the Modal's ref. This ensures that the
-	// focus hook will focus the first element in the Modal's **content** when
-	// `firstContentElement` is passed.
+	const shouldFocusContent = focusOnMount === 'firstContentElement';
 	const focusOnMountRef = useFocusOnMount(
-		focusOnMount === 'firstContentElement' ? 'firstElement' : focusOnMount
+		shouldFocusContent ? false : focusOnMount
 	);
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusReturnRef = useFocusReturn();
 	const contentRef = useRef< HTMLDivElement >( null );
 	const childrenContainerRef = useRef< HTMLDivElement >( null );
+	const focusContentRef = useRefEffect< HTMLDivElement >(
+		( node ) => {
+			if (
+				! shouldFocusContent ||
+				node.contains( node.ownerDocument.activeElement )
+			) {
+				return;
+			}
+
+			// Match useFocusOnMount's deferred focus so child effects can finish first.
+			const timerId = setTimeout( () => {
+				const childrenContainer = childrenContainerRef.current;
+				const target =
+					( childrenContainer &&
+						focus.tabbable.find( childrenContainer )[ 0 ] ) ||
+					focus.tabbable.find( node )[ 0 ] ||
+					node;
+				target.focus( { preventScroll: true } );
+			}, 0 );
+
+			return () => clearTimeout( timerId );
+		},
+		[ shouldFocusContent ]
+	);
 
 	const [ hasScrolledContent, setHasScrolledContent ] = useState( false );
 	const [ hasScrollableContent, setHasScrollableContent ] = useState( false );
@@ -264,9 +282,7 @@ function UnforwardedModal(
 						frameRef,
 						constrainedTabbingRef,
 						focusReturnRef,
-						focusOnMount !== 'firstContentElement'
-							? focusOnMountRef
-							: null,
+						shouldFocusContent ? focusContentRef : focusOnMountRef,
 					] ) }
 					role={ role }
 					aria-label={ contentLabel }
@@ -339,12 +355,7 @@ function UnforwardedModal(
 						) }
 
 						<div
-							ref={ useMergeRefs( [
-								childrenContainerRef,
-								focusOnMount === 'firstContentElement'
-									? focusOnMountRef
-									: null,
-							] ) }
+							ref={ childrenContainerRef }
 							className="components-modal__children-container"
 						>
 							{ children }

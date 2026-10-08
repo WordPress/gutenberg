@@ -55,6 +55,7 @@ export type ModalProps = {
 	 * - `"firstElement"` focuses the first tabbable element within.
 	 * - `"firstInputElement"` focuses the first value control within.
 	 * - `"firstContentElement"` focuses the first tabbable element within the modal’s content element.
+	 *   Falls back to the first tabbable element anywhere within the modal, then to the dialog frame.
 	 * - `true` focuses the element itself.
 	 * - `false` does nothing and _should not be used unless an accessible
 	 *    substitute behavior is implemented_.
