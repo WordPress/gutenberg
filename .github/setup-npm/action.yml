@@ -47,7 +47,9 @@ runs:
               # and fails the devEngines check under the bundled npm.
               # Consumer jobs may test Node versions below the repository's
               # devEngines floor. A global lookup does not enforce that floor.
-              echo "cache-dir=$(npm config get cache --global | tr -d '\r')" >> "$GITHUB_OUTPUT"
+              # Assign first: pipefail then fails here, not later with an empty path.
+              CACHE_DIR="$(npm config get cache --global | tr -d '\r')"
+              echo "cache-dir=$CACHE_DIR" >> "$GITHUB_OUTPUT"
 
               # Keep the hashFiles patterns workspace-relative and free of a "./"
               # prefix, so they match the same files as every other cache key.
