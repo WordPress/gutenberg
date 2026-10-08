@@ -111,18 +111,14 @@ export interface PopupProps extends ComponentProps< typeof _Menu.Popup > {
 
 export interface MenuItemLayoutProps {
 	/**
-	 * Presentational content displayed before the item label.
-	 * Use `Menu.PrefixIcon` for consistent icon sizing and alignment.
+	 * Presentational content before the item label. Use `Menu.PrefixIcon` for
+	 * icons that help users recognize actions or give a key action useful
+	 * prominence.
 	 *
-	 * Use familiar icons to help users recognize actions or give a key action
-	 * useful prominence. Prefer icons on every item in a group, or none. If only
-	 * one item benefits from an icon, reconsider its grouping. Prefer omitting
-	 * the icon over adding unnecessary icons to the other items. Mixed icon
-	 * usage is supported; labels without a prefix start at the icon column,
-	 * without an empty icon space. Each `Menu.Group` and `Menu.RadioGroup` has
-	 * its own prefix column. Items directly inside `Menu.Popup` share one, even
-	 * across `Menu.Separator`. Avoid combining a prefix icon and a description
-	 * in the same item.
+	 * Prefer icons on every item in a group, or none. If only one item needs an
+	 * icon, reconsider its grouping. Prefer omitting it over adding unnecessary
+	 * icons to the other items. Mixed icon usage is supported. Avoid combining
+	 * a prefix icon and a description in the same item.
 	 */
 	prefix?: ReactNode;
 
@@ -151,12 +147,11 @@ export interface ItemLabelProps extends ComponentProps< 'span' > {
 
 export interface ItemDescriptionProps extends ComponentProps< 'span' > {
 	/**
-	 * Supplementary content displayed below a menu item label. Use as a direct
-	 * child after `Menu.ItemLabel`. Content should be text or non-interactive
-	 * inline markup. Use sparingly, only for essential context that a short,
-	 * clear label cannot convey. Descriptions start at the prefix column,
-	 * including when the item has an icon. Avoid combining a description and a
-	 * prefix icon in the same item.
+	 * Supporting text below a menu item label. Use as a direct child after
+	 * `Menu.ItemLabel`. Content should be text or non-interactive inline markup.
+	 * Keep descriptions brief and use them only for essential context the label
+	 * cannot convey. Avoid combining a description and a prefix icon in the
+	 * same item.
 	 */
 	children: ReactNode;
 }

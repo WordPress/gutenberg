@@ -19,7 +19,7 @@ type Story = StoryObj;
 
 /**
  * Prefer prefix icons on every item in a group, or omit them from the whole group.
- * Each group makes this choice independently and keeps its item labels aligned.
+ * Groups can make different choices.
  */
 export const ConsistentPrefixIconsWithinGroups: Story = {
 	render: () => (
@@ -51,8 +51,8 @@ export const ConsistentPrefixIconsWithinGroups: Story = {
 };
 
 /**
- * Items without a prefix start at the icon column instead of leaving an empty
- * icon space. This layout is supported when a group needs mixed icon usage.
+ * Mixed icon usage is supported. Labels without icons start at the same
+ * position as neighboring icons, without an empty icon space.
  */
 export const MixedPrefixIcons: Story = {
 	render: () => (

@@ -277,7 +277,7 @@ export const WrappedItems: Story = {
 	parameters: {
 		docs: {
 			description: {
-				story: 'Exercises wrapping and disabled styling with deliberately long labels and descriptions. In product menus, keep labels short and use descriptions only when needed.',
+				story: 'Uses long text to demonstrate wrapping and disabled items. Keep product menu labels short and descriptions rare.',
 			},
 		},
 	},
