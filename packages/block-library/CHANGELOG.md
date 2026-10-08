@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 11.2.0 (2026-10-07)
+
 ### Enhancements
 
 -   Navigation Link: Search every entity type from the link UI instead of only the link's own type; so a category, tag or post can be added without needing to add that specific type's navigation link block ([#83408](https://github.com/WordPress/gutenberg/pull/83408)).
@@ -14,9 +16,11 @@
 -   Icon: Match an icon's keywords as well as its name and label when searching the icon library ([#82367](https://github.com/WordPress/gutenberg/pull/82367)).
 -   Button: Only open the link popover from the toolbar button or keyboard shortcut instead of whenever a linked button is selected. The toolbar button now shows a pressed state when a link is set ([#30166](https://github.com/WordPress/gutenberg/pull/30166)).
 -   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
+-   Image, Cover: Restore the previous attachment with snackbar Undo, including attachment-derived Image attributes while preserving Cover settings ([#81805](https://github.com/WordPress/gutenberg/pull/81805)).
 
 ### Bug Fixes
 
+-   Custom HTML: Keep a block whose markup renders nothing in the editor, such as a script or an empty container a third-party script fills in, selectable. The block takes no space, as on the front end, and a marker floats next to it that selects the block when clicked ([#84150](https://github.com/WordPress/gutenberg/pull/84150)).
 -   Tag Cloud: Space the tags of the Outline style evenly. The base link margin outranked the style's own reset, so each tag carried that margin on top of the container's gap and the horizontal spacing did not match the spacing between rows ([#70224](https://github.com/WordPress/gutenberg/pull/70224)).
 -   Image: Stop a click on the enlarged image from closing the lightbox, so tapping the image to inspect it, or mis-tapping while reaching for Previous or Next, no longer dismisses it. The Close button, Escape and the area around the image still close the lightbox ([#78898](https://github.com/WordPress/gutenberg/pull/78898)).
 -   Math: Align the cells of `aligned` and `cases`, and draw `\overline` and `\underline`, in Chromium, in the Math block and in inline math. The rules key on the MathML attributes and only apply where the engine does not render them natively ([#83164](https://github.com/WordPress/gutenberg/pull/83164)).

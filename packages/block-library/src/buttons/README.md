@@ -52,6 +52,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - `clientNavigation`: `true`
 - [`listView`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#listview): `true`
 - [`contentRole`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#contentrole): `true`
+- [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
 
 ## Block Markup
 
