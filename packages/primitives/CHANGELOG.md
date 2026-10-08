@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Refactor to TypeScript.
+
 ## 4.57.0 (2026-10-07)
 
 ### Bug Fixes
