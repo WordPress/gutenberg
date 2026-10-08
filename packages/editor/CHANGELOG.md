@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
 ### New Features
 
 -   Add a session-scoped editor intent (`edit`, `suggest`, `view`), with a private `setEditorIntent` action and `getEditorIntent` selector - the intent API stays private while Suggest mode is experimental. It is surfaced as an Edit / Suggest / View menu in the editor options for post types that support notes, and announced on change with a snackbar. Keyboard shortcuts follow the Google Docs convention: Ctrl+Alt+Shift+Z (Edit), +X (Suggest), +C (View) on Windows, ⌘⌥⇧Z/X/C on macOS ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
@@ -21,6 +25,11 @@
 -   Suggest mode: keep a review decision and its note together through undo. Accepting or rejecting a suggestion changes block content and resolves the note, but only the content half is in the undo stack, so undo put the marker back on a note that stayed resolved - a marked-up run with no Accept/Reject on it and no way to clear it. Undoing a decision made in this session now reopens its note along with the marker, restoring the suggestion's lifecycle meta to `pending` ([#81669](https://github.com/WordPress/gutenberg/pull/81669), [#81963](https://github.com/WordPress/gutenberg/pull/81963)).
 -   Suggest mode: extend a format suggestion on a second toggle instead of opening a second one. Toggling a further format over a run that already carries the suggester's own pending `format` marker recorded a suggestion whose before and after were both empty - unreviewable and unapplyable - and made every marker in the block disappear. The existing suggestion is now revised in place, a toggle that restores the original run retracts it rather than storing a note that proposes nothing, and a note that has replies is revised rather than withdrawn ([#81665](https://github.com/WordPress/gutenberg/pull/81665)).
 -   Suggest mode: refuse post status changes while suggesting. `editPost` drops the `status` field in the `suggest` intent, the status control and the summary panel show the status without offering to change it, and the publish button is disabled there when its click would change the status, rather than dropping the status edit and saving the post anyway; a plain save of a published or scheduled post stays available so the suggestion markers can be persisted. A status edit that travels with a companion field - the `password` that visibility changes carry, the `date` that scheduling carries - is refused whole rather than half-applied, a status repeated at the value it already holds is not announced as a refusal, and a status staged before the intent changed is discarded on the way in. The refusal is announced and shown in a snackbar ([#81664](https://github.com/WordPress/gutenberg/pull/81664)).
+
+### Bug Fixes
+
+-   Notes: Highlight the text an unsent note is about, and keep the note anchored to it when the selection changes or the text is edited before the note is sent ([#84125](https://github.com/WordPress/gutenberg/pull/84125)).
+-   Notes: Select the note under the caret: an inline note while the caret is inside its highlight, otherwise the block's unsent draft or block-level note, instead of an inline note on any click in the block ([#84147](https://github.com/WordPress/gutenberg/pull/84147)).
 
 ## 15.2.0 (2026-10-07)
 

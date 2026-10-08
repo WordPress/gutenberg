@@ -148,6 +148,7 @@ const DENYLIST = {
 			'Use `InputControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		TextareaControl:
 			'Use `TextareaControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
+		Tip: 'Use `Notice` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		ToggleControl:
 			'Use `SwitchControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		Tooltip: 'Use `Tooltip` from `@wordpress/ui` instead.',
