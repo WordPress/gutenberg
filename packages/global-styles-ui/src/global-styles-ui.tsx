@@ -15,7 +15,7 @@ import ScreenRoot from './screen-root';
 import ScreenBlockList from './screen-block-list';
 import ScreenBlock from './screen-block';
 import ScreenTypography from './screen-typography';
-import ScreenTypographyElement from './screen-typography-element';
+import ScreenElement from './screen-element';
 import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
 import ScreenBackground from './screen-background';
@@ -206,6 +206,9 @@ export function GlobalStylesUI( {
 					<GlobalStylesNavigationScreen path="/typography">
 						<ScreenTypography />
 					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/text">
+						<ScreenElement element="text" />
+					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/typography/font-sizes">
 						<FontSizes />
 					</GlobalStylesNavigationScreen>
@@ -242,32 +245,53 @@ export function GlobalStylesUI( {
 					<GlobalStylesNavigationScreen path="/background">
 						<ScreenBackground />
 					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/typography/text">
-						<ScreenTypographyElement element="text" />
-					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/typography/link">
-						<ScreenTypographyElement element="link" />
-					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/typography/heading">
-						<ScreenTypographyElement element="heading" />
-					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/typography/caption">
-						<ScreenTypographyElement element="caption" />
-					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/typography/cite">
-						<ScreenTypographyElement element="cite" />
-					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/typography/button">
-						<ScreenTypographyElement element="button" />
-					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/typography/textInput">
-						<ScreenTypographyElement element="textInput" />
-					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/typography/select">
-						<ScreenTypographyElement element="select" />
-					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/blocks">
 						<ScreenBlockList />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/blocks/elements/link">
+						<ScreenElement
+							element="link"
+							showStateControls={ showBlockStateControls }
+						/>
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/blocks/elements/caption">
+						<ScreenElement element="caption" />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/blocks/elements/cite">
+						<ScreenElement element="cite" />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/blocks/elements/heading">
+						<ScreenElement element="heading" />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/blocks/elements/h1">
+						<ScreenElement element="h1" />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/blocks/elements/h2">
+						<ScreenElement element="h2" />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/blocks/elements/h3">
+						<ScreenElement element="h3" />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/blocks/elements/h4">
+						<ScreenElement element="h4" />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/blocks/elements/h5">
+						<ScreenElement element="h5" />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/blocks/elements/h6">
+						<ScreenElement element="h6" />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/blocks/elements/textInput">
+						<ScreenElement element="textInput" />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/blocks/elements/select">
+						<ScreenElement element="select" />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/blocks/elements/button">
+						<ScreenElement
+							element="button"
+							showStateControls={ showBlockStateControls }
+						/>
 					</GlobalStylesNavigationScreen>
 					{ blocks.map( ( block ) => (
 						<Fragment key={ block.name }>

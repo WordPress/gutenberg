@@ -31,7 +31,9 @@ test.describe( 'Global styles sidebar', () => {
 			name: 'Editor settings',
 		} );
 
-		await settings.getByRole( 'button', { name: 'Blocks' } ).click();
+		await settings
+			.getByRole( 'button', { name: 'Blocks & Elements' } )
+			.click();
 		await settings
 			.getByRole( 'button', { name: 'Heading', exact: true } )
 			.click();
@@ -65,14 +67,14 @@ test.describe( 'Global styles sidebar', () => {
 	} );
 
 	test( 'should filter blocks list results', async ( { page } ) => {
-		// Navigate to Styles -> Blocks.
+		// Navigate to Styles -> Blocks & Elements.
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Styles' } )
 			.click();
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Blocks' } )
+			.getByRole( 'button', { name: 'Blocks & Elements' } )
 			.click();
 
 		await page
