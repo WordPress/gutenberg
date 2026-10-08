@@ -16,7 +16,7 @@
 
 ### Bug Fixes
 
--   `PaletteEdit`: Add Apply and Cancel controls to palette pickers, and apply edited values only after confirmation.
+-   `PaletteEdit`: Add Apply and Cancel controls to palette pickers, and apply edited values only after confirmation ([#84333](https://github.com/WordPress/gutenberg/pull/84333)).
 
 ## 42.0.0 (2026-10-07)
 
