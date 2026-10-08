@@ -103,21 +103,20 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 				! ( $has_background_gradient_support && $has_background_gradient_value ),
 		),
 	);
-	$color_attributes = array();
+	$attributes       = $block_attributes;
+	$has_color_styles = isset( $attributes['style']['color'] ) && is_array( $attributes['style']['color'] );
 
 	foreach ( $features as $feature => list( $preset_attribute, $is_allowed ) ) {
-		if ( ! $is_allowed ) {
+		if ( $is_allowed ) {
 			continue;
 		}
-		if ( array_key_exists( $preset_attribute, $block_attributes ) ) {
-			$color_attributes[ $preset_attribute ] = $block_attributes[ $preset_attribute ];
-		}
-		if ( isset( $block_attributes['style']['color'][ $feature ] ) ) {
-			$color_attributes['style']['color'][ $feature ] = $block_attributes['style']['color'][ $feature ];
+		unset( $attributes[ $preset_attribute ] );
+		if ( $has_color_styles ) {
+			unset( $attributes['style']['color'][ $feature ] );
 		}
 	}
 
-	return gutenberg_get_color_classes_and_styles( $color_attributes );
+	return gutenberg_get_color_classes_and_styles( $attributes );
 }
 
 /**
