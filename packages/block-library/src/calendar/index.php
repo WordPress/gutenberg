@@ -43,22 +43,16 @@ function render_block_core_calendar( $attributes ) {
 		}
 	}
 
-	$color_block_styles = array();
+	$color_attributes = array_intersect_key( $attributes, array_flip( array( 'textColor', 'backgroundColor' ) ) );
+	foreach ( array( 'text', 'background' ) as $feature ) {
+		if ( isset( $attributes['style']['color'][ $feature ] ) ) {
+			$color_attributes['style']['color'][ $feature ] = $attributes['style']['color'][ $feature ];
+		}
+	}
 
-	// Text color.
-	$preset_text_color          = array_key_exists( 'textColor', $attributes ) ? "var:preset|color|{$attributes['textColor']}" : null;
-	$custom_text_color          = $attributes['style']['color']['text'] ?? null;
-	$color_block_styles['text'] = $preset_text_color ? $preset_text_color : $custom_text_color;
-
-	// Background Color.
-	$preset_background_color          = array_key_exists( 'backgroundColor', $attributes ) ? "var:preset|color|{$attributes['backgroundColor']}" : null;
-	$custom_background_color          = $attributes['style']['color']['background'] ?? null;
-	$color_block_styles['background'] = $preset_background_color ? $preset_background_color : $custom_background_color;
-
-	// Generate color styles and classes.
-	$styles        = wp_style_engine_get_styles( array( 'color' => $color_block_styles ), array( 'convert_vars_to_classnames' => true ) );
-	$inline_styles = empty( $styles['css'] ) ? '' : sprintf( ' style="%s"', esc_attr( $styles['css'] ) );
-	$classnames    = empty( $styles['classnames'] ) ? '' : ' ' . esc_attr( $styles['classnames'] );
+	$styles        = wp_get_color_classes_and_styles( $color_attributes );
+	$inline_styles = empty( $styles['style'] ) ? '' : sprintf( ' style="%s"', esc_attr( $styles['style'] ) );
+	$classnames    = empty( $styles['class'] ) ? '' : ' ' . esc_attr( $styles['class'] );
 	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
 		$classnames .= ' has-link-color';
 	}
