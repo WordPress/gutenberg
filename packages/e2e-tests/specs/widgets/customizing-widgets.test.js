@@ -180,11 +180,7 @@ describe( 'Widgets Customizer', () => {
 
 		await showBlockToolbar();
 		await clickBlockToolbarButton( 'Options' );
-		let showMoreSettingsButton = await find( {
-			role: 'menuitem',
-			name: 'Show more settings',
-		} );
-		await showMoreSettingsButton.click();
+		await clickMenuItem( 'Show more settings' );
 
 		const backButton = await find( {
 			role: 'button',
@@ -219,11 +215,7 @@ describe( 'Widgets Customizer', () => {
 		await expect( inspectorHeading ).not.toBeVisible();
 
 		await clickBlockToolbarButton( 'Options' );
-		showMoreSettingsButton = await find( {
-			role: 'menuitem',
-			name: 'Show more settings',
-		} );
-		await showMoreSettingsButton.click();
+		await clickMenuItem( 'Show more settings' );
 
 		// Expect the inspector panel to be found.
 		inspectorHeading = await find( {
@@ -806,11 +798,7 @@ describe( 'Widgets Customizer', () => {
 		// Click the three dots button, then click "Show More Settings".
 		await showBlockToolbar();
 		await clickBlockToolbarButton( 'Options' );
-		const showMoreSettingsButton = await find( {
-			role: 'menuitem',
-			name: 'Show more settings',
-		} );
-		await showMoreSettingsButton.click();
+		await clickMenuItem( 'Show more settings' );
 
 		// Change `drop cap` (Any change made in this section is sufficient; not required to be `drop cap`).
 		const [ dropCapToggle ] = await page.$x(
@@ -835,6 +823,34 @@ describe( 'Widgets Customizer', () => {
 		} );
 	} );
 } );
+
+/**
+ * Clicks a menu item in the block toolbar's Options menu.
+ *
+ * The menu can re-render between finding the item and clicking it, which
+ * detaches the element handle and can close the menu. On a retry, the menu is
+ * reopened if it closed, and the item is looked up again, up to three
+ * attempts in total.
+ *
+ * @param {string} name The menu item's accessible name.
+ */
+async function clickMenuItem( name ) {
+	for ( let attempt = 1; ; attempt++ ) {
+		if ( attempt > 1 && ! ( await page.$( '[role="menu"]' ) ) ) {
+			await showBlockToolbar();
+			await clickBlockToolbarButton( 'Options' );
+		}
+		const menuItem = await find( { role: 'menuitem', name } );
+		try {
+			await menuItem.click();
+			return;
+		} catch ( error ) {
+			if ( attempt >= 3 || ! /detached/.test( error.message ) ) {
+				throw error;
+			}
+		}
+	}
+}
 
 /**
  * Wait when there's only one preview iframe.
