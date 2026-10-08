@@ -411,6 +411,62 @@ test.describe( 'Block Notes', () => {
 		await expect( headingThread ).toBeHidden();
 	} );
 
+	test( 'expands collapsed replies while searching notes', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Testing block comments' },
+			comment: 'Test comment',
+		} );
+		const sidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const replyForm = page.getByRole( 'textbox', { name: 'Reply to' } );
+		const replyButton = sidebar.getByRole( 'button', {
+			name: 'Reply',
+			exact: true,
+		} );
+		for ( const reply of [ 'Check the table.', 'Last reply' ] ) {
+			await replyForm.click();
+			await replyForm.pressSequentially( reply );
+			await replyButton.click();
+		}
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Reply added.' } )
+		).toHaveCount( 2 );
+
+		// Deselect the note so its middle reply collapses.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.focus();
+		const thread = sidebar.getByRole( 'treeitem', {
+			name: 'Note: Test comment',
+		} );
+		const moreReplies = thread.getByRole( 'button', {
+			name: '1 more reply',
+		} );
+		await expect( moreReplies ).toBeVisible();
+		await expect( thread.getByText( 'Check the table.' ) ).toBeHidden();
+
+		const search = sidebar.getByRole( 'searchbox', {
+			name: 'Search notes',
+		} );
+		await search.fill( 'table' );
+		await expect( thread.getByText( 'Check the table.' ) ).toBeVisible();
+		await expect( moreReplies ).toBeHidden();
+		await expect(
+			thread.getByRole( 'textbox', { name: 'Reply to' } )
+		).toBeHidden();
+
+		await search.fill( '' );
+		await expect( moreReplies ).toBeVisible();
+	} );
+
 	test( 'clearing the block selection does not select an orphaned note', async ( {
 		editor,
 		page,

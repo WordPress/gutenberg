@@ -3,6 +3,7 @@ import {
 	DEFAULT_NOTES_FILTERS,
 	filterNotes,
 	sanitizeNotesFilters,
+	shouldExpandReplies,
 } from '../notes-filters';
 
 type TestNote = {
@@ -122,5 +123,24 @@ describe( 'sanitizeNotesFilters', () => {
 				)
 			)
 		).toEqual( [ 1 ] );
+	} );
+
+	it( 'expands replies only for filters that can match a reply', () => {
+		expect( shouldExpandReplies( DEFAULT_NOTES_FILTERS ) ).toBe( false );
+		expect(
+			shouldExpandReplies( {
+				...DEFAULT_NOTES_FILTERS,
+				status: 'approved',
+			} )
+		).toBe( false );
+		expect(
+			shouldExpandReplies( { ...DEFAULT_NOTES_FILTERS, search: '  ' } )
+		).toBe( false );
+		expect(
+			shouldExpandReplies( { ...DEFAULT_NOTES_FILTERS, search: 'table' } )
+		).toBe( true );
+		expect(
+			shouldExpandReplies( { ...DEFAULT_NOTES_FILTERS, author: '2' } )
+		).toBe( true );
 	} );
 } );

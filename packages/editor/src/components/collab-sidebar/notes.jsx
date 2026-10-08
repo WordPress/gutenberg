@@ -26,6 +26,7 @@ export function Notes( {
 	sidebarRef,
 	isFloating = false,
 	isFiltered = false,
+	expandReplies = false,
 } ) {
 	const {
 		onCreate: onAddReply,
@@ -243,6 +244,7 @@ export function Notes( {
 						onDeleteNote={ handleDelete }
 						onEditNote={ onEditNote }
 						isSelected={ selectedNote === thread.id }
+						expandReplies={ expandReplies }
 						sidebarRef={ sidebarRef }
 						floating={
 							isFloating

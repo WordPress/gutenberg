@@ -19,6 +19,7 @@ import {
 	filterNotes,
 	hasActiveNotesFilters,
 	sanitizeNotesFilters,
+	shouldExpandReplies,
 } from './notes-filters';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
@@ -226,6 +227,7 @@ function NotesSidebar( { postId, drafts } ) {
 							notes={ filteredNotes }
 							sidebarRef={ sidebarRef }
 							isFiltered={ hasActiveNotesFilters( filters ) }
+							expandReplies={ shouldExpandReplies( filters ) }
 						/>
 					</NoteDraftsContext.Provider>
 				</PluginSidebar>

@@ -46,6 +46,15 @@ export function hasActiveNotesFilters( filters: NotesFilterValues ) {
 }
 
 /**
+ * Whether a filter can match a reply, so collapsed replies should be shown.
+ *
+ * @param filters Filter values.
+ */
+export function shouldExpandReplies( filters: NotesFilterValues ) {
+	return filters.search.trim() !== '' || filters.author !== 'all';
+}
+
+/**
  * Counts the filters set in the collapsible panel. Search is left out since
  * its field is always shown.
  *
