@@ -232,8 +232,8 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-.block-editor-inserter__insertable-blocks-at-selection {
-	border-bottom: $border-width solid $gray-200;
+.block-editor-inserter__insertable-blocks-at-selection:not(:empty) + .block-editor-inserter__all-blocks:not(:empty) {
+	border-top: $border-width solid $gray-200;
 }
 
 .block-editor-inserter__media-tabs-container,
