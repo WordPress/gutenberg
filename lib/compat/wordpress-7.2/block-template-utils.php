@@ -23,13 +23,14 @@ function gutenberg_prepare_post_template_choices( $templates, $query, $template_
 		! isset( $query['slug'], $query['post_type'] ) ||
 		! is_string( $query['slug'] ) ||
 		! is_string( $query['post_type'] ) ||
+		( isset( $query['post_id'] ) && ! is_numeric( $query['post_id'] ) ) ||
 		! is_array( $templates )
 	) {
 		return $templates;
 	}
 
 	$slug    = sanitize_title( $query['slug'] );
-	$post_id = isset( $query['post_id'] ) && is_numeric( $query['post_id'] ) ? (int) $query['post_id'] : 0;
+	$post_id = isset( $query['post_id'] ) ? (int) $query['post_id'] : 0;
 	if ( 'page' === $query['post_type'] && $post_id && 'page' === get_option( 'show_on_front' ) ) {
 		$fixed_template = null;
 		if ( (int) get_option( 'page_on_front' ) === $post_id ) {
@@ -40,21 +41,6 @@ function gutenberg_prepare_post_template_choices( $templates, $query, $template_
 		}
 		if ( $fixed_template ) {
 			return ! isset( $query['wp_id'] ) || (int) $fixed_template->wp_id === $query['wp_id'] ? array( $fixed_template ) : array();
-		}
-	}
-	if ( '' !== $slug && ! $post_id ) {
-		$posts = get_posts(
-			array(
-				'name'           => $slug,
-				'post_type'      => $query['post_type'],
-				'post_status'    => 'any',
-				'posts_per_page' => 2,
-				'fields'         => 'ids',
-			)
-		);
-		// Drafts and hierarchical posts can share a slug. Offer generic choices.
-		if ( count( $posts ) > 1 ) {
-			$slug = '';
 		}
 	}
 	$template_slug = 'page' === $query['post_type'] ? 'page' : 'single-' . $query['post_type'];
