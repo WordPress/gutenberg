@@ -18,7 +18,7 @@ export default function getFooterMessage(
 	if ( selectionCount > 0 ) {
 		return sprintf(
 			/* translators: %d: number of items. */
-			_n( '%d Item selected', '%d Items selected', selectionCount ),
+			_n( '%d item selected', '%d items selected', selectionCount ),
 			selectionCount
 		);
 	}
@@ -27,14 +27,14 @@ export default function getFooterMessage(
 	if ( onlyTotalCount || totalItems <= itemsCount ) {
 		return sprintf(
 			/* translators: %d: number of items. */
-			_n( '%d Item', '%d Items', totalItems ),
+			_n( '%d item', '%d items', totalItems ),
 			totalItems
 		);
 	}
 
 	return sprintf(
 		/* translators: %1$d: number of items. %2$d: total number of items. */
-		_n( '%1$d of %2$d Item', '%1$d of %2$d Items', totalItems ),
+		_n( '%1$d of %2$d item', '%1$d of %2$d items', totalItems ),
 		itemsCount,
 		totalItems
 	);

@@ -1,11 +1,17 @@
 import clsx from 'clsx';
 import { Spinner } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { inertValue } from '@wordpress/react-inert-value';
 import { Stack } from '@wordpress/ui';
 import type { ViewGridProps } from '../../../types';
 import getDataByGroup from '../utils/get-data-by-group';
 import useSelectionProps from '../utils/use-selection-props';
-import { hasAPossibleBulkAction } from '../../dataviews-bulk-actions';
+import {
+	BulkActionToolbar,
+	hasAPossibleBulkAction,
+	useSomeItemHasAPossibleBulkAction,
+} from '../../dataviews-bulk-actions';
 import CompositeGrid from './composite-grid';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
 
@@ -24,6 +30,7 @@ function ViewGrid< Item >( {
 	className,
 	empty,
 }: ViewGridProps< Item > ) {
+	const [ isActionInProgress, setIsActionInProgress ] = useState( false );
 	const isDelayedLoading = useDelayedLoading( !! isLoading );
 	const hasData = !! data?.length;
 	const groupField = view.groupBy?.field
@@ -47,7 +54,8 @@ function ViewGrid< Item >( {
 		selectionMode: 'multi',
 		shouldSelectOnClick: false,
 	} );
-	if ( ! hasData ) {
+	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
+	if ( ! hasData && ! isActionInProgress ) {
 		return (
 			<div
 				className={ clsx( 'dataviews-no-results', {
@@ -77,6 +85,16 @@ function ViewGrid< Item >( {
 	};
 	return (
 		<>
+			{ ( hasBulkActions || isActionInProgress ) && (
+				<div
+					className="dataviews-view-grid__bulk-actions-header"
+					inert={ inertValue( !! isLoading ) }
+				>
+					<BulkActionToolbar
+						onActionInProgressChange={ setIsActionInProgress }
+					/>
+				</div>
+			) }
 			{
 				// Render multiple groups.
 				hasData && groupField && dataByGroup && (

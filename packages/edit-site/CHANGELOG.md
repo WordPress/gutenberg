@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Label the quick edit action as Bulk edit when multiple pages are selected ([#82730](https://github.com/WordPress/gutenberg/pull/82730)).
+
 ## 7.6.0 (2026-10-07)
 
 ## 7.5.0 (2026-09-23)

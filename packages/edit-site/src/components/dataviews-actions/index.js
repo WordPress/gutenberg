@@ -37,7 +37,8 @@ export const useQuickEditPostAction = () => {
 	return useMemo(
 		() => ( {
 			id: 'quick-edit',
-			label: __( 'Quick Edit' ),
+			label: ( items ) =>
+				items.length > 1 ? __( 'Bulk edit' ) : __( 'Quick Edit' ),
 			icon: drawerRight,
 			isPrimary: true,
 			supportsBulk: true,

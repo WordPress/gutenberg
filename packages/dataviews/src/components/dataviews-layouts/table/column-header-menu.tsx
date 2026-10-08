@@ -3,8 +3,9 @@ import { __, isRTL } from '@wordpress/i18n';
 import { arrowLeft, arrowRight, unseen, funnel } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 import { forwardRef, Children, Fragment, useContext } from '@wordpress/element';
+import { inertValue } from '@wordpress/react-inert-value';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Menu } from '@wordpress/ui';
+import { Menu, VisuallyHidden } from '@wordpress/ui';
 import { SORTING_DIRECTIONS, sortArrows, sortLabels } from '../../../constants';
 import type {
 	NormalizedField,
@@ -24,6 +25,7 @@ interface HeaderMenuProps< Item > {
 	onChangeView: ( view: ViewTableType | ViewPickerTableType ) => void;
 	onHide: ( field: NormalizedField< Item > ) => void;
 	setOpenedFilter: ( fieldId: string ) => void;
+	isCovered?: boolean;
 	canMove?: boolean;
 	canInsertLeft?: boolean;
 	canInsertRight?: boolean;
@@ -48,6 +50,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 		onChangeView,
 		onHide,
 		setOpenedFilter,
+		isCovered = false,
 		canMove = true,
 		canInsertLeft = true,
 		canInsertRight = true,
@@ -87,7 +90,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 		! field.filterBy?.isPrimary;
 
 	if ( ! isSortable && ! canMove && ! isHidable && ! canAddFilter ) {
-		return header;
+		return isCovered ? <VisuallyHidden>{ header }</VisuallyHidden> : header;
 	}
 
 	// Operate on the rendered columns rather than the raw `view.fields`, so an
@@ -105,6 +108,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 
 	return (
 		<Menu.Root>
+			{ isCovered && <VisuallyHidden>{ header }</VisuallyHidden> }
 			<Menu.Trigger
 				render={
 					<Button
@@ -112,6 +116,8 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 						className="dataviews-view-table-header-button"
 						ref={ ref }
 						variant="tertiary"
+						aria-hidden={ isCovered || undefined }
+						inert={ inertValue( isCovered ) }
 					/>
 				}
 			>

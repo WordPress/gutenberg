@@ -89,8 +89,7 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 								align="center"
 								gap="sm"
 							>
-								<DataViews.BulkActionToolbar />
-								<DataViews.Pagination />
+								<DataViews.Footer />
 							</Stack>
 						</Card.Content>
 					</Card.Root>
@@ -113,7 +112,7 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
  *   - `<DataViews.Pagination />` - Page navigation
  *   - `<DataViews.ViewConfig />` - View settings (columns, density, etc.)
  *   - `<DataViews.LayoutSwitcher />` - Switch between table/grid/list views
- *   - `<DataViews.BulkActionToolbar />` - Actions for selected items
+ *   - `<DataViews.Footer />` - Item count and pagination
  *   - `<DataViews.Layout />` - The data display (table, grid, etc.)
  *
  * This pattern is useful when you need full control over the UI layout

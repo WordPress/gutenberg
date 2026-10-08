@@ -100,6 +100,7 @@
 		"@testing-library/react": "^16.3.3",
 		"@testing-library/user-event": "^14.6.1",
 		"@types/node": "^24.13.3",
+		"@wordpress/theme": "file:../theme",
 		"esbuild": "^0.27.2",
 		"storybook": "^10.6.1",
 		"vitest": "^5.0.3",

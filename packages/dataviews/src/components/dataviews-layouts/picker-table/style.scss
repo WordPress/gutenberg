@@ -25,13 +25,8 @@
 	}
 
 	.dataviews-selection-checkbox {
-		// Added specificity to override table styles.
-		.components-checkbox-control__input.components-checkbox-control__input {
-			// When the dataview is used as a picker, ensure the checkbox can't be clicked on.
-			// Only the row itself is clickable.
-			pointer-events: none;
-			opacity: 1;
-		}
+		// The row owns selection in picker mode.
+		pointer-events: none;
 	}
 
 	// When used in picker context, ensure row selection works as expected
