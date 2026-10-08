@@ -260,6 +260,35 @@ describe( 'Multi-entity save flow', () => {
 			await page.click( entitiesSaveSelector );
 		};
 
+		/*
+		 * The block inspector shows Settings and Styles tabs when the Settings
+		 * tab has controls to show, and then opens on the Settings tab. The font
+		 * size picker is on the Styles tab, so switch to it when the tabs are
+		 * there.
+		 */
+		const showFontSizePicker = async () => {
+			const fontSizePickerSelector =
+				'.components-font-size-picker__controls';
+			const stylesTabSelector =
+				'.block-editor-block-inspector__tabs button[role="tab"][aria-label="Styles"]';
+
+			await page.waitForSelector(
+				`${ fontSizePickerSelector }, ${ stylesTabSelector }`
+			);
+
+			if ( await page.$( stylesTabSelector ) ) {
+				const isStylesTabSelected = await page.$eval(
+					stylesTabSelector,
+					( tab ) => tab.getAttribute( 'aria-selected' ) === 'true'
+				);
+				if ( ! isStylesTabSelected ) {
+					await page.click( stylesTabSelector );
+				}
+			}
+
+			await page.waitForSelector( fontSizePickerSelector );
+		};
+
 		it( 'Save flow should work as expected', async () => {
 			// Navigate to site editor.
 			await visitSiteEditor( {
@@ -315,9 +344,7 @@ describe( 'Multi-entity save flow', () => {
 			await page.click( 'button[aria-label="Settings"]' );
 
 			// Wait for the font size picker controls.
-			await page.waitForSelector(
-				'.components-font-size-picker__controls'
-			);
+			await showFontSizePicker();
 
 			// Change the font size.
 			await page.click(
@@ -326,6 +353,9 @@ describe( 'Multi-entity save flow', () => {
 
 			// Save all changes.
 			await saveAllChanges();
+
+			// The picker should still be showing after saving.
+			await showFontSizePicker();
 
 			// Change the font size.
 			await page.click(
