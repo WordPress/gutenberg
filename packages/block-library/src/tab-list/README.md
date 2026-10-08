@@ -29,6 +29,10 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`ariaLabel`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#arialabel): `true`
 - [`visibility`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
 - [`lock`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#lock): `false`
+- [`background`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#background):
+  - `backgroundImage`: `true`
+  - `backgroundSize`: `true`
+  - `gradient`: `true`
 - [`color`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color):
   - [`background`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
   - [`text`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-text): `true`
@@ -42,6 +46,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `padding`: `true`
   - `blockGap`: `true`
+- [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
 
 ## Context
 
@@ -55,7 +60,9 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
 
+- **background**: `.wp-block-tab-list button`
 - **border**: `.wp-block-tab-list button`
+- **shadow**: `.wp-block-tab-list button`
 - **color**:
   - background: `.wp-block-tab-list button`
   - text: `.wp-block-tab-list button`
