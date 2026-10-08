@@ -169,4 +169,20 @@ class Tests_Blocks_Render_Post_Navigation_Link extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'style=', $output );
 		$this->assertStringNotContainsString( 'has-border-color', $output );
 	}
+
+	public function test_rendered_link_full_support_classes_and_styles() {
+		$output = $this->render_block( self::$second_post_id, $this->styled_attributes() );
+
+		$processor = new WP_HTML_Tag_Processor( $output );
+		$processor->next_tag( 'div' );
+
+		$this->assertSame(
+			'post-navigation-link-previous has-border-color has-accent-2-border-color wp-block-post-navigation-link',
+			$processor->get_attribute( 'class' )
+		);
+		$this->assertSame(
+			'border-style:dashed;border-width:3px;box-shadow:10px 10px 5px #000000;padding-top:20px;margin-top:30px',
+			$processor->get_attribute( 'style' )
+		);
+	}
 }
