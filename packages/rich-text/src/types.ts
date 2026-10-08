@@ -60,7 +60,7 @@ export type FormatType = {
 	/**
 	 * A class to match the format.
 	 */
-	className?: string | null;
+	className: string | null;
 	/**
 	 * Name of the format.
 	 */
@@ -69,7 +69,7 @@ export type FormatType = {
 	 * Should return a component for the user to interact with the new
 	 * registered format.
 	 */
-	edit: Function;
+	edit?: Function;
 	keywords?: string[];
 	attributes?: Record< string, string >;
 	contentEditable?: boolean;

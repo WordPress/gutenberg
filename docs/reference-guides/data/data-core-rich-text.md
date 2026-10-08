@@ -46,7 +46,7 @@ _Parameters_
 
 _Returns_
 
-- Format type.
+- `FormatType | undefined`: Format type.
 
 ### getFormatTypeForBareElement
 

@@ -1,5 +1,5 @@
 import { createSelector } from '@wordpress/data';
-import type { State } from '../types';
+import type { FormatType, State } from '../types';
 
 /**
  * Returns all the available format types.
@@ -75,7 +75,10 @@ export const getFormatTypes = createSelector(
  *
  * @return Format type.
  */
-export function getFormatType( state: State, name: string ) {
+export function getFormatType(
+	state: State,
+	name: string
+): FormatType | undefined {
 	return state.formatTypes[ name ];
 }
 
