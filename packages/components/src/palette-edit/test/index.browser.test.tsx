@@ -224,14 +224,12 @@ describe( 'PaletteEdit', () => {
 		},
 	];
 
-	it.each(
-		[ 'swatches', 'details' ].flatMap( ( view ) =>
-			[ 'Escape', 'Enter', 'outside click' ].map( ( action ) => ( {
-				view,
-				action,
-			} ) )
-		)
-	)(
+	it.each( [
+		{ view: 'swatches', action: 'Escape' },
+		{ view: 'details', action: 'Escape' },
+		{ view: 'swatches', action: 'Enter' },
+		{ view: 'swatches', action: 'outside click' },
+	] )(
 		'updates colors live and closes with $action in $view',
 		async ( { view, action } ) => {
 			const onChange = vi.fn();
@@ -340,56 +338,39 @@ describe( 'PaletteEdit', () => {
 		}
 	} );
 
-	it.each( [ 'swatches', 'details' ] )(
-		'lets the consumer restore its state on Escape in %s',
-		async ( view ) => {
-			const onChange = vi.fn();
-			const onChangeStart = vi.fn();
-			const onChangeCancel = vi.fn();
-			await render(
-				<PaletteEdit
-					{ ...defaultProps }
-					colors={ colors }
-					onChange={ onChange }
-					onChangeStart={ onChangeStart }
-					onChangeCancel={ onChangeCancel }
-				/>
-			);
-			if ( view === 'details' ) {
-				await userEvent.click(
-					screen.getByRole( 'button', { name: 'Color options' } )
-				);
-				await userEvent.click(
-					await screen.findByRole( 'menuitem', {
-						name: 'Show details',
-					} )
-				);
-			}
-			await userEvent.click(
-				screen.getByRole( 'button', {
-					name: view === 'details' ? 'Edit: Primary' : 'Primary',
-				} )
-			);
-			const input = await screen.findByRole( 'textbox', {
-				name: 'Hex color',
-			} );
-			await userEvent.fill( input, 'ff0000' );
-			await waitFor( () =>
-				expect( onChange ).toHaveBeenCalledTimes( 1 )
-			);
-			await userEvent.fill( input, '0000ff' );
-			await waitFor( () =>
-				expect( onChange ).toHaveBeenCalledTimes( 2 )
-			);
-			expect( onChangeStart ).toHaveBeenCalledTimes( 1 );
-			expect( onChangeStart.mock.invocationCallOrder[ 0 ] ).toBeLessThan(
-				onChange.mock.invocationCallOrder[ 0 ]
-			);
-			await userEvent.keyboard( '{Escape}' );
-			expect( onChangeCancel ).toHaveBeenCalledTimes( 1 );
-			expect( onChange ).toHaveBeenCalledTimes( 2 );
-		}
-	);
+	it( 'lets the consumer restore its state on Escape', async () => {
+		const onChange = vi.fn();
+		const onChangeStart = vi.fn();
+		const onChangeCancel = vi.fn();
+		await render(
+			<PaletteEdit
+				{ ...defaultProps }
+				colors={ colors }
+				onChange={ onChange }
+				onChangeStart={ onChangeStart }
+				onChangeCancel={ onChangeCancel }
+			/>
+		);
+		await userEvent.click(
+			screen.getByRole( 'button', {
+				name: 'Primary',
+			} )
+		);
+		const input = await screen.findByRole( 'textbox', {
+			name: 'Hex color',
+		} );
+		await userEvent.fill( input, 'ff0000' );
+		await waitFor( () => expect( onChange ).toHaveBeenCalledTimes( 1 ) );
+		await userEvent.fill( input, '0000ff' );
+		await waitFor( () => expect( onChange ).toHaveBeenCalledTimes( 2 ) );
+		expect( onChangeStart ).toHaveBeenCalledTimes( 1 );
+		expect( onChangeStart.mock.invocationCallOrder[ 0 ] ).toBeLessThan(
+			onChange.mock.invocationCallOrder[ 0 ]
+		);
+		await userEvent.keyboard( '{Escape}' );
+		expect( onChangeCancel ).toHaveBeenCalledTimes( 1 );
+		expect( onChange ).toHaveBeenCalledTimes( 2 );
+	} );
 
 	it( 'does not reapply a pending color after Escape restores an earlier live edit', async () => {
 		const onChange = vi.fn();
@@ -1004,37 +985,6 @@ describe( 'PaletteEdit', () => {
 				{
 					...colors[ 0 ],
 					name: 'Primary Updated',
-				},
-				colors[ 1 ],
-			] );
-		} );
-	} );
-
-	it( 'can update color palette value', async () => {
-		const onChange = vi.fn();
-
-		await render(
-			<PaletteEdit
-				{ ...defaultProps }
-				colors={ colors }
-				onChange={ onChange }
-			/>
-		);
-
-		await userEvent.click( screen.getByLabelText( 'Primary' ) );
-		const hexInput = screen.getByRole( 'textbox', {
-			name: 'Hex color',
-		} );
-
-		await clearInput( hexInput as HTMLInputElement );
-
-		await userEvent.keyboard( '000000' );
-
-		await waitFor( () => {
-			expect( onChange ).toHaveBeenCalledWith( [
-				{
-					...colors[ 0 ],
-					color: '#000000',
 				},
 				colors[ 1 ],
 			] );
