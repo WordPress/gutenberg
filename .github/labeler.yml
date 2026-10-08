@@ -127,6 +127,7 @@
 '[Package] Fields':
     - changed-files:
           - any-glob-to-any-file: 'packages/fields/**'
+          - any-glob-to-any-file: 'packages/fields-loader/**'
 
 '[Package] Format library':
     - changed-files:

@@ -2490,6 +2490,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/fields-loader",
+		"slug": "packages-fields-loader",
+		"markdown_source": "../packages/fields-loader/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/fields",
 		"slug": "packages-fields",
 		"markdown_source": "../packages/fields/README.md",

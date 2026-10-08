@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the `getFieldsConfig( kind, name )` selector, which fetches the fields registered on the server for an entity from the `/wp/v2/fields` route, and the `FieldsConfig` type ([#84323](https://github.com/WordPress/gutenberg/pull/84323)).
+
 ## 8.2.0 (2026-10-07)
 
 ### Enhancements
