@@ -4,7 +4,7 @@
 
 ### Internal
 
--   Move block breadcrumb styles to the block-editor package.
+-   Move footer-specific block breadcrumb styles to the editor and edit-widgets packages.
 
 ## 10.3.0 (2026-10-07)
 
