@@ -1224,3 +1224,19 @@ export const getViewConfig =
 		} );
 		dispatch.receiveViewConfig( kind, name, config );
 	};
+
+/**
+ * Requests the fields registered on the server for a given entity from the
+ * REST API.
+ *
+ * @param {string} kind Entity kind.
+ * @param {string} name Entity name.
+ */
+export const getFieldsConfig =
+	( kind, name ) =>
+	async ( { dispatch } ) => {
+		const config = await apiFetch( {
+			path: addQueryArgs( '/wp/v2/fields', { kind, name } ),
+		} );
+		dispatch.receiveFieldsConfig( kind, name, config );
+	};
