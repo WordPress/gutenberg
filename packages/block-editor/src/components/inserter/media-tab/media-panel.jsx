@@ -5,7 +5,7 @@ import MediaGrid from './media-grid';
 import { useMediaResults } from './hooks';
 import { useMediaInsert } from './use-media-insert';
 import { useAttachmentActions } from './use-attachment-actions';
-import AttachImagesButton from './attach-images-button';
+import MediaLibraryButton from './media-library-button';
 import InsertExternalImageModal from './insert-external-image-modal';
 import { getBlockAndPreviewFromMedia, getItemId } from './utils';
 import InserterNoResults from '../no-results';
@@ -13,6 +13,9 @@ import InserterNoResults from '../no-results';
 // Four rows at the grid's two columns: roughly one screen of the open panel,
 // so a page is browsed with little scrolling and the pager does the rest.
 const MEDIA_ITEMS_PER_PAGE = 8;
+
+// The attach flow is image-only, so the picker is constrained to images.
+const ATTACH_ALLOWED_TYPES = [ 'image' ];
 
 export function MediaCategoryPanel( {
 	onInsert,
@@ -127,7 +130,16 @@ export function MediaCategoryPanel( {
 				// footer action, in place of the shared one.
 				footer={
 					attach ? (
-						<AttachImagesButton onSelect={ handleAttach } />
+						<MediaLibraryButton
+							label={ __( 'Attach images' ) }
+							title={ __( 'Attach images' ) }
+							onSelect={ handleAttach }
+							// Purely additive: the picker opens with nothing
+							// preselected, so it never implies that deselecting
+							// would detach. Detaching is a per-item action.
+							multiple="add"
+							allowedTypes={ ATTACH_ALLOWED_TYPES }
+						/>
 					) : (
 						footer
 					)

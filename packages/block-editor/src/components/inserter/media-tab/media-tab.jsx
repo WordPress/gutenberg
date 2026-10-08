@@ -1,9 +1,12 @@
+import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
 import { useMediaCategories } from './hooks';
 import { getBlockAndPreviewFromMedia } from './utils';
 import MediaBrowser from './media-browser';
-import OpenMediaLibraryButton from './open-media-library-button';
+import MediaLibraryButton from './media-library-button';
 import InserterNoResults from '../no-results';
+
+const ALLOWED_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
 
 function MediaTab( { rootClientId, onInsert } ) {
 	const mediaCategories = useMediaCategories( rootClientId );
@@ -40,7 +43,13 @@ function MediaTab( { rootClientId, onInsert } ) {
 		<MediaBrowser
 			categories={ categories }
 			onInsert={ onInsert }
-			footer={ <OpenMediaLibraryButton onSelect={ onSelectMedia } /> }
+			footer={
+				<MediaLibraryButton
+					label={ __( 'Open Media Library' ) }
+					onSelect={ onSelectMedia }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+				/>
+			}
 		/>
 	);
 }
