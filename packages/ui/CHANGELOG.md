@@ -10,6 +10,10 @@
 
 -   `Menu`, `Popover`: Keep popups open when the user interacts with an iframe inside the popup. ([#83870](https://github.com/WordPress/gutenberg/pull/83870))
 
+### Enhancements
+
+-   `Menu`, `Select`, `Combobox`, `Autocomplete`, and searchable select controls: Use neutral highlights and a zero-offset ring for keyboard-focused items. Keep open submenu parents highlighted with the same neutral colors. ([#84087](https://github.com/WordPress/gutenberg/pull/84087))
+
 ## 0.24.0 (2026-10-07)
 
 ### Breaking Changes

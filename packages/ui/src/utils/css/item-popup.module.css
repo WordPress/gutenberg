@@ -165,30 +165,39 @@
 			}
 
 			&[data-highlighted]:not([aria-disabled="true"]) {
-				background-color: var(--wpds-color-background-interactive-brand-weak-active);
-				color: var(--wpds-color-foreground-interactive-neutral);
+				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+				color: var(--wpds-color-foreground-interactive-neutral-active);
 				outline: none; /* Disable user agent focus ring */
 
-				/*
-				 * Set the outline through the global CSS defense bridge, since
-				 * wp-admin's unlayered `div { outline: 0 }` beats layered styles.
-				 */
 				@media ( forced-colors: active ) {
-					--_gcd-div-outline: var(--wpds-border-width-focus) solid Highlight;
+					forced-color-adjust: none;
+					background-color: Highlight;
+					color: HighlightText;
 				}
 			}
 
 			&[aria-disabled="true"] {
-				/* Background is brand-toned (see `[data-highlighted]` above); the
-				   foreground text stays neutral in every state. The disabled
-				   background currently resolves to transparent, but referencing the
-				   token keeps it in sync if its value ever changes. */
-				background-color: var(--wpds-color-background-interactive-brand-weak-disabled);
+				background-color: var(--wpds-color-background-interactive-neutral-weak-disabled);
 				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
 				@media ( forced-colors: active ) {
 					color: GrayText;
 				}
+			}
+		}
+
+		.popup:not([data-pointer-highlight]) .item[data-highlighted]:focus-visible,
+		.item[data-highlighted][data-keyboard-highlight] {
+			/* Keep the ring visible above adjacent rows and wp-admin's resets. */
+			--_gcd-div-outline: var(--wpds-border-width-focus) solid var(--focus-color, var(--wpds-color-stroke-focus));
+
+			position: relative;
+			z-index: 1;
+			outline-offset: 0;
+
+			@media ( forced-colors: active ) {
+				--_gcd-div-outline: var(--wpds-border-width-focus) solid Highlight;
+				--_gcd-a-outline: var(--wpds-border-width-focus) solid Highlight;
 			}
 		}
 
@@ -227,6 +236,8 @@
 
 		.item[data-highlighted]:not([aria-disabled="true"]) .item-description,
 		.item[aria-disabled="true"] .item-description {
+			--_gcd-heading-color: currentColor;
+
 			color: inherit;
 		}
 

@@ -176,38 +176,65 @@
 			}
 
 			&[data-popup-open]:not([data-disabled]) {
+				--_gcd-a-color: var(--wpds-color-foreground-interactive-neutral-active);
+
 				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+				color: var(--wpds-color-foreground-interactive-neutral-active);
 
 				@media ( forced-colors: active ) {
 					--_gcd-div-outline: var(--wpds-border-width-xs) solid GrayText;
 					--_gcd-a-outline: var(--wpds-border-width-xs) solid GrayText;
+					--_gcd-a-color: HighlightText;
+
+					forced-color-adjust: none;
+					background-color: Highlight;
+					color: HighlightText;
 				}
 			}
 
 			&[data-highlighted]:not([aria-disabled="true"]) {
-				background-color: var(--wpds-color-background-interactive-brand-weak-active);
-				color: var(--wpds-color-foreground-interactive-neutral);
+				--_gcd-a-color: var(--wpds-color-foreground-interactive-neutral-active);
+
+				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+				color: var(--wpds-color-foreground-interactive-neutral-active);
 				outline: none;
 
-				/*
-				 * Set the outline through the global CSS defense bridge, since
-				 * wp-admin's unlayered `div { outline: 0 }` beats layered styles.
-				 */
 				@media ( forced-colors: active ) {
-					--_gcd-div-outline: var(--wpds-border-width-focus) solid Highlight;
-					--_gcd-a-outline: var(--wpds-border-width-focus) solid Highlight;
+					--_gcd-a-color: HighlightText;
+
+					forced-color-adjust: none;
+					background-color: Highlight;
+					color: HighlightText;
 				}
 			}
 
 			&[aria-disabled="true"] {
-				background-color: var(--wpds-color-background-interactive-brand-weak-disabled);
+				--_gcd-a-color: var(--wpds-color-foreground-interactive-neutral-disabled);
+
+				background-color: var(--wpds-color-background-interactive-neutral-weak-disabled);
 				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
 				@media ( forced-colors: active ) {
+					--_gcd-a-color: GrayText;
+
 					color: GrayText;
 				}
 			}
+		}
 
+		.popup:not([data-pointer-highlight]) .item[data-highlighted]:focus-visible {
+			/* Keep the ring visible above adjacent rows and wp-admin's resets. */
+			--_gcd-div-outline: var(--wpds-border-width-focus) solid var(--focus-color, var(--wpds-color-stroke-focus));
+			--_gcd-a-outline: var(--wpds-border-width-focus) solid var(--focus-color, var(--wpds-color-stroke-focus));
+
+			position: relative;
+			z-index: 1;
+			outline-offset: 0;
+
+			@media ( forced-colors: active ) {
+				--_gcd-div-outline: var(--wpds-border-width-focus) solid Highlight;
+				--_gcd-a-outline: var(--wpds-border-width-focus) solid Highlight;
+			}
 		}
 
 		/*
@@ -381,6 +408,10 @@
 			content: "\2196";
 		}
 
+		.item[data-popup-open]:not([data-disabled]) .item-description,
+		.item[data-popup-open]:not([data-disabled]) .item-suffix,
+		.item[data-popup-open]:not([data-disabled]) .item-shortcut,
+		.item[data-popup-open]:not([data-disabled]) .item-trailing,
 		.item[data-highlighted]:not([aria-disabled="true"]) .item-description,
 		.item[data-highlighted]:not([aria-disabled="true"]) .item-suffix,
 		.item[data-highlighted]:not([aria-disabled="true"]) .item-shortcut,

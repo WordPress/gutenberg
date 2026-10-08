@@ -2,9 +2,12 @@
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 @use "../utils/theme-variables" as *;
+@use "../utils/composite-item";
 
 .components-menu-item__button,
 .components-menu-item__button.components-button {
+	@include composite-item.menu-item;
+
 	width: 100%;
 	font-weight: var(--wpds-typography-font-weight-default);
 
