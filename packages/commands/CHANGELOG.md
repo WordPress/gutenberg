@@ -10,10 +10,6 @@
 
 -   The package now bundles TypeScript types ([#84315](https://github.com/WordPress/gutenberg/pull/84315)).
 
-### Internal
-
--   Refactor to TypeScript ([#84315](https://github.com/WordPress/gutenberg/pull/84315)).
-
 ## 1.57.0 (2026-10-07)
 
 ## 1.56.0 (2026-09-23)
