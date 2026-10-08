@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Bug Fixes
+
+-   `Menu`, `Popover`: Keep popups open when the user interacts with an iframe inside the popup. ([#83870](https://github.com/WordPress/gutenberg/pull/83870))
+
 ## 0.24.0 (2026-10-07)
 
 ### Breaking Changes
@@ -40,6 +48,8 @@
 -   `Autocomplete`, `Combobox`, `SearchableSelect`, `SearchableChipSelect`, `SearchableSelectControl`, and `SearchableChipSelectControl` add `ItemLabel` and `ItemDescription` subcomponents. Searchable selection items also accept an optional `description` string ([#83493](https://github.com/WordPress/gutenberg/pull/83493)).
 
 ### Bug Fixes
+
+-   `SearchableChipSelect`, `SearchableChipSelectControl`: Preserve selected chips when pressing Escape in an empty search field ([#84172](https://github.com/WordPress/gutenberg/pull/84172)).
 
 -   `VisuallyHidden`: Move hiding styles outside CSS cascade layers to prevent overrides by global element styles ([#84114](https://github.com/WordPress/gutenberg/pull/84114)).
 -   `Combobox.Root`: Preserve separate item and selected-value types for collections, including filtering callbacks ([#84094](https://github.com/WordPress/gutenberg/pull/84094)).
