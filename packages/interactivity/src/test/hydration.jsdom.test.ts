@@ -122,7 +122,7 @@ describe( 'hydrateRegions', () => {
 		const markOwner = vi.fn();
 		store( namespace, {
 			state: {
-				/** Leaves the owning island's fallback unchanged. */
+				/** Empties the owning island's HTML content during hydration. */
 				html: null,
 			},
 			actions: {
