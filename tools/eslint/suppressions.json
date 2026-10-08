@@ -4750,11 +4750,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/date-time/date-time/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/date-time/time-picker/styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
