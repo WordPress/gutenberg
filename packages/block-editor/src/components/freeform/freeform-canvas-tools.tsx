@@ -33,6 +33,7 @@ export default function FreeformCanvasTools() {
 			const {
 				getSelectedBlockClientIds,
 				getBlockParents,
+				getSectionRootClientId,
 				getBlockAttributes,
 				getBlockName,
 				getBlockEditingMode,
