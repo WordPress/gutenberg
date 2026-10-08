@@ -4720,11 +4720,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/color-picker/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/context/test/context-system-provider.jsdom.test.tsx": {
 		"no-restricted-imports": {
 			"count": 1
@@ -4740,17 +4735,7 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/custom-select-control-v2/styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
 	"packages/components/src/date-time/date-picker/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/components/src/date-time/date-time/styles.ts": {
 		"no-restricted-imports": {
 			"count": 1
 		}

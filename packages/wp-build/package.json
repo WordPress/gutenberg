@@ -22,6 +22,13 @@
 	"engines": {
 		"node": ">=20.10.0"
 	},
+	"files": [
+		"eslint-overrides.cjs",
+		"lib",
+		"templates",
+		"*.md",
+		"!**/test/**"
+	],
 	"type": "module",
 	"module": "./lib/build.mjs",
 	"exports": {

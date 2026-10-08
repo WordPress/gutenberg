@@ -5,20 +5,6 @@ import semver from 'semver';
 import execa from 'execa';
 
 /**
- * Options for lazy importing a package.
- */
-export interface LazyImportOptions {
-	/**
-	 * Path to the local directory or file.
-	 */
-	localPath?: string;
-	/**
-	 *
-	 * Callback to invoke when install starts.
-	 */
-	onInstall?: () => void;
-}
-/**
  * Returns an md5 hash of the given string.
  *
  * @param text Text for which to generate hash.
@@ -67,9 +53,9 @@ async function install( arg: string, alias: string ): Promise< void > {
  *
  * @return  Promise resolving to required module.
  */
-export async function lazyImport(
+async function lazyImport(
 	arg: string,
-	options: Partial< LazyImportOptions > = {}
+	options: Partial< lazyImport.LazyImportOptions > = {}
 ): Promise< NodeRequire > {
 	const { localPath = '' } = options;
 	const { rawSpec, name } = npmPackageArg( arg );
@@ -145,4 +131,21 @@ export async function lazyImport(
 	return require( join( localModule, localPath ) );
 }
 
-export default lazyImport;
+// `require( '@wordpress/lazy-import' )` has always returned the function itself.
+declare namespace lazyImport {
+	/**
+	 * Options for lazy importing a package.
+	 */
+	export interface LazyImportOptions {
+		/**
+		 * Path to the local directory or file.
+		 */
+		localPath?: string;
+		/**
+		 * Callback to invoke when install starts.
+		 */
+		onInstall?: () => void;
+	}
+}
+
+export = lazyImport;
