@@ -4,14 +4,20 @@ import { settings } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
 import { Menu } from '@wordpress/ui';
 
+/**
+ * One entry in the menu. Deliberately not a category: "Media library" stands
+ * for the `images`, `videos` and `audio` categories together, which the tab
+ * offers as media-type tabs, while every other source maps to a single
+ * registered `InserterMediaCategory`.
+ */
 export type MediaSource = {
 	name: string;
 	label: string;
 };
 
 /**
- * Picks which source the tab browses: the media library, the post's
- * attachments, or any other registered category such as Openverse.
+ * Picks which source the tab browses: the media library, the post's attached
+ * images, or any other registered category such as Openverse.
  */
 export default function SourceMenu( {
 	sources,
