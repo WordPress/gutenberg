@@ -38,7 +38,7 @@ import { getGrownCanvasLayout } from './canvases';
 import {
 	canDissolveIntoCanvas,
 	getLayoutSupport,
-	isArrangedContainer,
+	isAbsorbable,
 	planSectionFlatten,
 } from './flatten';
 
@@ -437,20 +437,35 @@ export default function FreeformCanvas( {
 		[ writeLayouts ]
 	);
 
-	// Whether a block is one cell of a grid of containers — a column. Asked at
+	// Whether the canvas dissolves a block rather than placing it. Asked at
 	// event time rather than subscribed to, because it is only ever needed to
 	// answer where a press landed.
-	const isCell = useCallback(
+	//
+	// A press has to resolve to a block that will still be there once the
+	// canvas has absorbed what it absorbs. Without this a press inside a
+	// column picked up the Columns, or the wrapper Group inside it — and the
+	// first drag then dissolved the very block being dragged, so the section
+	// converted and nothing moved.
+	const isAbsorbed = useCallback(
 		( clientId ) => {
 			if ( ! clientId ) {
 				return false;
 			}
-			const { getBlockName, getBlockRootClientId } =
+			const { getBlock, getBlockName, getBlockRootClientId } =
 				registry.select( blockEditorStore );
 			const root = getBlockRootClientId( clientId );
-			return isArrangedContainer(
-				getLayoutSupport( getBlockName( clientId ) ),
-				root ? getLayoutSupport( getBlockName( root ) ) : undefined
+			if ( ! root ) {
+				// A section is the canvas, never something it swallows.
+				return false;
+			}
+			const block = getBlock( clientId );
+			return (
+				!! block &&
+				isAbsorbable(
+					block,
+					{ name: getBlockName( root ) },
+					getLayoutSupport
+				)
 			);
 		},
 		[ registry ]
@@ -675,7 +690,7 @@ export default function FreeformCanvas( {
 			const clientId = getCanvasChild(
 				event.target,
 				canvasElement,
-				isCell
+				isAbsorbed
 			);
 			// Already typing in this block: the caret and the selection are
 			// the browser's business.
@@ -695,7 +710,7 @@ export default function FreeformCanvas( {
 		canvasElement.addEventListener( 'pointerdown', onPointerDown );
 		return () =>
 			canvasElement.removeEventListener( 'pointerdown', onPointerDown );
-	}, [ canvasElement, enteredClientId, selectedClientIds, isCell ] );
+	}, [ canvasElement, enteredClientId, selectedClientIds, isAbsorbed ] );
 
 	// The gesture is followed on the document so it survives the pointer
 	// leaving the block it started on.

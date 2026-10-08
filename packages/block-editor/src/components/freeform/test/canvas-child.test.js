@@ -48,58 +48,51 @@ describe( 'getCanvasChild', () => {
 	} );
 } );
 
-describe( 'getCanvasChild, stepping over a grid of containers', () => {
+describe( 'getCanvasChild, stepping over what the canvas absorbs', () => {
 	const canvas = el( 'canvas', null );
-	// A Columns in the section, with two columns in it.
+	// A Columns in the section, with a bare wrapper Group in one column and a
+	// padded card in the other. The canvas absorbs the Columns, the columns
+	// and the bare wrapper; the card stays a box.
 	const columns = el( 'columns', canvas );
 	const columnOne = el( 'column-1', columns );
 	const columnTwo = el( 'column-2', columns );
-	const isCell = ( clientId ) =>
-		clientId === 'column-1' || clientId === 'column-2';
+	const ABSORBED = [ 'columns', 'column-1', 'column-2', 'wrapper' ];
+	const isAbsorbed = ( clientId ) => ABSORBED.includes( clientId );
 
 	it( 'picks up the item in the column, not the Columns around it', () => {
 		// Without this a press inside a column would pick up the whole
-		// Columns block — which is the very block the first drag dissolves.
-		const item = el( 'item', columnTwo );
-
-		expect( getCanvasChild( item, canvas, isCell ) ).toBe( 'item' );
+		// Columns block — the very block the first drag dissolves.
+		expect(
+			getCanvasChild( el( 'item', columnTwo ), canvas, isAbsorbed )
+		).toBe( 'item' );
 	} );
 
-	it( 'picks up the item from a press deep inside it', () => {
-		const item = el( 'item', columnOne );
-		const word = el( null, el( null, item ) );
+	it( 'reaches through a bare wrapper Group to the item inside it', () => {
+		const wrapper = el( 'wrapper', columnOne );
+		const word = el( null, el( null, el( 'heading', wrapper ) ) );
 
-		expect( getCanvasChild( word, canvas, isCell ) ).toBe( 'item' );
+		expect( getCanvasChild( word, canvas, isAbsorbed ) ).toBe( 'heading' );
 	} );
 
-	it( 'picks up a Group in a column whole', () => {
-		const group = el( 'group', columnOne );
+	it( 'picks up a card whole, from a press on the text inside it', () => {
+		// The card has styling of its own, so it is a box on the canvas and
+		// what is inside it travels with it.
+		const card = el( 'card', columnOne );
 
 		expect(
-			getCanvasChild( el( 'paragraph', group ), canvas, isCell )
-		).toBe( 'group' );
-	} );
-
-	it( 'steps over a Columns nested in a column too', () => {
-		const inner = el( 'inner-columns', columnOne );
-		const innerColumn = el( 'inner-column', inner );
-		const deep = el( 'deep', innerColumn );
-		const nestedIsCell = ( clientId ) =>
-			isCell( clientId ) || clientId === 'inner-column';
-
-		expect( getCanvasChild( deep, canvas, nestedIsCell ) ).toBe( 'deep' );
+			getCanvasChild( el( 'paragraph', card ), canvas, isAbsorbed )
+		).toBe( 'card' );
 	} );
 
 	it( 'still picks up a direct child of the section', () => {
-		expect( getCanvasChild( el( 'plain', canvas ), canvas, isCell ) ).toBe(
-			'plain'
-		);
+		expect(
+			getCanvasChild( el( 'plain', canvas ), canvas, isAbsorbed )
+		).toBe( 'plain' );
 	} );
 
 	it( 'picks up nothing from the empty part of a column', () => {
 		// There is no item there, and naming the column instead would pick up
-		// a block that the first drag is about to dissolve. So the press is
-		// left alone and no drag starts.
-		expect( getCanvasChild( columnOne, canvas, isCell ) ).toBeNull();
+		// a block the first drag is about to dissolve. So no drag starts.
+		expect( getCanvasChild( columnOne, canvas, isAbsorbed ) ).toBeNull();
 	} );
 } );

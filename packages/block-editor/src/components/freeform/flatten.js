@@ -17,11 +17,87 @@ export function getLayoutSupport( name ) {
 /**
  * Whether a section's canvas should absorb this block, for the real registry.
  *
- * @param {Object} block A block, with `name` and `innerBlocks`.
- * @return {boolean} Whether it is a grid inside the grid.
+ * @param {Object} block  A block, with `name`, `attributes` and `innerBlocks`.
+ * @param {Object} parent The block it sits in.
+ * @return {boolean} Whether the section absorbs it.
  */
-export function canDissolveIntoCanvas( block ) {
-	return isGridOfContainers( block, getLayoutSupport );
+export function canDissolveIntoCanvas( block, parent ) {
+	return isAbsorbable( block, parent, getLayoutSupport );
+}
+
+/**
+ * Whether a block carries styling you can see, rather than being scaffolding.
+ *
+ * This is what decides whether a nested container is absorbed into the
+ * section's canvas or kept as a box on it. A Group with a background, a border,
+ * padding, a minimum height or a shadow is something on the page: dissolving it
+ * would take a visible card away. A Group with none of those only exists to
+ * hold what is inside it, which the section can do itself.
+ *
+ * `blockGap` deliberately does not count. It spaces out what is inside the
+ * container and leaves no mark of its own, and conversion captures the
+ * positions it produced anyway, so absorbing such a container changes nothing
+ * on screen.
+ *
+ * A class name does not count either. Patterns add them freely and most carry
+ * nothing visual, so reading them as styling would keep almost every wrapper —
+ * at the cost of a class that really does paint something being missed.
+ *
+ * @param {Object} [attributes] A block's attributes.
+ * @return {boolean} Whether it has visible styling of its own.
+ */
+export function hasVisualStyling( attributes ) {
+	const style = attributes?.style ?? {};
+	return !! (
+		attributes?.backgroundColor ||
+		attributes?.gradient ||
+		attributes?.borderColor ||
+		style.color?.background ||
+		style.color?.gradient ||
+		style.background ||
+		style.border ||
+		style.spacing?.padding ||
+		style.dimensions?.minHeight ||
+		style.shadow ||
+		style.outline
+	);
+}
+
+/**
+ * Whether the section's canvas absorbs a block, dissolving it.
+ *
+ * A section is one canvas, so anything between it and the content that is only
+ * there to arrange things is absorbed, and the content inside comes out onto
+ * the canvas at the position it already had. Three kinds of block go:
+ *
+ * - A grid of containers — Columns — see `isGridOfContainers`.
+ * - A cell of one — a column — whatever it carries. A column exists only to put
+ *   things side by side, and that is the arrangement being replaced.
+ * - A container with no styling of its own: the bare wrapper Group that
+ *   patterns put around things. See `hasVisualStyling`.
+ *
+ * Everything else stays whole, as a block on the canvas: a Group with a
+ * background is a card, and a card is moved, not dismantled.
+ *
+ * @param {Object}   block      A block, with `name`, `attributes`,
+ *                              `innerBlocks`.
+ * @param {Object}   parent     The block it sits in.
+ * @param {Function} getSupport Reads a block type's `layout` support.
+ * @return {boolean} Whether the canvas absorbs it.
+ */
+export function isAbsorbable( block, parent, getSupport ) {
+	if ( ! canHoldACanvas( getSupport( block.name ) ) ) {
+		// Not a container blocks can be placed in — but it may be a grid of
+		// them, which is absorbed through its cells.
+		return isGridOfContainers( block, getSupport );
+	}
+
+	// A cell of a grid is scaffolding by definition, however it is styled.
+	if ( canArrangeChildren( getSupport( parent?.name ) ) ) {
+		return true;
+	}
+
+	return ! hasVisualStyling( block.attributes );
 }
 
 /**
@@ -103,8 +179,9 @@ export function isArrangedContainer( ownSupport, parentSupport ) {
  * those would all jump.
  *
  * @param {Object}   section     The section block, with `innerBlocks`.
- * @param {Function} canDissolve Whether a block is a grid inside the grid; see
- *                               `isGridOfContainers`.
+ * @param {Function} canDissolve Whether the canvas absorbs a block, given the
+ *                               block and the block it sits in; see
+ *                               `isAbsorbable`.
  * @return {{citizens: string[], wrappers: Object[]}} The section's children in
  *         the document order they should end up in, and one entry per wrapper
  *         to dissolve — its `clientId` to remove, and the `moves` that empty it
@@ -123,28 +200,29 @@ export function planSectionFlatten( section, canDissolve ) {
 	// actually sits in: a Columns nested in a column means those blocks come
 	// out of that inner column, not out of the outer one.
 	const descend = ( wrapper ) => {
-		for ( const container of wrapper.innerBlocks ?? [] ) {
-			for ( const child of container.innerBlocks ?? [] ) {
-				if ( canDissolve( child ) ) {
-					descend( child );
-					continue;
-				}
-				citizens.push( child.clientId );
-				const last = moves[ moves.length - 1 ];
-				if ( last?.fromRootClientId === container.clientId ) {
-					last.clientIds.push( child.clientId );
-				} else {
-					moves.push( {
-						clientIds: [ child.clientId ],
-						fromRootClientId: container.clientId,
-					} );
-				}
+		for ( const child of wrapper.innerBlocks ?? [] ) {
+			if ( canDissolve( child, wrapper ) ) {
+				descend( child );
+				continue;
+			}
+			citizens.push( child.clientId );
+			// Each set is recorded against the block it actually sits in,
+			// which is not always the wrapper the caller started from: a
+			// column's contents come out of that column.
+			const last = moves[ moves.length - 1 ];
+			if ( last?.fromRootClientId === wrapper.clientId ) {
+				last.clientIds.push( child.clientId );
+			} else {
+				moves.push( {
+					clientIds: [ child.clientId ],
+					fromRootClientId: wrapper.clientId,
+				} );
 			}
 		}
 	};
 
 	for ( const child of section.innerBlocks ?? [] ) {
-		if ( canDissolve( child ) ) {
+		if ( canDissolve( child, section ) ) {
 			moves = [];
 			descend( child );
 			wrappers.push( { clientId: child.clientId, moves } );

@@ -19,10 +19,7 @@ import {
 	getBlockRootClientId,
 	getBlockAttributes,
 } from './selectors';
-import {
-	getLayoutSupport,
-	isArrangedContainer,
-} from '../components/freeform/flatten';
+import { getLayoutSupport, isAbsorbable } from '../components/freeform/flatten';
 import {
 	checkAllowListRecursive,
 	getAllPatternsDependants,
@@ -1438,20 +1435,26 @@ export function isBlockFreeformLocked( state, clientId ) {
 		return false;
 	}
 
-	// Walk up to the canvas the block is placed on, stepping over the cells of
-	// a grid of containers. A block in a column is placed by the section, not
-	// by the column: the first drag dissolves the grid into the section, so it
-	// is the section's canvas that decides whether this block is editable.
+	// Walk up to the canvas the block is placed on, stepping over everything
+	// the canvas absorbs — the Columns, its columns, the bare wrapper Groups
+	// patterns leave behind. A block inside those is placed by the section, not
+	// by them: the first drag dissolves them into it.
+	//
+	// The walk never steps over a top-level block, however plain it is: that is
+	// the section, and the section is the canvas rather than something it
+	// swallows.
 	let rootClientId = state.blocks.parents.get( clientId );
-	while ( rootClientId && isCellOfAGrid( state, rootClientId ) ) {
-		// A cell's parent is the grid it belongs to, so both are stepped over
-		// together: neither of them places this block, the canvas beyond them
-		// does. Looping handles grids nested in grids.
-		rootClientId = state.blocks.parents.get(
-			state.blocks.parents.get( rootClientId )
-		);
+	while (
+		rootClientId &&
+		state.blocks.parents.get( rootClientId ) &&
+		isAbsorbedByCanvas( state, rootClientId )
+	) {
+		rootClientId = state.blocks.parents.get( rootClientId );
 	}
-	if ( ! rootClientId ) {
+	if ( ! rootClientId || state.blocks.parents.get( rootClientId ) ) {
+		// Nothing above it, or the walk stopped on a block the canvas keeps —
+		// a card. A card travels as one piece, so the words inside it are not
+		// the canvas's to hold still, and stay editable.
 		return false;
 	}
 
@@ -1461,22 +1464,26 @@ export function isBlockFreeformLocked( state, clientId ) {
 }
 
 /**
- * Whether a container is one cell of a grid of containers — a column.
+ * Whether the section's canvas dissolves a block rather than placing it.
  *
  * @param {Object} state    Editor state.
- * @param {string} clientId A container's client id.
+ * @param {string} clientId A block's client id.
  *
- * @return {boolean} Whether it is a cell rather than a canvas.
+ * @return {boolean} Whether the canvas absorbs it.
  */
-function isCellOfAGrid( state, clientId ) {
+function isAbsorbedByCanvas( state, clientId ) {
 	const parentClientId = state.blocks.parents.get( clientId );
-	return isArrangedContainer(
-		getLayoutSupport( state.blocks.byClientId.get( clientId )?.name ),
-		parentClientId
-			? getLayoutSupport(
-					state.blocks.byClientId.get( parentClientId )?.name
-				)
-			: undefined
+	const nameOf = ( id ) => state.blocks.byClientId.get( id )?.name;
+	return isAbsorbable(
+		{
+			name: nameOf( clientId ),
+			attributes: state.blocks.attributes.get( clientId ),
+			innerBlocks: getBlockOrder( state, clientId ).map( ( id ) => ( {
+				name: nameOf( id ),
+			} ) ),
+		},
+		{ name: parentClientId ? nameOf( parentClientId ) : undefined },
+		getLayoutSupport
 	);
 }
 

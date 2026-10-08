@@ -5,6 +5,11 @@ import { isBlockFreeformLocked } from '../private-selectors';
 const state = ( { parentLayout, entered = null } ) => ( {
 	blocks: {
 		parents: new Map( [ [ 'child', 'canvas' ] ] ),
+		order: new Map( [
+			[ '', [ 'canvas' ] ],
+			[ 'canvas', [ 'child' ] ],
+			[ 'child', [] ],
+		] ),
 		byClientId: new Map( [
 			[ 'canvas', { name: 'core/group' } ],
 			[ 'child', { name: 'core/paragraph' } ],
@@ -86,6 +91,16 @@ const treeState = ( nodes, entered = null ) => ( {
 		parents: new Map(
 			nodes.map( ( { clientId, parent } ) => [ clientId, parent ?? '' ] )
 		),
+		// `order` is how the real store answers "what is in this block", which
+		// the walk needs to tell a Columns from any other arranging block.
+		order: new Map(
+			nodes.map( ( { clientId } ) => [
+				clientId,
+				nodes
+					.filter( ( n ) => ( n.parent ?? '' ) === clientId )
+					.map( ( n ) => n.clientId ),
+			] )
+		),
 		byClientId: new Map(
 			nodes.map( ( { clientId, name } ) => [ clientId, { name } ] )
 		),
@@ -110,7 +125,7 @@ const inColumns = ( sectionLayout ) => [
 	{ clientId: 'item', name: 'core/paragraph', parent: 'col' },
 ];
 
-describe( 'isBlockFreeformLocked, through a grid of containers', () => {
+describe( 'isBlockFreeformLocked, through what the canvas absorbs', () => {
 	beforeAll( () => {
 		for ( const [ name, supports ] of Object.entries( TYPES ) ) {
 			registerBlockType( name, {
@@ -128,6 +143,8 @@ describe( 'isBlockFreeformLocked, through a grid of containers', () => {
 			unregisterBlockType( name );
 		}
 	} );
+
+	const PADDED = { style: { spacing: { padding: { top: '2rem' } } } };
 
 	it( 'locks an item in a column of a section that is a canvas', () => {
 		expect(
@@ -156,25 +173,68 @@ describe( 'isBlockFreeformLocked, through a grid of containers', () => {
 		).toBe( false );
 	} );
 
-	it( 'does not lock what is inside a Group on a canvas', () => {
-		// A Group is a canvas in its own right, not a cell: its contents are
-		// laid out by the Group and are not the section's to place, so they
-		// stay editable.
+	it( 'reaches through a bare wrapper Group in a column', () => {
+		// The pattern wrapper the canvas dissolves: what is inside it lands on
+		// the section's canvas, so it is held still like any other block there.
 		const nodes = [
 			{
 				clientId: 'sec',
 				name: 'core/group',
 				attributes: { layout: { type: 'freeform' } },
 			},
-			{ clientId: 'inner', name: 'core/group', parent: 'sec' },
-			{ clientId: 'deep', name: 'core/paragraph', parent: 'inner' },
+			{ clientId: 'cols', name: 'core/columns', parent: 'sec' },
+			{ clientId: 'col', name: 'core/column', parent: 'cols' },
+			{ clientId: 'wrapper', name: 'core/group', parent: 'col' },
+			{ clientId: 'heading', name: 'core/heading', parent: 'wrapper' },
 		];
 
-		expect( isBlockFreeformLocked( treeState( nodes ), 'inner' ) ).toBe(
+		expect( isBlockFreeformLocked( treeState( nodes ), 'heading' ) ).toBe(
 			true
 		);
-		expect( isBlockFreeformLocked( treeState( nodes ), 'deep' ) ).toBe(
+	} );
+
+	it( 'leaves the text inside a card editable, and locks the card', () => {
+		// A padded Group is a box on the canvas: it is dragged as one, so the
+		// card is held still and the words inside it are still words.
+		const nodes = [
+			{
+				clientId: 'sec',
+				name: 'core/group',
+				attributes: { layout: { type: 'freeform' } },
+			},
+			{ clientId: 'cols', name: 'core/columns', parent: 'sec' },
+			{ clientId: 'col', name: 'core/column', parent: 'cols' },
+			{
+				clientId: 'card',
+				name: 'core/group',
+				parent: 'col',
+				attributes: PADDED,
+			},
+			{ clientId: 'inside', name: 'core/paragraph', parent: 'card' },
+		];
+
+		expect( isBlockFreeformLocked( treeState( nodes ), 'card' ) ).toBe(
+			true
+		);
+		expect( isBlockFreeformLocked( treeState( nodes ), 'inside' ) ).toBe(
 			false
+		);
+	} );
+
+	it( 'never steps over the section itself, however plain it is', () => {
+		// The top-level Group has no styling, which would make it absorbable
+		// anywhere else. It is the canvas, so the walk has to stop there.
+		const nodes = [
+			{
+				clientId: 'sec',
+				name: 'core/group',
+				attributes: { layout: { type: 'freeform' } },
+			},
+			{ clientId: 'item', name: 'core/paragraph', parent: 'sec' },
+		];
+
+		expect( isBlockFreeformLocked( treeState( nodes ), 'item' ) ).toBe(
+			true
 		);
 	} );
 

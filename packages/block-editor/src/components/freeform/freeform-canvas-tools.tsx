@@ -4,22 +4,22 @@ import { unlock } from '../../lock-unlock';
 import FreeformCanvas from './freeform-canvas';
 import FreeformStyles from './freeform-styles';
 import { canHoldACanvas } from './canvases';
-import { getLayoutSupport, isArrangedContainer } from './flatten';
+import { getLayoutSupport } from './flatten';
 
 /**
  * Mounts the freeform canvas editing surface for whichever section the current
  * selection sits in.
  *
- * A canvas is any container that holds blocks without insisting on how they are
- * arranged — a Group, a Cover — at any depth. It is a canvas whether or not it
- * has been converted yet: the first drag converts it, in place and at the
- * layout it already had.
+ * The canvas is the section: a top-level block that holds other blocks without
+ * insisting on how they are arranged, such as a Group or a Cover. It is a
+ * canvas whether or not it has been converted yet — the first drag converts it,
+ * in place and at the layout it already had.
  *
- * A column is the exception. It holds blocks, so it looks like a canvas, but a
- * canvas that stops at the column edge is not one: an item could never be
- * dragged into the next column. So the walk up steps over it and the section is
- * the canvas, which the first drag dissolves the whole grid into. See
- * `isArrangedContainer` and `planSectionFlatten`.
+ * Only a section is ever a canvas. Anything nested that
+ * holds blocks looks like a canvas and must not be one: a column, or the
+ * wrapper Group a pattern puts inside a column, would each be a grid of its own
+ * inside the section, and an item in one could never be dragged out of it. The
+ * first drag dissolves them into the section instead; see `planSectionFlatten`.
  *
  * Blocks that arrange their own children are left alone; see `canHoldACanvas`.
  *
@@ -32,7 +32,7 @@ export default function FreeformCanvasTools() {
 		( select ) => {
 			const {
 				getSelectedBlockClientIds,
-				getBlockRootClientId,
+				getBlockParents,
 				getBlockAttributes,
 				getBlockName,
 				getBlockEditingMode,
@@ -49,59 +49,30 @@ export default function FreeformCanvasTools() {
 			const isFreeform = ( clientId ) =>
 				!! clientId &&
 				getBlockAttributes( clientId )?.layout?.type === 'freeform';
-			const supportOf = ( clientId ) =>
-				clientId
-					? getLayoutSupport( getBlockName( clientId ) )
-					: undefined;
 			const isOpenContainer = ( clientId ) => {
 				if ( ! clientId || ! getBlockOrder( clientId ).length ) {
 					return false;
 				}
-				return canHoldACanvas( supportOf( clientId ) );
-			};
-			// A column holds blocks, so it looks like a canvas, and treating it
-			// as one is exactly what stops an item being dragged out of it into
-			// the next column. It is one cell of a grid, not a canvas, so it is
-			// stepped over: the canvas is the section the grid sits in, and the
-			// first drag dissolves the grid into it.
-			const isCell = ( clientId ) =>
-				isArrangedContainer(
-					supportOf( clientId ),
-					supportOf( getBlockRootClientId( clientId ) )
+				return canHoldACanvas(
+					getLayoutSupport( getBlockName( clientId ) )
 				);
-			const isCanvasContainer = ( clientId ) =>
-				! isCell( clientId ) &&
-				( isFreeform( clientId ) || isOpenContainer( clientId ) );
+			};
 
-			// The container around the selection is the canvas, and the
-			// selection is something on it. That order matters: a Group is
-			// both a container and a block you want to drag, and checking it
-			// first made selecting one show its own empty surface instead of
-			// a grip, so Groups could never be moved.
+			// A section is one canvas, so the canvas is the section: the
+			// top-level block the selection sits in, however deep it sits.
+			// Nothing nested is ever the canvas — a column, or the wrapper
+			// Group a pattern puts inside one, would each be a grid of its own
+			// inside the section, and an item in one could never be dragged
+			// out of it.
 			//
-			// The walk keeps going up because the nearest container is not
-			// always a canvas: a block in a column has a column above it,
-			// which is a cell of a grid, so the canvas is the section further
-			// up and the whole grid dissolves into it on the first drag.
-			//
-			// Only when nothing above the selection can hold a canvas is the
-			// selection itself the canvas — that is a section selected on its
-			// own, which shows the whole layout with nothing picked up.
-			let canvas = null;
-			let candidate = getBlockRootClientId( selected[ 0 ] );
-			while ( candidate ) {
-				if ( isCanvasContainer( candidate ) ) {
-					canvas = candidate;
-					break;
-				}
-				candidate = getBlockRootClientId( candidate );
-			}
-			if ( ! canvas && isCanvasContainer( selected[ 0 ] ) ) {
-				canvas = selected[ 0 ];
-			}
+			// A selected section is its own canvas, which shows the whole
+			// layout with nothing picked up.
+			const ancestors = getBlockParents( selected[ 0 ] );
+			const canvas = ancestors.length ? ancestors[ 0 ] : selected[ 0 ];
 
 			if (
 				! canvas ||
+				! ( isFreeform( canvas ) || isOpenContainer( canvas ) ) ||
 				getTemplateLock( canvas ) ||
 				getBlockEditingMode( canvas ) !== 'default'
 			) {

@@ -1,15 +1,23 @@
 import { describe, expect, it } from 'vitest';
 import {
+	hasVisualStyling,
+	isAbsorbable,
 	isArrangedContainer,
 	isGridOfContainers,
 	planSectionFlatten,
 } from '../flatten';
 
-const block = ( clientId, name, innerBlocks = [] ) => ( {
+const block = ( clientId, name, innerBlocks = [], attributes = {} ) => ( {
 	clientId,
 	name,
 	innerBlocks,
+	attributes,
 } );
+// A Group that looks like something: a card with padding, not scaffolding.
+const styledGroup = ( clientId, innerBlocks = [] ) =>
+	block( clientId, 'core/group', innerBlocks, {
+		style: { spacing: { padding: { top: '2rem' } } },
+	} );
 
 // The layout supports that matter, copied from the blocks themselves.
 const SUPPORTS = {
@@ -45,8 +53,8 @@ const SUPPORTS = {
 };
 const getLayoutSupport = ( name ) => SUPPORTS[ name ];
 
-const canDissolve = ( candidate ) =>
-	isGridOfContainers( candidate, getLayoutSupport );
+const canDissolve = ( candidate, parent ) =>
+	isAbsorbable( candidate, parent, getLayoutSupport );
 
 describe( 'isGridOfContainers', () => {
 	it( 'recognises Columns: it arranges its children, and they hold blocks', () => {
@@ -154,11 +162,14 @@ describe( 'planSectionFlatten', () => {
 		] );
 	} );
 
-	it( 'hoists a Group out of a column whole, leaving what is inside it alone', () => {
+	it( 'hoists a styled Group out of a column whole, keeping it a box', () => {
+		// It carries padding, so it is something you can see rather than
+		// scaffolding. It comes out of the column as one block and what is
+		// inside it is left alone.
 		const section = block( 'sec', 'core/group', [
 			block( 'cols', 'core/columns', [
 				block( 'c1', 'core/column', [
-					block( 'g', 'core/group', [
+					styledGroup( 'card', [
 						block( 'deep', 'core/paragraph' ),
 					] ),
 				] ),
@@ -166,9 +177,71 @@ describe( 'planSectionFlatten', () => {
 		] );
 
 		const plan = planSectionFlatten( section, canDissolve );
-		expect( plan.citizens ).toEqual( [ 'g' ] );
+		expect( plan.citizens ).toEqual( [ 'card' ] );
 		expect( plan.wrappers[ 0 ].moves ).toEqual( [
-			{ clientIds: [ 'g' ], fromRootClientId: 'c1' },
+			{ clientIds: [ 'card' ], fromRootClientId: 'c1' },
+		] );
+	} );
+
+	it( 'dissolves an unstyled Group in a column and takes its contents', () => {
+		// Patterns wrap column contents in a bare Group all the time. It is
+		// scaffolding, so the section absorbs it and what was inside joins the
+		// one grid.
+		const section = block( 'sec', 'core/group', [
+			block( 'cols', 'core/columns', [
+				block( 'c1', 'core/column', [
+					block( 'wrapper', 'core/group', [
+						block( 'heading', 'core/heading' ),
+						block( 'deep', 'core/paragraph' ),
+					] ),
+				] ),
+			] ),
+		] );
+
+		const plan = planSectionFlatten( section, canDissolve );
+		expect( plan.citizens ).toEqual( [ 'heading', 'deep' ] );
+		expect( plan.wrappers[ 0 ].moves ).toEqual( [
+			{ clientIds: [ 'heading', 'deep' ], fromRootClientId: 'wrapper' },
+		] );
+	} );
+
+	it( 'dissolves a bare wrapper Group sitting straight in the section', () => {
+		const section = block( 'sec', 'core/group', [
+			block( 'wrapper', 'core/group', [
+				block( 'a', 'core/paragraph' ),
+			] ),
+			styledGroup( 'card', [ block( 'b', 'core/paragraph' ) ] ),
+		] );
+
+		expect( planSectionFlatten( section, canDissolve ) ).toEqual( {
+			citizens: [ 'a', 'card' ],
+			wrappers: [
+				{
+					clientId: 'wrapper',
+					moves: [
+						{ clientIds: [ 'a' ], fromRootClientId: 'wrapper' },
+					],
+				},
+			],
+		} );
+	} );
+
+	it( 'absorbs a column’s contents even when the column itself is padded', () => {
+		// A column is scaffolding whatever it carries: it only exists to put
+		// things side by side, which is the arrangement being replaced.
+		const section = block( 'sec', 'core/group', [
+			block( 'cols', 'core/columns', [
+				block(
+					'c1',
+					'core/column',
+					[ block( 'a', 'core/paragraph' ) ],
+					{ style: { spacing: { padding: { top: '2rem' } } } }
+				),
+			] ),
+		] );
+
+		expect( planSectionFlatten( section, canDissolve ).citizens ).toEqual( [
+			'a',
 		] );
 	} );
 
@@ -281,5 +354,43 @@ describe( 'isArrangedContainer', () => {
 				SUPPORTS[ 'core/buttons' ]
 			)
 		).toBe( false );
+	} );
+} );
+
+describe( 'hasVisualStyling', () => {
+	it.each( [
+		[ 'padding', { style: { spacing: { padding: { top: '2rem' } } } } ],
+		[ 'a background colour', { backgroundColor: 'primary' } ],
+		[ 'a custom background', { style: { color: { background: '#fff' } } } ],
+		[ 'a gradient', { gradient: 'vivid-cyan-blue-to-vivid-purple' } ],
+		[
+			'a background image',
+			{ style: { background: { backgroundImage: {} } } },
+		],
+		[ 'a border', { style: { border: { width: '1px' } } } ],
+		[ 'a border colour', { borderColor: 'accent' } ],
+		[
+			'a minimum height',
+			{ style: { dimensions: { minHeight: '33vh' } } },
+		],
+		[ 'a shadow', { style: { shadow: 'var:preset|shadow|natural' } } ],
+	] )( 'sees a Group with %s', ( _label, attributes ) => {
+		expect( hasVisualStyling( attributes ) ).toBe( true );
+	} );
+
+	it.each( [
+		[ 'nothing at all', {} ],
+		[ 'only a block gap', { style: { spacing: { blockGap: '1rem' } } } ],
+		[ 'only an alignment', { align: 'full' } ],
+		[ 'only a layout', { layout: { type: 'constrained' } } ],
+		[ 'only a name', { metadata: { name: 'Wrapper' } } ],
+	] )( 'sees scaffolding in a Group with %s', ( _label, attributes ) => {
+		// `blockGap` spaces out what is inside and leaves no mark of its own,
+		// and the positions captured on conversion already account for it.
+		expect( hasVisualStyling( attributes ) ).toBe( false );
+	} );
+
+	it( 'copes with a block that has no attributes', () => {
+		expect( hasVisualStyling( undefined ) ).toBe( false );
 	} );
 } );
