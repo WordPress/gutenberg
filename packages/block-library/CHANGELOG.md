@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Cover: Stop an uploaded background video on the front end when the visitor prefers reduced motion ([#83853](https://github.com/WordPress/gutenberg/pull/83853)).
+
 ## 11.2.0 (2026-10-07)
 
 ### Enhancements
