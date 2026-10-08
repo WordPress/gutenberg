@@ -58,21 +58,17 @@ function gutenberg_apply_shadow_support( $block_type, $block_attributes ) {
 }
 
 /**
- * Generates shadow CSS classes and inline styles from block attributes.
- *
- * The PHP counterpart of the JS `getShadowClassesAndStyles()`. Support and
- * serialization checks are left to the caller.
+ * Returns shadow classes and inline styles for block attributes, like the JS
+ * `getShadowClassesAndStyles()`. Does not check block support or skipped
+ * serialization.
  *
  * @since 7.2.0
  *
  * @param array $block_attributes Block attributes.
- * @return array Shadow CSS classes and inline styles, each key present only when non-empty.
+ * @return array Array with `class` and `style` keys, each present only when non-empty.
  */
 function gutenberg_get_shadow_classes_and_styles( $block_attributes ) {
-	$shadow = null;
-	if ( isset( $block_attributes['style'] ) && is_array( $block_attributes['style'] ) ) {
-		$shadow = $block_attributes['style']['shadow'] ?? null;
-	}
+	$shadow = $block_attributes['style']['shadow'] ?? null;
 
 	$attributes = array();
 	$styles     = gutenberg_style_engine_get_styles( array( 'shadow' => $shadow ) );
