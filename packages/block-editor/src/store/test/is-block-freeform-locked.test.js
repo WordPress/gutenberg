@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { isBlockFreeformLocked } from '../private-selectors';
+import { sectionRootClientIdKey } from '../private-keys';
 
 const state = ( { parentLayout, entered = null } ) => ( {
 	blocks: {
@@ -86,7 +87,8 @@ const TYPES = {
 	'core/paragraph': {},
 };
 
-const treeState = ( nodes, entered = null ) => ( {
+const treeState = ( nodes, entered = null, sectionRoot = undefined ) => ( {
+	settings: sectionRoot ? { [ sectionRootClientIdKey ]: sectionRoot } : {},
 	blocks: {
 		parents: new Map(
 			nodes.map( ( { clientId, parent } ) => [ clientId, parent ?? '' ] )
@@ -253,6 +255,129 @@ describe( 'isBlockFreeformLocked, through what the canvas absorbs', () => {
 		];
 
 		expect( isBlockFreeformLocked( treeState( nodes ), 'deep' ) ).toBe(
+			true
+		);
+	} );
+} );
+
+describe( 'isBlockFreeformLocked, where sections are not top-level', () => {
+	beforeAll( () => {
+		for ( const [ name, supports ] of Object.entries( TYPES ) ) {
+			registerBlockType( name, {
+				apiVersion: 3,
+				title: name,
+				category: 'text',
+				supports,
+				save: () => null,
+			} );
+		}
+		registerBlockType( 'core/post-content', {
+			apiVersion: 3,
+			title: 'Content',
+			category: 'theme',
+			supports: { layout: true },
+			save: () => null,
+		} );
+		registerBlockType( 'core/template-part', {
+			apiVersion: 3,
+			title: 'Template Part',
+			category: 'theme',
+			supports: {},
+			save: () => null,
+		} );
+	} );
+
+	afterAll( () => {
+		for ( const name of Object.keys( TYPES ) ) {
+			unregisterBlockType( name );
+		}
+		unregisterBlockType( 'core/post-content' );
+		unregisterBlockType( 'core/template-part' );
+	} );
+
+	// What the site editor actually renders for a page: the template's parts
+	// and wrapper are the top-level blocks, and the page's sections are the
+	// children of the Post Content block, which the editor names as the
+	// section root.
+	const siteEditorTree = ( sectionLayout ) => [
+		{ clientId: 'header', name: 'core/template-part' },
+		{ clientId: 'wrapper', name: 'core/group' },
+		{ clientId: 'content', name: 'core/post-content', parent: 'wrapper' },
+		{
+			clientId: 'sec',
+			name: 'core/group',
+			parent: 'content',
+			attributes: { layout: sectionLayout },
+		},
+		{ clientId: 'item', name: 'core/paragraph', parent: 'sec' },
+	];
+
+	it( 'locks a block in a section inside the Post Content', () => {
+		// The section is two levels down, so "top-level" would never find it
+		// and nothing in a site-editor page would be draggable at all.
+		expect(
+			isBlockFreeformLocked(
+				treeState(
+					siteEditorTree( { type: 'freeform' } ),
+					null,
+					'content'
+				),
+				'item'
+			)
+		).toBe( true );
+	} );
+
+	it( 'leaves it alone when that section is not a canvas', () => {
+		expect(
+			isBlockFreeformLocked(
+				treeState(
+					siteEditorTree( { type: 'constrained' } ),
+					null,
+					'content'
+				),
+				'item'
+			)
+		).toBe( false );
+	} );
+
+	it( 'does not treat the template wrapper as a section', () => {
+		// The wrapper is top-level and holds blocks, so without the section
+		// root it looks exactly like a section — and converting it would take
+		// the header and footer with it.
+		const nodes = [
+			{
+				clientId: 'wrapper',
+				name: 'core/group',
+				attributes: { layout: { type: 'freeform' } },
+			},
+			{
+				clientId: 'content',
+				name: 'core/post-content',
+				parent: 'wrapper',
+			},
+			{ clientId: 'loose', name: 'core/paragraph', parent: 'wrapper' },
+		];
+
+		expect(
+			isBlockFreeformLocked(
+				treeState( nodes, null, 'content' ),
+				'loose'
+			)
+		).toBe( false );
+	} );
+
+	it( 'still treats a top-level block as the section with no section root', () => {
+		// The post editor, where the section root is simply not set.
+		const nodes = [
+			{
+				clientId: 'sec',
+				name: 'core/group',
+				attributes: { layout: { type: 'freeform' } },
+			},
+			{ clientId: 'item', name: 'core/paragraph', parent: 'sec' },
+		];
+
+		expect( isBlockFreeformLocked( treeState( nodes ), 'item' ) ).toBe(
 			true
 		);
 	} );

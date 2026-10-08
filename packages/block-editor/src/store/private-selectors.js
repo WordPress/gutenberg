@@ -1440,27 +1440,52 @@ export function isBlockFreeformLocked( state, clientId ) {
 	// patterns leave behind. A block inside those is placed by the section, not
 	// by them: the first drag dissolves them into it.
 	//
-	// The walk never steps over a top-level block, however plain it is: that is
-	// the section, and the section is the canvas rather than something it
-	// swallows.
+	// The walk never steps over a section, however plain it is: that is the
+	// canvas, rather than something the canvas swallows.
 	let rootClientId = state.blocks.parents.get( clientId );
 	while (
 		rootClientId &&
-		state.blocks.parents.get( rootClientId ) &&
+		! isSection( state, rootClientId ) &&
 		isAbsorbedByCanvas( state, rootClientId )
 	) {
 		rootClientId = state.blocks.parents.get( rootClientId );
 	}
-	if ( ! rootClientId || state.blocks.parents.get( rootClientId ) ) {
-		// Nothing above it, or the walk stopped on a block the canvas keeps —
-		// a card. A card travels as one piece, so the words inside it are not
-		// the canvas's to hold still, and stay editable.
+	if ( ! rootClientId || ! isSection( state, rootClientId ) ) {
+		// Nothing above it, or the walk stopped short of a section — on a
+		// block the canvas keeps, such as a card. A card travels as one piece,
+		// so the words inside it are not the canvas's to hold still and stay
+		// editable.
 		return false;
 	}
 
 	return (
 		state.blocks.attributes.get( rootClientId )?.layout?.type === 'freeform'
 	);
+}
+
+/**
+ * Whether a block is a section — one of the things a canvas can be.
+ *
+ * The editor says where sections live: they are the children of the section
+ * root, which is the main content of the template or post. In the site editor
+ * that is the Post Content block, so a page's sections sit two levels down
+ * while the top-level blocks are the template's parts and wrappers. Reading
+ * "top-level" as "section" there finds the template wrapper instead, and
+ * converting that would take the header and footer with it.
+ *
+ * With no section root — the post editor — a section is a top-level block.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId A block's client id.
+ *
+ * @return {boolean} Whether the block is a section.
+ */
+function isSection( state, clientId ) {
+	const sectionRootClientId = getSectionRootClientId( state );
+	const parentClientId = state.blocks.parents.get( clientId );
+	return sectionRootClientId
+		? parentClientId === sectionRootClientId
+		: ! parentClientId;
 }
 
 /**
