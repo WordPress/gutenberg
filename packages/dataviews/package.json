@@ -28,7 +28,7 @@
 		"build-style",
 		"build-types",
 		"build-wp",
-		"*.md"
+		"CHANGELOG.md"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",

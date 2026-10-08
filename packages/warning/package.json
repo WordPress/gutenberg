@@ -26,7 +26,7 @@
 		"build",
 		"build-module",
 		"build-types",
-		"*.md",
+		"CHANGELOG.md",
 		"babel-plugin.cjs"
 	],
 	"main": "build/index.cjs",

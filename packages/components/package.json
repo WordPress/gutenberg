@@ -27,7 +27,7 @@
 		"build-module",
 		"build-style",
 		"build-types",
-		"*.md"
+		"CHANGELOG.md"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
@@ -38,7 +38,6 @@
 			"require": "./build/index.cjs"
 		},
 		"./README.md": "./README.md",
-		"./CONTRIBUTING.md": "./CONTRIBUTING.md",
 		"./package.json": "./package.json",
 		"./build-style/*": "./build-style/*"
 	},

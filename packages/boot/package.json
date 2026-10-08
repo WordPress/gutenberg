@@ -26,7 +26,7 @@
 		"build-module",
 		"build-style",
 		"build-types",
-		"*.md"
+		"CHANGELOG.md"
 	],
 	"module": "build-module/index.mjs",
 	"exports": {
