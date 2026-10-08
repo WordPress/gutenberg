@@ -1,7 +1,7 @@
 import { defineConfig, type Config } from '@terrazzo/parser';
 import pluginCSS from '@terrazzo/plugin-css';
 import { makeCSSVar } from '@terrazzo/token-tools/css';
-import pluginDesignTokens from './bin/terrazzo-plugin-design-tokens/index.ts';
+import pluginTokenData from './bin/terrazzo-plugin-token-data/index.ts';
 import pluginDsTokenDocs from './bin/terrazzo-plugin-ds-tokens-docs/index.ts';
 import inlineAliasValues from './bin/terrazzo-plugin-inline-alias-values/index.ts';
 import typescriptTypes from './bin/terrazzo-plugin-typescript-types/index.ts';
@@ -70,7 +70,7 @@ const config: Config = {
 			],
 			legacyHex: true,
 		} ),
-		pluginDesignTokens( {
+		pluginTokenData( {
 			filename: 'prebuilt/js/design-tokens.mjs',
 			fallbacksFilename: 'prebuilt/js/design-token-fallbacks.mjs',
 			scssFilename: false,
