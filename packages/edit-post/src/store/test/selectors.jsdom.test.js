@@ -4,6 +4,7 @@ import {
 	isSavingMetaBoxes,
 	getActiveMetaBoxLocations,
 	isMetaBoxLocationActive,
+	isMetaBoxLocationVisible,
 } from '../selectors';
 
 vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
@@ -103,6 +104,50 @@ describe( 'selectors', () => {
 			const result = isMetaBoxLocationActive( state, 'side' );
 
 			expect( result ).toBe( true );
+		} );
+	} );
+
+	describe( 'isMetaBoxLocationVisible', () => {
+		const state = {
+			metaBoxes: {
+				locations: {
+					side: [ { id: 'side-box' } ],
+					normal: [],
+					advanced: [ { id: 'advanced-box' } ],
+				},
+			},
+		};
+
+		const withEnabledPanels = ( enabled ) => {
+			isMetaBoxLocationVisible.registry = {
+				select: () => ( {
+					isEditorPanelEnabled: ( name ) => enabled.includes( name ),
+				} ),
+			};
+		};
+
+		it( 'should return false for a location without meta boxes', () => {
+			withEnabledPanels( [ 'meta-box-side-box' ] );
+
+			expect( isMetaBoxLocationVisible( state, 'normal' ) ).toBe( false );
+		} );
+
+		it( 'should return false when only the side location has visible meta boxes', () => {
+			withEnabledPanels( [ 'meta-box-side-box' ] );
+
+			expect( isMetaBoxLocationVisible( state, 'side' ) ).toBe( true );
+			expect( isMetaBoxLocationVisible( state, 'normal' ) ).toBe( false );
+			expect( isMetaBoxLocationVisible( state, 'advanced' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'should return true when a meta box in the location is enabled', () => {
+			withEnabledPanels( [ 'meta-box-advanced-box' ] );
+
+			expect( isMetaBoxLocationVisible( state, 'advanced' ) ).toBe(
+				true
+			);
 		} );
 	} );
 } );

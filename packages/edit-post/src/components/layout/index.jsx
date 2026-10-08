@@ -117,7 +117,7 @@ function useEditorStyles( settings ) {
 	] );
 }
 
-function MetaBoxesMain() {
+export function MetaBoxesMain() {
 	const [ isOpen, openHeight, hasAnyVisible ] = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const { isMetaBoxLocationVisible } = select( editPostStore );
