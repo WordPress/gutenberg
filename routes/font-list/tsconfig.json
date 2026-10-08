@@ -16,7 +16,7 @@
 		{ "path": "../../packages/data" },
 		{ "path": "../../packages/editor/tsconfig.build.json" },
 		{ "path": "../../packages/element/tsconfig.build.json" },
-		{ "path": "../../packages/global-styles-ui" },
+		{ "path": "../../packages/global-styles-ui/tsconfig.build.json" },
 		{ "path": "../../packages/i18n/tsconfig.build.json" },
 		{ "path": "../../packages/private-apis" }
 	],

@@ -1,11 +1,10 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "@wordpress/monorepo-tools/tsconfig/dev.base.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
 	"compilerOptions": {
-		"types": [ "gutenberg-vitest-test-env" ]
+		"checkJs": false
 	},
 	"references": [
-		{ "path": "./tsconfig.build.json" },
 		{ "path": "../a11y/tsconfig.build.json" },
 		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../block-editor/tsconfig.build.json" },
@@ -24,5 +23,14 @@
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../private-apis" },
 		{ "path": "../ui/tsconfig.build.json" }
+	],
+	"exclude": [
+		"**/benchmark",
+		"**/test/**",
+		"**/tests/**",
+		"**/__tests__/**",
+		"**/stories/**",
+		"**/*.story.*",
+		"src/font-library/lib/**/*"
 	]
 }

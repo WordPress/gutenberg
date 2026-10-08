@@ -19,7 +19,7 @@
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../fields/tsconfig.build.json" },
 		{ "path": "../global-styles-engine/tsconfig.build.json" },
-		{ "path": "../global-styles-ui" },
+		{ "path": "../global-styles-ui/tsconfig.build.json" },
 		{ "path": "../html-entities/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
