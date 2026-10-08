@@ -11,14 +11,12 @@ type InternalItemDescriptionProps = ItemDescriptionProps & {
 };
 
 /**
- * Renders supplementary text below a menu item label. Use it as a direct child
- * after `Menu.ItemLabel`. Descriptions start at the prefix column, including
- * when the item has an icon. Suffixes and shortcuts stay alongside the label.
+ * Adds supporting text below a menu item label. Use it as a direct child
+ * after `Menu.ItemLabel`.
  *
- * Keep labels short and clear so most items do not need a description. Add
- * descriptions sparingly, only for essential context that the label cannot
- * convey concisely. Avoid combining a description and a prefix icon in the
- * same item.
+ * Keep labels clear on their own. Add a brief description only for essential
+ * context the label cannot convey. Avoid combining a description and a prefix
+ * icon in the same item.
  */
 const ItemDescription = forwardRef< HTMLSpanElement, ItemDescriptionProps >(
 	function MenuItemDescription( props, ref ) {
