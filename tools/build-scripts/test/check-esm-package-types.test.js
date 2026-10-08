@@ -199,7 +199,13 @@ test( 'fails when a published declaration imports an omitted sibling declaration
 
 	await expect(
 		checkNodeNextTypes(
-			{ directory: packageDirectory, packageJson },
+			{
+				directory: packageDirectory,
+				packageJson,
+				buildProjects: [
+					path.join( packageDirectory, 'tsconfig.build.json' ),
+				],
+			},
 			packedPackage
 		)
 	).rejects.toThrow( "Cannot find module './hidden.ts'" );
