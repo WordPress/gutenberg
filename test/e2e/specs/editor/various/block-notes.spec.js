@@ -2236,6 +2236,95 @@ test.describe( 'Block Notes', () => {
 		await expect( paragraph ).toHaveText( 'Keep my anchor.' );
 	} );
 
+	test( 'anchors an inline note to text stored in a string attribute', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/read-more',
+			attributes: { content: 'Read more here' },
+		} );
+
+		const readMore = editor.canvas.getByRole( 'document', {
+			name: 'Block: Read More',
+		} );
+		await readMore.click();
+		await blockNoteUtils.selectBlockText( { start: 5, length: 4 } );
+
+		await editor.clickBlockOptionsMenuItem( 'Add note' );
+		await page
+			.getByRole( 'textbox', { name: 'New note', exact: true } )
+			.fill( 'About this word' );
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Add note', exact: true } )
+			.click();
+
+		const mark = editor.canvas.locator( 'mark.wp-note' );
+		await expect( mark ).toHaveText( 'more' );
+		await expect( mark ).toHaveAttribute( 'data-id', /^\d+$/ );
+		await expect( readMore ).toHaveText( 'Read more here' );
+
+		// The attribute keeps its type.
+		const [ block ] = await editor.getBlocks();
+		expect( block.attributes.content ).toMatch(
+			/^Read <mark [^>]*class="wp-note"[^>]*>more<\/mark> here$/
+		);
+
+		// Resolving removes the marker from the attribute.
+		await page.getByRole( 'button', { name: 'Resolve' } ).click();
+		await expect( mark ).toHaveCount( 0 );
+		await expect( readMore ).toHaveText( 'Read more here' );
+	} );
+
+	test( 'anchors an inline note to text in a table cell', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/table',
+			attributes: {
+				body: [
+					{
+						cells: [
+							{ content: 'First cell', tag: 'td' },
+							{ content: 'Hello brave cell', tag: 'td' },
+						],
+					},
+				],
+			},
+		} );
+
+		const cells = editor.canvas.getByRole( 'textbox', {
+			name: 'Body cell text',
+		} );
+		await cells.nth( 1 ).click();
+		await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
+
+		await editor.clickBlockOptionsMenuItem( 'Add note' );
+		await page
+			.getByRole( 'textbox', { name: 'New note', exact: true } )
+			.fill( 'About this cell' );
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Add note', exact: true } )
+			.click();
+
+		// The marker wraps only the selected text of the second cell.
+		const mark = editor.canvas.locator( 'mark.wp-note' );
+		await expect( mark ).toHaveText( 'brave' );
+		await expect( mark ).toHaveAttribute( 'data-id', /^\d+$/ );
+		await expect( cells.nth( 0 ) ).toHaveText( 'First cell' );
+		await expect( cells.nth( 1 ) ).toHaveText( 'Hello brave cell' );
+
+		// Deleting the note removes the marker from the cell.
+		await blockNoteUtils.deleteNote();
+		await expect( mark ).toHaveCount( 0 );
+		await expect( cells.nth( 1 ) ).toHaveText( 'Hello brave cell' );
+	} );
+
 	test.describe( 'Restoring a deleted note', () => {
 		async function addInlineNote( { editor, blockNoteUtils }, note ) {
 			const paragraph = editor.canvas.getByRole( 'document', {

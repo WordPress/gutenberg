@@ -24,6 +24,10 @@ import {
 	getInlineMarkerStart,
 	getNoteMarkerSelector,
 	getNoteAnchorRect,
+	getAttributeByKey,
+	setAttributeByKey,
+	wrapInlineNote,
+	removeInlineNote,
 } from '../utils';
 import { noteFormat } from '../format';
 
@@ -875,6 +879,28 @@ describe( 'findNoteInBlock', () => {
 			end: 1,
 		} );
 	} );
+
+	it( 'finds a marker nested in another attribute and returns its path', () => {
+		const attributes = {
+			body: [
+				{
+					cells: [
+						{ content: RichTextData.fromHTMLString( 'one' ) },
+						{
+							content: RichTextData.fromHTMLString(
+								'a <span class="wp-note" data-id="4">two</span>'
+							),
+						},
+					],
+				},
+			],
+		};
+		expect( findNoteInBlock( attributes, 4 ) ).toEqual( {
+			attributeKey: 'body.0.cells.1.content',
+			start: 2,
+			end: 5,
+		} );
+	} );
 } );
 
 describe( 'applyNoteFormat', () => {
@@ -1160,6 +1186,174 @@ describe( 'removeNoteFormat', () => {
 				'5'
 			).toHTMLString()
 		).toBe( 'a b c' );
+	} );
+} );
+
+describe( 'getAttributeByKey', () => {
+	const attributes = {
+		label: 'Home',
+		body: [ { cells: [ { content: 'one' }, { content: 'two' } ] } ],
+	};
+
+	it( 'reads a top-level attribute', () => {
+		expect( getAttributeByKey( attributes, 'label' ) ).toBe( 'Home' );
+	} );
+
+	it( 'reads a nested value by its path', () => {
+		expect(
+			getAttributeByKey( attributes, 'body.0.cells.1.content' )
+		).toBe( 'two' );
+	} );
+
+	it( 'returns undefined when the path does not resolve', () => {
+		expect(
+			getAttributeByKey( attributes, 'body.3.cells.0.content' )
+		).toBeUndefined();
+		expect( getAttributeByKey( null, 'label' ) ).toBeUndefined();
+	} );
+} );
+
+describe( 'setAttributeByKey', () => {
+	it( 'updates a top-level attribute', () => {
+		expect(
+			setAttributeByKey( { label: 'Home' }, 'label', 'About' )
+		).toEqual( { label: 'About' } );
+	} );
+
+	it( 'updates a nested value through a copy of its top-level attribute', () => {
+		const attributes = {
+			body: [ { cells: [ { content: 'one' }, { content: 'two' } ] } ],
+		};
+		const update = setAttributeByKey(
+			attributes,
+			'body.0.cells.1.content',
+			'2'
+		);
+		expect( update ).toEqual( {
+			body: [ { cells: [ { content: 'one' }, { content: '2' } ] } ],
+		} );
+		expect( attributes.body[ 0 ].cells[ 1 ].content ).toBe( 'two' );
+		expect( update.body[ 0 ].cells[ 0 ] ).toBe(
+			attributes.body[ 0 ].cells[ 0 ]
+		);
+	} );
+} );
+
+describe( 'inline notes in string attributes', () => {
+	const FORMAT_NAME = 'core/note';
+
+	const isRegistered = () =>
+		!! select( richTextStore ).getFormatType( FORMAT_NAME );
+
+	beforeAll( () => {
+		if ( ! isRegistered() ) {
+			registerFormatType( FORMAT_NAME, {
+				title: 'Note',
+				tagName: 'mark',
+				className: 'wp-note',
+				attributes: { 'data-id': 'data-id' },
+				edit: () => null,
+			} );
+		}
+	} );
+
+	afterAll( () => {
+		if ( isRegistered() ) {
+			unregisterFormatType( FORMAT_NAME );
+		}
+	} );
+
+	it( 'wrapInlineNote wraps the range and returns a string', () => {
+		expect( wrapInlineNote( 'Read <em>more</em> here', 7, 5, 9 ) ).toBe(
+			'Read <mark data-id="7" class="wp-note"><em>more</em></mark> here'
+		);
+	} );
+
+	it( 'wrapInlineNote keeps returning rich text for a rich text value', () => {
+		const wrapped = wrapInlineNote(
+			RichTextData.fromHTMLString( 'Read more' ),
+			7,
+			5,
+			9
+		);
+		expect( wrapped ).toBeInstanceOf( RichTextData );
+		expect( findNoteRange( wrapped, 7 ) ).toEqual( { start: 5, end: 9 } );
+	} );
+
+	it( 'wrapInlineNote returns null when the value is not rich text', () => {
+		expect( wrapInlineNote( undefined, 7, 0, 1 ) ).toBeNull();
+		expect( wrapInlineNote( [ 'Read more' ], 7, 0, 1 ) ).toBeNull();
+	} );
+
+	it( 'removeNoteFormat removes the marker and returns a string', () => {
+		expect(
+			removeNoteFormat(
+				'Read <mark class="wp-note" data-id="7">more</mark> here',
+				7
+			)
+		).toBe( 'Read more here' );
+	} );
+
+	it( 'removeInlineNote returns the new value of a string attribute', () => {
+		expect(
+			removeInlineNote(
+				{
+					label: 'Read <mark class="wp-note" data-id="7">more</mark>',
+				},
+				7
+			)
+		).toEqual( {
+			attributeKey: 'label',
+			start: 5,
+			end: 9,
+			value: 'Read more',
+		} );
+	} );
+
+	it( 'removeInlineNote returns the new value of a nested attribute', () => {
+		const removed = removeInlineNote(
+			{
+				body: [
+					{
+						cells: [
+							{
+								content: RichTextData.fromHTMLString(
+									'<mark class="wp-note" data-id="7">one</mark>'
+								),
+							},
+						],
+					},
+				],
+			},
+			7
+		);
+		expect( removed ).toMatchObject( {
+			attributeKey: 'body.0.cells.0.content',
+			start: 0,
+			end: 3,
+		} );
+		expect( removed.value.toHTMLString() ).toBe( 'one' );
+	} );
+
+	it( 'getNoteAtCaret reads a marker in a nested attribute', () => {
+		const attributes = {
+			body: [
+				{
+					cells: [
+						{
+							content: RichTextData.fromHTMLString(
+								'<mark class="wp-note" data-id="7">one</mark>'
+							),
+						},
+					],
+				},
+			],
+		};
+		const caret = {
+			attributeKey: 'body.0.cells.0.content',
+			offset: 1,
+		};
+		expect( getNoteAtCaret( attributes, caret, caret ) ).toBe( 7 );
 	} );
 } );
 

@@ -25,14 +25,17 @@ import {
 	calculateNotePositions,
 	findNoteInBlock,
 	focusNoteThread,
+	getAttributeByKey,
 	getInlineMarkerStart,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
 	getNoteAtCaret,
+	getRichTextText,
 	pickNoteForCaret,
 	readInlineSelection,
 	removeInlineNote,
 	removeNoteIdFromMetadata,
+	setAttributeByKey,
 	wrapInlineNote,
 } from './utils';
 
@@ -216,14 +219,17 @@ export function useNoteActions() {
 	};
 
 	const removeNoteMarker = ( clientId, noteId ) => {
-		const removed = removeInlineNote(
-			getBlockAttributes( clientId ),
-			noteId
-		);
+		const attributes = getBlockAttributes( clientId );
+		const removed = removeInlineNote( attributes, noteId );
 		if ( removed ) {
-			updateNoteAnchor( clientId, {
-				[ removed.attributeKey ]: removed.value,
-			} );
+			updateNoteAnchor(
+				clientId,
+				setAttributeByKey(
+					attributes,
+					removed.attributeKey,
+					removed.value
+				)
+			);
 		}
 	};
 
@@ -242,16 +248,18 @@ export function useNoteActions() {
 			return;
 		}
 		onDiscard( clientId );
+		const attributes = getBlockAttributes( clientId );
 		const wrapped = wrapInlineNote(
-			getBlockAttributes( clientId )?.[ selection.attributeKey ],
+			getAttributeByKey( attributes, selection.attributeKey ),
 			'new',
 			selection.start,
 			selection.end
 		);
 		if ( wrapped ) {
-			updateNoteAnchor( clientId, {
-				[ selection.attributeKey ]: wrapped,
-			} );
+			updateNoteAnchor(
+				clientId,
+				setAttributeByKey( attributes, selection.attributeKey, wrapped )
+			);
 		}
 	};
 
@@ -296,11 +304,18 @@ export function useNoteActions() {
 				// Inline path: the draft marker becomes the note's marker.
 				const draft = removeInlineNote( attributes, 'new' );
 				if ( draft ) {
-					newAttributes[ draft.attributeKey ] = wrapInlineNote(
-						draft.value,
-						savedRecord.id,
-						draft.start,
-						draft.end
+					Object.assign(
+						newAttributes,
+						setAttributeByKey(
+							attributes,
+							draft.attributeKey,
+							wrapInlineNote(
+								draft.value,
+								savedRecord.id,
+								draft.start,
+								draft.end
+							)
+						)
 					);
 				}
 
@@ -433,14 +448,18 @@ export function useNoteActions() {
 					);
 				}
 				const { inline } = anchor;
-				const value = inline && attributes[ inline.attributeKey ];
+				const value =
+					inline &&
+					getAttributeByKey( attributes, inline.attributeKey );
 				// Re-wrap only text that hasn't changed since the delete;
 				// otherwise the note comes back as a block-level note.
 				if (
 					inline &&
 					! findNoteInBlock( attributes, noteId ) &&
-					value?.text?.slice( inline.start, inline.end ) ===
-						inline.text
+					getRichTextText( value )?.slice(
+						inline.start,
+						inline.end
+					) === inline.text
 				) {
 					const wrapped = wrapInlineNote(
 						value,
@@ -449,7 +468,14 @@ export function useNoteActions() {
 						inline.end
 					);
 					if ( wrapped ) {
-						newAttributes[ inline.attributeKey ] = wrapped;
+						Object.assign(
+							newAttributes,
+							setAttributeByKey(
+								attributes,
+								inline.attributeKey,
+								wrapped
+							)
+						);
 					}
 				}
 				if ( Object.keys( newAttributes ).length > 0 ) {
@@ -503,12 +529,15 @@ export function useNoteActions() {
 				const removed = removeInlineNote( attributes, note.id );
 				if ( removed ) {
 					const { attributeKey, start, end, value } = removed;
-					newAttributes[ attributeKey ] = value;
+					Object.assign(
+						newAttributes,
+						setAttributeByKey( attributes, attributeKey, value )
+					);
 					anchor.inline = {
 						attributeKey,
 						start,
 						end,
-						text: value.text.slice( start, end ),
+						text: getRichTextText( value ).slice( start, end ),
 					};
 				}
 				updateNoteAnchor( clientId, newAttributes );
