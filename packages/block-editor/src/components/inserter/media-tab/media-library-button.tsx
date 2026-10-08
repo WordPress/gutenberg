@@ -1,5 +1,4 @@
 import { Button } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 import UntypedMediaUpload from '../../media-upload';
 import MediaUploadCheck from '../../media-upload/check';
 
@@ -10,30 +9,44 @@ const MediaUpload = UntypedMediaUpload as unknown as React.ComponentType< {
 	multiple?: boolean | string;
 	onSelect?: ( media: unknown ) => void;
 	allowedTypes?: string[];
+	title?: string;
 	render: ( props: { open: () => void } ) => React.ReactElement;
 } >;
 
-const ALLOWED_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
-
 /**
- * Opens the Media Library to pick a single item to insert. Shown in the tab's
- * footer for every source except the one that owns the post's attachments,
- * which offers its own attach button in the same place.
+ * The Media tab's footer action: a button that opens the Media Library.
+ *
+ * Both uses open the same modal and differ only in what they do with the
+ * selection — inserting one item, or attaching several to the post — so they
+ * share this button rather than each wrapping `MediaUpload` themselves.
  */
-export default function OpenMediaLibraryButton( {
+export default function MediaLibraryButton( {
+	label,
 	onSelect,
+	multiple = false,
+	allowedTypes,
+	title,
 }: {
 	/**
-	 * Called with the selected media item.
+	 * The button's text.
 	 */
+	label: string;
 	onSelect: ( media: unknown ) => void;
+	multiple?: boolean | string;
+	allowedTypes?: string[];
+	/**
+	 * The modal's title, where the default ("Select or Upload Media") does not
+	 * describe what the selection is for.
+	 */
+	title?: string;
 } ) {
 	return (
 		<MediaUploadCheck>
 			<MediaUpload
-				multiple={ false }
+				multiple={ multiple }
 				onSelect={ onSelect }
-				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				allowedTypes={ allowedTypes }
+				title={ title }
 				render={ ( { open }: { open: () => void } ) => (
 					<Button
 						__next40pxDefaultSize
@@ -53,7 +66,7 @@ export default function OpenMediaLibraryButton( {
 						} }
 						variant="secondary"
 					>
-						{ __( 'Open Media Library' ) }
+						{ label }
 					</Button>
 				) }
 			/>

@@ -416,8 +416,7 @@ $block-inserter-tabs-height: 44px;
 	font-weight: var(--wpds-typography-font-weight-emphasis);
 }
 
-.block-editor-inserter__patterns-explore-button,
-.block-editor-inserter__media-library-button {
+.block-editor-inserter__patterns-explore-button {
 	&.components-button {
 		padding: $grid-unit-20;
 		justify-content: center;
@@ -507,12 +506,6 @@ $media-panel-min-height: 320px;
 		// The button sits 16px clear top and bottom, as the "Explore all
 		// patterns" button does in the Patterns tab.
 		padding: $grid-unit-15 $grid-unit-20 $grid-unit-20;
-
-		// That spacing comes from the stack gap here, so drop the top margin
-		// the shared button rule adds for the Patterns tab.
-		.block-editor-inserter__media-library-button.components-button {
-			margin-top: 0;
-		}
 	}
 
 	.block-editor-inserter__media-grid__range {
@@ -550,9 +543,9 @@ $media-panel-min-height: 320px;
 		background-color: rgba($white, 0.6);
 	}
 
-	.block-editor-inserter__media-panel-attach {
-		// Match the padding (and so the height) of the "Open Media Library"
-		// button beneath the panels, so the two line up.
+	// The footer button, whether it inserts from the library or attaches to
+	// the post. The footer stack stretches it to the full width.
+	.block-editor-inserter__media-library-button {
 		&.components-button {
 			justify-content: center;
 			padding: $grid-unit-20;
