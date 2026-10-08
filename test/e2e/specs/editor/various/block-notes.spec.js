@@ -2298,7 +2298,7 @@ test.describe( 'Block Notes', () => {
 	} );
 
 	test.describe( 'Block-level note highlight', () => {
-		test( 'tints the whole text block with the author color, holding the tint flat while the outline marks selection', async ( {
+		test( 'overlays the whole text block with the author tint, holding it flat while the outline marks selection', async ( {
 			editor,
 			page,
 			requestUtils,
@@ -2326,44 +2326,39 @@ test.describe( 'Block Notes', () => {
 				0
 			);
 
-			// Move focus to the title so the freshly added note is deselected.
+			// Move focus to the title so the freshly added note is deselected:
+			// an annotated block has to be legible as one at rest.
 			await editor.canvas
 				.getByRole( 'textbox', { name: 'Add title' } )
 				.click();
 			await expect
-				.poll( () => readTint( paragraph, rgb ) )
+				.poll( () => readTint( paragraph, rgb, '::after' ) )
 				.toBe( 'tint' );
 			await expect( paragraph ).not.toHaveClass( /is-highlighted/ );
 
-			/*
-			 * Both halves of the marking survive deselection: an annotated block
-			 * has to be legible as one at rest, without clicking it first. The
-			 * rule is a text underline, so every line of a wrapped paragraph
-			 * carries it, matching the inline-marker treatment.
-			 */
-			const decoration = await paragraph.evaluate( ( el ) => {
-				const style = window.getComputedStyle( el );
-				return {
-					line: style.textDecorationLine,
-					thickness: style.textDecorationThickness,
-				};
-			} );
-			expect( decoration.line ).toBe( 'underline' );
-			expect( decoration.thickness ).toBe( '1.5px' );
+			// The underline is the inline-note signal; the block-level note
+			// marks the block, not its text.
+			expect(
+				await paragraph.evaluate(
+					( el ) => window.getComputedStyle( el ).textDecorationLine
+				)
+			).toBe( 'none' );
 
 			// Selecting the note from the sidebar marks the block with its
-			// outline. The tint behind the text must not deepen with it: it
-			// covers the whole paragraph, so every increment is subtracted from
-			// the theme's text contrast for all of it. See #80543.
+			// outline. The tint must not deepen with it: it covers the whole
+			// paragraph, so every increment is subtracted from the theme's
+			// text contrast for all of it. See #80543.
 			await page
 				.getByRole( 'region', { name: 'Editor settings' } )
 				.getByRole( 'treeitem', { name: 'Note: Whole block note' } )
 				.click();
 			await expect( paragraph ).toHaveClass( /is-highlighted/ );
-			expect( await readTint( paragraph, rgb ) ).toBe( 'tint' );
+			expect( await readTint( paragraph, rgb, '::after' ) ).toBe(
+				'tint'
+			);
 		} );
 
-		test( 'tints and underlines each list item of an annotated list', async ( {
+		test( 'overlays text blocks with nested editables as a whole, not their text', async ( {
 			editor,
 			requestUtils,
 			blockNoteUtils,
@@ -2373,61 +2368,9 @@ test.describe( 'Block Notes', () => {
 				AVATAR_BORDER_COLORS[ me.id % AVATAR_BORDER_COLORS.length ]
 			);
 
-			// A list's wrapper is not a rich-text editable, but its direct
-			// children are block wrappers, so the treatment lands on each
-			// rich-text leaf: every list item tinted and underlined.
-			await editor.insertBlock( {
-				name: 'core/list',
-				innerBlocks: [
-					{
-						name: 'core/list-item',
-						attributes: { content: 'First item' },
-					},
-					{
-						name: 'core/list-item',
-						attributes: { content: 'Second item' },
-					},
-				],
-			} );
-			await blockNoteUtils.addNote( 'Whole list note' );
-
-			// Move focus to the title so the freshly added note is deselected:
-			// the marking has to be legible at rest.
-			await editor.canvas
-				.getByRole( 'textbox', { name: 'Add title' } )
-				.click();
-
-			const items = editor.canvas.getByRole( 'textbox', {
-				name: 'List text',
-			} );
-			await expect( items ).toHaveCount( 2 );
-			for ( const item of await items.all() ) {
-				await expect.poll( () => readTint( item, rgb ) ).toBe( 'tint' );
-				const decoration = await item.evaluate( ( el ) => {
-					const style = window.getComputedStyle( el );
-					return {
-						line: style.textDecorationLine,
-						thickness: style.textDecorationThickness,
-					};
-				} );
-				expect( decoration.line ).toBe( 'underline' );
-				expect( decoration.thickness ).toBe( '1.5px' );
-			}
-		} );
-
-		test( 'tints and underlines each cell of an annotated table', async ( {
-			editor,
-			requestUtils,
-			blockNoteUtils,
-		} ) => {
-			const me = await requestUtils.rest( { path: '/wp/v2/users/me' } );
-			const rgb = hexToRgb(
-				AVATAR_BORDER_COLORS[ me.id % AVATAR_BORDER_COLORS.length ]
-			);
-
-			// A table's editables are its cells, nested in its own markup
-			// rather than in child blocks. It holds no media, so its text
-			// takes the same treatment as a paragraph, not the image overlay.
+			// A table's editables are its cells, nested in its own markup.
+			// The note marks the block it is attached to, so the table is
+			// overlaid as a whole rather than cell by cell.
 			await editor.insertBlock( {
 				name: 'core/table',
 				attributes: {
@@ -2450,26 +2393,22 @@ test.describe( 'Block Notes', () => {
 			const table = editor.canvas.getByRole( 'document', {
 				name: 'Block: Table',
 			} );
+			await expect
+				.poll( () => readTint( table, rgb, '::after' ) )
+				.toBe( 'tint' );
 			const cells = table.getByRole( 'textbox', {
 				name: 'Body cell text',
 			} );
 			await expect( cells ).toHaveCount( 2 );
 			for ( const cell of await cells.all() ) {
-				await expect.poll( () => readTint( cell, rgb ) ).toBe( 'tint' );
-				const decoration = await cell.evaluate( ( el ) => {
-					const style = window.getComputedStyle( el );
-					return {
-						line: style.textDecorationLine,
-						thickness: style.textDecorationThickness,
-					};
-				} );
-				expect( decoration.line ).toBe( 'underline' );
-				expect( decoration.thickness ).toBe( '1.5px' );
+				expect( await readTint( cell, rgb ) ).not.toBe( 'tint' );
+				expect(
+					await cell.evaluate(
+						( el ) =>
+							window.getComputedStyle( el ).textDecorationLine
+					)
+				).toBe( 'none' );
 			}
-			// The text carries the marking, so no overlay veils it.
-			expect( await readTint( table, rgb, '::after' ) ).not.toBe(
-				'tint'
-			);
 		} );
 
 		test( 'overlays a non-text block with the tint and an all-around rule, alongside the selection outline', async ( {
@@ -2483,10 +2422,9 @@ test.describe( 'Block Notes', () => {
 				AVATAR_BORDER_COLORS[ me.id % AVATAR_BORDER_COLORS.length ]
 			);
 
-			// An image's editables (its caption) are nested inside non-block
-			// containers, so it takes the overlay path: a background behind it
-			// would be hidden by the image itself, so the tint is painted
-			// above the block instead, with the rule drawn all the way around.
+			// A background behind an image would be hidden by the image
+			// itself, which is why the tint is painted on an overlay above
+			// the block, with the rule drawn all the way around.
 			await editor.insertBlock( { name: 'core/image' } );
 			await blockNoteUtils.addNote( 'Whole image note' );
 
@@ -2510,8 +2448,7 @@ test.describe( 'Block Notes', () => {
 					};
 				} );
 
-			// Same tint classification as the text blocks, read off the
-			// overlay: the author color at the single allowed alpha.
+			// The author color at the single allowed alpha.
 			await expect
 				.poll( () => readTint( image, rgb, '::after' ) )
 				.toBe( 'tint' );
@@ -2559,9 +2496,8 @@ test.describe( 'Block Notes', () => {
 				AVATAR_BORDER_COLORS[ me.id % AVATAR_BORDER_COLORS.length ]
 			);
 
-			// Columns of images have no text for the leaf rule to tint, so
-			// they need the overlay or the note would leave no mark in the
-			// canvas.
+			// Columns of images hold no text at all; the overlay still marks
+			// them, so the note leaves a mark in the canvas.
 			await editor.insertBlock( {
 				name: 'core/columns',
 				innerBlocks: [
@@ -2601,7 +2537,8 @@ test.describe( 'Block Notes', () => {
 			} );
 			const backgroundOf = () =>
 				paragraph.evaluate(
-					( el ) => window.getComputedStyle( el ).backgroundColor
+					( el ) =>
+						window.getComputedStyle( el, '::after' ).backgroundColor
 				);
 
 			// Tinted while the note exists.
@@ -2667,7 +2604,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'textbox', { name: 'Add title' } )
 				.click();
 			await expect
-				.poll( () => readTint( blockNoted, rgb ) )
+				.poll( () => readTint( blockNoted, rgb, '::after' ) )
 				.toBe( 'tint' );
 			await expect.poll( () => readTint( marker, rgb ) ).toBe( 'tint' );
 
@@ -2678,23 +2615,25 @@ test.describe( 'Block Notes', () => {
 
 			// With no notes left on screen, the canvas carries no marking.
 			await blockNoteUtils.clickNotesMenuItem( 'Show all notes' );
-			const isUnmarked = ( locator ) =>
-				locator.evaluate( ( el ) => {
-					const style = window.getComputedStyle( el );
+			const isUnmarked = ( locator, pseudo = null ) =>
+				locator.evaluate( ( el, pseudoElt ) => {
+					const style = window.getComputedStyle( el, pseudoElt );
 					return (
 						/rgba\(0,\s*0,\s*0,\s*0\)|transparent/.test(
 							style.backgroundColor
 						) && style.textDecorationLine === 'none'
 					);
-				} );
-			await expect.poll( () => isUnmarked( blockNoted ) ).toBe( true );
+				}, pseudo );
+			await expect
+				.poll( () => isUnmarked( blockNoted, '::after' ) )
+				.toBe( true );
 			await expect.poll( () => isUnmarked( marker ) ).toBe( true );
 			// The marker stays in the content, it just isn't painted.
 			await expect( marker ).toHaveText( 'Note these words.' );
 
 			await blockNoteUtils.clickNotesMenuItem( 'Expand notes' );
 			await expect
-				.poll( () => readTint( blockNoted, rgb ) )
+				.poll( () => readTint( blockNoted, rgb, '::after' ) )
 				.toBe( 'tint' );
 			await expect.poll( () => readTint( marker, rgb ) ).toBe( 'tint' );
 		} );

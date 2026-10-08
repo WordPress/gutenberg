@@ -304,146 +304,64 @@ describe( 'getBlockLevelHighlights', () => {
 } );
 
 describe( 'buildBlockHighlightCss', () => {
-	// The tint-behind-the-text rule matches when the block's own wrapper
-	// element is itself a rich-text editable (paragraph, heading), or, for
-	// containers whose direct children are block wrappers (list, quote,
-	// group), each rich-text leaf inside; every other block gets the overlay.
-	const textSelectorFor = ( clientId ) =>
-		`[data-block="${ clientId }"].block-editor-rich-text__editable`;
-	const leafSelectorFor = ( clientId ) =>
-		`[data-block="${ clientId }"]:not(.block-editor-rich-text__editable):has(> [data-block]) .block-editor-rich-text__editable`;
-	const nestedSelectorFor = ( clientId ) =>
-		`[data-block="${ clientId }"]:not(.block-editor-rich-text__editable):not(:has(> [data-block])):not(:has(img,video,audio,iframe,canvas,object,embed)) .block-editor-rich-text__editable`;
 	const overlaySelectorFor = ( clientId ) =>
-		`[data-block="${ clientId }"]:not(.block-editor-rich-text__editable):not(.is-multi-selected):not(:has(> [data-block])):not(:has(.block-editor-rich-text__editable))::after,` +
-		`[data-block="${ clientId }"]:not(.block-editor-rich-text__editable):not(.is-multi-selected):not(:has(> [data-block])):has(img,video,audio,iframe,canvas,object,embed)::after`;
-	const emptyContainerSelectorFor = ( clientId ) =>
-		`[data-block="${ clientId }"]:not(.block-editor-rich-text__editable):not(.is-multi-selected):has(> [data-block]):not(:has(.block-editor-rich-text__editable))::after`;
-
-	it( 'tints each text block with its author color at the tint alpha (0x40)', () => {
-		const css = buildBlockHighlightCss( [
-			{ clientId: 'abc-1', id: 7, author: 1 },
-			{ clientId: 'abc-2', id: 12, author: 3 },
-		] );
-		expect( css ).toContain(
-			`${ textSelectorFor(
-				'abc-1'
-			) }{background-color:${ getAvatarBorderColor( 1 ) }40;`
-		);
-		expect( css ).toContain(
-			`${ textSelectorFor(
-				'abc-2'
-			) }{background-color:${ getAvatarBorderColor( 3 ) }40;`
-		);
-	} );
+		`[data-block="${ clientId }"]:not(.is-multi-selected)::after`;
 
 	/*
-	 * An annotated block has to be legible as one without clicking it, so the
-	 * underline belongs on the resting declaration - and it is a text
-	 * underline, not a bottom-edge rule, so every line of a wrapped paragraph
-	 * carries it, matching the inline-marker treatment.
-	 */
-	it( 'underlines every line of each text block at rest', () => {
-		const css = buildBlockHighlightCss( [
-			{ clientId: 'abc-1', id: 7, author: 1 },
-		] );
-		const color = getAvatarBorderColor( 1 );
-		expect( css ).toContain(
-			`${ textSelectorFor( 'abc-1' ) }{background-color:${ color }40;` +
-				'text-decoration-line:underline;' +
-				`text-decoration-color:color-mix(in srgb, currentColor 30%, ${ color });` +
-				'text-decoration-thickness:1.5px;'
-		);
-		expect( css ).not.toMatch( /editable\{[^}]*border/ );
-	} );
-
-	/*
-	 * A container whose direct children are block wrappers (list, quote,
-	 * group) has no text of its own to tint, so the same treatment lands on
-	 * each rich-text leaf inside it - every list item tinted and underlined
-	 * individually.
-	 */
-	it( 'tints and underlines each rich-text leaf of a block container', () => {
-		const css = buildBlockHighlightCss( [
-			{ clientId: 'abc-1', id: 7, author: 1 },
-		] );
-		const color = getAvatarBorderColor( 1 );
-		expect( css ).toContain(
-			`${ leafSelectorFor( 'abc-1' ) }{background-color:${ color }40;` +
-				'text-decoration-line:underline;'
-		);
-	} );
-
-	/*
-	 * Text blocks whose editables sit deeper in their own markup (a table's
-	 * cells, a code block's `<code>`) carry no media, so they get the text
-	 * treatment on those editables rather than the overlay an image gets.
-	 */
-	it( 'tints and underlines the nested editables of a media-free text block', () => {
-		const css = buildBlockHighlightCss( [
-			{ clientId: 'abc-1', id: 7, author: 1 },
-		] );
-		const color = getAvatarBorderColor( 1 );
-		expect( css ).toContain(
-			`${ nestedSelectorFor( 'abc-1' ) }{background-color:${ color }40;` +
-				'text-decoration-line:underline;'
-		);
-	} );
-
-	/*
-	 * A background behind a non-text block (an image, a container) is hidden by
-	 * the block's own content, so the same tint and rule are painted onto an
-	 * overlay above it instead - all the way around, since a non-text block has
-	 * no text baseline for a bottom edge to relate to. The overlay must ignore
-	 * pointer events or it would swallow every click on the block.
-	 *
-	 * A block with no editable text, or with media beside its text (an image
-	 * and its caption), takes the overlay. So does a container with no editable
-	 * text (a gallery, columns of images), which the leaf rule cannot tint.
+	 * Every block-level note marks its block the same way, whatever the block
+	 * holds: a tinted overlay with a rule all the way around. A background on
+	 * the block itself would be hidden behind an image and would replace the
+	 * block's own background, so the tint goes on an overlay. The overlay must
+	 * ignore pointer events or it would swallow every click on the block.
 	 *
 	 * The rule is a border, not a box-shadow: the editor's selection outline
 	 * sets `box-shadow` on the same `::after`, and the two must not compete.
 	 */
-	it( 'overlays non-text blocks and text-free containers with the tint and an all-around rule at rest', () => {
+	it( 'overlays each block with its author tint and an all-around rule at rest', () => {
 		const css = buildBlockHighlightCss( [
 			{ clientId: 'abc-1', id: 7, author: 1 },
+			{ clientId: 'abc-2', id: 12, author: 3 },
 		] );
-		const color = getAvatarBorderColor( 1 );
-		expect( css ).toContain(
-			`${ overlaySelectorFor( 'abc-1' ) },${ emptyContainerSelectorFor(
-				'abc-1'
-			) }{content:"";position:absolute;inset:0;pointer-events:none;background-color:${ color }40;border:1.5px solid color-mix(in srgb, currentColor 30%, ${ color });}`
-		);
+		for ( const [ clientId, author ] of [
+			[ 'abc-1', 1 ],
+			[ 'abc-2', 3 ],
+		] ) {
+			const color = getAvatarBorderColor( author );
+			expect( css ).toContain(
+				`${ overlaySelectorFor(
+					clientId
+				) }{content:"";position:absolute;inset:0;pointer-events:none;background-color:${ color }40;border:1.5px solid color-mix(in srgb, currentColor 30%, ${ color });}`
+			);
+		}
 		expect( css ).not.toContain( 'box-shadow' );
 	} );
 
+	// The underline is the inline-note signal; a block-level note marks the
+	// block, not its text.
+	it( 'does not underline the text of an annotated block', () => {
+		const css = buildBlockHighlightCss( [
+			{ clientId: 'abc-1', id: 7, author: 1 },
+		] );
+		expect( css ).not.toContain( 'text-decoration' );
+		expect( css ).not.toContain( 'block-editor-rich-text__editable' );
+	} );
+
 	/*
-	 * Forced colors strips background tints, so annotated text takes the
-	 * system `Mark`/`MarkText` pair and every annotated block gets a dashed
-	 * outline - the only marking an overlaid block has left, and dashed so it
-	 * stays distinct from the solid outline the editor draws on selection. The
-	 * overlay's border is dropped so it does not become a second, solid ring
-	 * beside the dashed outline.
+	 * Forced colors strips the tint, so every annotated block gets a dashed
+	 * outline, dashed so it stays distinct from the solid outline the editor
+	 * draws on selection. The overlay's border is dropped so it does not
+	 * become a second, solid ring beside the dashed outline.
 	 */
-	it( 'falls back to the system highlight pair and a dashed outline under forced colors', () => {
+	it( 'falls back to a dashed outline under forced colors', () => {
 		const css = buildBlockHighlightCss( [
 			{ clientId: 'abc-1', id: 7, author: 1 },
 			{ clientId: 'abc-2', id: 12, author: 3 },
 		] );
 		expect( css ).toContain(
 			'@media (forced-colors: active){[data-block="abc-1"],[data-block="abc-2"]{outline:1.5px dashed;outline-offset:2px;}' +
-				`${ textSelectorFor( 'abc-1' ) },${ leafSelectorFor(
-					'abc-1'
-				) },${ nestedSelectorFor( 'abc-1' ) },${ textSelectorFor(
+				`${ overlaySelectorFor( 'abc-1' ) },${ overlaySelectorFor(
 					'abc-2'
-				) },${ leafSelectorFor( 'abc-2' ) },${ nestedSelectorFor(
-					'abc-2'
-				) }{${ FORCED_COLORS_HIGHLIGHT }}` +
-				`${ overlaySelectorFor( 'abc-1' ) },${ emptyContainerSelectorFor(
-					'abc-1'
-				) },${ overlaySelectorFor(
-					'abc-2'
-				) },${ emptyContainerSelectorFor( 'abc-2' ) }{border:none;}}`
+				) }{border:none;}}`
 		);
 	} );
 
@@ -465,9 +383,8 @@ describe( 'buildBlockHighlightCss', () => {
 		]
 			.map( ( [ , alpha ] ) => alpha )
 			.filter( Boolean );
-		// One tint per treatment (text root + container leaves + nested
-		// editables + overlay) per block, all at 0x40.
-		expect( alphas ).toEqual( Array( 8 ).fill( '40' ) );
+		// One overlay tint per block, at 0x40.
+		expect( alphas ).toEqual( [ '40', '40' ] );
 	} );
 
 	it( 'escapes quotes and backslashes in the client id', () => {
@@ -488,9 +405,7 @@ describe( 'buildBlockHighlightCss', () => {
 	it( 'falls back to author 0 when the field is missing', () => {
 		const css = buildBlockHighlightCss( [ { clientId: 'abc-1', id: 7 } ] );
 		expect( css ).toContain(
-			`${ textSelectorFor(
-				'abc-1'
-			) }{background-color:${ getAvatarBorderColor( 0 ) }40;`
+			`background-color:${ getAvatarBorderColor( 0 ) }40;`
 		);
 	} );
 

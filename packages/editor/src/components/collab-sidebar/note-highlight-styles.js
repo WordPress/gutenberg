@@ -86,13 +86,6 @@ const FORCED_COLORS_HIGHLIGHT =
 
 const FORCED_COLORS_RESET = `@media (forced-colors: active){mark.wp-note{${ FORCED_COLORS_HIGHLIGHT }}}`;
 
-/*
- * Elements that make a block media rather than text. A block holding any of
- * them takes the overlay, since a tint behind its text would leave the media
- * itself unmarked.
- */
-const MEDIA_SELECTOR = 'img,video,audio,iframe,canvas,object,embed';
-
 /**
  * Derive the block-level highlights from the note threads: a thread marks its
  * whole block when no in-content `core/note` marker carries its id (an inline
@@ -199,40 +192,22 @@ export function buildHighlightCss( threads, selectedId = null ) {
  * the block level. Block-level notes carry no in-content `<mark>` to target, so
  * the block is matched by its client id instead.
  *
- * Text blocks - those whose own wrapper element *is* a rich-text editable
- * (paragraph, heading) - get the same treatment as an inline marker, applied
- * to all of their text: a tint behind the glyphs and an underline on every
- * line, so a block-level note reads as "all of this text is annotated".
- *
- * Blocks that *contain* other blocks directly (list, quote, group - their
- * wrapper's direct children are block wrappers) apply that same treatment to
- * each rich-text leaf inside them, so e.g. every list item is tinted and
- * underlined individually.
- *
- * Text blocks whose editables sit deeper in their own markup (a table's cells,
- * a code block's `<code>`, a button's link) get the same treatment on each of
- * those editables, as long as the block holds no media.
- *
- * Every other block (images, media covers, anything with no editable text)
- * paints the tint onto an `::after` overlay instead - a tinted veil with the
- * rule drawn all the way around - because a background behind e.g. an image is
- * hidden by the image itself. A container holding no editable text at all (a
- * group of images, a gallery) gets the overlay too. A container mixing text
- * and media only tints its text. The overlay ignores pointer events, so the
- * block stays editable through it.
+ * Every block gets the same treatment, whatever it holds: a tinted overlay on
+ * its `::after` with a rule drawn all the way around. The underline stays an
+ * inline-note signal, so a block-level note reads as "this block", not as text
+ * that was marked. An overlay rather than a background on the block itself,
+ * because a background is hidden behind an image and would replace a block's
+ * own background color. The overlay ignores pointer events, so the block stays
+ * editable through it.
  *
  * Both are present at rest, with no hover or selected variant, so an annotated
- * block is legible as one without clicking anything. The tint covers a whole
- * block rather than a few words, so deepening it on a state would cost the
- * theme's text contrast across all of that. Hovering or selecting the note
- * draws the block's own outline instead, which is what already signals "this
- * block" everywhere else in the editor.
+ * block is legible as one without clicking anything. Hovering or selecting the
+ * note draws the block's own outline instead, which is what already signals
+ * "this block" everywhere else in the editor.
  *
- * Under forced colors the tints are stripped by the browser, so annotated text
- * takes the system `Mark`/`MarkText` pair, and each annotated block also gets a
- * dashed outline - the only marking an overlaid block has left, and dashed so
- * it cannot be mistaken for the solid outline the editor draws on the selected
- * block.
+ * Under forced colors the tint is stripped by the browser, so each annotated
+ * block gets a dashed outline instead, dashed so it cannot be mistaken for the
+ * solid outline the editor draws on the selected block.
  *
  * @param {Array} blockHighlights Block-level notes (each with `clientId`, `id` and `author`).
  * @return {string} A serialized CSS string targeting the blocks' wrapper elements.
@@ -240,7 +215,6 @@ export function buildHighlightCss( threads, selectedId = null ) {
 export function buildBlockHighlightCss( blockHighlights ) {
 	const rules = [];
 	const blockSelectors = [];
-	const textSelectors = [];
 	const overlaySelectors = [];
 	for ( const highlight of blockHighlights ?? [] ) {
 		if ( ! highlight?.clientId ) {
@@ -255,33 +229,10 @@ export function buildBlockHighlightCss( blockHighlights ) {
 		);
 		const blockSel = `[data-block="${ escapedClientId }"]`;
 		blockSelectors.push( blockSel );
-		const textDeclarations = `background-color:${ color }${ TINT_ALPHA };${ underline(
-			color,
-			RULE_THICKNESS
-		) }`;
-		const textSel = `${ blockSel }.block-editor-rich-text__editable`;
-		// Containers whose direct children are block wrappers (list, quote,
-		// group) mark each of their rich-text leaves; a cover or image nests
-		// its editables inside non-block containers, so it won't match.
-		const leafSel = `${ blockSel }:not(.block-editor-rich-text__editable):has(> [data-block]) .block-editor-rich-text__editable`;
-		// Text blocks with their editables nested in their own markup (table,
-		// code, button). Any media in the block sends it to the overlay.
-		const nestedSel = `${ blockSel }:not(.block-editor-rich-text__editable):not(:has(> [data-block])):not(:has(${ MEDIA_SELECTOR })) .block-editor-rich-text__editable`;
-		textSelectors.push( textSel, leafSel, nestedSel );
-		rules.push( `${ textSel }{${ textDeclarations }}` );
-		rules.push( `${ leafSel }{${ textDeclarations }}` );
-		rules.push( `${ nestedSel }{${ textDeclarations }}` );
-		// Blocks with no text or with media, plus containers with no text to
-		// tint (a group of images, a gallery, columns of media), which the
-		// leaf rule above cannot mark. A multi-selected block is left out so
-		// the editor's selection overlay owns the pseudo-element outright.
-		const veilSel = `${ blockSel }:not(.block-editor-rich-text__editable):not(.is-multi-selected)`;
-		const veilSelectors = [
-			`${ veilSel }:not(:has(> [data-block])):not(:has(.block-editor-rich-text__editable))::after`,
-			`${ veilSel }:not(:has(> [data-block])):has(${ MEDIA_SELECTOR })::after`,
-			`${ veilSel }:has(> [data-block]):not(:has(.block-editor-rich-text__editable))::after`,
-		];
-		overlaySelectors.push( ...veilSelectors );
+		// A multi-selected block is left out so the editor's selection overlay
+		// owns the pseudo-element outright.
+		const overlaySel = `${ blockSel }:not(.is-multi-selected)::after`;
+		overlaySelectors.push( overlaySel );
 		/*
 		 * Block wrappers are position:relative and the overlay sits above the
 		 * content, so `inset:0` hugs the block exactly with no reflow.
@@ -293,9 +244,7 @@ export function buildBlockHighlightCss( blockHighlights ) {
 		 * (`::before` is not free either: cover, spacer and separator use it.)
 		 */
 		rules.push(
-			`${ veilSelectors.join(
-				','
-			) }{content:"";position:absolute;inset:0;pointer-events:none;background-color:${ color }${ TINT_ALPHA };border:${ RULE_THICKNESS } solid ${ ruleColor(
+			`${ overlaySel }{content:"";position:absolute;inset:0;pointer-events:none;background-color:${ color }${ TINT_ALPHA };border:${ RULE_THICKNESS } solid ${ ruleColor(
 				color
 			) };}`
 		);
@@ -310,9 +259,7 @@ export function buildBlockHighlightCss( blockHighlights ) {
 		rules.push(
 			`@media (forced-colors: active){${ blockSelectors.join(
 				','
-			) }{outline:${ RULE_THICKNESS } dashed;outline-offset:2px;}${ textSelectors.join(
-				','
-			) }{${ FORCED_COLORS_HIGHLIGHT }}${ overlaySelectors.join(
+			) }{outline:${ RULE_THICKNESS } dashed;outline-offset:2px;}${ overlaySelectors.join(
 				','
 			) }{border:none;}}`
 		);
@@ -325,8 +272,7 @@ export function buildBlockHighlightCss( blockHighlights ) {
  * markers carry their author's avatar color. The `core/note` format serializes
  * each marker as `<mark class="wp-note" data-id="{noteId}">`, which we target
  * directly. Notes attached at the block level have no marker, so the whole
- * block is marked instead - text blocks by tinting the text, any other block
- * by a tinted overlay.
+ * block is marked instead, by a tinted overlay.
  *
  * Uses `useStyleOverride` so the styles reach the iframed canvas; a plain
  * `<style>` element rendered in the sidebar would only affect the parent doc.
