@@ -48,7 +48,7 @@ class Tests_Blocks_Render_Avatar extends WP_UnitTestCase {
 	 *
 	 * @param array       $attributes     Block attributes.
 	 * @param string      $expected_class Expected image class.
-	 * @param string|null $expected_style Expected image style.
+	 * @param string      $expected_style Expected image style.
 	 */
 	public function test_image_border_styles( $attributes, $expected_class, $expected_style ) {
 		$this->assertSame(

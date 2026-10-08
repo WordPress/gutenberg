@@ -91,23 +91,23 @@ class Block_Core_Icon_Render_Test extends WP_UnitTestCase {
 	/**
 	 * @dataProvider data_support_styles
 	 *
-	 * @param array  $border         Border style attribute.
-	 * @param string $expected_class Expected SVG class.
-	 * @param string $expected_style Expected SVG style.
+	 * @param array  $border_attributes Border style attribute.
+	 * @param string $expected_class    Expected SVG class.
+	 * @param string $expected_style    Expected SVG style.
 	 */
-	public function test_applies_color_border_width_and_padding_styles( $border, $expected_class, $expected_style ) {
+	public function test_applies_color_border_width_and_padding_styles( $border_attributes, $expected_class, $expected_style ) {
 		$attributes = array(
 			'icon'      => 'core/caution',
 			'textColor' => 'vivid-red',
 			'style'     => array(
 				'color'      => array( 'background' => '#eeeeee' ),
-				'border'     => $border['style'],
+				'border'     => $border_attributes['style'],
 				'dimensions' => array( 'width' => '48px' ),
 				'spacing'    => array( 'padding' => array( 'top' => '4px' ) ),
 			),
 		);
-		if ( isset( $border['borderColor'] ) ) {
-			$attributes['borderColor'] = $border['borderColor'];
+		if ( isset( $border_attributes['borderColor'] ) ) {
+			$attributes['borderColor'] = $border_attributes['borderColor'];
 		}
 		$output = gutenberg_render_block_core_icon( $attributes );
 
@@ -133,7 +133,7 @@ class Block_Core_Icon_Render_Test extends WP_UnitTestCase {
 	public function data_support_styles() {
 		return array(
 			'custom'   => array(
-				'border'         => array(
+				'border_attributes' => array(
 					'style' => array(
 						'radius' => '10px',
 						'width'  => '2px',
@@ -141,22 +141,22 @@ class Block_Core_Icon_Render_Test extends WP_UnitTestCase {
 						'color'  => '#ff0000',
 					),
 				),
-				'expected_class' => 'has-text-color has-vivid-red-color has-background has-border-color',
-				'expected_style' => 'fill: none; color:var(--wp--preset--color--vivid-red);background-color:#eeeeee;border-color:#ff0000;border-radius:10px;border-style:solid;border-width:2px;width:48px;padding-top:4px;',
+				'expected_class'    => 'has-text-color has-vivid-red-color has-background has-border-color',
+				'expected_style'    => 'fill: none; color:var(--wp--preset--color--vivid-red);background-color:#eeeeee;border-color:#ff0000;border-radius:10px;border-style:solid;border-width:2px;width:48px;padding-top:4px;',
 			),
 			'preset'   => array(
-				'border'         => array(
+				'border_attributes' => array(
 					'borderColor' => 'accent-2',
 					'style'       => array(
 						'width' => '1px',
 						'style' => 'solid',
 					),
 				),
-				'expected_class' => 'has-text-color has-vivid-red-color has-background has-border-color has-accent-2-border-color',
-				'expected_style' => 'fill: none; color:var(--wp--preset--color--vivid-red);background-color:#eeeeee;border-style:solid;border-width:1px;width:48px;padding-top:4px;',
+				'expected_class'    => 'has-text-color has-vivid-red-color has-background has-border-color has-accent-2-border-color',
+				'expected_style'    => 'fill: none; color:var(--wp--preset--color--vivid-red);background-color:#eeeeee;border-style:solid;border-width:1px;width:48px;padding-top:4px;',
 			),
 			'per side' => array(
-				'border'         => array(
+				'border_attributes' => array(
 					'style' => array(
 						'top'  => array(
 							'color' => '#00ff00',
@@ -168,29 +168,29 @@ class Block_Core_Icon_Render_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'expected_class' => 'has-text-color has-vivid-red-color has-background',
-				'expected_style' => 'fill: none; color:var(--wp--preset--color--vivid-red);background-color:#eeeeee;border-top-width:3px;border-top-color:#00ff00;border-top-style:dashed;border-left-width:1px;width:48px;padding-top:4px;',
+				'expected_class'    => 'has-text-color has-vivid-red-color has-background',
+				'expected_style'    => 'fill: none; color:var(--wp--preset--color--vivid-red);background-color:#eeeeee;border-top-width:3px;border-top-color:#00ff00;border-top-style:dashed;border-left-width:1px;width:48px;padding-top:4px;',
 			),
 			'numeric'  => array(
-				'border'         => array(
+				'border_attributes' => array(
 					'style' => array(
 						'radius' => 5,
 						'width'  => 2,
 					),
 				),
-				'expected_class' => 'has-text-color has-vivid-red-color has-background',
-				'expected_style' => 'fill: none; color:var(--wp--preset--color--vivid-red);background-color:#eeeeee;border-radius:5px;border-width:2px;width:48px;padding-top:4px;',
+				'expected_class'    => 'has-text-color has-vivid-red-color has-background',
+				'expected_style'    => 'fill: none; color:var(--wp--preset--color--vivid-red);background-color:#eeeeee;border-radius:5px;border-width:2px;width:48px;padding-top:4px;',
 			),
 			'zero'     => array(
-				'border'         => array(
+				'border_attributes' => array(
 					'style' => array(
 						'radius' => 0,
 						'width'  => 0,
 						'style'  => 'solid',
 					),
 				),
-				'expected_class' => 'has-text-color has-vivid-red-color has-background',
-				'expected_style' => 'fill: none; color:var(--wp--preset--color--vivid-red);background-color:#eeeeee;border-radius:0px;border-style:solid;border-width:0px;width:48px;padding-top:4px;',
+				'expected_class'    => 'has-text-color has-vivid-red-color has-background',
+				'expected_style'    => 'fill: none; color:var(--wp--preset--color--vivid-red);background-color:#eeeeee;border-radius:0px;border-style:solid;border-width:0px;width:48px;padding-top:4px;',
 			),
 		);
 	}

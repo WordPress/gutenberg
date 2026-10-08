@@ -70,17 +70,17 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 		$border_attributes['borderColor'] = $block_attributes['borderColor'];
 	}
 
-	// Side values are filtered by skipped serialization only, not by feature support.
+	// Sides are filtered by skipped serialization only, not by feature support.
 	if ( $has_border_color_support || $has_border_width_support ) {
-		foreach ( array( 'top', 'right', 'bottom', 'left' ) as $side ) {
-			if ( ! isset( $border[ $side ] ) || ! is_array( $border[ $side ] ) ) {
-				continue;
+		$skipped_side_features = array();
+		foreach ( array( 'width', 'color', 'style' ) as $feature ) {
+			if ( wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', $feature ) ) {
+				$skipped_side_features[ $feature ] = true;
 			}
-			$border_styles[ $side ] = $border[ $side ];
-			foreach ( array( 'width', 'color', 'style' ) as $feature ) {
-				if ( wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', $feature ) ) {
-					unset( $border_styles[ $side ][ $feature ] );
-				}
+		}
+		foreach ( array( 'top', 'right', 'bottom', 'left' ) as $side ) {
+			if ( isset( $border[ $side ] ) && is_array( $border[ $side ] ) ) {
+				$border_styles[ $side ] = array_diff_key( $border[ $side ], $skipped_side_features );
 			}
 		}
 	}
@@ -91,17 +91,14 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 }
 
 /**
- * Generates border classes and inline styles from block attributes, the PHP
- * twin of the JS `getBorderClassesAndStyles()`.
- *
- * Block support and skipped serialization are not checked: the caller passes
- * only the border values it applies.
+ * Returns border classes and inline styles for block attributes, like the JS
+ * `getBorderClassesAndStyles()`. Does not check block support or skipped
+ * serialization.
  *
  * @since 7.2.0
  *
  * @param array $block_attributes Block attributes.
- *
- * @return array Border CSS classes and inline styles.
+ * @return array Array with `class` and `style` keys, each present only when non-empty.
  */
 function gutenberg_get_border_classes_and_styles( $block_attributes ) {
 	if ( ! is_array( $block_attributes ) ) {
@@ -113,7 +110,7 @@ function gutenberg_get_border_classes_and_styles( $block_attributes ) {
 		: array();
 	$border_styles = array();
 
-	// Radius and width accept unitless numbers from the original implementation.
+	// Unitless radius and width are from the original implementation.
 	if ( isset( $border['radius'] ) ) {
 		$border_styles['radius'] = is_numeric( $border['radius'] ) ? "{$border['radius']}px" : $border['radius'];
 	}
