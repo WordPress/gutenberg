@@ -34,7 +34,7 @@ collab-sidebar/
 │   ├── frequent-emojis.ts           useFrequentEmojis - persisted "Frequently used" section
 │   └── reaction-emojis.ts           curated reaction set and storage keys
 │
-├── hooks.js                        useNoteThreads, useNoteActions, useNoteSelection, useFloatingBoard, useEnableFloatingSidebar
+├── hooks.js                        useNoteThreads, useNoteActions, useNoteSelection, usePickNote, useNoteFocus, useFloatingBoard, useEnableFloatingSidebar
 ├── utils.js                        focusNoteThread, getNoteExcerpt, sanitizeNoteContent, calculateNotePositions, getAvatarBorderColor
 ├── board-store.js                  createBoardStore - DOM measurement for the floating layout
 ├── constants.js                    sidebar identifier strings
@@ -47,11 +47,11 @@ collab-sidebar/
 
 ```
 NotesSidebarContainer (index.jsx)         - gates on post type support, owns the unsent drafts Map
- └── NotesSidebar (index.jsx)             - owns sidebarRef + useNoteThreads + sidebar registration
+ └── NotesSidebar (index.jsx)             - owns sidebarRef + useNoteThreads + useNoteSelection + sidebar registration
       ├── AddNoteMenuItem                - slot fill in the block toolbar
       ├── NoteAvatarIndicator            - slot fill in the block toolbar (per-thread avatars)
       ├── PluginSidebar (all-notes)      - full sidebar
-      │    └── Notes (notes.jsx)          - owns outer Stack + aria-label + useNoteActions + keyboard nav
+      │    └── Notes (notes.jsx)          - owns outer Stack + aria-label + useNoteActions + useNoteFocus + keyboard nav
       │         ├── AddNote              - new note form for the selected block, rendered when selectedNote === 'new'
       │         └── NoteThread[]         - per thread
       │              └── <FloatingContainer>
@@ -66,7 +66,30 @@ NotesSidebarContainer (index.jsx)         - gates on post type support, owns the
 
 `Notes` is reused for both sidebar surfaces. The only visual difference is driven by `isFloating` (whether to layer threads over the canvas or stack them in a panel).
 
-Unsent note and reply text lives in a `Map` owned by `NotesSidebarContainer`, keyed by block client ID or note ID, so it survives the forms unmounting. It is a cache, not state: `useNoteDraft` reads it on mount and writes it on change, so typing doesn't re-render the sidebar. Slot fills don't inherit context, so `NotesSidebar` provides it inside each fill.
+Unsent note and reply text lives in a `Map` owned by `NotesSidebarContainer`, keyed by block client ID or note ID, so it survives the forms unmounting. It is a cache, not state: `useNoteDraft` reads it on mount and writes it on change, so typing doesn't re-render the sidebar. Slot fills don't inherit context, so `NotesSidebar` provides it inside each fill. The text a new note is started from is wrapped with a `core/note` marker whose id is `new`, the same sentinel `selectNote` uses for the form, until the note is sent, so the anchor follows edits like a saved note's does; `onCreate` swaps in the saved id, and each exit from an empty form strips it with `onDiscard` at the point of exit: Cancel, the form's focus-out, and `useNoteSelection` when the caret moves the selection away from `new`.
+
+## Note selection
+
+The selected note is a small state machine driven by the caret. `useCaretChange` reports caret moves from a block-editor store subscription, and `useNoteSelection` applies `pickNoteForCaret`, which holds the transitions. Three caret events change the selected note, and everything else leaves it alone:
+
+| Caret event | Selected note becomes |
+| --- | --- |
+| Enters a marker | That note, or the new note form for the `new` marker |
+| Enters another block | The block's note: its unsent draft, else a block-level note (the selected one, else the primary), else none |
+| Leaves the selected note's marker | The block's note, as above |
+| Anything else: typing, moving in plain text, a caret not reported yet | Unchanged |
+
+Typing is skipped before the rule runs: a selection change that comes with a change to the block's content moves the caret along with the text, never across a marker. "Anything else" is what keeps explicit actions in place: a block-level note collapsed with Escape stays collapsed while editing, since a block-level note has no caret position. A caret not reported yet is unknown, not outside: RichText reports no offsets on focus until mouseup, and `selectBlock` stores none.
+
+Explicit actions set the selected note directly:
+
+| Action | Effect |
+| --- | --- |
+| Thread click, avatar, keyboard expand, Add note | `usePickNote`: selects the block, then the note, so the caret events run on the block change before the pick lands |
+| Escape | None, until one of the caret events above |
+| Cancel, the new note form's focus-out | Strips the draft marker, none |
+
+A thread's or the new note form's focus-out deselects only when focus did not land in its block; in the block, the caret events decide.
 
 ## Floating board
 
