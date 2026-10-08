@@ -29,6 +29,7 @@
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../notices/tsconfig.build.json" },
+		{ "path": "../react-inert-value/tsconfig.build.json" },
 		{ "path": "../rich-text" },
 		{ "path": "../style-engine" },
 		{ "path": "../token-list/tsconfig.build.json" },

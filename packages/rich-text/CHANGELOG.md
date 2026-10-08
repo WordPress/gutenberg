@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.57.0 (2026-10-07)
+
 ### Bug Fixes
 
 -   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).

@@ -1,10 +1,20 @@
 import { describe, expect, it } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { useEffect } from '@wordpress/element';
 import { useCropOptions } from '../use-crop-options';
 import { ORIGINAL_ASPECT_RATIO } from '../../../image-editor/core/constants';
-import { MediaEditorStateProvider } from '../../../state';
+import { MediaEditorStateProvider, useMediaEditor } from '../../../state';
+
+const IMAGE = {
+	src: 'test.jpg',
+	naturalWidth: 1200,
+	naturalHeight: 600,
+};
 
 function CropOptionsHarness() {
+	// Load the image through the session, as the canvas does.
+	const { setSourceImage } = useMediaEditor();
+	useEffect( () => setSourceImage( IMAGE ), [ setSourceImage ] );
 	const cropOptions = useCropOptions( {
 		aspectRatioPresets: [
 			{ label: 'Square', value: 1 },
@@ -47,15 +57,7 @@ function CropOptionsHarness() {
 
 function renderHarness() {
 	render(
-		<MediaEditorStateProvider
-			initialCropperState={ {
-				image: {
-					src: 'test.jpg',
-					naturalWidth: 1200,
-					naturalHeight: 600,
-				},
-			} }
-		>
+		<MediaEditorStateProvider>
 			<CropOptionsHarness />
 		</MediaEditorStateProvider>
 	);

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/date",
-	"version": "5.56.0",
+	"version": "5.57.0",
 	"description": "Date module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -46,7 +46,7 @@
 		"moment-timezone": "^0.5.40"
 	},
 	"devDependencies": {
-		"vitest": "^5.0.0"
+		"vitest": "^5.0.3"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "18.0.0",
+	"version": "18.1.0",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -58,7 +58,7 @@
 		"build-module/hooks/**"
 	],
 	"dependencies": {
-		"@react-spring/web": "^9.4.5",
+		"@react-spring/web": "^10.1.2",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/blob": "file:../blob",
@@ -88,6 +88,7 @@
 		"@wordpress/preferences": "file:../preferences",
 		"@wordpress/priority-queue": "file:../priority-queue",
 		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/react-inert-value": "file:../react-inert-value",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/style-engine": "file:../style-engine",
 		"@wordpress/token-list": "file:../token-list",
@@ -114,8 +115,8 @@
 		"@types/postcss-prefix-selector": "^1.16.3",
 		"@wordpress/block-library": "file:../block-library",
 		"deep-freeze": "^0.0.1",
-		"storybook": "^10.5.3",
-		"vitest": "^5.0.0",
+		"storybook": "^10.6.1",
+		"vitest": "^5.0.3",
 		"vitest-browser-react": "^2.3.0"
 	},
 	"peerDependencies": {

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties } from 'react';
-import { useRef, useState } from '@wordpress/element';
+import { Fragment, useRef, useState } from '@wordpress/element';
 import { search } from '@wordpress/icons';
 import * as Autocomplete from '../index';
 import { Icon } from '../../../../icon';
@@ -36,7 +36,10 @@ const meta: Meta< typeof Autocomplete.Root > = {
 		'Autocomplete.Group': Autocomplete.Group,
 		'Autocomplete.GroupLabel': Autocomplete.GroupLabel,
 		'Autocomplete.Item': Autocomplete.Item,
+		'Autocomplete.ItemLabel': Autocomplete.ItemLabel,
+		'Autocomplete.ItemDescription': Autocomplete.ItemDescription,
 		'Autocomplete.Row': Autocomplete.Row,
+		'Autocomplete.Separator': Autocomplete.Separator,
 		'Autocomplete.Value': Autocomplete.Value,
 		'Autocomplete.Empty': Autocomplete.Empty,
 		'Autocomplete.Status': Autocomplete.Status,
@@ -78,7 +81,42 @@ export const Default: Story = {
 									key={ item.id }
 									value={ item }
 								>
-									{ item.value }
+									<Autocomplete.ItemLabel>
+										{ item.value }
+									</Autocomplete.ItemLabel>
+								</Autocomplete.Item>
+							) }
+						</Autocomplete.Collection>
+					</Autocomplete.ListBody>
+				</Autocomplete.List>
+			</Autocomplete.Popup>,
+		],
+	},
+};
+
+/**
+ * Item descriptions contribute to each suggestion's accessible description.
+ */
+export const WithItemDescriptions: Story = {
+	args: {
+		items: URLS.slice( 0, 3 ),
+		children: [
+			<Autocomplete.Input aria-label="URL" key="input" />,
+			<Autocomplete.Popup key="popup">
+				<Autocomplete.List>
+					<Autocomplete.ListBody>
+						<Autocomplete.Collection>
+							{ ( item: FixtureItem ) => (
+								<Autocomplete.Item
+									key={ item.id }
+									value={ item }
+								>
+									<Autocomplete.ItemLabel>
+										{ item.value }
+									</Autocomplete.ItemLabel>
+									<Autocomplete.ItemDescription>
+										Suggested URL
+									</Autocomplete.ItemDescription>
 								</Autocomplete.Item>
 							) }
 						</Autocomplete.Collection>
@@ -130,7 +168,9 @@ export const OpenOnlyOnMatch: Story = {
 										key={ item.id }
 										value={ item }
 									>
-										{ item.value }
+										<Autocomplete.ItemLabel>
+											{ item.value }
+										</Autocomplete.ItemLabel>
 									</Autocomplete.Item>
 								) }
 							</Autocomplete.Collection>
@@ -165,7 +205,7 @@ export const AsyncItems: Story = {
 		const [ query, setQuery ] = useState( '' );
 		const [ loading, setLoading ] = useState( false );
 		const [ results, setResults ] = useState< typeof URLS >( [] );
-		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
+		const timeoutRef = useRef< ReturnType< typeof setTimeout > >( null );
 
 		return (
 			<Autocomplete.Root
@@ -176,7 +216,9 @@ export const AsyncItems: Story = {
 					setQuery( newValue );
 					setLoading( true );
 					setResults( [] );
-					clearTimeout( timeoutRef.current );
+					if ( timeoutRef.current ) {
+						clearTimeout( timeoutRef.current );
+					}
 					timeoutRef.current = setTimeout( () => {
 						setResults(
 							URLS.filter( ( item ) =>
@@ -216,7 +258,9 @@ export const AsyncItems: Story = {
 										key={ item.id }
 										value={ item }
 									>
-										{ item.value }
+										<Autocomplete.ItemLabel>
+											{ item.value }
+										</Autocomplete.ItemLabel>
 									</Autocomplete.Item>
 								) }
 							</Autocomplete.Collection>
@@ -280,7 +324,9 @@ export const Inline: Story = {
 									key={ command.id }
 									value={ command }
 								>
-									{ command.value }
+									<Autocomplete.ItemLabel>
+										{ command.value }
+									</Autocomplete.ItemLabel>
 								</Autocomplete.Item>
 							) }
 						</Autocomplete.Collection>
@@ -325,7 +371,9 @@ export const WithSearchIconAndClearButton: Story = {
 									key={ item.id }
 									value={ item }
 								>
-									{ item.value }
+									<Autocomplete.ItemLabel>
+										{ item.value }
+									</Autocomplete.ItemLabel>
 								</Autocomplete.Item>
 							) }
 						</Autocomplete.Collection>
@@ -456,7 +504,9 @@ export const InlineMentionAutocomplete: Story = {
 										key={ item.id }
 										value={ item }
 									>
-										{ item.value }
+										<Autocomplete.ItemLabel>
+											{ item.value }
+										</Autocomplete.ItemLabel>
 									</Autocomplete.Item>
 								) }
 							</Autocomplete.Collection>
@@ -510,7 +560,9 @@ export const WithCustomZIndex: Story = {
 									key={ item.id }
 									value={ item }
 								>
-									{ item.value }
+									<Autocomplete.ItemLabel>
+										{ item.value }
+									</Autocomplete.ItemLabel>
 								</Autocomplete.Item>
 							) }
 						</Autocomplete.Collection>
@@ -553,11 +605,50 @@ export const Grouped: Story = {
 												key={ item.id }
 												value={ item }
 											>
-												{ item.value }
+												<Autocomplete.ItemLabel>
+													{ item.value }
+												</Autocomplete.ItemLabel>
 											</Autocomplete.Item>
 										) }
 									</Autocomplete.Collection>
 								</Autocomplete.Group>
+							) }
+						</Autocomplete.Collection>
+					</Autocomplete.ListBody>
+				</Autocomplete.List>
+			</Autocomplete.Popup>,
+		],
+	},
+};
+
+/**
+ * Use `Autocomplete.Separator` to set choices apart from each other.
+ */
+export const WithSeparator: Story = {
+	args: {
+		items: [ ...COMMANDS.slice( 0, 3 ), { id: 'help', value: 'Get help' } ],
+		openOnInputClick: true,
+		children: [
+			<Autocomplete.Input
+				aria-label="Command"
+				placeholder="Type a command"
+				key="input"
+			/>,
+			<Autocomplete.Popup key="popup">
+				<Autocomplete.List>
+					<Autocomplete.ListBody>
+						<Autocomplete.Collection>
+							{ ( item: FixtureItem, index: number ) => (
+								<Fragment key={ item.id }>
+									{ item.id === 'help' && index > 0 && (
+										<Autocomplete.Separator />
+									) }
+									<Autocomplete.Item value={ item }>
+										<Autocomplete.ItemLabel>
+											{ item.value }
+										</Autocomplete.ItemLabel>
+									</Autocomplete.Item>
+								</Fragment>
 							) }
 						</Autocomplete.Collection>
 					</Autocomplete.ListBody>
@@ -585,6 +676,9 @@ const emojiPickerCellStyle: CSSProperties = {
 	aspectRatio: '1 / 1',
 	marginInline: 0,
 	padding: 'var(--wpds-dimension-padding-xs)',
+};
+
+const emojiPickerLabelStyle: CSSProperties = {
 	fontSize: 'var(--wpds-typography-font-size-xl)',
 };
 
@@ -646,9 +740,15 @@ export const Grid: Story = {
 														emojiPickerCellStyle
 													}
 												>
-													<span aria-hidden="true">
-														{ emoji.emoji }
-													</span>
+													<Autocomplete.ItemLabel
+														style={
+															emojiPickerLabelStyle
+														}
+													>
+														<span aria-hidden="true">
+															{ emoji.emoji }
+														</span>
+													</Autocomplete.ItemLabel>
 												</Autocomplete.Item>
 											) ) }
 										</Autocomplete.Row>
