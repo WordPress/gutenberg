@@ -65,7 +65,7 @@
 
 ### Documentation
 
--   Add interactive popup width stories for all applicable form controls and primitives.
+-   Add interactive popup width stories for all applicable form controls and primitives ([#84320](https://github.com/WordPress/gutenberg/pull/84320)).
 
 -   `Progress`: Document migration from `ProgressBar`, layout width, and custom value content ([#84021](https://github.com/WordPress/gutenberg/pull/84021)).
 -   `Menu`: Explain when to disable triggers and items ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
