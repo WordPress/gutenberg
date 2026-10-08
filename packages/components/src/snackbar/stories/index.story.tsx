@@ -1,5 +1,6 @@
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { wordpress } from '@wordpress/icons';
+import Button from '../../button';
 import Icon from '../../icon';
 import Snackbar from '..';
 
@@ -93,3 +94,13 @@ WithActionAndExplicitDismiss.args = {
 		'Add an action and a cross to explicitly close the snackbar, and do not hide it automatically',
 	explicitDismiss: true,
 };
+
+export const WithFocusReturn: StoryFn< typeof Snackbar > = ( args ) => (
+	<>
+		<Button __next40pxDefaultSize variant="secondary">
+			Previous control
+		</Button>
+		<Snackbar { ...args } />
+	</>
+);
+WithFocusReturn.args = WithActionAndExplicitDismiss.args;

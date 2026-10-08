@@ -14,6 +14,10 @@
 
 -   `Tip`: Deprecate in favor of `Notice` from `@wordpress/ui`, preserving the legacy component for existing consumers ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
 
+### Bug Fixes
+
+-   `Snackbar`: Move focus to the preceding tabbable element when dismissing a focused snackbar outside SnackbarList ([#84342](https://github.com/WordPress/gutenberg/pull/84342)).
+
 ## 42.0.0 (2026-10-07)
 
 ### Breaking Changes

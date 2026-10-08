@@ -3,6 +3,7 @@ import { userEvent } from 'vitest/browser';
 import { act, screen, within } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { speak } from '@wordpress/a11y';
+import { useState } from '@wordpress/element';
 import { SVG, Path } from '@wordpress/primitives';
 import Snackbar from '../index';
 
@@ -154,6 +155,40 @@ describe( 'Snackbar', () => {
 		expect( onRemove ).toHaveBeenCalledTimes( 1 );
 		expect( onDismiss ).toHaveBeenCalledTimes( 1 );
 	} );
+
+	it.each( [ false, true ] )(
+		'restores standalone focus on keyboard dismissal with explicitDismiss=%s',
+		async ( explicitDismiss ) => {
+			function DismissibleSnackbar() {
+				const [ isVisible, setIsVisible ] = useState( true );
+				return (
+					<>
+						<button>Previous control</button>
+						{ isVisible && (
+							<Snackbar
+								explicitDismiss={ explicitDismiss }
+								actions={ [ { label: 'View post', url: '#' } ] }
+								onRemove={ () => setIsVisible( false ) }
+							>
+								Message
+							</Snackbar>
+						) }
+					</>
+				);
+			}
+			await render( <DismissibleSnackbar /> );
+			screen
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.focus();
+
+			await userEvent.keyboard( '{Enter}' );
+
+			expect( screen.queryByTestId( testId ) ).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', { name: 'Previous control' } )
+			).toHaveFocus();
+		}
+	);
 
 	describe( 'actions', () => {
 		it( 'should render only the first action with a warning when multiple actions are passed', async () => {
