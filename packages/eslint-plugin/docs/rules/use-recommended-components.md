@@ -20,7 +20,7 @@ The rule checks named imports and direct destructuring from `unlock( privateApis
 [radiocontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-radiocontrol--migration-guide
 [togglecontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-togglecontrol--migration-guide
 [textareacontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-textareacontrol--migration-guide
-[tip-migration-guide]: https://github.com/WordPress/gutenberg/blob/HEAD/packages/components/src/tip/README.md#migration-to-notice
+[tip-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-tip--migration-guide
 
 ## Rule details
 

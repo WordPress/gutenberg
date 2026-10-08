@@ -16,7 +16,7 @@ const meta: Meta< typeof Tip > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Deprecated. Use [`Notice`](?path=/docs/design-system-components-notice--docs) from `@wordpress/ui` instead.',
+			notes: 'Deprecated. Use [`Notice`](?path=/docs/design-system-components-notice--docs) from `@wordpress/ui` instead. See the [migration guide](?path=/docs/components-tip--migration-guide).',
 		},
 	},
 };

@@ -12,6 +12,7 @@ export function Tip( props: TipProps ) {
 
 	deprecated( 'wp.components.Tip', {
 		since: '7.2',
+		version: '7.4',
 		alternative: 'Notice from @wordpress/ui',
 	} );
 

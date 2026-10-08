@@ -2052,12 +2052,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "Tip",
-		"slug": "tip",
-		"markdown_source": "../packages/components/src/tip/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "ToggleControl",
 		"slug": "toggle-control",
 		"markdown_source": "../packages/components/src/toggle-control/README.md",
