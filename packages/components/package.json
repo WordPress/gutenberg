@@ -37,7 +37,6 @@
 			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
-		"./README.md": "./README.md",
 		"./package.json": "./package.json",
 		"./build-style/*": "./build-style/*"
 	},
