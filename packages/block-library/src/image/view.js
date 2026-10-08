@@ -56,17 +56,11 @@ const touchDrag = {
 	// stranding the image at its slide offset.
 	slideTimeout: 0,
 	pendingAdvance: null,
-	// Pending id for the timer that takes the fade-in class back off.
-	fadeTimeout: 0,
 };
 
 // Duration of the commit slide, in milliseconds. Must stay in sync with the
 // `transition: transform` duration on `.is-animating-slide` in `style.scss`.
 const SLIDE_TRANSITION_MS = 220;
-
-// Duration of the fade applied to the image that slides in. Must stay in sync
-// with the `lightbox-image-fade-in` duration in `style.scss`.
-const FADE_TRANSITION_MS = 150;
 
 // Movement (px) needed before a gesture latches to horizontal or vertical.
 const DIRECTION_LATCH_THRESHOLD_PX = 10;
@@ -498,25 +492,17 @@ const { state, actions, callbacks } = store(
 									actions.showPreviousImage( event );
 								}
 								// Re-triggers the fade-in animation on rapid
-								// successive swipes by dropping any pending
-								// clean-up and toggling the class with a forced
-								// reflow in between.
-								clearTimeout( touchDrag.fadeTimeout );
+								// successive swipes by toggling the class with a
+								// forced reflow in between. The class is left on
+								// afterwards on purpose: it shadows the
+								// `.zoom.active` rule that animates the image in,
+								// and taking it off changes the container's
+								// computed `animation-name` back, which restarts
+								// the open-zoom animation mid-gallery.
 								overlayEl.classList.remove( 'is-fading-in' );
 								// eslint-disable-next-line no-unused-expressions
 								overlayEl.offsetWidth;
 								overlayEl.classList.add( 'is-fading-in' );
-								// The class has to come back off once the fade is
-								// over. It outranks the `.zoom.active` rule that
-								// animates the image in, so left on it would
-								// replace the zoom the next time the lightbox is
-								// opened.
-								touchDrag.fadeTimeout = setTimeout( () => {
-									touchDrag.fadeTimeout = 0;
-									overlayEl.classList.remove(
-										'is-fading-in'
-									);
-								}, FADE_TRANSITION_MS );
 							}
 						};
 
