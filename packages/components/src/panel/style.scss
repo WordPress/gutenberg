@@ -3,8 +3,9 @@
 @use "../utils/theme-variables" as *;
 
 .components-panel {
-	background: $white;
-	border: $border-width solid $gray-200;
+	background: $components-color-background;
+	color: $components-color-foreground;
+	border: $border-width solid var(--wpds-color-stroke-surface-neutral);
 
 	> .components-panel__header:first-child,
 	> .components-panel__body:first-child {
@@ -22,8 +23,8 @@
 }
 
 .components-panel__body {
-	border-top: $border-width solid $gray-200;
-	border-bottom: $border-width solid $gray-200;
+	border-top: $border-width solid var(--wpds-color-stroke-surface-neutral);
+	border-bottom: $border-width solid var(--wpds-color-stroke-surface-neutral);
 
 	h3 {
 		margin: 0 0 0.5em;
@@ -49,7 +50,7 @@
 	h2 {
 		margin: 0;
 		font-size: inherit;
-		color: inherit;
+		color: var(--wpds-color-foreground-content-neutral-strong);
 	}
 }
 
@@ -80,7 +81,7 @@
 // Hover States
 .components-panel__body > .components-panel__body-title:hover {
 	// Override the default button hover style
-	background: $gray-100;
+	background: var(--wpds-color-background-interactive-neutral-weak-active);
 	border: none;
 }
 
@@ -90,7 +91,7 @@
 	width: 100%;
 	font-weight: var(--wpds-typography-font-weight-emphasis);
 	text-align: left;
-	color: $gray-900;
+	color: var(--wpds-color-foreground-interactive-neutral);
 
 	@media not (prefers-reduced-motion) {
 		transition: 0.1s background ease-in-out;
@@ -103,12 +104,25 @@
 		border-radius: 0;
 	}
 
+	&:not(:disabled, [aria-disabled="true"]):is(
+		:hover,
+		:active,
+		:focus-visible
+	) {
+		color: var(--wpds-color-foreground-interactive-neutral-active);
+	}
+
+	&:disabled,
+	&[aria-disabled="true"] {
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+	}
+
 	.components-panel__arrow {
 		position: absolute;
 		right: $grid-unit-20;
 		top: 50%;
 		transform: translateY(-50%);
-		color: $gray-900;
+		color: inherit;
 		fill: currentColor;
 
 		@media not (prefers-reduced-motion) {
@@ -126,7 +140,7 @@
 }
 
 .components-panel__icon {
-	color: $gray-700;
+	color: var(--wpds-color-foreground-content-neutral-weak);
 	margin: -2px 0 -2px 6px;
 }
 
