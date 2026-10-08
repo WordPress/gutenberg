@@ -10,7 +10,7 @@ export interface IconProps extends SVGProps {
 	/**
 	 * The size of the icon in pixels
 	 *
-	 * @default 24
+	 * @default 20
 	 */
 	size?: number;
 }
@@ -23,7 +23,7 @@ export interface IconProps extends SVGProps {
  * @return Icon component
  */
 export default forwardRef< Element, IconProps >(
-	( { icon, size = 24, style, ...props }: IconProps, ref ) => {
+	( { icon, size = 20, style, ...props }: IconProps, ref ) => {
 		const intrinsicStyle = ( icon.props as { style?: CSSProperties } )
 			.style;
 		const mergedStyle =

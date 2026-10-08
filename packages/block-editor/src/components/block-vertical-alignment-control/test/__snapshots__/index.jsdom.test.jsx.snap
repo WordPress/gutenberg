@@ -17,24 +17,24 @@ exports[`BlockVerticalAlignmentUI > should match snapshot when controls are hidd
       <svg
         aria-hidden="true"
         focusable="false"
-        height="24"
+        height="20"
         stroke="currentColor"
         stroke-width="1.5"
         style="fill: none;"
         viewBox="0 0 24 24"
-        width="24"
+        width="20"
         xmlns="http://www.w3.org/2000/svg"
       >
         <rect
           fill="currentColor"
-          height="11"
+          height="13.75"
           stroke="none"
-          width="6"
-          x="9"
-          y="9"
+          width="7.5"
+          x="8.25"
+          y="8.25"
         />
         <path
-          d="M4 4.75H20"
+          d="M2 3H22"
         />
       </svg>
     </button>
@@ -60,24 +60,24 @@ exports[`BlockVerticalAlignmentUI > should match snapshot when controls are visi
         <svg
           aria-hidden="true"
           focusable="false"
-          height="24"
+          height="20"
           stroke="currentColor"
           stroke-width="1.5"
           style="fill: none;"
           viewBox="0 0 24 24"
-          width="24"
+          width="20"
           xmlns="http://www.w3.org/2000/svg"
         >
           <rect
             fill="currentColor"
-            height="11"
+            height="13.75"
             stroke="none"
-            width="6"
-            x="9"
-            y="9"
+            width="7.5"
+            x="8.25"
+            y="8.25"
           />
           <path
-            d="M4 4.75H20"
+            d="M2 3H22"
           />
         </svg>
       </button>
@@ -93,24 +93,24 @@ exports[`BlockVerticalAlignmentUI > should match snapshot when controls are visi
         <svg
           aria-hidden="true"
           focusable="false"
-          height="24"
+          height="20"
           stroke="currentColor"
           stroke-width="1.5"
           style="fill: none;"
           viewBox="0 0 24 24"
-          width="24"
+          width="20"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M4 12H20"
+            d="M2 12H22"
           />
           <rect
             fill="currentColor"
-            height="16"
+            height="20"
             stroke="none"
-            width="6"
-            x="9"
-            y="4"
+            width="7.5"
+            x="8.25"
+            y="2"
           />
         </svg>
       </button>
@@ -126,24 +126,24 @@ exports[`BlockVerticalAlignmentUI > should match snapshot when controls are visi
         <svg
           aria-hidden="true"
           focusable="false"
-          height="24"
+          height="20"
           stroke="currentColor"
           stroke-width="1.5"
           style="fill: none;"
           viewBox="0 0 24 24"
-          width="24"
+          width="20"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M4 19.25H20"
+            d="M2 21H22"
           />
           <rect
             fill="currentColor"
-            height="11"
+            height="13.75"
             stroke="none"
-            width="6"
-            x="9"
-            y="4"
+            width="7.5"
+            x="8.25"
+            y="2"
           />
         </svg>
       </button>

@@ -56,12 +56,12 @@ describe( 'Icon', () => {
 		expect( screen.getByTestId( testId ) ).toBeVisible();
 	} );
 
-	it( 'renders an svg element with a default width and height of 24', async () => {
+	it( 'renders an svg element with a default width and height of 20', async () => {
 		await render( <Icon data-testid={ testId } icon={ svg } /> );
 		const icon = screen.getByTestId( testId );
 
-		expect( icon ).toHaveAttribute( 'width', '24' );
-		expect( icon ).toHaveAttribute( 'height', '24' );
+		expect( icon ).toHaveAttribute( 'width', '20' );
+		expect( icon ).toHaveAttribute( 'height', '20' );
 	} );
 
 	it( 'renders an svg element and override its width and height', async () => {

@@ -301,7 +301,7 @@ export default function BoxInputControl( {
 					} }
 					isPressed={ showCustomValueControl }
 					size="small"
-					iconSize={ 24 }
+					iconSize={ 20 }
 				/>
 			) }
 		</HStack>

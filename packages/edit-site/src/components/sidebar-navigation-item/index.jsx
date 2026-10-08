@@ -65,13 +65,13 @@ function SidebarNavigationItemContent( {
 			{ ...props }
 		>
 			<Stack direction="row" align="center" justify="start" gap="sm">
-				{ icon && <Icon icon={ icon } size={ 24 } /> }
+				{ icon && <Icon icon={ icon } size={ 20 } /> }
 				<FlexBlock>{ children }</FlexBlock>
 				{ withChevron && (
 					<Icon
 						icon={ isRTL() ? chevronLeftSmall : chevronRightSmall }
 						className="edit-site-sidebar-navigation-item__drilldown-indicator"
-						size={ 24 }
+						size={ 20 }
 					/>
 				) }
 				{ ! withChevron && suffix }

@@ -21,7 +21,7 @@
 	line-height: 0;
 
 	// Size multiple sequential buttons to be optically balanced.
-	// Icons are 36px, as set by a 24px icon and 12px padding.
+	// Icons are 20px, with 12px padding around them.
 	.components-button.components-button, // This needs specificity to override padding values inherited from the button component.
 	.components-button.has-icon.has-icon {
 		justify-content: center;
@@ -30,7 +30,7 @@
 		padding-right: $grid-unit-15 * 0.5;
 
 		svg {
-			min-width: var(--wpds-dimension-size-sm); // This is the optimal icon size, and we size the whole button after this.
+			min-width: var(--wpds-dimension-size-xs); // This is the optimal icon size, and we size the whole button after this.
 		}
 
 		&::before {

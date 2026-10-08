@@ -33,8 +33,6 @@ The `size` value, as well as any other additional props, will be passed through.
 
  - Type: `number`
  - Required: No
- - Default: `'string' === typeof icon ? 20 : 24`
+ - Default: `20`
 
 The size (width and height) of the icon.
-
-Defaults to `20` when `icon` is a string (i.e. a Dashicon id), otherwise `24`.

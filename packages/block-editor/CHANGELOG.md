@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `BlockCard`: Size the icon container to the 20px icon ([#84105](https://github.com/WordPress/gutenberg/pull/84105)).
+
 ## 18.1.0 (2026-10-07)
 
 ### New Features

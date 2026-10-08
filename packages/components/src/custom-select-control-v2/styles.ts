@@ -210,10 +210,10 @@ export const SelectedItemCheck = styled( Ariakit.SelectItemCheck )`
 	fill: currentColor;
 
 	// Keep the checkmark vertically aligned at the top. Since the item text has a
-	// 28px line height and the checkmark is 24px tall, a (28-24)/2 = 2px margin
+	// 28px line height and the checkmark is 20px tall, a (28-20)/2 = 4px margin
 	// is applied to keep the correct alignment between the text and the checkmark.
 	align-self: start;
-	margin-block-start: 2px;
+	margin-block-start: 4px;
 
 	// Since the checkmark's dimensions are applied with 'em' units, setting a
 	// font size of 0 allows the space reserved for the checkmark to collapse for
@@ -221,6 +221,6 @@ export const SelectedItemCheck = styled( Ariakit.SelectItemCheck )`
 	font-size: 0;
 	${ WithHintItemWrapper } ~ &,
 	&:not(:empty) {
-		font-size: 24px; // Size of checkmark icon
+		font-size: 20px; // Size of checkmark icon
 	}
 `;

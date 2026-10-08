@@ -3,7 +3,7 @@ import { SVG } from '@wordpress/primitives';
 import type { IconProps } from './types';
 
 /**
- * Renders an SVG icon with a 24px default size.
+ * Renders an SVG icon with a 20px default size.
  *
  * ```jsx
  * import { wordpress } from '@wordpress/icons';
@@ -12,7 +12,7 @@ import type { IconProps } from './types';
  * ```
  */
 export const Icon = forwardRef< SVGSVGElement, IconProps >(
-	function UnforwardedIcon( { icon, size = 24, style, ...restProps }, ref ) {
+	function UnforwardedIcon( { icon, size = 20, style, ...restProps }, ref ) {
 		const mergedStyle =
 			icon.props.style || style
 				? { ...icon.props.style, ...style }

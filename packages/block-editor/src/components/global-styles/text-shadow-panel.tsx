@@ -227,7 +227,7 @@ function TextShadowToggle( {
 					align="center"
 					gap="sm"
 				>
-					<Icon icon={ textShadowIcon } size={ 24 } />
+					<Icon icon={ textShadowIcon } size={ 20 } />
 					<span>{ __( 'Text shadow' ) }</span>
 				</Stack>
 			</Button>

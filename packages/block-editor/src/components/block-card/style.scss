@@ -37,16 +37,17 @@
 }
 
 .block-editor-block-card__name {
-	padding: 3px 0; // This makes the title as high as the icon.
+	// Keep the title the same height as the icon.
+	padding-block: calc((#{$icon-size} - 1lh) / 2);
 }
 
 .block-editor-block-card .block-editor-block-icon,
 .block-editor-block-card__child-indicator-icon {
-	flex: 0 0 $button-size-small;
+	flex: 0 0 $icon-size;
 	margin-left: 0;
 	margin-right: $grid-unit-15;
-	width: $button-size-small;
-	height: $button-size-small;
+	width: $icon-size;
+	height: $icon-size;
 }
 
 .block-editor-block-card.is-synced .block-editor-block-icon {

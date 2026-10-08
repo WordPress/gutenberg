@@ -38,7 +38,7 @@ A growing subset of the library is stroke-based. Those icons set `fill: none` as
 
 | Name    | Type      | Default | Description                                                                   |
 | ------- | --------- | ------- | ----------------------------------------------------------------------------- |
-| `size`  | `integer` | `24`    | Size of icon in pixels.                                                       |
+| `size`  | `integer` | `20`    | Size of icon in pixels.                                                       |
 | `style` | `object`  |         | Merged with the icon's intrinsic styles. Consumer properties take precedence. |
 
 ## Docs & examples

@@ -17,24 +17,24 @@ exports[`BlockAlignmentUI > should match snapshot when controls are hidden 1`] =
       <svg
         aria-hidden="true"
         focusable="false"
-        height="24"
+        height="20"
         stroke="currentColor"
         stroke-width="1.5"
         style="fill: none;"
         viewBox="0 0 24 24"
-        width="24"
+        width="20"
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M5 4.75H13M5 19.25H13"
+          d="M3.25 3H13.25M3.25 21H13.25"
         />
         <rect
           fill="currentColor"
-          height="6"
+          height="7.5"
           stroke="none"
-          width="14"
-          x="5"
-          y="9"
+          width="17.5"
+          x="3.25"
+          y="8.25"
         />
       </svg>
     </button>
@@ -60,24 +60,24 @@ exports[`BlockAlignmentUI > should match snapshot when controls are visible 1`] 
         <svg
           aria-hidden="true"
           focusable="false"
-          height="24"
+          height="20"
           stroke="currentColor"
           stroke-width="1.5"
           style="fill: none;"
           viewBox="0 0 24 24"
-          width="24"
+          width="20"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M5 5H19M5 19H19"
+            d="M3.25 3.25H20.75M3.25 20.75H20.75"
           />
           <rect
             fill="currentColor"
-            height="6"
+            height="7.5"
             stroke="none"
-            width="14"
-            x="5"
-            y="9"
+            width="17.5"
+            x="3.25"
+            y="8.25"
           />
         </svg>
       </button>
@@ -93,24 +93,24 @@ exports[`BlockAlignmentUI > should match snapshot when controls are visible 1`] 
         <svg
           aria-hidden="true"
           focusable="false"
-          height="24"
+          height="20"
           stroke="currentColor"
           stroke-width="1.5"
           style="fill: none;"
           viewBox="0 0 24 24"
-          width="24"
+          width="20"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M5 4.75H13M5 19.25H13"
+            d="M3.25 3H13.25M3.25 21H13.25"
           />
           <rect
             fill="currentColor"
-            height="6"
+            height="7.5"
             stroke="none"
-            width="14"
-            x="5"
-            y="9"
+            width="17.5"
+            x="3.25"
+            y="8.25"
           />
         </svg>
       </button>
@@ -126,24 +126,24 @@ exports[`BlockAlignmentUI > should match snapshot when controls are visible 1`] 
         <svg
           aria-hidden="true"
           focusable="false"
-          height="24"
+          height="20"
           stroke="currentColor"
           stroke-width="1.5"
           style="fill: none;"
           viewBox="0 0 24 24"
-          width="24"
+          width="20"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M5 4.75H19M5 19.25H19"
+            d="M3.25 3H20.75M3.25 21H20.75"
           />
           <rect
             fill="currentColor"
-            height="6"
+            height="7.5"
             stroke="none"
-            width="10"
-            x="7"
-            y="9"
+            width="12.5"
+            x="5.75"
+            y="8.25"
           />
         </svg>
       </button>
@@ -159,24 +159,24 @@ exports[`BlockAlignmentUI > should match snapshot when controls are visible 1`] 
         <svg
           aria-hidden="true"
           focusable="false"
-          height="24"
+          height="20"
           stroke="currentColor"
           stroke-width="1.5"
           style="fill: none;"
           viewBox="0 0 24 24"
-          width="24"
+          width="20"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M11 4.75H19M11 19.25H19"
+            d="M10.75 3H20.75M10.75 21H20.75"
           />
           <rect
             fill="currentColor"
-            height="6"
+            height="7.5"
             stroke="none"
-            width="14"
-            x="5"
-            y="9"
+            width="17.5"
+            x="3.25"
+            y="8.25"
           />
         </svg>
       </button>
