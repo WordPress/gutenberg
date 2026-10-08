@@ -60,11 +60,20 @@ export function getCanvasConversion( { paddingBox, children } ) {
  * Children are measured against the padding box rather than the border box,
  * because that is what an absolutely positioned child is placed against.
  *
- * @param {Element} element The section's element, inside the editor canvas.
+ * The blocks to measure are named rather than taken from the element's own
+ * children, because they are not always its children yet: a block sitting in a
+ * column is about to become one, and the position worth keeping is the one it
+ * has right now, while the column is still laying it out. Measure first, move
+ * afterwards — the other way round, the column has already reflowed and the
+ * position is gone.
+ *
+ * @param {Element}  element   The section's element, inside the editor canvas.
+ * @param {string[]} clientIds The blocks to measure, in the order they should
+ *                             end up in, at any depth inside the section.
  * @return {?{paddingBox: Object, children: Object[], clientIds: string[]}} The
- *         measurements, or null when the section has no blocks in it.
+ *         measurements, or null when none of them are rendered.
  */
-export function measureSection( element ) {
+export function measureSection( element, clientIds ) {
 	const view = element.ownerDocument.defaultView;
 	const style = view.getComputedStyle( element );
 	const box = element.getBoundingClientRect();
@@ -80,15 +89,15 @@ export function measureSection( element ) {
 		height: box.height - borderTop - borderBottom,
 	};
 
-	const clientIds = [];
+	const measured = [];
 	const children = [];
-	for ( const child of element.children ) {
-		const clientId = child.dataset?.block;
-		if ( ! clientId ) {
+	for ( const clientId of clientIds ) {
+		const child = element.querySelector( `[data-block="${ clientId }"]` );
+		if ( ! child ) {
 			continue;
 		}
 		const childBox = child.getBoundingClientRect();
-		clientIds.push( clientId );
+		measured.push( clientId );
 		children.push( {
 			left: childBox.left,
 			top: childBox.top,
@@ -97,5 +106,7 @@ export function measureSection( element ) {
 		} );
 	}
 
-	return children.length ? { paddingBox, children, clientIds } : null;
+	return children.length
+		? { paddingBox, children, clientIds: measured }
+		: null;
 }

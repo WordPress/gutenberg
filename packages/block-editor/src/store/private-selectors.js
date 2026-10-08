@@ -20,6 +20,10 @@ import {
 	getBlockAttributes,
 } from './selectors';
 import {
+	getLayoutSupport,
+	isArrangedContainer,
+} from '../components/freeform/flatten';
+import {
 	checkAllowListRecursive,
 	getAllPatternsDependants,
 	getInsertBlockTypeDependants,
@@ -1430,15 +1434,49 @@ export function isSelectedBlockStyleStateShownOnCanvas( state, clientId ) {
  * @return {boolean} Whether the block is locked.
  */
 export function isBlockFreeformLocked( state, clientId ) {
-	const rootClientId = state.blocks.parents.get( clientId );
-	if ( ! rootClientId ) {
-		return false;
-	}
 	if ( state.freeformEnteredBlock === clientId ) {
 		return false;
 	}
+
+	// Walk up to the canvas the block is placed on, stepping over the cells of
+	// a grid of containers. A block in a column is placed by the section, not
+	// by the column: the first drag dissolves the grid into the section, so it
+	// is the section's canvas that decides whether this block is editable.
+	let rootClientId = state.blocks.parents.get( clientId );
+	while ( rootClientId && isCellOfAGrid( state, rootClientId ) ) {
+		// A cell's parent is the grid it belongs to, so both are stepped over
+		// together: neither of them places this block, the canvas beyond them
+		// does. Looping handles grids nested in grids.
+		rootClientId = state.blocks.parents.get(
+			state.blocks.parents.get( rootClientId )
+		);
+	}
+	if ( ! rootClientId ) {
+		return false;
+	}
+
 	return (
 		state.blocks.attributes.get( rootClientId )?.layout?.type === 'freeform'
+	);
+}
+
+/**
+ * Whether a container is one cell of a grid of containers — a column.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId A container's client id.
+ *
+ * @return {boolean} Whether it is a cell rather than a canvas.
+ */
+function isCellOfAGrid( state, clientId ) {
+	const parentClientId = state.blocks.parents.get( clientId );
+	return isArrangedContainer(
+		getLayoutSupport( state.blocks.byClientId.get( clientId )?.name ),
+		parentClientId
+			? getLayoutSupport(
+					state.blocks.byClientId.get( parentClientId )?.name
+				)
+			: undefined
 	);
 }
 

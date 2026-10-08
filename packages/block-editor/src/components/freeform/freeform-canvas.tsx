@@ -6,7 +6,7 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { ESCAPE } from '@wordpress/keycodes';
 import { store as blockEditorStore } from '../../store';
@@ -35,6 +35,12 @@ import {
 import { getCanvasConversion, measureSection } from './conversion';
 import { getCanvasChild } from './canvas-child';
 import { getGrownCanvasLayout } from './canvases';
+import {
+	canDissolveIntoCanvas,
+	getLayoutSupport,
+	isArrangedContainer,
+	planSectionFlatten,
+} from './flatten';
 
 /**
  * How far the pointer has to travel before a press becomes a drag. Below this a
@@ -96,8 +102,11 @@ export default function FreeformCanvas( {
 		[ canvasClientId ]
 	);
 
+	const registry = useRegistry();
 	const {
 		updateBlockAttributes,
+		moveBlocksToPosition,
+		removeBlocks,
 		duplicateBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 		__unstableMarkLastChangeAsPersistent,
@@ -428,16 +437,57 @@ export default function FreeformCanvas( {
 		[ writeLayouts ]
 	);
 
+	// Whether a block is one cell of a grid of containers — a column. Asked at
+	// event time rather than subscribed to, because it is only ever needed to
+	// answer where a press landed.
+	const isCell = useCallback(
+		( clientId ) => {
+			if ( ! clientId ) {
+				return false;
+			}
+			const { getBlockName, getBlockRootClientId } =
+				registry.select( blockEditorStore );
+			const root = getBlockRootClientId( clientId );
+			return isArrangedContainer(
+				getLayoutSupport( getBlockName( clientId ) ),
+				root ? getLayoutSupport( getBlockName( root ) ) : undefined
+			);
+		},
+		[ registry ]
+	);
+
 	// Measures the section and freezes its current layout as coordinates, so a
 	// block can be picked up out of normal flow without the rest of the section
 	// collapsing onto the same spot. The rects are kept locally as well as
 	// written to the blocks: the stylesheet above uses them straight away.
+	//
+	// A section is one canvas, so this is also where a grid inside the grid is
+	// absorbed: the contents of any Columns in the section come out into the
+	// section itself, at the positions they already occupy, and the emptied
+	// Columns goes. Without that, a block in the second column could only ever
+	// be moved around the second column, which is not what a canvas means.
 	const convertSectionToCanvas = useCallback( () => {
-		const measured = canvasElement && measureSection( canvasElement );
+		const section = registry
+			.select( blockEditorStore )
+			.getBlock( canvasClientId );
+		const plan =
+			section && planSectionFlatten( section, canDissolveIntoCanvas );
+		const measured =
+			plan && canvasElement
+				? measureSection( canvasElement, plan.citizens )
+				: null;
 		const conversion = measured && getCanvasConversion( measured );
 		if ( ! conversion ) {
 			return null;
 		}
+
+		// Read every citizen's style from the store rather than from the
+		// section's current children: a block still sitting in a column is not
+		// one of those yet, and merging its rect into nothing would throw away
+		// whatever colour and spacing it already carries.
+		const citizenStyles = unlock(
+			registry.select( blockEditorStore )
+		).getBlockStyles( measured.clientIds );
 
 		const updates = {};
 		const convertedRects = {};
@@ -445,7 +495,7 @@ export default function FreeformCanvas( {
 			const rect = conversion.rects[ index ];
 			convertedRects[ clientId ] = rect;
 			updates[ clientId ] = {
-				style: mergeChildLayout( childStyles[ clientId ], rect ),
+				style: mergeChildLayout( citizenStyles[ clientId ], rect ),
 			};
 		} );
 
@@ -454,6 +504,9 @@ export default function FreeformCanvas( {
 			canvasHeight: conversion.canvasHeight,
 		} );
 
+		// The section becoming a canvas is the persistent change; everything
+		// after it is marked as not persistent so the whole conversion, grids
+		// absorbed and all, is a single thing to undo.
 		updateBlockAttributes( canvasClientId, {
 			layout: {
 				...canvasLayout,
@@ -461,6 +514,34 @@ export default function FreeformCanvas( {
 				canvasHeight: conversion.canvasHeight,
 			},
 		} );
+
+		for ( const wrapper of plan.wrappers ) {
+			// Read afresh: dissolving the wrapper before it has shifted the
+			// ones after it along.
+			let index = registry
+				.select( blockEditorStore )
+				.getBlockIndex( wrapper.clientId );
+			for ( const move of wrapper.moves ) {
+				__unstableMarkNextChangeAsNotPersistent();
+				moveBlocksToPosition(
+					move.clientIds,
+					move.fromRootClientId,
+					canvasClientId,
+					index
+				);
+				index += move.clientIds.length;
+			}
+		}
+		if ( plan.wrappers.length ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			// Emptied, so this takes the columns with it. `false` keeps the
+			// selection where it is: the block being picked up is in it.
+			removeBlocks(
+				plan.wrappers.map( ( wrapper ) => wrapper.clientId ),
+				false
+			);
+		}
+
 		__unstableMarkNextChangeAsNotPersistent();
 		updateBlockAttributes( Object.keys( updates ), updates, true );
 
@@ -469,8 +550,10 @@ export default function FreeformCanvas( {
 		canvasElement,
 		canvasClientId,
 		canvasLayout,
-		childStyles,
+		registry,
 		updateBlockAttributes,
+		moveBlocksToPosition,
+		removeBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 	] );
 
@@ -589,7 +672,11 @@ export default function FreeformCanvas( {
 			if ( event.button !== 0 || gestureRef.current ) {
 				return;
 			}
-			const clientId = getCanvasChild( event.target, canvasElement );
+			const clientId = getCanvasChild(
+				event.target,
+				canvasElement,
+				isCell
+			);
 			// Already typing in this block: the caret and the selection are
 			// the browser's business.
 			if ( ! clientId || clientId === enteredClientId ) {
@@ -608,7 +695,7 @@ export default function FreeformCanvas( {
 		canvasElement.addEventListener( 'pointerdown', onPointerDown );
 		return () =>
 			canvasElement.removeEventListener( 'pointerdown', onPointerDown );
-	}, [ canvasElement, enteredClientId, selectedClientIds ] );
+	}, [ canvasElement, enteredClientId, selectedClientIds, isCell ] );
 
 	// The gesture is followed on the document so it survives the pointer
 	// leaving the block it started on.
