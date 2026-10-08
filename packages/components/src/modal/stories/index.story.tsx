@@ -121,3 +121,39 @@ WithHeaderActions.args = {
 WithHeaderActions.parameters = {
 	...Default.parameters,
 };
+
+/**
+ * When the content has no tabbable elements, `firstContentElement` focuses the
+ * close button. Turn off `isDismissible` to focus the dialog frame instead.
+ */
+export const FocusFallback: StoryFn< typeof Modal > = ( {
+	onRequestClose,
+	...args
+} ) => {
+	const [ isOpen, setIsOpen ] = useState( false );
+	return (
+		<>
+			<Button
+				__next40pxDefaultSize
+				variant="secondary"
+				onClick={ () => setIsOpen( true ) }
+			>
+				Open Modal
+			</Button>
+			{ isOpen && (
+				<Modal
+					{ ...args }
+					onRequestClose={ ( event ) => {
+						setIsOpen( false );
+						onRequestClose( event );
+					} }
+				/>
+			) }
+		</>
+	);
+};
+FocusFallback.args = {
+	title: 'Focus fallback',
+	focusOnMount: 'firstContentElement',
+	children: <p>This content has no tabbable elements.</p>,
+};

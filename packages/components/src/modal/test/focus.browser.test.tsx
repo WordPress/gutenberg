@@ -8,23 +8,31 @@ import type { ModalProps } from '../types';
 
 const FocusMountDemo = ( {
 	focusOnMount,
-}: Pick< ModalProps, 'focusOnMount' > ) => {
+	children = (
+		<>
+			<p>Modal content</p>
+			<a href="https://wordpress.org">First Focusable Content Element</a>
+			<a href="https://wordpress.org">
+				Another Focusable Content Element
+			</a>
+		</>
+	),
+	...props
+}: Partial<
+	Pick< ModalProps, 'focusOnMount' | 'children' | 'isDismissible' >
+> ) => {
 	const [ isShown, setIsShown ] = useState( false );
 	return (
 		<>
 			<button onClick={ () => setIsShown( true ) }>Toggle Modal</button>
 			{ isShown && (
 				<Modal
+					{ ...props }
 					focusOnMount={ focusOnMount }
+					title="Modal title"
 					onRequestClose={ () => setIsShown( false ) }
 				>
-					<p>Modal content</p>
-					<a href="https://wordpress.org">
-						First Focusable Content Element
-					</a>
-					<a href="https://wordpress.org">
-						Another Focusable Content Element
-					</a>
+					{ children }
 				</Modal>
 			) }
 		</>
@@ -76,6 +84,40 @@ describe( 'Modal focus handling', () => {
 		);
 
 		expect( screen.getByRole( 'button', { name: 'Close' } ) ).toHaveFocus();
+	} );
+
+	it( 'focuses the close button when content has no tabbable elements', async () => {
+		const user = userEvent.setup();
+		await render(
+			<FocusMountDemo
+				focusOnMount="firstContentElement"
+				children={ null }
+			/>
+		);
+
+		await user.tab();
+		await user.keyboard( '{Enter}' );
+
+		await expect
+			.element( screen.getByRole( 'button', { name: 'Close' } ) )
+			.toHaveFocus();
+	} );
+
+	it( 'focuses the dialog frame when the Modal has no tabbable elements', async () => {
+		const user = userEvent.setup();
+		await render(
+			<FocusMountDemo
+				focusOnMount="firstContentElement"
+				isDismissible={ false }
+			>
+				<p>Modal content</p>
+			</FocusMountDemo>
+		);
+
+		await user.tab();
+		await user.keyboard( '{Enter}' );
+
+		await expect.element( screen.getByRole( 'dialog' ) ).toHaveFocus();
 	} );
 
 	it( 'should not move focus when `false` passed as value for `focusOnMount` prop', async () => {
