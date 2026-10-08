@@ -24,7 +24,7 @@ export { create };
  * @return The persistence layer initialized with the preloaded data.
  */
 export function __unstableCreatePersistenceLayer(
-	serverData: PreferencesData | '' | false,
+	serverData: PreferencesData | [] | '' | false,
 	userId: string
 ): PersistenceLayer {
 	const localStorageRestoreKey = `WP_PREFERENCES_USER_${ userId }`;
@@ -35,7 +35,10 @@ export function __unstableCreatePersistenceLayer(
 	// Date parse returns NaN for invalid input. Coerce anything invalid
 	// into a conveniently comparable zero.
 	const serverModified =
-		Date.parse( ( serverData && serverData._modified ) as string ) || 0;
+		Date.parse(
+			( serverData &&
+				( serverData as PreferencesData )._modified ) as string
+		) || 0;
 	const localModified =
 		Date.parse( ( localData && localData._modified ) as string ) || 0;
 
