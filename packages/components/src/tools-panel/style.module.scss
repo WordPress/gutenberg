@@ -47,6 +47,7 @@
 
 // Outrank Heading's base typography regardless of stylesheet insertion order.
 .tools-panel-heading.tools-panel-heading {
+	color: var(--wpds-color-foreground-content-neutral-strong);
 	font-size: inherit;
 	line-height: normal;
 	margin: 0;
@@ -98,17 +99,21 @@
 }
 
 .default-controls-item {
-	color: $gray-900;
+	color: var(--wpds-color-foreground-interactive-neutral);
+
+	&:not([aria-disabled="true"]):is(:hover, :active, :focus-visible) {
+		color: var(--wpds-color-foreground-interactive-neutral-active);
+	}
 }
 
 // Match the previous Emotion `&&` specificity so disabled MenuItem styles
 // continue to override its defaults.
 .default-controls-item.default-controls-item[aria-disabled="true"] {
-	color: $gray-700;
+	color: var(--wpds-color-foreground-interactive-neutral-disabled);
 	opacity: 1;
 
 	&:hover {
-		color: $gray-700;
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
 	}
 
 	.reset-label {
