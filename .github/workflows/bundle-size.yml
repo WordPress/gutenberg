@@ -74,6 +74,15 @@ jobs:
                   # compressed-size-action checks out the base branch, and the cache post step then runs that branch's copy of this action.
                   cache: 'false'
 
+            # Not part of setup-npm, so the post step does not depend on the checked out branch.
+            - name: Cache npm downloads
+              uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+              with:
+                  path: ~/.npm
+                  key: npm-cache-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package-lock.json') }}
+                  restore-keys: |
+                      npm-cache-${{ runner.os }}-${{ runner.arch }}-
+
             - uses: preactjs/compressed-size-action@f322c295dde06a1cb7ccaef105732dd8a726d1d9 # v2.10.0
               id: size
               with:
