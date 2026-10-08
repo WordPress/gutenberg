@@ -667,6 +667,31 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		] );
 	} );
 
+	test( 'should keep active formatting for input after an inline paste', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await pageUtils.pressKeys( 'primary+b' );
+		await page.keyboard.type( '123' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		pageUtils.setClipboardData( { plainText: 'a' } );
+		await pageUtils.pressKeys( 'primary+v' );
+		await pageUtils.pressKeys( 'primary+v' );
+		await page.keyboard.type( 'b' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '<strong>1aab23</strong>' },
+			},
+		] );
+	} );
+
 	// For some reason, tabbing in the highlight popover doesn't work in WebKit.
 	test( 'should preserve internal formatting (-webkit, -firefox)', async ( {
 		page,

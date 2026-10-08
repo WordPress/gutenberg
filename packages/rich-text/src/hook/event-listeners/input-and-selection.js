@@ -72,7 +72,11 @@ export default ( props ) => ( element ) => {
 		}
 
 		const currentValue = createRecord();
-		const { start, activeFormats: oldActiveFormats = [] } = record.current;
+		const { start } = record.current;
+		const oldActiveFormats = getActiveFormats(
+			record.current,
+			EMPTY_ACTIVE_FORMATS
+		);
 
 		// When a non-collapsed selection is deleted (not replaced with new
 		// text), the old active formats refer to the deleted content and
