@@ -64,43 +64,41 @@ function getCanvasRules( {
 #block-${ canvasClientId } > * {
 	margin: 0;
 }
-${ getMoveModeRules( canvasClientId ) }`;
+`;
 }
 
 /**
- * The rules that say the blocks on a canvas are moved rather than typed into.
+ * The rules that say a block is moved rather than typed into.
  *
- * One rule for the canvas rather than one per block, because every child is in
- * move mode whether or not it has coordinates yet — a block just inserted, or
- * every block in a section nobody has dragged in.
+ * Keyed on the blocks themselves rather than on a canvas's children, because
+ * the blocks a canvas can move are not always its children yet: an item in a
+ * column becomes one on the first drag, and until then a `> *` rule never
+ * reaches it. In the theme patterns almost everything is nested inside a
+ * Columns or a wrapper Group, so almost nothing would be covered.
  *
- * `> *` is deliberate: a Group kept whole on a canvas travels as one piece, and
- * the words inside it are still words. The entered block is excluded rather
- * than reset, so the editor goes on saying what the cursor over real text is.
+ * Nor is this about placement. A block with no coordinates — one just
+ * inserted, or anything in a section nobody has dragged in — is still a block
+ * you can pick up, so the two cannot be decided by the same rule.
  *
- * @param {string} canvasClientId The canvas block.
- * @return {string} CSS.
- */
-function getMoveModeRules( canvasClientId ) {
-	return `#block-${ canvasClientId } > *:not([contenteditable="true"]) {
-	cursor: move;
-	user-select: none;
-}`;
-}
-
-/**
- * The stylesheet for a section that is a canvas waiting to happen.
+ * Nothing here is a descendant selector: a Group kept whole on a canvas
+ * travels as one piece, and the words inside it are still words. The entered
+ * block is excluded rather than reset, so the editor goes on saying what the
+ * cursor over real text is.
  *
- * Its blocks are already held still — RichText sees to that — so they must
- * already say they can be moved. Nothing is positioned: the section is still
- * laying itself out, and coordinates it has not been measured for would
- * collapse it onto a single spot.
- *
- * @param {string[]} clientIds Sections that could become canvases.
+ * @param {string[]} clientIds Every block the canvas can move.
  * @return {string} CSS for the editor canvas.
  */
-export function getPendingCanvasCss( clientIds ) {
-	return clientIds.map( getMoveModeRules ).join( '\n' );
+export function getMoveModeCss( clientIds ) {
+	return clientIds
+		.map(
+			(
+				clientId
+			) => `#block-${ clientId }:not([contenteditable="true"]) {
+	cursor: move;
+	user-select: none;
+}`
+		)
+		.join( '\n' );
 }
 
 /**

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
 	getCanvasOverrideCss,
 	getCanvasesCss,
-	getPendingCanvasCss,
+	getMoveModeCss,
 } from '../override-css';
 
 const squash = ( css ) => css.replace( /\s+/g, ' ' ).trim();
@@ -61,9 +61,9 @@ describe( 'getCanvasOverrideCss', () => {
 
 		expect( css ).not.toContain( '.block-editor' );
 		// Two for the canvas — the positioning context and its children's
-		// margins — then two for the child: where it sits, and that it is in
-		// move mode.
-		expect( css.match( /#block-/g ) ).toHaveLength( 4 );
+		// margins — and one for the child, saying where it sits. Move mode is
+		// a separate stylesheet keyed on the movable blocks.
+		expect( css.match( /#block-/g ) ).toHaveLength( 3 );
 	} );
 
 	it( 'emits one rule per child', () => {
@@ -146,62 +146,59 @@ describe( 'placing a block whose height is not known', () => {
 } );
 
 describe( 'the rules that say a block is in move mode', () => {
-	// The editor does not re-render a section when it becomes a canvas, so the
-	// section's element never gains `is-layout-freeform` and CSS keyed on that
-	// class does nothing until something else forces a render. These rules
-	// therefore come from the canvas's own stylesheet, addressed by id, for the
-	// same reason the positioning does.
-	const canvas = {
-		clientId: 'sec',
-		canvasHeight: 600,
-		rects: { a: { x: 0, y: 0, width: 600, height: 60 } },
-	};
-
-	it( 'gives every block on the canvas the move cursor', () => {
-		expect( getCanvasOverrideCss( canvas ) ).toContain( 'cursor: move' );
+	// Keyed on the blocks themselves, not on the canvas's children, because
+	// the blocks a canvas can move are not always its children yet: an item in
+	// a column becomes one on the first drag, and until then `> *` never
+	// reaches it. In the theme patterns almost everything is nested like that,
+	// so almost nothing showed the move cursor.
+	it( 'names each movable block', () => {
+		const css = getMoveModeCss( [ 'a', 'b' ] );
+		expect( css ).toContain( '#block-a:not([contenteditable="true"])' );
+		expect( css ).toContain( '#block-b:not([contenteditable="true"])' );
 	} );
 
-	it( 'stops them looking like text to sweep over', () => {
-		expect( getCanvasOverrideCss( canvas ) ).toContain(
-			'user-select: none'
-		);
-	} );
-
-	it( 'says it once for the canvas rather than once per block', () => {
-		// Every child is in move mode, placed or not, so this is a rule about
-		// the canvas. Writing it per block missed the ones with no coordinates
-		// yet — a freshly inserted block, or a whole section nobody has dragged
-		// in.
-		expect( getCanvasOverrideCss( canvas ) ).toContain(
-			'#block-sec > *:not([contenteditable="true"])'
-		);
+	it( 'gives it the move cursor and stops it looking like text', () => {
+		const css = getMoveModeCss( [ 'a' ] );
+		expect( css ).toContain( 'cursor: move' );
+		expect( css ).toContain( 'user-select: none' );
 	} );
 
 	it( 'excludes a block that has been entered for editing', () => {
 		// Entered, it is text again: the caret belongs in it and the words are
 		// selectable, so neither rule may reach it.
-		expect( getCanvasOverrideCss( canvas ) ).toContain(
+		expect( getMoveModeCss( [ 'a' ] ) ).toContain(
 			':not([contenteditable="true"])'
 		);
 	} );
 
-	it( 'leaves what is inside a block alone', () => {
-		// `> *` is deliberate. A Group kept whole on the canvas travels as one
-		// piece, and the words inside it are still words.
-		expect( getCanvasOverrideCss( canvas ) ).not.toContain(
-			'#block-sec *:not'
-		);
+	it( 'leaves what is inside a movable block alone', () => {
+		// A Group kept whole on a canvas travels as one piece, and the words
+		// inside it are still words, so nothing here is a descendant selector.
+		expect( getMoveModeCss( [ 'a' ] ) ).not.toContain( '#block-a *' );
+		expect( getMoveModeCss( [ 'a' ] ) ).not.toContain( '#block-a >' );
 	} );
 
-	it( 'addresses move mode by id, which outranks the editor’s text cursor', () => {
+	it( 'outranks the editor’s text cursor by using an id', () => {
 		// `.block-editor-block-list__layout .block-editor-block-list__block
 		// [contenteditable]` sets `cursor: text` at 0-3-0 — and that attribute
 		// selector catches a locked block too, because it matches
 		// `contenteditable="false"` just as happily.
-		const css = getCanvasOverrideCss( canvas );
+		const css = getMoveModeCss( [ 'a' ] );
 		expect( css ).not.toContain( '.is-layout-freeform' );
-		expect( css ).toContain( '#block-sec' );
+		expect( css ).toContain( '#block-a' );
 	} );
+
+	it( 'is empty for no blocks', () => {
+		expect( getMoveModeCss( [] ) ).toBe( '' );
+	} );
+} );
+
+describe( 'placing blocks on a canvas', () => {
+	const canvas = {
+		clientId: 'sec',
+		canvasHeight: 600,
+		rects: { a: { x: 0, y: 0, width: 600, height: 60 } },
+	};
 
 	it( 'keeps blocks above the lattice', () => {
 		expect( getCanvasOverrideCss( canvas ) ).toContain( 'z-index: 1' );
@@ -212,33 +209,12 @@ describe( 'the rules that say a block is in move mode', () => {
 			'container-type: inline-size'
 		);
 	} );
-} );
 
-describe( 'a section nobody has dragged in yet', () => {
-	// It is a canvas waiting to happen: the first drag converts it. Its blocks
-	// are already held still, so they must already say they can be moved — but
-	// nothing may be positioned, because the section is still laying itself out
-	// and coordinates would collapse it.
-	it( 'says its blocks are in move mode', () => {
-		const css = getPendingCanvasCss( [ 'sec-a', 'sec-b' ] );
-		expect( css ).toContain(
-			'#block-sec-a > *:not([contenteditable="true"])'
+	it( 'says nothing about move mode, which is not about placement', () => {
+		// A block with no coordinates is still movable, so the two cannot be
+		// decided by the same rule.
+		expect( getCanvasOverrideCss( canvas ) ).not.toContain(
+			'cursor: move'
 		);
-		expect( css ).toContain(
-			'#block-sec-b > *:not([contenteditable="true"])'
-		);
-		expect( css ).toContain( 'cursor: move' );
-		expect( css ).toContain( 'user-select: none' );
-	} );
-
-	it( 'positions nothing at all', () => {
-		const css = getPendingCanvasCss( [ 'sec-a' ] );
-		expect( css ).not.toContain( 'position: absolute' );
-		expect( css ).not.toContain( 'aspect-ratio' );
-		expect( css ).not.toContain( 'left:' );
-	} );
-
-	it( 'is empty for no sections', () => {
-		expect( getPendingCanvasCss( [] ) ).toBe( '' );
 	} );
 } );
