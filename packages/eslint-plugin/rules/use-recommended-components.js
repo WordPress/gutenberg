@@ -23,6 +23,9 @@ const ALLOWLIST = {
 			'Badge',
 			'Calendar',
 			'Card',
+			'Checkbox',
+			'CheckboxControl',
+			'CheckboxGroup',
 			'Collapsible',
 			'CollapsibleCard',
 			'ControlWithError',
@@ -36,6 +39,11 @@ const ALLOWLIST = {
 			'KeyboardShortcutDescription',
 			'KeyboardShortcutDisplay',
 			'Link',
+			'Notice',
+			'Progress',
+			'Radio',
+			'RadioGroup',
+			'RadioGroupControl',
 			'RangeCalendar',
 			'SearchableChipSelect',
 			'SearchableChipSelectControl',
@@ -44,6 +52,8 @@ const ALLOWLIST = {
 			'Skeleton',
 			'Spinner',
 			'Stack',
+			'Switch',
+			'SwitchControl',
 			'Tabs',
 			'Text',
 			'Textarea',
@@ -59,22 +69,16 @@ const ALLOWLIST = {
 			'AlertDialog',
 			'Breadcrumb',
 			'Button',
-			'Checkbox',
-			'CheckboxGroup',
+			'ButtonLink',
 			'Combobox',
 			'Dialog',
 			'Drawer',
 			'IconButton',
-			'LinkButton',
 			'Menu',
-			'Notice',
+			'Meter',
 			'Popover',
-			'Radio',
-			'RadioGroup',
 			'SearchableSelect',
 			'SearchableSelectControl',
-			'Switch',
-			'SwitchControl',
 		],
 		message:
 			'`{{ name }}` from `{{ source }}` is not yet recommended for use in a WordPress environment.',
@@ -111,6 +115,7 @@ const DENYLIST = {
 		__experimentalZStack: 'Write your own CSS instead.',
 		Animate:
 			'Write your own CSS animations instead, preferably using the motion tokens available in `@wordpress/theme`.',
+		Badge: 'Use `{{ name }}` from `@wordpress/ui` instead.',
 		BaseControl:
 			'Use `Field` from `@wordpress/ui` instead. For a purely visual label, use `Field.VisualLabel`. For a group legend, use `Fieldset` and `Fieldset.Legend`.',
 		Card: 'Use `Card.Root` from `@wordpress/ui` instead.',
@@ -120,13 +125,21 @@ const DENYLIST = {
 		CardHeader:
 			'Use `Card.Header` (and optionally `Card.Title`) from `@wordpress/ui` instead.',
 		CardMedia: 'Use `Card.FullBleed` from `@wordpress/ui` instead.',
+		CheckboxControl:
+			'Use `CheckboxControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		Flex: 'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
 		FlexBlock:
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
 		FlexItem:
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
+		FormToggle:
+			'Use `Switch` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		__experimentalInputControl:
 			'Use `InputControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
+		Notice: 'Use `Notice` from `@wordpress/ui` instead.',
+		ProgressBar: 'Use `Progress` from `@wordpress/ui` instead.',
+		RadioControl:
+			'Use `RadioGroupControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		ResponsiveWrapper: 'Use the CSS `aspect-ratio` property instead.',
 		TabPanel: 'Use `Tabs` from `@wordpress/ui` instead.',
 		TabbableContainer: '{{ name }} is planned for deprecation.',
@@ -135,6 +148,9 @@ const DENYLIST = {
 			'Use `InputControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		TextareaControl:
 			'Use `TextareaControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
+		Tip: 'Use `Notice` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
+		ToggleControl:
+			'Use `SwitchControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		Tooltip: 'Use `Tooltip` from `@wordpress/ui` instead.',
 		VisuallyHidden: 'Use `{{ name }}` from `@wordpress/ui` instead.',
 	},

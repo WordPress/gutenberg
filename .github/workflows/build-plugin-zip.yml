@@ -361,7 +361,7 @@ jobs:
             # OCI Registry As Storage (ORAS) provides a way to push and pull non-image, generic artifacts (.gz files,
             # for example) to container registries such as GitHub Container Registry.
             - name: Setup ORAS
-              uses: oras-project/setup-oras@1d808f7d7f6995cc68b7bf507bfe5c5446e1dc9d # v2.0.1
+              uses: oras-project/setup-oras@005458ad77f1c8facd38a094e4af2e69e5607ff4 # v2.0.2
 
             # The owner/repository is hard-coded because capital letters are not allowed when publishing to GitHub
             # Container Registry. The organization name is WordPress, so ${{ github.repository }} causes an error.
@@ -598,10 +598,11 @@ jobs:
                   working-directory: main
                   cache: false
 
+            # Not `npm exec`: it exports the tool's .npmrc as npm_config_* variables, which override the release branch's own .npmrc.
             - name: Publish packages to npm ("latest" dist-tag)
               run: |
                   cd main
                   npm ci
-                  npm exec --no release-cli -- npm-latest --semver minor --ci --repository-path ../publish
+                  node tools/release/cli.js npm-latest --semver minor --ci --repository-path ../publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

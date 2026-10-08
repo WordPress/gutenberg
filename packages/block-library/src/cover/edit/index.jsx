@@ -11,6 +11,7 @@ import {
 import { Placeholder, SandBox, Spinner } from '@wordpress/components';
 import {
 	compose,
+	useMergeRefs,
 	useReducedMotion,
 	useResizeObserver,
 } from '@wordpress/compose';
@@ -521,7 +522,11 @@ function CoverEdit( {
 	);
 
 	const ref = useRef();
-	const blockProps = useBlockProps( { ref } );
+	// State, not a ref, so that the element is there on the next render.
+	const [ dropZoneElement, setDropZoneElement ] = useState( null );
+	const blockProps = useBlockProps( {
+		ref: useMergeRefs( [ ref, setDropZoneElement ] ),
+	} );
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
@@ -530,7 +535,7 @@ function CoverEdit( {
 		{
 			allowedBlocks,
 			templateLock,
-			dropZoneElement: ref.current,
+			dropZoneElement,
 		}
 	);
 
@@ -559,10 +564,17 @@ function CoverEdit( {
 			return;
 		}
 
+		const previousImage = { id, url: propsRef.current.attributes.url };
+		let isUndone = false;
 		openMediaEditorModal( {
 			id,
 			onClose: () => {
 				editMediaButtonRef.current?.focus();
+			},
+			onUndo: () => {
+				isUndone = true;
+				setIsSwappingMedia( false );
+				setAttributes( previousImage );
 			},
 			onUpdate: async ( { id: newId, url: newUrl } ) => {
 				if ( typeof newId !== 'number' ) {
@@ -585,6 +597,10 @@ function CoverEdit( {
 				if ( newUrl ) {
 					const averageBackgroundColor =
 						await getMediaColor( newUrl );
+					// Snackbar Undo can run while the image color is loading.
+					if ( isUndone ) {
+						return;
+					}
 
 					// Read latest values after await to avoid stale closures.
 					const {

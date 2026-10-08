@@ -74,7 +74,7 @@ npm install @wordpress/theme
 import '@wordpress/theme/design-tokens.css';
 ```
 
-The package's JavaScript entrypoints are ESM-only and require Node.js `^20.19.0` or `>=22.13.0`. Use `import` syntax from ESM or TypeScript configuration files.
+The package's JavaScript entrypoints are ESM-only and require Node.js `>=22.13.0`. Use `import` syntax from ESM or TypeScript configuration files.
 
 TypeScript consumers require TypeScript 5 or newer.
 
@@ -277,7 +277,8 @@ This step will:
 2. Generate primitive tokens.
 3. Build CSS and JavaScript token files.
 4. Update the design tokens documentation.
-5. Format all generated files.
+5. Generate complete Figma border collection mode files in `prebuilt/figma`.
+6. Format all generated files.
 
 The files generated in this step will all be committed to the repo.
 
