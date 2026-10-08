@@ -1,7 +1,8 @@
 import { Canvas, Meta } from '@storybook/addon-docs/blocks';
 import * as BreadcrumbStories from './index.story';
+import * as UsageGuidelinesStories from './usage-guidelines.story';
 
-<Meta of={ BreadcrumbStories } />
+<Meta of={ UsageGuidelinesStories } name="Usage guidelines" />
 
 # Breadcrumb usage guidelines
 
@@ -9,32 +10,40 @@ Use Breadcrumb to show a hierarchical path to the current page or selected item.
 
 ## Page navigation
 
-Use `LinkItem` ancestors with meaningful destinations followed by exactly one `CurrentItem`. The root is a named navigation landmark containing an ordered list, and the non-activatable current item defaults to `aria-current="page"`. This follows the [APG breadcrumb pattern](https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/).
+Use `LinkItem` ancestors with meaningful destinations followed by exactly one `CurrentItem`. Give `Root` an `aria-label` that describes the hierarchy, such as "Page hierarchy". The current item is not a link and defaults to `aria-current="page"`. This follows the [APG breadcrumb pattern](https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/).
 
 <Canvas of={ BreadcrumbStories.Default } />
 
 ## Hierarchy selection
 
-Use `ButtonItem` ancestors followed by exactly one `CurrentItem` when ancestors select or activate a position in the hierarchy. For example, a block editor trail can show Document, Group, and Paragraph. Group selects the ancestor block; Document clears selection. Breadcrumb owns ordering, overflow, tooltips, and responsive focus handling. The consumer owns selection state and intentional focus moves into the editor.
+Use `ButtonItem` ancestors followed by exactly one `CurrentItem` when ancestors select or activate a position in the hierarchy. For example, a block editor trail can show Document, Group, and Paragraph. Group selects the ancestor block; Document clears selection. Give `Root` a descriptive `aria-label`, such as "Block hierarchy".
 
-The root is a named group containing an ordered list. Visible ancestors are native buttons with `type="button"`; collapsed ancestors are menu actions. The current item is non-activatable and defaults to `aria-current="true"`. This selection variant extends beyond the APG breadcrumb pattern, which describes links to ancestor pages.
+Use `onClick` to update your selection state. If selection should move focus into the editor, do that in your handler. Breadcrumb preserves that focus move.
 
-<Canvas of={ BreadcrumbStories.HierarchySelection } />
+Set `aria-current="true"` on `CurrentItem` if selecting an ancestor can leave it as the only item. This keeps the trail as a group after all button ancestors are removed.
 
-Use `onClick` to activate an ancestor. Breadcrumb forwards refs and event handlers to an `HTMLButtonElement` in the visible trail and an `HTMLDivElement` in the overflow menu. Type refs and event `currentTarget` for both targets. A custom `render` must support both button and menu-item composition. Measurement copies receive neither public refs nor event handlers.
+<Canvas of={ UsageGuidelinesStories.HierarchySelection } />
 
-Activating an overflow action closes the menu. If selection removes the focused item or the overflow trigger, Breadcrumb focuses the current item when focus would otherwise fall back to the document body. A consumer focus move into the editor takes precedence. A focused ancestor stays visible during resize where space permits; if it no longer fits, focus moves to the overflow trigger.
+When using a ref or an event's `currentTarget`, handle both possible elements: `HTMLButtonElement` in the visible trail and `HTMLDivElement` in the overflow menu. A custom `render` must support both button and menu-item composition.
 
 ## Current-only trails
 
-A single `CurrentItem` is supported, including truncation when its label does not fit. Root infers its semantics from the complete ancestor collection. With no ancestors, an explicit `aria-current={true}` or `aria-current="true"` on `CurrentItem` selects group semantics. Otherwise, Root defaults to a navigation landmark. This inference works on both the server and client.
+A single `CurrentItem` is supported. For page navigation, no `aria-current` prop is needed. For hierarchy selection, set `aria-current="true"` explicitly:
 
-Use `aria-current` on `CurrentItem` to override its inferred value. For example, `<Breadcrumb.CurrentItem aria-current="true">Document</Breadcrumb.CurrentItem>` keeps both the group role and in-document current marker when the final button ancestor is removed. Ancestor links or buttons take precedence over this hint when present. The prop takes precedence over a custom `render` element and is omitted from hidden measurement copies.
+```tsx
+<Breadcrumb.Root aria-label="Block hierarchy">
+	<Breadcrumb.CurrentItem aria-current="true">
+		Document
+	</Breadcrumb.CurrentItem>
+</Breadcrumb.Root>
+```
 
 <Canvas of={ BreadcrumbStories.CurrentOnly } />
 
 ## Supported collections
 
-All ancestors must be links or all must be buttons. Mixed link/button collections produce a development validation error. Keep one final `CurrentItem`, use non-empty text labels, and give items generated from arrays stable React keys. The internal overflow trigger does not change the trail's variant.
+Use only links or only buttons for ancestors within one trail. Keep exactly one final `CurrentItem`, use non-empty text labels, and give items generated from arrays stable React keys.
 
-A truncated current label remains accessible from the keyboard through its tooltip. It does not become an activation control.
+## Truncated labels
+
+Keep labels concise and leave enough space to read them where possible. Truncated labels have a tooltip for mouse and keyboard users. Tooltips are unavailable on touch devices, so provide another way to read the full label when it is needed to understand the hierarchy.

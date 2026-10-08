@@ -517,6 +517,7 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 			if ( ! open && eventDetails.reason === 'item-press' ) {
 				// Menu's click handling focuses the item after consumer handlers.
 				// Restore an intentional focus move before Menu returns to its trigger.
+				// Upstream: https://github.com/mui/base-ui/issues/5930
 				activationFocusRef.current?.focus();
 				activationFocusRef.current = null;
 			}
