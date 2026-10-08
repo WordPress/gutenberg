@@ -12,7 +12,7 @@ export default function Text< Item >( {
 	config,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { prefix, suffix } = config || {};
+	const { prefix, prefixPadding, suffix, suffixPadding } = config || {};
 
 	return (
 		<ValidatedText
@@ -24,13 +24,17 @@ export default function Text< Item >( {
 				markWhenOptional,
 				validity,
 				prefix: prefix ? (
-					<InputLayout.Slot>
-						{ createElement( prefix ) }
+					<InputLayout.Slot padding={ prefixPadding }>
+						{ typeof prefix === 'string'
+							? prefix
+							: createElement( prefix ) }
 					</InputLayout.Slot>
 				) : undefined,
 				suffix: suffix ? (
-					<InputLayout.Slot>
-						{ createElement( suffix ) }
+					<InputLayout.Slot padding={ suffixPadding }>
+						{ typeof suffix === 'string'
+							? suffix
+							: createElement( suffix ) }
 					</InputLayout.Slot>
 				) : undefined,
 			} }

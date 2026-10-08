@@ -77,10 +77,7 @@ const meta = {
 };
 export default meta;
 
-const DollarPrefix = () => <span>$</span>;
 const StarIconPrefix = () => <Icon icon={ starFilled } />;
-const PercentSuffix = () => <span>%</span>;
-const USDSuffix = () => <span>USD</span>;
 type DataType = {
 	id: number;
 	text: string;
@@ -542,7 +539,7 @@ const fields: Field< DataType >[] = [
 		description: 'Text field with dollar sign prefix.',
 		Edit: {
 			control: 'text',
-			prefix: DollarPrefix,
+			prefix: '$',
 		},
 	},
 	{
@@ -553,6 +550,7 @@ const fields: Field< DataType >[] = [
 		Edit: {
 			control: 'text',
 			prefix: StarIconPrefix,
+			prefixPadding: 'minimal',
 		},
 	},
 	{
@@ -562,7 +560,7 @@ const fields: Field< DataType >[] = [
 		description: 'Text field with percent sign suffix.',
 		Edit: {
 			control: 'text',
-			suffix: PercentSuffix,
+			suffix: '%',
 		},
 	},
 	{
@@ -572,8 +570,8 @@ const fields: Field< DataType >[] = [
 		description: 'Text field with both dollar prefix and USD suffix.',
 		Edit: {
 			control: 'text',
-			prefix: DollarPrefix,
-			suffix: USDSuffix,
+			prefix: '$',
+			suffix: 'USD',
 		},
 	},
 ];
