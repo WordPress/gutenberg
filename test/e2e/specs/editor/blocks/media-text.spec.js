@@ -19,6 +19,43 @@ async function expectNoHorizontalPageScroll( page ) {
 // When the long string also appears in theme chrome (adjacent post nav, author
 // bio outside the block), page scrollWidth is not a reliable signal. Assert the
 // Media & Text block itself stays within the viewport instead.
+async function expectNestedSearchButtonLabelSingleLine( page, buttonText ) {
+	const button = page.locator(
+		'.wp-block-media-text__content .wp-block-search__button'
+	);
+	await expect( button ).toBeVisible();
+	await expect( button ).toHaveCSS( 'overflow-wrap', 'normal' );
+
+	if ( buttonText.includes( '<strong>' ) || buttonText.includes( '<em>' ) ) {
+		const formattedLabel = button.locator( 'strong, em' ).first();
+		await expect( formattedLabel ).toBeVisible();
+		await expect( formattedLabel ).toHaveCSS( 'overflow-wrap', 'normal' );
+	}
+
+	// Wrapped labels roughly double the button height (ciampo: ~31px → ~46px).
+	await expect
+		.poll( async () => {
+			return button.evaluate( ( el ) => {
+				const {
+					paddingTop,
+					paddingBottom,
+					borderTopWidth,
+					borderBottomWidth,
+					lineHeight,
+				} = window.getComputedStyle( el );
+				const verticalChrome =
+					parseFloat( paddingTop ) +
+					parseFloat( paddingBottom ) +
+					parseFloat( borderTopWidth ) +
+					parseFloat( borderBottomWidth );
+				const singleLineHeight =
+					parseFloat( lineHeight ) + verticalChrome;
+				return el.getBoundingClientRect().height / singleLineHeight;
+			} );
+		} )
+		.toBeLessThan( 1.35 );
+}
+
 async function expectMediaTextFitsViewport( page ) {
 	await expect
 		.poll( async () => {
@@ -40,62 +77,46 @@ test.describe( 'Media & Text', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'should keep a nested Search button with a long custom label on one line', async ( {
-		editor,
-		page,
-	} ) => {
-		await editor.insertBlock( {
-			name: 'core/media-text',
-			attributes: {
-				mediaType: 'image',
-				mediaUrl: 'https://s.w.org/images/core/5.3/MtBlanc1.jpg',
-			},
-			innerBlocks: [
-				{
-					name: 'core/search',
-					attributes: {
-						label: 'Search',
-						showLabel: false,
-						buttonUseIcon: false,
-						buttonPosition: 'button-outside',
-						buttonText: LONG_BUTTON_LABEL,
-					},
+	for ( const { description, buttonText } of [
+		{
+			description: 'plain',
+			buttonText: LONG_BUTTON_LABEL,
+		},
+		{
+			description: 'bold',
+			buttonText: `<strong>${ LONG_BUTTON_LABEL }</strong>`,
+		},
+	] ) {
+		test( `should keep a nested Search button with a long custom ${ description } label on one line`, async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/media-text',
+				attributes: {
+					mediaType: 'image',
+					mediaUrl: 'https://s.w.org/images/core/5.3/MtBlanc1.jpg',
 				},
-			],
+				innerBlocks: [
+					{
+						name: 'core/search',
+						attributes: {
+							label: 'Search',
+							showLabel: false,
+							buttonUseIcon: false,
+							buttonPosition: 'button-outside',
+							buttonText,
+						},
+					},
+				],
+			} );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			await expectNestedSearchButtonLabelSingleLine( page, buttonText );
 		} );
-
-		const postId = await editor.publishPost();
-		await page.goto( `/?p=${ postId }` );
-
-		const button = page.locator(
-			'.wp-block-media-text__content .wp-block-search__button'
-		);
-		await expect( button ).toBeVisible();
-		await expect( button ).toHaveCSS( 'overflow-wrap', 'normal' );
-
-		// Wrapped labels roughly double the button height (ciampo: ~31px → ~46px).
-		await expect
-			.poll( async () => {
-				return button.evaluate( ( el ) => {
-					const {
-						paddingTop,
-						paddingBottom,
-						borderTopWidth,
-						borderBottomWidth,
-						lineHeight,
-					} = window.getComputedStyle( el );
-					const verticalChrome =
-						parseFloat( paddingTop ) +
-						parseFloat( paddingBottom ) +
-						parseFloat( borderTopWidth ) +
-						parseFloat( borderBottomWidth );
-					const singleLineHeight =
-						parseFloat( lineHeight ) + verticalChrome;
-					return el.getBoundingClientRect().height / singleLineHeight;
-				} );
-			} )
-			.toBeLessThan( 1.35 );
-	} );
+	}
 
 	const nestedWrappingCases = [
 		{
