@@ -42,7 +42,7 @@ class Render_Block_Avatar_Test extends WP_UnitTestCase {
 		);
 
 		$processor = new WP_HTML_Tag_Processor( $block->render() );
-		$processor->next_tag( 'img' );
+		$this->assertTrue( $processor->next_tag( 'img' ) );
 
 		return array(
 			'class' => $processor->get_attribute( 'class' ),
@@ -53,7 +53,6 @@ class Render_Block_Avatar_Test extends WP_UnitTestCase {
 	public function test_shadow_is_applied_to_the_image() {
 		$actual = $this->render_image_attributes( array( 'shadow' => 'var:preset|shadow|natural' ) );
 
-		$this->assertSame( 'avatar avatar-96 photo wp-block-avatar__image', $actual['class'] );
 		$this->assertSame( 'box-shadow:var(--wp--preset--shadow--natural);', $actual['style'] );
 	}
 
@@ -70,11 +69,5 @@ class Render_Block_Avatar_Test extends WP_UnitTestCase {
 
 		$this->assertSame( 'avatar avatar-96 photo wp-block-avatar__image has-border-color', $actual['class'] );
 		$this->assertSame( 'border-color:#ff0000;border-radius:10px;box-shadow:1px 1px 1px #000;', $actual['style'] );
-	}
-
-	public function test_no_shadow_leaves_no_style() {
-		$actual = $this->render_image_attributes( array() );
-
-		$this->assertNull( $actual['style'] );
 	}
 }

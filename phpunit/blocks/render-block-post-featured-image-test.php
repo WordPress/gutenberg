@@ -52,7 +52,7 @@ class Render_Block_Post_Featured_Image_Test extends WP_UnitTestCase {
 		);
 
 		$processor = new WP_HTML_Tag_Processor( $block->render() );
-		$processor->next_tag( 'img' );
+		$this->assertTrue( $processor->next_tag( 'img' ) );
 		$actual = array(
 			'image_class' => $processor->get_attribute( 'class' ),
 			'image_style' => $processor->get_attribute( 'style' ),
@@ -93,7 +93,7 @@ class Render_Block_Post_Featured_Image_Test extends WP_UnitTestCase {
 		$this->assertSame( 'border-color:#ff0000;border-radius:10px', $actual['overlay_style'] );
 	}
 
-	public function test_no_shadow_leaves_no_style() {
+	public function test_empty_shadow_is_ignored() {
 		$actual = $this->render_attributes( array( 'style' => array( 'shadow' => '' ) ) );
 
 		$this->assertSame( 'object-fit:cover;', $actual['image_style'] );
