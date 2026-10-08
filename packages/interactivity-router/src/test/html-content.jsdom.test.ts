@@ -6,13 +6,7 @@
 import { beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 import { asDangerousHTML, store } from '@wordpress/interactivity';
 import { actions } from '../index';
-import {
-	hydrateHtml,
-	mockFetch,
-	nextFrames,
-	pageHtml,
-	quiet,
-} from './fixtures/helpers';
+import { hydrateHtml, nextFrames, pageHtml, quiet } from './fixtures/helpers';
 
 // Fill jsdom's runtime gaps before the Interactivity API evaluates.
 await vi.hoisted( async () => {
@@ -34,21 +28,13 @@ let marks: number;
  * @param content    Region content.
  * @param id         Region id within the current namespace.
  * @param attributes Additional attributes on the region element.
- * @param attachTo   Optional attachment selector.
  * @return Region markup.
  */
-const regionHtml = (
-	content: string,
-	id = 'r',
-	attributes = '',
-	attachTo?: string
-) =>
+const regionHtml = ( content: string, id = 'r', attributes = '' ) =>
 	`<div data-wp-interactive="${ namespace }" data-wp-router-region='${ JSON.stringify(
 		{
 			// Region signals persist across navigations, so ids must be unique.
 			id: `${ namespace }/${ id }`,
-			// JSON serialization omits this property for ordinary regions.
-			attachTo,
 		}
 	) }' ${ attributes }>${ content }</div>`;
 
@@ -90,76 +76,6 @@ beforeEach( () => {
 } );
 
 describe( 'router regions in HTML directive content', () => {
-	test.each( [ 'direct', 'prefetched' ] )(
-		'treats a destination region in a fallback as missing on %s navigation',
-		async ( mode ) => {
-			const current = hydrateHtml( regionHtml( '<p>current</p>' ) );
-			const destination = `<div data-wp-html="state.html">${ regionHtml(
-				'<p>nested</p>',
-				'r',
-				'data-wp-init="actions.mark"'
-			) }</div>`;
-
-			if ( mode === 'prefetched' ) {
-				const requests = mockFetch();
-				const prefetch = actions.prefetch( url );
-				requests[ 0 ].respond( pageHtml( destination ) );
-				await prefetch;
-				await actions.navigate( url, quiet );
-				await nextFrames();
-			} else {
-				await navigate( destination );
-			}
-
-			expect( current.isConnected ).toBe( false );
-			expect( document.body ).not.toHaveTextContent( 'current' );
-			expect( document.body ).not.toHaveTextContent( 'nested' );
-			expect( marks ).toBe( 0 );
-		}
-	);
-
-	test( 'does not attach a destination region inside a fallback', async () => {
-		const target = document.createElement( 'div' );
-		target.id = 'attach-target';
-		document.body.appendChild( target );
-
-		await navigate(
-			`<div data-wp-html="state.html">${ regionHtml(
-				'<p>nested</p>',
-				'r',
-				'data-wp-init="actions.mark"',
-				'#attach-target'
-			) }</div>`
-		);
-
-		expect( target ).toBeEmptyDOMElement();
-		expect( marks ).toBe( 0 );
-	} );
-
-	test( 'removes a current region when its destination copy is in HTML content inside another region', async () => {
-		const current = hydrateHtml( regionHtml( '<p>current</p>' ) );
-		const outer = hydrateHtml( regionHtml( '<p>old outer</p>', 'outer' ) );
-
-		await navigate(
-			regionHtml(
-				`<div data-wp-html="state.html">${ regionHtml(
-					'<p>nested</p>',
-					'r',
-					'data-wp-init="actions.mark"'
-				) }</div>`,
-				'outer'
-			)
-		);
-
-		expect( current.isConnected ).toBe( false );
-		expect( document.body ).not.toHaveTextContent( 'current' );
-		expect( outer ).toHaveTextContent( 'nested' );
-		expect( outer.querySelector( '[data-wp-html]' ) ).toHaveTextContent(
-			'nested'
-		);
-		expect( marks ).toBe( 0 );
-	} );
-
 	test( 'updates a region carrying data-wp-html in either attribute order without writing its token', async () => {
 		store( namespace, {
 			state: {
@@ -200,61 +116,5 @@ describe( 'router regions in HTML directive content', () => {
 
 		expect( current ).toHaveTextContent( 'static' );
 		expect( marks ).toBe( 0 );
-	} );
-} );
-
-describe( 'attachTo targets', () => {
-	test.each( [ 'content', 'element', 'absent' ] )(
-		'skips a region with only an ineligible %s target while updating other regions',
-		async ( targetPosition ) => {
-			const protectedElement = document.createElement( 'div' );
-			protectedElement.setAttribute( 'data-wp-html', 'state.html' );
-			protectedElement.innerHTML = '<div>unchanged</div>';
-			if ( targetPosition === 'content' ) {
-				protectedElement.firstElementChild!.id = 'attach-target';
-			} else if ( targetPosition === 'element' ) {
-				protectedElement.id = 'attach-target';
-			}
-			document.body.appendChild( protectedElement );
-			const fallback = protectedElement.innerHTML;
-			const current = hydrateHtml( regionHtml( '<p>current</p>', 's' ) );
-
-			await navigate(
-				regionHtml(
-					'<p>attached</p>',
-					'r',
-					'data-wp-init="actions.mark"',
-					'#attach-target'
-				) + regionHtml( '<p>destination</p>', 's' )
-			);
-
-			expect( protectedElement.innerHTML ).toBe( fallback );
-			expect( current.innerHTML ).toBe( '<p>destination</p>' );
-			expect( marks ).toBe( 0 );
-		}
-	);
-
-	test( 'attaches to the first eligible match after a match inside HTML content', async () => {
-		const container = document.createElement( 'div' );
-		container.innerHTML =
-			'<div data-wp-html="state.html"><div class="target">protected</div></div><div class="target">eligible</div>';
-		document.body.appendChild( container );
-		const [ protectedTarget, eligibleTarget ] =
-			container.querySelectorAll( '.target' );
-
-		await navigate(
-			regionHtml(
-				'<p>attached</p>',
-				'r',
-				'data-wp-init="actions.mark"',
-				'.target'
-			)
-		);
-
-		expect( protectedTarget.innerHTML ).toBe( 'protected' );
-		expect( eligibleTarget.querySelector( 'p' ) ).toHaveTextContent(
-			'attached'
-		);
-		expect( marks ).toBe( 1 );
 	} );
 } );

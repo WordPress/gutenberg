@@ -11,10 +11,9 @@ const tokens = {
 	U: asDangerousHTML( '<p>U</p>' ),
 };
 
-const { state } = store( 'router-html', {
+store( 'router-html', {
 	state: {
 		hydration: 'hydrated',
-		markCount: 0,
 		never: null,
 		get html() {
 			return getContext().resolved
@@ -32,9 +31,6 @@ const { state } = store( 'router-html', {
 				yield import( '@wordpress/interactivity-router' );
 			yield actions.navigate( event.target.href );
 		} ),
-		mark() {
-			state.markCount += 1;
-		},
 		resolve() {
 			getContext().resolved = true;
 		},

@@ -1,6 +1,6 @@
 <?php
 /**
- * HTML for testing router navigation with inert and kept HTML content.
+ * HTML for testing HTML elements kept across router navigation.
  *
  * @package gutenberg-test-interactive-blocks
  */
@@ -38,33 +38,6 @@ $region     = 'router-html-' . $scenario;
 	</div>
 </div>
 
-<?php if ( 'nested' === $scenario && 'one' === $page ) : ?>
-	<div data-wp-interactive="router-html">
-		<div data-testid="inert-html" data-wp-html="state.never">
-			<div data-wp-interactive="router-html" data-wp-router-region="<?php echo esc_attr( $region ); ?>" data-wp-init="actions.mark"><p>nested</p></div>
-		</div>
-	</div>
-<?php endif; ?>
-
-<?php if ( 'attach' === $scenario ) : ?>
-	<div data-wp-interactive="router-html">
-		<?php if ( 'one' === $page ) : ?>
-			<div data-testid="inert-html" data-wp-html="state.never">
-		<?php endif; ?>
-		<div
-			data-testid="attach-region"
-			data-wp-interactive="router-html"
-			data-wp-router-region='{"id":"router-html-attach-body","attachTo":"body"}'
-		>
-			<p>attached content from <?php echo esc_html( $page ); ?></p>
-		</div>
-		<?php if ( 'one' === $page ) : ?>
-			</div>
-		<?php endif; ?>
-	</div>
-<?php endif; ?>
-
 <div data-wp-interactive="router-html">
 	<p data-testid="hydration" data-wp-text="state.hydration">not hydrated</p>
-	<p data-testid="mark-count" data-wp-text="state.markCount">not hydrated</p>
 </div>

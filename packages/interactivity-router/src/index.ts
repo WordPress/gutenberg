@@ -11,7 +11,6 @@ const {
 	getRegionRootFragment,
 	initialVdomPromise,
 	toVdom,
-	closestHtmlDirectiveElement,
 	parseDirectiveValue,
 	render,
 	parseServerData,
@@ -31,18 +30,6 @@ const {
 const regionAttr = `data-wp-router-region`;
 const interactiveAttr = `data-wp-interactive`;
 const regionsSelector = `[${ interactiveAttr }][${ regionAttr }], [${ interactiveAttr }] [${ interactiveAttr }][${ regionAttr }]`;
-
-/**
- * Finds router regions outside HTML directive content. A region carrying an
- * HTML directive itself is eligible because that directive yields to it.
- *
- * @param dom The document whose regions should be discovered.
- * @return Router region elements outside HTML directive content.
- */
-const findRouterRegions = ( dom: Document ): Element[] =>
-	[ ...dom.querySelectorAll( regionsSelector ) ].filter(
-		( region ) => ! closestHtmlDirectiveElement( region.parentElement )
-	);
 
 export interface NavigateOptions {
 	force?: boolean;
@@ -218,8 +205,7 @@ const fetchPage = async ( url: string, { html }: { html: string } ) => {
  * Processes a DOM document to extract router regions and related resources.
  *
  * This function analyzes the provided DOM document and creates a virtual DOM
- * representation of regions marked with a `router-region` directive outside
- * HTML directive content.
+ * representation of all HTML regions marked with a `router-region` directive.
  * It also extracts and preloads associated styles and scripts to prepare for
  * rendering the page.
  *
@@ -246,7 +232,7 @@ const preparePage: PreparePage = async ( url, dom, { vdom } = {} ) => {
 	// Preserve every extracted attachment selector under its region id for the
 	// render pass, including ids that collide with Object.prototype properties.
 	const regionsToAttach: Record< string, string > = Object.create( null );
-	findRouterRegions( dom ).forEach( ( region ) => {
+	dom.querySelectorAll( regionsSelector ).forEach( ( region ) => {
 		const { id, attachTo } = parseRegionAttribute( region );
 
 		if ( region.parentElement.closest( `[${ regionAttr }]` ) ) {
@@ -284,9 +270,7 @@ const preparePage: PreparePage = async ( url, dom, { vdom } = {} ) => {
 
 /**
  * Renders a page by applying styles, populating server data, rendering regions,
- * and updating the document title. Regions with `attachTo` use the first target
- * outside HTML directive elements and their content, or are skipped when no
- * eligible target exists.
+ * and updating the document title.
  *
  * @param page The {@link Page} object to render.
  */
@@ -312,12 +296,7 @@ const renderPage = ( page: Page ) => {
 		// Inits regions with attachTo that don't exist yet.
 		const parentsToUpdate = new Set< Element >();
 		for ( const id in regionsToAttach ) {
-			const parent = [
-				...document.querySelectorAll( regionsToAttach[ id ] ),
-			].find( ( target ) => ! closestHtmlDirectiveElement( target ) );
-			if ( ! parent ) {
-				continue;
-			}
+			const parent = document.querySelector( regionsToAttach[ id ] );
 			if ( ! regionsToAttachByParent.has( parent ) ) {
 				regionsToAttachByParent.set( parent, [] );
 			}
@@ -522,10 +501,10 @@ window.addEventListener( 'popstate', async () => {
 	}
 } );
 
-// Detect router regions with `attachTo` outside HTML directive content in the
-// initial page. This step should be done before the initial page is processed
-// with `preparePage()` so it treats them as regular router regions.
-findRouterRegions( document ).forEach( ( region ) => {
+// Detect router regions with `attachTo` in the initial page. This step should
+// be done before the initial page is processed with `preparePage()` so this
+// function treats them as regular router regions.
+document.querySelectorAll( regionsSelector ).forEach( ( region ) => {
 	const { id, attachTo } = parseRegionAttribute( region );
 	if ( attachTo ) {
 		initialRegionsToAttach.add( id );

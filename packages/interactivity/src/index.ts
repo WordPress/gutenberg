@@ -10,11 +10,7 @@ import {
 	hydrateRegions,
 	getRegionRootFragment,
 } from './hydration';
-import {
-	closestHtmlDirectiveElement,
-	parseDirectiveValue,
-	toVdom,
-} from './vdom';
+import { parseDirectiveValue, toVdom } from './vdom';
 import { directive } from './hooks';
 import { getNamespace } from './namespaces';
 import { getScope } from './scopes';
@@ -60,7 +56,7 @@ const requiredConsent =
  * Exposes runtime internals to consumers that acknowledge their instability.
  *
  * @param lock Required consent to access private APIs.
- * @return Internal APIs, including the markup-only HTML ancestor lookup.
+ * @return Internal rendering, hydration, store and navigation APIs.
  */
 export const privateApis = (
 	lock: 'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
@@ -72,8 +68,6 @@ export const privateApis = (
 			toVdom,
 			// Shares the directive-value interpretation with internal consumers.
 			parseDirectiveValue,
-			// Finds HTML content boundaries from markup for internal consumers.
-			closestHtmlDirectiveElement,
 			directive,
 			getNamespace,
 			h,

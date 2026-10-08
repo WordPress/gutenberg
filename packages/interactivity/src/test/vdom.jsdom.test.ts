@@ -117,7 +117,10 @@ describe( 'closestHtmlDirectiveElement', () => {
 		);
 		expect( closestHtmlDirectiveElement( element ) ).toBe( element );
 	} );
-	it( 'exposes the ancestor lookup through the private API', async () => {
+} );
+
+describe( 'privateApis', () => {
+	it( 'exposes only the runtime private APIs', async () => {
 		document.body.innerHTML = '';
 		// jsdom has no navigation timing entry. Keep automatic hydration pending.
 		vi.spyOn( performance, 'getEntriesByType' ).mockReturnValue( [
@@ -128,10 +131,35 @@ describe( 'closestHtmlDirectiveElement', () => {
 		try {
 			const { privateApis } = await import( '../index' );
 			expect(
-				privateApis(
-					'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
-				).closestHtmlDirectiveElement
-			).toBe( closestHtmlDirectiveElement );
+				Object.keys(
+					privateApis(
+						'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
+					)
+				).sort()
+			).toEqual(
+				[
+					'getRegionRootFragment',
+					'initialVdomPromise',
+					'toVdom',
+					'parseDirectiveValue',
+					'directive',
+					'getNamespace',
+					'h',
+					'cloneElement',
+					'render',
+					'proxifyState',
+					'parseServerData',
+					'populateServerData',
+					'batch',
+					'routerRegions',
+					'deepReadOnly',
+					'navigationSignal',
+					'sessionId',
+					'warn',
+					'afterNextFrame',
+					'getScope',
+				].sort()
+			);
 		} finally {
 			options.vnode = originalVNodeHook;
 		}
