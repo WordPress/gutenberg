@@ -1,5 +1,6 @@
 import { useSelect } from '@wordpress/data';
 import { store as editorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 
 /**
  * A reaction emoji.
@@ -42,18 +43,17 @@ export function hexKeyToEmoji( hexKey: string ): string {
 }
 
 /**
- * The reaction emoji the editor offers: the `noteReactionEmojis` editor
- * setting, which the server builds from the `wp_note_reaction_emojis`
- * filter so the menu offers the same emoji the REST API accepts. Offers none
- * when the setting is missing, since the accepted emoji are then unknown.
+ * The reaction emoji the editor offers, from the private
+ * `getNoteReactionEmojis` selector. The server builds the list from the
+ * `wp_note_reaction_emojis` filter, so the menu offers the same emoji the
+ * REST API accepts. Offers none when the list is missing, since the
+ * accepted emoji are then unknown.
  *
  * @return The reaction emoji, in display order.
  */
 export function useReactionEmojis(): ReactionEmoji[] {
 	const setting: unknown = useSelect(
-		( select ) =>
-			// @ts-expect-error Editor settings are typed as a bare `Object`.
-			select( editorStore ).getEditorSettings().noteReactionEmojis,
+		( select ) => unlock( select( editorStore ) ).getNoteReactionEmojis(),
 		[]
 	);
 	return getReactionEmojisFromSetting( setting );

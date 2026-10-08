@@ -297,6 +297,9 @@ function gutenberg_get_note_reaction_keys() {
  * Passes the reaction emoji to the editor, so the reaction menu offers the
  * same emoji the REST API accepts.
  *
+ * The `noteReactionEmojis` setting is internal and may change: extend the
+ * list through the `wp_note_reaction_emojis` filter instead.
+ *
  * @since 7.2.0
  *
  * @param array $settings Block editor settings.
