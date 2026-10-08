@@ -26,10 +26,6 @@ function render_block_core_comment_author_avatar( $attributes, $content, $block 
 	// This is the only way to retrieve style and classes on different instances.
 	$wrapper_attributes = WP_Block_Supports::get_instance()->apply_block_supports();
 
-	// Spacing skips serialization, so it is applied to the wrapper rather than the image.
-	$spacing_attributes = $attributes['style']['spacing'] ?? null;
-	$spacing_styles     = wp_get_spacing_classes_and_styles( $attributes );
-
 	$width   = $attributes['width'] ?? 96;
 	$height  = $attributes['height'] ?? 96;
 	$styles  = $wrapper_attributes['style'] ?? '';
@@ -50,7 +46,10 @@ function render_block_core_comment_author_avatar( $attributes, $content, $block 
 			'class'      => $classes,
 		)
 	);
-	if ( isset( $spacing_attributes ) ) {
+
+	// Spacing skips serialization, so it goes on the outer div, not the image.
+	if ( isset( $attributes['style']['spacing'] ) ) {
+		$spacing_styles = wp_get_spacing_classes_and_styles( $attributes );
 		return sprintf( '<div style="%1$s">%2$s</div>', esc_attr( $spacing_styles['style'] ?? '' ), $avatar_block );
 	}
 	return sprintf( '<div>%s</div>', $avatar_block );

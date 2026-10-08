@@ -121,7 +121,7 @@ class Tests_Blocks_Render_Post_Navigation_Link extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'has-accent-2-border-color', $output );
 	}
 
-	public function test_rendered_link_has_the_full_border_shadow_and_spacing_styles() {
+	public function test_border_shadow_and_spacing_styles() {
 		$attributes                                      = $this->styled_attributes();
 		$attributes['style']['spacing']['margin']['top'] = 'var:preset|spacing|30';
 

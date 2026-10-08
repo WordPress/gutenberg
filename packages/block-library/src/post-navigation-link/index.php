@@ -204,7 +204,7 @@ function block_core_post_navigation_link_get_support_styles( $attributes ) {
 	$spacing_styles = wp_get_spacing_classes_and_styles( $attributes );
 
 	return array(
-		'class' => trim( ( $styles['classnames'] ?? '' ) . ' ' . ( $spacing_styles['class'] ?? '' ) ),
+		'class' => $styles['classnames'] ?? '',
 		'style' => ( $styles['css'] ?? '' ) . ( $spacing_styles['style'] ?? '' ),
 	);
 }

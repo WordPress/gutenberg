@@ -52,8 +52,8 @@ class Tests_Blocks_Render_Comment_Author_Avatar extends WP_UnitTestCase {
 	/**
 	 * @dataProvider data_spacing_styles
 	 *
-	 * @param array       $spacing        Spacing attribute.
-	 * @param string      $expected_style Expected wrapper style.
+	 * @param array  $spacing        Spacing attribute.
+	 * @param string $expected_style Expected wrapper style.
 	 */
 	public function test_wrapper_has_spacing_styles( $spacing, $expected_style ) {
 		$this->assertSame( $expected_style, $this->get_wrapper_style( array( 'style' => array( 'spacing' => $spacing ) ) ) );
