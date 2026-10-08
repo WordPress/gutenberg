@@ -85,6 +85,10 @@
 
 .dropdown-menu {
 	min-width: 200px;
+
+	:global(.components-menu-item__item) {
+		white-space: normal;
+	}
 }
 
 .default-controls-item {

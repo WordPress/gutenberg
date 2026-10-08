@@ -1,10 +1,15 @@
 import { describe, expect, it, vi } from 'vitest';
+import { page, userEvent } from 'vitest/browser';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { ContextSystemProvider } from '../../context';
 import { ToolsPanel, ToolsPanelItem } from '..';
 // The cascade contract includes Button's global icon-button defaults.
 import '../../button/style.scss';
+import '../../dropdown-menu/style.scss';
+import '../../menu-group/style.scss';
+import '../../menu-item/style.scss';
+import '../../popover/style.scss';
 
 const defaultProps = {
 	label: 'Panel header',
@@ -96,5 +101,42 @@ describe( 'ToolsPanel styles', () => {
 		const styles = getComputedStyle( toggle );
 		expect( styles.padding ).toBe( '0px' );
 		expect( styles.minWidth ).toBe( '24px' );
+	} );
+
+	it( 'keeps long action labels visible in a narrow viewport', async () => {
+		await page.viewport( 320, 640 );
+		await render(
+			<ToolsPanel { ...defaultProps }>
+				<ToolsPanelItem
+					{ ...controlProps }
+					label="A control with a longer label"
+				>
+					Control
+				</ToolsPanelItem>
+			</ToolsPanel>
+		);
+
+		await userEvent.click(
+			page.getByRole( 'button', { name: 'Panel header options' } )
+		);
+		const menu = screen.getByRole( 'menu', {
+			name: 'Panel header options',
+		} );
+		await expect.poll( () => menu ).toBePositionedPopover();
+
+		const item = screen.getByRole( 'menuitemcheckbox', {
+			name: 'Hide and reset A control with a longer label',
+		} );
+		const label = screen.getByText(
+			'Hide and reset A control with a longer label'
+		);
+		const menuBounds = menu.getBoundingClientRect();
+
+		expect( menuBounds.left ).toBeGreaterThanOrEqual( 0 );
+		expect( menuBounds.right ).toBeLessThanOrEqual( window.innerWidth );
+		expect( label.scrollWidth ).toBeLessThanOrEqual( label.clientWidth );
+		expect( label.getBoundingClientRect().height ).toBeLessThanOrEqual(
+			item.getBoundingClientRect().height
+		);
 	} );
 } );
