@@ -1,9 +1,5 @@
 import { useSelect } from '@wordpress/data';
-import {
-	__experimentalGetBlockLabel as getBlockLabel,
-	store as blocksStore,
-} from '@wordpress/blocks';
-import { store as blockEditorStore } from '../../store';
+import getBlockDisplayTitle from './get-block-display-title';
 
 /**
  * Returns the block's configured title as a string, or empty if the title
@@ -27,38 +23,7 @@ export default function useBlockDisplayTitle( {
 	context,
 } ) {
 	const blockTitle = useSelect(
-		( select ) => {
-			if ( ! clientId ) {
-				return null;
-			}
-
-			const { getBlockName, getBlockAttributes, getBlock } =
-				select( blockEditorStore );
-			const { getBlockType, getActiveBlockVariation } =
-				select( blocksStore );
-
-			const blockName = getBlockName( clientId );
-			const blockType = getBlockType( blockName );
-			if ( ! blockType ) {
-				return null;
-			}
-
-			const attributes = getBlockAttributes( clientId );
-			const label = getBlockLabel( blockType, attributes, context );
-			// If the label is defined we prioritize it over a possible block variation title match.
-			if ( label !== blockType.title ) {
-				return label;
-			}
-
-			const match = getActiveBlockVariation(
-				blockName,
-				attributes,
-				undefined,
-				getBlock?.( clientId )?.innerContent
-			);
-			// Label will fallback to the title if no label is defined for the current label context.
-			return match?.title || blockType.title;
-		},
+		( select ) => getBlockDisplayTitle( select, clientId, context ),
 		[ clientId, context ]
 	);
 
