@@ -54,7 +54,6 @@
 		{ "path": "packages/keyboard-shortcuts" },
 		{ "path": "packages/latex-to-mathml" },
 		{ "path": "packages/lazy-editor" },
-		{ "path": "packages/lazy-import" },
 		{ "path": "packages/list-reusable-blocks" },
 		{ "path": "packages/media-editor/tsconfig.build.json" },
 		{ "path": "packages/media-fields/tsconfig.build.json" },
