@@ -2,7 +2,13 @@ import { ResizableBox } from '@wordpress/components';
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
-import { getComputedCSS, getGridTracks, getClosestTrack } from './utils';
+import {
+	getComputedCSS,
+	getGridTracks,
+	getClosestTrack,
+	getRowEndForResize,
+	getGridItemPixelRect,
+} from './utils';
 import { useRotatedOverlayStyle } from './use-rotated-overlay-style';
 
 const justification = {
@@ -81,7 +87,9 @@ function GridItemResizerInner( {
 				top: !! isManualGrid
 					? topAvailable
 					: ! bottomAvailable && topAvailable,
-				bottom: bottomAvailable,
+				// In a manual grid, dragging the bottom edge past the last row
+				// adds rows, so it is always available.
+				bottom: !! isManualGrid || bottomAvailable,
 				left: !! isManualGrid
 					? leftAvailable
 					: ! rightAvailable && leftAvailable,
@@ -132,7 +140,10 @@ function GridItemResizerInner( {
 					topLeft: false,
 					topRight: false,
 				} }
-				bounds={ bounds }
+				// Manual grids grow when a block is resized past the last row,
+				// so they aren't limited to the grid's current size. Sizes are
+				// snapped to the grid's tracks when the resize stops.
+				bounds={ isManualGrid ? undefined : bounds }
 				boundsByDirection
 				onPointerDown={ ( { target, pointerId } ) => {
 					/*
@@ -172,9 +183,12 @@ function GridItemResizerInner( {
 						),
 						rowGap
 					);
+					// Grid tracks start at the grid's content box, so measure
+					// the resized box from there.
+					const itemRect = getGridItemPixelRect( blockElement );
 					const rect = new window.DOMRect(
-						blockElement.offsetLeft + boxElement.offsetLeft,
-						blockElement.offsetTop + boxElement.offsetTop,
+						itemRect.left + boxElement.offsetLeft,
+						itemRect.top + boxElement.offsetTop,
 						boxElement.offsetWidth,
 						boxElement.offsetHeight
 					);
@@ -185,9 +199,14 @@ function GridItemResizerInner( {
 					const columnEnd =
 						getClosestTrack( gridColumnTracks, rect.right, 'end' ) +
 						1;
-					const rowEnd =
-						getClosestTrack( gridRowTracks, rect.bottom, 'end' ) +
-						1;
+					const rowEnd = isManualGrid
+						? getRowEndForResize(
+								gridRowTracks,
+								rect.bottom,
+								rowGap
+							)
+						: getClosestTrack( gridRowTracks, rect.bottom, 'end' ) +
+							1;
 					onChange( {
 						columnSpan: columnEnd - columnStart + 1,
 						rowSpan: rowEnd - rowStart + 1,
