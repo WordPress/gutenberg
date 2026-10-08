@@ -31,12 +31,14 @@ function gutenberg_register_background_support( $block_type ) {
 }
 
 /**
- * Gets the background classes and styles for a block's attributes.
+ * Returns background classes and inline styles for block attributes, like the JS
+ * `getBackgroundClassesAndStyles()`. Does not check block support or skipped
+ * serialization.
  *
  * @since 7.2.0
  *
  * @param array $block_attributes Block attributes.
- * @return array Background `class` and `style` strings, each present only when non-empty.
+ * @return array Array with `class` and `style` keys, each present only when non-empty.
  */
 function gutenberg_get_background_classes_and_styles( $block_attributes ) {
 	$background = $block_attributes['style']['background'] ?? null;
@@ -57,7 +59,6 @@ function gutenberg_get_background_classes_and_styles( $block_attributes ) {
 
 	if ( ! empty( $background_styles['backgroundImage'] ) ) {
 		$background_styles['backgroundSize'] = $background_styles['backgroundSize'] ?? 'cover';
-		// If the background size is set to `contain` and no position is set, set the position to `center`.
 		if ( 'contain' === $background_styles['backgroundSize'] && ! $background_styles['backgroundPosition'] ) {
 			$background_styles['backgroundPosition'] = '50% 50%';
 		}
@@ -69,21 +70,18 @@ function gutenberg_get_background_classes_and_styles( $block_attributes ) {
 		return array();
 	}
 
-	$attributes = array();
+	$classes_and_styles = array();
 
-	/*
-	 * A background clipped to the text paints the glyphs rather than the
-	 * block's box, so there is no block background to announce.
-	 */
 	$has_background = ! empty( $background_styles['backgroundImage'] ) || ! empty( $background_styles['gradient'] );
 
+	// A text clip paints the glyphs, not the box, so there is no block background.
 	if ( $has_background && 'text' !== $background_styles['backgroundClip'] ) {
-		$attributes['class'] = 'has-background';
+		$classes_and_styles['class'] = 'has-background';
 	}
 
-	$attributes['style'] = $styles['css'];
+	$classes_and_styles['style'] = $styles['css'];
 
-	return $attributes;
+	return $classes_and_styles;
 }
 
 /**
@@ -136,7 +134,7 @@ function gutenberg_render_background_support( $block_content, $block ) {
 		$background_styles['backgroundClip'] = $block_attributes['style']['background']['backgroundClip'] ?? null;
 	}
 
-	// Pass only serialized values, so a skipped or unsupported clip cannot suppress `has-background`.
+	// Serialized values only, so a skipped clip cannot drop `has-background`.
 	$styles = gutenberg_get_background_classes_and_styles(
 		array( 'style' => array( 'background' => $background_styles ) )
 	);
