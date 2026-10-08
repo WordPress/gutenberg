@@ -2,8 +2,15 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `Menu`, `Popover`: Keep popups open when the user interacts with an iframe inside the popup. ([#83870](https://github.com/WordPress/gutenberg/pull/83870))
+
+## 0.24.0 (2026-10-07)
+
 ### Breaking Changes
 
+-   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
 -   Rename `LinkButton` to `ButtonLink`, including `LinkButton.Icon` to `ButtonLink.Icon`, `LinkButtonProps` to `ButtonLinkProps`, and `LinkButtonIconProps` to `ButtonLinkIconProps`. Rename `Dialog.CloseIcon`, `Drawer.CloseIcon`, and `Notice.CloseIcon` to `CloseIconButton` within each component. Update imports and JSX to use the new names; props and behavior are unchanged. If you use the `use-recommended-components` rule, also update `@wordpress/eslint-plugin` to a version that recognizes `ButtonLink` ([#83789](https://github.com/WordPress/gutenberg/pull/83789)).
 -   `Menu.Root`, `Menu.SubmenuRoot`: Remove the `disabled` prop. Disable `Menu.Trigger`, `Menu.SubmenuTrigger`, or individual items instead ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
 -   `Autocomplete.Item`, `Combobox.Item`, `SearchableSelect.Item`, `SearchableChipSelect.Item`, `SearchableSelectControl.Item`, and `SearchableChipSelectControl.Item` now require an `ItemLabel` as their first direct child, followed only by optional `ItemDescription` components. Wrap existing text children in `ItemLabel` ([#83493](https://github.com/WordPress/gutenberg/pull/83493)).
@@ -11,19 +18,41 @@
 
 ### New Features
 
+-   Add `Meter` with an 8px track, neutral and brand tones. ([#83855](https://github.com/WordPress/gutenberg/pull/83855))
 -   `Autocomplete`, `Combobox`, `Select`, `SearchableSelect`, `SearchableChipSelect`, and the select controls: Add `Separator` subcomponents for dividing popup items and groups ([#83776](https://github.com/WordPress/gutenberg/pull/83776)).
+-   `Progress`: Add a compound progress component with a track, indicator, accessible label, and formatted value. ([#83781](https://github.com/WordPress/gutenberg/pull/83781))
 -   Add `SearchableSelectControl` component ([#80979](https://github.com/WordPress/gutenberg/pull/80979)).
 
 ### Enhancements
 
+-   `Switch`, `SwitchControl`: Mark as recommended for use in a WordPress environment ([#84097](https://github.com/WordPress/gutenberg/pull/84097)).
+-   `Progress`: Default to a 160px width, overridable through `className` or `style` ([#84021](https://github.com/WordPress/gutenberg/pull/84021)).
+-   `Progress`: Mark as recommended for use in a WordPress environment. ([#84021](https://github.com/WordPress/gutenberg/pull/84021))
+-   `Menu`: Keep parent items highlighted with a neutral background while their submenus are open ([#84031](https://github.com/WordPress/gutenberg/pull/84031)).
+-   `Menu`: Align group labels and separators with item labels when a radio or checkbox column indents those labels ([#83993](https://github.com/WordPress/gutenberg/pull/83993)).
+-   `Menu`: Tighten item spacing and cap menus at 320px wide ([#84028](https://github.com/WordPress/gutenberg/pull/84028)).
+-   `Menu`: Align items without a prefix, and descriptions, with the prefix column ([#84028](https://github.com/WordPress/gutenberg/pull/84028)).
+-   `Menu`: Size checkbox and radio indicators at 16px and show suffixes and shortcuts at the description text size ([#84028](https://github.com/WordPress/gutenberg/pull/84028)).
+-   `Menu`: Use the label color for prefixes ([#84028](https://github.com/WordPress/gutenberg/pull/84028)).
+-   `Menu.PrefixIcon`: Render at 16px by default instead of 24px ([#84028](https://github.com/WordPress/gutenberg/pull/84028)).
 -   `Checkbox`, `CheckboxControl`, `CheckboxGroup`: Mark as recommended for use in a WordPress environment ([#83771](https://github.com/WordPress/gutenberg/pull/83771)).
+-   `Radio`, `RadioGroup`, `RadioGroupControl`: Mark as recommended for use in a WordPress environment ([#83872](https://github.com/WordPress/gutenberg/pull/83872)).
 -   `Spinner`: Show a trackless half-circle like the `Button` loading indicator, with a `color` prop that accepts any CSS color value and defaults to weak neutral foreground. Keep the arc visible in forced-colors mode ([#83775](https://github.com/WordPress/gutenberg/pull/83775)).
 -   Native text inputs and textareas use at least 16px below 600px to avoid iOS Safari zoom. Prefix and suffix text on `Input` match that size. Select and combobox trigger text stay at the `md` font size. ([#82764](https://github.com/WordPress/gutenberg/pull/82764))
 -   `Menu`: Add development-only checks against nesting `Group` and `RadioGroup` within each other, and document how to label radio groups ([#83792](https://github.com/WordPress/gutenberg/pull/83792)).
+-   `Notice`: Mark as recommended for use ([#82685](https://github.com/WordPress/gutenberg/pull/82685)).
 -   `Autocomplete`, `Combobox`, `SearchableSelect`, `SearchableChipSelect`, `SearchableSelectControl`, and `SearchableChipSelectControl` add `ItemLabel` and `ItemDescription` subcomponents. Searchable selection items also accept an optional `description` string ([#83493](https://github.com/WordPress/gutenberg/pull/83493)).
 
 ### Bug Fixes
 
+-   `SearchableChipSelect`, `SearchableChipSelectControl`: Preserve selected chips when pressing Escape in an empty search field ([#84172](https://github.com/WordPress/gutenberg/pull/84172)).
+
+-   `VisuallyHidden`: Move hiding styles outside CSS cascade layers to prevent overrides by global element styles ([#84114](https://github.com/WordPress/gutenberg/pull/84114)).
+-   `Combobox.Root`: Preserve separate item and selected-value types for collections, including filtering callbacks ([#84094](https://github.com/WordPress/gutenberg/pull/84094)).
+-   `Autocomplete.Root`: Preserve item type inference in filtering, formatting, and highlight callbacks for flat and grouped items ([#84095](https://github.com/WordPress/gutenberg/pull/84095)).
+-   `Breadcrumb`: Keep a custom renderer's ref on the visible item ([#84069](https://github.com/WordPress/gutenberg/pull/84069)).
+-   `RadioGroup`: Preserve value type inference in callbacks. `RadioGroupControl`: Type selected values and callbacks as strings to match its items ([#83872](https://github.com/WordPress/gutenberg/pull/83872)).
+-   `Menu`: Align the first submenu item's label with its parent label while preserving item centering, including when their heights differ ([#84031](https://github.com/WordPress/gutenberg/pull/84031)).
 -   `Checkbox`: Prevent rounded themes from making checkboxes circular. ([#83526](https://github.com/WordPress/gutenberg/pull/83526))
 -   `Select`, `SelectControl`, `Combobox`, `SearchableSelect`, `SearchableChipSelect`, `SearchableChipSelectControl`: Align the selected-item checkmark with the first line of the item label while keeping single-line items vertically centered. ([#82942](https://github.com/WordPress/gutenberg/pull/82942))
 -   `Popover`: Close non-modal popovers when the user presses inside a same-origin iframe. ([#83509](https://github.com/WordPress/gutenberg/pull/83509))
@@ -32,9 +61,11 @@
 ### Internal
 
 -   Document component status in `CONTRIBUTING.md` ([#83536](https://github.com/WordPress/gutenberg/pull/83536)).
+-   Declare `@types/react-dom` as a dev dependency ([#84013](https://github.com/WordPress/gutenberg/pull/84013)).
 
 ### Documentation
 
+-   `Progress`: Document migration from `ProgressBar`, layout width, and custom value content ([#84021](https://github.com/WordPress/gutenberg/pull/84021)).
 -   `Menu`: Explain when to disable triggers and items ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
 
 ## 0.23.0 (2026-09-23)

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/interactivity-router",
-	"version": "2.56.0",
+	"version": "2.57.0",
 	"description": "Package that exposes state and actions from the `core/router` store, part of the Interactivity API.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -50,7 +50,8 @@
 	},
 	"devDependencies": {
 		"@testing-library/jest-dom": "^7.0.1",
-		"vitest": "^5.0.0"
+		"preact": "^10.29.1",
+		"vitest": "^5.0.3"
 	},
 	"publishConfig": {
 		"access": "public"
