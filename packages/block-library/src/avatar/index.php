@@ -19,7 +19,7 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 	$size               = $attributes['size'] ?? 96;
 	$wrapper_attributes = get_block_wrapper_attributes();
 	$border_attributes  = get_block_core_avatar_border_attributes( $attributes );
-	$shadow_styles      = wp_style_engine_get_styles( array( 'shadow' => $attributes['style']['shadow'] ?? null ) );
+	$shadow_attributes  = wp_get_shadow_classes_and_styles( $attributes );
 
 	// Class gets passed through `esc_attr` via `get_avatar`.
 	$image_classes = ! empty( $border_attributes['class'] )
@@ -29,7 +29,7 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 	// Unlike class, `get_avatar` doesn't filter the styles via `esc_attr`.
 	// The style engine does pass the border and shadow styles through
 	// `safecss_filter_attr` however.
-	$image_css    = ( $border_attributes['style'] ?? '' ) . ( $shadow_styles['css'] ?? '' );
+	$image_css    = ( $border_attributes['style'] ?? '' ) . ( $shadow_attributes['style'] ?? '' );
 	$image_styles = ! empty( $image_css )
 		? sprintf( ' style="%s"', esc_attr( $image_css ) )
 		: '';
