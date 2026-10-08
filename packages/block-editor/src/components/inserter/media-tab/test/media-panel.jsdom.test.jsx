@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useState } from '@wordpress/element';
 import { MediaCategoryPanel } from '../media-panel';
 
 globalThis.wpVitest.mockMatchMedia();
@@ -58,10 +59,22 @@ const baseCategory = {
 	invalidate: vi.fn(),
 };
 
-function renderPanel( category ) {
-	return render(
-		<MediaCategoryPanel onInsert={ vi.fn() } category={ category } />
+// The search term lives above the panel (in `MediaBrowser`), so the harness
+// owns it here the same way.
+function PanelHarness( { category } ) {
+	const [ search, setSearch ] = useState( '' );
+	return (
+		<MediaCategoryPanel
+			onInsert={ vi.fn() }
+			category={ category }
+			search={ search }
+			onChangeSearch={ setSearch }
+		/>
 	);
+}
+
+function renderPanel( category ) {
+	return render( <PanelHarness category={ category } /> );
 }
 
 const getGridActions = () =>

@@ -965,18 +965,11 @@ test.describe( 'insert media from inserter', () => {
 
 		await page.getByLabel( 'Block Inserter' ).click();
 		await page.getByRole( 'tab', { name: 'Media' } ).click();
-		// Each media category is a collapsible panel. `exact` so this matches
-		// only "Images" and not "Attached images", which also contains the
-		// word. "Images" is the category that opens on mount; "Attached
-		// images" is listed above it but starts collapsed.
-		const imagesCategory = page.getByRole( 'button', {
-			name: 'Images',
-			exact: true,
-		} );
-		await expect( imagesCategory ).toHaveAttribute(
-			'aria-expanded',
-			'true'
-		);
+		// The tab opens on the media library's images, so the Images tab is
+		// already selected and its grid is showing.
+		await expect(
+			page.getByRole( 'tab', { name: 'Images' } )
+		).toHaveAttribute( 'aria-selected', 'true' );
 		// The card's preview is the click-to-insert target, named by the
 		// item's title.
 		await page
@@ -1029,10 +1022,13 @@ test.describe( 'Attached images media category', () => {
 
 		await page.getByLabel( 'Block Inserter' ).click();
 		await page.getByRole( 'tab', { name: 'Media' } ).click();
-		// Each media category is a collapsible panel; open the attached images one.
+		// Attached images is a source, chosen from the menu beside the search.
 		await page
 			.getByRole( 'tabpanel', { name: 'Media' } )
-			.getByRole( 'button', { name: 'Attached images', exact: true } )
+			.getByRole( 'button', { name: 'Media source' } )
+			.click();
+		await page
+			.getByRole( 'menuitemradio', { name: 'Attached images' } )
 			.click();
 
 		const mediaPanel = page.locator(
