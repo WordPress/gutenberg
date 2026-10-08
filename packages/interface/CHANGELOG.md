@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-### Enhancements
+### Internal
 
--   Support responsive block breadcrumbs in the editor footer.
+-   Move block breadcrumb styles to the block-editor package.
 
 ## 10.3.0 (2026-10-07)
 
