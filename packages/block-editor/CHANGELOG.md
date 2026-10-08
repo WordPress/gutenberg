@@ -117,6 +117,7 @@
 -   Writing Flow: Preserve rich text selection on Shift+click within the same block ([#84579](https://github.com/WordPress/gutenberg/pull/84579)).
 -   List View: Show the appender when the container is contentOnly ([#84713](https://github.com/WordPress/gutenberg/pull/84713)).
 -   NavigableToolbar: Ignore menu focus guards so menus from `@wordpress/ui` open on the first click ([#84547](https://github.com/WordPress/gutenberg/pull/84547)).
+-   Use semantic colors for inserter tiles, inserter surfaces, and block inspector content. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 -   Inserter: Only show the block-section separator when both sections contain blocks, avoiding a double border above the tip ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
 -   Block Toolbar: Keep `__unstableBlockToolbarLastItem` fills out of the placeholder toolbar shown on small screens while no block is selected ([#84554](https://github.com/WordPress/gutenberg/pull/84554)).
 -   Block Toolbar: Show a generic icon and accessible name on the phone placeholder's block button when no default block type is registered ([#84533](https://github.com/WordPress/gutenberg/pull/84533)).
