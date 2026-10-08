@@ -1,5 +1,6 @@
 @use "sass:math";
 @use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/breakpoints" as *;
 @use "@wordpress/base-styles/variables" as *;
 
 $button-spacing-x: $grid-unit-10 + math.div($grid-unit-05, 2); // 10px
@@ -62,6 +63,14 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 		flex-basis: 100%;
 	}
 
+	.wp-block-search__mobile-overlay {
+		display: contents;
+	}
+
+	.wp-block-search__mobile-submit {
+		display: none;
+	}
+
 	// !important here to override inline styles on button only deselected view.
 	&.wp-block-search__searchfield-hidden {
 		overflow: hidden;
@@ -80,6 +89,57 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 			flex-grow: 0;
 			margin: 0;
 			flex-basis: 0;
+		}
+	}
+}
+
+@media (max-width: #{ ($break-small) }) {
+	.wp-block-search__button-only:has(.wp-block-search__mobile-overlay) {
+		// Match the collapsed block's flex minimum when its overflow becomes visible.
+		min-width: 0;
+
+		.wp-block-search__inside-wrapper {
+			position: relative;
+			transition: none;
+		}
+
+		.wp-block-search__input {
+			transition: none;
+			min-width: 0;
+			grid-column: 1;
+		}
+
+		.wp-block-search__mobile-overlay {
+			box-sizing: border-box;
+			position: absolute;
+			top: 0;
+			width: 100vw;
+			min-height: 100%;
+			padding-left: var(--wp--style--root--padding-left, 1rem);
+			padding-right: var(--wp--style--root--padding-right, 1rem);
+			grid-template-columns: minmax(0, 1fr) auto;
+		}
+
+		.wp-block-search__mobile-submit {
+			grid-column: 2;
+		}
+
+		&:not(.wp-block-search__searchfield-hidden) {
+			position: relative;
+			z-index: 100000;
+
+			.wp-block-search__inside-wrapper > .wp-block-search__button {
+				// Preserve its layout footprint without exposing a duplicate submit button.
+				visibility: hidden;
+			}
+
+			.wp-block-search__mobile-overlay {
+				display: grid;
+			}
+
+			.wp-block-search__mobile-submit {
+				display: flex;
+			}
 		}
 	}
 }
