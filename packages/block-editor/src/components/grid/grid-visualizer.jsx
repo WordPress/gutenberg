@@ -114,7 +114,16 @@ const GridVisualizerGrid = forwardRef(
 					'is-dropping-allowed': isDroppingAllowed,
 				} ) }
 				clientId={ gridClientId }
-				__unstablePopoverSlot="__unstable-block-tools-after"
+				// Popovers in the block tools slots are hidden once a drag
+				// has been over the block flow. While blocks are dragged, a
+				// manual grid renders in the default popover slot instead, so
+				// its drop layer stays and blocks can be moved between the
+				// grid and the block flow in both directions.
+				__unstablePopoverSlot={
+					isManualGrid && isDroppingAllowed
+						? 'Popover'
+						: '__unstable-block-tools-after'
+				}
 			>
 				<div
 					ref={ ref }
