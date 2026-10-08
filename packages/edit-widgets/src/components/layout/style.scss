@@ -3,6 +3,7 @@
 
 .edit-widgets-layout__footer {
 	flex: 1 1 auto;
+	// Let the flex item shrink below the trail's content width so breadcrumbs can collapse.
 	min-width: 0;
 }
 

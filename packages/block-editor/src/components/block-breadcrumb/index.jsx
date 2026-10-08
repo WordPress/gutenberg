@@ -57,7 +57,6 @@ function BlockBreadcrumb( { rootLabelText, className } ) {
 					<Breadcrumb.LinkItem
 						href="#"
 						key="document"
-						className="block-editor-block-breadcrumb__button"
 						onClick={ ( event ) => {
 							event.preventDefault();
 							const editorRegion = getEditorRegion(
@@ -74,7 +73,6 @@ function BlockBreadcrumb( { rootLabelText, className } ) {
 							parentTitles[ index ] && (
 								<Breadcrumb.LinkItem
 									key={ parentClientId }
-									className="block-editor-block-breadcrumb__button"
 									href={ `#block-${ parentClientId }` }
 									onClick={ ( event ) => {
 										event.preventDefault();
@@ -88,7 +86,6 @@ function BlockBreadcrumb( { rootLabelText, className } ) {
 				] }
 			<Breadcrumb.CurrentItem
 				key={ clientId || 'document' }
-				className="block-editor-block-breadcrumb__current"
 				aria-current="true"
 			>
 				{ currentTitle || rootLabel }
