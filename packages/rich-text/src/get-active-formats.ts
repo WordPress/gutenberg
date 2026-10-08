@@ -1,17 +1,18 @@
-/** @typedef {import('./types').RichTextValue} RichTextValue */
-/** @typedef {import('./types').RichTextFormatList} RichTextFormatList */
 import { isFormatEqual } from './is-format-equal';
+import type { RichTextFormatList, RichTextValue } from './types';
 
 /**
  * Gets the all format objects at the start of the selection.
  *
- * @param {RichTextValue} value                Value to inspect.
- * @param {Array}         EMPTY_ACTIVE_FORMATS Array to return if there are no
- *                                             active formats.
+ * @param value                Value to inspect.
+ * @param EMPTY_ACTIVE_FORMATS Array to return if there are no active formats.
  *
- * @return {RichTextFormatList} Active format objects.
+ * @return Active format objects.
  */
-export function getActiveFormats( value, EMPTY_ACTIVE_FORMATS = [] ) {
+export function getActiveFormats(
+	value: RichTextValue,
+	EMPTY_ACTIVE_FORMATS: RichTextFormatList = []
+) {
 	const { formats, start, end, activeFormats } = value;
 	if ( start === undefined ) {
 		return EMPTY_ACTIVE_FORMATS;

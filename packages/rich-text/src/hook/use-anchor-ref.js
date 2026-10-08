@@ -6,7 +6,7 @@ import { getActiveFormat } from '../get-active-format';
  * @template T
  * @typedef {import('@wordpress/element').RefObject<T>} RefObject<T>
  */
-/** @typedef {import('../register-format-type').WPFormat} WPFormat */
+/** @typedef {import('../types').FormatType} WPFormat */
 /** @typedef {import('../types').RichTextValue} RichTextValue */
 
 /**

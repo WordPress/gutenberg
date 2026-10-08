@@ -4,11 +4,11 @@
  * (e.g. an editable block editor canvas wrapper) and the selection is fully
  * contained within the element.
  *
- * @param {HTMLElement} element The editable element.
+ * @param element The editable element.
  *
- * @return {boolean} Whether the element owns the document selection.
+ * @return Whether the element owns the document selection.
  */
-export function ownsSelection( element ) {
+export function ownsSelection( element: HTMLElement ) {
 	const { ownerDocument } = element;
 	const { activeElement } = ownerDocument;
 
@@ -24,14 +24,14 @@ export function ownsSelection( element ) {
 	// attribute is equivalent here.
 	if (
 		! activeElement ||
-		activeElement.contentEditable !== 'true' ||
+		( activeElement as HTMLElement ).contentEditable !== 'true' ||
 		element.contentEditable !== 'true' ||
 		! activeElement.contains( element )
 	) {
 		return false;
 	}
 
-	const selection = ownerDocument.defaultView.getSelection();
+	const selection = ownerDocument.defaultView!.getSelection()!;
 	const { anchorNode, focusNode } = selection;
 
 	return (

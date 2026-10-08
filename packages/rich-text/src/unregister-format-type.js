@@ -1,7 +1,7 @@
 import { select, dispatch } from '@wordpress/data';
 import { store as richTextStore } from './store';
 
-/** @typedef {import('./register-format-type').WPFormat} WPFormat */
+/** @typedef {import('./types').FormatType} WPFormat */
 
 /**
  * Unregisters a format.

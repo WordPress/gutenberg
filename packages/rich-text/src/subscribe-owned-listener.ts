@@ -12,24 +12,27 @@ const { subscribeDelegatedListener } = unlock( composePrivateApis );
 // document, all of them run on every event, which with an editable element per
 // block is O(blocks) per keystroke. The element map is weak so a detached
 // element (or the iframe holding it) can be garbage-collected.
-const registries = new WeakMap();
+const registries = new WeakMap<
+	Document,
+	Map< string, WeakMap< Node, Set< EventListener > > >
+>();
 
 /**
  * Listens for events on the element. Unlike an element listener, it also
  * fires when the selection is inside the element but a focused editing host
  * around it (e.g. the editable canvas wrapper) is the event target.
  *
- * @param {HTMLElement} element   The editable element.
- * @param {string}      eventType DOM event name.
- * @param {Function}    callback  Listener to be invoked with the event.
- * @param {boolean}     capture   Use the capture phase. Defaults to `false`.
+ * @param element   The editable element.
+ * @param eventType DOM event name.
+ * @param callback  Listener to be invoked with the event.
+ * @param capture   Use the capture phase. Defaults to `false`.
  *
- * @return {Function} Unsubscribe function.
+ * @return Unsubscribe function.
  */
 export function subscribeOwnedListener(
-	element,
-	eventType,
-	callback,
+	element: HTMLElement,
+	eventType: string,
+	callback: EventListener,
 	capture = false
 ) {
 	const { ownerDocument } = element;
@@ -52,7 +55,7 @@ export function subscribeOwnedListener(
 		subscribeDelegatedListener(
 			ownerDocument,
 			eventType,
-			( event ) => {
+			( event: Event ) => {
 				// These are editing and selection events, so the element that
 				// owns the event owns the selection, and it contains the
 				// selection anchor. Walk up from the anchor, testing
@@ -62,12 +65,12 @@ export function subscribeOwnedListener(
 				const { defaultView, activeElement } = ownerDocument;
 				const anchorNode = defaultView?.getSelection()?.anchorNode;
 				for (
-					let node = anchorNode ?? activeElement;
+					let node: Node | null = anchorNode ?? activeElement;
 					node;
 					node = node.parentNode
 				) {
-					const callbacks = elements.get( node );
-					if ( callbacks && ownsSelection( node ) ) {
+					const callbacks = elements!.get( node );
+					if ( callbacks && ownsSelection( node as HTMLElement ) ) {
 						for ( const cb of callbacks ) {
 							cb( event );
 						}
