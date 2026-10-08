@@ -122,7 +122,7 @@ _Parameters_
 
 _Returns_
 
-- `DOMRect?`: The rectangle.
+- `DOMRect | null`: The rectangle.
 
 ### getScrollContainer
 
@@ -131,7 +131,7 @@ Given a DOM node, finds the closest scrollable container node or the node itself
 _Parameters_
 
 - _node_ `Element | null`: Node from which to start.
-- _direction_ `?string`: Direction of scrollable container to search for ('vertical', 'horizontal', 'all'). Defaults to 'vertical'.
+- _direction_ `string | null`: Direction of scrollable container to search for ('vertical', 'horizontal', 'all'). Defaults to 'vertical'.
 
 _Returns_
 
@@ -145,10 +145,6 @@ _Parameters_
 
 - _newNode_ `Node`: Node to be inserted.
 - _referenceNode_ `Node`: Node after which to perform the insertion.
-
-_Returns_
-
-- `void`:
 
 ### isEmpty
 
@@ -319,10 +315,6 @@ _Parameters_
 
 - _node_ `Node`: Node to be removed.
 
-_Returns_
-
-- `void`:
-
 ### removeInvalidHTML
 
 Given a schema, unwraps or removes nodes, attributes and classes on HTML.
@@ -345,10 +337,6 @@ _Parameters_
 
 - _processedNode_ `Element`: Node to be removed.
 - _newNode_ `Element`: Node to be inserted in its place.
-
-_Returns_
-
-- `void`:
 
 ### replaceTag
 
@@ -382,10 +370,6 @@ Unwrap the given node. This means any child nodes are moved to the parent.
 _Parameters_
 
 - _node_ `Node`: The node to unwrap.
-
-_Returns_
-
-- `void`:
 
 ### wrap
 

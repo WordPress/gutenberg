@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Internal
+
+-   Refactor the `dom/*` utilities to TypeScript.
+
 ## 4.57.0 (2026-10-07)
 
 ## 4.56.0 (2026-09-23)
