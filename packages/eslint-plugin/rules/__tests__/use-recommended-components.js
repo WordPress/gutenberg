@@ -26,7 +26,7 @@ ruleTester.run( 'use-recommended-components', rule, {
 
 		// "Use with caution" components are allowed when opted in.
 		{
-			code: "import { Button, Dialog } from '@wordpress/ui';",
+			code: "import { Button, Dialog, ControlWithError, ValidatedInputControl, ValidatedTextareaControl } from '@wordpress/ui';",
 			options: [ { allowUseWithCaution: true } ],
 		},
 
@@ -74,21 +74,45 @@ ruleTester.run( 'use-recommended-components', rule, {
 		},
 		// "Use with caution" components are flagged unless opted in.
 		{
-			code: "import { Button } from '@wordpress/ui';",
+			code: "import { Button, ControlWithError, ValidatedInputControl, ValidatedTextareaControl } from '@wordpress/ui';",
 			errors: [
 				{
 					message:
 						'`Button` from `@wordpress/ui` is not yet recommended for use in a WordPress environment.',
 				},
+				{
+					message:
+						'`ControlWithError` from `@wordpress/ui` is not yet recommended for use in a WordPress environment.',
+				},
+				{
+					message:
+						'`ValidatedInputControl` from `@wordpress/ui` is not yet recommended for use in a WordPress environment.',
+				},
+				{
+					message:
+						'`ValidatedTextareaControl` from `@wordpress/ui` is not yet recommended for use in a WordPress environment.',
+				},
 			],
 		},
 		{
-			code: "import { Button } from '@wordpress/ui';",
+			code: "import { Button, ControlWithError, ValidatedInputControl, ValidatedTextareaControl } from '@wordpress/ui';",
 			options: [ { allowUseWithCaution: false } ],
 			errors: [
 				{
 					message:
 						'`Button` from `@wordpress/ui` is not yet recommended for use in a WordPress environment.',
+				},
+				{
+					message:
+						'`ControlWithError` from `@wordpress/ui` is not yet recommended for use in a WordPress environment.',
+				},
+				{
+					message:
+						'`ValidatedInputControl` from `@wordpress/ui` is not yet recommended for use in a WordPress environment.',
+				},
+				{
+					message:
+						'`ValidatedTextareaControl` from `@wordpress/ui` is not yet recommended for use in a WordPress environment.',
 				},
 			],
 		},

@@ -3146,6 +3146,9 @@
 		}
 	},
 	"packages/block-library/src/math/edit.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -5172,6 +5175,11 @@
 			"count": 1
 		}
 	},
+	"packages/dataviews/src/components/dataform-controls/color.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
 	"packages/dataviews/src/components/dataform-controls/date.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
@@ -5179,15 +5187,25 @@
 	},
 	"packages/dataviews/src/components/dataform-controls/datetime.tsx": {
 		"@wordpress/use-recommended-components": {
+			"count": 2
+		}
+	},
+	"packages/dataviews/src/components/dataform-controls/textarea.tsx": {
+		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
 	},
 	"packages/dataviews/src/components/dataform-controls/time.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
+			"count": 2
 		}
 	},
 	"packages/dataviews/src/components/dataform-controls/utils/relative-date-control.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
+	"packages/dataviews/src/components/dataform-controls/utils/validated-input.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
@@ -5287,15 +5305,45 @@
 	},
 	"packages/dataviews/src/components/validated-form-controls/checkbox-control.tsx": {
 		"@wordpress/use-recommended-components": {
+			"count": 2
+		}
+	},
+	"packages/dataviews/src/components/validated-form-controls/combobox-control.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
+	"packages/dataviews/src/components/validated-form-controls/form-token-field.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
+	"packages/dataviews/src/components/validated-form-controls/number-control.tsx": {
+		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
 	},
 	"packages/dataviews/src/components/validated-form-controls/radio-control.tsx": {
 		"@wordpress/use-recommended-components": {
+			"count": 2
+		}
+	},
+	"packages/dataviews/src/components/validated-form-controls/select-control.tsx": {
+		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
 	},
 	"packages/dataviews/src/components/validated-form-controls/toggle-control.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 2
+		}
+	},
+	"packages/dataviews/src/components/validated-form-controls/toggle-group-control.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
+	"packages/dataviews/src/dataform/stories/validation.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
@@ -7455,6 +7503,11 @@
 	},
 	"packages/format-library/src/link/test/css-classes-setting.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/format-library/src/math/index.tsx": {
+		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
 	},
