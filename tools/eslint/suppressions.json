@@ -1441,11 +1441,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/inserter/media-tab/media-tab.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/inserter/media-tab/test/media-panel.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1

@@ -5,6 +5,7 @@ import { unlock } from '../../../lock-unlock';
 
 /** @typedef {import('../../../store/actions').InserterMediaRequest} InserterMediaRequest */
 /** @typedef {import('../../../store/actions').InserterMediaItem} InserterMediaItem */
+/** @typedef {import('../../../store/actions').InserterMediaCategory} InserterMediaCategory */
 /** @typedef {import('../../../store/actions').InserterMediaResponse} InserterMediaResponse */
 
 /**
@@ -114,7 +115,9 @@ export function useMediaResults( category, query = {}, refreshKey ) {
 }
 
 export function useMediaCategories( rootClientId ) {
-	const [ categories, setCategories ] = useState( [] );
+	const [ categories, setCategories ] = useState(
+		/** @type {InserterMediaCategory[]} */ ( [] )
+	);
 
 	const inserterMediaCategories = useSelect(
 		( select ) =>
