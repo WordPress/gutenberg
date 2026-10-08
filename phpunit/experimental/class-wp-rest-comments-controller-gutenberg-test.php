@@ -629,6 +629,57 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * A user who can only edit their own post gets the same error for a note
+	 * on another post whatever that note's status, so its status doesn't leak.
+	 *
+	 * @dataProvider data_other_post_note_statuses
+	 *
+	 * @param string $status Status to move the other post's note to.
+	 */
+	public function test_reaction_on_note_from_other_post_does_not_leak_note_status( $status ) {
+		$own_post_id = self::factory()->post->create(
+			array(
+				'post_author' => self::$contributor_id,
+				'post_status' => 'draft',
+			)
+		);
+		$other_post  = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id     = $this->create_note( $other_post, self::$editor_id );
+		wp_set_comment_status( $note_id, $status );
+
+		wp_set_current_user( self::$contributor_id );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $own_post_id,
+					'type'    => 'reaction',
+					'parent'  => $note_id,
+					'content' => '2764',
+				)
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_comment_invalid_parent', $response, 400 );
+		$this->assertSame( 'A reaction must be attached to a note on the same post.', $response->as_error()->get_error_message() );
+	}
+
+	/**
+	 * Data provider for test_reaction_on_note_from_other_post_does_not_leak_note_status().
+	 *
+	 * @return array[]
+	 */
+	public function data_other_post_note_statuses() {
+		return array(
+			'open'     => array( 'hold' ),
+			'resolved' => array( 'approve' ),
+			'trashed'  => array( 'trash' ),
+		);
+	}
+
+	/**
 	 * A reaction created under a hidden note would never be reached by the
 	 * trash cascade, so the note must be live.
 	 *

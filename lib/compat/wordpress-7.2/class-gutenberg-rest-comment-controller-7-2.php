@@ -500,6 +500,17 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				);
 			}
 
+			// The parent note must belong to the post the reaction targets. Check
+			// this before the note's status, which would otherwise leak to a user
+			// who can only edit some other post.
+			if ( ! empty( $request['post'] ) && (int) $parent_comment->comment_post_ID !== (int) $request['post'] ) {
+				return new WP_Error(
+					'rest_comment_invalid_parent',
+					__( 'A reaction must be attached to a note on the same post.', 'gutenberg' ),
+					array( 'status' => 400 )
+				);
+			}
+
 			// A reaction under a hidden note would escape the trash cascade.
 			if ( in_array( $parent_comment->comment_approved, array( 'trash', 'spam' ), true ) ) {
 				return new WP_Error(
@@ -526,15 +537,6 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				return new WP_Error(
 					'rest_comment_invalid_parent',
 					__( 'A reaction cannot be added to a resolved note.', 'gutenberg' ),
-					array( 'status' => 400 )
-				);
-			}
-
-			// The parent note must belong to the post the reaction targets.
-			if ( ! empty( $request['post'] ) && (int) $parent_comment->comment_post_ID !== (int) $request['post'] ) {
-				return new WP_Error(
-					'rest_comment_invalid_parent',
-					__( 'A reaction must be attached to a note on the same post.', 'gutenberg' ),
 					array( 'status' => 400 )
 				);
 			}
