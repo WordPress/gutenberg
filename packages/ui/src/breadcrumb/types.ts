@@ -42,7 +42,10 @@ export interface CurrentItemProps extends Omit<
 	 *
 	 * @default 'page'
 	 */
-	'aria-current'?: ComponentProps< 'span' >[ 'aria-current' ];
+	'aria-current'?: Exclude<
+		ComponentProps< 'span' >[ 'aria-current' ],
+		false | 'false'
+	>;
 
 	/**
 	 * The plain-text label for the current item.

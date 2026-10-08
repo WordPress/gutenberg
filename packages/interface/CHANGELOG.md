@@ -4,7 +4,7 @@
 
 ### Internal
 
--   Move footer-specific block breadcrumb styles to the editor and edit-widgets packages.
+-   Remove misplaced block breadcrumb styles ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
 
 ## 10.3.0 (2026-10-07)
 

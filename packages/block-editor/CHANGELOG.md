@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `BlockBreadcrumb`: Use responsive breadcrumbs that collapse overflowing ancestors into a menu while preserving block selection and document-root activation. Accept a `className` for consumer-specific layout.
+-   `BlockBreadcrumb`: Use the `Breadcrumb` component from `@wordpress/ui` to collapse overflowing ancestors into a menu while preserving block selection and document-root activation. Accept a `className` for consumer-specific layout ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
 
 ## 18.1.0 (2026-10-07)
 
