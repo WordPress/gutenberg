@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `Button`, `IconButton`: Use the shared `Spinner` for loading indicators.
+-   `Button`, `IconButton`: Use the shared `Spinner` for loading indicators ([#84321](https://github.com/WordPress/gutenberg/pull/84321)).
 
 ### Bug Fixes
 
