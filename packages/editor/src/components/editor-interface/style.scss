@@ -6,6 +6,13 @@
 	min-height: var(--wpds-dimension-size-md);
 }
 
+.editor-editor-interface__breadcrumbs {
+	display: flex;
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+}
+
 .editor-editor-interface .entities-saved-states__panel-header {
 	height: $header-height + $border-width;
 }

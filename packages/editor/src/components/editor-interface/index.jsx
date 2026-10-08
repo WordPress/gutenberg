@@ -287,13 +287,15 @@ export default function EditorInterface( {
 						align="center"
 						className="editor-editor-interface__footer"
 					>
-						<BlockBreadcrumb
-							rootLabelText={
-								postTypeLabel
-									? decodeEntities( postTypeLabel )
-									: undefined
-							}
-						/>
+						<div className="editor-editor-interface__breadcrumbs">
+							<BlockBreadcrumb
+								rootLabelText={
+									postTypeLabel
+										? decodeEntities( postTypeLabel )
+										: undefined
+								}
+							/>
+						</div>
 						{ hasCanvasWidth && <ViewportStatus /> }
 					</Stack>
 				)
