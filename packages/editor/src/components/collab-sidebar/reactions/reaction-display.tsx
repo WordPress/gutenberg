@@ -14,9 +14,9 @@ import { useEmojiLabel } from './emojibase-data';
 
 interface ReactionSummaryEntry {
 	count: number;
-	reacted?: boolean;
-	// The current user's reaction comment ID, used to delete it again.
-	my_reaction_id?: number;
+	// The current user's reaction comment ID, used to delete it again;
+	// 0 when they have not reacted with this emoji.
+	current_user_reaction: number;
 }
 
 /**
@@ -53,11 +53,11 @@ function getReactionCount(
  * @param hexKey    The reaction hex key to check.
  * @return Whether the user has reacted.
  */
-function hasUserReacted(
+export function hasUserReacted(
 	reactions: ReactionSummary | null | undefined,
 	hexKey: string
 ): boolean {
-	return reactions?.[ hexKey ]?.reacted || false;
+	return ( reactions?.[ hexKey ]?.current_user_reaction ?? 0 ) > 0;
 }
 
 /**
@@ -328,9 +328,9 @@ function ReactionButton( {
 
 	const defaultLabel = sprintf(
 		/* translators: 1: emoji label, 2: count of reactions */
-		_n( '%1$s, %2$d reaction', '%1$s, %2$d reactions', count ),
+		_n( '%1$s, %2$s reaction', '%1$s, %2$s reactions', count ),
 		label,
-		count
+		count.toLocaleString()
 	);
 
 	const accessibleLabel = tooltipText || defaultLabel;
@@ -379,7 +379,7 @@ function ReactionButton( {
 				<span className="editor-collab-sidebar-panel__reaction-button-emoji">
 					{ emoji }
 				</span>
-				<span>{ count }</span>
+				<span>{ count.toLocaleString() }</span>
 			</Tooltip.Trigger>
 			<Tooltip.Popup>{ accessibleLabel }</Tooltip.Popup>
 		</Tooltip.Root>

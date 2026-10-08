@@ -8,9 +8,11 @@ import { IconButton } from '@wordpress/ui';
 import { reaction as reactionIcon } from '@wordpress/icons';
 import EmojiPicker from './emoji-picker';
 import { emojiToHexKey } from './reaction-emojis';
+import { hasUserReacted } from './reaction-display';
+import type { ReactionSummary } from './reaction-display';
 
 interface AddReactionButtonProps {
-	disabled?: boolean;
+	reactions?: ReactionSummary | null;
 	onToggleReaction: ( hexKey: string ) => void;
 }
 
@@ -19,14 +21,18 @@ interface AddReactionButtonProps {
  * with its "Frequently used" section seeded from the curated set.
  *
  * @param props                  Component props.
- * @param props.disabled         Whether the button is disabled (e.g. on a
- *                               resolved note thread).
+ * @param props.reactions        The note's reaction summary, used to mark the
+ *                               emoji the current user has already reacted with.
  * @param props.onToggleReaction Callback to toggle a reaction.
  */
 export function AddReactionButton( {
-	disabled = false,
+	reactions,
 	onToggleReaction,
 }: AddReactionButtonProps ) {
+	const reactedHexKeys = Object.keys( reactions ?? {} ).filter( ( hexKey ) =>
+		hasUserReacted( reactions, hexKey )
+	);
+
 	return (
 		<EmojiPicker
 			label={ __( 'Add reaction' ) }
@@ -41,7 +47,7 @@ export function AddReactionButton( {
 					label={ __( 'Add reaction' ) }
 				/>
 			}
-			disabled={ disabled }
+			reactedHexKeys={ reactedHexKeys }
 			onSelect={ ( emoji ) => onToggleReaction( emojiToHexKey( emoji ) ) }
 		/>
 	);

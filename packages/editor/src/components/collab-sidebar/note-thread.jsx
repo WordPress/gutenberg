@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { useEffect, useRef } from '@wordpress/element';
+import { useContext, useEffect, useRef, useState } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import {
@@ -18,9 +18,11 @@ import { Note } from './note';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { FloatingContainer } from './floating-container';
+import { NoteDraftsContext, useNoteDraft, usePickNote } from './hooks';
 import {
 	focusNoteThread,
 	getNoteExcerpt,
+	hasFocusWithin,
 	scrollNoteThreadIntoView,
 } from './utils';
 import { store as editorStore } from '../../store';
@@ -28,10 +30,54 @@ import { unlock } from '../../lock-unlock';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
+function NoteReply( { note, onEditNote, onAddReply, onCancel } ) {
+	const { initialValue, setDraft } = useNoteDraft( note.id );
+	return (
+		<NoteCard role="treeitem">
+			<NoteForm
+				onSubmit={ ( inputComment ) => {
+					if ( 'approved' === note.status ) {
+						// For reopening, include the content in the reopen action.
+						return onEditNote( note, {
+							status: 'hold',
+							content: inputComment,
+						} );
+					}
+					// For regular replies, add as separate comment.
+					return onAddReply( {
+						content: inputComment,
+						parent: note.id,
+					} );
+				} }
+				onCancel={ ( event ) => {
+					setDraft( '' );
+					onCancel( event );
+				} }
+				initialValue={ initialValue }
+				onChange={ setDraft }
+				labels={ {
+					submit:
+						'approved' === note.status
+							? __( 'Reopen & Reply' )
+							: __( 'Reply' ),
+					input: sprintf(
+						// translators: %1$s: note identifier, %2$s: author name
+						__( 'Reply to note %1$s by %2$s' ),
+						note.id,
+						note.author_name
+					),
+					placeholder: __( 'Reply or @ mention' ),
+				} }
+			/>
+		</NoteCard>
+	);
+}
+
 export function NoteThread( {
 	note,
 	onEditNote,
 	onAddReply,
+	onDiscard,
 	onDeleteNote,
 	isSelected,
 	sidebarRef,
@@ -39,9 +85,11 @@ export function NoteThread( {
 	onKeyDown,
 } ) {
 	const isFloating = !! floating;
-	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
+	const { toggleBlockHighlight, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
 	);
+	const drafts = useContext( NoteDraftsContext );
+	const pickNote = usePickNote( { drafts, onDiscard } );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
 	const relatedBlockElement = useBlockElement( note.blockClientId );
@@ -51,6 +99,8 @@ export function NoteThread( {
 	);
 	const floatingRef = useRef( null );
 	const isKeyboardTabbingRef = useRef( false );
+	// Minimized threads expand only while focused, not on block selection.
+	const [ hasFocus, setHasFocus ] = useState( false );
 
 	const registerThread = floating?.registerThread;
 	const unregisterThread = floating?.unregisterThread;
@@ -66,13 +116,15 @@ export function NoteThread( {
 	}, [ relatedBlockElement, note.id, registerThread, unregisterThread ] );
 
 	// Scroll the thread into view when it becomes selected, and re-scroll
-	// when its floating position settles after `useFloatingBoard` recomputes.
+	// when its floating position or height settles after `useFloatingBoard`
+	// recomputes. The canvas room follows the height, so an expanding thread
+	// can only scroll fully into view once it's measured.
 	useEffect( () => {
 		if ( ! isSelected || note.id === 'new' ) {
 			return;
 		}
 		scrollNoteThreadIntoView( note.id, sidebarRef.current );
-	}, [ isSelected, floating?.y, note.id, sidebarRef ] );
+	}, [ isSelected, floating?.y, floating?.height, note.id, sidebarRef ] );
 
 	/*
 	 * Deselect the thread once focus leaves it. `useFocusOutside` keeps the
@@ -82,6 +134,7 @@ export function NoteThread( {
 	 * React tree. It also ignores window/tab blur.
 	 */
 	const focusOutside = useFocusOutside( ( event ) => {
+		setHasFocus( false );
 		// When another note is clicked, do nothing because the current note is automatically closed.
 		const isNoteFocused = event.relatedTarget?.closest(
 			'.editor-collab-sidebar-panel__thread'
@@ -95,6 +148,11 @@ export function NoteThread( {
 			// Discard a hover toggle still in flight so it can't re-highlight afterwards.
 			debouncedToggleBlockHighlight.cancel();
 			toggleBlockHighlight( note.blockClientId, false );
+		}
+
+		// In the note's block, the caret events decide; deselecting here too would race them.
+		if ( hasFocusWithin( relatedBlockElement ) ) {
+			return;
 		}
 
 		/*
@@ -118,6 +176,7 @@ export function NoteThread( {
 	function onFocus( event ) {
 		// Cancel any pending deselect and highlight the related block.
 		focusOutside.onFocus( event );
+		setHasFocus( true );
 		debouncedToggleBlockHighlight.cancel();
 		toggleBlockHighlight( note.blockClientId, true );
 	}
@@ -127,13 +186,8 @@ export function NoteThread( {
 			return;
 		}
 
-		selectNote( note.id );
+		pickNote( note.id, note.blockClientId );
 		focusNoteThread( note.id, sidebarRef.current );
-		toggleBlockSpotlight( note.blockClientId, true );
-		if ( !! note.blockClientId ) {
-			// Pass `null` as the second parameter to prevent focusing the block.
-			selectBlock( note.blockClientId, null );
-		}
 	}
 
 	function onDeselectNote() {
@@ -142,7 +196,7 @@ export function NoteThread( {
 	}
 
 	function handleResolve() {
-		onEditNote( { id: note.id, status: 'approved' } );
+		onEditNote( note, { status: 'approved' } );
 		onDeselectNote();
 		if ( isFloating ) {
 			relatedBlockElement?.focus();
@@ -179,7 +233,10 @@ export function NoteThread( {
 	if ( isFloating && note.id === 'new' ) {
 		return (
 			<AddNote
+				key={ note.blockClientId }
+				clientId={ note.blockClientId }
 				onSubmit={ onAddReply }
+				onDiscard={ onDiscard }
 				sidebarRef={ sidebarRef }
 				floating={ { y: floating.y, ref: floatingRef } }
 			/>
@@ -193,6 +250,7 @@ export function NoteThread( {
 			}
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
 				'is-selected': isSelected,
+				'has-focus': hasFocus,
 			} ) }
 			id={ `note-thread-${ note.id }` }
 			gap="md"
@@ -296,44 +354,17 @@ export function NoteThread( {
 				/>
 			) }
 			{ isSelected && (
-				<NoteCard role="treeitem">
-					<NoteForm
-						onSubmit={ ( inputComment ) => {
-							if ( 'approved' === note.status ) {
-								// For reopening, include the content in the reopen action.
-								return onEditNote( {
-									id: note.id,
-									status: 'hold',
-									content: inputComment,
-								} );
-							}
-							// For regular replies, add as separate comment.
-							return onAddReply( {
-								content: inputComment,
-								parent: note.id,
-							} );
-						} }
-						onCancel={ ( event ) => {
-							// Prevent the parent onClick from being triggered.
-							event.stopPropagation();
-							onDeselectNote();
-							focusNoteThread( note.id, sidebarRef.current );
-						} }
-						labels={ {
-							submit:
-								'approved' === note.status
-									? __( 'Reopen & Reply' )
-									: __( 'Reply' ),
-							input: sprintf(
-								// translators: %1$s: note identifier, %2$s: author name
-								__( 'Reply to note %1$s by %2$s' ),
-								note.id,
-								note.author_name
-							),
-							placeholder: __( 'Reply or @ mention' ),
-						} }
-					/>
-				</NoteCard>
+				<NoteReply
+					note={ note }
+					onEditNote={ onEditNote }
+					onAddReply={ onAddReply }
+					onCancel={ ( event ) => {
+						// Prevent the parent onClick from being triggered.
+						event.stopPropagation();
+						onDeselectNote();
+						focusNoteThread( note.id, sidebarRef.current );
+					} }
+				/>
 			) }
 			{ !! note.blockClientId && (
 				<Button

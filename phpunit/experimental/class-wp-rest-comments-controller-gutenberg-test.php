@@ -470,6 +470,8 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			'content' => 'Test note for reactions',
 			'author'  => $user_id,
 			'type'    => 'note',
+			// Open, like the editor creates it: an approved note is resolved.
+			'status'  => 'hold',
 		);
 		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
 		$request->add_header( 'Content-Type', 'application/json' );
@@ -629,7 +631,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 
 	/**
 	 * A reaction created under a hidden note would never be reached by the
-	 * trash/restore cascade, so the note must be live.
+	 * trash cascade, so the note must be live.
 	 *
 	 * @dataProvider data_hidden_note_statuses
 	 *
@@ -973,8 +975,9 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$this->assertArrayHasKey( 'reaction_summary', $data );
 		$this->assertArrayHasKey( '2764', $data['reaction_summary'] );
 		$this->assertSame( 1, $data['reaction_summary']['2764']['count'] );
-		$this->assertTrue( $data['reaction_summary']['2764']['reacted'] );
-		$this->assertSame( $reaction_id, $data['reaction_summary']['2764']['my_reaction_id'] );
+		$this->assertSame( $reaction_id, $data['reaction_summary']['2764']['current_user_reaction'] );
+		$this->assertArrayNotHasKey( 'reacted', $data['reaction_summary']['2764'] );
+		$this->assertArrayNotHasKey( 'my_reaction_id', $data['reaction_summary']['2764'] );
 	}
 
 	public function test_reaction_summary_shows_not_reacted_for_other_user() {
@@ -1004,8 +1007,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 
 		$this->assertArrayHasKey( 'reaction_summary', $data );
 		$this->assertSame( 1, $data['reaction_summary']['2764']['count'] );
-		$this->assertFalse( $data['reaction_summary']['2764']['reacted'] );
-		$this->assertSame( 0, $data['reaction_summary']['2764']['my_reaction_id'] );
+		$this->assertSame( 0, $data['reaction_summary']['2764']['current_user_reaction'] );
 	}
 
 	/**
@@ -1047,7 +1049,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$this->assertCount( 2, $data );
 		foreach ( $data as $note ) {
 			$this->assertSame( 1, $note['reaction_summary']['2764']['count'] );
-			$this->assertTrue( $note['reaction_summary']['2764']['reacted'] );
+			$this->assertGreaterThan( 0, $note['reaction_summary']['2764']['current_user_reaction'] );
 		}
 		// One counts query and one current-user query for the whole page.
 		$this->assertSame( 2, $summary_queries );
@@ -1131,6 +1133,100 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Only the user who added a reaction can remove it, even though other
+	 * editors of the post can edit the note it belongs to.
+	 */
+	public function test_cannot_delete_another_users_reaction() {
+		wp_set_current_user( self::$editor_id );
+		$post_id     = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id     = $this->create_note( $post_id, self::$editor_id );
+		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$editor_id );
+
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'DELETE', '/wp/v2/comments/' . $reaction_id );
+		$request->set_param( 'force', true );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_cannot_delete', $response, 403 );
+		$this->assertNotNull( get_comment( $reaction_id ), 'Another user removed the reaction.' );
+	}
+
+	/**
+	 * The reaction's author can still remove it.
+	 */
+	public function test_can_delete_own_reaction() {
+		wp_set_current_user( self::$editor_id );
+		$post_id     = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id     = $this->create_note( $post_id, self::$admin_id );
+		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$editor_id );
+
+		wp_set_current_user( self::$editor_id );
+		$request = new WP_REST_Request( 'DELETE', '/wp/v2/comments/' . $reaction_id );
+		$request->set_param( 'force', true );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertNull( get_comment( $reaction_id ) );
+	}
+
+	/**
+	 * Resolving approves the thread's root note and the editor disables
+	 * reactions from then on, so the server rejects them too, on the root
+	 * note and on its replies.
+	 *
+	 * @dataProvider data_resolved_thread_targets
+	 *
+	 * @param bool $on_reply Whether to react to a reply rather than the root note.
+	 */
+	public function test_cannot_create_reaction_on_resolved_thread( $on_reply ) {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+		$target  = $note_id;
+		if ( $on_reply ) {
+			$target = self::factory()->comment->create(
+				array(
+					'comment_post_ID'  => $post_id,
+					'comment_parent'   => $note_id,
+					'comment_type'     => 'note',
+					'comment_approved' => 0,
+					'user_id'          => self::$editor_id,
+				)
+			);
+		}
+		wp_set_comment_status( $note_id, 'approve' );
+
+		wp_set_current_user( self::$editor_id );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'type'    => 'reaction',
+					'parent'  => $target,
+					'content' => '2764',
+				)
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_comment_invalid_parent', $response, 400 );
+	}
+
+	/**
+	 * Data provider for test_cannot_create_reaction_on_resolved_thread().
+	 *
+	 * @return array[]
+	 */
+	public function data_resolved_thread_targets() {
+		return array(
+			'root note' => array( false ),
+			'reply'     => array( true ),
+		);
+	}
+
+	/**
 	 * Notes remain editable - only reactions are locked down.
 	 */
 	public function test_can_still_update_note() {
@@ -1203,9 +1299,9 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 
 	/**
 	 * Core cascades a trashed note to its `note` children only, so
-	 * reactions need their own trash and restore cascade.
+	 * reactions need their own trash cascade.
 	 */
-	public function test_trashing_note_trashes_and_restores_its_reactions() {
+	public function test_trashing_note_trashes_its_reactions() {
 		if ( ! EMPTY_TRASH_DAYS ) {
 			$this->markTestSkipped( 'Trash is disabled; trashing force-deletes.' );
 		}
@@ -1217,52 +1313,6 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 
 		wp_trash_comment( $note_id );
 		$this->assertSame( 'trash', wp_get_comment_status( $reaction_id ), 'Reaction stayed approved under a trashed note.' );
-
-		wp_untrash_comment( $note_id );
-		$this->assertSame( 'approved', wp_get_comment_status( $reaction_id ), 'Reaction was not restored with its note.' );
-	}
-
-	/**
-	 * Restoring a note brings back only the reactions trashed along with it,
-	 * not ones the user had already removed.
-	 */
-	public function test_untrashing_note_does_not_restore_removed_reactions() {
-		if ( ! EMPTY_TRASH_DAYS ) {
-			$this->markTestSkipped( 'Trash is disabled; trashing force-deletes.' );
-		}
-
-		wp_set_current_user( self::$editor_id );
-		$post_id    = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
-		$note_id    = $this->create_note( $post_id, self::$editor_id );
-		$removed_id = $this->create_reaction( $post_id, $note_id, self::$editor_id );
-		wp_trash_comment( $removed_id );
-		$live_id = $this->create_reaction( $post_id, $note_id, self::$author_id, '1f680' );
-
-		wp_trash_comment( $note_id );
-		wp_untrash_comment( $note_id );
-
-		$this->assertSame( 'trash', wp_get_comment_status( $removed_id ), 'A reaction the user removed was restored with its note.' );
-		$this->assertSame( 'approved', wp_get_comment_status( $live_id ), 'The live reaction was not restored with its note.' );
-		$this->assertSame( '', get_comment_meta( $live_id, '_wp_trash_meta_with_note', true ), 'The restored reaction kept its cascade flag.' );
-	}
-
-	/**
-	 * The cascade flag only ever sits on reactions, so restoring any other
-	 * comment must leave its meta alone.
-	 */
-	public function test_untrashing_regular_comment_keeps_its_meta() {
-		if ( ! EMPTY_TRASH_DAYS ) {
-			$this->markTestSkipped( 'Trash is disabled; trashing force-deletes.' );
-		}
-
-		$post_id    = self::factory()->post->create();
-		$comment_id = self::factory()->comment->create( array( 'comment_post_ID' => $post_id ) );
-		add_comment_meta( $comment_id, '_wp_trash_meta_with_note', '1', true );
-
-		wp_trash_comment( $comment_id );
-		wp_untrash_comment( $comment_id );
-
-		$this->assertSame( '1', get_comment_meta( $comment_id, '_wp_trash_meta_with_note', true ) );
 	}
 
 	/**

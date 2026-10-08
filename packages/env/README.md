@@ -45,6 +45,7 @@ $ wp-env start --runtime=playground
 | MySQL database | Yes | No (SQLite) |
 | Multisite | Yes | Yes |
 | Custom PHP version | Yes | Yes |
+| Custom MariaDB version | Yes | No (SQLite) |
 | Plugin/theme mounting | Yes | Yes |
 | `wp-env run` command | Yes | No |
 
@@ -601,6 +602,7 @@ To enable editor autocomplete and validation, add a `$schema` key:
 |----------------------|----------------|----------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
 | `"core"`             | `string\|null` | `null`                                 | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.         |
 | `"phpVersion"`       | `string\|null` | `null`                                 | The PHP version to use. If `null` is specified, `wp-env` will use the default version used with production release of WordPress. |
+| `"mariadbVersion"`   | `string\|null` | `null`                                 | The MariaDB version to use: `"lts"`, `"latest"`, or a version such as `"10.11"`. If `null` is specified, `lts` is used.          |
 | `"plugins"`          | `string[]`     | `[]`                                   | A list of plugins to install and activate in the environment.                                                                    |
 | `"themes"`           | `string[]`     | `[]`                                   | A list of themes to install in the environment.                                                                                  |
 | `"port"`             | `integer`      | `8888`                                 | The port number to use for the installation. |
@@ -826,6 +828,21 @@ You can tell `wp-env` to use a specific PHP version for compatibility and testin
 	"plugins": [ "." ]
 }
 ```
+
+### Specific MariaDB Version
+
+You can tell `wp-env` which MariaDB version the database should run, for compatibility and testing. Use `"lts"`, `"latest"`, or a version such as `"10.11"` or `"11.4.2"`. This can also be set via the environment variable `WP_ENV_MARIADB_VERSION`, which applies to every environment. The Playground runtime uses SQLite and ignores this option.
+
+```json
+{
+	"mariadbVersion": "10.11",
+	"plugins": [ "." ]
+}
+```
+
+MariaDB cannot start on a database last used by a newer version. When that happens, `wp-env start` stops with an error that names both versions. To switch to a lower version, run `wp-env cleanup` first. It removes the environment's Docker containers, volumes, and local files, not only the databases, so everything is recreated on the next start.
+
+**Note:** MariaDB 5.5 images are not published for ARM processors. Apple silicon devices can still run version 5.5 under emulation by setting `DOCKER_DEFAULT_PLATFORM=linux/amd64` before running `wp-env start`. Be aware that every container in the environment runs under emulation, not only the database, so the whole environment runs more slowly.
 
 ### Multisite support
 

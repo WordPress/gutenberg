@@ -2,26 +2,44 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
 ### New Features
 
 -   Notes: allow reacting to a note with an emoji. Reactions display as pill buttons on the note with per-emoji counts, backed by a new `reaction` comment type. The add-reaction trigger shows on a selected note, fading in on hover or focus in its top corner, so a note with no reactions costs no vertical space for the option ([#76767](https://github.com/WordPress/gutenberg/pull/76767)).
 -   Notes: the add-reaction button now opens a full searchable emoji picker with a per-user skin tone preference, powered by a self-hosted Emojibase dataset configured via the `noteEmojibaseUrl` editor setting ([#78176](https://github.com/WordPress/gutenberg/pull/78176)).
 -   Notes: the emoji picker shows the highlighted emoji, enlarged, with its name in a footer under the grid, following both the pointer and the arrow keys ([#84051](https://github.com/WordPress/gutenberg/pull/84051)).
 
+### Bug Fixes
+
+-   Notes: Highlight the text an unsent note is about, and keep the note anchored to it when the selection changes or the text is edited before the note is sent ([#84125](https://github.com/WordPress/gutenberg/pull/84125)).
+-   Notes: Select the note under the caret: an inline note while the caret is inside its highlight, otherwise the block's unsent draft or block-level note, instead of an inline note on any click in the block ([#84147](https://github.com/WordPress/gutenberg/pull/84147)).
+
+## 15.2.0 (2026-10-07)
+
 ### Enhancements
 
+-   `trashPost`: Accept a `force` option to delete the post permanently instead of moving it to the trash ([#84045](https://github.com/WordPress/gutenberg/pull/84045)).
 -   `PostAuthor`: The field renders with the `SearchableSelect` component of `@wordpress/ui` instead of `ComboboxControl` and `SelectControl` ([#83323](https://github.com/WordPress/gutenberg/pull/83323)).
 -   `DocumentOutline`: Show the outline items' focus ring with the design system's outline instead of a legacy box-shadow ([#83755](https://github.com/WordPress/gutenberg/pull/83755)).
 -   Notes: Add a "Notes" submenu to the View group of the Options menu ([#83768](https://github.com/WordPress/gutenberg/pull/83768)).
 
 ### Bug Fixes
 
+-   `PostTrash`: Offer "Delete permanently" instead of "Move to trash" when the post can't be moved to the trash, based on the new `wp:action-trash` REST link ([#84045](https://github.com/WordPress/gutenberg/pull/84045)).
 -   Keep post actions and note actions menus dismissible when their triggers become disabled. Close the View menu when it becomes unavailable ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
 -   Remove redundant menu groups from the mode switcher and preview menu, and associate the Editor label with its radio group ([#83792](https://github.com/WordPress/gutenberg/pull/83792)).
 -   Error boundary: Explicitly announce the error title and description, excluding action labels ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
 -   `PostURL`: Leaving the slug field without typing no longer saves the displayed fallback as the slug, so a new post no longer publishes with the `auto-draft` slug ([#83518](https://github.com/WordPress/gutenberg/pull/83518)).
 -   Notes: Keep the clicked thread selected on a block with several notes, instead of switching to the block's primary note ([#83528](https://github.com/WordPress/gutenberg/pull/83528)).
 -   Notes: Keep floating threads aligned with their blocks when an editor notice or the device preview moves the canvas ([#83485](https://github.com/WordPress/gutenberg/pull/83485)).
+-   Notes: Add an Undo action to the "Note deleted." snackbar, and stop the editor's undo from bringing back the highlight of a deleted note ([#83988](https://github.com/WordPress/gutenberg/pull/83988)).
+-   Notes: Stop the editor's undo from detaching a newly added note from its block, or bringing back the highlight of a resolved note ([#84079](https://github.com/WordPress/gutenberg/pull/84079)).
+-   Notes: Delete notes permanently when they can't be moved to the trash, instead of failing with an error ([#84102](https://github.com/WordPress/gutenberg/pull/84102)).
+-   Notes: Disable the note form field while a note or reply is being sent, instead of accepting text the save would not include ([#84083](https://github.com/WordPress/gutenberg/pull/84083)).
+-   Notes: Keep an unsent note or reply when selecting another block or thread, instead of discarding it ([#84110](https://github.com/WordPress/gutenberg/pull/84110)).
 
 ### Internal
 

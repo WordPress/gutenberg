@@ -2,13 +2,28 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   `use-recommended-components`: Recommend `Notice` from `@wordpress/ui` instead of `Tip` from `@wordpress/components` ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
+
+## 27.1.0 (2026-10-07)
+
 ### New Features
 
 -   `use-recommended-components`: Add an `allowUseWithCaution` option that allows `@wordpress/ui` components marked "Use with caution" ([#83536](https://github.com/WordPress/gutenberg/pull/83536)).
 
 ### Enhancements
 
+-   `use-recommended-components`: Recommend `Switch` and `SwitchControl` from `@wordpress/ui`, and flag `FormToggle` and `ToggleControl` from `@wordpress/components` ([#84097](https://github.com/WordPress/gutenberg/pull/84097)).
+-   `test-unit`: Allow generated titles passed through variables with `vitest/valid-title`'s `allowArguments` option ([#83995](https://github.com/WordPress/gutenberg/pull/83995)).
+-   `use-recommended-components`: Recommend `Progress` from `@wordpress/ui` and flag `ProgressBar` from `@wordpress/components`. ([#84021](https://github.com/WordPress/gutenberg/pull/84021))
+-   `use-recommended-components`: Recognize the new `@wordpress/ui` Meter as use-with-caution. ([#83855](https://github.com/WordPress/gutenberg/pull/83855))
 -   `use-recommended-components`: Recommend `Checkbox`, `CheckboxControl`, and `CheckboxGroup` from `@wordpress/ui`, and flag `CheckboxControl` from `@wordpress/components` ([#83771](https://github.com/WordPress/gutenberg/pull/83771)).
+-   `use-recommended-components`: Recommend `Radio`, `RadioGroup`, and `RadioGroupControl` from `@wordpress/ui`, and flag `RadioControl` from `@wordpress/components` ([#83872](https://github.com/WordPress/gutenberg/pull/83872)).
 -   `use-recommended-components`: Update the "Use with caution" entry from `LinkButton` to `ButtonLink` to match the renamed `@wordpress/ui` component ([#83789](https://github.com/WordPress/gutenberg/pull/83789)).
 -   Update `use-recommended-components` rule to mark `Notice` from `@wordpress/ui` as recommended, and to prefer it over `@wordpress/components` `Notice` ([#82685](https://github.com/WordPress/gutenberg/pull/82685)).
 -   `use-recommended-components`: Recognize the new `@wordpress/ui` Progress as use-with-caution. ([#83781](https://github.com/WordPress/gutenberg/pull/83781))

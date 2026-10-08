@@ -40,8 +40,6 @@ npm install
 npm run dev
 ```
 
-> Note: The install scripts require [Python](https://www.python.org/) to be installed and in the path of the local system. This might be installed by default for your operating system, or require downloading and installing.
-
 ### Set up each worktree
 
 Install dependencies in each fresh Git worktree before you build, test, lint, or commit. Do not reuse `node_modules` or generated package files from a worktree whose `package-lock.json` is at a different revision. Results from that setup might not match the current checkout.
@@ -212,87 +210,27 @@ You can also test Storybook for the current `trunk` branch on GitHub Pages: [htt
 
 ## Developer tools
 
-We recommend configuring your editor to automatically check for syntax and lint errors. This will help you save time as you develop by automatically fixing minor formatting issues. Here are some directions for setting up Visual Studio Code, a popular editor used by many of the core developers, these tools are also available for other editors.
+We recommend configuring your editor to automatically check for syntax and lint errors. This will help you save time as you develop by automatically fixing minor formatting issues. The repository includes settings for Visual Studio Code, Cursor, and Zed. Other editors can use the same root formatting and lint configuration files. Formatting on save and automatic fixes are personal preferences; configure them in your editor's user settings if you want them.
 
 ### Visual Studio Code
 
-If you use Visual Studio Code, the following extensions and workspace settings can help the editor use the same linting, formatting, PHP, and TypeScript tooling as the Gutenberg repository. These settings are optional and should live in your local `.vscode/settings.json` file. Do not commit your personal workspace settings; add `.vscode/settings.json` to your [global gitignore file](https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files#configuring-ignored-files-for-all-repositories-on-your-computer) if needed.
+Install the [recommended extensions](https://github.com/WordPress/gutenberg/blob/HEAD/.vscode/extensions.json). The optional [`.vscode/settings.dist.jsonc`](https://github.com/WordPress/gutenberg/blob/HEAD/.vscode/settings.dist.jsonc) template selects the repository's native TypeScript and formatting tools, configures ESLint suppression hints, and targets PHP 7.4. Copy it to `.vscode/settings.json`, or merge its entries into your existing workspace settings. The repository does not install or update that file automatically. If you previously used the managed settings, replace that copy with the new template to remove its old save and exclusion defaults.
 
-Recommended extensions:
+Open a JavaScript or TypeScript file to activate the TypeScript 7 extension. When it asks whether to use the workspace TypeScript version, choose **Allow**; otherwise it keeps using its bundled version.
 
--   [EditorConfig for VS Code](https://marketplace.visualstudio.com/items?itemName=editorconfig.editorconfig)
--   [PHP Intelephense](https://marketplace.visualstudio.com/items?itemName=bmewburn.vscode-intelephense-client)
--   [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
--   [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
--   [PHP_CodeSniffer](https://marketplace.visualstudio.com/items?itemName=obliviousharmony.vscode-php-codesniffer)
--   [Stylelint](https://marketplace.visualstudio.com/items?itemName=stylelint.vscode-stylelint)
--   [Native TypeScript Preview](https://marketplace.visualstudio.com/items?itemName=TypeScriptTeam.native-preview)
+### Cursor
 
-You can start with this workspace settings file:
+Cursor supports the same `.vscode` settings template and extension recommendations. Follow the [Visual Studio Code setup](#visual-studio-code) above. In Cursor's Extensions view, search for `@id:TypeScriptTeam.native-preview` and make sure the **TypeScript 7** extension is installed and enabled. [Cursor uses its own marketplace proxy](https://cursor.com/help/customization/extensions), where extension availability can differ from Open VSX.
 
-```jsonc
-{
-	"search.exclude": {
-		"**/.cache/**": true,
-		"**/build/**": true,
-		"**/build-module/**": true,
-		"**/build-types/**": true,
-		"**/build-style/**": true,
-		"**/node_modules/**": true,
-		"**/vendor/**": true
-	},
-	// Use TypeScript from the workspace instead of VS Code's built-in TypeScript version.
-	"js/ts.tsdk.path": "tools/build-scripts/node_modules/@typescript/native/lib",
-	// Use ESLint, Prettier and Stylelint from the respective paths.
-	"eslint.nodePath": "tools/eslint/node_modules",
-	"prettier.prettierPath": "packages/prettier-config/node_modules/prettier",
-	"stylelint.stylelintPath": "tools/stylelint/node_modules/stylelint",
-	"[php]": {
-		"editor.formatOnSave": true,
-		"editor.defaultFormatter": "obliviousharmony.vscode-php-codesniffer"
-	},
-	"eslint.bulkSuppression.enable": true,
-	"eslint.bulkSuppression.location": "tools/eslint/suppressions.json",
-	"eslint.bulkSuppression.severity": "hint",
-	"intelephense.environment.phpVersion": "7.4.0",
-	"intelephense.files.exclude": [
-		"**/.cache/**",
-		"**/.git/**",
-		"**/.history/**",
-		"**/build/**",
-		"**/build-module/**",
-		"**/build-types/**",
-		"**/build-style/**",
-		"**/node_modules/**",
-		"**/vendor/**"
-	],
-	"phpCodeSniffer.autoExecutable": true,
-	"phpCodeSniffer.standard": "Automatic",
-	"phpCodeSniffer.exclude": [
-		"**/.git/**",
-		"**/.svn/**",
-		"**/.hg/**",
-		"**/.cache/**",
-		"**/build/**",
-		"**/node_modules/**",
-		"**/vendor/**"
-	],
-	"[javascript][javascriptreact][typescript][typescriptreact]": {
-		"editor.formatOnSave": false,
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
-	},
-	"editor.codeActionsOnSave": {
-		"source.fixAll.eslint": "explicit",
-		"source.fixAll.stylelint": "explicit"
-	},
-	"[css][scss][sass]": {
-		"editor.formatOnSave": false,
-		"editor.defaultFormatter": "stylelint.vscode-stylelint"
-	},
-	"stylelint.validate": [ "css", "postcss", "scss" ],
-	"js/ts.experimental.useTsgo": true
-}
-```
+Open a JavaScript or TypeScript file to activate the extension, then choose **Allow** if it prompts you to use the workspace TypeScript 7 version.
+
+### Zed
+
+Install dependencies with `npm install` and `composer install`, then open the repository root in Zed. Copy the optional [`.zed/settings.dist.json`](https://github.com/WordPress/gutenberg/blob/HEAD/.zed/settings.dist.json) template to `.zed/settings.json`, or merge its entries into your existing project settings. Like the VS Code template, it takes effect only after you copy or merge it. The local settings file is ignored by Git, and the repository does not install or update it automatically.
+
+Install **TypeScript Language Server** (`tsgo`), **PHP** (`php`), **PHPCS** (`phpcs`), **Stylelint** (`stylelint`), and **SCSS & SASS** (`scss`) through **zed: extensions** in the Command Palette. Zed includes ESLint support and reads `.editorconfig` without an extension. Make sure `node` and `php` are available on your `PATH`.
+
+The settings select the repository's native TypeScript language server and target PHP 7.4. Use **editor: format** to format JavaScript and TypeScript with WordPress Prettier, CSS and SCSS with Stylelint, and PHP with PHPCS. The integrations discover the root npm tools and Composer's `vendor/bin` executables automatically. Zed's bundled ESLint server does not support suppression hints; use `npm run lint:js` for the repository's suppression-aware results.
 
 ### EditorConfig
 
