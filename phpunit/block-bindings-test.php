@@ -168,7 +168,7 @@ HTML
 				function () {
 					return '<script>alert("Unsafe HTML")</script>';
 				},
-				'<p class="wp-block-paragraph">alert("Unsafe HTML")</p>',
+				'<p class="wp-block-paragraph"></p>',
 			),
 			'symbols and numbers should be rendered correctly' => array(
 				function () {
