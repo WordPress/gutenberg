@@ -192,13 +192,12 @@ describe( 'Multi-entity save flow', () => {
 			await navigationPanel.clickItemByText( 'Index' );
 			await navigationPanel.close();
 
-			// Select the header template part via list view.
-			await page.click( 'button[aria-label="List View"]' );
+			// Select the header template part via the Outline dropdown, which closes on selection.
+			await page.click( 'button[aria-label="Outline"]' );
 			const headerTemplatePartListViewButton = await page.waitForXPath(
 				'//button[contains(@class, "block-editor-block-navigation-block-select-button")][contains(., "Header")]'
 			);
-			headerTemplatePartListViewButton.click();
-			await page.click( 'button[aria-label="Close list view sidebar"]' );
+			await headerTemplatePartListViewButton.click();
 
 			// Insert something to dirty the editor.
 			await insertBlock( 'Paragraph' );
@@ -209,6 +208,10 @@ describe( 'Multi-entity save flow', () => {
 
 			// Should be enabled after edits.
 			expect( enabledButton ).not.toBeNull();
+			// TODO: Remove when toolbar supports text fields
+			expect( console ).toHaveWarnedWith(
+				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
+			);
 
 			// Save a11y button should be present.
 			await assertExistance( saveA11ySelector, true );
