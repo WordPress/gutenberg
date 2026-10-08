@@ -28,7 +28,6 @@
 		"build-types",
 		"*-plugins/**",
 		"prebuilt",
-		"CHANGELOG.md",
 		"!build-types/**/*.d.mts.map",
 		"!build-types/**/*.d.ts.map",
 		"!**/stories/**",

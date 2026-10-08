@@ -26,8 +26,7 @@
 	"files": [
 		"build",
 		"build-module",
-		"build-types",
-		"CHANGELOG.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
