@@ -503,9 +503,10 @@ $media-panel-min-height: 320px;
 		// room for the scrolling grid above.
 		flex-shrink: 0;
 		border-top: $border-width solid $gray-200;
-		// The button sits 16px clear top and bottom, as the "Explore all
-		// patterns" button does in the Patterns tab.
-		padding: $grid-unit-15 $grid-unit-20 $grid-unit-20;
+		// Even all round, so the button is clear by the same amount top and
+		// bottom whether or not the pager is above it. Matches the 16px the
+		// "Explore all patterns" button has in the Patterns tab.
+		padding: $grid-unit-20;
 	}
 
 	.block-editor-inserter__media-grid__range {
