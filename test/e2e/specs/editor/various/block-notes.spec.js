@@ -1461,6 +1461,57 @@ test.describe( 'Block Notes', () => {
 			).toHaveCount( 0 );
 			await expect( reactionButton ).toBeVisible();
 		} );
+
+		test.describe( 'Filtered emoji list', () => {
+			test.beforeAll( async ( { requestUtils } ) => {
+				await requestUtils.activatePlugin(
+					'gutenberg-test-note-reaction-emojis'
+				);
+			} );
+
+			test.afterAll( async ( { requestUtils } ) => {
+				await requestUtils.deactivatePlugin(
+					'gutenberg-test-note-reaction-emojis'
+				);
+			} );
+
+			test( 'offers the emoji from the wp_note_reaction_emojis filter', async ( {
+				page,
+				blockNoteUtils,
+			} ) => {
+				await blockNoteUtils.addBlockWithNote( {
+					type: 'core/paragraph',
+					attributes: { content: 'Testing filtered emoji' },
+					comment: 'Filtered emoji',
+				} );
+
+				await page
+					.getByRole( 'button', { name: 'Add reaction' } )
+					.click();
+				const menu = page.getByRole( 'menu', {
+					name: 'Add reaction',
+				} );
+				await expect(
+					menu.getByRole( 'menuitemcheckbox', { name: 'unicorn' } )
+				).toBeVisible();
+				await expect(
+					menu.getByRole( 'menuitemcheckbox', { name: 'eyes' } )
+				).toHaveCount( 0 );
+				await expect(
+					menu.getByRole( 'menuitemcheckbox' )
+				).toHaveCount( 5 );
+				await page.keyboard.press( 'Escape' );
+
+				// The REST API accepts the added emoji, and the pill renders it
+				// from its hex key with the filtered label.
+				await blockNoteUtils.addReactionToComment( 'unicorn' );
+				const reactionButton = page.getByRole( 'button', {
+					name: /unicorn/,
+				} );
+				await expect( reactionButton ).toContainText( '🦄' );
+				await expect( reactionButton ).toContainText( '1' );
+			} );
+		} );
 	} );
 
 	test.describe( 'Multiple notes per block', () => {

@@ -28,7 +28,7 @@ collab-sidebar/
 │   ├── use-reaction.ts              useReaction( note ) - the note's `reaction_summary` + toggleReaction
 │   ├── reaction-display.tsx         ReactionDisplay - reaction pills with reactor-name tooltips
 │   ├── add-reaction-button.tsx      AddReactionButton - the add-reaction trigger and its emoji Menu
-│   └── reaction-emojis.ts           the reaction emoji and their storage keys
+│   └── reaction-emojis.ts           useReactionEmojis() - the reaction emoji (filterable server-side) and their storage keys
 │
 ├── hooks.js                        useNoteThreads, useNoteActions, useNoteSelection, usePickNote, useNoteFocus, useFloatingBoard, useEnableFloatingSidebar
 ├── utils.js                        focusNoteThread, getNoteExcerpt, sanitizeNoteContent, calculateNotePositions, getAvatarBorderColor
