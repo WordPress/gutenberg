@@ -66,12 +66,6 @@ function render_block_core_icon( $attributes ) {
 		);
 	}
 
-	// Spacing (Padding).
-	$spacing_styles = array();
-	if ( isset( $attributes['style']['spacing']['padding'] ) ) {
-		$spacing_styles['padding'] = $attributes['style']['spacing']['padding'];
-	}
-
 	// Dimensions (Width).
 	$dimensions_styles = array();
 	if ( isset( $attributes['style']['dimensions']['width'] ) ) {
@@ -79,14 +73,23 @@ function render_block_core_icon( $attributes ) {
 	}
 
 	// Generate styles and classes.
-	$styles = wp_style_engine_get_styles(
+	$styles         = wp_style_engine_get_styles(
 		array(
 			'color'      => $color_styles,
 			'border'     => $border_styles,
-			'spacing'    => $spacing_styles,
 			'dimensions' => $dimensions_styles,
 		),
 	);
+	$spacing_styles = wp_get_spacing_classes_and_styles(
+		array(
+			'style' => array(
+				'spacing' => array(
+					'padding' => $attributes['style']['spacing']['padding'] ?? null,
+				),
+			),
+		)
+	);
+	$styles['css']  = ( $styles['css'] ?? '' ) . ( $spacing_styles['style'] ?? '' );
 
 	$svg = wp_get_icon(
 		$attributes['icon'],

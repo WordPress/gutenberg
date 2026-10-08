@@ -121,6 +121,19 @@ class Tests_Blocks_Render_Post_Navigation_Link extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'has-accent-2-border-color', $output );
 	}
 
+	public function test_border_shadow_and_spacing_styles() {
+		$attributes                                      = $this->styled_attributes();
+		$attributes['style']['spacing']['margin']['top'] = 'var:preset|spacing|30';
+
+		$processor = new WP_HTML_Tag_Processor( $this->render_block( self::$second_post_id, $attributes ) );
+		$this->assertTrue( $processor->next_tag( 'div' ) );
+		$this->assertSame( 'post-navigation-link-previous has-border-color has-accent-2-border-color wp-block-post-navigation-link', $processor->get_attribute( 'class' ) );
+		$this->assertSame(
+			'border-style:dashed;border-width:3px;box-shadow:10px 10px 5px #000000;padding-top:20px;margin-top:var(--wp--preset--spacing--30)',
+			$processor->get_attribute( 'style' )
+		);
+	}
+
 	public function test_individual_border_sides_match_the_core_declaration_order() {
 		$attributes = array(
 			'type'  => 'previous',

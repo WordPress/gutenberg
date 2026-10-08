@@ -195,20 +195,17 @@ function block_core_post_navigation_link_get_support_styles( $attributes ) {
 		);
 	}
 
-	$styles = wp_style_engine_get_styles(
+	$styles         = wp_style_engine_get_styles(
 		array(
-			'border'  => $border_styles,
-			'shadow'  => $block_styles['shadow'] ?? null,
-			'spacing' => array(
-				'margin'  => $block_styles['spacing']['margin'] ?? null,
-				'padding' => $block_styles['spacing']['padding'] ?? null,
-			),
+			'border' => $border_styles,
+			'shadow' => $block_styles['shadow'] ?? null,
 		)
 	);
+	$spacing_styles = wp_get_spacing_classes_and_styles( $attributes );
 
 	return array(
 		'class' => $styles['classnames'] ?? '',
-		'style' => $styles['css'] ?? '',
+		'style' => ( $styles['css'] ?? '' ) . ( $spacing_styles['style'] ?? '' ),
 	);
 }
 

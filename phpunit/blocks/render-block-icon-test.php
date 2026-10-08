@@ -88,6 +88,39 @@ class Block_Core_Icon_Render_Test extends WP_UnitTestCase {
 		$this->assertLessThan( strpos( $style, 'rotate' ), strpos( $style, 'fill' ) );
 	}
 
+	public function test_applies_color_border_width_and_padding_styles() {
+		$output = gutenberg_render_block_core_icon(
+			array(
+				'icon'      => 'core/caution',
+				'textColor' => 'accent',
+				'style'     => array(
+					'color'      => array( 'background' => '#ffeeee' ),
+					'border'     => array(
+						'radius' => '4px',
+						'width'  => '2px',
+						'style'  => 'solid',
+						'color'  => '#000000',
+					),
+					'dimensions' => array( 'width' => '48px' ),
+					'spacing'    => array(
+						'padding' => array(
+							'top'  => 'var:preset|spacing|20',
+							'left' => '8px',
+						),
+					),
+				),
+			)
+		);
+
+		$processor = new WP_HTML_Tag_Processor( $output );
+		$this->assertTrue( $processor->next_tag( 'svg' ) );
+		$this->assertSame( 'has-text-color has-accent-color has-background has-border-color', $processor->get_attribute( 'class' ) );
+		$this->assertSame(
+			'fill: none; color:var(--wp--preset--color--accent);background-color:#ffeeee;border-color:#000000;border-radius:4px;border-style:solid;border-width:2px;width:48px;padding-top:var(--wp--preset--spacing--20);padding-left:8px;',
+			$processor->get_attribute( 'style' )
+		);
+	}
+
 	public function test_renders_only_icons_in_public_collections() {
 		// Renders public core icon.
 		$processor = new WP_HTML_Tag_Processor( gutenberg_render_block_core_icon( array( 'icon' => 'core/caution' ) ) );
