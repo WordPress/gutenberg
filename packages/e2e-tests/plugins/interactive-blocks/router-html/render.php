@@ -9,6 +9,36 @@ $attributes = get_defined_vars()['attributes'];
 $scenario   = $attributes['scenario'];
 $page       = $attributes['page'];
 $region     = 'router-html-' . $scenario;
+
+if ( 'pending' === $attributes['value'] ) {
+	wp_interactivity_state(
+		'router-html',
+		array(
+			/**
+			 * Supplies the server-only derived HTML placeholder.
+			 *
+			 * @return null The client implementation is deferred.
+			 */
+			'late' => function () {
+				return null;
+			},
+		)
+	);
+	add_filter(
+		'script_module_data_@wordpress/interactivity',
+		/**
+		 * Declares a derived value whose client implementation loads later.
+		 *
+		 * @param array|null $data Serialized Interactivity API server data.
+		 * @return array Server data with the pending HTML getter declaration.
+		 */
+		function ( $data ) {
+			$data = $data ?? array();
+			$data['derivedStateClosures']['router-html'][] = 'state.late';
+			return $data;
+		}
+	);
+}
 ?>
 
 <div data-wp-interactive="router-html">

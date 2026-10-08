@@ -15,6 +15,11 @@
 	<div data-wp-html="state.html" data-testid="show state html">
 		<p data-testid="fallback">Fallback content</p>
 	</div>
+	<div data-wp-html="state.rejected" data-testid="rejected html"><p>Rejected fallback</p></div>
+	<ul data-testid="created items">
+		<template data-wp-each="state.list"><li><div data-wp-html="state.empty"></div></li></template>
+	</ul>
+	<button data-wp-on--click="actions.setRejected" data-testid="set rejected html">Set Rejected HTML</button>
 
 	<button data-wp-on--click="actions.setHtml" data-testid="set html">
 		Set HTML

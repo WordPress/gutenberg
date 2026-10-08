@@ -63,7 +63,7 @@ beforeEach( () => {
 	marks = 0;
 	store( namespace, {
 		state: {
-			// Leave fallback content in place unless a test supplies a token.
+			// Empty owned content unless a test supplies a token.
 			html: null,
 		},
 		actions: {
@@ -114,7 +114,9 @@ describe( 'router regions in HTML directive content', () => {
 			)
 		);
 
-		expect( current ).toHaveTextContent( 'static' );
+		expect(
+			current.querySelector( '[data-wp-html]' )!
+		).toBeEmptyDOMElement();
 		expect( marks ).toBe( 0 );
 	} );
 } );

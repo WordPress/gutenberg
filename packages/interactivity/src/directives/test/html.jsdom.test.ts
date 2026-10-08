@@ -98,7 +98,7 @@ describe( 'data-wp-html', () => {
 		expect( target.innerHTML ).toBe( '<em>Bye</em>' );
 	} );
 
-	it( 'leaves server-rendered content in place while the value is not trusted HTML yet', async () => {
+	it( 'empties server-rendered content when the value is null', async () => {
 		const namespace = uniqueNamespace();
 		store( namespace, { state: { html: null } } );
 
@@ -109,7 +109,7 @@ describe( 'data-wp-html', () => {
 		await act( () => hydrate( toVdom( region ), region.parentNode! ) );
 
 		const target = region.querySelector( 'div' )!;
-		expect( target.innerHTML ).toBe( '<p>Loading…</p>' );
+		expect( target ).toBeEmptyDOMElement();
 	} );
 
 	it( 'keeps the server-rendered nodes when they match the trusted HTML on hydration', async () => {
@@ -125,16 +125,19 @@ describe( 'data-wp-html', () => {
 		);
 		const target = region.querySelector( 'div' )!;
 		const serverNode = target.firstElementChild;
+		const writes = recordHtmlWrites( target );
 
 		await act( () => hydrate( toVdom( region ), region.parentNode! ) );
 		expect( target.innerHTML ).toBe( html );
 		expect( target.firstElementChild ).toBe( serverNode );
+		expect( writes ).toEqual( [] );
 
 		// A new token with the same HTML doesn't replace them either.
 		await act( () => {
 			state.html = asDangerousHTML( html );
 		} );
 		expect( target.firstElementChild ).toBe( serverNode );
+		expect( writes ).toEqual( [] );
 
 		// Different HTML still renders.
 		await act( () => {
@@ -163,12 +166,14 @@ describe( 'data-wp-html', () => {
 		);
 		const target = region.querySelector( 'div' )!;
 		const serverNode = target.firstElementChild;
+		const writes = recordHtmlWrites( target );
 
 		await act( () => hydrate( toVdom( region ), region.parentNode! ) );
 		expect( target.firstElementChild ).toBe( serverNode );
+		expect( writes ).toEqual( [] );
 	} );
 
-	it( 'keeps matching server nodes without writing when null resolves to trusted HTML later', async () => {
+	it( 'empties null content and writes matching HTML when a token resolves later', async () => {
 		const namespace = uniqueNamespace();
 		const { state } = store( namespace, {
 			// HTML is unavailable until the later reactive update.
@@ -182,18 +187,24 @@ describe( 'data-wp-html', () => {
 			'<div data-wp-html="state.html"><p>Same</p></div>'
 		);
 		const target = region.querySelector( 'div' )!;
-		const serverNode = target.firstElementChild;
 		const writes = recordHtmlWrites( target );
+		const mutations: MutationRecord[] = [];
+		const observer = new MutationObserver( ( records ) =>
+			mutations.push( ...records )
+		);
+		observer.observe( target, { childList: true } );
 
 		await act( () => hydrate( toVdom( region ), region.parentNode! ) );
-		expect( writes ).toEqual( [] );
-		expect( target.firstElementChild ).toBe( serverNode );
+		expect( writes ).toEqual( [ '' ] );
+		expect( target ).toBeEmptyDOMElement();
+		expect( mutations ).toHaveLength( 1 );
 		await act( () => {
 			state.html = asDangerousHTML( '<p>Same</p>' );
 		} );
-		expect( writes ).toEqual( [] );
-		expect( target.firstElementChild ).toBe( serverNode );
+		expect( writes ).toEqual( [ '', '<p>Same</p>' ] );
+		expect( mutations ).toHaveLength( 2 );
 		expect( target.innerHTML ).toBe( '<p>Same</p>' );
+		observer.disconnect();
 	} );
 
 	it.each( [ '<p>Same</p>', '<p>Client</p>' ] )(
@@ -213,8 +224,14 @@ describe( 'data-wp-html', () => {
 			const target = region.querySelector( 'div' )!;
 			const serverNode = target.firstElementChild;
 			const writes = recordHtmlWrites( target );
+			const mutations: MutationRecord[] = [];
+			const observer = new MutationObserver( ( records ) =>
+				mutations.push( ...records )
+			);
+			observer.observe( target, { childList: true } );
 			await act( () => hydrate( toVdom( region ), region.parentNode! ) );
 			expect( writes ).toEqual( [] );
+			expect( mutations ).toHaveLength( 0 );
 			expect( target.firstElementChild ).toBe( serverNode );
 
 			// Reactive source populated by the late store registration.
@@ -242,6 +259,7 @@ describe( 'data-wp-html', () => {
 			expect( target.innerHTML ).toBe( html );
 			const expectedWrites = html === '<p>Same</p>' ? [] : [ html ];
 			expect( writes ).toEqual( expectedWrites );
+			expect( mutations ).toHaveLength( expectedWrites.length );
 			expect( target.firstElementChild === serverNode ).toBe(
 				html === '<p>Same</p>'
 			);
@@ -251,18 +269,23 @@ describe( 'data-wp-html', () => {
 			} );
 			expect( writes ).toEqual( [ ...expectedWrites, '<p>Other</p>' ] );
 			expect( target.innerHTML ).toBe( '<p>Other</p>' );
+			expect( mutations ).toHaveLength( expectedWrites.length + 1 );
+			observer.disconnect();
 		}
 	);
 
-	it( 'shows fallback before HTML resolves and trusted HTML in existing and newly added list items', async () => {
+	it( 'shows pending fallback and follows resolved values in existing and added list items', async () => {
+		const warnings = vi.spyOn( console, 'warn' );
 		const namespace = uniqueNamespace();
+		populateServerData( {
+			state: { [ namespace ]: { html: {} } },
+			derivedStateClosures: { [ namespace ]: [ 'state.html' ] },
+		} );
 		const { state } = store( namespace, {
 			// Reactive list and HTML shared by all item elements.
 			state: {
 				// Items rendered from the template.
 				list: [ 'a' ],
-				// Trusted HTML remains unavailable during initial item creation.
-				html: null as DangerousHTML | null,
 			},
 		} );
 		const region = createRegion(
@@ -285,8 +308,10 @@ describe( 'data-wp-html', () => {
 			)
 		).toEqual( [ '<i>loading</i>', '<i>loading</i>' ] );
 
-		await act( () => {
-			state.html = asDangerousHTML( '<b>Ready</b>' );
+		await act( async () => {
+			store( namespace, {
+				state: { html: asDangerousHTML( '<b>Ready</b>' ) },
+			} );
 		} );
 		expect(
 			Array.from(
@@ -304,6 +329,31 @@ describe( 'data-wp-html', () => {
 				( item ) => item.innerHTML
 			)
 		).toEqual( [ '<b>Ready</b>', '<b>Ready</b>', '<b>Ready</b>' ] );
+		await act( () => {
+			store( namespace, { state: { html: null } } );
+			state.list = [ 'a', 'b', 'c', 'd' ];
+		} );
+		expect(
+			Array.from(
+				region.querySelectorAll( 'li div' ),
+				( item ) => item.innerHTML
+			)
+		).toEqual( [ '', '', '', '' ] );
+		expect( warnings ).not.toHaveBeenCalled();
+		await act( () => {
+			store( namespace, { state: { html: '<b>x</b>' } } );
+			state.list = [ 'a', 'b', 'c', 'd', 'e' ];
+		} );
+		expect(
+			Array.from(
+				region.querySelectorAll( 'li div' ),
+				( item ) => item.innerHTML
+			)
+		).toEqual( [ '', '', '', '', '' ] );
+		expect( warnings ).toHaveBeenCalledTimes( 1 );
+		expect( console ).toHaveWarnedWith(
+			expect.stringMatching( /not.*trusted HTML/ )
+		);
 	} );
 
 	it( 'does not render a plain string as HTML', async () => {
@@ -317,10 +367,10 @@ describe( 'data-wp-html', () => {
 		await act( () => hydrate( toVdom( region ), region.parentNode! ) );
 
 		const target = region.querySelector( 'div' )!;
-		expect( target.innerHTML ).toBe( '<p>fallback</p>' );
+		expect( target ).toBeEmptyDOMElement();
 	} );
 
-	it( 'keeps the last rendered HTML when the value later becomes untrusted', async () => {
+	it( 'empties trusted content when the value becomes null', async () => {
 		const namespace = uniqueNamespace();
 		const { state } = store( namespace, {
 			state: { html: asDangerousHTML( '<strong>Hi</strong>' ) },
@@ -335,17 +385,15 @@ describe( 'data-wp-html', () => {
 		const target = region.querySelector( 'div' )!;
 		expect( target.innerHTML ).toBe( '<strong>Hi</strong>' );
 
-		// A later value that resolves to `null` must not wipe the HTML that
-		// was already rendered — the directive should keep showing the last
-		// trusted HTML it received.
+		// Null removes the previously rendered trusted HTML.
 		await act( () => {
 			// @ts-expect-error Testing an invalid runtime value on purpose.
 			state.html = null;
 		} );
-		expect( target.innerHTML ).toBe( '<strong>Hi</strong>' );
+		expect( target ).toBeEmptyDOMElement();
 	} );
 
-	it( 'keeps the existing content when a getter throws from asDangerousHTML()', async () => {
+	it( 'empties content when a getter throws from asDangerousHTML()', async () => {
 		const namespace = uniqueNamespace();
 		const { state } = store( namespace, {
 			state: {
@@ -367,7 +415,7 @@ describe( 'data-wp-html', () => {
 		await act( () => hydrate( toVdom( region ), region.parentNode! ) );
 
 		const target = region.querySelector( 'div' )!;
-		expect( target.innerHTML ).toBe( '<p>fallback</p>' );
+		expect( target ).toBeEmptyDOMElement();
 
 		await act( () => {
 			state.isValid = true;
@@ -377,10 +425,10 @@ describe( 'data-wp-html', () => {
 		await act( () => {
 			state.isValid = false;
 		} );
-		expect( target.innerHTML ).toBe( '<strong>Hi</strong>' );
+		expect( target ).toBeEmptyDOMElement();
 	} );
 
-	it( 'keeps content and restores scope when a function value throws', async () => {
+	it( 'empties content and restores scope when a function value throws', async () => {
 		const namespace = uniqueNamespace();
 		const { state } = store( namespace, {
 			// Reactive values used by the HTML element and its sibling.
@@ -413,7 +461,7 @@ describe( 'data-wp-html', () => {
 
 		try {
 			await act( () => hydrate( toVdom( region ), region.parentNode! ) );
-			expect( target.innerHTML ).toBe( '<p>fallback</p>' );
+			expect( target ).toBeEmptyDOMElement();
 			expect( sibling ).toHaveTextContent( /^Hello$/ );
 			expect( getScope() ).toBeUndefined();
 
@@ -429,7 +477,7 @@ describe( 'data-wp-html', () => {
 				state.fail = true;
 				state.label = 'Unavailable';
 			} );
-			expect( target.innerHTML ).toBe( '<b>ok</b>' );
+			expect( target ).toBeEmptyDOMElement();
 			expect( sibling ).toHaveTextContent( /^Unavailable$/ );
 			expect( getScope() ).toBeUndefined();
 			expect( warnings ).not.toHaveBeenCalled();
@@ -443,9 +491,15 @@ describe( 'data-wp-html', () => {
 	} );
 
 	it( 'ignores suffixed and unique-ID variants', async () => {
+		const runtime = await loadConflictRuntime();
 		const namespace = uniqueNamespace();
-		store( namespace, {
-			state: { html: asDangerousHTML( '<strong>Hi</strong>' ) },
+		const { state } = runtime.store( namespace, {
+			state: {
+				/** Value ignored by unsupported directive spellings. */
+				html: runtime.asDangerousHTML(
+					'<strong>Hi</strong>'
+				) as unknown,
+			},
 		} );
 
 		const region = createRegion(
@@ -453,78 +507,101 @@ describe( 'data-wp-html', () => {
 			'<div data-wp-html--suffix="state.html"><p>a</p></div>' +
 				'<div data-wp-html---unique-id="state.html"><p>b</p></div>'
 		);
-		await act( () => hydrate( toVdom( region ), region.parentNode! ) );
+		await runtime.act( () =>
+			runtime.hydrate( runtime.toVdom( region ), region.parentNode! )
+		);
 
 		const [ suffixed, uniqueId ] = region.querySelectorAll( 'div' );
 		expect( suffixed.innerHTML ).toBe( '<p>a</p>' );
 		expect( uniqueId.innerHTML ).toBe( '<p>b</p>' );
 		expect( console ).toHaveWarned();
+		for ( const value of [ null, '<b>x</b>', undefined ] ) {
+			await runtime.act( () => {
+				state.html = value;
+			} );
+			expect( suffixed.innerHTML ).toBe( '<p>a</p>' );
+			expect( uniqueId.innerHTML ).toBe( '<p>b</p>' );
+		}
 	} );
 
-	it( 'warns and preserves existing content when the browser rejects the HTML value', async () => {
-		const namespace = uniqueNamespace();
-		store( namespace, {
-			state: { html: asDangerousHTML( '<strong>Hi</strong>' ) },
-		} );
+	it.each( [ true, false ] )(
+		'empties rejected HTML and suppresses retries (at hydration: %s)',
+		async ( atHydration ) => {
+			const runtime = await loadConflictRuntime();
+			const namespace = uniqueNamespace();
+			const { state } = runtime.store( namespace, {
+				state: {
+					/** Current token, including a selectively rejected value. */
+					html: runtime.asDangerousHTML(
+						atHydration ? '<b>bad</b>' : '<b>a</b>'
+					),
+				},
+			} );
 
-		const region = createRegion(
-			namespace,
-			'<div data-wp-html="state.html"><p>fallback</p></div>'
-		);
-		const target = region.querySelector( 'div' )!;
+			const region = createRegion(
+				namespace,
+				'<div data-wp-html="state.html"><p>fallback</p></div>'
+			);
+			const target = region.querySelector( 'div' )!;
 
-		// Simulate a Trusted Types rejection: the site enforces Trusted Types
-		// with no default policy, so the native setter throws for a plain
-		// string. Hydration reuses this exact node, so overriding its
-		// `innerHTML` accessor here intercepts the directive's own write.
-		Object.defineProperty( target, 'innerHTML', {
-			configurable: true,
-			get: () => '<p>fallback</p>',
-			set: () => {
-				throw new TypeError(
-					"Failed to set the 'innerHTML' property: This document requires 'TrustedHTML' assignment."
-				);
-			},
-		} );
+			const descriptor = Object.getOwnPropertyDescriptor(
+				Element.prototype,
+				'innerHTML'
+			)!;
+			const writes: string[] = [];
+			const warnings = vi.spyOn( console, 'warn' );
+			Object.defineProperty( target, 'innerHTML', {
+				/** Allows the accessor to be discarded with the element. */
+				configurable: true,
+				/** Serializes the native element's current content. */
+				get: () => descriptor.get!.call( target ),
+				/**
+				 * Records assignments while rejecting only the selected token.
+				 *
+				 * @param value HTML assigned to the element.
+				 */
+				set: ( value: string ) => {
+					writes.push( value );
+					if ( value === '<b>bad</b>' ) {
+						throw new TypeError( 'rejected' );
+					}
+					descriptor.set!.call( target, value );
+				},
+			} );
 
-		await act( () => hydrate( toVdom( region ), region.parentNode! ) );
-
-		expect( target.innerHTML ).toBe( '<p>fallback</p>' );
-		expect( console ).toHaveWarned();
-	} );
-
-	it( 'does not retry a value the browser already rejected once', async () => {
-		const namespace = uniqueNamespace();
-		const { state } = store( namespace, {
-			state: { html: asDangerousHTML( '<strong>Hi</strong>' ) },
-		} );
-
-		const region = createRegion(
-			namespace,
-			'<div data-wp-html="state.html"><p>fallback</p></div>'
-		);
-		const target = region.querySelector( 'div' )!;
-
-		let attempts = 0;
-		Object.defineProperty( target, 'innerHTML', {
-			configurable: true,
-			get: () => '<p>fallback</p>',
-			set: () => {
-				attempts++;
-				throw new TypeError( 'rejected' );
-			},
-		} );
-
-		await act( () => hydrate( toVdom( region ), region.parentNode! ) );
-		expect( attempts ).toBe( 1 );
-		expect( console ).toHaveWarned();
-
-		// Forcing an unrelated re-render must not retry the same value.
-		await act( () => {
-			state.html = asDangerousHTML( '<strong>Hi</strong>' );
-		} );
-		expect( attempts ).toBe( 1 );
-	} );
+			await runtime.act( () =>
+				runtime.hydrate( runtime.toVdom( region ), region.parentNode! )
+			);
+			expect( target.innerHTML ).toBe( atHydration ? '' : '<b>a</b>' );
+			if ( ! atHydration ) {
+				await runtime.act( () => {
+					state.html = runtime.asDangerousHTML( '<b>bad</b>' );
+				} );
+			}
+			expect( target ).toBeEmptyDOMElement();
+			expect( writes ).toEqual(
+				atHydration
+					? [ '<b>bad</b>', '' ]
+					: [ '<b>a</b>', '<b>bad</b>', '' ]
+			);
+			const count = warnings.mock.calls.length;
+			expect( count ).toBe( 1 );
+			expect( console ).toHaveWarnedWith(
+				expect.stringMatching( /browser rejected.*emptied/ )
+			);
+			await runtime.act( () => {
+				state.html = runtime.asDangerousHTML( '<b>bad</b>' );
+			} );
+			expect(
+				writes.filter( ( value ) => value === '<b>bad</b>' )
+			).toHaveLength( 1 );
+			expect( warnings.mock.calls ).toHaveLength( count );
+			await runtime.act( () => {
+				state.html = runtime.asDangerousHTML( '<b>c</b>' );
+			} );
+			expect( target.innerHTML ).toBe( '<b>c</b>' );
+		}
+	);
 } );
 
 /**
@@ -775,14 +852,17 @@ describe( 'data-wp-html conflicts', () => {
 		[ 'data-wp-text--x="state.text"', 'data-wp-each="state.list"' ].flatMap(
 			( conflict ) =>
 				[ true, false ].flatMap( ( debug ) =>
-					[ true, false ].map(
-						( htmlFirst ) => [ conflict, debug, htmlFirst ] as const
+					[ true, false ].flatMap( ( htmlFirst ) =>
+						[ true, false ].map(
+							( trusted ) =>
+								[ conflict, debug, htmlFirst, trusted ] as const
+						)
 					)
 				)
 		)
 	)(
-		'preserves the content and warnings of %s on a div (debug: %s, HTML first: %s)',
-		async ( conflict, debug, htmlFirst ) => {
+		'preserves the content and warnings of %s on a div (debug: %s, HTML first: %s, trusted: %s)',
+		async ( conflict, debug, htmlFirst, trusted ) => {
 			vi.stubGlobal( 'SCRIPT_DEBUG', debug );
 			const warnings = vi.spyOn( console, 'warn' );
 			const outputs: string[] = [];
@@ -798,7 +878,7 @@ describe( 'data-wp-html conflicts', () => {
 				const namespace = uniqueNamespace();
 				register( namespace, {
 					state: {
-						html: token( '<b>x</b>' ),
+						html: trusted ? token( '<b>x</b>' ) : null,
 						text: 'Hello',
 						list: [ 'a' ],
 					},
@@ -958,4 +1038,203 @@ describe( 'data-wp-html conflicts', () => {
 			'The usage of data-wp-html--suffix is not supported. Please use data-wp-html instead.',
 		] );
 	} );
+} );
+
+describe( 'data-wp-html value contract', () => {
+	afterEach( () => vi.unstubAllGlobals() );
+
+	it.each(
+		[ true, false ].flatMap( ( debug ) =>
+			[
+				'null',
+				'undefined',
+				'missing',
+				'getter',
+				'function',
+				'<b>x</b>',
+				'',
+				42,
+				true,
+				{},
+			].map( ( value ) => [ debug, value ] as const )
+		)
+	)(
+		'empties resolved non-tokens (debug: %s, value: %s)',
+		async ( debug, value ) => {
+			vi.stubGlobal( 'SCRIPT_DEBUG', debug );
+			const runtime = await loadConflictRuntime();
+			const namespace = uniqueNamespace();
+			const silent = [
+				'null',
+				'undefined',
+				'missing',
+				'getter',
+				'function',
+			].includes( value as string );
+			let source: unknown = value;
+			if ( value === 'null' ) {
+				source = null;
+			}
+			if ( value === 'undefined' ) {
+				source = undefined;
+			}
+			const definition = { html: source };
+			if ( value === 'getter' ) {
+				Object.defineProperty( definition, 'html', {
+					/** Makes the derived value visible to the store registry. */
+					enumerable: true,
+					/** Throws to simulate an unavailable derived value. */
+					get() {
+						throw new Error( 'unavailable' );
+					},
+				} );
+			} else if ( value === 'function' ) {
+				Object.assign( definition, {
+					/** Throws to simulate an unavailable function value. */
+					html() {
+						throw new Error( 'unavailable' );
+					},
+				} );
+			}
+			runtime.store( namespace, { state: definition } );
+			const region = createRegion(
+				namespace,
+				`<div data-wp-html="state.${ value === 'missing' ? 'missing' : 'html' }"><p>fallback</p></div>`
+			);
+			const warnings = vi.spyOn( console, 'warn' );
+			await runtime.act( () =>
+				runtime.hydrate( runtime.toVdom( region ), region.parentNode! )
+			);
+			expect( region.querySelector( 'div' )! ).toBeEmptyDOMElement();
+			expect( region.querySelector( 'b' ) ).toBeNull();
+			const expectedWarnings =
+				debug && ! silent
+					? [
+							'data-wp-html: the value is not trusted HTML. Use asDangerousHTML() to explicitly trust the markup.',
+						]
+					: [];
+			expect( warnings.mock.calls ).toEqual(
+				expectedWarnings.map( ( message ) => [ message ] )
+			);
+			for ( const message of expectedWarnings ) {
+				expect( console ).toHaveWarnedWith( message );
+			}
+		}
+	);
+
+	it( 'keeps pending server nodes without mutations or warnings', async () => {
+		const runtime = await loadConflictRuntime();
+		const namespace = uniqueNamespace();
+		runtime.populateServerData( {
+			state: { [ namespace ]: { html: {} } },
+			derivedStateClosures: { [ namespace ]: [ 'state.html' ] },
+		} );
+		const region = createRegion(
+			namespace,
+			'<div data-wp-html="state.html"><p>fallback</p></div>'
+		);
+		const target = region.querySelector( 'div' )!;
+		const original = target.firstChild;
+		const mutations: MutationRecord[] = [];
+		const observer = new MutationObserver( ( records ) =>
+			mutations.push( ...records )
+		);
+		observer.observe( target, { childList: true } );
+		const writes = recordHtmlWrites( target );
+		const warnings = vi.spyOn( console, 'warn' );
+		await runtime.act( () =>
+			runtime.hydrate( runtime.toVdom( region ), region.parentNode! )
+		);
+		expect( target.firstChild ).toBe( original );
+		expect( writes ).toEqual( [] );
+		expect( [ ...mutations, ...observer.takeRecords() ] ).toEqual( [] );
+		expect( warnings ).not.toHaveBeenCalled();
+		observer.disconnect();
+	} );
+
+	it( 'renders the current value and reapplies HTML after each removal', async () => {
+		const runtime = await loadConflictRuntime();
+		const namespace = uniqueNamespace();
+		const { state } = runtime.store( namespace, {
+			state: { html: runtime.asDangerousHTML( '<b>a</b>' ) as unknown },
+		} );
+		const region = createRegion(
+			namespace,
+			'<div data-wp-html="state.html"><p>fallback</p></div>'
+		);
+		const warnings = vi.spyOn( console, 'warn' );
+		await runtime.act( () =>
+			runtime.hydrate( runtime.toVdom( region ), region.parentNode! )
+		);
+		const target = region.querySelector( 'div' )!;
+		expect( target.innerHTML ).toBe( '<b>a</b>' );
+		for ( const [ value, expected, warningCount ] of [
+			[ null, '', 0 ],
+			[ runtime.asDangerousHTML( '<b>b</b>' ), '<b>b</b>', 0 ],
+			[ '<i>s</i>', '', 1 ],
+			[ runtime.asDangerousHTML( '<b>b</b>' ), '<b>b</b>', 1 ],
+		] ) {
+			await runtime.act( () => {
+				state.html = value;
+			} );
+			expect( target.innerHTML ).toBe( expected );
+			expect( warnings.mock.calls ).toHaveLength(
+				warningCount as number
+			);
+		}
+		expect( console ).toHaveWarnedWith(
+			expect.stringMatching( /not.*trusted HTML/ )
+		);
+	} );
+
+	it.each( [ true, false ] )(
+		'uses the empty HTML value for hydrated and created removals (Trusted Types: %s)',
+		async ( native ) => {
+			const empty = { toString: () => '', toJSON: () => '' };
+			if ( native ) {
+				vi.stubGlobal( 'trustedTypes', { emptyHTML: empty } );
+			}
+			const runtime = await loadConflictRuntime();
+			const namespace = uniqueNamespace();
+			const { state } = runtime.store( namespace, {
+				state: { html: null as unknown, list: [ 'a' ] },
+			} );
+			const region = createRegion(
+				namespace,
+				'<div data-wp-html="state.html"><p>fallback</p></div><ul><template data-wp-each="state.list"><li data-wp-html="state.html"></li></template></ul>'
+			);
+			const descriptor = Object.getOwnPropertyDescriptor(
+				Element.prototype,
+				'innerHTML'
+			)!;
+			const values: unknown[] = [];
+			const setter = vi
+				.spyOn( Element.prototype, 'innerHTML', 'set' )
+				.mockImplementation( function ( this: Element, value ) {
+					values.push( value );
+					descriptor.set!.call( this, value );
+				} );
+			await runtime.act( () =>
+				runtime.hydrate( runtime.toVdom( region ), region.parentNode! )
+			);
+			expect( region.querySelector( 'li' ) ).not.toBeNull();
+			expect( values.length ).toBeGreaterThanOrEqual( 2 );
+			expect(
+				values.every( ( value ) => value === ( native ? empty : '' ) )
+			).toBe( true );
+			await runtime.act( () => {
+				state.html = runtime.asDangerousHTML( '<b>a</b>' );
+			} );
+			values.length = 0;
+			await runtime.act( () => {
+				state.html = null;
+				state.list = [ 'a', 'b' ];
+			} );
+			expect( values.length ).toBeGreaterThanOrEqual( 3 );
+			expect(
+				values.every( ( value ) => value === ( native ? empty : '' ) )
+			).toBe( true );
+			setter.mockRestore();
+		}
+	);
 } );

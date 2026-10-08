@@ -33,6 +33,8 @@
 
 ### Bug Fixes
 
+-   `data-wp-html` follows its current value: pending leaves content unchanged, tokens render, and other values empty the element. Removals use empty trusted HTML under Trusted Types enforcement, and rejected token writes empty the element without retries until the value changes.
+
 -   Run `watch()` callbacks without a directive scope. A callback passed to `watch()` no longer inherits the scope of the action or callback that called `watch()`, so `getContext()` and `getElement()` throw inside it, as they already did when `watch()` was called outside any scope. ([#83280](https://github.com/WordPress/gutenberg/pull/83280))
 -   `data-wp-html` now yields deterministically to `data-wp-text`, `data-wp-each`, and `data-wp-router-region` on the same element. The decision depends only on which attributes are present, including their suffixed and unique-ID spellings, so it no longer varies with attribute order or resolved values. `data-wp-html` then writes nothing, the element behaves as it does without it, and `SCRIPT_DEBUG` shows a warning. ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
 -   Content owned by `data-wp-html` is now inert for interactive islands and router regions as well as directives. Elements with `data-wp-interactive` inside the fallback or inserted HTML are no longer hydrated, even when the `data-wp-html` element sits outside every interactive region, and router regions inside it are skipped during navigation and are never used as attachment targets. ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).

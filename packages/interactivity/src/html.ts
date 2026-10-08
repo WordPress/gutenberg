@@ -16,8 +16,21 @@ interface TrustedHTML {
  * @see https://developer.mozilla.org/en-US/docs/Web/API/TrustedTypePolicyFactory/isHTML
  */
 interface TrustedTypePolicyFactory {
+	/**
+	 * Checks whether a value is native trusted HTML.
+	 *
+	 * @param value Value to check.
+	 * @return Whether the value is native trusted HTML.
+	 */
 	isHTML: ( value: unknown ) => value is TrustedHTML;
+	/** Empty trusted HTML accepted by HTML sinks without a policy. */
+	readonly emptyHTML: TrustedHTML;
 }
+
+/** Empty HTML accepted by HTML sinks, including under Trusted Types enforcement. */
+export const emptyHTML =
+	( globalThis as { trustedTypes?: TrustedTypePolicyFactory } ).trustedTypes
+		?.emptyHTML ?? '';
 
 declare const dangerousHTMLBrand: unique symbol;
 
@@ -46,8 +59,8 @@ const trustedHtmlByToken = new WeakMap< DangerousHTML, string | TrustedHTML >();
 
 /**
  * Marks a string (or native `TrustedHTML`) as trusted so the `data-wp-html`
- * directive renders it as markup instead of leaving the bound element's
- * content untouched.
+ * directive renders it as markup. Non-token values empty the bound element,
+ * except while the reference is pending.
  *
  * This function never sanitizes or otherwise processes the HTML passed
  * here, the same responsibility you take on using `dangerouslySetInnerHTML`
@@ -67,7 +80,7 @@ const trustedHtmlByToken = new WeakMap< DangerousHTML, string | TrustedHTML >();
  * This package creates no Trusted Types policy of its own. On a site that
  * enforces Trusted Types with no default policy, a plain `string` argument
  * causes the browser to reject the eventual `element.innerHTML` write, and
- * the element's existing content is left in place. Pass a `TrustedHTML`
+ * the element is emptied. Pass a `TrustedHTML`
  * value from the site's own policy instead —
  * `asDangerousHTML( myPolicy.createHTML( markup ) )` — and it's passed
  * through to the DOM unchanged.

@@ -30,7 +30,7 @@ describe( 'hydrateRegions', () => {
 			const markFollowing = vi.fn();
 			store( namespace, {
 				state: {
-					/** Keeps the HTML element's server fallback in place. */
+					/** Empties owned HTML content during hydration. */
 					html: null,
 					/** Text rendered only by eligible islands. */
 					label: 'hydrated',
@@ -49,12 +49,18 @@ describe( 'hydrateRegions', () => {
 					: htmlElement ) +
 				`<div id="following" data-wp-interactive="${ namespace }" data-wp-init="actions.markFollowing"><span data-wp-text="state.label">static</span></div>`;
 
+			const fallback = document.querySelector( '[data-wp-html] span' )!;
 			await act( () => hydrateRegions() );
 
 			expect( mark ).not.toHaveBeenCalled();
+			expect( fallback ).toHaveTextContent( /^static$/ );
+			const inside = position === 'inside an island';
+			expect( fallback.isConnected ).toBe( ! inside );
 			expect(
-				document.querySelector( '[data-wp-html] span' )
-			).toHaveTextContent( /^static$/ );
+				document.querySelector( '[data-wp-html]' )!.outerHTML
+			).toBe(
+				inside ? '<div data-wp-html="state.html"></div>' : htmlElement
+			);
 			expect( markFollowing ).toHaveBeenCalledTimes( 1 );
 			expect(
 				document.querySelector( '#following span' )

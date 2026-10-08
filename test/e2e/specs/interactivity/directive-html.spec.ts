@@ -28,123 +28,96 @@ test.describe( 'data-wp-html', () => {
 		).toBeUndefined();
 	} );
 
-	test( 'renders late TrustedHTML without violations or errors under Trusted Types enforcement', async ( {
+	test( 'removes content safely and renders late trusted HTML under Trusted Types enforcement', async ( {
 		page,
 		interactivityUtils: utils,
 	} ) => {
+		const pageErrors: Error[] = [];
+		page.on( 'pageerror', ( error ) => pageErrors.push( error ) );
+		await page.addInitScript( () => {
+			const violations: { directive: string; sample: string }[] = [];
+			Object.assign( window, { htmlViolations: violations } );
+			document.addEventListener( 'securitypolicyviolation', ( event ) => {
+				violations.push( {
+					directive: event.violatedDirective,
+					sample: event.sample,
+				} );
+			} );
+		} );
 		const url = new URL( utils.getLink( 'test/directive-html' ) );
 		url.searchParams.set( 'require_trusted_types', 'true' );
 		const response = await page.goto( url.href );
-		expect( response ).not.toBeNull();
 		expect( response!.headers()[ 'content-security-policy' ] ).toBe(
 			"require-trusted-types-for 'script'"
 		);
 		await expect( page.getByTestId( 'hydration' ) ).toHaveText(
 			'hydrated'
 		);
-		const el = page.getByTestId( 'show state html' );
-		await expect( el.getByTestId( 'fallback' ) ).toBeVisible();
-
-		// Collect only after hydration, so the observed writes are late updates.
-		const pageErrors: Error[] = [];
-		page.on( 'pageerror', ( error ) => pageErrors.push( error ) );
-		const violations = await page.evaluateHandle( () => {
-			const events: string[] = [];
-			document.addEventListener( 'securitypolicyviolation', ( event ) => {
-				events.push( event.violatedDirective );
-			} );
-			return events;
-		} );
-
-		await page.getByTestId( 'set trusted html' ).click();
-		await expect( el.locator( 'p' ) ).toHaveText( 'Late' );
-		expect( await el.innerHTML() ).toBe( '<p>Late</p>' );
-		// Give queued CSP violation events a chance to reach the collector.
-		await page.evaluate(
-			() =>
-				new Promise< void >( ( resolve ) =>
+		const target = page.getByTestId( 'show state html' );
+		const rejected = page.getByTestId( 'rejected html' );
+		await expect.poll( () => target.innerHTML() ).toBe( '' );
+		await expect(
+			page.getByTestId( 'created items' ).locator( 'li' )
+		).toHaveCount( 2 );
+		for ( const item of await page
+			.getByTestId( 'created items' )
+			.locator( 'li div' )
+			.all() ) {
+			expect( await item.innerHTML() ).toBe( '' );
+		}
+		// Flush queued CSP events after each observed commit, including hydration.
+		const violations = async () =>
+			page.evaluate( async () => {
+				await new Promise< void >( ( resolve ) =>
 					requestAnimationFrame( () =>
 						requestAnimationFrame( () => resolve() )
 					)
-				)
-		);
-		expect( await violations.jsonValue() ).toEqual( [] );
-		expect( pageErrors ).toEqual( [] );
-		await violations.dispose();
-	} );
-
-	test( 'keeps the fallback for a rejected string token without errors under Trusted Types enforcement', async ( {
-		page,
-		interactivityUtils: utils,
-	} ) => {
-		const url = new URL( utils.getLink( 'test/directive-html' ) );
-		url.searchParams.set( 'require_trusted_types', 'true' );
-		const response = await page.goto( url.href );
-		expect( response ).not.toBeNull();
-		expect( response!.headers()[ 'content-security-policy' ] ).toBe(
-			"require-trusted-types-for 'script'"
-		);
-		await expect( page.getByTestId( 'hydration' ) ).toHaveText(
-			'hydrated'
-		);
-		const el = page.getByTestId( 'show state html' );
-		await expect( el.getByTestId( 'fallback' ) ).toBeVisible();
-
-		// Collect only after hydration, so the observed writes are late updates.
-		const pageErrors: Error[] = [];
-		page.on( 'pageerror', ( error ) => pageErrors.push( error ) );
-		const violations = await page.evaluateHandle( () => {
-			const events: string[] = [];
-			document.addEventListener( 'securitypolicyviolation', ( event ) => {
-				events.push( event.violatedDirective );
+				);
+				return (
+					window as typeof window & {
+						htmlViolations: { directive: string; sample: string }[];
+					}
+				 ).htmlViolations;
 			} );
-			return events;
-		} );
-
-		await page.getByTestId( 'set html' ).click();
-		// The rejection proves enforcement and that the action has run.
-		await expect
-			.poll( () => violations.jsonValue() )
-			.toEqual( [ 'require-trusted-types-for' ] );
-		await expect( el.getByTestId( 'fallback' ) ).toBeVisible();
-		await expect( el.getByTestId( 'rendered-strong' ) ).toHaveCount( 0 );
+		expect( await violations() ).toEqual( [] );
+		expect(
+			await page.evaluate(
+				() =>
+					(
+						window as typeof window & {
+							trustedTypes: { defaultPolicy: unknown };
+						}
+					 ).trustedTypes.defaultPolicy
+			)
+		).toBeNull();
 		expect( pageErrors ).toEqual( [] );
-		await violations.dispose();
-	} );
-
-	test( 'shows the server-rendered fallback before any HTML is set', async ( {
-		page,
-	} ) => {
-		const el = page.getByTestId( 'show state html' );
-		await expect( el.getByTestId( 'fallback' ) ).toBeVisible();
+		await page.getByTestId( 'set trusted html' ).click();
+		await expect.poll( () => target.innerHTML() ).toBe( '<p>Late</p>' );
+		expect( await violations() ).toEqual( [] );
+		expect( pageErrors ).toEqual( [] );
+		await page.getByTestId( 'set loading' ).click();
+		await expect.poll( () => target.innerHTML() ).toBe( '' );
+		expect( await violations() ).toEqual( [] );
+		expect( pageErrors ).toEqual( [] );
+		await page.getByTestId( 'set rejected html' ).click();
+		await expect.poll( violations ).toEqual( [
+			{
+				directive: 'require-trusted-types-for',
+				sample: expect.stringContaining( '<b>x</b>' ),
+			},
+		] );
+		expect( await rejected.innerHTML() ).toBe( '' );
+		expect( await violations() ).toHaveLength( 1 );
+		expect( pageErrors ).toEqual( [] );
 	} );
 
 	test( 'renders trusted HTML from asDangerousHTML()', async ( { page } ) => {
-		const el = page.getByTestId( 'show state html' );
 		await page.getByTestId( 'set html' ).click();
-		await expect( el.getByTestId( 'rendered-strong' ) ).toHaveText(
-			'Rendered HTML'
-		);
-	} );
-
-	test( 'keeps the last rendered HTML when the value becomes untrusted again', async ( {
-		page,
-	} ) => {
-		const el = page.getByTestId( 'show state html' );
-		await page.getByTestId( 'set html' ).click();
-		await expect( el.getByTestId( 'rendered-strong' ) ).toBeVisible();
-		await page.getByTestId( 'set loading' ).click();
-		// The previously rendered HTML should still be there.
-		await expect( el.getByTestId( 'rendered-strong' ) ).toBeVisible();
-	} );
-
-	test( 'does not render a plain string as HTML', async ( { page } ) => {
-		const el = page.getByTestId( 'show state html' );
-		await page.getByTestId( 'set plain string' ).click();
-		await expect( el ).not.toContainText( 'Not rendered' );
-		// The fallback should still be visible since a plain string never
-		// resolved to trusted HTML.
-		await expect( el.getByTestId( 'fallback' ) ).toBeVisible();
+		await expect(
+			page
+				.getByTestId( 'show state html' )
+				.getByTestId( 'rendered-strong' )
+		).toHaveText( 'Rendered HTML' );
 	} );
 
 	test( 'should ignore suffixes and unique-ids in the html directive', async ( {
