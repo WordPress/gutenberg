@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   Match pressed header controls to the strong neutral interactive tokens. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 -   Notes: Highlight the text an unsent note is about, and keep the note anchored to it when the selection changes or the text is edited before the note is sent ([#84125](https://github.com/WordPress/gutenberg/pull/84125)).
 -   Notes: Select the note under the caret: an inline note while the caret is inside its highlight, otherwise the block's unsent draft or block-level note, instead of an inline note on any click in the block ([#84147](https://github.com/WordPress/gutenberg/pull/84147)).
 
