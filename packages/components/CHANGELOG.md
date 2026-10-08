@@ -14,6 +14,10 @@
 
 -   `Tip`: Deprecate in favor of `Notice` from `@wordpress/ui`, preserving the legacy component for existing consumers ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
 
+### Bug Fixes
+
+-   `PaletteEdit`: Add Apply and Cancel controls to palette pickers, and apply edited values only after confirmation.
+
 ## 42.0.0 (2026-10-07)
 
 ### Breaking Changes

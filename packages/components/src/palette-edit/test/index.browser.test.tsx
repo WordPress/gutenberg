@@ -1,13 +1,14 @@
 import { describe, expect, it, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
+import { useState } from '@wordpress/element';
 import PaletteEdit, {
 	getNameAndSlugForPosition,
 	deduplicateElementSlugs,
 } from '..';
 import Modal from '../../modal';
-import type { PaletteElement } from '../types';
+import type { Color, PaletteElement } from '../types';
 
 const noop = () => {};
 
@@ -222,6 +223,118 @@ describe( 'PaletteEdit', () => {
 			slug: 'blue-red',
 		},
 	];
+
+	it.each(
+		[ 'swatches', 'details' ].flatMap( ( view ) =>
+			[ 'Escape', 'Cancel', 'Apply' ].map( ( action ) => ( {
+				view,
+				action,
+			} ) )
+		)
+	)(
+		'keeps color edits local until Apply and closes with $action in $view',
+		async ( { view, action } ) => {
+			const onChange = vi.fn();
+			function ControlledPalette() {
+				const [ value, setValue ] = useState< Color[] >( colors );
+				return (
+					<PaletteEdit
+						{ ...defaultProps }
+						colors={ value }
+						onChange={ ( nextColors ) => {
+							onChange( nextColors );
+							setValue( nextColors ?? [] );
+						} }
+					/>
+				);
+			}
+			await render( <ControlledPalette /> );
+			if ( view === 'details' ) {
+				await userEvent.click(
+					screen.getByRole( 'button', { name: 'Color options' } )
+				);
+				await userEvent.click(
+					await screen.findByRole( 'menuitem', {
+						name: 'Show details',
+					} )
+				);
+			}
+			const swatch = screen.getByRole( 'button', {
+				name: view === 'details' ? 'Edit: Primary' : 'Primary',
+			} );
+			swatch.focus();
+			await userEvent.keyboard( '{Enter}' );
+			const input = await screen.findByRole( 'textbox', {
+				name: 'Hex color',
+			} );
+			await userEvent.fill( input, 'ff0000' );
+			await waitFor( () => expect( input ).toHaveValue( 'ff0000' ) );
+			expect( onChange ).not.toHaveBeenCalled();
+			if ( action === 'Escape' ) {
+				await userEvent.keyboard( '{Escape}' );
+			} else if ( action === 'Cancel' ) {
+				await userEvent.click(
+					screen.getByRole( 'button', { name: action } )
+				);
+			} else {
+				const button = screen.getByRole( 'button', { name: action } );
+				button.focus();
+				await userEvent.keyboard( '{Enter}' );
+			}
+			await waitFor( () =>
+				expect( onChange ).toHaveBeenCalledTimes(
+					action === 'Apply' ? 1 : 0
+				)
+			);
+			expect( onChange.mock.lastCall?.[ 0 ] ).toEqual(
+				action === 'Apply'
+					? [ { ...colors[ 0 ], color: '#ff0000' }, colors[ 1 ] ]
+					: undefined
+			);
+			expect(
+				screen.queryByRole( 'textbox', { name: 'Hex color' } )
+			).not.toBeInTheDocument();
+			expect( swatch ).toHaveFocus();
+			await userEvent.keyboard( '{Enter}' );
+			expect(
+				await screen.findByRole( 'textbox', { name: 'Hex color' } )
+			).toHaveValue( action === 'Apply' ? 'FF0000' : '1A4548' );
+		}
+	);
+
+	it( 'does not change the palette when a pending color edit is cancelled', async () => {
+		const onChange = vi.fn();
+		await render(
+			<PaletteEdit
+				{ ...defaultProps }
+				colors={ colors }
+				onChange={ onChange }
+			/>
+		);
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Primary' } )
+		);
+		const input = await screen.findByRole( 'textbox', {
+			name: 'Hex color',
+		} );
+		vi.useFakeTimers( {
+			toFake: [ 'setTimeout', 'clearTimeout', 'Date' ],
+		} );
+		try {
+			await userEvent.fill( input, 'ff0000' );
+			await act( async () => {
+				vi.advanceTimersByTime( 100 );
+			} );
+			expect( onChange ).not.toHaveBeenCalled();
+			await userEvent.keyboard( '{Escape}' );
+			await act( async () => {
+				vi.advanceTimersByTime( 100 );
+			} );
+			expect( onChange ).not.toHaveBeenCalled();
+		} finally {
+			vi.useRealTimers();
+		}
+	} );
 
 	it( 'shows heading label', async () => {
 		await render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
@@ -788,6 +901,10 @@ describe( 'PaletteEdit', () => {
 
 		await userEvent.keyboard( '000000' );
 
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Apply' } )
+		);
+
 		await waitFor( () => {
 			expect( onChange ).toHaveBeenCalledWith( [
 				{
@@ -799,71 +916,112 @@ describe( 'PaletteEdit', () => {
 		} );
 	} );
 
-	it( 'can update gradient palette value', async () => {
-		const onChange = vi.fn();
+	it.each( [ 'Apply', 'Escape' ] )(
+		'keeps gradient edits local until Apply and closes with %s',
+		async ( action ) => {
+			const onChange = vi.fn();
 
-		await render(
-			<PaletteEdit
-				{ ...defaultProps }
-				gradients={ gradients }
-				onChange={ onChange }
-			/>
-		);
+			await render(
+				<PaletteEdit
+					{ ...defaultProps }
+					gradients={ gradients }
+					onChange={ onChange }
+				/>
+			);
 
-		await userEvent.click(
-			screen.getByLabelText( 'Gradient: Pale ocean' )
-		);
+			await userEvent.click(
+				screen.getByLabelText( 'Gradient: Pale ocean' )
+			);
 
-		// Select radial gradient option
-		await userEvent.selectOptions(
-			screen.getByRole( 'combobox', { name: 'Type' } ),
-			'radial-gradient'
-		);
+			// Select radial gradient option
+			await userEvent.selectOptions(
+				screen.getByRole( 'combobox', { name: 'Type' } ),
+				'radial-gradient'
+			);
 
-		await waitFor( () => {
-			expect( onChange ).toHaveBeenCalledWith( [
-				{
-					...gradients[ 0 ],
-					gradient:
-						'radial-gradient(rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%)',
-				},
-				gradients[ 1 ],
-			] );
-		} );
-	} );
+			expect( onChange ).not.toHaveBeenCalled();
+			if ( action === 'Escape' ) {
+				await userEvent.keyboard( '{Escape}' );
+			} else {
+				await userEvent.click(
+					screen.getByRole( 'button', { name: 'Apply' } )
+				);
+			}
 
-	it( 'can update duotone palette value', async () => {
-		const onChange = vi.fn();
+			await waitFor( () =>
+				expect( onChange ).toHaveBeenCalledTimes(
+					action === 'Apply' ? 1 : 0
+				)
+			);
+			expect( onChange.mock.lastCall?.[ 0 ] ).toEqual(
+				action === 'Apply'
+					? [
+							{
+								...gradients[ 0 ],
+								gradient:
+									'radial-gradient(rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%)',
+							},
+							gradients[ 1 ],
+						]
+					: undefined
+			);
+		}
+	);
 
-		await render(
-			<PaletteEdit
-				{ ...defaultProps }
-				duotones={ duotones }
-				colorPalette={ colors }
-				onChange={ onChange }
-			/>
-		);
+	it.each( [ 'Apply', 'Escape' ] )(
+		'keeps duotone edits local until Apply and closes with %s',
+		async ( action ) => {
+			const onChange = vi.fn();
 
-		await userEvent.click(
-			screen.getByLabelText( 'Duotone: Blue and red' )
-		);
-		await userEvent.click(
-			screen.getByRole( 'button', { name: /Shadows/ } )
-		);
-		await userEvent.click(
-			screen.getByRole( 'option', { name: 'Primary' } )
-		);
+			await render(
+				<PaletteEdit
+					{ ...defaultProps }
+					duotones={ duotones }
+					colorPalette={ colors }
+					onChange={ onChange }
+				/>
+			);
 
-		await waitFor( () => {
-			expect( onChange ).toHaveBeenCalledWith( [
-				duotones[ 0 ],
-				{
-					...duotones[ 1 ],
-					colors: [ '#1a4548', duotones[ 1 ].colors[ 1 ] ],
-				},
-			] );
-		} );
-	} );
+			await userEvent.click(
+				screen.getByLabelText( 'Duotone: Blue and red' )
+			);
+			await userEvent.click(
+				screen.getByRole( 'button', { name: /Shadows/ } )
+			);
+			await userEvent.click(
+				screen.getByRole( 'option', { name: 'Primary' } )
+			);
+
+			expect( onChange ).not.toHaveBeenCalled();
+			if ( action === 'Escape' ) {
+				await userEvent.keyboard( '{Escape}' );
+			} else {
+				await userEvent.click(
+					screen.getByRole( 'button', { name: 'Apply' } )
+				);
+			}
+
+			await waitFor( () =>
+				expect( onChange ).toHaveBeenCalledTimes(
+					action === 'Apply' ? 1 : 0
+				)
+			);
+			expect( onChange.mock.lastCall?.[ 0 ] ).toEqual(
+				action === 'Apply'
+					? [
+							duotones[ 0 ],
+							{
+								...duotones[ 1 ],
+								colors: [
+									'#1a4548',
+									duotones[ 1 ].colors[ 1 ],
+								],
+							},
+						]
+					: undefined
+			);
+		}
+	);
 
 	// The same filtering and normalization that applies when adding a duotone
 	// has to apply when editing one, or the shadows and highlights picker can
@@ -907,6 +1065,10 @@ describe( 'PaletteEdit', () => {
 			screen.getByRole( 'option', { name: 'Named black' } )
 		);
 
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Apply' } )
+		);
+
 		await waitFor( () => {
 			expect( onChange ).toHaveBeenCalledWith( [
 				duotones[ 0 ],
@@ -948,6 +1110,10 @@ describe( 'PaletteEdit', () => {
 		);
 		await userEvent.click(
 			screen.getByRole( 'option', { name: 'Primary' } )
+		);
+
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Apply' } )
 		);
 
 		await waitFor( () => {

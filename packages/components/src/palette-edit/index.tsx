@@ -315,6 +315,14 @@ function ColorPickerPopover< T extends PaletteElement >( {
 	popoverProps: receivedPopoverProps,
 	onClose = () => {},
 }: ColorPickerPopoverProps< T > ) {
+	const [ draftElement, setDraftElement ] = useState< T >();
+	const editedElement = draftElement ?? element;
+	const onApply = () => {
+		if ( draftElement ) {
+			onChange( draftElement );
+		}
+		onClose();
+	};
 	const popoverProps: ColorPickerPopoverProps< T >[ 'popoverProps' ] =
 		useMemo(
 			() => ( {
@@ -338,11 +346,11 @@ function ColorPickerPopover< T extends PaletteElement >( {
 		<Popover { ...popoverProps } onClose={ onClose }>
 			{ variant === 'color' && (
 				<ColorPicker
-					color={ element.color }
+					color={ editedElement.color }
 					enableAlpha
 					onChange={ ( newColor ) => {
-						onChange( {
-							...element,
+						setDraftElement( {
+							...editedElement,
 							color: newColor,
 						} );
 					} }
@@ -352,10 +360,10 @@ function ColorPickerPopover< T extends PaletteElement >( {
 				<div className="components-palette-edit__popover-gradient-picker">
 					<CustomGradientPicker
 						__experimentalIsRenderedInSidebar
-						value={ element.gradient }
+						value={ editedElement.gradient }
 						onChange={ ( newGradient ) => {
-							onChange( {
-								...element,
+							setDraftElement( {
+								...editedElement,
 								gradient: newGradient,
 							} );
 						} }
@@ -369,7 +377,7 @@ function ColorPickerPopover< T extends PaletteElement >( {
 					     same as the one in the block toolbar. */ }
 					<VStack spacing={ 3 }>
 						<CustomDuotoneBar
-							value={ getDuotoneColors( element ) }
+							value={ getDuotoneColors( editedElement ) }
 							onChange={ ( newColors ) => {
 								// A duotone needs two colors to render, and the
 								// bar refuses to drop below two stops, so an
@@ -377,19 +385,22 @@ function ColorPickerPopover< T extends PaletteElement >( {
 								if ( ! newColors?.length ) {
 									return;
 								}
-								onChange( { ...element, colors: newColors } );
+								setDraftElement( {
+									...editedElement,
+									colors: newColors,
+								} );
 							} }
 						/>
 						<ColorListPicker
 							labels={ [ __( 'Shadows' ), __( 'Highlights' ) ] }
 							colors={ colorPalette ?? [] }
-							value={ getDuotoneColors( element ) }
+							value={ getDuotoneColors( editedElement ) }
 							enableAlpha
 							onChange={ ( newColors ) => {
 								const [ defaultDark, defaultLight ] =
 									getDefaultColors( colorPalette ?? [] );
-								onChange( {
-									...element,
+								setDraftElement( {
+									...editedElement,
 									colors: [
 										// Falsy rather than nullish, to match
 										// how `DuotonePicker` fills a cleared
@@ -403,6 +414,25 @@ function ColorPickerPopover< T extends PaletteElement >( {
 					</VStack>
 				</div>
 			) }
+			<HStack
+				className={ styles[ 'popover-actions' ] }
+				justify="flex-end"
+			>
+				<Button
+					__next40pxDefaultSize
+					variant="tertiary"
+					onClick={ onClose }
+				>
+					{ __( 'Cancel' ) }
+				</Button>
+				<Button
+					__next40pxDefaultSize
+					variant="primary"
+					onClick={ onApply }
+				>
+					{ __( 'Apply' ) }
+				</Button>
+			</HStack>
 		</Popover>
 	);
 }
@@ -572,6 +602,8 @@ const EMPTY_ARRAY: Color[] = [];
 
 /**
  * Allows editing a palette of colors, gradients or duotones.
+ * Picker changes are kept locally until Apply calls `onChange`. Cancel or
+ * dismissing the picker discards those changes.
  *
  * ```jsx
  * import { PaletteEdit } from '@wordpress/components';
@@ -831,6 +863,7 @@ export function PaletteEdit( {
 					) }
 					{ ! isEditing && editingElement !== null && (
 						<ColorPickerPopover
+							key={ elements[ editingElement ?? -1 ]?.slug }
 							variant={ variant }
 							colorPalette={ duotoneColorPalette }
 							onClose={ () => setEditingElement( null ) }
