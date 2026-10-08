@@ -13,7 +13,8 @@
 			"role": "content"
 		},
 		"aspectRatio": {
-			"type": "string"
+			"type": "string",
+			"default": "auto"
 		},
 		"width": {
 			"type": "string"
