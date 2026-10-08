@@ -13,7 +13,6 @@ import {
 import { store as blockEditorStore } from '../../../store';
 import BlockBreadcrumb from '../';
 import { BlockRefs } from '../../provider/block-refs-provider';
-import '../style.scss';
 
 let registry;
 let blocks;
