@@ -10,13 +10,13 @@
     -   `ColorPicker` ([#84128](https://github.com/WordPress/gutenberg/pull/84128))
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Enhancements
+
+-   `MenuItem`, `DropdownMenu`, deprecated `Menu`, `CustomSelectControl`, `CustomSelectControlV2`, `ComboboxControl`, `FormTokenField`, and `Autocomplete`: Use neutral item highlights, theme-aware popup backgrounds, and zero-offset keyboard focus rings, matching `@wordpress/ui` ([#84087](https://github.com/WordPress/gutenberg/pull/84087)).
+
 ### Deprecations
 
 -   `Tip`: Deprecate in favor of `Notice` from `@wordpress/ui`, preserving the legacy component for existing consumers ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
-
-### Enhancements
-
--   `MenuItem`, `DropdownMenu`, deprecated `Menu`, `CustomSelectControl`, `CustomSelectControlV2`, `ComboboxControl`, `FormTokenField`, and `Autocomplete`: Use neutral item highlights, theme-aware popup backgrounds, and zero-offset keyboard focus rings, matching `@wordpress/ui`. ([#84087](https://github.com/WordPress/gutenberg/pull/84087))
 
 ## 42.0.0 (2026-10-07)
 
