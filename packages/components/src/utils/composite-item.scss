@@ -45,7 +45,7 @@
 		box-shadow: none;
 	}
 
-	&:is(:hover, :focus, [aria-expanded="true"]):not(:disabled, [aria-disabled="true"]) {
+	&:is(:hover, :focus-visible, [aria-expanded="true"]):not(:disabled, [aria-disabled="true"]) {
 		@include highlight;
 
 		.components-menu-item__info {
