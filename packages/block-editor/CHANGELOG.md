@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Inserter: Redesign the Media tab around a single DataViews grid, in place of the category list and flyout panel. One search covers the tab, media types are tabs, and other sources (the post's attached images, Openverse, anything registered through the public API) are chosen from a menu beside the search ([#82749](https://github.com/WordPress/gutenberg/pull/82749)).
+
 ## 18.1.0 (2026-10-07)
 
 ### New Features

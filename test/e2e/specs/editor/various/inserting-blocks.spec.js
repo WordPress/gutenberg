@@ -965,10 +965,17 @@ test.describe( 'insert media from inserter', () => {
 
 		await page.getByLabel( 'Block Inserter' ).click();
 		await page.getByRole( 'tab', { name: 'Media' } ).click();
-		// `exact` so this matches only the "Images" source and not the new
-		// "Attached images" source, which also contains "Images".
-		await page.getByRole( 'tab', { name: 'Images', exact: true } ).click();
-		await page.getByLabel( uploadedMedia.title.raw ).click();
+		// The tab opens on the media library's images. Asserted through the
+		// search field's label rather than the media-type tabs, which are not
+		// rendered when the library holds only one type.
+		await expect(
+			page.getByRole( 'searchbox', { name: 'Search images' } )
+		).toBeVisible();
+		// The card's preview is the click-to-insert target, named by the
+		// item's title.
+		await page
+			.getByRole( 'button', { name: uploadedMedia.title.raw } )
+			.click();
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:image {"id":${ uploadedMedia.id }} -->
 <figure class="wp-block-image"><img src="${ uploadedMedia.source_url }" alt="${ uploadedMedia.alt_text }" class="wp-image-${ uploadedMedia.id }"/></figure>
@@ -998,14 +1005,14 @@ test.describe( 'Attached images media category', () => {
 		requestUtils,
 	} ) => {
 		const post = await requestUtils.createPost( {
-			title: 'Attached images test',
+			title: 'Media attachment test',
 			status: 'draft',
 		} );
 		const media = await requestUtils.uploadMedia(
 			'./assets/10x10_e2e_test_image_z9T8jK.png'
 		);
 		// Re-parent the uploaded image to the post so it appears in the
-		// "Attached images" source, which filters by the attachment's parent.
+		// "Attached images" category, which filters by the attachment's parent.
 		await requestUtils.rest( {
 			method: 'POST',
 			path: `/wp/v2/media/${ media.id }`,
@@ -1016,25 +1023,34 @@ test.describe( 'Attached images media category', () => {
 
 		await page.getByLabel( 'Block Inserter' ).click();
 		await page.getByRole( 'tab', { name: 'Media' } ).click();
-		await page.getByRole( 'tab', { name: 'Attached images' } ).click();
+		// Attached images is a source, chosen from the menu beside the search.
+		await page
+			.getByRole( 'tabpanel', { name: 'Media' } )
+			.getByRole( 'button', { name: 'Media source' } )
+			.click();
+		await page
+			.getByRole( 'menuitemradio', { name: 'Attached images' } )
+			.click();
 
 		const mediaPanel = page.locator(
 			'.block-editor-inserter__media-panel'
 		);
-		const attachedImage = mediaPanel.getByRole( 'option', {
+		// The card's preview is the click-to-insert target, named by the
+		// item's title.
+		const attachedImage = mediaPanel.getByRole( 'button', {
 			name: media.title.raw,
 		} );
 		await expect( attachedImage ).toBeVisible();
 
-		// The per-item options button is only revealed once the item is
-		// hovered, matching how a user reaches the detach action.
+		// The per-item actions menu is only revealed once the card is hovered,
+		// matching how a user reaches the detach action.
 		await attachedImage.hover();
-		await mediaPanel.getByRole( 'button', { name: 'Options' } ).click();
+		await mediaPanel.getByRole( 'button', { name: 'Actions' } ).click();
 		await page
 			.getByRole( 'menuitem', { name: 'Detach from post' } )
 			.click();
 
-		// Detaching is confirmed in a modal before it takes effect.
+		// Detaching is confirmed in the action's modal before it takes effect.
 		await page
 			.getByRole( 'dialog', { name: 'Detach image' } )
 			.getByRole( 'button', { name: 'Detach' } )
@@ -1048,7 +1064,7 @@ test.describe( 'Attached images media category', () => {
 				.filter( { hasText: 'Image detached from' } )
 		).toBeVisible();
 
-		// With its only attachment removed, the source falls back to its empty
+		// With its only attachment removed, the category falls back to its empty
 		// state rather than dropping out of the tab list.
 		await expect( attachedImage ).toBeHidden();
 		await expect(
