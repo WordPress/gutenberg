@@ -14,7 +14,6 @@ import { store as blockEditorStore } from '../../../store';
 import BlockBreadcrumb from '../';
 import { BlockRefs } from '../../provider/block-refs-provider';
 import '../style.scss';
-import '../../../../../interface/src/components/interface-skeleton/style.scss';
 
 let registry;
 let blocks;
@@ -36,6 +35,7 @@ beforeEach( async () => {
 	registry.register( blockEditorStore );
 	let innerBlocks = [];
 	blocks = [];
+	// Nest six blocks, placing Ancestor 5 five levels below Ancestor 0.
 	for ( let index = 5; index >= 0; index-- ) {
 		const block = createBlock(
 			'test/breadcrumb',
@@ -54,6 +54,7 @@ beforeEach( async () => {
 afterEach( () => unregisterBlockType( 'test/breadcrumb' ) );
 
 it( 'selects an ancestor from its fragment link and clears selection from the document link', async () => {
+	// Supply block DOM refs so the document link can find and focus the editor canvas.
 	const refsMap = observableMap();
 	await render(
 		<RegistryProvider value={ registry }>
@@ -74,6 +75,8 @@ it( 'selects an ancestor from its fragment link and clears selection from the do
 			</BlockRefs.Provider>
 		</RegistryProvider>
 	);
+
+	// Each ancestor link points to its block in the editor canvas.
 	const ancestor = page.getByRole( 'link', {
 		name: 'Ancestor 3',
 		exact: true,
@@ -81,15 +84,21 @@ it( 'selects an ancestor from its fragment link and clears selection from the do
 	await expect
 		.element( ancestor )
 		.toHaveAttribute( 'href', `#block-${ blocks[ 3 ].clientId }` );
+
+	// Activating an ancestor with the keyboard selects that block.
 	ancestor.element().focus();
 	await userEvent.keyboard( '{Enter}' );
 	expect(
 		registry.select( blockEditorStore ).getSelectedBlockClientId()
 	).toBe( blocks[ 3 ].clientId );
+
+	// Activating the document link clears the block selection.
 	await page.getByRole( 'link', { name: 'Document', exact: true } ).click();
 	expect(
 		registry.select( blockEditorStore ).getSelectedBlockClientId()
 	).toBeNull();
+
+	// The document becomes the current breadcrumb after selection is cleared.
 	await expect
 		.element(
 			page
@@ -97,26 +106,29 @@ it( 'selects an ancestor from its fragment link and clears selection from the do
 				.getByText( 'Document', { exact: true } )
 		)
 		.toHaveAttribute( 'aria-current', 'true' );
+
+	// Focus returns to the editor canvas after activating the document link.
 	await expect
 		.element( page.getByRole( 'region', { name: 'Editor canvas' } ) )
 		.toHaveFocus();
 } );
 
-it( 'collapses ancestors in a narrow footer and selects them from the overflow menu', async () => {
+it( 'collapses ancestors in a narrow container and selects them from the overflow menu', async () => {
 	await render(
 		<RegistryProvider value={ registry }>
-			<div
-				className="interface-interface-skeleton__footer"
-				style={ { display: 'flex', position: 'relative', width: 350 } }
-			>
+			<div style={ { display: 'flex', width: 350 } }>
 				<BlockBreadcrumb />
 			</div>
 		</RegistryProvider>
 	);
+
+	// A narrow container moves ancestors into an overflow menu.
 	const trigger = page.getByRole( 'button', {
 		name: /hidden breadcrumb item/,
 	} );
 	await expect.element( trigger ).toBeVisible();
+
+	// Selecting a hidden ancestor closes the menu and selects its block.
 	await trigger.click();
 	await page
 		.getByRole( 'menuitem', { name: 'Ancestor 1', exact: true } )
@@ -135,11 +147,15 @@ it( 'restores ancestors to the breadcrumb trail when more space is available', a
 			</div>
 		</RegistryProvider>
 	);
+
+	// The overflow menu is available while the breadcrumb trail is constrained.
 	await expect
 		.element(
 			page.getByRole( 'button', { name: /hidden breadcrumb item/ } )
 		)
 		.toBeVisible();
+
+	// Widen the container so the complete breadcrumb trail can fit.
 	await screen.rerender(
 		<RegistryProvider value={ registry }>
 			<div style={ { width: 1500 } }>
@@ -147,11 +163,15 @@ it( 'restores ancestors to the breadcrumb trail when more space is available', a
 			</div>
 		</RegistryProvider>
 	);
+
+	// The overflow menu disappears once all ancestors fit in the trail.
 	await expect
 		.element(
 			page.getByRole( 'button', { name: /hidden breadcrumb item/ } )
 		)
 		.not.toBeInTheDocument();
+
+	// Previously hidden ancestors are available as links again.
 	await expect
 		.element(
 			page.getByRole( 'link', { name: 'Ancestor 1', exact: true } )
