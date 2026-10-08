@@ -117,7 +117,6 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 						ref={ ref }
 						variant="tertiary"
 						aria-hidden={ isCovered || undefined }
-						// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
 						inert={ inertValue( isCovered ) }
 					/>
 				}

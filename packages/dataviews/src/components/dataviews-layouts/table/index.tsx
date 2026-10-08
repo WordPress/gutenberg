@@ -519,7 +519,6 @@ function ViewTable< Item >( {
 								onContextMenu={ handleHeaderContextMenu }
 							>
 								<div
-									// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
 									inert={ inertValue(
 										disableHeaderControls
 									) }
@@ -650,7 +649,6 @@ function ViewTable< Item >( {
 								<div
 									className="dataviews-view-table__bulk-actions-overlay"
 									ref={ bulkActionsRef }
-									// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
 									inert={ inertValue( !! isLoading ) }
 								>
 									<BulkActionToolbar

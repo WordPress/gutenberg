@@ -88,7 +88,6 @@ function ViewGrid< Item >( {
 			{ ( hasBulkActions || isActionInProgress ) && (
 				<div
 					className="dataviews-view-grid__bulk-actions-header"
-					// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
 					inert={ inertValue( !! isLoading ) }
 				>
 					<BulkActionToolbar
