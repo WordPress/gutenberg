@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Bug Fixes
+
+-   Notes: Highlight the text an unsent note is about, and keep the note anchored to it when the selection changes or the text is edited before the note is sent ([#84125](https://github.com/WordPress/gutenberg/pull/84125)).
+-   Notes: Select the note under the caret: an inline note while the caret is inside its highlight, otherwise the block's unsent draft or block-level note, instead of an inline note on any click in the block ([#84147](https://github.com/WordPress/gutenberg/pull/84147)).
+
+## 15.2.0 (2026-10-07)
+
 ### Enhancements
 
 -   Notes: Highlight the whole text block when a note is attached at the block level, in the note author's color, and replace the spotlight dimming shown while a note is selected with the block's own outline. Hiding notes hides the highlights too ([#80578](https://github.com/WordPress/gutenberg/pull/80578), closes [#72860](https://github.com/WordPress/gutenberg/issues/72860)).
@@ -24,6 +35,7 @@
 -   Notes: Stop the editor's undo from detaching a newly added note from its block, or bringing back the highlight of a resolved note ([#84079](https://github.com/WordPress/gutenberg/pull/84079)).
 -   Notes: Delete notes permanently when they can't be moved to the trash, instead of failing with an error ([#84102](https://github.com/WordPress/gutenberg/pull/84102)).
 -   Notes: Disable the note form field while a note or reply is being sent, instead of accepting text the save would not include ([#84083](https://github.com/WordPress/gutenberg/pull/84083)).
+-   Notes: Keep an unsent note or reply when selecting another block or thread, instead of discarding it ([#84110](https://github.com/WordPress/gutenberg/pull/84110)).
 
 ### Internal
 

@@ -3,6 +3,7 @@ import {
 	store as blockEditorStore,
 	useStyleOverride,
 } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 import {
 	findNoteInBlock,
 	getAvatarBorderColor,
@@ -345,6 +346,10 @@ export function buildBlockHighlightCss( blockHighlights ) {
  * @return {null} Renders nothing; styles are applied via `useStyleOverride`.
  */
 export function NoteHighlightStyles( { threads, selectedId, isHidden } ) {
+	const currentUserId = useSelect(
+		( select ) => select( coreStore ).getCurrentUser()?.id,
+		[]
+	);
 	// Which threads are block-level depends on block attributes (a thread is
 	// inline iff its marker exists in the block), so the CSS is derived in
 	// `useSelect` to track attribute edits. It returns the finished string:
@@ -356,13 +361,17 @@ export function NoteHighlightStyles( { threads, selectedId, isHidden } ) {
 			}
 			const { getBlockAttributes } = select( blockEditorStore );
 			return (
-				buildHighlightCss( threads, selectedId ) +
+				// An unsent note's draft marker is tinted like a thread of its author.
+				buildHighlightCss(
+					[ ...threads, { id: 'new', author: currentUserId } ],
+					selectedId
+				) +
 				buildBlockHighlightCss(
 					getBlockLevelHighlights( threads, getBlockAttributes )
 				)
 			);
 		},
-		[ threads, selectedId, isHidden ]
+		[ threads, selectedId, isHidden, currentUserId ]
 	);
 	useStyleOverride( { id: 'core-note-highlights', css } );
 	return null;
