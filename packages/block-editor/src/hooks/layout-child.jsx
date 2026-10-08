@@ -10,7 +10,6 @@ import {
 	GridVisualizer,
 	GridItemResizer,
 	GridItemMovers,
-	GridItemGrip,
 	GridItemRotator,
 	useUpdateGridChildLayout,
 	isGridStackedOnMobile,
@@ -636,25 +635,22 @@ function GridTools( {
 				/>
 			) }
 			{ showManualGridTools && (
-				<>
-					<GridItemGrip clientId={ clientId } angle={ angle } />
-					<GridItemRotator
-						clientId={ clientId }
-						angle={ rotate ?? 0 }
-						onPreview={ setPreviewRotate }
-						onChange={ ( nextRotate ) =>
-							updateLayout( {
-								// In the default state, no rotation is stored as
-								// no value. In a viewport state, 0 is kept so it
-								// overrides the default rotation.
-								rotate:
-									nextRotate || isViewportState
-										? nextRotate
-										: undefined,
-							} )
-						}
-					/>
-				</>
+				<GridItemRotator
+					clientId={ clientId }
+					angle={ rotate ?? 0 }
+					onPreview={ setPreviewRotate }
+					onChange={ ( nextRotate ) =>
+						updateLayout( {
+							// In the default state, no rotation is stored as
+							// no value. In a viewport state, 0 is kept so it
+							// overrides the default rotation.
+							rotate:
+								nextRotate || isViewportState
+									? nextRotate
+									: undefined,
+						} )
+					}
+				/>
 			) }
 			{ isManualGrid && (
 				<GridItemMovers

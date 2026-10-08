@@ -1,24 +1,4 @@
-import { GridRect } from './utils';
-
-/**
- * Gets the index of the grid track at a position. A position that falls in
- * the gap after a track belongs to that track, and positions outside the grid
- * belong to the first or last track.
- *
- * @param {Array<{start: number, end: number}>} tracks   Grid tracks, as returned by `getGridTracks`.
- * @param {number}                              position Position in pixels, relative to the start of the first track.
- *
- * @return {number} The 0-based index of the track.
- */
-export function getTrackIndexAtPosition( tracks, position ) {
-	let index = 0;
-	for ( let i = 0; i < tracks.length; i++ ) {
-		if ( position >= tracks[ i ].start ) {
-			index = i;
-		}
-	}
-	return index;
-}
+import { GridRect, getClosestTrack } from './utils';
 
 function clamp( value, min, max ) {
 	return Math.min( Math.max( value, min ), max );
@@ -27,9 +7,10 @@ function clamp( value, min, max ) {
 /**
  * Works out which cells a block being dragged over a grid would land in.
  *
- * The cell under the pointer is the cell the block was grabbed by, so a block
- * grabbed by its bottom-right cell keeps that cell under the pointer. The
- * landing area keeps the block's span and is clamped to stay inside the grid.
+ * The pointer is the centre of the block, wherever the drag started. The
+ * block's top-left corner snaps to the closest cell, so the landing area is
+ * the one whose centre is closest to the pointer. The landing area keeps the
+ * block's span and is clamped to stay inside the grid.
  *
  * @param {Object}                              options
  * @param {number}                              options.x            Pointer position in pixels, relative to the start of the first column track.
@@ -38,7 +19,8 @@ function clamp( value, min, max ) {
  * @param {Array<{start: number, end: number}>} options.rowTracks    Row tracks, as returned by `getGridTracks`.
  * @param {number}                              options.columnSpan   Number of columns the block spans.
  * @param {number}                              options.rowSpan      Number of rows the block spans.
- * @param {{column: number, row: number}}       options.grabOffset   0-based offset of the grabbed cell inside the block.
+ * @param {number}                              options.width        Width of the block in pixels, unrotated. Defaults to the width of the columns it spans.
+ * @param {number}                              options.height       Height of the block in pixels, unrotated. Defaults to the height of the rows it spans.
  *
  * @return {GridRect} The cells the block would land in.
  */
@@ -49,11 +31,11 @@ export function getGridDropTarget( {
 	rowTracks,
 	columnSpan = 1,
 	rowSpan = 1,
-	grabOffset = { column: 0, row: 0 },
+	width = getSpanSize( columnTracks, columnSpan ),
+	height = getSpanSize( rowTracks, rowSpan ),
 } ) {
-	const column =
-		getTrackIndexAtPosition( columnTracks, x ) + 1 - grabOffset.column;
-	const row = getTrackIndexAtPosition( rowTracks, y ) + 1 - grabOffset.row;
+	const column = getClosestTrack( columnTracks, x - width / 2 ) + 1;
+	const row = getClosestTrack( rowTracks, y - height / 2 ) + 1;
 	return new GridRect( {
 		columnStart: clamp(
 			column,
@@ -68,6 +50,20 @@ export function getGridDropTarget( {
 		columnSpan,
 		rowSpan,
 	} );
+}
+
+/**
+ * Gets the size in pixels of a number of tracks starting at the first one,
+ * including the gaps between them.
+ *
+ * @param {Array<{start: number, end: number}>} tracks Grid tracks, as returned by `getGridTracks`.
+ * @param {number}                              span   Number of tracks.
+ *
+ * @return {number} The size in pixels.
+ */
+function getSpanSize( tracks, span ) {
+	const lastTrack = tracks[ Math.min( span, tracks.length ) - 1 ];
+	return lastTrack ? lastTrack.end - tracks[ 0 ].start : 0;
 }
 
 /**

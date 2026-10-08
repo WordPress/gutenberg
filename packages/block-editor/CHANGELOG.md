@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Grid: In manual placement grids (behind the `gutenberg-grid-interactivity` experiment), dragging a block shows the cells it will land in, any blocks it will overlap, and alignment guides to the container and nearby blocks. A grip and a rotate handle sit on the selected block, the block settings gain a Rotation control stored as `style.layout.rotate`,, the grid stacks its blocks on mobile unless "Stack on mobile" is turned off (`layout.stackOnMobile`), and every row of the grid is the same height ([#84340](https://github.com/WordPress/gutenberg/pull/84340)).
+-   Grid: In manual placement grids (behind the `gutenberg-grid-interactivity` experiment), dragging a block shows the cells it will land in, any blocks it will overlap, and alignment guides to the container and nearby blocks. The pointer marks the centre of the dragged block, a rotate handle sits on the selected block, the block settings gain a Rotation control stored as `style.layout.rotate`, the grid stacks its blocks on mobile unless "Stack on mobile" is turned off (`layout.stackOnMobile`), and every row of the grid is the same height ([#84340](https://github.com/WordPress/gutenberg/pull/84340)).
 
 ## 18.1.0 (2026-10-07)
 

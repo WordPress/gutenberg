@@ -359,8 +359,6 @@
 			pointer-events: none;
 		}
 
-		.block-editor-grid-item-handles__grip,
-		.block-editor-grid-item-handles__grip *,
 		.block-editor-grid-item-handles__rotate,
 		.block-editor-grid-item-handles__rotate * {
 			pointer-events: all;
@@ -374,7 +372,6 @@
 	height: 100%;
 }
 
-.block-editor-grid-item-handles__grip,
 .block-editor-grid-item-handles__rotate {
 	position: absolute;
 	display: flex;
@@ -384,18 +381,6 @@
 	background: $white;
 	color: $gray-900;
 	box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color), $elevation-x-small;
-}
-
-.block-editor-grid-item-handles__grip {
-	top: -$grid-unit-15;
-	left: -$grid-unit-15;
-	width: $grid-unit-30;
-	height: $grid-unit-30;
-	cursor: grab;
-
-	&:active {
-		cursor: grabbing;
-	}
 }
 
 .block-editor-grid-item-handles__rotate {

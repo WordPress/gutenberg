@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import {
 	getGridDropTarget,
 	getPixelRectFromGridRect,
-	getTrackIndexAtPosition,
 } from '../get-grid-drop-target';
 import { getGridTracks } from '../utils';
 
@@ -19,21 +18,6 @@ function toPlain( rect ) {
 	};
 }
 
-describe( 'getTrackIndexAtPosition()', () => {
-	it( 'finds the track containing a position', () => {
-		expect( getTrackIndexAtPosition( columnTracks, 150 ) ).toBe( 1 );
-	} );
-
-	it( 'gives a position in a gap to the track before the gap', () => {
-		expect( getTrackIndexAtPosition( columnTracks, 105 ) ).toBe( 0 );
-	} );
-
-	it( 'gives positions outside the grid to the first and last track', () => {
-		expect( getTrackIndexAtPosition( columnTracks, -20 ) ).toBe( 0 );
-		expect( getTrackIndexAtPosition( columnTracks, 900 ) ).toBe( 2 );
-	} );
-} );
-
 describe( 'getGridDropTarget()', () => {
 	it( 'lands a 1x1 block in the cell under the pointer', () => {
 		expect(
@@ -48,21 +32,31 @@ describe( 'getGridDropTarget()', () => {
 		).toEqual( { columnStart: 3, rowStart: 2, columnSpan: 1, rowSpan: 1 } );
 	} );
 
-	it( 'keeps the grabbed cell under the pointer', () => {
-		// A 2x2 block grabbed by its bottom-right cell, pointer over cell 3/3.
+	it( 'treats the pointer as the centre of the block', () => {
+		// A 2x2 block centred on the gap corner between cells 2/2 and 3/3.
 		expect(
 			toPlain(
 				getGridDropTarget( {
-					x: 230,
-					y: 130,
+					x: 215,
+					y: 115,
 					columnTracks,
 					rowTracks,
 					columnSpan: 2,
 					rowSpan: 2,
-					grabOffset: { column: 1, row: 1 },
 				} )
 			)
 		).toEqual( { columnStart: 2, rowStart: 2, columnSpan: 2, rowSpan: 2 } );
+	} );
+
+	it( 'centres the block by its measured size', () => {
+		// The cells a block spans give a 100px wide block, which lands in
+		// column 2. Measured at 300px wide, its left edge is in column 1.
+		const options = { x: 160, y: 25, columnTracks, rowTracks };
+		expect( getGridDropTarget( options ).columnStart ).toBe( 2 );
+		expect(
+			getGridDropTarget( { ...options, width: 300, height: 50 } )
+				.columnStart
+		).toBe( 1 );
 	} );
 
 	it( 'clamps the landing area against the right and bottom edges', () => {
@@ -90,7 +84,6 @@ describe( 'getGridDropTarget()', () => {
 					rowTracks,
 					columnSpan: 2,
 					rowSpan: 2,
-					grabOffset: { column: 1, row: 1 },
 				} )
 			)
 		).toEqual( { columnStart: 1, rowStart: 1, columnSpan: 2, rowSpan: 2 } );
@@ -114,18 +107,20 @@ describe( 'getGridDropTarget()', () => {
 		const unevenColumns = getGridTracks( '40px 200px 60px', 10 );
 		expect(
 			getGridDropTarget( {
-				x: 245,
-				y: 10,
+				x: 150,
+				y: 25,
 				columnTracks: unevenColumns,
 				rowTracks,
+				width: 200,
 			} ).columnStart
 		).toBe( 2 );
 		expect(
 			getGridDropTarget( {
-				x: 265,
-				y: 10,
+				x: 290,
+				y: 25,
 				columnTracks: unevenColumns,
 				rowTracks,
+				width: 60,
 			} ).columnStart
 		).toBe( 3 );
 	} );
@@ -136,7 +131,7 @@ describe( 'getPixelRectFromGridRect()', () => {
 		expect(
 			getPixelRectFromGridRect(
 				getGridDropTarget( {
-					x: 120,
+					x: 215,
 					y: 70,
 					columnTracks,
 					rowTracks,

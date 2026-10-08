@@ -16,7 +16,6 @@ import {
 	GridRect,
 	getGridInfo,
 	getGridItemRect,
-	getComputedCSS,
 	getGridTrackPositions,
 	getGridItemPixelRect,
 	getGridRectFromPixelRect,
@@ -24,7 +23,6 @@ import {
 import {
 	getGridDropTarget,
 	getPixelRectFromGridRect,
-	getTrackIndexAtPosition,
 } from './get-grid-drop-target';
 import { getAlignmentGuides } from './get-alignment-guides';
 import {
@@ -315,53 +313,6 @@ function getPixelRectStyle( rect ) {
 }
 
 /**
- * Works out which cell inside a grid item the pointer is over, as a 0-based
- * offset from the item's first cell.
- *
- * @param {DragEvent}   event           The `dragstart` event.
- * @param {HTMLElement} gridElement     The grid element.
- * @param {HTMLElement} gridItemElement The grid item being dragged.
- *
- * @return {{column: number, row: number}} The offset of the grabbed cell.
- */
-function getGrabOffset( event, gridElement, gridItemElement ) {
-	const { columnTracks, rowTracks } = getGridTrackPositions( gridElement );
-	const gridRect = gridElement.getBoundingClientRect();
-	const scale = gridElement.offsetWidth / gridRect.width || 1;
-	const contentLeft =
-		gridElement.clientLeft +
-		( parseFloat( getComputedCSS( gridElement, 'padding-left' ) ) || 0 );
-	const contentTop =
-		gridElement.clientTop +
-		( parseFloat( getComputedCSS( gridElement, 'padding-top' ) ) || 0 );
-	const column =
-		getTrackIndexAtPosition(
-			columnTracks,
-			( event.clientX - gridRect.left ) * scale - contentLeft
-		) + 1;
-	const row =
-		getTrackIndexAtPosition(
-			rowTracks,
-			( event.clientY - gridRect.top ) * scale - contentTop
-		) + 1;
-	const itemRect = getGridRectFromPixelRect(
-		getGridItemPixelRect( gridItemElement ),
-		columnTracks,
-		rowTracks
-	);
-	return {
-		column: Math.min(
-			Math.max( column - itemRect.columnStart, 0 ),
-			itemRect.columnSpan - 1
-		),
-		row: Math.min(
-			Math.max( row - itemRect.rowStart, 0 ),
-			itemRect.rowSpan - 1
-		),
-	};
-}
-
-/**
  * A drop zone covering the whole grid. While a block is dragged over it, it
  * works out which cells the block would land in, which other blocks those
  * cells overlap, and which alignment guides to show.
@@ -379,7 +330,6 @@ function GridVisualizerDropLayer( {
 	setDropTarget,
 } ) {
 	const layerRef = useRef();
-	const grabRef = useRef( null );
 	const lastTargetRef = useRef( null );
 	const {
 		getBlockAttributes,
@@ -395,27 +345,6 @@ function GridVisualizerDropLayer( {
 		gridClientId,
 		gridInfo.numColumns
 	);
-
-	// Remember which cell of a grid item was grabbed, so that cell stays
-	// under the pointer while dragging. Drags that start outside the grid
-	// (from the inserter or another container) have no offset.
-	useEffect( () => {
-		function onDragStart( event ) {
-			const gridItemElement = event.target?.closest?.( '[data-block]' );
-			if ( gridItemElement?.parentElement !== gridElement ) {
-				grabRef.current = null;
-				return;
-			}
-			grabRef.current = {
-				clientId: gridItemElement.getAttribute( 'data-block' ),
-				...getGrabOffset( event, gridElement, gridItemElement ),
-			};
-		}
-		gridElement.addEventListener( 'dragstart', onDragStart );
-		return () => {
-			gridElement.removeEventListener( 'dragstart', onDragStart );
-		};
-	}, [ gridElement ] );
 
 	function clearDropTarget() {
 		lastTargetRef.current = null;
@@ -452,6 +381,7 @@ function GridVisualizerDropLayer( {
 		// matches what is on screen in every viewport.
 		const siblings = [];
 		let srcSpan = null;
+		let srcPixelRect = null;
 		for ( const child of gridElement.children ) {
 			const childClientId = child.getAttribute( 'data-block' );
 			if ( ! childClientId || ! child.offsetParent ) {
@@ -465,6 +395,7 @@ function GridVisualizerDropLayer( {
 			);
 			if ( childClientId === srcClientId ) {
 				srcSpan = rect;
+				srcPixelRect = pixelRect;
 				continue;
 			}
 			siblings.push( { pixelRect, rect } );
@@ -475,10 +406,9 @@ function GridVisualizerDropLayer( {
 
 		const layerRect = layer.getBoundingClientRect();
 		const scale = layer.offsetWidth / layerRect.width || 1;
-		const grabOffset =
-			grabRef.current?.clientId === srcClientId
-				? grabRef.current
-				: { column: 0, row: 0 };
+		// The pointer is the centre of the block. Its size is measured
+		// without rotation, so a rotated block lands by the cells it takes up.
+		// Blocks dragged in from elsewhere are the size of the cells they span.
 		const landing = getGridDropTarget( {
 			x: ( event.clientX - layerRect.left ) * scale,
 			y: ( event.clientY - layerRect.top ) * scale,
@@ -486,7 +416,12 @@ function GridVisualizerDropLayer( {
 			rowTracks,
 			columnSpan,
 			rowSpan,
-			grabOffset,
+			width: srcPixelRect
+				? srcPixelRect.right - srcPixelRect.left
+				: undefined,
+			height: srcPixelRect
+				? srcPixelRect.bottom - srcPixelRect.top
+				: undefined,
 		} );
 
 		const lastTarget = lastTargetRef.current;
