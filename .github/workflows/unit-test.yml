@@ -34,14 +34,8 @@ jobs:
             fail-fast: false
             matrix:
                 event: ['${{ github.event_name }}']
-                node: ['20', '22', '24']
+                node: ['24']
                 shard: ['1/4', '2/4', '3/4', '4/4']
-                exclude:
-                    # On PRs: Only test Node 20
-                    - event: 'pull_request'
-                      node: '22'
-                    - event: 'pull_request'
-                      node: '24'
 
         steps:
             - name: Checkout repository
@@ -86,13 +80,7 @@ jobs:
             fail-fast: false
             matrix:
                 event: ['${{ github.event_name }}']
-                node: ['20', '22', '24']
-                exclude:
-                    # On PRs: Only test Node 20
-                    - event: 'pull_request'
-                      node: '22'
-                    - event: 'pull_request'
-                      node: '24'
+                node: ['24']
 
         steps:
             - name: Checkout repository
@@ -383,38 +371,3 @@ jobs:
             - name: Mark the job as passed if all the checks pass
               if: ${{ needs.test-php.result == 'success' && needs.phpcs.result == 'success' }}
               run: exit 0
-
-    mobile-unit-js:
-        name: Mobile
-        runs-on: 'ubuntu-24.04'
-        permissions:
-            contents: read
-        # React 19 breaks these tests, and upgrading React Native to a compatible version is paused.
-        # See: https://github.com/WordPress/gutenberg/issues/71336
-        if: false
-        #if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
-
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
-              with:
-                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
-                  persist-credentials: false
-
-            - name: Determine the number of CPU cores
-              uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
-              id: cpu-cores
-
-            - name: Setup Node.js and install dependencies
-              uses: ./.github/setup-node
-
-            - name: Run build scripts
-              # It's not necessary to run the full build, since Jest can interpret
-              # source files with `babel-jest`. Some packages have their own custom
-              # build tasks, however. These must be run.
-              run: npx lerna run build
-
-            - name: Running the tests
-              env:
-                  MAXWORKERS: ${{ steps.cpu-cores.outputs.count }}
-              run: npm run test:native -- --ci --maxWorkers="$MAXWORKERS" --cacheDirectory="$HOME/.jest-cache"

@@ -15,8 +15,19 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=20.10.0",
-		"npm": ">=10.2.3"
+		"node": ">=24.18.0",
+		"npm": ">=11.18.0"
+	},
+	"devEngines": {
+		"runtime": {
+			"name": "node",
+			"version": ">=24.18.0"
+		},
+		"packageManager": {
+			"name": "npm",
+			"version": ">=11.18.0",
+			"onFail": "error"
+		}
 	},
 	"wpPlugin": {
 		"name": "gutenberg",
@@ -165,7 +176,6 @@
 		"prelint:php": "npm run other:update-packages:php",
 		"lint:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script lint",
 		"lint:pkg-json": "wp-scripts lint-pkg-json . 'packages/*/package.json'",
-		"native": "npm run --prefix packages/react-native-editor",
 		"other:changelog": "node ./bin/plugin/cli.js changelog",
 		"other:check-licenses": "concurrently \"node ./bin/check-licenses.mjs\" \"wp-scripts check-licenses --dev\"",
 		"preother:check-local-changes": "npm run docs:build && npm run --workspace @wordpress/theme build",
@@ -173,7 +183,7 @@
 		"other:cherry-pick": "node ./bin/cherry-pick.mjs",
 		"other:generate-php-sync-issue": "node ./bin/generate-php-sync-issue.mjs",
 		"other:update-packages:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer update --no-interaction",
-		"postinstall": "patch-package && node ./patches/patch-xcode.js",
+		"postinstall": "patch-package",
 		"prepare": "husky install",
 		"prepublishOnly": "npm run build",
 		"start": "npm run dev",
@@ -189,13 +199,6 @@
 		"test:e2e:playwright:debug": "npm run test:e2e:debug",
 		"test:e2e:storybook": "playwright test --config test/storybook-playwright/playwright.config.ts",
 		"test:e2e:watch": "npm run test:e2e -- --watch",
-		"test:native": "cross-env NODE_ENV=test jest --config test/native/jest.config.js",
-		"test:native:watch": "npm run test:native -- --watch",
-		"test:native:clean": "jest --clearCache --config test/native/jest.config.js; rm -rf $TMPDIR/jest_*",
-		"test:native:debug": "cross-env NODE_ENV=test node --inspect-brk node_modules/.bin/jest --runInBand --verbose --config test/native/jest.config.js",
-		"test:native:perf": "cross-env TEST_RUNNER_ARGS='--runInBand --config test/native/jest.config.js --testMatch \"**/performance/*.native.[jt]s?(x)\"' reassure",
-		"test:native:perf:baseline": "cross-env TEST_RUNNER_ARGS='--runInBand --config test/native/jest.config.js --testMatch \"**/performance/*.native.[jt]s?(x)\"' reassure --baseline",
-		"test:native:update": "npm run test:native -- --updateSnapshot",
 		"test:performance": "wp-scripts test-playwright --config test/performance/playwright.config.ts",
 		"test:performance:debug": "wp-scripts test-playwright --config test/performance/playwright.config.ts --debug",
 		"test:php": "npm-run-all lint:php test:unit:php",
@@ -253,6 +256,19 @@
 	"workspaces": [
 		"packages/*",
 		"routes/*",
-		"storybook"
-	]
+		"storybook",
+		"!packages/react-native-*"
+	],
+	"allowScripts": {
+		"@parcel/watcher": false,
+		"@swc/core": false,
+		"core-js": false,
+		"core-js-pure": false,
+		"esbuild": false,
+		"fs-ext": false,
+		"fsevents": false,
+		"husky": false,
+		"nx": false,
+		"unrs-resolver": false
+	}
 }
