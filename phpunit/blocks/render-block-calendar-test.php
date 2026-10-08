@@ -13,10 +13,8 @@
  */
 class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 
-	public function set_up() {
-		parent::set_up();
-
-		self::factory()->post->create( array( 'post_status' => 'publish' ) );
+	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
+		$factory->post->create( array( 'post_status' => 'publish' ) );
 	}
 
 	/**
