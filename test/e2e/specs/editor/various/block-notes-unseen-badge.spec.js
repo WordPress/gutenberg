@@ -216,18 +216,41 @@ test.describe( 'Notes: unseen badge', () => {
 		const badge = page.locator( '.interface-complementary-area__badge' );
 		await expect( badge ).toHaveText( '1' );
 
-		// Authoring a note selects the 'new' form, which is not reading
-		// anybody else's note.
-		await editor.canvas
-			.getByRole( 'document', { name: 'Block: Paragraph' } )
-			.first()
-			.click();
+		/*
+		 * Authoring a note selects the 'new' form, which is not reading
+		 * anybody else's note. Use a block of its own: selecting the noted
+		 * paragraph would select the collaborator's thread, which does count.
+		 */
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'My paragraph' },
+		} );
 		await editor.clickBlockOptionsMenuItem( 'Add note' );
 		await expect(
 			page.getByRole( 'textbox', { name: 'New note', exact: true } )
 		).toBeFocused();
 
 		await expect( badge ).toHaveText( '1' );
+	} );
+
+	test( 'hides the badge on mobile, where the toggle it sits on is hidden', async ( {
+		admin,
+		page,
+		notesUtils,
+	} ) => {
+		const { postId } = await notesUtils.createPostWithNotes( [
+			{ author: collaboratorId, content: 'Seen on a phone' },
+		] );
+
+		await admin.editPost( postId );
+
+		const badge = page.locator( '.interface-complementary-area__badge' );
+		await expect( badge ).toHaveText( '1' );
+
+		// Pinned toggles are hidden below the small breakpoint, so a badge
+		// left behind would float over nothing that opens the sidebar.
+		await page.setViewportSize( { width: 400, height: 800 } );
+		await expect( badge ).toBeHidden();
 	} );
 
 	test( 'does not count resolved threads', async ( {
