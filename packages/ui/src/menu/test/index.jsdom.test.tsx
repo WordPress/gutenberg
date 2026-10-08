@@ -71,6 +71,65 @@ function queryExternalLinkIndicator( item: HTMLElement ) {
 }
 
 describe( 'Menu', () => {
+	it( 'keeps a popup portaled into an iframe open for inside presses and closes it for outside presses', async () => {
+		const user = userEvent.setup();
+		const iframe = document.createElement( 'iframe' );
+		document.body.appendChild( iframe );
+		const iframeDocument = iframe.contentDocument;
+
+		if ( ! iframeDocument ) {
+			throw new Error( 'Expected a same-origin iframe document.' );
+		}
+
+		try {
+			const outsideTarget = iframeDocument.createElement( 'button' );
+			iframeDocument.body.appendChild( outsideTarget );
+
+			render(
+				<Menu.Root modal={ false }>
+					<Menu.Trigger>Actions</Menu.Trigger>
+					<Menu.Popup
+						portal={
+							<Menu.Portal container={ iframeDocument.body } />
+						}
+					>
+						<Menu.Item>
+							<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+						</Menu.Item>
+					</Menu.Popup>
+				</Menu.Root>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Actions' } )
+			);
+			const portaledMenu = await within( iframeDocument.body ).findByRole(
+				'menu'
+			);
+			const item = within( portaledMenu ).getByRole( 'menuitem', {
+				name: 'Duplicate',
+			} );
+
+			act( () => {
+				item.dispatchEvent(
+					new MouseEvent( 'pointerdown', { bubbles: true } )
+				);
+			} );
+			expect( portaledMenu ).toBeVisible();
+
+			act( () => {
+				outsideTarget.dispatchEvent(
+					new MouseEvent( 'pointerdown', { bubbles: true } )
+				);
+			} );
+			await waitFor( () => {
+				expect( portaledMenu ).not.toBeInTheDocument();
+			} );
+		} finally {
+			iframe.remove();
+		}
+	} );
+
 	it( 'renders prefix icons at 16px by default', () => {
 		render( <Menu.PrefixIcon icon={ <svg /> } role="img" /> );
 

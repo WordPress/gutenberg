@@ -35,6 +35,44 @@ afterEach( () => {
 } );
 
 describe( 'Menu', () => {
+	it( 'keeps the popup open when clicking inside an iframe contained by it', async () => {
+		const onFrameClick = vi.fn();
+		await render(
+			<Menu.Root modal={ false }>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.Item>
+						<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+					</Menu.Item>
+					<iframe title="Popup frame" />
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Actions' } )
+		);
+		await expect.element( page.getByRole( 'menu' ) ).toBeVisible();
+
+		const iframe = screen.getByTitle< HTMLIFrameElement >( 'Popup frame' );
+		const iframeDocument = iframe.contentDocument;
+		if ( ! iframeDocument ) {
+			throw new Error( 'Expected a same-origin iframe document.' );
+		}
+		const button = iframeDocument.createElement( 'button' );
+		button.textContent = 'Inside popup';
+		button.addEventListener( 'click', onFrameClick );
+		iframeDocument.body.appendChild( button );
+
+		await page
+			.frameLocator( page.getByTitle( 'Popup frame' ) )
+			.getByRole( 'button', { name: 'Inside popup' } )
+			.click();
+
+		expect( onFrameClick ).toHaveBeenCalledTimes( 1 );
+		await expect.element( page.getByRole( 'menu' ) ).toBeVisible();
+	} );
+
 	it( 'closes a non-modal menu without consuming an iframe pointer interaction', async () => {
 		const user = userEvent;
 		const onCanvasClick = vi.fn();
