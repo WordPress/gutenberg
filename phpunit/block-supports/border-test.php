@@ -458,4 +458,180 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 
 		$this->assertSame( $expected, $actual );
 	}
+
+	public function test_split_borders_with_color_support_only_keep_side_style() {
+		$block_type  = self::register_bordered_block_with_support(
+			'test/split-borders-with-color-support-only',
+			array(
+				'__experimentalBorder' => array(
+					'color' => true,
+				),
+			)
+		);
+		$block_attrs = array(
+			'style' => array(
+				'border' => array(
+					'style' => 'solid',
+					'top'   => array(
+						'color' => '#72aee6',
+						'style' => 'dashed',
+					),
+				),
+			),
+		);
+		$actual      = gutenberg_apply_border_support( $block_type, $block_attrs );
+		$expected    = array(
+			'style' => 'border-top-color:#72aee6;border-top-style:dashed;',
+		);
+
+		$this->assertSame( $expected, $actual );
+	}
+
+	public function test_split_borders_with_width_support_only_keep_side_color() {
+		$block_type  = self::register_bordered_block_with_support(
+			'test/split-borders-with-width-support-only',
+			array(
+				'__experimentalBorder' => array(
+					'width' => true,
+				),
+			)
+		);
+		$block_attrs = array(
+			'borderColor' => 'red',
+			'style'       => array(
+				'border' => array(
+					'top' => array(
+						'color' => '#72aee6',
+						'width' => '2px',
+					),
+				),
+			),
+		);
+		$actual      = gutenberg_apply_border_support( $block_type, $block_attrs );
+		$expected    = array(
+			'style' => 'border-top-width:2px;border-top-color:#72aee6;',
+		);
+
+		$this->assertSame( $expected, $actual );
+	}
+
+	/**
+	 * @dataProvider data_get_border_classes_and_styles
+	 *
+	 * @param mixed $block_attributes Block attributes.
+	 * @param array $expected         Expected classes and styles.
+	 */
+	public function test_get_border_classes_and_styles( $block_attributes, $expected ) {
+		$this->assertSame( $expected, gutenberg_get_border_classes_and_styles( $block_attributes ) );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_get_border_classes_and_styles() {
+		return array(
+			'custom'              => array(
+				'block_attributes' => array(
+					'style' => array(
+						'border' => array(
+							'radius' => '10px',
+							'style'  => 'solid',
+							'width'  => '2px',
+							'color'  => '#ff0000',
+							'top'    => array(
+								'style' => 'dashed',
+								'color' => '#00ff00',
+								'width' => '3px',
+							),
+						),
+					),
+				),
+				'expected'         => array(
+					'class' => 'has-border-color',
+					'style' => 'border-color:#ff0000;border-radius:10px;border-style:solid;border-width:2px;border-top-width:3px;border-top-color:#00ff00;border-top-style:dashed;',
+				),
+			),
+			'preset'              => array(
+				'block_attributes' => array(
+					'borderColor' => 'red',
+					'style'       => array(
+						'border' => array(
+							'color' => '#ff0000',
+						),
+					),
+				),
+				'expected'         => array(
+					'class' => 'has-border-color has-red-border-color',
+				),
+			),
+			'preset only'         => array(
+				'block_attributes' => array(
+					'borderColor' => 'red',
+				),
+				'expected'         => array(
+					'class' => 'has-border-color has-red-border-color',
+				),
+			),
+			'numeric'             => array(
+				'block_attributes' => array(
+					'style' => array(
+						'border' => array(
+							'radius' => 5,
+							'width'  => 2,
+						),
+					),
+				),
+				'expected'         => array(
+					'style' => 'border-radius:5px;border-width:2px;',
+				),
+			),
+			'zero'                => array(
+				'block_attributes' => array(
+					'style' => array(
+						'border' => array(
+							'radius' => 0,
+							'width'  => 0,
+						),
+					),
+				),
+				'expected'         => array(
+					'style' => 'border-radius:0px;border-width:0px;',
+				),
+			),
+			'empty'               => array(
+				'block_attributes' => array(),
+				'expected'         => array(),
+			),
+			'malformed border'    => array(
+				'block_attributes' => array(
+					'style' => array(
+						'border' => 'solid',
+					),
+				),
+				'expected'         => array(),
+			),
+			'malformed side'      => array(
+				'block_attributes' => array(
+					'style' => array(
+						'border' => array(
+							'top' => '1px solid',
+						),
+					),
+				),
+				'expected'         => array(),
+			),
+			'malformed style'     => array(
+				'block_attributes' => array(
+					'style' => 'border:1px solid',
+				),
+				'expected'         => array(),
+			),
+			'malformed non-array' => array(
+				'block_attributes' => 'border',
+				'expected'         => array(),
+			),
+		);
+	}
 }
