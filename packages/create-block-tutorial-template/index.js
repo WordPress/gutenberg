@@ -12,12 +12,6 @@ module.exports = {
 		description:
 			'A Gutenberg block to show your pride! This block enables you to type text and style it with the color font Gilbert from Type with Pride.',
 		dashicon: 'flag',
-		npmDependencies: [
-			'@wordpress/block-editor',
-			'@wordpress/blocks',
-			'@wordpress/components',
-			'@wordpress/i18n',
-		],
 	},
 	templatesPath: join( __dirname, 'templates' ),
 	assetsPath: join( __dirname, 'assets' ),
