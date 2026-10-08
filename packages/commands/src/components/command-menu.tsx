@@ -1,4 +1,5 @@
 import { Command, useCommandState } from 'cmdk';
+import type { JSX } from 'react';
 import clsx from 'clsx';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -27,6 +28,14 @@ import {
 	useLoaderCollector,
 	useRecentCommands,
 } from './use-recent-commands';
+import type { CommandCategory } from '../store/types';
+import type {
+	CommandInputProps,
+	CommandItemProps,
+	CommandListProps,
+	CommandMenuLoaderProps,
+	RecentLoaderRunnerProps,
+} from './types';
 
 // Namespaces item ids to avoid collisions with other elements on the page.
 const ITEM_ID_PREFIX = 'command-palette-item-';
@@ -37,14 +46,16 @@ const inputLabel = __( 'Search commands and settings' );
  * its own. Navigating somewhere reads the same way across the palette, so `view`
  * commands are expected to rely on this rather than pass an icon.
  */
-const CATEGORY_FALLBACK_ICONS = {
+const CATEGORY_FALLBACK_ICONS: Partial<
+	Record< CommandCategory, JSX.Element >
+> = {
 	view: arrowRight,
 };
 
 /**
  * Translatable labels for command categories.
  */
-const CATEGORY_LABELS = {
+const CATEGORY_LABELS: Record< CommandCategory, string > = {
 	command: __( 'Command' ),
 	view: __( 'View' ),
 	edit: __( 'Edit' ),
@@ -57,12 +68,12 @@ const CATEGORY_LABELS = {
  * Taken from @wordpress/blocks/src/api/utils.js and copied
  * in case requirements diverge and to avoid a dependency on @wordpress/blocks.
  *
- * @param {*} icon Parameter to be checked.
+ * @param icon Parameter to be checked.
  *
- * @return {boolean} True if the parameter is a valid icon and false otherwise.
+ * @return True if the parameter is a valid icon and false otherwise.
  */
 
-export function isValidIcon( icon ) {
+export function isValidIcon( icon: unknown ): boolean {
 	return (
 		!! icon &&
 		( typeof icon === 'string' ||
@@ -72,10 +83,17 @@ export function isValidIcon( icon ) {
 	);
 }
 
-function CommandItem( { command, search, category, valuePrefix } ) {
+function CommandItem( {
+	command,
+	search,
+	category,
+	valuePrefix,
+}: CommandItemProps ) {
 	const { close } = useDispatch( commandsStore );
 	const commandCategory = category ?? command.category;
-	const icon = command.icon ?? CATEGORY_FALLBACK_ICONS[ commandCategory ];
+	const icon =
+		command.icon ??
+		CATEGORY_FALLBACK_ICONS[ commandCategory as CommandCategory ];
 	const label = command.searchLabel ?? command.label;
 	const value = valuePrefix ? `${ valuePrefix }${ command.name }` : label;
 	return (
@@ -99,16 +117,20 @@ function CommandItem( { command, search, category, valuePrefix } ) {
 					'has-icon': !! icon,
 				} ) }
 			>
-				{ isValidIcon( icon ) && <Icon icon={ icon } /> }
+				{ isValidIcon( icon ) && <Icon icon={ icon! } /> }
 				<span className="commands-command-menu__item-label">
 					<TextHighlight
 						text={ command.label }
 						highlight={ search }
 					/>
 				</span>
-				{ CATEGORY_LABELS[ commandCategory ] && (
+				{ CATEGORY_LABELS[ commandCategory as CommandCategory ] && (
 					<span className="commands-command-menu__item-category">
-						{ CATEGORY_LABELS[ commandCategory ] }
+						{
+							CATEGORY_LABELS[
+								commandCategory as CommandCategory
+							]
+						}
 					</span>
 				) }
 			</HStack>
@@ -116,7 +138,13 @@ function CommandItem( { command, search, category, valuePrefix } ) {
 	);
 }
 
-function CommandMenuLoader( { name, search, hook, category, valuePrefix } ) {
+function CommandMenuLoader( {
+	name,
+	search,
+	hook,
+	category,
+	valuePrefix,
+}: CommandMenuLoaderProps ) {
 	const { setLoaderLoading } = unlock( useDispatch( commandsStore ) );
 	const { isLoading: loading, commands = [] } = hook( { search } ) ?? {};
 	useEffect( () => {
@@ -142,7 +170,10 @@ function CommandMenuLoader( { name, search, hook, category, valuePrefix } ) {
 	);
 }
 
-function CommandMenuLoaderWrapper( { hook, ...props } ) {
+function CommandMenuLoaderWrapper( {
+	hook,
+	...props
+}: CommandMenuLoaderProps ) {
 	// The "hook" prop is actually a custom React hook
 	// so to avoid breaking the rules of hooks
 	// the CommandMenuLoaderWrapper component need to be
@@ -165,7 +196,12 @@ function CommandMenuLoaderWrapper( { hook, ...props } ) {
 	);
 }
 
-function CommandList( { search, commands, loaders, valuePrefix } ) {
+function CommandList( {
+	search,
+	commands,
+	loaders,
+	valuePrefix,
+}: CommandListProps ) {
 	return (
 		<>
 			{ commands.map( ( command ) => (
@@ -190,7 +226,12 @@ function CommandList( { search, commands, loaders, valuePrefix } ) {
 	);
 }
 
-function RecentLoaderRunner( { hook, name, filterNames, onResolved } ) {
+function RecentLoaderRunner( {
+	hook,
+	name,
+	filterNames,
+	onResolved,
+}: RecentLoaderRunnerProps ) {
 	useLoaderCollector( hook, name, filterNames, onResolved );
 	return null;
 }
@@ -241,7 +282,7 @@ function SuggestionsGroup() {
 	);
 }
 
-function ResultsGroup( { search } ) {
+function ResultsGroup( { search }: { search: string } ) {
 	const { commands, contextualCommands, loaders, contextualLoaders } =
 		useSelect( ( select ) => {
 			const { getCommands, getCommandLoaders } = select( commandsStore );
@@ -269,13 +310,13 @@ function ResultsGroup( { search } ) {
 	);
 }
 
-function CommandInput( { search, setSearch } ) {
-	const commandMenuInput = useRef();
+function CommandInput( { search, setSearch }: CommandInputProps ) {
+	const commandMenuInput = useRef< HTMLInputElement >( null );
 	const _value = useCommandState( ( state ) => state.value );
 	const selectedItemId = _value ? `${ ITEM_ID_PREFIX }${ _value }` : null;
 	useEffect( () => {
 		// Focus the command palette input when mounting the modal.
-		commandMenuInput.current.focus();
+		commandMenuInput.current!.focus();
 	}, [] );
 	return (
 		<Command.Input
@@ -283,7 +324,7 @@ function CommandInput( { search, setSearch } ) {
 			value={ search }
 			onValueChange={ setSearch }
 			placeholder={ inputLabel }
-			aria-activedescendant={ selectedItemId }
+			aria-activedescendant={ selectedItemId as string }
 		/>
 	);
 }
@@ -317,8 +358,7 @@ export function CommandMenu() {
 
 	useShortcut(
 		'core/commands',
-		/** @type {React.KeyboardEventHandler} */
-		withIgnoreIMEEvents( ( event ) => {
+		withIgnoreIMEEvents( ( event: KeyboardEvent ) => {
 			// Bails to avoid obscuring the effect of the preceding handler(s).
 			if ( event.defaultPrevented ) {
 				return;
@@ -330,10 +370,7 @@ export function CommandMenu() {
 			} else {
 				open();
 			}
-		} ),
-		{
-			bindGlobal: true,
-		}
+		} )
 	);
 
 	const closeAndReset = () => {

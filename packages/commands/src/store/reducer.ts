@@ -1,14 +1,18 @@
 import { combineReducers } from '@wordpress/data';
+import type { Action, State } from './types';
 
 /**
  * Reducer returning the registered commands
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-function commands( state = {}, action ) {
+function commands(
+	state: State[ 'commands' ] = {},
+	action: Action
+): State[ 'commands' ] {
 	switch ( action.type ) {
 		case 'REGISTER_COMMAND':
 			return {
@@ -36,12 +40,15 @@ function commands( state = {}, action ) {
 /**
  * Reducer returning the command loaders
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-function commandLoaders( state = {}, action ) {
+function commandLoaders(
+	state: State[ 'commandLoaders' ] = {},
+	action: Action
+): State[ 'commandLoaders' ] {
 	switch ( action.type ) {
 		case 'REGISTER_COMMAND_LOADER':
 			return {
@@ -65,12 +72,12 @@ function commandLoaders( state = {}, action ) {
 /**
  * Reducer returning the command palette open state.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {boolean} Updated state.
+ * @return Updated state.
  */
-function isOpen( state = false, action ) {
+function isOpen( state: boolean = false, action: Action ): boolean {
 	switch ( action.type ) {
 		case 'OPEN':
 			return true;
@@ -84,12 +91,12 @@ function isOpen( state = false, action ) {
 /**
  * Reducer returning the command palette's active context.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {boolean} Updated state.
+ * @return Updated state.
  */
-function context( state = 'root', action ) {
+function context( state: string = 'root', action: Action ): string {
 	switch ( action.type ) {
 		case 'SET_CONTEXT':
 			return action.context;
@@ -98,7 +105,10 @@ function context( state = 'root', action ) {
 	return state;
 }
 
-function loaderStates( state = {}, action ) {
+function loaderStates(
+	state: State[ 'loaderStates' ] = {},
+	action: Action
+): State[ 'loaderStates' ] {
 	switch ( action.type ) {
 		case 'SET_LOADER_LOADING':
 			return {

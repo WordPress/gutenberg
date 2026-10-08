@@ -1,3 +1,9 @@
+import type {
+	CommandCategory,
+	CommandConfig,
+	CommandLoaderConfig,
+} from './types';
+
 /** @typedef {import('@wordpress/keycodes').WPKeycodeModifier} WPKeycodeModifier */
 
 /**
@@ -11,7 +17,7 @@
  *
  * @type {Set<WPCommandCategory>}
  */
-const REGISTERABLE_CATEGORIES = new Set( [
+const REGISTERABLE_CATEGORIES = new Set< CommandCategory >( [
 	'command',
 	'view',
 	'edit',
@@ -57,7 +63,7 @@ const REGISTERABLE_CATEGORIES = new Set( [
  *
  * @return {Object} action.
  */
-export function registerCommand( config ) {
+export function registerCommand( config: CommandConfig ) {
 	let { category } = config;
 
 	// Defaults to 'action' if no category is provided or if the category is invalid. Future versions will emit a warning.
@@ -66,7 +72,7 @@ export function registerCommand( config ) {
 	}
 
 	return {
-		type: 'REGISTER_COMMAND',
+		type: 'REGISTER_COMMAND' as const,
 		...config,
 		category,
 	};
@@ -79,9 +85,9 @@ export function registerCommand( config ) {
  *
  * @return {Object} action.
  */
-export function unregisterCommand( name ) {
+export function unregisterCommand( name: string ) {
 	return {
-		type: 'UNREGISTER_COMMAND',
+		type: 'UNREGISTER_COMMAND' as const,
 		name,
 	};
 }
@@ -93,7 +99,7 @@ export function unregisterCommand( name ) {
  *
  * @return {Object} action.
  */
-export function registerCommandLoader( config ) {
+export function registerCommandLoader( config: CommandLoaderConfig ) {
 	let { category } = config;
 
 	// Defaults to 'action' if no category is provided or if the category is invalid. Future versions will emit a warning.
@@ -102,7 +108,7 @@ export function registerCommandLoader( config ) {
 	}
 
 	return {
-		type: 'REGISTER_COMMAND_LOADER',
+		type: 'REGISTER_COMMAND_LOADER' as const,
 		...config,
 		category,
 	};
@@ -115,9 +121,9 @@ export function registerCommandLoader( config ) {
  *
  * @return {Object} action.
  */
-export function unregisterCommandLoader( name ) {
+export function unregisterCommandLoader( name: string ) {
 	return {
-		type: 'UNREGISTER_COMMAND_LOADER',
+		type: 'UNREGISTER_COMMAND_LOADER' as const,
 		name,
 	};
 }
@@ -129,7 +135,7 @@ export function unregisterCommandLoader( name ) {
  */
 export function open() {
 	return {
-		type: 'OPEN',
+		type: 'OPEN' as const,
 	};
 }
 
@@ -140,6 +146,6 @@ export function open() {
  */
 export function close() {
 	return {
-		type: 'CLOSE',
+		type: 'CLOSE' as const,
 	};
 }

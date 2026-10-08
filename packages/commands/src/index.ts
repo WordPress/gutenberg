@@ -3,3 +3,9 @@ export { privateApis } from './private-apis';
 export { useCommand, useCommands } from './hooks/use-command';
 export { default as useCommandLoader } from './hooks/use-command-loader';
 export { store } from './store';
+export type {
+	CommandCategory,
+	CommandConfig,
+	CommandLoaderConfig,
+	CommandLoaderHook,
+} from './store/types';

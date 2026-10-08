@@ -10,6 +10,7 @@
 		{ "path": "./tsconfig.build.json" },
 		{ "path": "../a11y/tsconfig.build.json" },
 		{ "path": "../admin-ui/tsconfig.build.json" },
+		{ "path": "../commands" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../data" },
 		{ "path": "../dataviews/tsconfig.build.json" },

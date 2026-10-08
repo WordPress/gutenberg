@@ -5,9 +5,9 @@
  *
  * @return {Object} action.
  */
-export function setContext( context ) {
+export function setContext( context: string ) {
 	return {
-		type: 'SET_CONTEXT',
+		type: 'SET_CONTEXT' as const,
 		context,
 	};
 }
@@ -20,9 +20,12 @@ export function setContext( context ) {
  *
  * @return {Object} action.
  */
-export function setLoaderLoading( name, isLoading ) {
+export function setLoaderLoading(
+	name: string,
+	isLoading: boolean | undefined
+) {
 	return {
-		type: 'SET_LOADER_LOADING',
+		type: 'SET_LOADER_LOADING' as const,
 		name,
 		isLoading,
 	};
