@@ -91,9 +91,14 @@ function CommandItem( {
 }: CommandItemProps ) {
 	const { close } = useDispatch( commandsStore );
 	const commandCategory = category ?? command.category;
+	const categoryLabel = commandCategory
+		? CATEGORY_LABELS[ commandCategory ]
+		: undefined;
 	const icon =
 		command.icon ??
-		CATEGORY_FALLBACK_ICONS[ commandCategory as CommandCategory ];
+		( commandCategory
+			? CATEGORY_FALLBACK_ICONS[ commandCategory ]
+			: undefined );
 	const label = command.searchLabel ?? command.label;
 	const value = valuePrefix ? `${ valuePrefix }${ command.name }` : label;
 	return (
@@ -124,13 +129,9 @@ function CommandItem( {
 						highlight={ search }
 					/>
 				</span>
-				{ CATEGORY_LABELS[ commandCategory as CommandCategory ] && (
+				{ categoryLabel && (
 					<span className="commands-command-menu__item-category">
-						{
-							CATEGORY_LABELS[
-								commandCategory as CommandCategory
-							]
-						}
+						{ categoryLabel }
 					</span>
 				) }
 			</HStack>
@@ -324,7 +325,7 @@ function CommandInput( { search, setSearch }: CommandInputProps ) {
 			value={ search }
 			onValueChange={ setSearch }
 			placeholder={ inputLabel }
-			aria-activedescendant={ selectedItemId as string }
+			aria-activedescendant={ selectedItemId ?? undefined }
 		/>
 	);
 }
@@ -379,7 +380,7 @@ export function CommandMenu() {
 	};
 
 	if ( ! paletteIsOpen ) {
-		return false;
+		return null;
 	}
 
 	return (

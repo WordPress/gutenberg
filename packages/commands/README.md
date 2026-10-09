@@ -99,6 +99,10 @@ Configuration of a command loader registered with `useCommandLoader`.
 
 A hook that receives the search term and returns the matching commands and whether they are still loading.
 
+### RegisterableCommandCategory
+
+The categories a command or command loader can be registered with: `command`, `view`, `edit` or `action`.
+
 ### store
 
 Store definition for the commands namespace.

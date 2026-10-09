@@ -10,6 +10,12 @@ export { store } from './store';
 export type { CommandCategory } from './store/types';
 
 /**
+ * The categories a command or command loader can be registered with:
+ * `command`, `view`, `edit` or `action`.
+ */
+export type { RegisterableCommandCategory } from './store/types';
+
+/**
  * Configuration of a command registered with `useCommand` or `useCommands`.
  */
 export type { CommandConfig } from './store/types';

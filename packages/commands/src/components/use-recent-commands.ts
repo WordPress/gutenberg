@@ -127,7 +127,7 @@ export function useRecentCommands() {
 	// Return in recency order.
 	const commands = recentNames
 		.map( ( n ) => allByName.get( n ) )
-		.filter( Boolean ) as CommandConfig[];
+		.filter( ( c ): c is CommandConfig => !! c );
 
 	return { commands, loaders, recentSet, onResolved };
 }
