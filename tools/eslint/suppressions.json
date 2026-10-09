@@ -8028,11 +8028,8 @@
 			"count": 1
 		}
 	},
-	"packages/workflow/src/components/workflow-menu.jsx": {
+	"packages/workflow/src/components/workflow-menu.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
