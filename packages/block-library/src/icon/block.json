@@ -42,6 +42,9 @@
 		"interactivity": {
 			"clientNavigation": true
 		},
+		"shadow": {
+			"__experimentalSkipSerialization": true
+		},
 		"__experimentalBorder": {
 			"color": true,
 			"radius": true,
@@ -75,6 +78,7 @@
 	"selectors": {
 		"root": ".wp-block-icon svg",
 		"css": ".wp-block-icon",
+		"shadow": ".wp-block-icon svg",
 		"spacing": {
 			"margin": ".wp-block-icon"
 		}

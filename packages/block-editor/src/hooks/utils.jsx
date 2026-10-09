@@ -565,8 +565,19 @@ export function createBlockEditFilter( features ) {
 							shareWithChildBlocks,
 							supportsPatternEditing,
 						} = feature;
+						// Explicit `false` hides the feature during pattern editing,
+						// even when the block is selected.
+						if (
+							context[ mayDisplayPatternEditingControlsKey ] &&
+							supportsPatternEditing === false
+						) {
+							return null;
+						}
+
 						const shouldDisplayControls =
-							( supportsPatternEditing &&
+							// Explicit `true` also shows controls for unselected blocks
+							// in the section. `undefined` uses the selection/parent rules.
+							( supportsPatternEditing === true &&
 								context[
 									mayDisplayPatternEditingControlsKey
 								] ) ||

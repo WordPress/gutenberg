@@ -2,8 +2,31 @@ import { describe, expect, it } from 'vitest';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import Icon from '..';
+import check from '../../library/check';
 
 describe( 'Icon', () => {
+	it.each( [ 16, 20, 24 ] )(
+		'renders library icons with scaling strokes at %ipx',
+		async ( size ) => {
+			await render(
+				<Icon icon={ check } size={ size } data-testid="scaled-icon" />
+			);
+
+			const icon = screen.getByTestId( 'scaled-icon' );
+			// SVG stroke geometry has no Testing Library query.
+			// eslint-disable-next-line testing-library/no-node-access
+			const shape = icon.querySelector( 'path' )!;
+			const scale = shape.getScreenCTM()!;
+
+			expect( icon.getBoundingClientRect().width ).toBe( size );
+			expect( icon.getBoundingClientRect().height ).toBe( size );
+			expect( shape ).toHaveStyle( 'vector-effect: none' );
+			expect(
+				parseFloat( getComputedStyle( shape ).strokeWidth ) * scale.a
+			).toBeCloseTo( ( 1.5 * size ) / 24 );
+		}
+	);
+
 	it( "merges consumer styles with the icon's intrinsic styles", async () => {
 		await render(
 			<Icon

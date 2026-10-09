@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
 ### Enhancements
 
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
@@ -12,6 +16,7 @@
 -   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
 -   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
 -   Replace the `cmdk` dependency with the `Autocomplete` primitive from `@wordpress/ui` ([#82504](https://github.com/WordPress/gutenberg/pull/82504)).
+-   Refactor to TypeScript ([#84311](https://github.com/WordPress/gutenberg/pull/84311)).
 
 ## 0.1.0 (2025-10-23)
 
