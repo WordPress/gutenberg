@@ -1,6 +1,7 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/breakpoints" as *;
 @use "../utils/theme-variables" as *;
+@use "../utils/composite-item";
 
 // Variant selectors use :where() to retain the single-class Emotion specificity.
 .select {
@@ -81,6 +82,9 @@ $sizes: (default, 40px, 12px), (compact, 32px, 8px), (small, 24px, 8px);
 }
 
 .popover {
+	box-sizing: border-box;
+	padding: var(--wpds-dimension-padding-xs);
+	scroll-padding: var(--wpds-dimension-padding-xs);
 	display: flex;
 	flex-direction: column;
 	background-color: $components-color-background;
@@ -111,6 +115,7 @@ $sizes: (default, 40px, 12px), (compact, 32px, 8px), (small, 24px, 8px);
 }
 
 .item {
+	border-radius: var(--wpds-border-radius-sm);
 	cursor: default;
 	display: flex;
 	align-items: center;
@@ -126,8 +131,16 @@ $sizes: (default, 40px, 12px), (compact, 32px, 8px), (small, 24px, 8px);
 		cursor: not-allowed;
 	}
 
-	&[data-active-item] {
-		background-color: $components-color-gray-300;
+	&[data-active-item]:not([aria-disabled="true"]) {
+		@include composite-item.highlight;
+
+		.item-hint {
+			color: inherit;
+		}
+	}
+
+	&[data-focus-visible] {
+		@include composite-item.focus;
 	}
 }
 

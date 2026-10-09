@@ -13,6 +13,7 @@ export function SuggestionsList<
 	T extends string | { value: string; disabled?: boolean },
 >( {
 	selectedIndex,
+	isKeyboardNavigation = false,
 	scrollIntoView,
 	match,
 	onHover,
@@ -88,6 +89,7 @@ export function SuggestionsList<
 			className="components-form-token-field__suggestions-list"
 			id={ `components-form-token-suggestions-${ instanceId }` }
 			role="listbox"
+			data-keyboard-navigation={ isKeyboardNavigation ? '' : undefined }
 		>
 			{ suggestions.map( ( suggestion, index ) => {
 				const matchText = computeSuggestionMatch( suggestion );

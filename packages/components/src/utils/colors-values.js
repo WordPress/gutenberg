@@ -15,6 +15,9 @@
 
 const white = '#fff';
 
+export const FOCUS_RING_WIDTH =
+	'var(--wpds-border-width-focus, var(--wp-admin-border-width-focus, 2px))';
+
 // Matches the grays in @wordpress/base-styles
 const GRAY = {
 	900: '#1e1e1e',
@@ -47,6 +50,12 @@ const ALERT = {
 // so JS behaves consistently with the Sass variables. Keep both the token
 // references and the fallbacks in sync with the Sass version.
 const THEME = {
+	itemHighlightBackground:
+		'var(--wpds-color-background-interactive-neutral-weak-active, #ededed)',
+	itemHighlightForeground:
+		'var(--wpds-color-foreground-interactive-neutral-active, #1e1e1e)',
+	focusStroke:
+		'var(--focus-color, var(--wpds-color-stroke-focus, var(--wp-admin-theme-color, #3858e9)))',
 	accent: `var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9))`,
 	accentDarker10: `var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6))`,
 	accentDarker20: `var(--wp-components-color-accent-darker-20, var(--wp-admin-theme-color-darker-20, #183ad6))`,
