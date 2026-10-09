@@ -47,10 +47,13 @@ const brand = tokens[ '--wpds-color-background-interactive-brand-strong' ];
 // brand.modes.default.css: '#3858e9'
 // brand.fallback: 'var(--wp-admin-theme-color, #3858e9)'
 
-const borderTokenNames = groups.border;
+const radiusTokenNames = groups.border.groups.radius.tokens;
+const fontFamilyTokenNames = groups.typography.groups[ 'font-family' ].tokens;
 ```
 
-`tokens` is keyed by semantic CSS custom property name. Each entry has `$description`, `$type`, `group`, `fallback`, and `modes.default`, containing the resolved DTCG `$value` and CSS string `css`. `groups` maps namespaces such as `border`, `color`, and `typography` to token-name arrays.
+`tokens` is keyed by semantic CSS custom property name. Each entry has `$description`, `$type`, `group`, `fallback`, and `modes.default`, containing the resolved DTCG `$value` and CSS string `css`. `group` identifies the top-level namespace, such as `border`, `color`, or `typography`.
+
+`groups` preserves the source token hierarchy, keyed by top-level namespace. Every group has a `tokens` array of CSS custom property names belonging directly to that group and a `groups` object containing its child groups. Parent token arrays do not include descendant tokens. Groups without direct tokens have an empty array, and groups without children have an empty object. Compound group names such as `surface-width` and `font-family` remain intact. Token metadata is available through `tokens[ name ]`.
 
 `modes.default` contains build-time defaults and does not reflect theme overrides. Use CSS custom properties to follow the current theme. `fallback` is the expression used by the build plugins when a token variable is unavailable and can differ from the default value, as shown above.
 

@@ -18,6 +18,11 @@ interface TokenMetadata {
 	};
 }
 
+interface TokenGroup {
+	tokens: string[];
+	groups: Record< string, TokenGroup >;
+}
+
 interface PluginTokenDataOptions {
 	filename?: string;
 	fallbacksFilename?: string;
@@ -35,7 +40,7 @@ export default function pluginTokenData( {
 		name: '@wordpress/terrazzo-plugin-token-data',
 		async build( { getTransforms, outputFile } ) {
 			const tokens: Record< string, TokenMetadata > = {};
-			const groups: Record< string, string[] > = {};
+			const groups: Record< string, TokenGroup > = {};
 			const getFallback = createTokenFallbackResolver();
 
 			// '.' is Terrazzo's identifier for the default (base) mode.
@@ -53,9 +58,8 @@ export default function pluginTokenData( {
 
 				// Resolver tokens share the resolver's source location, so group by
 				// the stable token namespace. This matches the documentation plugin.
-				const group =
-					token.token.id.split( '.' )[ 0 ]?.replace( /^wpds-/, '' ) ||
-					'unknown';
+				const [ namespace, ...path ] = token.token.id.split( '.' );
+				const group = namespace?.replace( /^wpds-/, '' ) || 'unknown';
 
 				const css = typeof token.value === 'string' ? token.value : '';
 
@@ -72,8 +76,16 @@ export default function pluginTokenData( {
 					},
 				};
 
-				groups[ group ] ??= [];
-				groups[ group ].push( token.localID );
+				groups[ group ] ??= { tokens: [], groups: {} };
+				let currentGroup = groups[ group ];
+				for ( const segment of path.slice( 0, -1 ) ) {
+					currentGroup.groups[ segment ] ??= {
+						tokens: [],
+						groups: {},
+					};
+					currentGroup = currentGroup.groups[ segment ];
+				}
+				currentGroup.tokens.push( token.localID );
 			}
 
 			outputFile(
