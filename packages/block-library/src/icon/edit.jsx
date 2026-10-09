@@ -24,7 +24,7 @@ import {
 	getDimensionsClassesAndStyles as useDimensionsProps,
 } from '@wordpress/block-editor';
 import { getBlockBindingsSource } from '@wordpress/blocks';
-import { useState } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 import { SVG, Rect, Path } from '@wordpress/primitives';
 import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
@@ -67,6 +67,15 @@ export function Edit( { attributes, setAttributes, isSelected, context } ) {
 	} = attributes;
 
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
+
+	// Stable so the memoized icon grid items don't re-render.
+	const onChangeIcon = useCallback(
+		( name ) => {
+			setAttributes( { icon: name } );
+			setInserterOpen( false );
+		},
+		[ setAttributes ]
+	);
 
 	const isContentOnlyMode = useBlockEditingMode() === 'contentOnly';
 	const { isIconBindingReadOnly = false, iconBindingReadOnlyMessage } =
@@ -314,10 +323,7 @@ export function Edit( { attributes, setAttributes, isSelected, context } ) {
 				<CustomInserterModal
 					onClose={ () => setInserterOpen( false ) }
 					value={ attributes.icon }
-					onChange={ ( name ) => {
-						setAttributes( { icon: name } );
-						setInserterOpen( false );
-					} }
+					onChange={ onChangeIcon }
 				/>
 			) }
 		</>
