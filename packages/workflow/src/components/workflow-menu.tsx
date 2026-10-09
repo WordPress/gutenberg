@@ -13,6 +13,7 @@ import { executeAbility, store as abilitiesStore } from '@wordpress/abilities';
 import type { Ability } from '@wordpress/abilities';
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
 import type { AbilityRunResult } from './types';
+import { getErrorMessage } from '../utils/get-error-message';
 import './workflow-menu.scss';
 
 /**
@@ -22,34 +23,58 @@ const EMPTY_ARRAY: Ability[] = [];
 const inputLabel = __( 'Run abilities and workflows' );
 
 /**
- * Abilities can throw anything, so only a non-empty string message is shown.
- *
- * @param error The value the ability threw.
- * @return The message to show the user.
- */
-function getErrorMessage( error: unknown ): string {
-	if ( typeof error === 'string' && error ) {
-		return error;
-	}
-	if (
-		error &&
-		typeof error === 'object' &&
-		'message' in error &&
-		typeof error.message === 'string' &&
-		error.message
-	) {
-		return error.message;
-	}
-	return __( 'The ability could not be run.' );
-}
-
-/**
  * @ignore
  */
 export function WorkflowMenu() {
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
-	const [ search, setSearch ] = useState( '' );
 	const [ isOpen, setIsOpen ] = useState( false );
+
+	useEffect( () => {
+		registerShortcut( {
+			name: 'core/workflows',
+			category: 'global',
+			description: __( 'Open the workflow palette.' ),
+			keyCombination: {
+				modifier: 'primary',
+				character: 'j',
+			},
+		} );
+	}, [ registerShortcut ] );
+
+	useShortcut(
+		'core/workflows',
+		withIgnoreIMEEvents( ( event: KeyboardEvent ) => {
+			// Bails to avoid obscuring the effect of the preceding handler(s).
+			if ( event.defaultPrevented ) {
+				return;
+			}
+
+			event.preventDefault();
+			setIsOpen( ! isOpen );
+		} )
+	);
+
+	useEffect( () => {
+		if ( isOpen ) {
+			// Load @wordpress/core-abilities on demand. Importing it fetches
+			// and registers all server abilities and categories.
+			import( '@wordpress/core-abilities' );
+		}
+	}, [ isOpen ] );
+
+	if ( ! isOpen ) {
+		return null;
+	}
+
+	return <WorkflowPalette onClose={ () => setIsOpen( false ) } />;
+}
+
+/*
+ * Unmounted on close, so its state resets and a run that finishes after
+ * closing is dropped.
+ */
+function WorkflowPalette( { onClose }: { onClose: () => void } ) {
+	const [ search, setSearch ] = useState( '' );
 	const [ abilityOutput, setAbilityOutput ] =
 		useState< AbilityRunResult | null >( null );
 	const [ isExecuting, setIsExecuting ] = useState( false );
@@ -68,8 +93,8 @@ export function WorkflowMenu() {
 		const searchLower = search.toLowerCase();
 		return abilities.filter(
 			( ability ) =>
-				ability.label?.toLowerCase().includes( searchLower ) ||
-				ability.name?.toLowerCase().includes( searchLower )
+				ability.label.toLowerCase().includes( searchLower ) ||
+				ability.name.toLowerCase().includes( searchLower )
 		);
 	}, [ abilities, search ] );
 
@@ -81,53 +106,10 @@ export function WorkflowMenu() {
 	}, [ abilityOutput ] );
 
 	useEffect( () => {
-		if ( isOpen && ! abilityOutput ) {
+		if ( ! abilityOutput ) {
 			inputRef.current?.focus();
 		}
-	}, [ isOpen, abilityOutput ] );
-
-	useEffect( () => {
-		registerShortcut( {
-			name: 'core/workflows',
-			category: 'global',
-			description: __( 'Open the workflow palette.' ),
-			keyCombination: {
-				modifier: 'primary',
-				character: 'j',
-			},
-		} );
-	}, [ registerShortcut ] );
-
-	const toggleOnShortcut = useMemo(
-		() =>
-			withIgnoreIMEEvents( ( event: KeyboardEvent ) => {
-				// Bails to avoid obscuring the effect of the preceding handler(s).
-				if ( event.defaultPrevented ) {
-					return;
-				}
-
-				event.preventDefault();
-				setIsOpen( ( open ) => ! open );
-			} ),
-		[]
-	);
-
-	useShortcut( 'core/workflows', toggleOnShortcut );
-
-	useEffect( () => {
-		if ( isOpen ) {
-			// Load @wordpress/core-abilities on demand. Importing it fetches
-			// and registers all server abilities and categories.
-			import( '@wordpress/core-abilities' );
-		}
-	}, [ isOpen ] );
-
-	const closeAndReset = () => {
-		setSearch( '' );
-		setIsOpen( false );
-		setAbilityOutput( null );
-		setIsExecuting( false );
-	};
+	}, [ abilityOutput ] );
 
 	const goBack = () => {
 		setAbilityOutput( null );
@@ -170,10 +152,6 @@ export function WorkflowMenu() {
 		}
 	};
 
-	if ( ! isOpen ) {
-		return null;
-	}
-
 	const items = isExecuting ? EMPTY_ARRAY : filteredAbilities;
 	const showEmpty = ! isExecuting && !! search && ! filteredAbilities.length;
 
@@ -181,7 +159,7 @@ export function WorkflowMenu() {
 		<Modal
 			className="workflows-workflow-menu"
 			overlayClassName="workflows-workflow-menu__overlay"
-			onRequestClose={ abilityOutput ? goBack : closeAndReset }
+			onRequestClose={ abilityOutput ? goBack : onClose }
 			__experimentalHideHeader
 			contentLabel={ __( 'Workflow palette' ) }
 		>
