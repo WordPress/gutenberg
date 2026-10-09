@@ -875,7 +875,6 @@
   props:
       - children
       - className
-      - description
       - icon
       - iconPosition
       - info

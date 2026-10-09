@@ -34,15 +34,6 @@ MenuItem supports the following props. Any additional props are passed through t
 
 Element to render as child of button.
 
-### `description`
-
--   Type: `string`
--   Required: No
-
-Additional text that describes the action to assistive technologies without changing the menu item's accessible name or visible label.
-
-Refer to documentation for [Button's `description` prop](/packages/components/src/button/README.md#description).
-
 ### `disabled`
 
 -   Type: `boolean`

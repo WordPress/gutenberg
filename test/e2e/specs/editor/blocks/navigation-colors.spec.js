@@ -159,7 +159,9 @@ test.describe( 'Navigation colors', () => {
 		// Link/element colors now live in the Elements panel.
 		await editor.openDocumentSettingsSidebar();
 		await page.getByRole( 'button', { name: 'Elements options' } ).click();
-		await page.getByRole( 'menuitemcheckbox', { name: 'Link' } ).click();
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'Link, show' } )
+			.click();
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'button', { name: 'Link', exact: true } )

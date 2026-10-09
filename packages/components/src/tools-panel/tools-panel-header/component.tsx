@@ -89,15 +89,15 @@ const OptionalControlsGroup = ( {
 	return (
 		<>
 			{ items.map( ( [ label, isSelected ] ) => {
-				const itemDescription = isSelected
+				const itemLabel = isSelected
 					? sprintf(
-							// translators: %s: The name of the control being hidden and reset e.g. "Padding".
-							__( 'Hide and reset %s' ),
+							// translators: %s: The control name, e.g. "Padding". Keep the control name first, followed by the hide and reset action.
+							__( '%s, hide and reset' ),
 							label
 						)
 					: sprintf(
-							// translators: %s: The name of the control to display e.g. "Padding".
-							_x( 'Show %s', 'input control' ),
+							// translators: %s: The control name, e.g. "Padding". Keep the control name first, followed by the show action.
+							_x( '%s, show', 'input control' ),
 							label
 						);
 
@@ -106,7 +106,7 @@ const OptionalControlsGroup = ( {
 						key={ label }
 						icon={ isSelected ? check : null }
 						isSelected={ isSelected }
-						description={ itemDescription }
+						label={ itemLabel }
 						onClick={ () => {
 							if ( isSelected ) {
 								speak(

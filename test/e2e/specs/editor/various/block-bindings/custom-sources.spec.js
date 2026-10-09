@@ -75,7 +75,9 @@ test.describe( 'Registered sources', () => {
 			} );
 			await page.getByRole( 'tab', { name: 'Settings' } ).click();
 			await page.getByLabel( 'Attributes options' ).click();
-			await page.getByRole( 'menuitemcheckbox', { name: 'id' } ).click();
+			await page
+				.getByRole( 'menuitemcheckbox', { name: 'id, show' } )
+				.click();
 			const idAttribute = page.getByRole( 'button', {
 				name: 'id',
 			} );
@@ -1062,7 +1064,7 @@ test.describe( 'Registered sources', () => {
 			await page.getByLabel( 'Attributes options' ).click();
 			await page
 				.getByRole( 'menuitemcheckbox', {
-					name: 'content',
+					name: 'content, show',
 				} )
 				.click();
 			await page.getByRole( 'button', { name: 'content' } ).click();
@@ -1090,7 +1092,7 @@ test.describe( 'Registered sources', () => {
 			} );
 			await page.getByLabel( 'Attributes options' ).click();
 			const contentAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'content',
+				name: 'content, show',
 			} );
 			await expect( contentAttribute ).toBeVisible();
 		} );
@@ -1104,7 +1106,7 @@ test.describe( 'Registered sources', () => {
 			} );
 			await page.getByLabel( 'Attributes options' ).click();
 			const contentAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'content',
+				name: 'content, show',
 			} );
 			await expect( contentAttribute ).toBeVisible();
 		} );
@@ -1121,7 +1123,7 @@ test.describe( 'Registered sources', () => {
 			} );
 			await page.getByLabel( 'Attributes options' ).click();
 			const iconAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'icon',
+				name: 'icon, show',
 			} );
 			await expect( iconAttribute ).toBeVisible();
 			await iconAttribute.click();
@@ -1167,24 +1169,24 @@ test.describe( 'Registered sources', () => {
 				.click();
 			await page.getByLabel( 'Attributes options' ).click();
 			const urlAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'url',
+				name: 'url, show',
 			} );
 			await expect( urlAttribute ).toBeVisible();
 			const textAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'text',
+				name: 'text, show',
 			} );
 			await expect( textAttribute ).toBeVisible();
 			const linkTargetAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'linkTarget',
+				name: 'linkTarget, show',
 			} );
 			await expect( linkTargetAttribute ).toBeVisible();
 			const relAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'rel',
+				name: 'rel, show',
 			} );
 			await expect( relAttribute ).toBeVisible();
 			// Check not supported attributes are not included.
 			const tagNameAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'tagName',
+				name: 'tagName, show',
 			} );
 			await expect( tagNameAttribute ).toBeHidden();
 		} );
@@ -1204,24 +1206,24 @@ test.describe( 'Registered sources', () => {
 				.getByLabel( 'Attributes options' )
 				.click();
 			const urlAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'url',
+				name: 'url, show',
 			} );
 			await expect( urlAttribute ).toBeVisible();
 			const idAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'id',
+				name: 'id, show',
 			} );
 			await expect( idAttribute ).toBeVisible();
 			const titleAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'title',
+				name: 'title, show',
 			} );
 			await expect( titleAttribute ).toBeVisible();
 			const altAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'alt',
+				name: 'alt, show',
 			} );
 			await expect( altAttribute ).toBeVisible();
 			// Check not supported attributes are not included.
 			const linkClassAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'linkClass',
+				name: 'linkClass, show',
 			} );
 			await expect( linkClassAttribute ).toBeHidden();
 		} );
@@ -1561,7 +1563,9 @@ test.describe( 'Registered sources', () => {
 			await editor.insertBlock( { name: 'core/image' } );
 			await page.getByRole( 'tab', { name: 'Settings' } ).click();
 			await page.getByLabel( 'Attributes options' ).click();
-			await page.getByRole( 'menuitemcheckbox', { name: 'id' } ).click();
+			await page
+				.getByRole( 'menuitemcheckbox', { name: 'id, show' } )
+				.click();
 			await page.getByRole( 'button', { name: 'id' } ).click();
 
 			const idMenuItem = page.getByRole( 'menuitem', {

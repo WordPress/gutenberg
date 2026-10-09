@@ -121,7 +121,7 @@ describe( 'FlexLayoutInspectorControls', () => {
 		);
 		await user.click(
 			screen.getByRole( 'menuitemcheckbox', {
-				name: 'Wrapping',
+				name: 'Wrapping, show',
 			} )
 		);
 
@@ -144,7 +144,7 @@ describe( 'FlexLayoutInspectorControls', () => {
 
 		expect(
 			screen.queryByRole( 'menuitemcheckbox', {
-				name: 'Wrapping',
+				name: 'Wrapping, show',
 			} )
 		).not.toBeInTheDocument();
 	} );

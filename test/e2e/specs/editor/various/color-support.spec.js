@@ -21,7 +21,9 @@ test.describe( 'Link color in themes', () => {
 
 		await page.getByRole( 'button', { name: 'Elements options' } ).click();
 
-		await page.getByRole( 'menuitemcheckbox', { name: 'Link' } ).click();
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'Link, show' } )
+			.click();
 
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )

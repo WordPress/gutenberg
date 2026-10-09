@@ -215,7 +215,9 @@ test.describe( 'PHP-only auto-register blocks', () => {
 		await page
 			.getByRole( 'button', { name: 'Background options' } )
 			.click();
-		await page.getByRole( 'menuitemcheckbox', { name: 'Color' } ).click();
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'Color, show' } )
+			.click();
 
 		const backgroundColorButton = page
 			.getByRole( 'region', { name: 'Editor settings' } )

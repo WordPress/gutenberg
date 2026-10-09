@@ -115,7 +115,7 @@ describe( 'ConstrainedLayoutInspectorControls', () => {
 			);
 			await user.click(
 				screen.getByRole( 'menuitemcheckbox', {
-					name: label,
+					name: `${ label }, show`,
 				} )
 			);
 			await user.clear(
