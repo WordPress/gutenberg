@@ -1206,7 +1206,7 @@
 	},
 	"packages/block-editor/src/components/global-styles/typography-panel.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 1
 		},
 		"react/jsx-filename-extension": {
 			"count": 1

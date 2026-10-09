@@ -43,6 +43,7 @@ function registerWithSkip( { colorSkip, backgroundSkip } = {} ) {
 			background: {
 				backgroundImage: true,
 				gradient: true,
+				backgroundClip: true,
 				__experimentalSkipSerialization: backgroundSkip,
 			},
 		},
@@ -123,6 +124,42 @@ describe( 'color useBlockProps has-background', () => {
 				( className ) => 'has-background' === className
 			)
 		).toHaveLength( 1 );
+	} );
+
+	it.each( [
+		[ 'a background image', imageValue ],
+		[ 'a background gradient', gradientValue ],
+	] )( 'is not added for %s clipped to the text', ( _label, style ) => {
+		registerWithSkip();
+		expect(
+			getClassNames( {
+				background: { ...style.background, backgroundClip: 'text' },
+			} )
+		).not.toContain( 'has-background' );
+	} );
+
+	it( 'is added for a gradient clipped to a box', () => {
+		registerWithSkip();
+		expect(
+			getClassNames( {
+				background: {
+					...gradientValue.background,
+					backgroundClip: 'padding-box',
+				},
+			} )
+		).toEqual( [ 'has-background' ] );
+	} );
+
+	it( 'is added for a text clip whose serialization is skipped', () => {
+		registerWithSkip( { backgroundSkip: [ 'backgroundClip' ] } );
+		expect(
+			getClassNames( {
+				background: {
+					...gradientValue.background,
+					backgroundClip: 'text',
+				},
+			} )
+		).toEqual( [ 'has-background' ] );
 	} );
 
 	it( 'follows the background gradient skip separately from the image', () => {

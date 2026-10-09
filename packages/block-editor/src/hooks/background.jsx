@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { getBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import InspectorControls from '../components/inspector-controls';
 import { cleanEmptyObject } from './utils';
@@ -125,18 +126,25 @@ function useBlockProps( { name, style } ) {
  * @return {string} CSS class name.
  */
 export function getBackgroundImageClasses( style ) {
-	return hasBackgroundImageValue( style ) ||
-		hasBackgroundGradientValue( style )
-		? 'has-background'
-		: '';
+	const hasBackground =
+		hasBackgroundImageValue( style ) || hasBackgroundGradientValue( style );
+
+	// A text clip paints the glyphs, not the block. Mirror of
+	// `gutenberg_render_background_support()`.
+	if ( ! hasBackground || 'text' === style?.background?.backgroundClip ) {
+		return '';
+	}
+
+	return 'has-background';
 }
 
 // Clears every control the Background panel owns: the background image,
 // background color, and the gradient. The Background panel owns the gradient
 // control for both the newer `background.gradient` support and the legacy
 // `color.gradient` path, so "Reset all" clears the legacy value too,
-// regardless of which path stored it.
-export function backgroundResetAllFilter( attributes ) {
+// regardless of which path stored it. `panelResetAllFilter` keeps what the
+// panel does not own, like a text gradient.
+export function backgroundResetAllFilter( attributes, panelResetAllFilter ) {
 	const updatedClassName = attributes.className?.includes( 'has-background' )
 		? attributes.className
 				.split( ' ' )
@@ -150,7 +158,7 @@ export function backgroundResetAllFilter( attributes ) {
 		gradient: undefined,
 		style: cleanEmptyObject( {
 			...attributes.style,
-			background: undefined,
+			background: panelResetAllFilter?.( attributes.style )?.background,
 			color: {
 				...attributes.style?.color,
 				background: undefined,
@@ -160,11 +168,17 @@ export function backgroundResetAllFilter( attributes ) {
 	};
 }
 
-function BackgroundInspectorControl( { children } ) {
+function BackgroundInspectorControl( { children, resetAllFilter } ) {
+	const attributesResetAllFilter = useCallback(
+		( attributes ) =>
+			backgroundResetAllFilter( attributes, resetAllFilter ),
+		[ resetAllFilter ]
+	);
+
 	return (
 		<InspectorControls
 			group="background"
-			resetAllFilter={ backgroundResetAllFilter }
+			resetAllFilter={ attributesResetAllFilter }
 		>
 			{ children }
 		</InspectorControls>
@@ -336,7 +350,8 @@ export function BackgroundImagePanel( {
 		// Conversely, if the gradient is cleared and has-background was added
 		// during a previous migration, remove it so it does not linger.
 		const hasNewGradient = !! newGradientSlug || !! newGradientValue;
-		if ( isMigrating && hasNewGradient ) {
+		const isTextGradient = 'text' === newStyle?.background?.backgroundClip;
+		if ( isMigrating && hasNewGradient && ! isTextGradient ) {
 			newAttributes.className = clsx( className, 'has-background' );
 		} else if (
 			! hasNewGradient &&
@@ -395,6 +410,7 @@ export function BackgroundImagePanel( {
 					? getStyleForState( style, selectedState )
 					: styleValue
 			}
+			baseValue={ isStateSelected ? styleValue : undefined }
 			contrastWarning={ contrastWarning }
 			inheritedValue={ inheritedValue }
 		/>

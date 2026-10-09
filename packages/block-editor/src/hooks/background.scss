@@ -6,5 +6,15 @@
 		.background-block-support-panel__inner-wrapper {
 			row-gap: 0;
 		}
+
+		// Restore the row gap the wrapper removes.
+		.block-editor-background-panel__clip-item:not(.first) {
+			margin-top: $grid-unit-20;
+		}
+
+		.block-editor-background-panel__clips-to-text-notice {
+			grid-column: 1 / -1;
+			margin-top: $grid-unit-20;
+		}
 	}
 }

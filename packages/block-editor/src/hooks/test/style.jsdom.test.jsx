@@ -384,6 +384,99 @@ describe( 'getBlockStateStylesCSS', () => {
 	} );
 } );
 
+describe( 'getStateStylesCSS under a text clip', () => {
+	const textClipBase = { background: { backgroundClip: 'text' } };
+
+	it( 'stops an inherited gradient painting when a state escapes the clip', () => {
+		const css = getStateStylesCSS(
+			{ background: { backgroundClip: 'border-box' } },
+			'.wp-block-test',
+			textClipBase
+		);
+
+		expect( css ).toContain( 'background-clip: border-box !important' );
+		expect( css ).toContain(
+			'-webkit-text-fill-color: currentColor !important'
+		);
+		expect( css ).toContain( 'background-image: unset !important' );
+	} );
+
+	it( 'keeps a background the state paints itself', () => {
+		const css = getStateStylesCSS(
+			{
+				background: {
+					backgroundClip: 'padding-box',
+					gradient: 'linear-gradient(red,blue)',
+				},
+			},
+			'.wp-block-test',
+			textClipBase
+		);
+
+		expect( css ).not.toContain( 'background-image: unset' );
+	} );
+
+	it( 'leaves a deliberate box clip alone when nothing above clips to text', () => {
+		const css = getStateStylesCSS(
+			{ background: { backgroundClip: 'padding-box' } },
+			'.wp-block-test',
+			{ background: { backgroundImage: { url: 'image.png' } } }
+		);
+
+		expect( css ).not.toContain( 'background-image: unset' );
+	} );
+
+	it( 'paints a text color the clip would otherwise hide', () => {
+		const css = getStateStylesCSS(
+			{ color: { text: '#ff0000' } },
+			'.wp-block-test',
+			textClipBase
+		);
+
+		expect( css ).toContain( 'color: #ff0000 !important' );
+		expect( css ).toContain(
+			'-webkit-text-fill-color: currentColor !important'
+		);
+	} );
+
+	it( 'leaves the fill to the style engine when the state sets its own clip', () => {
+		const css = getStateStylesCSS(
+			{
+				color: { text: '#ff0000' },
+				background: { backgroundClip: 'text' },
+			},
+			'.wp-block-test',
+			textClipBase
+		);
+
+		// The engine already writes `transparent` for a text clip.
+		expect( css ).not.toContain( 'currentColor' );
+	} );
+
+	it( 'leaves the fill alone when the state paints its own gradient', () => {
+		const css = getStateStylesCSS(
+			{
+				color: { text: '#ff0000' },
+				background: { gradient: 'linear-gradient(red,blue)' },
+			},
+			'.wp-block-test',
+			textClipBase
+		);
+
+		// `currentColor` would paint over this state's gradient.
+		expect( css ).not.toContain( 'currentColor' );
+	} );
+
+	it( 'says nothing without a clip to escape', () => {
+		expect(
+			getStateStylesCSS(
+				{ color: { text: '#ff0000' } },
+				'.wp-block-test'
+			)
+		).toBe( '.wp-block-test { color: #ff0000 !important; }' );
+	} );
+} );
+
 describe( 'getResponsiveStateCSSRules', () => {
 	beforeEach( () => {
 		registerBlockType( 'test/state-button', {

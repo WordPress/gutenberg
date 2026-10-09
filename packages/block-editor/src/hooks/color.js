@@ -178,6 +178,9 @@ function getSerializedBackgroundClasses( name, style ) {
 			gradient: shouldSerialize( 'gradient' )
 				? style?.background?.gradient
 				: undefined,
+			backgroundClip: shouldSerialize( 'backgroundClip' )
+				? style?.background?.backgroundClip
+				: undefined,
 		},
 	} );
 }
