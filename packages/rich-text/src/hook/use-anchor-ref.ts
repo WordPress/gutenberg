@@ -23,7 +23,7 @@ export function useAnchorRef( {
 	value,
 	settings = {},
 }: {
-	ref: RefObject< HTMLElement | null >;
+	ref: RefObject< HTMLElement | null | undefined >;
 	value: RichTextValue;
 	settings?: Partial< FormatType >;
 } ) {

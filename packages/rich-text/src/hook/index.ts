@@ -53,10 +53,7 @@ function useRichTextBase( {
 	__unstableAddInvisibleFormats,
 }: RichTextBaseProps ) {
 	const registry = useRegistry();
-	const [ , forceRender ] = useReducer(
-		(): object | undefined => ( {} ),
-		undefined
-	);
+	const [ , forceRender ] = useReducer( () => ( {} ), undefined );
 	const ref = useRef< HTMLElement >( undefined );
 
 	function createRecord() {
@@ -260,14 +257,16 @@ function useRichTextBase( {
 	};
 }
 
-export function useRichText( {
+export function useRichText<
+	V extends string | RichTextData = string | RichTextData,
+>( {
 	allowedFormats,
 	withoutInteractiveFormatting,
 	onChange,
 	__unstableDependencies = [],
 	__unstableFormatTypeHandlerContext,
 	...props
-}: RichTextProps ) {
+}: RichTextProps< V > ) {
 	const {
 		formatTypes,
 		prepareHandlers,
@@ -314,7 +313,10 @@ export function useRichText( {
 			value: string | RichTextData,
 			{ __unstableFormats, __unstableText }: RichTextChangeMeta
 		) {
-			onChange( value, { __unstableFormats, __unstableText } );
+			onChange( value as V | string, {
+				__unstableFormats,
+				__unstableText,
+			} );
 			Object.values( changeHandlers ).forEach( ( changeHandler ) => {
 				changeHandler( __unstableFormats, __unstableText );
 			} );
@@ -328,9 +330,11 @@ export function useRichText( {
 	return { ...result, formatTypes };
 }
 
-export function useDeprecatedRichText( props: RichTextBaseProps ) {
+export function useDeprecatedRichText<
+	V extends string | RichTextData = string | RichTextData,
+>( props: RichTextBaseProps< V > ) {
 	deprecated( '`__unstableUseRichText` hook', {
 		since: '7.0',
 	} );
-	return useRichTextBase( props );
+	return useRichTextBase( props as RichTextBaseProps );
 }
