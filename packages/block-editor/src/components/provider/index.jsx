@@ -133,7 +133,9 @@ function addToUploadQueue(
 				onError(
 					typeof error === 'string' ? error : ( error?.message ?? '' )
 				);
-				settleFile( index );
+				// The queue reports a failed upload's `onBatchSuccess` only after
+				// removing it, so wait a tick to let that settle the file first.
+				window.queueMicrotask( () => settleFile( index ) );
 			},
 			additionalData,
 			allowedTypes,
