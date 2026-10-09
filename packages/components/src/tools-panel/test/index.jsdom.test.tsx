@@ -618,7 +618,7 @@ describe( 'ToolsPanel', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'resets a default control with a name matching its visible label', async () => {
+		it( 'resets a default control with a name explaining the visible reset action', async () => {
 			render(
 				<ToolsPanel { ...defaultProps }>
 					<ToolsPanelItem { ...controlProps } isShownByDefault>
@@ -633,7 +633,7 @@ describe( 'ToolsPanel', () => {
 
 			await openDropdownMenu();
 			const menuItem = screen.getByRole( 'menuitem', {
-				name: 'Example Reset',
+				name: 'Example, reset to default',
 			} );
 			expect( within( menuItem ).getByText( 'Reset' ) ).toBeVisible();
 			await selectMenuItem( controlProps.label );
@@ -1236,7 +1236,7 @@ describe( 'ToolsPanel', () => {
 
 			const defaultItem = screen.getByText( 'Nested Control 1' );
 			const defaultMenuItem = screen.getByRole( 'menuitem', {
-				name: 'Nested Control 1 Reset',
+				name: 'Nested Control 1, reset to default',
 			} );
 
 			const altItem = screen.getByText( 'Nested Control 2' );
@@ -1274,7 +1274,7 @@ describe( 'ToolsPanel', () => {
 
 			const defaultItem = screen.getByText( 'Nested Control 1' );
 			const defaultMenuItem = screen.getByRole( 'menuitem', {
-				name: 'Nested Control 1 Reset',
+				name: 'Nested Control 1, reset to default',
 			} );
 
 			const altItem = screen.getByText( 'Nested Control 2' );
@@ -1896,7 +1896,7 @@ describe( 'ToolsPanel', () => {
 			).toHaveAttribute( 'aria-disabled', 'false' );
 			expect(
 				await screen.findByRole( 'menuitem', {
-					name: 'Survivor Reset',
+					name: 'Survivor, reset to default',
 				} )
 			).toBeInTheDocument();
 		} );
