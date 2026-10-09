@@ -1,7 +1,9 @@
 import type { ScopedPreferences } from '../../types';
 
 export default function convertEditorSettings( data: ScopedPreferences ) {
-	let newData = data;
+	const newData = { ...data };
+	const editPost = { ...data[ 'core/edit-post' ] };
+	const editSite = { ...data[ 'core/edit-site' ] };
 	const settingsToMoveToCore = [
 		'allowRightClickOverrides',
 		'distractionFree',
@@ -22,28 +24,29 @@ export default function convertEditorSettings( data: ScopedPreferences ) {
 	];
 
 	settingsToMoveToCore.forEach( ( setting ) => {
-		if ( data?.[ 'core/edit-post' ]?.[ setting ] !== undefined ) {
-			newData = {
-				...newData,
-				core: {
-					...newData?.core,
-					[ setting ]: data[ 'core/edit-post' ][ setting ],
-				},
+		if ( editPost[ setting ] !== undefined ) {
+			newData.core = {
+				...newData.core,
+				[ setting ]: editPost[ setting ],
 			};
-			delete newData[ 'core/edit-post' ]![ setting ];
+			delete editPost[ setting ];
 		}
 
-		if ( data?.[ 'core/edit-site' ]?.[ setting ] !== undefined ) {
-			delete newData[ 'core/edit-site' ]![ setting ];
+		if ( editSite[ setting ] !== undefined ) {
+			delete editSite[ setting ];
 		}
 	} );
 
-	if ( Object.keys( newData?.[ 'core/edit-post' ] ?? {} )?.length === 0 ) {
+	if ( Object.keys( editPost ).length === 0 ) {
 		delete newData[ 'core/edit-post' ];
+	} else {
+		newData[ 'core/edit-post' ] = editPost;
 	}
 
-	if ( Object.keys( newData?.[ 'core/edit-site' ] ?? {} )?.length === 0 ) {
+	if ( Object.keys( editSite ).length === 0 ) {
 		delete newData[ 'core/edit-site' ];
+	} else {
+		newData[ 'core/edit-site' ] = editSite;
 	}
 
 	return newData;
