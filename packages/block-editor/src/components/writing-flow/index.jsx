@@ -12,6 +12,7 @@ import useArrowNav from './use-arrow-nav';
 import { usePreviewModeNav } from './use-preview-mode-nav';
 import useSelectAll from './use-select-all';
 import useDragSelection from './use-drag-selection';
+import useSelectionBox from './use-selection-box';
 import useSelectionObserver from './use-selection-observer';
 import useEditableRootEventHandlers from './use-editable-root-event-handlers';
 import useClickSelection from './use-click-selection';
@@ -40,6 +41,7 @@ export function useWritingFlow() {
 			useEditableRoot(),
 			useHomeEnd(),
 			useDragSelection(),
+			useSelectionBox(),
 			useSelectionObserver(),
 			useClickSelection(),
 			useMultiSelection(),

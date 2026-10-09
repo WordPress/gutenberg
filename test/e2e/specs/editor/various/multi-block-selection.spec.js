@@ -835,6 +835,100 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		] );
 	} );
 
+	test( 'should draw a selection box while dragging', async ( {
+		page,
+		editor,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '1' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '2' },
+		} );
+		// To hide the block tool bar.
+		await page.keyboard.press( 'ArrowDown' );
+
+		const [ paragraph1, paragraph2 ] = await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.all();
+		const box = editor.canvas.locator(
+			'.block-editor-writing-flow__selection-box'
+		);
+
+		await paragraph1.hover();
+		await page.mouse.down();
+		await expect( box ).toBeHidden();
+		await paragraph2.hover();
+		await expect( box ).toBeVisible();
+		await page.mouse.up();
+		await expect( box ).toBeHidden();
+
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1, 2 ] );
+	} );
+
+	test( 'should select the blocks the selection box touches when dragging from outside the blocks', async ( {
+		page,
+		editor,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '1' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '2' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '3' },
+		} );
+		// To hide the block tool bar.
+		await page.keyboard.press( 'ArrowDown' );
+
+		const [ paragraph1, paragraph2, paragraph3 ] = await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.all();
+
+		// Start to the left of the first paragraph, outside of any block.
+		const paragraph1Box = await paragraph1.boundingBox();
+		await page.mouse.move( paragraph1Box.x - 20, paragraph1Box.y );
+		await page.mouse.down();
+		await paragraph2.hover( { position: { x: 1, y: 1 } } );
+
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1, 2 ] );
+
+		await paragraph3.hover( { position: { x: 1, y: 1 } } );
+
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1, 2, 3 ] );
+
+		// Shrinking the box shrinks the selection.
+		await paragraph2.hover( { position: { x: 1, y: 1 } } );
+		await page.mouse.up();
+
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1, 2 ] );
+
+		// Act on the selection, as with any other multi-selection.
+		await page.keyboard.press( 'Backspace' );
+
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph', attributes: { content: '3' } },
+			] );
+	} );
+
 	test( 'should clear selection when clicking next to blocks', async ( {
 		page,
 		editor,

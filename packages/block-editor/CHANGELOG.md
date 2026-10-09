@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Writing flow: Draw a selection box while dragging the pointer across the canvas. A drag that starts outside of the blocks' content (the canvas margins, the space between blocks, a container's padding) now selects the blocks the box touches.
+
 ## 18.1.0 (2026-10-07)
 
 ### New Features
