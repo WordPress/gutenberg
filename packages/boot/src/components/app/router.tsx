@@ -101,6 +101,13 @@ function createRouteFromDefinition( route: Route, parentRoute: AnyRoute ) {
 				stage = await routeConfig.stage( context );
 			}
 
+			// A custom canvas with no stage beside it fills the screen on
+			// mobile, so the root has to offer the navigation over it.
+			if ( stage && canvasData === null && route.content_module ) {
+				const contentModule = await import( route.content_module );
+				stage = !! contentModule.stage;
+			}
+
 			return {
 				...( loaderData as any ),
 				canvas: canvasData,
