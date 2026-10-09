@@ -16,6 +16,10 @@
     -   `ColorPicker` ([#84128](https://github.com/WordPress/gutenberg/pull/84128))
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Enhancements
+
+-   `Toolbar`: Use the same surface as the `Menu` popup — medium radius, neutral surface stroke and background, and the shared elevation — with inset group dividers instead of full-height borders. Dropdowns inside a toolbar use the default popover rather than the high-contrast `toolbar` variant, so the editor does not need the menu variant proposed in #83850.
+
 ### Deprecations
 
 -   `Tip`: Deprecate in favor of `Notice` from `@wordpress/ui`, preserving the legacy component for existing consumers ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).

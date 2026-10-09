@@ -107,8 +107,10 @@
 		pointer-events: all;
 		margin-top: $grid-unit-10;
 		margin-bottom: $grid-unit-10;
-		border: $border-width solid $gray-900;
-		border-radius: $radius-small;
+		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+		border-radius: var(--wpds-border-radius-md);
+		background-color: var(--wpds-color-background-surface-neutral-strong);
+		box-shadow: $elevation-medium;
 		overflow: visible; // allow the parent selector to be visible
 		position: static;
 		width: auto;
@@ -131,11 +133,6 @@
 
 	.block-editor-block-toolbar {
 		overflow: visible;
-	}
-
-	.block-editor-block-toolbar .components-toolbar-group,
-	.block-editor-block-toolbar .components-toolbar {
-		border-right-color: $gray-900;
 	}
 
 	// Hide the block toolbar if the insertion point is shown.
@@ -164,16 +161,17 @@
 		// detached position and the full border are its own.
 		&:has(.block-editor-block-parent-selector__inserter) {
 			left: calc(-#{$grid-unit-60} - #{$grid-unit-30} - #{$grid-unit-15} - #{$grid-unit-10} - 3 * #{$border-width});
-			border: $border-width solid $gray-900;
-			border-radius: $radius-small;
+			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+			border-radius: var(--wpds-border-radius-md);
 			// The box paints the background, like the toolbar box does for
 			// its groups.
-			background-color: $white;
+			background-color: var(--wpds-color-background-surface-neutral-strong);
+			box-shadow: $elevation-medium;
 
 			// The same rule the Toolbar container has for its last group;
 			// this box stands in for it here.
-			> .components-toolbar-group:last-child {
-				border-right: none;
+			> .components-toolbar-group:last-child::after {
+				content: none;
 			}
 
 			.block-editor-block-parent-selector__button {
@@ -181,6 +179,7 @@
 				// background and border behind them.
 				border: none;
 				background: none;
+				box-shadow: none;
 			}
 		}
 
@@ -253,10 +252,12 @@
 		}
 
 		.block-editor-block-parent-selector__button {
-			border: $border-width solid $gray-900;
+			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+			border-radius: var(--wpds-border-radius-md);
 			padding-right: 6px;
 			padding-left: 6px;
-			background-color: $white;
+			background-color: var(--wpds-color-background-surface-neutral-strong);
+			box-shadow: $elevation-medium;
 
 			.show-icon-labels & {
 				padding-right: $grid-unit-15;
@@ -274,10 +275,6 @@
 			margin-left: -$border-width;
 		}
 
-		.block-editor-block-mover__move-button-container,
-		.block-editor-block-toolbar__block-controls .block-editor-block-mover {
-			border-left: 1px solid $gray-900;
-		}
 	}
 }
 

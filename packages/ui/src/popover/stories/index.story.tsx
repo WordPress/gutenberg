@@ -886,42 +886,6 @@ export const Anchor: Story = {
 };
 
 /**
- * Use `variant="unstyled"` and custom inline styles to replicate a toolbar-like
- * appearance: high-contrast border, no shadow, and a smaller border radius.
- *
- * A first-class `variant="toolbar"` may be added in the future if this pattern
- * becomes widespread.
- */
-export const ToolbarVariant: Story = {
-	args: {
-		children: [
-			<Popover.Trigger key="trigger">Open Toolbar</Popover.Trigger>,
-			<Popover.Popup
-				variant="unstyled"
-				style={ {
-					display: 'flex',
-					gap: 'var(--wpds-dimension-gap-xs)',
-					padding: '4px 8px',
-					border: '1px solid #1e1e1e',
-					borderRadius: 2,
-					background: '#fff',
-					fontSize: 13,
-				} }
-				key="popup"
-			>
-				<VisuallyHidden render={ <Popover.Title /> }>
-					Formatting
-				</VisuallyHidden>
-				<button type="button">B</button>
-				<button type="button">I</button>
-				<button type="button">U</button>
-				<button type="button">Link</button>
-			</Popover.Popup>,
-		],
-	},
-};
-
-/**
  * `Popover.Positioner` exposes `--available-height` and `--available-width`
  * CSS variables representing the space between the anchor and the viewport
  * edge. These cascade down to `Popover.Popup`, where applying them as

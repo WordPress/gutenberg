@@ -39,8 +39,30 @@
 		// The component is born with a border, but we only need some of them.
 		border: 0;
 
-		// Add a border after item groups to show as separator in the block toolbar.
-		border-right: $border-width solid $gray-300;
+		// Groups in the block toolbar are not siblings, so the component's
+		// `:not(:last-child)` hairline does not run between segments. Draw it
+		// here, then clear it on the last segment below.
+		&::after {
+			content: "";
+			position: absolute;
+			z-index: 1;
+			inset-block: 0;
+			inset-inline-end: 0;
+			margin-block: auto;
+			width: var(--wpds-border-width-xs);
+			height: var(--wpds-dimension-size-sm);
+			background-color: var(--wpds-color-stroke-surface-neutral-weak);
+			pointer-events: none;
+
+			@media ( forced-colors: active ) {
+				background-color: CanvasText;
+			}
+		}
+	}
+
+	.components-toolbar-group .components-toolbar-group::after,
+	.components-toolbar .components-toolbar::after {
+		content: none;
 	}
 
 	&.is-connected {
@@ -79,11 +101,13 @@
 	> :last-child .components-toolbar-group,
 	> :last-child .components-toolbar,
 	// If the last toolbar group is empty,
-	// we need to remove the double border from the penultimate one.
+	// we need to remove the divider from the penultimate one.
 	&:has(> :last-child:empty) > :nth-last-child(2),
 	&:has(> :last-child:empty) > :nth-last-child(2) .components-toolbar-group,
 	&:has(> :last-child:empty) > :nth-last-child(2) .components-toolbar {
-		border-right: none;
+		&::after {
+			content: none;
+		}
 	}
 
 	.components-toolbar-group:empty {
@@ -98,13 +122,15 @@
 	display: block;
 	width: 100%;
 	// Block UI appearance.
-	background-color: $white;
+	background-color: var(--wpds-color-background-surface-neutral-strong);
 	flex-shrink: 3;
 
-	// Raise the specificity.
+	// Raise the specificity. The floating toolbar paints the surface again
+	// from the block popover. This keeps the docked bar flat.
 	&.components-accessible-toolbar {
 		border: none;
 		border-radius: 0;
+		box-shadow: none;
 	}
 
 	&.is-unstyled {
@@ -269,10 +295,27 @@
 
 	// Mover overrides.
 	.block-editor-block-toolbar__block-controls .block-editor-block-mover {
-		border-left: 1px solid $gray-300;
+		position: relative;
 		margin-left: 6px;
 		margin-right: -6px;
 		white-space: nowrap;
+
+		&::after {
+			content: "";
+			position: absolute;
+			z-index: 1;
+			inset-block: 0;
+			inset-inline-start: 0;
+			margin-block: auto;
+			width: var(--wpds-border-width-xs);
+			height: var(--wpds-dimension-size-sm);
+			background-color: var(--wpds-color-stroke-surface-neutral-weak);
+			pointer-events: none;
+
+			@media ( forced-colors: active ) {
+				background-color: CanvasText;
+			}
+		}
 	}
 
 	.block-editor-block-mover .block-editor-block-mover__drag-handle.has-icon {
