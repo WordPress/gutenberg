@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Enhancements
+
+-   Legacy widget: Migrate widget type selection to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
+
 ### Bug Fixes
 
 -   Legacy Widget: "Convert to blocks" skips block types that are not allowed ([#84183](https://github.com/WordPress/gutenberg/pull/84183)).

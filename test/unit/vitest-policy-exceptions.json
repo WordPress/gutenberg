@@ -3,7 +3,8 @@
 		"packages/components/src/focal-point-picker/test/index.browser.test.tsx": "Starts an unreleased mouse gesture to verify cancellation when native Tab moves focus away; subsequent movement uses native hover.",
 		"packages/media-editor/src/image-editor/react/components/stencils/test/rectangle-stencil.browser.test.tsx": "Uses exact pointer and touch payloads for capture lifecycle coverage, plus direct key events only where fake timers verify resize debounce timing.",
 		"packages/media-editor/src/image-editor/react/components/test/cropper.browser.test.tsx": "Uses exact pointer, wheel, and transition payloads for crop geometry and lifecycle coverage, plus a direct key event only where fake timers isolate resize timing.",
-		"packages/components/src/color-picker/test/index.browser.test.tsx": "Supplies exact bottom-edge mouse coordinates for click-to-black saturation coverage, where native hit testing excludes the lower boundary. Drag and keyboard paths use native input."
+		"packages/components/src/color-picker/test/index.browser.test.tsx": "Supplies exact bottom-edge mouse coordinates for click-to-black saturation coverage, where native hit testing excludes the lower boundary. Drag and keyboard paths use native input.",
+		"packages/components/src/number-control/test/index.browser.test.tsx": "Supplies identical touch and mouse PointerEvent sequences to verify the per-pointer-type drag policy; Browser Mode userEvent does not support touch drags."
 	},
 	"jsdomBrowserApis": {
 		"test/unit/config/setup-globals.vitest.jsdom.test.js": "This infrastructure regression must exercise the opt-in matchMedia mock in the jsdom project that installs it.",

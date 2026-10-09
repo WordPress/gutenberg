@@ -39,6 +39,7 @@
 		"./package.json": "./package.json"
 	},
 	"wpScript": true,
+	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
 		"@wordpress/api-fetch": "file:../api-fetch"

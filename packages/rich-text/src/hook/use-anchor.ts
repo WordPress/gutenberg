@@ -1,7 +1,7 @@
 import { usePrevious } from '@wordpress/compose';
 import { useState, useLayoutEffect } from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
-import type { WPFormat } from '../register-format-type';
+import type { FormatType } from '../types';
 import { ownsSelection } from '../owns-selection';
 
 /**
@@ -181,11 +181,11 @@ export function useAnchor( {
 	settings,
 }: {
 	editableContentElement: HTMLElement | null;
-	settings?: WPFormat;
+	settings?: FormatType;
 } ): Element | VirtualAnchorElement | undefined | null {
 	const { tagName, className } = settings ?? DEFAULT_SETTINGS;
 
-	// `isActive` is not a property of `WPFormat`, but it has made its way into
+	// `isActive` is not a property of `FormatType`, but it has made its way into
 	// `settings` in certain cases (see `core/link` format). Avoid making this
 	// exception "public" in the function signature: tell TS how to look for it
 	// dynamically.

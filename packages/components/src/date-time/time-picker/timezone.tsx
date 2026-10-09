@@ -1,7 +1,8 @@
+import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { getSettings as getDateSettings } from '@wordpress/date';
 import Tooltip from '../../tooltip';
-import { TimeZone as StyledComponent } from './styles';
+import styles from './style.module.scss';
 
 /**
  * Displays timezone information when user timezone is different from site
@@ -39,14 +40,24 @@ const TimeZone = () => {
 		prettyTimezoneString.trim().length === 0;
 
 	return hasNoAdditionalTimezoneDetail ? (
-		<StyledComponent className="components-datetime__timezone">
+		<div
+			className={ clsx(
+				'components-datetime__timezone',
+				styles[ 'time-zone' ]
+			) }
+		>
 			{ zoneAbbr }
-		</StyledComponent>
+		</div>
 	) : (
 		<Tooltip placement="top" text={ timezoneDetail }>
-			<StyledComponent className="components-datetime__timezone">
+			<div
+				className={ clsx(
+					'components-datetime__timezone',
+					styles[ 'time-zone' ]
+				) }
+			>
 				{ zoneAbbr }
-			</StyledComponent>
+			</div>
 		</Tooltip>
 	);
 };
