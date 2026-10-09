@@ -50,7 +50,7 @@ export function WorkflowMenu() {
 			}
 
 			event.preventDefault();
-			setIsOpen( ! isOpen );
+			setIsOpen( ( open ) => ! open );
 		} )
 	);
 
