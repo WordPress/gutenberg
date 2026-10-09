@@ -74,6 +74,10 @@ jobs:
 
         env:
             WP_ENV_PHP_VERSION: ${{ matrix.php }}
+            # The WordPress 5.6 test library refuses PHPUnit 8 and newer, which
+            # the `wordpressdevelop/phpunit` images ship for PHP 7.2 and newer.
+            # Those versions run the Composer-installed PHPUnit 7.5 instead.
+            PHPUNIT: ${{ ( matrix.php == '5.6' || matrix.php == '7.0' ) && 'phpunit' || 'php /var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit' }}
 
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -105,11 +109,11 @@ jobs:
 
             - name: Running single site unit tests
               if: ${{ ! matrix.multisite }}
-              run: npm run test-unit-php
+              run: npm run wp-env run phpunit "$PHPUNIT -c /var/www/html/wp-content/plugins/gutenberg/phpunit.xml.dist --verbose"
 
             - name: Running multisite unit tests
               if: ${{ matrix.multisite }}
-              run: npm run test-unit-php-multisite
+              run: npm run wp-env run phpunit "WP_MULTISITE=1 $PHPUNIT -c /var/www/html/wp-content/plugins/gutenberg/phpunit/multisite.xml --verbose"
 
     phpcs:
         name: PHP coding standards
