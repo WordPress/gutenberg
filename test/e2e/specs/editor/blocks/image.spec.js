@@ -427,6 +427,36 @@ test.describe( 'Image', () => {
 		page,
 		editor,
 	} ) => {
+		// Serve Openverse and its image hosts locally; CI runners can't reliably fetch them.
+		const mockImages = [
+			'10x10_e2e_test_image_green.png',
+			'10x10_e2e_test_image_z9T8jK.png',
+		];
+		await page.route( 'https://api.openverse.org/v1/images/?*', ( route ) =>
+			route.fulfill( {
+				json: {
+					results: mockImages.map( ( fileName, index ) => ( {
+						id: `mock-${ index }`,
+						title: fileName,
+						url: `https://openverse.test/${ fileName }`,
+						thumbnail: `https://openverse.test/${ fileName }`,
+						license: 'cc0',
+						license_version: '1.0',
+					} ) ),
+				},
+			} )
+		);
+		await page.route( 'https://openverse.test/*', ( route ) =>
+			route.fulfill( {
+				path: path.join(
+					__dirname,
+					'../../../assets',
+					new URL( route.request().url() ).pathname
+				),
+				headers: { 'Access-Control-Allow-Origin': '*' },
+			} )
+		);
+
 		// This is a temp workaround for dragging and dropping images from the inserter.
 		// This should be removed when we have the zoom out view for media categories.
 		await page.setViewportSize( { width: 1400, height: 800 } );
