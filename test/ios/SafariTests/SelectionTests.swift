@@ -30,6 +30,16 @@ final class SelectionTests: XCTestCase {
 		XCTAssertTrue( safari.wait( for: .runningForeground, timeout: 30 ) )
 	}
 
+	/// Safari on a fresh simulator shows a tip over the page, and a tap
+	/// anywhere only closes it.
+	func closeSafariTip() {
+		let tip = safari.otherElements[ "PopoverDismissRegion" ]
+		if tip.exists {
+			safari.buttons[ "xmark.circle.fill" ].tap()
+			XCTAssertTrue( tip.waitForNonExistence( timeout: 5 ), "Safari's tip did not close" )
+		}
+	}
+
 	func paragraphs() -> [ String ] {
 		web.textViews.matching( NSPredicate( format: "label == 'Block: Paragraph'" ) )
 			.allElementsBoundByIndex
@@ -49,6 +59,7 @@ final class SelectionTests: XCTestCase {
 
 		let second = paragraph( startingWith: "Delta echo" )
 		XCTAssertTrue( second.waitForExistence( timeout: 240 ), "The post did not load" )
+		closeSafariTip()
 
 		// Select the second paragraph.
 		second.tap()
