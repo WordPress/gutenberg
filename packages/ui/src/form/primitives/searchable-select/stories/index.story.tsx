@@ -11,7 +11,6 @@ import { ITEMS } from './fixtures';
 import {
 	longLabelPopupItems,
 	narrowContainerDecorator,
-	popupWidthControl,
 } from '../../../stories/shared';
 
 const meta: Meta< typeof SearchableSelect > = {
@@ -191,7 +190,6 @@ export const WithSeparator: Story = {
  */
 export const PopupWidth: Story = {
 	decorators: [ narrowContainerDecorator ],
-	argTypes: { popupWidth: popupWidthControl },
 	args: {
 		'aria-label': 'Tags',
 		items: longLabelPopupItems,

@@ -5,7 +5,6 @@ import {
 	DETAILS_EXAMPLE,
 	longLabelPopupItems,
 	narrowContainerDecorator,
-	popupWidthControl,
 } from '../../stories/shared';
 
 const meta: Meta< typeof SelectControl > = {
@@ -366,7 +365,6 @@ export const WithItemDescription: Story = {
  */
 export const PopupWidth: Story = {
 	decorators: [ narrowContainerDecorator ],
-	argTypes: { popupWidth: popupWidthControl },
 	args: {
 		label: 'Label',
 		items: longLabelPopupItems,
