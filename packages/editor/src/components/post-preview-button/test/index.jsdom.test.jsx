@@ -162,7 +162,8 @@ describe( 'PostPreviewButton', () => {
 		await openMenu( user );
 
 		const menuItem = screen.getByRole( 'menuitem', {
-			name: 'Preview (opens in a new tab)',
+			// TODO: jsdom-only name; browsers separate the notice with a space.
+			name: 'Preview(opens in a new tab)',
 		} );
 		expect( menuItem.tagName ).toBe( 'A' );
 		expect( menuItem ).toHaveAttribute( 'href', url );
