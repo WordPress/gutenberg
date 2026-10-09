@@ -103,6 +103,38 @@ describe( 'ToolsPanel styles', () => {
 		expect( styles.minWidth ).toBe( '24px' );
 	} );
 
+	it( 'keeps the remove action on one line in a narrow viewport', async () => {
+		await page.viewport( 320, 640 );
+		await render(
+			<ToolsPanel { ...defaultProps }>
+				<ToolsPanelItem { ...controlProps } label="Text decoration">
+					Control
+				</ToolsPanelItem>
+			</ToolsPanel>
+		);
+
+		await userEvent.click(
+			page.getByRole( 'button', { name: 'Panel header options' } )
+		);
+		const menu = screen.getByRole( 'menu' );
+		await expect.poll( () => menu ).toBePositionedPopover();
+
+		const item = screen.getByRole( 'menuitemcheckbox', { checked: true } );
+		const label = screen.getByText( 'Remove Text decoration' );
+		const text = document.createRange();
+		text.selectNodeContents( label );
+
+		expect( text.getClientRects() ).toHaveLength( 1 );
+		expect( text.getBoundingClientRect().right ).toBeLessThanOrEqual(
+			item.getBoundingClientRect().right
+		);
+		expect( menu.getBoundingClientRect().left ).toBeGreaterThanOrEqual( 0 );
+		expect( menu.getBoundingClientRect().right ).toBeLessThanOrEqual(
+			window.innerWidth
+		);
+		expect( item ).toHaveAccessibleName( 'Remove Text decoration' );
+	} );
+
 	it( 'keeps long action labels visible in a narrow viewport', async () => {
 		await page.viewport( 320, 640 );
 		await render(
@@ -125,10 +157,10 @@ describe( 'ToolsPanel styles', () => {
 		await expect.poll( () => menu ).toBePositionedPopover();
 
 		const item = screen.getByRole( 'menuitemcheckbox', {
-			name: 'Hide and reset A control with a longer label',
+			name: 'Remove A control with a longer label',
 		} );
 		const label = screen.getByText(
-			'Hide and reset A control with a longer label'
+			'Remove A control with a longer label'
 		);
 		const menuBounds = menu.getBoundingClientRect();
 

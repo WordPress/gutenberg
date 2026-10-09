@@ -68,8 +68,8 @@ const OptionalControlsGroup = ( {
 			{ items.map( ( [ label, isSelected ] ) => {
 				const itemLabel = isSelected
 					? sprintf(
-							// translators: %s: The name of the control being hidden and reset e.g. "Padding".
-							__( 'Hide and reset %s' ),
+							// translators: %s is the name of a control, e.g. "Padding". Removing it hides the control and resets its value.
+							__( 'Remove %s' ),
 							label
 						)
 					: sprintf(
