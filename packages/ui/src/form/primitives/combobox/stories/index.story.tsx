@@ -10,6 +10,10 @@ import {
 	type FixtureGroup,
 	type FixtureItem,
 } from './fixtures';
+import {
+	longLabelPopupItems,
+	narrowContainerDecorator,
+} from '../../../stories/shared';
 
 const meta: Meta< typeof Combobox.Root > = {
 	title: 'Components/@wordpress-ui/Form/Primitives/Combobox',
@@ -559,4 +563,42 @@ export const WithCustomZIndex: Story = {
 			</Combobox.Popup>,
 		],
 	},
+};
+
+/**
+ * Use `width` on `Combobox.Popup` to constrain the popup relative to a narrow anchor.
+ */
+export const PopupWidth: Story = {
+	decorators: [ narrowContainerDecorator ],
+	args: {
+		items: longLabelPopupItems,
+	},
+	render: ( args ) => (
+		<Combobox.Root { ...args }>
+			<Combobox.Trigger aria-label="Label" />
+			<Combobox.Popup width="sm">
+				<div style={ inputWrapperStyle }>
+					<Combobox.Input aria-label="Search" placeholder="Search" />
+				</div>
+				<Combobox.List>
+					<Combobox.ListBody>
+						<Combobox.Collection>
+							{ (
+								item: ( typeof longLabelPopupItems )[ number ]
+							) => (
+								<Combobox.Item
+									key={ item.value }
+									value={ item }
+								>
+									<Combobox.ItemLabel>
+										{ item.label }
+									</Combobox.ItemLabel>
+								</Combobox.Item>
+							) }
+						</Combobox.Collection>
+					</Combobox.ListBody>
+				</Combobox.List>
+			</Combobox.Popup>
+		</Combobox.Root>
+	),
 };
