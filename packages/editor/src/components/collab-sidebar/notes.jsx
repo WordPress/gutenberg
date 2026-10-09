@@ -21,7 +21,13 @@ import { store as editorStore } from '../../store';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-export function Notes( { notes, sidebarRef, isFloating = false } ) {
+export function Notes( {
+	notes,
+	sidebarRef,
+	isFloating = false,
+	isFiltered = false,
+	expandReplies = false,
+} ) {
 	const {
 		onCreate: onAddReply,
 		onEdit: onEditNote,
@@ -183,6 +189,9 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 	const isAddingNote =
 		! isFloating && selectedNote === 'new' && !! selectedBlockClientId;
 
+	// When filters hide every thread, say so instead of an empty list.
+	const showNoResults = isFiltered && ! isAddingNote && ! threads.length;
+
 	return (
 		<Stack
 			className="editor-collab-sidebar-panel"
@@ -201,6 +210,9 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 				isFloating ? __( 'Unresolved notes' ) : __( 'All notes' )
 			}
 		>
+			{ showNoResults && (
+				<Text render={ <p /> }>{ __( 'No notes found.' ) }</Text>
+			) }
 			{ isAddingNote && (
 				<AddNote
 					key={ selectedBlockClientId }
@@ -232,6 +244,7 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 						onDeleteNote={ handleDelete }
 						onEditNote={ onEditNote }
 						isSelected={ selectedNote === thread.id }
+						expandReplies={ expandReplies }
 						sidebarRef={ sidebarRef }
 						floating={
 							isFloating

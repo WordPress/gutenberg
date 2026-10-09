@@ -347,6 +347,126 @@ test.describe( 'Block Notes', () => {
 		] );
 	} );
 
+	test( 'can search and filter notes in the "All notes" sidebar', async ( {
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'First block.' },
+			comment: 'Fix the heading.',
+		} );
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Second block.' },
+			comment: 'Swap the image.',
+		} );
+
+		await blockNoteUtils.openBlockNoteSidebar();
+		const sidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const headingThread = sidebar.getByRole( 'treeitem', {
+			name: 'Note: Fix the heading.',
+		} );
+		const imageThread = sidebar.getByRole( 'treeitem', {
+			name: 'Note: Swap the image.',
+		} );
+
+		// Resolve the first note, then collapse it so it isn't kept visible
+		// as the selected thread.
+		await headingThread.click();
+		await page.getByRole( 'button', { name: 'Resolve' } ).click();
+		await expect(
+			sidebar.locator( '.editor-collab-sidebar-panel__status-separator' )
+		).toBeVisible();
+		await headingThread.focus();
+		await page.keyboard.press( 'Escape' );
+
+		const search = sidebar.getByRole( 'searchbox', {
+			name: 'Search notes',
+		} );
+		await search.fill( 'IMAGE' );
+		await expect( imageThread ).toBeVisible();
+		await expect( headingThread ).toBeHidden();
+
+		await search.fill( 'nothing matches' );
+		await expect( sidebar.getByText( 'No notes found.' ) ).toBeVisible();
+		await expect(
+			sidebar.getByRole( 'textbox', { name: 'New note', exact: true } )
+		).toBeHidden();
+
+		await search.fill( '' );
+		await sidebar.getByRole( 'button', { name: 'Filter' } ).click();
+		const status = sidebar.getByRole( 'combobox', { name: 'Status' } );
+		await status.selectOption( 'Resolved' );
+		await expect( headingThread ).toBeVisible();
+		await expect( imageThread ).toBeHidden();
+		await expect(
+			sidebar.getByRole( 'button', { name: 'Filter (1 applied)' } )
+		).toBeVisible();
+
+		await status.selectOption( 'Open' );
+		await expect( imageThread ).toBeVisible();
+		await expect( headingThread ).toBeHidden();
+	} );
+
+	test( 'expands collapsed replies while searching notes', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Testing block comments' },
+			comment: 'Test comment',
+		} );
+		const sidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const replyForm = page.getByRole( 'textbox', { name: 'Reply to' } );
+		const replyButton = sidebar.getByRole( 'button', {
+			name: 'Reply',
+			exact: true,
+		} );
+		for ( const reply of [ 'Check the table.', 'Last reply' ] ) {
+			await replyForm.click();
+			await replyForm.pressSequentially( reply );
+			await replyButton.click();
+		}
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Reply added.' } )
+		).toHaveCount( 2 );
+
+		// Deselect the note so its middle reply collapses.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.focus();
+		const thread = sidebar.getByRole( 'treeitem', {
+			name: 'Note: Test comment',
+		} );
+		const moreReplies = thread.getByRole( 'button', {
+			name: '1 more reply',
+		} );
+		await expect( moreReplies ).toBeVisible();
+		await expect( thread.getByText( 'Check the table.' ) ).toBeHidden();
+
+		const search = sidebar.getByRole( 'searchbox', {
+			name: 'Search notes',
+		} );
+		await search.fill( 'table' );
+		await expect( thread.getByText( 'Check the table.' ) ).toBeVisible();
+		await expect( moreReplies ).toBeHidden();
+		await expect(
+			thread.getByRole( 'textbox', { name: 'Reply to' } )
+		).toBeHidden();
+
+		await search.fill( '' );
+		await expect( moreReplies ).toBeVisible();
+	} );
+
 	test( 'clearing the block selection does not select an orphaned note', async ( {
 		editor,
 		page,
