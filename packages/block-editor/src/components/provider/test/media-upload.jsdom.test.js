@@ -129,16 +129,12 @@ describe( 'mediaUpload with client-side media processing', () => {
 		} );
 
 		await finishServerUpload( 'seven.txt' );
-		await failServerUpload( 'eight.txt' );
-		await waitFor( () => {
-			expect( onSuccess ).toHaveBeenCalled();
-			expect( onError ).toHaveBeenCalled();
-		} );
+		await finishServerUpload( 'nine.txt' );
+		await waitFor( () => expect( onSuccess ).toHaveBeenCalledTimes( 2 ) );
 		expect( onBatchSuccess ).not.toHaveBeenCalled();
 
-		await finishServerUpload( 'nine.txt' );
-		await waitFor( () =>
-			expect( onBatchSuccess ).toHaveBeenCalledTimes( 1 )
-		);
+		await failServerUpload( 'eight.txt' );
+		await waitFor( () => expect( onError ).toHaveBeenCalled() );
+		expect( onBatchSuccess ).toHaveBeenCalledTimes( 1 );
 	} );
 } );
