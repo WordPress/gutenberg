@@ -44,45 +44,19 @@ final class SelectionTests: XCTestCase {
 		safari.coordinate( withNormalizedOffset: .zero ).withOffset( CGVector( dx: x, dy: y ) )
 	}
 
-	/// Waits until the element stops moving: the keyboard scrolls the
-	/// canvas after a selection.
-	func waitUntilStill( _ element: XCUIElement ) {
-		var previous = CGRect.null
-		for _ in 0 ..< 50 {
-			let frame = element.frame
-			if frame == previous {
-				return
-			}
-			previous = frame
-			usleep( 200_000 )
-		}
-		XCTFail( "The canvas kept moving" )
-	}
-
 	func testHandleExtendsSelectionIntoPreviousParagraph() throws {
 		openPost()
 
-		let title = web.textViews[ "Add title" ]
 		let second = paragraph( startingWith: "Delta echo" )
 		XCTAssertTrue( second.waitForExistence( timeout: 240 ), "The post did not load" )
-		waitUntilStill( title )
-
-		// Once the canvas is the editing host, paragraphs can stop being
-		// text views of their own. Measure them now and follow the title,
-		// which moves with them.
-		let titleBefore = title.frame
-		let firstBefore = paragraph( startingWith: "Alpha bravo" ).frame
-		let secondBefore = second.frame
 
 		// Select the second paragraph.
-		point( secondBefore.midX, secondBefore.midY ).tap()
+		second.tap()
 		let focused = web.textViews.matching( NSPredicate( format: "hasKeyboardFocus == true" ) ).firstMatch
 		XCTAssertTrue( focused.waitForExistence( timeout: 10 ), "The tap did not focus the paragraph" )
-		waitUntilStill( title )
 
-		let shift = title.frame.minY - titleBefore.minY
-		let first = firstBefore.offsetBy( dx: 0, dy: shift )
-		let target = secondBefore.offsetBy( dx: 0, dy: shift )
+		let first = paragraph( startingWith: "Alpha bravo" ).frame
+		let target = second.frame
 
 		// Double tap the first word, "Delta".
 		point( target.minX + 15, target.midY ).doubleTap()

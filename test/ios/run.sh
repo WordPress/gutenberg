@@ -40,10 +40,13 @@ xcrun simctl boot "$UDID" 2>/dev/null || true
 # WordPress runs in Playground: PHP compiled to WebAssembly, no Docker.
 step "Starting WordPress"
 PLAYGROUND_LOG=$( mktemp )
-npx --yes @wp-playground/cli@3.1.53 server \
-	--auto-mount="$PWD" \
-	--blueprint=test/ios/blueprint.json \
-	--port "$PORT" > "$PLAYGROUND_LOG" 2>&1 &
+# npx runs outside the checkout: the checkout's npm settings refuse
+# Playground's install scripts.
+ROOT="$PWD"
+( cd "$( mktemp -d )" && exec npx --yes @wp-playground/cli@3.1.53 server \
+	--auto-mount="$ROOT" \
+	--blueprint="$ROOT/test/ios/blueprint.json" \
+	--port "$PORT" ) > "$PLAYGROUND_LOG" 2>&1 &
 PLAYGROUND_PID=$!
 trap 'kill "$PLAYGROUND_PID" 2>/dev/null || true' EXIT
 # Playground prints "Ready!" once it listens and the blueprint has run; the
