@@ -2889,7 +2889,7 @@ export const tokens = /** @type {const} */ ( {
 	},
 } );
 
-export const groups = {
+export const groups = /** @type {const} */ ( {
 	border: [
 		'--wpds-border-radius-xs',
 		'--wpds-border-radius-sm',
@@ -3071,6 +3071,6 @@ export const groups = {
 		'--wpds-typography-font-weight-default',
 		'--wpds-typography-font-weight-emphasis',
 	],
-};
+} );
 
 export default Object.keys( tokens );

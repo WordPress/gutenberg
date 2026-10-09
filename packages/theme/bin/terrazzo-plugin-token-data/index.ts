@@ -90,11 +90,11 @@ export default function pluginTokenData( {
 						'\t'
 					) } );`,
 					'',
-					`export const groups = ${ JSON.stringify(
+					`export const groups = /** @type {const} */ ( ${ JSON.stringify(
 						groups,
 						null,
 						'\t'
-					) };`,
+					) } );`,
 					'',
 					'export default Object.keys( tokens );',
 					'',
