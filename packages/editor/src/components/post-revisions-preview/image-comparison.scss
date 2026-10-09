@@ -58,9 +58,7 @@
 	left: 50%;
 	width: 100%;
 
-	// BlockPreview has no public prop to lift its pattern-thumbnail cap.
-	// Iframe adds layout wrappers, so its capped iframe is a descendant.
-	// Remove only those two caps; measure this wrapper before outer scaling.
+	// Override BlockPreview's default maxHeight inline style so images can scale naturally.
 	.block-editor-block-preview__content,
 	.block-editor-block-preview__content iframe {
 		max-height: none !important;

@@ -113,8 +113,7 @@ function ImageComparison( { before, after }: ImageComparisonProps ) {
 	useEffect( () => {
 		setAvailability( {} );
 		setPreviewHeights( {} );
-		// The probe and disposable preview use the same saved URL. Current
-		// bindings cannot replace it inside BlockPreview's separate document.
+		// Preload the saved image URLs to verify availability and get their dimensions.
 		const images = VERSIONS.map( ( version ) => {
 			const url = previews[ version ].attributes.url;
 			if ( typeof url !== 'string' || ! url.trim() ) {
