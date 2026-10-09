@@ -1,6 +1,6 @@
 import { getPhrasingContentSchema, removeInvalidHTML } from '@wordpress/dom';
 import { htmlToBlocks } from './html-to-blocks';
-import { hasBlockSupport } from '../registration';
+import { getBlockType, hasBlockSupport } from '../registration';
 import { getBlockInnerHTML } from '../serializer';
 import parse from '../parser';
 import normaliseBlocks from './normalise-blocks';
@@ -74,13 +74,14 @@ function filterInlineHTML( HTML: string ): string {
  * Converts an HTML string to known blocks. Strips everything else.
  *
  * @param options
- * @param options.HTML      The HTML to convert.
- * @param options.plainText Plain text version.
- * @param options.mode      Handle content as blocks or inline content.
- *                          * 'AUTO': Decide based on the content passed.
- *                          * 'INLINE': Always handle as inline content, and return string.
- *                          * 'BLOCKS': Always handle as blocks, and return array of blocks.
- * @param options.tagName   The tag into which content will be inserted.
+ * @param options.HTML               The HTML to convert.
+ * @param options.plainText          Plain text version.
+ * @param options.mode               Handle content as blocks or inline content.
+ *                                   * 'AUTO': Decide based on the content passed.
+ *                                   * 'INLINE': Always handle as inline content, and return string.
+ *                                   * 'BLOCKS': Always handle as blocks, and return array of blocks.
+ * @param options.tagName            The tag into which content will be inserted.
+ * @param options.convertLatexToMath Whether plain text LaTeX may become a Math block.
  *
  * @return A list of blocks or a string, depending on `handlerMode`.
  */
@@ -89,6 +90,7 @@ export function pasteHandler( {
 	plainText = '',
 	mode = 'AUTO',
 	tagName,
+	convertLatexToMath = true,
 }: RawHandlerOptions ): Block[] | string {
 	// Allows us to ask for this information when we get a report.
 	log( 'Received HTML (pasteHandler):\n\n', HTML );
@@ -138,7 +140,13 @@ export function pasteHandler( {
 	// * There is no HTML version, or it has no formatting.
 	const isPlainText = plainText && ( ! HTML || isPlain( HTML ) );
 
-	if ( isPlainText && isLatexMathMode( plainText ) ) {
+	// Only convert to a math block if it is registered and allowed.
+	if (
+		isPlainText &&
+		convertLatexToMath &&
+		getBlockType( 'core/math' ) &&
+		isLatexMathMode( plainText )
+	) {
 		return [ createBlock( 'core/math', { latex: plainText } ) ];
 	}
 

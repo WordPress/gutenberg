@@ -449,4 +449,21 @@ describe( 'pasteHandler — core/image', () => {
 		expect( result.attributes.width ).toBeUndefined();
 		expect( result.attributes.height ).toBeUndefined();
 	} );
+
+	it( 'does not convert LaTeX to a Math block when convertLatexToMath is false', () => {
+		const plainText = 'x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}';
+		const HTML = `<span style="color: red">${ plainText }</span>`;
+
+		const result = pasteHandler( {
+			HTML,
+			plainText,
+			mode: 'AUTO',
+			convertLatexToMath: false,
+		} );
+
+		expect( console ).toHaveLogged();
+
+		expect( typeof result ).toBe( 'string' );
+		expect( result ).toContain( '\\frac' );
+	} );
 } );

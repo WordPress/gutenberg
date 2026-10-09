@@ -211,6 +211,10 @@ export default function useClipboardHandler() {
 						.flat();
 				} else {
 					blocks = pasteHandler( {
+						convertLatexToMath: canInsertBlockType(
+							'core/math',
+							getBlockRootClientId( selectedBlockClientIds[ 0 ] )
+						),
 						HTML: html,
 						plainText,
 						mode: isFullySelected ? 'BLOCKS' : 'AUTO',
