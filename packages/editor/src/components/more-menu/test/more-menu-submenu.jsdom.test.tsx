@@ -86,7 +86,8 @@ describe( 'toMenuItems', () => {
 
 		expect(
 			screen.getByRole( 'menuitem', {
-				name: 'Legacy item Legacy description',
+				// TODO: jsdom-only name; browsers separate label and info with a space.
+				name: 'Legacy itemLegacy description',
 			} )
 		).toBeInTheDocument();
 	} );

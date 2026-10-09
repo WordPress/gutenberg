@@ -70,7 +70,8 @@ describe( 'General media replace flow', () => {
 		);
 
 		const link = screen.getByRole( 'link', {
-			name: 'example.media (opens in a new tab)',
+			// TODO: jsdom-only name; browsers separate the notice with a space.
+			name: 'example.media(opens in a new tab)',
 		} );
 
 		await waitFor( () => expect( link ).toBePositionedPopover() );
@@ -93,7 +94,8 @@ describe( 'General media replace flow', () => {
 		await waitFor( () =>
 			expect(
 				screen.getByRole( 'link', {
-					name: 'example.media (opens in a new tab)',
+					// TODO: jsdom-only name; browsers separate the notice with a space.
+					name: 'example.media(opens in a new tab)',
 				} )
 			).toBePositionedPopover()
 		);
@@ -120,7 +122,8 @@ describe( 'General media replace flow', () => {
 
 		expect(
 			screen.getByRole( 'link', {
-				name: 'new.example.media (opens in a new tab)',
+				// TODO: jsdom-only name; browsers separate the notice with a space.
+				name: 'new.example.media(opens in a new tab)',
 			} )
 		).toHaveAttribute( 'href', 'https://new.example.media' );
 	} );
