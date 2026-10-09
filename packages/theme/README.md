@@ -19,7 +19,8 @@ This README is the entry point for package consumers. It covers how to load desi
 
 | Entrypoint | Supported use |
 | --- | --- |
-| `@wordpress/theme` | `ThemeProvider` and the generated token scale types, such as `PaddingSize` and `GapSize`. Derive provider props and callback types from the component as shown below. |
+| `@wordpress/theme` | `ThemeProvider`, `generateColorTokens` and its types, and the generated token scale types, such as `PaddingSize` and `GapSize`. Derive provider props and callback types from the component as shown below. |
+| `@wordpress/theme/colors` | `generateColorTokens` without loading React. Also a WordPress script module with the same ID. See [Generating Colors Outside React](#generating-colors-outside-react). |
 | `@wordpress/theme/design-tokens.css` | Default semantic `--wpds-*` custom properties. Load once per document. |
 | `@wordpress/theme/design-tokens.js` | Default export containing the list of semantic CSS custom property names. It contains names, not token values, and does not load styles. |
 | Build plugin subpaths | The four public integrations listed under [Build Plugins](#build-plugins). |
@@ -283,6 +284,32 @@ This step will:
 The files generated in this step will all be committed to the repo.
 
 After the prebuild step, the package will be built into its final form via the repo's standard package build script.
+
+## Generating Colors Outside React
+
+For environments that do not use React, `generateColorTokens` is available as a plain JavaScript function that generates color token values from seed colors, producing the same values as `ThemeProvider`. It can be used to generate token values as plain data:
+
+```js
+import { generateColorTokens } from '@wordpress/theme';
+
+const { tokens, compatibility, warnings } = generateColorTokens( {
+	primary: '#d63638',
+} );
+```
+
+The result has three parts:
+
+- `tokens`: design token values, keyed by custom property name (for example `--wpds-color-background-surface-neutral`).
+- `compatibility`: the transitional [legacy compatibility](#legacy-compatibility) values, keyed the same way. These are not design tokens. Apply them only where older styles are in play, and only where nothing else already defines them.
+- `warnings`: the same contrast warnings that `onColorWarnings` reports.
+
+The function does not apply any styles. You choose where to use the values, for example in a stylesheet rule or as inline styles. To use both groups, as `ThemeProvider` does, merge them:
+
+```js
+const styles = { ...tokens, ...compatibility };
+```
+
+To use it without loading React, import it from `@wordpress/theme/colors`. In WordPress, this is also the ID of a script module, so a script module can import it, including with a dynamic `import()` that loads it only when needed. A classic script cannot import a script module: it can use `wp.theme.generateColorTokens`, but the `wp-theme` script loads React.
 
 ## Stylelint Plugins
 
