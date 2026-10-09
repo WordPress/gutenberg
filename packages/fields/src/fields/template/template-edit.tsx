@@ -2,7 +2,7 @@ import { useCallback, useMemo } from '@wordpress/element';
 import type { WpTemplate } from '@wordpress/core-data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { DataFormControlProps } from '@wordpress/dataviews';
-import { SelectControl } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { getItemTitle } from '../../actions/utils';
@@ -27,7 +27,7 @@ function ClassicTemplateEdit( {
 	const postId =
 		typeof data.id === 'number' ? data.id : parseInt( data.id, 10 );
 	const value = field.getValue( { item: data } );
-	const options = useMemo(
+	const items = useMemo(
 		() =>
 			Object.entries(
 				( ( data as Record< string, any > )?.available_templates ??
@@ -56,9 +56,13 @@ function ClassicTemplateEdit( {
 		<SelectControl
 			label={ __( 'Template' ) }
 			hideLabelFromVision
-			value={ value }
-			options={ options }
-			onChange={ onChange }
+			value={
+				items.find( ( item ) => item.value === value ) ??
+				items[ 0 ] ??
+				null
+			}
+			items={ items }
+			onValueChange={ ( item ) => onChange( item?.value ?? '' ) }
 			disabled={ ! canSwitchTemplate }
 		/>
 	);
@@ -106,7 +110,7 @@ function BlockThemeTemplateEdit( {
 		slug
 	);
 	const value = field.getValue( { item: data } );
-	const options = useMemo( () => {
+	const items = useMemo( () => {
 		const templateOptions = templates.map( ( template ) => ( {
 			label: getItemTitle( template ),
 			value: template.slug,
@@ -120,9 +124,13 @@ function BlockThemeTemplateEdit( {
 		<SelectControl
 			label={ __( 'Template' ) }
 			hideLabelFromVision
-			value={ value }
-			options={ options }
-			onChange={ onChange }
+			value={
+				items.find( ( item ) => item.value === value ) ??
+				items[ 0 ] ??
+				null
+			}
+			items={ items }
+			onValueChange={ ( item ) => onChange( item?.value ?? '' ) }
 			disabled={ ! canSwitchTemplate }
 		/>
 	);

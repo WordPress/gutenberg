@@ -1,0 +1,95 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+.wrapper {
+	box-sizing: border-box;
+	font-size: $font-size-medium;
+}
+
+.fieldset {
+	border: 0;
+	margin: 0 0 $grid-unit-20;
+	padding: 0;
+
+	&:last-child {
+		margin-bottom: 0;
+	}
+}
+
+.time-wrapper {
+	/* rtl:ignore */
+	direction: ltr;
+	display: flex;
+}
+
+.hours-input.hours-input.hours-input,
+.minutes-input.minutes-input.minutes-input,
+.day-input.day-input.day-input,
+.year-input.year-input.year-input {
+	// Keep the original specificity over InputControl's Emotion styles.
+	:global(.components-input-control__input) {
+		/* stylelint-disable logical-css/require-logical-properties -- Time fields remain physically LTR, including in RTL locales. */
+		padding-left: $grid-unit-10;
+		padding-right: $grid-unit-10;
+		/* stylelint-enable logical-css/require-logical-properties */
+		text-align: center;
+	}
+}
+
+.hours-input {
+	width: 36px;
+
+	&.hours-input.hours-input {
+		/* stylelint-disable logical-css/require-logical-properties -- Preserve the physical joins between the LTR hours and minutes fields. */
+		:global(.components-input-control__input) {
+			padding-right: 0;
+		}
+		:global(.components-input-control__backdrop) {
+			border-right: 0;
+			border-top-right-radius: 0;
+			border-bottom-right-radius: 0;
+		}
+		/* stylelint-enable logical-css/require-logical-properties */
+	}
+}
+
+.time-separator {
+	border-top: 1px solid $gray-700;
+	border-bottom: 1px solid $gray-700;
+	font-size: $font-size-medium;
+	line-height: calc(36px - 1px * 2);
+	display: inline-block;
+}
+
+.minutes-input {
+	width: 36px;
+
+	&.minutes-input.minutes-input {
+		/* stylelint-disable logical-css/require-logical-properties -- Preserve the physical joins between the LTR hours and minutes fields. */
+		:global(.components-input-control__input) {
+			padding-left: 0;
+		}
+		:global(.components-input-control__backdrop) {
+			border-left: 0;
+			border-top-left-radius: 0;
+			border-bottom-left-radius: 0;
+		}
+		/* stylelint-enable logical-css/require-logical-properties */
+	}
+}
+
+.month-select-wrapper {
+	flex-grow: 1;
+}
+
+.day-input {
+	width: 36px;
+}
+
+.year-input {
+	width: 56px;
+}
+
+.time-zone {
+	text-decoration: underline dotted;
+}

@@ -1,7 +1,7 @@
 import {
 	Button,
 	ExternalLink,
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 	__experimentalVStack as VStack,
@@ -15,6 +15,7 @@ import { safeDecodeURIComponent } from '@wordpress/url';
 import type { DataFormControlProps } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
 import type { BasePost } from '../../types';
+import { hasActionLink } from '../utils';
 import { getSlug } from './utils';
 
 const SlugEdit = ( {
@@ -32,7 +33,10 @@ const SlugEdit = ( {
 	);
 	const permalinkPrefix = prefix;
 	const permalinkSuffix = suffix;
-	const isEditable = PERMALINK_POSTNAME_REGEX.test( permalinkTemplate );
+	// A user who can't publish only gets the permalink.
+	const isEditable =
+		PERMALINK_POSTNAME_REGEX.test( permalinkTemplate ) &&
+		hasActionLink( data, 'wp:action-publish' );
 	const originalSlugRef = useRef( slug );
 	const slugToDisplay = slug || originalSlugRef.current;
 	const permalink = isEditable
@@ -79,7 +83,7 @@ const SlugEdit = ( {
 							{ __( 'Learn more' ) }
 						</ExternalLink>
 					</VStack>
-					<InputControl
+					<WCInputControl
 						prefix={
 							<InputControlPrefixWrapper>
 								/
@@ -135,7 +139,7 @@ const SlugEdit = ( {
 			) }
 			{ ! isEditable && (
 				<ExternalLink
-					className="fields-controls__slug-help"
+					className="fields-controls__slug-help-link"
 					href={ permalink }
 				>
 					{ permalink }

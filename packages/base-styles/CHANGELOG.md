@@ -4,6 +4,40 @@
 
 ### Breaking Changes
 
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 13.3.0 (2026-10-07)
+
+### Enhancements
+
+-   Default `--wp-admin-theme-color` to `#3858e9`, the WordPress 7.0 default admin color scheme, instead of the legacy `#007cba`. To keep the old color, include `admin-scheme(#007cba)` on `:root` in your own stylesheet. `wordpress-admin-schemes()` and the default custom properties now set `#007cba` for the Fresh scheme, which had used the `:root` default ([#83749](https://github.com/WordPress/gutenberg/pull/83749)).
+-   `radio-control`: Use the design system color tokens ([#83270](https://github.com/WordPress/gutenberg/pull/83270)).
+
+### Bug Fixes
+
+-   `radio-control`: Keep radio circles and checked dots visually 16px and 8px on narrow screens while providing a 24px pointer target ([#83840](https://github.com/WordPress/gutenberg/pull/83840)).
+
+## 13.2.0 (2026-09-23)
+
+### Enhancements
+
+-   `checkbox-control`: Use the design system tokens for the default border, hover, and disabled icon colors ([#83271](https://github.com/WordPress/gutenberg/pull/83271)).
+-   `checkbox-control`: Use the design system disabled fill and border tokens ([#82555](https://github.com/WordPress/gutenberg/pull/82555)).
+
+## 13.1.0 (2026-09-10)
+
+### Internal
+
+-   Regenerate the WPDS fallback map with the solid neutral interactive background state tokens. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))
+
+### Enhancements
+
+-   Add a `$block-bg-padding` variable that resolves the default background padding through the `--wp--style--block-background-padding` custom property, keeping the existing values as its fallback ([#82024](https://github.com/WordPress/gutenberg/pull/82024)).
+
+## 13.0.0 (2026-08-26)
+
+### Breaking Changes
+
 -   Remove the `input-style__focus` mixin. Use `outset-ring__focus` instead ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
 
 ### Enhancements

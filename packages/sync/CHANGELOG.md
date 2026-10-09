@@ -2,6 +2,31 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 2.0.0 (2026-10-07)
+
+### Breaking Changes
+
+-   Stop registering the package as a WordPress script. `@wordpress/sync` is now bundled into its consumers, so the `wp-sync` script handle and the `wp.sync` global are no longer exposed ([#81999](https://github.com/WordPress/gutenberg/pull/81999)).
+-   Remove the `privateApis` export. `ConnectionErrorCode`, `createSyncManager`, `Delta`, `CRDT_DOC_META_PERSISTENCE_KEY`, `CRDT_RECORD_MAP_KEY`, `LOCAL_EDITOR_ORIGIN`, `LOCAL_UNDO_IGNORED_ORIGIN`, and `retrySyncConnection` are now regular exports, and the package no longer depends on `@wordpress/private-apis` ([#81999](https://github.com/WordPress/gutenberg/pull/81999)).
+
+### Bug Fixes
+
+-   The sync manager's undo manager no longer stands in for the editor's undo manager. It is the undo history of the loaded entities only: it reports each level Yjs opens through the new `onUndoLevelOpened` record handler (replacing `onUndoStackChange`), and `undo()` and `redo()` take the entity whose level to move and return whether a level was moved. Each entity has its own Yjs undo manager, which replaces the copied `YMultiDocUndoManager`. `stopCapturing()` and `clearRedo()` let the consumer keep its own history in step. The manager exposes `isLoaded()`, and its undo manager exists from creation instead of from the first load. Together with the `core-data` change, undo and redo keep working for entities collaboration does not sync ([#83888](https://github.com/WordPress/gutenberg/pull/83888)).
+
+## 1.56.0 (2026-09-23)
+
+### New Features
+
+-   Pass the Yjs module to sync provider creators as the `Y` property of the provider creator options. Providers should use it instead of the `window.wp.sync.Y` global, which will be removed in a future release ([#82621](https://github.com/WordPress/gutenberg/pull/82621)).
+
+## 1.55.0 (2026-09-10)
+
+## 1.54.0 (2026-08-26)
+
 ### Internal
 
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))

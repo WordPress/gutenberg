@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/lazy-editor",
-	"version": "1.19.0",
+	"version": "1.23.0",
 	"description": "Lazy-loading editor component with automatic asset and settings management.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -21,15 +21,13 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
-		"npm": ">=8.19.2"
+		"node": ">=22.13.0"
 	},
 	"files": [
 		"src",
 		"build",
 		"build-module",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
@@ -59,10 +57,15 @@
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",
-		"react": "^18 || ^19"
+		"@types/react-dom": "^18 || ^19",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
 	},
 	"peerDependenciesMeta": {
 		"@types/react": {
+			"optional": true
+		},
+		"@types/react-dom": {
 			"optional": true
 		}
 	},

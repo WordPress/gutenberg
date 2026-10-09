@@ -255,7 +255,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 								'postType',
 								'wp_template_part',
 								postId
-						  )?.area === 'navigation-overlay'
+							)?.area === 'navigation-overlay'
 						: false,
 				isRevisionsMode: _isRevisionsMode(),
 			};
@@ -383,8 +383,12 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			[ mediaEditKey ]: hasUploadPermissions
 				? editMediaEntity
 				: undefined,
-			[ openMediaEditorModalKey ]: ( { id, onUpdate, onClose } ) =>
-				openMediaEditorModal( { id, onUpdate, onClose } ),
+			[ openMediaEditorModalKey ]: ( {
+				id,
+				onUpdate,
+				onUndo,
+				onClose,
+			} ) => openMediaEditorModal( { id, onUpdate, onUndo, onClose } ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			[ mediaUploadOnSuccessKey ]: hasUploadPermissions
 				? mediaUploadOnSuccess
@@ -434,10 +438,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					: settings.template,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
 			[ sectionRootClientIdKey ]: sectionRootClientId,
-			editorTool:
-				renderingMode === 'post-only' && postType !== 'wp_template'
-					? 'edit'
-					: undefined,
 			// When editing template parts, patterns, or navigation directly,
 			// we're in an isolated editing context (focused on that entity alone).
 			[ isIsolatedEditorKey ]: [

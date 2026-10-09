@@ -1,9 +1,9 @@
 import { FORMAT_ID } from '@terrazzo/plugin-css';
 import type { Plugin } from '@terrazzo/parser';
 import { ColorSpace, to, get, OKLCH, sRGB } from 'colorjs.io/fn';
-import colorTokens from '../../src/prebuilt/ts/color-tokens';
-import { DEFAULT_RAMPS } from '../../src/color-ramps/lib/default-ramps';
-import { DEFAULT_SEED_COLORS } from '../../src/color-ramps/lib/constants';
+import colorTokens from '../../src/prebuilt/ts/color-tokens.ts';
+import { DEFAULT_RAMPS } from '../../src/color-ramps/lib/default-ramps.ts';
+import { DEFAULT_SEED_COLORS } from '../../src/color-ramps/lib/constants.ts';
 
 const WP_ADMIN_THEME_COLOR_VAR = '--wp-admin-theme-color';
 const PRIMARY_SEED = DEFAULT_SEED_COLORS.primary;

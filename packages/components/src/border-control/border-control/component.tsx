@@ -1,6 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import BorderControlDropdown from '../border-control-dropdown';
 import UnitControl from '../../unit-control';
+import { CSS_UNITS } from '../../unit-control/utils';
 import RangeControl from '../../range-control';
 import { HStack } from '../../h-stack';
 import { StyledLabel } from '../../base-control/styles/base-control-styles';
@@ -11,6 +12,9 @@ import { contextConnect } from '../../context';
 import { useBorderControl } from './hook';
 import type { BorderControlProps, LabelProps } from '../types';
 import { Spacer } from '../../spacer';
+
+// Percentages are not valid `border-width` values.
+const BORDER_WIDTH_UNITS = CSS_UNITS.filter( ( unit ) => unit.value !== '%' );
 
 const BorderLabel = ( props: LabelProps ) => {
 	const { label, hideLabelFromVision } = props;
@@ -93,6 +97,7 @@ const UnconnectedBorderControl = (
 					onChange={ onWidthChange }
 					value={ border?.width || '' }
 					placeholder={ placeholder }
+					units={ BORDER_WIDTH_UNITS }
 					disableUnits={ disableUnits }
 					__unstableInputWidth={ inputWidth }
 				/>
@@ -105,7 +110,7 @@ const UnconnectedBorderControl = (
 						max={ 100 }
 						min={ 0 }
 						onChange={ onSliderChange }
-						step={ [ 'px', '%' ].includes( widthUnit ) ? 1 : 0.1 }
+						step={ widthUnit === 'px' ? 1 : 0.1 }
 						value={ widthValue || undefined }
 						withInputField={ false }
 					/>

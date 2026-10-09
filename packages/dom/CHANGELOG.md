@@ -2,6 +2,43 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   Refine the public types: `getScrollContainer` types `direction` as a union, `isEmpty` takes any `Node`, `isFormElement` accepts a missing element, `getPhrasingContentSchema` returns `ContentSchema`, `allowEmpty` is optional in a `Schema` item, and `Schema` and `SchemaItem` are exported ([#84317](https://github.com/WordPress/gutenberg/pull/84317)).
+
+### Bug Fixes
+
+-   `getOffsetParent`: Fix an infinite loop when the parent of the node is not an element ([#84374](https://github.com/WordPress/gutenberg/pull/84374)).
+
+### Internal
+
+-   Refactor to TypeScript ([#84317](https://github.com/WordPress/gutenberg/pull/84317)).
+
+## 4.57.0 (2026-10-07)
+
+## 4.56.0 (2026-09-23)
+
+### Bug Fixes
+
+-   `getRectangleFromRange`: Measure a collapsed range on an element at the text position next to it instead of inserting a temporary text node under the caret ([#82977](https://github.com/WordPress/gutenberg/pull/82977)).
+-   `focusable.find`: Return linked image-map areas when their mapped image is visible and outside an inert subtree ([#82736](https://github.com/WordPress/gutenberg/pull/82736)).
+
+## 4.55.0 (2026-09-10)
+
+### Bug Fixes
+
+-   `focusable.find`: Exclude elements hidden by CSS `visibility` or `content-visibility` while preserving explicitly visible descendants ([#82574](https://github.com/WordPress/gutenberg/pull/82574)).
+
+## 4.54.0 (2026-08-26)
+
+### Bug Fixes
+
+-   `cleanNodeList`: Unwrap whitespace-only phrasing content elements instead of removing them, so pasting content like `a<em> </em>b` no longer loses the space between words ([#76696](https://github.com/WordPress/gutenberg/pull/76696)).
+
 ## 4.53.0 (2026-08-12)
 
 

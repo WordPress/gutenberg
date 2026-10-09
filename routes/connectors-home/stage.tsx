@@ -13,7 +13,6 @@ import { useSelect } from '@wordpress/data';
 import { createInterpolateElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-// eslint-disable-next-line @wordpress/use-recommended-components
 import { Notice } from '@wordpress/ui';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import './style.scss';
@@ -65,7 +64,9 @@ function ConnectorsPage() {
 					( connector: ConnectorConfig ) =>
 						connector.plugin?.file?.split( '/' )[ 0 ]
 				)
-				.filter( ( slug ): slug is string => !! slug )
+				.filter(
+					( slug: string | undefined ): slug is string => !! slug
+				)
 		)
 	).sort();
 	const installedPluginSlugs = new Set(
@@ -109,10 +110,10 @@ function ConnectorsPage() {
 								{ isFileModDisabled
 									? __(
 											'Plugins cannot be installed here due to your site configuration. Install them manually using your normal deployment workflow.'
-									  )
+										)
 									: __(
 											'You do not have permission to install plugins. Please ask a site administrator to install them for you.'
-									  ) }
+										) }
 							</Notice.Description>
 						</Notice.Root>
 					) }
@@ -171,7 +172,7 @@ function ConnectorsPage() {
 					</VStack>
 				) }
 				{ canInstallPlugins && ! isFileModDisabled && (
-					<p>
+					<p className="connectors-page__help-text">
 						{ createInterpolateElement(
 							__(
 								'If the connector you need is not listed, <a>search the plugin directory</a> to see if a connector is available.'

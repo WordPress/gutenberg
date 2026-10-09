@@ -12,11 +12,12 @@ import {
 } from '@wordpress/components';
 import type { Action } from '@wordpress/dataviews';
 import { getItemTitle } from './utils';
+import { hasActionLink } from '../fields/utils';
 import type { CoreDataError, PostWithPermissions } from '../types';
 
 const trashPost: Action< PostWithPermissions > = {
 	id: 'move-to-trash',
-	label: _x( 'Trash', 'verb' ),
+	label: _x( 'Trash…', 'verb' ),
 	isPrimary: true,
 	icon: trash,
 	isEligible( item ) {
@@ -32,7 +33,8 @@ const trashPost: Action< PostWithPermissions > = {
 		return (
 			!! item.status &&
 			! [ 'auto-draft', 'trash' ].includes( item.status ) &&
-			item.permissions?.delete
+			item.permissions?.delete &&
+			hasActionLink( item, 'wp:action-trash' )
 		);
 	},
 	supportsBulk: true,
@@ -53,7 +55,7 @@ const trashPost: Action< PostWithPermissions > = {
 									'Are you sure you want to move "%s" to the trash?'
 								),
 								getItemTitle( items[ 0 ] )
-						  )
+							)
 						: sprintf(
 								// translators: %d: The number of items (2 or more).
 								_n(
@@ -62,7 +64,7 @@ const trashPost: Action< PostWithPermissions > = {
 									items.length
 								),
 								items.length
-						  ) }
+							) }
 				</WCText>
 				<HStack justify="right">
 					<Button

@@ -2,14 +2,93 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   Template field: Migrate template selection to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
+
+### Bug Fixes
+
+-   `PageTitleView`: Keep the page-type badge on a single line, so a list row with the `Privacy Policy Page` badge no longer grows and jumps when hovering reveals the primary action. ([#84368](https://github.com/WordPress/gutenberg/pull/84368))
+-   Status and slug fields: When the post's `_links` lack the `wp:action-publish` relation, disable the status field and show only the permalink in the slug control, so a user who can't publish gets what the classic sidebar shows. ([#84371](https://github.com/WordPress/gutenberg/pull/84371))
+-   `SlugEdit`: Keep the external link icon on the same line as the permalink when the slug can't be edited. ([#84371](https://github.com/WordPress/gutenberg/pull/84371))
+
+## 0.49.0 (2026-10-07)
+
+### Breaking Changes
+
+-   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
+
+### Enhancements
+
+-   `MediaEdit`: Use design system's outine focus ring instead of previous box-shadow based implementation. ([#83854](https://github.com/WordPress/gutenberg/pull/83854))
+
+### Bug Fixes
+
+-   `trashPost`, `permanentlyDeletePost`: Offer "Permanently delete" instead of "Trash" for posts without the `wp:action-trash` REST link. Requires WordPress 7.2 or the Gutenberg plugin ([#84045](https://github.com/WordPress/gutenberg/pull/84045)).
+-   `AuthorView`: Fetch the author through the users list in the `view` context, so users who can't edit other users still see the author's name and avatar, including for authors without published posts. ([#83498](https://github.com/WordPress/gutenberg/pull/83498))
+-   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+-   `MediaEdit`: Show a checkerboard background behind image previews, so images with transparent backgrounds stay visible, as in the classic featured image panel. ([#83846](https://github.com/WordPress/gutenberg/pull/83846))
+
+## 0.48.0 (2026-09-23)
+
+### Enhancements
+
+-   Featured image field: support the `editor.PostFeaturedImage` filter in the post summary. ([#83133](https://github.com/WordPress/gutenberg/pull/83133))
+-   Excerpt field: render nothing when the excerpt is empty. ([#82423](https://github.com/WordPress/gutenberg/pull/82423))
+-   Featured image field: support the `editor.MediaUpload` filter in the post summary and open the featured-image media frame, as the classic panel does. ([#82678](https://github.com/WordPress/gutenberg/pull/82678))
+
+### Bug Fixes
+
+-   Hide the date, author and password fields when the post's `_links` lack the `wp:action-publish` / `wp:action-assign-author` relations, matching the classic sidebar. ([#82844](https://github.com/WordPress/gutenberg/pull/82844))
+-   Template field: Show it on block themes to users who can't create templates, like the post editor's template panel. ([#82857](https://github.com/WordPress/gutenberg/pull/82857))
+-   `MediaEdit`: Show a message instead of the picker when the user lacks permission to upload media. ([#82720](https://github.com/WordPress/gutenberg/pull/82720))
+-   Featured image field: label the button that sets the image with the post type's `set_featured_image` label and title the DataViews media modal with its `featured_image` label, as the classic panel does. ([#83445](https://github.com/WordPress/gutenberg/pull/83445))
+
+### Internal
+
+-   Featured image field: pass the stabilized `featuredImageFlow` prop to `MediaEdit` alongside the deprecated `unstableFeaturedImageFlow`, so plugins reading either name still recognize the featured image. ([#83439](https://github.com/WordPress/gutenberg/pull/83439))
+- 	Replace deprecated `word-break: break-word` with `overflow-wrap: anywhere` on the slug permalink help link to clear the Stylelint suppression. ([#82693](https://github.com/WordPress/gutenberg/pull/82693))
+
+## 0.47.0 (2026-09-10)
+
+### Enhancements
+
+-   Show a "Privacy Policy Page" badge next to the title of the page assigned in Settings > Privacy, alongside the existing "Homepage" and "Posts Page" badges ([#82422](https://github.com/WordPress/gutenberg/pull/82422)).
+-   Append an ellipsis (`…`) to the labels of the actions that open a dialog requiring further input or confirmation (`Delete…`, `Trash…`, `Permanently delete…`, `Rename…`, `Duplicate…`, `Reset…`, `Order…`), following the menu ellipsis guideline. The dialog titles keep the ellipsis-free wording. ([#81994](https://github.com/WordPress/gutenberg/pull/81994))
+-   `PageTitleView`: Migrate the page-type badge from the private Components `Badge` to `@wordpress/ui` `Badge`. ([#82499](https://github.com/WordPress/gutenberg/pull/82499))
+
+### Bug Fixes
+
+-   `author`: Drop the custom `sort` callback, which read `_embedded.author` from the arguments although `Field.sort` receives the field values (the author ids), so every comparison returned `0` and in-memory sorting by author was a no-op. The field now sorts by author id through the `integer` type, matching the order the REST API returns for `orderby=author` ([#82559](https://github.com/WordPress/gutenberg/pull/82559)).
+-   Hide the slug field for posts without a permalink, such as posts of non-public post types, matching the classic post URL panel ([#82341](https://github.com/WordPress/gutenberg/pull/82341)).
+-   Normalize special characters in exported pattern filenames to prevent broken or unreadable files. ([#77033](https://github.com/WordPress/gutenberg/pull/77033))
+
+### Internal
+
+-   `pingStatusField`: Replace the custom `Edit` component with the built-in checkbox control of the `boolean` field type. The field now exposes the REST API's `open` / `closed` value as a boolean through `getValue` and `setValue`, and passes the help link as the field's `description` ([#82539](https://github.com/WordPress/gutenberg/pull/82539)).
+-   `MediaEdit`: Space `ValidityIndicator` with `Stack` now that the indicator has no outer margin. ([#82267](https://github.com/WordPress/gutenberg/pull/82267))
+-   Remove the template activation (`active_templates`) experiment checks from the rename, reset, and duplicate actions ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).
+-   Remove unused dependencies `@wordpress/hooks`, `@wordpress/primitives`, `@wordpress/router`, etc. ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Update a source reference after its JSX file moved to the `.jsx` extension ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+-   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+
+## 0.46.0 (2026-08-26)
+
 ### Enhancements
 
 -   Export `build-style/*`, so the stylesheet can be imported as `@wordpress/fields/build-style/style.css` [#81769](https://github.com/WordPress/gutenberg/pull/81769)).
 
 ### Internal
 
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81516](https://github.com/WordPress/gutenberg/pull/81516))
 -   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81515](https://github.com/WordPress/gutenberg/pull/81515))
 -   `parent`: Narrow the combobox `onChange` handler parameter to `string | null`, following the upstream `ComboboxControl` type fix that removed the accidental `undefined` from the callback type. ([#81568](https://github.com/WordPress/gutenberg/pull/81568))
+-   `CreateTemplatePartModal`: Migrate the `utils` helpers to TypeScript. ([#81808](https://github.com/WordPress/gutenberg/pull/81808))
+-   `MediaEdit`: Render the validity message with `ValidityIndicator` from `@wordpress/ui` instead of hand-rolled markup styled by `@wordpress/components` global class names. The valid state now shows the success icon rather than the error icon. ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574))
 
 ## 0.45.0 (2026-08-12)
 
@@ -85,7 +164,7 @@
 
 ### Enhancements
 
-- Update the base `titleField` to enable hiding. [#71369](https://github.com/WordPress/gutenberg/pull/71369)
+-   Update the base `titleField` to enable hiding. [#71369](https://github.com/WordPress/gutenberg/pull/71369)
 
 ## 0.21.0 (2025-08-20)
 

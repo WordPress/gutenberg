@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/style-runtime",
-	"version": "0.9.0",
+	"version": "0.13.0",
 	"description": "Runtime helpers for injecting WordPress package styles.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,15 +19,13 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=20.10.0",
-		"npm": ">=10.2.3"
+		"node": ">=22.13.0"
 	},
 	"files": [
 		"src",
 		"build",
 		"build-module",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
@@ -41,6 +39,10 @@
 	},
 	"types": "build-types",
 	"sideEffects": false,
+	"devDependencies": {
+		"@testing-library/jest-dom": "^7.0.1",
+		"vitest": "^5.0.3"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

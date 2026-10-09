@@ -42,6 +42,14 @@ The hook reaches for no store or endpoint. The host fetches the records however 
 
 See **Field Types** for the full pipeline.
 
+### Host capabilities
+
+`HostLink` is the anchor consumers mount for a link target, and the only piece of the seam most of them touch. It reads the host's `links` capability and mounts the application's own link or a plain anchor, so no consumer branches on it.
+
+`WidgetHostProvider` / `useWidgetHost`: the seam itself, through which the embedding application provides what only it knows. Every capability is optional, and an absent one degrades to the host-agnostic behavior. `links` is the first: recognition of the application's own routes plus its router's link primitive. Applications mount the provider; the hook reads the bag directly, for a capability no component covers yet.
+
+See **Widget Host** for the contract.
+
 ### Rendering
 
 `<WidgetRender />` resolves a `WidgetType.renderModule` through a host-provided `ResolveWidgetModule` and mounts the component with the `attributes` / `setAttributes` contract.

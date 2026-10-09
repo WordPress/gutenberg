@@ -2,6 +2,33 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 10.3.0 (2026-10-07)
+
+## 10.2.0 (2026-09-23)
+
+### Enhancements
+
+-   The package now bundles TypeScript types ([#82753](https://github.com/WordPress/gutenberg/pull/82753)).
+
+## 10.1.0 (2026-09-10)
+
+### Internal
+
+-   `ComplementaryAreaMoreMenuItem`: Stop passing a `selectedIcon`. The component the item renders as shows the selection ([#81564](https://github.com/WordPress/gutenberg/pull/81564)).
+-   Remove unused dependency `@wordpress/a11y` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+## 10.0.0 (2026-08-26)
+
+### Breaking Changes
+
+-   `ActionItem`: `as` now defaults to `MenuItem` instead of `Button` ([#81507](https://github.com/WordPress/gutenberg/pull/81507)).
+-   `ActionItem.Slot`: Remove the `bubblesVirtually` prop ([#81507](https://github.com/WordPress/gutenberg/pull/81507)).
+
 ## 9.38.0 (2026-08-12)
 
 ### Enhancements

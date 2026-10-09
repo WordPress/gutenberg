@@ -13,6 +13,9 @@
 	],
 	"supports": {
 		"anchor": true,
+		"background": {
+			"gradient": true
+		},
 		"color": {
 			"background": true,
 			"gradients": true
@@ -45,6 +48,7 @@
 				"letterSpacing"
 			],
 			"fontSize": true,
+			"lineHeight": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,
@@ -61,6 +65,7 @@
 		"lock": false
 	},
 	"selectors": {
+		"spacing": ".wp-block-accordion-heading .wp-block-accordion-heading__toggle",
 		"typography": {
 			"letterSpacing": ".wp-block-accordion-heading .wp-block-accordion-heading__toggle-title",
 			"textDecoration": ".wp-block-accordion-heading .wp-block-accordion-heading__toggle-title"

@@ -4,7 +4,7 @@ import KeyboardShortcuts from '..';
 const meta: Meta< typeof KeyboardShortcuts > = {
 	tags: [ 'manifest' ],
 	component: KeyboardShortcuts,
-	title: 'Components/Utilities/KeyboardShortcuts',
+	title: 'Components/@wordpress-components/Utilities/KeyboardShortcuts',
 	id: 'components-keyboardshortcuts',
 	parameters: {
 		controls: { expanded: true },
@@ -34,7 +34,7 @@ Default.args = {
 			{ /* eslint-disable react/no-unescaped-entities */ }
 			<p>Hit the "a" or "b" key in this textarea:</p>
 			{ /* eslint-enable react/no-unescaped-entities */ }
-			<textarea />
+			<textarea aria-label="Keyboard shortcuts demo" />
 		</div>
 	),
 };
@@ -52,7 +52,7 @@ Default.parameters = {
     <p>
       Hit the "a" or "b" key in this textarea:
     </p>
-    <textarea />
+    <textarea aria-label="Keyboard shortcuts demo" />
   </div>
 </KeyboardShortcuts>
 			`,

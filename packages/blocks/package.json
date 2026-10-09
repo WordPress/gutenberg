@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/blocks",
-	"version": "15.26.0",
+	"version": "16.2.0",
 	"description": "Block API for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,15 +19,13 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
-		"npm": ">=8.19.2"
+		"node": ">=22.13.0"
 	},
 	"files": [
 		"src",
 		"build",
 		"build-module",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
@@ -67,27 +65,33 @@
 		"@wordpress/shortcode": "file:../shortcode",
 		"@wordpress/warning": "file:../warning",
 		"change-case": "^4.1.2",
-		"colord": "^2.9.3",
+		"colord": "^2.9.4",
 		"fast-deep-equal": "^3.1.3",
 		"hpq": "^1.4.0",
-		"is-plain-object": "^5.0.0",
+		"is-plain-object": "^5.1.0",
 		"marked": "^18.0.3",
 		"memize": "^2.1.1",
-		"react-is": "^18.3.0",
+		"react-is": "^19.3.0",
 		"remove-accents": "^0.5.0",
 		"simple-html-tokenizer": "^0.5.7",
 		"uuid": "^14.0.0"
 	},
 	"devDependencies": {
-		"@types/react-is": "^18.3.1",
-		"deep-freeze": "^0.0.1"
+		"@types/react-is": "^19.3.0",
+		"deep-freeze": "^0.0.1",
+		"vitest": "^5.0.3"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",
-		"react": "^18 || ^19"
+		"@types/react-dom": "^18 || ^19",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
 	},
 	"peerDependenciesMeta": {
 		"@types/react": {
+			"optional": true
+		},
+		"@types/react-dom": {
 			"optional": true
 		}
 	},

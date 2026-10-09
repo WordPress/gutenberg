@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import filesizeField from '../index';
 import type { MediaItem } from '../../types';
 

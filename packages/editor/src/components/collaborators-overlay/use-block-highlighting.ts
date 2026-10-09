@@ -4,6 +4,9 @@ import {
 	type PostEditorAwarenessState as ActiveCollaborator,
 	type SelectionEndpoint,
 } from '@wordpress/core-data';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor
+// prettier-ignore
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { unlock } from '../../lock-unlock';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
@@ -12,11 +15,17 @@ import {
 	useDebouncedRecompute,
 	useRequestAnimationFrameRecompute,
 } from './use-debounced-recompute';
-import { getOrderedBlockRange } from './cursor-dom-utils';
+import {
+	getNearestVisibleBlockAncestor,
+	getOrderedBlockRange,
+} from './cursor-dom-utils';
+import { resolveTargetElement } from './compute-selection';
+import { resolveStartPosition } from './resolve-start-position';
 import { getCollaboratorDisplayName } from '../../utils/get-collaborator-display-name';
 
 const { useActiveCollaborators, useResolvedSelection } =
 	unlock( coreDataPrivateApis );
+const { isElementVisible } = unlock( blockEditorPrivateApis );
 const { SelectionType } = unlock( coreDataPrivateApis ) as Pick<
 	CoreDataPrivateApis,
 	'SelectionType'
@@ -110,7 +119,9 @@ export function useBlockHighlighting(
 				const selType = userState.editorState?.selection?.type;
 				return (
 					selType === SelectionType.WholeBlock ||
-					selType === SelectionType.SelectionInMultipleBlocks
+					selType === SelectionType.SelectionInMultipleBlocks ||
+					selType === SelectionType.Cursor ||
+					selType === SelectionType.SelectionInOneBlock
 				);
 			} )
 			.flatMap< BlockEntry >( ( userState ) => {
@@ -128,9 +139,91 @@ export function useBlockHighlighting(
 					if ( ! localClientId ) {
 						return [];
 					}
+
+					// The selected block may be hidden inside collapsed
+					// content (e.g. a closed core/details or an inactive
+					// core/accordion panel). Fall back to outlining the
+					// nearest *visible* ancestor instead, same as the
+					// Cursor/SelectionInOneBlock case below, so the
+					// collaborator still has a findable presence indicator
+					// rather than silently getting no highlight at all.
+					let blockId = localClientId;
+					const blockElement = getBlockElementById(
+						blockEditorDocument,
+						localClientId
+					);
+					if ( blockElement && ! isElementVisible( blockElement ) ) {
+						const container =
+							getNearestVisibleBlockAncestor( blockElement );
+						const containerId =
+							container?.getAttribute( 'data-block' );
+						if ( ! containerId ) {
+							return [];
+						}
+						blockId = containerId;
+					}
+
 					return [
 						{
-							blockId: localClientId,
+							blockId,
+							clientId: userState.clientId,
+							userId:
+								userState.collaboratorInfo.id ??
+								userState.clientId,
+							color: getAvatarBorderColor(
+								userState.collaboratorInfo.id ??
+									userState.clientId
+							),
+							userName: getCollaboratorDisplayName(
+								userState.collaboratorInfo
+							),
+							avatarUrl: getAvatarUrl(
+								userState.collaboratorInfo.avatar_urls
+							),
+							alwaysOutline: true,
+						},
+					];
+				}
+
+				if (
+					selection.type === SelectionType.Cursor ||
+					selection.type === SelectionType.SelectionInOneBlock
+				) {
+					// These normally render as a real cursor/selection via
+					// use-render-cursors — this hook only needs to step in
+					// when the target is hidden inside collapsed content
+					// (e.g. a closed core/details or an inactive
+					// core/accordion panel), where a real cursor has nowhere
+					// valid to draw. In that case, fall back to outlining
+					// and placing an avatar on the nearest *visible*
+					// ancestor block, so collaborators still have a
+					// findable presence indicator.
+					const resolved = resolveStartPosition(
+						selection,
+						resolveSelection
+					);
+					if ( ! resolved?.localClientId ) {
+						return [];
+					}
+					const targetElement = resolveTargetElement(
+						blockEditorDocument,
+						resolved
+					);
+					if (
+						! targetElement ||
+						isElementVisible( targetElement )
+					) {
+						return [];
+					}
+					const container =
+						getNearestVisibleBlockAncestor( targetElement );
+					const containerId = container?.getAttribute( 'data-block' );
+					if ( ! containerId ) {
+						return [];
+					}
+					return [
+						{
+							blockId: containerId,
 							clientId: userState.clientId,
 							userId:
 								userState.collaboratorInfo.id ??
@@ -280,6 +373,16 @@ export function useBlockHighlighting(
 			blockElement.classList.remove( 'is-collaborator-selected' );
 			blockElement.style.removeProperty( '--collaborator-outline-color' );
 			currentHighlightedIds.delete( blockId );
+
+			// The block may be hidden inside collapsed content (e.g. a closed
+			// core/details or an inactive core/accordion panel). Skip drawing
+			// a new outline or avatar for it rather than misplacing them at
+			// the collapsed wrapper's position — the reset above still runs so
+			// a block that was outlined before collapsing doesn't keep a
+			// stale outline class or dangling entry in currentHighlightedIds.
+			if ( ! isElementVisible( blockElement ) ) {
+				return;
+			}
 
 			// WholeBlock (single block entirely selected): always outline.
 			// SelectionInMultipleBlocks: outline only on non-text blocks

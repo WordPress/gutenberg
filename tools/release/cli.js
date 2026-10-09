@@ -13,7 +13,7 @@ const semverOption = [ '--semver <semver>', 'Semantic Versioning', 'patch' ];
 const ciOption = [ '-c, --ci', 'Run in CI (non interactive)' ];
 const repositoryPathOption = [
 	'--repository-path <repository-path>',
-	'Relative path to the git repository.',
+	'Path to the git repository, relative to the working directory or absolute.',
 ];
 
 program
@@ -78,6 +78,14 @@ program
 	.option(
 		'--rounds <count>',
 		'Run each test suite this many times for each branch; results are summarized, default = 1'
+	)
+	.option(
+		'--plugins-dir <dir>',
+		'Use prebuilt plugins from <dir>/<branch> and the current checkout as the test runner'
+	)
+	.option(
+		'--suites <suites>',
+		'Comma separated names of the test suites to run, default = all'
 	)
 	.option(
 		'--tests-branch <branch>',

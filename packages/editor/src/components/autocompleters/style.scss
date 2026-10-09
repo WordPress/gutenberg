@@ -9,7 +9,7 @@
 .editor-autocompleters__user {
 	.editor-autocompleters__no-avatar::before {
 		/* stylelint-disable-next-line font-family-no-missing-generic-family-keyword -- dashicons don't need a generic family keyword. */
-		font: normal 20px/1 dashicons;
+		font: 400 20px/1 dashicons;
 		content: "\f110";
 		margin-right: 5px;
 		vertical-align: middle;

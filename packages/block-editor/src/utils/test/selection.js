@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import {
 	retrieveSelectedAttribute,
 	START_OF_SELECTED_AREA,
