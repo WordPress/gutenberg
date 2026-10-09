@@ -19,7 +19,11 @@ const widthExampleStyle = ( name: string ): CSSProperties => ( {
 	display: 'block',
 	width: '100%',
 	height: 0,
-	borderBlockStart: `var(${ name }) solid var(--wpds-color-foreground-content-neutral)`,
+	borderBlockStart: `var(${ name }) solid ${
+		name === '--wpds-border-width-focus'
+			? 'var(--wpds-color-stroke-focus)'
+			: 'var(--wpds-color-foreground-content-neutral)'
+	}`,
 } );
 
 const radiusExampleStyle = ( name: string ): CSSProperties => ( {
@@ -50,7 +54,13 @@ export function BorderTokenPreview() {
 						<h2 style={ headingStyle }>{ groupTitles[ kind ] }</h2>
 						<dl style={ listStyle }>
 							{ group.tokens.map( ( { name, description } ) => (
-								<div key={ name } style={ itemStyle }>
+								<div
+									key={ name }
+									style={ {
+										...itemStyle,
+										gridTemplateColumns: '80px 1fr',
+									} }
+								>
 									<dd
 										style={ { margin: 0 } }
 										aria-hidden="true"

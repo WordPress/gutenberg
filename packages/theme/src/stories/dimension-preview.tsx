@@ -128,7 +128,7 @@ export function DimensionTokenPreview() {
 				return (
 					<section key={ key }>
 						<h2 style={ headingStyle }>{ title }</h2>
-						<p style={ descriptionStyle }>{ intro }</p>
+						<p>{ intro }</p>
 						<dl style={ { ...listStyle, marginBlockStart: 8 } }>
 							{ group.tokens.map( ( { name, description } ) => (
 								<div
@@ -136,7 +136,9 @@ export function DimensionTokenPreview() {
 									style={ {
 										...itemStyle,
 										gridTemplateColumns:
-											'minmax(96px, 1fr) 2fr',
+											key === 'surface-width'
+												? '1fr'
+												: 'minmax(96px, 1fr) 2fr',
 									} }
 								>
 									<dt style={ textStyle }>
