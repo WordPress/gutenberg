@@ -1,5 +1,10 @@
 import clsx from 'clsx';
-import type { ComponentProps, CSSProperties, ReactElement } from 'react';
+import type {
+	ComponentProps,
+	CSSProperties,
+	ReactElement,
+	ReactNode,
+} from 'react';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import {
 	Spinner as WCSpinner,
@@ -40,6 +45,12 @@ import ColumnPrimary from './column-primary';
 import getHierarchicalRows, {
 	type HierarchicalRow,
 } from './get-hierarchical-rows';
+import getTreeRows, { type TreeRow } from './get-tree-rows';
+import {
+	HierarchyCell,
+	HierarchyHeaderCell,
+	getHierarchyBulkActionsStart,
+} from './hierarchy-cell';
 import { useScrollState } from './use-scroll-state';
 import useBulkActionsFocus from '../utils/use-bulk-actions-focus';
 import getDataByGroup from '../utils/get-data-by-group';
@@ -112,6 +123,11 @@ interface TableRowProps< Item > {
 		} & ComponentProps< 'a' >
 	) => ReactElement;
 	posinset?: number;
+	isTreeHierarchy?: boolean;
+	hierarchyLevel?: number;
+	hasChildren?: boolean;
+	isExpanded?: boolean;
+	onToggleExpanded?: ( id: string ) => void;
 }
 
 function TableColumnField< Item >( {
@@ -159,6 +175,11 @@ function TableRow< Item >( {
 	onMouseDown,
 	onClickCapture,
 	posinset,
+	isTreeHierarchy,
+	hierarchyLevel = 0,
+	hasChildren,
+	isExpanded,
+	onToggleExpanded,
 }: TableRowProps< Item > ) {
 	const { paginationInfo } = useContext( DataViewsContext );
 	const hasPossibleBulkAction = useHasAPossibleBulkAction( actions, item );
@@ -174,6 +195,38 @@ function TableRow< Item >( {
 		( titleField && showTitle ) ||
 		( mediaField && showMedia ) ||
 		( descriptionField && showDescription );
+	const itemTitle = titleField?.getValue?.( { item } );
+	const itemLabel =
+		typeof itemTitle === 'string' && itemTitle ? itemTitle : id;
+
+	const selectionCheckbox = (
+		<DataViewsSelectionCheckbox
+			item={ item }
+			selection={ selection }
+			onChangeSelection={ onChangeSelection }
+			getItemId={ getItemId }
+			titleField={ titleField }
+			disabled={ ! hasPossibleBulkAction }
+		/>
+	);
+	const renderHierarchyCell = (
+		content: ReactNode,
+		isHierarchyCell = isTreeHierarchy
+	) =>
+		isHierarchyCell ? (
+			<HierarchyCell
+				level={ hierarchyLevel }
+				label={ itemLabel }
+				hasChildren={ hasChildren }
+				isExpanded={ isExpanded }
+				onToggle={ () => onToggleExpanded?.( id ) }
+				checkbox={ hasBulkActions && selectionCheckbox }
+			>
+				{ content }
+			</HierarchyCell>
+		) : (
+			content
+		);
 
 	return (
 		<tr
@@ -181,6 +234,14 @@ function TableRow< Item >( {
 				'is-selected': hasPossibleBulkAction && isSelected,
 				'has-bulk-actions': hasPossibleBulkAction,
 			} ) }
+			style={
+				isTreeHierarchy
+					? ( {
+							'--wp-dataviews-table-hierarchy-level':
+								hierarchyLevel,
+						} as CSSProperties )
+					: undefined
+			}
 			aria-setsize={
 				infiniteScrollEnabled ? paginationInfo.totalItems : undefined
 			}
@@ -204,38 +265,39 @@ function TableRow< Item >( {
 				onMouseDown( event );
 			} }
 		>
-			{ hasBulkActions && (
+			{ hasBulkActions && ! isTreeHierarchy && (
 				<td className="dataviews-view-table__checkbox-column">
 					<div className="dataviews-view-table__cell-content-wrapper">
-						<DataViewsSelectionCheckbox
-							item={ item }
-							selection={ selection }
-							onChangeSelection={ onChangeSelection }
-							getItemId={ getItemId }
-							titleField={ titleField }
-							disabled={ ! hasPossibleBulkAction }
-						/>
+						{ selectionCheckbox }
 					</div>
 				</td>
 			) }
 			{ hasPrimaryColumn && (
-				<td>
-					<ColumnPrimary
-						item={ item }
-						level={ level }
-						titleField={ showTitle ? titleField : undefined }
-						mediaField={ showMedia ? mediaField : undefined }
-						mediaAspectRatio={ mediaAspectRatio }
-						descriptionField={
-							showDescription ? descriptionField : undefined
-						}
-						isItemClickable={ isItemClickable }
-						onClickItem={ onClickItem }
-						renderItemLink={ renderItemLink }
-					/>
+				<td
+					className={
+						isTreeHierarchy
+							? 'dataviews-view-table__hierarchy-content-column'
+							: undefined
+					}
+				>
+					{ renderHierarchyCell(
+						<ColumnPrimary
+							item={ item }
+							level={ level }
+							titleField={ showTitle ? titleField : undefined }
+							mediaField={ showMedia ? mediaField : undefined }
+							mediaAspectRatio={ mediaAspectRatio }
+							descriptionField={
+								showDescription ? descriptionField : undefined
+							}
+							isItemClickable={ isItemClickable }
+							onClickItem={ onClickItem }
+							renderItemLink={ renderItemLink }
+						/>
+					) }
 				</td>
 			) }
-			{ columns.map( ( column: string ) => {
+			{ columns.map( ( column: string, index: number ) => {
 				// Explicit picks the supported styles.
 				const { width, maxWidth, minWidth, align } =
 					view.layout?.styles?.[ column ] ?? {};
@@ -245,18 +307,26 @@ function TableRow< Item >( {
 				return (
 					<td
 						key={ column }
+						className={
+							isTreeHierarchy && ! hasPrimaryColumn && index === 0
+								? 'dataviews-view-table__hierarchy-content-column'
+								: undefined
+						}
 						style={ {
 							width,
 							maxWidth,
 							minWidth,
 						} }
 					>
-						<TableColumnField
-							fields={ fields }
-							item={ item }
-							column={ column }
-							align={ effectiveAlign }
-						/>
+						{ renderHierarchyCell(
+							<TableColumnField
+								fields={ fields }
+								item={ item }
+								column={ column }
+								align={ effectiveAlign }
+							/>,
+							isTreeHierarchy && ! hasPrimaryColumn && index === 0
+						) }
 					</td>
 				);
 			} ) }
@@ -285,6 +355,9 @@ function ViewTable< Item >( {
 	getItemId,
 	getItemLevel,
 	getItemParentId,
+	getItemHasChildren,
+	expandedItemIds,
+	onChangeExpandedItemIds,
 	isLoading = false,
 	onChangeView,
 	onChangeSelection,
@@ -312,10 +385,26 @@ function ViewTable< Item >( {
 				getItemParentId,
 				view.showLevels
 			);
+	const tree =
+		! dataByGroup &&
+		view.showLevels &&
+		getItemParentId &&
+		getItemHasChildren &&
+		expandedItemIds &&
+		onChangeExpandedItemIds
+			? getTreeRows(
+					rows,
+					getItemHasChildren,
+					expandedItemIds,
+					onChangeExpandedItemIds
+				)
+			: undefined;
+	const isTreeHierarchy = !! tree;
+	const renderedRows = tree ? tree.visibleRows : rows;
 	// Selection ranges follow the rendered hierarchy and group order.
 	const orderedData = dataByGroup
 		? Array.from( dataByGroup.values() ).flat()
-		: rows.map( ( row ) => row.item );
+		: renderedRows.map( ( row ) => row.item );
 	const { getSelectionProps } = useSelectionProps( {
 		data: orderedData,
 		getItemId,
@@ -361,6 +450,20 @@ function ViewTable< Item >( {
 			);
 			overlay.style.insetBlockStart =
 				win.getComputedStyle( header ).insetBlockStart;
+			const start = getHierarchyBulkActionsStart(
+				header,
+				tableSelectionRef.current
+			);
+			if ( start !== undefined ) {
+				overlay.style.setProperty(
+					'--wp-dataviews-table-bulk-actions-start',
+					`${ start }px`
+				);
+			} else {
+				overlay.style.removeProperty(
+					'--wp-dataviews-table-bulk-actions-start'
+				);
+			}
 		}
 	};
 	const resizeHeaderRef = useResizeObserver< HTMLTableSectionElement >(
@@ -372,7 +475,14 @@ function ViewTable< Item >( {
 	const showBulkActions =
 		( hasBulkActions && selection.length > 0 ) || isActionInProgress;
 	// The resize observer reports after the first paint, so measure on show.
-	useLayoutEffect( syncBulkActionsPosition, [ showBulkActions ] );
+	const hasExpandableItems = !! tree?.expandableItemIds.length;
+	const density = view.layout?.density;
+	useLayoutEffect( syncBulkActionsPosition, [
+		showBulkActions,
+		isTreeHierarchy,
+		hasExpandableItems,
+		density,
+	] );
 	// The toolbar covers the header, so move focus between the two
 	// selection checkboxes when an interaction shows or hides the toolbar.
 	const focusAfterToggle = useBulkActionsFocus( {
@@ -491,6 +601,41 @@ function ViewTable< Item >( {
 		);
 	}
 
+	const renderHierarchyHeader = (
+		content: ReactNode,
+		isHierarchyCell = isTreeHierarchy
+	) =>
+		isHierarchyCell ? (
+			<HierarchyHeaderCell
+				isAllExpanded={ !! tree?.isAllExpanded }
+				onToggleAll={
+					tree?.expandableItemIds.length
+						? tree.onToggleAll
+						: undefined
+				}
+				isCovered={ disableHeaderControls }
+				checkbox={
+					hasBulkActions && (
+						<BulkSelectionCheckbox
+							checkboxRef={ tableSelectionRef }
+							onSelect={ () =>
+								focusAfterToggle( bulkSelectionRef )
+							}
+							selection={ selection }
+							onChangeSelection={ onChangeSelection }
+							data={ data }
+							actions={ actions }
+							getItemId={ getItemId }
+						/>
+					)
+				}
+			>
+				{ content }
+			</HierarchyHeaderCell>
+		) : (
+			content
+		);
+
 	return (
 		<>
 			{ ( hasBulkActions || isActionInProgress ) && (
@@ -498,6 +643,7 @@ function ViewTable< Item >( {
 					className={ clsx(
 						'dataviews-view-table__bulk-actions-overlay',
 						{
+							'is-hierarchy': isTreeHierarchy,
 							'is-refreshing':
 								! isInfiniteScroll && isDelayedLoading,
 						}
@@ -538,7 +684,7 @@ function ViewTable< Item >( {
 				<colgroup>
 					{ /* The column of the fade cell at the start of each row. */ }
 					<col className="dataviews-view-table__col-scroll-fade" />
-					{ hasBulkActions && (
+					{ hasBulkActions && ! isTreeHierarchy && (
 						<col className="dataviews-view-table__col-checkbox" />
 					) }
 					{ hasPrimaryColumn && (
@@ -579,7 +725,7 @@ function ViewTable< Item >( {
 					onContextMenu={ handleHeaderContextMenu }
 				>
 					<tr className="dataviews-view-table__row">
-						{ hasBulkActions && (
+						{ hasBulkActions && ! isTreeHierarchy && (
 							<th
 								className="dataviews-view-table__checkbox-column"
 								scope="col"
@@ -617,33 +763,37 @@ function ViewTable< Item >( {
 										: undefined
 								}
 							>
-								{ titleField && (
-									<ColumnHeaderMenu
-										ref={ headerMenuRef(
-											titleField.id,
-											0
-										) }
-										fieldId={ titleField.id }
-										isCovered={ disableHeaderControls }
-										view={ view }
-										fields={ fields }
-										onChangeView={ onChangeView }
-										onHide={ onHide }
-										setOpenedFilter={ setOpenedFilter }
-										canMove={ false }
-										canInsertLeft={
-											isRtl
-												? ( view.layout?.enableMoving ??
-													true )
-												: false
-										}
-										canInsertRight={
-											isRtl
-												? false
-												: ( view.layout?.enableMoving ??
-													true )
-										}
-									/>
+								{ renderHierarchyHeader(
+									titleField && (
+										<ColumnHeaderMenu
+											ref={ headerMenuRef(
+												titleField.id,
+												0
+											) }
+											fieldId={ titleField.id }
+											isCovered={ disableHeaderControls }
+											view={ view }
+											fields={ fields }
+											onChangeView={ onChangeView }
+											onHide={ onHide }
+											setOpenedFilter={ setOpenedFilter }
+											canMove={ false }
+											canInsertLeft={
+												isRtl
+													? ( view.layout
+															?.enableMoving ??
+														true )
+													: false
+											}
+											canInsertRight={
+												isRtl
+													? false
+													: ( view.layout
+															?.enableMoving ??
+														true )
+											}
+										/>
+									)
 								) }
 							</th>
 						) }
@@ -677,19 +827,27 @@ function ViewTable< Item >( {
 									}
 									scope="col"
 								>
-									<ColumnHeaderMenu
-										ref={ headerMenuRef( column, index ) }
-										fieldId={ column }
-										isCovered={ disableHeaderControls }
-										view={ view }
-										fields={ fields }
-										onChangeView={ onChangeView }
-										onHide={ onHide }
-										setOpenedFilter={ setOpenedFilter }
-										canMove={ canInsertOrMove }
-										canInsertLeft={ canInsertOrMove }
-										canInsertRight={ canInsertOrMove }
-									/>
+									{ renderHierarchyHeader(
+										<ColumnHeaderMenu
+											ref={ headerMenuRef(
+												column,
+												index
+											) }
+											fieldId={ column }
+											isCovered={ disableHeaderControls }
+											view={ view }
+											fields={ fields }
+											onChangeView={ onChangeView }
+											onHide={ onHide }
+											setOpenedFilter={ setOpenedFilter }
+											canMove={ canInsertOrMove }
+											canInsertLeft={ canInsertOrMove }
+											canInsertRight={ canInsertOrMove }
+										/>,
+										isTreeHierarchy &&
+											! hasPrimaryColumn &&
+											index === 0
+									) }
 								</th>
 							);
 						} ) }
@@ -767,13 +925,18 @@ function ViewTable< Item >( {
 				) : (
 					<tbody>
 						{ hasData &&
-							rows.map( ( row, index ) => {
+							renderedRows.map( ( row, index ) => {
 								const { id, item, level } = row;
+								const treeRow = isTreeHierarchy
+									? ( row as TreeRow< Item > )
+									: undefined;
 								return (
 									<TableRow
 										key={ id }
 										item={ item }
-										level={ level }
+										level={
+											isTreeHierarchy ? undefined : level
+										}
 										hasBulkActions={ hasBulkActions }
 										actions={ actions }
 										fields={ fields }
@@ -790,6 +953,11 @@ function ViewTable< Item >( {
 										onClickItem={ onClickItem }
 										renderItemLink={ renderItemLink }
 										isItemClickable={ isItemClickable }
+										isTreeHierarchy={ isTreeHierarchy }
+										hierarchyLevel={ level }
+										hasChildren={ treeRow?.hasChildren }
+										isExpanded={ treeRow?.isExpanded }
+										onToggleExpanded={ tree?.onToggle }
 										posinset={
 											isInfiniteScroll
 												? index + 1
