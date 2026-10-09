@@ -8,7 +8,7 @@
 
 ### Internal
 
--   Refactor to TypeScript ([#84324](https://github.com/WordPress/gutenberg/pull/84324), [#84365](https://github.com/WordPress/gutenberg/pull/84365)).
+-   Refactor to TypeScript ([#84324](https://github.com/WordPress/gutenberg/pull/84324), [#84365](https://github.com/WordPress/gutenberg/pull/84365), [#84378](https://github.com/WordPress/gutenberg/pull/84378)).
 
 ## 7.57.0 (2026-10-07)
 
