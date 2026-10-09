@@ -4,6 +4,7 @@ import {
 	useLayoutEffect,
 	useReducer,
 } from '@wordpress/element';
+import type { RefObject } from 'react';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { useRegistry } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
@@ -15,6 +16,13 @@ import { useDefaultStyle } from './use-default-style';
 import { useBoundaryStyle } from './use-boundary-style';
 import { useEventListeners } from './event-listeners';
 import { useFormatTypes } from './use-format-types';
+import type {
+	ApplyRecordOptions,
+	RichTextBaseProps,
+	RichTextChangeMeta,
+	RichTextProps,
+	RichTextRecord,
+} from './types';
 
 // A symbol, so the function stays private if the hook becomes public.
 export const getDomPositionKey = Symbol( 'getDomPosition' );
@@ -28,12 +36,12 @@ export const getDomPositionKey = Symbol( 'getDomPosition' );
  *
  * @return {boolean} Whether the element has focus.
  */
-function hasFocus( element ) {
+function hasFocus( element: HTMLElement ) {
 	const { activeElement } = element.ownerDocument;
 	return (
 		activeElement === element ||
-		( activeElement?.contentEditable === 'true' &&
-			activeElement.contains( element ) )
+		( ( activeElement as HTMLElement | null )?.contentEditable === 'true' &&
+			activeElement!.contains( element ) )
 	);
 }
 
@@ -51,16 +59,19 @@ function useRichTextBase( {
 	__unstableAfterParse,
 	__unstableBeforeSerialize,
 	__unstableAddInvisibleFormats,
-} ) {
+}: RichTextBaseProps ) {
 	const registry = useRegistry();
-	const [ , forceRender ] = useReducer( () => ( {} ) );
-	const ref = useRef();
+	const [ , forceRender ] = useReducer(
+		(): object | undefined => ( {} ),
+		undefined
+	);
+	const ref = useRef< HTMLElement >( undefined );
 
 	function createRecord() {
 		const {
 			ownerDocument: { defaultView },
-		} = ref.current;
-		const selection = defaultView.getSelection();
+		} = ref.current!;
+		const selection = defaultView!.getSelection()!;
 		const range =
 			selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
 
@@ -71,10 +82,13 @@ function useRichTextBase( {
 		} );
 	}
 
-	function applyRecord( newRecord, { domOnly } = {} ) {
+	function applyRecord(
+		newRecord: RichTextRecord,
+		{ domOnly }: ApplyRecordOptions = {}
+	) {
 		apply( {
 			value: newRecord,
-			current: ref.current,
+			current: ref.current!,
 			prepareEditableTree: __unstableAddInvisibleFormats,
 			__unstableDomOnly: domOnly,
 			placeholder,
@@ -83,24 +97,32 @@ function useRichTextBase( {
 
 	// Internal values are updated synchronously, unlike props and state.
 	const _valueRef = useRef( value );
-	const recordRef = useRef();
+	const recordRef = useRef< RichTextRecord >( undefined );
 
 	function setRecordFromProps() {
 		const activeFormats = recordRef.current?.activeFormats;
+		// The record holds the parsed `RichTextData` until it is copied below.
+		const parsedRef = recordRef as unknown as RefObject< RichTextData >;
 		_valueRef.current = value;
-		recordRef.current = value;
+		parsedRef.current = value as RichTextData;
 		if ( ! ( value instanceof RichTextData ) ) {
-			recordRef.current = value
-				? RichTextData.fromHTMLString( value, { preserveWhiteSpace } )
+			// `fromHTMLString` ignores `preserveWhiteSpace`.
+			parsedRef.current = value
+				? (
+						RichTextData.fromHTMLString as (
+							html: string,
+							options: { preserveWhiteSpace?: boolean }
+						) => RichTextData
+					 )( value, { preserveWhiteSpace } )
 				: RichTextData.empty();
 		}
 		// To do: make rich text internally work with RichTextData.
 		recordRef.current = {
-			text: recordRef.current.text,
-			formats: recordRef.current.formats,
-			replacements: recordRef.current.replacements,
+			text: parsedRef.current.text,
+			formats: parsedRef.current.formats,
+			replacements: parsedRef.current.replacements,
 			activeFormats,
-		};
+		} as RichTextRecord;
 		if ( disableFormats ) {
 			recordRef.current.formats = Array( value.length );
 			recordRef.current.replacements = Array( value.length );
@@ -110,8 +132,8 @@ function useRichTextBase( {
 				recordRef.current
 			);
 		}
-		recordRef.current.start = selectionStart;
-		recordRef.current.end = selectionEnd;
+		recordRef.current.start = selectionStart!;
+		recordRef.current.end = selectionEnd!;
 	}
 
 	if ( ! recordRef.current ) {
@@ -122,8 +144,8 @@ function useRichTextBase( {
 	) {
 		recordRef.current = {
 			...recordRef.current,
-			start: selectionStart,
-			end: selectionEnd,
+			start: selectionStart!,
+			end: selectionEnd!,
 			activeFormats: undefined,
 		};
 	}
@@ -131,9 +153,9 @@ function useRichTextBase( {
 	// The selection the element last sent out, so it can be told apart from
 	// one set from outside. Forgotten once compared: the same positions can
 	// come back from outside later, after the selection moved elsewhere.
-	const sentSelectionRef = useRef( [] );
+	const sentSelectionRef = useRef< ( number | undefined )[] >( [] );
 
-	function sendSelection( start, end ) {
+	function sendSelection( start?: number, end?: number ) {
 		sentSelectionRef.current = [ start, end ];
 		onSelectionChange( start, end );
 	}
@@ -144,7 +166,7 @@ function useRichTextBase( {
 	 *
 	 * @param {Object} newRecord The record to sync and apply.
 	 */
-	function handleChange( newRecord ) {
+	function handleChange( newRecord: RichTextRecord ) {
 		recordRef.current = newRecord;
 		applyRecord( newRecord );
 
@@ -165,7 +187,7 @@ function useRichTextBase( {
 			}
 		}
 
-		const { start, end, formats, text } = recordRef.current;
+		const { start, end, formats, text } = recordRef.current!;
 
 		// Selection must be updated first, so it is recorded in history when
 		// the content change happens.
@@ -187,8 +209,8 @@ function useRichTextBase( {
 		}
 
 		setRecordFromProps();
-		applyRecord( recordRef.current, {
-			domOnly: ! hasFocus( ref.current ),
+		applyRecord( recordRef.current!, {
+			domOnly: ! hasFocus( ref.current! ),
 		} );
 		forceRender();
 	}, [ value ] );
@@ -201,18 +223,20 @@ function useRichTextBase( {
 		if (
 			isSelected &&
 			( selectionStart !== sentStart || selectionEnd !== sentEnd ) &&
-			hasFocus( ref.current )
+			hasFocus( ref.current! )
 		) {
-			applyRecord( recordRef.current );
+			applyRecord( recordRef.current! );
 		}
 	}, [ selectionStart, selectionEnd, isSelected ] );
 
 	const mergedRefs = useMergeRefs( [
 		ref,
 		useDefaultStyle(),
-		useBoundaryStyle( { record: recordRef } ),
+		useBoundaryStyle( {
+			record: recordRef as RefObject< RichTextRecord >,
+		} ),
 		useEventListeners( {
-			record: recordRef,
+			record: recordRef as RefObject< RichTextRecord >,
 			handleChange,
 			applyRecord,
 			createRecord,
@@ -221,9 +245,9 @@ function useRichTextBase( {
 			forceRender,
 		} ),
 		useRefEffect(
-			( element ) => {
+			( element: HTMLElement ) => {
 				setRecordFromProps();
-				applyRecord( recordRef.current, {
+				applyRecord( recordRef.current!, {
 					domOnly: ! hasFocus( element ),
 				} );
 			},
@@ -232,23 +256,23 @@ function useRichTextBase( {
 	] );
 
 	return {
-		value: recordRef.current,
+		value: recordRef.current!,
 		// A function to get the most recent value so event handlers in
 		// useRichText implementations have access to it. For example when
 		// listening to input events, we internally update the state, but this
 		// state is not yet available to the input event handler because React
 		// may re-render asynchronously.
-		getValue: () => recordRef.current,
+		getValue: () => recordRef.current!,
 		onChange: handleChange,
 		ref: mergedRefs,
 		// The DOM position of an offset in the value, for a selection set
 		// from outside the element.
 		[ getDomPositionKey ]: useCallback(
-			( offset ) =>
+			( offset: number ) =>
 				getDomPosition( {
-					value: recordRef.current,
-					offset: Math.min( offset, recordRef.current.text.length ),
-					element: ref.current,
+					value: recordRef.current!,
+					offset: Math.min( offset, recordRef.current!.text.length ),
+					element: ref.current!,
 					prepareEditableTree: __unstableAddInvisibleFormats,
 					placeholder,
 				} ),
@@ -264,7 +288,7 @@ export function useRichText( {
 	__unstableDependencies = [],
 	__unstableFormatTypeHandlerContext,
 	...props
-} ) {
+}: RichTextProps ) {
 	const {
 		formatTypes,
 		prepareHandlers,
@@ -277,14 +301,14 @@ export function useRichText( {
 		__unstableFormatTypeHandlerContext,
 	} );
 
-	function addEditorOnlyFormats( record ) {
+	function addEditorOnlyFormats( record: RichTextRecord ) {
 		return valueHandlers.reduce(
 			( accumulator, fn ) => fn( accumulator, record.text ),
 			record.formats
 		);
 	}
 
-	function removeEditorOnlyFormats( record ) {
+	function removeEditorOnlyFormats( record: RichTextRecord ) {
 		formatTypes.forEach( ( formatType ) => {
 			if ( formatType.__experimentalCreatePrepareEditableTree ) {
 				record = removeFormat(
@@ -298,7 +322,7 @@ export function useRichText( {
 		return record.formats;
 	}
 
-	function addInvisibleFormats( record ) {
+	function addInvisibleFormats( record: RichTextRecord ) {
 		return prepareHandlers.reduce(
 			( accumulator, fn ) => fn( accumulator, record.text ),
 			record.formats
@@ -307,7 +331,10 @@ export function useRichText( {
 
 	const result = useRichTextBase( {
 		...props,
-		onChange( value, { __unstableFormats, __unstableText } ) {
+		onChange(
+			value: string | RichTextData,
+			{ __unstableFormats, __unstableText }: RichTextChangeMeta
+		) {
 			onChange( value, { __unstableFormats, __unstableText } );
 			Object.values( changeHandlers ).forEach( ( changeHandler ) => {
 				changeHandler( __unstableFormats, __unstableText );
@@ -322,7 +349,7 @@ export function useRichText( {
 	return { ...result, formatTypes };
 }
 
-export function useDeprecatedRichText( props ) {
+export function useDeprecatedRichText( props: RichTextBaseProps ) {
 	deprecated( '`__unstableUseRichText` hook', {
 		since: '7.0',
 	} );
