@@ -11,14 +11,14 @@
 -   Add `Avatar.Root`, `Avatar.Image`, and `Avatar.Fallback` for profile images with customizable fallbacks, circle and square shapes, a neutral border, five sizes from 16px to 64px, and a reduced-motion-aware image fade. ([#84145](https://github.com/WordPress/gutenberg/pull/84145))
 -   `Breadcrumb`: Add `ButtonItem` ancestors for hierarchy selection, current-only trails, and customizable `CurrentItem` `aria-current` ([#84156](https://github.com/WordPress/gutenberg/pull/84156)).
 
+### Enhancements
+
+-   `Select`, `Combobox`, `Autocomplete`, and the select controls: Tighten popup item spacing, use 16px selection indicators, and align group labels and separators with item content ([#84393](https://github.com/WordPress/gutenberg/pull/84393)).
+
 ### Bug Fixes
 
 -   `Menu`, `Popover`: Keep popups open when the user interacts with an iframe inside the popup. ([#83870](https://github.com/WordPress/gutenberg/pull/83870))
 -   `AlertDialog`: Use the WordPress compatibility overlay slot as the default portal container when available, preserving an explicit null container to delay rendering ([#83878](https://github.com/WordPress/gutenberg/pull/83878)).
-
-### Enhancements
-
--   `Select`, `Combobox`, `Autocomplete`, and the select controls: Tighten popup item spacing, use 16px selection indicators, and align group labels and separators with item content ([#84393](https://github.com/WordPress/gutenberg/pull/84393)).
 
 ## 0.24.0 (2026-10-07)
 
