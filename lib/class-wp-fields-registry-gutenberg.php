@@ -5,26 +5,18 @@
  * @package gutenberg
  */
 
-/**
- * The fields registry the plugin puts in place of the core one.
- *
- * Replacing the singleton on `init` makes every reader of the core registry,
- * `WP_Fields_Registry::get_instance()` and the functions wrapping it, read
- * the plugin one, so the plugin can change the registry ahead of core by
- * overriding its methods here.
- */
 class WP_Fields_Registry_Gutenberg extends WP_Fields_Registry {
 
 	/**
-	 * Returns the shared registry instance, replacing the core one.
+	 * Returns the shared registry instance.
 	 *
-	 * The base `$instance` slot is not redefined, so
-	 * `WP_Fields_Registry::get_instance()` and this method share one
-	 * instance. A core registry in place hands over what it holds: its
-	 * fields, their script modules, and whether `wp_fields_api_init` has
-	 * fired, so the action does not fire again for the new instance. The
-	 * state is copied rather than registered again, since register() only
-	 * runs on the action.
+	 * This class intentionally does not redeclare the static `$instance`
+	 * property, so that it can be shared between `WP_Fields_Registry` and
+	 * `WP_Fields_Registry_Gutenberg`.
+	 *
+	 * In other words, consumers can (and should) continue to call
+	 * `WP_Fields_Registry::get_instance()` to access the registry, but they
+	 * will receive an instance of `WP_Fields_Registry_Gutenberg`.
 	 *
 	 * @return WP_Fields_Registry_Gutenberg The registry.
 	 */
@@ -33,6 +25,22 @@ class WP_Fields_Registry_Gutenberg extends WP_Fields_Registry {
 			$core_registry = self::$instance;
 			$registry      = new self();
 
+			/*
+			 * Note that the base registry enforces lazy registration of
+			 * fields, such that fields are only registered well after the
+			 * 'init' hook has fired.
+			 *
+			 * This means that, in practice, it's likely impossible that we
+			 * find ourselves in a situation where there is data in the
+			 * properties of the instance of `WP_Fields_Registry` that needs to
+			 * be copied to the instance of `WP_Fields_Registry_Gutenberg`.
+			 *
+			 * THUS, THE ASSIGNMENTS BELOW REFLECT AN ABUNDANCE OF CAUTION AND
+			 * NOT AN ACTUAL NEED.
+			 *
+			 * @see WP_Fields_Registry::initialize()
+			 * @see WP_Fields_Registry::doing_fields_api_init()
+			 */
 			if ( null !== $core_registry ) {
 				$registry->fields        = $core_registry->fields;
 				$registry->field_modules = $core_registry->field_modules;
