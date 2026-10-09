@@ -22,6 +22,7 @@ export default function DataViewsFooter() {
 		actions = EMPTY_ARRAY,
 		isLoading,
 		hasInitiallyLoaded,
+		isHierarchyPaginationActive,
 	} = useContext( DataViewsContext );
 
 	const isRefreshing = !! isLoading && hasInitiallyLoaded && !! data?.length;
@@ -32,12 +33,15 @@ export default function DataViewsFooter() {
 		useSomeItemHasAPossibleBulkAction( actions, data ) &&
 		[ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type );
 
-	const hasPagination = hasPaginationControls( view, {
-		totalItems,
-		totalPages,
-	} );
+	const hasPagination =
+		! isHierarchyPaginationActive &&
+		hasPaginationControls( view, {
+			totalItems,
+			totalPages,
+		} );
+	const itemCount = isHierarchyPaginationActive ? data.length : totalItems;
 
-	if ( ! totalItems || ( ! hasBulkActions && ! hasPagination ) ) {
+	if ( ! itemCount || ( ! hasBulkActions && ! hasPagination ) ) {
 		return null;
 	}
 

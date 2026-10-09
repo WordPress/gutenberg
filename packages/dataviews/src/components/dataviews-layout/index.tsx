@@ -22,6 +22,7 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 		getItemHasChildren,
 		expandedItemIds,
 		onChangeExpandedItemIds,
+		hierarchyPagination,
 		hasInitiallyLoaded,
 		isLoading,
 		view,
@@ -75,6 +76,7 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 				getItemHasChildren={ getItemHasChildren }
 				expandedItemIds={ expandedItemIds }
 				onChangeExpandedItemIds={ onChangeExpandedItemIds }
+				hierarchyPagination={ hierarchyPagination }
 				isLoading={ isLoading }
 				onChangeView={ onChangeView }
 				onChangeSelection={ onChangeSelection }

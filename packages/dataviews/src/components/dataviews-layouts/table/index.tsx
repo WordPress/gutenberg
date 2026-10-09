@@ -5,7 +5,7 @@ import type {
 	ReactElement,
 	ReactNode,
 } from 'react';
-import { __, sprintf, isRTL } from '@wordpress/i18n';
+import { __, _n, sprintf, isRTL } from '@wordpress/i18n';
 import { Button, Spinner, Popover } from '@wordpress/components';
 import { VisuallyHidden } from '@wordpress/ui';
 import {
@@ -33,6 +33,8 @@ import {
 } from '../../dataviews-bulk-actions';
 import type {
 	Action,
+	HierarchyPagination,
+	HierarchyPaginationInfo,
 	MediaAspectRatio,
 	NormalizedField,
 	ViewTable as ViewTableType,
@@ -117,11 +119,219 @@ function getTreeRows< Item >(
 	return { allRows, visibleRows };
 }
 
+interface HierarchyContinuation< Item > {
+	parent: TreeRow< Item >;
+	paginationInfo: HierarchyPaginationInfo;
+}
+
+function hasHierarchyContinuation(
+	paginationInfo: HierarchyPaginationInfo | undefined
+): paginationInfo is HierarchyPaginationInfo {
+	return !! (
+		paginationInfo &&
+		( paginationInfo.hasMore ||
+			paginationInfo.isLoading ||
+			( typeof paginationInfo.error === 'string' &&
+				paginationInfo.error ) )
+	);
+}
+
+function getHierarchyContinuations< Item >(
+	rows: TreeRow< Item >[],
+	hierarchyPagination: HierarchyPagination
+): Map< number, HierarchyContinuation< Item >[] > {
+	const continuations = new Map< number, HierarchyContinuation< Item >[] >();
+	const openContinuations: HierarchyContinuation< Item >[] = [];
+	const closeContinuation = ( rowIndex: number ) => {
+		const continuation = openContinuations.pop();
+		if ( continuation ) {
+			const current = continuations.get( rowIndex ) ?? [];
+			current.push( continuation );
+			continuations.set( rowIndex, current );
+		}
+	};
+
+	rows.forEach( ( row, rowIndex ) => {
+		while (
+			openContinuations.length &&
+			openContinuations[ openContinuations.length - 1 ].parent.level >=
+				row.level
+		) {
+			closeContinuation( rowIndex - 1 );
+		}
+
+		const paginationInfo = row.isExpanded
+			? hierarchyPagination.getPaginationInfo( row.id )
+			: undefined;
+		if ( hasHierarchyContinuation( paginationInfo ) ) {
+			openContinuations.push( { parent: row, paginationInfo } );
+		}
+	} );
+
+	while ( openContinuations.length ) {
+		closeContinuation( rows.length - 1 );
+	}
+
+	return continuations;
+}
+
 interface TableColumnFieldProps< Item > {
 	fields: NormalizedField< Item >[];
 	column: string;
 	item: Item;
 	align?: 'start' | 'center' | 'end';
+}
+
+function getItemLabel< Item >(
+	item: Item,
+	id: string,
+	titleField?: NormalizedField< Item >
+): string {
+	const title = titleField?.getValue?.( { item } );
+	return typeof title === 'string' && title ? title : id;
+}
+
+interface HierarchyPaginationRowProps {
+	columnCount: number;
+	level: number;
+	parentId: string | null;
+	parentLabel?: string;
+	paginationInfo: HierarchyPaginationInfo;
+	onLoadMore: ( parentId: string | null ) => void;
+	getFocusFallback: () => HTMLElement | null;
+}
+
+function HierarchyPaginationRow( {
+	columnCount,
+	level,
+	parentId,
+	parentLabel,
+	paginationInfo,
+	onLoadMore,
+	getFocusFallback,
+}: HierarchyPaginationRowProps ) {
+	const error =
+		typeof paginationInfo.error === 'string' && paginationInfo.error
+			? paginationInfo.error
+			: undefined;
+	const isRetry = !! error;
+	const hasFocusRef = useRef( false );
+	const getFocusFallbackRef = useRef( getFocusFallback );
+	useEffect(
+		() => () => {
+			if ( hasFocusRef.current ) {
+				window.requestAnimationFrame( () => {
+					getFocusFallbackRef.current()?.focus();
+				} );
+			}
+		},
+		[]
+	);
+	const remainingItems = paginationInfo.remainingItems;
+	const hasRemainingItems =
+		typeof remainingItems === 'number' &&
+		Number.isInteger( remainingItems ) &&
+		remainingItems >= 0;
+	let buttonLabel;
+	if ( paginationInfo.isLoading ) {
+		buttonLabel = parentLabel
+			? sprintf(
+					/* translators: %s: The parent item title. */
+					__( 'Loading children of %s' ),
+					parentLabel
+				)
+			: __( 'Loading items' );
+	} else if ( hasRemainingItems && ! isRetry ) {
+		buttonLabel = parentLabel
+			? sprintf(
+					/* translators: 1: Number of remaining children, 2: The parent item title. */
+					_n(
+						'Show %1$d more child of %2$s',
+						'Show %1$d more children of %2$s',
+						remainingItems
+					),
+					remainingItems,
+					parentLabel
+				)
+			: sprintf(
+					/* translators: %d: Number of remaining items. */
+					_n(
+						'Show %d more item',
+						'Show %d more items',
+						remainingItems
+					),
+					remainingItems
+				);
+	} else if ( parentLabel ) {
+		buttonLabel = isRetry
+			? sprintf(
+					/* translators: %s: The parent item title. */
+					__( 'Retry loading children of %s' ),
+					parentLabel
+				)
+			: sprintf(
+					/* translators: %s: The parent item title. */
+					__( 'Load more children of %s' ),
+					parentLabel
+				);
+	} else {
+		buttonLabel = isRetry
+			? __( 'Retry loading items' )
+			: __( 'Load more items' );
+	}
+	let buttonText: string = __( 'Load more' );
+	if ( paginationInfo.isLoading ) {
+		buttonText = __( 'Loading…' );
+	} else if ( isRetry ) {
+		buttonText = __( 'Retry' );
+	} else if ( hasRemainingItems ) {
+		buttonText = sprintf(
+			/* translators: %d: Total number of remaining items at this level. */
+			_n( 'Show %d more', 'Show %d more', remainingItems ),
+			remainingItems
+		);
+	}
+	const content = (
+		<div className="dataviews-view-table__hierarchy-pagination-content">
+			{ error && <span role="alert">{ error }</span> }
+			<Button
+				variant="tertiary"
+				size="compact"
+				aria-label={ buttonLabel }
+				disabled={ paginationInfo.isLoading }
+				accessibleWhenDisabled
+				isBusy={ paginationInfo.isLoading }
+				aria-busy={ paginationInfo.isLoading }
+				onClick={ () => onLoadMore( parentId ) }
+				onFocus={ () => {
+					hasFocusRef.current = true;
+				} }
+				onBlur={ () => {
+					hasFocusRef.current = false;
+				} }
+			>
+				{ buttonText }
+			</Button>
+		</div>
+	);
+
+	return (
+		<tr
+			className="dataviews-view-table__hierarchy-pagination-row"
+			style={
+				{
+					'--wp-dataviews-table-hierarchy-level': level,
+				} as CSSProperties
+			}
+		>
+			<td
+				className="dataviews-view-table__hierarchy-content-column"
+				colSpan={ columnCount }
+			>
+				{ content }
+			</td>
+		</tr>
+	);
 }
 
 interface TableRowProps< Item > {
@@ -149,12 +359,14 @@ interface TableRowProps< Item > {
 		} & ComponentProps< 'a' >
 	) => ReactElement;
 	isActionsColumnSticky?: boolean;
+	isInfiniteScroll?: boolean;
 	posinset?: number;
 	isTreeHierarchy?: boolean;
 	hierarchyLevel?: number;
 	hasChildren?: boolean;
 	isExpanded?: boolean;
 	onToggleExpanded?: ( id: string ) => void;
+	hierarchyToggleRef?: ( element: HTMLButtonElement | null ) => void;
 }
 
 function TableColumnField< Item >( {
@@ -202,30 +414,25 @@ function TableRow< Item >( {
 	onMouseDown,
 	onClickCapture,
 	isActionsColumnSticky,
+	isInfiniteScroll,
 	posinset,
 	isTreeHierarchy,
 	hierarchyLevel = 0,
 	hasChildren,
 	isExpanded,
 	onToggleExpanded,
+	hierarchyToggleRef,
 }: TableRowProps< Item > ) {
 	const { paginationInfo } = useContext( DataViewsContext );
 	const hasPossibleBulkAction = useHasAPossibleBulkAction( actions, item );
 	const isSelected = hasPossibleBulkAction && selection.includes( id );
-	const {
-		showTitle = true,
-		showMedia = true,
-		showDescription = true,
-		infiniteScrollEnabled,
-	} = view;
+	const { showTitle = true, showMedia = true, showDescription = true } = view;
 	const columns = getTableColumns( view, fields );
 	const hasPrimaryColumn =
 		( titleField && showTitle ) ||
 		( mediaField && showMedia ) ||
 		( descriptionField && showDescription );
-	const itemTitle = titleField?.getValue?.( { item } );
-	const itemLabel =
-		typeof itemTitle === 'string' && itemTitle ? itemTitle : id;
+	const itemLabel = getItemLabel( item, id, titleField );
 	let hierarchyIcon = chevronRightSmall;
 	if ( isExpanded ) {
 		hierarchyIcon = chevronDownSmall;
@@ -261,6 +468,7 @@ function TableRow< Item >( {
 				<span className="dataviews-view-table__hierarchy-toggle-slot">
 					{ hasChildren && (
 						<Button
+							ref={ hierarchyToggleRef }
 							className="dataviews-view-table__hierarchy-toggle"
 							icon={ hierarchyIcon }
 							label={
@@ -304,10 +512,10 @@ function TableRow< Item >( {
 					: undefined
 			}
 			aria-setsize={
-				infiniteScrollEnabled ? paginationInfo.totalItems : undefined
+				isInfiniteScroll ? paginationInfo.totalItems : undefined
 			}
 			aria-posinset={ posinset }
-			role={ infiniteScrollEnabled ? 'article' : undefined }
+			role={ isInfiniteScroll ? 'article' : undefined }
 			onClickCapture={ onClickCapture }
 			onMouseDown={ ( event ) => {
 				// Firefox has a unique feature where ctrl/cmd + click selects a
@@ -423,6 +631,7 @@ function ViewTable< Item >( {
 	getItemHasChildren,
 	expandedItemIds,
 	onChangeExpandedItemIds,
+	hierarchyPagination,
 	isLoading = false,
 	onChangeView,
 	onChangeSelection,
@@ -463,6 +672,9 @@ function ViewTable< Item >( {
 		? getTreeRows( rows, getItemHasChildren, expandedItemIdSet )
 		: undefined;
 	const renderedRows = treeRows?.visibleRows ?? rows;
+	const isHierarchyPaginationActive = !! (
+		isTreeHierarchy && hierarchyPagination
+	);
 	const expandableItemIds =
 		treeRows?.allRows
 			.filter( ( row ) => row.hasChildren )
@@ -497,6 +709,17 @@ function ViewTable< Item >( {
 		Map< string, { node: HTMLButtonElement; fallback: string } >
 	>( new Map() );
 	const headerMenuToFocusRef = useRef< HTMLButtonElement >( undefined );
+	const hierarchyToggleRefs = useRef< Map< string, HTMLButtonElement > >(
+		new Map()
+	);
+	const hierarchyTableRef = useRef< HTMLTableElement | null >( null );
+	const hierarchyEmptyRef = useRef< HTMLDivElement | null >( null );
+	const getHierarchyFocusFallback = ( parentId: string | null ) =>
+		( parentId !== null
+			? hierarchyToggleRefs.current.get( parentId )
+			: null ) ??
+		hierarchyTableRef.current ??
+		hierarchyEmptyRef.current;
 	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] =
 		useState< HTMLButtonElement >();
 	const [ contextMenuAnchor, setContextMenuAnchor ] = useState< {
@@ -528,6 +751,17 @@ function ViewTable< Item >( {
 		setNextHeaderMenuToFocus( undefined );
 		return;
 	}
+
+	const hierarchyContinuations = isHierarchyPaginationActive
+		? getHierarchyContinuations(
+				renderedRows as TreeRow< Item >[],
+				hierarchyPagination
+			)
+		: new Map< number, HierarchyContinuation< Item >[] >();
+	const rootPaginationInfo = isHierarchyPaginationActive
+		? hierarchyPagination.getPaginationInfo( null )
+		: undefined;
+	const hasRootContinuation = hasHierarchyContinuation( rootPaginationInfo );
 
 	const onHide = ( field: NormalizedField< Item > ) => {
 		const hidden = headerMenuRefs.current.get( field.id );
@@ -572,6 +806,11 @@ function ViewTable< Item >( {
 		( mediaField && showMedia ) ||
 		( descriptionField && showDescription );
 	const columns = getTableColumns( view, fields );
+	const tableColumnCount =
+		( hasBulkActions && ! isTreeHierarchy ? 1 : 0 ) +
+		( hasPrimaryColumn ? 1 : 0 ) +
+		columns.length +
+		( actions?.length ? 1 : 0 );
 	const headerMenuRef =
 		( column: string, index: number ) => ( node: HTMLButtonElement ) => {
 			if ( node ) {
@@ -583,7 +822,10 @@ function ViewTable< Item >( {
 				headerMenuRefs.current.delete( column );
 			}
 		};
-	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+	const isInfiniteScroll =
+		view.infiniteScrollEnabled &&
+		! dataByGroup &&
+		! isHierarchyPaginationActive;
 	const isRtl = isRTL();
 	let hierarchyHeaderIcon = isRtl ? chevronLeftSmall : chevronRightSmall;
 	if ( allItemsExpanded ) {
@@ -604,9 +846,12 @@ function ViewTable< Item >( {
 	const tableStyle = {
 		'--wp-dataviews-media-aspect-ratio': mediaAspectRatio ?? '1/1',
 	} as CSSProperties;
-	if ( ! hasData ) {
+	if ( ! hasData && ! hasRootContinuation ) {
 		return (
 			<div
+				ref={ hierarchyEmptyRef }
+				role={ isHierarchyPaginationActive ? 'status' : undefined }
+				tabIndex={ isHierarchyPaginationActive ? -1 : undefined }
 				className={ clsx( 'dataviews-no-results', {
 					'is-refreshing': isDelayedLoading,
 				} ) }
@@ -668,6 +913,8 @@ function ViewTable< Item >( {
 	return (
 		<>
 			<table
+				ref={ hierarchyTableRef }
+				tabIndex={ isHierarchyPaginationActive ? -1 : undefined }
 				className={ clsx( 'dataviews-view-table', className, {
 					[ `has-${ view.layout?.density }-density` ]:
 						view.layout?.density &&
@@ -911,6 +1158,9 @@ function ViewTable< Item >( {
 											isActionsColumnSticky={
 												! isHorizontalScrollEnd
 											}
+											isInfiniteScroll={
+												isInfiniteScroll
+											}
 										/>
 									);
 								} ) }
@@ -920,14 +1170,16 @@ function ViewTable< Item >( {
 				) : (
 					<tbody>
 						{ hasData &&
-							renderedRows.map( ( row, index ) => {
+							renderedRows.flatMap( ( row, index ) => {
 								const { id, item, level } = row;
 								const treeRow = isTreeHierarchy
 									? ( row as TreeRow< Item > )
 									: undefined;
-								return (
+								const continuations =
+									hierarchyContinuations.get( index ) ?? [];
+								return [
 									<TableRow
-										key={ id }
+										key={ `item-${ id }` }
 										item={ item }
 										level={
 											isTreeHierarchy ? undefined : level
@@ -951,19 +1203,71 @@ function ViewTable< Item >( {
 										isActionsColumnSticky={
 											! isHorizontalScrollEnd
 										}
+										isInfiniteScroll={ isInfiniteScroll }
 										isTreeHierarchy={ isTreeHierarchy }
 										hierarchyLevel={ level }
 										hasChildren={ treeRow?.hasChildren }
 										isExpanded={ treeRow?.isExpanded }
 										onToggleExpanded={ onToggleExpanded }
+										hierarchyToggleRef={ ( element ) => {
+											if ( element ) {
+												hierarchyToggleRefs.current.set(
+													id,
+													element
+												);
+											} else {
+												hierarchyToggleRefs.current.delete(
+													id
+												);
+											}
+										} }
 										posinset={
 											isInfiniteScroll
 												? index + 1
 												: undefined
 										}
-									/>
-								);
+									/>,
+									...continuations.map(
+										( { parent, paginationInfo } ) => (
+											<HierarchyPaginationRow
+												key={ `pagination-${ parent.id }` }
+												columnCount={ tableColumnCount }
+												level={ parent.level + 1 }
+												parentId={ parent.id }
+												parentLabel={ getItemLabel(
+													parent.item,
+													parent.id,
+													titleField
+												) }
+												paginationInfo={
+													paginationInfo
+												}
+												onLoadMore={
+													hierarchyPagination!
+														.onLoadMore
+												}
+												getFocusFallback={ () =>
+													getHierarchyFocusFallback(
+														parent.id
+													)
+												}
+											/>
+										)
+									),
+								];
 							} ) }
+						{ hasRootContinuation && rootPaginationInfo && (
+							<HierarchyPaginationRow
+								columnCount={ tableColumnCount }
+								level={ 0 }
+								parentId={ null }
+								paginationInfo={ rootPaginationInfo }
+								onLoadMore={ hierarchyPagination!.onLoadMore }
+								getFocusFallback={ () =>
+									getHierarchyFocusFallback( null )
+								}
+							/>
+						) }
 					</tbody>
 				) }
 			</table>

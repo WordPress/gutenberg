@@ -246,6 +246,19 @@
 		min-width: var(--wpds-dimension-size-md);
 	}
 
+	.dataviews-view-table__hierarchy-pagination-content {
+		// Align the minimal button label with the children's selection controls.
+		padding-inline-start: var(--wpds-dimension-size-md);
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--wpds-dimension-gap-sm);
+		min-height: var(--wpds-dimension-size-md);
+
+		[role="alert"] {
+			color: var(--wpds-color-foreground-content-error-weak);
+		}
+	}
 
 	// Density style overrides.
 	&.has-compact-density {

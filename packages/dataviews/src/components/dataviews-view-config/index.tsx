@@ -185,14 +185,16 @@ function SortDirectionControl() {
 }
 
 function ItemsPerPageControl() {
-	const { view, config, onChangeView } = useContext( DataViewsContext );
+	const { view, config, onChangeView, isHierarchyPaginationActive } =
+		useContext( DataViewsContext );
 	const { infiniteScrollEnabled } = view;
 	if (
 		! config ||
 		! config.perPageSizes ||
 		config.perPageSizes.length < 2 ||
 		config.perPageSizes.length > 6 ||
-		infiniteScrollEnabled
+		infiniteScrollEnabled ||
+		isHierarchyPaginationActive
 	) {
 		return null;
 	}

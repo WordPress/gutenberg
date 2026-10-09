@@ -21,10 +21,13 @@ export function hasPaginationControls(
 }
 
 export function DataViewsPagination() {
-	const { view, onChangeView, paginationInfo } =
+	const { view, onChangeView, paginationInfo, isHierarchyPaginationActive } =
 		useContext( DataViewsContext );
 
-	if ( ! hasPaginationControls( view, paginationInfo ) ) {
+	if (
+		isHierarchyPaginationActive ||
+		! hasPaginationControls( view, paginationInfo )
+	) {
 		return null;
 	}
 
