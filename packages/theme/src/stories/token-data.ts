@@ -30,7 +30,9 @@ function collect(
 	const result: TokenGroup[] = [];
 	const prefix = `--wpds-${ group }-`;
 
-	for ( const name of ( groups as Record< string, string[] > )[ group ] ) {
+	for ( const name of ( groups as Record< string, readonly string[] > )[
+		group
+	] ) {
 		const path = getPath( name.slice( prefix.length ).split( '-' ) );
 		const key = path.join( '/' );
 		let entry = result.find( ( item ) => item.path.join( '/' ) === key );
