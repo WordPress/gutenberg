@@ -838,6 +838,9 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/image' );
+		await expect(
+			page.getByRole( 'option', { name: 'Image', selected: true } )
+		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
 		await editor.clickBlockToolbarButton( 'Align' );
 
@@ -915,6 +918,9 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/table' );
+		await expect(
+			page.getByRole( 'option', { name: 'Table', selected: true } )
+		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
 		// Tab to the "Create table" button.
 		await pageUtils.pressKeys( 'Tab' );
