@@ -12,10 +12,17 @@
 		/*rtl:ignore*/
 		text-align: right;
 	}
+}
 
-	* + .wp-block-file__button {
-		margin-left: 0.75em;
-	}
+// Map the block alignment to a justification: `text-align` no longer positions
+// a flex container's contents. Zero specificity, so an editor choice wins.
+:where(.wp-block-file.is-layout-flex.aligncenter) {
+	justify-content: center;
+}
+
+:where(.wp-block-file.is-layout-flex.alignright) {
+	// RTL rows start on the right, so flip the value to keep the block on the right.
+	justify-content: flex-end #{"/*rtl:flex-start;*/"};
 }
 
 // Matches Global Styles specificity so a font size set there can win, since
@@ -29,15 +36,10 @@
 	margin-bottom: 1.5em;
 }
 
-.wp-block-file__embed {
-	margin-bottom: 1em;
-}
-
 //This needs a low specificity so it won't override the rules from the button element if defined in theme.json.
 :where(.wp-block-file__button) {
 	border-radius: 2em;
 	padding: 0.5em 1em;
-	display: inline-block;
 
 	&:where(a) {
 		&:hover,
