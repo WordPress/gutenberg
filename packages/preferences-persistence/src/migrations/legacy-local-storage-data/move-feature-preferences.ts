@@ -1,3 +1,5 @@
+import type { FeaturePreferences, LegacyData } from './types';
+
 /**
  * Move the 'features' object in local storage from the sourceStoreName to the
  * preferences store data structure.
@@ -49,13 +51,16 @@
  * This function handles moving from either the source store or the interface
  * store to the preferences data structure.
  *
- * @param {Object} state           The state before migration.
- * @param {string} sourceStoreName The name of the store that has persisted
- *                                 preferences to migrate to the preferences
- *                                 package.
- * @return {Object} The migrated state
+ * @param state           The state before migration.
+ * @param sourceStoreName The name of the store that has persisted
+ *                        preferences to migrate to the preferences
+ *                        package.
+ * @return The migrated state
  */
-export default function moveFeaturePreferences( state, sourceStoreName ) {
+export default function moveFeaturePreferences(
+	state: LegacyData,
+	sourceStoreName: string
+): LegacyData {
 	const preferencesStoreName = 'core/preferences';
 	const interfaceStoreName = 'core/interface';
 
@@ -67,7 +72,8 @@ export default function moveFeaturePreferences( state, sourceStoreName ) {
 		state?.[ interfaceStoreName ]?.preferences?.features?.[
 			sourceStoreName
 		];
-	const sourceFeatures = state?.[ sourceStoreName ]?.preferences?.features;
+	const sourceFeatures = state?.[ sourceStoreName ]?.preferences?.features as
+		FeaturePreferences | undefined;
 	const featuresToMigrate = interfaceFeatures
 		? interfaceFeatures
 		: sourceFeatures;

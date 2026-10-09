@@ -1,4 +1,6 @@
-export default function convertEditorSettings( data ) {
+import type { ScopedPreferences } from '../../types';
+
+export default function convertEditorSettings( data: ScopedPreferences ) {
 	let newData = data;
 	const settingsToMoveToCore = [
 		'allowRightClickOverrides',
@@ -28,11 +30,11 @@ export default function convertEditorSettings( data ) {
 					[ setting ]: data[ 'core/edit-post' ][ setting ],
 				},
 			};
-			delete newData[ 'core/edit-post' ][ setting ];
+			delete newData[ 'core/edit-post' ]![ setting ];
 		}
 
 		if ( data?.[ 'core/edit-site' ]?.[ setting ] !== undefined ) {
-			delete newData[ 'core/edit-site' ][ setting ];
+			delete newData[ 'core/edit-site' ]![ setting ];
 		}
 	} );
 

@@ -1,3 +1,6 @@
+import type { ScopePreferences } from '../../types';
+import type { EditPostPanels, LegacyEditPostPanel } from './types';
+
 /**
  * Convert the post editor's panels state from:
  * ```
@@ -25,13 +28,18 @@
  *     ],
  * }
  *
- * @param {Object} preferences A preferences object.
+ * @param preferences A preferences object.
  *
- * @return {Object} The converted data.
+ * @return The converted data.
  */
-export default function convertEditPostPanels( preferences ) {
-	const panels = preferences?.panels ?? {};
-	return Object.keys( panels ).reduce(
+export default function convertEditPostPanels(
+	preferences: ScopePreferences
+): EditPostPanels {
+	const panels = ( preferences?.panels ?? {} ) as Record<
+		string,
+		LegacyEditPostPanel | undefined
+	>;
+	return Object.keys( panels ).reduce< EditPostPanels >(
 		( convertedData, panelName ) => {
 			const panel = panels[ panelName ];
 

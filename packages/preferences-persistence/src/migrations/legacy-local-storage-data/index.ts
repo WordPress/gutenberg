@@ -3,29 +3,33 @@ import moveThirdPartyFeaturePreferences from './move-third-party-feature-prefere
 import moveIndividualPreference from './move-individual-preference';
 import moveInterfaceEnableItems from './move-interface-enable-items';
 import convertEditPostPanels from './convert-edit-post-panels';
+import type { ScopedPreferences } from '../../types';
+import type { LegacyData } from './types';
 
 /**
  * Gets the legacy local storage data for a given user.
  *
- * @param {string | number} userId The user id.
+ * @param userId The user id.
  *
- * @return {Object | null} The local storage data.
+ * @return The local storage data.
  */
-function getLegacyData( userId ) {
+function getLegacyData( userId: string | number ): LegacyData | null {
 	const key = `WP_DATA_USER_${ userId }`;
 	const unparsedData = window.localStorage.getItem( key );
-	return JSON.parse( unparsedData );
+	return JSON.parse( unparsedData as string );
 }
 
 /**
  * Converts data from the old `@wordpress/data` package format.
  *
- * @param {Object | null | undefined} data The legacy data in its original format.
+ * @param data The legacy data in its original format.
  *
- * @return {Object | undefined} The converted data or `undefined` if there was
- *                              nothing to convert.
+ * @return The converted data or `undefined` if there was
+ *         nothing to convert.
  */
-export function convertLegacyData( data ) {
+export function convertLegacyData(
+	data: LegacyData | null | undefined
+): ScopedPreferences | undefined {
 	if ( ! data ) {
 		return;
 	}
@@ -88,12 +92,14 @@ export function convertLegacyData( data ) {
  * Gets the legacy local storage data for the given user and returns the
  * data converted to the new format.
  *
- * @param {string | number} userId The user id.
+ * @param userId The user id.
  *
- * @return {Object | undefined} The converted data or undefined if no local
- *                              storage data could be found.
+ * @return The converted data or undefined if no local
+ *         storage data could be found.
  */
-export default function convertLegacyLocalStorageData( userId ) {
+export default function convertLegacyLocalStorageData(
+	userId: string | number
+): ScopedPreferences | undefined {
 	const data = getLegacyData( userId );
 	return convertLegacyData( data );
 }
