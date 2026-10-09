@@ -6,16 +6,24 @@ vi.mock( import( '../../use-media-query' ), () => ( { default: vi.fn() } ) );
 
 describe( 'useViewportMatch', () => {
 	afterEach( () => {
-		useMediaQueryMock.mockClear();
+		vi.mocked( useMediaQueryMock ).mockClear();
 	} );
 
-	const TestComponent = ( { breakpoint, operator } ) => {
+	type ViewportMatchParams = Parameters< typeof useViewportMatch >;
+
+	const TestComponent = ( {
+		breakpoint,
+		operator,
+	}: {
+		breakpoint: ViewportMatchParams[ 0 ];
+		operator: ViewportMatchParams[ 1 ];
+	} ) => {
 		const result = useViewportMatch( breakpoint, operator );
 		return `useViewportMatch: ${ result }`;
 	};
 
 	it( 'should return true when the viewport matches', async () => {
-		useMediaQueryMock.mockReturnValue( true );
+		vi.mocked( useMediaQueryMock ).mockReturnValue( true );
 
 		const { container, rerender } = render(
 			<TestComponent breakpoint="wide" operator="<" />
@@ -50,7 +58,7 @@ describe( 'useViewportMatch', () => {
 	} );
 
 	it( 'should return false when the viewport matches', async () => {
-		useMediaQueryMock.mockReturnValue( false );
+		vi.mocked( useMediaQueryMock ).mockReturnValue( false );
 
 		const { container, rerender } = render(
 			<TestComponent breakpoint="huge" operator=">=" />
@@ -85,7 +93,7 @@ describe( 'useViewportMatch', () => {
 	} );
 
 	it( 'should correctly simulate a value', async () => {
-		useMediaQueryMock.mockReturnValue( true );
+		vi.mocked( useMediaQueryMock ).mockReturnValue( true );
 
 		const innerElement = <TestComponent breakpoint="wide" operator=">=" />;
 		const WidthProvider = useViewportMatch.__experimentalWidthProvider;

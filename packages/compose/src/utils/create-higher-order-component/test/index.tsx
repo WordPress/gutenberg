@@ -53,11 +53,12 @@ describe( 'createHigherOrderComponent', () => {
 
 	it( 'should use displayName property', () => {
 		class SomeYetAnotherComponent extends Component {
+			static displayName = 'CustomDisplayName';
+
 			render() {
 				return <div />;
 			}
 		}
-		SomeYetAnotherComponent.displayName = 'CustomDisplayName';
 		const TestComponent = createHigherOrderComponent(
 			( OriginalComponent ) => OriginalComponent,
 			'withTest'
