@@ -10,6 +10,7 @@
 		{ "path": "../block-serialization-default-parser" },
 		{ "path": "../blob/tsconfig.build.json" },
 		{ "path": "../blocks" },
+		{ "path": "../commands" },
 		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../data" },
@@ -42,12 +43,14 @@
 		{ "path": "../warning" }
 	],
 	/*
-	 * The package has no TypeScript tests, and its two stories import
-	 * components the build allowlist does not type yet, so nothing is checked.
+	 * These dev files import sources outside the build's TypeScript allowlist.
+	 * TypeScript unit tests are checked separately by test:unit:conventions.
 	 */
 	"exclude": [
 		"**/benchmark",
 		"src/components/block-icon/stories/index.story.ts",
-		"src/components/contrast-checker/stories/index.story.ts"
+		"src/components/contrast-checker/stories/index.story.ts",
+		"src/components/inspector-controls-tabs/test/use-inspector-controls-tabs.jsdom.test.tsx",
+		"src/hooks/test/utils.jsdom.test.tsx"
 	]
 }

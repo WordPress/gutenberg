@@ -3,7 +3,7 @@ import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { page, userEvent } from 'vitest/browser';
 import * as Select from '../index';
-import { addCanvasButton } from '../../../test/iframe';
+import { addCanvasButton } from '../../../test/fixtures/iframe';
 
 describe( 'Select iframe dismissal', () => {
 	it( 'closes a non-modal Select and delivers the iframe click', async () => {

@@ -102,6 +102,7 @@ function TableEdit( {
 
 	const colorProps = useColorProps( attributes );
 	const borderProps = useBorderProps( attributes );
+	const textAlign = attributes?.style?.typography?.textAlign;
 	const blockEditingMode = useBlockEditingMode();
 
 	const tableRef = useRef();
@@ -528,6 +529,7 @@ function TableEdit( {
 						borderProps.className,
 						{
 							'has-fixed-layout': hasFixedLayout,
+							[ `has-text-align-${ textAlign }` ]: textAlign,
 							// This is required in the editor only to overcome
 							// the fact the editor rewrites individual border
 							// widths into a shorthand format.

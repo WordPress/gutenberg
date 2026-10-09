@@ -150,6 +150,33 @@ test.describe( 'Embedding content', () => {
 		).toHaveAttribute( 'title', 'Embedded content from cloudup.com' );
 	} );
 
+	// See https://github.com/WordPress/gutenberg/issues/73288.
+	test( 'should send a referrer from iframes inside embed previews @webkit', async ( {
+		page,
+		embedUtils,
+	} ) => {
+		await embedUtils.interceptRequests( {
+			'https://www.youtube.com/watch?v=lXMskKTw3Bc': {
+				...MOCK_EMBED_VIDEO_SUCCESS_RESPONSE,
+				html: '<iframe title="YouTube video" src="https://www.youtube.com/embed/lXMskKTw3Bc"></iframe>',
+			},
+		} );
+		const embedRequest = page.waitForRequest(
+			'https://www.youtube.com/embed/lXMskKTw3Bc'
+		);
+		await page.route( 'https://www.youtube.com/embed/**', ( route ) =>
+			route.fulfill( { contentType: 'text/html', body: '' } )
+		);
+
+		await embedUtils.insertEmbed(
+			'https://www.youtube.com/watch?v=lXMskKTw3Bc'
+		);
+
+		expect( await ( await embedRequest ).headerValue( 'referer' ) ).toBe(
+			`${ new URL( page.url() ).origin }/`
+		);
+	} );
+
 	test( 'should allow the user to convert unembeddable URLs to a paragraph with a link in it', async ( {
 		editor,
 		embedUtils,

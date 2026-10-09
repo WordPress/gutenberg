@@ -13,7 +13,9 @@ import { useIframeOutsidePressBridge } from '../../../utils/use-iframe-outside-p
  * Use the primitives directly, and remember to label the input field,
  * usually by using the `Field` component.
  */
-export function Root( props: AutocompleteRootProps ) {
+export const Root: typeof _Autocomplete.Root = function Root(
+	props: AutocompleteRootProps
+) {
 	const iframeDismissalProps =
 		useIframeOutsidePressBridge< _Autocomplete.Root.ChangeEventDetails >( {
 			defaultOpen: props.defaultOpen,
@@ -31,4 +33,4 @@ export function Root( props: AutocompleteRootProps ) {
 			</DirectionProvider>
 		</AutocompleteGridContext.Provider>
 	);
-}
+};

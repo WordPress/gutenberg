@@ -18,6 +18,7 @@ import {
 import { useRef, useEffect, useState } from '@wordpress/element';
 import { useReducedMotion } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
+import { inertValue } from '@wordpress/react-inert-value';
 import { useDispatch } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -260,7 +261,7 @@ function VideoEdit( {
 			<figure { ...blockProps }>
 				<video
 					controls={ controls }
-					inert={ ! isSingleSelected ? 'true' : undefined }
+					inert={ inertValue( ! isSingleSelected ) }
 					poster={ poster }
 					src={ src || temporaryURL }
 					ref={ videoPlayer }

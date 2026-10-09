@@ -3,7 +3,7 @@ import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { page, userEvent } from 'vitest/browser';
 import * as Combobox from '../index';
-import { addCanvasButton } from '../../../test/iframe';
+import { addCanvasButton } from '../../../test/fixtures/iframe';
 
 describe( 'Combobox iframe dismissal', () => {
 	it( 'closes Combobox and delivers the iframe click', async () => {

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useRef, useState } from '@wordpress/element';
+import { Fragment, useRef, useState } from '@wordpress/element';
 import * as Combobox from '../index';
 import { Spinner } from '../../../../spinner';
 import { Stack } from '../../../../stack';
@@ -31,6 +31,7 @@ const meta: Meta< typeof Combobox.Root > = {
 		'Combobox.Item': Combobox.Item,
 		'Combobox.ItemLabel': Combobox.ItemLabel,
 		'Combobox.ItemDescription': Combobox.ItemDescription,
+		'Combobox.Separator': Combobox.Separator,
 		'Combobox.Value': Combobox.Value,
 		'Combobox.Chips': Combobox.Chips,
 		'Combobox.ChipWithRemove': Combobox.ChipWithRemove,
@@ -286,7 +287,7 @@ export const AsyncItems: Story = {
 		const [ items, setItems ] = useState< FixtureItem[] >( [] );
 		const [ value, setValue ] = useState< FixtureItem | undefined >();
 		const [ open, setOpen ] = useState( false );
-		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
+		const timeoutRef = useRef< ReturnType< typeof setTimeout > >( null );
 
 		return (
 			<Combobox.Root
@@ -301,14 +302,15 @@ export const AsyncItems: Story = {
 					args.onValueChange?.( newValue, ...changeArgs );
 				} }
 				onOpenChange={ ( nextOpen ) => {
+					if ( timeoutRef.current ) {
+						clearTimeout( timeoutRef.current );
+					}
 					setOpen( nextOpen );
 					if ( ! nextOpen ) {
-						clearTimeout( timeoutRef.current );
 						return;
 					}
 					setLoading( true );
 					setItems( [] );
-					clearTimeout( timeoutRef.current );
 					timeoutRef.current = setTimeout( () => {
 						setItems( ITEMS );
 						setValue( ( current ) => current ?? ITEMS[ 0 ] );
@@ -459,6 +461,41 @@ export const Grouped: Story = {
 										) }
 									</Combobox.Collection>
 								</Combobox.Group>
+							) }
+						</Combobox.Collection>
+					</Combobox.ListBody>
+				</Combobox.List>
+			</Combobox.Popup>,
+		],
+	},
+};
+
+/**
+ * Use `Combobox.Separator` to set choices apart from each other.
+ */
+export const WithSeparator: Story = {
+	args: {
+		items: [ ...ITEMS.slice( 0, 3 ), { value: 'other', label: 'Other' } ],
+		children: [
+			<Combobox.Trigger aria-label="Fruit" key="trigger" />,
+			<Combobox.Popup aria-label="Fruit" key="popup">
+				<div style={ inputWrapperStyle }>
+					<Combobox.Input aria-label="Search" placeholder="Search" />
+				</div>
+				<Combobox.List>
+					<Combobox.ListBody>
+						<Combobox.Collection>
+							{ ( item: FixtureItem, index: number ) => (
+								<Fragment key={ item.value }>
+									{ item.value === 'other' && index > 0 && (
+										<Combobox.Separator />
+									) }
+									<Combobox.Item value={ item }>
+										<Combobox.ItemLabel>
+											{ item.label }
+										</Combobox.ItemLabel>
+									</Combobox.Item>
+								</Fragment>
 							) }
 						</Combobox.Collection>
 					</Combobox.ListBody>

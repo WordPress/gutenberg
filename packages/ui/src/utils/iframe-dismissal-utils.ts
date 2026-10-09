@@ -23,33 +23,46 @@ function forEachIframe(
 	element.querySelectorAll( 'iframe' ).forEach( callback );
 }
 
+export function getNodeDocument( node: Node | null ) {
+	return node?.nodeType === Node.DOCUMENT_NODE
+		? ( node as Document )
+		: ( node?.ownerDocument ?? null );
+}
+
 export function isInsideCurrentPopup( event: Event, trigger: Element ) {
-	const target = event.target as Node | null;
-	const targetElement =
-		target?.nodeType === Node.ELEMENT_NODE
-			? ( target as Element )
-			: target?.parentElement;
 	const popupId = trigger.getAttribute( 'aria-controls' );
-
-	if ( ! targetElement || ! popupId ) {
+	if ( ! popupId ) {
 		return false;
 	}
 
-	const popup = targetElement.ownerDocument.getElementById( popupId );
-	if ( ! popup ) {
-		return false;
+	let target = event.target as Node | null;
+	while ( target ) {
+		const targetDocument = getNodeDocument( target );
+		const targetElement =
+			target.nodeType === Node.ELEMENT_NODE
+				? ( target as Element )
+				: target.parentElement;
+		const popup = targetDocument?.getElementById( popupId );
+		if ( popup && targetElement ) {
+			const rootOwnerId = popup.getAttribute( 'data-rootownerid' );
+			if ( ! rootOwnerId ) {
+				return popup.contains( targetElement );
+			}
+
+			return (
+				targetElement
+					.closest( '[data-rootownerid]' )
+					?.getAttribute( 'data-rootownerid' ) === rootOwnerId
+			);
+		}
+
+		if ( targetDocument === trigger.ownerDocument ) {
+			break;
+		}
+		target = targetDocument?.defaultView?.frameElement ?? null;
 	}
 
-	const rootOwnerId = popup.getAttribute( 'data-rootownerid' );
-	if ( ! rootOwnerId ) {
-		return popup.contains( targetElement );
-	}
-
-	return (
-		targetElement
-			.closest( '[data-rootownerid]' )
-			?.getAttribute( 'data-rootownerid' ) === rootOwnerId
-	);
+	return false;
 }
 
 export function useObserveIframePresses( {

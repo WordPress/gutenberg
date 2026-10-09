@@ -9,9 +9,11 @@ import { useIframeOutsidePressBridge } from '../../../utils/use-iframe-outside-p
  * See `SearchableSelectControl` and `SearchableChipSelectControl` for standard
  * implementations of a single and multiple selection combobox.
  */
-export function Root< Value, Multiple extends boolean | undefined = false >(
-	props: ComboboxRootProps< Value, Multiple >
-) {
+export function Root<
+	Value,
+	Multiple extends boolean | undefined = false,
+	Item = Value,
+>( props: ComboboxRootProps< Value, Multiple, Item > ) {
 	const iframeDismissalProps =
 		useIframeOutsidePressBridge< _Combobox.Root.ChangeEventDetails >( {
 			defaultOpen: props.defaultOpen,

@@ -3,7 +3,7 @@ import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { page, userEvent } from 'vitest/browser';
 import * as Autocomplete from '../index';
-import { addCanvasButton } from '../../../test/iframe';
+import { addCanvasButton } from '../../../test/fixtures/iframe';
 
 describe( 'Autocomplete iframe dismissal', () => {
 	it( 'closes Autocomplete and delivers the iframe click', async () => {

@@ -2,8 +2,10 @@ import clsx from 'clsx';
 import {
 	RichText,
 	useBlockProps,
+	getBackgroundClassesAndStyles,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 } from '@wordpress/block-editor';
 
@@ -13,16 +15,24 @@ export default function save( { attributes } ) {
 		role: 'tablist',
 	} );
 
+	const backgroundProps = getBackgroundClassesAndStyles( attributes );
 	const colorProps = getColorClassesAndStyles( attributes );
 	const borderProps = getBorderClassesAndStyles( attributes );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
+	const shadowProps = getShadowClassesAndStyles( attributes );
 
-	const buttonClassName = clsx( colorProps.className, borderProps.className );
+	const buttonClassName = clsx(
+		backgroundProps.className,
+		colorProps.className,
+		borderProps.className
+	);
 
 	const buttonStyle = {
+		...backgroundProps.style,
 		...colorProps.style,
 		...borderProps.style,
 		...spacingProps.style,
+		...shadowProps.style,
 	};
 
 	return (
