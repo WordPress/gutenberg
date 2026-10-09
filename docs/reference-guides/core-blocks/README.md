@@ -265,7 +265,7 @@ Displays the next comment's page link.
 -	**Name:** [core/comments-pagination-next](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comments-pagination-next/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
 -	**Parent:** core/comments-pagination
--	**Supports:** anchor, background (gradient), color (background, gradients, ~~text~~), interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** anchor, background (gradient), color (background, gradients, ~~text~~), interactivity (clientNavigation), spacing (padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** label
 
 ## Comments Page Numbers
@@ -303,7 +303,7 @@ Add an image or video with a text overlay.
 
 -	**Name:** [core/cover](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-cover/)
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
--	**Supports:** align, allowedBlocks, anchor, color (heading, text, ~~background~~, ~~enableContrastChecker~~), dimensions (aspectRatio, minWidth), filter (duotone), interactivity (clientNavigation, interactive), layout (~~allowJustification~~), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align, allowedBlocks, anchor, color (button, heading, link, text, ~~background~~, ~~enableContrastChecker~~), dimensions (aspectRatio, minWidth), filter (duotone), interactivity (clientNavigation, interactive), layout (~~allowJustification~~), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** allowedVideoProviders, alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, isUserOverlayColor, minHeight, minHeightUnit, overlayColor, poster, sizeSlug, tagName, templateLock, url, useFeaturedImage
 
 ## Details
@@ -440,7 +440,7 @@ An organized collection of items displayed in a specific order.
 -	**Name:** [core/list](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-list/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
 -	**Allowed Blocks:** core/list-item
--	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), interactivity (clientNavigation), listView, shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), listView, shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** ordered, placeholder, reversed, start, type, values
 
 ## List Item
@@ -574,7 +574,7 @@ Start with the basic building block of all narrative.
 
 -	**Name:** [core/paragraph](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-paragraph/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
--	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), shadow, spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight, textAlign, textColumns, textIndent, textShadow), ~~className~~
+-	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), shadow, spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight, textAlign, textColumns, textIndent, textShadow), ~~className~~
 -	**Attributes:** content, direction, dropCap, placeholder
 
 ## Pattern Placeholder
@@ -877,7 +877,7 @@ Help visitors find your content.
 
 -	**Name:** [core/search](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-search/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
--	**Supports:** align (center, left, right), anchor, color (background, gradients, text), interactivity, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (center, left, right), anchor, background (gradient), color (background, gradients, text), interactivity, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** buttonPosition, buttonText, buttonUseIcon, label, placeholder, query, showLabel, tagName, width, widthUnit
 
 ## Separator
@@ -1072,7 +1072,7 @@ An advanced block that allows displaying taxonomy terms based on different query
 
 -	**Name:** [core/terms-query](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-terms-query/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** align (full, wide), anchor, interactivity, layout, ~~html~~
+-	**Supports:** align (full, wide), anchor, interactivity, layout, spacing (blockGap, margin, padding), ~~html~~
 -	**Attributes:** tagName, termQuery
 
 ## Text Columns (deprecated)
