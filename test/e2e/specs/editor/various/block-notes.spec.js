@@ -1131,6 +1131,317 @@ test.describe( 'Block Notes', () => {
 		} );
 	} );
 
+	test.describe( 'Emoji Reactions', () => {
+		test( 'can add an emoji reaction to a note', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing emoji reactions' },
+				comment: 'Test comment for reactions',
+			} );
+
+			await blockNoteUtils.addReactionToComment( 'heart' );
+
+			// Verify the reaction button appears with count.
+			const reactionButton = page.getByRole( 'button', {
+				name: /heart/,
+			} );
+			await expect( reactionButton ).toBeVisible();
+			await expect( reactionButton ).toContainText( '1' );
+			await expect( reactionButton ).toHaveAttribute(
+				'aria-pressed',
+				'true'
+			);
+		} );
+
+		test( 'can re-add the same reaction after removing it', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing re-add reaction' },
+				comment: 'Re-add reaction',
+			} );
+
+			await blockNoteUtils.addReactionToComment( 'heart' );
+			const reactionButton = page.getByRole( 'button', {
+				name: /heart/,
+			} );
+			await expect( reactionButton ).toBeVisible();
+			await expect( reactionButton ).toContainText( '1' );
+
+			// Remove the reaction.
+			await reactionButton.click();
+			await expect( reactionButton ).toBeHidden();
+
+			// Add the same reaction again. This used to fail two ways:
+			// 1) the parent note's cached `reaction_summary` still
+			//    reported the removed heart as `reacted`, so the toggle
+			//    attempted to delete a now-missing comment record
+			//    instead of routing to add; and 2) the server's
+			//    duplicate-reaction guard included trashed comments,
+			//    so the just-removed reaction blocked the re-add with
+			//    `rest_comment_duplicate_reaction` ("You have already
+			//    reacted with this emoji").
+			await blockNoteUtils.addReactionToComment( 'heart' );
+			await expect( reactionButton ).toBeVisible();
+			await expect( reactionButton ).toContainText( '❤' );
+			await expect( reactionButton ).toContainText( '1' );
+
+			// The duplicate-reaction error must never appear — pins both
+			// fixes (client refetch + server status='approve' query)
+			// against regression.
+			await expect(
+				page.locator( '.components-snackbar__content', {
+					hasText: /already reacted/i,
+				} )
+			).toHaveCount( 0 );
+		} );
+
+		test( 'editing a note after toggling a reaction keeps its text', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing edit after reaction' },
+				comment: 'Original note text',
+			} );
+
+			await blockNoteUtils.addReactionToComment( 'heart' );
+			await expect(
+				page.getByRole( 'button', { name: /heart/ } )
+			).toContainText( '1' );
+
+			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Edit' );
+			await expect(
+				page.getByRole( 'textbox', { name: 'Edit note' } )
+			).toHaveText( 'Original note text' );
+		} );
+
+		test( 'can see reaction tooltip on hover', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing reaction tooltip' },
+				comment: 'Test comment for reaction tooltip',
+			} );
+
+			// Add a reaction.
+			await blockNoteUtils.addReactionToComment( 'celebration' );
+
+			// Hover over the reaction button to trigger tooltip.
+			const reactionButton = page.getByRole( 'button', {
+				name: /celebration/,
+			} );
+			await expect( reactionButton ).toBeVisible();
+			await reactionButton.hover();
+
+			// The Design System tooltip popup carries no `tooltip` role, so
+			// match its text. The pill's own label is an `aria-label`, not
+			// text, so this only matches the popup.
+			await expect(
+				page.getByText( /reacted with celebration/ )
+			).toBeVisible();
+		} );
+
+		test( 'the reaction menu is keyboard accessible', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing keyboard accessibility' },
+				comment: 'Test comment for keyboard access',
+			} );
+
+			const trigger = page.getByRole( 'button', {
+				name: 'Add reaction',
+			} );
+			const menu = page.getByRole( 'menu', { name: 'Add reaction' } );
+
+			// Escape closes the menu and hands focus back to the trigger.
+			await trigger.focus();
+			await page.keyboard.press( 'Enter' );
+			await expect( menu ).toBeVisible();
+			await page.keyboard.press( 'Escape' );
+			await expect( menu ).toBeHidden();
+			await expect( trigger ).toBeFocused();
+
+			// The arrow keys move through the emoji, and Enter picks one.
+			await page.keyboard.press( 'Enter' );
+			await expect(
+				menu.getByRole( 'menuitemcheckbox', { name: 'heart' } )
+			).toBeFocused();
+			await page.keyboard.press( 'ArrowDown' );
+			await expect(
+				menu.getByRole( 'menuitemcheckbox', { name: 'celebration' } )
+			).toBeFocused();
+			await page.keyboard.press( 'Enter' );
+
+			await expect(
+				page.getByRole( 'button', { name: /celebration/ } )
+			).toContainText( '1' );
+
+			// The menu marks the emoji the user has already reacted with.
+			await trigger.click();
+			await expect(
+				menu.getByRole( 'menuitemcheckbox', { name: 'celebration' } )
+			).toBeChecked();
+			await expect(
+				menu.getByRole( 'menuitemcheckbox', { name: 'heart' } )
+			).not.toBeChecked();
+		} );
+
+		test( 'resolving a thread locks its reactions', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing resolved reactions' },
+				comment: 'Test comment for resolved reactions',
+			} );
+
+			// The floating overlay hides a resolved thread, so drive this
+			// through the sidebar where it stays reachable.
+			await blockNoteUtils.openBlockNoteSidebar();
+			const sidebar = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			const thread = sidebar.getByRole( 'treeitem', {
+				name: 'Note: Test comment for resolved reactions',
+			} );
+			await thread.click();
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+
+			await blockNoteUtils.addReactionToComment( 'heart' );
+			const reactionPill = sidebar.getByRole( 'button', {
+				name: /heart/,
+			} );
+			await expect( reactionPill ).toBeVisible();
+
+			const addReaction = sidebar.getByRole( 'button', {
+				name: 'Add reaction',
+			} );
+			const resolveButton = sidebar.getByRole( 'button', {
+				name: 'Resolve',
+			} );
+
+			// Resolving collapses the thread, so re-select it to reach the
+			// reaction controls again.
+			await resolveButton.click();
+			await thread.click();
+			await expect( resolveButton ).toBeDisabled();
+
+			// A resolved thread is an archived conversation: the add trigger
+			// is gone and the existing pill can no longer mutate reactions.
+			await expect( addReaction ).toHaveCount( 0 );
+			await expect( reactionPill ).toBeDisabled();
+
+			// Reopening the thread unlocks them again.
+			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Reopen' );
+			await expect( resolveButton ).toBeEnabled();
+			await expect( addReaction.first() ).toBeEnabled();
+			await expect( reactionPill ).toBeEnabled();
+		} );
+
+		test( 'note remains selected while reaction picker is open', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing selection persistence' },
+				comment: 'Selection persistence',
+			} );
+
+			const thread = page.getByRole( 'treeitem', {
+				name: /Note: Selection persistence/,
+			} );
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+
+			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
+			await expect(
+				page.getByRole( 'menu', { name: 'Add reaction' } )
+			).toBeVisible();
+
+			// Focus has moved into the portaled menu, but its focus events
+			// still bubble to the thread's `useFocusOutside` through the
+			// React tree, so the thread stays selected and the trigger mounted.
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+		} );
+
+		test( 'the add-reaction trigger is revealed on hover and focus', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing the hover trigger' },
+				comment: 'Test comment for the hover trigger',
+			} );
+
+			const trigger = page.getByRole( 'button', {
+				name: 'Add reaction',
+			} );
+			// The reply composer shares the note class, so match only notes
+			// that carry a reaction trigger.
+			const note = page
+				.locator( '.editor-collab-sidebar-panel__note' )
+				.filter( { has: trigger } );
+
+			// Park the pointer outside the sidebar: adding the note leaves it
+			// over the thread, which would hold the trigger open.
+			await page.mouse.move( 0, 0 );
+			await expect( trigger ).toHaveCSS( 'opacity', '0' );
+
+			await note.hover();
+			await expect( trigger ).toHaveCSS( 'opacity', '1' );
+
+			// Keyboard reaches it too: the reveal hangs off the trigger, not
+			// the thread, which stays focused for as long as it is selected.
+			await page.mouse.move( 0, 0 );
+			await expect( trigger ).toHaveCSS( 'opacity', '0' );
+			await trigger.focus();
+			await expect( trigger ).toHaveCSS( 'opacity', '1' );
+		} );
+
+		test( 'reactions stay visible once the thread is deselected', async ( {
+			page,
+			editor,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing deselected reactions' },
+				comment: 'Test comment for deselected reactions',
+			} );
+
+			await blockNoteUtils.addReactionToComment( 'heart' );
+			const reactionButton = page.getByRole( 'button', {
+				name: /heart/,
+			} );
+			await expect( reactionButton ).toBeVisible();
+
+			// Focus the title to deselect the block and the note. The pills
+			// carry information about the note, so unlike its actions they
+			// survive being deselected.
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.focus();
+			await expect(
+				page.getByRole( 'button', { name: 'Add reaction' } )
+			).toHaveCount( 0 );
+			await expect( reactionButton ).toBeVisible();
+		} );
+	} );
+
 	test.describe( 'Multiple notes per block', () => {
 		test( 'can add multiple notes to the same block', async ( {
 			editor,
