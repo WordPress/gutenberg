@@ -1,0 +1,96 @@
+import type { RefObject } from 'react';
+import type { RichTextData } from '../create';
+import type { RichTextFormatList, RichTextValue } from '../types';
+
+/**
+ * The internal record of a rich text field. `_newActiveFormats` holds the
+ * active formats picked by arrow key navigation until the selection syncs.
+ */
+export type RichTextRecord = RichTextValue & {
+	_newActiveFormats?: RichTextFormatList;
+};
+
+/**
+ * Derives formats from a record, such as adding or removing editor only ones.
+ */
+export type RecordFormatsHandler = (
+	record: RichTextRecord
+) => RichTextFormatList[];
+
+/**
+ * Change metadata passed to `onChange`.
+ */
+export type RichTextChangeMeta = {
+	__unstableFormats: RichTextFormatList[];
+	__unstableText: string;
+};
+
+/**
+ * Props of `useRichText` before the format types add their handlers.
+ */
+export type RichTextBaseProps<
+	V extends string | RichTextData = string | RichTextData,
+> = {
+	value?: V;
+	selectionStart?: number;
+	selectionEnd?: number;
+	placeholder?: string;
+	onSelectionChange: ( start?: number, end?: number ) => void;
+	preserveWhiteSpace?: boolean;
+	/**
+	 * Receives plain text instead of `RichTextData` when formats are disabled.
+	 */
+	onChange: ( value: V | string, meta: RichTextChangeMeta ) => void;
+	__unstableDisableFormats?: boolean;
+	__unstableIsSelected?: boolean;
+	__unstableDependencies?: readonly unknown[];
+	__unstableAfterParse?: RecordFormatsHandler;
+	__unstableBeforeSerialize?: RecordFormatsHandler;
+	__unstableAddInvisibleFormats?: RecordFormatsHandler;
+};
+
+/**
+ * Props of `useRichText`.
+ */
+export type RichTextProps<
+	V extends string | RichTextData = string | RichTextData,
+> = Omit<
+	RichTextBaseProps< V >,
+	| '__unstableAfterParse'
+	| '__unstableBeforeSerialize'
+	| '__unstableAddInvisibleFormats'
+> & {
+	allowedFormats?: readonly string[];
+	withoutInteractiveFormatting?: boolean;
+	__unstableFormatTypeHandlerContext?: object;
+};
+
+/**
+ * Options of `applyRecord`.
+ */
+export type ApplyRecordOptions = {
+	domOnly?: boolean;
+};
+
+/**
+ * The latest props of the event listeners, read when an event fires.
+ */
+export type EventListenerProps = {
+	record: RefObject< RichTextRecord >;
+	handleChange: ( record: RichTextRecord ) => void;
+	applyRecord: (
+		record: RichTextRecord,
+		options?: ApplyRecordOptions
+	) => void;
+	createRecord: () => RichTextValue;
+	isSelected?: boolean;
+	onSelectionChange: ( start?: number, end?: number ) => void;
+	forceRender: () => void;
+};
+
+/**
+ * Subscribes listeners to the editable element and returns a cleanup.
+ */
+export type EventListenerEffect = (
+	props: RefObject< EventListenerProps >
+) => ( element: HTMLElement ) => () => void;

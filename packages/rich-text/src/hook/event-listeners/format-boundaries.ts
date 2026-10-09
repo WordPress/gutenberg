@@ -1,11 +1,13 @@
 import { LEFT, RIGHT } from '@wordpress/keycodes';
 import { isCollapsed } from '../../is-collapsed';
 import { subscribeOwnedListener } from '../../subscribe-owned-listener';
+import type { RichTextFormatList } from '../../types';
+import type { EventListenerEffect } from '../types';
 
-const EMPTY_ACTIVE_FORMATS = [];
+const EMPTY_ACTIVE_FORMATS: RichTextFormatList = [];
 
-export default ( props ) => ( element ) => {
-	function onKeyDown( event ) {
+const formatBoundaries: EventListenerEffect = ( props ) => ( element ) => {
+	function onKeyDown( event: KeyboardEvent ) {
 		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
 
 		if (
@@ -30,7 +32,7 @@ export default ( props ) => ( element ) => {
 		const collapsed = isCollapsed( record.current );
 		const { defaultView } = element.ownerDocument;
 		// To do: ideally, we should look at visual position instead.
-		const { direction } = defaultView.getComputedStyle( element );
+		const { direction } = defaultView!.getComputedStyle( element );
 		const reverseKey = direction === 'rtl' ? RIGHT : LEFT;
 		const isReverse = event.keyCode === reverseKey;
 
@@ -89,5 +91,12 @@ export default ( props ) => ( element ) => {
 		forceRender();
 	}
 
-	return subscribeOwnedListener( element, 'keydown', onKeyDown, true );
+	return subscribeOwnedListener(
+		element,
+		'keydown',
+		onKeyDown as EventListener,
+		true
+	);
 };
+
+export default formatBoundaries;

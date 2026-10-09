@@ -1,9 +1,10 @@
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { remove } from '../../remove';
 import { subscribeOwnedListener } from '../../subscribe-owned-listener';
+import type { EventListenerEffect } from '../types';
 
-export default ( props ) => ( element ) => {
-	function onKeyDown( event ) {
+const deleteHandler: EventListenerEffect = ( props ) => ( element ) => {
+	function onKeyDown( event: KeyboardEvent ) {
 		const { keyCode } = event;
 
 		if ( event.defaultPrevented ) {
@@ -25,5 +26,11 @@ export default ( props ) => ( element ) => {
 		}
 	}
 
-	return subscribeOwnedListener( element, 'keydown', onKeyDown );
+	return subscribeOwnedListener(
+		element,
+		'keydown',
+		onKeyDown as EventListener
+	);
 };
+
+export default deleteHandler;

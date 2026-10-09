@@ -5,6 +5,8 @@ import { updateFormats } from '../../update-formats';
 import { ownsSelection } from '../../owns-selection';
 import { subscribeOwnedListener } from '../../subscribe-owned-listener';
 import { unlock } from '../../lock-unlock';
+import type { RichTextFormatList } from '../../types';
+import type { EventListenerEffect } from '../types';
 
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
@@ -12,8 +14,6 @@ const { subscribeDelegatedListener } = unlock( composePrivateApis );
  * All inserting input types that would insert HTML into the DOM.
  *
  * @see https://www.w3.org/TR/input-events-2/#interface-InputEvent-Attributes
- *
- * @type {Set}
  */
 const INSERTION_INPUT_TYPES_TO_IGNORE = new Set( [
 	'insertParagraph',
@@ -23,11 +23,11 @@ const INSERTION_INPUT_TYPES_TO_IGNORE = new Set( [
 	'insertLink',
 ] );
 
-const EMPTY_ACTIVE_FORMATS = [];
+const EMPTY_ACTIVE_FORMATS: RichTextFormatList = [];
 
 const PLACEHOLDER_ATTR_NAME = 'data-rich-text-placeholder';
 
-export default ( props ) => ( element ) => {
+const inputAndSelection: EventListenerEffect = ( props ) => ( element ) => {
 	const { ownerDocument } = element;
 	const { defaultView } = ownerDocument;
 
@@ -42,7 +42,7 @@ export default ( props ) => ( element ) => {
 		isPointerDown = false;
 	}
 
-	function onInput( event ) {
+	function onInput( event?: Event | Pick< InputEvent, 'inputType' > ) {
 		// Do not trigger a change if characters are being composed. Browsers
 		// will usually emit a final `input` event when the characters are
 		// composed. As of December 2019, Safari doesn't support
@@ -54,7 +54,7 @@ export default ( props ) => ( element ) => {
 		let inputType;
 
 		if ( event ) {
-			inputType = event.inputType;
+			inputType = ( event as InputEvent ).inputType;
 		}
 
 		const { record, applyRecord, createRecord, handleChange } =
@@ -91,7 +91,16 @@ export default ( props ) => ( element ) => {
 		handleChange( change );
 	}
 
-	let selectionSnapshot;
+	let selectionSnapshot:
+		| {
+				anchorNode: Node | null;
+				anchorOffset: number;
+				focusNode: Node | null;
+				focusOffset: number;
+				processedStart: number;
+				processedEnd: number;
+		  }
+		| undefined;
 
 	/**
 	 * Syncs the selection to local state. A callback for the `selectionchange`
@@ -126,7 +135,7 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		const selection = defaultView.getSelection();
+		const selection = defaultView!.getSelection()!;
 
 		// Skip selections that have already been processed into the current
 		// record, such as the `selectionchange` event for a selection that
@@ -229,7 +238,7 @@ export default ( props ) => ( element ) => {
 		onInput( { inputType: 'insertText' } );
 	}
 
-	function onFocus( event ) {
+	function onFocus( event: FocusEvent ) {
 		// `focusin` bubbles from focusable descendants too — only act
 		// when focus lands on the editable itself.
 		if ( event.target !== element ) {
@@ -251,13 +260,13 @@ export default ( props ) => ( element ) => {
 
 		// When the whole editor is editable, let writing flow handle
 		// selection.
-		if ( element.parentElement.closest( '[contenteditable="true"]' ) ) {
+		if ( element.parentElement!.closest( '[contenteditable="true"]' ) ) {
 			// A nested editable element does not receive a caret from being
 			// focused, unlike an editing host. When the element does not
 			// contain the selection, restore the internal record's selection,
 			// or match the editing host behavior for programmatic focus and
 			// place the caret at the start.
-			const selection = defaultView.getSelection();
+			const selection = defaultView!.getSelection()!;
 			if (
 				! selection.anchorNode ||
 				! element.contains( selection.anchorNode )
@@ -275,7 +284,8 @@ export default ( props ) => ( element ) => {
 			// We know for certain that on focus, the old selection is invalid.
 			// It will be recalculated on the next mouseup, keyup, or touchend
 			// event.
-			const index = undefined;
+			// `RichTextValue` types `start` and `end` as required for now.
+			const index = undefined as unknown as number;
 
 			record.current = {
 				...record.current,
@@ -326,7 +336,7 @@ export default ( props ) => ( element ) => {
 	const unsubscribeFocus = subscribeDelegatedListener(
 		element,
 		'focusin',
-		onFocus
+		onFocus as EventListener
 	);
 	const unsubscribePointerDown = subscribeDelegatedListener(
 		element,
@@ -334,12 +344,12 @@ export default ( props ) => ( element ) => {
 		onPointerDown
 	);
 	const unsubscribePointerUp = subscribeDelegatedListener(
-		defaultView,
+		defaultView!,
 		'pointerup',
 		onPointerUp
 	);
 	const unsubscribePointerCancel = subscribeDelegatedListener(
-		defaultView,
+		defaultView!,
 		'pointercancel',
 		onPointerUp
 	);
@@ -391,3 +401,5 @@ export default ( props ) => ( element ) => {
 		);
 	};
 };
+
+export default inputAndSelection;

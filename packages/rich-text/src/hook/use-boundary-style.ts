@@ -1,12 +1,18 @@
 import { colord } from 'colord';
 import { useEffect, useRef } from '@wordpress/element';
+import type { RefObject } from 'react';
+import type { RichTextRecord } from './types';
 
 /*
  * Calculates and renders the format boundary style when the active formats
  * change.
  */
-export function useBoundaryStyle( { record } ) {
-	const ref = useRef();
+export function useBoundaryStyle( {
+	record,
+}: {
+	record: RefObject< RichTextRecord >;
+} ) {
+	const ref = useRef< HTMLElement >( undefined );
 	const { activeFormats = [], replacements, start } = record.current;
 	const activeReplacement = replacements[ start ];
 	useEffect( () => {
@@ -20,7 +26,7 @@ export function useBoundaryStyle( { record } ) {
 		}
 
 		const boundarySelector = '*[data-rich-text-format-boundary]';
-		const element = ref.current.querySelector( boundarySelector );
+		const element = ref.current!.querySelector( boundarySelector );
 
 		if ( ! element ) {
 			return;
@@ -28,7 +34,7 @@ export function useBoundaryStyle( { record } ) {
 
 		const { ownerDocument } = element;
 		const { defaultView } = ownerDocument;
-		const computedStyle = defaultView.getComputedStyle( element );
+		const computedStyle = defaultView!.getComputedStyle( element );
 		const newColor = colord( computedStyle.color )
 			.alpha( 0.2 )
 			.toRgbString();

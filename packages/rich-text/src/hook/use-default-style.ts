@@ -17,13 +17,11 @@ import { useCallback } from '@wordpress/element';
  * > some corner cases if 'white-space' is left at its default value.
  *
  * https://html.spec.whatwg.org/multipage/interaction.html#best-practices-for-in-page-editors
- *
- * @type {string}
  */
 const whiteSpace = 'pre-wrap';
 
 export function useDefaultStyle() {
-	return useCallback( ( element ) => {
+	return useCallback( ( element: HTMLElement | null ) => {
 		if ( ! element ) {
 			return;
 		}

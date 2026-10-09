@@ -6,11 +6,12 @@ import { remove } from '../../remove';
 import { getTextContent } from '../../get-text-content';
 import { ownsSelection } from '../../owns-selection';
 import { unlock } from '../../lock-unlock';
+import type { EventListenerEffect } from '../types';
 
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
-export default ( props ) => ( element ) => {
-	function onCopy( event ) {
+const copyHandler: EventListenerEffect = ( props ) => ( element ) => {
+	function onCopy( event: ClipboardEvent ) {
 		const { record, handleChange } = props.current;
 		const { ownerDocument } = element;
 		if (
@@ -28,9 +29,9 @@ export default ( props ) => ( element ) => {
 		const selectedRecord = slice( record.current );
 		const plainText = getTextContent( selectedRecord );
 		const html = toHTMLString( { value: selectedRecord } );
-		event.clipboardData.setData( 'text/plain', plainText );
-		event.clipboardData.setData( 'text/html', html );
-		event.clipboardData.setData( 'rich-text', 'true' );
+		event.clipboardData!.setData( 'text/plain', plainText );
+		event.clipboardData!.setData( 'text/html', html );
+		event.clipboardData!.setData( 'rich-text', 'true' );
 		event.preventDefault();
 
 		if ( event.type === 'cut' ) {
@@ -44,17 +45,19 @@ export default ( props ) => ( element ) => {
 
 	const { defaultView } = element.ownerDocument;
 	const unsubscribeCopy = subscribeDelegatedListener(
-		defaultView,
+		defaultView!,
 		'copy',
-		onCopy
+		onCopy as EventListener
 	);
 	const unsubscribeCut = subscribeDelegatedListener(
-		defaultView,
+		defaultView!,
 		'cut',
-		onCopy
+		onCopy as EventListener
 	);
 	return () => {
 		unsubscribeCopy();
 		unsubscribeCut();
 	};
 };
+
+export default copyHandler;

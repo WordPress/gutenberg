@@ -7,11 +7,12 @@ import deleteHandler from './delete';
 import inputAndSelection from './input-and-selection';
 import selectionChangeCompat from './selection-change-compat';
 import { preventFocusCapture } from './prevent-focus-capture';
+import type { EventListenerEffect, EventListenerProps } from '../types';
 
 // `inputAndSelection` must come first: it subscribes the listener that
 // synchronizes the internal record with a pending selection change at the
 // start of any keydown, which the other keydown listeners depend on.
-const allEventListeners = [
+const allEventListeners: EventListenerEffect[] = [
 	inputAndSelection,
 	copyHandler,
 	selectObject,
@@ -21,7 +22,7 @@ const allEventListeners = [
 	preventFocusCapture,
 ];
 
-export function useEventListeners( props ) {
+export function useEventListeners( props: EventListenerProps ) {
 	const propsRef = useRef( props );
 	useInsertionEffect( () => {
 		propsRef.current = props;
@@ -32,7 +33,7 @@ export function useEventListeners( props ) {
 	);
 
 	return useRefEffect(
-		( element ) => {
+		( element: HTMLElement ) => {
 			const cleanups = refEffects.map( ( effect ) => effect( element ) );
 			return () => {
 				cleanups.forEach( ( cleanup ) => cleanup() );
