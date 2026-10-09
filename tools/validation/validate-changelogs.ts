@@ -260,6 +260,41 @@ function validateEntryLinks(
 }
 
 /**
+ * Rejects blank lines between top-level list entries. A blank line turns the
+ * list into a "loose" list, which renders each entry as a separate paragraph.
+ *
+ * @param unreleased Unreleased section.
+ * @param filePath   Path for error messages.
+ * @return Error messages.
+ */
+function validateListSpacing(
+	unreleased: UnreleasedSection,
+	filePath: string
+): string[] {
+	const errors: string[] = [];
+	let inList = false;
+
+	for ( let i = 1; i < unreleased.lines.length; i++ ) {
+		const line = unreleased.lines[ i ];
+		if ( /^-\s+/.test( line ) ) {
+			if ( inList && unreleased.lines[ i - 1 ].trim() === '' ) {
+				errors.push(
+					`${ filePath }:${
+						unreleased.start + i
+					}: remove the blank line between Unreleased entries.`
+				);
+			}
+			inList = true;
+		} else if ( line !== '' && ! /^\s/.test( line ) ) {
+			// A heading or prose line ends the list.
+			inList = false;
+		}
+	}
+
+	return errors;
+}
+
+/**
  * Markdown link for a Gutenberg pull request.
  *
  * @param pr Pull request number.
@@ -350,6 +385,7 @@ export function validateChangelog(
 		...validateSubsectionHeadings( unreleased, filePath ),
 		...validateSectionTitles( unreleased, filePath ),
 		...validateEntryLinks( unreleased, filePath ),
+		...validateListSpacing( unreleased, filePath ),
 		...placementErrors,
 		...( options.requirePr
 			? validateRequiredPrLink( unreleased, filePath, options.requirePr )
