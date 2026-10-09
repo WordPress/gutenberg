@@ -14,6 +14,7 @@
 		{ "path": "packages/block-serialization-default-parser" },
 		{ "path": "packages/blocks" },
 		{ "path": "packages/boot" },
+		{ "path": "packages/commands" },
 		{ "path": "packages/components/tsconfig.build.json" },
 		{ "path": "packages/connectors/tsconfig.build.json" },
 		{ "path": "packages/compose/tsconfig.build.json" },

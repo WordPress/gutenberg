@@ -1,11 +1,12 @@
 import { useEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as commandsStore } from '../store';
+import type { CommandConfig } from '../store/types';
 
 /**
  * Attach a command to the command palette. Used for static commands.
  *
- * @param {import('../store/actions').WPCommandConfig} command command config.
+ * @param command command config.
  *
  * @example
  * ```js
@@ -24,7 +25,7 @@ import { store as commandsStore } from '../store';
  * } );
  * ```
  */
-export function useCommand( command ) {
+export function useCommand( command: CommandConfig ) {
 	const { registerCommand, unregisterCommand } = useDispatch( commandsStore );
 	const currentCallbackRef = useRef( command.callback );
 	useEffect( () => {
@@ -43,7 +44,8 @@ export function useCommand( command ) {
 			searchLabel: command.searchLabel,
 			icon: command.icon,
 			keywords: command.keywords,
-			callback: ( ...args ) => currentCallbackRef.current( ...args ),
+			callback: ( ...args: Parameters< CommandConfig[ 'callback' ] > ) =>
+				currentCallbackRef.current( ...args ),
 		} );
 		return () => {
 			unregisterCommand( command.name );
@@ -65,7 +67,7 @@ export function useCommand( command ) {
 /**
  * Attach multiple commands to the command palette. Used for static commands.
  *
- * @param {import('../store/actions').WPCommandConfig[]} commands Array of command configs.
+ * @param commands Array of command configs.
  *
  * @example
  * ```js
@@ -96,9 +98,11 @@ export function useCommand( command ) {
  * ] );
  * ```
  */
-export function useCommands( commands ) {
+export function useCommands( commands: CommandConfig[] ) {
 	const { registerCommand, unregisterCommand } = useDispatch( commandsStore );
-	const currentCallbacksRef = useRef( {} );
+	const currentCallbacksRef = useRef<
+		Record< string, CommandConfig[ 'callback' ] >
+	>( {} );
 
 	useEffect( () => {
 		if ( ! commands ) {
@@ -127,7 +131,9 @@ export function useCommands( commands ) {
 				searchLabel: command.searchLabel,
 				icon: command.icon,
 				keywords: command.keywords,
-				callback: ( ...args ) => {
+				callback: (
+					...args: Parameters< CommandConfig[ 'callback' ] >
+				) => {
 					const callback =
 						currentCallbacksRef.current[ command.name ];
 					if ( callback ) {

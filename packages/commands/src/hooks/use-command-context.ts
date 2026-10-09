@@ -6,9 +6,9 @@ import { unlock } from '../lock-unlock';
 /**
  * Sets the active context of the command palette
  *
- * @param {string} context Context to set.
+ * @param context Context to set.
  */
-export default function useCommandContext( context ) {
+export default function useCommandContext( context: string ) {
 	const { getContext } = useSelect( commandsStore );
 	const initialContext = useRef( getContext() );
 	const { setContext } = unlock( useDispatch( commandsStore ) );

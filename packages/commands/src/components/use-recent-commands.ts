@@ -8,18 +8,20 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { store as commandsStore } from '../store';
 import { unlock } from '../lock-unlock';
+import type { CommandConfig, CommandLoaderHook } from '../store/types';
+import type { OnResolved } from './types';
 
 const MAX_RECENTLY_SAVED = 30;
 const MAX_RECENTLY_DISPLAYED = 5;
-const EMPTY_ARRAY = [];
-const EMPTY_SET = new Set();
+const EMPTY_ARRAY: string[] = [];
+const EMPTY_SET = new Set< string >();
 
-export function recordUsage( name ) {
+export function recordUsage( name: string ) {
 	const current =
-		globalSelect( preferencesStore ).get(
+		( globalSelect( preferencesStore ).get(
 			'core/commands',
 			'recentlyUsed'
-		) ?? [];
+		) as string[] | undefined ) ?? [];
 	const next = [ name, ...current.filter( ( n ) => n !== name ) ].slice(
 		0,
 		MAX_RECENTLY_SAVED
@@ -27,7 +29,12 @@ export function recordUsage( name ) {
 	dispatch( preferencesStore ).set( 'core/commands', 'recentlyUsed', next );
 }
 
-export function useLoaderCollector( hook, name, filterNames, onResolved ) {
+export function useLoaderCollector(
+	hook: CommandLoaderHook,
+	name: string,
+	filterNames: Set< string > | undefined,
+	onResolved: OnResolved
+) {
 	const { setLoaderLoading } = unlock( useDispatch( commandsStore ) );
 	const { isLoading: loading, commands = [] } = hook( { search: '' } ) ?? {};
 
@@ -66,13 +73,15 @@ export function useRecentCommands() {
 			recentlyUsedNames: select( preferencesStore ).get(
 				'core/commands',
 				'recentlyUsed'
-			),
+			) as string[] | undefined,
 		};
 	}, [] );
 
-	const [ resolvedMap, setResolvedMap ] = useState( () => new Map() );
+	const [ resolvedMap, setResolvedMap ] = useState(
+		() => new Map< string, CommandConfig[] >()
+	);
 
-	const onResolved = useCallback( ( loaderName, cmds ) => {
+	const onResolved: OnResolved = useCallback( ( loaderName, cmds ) => {
 		setResolvedMap( ( prev ) => {
 			const prevCmds = prev.get( loaderName );
 			if (
@@ -106,7 +115,7 @@ export function useRecentCommands() {
 	const loaders = [ ...contextualLoaders, ...staticLoaders ];
 
 	// Merge static commands with loader-resolved commands.
-	const allByName = new Map();
+	const allByName = new Map< string, CommandConfig >();
 	allStaticCommands.forEach( ( c ) => allByName.set( c.name, c ) );
 	for ( const cmds of resolvedMap.values() ) {
 		cmds.forEach( ( c ) => {
@@ -118,7 +127,7 @@ export function useRecentCommands() {
 	// Return in recency order.
 	const commands = recentNames
 		.map( ( n ) => allByName.get( n ) )
-		.filter( Boolean );
+		.filter( ( c ): c is CommandConfig => !! c );
 
 	return { commands, loaders, recentSet, onResolved };
 }

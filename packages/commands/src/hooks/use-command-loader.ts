@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as commandsStore } from '../store';
+import type { CommandLoaderConfig, CommandLoaderHook } from '../store/types';
 
 /**
  * Attach a command loader to the command palette. Used for dynamic commands.
@@ -8,7 +9,7 @@ import { store as commandsStore } from '../store';
  * The palette always calls the most recent `hook`. Changing the `hook` instance
  * doesn't re-render the palette.
  *
- * @param {import('../store/actions').WPCommandLoaderConfig} loader command loader config.
+ * @param loader command loader config.
  *
  * @example
  * ```js
@@ -75,7 +76,7 @@ import { store as commandsStore } from '../store';
  * } );
  * ```
  */
-export default function useCommandLoader( loader ) {
+export default function useCommandLoader( loader: CommandLoaderConfig ) {
 	const { registerCommandLoader, unregisterCommandLoader } =
 		useDispatch( commandsStore );
 	const currentHookRef = useRef( loader.hook );
@@ -86,7 +87,8 @@ export default function useCommandLoader( loader ) {
 	// Stable identity, so a hook rebuilt on every render does not re-register
 	// the loader.
 	const hook = useCallback(
-		( ...args ) => currentHookRef.current( ...args ),
+		( ...args: Parameters< CommandLoaderHook > ) =>
+			currentHookRef.current( ...args ),
 		[]
 	);
 
