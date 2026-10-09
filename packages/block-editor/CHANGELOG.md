@@ -37,6 +37,7 @@
 -   Inserter: Stop re-rendering the block list when the block selection changes while the inserter is open ([#83284](https://github.com/WordPress/gutenberg/pull/83284)).
 -   Fix style edits applied to a multi-block selection overwriting each block's other styles. Only the changed values are now applied to every selected block, so distinct styles are preserved and resets propagate to the whole selection ([#80070](https://github.com/WordPress/gutenberg/pull/80070)).
 -   Fix exception thrown by `getSelectedBlockStyleState` when an `undefined` `clientId` is passed as an argument. ([#84140](https://github.com/WordPress/gutenberg/pull/84140))
+-   Block alignment: Keep the alignment control when a block carries a wide or full alignment its parent layout withholds, such as a full-width pattern inserted into a layout without full width. The menu shows the alignment as set but not applied, and None removes it. Previously the control disappeared, leaving no sign that the saved markup still had the alignment class.
 
 ### Internal
 
