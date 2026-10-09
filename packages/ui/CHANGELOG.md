@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   `Select`, `SelectControl`, `Combobox`, `SearchableSelect`, `SearchableChipSelect`, `SearchableSelectControl`, `SearchableChipSelectControl`, `Autocomplete`: Close non-modal popups when the user presses inside a same-origin iframe while still allowing the iframe interaction. ([#83778](https://github.com/WordPress/gutenberg/pull/83778))
 -   `Menu`, `Popover`: Keep popups open when the user interacts with an iframe inside the popup. ([#83870](https://github.com/WordPress/gutenberg/pull/83870))
 -   `AlertDialog`: Use the WordPress compatibility overlay slot as the default portal container when available, preserving an explicit null container to delay rendering ([#83878](https://github.com/WordPress/gutenberg/pull/83878)).
 

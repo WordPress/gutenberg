@@ -1,48 +1,61 @@
-import type { RefObject } from 'react';
-import { useCallback, useRef, useState } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 import {
+	getNodeDocument,
 	isInsideCurrentPopup,
 	useObserveIframePresses,
 } from './iframe-dismissal-utils';
-
-type Actions = { close: () => void };
 
 type OpenChangeHandler< EventDetails > = (
 	open: boolean,
 	eventDetails: EventDetails
 ) => void;
 
-/*
- * Temporary bridge for https://github.com/mui/base-ui/issues/5410#issuecomment-5376507925.
- * Base UI listens for outside presses only in the popup's owner document,
- * but pointer events do not cross document boundaries. Once the minimum Base
- * UI version fixes this, delete this hook's import, call, and prop spread from
- * `Menu.Root` and `Popover.Root`, then pass their `onOpenChange` handlers
- * directly to the Base UI roots again.
- */
-export function useIframeDismissalBridge<
-	TActions extends Actions,
+function dispatchOutsidePress( event: Event, ownerDocument: Document ) {
+	let frameElement = getNodeDocument( event.target as Node | null )
+		?.defaultView?.frameElement;
+	while ( frameElement && frameElement.ownerDocument !== ownerDocument ) {
+		frameElement = frameElement.ownerDocument.defaultView?.frameElement;
+	}
+
+	if ( ! frameElement ) {
+		return;
+	}
+
+	const PointerEventConstructor = ownerDocument.defaultView?.PointerEvent;
+	if ( ! PointerEventConstructor ) {
+		return;
+	}
+
+	const pointerEvent = event as PointerEvent;
+	frameElement.dispatchEvent(
+		new PointerEventConstructor( event.type, {
+			bubbles: true,
+			button: pointerEvent.button,
+			detail: pointerEvent.detail,
+			pointerType: pointerEvent.pointerType,
+		} )
+	);
+}
+
+export function useIframeOutsidePressBridge<
 	TEventDetails extends {
 		isCanceled: boolean;
 		trigger: Element | undefined;
+		event: Event;
 	},
 >( {
-	actionsRef,
 	defaultOpen,
 	disabled,
 	modal,
 	onOpenChange,
 	open: openProp,
 }: {
-	actionsRef?: RefObject< TActions | null >;
 	defaultOpen?: boolean;
 	disabled?: boolean;
-	modal?: boolean | 'trap-focus';
+	modal?: boolean;
 	onOpenChange: OpenChangeHandler< TEventDetails >;
 	open?: boolean;
 } ) {
-	const fallbackActionsRef = useRef< TActions | null >( null );
-	const resolvedActionsRef = actionsRef ?? fallbackActionsRef;
 	const [ uncontrolledOpen, setUncontrolledOpen ] = useState(
 		defaultOpen ?? false
 	);
@@ -51,14 +64,14 @@ export function useIframeDismissalBridge<
 	const handleIframePointerDown = useCallback(
 		( event: Event ) => {
 			if ( trigger && ! isInsideCurrentPopup( event, trigger ) ) {
-				resolvedActionsRef.current?.close();
+				dispatchOutsidePress( event, trigger.ownerDocument );
 			}
 		},
-		[ resolvedActionsRef, trigger ]
+		[ trigger ]
 	);
-
 	useObserveIframePresses( {
 		enabled: open && modal === false && ! disabled && trigger !== null,
+		onClick: handleIframePointerDown,
 		onPointerDown: handleIframePointerDown,
 		ownerDocument: trigger?.ownerDocument ?? null,
 	} );
@@ -74,11 +87,16 @@ export function useIframeDismissalBridge<
 		}
 
 		setUncontrolledOpen( nextOpen );
-		setTrigger( nextOpen ? ( eventDetails.trigger ?? null ) : null );
+		const eventTarget = eventDetails.event.target;
+		setTrigger(
+			nextOpen
+				? ( eventDetails.trigger ??
+						( eventTarget instanceof Element
+							? eventTarget
+							: null ) )
+				: null
+		);
 	};
 
-	return {
-		actionsRef: resolvedActionsRef,
-		onOpenChange: handleOpenChange,
-	};
+	return { onOpenChange: handleOpenChange };
 }
