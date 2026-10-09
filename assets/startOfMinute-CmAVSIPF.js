@@ -1,0 +1,1 @@
+import{n as t}from"./rolldown-runtime-DiifJuVD.js";import{n,t as i}from"./toDate-DxqZh13A.js";function startOfMinute(t,i){const r=n(t,i?.in);return r.setSeconds(0,0),r}function init_startOfMinute(){return(init_startOfMinute=t(()=>{i()}))()}export{startOfMinute as n,init_startOfMinute as t};
