@@ -83,8 +83,7 @@
 				calc($radius-small /
 				(var(--selected-height, 0) / var(--antialiasing-factor)));
 			top: 0;
-			/* stylelint-disable-next-line logical-css/require-logical-properties -- Preserve the physical anchor used by the translateY indicator. */
-			left: 0;
+			inset-inline-start: 0;
 			width: 100%;
 			height: calc(var(--antialiasing-factor) * 1px);
 			transform:
