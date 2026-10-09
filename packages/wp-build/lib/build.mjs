@@ -3,7 +3,6 @@ import { readFile, writeFile, copyFile, mkdir, unlink } from 'fs/promises';
 import path from 'path';
 import { createRequire as createNodeRequire } from 'node:module';
 import { parseArgs } from 'node:util';
-import esbuild from 'esbuild';
 import glob from 'fast-glob';
 import chokidar from 'chokidar';
 import browserslistToEsbuild from 'browserslist-to-esbuild';
@@ -49,6 +48,12 @@ import {
 	compileInlineStyle,
 	dsTokenFallbacks,
 } from './compile-inline-style.mjs';
+import {
+	buildWithConcurrency,
+	getDefaultBuildConcurrency,
+	parseBuildConcurrency,
+	setBuildConcurrency,
+} from './build-concurrency.mjs';
 
 /**
  * Resolve the ESBuild target from the project's Browserslist config.
@@ -594,7 +599,7 @@ async function bundlePackage( packageName, options = {} ) {
 		];
 
 		builds.push(
-			esbuild.build( {
+			buildWithConcurrency( {
 				...baseConfig,
 				outfile: path.join( outputDir, 'index.min.js' ),
 				minify: true,
@@ -609,7 +614,7 @@ async function bundlePackage( packageName, options = {} ) {
 					),
 				],
 			} ),
-			esbuild.build( {
+			buildWithConcurrency( {
 				...baseConfig,
 				outfile: path.join( outputDir, 'index.js' ),
 				minify: false,
@@ -664,7 +669,7 @@ async function bundlePackage( packageName, options = {} ) {
 				);
 
 			builds.push(
-				esbuild.build( {
+				buildWithConcurrency( {
 					entryPoints: [ entryPoint ],
 					outfile: path.join(
 						rootBuildModuleDir,
@@ -695,7 +700,7 @@ async function bundlePackage( packageName, options = {} ) {
 
 			if ( ! isWasmWorker ) {
 				builds.push(
-					esbuild.build( {
+					buildWithConcurrency( {
 						entryPoints: [ entryPoint ],
 						outfile: path.join(
 							rootBuildModuleDir,
@@ -1419,7 +1424,7 @@ async function transpilePackage( packageName ) {
 
 	if ( packageJson.main ) {
 		builds.push(
-			esbuild.build( {
+			buildWithConcurrency( {
 				entryPoints: srcFiles,
 				outdir: buildDir,
 				outbase: srcDir,
@@ -1452,7 +1457,7 @@ async function transpilePackage( packageName ) {
 
 	if ( packageJson.module ) {
 		builds.push(
-			esbuild.build( {
+			buildWithConcurrency( {
 				entryPoints: srcFiles,
 				outdir: buildModuleDir,
 				outbase: srcDir,
@@ -1559,7 +1564,7 @@ async function compileStyles( packageName ) {
 
 			await mkdir( outputDir, { recursive: true } );
 
-			await esbuild.build( {
+			await buildWithConcurrency( {
 				entryPoints: [ styleEntryPath ],
 				outdir: outputDir,
 				bundle: true,
@@ -1695,7 +1700,7 @@ async function buildRoute( routeName ) {
 		if ( routeEntryPoints.length > 0 ) {
 			// Build both minified and non-minified versions in parallel
 			await Promise.all( [
-				esbuild.build( {
+				buildWithConcurrency( {
 					entryPoints: routeEntryPoints,
 					outfile: path.join( outputDir, 'route.min.js' ),
 					bundle: true,
@@ -1713,7 +1718,7 @@ async function buildRoute( routeName ) {
 						),
 					],
 				} ),
-				esbuild.build( {
+				buildWithConcurrency( {
 					entryPoints: routeEntryPoints,
 					outfile: path.join( outputDir, 'route.js' ),
 					bundle: true,
@@ -1746,7 +1751,7 @@ async function buildRoute( routeName ) {
 
 		// Build both minified and non-minified versions in parallel
 		await Promise.all( [
-			esbuild.build( {
+			buildWithConcurrency( {
 				entryPoints: [ tempEntryPath ],
 				outfile: path.join( outputDir, 'content.min.js' ),
 				bundle: true,
@@ -1764,7 +1769,7 @@ async function buildRoute( routeName ) {
 					),
 				],
 			} ),
-			esbuild.build( {
+			buildWithConcurrency( {
 				entryPoints: [ tempEntryPath ],
 				outfile: path.join( outputDir, 'content.js' ),
 				bundle: true,
@@ -1856,7 +1861,7 @@ async function buildWidget( widgetName ) {
 		if ( renderEntryPoints.length > 0 ) {
 			// Build both minified and non-minified versions in parallel
 			await Promise.all( [
-				esbuild.build( {
+				buildWithConcurrency( {
 					entryPoints: renderEntryPoints,
 					outfile: path.join( outputDir, 'render.min.js' ),
 					bundle: true,
@@ -1874,7 +1879,7 @@ async function buildWidget( widgetName ) {
 						),
 					],
 				} ),
-				esbuild.build( {
+				buildWithConcurrency( {
 					entryPoints: renderEntryPoints,
 					outfile: path.join( outputDir, 'render.js' ),
 					bundle: true,
@@ -1906,7 +1911,7 @@ async function buildWidget( widgetName ) {
 		if ( widgetEntryPoints.length > 0 ) {
 			// Build both minified and non-minified versions in parallel
 			await Promise.all( [
-				esbuild.build( {
+				buildWithConcurrency( {
 					entryPoints: widgetEntryPoints,
 					outfile: path.join( outputDir, 'widget.min.js' ),
 					bundle: true,
@@ -1924,7 +1929,7 @@ async function buildWidget( widgetName ) {
 						),
 					],
 				} ),
-				esbuild.build( {
+				buildWithConcurrency( {
 					entryPoints: widgetEntryPoints,
 					outfile: path.join( outputDir, 'widget.js' ),
 					bundle: true,
@@ -2841,11 +2846,20 @@ async function main() {
 						? "includes_url( 'build/' )"
 						: 'plugin_dir_url( __FILE__ )',
 			},
+			concurrency: {
+				type: 'string',
+				default: process.env.WP_BUILD_CONCURRENCY,
+			},
 		},
 		strict: false,
 	} );
 
 	const baseUrlExpression = values[ 'base-url' ];
+	const buildConcurrency =
+		parseBuildConcurrency( values.concurrency ) ??
+		getDefaultBuildConcurrency();
+	setBuildConcurrency( buildConcurrency );
+	console.log( `⚙️ Using build concurrency: ${ buildConcurrency }\n` );
 
 	await buildAll( baseUrlExpression );
 
