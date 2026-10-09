@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, waitFor } from '@testing-library/react';
-import { useSelect } from '@wordpress/data';
+import { select as selectStore, useSelect } from '@wordpress/data';
 import { createElement } from '@wordpress/element';
+import { store as uploadStore } from '@wordpress/upload-media';
 import { BlockEditorProvider } from '../';
 import { store as blockEditorStore } from '../../../store';
 
@@ -119,7 +120,14 @@ describe( 'mediaUpload with client-side media processing', () => {
 		const mediaUpload = setUpMediaUpload();
 		const onSuccess = vi.fn();
 		const onError = vi.fn();
-		const onBatchSuccess = vi.fn();
+		const queuedAtBatchSuccess = [];
+		const onBatchSuccess = vi.fn( () =>
+			queuedAtBatchSuccess.push(
+				selectStore( uploadStore )
+					.getItems()
+					.map( ( item ) => item.file.name )
+			)
+		);
 
 		mediaUpload( {
 			filesList: createFiles( 'seven.txt', 'eight.txt', 'nine.txt' ),
@@ -137,5 +145,6 @@ describe( 'mediaUpload with client-side media processing', () => {
 		await waitFor( () => expect( onError ).toHaveBeenCalled() );
 		expect( onBatchSuccess ).toHaveBeenCalledTimes( 1 );
 		expect( onError ).toHaveBeenCalledBefore( onBatchSuccess );
+		expect( queuedAtBatchSuccess ).toEqual( [ [] ] );
 	} );
 } );
