@@ -17,7 +17,6 @@
 ### Breaking Changes
 
 -   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
--   Stop exporting the `MediaEdit` component and its `MediaEditProps` type. The featured image field keeps rendering the control ([#83368](https://github.com/WordPress/gutenberg/pull/83368)).
 
 ### Enhancements
 
