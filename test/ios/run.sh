@@ -74,6 +74,9 @@ fi
 
 step "Waiting for the simulator"
 xcrun simctl bootstatus "$UDID" -b
+# Safari's tips cover the page on a fresh simulator, and a tap then only
+# closes the tip.
+xcrun simctl spawn "$UDID" defaults write com.apple.mobilesafari com.apple.TipKit.HideAllTips -bool YES
 # Playground logs a browser in once and remembers that in a cookie, which
 # outlives the server: start Safari without cookies from an earlier run.
 xcrun simctl terminate "$UDID" com.apple.mobilesafari 2>/dev/null || true
