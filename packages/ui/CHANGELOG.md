@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### New Features
+
+-   `Breadcrumb`: Add `ButtonItem` ancestors for hierarchy selection, current-only trails, and customizable `CurrentItem` `aria-current` ([#84156](https://github.com/WordPress/gutenberg/pull/84156)).
+
 ### Bug Fixes
 
 -   `Menu`, `Popover`: Keep popups open when the user interacts with an iframe inside the popup. ([#83870](https://github.com/WordPress/gutenberg/pull/83870))
