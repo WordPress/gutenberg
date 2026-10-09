@@ -1,5 +1,5 @@
 import { createContext } from '@wordpress/element';
-import type { EventListenersProps } from './types';
+import type { EventCallbacksRef } from './types';
 
 /**
  * Holds a ref to a Set of keyboard shortcut callbacks registered by format
@@ -7,7 +7,7 @@ import type { EventListenersProps } from './types';
  * element provides the ref and dispatches the callbacks on `keydown`.
  */
 export const KeyboardShortcutContext = createContext<
-	EventListenersProps[ 'keyboardShortcuts' ] | undefined
+	EventCallbacksRef< KeyboardEvent > | undefined
 >( undefined );
 KeyboardShortcutContext.displayName = 'KeyboardShortcutContext';
 
@@ -17,6 +17,6 @@ KeyboardShortcutContext.displayName = 'KeyboardShortcutContext';
  * element provides the ref and dispatches the callbacks on `input`.
  */
 export const InputEventContext = createContext<
-	EventListenersProps[ 'inputEvents' ] | undefined
+	EventCallbacksRef< Event > | undefined
 >( undefined );
 InputEventContext.displayName = 'InputEventContext';

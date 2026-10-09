@@ -229,6 +229,13 @@ export type HTMLTreeNode = {
  * rich text field that owns the editable element provides the Sets.
  */
 export type EventListenersProps = {
-	keyboardShortcuts: RefObject< Set< ( event: KeyboardEvent ) => void > >;
-	inputEvents: RefObject< Set< ( event: Event ) => void > >;
+	keyboardShortcuts: EventCallbacksRef< KeyboardEvent >;
+	inputEvents: EventCallbacksRef< Event >;
 };
+
+/**
+ * A ref to the Set of callbacks that format types register for an event.
+ */
+export type EventCallbacksRef< E extends Event > = RefObject<
+	Set< ( event: E ) => void >
+>;
