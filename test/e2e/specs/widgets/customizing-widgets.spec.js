@@ -299,7 +299,9 @@ test.describe( 'Widgets Customizer', () => {
 		const headingBlock = page.locator(
 			'role=document[name="Block: Heading 2"i] >> text="First Heading"'
 		);
-		await expect( headingBlock ).toBeFocused();
+		await expect
+			.poll( () => editor.ownsSelection( headingBlock ) )
+			.toBe( true );
 	} );
 
 	test( 'should clear block selection', async ( {
