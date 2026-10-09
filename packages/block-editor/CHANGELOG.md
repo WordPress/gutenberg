@@ -13,6 +13,7 @@
 ### Bug Fixes
 
 -   Inserter: Only show the block-section separator when both sections contain blocks, avoiding a double border above the tip ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
+-   Client-side media processing: Call `onFileChange` with every file of a multi-file upload so far, in file order, so blocks such as `MediaPlaceholder` with `multiple` keep every file ([#84364](https://github.com/WordPress/gutenberg/pull/84364)).
 
 ## 18.1.0 (2026-10-07)
 
