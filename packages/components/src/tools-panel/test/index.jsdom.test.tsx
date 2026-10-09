@@ -359,10 +359,10 @@ describe( 'ToolsPanel', () => {
 
 			expect(
 				screen.getByRole( 'menuitemcheckbox', {
-					name: 'Hide and reset Alt',
+					name: 'Remove Alt',
 					checked: true,
 				} )
-			).toHaveTextContent( /^Hide and reset Alt$/ );
+			).toHaveTextContent( /^Remove Alt$/ );
 
 			expect( control ).toBeInTheDocument();
 
@@ -375,11 +375,11 @@ describe( 'ToolsPanel', () => {
 			renderPanel();
 			await openDropdownMenu();
 			const menuItem = screen.getByRole( 'menuitemcheckbox', {
-				name: 'Hide and reset Example',
+				name: 'Remove Example',
 				checked: true,
 			} );
-			expect( menuItem ).toHaveTextContent( /^Hide and reset Example$/ );
-			await selectMenuItem( 'Hide and reset Example' );
+			expect( menuItem ).toHaveTextContent( /^Remove Example$/ );
+			await selectMenuItem( 'Remove Example' );
 			const control = screen.queryByText( 'Example control' );
 
 			expect(
@@ -609,7 +609,7 @@ describe( 'ToolsPanel', () => {
 			).toBeInTheDocument();
 
 			await openDropdownMenu();
-			await selectMenuItem( 'Hide and reset Alt' );
+			await selectMenuItem( 'Remove Alt' );
 			expect(
 				screen.queryByText( 'Optional control' )
 			).not.toBeInTheDocument();
@@ -1057,7 +1057,7 @@ describe( 'ToolsPanel', () => {
 			renderPanel();
 
 			await openDropdownMenu();
-			await selectMenuItem( 'Hide and reset Example' );
+			await selectMenuItem( 'Remove Example' );
 
 			expect( controlProps.onSelect ).not.toHaveBeenCalled();
 			expect( controlProps.onDeselect ).toHaveBeenCalledTimes( 1 );
@@ -1098,7 +1098,7 @@ describe( 'ToolsPanel', () => {
 
 			expect( controlProps.onDeselect ).not.toHaveBeenCalled();
 
-			await selectMenuItem( 'Hide and reset Example' ); // Reset control.
+			await selectMenuItem( 'Remove Example' ); // Reset control.
 
 			expect( controlProps.onDeselect ).toHaveBeenCalled();
 		} );
@@ -1126,7 +1126,7 @@ describe( 'ToolsPanel', () => {
 
 			await openDropdownMenu();
 			await selectMenuItem( 'Show Alt' );
-			await selectMenuItem( 'Hide and reset Alt' );
+			await selectMenuItem( 'Remove Alt' );
 
 			expect( altControlProps.onShownChange ).toHaveBeenCalledTimes( 2 );
 			expect( altControlProps.onShownChange ).toHaveBeenLastCalledWith(
@@ -1140,7 +1140,7 @@ describe( 'ToolsPanel', () => {
 			renderPanel();
 
 			await openDropdownMenu();
-			await selectMenuItem( 'Hide and reset Example' );
+			await selectMenuItem( 'Remove Example' );
 
 			expect( controlProps.onShownChange ).toHaveBeenCalledTimes( 1 );
 			expect( controlProps.onShownChange ).toHaveBeenCalledWith( false );
@@ -1341,8 +1341,8 @@ describe( 'ToolsPanel', () => {
 			expect( items[ 1 ] ).toHaveTextContent( 'Item 2' );
 
 			// Then toggle off both items.
-			await selectMenuItem( 'Hide and reset Example' );
-			await selectMenuItem( 'Hide and reset Alt' );
+			await selectMenuItem( 'Remove Example' );
+			await selectMenuItem( 'Remove Alt' );
 
 			// Toggle on controls again and ensure order remains.
 			await selectMenuItem( 'Show Example' );
@@ -1640,7 +1640,7 @@ describe( 'ToolsPanel', () => {
 			).toBeInTheDocument();
 			expect(
 				screen.queryByRole( 'menuitemcheckbox', {
-					name: 'Hide and reset Example',
+					name: 'Remove Example',
 				} )
 			).not.toBeInTheDocument();
 
@@ -1654,7 +1654,7 @@ describe( 'ToolsPanel', () => {
 			).not.toBeInTheDocument();
 			expect(
 				screen.getByRole( 'menuitemcheckbox', {
-					name: 'Hide and reset Example',
+					name: 'Remove Example',
 				} )
 			).toBeInTheDocument();
 		} );
