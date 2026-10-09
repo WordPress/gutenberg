@@ -1,8 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { Component } from '@wordpress/element';
+import type { ReactNode } from 'react';
 import withGlobalEvents from '../';
 import Listener from '../listener';
+
+type TrackedListener = typeof Listener & { _instance?: Listener };
 
 vi.mock( import( '../listener' ), async ( importOriginal ) => {
 	const { default: ActualListener } = await importOriginal();
@@ -10,12 +13,12 @@ vi.mock( import( '../listener' ), async ( importOriginal ) => {
 	return {
 		default: class extends ActualListener {
 			constructor() {
-				super( ...arguments );
+				super();
 
-				this.constructor._instance = this;
+				( this.constructor as TrackedListener )._instance = this;
 
-				vi.spyOn( this, 'add' );
-				vi.spyOn( this, 'remove' );
+				vi.spyOn( this as Listener, 'add' );
+				vi.spyOn( this as Listener, 'remove' );
 			}
 		},
 	};
@@ -25,9 +28,12 @@ describe( 'withGlobalEvents', () => {
 	const DEPRECATION_MESSAGE =
 		'wp.compose.withGlobalEvents is deprecated since version 5.7. Please use useEffect instead.';
 
-	class OriginalComponent extends Component {
-		handleResize( event ) {
-			this.props.onResize( event );
+	class OriginalComponent extends Component< {
+		children: ReactNode;
+		onResize?: ( event: Event ) => void;
+	} > {
+		handleResize( event: Event ) {
+			this.props.onResize!( event );
 		}
 
 		render() {
@@ -38,9 +44,10 @@ describe( 'withGlobalEvents', () => {
 
 	beforeEach( () => {
 		vi.spyOn( OriginalComponent.prototype, 'handleResize' );
-		if ( Listener._instance ) {
-			vi.spyOn( Listener._instance, 'add' );
-			vi.spyOn( Listener._instance, 'remove' );
+		const { _instance } = Listener as TrackedListener;
+		if ( _instance ) {
+			vi.spyOn( _instance, 'add' );
+			vi.spyOn( _instance, 'remove' );
 		}
 	} );
 
@@ -63,7 +70,9 @@ describe( 'withGlobalEvents', () => {
 		render( <EnhancedComponent ref={ () => {} }>Hello</EnhancedComponent> );
 
 		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
-		expect( Listener._instance.add ).toHaveBeenCalledWith(
+		expect(
+			( Listener as TrackedListener )._instance!.add
+		).toHaveBeenCalledWith(
 			'resize',
 			// If not `undefined`, then we consider handlers were properly bound to the wrapper component.
 			expect.any( Object )
@@ -83,9 +92,9 @@ describe( 'withGlobalEvents', () => {
 		);
 		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
 
-		const event = { type: 'resize' };
+		const event = { type: 'resize' } as Event;
 
-		Listener._instance.handleEvent( event );
+		( Listener as TrackedListener )._instance!.handleEvent( event );
 
 		expect( OriginalComponent.prototype.handleResize ).toHaveBeenCalledWith(
 			event
