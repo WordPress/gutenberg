@@ -1,5 +1,7 @@
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { ValidatedInputControl } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	ValidatedInputControl,
+} from '@wordpress/ui';
 import { useCallback } from '@wordpress/element';
 import type { DataFormControlProps } from '../../../types';
 import getCustomValidity from './get-custom-validity';

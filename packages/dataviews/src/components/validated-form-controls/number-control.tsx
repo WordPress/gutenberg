@@ -1,8 +1,10 @@
 import { forwardRef, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { __experimentalNumberControl as NumberControl } from '@wordpress/components';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { ControlWithError } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	ControlWithError,
+} from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 
 type NumberControlProps = React.ComponentProps< typeof NumberControl >;
