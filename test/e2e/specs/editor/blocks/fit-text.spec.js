@@ -27,7 +27,7 @@ test.describe( 'Fit Text', () => {
 				.click();
 			await page
 				.getByRole( 'menu', { name: 'Typography options' } )
-				.getByRole( 'menuitemcheckbox', { name: 'Show Fit text' } )
+				.getByRole( 'menuitemcheckbox', { name: 'Fit text' } )
 				.click();
 
 			const fitTextToggle = page.getByRole( 'checkbox', {
@@ -99,7 +99,7 @@ test.describe( 'Fit Text', () => {
 				.click();
 			await page
 				.getByRole( 'menu', { name: 'Typography options' } )
-				.getByRole( 'menuitemcheckbox', { name: 'Show Fit text' } )
+				.getByRole( 'menuitemcheckbox', { name: 'Fit text' } )
 				.click();
 
 			const fitTextToggle = page.getByRole( 'checkbox', {
@@ -281,7 +281,7 @@ test.describe( 'Fit Text', () => {
 				.click();
 			await page
 				.getByRole( 'menu', { name: 'Typography options' } )
-				.getByRole( 'menuitemcheckbox', { name: 'Show Fit text' } )
+				.getByRole( 'menuitemcheckbox', { name: 'Fit text' } )
 				.click();
 
 			const fitTextToggle = page.getByRole( 'checkbox', {
