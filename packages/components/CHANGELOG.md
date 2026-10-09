@@ -22,6 +22,10 @@
 -   `InputControl`, `NumberControl`, `UnitControl`: Ignore the drag gesture for touch input, where it has no cursor affordance and is easy to trigger by accident ([#38865](https://github.com/WordPress/gutenberg/issues/38865), [#81519](https://github.com/WordPress/gutenberg/pull/81519)).
 -   `navigateRegions`: Only outline the Publish and Save controls when their region has focus ([#84343](https://github.com/WordPress/gutenberg/pull/84343)).
 
+### Internal
+
+-   `Autocomplete`: Read the `text` property of rich text values instead of the deprecated `getTextContent` ([#56111](https://github.com/WordPress/gutenberg/pull/56111)).
+
 ## 42.0.0 (2026-10-07)
 
 ### Breaking Changes
