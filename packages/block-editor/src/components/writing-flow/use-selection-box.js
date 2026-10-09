@@ -8,8 +8,16 @@ import { unlock } from '../../lock-unlock';
 // click (with a slightly shaky hand) does not flash the box.
 const DRAG_THRESHOLD = 3;
 
-const FOCUSABLE_SELECTOR =
-	'a[href], button, input, select, textarea, [contenteditable="true"], [tabindex]';
+// A press on an element's scrollbar targets the element, outside of its client
+// area: right of it, or left of it in right-to-left layouts, or below it.
+function isOnScrollbar( { target, offsetX, offsetY } ) {
+	return (
+		offsetX < 0 ||
+		offsetY < 0 ||
+		offsetX > target.clientWidth ||
+		offsetY > target.clientHeight
+	);
+}
 
 function clampToRect( x, y, rect ) {
 	return [
@@ -375,21 +383,21 @@ export default function useSelectionBox() {
 				mouseDownEvent = event;
 				mode = undefined;
 				const { target } = event;
-				const clientId = getBlockClientId( target );
-				const focusable = target.closest( FOCUSABLE_SELECTOR );
-				// Outside of any block, or on a container block's own element
-				// (its padding, the gap between its inner blocks) rather than
-				// on its content. Not on a scrollbar, nor on anything else
-				// the user can interact with, such as the post title.
+				// Only a press on empty space: the canvas, a block list
+				// layout (the gaps between its blocks), or a block's own
+				// element (its padding) rather than its content. Anything
+				// else, interactive or not, may handle the press itself.
 				selectsBlocks =
-					event.offsetX <= target.clientWidth &&
-					event.offsetY <= target.clientHeight &&
-					( clientId
-						? target.id === `block-${ clientId }` &&
+					! isOnScrollbar( event ) &&
+					( target === node ||
+						target.classList.contains(
+							'block-editor-block-list__layout'
+						) ||
+						( target.hasAttribute( 'data-block' ) &&
 							// Not `isContentEditable`: the whole canvas is
 							// editable while blocks are multi-selected.
-							target.getAttribute( 'contenteditable' ) !== 'true'
-						: ! focusable || focusable === node );
+							target.getAttribute( 'contenteditable' ) !==
+								'true' ) );
 
 				if ( selectsBlocks ) {
 					// The press would start a text selection, which, once
@@ -398,7 +406,9 @@ export default function useSelectionBox() {
 					// collapse the previous selection and move focus.
 					event.preventDefault();
 					defaultView.getSelection().removeAllRanges();
-					( focusable ?? node ).focus( { preventScroll: true } );
+					( target.closest( '[tabindex]' ) ?? node ).focus( {
+						preventScroll: true,
+					} );
 				}
 
 				const scroll = getScroll();
