@@ -1,5 +1,4 @@
 @use "@wordpress/base-styles/variables" as *;
-@use "@wordpress/base-styles/colors" as *;
 
 .editor-editor-interface .entities-saved-states__panel-header {
 	height: $header-height + $border-width;
@@ -22,14 +21,6 @@
 
 .editor-visual-editor {
 	flex: 1 0 auto;
-}
-
-// Keep the row of the block toolbar while no block is selected, so selecting
-// one does not move the canvas down.
-.editor-editor-interface__block-toolbar {
-	flex-shrink: 0;
-	min-height: $block-toolbar-height - 2 * $border-width;
-	background-color: $white;
 }
 
 .editor-notices__dismissible,

@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	BlockBreadcrumb,
+	BlockToolbar,
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -31,7 +32,7 @@ import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import StylesCanvas from '../styles-canvas';
 
-const { PrivateBlockToolbar } = unlock( blockEditorPrivateApis );
+const { blockToolbarShowPlaceholderKey } = unlock( blockEditorPrivateApis );
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -252,12 +253,12 @@ export default function EditorInterface( {
 							{ ! isPreviewMode &&
 								! isLargeViewport &&
 								mode === 'visual' && (
-									<div className="editor-editor-interface__block-toolbar">
-										<PrivateBlockToolbar
-											hideDragHandle
-											showPlaceholder
-										/>
-									</div>
+									<BlockToolbar
+										hideDragHandle
+										{ ...{
+											[ blockToolbarShowPlaceholderKey ]: true,
+										} }
+									/>
 								) }
 							{ ( isPreviewMode || mode === 'visual' ) && (
 								<VisualEditor

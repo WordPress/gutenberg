@@ -315,16 +315,18 @@ export function PrivateBlockToolbar( {
 							) }
 						</>
 					) }
-				{ ! isPlaceholder && (
-					<>
-						<BlockEditVisuallyButton clientIds={ blockClientIds } />
-						<BlockSettingsMenu clientIds={ blockClientIds } />
-					</>
-				) }
+				<BlockEditVisuallyButton clientIds={ blockClientIds } />
+				<BlockSettingsMenu clientIds={ blockClientIds } />
 			</div>
 		</NavigableToolbar>
 	);
 }
+
+/**
+ * Private prop of BlockToolbar: while no block is selected, show the default
+ * block's icon, the mover and the options menu, disabled.
+ */
+export const showPlaceholderKey = Symbol( 'showPlaceholder' );
 
 /**
  * Renders the block toolbar.
@@ -335,11 +337,13 @@ export function PrivateBlockToolbar( {
  * @param {boolean} props.hideDragHandle Show or hide the Drag Handle for drag and drop functionality.
  * @param {string}  props.variant        Style variant of the toolbar, also passed to the Dropdowns rendered from Block Toolbar Buttons.
  */
-export default function BlockToolbar( { hideDragHandle, variant } ) {
+export default function BlockToolbar( props ) {
+	const { hideDragHandle, variant } = props;
 	return (
 		<PrivateBlockToolbar
 			hideDragHandle={ hideDragHandle }
 			variant={ variant }
+			showPlaceholder={ !! props[ showPlaceholderKey ] }
 			focusOnMount={ undefined }
 			__experimentalInitialIndex={ undefined }
 			__experimentalOnIndexChange={ undefined }
