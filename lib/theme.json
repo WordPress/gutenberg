@@ -408,6 +408,11 @@
 					"width": "24px"
 				}
 			},
+			"core/list": {
+				"spacing": {
+					"blockGap": "0"
+				}
+			},
 			"core/site-logo": {
 				"variations": {
 					"rounded": {

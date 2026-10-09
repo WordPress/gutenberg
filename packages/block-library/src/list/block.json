@@ -88,7 +88,7 @@
 			"__experimentalDefaultControls": {
 				"margin": false,
 				"padding": false,
-				"blockGap": true
+				"blockGap": false
 			},
 			"blockGap": true
 		},
@@ -101,7 +101,6 @@
 		},
 		"listView": true
 	},
-
 	"selectors": {
 		"border": ".wp-block-list:not(.wp-block-list .wp-block-list)",
 		"dimensions": ".wp-block-list:not(.wp-block-list .wp-block-list)",
