@@ -17,6 +17,10 @@
 -   Consolidate border mode overrides in the resolver and inherit default values from the base tokens ([#84108](https://github.com/WordPress/gutenberg/pull/84108)).
 -   Update the Vite development dependency to 8.3.4 ([#84544](https://github.com/WordPress/gutenberg/pull/84544)).
 
+### Documentation
+
+-   Add Color, Border, Dimension, and Cursor pages to the Storybook design tokens docs, and show token descriptions on the Typography page ([#84373](https://github.com/WordPress/gutenberg/pull/84373)).
+
 ## 2.3.0 (2026-10-07)
 
 ### New Features
