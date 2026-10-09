@@ -31,15 +31,13 @@ const GUTENBERG_EDIT_ROOT_ATTACHMENT_ID_META_KEY = '_wp_attachment_edit_root_id'
  * Get the edit root attachment id for an attachment.
  *
  * Returns the id recorded in `_wp_attachment_edit_root_id` when the
- * attachment was created by editing another one, or the attachment's
- * own id when it has no edit lineage. Callers that want to tell
- * "has an edit root" apart from "is its own edit root" should compare
- * the result against the id they passed in.
+ * attachment was created by editing another one, or 0 when it has no
+ * edit lineage.
  *
  * In core this would be `wp_get_edit_root_attachment_id()`.
  *
  * @param int $attachment_id Attachment id to resolve.
- * @return int The edit root attachment id, or `$attachment_id` when there is no lineage.
+ * @return int The edit root attachment id, or 0 when there is no lineage.
  */
 function gutenberg_get_edit_root_attachment_id( $attachment_id ) {
 	$edit_root_id = (int) get_post_meta(
@@ -48,7 +46,12 @@ function gutenberg_get_edit_root_attachment_id( $attachment_id ) {
 		true
 	);
 
-	return $edit_root_id > 0 ? $edit_root_id : (int) $attachment_id;
+	// An attachment recorded as its own edit root is a broken record rather than a chain.
+	if ( $edit_root_id <= 0 || $edit_root_id === (int) $attachment_id ) {
+		return 0;
+	}
+
+	return $edit_root_id;
 }
 
 /**
@@ -70,6 +73,10 @@ function gutenberg_record_edit_root_attachment_id( $new_image_meta, $new_attachm
 	// The new child's edit root is its parent's edit root, or the
 	// parent itself when the parent has no lineage of its own.
 	$edit_root_id = gutenberg_get_edit_root_attachment_id( $attachment_id );
+
+	if ( ! $edit_root_id ) {
+		$edit_root_id = (int) $attachment_id;
+	}
 
 	update_post_meta(
 		$new_attachment_id,
@@ -131,9 +138,7 @@ function gutenberg_get_edit_root_field( $attachment ) {
 		return 0;
 	}
 
-	$edit_root_id = gutenberg_get_edit_root_attachment_id( $attachment_id );
-
-	return $edit_root_id === $attachment_id ? 0 : $edit_root_id;
+	return gutenberg_get_edit_root_attachment_id( $attachment_id );
 }
 
 /**
@@ -172,7 +177,7 @@ function gutenberg_add_edit_root_link( $response, $post, $request ) {
 	}
 
 	$edit_root_id = gutenberg_get_edit_root_attachment_id( $post->ID );
-	if ( $edit_root_id === (int) $post->ID ) {
+	if ( ! $edit_root_id ) {
 		return $response;
 	}
 
