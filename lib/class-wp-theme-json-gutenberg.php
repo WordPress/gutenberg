@@ -3162,6 +3162,15 @@ class WP_Theme_JSON_Gutenberg {
 				continue;
 			}
 
+			/*
+			 * Root padding values are consumed inside CSS math functions such as
+			 * `clamp()` and `calc()`, where a unitless `0` is a number rather than a length
+			 * and breaks the declaration. Output a length instead.
+			 */
+			if ( $is_root_style && is_numeric( $value ) && 0.0 === (float) $value ) {
+				$value = '0px';
+			}
+
 			// Calculates fluid typography rules where available.
 			if ( 'font-size' === $css_property ) {
 				/*
