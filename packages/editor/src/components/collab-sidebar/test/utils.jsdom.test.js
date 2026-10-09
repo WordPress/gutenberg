@@ -13,6 +13,7 @@ import {
 	findNoteInBlock,
 	applyNoteFormat,
 	removeNoteFormat,
+	wrapInlineNote,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
 	removeNoteIdFromMetadata,
@@ -31,6 +32,13 @@ vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 function makeRect( top ) {
 	return { top };
+}
+
+// Rich-text attributes parsed from post content keep their source HTML.
+function parseRichTextAttribute( html ) {
+	const element = document.createElement( 'p' );
+	element.innerHTML = html;
+	return RichTextData.fromHTMLElement( element );
 }
 
 describe( 'getNoteIdsFromMetadata', () => {
@@ -761,6 +769,13 @@ describe( 'findNoteRange', () => {
 		expect( findNoteRange( html, 7 ) ).toEqual( { start: 6, end: 12 } );
 	} );
 
+	it( 'returns the range in parsed content with collapsible whitespace', () => {
+		const value = parseRichTextAttribute(
+			'one\n  two <span class="wp-note" data-id="7">three</span>'
+		);
+		expect( findNoteRange( value, 7 ) ).toEqual( { start: 8, end: 13 } );
+	} );
+
 	it( 'returns null when the marker id does not match', () => {
 		const value = RichTextData.fromHTMLString(
 			'<span class="wp-note" data-id="3">x</span>'
@@ -917,17 +932,20 @@ describe( 'applyNoteFormat', () => {
 		attributes: { 'data-id': String( id ) },
 	} );
 
-	// Apply a sequence of [ id, start, end ] notes, then round-trip through HTML
-	// to a normalised value (matching how wrapInlineNote stores the result).
 	const applyAll = ( html, ops ) => {
 		let record = create( { html } );
 		for ( const [ id, start, end ] of ops ) {
 			record = applyNoteFormat( record, note( id ), start, end );
 		}
-		return RichTextData.fromHTMLString(
-			new RichTextData( record ).toHTMLString()
-		);
+		return new RichTextData( record );
 	};
+
+	it( 'wraps the selected text in parsed content with collapsible whitespace', () => {
+		const value = parseRichTextAttribute( 'one\n  two three' );
+		expect( wrapInlineNote( value, 7, 8, 13 ).toHTMLString() ).toBe(
+			'one two <mark data-id="7" class="wp-note">three</mark>'
+		);
+	} );
 
 	it( 'adds a single marker over plain text', () => {
 		const value = applyAll( 'the quick brown fox', [ [ 7, 4, 9 ] ] );
@@ -1133,6 +1151,24 @@ describe( 'removeNoteFormat', () => {
 		);
 		expect( removeNoteFormat( value, 7 ).toHTMLString() ).toBe(
 			'the quick brown fox'
+		);
+	} );
+
+	it( 'leaves unformatted text without format entries', () => {
+		const value = RichTextData.fromHTMLString(
+			'the <mark class="wp-note" data-id="7">quick</mark> brown fox'
+		);
+		expect( Object.keys( removeNoteFormat( value, 7 ).formats ) ).toEqual(
+			[]
+		);
+	} );
+
+	it( 'leaves the text intact in parsed content with collapsible whitespace', () => {
+		const value = parseRichTextAttribute(
+			'one\n  two <mark class="wp-note" data-id="7">three</mark>'
+		);
+		expect( removeNoteFormat( value, 7 ).toHTMLString() ).toBe(
+			'one two three'
 		);
 	} );
 
