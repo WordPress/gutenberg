@@ -60,6 +60,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
 
 - **border**: `.wp-block-list:not(.wp-block-list .wp-block-list)`
+- **dimensions**: `.wp-block-list:not(.wp-block-list .wp-block-list)`
 - **shadow**: `.wp-block-list:not(.wp-block-list .wp-block-list)`
 
 ## Block Markup
