@@ -33,7 +33,7 @@
 
 ### Bug Fixes
 
--   `data-wp-html` now always shows what its value says, on hydration, on every later update and after client-side navigation: `asDangerousHTML()` renders its HTML, a pending value keeps the server-rendered content, and any other value, `null` included, empties the element. A value that arrives after hydration replaces the content once, directly with the trusted HTML, and a getter or function that throws no longer breaks rendering. ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
+-   `data-wp-html` now follows its value on hydration, on every later update and after client-side navigation: `asDangerousHTML()` renders its HTML, a pending value leaves the existing content as it is, and any other value, `null` included, empties the element. Trusted HTML that matches the content already there isn't rewritten, and a getter or function that throws no longer breaks rendering. ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
 -   Run `watch()` callbacks without a directive scope. A callback passed to `watch()` no longer inherits the scope of the action or callback that called `watch()`, so `getContext()` and `getElement()` throw inside it, as they already did when `watch()` was called outside any scope. ([#83280](https://github.com/WordPress/gutenberg/pull/83280))
 -   `data-wp-html` now yields to `data-wp-text`, `data-wp-each` and `data-wp-router-region` on the same element, whatever the attribute order or value, with a warning under `SCRIPT_DEBUG`. ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
 -   Interactive islands inside `data-wp-html` content are no longer hydrated, even when the element sits outside every interactive region. ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
