@@ -172,7 +172,7 @@ export function toTree< T >( {
 				lastCharacter === '\n' );
 
 		const characterFormats = formats[ i ];
-		let pointer = getLastChild( tree );
+		let pointer: T = getLastChild( tree )!;
 
 		if ( characterFormats ) {
 			characterFormats.forEach( ( format: ParsedFormat, formatIndex ) => {
@@ -186,7 +186,7 @@ export function toTree< T >( {
 						formatIndex
 					)
 				) {
-					pointer = getLastChild( pointer );
+					pointer = getLastChild( pointer )!;
 					return;
 				}
 

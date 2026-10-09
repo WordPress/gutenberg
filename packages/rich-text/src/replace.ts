@@ -34,12 +34,7 @@ export function replace(
 		let newReplacements;
 
 		if ( typeof newText === 'function' ) {
-			newText = (
-				replacement as Exclude<
-					typeof replacement,
-					string | RichTextContent
-				>
-			 )( match, ...rest );
+			newText = newText( match, ...rest );
 		}
 
 		if ( typeof newText === 'object' ) {

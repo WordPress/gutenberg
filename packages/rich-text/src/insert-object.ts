@@ -25,7 +25,7 @@ export function insertObject(
 	endIndex?: number
 ) {
 	const valueToInsert = {
-		formats: [ , ] as unknown as RichTextFormatList[],
+		formats: Array< RichTextFormatList >( 1 ),
 		replacements: [ formatToInsert ],
 		text: OBJECT_REPLACEMENT_CHARACTER,
 	};
