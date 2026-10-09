@@ -1,4 +1,4 @@
-export interface AbilityOutput {
+export interface AbilityRunResult {
 	name: string;
 	label: string;
 	description: string;

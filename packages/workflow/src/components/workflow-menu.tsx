@@ -12,7 +12,7 @@ import { search as inputIcon } from '@wordpress/icons';
 import { executeAbility, store as abilitiesStore } from '@wordpress/abilities';
 import type { Ability } from '@wordpress/abilities';
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
-import type { AbilityOutput } from './types';
+import type { AbilityRunResult } from './types';
 import './workflow-menu.scss';
 
 /**
@@ -29,7 +29,7 @@ export function WorkflowMenu() {
 	const [ search, setSearch ] = useState( '' );
 	const [ isOpen, setIsOpen ] = useState( false );
 	const [ abilityOutput, setAbilityOutput ] =
-		useState< AbilityOutput | null >( null );
+		useState< AbilityRunResult | null >( null );
 	const [ isExecuting, setIsExecuting ] = useState( false );
 	const containerRef = useRef< HTMLDivElement >( null );
 	const inputRef = useRef< HTMLInputElement >( null );

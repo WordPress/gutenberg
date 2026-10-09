@@ -57,12 +57,17 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/keycodes": "file:../keycodes",
-		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/ui": "file:../ui"
 	},
 	"peerDependencies": {
+		"@types/react": "^18 || ^19",
 		"react": "^18 || ^19",
 		"react-dom": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"
