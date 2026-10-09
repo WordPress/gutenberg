@@ -5,6 +5,7 @@
 ### Breaking Changes
 
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+    -   `Tabs` ([#84332](https://github.com/WordPress/gutenberg/pull/84332))
     -   `NumberControl` ([#84330](https://github.com/WordPress/gutenberg/pull/84330))
     -   `TimePicker` ([#84331](https://github.com/WordPress/gutenberg/pull/84331))
     -   `CustomSelectControl` and `CustomSelectControlV2` ([#84131](https://github.com/WordPress/gutenberg/pull/84131))
