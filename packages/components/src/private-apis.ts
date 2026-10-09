@@ -12,6 +12,7 @@ import {
 	ValidatedTextareaControl,
 } from './validated-form-controls';
 import ContentEditableControl from './content-editable-control';
+import { useAutocompleteProps } from './autocomplete';
 
 export const privateApis = {};
 lock( privateApis, {
@@ -34,4 +35,5 @@ lock( privateApis, {
 	ValidatedInputControl,
 	ValidatedContentEditableControl,
 	ValidatedTextareaControl,
+	useAutocompleteProps,
 } );
