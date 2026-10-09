@@ -1,0 +1,30 @@
+# Generated into an Xcode project by xcodegen (see run.sh). XCUITest needs a
+# host app even though the tests only drive Safari.
+name: GutenbergIOS
+options:
+    bundleIdPrefix: org.wordpress.gutenberg.tests
+    deploymentTarget:
+        iOS: '17.0'
+settings:
+    GENERATE_INFOPLIST_FILE: YES
+targets:
+    Host:
+        type: application
+        platform: iOS
+        sources: [Host]
+        settings:
+            INFOPLIST_KEY_UILaunchScreen_Generation: YES
+    SafariTests:
+        type: bundle.ui-testing
+        platform: iOS
+        sources: [SafariTests]
+        dependencies:
+            - target: Host
+schemes:
+    SafariTests:
+        build:
+            targets:
+                Host: all
+                SafariTests: [test]
+        test:
+            targets: [SafariTests]
