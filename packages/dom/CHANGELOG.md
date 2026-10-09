@@ -10,6 +10,10 @@
 
 -   Refine the public types: `getScrollContainer` types `direction` as a union, `isEmpty` takes any `Node`, `isFormElement` accepts a missing element, `getPhrasingContentSchema` returns `ContentSchema`, `allowEmpty` is optional in a `Schema` item, and `Schema` and `SchemaItem` are exported ([#84317](https://github.com/WordPress/gutenberg/pull/84317)).
 
+### Bug Fixes
+
+-   `getOffsetParent`: Fix an infinite loop when the parent of the node is not an element ([#84374](https://github.com/WordPress/gutenberg/pull/84374)).
+
 ### Internal
 
 -   Refactor to TypeScript ([#84317](https://github.com/WordPress/gutenberg/pull/84317)).
