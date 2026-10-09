@@ -1278,6 +1278,35 @@ test.describe( 'Block Notes', () => {
 				'false'
 			);
 		} );
+
+		test( 'keeps a clicked inline note selected', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Alpha bravo charlie.' },
+			} );
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.click();
+			await blockNoteUtils.selectBlockText( { start: 0, length: 5 } );
+			await blockNoteUtils.addNote( 'Alpha note' );
+			// Move the block selection away, so clicking the thread also selects its block.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Another block' },
+			} );
+
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Alpha note' } );
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+
+			await thread.click();
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+		} );
 	} );
 
 	test.describe( 'Draft persistence', () => {
@@ -1826,6 +1855,15 @@ test.describe( 'Block Notes', () => {
 				'wp-note'
 			);
 
+			// A click past the end of the text moves the caret out of the
+			// marker, which closes the form.
+			await paragraph.click();
+			await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect( mark ).toHaveText( 'brave' );
+			await paragraph.click();
+			await expect( mark ).toHaveCount( 0 );
+
 			// Selecting another block closes the form before its own
 			// focus-out runs.
 			await paragraph.click();
@@ -1834,6 +1872,39 @@ test.describe( 'Block Notes', () => {
 			await expect( mark ).toHaveText( 'brave' );
 			await editor.canvas.getByText( 'Another block' ).click();
 			await expect( mark ).toHaveCount( 0 );
+		} );
+
+		test( 'removes the draft marker when another note in the block is picked', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Hello brave new world.' },
+				comment: 'Block note',
+			} );
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			const blockThread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Block note' } );
+
+			await paragraph.click();
+			await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect(
+				editor.canvas.locator( 'mark.wp-note[data-id="new"]' )
+			).toHaveText( 'brave' );
+
+			await blockThread.click();
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
+			expect( await editor.getEditedPostContent() ).not.toContain(
+				'wp-note'
+			);
 		} );
 
 		test( 'moves the draft marker to a new selection when Add note runs again', async ( {
@@ -2014,6 +2085,112 @@ test.describe( 'Block Notes', () => {
 				'true'
 			);
 			await expect( charlieThread ).toHaveAttribute(
+				'aria-expanded',
+				'false'
+			);
+		} );
+
+		test( 'selects no note while the caret is outside the inline highlights', async ( {
+			editor,
+			page,
+			pageUtils,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Alpha bravo charlie.' },
+			} );
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraph.click();
+			await blockNoteUtils.selectBlockText( { start: 0, length: 5 } );
+			await blockNoteUtils.addNote( 'Alpha note' );
+
+			const alphaThread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Alpha note' } );
+			await expect( alphaThread ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+
+			// The block's only note is inline, so a click past the end of its
+			// text selects the block but no note.
+			await paragraph.click();
+			await expect( paragraph ).toBeFocused();
+			await expect( alphaThread ).toHaveAttribute(
+				'aria-expanded',
+				'false'
+			);
+
+			// Into the marker and out again.
+			await pageUtils.pressKeys( 'ArrowLeft', { times: 18 } );
+			await expect( alphaThread ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+			await pageUtils.pressKeys( 'ArrowRight', { times: 8 } );
+			await expect( alphaThread ).toHaveAttribute(
+				'aria-expanded',
+				'false'
+			);
+		} );
+
+		test( 'selects the block-level note when the caret leaves an inline highlight', async ( {
+			editor,
+			page,
+			pageUtils,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Alpha bravo charlie.' },
+				comment: 'Block note',
+			} );
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraph.click();
+			await blockNoteUtils.selectBlockText( { start: 0, length: 5 } );
+			await blockNoteUtils.addNote( 'Alpha note' );
+
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			const blockThread = settings.getByRole( 'treeitem', {
+				name: 'Note: Block note',
+			} );
+			const alphaThread = settings.getByRole( 'treeitem', {
+				name: 'Note: Alpha note',
+			} );
+			await expect( alphaThread ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+
+			// Focus leaves the thread for its own block: the caret, inside the
+			// marker, keeps the note selected.
+			await editor.canvas
+				.locator( 'mark.wp-note' )
+				.filter( { hasText: 'Alpha' } )
+				.click();
+			await expect( alphaThread ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+			await expect( blockThread ).toHaveAttribute(
+				'aria-expanded',
+				'false'
+			);
+
+			// Past the marker, the block-level note stands for the caret.
+			await pageUtils.pressKeys( 'ArrowRight', { times: 8 } );
+			await expect( blockThread ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+			await expect( alphaThread ).toHaveAttribute(
 				'aria-expanded',
 				'false'
 			);
