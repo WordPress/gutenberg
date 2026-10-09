@@ -9,7 +9,7 @@
 ### Enhancements
 
 -   Inserter: Replace random tips with info notices using the same light-bulb icon and style keyboard hints as keys ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
--   Writing flow: Draw a selection box while dragging the pointer across the canvas. A drag that starts outside of the blocks' content (the canvas margins, the space between blocks, a container's padding) now selects the blocks the box touches ([#84381](https://github.com/WordPress/gutenberg/pull/84381)).
+-   Writing flow: Draw a selection box while dragging the pointer across the canvas. A drag selection can now also start outside of the blocks' content (the canvas margins, the space between blocks, a container's padding) ([#84381](https://github.com/WordPress/gutenberg/pull/84381)).
 
 ### Bug Fixes
 
