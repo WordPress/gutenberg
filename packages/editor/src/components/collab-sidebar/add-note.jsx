@@ -9,7 +9,7 @@ import {
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { FloatingContainer } from './floating-container';
-import { focusNoteThread } from './utils';
+import { focusNoteThread, hasFocusWithin } from './utils';
 import { useNoteDraft } from './hooks';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
@@ -47,6 +47,10 @@ export function AddNote( {
 		}
 		// Never dismiss mid-submit; clicking "Add note" blurs before it settles.
 		if ( isSubmittingRef.current ) {
+			return;
+		}
+		// In the block, the caret events decide; dismissing here too would race them.
+		if ( hasFocusWithin( blockElement ) ) {
 			return;
 		}
 

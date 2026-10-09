@@ -22,6 +22,7 @@ import {
 	useNoteActions,
 	useNoteSelection,
 	useNoteThreads,
+	usePickNote,
 } from './hooks';
 import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
@@ -66,23 +67,31 @@ function NotesSidebar( { postId, drafts } ) {
 	const { onStart, onDiscard } = useNoteActions();
 	// Here rather than in `Notes`, which unmounts with its surface: a draft
 	// must be restored on block selection even while no note is shown.
-	useNoteSelection( { notes, drafts, onDiscard } );
+	// Floating notes don't list resolved threads, so don't select one there.
+	useNoteSelection( {
+		notes: isAllNotesSidebarOpen ? notes : unresolvedNotes,
+		drafts,
+		onDiscard,
+	} );
 
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
-	const { toggleBlockSpotlight, selectBlock } = unlock(
-		useDispatch( blockEditorStore )
-	);
-	const { selectNote } = unlock( useDispatch( editorStore ) );
+	const pickNote = usePickNote( { drafts, onDiscard } );
 
 	const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
 	const areNotesHidden = notesDisplayMode === 'hidden';
 	// Fallback to "All notes" sidebar on smaller viewports or a narrow canvas.
 	const showAllNotesSidebar =
 		notes.length > 0 || ! isLargeViewport || isAllNotesSidebarOpen;
+	const selectedThread = notes.find(
+		( thread ) => thread.id === selectedNoteId
+	);
+	// A just-saved note isn't listed yet, so it still floats.
+	const canSelectedNoteFloat =
+		selectedNoteId !== undefined && selectedThread?.status !== 'approved';
 	const hasFloatingNotes =
 		isLargeViewport &&
-		( unresolvedNotes.length > 0 || selectedNoteId !== undefined );
+		( unresolvedNotes.length > 0 || canSelectedNoteFloat );
 	// "All notes" lists the same threads, so floating notes yield to it.
 	const showFloatingNotes =
 		hasFloatingNotes && ! areNotesHidden && ! isAllNotesSidebarOpen;
@@ -111,9 +120,7 @@ function NotesSidebar( { postId, drafts } ) {
 
 		// A special case for the List View, where block selection isn't required to trigger an action.
 		// The action won't do anything if the block is already selected.
-		selectBlock( targetClientId, null );
-		toggleBlockSpotlight( targetClientId, true );
-		selectNote( targetNoteId, { focus: true } );
+		pickNote( targetNoteId, targetClientId, { focus: true } );
 	}
 
 	function openNoteForBlock( targetClientId ) {

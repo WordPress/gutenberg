@@ -19,6 +19,7 @@ import {
 	useBlockEditingMode,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalUseBorderProps as useBorderProps,
+	__experimentalGetShadowClassesAndStyles as useShadowProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	getDimensionsClassesAndStyles as useDimensionsProps,
 } from '@wordpress/block-editor';
@@ -111,6 +112,7 @@ export function Edit( { attributes, setAttributes, isSelected, context } ) {
 		},
 	} );
 	const borderProps = useBorderProps( attributes );
+	const shadowProps = useShadowProps( attributes );
 	const dimensionsProps = useDimensionsProps( attributes );
 
 	const selectedIcon = useSelect(
@@ -282,6 +284,7 @@ export function Edit( { attributes, setAttributes, isSelected, context } ) {
 							style: {
 								...colorProps.style,
 								...borderProps.style,
+								...shadowProps.style,
 								...spacingProps.style,
 								...dimensionsProps.style,
 								...rotationStyle,
@@ -298,6 +301,7 @@ export function Edit( { attributes, setAttributes, isSelected, context } ) {
 						) }
 						style={ {
 							...borderProps.style,
+							...shadowProps.style,
 							...spacingProps.style,
 							...dimensionsProps.style,
 							...rotationStyle,
