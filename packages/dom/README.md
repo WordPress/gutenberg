@@ -114,7 +114,7 @@ _Parameters_
 
 _Returns_
 
-- `Partial< ContentSchema >`: Schema.
+- `ContentSchema`: Schema.
 
 ### getRectangleFromRange
 
@@ -180,7 +180,7 @@ Detects if element is a form element.
 
 _Parameters_
 
-- _element_ `Element`: The element to check.
+- _element_ `Element | null | undefined`: The element to check.
 
 _Returns_
 

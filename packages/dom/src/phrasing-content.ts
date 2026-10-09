@@ -143,9 +143,7 @@ const phrasingContentSchema = {
  *
  * @return Schema.
  */
-export function getPhrasingContentSchema(
-	context?: string
-): Partial< ContentSchema > {
+export function getPhrasingContentSchema( context?: string ): ContentSchema {
 	if ( context !== 'paste' ) {
 		return phrasingContentSchema;
 	}
@@ -159,7 +157,7 @@ export function getPhrasingContentSchema(
 		bdi, // Invisible.
 		bdo, // Invisible.
 		...remainingContentSchema
-	}: Partial< ContentSchema > = {
+	}: ContentSchema = {
 		...phrasingContentSchema,
 		// We shouldn't paste potentially sensitive information which is not
 		// visible to the user when pasted, so strip the attributes.

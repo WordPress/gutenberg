@@ -14,7 +14,7 @@ const noop = () => {};
  *
  * @param nodeList The nodeList to filter.
  * @param doc      The document of the nodeList.
- * @param schema   An array of functions that can mutate with the provided node.
+ * @param schema   Schema for the HTML.
  * @param inline   Whether to clean for inline mode.
  */
 export default function cleanNodeList(

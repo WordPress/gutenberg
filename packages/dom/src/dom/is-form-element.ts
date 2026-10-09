@@ -8,7 +8,9 @@ import isInputOrTextArea from './is-input-or-text-area';
  *
  * @return True if form element and false otherwise.
  */
-export default function isFormElement( element: Element ): boolean {
+export default function isFormElement(
+	element: Element | null | undefined
+): boolean {
 	if ( ! element ) {
 		return false;
 	}

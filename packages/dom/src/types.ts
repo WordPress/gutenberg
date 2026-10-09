@@ -4,7 +4,7 @@ export interface SemanticElementDefinition {
 	 */
 	attributes?: string[];
 	/**
-	 * Content attributes
+	 * Allowed child elements, or `'*'` for any
 	 */
 	children?: ContentSchema | '*';
 }
