@@ -299,3 +299,47 @@ describe( 'isTextBlock', () => {
 		expect( isTextBlock( undefined, false ) ).toBe( false );
 	} );
 } );
+
+describe( 'rounding a measurement into design space', () => {
+	// Positions round to the nearest unit, but sizes round up. Rounding a size
+	// down makes a block come back from a drag a shade shorter or narrower
+	// than it was, which on a Group with a background reads as the box
+	// collapsing, and on a line of text can re-wrap it.
+	const tight = { left: 0, top: 0, width: 1200, height: 301 };
+
+	it( 'never gives a block less height than it was measured at', () => {
+		const { rects } = getCanvasConversion( {
+			paddingBox: tight,
+			children: [ { left: 0, top: 0, width: 100, height: 100.4 } ],
+		} );
+		expect( rects[ 0 ].height ).toBe( 101 );
+	} );
+
+	it( 'never gives it less width either', () => {
+		const { rects } = getCanvasConversion( {
+			paddingBox: tight,
+			children: [ { left: 0, top: 0, width: 100.2, height: 100 } ],
+		} );
+		expect( rects[ 0 ].width ).toBe( 101 );
+	} );
+
+	it( 'keeps the canvas at least as tall as the section it froze', () => {
+		expect(
+			getCanvasConversion( {
+				paddingBox: { left: 0, top: 0, width: 1200, height: 300.2 },
+				children: [ { left: 0, top: 0, width: 10, height: 10 } ],
+			} ).canvasHeight
+		).toBe( 301 );
+	} );
+
+	it( 'still rounds a position to the nearest unit', () => {
+		// A position rounded up every time would walk a block down and to the
+		// right a little on each conversion.
+		const { rects } = getCanvasConversion( {
+			paddingBox: tight,
+			children: [ { left: 10.2, top: 20.4, width: 100, height: 100 } ],
+		} );
+		expect( rects[ 0 ].x ).toBe( 10 );
+		expect( rects[ 0 ].y ).toBe( 20 );
+	} );
+} );

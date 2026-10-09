@@ -41,15 +41,22 @@ export function getCanvasConversion( { paddingBox, children } ) {
 	}
 
 	const scale = paddingBox.width / DESIGN_WIDTH;
+	// A position rounds to the nearest unit; a size only ever rounds up.
+	// Rounding a size down hands a block back from a drag a shade shorter or
+	// narrower than it was, which on a Group with a background reads as the
+	// box collapsing and on a line of text can re-wrap it. Rounding a position
+	// up instead would walk every block down and to the right a little each
+	// time a section was frozen.
 	const toDesign = ( value ) => Math.round( value / scale );
+	const toDesignSize = ( value ) => Math.ceil( value / scale );
 
 	return {
-		canvasHeight: toDesign( paddingBox.height ),
+		canvasHeight: toDesignSize( paddingBox.height ),
 		rects: children.map( ( child ) => ( {
 			x: toDesign( child.left - paddingBox.left ),
 			y: toDesign( child.top - paddingBox.top ),
-			width: toDesign( child.width ),
-			height: toDesign( child.height ),
+			width: toDesignSize( child.width ),
+			height: toDesignSize( child.height ),
 		} ) ),
 	};
 }
