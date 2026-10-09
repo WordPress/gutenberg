@@ -45,7 +45,7 @@ const comparator = < T extends SortItem >(
 			return order === 'asc' ? -1 : 1;
 		}
 
-		// `Array.prototype.sort` is stable, so ties keep their original order.
+		// `Array.prototype.toSorted` is stable, so ties keep their original order.
 		return 0;
 	};
 };
@@ -66,5 +66,5 @@ export function orderBy< T extends SortItem >(
 	field: SortField< T >,
 	order = 'asc'
 ) {
-	return items.concat().sort( comparator( field, order ) );
+	return items.toSorted( comparator( field, order ) );
 }
