@@ -76,7 +76,7 @@ export function useFormatTypes( {
 	withoutInteractiveFormatting,
 	__unstableFormatTypeHandlerContext,
 }: {
-	allowedFormats?: string[];
+	allowedFormats?: readonly string[];
 	withoutInteractiveFormatting?: boolean;
 	__unstableFormatTypeHandlerContext?: object;
 } ) {

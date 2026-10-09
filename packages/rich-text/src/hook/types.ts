@@ -28,20 +28,22 @@ export type RichTextChangeMeta = {
 /**
  * Props of `useRichText` before the format types add their handlers.
  */
-export type RichTextBaseProps = {
-	value?: string | RichTextData;
+export type RichTextBaseProps<
+	V extends string | RichTextData = string | RichTextData,
+> = {
+	value?: V;
 	selectionStart?: number;
 	selectionEnd?: number;
 	placeholder?: string;
 	onSelectionChange: ( start?: number, end?: number ) => void;
 	preserveWhiteSpace?: boolean;
-	onChange: (
-		value: string | RichTextData,
-		meta: RichTextChangeMeta
-	) => void;
+	/**
+	 * Receives plain text instead of `RichTextData` when formats are disabled.
+	 */
+	onChange: ( value: V | string, meta: RichTextChangeMeta ) => void;
 	__unstableDisableFormats?: boolean;
 	__unstableIsSelected?: boolean;
-	__unstableDependencies?: unknown[];
+	__unstableDependencies?: readonly unknown[];
 	__unstableAfterParse?: RecordFormatsHandler;
 	__unstableBeforeSerialize?: RecordFormatsHandler;
 	__unstableAddInvisibleFormats?: RecordFormatsHandler;
@@ -50,13 +52,15 @@ export type RichTextBaseProps = {
 /**
  * Props of `useRichText`.
  */
-export type RichTextProps = Omit<
-	RichTextBaseProps,
+export type RichTextProps<
+	V extends string | RichTextData = string | RichTextData,
+> = Omit<
+	RichTextBaseProps< V >,
 	| '__unstableAfterParse'
 	| '__unstableBeforeSerialize'
 	| '__unstableAddInvisibleFormats'
 > & {
-	allowedFormats?: string[];
+	allowedFormats?: readonly string[];
 	withoutInteractiveFormatting?: boolean;
 	__unstableFormatTypeHandlerContext?: object;
 };
