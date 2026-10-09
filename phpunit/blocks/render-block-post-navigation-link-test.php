@@ -71,12 +71,16 @@ class Tests_Blocks_Render_Post_Navigation_Link extends WP_UnitTestCase {
 			'type'        => 'previous',
 			'borderColor' => 'accent-2',
 			'style'       => array(
-				'border'  => array(
+				'border'     => array(
 					'width' => '3px',
 					'style' => 'dashed',
 				),
-				'shadow'  => '10px 10px 5px #000000',
-				'spacing' => array(
+				'dimensions' => array(
+					'minHeight' => '100px',
+					'minWidth'  => '200px',
+				),
+				'shadow'     => '10px 10px 5px #000000',
+				'spacing'    => array(
 					'padding' => array( 'top' => '20px' ),
 					'margin'  => array( 'top' => '30px' ),
 				),
@@ -84,7 +88,7 @@ class Tests_Blocks_Render_Post_Navigation_Link extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_empty_wrapper_omits_border_shadow_and_spacing() {
+	public function test_empty_wrapper_omits_border_dimensions_shadow_and_spacing() {
 		$output = $this->render_block( self::$first_post_id, $this->styled_attributes() );
 
 		$this->assertStringContainsString( '></div>', $output, 'The wrapper should render with no content.' );
@@ -109,11 +113,13 @@ class Tests_Blocks_Render_Post_Navigation_Link extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'border-width', $output );
 	}
 
-	public function test_rendered_link_includes_border_shadow_and_spacing() {
+	public function test_rendered_link_includes_border_dimensions_shadow_and_spacing() {
 		$output = $this->render_block( self::$second_post_id, $this->styled_attributes() );
 
 		$this->assertStringContainsString( 'border-style:dashed', $output );
 		$this->assertStringContainsString( 'border-width:3px', $output );
+		$this->assertStringContainsString( 'min-height:100px', $output );
+		$this->assertStringContainsString( 'min-width:200px', $output );
 		$this->assertStringContainsString( 'box-shadow:10px 10px 5px #000000', $output );
 		$this->assertStringContainsString( 'padding-top:20px', $output );
 		$this->assertStringContainsString( 'margin-top:30px', $output );
