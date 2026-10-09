@@ -161,5 +161,17 @@ describe( 'create', () => {
 			const { get } = create();
 			expect( await get() ).toEqual( {} );
 		} );
+
+		it( 'ignores an empty array from the REST API', async () => {
+			mockedApiFetch.mockResolvedValueOnce( {
+				meta: { persisted_preferences: [] },
+			} );
+			vi.spyOn( global.Storage.prototype, 'getItem' ).mockReturnValueOnce(
+				'null'
+			);
+
+			const { get } = create();
+			expect( await get() ).toEqual( {} );
+		} );
 	} );
 } );

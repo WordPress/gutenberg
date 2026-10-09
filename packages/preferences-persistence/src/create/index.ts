@@ -1,5 +1,6 @@
 import apiFetch from '@wordpress/api-fetch';
 import debounceAsync from './debounce-async';
+import isPreferencesData from '../is-preferences-data';
 import { readStoredJSON, writeStoredJSON } from '../local-storage';
 import type {
 	CreateOptions,
@@ -40,15 +41,17 @@ export default function create( {
 		}
 
 		const user = await apiFetch< {
-			meta?: { persisted_preferences?: PreferencesData | null };
+			meta?: { persisted_preferences?: unknown };
 		} >( {
 			path: '/wp/v2/users/me?context=edit',
 		} );
 
-		const serverData = user?.meta?.persisted_preferences;
-		const localData = readStoredJSON(
-			localStorageRestoreKey
-		) as PreferencesData | null;
+		const persistedData = user?.meta?.persisted_preferences;
+		const serverData = isPreferencesData( persistedData )
+			? persistedData
+			: null;
+		const storedData = readStoredJSON( localStorageRestoreKey );
+		const localData = isPreferencesData( storedData ) ? storedData : null;
 
 		// Date parse returns NaN for invalid input. Coerce anything invalid
 		// into a conveniently comparable zero.
