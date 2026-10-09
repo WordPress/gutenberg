@@ -18,11 +18,11 @@ This README is the entry point for package consumers. It covers how to load desi
 
 ## Public API
 
-| Entrypoint | Supported use |
-| --- | --- |
-| `@wordpress/theme` | `ThemeProvider` and the generated token scale types, such as `PaddingSize` and `GapSize`. Derive provider props and callback types from the component as shown below. |
-| `@wordpress/theme/design-tokens.css` | Default semantic `--wpds-*` custom properties. Load once per document. |
-| `@wordpress/theme/design-tokens.js` | Default token-name array, plus `tokens` metadata and `groups` named exports. Does not load styles. |
+| Entrypoint                           | Supported use                                                                                                                                                         |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@wordpress/theme`                   | `ThemeProvider` and the generated token scale types, such as `PaddingSize` and `GapSize`. Derive provider props and callback types from the component as shown below. |
+| `@wordpress/theme/design-tokens.css` | Default semantic `--wpds-*` custom properties. Load once per document.                                                                                                |
+| `@wordpress/theme/design-tokens.js`  | Default token-name array, plus `tokens` metadata and `groups` named exports. Does not load styles.                                                                    |
 
 The `privateApis` export exists for temporary compatibility with older WordPress bundles. It is not a supported consumer API. Token source JSON, ramp builders, generated fallback maps, and other paths not listed in the package's `exports` are implementation details.
 

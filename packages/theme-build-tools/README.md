@@ -15,7 +15,7 @@ npm install @wordpress/theme-build-tools --save-dev
 
 Install the tool you use the plugins with (`stylelint`, `postcss`, `lightningcss`, `esbuild`, or `vite`) as well; they are optional peer dependencies.
 
-The package's entrypoints are ESM-only and require Node.js `^20.19.0` or `>=22.13.0`. Use `import` syntax from ESM or TypeScript configuration files.
+The package's entrypoints are ESM-only and require Node.js `>=22.13.0`. Use `import` syntax from ESM or TypeScript configuration files.
 
 ## Stylelint Plugins
 
