@@ -294,6 +294,12 @@
 		"parent": "how-to-guides"
 	},
 	{
+		"title": "Registering block templates from a plugin",
+		"slug": "registering-block-templates-from-plugins",
+		"markdown_source": "../docs/how-to-guides/registering-block-templates-from-plugins.md",
+		"parent": "how-to-guides"
+	},
+	{
 		"title": "Themes",
 		"slug": "themes",
 		"markdown_source": "../docs/how-to-guides/themes/README.md",
