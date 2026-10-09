@@ -21,14 +21,13 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": "^20.19.0 || >=22.13.0"
+		"node": ">=22.13.0"
 	},
 	"files": [
 		"build-module",
 		"build-types",
 		"*-plugins/**",
 		"prebuilt",
-		"*.md",
 		"!build-types/**/*.d.mts.map",
 		"!build-types/**/*.d.ts.map",
 		"!**/stories/**",
@@ -162,6 +161,6 @@
 		"build:figma": "node bin/build-figma-tokens/index.ts",
 		"build": "npm run build:default-ramps && npm run build:tokens && npm run build:figma",
 		"lint:package-contents": "wp-validate-package-contents . --disallow-path src",
-		"postbuild": "prettier --write tokens/color.json tokens/modes prebuilt src/prebuilt src/color-ramps/lib/default-ramps.ts docs ../base-styles/internal/_wpds-token-fallbacks.scss"
+		"postbuild": "prettier --write tokens/color.json tokens/wpds.resolver.json prebuilt src/prebuilt src/color-ramps/lib/default-ramps.ts docs ../base-styles/internal/_wpds-token-fallbacks.scss"
 	}
 }

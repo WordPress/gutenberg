@@ -1,0 +1,6 @@
+.fields-field__page-title-badge {
+	// Keep the badge on one line; it truncates alongside the title.
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
