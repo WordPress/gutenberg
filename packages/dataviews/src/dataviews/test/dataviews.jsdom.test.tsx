@@ -414,6 +414,118 @@ describe( 'DataViews component', () => {
 		expect( rows[ 4 ] ).toHaveTextContent( /^Other parent$/ );
 	} );
 
+	it( 'hides the children of a collapsed row and expands it from its toggle', async () => {
+		const user = userEvent.setup();
+		const onChangeExpandedItemIds = vi.fn();
+		render(
+			<DataViewWrapper
+				data={ [
+					{ id: 2, title: 'Child' },
+					{ id: 1, title: 'Parent' },
+				] }
+				getItemParentId={ ( item ) =>
+					item.id === 2 ? 1 : undefined
+				}
+				getItemHasChildren={ ( item ) => item.id === 1 }
+				expandedItemIds={ [] }
+				onChangeExpandedItemIds={ onChangeExpandedItemIds }
+				view={ {
+					...DEFAULT_VIEW,
+					fields: [],
+					showLevels: true,
+					titleField: 'title',
+				} }
+			/>
+		);
+
+		expect( screen.queryByText( 'Child' ) ).not.toBeInTheDocument();
+		await user.click(
+			screen.getByRole( 'button', { name: 'Expand Parent' } )
+		);
+		expect( onChangeExpandedItemIds ).toHaveBeenCalledWith( [ '1' ] );
+	} );
+
+	it( 'shows a toggle when children are unknown, and none for known leaves', () => {
+		render(
+			<DataViewWrapper
+				data={ [
+					{ id: 1, title: 'Unknown' },
+					{ id: 2, title: 'Leaf' },
+				] }
+				getItemParentId={ () => undefined }
+				getItemHasChildren={ ( item ) =>
+					item.id === 1 ? undefined : false
+				}
+				expandedItemIds={ [] }
+				onChangeExpandedItemIds={ vi.fn() }
+				view={ {
+					...DEFAULT_VIEW,
+					fields: [],
+					showLevels: true,
+					titleField: 'title',
+				} }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Expand Unknown' } )
+		).toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', { name: 'Expand Leaf' } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'Expand all and Collapse all keep ids that are not loaded', async () => {
+		const user = userEvent.setup();
+		const onChangeExpandedItemIds = vi.fn();
+		const hierarchyProps = {
+			data: [
+				{ id: 2, title: 'Child' },
+				{ id: 1, title: 'Parent' },
+			],
+			getItemParentId: ( item: Data ) =>
+				item.id === 2 ? 1 : undefined,
+			getItemHasChildren: ( item: Data ) => item.id === 1,
+			onChangeExpandedItemIds,
+			view: {
+				...DEFAULT_VIEW,
+				fields: [],
+				showLevels: true,
+				titleField: 'title',
+			},
+		};
+		const { rerender } = render(
+			<DataViewWrapper
+				{ ...hierarchyProps }
+				expandedItemIds={ [ 'unloaded' ] }
+			/>
+		);
+
+		const expandAll = screen.getByRole( 'button', {
+			name: 'Expand all',
+		} );
+		await user.click( expandAll );
+		expect( onChangeExpandedItemIds ).toHaveBeenCalledWith( [
+			'unloaded',
+			'1',
+		] );
+
+		onChangeExpandedItemIds.mockClear();
+		rerender(
+			<DataViewWrapper
+				{ ...hierarchyProps }
+				expandedItemIds={ [ 'unloaded', '1' ] }
+			/>
+		);
+		const collapseAll = screen.getByRole( 'button', {
+			name: 'Collapse all',
+		} );
+		await user.click( collapseAll );
+		expect( onChangeExpandedItemIds ).toHaveBeenCalledWith( [
+			'unloaded',
+		] );
+	} );
+
 	it( 'should filter results by "search" text, if field has enableGlobalSearch set to true', async () => {
 		const fieldsWithSearch = [
 			{
