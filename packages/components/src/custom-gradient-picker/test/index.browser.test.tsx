@@ -163,6 +163,88 @@ describe( 'CustomGradientPicker', () => {
 			expect( lastCall ).not.toContain( 'deg' );
 		} );
 	} );
+
+	describe( 'with a color interpolation method', () => {
+		const INTERPOLATED_GRADIENT =
+			'linear-gradient(in oklch 160deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)';
+
+		it( 'shows the color stops of a gradient that has an interpolation method', async () => {
+			await render(
+				<CustomGradientPicker
+					value={ INTERPOLATED_GRADIENT }
+					onChange={ vi.fn() }
+				/>
+			);
+
+			expect(
+				screen.getAllByRole( 'button', {
+					name: /Gradient control point/,
+				} )
+			).toHaveLength( 2 );
+		} );
+
+		it( 'keeps the interpolation method when the angle changes', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			await render(
+				<CustomGradientPicker
+					value={ INTERPOLATED_GRADIENT }
+					onChange={ onChange }
+				/>
+			);
+
+			screen.getByRole( 'spinbutton', { name: 'Angle' } ).focus();
+			await user.keyboard( '[ArrowUp]' );
+
+			const lastCall =
+				onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
+			expect( lastCall ).toMatch( /^linear-gradient\(in oklch 161deg,/ );
+		} );
+
+		it( 'keeps the interpolation method when switching to a radial gradient', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			await render(
+				<CustomGradientPicker
+					value={ INTERPOLATED_GRADIENT }
+					onChange={ onChange }
+				/>
+			);
+
+			await user.selectOptions(
+				screen.getByRole( 'combobox', { name: /type/i } ),
+				'radial-gradient'
+			);
+
+			const lastCall =
+				onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
+			expect( lastCall ).toMatch( /^radial-gradient\(in oklch,/ );
+		} );
+
+		it( 'keeps the interpolation method when a color stop moves', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			await render(
+				<CustomGradientPicker
+					value={ INTERPOLATED_GRADIENT }
+					onChange={ onChange }
+				/>
+			);
+
+			const [ firstPoint ] = screen.getAllByRole( 'button', {
+				name: /Gradient control point/,
+			} );
+			firstPoint.focus();
+			await user.keyboard( '[ArrowRight]' );
+
+			const lastCall =
+				onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
+			expect( lastCall ).toMatch( /^linear-gradient\(in oklch 160deg,/ );
+		} );
+	} );
 } );
 
 describe( 'CustomGradientBar', () => {
