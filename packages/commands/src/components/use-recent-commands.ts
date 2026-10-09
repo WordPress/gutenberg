@@ -14,6 +14,7 @@ import type { OnResolved } from './types';
 const MAX_RECENTLY_SAVED = 30;
 const MAX_RECENTLY_DISPLAYED = 5;
 const EMPTY_ARRAY: string[] = [];
+const EMPTY_COMMANDS: CommandConfig[] = [];
 const EMPTY_SET = new Set< string >();
 
 export function recordUsage( name: string ) {
@@ -36,15 +37,21 @@ export function useLoaderCollector(
 	onResolved: OnResolved
 ) {
 	const { setLoaderLoading } = unlock( useDispatch( commandsStore ) );
-	const { isLoading: loading, commands = [] } = hook( { search: '' } ) ?? {};
+	const { isLoading: loading, commands = EMPTY_COMMANDS } =
+		hook( { search: '' } ) ?? {};
 
 	useEffect( () => {
 		setLoaderLoading( name, loading );
 	}, [ setLoaderLoading, name, loading ] );
 
-	const filtered = filterNames
-		? commands.filter( ( c ) => filterNames.has( c.name ) )
-		: commands;
+	// A fresh array would re-run the effect below, and `onResolved`, on every render.
+	const filtered = useMemo(
+		() =>
+			filterNames
+				? commands.filter( ( c ) => filterNames.has( c.name ) )
+				: commands,
+		[ commands, filterNames ]
+	);
 
 	useEffect( () => {
 		onResolved( name, filtered );
@@ -102,6 +109,30 @@ export function useRecentCommands() {
 		return { recentNames: names, recentSet: new Set( names ) };
 	}, [ recentlyUsedNames ] );
 
+	const loaders = useMemo(
+		() => [ ...contextualLoaders, ...staticLoaders ],
+		[ contextualLoaders, staticLoaders ]
+	);
+
+	const commands = useMemo( () => {
+		// Merge static commands with loader-resolved commands.
+		const allByName = new Map< string, CommandConfig >();
+		[ ...contextualCommands, ...staticCommands ].forEach( ( c ) =>
+			allByName.set( c.name, c )
+		);
+		for ( const cmds of resolvedMap.values() ) {
+			cmds.forEach( ( c ) => {
+				if ( ! allByName.has( c.name ) ) {
+					allByName.set( c.name, c );
+				}
+			} );
+		}
+		// Return in recency order.
+		return recentNames
+			.map( ( n ) => allByName.get( n ) )
+			.filter( ( c ): c is CommandConfig => !! c );
+	}, [ contextualCommands, staticCommands, resolvedMap, recentNames ] );
+
 	if ( ! recentlyUsedNames.length ) {
 		return {
 			commands: [],
@@ -110,24 +141,6 @@ export function useRecentCommands() {
 			onResolved,
 		};
 	}
-
-	const allStaticCommands = [ ...contextualCommands, ...staticCommands ];
-	const loaders = [ ...contextualLoaders, ...staticLoaders ];
-
-	// Merge static commands with loader-resolved commands.
-	const allByName = new Map< string, CommandConfig >();
-	allStaticCommands.forEach( ( c ) => allByName.set( c.name, c ) );
-	for ( const cmds of resolvedMap.values() ) {
-		cmds.forEach( ( c ) => {
-			if ( ! allByName.has( c.name ) ) {
-				allByName.set( c.name, c );
-			}
-		} );
-	}
-	// Return in recency order.
-	const commands = recentNames
-		.map( ( n ) => allByName.get( n ) )
-		.filter( ( c ): c is CommandConfig => !! c );
 
 	return { commands, loaders, recentSet, onResolved };
 }
