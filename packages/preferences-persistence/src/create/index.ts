@@ -52,10 +52,8 @@ export default function create( {
 
 		// Date parse returns NaN for invalid input. Coerce anything invalid
 		// into a conveniently comparable zero.
-		const serverTimestamp =
-			Date.parse( serverData?._modified as string ) || 0;
-		const localTimestamp =
-			Date.parse( localData?._modified as string ) || 0;
+		const serverTimestamp = Date.parse( serverData?._modified ?? '' ) || 0;
+		const localTimestamp = Date.parse( localData?._modified ?? '' ) || 0;
 
 		// Prefer server data if it exists and is more recent.
 		// Otherwise fallback to localStorage data.

@@ -25,7 +25,7 @@ export { create };
  */
 export function __unstableCreatePersistenceLayer(
 	serverData: PreferencesData | [] | '' | false,
-	userId: string
+	userId: string | number
 ): PersistenceLayer {
 	const localStorageRestoreKey = `WP_PREFERENCES_USER_${ userId }`;
 	const localData: PreferencesData | null = JSON.parse(
@@ -39,8 +39,7 @@ export function __unstableCreatePersistenceLayer(
 			( serverData &&
 				( serverData as PreferencesData )._modified ) as string
 		) || 0;
-	const localModified =
-		Date.parse( ( localData && localData._modified ) as string ) || 0;
+	const localModified = Date.parse( localData?._modified ?? '' ) || 0;
 
 	let preloadedData;
 	if ( serverData && serverModified >= localModified ) {
