@@ -29,3 +29,34 @@ export const DIRECTIONAL_ORIENTATION_ANGLE_MAP = {
 	'top left': 315,
 	'left top': 315,
 };
+
+// The color spaces and hue interpolation methods that a CSS
+// `<color-interpolation-method>` accepts, e.g. `in oklch longer hue`.
+// See https://www.w3.org/TR/css-color-4/#interpolation-space.
+export const RECTANGULAR_INTERPOLATION_COLOR_SPACES = [
+	'srgb',
+	'srgb-linear',
+	'display-p3',
+	'a98-rgb',
+	'prophoto-rgb',
+	'rec2020',
+	'lab',
+	'oklab',
+	'xyz',
+	'xyz-d50',
+	'xyz-d65',
+];
+
+export const POLAR_INTERPOLATION_COLOR_SPACES = [
+	'hsl',
+	'hwb',
+	'lch',
+	'oklch',
+];
+
+export const HUE_INTERPOLATION_METHODS = [
+	'shorter',
+	'longer',
+	'increasing',
+	'decreasing',
+];
