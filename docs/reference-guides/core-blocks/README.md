@@ -35,7 +35,7 @@ Displays a heading that toggles the accordion panel.
 -	**Name:** [core/accordion-heading](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-accordion-heading/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/accordion-item
--	**Supports:** anchor, color (background, gradients, text), interactivity, shadow, spacing (padding), typography (fontSize, lineHeight), ~~align~~, ~~lock~~, ~~visibility~~
+-	**Supports:** anchor, background (gradient), color (background, gradients, text), interactivity, shadow, spacing (padding), typography (fontSize, lineHeight), ~~align~~, ~~lock~~, ~~visibility~~
 -	**Attributes:** iconPosition, level, openByDefault, showIcon, title
 
 ## Accordion Item
