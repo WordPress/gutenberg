@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   Show a fallback message when an ability throws a value without a string message, instead of failing silently or showing `[object Object]` ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+-   Show a fallback message when an ability throws a value without a string message, instead of failing silently or showing `[object Object]` ([#84361](https://github.com/WordPress/gutenberg/pull/84361)).
 
 ### Enhancements
 
