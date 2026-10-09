@@ -1,8 +1,8 @@
 import type { CSSProperties } from 'react';
+import { GroupTitle } from './group-title';
 import { groups, tokens } from '../../prebuilt/js/design-tokens.mjs';
 import {
 	descriptionStyle,
-	headingStyle,
 	itemStyle,
 	listStyle,
 	previewStyle,
@@ -28,14 +28,6 @@ const sectionTitleStyle: CSSProperties = {
 	margin: 0,
 	textTransform: 'capitalize',
 };
-
-function TargetTitle( { name }: { name: string } ) {
-	return (
-		<h3 style={ { ...headingStyle, textTransform: 'capitalize' } }>
-			{ name.replace( /-/g, ' ' ) }
-		</h3>
-	);
-}
 
 function ColorTokenList( {
 	names,
@@ -81,7 +73,7 @@ export function ColorTokenPreview() {
 						{ Object.entries( group.groups ).map(
 							( [ target, targetGroup ] ) => (
 								<div key={ target }>
-									<TargetTitle name={ target } />
+									<GroupTitle name={ target } level={ 3 } />
 									<ColorTokenList
 										names={ targetGroup.tokens }
 									/>
