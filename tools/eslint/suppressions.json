@@ -4787,11 +4787,6 @@
 			"count": 2
 		}
 	},
-	"packages/components/src/number-control/styles/number-control-styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
 	"packages/components/src/panel/body.tsx": {
 		"react-hooks/refs": {
 			"count": 1
