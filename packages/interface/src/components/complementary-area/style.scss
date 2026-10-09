@@ -77,3 +77,43 @@
 .interface-complementary-area__fill {
 	height: 100%;
 }
+
+/*
+ * Dot badge overlaid on a pinned toolbar toggle. The wrapper only exists when
+ * a badge is rendered, so no other pinned item is affected. `display: flex`
+ * keeps the wrapped button sized exactly as it is elsewhere in the row.
+ *
+ * Pinned toggles are hidden on mobile (see `.interface-pinned-items`), so the
+ * wrapper hides with them: otherwise the badge would stay on screen with no
+ * button under it to open the sidebar.
+ */
+.interface-complementary-area__pinned-toggle {
+	display: none;
+	position: relative;
+
+	@include break-small() {
+		display: flex;
+	}
+}
+
+.interface-complementary-area__badge {
+	position: absolute;
+	top: 2px;
+	inset-inline-end: 2px;
+	width: $grid-unit-10;
+	height: $grid-unit-10;
+	border-radius: 50%;
+	// A ring in the header's own background colour, so the dot reads as a
+	// separate element where it overlaps the toggle's icon.
+	box-shadow: 0 0 0 2px $white;
+	background: var(--wp-admin-theme-color, #3858e9);
+	// The toggle underneath owns every interaction.
+	pointer-events: none;
+
+	// Forced colors would otherwise paint the dot away with the background.
+	@media (forced-colors: active) {
+		forced-color-adjust: none;
+		background: Highlight;
+		box-shadow: 0 0 0 2px Canvas;
+	}
+}

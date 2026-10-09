@@ -68,7 +68,9 @@ test.describe( 'Collaboration - Notes Sync', () => {
 		// Open the All Notes sidebar on User B's page.
 		const toggleButton = page2
 			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'All notes', exact: true } );
+			// Not `exact`: the toggle's accessible name gains ", new activity"
+			// once a collaborator's note arrives.
+			.getByRole( 'button', { name: 'All notes' } );
 
 		// The button may need a moment to appear after the note syncs.
 		await expect( toggleButton ).toBeVisible( { timeout: 10000 } );
@@ -143,7 +145,9 @@ test.describe( 'Collaboration - Notes Sync', () => {
 		// Open notes sidebar on User A's page.
 		const toggleButton = page
 			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'All notes', exact: true } );
+			// Not `exact`: the toggle's accessible name gains ", new activity"
+			// once a collaborator's note arrives.
+			.getByRole( 'button', { name: 'All notes' } );
 		await expect( toggleButton ).toBeVisible( { timeout: 10000 } );
 		const isExpanded = await toggleButton.getAttribute( 'aria-expanded' );
 		if ( isExpanded === 'false' ) {
@@ -230,7 +234,9 @@ test.describe( 'Collaboration - Notes Sync', () => {
 		// Open notes sidebar on User B's page.
 		const toggleButton = page2
 			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'All notes', exact: true } );
+			// Not `exact`: the toggle's accessible name gains ", new activity"
+			// once a collaborator's note arrives.
+			.getByRole( 'button', { name: 'All notes' } );
 		await expect( toggleButton ).toBeVisible( { timeout: 10000 } );
 		const isExpanded = await toggleButton.getAttribute( 'aria-expanded' );
 		if ( isExpanded === 'false' ) {

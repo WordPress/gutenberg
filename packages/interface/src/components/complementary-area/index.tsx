@@ -1,4 +1,4 @@
-import type { HTMLAttributes } from 'react';
+import type { HTMLAttributes, ReactNode } from 'react';
 import clsx from 'clsx';
 import {
 	Button,
@@ -138,6 +138,38 @@ function ComplementaryAreaFill( {
 	);
 }
 
+/**
+ * Overlays a dot on the pinned toolbar toggle, flagging that the area has
+ * something new.
+ *
+ * Without a badge the toggle is returned untouched, so the pinned items row -
+ * and the flex layout every other sidebar relies on - gains no extra wrapper.
+ */
+function PinnedToggle( {
+	badge,
+	children,
+}: {
+	/** Whether to show the dot. */
+	badge?: boolean;
+	/** The pinned toggle. */
+	children: ReactNode;
+} ) {
+	if ( ! badge ) {
+		return children;
+	}
+
+	return (
+		<div className="interface-complementary-area__pinned-toggle">
+			{ children }
+			{ /* Announced through the toggle's accessible label instead. */ }
+			<span
+				className="interface-complementary-area__badge"
+				aria-hidden="true"
+			/>
+		</div>
+	);
+}
+
 function useAdjustComplementaryListener(
 	scope: string,
 	identifier: string,
@@ -194,6 +226,8 @@ function useAdjustComplementaryListener(
 }
 
 function ComplementaryArea( {
+	badge,
+	badgeLabel,
 	children,
 	className,
 	closeLabel = __( 'Close plugin' ),
@@ -296,21 +330,27 @@ function ComplementaryArea( {
 			{ isPinnable && (
 				<PinnedItems scope={ scope }>
 					{ isPinned && (
-						<ComplementaryAreaToggle
-							scope={ scope }
-							identifier={ identifier }
-							isPressed={
-								isActive && ( ! showIconLabels || isLarge )
-							}
-							aria-expanded={ isActive }
-							aria-disabled={ isLoading }
-							label={ title }
-							icon={ showIconLabels ? check : icon }
-							showTooltip={ ! showIconLabels }
-							variant={ showIconLabels ? 'tertiary' : undefined }
-							size="compact"
-							shortcut={ toggleShortcut }
-						/>
+						<PinnedToggle badge={ badge }>
+							<ComplementaryAreaToggle
+								scope={ scope }
+								identifier={ identifier }
+								isPressed={
+									isActive && ( ! showIconLabels || isLarge )
+								}
+								aria-expanded={ isActive }
+								aria-disabled={ isLoading }
+								label={
+									badge && badgeLabel ? badgeLabel : title
+								}
+								icon={ showIconLabels ? check : icon }
+								showTooltip={ ! showIconLabels }
+								variant={
+									showIconLabels ? 'tertiary' : undefined
+								}
+								size="compact"
+								shortcut={ toggleShortcut }
+							/>
+						</PinnedToggle>
 					) }
 				</PinnedItems>
 			) }

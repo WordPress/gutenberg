@@ -18,7 +18,15 @@ import {
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
+import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 import { store as editorStore } from '../../store';
+import {
+	ALL_NOTES_SIDEBAR,
+	NOTES_LAST_SEEN_LIMIT,
+	NOTES_LAST_SEEN_PREFERENCE,
+	NOTES_LAST_SEEN_SCOPE,
+} from './constants';
 import { unlock } from '../../lock-unlock';
 import { createBoardStore } from './board-store';
 import {
@@ -28,11 +36,14 @@ import {
 	getInlineMarkerStart,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
+	getLatestNoteActivity,
+	getUnseenNoteIds,
 	getNoteAtCaret,
 	pickNoteForCaret,
 	readInlineSelection,
 	removeInlineNote,
 	removeNoteIdFromMetadata,
+	setNotesLastSeen,
 	wrapInlineNote,
 } from './utils';
 
@@ -174,6 +185,151 @@ export function useNoteThreads( postId ) {
 	return {
 		notes,
 		unresolvedNotes,
+	};
+}
+
+const NO_NOTE_IDS = [];
+
+/**
+ * Tracks whether the post has note activity the current user has not seen, and
+ * marks the post's notes as seen while the "All notes" sidebar is open.
+ *
+ * Only a single per-post timestamp is stored, so this cannot say which notes a
+ * user has read - just that something happened since they last looked. That
+ * is why the badge is a dot rather than a count.
+ *
+ * Two things count as having looked. Opening the pinned "All notes" sidebar -
+ * the one the badge sits on - is the obvious one. Selecting a thread is the
+ * other, and it matters because of the floating notes: on a large viewport they
+ * sit in the canvas margin and show every unresolved thread. Someone can read
+ * all of them there without ever touching "All notes", and their badge would
+ * otherwise never clear. The floating notes being on screen cannot itself
+ * count, since nobody asked for them.
+ *
+ * Selecting a thread expands it - replies unfold, a clamped note can be opened
+ * with "Show more" - so it is the point where reading is demonstrated rather
+ * than assumed. Those finer expansions are deliberately not wired up as
+ * separate signals: they all imply a selection, and a post whose notes are
+ * short and reply-free offers nothing to expand at all, which would leave its
+ * badge stuck forever. A badge that never clears is worse than one that clears
+ * eagerly.
+ *
+ * The recorded timestamp is the newest `date_gmt` the user has actually been
+ * shown rather than the current time, which keeps the comparison immune to
+ * clock skew between the browser and the server.
+ *
+ * Opening "All notes" advances that timestamp straight away, so the threads
+ * that were unseen at that moment are captured first and returned as
+ * `highlightedNoteIds`, letting the sidebar point them out. The list is kept
+ * until the sidebar closes and only lives in memory.
+ *
+ * @param {Object}  options        Options.
+ * @param {?number} options.postId Post the notes belong to.
+ * @param {Array}   options.notes  Every note thread loaded for the post.
+ * @return {{hasUnseenNotes: boolean, highlightedNoteIds: Array}} Whether any thread has unseen activity, and the threads to highlight in "All notes".
+ */
+export function useUnseenNotes( { postId, notes } ) {
+	const { set: setPreference } = useDispatch( preferencesStore );
+
+	const { lastSeenByPost, currentUserId, isAllNotesOpen, hasSelectedNote } =
+		useSelect(
+			( select ) => ( {
+				lastSeenByPost: select( preferencesStore ).get(
+					NOTES_LAST_SEEN_SCOPE,
+					NOTES_LAST_SEEN_PREFERENCE
+				),
+				currentUserId: select( coreStore ).getCurrentUser()?.id,
+				isAllNotesOpen:
+					select( interfaceStore ).getActiveComplementaryArea(
+						'core'
+					) === ALL_NOTES_SIDEBAR,
+				/*
+				 * `getSelectedNote` also returns 'new' for the add-note form.
+				 * Authoring a note is not reading anyone else's, so only a real
+				 * thread id counts.
+				 */
+				hasSelectedNote:
+					typeof unlock( select( editorStore ) ).getSelectedNote() ===
+					'number',
+			} ),
+			[]
+		);
+
+	const lastSeen = postId ? lastSeenByPost?.[ postId ] : undefined;
+	const latestActivity = useMemo(
+		() => getLatestNoteActivity( notes ),
+		[ notes ]
+	);
+	/*
+	 * Resolving a thread is not activity worth badging, so only open threads
+	 * are eligible. This deliberately reads the full list rather than
+	 * `unresolvedNotes`, which drops threads whose block has been deleted -
+	 * those still need attention and still appear under "All notes".
+	 */
+	const openThreads = useMemo(
+		() => ( notes ?? [] ).filter( ( thread ) => thread.status === 'hold' ),
+		[ notes ]
+	);
+
+	const unseenNoteIds = useMemo(
+		() => getUnseenNoteIds( openThreads, lastSeen, currentUserId ),
+		[ openThreads, lastSeen, currentUserId ]
+	);
+
+	const [ highlightedNoteIds, setHighlightedNoteIds ] =
+		useState( NO_NOTE_IDS );
+	// Runs before the effect below advances the timestamp, so it still sees
+	// what was unseen when the sidebar opened. Activity arriving while it
+	// stays open is added too.
+	useEffect( () => {
+		if ( ! isAllNotesOpen ) {
+			setHighlightedNoteIds( NO_NOTE_IDS );
+			return;
+		}
+		if ( ! unseenNoteIds.length ) {
+			return;
+		}
+		setHighlightedNoteIds( ( current ) => {
+			const added = unseenNoteIds.filter(
+				( id ) => ! current.includes( id )
+			);
+			return added.length ? [ ...current, ...added ] : current;
+		} );
+	}, [ isAllNotesOpen, unseenNoteIds ] );
+
+	const hasLooked = isAllNotesOpen || hasSelectedNote;
+
+	useEffect( () => {
+		if ( ! hasLooked || ! postId || ! latestActivity ) {
+			return;
+		}
+		// Already recorded, including for activity arriving while the sidebar
+		// stays open.
+		if ( lastSeen && lastSeen >= latestActivity ) {
+			return;
+		}
+		setPreference(
+			NOTES_LAST_SEEN_SCOPE,
+			NOTES_LAST_SEEN_PREFERENCE,
+			setNotesLastSeen(
+				lastSeenByPost,
+				postId,
+				latestActivity,
+				NOTES_LAST_SEEN_LIMIT
+			)
+		);
+	}, [
+		hasLooked,
+		postId,
+		latestActivity,
+		lastSeen,
+		lastSeenByPost,
+		setPreference,
+	] );
+
+	return {
+		hasUnseenNotes: unseenNoteIds.length > 0,
+		highlightedNoteIds,
 	};
 }
 
