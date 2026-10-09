@@ -1,20 +1,29 @@
 import { isFormatEqual } from './is-format-equal';
-
-/** @typedef {import('./types').RichTextValue} RichTextValue */
+import type { RichTextFormatList, RichTextValue } from './types';
 
 /**
  * Efficiently updates all the formats from `start` (including) until `end`
  * (excluding) with the active formats. Mutates `value`.
  *
- * @param {Object}        $1         Named paramentes.
- * @param {RichTextValue} $1.value   Value te update.
- * @param {number}        $1.start   Index to update from.
- * @param {number}        $1.end     Index to update until.
- * @param {Array}         $1.formats Replacement formats.
+ * @param options         Named paramentes.
+ * @param options.value   Value te update.
+ * @param options.start   Index to update from.
+ * @param options.end     Index to update until.
+ * @param options.formats Replacement formats.
  *
- * @return {RichTextValue} Mutated value.
+ * @return Mutated value.
  */
-export function updateFormats( { value, start, end, formats } ) {
+export function updateFormats( {
+	value,
+	start,
+	end,
+	formats,
+}: {
+	value: RichTextValue;
+	start: number;
+	end: number;
+	formats: RichTextFormatList;
+} ) {
 	// Start and end may be switched in case of delete.
 	const min = Math.min( start, end );
 	const max = Math.max( start, end );

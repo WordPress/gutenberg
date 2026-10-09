@@ -38,6 +38,12 @@ export function __experimentalRichText() {}
 export type { RichTextValue } from './types';
 
 /**
+ * The text, formats and replacements of a `RichTextValue`, without the
+ * selection.
+ */
+export type { RichTextContent } from './types';
+
+/**
  * A single format, such as `core/bold`, applied to a range of characters within
  * a `RichTextValue`. See main `@wordpress/rich-text` documentation for more
  * information.
@@ -45,6 +51,11 @@ export type { RichTextValue } from './types';
 export type { RichTextFormat } from './types';
 
 /**
+ * The formats applied to a single character of a `RichTextValue`.
+ */
+export type { RichTextFormatList } from './types';
+
+/**
  * The callback-Set refs the private event-listener helpers dispatch from.
  */
-export type { EventListenersProps } from './event-listeners';
+export type { EventListenersProps } from './types';

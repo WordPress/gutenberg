@@ -9,6 +9,7 @@ import type {
 	FormatType,
 	ParsedFormat,
 	RichTextContent,
+	RichTextFormatList,
 	RichTextValue,
 	SelectionRange,
 } from './types';
@@ -167,7 +168,7 @@ export class RichTextData {
 		this.#value = init;
 	}
 	toPlainText() {
-		return getTextContent( this.#value as RichTextValue );
+		return getTextContent( this.#value );
 	}
 	// We could expose `toHTMLElement` at some point as well, but we'd only use
 	// it internally.
@@ -256,12 +257,12 @@ for ( const name of Object.getOwnPropertyNames( String.prototype ) ) {
  * `start` and `end` state which text indices are selected. They are only
  * provided if a `Range` was given.
  *
- * @param [$1]                          Optional named arguments.
- * @param [$1.element]                  Element to create value from.
- * @param [$1.text]                     Text to create value from.
- * @param [$1.html]                     HTML to create value from.
- * @param [$1.range]                    Range to create value from.
- * @param [$1.__unstableIsEditableTree]
+ * @param [options]                          Optional named arguments.
+ * @param [options.element]                  Element to create value from.
+ * @param [options.text]                     Text to create value from.
+ * @param [options.html]                     HTML to create value from.
+ * @param [options.range]                    Range to create value from.
+ * @param [options.__unstableIsEditableTree]
  * @return A rich text value.
  */
 export function create( {
@@ -515,10 +516,10 @@ export function removeReservedCharacters( string: string ) {
 /**
  * Creates a Rich Text value from a DOM element and range.
  *
- * @param $1                  Named arguments.
- * @param [$1.element]        Element to create value from.
- * @param [$1.range]          Range to create value from.
- * @param [$1.isEditableTree]
+ * @param options                  Named arguments.
+ * @param [options.element]        Element to create value from.
+ * @param [options.range]          Range to create value from.
+ * @param [options.isEditableTree]
  *
  * @return A rich text value.
  */
@@ -568,17 +569,17 @@ function createFromElement( {
 				( node as Element ).hasAttribute( 'data-rich-text-comment' ) )
 		) {
 			const value = {
-				formats: [ , ],
+				formats: Array< RichTextFormatList >( 1 ),
 				replacements: [
 					{
 						type: '#comment',
 						attributes: {
 							'data-rich-text-comment':
 								node.nodeType === node.COMMENT_NODE
-									? node.nodeValue
+									? node.nodeValue!
 									: ( node as Element ).getAttribute(
 											'data-rich-text-comment'
-										),
+										)!,
 						},
 					},
 				],
@@ -605,7 +606,7 @@ function createFromElement( {
 
 		if ( tagName === 'script' ) {
 			const value = {
-				formats: [ , ],
+				formats: Array< RichTextFormatList >( 1 ),
 				replacements: [
 					{
 						type: tagName,
@@ -644,7 +645,7 @@ function createFromElement( {
 			delete format.formatType;
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			mergePair( accumulator, {
-				formats: [ , ],
+				formats: Array< RichTextFormatList >( 1 ),
 				replacements: [
 					{
 						...format,
@@ -679,7 +680,7 @@ function createFromElement( {
 		} else if ( value.text.length === 0 ) {
 			if ( format.attributes ) {
 				mergePair( accumulator, {
-					formats: [ , ],
+					formats: Array< RichTextFormatList >( 1 ),
 					replacements: [ format ],
 					text: OBJECT_REPLACEMENT_CHARACTER,
 				} );
@@ -723,8 +724,8 @@ function createFromElement( {
 /**
  * Gets the attributes of an element in object shape.
  *
- * @param $1         Named arguments.
- * @param $1.element Element to get attributes from.
+ * @param options         Named arguments.
+ * @param options.element Element to get attributes from.
  *
  * @return Attribute object or `undefined` if the element has no attributes.
  */
