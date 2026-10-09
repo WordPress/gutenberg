@@ -169,11 +169,11 @@ As you can see, text and formatting are separated. `text` holds the text, includ
 
 _Parameters_
 
-- _$1_ `[{ element?: Element; text?: string; html?: string | RichTextData; range?: Range; __unstableIsEditableTree?: boolean; }]`: Optional named arguments.
+- _$1_ `[{ element?: Element; text?: string; html?: string | RichTextData; range?: Range | null; __unstableIsEditableTree?: boolean; }]`: Optional named arguments.
 - _$1.element_ `[Element]`: Element to create value from.
 - _$1.text_ `[string]`: Text to create value from.
 - _$1.html_ `[string | RichTextData]`: HTML to create value from.
-- _$1.range_ `[Range]`: Range to create value from.
+- _$1.range_ `[Range | null]`: Range to create value from.
 - _$1.\_\_unstableIsEditableTree_ `[boolean]`:
 
 _Returns_
@@ -314,7 +314,7 @@ Registers a new format provided a unique name and an object defining its behavio
 _Parameters_
 
 - _name_ `string`: Format name.
-- _settings_ `Omit< FormatType, 'name' > & { name?: string; }`: Format settings. `name` is injected from the first argument.
+- _settings_ `Omit< FormatType, 'name' >`: Format settings. `name` is injected from the first argument.
 
 _Returns_
 

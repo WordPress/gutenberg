@@ -44,9 +44,8 @@ export function subscribeOwnedListener(
 	}
 
 	const key = capture ? `${ eventType }:capture` : eventType;
-	let elements = byEvent.get( key );
-	if ( ! elements ) {
-		elements = new WeakMap();
+	const elements = byEvent.get( key ) ?? new WeakMap();
+	if ( ! byEvent.has( key ) ) {
 		byEvent.set( key, elements );
 		// One delegated listener per document, event type and phase, bound to
 		// the document so it is reached for every event. Riding the delegated
@@ -69,7 +68,7 @@ export function subscribeOwnedListener(
 					node;
 					node = node.parentNode
 				) {
-					const callbacks = elements!.get( node );
+					const callbacks = elements.get( node );
 					if ( callbacks && ownsSelection( node as HTMLElement ) ) {
 						for ( const cb of callbacks ) {
 							cb( event );

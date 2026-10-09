@@ -14,41 +14,41 @@ import type { FormatType } from './types';
  */
 export function registerFormatType(
 	name: string,
-	settings: Omit< FormatType, 'name' > & { name?: string }
+	settings: Omit< FormatType, 'name' >
 ) {
-	settings = {
+	const formatType: FormatType = {
 		name,
 		...settings,
 	};
 
-	if ( typeof settings.name !== 'string' ) {
+	if ( typeof formatType.name !== 'string' ) {
 		window.console.error( 'Format names must be strings.' );
 		return;
 	}
 
-	if ( ! /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/.test( settings.name ) ) {
+	if ( ! /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/.test( formatType.name ) ) {
 		window.console.error(
 			'Format names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-format'
 		);
 		return;
 	}
 
-	if ( select( richTextStore ).getFormatType( settings.name ) ) {
+	if ( select( richTextStore ).getFormatType( formatType.name ) ) {
 		window.console.error(
-			'Format "' + settings.name + '" is already registered.'
+			'Format "' + formatType.name + '" is already registered.'
 		);
 		return;
 	}
 
-	if ( typeof settings.tagName !== 'string' || settings.tagName === '' ) {
+	if ( typeof formatType.tagName !== 'string' || formatType.tagName === '' ) {
 		window.console.error( 'Format tag names must be a string.' );
 		return;
 	}
 
 	if (
-		( typeof settings.className !== 'string' ||
-			settings.className === '' ) &&
-		settings.className !== null
+		( typeof formatType.className !== 'string' ||
+			formatType.className === '' ) &&
+		formatType.className !== null
 	) {
 		window.console.error(
 			'Format class names must be a string, or null to handle bare elements.'
@@ -57,8 +57,8 @@ export function registerFormatType(
 	}
 
 	if (
-		settings.className !== null &&
-		! /^[_a-zA-Z]+[a-zA-Z0-9_-]*$/.test( settings.className )
+		formatType.className !== null &&
+		! /^[_a-zA-Z]+[a-zA-Z0-9_-]*$/.test( formatType.className )
 	) {
 		window.console.error(
 			'A class name must begin with a letter, followed by any number of hyphens, underscores, letters, or numbers.'
@@ -66,55 +66,55 @@ export function registerFormatType(
 		return;
 	}
 
-	if ( settings.className === null ) {
+	if ( formatType.className === null ) {
 		const formatTypeForBareElement = select(
 			richTextStore
-		).getFormatTypeForBareElement( settings.tagName );
+		).getFormatTypeForBareElement( formatType.tagName );
 
 		if (
 			formatTypeForBareElement &&
 			formatTypeForBareElement.name !== 'core/unknown'
 		) {
 			window.console.error(
-				`Format "${ formatTypeForBareElement.name }" is already registered to handle bare tag name "${ settings.tagName }".`
+				`Format "${ formatTypeForBareElement.name }" is already registered to handle bare tag name "${ formatType.tagName }".`
 			);
 			return;
 		}
 	} else {
 		const formatTypeForClassName = select(
 			richTextStore
-		).getFormatTypeForClassName( settings.className );
+		).getFormatTypeForClassName( formatType.className );
 
 		if ( formatTypeForClassName ) {
 			window.console.error(
-				`Format "${ formatTypeForClassName.name }" is already registered to handle class name "${ settings.className }".`
+				`Format "${ formatTypeForClassName.name }" is already registered to handle class name "${ formatType.className }".`
 			);
 			return;
 		}
 	}
 
-	if ( ! ( 'title' in settings ) || settings.title === '' ) {
+	if ( ! ( 'title' in formatType ) || formatType.title === '' ) {
 		window.console.error(
-			'The format "' + settings.name + '" must have a title.'
+			'The format "' + formatType.name + '" must have a title.'
 		);
 		return;
 	}
 
-	if ( 'keywords' in settings && settings.keywords!.length > 3 ) {
+	if ( 'keywords' in formatType && formatType.keywords!.length > 3 ) {
 		window.console.error(
 			'The format "' +
-				settings.name +
+				formatType.name +
 				'" can have a maximum of 3 keywords.'
 		);
 		return;
 	}
 
-	if ( typeof settings.title !== 'string' ) {
+	if ( typeof formatType.title !== 'string' ) {
 		window.console.error( 'Format titles must be strings.' );
 		return;
 	}
 
-	dispatch( richTextStore ).addFormatTypes( settings as FormatType );
+	dispatch( richTextStore ).addFormatTypes( formatType );
 
-	return settings as FormatType;
+	return formatType;
 }

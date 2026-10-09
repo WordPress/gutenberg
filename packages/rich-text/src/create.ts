@@ -274,7 +274,7 @@ export function create( {
 	element?: Element;
 	text?: string;
 	html?: string | RichTextData;
-	range?: Range;
+	range?: Range | null;
 	__unstableIsEditableTree?: boolean;
 } = {} ) {
 	if ( html instanceof RichTextData ) {
@@ -322,7 +322,7 @@ export function create( {
 function accumulateSelection(
 	accumulator: RichTextValue,
 	node: Node,
-	range: SelectionRange | undefined,
+	range: SelectionRange | null | undefined,
 	value: Pick< RichTextValue, 'text' > &
 		Partial< Pick< RichTextValue, 'start' | 'end' > >
 ) {
@@ -392,7 +392,7 @@ function accumulateSelection(
  */
 function filterRange(
 	node: Node,
-	range: SelectionRange | undefined,
+	range: SelectionRange | null | undefined,
 	filter: ( string: string ) => string
 ) {
 	if ( ! range ) {
@@ -528,7 +528,7 @@ function createFromElement( {
 	isEditableTree,
 }: {
 	element?: Node;
-	range?: SelectionRange;
+	range?: SelectionRange | null;
 	isEditableTree?: boolean;
 } ) {
 	const accumulator = createEmptyValue();
