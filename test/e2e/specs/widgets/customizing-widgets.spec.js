@@ -586,7 +586,7 @@ test.describe( 'Widgets Customizer', () => {
 			.getByRole( 'button', { name: 'Typography options' } )
 			.click();
 		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Show Drop cap' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Drop cap' } )
 			.click();
 
 		await page.getByRole( 'checkbox', { name: 'Drop cap' } ).click();
