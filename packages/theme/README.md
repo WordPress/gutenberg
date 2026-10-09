@@ -21,7 +21,7 @@ This README is the entry point for package consumers. It covers how to load desi
 | --- | --- |
 | `@wordpress/theme` | `ThemeProvider` and the generated token scale types, such as `PaddingSize` and `GapSize`. Derive provider props and callback types from the component as shown below. |
 | `@wordpress/theme/design-tokens.css` | Default semantic `--wpds-*` custom properties. Load once per document. |
-| `@wordpress/theme/design-tokens.js` | `tokens` metadata and `groups` named exports. Does not load styles. |
+| `@wordpress/theme/design-tokens.js` | Default token-name array, plus `tokens` metadata and `groups` named exports. Does not load styles. |
 | Build plugin subpaths | The four public integrations listed under [Build Plugins](#build-plugins). |
 | Stylelint plugin subpaths | The three public rules listed under [Stylelint Plugins](#stylelint-plugins). |
 

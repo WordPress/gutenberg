@@ -5,11 +5,10 @@
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
--   Remove the default token-name array export from `@wordpress/theme/design-tokens.js`. Replace `import tokenNames from '@wordpress/theme/design-tokens.js'` with `import { tokens } from '@wordpress/theme/design-tokens.js'` and derive the name list with `const tokenNames = Object.keys( tokens )` ([#76604](https://github.com/WordPress/gutenberg/pull/76604)).
 
 ### New Features
 
--   Add `tokens` and `groups` named exports to `design-tokens.js`, exposing descriptions, types, groups, default DTCG and CSS values, and build-plugin fallback expressions for every semantic token ([#76604](https://github.com/WordPress/gutenberg/pull/76604)).
+-   Add `tokens` and `groups` named exports to `design-tokens.js`, exposing descriptions, types, groups, default DTCG and CSS values, and build-plugin fallback expressions for every semantic token while retaining the default token-name list ([#76604](https://github.com/WordPress/gutenberg/pull/76604)).
 
 ## 2.3.0 (2026-10-07)
 

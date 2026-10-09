@@ -1,4 +1,7 @@
-const { tokens } = require( '@wordpress/theme/design-tokens.js' );
+const tokenModule = require( '@wordpress/theme/design-tokens.js' );
+const tokenList = tokenModule.tokens
+	? Object.keys( tokenModule.tokens )
+	: tokenModule.default || tokenModule;
 const {
 	DS_TOKEN_PREFIX,
 	collectTokenOccurrences,
@@ -6,7 +9,7 @@ const {
 	wpdsTokensRegex,
 } = require( '../utils/ds-token-utils' );
 
-const knownTokens = new Set( Object.keys( tokens ) );
+const knownTokens = new Set( tokenList );
 
 /**
  * @param {Array<{ token: string, bare: boolean, declaration: boolean }>} occurrences

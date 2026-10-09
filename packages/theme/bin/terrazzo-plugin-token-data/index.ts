@@ -96,6 +96,8 @@ export default function pluginTokenData( {
 						'\t'
 					) } );`,
 					'',
+					'export default Object.keys( tokens );',
+					'',
 				].join( '\n' )
 			);
 
