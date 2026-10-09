@@ -526,7 +526,7 @@ A customizable button to close overlays.
 
 -	**Name:** [core/navigation-overlay-close](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-navigation-overlay-close/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
--	**Supports:** color (background, text, ~~gradients~~), shadow, spacing (padding), typography (fontSize, lineHeight)
+-	**Supports:** color (background, text, ~~gradients~~), dimensions (minHeight, minWidth), shadow, spacing (padding), typography (fontSize, lineHeight)
 -	**Attributes:** displayMode, text
 
 ## Submenu
@@ -593,7 +593,7 @@ Embed a simple playlist.
 -	**Name:** [core/playlist](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-playlist/)
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
 -	**Allowed Blocks:** core/playlist-track
--	**Supports:** align, anchor, color (background, gradients, link, text), interactivity, shadow, spacing (margin, padding), typography (fontSize)
+-	**Supports:** align, anchor, color (background, gradients, link, text), dimensions (minHeight, minWidth), interactivity, shadow, spacing (margin, padding), typography (fontSize)
 -	**Attributes:** caption, order, showArtists, showImages, showNumbers, showPlayButtonArtwork, showTrackLength, showTracklist, type, waveformBackgroundColor, waveformBackgroundGradient, waveformColor, waveformGradient, waveformStyle
 
 ## Playlist track
@@ -719,7 +719,7 @@ Contains the block elements used to render a post, like the title, date, feature
 -	**Name:** [core/post-template](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-template/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
 -	**Ancestor:** core/query
--	**Supports:** align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, button, gradients, heading, link, text), interactivity (clientNavigation), layout, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, button, gradients, heading, link, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), layout, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 
 ## Post Terms
 
@@ -763,7 +763,7 @@ Give special visual emphasis to a quote from your text.
 
 -	**Name:** [core/pullquote](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-pullquote/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
--	**Supports:** align (full, left, right, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight, textAlign)
+-	**Supports:** align (full, left, right, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight, textAlign, textIndent)
 -	**Attributes:** citation, value
 
 ## Query Loop
@@ -961,7 +961,7 @@ Display the tab buttons for a tabbed interface.
 -	**Name:** [core/tab-list](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab-list/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/tabs
--	**Supports:** ariaLabel, color (background, text), layout (default, ~~allowOrientation~~, ~~allowVerticalAlignment~~, ~~allowWrap~~), shadow, spacing (blockGap, padding), typography (fontSize), ~~html~~, ~~lock~~, ~~visibility~~
+-	**Supports:** ariaLabel, background (backgroundImage, backgroundSize, gradient), color (background, text), layout (default, ~~allowOrientation~~, ~~allowVerticalAlignment~~, ~~allowWrap~~), shadow, spacing (blockGap, padding), typography (fontSize), ~~html~~, ~~lock~~, ~~visibility~~
 -	**Attributes:** tabs
 
 ## Tab Panel

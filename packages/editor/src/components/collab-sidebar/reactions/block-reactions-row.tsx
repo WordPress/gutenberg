@@ -80,6 +80,7 @@ export function BlockReactionsRow( {
 				>
 					<AddReactionButton
 						label={ __( 'Add block reaction' ) }
+						reactions={ reactions }
 						onToggleReaction={ toggleReaction }
 					/>
 				</ReactionDisplay>

@@ -43,9 +43,7 @@
 		@include minimized-threads;
 	}
 
-	// The canvas draws the divider.
 	.editor-collab-sidebar-panel {
-		border-left: 0;
 		// A real scroller, mirrored with the canvas by `useFloatingBoard`.
 		// No anchoring, so a thread that grows doesn't move the panel.
 		overflow-y: auto;
@@ -79,7 +77,6 @@
 	padding: $grid-unit-20 $grid-unit-20 $grid-unit-30;
 	height: 100%;
 	overflow: hidden;
-	border-left: $border-width solid color-mix(in srgb, currentColor 10%, transparent);
 }
 
 .editor-collab-sidebar-panel__thread,
@@ -557,6 +554,11 @@ mark.wp-note {
 	justify-content: center;
 	height: var(--emoji-picker-cell-size);
 	padding: 0;
+
+	// The brand outline marks the user's own reactions, as on the pills.
+	&.is-reacted {
+		box-shadow: inset 0 0 0 var(--wpds-border-width-xs) var(--wpds-color-stroke-interactive-brand);
+	}
 }
 
 .editor-collab-sidebar-panel__picker-emoji-label {

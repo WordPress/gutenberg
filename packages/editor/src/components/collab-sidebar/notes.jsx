@@ -1,4 +1,4 @@
-import { Fragment, useMemo } from '@wordpress/element';
+import { Fragment, useContext, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Stack, Text } from '@wordpress/ui';
@@ -11,7 +11,13 @@ import { NoteThread } from './note-thread';
 import { BlockReactionsEntry } from './reactions/block-reactions-entry';
 import { isBlockReactionsEntry } from './reactions/block-reactions';
 import { focusNoteThread } from './utils';
-import { useFloatingBoard, useNoteActions, useNoteSelection } from './hooks';
+import {
+	NoteDraftsContext,
+	useFloatingBoard,
+	useNoteActions,
+	useNoteFocus,
+	usePickNote,
+} from './hooks';
 import { AddNote } from './add-note';
 import { store as editorStore } from '../../store';
 
@@ -21,12 +27,14 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 	const {
 		onCreate: onAddReply,
 		onEdit: onEditNote,
+		onDiscard,
 		onDelete,
 	} = useNoteActions();
 	const { selectNote } = unlock( useDispatch( editorStore ) );
-	const { selectBlock, toggleBlockSpotlight } = unlock(
-		useDispatch( blockEditorStore )
-	);
+	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
+	const drafts = useContext( NoteDraftsContext );
+	const pickNote = usePickNote( { drafts, onDiscard } );
+	useNoteFocus( { sidebarRef } );
 
 	const { selectedBlockClientId, orderedBlockIds } = useSelect(
 		( select ) => {
@@ -43,8 +51,6 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
 		[]
 	);
-
-	useNoteSelection( { notes, sidebarRef } );
 
 	const relatedBlockElement = useBlockElement( selectedBlockClientId );
 
@@ -102,13 +108,8 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 
 		const adjacentThread = nextThread ?? prevThread;
 		if ( adjacentThread ) {
-			selectNote( adjacentThread.id );
+			pickNote( adjacentThread.id, adjacentThread.blockClientId );
 			focusNoteThread( adjacentThread.id, sidebarRef.current );
-			if ( adjacentThread.blockClientId ) {
-				toggleBlockSpotlight( adjacentThread.blockClientId, true );
-				// Pass `null` as the second parameter to prevent focusing the block.
-				selectBlock( adjacentThread.blockClientId, null );
-			}
 		} else {
 			selectNote( undefined );
 			toggleBlockSpotlight( note.blockClientId, false );
@@ -139,12 +140,7 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 			! isSelected
 		) {
 			// Expand thread.
-			selectNote( thread.id );
-			if ( !! thread.blockClientId ) {
-				// Pass `null` as the second parameter to prevent focusing the block.
-				selectBlock( thread.blockClientId, null );
-				toggleBlockSpotlight( thread.blockClientId, true );
-			}
+			pickNote( thread.id, thread.blockClientId );
 		} else if (
 			( ( event.key === 'Enter' || event.key === 'ArrowLeft' ) &&
 				isSelfTarget &&
@@ -212,6 +208,7 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 					key={ selectedBlockClientId }
 					clientId={ selectedBlockClientId }
 					onSubmit={ onAddReply }
+					onDiscard={ onDiscard }
 					sidebarRef={ sidebarRef }
 				/>
 			) }
@@ -233,6 +230,7 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 					<Thread
 						note={ thread }
 						onAddReply={ onAddReply }
+						onDiscard={ onDiscard }
 						onDeleteNote={ handleDelete }
 						onEditNote={ onEditNote }
 						isSelected={ selectedNote === thread.id }
