@@ -7,7 +7,6 @@ import {
 	useEffect,
 	useRef,
 	isValidElement,
-	Component,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -63,26 +62,6 @@ const CATEGORY_LABELS: Record< CommandCategory, string > = {
 	workflow: __( 'Workflow' ),
 };
 
-/**
- * Function that checks if the parameter is a valid icon.
- * Taken from @wordpress/blocks/src/api/utils.js and copied
- * in case requirements diverge and to avoid a dependency on @wordpress/blocks.
- *
- * @param icon Parameter to be checked.
- *
- * @return True if the parameter is a valid icon and false otherwise.
- */
-
-export function isValidIcon( icon: unknown ): boolean {
-	return (
-		!! icon &&
-		( typeof icon === 'string' ||
-			isValidElement( icon ) ||
-			typeof icon === 'function' ||
-			icon instanceof Component )
-	);
-}
-
 function CommandItem( {
 	command,
 	search,
@@ -122,7 +101,7 @@ function CommandItem( {
 					'has-icon': !! icon,
 				} ) }
 			>
-				{ isValidIcon( icon ) && <Icon icon={ icon! } /> }
+				{ isValidElement( icon ) && <Icon icon={ icon } /> }
 				<span className="commands-command-menu__item-label">
 					<TextHighlight
 						text={ command.label }
