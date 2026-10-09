@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Bug Fixes
-
--   `use-recommended-components`: Require `allowUseWithCaution` for `ControlWithError`, `ValidatedInputControl`, and `ValidatedTextareaControl` from `@wordpress/ui`, matching their Storybook status ([#84319](https://github.com/WordPress/gutenberg/pull/84319)).
-
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
@@ -13,6 +9,10 @@
 ### Enhancements
 
 -   `use-recommended-components`: Recommend `Notice` from `@wordpress/ui` instead of `Tip` from `@wordpress/components` ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
+
+### Bug Fixes
+
+-   `use-recommended-components`: Require `allowUseWithCaution` for `ControlWithError`, `ValidatedInputControl`, and `ValidatedTextareaControl` from `@wordpress/ui`, matching their Storybook status ([#84319](https://github.com/WordPress/gutenberg/pull/84319)).
 
 ## 27.1.0 (2026-10-07)
 
