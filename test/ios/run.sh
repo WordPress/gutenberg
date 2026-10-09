@@ -85,7 +85,8 @@ fi
 step "Generating the Xcode project"
 ( cd test/ios && xcodegen generate --quiet )
 step "Building and running the tests"
-rm -rf test/ios/build/results.xcresult
+rm -rf test/ios/build/results.xcresult test/ios/build/simulator.log
+TEST_START=$( date +'%Y-%m-%d %H:%M:%S' )
 STATUS=0
 TEST_RUNNER_WP_BASE_URL="$WP_BASE_URL" xcodebuild test \
 	-project test/ios/GutenbergIOS.xcodeproj \
@@ -94,4 +95,12 @@ TEST_RUNNER_WP_BASE_URL="$WP_BASE_URL" xcodebuild test \
 	-derivedDataPath test/ios/build \
 	-resultBundlePath test/ios/build/results.xcresult \
 	"$@" || STATUS=$?
+# Temporary diagnostics: what the simulator logged about touches.
+xcrun simctl spawn "$UDID" log show --info --debug --style compact \
+	--start "$TEST_START" \
+	--predicate 'process IN {"MobileSafari", "com.apple.WebKit.WebContent", "SpringBoard", "backboardd"} AND NOT (category IN {"Network", "ResourceLoading", "BackgroundTask"})' \
+	> test/ios/build/simulator.log 2>&1 || true
+echo "Simulator log: $( wc -l < test/ios/build/simulator.log ) lines"
+grep -cE "unknown digitizer" test/ios/build/simulator.log || true
+grep -E "unknown digitizer|skipping event|canceling paths contacts|touch cancelled" test/ios/build/simulator.log | cut -c1-200 | head -20 || true
 exit "$STATUS"

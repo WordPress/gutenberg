@@ -105,5 +105,7 @@ jobs:
               if: ${{ always() }}
               with:
                   name: ios-test-results
-                  path: test/ios/build/results.xcresult
+                  path: |
+                      test/ios/build/results.xcresult
+                      test/ios/build/simulator.log
                   if-no-files-found: ignore
