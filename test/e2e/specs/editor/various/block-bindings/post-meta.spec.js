@@ -420,7 +420,14 @@ test.describe( 'Post Meta source', () => {
 				await expect( paragraphBlock ).toHaveText( 'Bound text' );
 				await paragraphBlock.click();
 				if ( copyMethod === 'menu' ) {
-					await editor.clickBlockOptionsMenuItem( 'Copy' );
+					await editor.clickBlockToolbarButton( 'Options' );
+					await page
+						.getByRole( 'menu', { name: 'Options' } )
+						.getByRole( 'menuitem' )
+						.filter( {
+							has: page.getByText( 'Copy', { exact: true } ),
+						} )
+						.click();
 				} else if ( copyMethod === 'list view' ) {
 					await pageUtils.pressKeys( 'access+o' );
 					await page
