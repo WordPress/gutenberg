@@ -37,7 +37,7 @@
 		"@wordpress/vips": "file:../../packages/vips",
 		"client-zip": "^2.4.5",
 		"glob": "^13.0.6",
-		"jsdom": "^26.1.0",
+		"jsdom": "^30.1.2",
 		"playwright": "^1.63.0",
 		"react": "^19.3.0",
 		"react-dom": "^19.3.0",
