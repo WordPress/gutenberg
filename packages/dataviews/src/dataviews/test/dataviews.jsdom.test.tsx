@@ -27,6 +27,7 @@ type Data = {
 	title: string;
 	author?: number;
 	order?: number;
+	parentId?: number;
 };
 
 const DEFAULT_VIEW = {
@@ -382,6 +383,35 @@ describe( 'DataViews component', () => {
 	it( 'should show "No results" if data is empty', () => {
 		render( <DataViewWrapper data={ [] } /> );
 		expect( screen.getByText( 'No results' ) ).toBeInTheDocument();
+	} );
+
+	it( 'puts children under their parent and keeps sibling order', () => {
+		render(
+			<DataViewWrapper
+				data={ [
+					{ id: 3, title: 'Child 2', parentId: 1 },
+					{ id: 1, title: 'Parent' },
+					{ id: 2, title: 'Child 1', parentId: 1 },
+					{ id: 4, title: 'Grandchild', parentId: 2 },
+					{ id: 5, title: 'Other parent' },
+				] }
+				getItemParentId={ ( item ) => item.parentId }
+				view={ {
+					...DEFAULT_VIEW,
+					fields: [],
+					showLevels: true,
+					titleField: 'title',
+				} }
+			/>
+		);
+
+		const rows = screen.getAllByRole( 'row' ).slice( 1 );
+		expect( rows ).toHaveLength( 5 );
+		expect( rows[ 0 ] ).toHaveTextContent( /^Parent$/ );
+		expect( rows[ 1 ] ).toHaveTextContent( /^— Child 2$/ );
+		expect( rows[ 2 ] ).toHaveTextContent( /^— Child 1$/ );
+		expect( rows[ 3 ] ).toHaveTextContent( /^— — Grandchild$/ );
+		expect( rows[ 4 ] ).toHaveTextContent( /^Other parent$/ );
 	} );
 
 	it( 'should filter results by "search" text, if field has enableGlobalSearch set to true', async () => {

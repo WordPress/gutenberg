@@ -37,6 +37,9 @@ import type {
 import type { SetSelection } from '../../../types/private';
 import ColumnHeaderMenu from './column-header-menu';
 import ColumnPrimary from './column-primary';
+import getHierarchicalRows, {
+	type HierarchicalRow,
+} from './get-hierarchical-rows';
 import { useScrollState } from './use-scroll-state';
 import useBulkActionsFocus from '../utils/use-bulk-actions-focus';
 import getDataByGroup from '../utils/get-data-by-group';
@@ -262,6 +265,7 @@ function ViewTable< Item >( {
 	fields,
 	getItemId,
 	getItemLevel,
+	getItemParentId,
 	isLoading = false,
 	onChangeView,
 	onChangeSelection,
@@ -280,11 +284,22 @@ function ViewTable< Item >( {
 		? fields.find( ( f ) => f.id === view.groupBy?.field )
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
-	// When grouping is enabled the rendered order is by group rather than the
-	// order of `data`; ranges follow what the user sees.
+	// Grouped tables render by group and do not read the rows.
+	const rows: HierarchicalRow< Item >[] =
+		! dataByGroup && view.showLevels && getItemParentId
+			? getHierarchicalRows( data, getItemId, getItemParentId )
+			: data.map( ( item, index ) => ( {
+					item,
+					id: getItemId( item ) || index.toString(),
+					level:
+						view.showLevels && getItemLevel
+							? getItemLevel( item )
+							: 0,
+				} ) );
+	// Selection ranges follow the rendered hierarchy and group order.
 	const orderedData = dataByGroup
 		? Array.from( dataByGroup.values() ).flat()
-		: data;
+		: rows.map( ( row ) => row.item );
 	const { getSelectionProps } = useSelectionProps( {
 		data: orderedData,
 		getItemId,
@@ -736,19 +751,13 @@ function ViewTable< Item >( {
 				) : (
 					<tbody>
 						{ hasData &&
-							data.map( ( item, index ) => {
-								const id =
-									getItemId( item ) || index.toString();
+							rows.map( ( row, index ) => {
+								const { id, item, level } = row;
 								return (
 									<TableRow
-										key={ getItemId( item ) }
+										key={ id }
 										item={ item }
-										level={
-											view.showLevels &&
-											typeof getItemLevel === 'function'
-												? getItemLevel( item )
-												: undefined
-										}
+										level={ level }
 										hasBulkActions={ hasBulkActions }
 										actions={ actions }
 										fields={ fields }
