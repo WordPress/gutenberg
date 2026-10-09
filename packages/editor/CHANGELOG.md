@@ -10,6 +10,7 @@
 
 -   Notes: allow reacting to a note with an emoji. Reactions display as pill buttons on the note with per-emoji counts, backed by a new `reaction` comment type. The add-reaction trigger shows on a selected note, fading in on hover or focus in its top corner, so a note with no reactions costs no vertical space for the option ([#76767](https://github.com/WordPress/gutenberg/pull/76767)).
 -   Notes: the add-reaction button now opens a full searchable emoji picker with a per-user skin tone preference, powered by a self-hosted Emojibase dataset configured via the `noteEmojibaseUrl` editor setting ([#78176](https://github.com/WordPress/gutenberg/pull/78176)).
+-   Notes: allow reacting to a block with an emoji. The "Add reaction" item in the block options menu, after "Add note", lists the block in the Notes sidebar, where its reactions sit at the head of the block's thread or in an entry of their own when the block has no note. Block reactions are `reaction` comments anchored by a `metadata.reactionsId` block attribute, minted on the first reaction and saved with the post ([#83169](https://github.com/WordPress/gutenberg/pull/83169)).
 
 ### Bug Fixes
 

@@ -8,6 +8,8 @@ import {
 } from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
 import { NoteThread } from './note-thread';
+import { BlockReactionsEntry } from './reactions/block-reactions-entry';
+import { isBlockReactionsEntry } from './reactions/block-reactions';
 import { focusNoteThread } from './utils';
 import {
 	NoteDraftsContext,
@@ -225,7 +227,7 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 							</Text>
 						</Stack>
 					) }
-					<NoteThread
+					<Thread
 						note={ thread }
 						onAddReply={ onAddReply }
 						onDiscard={ onDiscard }
@@ -254,5 +256,19 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 				</Fragment>
 			) ) }
 		</Stack>
+	);
+}
+
+/**
+ * A list entry: a note thread, or the entry for a block with reactions but
+ * no note, which takes the same props.
+ *
+ * @param {Object} props Props for `NoteThread`.
+ */
+function Thread( props ) {
+	return isBlockReactionsEntry( props.note ) ? (
+		<BlockReactionsEntry { ...props } />
+	) : (
+		<NoteThread { ...props } />
 	);
 }

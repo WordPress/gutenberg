@@ -251,7 +251,7 @@ export function Note( {
 							 * thread is deselected.
 							 */ }
 							<ReactionDisplay
-								noteId={ note.id }
+								target={ { kind: 'note', id: note.id } }
 								reactions={ reactions }
 								disabled={ isThreadResolved }
 								onToggleReaction={ toggleReaction }

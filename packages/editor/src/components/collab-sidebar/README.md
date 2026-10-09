@@ -7,6 +7,8 @@ The Notes sidebar (a.k.a. collab sidebar) lets users attach threaded notes to in
 
 Notes are stored as WordPress comments (`type: 'note'`) attached to the post. A block references its thread via `metadata.noteId` on block attributes. Each thread has a top-level note plus replies; threads can be resolved (stored as status `approved`) or reopened.
 
+Emoji reactions are comments too (`type: 'reaction'`), on a note (as its child) or on a block itself (see [Block reactions](#block-reactions)).
+
 ## File structure
 
 ```
@@ -24,15 +26,20 @@ collab-sidebar/
 ├── note-indicator-toolbar.jsx       NoteAvatarIndicator - toolbar participants avatars
 ├── floating-container.jsx           FloatingContainer - stack wrapper that applies `top` in floating mode
 │
-├── reactions/                       emoji reactions on a note
+├── reactions/                       emoji reactions on a note or a block
 │   ├── use-reaction.ts              useReaction( note ) - the note's `reaction_summary` + toggleReaction
-│   ├── reaction-display.tsx         ReactionDisplay - reaction pills with reactor-name tooltips
+│   ├── reaction-display.tsx         ReactionDisplay - reaction pills for a note or block target
 │   ├── add-reaction-button.tsx      AddReactionButton - the add-reaction trigger for the picker
 │   ├── emoji-picker.tsx             EmojiPicker - Autocomplete trigger + popup grid over the Emojibase dataset
 │   ├── skin-tone-picker.tsx         SkinTonePicker - default skin tone preference Menu
 │   ├── emojibase-data.ts            Emojibase dataset loading, labels, and settings
 │   ├── frequent-emojis.ts           useFrequentEmojis - persisted "Frequently used" section
-│   └── reaction-emojis.ts           curated reaction set and storage keys
+│   ├── reaction-emojis.ts           curated reaction set and storage keys
+│   ├── block-reactions.ts           reaction target type, block anchor helpers, sidebar entry merging
+│   ├── use-block-reaction.ts        useBlockReaction( clientId ) - a block's reactions + toggleReaction
+│   ├── block-reactions-row.tsx      BlockReactionsRow - a block's own reactions (icon + pills + trigger)
+│   ├── block-reactions-entry.tsx    BlockReactionsEntry - sidebar entry for a block with reactions but no note
+│   └── block-reactions-menu-item.tsx  BlockReactionsMenuItem - block options "Add reaction" item that opens the block's reactions
 │
 ├── hooks.js                        useNoteThreads, useNoteActions, useNoteSelection, usePickNote, useNoteFocus, useFloatingBoard, useEnableFloatingSidebar
 ├── utils.js                        focusNoteThread, getNoteExcerpt, sanitizeNoteContent, calculateNotePositions, getAvatarBorderColor
@@ -50,11 +57,15 @@ NotesSidebarContainer (index.jsx)         - gates on post type support, owns the
  └── NotesSidebar (index.jsx)             - owns sidebarRef + useNoteThreads + useNoteSelection + sidebar registration
       ├── AddNoteMenuItem                - slot fill in the block toolbar
       ├── NoteAvatarIndicator            - slot fill in the block toolbar (per-thread avatars)
+      ├── BlockReactionsMenuItem         - slot fill in the block options menu ("Add reaction")
       ├── PluginSidebar (all-notes)      - full sidebar
       │    └── Notes (notes.jsx)          - owns outer Stack + aria-label + useNoteActions + useNoteFocus + keyboard nav
       │         ├── AddNote              - new note form for the selected block, rendered when selectedNote === 'new'
+      │         ├── BlockReactionsEntry[] - a block with reactions but no note (same shell as a thread)
+      │         │    └── BlockReactionsRow
       │         └── NoteThread[]         - per thread
       │              └── <FloatingContainer>
+      │                   ├── BlockReactionsRow - the block's own reactions, on its first unresolved thread
       │                   ├── Note       - top-level note (own state: edit/delete/dialog)
       │                   │    └── NoteCard
       │                   │         └── NoteByline + actions slot + body children
@@ -90,6 +101,16 @@ Explicit actions set the selected note directly:
 | Cancel, the new note form's focus-out | Strips the draft marker, none |
 
 A thread's or the new note form's focus-out deselects only when focus did not land in its block; in the block, the caret events decide.
+
+## Block reactions
+
+A reaction on a block is a top-level `reaction` comment on the post (no parent), anchored to the block through the `_wp_reaction_block` comment meta. The anchor is `metadata.reactionsId` on the block: a short id the editor mints on the block's first reaction, which like the first note makes the post dirty until saved. Blocks have no server-side identity, so the anchor lives in the content.
+
+The server returns every block reaction on the post as one read-only `block_reaction_summary` field on the post record (`edit` context, single-item requests only), keyed by anchor and then by emoji slug with the same `{ count, current_user_reaction }` shape as a note's `reaction_summary`. `useBlockReaction( clientId )` mirrors `useReaction( note )`: it reads the block's slice of that summary off the raw post record, and its `toggleReaction` posts or deletes the reaction comment, folds the result into the cached post record as a partial (so unsaved edits survive) and refetches only the summary.
+
+`useNoteThreads` merges reacted blocks into the thread list in document order (`addBlockReactionEntries`). A block's reactions row leads its first unresolved thread, so the floating view (which lists only unresolved threads) agrees with the full sidebar; a block with no unresolved note gets a `BlockReactionsEntry` of its own above the "Resolved" divider. An anchor with no matching block is not listed: a reaction carries no content worth keeping in view once its block is gone, and undo restores the block with its anchor.
+
+The picker lives only in the sidebar. "Add reaction" in the block options menu, after "Add note", is a plain menu item: it lists the selected block in the sidebar even before its first reaction (until another block is selected) and focuses the row's "Add block reaction" trigger. Note reactions keep their own "Add reaction" trigger.
 
 ## Floating board
 

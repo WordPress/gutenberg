@@ -8,12 +8,15 @@ import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as editorStore } from '../../../store';
 import { invalidateReactionNames } from './reaction-display';
-import type { ReactionSummary } from './reaction-display';
+import {
+	applyReactionSummaryDelta,
+	type ReactionSummary,
+} from './block-reactions';
 
 /**
  * The parts of a note comment record that reactions read.
  */
-export interface ReactionTarget {
+export interface ReactableNote {
 	id: number;
 	reaction_summary?: ReactionSummary | null;
 }
@@ -31,39 +34,19 @@ export interface ReactionTarget {
  *               added or removed.
  * @return The note with an updated `reaction_summary`.
  */
-export function applyReactionDelta< T extends ReactionTarget >(
+export function applyReactionDelta< T extends ReactableNote >(
 	note: T,
 	hexKey: string,
 	change: { added: number } | { removed: number }
 ): T {
-	const summary: ReactionSummary = { ...( note.reaction_summary || {} ) };
-	const entry = summary[ hexKey ];
-
-	if ( 'added' in change ) {
-		// Concurrent adds converge server-side on one surviving row, so a
-		// repeated ID is already counted.
-		if ( entry?.current_user_reaction === change.added ) {
-			return note;
-		}
-		summary[ hexKey ] = {
-			count: ( entry?.count || 0 ) + 1,
-			current_user_reaction: change.added,
-		};
-	} else {
-		// Another toggle's refresh may already have dropped the reaction;
-		// decrementing again would hide someone else's.
-		if ( entry?.current_user_reaction !== change.removed ) {
-			return note;
-		}
-		const count = entry.count - 1;
-		if ( count > 0 ) {
-			summary[ hexKey ] = { count, current_user_reaction: 0 };
-		} else {
-			delete summary[ hexKey ];
-		}
-	}
-
-	return { ...note, reaction_summary: summary };
+	const summary = applyReactionSummaryDelta(
+		note.reaction_summary,
+		hexKey,
+		change
+	);
+	return summary === note.reaction_summary
+		? note
+		: { ...note, reaction_summary: summary };
 }
 
 /*
@@ -91,7 +74,7 @@ const pendingToggles = new Set< string >();
  * @param note The note comment record.
  * @return The note's reaction summary and the toggle callback.
  */
-export function useReaction( note: ReactionTarget ) {
+export function useReaction( note: ReactableNote ) {
 	const { id: noteId, reaction_summary: reactions } = note;
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord, receiveEntityRecords } =
@@ -158,7 +141,7 @@ export function useReaction( note: ReactionTarget ) {
 			}
 
 			// The note's reactor lists changed, so its pill tooltips refetch.
-			invalidateReactionNames( noteId );
+			invalidateReactionNames( { kind: 'note', id: noteId } );
 
 			// Mutating a reaction comment doesn't invalidate the cached
 			// `reaction_summary`, so a subsequent toggle would read stale
@@ -173,7 +156,7 @@ export function useReaction( note: ReactionTarget ) {
 			reactionMutationCounts.set( noteId, mutationCount );
 
 			const cached = getEntityRecord( 'root', 'comment', noteId ) as
-				ReactionTarget | undefined;
+				ReactableNote | undefined;
 			const change = myReactionId
 				? { removed: myReactionId }
 				: addedReactionId && { added: addedReactionId };
