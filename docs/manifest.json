@@ -2616,12 +2616,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/lazy-import",
-		"slug": "packages-lazy-import",
-		"markdown_source": "../packages/lazy-import/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/list-reusable-blocks",
 		"slug": "packages-list-reusable-blocks",
 		"markdown_source": "../packages/list-reusable-blocks/README.md",

@@ -70,9 +70,6 @@
 		}
 	},
 	"packages/block-directory/src/components/downloadable-blocks-panel/no-results.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -4694,14 +4691,11 @@
 			"count": 2
 		}
 	},
-	"packages/commands/src/components/command-menu.jsx": {
+	"packages/commands/src/components/command-menu.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		},
 		"react-hooks/refs": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -4720,11 +4714,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/color-picker/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/context/test/context-system-provider.jsdom.test.tsx": {
 		"no-restricted-imports": {
 			"count": 1
@@ -4740,17 +4729,7 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/custom-select-control-v2/styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
 	"packages/components/src/date-time/date-picker/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/components/src/date-time/date-time/styles.ts": {
 		"no-restricted-imports": {
 			"count": 1
 		}
@@ -4803,16 +4782,6 @@
 	"packages/components/src/number-control/index.tsx": {
 		"react-hooks/refs": {
 			"count": 2
-		}
-	},
-	"packages/components/src/number-control/styles/number-control-styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
-	"packages/components/src/palette-edit/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
 		}
 	},
 	"packages/components/src/panel/body.tsx": {
@@ -7953,11 +7922,6 @@
 			"count": 7
 		}
 	},
-	"packages/primitives/src/svg/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/private-apis/src/test/index.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -8056,11 +8020,8 @@
 			"count": 1
 		}
 	},
-	"packages/workflow/src/components/workflow-menu.jsx": {
+	"packages/workflow/src/components/workflow-menu.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},

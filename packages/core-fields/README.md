@@ -87,22 +87,22 @@ There is no precedence between collections: the registry skips a field already r
 
 `src/index.php` registers the core fields through the public Fields API, exactly as a plugin registers its own. `register_core_field_collections()` runs on the `wp_fields_api_init` action at priority 0: it registers the defaults first, unregisters the ones the core post types do not get, then calls `wp_register_field_collection()` for each collection, listed explicitly. The action fires once `init` has completed, when the supports of the post types are final, and a plugin hooking it at the default priority sees the core fields registered, and can update or unregister them.
 
-`wp_register_field_collection( $registry, $directory )` reads one collection and registers its fields on the registry the action passes, after the fields registered on the entity before, in the alphabetical order of their folders. Like the registry, it does not check that the entity exists: the `/wp/v2/fields` route only serves the fields of the entities the REST API exposes. It returns whether the collection is valid and the registry accepted all of its fields.
+`wp_register_field_collection( $directory )` reads one collection and registers its fields, after the fields registered on the entity before, in the alphabetical order of their folders. Like `wp_register_fields()`, it only runs on the `wp_fields_api_init` action. Like the registry, it does not check that the entity exists: the `/wp/v2/fields` route only serves the fields of the entities the REST API exposes. It returns whether the collection is valid and the registry accepted all of its fields.
 
-A plugin does the same with its own collections. With the Gutenberg plugin, the functions are `gutenberg_register_field_collection()` and `gutenberg_get_field_collection_fields()`:
+A plugin does the same with its own collections:
 
 ```php
 add_action(
 	'wp_fields_api_init',
-	function ( $registry ) {
+	function () {
 		// Books do not get the default comment status.
-		$registry->unregister( 'postType', 'book', array( 'comment_status' ) );
-		wp_register_field_collection( $registry, __DIR__ . '/fields/book' );
+		wp_unregister_fields( 'postType', 'book', array( 'comment_status' ) );
+		wp_register_field_collection( __DIR__ . '/fields/book' );
 	}
 );
 ```
 
-The source PHP is written as it is in WordPress core. The Gutenberg build copies the PHP files to `build/scripts/core-fields`, which `lib/load.php` loads, and prefixes the functions defined in them, `wp_register_field_collection()`, and `wp_get_field_collection_fields()` with `gutenberg_`; the `index.php` and `field.php` files of the collections come out as they are. The build only prefixes the calls to a function in the file that defines it, which is why the functions of this package all live in `src/index.php`. A new collection needs its folder, an entry in `src/index.php` and, if it has JavaScript parts, an entry in `wpScriptModuleExports`.
+The source PHP is written as it is in WordPress core. The Gutenberg build copies the PHP files to `build/scripts/core-fields`, which `lib/load.php` loads, and prefixes the functions defined in them with `gutenberg_`; the `index.php` and `field.php` files of the collections come out as they are. The functions of the Fields API keep their names: the plugin defines them when WordPress does not. The build only prefixes the calls to a function in the file that defines it, which is why the functions of this package all live in `src/index.php`. A new collection needs its folder, an entry in `src/index.php` and, if it has JavaScript parts, an entry in `wpScriptModuleExports`.
 
 The client never imports this package directly. `loadFields` and `useFields` from [`@wordpress/fields-loader`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/fields-loader/README.md) import the script module of a collection on demand, when the `/wp/v2/fields` route lists it for an entity, and merge each entry into the field with the same id among the fields registered with that module. That is why each collection with JavaScript parts has a module of its own: `post_type_supports` and `wp_template` both have an `author` field.
 

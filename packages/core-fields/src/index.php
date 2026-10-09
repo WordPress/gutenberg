@@ -51,10 +51,8 @@
  * comments or notes lists the module too, which is small.
  *
  * @since 7.2.0
- *
- * @param WP_Fields_Registry $registry The registry being read.
  */
-function register_core_post_type_supports_fields( $registry ) {
+function register_core_post_type_supports_fields() {
 	$definitions = wp_get_field_collection_fields( __DIR__ . '/post_type_supports' );
 
 	foreach ( get_post_types( array( 'show_in_rest' => true ) ) as $post_type ) {
@@ -87,7 +85,7 @@ function register_core_post_type_supports_fields( $registry ) {
 		// Keeps the alphabetical order of the folders.
 		$fields = array_values( array_intersect_key( $definitions, array_filter( $applies ) ) );
 		if ( $fields ) {
-			$registry->register( 'core', 'postType', $post_type, $fields, '@wordpress/core-fields/post_type_supports' );
+			wp_register_fields( 'core', 'postType', $post_type, $fields, '@wordpress/core-fields/post_type_supports' );
 		}
 	}
 }
@@ -102,37 +100,35 @@ function register_core_post_type_supports_fields( $registry ) {
  * unregister them.
  *
  * @since 7.2.0
- *
- * @param WP_Fields_Registry $registry The registry being read.
  */
-function register_core_field_collections( $registry ) {
+function register_core_field_collections() {
 	// Defaults registered for all post types based on their supports.
-	register_core_post_type_supports_fields( $registry );
+	register_core_post_type_supports_fields();
 
 	// page: unregister unwanted default fields, and register its own.
-	$registry->unregister( 'postType', 'page', array( 'title' ) );
-	wp_register_field_collection( $registry, __DIR__ . '/page' );
+	wp_unregister_fields( 'postType', 'page', array( 'title' ) );
+	wp_register_field_collection( __DIR__ . '/page' );
 
 	// wp_template: unregister unwanted default fields, and register its own.
-	$registry->unregister( 'postType', 'wp_template', array( 'author', 'date', 'excerpt', 'password', 'post-content-info', 'scheduled_date', 'slug', 'status', 'template', 'title' ) );
-	wp_register_field_collection( $registry, __DIR__ . '/wp_template' );
+	wp_unregister_fields( 'postType', 'wp_template', array( 'author', 'date', 'excerpt', 'password', 'post-content-info', 'scheduled_date', 'slug', 'status', 'template', 'title' ) );
+	wp_register_field_collection( __DIR__ . '/wp_template' );
 
 	// wp_template_part: unregister unwanted default fields, and register its own.
-	$registry->unregister( 'postType', 'wp_template_part', array( 'author', 'date', 'excerpt', 'password', 'post-content-info', 'scheduled_date', 'slug', 'status', 'template', 'title' ) );
-	wp_register_field_collection( $registry, __DIR__ . '/wp_template_part' );
+	wp_unregister_fields( 'postType', 'wp_template_part', array( 'author', 'date', 'excerpt', 'password', 'post-content-info', 'scheduled_date', 'slug', 'status', 'template', 'title' ) );
+	wp_register_field_collection( __DIR__ . '/wp_template_part' );
 
 	// wp_block: unregister unwanted default fields, and register its own.
-	$registry->unregister( 'postType', 'wp_block', array( 'date', 'excerpt', 'password', 'scheduled_date', 'slug', 'status', 'template', 'title' ) );
-	wp_register_field_collection( $registry, __DIR__ . '/wp_block' );
+	wp_unregister_fields( 'postType', 'wp_block', array( 'date', 'excerpt', 'password', 'scheduled_date', 'slug', 'status', 'template', 'title' ) );
+	wp_register_field_collection( __DIR__ . '/wp_block' );
 
 	// attachment: unregister all default fields, and register its own.
-	$registry->unregister( 'postType', 'attachment' );
-	wp_register_field_collection( $registry, __DIR__ . '/attachment' );
+	wp_unregister_fields( 'postType', 'attachment' );
+	wp_register_field_collection( __DIR__ . '/attachment' );
 
 	// wp_navigation: unregister unwanted default fields.
-	$registry->unregister( 'postType', 'wp_navigation', array( 'date', 'password', 'post-content-info', 'scheduled_date', 'slug', 'status', 'template' ) );
+	wp_unregister_fields( 'postType', 'wp_navigation', array( 'date', 'password', 'post-content-info', 'scheduled_date', 'slug', 'status', 'template' ) );
 
 	// Register fields for root/site (entity/kind).
-	wp_register_field_collection( $registry, __DIR__ . '/root_site' );
+	wp_register_field_collection( __DIR__ . '/root_site' );
 }
 add_action( 'wp_fields_api_init', 'register_core_field_collections', 0 );

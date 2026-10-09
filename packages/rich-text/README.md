@@ -169,16 +169,16 @@ As you can see, text and formatting are separated. `text` holds the text, includ
 
 _Parameters_
 
-- _$1_ `[Object]`: Optional named arguments.
+- _$1_ `[{ element?: Element; text?: string; html?: string | RichTextData; range?: Range | null; __unstableIsEditableTree?: boolean; }]`: Optional named arguments.
 - _$1.element_ `[Element]`: Element to create value from.
 - _$1.text_ `[string]`: Text to create value from.
-- _$1.html_ `[string]`: HTML to create value from.
-- _$1.range_ `[Range]`: Range to create value from.
+- _$1.html_ `[string | RichTextData]`: HTML to create value from.
+- _$1.range_ `[Range | null]`: Range to create value from.
 - _$1.\_\_unstableIsEditableTree_ `[boolean]`:
 
 _Returns_
 
-- `RichTextValue`: A rich text value.
+- A rich text value.
 
 ### EventListenersProps
 
@@ -204,11 +204,11 @@ Gets the all format objects at the start of the selection.
 _Parameters_
 
 - _value_ `RichTextValue`: Value to inspect.
-- _EMPTY_ACTIVE_FORMATS_ `Array`: Array to return if there are no active formats.
+- _EMPTY_ACTIVE_FORMATS_ `RichTextFormatList`: Array to return if there are no active formats.
 
 _Returns_
 
-- `RichTextFormatList`: Active format objects.
+- Active format objects.
 
 ### getActiveObject
 
@@ -314,11 +314,11 @@ Registers a new format provided a unique name and an object defining its behavio
 _Parameters_
 
 - _name_ `string`: Format name.
-- _settings_ `Omit<WPFormat, 'name'>`: Format settings. `name` is injected from the first argument.
+- _settings_ `Omit< FormatType, 'name' >`: Format settings. `name` is injected from the first argument.
 
 _Returns_
 
-- `WPFormat|undefined`: The format, if it has been successfully registered; otherwise `undefined`.
+- The format, if it has been successfully registered; otherwise `undefined`.
 
 ### remove
 
@@ -419,10 +419,6 @@ _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore>
 
-_Type_
-
-- `Object`
-
 ### toggleFormat
 
 Toggles a format object to a Rich Text value at the current selection.
@@ -460,7 +456,7 @@ _Parameters_
 
 _Returns_
 
-- `WPFormat|undefined`: The previous format value, if it has been successfully unregistered; otherwise `undefined`.
+- `FormatType|undefined`: The previous format value, if it has been successfully unregistered; otherwise `undefined`.
 
 ### useAnchor
 
@@ -468,9 +464,9 @@ This hook, to be used in a format type's Edit component, returns the active elem
 
 _Parameters_
 
-- _obj_ `{ editableContentElement: HTMLElement | null; settings?: WPFormat; }`: Named parameters.
+- _obj_ `{ editableContentElement: HTMLElement | null; settings?: FormatType; }`: Named parameters.
 - _obj.editableContentElement_ `HTMLElement | null`: The element containing the editable content.
-- _obj.settings_ `WPFormat`: The format type's settings.
+- _obj.settings_ `FormatType`: The format type's settings.
 
 _Returns_
 
@@ -485,7 +481,7 @@ _Parameters_
 - _$1_ `Object`: Named parameters.
 - _$1.ref_ `RefObject<HTMLElement>`: React ref of the element containing the editable content.
 - _$1.value_ `RichTextValue`: Value to check for selection.
-- _$1.settings_ `WPFormat`: The format type's settings.
+- _$1.settings_ `FormatType`: The format type's settings.
 
 _Returns_
 

@@ -142,12 +142,12 @@ class Gutenberg_REST_Fields_Controller_7_2 extends WP_REST_Controller {
 
 		$field_schema = $this->get_field_schema();
 		$fields       = array();
-		foreach ( gutenberg_get_registered_fields( $kind, $name ) as $field ) {
+		foreach ( wp_get_registered_fields( $kind, $name ) as $field ) {
 			$fields[] = gutenberg_rest_cast_empty_objects_from_schema( $field, $field_schema );
 		}
 
 		$script_modules = array();
-		foreach ( gutenberg_get_registered_field_modules( $kind, $name ) as $module => $field_ids ) {
+		foreach ( wp_get_registered_field_modules( $kind, $name ) as $module => $field_ids ) {
 			$script_modules[] = array(
 				'id'     => $module,
 				'fields' => array_values( $field_ids ),

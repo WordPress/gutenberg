@@ -66,6 +66,7 @@
 		{ "path": "packages/widget-primitives" },
 		{ "path": "packages/wordcount" },
 		{ "path": "packages/worker-threads" },
+		{ "path": "packages/workflow" },
 		{ "path": "routes/connectors-home" },
 		{ "path": "routes/connectors-home/tsconfig.test.json" },
 		{ "path": "routes/dashboard" },

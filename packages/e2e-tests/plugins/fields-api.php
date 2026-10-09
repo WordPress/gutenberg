@@ -36,8 +36,8 @@
  * Case 1: a declarative field (`menu_order`), whose value is a property of
  * the record. No JavaScript, no styles.
  */
-function gutenberg_test_fields_api_add_field_declarative( $registry ) {
-	$registry->register(
+function gutenberg_test_fields_api_add_field_declarative() {
+	wp_register_fields(
 		'gutenberg-test-fields-api',
 		'postType',
 		'page',
@@ -101,8 +101,8 @@ function gutenberg_test_fields_api_register_reading_time_assets() {
 }
 add_action( 'init', 'gutenberg_test_fields_api_register_reading_time_assets' );
 
-function gutenberg_test_fields_api_add_field_with_script_module( $registry ) {
-	$registry->register(
+function gutenberg_test_fields_api_add_field_with_script_module() {
+	wp_register_fields(
 		'gutenberg-test-fields-api',
 		'postType',
 		'page',
@@ -155,8 +155,8 @@ function gutenberg_test_fields_api_register_comment_status_assets() {
 }
 add_action( 'init', 'gutenberg_test_fields_api_register_comment_status_assets' );
 
-function gutenberg_test_fields_api_update_field( $registry ) {
-	$registry->update(
+function gutenberg_test_fields_api_update_field() {
+	wp_update_fields(
 		'gutenberg-test-fields-api',
 		'postType',
 		'page',
@@ -178,9 +178,9 @@ add_action( 'wp_fields_api_init', 'gutenberg_test_fields_api_update_field' );
  * follows is the whole field. The default priority runs after the default
  * fields: there is nothing to unregister before.
  */
-function gutenberg_test_fields_api_replace_field( $registry ) {
-	$registry->unregister( 'postType', 'page', array( 'author' ) );
-	$registry->register(
+function gutenberg_test_fields_api_replace_field() {
+	wp_unregister_fields( 'postType', 'page', array( 'author' ) );
+	wp_register_fields(
 		'gutenberg-test-fields-api',
 		'postType',
 		'page',
@@ -214,8 +214,8 @@ add_action( 'wp_fields_api_init', 'gutenberg_test_fields_api_replace_field' );
  *   field to the end of the form. Filtered from the moment the plugin
  *   loads, whenever the view configuration is read.
  */
-function gutenberg_test_fields_api_add_field_with_data( $registry ) {
-	$registry->register(
+function gutenberg_test_fields_api_add_field_with_data() {
+	wp_register_fields(
 		'gutenberg-test-fields-api',
 		'postType',
 		'page',
