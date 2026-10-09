@@ -12,6 +12,7 @@
 
 ### Internal
 
+-   Load design token fallback plugins from the new `@wordpress/theme-build-tools` dependency instead of the optional `@wordpress/theme` peer dependency; fallbacks are still applied when `@wordpress/theme` is installed ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
 -   Publish only runtime files, dropping `tsconfig.json`, the TypeScript build cache (`.cache`) and the test files from the package ([#84164](https://github.com/WordPress/gutenberg/pull/84164)).
 
 ## 0.25.0 (2026-10-07)
@@ -23,6 +24,7 @@
 
 ### Internal
 
+-   Load design token fallback plugins from the new `@wordpress/theme-build-tools` dependency instead of the optional `@wordpress/theme` peer dependency; fallbacks are still applied when `@wordpress/theme` is installed ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
 -   Drop the optional `@wordpress/boot`, `@wordpress/private-apis`, and `@wordpress/route` peer dependencies, unused since they are no longer bundled ([#83601](https://github.com/WordPress/gutenberg/pull/83601)).
 
 ## 0.24.0 (2026-09-23)

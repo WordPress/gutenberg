@@ -2,16 +2,8 @@ import { createHash } from 'node:crypto';
 import cssnano from 'cssnano';
 import postcss from 'postcss';
 import postcssModules from 'postcss-modules';
+import dsTokenFallbacks from '@wordpress/theme-build-tools/postcss-plugins/postcss-ds-token-fallbacks';
 
-/** @type {import('postcss').AcceptedPlugin | undefined} */
-let dsTokenFallbacks;
-try {
-	const { default: postcssPlugin } =
-		await import( '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks' );
-	dsTokenFallbacks = postcssPlugin;
-} catch {
-	// @wordpress/theme is optional; skip token fallbacks if not available.
-}
 export { dsTokenFallbacks };
 
 /**
@@ -35,7 +27,8 @@ export function compileInlineStyle( {
 	return async function styleType( cssText, _dirname, filePath ) {
 		let moduleExports = null;
 
-		const plugins = dsTokenFallbacks ? [ dsTokenFallbacks ] : [];
+		/** @type {import('postcss').AcceptedPlugin[]} */
+		const plugins = [ dsTokenFallbacks ];
 		if ( cssModules ) {
 			plugins.push(
 				postcssModules( {

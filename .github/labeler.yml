@@ -248,6 +248,10 @@
     - changed-files:
           - any-glob-to-any-file: 'packages/theme/**'
 
+'[Package] Theme Build Tools':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/theme-build-tools/**'
+
 '[Package] Token List':
     - changed-files:
           - any-glob-to-any-file: 'packages/token-list/**'

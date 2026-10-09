@@ -13,12 +13,12 @@ import {
 	transform as lightningcssTransform,
 } from 'lightningcss';
 import postcss from 'postcss';
-import tokenFallbacks from '../../prebuilt/js/design-token-fallbacks.mjs';
-import esbuildPlugin from '../../esbuild-plugins/esbuild-ds-token-fallbacks.mjs';
-import lightningcssPlugin from '../../lightningcss-plugins/lightningcss-ds-token-fallbacks.mjs';
-import postcssPlugin from '../../postcss-plugins/postcss-ds-token-fallbacks.mjs';
-import vitePlugin from '../../vite-plugins/vite-ds-token-fallbacks.mjs';
-import type { transformDsTokenFallbacks } from '../../js-plugins/transform-ds-token-fallbacks.mjs';
+import esbuildPlugin from '../esbuild-plugins/esbuild-ds-token-fallbacks.mjs';
+import lightningcssPlugin from '../lightningcss-plugins/lightningcss-ds-token-fallbacks.mjs';
+import postcssPlugin from '../postcss-plugins/postcss-ds-token-fallbacks.mjs';
+import vitePlugin from '../vite-plugins/vite-ds-token-fallbacks.mjs';
+import type { transformDsTokenFallbacks } from '../js-plugins/transform-ds-token-fallbacks.mjs';
+import { tokenFallbacks } from '../lib/theme-tokens.mjs';
 
 const fixturesDirectory = join( __dirname, 'fixtures/build-plugins' );
 const validJsFixture = join( fixturesDirectory, 'source.ts' );
@@ -211,7 +211,7 @@ describe( 'design token fallback build plugin parity', () => {
 	it( 'throws when a known token has no parsed fallback', () => {
 		const tokenName = '--wpds-test-missing-fallback';
 		// Simulate a generated token missing from the plugin's parsed cache.
-		Object.defineProperty( tokenFallbacks, tokenName, {
+		Object.defineProperty( tokenFallbacks!, tokenName, {
 			value: '1px',
 			configurable: true,
 		} );
@@ -224,7 +224,7 @@ describe( 'design token fallback build plugin parity', () => {
 				)
 			).toThrow( `No parsed fallback for design token: ${ tokenName }.` );
 		} finally {
-			Reflect.deleteProperty( tokenFallbacks, tokenName );
+			Reflect.deleteProperty( tokenFallbacks!, tokenName );
 		}
 	} );
 
