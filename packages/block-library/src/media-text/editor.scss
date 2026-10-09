@@ -39,6 +39,21 @@
 	max-width: unset;
 }
 
+.wp-block-media-text .wp-block-media-text__content {
+	// The block list and UA stylesheet set `overflow-wrap: break-word` on
+	// block wrappers / editable elements. That wins over the inherited
+	// `anywhere` from style.scss and inflates the content column's
+	// min-content size (horizontal editor scroll). Inherit from the content
+	// column with enough specificity to beat
+	// `.block-editor-block-list__layout .block-editor-block-list__block`.
+	// Nested blocks that set break-word are re-asserted in style.scss.
+	// Exclude Search's button: it opts out via search/style.scss.
+	.block-editor-block-list__block,
+	[contenteditable="true"]:not(.wp-block-search__button) {
+		overflow-wrap: inherit;
+	}
+}
+
 /* Make the featured image placeholder the same height as the media selection area. */
 .wp-block-media-text--placeholder-image {
 	min-height: 205px;

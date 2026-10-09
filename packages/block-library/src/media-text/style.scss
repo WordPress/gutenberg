@@ -52,8 +52,48 @@
 	grid-column: 2;
 	grid-row: 1;
 	/*rtl:end:ignore*/
-	// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- Pending review of overflow-wrap alternative.
-	word-break: break-word;
+	word-break: normal;
+	overflow-wrap: anywhere;
+
+	// Nested blocks that set overflow-wrap: break-word (or sit under theme
+	// rules like `.entry-content p { overflow-wrap: break-word }`) override
+	// the inherited anywhere and let long unbroken text inflate the content
+	// column's min-content size. Re-assert anywhere on those blocks and their
+	// descendants only — a content-wide `*` catch-all would also override
+	// intentional opt-outs such as a custom `.no-break { overflow-wrap: normal }`.
+	// Search's button opts out via search/style.scss and is not listed here.
+	.wp-block-quote,
+	.wp-block-quote *,
+	.wp-block-pullquote,
+	.wp-block-pullquote *,
+	.wp-block-embed,
+	.wp-block-embed *,
+	.wp-block-verse,
+	.wp-block-verse *,
+	.wp-block-column,
+	.wp-block-column *,
+	.wp-block-post-author-biography,
+	.wp-block-post-author-biography *,
+	.wp-block-latest-posts li,
+	.wp-block-latest-posts li *,
+	.wp-block-navigation-item__label,
+	.wp-block-navigation-item__label *,
+	.wp-block-post-comments-form input[type="submit"] {
+		overflow-wrap: anywhere;
+	}
+
+	// Code is a <pre>; the UA white-space: pre ignores overflow-wrap, so the
+	// long unbroken string still inflates min-content unless the pre itself
+	// is allowed to wrap. min-width: 0 lets the grid track shrink.
+	.wp-block-code {
+		overflow-wrap: anywhere;
+		white-space: break-spaces;
+		min-width: 0;
+
+		code {
+			overflow-wrap: anywhere;
+		}
+	}
 }
 
 // Zero specificity so the default padding can be overridden by theme.json or theme styles.
