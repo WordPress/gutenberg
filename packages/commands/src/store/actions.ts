@@ -4,18 +4,10 @@ import type {
 	CommandLoaderConfig,
 } from './types';
 
-/** @typedef {import('@wordpress/keycodes').WPKeycodeModifier} WPKeycodeModifier */
-
-/**
- * @typedef {'command'|'view'|'edit'|'workflow'|'action'} WPCommandCategory
- */
-
 /**
  * Command categories allowed via registerCommand.
  * The 'workflow' category is reserved for internal use
  * and cannot be registered through this API.
- *
- * @type {Set<WPCommandCategory>}
  */
 const REGISTERABLE_CATEGORIES = new Set< CommandCategory >( [
 	'command',
@@ -23,38 +15,6 @@ const REGISTERABLE_CATEGORIES = new Set< CommandCategory >( [
 	'edit',
 	'action',
 ] );
-
-/**
- * Configuration of a registered command.
- *
- * @typedef {Object} WPCommandConfig
- *
- * @property {string}             name        Command name.
- * @property {string}             label       Command label.
- * @property {string=}            searchLabel Command search label.
- * @property {string=}            context     Command context.
- * @property {WPCommandCategory=} category    Command category.
- * @property {React.JSX.Element=} icon        Command icon.
- * @property {Function}           callback    Command callback.
- * @property {boolean=}           disabled    Whether to disable the command.
- * @property {string[]=}          keywords    Command keywords for search matching.
- */
-
-/**
- * @typedef {(options: {search: string}) => {commands?: WPCommandConfig[], isLoading?: boolean}|undefined} WPCommandLoaderHook
- */
-
-/**
- * Command loader config.
- *
- * @typedef {Object} WPCommandLoaderConfig
- *
- * @property {string}              name     Command loader name.
- * @property {string=}             context  Command loader context.
- * @property {WPCommandCategory=}  category Command loader category.
- * @property {WPCommandLoaderHook} hook     Command loader hook.
- * @property {boolean=}            disabled Whether to disable the command loader.
- */
 
 /**
  * Returns an action object used to register a new command.
