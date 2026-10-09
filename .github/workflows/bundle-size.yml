@@ -74,11 +74,22 @@ jobs:
                   # compressed-size-action checks out the base branch, and the cache post step then runs that branch's copy of this action.
                   cache: 'false'
 
+            # actions/cache versions a cache by its path string, so match the one setup-npm uses.
+            - name: Get the npm cache directory
+              id: npm-cache
+              run: |
+                  CACHE_DIR="$(npm config get cache | tr -d '\r')"
+                  if [ -z "$CACHE_DIR" ]; then
+                      echo "::error::npm config get cache printed no directory."
+                      exit 1
+                  fi
+                  echo "dir=$CACHE_DIR" >> "$GITHUB_OUTPUT"
+
             # Not part of setup-npm, so the post step does not depend on the checked out branch.
             - name: Cache npm downloads
               uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
               with:
-                  path: ~/.npm
+                  path: ${{ steps.npm-cache.outputs.dir }}
                   key: npm-cache-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package-lock.json') }}
                   restore-keys: |
                       npm-cache-${{ runner.os }}-${{ runner.arch }}-
