@@ -77,6 +77,98 @@ function refuseExtraFiles(
 }
 
 /**
+ * Adds files to the upload queue, one queue call per file.
+ *
+ * The queue calls `onChange` with one file at a time, but callers of
+ * `mediaUpload` expect every file of the upload so far, in file order, as
+ * `uploadMedia()` in `@wordpress/media-utils` provides them. A caller that
+ * replaces its list on each call would otherwise keep only one file
+ * (gutenberg#84363).
+ *
+ * @param registry          The data registry.
+ * @param settings          Block editor settings.
+ * @param $3                Parameters object passed to the function.
+ * @param $3.files          Files to upload.
+ * @param $3.allowedTypes   Array with the types of media that can be uploaded, if unset all types are allowed.
+ * @param $3.additionalData Additional data to include in the request.
+ * @param $3.onError        Function called when an error happens.
+ * @param $3.onFileChange   Function called each time a file or a temporary representation of the file is available.
+ * @param $3.onSuccess      Function called once a file has completely finished uploading, including thumbnails.
+ * @param $3.onBatchSuccess Function called once all files have completely finished uploading, including thumbnails.
+ */
+function addToUploadQueue(
+	registry: DataRegistry,
+	settings: Settings,
+	{
+		files,
+		allowedTypes,
+		additionalData,
+		onError,
+		onFileChange,
+		onSuccess,
+		onBatchSuccess,
+	}: Omit< MediaUploadOptions, 'filesList' | 'multiple' | 'onError' > & {
+		files: File[];
+		onError: ( message: string ) => void;
+	}
+) {
+	const filesSet: Array< Record< string, unknown > | null > = [];
+	const settledFiles = new Set< number >();
+
+	const updateFiles = (
+		index: number,
+		value: Record< string, unknown > | null
+	) => {
+		filesSet[ index ] = value;
+		onFileChange?.(
+			filesSet.filter(
+				( attachment ): attachment is Record< string, unknown > =>
+					!! attachment
+			)
+		);
+	};
+
+	// A failed upload reports `onError` and then `onBatchSuccess`, while a
+	// file refused before upload reports only `onError`. Count each file once.
+	const settleFile = ( index: number ) => {
+		if ( settledFiles.has( index ) ) {
+			return;
+		}
+		settledFiles.add( index );
+		if ( settledFiles.size === files.length ) {
+			onBatchSuccess?.();
+		}
+	};
+
+	files.forEach( ( file, index ) => {
+		void registry.dispatch( uploadStore ).addItems( {
+			files: [ file ],
+			onChange: ( [ attachment ] ) => updateFiles( index, attachment ),
+			onSuccess: ( attachments ) => {
+				// The private success callback takes the attachments.
+				(
+					settings?.[ mediaUploadOnSuccessKey ] as
+						( ( attachments: unknown ) => void ) | undefined
+				 )?.( attachments );
+				onSuccess?.( attachments );
+			},
+			onBatchSuccess: () => settleFile( index ),
+			onError: ( error ) => {
+				if ( filesSet[ index ] ) {
+					updateFiles( index, null );
+				}
+				settleFile( index );
+				onError(
+					typeof error === 'string' ? error : ( error?.message ?? '' )
+				);
+			},
+			additionalData,
+			allowedTypes,
+		} );
+	} );
+}
+
+/**
  * Checks if client-side media processing should be enabled.
  *
  * Returns true only if:
@@ -195,24 +287,14 @@ function mediaUpload(
 		return;
 	}
 
-	void registry.dispatch( uploadStore ).addItems( {
+	addToUploadQueue( registry, settings, {
 		files: Array.from( filesList ),
-		onChange: onFileChange,
-		onSuccess: ( attachments ) => {
-			// The private success callback takes the attachments.
-			(
-				settings?.[ mediaUploadOnSuccessKey ] as
-					( ( attachments: unknown ) => void ) | undefined
-			 )?.( attachments );
-			onSuccess?.( attachments );
-		},
-		onBatchSuccess,
-		onError: ( error ) =>
-			onError(
-				typeof error === 'string' ? error : ( error?.message ?? '' )
-			),
-		additionalData,
 		allowedTypes,
+		additionalData,
+		onError,
+		onFileChange,
+		onSuccess,
+		onBatchSuccess,
 	} );
 }
 
@@ -282,24 +364,14 @@ async function heicMediaUpload(
 
 	// Route HEIC files through the upload-media pipeline.
 	if ( heicFiles.length > 0 ) {
-		void registry.dispatch( uploadStore ).addItems( {
+		addToUploadQueue( registry, settings, {
 			files: heicFiles,
-			onChange: onFileChange,
-			onSuccess: ( attachments ) => {
-				// The private success callback takes the attachments.
-				(
-					settings?.[ mediaUploadOnSuccessKey ] as
-						( ( attachments: unknown ) => void ) | undefined
-				 )?.( attachments );
-				onSuccess?.( attachments );
-			},
-			onBatchSuccess: coordinatedBatchSuccess,
-			onError: ( error ) =>
-				onError(
-					typeof error === 'string' ? error : ( error?.message ?? '' )
-				),
-			additionalData,
 			allowedTypes,
+			additionalData,
+			onError,
+			onFileChange,
+			onSuccess,
+			onBatchSuccess: coordinatedBatchSuccess,
 		} );
 	}
 
