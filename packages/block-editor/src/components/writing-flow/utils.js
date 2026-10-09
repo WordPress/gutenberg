@@ -13,6 +13,28 @@ import { store as blockEditorStore } from '../../store';
 
 export const requiresWrapperOnCopy = Symbol( 'requiresWrapperOnCopy' );
 
+// How far the pointer must travel before a press counts as a drag, so that a
+// click (with a slightly shaky hand) is not taken for one.
+export const DRAG_THRESHOLD = 3;
+
+/**
+ * Whether a press is on the scrollbar of the element it targets: the press is
+ * then outside of the element's client area, right of it, or left of it in
+ * right-to-left layouts, or below it.
+ *
+ * @param {MouseEvent} event The press.
+ *
+ * @return {boolean} Whether the press is on a scrollbar.
+ */
+export function isOnScrollbar( { target, offsetX, offsetY } ) {
+	return (
+		offsetX < 0 ||
+		offsetY < 0 ||
+		offsetX > target.clientWidth ||
+		offsetY > target.clientHeight
+	);
+}
+
 /**
  * Sets the clipboard data for the provided blocks, with both HTML and plain
  * text representations.
