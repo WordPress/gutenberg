@@ -35,7 +35,7 @@ try {
 
 /**
  * ESLint v10 forbids redefining a plugin under the same key unless the
- * reference is strictly identical. Because the @wordpress/eslint-plugin
+ * reference is strictly identical. Because the `@wordpress/eslint-plugin`
  * configs are assembled from separate sub-configs that each carry their own
  * copy of the plugin object, we normalise them here so that every occurrence
  * of the same plugin name resolves to a single shared reference.

@@ -54,8 +54,8 @@ const CATEGORY_LABELS = {
 
 /**
  * Function that checks if the parameter is a valid icon.
- * Taken from @wordpress/blocks/src/api/utils.js and copied
- * in case requirements diverge and to avoid a dependency on @wordpress/blocks.
+ * Taken from `@wordpress/blocks/src/api/utils.js` and copied
+ * in case requirements diverge and to avoid a dependency on `@wordpress/blocks`.
  *
  * @param {*} icon Parameter to be checked.
  *

@@ -1,5 +1,5 @@
 /**
- * Main entry point for @wordpress/worker-threads.
+ * Main entry point for `@wordpress/worker-threads`.
  *
  * This module provides utilities for type-safe Web Worker communication
  * using an RPC (Remote Procedure Call) pattern. It allows you to call

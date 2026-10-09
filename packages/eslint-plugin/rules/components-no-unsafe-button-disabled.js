@@ -1,7 +1,7 @@
 const { hasTruthyJsxAttribute } = require( '../utils' );
 
 /**
- * Enforces that Button from @wordpress/components includes `accessibleWhenDisabled`
+ * Enforces that Button from `@wordpress/components` includes `accessibleWhenDisabled`
  * when `disabled` is set.
  *
  * @type {import('eslint').Rule.RuleModule}

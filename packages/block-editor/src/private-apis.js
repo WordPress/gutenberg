@@ -82,7 +82,7 @@ import { isElementVisible } from './utils/dom';
 const { getDuotoneFilter } = unlock( globalStylesEnginePrivateApis );
 
 /**
- * Private @wordpress/block-editor APIs.
+ * Private `@wordpress/block-editor` APIs.
  */
 export const privateApis = {};
 lock( privateApis, {
