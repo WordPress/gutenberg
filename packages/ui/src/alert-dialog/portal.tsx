@@ -11,7 +11,11 @@ const Portal = forwardRef< HTMLDivElement, PortalProps >(
 		return (
 			<_AlertDialog.Portal
 				ref={ ref }
-				container={ container ?? getWpCompatOverlaySlot() }
+				container={
+					container === undefined
+						? getWpCompatOverlaySlot()
+						: container
+				}
 				{ ...props }
 			/>
 		);
