@@ -257,12 +257,12 @@ for ( const name of Object.getOwnPropertyNames( String.prototype ) ) {
  * `start` and `end` state which text indices are selected. They are only
  * provided if a `Range` was given.
  *
- * @param [$1]                          Optional named arguments.
- * @param [$1.element]                  Element to create value from.
- * @param [$1.text]                     Text to create value from.
- * @param [$1.html]                     HTML to create value from.
- * @param [$1.range]                    Range to create value from.
- * @param [$1.__unstableIsEditableTree]
+ * @param [options]                          Optional named arguments.
+ * @param [options.element]                  Element to create value from.
+ * @param [options.text]                     Text to create value from.
+ * @param [options.html]                     HTML to create value from.
+ * @param [options.range]                    Range to create value from.
+ * @param [options.__unstableIsEditableTree]
  * @return A rich text value.
  */
 export function create( {
@@ -516,10 +516,10 @@ export function removeReservedCharacters( string: string ) {
 /**
  * Creates a Rich Text value from a DOM element and range.
  *
- * @param $1                  Named arguments.
- * @param [$1.element]        Element to create value from.
- * @param [$1.range]          Range to create value from.
- * @param [$1.isEditableTree]
+ * @param options                  Named arguments.
+ * @param [options.element]        Element to create value from.
+ * @param [options.range]          Range to create value from.
+ * @param [options.isEditableTree]
  *
  * @return A rich text value.
  */
@@ -724,8 +724,8 @@ function createFromElement( {
 /**
  * Gets the attributes of an element in object shape.
  *
- * @param $1         Named arguments.
- * @param $1.element Element to get attributes from.
+ * @param options         Named arguments.
+ * @param options.element Element to get attributes from.
  *
  * @return Attribute object or `undefined` if the element has no attributes.
  */
