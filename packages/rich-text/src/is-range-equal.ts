@@ -3,12 +3,12 @@
  * considered equal if their start and end occur in the same container and
  * offset.
  *
- * @param {Range|null} a First range object to test.
- * @param {Range|null} b First range object to test.
+ * @param a First range object to test.
+ * @param b First range object to test.
  *
- * @return {boolean} Whether the two ranges are equal.
+ * @return Whether the two ranges are equal.
  */
-export function isRangeEqual( a, b ) {
+export function isRangeEqual( a: Range | null, b: Range | null ) {
 	return (
 		a === b ||
 		( a &&

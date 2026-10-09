@@ -1,6 +1,14 @@
 import { toTree } from './to-tree';
 import { createElement } from './create-element';
 import { isRangeEqual } from './is-range-equal';
+import type {
+	RichTextFormatList,
+	RichTextValue,
+	ToDomSelection,
+	ToTreeOptions,
+	TreeElement,
+	TreeHTML,
+} from './types';
 
 /**
  * MathML namespace URI.
@@ -9,23 +17,21 @@ import { isRangeEqual } from './is-range-equal';
  */
 const MATHML_NAMESPACE = 'http://www.w3.org/1998/Math/MathML';
 
-/** @typedef {import('./types').RichTextValue} RichTextValue */
-
 /**
  * Creates a path as an array of indices from the given root node to the given
  * node.
  *
- * @param {Node}        node     Node to find the path of.
- * @param {HTMLElement} rootNode Root node to find the path from.
- * @param {Array}       path     Initial path to build on.
+ * @param node     Node to find the path of.
+ * @param rootNode Root node to find the path from.
+ * @param path     Initial path to build on.
  *
- * @return {Array} The path from the root node to the node.
+ * @return The path from the root node to the node.
  */
-function createPathToNode( node, rootNode, path ) {
-	const parentNode = node.parentNode;
+function createPathToNode( node: Node | null, rootNode: Node, path: number[] ) {
+	const parentNode = node!.parentNode;
 	let i = 0;
 
-	while ( ( node = node.previousSibling ) ) {
+	while ( ( node = node!.previousSibling ) ) {
 		i++;
 	}
 
@@ -41,16 +47,16 @@ function createPathToNode( node, rootNode, path ) {
 /**
  * Gets a node given a path (array of indices) from the given node.
  *
- * @param {HTMLElement} node Root node to find the wanted node in.
- * @param {Array}       path Path (indices) to the wanted node.
+ * @param node Root node to find the wanted node in.
+ * @param path Path (indices) to the wanted node.
  *
- * @return {Object} Object with the found node and the remaining offset (if any).
+ * @return Object with the found node and the remaining offset (if any).
  */
-function getNodeByPath( node, path ) {
+function getNodeByPath( node: Node, path: number[] ) {
 	path = [ ...path ];
 
 	while ( node && path.length > 1 ) {
-		node = node.childNodes[ path.shift() ];
+		node = node.childNodes[ path.shift()! ];
 	}
 
 	return {
@@ -59,21 +65,26 @@ function getNodeByPath( node, path ) {
 	};
 }
 
-function append( element, child ) {
-	if ( child.html !== undefined ) {
-		return ( element.innerHTML += child.html );
+function append( element: Element, child: TreeHTML ): string;
+function append( element: Element, child: string | TreeElement ): Node;
+function append(
+	element: Element,
+	child: string | TreeElement | TreeHTML | Node
+) {
+	if ( ( child as TreeHTML ).html !== undefined ) {
+		return ( element.innerHTML += ( child as TreeHTML ).html );
 	}
 
 	if ( typeof child === 'string' ) {
 		child = element.ownerDocument.createTextNode( child );
 	}
 
-	const { type, attributes } = child;
+	const { type, attributes } = child as TreeElement;
 
 	if ( type ) {
 		if ( type === '#comment' ) {
 			child = element.ownerDocument.createComment(
-				attributes[ 'data-rich-text-comment' ]
+				attributes![ 'data-rich-text-comment' ] as string
 			);
 		} else {
 			// Handle namespace-aware element creation
@@ -102,36 +113,39 @@ function append( element, child ) {
 			}
 
 			for ( const key in attributes ) {
-				child.setAttribute( key, attributes[ key ] );
+				( child as Element ).setAttribute(
+					key,
+					attributes[ key ] as string
+				);
 			}
 		}
 	}
 
-	return element.appendChild( child );
+	return element.appendChild( child as Node );
 }
 
-function appendText( node, text ) {
+function appendText( node: Text, text: string ) {
 	node.appendData( text );
 }
 
-function getLastChild( { lastChild } ) {
-	return lastChild;
+function getLastChild( { lastChild }: Node ) {
+	return lastChild!;
 }
 
-function getParent( { parentNode } ) {
-	return parentNode;
+function getParent( { parentNode }: Node ) {
+	return parentNode!;
 }
 
-function isText( node ) {
+function isText( node: Node ) {
 	return node.nodeType === node.TEXT_NODE;
 }
 
-function getText( { nodeValue } ) {
-	return nodeValue;
+function getText( { nodeValue }: Node ) {
+	return nodeValue!;
 }
 
-function remove( node ) {
-	return node.parentNode.removeChild( node );
+function remove( node: Node ) {
+	return node.parentNode!.removeChild( node );
 }
 
 export function toDom( {
@@ -140,9 +154,15 @@ export function toDom( {
 	isEditableTree = true,
 	placeholder,
 	doc = document,
+}: {
+	value: RichTextValue;
+	prepareEditableTree?: ( value: RichTextValue ) => RichTextFormatList[];
+	isEditableTree?: boolean;
+	placeholder?: string;
+	doc?: Document;
 } ) {
-	let startPath = [];
-	let endPath = [];
+	let startPath: number[] = [];
+	let endPath: number[] = [];
 
 	if ( prepareEditableTree ) {
 		value = {
@@ -159,28 +179,29 @@ export function toDom( {
 	 * each call to `createEmpty`. Therefore, you should not hold a reference to
 	 * the value to operate upon asynchronously, as it may have unexpected results.
 	 *
-	 * @return {Object} RichText tree.
+	 * @return RichText tree.
 	 */
 	const createEmpty = () => createElement( doc, '' );
 
-	const tree = toTree( {
+	const tree = toTree< Node >( {
 		value,
 		createEmpty,
-		append,
+		// `toTree` only appends to elements, and appends text to text nodes.
+		append: append as ToTreeOptions< Node >[ 'append' ],
 		getLastChild,
 		getParent,
 		isText,
 		getText,
 		remove,
-		appendText,
+		appendText: appendText as ToTreeOptions< Node >[ 'appendText' ],
 		onStartIndex( body, pointer ) {
 			startPath = createPathToNode( pointer, body, [
-				pointer.nodeValue.length,
+				pointer.nodeValue!.length,
 			] );
 		},
 		onEndIndex( body, pointer ) {
 			endPath = createPathToNode( pointer, body, [
-				pointer.nodeValue.length,
+				pointer.nodeValue!.length,
 			] );
 		},
 		isEditableTree,
@@ -197,12 +218,12 @@ export function toDom( {
  * Create an `Element` tree from a Rich Text value and applies the difference to
  * the `Element` tree contained by `current`.
  *
- * @param {Object}        $1                       Named arguments.
- * @param {RichTextValue} $1.value                 Value to apply.
- * @param {HTMLElement}   $1.current               The live root node to apply the element tree to.
- * @param {Function}      [$1.prepareEditableTree] Function to filter editorable formats.
- * @param {boolean}       [$1.__unstableDomOnly]   Only apply elements, no selection.
- * @param {string}        [$1.placeholder]         Placeholder text.
+ * @param $1                       Named arguments.
+ * @param $1.value                 Value to apply.
+ * @param $1.current               The live root node to apply the element tree to.
+ * @param [$1.prepareEditableTree] Function to filter editorable formats.
+ * @param [$1.__unstableDomOnly]   Only apply elements, no selection.
+ * @param [$1.placeholder]         Placeholder text.
  */
 export function apply( {
 	value,
@@ -210,6 +231,12 @@ export function apply( {
 	prepareEditableTree,
 	__unstableDomOnly,
 	placeholder,
+}: {
+	value: RichTextValue;
+	current: HTMLElement;
+	prepareEditableTree?: ( value: RichTextValue ) => RichTextFormatList[];
+	__unstableDomOnly?: boolean;
+	placeholder?: string;
 } ) {
 	// Construct a new element tree in memory.
 	const { body, selection } = toDom( {
@@ -226,7 +253,7 @@ export function apply( {
 	}
 }
 
-export function applyValue( future, current ) {
+export function applyValue( future: Node, current: Node ) {
 	let i = 0;
 	let futureChild;
 
@@ -239,12 +266,14 @@ export function applyValue( future, current ) {
 			if (
 				currentChild.nodeName !== futureChild.nodeName ||
 				( currentChild.nodeType === currentChild.TEXT_NODE &&
-					currentChild.data !== futureChild.data )
+					( currentChild as Text ).data !==
+						( futureChild as Text ).data )
 			) {
 				current.replaceChild( futureChild, currentChild );
 			} else {
-				const currentAttributes = currentChild.attributes;
-				const futureAttributes = futureChild.attributes;
+				const currentAttributes = ( currentChild as Element )
+					.attributes;
+				const futureAttributes = ( futureChild as Element ).attributes;
 
 				if ( currentAttributes ) {
 					let ii = currentAttributes.length;
@@ -254,8 +283,10 @@ export function applyValue( future, current ) {
 					while ( ii-- ) {
 						const { name } = currentAttributes[ ii ];
 
-						if ( ! futureChild.getAttribute( name ) ) {
-							currentChild.removeAttribute( name );
+						if (
+							! ( futureChild as Element ).getAttribute( name )
+						) {
+							( currentChild as Element ).removeAttribute( name );
 						}
 					}
 				}
@@ -264,8 +295,14 @@ export function applyValue( future, current ) {
 					for ( let ii = 0; ii < futureAttributes.length; ii++ ) {
 						const { name, value } = futureAttributes[ ii ];
 
-						if ( currentChild.getAttribute( name ) !== value ) {
-							currentChild.setAttribute( name, value );
+						if (
+							( currentChild as Element ).getAttribute( name ) !==
+							value
+						) {
+							( currentChild as Element ).setAttribute(
+								name,
+								value
+							);
 						}
 					}
 				}
@@ -285,7 +322,10 @@ export function applyValue( future, current ) {
 	}
 }
 
-export function applySelection( { startPath, endPath }, current ) {
+export function applySelection(
+	{ startPath, endPath }: ToDomSelection,
+	current: HTMLElement
+) {
 	const { node: startContainer, offset: startOffset } = getNodeByPath(
 		current,
 		startPath
@@ -296,7 +336,7 @@ export function applySelection( { startPath, endPath }, current ) {
 	);
 	const { ownerDocument } = current;
 	const { defaultView } = ownerDocument;
-	const selection = defaultView.getSelection();
+	const selection = defaultView!.getSelection()!;
 	const range = ownerDocument.createRange();
 
 	range.setStart( startContainer, startOffset );
@@ -325,7 +365,7 @@ export function applySelection( { startPath, endPath }, current ) {
 		// or `blur` property).
 		//
 		// See: https://github.com/Microsoft/TypeScript/issues/5901#issuecomment-431649653
-		if ( activeElement instanceof defaultView.HTMLElement ) {
+		if ( activeElement instanceof defaultView!.HTMLElement ) {
 			activeElement.focus();
 		}
 	}

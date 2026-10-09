@@ -1,8 +1,10 @@
 import { insert } from './insert';
 import { OBJECT_REPLACEMENT_CHARACTER } from './special-characters';
-
-/** @typedef {import('./types').RichTextValue} RichTextValue */
-/** @typedef {import('./types').RichTextFormat} RichTextFormat */
+import type {
+	RichTextFormat,
+	RichTextFormatList,
+	RichTextValue,
+} from './types';
 
 /**
  * Insert a format as an object into a Rich Text value at the given
@@ -16,9 +18,14 @@ import { OBJECT_REPLACEMENT_CHARACTER } from './special-characters';
  *
  * @return {RichTextValue} A new value with the object inserted.
  */
-export function insertObject( value, formatToInsert, startIndex, endIndex ) {
+export function insertObject(
+	value: RichTextValue,
+	formatToInsert: RichTextFormat,
+	startIndex?: number,
+	endIndex?: number
+) {
 	const valueToInsert = {
-		formats: [ , ],
+		formats: [ , ] as unknown as RichTextFormatList[],
 		replacements: [ formatToInsert ],
 		text: OBJECT_REPLACEMENT_CHARACTER,
 	};

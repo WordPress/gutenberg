@@ -1,9 +1,15 @@
 import { normaliseFormats } from './normalise-formats';
+import type {
+	RichTextFormat,
+	RichTextFormatList,
+	RichTextValue,
+} from './types';
 
-/** @typedef {import('./types').RichTextValue} RichTextValue */
-/** @typedef {import('./types').RichTextFormat} RichTextFormat */
-
-function replace( array, index, value ) {
+function replace(
+	array: RichTextFormatList,
+	index: number,
+	value: RichTextFormat
+) {
 	array = array.slice();
 	array[ index ] = value;
 	return array;
@@ -14,16 +20,16 @@ function replace( array, index, value ) {
  * given `endIndex`. Indices are retrieved from the selection if none are
  * provided.
  *
- * @param {RichTextValue}  value        Value to modify.
- * @param {RichTextFormat} format       Format to apply.
- * @param {number}         [startIndex] Start index.
- * @param {number}         [endIndex]   End index.
+ * @param value        Value to modify.
+ * @param format       Format to apply.
+ * @param [startIndex] Start index.
+ * @param [endIndex]   End index.
  *
- * @return {RichTextValue} A new value with the format applied.
+ * @return A new value with the format applied.
  */
 export function applyFormat(
-	value,
-	format,
+	value: RichTextValue,
+	format: RichTextFormat,
 	startIndex = value.start,
 	endIndex = value.end
 ) {

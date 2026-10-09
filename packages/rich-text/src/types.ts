@@ -1,3 +1,4 @@
+import type { WPKeycodeModifier } from '@wordpress/keycodes';
 import type * as actions from './store/actions';
 
 /**
@@ -119,3 +120,104 @@ export type SelectionRange = Pick<
 	Range,
 	'startContainer' | 'startOffset' | 'endContainer' | 'endOffset'
 >;
+
+/**
+ * Props of `RichTextShortcut`, which calls `onUse` when the shortcut is pressed.
+ */
+export type RichTextShortcutProps = {
+	/**
+	 * The character key of the shortcut.
+	 */
+	character: string;
+	/**
+	 * The modifier of the shortcut, such as `primary`.
+	 */
+	type: WPKeycodeModifier;
+	/**
+	 * Called when the shortcut is pressed.
+	 */
+	onUse: () => void;
+};
+
+/**
+ * Props of `RichTextInputEvent`, which calls `onInput` for a given input type.
+ */
+export type RichTextInputEventProps = {
+	/**
+	 * The `InputEvent.inputType` to handle, such as `formatBold`.
+	 */
+	inputType: string;
+	/**
+	 * Called when an input event of `inputType` is fired.
+	 */
+	onInput: () => void;
+};
+
+/**
+ * Attributes of an element created by `toTree`. Editable trees also set
+ * boolean flags such as `data-rich-text-bogus`.
+ */
+export type TreeAttributes = Record< string, string | boolean >;
+
+/**
+ * An element to create while building a tree from a rich text value.
+ */
+export type TreeElement = {
+	type: string;
+	attributes?: TreeAttributes;
+	object?: boolean;
+};
+
+/**
+ * Raw HTML to insert while building a tree from a rich text value.
+ */
+export type TreeHTML = {
+	html: string;
+};
+
+/**
+ * Options of `toTree`. The callbacks build a tree of `T`, such as DOM nodes or
+ * plain objects.
+ */
+export type ToTreeOptions< T > = {
+	value: RichTextValue;
+	preserveWhiteSpace?: boolean;
+	createEmpty: () => T;
+	append: {
+		( parent: T, object: TreeHTML ): unknown;
+		( parent: T, object: string | TreeElement ): T;
+	};
+	getLastChild: ( node: T ) => T;
+	getParent: ( node: T ) => T;
+	isText: ( node: T ) => boolean;
+	getText: ( node: T ) => string;
+	remove: ( node: T ) => T;
+	appendText: ( node: T, text: string ) => void;
+	onStartIndex?: ( tree: T, pointer: T ) => void;
+	onEndIndex?: ( tree: T, pointer: T ) => void;
+	isEditableTree?: boolean;
+	placeholder?: string;
+};
+
+/**
+ * The selection of a tree built by `toDom`, as paths of child indices from the
+ * root, ending with the offset.
+ */
+export type ToDomSelection = {
+	startPath: number[];
+	endPath: number[];
+};
+
+/**
+ * A node of the plain object tree `toHTMLString` builds. Text nodes have
+ * `text`, raw HTML has `html`, and elements have `type`.
+ */
+export type HTMLTreeNode = {
+	type?: string;
+	attributes?: TreeAttributes;
+	object?: boolean;
+	html?: string;
+	text?: string;
+	parent?: HTMLTreeNode;
+	children?: HTMLTreeNode[];
+};
