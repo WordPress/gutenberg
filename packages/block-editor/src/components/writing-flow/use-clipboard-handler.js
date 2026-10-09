@@ -17,6 +17,7 @@ import { useNotifyCopy } from '../../utils/use-notify-copy';
 import { setClipboardBlocks, setContentEditableWrapper } from './utils';
 import { getPasteEventData } from '../../utils/pasting';
 import { getBlockClientId } from '../../utils/dom';
+import { replacePatternOverridesDefaultBinding } from '../../utils/block-bindings';
 
 /**
  * Whether the DOM selection entirely spans the content of the given block,
@@ -56,6 +57,8 @@ export default function useClipboardHandler() {
 		__unstableGetSelectedBlocksWithPartialSelection,
 		canInsertBlockType,
 		getBlockRootClientId,
+		getSelectionStart,
+		getBlockAttributes,
 	} = useSelect( blockEditorStore );
 	const {
 		flashBlock,
@@ -94,6 +97,26 @@ export default function useClipboardHandler() {
 					event.target.ownerDocument,
 					selectedBlockClientIds[ 0 ]
 				);
+
+			if ( isWholeSingleBlockCopy ) {
+				const { clientId, attributeKey } = getSelectionStart();
+				const supportedAttributes =
+					getSettings()
+						.__experimentalBlockBindingsSupportedAttributes?.[
+						getBlockName( clientId )
+					] ?? [];
+				const bindings = replacePatternOverridesDefaultBinding(
+					getBlockAttributes( clientId )?.metadata?.bindings,
+					supportedAttributes
+				);
+
+				if (
+					supportedAttributes.includes( attributeKey ) &&
+					bindings?.[ attributeKey ]
+				) {
+					return;
+				}
+			}
 
 			// Let native copy/paste behaviour take over in input fields.
 			// But always handle multiple selected blocks.
