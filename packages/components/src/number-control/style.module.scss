@@ -1,0 +1,27 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
+.hide-html-arrows {
+	input[type="number"]::-webkit-outer-spin-button,
+	input[type="number"]::-webkit-inner-spin-button {
+		-webkit-appearance: none !important;
+		margin: 0 !important;
+	}
+
+	input[type="number"] {
+		-moz-appearance: textfield;
+	}
+}
+
+.spin-button {
+	// Preserve the specificity of the Emotion wrapper over Button styles.
+	&.spin-button.spin-button.spin-button.spin-button {
+		color: $components-color-accent;
+	}
+
+	&:where(.is-small) {
+		width: $grid-unit-20 + $grid-unit-05;
+		min-width: $grid-unit-20 + $grid-unit-05;
+		height: $grid-unit-20 + $grid-unit-05;
+	}
+}

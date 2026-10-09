@@ -11,6 +11,7 @@ import type {
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 import { WidgetActions } from '../components/widget-actions/widget-actions';
 import { WidgetFooter } from '../components/widget-footer/widget-footer';
+import { WidgetDashboard } from '../widget-dashboard';
 
 const MATCHED_HREF = 'admin.php?page=dashboard&p=/reports';
 const MATCHED_PATH = '/reports';
@@ -25,7 +26,10 @@ function createHost( onNavigate?: ( path: string ) => void ) {
 	const HostLink = forwardRef<
 		HTMLAnchorElement,
 		{ path: string } & Omit< ComponentPropsWithoutRef< 'a' >, 'href' >
-	>( function HostLink( { path, onClick, children, ...props }, ref ) {
+	>( function UnforwardedHostLink(
+		{ path, onClick, children, ...props },
+		ref
+	) {
 		receivedRef.push( ref !== null );
 
 		return (
@@ -55,9 +59,19 @@ function createHost( onNavigate?: ( path: string ) => void ) {
 	return { links, receivedRef };
 }
 
+/* The surfaces read the pending map from the dashboard's context. */
 function renderWithHost( ui: ReactNode, links: WidgetHostLinks ) {
 	return renderInBrowser(
-		<WidgetHostProvider value={ { links } }>{ ui }</WidgetHostProvider>
+		<WidgetHostProvider value={ { links } }>
+			<WidgetDashboard
+				layout={ [] }
+				onLayoutChange={ () => {} }
+				widgetTypes={ [] }
+				resolveWidgetModule={ async () => ( { default: () => null } ) }
+			>
+				{ ui }
+			</WidgetDashboard>
+		</WidgetHostProvider>
 	);
 }
 
@@ -111,7 +125,7 @@ describe( 'host links across the chrome compositions', () => {
 		it( 'mounts the host link for a matched high action', async () => {
 			const { links } = createHost();
 			await renderWithHost(
-				<WidgetFooter actions={ footerActions } />,
+				<WidgetFooter uuid="w1" actions={ footerActions } />,
 				links
 			);
 
@@ -123,7 +137,7 @@ describe( 'host links across the chrome compositions', () => {
 		it( 'keeps the plain anchor for an unmatched high action', async () => {
 			const { links } = createHost();
 			await renderWithHost(
-				<WidgetFooter actions={ footerActions } />,
+				<WidgetFooter uuid="w1" actions={ footerActions } />,
 				links
 			);
 
@@ -140,7 +154,7 @@ describe( 'host links across the chrome compositions', () => {
 		it( 'hands the tooltip ref to the host link of a matched medium action', async () => {
 			const { links, receivedRef } = createHost();
 			await renderWithHost(
-				<WidgetFooter actions={ footerActions } />,
+				<WidgetFooter uuid="w1" actions={ footerActions } />,
 				links
 			);
 
@@ -156,7 +170,7 @@ describe( 'host links across the chrome compositions', () => {
 		it( 'keeps the plain anchor and the download for a download action', async () => {
 			const { links } = createHost();
 			await renderWithHost(
-				<WidgetFooter actions={ footerActions } />,
+				<WidgetFooter uuid="w1" actions={ footerActions } />,
 				links
 			);
 
@@ -169,7 +183,7 @@ describe( 'host links across the chrome compositions', () => {
 		it( 'keeps the plain anchor for an empty-string download', async () => {
 			const { links } = createHost();
 			await renderWithHost(
-				<WidgetFooter actions={ footerActions } />,
+				<WidgetFooter uuid="w1" actions={ footerActions } />,
 				links
 			);
 
@@ -184,7 +198,7 @@ describe( 'host links across the chrome compositions', () => {
 		it( 'keeps the plain anchor for a new-tab action', async () => {
 			const { links } = createHost();
 			await renderWithHost(
-				<WidgetFooter actions={ footerActions } />,
+				<WidgetFooter uuid="w1" actions={ footerActions } />,
 				links
 			);
 
@@ -214,7 +228,7 @@ describe( 'host links across the chrome compositions', () => {
 			const user = userEvent.setup();
 			const { links } = createHost();
 			await renderWithHost(
-				<WidgetFooter actions={ footerActions } />,
+				<WidgetFooter uuid="w1" actions={ footerActions } />,
 				links
 			);
 
@@ -236,6 +250,7 @@ describe( 'host links across the chrome compositions', () => {
 			const { links } = createHost( onNavigate );
 			await renderWithHost(
 				<WidgetActions
+					uuid="w1"
 					actions={ [
 						{
 							id: 'report',
@@ -290,7 +305,7 @@ describe( 'host links across the chrome compositions', () => {
 			const user = userEvent.setup();
 			const { links, receivedRef } = createHost();
 			await renderWithHost(
-				<WidgetActions actions={ menuActions } />,
+				<WidgetActions uuid="w1" actions={ menuActions } />,
 				links
 			);
 
@@ -334,7 +349,7 @@ describe( 'host links across the chrome compositions', () => {
 			const user = userEvent.setup();
 			const { links } = createHost();
 			await renderWithHost(
-				<WidgetActions actions={ menuActions } />,
+				<WidgetActions uuid="w1" actions={ menuActions } />,
 				links
 			);
 

@@ -121,7 +121,7 @@ export function FlatTermSelector( { slug } ) {
 				...DEFAULT_QUERY,
 				// Sort ids so reordering alone doesn't produce a new query key and re-fetch.
 				include: _termIds?.length
-					? [ ..._termIds ].sort( ( a, b ) => a - b ).join( ',' )
+					? _termIds.toSorted( ( a, b ) => a - b ).join( ',' )
 					: undefined,
 				per_page: -1,
 			};
@@ -417,20 +417,6 @@ export function FlatTermSelector( { slug } ) {
 				}
 				emptyContent={ isSearching ? null : notFoundLabel }
 				showClearButton={ false }
-				chipsContent={ ( selectedTerms ) =>
-					selectedTerms.map( ( term ) => (
-						<SearchableChipSelectControl.ChipWithRemove
-							key={ term.value }
-							removeLabel={ sprintf(
-								/* translators: %s: term name. */
-								_x( 'Remove %s', 'term' ),
-								term.label
-							) }
-						>
-							{ term.label }
-						</SearchableChipSelectControl.ChipWithRemove>
-					) )
-				}
 			/>
 			<MostUsedTerms taxonomy={ taxonomy } onSelect={ appendTerm } />
 		</Stack>

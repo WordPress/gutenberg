@@ -19,12 +19,12 @@ import {
 } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
 import { symbol } from '@wordpress/icons';
-import { logged } from '@wordpress/deprecated';
 import { select, dispatch } from '@wordpress/data';
 import * as selectors from '../selectors';
 import { store } from '../';
 import { lock } from '../../lock-unlock';
 import { sectionRootClientIdKey } from '../private-keys';
+import { isFiltered } from '../utils';
 
 const {
 	getBlockName,
@@ -3934,6 +3934,56 @@ describe( 'selectors', () => {
 			);
 		} );
 
+		it( 'should reuse item objects across roots', async () => {
+			await dispatch( store ).resetBlocks( [
+				{
+					clientId: 'block3',
+					name: 'core/test-block-a',
+					innerBlocks: [],
+				},
+				{
+					clientId: 'block4',
+					name: 'core/test-block-a',
+					innerBlocks: [],
+				},
+			] );
+			await dispatch( store ).updateBlockListSettings( 'block3', {} );
+			await dispatch( store ).updateBlockListSettings( 'block4', {} );
+
+			const forFirstRoot = select( store ).getInserterItems( 'block3' );
+			const forSecondRoot = select( store ).getInserterItems( 'block4' );
+			expect( forFirstRoot ).not.toBe( forSecondRoot );
+			expect( forFirstRoot.length ).toBeGreaterThan( 0 );
+			forFirstRoot.forEach( ( item, index ) => {
+				expect( item ).toBe( forSecondRoot[ index ] );
+			} );
+
+			// The copies carrying `isAllowedInCurrentRoot` are shared too.
+			const allForFirstRoot = select( store ).getInserterItems(
+				'block3',
+				{
+					[ isFiltered ]: false,
+				}
+			);
+			const allForSecondRoot = select( store ).getInserterItems(
+				'block4',
+				{ [ isFiltered ]: false }
+			);
+			allForFirstRoot.forEach( ( item, index ) => {
+				expect( item ).toBe( allForSecondRoot[ index ] );
+			} );
+
+			// A change under another root does not rebuild the items either.
+			await dispatch( store ).updateBlockListSettings( 'block4', {
+				allowedBlocks: [ 'core/test-block-b' ],
+			} );
+			const afterChange = select( store ).getInserterItems( 'block3' );
+			afterChange.forEach( ( item, index ) => {
+				expect( item ).toBe( forFirstRoot[ index ] );
+			} );
+			await dispatch( store ).updateBlockListSettings( 'block4', {} );
+		} );
+
 		it( 'should set isDisabled when a block with `multiple: false` has been used', async () => {
 			await dispatch( store ).resetBlocks( [
 				{
@@ -4658,64 +4708,67 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getActiveBlockIdByBlockName', () => {
-		const state = {
-			selection: {
-				selectionStart: {
-					clientId: 'client-id-04',
+		let state;
+		beforeEach( () => {
+			state = {
+				selection: {
+					selectionStart: {
+						clientId: 'client-id-04',
+					},
+					selectionEnd: {
+						clientId: 'client-id-04',
+					},
 				},
-				selectionEnd: {
-					clientId: 'client-id-04',
+				blocks: {
+					parents: new Map(
+						Object.entries( {
+							'client-id-01': '',
+							'client-id-02': 'client-id-01',
+							'client-id-03': 'client-id-02',
+							'client-id-04': 'client-id-03',
+							'client-id-05': 'client-id-03',
+						} )
+					),
+					byClientId: new Map(
+						Object.entries( {
+							'client-id-01': {
+								clientId: 'client-id-01',
+								name: 'core/columns',
+							},
+							'client-id-02': {
+								clientId: 'client-id-02',
+								name: 'core/navigation',
+							},
+							'client-id-03': {
+								clientId: 'client-id-03',
+								name: 'core/navigation-link',
+							},
+							'client-id-04': {
+								clientId: 'client-id-04',
+								name: 'core/navigation-link',
+							},
+							'client-id-05': {
+								clientId: 'client-id-05',
+								name: 'core/navigation-link',
+							},
+						} )
+					),
+					cache: {
+						'client-id-01': {},
+						'client-id-02': {},
+						'client-id-03': {},
+						'client-id-04': {},
+						'client-id-05': {},
+					},
+					order: new Map(
+						Object.entries( {
+							'client-id-03': [ 'client-id-04', 'client-id-05' ],
+						} )
+					),
+					controlledInnerBlocks: new Set(),
 				},
-			},
-			blocks: {
-				parents: new Map(
-					Object.entries( {
-						'client-id-01': '',
-						'client-id-02': 'client-id-01',
-						'client-id-03': 'client-id-02',
-						'client-id-04': 'client-id-03',
-						'client-id-05': 'client-id-03',
-					} )
-				),
-				byClientId: new Map(
-					Object.entries( {
-						'client-id-01': {
-							clientId: 'client-id-01',
-							name: 'core/columns',
-						},
-						'client-id-02': {
-							clientId: 'client-id-02',
-							name: 'core/navigation',
-						},
-						'client-id-03': {
-							clientId: 'client-id-03',
-							name: 'core/navigation-link',
-						},
-						'client-id-04': {
-							clientId: 'client-id-04',
-							name: 'core/navigation-link',
-						},
-						'client-id-05': {
-							clientId: 'client-id-05',
-							name: 'core/navigation-link',
-						},
-					} )
-				),
-				cache: {
-					'client-id-01': {},
-					'client-id-02': {},
-					'client-id-03': {},
-					'client-id-04': {},
-					'client-id-05': {},
-				},
-				order: new Map(
-					Object.entries( {
-						'client-id-03': [ 'client-id-04', 'client-id-05' ],
-					} )
-				),
-				controlledInnerBlocks: new Set(),
-			},
-		};
+			};
+		} );
 		it( 'Should return first active matching block (including self) when single block selected', () => {
 			expect(
 				getActiveBlockIdByBlockNames( state, [
@@ -5314,6 +5367,9 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 } );
 
 describe( '__unstableGetClientIdWithClientIdsTree', () => {
+	const DEPRECATION_MESSAGE =
+		"wp.data.select( 'core/block-editor' ).__unstableGetClientIdWithClientIdsTree is deprecated since version 6.3 and will be removed in version 6.5.";
+
 	it( "should return a stripped down block object containing only its client ID and its inner blocks' client IDs", () => {
 		const state = {
 			blocks: {
@@ -5339,13 +5395,12 @@ describe( '__unstableGetClientIdWithClientIdsTree', () => {
 				{ clientId: 'baz', innerBlocks: [] },
 			],
 		} );
-		expect( console ).toHaveWarned();
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
 	} );
 } );
 describe( '__unstableGetClientIdsTree', () => {
-	afterEach( () => {
-		Object.keys( logged ).forEach( ( key ) => delete logged[ key ] );
-	} );
+	const DEPRECATION_MESSAGE =
+		"wp.data.select( 'core/block-editor' ).__unstableGetClientIdsTree is deprecated since version 6.3 and will be removed in version 6.5.";
 
 	it( "should return the full content tree starting from the given root, consisting of stripped down block object containing only its client ID and its inner blocks' client IDs", () => {
 		const state = {
@@ -5367,7 +5422,7 @@ describe( '__unstableGetClientIdsTree', () => {
 			},
 			{ clientId: 'baz', innerBlocks: [] },
 		] );
-		expect( console ).toHaveWarned();
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
 	} );
 
 	it( "should return the full content tree starting from the root, consisting of stripped down block object containing only its client ID and its inner blocks' client IDs", () => {
@@ -5395,7 +5450,7 @@ describe( '__unstableGetClientIdsTree', () => {
 				],
 			},
 		] );
-		expect( console ).toHaveWarned();
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
 	} );
 } );
 
@@ -5526,6 +5581,15 @@ describe( 'getBlockEditingMode', () => {
 	} );
 
 	describe( 'getSelectedBlockStyleState', () => {
+		it( 'returns default when no clientId is passed', () => {
+			const state = {};
+
+			expect( getSelectedBlockStyleState( state, undefined ) ).toEqual( {
+				viewport: 'default',
+				pseudo: 'default',
+			} );
+		} );
+
 		it( 'returns default when the block has no selected state', () => {
 			const state = {};
 

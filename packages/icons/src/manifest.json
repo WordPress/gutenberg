@@ -57,7 +57,8 @@
 	{
 		"slug": "archive",
 		"label": "Archive",
-		"filePath": "library/archive.svg"
+		"filePath": "library/archive.svg",
+		"keywords": [ "folder" ]
 	},
 	{
 		"slug": "arrow-down",
@@ -116,13 +117,15 @@
 		"slug": "at-symbol",
 		"label": "At Symbol (@)",
 		"filePath": "library/at-symbol.svg",
-		"collections": [ "core" ]
+		"collections": [ "core" ],
+		"keywords": [ "email" ]
 	},
 	{
 		"slug": "audio",
 		"label": "Audio",
 		"filePath": "library/audio.svg",
-		"collections": [ "core" ]
+		"collections": [ "core" ],
+		"keywords": [ "music", "note" ]
 	},
 	{
 		"slug": "background",
@@ -208,7 +211,8 @@
 	{
 		"slug": "cancel-circle-filled",
 		"label": "Cancel Circle Filled",
-		"filePath": "library/cancel-circle-filled.svg"
+		"filePath": "library/cancel-circle-filled.svg",
+		"keywords": [ "close" ]
 	},
 	{
 		"slug": "caption",
@@ -243,12 +247,14 @@
 		"slug": "caution",
 		"label": "Caution",
 		"filePath": "library/caution.svg",
-		"collections": [ "core" ]
+		"collections": [ "core" ],
+		"keywords": [ "alert", "exclamation", "warning" ]
 	},
 	{
 		"slug": "caution-filled",
 		"label": "Caution Filled",
-		"filePath": "library/caution-filled.svg"
+		"filePath": "library/caution-filled.svg",
+		"keywords": [ "alert", "exclamation", "warning" ]
 	},
 	{
 		"slug": "chart-bar",
@@ -457,7 +463,8 @@
 		"slug": "create",
 		"label": "Create",
 		"filePath": "library/create.svg",
-		"collections": [ "core" ]
+		"collections": [ "core" ],
+		"keywords": [ "add", "new", "plus" ]
 	},
 	{
 		"slug": "crop",
@@ -538,13 +545,15 @@
 		"slug": "envelope",
 		"label": "Envelope",
 		"filePath": "library/envelope.svg",
-		"collections": [ "core" ]
+		"collections": [ "core" ],
+		"keywords": [ "email", "letter", "post" ]
 	},
 	{
 		"slug": "error",
 		"label": "Error",
 		"filePath": "library/error.svg",
-		"collections": [ "core" ]
+		"collections": [ "core" ],
+		"keywords": [ "alert", "caution", "exclamation", "warning" ]
 	},
 	{
 		"slug": "external",
@@ -556,7 +565,8 @@
 		"slug": "file",
 		"label": "File",
 		"filePath": "library/file.svg",
-		"collections": [ "core" ]
+		"collections": [ "core" ],
+		"keywords": [ "archive", "document", "folder" ]
 	},
 	{
 		"slug": "filter",
@@ -846,6 +856,11 @@
 		"filePath": "library/justify-right.svg"
 	},
 	{
+		"slug": "justify-space-around",
+		"label": "Justify Space Around",
+		"filePath": "library/justify-space-around.svg"
+	},
+	{
 		"slug": "justify-space-between",
 		"label": "Justify Space Between",
 		"filePath": "library/justify-space-between.svg"
@@ -915,7 +930,8 @@
 	{
 		"slug": "lifesaver",
 		"label": "Lifesaver",
-		"filePath": "library/lifesaver.svg"
+		"filePath": "library/lifesaver.svg",
+		"keywords": [ "buoy", "ring" ]
 	},
 	{
 		"slug": "line-dashed",
@@ -1117,7 +1133,8 @@
 		"slug": "pencil",
 		"label": "Pencil",
 		"filePath": "library/pencil.svg",
-		"collections": [ "core", "core-admin" ]
+		"collections": [ "core", "core-admin" ],
+		"keywords": [ "edit" ]
 	},
 	{
 		"slug": "pending",
@@ -1414,7 +1431,8 @@
 	{
 		"slug": "seen",
 		"label": "Seen",
-		"filePath": "library/seen.svg"
+		"filePath": "library/seen.svg",
+		"keywords": [ "eye", "show", "visible" ]
 	},
 	{
 		"slug": "send",
@@ -1552,7 +1570,8 @@
 		"slug": "star-filled",
 		"label": "Star Filled",
 		"filePath": "library/star-filled.svg",
-		"collections": [ "core" ]
+		"collections": [ "core" ],
+		"keywords": [ "favorite" ]
 	},
 	{
 		"slug": "star-half",
@@ -1710,17 +1729,20 @@
 	{
 		"slug": "thumbs-down",
 		"label": "Thumbs Down",
-		"filePath": "library/thumbs-down.svg"
+		"filePath": "library/thumbs-down.svg",
+		"keywords": [ "dislike" ]
 	},
 	{
 		"slug": "thumbs-up",
 		"label": "Thumbs Up",
-		"filePath": "library/thumbs-up.svg"
+		"filePath": "library/thumbs-up.svg",
+		"keywords": [ "like" ]
 	},
 	{
 		"slug": "time",
 		"label": "Time",
-		"filePath": "library/time.svg"
+		"filePath": "library/time.svg",
+		"keywords": [ "clock", "duration", "hour" ]
 	},
 	{
 		"slug": "tip",
@@ -1742,7 +1764,8 @@
 	{
 		"slug": "trash",
 		"label": "Trash",
-		"filePath": "library/trash.svg"
+		"filePath": "library/trash.svg",
+		"keywords": [ "delete" ]
 	},
 	{
 		"slug": "trending-down",
@@ -1777,7 +1800,8 @@
 	{
 		"slug": "unseen",
 		"label": "Unseen",
-		"filePath": "library/unseen.svg"
+		"filePath": "library/unseen.svg",
+		"keywords": [ "eye", "hide", "hidden" ]
 	},
 	{
 		"slug": "update",

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/private-apis",
-	"version": "1.56.0",
+	"version": "2.0.0",
 	"description": "Internal experimental APIs for WordPress core.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,14 +20,13 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0"
+		"node": ">=22.13.0"
 	},
 	"files": [
 		"src",
 		"build",
 		"build-module",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
@@ -43,8 +42,8 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"devDependencies": {
-		"react": "^18.3.1",
-		"vitest": "^5.0.0"
+		"react": "^19.3.0",
+		"vitest": "^5.0.3"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -2,6 +2,29 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Bug Fixes
+
+-   Check that `SCRIPT_DEBUG` is defined before reading it in the generated `build/scripts.php` and `build/styles.php`, like the other generated files, so they no longer throw an `Error` when loaded without WordPress defining the constant ([#83633](https://github.com/WordPress/gutenberg/pull/83633)).
+
+### Internal
+
+-   Publish only runtime files, dropping `tsconfig.json`, the TypeScript build cache (`.cache`) and the test files from the package ([#84164](https://github.com/WordPress/gutenberg/pull/84164)).
+
+## 0.25.0 (2026-10-07)
+
+### Bug Fixes
+
+-   Add the `@babel/core` dependency, a peer of `esbuild-plugin-babel` ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+-   Keep the build machine's absolute paths out of worker source maps when `wpWorkers` redirects a module with `resolve`, so the output is reproducible across checkouts ([#84163](https://github.com/WordPress/gutenberg/pull/84163)).
+
+### Internal
+
+-   Drop the optional `@wordpress/boot`, `@wordpress/private-apis`, and `@wordpress/route` peer dependencies, unused since they are no longer bundled ([#83601](https://github.com/WordPress/gutenberg/pull/83601)).
+
 ## 0.24.0 (2026-09-23)
 
 ### Enhancements
