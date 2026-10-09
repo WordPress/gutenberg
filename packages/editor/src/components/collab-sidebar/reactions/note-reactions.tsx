@@ -5,17 +5,28 @@ import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { Comment } from '@wordpress/core-data';
-/*
- * `Button` and `IconButton` are pending Design System review
- * (WordPress/gutenberg#76135).
- */
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+// eslint-disable-next-line @wordpress/use-recommended-components -- Pending Design System review, see #76135.
 import { Button, IconButton, Menu, Stack, Tooltip } from '@wordpress/ui';
 import { ThemeProvider } from '@wordpress/theme';
 import { reaction as reactionIcon } from '@wordpress/icons';
 import { store as editorStore } from '../../../store';
 import { REACTION_EMOJIS, getReactionEmoji } from './reaction-emojis';
 import { useNoteReactions } from './use-note-reactions';
+
+interface ReactionButtonProps {
+	noteId: number;
+	hexKey: string;
+	count: number;
+	isActive: boolean;
+	disabled: boolean;
+	onToggle: ( hexKey: string ) => void;
+}
+
+interface NoteReactionsProps {
+	noteId: number;
+	canReact: boolean;
+	disabled: boolean;
+}
 
 /**
  * GitHub-style reactor list, e.g. "Ada, Grace, and 3 others reacted with heart".
@@ -57,15 +68,6 @@ function formatReactorNames( names: string[], emojiLabel: string ): string {
 		othersCount,
 		emojiLabel
 	);
-}
-
-interface ReactionButtonProps {
-	noteId: number;
-	hexKey: string;
-	count: number;
-	isActive: boolean;
-	disabled: boolean;
-	onToggle: ( hexKey: string ) => void;
 }
 
 function ReactionButton( {
@@ -156,12 +158,6 @@ function ReactionButton( {
 			<Tooltip.Popup>{ label }</Tooltip.Popup>
 		</Tooltip.Root>
 	);
-}
-
-interface NoteReactionsProps {
-	noteId: number;
-	canReact: boolean;
-	disabled: boolean;
 }
 
 /**
