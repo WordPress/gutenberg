@@ -1,6 +1,7 @@
 import create from './create';
 import convertLegacyLocalStorageData from './migrations/legacy-local-storage-data';
 import convertPreferencesPackageData from './migrations/preferences-package-data';
+import { readStoredJSON } from './local-storage';
 import type {
 	PersistenceLayer,
 	PreferencesData,
@@ -30,9 +31,9 @@ export function __unstableCreatePersistenceLayer(
 	userId: string | number
 ): PersistenceLayer {
 	const localStorageRestoreKey = `WP_PREFERENCES_USER_${ userId }`;
-	const localData: PreferencesData | null = JSON.parse(
-		window.localStorage.getItem( localStorageRestoreKey ) as string
-	);
+	const localData = readStoredJSON(
+		localStorageRestoreKey
+	) as PreferencesData | null;
 
 	// Date parse returns NaN for invalid input. Coerce anything invalid
 	// into a conveniently comparable zero.
