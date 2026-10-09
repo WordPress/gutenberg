@@ -60,6 +60,7 @@ interface QuickEditModalProps {
 	postId: string[];
 	closeModal: () => void;
 	quickEditForm: Form | undefined;
+	onSaved?: () => void;
 }
 
 export function QuickEditModal( {
@@ -67,6 +68,7 @@ export function QuickEditModal( {
 	postId,
 	closeModal,
 	quickEditForm,
+	onSaved,
 }: QuickEditModalProps ) {
 	const isBulk = postId.length > 1;
 
@@ -203,6 +205,7 @@ export function QuickEditModal( {
 		} else {
 			await saveEditedEntityRecord( 'postType', postType, postId[ 0 ] );
 		}
+		onSaved?.();
 		closeModal?.();
 	};
 

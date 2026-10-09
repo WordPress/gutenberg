@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Load Pages as an expandable hierarchy with independent root and child pagination in the table view ([#80360](https://github.com/WordPress/gutenberg/issues/80360)).
 -   Mark the Welcome Guide item of the Options menu with `aria-haspopup="dialog"`, since it opens a modal dialog ([#82395](https://github.com/WordPress/gutenberg/pull/82395)).
 
 ## 7.4.0 (2026-09-10)
