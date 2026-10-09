@@ -9,6 +9,7 @@
 ### Bug Fixes
 
 -   Point the apt sources of the bullseye-based WordPress images (PHP 7.4 and 8.0) at `archive.debian.org`, so building them no longer fails now that Debian 11 has reached end-of-life and left the regular mirrors.
+-   Add MySQL healthcheck to prevent race condition where WordPress containers start before MySQL is fully initialized. Uses MariaDB's official `healthcheck.sh` script with `MARIADB_AUTO_UPGRADE` to support both new and existing installations when the image has the script and the healthcheck user, and pings the server over TCP with `mariadb-admin` or `mysqladmin` otherwise, so images for older MariaDB versions also become healthy ([#75046](https://github.com/WordPress/gutenberg/pull/75046), [#83751](https://github.com/WordPress/gutenberg/pull/83751)).
 
 ## 10.33.0 (2025-10-17)
 
