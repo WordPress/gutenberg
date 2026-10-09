@@ -207,7 +207,7 @@ When a persistence layer is set, the preferences store will:
 
 _Parameters_
 
-- _persistenceLayer_ `WPPreferencesPersistenceLayer< D >`: The persistence layer.
+- _persistenceLayer_ `PersistenceLayer< D >`: The persistence layer.
 
 _Returns_
 

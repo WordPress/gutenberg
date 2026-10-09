@@ -37,7 +37,13 @@ export interface CreateOptions {
 	requestDebounceMS?: number;
 }
 
-export interface PersistenceLayer {
-	get: () => Promise< PreferencesData >;
-	set: ( newData: PreferencesData ) => void;
+export interface PersistenceLayer< D extends object = PreferencesData > {
+	/**
+	 * An async function that gets data from the persistence layer.
+	 */
+	get: () => Promise< D >;
+	/**
+	 * A function that sets data in the persistence layer.
+	 */
+	set: ( value: D ) => void;
 }

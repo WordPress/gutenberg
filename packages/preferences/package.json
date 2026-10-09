@@ -57,6 +57,7 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
+		"@wordpress/preferences-persistence": "file:../preferences-persistence",
 		"@wordpress/private-apis": "file:../private-apis"
 	},
 	"devDependencies": {

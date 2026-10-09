@@ -1,5 +1,6 @@
 import { combineReducers } from '@wordpress/data';
-import type { StoreState, WPPreferencesPersistenceLayer } from './types';
+import type { PersistenceLayer } from '@wordpress/preferences-persistence';
+import type { StoreState } from './types';
 import type { AvailableActions } from './actions';
 
 /**
@@ -47,7 +48,7 @@ type PreferencesReducer = (
  * @return The enhanced reducer.
  */
 function withPersistenceLayer( reducer: PreferencesReducer ) {
-	let persistenceLayer: WPPreferencesPersistenceLayer< any >;
+	let persistenceLayer: PersistenceLayer< any >;
 
 	return ( state: StoreState[ 'preferences' ], action: AvailableActions ) => {
 		// Set up the persistence layer, and return the persisted data
