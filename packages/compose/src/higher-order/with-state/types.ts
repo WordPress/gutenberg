@@ -1,4 +1,4 @@
-import type { Component, ComponentType } from 'react';
+import type { Component, ComponentClass, ComponentType } from 'react';
 
 /**
  * Props the wrapped component receives: its own, the state and `setState`.
@@ -13,4 +13,4 @@ export type WithStateInnerProps< TState extends object > = TState & {
  */
 export type WithStateHOC< TState extends object > = < TProps extends object >(
 	Inner: ComponentType< TProps & WithStateInnerProps< TState > >
-) => ComponentType< TProps >;
+) => ComponentClass< TProps, TState >;
