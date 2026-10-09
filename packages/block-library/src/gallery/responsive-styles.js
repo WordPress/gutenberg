@@ -78,7 +78,10 @@ export function getUpdatedGalleryStyle( {
 	};
 
 	Object.entries( settings ).forEach( ( [ key, value ] ) => {
-		if ( value === undefined || value === baseSettings[ key ] ) {
+		if (
+			value === undefined ||
+			( key !== 'columns' && value === baseSettings[ key ] )
+		) {
 			delete nextViewportStyle[ key ];
 		} else {
 			nextViewportStyle[ key ] = value;
