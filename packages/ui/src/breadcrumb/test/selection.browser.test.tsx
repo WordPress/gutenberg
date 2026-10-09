@@ -1,4 +1,4 @@
-import { describe, expect, expectTypeOf, it, vi } from 'vitest';
+import { describe, expect, expectTypeOf, it, onTestFinished, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
@@ -284,6 +284,15 @@ describe( 'Breadcrumb hierarchy selection', () => {
 					<iframe title="Editor canvas" />
 				</>
 			);
+			const outerEditor = screen.getByRole< HTMLTextAreaElement >(
+				'textbox',
+				{ name: 'Editor' }
+			);
+			onTestFinished( () => {
+				// Leave the iframe before cleanup so the next test's Tab starts
+				// within the test document instead of entering it from outside.
+				outerEditor.focus();
+			} );
 			const iframe =
 				screen.getByTitle< HTMLIFrameElement >( 'Editor canvas' );
 			const iframeDocument = iframe.contentDocument;
