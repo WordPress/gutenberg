@@ -6,6 +6,14 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Enhancements
+
+-   Type `withGlobalEvents` and `withState` instead of returning `any`, and let `withGlobalEvents` take only the events it handles.
+
+### Internal
+
+-   Refactor to TypeScript.
+
 ## 8.10.0 (2026-10-07)
 
 ### Bug Fixes
