@@ -690,6 +690,24 @@
 		"parent": "core-blocks-media"
 	},
 	{
+		"title": "Description Detail",
+		"slug": "core-block-description-detail",
+		"markdown_source": "../packages/block-library/src/description-detail/README.md",
+		"parent": "core-blocks-text"
+	},
+	{
+		"title": "Description List",
+		"slug": "core-block-description-list",
+		"markdown_source": "../packages/block-library/src/description-list/README.md",
+		"parent": "core-blocks-text"
+	},
+	{
+		"title": "Description Term",
+		"slug": "core-block-description-term",
+		"markdown_source": "../packages/block-library/src/description-term/README.md",
+		"parent": "core-blocks-text"
+	},
+	{
 		"title": "Details",
 		"slug": "core-block-details",
 		"markdown_source": "../packages/block-library/src/details/README.md",
