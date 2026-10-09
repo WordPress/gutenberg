@@ -1,10 +1,10 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, DOMAttributes } from 'react';
 import type { ComponentProps } from '../utils/types';
 
 export interface RootProps extends Omit< ComponentProps< 'nav' >, 'children' > {
 	/**
-	 * `Breadcrumb.LinkItem` elements followed by one
-	 * `Breadcrumb.CurrentItem`.
+	 * Ancestors of one kind, either `Breadcrumb.LinkItem` or
+	 * `Breadcrumb.ButtonItem`, followed by exactly one `Breadcrumb.CurrentItem`.
 	 */
 	children: ReactNode;
 }
@@ -34,10 +34,35 @@ export interface LinkItemProps extends Omit<
 
 export interface CurrentItemProps extends Omit<
 	ComponentProps< 'span' >,
-	'aria-current' | 'children' | 'tabIndex'
+	'children' | 'tabIndex'
 > {
 	/**
-	 * The plain-text label for the current page.
+	 * How this item represents the current location. Defaults to `true` for
+	 * button ancestors and `page` for links or a current-only trail.
+	 * With no ancestors, an explicit `true` or `"true"` also makes Root a
+	 * selection group. Ancestor links or buttons take precedence when present.
+	 */
+	'aria-current'?: ComponentProps< 'span' >[ 'aria-current' ];
+
+	/**
+	 * The plain-text label for the current item.
 	 */
 	children: string;
+}
+
+/** The rendered target is a button in the trail and a div in the overflow menu. */
+export type ButtonItemElement = HTMLButtonElement | HTMLDivElement;
+
+export interface ButtonItemProps
+	extends
+		Omit<
+			ComponentProps< 'div' >,
+			keyof DOMAttributes< HTMLDivElement > | 'aria-current'
+		>,
+		Omit< DOMAttributes< ButtonItemElement >, 'children' > {
+	/** The plain-text label for an ancestor in the same hierarchy. */
+	children: string;
+
+	/** Whether ancestor activation is unavailable. */
+	disabled?: boolean;
 }

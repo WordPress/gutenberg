@@ -6,6 +6,7 @@
 
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
     -   `NumberControl` ([#84330](https://github.com/WordPress/gutenberg/pull/84330))
+    -   `TimePicker` ([#84331](https://github.com/WordPress/gutenberg/pull/84331))
     -   `CustomSelectControl` and `CustomSelectControlV2` ([#84131](https://github.com/WordPress/gutenberg/pull/84131))
     -   `DateTimePicker` ([#84129](https://github.com/WordPress/gutenberg/pull/84129))
     -   `ColorPicker` ([#84128](https://github.com/WordPress/gutenberg/pull/84128))
@@ -17,6 +18,7 @@
 
 ### Bug Fixes
 
+-   `InputControl`, `NumberControl`, `UnitControl`: Ignore the drag gesture for touch input, where it has no cursor affordance and is easy to trigger by accident ([#38865](https://github.com/WordPress/gutenberg/issues/38865), [#81519](https://github.com/WordPress/gutenberg/pull/81519)).
 -   `navigateRegions`: Only outline the Publish and Save controls when their region has focus ([#84343](https://github.com/WordPress/gutenberg/pull/84343)).
 
 ## 42.0.0 (2026-10-07)
