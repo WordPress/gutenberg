@@ -3,8 +3,8 @@
 @use "../../utils/theme-variables" as *;
 
 .components-toolbar-group {
+	position: relative;
 	min-height: $block-toolbar-height;
-	border-right: $border-width solid $components-color-foreground;
 	background-color: $components-color-background;
 	display: inline-flex;
 	flex-shrink: 0;
@@ -12,10 +12,33 @@
 	padding-left: $grid-unit-15 * 0.5; // 6px.
 	padding-right: $grid-unit-15 * 0.5;
 
+	// Hairline between groups. Matches a Menu separator: 1px weak stroke, sized
+	// to the content (the 24px icon) rather than the button.
+	&:not(:last-child)::after {
+		content: "";
+		position: absolute;
+		z-index: 1;
+		inset-block: 0;
+		inset-inline-end: 0;
+		margin-block: auto;
+		width: var(--wpds-border-width-xs);
+		height: var(--wpds-dimension-size-sm);
+		background-color: var(--wpds-color-stroke-surface-neutral-weak);
+		pointer-events: none;
+
+		@media ( forced-colors: active ) {
+			background-color: CanvasText;
+		}
+	}
+
 	// Unset for nested toolbar groups. Increase specificity.
 	& .components-toolbar-group.components-toolbar-group {
 		border-width: 0;
 		margin: 0;
+
+		&::after {
+			content: none;
+		}
 	}
 
 	line-height: 0;
@@ -43,18 +66,50 @@
 // Legacy toolbar group
 // External code references to it, so we can't change it?
 .components-toolbar {
+	position: relative;
 	min-height: $block-toolbar-height;
 	margin: 0;
-	border: $border-width solid $components-color-foreground;
-	background-color: $components-color-background;
+	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+	border-radius: var(--wpds-border-radius-md);
+	background-color: var(--wpds-color-background-surface-neutral-strong);
+	// Same shadow as `.components-accessible-toolbar`.
+	box-shadow: $elevation-medium;
 	display: inline-flex;
 	flex-shrink: 0;
 	flex-wrap: wrap;
+
+	// A segment inside the accessible toolbar; the parent paints the surface.
+	.components-accessible-toolbar & {
+		border: 0;
+		border-radius: 0;
+		box-shadow: none;
+
+		&:not(:last-child)::after {
+			content: "";
+			position: absolute;
+			z-index: 1;
+			inset-block: 0;
+			inset-inline-end: 0;
+			margin-block: auto;
+			width: var(--wpds-border-width-xs);
+			height: var(--wpds-dimension-size-sm);
+			background-color: var(--wpds-color-stroke-surface-neutral-weak);
+			pointer-events: none;
+
+			@media ( forced-colors: active ) {
+				background-color: CanvasText;
+			}
+		}
+	}
 
 	// Unset for nested toolbars. Increase specificity.
 	& .components-toolbar.components-toolbar {
 		border-width: 0;
 		margin: 0;
+
+		&::after {
+			content: none;
+		}
 	}
 }
 
@@ -75,7 +130,7 @@ div.components-toolbar {
 			display: inline-block;
 			content: "";
 			box-sizing: content-box;
-			background-color: var(--wpds-color-stroke-surface-neutral);
+			background-color: var(--wpds-color-stroke-surface-neutral-weak);
 			position: absolute;
 			top: 8px;
 			left: -3px;

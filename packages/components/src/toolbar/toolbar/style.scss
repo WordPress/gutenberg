@@ -5,19 +5,72 @@
 
 .components-accessible-toolbar {
 	display: inline-flex;
-	border: $border-width solid $components-color-foreground;
-	border-radius: $radius-small;
+	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+	border-radius: var(--wpds-border-radius-md);
+	background-color: var(--wpds-color-background-surface-neutral-strong);
+	// Same four-layer shadow Menu uses. `$elevation-medium` is that stack;
+	// the design-system elevation tokens are not restored.
+	box-shadow: $elevation-medium;
 	flex-shrink: 0;
 
-	& > .components-toolbar-group:last-child {
-		border-right: none;
+	// Groups paint their own background. Round the ends so that fill follows
+	// the surface corners. `overflow` stays visible for detached toolbar UI.
+	> .components-toolbar-group:first-child,
+	> .components-toolbar:first-child {
+		border-start-start-radius: var(--wpds-border-radius-md);
+		border-end-start-radius: var(--wpds-border-radius-md);
+	}
+
+	> .components-toolbar-group:last-child,
+	> .components-toolbar:last-child {
+		border-start-end-radius: var(--wpds-border-radius-md);
+		border-end-end-radius: var(--wpds-border-radius-md);
+	}
+
+	&[aria-orientation="vertical"] {
+		> .components-toolbar-group:first-child,
+		> .components-toolbar:first-child {
+			border-radius: 0;
+			border-start-start-radius: var(--wpds-border-radius-md);
+			border-start-end-radius: var(--wpds-border-radius-md);
+		}
+
+		> .components-toolbar-group:last-child,
+		> .components-toolbar:last-child {
+			border-radius: 0;
+			border-end-start-radius: var(--wpds-border-radius-md);
+			border-end-end-radius: var(--wpds-border-radius-md);
+		}
+
+		// The horizontal hairline sits on the block-end edge, sized to the
+		// content (the 24px icon) like the vertical hairline.
+		.components-toolbar-group:not(:last-child)::after,
+		.components-toolbar:not(:last-child)::after {
+			inset-block: auto;
+			inset-inline: 0;
+			inset-block-end: 0;
+			margin-block: 0;
+			margin-inline: auto;
+			width: var(--wpds-dimension-size-sm);
+			height: var(--wpds-border-width-xs);
+		}
 	}
 
 	&.is-unstyled {
 		border: none;
+		background-color: transparent;
+		box-shadow: none;
 
-		& > .components-toolbar-group {
-			border-right: none;
+		// The outer chrome goes away. Direct groups keep no divider, matching
+		// the previous `border-right: none`. Nested block-toolbar segments
+		// draw their own hairline.
+		> .components-toolbar-group,
+		> .components-toolbar {
+			border-radius: 0;
+
+			&::after {
+				content: none;
+			}
 		}
 	}
 }

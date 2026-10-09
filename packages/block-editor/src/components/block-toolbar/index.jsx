@@ -216,7 +216,8 @@ export function PrivateBlockToolbar( {
 			className={ classes }
 			/* translators: accessibility text for the block toolbar */
 			aria-label={ __( 'Block tools' ) }
-			// The variant is applied as "toolbar" when undefined, which is the black border style of the dropdown from the toolbar popover.
+			// `"toolbar"` selects the surfaced toolbar. `PrivateBlockToolbar`
+			// defaults to `"unstyled"`, which is the flat docked bar.
 			variant={ variant === 'toolbar' ? undefined : variant }
 			focusOnMount={ focusOnMount }
 			__experimentalInitialIndex={ __experimentalInitialIndex }
