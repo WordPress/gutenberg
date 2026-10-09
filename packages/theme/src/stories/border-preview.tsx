@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import { borderGroups } from './token-data';
+import { groups, tokens } from '../../prebuilt/js/design-tokens.mjs';
 import {
 	descriptionStyle,
 	headingStyle,
@@ -42,18 +42,13 @@ const radiusExampleStyle = ( name: string ): CSSProperties => ( {
 export function BorderTokenPreview() {
 	return (
 		<div style={ previewStyle }>
-			{ [ 'width', 'radius' ].map( ( kind ) => {
-				const group = borderGroups.find(
-					( { path } ) => path[ 0 ] === kind
-				);
-				if ( ! group ) {
-					return null;
-				}
+			{ ( [ 'width', 'radius' ] as const ).map( ( kind ) => {
+				const group = groups.border.groups[ kind ];
 				return (
 					<section key={ kind }>
 						<h2 style={ headingStyle }>{ groupTitles[ kind ] }</h2>
 						<dl style={ listStyle }>
-							{ group.tokens.map( ( { name, description } ) => (
+							{ group.tokens.map( ( name ) => (
 								<div
 									key={ name }
 									style={ {
@@ -78,7 +73,7 @@ export function BorderTokenPreview() {
 											{ name }
 										</code>
 										<span style={ descriptionStyle }>
-											{ description }
+											{ tokens[ name ].$description }
 										</span>
 									</dt>
 								</div>

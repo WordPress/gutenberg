@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import { colorGroups, pathTitle } from './token-data';
+import { groups, tokens } from '../../prebuilt/js/design-tokens.mjs';
 import {
 	descriptionStyle,
 	headingStyle,
@@ -29,61 +29,66 @@ const sectionTitleStyle: CSSProperties = {
 	textTransform: 'capitalize',
 };
 
+const titleCase = ( key: string ) => {
+	const text = key.replace( /-/g, ' ' );
+	return text.charAt( 0 ).toUpperCase() + text.slice( 1 );
+};
+
+function ColorTokenList( { names }: { names: readonly string[] } ) {
+	return (
+		<dl style={ listStyle }>
+			{ names.map( ( name ) => (
+				<div key={ name } style={ itemStyle }>
+					<dd style={ { margin: 0 } } aria-hidden="true">
+						<span
+							style={ {
+								...swatchStyle,
+								backgroundColor: `var(${ name })`,
+							} }
+						/>
+					</dd>
+					<dt style={ textStyle }>
+						<code style={ tokenNameStyle }>{ name }</code>
+						<span style={ descriptionStyle }>
+							{ tokens[ name ].$description }
+						</span>
+					</dt>
+				</div>
+			) ) }
+		</dl>
+	);
+}
+
 /**
  * Displays every public semantic color token with its description and a
  * swatch of the resolved color, grouped by property (background, foreground,
  * stroke) and target.
  */
 export function ColorTokenPreview() {
-	const properties = [
-		...new Set( colorGroups.map( ( { path } ) => path[ 0 ] ) ),
-	];
-
 	return (
 		<div style={ previewStyle }>
-			{ properties.map( ( property ) => (
-				<section key={ property } style={ sectionStyle }>
-					<h2 style={ sectionTitleStyle }>{ property }</h2>
-					{ colorGroups
-						.filter( ( { path } ) => path[ 0 ] === property )
-						.map( ( { path, tokens } ) => (
-							<div key={ path.join( '/' ) }>
-								{ path.length > 1 && (
+			{ Object.entries( groups.color.groups ).map(
+				( [ property, group ] ) => (
+					<section key={ property } style={ sectionStyle }>
+						<h2 style={ sectionTitleStyle }>{ property }</h2>
+						{ Object.entries( group.groups ).map(
+							( [ target, targetGroup ] ) => (
+								<div key={ target }>
 									<h3 style={ headingStyle }>
-										{ pathTitle( path.slice( 1 ) ) }
+										{ titleCase( target ) }
 									</h3>
-								) }
-								<dl style={ listStyle }>
-									{ tokens.map( ( { name, description } ) => (
-										<div key={ name } style={ itemStyle }>
-											<dd
-												style={ { margin: 0 } }
-												aria-hidden="true"
-											>
-												<span
-													style={ {
-														...swatchStyle,
-														backgroundColor: `var(${ name })`,
-													} }
-												/>
-											</dd>
-											<dt style={ textStyle }>
-												<code style={ tokenNameStyle }>
-													{ name }
-												</code>
-												<span
-													style={ descriptionStyle }
-												>
-													{ description }
-												</span>
-											</dt>
-										</div>
-									) ) }
-								</dl>
-							</div>
-						) ) }
-				</section>
-			) ) }
+									<ColorTokenList
+										names={ targetGroup.tokens }
+									/>
+								</div>
+							)
+						) }
+						{ group.tokens.length > 0 && (
+							<ColorTokenList names={ group.tokens } />
+						) }
+					</section>
+				)
+			) }
 		</div>
 	);
 }

@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react';
-import { dimensionGroups } from './token-data';
+import { groups, tokens } from '../../prebuilt/js/design-tokens.mjs';
 import {
 	descriptionStyle,
 	headingStyle,
@@ -21,7 +21,7 @@ const contentStyle: CSSProperties = {
 };
 
 type DimensionKind = {
-	key: string;
+	key: keyof typeof groups.dimension.groups;
 	title: string;
 	intro: string;
 	example: ( name: string ) => ReactNode;
@@ -119,18 +119,13 @@ export function DimensionTokenPreview() {
 	return (
 		<div style={ previewStyle }>
 			{ kinds.map( ( { key, title, intro, example } ) => {
-				const group = dimensionGroups.find(
-					( { path } ) => path.join( '-' ) === key
-				);
-				if ( ! group ) {
-					return null;
-				}
+				const group = groups.dimension.groups[ key ];
 				return (
 					<section key={ key }>
 						<h2 style={ headingStyle }>{ title }</h2>
 						<p>{ intro }</p>
 						<dl style={ { ...listStyle, marginBlockStart: 8 } }>
-							{ group.tokens.map( ( { name, description } ) => (
+							{ group.tokens.map( ( name ) => (
 								<div
 									key={ name }
 									style={ {
@@ -146,7 +141,7 @@ export function DimensionTokenPreview() {
 											{ name }
 										</code>
 										<span style={ descriptionStyle }>
-											{ description }
+											{ tokens[ name ].$description }
 										</span>
 									</dt>
 									<dd
