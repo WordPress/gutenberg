@@ -19,7 +19,8 @@ const afterLineRegexp = /^\s*(\n|<\/p>|<br\s*\/?>)/;
 function segmentHTMLToShortcodeBlock(
 	HTML: string,
 	lastIndex: number = 0,
-	excludedBlockNames: string[] = []
+	excludedBlockNames: string[] = [],
+	isBlockTypeAllowed?: ( blockName: string ) => boolean
 ): Array< string | Block > {
 	// Get all matches.
 	const transformsFrom = getBlockTransforms( 'from' ).filter(
@@ -33,6 +34,8 @@ function segmentHTMLToShortcodeBlock(
 		transformsFrom,
 		( transform ) =>
 			excludedBlockNames.indexOf( transform.blockName ) === -1 &&
+			( ! isBlockTypeAllowed ||
+				isBlockTypeAllowed( transform.blockName ) ) &&
 			castArray( transform.tag ).some( ( tag ) =>
 				regexp( tag ).test( HTML )
 			)
@@ -70,7 +73,12 @@ function segmentHTMLToShortcodeBlock(
 			afterLineRegexp.test( afterHTML )
 		)
 	) {
-		return segmentHTMLToShortcodeBlock( HTML, lastIndex );
+		return segmentHTMLToShortcodeBlock(
+			HTML,
+			lastIndex,
+			[],
+			isBlockTypeAllowed
+		);
 	}
 
 	// If a transformation's `isMatch` predicate fails for the inbound
@@ -78,17 +86,19 @@ function segmentHTMLToShortcodeBlock(
 	//
 	// This is the only call to `segmentHTMLToShortcodeBlock` that should
 	// ever carry over `excludedBlockNames`. Other calls in the module
-	// should skip that argument as a way to reset the exclusion state, so
+	// should pass an empty list as a way to reset the exclusion state, so
 	// that one `isMatch` fail in an HTML fragment doesn't prevent any
 	// valid matches in subsequent fragments.
 	if (
 		transformation.isMatch &&
 		! transformation.isMatch( match.shortcode.attrs )
 	) {
-		return segmentHTMLToShortcodeBlock( HTML, previousIndex, [
-			...excludedBlockNames,
-			transformation.blockName,
-		] );
+		return segmentHTMLToShortcodeBlock(
+			HTML,
+			previousIndex,
+			[ ...excludedBlockNames, transformation.blockName ],
+			isBlockTypeAllowed
+		);
 	}
 
 	let blocks: Block[] = [];
@@ -158,11 +168,17 @@ function segmentHTMLToShortcodeBlock(
 
 	return [
 		...segmentHTMLToShortcodeBlock(
-			beforeHTML.replace( beforeLineRegexp, '' )
+			beforeHTML.replace( beforeLineRegexp, '' ),
+			0,
+			[],
+			isBlockTypeAllowed
 		),
 		...blocks,
 		...segmentHTMLToShortcodeBlock(
-			afterHTML.replace( afterLineRegexp, '' )
+			afterHTML.replace( afterLineRegexp, '' ),
+			0,
+			[],
+			isBlockTypeAllowed
 		),
 	];
 }

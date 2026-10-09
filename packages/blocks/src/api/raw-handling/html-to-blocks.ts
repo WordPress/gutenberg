@@ -8,21 +8,31 @@ import type { Block, RawHandler } from '../../types';
  * top-level tag. The HTML should be filtered to not have any text between
  * top-level tags and formatted in a way that blocks can handle the HTML.
  *
- * @param html    HTML to convert.
- * @param handler The handler calling htmlToBlocks: either rawHandler
- *                or pasteHandler.
+ * @param html               HTML to convert.
+ * @param handler            The handler calling htmlToBlocks: either
+ *                           rawHandler or pasteHandler.
+ * @param isBlockTypeAllowed Optional check to skip transforms to block types
+ *                           that are not allowed.
  *
  * @return An array of blocks.
  */
-export function htmlToBlocks( html: string, handler: RawHandler ): Block[] {
+export function htmlToBlocks(
+	html: string,
+	handler: RawHandler,
+	isBlockTypeAllowed?: ( blockName: string ) => boolean
+): Block[] {
 	const doc = document.implementation.createHTMLDocument( '' );
 
 	doc.body.innerHTML = html;
 
 	return Array.from( doc.body.children ).flatMap( ( node ) => {
 		const transforms = getRawTransforms();
-		const rawTransform = findTransform( transforms, ( transform ) =>
-			transform.isMatch( node )
+		const rawTransform = findTransform(
+			transforms,
+			( transform ) =>
+				( ! isBlockTypeAllowed ||
+					isBlockTypeAllowed( transform.blockName ) ) &&
+				transform.isMatch( node )
 		);
 
 		if ( ! rawTransform ) {

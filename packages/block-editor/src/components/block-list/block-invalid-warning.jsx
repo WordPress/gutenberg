@@ -7,11 +7,6 @@ import Warning from '../warning';
 import BlockCompare from '../block-compare';
 import { store as blockEditorStore } from '../../store';
 
-const blockToBlocks = ( block ) =>
-	rawHandler( {
-		HTML: block.originalContent,
-	} );
-
 export default function BlockInvalidWarning( { clientId } ) {
 	const { block, canInsertHTMLBlock } = useSelect(
 		( select ) => {
@@ -30,10 +25,25 @@ export default function BlockInvalidWarning( { clientId } ) {
 		},
 		[ clientId ]
 	);
+	const { canInsertBlockType, getBlockRootClientId } =
+		useSelect( blockEditorStore );
 	const { replaceBlock } = useDispatch( blockEditorStore );
 
 	const [ compare, setCompare ] = useState( false );
 	const onCompareClose = useCallback( () => setCompare( false ), [] );
+
+	const blockToBlocks = useCallback(
+		( blockToConvert ) =>
+			rawHandler( {
+				HTML: blockToConvert.originalContent,
+				isBlockTypeAllowed: ( name ) =>
+					canInsertBlockType(
+						name,
+						getBlockRootClientId( blockToConvert.clientId )
+					),
+			} ),
+		[ canInsertBlockType, getBlockRootClientId ]
+	);
 
 	const convert = useMemo(
 		() => ( {
@@ -59,7 +69,7 @@ export default function BlockInvalidWarning( { clientId } ) {
 				return replaceBlock( block.clientId, recoveredBlock );
 			},
 		} ),
-		[ block, replaceBlock ]
+		[ block, replaceBlock, blockToBlocks ]
 	);
 
 	const secondaryActions = useMemo(

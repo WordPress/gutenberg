@@ -26,8 +26,12 @@ export function deprecatedGetPhrasingContentSchema(
 /**
  * Converts an HTML string to known blocks.
  *
- * @param options      Options.
- * @param options.HTML The HTML to convert.
+ * @param options                    Options.
+ * @param options.HTML               The HTML to convert.
+ * @param options.isBlockTypeAllowed Optional callback that returns whether a
+ *                                   block type can be created. Transforms to
+ *                                   block types it rejects are skipped, so the
+ *                                   content falls back to another block.
  *
  * @example
  * ```js
@@ -38,7 +42,13 @@ export function deprecatedGetPhrasingContentSchema(
  *
  * @return A list of blocks.
  */
-export function rawHandler( { HTML = '' }: { HTML?: string } ): Block[] {
+export function rawHandler( {
+	HTML = '',
+	isBlockTypeAllowed,
+}: {
+	HTML?: string;
+	isBlockTypeAllowed?: ( blockName: string ) => boolean;
+} ): Block[] {
 	// If we detect block delimiters, parse entirely as blocks.
 	if ( HTML.indexOf( '<!-- wp:' ) !== -1 ) {
 		const parseResult = parse( HTML );
@@ -52,7 +62,7 @@ export function rawHandler( { HTML = '' }: { HTML?: string } ): Block[] {
 
 	// An array of HTML strings and block objects. The blocks replace matched
 	// shortcodes.
-	const pieces = shortcodeConverter( HTML );
+	const pieces = shortcodeConverter( HTML, 0, [], isBlockTypeAllowed );
 	const blockContentSchema = getBlockContentSchema();
 
 	return pieces
@@ -80,7 +90,7 @@ export function rawHandler( { HTML = '' }: { HTML?: string } ): Block[] {
 			piece = deepFilterHTML( piece, filters, blockContentSchema );
 			piece = normaliseBlocks( piece, { raw: true } );
 
-			return htmlToBlocks( piece, rawHandler );
+			return htmlToBlocks( piece, rawHandler, isBlockTypeAllowed );
 		} )
 		.flat()
 		.filter( Boolean );

@@ -10,6 +10,10 @@
 
 -   Legacy widget: Migrate widget type selection to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
 
+### Bug Fixes
+
+-   Legacy Widget: "Convert to blocks" skips block types that are not allowed ([#84183](https://github.com/WordPress/gutenberg/pull/84183)).
+
 ## 4.57.0 (2026-10-07)
 
 ## 4.56.0 (2026-09-23)
