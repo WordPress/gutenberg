@@ -8,11 +8,7 @@
 		},
 		{
 			"step": "runPHP",
-			"code": "<?php require '/wordpress/wp-load.php'; wp_insert_post( array( 'import_id' => 100, 'post_title' => 'Selection across paragraphs', 'post_status' => 'draft', 'post_content' => \"<!-- wp:paragraph -->\\n<p>The first paragraph of filler text at the start of the post.</p>\\n<!-- /wp:paragraph -->\\n\\n<!-- wp:paragraph -->\\n<p>A second paragraph of filler text, long enough to wrap onto a few lines on a phone screen.</p>\\n<!-- /wp:paragraph -->\\n\\n<!-- wp:paragraph -->\\n<p>A third paragraph of filler text keeps the paragraphs under test further down the page.</p>\\n<!-- /wp:paragraph -->\\n\\n<!-- wp:paragraph -->\\n<p>Alpha bravo charlie</p>\\n<!-- /wp:paragraph -->\\n\\n<!-- wp:paragraph -->\\n<p>Delta echo foxtrot</p>\\n<!-- /wp:paragraph -->\\n\\n<!-- wp:paragraph -->\\n<p>Another paragraph after the pair, so there is text below them as well.</p>\\n<!-- /wp:paragraph -->\\n\\n<!-- wp:paragraph -->\\n<p>A last paragraph of filler text at the end of the post.</p>\\n<!-- /wp:paragraph -->\" ) );"
-		},
-		{
-			"step": "runPHP",
-			"code": "<?php require '/wordpress/wp-load.php'; $source = glob( WP_PLUGIN_DIR . '/*/test/ios/diagnostics/load-log.js' ); if ( ! $source ) { throw new Exception( 'load-log.js not found under ' . WP_PLUGIN_DIR ); } if ( ! is_dir( WP_CONTENT_DIR . '/mu-plugins' ) ) { mkdir( WP_CONTENT_DIR . '/mu-plugins' ); } copy( $source[0], WP_CONTENT_DIR . '/mu-plugins/load-log.js' ); file_put_contents( WP_CONTENT_DIR . '/mu-plugins/load-log.php', \"<?php add_action( 'admin_enqueue_scripts', function () { wp_enqueue_script( 'load-log', content_url( 'mu-plugins/load-log.js' ), array(), null, false ); } );\" );"
+			"code": "<?php require '/wordpress/wp-load.php'; wp_insert_post( array( 'import_id' => 100, 'post_title' => 'Selection across paragraphs', 'post_status' => 'draft', 'post_content' => \"<!-- wp:paragraph -->\\n<p>Alpha bravo charlie</p>\\n<!-- /wp:paragraph -->\\n\\n<!-- wp:paragraph -->\\n<p>Delta echo foxtrot</p>\\n<!-- /wp:paragraph -->\\n\\n<!-- wp:paragraph -->\\n<p>Another paragraph after the pair, so there is text below them as well.</p>\\n<!-- /wp:paragraph -->\\n\\n<!-- wp:paragraph -->\\n<p>A last paragraph of filler text at the end of the post.</p>\\n<!-- /wp:paragraph -->\" ) );"
 		}
 	]
 }

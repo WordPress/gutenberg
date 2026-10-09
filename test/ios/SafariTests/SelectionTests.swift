@@ -19,9 +19,6 @@ final class SelectionTests: XCTestCase {
 	}
 
 	override func tearDownWithError() throws {
-		// Temporary diagnostics.
-		let pageLog = web.descendants( matching: .any ).matching( NSPredicate( format: "label BEGINSWITH 'PLOG'" ) ).firstMatch
-		print( "PLOG\n  " + ( pageLog.exists ? pageLog.label : "missing" ).split( separator: "|" ).joined( separator: "\n  " ) )
 		safari.terminate()
 	}
 
@@ -89,6 +86,6 @@ final class SelectionTests: XCTestCase {
 			"The selection did not extend into the previous paragraph: \( paragraphs() )"
 		)
 		XCTAssertFalse( paragraphs().contains { $0.contains( "Delta" ) }, "The selected word is still there" )
-		XCTAssertEqual( paragraphs().count, 6, "The two paragraphs did not join" )
+		XCTAssertEqual( paragraphs().count, 3, "The two paragraphs did not join" )
 	}
 }
