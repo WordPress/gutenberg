@@ -28,6 +28,7 @@ import { CollaboratorsOverlay } from '../collaborators-overlay';
 import { useCollaboratorNotifications } from '../collaborators-presence/use-collaborator-notifications';
 import SavePublishPanels from '../save-publish-panels';
 import TextEditor from '../text-editor';
+import BlockToolbarPlaceholder from './block-toolbar-placeholder';
 import VisualEditor from '../visual-editor';
 import StylesCanvas from '../styles-canvas';
 
@@ -155,6 +156,10 @@ export default function EditorInterface( {
 	useCollaboratorNotifications( postId, postType );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
+	const hasBlockSelection = useSelect(
+		( select ) => !! select( blockEditorStore ).getBlockSelectionStart(),
+		[]
+	);
 	const secondarySidebarLabel = isListViewOpened
 		? __( 'Document Overview' )
 		: __( 'Block Library' );
@@ -250,7 +255,13 @@ export default function EditorInterface( {
 							{ ! isPreviewMode &&
 								! isLargeViewport &&
 								mode === 'visual' && (
-									<BlockToolbar hideDragHandle />
+									<div className="editor-editor-interface__block-toolbar">
+										{ hasBlockSelection ? (
+											<BlockToolbar hideDragHandle />
+										) : (
+											<BlockToolbarPlaceholder />
+										) }
+									</div>
 								) }
 							{ ( isPreviewMode || mode === 'visual' ) && (
 								<VisualEditor
