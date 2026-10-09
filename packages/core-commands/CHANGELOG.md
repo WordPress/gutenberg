@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   Add native TypeScript support.
+-   Add native TypeScript support ([#84385](https://github.com/WordPress/gutenberg/pull/84385)).
 
 ## 1.57.0 (2026-10-07)
 
