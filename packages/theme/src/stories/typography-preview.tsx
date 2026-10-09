@@ -101,7 +101,16 @@ const tokenNameStyle: CSSProperties = {
 };
 
 const tokenNameContainerStyle: CSSProperties = {
+	display: 'flex',
+	flexDirection: 'column',
+	gap: 'var(--wpds-dimension-gap-xs)',
 	margin: 0,
+};
+
+const descriptionStyle: CSSProperties = {
+	fontSize: 'var(--wpds-typography-font-size-sm)',
+	lineHeight: 'var(--wpds-typography-line-height-sm)',
+	color: 'var(--wpds-color-foreground-content-neutral-weak)',
 };
 
 const sampleStyle: CSSProperties = {
@@ -123,7 +132,7 @@ function TypographyTokenSection( {
 	sampleLines,
 	getSampleStyle,
 }: TypographyTokenGroup ) {
-	const tokens = typographyTokens.filter( ( tokenName ) =>
+	const sectionTokens = typographyTokens.filter( ( tokenName ) =>
 		tokenName.startsWith( tokenPrefix )
 	);
 
@@ -131,7 +140,7 @@ function TypographyTokenSection( {
 		<section>
 			<h2 style={ headingStyle }>{ title }</h2>
 			<dl style={ listStyle }>
-				{ tokens.map( ( tokenName ) => {
+				{ sectionTokens.map( ( tokenName ) => {
 					const tokenValue = getTokenValue( tokenName );
 					const tokenStyle = getSampleStyle( tokenValue, tokenName );
 
@@ -141,6 +150,13 @@ function TypographyTokenSection( {
 								<code style={ tokenNameStyle }>
 									{ tokenName }
 								</code>
+								<span style={ descriptionStyle }>
+									{
+										wpdsTokens[
+											tokenName as keyof typeof wpdsTokens
+										].$description
+									}
+								</span>
 							</dt>
 							<dd style={ { margin: 0 } }>
 								<p style={ sampleStyle }>

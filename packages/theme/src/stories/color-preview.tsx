@@ -18,8 +18,14 @@ const swatchStyle: CSSProperties = {
 	borderRadius: 'var(--wpds-border-radius-sm)',
 };
 
+const sectionStyle: CSSProperties = {
+	display: 'flex',
+	flexDirection: 'column',
+	gap: 'var(--wpds-dimension-gap-3xl)',
+};
+
 const sectionTitleStyle: CSSProperties = {
-	...headingStyle,
+	margin: 0,
 	textTransform: 'capitalize',
 };
 
@@ -36,7 +42,7 @@ export function ColorTokenPreview() {
 	return (
 		<div style={ previewStyle }>
 			{ properties.map( ( property ) => (
-				<section key={ property }>
+				<section key={ property } style={ sectionStyle }>
 					<h2 style={ sectionTitleStyle }>{ property }</h2>
 					{ colorGroups
 						.filter( ( { path } ) => path[ 0 ] === property )
