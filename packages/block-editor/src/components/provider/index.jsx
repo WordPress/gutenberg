@@ -130,10 +130,10 @@ function addToUploadQueue(
 				if ( filesSet[ index ] ) {
 					updateFiles( index, null );
 				}
-				settleFile( index );
 				onError(
 					typeof error === 'string' ? error : ( error?.message ?? '' )
 				);
+				settleFile( index );
 			},
 			additionalData,
 			allowedTypes,
