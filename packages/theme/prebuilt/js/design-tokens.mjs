@@ -3072,5 +3072,3 @@ export const groups = /** @type {const} */ ( {
 		'--wpds-typography-font-weight-emphasis',
 	],
 } );
-
-export default Object.keys( tokens );
