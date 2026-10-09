@@ -3,6 +3,7 @@ import moveThirdPartyFeaturePreferences from './move-third-party-feature-prefere
 import moveIndividualPreference from './move-individual-preference';
 import moveInterfaceEnableItems from './move-interface-enable-items';
 import convertEditPostPanels from './convert-edit-post-panels';
+import { readStoredJSON } from '../../local-storage';
 import type { ScopedPreferences } from '../../types';
 import type { LegacyData } from './types';
 
@@ -14,9 +15,7 @@ import type { LegacyData } from './types';
  * @return The local storage data.
  */
 function getLegacyData( userId: string | number ): LegacyData | null {
-	const key = `WP_DATA_USER_${ userId }`;
-	const unparsedData = window.localStorage.getItem( key );
-	return JSON.parse( unparsedData as string );
+	return readStoredJSON( `WP_DATA_USER_${ userId }` ) as LegacyData | null;
 }
 
 /**
