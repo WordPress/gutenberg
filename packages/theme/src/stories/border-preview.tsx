@@ -1,19 +1,14 @@
 import type { CSSProperties } from 'react';
 import { groups, tokens } from '../../prebuilt/js/design-tokens.mjs';
+import { GroupTitle } from './group-title';
 import {
 	descriptionStyle,
-	headingStyle,
 	itemStyle,
 	listStyle,
 	previewStyle,
 	textStyle,
 	tokenNameStyle,
 } from './token-preview-styles';
-
-const groupTitles: Record< string, string > = {
-	width: 'Width',
-	radius: 'Radius',
-};
 
 const widthExampleStyle = ( name: string ): CSSProperties => ( {
 	display: 'block',
@@ -35,6 +30,16 @@ const radiusExampleStyle = ( name: string ): CSSProperties => ( {
 	borderRadius: `var(${ name })`,
 } );
 
+type BorderGroupKey = keyof typeof groups.border.groups;
+
+const borderGroupConfig: Record<
+	BorderGroupKey,
+	{ example: ( name: string ) => CSSProperties }
+> = {
+	width: { example: widthExampleStyle },
+	radius: { example: radiusExampleStyle },
+};
+
 /**
  * Displays the border width tokens as lines and the border radius tokens as
  * the corners of a box.
@@ -42,46 +47,43 @@ const radiusExampleStyle = ( name: string ): CSSProperties => ( {
 export function BorderTokenPreview() {
 	return (
 		<div style={ previewStyle }>
-			{ ( [ 'width', 'radius' ] as const ).map( ( kind ) => {
-				const group = groups.border.groups[ kind ];
-				return (
-					<section key={ kind }>
-						<h2 style={ headingStyle }>{ groupTitles[ kind ] }</h2>
-						<dl style={ listStyle }>
-							{ group.tokens.map( ( name ) => (
-								<div
-									key={ name }
-									style={ {
-										...itemStyle,
-										gridTemplateColumns: '80px 1fr',
-									} }
-								>
-									<dd
-										style={ { margin: 0 } }
-										aria-hidden="true"
+			{ ( Object.keys( groups.border.groups ) as BorderGroupKey[] ).map(
+				( kind ) => {
+					const group = groups.border.groups[ kind ];
+					const { example } = borderGroupConfig[ kind ];
+					return (
+						<section key={ kind }>
+							<GroupTitle name={ kind } />
+							<dl style={ listStyle }>
+								{ group.tokens.map( ( name ) => (
+									<div
+										key={ name }
+										style={ {
+											...itemStyle,
+											gridTemplateColumns: '80px 1fr',
+										} }
 									>
-										<span
-											style={
-												kind === 'width'
-													? widthExampleStyle( name )
-													: radiusExampleStyle( name )
-											}
-										/>
-									</dd>
-									<dt style={ textStyle }>
-										<code style={ tokenNameStyle }>
-											{ name }
-										</code>
-										<span style={ descriptionStyle }>
-											{ tokens[ name ].$description }
-										</span>
-									</dt>
-								</div>
-							) ) }
-						</dl>
-					</section>
-				);
-			} ) }
+										<dd
+											style={ { margin: 0 } }
+											aria-hidden="true"
+										>
+											<span style={ example( name ) } />
+										</dd>
+										<dt style={ textStyle }>
+											<code style={ tokenNameStyle }>
+												{ name }
+											</code>
+											<span style={ descriptionStyle }>
+												{ tokens[ name ].$description }
+											</span>
+										</dt>
+									</div>
+								) ) }
+							</dl>
+						</section>
+					);
+				}
+			) }
 		</div>
 	);
 }

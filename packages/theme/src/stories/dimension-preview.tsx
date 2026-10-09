@@ -1,8 +1,8 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { groups, tokens } from '../../prebuilt/js/design-tokens.mjs';
+import { GroupTitle } from './group-title';
 import {
 	descriptionStyle,
-	headingStyle,
 	itemStyle,
 	listStyle,
 	previewStyle,
@@ -21,16 +21,14 @@ const contentStyle: CSSProperties = {
 };
 
 type DimensionKind = {
-	key: keyof typeof groups.dimension.groups;
-	title: string;
 	intro: string;
 	example: ( name: string ) => ReactNode;
 };
 
-const kinds: DimensionKind[] = [
-	{
-		key: 'padding',
-		title: 'Padding',
+type DimensionGroupKey = keyof typeof groups.dimension.groups;
+
+const dimensionConfig: Record< DimensionGroupKey, DimensionKind > = {
+	padding: {
 		intro: 'Space between the edge of a container and its content. The shaded area is the padding.',
 		example: ( name ) => (
 			<span
@@ -51,9 +49,7 @@ const kinds: DimensionKind[] = [
 			</span>
 		),
 	},
-	{
-		key: 'gap',
-		title: 'Gap',
+	gap: {
 		intro: 'Space between sibling elements in a flex or grid layout.',
 		example: ( name ) => (
 			<span
@@ -77,9 +73,7 @@ const kinds: DimensionKind[] = [
 			</span>
 		),
 	},
-	{
-		key: 'size',
-		title: 'Size',
+	size: {
 		intro: 'Width and height of controls, icons, and markers.',
 		example: ( name ) => (
 			<span
@@ -93,9 +87,7 @@ const kinds: DimensionKind[] = [
 			/>
 		),
 	},
-	{
-		key: 'surface-width',
-		title: 'Surface width',
+	'surface-width': {
 		intro: 'Widths for surfaces such as popovers, dialogs, and panels.',
 		example: ( name ) => (
 			<span
@@ -109,7 +101,7 @@ const kinds: DimensionKind[] = [
 			/>
 		),
 	},
-];
+};
 
 /**
  * Displays the dimension tokens grouped by purpose, each with an example of
@@ -118,11 +110,14 @@ const kinds: DimensionKind[] = [
 export function DimensionTokenPreview() {
 	return (
 		<div style={ previewStyle }>
-			{ kinds.map( ( { key, title, intro, example } ) => {
+			{ (
+				Object.keys( groups.dimension.groups ) as DimensionGroupKey[]
+			 ).map( ( key ) => {
 				const group = groups.dimension.groups[ key ];
+				const { intro, example } = dimensionConfig[ key ];
 				return (
 					<section key={ key }>
-						<h2 style={ headingStyle }>{ title }</h2>
+						<GroupTitle name={ key } />
 						<p>{ intro }</p>
 						<dl style={ { ...listStyle, marginBlockStart: 8 } }>
 							{ group.tokens.map( ( name ) => (
