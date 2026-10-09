@@ -2,6 +2,7 @@ import { Component, forwardRef } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 import { createHigherOrderComponent } from '../../utils/create-higher-order-component';
 import Listener from './listener';
+import type { WithGlobalEventsHOC, RefComponent, WrapperProps } from './types';
 
 /**
  * Listener instance responsible for managing document event handling.
@@ -18,24 +19,27 @@ const listener = new Listener();
  *
  * @deprecated
  *
- * @param {Record<keyof GlobalEventHandlersEventMap, string>} eventTypesToHandlers Object with keys of DOM
- *                                                                                 event type, the value a
- *                                                                                 name of the function on
- *                                                                                 the original component's
- *                                                                                 instance which handles
- *                                                                                 the event.
+ * @param eventTypesToHandlers Object with keys of DOM event type, the value a
+ *                             name of the function on the original component's
+ *                             instance which handles the event.
  *
- * @return {any} Higher-order component.
+ * @return Higher-order component.
  */
-export default function withGlobalEvents( eventTypesToHandlers ) {
+export default function withGlobalEvents(
+	eventTypesToHandlers: Partial<
+		Record< keyof GlobalEventHandlersEventMap, string >
+	>
+) {
 	deprecated( 'wp.compose.withGlobalEvents', {
 		since: '5.7',
 		alternative: 'useEffect',
 	} );
 
-	return createHigherOrderComponent( ( WrappedComponent ) => {
-		class Wrapper extends Component {
-			constructor( /** @type {any} */ props ) {
+	return createHigherOrderComponent( ( WrappedComponent: RefComponent ) => {
+		class Wrapper extends Component< WrapperProps > {
+			declare wrappedRef: Record< string, unknown > | null;
+
+			constructor( props: WrapperProps ) {
 				super( props );
 
 				this.handleEvent = this.handleEvent.bind( this );
@@ -54,19 +58,19 @@ export default function withGlobalEvents( eventTypesToHandlers ) {
 				} );
 			}
 
-			handleEvent( /** @type {any} */ event ) {
+			handleEvent( event: Event ) {
 				const handler =
 					eventTypesToHandlers[
-						/** @type {keyof GlobalEventHandlersEventMap} */ (
-							event.type
-						)
-					];
-				if ( typeof this.wrappedRef[ handler ] === 'function' ) {
-					this.wrappedRef[ handler ]( event );
+						event.type as keyof GlobalEventHandlersEventMap
+					]!;
+				if ( typeof this.wrappedRef![ handler ] === 'function' ) {
+					( this.wrappedRef![ handler ] as ( event: Event ) => void )(
+						event
+					);
 				}
 			}
 
-			handleRef( /** @type {any} */ el ) {
+			handleRef( el: Record< string, unknown > | null ) {
 				this.wrappedRef = el;
 				// Any component using `withGlobalEvents` that is not setting a `ref`
 				// will cause `this.props.forwardedRef` to be `null`, so we need this
@@ -86,8 +90,14 @@ export default function withGlobalEvents( eventTypesToHandlers ) {
 			}
 		}
 
-		return forwardRef( ( props, ref ) => {
-			return <Wrapper ownProps={ props } forwardedRef={ ref } />;
+		return forwardRef( ( props: object, ref ) => {
+			return (
+				<Wrapper
+					ownProps={ props }
+					// Only callback refs are supported.
+					forwardedRef={ ref as WrapperProps[ 'forwardedRef' ] }
+				/>
+			);
 		} );
-	}, 'withGlobalEvents' );
+	}, 'withGlobalEvents' ) as WithGlobalEventsHOC;
 }
