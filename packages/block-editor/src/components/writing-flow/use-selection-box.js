@@ -11,6 +11,19 @@ const DRAG_THRESHOLD = 3;
 const FOCUSABLE_SELECTOR =
 	'a[href], button, input, select, textarea, [contenteditable="true"], [tabindex]';
 
+function clampToRect( x, y, rect ) {
+	return [
+		Math.min( Math.max( x, rect.left + 1 ), rect.right - 1 ),
+		Math.min( Math.max( y, rect.top + 1 ), rect.bottom - 1 ),
+	];
+}
+
+function getRichTextElement( node ) {
+	const element =
+		node.nodeType === node.ELEMENT_NODE ? node : node.parentElement;
+	return element?.closest( '[data-wp-block-attribute-key]' );
+}
+
 function intersects( a, b ) {
 	return (
 		a.left <= b.right &&
@@ -28,13 +41,16 @@ function intersects( a, b ) {
  * (see `useDragSelection` and `useSelectionObserver`): the box only shows the
  * gesture. A drag that starts outside any block's content (the canvas margins,
  * the space between blocks, a container's padding) has no native selection to
- * follow, so it selects the blocks the box touches instead.
+ * follow, so it makes one with the same outcome: while the box touches a
+ * single block with text, it selects the text from the press to the pointer,
+ * and once it touches several blocks, it selects those blocks.
  */
 export default function useSelectionBox() {
 	const {
 		startMultiSelect,
 		stopMultiSelect,
 		multiSelect,
+		selectBlock,
 		clearSelectedBlock,
 	} = useDispatch( blockEditorStore );
 	const {
@@ -61,6 +77,8 @@ export default function useSelectionBox() {
 			let pointer;
 			let box;
 			let selectsBlocks;
+			// What the drag selects so far: `'text'` or `'blocks'`.
+			let mode;
 			let selectedRange;
 			let rafId;
 
@@ -83,6 +101,19 @@ export default function useSelectionBox() {
 					top: Math.min( originY, pointer.y ),
 					bottom: Math.max( originY, pointer.y ),
 				};
+			}
+
+			function caretFromPoint( [ x, y ] ) {
+				if ( ownerDocument.caretPositionFromPoint ) {
+					const position = ownerDocument.caretPositionFromPoint(
+						x,
+						y
+					);
+					return position && [ position.offsetNode, position.offset ];
+				}
+
+				const range = ownerDocument.caretRangeFromPoint?.( x, y );
+				return range && [ range.startContainer, range.startOffset ];
 			}
 
 			function getBlockElement( clientId ) {
@@ -116,12 +147,73 @@ export default function useSelectionBox() {
 				return found;
 			}
 
-			// Selects the blocks the box touches. As with a native selection,
-			// the ends are promoted to siblings, so a box across two
-			// containers selects both containers.
-			function selectBlocksInRect( rect ) {
+			// Selects the text of a block from the press to the pointer, both
+			// brought within the block, as a native selection starting next to
+			// the block would. The selection observer takes it from there.
+			function selectText( clientId ) {
+				const bounds =
+					getBlockElement( clientId ).getBoundingClientRect();
+				const scroll = getScroll();
+				const anchor = caretFromPoint(
+					clampToRect(
+						origin.x - scroll.x,
+						origin.y - scroll.y,
+						bounds
+					)
+				);
+				const focus = caretFromPoint(
+					clampToRect( pointer.x, pointer.y, bounds )
+				);
+				const richTextElement =
+					anchor && getRichTextElement( anchor[ 0 ] );
+
+				if (
+					! richTextElement ||
+					! focus ||
+					getRichTextElement( focus[ 0 ] ) !== richTextElement ||
+					getBlockClientId( richTextElement ) !== clientId
+				) {
+					return false;
+				}
+
+				// Leave the multi-selection first: once it stops, a selection
+				// of several blocks would replace the native selection.
+				if ( mode === 'blocks' ) {
+					selectBlock( clientId, null );
+					stopMultiSelect();
+				}
+
+				mode = 'text';
+				selectedRange = undefined;
+				defaultView
+					.getSelection()
+					.setBaseAndExtent( ...anchor, ...focus );
+				return true;
+			}
+
+			// Selects what the box touches: the text of a single block, or
+			// the blocks. As with a native selection, the ends are promoted to
+			// siblings, so a box across two containers selects both
+			// containers.
+			function selectInRect( rect ) {
 				const first = findEdgeBlock( rect, false );
 				const last = findEdgeBlock( rect, true );
+
+				if ( first && first === last && selectText( first ) ) {
+					return;
+				}
+
+				if ( mode !== 'blocks' ) {
+					if ( mode === 'text' ) {
+						defaultView.getSelection().removeAllRanges();
+						node.focus( { preventScroll: true } );
+					}
+
+					mode = 'blocks';
+					selectedRange = undefined;
+					startMultiSelect();
+				}
+
 				let range;
 
 				if ( first && last ) {
@@ -182,7 +274,7 @@ export default function useSelectionBox() {
 				box.style.height = `${ Math.max( bottom - top, 0 ) }px`;
 
 				if ( selectsBlocks ) {
-					selectBlocksInRect( rect );
+					selectInRect( rect );
 				}
 			}
 
@@ -200,11 +292,6 @@ export default function useSelectionBox() {
 					isDraggingBlocks()
 				) {
 					return false;
-				}
-
-				if ( selectsBlocks ) {
-					selectedRange = undefined;
-					startMultiSelect();
 				}
 
 				box = ownerDocument.createElement( 'div' );
@@ -235,7 +322,7 @@ export default function useSelectionBox() {
 				box.remove();
 				box = null;
 
-				if ( selectsBlocks ) {
+				if ( mode === 'blocks' ) {
 					stopMultiSelect();
 				}
 			}
@@ -286,6 +373,7 @@ export default function useSelectionBox() {
 
 				stop();
 				mouseDownEvent = event;
+				mode = undefined;
 				const { target } = event;
 				const clientId = getBlockClientId( target );
 				const focusable = target.closest( FOCUSABLE_SELECTOR );
@@ -337,6 +425,7 @@ export default function useSelectionBox() {
 			startMultiSelect,
 			stopMultiSelect,
 			multiSelect,
+			selectBlock,
 			clearSelectedBlock,
 			isSelectionEnabled,
 			isDraggingBlocks,
