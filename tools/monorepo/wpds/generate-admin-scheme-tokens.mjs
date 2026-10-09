@@ -18,7 +18,7 @@
  * as a plain function yet. Once `@wordpress/theme` does, this script and its
  * output are meant to be replaced by that.
  *
- * Usage: npm run wpds:admin-scheme-tokens --workspace @wordpress/monorepo-tools
+ * Usage: npm run wpds:admin-scheme-tokens --workspace `@wordpress/monorepo-tools`
  */
 
 import { writeFileSync } from 'node:fs';

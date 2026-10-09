@@ -884,7 +884,7 @@ _Returns_
 
 ### privateApis
 
-Private @wordpress/block-editor APIs.
+Private `@wordpress/block-editor` APIs.
 
 ### RecursionProvider
 

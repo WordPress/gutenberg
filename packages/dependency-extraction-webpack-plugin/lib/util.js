@@ -21,7 +21,7 @@ const BUNDLED_PACKAGES = [
 /**
  * Default request to global transformation
  *
- * Transform @wordpress dependencies:
+ * Transform `@wordpress` dependencies:
  * - request `@wordpress/api-fetch` becomes `[ 'wp', 'apiFetch' ]`
  * - request `@wordpress/i18n` becomes `[ 'wp', 'i18n' ]`
  *
@@ -75,7 +75,7 @@ function defaultRequestToExternal( request ) {
 /**
  * Default request to external module transformation
  *
- * Currently only @wordpress/interactivity and `@wordpress/interactivity-router`
+ * Currently only `@wordpress/interactivity` and `@wordpress/interactivity-router`
  * are supported.
  *
  * Do not use the boolean shorthand here, it's only handled for the
@@ -115,7 +115,7 @@ function defaultRequestToExternalModule( request ) {
 /**
  * Default request to WordPress script handle transformation
  *
- * Transform @wordpress dependencies:
+ * Transform `@wordpress` dependencies:
  * - request `@wordpress/i18n` becomes `wp-i18n`
  * - request `@wordpress/escape-html` becomes `wp-escape-html`
  *

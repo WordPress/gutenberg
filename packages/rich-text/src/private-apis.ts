@@ -9,7 +9,7 @@ import { ownsSelection } from './owns-selection';
 import { subscribeOwnedListener } from './subscribe-owned-listener';
 
 /**
- * Private @wordpress/rich-text APIs.
+ * Private `@wordpress/rich-text` APIs.
  */
 export const privateApis = {};
 lock( privateApis, {
