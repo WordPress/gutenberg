@@ -211,7 +211,6 @@
 	},
 	"selectors": {
 		"root": ".wp-block-table > table",
-		"background": ".wp-block-table > table",
 		"spacing": ".wp-block-table"
 	},
 	"styles": [
