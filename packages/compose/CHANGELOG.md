@@ -8,11 +8,11 @@
 
 ### Enhancements
 
--   Type `withGlobalEvents` and `withState` instead of returning `any`, and let `withGlobalEvents` take only the events it handles.
+-   Type `withGlobalEvents` and `withState` instead of returning `any`, and let `withGlobalEvents` take only the events it handles ([#84382](https://github.com/WordPress/gutenberg/pull/84382)).
 
 ### Internal
 
--   Refactor to TypeScript.
+-   Refactor to TypeScript ([#84382](https://github.com/WordPress/gutenberg/pull/84382)).
 
 ## 8.10.0 (2026-10-07)
 
