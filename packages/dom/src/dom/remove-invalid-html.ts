@@ -4,9 +4,9 @@ import type { Schema } from './types';
 /**
  * Given a schema, unwraps or removes nodes, attributes and classes on HTML.
  *
- * @param {string}                   HTML   The HTML to clean up.
- * @param {import('./types').Schema} schema Schema for the HTML.
- * @param {boolean}                  inline Whether to clean for inline mode.
+ * @param {string}  HTML   The HTML to clean up.
+ * @param {Schema}  schema Schema for the HTML.
+ * @param {boolean} inline Whether to clean for inline mode.
  *
  * @return {string} The cleaned up HTML.
  */
