@@ -65,8 +65,9 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	/**
 	 * Tears down each test.
 	 *
-	 * Resetting the registry drops the fields a test registered; the next
-	 * read fires `wp_fields_api_init` again.
+	 * Resetting the registry drops the fields a test registered along with
+	 * the defaults; the next read fires `wp_fields_api_init` again and
+	 * registers the defaults anew.
 	 */
 	public function tear_down() {
 		foreach ( $this->callbacks as $callback ) {
@@ -98,7 +99,8 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	 *
 	 * Registering only runs on the action, so the registration is hooked to
 	 * it, as a plugin does, and the action fired anew: the registry is reset
-	 * and read, which replays the registrations made so far, in order.
+	 * and read, which registers the defaults again and replays the
+	 * registrations made so far, in order.
 	 *
 	 * @param string      $kind   The entity kind.
 	 * @param string      $name   The entity name.
@@ -396,6 +398,74 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 		$this->assertSame( 'page', $data['name'] );
 		$this->assertIsArray( $data['fields'] );
 		$this->assertIsArray( $data['script_modules'] );
+	}
+
+	/**
+	 * The default fields registered for a post type are exposed.
+	 *
+	 * @covers ::get_items
+	 */
+	public function test_get_items_exposes_the_default_post_type_fields() {
+		wp_set_current_user( self::$editor_id );
+
+		$data = $this->dispatch_request( 'postType', 'page' )->get_data();
+		$ids  = array_column( $data['fields'], 'id' );
+
+		$this->assertContains( 'author', $ids, 'Pages support authors.' );
+		$this->assertContains( 'comment_status', $ids, 'Pages support comments.' );
+		$this->assertSame( wp_get_registered_fields( 'postType', 'page' ), $data['fields'] );
+		$this->assertSame(
+			array(
+				array(
+					'id'     => '@wordpress/core-fields/post_type_supports',
+					'fields' => array_values( array_diff( $ids, array( 'title' ) ) ),
+				),
+				array(
+					'id'     => '@wordpress/core-fields/page',
+					'fields' => array( 'title' ),
+				),
+			),
+			$data['script_modules'],
+			'The fields are registered with the module of their collection.'
+		);
+	}
+
+	/**
+	 * The pattern collection exposes its fields and their script module.
+	 *
+	 * @covers ::get_items
+	 */
+	public function test_get_items_exposes_pattern_fields_and_their_script_module() {
+		wp_set_current_user( self::$editor_id );
+
+		$data    = $this->dispatch_request( 'postType', 'wp_block' )->get_data();
+		$ids     = array_column( $data['fields'], 'id' );
+		$modules = array_column( $data['script_modules'], 'fields', 'id' );
+
+		$this->assertContains( 'excerpt', $ids );
+		$this->assertContains( 'sync-status', $ids );
+		$this->assertContains( 'title', $ids );
+		$this->assertSame( wp_get_registered_fields( 'postType', 'wp_block' ), $data['fields'] );
+		$this->assertSame(
+			array( 'excerpt', 'sync-status', 'title' ),
+			$modules['@wordpress/core-fields/wp_block']
+		);
+	}
+
+	/**
+	 * The default fields are exposed with the `core` origin.
+	 *
+	 * @covers ::get_items
+	 */
+	public function test_get_items_exposes_the_default_fields_with_the_core_origin() {
+		wp_set_current_user( self::$editor_id );
+
+		$data = $this->dispatch_request( 'postType', 'page' )->get_data();
+
+		$this->assertNotEmpty( $data['fields'] );
+		foreach ( $data['fields'] as $field ) {
+			$this->assertSame( 'core', $field['origin']['registeredBy'] );
+		}
 	}
 
 	/**

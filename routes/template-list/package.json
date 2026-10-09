@@ -18,6 +18,7 @@
 		"@wordpress/element": "file:../../packages/element",
 		"@wordpress/editor": "file:../../packages/editor",
 		"@wordpress/fields": "file:../../packages/fields",
+		"@wordpress/fields-loader": "file:../../packages/fields-loader",
 		"@wordpress/html-entities": "file:../../packages/html-entities",
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/icons": "file:../../packages/icons",

@@ -19,6 +19,13 @@ export const route = {
 			throw notFound();
 		}
 	},
+	loader: async () => {
+		// Warm up the fields the stage renders. `useFields` there shares this
+		// resolution, so the screen paints with its fields on first render.
+		// `loadTemplateFields` reports no failure of its own: that is the
+		// stage's to report, so it does not block the route.
+		await loadTemplateFields();
+	},
 	title: () => __( 'Templates' ),
 	async canvas( context: {
 		params: {

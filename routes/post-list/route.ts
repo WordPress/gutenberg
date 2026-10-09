@@ -1,5 +1,6 @@
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { loadFields } from '@wordpress/fields-loader';
 import { notFound } from '@wordpress/route';
 import { ensureView, viewToQuery } from './view-utils';
 
@@ -19,6 +20,15 @@ export const route = {
 		} catch {
 			throw notFound();
 		}
+	},
+	loader: async ( { params }: { params: { type: string } } ) => {
+		// Warm up the fields the stage renders. `useFields` there shares this
+		// resolution, so the screen paints with its fields on first render. A
+		// failure is the stage's to report, so it does not block the route.
+		await loadFields( {
+			kind: 'postType',
+			name: params.type,
+		} ).catch( () => {} );
 	},
 	title: async ( { params }: { params: { type: string } } ) => {
 		const postType = await resolveSelect( coreStore ).getPostType(

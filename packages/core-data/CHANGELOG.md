@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### New Features
+
+-   Add the `getFieldsConfig( kind, name )` selector, which returns the fields an entity registered on the server, as the `/wp/v2/fields` REST API route returns them, and the `FieldsConfig` type that describes them ([#83368](https://github.com/WordPress/gutenberg/pull/83368)).
+
 ## 8.2.0 (2026-10-07)
 
 ### Enhancements

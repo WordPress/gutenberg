@@ -1,0 +1,9 @@
+/*
+ * Reset `fieldset` browser defaults, without specificity so the editors'
+ * styles for `.fields-controls__password` (a top border and padding) win.
+ */
+:where(.password) {
+	border: 0;
+	padding: 0;
+	margin: 0;
+}

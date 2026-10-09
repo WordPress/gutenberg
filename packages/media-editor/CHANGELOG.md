@@ -5,6 +5,7 @@
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+-   `MediaForm` no longer accepts a `form` prop. Pass the form as `settings.form` of `MediaEditorProvider` instead, so the fields and their layout are decided in one place ([#83368](https://github.com/WordPress/gutenberg/pull/83368)).
 
 ### Internal
 
@@ -16,6 +17,8 @@
 
 -   Restore an image's original attachment and editable details from the media editor's More options menu ([#81805](https://github.com/WordPress/gutenberg/pull/81805)).
 -   Allow consumers to restore their own state with snackbar Undo after saving an image edit ([#81805](https://github.com/WordPress/gutenberg/pull/81805)).
+-   Lay out the default attachment form in a fixed order of the core fields, so it no longer depends on the order the fields are passed in. Other fields are no longer part of the default form: pass a `settings.form` to `MediaEditorProvider` to show them ([#83368](https://github.com/WordPress/gutenberg/pull/83368)).
+-   `MediaEditorProvider` accepts a `settings.form` to lay out the fields with, which `MediaForm` uses instead of the default form ([#83368](https://github.com/WordPress/gutenberg/pull/83368)).
 
 ### Bug Fixes
 

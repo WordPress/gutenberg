@@ -2340,6 +2340,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/core-fields",
+		"slug": "packages-core-fields",
+		"markdown_source": "../packages/core-fields/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/create-block-interactive-template",
 		"slug": "packages-create-block-interactive-template",
 		"markdown_source": "../packages/create-block-interactive-template/README.md",
@@ -2487,6 +2493,12 @@
 		"title": "@wordpress/eslint-plugin",
 		"slug": "packages-eslint-plugin",
 		"markdown_source": "../packages/eslint-plugin/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/fields-loader",
+		"slug": "packages-fields-loader",
+		"markdown_source": "../packages/fields-loader/README.md",
 		"parent": "packages"
 	},
 	{

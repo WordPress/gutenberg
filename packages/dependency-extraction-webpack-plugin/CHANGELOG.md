@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Enhancements
+
+-   Add `@wordpress/fields-loader` as a bundled package, so consumer builds bundle it instead of externalizing it to a nonexistent `wp-fields-loader` script ([#83368](https://github.com/WordPress/gutenberg/pull/83368)).
+
 ## 6.57.0 (2026-10-07)
 
 ### Enhancements
