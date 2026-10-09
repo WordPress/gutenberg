@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import os from 'node:os';
 import esbuild from 'esbuild';
 

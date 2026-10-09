@@ -8,10 +8,6 @@
  */
 import { readFile, writeFile, access } from 'fs/promises';
 import path from 'path';
-
-/**
- * Internal dependencies
- */
 import { buildWithConcurrency } from './build-concurrency.mjs';
 
 /**
