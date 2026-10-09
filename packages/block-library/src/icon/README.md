@@ -37,6 +37,8 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - `margin`: `true`
 - [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
   - `width`: `true`
+  - `minWidth`: `true`
+  - `minHeight`: `true`
 
 ## CSS Selectors
 
