@@ -12,7 +12,7 @@
 
 ### Bug Fixes
 
--   `getOffsetParent`: Fix an infinite loop when the parent of the node is not an element.
+-   `getOffsetParent`: Fix an infinite loop when the parent of the node is not an element ([#84374](https://github.com/WordPress/gutenberg/pull/84374)).
 
 ### Internal
 
