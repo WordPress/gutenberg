@@ -4,6 +4,7 @@ import {
 	getRepairedRect,
 	getVisibleBox,
 	isEditorFurniture,
+	isTextBlock,
 } from '../conversion';
 import { DESIGN_WIDTH } from '../constants';
 
@@ -253,5 +254,48 @@ describe( 'a block whose content is only text', () => {
 				DESIGN_WIDTH
 			)
 		).toBe( stored );
+	} );
+} );
+
+describe( 'isTextBlock', () => {
+	// A paragraph is text however it is marked up. Counting its contents meant
+	// a paragraph with a link or a bold word in it had element children, got
+	// measured by them, and narrowed to the width of that markup the moment it
+	// was dragged — while a paragraph of plain text kept its size. The block
+	// itself says what it is: a rich text root carries the editable attribute
+	// and the editor's class for it.
+	it( 'knows a paragraph by the attribute RichText puts on it', () => {
+		expect( isTextBlock( 'wp-block-paragraph', true ) ).toBe( true );
+	} );
+
+	it( 'knows one that is held still on a canvas, which is still text', () => {
+		// Locked for dragging, `contenteditable="false"` — the attribute is
+		// there either way, which is the point.
+		expect(
+			isTextBlock(
+				'block-editor-rich-text__editable wp-block-paragraph',
+				true
+			)
+		).toBe( true );
+	} );
+
+	it( 'knows it by the class alone', () => {
+		expect( isTextBlock( 'block-editor-rich-text__editable', false ) ).toBe(
+			true
+		);
+	} );
+
+	it( 'does not mistake an image block for text', () => {
+		expect( isTextBlock( 'wp-block-image', false ) ).toBe( false );
+	} );
+
+	it( 'does not mistake a Buttons block for text', () => {
+		// Its buttons hold the editable text, not the block itself, so the
+		// block is measured by them and can be placed anywhere.
+		expect( isTextBlock( 'wp-block-buttons', false ) ).toBe( false );
+	} );
+
+	it( 'copes with a block that has no class', () => {
+		expect( isTextBlock( undefined, false ) ).toBe( false );
 	} );
 } );

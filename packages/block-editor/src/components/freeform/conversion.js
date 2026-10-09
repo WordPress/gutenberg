@@ -203,6 +203,15 @@ function toBox( rect ) {
  *         content is text, which leaves its own box as the measurement.
  */
 function getContentBoxes( element ) {
+	if (
+		isTextBlock(
+			element.className,
+			element.hasAttribute( 'contenteditable' )
+		)
+	) {
+		return [];
+	}
+
 	const boxes = [];
 	for ( const child of element.children ) {
 		if ( isEditorFurniture( child.className ) ) {
@@ -267,4 +276,33 @@ export function getRepairedRect( storedRect, visibleRect, designWidth ) {
 	}
 
 	return { ...storedRect, x: visibleRect.x, width: visibleRect.width };
+}
+
+/**
+ * Whether a block is text, whatever it is marked up with.
+ *
+ * Text is measured by its own box rather than by its contents, so that a
+ * paragraph is the size it was before it was dragged. Deciding that by whether
+ * it has elements inside only works for plain text: a paragraph with a link or
+ * a bold word in it has element children, and would be measured by them and
+ * narrow to the width of that markup the moment it was picked up.
+ *
+ * The block says what it is instead. A rich text root carries the editable
+ * attribute — `"false"` while it is held still on a canvas, `"true"` once it
+ * has been entered, present either way — and the editor's own class for it.
+ *
+ * A Buttons block is deliberately not text: its buttons hold the editable
+ * words, not the block, so it is measured by them and can be placed anywhere.
+ *
+ * @param {string}  [className]       The block element's class attribute.
+ * @param {boolean} isContentEditable Whether it carries `contenteditable`.
+ * @return {boolean} Whether to leave it at the width it is laid out at.
+ */
+export function isTextBlock( className, isContentEditable ) {
+	return (
+		!! isContentEditable ||
+		String( className ?? '' )
+			.split( ' ' )
+			.includes( 'block-editor-rich-text__editable' )
+	);
 }
