@@ -181,6 +181,71 @@ export const Loading: Story = {
 	},
 };
 
+export const LoadingStates: Story = {
+	args: {
+		children: 'Save',
+		loadingAnnouncement: '',
+	},
+	render: ( args ) => (
+		<div
+			data-loading-states
+			style={ {
+				display: 'inline-grid',
+				justifyItems: 'start',
+				gridTemplateColumns: 'max-content repeat(4, max-content)',
+				gap: '16px',
+				alignItems: 'center',
+				padding: '16px',
+				background:
+					'var(--wpds-color-background-surface-neutral-strong)',
+				color: 'var(--wpds-color-foreground-content-neutral)',
+			} }
+		>
+			<span />
+			<span>Resting</span>
+			<span>Disabled</span>
+			<span>Loading, enabled</span>
+			<span>Loading, disabled</span>
+			{ ( [ 'brand', 'neutral' ] as const ).map( ( tone ) =>
+				( [ 'solid', 'outline', 'minimal' ] as const ).map(
+					( variant ) => (
+						<Fragment key={ `${ tone }-${ variant }` }>
+							<span>
+								{ tone }, { variant }
+							</span>
+							<Button
+								{ ...args }
+								tone={ tone }
+								variant={ variant }
+							/>
+							<Button
+								{ ...args }
+								tone={ tone }
+								variant={ variant }
+								disabled
+							/>
+							<Button
+								{ ...args }
+								tone={ tone }
+								variant={ variant }
+								loading
+								disabled={ false }
+							/>
+							<Button
+								{ ...args }
+								tone={ tone }
+								variant={ variant }
+								loading
+								disabled
+							/>
+						</Fragment>
+					)
+				)
+			) }
+		</div>
+	),
+};
+
 /**
  * The pressed state is only available for buttons with `tone="neutral"` and
  * `variant="minimal"` and can be toggled via the `aria-pressed` HTML attribute.

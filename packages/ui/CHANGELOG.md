@@ -8,6 +8,8 @@
 
 ### Bug Fixes
 
+-   `Button`, `IconButton`: Apply disabled colors to the button and loading indicator when loading and disabled.
+
 -   `Menu`, `Popover`: Keep popups open when the user interacts with an iframe inside the popup. ([#83870](https://github.com/WordPress/gutenberg/pull/83870))
 -   `AlertDialog`: Use the WordPress compatibility overlay slot as the default portal container when available, preserving an explicit null container to delay rendering ([#83878](https://github.com/WordPress/gutenberg/pull/83878)).
 

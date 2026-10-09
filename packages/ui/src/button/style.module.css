@@ -98,15 +98,20 @@
 				border-color: var(--wp-ui-button-border-color-active);
 			}
 
-			&[data-disabled]:not(.is-loading) {
-				/* A loading button, even when disabled, won't "look" disabled */
+			&[data-disabled] {
 				background-color: var(--wp-ui-button-background-color-disabled);
-				color: var(--wp-ui-button-foreground-color-disabled);
 				border-color: var(--wp-ui-button-border-color-disabled);
+
+				&:not(.is-loading) {
+					color: var(--wp-ui-button-foreground-color-disabled);
+
+					@media ( forced-colors: active ) {
+						color: GrayText;
+					}
+				}
 
 				@media ( forced-colors: active ) {
 					border-color: GrayText;
-					color: GrayText;
 				}
 			}
 
@@ -247,6 +252,15 @@
 
 			* {
 				opacity: 0;
+			}
+
+			&[data-disabled]::before {
+				border-block-start-color: var(--wp-ui-button-foreground-color-disabled);
+				border-inline-end-color: var(--wp-ui-button-foreground-color-disabled);
+
+				@media ( forced-colors: active ) {
+					border-color: GrayText;
+				}
 			}
 
 			&::before {
