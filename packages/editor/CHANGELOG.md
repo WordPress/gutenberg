@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Enhancements
+
+-   Notes: Mark noted content in the author's color at rest. Inline notes get a tint and an underline that thickens when the note is selected, and block-level notes tint the whole block with an outline around it. Selecting a note outlines its block instead of dimming the rest of the canvas, and hiding notes hides the marks ([#80578](https://github.com/WordPress/gutenberg/pull/80578)).
+
 ### Bug Fixes
 
 -   Notes: Highlight the text an unsent note is about, and keep the note anchored to it when the selection changes or the text is edited before the note is sent ([#84125](https://github.com/WordPress/gutenberg/pull/84125)).
