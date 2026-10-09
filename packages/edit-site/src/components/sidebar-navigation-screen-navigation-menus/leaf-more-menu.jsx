@@ -1,22 +1,29 @@
-import { chevronUp, chevronDown, moreVertical } from '@wordpress/icons';
+import { chevronUp, chevronDown, moreVertical, pencil } from '@wordpress/icons';
 import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { unlock } from '../../lock-unlock';
+
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	placement: 'bottom-start',
 };
-import { unlock } from '../../lock-unlock';
+
+const BLOCKS_WITH_LINK_EDIT_SUPPORT = [
+	'core/navigation-link',
+	'core/navigation-submenu',
+];
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 export default function LeafMoreMenu( props ) {
 	const history = useHistory();
 	const { path } = useLocation();
-	const { clientId } = props;
+	const { block, clientId: propClientId, setEditingBlock } = props;
+	const clientId = block?.clientId ?? propClientId;
 	const { moveBlocksDown, moveBlocksUp, removeBlocks } =
 		useDispatch( blockEditorStore );
 
@@ -45,6 +52,8 @@ export default function LeafMoreMenu( props ) {
 		},
 		[ clientId ]
 	);
+
+	const canEditLink = BLOCKS_WITH_LINK_EDIT_SUPPORT.includes( blockName );
 
 	const onGoToPage = useCallback( () => {
 		if (
@@ -79,6 +88,22 @@ export default function LeafMoreMenu( props ) {
 			{ ( { onClose } ) => (
 				<>
 					<MenuGroup>
+						{ canEditLink && (
+							<MenuItem
+								icon={ pencil }
+								onClick={ () => {
+									setEditingBlock?.( {
+										...( block ?? {} ),
+										clientId,
+										name: blockName,
+										attributes,
+									} );
+									onClose();
+								} }
+							>
+								{ __( 'Edit link' ) }
+							</MenuItem>
+						) }
 						<MenuItem
 							icon={ chevronUp }
 							onClick={ () => {
