@@ -136,5 +136,6 @@ describe( 'mediaUpload with client-side media processing', () => {
 		await failServerUpload( 'eight.txt' );
 		await waitFor( () => expect( onError ).toHaveBeenCalled() );
 		expect( onBatchSuccess ).toHaveBeenCalledTimes( 1 );
+		expect( onError ).toHaveBeenCalledBefore( onBatchSuccess );
 	} );
 } );
