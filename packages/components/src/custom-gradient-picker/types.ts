@@ -37,16 +37,26 @@ export type CustomGradientPickerProps = {
 	__experimentalIsRenderedInSidebar?: boolean;
 };
 
+/**
+ * `gradient-parser` can't read the color interpolation method of a gradient
+ * (e.g. `in oklch`), so the picker keeps it next to the parsed AST.
+ */
+type WithColorInterpolation = { colorInterpolation?: string };
+
+export type GradientAST = gradientParser.GradientNode & WithColorInterpolation;
+
 export type GradientAnglePickerProps = {
-	gradientAST:
+	gradientAST: (
 		| gradientParser.LinearGradientNode
-		| gradientParser.RepeatingLinearGradientNode;
+		| gradientParser.RepeatingLinearGradientNode
+	) &
+		WithColorInterpolation;
 	hasGradient: boolean;
 	onChange: ( gradient: string ) => void;
 };
 
 export type GradientTypePickerProps = {
-	gradientAST: gradientParser.GradientNode;
+	gradientAST: GradientAST;
 	hasGradient: boolean;
 	onChange: ( gradient: string ) => void;
 };
