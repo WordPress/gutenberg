@@ -1,7 +1,10 @@
 import clsx from 'clsx';
 import type { MouseEvent } from 'react';
 import { __, sprintf, _n } from '@wordpress/i18n';
-import { useRef, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import type { Comment } from '@wordpress/core-data';
 /*
  * `Button` and `IconButton` are pending Design System review
  * (WordPress/gutenberg#76135).
@@ -10,84 +13,9 @@ import { useRef, useState } from '@wordpress/element';
 import { Button, IconButton, Menu, Stack, Tooltip } from '@wordpress/ui';
 import { ThemeProvider } from '@wordpress/theme';
 import { reaction as reactionIcon } from '@wordpress/icons';
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
+import { store as editorStore } from '../../../store';
 import { REACTION_EMOJIS, getReactionEmoji } from './reaction-emojis';
 import { useNoteReactions } from './use-note-reactions';
-import type { ReactionSummary } from './use-note-reactions';
-
-type ReactorNames = Record< string, string[] >;
-
-interface ReactionComment {
-	author_name: string;
-	content: string | { raw?: string; rendered?: string };
-}
-
-const REACTIONS_PER_PAGE = 100;
-
-// A note with more reactions than this is not worth walking page by page just
-// to name them; the pill falls back to its count-based label instead.
-const MAX_REACTION_PAGES = 10;
-
-/**
- * Fetches the names of everyone who reacted to a note, grouped by hex key.
- *
- * The REST collection cannot be filtered by hex key, so every reaction on the
- * note comes back and is grouped here.
- *
- * @param noteId The parent note comment ID.
- * @return Reactor names keyed by hex key, or `null` when the note has more
- *         reactions than the walk will fetch.
- */
-async function fetchReactorNames(
-	noteId: number
-): Promise< ReactorNames | null > {
-	const names: ReactorNames = {};
-
-	for ( let page = 1; page <= MAX_REACTION_PAGES; page++ ) {
-		let batch: ReactionComment[];
-		try {
-			batch = await apiFetch< ReactionComment[] >( {
-				path: addQueryArgs( '/wp/v2/comments', {
-					parent: noteId,
-					type: 'reaction',
-					status: 'all',
-					page,
-					per_page: REACTIONS_PER_PAGE,
-					_fields: 'author_name,content',
-				} ),
-			} );
-		} catch ( error ) {
-			// A full last page sends the walk one page past the end, which the
-			// endpoint rejects.
-			if (
-				page > 1 &&
-				( error as { code?: string } )?.code ===
-					'rest_comment_invalid_page_number'
-			) {
-				return names;
-			}
-			throw error;
-		}
-
-		for ( const { author_name: authorName, content } of batch ) {
-			const raw =
-				typeof content === 'object'
-					? content?.raw || content?.rendered
-					: content;
-			const hexKey = raw?.replace( /<[^>]*>/g, '' ).trim();
-			if ( hexKey ) {
-				names[ hexKey ] = [ ...( names[ hexKey ] ?? [] ), authorName ];
-			}
-		}
-
-		if ( batch.length < REACTIONS_PER_PAGE ) {
-			return names;
-		}
-	}
-
-	return null;
-}
 
 /**
  * GitHub-style reactor list, e.g. "Ada, Grace, and 3 others reacted with heart".
@@ -132,34 +60,59 @@ function formatReactorNames( names: string[], emojiLabel: string ): string {
 }
 
 interface ReactionButtonProps {
+	noteId: number;
 	hexKey: string;
 	count: number;
 	isActive: boolean;
-	names?: string[];
 	disabled: boolean;
 	onToggle: ( hexKey: string ) => void;
-	onShowNames: () => void;
 }
 
 function ReactionButton( {
+	noteId,
 	hexKey,
 	count,
 	isActive,
-	names,
 	disabled,
 	onToggle,
-	onShowNames,
 }: ReactionButtonProps ) {
+	const [ isShowingNames, setIsShowingNames ] = useState( false );
+	// Fetched on hover or focus only; afterwards the cached records are read.
+	const reactions = useSelect(
+		( select ) => {
+			if ( ! isShowingNames ) {
+				return null;
+			}
+			return select( coreStore ).getEntityRecords< Comment< 'edit' > >(
+				'root',
+				'comment',
+				{
+					post: select( editorStore ).getCurrentPostId(),
+					parent: noteId,
+					type: 'reaction',
+					status: 'all',
+					per_page: -1,
+					_fields: 'id,author_name,content',
+				}
+			);
+		},
+		[ isShowingNames, noteId ]
+	);
+	const names = reactions
+		?.filter( ( reaction ) => reaction.content.raw === hexKey )
+		.map( ( reaction ) => reaction.author_name );
 	const emoji = getReactionEmoji( hexKey );
 	const emojiLabel = emoji?.label ?? hexKey;
-	const label = names?.length
-		? formatReactorNames( names, emojiLabel )
-		: sprintf(
-				/* translators: 1: emoji label, 2: count of reactions */
-				_n( '%1$s, %2$s reaction', '%1$s, %2$s reactions', count ),
-				emojiLabel,
-				count.toLocaleString()
-			);
+	// Names that don't add up to the count are stale until the refetch lands.
+	const label =
+		names?.length === count
+			? formatReactorNames( names, emojiLabel )
+			: sprintf(
+					/* translators: 1: emoji label, 2: count of reactions */
+					_n( '%1$s, %2$s reaction', '%1$s, %2$s reactions', count ),
+					emojiLabel,
+					count.toLocaleString()
+				);
 
 	return (
 		<Tooltip.Root>
@@ -188,8 +141,10 @@ function ReactionButton( {
 							}
 							onToggle( hexKey );
 						} }
-						onMouseEnter={ onShowNames }
-						onFocus={ onShowNames }
+						onMouseEnter={ () => setIsShowingNames( true ) }
+						onMouseLeave={ () => setIsShowingNames( false ) }
+						onFocus={ () => setIsShowingNames( true ) }
+						onBlur={ () => setIsShowingNames( false ) }
 					/>
 				}
 			>
@@ -224,43 +179,10 @@ export function NoteReactions( {
 	disabled,
 }: NoteReactionsProps ) {
 	const [ reactions, toggleReaction ] = useNoteReactions( noteId );
-	const [ fetchedNames, setFetchedNames ] = useState< {
-		summary: ReactionSummary;
-		names: ReactorNames;
-	} | null >( null );
-	const requestedSummaryRef = useRef< ReactionSummary | undefined >(
-		undefined
-	);
-
-	// Names fetched for an older summary may not match the current counts.
-	const reactorNames =
-		reactions && fetchedNames?.summary === reactions
-			? fetchedNames.names
-			: undefined;
 	const entries = Object.entries( reactions ?? {} );
 
 	if ( ! entries.length && ! canReact ) {
 		return null;
-	}
-
-	function showNames() {
-		const summary = reactions;
-		if ( ! summary || requestedSummaryRef.current === summary ) {
-			return;
-		}
-		requestedSummaryRef.current = summary;
-		fetchReactorNames( noteId )
-			.then( ( names ) => {
-				// A partial list reads as complete; keep the count-based label.
-				if ( names ) {
-					setFetchedNames( { summary, names } );
-				}
-			} )
-			.catch( () => {
-				if ( requestedSummaryRef.current === summary ) {
-					requestedSummaryRef.current = undefined;
-				}
-			} );
 	}
 
 	return (
@@ -281,13 +203,12 @@ export function NoteReactions( {
 				{ entries.map( ( [ hexKey, entry ] ) => (
 					<ReactionButton
 						key={ hexKey }
+						noteId={ noteId }
 						hexKey={ hexKey }
 						count={ entry.count }
 						isActive={ entry.current_user_reaction > 0 }
-						names={ reactorNames?.[ hexKey ] }
 						disabled={ disabled }
 						onToggle={ toggleReaction }
-						onShowNames={ showNames }
 					/>
 				) ) }
 				{ /*
