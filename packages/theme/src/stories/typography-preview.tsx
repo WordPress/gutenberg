@@ -1,21 +1,16 @@
 import type { CSSProperties } from 'react';
-import { tokens as wpdsTokens } from '../../prebuilt/js/design-tokens.mjs';
-
-const typographyTokens = Object.keys( wpdsTokens ).filter( ( tokenName ) =>
-	tokenName.startsWith( '--wpds-typography-' )
-);
+import { GroupTitle } from './group-title';
+import { groups, tokens } from '../../prebuilt/js/design-tokens.mjs';
 
 type TypographyTokenGroup = {
-	title: string;
-	tokenPrefix: string;
 	sampleLines: string[];
 	getSampleStyle: ( tokenValue: string, tokenName: string ) => CSSProperties;
 };
 
-const tokenGroups: TypographyTokenGroup[] = [
-	{
-		title: 'Font families',
-		tokenPrefix: '--wpds-typography-font-family-',
+type TypographyGroupKey = keyof typeof groups.typography.groups;
+
+const typographyConfig: Record< TypographyGroupKey, TypographyTokenGroup > = {
+	'font-family': {
 		sampleLines: [ 'Code is Poetry.' ],
 		getSampleStyle: ( tokenValue ) => ( {
 			fontFamily: tokenValue,
@@ -23,9 +18,7 @@ const tokenGroups: TypographyTokenGroup[] = [
 			lineHeight: 'var(--wpds-typography-line-height-xl)',
 		} ),
 	},
-	{
-		title: 'Font sizes',
-		tokenPrefix: '--wpds-typography-font-size-',
+	'font-size': {
 		sampleLines: [ 'Code is Poetry.' ],
 		getSampleStyle: ( tokenValue, tokenName ) => ( {
 			fontFamily: 'var(--wpds-typography-font-family-heading)',
@@ -36,9 +29,7 @@ const tokenGroups: TypographyTokenGroup[] = [
 			),
 		} ),
 	},
-	{
-		title: 'Line heights',
-		tokenPrefix: '--wpds-typography-line-height-',
+	'line-height': {
 		sampleLines: [
 			'WordPress grows when people like you tell their friends about it.',
 			'Code is Poetry.',
@@ -49,9 +40,7 @@ const tokenGroups: TypographyTokenGroup[] = [
 			lineHeight: tokenValue,
 		} ),
 	},
-	{
-		title: 'Font weights',
-		tokenPrefix: '--wpds-typography-font-weight-',
+	'font-weight': {
 		sampleLines: [ 'Code is Poetry.' ],
 		getSampleStyle: ( tokenValue ) => ( {
 			fontFamily: 'var(--wpds-typography-font-family-body)',
@@ -60,17 +49,13 @@ const tokenGroups: TypographyTokenGroup[] = [
 			lineHeight: 'var(--wpds-typography-line-height-lg)',
 		} ),
 	},
-];
+};
 
 const previewStyle: CSSProperties = {
 	display: 'flex',
 	flexDirection: 'column',
 	gap: 'var(--wpds-dimension-gap-3xl)',
 	color: 'var(--wpds-color-foreground-content-neutral)',
-};
-
-const headingStyle: CSSProperties = {
-	marginBlockEnd: 'var(--wpds-dimension-gap-xs)',
 };
 
 const listStyle: CSSProperties = {
@@ -101,7 +86,16 @@ const tokenNameStyle: CSSProperties = {
 };
 
 const tokenNameContainerStyle: CSSProperties = {
+	display: 'flex',
+	flexDirection: 'column',
+	gap: 'var(--wpds-dimension-gap-xs)',
 	margin: 0,
+};
+
+const descriptionStyle: CSSProperties = {
+	fontSize: 'var(--wpds-typography-font-size-sm)',
+	lineHeight: 'var(--wpds-typography-line-height-sm)',
+	color: 'var(--wpds-color-foreground-content-neutral-weak)',
 };
 
 const sampleStyle: CSSProperties = {
@@ -118,20 +112,21 @@ function getTokenValue( tokenName: string ) {
 }
 
 function TypographyTokenSection( {
-	title,
-	tokenPrefix,
+	groupKey,
+	tokenNames,
 	sampleLines,
 	getSampleStyle,
-}: TypographyTokenGroup ) {
-	const tokens = typographyTokens.filter( ( tokenName ) =>
-		tokenName.startsWith( tokenPrefix )
-	);
+}: TypographyTokenGroup & {
+	groupKey: string;
+	tokenNames: readonly ( keyof typeof tokens )[];
+} ) {
+	const sectionTokens = tokenNames;
 
 	return (
 		<section>
-			<h2 style={ headingStyle }>{ title }</h2>
+			<GroupTitle name={ groupKey } />
 			<dl style={ listStyle }>
-				{ tokens.map( ( tokenName ) => {
+				{ sectionTokens.map( ( tokenName ) => {
 					const tokenValue = getTokenValue( tokenName );
 					const tokenStyle = getSampleStyle( tokenValue, tokenName );
 
@@ -141,6 +136,9 @@ function TypographyTokenSection( {
 								<code style={ tokenNameStyle }>
 									{ tokenName }
 								</code>
+								<span style={ descriptionStyle }>
+									{ tokens[ tokenName ].$description }
+								</span>
 							</dt>
 							<dd style={ { margin: 0 } }>
 								<p style={ sampleStyle }>
@@ -172,10 +170,14 @@ function TypographyTokenSection( {
 export function TypographyTokenPreview() {
 	return (
 		<div style={ previewStyle }>
-			{ tokenGroups.map( ( tokenGroup ) => (
+			{ (
+				Object.keys( groups.typography.groups ) as TypographyGroupKey[]
+			 ).map( ( key ) => (
 				<TypographyTokenSection
-					key={ tokenGroup.tokenPrefix }
-					{ ...tokenGroup }
+					key={ key }
+					groupKey={ key }
+					tokenNames={ groups.typography.groups[ key ].tokens }
+					{ ...typographyConfig[ key ] }
 				/>
 			) ) }
 		</div>

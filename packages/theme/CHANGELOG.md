@@ -10,6 +10,10 @@
 
 -   Add `tokens` and `groups` named exports to `design-tokens.js`, exposing descriptions, types, the full group hierarchy, default DTCG and CSS values, and build-plugin fallback expressions for every semantic token while retaining the default token-name list ([#76604](https://github.com/WordPress/gutenberg/pull/76604)).
 
+### Documentation
+
+-   Add Color, Border, Dimension, and Cursor pages to the Storybook design tokens docs, and show token descriptions on the Typography page ([#84373](https://github.com/WordPress/gutenberg/pull/84373)).
+
 ## 2.3.0 (2026-10-07)
 
 ### New Features
