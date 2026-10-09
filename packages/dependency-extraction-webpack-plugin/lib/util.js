@@ -21,7 +21,7 @@ const BUNDLED_PACKAGES = [
 /**
  * Default request to global transformation
  *
- * Transform `@wordpress` dependencies:
+ * Transform `@wordpress/*` dependencies:
  * - request `@wordpress/api-fetch` becomes `[ 'wp', 'apiFetch' ]`
  * - request `@wordpress/i18n` becomes `[ 'wp', 'i18n' ]`
  *
