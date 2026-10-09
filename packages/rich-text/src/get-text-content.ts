@@ -5,11 +5,10 @@ import type { RichTextValue } from './types';
  * Get the textual content of a Rich Text value. This is similar to
  * `Element.textContent`.
  *
- * @param value      Value to use.
- * @param value.text Text of the value.
+ * @param {Pick<RichTextValue, 'text'>} value Value to use.
  *
- * @return The text content.
+ * @return {string} The text content.
  */
-export function getTextContent( { text }: RichTextValue ) {
+export function getTextContent( { text }: Pick< RichTextValue, 'text' > ) {
 	return text.replace( OBJECT_REPLACEMENT_CHARACTER, '' );
 }

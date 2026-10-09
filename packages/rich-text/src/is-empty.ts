@@ -8,6 +8,6 @@ import type { RichTextValue } from './types';
  *
  * @return {boolean} True if the value is empty, false if not.
  */
-export function isEmpty( { text }: RichTextValue ) {
+export function isEmpty( { text }: Pick< RichTextValue, 'text' > ) {
 	return text.length === 0;
 }

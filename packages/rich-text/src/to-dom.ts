@@ -129,7 +129,7 @@ function appendText( node: Text, text: string ) {
 }
 
 function getLastChild( { lastChild }: Node ) {
-	return lastChild!;
+	return lastChild;
 }
 
 function getParent( { parentNode }: Node ) {

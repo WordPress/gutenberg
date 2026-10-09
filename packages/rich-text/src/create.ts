@@ -168,7 +168,7 @@ export class RichTextData {
 		this.#value = init;
 	}
 	toPlainText() {
-		return getTextContent( this.#value as RichTextValue );
+		return getTextContent( this.#value );
 	}
 	// We could expose `toHTMLElement` at some point as well, but we'd only use
 	// it internally.
@@ -569,7 +569,7 @@ function createFromElement( {
 				( node as Element ).hasAttribute( 'data-rich-text-comment' ) )
 		) {
 			const value = {
-				formats: [ , ] as unknown as RichTextFormatList[],
+				formats: Array< RichTextFormatList >( 1 ),
 				replacements: [
 					{
 						type: '#comment',
@@ -606,7 +606,7 @@ function createFromElement( {
 
 		if ( tagName === 'script' ) {
 			const value = {
-				formats: [ , ] as unknown as RichTextFormatList[],
+				formats: Array< RichTextFormatList >( 1 ),
 				replacements: [
 					{
 						type: tagName,
@@ -645,7 +645,7 @@ function createFromElement( {
 			delete format.formatType;
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			mergePair( accumulator, {
-				formats: [ , ] as unknown as RichTextFormatList[],
+				formats: Array< RichTextFormatList >( 1 ),
 				replacements: [
 					{
 						...format,
@@ -680,7 +680,7 @@ function createFromElement( {
 		} else if ( value.text.length === 0 ) {
 			if ( format.attributes ) {
 				mergePair( accumulator, {
-					formats: [ , ] as unknown as RichTextFormatList[],
+					formats: Array< RichTextFormatList >( 1 ),
 					replacements: [ format ],
 					text: OBJECT_REPLACEMENT_CHARACTER,
 				} );

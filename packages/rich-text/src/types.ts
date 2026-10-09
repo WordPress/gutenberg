@@ -188,7 +188,7 @@ export type ToTreeOptions< T > = {
 		( parent: T, object: TreeHTML ): unknown;
 		( parent: T, object: string | TreeElement ): T;
 	};
-	getLastChild: ( node: T ) => T;
+	getLastChild: ( node: T ) => T | null | undefined;
 	getParent: ( node: T ) => T;
 	isText: ( node: T ) => boolean;
 	getText: ( node: T ) => string;

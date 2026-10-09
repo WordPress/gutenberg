@@ -43,7 +43,7 @@ function createEmpty() {
 }
 
 function getLastChild( { children }: HTMLTreeNode ) {
-	return ( children && children[ children.length - 1 ] )!;
+	return children && children[ children.length - 1 ];
 }
 
 function append( parent: HTMLTreeNode, object: string | HTMLTreeNode ) {

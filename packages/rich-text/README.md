@@ -228,12 +228,11 @@ Get the textual content of a Rich Text value. This is similar to `Element.textCo
 
 _Parameters_
 
-- _value_ `RichTextValue`: Value to use.
-- _value.text_ `RichTextValue[ 'text' ]`: Text of the value.
+- _value_ `Pick<RichTextValue, 'text'>`: Value to use.
 
 _Returns_
 
-- The text content.
+- `string`: The text content.
 
 ### insert
 
