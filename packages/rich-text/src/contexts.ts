@@ -1,5 +1,5 @@
 import { createContext } from '@wordpress/element';
-import type { EventListenersProps } from './event-listeners';
+import type { EventListenersProps } from './types';
 
 /**
  * Holds a ref to a Set of keyboard shortcut callbacks registered by format

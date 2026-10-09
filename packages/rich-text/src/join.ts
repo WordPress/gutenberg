@@ -1,6 +1,6 @@
 import { create } from './create';
 import { normaliseFormats } from './normalise-formats';
-import type { RichTextContent } from './types';
+import type { RichTextContent, RichTextValue } from './types';
 
 /**
  * Combine an array of Rich Text values into one, optionally separated by
@@ -29,5 +29,5 @@ export function join(
 			),
 			text: accumulator.text + separator.text + text,
 		} ) )
-	);
+	) as RichTextValue;
 }

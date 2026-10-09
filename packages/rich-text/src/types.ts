@@ -1,3 +1,4 @@
+import type { RefObject } from 'react';
 import type { WPKeycodeModifier } from '@wordpress/keycodes';
 import type * as actions from './store/actions';
 
@@ -220,4 +221,14 @@ export type HTMLTreeNode = {
 	text?: string;
 	parent?: HTMLTreeNode;
 	children?: HTMLTreeNode[];
+};
+
+/**
+ * Format types register their keyboard shortcut and input event callbacks
+ * into these Sets via `KeyboardShortcutContext` / `InputEventContext`. The
+ * rich text field that owns the editable element provides the Sets.
+ */
+export type EventListenersProps = {
+	keyboardShortcuts: RefObject< Set< ( event: KeyboardEvent ) => void > >;
+	inputEvents: RefObject< Set< ( event: Event ) => void > >;
 };

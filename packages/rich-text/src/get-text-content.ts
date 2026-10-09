@@ -1,5 +1,5 @@
 import { OBJECT_REPLACEMENT_CHARACTER } from './special-characters';
-import type { RichTextContent } from './types';
+import type { RichTextValue } from './types';
 
 /**
  * Get the textual content of a Rich Text value. This is similar to
@@ -10,6 +10,6 @@ import type { RichTextContent } from './types';
  *
  * @return The text content.
  */
-export function getTextContent( { text }: RichTextContent ) {
+export function getTextContent( { text }: RichTextValue ) {
 	return text.replace( OBJECT_REPLACEMENT_CHARACTER, '' );
 }

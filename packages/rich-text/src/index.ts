@@ -58,4 +58,4 @@ export type { RichTextFormatList } from './types';
 /**
  * The callback-Set refs the private event-listener helpers dispatch from.
  */
-export type { EventListenersProps } from './event-listeners';
+export type { EventListenersProps } from './types';

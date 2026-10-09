@@ -360,7 +360,7 @@ function InlineLinkUI( {
 function getRichTextValueFromSelection(
 	value: RichTextValue,
 	isActive: boolean
-) {
+): RichTextValue {
 	// Default to the selection ranges on the RichTextValue object.
 	let textStart = value.start;
 	let textEnd = value.end;

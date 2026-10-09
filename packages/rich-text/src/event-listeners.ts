@@ -1,17 +1,5 @@
-import type { MutableRefObject } from 'react';
-
-/*
- * Format types register their keyboard shortcut and input event callbacks
- * into these Sets via `KeyboardShortcutContext` / `InputEventContext` (see
- * `./contexts`). The rich text field that owns the editable element provides
- * the Sets and attaches these listeners to dispatch the callbacks.
- */
-export type EventListenersProps = {
-	keyboardShortcuts: MutableRefObject<
-		Set< ( event: KeyboardEvent ) => void >
-	>;
-	inputEvents: MutableRefObject< Set< ( event: Event ) => void > >;
-};
+import type { RefObject } from 'react';
+import type { EventListenersProps } from './types';
 
 /**
  * Attaches a `keydown` listener that dispatches the keyboard shortcut
@@ -23,8 +11,7 @@ export type EventListenersProps = {
  *         cleanup function.
  */
 export const shortcutsListener =
-	( props: MutableRefObject< EventListenersProps > ) =>
-	( element: HTMLElement ) => {
+	( props: RefObject< EventListenersProps > ) => ( element: HTMLElement ) => {
 		const { keyboardShortcuts } = props.current;
 		function onKeyDown( event: KeyboardEvent ) {
 			for ( const keyboardShortcut of keyboardShortcuts.current ) {
@@ -48,8 +35,7 @@ export const shortcutsListener =
  *         cleanup function.
  */
 export const inputEventsListener =
-	( props: MutableRefObject< EventListenersProps > ) =>
-	( element: HTMLElement ) => {
+	( props: RefObject< EventListenersProps > ) => ( element: HTMLElement ) => {
 		const { inputEvents } = props.current;
 		function onInput( event: Event ) {
 			for ( const inputEventHandler of inputEvents.current ) {
