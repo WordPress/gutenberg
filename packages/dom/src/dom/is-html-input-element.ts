@@ -1,5 +1,5 @@
 /**
- * @param {Node|null|undefined} node
+ * @param {Node} node
  * @return {node is HTMLInputElement} Whether the node is an HTMLInputElement.
  */
 export default function isHTMLInputElement(
