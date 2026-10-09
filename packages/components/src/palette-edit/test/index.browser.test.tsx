@@ -1,13 +1,14 @@
 import { describe, expect, it, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
+import { useState } from '@wordpress/element';
 import PaletteEdit, {
 	getNameAndSlugForPosition,
 	deduplicateElementSlugs,
 } from '..';
 import Modal from '../../modal';
-import type { PaletteElement } from '../types';
+import type { Color, PaletteElement } from '../types';
 
 const noop = () => {};
 
@@ -222,6 +223,228 @@ describe( 'PaletteEdit', () => {
 			slug: 'blue-red',
 		},
 	];
+
+	it.each( [
+		{ view: 'swatches', action: 'Escape' },
+		{ view: 'details', action: 'Escape' },
+		{ view: 'swatches', action: 'Enter' },
+		{ view: 'swatches', action: 'outside click' },
+	] )(
+		'updates colors live and closes with $action in $view',
+		async ( { view, action } ) => {
+			const onChange = vi.fn();
+			function ControlledPalette() {
+				const [ value, setValue ] = useState< Color[] >( colors );
+				return (
+					<PaletteEdit
+						{ ...defaultProps }
+						colors={ value }
+						onChange={ ( nextColors ) => {
+							onChange( nextColors );
+							setValue( nextColors ?? [] );
+						} }
+					/>
+				);
+			}
+			await render( <ControlledPalette /> );
+			if ( view === 'details' ) {
+				await userEvent.click(
+					screen.getByRole( 'button', { name: 'Color options' } )
+				);
+				await userEvent.click(
+					await screen.findByRole( 'menuitem', {
+						name: 'Show details',
+					} )
+				);
+			}
+			const swatch = screen.getByRole( 'button', {
+				name: view === 'details' ? 'Edit: Primary' : 'Primary',
+			} );
+			swatch.focus();
+			await userEvent.keyboard( '{Enter}' );
+			const input = await screen.findByRole( 'textbox', {
+				name: 'Hex color',
+			} );
+			await userEvent.fill( input, 'ff0000' );
+			await waitFor( () => expect( input ).toHaveValue( 'ff0000' ) );
+			await waitFor( () =>
+				expect( onChange ).toHaveBeenCalledWith( [
+					{ ...colors[ 0 ], color: '#ff0000' },
+					colors[ 1 ],
+				] )
+			);
+			expect(
+				screen.queryByRole( 'button', { name: 'Apply' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', { name: 'Cancel' } )
+			).not.toBeInTheDocument();
+			if ( action === 'Escape' || action === 'Enter' ) {
+				await userEvent.keyboard( `{${ action }}` );
+			} else {
+				await userEvent.click(
+					screen.getByRole( 'heading', { name: 'Test label' } )
+				);
+			}
+			expect( onChange.mock.lastCall?.[ 0 ] ).toEqual(
+				action === 'Escape'
+					? colors
+					: [ { ...colors[ 0 ], color: '#ff0000' }, colors[ 1 ] ]
+			);
+			expect(
+				screen.queryByRole( 'textbox', { name: 'Hex color' } )
+			).not.toBeInTheDocument();
+			expect(
+				action === 'outside click' ? document.body : swatch
+			).toHaveFocus();
+			await userEvent.click( swatch );
+			expect(
+				await screen.findByRole( 'textbox', { name: 'Hex color' } )
+			).toHaveValue( action === 'Escape' ? '1A4548' : 'FF0000' );
+		}
+	);
+
+	it( 'does not change the palette when a pending color edit is cancelled', async () => {
+		const onChange = vi.fn();
+		await render(
+			<PaletteEdit
+				{ ...defaultProps }
+				colors={ colors }
+				onChange={ onChange }
+			/>
+		);
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Primary' } )
+		);
+		const input = await screen.findByRole( 'textbox', {
+			name: 'Hex color',
+		} );
+		vi.useFakeTimers( {
+			toFake: [ 'setTimeout', 'clearTimeout', 'Date' ],
+		} );
+		try {
+			await userEvent.fill( input, 'ff0000' );
+			await act( async () => {
+				vi.advanceTimersByTime( 0 );
+			} );
+			expect( onChange ).not.toHaveBeenCalled();
+			await userEvent.keyboard( '{Escape}' );
+			await act( async () => {
+				vi.advanceTimersByTime( 100 );
+			} );
+			expect( onChange ).not.toHaveBeenCalled();
+		} finally {
+			vi.useRealTimers();
+		}
+	} );
+
+	it( 'lets the consumer restore its state on Escape', async () => {
+		const onChange = vi.fn();
+		const onChangeStart = vi.fn();
+		const onChangeCancel = vi.fn();
+		await render(
+			<PaletteEdit
+				{ ...defaultProps }
+				colors={ colors }
+				onChange={ onChange }
+				onChangeStart={ onChangeStart }
+				onChangeCancel={ onChangeCancel }
+			/>
+		);
+		await userEvent.click(
+			screen.getByRole( 'button', {
+				name: 'Primary',
+			} )
+		);
+		const input = await screen.findByRole( 'textbox', {
+			name: 'Hex color',
+		} );
+		await userEvent.fill( input, 'ff0000' );
+		await waitFor( () => expect( onChange ).toHaveBeenCalledTimes( 1 ) );
+		await userEvent.fill( input, '0000ff' );
+		await waitFor( () => expect( onChange ).toHaveBeenCalledTimes( 2 ) );
+		expect( onChangeStart ).toHaveBeenCalledTimes( 1 );
+		expect( onChangeStart.mock.invocationCallOrder[ 0 ] ).toBeLessThan(
+			onChange.mock.invocationCallOrder[ 0 ]
+		);
+		await userEvent.keyboard( '{Escape}' );
+		expect( onChangeCancel ).toHaveBeenCalledTimes( 1 );
+		expect( onChange ).toHaveBeenCalledTimes( 2 );
+	} );
+
+	it( 'does not reapply a pending color after Escape restores an earlier live edit', async () => {
+		const onChange = vi.fn();
+		await render(
+			<PaletteEdit
+				{ ...defaultProps }
+				colors={ colors }
+				onChange={ onChange }
+			/>
+		);
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Primary' } )
+		);
+		const input = await screen.findByRole( 'textbox', {
+			name: 'Hex color',
+		} );
+		await userEvent.fill( input, 'ff0000' );
+		await waitFor( () => expect( onChange ).toHaveBeenCalledTimes( 1 ) );
+		vi.useFakeTimers( {
+			toFake: [ 'setTimeout', 'clearTimeout', 'Date' ],
+		} );
+		try {
+			await userEvent.fill( input, '0000ff' );
+			await act( async () => {
+				vi.advanceTimersByTime( 0 );
+			} );
+			await userEvent.keyboard( '{Escape}' );
+			await act( async () => {
+				vi.advanceTimersByTime( 100 );
+			} );
+			expect( onChange ).toHaveBeenCalledTimes( 2 );
+			expect( onChange.mock.lastCall?.[ 0 ] ).toEqual( colors );
+		} finally {
+			vi.useRealTimers();
+		}
+	} );
+
+	it( 'keeps the latest pending color when Enter accepts the edit', async () => {
+		const onChange = vi.fn();
+		await render(
+			<PaletteEdit
+				{ ...defaultProps }
+				colors={ colors }
+				onChange={ onChange }
+			/>
+		);
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Primary' } )
+		);
+		const input = await screen.findByRole( 'textbox', {
+			name: 'Hex color',
+		} );
+		vi.useFakeTimers( {
+			toFake: [ 'setTimeout', 'clearTimeout', 'Date' ],
+		} );
+		try {
+			await userEvent.fill( input, 'ff0000' );
+			await act( async () => {
+				vi.advanceTimersByTime( 0 );
+			} );
+			expect( onChange ).not.toHaveBeenCalled();
+			await userEvent.keyboard( '{Enter}' );
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
+			expect( onChange.mock.lastCall?.[ 0 ] ).toEqual( [
+				{ ...colors[ 0 ], color: '#ff0000' },
+				colors[ 1 ],
+			] );
+			expect(
+				screen.queryByRole( 'textbox', { name: 'Hex color' } )
+			).not.toBeInTheDocument();
+		} finally {
+			vi.useRealTimers();
+		}
+	} );
 
 	it( 'shows heading label', async () => {
 		await render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
@@ -768,102 +991,110 @@ describe( 'PaletteEdit', () => {
 		} );
 	} );
 
-	it( 'can update color palette value', async () => {
-		const onChange = vi.fn();
+	it.each( [ 'outside click', 'Escape' ] )(
+		'updates gradients live and closes with %s',
+		async ( action ) => {
+			const onChange = vi.fn();
 
-		await render(
-			<PaletteEdit
-				{ ...defaultProps }
-				colors={ colors }
-				onChange={ onChange }
-			/>
-		);
+			await render(
+				<PaletteEdit
+					{ ...defaultProps }
+					gradients={ gradients }
+					onChange={ onChange }
+				/>
+			);
 
-		await userEvent.click( screen.getByLabelText( 'Primary' ) );
-		const hexInput = screen.getByRole( 'textbox', {
-			name: 'Hex color',
-		} );
+			await userEvent.click(
+				screen.getByLabelText( 'Gradient: Pale ocean' )
+			);
 
-		await clearInput( hexInput as HTMLInputElement );
+			// Select radial gradient option
+			await userEvent.selectOptions(
+				screen.getByRole( 'combobox', { name: 'Type' } ),
+				'radial-gradient'
+			);
 
-		await userEvent.keyboard( '000000' );
+			await waitFor( () =>
+				expect( onChange ).toHaveBeenCalledTimes( 1 )
+			);
+			if ( action === 'Escape' ) {
+				await userEvent.keyboard( '{Escape}' );
+			} else {
+				await userEvent.click(
+					screen.getByRole( 'heading', { name: 'Test label' } )
+				);
+			}
+			expect( onChange ).toHaveBeenCalledTimes(
+				action === 'Escape' ? 2 : 1
+			);
+			expect( onChange.mock.lastCall?.[ 0 ] ).toEqual(
+				action !== 'Escape'
+					? [
+							{
+								...gradients[ 0 ],
+								gradient:
+									'radial-gradient(rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%)',
+							},
+							gradients[ 1 ],
+						]
+					: gradients
+			);
+		}
+	);
 
-		await waitFor( () => {
-			expect( onChange ).toHaveBeenCalledWith( [
-				{
-					...colors[ 0 ],
-					color: '#000000',
-				},
-				colors[ 1 ],
-			] );
-		} );
-	} );
+	it.each( [ 'outside click', 'Escape' ] )(
+		'updates duotones live and closes with %s',
+		async ( action ) => {
+			const onChange = vi.fn();
 
-	it( 'can update gradient palette value', async () => {
-		const onChange = vi.fn();
+			await render(
+				<PaletteEdit
+					{ ...defaultProps }
+					duotones={ duotones }
+					colorPalette={ colors }
+					onChange={ onChange }
+				/>
+			);
 
-		await render(
-			<PaletteEdit
-				{ ...defaultProps }
-				gradients={ gradients }
-				onChange={ onChange }
-			/>
-		);
+			await userEvent.click(
+				screen.getByLabelText( 'Duotone: Blue and red' )
+			);
+			await userEvent.click(
+				screen.getByRole( 'button', { name: /Shadows/ } )
+			);
+			await userEvent.click(
+				screen.getByRole( 'option', { name: 'Primary' } )
+			);
 
-		await userEvent.click(
-			screen.getByLabelText( 'Gradient: Pale ocean' )
-		);
-
-		// Select radial gradient option
-		await userEvent.selectOptions(
-			screen.getByRole( 'combobox', { name: 'Type' } ),
-			'radial-gradient'
-		);
-
-		await waitFor( () => {
-			expect( onChange ).toHaveBeenCalledWith( [
-				{
-					...gradients[ 0 ],
-					gradient:
-						'radial-gradient(rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%)',
-				},
-				gradients[ 1 ],
-			] );
-		} );
-	} );
-
-	it( 'can update duotone palette value', async () => {
-		const onChange = vi.fn();
-
-		await render(
-			<PaletteEdit
-				{ ...defaultProps }
-				duotones={ duotones }
-				colorPalette={ colors }
-				onChange={ onChange }
-			/>
-		);
-
-		await userEvent.click(
-			screen.getByLabelText( 'Duotone: Blue and red' )
-		);
-		await userEvent.click(
-			screen.getByRole( 'button', { name: /Shadows/ } )
-		);
-		await userEvent.click(
-			screen.getByRole( 'option', { name: 'Primary' } )
-		);
-
-		await waitFor( () => {
-			expect( onChange ).toHaveBeenCalledWith( [
-				duotones[ 0 ],
-				{
-					...duotones[ 1 ],
-					colors: [ '#1a4548', duotones[ 1 ].colors[ 1 ] ],
-				},
-			] );
-		} );
-	} );
+			await waitFor( () =>
+				expect( onChange ).toHaveBeenCalledTimes( 1 )
+			);
+			if ( action === 'Escape' ) {
+				await userEvent.keyboard( '{Escape}' );
+			} else {
+				await userEvent.click(
+					screen.getByRole( 'heading', { name: 'Test label' } )
+				);
+			}
+			expect( onChange ).toHaveBeenCalledTimes(
+				action === 'Escape' ? 2 : 1
+			);
+			expect( onChange.mock.lastCall?.[ 0 ] ).toEqual(
+				action !== 'Escape'
+					? [
+							duotones[ 0 ],
+							{
+								...duotones[ 1 ],
+								colors: [
+									'#1a4548',
+									duotones[ 1 ].colors[ 1 ],
+								],
+							},
+						]
+					: duotones
+			);
+		}
+	);
 
 	// The same filtering and normalization that applies when adding a duotone
 	// has to apply when editing one, or the shadows and highlights picker can

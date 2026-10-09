@@ -6,6 +6,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSetting } from './hooks';
+import { usePaletteSetting } from './use-palette-setting';
 import ColorVariations from './variations/variations-color';
 
 const mobilePopoverProps = { placement: 'bottom-start' as const, offset: 8 };
@@ -15,28 +16,22 @@ interface ColorPalettePanelProps {
 }
 
 export default function ColorPalettePanel( { name }: ColorPalettePanelProps ) {
-	const [ themeColors, setThemeColors ] = useSetting< Color[] >(
-		'color.palette.theme',
-		name
-	);
+	const [ themeColors, setThemeColors, themeColorsEditProps ] =
+		usePaletteSetting< Color[] >( 'color.palette.theme', name );
 	const [ baseThemeColors ] = useSetting< Color[] >(
 		'color.palette.theme',
 		name,
 		'base'
 	);
-	const [ defaultColors, setDefaultColors ] = useSetting< Color[] >(
-		'color.palette.default',
-		name
-	);
+	const [ defaultColors, setDefaultColors, defaultColorsEditProps ] =
+		usePaletteSetting< Color[] >( 'color.palette.default', name );
 	const [ baseDefaultColors ] = useSetting< Color[] >(
 		'color.palette.default',
 		name,
 		'base'
 	);
-	const [ customColors, setCustomColors ] = useSetting< Color[] >(
-		'color.palette.custom',
-		name
-	);
+	const [ customColors, setCustomColors, customColorsEditProps ] =
+		usePaletteSetting< Color[] >( 'color.palette.custom', name );
 
 	const [ defaultPaletteEnabled ] = useSetting< boolean >(
 		'color.defaultPalette',
@@ -54,6 +49,7 @@ export default function ColorPalettePanel( { name }: ColorPalettePanelProps ) {
 					canOnlyChangeValues
 					colors={ themeColors }
 					onChange={ setThemeColors }
+					{ ...themeColorsEditProps }
 					paletteLabel={ __( 'Theme' ) }
 					paletteLabelHeadingLevel={ 3 }
 					popoverProps={ popoverProps }
@@ -67,6 +63,7 @@ export default function ColorPalettePanel( { name }: ColorPalettePanelProps ) {
 						canOnlyChangeValues
 						colors={ defaultColors }
 						onChange={ setDefaultColors }
+						{ ...defaultColorsEditProps }
 						paletteLabel={ __( 'Default' ) }
 						paletteLabelHeadingLevel={ 3 }
 						popoverProps={ popoverProps }
@@ -75,6 +72,7 @@ export default function ColorPalettePanel( { name }: ColorPalettePanelProps ) {
 			<PaletteEdit
 				colors={ customColors }
 				onChange={ setCustomColors }
+				{ ...customColorsEditProps }
 				paletteLabel={ __( 'Custom' ) }
 				paletteLabelHeadingLevel={ 3 }
 				slugPrefix="custom-"

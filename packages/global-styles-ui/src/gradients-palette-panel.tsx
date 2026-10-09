@@ -6,6 +6,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import type { Gradient } from '@wordpress/global-styles-engine';
 import { useSetting } from './hooks';
+import { usePaletteSetting } from './use-palette-setting';
 
 const mobilePopoverProps = { placement: 'bottom-start' as const, offset: 8 };
 
@@ -16,28 +17,22 @@ interface GradientPalettePanelProps {
 export default function GradientPalettePanel( {
 	name,
 }: GradientPalettePanelProps ) {
-	const [ themeGradients, setThemeGradients ] = useSetting< Gradient[] >(
-		'color.gradients.theme',
-		name
-	);
+	const [ themeGradients, setThemeGradients, themeGradientsEditProps ] =
+		usePaletteSetting< Gradient[] >( 'color.gradients.theme', name );
 	const [ baseThemeGradients ] = useSetting< Gradient[] >(
 		'color.gradients.theme',
 		name,
 		'base'
 	);
-	const [ defaultGradients, setDefaultGradients ] = useSetting< Gradient[] >(
-		'color.gradients.default',
-		name
-	);
+	const [ defaultGradients, setDefaultGradients, defaultGradientsEditProps ] =
+		usePaletteSetting< Gradient[] >( 'color.gradients.default', name );
 	const [ baseDefaultGradients ] = useSetting< Gradient[] >(
 		'color.gradients.default',
 		name,
 		'base'
 	);
-	const [ customGradients, setCustomGradients ] = useSetting< Gradient[] >(
-		'color.gradients.custom',
-		name
-	);
+	const [ customGradients, setCustomGradients, customGradientsEditProps ] =
+		usePaletteSetting< Gradient[] >( 'color.gradients.custom', name );
 
 	const [ defaultPaletteEnabled ] = useSetting< boolean >(
 		'color.defaultGradients',
@@ -58,6 +53,7 @@ export default function GradientPalettePanel( {
 					canOnlyChangeValues
 					gradients={ themeGradients }
 					onChange={ setThemeGradients }
+					{ ...themeGradientsEditProps }
 					paletteLabel={ __( 'Theme' ) }
 					paletteLabelHeadingLevel={ 3 }
 					popoverProps={ popoverProps }
@@ -71,6 +67,7 @@ export default function GradientPalettePanel( {
 						canOnlyChangeValues
 						gradients={ defaultGradients }
 						onChange={ setDefaultGradients }
+						{ ...defaultGradientsEditProps }
 						paletteLabel={ __( 'Default' ) }
 						paletteLabelHeadingLevel={ 3 }
 						popoverProps={ popoverProps }
@@ -79,6 +76,7 @@ export default function GradientPalettePanel( {
 			<PaletteEdit
 				gradients={ customGradients }
 				onChange={ setCustomGradients }
+				{ ...customGradientsEditProps }
 				paletteLabel={ __( 'Custom' ) }
 				paletteLabelHeadingLevel={ 3 }
 				slugPrefix="custom-"

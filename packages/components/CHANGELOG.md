@@ -14,6 +14,10 @@
 
 -   `Tip`: Deprecate in favor of `Notice` from `@wordpress/ui`, preserving the legacy component for existing consumers ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
 
+### Bug Fixes
+
+-   `PaletteEdit`: Restore the opening picker value on Escape while retaining live palette updates ([#84333](https://github.com/WordPress/gutenberg/pull/84333)).
+
 ## 42.0.0 (2026-10-07)
 
 ### Breaking Changes

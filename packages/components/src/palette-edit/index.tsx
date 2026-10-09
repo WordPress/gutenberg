@@ -10,7 +10,7 @@ import {
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { lineSolid, moreVertical, plus } from '@wordpress/icons';
-import { useDebounce, useInstanceId } from '@wordpress/compose';
+import { useDebounce, useEvent, useInstanceId } from '@wordpress/compose';
 import { Menu, Stack, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import Button from '../button';
 import { ColorPicker } from '../color-picker';
@@ -312,9 +312,37 @@ function ColorPickerPopover< T extends PaletteElement >( {
 	colorPalette,
 	element,
 	onChange,
+	onChangeStart,
+	onChangeCancel,
 	popoverProps: receivedPopoverProps,
 	onClose = () => {},
 }: ColorPickerPopoverProps< T > ) {
+	const [ draftElement, setDraftElement ] = useState< T >();
+	const editedElement = draftElement ?? element;
+	const originalElementRef = useRef( element );
+	const editStateRef = useRef<
+		'initial' | 'pending' | 'changed' | 'cancelled'
+	>( 'initial' );
+	const emitChange = useEvent( ( newElement: T ) => {
+		editStateRef.current = 'changed';
+		onChange( newElement );
+	} );
+	const debouncedChange = useDebounce( emitChange, 100 );
+	const changeElement = ( newElement: T ) => {
+		if ( editStateRef.current === 'cancelled' ) {
+			return;
+		}
+		if ( editStateRef.current === 'initial' ) {
+			onChangeStart?.();
+			editStateRef.current = 'pending';
+		}
+		setDraftElement( newElement );
+		debouncedChange( newElement );
+	};
+	const close = () => {
+		debouncedChange.flush();
+		onClose();
+	};
 	const popoverProps: ColorPickerPopoverProps< T >[ 'popoverProps' ] =
 		useMemo(
 			() => ( {
@@ -335,14 +363,46 @@ function ColorPickerPopover< T extends PaletteElement >( {
 		);
 
 	return (
-		<Popover { ...popoverProps } onClose={ onClose }>
+		<Popover
+			{ ...popoverProps }
+			onClose={ close }
+			onKeyDown={ ( event ) => {
+				receivedPopoverProps?.onKeyDown?.( event );
+				if ( event.defaultPrevented ) {
+					return;
+				}
+				if (
+					event.key === 'Enter' &&
+					! event.nativeEvent.isComposing &&
+					( event.target as HTMLElement ).tagName === 'INPUT'
+				) {
+					event.preventDefault();
+					event.stopPropagation();
+					close();
+					return;
+				}
+				if ( event.key !== 'Escape' ) {
+					return;
+				}
+				const hasChanged = editStateRef.current === 'changed';
+				editStateRef.current = 'cancelled';
+				debouncedChange.cancel();
+				if ( hasChanged ) {
+					if ( onChangeCancel ) {
+						onChangeCancel();
+					} else {
+						onChange( originalElementRef.current );
+					}
+				}
+			} }
+		>
 			{ variant === 'color' && (
 				<ColorPicker
-					color={ element.color }
+					color={ editedElement.color }
 					enableAlpha
 					onChange={ ( newColor ) => {
-						onChange( {
-							...element,
+						changeElement( {
+							...editedElement,
 							color: newColor,
 						} );
 					} }
@@ -352,10 +412,10 @@ function ColorPickerPopover< T extends PaletteElement >( {
 				<div className="components-palette-edit__popover-gradient-picker">
 					<CustomGradientPicker
 						__experimentalIsRenderedInSidebar
-						value={ element.gradient }
+						value={ editedElement.gradient }
 						onChange={ ( newGradient ) => {
-							onChange( {
-								...element,
+							changeElement( {
+								...editedElement,
 								gradient: newGradient,
 							} );
 						} }
@@ -369,7 +429,7 @@ function ColorPickerPopover< T extends PaletteElement >( {
 					     same as the one in the block toolbar. */ }
 					<VStack spacing={ 3 }>
 						<CustomDuotoneBar
-							value={ getDuotoneColors( element ) }
+							value={ getDuotoneColors( editedElement ) }
 							onChange={ ( newColors ) => {
 								// A duotone needs two colors to render, and the
 								// bar refuses to drop below two stops, so an
@@ -377,19 +437,22 @@ function ColorPickerPopover< T extends PaletteElement >( {
 								if ( ! newColors?.length ) {
 									return;
 								}
-								onChange( { ...element, colors: newColors } );
+								changeElement( {
+									...editedElement,
+									colors: newColors,
+								} );
 							} }
 						/>
 						<ColorListPicker
 							labels={ [ __( 'Shadows' ), __( 'Highlights' ) ] }
 							colors={ colorPalette ?? [] }
-							value={ getDuotoneColors( element ) }
+							value={ getDuotoneColors( editedElement ) }
 							enableAlpha
 							onChange={ ( newColors ) => {
 								const [ defaultDark, defaultLight ] =
 									getDefaultColors( colorPalette ?? [] );
-								onChange( {
-									...element,
+								changeElement( {
+									...editedElement,
 									colors: [
 										// Falsy rather than nullish, to match
 										// how `DuotonePicker` fills a cleared
@@ -411,11 +474,14 @@ function Option< T extends PaletteElement >( {
 	canOnlyChangeValues,
 	element,
 	onChange,
+	onChangeStart,
+	onChangeCancel,
 	onRemove,
 	popoverProps: receivedPopoverProps,
 	variant,
 	colorPalette,
 }: OptionProps< T > ) {
+	const debouncedNameChange = useDebounce( onChange, 100 );
 	const value = getElementValue( element, variant );
 	const [ isEditingColor, setIsEditingColor ] = useState( false );
 
@@ -457,7 +523,7 @@ function Option< T extends PaletteElement >( {
 							label={ getNameInputLabel( variant ) }
 							value={ element.name }
 							onChange={ ( nextName?: string ) =>
-								onChange( {
+								debouncedNameChange( {
 									...element,
 									name: nextName,
 								} )
@@ -494,6 +560,8 @@ function Option< T extends PaletteElement >( {
 					variant={ variant }
 					colorPalette={ colorPalette }
 					onChange={ onChange }
+					onChangeStart={ onChangeStart }
+					onChangeCancel={ onChangeCancel }
 					element={ element }
 					popoverProps={ popoverProps }
 					onClose={ () => setIsEditingColor( false ) }
@@ -506,6 +574,8 @@ function Option< T extends PaletteElement >( {
 function PaletteEditListView< T extends PaletteElement >( {
 	elements,
 	onChange,
+	onChangeStart,
+	onChangeCancel,
 	canOnlyChangeValues,
 	variant,
 	colorPalette,
@@ -518,31 +588,29 @@ function PaletteEditListView< T extends PaletteElement >( {
 		elementsReferenceRef.current = elements;
 	}, [ elements ] );
 
-	const debounceOnChange = useDebounce(
-		( updatedElements: T[] ) =>
-			onChange( deduplicateElementSlugs( updatedElements ) ),
-		100
-	);
-
 	return (
 		<VStack spacing={ 3 }>
 			<ItemGroup isRounded isBordered isSeparated>
 				{ elements.map( ( element, index ) => (
 					<Option
+						onChangeStart={ onChangeStart }
+						onChangeCancel={ onChangeCancel }
 						variant={ variant }
 						colorPalette={ colorPalette }
 						canOnlyChangeValues={ canOnlyChangeValues }
 						key={ index }
 						element={ element }
 						onChange={ ( newElement ) => {
-							debounceOnChange(
-								elements.map(
-									( currentElement, currentIndex ) => {
-										if ( currentIndex === index ) {
-											return newElement;
+							onChange(
+								deduplicateElementSlugs(
+									elements.map(
+										( currentElement, currentIndex ) => {
+											if ( currentIndex === index ) {
+												return newElement;
+											}
+											return currentElement;
 										}
-										return currentElement;
-									}
+									)
 								)
 							);
 						} }
@@ -572,6 +640,9 @@ const EMPTY_ARRAY: Color[] = [];
 
 /**
  * Allows editing a palette of colors, gradients or duotones.
+ * Picker changes update the palette live. Escape restores the opening value
+ * and closes the picker. Enter in a value field or other dismissal retains
+ * the edited value.
  *
  * ```jsx
  * import { PaletteEdit } from '@wordpress/components';
@@ -596,6 +667,8 @@ export function PaletteEdit( {
 	colors = EMPTY_ARRAY,
 	colorPalette,
 	onChange,
+	onChangeStart,
+	onChangeCancel,
 	paletteLabel,
 	paletteLabelHeadingLevel = 2,
 	emptyMessage,
@@ -633,7 +706,6 @@ export function PaletteEdit( {
 		! elements[ editingElement ].slug;
 	const elementsLength = elements.length;
 	const hasElements = elementsLength > 0;
-	const debounceOnChange = useDebounce( onChange, 100 );
 	const onSelectPaletteItem = useCallback(
 		(
 			value?: PaletteElement[ keyof PaletteElement ],
@@ -826,18 +898,23 @@ export function PaletteEdit( {
 							variant={ variant }
 							colorPalette={ duotoneColorPalette }
 							popoverProps={ popoverProps }
+							onChangeStart={ onChangeStart }
+							onChangeCancel={ onChangeCancel }
 							addColorRef={ addColorRef }
 						/>
 					) }
 					{ ! isEditing && editingElement !== null && (
 						<ColorPickerPopover
+							key={ elements[ editingElement ?? -1 ]?.slug }
 							variant={ variant }
 							colorPalette={ duotoneColorPalette }
+							onChangeStart={ onChangeStart }
+							onChangeCancel={ onChangeCancel }
 							onClose={ () => setEditingElement( null ) }
 							onChange={ (
 								newElement: ( typeof elements )[ number ]
 							) => {
-								debounceOnChange(
+								onChange(
 									// @ts-expect-error TODO: Don't know how to resolve
 									elements.map(
 										(
