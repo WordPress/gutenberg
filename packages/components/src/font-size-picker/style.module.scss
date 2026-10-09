@@ -1,0 +1,30 @@
+.container {
+	border: 0;
+	margin: 0;
+	padding: 0;
+	display: contents;
+}
+
+.header {
+	height: 16px;
+}
+
+.header-toggle {
+	margin-top: -4px;
+}
+
+.header-label {
+	display: flex;
+	gap: 4px;
+	justify-content: flex-start;
+	margin-bottom: 0;
+}
+
+// Force a line break between name and hint while keeping the checkmark on the right.
+.select {
+	:global(.components-custom-select-control__item) {
+		:global(.components-custom-select-control__item-hint) {
+			width: 100%;
+		}
+	}
+}

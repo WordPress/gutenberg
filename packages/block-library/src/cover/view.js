@@ -1,5 +1,5 @@
 import { getContext, store } from '@wordpress/interactivity';
-import { prefersReducedMotion } from '@wordpress/a11y';
+import { prefersReducedMotion } from '../utils/reduced-motion';
 
 store(
 	'core/cover',
