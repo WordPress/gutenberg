@@ -713,7 +713,7 @@ Registration is hooked into the `init` action. The `SCRIPT_DEBUG` constant contr
 
 ### Watch Mode
 
-In development (`wp-build --watch`), widget source files are watched for changes. When a file inside `widgets/{name}/` changes, only that widget is rebuilt.
+In development (`wp-build --watch`), widget source files are watched for changes. When a file inside `widgets/{name}/` changes, only that widget is rebuilt, and `build/widgets/registry.php` is rewritten for the widgets known when the watcher started.
 
 ## Contributing to this package
 
