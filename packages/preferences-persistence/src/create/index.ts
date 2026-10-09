@@ -8,8 +8,6 @@ import type {
 	PreferencesData,
 } from '../types';
 
-const EMPTY_OBJECT: PreferencesData = {};
-
 /**
  * Creates a persistence layer that stores data in WordPress user meta via the
  * REST API.
@@ -65,7 +63,7 @@ export default function create( {
 		} else if ( localData ) {
 			cache = localData;
 		} else {
-			cache = EMPTY_OBJECT;
+			cache = {};
 		}
 
 		return cache;
