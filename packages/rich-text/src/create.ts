@@ -168,7 +168,7 @@ export class RichTextData {
 		this.#value = init;
 	}
 	toPlainText() {
-		return getTextContent( this.#value );
+		return getTextContent( this.#value as RichTextValue );
 	}
 	// We could expose `toHTMLElement` at some point as well, but we'd only use
 	// it internally.

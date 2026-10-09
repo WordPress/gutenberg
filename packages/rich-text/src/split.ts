@@ -51,7 +51,7 @@ export function split(
 			}
 		}
 
-		return value;
+		return value as RichTextValue;
 	} );
 }
 
@@ -77,5 +77,5 @@ function splitAtSelection(
 		end: 0,
 	};
 
-	return [ before, after ];
+	return [ before, after ] as RichTextValue[];
 }

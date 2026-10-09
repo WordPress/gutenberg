@@ -26,5 +26,5 @@ export function slice(
 		formats: formats.slice( startIndex, endIndex ),
 		replacements: replacements.slice( startIndex, endIndex ),
 		text: text.slice( startIndex, endIndex ),
-	};
+	} as RichTextValue;
 }
