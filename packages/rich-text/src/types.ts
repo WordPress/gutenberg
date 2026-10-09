@@ -1,3 +1,5 @@
+import type * as actions from './store/actions';
+
 /**
  * Stores the type of a rich text format, such as core/bold.
  */
@@ -33,6 +35,14 @@ export type RichTextValue = {
 	end: number;
 	activeFormats?: RichTextFormatList;
 };
+
+/**
+ * The content of a `RichTextValue`, without the selection.
+ */
+export type RichTextContent = Pick<
+	RichTextValue,
+	'text' | 'formats' | 'replacements'
+>;
 
 /**
  * A registered format type. `name` and `tagName` identify it, `className`
@@ -77,6 +87,11 @@ export type FormatType = {
 	__experimentalCreateOnChangeEditableValue?: Function;
 	__experimentalGetPropsForEditableTreePreparation?: Function;
 	__experimentalGetPropsForEditableTreeChangeHandler?: Function;
+	__unstableInputRule?: ( value: RichTextValue ) => RichTextValue;
+	__unstablePasteRule?: (
+		value: RichTextValue,
+		data: { html: string; plainText: string }
+	) => RichTextValue;
 };
 
 /**
@@ -86,9 +101,7 @@ export type State = {
 	formatTypes: Record< string, FormatType >;
 };
 
-export type Action =
-	| { type: 'ADD_FORMAT_TYPES'; formatTypes: FormatType[] }
-	| { type: 'REMOVE_FORMAT_TYPES'; names: string[] };
+export type Action = ReturnType< ( typeof actions )[ keyof typeof actions ] >;
 
 /**
  * A format parsed from an element, before `formatType` is stripped.

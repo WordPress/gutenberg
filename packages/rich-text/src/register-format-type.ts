@@ -56,7 +56,10 @@ export function registerFormatType(
 		return;
 	}
 
-	if ( ! /^[_a-zA-Z]+[a-zA-Z0-9_-]*$/.test( settings.className as string ) ) {
+	if (
+		settings.className !== null &&
+		! /^[_a-zA-Z]+[a-zA-Z0-9_-]*$/.test( settings.className )
+	) {
 		window.console.error(
 			'A class name must begin with a letter, followed by any number of hyphens, underscores, letters, or numbers.'
 		);

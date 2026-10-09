@@ -8,6 +8,7 @@ import { getTextContent } from './get-text-content';
 import type {
 	FormatType,
 	ParsedFormat,
+	RichTextContent,
 	RichTextValue,
 	SelectionRange,
 } from './types';
@@ -128,7 +129,7 @@ function toFormat( {
  * @todo Add methods to manipulate the data, such as applyFormat, slice etc.
  */
 export class RichTextData {
-	#value: RichTextValue;
+	#value: RichTextContent;
 	declare originalHTML?: string;
 
 	static empty() {
@@ -162,11 +163,11 @@ export class RichTextData {
 		} );
 		return richTextData;
 	}
-	constructor( init: RichTextValue = createEmptyValue() ) {
+	constructor( init: RichTextContent = createEmptyValue() ) {
 		this.#value = init;
 	}
 	toPlainText() {
-		return getTextContent( this.#value );
+		return getTextContent( this.#value as RichTextValue );
 	}
 	// We could expose `toHTMLElement` at some point as well, but we'd only use
 	// it internally.
@@ -182,7 +183,10 @@ export class RichTextData {
 	}: { preserveWhiteSpace?: boolean } = {} ) {
 		return (
 			this.originalHTML ||
-			toHTMLString( { value: this.#value, preserveWhiteSpace } )
+			toHTMLString( {
+				value: this.#value as RichTextValue,
+				preserveWhiteSpace,
+			} )
 		);
 	}
 	valueOf() {
