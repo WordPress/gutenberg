@@ -5,6 +5,7 @@ import type { Settings } from '@wordpress/core-data';
 import { Badge } from '@wordpress/ui';
 import { BaseTitleView } from '../../shared/title/view';
 import type { ItemWithTitle } from '../../shared/title/get-item-title';
+import styles from './style.module.css';
 
 /*
  * A copy of the page title view of `@wordpress/fields`.
@@ -39,7 +40,7 @@ export default function PageTitleView( {
 	}
 	return (
 		<BaseTitleView item={ item }>
-			{ badge && <Badge>{ badge }</Badge> }
+			{ badge && <Badge className={ styles.badge }>{ badge }</Badge> }
 		</BaseTitleView>
 	);
 }
