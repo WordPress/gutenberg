@@ -5,12 +5,11 @@ import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	getBlockType,
-	getDefaultBlockName,
 	hasBlockSupport,
 	isReusableBlock,
 	isTemplatePart,
 } from '@wordpress/blocks';
-import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import { ToolbarGroup } from '@wordpress/components';
 import BlockMover from '../block-mover';
 import BlockParentSelector from '../block-parent-selector';
 import BlockControls from '../block-controls';
@@ -30,7 +29,6 @@ import EditSectionButton from './edit-section-button';
 import { unlock } from '../../lock-unlock';
 import { deviceTypeKey } from '../../store/private-keys';
 import BlockToolbarIcon from './block-toolbar-icon';
-import BlockIcon from '../block-icon';
 import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
 
 /**
@@ -113,10 +111,12 @@ export function PrivateBlockToolbar( {
 		const isVisual = selectedBlockClientIds.every(
 			( id ) => getBlockMode( id ) === 'visual'
 		);
-		const _isUsingBindings = selectedBlockClientIds.every(
-			( clientId ) =>
-				!! getBlockAttributes( clientId )?.metadata?.bindings
-		);
+		const _isUsingBindings =
+			selectedBlockClientIds.length > 0 &&
+			selectedBlockClientIds.every(
+				( clientId ) =>
+					!! getBlockAttributes( clientId )?.metadata?.bindings
+			);
 
 		// If one or more selected blocks are locked, do not show the BlockGroupToolbar.
 		const _hasTemplateLock = selectedBlockClientIds.some(
@@ -189,10 +189,8 @@ export function PrivateBlockToolbar( {
 	const isLargeViewport = ! useViewportMatch( 'medium', '<' );
 
 	const hasBlockToolbar = useHasBlockToolbar();
-	if ( ! hasBlockToolbar ) {
-		if ( showPlaceholder && ! blockClientIds.length ) {
-			return <BlockToolbarPlaceholder variant={ variant } />;
-		}
+	const isPlaceholder = showPlaceholder && ! blockClientIds.length;
+	if ( ! hasBlockToolbar && ! isPlaceholder ) {
 		return null;
 	}
 
@@ -203,6 +201,7 @@ export function PrivateBlockToolbar( {
 	// Shifts the toolbar to make room for the parent block selector.
 	const classes = clsx( 'block-editor-block-contextual-toolbar', {
 		'has-parent': showParentSelector,
+		'is-placeholder': isPlaceholder,
 	} );
 
 	const innerClasses = clsx( 'block-editor-block-toolbar', {
@@ -229,20 +228,24 @@ export function PrivateBlockToolbar( {
 				{ showParentSelector && ! isMultiToolbar && isLargeViewport && (
 					<BlockParentSelector />
 				) }
-				{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
+				{ ( shouldShowVisualToolbar ||
+					isMultiToolbar ||
+					isPlaceholder ) && (
 					<div ref={ nodeRef } { ...showHoveredOrFocusedGestures }>
 						<ToolbarGroup className="block-editor-block-toolbar__block-controls">
 							<BlockToolbarIcon
 								clientIds={ blockClientIds }
 								isSynced={ isSynced }
 							/>
-							{ isDefaultEditingMode &&
+							{ ! isPlaceholder &&
+								isDefaultEditingMode &&
 								showBlockVisibilityButton && (
 									<ViewportVisibilityToolbar
 										clientIds={ blockClientIds }
 									/>
 								) }
-							{ ! isMultiToolbar &&
+							{ ! isPlaceholder &&
+								! isMultiToolbar &&
 								isDefaultEditingMode &&
 								showLockButtons && (
 									<BlockLockToolbar
@@ -261,7 +264,7 @@ export function PrivateBlockToolbar( {
 					shouldShowVisualToolbar &&
 					isMultiToolbar &&
 					showGroupButtons && <BlockGroupToolbar /> }
-				{ ! isMultiToolbar && canEdit && (
+				{ ! isPlaceholder && ! isMultiToolbar && canEdit && (
 					<EditSectionButton clientId={ blockClientIds[ 0 ] } />
 				) }
 				{ ! areSelectedBlocksHiddenOnViewport && showShuffleButton && (
@@ -312,39 +315,12 @@ export function PrivateBlockToolbar( {
 							) }
 						</>
 					) }
-				<BlockEditVisuallyButton clientIds={ blockClientIds } />
-				<BlockSettingsMenu clientIds={ blockClientIds } />
-			</div>
-		</NavigableToolbar>
-	);
-}
-
-function BlockToolbarPlaceholder( { variant } ) {
-	const blockType = getBlockType( getDefaultBlockName() );
-
-	return (
-		<NavigableToolbar
-			className="block-editor-block-contextual-toolbar is-placeholder"
-			/* translators: accessibility text for the block toolbar */
-			aria-label={ __( 'Block tools' ) }
-			variant={ variant === 'toolbar' ? undefined : variant }
-		>
-			<div className="block-editor-block-toolbar">
-				<ToolbarGroup className="block-editor-block-toolbar__block-controls">
-					{ blockType && (
-						<ToolbarButton
-							disabled
-							icon={
-								<BlockIcon
-									className="block-editor-block-toolbar__block-icon"
-									icon={ blockType.icon }
-								/>
-							}
-							label={ blockType.title }
-						/>
-					) }
-					<BlockMover clientIds={ [] } hideDragHandle />
-				</ToolbarGroup>
+				{ ! isPlaceholder && (
+					<>
+						<BlockEditVisuallyButton clientIds={ blockClientIds } />
+						<BlockSettingsMenu clientIds={ blockClientIds } />
+					</>
+				) }
 			</div>
 		</NavigableToolbar>
 	);
