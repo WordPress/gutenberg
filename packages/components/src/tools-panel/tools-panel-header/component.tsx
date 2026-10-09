@@ -8,6 +8,7 @@ import MenuItem from '../../menu-item';
 import { HStack } from '../../h-stack';
 import { Heading } from '../../heading';
 import { useToolsPanelHeader } from './hook';
+import styles from '../style.module.scss';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import type {
@@ -24,33 +25,50 @@ const DefaultControlsGroup = ( {
 		return null;
 	}
 
+	const resetSuffix = (
+		<span className={ styles[ 'reset-label' ] }>{ __( 'Reset' ) }</span>
+	);
+
 	return (
 		<>
-			{ items.map( ( [ label, hasValue ] ) => (
-				<MenuItem
-					key={ label }
-					className={ itemClassName }
-					role="menuitem"
-					disabled={ ! hasValue }
-					onClick={ () => {
-						toggleItem( label );
-						speak(
-							sprintf(
-								// translators: %s: The name of the control being reset e.g. "Padding".
-								__( '%s reset to default' ),
-								label
-							),
-							'assertive'
-						);
-					} }
-				>
-					{ sprintf(
-						// translators: %s: The name of the control being reset e.g. "Padding".
-						__( 'Reset %s' ),
-						label
-					) }
-				</MenuItem>
-			) ) }
+			{ items.map( ( [ label, hasValue ] ) => {
+				if ( hasValue ) {
+					return (
+						<MenuItem
+							key={ label }
+							className={ itemClassName }
+							role="menuitem"
+							onClick={ () => {
+								toggleItem( label );
+								speak(
+									sprintf(
+										// translators: %s: The name of the control being reset e.g. "Padding".
+										__( '%s reset to default' ),
+										label
+									),
+									'assertive'
+								);
+							} }
+							suffix={ resetSuffix }
+						>
+							{ label }
+						</MenuItem>
+					);
+				}
+
+				return (
+					<MenuItem
+						key={ label }
+						icon={ check }
+						className={ itemClassName }
+						role="menuitemcheckbox"
+						isSelected
+						aria-disabled
+					>
+						{ label }
+					</MenuItem>
+				);
+			} ) }
 		</>
 	);
 };
@@ -66,10 +84,10 @@ const OptionalControlsGroup = ( {
 	return (
 		<>
 			{ items.map( ( [ label, isSelected ] ) => {
-				const itemLabel = isSelected
+				const itemDescription = isSelected
 					? sprintf(
-							// translators: %s is the name of a control, e.g. "Padding". Removing it hides the control and resets its value.
-							__( 'Remove %s' ),
+							// translators: %s: The name of the control being hidden and reset e.g. "Padding".
+							__( 'Hide and reset %s' ),
 							label
 						)
 					: sprintf(
@@ -83,6 +101,7 @@ const OptionalControlsGroup = ( {
 						key={ label }
 						icon={ isSelected ? check : null }
 						isSelected={ isSelected }
+						description={ itemDescription }
 						onClick={ () => {
 							if ( isSelected ) {
 								speak(
@@ -107,7 +126,7 @@ const OptionalControlsGroup = ( {
 						} }
 						role="menuitemcheckbox"
 					>
-						{ itemLabel }
+						{ label }
 					</MenuItem>
 				);
 			} ) }
