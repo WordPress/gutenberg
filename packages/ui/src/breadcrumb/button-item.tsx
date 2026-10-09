@@ -130,14 +130,24 @@ const ButtonItem = forwardRef< ButtonItemElement, ButtonItemProps >(
 						const ownerDocument = event.currentTarget.ownerDocument;
 						onClick?.( event );
 						const active = ownerDocument.activeElement;
-						onButtonActivate?.(
+						let focusTarget =
 							active !== ownerDocument.body &&
-								! event.currentTarget
-									.closest( '[role="menu"]' )
-									?.contains( active )
-								? ( active as HTMLElement )
-								: null
-						);
+							! event.currentTarget
+								.closest( '[role="menu"]' )
+								?.contains( active )
+								? active
+								: null;
+						// Restoring only the iframe would lose focus on its control.
+						while ( focusTarget?.tagName === 'IFRAME' ) {
+							const iframeActive = (
+								focusTarget as HTMLIFrameElement
+							 ).contentDocument?.activeElement;
+							if ( ! iframeActive ) {
+								break;
+							}
+							focusTarget = iframeActive;
+						}
+						onButtonActivate?.( focusTarget as HTMLElement | null );
 					} }
 					ref={ ref as ForwardedRef< HTMLDivElement > }
 					closeOnClick

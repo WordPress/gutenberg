@@ -267,6 +267,65 @@ describe( 'Breadcrumb hierarchy selection', () => {
 			.toHaveFocus();
 	} );
 
+	it.each( [
+		{ width: 500, pointer: true },
+		{ width: 500, pointer: false },
+		{ width: 280, pointer: true },
+		{ width: 280, pointer: false },
+	] )(
+		'preserves focus inside an iframe when an ancestor button synchronously moves focus, width: $width, pointer: $pointer',
+		async ( { width, pointer } ) => {
+			await render(
+				<>
+					<SelectionTrail
+						width={ width }
+						onActivate={ () => editor.focus() }
+					/>
+					<iframe title="Editor canvas" />
+				</>
+			);
+			const iframe =
+				screen.getByTitle< HTMLIFrameElement >( 'Editor canvas' );
+			const iframeDocument = iframe.contentDocument;
+			if ( ! iframeDocument ) {
+				throw new Error( 'Expected a same-origin iframe document.' );
+			}
+			const editor = iframeDocument.createElement( 'textarea' );
+			editor.setAttribute( 'aria-label', 'Canvas editor' );
+			iframeDocument.body.appendChild( editor );
+			const target = page.getByRole(
+				width === 280 ? 'menuitem' : 'button',
+				{ name: 'Outer group' }
+			);
+			const initialTarget =
+				width === 280
+					? page.getByRole( 'button', { name: /hidden breadcrumb/ } )
+					: target;
+			await expect.element( initialTarget ).toBeVisible();
+			( initialTarget.element() as HTMLButtonElement ).focus();
+			await expect.element( initialTarget ).toHaveFocus();
+			if ( width === 280 ) {
+				await userEvent.keyboard( '{Enter}' );
+			}
+			await expect.element( target ).toHaveFocus();
+			if ( pointer ) {
+				await target.click();
+			} else {
+				await userEvent.keyboard( '{Enter}' );
+			}
+			await expect
+				.element( page.getByRole( 'menu' ) )
+				.not.toBeInTheDocument();
+			await expect
+				.element(
+					page
+						.frameLocator( page.getByTitle( 'Editor canvas' ) )
+						.getByRole( 'textbox', { name: 'Canvas editor' } )
+				)
+				.toHaveFocus();
+		}
+	);
+
 	it( 'respects a focus move supplied through render composition', async () => {
 		await render( <SelectionTrail width={ 280 } renderFocusEditor /> );
 		const trigger = page.getByRole( 'button', {
