@@ -29,12 +29,19 @@ const sectionTitleStyle: CSSProperties = {
 	textTransform: 'capitalize',
 };
 
-const titleCase = ( key: string ) => {
-	const text = key.replace( /-/g, ' ' );
-	return text.charAt( 0 ).toUpperCase() + text.slice( 1 );
-};
+function TargetTitle( { name }: { name: string } ) {
+	return (
+		<h3 style={ { ...headingStyle, textTransform: 'capitalize' } }>
+			{ name.replace( /-/g, ' ' ) }
+		</h3>
+	);
+}
 
-function ColorTokenList( { names }: { names: readonly string[] } ) {
+function ColorTokenList( {
+	names,
+}: {
+	names: readonly ( keyof typeof tokens )[];
+} ) {
 	return (
 		<dl style={ listStyle }>
 			{ names.map( ( name ) => (
@@ -74,9 +81,7 @@ export function ColorTokenPreview() {
 						{ Object.entries( group.groups ).map(
 							( [ target, targetGroup ] ) => (
 								<div key={ target }>
-									<h3 style={ headingStyle }>
-										{ titleCase( target ) }
-									</h3>
+									<TargetTitle name={ target } />
 									<ColorTokenList
 										names={ targetGroup.tokens }
 									/>
