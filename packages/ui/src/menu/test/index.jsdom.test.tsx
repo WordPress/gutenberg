@@ -5,12 +5,17 @@ import {
 	it,
 	vi,
 	type MockedFunction,
+	beforeEach,
 } from 'vitest';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef, useId, useState } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 import * as Menu from '../index';
+import {
+	getWpCompatOverlaySlot,
+	__resetWpCompatOverlaySlotCacheForTests,
+} from '../../utils/wp-compat-overlay-slot';
 
 vi.mock( import( '@wordpress/i18n' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
@@ -811,5 +816,44 @@ describe( 'Menu', () => {
 		expect( screen.getByText( 'Create a separate copy.' ).tagName ).toBe(
 			'H3'
 		);
+	} );
+} );
+
+describe( 'Menu.Portal', () => {
+	beforeEach( () => {
+		vi.stubGlobal( '__wpUiCompatOverlaySlotEnabled', true );
+	} );
+
+	afterEach( () => {
+		getWpCompatOverlaySlot()?.remove();
+		__resetWpCompatOverlaySlotCacheForTests();
+		vi.unstubAllGlobals();
+	} );
+
+	it( 'waits for an explicit null container to become available', async () => {
+		const content = ( container: HTMLElement | null ) => (
+			<Menu.Root defaultOpen>
+				<Menu.Trigger>Open Menu</Menu.Trigger>
+				<div data-testid="portal-target" />
+				<Menu.Popup portal={ <Menu.Portal container={ container } /> }>
+					Portal content
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		const { rerender } = render( content( null ) );
+
+		expect(
+			screen.queryByText( 'Portal content' )
+		).not.toBeInTheDocument();
+
+		const target = screen.getByTestId( 'portal-target' );
+		rerender( content( target ) );
+
+		await waitFor( () => {
+			expect(
+				within( target ).getByText( 'Portal content' )
+			).toBeVisible();
+		} );
 	} );
 } );
