@@ -1,5 +1,9 @@
 import { __, sprintf } from '@wordpress/i18n';
-import { Placeholder, Button, Spinner } from '@wordpress/components';
+import {
+	Placeholder,
+	Button,
+	Spinner as WCSpinner,
+} from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -64,7 +68,7 @@ export default function TemplatePartPlaceholder( {
 						)
 			}
 		>
-			{ isResolving && <Spinner /> }
+			{ isResolving && <WCSpinner /> }
 
 			{ ! isResolving &&
 				!! ( templateParts.length || blockPatterns.length ) && (

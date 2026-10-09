@@ -1,4 +1,4 @@
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import type { DataFormControlProps } from '../../types';
 import useElements from '../../hooks/use-elements';
@@ -31,7 +31,7 @@ export default function Select< Item >( {
 	} );
 
 	if ( isLoading ) {
-		return <Spinner />;
+		return <WCSpinner />;
 	}
 
 	return (

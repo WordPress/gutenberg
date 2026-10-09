@@ -13,7 +13,7 @@ import {
 	__experimentalTruncate as Truncate,
 	Dropdown,
 	Placeholder,
-	Spinner,
+	Spinner as WCSpinner,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	Button,
 } from '@wordpress/components';
@@ -268,7 +268,7 @@ function BackgroundControlsPanel( {
 function LoadingSpinner() {
 	return (
 		<Placeholder className="block-editor-global-styles-background-panel__loading">
-			<Spinner />
+			<WCSpinner />
 		</Placeholder>
 	);
 }

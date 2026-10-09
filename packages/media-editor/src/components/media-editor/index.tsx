@@ -4,7 +4,7 @@ import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
-	Spinner,
+	Spinner as WCSpinner,
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import { Stack, Tabs, VisuallyHidden } from '@wordpress/ui';
@@ -894,7 +894,7 @@ function MediaEditorContent( {
 			<div className="media-editor">
 				{ ! media ? (
 					<div className="media-editor__loading">
-						<Spinner />
+						<WCSpinner />
 					</div>
 				) : (
 					<div
