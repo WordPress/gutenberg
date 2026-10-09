@@ -3,6 +3,7 @@ import { Button } from '@wordpress/components';
 import { useAsyncList } from '@wordpress/compose';
 import { forwardRef, memo, useRef, useLayoutEffect } from '@wordpress/element';
 import { getScrollContainer } from '@wordpress/dom';
+import HtmlRenderer from '../../../utils/html-renderer';
 
 const BATCH_SIZE = 20;
 
@@ -20,11 +21,9 @@ const IconGridItem = memo(
 				variant={ isSelected ? 'primary' : undefined }
 				__next40pxDefaultSize
 			>
-				<span
-					className="wp-block-icon__inserter-grid-icons-list-item-icon"
-					// Icons come from the icon registry, which sanitizes them on the server.
-					dangerouslySetInnerHTML={ { __html: icon.content } }
-				/>
+				<span className="wp-block-icon__inserter-grid-icons-list-item-icon">
+					<HtmlRenderer html={ icon.content } />
+				</span>
 				<span className="wp-block-icon__inserter-grid-icons-list-item-title">
 					{ icon.label }
 				</span>
