@@ -125,9 +125,16 @@
 			margin-block: auto;
 		}
 
-		/* Add partial transparency to CloseIconButton and outline/minimal ActionButton
+		/* Keep the dismiss control in the notice's color palette. */
+		.close-icon {
+			--wp-ui-button-foreground-color: var(--wp-ui-notice-text-color);
+			--wp-ui-button-foreground-color-active: var(--wp-ui-notice-text-color);
+			--wp-ui-button-border-color-active: transparent;
+			--wp-ui-button-background-color-active: color-mix(in srgb, var(--wp-ui-notice-text-color) 10%, transparent);
+		}
+
+		/* Add partial transparency to outline/minimal ActionButton
 		 * for a better look over tinted backgrounds */
-		.close-icon,
 		.action-button:is(.is-action-button-outline, .is-action-button-minimal) {
 			--wp-ui-button-background-color-active: color-mix(in srgb, transparent 50%, var(--wpds-color-background-interactive-neutral-weak-active));
 		}

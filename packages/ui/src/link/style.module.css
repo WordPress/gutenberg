@@ -3,8 +3,13 @@
 
 	@layer components {
 		.link {
+			text-decoration-color: currentColor;
 			text-underline-offset: 0.2em;
 			text-decoration-thickness: from-font;
+
+			&:is(:hover, :active, :focus-visible) {
+				text-decoration-thickness: max(0.12em, var(--wpds-border-width-sm));
+			}
 		}
 
 		/* Brand tone */
@@ -16,7 +21,8 @@
 		}
 
 		.is-brand:hover,
-		.is-brand:active {
+		.is-brand:active,
+		.is-brand:focus-visible {
 			--_gcd-a-color: var(--wpds-color-foreground-interactive-brand-active);
 
 			color: var(--wpds-color-foreground-interactive-brand-active);
@@ -28,11 +34,11 @@
 			--_gcd-a-color: var(--wpds-color-foreground-interactive-neutral);
 
 			color: var(--wpds-color-foreground-interactive-neutral);
-			text-decoration-color: var(--wpds-color-stroke-interactive-neutral);
 		}
 
 		.is-neutral:hover,
-		.is-neutral:active {
+		.is-neutral:active,
+		.is-neutral:focus-visible {
 			--_gcd-a-color: var(--wpds-color-foreground-interactive-neutral-active);
 
 			color: var(--wpds-color-foreground-interactive-neutral-active);

@@ -62,6 +62,7 @@ export default [
 	'--wpds-color-background-thumb-brand-disabled',
 	'--wpds-color-background-thumb-neutral-weak-disabled',
 	'--wpds-color-foreground-content-neutral',
+	'--wpds-color-foreground-content-neutral-strong',
 	'--wpds-color-foreground-content-neutral-weak',
 	'--wpds-color-foreground-content-success',
 	'--wpds-color-foreground-content-success-weak',

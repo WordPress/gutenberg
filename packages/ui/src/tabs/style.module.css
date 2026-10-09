@@ -25,6 +25,12 @@
 
 				width: fit-content;
 
+				/* Paint outside the list when the tabs fit. Shadows and outlines
+				 * do not contribute to the measured scrollable width. */
+				&:not(.is-scrolling) {
+					overflow: visible;
+				}
+
 				&.is-overflowing-first {
 					mask-image: linear-gradient(to var(--direction-end), var(--fade-gradient-base));
 				}
@@ -77,7 +83,11 @@
 
 				width: var(--active-tab-width);
 				translate: var(--active-tab-left) 0;
-				background-color: var(--wpds-color-stroke-interactive-neutral-strong);
+				background-color: var(--wpds-color-foreground-interactive-neutral);
+
+				.tablist:has(> .tab[aria-selected="true"]:not([data-disabled]):is(:hover, :active, :focus-visible)) & {
+					background-color: var(--wpds-color-foreground-interactive-neutral-active);
+				}
 			}
 
 			&[data-orientation="vertical"] {
@@ -140,20 +150,23 @@
 				}
 			}
 
-			&:not([data-disabled]):is(:hover, :focus-visible) {
+			&:not([data-disabled]):is(:hover, :active, :focus-visible) {
 				color: var(--wpds-color-foreground-interactive-neutral-active);
+
+				&::after {
+					background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+					opacity: 1;
+				}
 			}
 
-			/* Focus indicator. */
+			/* Interaction background and focus indicator. */
 			&::after {
 				position: absolute;
 				z-index: -1;
 				pointer-events: none;
 
 				/* Outline works for Windows high contrast mode as well. */
-				outline:
-					var(--wpds-border-width-focus) solid
-					var(--wpds-color-stroke-focus);
+				outline: var(--wpds-border-width-focus) solid transparent;
 				border-radius: var(--wpds-border-radius-sm);
 
 				/* Animation */
@@ -165,6 +178,7 @@
 			}
 
 			&:focus-visible::after {
+				outline-color: var(--wpds-color-stroke-focus);
 				opacity: 1;
 			}
 
@@ -175,7 +189,15 @@
 
 				&::after {
 					content: "";
-					inset: var(--wpds-dimension-padding-md);
+					inset-block: calc(var(--wpds-dimension-padding-md) + var(--wpds-dimension-padding-xs));
+					inset-inline: var(--wpds-dimension-padding-lg);
+					outline-offset: var(--wpds-dimension-padding-xs);
+				}
+
+				/* The shadow paints padding around the smaller pseudo-element
+				 * without increasing the tab's box or scrollable overflow. */
+				&:not([data-disabled]):is(:hover, :active, :focus-visible)::after {
+					box-shadow: 0 0 0 var(--wpds-dimension-padding-xs) var(--wpds-color-background-interactive-neutral-weak-active);
 				}
 			}
 
@@ -183,23 +205,23 @@
 				padding-inline: 0;
 
 				&::after {
-					/*
-					 * Prevent clipping the focus ring at the tablist edge.
-					 * Use rounding, as the focus ring width may have sub-pixel values
-					 * depending on the screen pixel ratio.
-					 */
-					inset-inline: round(up, var(--wpds-border-width-focus), 1px);
+					inset-inline: 0;
 				}
 			}
 
 			[data-orientation="vertical"] & {
 				padding: var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-md);
 				min-height: var(--wpds-dimension-size-lg);
+
+				&::after {
+					content: "";
+					inset: var(--wpds-border-width-focus); /* TODO: Use or create new control/interactive padding token */
+				}
 			}
 
-			[data-orientation="vertical"][data-select-on-move="false"] &::after {
-				content: "";
-				inset: var(--wpds-border-width-focus); /* TODO: Use or create new control/interactive padding token */
+			[data-orientation="vertical"][data-select-on-move="true"] &::after {
+				/* The shared selection indicator supplies the focus ring. */
+				outline: none;
 			}
 		}
 

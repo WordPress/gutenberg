@@ -1,8 +1,5 @@
-/* eslint-disable @wordpress/no-ds-tokens -- This file is the JS counterpart of
-   theme-variables.scss and the package's single mapping to the design system.
-   The rule guards against bare `--wpds-*` references, which the build can't
-   inject fallbacks into for Emotion/JS files; here every reference carries an
-   explicit fallback, so that concern doesn't apply.
+/* eslint-disable @wordpress/no-ds-tokens -- This file is the package's plain-value
+   mapping to design system tokens. The build plugin injects generated fallbacks.
 
    IMPORTANT: because this file's source contains `--wpds-` text, the
    design-system fallback build plugin claims it (it matches any file whose
@@ -42,45 +39,46 @@ const ALERT = {
 // Should match packages/components/src/utils/theme-variables.scss.
 //
 // Mirrors the Sass structure: each non-accent value resolves through a design
-// system (`--wpds-*`) token, then a hardcoded fallback. The hardcoded values
-// match what the design-system fallback plugin injects into the Sass version,
-// so JS behaves consistently with the Sass variables. Keep both the token
-// references and the fallbacks in sync with the Sass version.
+// system (`--wpds-*`) token. The build plugin injects generated fallbacks into
+// both versions so their defaults cannot drift apart.
 const THEME = {
 	accent: `var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9))`,
 	accentDarker10: `var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6))`,
 	accentDarker20: `var(--wp-components-color-accent-darker-20, var(--wp-admin-theme-color-darker-20, #183ad6))`,
 	/** Used when placing text on the accent color. */
-	accentInverted: `var(--wp-components-color-accent-inverted, var(--wpds-color-foreground-interactive-brand-strong, #fff))`,
+	accentInverted: `var(--wp-components-color-accent-inverted, var(--wpds-color-foreground-interactive-brand-strong))`,
 
-	background: `var(--wp-components-color-background, var(--wpds-color-background-surface-neutral-strong, #fff))`,
+	background: `var(--wp-components-color-background, var(--wpds-color-background-surface-neutral-strong))`,
 
-	foreground: `var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e))`,
+	foreground: `var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral))`,
 	/** Used when placing text on the foreground color. */
-	foregroundInverted: `var(--wp-components-color-foreground-inverted, var(--wpds-color-background-surface-neutral, #fcfcfc))`,
+	foregroundInverted: `var(--wp-components-color-foreground-inverted, var(--wpds-color-background-surface-neutral))`,
 
 	gray: {
 		/** @deprecated Use `COLORS.theme.foreground` instead. */
-		900: `var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e))`,
-		800: `var(--wp-components-color-gray-800, var(--wpds-color-foreground-content-neutral, #1e1e1e))`,
-		700: `var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070))`,
-		600: `var(--wp-components-color-gray-600, var(--wpds-color-stroke-interactive-neutral, #8d8d8d))`,
-		400: `var(--wp-components-color-gray-400, var(--wpds-color-stroke-interactive-neutral, #8d8d8d))`,
-		300: `var(--wp-components-color-gray-300, var(--wpds-color-stroke-surface-neutral, #dbdbdb))`,
-		200: `var(--wp-components-color-gray-200, var(--wpds-color-stroke-surface-neutral, #dbdbdb))`,
-		100: `var(--wp-components-color-gray-100, var(--wpds-color-background-surface-neutral, #fcfcfc))`,
+		900: `var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral))`,
+		800: `var(--wp-components-color-gray-800, var(--wpds-color-foreground-content-neutral))`,
+		700: `var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak))`,
+		600: `var(--wp-components-color-gray-600, var(--wpds-color-stroke-interactive-neutral))`,
+		400: `var(--wp-components-color-gray-400, var(--wpds-color-stroke-interactive-neutral))`,
+		300: `var(--wp-components-color-gray-300, var(--wpds-color-stroke-surface-neutral))`,
+		200: `var(--wp-components-color-gray-200, var(--wpds-color-stroke-surface-neutral))`,
+		100: `var(--wp-components-color-gray-100, var(--wpds-color-background-surface-neutral))`,
 	},
 };
 
 const UI = {
+	text: `var(--wpds-color-foreground-interactive-neutral)`,
+	textActive: `var(--wpds-color-foreground-interactive-neutral-active)`,
+	backgroundActive: `var(--wpds-color-background-interactive-neutral-weak-active)`,
 	background: THEME.background,
 	backgroundDisabled: THEME.gray[ 100 ],
 	border: THEME.gray[ 600 ],
 	borderHover: THEME.gray[ 700 ],
 	borderFocus: THEME.accent,
 	// The gray ramp above has no disabled step to map these through.
-	borderDisabled: `var(--wpds-color-stroke-interactive-neutral-disabled, #dbdbdb)`,
-	textDisabled: `var(--wpds-color-foreground-interactive-neutral-disabled, #8d8d8d)`,
+	borderDisabled: `var(--wpds-color-stroke-interactive-neutral-disabled)`,
+	textDisabled: `var(--wpds-color-foreground-interactive-neutral-disabled)`,
 
 	// Matches @wordpress/base-styles
 	darkGrayPlaceholder: `color-mix(in srgb, ${ THEME.foreground }, transparent 38%)`,

@@ -10,9 +10,19 @@
     -   `ColorPicker` ([#84128](https://github.com/WordPress/gutenberg/pull/84128))
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Enhancements
+
+-   Add interaction backgrounds within `TabPanel` tabs' focus-ring bounds and match their indicators to the text color, match `Notice` dismiss controls to the notice's tone with a tinted interaction background, and make `ExternalLink` underlines follow the text color and thicken on hover, press, and keyboard focus. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
+
 ### Deprecations
 
 -   `Tip`: Deprecate in favor of `Notice` from `@wordpress/ui`, preserving the legacy component for existing consumers ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
+
+### Bug Fixes
+
+-   Use semantic colors for `Modal`, `Panel`, and `ToolsPanel` surfaces, headings, and controls. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
+-   Align pressed `Button` colors and legacy `Tabs` interaction states with the semantic design tokens. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
+-   Keep JavaScript color fallbacks in sync with the generated design tokens. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 
 ## 42.0.0 (2026-10-07)
 

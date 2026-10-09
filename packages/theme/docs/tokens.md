@@ -239,6 +239,7 @@ The semantic token set is role-based, not a complete matrix of every property, t
 | `--wpds-color-background-thumb-brand-disabled`                | Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state.             |
 | `--wpds-color-background-thumb-neutral-weak-disabled`         | Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb), in their disabled state.                           |
 | `--wpds-color-foreground-content-neutral`                     | Foreground color for content like text with normal emphasis.                                                                                |
+| `--wpds-color-foreground-content-neutral-strong`              | Foreground color for content like headings with strong emphasis.                                                                            |
 | `--wpds-color-foreground-content-neutral-weak`                | Foreground color for content like text with weak emphasis.                                                                                  |
 | `--wpds-color-foreground-content-success`                     | Foreground color for content like text with success tone and normal emphasis.                                                               |
 | `--wpds-color-foreground-content-success-weak`                | Foreground color for content like text with success tone and weak emphasis.                                                                 |

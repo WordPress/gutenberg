@@ -6,6 +6,19 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### New Features
+
+-   Add `--wpds-color-foreground-content-neutral-strong` for headings and other content with strong emphasis. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
+
+### Enhancements
+
+-   Swap resting and active backgrounds for strong neutral controls. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
+-   Generate perception-aware color ramps with ordered surface and stroke progressions, preserve available surface spacing near black and white, align normal content with resting interactive colors, use the fifth foreground step for strong content and interaction states, and keep WCAG contrast floors unchanged. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
+
+### Internal
+
+-   Register color spaces only when calculating colors, avoiding module-import side effects. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
+
 ## 2.3.0 (2026-10-07)
 
 ### New Features

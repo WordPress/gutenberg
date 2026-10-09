@@ -61,13 +61,14 @@
 .components-notice__dismiss {
 	grid-column: 2;
 	grid-row: 1;
-	color: var(--wpds-color-foreground-interactive-neutral);
+	color: var(--wp-components-notice-text-color);
 	margin-inline-start: var(--wpds-dimension-gap-xs);
 
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover,
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
 	&:not(:disabled):not([aria-disabled="true"]):focus {
-		color: var(--wpds-color-foreground-interactive-neutral-active);
+		color: var(--wp-components-notice-text-color);
+		background-color: color-mix(in srgb, var(--wp-components-notice-text-color) 10%, transparent);
 	}
 }
 
