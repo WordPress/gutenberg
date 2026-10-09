@@ -48,7 +48,6 @@ _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/refe
 
 - **root**: `.wp-block-icon svg`
 - **css**: `.wp-block-icon`
-- **background**: `.wp-block-icon svg`
 - **shadow**: `.wp-block-icon svg`
 - **spacing**:
   - margin: `.wp-block-icon`

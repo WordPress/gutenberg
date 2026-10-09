@@ -84,7 +84,6 @@
 	"selectors": {
 		"root": ".wp-block-icon svg",
 		"css": ".wp-block-icon",
-		"background": ".wp-block-icon svg",
 		"shadow": ".wp-block-icon svg",
 		"spacing": {
 			"margin": ".wp-block-icon"
