@@ -10,10 +10,6 @@
 
 -   Query: List the existing terms in the taxonomy filters, so categories and tags can be browsed and selected instead of recalled and typed. The controls now use `SearchableChipSelectControl` from `@wordpress/ui` ([#82583](https://github.com/WordPress/gutenberg/pull/82583)).
 
-### Bug Fixes
-
--   Accordion Heading, Categories: Set the `identifier` of the title and label `RichText`, so selected text can get an inline note ([#84337](https://github.com/WordPress/gutenberg/pull/84337)).
-
 ## 11.2.0 (2026-10-07)
 
 ### Enhancements

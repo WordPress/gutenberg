@@ -125,7 +125,6 @@ export default function CategoriesEdit( {
 			<>
 				{ showLabel ? (
 					<RichText
-						identifier="label"
 						className="wp-block-categories__label"
 						aria-label={ __( 'Label text' ) }
 						placeholder={ taxonomy?.name }

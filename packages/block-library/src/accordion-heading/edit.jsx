@@ -76,7 +76,6 @@ export default function Edit( { attributes, setAttributes, context } ) {
 					</span>
 				) }
 				<RichText
-					identifier="title"
 					withoutInteractiveFormatting
 					disableLineBreaks
 					tagName="span"
