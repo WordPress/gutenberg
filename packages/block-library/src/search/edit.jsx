@@ -7,12 +7,13 @@ import {
 	__experimentalUseColorProps as useColorProps,
 	useBackgroundProps,
 	getTypographyClassesAndStyles as useTypographyProps,
+	getDimensionsClassesAndStyles as useDimensionsProps,
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
 	useSettings,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import {
 	SelectControl as WCSelectControl,
 	ToggleControl,
@@ -137,6 +138,8 @@ export default function SearchEdit( {
 
 	const colorProps = useColorProps( attributes );
 	const backgroundProps = useBackgroundProps( attributes );
+	const dimensionsProps = useDimensionsProps( attributes );
+	const [ isResizing, setIsResizing ] = useState( false );
 	const [ fluidTypographySettings, layout ] = useSettings(
 		'typography.fluid',
 		'layout'
@@ -640,19 +643,30 @@ export default function SearchEdit( {
 							: undefined
 					) }
 					style={ getWrapperStyles() }
-					minWidth={ MIN_WIDTH }
+					// ResizableBox writes these over `style`, and only reads
+					// them as pixel limits while resizing.
+					minWidth={
+						isResizing ? MIN_WIDTH : dimensionsProps.style?.minWidth
+					}
+					minHeight={
+						isResizing
+							? undefined
+							: dimensionsProps.style?.minHeight
+					}
 					enable={ getResizableSides() }
 					onResizeStart={ ( event, direction, elt ) => {
 						setAttributes( {
 							width: parseInt( elt.offsetWidth, 10 ),
 							widthUnit: 'px',
 						} );
+						setIsResizing( true );
 						toggleSelection( false );
 					} }
 					onResizeStop={ ( event, direction, elt, delta ) => {
 						setAttributes( {
 							width: parseInt( width + delta.width, 10 ),
 						} );
+						setIsResizing( false );
 						toggleSelection( true );
 					} }
 					showHandle={ isSelected }
