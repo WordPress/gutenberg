@@ -1,6 +1,50 @@
 import { hydrate, type ContainerNode, type ComponentChild } from 'preact';
-import { toVdom, hydratedIslands, closestHtmlDirectiveElement } from './vdom';
+import {
+	toVdom,
+	hydratedIslands,
+	parseDirectiveName,
+	getHtmlDirectiveStatus,
+	type ParsedDirectives,
+} from './vdom';
 import { createRootFragment, splitTask } from './utils';
+
+/**
+ * Finds the nearest inclusive ancestor whose HTML directive owns its content.
+ * Attribute names use the same filter and parser as `toVdom()`, and content
+ * ownership follows the shared parsed-directive rule in `vdom.ts`.
+ *
+ * @param element Element at which to begin the inclusive ancestor walk. Pass
+ *                a node's parent element to test strict content membership.
+ * @return The nearest eligible HTML directive element, or `null`.
+ */
+export function closestHtmlDirectiveElement(
+	element: Element
+): Element | null {
+	let current: Element | null = element;
+	while ( current ) {
+		const directives: ParsedDirectives = {};
+		for ( const { name } of current.attributes ) {
+			if (
+				! name.startsWith( 'data-wp-' ) ||
+				! name[ 8 ] ||
+				name === 'data-wp-interactive'
+			) {
+				continue;
+			}
+			const parsed = parseDirectiveName( name );
+			if ( parsed ) {
+				const { prefix, suffix } = parsed;
+				directives[ prefix ] = directives[ prefix ] || [];
+				directives[ prefix ].push( { suffix } );
+			}
+		}
+		if ( getHtmlDirectiveStatus( directives ).isHtmlDirectiveElement ) {
+			return current;
+		}
+		current = current.parentElement;
+	}
+	return null;
+}
 
 // Keep the same root fragment for each interactive region node.
 const regionRootFragments = new WeakMap();
