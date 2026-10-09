@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import { tokens, groups } from '../../prebuilt/js/design-tokens.mjs';
+import { groups, tokens } from '../../prebuilt/js/design-tokens.mjs';
 import {
 	descriptionStyle,
 	itemStyle,
@@ -9,7 +9,7 @@ import {
 	tokenNameStyle,
 } from './token-preview-styles';
 
-const cursorTokens: readonly string[] = groups.cursor;
+const cursorTokens = groups.cursor.tokens;
 
 const controlStyle: CSSProperties = {
 	cursor: 'var(--wpds-cursor-control)',
@@ -47,10 +47,7 @@ export function CursorTokenPreview() {
 						<dt style={ textStyle }>
 							<code style={ tokenNameStyle }>{ name }</code>
 							<span style={ descriptionStyle }>
-								{
-									tokens[ name as keyof typeof tokens ]
-										.$description
-								}
+								{ tokens[ name ].$description }
 							</span>
 						</dt>
 					</div>

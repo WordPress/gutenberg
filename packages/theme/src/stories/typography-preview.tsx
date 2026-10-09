@@ -1,13 +1,9 @@
 import type { CSSProperties } from 'react';
-import { tokens as wpdsTokens } from '../../prebuilt/js/design-tokens.mjs';
-
-const typographyTokens = Object.keys( wpdsTokens ).filter( ( tokenName ) =>
-	tokenName.startsWith( '--wpds-typography-' )
-);
+import { groups, tokens } from '../../prebuilt/js/design-tokens.mjs';
 
 type TypographyTokenGroup = {
 	title: string;
-	tokenPrefix: string;
+	groupKey: keyof typeof groups.typography.groups;
 	sampleLines: string[];
 	getSampleStyle: ( tokenValue: string, tokenName: string ) => CSSProperties;
 };
@@ -15,7 +11,7 @@ type TypographyTokenGroup = {
 const tokenGroups: TypographyTokenGroup[] = [
 	{
 		title: 'Font families',
-		tokenPrefix: '--wpds-typography-font-family-',
+		groupKey: 'font-family',
 		sampleLines: [ 'Code is Poetry.' ],
 		getSampleStyle: ( tokenValue ) => ( {
 			fontFamily: tokenValue,
@@ -25,7 +21,7 @@ const tokenGroups: TypographyTokenGroup[] = [
 	},
 	{
 		title: 'Font sizes',
-		tokenPrefix: '--wpds-typography-font-size-',
+		groupKey: 'font-size',
 		sampleLines: [ 'Code is Poetry.' ],
 		getSampleStyle: ( tokenValue, tokenName ) => ( {
 			fontFamily: 'var(--wpds-typography-font-family-heading)',
@@ -38,7 +34,7 @@ const tokenGroups: TypographyTokenGroup[] = [
 	},
 	{
 		title: 'Line heights',
-		tokenPrefix: '--wpds-typography-line-height-',
+		groupKey: 'line-height',
 		sampleLines: [
 			'WordPress grows when people like you tell their friends about it.',
 			'Code is Poetry.',
@@ -51,7 +47,7 @@ const tokenGroups: TypographyTokenGroup[] = [
 	},
 	{
 		title: 'Font weights',
-		tokenPrefix: '--wpds-typography-font-weight-',
+		groupKey: 'font-weight',
 		sampleLines: [ 'Code is Poetry.' ],
 		getSampleStyle: ( tokenValue ) => ( {
 			fontFamily: 'var(--wpds-typography-font-family-body)',
@@ -128,13 +124,11 @@ function getTokenValue( tokenName: string ) {
 
 function TypographyTokenSection( {
 	title,
-	tokenPrefix,
+	groupKey,
 	sampleLines,
 	getSampleStyle,
 }: TypographyTokenGroup ) {
-	const sectionTokens = typographyTokens.filter( ( tokenName ) =>
-		tokenName.startsWith( tokenPrefix )
-	);
+	const sectionTokens = groups.typography.groups[ groupKey ].tokens;
 
 	return (
 		<section>
@@ -151,11 +145,7 @@ function TypographyTokenSection( {
 									{ tokenName }
 								</code>
 								<span style={ descriptionStyle }>
-									{
-										wpdsTokens[
-											tokenName as keyof typeof wpdsTokens
-										].$description
-									}
+									{ tokens[ tokenName ].$description }
 								</span>
 							</dt>
 							<dd style={ { margin: 0 } }>
@@ -190,7 +180,7 @@ export function TypographyTokenPreview() {
 		<div style={ previewStyle }>
 			{ tokenGroups.map( ( tokenGroup ) => (
 				<TypographyTokenSection
-					key={ tokenGroup.tokenPrefix }
+					key={ tokenGroup.groupKey }
 					{ ...tokenGroup }
 				/>
 			) ) }
