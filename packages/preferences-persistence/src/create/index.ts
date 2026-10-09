@@ -13,16 +13,16 @@ const localStorage = window.localStorage;
  * Creates a persistence layer that stores data in WordPress user meta via the
  * REST API.
  *
- * @param options
- * @param options.preloadedData          Any persisted preferences data that should be preloaded.
- *                                       When set, the persistence layer will avoid fetching data
- *                                       from the REST API.
- * @param options.localStorageRestoreKey The key to use for restoring the localStorage backup, used
- *                                       when the persistence layer calls `localStorage.getItem` or
- *                                       `localStorage.setItem`.
- * @param options.requestDebounceMS      Debounce requests to the API so that they only occur at
- *                                       minimum every `requestDebounceMS` milliseconds, and don't
- *                                       swamp the server. Defaults to 2500ms.
+ * @param {CreateOptions}        [options]
+ * @param {PreferencesData|null} [options.preloadedData]          Any persisted preferences data that should be preloaded.
+ *                                                                When set, the persistence layer will avoid fetching data
+ *                                                                from the REST API.
+ * @param {string}               [options.localStorageRestoreKey] The key to use for restoring the localStorage backup, used
+ *                                                                when the persistence layer calls `localStorage.getItem` or
+ *                                                                `localStorage.setItem`.
+ * @param {number}               [options.requestDebounceMS]      Debounce requests to the API so that they only occur at
+ *                                                                minimum every `requestDebounceMS` milliseconds, and don't
+ *                                                                swamp the server. Defaults to 2500ms.
  *
  * @return A persistence layer for WordPress user meta.
  */

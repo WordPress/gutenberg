@@ -38,10 +38,10 @@ Creates a persistence layer that stores data in WordPress user meta via the REST
 
 _Parameters_
 
-- _options_ `CreateOptions`:
-- _options.preloadedData_ `CreateOptions[ 'preloadedData' ]`: Any persisted preferences data that should be preloaded. When set, the persistence layer will avoid fetching data from the REST API.
-- _options.localStorageRestoreKey_ `CreateOptions[ 'localStorageRestoreKey' ]`: The key to use for restoring the localStorage backup, used when the persistence layer calls `localStorage.getItem` or `localStorage.setItem`.
-- _options.requestDebounceMS_ `CreateOptions[ 'requestDebounceMS' ]`: Debounce requests to the API so that they only occur at minimum every `requestDebounceMS` milliseconds, and don't swamp the server. Defaults to 2500ms.
+- _options_ `[CreateOptions]`:
+- _options.preloadedData_ `[PreferencesData|null]`: Any persisted preferences data that should be preloaded. When set, the persistence layer will avoid fetching data from the REST API.
+- _options.localStorageRestoreKey_ `[string]`: The key to use for restoring the localStorage backup, used when the persistence layer calls `localStorage.getItem` or `localStorage.setItem`.
+- _options.requestDebounceMS_ `[number]`: Debounce requests to the API so that they only occur at minimum every `requestDebounceMS` milliseconds, and don't swamp the server. Defaults to 2500ms.
 
 _Returns_
 
