@@ -38,6 +38,11 @@ const DefaultControlsGroup = ( {
 							key={ label }
 							className={ itemClassName }
 							role="menuitem"
+							label={ sprintf(
+								// translators: %s: The control name, e.g. "Padding". Keep the control name first, followed by the reset action, to match the visible menu label order.
+								__( '%s, reset to default' ),
+								label
+							) }
 							onClick={ () => {
 								toggleItem( label );
 								speak(
