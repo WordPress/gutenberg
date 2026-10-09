@@ -9,6 +9,8 @@ import type {
 
 export { create };
 
+export type * from './types';
+
 /**
  * Creates the persistence layer with preloaded data.
  *
