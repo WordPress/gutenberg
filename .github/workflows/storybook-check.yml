@@ -1,4 +1,4 @@
-name: Storybook build and Smoke Tests
+name: Storybook Build and Smoke Tests
 
 on:
     pull_request:
@@ -19,6 +19,7 @@ permissions: {}
 
 jobs:
     check:
+        name: Storybook Build and Smoke Tests
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
@@ -47,6 +48,9 @@ jobs:
             - name: Validate manifest matches design-system-mcp contract
               run: node packages/design-system-mcp/scripts/validate-manifest.mjs
 
+            - name: Validate manifest has no component or story errors
+              run: node storybook/scripts/validate-manifest-errors.mts storybook/build/manifests/components.json
+
             # Regenerates the committed snapshot of components/props/descriptions
             # from the freshly built manifest. Fails if a component or prop is
             # newly missing a description (see the allowlist for known gaps).
@@ -67,6 +71,7 @@ jobs:
 
             - name: Build E2E Storybook
               env:
+                  NODE_OPTIONS: --max-old-space-size=8192
                   NODE_ENV: test
               run: npm run storybook:e2e:build
 

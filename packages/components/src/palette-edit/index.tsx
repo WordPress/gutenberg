@@ -11,7 +11,6 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { lineSolid, moreVertical, plus } from '@wordpress/icons';
 import { useDebounce, useInstanceId } from '@wordpress/compose';
-import { kebabCase } from '@wordpress/kebab-case';
 import { Menu, Stack, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import Button from '../button';
 import { ColorPicker } from '../color-picker';
@@ -29,16 +28,11 @@ import {
 	getGradientFromCSSColors,
 } from '../duotone-picker/utils';
 import Popover from '../popover';
-import {
-	PaletteEditStyles,
-	PaletteHeading,
-	IndicatorStyled,
-	NameContainer,
-	NameInputControl,
-	DoneButton,
-	RemoveButton,
-	PaletteEditContents,
-} from './styles';
+import { Heading } from '../heading';
+import { View } from '../view';
+import InputControl from '../input-control';
+import ColorIndicator from '../color-indicator';
+import styles from './style.module.scss';
 import { DEFAULT_GRADIENT } from '../custom-gradient-picker/constants';
 import CustomGradientPicker from '../custom-gradient-picker';
 import type {
@@ -229,7 +223,8 @@ function getResetLabel( variant: PaletteVariant ) {
 
 function NameInput( { value, onChange, label }: NameInputProps ) {
 	return (
-		<NameInputControl
+		<InputControl
+			className={ styles[ 'name-input' ] }
 			size="compact"
 			label={ label }
 			hideLabelFromVision
@@ -418,7 +413,6 @@ function Option< T extends PaletteElement >( {
 	onChange,
 	onRemove,
 	popoverProps: receivedPopoverProps,
-	slugPrefix,
 	variant,
 	colorPalette,
 }: OptionProps< T > ) {
@@ -452,7 +446,10 @@ function Option< T extends PaletteElement >( {
 					) }
 					style={ { padding: 0 } }
 				>
-					<IndicatorStyled colorValue={ value } />
+					<ColorIndicator
+						className={ styles.indicator }
+						colorValue={ value }
+					/>
 				</Button>
 				<FlexBlock>
 					{ ! canOnlyChangeValues ? (
@@ -463,24 +460,22 @@ function Option< T extends PaletteElement >( {
 								onChange( {
 									...element,
 									name: nextName,
-									slug:
-										slugPrefix +
-										kebabCase( nextName ?? '' ),
 								} )
 							}
 						/>
 					) : (
-						<NameContainer>
+						<div className={ styles.name }>
 							{ element.name.trim().length
 								? element.name
 								: /* Fall back to non-breaking space to maintain height */
 									'\u00A0' }
-						</NameContainer>
+						</div>
 					) }
 				</FlexBlock>
 				{ ! canOnlyChangeValues && (
 					<FlexItem>
-						<RemoveButton
+						<Button
+							className={ styles.remove }
 							size="small"
 							icon={ lineSolid }
 							label={ sprintf(
@@ -512,7 +507,6 @@ function PaletteEditListView< T extends PaletteElement >( {
 	elements,
 	onChange,
 	canOnlyChangeValues,
-	slugPrefix,
 	variant,
 	colorPalette,
 	popoverProps,
@@ -566,7 +560,6 @@ function PaletteEditListView< T extends PaletteElement >( {
 							);
 							addColorRef.current?.focus();
 						} }
-						slugPrefix={ slugPrefix }
 						popoverProps={ popoverProps }
 					/>
 				) ) }
@@ -688,17 +681,19 @@ export function PaletteEdit( {
 	);
 
 	return (
-		<PaletteEditStyles>
+		<View className={ styles.palette }>
 			<HStack>
-				<PaletteHeading
+				<Heading
+					className={ styles.heading }
 					id={ paletteLabelId }
 					level={ paletteLabelHeadingLevel }
 				>
 					{ paletteLabel }
-				</PaletteHeading>
+				</Heading>
 				<Stack direction="row" gap="xs">
 					{ hasElements && isEditing && (
-						<DoneButton
+						<Button
+							className={ styles.done }
 							size="small"
 							onClick={ () => {
 								setIsEditing( false );
@@ -706,7 +701,7 @@ export function PaletteEdit( {
 							} }
 						>
 							{ __( 'Done' ) }
-						</DoneButton>
+						</Button>
 					) }
 					{ ! canOnlyChangeValues && (
 						<Button
@@ -821,14 +816,13 @@ export function PaletteEdit( {
 				</Stack>
 			</HStack>
 			{ hasElements && (
-				<PaletteEditContents>
+				<View className={ styles.contents }>
 					{ isEditing && (
 						<PaletteEditListView< ( typeof elements )[ number ] >
 							canOnlyChangeValues={ canOnlyChangeValues }
 							elements={ elements }
 							// @ts-expect-error TODO: Don't know how to resolve
 							onChange={ onChange }
-							slugPrefix={ slugPrefix }
 							variant={ variant }
 							colorPalette={ duotoneColorPalette }
 							popoverProps={ popoverProps }
@@ -897,12 +891,12 @@ export function PaletteEdit( {
 							disableCustomColors
 						/>
 					) }
-				</PaletteEditContents>
+				</View>
 			) }
 			{ ! hasElements && emptyMessage && (
-				<PaletteEditContents>{ emptyMessage }</PaletteEditContents>
+				<View className={ styles.contents }>{ emptyMessage }</View>
 			) }
-		</PaletteEditStyles>
+		</View>
 	);
 }
 

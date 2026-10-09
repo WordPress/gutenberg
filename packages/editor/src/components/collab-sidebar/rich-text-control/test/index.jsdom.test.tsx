@@ -21,7 +21,7 @@ import RichTextControl from '../';
 import { unlock } from '../../../../lock-unlock';
 
 /*
- * `registerFormatType` types its settings as the full `WPFormat` shape; the
+ * `registerFormatType` types its settings as the full `FormatType` shape; the
  * minimal stubs in this file only need the members the control exercises.
  */
 function registerTestFormatType(
