@@ -115,7 +115,7 @@ function defaultRequestToExternalModule( request ) {
 /**
  * Default request to WordPress script handle transformation
  *
- * Transform `@wordpress` dependencies:
+ * Transform `@wordpress/*` dependencies:
  * - request `@wordpress/i18n` becomes `wp-i18n`
  * - request `@wordpress/escape-html` becomes `wp-escape-html`
  *
