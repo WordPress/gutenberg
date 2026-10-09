@@ -195,10 +195,10 @@ function block_core_post_navigation_link_get_support_styles( $attributes ) {
 		);
 	}
 
-	$styles = wp_style_engine_get_styles(
+	$border_output  = wp_style_engine_get_styles( array( 'border' => $border_styles ) );
+	$shadow_output  = wp_get_shadow_classes_and_styles( $attributes );
+	$spacing_output = wp_style_engine_get_styles(
 		array(
-			'border'  => $border_styles,
-			'shadow'  => $block_styles['shadow'] ?? null,
 			'spacing' => array(
 				'margin'  => $block_styles['spacing']['margin'] ?? null,
 				'padding' => $block_styles['spacing']['padding'] ?? null,
@@ -206,9 +206,17 @@ function block_core_post_navigation_link_get_support_styles( $attributes ) {
 		)
 	);
 
+	$classes = array_filter(
+		array(
+			$border_output['classnames'] ?? '',
+			$shadow_output['class'] ?? '',
+			$spacing_output['classnames'] ?? '',
+		)
+	);
+
 	return array(
-		'class' => $styles['classnames'] ?? '',
-		'style' => $styles['css'] ?? '',
+		'class' => implode( ' ', $classes ),
+		'style' => ( $border_output['css'] ?? '' ) . ( $shadow_output['style'] ?? '' ) . ( $spacing_output['css'] ?? '' ),
 	);
 }
 

@@ -276,4 +276,36 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 			'Submenu should not have "open-on-hover-click" class when legacy openSubmenusOnClick was true'
 		);
 	}
+
+	/**
+	 * @covers ::gutenberg_render_block_core_navigation_submenu
+	 */
+	public function test_should_apply_shadow_to_the_submenu_container() {
+		$page_id = self::$page->ID;
+
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:navigation-submenu {"label":"Submenu Label","type":"page","id":' . $page_id . ',"url":"http://localhost:8888/?page_id=' . $page_id . '","kind":"post-type","style":{"shadow":"var:preset|shadow|natural"}} -->
+            <!-- wp:navigation-link {"label":"Submenu Item Link Label","type":"page","id":' . $page_id . ',"url":"http://localhost:8888/?page_id=' . $page_id . '","kind":"post-type"} /-->
+        <!-- /wp:navigation-submenu -->'
+		);
+
+		$navigation_submenu_block = new WP_Block( $parsed_blocks[0], array( 'overlayTextColor' => 'purple' ) );
+
+		$tags = new WP_HTML_Tag_Processor(
+			gutenberg_render_block_core_navigation_submenu(
+				$navigation_submenu_block->attributes,
+				array(),
+				$navigation_submenu_block
+			)
+		);
+		$this->assertTrue(
+			$tags->next_tag(
+				array(
+					'tag_name'   => 'ul',
+					'class_name' => 'wp-block-navigation__submenu-container',
+				)
+			)
+		);
+		$this->assertSame( 'box-shadow:var(--wp--preset--shadow--natural)', $tags->get_attribute( 'style' ) );
+	}
 }
