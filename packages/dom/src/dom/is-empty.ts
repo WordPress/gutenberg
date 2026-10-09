@@ -6,22 +6,20 @@
  *
  * @return Whether or not the element is empty.
  */
-export default function isEmpty( element: Element ): boolean {
+export default function isEmpty( element: Node ): boolean {
 	switch ( element.nodeType ) {
 		case element.TEXT_NODE:
 			// We cannot use \s since it includes special spaces which we want
 			// to preserve.
 			return /^[ \f\n\r\t\v\u00a0]*$/.test( element.nodeValue || '' );
 		case element.ELEMENT_NODE:
-			if ( element.hasAttributes() ) {
+			if ( ( element as Element ).hasAttributes() ) {
 				return false;
 			} else if ( ! element.hasChildNodes() ) {
 				return true;
 			}
 
-			return ( Array.from( element.childNodes ) as Element[] ).every(
-				isEmpty
-			);
+			return Array.from( element.childNodes ).every( isEmpty );
 		default:
 			return true;
 	}

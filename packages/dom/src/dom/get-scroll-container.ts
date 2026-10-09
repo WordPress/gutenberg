@@ -11,7 +11,7 @@ import getComputedStyle from './get-computed-style';
  */
 export default function getScrollContainer(
 	node: Element | null,
-	direction: string | null = 'vertical'
+	direction: 'vertical' | 'horizontal' | 'all' = 'vertical'
 ): Element | undefined {
 	if ( ! node ) {
 		return undefined;

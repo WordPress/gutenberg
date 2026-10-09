@@ -11,7 +11,7 @@
 export function scrollIfNoRange(
 	container: HTMLElement,
 	alignToTop: boolean,
-	callback: Function
+	callback: () => Range | null
 ): Range | null {
 	let range = callback();
 

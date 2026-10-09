@@ -18,7 +18,7 @@ export interface SchemaItem {
 	/**
 	 * Whether to allow nodes without children.
 	 */
-	allowEmpty: boolean;
+	allowEmpty?: boolean;
 	/**
 	 * Function to test whether a node is a match. If left undefined any node will be assumed to match.
 	 */

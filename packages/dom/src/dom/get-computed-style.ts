@@ -6,7 +6,7 @@ import { assertIsDefined } from '../utils/assert-is-defined';
  */
 export default function getComputedStyle(
 	element: Element
-): ReturnType< Window[ 'getComputedStyle' ] > {
+): CSSStyleDeclaration {
 	assertIsDefined(
 		element.ownerDocument.defaultView,
 		'element.ownerDocument.defaultView'
