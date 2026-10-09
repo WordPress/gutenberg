@@ -30,6 +30,7 @@
 
 ### Enhancements
 
+-   `Drawer`: Use the WordPress compatibility overlay slot as the default portal container when available, preserving explicit container overrides, including null to delay rendering.
 -   `Switch`, `SwitchControl`: Mark as recommended for use in a WordPress environment ([#84097](https://github.com/WordPress/gutenberg/pull/84097)).
 -   `Progress`: Default to a 160px width, overridable through `className` or `style` ([#84021](https://github.com/WordPress/gutenberg/pull/84021)).
 -   `Progress`: Mark as recommended for use in a WordPress environment. ([#84021](https://github.com/WordPress/gutenberg/pull/84021))
