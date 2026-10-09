@@ -19,7 +19,7 @@
 -   `PostAuthor`: The field renders with the `SearchableSelect` component of `@wordpress/ui` instead of `ComboboxControl` and `SelectControl` ([#83323](https://github.com/WordPress/gutenberg/pull/83323)).
 -   `DocumentOutline`: Show the outline items' focus ring with the design system's outline instead of a legacy box-shadow ([#83755](https://github.com/WordPress/gutenberg/pull/83755)).
 -   Notes: Add a "Notes" submenu to the View group of the Options menu ([#83768](https://github.com/WordPress/gutenberg/pull/83768)).
--   Notes: Badge the "All notes" toolbar toggle with the number of unresolved note threads carrying activity you have not seen. Your own notes never count, opening the sidebar or selecting a thread clears the badge, and counts above 9 display as "9+" while assistive technology is given the exact number ([#81951](https://github.com/WordPress/gutenberg/pull/81951)).
+-   Notes: Show a dot on the "All notes" toolbar toggle when unresolved notes have activity you have not seen. Your own notes never count, and opening the sidebar or selecting a thread clears it. Opening "All notes" highlights the threads that were unseen, with their replies expanded, until they scroll into view ([#81951](https://github.com/WordPress/gutenberg/pull/81951)).
 
 ### Bug Fixes
 

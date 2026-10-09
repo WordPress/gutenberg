@@ -28,13 +28,13 @@ export type ComplementaryAreaFillProps = {
 
 export type ComplementaryAreaProps = {
 	/**
-	 * A count rendered over the pinned toolbar toggle. Counts above 9 display
-	 * as "9+"; pass `badgeLabel` so the exact number is still announced.
+	 * Shows a dot over the pinned toolbar toggle, flagging that the area has
+	 * something new. Pass `badgeLabel` so assistive technology is told too.
 	 */
-	badge?: number;
+	badge?: boolean;
 	/**
 	 * Accessible label for the pinned toolbar toggle while a badge is shown,
-	 * replacing `title` so the exact count is announced.
+	 * replacing `title` so the badge is announced.
 	 */
 	badgeLabel?: string;
 	/**

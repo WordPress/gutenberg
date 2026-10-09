@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   `ComplementaryArea`: Add `badge` and `badgeLabel` props, rendering a count over the pinned toolbar toggle ([#81951](https://github.com/WordPress/gutenberg/pull/81951)).
+-   `ComplementaryArea`: Add `badge` and `badgeLabel` props, rendering a dot over the pinned toolbar toggle ([#81951](https://github.com/WordPress/gutenberg/pull/81951)).
 
 ## 10.3.0 (2026-10-07)
 

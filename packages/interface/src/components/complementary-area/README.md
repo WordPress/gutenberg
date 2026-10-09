@@ -11,14 +11,14 @@ Besides rendering the complementary area, the component renders a button in `Pin
 
 ### badge
 
-A count rendered over the pinned toolbar toggle. Counts above 9 are displayed as "9+"; pass `badgeLabel` so assistive technology still gets the exact number. No badge is rendered for `0` or `undefined`, and the pinned toggle's markup is left untouched.
+Shows a dot over the pinned toolbar toggle, flagging that the area has something new. The dot is hidden from assistive technology; pass `badgeLabel` so it is announced. Without a badge the pinned toggle's markup is left untouched.
 
--   Type: `Number`
+-   Type: `Boolean`
 -   Required: No
 
 ### badgeLabel
 
-Accessible label for the pinned toolbar toggle while a badge is shown, replacing `title` so the exact count is announced and appears in the toggle's tooltip - for example "All notes, 12 unseen". Ignored when there is no `badge`.
+Accessible label for the pinned toolbar toggle while a badge is shown, replacing `title` so the badge is announced and appears in the toggle's tooltip - for example "All notes, new activity". Ignored when there is no `badge`.
 
 -   Type: `String`
 -   Required: No

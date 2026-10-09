@@ -37,7 +37,7 @@ import {
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
 	getLatestNoteActivity,
-	getUnseenNoteCount,
+	getUnseenNoteIds,
 	getNoteAtCaret,
 	pickNoteForCaret,
 	readInlineSelection,
@@ -188,9 +188,15 @@ export function useNoteThreads( postId ) {
 	};
 }
 
+const NO_NOTE_IDS = [];
+
 /**
- * Counts the note threads carrying activity the current user has not seen, and
+ * Tracks whether the post has note activity the current user has not seen, and
  * marks the post's notes as seen while the "All notes" sidebar is open.
+ *
+ * Only a single per-post timestamp is stored, so this cannot say which notes a
+ * user has read - just that something happened since they last looked. That
+ * is why the badge is a dot rather than a count.
  *
  * Two things count as having looked. Opening the pinned "All notes" sidebar -
  * the one the badge sits on - is the obvious one. Selecting a thread is the
@@ -212,10 +218,15 @@ export function useNoteThreads( postId ) {
  * shown rather than the current time, which keeps the comparison immune to
  * clock skew between the browser and the server.
  *
+ * Opening "All notes" advances that timestamp straight away, so the threads
+ * that were unseen at that moment are captured first and returned as
+ * `highlightedNoteIds`, letting the sidebar point them out. The list is kept
+ * until the sidebar closes and only lives in memory.
+ *
  * @param {Object}  options        Options.
  * @param {?number} options.postId Post the notes belong to.
  * @param {Array}   options.notes  Every note thread loaded for the post.
- * @return {number} Number of threads with unseen activity.
+ * @return {{hasUnseenNotes: boolean, highlightedNoteIds: Array}} Whether any thread has unseen activity, and the threads to highlight in "All notes".
  */
 export function useUnseenNotes( { postId, notes } ) {
 	const { set: setPreference } = useDispatch( preferencesStore );
@@ -260,6 +271,32 @@ export function useUnseenNotes( { postId, notes } ) {
 		[ notes ]
 	);
 
+	const unseenNoteIds = useMemo(
+		() => getUnseenNoteIds( openThreads, lastSeen, currentUserId ),
+		[ openThreads, lastSeen, currentUserId ]
+	);
+
+	const [ highlightedNoteIds, setHighlightedNoteIds ] =
+		useState( NO_NOTE_IDS );
+	// Runs before the effect below advances the timestamp, so it still sees
+	// what was unseen when the sidebar opened. Activity arriving while it
+	// stays open is added too.
+	useEffect( () => {
+		if ( ! isAllNotesOpen ) {
+			setHighlightedNoteIds( NO_NOTE_IDS );
+			return;
+		}
+		if ( ! unseenNoteIds.length ) {
+			return;
+		}
+		setHighlightedNoteIds( ( current ) => {
+			const added = unseenNoteIds.filter(
+				( id ) => ! current.includes( id )
+			);
+			return added.length ? [ ...current, ...added ] : current;
+		} );
+	}, [ isAllNotesOpen, unseenNoteIds ] );
+
 	const hasLooked = isAllNotesOpen || hasSelectedNote;
 
 	useEffect( () => {
@@ -290,10 +327,10 @@ export function useUnseenNotes( { postId, notes } ) {
 		setPreference,
 	] );
 
-	return useMemo(
-		() => getUnseenNoteCount( openThreads, lastSeen, currentUserId ),
-		[ openThreads, lastSeen, currentUserId ]
-	);
+	return {
+		hasUnseenNotes: unseenNoteIds.length > 0,
+		highlightedNoteIds,
+	};
 }
 
 export function useNoteActions() {

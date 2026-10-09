@@ -931,9 +931,9 @@ export function getLatestNoteActivity( threads ) {
 }
 
 /**
- * Counts the note threads carrying activity the current user has not seen yet.
+ * Lists the note threads carrying activity the current user has not seen yet.
  *
- * A thread counts once however many unseen replies it holds, and only activity
+ * A thread is listed once however many unseen replies it holds, and only activity
  * authored by somebody else counts - your own note never badges your own
  * toolbar. Pass only the threads that should be eligible (unresolved ones);
  * resolving a thread is not activity a badge should surface.
@@ -941,23 +941,25 @@ export function getLatestNoteActivity( threads ) {
  * @param {Array}   threads       Eligible note threads, each optionally carrying a `reply` array.
  * @param {?string} lastSeen      `date_gmt` the user last looked at this post's notes. A missing value means nothing has been seen yet.
  * @param {?number} currentUserId Id of the user the count is for.
- * @return {number} Number of threads with unseen activity.
+ * @return {Array} Ids of the threads with unseen activity.
  */
-export function getUnseenNoteCount( threads, lastSeen, currentUserId ) {
+export function getUnseenNoteIds( threads, lastSeen, currentUserId ) {
 	// Without a known viewer there is no way to tell whose activity is whose,
-	// and counting every thread would badge the user for their own notes.
+	// and listing every thread would badge the user for their own notes.
 	if ( ! threads?.length || ! currentUserId ) {
-		return 0;
+		return [];
 	}
 
-	return threads.filter( ( thread ) =>
-		[ thread, ...( thread?.reply ?? [] ) ].some(
-			( entry ) =>
-				!! entry?.date_gmt &&
-				entry.author !== currentUserId &&
-				( ! lastSeen || entry.date_gmt > lastSeen )
+	return threads
+		.filter( ( thread ) =>
+			[ thread, ...( thread?.reply ?? [] ) ].some(
+				( entry ) =>
+					!! entry?.date_gmt &&
+					entry.author !== currentUserId &&
+					( ! lastSeen || entry.date_gmt > lastSeen )
+			)
 		)
-	).length;
+		.map( ( thread ) => thread.id );
 }
 
 /**

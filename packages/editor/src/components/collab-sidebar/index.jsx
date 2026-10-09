@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useRef, useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
@@ -65,7 +65,10 @@ function NotesSidebar( { postId, drafts } ) {
 		}, [] );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { notes, unresolvedNotes } = useNoteThreads( postId );
-	const unseenNoteCount = useUnseenNotes( { postId, notes } );
+	const { hasUnseenNotes, highlightedNoteIds } = useUnseenNotes( {
+		postId,
+		notes,
+	} );
 	const { onStart, onDiscard } = useNoteActions();
 	// Here rather than in `Notes`, which unmounts with its surface: a draft
 	// must be restored on block selection even while no note is shown.
@@ -197,24 +200,20 @@ function NotesSidebar( { postId, drafts } ) {
 						</h2>
 					}
 					icon={ commentIcon }
-					badge={ unseenNoteCount }
+					badge={ hasUnseenNotes }
 					badgeLabel={
-						unseenNoteCount > 0
-							? sprintf(
-									/* translators: %d: Number of note threads with activity the user has not seen. */
-									_n(
-										'All notes, %d unseen',
-										'All notes, %d unseen',
-										unseenNoteCount
-									),
-									unseenNoteCount
-								)
+						hasUnseenNotes
+							? __( 'All notes, new activity' )
 							: undefined
 					}
 					closeLabel={ __( 'Close Notes' ) }
 				>
 					<NoteDraftsContext.Provider value={ drafts }>
-						<Notes notes={ notes } sidebarRef={ sidebarRef } />
+						<Notes
+							notes={ notes }
+							sidebarRef={ sidebarRef }
+							highlightedNoteIds={ highlightedNoteIds }
+						/>
 					</NoteDraftsContext.Provider>
 				</PluginSidebar>
 			) }

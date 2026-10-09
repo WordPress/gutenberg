@@ -9,7 +9,7 @@ import {
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __, sprintf, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { check, starEmpty, starFilled } from '@wordpress/icons';
 import {
 	cloneElement,
@@ -139,14 +139,8 @@ function ComplementaryAreaFill( {
 }
 
 /**
- * Counts above this are truncated on the pinned toggle badge, which has to stay
- * legible inside a compact toolbar button. The untruncated count is still
- * announced through the toggle's `badgeLabel`.
- */
-const MAX_BADGE_COUNT = 9;
-
-/**
- * Overlays a count badge on the pinned toolbar toggle.
+ * Overlays a dot on the pinned toolbar toggle, flagging that the area has
+ * something new.
  *
  * Without a badge the toggle is returned untouched, so the pinned items row -
  * and the flex layout every other sidebar relies on - gains no extra wrapper.
@@ -155,8 +149,8 @@ function PinnedToggle( {
 	badge,
 	children,
 }: {
-	/** Count to display; falsy renders nothing. */
-	badge?: number;
+	/** Whether to show the dot. */
+	badge?: boolean;
 	/** The pinned toggle. */
 	children: ReactNode;
 } ) {
@@ -167,19 +161,11 @@ function PinnedToggle( {
 	return (
 		<div className="interface-complementary-area__pinned-toggle">
 			{ children }
-			{ /* The count is announced through the toggle's accessible label. */ }
+			{ /* Announced through the toggle's accessible label instead. */ }
 			<span
 				className="interface-complementary-area__badge"
 				aria-hidden="true"
-			>
-				{ badge > MAX_BADGE_COUNT
-					? sprintf(
-							/* translators: %d: Highest count a badge shows before truncating, e.g. "9+". */
-							_x( '%d+', 'truncated badge count' ),
-							MAX_BADGE_COUNT
-						)
-					: badge }
-			</span>
+			/>
 		</div>
 	);
 }

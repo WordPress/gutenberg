@@ -26,7 +26,7 @@ import {
 	getNoteMarkerSelector,
 	getLatestNoteActivity,
 	getNoteAnchorRect,
-	getUnseenNoteCount,
+	getUnseenNoteIds,
 	setNotesLastSeen,
 } from '../utils';
 import { noteFormat } from '../format';
@@ -1285,20 +1285,20 @@ describe( 'getLatestNoteActivity', () => {
 	} );
 } );
 
-describe( 'getUnseenNoteCount', () => {
-	it( 'returns 0 when the current user is unknown', () => {
+describe( 'getUnseenNoteIds', () => {
+	it( 'returns nothing when the current user is unknown', () => {
 		expect(
-			getUnseenNoteCount(
+			getUnseenNoteIds(
 				[ makeThread( { date: '2026-08-01T10:00:00' } ) ],
 				undefined,
 				undefined
 			)
-		).toBe( 0 );
+		).toEqual( [] );
 	} );
 
-	it( 'counts every thread by others when nothing has been seen', () => {
+	it( 'returns every thread by others when nothing has been seen', () => {
 		expect(
-			getUnseenNoteCount(
+			getUnseenNoteIds(
 				[
 					makeThread( { id: 1, date: '2026-08-01T10:00:00' } ),
 					makeThread( { id: 2, date: '2026-08-02T10:00:00' } ),
@@ -1306,7 +1306,7 @@ describe( 'getUnseenNoteCount', () => {
 				undefined,
 				ME
 			)
-		).toBe( 2 );
+		).toEqual( [ 1, 2 ] );
 	} );
 
 	it( 'ignores activity at or before the last seen timestamp', () => {
@@ -1314,17 +1314,17 @@ describe( 'getUnseenNoteCount', () => {
 			makeThread( { id: 1, date: '2026-08-01T10:00:00' } ),
 			makeThread( { id: 2, date: '2026-08-03T10:00:00' } ),
 		];
-		expect( getUnseenNoteCount( threads, '2026-08-02T10:00:00', ME ) ).toBe(
-			1
-		);
-		expect( getUnseenNoteCount( threads, '2026-08-03T10:00:00', ME ) ).toBe(
-			0
-		);
+		expect(
+			getUnseenNoteIds( threads, '2026-08-02T10:00:00', ME )
+		).toEqual( [ 2 ] );
+		expect(
+			getUnseenNoteIds( threads, '2026-08-03T10:00:00', ME )
+		).toEqual( [] );
 	} );
 
-	it( 'never counts the current user’s own activity', () => {
+	it( 'never returns the current user’s own activity', () => {
 		expect(
-			getUnseenNoteCount(
+			getUnseenNoteIds(
 				[
 					makeThread( {
 						id: 1,
@@ -1335,12 +1335,12 @@ describe( 'getUnseenNoteCount', () => {
 				'2026-08-01T10:00:00',
 				ME
 			)
-		).toBe( 0 );
+		).toEqual( [] );
 	} );
 
-	it( 'counts a thread once however many unseen replies it holds', () => {
+	it( 'returns a thread once however many unseen replies it holds', () => {
 		expect(
-			getUnseenNoteCount(
+			getUnseenNoteIds(
 				[
 					makeThread( {
 						id: 1,
@@ -1360,12 +1360,12 @@ describe( 'getUnseenNoteCount', () => {
 				'2026-08-02T10:00:00',
 				ME
 			)
-		).toBe( 1 );
+		).toEqual( [ 1 ] );
 	} );
 
-	it( 'counts a seen thread that gained a reply from somebody else', () => {
+	it( 'returns a seen thread that gained a reply from somebody else', () => {
 		expect(
-			getUnseenNoteCount(
+			getUnseenNoteIds(
 				[
 					makeThread( {
 						id: 1,
@@ -1382,7 +1382,7 @@ describe( 'getUnseenNoteCount', () => {
 				'2026-08-02T10:00:00',
 				ME
 			)
-		).toBe( 1 );
+		).toEqual( [ 1 ] );
 	} );
 } );
 

@@ -95,6 +95,18 @@
 		z-index: 1;
 	}
 
+	// Activity the user hadn't seen when they opened "All notes". The tint
+	// fades out once the thread has been in view for a moment.
+	&.is-unseen {
+		background-color: var(--wpds-color-background-surface-caution-weak);
+	}
+
+	&.was-unseen {
+		@media (prefers-reduced-motion: no-preference) {
+			transition: background-color var(--wpds-motion-duration-xl) var(--wpds-motion-easing-subtle);
+		}
+	}
+
 	&:focus {
 		outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
 		outline-offset: calc((-1 * var(--wp-admin-border-width-focus)));

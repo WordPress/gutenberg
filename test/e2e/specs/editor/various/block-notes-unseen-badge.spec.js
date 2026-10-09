@@ -59,7 +59,7 @@ test.describe( 'Notes: unseen badge', () => {
 		await requestUtils.resetPreferences();
 	} );
 
-	test( 'counts a collaborator’s note, then clears for good once the sidebar is opened', async ( {
+	test( 'flags a collaborator’s note, then clears for good once the sidebar is opened', async ( {
 		admin,
 		page,
 		notesUtils,
@@ -75,9 +75,11 @@ test.describe( 'Notes: unseen badge', () => {
 			.getByRole( 'button', { name: 'All notes' } );
 		const badge = page.locator( '.interface-complementary-area__badge' );
 
-		await expect( badge ).toHaveText( '1' );
-		// The exact count is what assistive technology is given.
-		await expect( toggle ).toHaveAccessibleName( 'All notes, 1 unseen' );
+		await expect( badge ).toBeVisible();
+		// The dot itself is hidden from assistive technology.
+		await expect( toggle ).toHaveAccessibleName(
+			'All notes, new activity'
+		);
 
 		// Opening the sidebar marks the notes as seen.
 		await toggle.click();
@@ -100,10 +102,10 @@ test.describe( 'Notes: unseen badge', () => {
 			content: 'One more thing',
 		} );
 		await admin.editPost( postId );
-		await expect( badge ).toHaveText( '1' );
+		await expect( badge ).toBeVisible();
 	} );
 
-	test( 'never counts the current user’s own notes', async ( {
+	test( 'highlights only other people’s unseen threads in the sidebar', async ( {
 		admin,
 		page,
 		notesUtils,
@@ -114,35 +116,67 @@ test.describe( 'Notes: unseen badge', () => {
 		] );
 
 		await admin.editPost( postId );
-
-		// Two open threads, one of them the admin's own: the badge counts one.
 		await expect(
 			page.locator( '.interface-complementary-area__badge' )
-		).toHaveText( '1' );
+		).toBeVisible();
+
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'All notes' } )
+			.click();
+
+		const allNotes = page.getByRole( 'tree', { name: 'All notes' } );
+		const collaboratorThread = allNotes.getByRole( 'treeitem', {
+			name: 'Note: A note from a collaborator, new activity',
+		} );
+		const ownThread = allNotes.getByRole( 'treeitem', {
+			name: 'Note: A note to self',
+			exact: true,
+		} );
+
+		await expect( collaboratorThread ).toBeVisible();
+		await expect( ownThread ).toBeVisible();
+		// Highlighted, then faded once it has been in view for a moment.
+		await expect( collaboratorThread ).toHaveClass( /\bis-unseen\b/ );
+		await expect( collaboratorThread ).toHaveClass( /\bwas-unseen\b/ );
+		await expect( ownThread ).not.toHaveClass( /unseen/ );
 	} );
 
-	test( 'truncates counts above nine while announcing the exact number', async ( {
+	test( 'expands every reply on an unseen thread', async ( {
 		admin,
 		page,
 		notesUtils,
 	} ) => {
-		const { postId } = await notesUtils.createPostWithNotes(
-			Array.from( { length: 12 }, ( _, index ) => ( {
-				author: collaboratorId,
-				content: `Note ${ index + 1 }`,
-			} ) )
-		);
+		const { postId, noteIds } = await notesUtils.createPostWithNotes( [
+			{ author: collaboratorId, content: 'Thread with replies' },
+		] );
+		await notesUtils.addNoteToPost( postId, {
+			author: collaboratorId,
+			content: 'First reply',
+			parent: noteIds[ 0 ],
+		} );
+		await notesUtils.addNoteToPost( postId, {
+			author: collaboratorId,
+			content: 'Second reply',
+			parent: noteIds[ 0 ],
+		} );
 
 		await admin.editPost( postId );
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'All notes' } )
+			.click();
 
+		const thread = page
+			.getByRole( 'tree', { name: 'All notes' } )
+			.getByRole( 'treeitem', { name: /Thread with replies/ } );
+
+		// A collapsed thread would hide the first reply behind "1 more reply".
+		await expect( thread.getByText( 'First reply' ) ).toBeVisible();
+		await expect( thread.getByText( 'Second reply' ) ).toBeVisible();
 		await expect(
-			page.locator( '.interface-complementary-area__badge' )
-		).toHaveText( '9+' );
-		await expect(
-			page
-				.getByRole( 'region', { name: 'Editor top bar' } )
-				.getByRole( 'button', { name: 'All notes' } )
-		).toHaveAccessibleName( 'All notes, 12 unseen' );
+			thread.getByRole( 'button', { name: '1 more reply' } )
+		).toBeHidden();
 	} );
 
 	test( 'clears when a thread is selected without opening the sidebar', async ( {
@@ -164,7 +198,7 @@ test.describe( 'Notes: unseen badge', () => {
 		await admin.editPost( postId );
 
 		const badge = page.locator( '.interface-complementary-area__badge' );
-		await expect( badge ).toHaveText( '1' );
+		await expect( badge ).toBeVisible();
 
 		const toggle = page
 			.getByRole( 'region', { name: 'Editor top bar' } )
@@ -189,7 +223,7 @@ test.describe( 'Notes: unseen badge', () => {
 
 		// The panel showing up is not the user doing anything, so the note is
 		// readable on screen and still counted.
-		await expect( badge ).toHaveText( '1' );
+		await expect( badge ).toBeVisible();
 
 		// Selecting the thread is the act that counts.
 		await thread.click();
@@ -214,7 +248,7 @@ test.describe( 'Notes: unseen badge', () => {
 		await admin.editPost( postId );
 
 		const badge = page.locator( '.interface-complementary-area__badge' );
-		await expect( badge ).toHaveText( '1' );
+		await expect( badge ).toBeVisible();
 
 		/*
 		 * Authoring a note selects the 'new' form, which is not reading
@@ -230,7 +264,7 @@ test.describe( 'Notes: unseen badge', () => {
 			page.getByRole( 'textbox', { name: 'New note', exact: true } )
 		).toBeFocused();
 
-		await expect( badge ).toHaveText( '1' );
+		await expect( badge ).toBeVisible();
 	} );
 
 	test( 'hides the badge on mobile, where the toggle it sits on is hidden', async ( {
@@ -245,7 +279,7 @@ test.describe( 'Notes: unseen badge', () => {
 		await admin.editPost( postId );
 
 		const badge = page.locator( '.interface-complementary-area__badge' );
-		await expect( badge ).toHaveText( '1' );
+		await expect( badge ).toBeVisible();
 
 		// Pinned toggles are hidden below the small breakpoint, so a badge
 		// left behind would float over nothing that opens the sidebar.
@@ -253,7 +287,7 @@ test.describe( 'Notes: unseen badge', () => {
 		await expect( badge ).toBeHidden();
 	} );
 
-	test( 'does not count resolved threads', async ( {
+	test( 'does not highlight resolved threads', async ( {
 		admin,
 		page,
 		notesUtils,
@@ -265,11 +299,24 @@ test.describe( 'Notes: unseen badge', () => {
 		await notesUtils.resolveNote( noteIds[ 0 ] );
 
 		await admin.editPost( postId );
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'All notes' } )
+			.click();
 
-		// Both threads are unseen; only the open one is counted.
+		// Both threads are unseen; only the open one is highlighted.
+		const allNotes = page.getByRole( 'tree', { name: 'All notes' } );
 		await expect(
-			page.locator( '.interface-complementary-area__badge' )
-		).toHaveText( '1' );
+			allNotes.getByRole( 'treeitem', {
+				name: 'Note: Still open, new activity',
+			} )
+		).toBeVisible();
+		await expect(
+			allNotes.getByRole( 'treeitem', {
+				name: 'Note: Already handled',
+				exact: true,
+			} )
+		).toBeVisible();
 	} );
 } );
 
@@ -291,9 +338,10 @@ class NotesUtils {
 	 * @param {Object}  note         Note to create.
 	 * @param {?number} note.author  Author id. Defaults to the requesting user.
 	 * @param {string}  note.content Note body.
+	 * @param {?number} note.parent  Thread to reply to.
 	 * @return {Promise<Object>} The created note.
 	 */
-	async addNoteToPost( postId, { author, content } ) {
+	async addNoteToPost( postId, { author, content, parent } ) {
 		return this.#requestUtils.rest( {
 			method: 'POST',
 			path: '/wp/v2/comments',
@@ -303,6 +351,7 @@ class NotesUtils {
 				status: 'hold',
 				content,
 				...( author ? { author } : {} ),
+				...( parent ? { parent } : {} ),
 			},
 		} );
 	}
