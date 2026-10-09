@@ -9,6 +9,7 @@
  */
 
 return array(
-	'version' => '{{VERSION}}',
-	'build_url' => {{BASE_URL}},
+	'version'          => '{{VERSION}}',
+	'build_url'        => {{BASE_URL}},
+	'has_debug_assets' => {{HAS_DEBUG_ASSETS}},
 );
