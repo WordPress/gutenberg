@@ -212,6 +212,7 @@ export function PrivateBlockToolbar( {
 	return (
 		<NavigableToolbar
 			focusEditorOnEscape
+			shouldUseKeyboardFocusShortcut={ ! isPlaceholder }
 			className={ classes }
 			/* translators: accessibility text for the block toolbar */
 			aria-label={ __( 'Block tools' ) }
