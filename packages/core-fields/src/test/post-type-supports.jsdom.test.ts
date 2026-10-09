@@ -128,6 +128,17 @@ describe( 'post_type_supports', () => {
 		);
 	} );
 
+	it( "locks the status for the users who can't publish the post", () => {
+		const isDisabled = postTypeSupports.status.isDisabled as ( args: {
+			item: { _links?: Record< string, unknown > };
+		} ) => boolean;
+		expect(
+			isDisabled( { item: { _links: { 'wp:action-publish': [] } } } )
+		).toBe( false );
+		expect( isDisabled( { item: { _links: {} } } ) ).toBe( true );
+		expect( isDisabled( { item: {} } ) ).toBe( false );
+	} );
+
 	it( 'shows the password of the posts that can have one', () => {
 		const { isVisible } = postTypeSupports.password;
 		const _links = { 'wp:action-publish': [] };

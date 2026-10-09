@@ -1,8 +1,8 @@
 <?php
 /**
  * The status of a post, for every post type but the design ones. Its
- * JavaScript parts (`getValue` and `render`) are in `field.tsx`, next to
- * this file; the render adds the icon of each status.
+ * JavaScript parts (`getValue`, `render`, and `isDisabled`) are in
+ * `field.tsx`, next to this file; the render adds the icon of each status.
  *
  * Custom statuses are not supported, see
  * https://github.com/WordPress/gutenberg/issues/55886.

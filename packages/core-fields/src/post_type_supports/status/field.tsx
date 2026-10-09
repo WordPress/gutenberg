@@ -1,4 +1,5 @@
 import type { FieldsScriptParts } from '@wordpress/fields-loader';
+import { hasActionLink } from '../../shared/has-action-link';
 import type { PostWithStatus } from './types';
 import StatusView from './view';
 
@@ -11,4 +12,6 @@ export const fieldExtensions: FieldsScriptParts< PostWithStatus >[ string ] = {
 	getValue: ( { item } ) =>
 		item.status === 'auto-draft' ? 'draft' : item.status,
 	render: StatusView,
+	// A user who can't publish can't change the status either.
+	isDisabled: ( { item } ) => ! hasActionLink( item, 'wp:action-publish' ),
 };

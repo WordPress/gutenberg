@@ -9,4 +9,5 @@ export interface PostWithSlug extends ItemWithTitle {
 	generated_slug?: string;
 	link?: string;
 	permalink_template?: string;
+	_links?: Record< string, unknown >;
 }

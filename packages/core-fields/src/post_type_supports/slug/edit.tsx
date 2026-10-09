@@ -7,6 +7,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { InputControl, InputLayout, Link, Stack } from '@wordpress/ui';
 import { safeDecodeURIComponent } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
+import { hasActionLink } from '../../shared/has-action-link';
 import type { PostWithSlug } from './types';
 import { getSlug } from './utils';
 import styles from './style.module.css';
@@ -39,7 +40,10 @@ const SlugEdit = ( {
 	const [ permalinkPrefix, permalinkSuffix ] = permalinkTemplate.split(
 		PERMALINK_POSTNAME_REGEX
 	);
-	const isEditable = PERMALINK_POSTNAME_REGEX.test( permalinkTemplate );
+	// A user who can't publish only gets the permalink.
+	const isEditable =
+		PERMALINK_POSTNAME_REGEX.test( permalinkTemplate ) &&
+		hasActionLink( data, 'wp:action-publish' );
 	// The slug the post had first, shown and restored while the slug is
 	// emptied.
 	const [ originalSlug ] = useState( slug );
@@ -130,7 +134,11 @@ const SlugEdit = ( {
 				</Stack>
 			) }
 			{ ! isEditable && (
-				<Link className={ styles.help } href={ permalink } openInNewTab>
+				<Link
+					className={ styles[ 'help-link' ] }
+					href={ permalink }
+					openInNewTab
+				>
 					{ permalink }
 				</Link>
 			) }
