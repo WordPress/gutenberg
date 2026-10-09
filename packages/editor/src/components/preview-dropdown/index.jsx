@@ -4,6 +4,7 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { desktop, mobile, tablet } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { useEffect, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { ActionItem, store as interfaceStore } from '@wordpress/interface';
@@ -22,6 +23,13 @@ import { unlock } from '../../lock-unlock';
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 function PreviewMenu( { forceIsAutosaveable, disabled } ) {
+	const menuActionsRef = useRef( null );
+	useEffect( () => {
+		if ( disabled ) {
+			menuActionsRef.current?.close();
+		}
+	}, [ disabled ] );
+
 	const {
 		deviceType,
 		homeUrl,
@@ -151,8 +159,9 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 	];
 
 	return (
-		<Menu.Root modal={ false } disabled={ disabled }>
+		<Menu.Root modal={ false } actionsRef={ menuActionsRef }>
 			<Menu.Trigger
+				disabled={ disabled }
 				render={
 					<Button
 						className={ clsx( 'editor-preview-dropdown__toggle', {
@@ -162,7 +171,6 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 						icon={ deviceIcons[ deviceType.toLowerCase() ] }
 						label={ __( 'View' ) }
 						showTooltip={ ! showIconLabels }
-						disabled={ disabled }
 						accessibleWhenDisabled={ disabled }
 					/>
 				}
@@ -177,21 +185,17 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 						handleDevicePreviewChange( value )
 					}
 				>
-					<Menu.Group>
-						{ choices.map( ( choice ) => (
-							<Menu.RadioItem
-								key={ choice.value }
-								value={ choice.value }
-							>
-								<Menu.ItemLabel>
-									{ choice.label }
-								</Menu.ItemLabel>
-								<Menu.ItemDescription>
-									{ choice.info }
-								</Menu.ItemDescription>
-							</Menu.RadioItem>
-						) ) }
-					</Menu.Group>
+					{ choices.map( ( choice ) => (
+						<Menu.RadioItem
+							key={ choice.value }
+							value={ choice.value }
+						>
+							<Menu.ItemLabel>{ choice.label }</Menu.ItemLabel>
+							<Menu.ItemDescription>
+								{ choice.info }
+							</Menu.ItemDescription>
+						</Menu.RadioItem>
+					) ) }
 				</Menu.RadioGroup>
 				{ isResponsiveEditingEnabled && (
 					<>

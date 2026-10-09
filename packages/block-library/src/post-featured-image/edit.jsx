@@ -507,8 +507,8 @@ export default function PostFeaturedImageEdit( {
 				</BlockControls>
 			) }
 			<figure { ...blockProps }>
-				{ /* If the featured image is linked, wrap in an <a /> tag to trigger any inherited link element styles */ }
-				{ !! isLink ? (
+				{ /* Wrap the image in an <a> to pick up the theme's inherited link styles. Never wrap the placeholder, since its buttons must not sit inside an anchor. */ }
+				{ !! isLink && ( featuredImage || temporaryURL ) ? (
 					<a href={ postPermalink } target={ linkTarget }>
 						{ image }
 					</a>

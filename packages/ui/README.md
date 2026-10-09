@@ -24,7 +24,7 @@ This is a companion to the `@wordpress/theme` package that provides:
 
 Install using NPM:
 
-```
+```bash
 npm install @wordpress/ui
 ```
 
@@ -40,7 +40,7 @@ In standard WordPress editor screens (such as the post editor or the site editor
 
 The components ship with built-in fallback values for all CSS custom properties, so they work out of the box without any theme setup. For full theming capabilities, it's recommended that you install and load the design tokens stylesheet:
 
-```
+```bash
 npm install @wordpress/theme
 ```
 
@@ -90,6 +90,12 @@ function App() {
 This opts the app into a shared body-level overlay container so `@wordpress/ui` overlays reliably stack above `@wordpress/components` overlays. The opt-in is one-way and idempotent. It is not needed in standard WordPress editor screens, where the slot auto-enables based on `window.wp.components`.
 
 ## Usage
+
+### Component names
+
+Component names describe what the component is, with modifiers for its appearance or purpose. `IconButton` is a button that displays an icon. `ButtonLink` is a link styled as a button. `Dialog.CloseIconButton`, `Drawer.CloseIconButton`, and `Notice.CloseIconButton` provide icon buttons for close or dismiss actions.
+
+Compound components group related parts under one name. For example, `ButtonLink.Icon` renders an icon inside `ButtonLink`, and `Menu.LinkItem` is a link item within a menu. See [Component naming](https://github.com/WordPress/gutenberg/tree/HEAD/packages/ui/CONTRIBUTING.md#component-naming) for contributor guidance.
 
 ### Basic Component Usage
 
@@ -231,7 +237,7 @@ The `onXChange` callback is distinct from the native DOM `onChange` event handle
 
 Components that wrap native form elements may still support native event handlers (like `onChange`, `onInput`) for interoperability, but `onXChange` is the recommended approach within this package.
 
-For guidance on implementing this pattern in new components, see [Controlled and uncontrolled props](./CONTRIBUTING.md#controlled-and-uncontrolled-props).
+For guidance on implementing this pattern in new components, see [Controlled and uncontrolled props](https://github.com/WordPress/gutenberg/tree/HEAD/packages/ui/CONTRIBUTING.md#controlled-and-uncontrolled-props).
 
 ## Contributing to this package
 

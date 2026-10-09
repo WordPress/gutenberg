@@ -1,4 +1,5 @@
 import { useId, useMemo } from '@wordpress/element';
+import { inertValue } from '@wordpress/react-inert-value';
 import { Card } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 import { WidgetContextProvider } from '../../context/widget-context';
@@ -36,7 +37,7 @@ export function WidgetPreviewChrome( {
 
 	return (
 		<WidgetContextProvider value={ contextValue }>
-			<div className={ styles.viewport } { ...{ inert: '' } }>
+			<div className={ styles.viewport } inert={ inertValue( true ) }>
 				<div className={ styles.canvas }>
 					<Card.Root
 						render={ <section /> }
