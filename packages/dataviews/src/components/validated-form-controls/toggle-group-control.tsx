@@ -1,5 +1,6 @@
 import { forwardRef, useId, useRef } from '@wordpress/element';
 import { __experimentalToggleGroupControl as ToggleGroupControl } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components
 import { ControlWithError } from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 

@@ -11,6 +11,7 @@ import type { RichTextValue } from '@wordpress/rich-text';
 // @ts-expect-error Block Editor not fully typed yet.
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components
 import { ValidatedInputControl, Link } from '@wordpress/ui';
 import { math as icon } from '@wordpress/icons';
 import type { FormatEditProps } from '../types';

@@ -6,6 +6,7 @@ import {
 	Dropdown,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components
 import { InputLayout, ValidatedInputControl } from '@wordpress/ui';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';

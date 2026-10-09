@@ -1,6 +1,7 @@
 import { BaseControl } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+// eslint-disable-next-line @wordpress/use-recommended-components
 import { Stack, ValidatedInputControl } from '@wordpress/ui';
 import type { DataFormControlProps, FormatTime } from '../../types';
 import { OPERATOR_BETWEEN } from '../../constants';

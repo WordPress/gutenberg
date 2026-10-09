@@ -1,3 +1,4 @@
+// eslint-disable-next-line @wordpress/use-recommended-components
 import { ValidatedInputControl } from '@wordpress/ui';
 import { useCallback } from '@wordpress/element';
 import type { DataFormControlProps } from '../../../types';

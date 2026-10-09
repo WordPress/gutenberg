@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import { Button } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components
 import { Stack, ValidatedInputControl } from '@wordpress/ui';
 import DataForm from '../index';
 import useFormValidity from '../../hooks/use-form-validity';

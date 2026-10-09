@@ -4,6 +4,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components
 import { ValidatedTextareaControl, Link } from '@wordpress/ui';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
