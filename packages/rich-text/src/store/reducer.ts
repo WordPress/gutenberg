@@ -1,14 +1,18 @@
 import { combineReducers } from '@wordpress/data';
+import type { Action, FormatType, State } from '../types';
 
 /**
  * Reducer managing the format types
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-export function formatTypes( state = {}, action ) {
+export function formatTypes(
+	state: State[ 'formatTypes' ] = {},
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'ADD_FORMAT_TYPES':
 			return {
@@ -19,7 +23,7 @@ export function formatTypes( state = {}, action ) {
 						...newFormatTypes,
 						[ type.name ]: type,
 					} ),
-					{}
+					{} as Record< string, FormatType >
 				),
 			};
 		case 'REMOVE_FORMAT_TYPES':

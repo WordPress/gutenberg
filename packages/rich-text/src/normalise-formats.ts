@@ -1,16 +1,15 @@
 import { isFormatEqual } from './is-format-equal';
-
-/** @typedef {import('./types').RichTextValue} RichTextValue */
+import type { RichTextValue } from './types';
 
 /**
  * Normalises formats: ensures subsequent adjacent equal formats have the same
  * reference.
  *
- * @param {RichTextValue} value Value to normalise formats of.
+ * @param value Value to normalise formats of.
  *
- * @return {RichTextValue} New value with normalised formats.
+ * @return New value with normalised formats.
  */
-export function normaliseFormats( value ) {
+export function normaliseFormats( value: RichTextValue ) {
 	const newFormats = value.formats.slice();
 
 	newFormats.forEach( ( formatsAtIndex, index ) => {

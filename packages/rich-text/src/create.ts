@@ -5,19 +5,30 @@ import { mergePair } from './concat';
 import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from './special-characters';
 import { toHTMLString } from './to-html-string';
 import { getTextContent } from './get-text-content';
-
-/** @typedef {import('./types').RichTextValue} RichTextValue */
+import type {
+	FormatType,
+	ParsedFormat,
+	RichTextContent,
+	RichTextValue,
+	SelectionRange,
+} from './types';
 
 function createEmptyValue() {
 	return {
 		formats: [],
 		replacements: [],
 		text: '',
-	};
+	} as unknown as RichTextValue;
 }
 
-function toFormat( { tagName, attributes } ) {
-	let formatType;
+function toFormat( {
+	tagName,
+	attributes,
+}: {
+	tagName: string;
+	attributes?: Record< string, string >;
+} ) {
+	let formatType: FormatType | undefined;
 
 	if ( attributes && attributes.class ) {
 		formatType = select( richTextStore ).getFormatTypeForClassName(
@@ -56,12 +67,12 @@ function toFormat( { tagName, attributes } ) {
 		return { formatType, type: formatType.name, tagName };
 	}
 
-	const registeredAttributes = {};
-	const unregisteredAttributes = {};
+	const registeredAttributes: Record< string, string > = {};
+	const unregisteredAttributes: Record< string, string > = {};
 	const _attributes = { ...attributes };
 
 	for ( const key in formatType.attributes ) {
-		const name = formatType.attributes[ key ];
+		const name = formatType.attributes![ key ];
 
 		registeredAttributes[ key ] = _attributes[ name ];
 
@@ -85,7 +96,7 @@ function toFormat( { tagName, attributes } ) {
 	// Omit empty attribute objects so that parsed formats have the same shape
 	// as manually applied formats (`{ type, attributes? }`), which is required
 	// for format equality checks.
-	const format = {
+	const format: ParsedFormat = {
 		formatType,
 		type: formatType.name,
 		tagName,
@@ -118,25 +129,30 @@ function toFormat( { tagName, attributes } ) {
  * @todo Add methods to manipulate the data, such as applyFormat, slice etc.
  */
 export class RichTextData {
-	#value;
+	#value: RichTextContent;
+	declare originalHTML?: string;
 
 	static empty() {
 		return new RichTextData();
 	}
-	static fromPlainText( text ) {
+	static fromPlainText( text: string ) {
 		return new RichTextData( create( { text } ) );
 	}
-	static fromHTMLString( html ) {
+	static fromHTMLString( html: string ) {
 		return new RichTextData( create( { html } ) );
 	}
 	/**
 	 * Create a RichTextData instance from an HTML element.
 	 *
-	 * @param {HTMLElement}                    htmlElement The HTML element to create the instance from.
-	 * @param {{preserveWhiteSpace?: boolean}} options     Options.
-	 * @return {RichTextData} The RichTextData instance.
+	 * @param htmlElement                The HTML element to create the instance from.
+	 * @param options                    Options.
+	 * @param options.preserveWhiteSpace Whether to preserve white space.
+	 * @return The RichTextData instance.
 	 */
-	static fromHTMLElement( htmlElement, options = {} ) {
+	static fromHTMLElement(
+		htmlElement: HTMLElement,
+		options: { preserveWhiteSpace?: boolean } = {}
+	) {
 		const { preserveWhiteSpace = false } = options;
 		const element = preserveWhiteSpace
 			? htmlElement
@@ -147,24 +163,30 @@ export class RichTextData {
 		} );
 		return richTextData;
 	}
-	constructor( init = createEmptyValue() ) {
+	constructor( init: RichTextContent = createEmptyValue() ) {
 		this.#value = init;
 	}
 	toPlainText() {
-		return getTextContent( this.#value );
+		return getTextContent( this.#value as RichTextValue );
 	}
 	// We could expose `toHTMLElement` at some point as well, but we'd only use
 	// it internally.
 	/**
 	 * Convert the rich text value to an HTML string.
 	 *
-	 * @param {{preserveWhiteSpace?: boolean}} options Options.
-	 * @return {string} The HTML string.
+	 * @param options                    Options.
+	 * @param options.preserveWhiteSpace Whether to preserve white space.
+	 * @return The HTML string.
 	 */
-	toHTMLString( { preserveWhiteSpace } = {} ) {
+	toHTMLString( {
+		preserveWhiteSpace,
+	}: { preserveWhiteSpace?: boolean } = {} ) {
 		return (
 			this.originalHTML ||
-			toHTMLString( { value: this.#value, preserveWhiteSpace } )
+			toHTMLString( {
+				value: this.#value as RichTextValue,
+				preserveWhiteSpace,
+			} )
 		);
 	}
 	valueOf() {
@@ -196,9 +218,14 @@ for ( const name of Object.getOwnPropertyNames( String.prototype ) ) {
 	}
 
 	Object.defineProperty( RichTextData.prototype, name, {
-		value( ...args ) {
+		value( this: RichTextData, ...args: unknown[] ) {
 			// Should we convert back to RichTextData?
-			return this.toHTMLString()[ name ]( ...args );
+			return (
+				this.toHTMLString() as unknown as Record<
+					string,
+					( ...args: unknown[] ) => unknown
+				>
+			 )[ name ]( ...args );
 		},
 	} );
 }
@@ -229,13 +256,13 @@ for ( const name of Object.getOwnPropertyNames( String.prototype ) ) {
  * `start` and `end` state which text indices are selected. They are only
  * provided if a `Range` was given.
  *
- * @param {Object}  [$1]                          Optional named arguments.
- * @param {Element} [$1.element]                  Element to create value from.
- * @param {string}  [$1.text]                     Text to create value from.
- * @param {string}  [$1.html]                     HTML to create value from.
- * @param {Range}   [$1.range]                    Range to create value from.
- * @param {boolean} [$1.__unstableIsEditableTree]
- * @return {RichTextValue} A rich text value.
+ * @param [$1]                          Optional named arguments.
+ * @param [$1.element]                  Element to create value from.
+ * @param [$1.text]                     Text to create value from.
+ * @param [$1.html]                     HTML to create value from.
+ * @param [$1.range]                    Range to create value from.
+ * @param [$1.__unstableIsEditableTree]
+ * @return A rich text value.
  */
 export function create( {
 	element,
@@ -243,13 +270,19 @@ export function create( {
 	html,
 	range,
 	__unstableIsEditableTree: isEditableTree,
+}: {
+	element?: Element;
+	text?: string;
+	html?: string | RichTextData;
+	range?: Range | null;
+	__unstableIsEditableTree?: boolean;
 } = {} ) {
 	if ( html instanceof RichTextData ) {
 		return {
 			text: html.text,
 			formats: html.formats,
 			replacements: html.replacements,
-		};
+		} as RichTextValue;
 	}
 
 	if ( typeof text === 'string' && text.length > 0 ) {
@@ -257,7 +290,7 @@ export function create( {
 			formats: Array( text.length ),
 			replacements: Array( text.length ),
 			text,
-		};
+		} as RichTextValue;
 	}
 
 	if ( typeof html === 'string' && html.length > 0 ) {
@@ -281,12 +314,18 @@ export function create( {
  * Helper to accumulate the value's selection start and end from the current
  * node and range.
  *
- * @param {Object} accumulator Object to accumulate into.
- * @param {Node}   node        Node to create value with.
- * @param {Range}  range       Range to create value with.
- * @param {Object} value       Value that is being accumulated.
+ * @param accumulator Object to accumulate into.
+ * @param node        Node to create value with.
+ * @param range       Range to create value with.
+ * @param value       Value that is being accumulated.
  */
-function accumulateSelection( accumulator, node, range, value ) {
+function accumulateSelection(
+	accumulator: RichTextValue,
+	node: Node,
+	range: SelectionRange | null | undefined,
+	value: Pick< RichTextValue, 'text' > &
+		Partial< Pick< RichTextValue, 'start' | 'end' > >
+) {
 	if ( ! range ) {
 		return;
 	}
@@ -345,13 +384,17 @@ function accumulateSelection( accumulator, node, range, value ) {
 /**
  * Adjusts the start and end offsets from a range based on a text filter.
  *
- * @param {Node}     node   Node of which the text should be filtered.
- * @param {Range}    range  The range to filter.
- * @param {Function} filter Function to use to filter the text.
+ * @param node   Node of which the text should be filtered.
+ * @param range  The range to filter.
+ * @param filter Function to use to filter the text.
  *
- * @return {Object|void} Object containing range properties.
+ * @return Object containing range properties.
  */
-function filterRange( node, range, filter ) {
+function filterRange(
+	node: Node,
+	range: SelectionRange | null | undefined,
+	filter: ( string: string ) => string
+) {
 	if ( ! range ) {
 		return;
 	}
@@ -360,11 +403,11 @@ function filterRange( node, range, filter ) {
 	let { startOffset, endOffset } = range;
 
 	if ( node === startContainer ) {
-		startOffset = filter( node.nodeValue.slice( 0, startOffset ) ).length;
+		startOffset = filter( node.nodeValue!.slice( 0, startOffset ) ).length;
 	}
 
 	if ( node === endContainer ) {
-		endOffset = filter( node.nodeValue.slice( 0, endOffset ) ).length;
+		endOffset = filter( node.nodeValue!.slice( 0, endOffset ) ).length;
 	}
 
 	return { startContainer, startOffset, endContainer, endOffset };
@@ -382,24 +425,24 @@ function filterRange( node, range, filter ) {
  * @see
  * https://developer.mozilla.org/en-US/docs/Web/CSS/white-space-collapse#collapsing_of_white_space
  *
- * @param {HTMLElement} element
- * @param {boolean}     isRoot
- * @param {boolean}     hasPrecedingSpace
- * @param {boolean}     hasTrailingSpace
+ * @param element
+ * @param isRoot
+ * @param hasPrecedingSpace
+ * @param hasTrailingSpace
  *
- * @return {HTMLElement} New element with collapsed whitespace.
+ * @return New element with collapsed whitespace.
  */
 function collapseWhiteSpace(
-	element,
+	element: HTMLElement,
 	isRoot = true,
 	hasPrecedingSpace = false,
 	hasTrailingSpace = false
 ) {
-	const clone = element.cloneNode( true );
+	const clone = element.cloneNode( true ) as HTMLElement;
 	clone.normalize();
 	Array.from( clone.childNodes ).forEach( ( node, i, nodes ) => {
 		if ( node.nodeType === node.TEXT_NODE ) {
-			let newNodeValue = node.nodeValue;
+			let newNodeValue = node.nodeValue!;
 
 			if ( /[\n\t\r\f]/.test( newNodeValue ) ) {
 				newNodeValue = newNodeValue.replace( /[\n\t\r\f]+/g, ' ' );
@@ -427,11 +470,11 @@ function collapseWhiteSpace(
 			node.nodeValue = newNodeValue;
 		} else if ( node.nodeType === node.ELEMENT_NODE ) {
 			const { previousSibling, nextSibling } = node;
-			const prevHasSpace = previousSibling?.textContent.endsWith( ' ' );
-			const nextHasSpace = nextSibling?.textContent.startsWith( ' ' );
+			const prevHasSpace = previousSibling?.textContent!.endsWith( ' ' );
+			const nextHasSpace = nextSibling?.textContent!.startsWith( ' ' );
 			node.replaceWith(
 				collapseWhiteSpace(
-					node,
+					node as HTMLElement,
 					false,
 					previousSibling
 						? prevHasSpace
@@ -455,9 +498,9 @@ const CARRIAGE_RETURN = '\r';
  * Removes reserved characters used by rich-text (zero width non breaking spaces
  * added by `toTree` and object replacement characters).
  *
- * @param {string} string
+ * @param string
  */
-export function removeReservedCharacters( string ) {
+export function removeReservedCharacters( string: string ) {
 	// with the global flag, note that we should create a new regex each time OR
 	// reset lastIndex state.
 	return string.replace(
@@ -472,14 +515,22 @@ export function removeReservedCharacters( string ) {
 /**
  * Creates a Rich Text value from a DOM element and range.
  *
- * @param {Object}  $1                  Named arguments.
- * @param {Element} [$1.element]        Element to create value from.
- * @param {Range}   [$1.range]          Range to create value from.
- * @param {boolean} [$1.isEditableTree]
+ * @param $1                  Named arguments.
+ * @param [$1.element]        Element to create value from.
+ * @param [$1.range]          Range to create value from.
+ * @param [$1.isEditableTree]
  *
- * @return {RichTextValue} A rich text value.
+ * @return A rich text value.
  */
-function createFromElement( { element, range, isEditableTree } ) {
+function createFromElement( {
+	element,
+	range,
+	isEditableTree,
+}: {
+	element?: Node;
+	range?: SelectionRange | null;
+	isEditableTree?: boolean;
+} ) {
 	const accumulator = createEmptyValue();
 
 	if ( ! element ) {
@@ -499,7 +550,7 @@ function createFromElement( { element, range, isEditableTree } ) {
 		const tagName = node.nodeName.toLowerCase();
 
 		if ( node.nodeType === node.TEXT_NODE ) {
-			const text = removeReservedCharacters( node.nodeValue );
+			const text = removeReservedCharacters( node.nodeValue! );
 			range = filterRange( node, range, removeReservedCharacters );
 			accumulateSelection( accumulator, node, range, { text } );
 			// Create a sparse array of the same length as `text`, in which
@@ -513,8 +564,8 @@ function createFromElement( { element, range, isEditableTree } ) {
 		if (
 			node.nodeType === node.COMMENT_NODE ||
 			( node.nodeType === node.ELEMENT_NODE &&
-				node.tagName === 'SPAN' &&
-				node.hasAttribute( 'data-rich-text-comment' ) )
+				( node as Element ).tagName === 'SPAN' &&
+				( node as Element ).hasAttribute( 'data-rich-text-comment' ) )
 		) {
 			const value = {
 				formats: [ , ],
@@ -525,7 +576,7 @@ function createFromElement( { element, range, isEditableTree } ) {
 							'data-rich-text-comment':
 								node.nodeType === node.COMMENT_NODE
 									? node.nodeValue
-									: node.getAttribute(
+									: ( node as Element ).getAttribute(
 											'data-rich-text-comment'
 										),
 						},
@@ -546,7 +597,7 @@ function createFromElement( { element, range, isEditableTree } ) {
 			isEditableTree &&
 			// Ignore any line breaks that are not inserted by us.
 			tagName === 'br' &&
-			! node.getAttribute( 'data-rich-text-line-break' )
+			! ( node as Element ).getAttribute( 'data-rich-text-line-break' )
 		) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			continue;
@@ -560,8 +611,12 @@ function createFromElement( { element, range, isEditableTree } ) {
 						type: tagName,
 						attributes: {
 							'data-rich-text-script':
-								node.getAttribute( 'data-rich-text-script' ) ||
-								encodeURIComponent( node.innerHTML ),
+								( node as Element ).getAttribute(
+									'data-rich-text-script'
+								) ||
+								encodeURIComponent(
+									( node as Element ).innerHTML
+								),
 						},
 					},
 				],
@@ -580,7 +635,7 @@ function createFromElement( { element, range, isEditableTree } ) {
 
 		const format = toFormat( {
 			tagName,
-			attributes: getAttributes( { element: node } ),
+			attributes: getAttributes( { element: node as Element } ),
 		} );
 
 		// When a format type is declared as not editable, replace it with an
@@ -593,7 +648,7 @@ function createFromElement( { element, range, isEditableTree } ) {
 				replacements: [
 					{
 						...format,
-						innerHTML: node.innerHTML,
+						innerHTML: ( node as Element ).innerHTML,
 					},
 				],
 				text: OBJECT_REPLACEMENT_CHARACTER,
@@ -617,8 +672,8 @@ function createFromElement( { element, range, isEditableTree } ) {
 		// might insert text inside them when the editable element is flex.
 		if (
 			! format ||
-			node.getAttribute( 'data-rich-text-placeholder' ) ||
-			node.getAttribute( 'data-rich-text-bogus' )
+			( node as Element ).getAttribute( 'data-rich-text-placeholder' ) ||
+			( node as Element ).getAttribute( 'data-rich-text-bogus' )
 		) {
 			mergePair( accumulator, value );
 		} else if ( value.text.length === 0 ) {
@@ -632,16 +687,20 @@ function createFromElement( { element, range, isEditableTree } ) {
 		} else {
 			// Indices should share a reference to the same formats array.
 			// Only create a new reference if `formats` changes.
-			function mergeFormats( formats ) {
-				if ( mergeFormats.formats === formats ) {
+			function mergeFormats( formats: ParsedFormat[] | undefined ) {
+				if (
+					( mergeFormats as { formats?: ParsedFormat[] } ).formats ===
+					formats
+				) {
 					return mergeFormats.newFormats;
 				}
 
 				const newFormats = formats
-					? [ format, ...formats ]
-					: [ format ];
+					? [ format!, ...formats ]
+					: [ format! ];
 
-				mergeFormats.formats = formats;
+				( mergeFormats as { formats?: ParsedFormat[] } ).formats =
+					formats;
 				mergeFormats.newFormats = newFormats;
 
 				return newFormats;
@@ -664,19 +723,18 @@ function createFromElement( { element, range, isEditableTree } ) {
 /**
  * Gets the attributes of an element in object shape.
  *
- * @param {Object}  $1         Named arguments.
- * @param {Element} $1.element Element to get attributes from.
+ * @param $1         Named arguments.
+ * @param $1.element Element to get attributes from.
  *
- * @return {Object|void} Attribute object or `undefined` if the element has no
- *                       attributes.
+ * @return Attribute object or `undefined` if the element has no attributes.
  */
-function getAttributes( { element } ) {
+function getAttributes( { element }: { element: Element } ) {
 	if ( ! element.hasAttributes() ) {
 		return;
 	}
 
 	const length = element.attributes.length;
-	let accumulator;
+	let accumulator: Record< string, string > | undefined;
 
 	// Optimise for speed.
 	for ( let i = 0; i < length; i++ ) {

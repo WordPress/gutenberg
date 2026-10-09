@@ -1,3 +1,5 @@
+import type { FormatType } from '../types';
+
 /**
  * Returns an action object used in signalling that format types have been
  * added.
@@ -5,13 +7,13 @@
  *
  * @ignore
  *
- * @param {Array|Object} formatTypes Format types received.
+ * @param formatTypes Format types received.
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
-export function addFormatTypes( formatTypes ) {
+export function addFormatTypes( formatTypes: FormatType | FormatType[] ) {
 	return {
-		type: 'ADD_FORMAT_TYPES',
+		type: 'ADD_FORMAT_TYPES' as const,
 		formatTypes: Array.isArray( formatTypes )
 			? formatTypes
 			: [ formatTypes ],
@@ -25,13 +27,13 @@ export function addFormatTypes( formatTypes ) {
  *
  * @ignore
  *
- * @param {string|Array} names Format name.
+ * @param names Format name.
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
-export function removeFormatTypes( names ) {
+export function removeFormatTypes( names: string | string[] ) {
 	return {
-		type: 'REMOVE_FORMAT_TYPES',
+		type: 'REMOVE_FORMAT_TYPES' as const,
 		names: Array.isArray( names ) ? names : [ names ],
 	};
 }

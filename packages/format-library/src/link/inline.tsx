@@ -284,7 +284,7 @@ function InlineLinkUI( {
 	}
 
 	/*
-	 * `isActive` is not part of `WPFormat`, but `useAnchor` reads it
+	 * `isActive` is not part of `FormatType`, but `useAnchor` reads it
 	 * dynamically. Hoisting the object out of the call avoids excess property
 	 * checking, which only applies to object literals passed inline.
 	 */
