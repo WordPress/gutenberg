@@ -26,9 +26,7 @@ const DefaultControlsGroup = ( {
 	}
 
 	const resetSuffix = (
-		<span aria-hidden className={ styles[ 'reset-label' ] }>
-			{ __( 'Reset' ) }
-		</span>
+		<span className={ styles[ 'reset-label' ] }>{ __( 'Reset' ) }</span>
 	);
 
 	return (
@@ -41,8 +39,8 @@ const DefaultControlsGroup = ( {
 							className={ itemClassName }
 							role="menuitem"
 							label={ sprintf(
-								// translators: %s: The name of the control being reset e.g. "Padding".
-								__( 'Reset %s' ),
+								// translators: %s: The control name, e.g. "Padding". Keep the control name first, followed by the reset action, to match the visible menu label order.
+								__( '%s, reset to default' ),
 								label
 							) }
 							onClick={ () => {
@@ -93,13 +91,13 @@ const OptionalControlsGroup = ( {
 			{ items.map( ( [ label, isSelected ] ) => {
 				const itemLabel = isSelected
 					? sprintf(
-							// translators: %s: The name of the control being hidden and reset e.g. "Padding".
-							__( 'Hide and reset %s' ),
+							// translators: %s: The control name, e.g. "Padding". Keep the control name first, followed by the hide and reset action.
+							__( '%s, hide and reset' ),
 							label
 						)
 					: sprintf(
-							// translators: %s: The name of the control to display e.g. "Padding".
-							_x( 'Show %s', 'input control' ),
+							// translators: %s: The control name, e.g. "Padding". Keep the control name first, followed by the show action.
+							_x( '%s, show', 'input control' ),
 							label
 						);
 

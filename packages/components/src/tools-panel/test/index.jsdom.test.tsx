@@ -346,11 +346,18 @@ describe( 'ToolsPanel', () => {
 			expect( altControl ).not.toBeInTheDocument();
 		} );
 
-		it( 'should render panel item when corresponding menu item is selected', async () => {
+		it( 'shows a hidden optional control with the setting followed by the action', async () => {
 			renderPanel();
 			await openDropdownMenu();
+			const menuItem = screen.getByRole( 'menuitemcheckbox', {
+				name: 'Alt, show',
+				checked: false,
+			} );
+			expect( menuItem ).toHaveTextContent( 'Alt' );
 			await selectMenuItem( altControlProps.label );
 			const control = await screen.findByText( 'Alt control' );
+			expect( menuItem ).toHaveAccessibleName( 'Alt, hide and reset' );
+			expect( menuItem ).toBeChecked();
 
 			expect( control ).toBeInTheDocument();
 
@@ -359,11 +366,19 @@ describe( 'ToolsPanel', () => {
 			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
-		it( 'should prevent optional panel item rendering when toggled off via menu item', async () => {
+		it( 'hides and resets an optional control with the setting followed by the action', async () => {
 			renderPanel();
 			await openDropdownMenu();
+			const menuItem = screen.getByRole( 'menuitemcheckbox', {
+				name: 'Example, hide and reset',
+				checked: true,
+			} );
+			expect( menuItem ).toHaveTextContent( 'Example' );
 			await selectMenuItem( controlProps.label );
 			const control = screen.queryByText( 'Example control' );
+			expect( menuItem ).toHaveAccessibleName( 'Example, show' );
+			expect( menuItem ).not.toBeChecked();
+			expect( controlProps.onDeselect ).toHaveBeenCalledTimes( 1 );
 
 			expect( control ).not.toBeInTheDocument();
 
@@ -597,7 +612,7 @@ describe( 'ToolsPanel', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'should continue to render shown by default item after it is toggled off via menu item', async () => {
+		it( 'resets a default control with a name explaining the visible reset action', async () => {
 			render(
 				<ToolsPanel { ...defaultProps }>
 					<ToolsPanelItem { ...controlProps } isShownByDefault>
@@ -611,8 +626,20 @@ describe( 'ToolsPanel', () => {
 			expect( control ).toBeInTheDocument();
 
 			await openDropdownMenu();
+			const menuItem = screen.getByRole( 'menuitem', {
+				name: 'Example, reset to default',
+			} );
+			expect( within( menuItem ).getByText( 'Reset' ) ).toBeVisible();
 			await selectMenuItem( controlProps.label );
 			const resetControl = screen.getByText( 'Default control' );
+			const disabledItem = screen.getByRole( 'menuitemcheckbox', {
+				name: 'Example',
+				checked: true,
+			} );
+			expect( disabledItem ).toHaveAttribute( 'aria-disabled', 'true' );
+			controlProps.onDeselect.mockClear();
+			await selectMenuItem( controlProps.label );
+			expect( controlProps.onDeselect ).not.toHaveBeenCalled();
 
 			expect( resetControl ).toBeInTheDocument();
 
@@ -729,14 +756,16 @@ describe( 'ToolsPanel', () => {
 			const defaultItem = within( menuGroups[ 0 ] ).getByText( 'Linked' );
 			expect( defaultItem ).toBeInTheDocument();
 
-			// Optional controls have an additional aria-label. This can be used
-			// to confirm the conditional default control is now being treated
-			// as default control.
-			expect(
-				screen.queryByRole( 'menuitemcheckbox', {
-					name: 'Show Linked',
-				} )
-			).not.toBeInTheDocument();
+			// Default controls without a custom value stay checked and disabled.
+			const defaultMenuItem = screen.getByRole( 'menuitemcheckbox', {
+				name: 'Linked',
+				checked: true,
+			} );
+			expect( defaultMenuItem ).toHaveAttribute(
+				'aria-disabled',
+				'true'
+			);
+			expect( defaultMenuItem ).not.toHaveAccessibleDescription();
 		} );
 
 		it( 'should handle conditionally rendered default control', async () => {
@@ -1201,12 +1230,12 @@ describe( 'ToolsPanel', () => {
 
 			const defaultItem = screen.getByText( 'Nested Control 1' );
 			const defaultMenuItem = screen.getByRole( 'menuitem', {
-				name: 'Reset Nested Control 1',
+				name: 'Nested Control 1, reset to default',
 			} );
 
 			const altItem = screen.getByText( 'Nested Control 2' );
 			const altMenuItem = screen.getByRole( 'menuitemcheckbox', {
-				name: 'Show Nested Control 2',
+				name: 'Nested Control 2, show',
 				checked: false,
 			} );
 
@@ -1239,12 +1268,12 @@ describe( 'ToolsPanel', () => {
 
 			const defaultItem = screen.getByText( 'Nested Control 1' );
 			const defaultMenuItem = screen.getByRole( 'menuitem', {
-				name: 'Reset Nested Control 1',
+				name: 'Nested Control 1, reset to default',
 			} );
 
 			const altItem = screen.getByText( 'Nested Control 2' );
 			const altMenuItem = screen.getByRole( 'menuitemcheckbox', {
-				name: 'Show Nested Control 2',
+				name: 'Nested Control 2, show',
 				checked: false,
 			} );
 
@@ -1550,7 +1579,7 @@ describe( 'ToolsPanel', () => {
 
 			expect(
 				await screen.findByRole( 'menuitemcheckbox', {
-					name: 'Show Shared',
+					name: 'Shared, show',
 				} )
 			).toBeInTheDocument();
 			expect( screen.queryByText( 'Item 2' ) ).not.toBeInTheDocument();
@@ -1591,12 +1620,12 @@ describe( 'ToolsPanel', () => {
 			// and appear in the panel menu.
 			expect(
 				screen.getByRole( 'menuitemcheckbox', {
-					name: 'Show Alt',
+					name: 'Alt, show',
 				} )
 			).toBeInTheDocument();
 			expect(
 				screen.queryByRole( 'menuitemcheckbox', {
-					name: 'Hide and reset Example',
+					name: 'Example, hide and reset',
 				} )
 			).not.toBeInTheDocument();
 
@@ -1605,12 +1634,12 @@ describe( 'ToolsPanel', () => {
 			rerender( <TestSlotFillPanel panelId="9999" /> );
 			expect(
 				screen.queryByRole( 'menuitemcheckbox', {
-					name: 'Show Alt',
+					name: 'Alt, show',
 				} )
 			).not.toBeInTheDocument();
 			expect(
 				screen.getByRole( 'menuitemcheckbox', {
-					name: 'Hide and reset Example',
+					name: 'Example, hide and reset',
 				} )
 			).toBeInTheDocument();
 		} );
@@ -1861,7 +1890,7 @@ describe( 'ToolsPanel', () => {
 			).toHaveAttribute( 'aria-disabled', 'false' );
 			expect(
 				await screen.findByRole( 'menuitem', {
-					name: 'Reset Survivor',
+					name: 'Survivor, reset to default',
 				} )
 			).toBeInTheDocument();
 		} );
