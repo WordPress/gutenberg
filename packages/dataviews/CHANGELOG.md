@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   DataViews: Add `getItemParentId` support for hierarchical table rows ([#83315](https://github.com/WordPress/gutenberg/pull/83315)).
+
 ### Bug Fixes
 
 -   Grid layout: when the title is hidden (`showTitle: false`) and items are clickable, label each item's clickable media area with its title instead of the generic "Navigate to item" ([#82639](https://github.com/WordPress/gutenberg/pull/82639)).
