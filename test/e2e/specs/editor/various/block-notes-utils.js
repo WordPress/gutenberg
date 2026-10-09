@@ -129,10 +129,7 @@ class BlockNoteUtils {
 	}
 
 	async addNote( content ) {
-		await this.#page
-			.getByRole( 'toolbar', { name: 'Block tools' } )
-			.getByRole( 'button', { name: 'Add note', exact: true } )
-			.click();
+		await this.#editor.clickBlockOptionsMenuItem( 'Add note' );
 		await this.#page
 			.getByRole( 'textbox', { name: 'New note', exact: true } )
 			.pressSequentially( content );

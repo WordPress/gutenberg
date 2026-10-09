@@ -86,10 +86,8 @@ test.describe( 'Parent selector inserter', () => {
 		await expect(
 			toolbar.locator( 'role=button[name="Select parent block: List"]' )
 		).toBeVisible();
-		// The inserter's label varies with the block it would add, so match
-		// the inserter itself rather than any toolbar button named "Add …".
 		await expect(
-			toolbar.locator( '.block-editor-block-parent-selector__inserter' )
+			toolbar.locator( 'role=button[name^="Add "]' )
 		).toBeHidden();
 	} );
 
@@ -124,10 +122,8 @@ test.describe( 'Parent selector inserter', () => {
 				name: 'Select parent block: Group',
 			} )
 		).toBeVisible();
-		// Match the inserter itself: the toolbar also carries the "Add note"
-		// button, which a name-based "Add …" locator would catch.
 		await expect(
-			toolbar.locator( '.block-editor-block-parent-selector__inserter' )
+			toolbar.getByRole( 'button', { name: /^Add / } )
 		).toBeHidden();
 	} );
 } );

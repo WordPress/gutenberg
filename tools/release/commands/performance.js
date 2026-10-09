@@ -1,7 +1,7 @@
 const os = require( 'os' );
 const fs = require( 'fs' );
 const path = require( 'path' );
-const SimpleGit = require( 'simple-git' );
+const { simpleGit } = require( 'simple-git' );
 const { formats, log } = require( '../lib/logger' );
 const {
 	runShellScript,
@@ -73,7 +73,7 @@ function fixed( number ) {
  * @param {number[]} array
  */
 function quartiles( array ) {
-	const numbers = array.slice().sort( ( a, b ) => a - b );
+	const numbers = array.toSorted( ( a, b ) => a - b );
 
 	/**
 	 * @param {number} offset
@@ -320,8 +320,7 @@ async function runPerformanceTests( branches, options ) {
 		logAtIndent( 2, 'Creating directory:', formats.success( sourceDir ) );
 		fs.mkdirSync( sourceDir );
 
-		// @ts-expect-error The `simple-git` module namespace has no call signatures.
-		const sourceGit = SimpleGit( sourceDir );
+		const sourceGit = simpleGit( sourceDir );
 		logAtIndent(
 			2,
 			'Initializing:',
@@ -380,8 +379,7 @@ async function runPerformanceTests( branches, options ) {
 			'Checking out branch:',
 			formats.success( testRunnerBranch )
 		);
-		// @ts-expect-error The `simple-git` module namespace has no call signatures.
-		await SimpleGit( testRunnerDir ).raw( 'checkout', testRunnerBranch );
+		await simpleGit( testRunnerDir ).raw( 'checkout', testRunnerBranch );
 
 		logAtIndent( 2, 'Installing dependencies and building' );
 		await runShellScript(
@@ -466,8 +464,7 @@ async function runPerformanceTests( branches, options ) {
 			await runShellScript( `cp -R ${ sourceDir } ${ buildDir }` );
 
 			logAtIndent( 3, 'Checking out:', formats.success( branch ) );
-			// @ts-expect-error The `simple-git` module namespace has no call signatures.
-			await SimpleGit( buildDir ).raw( 'checkout', branch );
+			await simpleGit( buildDir ).raw( 'checkout', branch );
 
 			logAtIndent( 3, 'Installing dependencies and building' );
 			await runShellScript(

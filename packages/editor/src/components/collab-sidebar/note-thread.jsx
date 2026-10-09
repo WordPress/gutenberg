@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useContext, useEffect, useRef, useState } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import {
@@ -18,9 +18,11 @@ import { Note } from './note';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { FloatingContainer } from './floating-container';
+import { NoteDraftsContext, useNoteDraft, usePickNote } from './hooks';
 import {
 	focusNoteThread,
 	getNoteExcerpt,
+	hasFocusWithin,
 	scrollNoteThreadIntoView,
 } from './utils';
 import { store as editorStore } from '../../store';
@@ -29,6 +31,7 @@ import { unlock } from '../../lock-unlock';
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
 function NoteReply( { note, onEditNote, onAddReply, onCancel } ) {
+	const { initialValue, setDraft } = useNoteDraft( note.id );
 	return (
 		<NoteCard role="treeitem">
 			<NoteForm
@@ -46,7 +49,12 @@ function NoteReply( { note, onEditNote, onAddReply, onCancel } ) {
 						parent: note.id,
 					} );
 				} }
-				onCancel={ onCancel }
+				onCancel={ ( event ) => {
+					setDraft( '' );
+					onCancel( event );
+				} }
+				initialValue={ initialValue }
+				onChange={ setDraft }
 				labels={ {
 					submit:
 						'approved' === note.status
@@ -69,6 +77,7 @@ export function NoteThread( {
 	note,
 	onEditNote,
 	onAddReply,
+	onDiscard,
 	onDeleteNote,
 	isSelected,
 	sidebarRef,
@@ -76,9 +85,11 @@ export function NoteThread( {
 	onKeyDown,
 } ) {
 	const isFloating = !! floating;
-	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
+	const { toggleBlockHighlight, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
 	);
+	const drafts = useContext( NoteDraftsContext );
+	const pickNote = usePickNote( { drafts, onDiscard } );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
 	const relatedBlockElement = useBlockElement( note.blockClientId );
@@ -139,6 +150,11 @@ export function NoteThread( {
 			toggleBlockHighlight( note.blockClientId, false );
 		}
 
+		// In the note's block, the caret events decide; deselecting here too would race them.
+		if ( hasFocusWithin( relatedBlockElement ) ) {
+			return;
+		}
+
 		/*
 		 * Selection may have moved on before this deferred callback runs; only
 		 * clear it while this still owns the selection, or it would wipe out the
@@ -170,13 +186,8 @@ export function NoteThread( {
 			return;
 		}
 
-		selectNote( note.id );
+		pickNote( note.id, note.blockClientId );
 		focusNoteThread( note.id, sidebarRef.current );
-		toggleBlockSpotlight( note.blockClientId, true );
-		if ( !! note.blockClientId ) {
-			// Pass `null` as the second parameter to prevent focusing the block.
-			selectBlock( note.blockClientId, null );
-		}
 	}
 
 	function onDeselectNote() {
@@ -218,8 +229,10 @@ export function NoteThread( {
 	if ( isFloating && note.id === 'new' ) {
 		return (
 			<AddNote
+				key={ note.blockClientId }
 				clientId={ note.blockClientId }
 				onSubmit={ onAddReply }
+				onDiscard={ onDiscard }
 				sidebarRef={ sidebarRef }
 				floating={ { y: floating.y, ref: floatingRef } }
 			/>

@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { __experimentalUseSlot as useSlot } from '@wordpress/components';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -14,24 +14,26 @@ import { ALL_NOTES_SIDEBAR } from './constants';
 import { Notes } from './notes';
 import { NotesDisplayModeMenu } from './notes-display-mode-menu';
 import { store as editorStore } from '../../store';
+import { AddNoteMenuItem } from './add-note-menu-item';
 import { AddNoteToolbarButton } from './add-note-toolbar-button';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { NoteHighlightStyles } from './note-highlight-styles';
-import { useNoteThreads } from './hooks';
+import {
+	NoteDraftsContext,
+	useNoteActions,
+	useNoteSelection,
+	useNoteThreads,
+	usePickNote,
+} from './hooks';
 import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { CanvasMargin } from '../visual-editor/canvas-margin';
 import { unlock } from '../../lock-unlock';
 
-function NotesSidebar( { postId } ) {
-	const { getActiveComplementaryArea } = useSelect( interfaceStore );
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
-	const { toggleBlockSpotlight, selectBlock } = unlock(
-		useDispatch( blockEditorStore )
-	);
-	const { selectNote } = unlock( useDispatch( editorStore ) );
-	const isLargeViewport = useViewportMatch( 'medium' );
+function NotesSidebar( { postId, drafts } ) {
 	const sidebarRef = useRef( null );
+	const isLargeViewport = useViewportMatch( 'medium' );
+	const { ref: canvasMarginRef } = useSlot( CanvasMargin.name );
 
 	const { clientId, noteId, isClassicBlock, canEditBlock } = useSelect(
 		( select ) => {
@@ -50,44 +52,57 @@ function NotesSidebar( { postId } ) {
 				isClassicBlock: _clientId
 					? getBlockName( _clientId ) === 'core/freeform'
 					: false,
-				// Adding a note writes `metadata.noteId` to the block, so the
-				// affordance follows the same permission as the menu item it
-				// replaced: blocks locked against editing do not offer it.
+				// Adding a note writes `metadata.noteId`, so match the menu item.
 				canEditBlock: _clientId ? _canEditBlock( _clientId ) : false,
 			};
 		},
 		[]
 	);
-
-	const { isDistractionFree, notesDisplayMode } = useSelect( ( select ) => {
-		const { get } = select( preferencesStore );
-		return {
-			isDistractionFree: get( 'core', 'distractionFree' ),
-			notesDisplayMode: get( 'core', 'notesDisplayMode' ),
-		};
-	}, [] );
-	const areNotesHidden = notesDisplayMode === 'hidden';
-	const { set: setPreference } = useDispatch( preferencesStore );
-	const selectedNoteId = useSelect(
-		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
-		[]
-	);
-
+	const { notesDisplayMode, selectedNoteId, isAllNotesSidebarOpen } =
+		useSelect( ( select ) => {
+			const { get } = select( preferencesStore );
+			return {
+				notesDisplayMode: get( 'core', 'notesDisplayMode' ),
+				selectedNoteId: unlock(
+					select( editorStore )
+				).getSelectedNote(),
+				isAllNotesSidebarOpen:
+					select( interfaceStore ).getActiveComplementaryArea(
+						'core'
+					) === ALL_NOTES_SIDEBAR,
+			};
+		}, [] );
+	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { notes, unresolvedNotes } = useNoteThreads( postId );
-	const isAllNotesSidebarOpen = useSelect(
-		( select ) =>
-			select( interfaceStore ).getActiveComplementaryArea( 'core' ) ===
-			ALL_NOTES_SIDEBAR,
-		[]
-	);
-	const { ref: canvasMarginRef } = useSlot( CanvasMargin.name );
+	const { onStart, onDiscard } = useNoteActions();
+	// Here rather than in `Notes`, which unmounts with its surface: a draft
+	// must be restored on block selection even while no note is shown.
+	// Floating notes don't list resolved threads, so don't select one there.
+	useNoteSelection( {
+		notes: isAllNotesSidebarOpen ? notes : unresolvedNotes,
+		drafts,
+		onDiscard,
+	} );
 
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
+	const { set: setPreference } = useDispatch( preferencesStore );
+	const pickNote = usePickNote( { drafts, onDiscard } );
+
+	const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
+	const areNotesHidden = notesDisplayMode === 'hidden';
 	// Fallback to "All notes" sidebar on smaller viewports or a narrow canvas.
 	const showAllNotesSidebar =
 		notes.length > 0 || ! isLargeViewport || isAllNotesSidebarOpen;
+	const selectedThread = notes.find(
+		( thread ) => thread.id === selectedNoteId
+	);
+	// A just-saved note isn't listed yet, so it still floats.
+	const canSelectedNoteFloat =
+		selectedNoteId !== undefined && selectedThread?.status !== 'approved';
 	const hasFloatingNotes =
 		isLargeViewport &&
-		( unresolvedNotes.length > 0 || selectedNoteId !== undefined );
+		( unresolvedNotes.length > 0 || canSelectedNoteFloat );
 	// "All notes" lists the same threads, so floating notes yield to it.
 	const showFloatingNotes =
 		hasFloatingNotes && ! areNotesHidden && ! isAllNotesSidebarOpen;
@@ -110,11 +125,13 @@ function NotesSidebar( { postId } ) {
 			setPreference( 'core', 'notesDisplayMode', 'full' );
 		}
 
+		if ( targetNoteId === 'new' ) {
+			onStart( targetClientId );
+		}
+
 		// A special case for the List View, where block selection isn't required to trigger an action.
 		// The action won't do anything if the block is already selected.
-		selectBlock( targetClientId, null );
-		toggleBlockSpotlight( targetClientId, true );
-		selectNote( targetNoteId, { focus: true } );
+		pickNote( targetNoteId, targetClientId, { focus: true } );
 	}
 
 	function openNoteForBlock( targetClientId ) {
@@ -139,20 +156,18 @@ function NotesSidebar( { postId } ) {
 	}
 
 	/*
-	 * Opening the form widens the sidebar, which narrows the canvas and
-	 * re-centres the block toolbar out from under the pointer. A second click
-	 * therefore lands wherever the button used to be, so the button itself has
-	 * to stay predictable: toggle the form it owns rather than silently
-	 * re-opening the one already on screen.
+	 * Opening the form widens the sidebar, which re-centres the block toolbar
+	 * out from under the pointer, so a second click on the button closes the
+	 * form it opened rather than silently re-opening it.
 	 */
 	function toggleNewNoteForBlock( targetClientId ) {
 		if ( selectedNoteId === 'new' && targetClientId === clientId ) {
-			selectNote( undefined );
+			pickNote( undefined );
 			toggleBlockSpotlight( targetClientId, false );
-			return undefined;
+			return;
 		}
 
-		return addNewNoteForBlock( targetClientId );
+		addNewNoteForBlock( targetClientId );
 	}
 
 	useShortcut(
@@ -162,16 +177,11 @@ function NotesSidebar( { postId } ) {
 			addNewNoteForBlock( clientId );
 		},
 		{
-			isDisabled: isDistractionFree || isClassicBlock || ! clientId,
+			isDisabled: isClassicBlock || ! clientId,
 		}
 	);
 
-	if ( isDistractionFree ) {
-		return null;
-	}
-
 	// Surface one thread for the avatar indicator.
-	const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
 	const currentThreads =
 		blockNoteIds.length > 0
 			? notes.filter( ( thread ) => blockNoteIds.includes( thread.id ) )
@@ -190,13 +200,20 @@ function NotesSidebar( { postId } ) {
 					onClick={ () => openNoteForBlock( clientId ) }
 				/>
 			) }
-			{ !! clientId && canEditBlock && (
+			<AddNoteMenuItem
+				onClick={ ( menuClientId ) =>
+					addNewNoteForBlock( menuClientId )
+				}
+			/>
+			{ /*
+			 * The first note comes from the block options menu; once the post
+			 * has notes, promote the action to the block toolbar too.
+			 */ }
+			{ notes.length > 0 && !! clientId && canEditBlock && (
 				<AddNoteToolbarButton
 					clientId={ clientId }
 					isOpen={ selectedNoteId === 'new' }
-					onClick={ ( toolbarClientId ) =>
-						toggleNewNoteForBlock( toolbarClientId )
-					}
+					onClick={ toggleNewNoteForBlock }
 				/>
 			) }
 			<NotesDisplayModeMenu
@@ -217,7 +234,9 @@ function NotesSidebar( { postId } ) {
 					icon={ commentIcon }
 					closeLabel={ __( 'Close Notes' ) }
 				>
-					<Notes notes={ notes } sidebarRef={ sidebarRef } />
+					<NoteDraftsContext.Provider value={ drafts }>
+						<Notes notes={ notes } sidebarRef={ sidebarRef } />
+					</NoteDraftsContext.Provider>
 				</PluginSidebar>
 			) }
 			{ showFloatingNotes && (
@@ -229,11 +248,13 @@ function NotesSidebar( { postId } ) {
 							'is-minimized': notesDisplayMode === 'minimized',
 						} ) }
 					>
-						<Notes
-							notes={ unresolvedNotes }
-							sidebarRef={ sidebarRef }
-							isFloating
-						/>
+						<NoteDraftsContext.Provider value={ drafts }>
+							<Notes
+								notes={ unresolvedNotes }
+								sidebarRef={ sidebarRef }
+								isFloating
+							/>
+						</NoteDraftsContext.Provider>
 					</div>
 				</CanvasMargin.Fill>
 			) }
@@ -242,16 +263,24 @@ function NotesSidebar( { postId } ) {
 }
 
 export default function NotesSidebarContainer() {
-	const { postId, editorMode, revisionsMode } = useSelect( ( select ) => {
-		const { getCurrentPostId, getEditorMode, isRevisionsMode } = unlock(
-			select( editorStore )
-		);
-		return {
-			postId: getCurrentPostId(),
-			editorMode: getEditorMode(),
-			revisionsMode: isRevisionsMode(),
-		};
-	}, [] );
+	const [ drafts ] = useState( () => new Map() );
+	const { postId, editorMode, revisionsMode, isDistractionFree } = useSelect(
+		( select ) => {
+			const { getCurrentPostId, getEditorMode, isRevisionsMode } = unlock(
+				select( editorStore )
+			);
+			return {
+				postId: getCurrentPostId(),
+				editorMode: getEditorMode(),
+				revisionsMode: isRevisionsMode(),
+				isDistractionFree: select( preferencesStore ).get(
+					'core',
+					'distractionFree'
+				),
+			};
+		},
+		[]
+	);
 
 	if ( ! postId || typeof postId !== 'number' ) {
 		return null;
@@ -264,7 +293,11 @@ export default function NotesSidebarContainer() {
 
 	return (
 		<PostTypeSupportCheck supportKeys="editor.notes">
-			<NotesSidebar postId={ postId } />
+			{ isDistractionFree ? (
+				<AddNoteMenuItem isDistractionFree />
+			) : (
+				<NotesSidebar postId={ postId } drafts={ drafts } />
+			) }
 		</PostTypeSupportCheck>
 	);
 }

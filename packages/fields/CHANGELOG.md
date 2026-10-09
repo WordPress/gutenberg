@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Bug Fixes
+
+-   `PageTitleView`: Keep the page-type badge on a single line, so a list row with the `Privacy Policy Page` badge no longer grows and jumps when hovering reveals the primary action. ([#84368](https://github.com/WordPress/gutenberg/pull/84368))
+
+## 0.49.0 (2026-10-07)
+
+### Breaking Changes
+
+-   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
+
 ### Enhancements
 
 -   `MediaEdit`: Use design system's outine focus ring instead of previous box-shadow based implementation. ([#83854](https://github.com/WordPress/gutenberg/pull/83854))
