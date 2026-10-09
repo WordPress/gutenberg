@@ -115,6 +115,11 @@ function loaderStates(
 				...state,
 				[ action.name ]: action.isLoading,
 			};
+		// A loader unregistered mid-load would otherwise keep `isLoading()` true.
+		case 'UNREGISTER_COMMAND_LOADER': {
+			const { [ action.name ]: _, ...remainingState } = state;
+			return remainingState;
+		}
 	}
 
 	return state;
