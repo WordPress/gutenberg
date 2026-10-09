@@ -1,25 +1,32 @@
-/** @typedef {import('./types').RichTextValue} RichTextValue */
+import type { RichTextContent, RichTextValue } from './types';
 
 /**
  * Split a Rich Text value in two at the given `startIndex` and `endIndex`, or
  * split at the given separator. This is similar to `String.prototype.split`.
  * Indices are retrieved from the selection if none are provided.
  *
- * @param {RichTextValue} value
- * @param {number|string} [string] Start index, or string at which to split.
+ * @param richTextValue Value to split.
+ * @param [string]      Start index, or string at which to split.
+ * @param [endIndex]    End index, when splitting at indices.
  *
- * @return {Array<RichTextValue>|undefined} An array of new values.
+ * @return An array of new values.
  */
-export function split( { formats, replacements, text, start, end }, string ) {
+export function split(
+	richTextValue: RichTextValue,
+	string?: number | string,
+	endIndex?: number
+) {
 	if ( typeof string !== 'string' ) {
-		return splitAtSelection( ...arguments );
+		return splitAtSelection( richTextValue, string, endIndex );
 	}
+
+	const { formats, replacements, text, start, end } = richTextValue;
 
 	let nextStart = 0;
 
 	return text.split( string ).map( ( substring ) => {
 		const startIndex = nextStart;
-		const value = {
+		const value: RichTextContent & { start?: number; end?: number } = {
 			formats: formats.slice( startIndex, startIndex + substring.length ),
 			replacements: replacements.slice(
 				startIndex,
@@ -49,7 +56,7 @@ export function split( { formats, replacements, text, start, end }, string ) {
 }
 
 function splitAtSelection(
-	{ formats, replacements, text, start, end },
+	{ formats, replacements, text, start, end }: RichTextValue,
 	startIndex = start,
 	endIndex = end
 ) {

@@ -1,6 +1,5 @@
 import { normaliseFormats } from './normalise-formats';
-
-/** @typedef {import('./types').RichTextValue} RichTextValue */
+import type { RichTextContent, RichTextValue } from './types';
 
 /**
  * Search a Rich Text value and replace the match(es) with `replacement`. This
@@ -21,9 +20,12 @@ import { normaliseFormats } from './normalise-formats';
  * @return {RichTextValue} A new value with replacements applied.
  */
 export function replace(
-	{ formats, replacements, text, start, end },
-	pattern,
-	replacement
+	{ formats, replacements, text, start, end }: RichTextValue,
+	pattern: RegExp | string,
+	replacement:
+		| string
+		| RichTextContent
+		| ( ( match: string, ...rest: unknown[] ) => string | RichTextContent )
 ) {
 	text = text.replace( pattern, ( match, ...rest ) => {
 		const offset = rest[ rest.length - 2 ];
@@ -32,7 +34,12 @@ export function replace(
 		let newReplacements;
 
 		if ( typeof newText === 'function' ) {
-			newText = replacement( match, ...rest );
+			newText = (
+				replacement as Exclude<
+					typeof replacement,
+					string | RichTextContent
+				>
+			 )( match, ...rest );
 		}
 
 		if ( typeof newText === 'object' ) {
