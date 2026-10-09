@@ -22,6 +22,28 @@ const EMPTY_ARRAY: Ability[] = [];
 const inputLabel = __( 'Run abilities and workflows' );
 
 /**
+ * Abilities can throw anything, so only a non-empty string message is shown.
+ *
+ * @param error The value the ability threw.
+ * @return The message to show the user.
+ */
+function getErrorMessage( error: unknown ): string {
+	if ( typeof error === 'string' && error ) {
+		return error;
+	}
+	if (
+		error &&
+		typeof error === 'object' &&
+		'message' in error &&
+		typeof error.message === 'string' &&
+		error.message
+	) {
+		return error.message;
+	}
+	return __( 'The ability could not be run.' );
+}
+
+/**
  * @ignore
  */
 export function WorkflowMenu() {
@@ -76,18 +98,21 @@ export function WorkflowMenu() {
 		} );
 	}, [ registerShortcut ] );
 
-	useShortcut(
-		'core/workflows',
-		withIgnoreIMEEvents( ( event: KeyboardEvent ) => {
-			// Bails to avoid obscuring the effect of the preceding handler(s).
-			if ( event.defaultPrevented ) {
-				return;
-			}
+	const toggleOnShortcut = useMemo(
+		() =>
+			withIgnoreIMEEvents( ( event: KeyboardEvent ) => {
+				// Bails to avoid obscuring the effect of the preceding handler(s).
+				if ( event.defaultPrevented ) {
+					return;
+				}
 
-			event.preventDefault();
-			setIsOpen( ! isOpen );
-		} )
+				event.preventDefault();
+				setIsOpen( ( open ) => ! open );
+			} ),
+		[]
 	);
+
+	useShortcut( 'core/workflows', toggleOnShortcut );
 
 	useEffect( () => {
 		if ( isOpen ) {
@@ -112,24 +137,19 @@ export function WorkflowMenu() {
 
 	const handleExecuteAbility = async ( ability: Ability ) => {
 		setIsExecuting( true );
+		const details = {
+			name: ability.name,
+			label: ability.label || ability.name,
+			description: ability.description || '',
+		};
 		try {
 			const result = await executeAbility( ability.name );
-			setAbilityOutput( {
-				name: ability.name,
-				label: ability?.label || ability.name,
-				description: ability?.description || '',
-				success: true,
-				data: result,
-			} );
+			setAbilityOutput( { ...details, success: true, data: result } );
 		} catch ( error ) {
 			setAbilityOutput( {
-				name: ability.name,
-				label: ability?.label || ability.name,
-				description: ability?.description || '',
+				...details,
 				success: false,
-				error:
-					( error as { message?: string } ).message ||
-					String( error ),
+				error: getErrorMessage( error ),
 			} );
 		} finally {
 			setIsExecuting( false );

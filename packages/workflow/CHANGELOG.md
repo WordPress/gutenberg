@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Bug Fixes
+
+-   Show a fallback message when an ability throws a value without a string message, instead of failing silently or showing `[object Object]` ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+
 ### Enhancements
 
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
