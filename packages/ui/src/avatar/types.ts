@@ -22,7 +22,19 @@ export type RootProps = ComponentProps< typeof _Avatar.Root > & {
 	children?: React.ReactNode;
 };
 
-export type ImageProps = ComponentProps< typeof _Avatar.Image >;
+export type ImageProps = Omit<
+	ComponentProps< typeof _Avatar.Image >,
+	'src' | 'alt'
+> & {
+	/**
+	 * The URL of the image to display.
+	 */
+	src?: ComponentProps< typeof _Avatar.Image >[ 'src' ];
+	/**
+	 * Alternative text for the image.
+	 */
+	alt?: ComponentProps< typeof _Avatar.Image >[ 'alt' ];
+};
 
 export type FallbackProps = ComponentProps< typeof _Avatar.Fallback > & {
 	/**
