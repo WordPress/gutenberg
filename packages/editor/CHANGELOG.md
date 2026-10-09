@@ -15,6 +15,8 @@
 
 ### Enhancements
 
+-   Notes Sidebar: Once a post has a note, add an "Add note" button to the block toolbar alongside the block options menu item. The button toggles the form it opened and exposes `aria-expanded` ([#78205](https://github.com/WordPress/gutenberg/pull/78205)).
+-   Notes Sidebar: Fade the floating note card in once its anchor has been measured, rather than cutting it to full opacity in a single frame ([#78205](https://github.com/WordPress/gutenberg/pull/78205)).
 -   `trashPost`: Accept a `force` option to delete the post permanently instead of moving it to the trash ([#84045](https://github.com/WordPress/gutenberg/pull/84045)).
 -   `PostAuthor`: The field renders with the `SearchableSelect` component of `@wordpress/ui` instead of `ComboboxControl` and `SelectControl` ([#83323](https://github.com/WordPress/gutenberg/pull/83323)).
 -   `DocumentOutline`: Show the outline items' focus ring with the design system's outline instead of a legacy box-shadow ([#83755](https://github.com/WordPress/gutenberg/pull/83755)).

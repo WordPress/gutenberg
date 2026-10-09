@@ -15,6 +15,7 @@ import { Notes } from './notes';
 import { NotesDisplayModeMenu } from './notes-display-mode-menu';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
+import { AddNoteToolbarButton } from './add-note-toolbar-button';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { NoteHighlightStyles } from './note-highlight-styles';
 import {
@@ -34,20 +35,29 @@ function NotesSidebar( { postId, drafts } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { ref: canvasMarginRef } = useSlot( CanvasMargin.name );
 
-	const { clientId, noteId, isClassicBlock } = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientId, getBlockName } =
-			select( blockEditorStore );
-		const _clientId = getSelectedBlockClientId();
-		return {
-			clientId: _clientId,
-			noteId: _clientId
-				? getBlockAttributes( _clientId )?.metadata?.noteId
-				: null,
-			isClassicBlock: _clientId
-				? getBlockName( _clientId ) === 'core/freeform'
-				: false,
-		};
-	}, [] );
+	const { clientId, noteId, isClassicBlock, canEditBlock } = useSelect(
+		( select ) => {
+			const {
+				getBlockAttributes,
+				getSelectedBlockClientId,
+				getBlockName,
+				canEditBlock: _canEditBlock,
+			} = select( blockEditorStore );
+			const _clientId = getSelectedBlockClientId();
+			return {
+				clientId: _clientId,
+				noteId: _clientId
+					? getBlockAttributes( _clientId )?.metadata?.noteId
+					: null,
+				isClassicBlock: _clientId
+					? getBlockName( _clientId ) === 'core/freeform'
+					: false,
+				// Adding a note writes `metadata.noteId`, so match the menu item.
+				canEditBlock: _clientId ? _canEditBlock( _clientId ) : false,
+			};
+		},
+		[]
+	);
 	const { notesDisplayMode, selectedNoteId, isAllNotesSidebarOpen } =
 		useSelect( ( select ) => {
 			const { get } = select( preferencesStore );
@@ -75,6 +85,7 @@ function NotesSidebar( { postId, drafts } ) {
 	} );
 
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
 	const { set: setPreference } = useDispatch( preferencesStore );
 	const pickNote = usePickNote( { drafts, onDiscard } );
 
@@ -144,6 +155,21 @@ function NotesSidebar( { postId, drafts } ) {
 		} );
 	}
 
+	/*
+	 * Opening the form widens the sidebar, which re-centres the block toolbar
+	 * out from under the pointer, so a second click on the button closes the
+	 * form it opened rather than silently re-opening it.
+	 */
+	function toggleNewNoteForBlock( targetClientId ) {
+		if ( selectedNoteId === 'new' && targetClientId === clientId ) {
+			pickNote( undefined );
+			toggleBlockSpotlight( targetClientId, false );
+			return;
+		}
+
+		addNewNoteForBlock( targetClientId );
+	}
+
 	useShortcut(
 		'core/editor/new-note',
 		( event ) => {
@@ -179,6 +205,17 @@ function NotesSidebar( { postId, drafts } ) {
 					addNewNoteForBlock( menuClientId )
 				}
 			/>
+			{ /*
+			 * The first note comes from the block options menu; once the post
+			 * has notes, promote the action to the block toolbar too.
+			 */ }
+			{ notes.length > 0 && !! clientId && canEditBlock && (
+				<AddNoteToolbarButton
+					clientId={ clientId }
+					isOpen={ selectedNoteId === 'new' }
+					onClick={ toggleNewNoteForBlock }
+				/>
+			) }
 			<NotesDisplayModeMenu
 				hasFloatingNotes={ hasFloatingNotes }
 				hasAllNotes={ showAllNotesSidebar }
