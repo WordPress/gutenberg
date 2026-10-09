@@ -76,6 +76,31 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that custom CSS which produces no rules does not add a class name.
+	 *
+	 * @covers ::gutenberg_render_custom_css_support_styles
+	 */
+	public function test_custom_css_support_does_not_add_class_name_when_processing_produces_no_css() {
+		$this->register_custom_css_block_with_support(
+			'test/custom-css-empty-output',
+			array( 'customCSS' => true )
+		);
+
+		$parsed_block = array(
+			'blockName' => 'test/custom-css-empty-output',
+			'attrs'     => array(
+				'style' => array(
+					'css' => '&',
+				),
+			),
+		);
+
+		$result = gutenberg_render_custom_css_support_styles( $parsed_block );
+
+		$this->assertArrayNotHasKey( 'className', $result['attrs'] );
+	}
+
+	/**
 	 * Tests that custom CSS support preserves existing className.
 	 *
 	 * @covers ::gutenberg_render_custom_css_support_styles
@@ -448,6 +473,73 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 		$result = gutenberg_render_custom_css_support_styles( $parsed_block );
 
 		$this->assertArrayNotHasKey( 'className', $result['attrs'], 'Block should not have className added when CSS contains HTML closing tags.' );
+	}
+
+	/**
+	 * Tests that custom CSS is correctly scoped for style states.
+	 *
+	 * @covers ::gutenberg_process_custom_css_state_entries
+	 */
+	public function test_custom_css_processes_style_state_entries() {
+		$entries = array(
+			array(
+				'css'         => 'color: red;',
+				'pseudo'      => null,
+				'media_query' => null,
+			),
+			array(
+				'css'         => 'color: blue;',
+				'pseudo'      => ':hover',
+				'media_query' => null,
+			),
+			array(
+				'css'         => 'color: green;',
+				'pseudo'      => null,
+				'media_query' => '@media (width <= 480px)',
+			),
+			array(
+				'css'         => 'color: purple;',
+				'pseudo'      => ':focus',
+				'media_query' => '@media (width <= 480px)',
+			),
+		);
+
+		$result = gutenberg_process_custom_css_state_entries( $entries, '.test-block' );
+
+		$this->assertSame(
+			':root :where(.test-block){color: red;}' .
+			':root :where(.test-block:hover){color: blue;}' .
+			'@media (width <= 480px){:root :where(.test-block){color: green;}}' .
+			'@media (width <= 480px){:root :where(.test-block:focus){color: purple;}}',
+			$result
+		);
+	}
+
+	/**
+	 * Tests that valid CSS state entries are processed when another state contains HTML.
+	 *
+	 * @covers ::gutenberg_process_custom_css_state_entries
+	 */
+	public function test_custom_css_processes_valid_state_entries_when_another_state_contains_html() {
+		$valid_entry = array(
+			'css'         => 'color: red;',
+			'pseudo'      => null,
+			'media_query' => null,
+		);
+
+		$entries = array(
+			$valid_entry,
+			array(
+				'css'         => '<script>alert(1)</script>',
+				'pseudo'      => ':hover',
+				'media_query' => null,
+			),
+		);
+
+		$result = gutenberg_process_custom_css_state_entries( $entries, '.test-block' );
+
+		$this->assertStringContainsString( 'color: red', $result );
+		$this->assertStringNotContainsString( '<script>', $result );
 	}
 
 	/**
