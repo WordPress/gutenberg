@@ -19,7 +19,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0"
+		"node": ">=22.13.0"
 	},
 	"files": [
 		"src",
@@ -42,7 +42,7 @@
 	"sideEffects": [
 		"src/**/*.scss",
 		"src/index.js",
-		"src/store/index.js",
+		"src/store/index.ts",
 		"build/index.cjs",
 		"build/store/index.cjs",
 		"build-module/index.mjs",

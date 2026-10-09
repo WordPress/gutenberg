@@ -116,6 +116,19 @@
 	}
 
 	@layer compositions {
+		.root--selection .separator {
+			padding-inline: 0;
+		}
+
+		/* Keep separator widths uniform for overflow measurement. */
+		.root--selection .current-item:not(:first-child) .current {
+			padding-inline-start: var(--wpds-dimension-gap-sm);
+		}
+
+		.button-item {
+			--wp-ui-button-font-weight: var(--wpds-typography-font-weight-default);
+		}
+
 		.overflow-trigger {
 			--wp-ui-button-min-width: unset;
 		}

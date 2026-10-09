@@ -20,7 +20,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0"
+		"node": ">=22.13.0"
 	},
 	"files": [
 		"src",
@@ -39,6 +39,7 @@
 		"./package.json": "./package.json"
 	},
 	"wpScript": true,
+	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
 		"@wordpress/api-fetch": "file:../api-fetch"
