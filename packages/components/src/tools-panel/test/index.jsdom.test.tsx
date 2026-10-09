@@ -346,21 +346,18 @@ describe( 'ToolsPanel', () => {
 			expect( altControl ).not.toBeInTheDocument();
 		} );
 
-		it( 'shows a hidden optional control with a stable name and action description', async () => {
+		it( 'shows a hidden optional control with the setting followed by the action', async () => {
 			renderPanel();
 			await openDropdownMenu();
 			const menuItem = screen.getByRole( 'menuitemcheckbox', {
-				name: 'Alt',
+				name: 'Alt, show',
 				checked: false,
 			} );
-			expect( menuItem ).toHaveAccessibleDescription( 'Show Alt' );
+			expect( menuItem ).toHaveTextContent( 'Alt' );
 			await selectMenuItem( altControlProps.label );
 			const control = await screen.findByText( 'Alt control' );
-			expect( menuItem ).toHaveAccessibleName( 'Alt' );
+			expect( menuItem ).toHaveAccessibleName( 'Alt, hide and reset' );
 			expect( menuItem ).toBeChecked();
-			expect( menuItem ).toHaveAccessibleDescription(
-				'Hide and reset Alt'
-			);
 
 			expect( control ).toBeInTheDocument();
 
@@ -369,21 +366,18 @@ describe( 'ToolsPanel', () => {
 			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
-		it( 'hides and resets an optional control with a stable name and action description', async () => {
+		it( 'hides and resets an optional control with the setting followed by the action', async () => {
 			renderPanel();
 			await openDropdownMenu();
 			const menuItem = screen.getByRole( 'menuitemcheckbox', {
-				name: 'Example',
+				name: 'Example, hide and reset',
 				checked: true,
 			} );
-			expect( menuItem ).toHaveAccessibleDescription(
-				'Hide and reset Example'
-			);
+			expect( menuItem ).toHaveTextContent( 'Example' );
 			await selectMenuItem( controlProps.label );
 			const control = screen.queryByText( 'Example control' );
-			expect( menuItem ).toHaveAccessibleName( 'Example' );
+			expect( menuItem ).toHaveAccessibleName( 'Example, show' );
 			expect( menuItem ).not.toBeChecked();
-			expect( menuItem ).toHaveAccessibleDescription( 'Show Example' );
 			expect( controlProps.onDeselect ).toHaveBeenCalledTimes( 1 );
 
 			expect( control ).not.toBeInTheDocument();
@@ -1241,7 +1235,7 @@ describe( 'ToolsPanel', () => {
 
 			const altItem = screen.getByText( 'Nested Control 2' );
 			const altMenuItem = screen.getByRole( 'menuitemcheckbox', {
-				name: 'Nested Control 2',
+				name: 'Nested Control 2, show',
 				checked: false,
 			} );
 
@@ -1279,7 +1273,7 @@ describe( 'ToolsPanel', () => {
 
 			const altItem = screen.getByText( 'Nested Control 2' );
 			const altMenuItem = screen.getByRole( 'menuitemcheckbox', {
-				name: 'Nested Control 2',
+				name: 'Nested Control 2, show',
 				checked: false,
 			} );
 
@@ -1585,7 +1579,7 @@ describe( 'ToolsPanel', () => {
 
 			expect(
 				await screen.findByRole( 'menuitemcheckbox', {
-					name: 'Shared',
+					name: 'Shared, show',
 				} )
 			).toBeInTheDocument();
 			expect( screen.queryByText( 'Item 2' ) ).not.toBeInTheDocument();
@@ -1626,12 +1620,12 @@ describe( 'ToolsPanel', () => {
 			// and appear in the panel menu.
 			expect(
 				screen.getByRole( 'menuitemcheckbox', {
-					name: 'Alt',
+					name: 'Alt, show',
 				} )
 			).toBeInTheDocument();
 			expect(
 				screen.queryByRole( 'menuitemcheckbox', {
-					name: 'Example',
+					name: 'Example, hide and reset',
 				} )
 			).not.toBeInTheDocument();
 
@@ -1640,12 +1634,12 @@ describe( 'ToolsPanel', () => {
 			rerender( <TestSlotFillPanel panelId="9999" /> );
 			expect(
 				screen.queryByRole( 'menuitemcheckbox', {
-					name: 'Alt',
+					name: 'Alt, show',
 				} )
 			).not.toBeInTheDocument();
 			expect(
 				screen.getByRole( 'menuitemcheckbox', {
-					name: 'Example',
+					name: 'Example, hide and reset',
 				} )
 			).toBeInTheDocument();
 		} );

@@ -1,10 +1,7 @@
 import type { ReactNode } from 'react';
 import type { ButtonAsButtonProps } from '../button/types';
 
-export type MenuItemProps = Pick<
-	ButtonAsButtonProps,
-	'description' | 'isDestructive'
-> & {
+export type MenuItemProps = Pick< ButtonAsButtonProps, 'isDestructive' > & {
 	/**
 	 * A CSS `class` to give to the container element.
 	 */

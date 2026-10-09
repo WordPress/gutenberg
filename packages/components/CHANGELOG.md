@@ -19,7 +19,7 @@
 ### Bug Fixes
 
 -   `navigateRegions`: Only outline the Publish and Save controls when their region has focus ([#84343](https://github.com/WordPress/gutenberg/pull/84343)).
--   `ToolsPanel`: Keep visible setting names in accessible labels and explain reset and optional control actions without changing the menu design ([#84341](https://github.com/WordPress/gutenberg/pull/84341)).
+-   `ToolsPanel`: Use setting-first accessible action labels without changing the menu design ([#84341](https://github.com/WordPress/gutenberg/pull/84341)).
 
 ## 42.0.0 (2026-10-07)
 

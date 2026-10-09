@@ -92,7 +92,9 @@ test.describe( 'Relocated color controls with block style states', () => {
 		await elementsPanel
 			.getByRole( 'button', { name: 'Elements options' } )
 			.click();
-		await page.getByRole( 'menuitemcheckbox', { name: 'Link' } ).click();
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'Link, show' } )
+			.click();
 		await elementsPanel
 			.getByRole( 'button', { name: 'Elements options' } )
 			.click();
