@@ -1,16 +1,16 @@
-jest.mock( 'esbuild', () => ( {
-	build: jest.fn(),
-} ) );
-
-/**
- * Internal dependencies
- */
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
 	enqueueBuild,
 	getDefaultBuildConcurrency,
 	parseBuildConcurrency,
 	setBuildConcurrency,
 } from '../build-concurrency.mjs';
+
+vi.mock( import( 'esbuild' ), () => ( {
+	default: {
+		build: vi.fn(),
+	},
+} ) );
 
 const flushPromises = () =>
 	new Promise( ( resolve ) => {
@@ -41,21 +41,13 @@ describe( 'parseBuildConcurrency()', () => {
 	} );
 
 	it( 'warns and returns undefined for invalid values', () => {
-		const warnSpy = jest.spyOn( console, 'warn' ).mockImplementation();
-
-		try {
-			for ( const value of [ '', '0', '-1', '1.5', 'abc' ] ) {
-				expect( parseBuildConcurrency( value ) ).toBe( undefined );
-				expect( warnSpy ).toHaveBeenLastCalledWith(
-					'Invalid build concurrency value: ' +
-						JSON.stringify( value ) +
-						'. Expected a positive integer; falling back to the default.'
-				);
-			}
-
-			expect( warnSpy ).toHaveBeenCalledTimes( 5 );
-		} finally {
-			warnSpy.mockRestore();
+		for ( const value of [ '', '0', '-1', '1.5', 'abc' ] ) {
+			expect( parseBuildConcurrency( value ) ).toBe( undefined );
+			expect( console ).toHaveWarnedWith(
+				'Invalid build concurrency value: ' +
+					JSON.stringify( value ) +
+					'. Expected a positive integer; falling back to the default.'
+			);
 		}
 	} );
 } );
