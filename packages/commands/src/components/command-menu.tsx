@@ -78,6 +78,7 @@ function CommandItem( {
 		( commandCategory
 			? CATEGORY_FALLBACK_ICONS[ commandCategory ]
 			: undefined );
+	const hasIcon = isValidElement( icon );
 	const label = command.searchLabel ?? command.label;
 	const value = valuePrefix ? `${ valuePrefix }${ command.name }` : label;
 	return (
@@ -98,10 +99,10 @@ function CommandItem( {
 			<HStack
 				alignment="left"
 				className={ clsx( 'commands-command-menu__item', {
-					'has-icon': !! icon,
+					'has-icon': hasIcon,
 				} ) }
 			>
-				{ isValidElement( icon ) && <Icon icon={ icon } /> }
+				{ hasIcon && <Icon icon={ icon } /> }
 				<span className="commands-command-menu__item-label">
 					<TextHighlight
 						text={ command.label }
