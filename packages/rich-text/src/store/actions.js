@@ -1,7 +1,7 @@
 /**
  * Returns an action object used in signalling that format types have been
  * added.
- * Ignored from documentation as registerFormatType should be used instead from @wordpress/rich-text
+ * Ignored from documentation as registerFormatType should be used instead from `@wordpress/rich-text`
  *
  * @ignore
  *
@@ -21,7 +21,7 @@ export function addFormatTypes( formatTypes ) {
 /**
  * Returns an action object used to remove a registered format type.
  *
- * Ignored from documentation as unregisterFormatType should be used instead from @wordpress/rich-text
+ * Ignored from documentation as unregisterFormatType should be used instead from `@wordpress/rich-text`
  *
  * @ignore
  *

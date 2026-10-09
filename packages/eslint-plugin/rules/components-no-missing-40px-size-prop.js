@@ -1,7 +1,7 @@
 const { hasTruthyJsxAttribute } = require( '../utils' );
 
 /**
- * Enforces that specific components from @wordpress/components include the
+ * Enforces that specific components from `@wordpress/components` include the
  * `__next40pxDefaultSize` prop.
  *
  * @type {import('eslint').Rule.RuleModule}
