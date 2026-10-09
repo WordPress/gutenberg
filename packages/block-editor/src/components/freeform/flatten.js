@@ -73,6 +73,8 @@ export function hasVisualStyling( attributes ) {
  * - A grid of containers — Columns — see `isGridOfContainers`.
  * - A cell of one — a column — whatever it carries. A column exists only to put
  *   things side by side, and that is the arrangement being replaced.
+ * - A container that arranges its contents: a Row, a Stack, a Grid. Same
+ *   reason, and like a column it goes whatever it is styled with.
  * - A container with no styling of its own: the bare wrapper Group that
  *   patterns put around things. See `hasVisualStyling`.
  *
@@ -94,6 +96,15 @@ export function isAbsorbable( block, parent, getSupport ) {
 
 	// A cell of a grid is scaffolding by definition, however it is styled.
 	if ( canArrangeChildren( getSupport( parent?.name ) ) ) {
+		return true;
+	}
+
+	// So is a container that arranges what is in it. A Row and a Stack are a
+	// Group with a flex layout, a Grid is one with a grid layout, and all of
+	// them exist to put their contents in an order — side by side, one above
+	// the next, in cells. That ordering is the thing a canvas replaces, so it
+	// goes the way a Columns does, whatever it is styled with.
+	if ( arrangesItsContents( block.attributes?.layout ) ) {
 		return true;
 	}
 
@@ -135,6 +146,20 @@ export function isGridOfContainers( block, getSupport ) {
 			canHoldACanvas( getSupport( child.name ) )
 		)
 	);
+}
+
+/**
+ * Whether a container's layout puts its contents in an order of its own.
+ *
+ * `flex` is a Row or a Stack, `grid` is a Grid. A Group laid out `default` or
+ * `constrained` only holds its blocks in flow and is a box rather than an
+ * arrangement, so it stays whole when it has a look of its own.
+ *
+ * @param {Object} [layout] A block's `layout` attribute.
+ * @return {boolean} Whether the canvas replaces what it does.
+ */
+function arrangesItsContents( layout ) {
+	return layout?.type === 'flex' || layout?.type === 'grid';
 }
 
 function canArrangeChildren( layoutSupport ) {

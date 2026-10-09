@@ -394,3 +394,70 @@ describe( 'hasVisualStyling', () => {
 		expect( hasVisualStyling( undefined ) ).toBe( false );
 	} );
 } );
+
+describe( 'a Row or a Stack', () => {
+	// Both are a Group with a flex layout, and both exist to arrange what is
+	// in them — side by side, or one above the next. That arrangement is the
+	// thing a canvas replaces, so the canvas absorbs them as it does a Columns,
+	// whatever they are styled with. A Group that merely holds its blocks in
+	// flow is a different thing and stays whole if it has a look of its own.
+	const PADDED = { style: { spacing: { padding: { top: '2rem' } } } };
+	const row = ( clientId, attributes = {} ) =>
+		block( clientId, 'core/group', [ block( 'a', 'core/paragraph' ) ], {
+			...attributes,
+			layout: { type: 'flex', orientation: 'horizontal' },
+		} );
+	const stack = ( clientId, attributes = {} ) =>
+		block( clientId, 'core/group', [ block( 'a', 'core/paragraph' ) ], {
+			...attributes,
+			layout: { type: 'flex', orientation: 'vertical' },
+		} );
+	const section = ( child ) => block( 'sec', 'core/group', [ child ] );
+
+	it( 'dissolves a Row', () => {
+		expect(
+			planSectionFlatten( section( row( 'r' ) ), canDissolve ).wrappers
+		).toHaveLength( 1 );
+	} );
+
+	it( 'dissolves a Stack', () => {
+		expect(
+			planSectionFlatten( section( stack( 's' ) ), canDissolve ).wrappers
+		).toHaveLength( 1 );
+	} );
+
+	it( 'dissolves a Row even when it is padded', () => {
+		// A Columns is absorbed however it is styled, and a Row is the same
+		// kind of thing.
+		const plan = planSectionFlatten(
+			section( row( 'r', PADDED ) ),
+			canDissolve
+		);
+		expect( plan.wrappers ).toHaveLength( 1 );
+		expect( plan.citizens ).toEqual( [ 'a' ] );
+	} );
+
+	it( 'dissolves a Grid group too', () => {
+		const grid = block(
+			'g',
+			'core/group',
+			[ block( 'a', 'core/paragraph' ) ],
+			{ ...PADDED, layout: { type: 'grid' } }
+		);
+		expect(
+			planSectionFlatten( section( grid ), canDissolve ).wrappers
+		).toHaveLength( 1 );
+	} );
+
+	it( 'still keeps a padded Group that only holds its blocks in flow', () => {
+		const card = block(
+			'card',
+			'core/group',
+			[ block( 'a', 'core/paragraph' ) ],
+			{ ...PADDED, layout: { type: 'constrained' } }
+		);
+		const plan = planSectionFlatten( section( card ), canDissolve );
+		expect( plan.wrappers ).toHaveLength( 0 );
+		expect( plan.citizens ).toEqual( [ 'card' ] );
+	} );
+} );
