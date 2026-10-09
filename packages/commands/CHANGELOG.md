@@ -10,6 +10,10 @@
 
 -   The package now bundles TypeScript types ([#84315](https://github.com/WordPress/gutenberg/pull/84315)).
 
+### Bug Fixes
+
+-   Render only React elements as command icons, and stop reporting an unregistered command loader as loading ([#84377](https://github.com/WordPress/gutenberg/pull/84377)).
+
 ## 1.57.0 (2026-10-07)
 
 ## 1.56.0 (2026-09-23)
