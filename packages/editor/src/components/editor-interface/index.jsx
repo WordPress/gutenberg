@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	BlockBreadcrumb,
-	BlockToolbar,
+	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
@@ -28,9 +28,10 @@ import { CollaboratorsOverlay } from '../collaborators-overlay';
 import { useCollaboratorNotifications } from '../collaborators-presence/use-collaborator-notifications';
 import SavePublishPanels from '../save-publish-panels';
 import TextEditor from '../text-editor';
-import BlockToolbarPlaceholder from './block-toolbar-placeholder';
 import VisualEditor from '../visual-editor';
 import StylesCanvas from '../styles-canvas';
+
+const { PrivateBlockToolbar } = unlock( blockEditorPrivateApis );
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -156,10 +157,6 @@ export default function EditorInterface( {
 	useCollaboratorNotifications( postId, postType );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const hasBlockSelection = useSelect(
-		( select ) => !! select( blockEditorStore ).getBlockSelectionStart(),
-		[]
-	);
 	const secondarySidebarLabel = isListViewOpened
 		? __( 'Document Overview' )
 		: __( 'Block Library' );
@@ -256,11 +253,10 @@ export default function EditorInterface( {
 								! isLargeViewport &&
 								mode === 'visual' && (
 									<div className="editor-editor-interface__block-toolbar">
-										{ hasBlockSelection ? (
-											<BlockToolbar hideDragHandle />
-										) : (
-											<BlockToolbarPlaceholder />
-										) }
+										<PrivateBlockToolbar
+											hideDragHandle
+											showPlaceholder
+										/>
 									</div>
 								) }
 							{ ( isPreviewMode || mode === 'visual' ) && (

@@ -39,9 +39,3 @@
 	top: 0;
 	right: 0;
 }
-
-// The block toolbar has no separator after its last group, but here the last
-// group stands in for the first of many.
-.editor-block-toolbar-placeholder .block-editor-block-toolbar > :last-child {
-	border-right: $border-width solid $gray-300;
-}

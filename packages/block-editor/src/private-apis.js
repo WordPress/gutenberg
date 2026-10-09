@@ -14,6 +14,7 @@ import { getPopulatedCategories } from './components/inserter/block-patterns-tab
 import { PrivateListView } from './components/list-view';
 import InspectorControlsLastItem from './components/inspector-controls/last-item';
 import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
+import { PrivateBlockToolbar } from './components/block-toolbar';
 import { cleanEmptyObject, usePrivateStyleOverride } from './hooks/utils';
 import { isDefaultBlockStyleState } from './hooks/block-style-state';
 import BlockQuickNavigation from './components/block-quick-navigation';
@@ -99,6 +100,7 @@ lock( privateApis, {
 	ResizableBoxPopover,
 	InspectorControlsLastItem,
 	useHasBlockToolbar,
+	PrivateBlockToolbar,
 	cleanEmptyObject,
 	isDefaultBlockStyleState,
 	usePrivateStyleOverride,

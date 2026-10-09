@@ -5,11 +5,12 @@ import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	getBlockType,
+	getDefaultBlockName,
 	hasBlockSupport,
 	isReusableBlock,
 	isTemplatePart,
 } from '@wordpress/blocks';
-import { ToolbarGroup } from '@wordpress/components';
+import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import BlockMover from '../block-mover';
 import BlockParentSelector from '../block-parent-selector';
 import BlockControls from '../block-controls';
@@ -29,6 +30,7 @@ import EditSectionButton from './edit-section-button';
 import { unlock } from '../../lock-unlock';
 import { deviceTypeKey } from '../../store/private-keys';
 import BlockToolbarIcon from './block-toolbar-icon';
+import BlockIcon from '../block-icon';
 import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
 
 /**
@@ -42,6 +44,7 @@ import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
  * @param {number}   props.__experimentalInitialIndex  The initial index of the toolbar item to focus.
  * @param {Function} props.__experimentalOnIndexChange Callback function to be called when the index of the focused toolbar item changes.
  * @param {string}   props.variant                     Style variant of the toolbar, also passed to the Dropdowns rendered from Block Toolbar Buttons.
+ * @param {boolean}  props.showPlaceholder             While no block is selected, show the default block's icon and the mover, disabled.
  */
 export function PrivateBlockToolbar( {
 	hideDragHandle,
@@ -49,6 +52,7 @@ export function PrivateBlockToolbar( {
 	__experimentalInitialIndex,
 	__experimentalOnIndexChange,
 	variant = 'unstyled',
+	showPlaceholder = false,
 } ) {
 	const {
 		blockClientId,
@@ -186,6 +190,9 @@ export function PrivateBlockToolbar( {
 
 	const hasBlockToolbar = useHasBlockToolbar();
 	if ( ! hasBlockToolbar ) {
+		if ( showPlaceholder && ! blockClientIds.length ) {
+			return <BlockToolbarPlaceholder variant={ variant } />;
+		}
 		return null;
 	}
 
@@ -307,6 +314,37 @@ export function PrivateBlockToolbar( {
 					) }
 				<BlockEditVisuallyButton clientIds={ blockClientIds } />
 				<BlockSettingsMenu clientIds={ blockClientIds } />
+			</div>
+		</NavigableToolbar>
+	);
+}
+
+function BlockToolbarPlaceholder( { variant } ) {
+	const blockType = getBlockType( getDefaultBlockName() );
+
+	return (
+		<NavigableToolbar
+			className="block-editor-block-contextual-toolbar is-placeholder"
+			/* translators: accessibility text for the block toolbar */
+			aria-label={ __( 'Block tools' ) }
+			variant={ variant === 'toolbar' ? undefined : variant }
+		>
+			<div className="block-editor-block-toolbar">
+				<ToolbarGroup className="block-editor-block-toolbar__block-controls">
+					{ blockType && (
+						<ToolbarButton
+							disabled
+							icon={
+								<BlockIcon
+									className="block-editor-block-toolbar__block-icon"
+									icon={ blockType.icon }
+								/>
+							}
+							label={ blockType.title }
+						/>
+					) }
+					<BlockMover clientIds={ [] } hideDragHandle />
+				</ToolbarGroup>
 			</div>
 		</NavigableToolbar>
 	);
