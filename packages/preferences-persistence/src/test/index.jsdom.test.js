@@ -38,6 +38,11 @@ describe( '__unstableCreatePersistenceLayer', () => {
 		}
 	);
 
+	it( 'returns an empty object without fetching when server data is an empty array', async () => {
+		const { get } = __unstableCreatePersistenceLayer( [], 1 );
+		expect( await get() ).toEqual( {} );
+	} );
+
 	it( 'falls back to legacy data when server data is an empty array', async () => {
 		window.localStorage.setItem(
 			'WP_DATA_USER_1',
