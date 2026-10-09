@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
+import { archive, copy } from '@wordpress/icons';
 import * as Autocomplete from '../../form/primitives/autocomplete';
 import { SelectControl } from '../../form/select-control';
 import * as Menu from '../';
@@ -15,6 +16,65 @@ const meta: Meta = {
 export default meta;
 
 type Story = StoryObj;
+
+/**
+ * Prefer prefix icons on every item in a group, or omit them from the whole group.
+ * Groups can make different choices.
+ */
+export const ConsistentPrefixIconsWithinGroups: Story = {
+	render: () => (
+		<Menu.Root>
+			<Menu.Trigger>Item options</Menu.Trigger>
+			<Menu.Popup>
+				<Menu.Group>
+					<Menu.GroupLabel>Actions</Menu.GroupLabel>
+					<Menu.Item prefix={ <Menu.PrefixIcon icon={ copy } /> }>
+						<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+					</Menu.Item>
+					<Menu.Item prefix={ <Menu.PrefixIcon icon={ archive } /> }>
+						<Menu.ItemLabel>Archive</Menu.ItemLabel>
+					</Menu.Item>
+				</Menu.Group>
+				<Menu.Separator />
+				<Menu.Group>
+					<Menu.GroupLabel>Navigation</Menu.GroupLabel>
+					<Menu.LinkItem href="#menu-usage-guidelines-destination">
+						<Menu.ItemLabel>View details</Menu.ItemLabel>
+					</Menu.LinkItem>
+					<Menu.LinkItem href="https://wordpress.org">
+						<Menu.ItemLabel>WordPress.org</Menu.ItemLabel>
+					</Menu.LinkItem>
+				</Menu.Group>
+			</Menu.Popup>
+		</Menu.Root>
+	),
+};
+
+/**
+ * Mixed icon usage is supported. Labels without icons start at the same
+ * position as neighboring icons, without an empty icon space.
+ */
+export const MixedPrefixIcons: Story = {
+	render: () => (
+		<Menu.Root>
+			<Menu.Trigger>Mixed item options</Menu.Trigger>
+			<Menu.Popup>
+				<Menu.Group>
+					<Menu.GroupLabel>Actions</Menu.GroupLabel>
+					<Menu.Item prefix={ <Menu.PrefixIcon icon={ copy } /> }>
+						<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+					</Menu.Item>
+					<Menu.Item>
+						<Menu.ItemLabel>Rename…</Menu.ItemLabel>
+					</Menu.Item>
+					<Menu.Item prefix={ <Menu.PrefixIcon icon={ archive } /> }>
+						<Menu.ItemLabel>Archive</Menu.ItemLabel>
+					</Menu.Item>
+				</Menu.Group>
+			</Menu.Popup>
+		</Menu.Root>
+	),
+};
 
 const viewItems = [
 	{ value: 'list', label: 'List' },
