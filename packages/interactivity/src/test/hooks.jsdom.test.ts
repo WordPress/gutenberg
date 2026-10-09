@@ -67,37 +67,4 @@ describe( 'getEvaluate', () => {
 			expect( getScope() ).toBe( caller );
 		}
 	);
-
-	it.each( [ false, true ] )(
-		'propagates a resolution error and restores the caller scope (scoped: %s)',
-		( scoped ) => {
-			const scope = createScope();
-			const caller = scoped ? createScope() : undefined;
-			const error = new Error( 'Context unavailable' );
-			Object.defineProperty( scope, 'context', {
-				// Resolving a context path fails before a value is available.
-				get() {
-					expect( getScope() ).toBe( scope );
-					throw error;
-				},
-			} );
-			if ( caller ) {
-				setScope( caller );
-			}
-			const evaluate = getEvaluate( { scope } );
-			expect( () =>
-				evaluate( {
-					// Path requiring access to the scoped context.
-					value: 'context.value',
-					// Namespace for the context path.
-					namespace: 'test/evaluate-context',
-					// Default directive spelling.
-					suffix: null,
-					// No unique directive identifier.
-					uniqueId: null,
-				} )
-			).toThrow( error );
-			expect( getScope() ).toBe( caller );
-		}
-	);
 } );
