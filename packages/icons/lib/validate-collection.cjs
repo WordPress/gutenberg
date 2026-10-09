@@ -4,6 +4,9 @@ const { readdir, stat, readFile } = require( 'fs/promises' );
 const ICON_LIBRARY_DIR = path.join( __dirname, '..', 'src', 'library' );
 const ICON_VIEW_BOX = '0 0 24 24';
 
+// The collections an icon may be shipped in.
+const VALID_ICON_COLLECTIONS = [ 'core', 'core-admin' ];
+
 function isStrokeBasedSvg( svgContent ) {
 	const svgTag = svgContent.match( /<svg\b[^>]*>/ )?.[ 0 ];
 	return /\sstyle=(["'])fill\s*:\s*none\s*;?\s*\1/.test( svgTag ?? '' );
@@ -13,14 +16,16 @@ function isStrokeBasedSvg( svgContent ) {
  * Validating the icons collection checks that:
  *
  * - Each manifest entry has a matching SVG in library/, and vice versa.
- * - Each manifest entry's `public` property, if present, is a boolean.
+ * - Each manifest entry's `collections` property, if present, is a non-empty array of
+ *   known collection slugs.
+ * - Each manifest entry's `keywords` property, if present, is an array of strings.
  * - Each SVG uses currentColor so icons inherit text color.
  * - Each SVG uses viewBox="0 0 24 24".
  * - Each stroke-based SVG contains at least one stroked graphical element.
- * - Each stroked graphical element uses a non-scaling stroke.
+ * - Each SVG omits vector-effect so strokes scale with the icon.
  */
-async function validateCollection() {
-	const manifestPath = path.join( ICON_LIBRARY_DIR, '..', 'manifest.json' );
+async function validateCollection( iconLibraryDir = ICON_LIBRARY_DIR ) {
+	const manifestPath = path.join( iconLibraryDir, '..', 'manifest.json' );
 
 	try {
 		await stat( manifestPath );
@@ -62,14 +67,45 @@ async function validateCollection() {
 		manifestPaths.push( icon.filePath );
 
 		/*
-		 * Verify that `public`, if present, is a boolean.
+		 * Verify that `collections`, if present, lists known collection slugs. An icon
+		 * without the property stays in the JS library and is not shipped to core.
 		 */
-		if ( 'public' in icon && typeof icon.public !== 'boolean' ) {
+		if ( 'collections' in icon ) {
+			const { collections } = icon;
+			const isValid =
+				Array.isArray( collections ) &&
+				collections.length > 0 &&
+				collections.every( ( collection ) =>
+					VALID_ICON_COLLECTIONS.includes( collection )
+				) &&
+				new Set( collections ).size === collections.length;
+
+			if ( ! isValid ) {
+				problems.push(
+					`- Invalid icon definition for icon '${
+						icon.slug
+					}': expected 'collections' to be a non-empty array of unique slugs out of ${ VALID_ICON_COLLECTIONS.map(
+						( collection ) => `'${ collection }'`
+					).join( ', ' ) }, saw ${ JSON.stringify( collections ) }`
+				);
+			}
+		}
+
+		/*
+		 * Verify that `keywords`, if present, is an array of strings.
+		 */
+		if (
+			'keywords' in icon &&
+			( ! Array.isArray( icon.keywords ) ||
+				icon.keywords.some(
+					( keyword ) => typeof keyword !== 'string'
+				) )
+		) {
 			problems.push(
 				`- Invalid icon definition for icon '${
 					icon.slug
-				}': expected 'public' to be true or false, saw ${ JSON.stringify(
-					icon.public
+				}': expected 'keywords' to be an array of strings, saw ${ JSON.stringify(
+					icon.keywords
 				) }`
 			);
 		}
@@ -78,13 +114,13 @@ async function validateCollection() {
 		 * Verify that the corresponding SVG file is found.
 		 */
 		if (
-			! ( await stat(
-				path.join( ICON_LIBRARY_DIR, '..', expected )
-			).catch( () => false ) )
+			! ( await stat( path.join( iconLibraryDir, '..', expected ) ).catch(
+				() => false
+			) )
 		) {
 			problems.push(
 				`- Icon file ${ path.join(
-					ICON_LIBRARY_DIR,
+					iconLibraryDir,
 					'..',
 					expected
 				) } not found`
@@ -96,7 +132,7 @@ async function validateCollection() {
 	 * Conversely, check that all the SVG files under library/ are listed in
 	 * the manifest.
 	 */
-	const svgFiles = ( await readdir( ICON_LIBRARY_DIR ) )
+	const svgFiles = ( await readdir( iconLibraryDir ) )
 		.filter( ( file ) => file.match( /^[a-z0-9--]+\.svg$/ ) )
 		.map( ( file ) => path.join( 'library', file ) )
 
@@ -104,7 +140,7 @@ async function validateCollection() {
 		.map( ( file ) => file.replaceAll( path.sep, '/' ) );
 
 	for ( const file of svgFiles ) {
-		const svgPath = path.join( ICON_LIBRARY_DIR, path.basename( file ) );
+		const svgPath = path.join( iconLibraryDir, path.basename( file ) );
 
 		if ( ! manifestPaths.includes( file ) ) {
 			problems.push( `- Missing entry for icon ${ svgPath }` );
@@ -127,6 +163,12 @@ async function validateCollection() {
 			);
 		}
 
+		if ( /\svector-effect\s*=/.test( svgContent ) ) {
+			problems.push(
+				`- Icon ${ svgPath } must omit vector-effect so its stroke width scales with its size`
+			);
+		}
+
 		if ( isStrokeBasedSvg( svgContent ) ) {
 			const graphicalElements = svgContent.match(
 				/<(?:circle|ellipse|line|path|polygon|polyline|rect)\b[^>]*>/g
@@ -138,19 +180,6 @@ async function validateCollection() {
 			if ( ! strokedElements?.length ) {
 				problems.push(
 					`- Stroke-based icon ${ svgPath } must contain a graphical element that does not set stroke="none"`
-				);
-			}
-
-			if (
-				strokedElements?.some(
-					( element ) =>
-						! element.includes(
-							'vector-effect="non-scaling-stroke"'
-						)
-				)
-			) {
-				problems.push(
-					`- Stroked elements in ${ svgPath } must set vector-effect="non-scaling-stroke"`
 				);
 			}
 		}

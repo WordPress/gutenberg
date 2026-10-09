@@ -2,14 +2,45 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 0.49.0 (2026-10-07)
+
+### Breaking Changes
+
+-   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
+
+### Enhancements
+
+-   `MediaEdit`: Use design system's outine focus ring instead of previous box-shadow based implementation. ([#83854](https://github.com/WordPress/gutenberg/pull/83854))
+
+### Bug Fixes
+
+-   `trashPost`, `permanentlyDeletePost`: Offer "Permanently delete" instead of "Trash" for posts without the `wp:action-trash` REST link. Requires WordPress 7.2 or the Gutenberg plugin ([#84045](https://github.com/WordPress/gutenberg/pull/84045)).
+-   `AuthorView`: Fetch the author through the users list in the `view` context, so users who can't edit other users still see the author's name and avatar, including for authors without published posts. ([#83498](https://github.com/WordPress/gutenberg/pull/83498))
+-   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+-   `MediaEdit`: Show a checkerboard background behind image previews, so images with transparent backgrounds stay visible, as in the classic featured image panel. ([#83846](https://github.com/WordPress/gutenberg/pull/83846))
+
+## 0.48.0 (2026-09-23)
+
+### Enhancements
+
+-   Featured image field: support the `editor.PostFeaturedImage` filter in the post summary. ([#83133](https://github.com/WordPress/gutenberg/pull/83133))
+-   Excerpt field: render nothing when the excerpt is empty. ([#82423](https://github.com/WordPress/gutenberg/pull/82423))
+-   Featured image field: support the `editor.MediaUpload` filter in the post summary and open the featured-image media frame, as the classic panel does. ([#82678](https://github.com/WordPress/gutenberg/pull/82678))
+
 ### Bug Fixes
 
 -   Hide the date, author and password fields when the post's `_links` lack the `wp:action-publish` / `wp:action-assign-author` relations, matching the classic sidebar. ([#82844](https://github.com/WordPress/gutenberg/pull/82844))
 -   Template field: Show it on block themes to users who can't create templates, like the post editor's template panel. ([#82857](https://github.com/WordPress/gutenberg/pull/82857))
 -   `MediaEdit`: Show a message instead of the picker when the user lacks permission to upload media. ([#82720](https://github.com/WordPress/gutenberg/pull/82720))
+-   Featured image field: label the button that sets the image with the post type's `set_featured_image` label and title the DataViews media modal with its `featured_image` label, as the classic panel does. ([#83445](https://github.com/WordPress/gutenberg/pull/83445))
 
 ### Internal
 
+-   Featured image field: pass the stabilized `featuredImageFlow` prop to `MediaEdit` alongside the deprecated `unstableFeaturedImageFlow`, so plugins reading either name still recognize the featured image. ([#83439](https://github.com/WordPress/gutenberg/pull/83439))
 - 	Replace deprecated `word-break: break-word` with `overflow-wrap: anywhere` on the slug permalink help link to clear the Stylelint suppression. ([#82693](https://github.com/WordPress/gutenberg/pull/82693))
 
 ## 0.47.0 (2026-09-10)

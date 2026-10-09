@@ -2,7 +2,6 @@
 @use "@wordpress/base-styles/colors";
 @use "@wordpress/base-styles/mixins";
 @use "./font-library/style.scss" as *;
-@use "./pagination/style.scss" as *;
 @use "./screen-revisions/style.scss" as *;
 @use "./size-control/style.scss" as *;
 @use "./variations/style.scss" as *;
@@ -124,6 +123,16 @@
 	// Match the height of the rest of the icons (24px).
 	height: variables.$grid-unit * 3;
 	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+}
+
+.global-styles-ui__palette-preview {
+	display: inline-flex;
+
+	> * + * {
+		margin-inline-start: calc(-1 * variables.$grid-unit);
+	}
 }
 
 .global-styles-ui__shadows-panel__options-container,

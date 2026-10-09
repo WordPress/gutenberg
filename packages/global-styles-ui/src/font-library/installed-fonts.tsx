@@ -1,3 +1,4 @@
+import { Progress } from '@wordpress/ui';
 import {
 	Button,
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -10,8 +11,7 @@ import {
 	__experimentalVStack as VStack,
 	Flex,
 	Notice,
-	ProgressBar,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 } from '@wordpress/components';
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
@@ -272,7 +272,14 @@ function InstalledFonts() {
 		<div className="font-library__tabpanel-layout">
 			{ isResolvingLibrary && (
 				<div className="font-library__loading">
-					<ProgressBar />
+					<Progress.Root
+						value={ null }
+						aria-label={ __( 'Loading fonts' ) }
+					>
+						<Progress.Track>
+							<Progress.Indicator />
+						</Progress.Track>
+					</Progress.Root>
 				</div>
 			) }
 			{ ! isResolvingLibrary && (
@@ -449,7 +456,7 @@ function InstalledFonts() {
 							</WCText>
 							<Spacer margin={ 4 } />
 							<VStack spacing={ 0 }>
-								<CheckboxControl
+								<WCCheckboxControl
 									className="font-library__select-all"
 									label={ __( 'Select all' ) }
 									checked={ isSelectAllChecked }
@@ -488,7 +495,16 @@ function InstalledFonts() {
 					</Navigator>
 
 					<HStack justify="flex-end" className="font-library__footer">
-						{ isInstalling && <ProgressBar /> }
+						{ isInstalling && (
+							<Progress.Root
+								value={ null }
+								aria-label={ __( 'Installing fonts' ) }
+							>
+								<Progress.Track>
+									<Progress.Indicator />
+								</Progress.Track>
+							</Progress.Root>
+						) }
 						{ shouldDisplayDeleteButton && (
 							<Button
 								__next40pxDefaultSize

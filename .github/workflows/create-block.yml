@@ -3,7 +3,12 @@ name: Create Block
 on:
     pull_request:
     push:
-        branches: [trunk, wp/latest]
+        branches:
+            - trunk
+            - 'release/[0-9]+.[0-9]'
+            - 'wp/[0-9]+.[0-9]'
+            - wp/latest
+            - wp/next
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
@@ -63,7 +68,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                node: ['minimum', '22.0.0']
+                node: ['minimum']
 
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

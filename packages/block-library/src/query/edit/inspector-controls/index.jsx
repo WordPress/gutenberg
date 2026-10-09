@@ -1,6 +1,6 @@
 import {
 	TextControl,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	Notice,
 	__experimentalVStack as VStack,
 	__experimentalToolsPanel as ToolsPanel,
@@ -275,7 +275,7 @@ export default function QueryInspectorControls( props ) {
 							isShownByDefault
 						>
 							{ postTypesSelectOptions.length > 2 ? (
-								<SelectControl
+								<WCSelectControl
 									options={ postTypesSelectOptions }
 									value={ postType }
 									label={ postTypeControlLabel }

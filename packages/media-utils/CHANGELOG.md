@@ -2,6 +2,31 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 5.57.0 (2026-10-07)
+
+### Bug Fixes
+
+-   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+-   `MediaUpload`: Fix `allowedTypes` being ignored when `gallery` prop is `true` ([#78257](https://github.com/WordPress/gutenberg/pull/78257)).
+
+### Internal
+
+-   Add `MediaEdit` and `MediaEditControl`, the media control of DataForm fields, as private APIs ([#84046](https://github.com/WordPress/gutenberg/pull/84046)).
+
+## 5.56.0 (2026-09-23)
+
+### New Features
+
+-   `MediaUpload`: Add a `featuredImageFlow` prop that opens the featured image media frame. ([#83439](https://github.com/WordPress/gutenberg/pull/83439))
+
+### Deprecations
+
+-   `MediaUpload`: Deprecate the `unstableFeaturedImageFlow` prop in favor of `featuredImageFlow`. ([#83439](https://github.com/WordPress/gutenberg/pull/83439))
+
 ## 5.55.0 (2026-09-10)
 
 ### New Features

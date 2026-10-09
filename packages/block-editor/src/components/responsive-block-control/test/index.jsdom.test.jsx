@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Fragment, useState } from '@wordpress/element';
-import { SelectControl } from '@wordpress/components';
+import { SelectControl as WCSelectControl } from '@wordpress/components';
 import ResponsiveBlockControl from '../index';
 
 globalThis.wpVitest.mockMatchMedia();
@@ -31,7 +31,7 @@ const sizeOptions = [
 const renderTestDefaultControlComponent = ( labelComponent, device ) => {
 	return (
 		<>
-			<SelectControl label={ labelComponent } options={ sizeOptions } />
+			<WCSelectControl label={ labelComponent } options={ sizeOptions } />
 			<p id={ device.id }>
 				{ device.label } is used here for testing purposes to ensure we
 				have access to details about the device.

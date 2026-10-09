@@ -39,6 +39,7 @@ describe( 'matchers', () => {
 				'<blockquote><p>A delicious sundae dessert</p></blockquote>';
 			const match = parse( html, sources.node() );
 
+			expect( console ).toHaveWarned();
 			expect( renderToString( match ) ).toBe( `<body>${ html }</body>` );
 		} );
 	} );

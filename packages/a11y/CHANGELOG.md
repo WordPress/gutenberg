@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove `prefersReducedMotion`, added in 4.57.0. The reduce motion preference is not specific to accessibility, so it is no longer part of this package. The block library keeps it as a private helper instead ([#84297](https://github.com/WordPress/gutenberg/pull/84297)).
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 4.57.0 (2026-10-07)
+
+### New Features
+
+-   Add `prefersReducedMotion`, which reports whether the user has asked their operating system to reduce motion. It is the counterpart to the `useReducedMotion` hook in `@wordpress/compose`, for code that runs outside React such as block view scripts ([#83452](https://github.com/WordPress/gutenberg/pull/83452)).
+
+## 4.56.0 (2026-09-23)
+
 ## 4.55.0 (2026-09-10)
 
 ## 4.54.0 (2026-08-26)

@@ -1,5 +1,8 @@
 import { useId } from '@wordpress/element';
-import { CheckboxControl, Flex } from '@wordpress/components';
+import {
+	CheckboxControl as WCCheckboxControl,
+	Flex,
+} from '@wordpress/components';
 import { getFontFaceVariantName } from './utils';
 import FontDemo from './font-demo';
 import type { CollectionFontVariantProps } from './types';
@@ -24,7 +27,7 @@ function CollectionFontVariant( {
 	return (
 		<div className="font-library__font-card">
 			<Flex justify="flex-start" align="center" gap="1rem">
-				<CheckboxControl
+				<WCCheckboxControl
 					checked={ selected }
 					onChange={ handleToggleActivation }
 					id={ checkboxId }

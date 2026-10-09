@@ -33,14 +33,8 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		// Invoke the private method.
 		$result = $method->invoke( $reflection, $navigation_link_block );
 
-		if ( is_wp_version_compatible( '7.0' ) ) {
-			$expected = '<li class="wp-block-navigation-item wp-block-navigation-link"><a class="wp-block-navigation-item__content"  href="/hello-world"><span class="wp-block-navigation-item__label">Sample Page</span></a></li>';
-		} else {
-			// Block markup for WP 6.9 (space before wp-block-navigation-item class)
-			// TODO: Remove the second expected markup after WP 6.9 support is dropped and the old markup is no longer generated.
-			$expected = '<li class=" wp-block-navigation-item wp-block-navigation-link"><a class="wp-block-navigation-item__content"  href="/hello-world"><span class="wp-block-navigation-item__label">Sample Page</span></a></li>';
-			$this->assertEquals( $expected, $result );
-		}
+		$expected = '<li class="wp-block-navigation-item wp-block-navigation-link"><a class="wp-block-navigation-item__content"  href="/hello-world"><span class="wp-block-navigation-item__label">Sample Page</span></a></li>';
+		$this->assertEqualHTML( $expected, $result );
 	}
 
 	/**
@@ -506,5 +500,36 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 
 		$this->assertStringNotContainsString( 'disable-default-overlay', $output, 'An overlay that renders nothing should keep the default overlay styles.' );
 		$this->assertStringNotContainsString( '"hasCustomOverlay":true', $output, 'An overlay that renders nothing should not flag the context as a custom overlay.' );
+	}
+
+	/**
+	 * Test that the submenu detection of one navigation block is not reused for the
+	 * next navigation block rendered in the same request.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::render
+	 *
+	 * @see https://github.com/WordPress/gutenberg/issues/82288
+	 */
+	public function test_submenu_detection_is_not_shared_between_navigation_blocks() {
+		$view_module = '@wordpress/block-library/navigation/view';
+		wp_dequeue_script_module( $view_module );
+
+		// A navigation with a submenu that is not interactive by itself.
+		do_blocks(
+			'<!-- wp:navigation {"showSubmenuIcon":false,"openSubmenusOnClick":false,"overlayMenu":"never"} -->' .
+			'<!-- wp:navigation-submenu {"label":"More","url":"/more"} --><!-- wp:navigation-link {"label":"Deep","url":"/deep"} /--><!-- /wp:navigation-submenu -->' .
+			'<!-- /wp:navigation -->'
+		);
+		$this->assertNotContains( $view_module, wp_script_modules()->get_queue(), 'A non-interactive navigation with a submenu should not enqueue the view module.' );
+
+		// A navigation without submenus rendered afterwards in the same request.
+		do_blocks(
+			'<!-- wp:navigation {"showSubmenuIcon":true,"overlayMenu":"never"} -->' .
+			'<!-- wp:navigation-link {"label":"Home","url":"/"} /-->' .
+			'<!-- /wp:navigation -->'
+		);
+		$this->assertNotContains( $view_module, wp_script_modules()->get_queue(), 'A navigation without submenus should not enqueue the view module because a previous navigation had a submenu.' );
 	}
 }

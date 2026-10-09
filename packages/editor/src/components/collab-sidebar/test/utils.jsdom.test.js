@@ -18,9 +18,12 @@ import {
 	removeNoteIdFromMetadata,
 	calculateNotePositions,
 	pickPrimaryNote,
+	getNoteAtCaret,
+	pickNoteForCaret,
 	BLOCK_LEVEL_NOTE_START,
 	getInlineMarkerStart,
 	getNoteMarkerSelector,
+	getNoteAnchorRect,
 } from '../utils';
 import { noteFormat } from '../format';
 
@@ -333,6 +336,120 @@ describe( 'pickPrimaryNote', () => {
 	} );
 } );
 
+describe( 'pickNoteForCaret', () => {
+	const FORMAT_NAME = 'core/note';
+	const isRegistered = () =>
+		!! select( richTextStore ).getFormatType( FORMAT_NAME );
+
+	// "Alpha" is wrapped by note 7 (offsets 0-5), "charlie" by the draft
+	// marker (12-19); note 3 is block-level. Parsed once the format exists.
+	let attributes;
+
+	beforeAll( () => {
+		if ( ! isRegistered() ) {
+			registerFormatType( FORMAT_NAME, noteFormat );
+		}
+		attributes = {
+			content: RichTextData.fromHTMLString(
+				'<mark class="wp-note" data-id="7">Alpha</mark> bravo <mark class="wp-note" data-id="new">charlie</mark> delta.'
+			),
+			metadata: { noteId: [ 3, 7 ] },
+		};
+	} );
+
+	afterAll( () => {
+		if ( isRegistered() ) {
+			unregisterFormatType( FORMAT_NAME );
+		}
+	} );
+	const notes = [
+		{ id: 3, status: 'hold', blockClientId: 'b' },
+		{ id: 7, status: 'hold', blockClientId: 'b' },
+	];
+	const caret = ( offset, end = offset ) => ( {
+		selectionStart: { attributeKey: 'content', offset },
+		selectionEnd: { attributeKey: 'content', offset: end },
+	} );
+	const noCaret = { selectionStart: {}, selectionEnd: {} };
+	const pick = (
+		{ selectionStart, selectionEnd },
+		{ attributes: blockAttributes = attributes, ...overrides } = {}
+	) =>
+		pickNoteForCaret( {
+			noteAtCaret: getNoteAtCaret(
+				blockAttributes,
+				selectionStart,
+				selectionEnd
+			),
+			attributes: blockAttributes,
+			blockThreads: notes,
+			hasDraft: false,
+			selectedNoteId: undefined,
+			isBlockChange: true,
+			...overrides,
+		} );
+
+	it( 'enters a marker: selects that note', () => {
+		expect( pick( caret( 2 ) ) ).toBe( 7 );
+		expect( pick( caret( 14 ) ) ).toBe( 'new' );
+		expect( pick( caret( 2 ), { hasDraft: true } ) ).toBe( 7 );
+	} );
+
+	it( "enters another block: selects the block's note", () => {
+		expect( pick( caret( 8 ) ) ).toBe( 3 );
+		expect( pick( noCaret ) ).toBe( 3 );
+		expect( pick( caret( 8 ), { hasDraft: true } ) ).toBe( 'new' );
+		expect(
+			pick( caret( 8 ), {
+				blockThreads: [ { id: 7, status: 'hold', blockClientId: 'b' } ],
+			} )
+		).toBeUndefined();
+	} );
+
+	it( 'enters another block: keeps the selected block-level note among several, else the primary', () => {
+		const several = [
+			{ id: 3, status: 'hold', blockClientId: 'b' },
+			{ id: 9, status: 'hold', blockClientId: 'b' },
+		];
+		expect(
+			pick( caret( 8 ), { blockThreads: several, selectedNoteId: 9 } )
+		).toBe( 9 );
+		expect(
+			pick( caret( 8 ), { blockThreads: several, selectedNoteId: 7 } )
+		).toBe( 3 );
+	} );
+
+	it( "leaves the selected note's marker: selects the block's note", () => {
+		const inBlock = { isBlockChange: false };
+		expect( pick( caret( 8 ), { ...inBlock, selectedNoteId: 7 } ) ).toBe(
+			3
+		);
+		expect(
+			pick( caret( 8 ), { ...inBlock, selectedNoteId: 'new' } )
+		).toBe( 3 );
+	} );
+
+	it( 'anything else: keeps the selection', () => {
+		const inBlock = { isBlockChange: false };
+		expect( pick( caret( 8 ), inBlock ) ).toBeUndefined();
+		expect( pick( caret( 8 ), { ...inBlock, selectedNoteId: 3 } ) ).toBe(
+			3
+		);
+		expect( pick( noCaret, { ...inBlock, selectedNoteId: 7 } ) ).toBe( 7 );
+	} );
+
+	it( 'reads markers from a string attribute', () => {
+		expect(
+			pick( caret( 2 ), {
+				attributes: {
+					content:
+						'<mark class="wp-note" data-id="7">Alpha</mark> bravo',
+				},
+			} )
+		).toBe( 7 );
+	} );
+} );
+
 describe( 'calculateNotePositions', () => {
 	it( 'returns empty positions when the anchor thread has no blockRect', () => {
 		const { positions } = calculateNotePositions( {
@@ -366,6 +483,26 @@ describe( 'calculateNotePositions', () => {
 		// 2: 300 - 16 = 284
 		// 3: 500 - 16 = 484
 		expect( positions ).toEqual( { 1: 84, 2: 284, 3: 484 } );
+	} );
+
+	it( 'returns the content height that fits the lowest measured thread', () => {
+		const getContentHeight = ( heights ) =>
+			calculateNotePositions( {
+				threads: [ { id: 1 }, { id: 2 }, { id: 3 } ],
+				selectedNoteId: undefined,
+				blockRects: {
+					1: makeRect( 100 ),
+					2: makeRect( 300 ),
+					3: makeRect( 500 ),
+				},
+				heights,
+				scrollTop: 0,
+			} ).contentHeight;
+
+		// 2: 284, plus its 16px margin, 50px height and a 16px gap. The
+		// unmeasured thread 3 doesn't count until it has a height.
+		expect( getContentHeight( { 1: 50, 2: 50 } ) ).toBe( 366 );
+		expect( getContentHeight( { 1: 50, 2: 50, 3: 50 } ) ).toBe( 566 );
 	} );
 
 	it( 'pushes an overlapping thread above the anchor upward', () => {
@@ -1054,5 +1191,80 @@ describe( 'getNoteMarkerSelector / noteFormat', () => {
 		marker.setAttribute( noteFormat.attributes[ 'data-id' ], '7' );
 
 		expect( marker.matches( getNoteMarkerSelector( 7 ) ) ).toBe( true );
+	} );
+} );
+
+function mockRect( element, top ) {
+	element.getBoundingClientRect = () => ( { top } );
+}
+
+describe( 'getNoteAnchorRect', () => {
+	it( 'anchors an inline note to its in-content marker', () => {
+		const blockEl = document.createElement( 'p' );
+		blockEl.innerHTML =
+			'Some <mark class="wp-note" data-id="12">noted</mark> text';
+		mockRect( blockEl, 100 );
+		mockRect( blockEl.querySelector( 'mark' ), 160 );
+
+		expect( getNoteAnchorRect( 12, blockEl ).top ).toBe( 160 );
+	} );
+
+	it( 'falls back to the block rect for block-level notes', () => {
+		const blockEl = document.createElement( 'p' );
+		blockEl.textContent = 'No marker here';
+		mockRect( blockEl, 100 );
+
+		expect( getNoteAnchorRect( 12, blockEl ).top ).toBe( 100 );
+	} );
+
+	it( 'stops at the outermost block when no block is visible', () => {
+		const outerEl = document.createElement( 'div' );
+		outerEl.dataset.block = 'outer';
+		outerEl.innerHTML = '<p data-block="inner">Hidden</p>';
+		const blockEl = outerEl.querySelector( 'p' );
+		mockRect( outerEl, 40 );
+		mockRect( blockEl, 100 );
+		outerEl.checkVisibility = () => false;
+		blockEl.checkVisibility = () => false;
+
+		expect( getNoteAnchorRect( 12, blockEl ).top ).toBe( 40 );
+	} );
+
+	it( 'anchors a marker split into several runs to its first run', () => {
+		const blockEl = document.createElement( 'p' );
+		/*
+		 * Overlapping notes split a marker into several runs sharing the
+		 * same data-id (see applyNoteFormat): the overlapped stretch nests
+		 * inside the other note's marker. Each note anchors to its first
+		 * run in document order.
+		 */
+		blockEl.innerHTML =
+			'One <mark class="wp-note" data-id="12">first run</mark>' +
+			'<mark class="wp-note" data-id="34">' +
+			'<mark class="wp-note" data-id="12">overlap</mark>' +
+			' tail</mark> text';
+		const [ firstRun, outer, nestedRun ] =
+			blockEl.querySelectorAll( 'mark' );
+		mockRect( blockEl, 100 );
+		mockRect( firstRun, 140 );
+		mockRect( outer, 170 );
+		mockRect( nestedRun, 200 );
+
+		expect( getNoteAnchorRect( 12, blockEl ).top ).toBe( 140 );
+		expect( getNoteAnchorRect( 34, blockEl ).top ).toBe( 170 );
+	} );
+
+	it( 'anchors each note to its own marker within the same block', () => {
+		const blockEl = document.createElement( 'p' );
+		blockEl.innerHTML =
+			'One <mark class="wp-note" data-id="12">first</mark> and ' +
+			'another <mark class="wp-note" data-id="34">second</mark> note';
+		const [ first, second ] = blockEl.querySelectorAll( 'mark' );
+		mockRect( blockEl, 100 );
+		mockRect( first, 120 );
+		mockRect( second, 180 );
+
+		expect( getNoteAnchorRect( 12, blockEl ).top ).toBe( 120 );
+		expect( getNoteAnchorRect( 34, blockEl ).top ).toBe( 180 );
 	} );
 } );

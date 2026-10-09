@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import {
 	BaseControl,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	__experimentalNumberControl as NumberControl,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
@@ -93,7 +93,7 @@ export default function RelativeDateControl< Item >( {
 					onChange={ onChangeValue }
 					disabled={ disabled }
 				/>
-				<SelectControl
+				<WCSelectControl
 					className="dataviews-controls__relative-date-unit"
 					label={ __( 'Unit' ) }
 					value={ unit }

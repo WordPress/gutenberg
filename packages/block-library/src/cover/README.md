@@ -153,6 +153,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`enableContrastChecker`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-enablecontrastchecker): `false`
 - [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
   - `aspectRatio`: `true`
+  - `minWidth`: `true`
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
@@ -160,6 +161,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`allowJustification`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowjustification): `false`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
+  - `interactive`: `true`
 - [`filter`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#filter):
   - [`duotone`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#filter-duotone): `true`
 - [`allowedBlocks`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#allowedblocks): `true`

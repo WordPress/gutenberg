@@ -147,6 +147,7 @@ function StyleStateInspectorSlots( {
 						label={ __( 'Elements' ) }
 						className="elements-block-support-panel__inner-wrapper"
 					/>
+					{ isViewportStyleState && <PositionControls /> }
 				</>
 			) }
 			{ isViewportStyleState && (
@@ -218,9 +219,9 @@ function BlockInspector() {
 			hasBlockStyles: _hasBlockStyles,
 			editedContentOnlySection: getEditedContentOnlySection(),
 			blockEditingMode: getBlockEditingMode( _renderedBlockClientId ),
-			selectedBlockStyleState: getSelectedBlockStyleState(
-				_renderedBlockClientId
-			),
+			selectedBlockStyleState: _renderedBlockClientId
+				? getSelectedBlockStyleState( _renderedBlockClientId )
+				: undefined,
 			showStateOnCanvas: isSelectedBlockStyleStateShownOnCanvas(
 				_renderedBlockClientId
 			),

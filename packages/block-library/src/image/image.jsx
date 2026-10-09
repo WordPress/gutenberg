@@ -6,7 +6,7 @@ import {
 	Spinner,
 	TextareaControl as WCTextareaControl,
 	TextControl,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 	ToolbarButton,
 	ToolbarGroup,
 	__experimentalToolsPanel as ToolsPanel,
@@ -73,7 +73,6 @@ import { evalAspectRatio, mediaPosition } from './utils';
 
 const {
 	DimensionsTool,
-	isDefaultBlockStyleState,
 	ResolutionTool,
 	mediaEditKey,
 	mediaSideloadFromUrlKey,
@@ -666,20 +665,23 @@ export default function Image( {
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const selectedStyleState = useSelect(
+	const { selectedStyleState, hasSelectedStyleState } = useSelect(
 		( select ) => {
 			if ( ! isSingleSelected ) {
-				return undefined;
+				return {
+					selectedStyleState: undefined,
+					hasSelectedStyleState: false,
+				};
 			}
-			const { getSelectedBlockStyleState } = unlock(
-				select( blockEditorStore )
-			);
-			return getSelectedBlockStyleState( clientId );
+			const { getSelectedBlockStyleState, hasSelectedBlockStyleState } =
+				select( blockEditorStore );
+			return {
+				selectedStyleState: getSelectedBlockStyleState( clientId ),
+				hasSelectedStyleState: hasSelectedBlockStyleState( clientId ),
+			};
 		},
 		[ clientId, isSingleSelected ]
 	);
-	const hasSelectedStyleState =
-		! isDefaultBlockStyleState( selectedStyleState );
 	const selectedStyleStateKey = getStyleStateKey( selectedStyleState );
 	const activeWidth = getActiveDimensionValue( {
 		attributes,
@@ -1043,7 +1045,7 @@ export default function Image( {
 									setAttributes( { isDecorative: false } )
 								}
 							>
-								<CheckboxControl
+								<WCCheckboxControl
 									label={ __( 'Mark as decorative' ) }
 									checked={ !! isDecorative }
 									onChange={ updateIsDecorative }

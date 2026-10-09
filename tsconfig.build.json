@@ -68,6 +68,7 @@
 		{ "path": "packages/private-apis" },
 		{ "path": "packages/project-management-automation" },
 		{ "path": "packages/react-i18n" },
+		{ "path": "packages/react-inert-value/tsconfig.build.json" },
 		{ "path": "packages/redux-routine" },
 		{ "path": "packages/report-flaky-tests/tsconfig.build.json" },
 		{ "path": "packages/rich-text" },
@@ -94,6 +95,7 @@
 		{ "path": "packages/widget-primitives/tsconfig.build.json" },
 		{ "path": "packages/wordcount/tsconfig.build.json" },
 		{ "path": "packages/worker-threads/tsconfig.build.json" },
+		{ "path": "packages/workflow" },
 		{ "path": "packages/wp-build" }
 	],
 	"files": []

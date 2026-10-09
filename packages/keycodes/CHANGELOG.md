@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 4.57.0 (2026-10-07)
+
+## 4.56.0 (2026-09-23)
+
 ### New Features
 
 -   Add `keyboardShortcut`, a helper returning the values used to display and describe a keyboard shortcut (`displayShortcut`, `ariaKeyShortcut` and `label`) ([#82632](https://github.com/WordPress/gutenberg/pull/82632)).

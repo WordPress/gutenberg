@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 1.24.0 (2026-10-07)
+
+### New Features
+
+-   Accept `background.backgroundClip` as a valid theme.json setting ([#77141](https://github.com/WordPress/gutenberg/pull/77141)).
+
+### Bug Fixes
+
+-   Declare `react`, `react-dom`, and their types as peer dependencies, forwarding the peers of `@wordpress/data`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+
+## 1.23.0 (2026-09-23)
+
 ### New Features
 
 -   Add text shadow settings and presets ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).

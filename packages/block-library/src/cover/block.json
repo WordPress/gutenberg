@@ -134,7 +134,8 @@
 			"enableContrastChecker": false
 		},
 		"dimensions": {
-			"aspectRatio": true
+			"aspectRatio": true,
+			"minWidth": true
 		},
 		"typography": {
 			"fontSize": true,
@@ -153,7 +154,8 @@
 			"allowJustification": false
 		},
 		"interactivity": {
-			"clientNavigation": true
+			"clientNavigation": true,
+			"interactive": true
 		},
 		"filter": {
 			"duotone": true

@@ -1,5 +1,5 @@
 import {
-	SelectControl,
+	SelectControl as WCSelectControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
@@ -42,7 +42,7 @@ export default function ResolutionTool( {
 			panelId={ panelId }
 			resetAllFilter={ resetAllFilter }
 		>
-			<SelectControl
+			<WCSelectControl
 				label={ __( 'Resolution' ) }
 				value={ displayValue }
 				options={ options }

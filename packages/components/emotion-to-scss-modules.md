@@ -106,7 +106,7 @@ Match the evidence to the behavior at risk:
 | Real SCSS declarations, specificity, custom-property resolution, dimensions, and animation | Storybook or editor comparison using production styles, computed styles, and relevant interactions. Include a consumer override and the affected document/RTL states. |
 | Cross-document registration or a particular mixed-style composition mechanism | Reuse shared registration coverage. Add a component-specific test only for an uncovered registration or composition risk. A small fixture stylesheet can test that mechanism; pair it with a real-style check. |
 
-Jest mocks stylesheet imports. Public-class assertions can protect a compatibility contract; private module-class assertions establish wiring only. Neither proves that the real CSS loads or wins. Do not add class assertions or snapshots solely to mirror the implementation. Do not inject the desired production selector into a test and claim it protects that selector: the test would still pass if the SCSS rule were deleted. This distinction led to removing tests in [#81792](https://github.com/WordPress/gutenberg/pull/81792#discussion_r3811746653).
+The Node and jsdom projects mock stylesheet imports; Browser Mode loads the real styles. Public-class assertions can protect a compatibility contract; private module-class assertions establish wiring only. Neither proves that the real CSS loads or wins. Do not add class assertions or snapshots solely to mirror the implementation. Do not inject the desired production selector into a test and claim it protects that selector: the test would still pass if the SCSS rule were deleted. This distinction led to removing tests in [#81792](https://github.com/WordPress/gutenberg/pull/81792#discussion_r3811746653).
 
 Keep new tests focused on the migrated component's integration. A wrapper test can protect its `as`, ref, or prop forwarding even when the shared helper is already tested. Do not copy PolymorphicElement's entire filtering suite into every wrapper, duplicate a full editor setup for a small assertion, or introduce a new Storybook testing convention just for the migration. Check the relevant states and combinations from the contract audit; do not generate every prop combination or supported tag. When a real-style assertion is unavailable, state the gap and give reproducible manual steps.
 
@@ -114,21 +114,19 @@ Keep new tests focused on the migrated component's integration. A wrapper test c
 
 Remove obsolete Emotion imports, files, lint/type suppressions, and utilities that become unused because of this migration. Search all consumers before deleting shared constants. Preserve useful comments explaining layout calculations or compatibility workarounds. Leave unrelated cleanup and global Emotion dependencies, Babel wiring, serializers, `useCx`, and the `rtl` utility until their remaining users are gone.
 
-Follow [worktree setup](/docs/contributors/code/getting-started-with-code-contribution.md#set-up-each-worktree) and read the [testing overview](/docs/contributors/code/testing-overview.md) before adding tests. New tests use Vitest; the [migration manifest](/test/unit/test-migration.json) identifies legacy tests still owned by Jest. From the repository root, use the appropriate focused command below, then run lint and the repository gates:
+Follow [worktree setup](/docs/contributors/code/getting-started-with-code-contribution.md#set-up-each-worktree) and read the [testing overview](/docs/contributors/code/testing-overview.md) before adding tests. All unit tests use Vitest. Follow the [filename-based environment conventions](/docs/contributors/code/testing-overview.md#folder-structure). From the repository root, use the appropriate focused command below, then run lint and the repository gates:
 
 ```sh
-npm run test:unit -- <legacy-jest-test-path> --runInBand
-npm run test:unit:vitest -- <vitest-test-path>
+npm run test:unit -- <test-path>
 npm run lint:js -- <changed-js-files>
 npm run lint:css
 npm run typecheck
 npm run build
-npm run test:unit:update
-npm run test:unit:vitest:update
+npm run test:unit:update -- <test-path>
 git diff --check
 ```
 
-The snapshot updates are for the whole repository because downstream consumers can change. Jest and Vitest own separate suites, so neither command covers both. Review every snapshot change for removed or duplicated public classes, changed elements, forwarded props, and consumer output. Do not accept a snapshot solely because Emotion classes disappeared. Rerun the exact failing file or shard before attributing a broad failure to the migration.
+Update snapshots for the migrated component and affected downstream consumers. Omit the path only when the change requires a repository-wide snapshot update. Review every snapshot change for removed or duplicated public classes, changed elements, forwarded props, and consumer output. Do not accept a snapshot solely because Emotion classes disappeared. Rerun the exact failing file or shard before attributing a broad failure to the migration.
 
 For generated-file verification, start from a clean committed worktree and run the applicable generators and suppression updates. `npm run other:check-local-changes` runs the documentation and theme generators through its npm prehook, then checks the unstaged diff. It does not run every generator or suppression update; consult the current [static-checks workflow](/.github/workflows/static-checks.yml) for those required by the migration. Inspect generated changes before staging them, since staged changes are invisible to the checker. Commit required updates, then repeat the applicable generation and check commands from the clean worktree.
 
