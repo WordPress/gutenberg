@@ -2,6 +2,7 @@ import {
 	RichText,
 	useBlockProps,
 	__experimentalGetElementClassName,
+	__experimentalGetDimensionsClassesAndStyles as getDimensionsClassesAndStyles,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
 import Tracks from './tracks';
@@ -30,6 +31,7 @@ export default function save( { attributes } ) {
 		width && height ? `${ width } / ${ height }` : undefined;
 	const videoStyle = {
 		...( aspectRatio && { aspectRatio } ),
+		...getDimensionsClassesAndStyles( attributes ).style,
 		...getShadowClassesAndStyles( attributes ).style,
 	};
 	return (
