@@ -470,13 +470,16 @@
       - data
       - defaultLayouts
       - empty
+      - expandedItemIds
       - fields
+      - getItemHasChildren
       - getItemId
       - getItemLevel
       - getItemParentId
       - header
       - isItemClickable
       - isLoading
+      - onChangeExpandedItemIds
       - onChangeSelection
       - onChangeView
       - onClickItem
