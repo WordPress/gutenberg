@@ -1,0 +1,14 @@
+{
+	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+	"login": true,
+	"steps": [
+		{
+			"step": "runPHP",
+			"code": "<?php require '/wordpress/wp-load.php'; update_user_meta( 1, 'wp_persisted_preferences', array( 'core/edit-post' => array( 'welcomeGuide' => false, 'fullscreenMode' => false ), '_modified' => gmdate( 'c' ) ) );"
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php require '/wordpress/wp-load.php'; wp_insert_post( array( 'import_id' => 100, 'post_title' => 'Selection across paragraphs', 'post_status' => 'draft', 'post_content' => \"<!-- wp:paragraph -->\\n<p>Alpha bravo charlie</p>\\n<!-- /wp:paragraph -->\\n\\n<!-- wp:paragraph -->\\n<p>Delta echo foxtrot</p>\\n<!-- /wp:paragraph -->\\n\\n<!-- wp:paragraph -->\\n<p>Another paragraph after the pair, so there is text below them as well.</p>\\n<!-- /wp:paragraph -->\\n\\n<!-- wp:paragraph -->\\n<p>A last paragraph of filler text at the end of the post.</p>\\n<!-- /wp:paragraph -->\" ) );"
+		}
+	]
+}
