@@ -1,5 +1,3 @@
-import { OBJECT_REPLACEMENT_CHARACTER } from './special-characters';
-
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 /** @typedef {import('./types').RichTextFormat} RichTextFormat */
 
@@ -10,8 +8,8 @@ import { OBJECT_REPLACEMENT_CHARACTER } from './special-characters';
  *
  * @return {RichTextFormat|void} Active object, or undefined.
  */
-export function getActiveObject( { start, end, replacements, text } ) {
-	if ( start + 1 !== end || text[ start ] !== OBJECT_REPLACEMENT_CHARACTER ) {
+export function getActiveObject( { start, end, replacements } ) {
+	if ( start + 1 !== end || ! replacements[ start ] ) {
 		return;
 	}
 

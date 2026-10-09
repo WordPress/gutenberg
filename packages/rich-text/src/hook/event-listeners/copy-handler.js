@@ -3,7 +3,6 @@ import { toHTMLString } from '../../to-html-string';
 import { isCollapsed } from '../../is-collapsed';
 import { slice } from '../../slice';
 import { remove } from '../../remove';
-import { getTextContent } from '../../get-text-content';
 import { ownsSelection } from '../../owns-selection';
 import { unlock } from '../../lock-unlock';
 
@@ -26,7 +25,7 @@ export default ( props ) => ( element ) => {
 		}
 
 		const selectedRecord = slice( record.current );
-		const plainText = getTextContent( selectedRecord );
+		const plainText = selectedRecord.text;
 		const html = toHTMLString( { value: selectedRecord } );
 		event.clipboardData.setData( 'text/plain', plainText );
 		event.clipboardData.setData( 'text/html', html );

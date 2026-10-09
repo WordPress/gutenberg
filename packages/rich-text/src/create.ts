@@ -2,9 +2,8 @@ import { select } from '@wordpress/data';
 import { store as richTextStore } from './store';
 import { createElement } from './create-element';
 import { mergePair } from './concat';
-import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from './special-characters';
+import { ZWNBSP } from './special-characters';
 import { toHTMLString } from './to-html-string';
-import { getTextContent } from './get-text-content';
 import type {
 	FormatType,
 	ParsedFormat,
@@ -167,7 +166,7 @@ export class RichTextData {
 		this.#value = init;
 	}
 	toPlainText() {
-		return getTextContent( this.#value as RichTextValue );
+		return ( this.#value as RichTextValue ).text;
 	}
 	// We could expose `toHTMLElement` at some point as well, but we'd only use
 	// it internally.
@@ -496,7 +495,7 @@ const CARRIAGE_RETURN = '\r';
 
 /**
  * Removes reserved characters used by rich-text (zero width non breaking spaces
- * added by `toTree` and object replacement characters).
+ * added by `toTree`).
  *
  * @param string
  */
@@ -504,10 +503,7 @@ export function removeReservedCharacters( string: string ) {
 	// with the global flag, note that we should create a new regex each time OR
 	// reset lastIndex state.
 	return string.replace(
-		new RegExp(
-			`[${ ZWNBSP }${ OBJECT_REPLACEMENT_CHARACTER }${ CARRIAGE_RETURN }]`,
-			'gu'
-		),
+		new RegExp( `[${ ZWNBSP }${ CARRIAGE_RETURN }]`, 'gu' ),
 		''
 	);
 }
@@ -582,7 +578,7 @@ function createFromElement( {
 						},
 					},
 				],
-				text: OBJECT_REPLACEMENT_CHARACTER,
+				text: ' ',
 			};
 			accumulateSelection( accumulator, node, range, value );
 			mergePair( accumulator, value );
@@ -620,7 +616,7 @@ function createFromElement( {
 						},
 					},
 				],
-				text: OBJECT_REPLACEMENT_CHARACTER,
+				text: ' ',
 			};
 			accumulateSelection( accumulator, node, range, value );
 			mergePair( accumulator, value );
@@ -638,8 +634,8 @@ function createFromElement( {
 			attributes: getAttributes( { element: node as Element } ),
 		} );
 
-		// When a format type is declared as not editable, replace it with an
-		// object replacement character and preserve the inner HTML.
+		// When a format type is declared as not editable, replace it with a
+		// replacement object and preserve the inner HTML.
 		if ( format?.formatType?.contentEditable === false ) {
 			delete format.formatType;
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
@@ -651,7 +647,7 @@ function createFromElement( {
 						innerHTML: ( node as Element ).innerHTML,
 					},
 				],
-				text: OBJECT_REPLACEMENT_CHARACTER,
+				text: ' ',
 			} );
 			continue;
 		}
@@ -681,7 +677,7 @@ function createFromElement( {
 				mergePair( accumulator, {
 					formats: [ , ],
 					replacements: [ format ],
-					text: OBJECT_REPLACEMENT_CHARACTER,
+					text: ' ',
 				} );
 			}
 		} else {

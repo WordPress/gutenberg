@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import deepFreeze from 'deep-freeze';
 import { insertObject } from '../insert-object';
 import { getSparseArrayLength } from './helpers';
-import { OBJECT_REPLACEMENT_CHARACTER } from '../special-characters';
 
 describe( 'insert', () => {
 	const obj = { type: 'obj' };
@@ -19,7 +18,7 @@ describe( 'insert', () => {
 		const expected = {
 			formats: [ , , , [ em ], , , , , , , ],
 			replacements: [ , , obj, , , , , , , , ],
-			text: `on${ OBJECT_REPLACEMENT_CHARACTER }o three`,
+			text: 'on o three',
 			start: 3,
 			end: 3,
 		};

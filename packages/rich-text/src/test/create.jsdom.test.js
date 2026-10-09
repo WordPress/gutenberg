@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import '../store';
 import { create, removeReservedCharacters, RichTextData } from '../create';
-import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from '../special-characters';
+import { ZWNBSP } from '../special-characters';
 import { createElement } from '../create-element';
 import { registerFormatType } from '../register-format-type';
 import { unregisterFormatType } from '../unregister-format-type';
@@ -197,22 +197,12 @@ describe( 'create', () => {
 	} );
 
 	it( 'removeReservedCharacters should remove all reserved characters', () => {
-		expect(
-			removeReservedCharacters( `${ OBJECT_REPLACEMENT_CHARACTER }` )
-		).toEqual( '' );
 		expect( removeReservedCharacters( `${ ZWNBSP }` ) ).toEqual( '' );
-		expect(
-			removeReservedCharacters(
-				`${ OBJECT_REPLACEMENT_CHARACTER }c${ OBJECT_REPLACEMENT_CHARACTER }at${ OBJECT_REPLACEMENT_CHARACTER }`
-			)
-		).toEqual( 'cat' );
 		expect(
 			removeReservedCharacters( `${ ZWNBSP }b${ ZWNBSP }at${ ZWNBSP }` )
 		).toEqual( 'bat' );
 		expect(
-			removeReservedCharacters(
-				`te${ OBJECT_REPLACEMENT_CHARACTER }st${ ZWNBSP }${ ZWNBSP }`
-			)
+			removeReservedCharacters( `te${ ZWNBSP }st${ ZWNBSP }${ ZWNBSP }` )
 		).toEqual( 'test' );
 	} );
 } );

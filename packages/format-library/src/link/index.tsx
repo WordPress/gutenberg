@@ -1,7 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { useState, useLayoutEffect, useEffect } from '@wordpress/element';
 import {
-	getTextContent,
 	applyFormat,
 	removeFormat,
 	slice,
@@ -93,7 +92,7 @@ function Edit( {
 	}, [ contentRef, isActive ] );
 
 	function addLink( target?: HTMLElement ) {
-		const text = getTextContent( slice( value ) );
+		const { text } = slice( value );
 
 		if ( ! isActive && text && isURL( text ) && isValidHref( text ) ) {
 			onChange(

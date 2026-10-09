@@ -5,6 +5,11 @@
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+-   Replacement objects such as images now occupy a space character in a value's `text` instead of the object replacement character `U+FFFC` ([#56111](https://github.com/WordPress/gutenberg/pull/56111)).
+
+### Deprecations
+
+-   `getTextContent`: deprecated, use the `text` property of the value instead ([#56111](https://github.com/WordPress/gutenberg/pull/56111)).
 
 ### Internal
 

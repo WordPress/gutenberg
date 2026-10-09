@@ -1,12 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect, useRef } from '@wordpress/element';
-import {
-	insert,
-	insertObject,
-	slice,
-	getTextContent,
-	useAnchor,
-} from '@wordpress/rich-text';
+import { insert, insertObject, slice, useAnchor } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
 // @ts-expect-error Block Editor not fully typed yet.
 import { RichTextToolbarButton } from '@wordpress/block-editor';
@@ -164,7 +158,7 @@ function Edit( {
 		} else {
 			// If there's a selection, seed the format with it so you can type
 			// LaTeX inline and then mark it as math.
-			const selectedText = getTextContent( slice( value ) );
+			const { text: selectedText } = slice( value );
 			let innerHTML = '';
 			if ( selectedText && latexToMathML ) {
 				try {

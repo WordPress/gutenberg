@@ -1,4 +1,4 @@
-import { ZWNBSP, OBJECT_REPLACEMENT_CHARACTER } from '../../special-characters';
+import { ZWNBSP } from '../../special-characters';
 
 export function getSparseArrayLength( array ) {
 	return array.reduce( ( accumulator ) => accumulator + 1, 0 );
@@ -31,46 +31,6 @@ export const spec = [
 			formats: [],
 			replacements: [],
 			text: '',
-		},
-	},
-	{
-		description:
-			'should ignore manually added object replacement character',
-		html: `test${ OBJECT_REPLACEMENT_CHARACTER }`,
-		createRange: ( element ) => ( {
-			startOffset: 0,
-			startContainer: element,
-			endOffset: 1,
-			endContainer: element,
-		} ),
-		startPath: [ 0, 0 ],
-		endPath: [ 0, 4 ],
-		record: {
-			start: 0,
-			end: 4,
-			formats: [ , , , , ],
-			replacements: [ , , , , ],
-			text: 'test',
-		},
-	},
-	{
-		description:
-			'should ignore manually added object replacement character with formatting',
-		html: `<em>h${ OBJECT_REPLACEMENT_CHARACTER }i</em>`,
-		createRange: ( element ) => ( {
-			startOffset: 0,
-			startContainer: element,
-			endOffset: 1,
-			endContainer: element,
-		} ),
-		startPath: [ 0, 0, 0 ],
-		endPath: [ 0, 0, 2 ],
-		record: {
-			start: 0,
-			end: 2,
-			formats: [ [ em ], [ em ] ],
-			replacements: [ , , ],
-			text: 'hi',
 		},
 	},
 	{
@@ -265,7 +225,7 @@ export const spec = [
 			end: 0,
 			formats: [ , ],
 			replacements: [ img ],
-			text: '\ufffc',
+			text: ' ',
 		},
 	},
 	{
@@ -284,7 +244,7 @@ export const spec = [
 			end: 1,
 			formats: [ [ em ] ],
 			replacements: [ img ],
-			text: '\ufffc',
+			text: ' ',
 		},
 	},
 	{
@@ -303,7 +263,7 @@ export const spec = [
 			end: 5,
 			formats: [ , , [ em ], [ em ], [ em ] ],
 			replacements: [ , , , , img ],
-			text: 'test\ufffc',
+			text: 'test ',
 		},
 	},
 	{
@@ -322,7 +282,7 @@ export const spec = [
 			end: 5,
 			formats: [ [ em ], [ em ], [ em ], , , ],
 			replacements: [ img, , , , , ],
-			text: '\ufffctest',
+			text: ' test',
 		},
 	},
 	{
@@ -523,7 +483,7 @@ export const spec = [
 					type: 'script',
 				},
 			],
-			text: '\ufffc',
+			text: ' ',
 		},
 	},
 	{
@@ -549,7 +509,7 @@ export const spec = [
 					type: 'img',
 				},
 			],
-			text: '\ufffc',
+			text: ' ',
 		},
 	},
 	{
@@ -575,7 +535,7 @@ export const spec = [
 					type: '#comment',
 				},
 			],
-			text: '\ufffc',
+			text: ' ',
 		},
 	},
 	{
@@ -601,7 +561,7 @@ export const spec = [
 					type: '#comment',
 				},
 			],
-			text: '\ufffc',
+			text: ' ',
 		},
 	},
 	{
@@ -823,7 +783,7 @@ export const specWithRegistration = [
 					innerHTML: 'a',
 				},
 			],
-			text: OBJECT_REPLACEMENT_CHARACTER,
+			text: ' ',
 		},
 	},
 	{

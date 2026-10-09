@@ -11,7 +11,6 @@ import {
 	slice,
 	insert,
 	isCollapsed,
-	getTextContent,
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import { speak } from '@wordpress/a11y';
@@ -120,7 +119,7 @@ export function useAutocomplete( {
 		const toInsert = create( { html: renderToString( replacement ) } );
 
 		onChange( insert( record, toInsert, start, end ) );
-		return getTextContent( toInsert );
+		return toInsert.text;
 	}
 
 	function select( option: KeyedOption ) {
@@ -238,7 +237,7 @@ export function useAutocomplete( {
 	// is a potential bottleneck for the editor type metric.
 	const textContent = useMemo( () => {
 		if ( isCollapsed( record ) ) {
-			return getTextContent( slice( record, 0 ) );
+			return slice( record, 0 ).text;
 		}
 		return '';
 	}, [ record ] );
@@ -249,13 +248,7 @@ export function useAutocomplete( {
 
 		function getTextAfterSelection() {
 			return textContent
-				? getTextContent(
-						slice(
-							record,
-							undefined,
-							getTextContent( record ).length
-						)
-					)
+				? slice( record, undefined, record.text.length ).text
 				: '';
 		}
 
