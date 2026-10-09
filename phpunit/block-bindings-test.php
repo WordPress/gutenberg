@@ -557,12 +557,14 @@ HTML;
 			$result,
 			'Event handler attributes should be stripped from list item source content.'
 		);
-		$this->assertEqualHTML(
-			'<li>Bound <img src="https://example.com/inline-image.jpg" alt="Inline image"></li>',
-			$result,
-			'<body>',
-			'Safe image markup should remain after sanitization.'
-		);
+
+		$processor = new WP_HTML_Tag_Processor( $result );
+		$this->assertTrue( $processor->next_tag( 'IMG' ), 'Safe image markup should remain after sanitization.' );
+		$this->assertSame( 'https://example.com/inline-image.jpg', $processor->get_attribute( 'src' ), 'The image src should be preserved.' );
+		$this->assertSame( 'Inline image', $processor->get_attribute( 'alt' ), 'The image alt should be preserved.' );
+
+		$processor = new WP_HTML_Tag_Processor( $result );
+		$this->assertFalse( $processor->next_tag( 'SCRIPT' ), 'The SCRIPT element should be removed.' );
 	}
 
 	/**

@@ -91,12 +91,13 @@ jobs:
                   working-directory: cli
                   cache: false
 
+            # Not `npm exec`: it exports the tool's .npmrc as npm_config_* variables, which override the release branch's own .npmrc.
             - name: Publish development packages to npm ("next" dist-tag)
               if: ${{ github.event.inputs.release_type == 'development' }}
               run: |
                   cd cli
                   npm ci
-                  npm exec --no release-cli -- npm-next --ci --repository-path ../publish
+                  node tools/release/cli.js npm-next --ci --repository-path ../publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -105,7 +106,7 @@ jobs:
               run: |
                   cd cli
                   npm ci
-                  npm exec --no release-cli -- npm-latest --semver minor --ci --repository-path ../publish
+                  node tools/release/cli.js npm-latest --semver minor --ci --repository-path ../publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -114,7 +115,7 @@ jobs:
               run: |
                   cd cli
                   npm ci
-                  npm exec --no release-cli -- npm-bugfix --ci --repository-path ../publish
+                  node tools/release/cli.js npm-bugfix --ci --repository-path ../publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -123,7 +124,7 @@ jobs:
               run: |
                   cd cli
                   npm ci
-                  npm exec --no release-cli -- npm-wp --wp-version "$WP_VERSION" --ci --repository-path ../publish
+                  node tools/release/cli.js npm-wp --wp-version "$WP_VERSION" --ci --repository-path ../publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
                   WP_VERSION: ${{ github.event.inputs.wp_version }}
