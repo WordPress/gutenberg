@@ -5,11 +5,11 @@ import type { RichTextFormatList, RichTextValue } from './types';
  * Efficiently updates all the formats from `start` (including) until `end`
  * (excluding) with the active formats. Mutates `value`.
  *
- * @param $1         Named paramentes.
- * @param $1.value   Value te update.
- * @param $1.start   Index to update from.
- * @param $1.end     Index to update until.
- * @param $1.formats Replacement formats.
+ * @param options         Named paramentes.
+ * @param options.value   Value te update.
+ * @param options.start   Index to update from.
+ * @param options.end     Index to update until.
+ * @param options.formats Replacement formats.
  *
  * @return Mutated value.
  */

@@ -218,12 +218,12 @@ export function toDom( {
  * Create an `Element` tree from a Rich Text value and applies the difference to
  * the `Element` tree contained by `current`.
  *
- * @param $1                       Named arguments.
- * @param $1.value                 Value to apply.
- * @param $1.current               The live root node to apply the element tree to.
- * @param [$1.prepareEditableTree] Function to filter editorable formats.
- * @param [$1.__unstableDomOnly]   Only apply elements, no selection.
- * @param [$1.placeholder]         Placeholder text.
+ * @param options                       Named arguments.
+ * @param options.value                 Value to apply.
+ * @param options.current               The live root node to apply the element tree to.
+ * @param [options.prepareEditableTree] Function to filter editorable formats.
+ * @param [options.__unstableDomOnly]   Only apply elements, no selection.
+ * @param [options.placeholder]         Placeholder text.
  */
 export function apply( {
 	value,

@@ -9,9 +9,9 @@ import type { HTMLTreeNode, RichTextValue } from './types';
 /**
  * Create an HTML string from a Rich Text value.
  *
- * @param $1                      Named arguments.
- * @param $1.value                Rich text value.
- * @param [$1.preserveWhiteSpace] Preserves newlines if true.
+ * @param options                      Named arguments.
+ * @param options.value                Rich text value.
+ * @param [options.preserveWhiteSpace] Preserves newlines if true.
  *
  * @return HTML string.
  */

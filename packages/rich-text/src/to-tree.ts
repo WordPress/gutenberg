@@ -34,17 +34,17 @@ function restoreOnAttributes(
  * Converts a format object to information that can be used to create an element
  * from (type, attributes and object).
  *
- * @param $1                        Named parameters.
- * @param $1.type                   The format type.
- * @param $1.tagName                The tag name.
- * @param $1.attributes             The format attributes.
- * @param $1.unregisteredAttributes The unregistered format
- *                                  attributes.
- * @param $1.object                 Whether or not it is an object
- *                                  format.
- * @param $1.boundaryClass          Whether or not to apply a boundary
- *                                  class.
- * @param $1.isEditableTree
+ * @param options                        Named parameters.
+ * @param options.type                   The format type.
+ * @param options.tagName                The tag name.
+ * @param options.attributes             The format attributes.
+ * @param options.unregisteredAttributes The unregistered format
+ *                                       attributes.
+ * @param options.object                 Whether or not it is an object
+ *                                       format.
+ * @param options.boundaryClass          Whether or not to apply a boundary
+ *                                       class.
+ * @param options.isEditableTree
  *
  * @return Information to be used for element creation.
  */

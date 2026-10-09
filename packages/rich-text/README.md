@@ -169,12 +169,12 @@ As you can see, text and formatting are separated. `text` holds the text, includ
 
 _Parameters_
 
-- _$1_ `[{ element?: Element; text?: string; html?: string | RichTextData; range?: Range | null; __unstableIsEditableTree?: boolean; }]`: Optional named arguments.
-- _$1.element_ `[Element]`: Element to create value from.
-- _$1.text_ `[string]`: Text to create value from.
-- _$1.html_ `[string | RichTextData]`: HTML to create value from.
-- _$1.range_ `[Range | null]`: Range to create value from.
-- _$1.\_\_unstableIsEditableTree_ `[boolean]`:
+- _options_ `[{ element?: Element; text?: string; html?: string | RichTextData; range?: Range | null; __unstableIsEditableTree?: boolean; }]`: Optional named arguments.
+- _options.element_ `[Element]`: Element to create value from.
+- _options.text_ `[string]`: Text to create value from.
+- _options.html_ `[string | RichTextData]`: HTML to create value from.
+- _options.range_ `[Range | null]`: Range to create value from.
+- _options.\_\_unstableIsEditableTree_ `[boolean]`:
 
 _Returns_
 
@@ -448,9 +448,9 @@ Create an HTML string from a Rich Text value.
 
 _Parameters_
 
-- _$1_ `{ value: RichTextValue; preserveWhiteSpace?: boolean; }`: Named arguments.
-- _$1.value_ `RichTextValue`: Rich text value.
-- _$1.preserveWhiteSpace_ `[boolean]`: Preserves newlines if true.
+- _options_ `{ value: RichTextValue; preserveWhiteSpace?: boolean; }`: Named arguments.
+- _options.value_ `RichTextValue`: Rich text value.
+- _options.preserveWhiteSpace_ `[boolean]`: Preserves newlines if true.
 
 _Returns_
 
