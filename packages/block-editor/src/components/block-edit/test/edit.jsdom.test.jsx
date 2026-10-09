@@ -1,19 +1,34 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import {
+	getBlockBindingsSource,
+	registerBlockBindingsSource,
 	registerBlockType,
+	unregisterBlockBindingsSource,
 	unregisterBlockType,
 	getBlockTypes,
 } from '@wordpress/blocks';
+import { StrictMode } from '@wordpress/element';
 import Edit from '../edit';
 import { BlockContextProvider } from '../../block-context';
+import { PrivateBlockContext } from '../../block-list/private-block-context';
+import {
+	BlockRefs,
+	getBoundAttributesForCopy,
+} from '../../provider/block-refs-provider';
+import { BlockEditContextProvider, isPreviewModeKey } from '../context';
 
 const noop = () => {};
 
 describe( 'Edit', () => {
 	afterEach( () => {
-		getBlockTypes().forEach( ( block ) => {
-			unregisterBlockType( block.name );
+		act( () => {
+			if ( getBlockBindingsSource( 'testing/copy' ) ) {
+				unregisterBlockBindingsSource( 'testing/copy' );
+			}
+			getBlockTypes().forEach( ( block ) => {
+				unregisterBlockType( block.name );
+			} );
 		} );
 	} );
 
@@ -21,6 +36,222 @@ describe( 'Edit', () => {
 		const { container } = render( <Edit name="core/test-block" /> );
 
 		expect( container ).toBeEmptyDOMElement();
+	} );
+
+	describe( 'bound attributes for copying', () => {
+		const bindings = { content: { source: 'testing/copy' } };
+
+		function registerBoundBlock(
+			getValues = () => ( { content: 'Resolved text' } )
+		) {
+			registerBlockBindingsSource( {
+				name: 'testing/copy',
+				label: 'Copy test',
+				getValues,
+			} );
+			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
+				category: 'text',
+				title: 'Copy test',
+				edit: ( { attributes } ) => <p>{ attributes.content }</p>,
+				save: noop,
+			} );
+		}
+
+		function BoundEdit( {
+			attributesForCopy,
+			attributes,
+			clientId = 'bound-block',
+			bindableAttributes = [ 'content' ],
+			isPreviewMode = false,
+			blockContext = {},
+		} ) {
+			return (
+				<BlockRefs.Provider value={ { attributesForCopy } }>
+					<PrivateBlockContext.Provider
+						value={ { bindableAttributes } }
+					>
+						<BlockEditContextProvider
+							value={ { [ isPreviewModeKey ]: isPreviewMode } }
+						>
+							<BlockContextProvider value={ blockContext }>
+								<Edit
+									name="core/test-block"
+									clientId={ clientId }
+									attributes={ attributes }
+								/>
+							</BlockContextProvider>
+						</BlockEditContextProvider>
+					</PrivateBlockContext.Provider>
+				</BlockRefs.Provider>
+			);
+		}
+
+		it( 'registers the resolved value without changing the stored attributes', () => {
+			registerBoundBlock();
+			const attributesForCopy = new Map();
+			const attributes = { content: '', metadata: { bindings } };
+			const block = { clientId: 'bound-block', attributes };
+			const { unmount } = render(
+				<BoundEdit
+					attributesForCopy={ attributesForCopy }
+					attributes={ attributes }
+				/>
+			);
+
+			expect( screen.getByText( 'Resolved text' ) ).toBeVisible();
+			expect(
+				getBoundAttributesForCopy( block, attributesForCopy )
+			).toEqual( { content: 'Resolved text' } );
+			expect( attributes.content ).toBe( '' );
+			expect( attributes.metadata.bindings ).toBe( bindings );
+			unmount();
+			expect( attributesForCopy.size ).toBe( 0 );
+		} );
+
+		it( 'refreshes the snapshot when the block attributes change', () => {
+			registerBoundBlock();
+			const attributesForCopy = new Map();
+			const originalAttributes = { content: '', metadata: { bindings } };
+			const nextAttributes = { ...originalAttributes, anchor: 'updated' };
+			const { rerender } = render(
+				<BoundEdit
+					attributesForCopy={ attributesForCopy }
+					attributes={ originalAttributes }
+				/>
+			);
+			rerender(
+				<BoundEdit
+					attributesForCopy={ attributesForCopy }
+					attributes={ nextAttributes }
+				/>
+			);
+
+			expect(
+				getBoundAttributesForCopy(
+					{ clientId: 'bound-block', attributes: originalAttributes },
+					attributesForCopy
+				)
+			).toBeUndefined();
+			expect(
+				getBoundAttributesForCopy(
+					{ clientId: 'bound-block', attributes: nextAttributes },
+					attributesForCopy
+				)
+			).toEqual( { content: 'Resolved text' } );
+		} );
+
+		it( 'ignores ambiguous instances and removes only the unmounted instance', () => {
+			registerBoundBlock();
+			const attributesForCopy = new Map();
+			const attributes = { content: '', metadata: { bindings } };
+			const block = { clientId: 'bound-block', attributes };
+			const { unmount: unmountFirst } = render(
+				<BoundEdit
+					attributesForCopy={ attributesForCopy }
+					attributes={ attributes }
+				/>
+			);
+			const { unmount: unmountSecond } = render(
+				<BoundEdit
+					attributesForCopy={ attributesForCopy }
+					attributes={ attributes }
+				/>
+			);
+
+			expect( attributesForCopy.get( block.clientId ).size ).toBe( 2 );
+			expect(
+				getBoundAttributesForCopy( block, attributesForCopy )
+			).toBeUndefined();
+			unmountFirst();
+			expect(
+				getBoundAttributesForCopy( block, attributesForCopy )
+			).toEqual( { content: 'Resolved text' } );
+			unmountSecond();
+			expect( attributesForCopy.size ).toBe( 0 );
+		} );
+
+		it( 'registers a single instance under StrictMode', () => {
+			registerBoundBlock();
+			const attributesForCopy = new Map();
+			const attributes = { content: '', metadata: { bindings } };
+			const { unmount } = render(
+				<StrictMode>
+					<BoundEdit
+						attributesForCopy={ attributesForCopy }
+						attributes={ attributes }
+					/>
+				</StrictMode>
+			);
+
+			expect( attributesForCopy.get( 'bound-block' ).size ).toBe( 1 );
+			unmount();
+			expect( attributesForCopy.size ).toBe( 0 );
+		} );
+
+		it.each( [
+			{ isPreviewMode: true },
+			{ clientId: null },
+			{ clientId: '' },
+			{ attributesForCopy: undefined },
+			{ bindableAttributes: [] },
+			{ blockContext: { queryId: 0 } },
+			{ blockContext: { query: {} } },
+		] )(
+			'does not register an ineligible edit instance (%j)',
+			( props ) => {
+				registerBoundBlock();
+				const attributesForCopy = new Map();
+				const attributes = { content: '', metadata: { bindings } };
+				render(
+					<BoundEdit
+						attributesForCopy={ attributesForCopy }
+						attributes={ attributes }
+						{ ...props }
+					/>
+				);
+
+				expect( attributesForCopy.size ).toBe( 0 );
+			}
+		);
+
+		it( 'does not register bindings to an unknown source', () => {
+			registerBoundBlock();
+			const attributesForCopy = new Map();
+			const attributes = {
+				content: '',
+				metadata: {
+					bindings: { content: { source: 'testing/unknown' } },
+				},
+			};
+			render(
+				<BoundEdit
+					attributesForCopy={ attributesForCopy }
+					attributes={ attributes }
+				/>
+			);
+
+			expect( attributesForCopy.size ).toBe( 0 );
+		} );
+
+		it( 'omits partially resolved attributes', () => {
+			registerBoundBlock( () => ( {} ) );
+			const attributesForCopy = new Map();
+			const attributes = { metadata: { bindings } };
+			render(
+				<BoundEdit
+					attributesForCopy={ attributesForCopy }
+					attributes={ attributes }
+				/>
+			);
+
+			expect(
+				getBoundAttributesForCopy(
+					{ clientId: 'bound-block', attributes },
+					attributesForCopy
+				)
+			).toBeUndefined();
+		} );
 	} );
 
 	it( 'should use edit implementation of block', () => {
