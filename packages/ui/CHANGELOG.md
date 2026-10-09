@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `useEnableWpCompatOverlaySlot`: Mark as recommended for use in a WordPress environment ([#84305](https://github.com/WordPress/gutenberg/pull/84305)).
+
 ## 0.24.0 (2026-10-07)
 
 ### Breaking Changes

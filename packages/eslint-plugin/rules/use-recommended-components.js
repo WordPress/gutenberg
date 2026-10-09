@@ -63,6 +63,7 @@ const ALLOWLIST = {
 			'ValidatedTextareaControl',
 			'ValidityIndicator',
 			'VisuallyHidden',
+			'useEnableWpCompatOverlaySlot',
 			'useKeyboardShortcutProps',
 		],
 		caution: [

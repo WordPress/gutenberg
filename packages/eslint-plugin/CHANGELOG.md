@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `use-recommended-components`: Recommend `useEnableWpCompatOverlaySlot` from `@wordpress/ui` ([#84305](https://github.com/WordPress/gutenberg/pull/84305)).
+
 ## 27.1.0 (2026-10-07)
 
 ### New Features
