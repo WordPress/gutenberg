@@ -1,4 +1,9 @@
-import type { ComponentType, RefAttributes } from 'react';
+import type {
+	Component,
+	ComponentClass,
+	ComponentType,
+	RefCallback,
+} from 'react';
 
 /**
  * An instance that receives the window events it subscribed to.
@@ -24,8 +29,9 @@ export type RefComponent = ComponentType< {
 } >;
 
 /**
- * Wraps a component, returning one that forwards its ref and props.
+ * Wraps a class component, whose instance handles the events, returning one
+ * that forwards its props and a callback ref, the only kind it supports.
  */
 export type WithGlobalEventsHOC = < TProps extends object >(
-	Inner: ComponentType< TProps >
-) => ComponentType< TProps & RefAttributes< unknown > >;
+	Inner: ComponentClass< TProps >
+) => ComponentType< TProps & { ref?: RefCallback< Component< TProps > > } >;
