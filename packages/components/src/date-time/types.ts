@@ -1,4 +1,4 @@
-import type { MinutesInput } from './time-picker/minutes-input';
+import type NumberControl from '../number-control';
 
 export type TimePickerProps = {
 	/**
@@ -71,7 +71,7 @@ export type TimeInputProps = {
 	/**
 	 * The props to pass down to the minutes input.
 	 */
-	minutesProps?: React.ComponentProps< typeof MinutesInput >;
+	minutesProps?: React.ComponentProps< typeof NumberControl >;
 
 	/**
 	 * The label for the time input.

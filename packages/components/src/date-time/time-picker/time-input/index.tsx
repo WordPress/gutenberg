@@ -2,7 +2,6 @@ import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 import NumberControl from '../../../number-control';
-import { MinutesInput } from '../minutes-input';
 import styles from '../style.module.scss';
 import { HStack } from '../../../h-stack';
 import {
@@ -129,11 +128,7 @@ export function TimeInput( {
 					>
 						:
 					</span>
-					<MinutesInput
-						className={ clsx(
-							'components-datetime__time-field-minutes-input', // Unused, for backwards compatibility.
-							minutesProps?.className
-						) }
+					<NumberControl
 						label={ __( 'Minutes' ) }
 						hideLabelFromVision
 						value={ String( value.minutes ).padStart( 2, '0' ) }
@@ -155,6 +150,11 @@ export function TimeInput( {
 							2
 						) }
 						{ ...minutesProps }
+						className={ clsx(
+							styles[ 'minutes-input' ],
+							minutesProps?.className ??
+								'components-datetime__time-field-minutes-input' // Unused, for backwards compatibility.
+						) }
 					/>
 				</div>
 				{ is12Hour && (
