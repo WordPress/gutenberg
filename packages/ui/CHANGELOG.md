@@ -8,7 +8,7 @@
 
 ### Documentation
 
--   Add interactive popup width stories for all applicable form controls and primitives ([#84320](https://github.com/WordPress/gutenberg/pull/84320)).
+-   Add popup width stories for Autocomplete, Combobox, Select, SearchableSelect, and SearchableChipSelect ([#84320](https://github.com/WordPress/gutenberg/pull/84320)).
 
 ## 0.24.0 (2026-10-07)
 

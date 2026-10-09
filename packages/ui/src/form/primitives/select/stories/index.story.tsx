@@ -1,10 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import type { ComponentProps } from 'react';
 import * as Select from '../';
 import {
 	longLabelPopupItems,
 	narrowContainerDecorator,
-	popupWidthControl,
 } from '../../../stories/shared';
 
 const meta: Meta< typeof Select.Root > = {
@@ -511,20 +509,15 @@ export const WithCustomZIndex: Story = {
 /**
  * Use `width` on `Select.Popup` to constrain the popup relative to a narrow anchor.
  */
-export const PopupWidth: StoryObj<
-	ComponentProps< typeof Select.Root > &
-		Pick< ComponentProps< typeof Select.Popup >, 'width' >
-> = {
+export const PopupWidth: Story = {
 	decorators: [ narrowContainerDecorator ],
-	argTypes: { width: popupWidthControl },
 	args: {
 		items: longLabelPopupItems,
-		width: 'sm',
 	},
-	render: ( { width, ...args } ) => (
+	render: ( args ) => (
 		<Select.Root { ...args }>
 			<Select.Trigger aria-label="Label" />
-			<Select.Popup width={ width }>
+			<Select.Popup width="sm">
 				{ longLabelPopupItems.map( ( item ) => (
 					<Select.Item key={ item.value } value={ item }>
 						<Select.ItemLabel>{ item.label }</Select.ItemLabel>

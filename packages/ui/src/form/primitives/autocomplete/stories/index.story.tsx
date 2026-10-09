@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import type { ComponentProps, CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 import { Fragment, useRef, useState } from '@wordpress/element';
 import { search } from '@wordpress/icons';
 import * as Autocomplete from '../index';
@@ -21,7 +21,6 @@ import {
 import {
 	longLabelPopupItems,
 	narrowContainerDecorator,
-	popupWidthControl,
 } from '../../../stories/shared';
 
 const meta: Meta< typeof Autocomplete.Root > = {
@@ -771,20 +770,15 @@ export const Grid: Story = {
 /**
  * Use `width` on `Autocomplete.Popup` to constrain the popup relative to a narrow anchor.
  */
-export const PopupWidth: StoryObj<
-	ComponentProps< typeof Autocomplete.Root > &
-		Pick< ComponentProps< typeof Autocomplete.Popup >, 'width' >
-> = {
+export const PopupWidth: Story = {
 	decorators: [ narrowContainerDecorator ],
-	argTypes: { width: popupWidthControl },
 	args: {
 		items: longLabelPopupItems.map( ( item ) => item.label ),
-		width: 'sm',
 	},
-	render: ( { width, ...args } ) => (
+	render: ( args ) => (
 		<Autocomplete.Root { ...args }>
 			<Autocomplete.Input aria-label="Label" />
-			<Autocomplete.Popup width={ width }>
+			<Autocomplete.Popup width="sm">
 				<Autocomplete.List>
 					<Autocomplete.ListBody>
 						<Autocomplete.Collection>
