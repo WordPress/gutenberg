@@ -4,6 +4,15 @@ export type CommandCategory =
 	'command' | 'view' | 'edit' | 'workflow' | 'action';
 
 /**
+ * The categories `registerCommand` and `registerCommandLoader` keep. Any other
+ * value, including the internal `workflow`, becomes `action`.
+ */
+export type RegisterableCommandCategory = Exclude<
+	CommandCategory,
+	'workflow'
+>;
+
+/**
  * Configuration of a registered command.
  */
 export interface CommandConfig {
@@ -26,7 +35,7 @@ export interface CommandConfig {
 	/**
 	 * Command category.
 	 */
-	category?: CommandCategory;
+	category?: RegisterableCommandCategory;
 	/**
 	 * Command icon.
 	 */
@@ -52,7 +61,7 @@ export interface CommandLoaderHookResult {
 
 export type CommandLoaderHook = ( options: {
 	search: string;
-} ) => CommandLoaderHookResult;
+} ) => CommandLoaderHookResult | undefined;
 
 /**
  * Command loader config.
@@ -69,7 +78,7 @@ export interface CommandLoaderConfig {
 	/**
 	 * Command loader category.
 	 */
-	category?: CommandCategory;
+	category?: RegisterableCommandCategory;
 	/**
 	 * Command loader hook.
 	 */
@@ -87,12 +96,12 @@ export type CommandLoader = Omit< CommandLoaderConfig, 'disabled' >;
 export type Action =
 	| ( Omit< CommandConfig, 'category' > & {
 			type: 'REGISTER_COMMAND';
-			category: CommandCategory;
+			category: RegisterableCommandCategory;
 	  } )
 	| { type: 'UNREGISTER_COMMAND'; name: string }
 	| ( Omit< CommandLoaderConfig, 'category' > & {
 			type: 'REGISTER_COMMAND_LOADER';
-			category: CommandCategory;
+			category: RegisterableCommandCategory;
 	  } )
 	| { type: 'UNREGISTER_COMMAND_LOADER'; name: string }
 	| { type: 'OPEN' }

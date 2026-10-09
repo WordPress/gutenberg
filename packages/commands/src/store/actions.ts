@@ -25,7 +25,7 @@ const REGISTERABLE_CATEGORIES = new Set< CommandCategory >( [
 ] );
 
 /**
- * Configuration of a registered keyboard shortcut.
+ * Configuration of a registered command.
  *
  * @typedef {Object} WPCommandConfig
  *
@@ -34,14 +34,14 @@ const REGISTERABLE_CATEGORIES = new Set< CommandCategory >( [
  * @property {string=}            searchLabel Command search label.
  * @property {string=}            context     Command context.
  * @property {WPCommandCategory=} category    Command category.
- * @property {React.JSX.Element}  icon        Command icon.
+ * @property {React.JSX.Element=} icon        Command icon.
  * @property {Function}           callback    Command callback.
- * @property {boolean}            disabled    Whether to disable the command.
+ * @property {boolean=}           disabled    Whether to disable the command.
  * @property {string[]=}          keywords    Command keywords for search matching.
  */
 
 /**
- * @typedef {(search: string) => WPCommandConfig[]} WPCommandLoaderHook hoo
+ * @typedef {(options: {search: string}) => {commands?: WPCommandConfig[], isLoading?: boolean}|undefined} WPCommandLoaderHook
  */
 
 /**
@@ -53,15 +53,15 @@ const REGISTERABLE_CATEGORIES = new Set< CommandCategory >( [
  * @property {string=}             context  Command loader context.
  * @property {WPCommandCategory=}  category Command loader category.
  * @property {WPCommandLoaderHook} hook     Command loader hook.
- * @property {boolean}             disabled Whether to disable the command loader.
+ * @property {boolean=}            disabled Whether to disable the command loader.
  */
 
 /**
  * Returns an action object used to register a new command.
  *
- * @param {WPCommandConfig} config Command config.
+ * @param config Command config.
  *
- * @return {Object} action.
+ * @return action.
  */
 export function registerCommand( config: CommandConfig ) {
 	let { category } = config;
@@ -81,9 +81,9 @@ export function registerCommand( config: CommandConfig ) {
 /**
  * Returns an action object used to unregister a command.
  *
- * @param {string} name Command name.
+ * @param name Command name.
  *
- * @return {Object} action.
+ * @return action.
  */
 export function unregisterCommand( name: string ) {
 	return {
@@ -95,9 +95,9 @@ export function unregisterCommand( name: string ) {
 /**
  * Register command loader.
  *
- * @param {WPCommandLoaderConfig} config Command loader config.
+ * @param config Command loader config.
  *
- * @return {Object} action.
+ * @return action.
  */
 export function registerCommandLoader( config: CommandLoaderConfig ) {
 	let { category } = config;
@@ -117,9 +117,9 @@ export function registerCommandLoader( config: CommandLoaderConfig ) {
 /**
  * Unregister command loader hook.
  *
- * @param {string} name Command loader name.
+ * @param name Command loader name.
  *
- * @return {Object} action.
+ * @return action.
  */
 export function unregisterCommandLoader( name: string ) {
 	return {
@@ -131,7 +131,7 @@ export function unregisterCommandLoader( name: string ) {
 /**
  * Opens the command palette.
  *
- * @return {Object} action.
+ * @return action.
  */
 export function open() {
 	return {
@@ -142,7 +142,7 @@ export function open() {
 /**
  * Closes the command palette.
  *
- * @return {Object} action.
+ * @return action.
  */
 export function close() {
 	return {
