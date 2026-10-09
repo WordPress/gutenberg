@@ -21,7 +21,7 @@ This README is the entry point for package consumers. It covers how to load desi
 | --- | --- |
 | `@wordpress/theme` | `ThemeProvider` and the generated token scale types, such as `PaddingSize` and `GapSize`. Derive provider props and callback types from the component as shown below. |
 | `@wordpress/theme/design-tokens.css` | Default semantic `--wpds-*` custom properties. Load once per document. |
-| `@wordpress/theme/design-tokens.js` | Default export containing the list of semantic CSS custom property names. It contains names, not token values, and does not load styles. |
+| `@wordpress/theme/design-tokens.js` | Default token-name array, plus `tokens` metadata and `groups` named exports. Does not load styles. |
 | Build plugin subpaths | The four public integrations listed under [Build Plugins](#build-plugins). |
 | Stylelint plugin subpaths | The three public rules listed under [Stylelint Plugins](#stylelint-plugins). |
 
@@ -32,9 +32,41 @@ Runtime APIs supplied by WordPress follow its [backward compatibility policy](ht
 To inspect token names in development tooling:
 
 ```js
-import tokenNames from '@wordpress/theme/design-tokens.js';
+import { tokens } from '@wordpress/theme/design-tokens.js';
 
+const tokenNames = Object.keys( tokens );
 const isKnownToken = tokenNames.includes( '--wpds-dimension-gap-sm' );
+```
+
+To inspect token metadata and default values:
+
+```js
+import { tokens, groups } from '@wordpress/theme/design-tokens.js';
+
+const brand = tokens[ '--wpds-color-background-interactive-brand-strong' ];
+// brand.modes.default.css: '#3858e9'
+// brand.fallback: 'var(--wp-admin-theme-color, #3858e9)'
+
+const borderTokenNames = groups.border;
+```
+
+`tokens` is keyed by semantic CSS custom property name. Each entry has `$description`, `$type`, `group`, `fallback`, and `modes.default`, containing the resolved DTCG `$value` and CSS string `css`. `groups` maps namespaces such as `border`, `color`, and `typography` to token-name arrays.
+
+`modes.default` contains build-time defaults and does not reflect theme overrides. Use CSS custom properties to follow the current theme. `fallback` is the expression used by the build plugins when a token variable is unavailable and can differ from the default value, as shown above.
+
+Literal token types are preserved in TypeScript declarations, allowing narrowing by `$type`.
+
+To build a fallback map for a custom plugin:
+
+```js
+import { tokens } from '@wordpress/theme/design-tokens.js';
+
+const tokenFallbacks = Object.fromEntries(
+	Object.entries( tokens ).map( ( [ name, token ] ) => [
+		name,
+		token.fallback,
+	] )
+);
 ```
 
 ## Design Tokens
