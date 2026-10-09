@@ -164,12 +164,16 @@
 			"gradient": true
 		},
 		"color": {
+			"__experimentalSkipSerialization": [
+				"text",
+				"background",
+				"gradients"
+			],
 			"gradients": true,
 			"link": true,
 			"__experimentalDefaultControls": {
 				"background": true,
-				"text": true,
-				"link": true
+				"text": true
 			}
 		},
 		"spacing": {
