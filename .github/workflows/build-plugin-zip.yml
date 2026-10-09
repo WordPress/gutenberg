@@ -245,6 +245,7 @@ jobs:
               with:
                   node-version-file: '.nvmrc'
                   check-latest: true
+                  package-manager-cache: false
 
             - name: Configure build for wordpress-develop
               if: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
@@ -563,6 +564,7 @@ jobs:
                   node-version-file: 'main/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
                   check-latest: true
+                  package-manager-cache: false
 
             - name: Publish packages to npm ("latest" dist-tag)
               run: |
