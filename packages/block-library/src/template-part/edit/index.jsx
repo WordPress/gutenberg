@@ -13,7 +13,7 @@ import {
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
-	Spinner,
+	Spinner as WCSpinner,
 	Modal,
 	MenuItem,
 	ToolbarButton,
@@ -324,7 +324,7 @@ export default function TemplatePartEdit( {
 				) }
 				{ ! isPlaceholder && ! isResolved && (
 					<TagName { ...blockProps }>
-						<Spinner />
+						<WCSpinner />
 					</TagName>
 				) }
 			</RecursionProvider>

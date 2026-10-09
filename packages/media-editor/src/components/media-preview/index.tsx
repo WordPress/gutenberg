@@ -1,4 +1,4 @@
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useMediaEditorContext } from '../media-editor-provider';
@@ -130,7 +130,7 @@ export default function MediaPreview( props: MediaPreviewProps ) {
 		>
 			{ mediaType.type === 'image' && loadingState === 'loading' && (
 				<div className="media-editor-preview__spinner">
-					<Spinner />
+					<WCSpinner />
 				</div>
 			) }
 			<MediaPreviewContent

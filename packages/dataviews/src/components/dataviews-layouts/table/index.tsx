@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import type { ComponentProps, CSSProperties, ReactElement } from 'react';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
-import { Spinner, Popover } from '@wordpress/components';
+import { Spinner as WCSpinner, Popover } from '@wordpress/components';
 import {
 	useContext,
 	useEffect,
@@ -701,7 +701,7 @@ function ViewTable< Item >( {
 			{ isInfiniteScroll && isLoading && (
 				<div className="dataviews-loading" id={ tableNoticeId }>
 					<p className="dataviews-loading-more">
-						<Spinner />
+						<WCSpinner />
 					</p>
 				</div>
 			) }

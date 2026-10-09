@@ -4,7 +4,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { wordpress } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { Button, Icon, Stack, Text } from '@wordpress/ui';
 import styles from './style.module.css';
 
@@ -92,7 +92,7 @@ export default function SitePreview() {
 						justify="center"
 						className={ styles.loading }
 					>
-						<Spinner />
+						<WCSpinner />
 					</Stack>
 				) }
 				<iframe

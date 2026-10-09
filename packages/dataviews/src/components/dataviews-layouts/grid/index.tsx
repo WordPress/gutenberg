@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Stack } from '@wordpress/ui';
 import type { ViewGridProps } from '../../../types';
@@ -121,7 +121,7 @@ function ViewGrid< Item >( {
 			}
 			{ isInfiniteScroll && isLoading && (
 				<p className="dataviews-loading-more">
-					<Spinner />
+					<WCSpinner />
 				</p>
 			) }
 		</>

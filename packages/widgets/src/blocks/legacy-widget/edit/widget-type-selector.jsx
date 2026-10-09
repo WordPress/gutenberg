@@ -1,5 +1,5 @@
 import {
-	Spinner,
+	Spinner as WCSpinner,
 	SelectControl as WCSelectControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -18,7 +18,7 @@ export default function WidgetTypeSelector( { selectedId, onSelect } ) {
 	}, [] );
 
 	if ( ! widgetTypes ) {
-		return <Spinner />;
+		return <WCSpinner />;
 	}
 
 	if ( widgetTypes.length === 0 ) {

@@ -1,5 +1,10 @@
 import clsx from 'clsx';
-import { Button, Modal, Spinner, SearchControl } from '@wordpress/components';
+import {
+	Button,
+	Modal,
+	Spinner as WCSpinner,
+	SearchControl,
+} from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import {
 	useCallback,
@@ -270,7 +275,7 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 			/>
 			{ isLoading && ! mediaList?.length && (
 				<div className={ `${ baseCssClass }-spinner` }>
-					<Spinner />
+					<WCSpinner />
 				</div>
 			) }
 			{ ! isLoading && ! mediaList?.length && (

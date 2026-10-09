@@ -3,7 +3,7 @@ import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
-	Spinner,
+	Spinner as WCSpinner,
 	Modal,
 	Flex,
 	FlexItem,
@@ -285,7 +285,7 @@ export function MediaPreview( { media, onClick, onDetach, category } ) {
 												{ preview }
 												{ isInserting && (
 													<div className="block-editor-inserter__media-list__item-preview-spinner">
-														<Spinner />
+														<WCSpinner />
 													</div>
 												) }
 											</div>

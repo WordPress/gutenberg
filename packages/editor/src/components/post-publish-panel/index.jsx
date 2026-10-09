@@ -2,7 +2,7 @@ import { __ } from '@wordpress/i18n';
 import { useEffect, useRef } from '@wordpress/element';
 import {
 	Button,
-	Spinner,
+	Spinner as WCSpinner,
 	CheckboxControl as WCCheckboxControl,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -177,7 +177,7 @@ export default function PostPublishPanel( {
 					</PostPublishPanelPostpublish>
 				) }
 				{ isSaving && (
-					<Spinner data-testid="post-publish-panel-spinner" />
+					<WCSpinner data-testid="post-publish-panel-spinner" />
 				) }
 			</div>
 			<div className="editor-post-publish-panel__footer">

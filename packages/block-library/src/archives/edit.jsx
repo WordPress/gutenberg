@@ -1,7 +1,7 @@
 import {
 	ToggleControl,
 	SelectControl as WCSelectControl,
-	Spinner,
+	Spinner as WCSpinner,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -126,7 +126,7 @@ export default function ArchivesEdit( { attributes, setAttributes, name } ) {
 			</InspectorControls>
 			{ status === 'loading' && (
 				<div { ...blockProps }>
-					<Spinner />
+					<WCSpinner />
 				</div>
 			) }
 			{ status === 'error' && (

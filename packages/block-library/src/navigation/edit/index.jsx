@@ -28,7 +28,7 @@ import {
 	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-	Spinner,
+	Spinner as WCSpinner,
 	Notice,
 	ToolbarButton,
 	ToolbarGroup,
@@ -1139,7 +1139,7 @@ function Navigation( {
 					>
 						{ isLoading && ! isHiddenByDefault && (
 							<div className="wp-block-navigation__loading-indicator-container">
-								<Spinner className="wp-block-navigation__loading-indicator" />
+								<WCSpinner className="wp-block-navigation__loading-indicator" />
 							</div>
 						) }
 
