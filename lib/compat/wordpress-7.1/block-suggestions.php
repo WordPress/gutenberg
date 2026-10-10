@@ -493,10 +493,14 @@ function gutenberg_can_suggest_post_meta( $post, $key ) {
  * keeps the walk clear of the bookmark limit however many markers a block
  * holds. Walking tokens rather than matching `<mark>` with a regex means
  * `</mark>`-looking text inside a comment or an attribute value can never be
- * mistaken for a tag. A nesting stack pairs each opener with its own closer; a
- * marker without a closer (malformed or truncated markup) is left in place so
- * its content is never dropped. When markers nest, the outer replacement wins:
- * replacing a span discards every edit already recorded inside it.
+ * mistaken for a tag. A stack of open elements pairs each opener with its own
+ * closer. A marker without a closer (malformed or truncated markup) ends where
+ * a browser would end it - at the closer of an element that encloses it, or at
+ * the end of the block - and only a deletion fails open there: its tag is
+ * removed and its text kept, while an unclosed addition or format change is
+ * removed through that point so pending content and its metadata never
+ * render. When markers nest, the outer replacement wins: replacing a span
+ * discards every edit already recorded inside it.
  *
  * @param string        $block_content Rendered block HTML.
  * @param array         $block         Parsed block. Unused.
@@ -571,16 +575,46 @@ function gutenberg_strip_inline_suggestion_markers( $block_content, $block = arr
 	};
 
 	/*
-	 * Each `<mark>` opener pushes its strip mode (`null` for a mark that is not
-	 * a suggestion marker) so each closer pops the mode of its own opener.
+	 * Closes a suggestion marker. `$closer` is the span of its own `</mark>`,
+	 * or null when the marker was left open and ends implicitly at `$end`.
+	 * Only a deletion fails open: its text is real content, so it is kept and
+	 * only the marker tag goes. An unclosed addition or format change is
+	 * removed through `$end`, since its run is unaccepted content. A closed
+	 * format change whose original cannot be resolved unwraps like a deletion.
 	 */
-	$mark_stack = array();
-	$query      = array( 'tag_closers' => 'visit' );
-	while ( $processor->next_tag( $query ) ) {
-		if ( 'MARK' !== $processor->get_tag() ) {
-			continue;
+	$close = static function ( $marker, $end, $closer ) use ( &$edits, $replace, &$restoring ) {
+		if ( 'del' === $marker['mode'] || ( 'unresolved-format' === $marker['mode'] && null !== $closer ) ) {
+			$edits[] = array( $marker['start'], $marker['start'] + $marker['length'], '' );
+			if ( null !== $closer ) {
+				$edits[] = array( $closer[0], $closer[0] + $closer[1], '' );
+			}
+			return;
 		}
+		$text = '';
+		if ( 'format' === $marker['mode'] && null !== $closer ) {
+			$restoring = true;
+			$text      = gutenberg_strip_inline_suggestion_markers( $marker['original'] );
+			$restoring = false;
+		}
+		$replace( $marker['start'], null === $closer ? $end : $closer[0] + $closer[1], $text );
+	};
 
+	/*
+	 * Open elements, each `[ tag name, suggestion marker or null ]`, so each
+	 * closer pairs with its own opener. A closer also ends every element
+	 * opened after its opener, the way a browser closes a `<mark>` left open
+	 * inside a `<p>` at the `</p>`. As in a browser, a closer does not reach
+	 * past a table cell or the other default scope boundaries, and a closer
+	 * without an opener is ignored. Start tags that implicitly close an open
+	 * element are not modelled: a marker then stays open until a later closer
+	 * or the end of the block, which removes more of an addition, never less.
+	 */
+	$void_elements  = array( 'AREA', 'BASE', 'BASEFONT', 'BGSOUND', 'BR', 'COL', 'EMBED', 'FRAME', 'HR', 'IMG', 'INPUT', 'KEYGEN', 'LINK', 'META', 'PARAM', 'SOURCE', 'TRACK', 'WBR' );
+	$scope_boundary = array( 'APPLET', 'CAPTION', 'HTML', 'MARQUEE', 'OBJECT', 'TABLE', 'TD', 'TEMPLATE', 'TH' );
+	$open_elements  = array();
+	$query          = array( 'tag_closers' => 'visit' );
+	while ( $processor->next_tag( $query ) ) {
+		$tag  = $processor->get_tag();
 		$span = $processor->get_token_span();
 		if ( null === $span ) {
 			// Unreachable while paused on a tag; fail closed rather than
@@ -589,49 +623,69 @@ function gutenberg_strip_inline_suggestion_markers( $block_content, $block = arr
 		}
 
 		if ( $processor->is_tag_closer() ) {
-			$open = array_pop( $mark_stack );
-			if ( null === $open ) {
+			$match = null;
+			for ( $i = count( $open_elements ) - 1; $i >= 0; $i-- ) {
+				if ( $tag === $open_elements[ $i ][0] ) {
+					$match = $i;
+					break;
+				}
+				if ( in_array( $open_elements[ $i ][0], $scope_boundary, true ) ) {
+					break;
+				}
+			}
+			if ( null === $match ) {
 				continue;
 			}
-			if ( 'del' === $open['mode'] ) {
-				$edits[] = array( $open['start'], $open['start'] + $open['length'], '' );
-				$edits[] = array( $span[0], $span[0] + $span[1], '' );
-				continue;
+			while ( count( $open_elements ) > $match + 1 ) {
+				$element = array_pop( $open_elements );
+				if ( null !== $element[1] ) {
+					$close( $element[1], $span[0], null );
+				}
 			}
-			$text = '';
-			if ( 'format' === $open['mode'] ) {
-				$restoring = true;
-				$text      = gutenberg_strip_inline_suggestion_markers( $open['original'] );
-				$restoring = false;
+			$element = array_pop( $open_elements );
+			if ( null !== $element[1] ) {
+				$close( $element[1], $span[0] + $span[1], $span );
 			}
-			$replace( $open['start'], $span[0] + $span[1], $text );
 			continue;
 		}
 
-		if ( ! $processor->has_class( 'wp-suggestion' ) ) {
-			$mark_stack[] = null;
+		if ( in_array( $tag, $void_elements, true ) ) {
+			continue;
+		}
+		if ( 'MARK' !== $tag || ! $processor->has_class( 'wp-suggestion' ) ) {
+			$open_elements[] = array( $tag, null );
 			continue;
 		}
 
 		// An unknown or missing type defaults to deletion (unwrap, keep text)
 		// so a malformed marker never silently drops content.
-		$type  = $processor->get_attribute( 'data-suggestion-type' );
-		$entry = array(
+		$type   = $processor->get_attribute( 'data-suggestion-type' );
+		$marker = array(
 			'mode'   => ( 'add' === $type ) ? 'add' : 'del',
 			'start'  => $span[0],
 			'length' => $span[1],
 		);
 		if ( 'format' === $type ) {
-			$original = gutenberg_get_pending_format_suggestion_html(
+			$original       = gutenberg_get_pending_format_suggestion_html(
 				(int) $processor->get_attribute( 'data-suggestion-id' ),
 				$post_id
 			);
+			$marker['mode'] = 'format';
 			if ( null !== $original ) {
-				$entry['mode']     = 'format';
-				$entry['original'] = $original;
+				$marker['original'] = $original;
+			} else {
+				$marker['mode'] = 'unresolved-format';
 			}
 		}
-		$mark_stack[] = $entry;
+		$open_elements[] = array( $tag, $marker );
+	}
+
+	// Whatever is still open ends with the block.
+	while ( $open_elements ) {
+		$element = array_pop( $open_elements );
+		if ( null !== $element[1] ) {
+			$close( $element[1], strlen( $block_content ), null );
+		}
 	}
 
 	usort(

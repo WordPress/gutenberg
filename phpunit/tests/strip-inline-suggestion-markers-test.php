@@ -138,14 +138,12 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	}
 
 	public function test_unpaired_flagged_opener_leaks_no_sentinel() {
-		// A suggestion opener with no closer can't be paired by the offset
-		// pass; the marker stays (defaulting safe: text kept) but the internal
-		// sentinel must not leak into public output.
-		$html     = '<p><mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add">oops</p>';
+		// An addition with no closer still never shows its text, and the
+		// internal sentinel must not leak into public output.
+		$html     = '<p><mark class="wp-suggestion" data-wp-suggestion-strip="del" data-suggestion-id="1" data-suggestion-type="add">oops</p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
-		$this->assertStringContainsString( 'oops', $stripped );
-		$this->assertStringNotContainsString( 'data-wp-suggestion-strip', $stripped );
+		$this->assertSame( '<p></p>', $stripped );
 	}
 
 	public function test_closer_inside_attribute_of_addition_child_does_not_end_the_addition() {
@@ -217,20 +215,68 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 		$this->assertSame( '<p>xyold</p>', $stripped );
 	}
 
-	public function test_unclosed_addition_keeps_its_content_and_unwraps_a_closed_inner_deletion() {
-		// The `</mark>` closes the inner deletion, leaving the addition without
-		// a closer: its content must never be dropped.
-		$html     = '<p><mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add">a<mark class="wp-suggestion" data-suggestion-id="2" data-suggestion-type="del">b</mark>c</p>';
+	public function test_unclosed_addition_ends_with_its_enclosing_element() {
+		// The `</p>` implicitly closes the addition, as it does in a browser and
+		// in the editor: the pending text up to it is removed, and its metadata
+		// never renders.
+		$html     = '<p>keep <mark class="wp-suggestion" data-suggestion-type="add" data-author="3" data-suggestion-id="1">PENDING</p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
-		$this->assertSame( '<p><mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add">abc</p>', $stripped );
+		$this->assertSame( '<p>keep </p>', $stripped );
+	}
+
+	public function test_addition_left_open_by_a_closed_plain_mark_is_removed() {
+		// The `</mark>` closes the inner plain mark, leaving the addition open.
+		$html     = '<p><mark class="wp-suggestion" data-suggestion-type="add" data-author="3" data-suggestion-id="1">PENDING<mark>x</mark></p>';
+		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
+
+		$this->assertSame( '<p></p>', $stripped );
+	}
+
+	public function test_unclosed_addition_is_removed_with_a_closed_inner_deletion() {
+		// The `</mark>` closes the inner deletion, leaving the addition open.
+		$html     = '<p>x<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add">a<mark class="wp-suggestion" data-suggestion-id="2" data-suggestion-type="del">b</mark>c</p><p>y</p>';
+		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
+
+		$this->assertSame( '<p>x</p><p>y</p>', $stripped );
+	}
+
+	public function test_unclosed_addition_runs_to_the_end_of_the_block() {
+		$html     = 'a<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add">PENDING<span>more';
+		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
+
+		$this->assertSame( 'a', $stripped );
+	}
+
+	public function test_unclosed_addition_is_not_ended_by_a_closer_outside_table_scope() {
+		// A browser ignores `</div>` inside the table cell, so the cell (and
+		// the text after it) stays inside the addition.
+		$html     = '<div>a<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add"><table><tr><td>X</div>Y</td></tr></table></div>';
+		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
+
+		$this->assertSame( '<div>a</div>', $stripped );
+	}
+
+	public function test_unclosed_deletion_keeps_its_text_but_drops_the_marker() {
+		$html     = '<p>a<mark class="wp-suggestion" data-suggestion-type="del" data-author="3" data-suggestion-id="1">kept</p>';
+		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
+
+		$this->assertSame( '<p>akept</p>', $stripped );
+	}
+
+	public function test_unclosed_format_is_removed() {
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_format_note( $post_id, 'orig' );
+		$html    = '<p>a<mark class="wp-suggestion" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>b</strong></p>';
+
+		$this->assertSame( '<p>a</p>', $this->strip_in_post( $post_id, $html ) );
 	}
 
 	public function test_planted_sentinel_on_unclosed_marker_is_removed() {
 		$html     = '<p><mark class="wp-suggestion" data-wp-suggestion-strip="add" data-suggestion-id="1" data-suggestion-type="del">kept</p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
-		$this->assertSame( '<p><mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del">kept</p>', $this->normalize_tag_whitespace( $stripped ) );
+		$this->assertSame( '<p>kept</p>', $stripped );
 	}
 
 	public function test_planted_sentinel_inside_deletion_is_removed() {
@@ -443,15 +489,13 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	public function test_addition_after_999_open_deletions_is_removed_once() {
 		$stripped = gutenberg_strip_inline_suggestion_markers( $this->many_open_deletions_then_addition( 999 ) );
 
-		$this->assertStringNotContainsString( 'PENDING', $stripped );
-		$this->assertSame( 999, substr_count( $stripped, 'Q' ) );
+		$this->assertSame( '<p>' . str_repeat( 'Q', 999 ) . '</p>', $stripped );
 	}
 
 	public function test_addition_after_1000_open_deletions_is_removed_once() {
 		$stripped = gutenberg_strip_inline_suggestion_markers( $this->many_open_deletions_then_addition( 1000 ) );
 
-		$this->assertStringNotContainsString( 'PENDING', $stripped );
-		$this->assertSame( 1000, substr_count( $stripped, 'Q' ) );
+		$this->assertSame( '<p>' . str_repeat( 'Q', 1000 ) . '</p>', $stripped );
 	}
 
 	public function test_filter_is_registered_on_render_block() {
