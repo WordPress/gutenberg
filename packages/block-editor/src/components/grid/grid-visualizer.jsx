@@ -506,7 +506,10 @@ function GridVisualizerDropLayer( {
 function GridDropIndicator( { dropTarget } ) {
 	const { landingPixelRect, overlaps, guides } = dropTarget;
 	return (
-		<div className="block-editor-grid-visualizer__drop-indicator">
+		<div
+			className="block-editor-grid-visualizer__drop-indicator"
+			aria-hidden="true"
+		>
 			<div
 				className="block-editor-grid-visualizer__landing"
 				style={ getPixelRectStyle( landingPixelRect ) }
