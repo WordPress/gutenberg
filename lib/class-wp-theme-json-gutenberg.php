@@ -253,6 +253,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.6.0 Added `background-[image|position|repeat|size]` properties.
 	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`, and
 	 *              `typography.textIndent` properties.
+	 * @since 7.2.0 Added `text-wrap` property.
 	 *
 	 * @var array
 	 */
@@ -320,6 +321,7 @@ class WP_Theme_JSON_Gutenberg {
 		'text-shadow'                       => array( 'typography', 'textShadow' ),
 		'text-transform'                    => array( 'typography', 'textTransform' ),
 		'text-indent'                       => array( 'typography', 'textIndent' ),
+		'text-wrap'                         => array( 'typography', 'textWrap' ),
 		'filter'                            => array( 'filter', 'duotone' ),
 		'box-shadow'                        => array( 'shadow' ),
 		'height'                            => array( 'dimensions', 'height' ),
@@ -550,6 +552,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.6.0 Added `dimensions.aspectRatio`.
 	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`, and
 	 *              `typography.textIndent` properties.
+	 * @since 7.2.0 Added `typography.textWrap`.
 	 * @var array
 	 */
 	const VALID_STYLES = array(
@@ -612,6 +615,7 @@ class WP_Theme_JSON_Gutenberg {
 			'textIndent'     => null,
 			'textShadow'     => null,
 			'textTransform'  => null,
+			'textWrap'       => null,
 			'writingMode'    => null,
 		),
 		'css'        => null,

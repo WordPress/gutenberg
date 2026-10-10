@@ -358,6 +358,12 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					),
 					'path'          => array( 'typography', 'textTransform' ),
 				),
+				'textWrap'       => array(
+					'property_keys' => array(
+						'default' => 'text-wrap',
+					),
+					'path'          => array( 'typography', 'textWrap' ),
+				),
 				'letterSpacing'  => array(
 					'property_keys' => array(
 						'default' => 'letter-spacing',
