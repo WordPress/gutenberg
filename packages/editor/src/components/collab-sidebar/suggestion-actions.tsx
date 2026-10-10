@@ -42,9 +42,13 @@ import {
 	SUGGESTION_TYPE_REPLACEMENT,
 	findSuggestionText,
 	stripSuggestionMarkers,
+	suggestionRelations,
+	suggestionsEmptiedBy,
 } from '../inline-suggestions';
+import { suggestionContextLines } from './suggestion-context';
 
 const EMPTY_ARRAY: Array< string | null > = [];
+const EMPTY_LINES: string[] = [];
 
 const STRUCTURAL_OP_TYPES = new Set( [
 	'block-insert-after',
@@ -164,6 +168,53 @@ export function useSuggestionDecision( thread: any ) {
 		[ payload ]
 	);
 	const isPostSuggestion = postOps.length > 0;
+	/*
+	 * Where this suggestion sits among others in its block - inside
+	 * someone's addition, or holding others' suggestions - and what
+	 * rejecting it would do to them. Derived from the markers on read, like
+	 * the summary text.
+	 */
+	const contextLines = useSelect(
+		( select ) => {
+			const inlineOp = payload?.operations?.find(
+				( op: any ) => op.type === 'inline-suggestion' && op.attribute
+			);
+			if ( ! inlineOp || ! thread?.blockClientId ) {
+				return EMPTY_LINES;
+			}
+			const value = select( blockEditorStore ).getBlockAttributes(
+				thread.blockClientId
+			)?.[ inlineOp.attribute ];
+			const relations = suggestionRelations( value, thread.id );
+			// Decided at all, provisionally or for good.
+			const isDecided = ! isPendingStatus(
+				getSuggestionStatus( thread )
+			);
+			const canEmpty =
+				relations.children.length > 0 &&
+				( inlineOp.suggestionType === SUGGESTION_TYPE_ADDITION ||
+					inlineOp.suggestionType === SUGGESTION_TYPE_REPLACEMENT );
+			const emptiedCount = canEmpty
+				? suggestionsEmptiedBy( value, {
+						id: thread.id,
+						suggestionType: inlineOp.suggestionType,
+						decision: 'reject',
+					} ).length
+				: 0;
+			const { getEntityRecord } = select( coreStore ) as any;
+			const lines = suggestionContextLines( {
+				relations,
+				emptiedCount,
+				nameOf: ( noteId ) =>
+					getEntityRecord( 'root', 'comment', Number( noteId ) )
+						?.author_name || undefined,
+				isResolved: isDecided,
+			} );
+			return lines.length ? lines : EMPTY_LINES;
+		},
+		[ payload, thread ]
+	);
+
 	const decidedBy = Number( thread?.meta?._wp_suggestion_decided_by ) || 0;
 	const { blockExists, hasConflict, postFieldProposed, deciderName } =
 		useSelect(
@@ -327,6 +378,7 @@ export function useSuggestionDecision( thread: any ) {
 		isResolved,
 		isGrouped,
 		isPostSuggestion,
+		contextLines,
 		busy,
 		onApplyClick,
 		onReject,
@@ -624,6 +676,7 @@ export default function SuggestionActions( {
 		presentation,
 		isResolved,
 		isGrouped,
+		contextLines,
 		applyDisabledReason,
 	} = decision;
 	const decisionLabel =
@@ -661,6 +714,15 @@ export default function SuggestionActions( {
 				thread={ thread }
 				operations={ payload.operations }
 			/>
+			{ contextLines.map( ( line ) => (
+				<Text
+					key={ line }
+					variant="body-sm"
+					className="editor-collab-sidebar-panel__suggestion-status editor-collab-sidebar-panel__suggestion-context"
+				>
+					{ line }
+				</Text>
+			) ) }
 			{ ! isResolved && isGrouped && (
 				<Text
 					variant="body-sm"
