@@ -108,8 +108,12 @@ describe( 'getLayoutStyle', () => {
 
 			expect( result ).toBe( expected );
 		} );
-		it( 'should size manual placement grids by their width', () => {
-			const expected = `.my-container { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(1rem, 1fr)); grid-auto-rows: minmax(1rem, 1fr); aspect-ratio: 3 / 2; min-height: 0; }`;
+		it( 'should size manual placement grids by their width and make images cover their cells', () => {
+			const expected =
+				`.my-container { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(1rem, 1fr)); grid-auto-rows: minmax(1rem, 1fr); aspect-ratio: 3 / 2; min-height: 0; }` +
+				`.my-container > .wp-block-image { display: flex; flex-direction: column; }` +
+				`.my-container > .wp-block-image > :is(img, a) { flex: 1 1 0; min-height: 0; }` +
+				`.my-container > .wp-block-image > img,.my-container > .wp-block-image > a > img { width: 100%; height: 100%; object-fit: cover; }`;
 
 			const result = grid.getLayoutStyle( {
 				selector: '.my-container',
@@ -142,6 +146,11 @@ describe( 'getLayoutStyle', () => {
 			} );
 
 			expect( result ).toContain( 'aspect-ratio: 1 / 2' );
+			// Images cover their cells again, in case a wider viewport's
+			// override stopped them.
+			expect( result ).toContain(
+				'.my-container > .wp-block-image > img,.my-container > .wp-block-image > a > img { width: 100%; height: 100%; object-fit: cover; }'
+			);
 		} );
 		it( 'should not output rows for a viewport column count of auto placement grids', () => {
 			const result = grid.getLayoutStyle( {
@@ -177,6 +186,26 @@ describe( 'getLayoutStyle', () => {
 				'grid-template-rows: repeat(2, minmax(1rem, 1fr)); grid-auto-rows: minmax(1rem, 1fr);'
 			);
 			expect( result ).not.toContain( 'aspect-ratio' );
+			expect( result ).not.toContain( '.wp-block-image' );
+		} );
+		it( 'should leave images alone when a viewport changes the column count of manual placement grids with a minimum column width', () => {
+			const result = grid.getLayoutStyle( {
+				selector: '.my-container',
+				layout: {
+					columnCount: 3,
+					rowCount: 2,
+					minimumColumnWidth: '12rem',
+					isManualPlacement: true,
+				},
+				viewportOverrides: { columnCount: 1 },
+				style: {},
+				blockName: 'test-block',
+				hasBlockGapSupport: false,
+				layoutDefinitions: undefined,
+			} );
+
+			expect( result ).not.toContain( 'aspect-ratio' );
+			expect( result ).not.toContain( '.wp-block-image' );
 		} );
 		it( 'should stop sizing manual placement grids by their width when a viewport adds a minimum column width', () => {
 			const result = grid.getLayoutStyle( {
@@ -195,6 +224,10 @@ describe( 'getLayoutStyle', () => {
 
 			expect( result ).toContain(
 				'grid-auto-rows: minmax(1rem, 1fr); aspect-ratio: auto; min-height: auto;'
+			);
+			expect( result ).toContain(
+				'.my-container > .wp-block-image { display: block; }' +
+					'.my-container > .wp-block-image > img,.my-container > .wp-block-image > a > img { width: auto; height: auto; }'
 			);
 		} );
 	} );
