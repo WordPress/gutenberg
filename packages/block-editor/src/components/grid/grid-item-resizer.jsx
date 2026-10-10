@@ -174,9 +174,14 @@ function GridItemResizerInner( {
 						),
 						rowGap
 					);
-					// Grid tracks start at the grid's content box, so measure
-					// the resized box from there.
-					const itemRect = getGridItemPixelRect( blockElement );
+					// Grid tracks start at the grid's content box, so manual
+					// grids measure the resized box from there.
+					const itemRect = isManualGrid
+						? getGridItemPixelRect( blockElement )
+						: {
+								left: blockElement.offsetLeft,
+								top: blockElement.offsetTop,
+							};
 					const rect = new window.DOMRect(
 						itemRect.left + boxElement.offsetLeft,
 						itemRect.top + boxElement.offsetTop,

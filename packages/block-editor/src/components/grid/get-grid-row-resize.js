@@ -4,8 +4,10 @@
  *
  * Dragging the bottom edge adds or removes rows at the bottom, but never rows
  * that a block is in. Dragging the top edge adds or removes rows at the top,
- * and moves every block by the same number of rows so it stays where it is
- * on screen. Rows can only be removed from the top while they are empty.
+ * and moves every block by the same number of rows, so blocks keep their
+ * place relative to each other and to the grid's bottom edge while the grid
+ * grows or shrinks above them. Rows can only be removed from the top while
+ * they are empty.
  *
  * @param {Object}                                       options
  * @param {number}                                       options.rowCount The grid's current number of rows.
