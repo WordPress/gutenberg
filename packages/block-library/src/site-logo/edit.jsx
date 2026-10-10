@@ -35,7 +35,11 @@ import { store as coreStore } from '@wordpress/core-data';
 import { crop, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { MIN_SIZE } from '../image/constants';
-import { MediaControl, MediaControlPreview } from '../utils/media-control';
+import {
+	MediaControlPreview,
+	MediaPanel,
+	MediaPanelItem,
+} from '../utils/media-control';
 import { unlock } from '../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
@@ -440,7 +444,6 @@ export default function LogoEdit( {
 	}, [] );
 	const { getSettings } = useSelect( blockEditorStore );
 	const [ temporaryURL, setTemporaryURL ] = useState();
-	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const { editEntityRecord } = useDispatch( coreStore );
 
@@ -601,54 +604,45 @@ export default function LogoEdit( {
 	const blockProps = useBlockProps( { className: classes } );
 
 	const mediaInspectorPanel = ( canUserEdit || logoUrl ) && (
-		<InspectorControls>
-			<ToolsPanel
-				label={ __( 'Media' ) }
-				dropdownMenuProps={ dropdownMenuProps }
-			>
-				{ ! canUserEdit ? (
-					<div
-						className="block-library-site-logo__inspector-media-replace-container"
-						style={ { gridColumn: '1 / -1' } }
-					>
-						<MediaControlPreview
-							url={ mediaItemData?.source_url }
-							filename={
-								mediaItemData?.media_details?.sizes?.full
-									?.file || mediaItemData?.slug
-							}
-							itemGroupProps={ {
-								isBordered: true,
-								className:
-									'block-library-site-logo__inspector-readonly-logo-preview',
-							} }
-							className="block-library-site-logo__inspector-media-replace-title"
-						/>
-					</div>
-				) : (
-					<ToolsPanelItem
-						hasValue={ () => !! logoUrl }
-						label={ __( 'Logo' ) }
-						isShownByDefault
-					>
-						<MediaControl
-							mediaId={ siteLogoId }
-							mediaUrl={ logoUrl }
-							filename={
-								mediaItemData?.media_details?.sizes?.full
-									?.file || mediaItemData?.slug
-							}
-							allowedTypes={ ALLOWED_MEDIA_TYPES }
-							onSelect={ onSelectLogo }
-							onError={ onUploadError }
-							onReset={ onRemoveLogo }
-							isUploading={ !! temporaryURL }
-							emptyLabel={ __( 'Logo' ) }
-						/>
-					</ToolsPanelItem>
-				) }
-			</ToolsPanel>
-		</InspectorControls>
+		<MediaPanel group="settings">
+			{ ! canUserEdit ? (
+				<div
+					className="block-library-site-logo__inspector-media-replace-container"
+					style={ { gridColumn: '1 / -1' } }
+				>
+					<MediaControlPreview
+						url={ mediaItemData?.source_url }
+						filename={
+							mediaItemData?.media_details?.sizes?.full?.file ||
+							mediaItemData?.slug
+						}
+						itemGroupProps={ {
+							isBordered: true,
+							className:
+								'block-library-site-logo__inspector-readonly-logo-preview',
+						} }
+						className="block-library-site-logo__inspector-media-replace-title"
+					/>
+				</div>
+			) : (
+				<MediaPanelItem
+					label={ __( 'Logo' ) }
+					hasValue={ () => !! logoUrl }
+					mediaId={ siteLogoId }
+					mediaUrl={ logoUrl }
+					filename={
+						mediaItemData?.media_details?.sizes?.full?.file ||
+						mediaItemData?.slug
+					}
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					onSelect={ onSelectLogo }
+					onError={ onUploadError }
+					onReset={ onRemoveLogo }
+					isUploading={ !! temporaryURL }
+					emptyLabel={ __( 'Logo' ) }
+				/>
+			) }
+		</MediaPanel>
 	);
 
 	return (
