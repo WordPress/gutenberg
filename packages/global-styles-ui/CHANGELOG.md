@@ -11,6 +11,7 @@
 ### Enhancements
 
 -   Blocks screen: add the hover, focus, focus-visible and active state controls for the Navigation Link block, which already supports those states in `theme.json` and in the block inspector ([#83451](https://github.com/WordPress/gutenberg/pull/83451)).
+-   Font Library: list the fonts that registered font providers supply, read-only, under each provider's name ([#83127](https://github.com/WordPress/gutenberg/pull/83127)).
 
 ### Internal
 

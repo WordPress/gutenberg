@@ -121,6 +121,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/experimental/rest-api.php';
 
 	require_once __DIR__ . '/experimental/class-gutenberg-hierarchical-sort.php';
+
+	// Font providers.
+	require __DIR__ . '/experimental/font-providers/class-wp-rest-font-providers-controller.php';
 }
 
 require_once __DIR__ . '/remove-core-enqueue-scripts.php';
@@ -153,6 +156,8 @@ require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/script-modules.php';
 require __DIR__ . '/experimental/pages/site-editor.php';
 require __DIR__ . '/experimental/collaboration/meta-box-rtc-compat.php';
+require __DIR__ . '/experimental/font-providers/class-wp-font-provider-registry.php';
+require __DIR__ . '/experimental/font-providers/font-providers.php';
 
 // Experiment defaults, which `gutenberg_get_experiment_default()` reads below.
 require __DIR__ . '/experimental/experiments/react-19.php';
