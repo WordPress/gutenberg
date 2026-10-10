@@ -281,6 +281,7 @@ test.describe( 'Suggestion mode: post fields', () => {
 			await expect( discussion ).toBeEnabled();
 		} );
 	} );
+
 	test.describe( 'excerpt, featured image and slug', () => {
 		let mediaId: number;
 
@@ -456,6 +457,7 @@ test.describe( 'Suggestion mode: post fields', () => {
 			await expect( suggestionThreads( sidebar ) ).toHaveCount( 0 );
 		} );
 	} );
+
 	test.describe( 'terms', () => {
 		let newsId: number;
 		let sportId: number;
@@ -588,6 +590,7 @@ test.describe( 'Suggestion mode: post fields', () => {
 			).toBeHidden();
 		} );
 	} );
+
 	test.describe( 'post meta', () => {
 		test.beforeAll( async ( { requestUtils } ) => {
 			await requestUtils.activatePlugin(
@@ -729,6 +732,88 @@ test.describe( 'Suggestion mode: post fields', () => {
 				}
 			}, postId );
 			expect( status ).toBe( 'rest_invalid_suggestion' );
+		} );
+	} );
+
+	test.describe( 'trash', () => {
+		const TRASH_REFUSED_MESSAGE =
+			"Moving to the trash isn't available while suggesting. Switch to Editing to move it to the trash.";
+
+		test( 'Move to trash is locked while suggesting', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.openDocumentSettingsSidebar();
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			const trashButton = settings.getByRole( 'button', {
+				name: 'Move to trash',
+			} );
+			await expect( trashButton ).toBeEnabled();
+
+			await switchIntent( page, 'Suggesting' );
+			await expect( trashButton ).toBeDisabled();
+			await expect( trashButton ).toHaveAccessibleDescription(
+				TRASH_REFUSED_MESSAGE
+			);
+
+			// The post actions menu does not offer it either.
+			await settings.getByRole( 'button', { name: 'Actions' } ).click();
+			await expect(
+				page.getByRole( 'menuitem', { name: 'Rename…' } )
+			).toBeVisible();
+			await expect(
+				page.getByRole( 'menuitem', { name: 'Trash…' } )
+			).toBeHidden();
+			await page.keyboard.press( 'Escape' );
+
+			await switchIntent( page, 'Editing' );
+			await expect( trashButton ).toBeEnabled();
+		} );
+
+		test( 'trashing the post is refused while suggesting, whatever the path', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			await switchIntent( page, 'Suggesting' );
+
+			for ( const path of [ 'trashPost', 'deleteEntityRecord' ] ) {
+				await page.evaluate(
+					( [ id, via ]: [ number, string ] ) => {
+						const { dispatch } = ( window as any ).wp.data;
+						dispatch( 'core/notices' ).removeAllNotices(
+							'snackbar'
+						);
+						if ( via === 'trashPost' ) {
+							return dispatch( 'core/editor' ).trashPost();
+						}
+						return dispatch( 'core' ).deleteEntityRecord(
+							'postType',
+							'post',
+							id
+						);
+					},
+					[ postId, path ]
+				);
+				await expect(
+					page
+						.locator( '.components-snackbar-list' )
+						.getByText( TRASH_REFUSED_MESSAGE )
+				).toBeVisible();
+			}
+
+			// `status: 'trash'` through the post itself is refused as a status
+			// change.
+			await page.evaluate( () =>
+				( window as any ).wp.data
+					.dispatch( 'core/editor' )
+					.editPost( { status: 'trash' } )
+			);
+			await savePost( page );
+
+			const stored = await readStoredPost( requestUtils, postId );
+			expect( stored.status ).toBe( 'draft' );
 		} );
 	} );
 } );
