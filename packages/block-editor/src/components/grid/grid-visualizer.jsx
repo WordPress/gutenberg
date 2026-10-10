@@ -8,6 +8,7 @@ import {
 } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
 import {
@@ -23,6 +24,7 @@ import {
 	getGridDropTarget,
 	getPixelRectFromGridRect,
 } from './get-grid-drop-target';
+import { getAlignmentGuides } from './get-alignment-guides';
 import { store as blockEditorStore } from '../../store';
 import { useGetNumberOfBlocksBeforeCell } from './use-get-number-of-blocks-before-cell';
 import ButtonBlockAppender from '../button-block-appender';
@@ -279,8 +281,8 @@ function getPixelRectStyle( rect ) {
 
 /**
  * A drop zone covering the whole grid. While a block is dragged over it, it
- * works out which cells the block would land in, and which other blocks those
- * cells overlap.
+ * works out which cells the block would land in, which other blocks those
+ * cells overlap, and which alignment guides to show.
  *
  * @param {Object}                    props
  * @param {string}                    props.gridClientId  Client ID of the grid block.
@@ -347,7 +349,7 @@ function GridVisualizerDropLayer( {
 
 		// Measure the blocks in the grid from the canvas, so that the result
 		// matches what is on screen in every viewport.
-		const siblingRects = [];
+		const siblings = [];
 		let srcSpan = null;
 		let srcPixelRect = null;
 		for ( const child of gridElement.children ) {
@@ -366,7 +368,7 @@ function GridVisualizerDropLayer( {
 				srcPixelRect = pixelRect;
 				continue;
 			}
-			siblingRects.push( rect );
+			siblings.push( { pixelRect, rect } );
 		}
 		const srcLayout = getBlockAttributes( srcClientId )?.style?.layout;
 		const columnSpan = srcSpan?.columnSpan ?? srcLayout?.columnSpan ?? 1;
@@ -413,21 +415,24 @@ function GridVisualizerDropLayer( {
 			return;
 		}
 
-		const overlaps = siblingRects
-			.filter( ( rect ) => rect.intersectsRect( landing ) )
-			.map( ( rect ) =>
+		const overlaps = siblings
+			.filter( ( sibling ) => sibling.rect.intersectsRect( landing ) )
+			.map( ( sibling ) =>
 				getPixelRectFromGridRect(
 					new GridRect( {
 						columnStart: Math.max(
-							rect.columnStart,
+							sibling.rect.columnStart,
 							landing.columnStart
 						),
 						columnEnd: Math.min(
-							rect.columnEnd,
+							sibling.rect.columnEnd,
 							landing.columnEnd
 						),
-						rowStart: Math.max( rect.rowStart, landing.rowStart ),
-						rowEnd: Math.min( rect.rowEnd, landing.rowEnd ),
+						rowStart: Math.max(
+							sibling.rect.rowStart,
+							landing.rowStart
+						),
+						rowEnd: Math.min( sibling.rect.rowEnd, landing.rowEnd ),
 					} ),
 					columnTracks,
 					rowTracks
@@ -435,11 +440,23 @@ function GridVisualizerDropLayer( {
 			)
 			.filter( Boolean );
 
+		const guides = getAlignmentGuides( {
+			target: landingPixelRect,
+			siblings: siblings.map( ( sibling ) => sibling.pixelRect ),
+			container: {
+				left: 0,
+				top: 0,
+				right: columnTracks[ columnTracks.length - 1 ].end,
+				bottom: rowTracks[ rowTracks.length - 1 ].end,
+			},
+		} );
+
 		const target = {
 			srcClientId,
 			landing,
 			landingPixelRect,
 			overlaps,
+			guides,
 		};
 		lastTargetRef.current = target;
 		setDropTarget( target );
@@ -487,7 +504,7 @@ function GridVisualizerDropLayer( {
 }
 
 function GridDropIndicator( { dropTarget } ) {
-	const { landingPixelRect, overlaps } = dropTarget;
+	const { landingPixelRect, overlaps, guides } = dropTarget;
 	return (
 		<div className="block-editor-grid-visualizer__drop-indicator">
 			<div
@@ -500,6 +517,35 @@ function GridDropIndicator( { dropTarget } ) {
 					className="block-editor-grid-visualizer__overlap"
 					style={ getPixelRectStyle( rect ) }
 				/>
+			) ) }
+			{ guides.map( ( guide, index ) => (
+				<div
+					key={ `guide-${ index }` }
+					className={ clsx(
+						'block-editor-grid-visualizer__guide',
+						`is-${ guide.orientation }`,
+						`is-${ guide.kind }`
+					) }
+					style={
+						guide.orientation === 'vertical'
+							? {
+									left: guide.position,
+									top: guide.start,
+									height: guide.end - guide.start,
+								}
+							: {
+									top: guide.position,
+									left: guide.start,
+									width: guide.end - guide.start,
+								}
+					}
+				>
+					{ guide.kind === 'container-center' && (
+						<span className="block-editor-grid-visualizer__guide-label">
+							{ __( 'Center' ) }
+						</span>
+					) }
+				</div>
 			) ) }
 		</div>
 	);

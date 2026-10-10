@@ -76,7 +76,8 @@
 }
 
 .block-editor-grid-visualizer__landing,
-.block-editor-grid-visualizer__overlap {
+.block-editor-grid-visualizer__overlap,
+.block-editor-grid-visualizer__guide {
 	position: absolute;
 }
 
@@ -90,6 +91,84 @@
 // a warning tint rather than an error.
 .block-editor-grid-visualizer__overlap {
 	background: repeating-linear-gradient(-45deg, color-mix(in srgb, var(--wp-admin-theme-color) 35%, transparent) 0 $grid-unit-05, transparent $grid-unit-05 $grid-unit-10);
+}
+
+.block-editor-grid-visualizer__guide {
+	background: var(--wp-admin-theme-color);
+
+	&.is-vertical {
+		width: $border-width;
+		margin-left: -0.5px;
+	}
+
+	&.is-horizontal {
+		height: $border-width;
+		margin-top: -0.5px;
+	}
+
+	// Short ticks at both ends of a guide between two blocks.
+	&.is-sibling::before,
+	&.is-sibling::after {
+		content: "";
+		position: absolute;
+		background: inherit;
+	}
+
+	&.is-sibling.is-vertical::before,
+	&.is-sibling.is-vertical::after {
+		left: -2px;
+		width: 5px;
+		height: $border-width;
+	}
+
+	&.is-sibling.is-vertical::before {
+		top: 0;
+	}
+
+	&.is-sibling.is-vertical::after {
+		bottom: 0;
+	}
+
+	&.is-sibling.is-horizontal::before,
+	&.is-sibling.is-horizontal::after {
+		top: -2px;
+		width: $border-width;
+		height: 5px;
+	}
+
+	&.is-sibling.is-horizontal::before {
+		left: 0;
+	}
+
+	&.is-sibling.is-horizontal::after {
+		right: 0;
+	}
+
+	&.is-container-center {
+		background: none;
+
+		&.is-vertical {
+			border-left: $border-width dashed var(--wp-admin-theme-color);
+		}
+
+		&.is-horizontal {
+			border-top: $border-width dashed var(--wp-admin-theme-color);
+		}
+	}
+}
+
+.block-editor-grid-visualizer__guide-label {
+	position: absolute;
+	top: $grid-unit-05;
+	left: $grid-unit-05;
+	padding: 0 $grid-unit-05;
+	border-radius: $radius-x-small;
+	background: var(--wp-admin-theme-color);
+	color: $white;
+	font-family: $default-font;
+	font-size: $helptext-font-size;
+	line-height: $default-line-height;
+	white-space: nowrap;
 }
 
 .block-editor-grid-item-resizer {
