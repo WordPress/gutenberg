@@ -688,19 +688,20 @@ function isTextLike( value: any ): boolean {
  * whole phrase.
  *
  * @param restBase The taxonomy's `rest_base`.
- * @return A `sprintf` format taking the comma-separated term names.
+ * @param names    The comma-separated new term names.
+ * @return The wording.
  */
-function newTermsLabel( restBase: string ): string {
+function describeNewTerms( restBase: string, names: string ): string {
 	switch ( restBase ) {
 		case 'categories':
 			/* translators: %s: comma-separated category names. */
-			return __( 'New category: %s' );
+			return sprintf( __( 'New category: %s' ), names );
 		case 'tags':
 			/* translators: %s: comma-separated tag names. */
-			return __( 'New tag: %s' );
+			return sprintf( __( 'New tag: %s' ), names );
 	}
 	/* translators: %s: comma-separated term names. */
-	return __( 'New term: %s' );
+	return sprintf( __( 'New term: %s' ), names );
 }
 
 /**
@@ -748,8 +749,8 @@ function describePostFieldChange(
 		}
 		if ( created.length ) {
 			parts.push(
-				sprintf(
-					newTermsLabel( op.attribute ),
+				describeNewTerms(
+					op.attribute,
 					created
 						.map( ( term ) => stripTags( String( term.name ) ) )
 						.join( ', ' )
