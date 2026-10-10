@@ -816,4 +816,191 @@ test.describe( 'Suggestion mode: post fields', () => {
 			expect( stored.status ).toBe( 'draft' );
 		} );
 	} );
+
+	test.describe( 'site settings', () => {
+		test.afterEach( async ( { requestUtils } ) => {
+			await requestUtils.updateSiteSettings( {
+				posts_per_page: 10,
+				default_comment_status: 'open',
+			} );
+		} );
+
+		test( 'a site settings edit is refused while suggesting', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			await switchIntent( page, 'Suggesting' );
+
+			await page.evaluate( () =>
+				( window as any ).wp.data
+					.dispatch( 'core' )
+					.editEntityRecord( 'root', 'site', undefined, {
+						posts_per_page: 3,
+					} )
+			);
+			await expect(
+				page
+					.locator( '.components-snackbar-list' )
+					.getByText( REFUSED_FIELD_MESSAGE )
+			).toBeVisible();
+			expect(
+				await page.evaluate(
+					() =>
+						( window as any ).wp.data
+							.select( 'core' )
+							.getEditedEntityRecord( 'root', 'site' )
+							.posts_per_page
+				)
+			).toBe( 10 );
+
+			// A direct save of the site entity is refused too.
+			await page.evaluate( () =>
+				( window as any ).wp.data
+					.dispatch( 'core' )
+					.saveEntityRecord( 'root', 'site', {
+						default_comment_status: 'closed',
+					} )
+			);
+			const settings = await requestUtils.getSiteSettings();
+			expect( settings.posts_per_page ).toBe( 10 );
+			expect( settings.default_comment_status ).toBe( 'open' );
+		} );
+
+		test.describe( 'in the index template', () => {
+			let blogPage: any;
+
+			test.beforeAll( async ( { requestUtils } ) => {
+				await requestUtils.activateTheme( 'emptytheme' );
+				blogPage = await requestUtils.createPage( {
+					title: 'Blog',
+					status: 'publish',
+				} );
+				await requestUtils.updateSiteSettings( {
+					show_on_front: 'page',
+					page_for_posts: blogPage.id,
+				} );
+			} );
+
+			test.afterAll( async ( { requestUtils } ) => {
+				await requestUtils.updateSiteSettings( {
+					show_on_front: 'posts',
+					page_for_posts: 0,
+				} );
+				await requestUtils.deleteAllPages();
+				await requestUtils.activateTheme( 'twentytwentyone' );
+			} );
+
+			test( 'the site settings rows are read-only while suggesting', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.setPreferences( 'core/edit-post', {
+					welcomeGuideTemplate: false,
+				} );
+				await switchIntent( page, 'Suggesting' );
+				// The template panel is locked while suggesting, so open the
+				// template the way its "Edit template" item does.
+				await page.evaluate( () =>
+					( window as any ).wp.data
+						.select( 'core/editor' )
+						.getEditorSettings()
+						.onNavigateToEntityRecord( {
+							postId: 'emptytheme//index',
+							postType: 'wp_template',
+						} )
+				);
+				await editor.openDocumentSettingsSidebar();
+				const settings = page.getByRole( 'region', {
+					name: 'Editor settings',
+				} );
+				const rows = [
+					settings.getByRole( 'button', {
+						name: 'Change blog title: Blog',
+					} ),
+					settings.getByRole( 'button', {
+						name: 'Change posts per page',
+					} ),
+					settings.getByRole( 'button', {
+						name: 'Change discussion settings',
+					} ),
+				];
+				for ( const row of rows ) {
+					await expect( row ).toBeDisabled();
+					await expect( row ).toHaveAccessibleDescription(
+						LOCKED_FIELD_HINT
+					);
+				}
+
+				// The blog title is the posts page's title, also refused.
+				await page.evaluate(
+					( id ) =>
+						( window as any ).wp.data
+							.dispatch( 'core' )
+							.editEntityRecord( 'postType', 'page', id, {
+								title: 'Latest news',
+							} ),
+					blogPage.id
+				);
+				await expect(
+					page
+						.locator( '.components-snackbar-list' )
+						.getByText( REFUSED_FIELD_MESSAGE )
+				).toBeVisible();
+				expect(
+					await page.evaluate(
+						( id ) =>
+							( window as any ).wp.data
+								.select( 'core' )
+								.getEditedEntityRecord( 'postType', 'page', id )
+								.title,
+						blogPage.id
+					)
+				).toBe( 'Blog' );
+			} );
+
+			test( 'the DataForm summary shows the site settings read-only while suggesting', async ( {
+				admin,
+				editor,
+				page,
+				requestUtils,
+			} ) => {
+				await requestUtils.setGutenbergExperiments( [
+					'gutenberg-suggestion-mode',
+					'gutenberg-dataform-inspector',
+				] );
+				try {
+					await admin.editPost( postId );
+					await editor.setPreferences( 'core/edit-post', {
+						welcomeGuideTemplate: false,
+					} );
+					await switchIntent( page, 'Suggesting' );
+					await page.evaluate( () =>
+						( window as any ).wp.data
+							.select( 'core/editor' )
+							.getEditorSettings()
+							.onNavigateToEntityRecord( {
+								postId: 'emptytheme//index',
+								postType: 'wp_template',
+							} )
+					);
+					await editor.openDocumentSettingsSidebar();
+					const settings = page.getByRole( 'region', {
+						name: 'Editor settings',
+					} );
+					await expect(
+						settings.getByText( 'Posts per page' )
+					).toBeVisible();
+					await expect(
+						settings.getByRole( 'button', {
+							name: /^Edit (Blog title|Posts per page|Discussion)$/,
+						} )
+					).toHaveCount( 0 );
+				} finally {
+					await requestUtils.setGutenbergExperiments( [
+						'gutenberg-suggestion-mode',
+					] );
+				}
+			} );
+		} );
+	} );
 } );
