@@ -498,6 +498,16 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 		$this->assertSame( '<p>' . str_repeat( 'Q', 1000 ) . '</p>', $stripped );
 	}
 
+	public function test_restored_format_run_has_its_note_markers_stripped() {
+		// The note-marker strip has already run on the block by the time the
+		// original is swapped in, so the original needs its own pass.
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_format_note( $post_id, 'a<mark class="wp-note" data-note-id="4">orig</mark>b' );
+		$html    = '<p><mark class="wp-suggestion" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>x</strong></mark></p>';
+
+		$this->assertSame( '<p>aorigb</p>', $this->strip_in_post( $post_id, $html ) );
+	}
+
 	public function test_filter_is_registered_on_render_block() {
 		$this->assertNotFalse(
 			has_filter( 'render_block', 'gutenberg_strip_inline_suggestion_markers' )

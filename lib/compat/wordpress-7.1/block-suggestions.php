@@ -595,6 +595,11 @@ function gutenberg_strip_inline_suggestion_markers( $block_content, $block = arr
 			$restoring = true;
 			$text      = gutenberg_strip_inline_suggestion_markers( $marker['original'] );
 			$restoring = false;
+			// The note-marker strip may already have run on this block, so
+			// the swapped-in original gets its own pass.
+			if ( function_exists( 'gutenberg_strip_inline_note_markers' ) ) {
+				$text = gutenberg_strip_inline_note_markers( $text );
+			}
 		}
 		$replace( $marker['start'], null === $closer ? $end : $closer[0] + $closer[1], $text );
 	};
