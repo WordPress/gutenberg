@@ -37,7 +37,7 @@ function gutenberg_initialize_experiments_settings() {
 				array(
 					'id'          => 'gutenberg-block-rotation',
 					'label'       => __( 'Block rotation', 'gutenberg' ),
-					'description' => __( 'Adds a Rotation control to the Dimensions panel of every block.', 'gutenberg' ),
+					'description' => __( 'Adds a Rotation control to the Dimensions panel of blocks. Blocks that are already rotated stay rotated when this is off.', 'gutenberg' ),
 				),
 			),
 		),
