@@ -57,7 +57,7 @@ describe( 'hasSuggestionMarkers', () => {
 		( type ) => {
 			expect(
 				hasSuggestionMarkers(
-					`<!-- wp:paragraph -->\n<p>Hello <mark class="wp-suggestion" data-suggestion-id="12" data-suggestion-type="${ type }">world</mark></p>\n<!-- /wp:paragraph -->`
+					`<!-- wp:paragraph -->\n<p>Hello <mark class="wp-suggestion-${ type }" data-suggestion-id="12" data-suggestion-type="${ type }">world</mark></p>\n<!-- /wp:paragraph -->`
 				)
 			).toBe( true );
 		}

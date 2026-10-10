@@ -1,35 +1,28 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import {
-	RichTextData,
-	unregisterFormatType,
-	store as richTextStore,
-} from '@wordpress/rich-text';
-import { select } from '@wordpress/data';
+import { RichTextData } from '@wordpress/rich-text';
 import {
 	hasSuggestionMarkers,
 	stripSuggestionMarkers,
 	stripSuggestionMarkersFromAttributes,
 	settleInsertedSuggestionMarkers,
 } from '../strip-markers';
-import { registerSuggestionFormat, SUGGESTION_FORMAT_NAME } from '../format';
-
-const getFormatType = ( name: string ) =>
-	( select( richTextStore as any ) as any ).getFormatType( name );
+import {
+	registerSuggestionFormat,
+	unregisterSuggestionFormats,
+} from '../format';
 
 const del = ( id: number | string, text: string ) =>
-	`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="del">${ text }</mark>`;
+	`<mark class="wp-suggestion-del" data-suggestion-id="${ id }" data-suggestion-type="del">${ text }</mark>`;
 
 const add = ( id: number | string, text: string ) =>
-	`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="add">${ text }</mark>`;
+	`<mark class="wp-suggestion-add" data-suggestion-id="${ id }" data-suggestion-type="add">${ text }</mark>`;
 
 beforeAll( () => {
 	registerSuggestionFormat();
 } );
 
 afterAll( () => {
-	if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-		unregisterFormatType( SUGGESTION_FORMAT_NAME );
-	}
+	unregisterSuggestionFormats();
 } );
 
 describe( 'hasSuggestionMarkers', () => {
@@ -141,7 +134,7 @@ describe( 'settleInsertedSuggestionMarkers', () => {
 		author: number,
 		text: string
 	) =>
-		`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="${ type }" data-author="${ author }">${ text }</mark>`;
+		`<mark class="wp-suggestion-${ type }" data-suggestion-id="${ id }" data-suggestion-type="${ type }" data-author="${ author }">${ text }</mark>`;
 
 	it( "keeps the author's own addition as plain text", () => {
 		const { value, ids } = settleInsertedSuggestionMarkers(

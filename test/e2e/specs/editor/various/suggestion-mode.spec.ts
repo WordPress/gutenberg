@@ -5,7 +5,7 @@
  * the store interceptor, and the empty-inserted-block guard.
  *
  * The inline "golden paths" (typed/deleted text rendered as in-content
- * `<mark class="wp-suggestion">` markers) live with the inline-suggestions
+ * `<mark class="wp-suggestion-<kind>">` markers) live with the inline-suggestions
  * layer, which owns that rendering.
  */
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
@@ -107,9 +107,7 @@ test.describe( 'Suggestion mode', () => {
 		// already landed while the text was being typed.) Typing routes
 		// through the inline-marker path, which bypasses the overlay, so the
 		// block doesn't take the overlay-only `is-suggestion-pending` bracket.
-		const marker = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="add"]'
-		);
+		const marker = paragraph.locator( 'mark.wp-suggestion-add' );
 		await expect( marker ).toContainText( 'plus suggested' );
 		await expect( marker ).toHaveAttribute( 'data-suggestion-id', /\d/ );
 
@@ -144,9 +142,7 @@ test.describe( 'Suggestion mode', () => {
 
 		// The note is created asynchronously, then the marker is written.
 		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="add"]'
-			)
+			paragraph.locator( 'mark.wp-suggestion-add' )
 		).toContainText( 'world' );
 
 		// The proposed text now lives in content as a marker (Option B), so
@@ -185,9 +181,7 @@ test.describe( 'Suggestion mode', () => {
 		// A single character keeps the marker write to one attribute update.
 		await page.keyboard.type( '!' );
 
-		const marker = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="add"]'
-		);
+		const marker = paragraph.locator( 'mark.wp-suggestion-add' );
 		// The marker is only written once the async note id resolves, so a
 		// populated id means the write (the undo step under test) landed.
 		await expect( marker ).toHaveAttribute( 'data-suggestion-id', /\d/ );
@@ -237,9 +231,7 @@ test.describe( 'Suggestion mode', () => {
 		// typing, so reaching this point means the suggestion already exists —
 		// no separate auto-save wait is needed for the inline path.
 		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="add"]'
-			)
+			paragraph.locator( 'mark.wp-suggestion-add' )
 		).toContainText( 'new text' );
 
 		// Open the notes sidebar and read the suggestion's summary line.
@@ -293,9 +285,7 @@ test.describe( 'Suggestion mode', () => {
 		// `data-suggestion-id` is minted by the note comment created during
 		// typing — its presence proves the suggestion already saved.
 		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="add"]'
-			)
+			paragraph.locator( 'mark.wp-suggestion-add' )
 		).toHaveAttribute( 'data-suggestion-id', /\d/ );
 
 		// Open the notes sidebar and read the suggestion's summary line.
@@ -346,9 +336,7 @@ test.describe( 'Suggestion mode', () => {
 		await page.keyboard.press( 'End' );
 		await page.keyboard.type( 'ADDED' );
 
-		const markers = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="add"]'
-		);
+		const markers = paragraph.locator( 'mark.wp-suggestion-add' );
 		await expect( markers ).toHaveText( [ 'ADDED' ] );
 		const firstId = ( await markers.getAttribute( 'data-suggestion-id' ) )!;
 		expect( firstId ).toMatch( /\d/ );
@@ -493,9 +481,7 @@ test.describe( 'Suggestion mode', () => {
 			await paragraph.click();
 			release();
 
-			const marker = heading.locator(
-				'mark.wp-suggestion[data-suggestion-type="add"]'
-			);
+			const marker = heading.locator( 'mark.wp-suggestion-add' );
 			await expect( marker ).toHaveText( ' A' );
 			await expect( marker ).toHaveAttribute(
 				'data-suggestion-id',
@@ -540,9 +526,7 @@ test.describe( 'Suggestion mode', () => {
 			} );
 			await expect( paragraphs ).toHaveCount( 2 );
 			const head = paragraphs.first();
-			const marker = head.locator(
-				'mark.wp-suggestion[data-suggestion-type="add"]'
-			);
+			const marker = head.locator( 'mark.wp-suggestion-add' );
 			await expect( marker ).toHaveText( ' tail' );
 			await expect( marker ).toHaveAttribute(
 				'data-suggestion-id',
@@ -578,11 +562,9 @@ test.describe( 'Suggestion mode', () => {
 			await page.keyboard.type( 'BC' );
 			release();
 
-			const headingMarker = heading.locator(
-				'mark.wp-suggestion[data-suggestion-type="add"]'
-			);
+			const headingMarker = heading.locator( 'mark.wp-suggestion-add' );
 			const paragraphMarker = paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="add"]'
+				'mark.wp-suggestion-add'
 			);
 			await expect( headingMarker ).toHaveText( 'A' );
 			await expect( paragraphMarker ).toHaveText( 'BC' );
@@ -598,7 +580,9 @@ test.describe( 'Suggestion mode', () => {
 			);
 			// Two notes, one per block.
 			const ids = await editor.canvas
-				.locator( 'mark.wp-suggestion' )
+				.locator(
+					'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)'
+				)
 				.evaluateAll( ( marks: Element[] ) =>
 					marks.map( ( mark ) =>
 						mark.getAttribute( 'data-suggestion-id' )
@@ -632,15 +616,11 @@ test.describe( 'Suggestion mode', () => {
 			release();
 
 			await expect(
-				heading.locator(
-					'mark.wp-suggestion[data-suggestion-type="del"]'
-				)
+				heading.locator( 'mark.wp-suggestion-del' )
 			).toHaveText( 'g' );
 			await expect( heading ).toHaveText( 'Heading' );
 			await expect(
-				paragraph.locator(
-					'mark.wp-suggestion[data-suggestion-type="add"]'
-				)
+				paragraph.locator( 'mark.wp-suggestion-add' )
 			).toHaveText( 'BC' );
 			await expect( paragraph ).toHaveText( 'ParagraphBC' );
 		} );
@@ -672,9 +652,7 @@ test.describe( 'Suggestion mode', () => {
 		await page.keyboard.press( 'Backspace' );
 
 		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="del"]'
-			)
+			paragraph.locator( 'mark.wp-suggestion-del' )
 		).toContainText( 'world' );
 
 		// Deletion keeps the text until the suggestion is accepted.
@@ -704,12 +682,8 @@ test.describe( 'Suggestion mode', () => {
 		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
 		await page.keyboard.type( 'planet' );
 
-		const added = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="add"]'
-		);
-		const deleted = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="del"]'
-		);
+		const added = paragraph.locator( 'mark.wp-suggestion-add' );
+		const deleted = paragraph.locator( 'mark.wp-suggestion-del' );
 		await expect( added ).toHaveText( 'planet' );
 		await expect( deleted ).toHaveText( 'world' );
 		await expect( paragraph ).toHaveText( 'Hello planetworld' );
@@ -757,9 +731,7 @@ test.describe( 'Suggestion mode', () => {
 		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
 		await page.keyboard.type( 'planet' );
 		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="add"]'
-			)
+			paragraph.locator( 'mark.wp-suggestion-add' )
 		).toHaveAttribute( 'data-suggestion-id', /\d/ );
 
 		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
@@ -778,9 +750,11 @@ test.describe( 'Suggestion mode', () => {
 			.click();
 
 		await expect( paragraph ).toHaveText( 'Hello planet' );
-		await expect( paragraph.locator( 'mark.wp-suggestion' ) ).toHaveCount(
-			0
-		);
+		await expect(
+			paragraph.locator(
+				'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)'
+			)
+		).toHaveCount( 0 );
 	} );
 
 	test( 'type-over: rejecting the Replace suggestion restores the text', async ( {
@@ -803,9 +777,7 @@ test.describe( 'Suggestion mode', () => {
 		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
 		await page.keyboard.type( 'planet' );
 		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="add"]'
-			)
+			paragraph.locator( 'mark.wp-suggestion-add' )
 		).toHaveAttribute( 'data-suggestion-id', /\d/ );
 
 		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
@@ -824,9 +796,11 @@ test.describe( 'Suggestion mode', () => {
 			.click();
 
 		await expect( paragraph ).toHaveText( 'Hello world' );
-		await expect( paragraph.locator( 'mark.wp-suggestion' ) ).toHaveCount(
-			0
-		);
+		await expect(
+			paragraph.locator(
+				'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)'
+			)
+		).toHaveCount( 0 );
 	} );
 
 	test( 'Backspace corrects a typo in your own pending addition', async ( {
@@ -850,9 +824,7 @@ test.describe( 'Suggestion mode', () => {
 		await page.keyboard.press( 'End' );
 		await page.keyboard.type( ' wrold' );
 
-		const added = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="add"]'
-		);
+		const added = paragraph.locator( 'mark.wp-suggestion-add' );
 		await expect( added ).toHaveText( ' wrold' );
 		await expect( added ).toHaveAttribute( 'data-suggestion-id', /\d/ );
 
@@ -866,9 +838,7 @@ test.describe( 'Suggestion mode', () => {
 		await expect( added ).toHaveText( ' world' );
 		await expect( paragraph ).toHaveText( 'Hello world' );
 		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="del"]'
-			)
+			paragraph.locator( 'mark.wp-suggestion-del' )
 		).toHaveCount( 0 );
 	} );
 
@@ -894,9 +864,7 @@ test.describe( 'Suggestion mode', () => {
 		await page.keyboard.press( 'End' );
 		await page.keyboard.type( ' wrold' );
 
-		const added = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="add"]'
-		);
+		const added = paragraph.locator( 'mark.wp-suggestion-add' );
 		await expect( added ).toHaveText( ' wrold' );
 		await expect( added ).toHaveAttribute( 'data-suggestion-id', /\d/ );
 		const id = await added.getAttribute( 'data-suggestion-id' );
@@ -914,9 +882,7 @@ test.describe( 'Suggestion mode', () => {
 		await expect( added ).toHaveAttribute( 'data-suggestion-id', id! );
 		await expect( paragraph ).toHaveText( 'Hello world' );
 		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="del"]'
-			)
+			paragraph.locator( 'mark.wp-suggestion-del' )
 		).toHaveCount( 0 );
 
 		// Typing on from the caret keeps growing the same marker.
@@ -971,12 +937,8 @@ test.describe( 'Suggestion mode', () => {
 		await page.keyboard.press( 'End' );
 		await page.keyboard.type( ' wrold' );
 
-		const added = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="add"]'
-		);
-		const deleted = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="del"]'
-		);
+		const added = paragraph.locator( 'mark.wp-suggestion-add' );
+		const deleted = paragraph.locator( 'mark.wp-suggestion-del' );
 		await expect( added ).toHaveText( ' wrold' );
 		await expect( added ).toHaveAttribute( 'data-suggestion-id', /\d/ );
 		const id = await added.getAttribute( 'data-suggestion-id' );
@@ -1024,9 +986,11 @@ test.describe( 'Suggestion mode', () => {
 			.getByRole( 'button', { name: 'Reject suggestion' } )
 			.click();
 		await expect( paragraph ).toHaveText( 'Hello' );
-		await expect( paragraph.locator( 'mark.wp-suggestion' ) ).toHaveCount(
-			0
-		);
+		await expect(
+			paragraph.locator(
+				'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)'
+			)
+		).toHaveCount( 0 );
 	} );
 
 	test( 'type-over inside another author’s pending addition is refused', async ( {
@@ -1049,10 +1013,7 @@ test.describe( 'Suggestion mode', () => {
 		await paragraph().click();
 		await page.keyboard.press( 'End' );
 		await page.keyboard.type( ' wrold' );
-		const added = () =>
-			paragraph().locator(
-				'mark.wp-suggestion[data-suggestion-type="add"]'
-			);
+		const added = () => paragraph().locator( 'mark.wp-suggestion-add' );
 		await expect( added() ).toHaveText( ' wrold' );
 		await expect( added() ).toHaveAttribute( 'data-suggestion-id', /\d/ );
 
@@ -1107,7 +1068,9 @@ test.describe( 'Suggestion mode', () => {
 		await expect(
 			page
 				.locator( '.components-snackbar-list' )
-				.getByText( 'overlaps a pending suggestion' )
+				.getByText(
+					'othertypeover suggested adding this text. Reply to their suggestion to propose a change.'
+				)
 		).toBeVisible();
 		await expect( added() ).toHaveCount( 1 );
 		await expect( added() ).toHaveText( ' wrold' );
@@ -1135,9 +1098,7 @@ test.describe( 'Suggestion mode', () => {
 		await pageUtils.pressKeys( 'shift+ArrowRight', { times: 4 } );
 		await page.keyboard.type( 'mu' );
 
-		const added = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="add"]'
-		);
+		const added = paragraph.locator( 'mark.wp-suggestion-add' );
 		await expect( added ).toHaveText( 'mu' );
 		await expect( added ).toHaveAttribute( 'data-suggestion-id', /\d/ );
 
@@ -1146,9 +1107,7 @@ test.describe( 'Suggestion mode', () => {
 
 		await expect( added ).toHaveText( 'my' );
 		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="del"]'
-			)
+			paragraph.locator( 'mark.wp-suggestion-del' )
 		).toHaveText( 'your' );
 		await expect( paragraph ).toHaveText( 'This is myyour first doc' );
 	} );
@@ -1174,9 +1133,7 @@ test.describe( 'Suggestion mode', () => {
 		await page.keyboard.press( 'Backspace' );
 
 		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="del"]'
-			)
+			paragraph.locator( 'mark.wp-suggestion-del' )
 		).toContainText( 'f' );
 		// The character is kept until accepted.
 		await expect( paragraph ).toContainText( 'abcdef' );
@@ -1205,9 +1162,7 @@ test.describe( 'Suggestion mode', () => {
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.press( 'Backspace' );
 
-		const markers = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="del"]'
-		);
+		const markers = paragraph.locator( 'mark.wp-suggestion-del' );
 		await expect( markers ).toHaveCount( 1 );
 		await expect( markers ).toHaveText( 'def' );
 		// The text is kept until the suggestion is accepted.
@@ -1255,9 +1210,7 @@ test.describe( 'Suggestion mode', () => {
 		await page.keyboard.press( 'Home' );
 		await page.keyboard.press( 'Delete' );
 
-		const markers = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="del"]'
-		);
+		const markers = paragraph.locator( 'mark.wp-suggestion-del' );
 		// Wait for the first press to mint its note before repeating, so the
 		// growth path (not the buffered-repeat path) is what is exercised.
 		await expect( markers ).toHaveText( 'a' );
@@ -1313,9 +1266,7 @@ test.describe( 'Suggestion mode', () => {
 		await page.keyboard.press( 'End' );
 		await page.keyboard.press( 'Backspace' );
 
-		const markers = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="del"]'
-		);
+		const markers = paragraph.locator( 'mark.wp-suggestion-del' );
 		// Wait for the first press to mint its note before repeating.
 		await expect( markers ).toHaveText( 'f' );
 		await page.keyboard.press( 'Backspace' );
@@ -1361,9 +1312,7 @@ test.describe( 'Suggestion mode', () => {
 		await page.keyboard.press( 'End' );
 		await page.keyboard.press( 'Backspace' );
 
-		const markers = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="del"]'
-		);
+		const markers = paragraph.locator( 'mark.wp-suggestion-del' );
 		await expect( markers ).toHaveCount( 1 );
 		await expect( markers ).toHaveText( '👨‍👩‍👧' );
 		// The grapheme survives, whole, until the suggestion is accepted.
@@ -1403,7 +1352,7 @@ test.describe( 'Suggestion mode', () => {
 
 		// The cut becomes a del marker (the text stays, struck through)…
 		await expect(
-			source.locator( 'mark.wp-suggestion[data-suggestion-type="del"]' )
+			source.locator( 'mark.wp-suggestion-del' )
 		).toContainText( 'world' );
 
 		// …and the clipboard received the cut text: pasting it into another
@@ -1415,7 +1364,7 @@ test.describe( 'Suggestion mode', () => {
 		await page.keyboard.press( 'End' );
 		await pageUtils.pressKeys( 'primary+v' );
 		await expect(
-			target.locator( 'mark.wp-suggestion[data-suggestion-type="add"]' )
+			target.locator( 'mark.wp-suggestion-add' )
 		).toContainText( 'world' );
 	} );
 
@@ -1447,9 +1396,7 @@ test.describe( 'Suggestion mode', () => {
 
 		// The note is created asynchronously, then the marker is written over
 		// the reformatted run. Its presence proves the whole flow completed.
-		const marker = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="format"]'
-		);
+		const marker = paragraph.locator( 'mark.wp-suggestion-format' );
 		await expect( marker ).toContainText( 'world' );
 
 		// The proposed bold is preserved inside the marker; the run is shown
@@ -1517,9 +1464,7 @@ test.describe( 'Suggestion mode', () => {
 		await pageUtils.pressKeys( 'primary+b' );
 
 		// The marker proves the un-bold was captured as a format suggestion.
-		const marker = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="format"]'
-		);
+		const marker = paragraph.locator( 'mark.wp-suggestion-format' );
 		await expect( marker ).toContainText( 'world' );
 		await expect( paragraph ).toHaveText( 'Hello world' );
 
@@ -1565,9 +1510,7 @@ test.describe( 'Suggestion mode', () => {
 		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
 		await pageUtils.pressKeys( 'primary+i' );
 
-		const marker = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="format"]'
-		);
+		const marker = paragraph.locator( 'mark.wp-suggestion-format' );
 		await expect( marker ).toContainText( 'world' );
 		// The proposed italic lives inside the marker; the run shows once.
 		await expect( paragraph.locator( 'em' ) ).toContainText( 'world' );
@@ -1598,9 +1541,7 @@ test.describe( 'Suggestion mode', () => {
 			.fill( 'https://example.com/' );
 		await page.keyboard.press( 'Enter' );
 
-		const marker = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="format"]'
-		);
+		const marker = paragraph.locator( 'mark.wp-suggestion-format' );
 		await expect( marker ).toContainText( 'world' );
 		// The proposed link lives inside the marker; the run shows once.
 		await expect(
@@ -1638,9 +1579,7 @@ test.describe( 'Suggestion mode', () => {
 		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
 		await pageUtils.pressKeys( 'primary+b' );
 
-		const marker = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="format"]'
-		);
+		const marker = paragraph.locator( 'mark.wp-suggestion-format' );
 		await expect( marker ).toContainText( 'world' );
 		await expect( paragraph.locator( 'strong' ) ).toContainText( 'world' );
 
@@ -1674,9 +1613,11 @@ test.describe( 'Suggestion mode', () => {
 		// The one marker survives on the canvas, over the same run.
 		await expect( marker ).toContainText( 'world' );
 		await expect( paragraph.locator( 'em' ) ).toContainText( 'world' );
-		await expect( paragraph.locator( 'mark.wp-suggestion' ) ).toHaveCount(
-			1
-		);
+		await expect(
+			paragraph.locator(
+				'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)'
+			)
+		).toHaveCount( 1 );
 		await expect( paragraph ).toHaveText( 'Hello world' );
 
 		// The single note describes both proposed formats.
@@ -1724,9 +1665,7 @@ test.describe( 'Suggestion mode', () => {
 		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
 		await pageUtils.pressKeys( 'primary+b' );
 
-		const marker = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="format"]'
-		);
+		const marker = paragraph.locator( 'mark.wp-suggestion-format' );
 		await expect( marker ).toContainText( 'world' );
 
 		await page.keyboard.press( 'ArrowRight' );
@@ -1741,9 +1680,11 @@ test.describe( 'Suggestion mode', () => {
 		await expect
 			.poll( async () => await editor.getEditedPostContent() )
 			.not.toContain( 'wp-suggestion' );
-		await expect( paragraph.locator( 'mark.wp-suggestion' ) ).toHaveCount(
-			0
-		);
+		await expect(
+			paragraph.locator(
+				'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)'
+			)
+		).toHaveCount( 0 );
 		await expect( paragraph.locator( 'strong' ) ).toHaveCount( 0 );
 		const serialized = await editor.getEditedPostContent();
 		expect( serialized ).not.toContain( 'noteId' );
@@ -1876,7 +1817,9 @@ test.describe( 'Suggestion mode', () => {
 		// The typed text is plain content of the inserted block — NOT wrapped
 		// in an inline add marker (that would be the second suggestion).
 		await expect(
-			newParagraph.locator( 'mark.wp-suggestion' )
+			newParagraph.locator(
+				'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)'
+			)
 		).toHaveCount( 0 );
 
 		// The pre-existing paragraph is untouched.
@@ -1927,9 +1870,7 @@ test.describe( 'Suggestion mode', () => {
 
 		// The pasted run lands as a single add marker, not a raw commit.
 		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="add"]'
-			)
+			paragraph.locator( 'mark.wp-suggestion-add' )
 		).toContainText( 'pasted words' );
 		const serialized = await editor.getEditedPostContent();
 		expect( serialized ).toContain( 'Hello' );
@@ -1961,9 +1902,7 @@ test.describe( 'Suggestion mode', () => {
 		await pageUtils.pressKeys( 'primary+v' );
 
 		// The whole pasted run is one add marker…
-		const marker = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="add"]'
-		);
+		const marker = paragraph.locator( 'mark.wp-suggestion-add' );
 		await expect( marker ).toHaveCount( 1 );
 		await expect( marker ).toContainText( 'rich bold and a link' );
 		// …and the formatting the author pasted is inside it, not flattened.
@@ -2045,9 +1984,7 @@ test.describe( 'Suggestion mode', () => {
 		// puts this assertion safely after the moment the sidebar would have
 		// been switched open.
 		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="add"]'
-			)
+			paragraph.locator( 'mark.wp-suggestion-add' )
 		).toHaveAttribute( 'data-suggestion-id', /\d/ );
 		// The saved note still has to travel back through the notes query
 		// before the floating board would claim the vacated slot, and the
@@ -2107,45 +2044,49 @@ test.describe( 'Suggestion mode', () => {
 		await page.keyboard.press( 'End' );
 		await page.keyboard.type( ' one' );
 		await expect(
-			alpha.locator( 'mark.wp-suggestion[data-suggestion-type="add"]' )
+			alpha.locator( 'mark.wp-suggestion-add' )
 		).toHaveAttribute( 'data-suggestion-id', /\d/ );
 
 		// The typed run must land INSIDE the marker: with the `editableRoot`
 		// editing host, input events target the writing-flow wrapper, and a
 		// mis-resolved target once dropped everything after the first
 		// character (an attribute-only assertion missed it).
-		await expect(
-			alpha.locator( 'mark.wp-suggestion[data-suggestion-type="add"]' )
-		).toHaveText( ' one' );
+		await expect( alpha.locator( 'mark.wp-suggestion-add' ) ).toHaveText(
+			' one'
+		);
 
 		await beta.click();
 		await page.keyboard.press( 'End' );
 		await page.keyboard.type( ' two' );
 		await expect(
-			beta.locator( 'mark.wp-suggestion[data-suggestion-type="add"]' )
+			beta.locator( 'mark.wp-suggestion-add' )
 		).toHaveAttribute( 'data-suggestion-id', /\d/ );
-		await expect(
-			beta.locator( 'mark.wp-suggestion[data-suggestion-type="add"]' )
-		).toHaveText( ' two' );
+		await expect( beta.locator( 'mark.wp-suggestion-add' ) ).toHaveText(
+			' two'
+		);
 
 		// Each marker records who proposed it.
 		const currentUserId = await page.evaluate(
 			() => window.wp.data.select( 'core' ).getCurrentUser().id
 		);
-		await expect( alpha.locator( 'mark.wp-suggestion' ) ).toHaveAttribute(
-			'data-author',
-			String( currentUserId )
-		);
-		await expect( beta.locator( 'mark.wp-suggestion' ) ).toHaveAttribute(
-			'data-author',
-			String( currentUserId )
-		);
+		await expect(
+			alpha.locator(
+				'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)'
+			)
+		).toHaveAttribute( 'data-author', String( currentUserId ) );
+		await expect(
+			beta.locator(
+				'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)'
+			)
+		).toHaveAttribute( 'data-author', String( currentUserId ) );
 
 		// Reassign the second suggestion to another user via REST — the
 		// state a second suggester's note and marker would be saved in.
 		const secondNoteId = Number(
 			await beta
-				.locator( 'mark.wp-suggestion' )
+				.locator(
+					'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)'
+				)
 				.getAttribute( 'data-suggestion-id' )
 		);
 		const secondAuthor = await requestUtils.createUser( {
@@ -2192,11 +2133,15 @@ test.describe( 'Suggestion mode', () => {
 		const alphaMark = editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: 'Alpha' } )
-			.locator( 'mark.wp-suggestion' );
+			.locator(
+				'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)'
+			);
 		const betaMark = editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: 'Beta' } )
-			.locator( 'mark.wp-suggestion' );
+			.locator(
+				'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)'
+			);
 		await expect( alphaMark ).toBeVisible();
 		await expect( betaMark ).toBeVisible();
 		// Each author's expected tint is the deterministic palette pick for

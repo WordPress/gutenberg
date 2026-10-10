@@ -14,7 +14,7 @@ Tracking issue: [#73411](https://github.com/WordPress/gutenberg/issues/73411). T
 | --- | --- | --- | --- |
 | Example | Type, delete, paste, bold a word | Delete a block, add a block, drag a block, paste a URL that becomes an Embed | Change H2 to H3, align center |
 | Captured by | `beforeinput` / `cut` / plain-text `paste` "keyboards", plus a content reconciler for IME, autocorrect, drag-drop and pastes the editor transforms | Store interceptor (`registry.subscribe` diff) | `setAttributes` HOC, plus the store interceptor for direct dispatches |
-| Pending state lives in | A `<mark class="wp-suggestion">` in the block's content | `metadata.suggestion` marker on the block, saved in `post_content` | The proposed values in `metadata.suggestion.after` (a `pending-attributes` marker, or `after` on a structural marker the block already has); the live attributes stay at the baseline |
+| Pending state lives in | A `<mark class="wp-suggestion-add">` (or `-del`, `-format`) in the block's content | `metadata.suggestion` marker on the block, saved in `post_content` | The proposed values in `metadata.suggestion.after` (a `pending-attributes` marker, or `after` on a structural marker the block already has); the live attributes stay at the baseline |
 | Note payload | `inline-suggestion` op | `block-insert-after` / `block-remove` / `block-move` op | `attribute-set` op |
 | Survives reload | Yes | Yes | Yes |
 | Front end before accept | `add` text hidden, `del` text shown, `format` shows the original | Pending insert hidden, pending move shown in its original order | Unchanged: the live attributes were never touched, and `metadata` never reaches front-end markup |
@@ -46,7 +46,7 @@ flowchart TB
     end
 
     subgraph State["Pending state (all in post_content)"]
-        Inline["Inline markers<br/>mark.wp-suggestion in content"]
+        Inline["Inline markers<br/>mark.wp-suggestion-add, -del, -format in content"]
         BlockMarker["Block markers<br/>metadata.suggestion<br/>structural type + proposed after"]
     end
 
@@ -101,7 +101,7 @@ flowchart BT
 | 2 | [#80428](https://github.com/WordPress/gutenberg/pull/80428) Storage, REST, provider | `_wp_suggestion` and `_wp_suggestion_status` meta (64 KB cap, KSES on block snapshots), the 7.1 REST comment controller subclass, the first provider (create, update, apply, reject, schema versioning), an in-memory overlay store, the auto-save loop. No capture yet. #80433 later replaces the overlay and splits the provider | `lib/compat/wordpress-7.1/block-suggestions.php`, `suggestion-mode/provider.ts`, `overlay-context.tsx`, `auto-save.ts` |
 | 3 | [#80429](https://github.com/WordPress/gutenberg/pull/80429) Block-level capture | Store interceptor (attribute drift and structural insert / remove / move, list indent and outdent), the `setAttributes` HOC, pending treatments and move ghosts, revert and undo guards, PHP structural strip and move-order restore | `suggestion-mode/store-interceptor.ts`, `with-suggestion-overlay.tsx`, `block-list/content-suggestion.scss` |
 | 4 | [#80430](https://github.com/WordPress/gutenberg/pull/80430) Inline marker primitive | Format-agnostic rich-text utilities shared with Notes: wrap a range, find a marker by id (the only offset resolver), read caret and selection, reconcile after edits, decorate via annotations | `editor/src/components/inline-markers/` |
-| 5 | [#80431](https://github.com/WordPress/gutenberg/pull/80431) Inline operations | Pure functions: the `core/suggestion` format, create / accept / reject for `add`, `del` and `format`, edit and format planners, word and line delete ranges, marker stripping | `editor/src/components/inline-suggestions/` |
+| 5 | [#80431](https://github.com/WordPress/gutenberg/pull/80431) Inline operations | Pure functions: one marker format per kind (`core/suggestion-add`, `-del`, `-format`) in a canonical nesting order, create / accept / reject for each kind, the overlap matrix and what a decision does to nested suggestions, edit and format planners, word and line delete ranges, marker stripping | `editor/src/components/inline-suggestions/` |
 | 6 | [#80432](https://github.com/WordPress/gutenberg/pull/80432) Review UI | Accept / Reject in the note header, the Docs-style summary ("Add: ...", "Delete: ...", "Change: heading level 2 to 3") with a bounded word diff | `collab-sidebar/suggestion-actions.tsx`, `suggestion-mode/suggestion-summary.tsx` |
 | 7 | [#80433](https://github.com/WordPress/gutenberg/pull/80433) Inline live wiring | The addition, deletion and format keyboards, the content reconciler, author colors and marker reveal, Note garbage collection, post title suggestions, clipboard strip, refusals (post status, publish), List View labels, PHP inline strip, a `core-data` CRDT serializer fix. Also the move of attribute suggestions onto the block marker (the overlay context becomes `suggestion-session.tsx`, auto-save walks markers) and the provider split into `SuggestionStore`, submission and decision hooks, and pure `operations/` | `suggestion-mode/suggestion-*-keyboard.ts`, `suggestion-content-reconciler.ts`, `suggestion-note-gc.ts`, `marker.ts`, `suggestion-session.tsx`, `suggestion-store.ts`, `use-suggestion-*.ts`, `operations/` |
 | 8 | [#82047](https://github.com/WordPress/gutenberg/pull/82047) Docs | This page and [suggestions.md](./suggestions.md) | `docs/explanations/architecture/` |
@@ -153,11 +153,13 @@ Three rules hold the model together:
 2. **Operations describe intent, not diffs.** A payload is a list of declarative ops (`attribute-set`, `block-insert-after`, `block-remove`, `block-move`, `inline-suggestion`, `post-attribute-set`). Accept replays them against the current block, and conflicts are checked per attribute.
 3. **Two status axes.** The comment status (open or resolved discussion) and `_wp_suggestion_status` (pending, applied, rejected) are independent, so a decided suggestion can keep its thread open.
 
-The inline marker serializes as:
+The inline marker serializes as one class per kind:
 
 ```html
-<mark class="wp-suggestion" data-suggestion-id="42" data-suggestion-type="add" data-author="7">new words</mark>
+<mark class="wp-suggestion-add" data-suggestion-id="42" data-suggestion-type="add" data-author="7">new words</mark>
 ```
+
+Markers of different kinds nest, so another author can suggest deleting or reformatting words inside a pending addition; rejecting the addition takes those suggestions with it, accepting it leaves them pending. Two suggestions of one kind on the same text are refused, naming the other author. See [Overlapping suggestions](./suggestions.md#overlapping-suggestions).
 
 ## Data flow: an inline text suggestion
 

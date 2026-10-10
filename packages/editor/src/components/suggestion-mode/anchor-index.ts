@@ -3,7 +3,7 @@
  * that anchor is still there.
  *
  * Every suggestion note is held by something in block content: an inline
- * `<mark class="wp-suggestion">` marker, a structural `metadata.suggestion`
+ * `<mark class="wp-suggestion-<kind>">` marker, a structural `metadata.suggestion`
  * marker on a block, or an attribute proposal in that marker's `after`. The
  * note collector watches anchors disappear; the sidebar asks whether a
  * decided note's anchor is still present, which means the decision did not
@@ -28,9 +28,9 @@ import {
 	parseSuggestionPayload,
 } from './operations';
 import {
-	SUGGESTION_CLASS,
-	SUGGESTION_FORMAT_NAME,
+	SUGGESTION_CLASS_PROBE,
 	SUGGESTION_ID_ATTRIBUTE,
+	isSuggestionFormat,
 } from '../inline-suggestions';
 import { getNoteIdsFromMetadata } from '../collab-sidebar/utils';
 
@@ -144,7 +144,7 @@ export function buildAnchorIndex(
 				for ( const stack of formats ) {
 					for ( const format of stack ?? [] ) {
 						const id =
-							format.type === SUGGESTION_FORMAT_NAME &&
+							isSuggestionFormat( format ) &&
 							format.attributes?.[ SUGGESTION_ID_ATTRIBUTE ];
 						if ( id ) {
 							addId( id );
@@ -153,7 +153,7 @@ export function buildAnchorIndex(
 				}
 			} else if (
 				typeof value === 'string' &&
-				value.includes( SUGGESTION_CLASS )
+				value.includes( SUGGESTION_CLASS_PROBE )
 			) {
 				for ( const match of value.matchAll( SUGGESTION_ID_PATTERN ) ) {
 					addId( match[ 1 ] );

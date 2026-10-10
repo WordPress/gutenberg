@@ -89,7 +89,9 @@ test.describe( 'Suggestion mode: formatting across blocks', () => {
 		// The refusal still holds: no marker anywhere, and the serialized
 		// content is exactly what it was before the keystroke.
 		await expect(
-			editor.canvas.locator( 'mark.wp-suggestion' )
+			editor.canvas.locator(
+				'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)'
+			)
 		).toHaveCount( 0 );
 		const serialized = await editor.getEditedPostContent();
 		expect( serialized ).not.toContain( 'wp-suggestion' );
@@ -116,9 +118,7 @@ test.describe( 'Suggestion mode: formatting across blocks', () => {
 		// the notice is absent, so the absence is measured after the flow has
 		// had its turn rather than before it started.
 		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="format"]'
-			)
+			paragraph.locator( 'mark.wp-suggestion-format' )
 		).toContainText( 'paragraph' );
 		await expect(
 			page

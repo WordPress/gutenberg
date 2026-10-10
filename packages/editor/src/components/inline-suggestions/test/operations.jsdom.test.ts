@@ -30,20 +30,20 @@ import {
 import {
 	registerSuggestionFormat,
 	findSuggestionText,
-	SUGGESTION_FORMAT_NAME,
+	unregisterSuggestionFormats,
 } from '../format';
 
 const getFormatType = ( name: string ) =>
 	( select( richTextStore as any ) as any ).getFormatType( name );
 
 const del = ( id: number | string, text: string ) =>
-	`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="del">${ text }</mark>`;
+	`<mark class="wp-suggestion-del" data-suggestion-id="${ id }" data-suggestion-type="del">${ text }</mark>`;
 
 const add = ( id: number | string, text: string ) =>
-	`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="add">${ text }</mark>`;
+	`<mark class="wp-suggestion-add" data-suggestion-id="${ id }" data-suggestion-type="add">${ text }</mark>`;
 
 const fmt = ( id: number | string, inner: string ) =>
-	`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="format">${ inner }</mark>`;
+	`<mark class="wp-suggestion-format" data-suggestion-id="${ id }" data-suggestion-type="format">${ inner }</mark>`;
 
 describe( 'inline deletion operations', () => {
 	beforeAll( () => {
@@ -51,9 +51,7 @@ describe( 'inline deletion operations', () => {
 	} );
 
 	afterAll( () => {
-		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 	} );
 
 	describe( 'acceptInlineDeletion', () => {
@@ -160,9 +158,7 @@ describe( 'inline addition operations', () => {
 	} );
 
 	afterAll( () => {
-		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 	} );
 
 	describe( 'acceptInlineAddition', () => {
@@ -304,7 +300,7 @@ describe( 'inline addition operations', () => {
 			} );
 			const html = result.toHTMLString();
 			expect( stripTags( html ) ).toBe( 'before NEW after' );
-			expect( html ).toContain( 'class="wp-suggestion"' );
+			expect( html ).toContain( 'class="wp-suggestion-add"' );
 			expect( html ).toContain( 'data-suggestion-id="9"' );
 			expect( html ).toContain( 'data-suggestion-type="add"' );
 		} );
@@ -582,14 +578,12 @@ describe( 'formatsAdditionRunToExtend / valueAdditionRunToExtend', () => {
 	} );
 
 	afterAll( () => {
-		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 	} );
 
 	// A pending `add` marker authored by user 2.
 	const mine = ( id: number | string, text: string ) =>
-		`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="add" data-author="2">${ text }</mark>`;
+		`<mark class="wp-suggestion-add" data-suggestion-id="${ id }" data-suggestion-type="add" data-author="2">${ text }</mark>`;
 
 	it( 'matches a caret inside the author own addition', () => {
 		const value = RichTextData.fromHTMLString(
@@ -654,18 +648,19 @@ describe( 'formatsAdditionRunToExtend / valueAdditionRunToExtend', () => {
 		expect( valueAdditionRunToExtend( value, 2, '2' ) ).toBeNull();
 	} );
 
-	it( 'does not match an own addition with another marker nested inside it', () => {
+	it( 'matches an own addition with another kind of marker nested inside it', () => {
 		// A collaborator proposed deleting part of this author's addition.
-		// Growing would re-apply the outer marker over the run and strip the
-		// nested one, orphaning its note.
+		// Growing re-applies the `add` marker only, which leaves the nested
+		// `del` marker and its note alone.
 		const value = RichTextData.fromHTMLString(
-			`<mark class="wp-suggestion" data-suggestion-id="41" data-suggestion-type="add" data-author="2">out${ del(
+			`<mark class="wp-suggestion-add" data-suggestion-id="41" data-suggestion-type="add" data-author="2">out${ del(
 				42,
 				'in'
 			) }</mark>`
 		);
-		expect( valueAdditionRunToExtend( value, 5, '2' ) ).toBeNull();
-		expect( valueAdditionRunToExtend( value, 3, '2' ) ).toBeNull();
+		const run = { id: '41', start: 0, end: 5 };
+		expect( valueAdditionRunToExtend( value, 5, '2' ) ).toEqual( run );
+		expect( valueAdditionRunToExtend( value, 3, '2' ) ).toEqual( run );
 	} );
 
 	it( 'returns null for unmarked text and non-rich values', () => {
@@ -745,9 +740,7 @@ describe( 'inline format operations', () => {
 		if ( getFormatType( 'test/bold' ) ) {
 			unregisterFormatType( 'test/bold' );
 		}
-		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 	} );
 
 	describe( 'acceptInlineFormat', () => {
@@ -832,9 +825,7 @@ describe( 'suggestion range overlap detection', () => {
 	} );
 
 	afterAll( () => {
-		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 	} );
 
 	describe( 'valueRangeHasSuggestion', () => {
@@ -893,7 +884,7 @@ describe( 'suggestion range overlap detection', () => {
 
 	describe( 'formatsRangeHasSuggestion', () => {
 		it( 'clamps out-of-bounds ranges', () => {
-			const stack = [ { type: SUGGESTION_FORMAT_NAME } ];
+			const stack = [ { type: 'core/suggestion-del' } ];
 			const formats = [ undefined, stack, stack ];
 			expect( formatsRangeHasSuggestion( formats, -5, 1 ) ).toBe( false );
 			expect( formatsRangeHasSuggestion( formats, 1, 99 ) ).toBe( true );
@@ -913,14 +904,12 @@ describe( 'inline replacement operations', () => {
 	} );
 
 	afterAll( () => {
-		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 	} );
 
 	// A type-over: the new text, then the replaced text, under one id.
 	const mine = ( id: number | string, text: string ) =>
-		`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="add" data-author="2">${ text }</mark>`;
+		`<mark class="wp-suggestion-add" data-suggestion-id="${ id }" data-suggestion-type="add" data-author="2">${ text }</mark>`;
 	const replaced = `This is ${ mine( 7, 'my' ) }${ del(
 		7,
 		'your'
@@ -997,13 +986,11 @@ describe( 'reviseOwnAddition', () => {
 	} );
 
 	afterAll( () => {
-		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 	} );
 
 	const addBy = ( id: number, author: number, text: string ) =>
-		`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="add" data-author="${ author }">${ text }</mark>`;
+		`<mark class="wp-suggestion-add" data-suggestion-id="${ id }" data-suggestion-type="add" data-author="${ author }">${ text }</mark>`;
 
 	it( 'replaces a selection inside the addition within the same marker', () => {
 		// "Hello wrold": select "ro" (offsets 7-9) and type "or".
@@ -1142,7 +1129,7 @@ describe( 'reviseOwnAddition', () => {
 
 	it( 'declines straddling a replacement that already owns a deletion', () => {
 		const value = RichTextData.fromHTMLString(
-			`Hi ${ addBy( 4, 1, 'new' ) }<mark class="wp-suggestion" data-suggestion-id="4" data-suggestion-type="del" data-author="1">old</mark>`
+			`Hi ${ addBy( 4, 1, 'new' ) }<mark class="wp-suggestion-del" data-suggestion-id="4" data-suggestion-type="del" data-author="1">old</mark>`
 		);
 		expect(
 			reviseOwnAddition( value, {
@@ -1184,13 +1171,36 @@ describe( 'deleteAcrossOwnMarkers', () => {
 	} );
 
 	afterAll( () => {
-		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 	} );
 
 	const mark = ( id: number, type: string, author: number, text: string ) =>
-		`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="${ type }" data-author="${ author }">${ text }</mark>`;
+		`<mark class="wp-suggestion-${ type }" data-suggestion-id="${ id }" data-suggestion-type="${ type }" data-author="${ author }">${ text }</mark>`;
+
+	it( 'removes an own addition together with another author marker nested in it', () => {
+		// Author 2 proposed deleting "ll" inside author 1's addition. Author
+		// 1 taking the addition back takes the nested deletion with it: it
+		// described text that is no longer proposed.
+		const value = RichTextData.fromHTMLString(
+			`a${ mark(
+				3,
+				'add',
+				1,
+				`he${ mark( 5, 'del', 2, 'll' ) }o`
+			) } world`
+		);
+		const result = deleteAcrossOwnMarkers( value, 0, 7, '1' );
+		expect( result!.value.text ).toBe( 'a world' );
+		expect( result!.deletion ).toEqual( { start: 0, end: 2 } );
+		expect( findSuggestionText( result!.value, 5 ) ).toBe( '' );
+	} );
+
+	it( 'declines another author marker outside an own addition', () => {
+		const value = RichTextData.fromHTMLString(
+			`${ mark( 3, 'add', 1, 'hi' ) }${ mark( 5, 'del', 2, 'there' ) }`
+		);
+		expect( deleteAcrossOwnMarkers( value, 0, 7, '1' ) ).toBeNull();
+	} );
 
 	it( 'removes own additions and keeps own deletions', () => {
 		// "Hi " (add) "Hello" (del) " there" (add).

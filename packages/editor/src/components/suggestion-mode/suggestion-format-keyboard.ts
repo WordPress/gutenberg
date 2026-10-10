@@ -39,7 +39,7 @@ import { store as editorStore } from '../../store';
  *
  * The handler opens a `format` suggestion note (recording the original run as
  * `beforeHTML` so a reject can restore it), then writes the reformatted run
- * wrapped in one `core/suggestion` marker to the live block, bypassing the
+ * wrapped in one `core/suggestion-format` marker to the live block, bypassing the
  * suggest-mode interceptor exactly as the addition keyboard writes its markers.
  * The text is shown once, carrying the proposed formatting (the Google Docs
  * model), never duplicated.

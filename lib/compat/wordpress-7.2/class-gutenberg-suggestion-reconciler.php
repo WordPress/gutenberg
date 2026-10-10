@@ -283,7 +283,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 * @return bool
 		 */
 		private static function may_carry_anchors( $content ) {
-			return '' !== $content && ( false !== strpos( $content, 'wp-suggestion' ) || false !== strpos( $content, '"suggestion":' ) );
+			return '' !== $content && ( false !== strpos( $content, 'wp-suggestion-' ) || false !== strpos( $content, '"suggestion":' ) );
 		}
 
 		/**

@@ -6,7 +6,7 @@
  * Two groups:
  *
  *   1. INVARIANT - the end-state property the migration establishes: a single
- *      block never carries both an inline `<mark class="wp-suggestion">` marker
+ *      block never carries both an inline `<mark class="wp-suggestion-<kind>">` marker
  *      AND an overlay `<del>/<ins class="has-suggestion-*">` diff. This holds
  *      now that Phase 2 moved formatting to markers, including when a formatting
  *      change and a text addition coexist on one block (non-overlapping runs).
@@ -34,7 +34,8 @@
  */
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
-const SUGGESTION_MARK = 'mark.wp-suggestion';
+const SUGGESTION_MARK =
+	'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)';
 const OVERLAY_ADD = 'ins.has-suggestion-addition';
 const OVERLAY_DEL = 'del.has-suggestion-deletion';
 
@@ -510,7 +511,7 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 		expect( serialized ).toContain( 'data-suggestion-type="add"' );
 	} );
 
-	test( 'invariant: a delete straddling an existing marker is declined, not swallowed by an overlay', async ( {
+	test( 'invariant: a delete straddling a formatting change becomes a deletion over it, not an overlay', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -530,49 +531,48 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 		await page.keyboard.press( 'End' );
 		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
 		await pageUtils.pressKeys( 'primary+b' );
-		const formatMarker = paragraph.locator(
-			`${ SUGGESTION_MARK }[data-suggestion-type="format"]`
-		);
+		const formatMarker = paragraph.locator( 'mark.wp-suggestion-format' );
 		await expect( formatMarker ).toHaveAttribute(
 			'data-suggestion-id',
 			/\d/
 		);
 
 		/*
-		 * Select "lo wor" — a range straddling the format marker's boundary —
-		 * and delete it. Neither representation fits: a `del` marker over the
-		 * range would re-attribute half of the existing marker to a new note,
-		 * and the whole-content overlay this used to fall through to renders a
-		 * marker-free snapshot, which hid every marker in the block while the
-		 * earlier note kept describing them (#73411, F-09). The gesture is
-		 * declined instead. (A range crossing only the author's own additions
-		 * and deletions is handled; see the test below.)
+		 * Select "lo wor" - a range straddling the format marker's boundary -
+		 * and delete it. A deletion and a formatting change are different
+		 * marker kinds, so they share the text: the deletion becomes its own
+		 * suggestion, split around the format marker's edge and nested inside
+		 * it, and the formatting change keeps exactly its run. The
+		 * whole-content overlay this used to fall through to would have hidden
+		 * every marker in the block (#73411, F-09).
 		 */
-		await page.keyboard.press( 'Home' );
-		await pageUtils.pressKeys( 'ArrowRight', { times: 3 } );
-		await pageUtils.pressKeys( 'shift+ArrowRight', { times: 6 } );
+		await page.evaluate( () => {
+			const { select, dispatch } = window.wp.data;
+			const [ block ] = select( 'core/block-editor' ).getBlocks();
+			dispatch( 'core/block-editor' ).selectionChange(
+				block.clientId,
+				'content',
+				3,
+				9
+			);
+		} );
 		await page.keyboard.press( 'Backspace' );
 
-		// The user is told why the edit did not take.
+		const deletion = paragraph.locator( 'mark.wp-suggestion-del' );
+		await expect( deletion ).toHaveText( [ 'lo ', 'wor' ] );
 		await expect(
-			page
-				.locator( '.components-snackbar-list' )
-				.getByText( 'overlaps a pending suggestion' )
-		).toBeVisible();
+			paragraph.locator(
+				'mark.wp-suggestion-format mark.wp-suggestion-del'
+			)
+		).toHaveText( 'wor' );
 
 		await deselect( page );
 
-		// Never nested: a marker inside a marker would corrupt both.
-		await expect(
-			paragraph.locator( `${ SUGGESTION_MARK } ${ SUGGESTION_MARK }` )
-		).toHaveCount( 0 );
-		// The invariant: no overlay landed on this block, so the marker is
-		// still the block's rendered state and still the only suggestion on it.
+		// No overlay landed on this block: the markers are its rendered state.
 		await expect( paragraph ).not.toHaveClass( /is-suggestion-pending/ );
 		await expect( paragraph.locator( OVERLAY_ADD ) ).toHaveCount( 0 );
 		await expect( paragraph.locator( OVERLAY_DEL ) ).toHaveCount( 0 );
-		await expect( formatMarker ).toBeVisible();
-		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 1 );
+		await expect( formatMarker ).toHaveText( 'world' );
 		// Nothing was removed, and the earlier suggestion survives verbatim.
 		await expect
 			.poll( () => paragraph.textContent() )
@@ -928,7 +928,7 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 			name: 'core/paragraph',
 			attributes: {
 				content:
-					'Hello <mark class="wp-suggestion" data-suggestion-id="987654" data-suggestion-type="add" data-author="987654">brave new</mark> world',
+					'Hello <mark class="wp-suggestion-add" data-suggestion-id="987654" data-suggestion-type="add" data-author="987654">brave new</mark> world',
 			},
 		} );
 

@@ -14,6 +14,12 @@ import { store as annotationsStore } from '@wordpress/annotations';
  * Callers are responsible for memoizing `ranges` so the effect only re-runs
  * when the resolved ranges actually change.
  *
+ * Ranges are applied in the order given, and the annotations API keeps one
+ * `core/annotation` format per character, so where two ranges overlap the
+ * later one wins. A caller whose ranges can nest orders them itself: the
+ * enclosing ranges first and the one that must stay visible (the selected
+ * thread) last.
+ *
  * @param source Annotation source identifier.
  * @param ranges Ranges to decorate: `{ id, clientId, attributeKey, start, end }`.
  */

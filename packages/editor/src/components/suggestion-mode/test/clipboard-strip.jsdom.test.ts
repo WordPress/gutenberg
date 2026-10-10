@@ -13,14 +13,14 @@ import {
 } from '../clipboard-strip';
 import {
 	registerSuggestionFormat,
-	SUGGESTION_FORMAT_NAME,
+	unregisterSuggestionFormats,
 } from '../../inline-suggestions/format';
 
 const getFormatType = ( name: string ) =>
 	( select( richTextStore as any ) as any ).getFormatType( name );
 
 const marker = ( id: number | string, type: string, text: string ) =>
-	`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="${ type }" data-author="1">${ text }</mark>`;
+	`<mark class="wp-suggestion-${ type }" data-suggestion-id="${ id }" data-suggestion-type="${ type }" data-author="1">${ text }</mark>`;
 
 // The shape of the inline note format, registered by `collab-sidebar`.
 const NOTE_FORMAT_NAME = 'core/note';
@@ -39,7 +39,8 @@ beforeAll( () => {
 } );
 
 afterAll( () => {
-	for ( const name of [ SUGGESTION_FORMAT_NAME, NOTE_FORMAT_NAME ] ) {
+	unregisterSuggestionFormats();
+	for ( const name of [ NOTE_FORMAT_NAME ] ) {
 		if ( getFormatType( name ) ) {
 			unregisterFormatType( name );
 		}

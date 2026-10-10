@@ -10,18 +10,14 @@ import {
 import { render, act } from '@testing-library/react';
 import apiFetch from '@wordpress/api-fetch';
 import { useEffect } from '@wordpress/element';
-import { createRegistry, RegistryProvider, select } from '@wordpress/data';
+import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 // @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { createBlock, registerBlockType } from '@wordpress/blocks';
-import {
-	RichTextData,
-	unregisterFormatType,
-	store as richTextStore,
-} from '@wordpress/rich-text';
+import { RichTextData } from '@wordpress/rich-text';
 import SuggestionContentReconciler, {
 	contentKey,
 } from '../suggestion-content-reconciler';
@@ -31,7 +27,7 @@ import {
 } from '../suggestion-session';
 import {
 	registerSuggestionFormat,
-	SUGGESTION_FORMAT_NAME,
+	unregisterSuggestionFormats,
 } from '../../inline-suggestions';
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
@@ -84,13 +80,7 @@ beforeAll( () => {
 } );
 
 afterAll( () => {
-	if (
-		( select( richTextStore as any ) as any ).getFormatType(
-			SUGGESTION_FORMAT_NAME
-		)
-	) {
-		unregisterFormatType( SUGGESTION_FORMAT_NAME );
-	}
+	unregisterSuggestionFormats();
 } );
 
 beforeEach( () => {
@@ -199,7 +189,7 @@ describe( 'SuggestionContentReconciler', () => {
 
 	it( 'grows an existing marker without opening a note', async () => {
 		const marked =
-			'Hi <mark class="wp-suggestion" data-suggestion-id="9" data-suggestion-type="add">new</mark>';
+			'Hi <mark class="wp-suggestion-add" data-suggestion-id="9" data-suggestion-type="add">new</mark>';
 		const { clientId, getContent } = setup( { content: marked } );
 
 		let accepted;

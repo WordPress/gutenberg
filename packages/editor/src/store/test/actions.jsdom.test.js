@@ -1498,7 +1498,7 @@ describe( 'Editor actions', () => {
 				status: 'draft',
 				title: 'bar',
 				content:
-					'<!-- wp:paragraph --><p>Hello <mark class="wp-suggestion" data-suggestion-id="7" data-suggestion-type="add">there</mark></p><!-- /wp:paragraph -->',
+					'<!-- wp:paragraph --><p>Hello <mark class="wp-suggestion-add" data-suggestion-id="7" data-suggestion-type="add">there</mark></p><!-- /wp:paragraph -->',
 				excerpt: '',
 			};
 			registry
@@ -1641,7 +1641,7 @@ describe( 'Editor actions', () => {
 				status: 'draft',
 				title: 'bar',
 				content:
-					'<!-- wp:paragraph --><p>Hello <mark class="wp-suggestion" data-suggestion-id="7" data-suggestion-type="add">there</mark></p><!-- /wp:paragraph -->',
+					'<!-- wp:paragraph --><p>Hello <mark class="wp-suggestion-add" data-suggestion-id="7" data-suggestion-type="add">there</mark></p><!-- /wp:paragraph -->',
 				excerpt: '',
 			};
 			registry
@@ -1696,7 +1696,7 @@ describe( 'Editor actions', () => {
 				.dispatch( coreStore )
 				.editEntityRecord( 'postType', 'post', postId, {
 					content:
-						'<!-- wp:paragraph --><p>Hello <mark class="wp-suggestion" data-suggestion-id="7" data-suggestion-type="add">there</mark></p><!-- /wp:paragraph -->',
+						'<!-- wp:paragraph --><p>Hello <mark class="wp-suggestion-add" data-suggestion-id="7" data-suggestion-type="add">there</mark></p><!-- /wp:paragraph -->',
 				} );
 
 			// Back to Editing with the suggestion still unresolved. Lifting

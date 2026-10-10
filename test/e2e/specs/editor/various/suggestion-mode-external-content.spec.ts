@@ -232,7 +232,9 @@ test.describe( 'Suggestion mode and externally-supplied content', () => {
 		await suggestionSaved;
 
 		await expect(
-			editor.canvas.locator( 'mark.wp-suggestion' )
+			editor.canvas.locator(
+				'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)'
+			)
 		).toContainText( ' and by me' );
 	} );
 } );

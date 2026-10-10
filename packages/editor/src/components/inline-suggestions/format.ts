@@ -2,6 +2,7 @@ import { __ } from '@wordpress/i18n';
 import { select } from '@wordpress/data';
 import {
 	registerFormatType,
+	unregisterFormatType,
 	store as richTextStore,
 } from '@wordpress/rich-text';
 import {
@@ -9,19 +10,6 @@ import {
 	findMarkerText,
 	getMarkerSelector,
 } from '../inline-markers';
-
-export const SUGGESTION_FORMAT_NAME = 'core/suggestion';
-
-/**
- * Exact class token on a suggestion `<mark>`. Kept distinct from `wp-note` (and
- * from any user/`core/text-color` `<mark>`) so the PHP strip and CSS only ever
- * touch suggestion markers.
- *
- * Mirrored as `SUGGESTION_MARKER_CLASS` in `store/constants.ts`, which the
- * store reads saved content back with and cannot import from here. Those two
- * are the only copies; keep them in step.
- */
-export const SUGGESTION_CLASS = 'wp-suggestion';
 
 /**
  * Annotation source for suggestion decoration. The annotations API turns this
@@ -65,25 +53,253 @@ export const SUGGESTION_TYPE_REPLACEMENT = 'replace';
  */
 export const SUGGESTION_TYPE_FORMAT = 'format';
 
+/** A kind of inline suggestion marker. */
+export type SuggestionMarkerKind = 'add' | 'del' | 'format';
+
 /**
- * Rich-text format for an inline suggestion marker. Serializes as
- * `<mark class="wp-suggestion" data-suggestion-id data-suggestion-type data-author>`.
+ * One rich-text format per marker kind. Rich text keeps one format of a type
+ * per character, so a single shared format would let a second author's marker
+ * over the same text replace the first and take its attribution. With one
+ * format per kind, a deletion or a formatting change can sit inside someone
+ * else's addition. Same-kind overlap is still refused by the editing paths.
  *
- * The `edit` component is intentionally inert here: suggestion markers are
- * created by the suggest-mode "suggest delete/add" actions (a later phase), not
- * from a generic rich-text toolbar entry. Registering the format is what lets
- * rich-text round-trip the marker and the annotations API decorate it.
+ * Each kind serializes as `<mark class="wp-suggestion-<kind>">` plus the
+ * `data-suggestion-id`, `data-suggestion-type` and `data-author` attributes.
+ * The class is authoritative: `data-suggestion-type` is written alongside it
+ * for styling and the a11y decoration. `gutenberg_get_suggestion_marker_kind()`
+ * is the PHP mirror of this contract, and `SUGGESTION_MARKER_CLASSES` in
+ * `store/constants.ts` the store's copy of the class tokens.
  */
-export const suggestionFormat = {
-	title: __( 'Suggestion' ),
-	tagName: 'mark',
-	className: SUGGESTION_CLASS,
-	attributes: {
-		[ SUGGESTION_ID_ATTRIBUTE ]: SUGGESTION_ID_ATTRIBUTE,
-		[ SUGGESTION_TYPE_ATTRIBUTE ]: SUGGESTION_TYPE_ATTRIBUTE,
-		[ SUGGESTION_AUTHOR_ATTRIBUTE ]: SUGGESTION_AUTHOR_ATTRIBUTE,
+export const SUGGESTION_MARKER_KINDS: Record<
+	SuggestionMarkerKind,
+	{ formatName: string; className: string }
+> = {
+	add: {
+		formatName: 'core/suggestion-add',
+		className: 'wp-suggestion-add',
 	},
-	edit: () => null,
+	del: {
+		formatName: 'core/suggestion-del',
+		className: 'wp-suggestion-del',
+	},
+	format: {
+		formatName: 'core/suggestion-format',
+		className: 'wp-suggestion-format',
+	},
+};
+
+/**
+ * Canonical nesting of markers on a character, outermost first: an addition
+ * goes away as a unit, so whatever is nested in it sits inside it; a format
+ * marker sits outside a deletion so a straddling deletion fragments (harmless,
+ * it only unwraps) rather than the format marker, whose original run the
+ * server restores in one piece.
+ */
+export const SUGGESTION_KIND_ORDER: readonly SuggestionMarkerKind[] = [
+	SUGGESTION_TYPE_ADDITION,
+	SUGGESTION_TYPE_FORMAT,
+	SUGGESTION_TYPE_DELETION,
+] as SuggestionMarkerKind[];
+
+/** Every marker format name, in `SUGGESTION_MARKER_KINDS` order. */
+export const SUGGESTION_FORMAT_NAMES: readonly string[] = Object.values(
+	SUGGESTION_MARKER_KINDS
+).map( ( { formatName } ) => formatName );
+
+/** Every marker class token, in `SUGGESTION_MARKER_KINDS` order. */
+export const SUGGESTION_CLASSES: readonly string[] = Object.values(
+	SUGGESTION_MARKER_KINDS
+).map( ( { className } ) => className );
+
+/**
+ * Substring every marker's serialized class carries. Only a cheap pre-filter
+ * before a parse: `wp-suggestion-a11y` and prose about the feature match too.
+ */
+export const SUGGESTION_CLASS_PROBE = 'wp-suggestion-';
+
+const KIND_BY_FORMAT_NAME = new Map< string, SuggestionMarkerKind >(
+	(
+		Object.entries( SUGGESTION_MARKER_KINDS ) as Array<
+			[ SuggestionMarkerKind, { formatName: string } ]
+		>
+	 ).map( ( [ kind, { formatName } ] ) => [ formatName, kind ] )
+);
+
+/**
+ * The marker kind of a rich-text format, or null for any other format.
+ *
+ * @param format Rich-text format.
+ * @return Marker kind.
+ */
+export function suggestionKindOf( format: any ): SuggestionMarkerKind | null {
+	return ( format && KIND_BY_FORMAT_NAME.get( format.type ) ) ?? null;
+}
+
+/**
+ * Whether a rich-text format is an inline suggestion marker of any kind.
+ *
+ * @param format Rich-text format.
+ * @return True for a marker.
+ */
+export function isSuggestionFormat( format: any ): boolean {
+	return suggestionKindOf( format ) !== null;
+}
+
+/**
+ * The rich-text format name of a marker kind.
+ *
+ * @param kind Marker kind.
+ * @return Format name.
+ */
+export function suggestionFormatNameFor( kind: SuggestionMarkerKind ): string {
+	return SUGGESTION_MARKER_KINDS[ kind ].formatName;
+}
+
+/**
+ * The markers in one character's format stack, by kind. A stack holds at most
+ * one marker of each kind.
+ *
+ * @param stack Per-character format stack.
+ * @return Markers present, keyed by kind.
+ */
+export function suggestionMarkersAt(
+	stack: any[] | undefined | null
+): Partial< Record< SuggestionMarkerKind, any > > {
+	const markers: Partial< Record< SuggestionMarkerKind, any > > = {};
+	for ( const format of stack ?? [] ) {
+		const kind = suggestionKindOf( format );
+		if ( kind && ! markers[ kind ] ) {
+			markers[ kind ] = format;
+		}
+	}
+	return markers;
+}
+
+/**
+ * Every marker in one character's format stack, outermost first.
+ *
+ * @param stack Per-character format stack.
+ * @return Marker formats.
+ */
+export function suggestionMarkersIn( stack: any[] | undefined | null ): any[] {
+	return ( stack ?? [] ).filter( isSuggestionFormat );
+}
+
+/**
+ * Whether two marker formats are the same marker: same kind, same attributes.
+ *
+ * @param a Marker format.
+ * @param b Marker format.
+ * @return True when equal.
+ */
+function isSameMarker( a: any, b: any ): boolean {
+	if ( a === b ) {
+		return true;
+	}
+	if ( ! a || ! b || a.type !== b.type ) {
+		return false;
+	}
+	const keysA = Object.keys( a.attributes ?? {} );
+	const keysB = Object.keys( b.attributes ?? {} );
+	return (
+		keysA.length === keysB.length &&
+		keysA.every( ( key ) => a.attributes[ key ] === b.attributes?.[ key ] )
+	);
+}
+
+/**
+ * Reorder every character's format stack so markers come first, in
+ * `SUGGESTION_KIND_ORDER`, followed by the other formats in their existing
+ * order, and let adjacent characters share one object for the same marker.
+ *
+ * `applyFormat` slots a new format in at the shallowest depth its whole range
+ * shares, so the nesting of two markers - and with it the serialized bytes -
+ * would depend on the order they were written in. One fixed order keeps the
+ * HTML identical for the same state (stable round trips and RTC merges) and
+ * never splits a format marker around a nested deletion.
+ *
+ * `toTree` reuses an element while the formats at each depth stay the same
+ * objects, so a marker parsed from two adjacent elements (or written in two
+ * steps) is unified onto one object here; otherwise one run would serialize
+ * as two `<mark>`s depending on how it was produced.
+ *
+ * @param record Rich-text record.
+ * @return The record, reordered; the same record when already canonical.
+ */
+export function canonicalizeSuggestionStack< T extends { formats: any[] } >(
+	record: T
+): T {
+	let formats: any[] | null = null;
+	let previous: any[] = [];
+	for ( let index = 0; index < record.formats.length; index++ ) {
+		const stack = record.formats[ index ];
+		const markers = Array.isArray( stack )
+			? suggestionMarkersIn( stack )
+			: [];
+		if ( ! markers.length ) {
+			previous = [];
+			continue;
+		}
+		markers.sort(
+			( a, b ) =>
+				SUGGESTION_KIND_ORDER.indexOf( suggestionKindOf( a )! ) -
+				SUGGESTION_KIND_ORDER.indexOf( suggestionKindOf( b )! )
+		);
+		const unified = markers.map(
+			( marker ) =>
+				previous.find( ( candidate ) =>
+					isSameMarker( candidate, marker )
+				) ?? marker
+		);
+		previous = unified;
+		const ordered = [
+			...unified,
+			...stack.filter(
+				( format: any ) => ! isSuggestionFormat( format )
+			),
+		];
+		if ( ordered.every( ( format, i ) => format === stack[ i ] ) ) {
+			continue;
+		}
+		formats ??= record.formats.slice();
+		formats[ index ] = ordered;
+	}
+	return formats ? { ...record, formats } : record;
+}
+
+/**
+ * Rich-text format settings for one marker kind.
+ *
+ * The `edit` component is inert here: markers are written by the Suggestion
+ * mode keyboards and the content reconciler, not from a toolbar entry.
+ * Registering the format is what lets rich text round-trip the marker and the
+ * annotations API decorate it.
+ *
+ * @param kind Marker kind.
+ * @return Format settings.
+ */
+function markerFormatSettings( kind: SuggestionMarkerKind ) {
+	return {
+		title: __( 'Suggestion' ),
+		tagName: 'mark',
+		className: SUGGESTION_MARKER_KINDS[ kind ].className,
+		attributes: {
+			[ SUGGESTION_ID_ATTRIBUTE ]: SUGGESTION_ID_ATTRIBUTE,
+			[ SUGGESTION_TYPE_ATTRIBUTE ]: SUGGESTION_TYPE_ATTRIBUTE,
+			[ SUGGESTION_AUTHOR_ATTRIBUTE ]: SUGGESTION_AUTHOR_ATTRIBUTE,
+		},
+		edit: () => null,
+	};
+}
+
+/** Format settings for each marker kind, keyed by kind. */
+export const suggestionMarkerFormats: Record<
+	SuggestionMarkerKind,
+	ReturnType< typeof markerFormatSettings >
+> = {
+	add: markerFormatSettings( SUGGESTION_TYPE_ADDITION as 'add' ),
+	del: markerFormatSettings( SUGGESTION_TYPE_DELETION as 'del' ),
+	format: markerFormatSettings( SUGGESTION_TYPE_FORMAT as 'format' ),
 };
 
 export const SUGGESTION_A11Y_FORMAT_NAME = 'core/suggestion-a11y';
@@ -144,12 +360,12 @@ export function getSuggestionA11yDescriptor( type?: string | null ): {
 
 /**
  * Editor-only decoration pass that gives suggestion markers screen-reader
- * semantics. A bare `<mark class="wp-suggestion">` is invisible to assistive
- * technology — a suggested deletion reads as normal text. For each rich-text
- * run covered by a `core/suggestion` format, nest a `core/suggestion-a11y`
- * format carrying the bracketing announcements for its type and, where one
- * applies, `role="insertion"` (add markers) or `role="deletion"` (del markers),
- * which ARIA maps to `<ins>`/`<del>` semantics.
+ * semantics. A bare `<mark class="wp-suggestion-del">` is invisible to
+ * assistive technology - a suggested deletion reads as normal text. For each
+ * rich-text run covered by a marker, nest a `core/suggestion-a11y` format
+ * carrying the bracketing announcements for its kind and, where one applies,
+ * `role="insertion"` (add markers) or `role="deletion"` (del markers), which
+ * ARIA maps to `<ins>`/`<del>` semantics.
  *
  * The role must never serialize into post content, so it cannot live on the
  * marker format itself (reading the editable DOM back would absorb it). It is
@@ -158,18 +374,19 @@ export function getSuggestionA11yDescriptor( type?: string | null ): {
  * DOM but are ignored when the DOM is parsed back into a value (see
  * `toFormat` in `@wordpress/rich-text`), exactly like `core/annotation`.
  *
- * One decoration object is reused across each contiguous marker run
- * (rich-text merges adjacent identical format references into a single
- * element), so a marker gains exactly one nested role element. Where markers
- * nest, each run keeps its own decoration describing the marker that wraps it.
+ * Every marker in a stack gets its own decoration, so nested suggestions read
+ * as outer start, inner start, text, inner end, outer end. One decoration
+ * object is reused across each marker's run (rich text merges adjacent
+ * identical format references into a single element), so a marker gains
+ * exactly one nested role element.
  *
- * It is spliced in directly after the marker rather than pushed onto the end of
- * the stack. `toTree` decides whether to reuse an element by comparing format
- * stacks *by index*, so a bold run or link covering only part of a marker would
- * shift a trailing decoration's index and split it into two elements - and two
- * elements means the closing announcement is read out mid-suggestion and the
- * opening one repeated. Sitting immediately inside the marker keeps its index
- * fixed for the marker's whole run.
+ * Each decoration is spliced in directly after its marker rather than pushed
+ * onto the end of the stack. `toTree` decides whether to reuse an element by
+ * comparing format stacks *by index*, so a bold run or link covering only part
+ * of a marker would shift a trailing decoration's index and split it into two
+ * elements - and two elements means the closing announcement is read out
+ * mid-suggestion and the opening one repeated. Sitting immediately inside the
+ * marker keeps its index fixed for the marker's whole run.
  *
  * @param formats Per-character format stacks.
  * @return Format stacks with role decorations added.
@@ -179,64 +396,53 @@ export function addSuggestionRoleFormats( formats: any[] | undefined ): any {
 		return formats;
 	}
 	let out: any[] | null = null;
-	let lastSuggestion: any = null;
-	let lastDecoration: any = null;
+	const decorations = new Map< any, any >();
+	const decorationFor = ( marker: any ) => {
+		let decoration = decorations.get( marker );
+		if ( decoration ) {
+			return decoration;
+		}
+		const type = suggestionKindOf( marker )!;
+		const author = marker.attributes?.[ SUGGESTION_AUTHOR_ATTRIBUTE ];
+		const { start, end, role } = getSuggestionA11yDescriptor( type );
+		/*
+		 * Absent values are omitted rather than set to a falsy one: rich
+		 * text renders every key in this object, so an undefined entry would
+		 * serialize as `role="undefined"`.
+		 *
+		 * Type and author are repeated onto the decoration so the per-author
+		 * announcement stylesheet can select it directly. An ancestor
+		 * selector would also match a decoration nested deeper inside an
+		 * enclosing marker, letting that marker's author claim a run they did
+		 * not suggest.
+		 */
+		decoration = {
+			type: SUGGESTION_A11Y_FORMAT_NAME,
+			attributes: {
+				start,
+				end,
+				...( role && { role } ),
+				suggestionType: type,
+				...( author !== undefined && { author } ),
+			},
+		};
+		decorations.set( marker, decoration );
+		return decoration;
+	};
 	for ( let i = 0; i < formats.length; i++ ) {
 		const stack = formats[ i ];
-		/*
-		 * The innermost marker, not the first: overlapping runs from two
-		 * people serialize as nested markers, and the decoration goes just
-		 * inside the deepest of them. Describing an enclosing marker would
-		 * announce the wrong change - a deletion nested inside someone else's
-		 * addition read aloud as an addition.
-		 */
-		const markerIndex = Array.isArray( stack )
-			? stack.findLastIndex(
-					( f: any ) => f.type === SUGGESTION_FORMAT_NAME
-				)
-			: -1;
-		if ( markerIndex === -1 ) {
-			lastSuggestion = null;
-			lastDecoration = null;
+		if ( ! Array.isArray( stack ) || ! stack.some( isSuggestionFormat ) ) {
 			continue;
 		}
-		const suggestion = stack[ markerIndex ];
-		if ( ! out ) {
-			out = formats.slice();
+		out ??= formats.slice();
+		const decorated: any[] = [];
+		for ( const format of stack ) {
+			decorated.push( format );
+			if ( isSuggestionFormat( format ) ) {
+				decorated.push( decorationFor( format ) );
+			}
 		}
-		if ( suggestion !== lastSuggestion ) {
-			lastSuggestion = suggestion;
-			const type = suggestion.attributes?.[ SUGGESTION_TYPE_ATTRIBUTE ];
-			const author =
-				suggestion.attributes?.[ SUGGESTION_AUTHOR_ATTRIBUTE ];
-			const { start, end, role } = getSuggestionA11yDescriptor( type );
-			/*
-			 * Absent values are omitted rather than set to a falsy one:
-			 * rich-text renders every key in this object, so an undefined
-			 * entry would serialize as `role="undefined"`.
-			 *
-			 * Type and author are repeated onto the decoration so the
-			 * per-author announcement stylesheet can select it directly. An
-			 * ancestor selector would also match a decoration nested deeper
-			 * inside an enclosing marker, letting that marker's author claim
-			 * a run they did not suggest.
-			 */
-			lastDecoration = {
-				type: SUGGESTION_A11Y_FORMAT_NAME,
-				attributes: {
-					start,
-					end,
-					...( role && { role } ),
-					...( type !== undefined && { suggestionType: type } ),
-					...( author !== undefined && { author } ),
-				},
-			};
-		}
-		out[ i ] = [
-			...stack.slice( 0, markerIndex + 1 ),
-			lastDecoration,
-			...stack.slice( markerIndex + 1 ),
-		];
+		out[ i ] = decorated;
 	}
 	return out ?? formats;
 }
@@ -265,73 +471,92 @@ export const suggestionA11yFormat = {
 };
 
 /**
- * Idempotently register the `core/suggestion` marker format so rich-text can
+ * Idempotently register the marker formats, one per kind, so rich text can
  * round-trip a suggestion `<mark>` in block content and the annotations API can
  * decorate it. Guarded against duplicate registration (HMR, repeated editor
  * bootstrap, tests) the same way `core/note` is registered. Also registers the
  * editor-only `core/suggestion-a11y` decoration format that gives markers
  * screen-reader `role="insertion"`/`role="deletion"` semantics at render time.
  *
- * The format itself is generic (inert `edit`); a consumer that owns the
- * suggesting UI — i.e. suggest mode — passes its own `edit` so the
- * marker-creating toolbar control lives with the feature, not the primitive.
+ * The formats themselves are generic (inert `edit`); a consumer that owns the
+ * suggesting UI - Suggestion mode - passes its own `edit`, registered on every
+ * kind, so the marker-aware caret UI lives with the feature, not the
+ * primitive.
  *
  * @param [edit] Optional rich-text format `edit` component.
  */
 export function registerSuggestionFormat( edit?: any ) {
-	if (
-		! ( select( richTextStore as any ) as any ).getFormatType(
-			SUGGESTION_A11Y_FORMAT_NAME
-		)
-	) {
+	const getFormatType = ( name: string ) =>
+		( select( richTextStore as any ) as any ).getFormatType( name );
+	if ( ! getFormatType( SUGGESTION_A11Y_FORMAT_NAME ) ) {
 		registerFormatType(
 			SUGGESTION_A11Y_FORMAT_NAME,
 			suggestionA11yFormat as any
 		);
 	}
-	if (
-		( select( richTextStore as any ) as any ).getFormatType(
-			SUGGESTION_FORMAT_NAME
-		)
-	) {
-		return;
+	for ( const kind of SUGGESTION_KIND_ORDER ) {
+		const name = suggestionFormatNameFor( kind );
+		if ( getFormatType( name ) ) {
+			continue;
+		}
+		const settings = suggestionMarkerFormats[ kind ];
+		registerFormatType(
+			name,
+			( edit ? { ...settings, edit } : settings ) as any
+		);
 	}
-	registerFormatType(
-		SUGGESTION_FORMAT_NAME,
-		( edit ? { ...suggestionFormat, edit } : suggestionFormat ) as any
-	);
 }
 
 /**
- * Build the CSS selector matching a suggestion's in-content marker in the
- * editor canvas. The format serializes as `<mark class="wp-suggestion">` with
- * the suggestion id in `data-suggestion-id`, so the marker element can be
- * targeted directly — no separate annotation layer needed.
+ * Unregister every format `registerSuggestionFormat` registered. For tests and
+ * teardown; a no-op for formats that are not registered.
+ */
+export function unregisterSuggestionFormats() {
+	for ( const name of [
+		...SUGGESTION_FORMAT_NAMES,
+		SUGGESTION_A11Y_FORMAT_NAME,
+	] ) {
+		if ( ( select( richTextStore as any ) as any ).getFormatType( name ) ) {
+			unregisterFormatType( name );
+		}
+	}
+}
+
+/**
+ * Build the CSS selector matching a suggestion's in-content markers in the
+ * editor canvas, whatever their kind: a replacement's id is carried by an add
+ * marker and a del marker.
  *
  * @param id Suggestion id the marker carries.
  * @return Selector for the suggestion's marker element(s).
  */
 export function getSuggestionMarkerSelector( id: number | string ): string {
-	return getMarkerSelector( SUGGESTION_CLASS, SUGGESTION_ID_ATTRIBUTE, id );
+	return getMarkerSelector( SUGGESTION_CLASSES, SUGGESTION_ID_ATTRIBUTE, id );
 }
 
 /**
  * Resolve a suggestion marker's live character range in a rich-text value by
- * id, deriving the position from the in-content marker on every read.
+ * id, deriving the position from the in-content markers on every read. The
+ * range spans every marker carrying the id; pass `kind` to look at one kind
+ * only (a replacement's add half, say).
  *
- * @param value Block attribute value (RichTextData, string, or other).
- * @param id    Suggestion id to search for.
+ * @param value  Block attribute value (RichTextData, string, or other).
+ * @param id     Suggestion id to search for.
+ * @param [kind] Only markers of this kind.
  * @return Range or null when no marker is found.
  */
 export function findSuggestionRange(
 	value: any,
-	id: number | string
+	id: number | string,
+	kind?: SuggestionMarkerKind
 ): { start: number; end: number } | null {
 	return findMarkerRange( value, {
-		formatType: SUGGESTION_FORMAT_NAME,
+		formatType: kind
+			? suggestionFormatNameFor( kind )
+			: SUGGESTION_FORMAT_NAMES,
 		idAttribute: SUGGESTION_ID_ATTRIBUTE,
 		id,
-		quickReject: SUGGESTION_CLASS,
+		quickReject: SUGGESTION_CLASS_PROBE,
 	} );
 }
 
@@ -342,23 +567,25 @@ export function findSuggestionRange(
  * without storing the text in the suggestion payload.
  *
  * A replacement keeps its replaced text and its new text under one id; pass
- * `type` to quote one side.
+ * `kind` to quote one side.
  *
  * @param value  Block attribute value (RichTextData, string, or other).
  * @param id     Suggestion id to search for.
- * @param [type] Only quote runs whose marker has this type.
+ * @param [kind] Only quote runs of this marker kind.
  * @return The marked text, or '' when no marker is found.
  */
 export function findSuggestionText(
 	value: any,
 	id: number | string,
-	type?: string
+	kind?: string
 ): string {
 	return findMarkerText( value, {
-		formatType: SUGGESTION_FORMAT_NAME,
+		formatType:
+			kind && Object.hasOwn( SUGGESTION_MARKER_KINDS, kind )
+				? suggestionFormatNameFor( kind as SuggestionMarkerKind )
+				: SUGGESTION_FORMAT_NAMES,
 		idAttribute: SUGGESTION_ID_ATTRIBUTE,
 		id,
-		quickReject: SUGGESTION_CLASS,
-		...( type && { match: { [ SUGGESTION_TYPE_ATTRIBUTE ]: type } } ),
+		quickReject: SUGGESTION_CLASS_PROBE,
 	} );
 }

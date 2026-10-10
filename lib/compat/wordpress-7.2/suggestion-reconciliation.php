@@ -11,9 +11,10 @@
  * The single place that knows how a suggestion is anchored in serialized
  * content, so a change to the marker shape only touches this function:
  *
- * - `inline`: a `<mark class="wp-suggestion" data-suggestion-id="N">` run.
- *   Every type (`add`, `del`, `format`, either half of a replacement) counts,
- *   nested runs included, since the Tag Processor sees each opener.
+ * - `inline`: a `<mark class="wp-suggestion-<kind>" data-suggestion-id="N">`
+ *   run, told apart by `gutenberg_get_suggestion_marker_kind()`. Every kind
+ *   (`add`, `del`, `format`, either half of a replacement) counts, nested runs
+ *   included, since the Tag Processor sees each opener.
  * - a structural marker type (`pending-insert`, `pending-remove`,
  *   `pending-move`, `pending-attributes`): `metadata.suggestion` on a block,
  *   linked to its notes by `metadata.noteId` and `metadata.suggestion.commentId`.
@@ -33,10 +34,10 @@ function gutenberg_get_suggestion_anchor_index( $content ) {
 		return $index;
 	}
 
-	if ( false !== strpos( $content, 'wp-suggestion' ) ) {
+	if ( false !== strpos( $content, 'wp-suggestion-' ) ) {
 		$processor = new WP_HTML_Tag_Processor( $content );
 		while ( $processor->next_tag( array( 'tag_name' => 'MARK' ) ) ) {
-			if ( ! $processor->has_class( 'wp-suggestion' ) ) {
+			if ( null === gutenberg_get_suggestion_marker_kind( $processor ) ) {
 				continue;
 			}
 			$id = (int) $processor->get_attribute( 'data-suggestion-id' );

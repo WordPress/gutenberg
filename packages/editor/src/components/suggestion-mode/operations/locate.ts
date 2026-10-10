@@ -42,7 +42,7 @@ export function findStructuralOp(
 }
 
 /**
- * Operation type for an inline suggestion: a `core/suggestion` marker anchored
+ * Operation type for an inline suggestion: a suggestion marker anchored
  * in a single rich-text attribute. The marked range is never stored — it is
  * re-derived from the in-content marker by id (the comment id) on read — so the
  * op only records which attribute carries the marker and the marker kind.
