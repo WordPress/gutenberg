@@ -964,73 +964,43 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				'grid-template-rows' => 'repeat(' . $row_count . ', minmax(1rem, 1fr))',
 				'grid-auto-rows'     => 'minmax(1rem, 1fr)',
 			);
-			$image_styles          = array();
-			// The image itself, linked or not, leaving out images in its caption.
-			$image_selector = "$selector > .wp-block-image > img, $selector > .wp-block-image > a > img";
 			/*
 			 * The grid takes its height from its width, so that cells are close to square and
 			 * content never makes them bigger. The gaps keep them from being exactly square.
+			 *
+			 * `--wp--style--grid-cells` tells the grid's children whether their cells have a
+			 * fixed size, so that blocks can fill them. Blocks read it with a container style
+			 * query in their own styles.
 			 */
 			if ( $has_cells_sized_by_width ) {
-				$grid_row_declarations['aspect-ratio'] = $column_count . ' / ' . $row_count;
-				$grid_row_declarations['min-height']   = '0';
-				/*
-				 * Images cover their cells, below any caption. Only cells sized by the grid's
-				 * width can be covered: rows sized by their content would collapse around
-				 * images that take their height from the row.
-				 */
-				$image_styles = array(
-					array(
-						'selector'     => "$selector > .wp-block-image",
-						'declarations' => array(
-							'display'        => 'flex',
-							'flex-direction' => 'column',
-						),
-					),
-					array(
-						'selector'     => "$selector > .wp-block-image > :is(img, a)",
-						'declarations' => array(
-							'flex'       => '1 1 0',
-							'min-height' => '0',
-						),
-					),
-					array(
-						'selector'     => $image_selector,
-						'declarations' => array(
-							'width'      => '100%',
-							'height'     => '100%',
-							'object-fit' => 'cover',
-						),
-					),
-				);
+				$grid_row_declarations['aspect-ratio']            = $column_count . ' / ' . $row_count;
+				$grid_row_declarations['min-height']              = '0';
+				$grid_row_declarations['--wp--style--grid-cells'] = 'fixed';
 			} elseif ( null !== $viewport_overrides && $base_has_cells_sized_by_width ) {
-				$grid_row_declarations['aspect-ratio'] = 'auto';
-				$grid_row_declarations['min-height']   = 'auto';
-				// Rows are sized by their content again, so images keep their own height.
-				$image_styles = array(
-					array(
-						'selector'     => "$selector > .wp-block-image",
-						'declarations' => array( 'display' => 'block' ),
-					),
-					array(
-						'selector'     => $image_selector,
-						'declarations' => array(
-							'width'  => 'auto',
-							'height' => 'auto',
-						),
-					),
-				);
+				$grid_row_declarations['aspect-ratio']            = 'auto';
+				$grid_row_declarations['min-height']              = 'auto';
+				$grid_row_declarations['--wp--style--grid-cells'] = 'auto';
 			}
 			$layout_styles[] = array(
 				'selector'     => $selector,
 				'declarations' => $grid_row_declarations,
 			);
-
-			$layout_styles = array_merge( $layout_styles, $image_styles );
 		} elseif ( $should_output_grid_rows ) {
 			$layout_styles[] = array(
 				'selector'     => $selector,
 				'declarations' => array( 'grid-template-rows' => 'repeat(' . $row_count . ', minmax(1rem, auto))' ),
+			);
+		}
+
+		/*
+		 * The cell state is inherited, so grids nested inside this one reset it to describe
+		 * their own cells. A nested grid with fixed cells sets it again, as its own rule is
+		 * more specific.
+		 */
+		if ( $has_same_size_cells && null === $viewport_overrides ) {
+			$layout_styles[] = array(
+				'selector'     => ":where($selector .is-layout-grid)",
+				'declarations' => array( '--wp--style--grid-cells' => 'auto' ),
 			);
 		}
 

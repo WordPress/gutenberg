@@ -336,12 +336,6 @@ export default {
 
 		let output = '';
 		const rules = [];
-		let imageCSS = '';
-		// The image itself, linked or not, leaving out images in its caption.
-		const imageSelector = [
-			appendSelectors( selector, '> .wp-block-image > img' ),
-			appendSelectors( selector, '> .wp-block-image > a > img' ),
-		].join( ',' );
 		const shouldOutputGridColumns =
 			! hasViewportOverrides ||
 			hasViewportOverride( 'minimumColumnWidth' ) ||
@@ -414,35 +408,22 @@ export default {
 			// The grid takes its height from its width, so that cells are
 			// close to square and content never makes them bigger. The gaps
 			// keep them from being exactly square.
+			//
+			// `--wp--style--grid-cells` tells the grid's children whether their
+			// cells have a fixed size, so that blocks can fill them. Blocks read
+			// it with a container style query in their own styles.
 			if ( hasCellsSizedByWidth ) {
 				rules.push(
 					`aspect-ratio: ${ columnCount } / ${ rowCount }`,
-					'min-height: 0'
+					'min-height: 0',
+					'--wp--style--grid-cells: fixed'
 				);
-				// Images cover their cells, below any caption. Only cells sized
-				// by the grid's width can be covered: rows sized by their
-				// content would collapse around images that take their height
-				// from the row.
-				imageCSS =
-					`${ appendSelectors(
-						selector,
-						'> .wp-block-image'
-					) } { display: flex; flex-direction: column; }` +
-					`${ appendSelectors(
-						selector,
-						'> .wp-block-image > :is(img, a)'
-					) } { flex: 1 1 0; min-height: 0; }` +
-					`${ imageSelector } { width: 100%; height: 100%; object-fit: cover; }`;
 			} else if ( hasViewportOverrides && baseHasCellsSizedByWidth ) {
-				rules.push( 'aspect-ratio: auto', 'min-height: auto' );
-				// Rows are sized by their content again, so images keep their
-				// own height.
-				imageCSS =
-					`${ appendSelectors(
-						selector,
-						'> .wp-block-image'
-					) } { display: block; }` +
-					`${ imageSelector } { width: auto; height: auto; }`;
+				rules.push(
+					'aspect-ratio: auto',
+					'min-height: auto',
+					'--wp--style--grid-cells: auto'
+				);
 			}
 		} else if ( shouldOutputGridRows ) {
 			rules.push(
@@ -455,7 +436,16 @@ export default {
 				'; '
 			) }; }`;
 		}
-		output += imageCSS;
+
+		// The cell state is inherited, so grids nested inside this one reset
+		// it to describe their own cells. A nested grid with fixed cells sets
+		// it again, as its own rule is more specific.
+		if ( hasSameSizeCells && ! hasViewportOverrides ) {
+			output += `:where(${ appendSelectors(
+				selector,
+				'.is-layout-grid'
+			) }) { --wp--style--grid-cells: auto; }`;
+		}
 
 		// Output blockGap styles based on rules contained in layout definitions in theme.json.
 		if ( hasBlockGapSupport && hasBlockGapOverride && blockGapValue ) {

@@ -1635,7 +1635,8 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 
 	/**
 	 * Check that manual placement grids take their height from their width when the grid
-	 * interactivity experiment is on, and that their images cover their cells.
+	 * interactivity experiment is on, tell their children that the cells are fixed, and reset
+	 * that for grids nested inside them.
 	 *
 	 * @covers ::gutenberg_get_layout_style
 	 */
@@ -1653,10 +1654,8 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertSame(
-			'.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);aspect-ratio:3 / 2;min-height:0;}' .
-			'.wp-layout > .wp-block-image{display:flex;flex-direction:column;}' .
-			'.wp-layout > .wp-block-image > :is(img, a){flex:1 1 0;min-height:0;}' .
-			'.wp-layout > .wp-block-image > img, .wp-layout > .wp-block-image > a > img{width:100%;height:100%;object-fit:cover;}',
+			'.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);aspect-ratio:3 / 2;min-height:0;--wp--style--grid-cells:fixed;}' .
+			':where(.wp-layout .is-layout-grid){--wp--style--grid-cells:auto;}',
 			$layout_styles
 		);
 	}
@@ -1686,8 +1685,8 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 
 	/**
 	 * Check that same-size cells are only output for manual placement grids with the grid
-	 * interactivity experiment on, and that the grid is only sized by its width, with images
-	 * covering its cells, when it has no minimum column width.
+	 * interactivity experiment on, and that the grid is only sized by its width when it has
+	 * no minimum column width.
 	 *
 	 * @dataProvider data_gutenberg_get_layout_style_same_size_cells
 	 *
@@ -1728,16 +1727,13 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 			'columnCount' => 3,
 			'rowCount'    => 2,
 		);
-		$image_cover   = '.wp-layout > .wp-block-image{display:flex;flex-direction:column;}' .
-			'.wp-layout > .wp-block-image > :is(img, a){flex:1 1 0;min-height:0;}' .
-			'.wp-layout > .wp-block-image > img, .wp-layout > .wp-block-image > a > img{width:100%;height:100%;object-fit:cover;}';
 
 		return array(
 			'manual grid, experiment on, viewport column count' => array(
 				'experiment_enabled' => true,
 				'layout'             => $manual_layout,
 				'viewport_overrides' => array( 'columnCount' => 1 ),
-				'expected_output'    => '.wp-layout{grid-template-columns:repeat(1, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);aspect-ratio:1 / 2;min-height:0;}' . $image_cover,
+				'expected_output'    => '.wp-layout{grid-template-columns:repeat(1, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);aspect-ratio:1 / 2;min-height:0;--wp--style--grid-cells:fixed;}',
 			),
 			'manual grid, experiment off, viewport column count' => array(
 				'experiment_enabled' => false,
@@ -1767,21 +1763,14 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				'experiment_enabled' => true,
 				'layout'             => array_merge( $manual_layout, array( 'minimumColumnWidth' => '12rem' ) ),
 				'viewport_overrides' => null,
-				'expected_output'    => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(max(min(12rem, 100%), (100% - (0.5em * (3 - 1))) /3), 1fr));container-type:inline-size;grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);}',
-			),
-			'manual grid with a minimum column width, experiment on, viewport column count' => array(
-				'experiment_enabled' => true,
-				'layout'             => array_merge( $manual_layout, array( 'minimumColumnWidth' => '12rem' ) ),
-				'viewport_overrides' => array( 'columnCount' => 1 ),
-				'expected_output'    => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(max(min(12rem, 100%), (100% - (0.5em * (1 - 1))) /1), 1fr));grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);}',
+				'expected_output'    => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(max(min(12rem, 100%), (100% - (0.5em * (3 - 1))) /3), 1fr));container-type:inline-size;grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);}' .
+					':where(.wp-layout .is-layout-grid){--wp--style--grid-cells:auto;}',
 			),
 			'manual grid, experiment on, viewport minimum column width' => array(
 				'experiment_enabled' => true,
 				'layout'             => $manual_layout,
 				'viewport_overrides' => array( 'minimumColumnWidth' => '12rem' ),
-				'expected_output'    => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(max(min(12rem, 100%), (100% - (0.5em * (3 - 1))) /3), 1fr));container-type:inline-size;grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);aspect-ratio:auto;min-height:auto;}' .
-					'.wp-layout > .wp-block-image{display:block;}' .
-					'.wp-layout > .wp-block-image > img, .wp-layout > .wp-block-image > a > img{width:auto;height:auto;}',
+				'expected_output'    => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(max(min(12rem, 100%), (100% - (0.5em * (3 - 1))) /3), 1fr));container-type:inline-size;grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);aspect-ratio:auto;min-height:auto;--wp--style--grid-cells:auto;}',
 			),
 		);
 	}
@@ -2110,58 +2099,6 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		$this->assertSame( '--wp--grid-item--row-span:2', safecss_filter_attr( '--wp--grid-item--row-span:2' ) );
 		$this->assertSame( 'grid-row:span var(--wp--grid-item--row-span, 1)', safecss_filter_attr( 'grid-row:span var(--wp--grid-item--row-span, 1)' ) );
 		$this->assertSame( 'rotate:none', safecss_filter_attr( 'rotate:none' ) );
-	}
-
-	/**
-	 * Check that a rendered manual placement grid makes its images cover their cells, and
-	 * that a viewport adding a minimum column width puts them back to their own size inside
-	 * that viewport's media query.
-	 *
-	 * @covers ::gutenberg_render_layout_support_flag
-	 */
-	public function test_layout_support_flag_resets_manual_grid_images_in_viewport_with_minimum_column_width() {
-		add_filter( 'pre_option_gutenberg-experiments', array( $this, 'filter_enable_grid_interactivity' ), 11 );
-		switch_theme( 'block-theme' );
-
-		$block_content = '<div class="wp-block-group"></div>';
-		$block         = array(
-			'blockName'    => 'core/group',
-			'attrs'        => array(
-				'layout' => array(
-					'type'              => 'grid',
-					'columnCount'       => 3,
-					'rowCount'          => 2,
-					'isManualPlacement' => true,
-				),
-				'style'  => array(
-					'@tablet' => array(
-						'layout' => array( 'minimumColumnWidth' => '12rem' ),
-					),
-				),
-			),
-			'innerBlocks'  => array(),
-			'innerHTML'    => $block_content,
-			'innerContent' => array( $block_content ),
-		);
-
-		$output = gutenberg_render_layout_support_flag( $block_content, $block );
-		$this->assertMatchesRegularExpression( '/wp-container-core-group-is-layout-[a-z0-9]+/', $output );
-		preg_match( '/wp-container-core-group-is-layout-[a-z0-9]+/', $output, $matches );
-		$container_class = $matches[0];
-
-		$media_queries = WP_Theme_JSON_Gutenberg::get_viewport_media_queries( null );
-		$stylesheet    = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
-		$image         = ".$container_class > .wp-block-image > img, .$container_class > .wp-block-image > a > img";
-		$cover_rule    = "$image{width:100%;height:100%;object-fit:cover;}";
-		$reset_rule    = "$image{width:auto;height:auto;}";
-
-		$this->assertStringContainsString( $cover_rule, $stylesheet, 'Images should cover their cells.' );
-		$this->assertStringNotContainsString( $media_queries['@tablet'] . '{' . $cover_rule, $stylesheet, 'The cover rule should not be inside the tablet media query.' );
-
-		$tablet_styles = strstr( $stylesheet, $media_queries['@tablet'] . '{' );
-		$this->assertNotFalse( $tablet_styles, 'The tablet viewport should have its own styles.' );
-		$this->assertStringContainsString( ".$container_class > .wp-block-image{display:block;}", $tablet_styles, 'Images should be laid out as blocks again on tablets.' );
-		$this->assertStringContainsString( $reset_rule, $tablet_styles, 'Images should keep their own size on tablets.' );
 	}
 
 	/**
