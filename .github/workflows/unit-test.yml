@@ -107,6 +107,15 @@ jobs:
             - name: Install Composer dependencies
               run: npm run wp-env run composer 'install --no-interaction'
 
+            # PHP 5.6 and 7.0 run the PHPUnit bundled in their `phpunit` image.
+            # `phpunit/phpunit` 7.5 requires PHP 7.1 or newer, and leaving it in
+            # `vendor` lets the test bootstrap autoload its classes, which PHP 5.6
+            # can't parse. `--no-update` is not used: it would only edit
+            # `composer.json`, leaving the locked package installed.
+            - name: Remove incompatible Composer packages
+              if: ${{ matrix.php == '5.6' || matrix.php == '7.0' }}
+              run: npm run wp-env run composer 'remove phpunit/phpunit --dev --no-interaction'
+
             - name: Running single site unit tests
               if: ${{ ! matrix.multisite }}
               run: npm run wp-env run phpunit "$PHPUNIT -c /var/www/html/wp-content/plugins/gutenberg/phpunit.xml.dist --verbose"
