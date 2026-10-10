@@ -19,7 +19,8 @@
  */
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
-const SUGGESTION_MARK = 'mark.wp-suggestion';
+const SUGGESTION_MARK =
+	'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)';
 
 /*
  * The collector announces the reprieve once its grace period is out, so the

@@ -709,7 +709,7 @@ test.describe( 'Suggestion mode persistence', () => {
 		await page.keyboard.press( 'End' );
 		await page.keyboard.type( ' PROPOSED' );
 		await expect(
-			first.locator( 'mark.wp-suggestion[data-suggestion-type="add"]' )
+			first.locator( 'mark.wp-suggestion-add' )
 		).toHaveAttribute( 'data-suggestion-id', /\d/ );
 
 		// …a deletion of "rendering"…
@@ -719,7 +719,7 @@ test.describe( 'Suggestion mode persistence', () => {
 		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 3 } );
 		await page.keyboard.press( 'Backspace' );
 		await expect(
-			second.locator( 'mark.wp-suggestion[data-suggestion-type="del"]' )
+			second.locator( 'mark.wp-suggestion-del' )
 		).toHaveAttribute( 'data-suggestion-id', /\d/ );
 
 		// …and a format change.
@@ -729,7 +729,7 @@ test.describe( 'Suggestion mode persistence', () => {
 		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 6 } );
 		await pageUtils.pressKeys( 'primary+b' );
 		await expect(
-			third.locator( 'mark.wp-suggestion[data-suggestion-type="format"]' )
+			third.locator( 'mark.wp-suggestion-format' )
 		).toHaveAttribute( 'data-suggestion-id', /\d/ );
 
 		// See above: leave Suggesting before publishing.
@@ -745,7 +745,11 @@ test.describe( 'Suggestion mode persistence', () => {
 		await expect( body.getByText( 'Keep rendering me' ) ).toBeVisible();
 		await expect( body.getByText( 'Format target' ) ).toBeVisible();
 		// …with the marker wrappers stripped.
-		await expect( body.locator( 'mark.wp-suggestion' ) ).toHaveCount( 0 );
+		await expect(
+			body.locator(
+				'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)'
+			)
+		).toHaveCount( 0 );
 	} );
 
 	test( 'a typed inline addition survives a reload and can still be accepted', async ( {
@@ -769,9 +773,7 @@ test.describe( 'Suggestion mode persistence', () => {
 		await suggestionSaved;
 		// The marker is only written once the async note id resolves.
 		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="add"]'
-			)
+			paragraph.locator( 'mark.wp-suggestion-add' )
 		).toHaveAttribute( 'data-suggestion-id', /\d/ );
 
 		await editor.saveDraft();
@@ -783,7 +785,7 @@ test.describe( 'Suggestion mode persistence', () => {
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.first();
 		await expect(
-			reloaded.locator( 'mark.wp-suggestion[data-suggestion-type="add"]' )
+			reloaded.locator( 'mark.wp-suggestion-add' )
 		).toContainText( 'world' );
 
 		// Accepting after the reload unwraps the marker and keeps the text.
@@ -818,9 +820,7 @@ test.describe( 'Suggestion mode persistence', () => {
 		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 6 } );
 		await pageUtils.pressKeys( 'primary+b' );
 		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="format"]'
-			)
+			paragraph.locator( 'mark.wp-suggestion-format' )
 		).toHaveAttribute( 'data-suggestion-id', /\d/ );
 
 		await switchIntent( page, 'Editing' );
@@ -885,9 +885,7 @@ test.describe( 'Suggestion mode persistence', () => {
 
 		// The image is the proposed addition, inside its marker.
 		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="add"] img'
-			)
+			paragraph.locator( 'mark.wp-suggestion-add img' )
 		).toBeVisible();
 
 		await decideSuggestion( page, 'Accept' );

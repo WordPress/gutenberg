@@ -2,7 +2,7 @@
  * E2E coverage for F-34: copying blocks out of a post must not carry that
  * post's suggestion state with them.
  *
- * A suggestion is a proposal about one post. Its inline `wp-suggestion`
+ * A suggestion is a proposal about one post. Its inline `wp-suggestion-<kind>`
  * marker and the `metadata.noteId` link both point at a note comment attached
  * to that post's id, so pasting the blocks into a different post produces
  * permanently highlighted text with no note behind it and no Accept/Reject to
@@ -64,9 +64,7 @@ test.describe( 'Suggestion mode clipboard', () => {
 		 * exists: the marker is only written once the note comment's id
 		 * comes back.
 		 */
-		const marker = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="add"]'
-		);
+		const marker = paragraph.locator( 'mark.wp-suggestion-add' );
 		await expect( marker ).toContainText( 'COPIED' );
 		await expect( marker ).toHaveAttribute( 'data-suggestion-id', /\d/ );
 
@@ -102,7 +100,9 @@ test.describe( 'Suggestion mode clipboard', () => {
 
 		// Nothing marked means nothing to review: no orphaned markers render.
 		await expect(
-			editor.canvas.locator( 'mark.wp-suggestion' )
+			editor.canvas.locator(
+				'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)'
+			)
 		).toHaveCount( 0 );
 	} );
 
@@ -140,9 +140,7 @@ test.describe( 'Suggestion mode clipboard', () => {
 		} );
 		await pageUtils.pressKeys( 'primary+v' );
 
-		const formatMark = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="format"]'
-		);
+		const formatMark = paragraph.locator( 'mark.wp-suggestion-format' );
 		await expect( formatMark ).toHaveText( 'today' );
 		await expect( formatMark ).toHaveAttribute(
 			'data-suggestion-id',
@@ -156,7 +154,7 @@ test.describe( 'Suggestion mode clipboard', () => {
 		).toHaveText( 'today' );
 		await expect(
 			paragraph.locator(
-				'mark.wp-suggestion:is([data-suggestion-type="add"],[data-suggestion-type="del"])'
+				'mark:is(.wp-suggestion-add, .wp-suggestion-del)'
 			)
 		).toHaveCount( 0 );
 	} );
@@ -186,9 +184,7 @@ test.describe( 'Suggestion mode clipboard', () => {
 		} );
 		await pageUtils.pressKeys( 'primary+v' );
 
-		const addMark = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="add"]'
-		);
+		const addMark = paragraph.locator( 'mark.wp-suggestion-add' );
 		await expect( addMark ).toHaveText( 'https://wordpress.org/' );
 		await expect( addMark ).toHaveAttribute( 'data-suggestion-id', /\d/ );
 		await expect(
@@ -251,9 +247,7 @@ test.describe( 'Suggestion mode clipboard', () => {
 					clip: { plainText: 'some **bold** and `code` here' },
 				}
 			);
-			const addMark = paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="add"]'
-			);
+			const addMark = paragraph.locator( 'mark.wp-suggestion-add' );
 			await expect( addMark ).toHaveAttribute(
 				'data-suggestion-id',
 				/\d/
@@ -277,9 +271,7 @@ test.describe( 'Suggestion mode clipboard', () => {
 					clip: { plainText: 'bold text', html: '<b>bold text</b>' },
 				}
 			);
-			const addMark = code.locator(
-				'mark.wp-suggestion[data-suggestion-type="add"]'
-			);
+			const addMark = code.locator( 'mark.wp-suggestion-add' );
 			await expect( addMark ).toHaveAttribute(
 				'data-suggestion-id',
 				/\d/
@@ -302,9 +294,7 @@ test.describe( 'Suggestion mode clipboard', () => {
 					clip: { plainText: 'a@example.com' },
 				}
 			);
-			const addMark = paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="add"]'
-			);
+			const addMark = paragraph.locator( 'mark.wp-suggestion-add' );
 			await expect( addMark ).toHaveAttribute(
 				'data-suggestion-id',
 				/\d/
@@ -313,9 +303,7 @@ test.describe( 'Suggestion mode clipboard', () => {
 				addMark.locator( 'a[href="mailto:a@example.com"]' )
 			).toHaveText( 'a@example.com' );
 			await expect(
-				paragraph.locator(
-					'mark.wp-suggestion[data-suggestion-type="del"]'
-				)
+				paragraph.locator( 'mark.wp-suggestion-del' )
 			).toHaveText( 'now' );
 		} );
 

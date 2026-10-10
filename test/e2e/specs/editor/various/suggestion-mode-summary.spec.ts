@@ -255,14 +255,10 @@ test.describe( 'Suggest mode: sidebar summaries', () => {
 		// The markers are only written once the note POST returns its id.
 		await saved;
 		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="add"]'
-			)
+			paragraph.locator( 'mark.wp-suggestion-add' )
 		).toHaveText( replacement );
 		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="del"]'
-			)
+			paragraph.locator( 'mark.wp-suggestion-del' )
 		).toHaveText( original );
 
 		const sidebar = await openNotesSidebar( page );

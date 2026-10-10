@@ -96,9 +96,7 @@ test.describe( 'Suggestion mode marker accessibility', () => {
 		const saved = suggestionSavedPromise( page );
 		await page.keyboard.type( ' world' );
 
-		const marker = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="add"]'
-		);
+		const marker = paragraph.locator( 'mark.wp-suggestion-add' );
 		await expect( marker ).toContainText( 'world' );
 
 		// ARIA maps `insertion` to `<ins>`, so the run is at least exposed as
@@ -157,7 +155,7 @@ test.describe( 'Suggestion mode marker accessibility', () => {
 		await page.keyboard.press( 'Backspace' );
 
 		const decoration = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="del"] span.wp-suggestion-a11y'
+			'mark.wp-suggestion-del span.wp-suggestion-a11y'
 		);
 		await expect( decoration ).toHaveCount( 1 );
 		await expect( decoration ).toHaveAttribute( 'role', 'deletion' );
@@ -191,9 +189,7 @@ test.describe( 'Suggestion mode marker accessibility', () => {
 		const saved = suggestionSavedPromise( page );
 		await pageUtils.pressKeys( 'primary+b' );
 
-		const marker = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="format"]'
-		);
+		const marker = paragraph.locator( 'mark.wp-suggestion-format' );
 		await expect( marker ).toContainText( 'world' );
 
 		const decoration = marker.locator( 'span.wp-suggestion-a11y' );
@@ -232,9 +228,7 @@ test.describe( 'Suggestion mode marker accessibility', () => {
 		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 10 } );
 		await page.keyboard.press( 'Backspace' );
 
-		const marker = paragraph.locator(
-			'mark.wp-suggestion[data-suggestion-type="del"]'
-		);
+		const marker = paragraph.locator( 'mark.wp-suggestion-del' );
 		await expect( marker ).toContainText( 'bold world' );
 		await expect( marker.locator( 'span.wp-suggestion-a11y' ) ).toHaveCount(
 			1

@@ -6,7 +6,7 @@
  * Two groups:
  *
  *   1. INVARIANT - the end-state property the migration establishes: a single
- *      block never carries both an inline `<mark class="wp-suggestion">` marker
+ *      block never carries both an inline `<mark class="wp-suggestion-<kind>">` marker
  *      AND an overlay `<del>/<ins class="has-suggestion-*">` diff. This holds
  *      now that Phase 2 moved formatting to markers, including when a formatting
  *      change and a text addition coexist on one block (non-overlapping runs).
@@ -34,7 +34,8 @@
  */
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
-const SUGGESTION_MARK = 'mark.wp-suggestion';
+const SUGGESTION_MARK =
+	'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)';
 const OVERLAY_ADD = 'ins.has-suggestion-addition';
 const OVERLAY_DEL = 'del.has-suggestion-deletion';
 
@@ -928,7 +929,7 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 			name: 'core/paragraph',
 			attributes: {
 				content:
-					'Hello <mark class="wp-suggestion" data-suggestion-id="987654" data-suggestion-type="add" data-author="987654">brave new</mark> world',
+					'Hello <mark class="wp-suggestion-add" data-suggestion-id="987654" data-suggestion-type="add" data-author="987654">brave new</mark> world',
 			},
 		} );
 

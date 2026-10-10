@@ -4,7 +4,7 @@
  *
  * Suggestion state deliberately outlives the experiment flag: the
  * `core/suggestion` format is registered unconditionally so a `<mark
- * class="wp-suggestion">` survives a load-and-save byte for byte. That keeps
+ * class="wp-suggestion-add">` survives a load-and-save byte for byte. That keeps
  * content safe when the experiment is toggled off on a site that has been
  * using it, at the cost of comprehension — the markers render with no intent
  * switcher, no tooltip and no per-author tinting to explain them.
@@ -72,7 +72,7 @@ async function createPostWithSuggestion( {
 
 	// A populated id proves the backing note comment saved.
 	await expect(
-		paragraph.locator( 'mark.wp-suggestion[data-suggestion-type="add"]' )
+		paragraph.locator( 'mark.wp-suggestion-add' )
 	).toHaveAttribute( 'data-suggestion-id', /\d/ );
 
 	await editor.saveDraft();
@@ -108,9 +108,7 @@ test.describe( 'Suggestion data with the experiment off', () => {
 		// The marker is still there — content safety is the invariant this
 		// notice exists to explain, not to change.
 		await expect(
-			editor.canvas.locator(
-				'mark.wp-suggestion[data-suggestion-type="add"]'
-			)
+			editor.canvas.locator( 'mark.wp-suggestion-add' )
 		).toBeVisible();
 
 		const notice = page.locator( '.components-notice', {
@@ -173,9 +171,7 @@ test.describe( 'Suggestion data with the experiment off', () => {
 		await admin.editPost( postId );
 
 		await expect(
-			editor.canvas.locator(
-				'mark.wp-suggestion[data-suggestion-type="add"]'
-			)
+			editor.canvas.locator( 'mark.wp-suggestion-add' )
 		).toBeVisible();
 		await expect(
 			page.locator( '.components-notice', { hasText: NOTICE_TEXT } )

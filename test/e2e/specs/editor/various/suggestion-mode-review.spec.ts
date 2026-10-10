@@ -448,9 +448,7 @@ test.describe( 'Suggestion mode review flows', () => {
 		const formatSaved = suggestionSavedPromise( page );
 		await pageUtils.pressKeys( 'primary+b' );
 		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="format"]'
-			)
+			paragraph.locator( 'mark.wp-suggestion-format' )
 		).toContainText( 'world' );
 		await formatSaved;
 
@@ -1202,9 +1200,7 @@ test.describe( 'Suggestion mode review flows', () => {
 		// A populated id proves the note comment saved (see
 		// suggestion-mode.spec.ts for the rationale).
 		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="add"]'
-			)
+			paragraph.locator( 'mark.wp-suggestion-add' )
 		).toHaveAttribute( 'data-suggestion-id', /\d/ );
 
 		await switchIntent( page, 'Editing' );
@@ -1212,9 +1208,11 @@ test.describe( 'Suggestion mode review flows', () => {
 
 		// The proposed text is now permanent content, marker gone.
 		await expect( paragraph ).toHaveText( 'Hello world' );
-		await expect( paragraph.locator( 'mark.wp-suggestion' ) ).toHaveCount(
-			0
-		);
+		await expect(
+			paragraph.locator(
+				'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)'
+			)
+		).toHaveCount( 0 );
 		const serialized = await editor.getEditedPostContent();
 		expect( serialized ).toContain( 'Hello world' );
 		expect( serialized ).not.toContain( 'data-suggestion' );
@@ -1243,9 +1241,7 @@ test.describe( 'Suggestion mode review flows', () => {
 		await page.keyboard.type( ' world' );
 
 		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="add"]'
-			)
+			paragraph.locator( 'mark.wp-suggestion-add' )
 		).toHaveAttribute( 'data-suggestion-id', /\d/ );
 
 		await switchIntent( page, 'Editing' );
@@ -1253,9 +1249,11 @@ test.describe( 'Suggestion mode review flows', () => {
 
 		// The block reads exactly as it did before the suggestion.
 		await expect( paragraph ).toHaveText( 'Hello' );
-		await expect( paragraph.locator( 'mark.wp-suggestion' ) ).toHaveCount(
-			0
-		);
+		await expect(
+			paragraph.locator(
+				'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)'
+			)
+		).toHaveCount( 0 );
 		const serialized = await editor.getEditedPostContent();
 		expect( serialized ).not.toContain( 'world' );
 		expect( serialized ).not.toContain( 'data-suggestion' );
@@ -1286,9 +1284,7 @@ test.describe( 'Suggestion mode review flows', () => {
 		await page.keyboard.press( 'Backspace' );
 
 		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="del"]'
-			)
+			paragraph.locator( 'mark.wp-suggestion-del' )
 		).toHaveAttribute( 'data-suggestion-id', /\d/ );
 
 		await switchIntent( page, 'Editing' );
@@ -1297,9 +1293,11 @@ test.describe( 'Suggestion mode review flows', () => {
 		// The struck-through text is finally removed.
 		await expect( paragraph ).not.toContainText( 'world' );
 		await expect( paragraph ).toContainText( 'Hello' );
-		await expect( paragraph.locator( 'mark.wp-suggestion' ) ).toHaveCount(
-			0
-		);
+		await expect(
+			paragraph.locator(
+				'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)'
+			)
+		).toHaveCount( 0 );
 		const serialized = await editor.getEditedPostContent();
 		expect( serialized ).not.toContain( 'world' );
 		expect( serialized ).not.toContain( 'data-suggestion' );
@@ -1330,9 +1328,7 @@ test.describe( 'Suggestion mode review flows', () => {
 		await page.keyboard.press( 'Backspace' );
 
 		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="del"]'
-			)
+			paragraph.locator( 'mark.wp-suggestion-del' )
 		).toHaveAttribute( 'data-suggestion-id', /\d/ );
 
 		await switchIntent( page, 'Editing' );
@@ -1340,9 +1336,11 @@ test.describe( 'Suggestion mode review flows', () => {
 
 		// The text survives, back to plain content.
 		await expect( paragraph ).toHaveText( 'Hello world' );
-		await expect( paragraph.locator( 'mark.wp-suggestion' ) ).toHaveCount(
-			0
-		);
+		await expect(
+			paragraph.locator(
+				'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)'
+			)
+		).toHaveCount( 0 );
 		const serialized = await editor.getEditedPostContent();
 		expect( serialized ).toContain( 'Hello world' );
 		expect( serialized ).not.toContain( 'data-suggestion' );
@@ -1373,9 +1371,7 @@ test.describe( 'Suggestion mode review flows', () => {
 		await pageUtils.pressKeys( 'primary+b' );
 
 		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="format"]'
-			)
+			paragraph.locator( 'mark.wp-suggestion-format' )
 		).toHaveAttribute( 'data-suggestion-id', /\d/ );
 
 		await switchIntent( page, 'Editing' );
@@ -1384,9 +1380,11 @@ test.describe( 'Suggestion mode review flows', () => {
 		// The bold survives as regular formatting; the marker is unwrapped.
 		await expect( paragraph.locator( 'strong' ) ).toContainText( 'world' );
 		await expect( paragraph ).toHaveText( 'Hello world' );
-		await expect( paragraph.locator( 'mark.wp-suggestion' ) ).toHaveCount(
-			0
-		);
+		await expect(
+			paragraph.locator(
+				'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)'
+			)
+		).toHaveCount( 0 );
 		const serialized = await editor.getEditedPostContent();
 		expect( serialized ).toContain( '<strong>' );
 		expect( serialized ).not.toContain( 'data-suggestion' );
@@ -1417,9 +1415,7 @@ test.describe( 'Suggestion mode review flows', () => {
 		await pageUtils.pressKeys( 'primary+b' );
 
 		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="format"]'
-			)
+			paragraph.locator( 'mark.wp-suggestion-format' )
 		).toHaveAttribute( 'data-suggestion-id', /\d/ );
 
 		await switchIntent( page, 'Editing' );
@@ -1428,9 +1424,11 @@ test.describe( 'Suggestion mode review flows', () => {
 		// Text intact, no bold, no marker — as if nothing was proposed.
 		await expect( paragraph ).toHaveText( 'Hello world' );
 		await expect( paragraph.locator( 'strong' ) ).toHaveCount( 0 );
-		await expect( paragraph.locator( 'mark.wp-suggestion' ) ).toHaveCount(
-			0
-		);
+		await expect(
+			paragraph.locator(
+				'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)'
+			)
+		).toHaveCount( 0 );
 		const serialized = await editor.getEditedPostContent();
 		expect( serialized ).not.toContain( '<strong>' );
 		expect( serialized ).not.toContain( 'data-suggestion' );
@@ -1480,7 +1478,7 @@ test.describe( 'Suggestion mode review flows', () => {
 		await page.keyboard.type( ' XYZ' );
 		await inlineSaved;
 		await expect(
-			heading.locator( 'mark.wp-suggestion[data-suggestion-type="add"]' )
+			heading.locator( 'mark.wp-suggestion-add' )
 		).toHaveAttribute( 'data-suggestion-id', /\d/ );
 
 		// Both suggestions are listed as their own threads.
@@ -1504,9 +1502,11 @@ test.describe( 'Suggestion mode review flows', () => {
 		).toBeVisible();
 
 		// The addition landed: marker unwrapped, text kept.
-		await expect( heading.locator( 'mark.wp-suggestion' ) ).toHaveCount(
-			0
-		);
+		await expect(
+			heading.locator(
+				'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)'
+			)
+		).toHaveCount( 0 );
 		await expect( heading ).toHaveText( 'My Heading XYZ' );
 
 		/*
@@ -1753,9 +1753,7 @@ test.describe( 'Suggestion mode review flows', () => {
 		await page.keyboard.type( '   ' );
 
 		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="add"]'
-			)
+			paragraph.locator( 'mark.wp-suggestion-add' )
 		).toHaveAttribute( 'data-suggestion-id', /\d/ );
 		await suggestionSaved;
 
@@ -1795,9 +1793,7 @@ test.describe( 'Suggestion mode review flows', () => {
 		await page.keyboard.press( 'Enter' );
 
 		await expect(
-			paragraph.locator(
-				'mark.wp-suggestion[data-suggestion-type="format"]'
-			)
+			paragraph.locator( 'mark.wp-suggestion-format' )
 		).toContainText( 'world' );
 		await suggestionSaved;
 

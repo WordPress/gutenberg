@@ -24,7 +24,8 @@
  */
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
-const SUGGESTION_MARK = 'mark.wp-suggestion';
+const SUGGESTION_MARK =
+	'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)';
 
 async function switchIntent( page: any, intentLabel: string ) {
 	await page

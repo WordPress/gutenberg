@@ -39,9 +39,7 @@ async function suggestAdditionIn( page: any, editor: any, index: number ) {
 	await paragraph.click();
 	await page.keyboard.press( 'End' );
 	await page.keyboard.type( ' edit' );
-	const marker = paragraph.locator(
-		'mark.wp-suggestion[data-suggestion-type="add"]'
-	);
+	const marker = paragraph.locator( 'mark.wp-suggestion-add' );
 	await expect( marker ).toHaveAttribute( 'data-suggestion-id', /\d/ );
 	return marker;
 }
@@ -165,14 +163,14 @@ test.describe( 'Suggestion marker reveal', () => {
 		await pageUtils.pressKeys( 'shift+ArrowRight', { times: 5 } );
 		await page.keyboard.type( 'BRAVO' );
 		const bravo = paragraph
-			.locator( 'mark.wp-suggestion[data-suggestion-type="add"]' )
+			.locator( 'mark.wp-suggestion-add' )
 			.filter( { hasText: 'BRAVO' } );
 		await expect( bravo ).toHaveAttribute( 'data-suggestion-id', /\d/ );
 		await page.keyboard.press( 'End' );
 		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
 		await page.keyboard.type( 'DELTA' );
 		const delta = paragraph
-			.locator( 'mark.wp-suggestion[data-suggestion-type="add"]' )
+			.locator( 'mark.wp-suggestion-add' )
 			.filter( { hasText: 'DELTA' } );
 		await expect( delta ).toHaveAttribute( 'data-suggestion-id', /\d/ );
 		const bravoId = await bravo.getAttribute( 'data-suggestion-id' );
