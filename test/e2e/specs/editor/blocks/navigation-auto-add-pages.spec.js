@@ -128,14 +128,26 @@ test.describe( 'Navigation block: Auto add pages', () => {
 		await toggle.click();
 		await expect( toggle ).not.toBeChecked();
 
-		// Saving the post also saves the menu.
-		await editor.publishPost();
+		// The setting saves on its own, without the post being saved.
+		await expect
+			.poll( async () => {
+				const savedMenu = await requestUtils.rest( {
+					path: `/wp/v2/navigation/${ menu.id }`,
+					params: { context: 'edit' },
+				} );
+				return savedMenu.meta[ META_KEY ];
+			} )
+			.toBe( false );
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Publish', exact: true } )
+		).toBeVisible();
 
 		const savedMenu = await requestUtils.rest( {
 			path: `/wp/v2/navigation/${ menu.id }`,
 			params: { context: 'edit' },
 		} );
-		expect( savedMenu.meta[ META_KEY ] ).toBe( false );
 
 		await requestUtils.createPage( { title: 'Later', status: 'publish' } );
 		const unchangedMenu = await requestUtils.rest( {
