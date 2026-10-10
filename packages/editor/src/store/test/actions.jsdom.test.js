@@ -422,6 +422,62 @@ describe( 'Post actions', () => {
 			uninstall();
 		} );
 
+		it( 'refuses to trash the post while suggesting, whichever path asks', async () => {
+			const registry = setupPost();
+			const uninstall = installSuggestPostEditGuard( registry );
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				EDITOR_INTENT_SUGGEST
+			);
+			const fetchHandler = vi.fn( async ( options ) =>
+				unknownPath( getMethod( options ), options.path ?? '' )
+			);
+			apiFetch.setFetchHandler( fetchHandler );
+			speak.mockClear();
+
+			await registry.dispatch( editorStore ).trashPost();
+			await registry
+				.dispatch( coreStore )
+				.deleteEntityRecord( 'postType', 'post', draftPost.id );
+
+			expect(
+				fetchHandler.mock.calls.filter(
+					( [ options ] ) => getMethod( options ) === 'DELETE'
+				)
+			).toEqual( [] );
+			expect( speak ).toHaveBeenCalledTimes( 2 );
+			expect( speak ).toHaveBeenCalledWith(
+				"Moving to the trash isn't available while suggesting. Switch to Editing to move it to the trash.",
+				'assertive'
+			);
+			uninstall();
+		} );
+
+		it( 'refuses a site settings edit while suggesting', () => {
+			const registry = setupPost();
+			const uninstall = installSuggestPostEditGuard( registry );
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				EDITOR_INTENT_SUGGEST
+			);
+			speak.mockClear();
+
+			registry
+				.dispatch( coreStore )
+				.editEntityRecord( 'root', 'site', undefined, {
+					posts_per_page: 3,
+				} );
+
+			expect(
+				registry
+					.select( coreStore )
+					.getEntityRecordEdits( 'root', 'site' )
+			).toBeUndefined();
+			expect( speak ).toHaveBeenCalledWith(
+				REFUSED_FIELD_MESSAGE,
+				'assertive'
+			);
+			uninstall();
+		} );
+
 		it( 'discards a status staged while editing when the suggest intent is entered', () => {
 			const registry = setupPost();
 
@@ -1190,6 +1246,7 @@ describe( 'Post actions', () => {
 			const select = {
 				getCurrentPostType: () => 'post',
 				getCurrentPost: () => post,
+				getEditorIntent: () => 'edit',
 			};
 			const registry = {
 				dispatch: () => ( {
