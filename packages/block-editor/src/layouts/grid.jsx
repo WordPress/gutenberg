@@ -270,6 +270,7 @@ export default {
 
 		let output = '';
 		const rules = [];
+		let imageCSS = '';
 		const shouldOutputGridColumns =
 			! hasViewportOverrides ||
 			hasViewportOverride( 'minimumColumnWidth' ) ||
@@ -347,8 +348,36 @@ export default {
 					`aspect-ratio: ${ columnCount } / ${ rowCount }`,
 					'min-height: 0'
 				);
+				// Images cover their cells, below any caption. Only cells sized
+				// by the grid's width can be covered: rows sized by their
+				// content would collapse around images that take their height
+				// from the row.
+				imageCSS =
+					`${ appendSelectors(
+						selector,
+						'> .wp-block-image'
+					) } { display: flex; flex-direction: column; }` +
+					`${ appendSelectors(
+						selector,
+						'> .wp-block-image > :is(img, a)'
+					) } { flex: 1 1 0; min-height: 0; }` +
+					`${ appendSelectors(
+						selector,
+						'> .wp-block-image img'
+					) } { width: 100%; height: 100%; object-fit: cover; }`;
 			} else if ( hasViewportOverrides && baseHasCellsSizedByWidth ) {
 				rules.push( 'aspect-ratio: auto', 'min-height: auto' );
+				// Rows are sized by their content again, so images keep their
+				// own height.
+				imageCSS =
+					`${ appendSelectors(
+						selector,
+						'> .wp-block-image'
+					) } { display: block; }` +
+					`${ appendSelectors(
+						selector,
+						'> .wp-block-image img'
+					) } { height: auto; }`;
 			}
 		} else if ( shouldOutputGridRows ) {
 			rules.push(
@@ -361,6 +390,7 @@ export default {
 				'; '
 			) }; }`;
 		}
+		output += imageCSS;
 
 		// Output blockGap styles based on rules contained in layout definitions in theme.json.
 		if ( hasBlockGapSupport && hasBlockGapOverride && blockGapValue ) {

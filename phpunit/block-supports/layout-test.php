@@ -1635,7 +1635,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 
 	/**
 	 * Check that manual placement grids take their height from their width when the grid
-	 * interactivity experiment is on.
+	 * interactivity experiment is on, and that their images cover their cells.
 	 *
 	 * @covers ::gutenberg_get_layout_style
 	 */
@@ -1653,7 +1653,10 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertSame(
-			'.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);aspect-ratio:3 / 2;min-height:0;}',
+			'.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);aspect-ratio:3 / 2;min-height:0;}' .
+			'.wp-layout > .wp-block-image{display:flex;flex-direction:column;}' .
+			'.wp-layout > .wp-block-image > :is(img, a){flex:1 1 0;min-height:0;}' .
+			'.wp-layout > .wp-block-image img{width:100%;height:100%;object-fit:cover;}',
 			$layout_styles
 		);
 	}
@@ -1683,8 +1686,8 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 
 	/**
 	 * Check that same-size cells are only output for manual placement grids with the grid
-	 * interactivity experiment on, and that the grid is only sized by its width when it has
-	 * no minimum column width.
+	 * interactivity experiment on, and that the grid is only sized by its width, with images
+	 * covering its cells, when it has no minimum column width.
 	 *
 	 * @dataProvider data_gutenberg_get_layout_style_same_size_cells
 	 *
@@ -1725,13 +1728,16 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 			'columnCount' => 3,
 			'rowCount'    => 2,
 		);
+		$image_cover   = '.wp-layout > .wp-block-image{display:flex;flex-direction:column;}' .
+			'.wp-layout > .wp-block-image > :is(img, a){flex:1 1 0;min-height:0;}' .
+			'.wp-layout > .wp-block-image img{width:100%;height:100%;object-fit:cover;}';
 
 		return array(
 			'manual grid, experiment on, viewport column count' => array(
 				'experiment_enabled' => true,
 				'layout'             => $manual_layout,
 				'viewport_overrides' => array( 'columnCount' => 1 ),
-				'expected_output'    => '.wp-layout{grid-template-columns:repeat(1, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);aspect-ratio:1 / 2;min-height:0;}',
+				'expected_output'    => '.wp-layout{grid-template-columns:repeat(1, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);aspect-ratio:1 / 2;min-height:0;}' . $image_cover,
 			),
 			'manual grid, experiment off, viewport column count' => array(
 				'experiment_enabled' => false,
@@ -1767,7 +1773,9 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				'experiment_enabled' => true,
 				'layout'             => $manual_layout,
 				'viewport_overrides' => array( 'minimumColumnWidth' => '12rem' ),
-				'expected_output'    => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(max(min(12rem, 100%), (100% - (0.5em * (3 - 1))) /3), 1fr));container-type:inline-size;grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);aspect-ratio:auto;min-height:auto;}',
+				'expected_output'    => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(max(min(12rem, 100%), (100% - (0.5em * (3 - 1))) /3), 1fr));container-type:inline-size;grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);aspect-ratio:auto;min-height:auto;}' .
+					'.wp-layout > .wp-block-image{display:block;}' .
+					'.wp-layout > .wp-block-image img{height:auto;}',
 			),
 		);
 	}
