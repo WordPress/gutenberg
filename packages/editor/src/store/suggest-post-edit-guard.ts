@@ -161,11 +161,49 @@ function isCurrentPost(
 }
 
 /**
- * Wrap the core-data actions that can change the post without passing
- * through `editPost`, so a direct write is refused while suggesting:
+ * Whether a record holds site settings rather than the post: the site
+ * entity itself, or the posts page, whose title the template summary edits
+ * as the blog title. A suggestion is about the post, so these can never be
+ * proposed.
+ *
+ * @param registry The data registry.
+ * @param kind     Entity kind.
+ * @param name     Entity name.
+ * @param recordId Record id.
+ * @return Whether it is a site settings record.
+ */
+function isSiteSettingsRecord(
+	registry: any,
+	kind: string,
+	name: string,
+	recordId: any
+): boolean {
+	if ( kind === 'root' && name === 'site' ) {
+		return true;
+	}
+	if ( kind !== 'postType' || name !== 'page' ) {
+		return false;
+	}
+	const postsPageId = registry
+		.select( coreStore )
+		.getEntityRecord( 'root', 'site' )?.page_for_posts;
+	return (
+		!! postsPageId &&
+		String( recordId ) === String( postsPageId ) &&
+		! isCurrentPost( registry, kind, name, recordId )
+	);
+}
+
+/**
+ * Wrap the core-data actions that can change the post, or the site settings
+ * shown beside it, without passing through `editPost`, so a direct write is
+ * refused while suggesting:
  *
  *   - `editEntityRecord` on the current post keeps content edits and refuses
- *     the rest.
+ *     the rest; on the site settings it is refused outright.
+ *   - `saveEntityRecord` and `saveEditedEntityRecord` on the site settings
+ *     are refused, so a site setting staged in Editing is not saved from
+ *     Suggesting either.
  *   - `deleteEntityRecord` on the current post (the actions menu's "Trash")
  *     is refused.
  *
@@ -188,6 +226,8 @@ export function installSuggestPostEditGuard( registry: any ): () => void {
 	if ( ! installed.has( coreActions ) ) {
 		const originals: WrappedActions = {
 			editEntityRecord: coreActions.editEntityRecord,
+			saveEntityRecord: coreActions.saveEntityRecord,
+			saveEditedEntityRecord: coreActions.saveEditedEntityRecord,
 			deleteEntityRecord: coreActions.deleteEntityRecord,
 		};
 		installed.set( coreActions, originals );
@@ -203,6 +243,10 @@ export function installSuggestPostEditGuard( registry: any ): () => void {
 			const original = originals.editEntityRecord;
 			if ( ! isGuarded() ) {
 				return original( kind, name, recordId, edits, options );
+			}
+			if ( isSiteSettingsRecord( registry, kind, name, recordId ) ) {
+				announceSuggestRefusal( registry, Object.keys( edits ?? {} ) );
+				return Promise.resolve();
 			}
 			if ( ! isCurrentPost( registry, kind, name, recordId ) ) {
 				return original( kind, name, recordId, edits, options );
@@ -222,6 +266,33 @@ export function installSuggestPostEditGuard( registry: any ): () => void {
 			}
 			return original( kind, name, recordId, passthrough, options );
 		};
+
+		for ( const action of [
+			'saveEntityRecord',
+			'saveEditedEntityRecord',
+		] as const ) {
+			if ( ! originals[ action ] ) {
+				continue;
+			}
+			coreActions[ action ] = (
+				kind: string,
+				name: string,
+				...args: any[]
+			) => {
+				// `saveEntityRecord` takes the record, `saveEditedEntityRecord`
+				// its id; the site entity has no id either way.
+				const recordId =
+					action === 'saveEntityRecord' ? args[ 0 ]?.id : args[ 0 ];
+				if (
+					isGuarded() &&
+					isSiteSettingsRecord( registry, kind, name, recordId )
+				) {
+					announceSuggestRefusal( registry, [ name ] );
+					return Promise.resolve();
+				}
+				return originals[ action ]( kind, name, ...args );
+			};
+		}
 
 		if ( originals.deleteEntityRecord ) {
 			coreActions.deleteEntityRecord = (
