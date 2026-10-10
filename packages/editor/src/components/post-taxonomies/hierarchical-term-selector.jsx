@@ -26,6 +26,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { buildTermsTree } from '../../utils/terms';
 import { normalizeTextString } from '../../utils/normalize-text-string';
 import { store as editorStore } from '../../store';
+import { EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 
 const { RECEIVE_INTERMEDIATE_RESULTS } = unlock( coreDataPrivateApis );
@@ -218,6 +219,8 @@ export function HierarchicalTermSelector( { slug } ) {
 		hasCreateAction,
 		hasAssignAction,
 		terms,
+		newTerms,
+		isSuggesting,
 		loading,
 		availableTerms,
 		taxonomy,
@@ -229,21 +232,36 @@ export function HierarchicalTermSelector( { slug } ) {
 				select( coreStore );
 			const _taxonomy = getEntityRecord( 'root', 'taxonomy', slug );
 			const post = getCurrentPost();
+			// `getEditorIntent` is private while Suggestion mode is experimental.
+			const _isSuggesting =
+				unlock( select( editorStore ) ).getEditorIntent() ===
+				EDITOR_INTENT_SUGGEST;
+
+			const _hasAssignAction = _taxonomy
+				? !! post._links?.[ 'wp:action-assign-' + _taxonomy.rest_base ]
+				: false;
 
 			return {
-				hasCreateAction: _taxonomy
-					? !! post._links?.[
-							'wp:action-create-' + _taxonomy.rest_base
-						]
-					: false,
-				hasAssignAction: _taxonomy
-					? !! post._links?.[
-							'wp:action-assign-' + _taxonomy.rest_base
-						]
-					: false,
+				// A new term suggested while suggesting is not created: it
+				// rides on the terms proposal until a reviewer accepts it, so
+				// assigning terms is all a suggester needs. See issue #73411.
+				hasCreateAction:
+					_taxonomy && _isSuggesting
+						? _hasAssignAction
+						: !! _taxonomy &&
+							!! post._links?.[
+								'wp:action-create-' + _taxonomy.rest_base
+							],
+				hasAssignAction: _hasAssignAction,
 				terms: _taxonomy
 					? getEditedPostAttribute( _taxonomy.rest_base )
 					: EMPTY_ARRAY,
+				newTerms: _taxonomy
+					? unlock( select( editorStore ) ).getProposedNewTerms(
+							_taxonomy.rest_base
+						)
+					: EMPTY_ARRAY,
+				isSuggesting: _isSuggesting,
 				loading: isResolving( 'getEntityRecords', [
 					'taxonomy',
 					slug,
@@ -300,10 +318,16 @@ export function HierarchicalTermSelector( { slug } ) {
 	/**
 	 * Update terms for post.
 	 *
-	 * @param {number[]} termIds Term ids.
+	 * @param {number[]} termIds        Term ids.
+	 * @param {Object[]} [nextNewTerms] The proposed new terms to keep, while
+	 *                                  suggesting.
 	 */
-	const onUpdateTerms = ( termIds ) => {
-		editPost( { [ taxonomy.rest_base ]: termIds } );
+	const onUpdateTerms = ( termIds, nextNewTerms = newTerms ) => {
+		editPost( {
+			[ taxonomy.rest_base ]: nextNewTerms.length
+				? [ ...termIds, ...nextNewTerms ]
+				: termIds,
+		} );
 	};
 
 	// Stable, so unchanged checkboxes can bail out of re-rendering.
@@ -349,6 +373,14 @@ export function HierarchicalTermSelector( { slug } ) {
 		setShowForm( ! showForm );
 	};
 
+	const termAddedMessage = () =>
+		sprintf(
+			/* translators: %s: term name. */
+			_x( '%s added', 'term' ),
+			taxonomy?.labels?.singular_name ??
+				( slug === 'category' ? __( 'Category' ) : __( 'Term' ) )
+		);
+
 	const onAddTerm = async ( event ) => {
 		event.preventDefault();
 		if ( formName === '' || adding ) {
@@ -368,6 +400,30 @@ export function HierarchicalTermSelector( { slug } ) {
 
 			return;
 		}
+		// While suggesting, the term is proposed rather than created: it is
+		// created once a reviewer accepts the suggestion.
+		if ( isSuggesting ) {
+			const isProposed = newTerms.some(
+				( term ) =>
+					term.name.toLowerCase() === formName.toLowerCase() &&
+					( term.parent ?? 0 ) === Number( formParent || 0 )
+			);
+			if ( ! isProposed ) {
+				onUpdateTerms( terms, [
+					...newTerms,
+					{
+						name: formName,
+						...( formParent
+							? { parent: Number( formParent ) }
+							: {} ),
+					},
+				] );
+				speak( termAddedMessage(), 'assertive' );
+			}
+			setFormName( '' );
+			setFormParent( '' );
+			return;
+		}
 		setAdding( true );
 		let newTerm;
 		try {
@@ -381,14 +437,7 @@ export function HierarchicalTermSelector( { slug } ) {
 			} );
 			return;
 		}
-		const defaultName =
-			slug === 'category' ? __( 'Category' ) : __( 'Term' );
-		const termAddedMessage = sprintf(
-			/* translators: %s: term name. */
-			_x( '%s added', 'term' ),
-			taxonomy?.labels?.singular_name ?? defaultName
-		);
-		speak( termAddedMessage, 'assertive' );
+		speak( termAddedMessage(), 'assertive' );
 		setAdding( false );
 		setFormName( '' );
 		setFormParent( '' );
@@ -458,6 +507,25 @@ export function HierarchicalTermSelector( { slug } ) {
 						selectedTerms={ selectedTerms }
 						onToggle={ onToggleTerm }
 					/>
+				) ) }
+				{ newTerms.map( ( term ) => (
+					<div
+						key={ `${ term.parent ?? 0 }:${ term.name }` }
+						className="editor-post-taxonomies__hierarchical-terms-choice"
+					>
+						<WCCheckboxControl
+							checked
+							onChange={ () =>
+								onUpdateTerms(
+									terms,
+									newTerms.filter(
+										( newTerm ) => newTerm !== term
+									)
+								)
+							}
+							label={ term.name }
+						/>
+					</div>
 				) ) }
 			</div>
 			{ ! loading && hasCreateAction && (

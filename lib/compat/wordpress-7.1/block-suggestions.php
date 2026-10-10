@@ -216,6 +216,179 @@ function gutenberg_register_suggestion_meta() {
 add_action( 'init', 'gutenberg_register_suggestion_meta' );
 
 /**
+ * Validates the post-level operations of a suggestion before its note is
+ * saved.
+ *
+ * A `post-attribute-set` operation proposes a change to a field of the post
+ * the note belongs to; a reviewer's accept writes it to the post. Only the
+ * fields Suggestion mode can propose are accepted: the title, excerpt,
+ * featured image and slug, the terms of one of the post type's REST-exposed
+ * taxonomies (by `rest_base`), and a post meta key. A meta key must be
+ * registered for the post type with `show_in_rest`, and the suggester must be
+ * allowed to edit it (`edit_post_meta`), so a suggestion can never carry a
+ * key its author could not have written directly. The reviewer's save checks
+ * the reviewer's own capabilities again, as any post save does.
+ *
+ * Hooked to `rest_preprocess_comment`, which runs for both creating and
+ * updating a comment, so the request is refused with a 400 before anything
+ * is stored.
+ *
+ * @param array|WP_Error  $prepared_comment The prepared comment data.
+ * @param WP_REST_Request $request          The REST request.
+ * @return array|WP_Error The prepared comment, or an error for an invalid
+ *                        post-level operation.
+ */
+function gutenberg_validate_suggestion_post_operations( $prepared_comment, $request ) {
+	if ( is_wp_error( $prepared_comment ) ) {
+		return $prepared_comment;
+	}
+	$meta = $request['meta'];
+	if ( ! is_array( $meta ) || ! isset( $meta['_wp_suggestion'] ) || ! is_string( $meta['_wp_suggestion'] ) ) {
+		return $prepared_comment;
+	}
+	$payload = json_decode( $meta['_wp_suggestion'], true );
+	if ( ! is_array( $payload ) || ! isset( $payload['operations'] ) || ! is_array( $payload['operations'] ) ) {
+		return $prepared_comment;
+	}
+
+	$post_id = isset( $prepared_comment['comment_post_ID'] ) ? (int) $prepared_comment['comment_post_ID'] : 0;
+	if ( ! $post_id && isset( $request['id'] ) ) {
+		$comment = get_comment( (int) $request['id'] );
+		$post_id = $comment ? (int) $comment->comment_post_ID : 0;
+	}
+	$post = get_post( $post_id );
+
+	$error = new WP_Error(
+		'rest_invalid_suggestion',
+		__( 'This suggestion changes a post setting that cannot be suggested.', 'gutenberg' ),
+		array( 'status' => 400 )
+	);
+
+	$sanitized = false;
+	foreach ( $payload['operations'] as $index => $operation ) {
+		if ( ! is_array( $operation ) || ! isset( $operation['type'] ) || 'post-attribute-set' !== $operation['type'] ) {
+			continue;
+		}
+		if ( ! $post || ! isset( $operation['attribute'] ) || ! is_string( $operation['attribute'] ) ) {
+			return $error;
+		}
+		$attribute = $operation['attribute'];
+		if ( in_array( $attribute, array( 'title', 'excerpt', 'featured_media', 'slug' ), true ) ) {
+			continue;
+		}
+		if ( 'meta' === $attribute ) {
+			$key = isset( $operation['key'] ) && is_string( $operation['key'] ) ? $operation['key'] : '';
+			if ( ! gutenberg_can_suggest_post_meta( $post, $key ) ) {
+				return $error;
+			}
+			continue;
+		}
+		$suggested_taxonomy = null;
+		foreach ( get_object_taxonomies( $post->post_type, 'objects' ) as $taxonomy ) {
+			if ( ! empty( $taxonomy->show_in_rest ) && ( $taxonomy->rest_base ? $taxonomy->rest_base : $taxonomy->name ) === $attribute ) {
+				$suggested_taxonomy = $taxonomy;
+				break;
+			}
+		}
+		if ( ! $suggested_taxonomy ) {
+			return $error;
+		}
+		$after = isset( $operation['after'] ) ? $operation['after'] : array();
+		$terms = gutenberg_sanitize_suggested_terms( $after, $suggested_taxonomy );
+		if ( null === $terms ) {
+			return $error;
+		}
+		if ( $terms !== $after ) {
+			$payload['operations'][ $index ]['after'] = $terms;
+			$sanitized                                = true;
+		}
+	}
+
+	// Store the sanitized new term names, not the ones sent.
+	if ( $sanitized ) {
+		$meta['_wp_suggestion'] = wp_json_encode( $payload );
+		$request->set_param( 'meta', $meta );
+	}
+
+	return $prepared_comment;
+}
+
+/**
+ * Validates and sanitizes the terms a terms suggestion proposes.
+ *
+ * Each entry is either the id of a term to assign, or a term that does not
+ * exist yet, as `{ name, parent? }`: Suggestion mode never writes to a
+ * taxonomy, so a new term rides on the suggestion and is only created when a
+ * reviewer accepts it, through the normal term permissions. The suggester
+ * therefore needs no capability to create terms. A new term's name is
+ * sanitized, and a parent is only accepted for a hierarchical taxonomy, as
+ * the id of an existing term in it.
+ *
+ * @param mixed       $terms    The proposed terms.
+ * @param WP_Taxonomy $taxonomy The taxonomy they belong to.
+ * @return array|null The sanitized terms, or null if an entry is invalid.
+ */
+function gutenberg_sanitize_suggested_terms( $terms, $taxonomy ) {
+	if ( ! wp_is_numeric_array( $terms ) ) {
+		return null;
+	}
+	$sanitized = array();
+	foreach ( $terms as $term ) {
+		if ( is_int( $term ) && $term > 0 ) {
+			$sanitized[] = $term;
+			continue;
+		}
+		if ( ! is_array( $term ) || ! isset( $term['name'] ) || ! is_string( $term['name'] ) ) {
+			return null;
+		}
+		$name = sanitize_text_field( $term['name'] );
+		if ( '' === $name ) {
+			return null;
+		}
+		$new_term = array( 'name' => $name );
+		if ( isset( $term['parent'] ) ) {
+			$parent = $term['parent'];
+			if ( ! $taxonomy->hierarchical || ! is_int( $parent ) || $parent < 0 ) {
+				return null;
+			}
+			if ( $parent > 0 ) {
+				$parent_term = get_term( $parent, $taxonomy->name );
+				if ( ! $parent_term instanceof WP_Term ) {
+					return null;
+				}
+				$new_term['parent'] = $parent;
+			}
+		}
+		$sanitized[] = $new_term;
+	}
+	return $sanitized;
+}
+add_filter( 'rest_preprocess_comment', 'gutenberg_validate_suggestion_post_operations', 10, 2 );
+
+/**
+ * Whether the current user may suggest a change to a post meta key: the key
+ * is registered for the post's type with `show_in_rest`, and the user could
+ * edit it directly.
+ *
+ * @param WP_Post $post The post the suggestion belongs to.
+ * @param string  $key  The meta key.
+ * @return bool Whether the key can be suggested.
+ */
+function gutenberg_can_suggest_post_meta( $post, $key ) {
+	if ( '' === $key ) {
+		return false;
+	}
+	$registered = array_merge(
+		get_registered_meta_keys( 'post' ),
+		get_registered_meta_keys( 'post', $post->post_type )
+	);
+	if ( ! isset( $registered[ $key ] ) || empty( $registered[ $key ]['show_in_rest'] ) ) {
+		return false;
+	}
+	return current_user_can( 'edit_post_meta', $post->ID, $key );
+}
+
+/**
  * Strip inline suggestion markers from rendered block output.
  *
  * The public HTML must never expose suggestion metadata, and an un-accepted

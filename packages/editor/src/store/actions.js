@@ -28,7 +28,17 @@ import {
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
-import { EDITOR_INTENT_SUGGEST, SUGGEST_LOCKED_POST_FIELDS } from './constants';
+import { EDITOR_INTENT_SUGGEST } from './constants';
+import {
+	classifySuggestedPostEdits,
+	getPostFieldProposalId,
+	stripSuggestedPostSave,
+} from './suggest-post-edits';
+import {
+	announceSuggestRefusal,
+	announceSuggestTrashRefusal,
+	withoutSuggestPostEditGuard,
+} from './suggest-post-edit-guard';
 import attachMediaInPost from './utils/attach-media-in-post';
 import { unlock } from '../lock-unlock';
 import { setCanvasWidth } from './private-actions';
@@ -183,7 +193,7 @@ export function setEditedPost( postType, postId ) {
  */
 export const editPost =
 	( edits, options ) =>
-	( { select, registry } ) => {
+	( { select, dispatch, registry } ) => {
 		const { id, type } = select.getCurrentPost();
 		let nextEdits = edits;
 
@@ -221,60 +231,28 @@ export const editPost =
 		}
 
 		/*
-		 * Suggest mode proposes changes, it doesn't apply them. Post status is
-		 * the one post-level field that moves the post along the editorial
-		 * workflow (draft -> pending -> publish), so a suggester who can change
-		 * it is approving their own work while nominally only suggesting.
-		 * Drop it here rather than in the sidebar control alone: the publish
-		 * button, "Switch to draft", the command palette and third-party code
-		 * all reach the post through this action. See issue #73411 (F-15).
+		 * Suggestion mode proposes changes, it doesn't apply them. Content
+		 * edits pass (the blocks carry their own suggestion markers); every
+		 * other post-level change is refused - status among them, the field
+		 * that moves the post along the editorial workflow. Refused here
+		 * rather than in the sidebar controls alone: the publish button,
+		 * "Switch to draft", the command palette and third-party code all
+		 * reach the post through this action. See issue #73411 (F-15).
 		 */
 		if ( select.getEditorIntent() === EDITOR_INTENT_SUGGEST ) {
-			const locked = SUGGEST_LOCKED_POST_FIELDS.filter(
-				( key ) => key in nextEdits
-			);
-			/*
-			 * A locked field repeated at the value it already holds is not a
-			 * change to refuse. `PostVisibility` sends the current status
-			 * alongside every visibility choice, so refusing on the mere
-			 * presence of the key would announce a refusal for an edit that
-			 * proposed nothing. Drop those keys silently - writing them back
-			 * would dirty the post for no reason - and let the rest apply.
-			 */
-			const changed = locked.filter(
-				( key ) =>
-					nextEdits[ key ] !== select.getEditedPostAttribute( key )
-			);
-			if ( locked.length && ! changed.length ) {
-				nextEdits = { ...nextEdits };
-				locked.forEach( ( key ) => {
-					delete nextEdits[ key ];
+			const { passthrough, proposals, refused } =
+				classifySuggestedPostEdits( edits, {
+					// A proposal's full value: a terms proposal can hold
+					// new terms `getEditedPostAttribute` leaves out.
+					getCurrentValue: ( key ) =>
+						key !== 'meta' && select.getPostFieldProposals()[ key ]
+							? select.getPostFieldProposals()[ key ].proposed
+							: select.getEditedPostAttribute( key ),
+					isProposable: ( attribute, key ) =>
+						select.isProposablePostField( attribute, key ),
 				} );
-			}
-			if ( changed.length ) {
-				/*
-				 * Say it twice over, in two channels: a refusal only screen reader
-				 * users perceive is indistinguishable from a control that quietly
-				 * does nothing. `speak` carries the announcement because it fires
-				 * on every refusal and can be assertive; the snackbar carries the
-				 * visible half with `speak: false`, since a spoken snackbar would
-				 * announce the same sentence a second time.
-				 */
-				const message = __(
-					"The post status can't be changed while suggesting. Switch to Editing to change it."
-				);
-				speak( message, 'assertive' );
-				registry
-					.dispatch( noticesStore )
-					.createNotice( 'info', message, {
-						// Reuse one notice id so a control that dispatches repeatedly
-						// replaces its own snackbar instead of stacking them.
-						id: 'editor-suggest-locked-post-status',
-						type: 'snackbar',
-						isDismissible: true,
-						speak: false,
-					} );
-
+			if ( refused.length ) {
+				announceSuggestRefusal( registry, refused );
 				/*
 				 * Refuse the whole call, not just the locked key. A status
 				 * edit rarely travels alone - `PostVisibility` pairs it with
@@ -282,10 +260,57 @@ export const editPost =
 				 * the companion while dropping the status leaves the post in
 				 * a state nobody asked for: switching a published post to
 				 * Private while suggesting would strip its password and keep
-				 * it published.
+				 * it published. Content still passes (`passthrough` holds
+				 * nothing else), so a stray locked key never costs the user
+				 * their block edits.
 				 */
+			} else {
+				/*
+				 * A proposal keeps the value the field had when it was first
+				 * proposed as its baseline, so revising a proposal never
+				 * moves what the reviewer compares against.
+				 */
+				for ( const { attribute, key, value } of proposals ) {
+					const proposalId = getPostFieldProposalId( attribute, key );
+					const existing =
+						select.getPostFieldProposals()[ proposalId ];
+					dispatch.setPostFieldProposal( proposalId, {
+						attribute,
+						...( key ? { key } : {} ),
+						// A proposal restored from its note keeps the link,
+						// so the note is updated rather than duplicated.
+						...( existing?.commentId
+							? {
+									commentId: existing.commentId,
+									noteValue: existing.noteValue,
+								}
+							: {} ),
+						baseline: existing
+							? existing.baseline
+							: select.getPostFieldValueWithoutProposals(
+									attribute,
+									key
+								),
+						proposed: value,
+					} );
+				}
+			}
+			nextEdits = passthrough;
+			if ( ! Object.keys( nextEdits ).length ) {
 				return;
 			}
+			withoutSuggestPostEditGuard( () =>
+				registry
+					.dispatch( coreStore )
+					.editEntityRecord(
+						'postType',
+						type,
+						id,
+						nextEdits,
+						options
+					)
+			);
+			return;
 		}
 
 		registry
@@ -335,6 +360,19 @@ export const savePost =
 			);
 		} catch ( err ) {
 			error = err;
+		}
+
+		/*
+		 * A save made while suggesting sends the content and nothing else.
+		 * `editPost` and the entity guard refuse post-level edits as they are
+		 * made, but an edit staged in Editing is still on the entity when the
+		 * intent changes, and a plugin's `editor.preSavePost` filter can add
+		 * one: neither may reach the post from Suggesting. Stripped after the
+		 * filter so nothing can add a field back. The stripped edits stay on
+		 * the entity, so returning to Editing saves them as usual.
+		 */
+		if ( select.getEditorIntent() === EDITOR_INTENT_SUGGEST ) {
+			edits = stripSuggestedPostSave( edits );
 		}
 
 		if ( ! error ) {
@@ -495,6 +533,15 @@ export function refreshPost() {
 export const trashPost =
 	( { force = false } = {} ) =>
 	async ( { select, dispatch, registry } ) => {
+		/*
+		 * Suggestion mode proposes changes; trashing the post is not one a
+		 * reviewer could accept or reject, so it is refused while suggesting,
+		 * whichever control asked. See issue #73411.
+		 */
+		if ( select.getEditorIntent() === EDITOR_INTENT_SUGGEST ) {
+			announceSuggestTrashRefusal( registry );
+			return;
+		}
 		const postTypeSlug = select.getCurrentPostType();
 		const postType = await registry
 			.resolveSelect( coreStore )
