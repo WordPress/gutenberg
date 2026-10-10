@@ -41,7 +41,9 @@ import { unlock } from '../lock-unlock';
 import { getDimensionResetAttributes } from '../utils/style-state';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
-const { ResolutionTool } = unlock( blockEditorPrivateApis );
+const { ResolutionTool, useIsInFixedGridCell } = unlock(
+	blockEditorPrivateApis
+);
 
 const hasDimensionValue = ( value ) =>
 	value !== undefined && value !== null && value !== '';
@@ -160,6 +162,9 @@ export default function PostFeaturedImageEdit( {
 		},
 		[ clientId, featuredImage, postTypeSlug, postId ]
 	);
+	// In a grid cell with a fixed size, the image fills the cell, so its own
+	// size settings have no effect.
+	const isInFixedGridCell = useIsInFixedGridCell( clientId );
 
 	const mediaUrl =
 		media?.media_details?.sizes?.[ sizeSlug ]?.source_url ||
@@ -245,32 +250,39 @@ export default function PostFeaturedImageEdit( {
 					clientId={ clientId }
 				/>
 			</InspectorControls>
-			<InspectorControls
-				group="dimensions"
-				resetAllFilter={ ( attrs ) => {
-					return getDimensionResetAttributes( {
-						attributes: attrs,
-						selectedState: selectedStyleState,
-						hasSelectedStyleState,
-						keys: [ 'aspectRatio', 'height', 'objectFit', 'width' ],
-						defaultAttributes: {
-							aspectRatio: undefined,
-							height: undefined,
-							scale: undefined,
-							width: undefined,
-						},
-					} );
-				} }
-			>
-				<DimensionControls
-					clientId={ clientId }
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					media={ media }
-					selectedStyleState={ selectedStyleState }
-					hasSelectedStyleState={ hasSelectedStyleState }
-				/>
-			</InspectorControls>
+			{ ! isInFixedGridCell && (
+				<InspectorControls
+					group="dimensions"
+					resetAllFilter={ ( attrs ) => {
+						return getDimensionResetAttributes( {
+							attributes: attrs,
+							selectedState: selectedStyleState,
+							hasSelectedStyleState,
+							keys: [
+								'aspectRatio',
+								'height',
+								'objectFit',
+								'width',
+							],
+							defaultAttributes: {
+								aspectRatio: undefined,
+								height: undefined,
+								scale: undefined,
+								width: undefined,
+							},
+						} );
+					} }
+				>
+					<DimensionControls
+						clientId={ clientId }
+						attributes={ attributes }
+						setAttributes={ setAttributes }
+						media={ media }
+						selectedStyleState={ selectedStyleState }
+						hasSelectedStyleState={ hasSelectedStyleState }
+					/>
+				</InspectorControls>
+			) }
 			{ ( featuredImage || isDescendentOfQueryLoop || ! postId ) && (
 				<InspectorControls>
 					<ToolsPanel

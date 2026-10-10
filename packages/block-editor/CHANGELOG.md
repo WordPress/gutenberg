@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### New Features
+
+-   Add a rotate block support, behind the `gutenberg-block-rotation` experiment: blocks get a Rotation control in their Dimensions panel unless they opt out with `supports.rotate: false`, stored in `style.rotate` with viewport overrides, and rotated with the CSS `rotate` property ([#84505](https://github.com/WordPress/gutenberg/pull/84505)).
+
 ### Enhancements
 
 -   Inserter: Replace random tips with info notices using the same light-bulb icon and style keyboard hints as keys ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
@@ -15,6 +19,7 @@
 -   Grid: Behind the `gutenberg-grid-interactivity` experiment, a selected manual placement grid has handles on its top and bottom edges that add or remove rows in the selected style state. Rows added or removed at the top move every block with them, and rows with blocks in them can't be removed. Dragging a block's bottom resize handle past the last row also adds rows ([#84502](https://github.com/WordPress/gutenberg/pull/84502)).
 -   Grid: Behind the `gutenberg-grid-interactivity` experiment, pressing on an empty cell of a manual placement grid with a mouse or pen and dragging selects a rectangle of cells. On release, the inserter opens, and the block inserted covers the selected cells. The block always gets a placement in the default style state, fitted to the grid's columns and rows, and when a viewport is selected, also the drawn cells for that viewport. Blocks inserted into a cell of a manual grid now keep the style they were inserted with, such as a pattern's root block styles ([#84503](https://github.com/WordPress/gutenberg/pull/84503)).
 -   Grid: Behind the `gutenberg-grid-interactivity` experiment, manual placement grids stack their blocks on mobile, full width, in block order, keeping their row spans and setting `--wp--style--grid-cells: auto` so blocks stop filling cells, unless "Stack on mobile" is turned off (`layout.stackOnMobile`, which can also be set in the mobile state). In the Mobile state, the canvas tools and block settings work from the stack: the first edit gives the grid its own mobile layout matching the stack, then applies the edit, as one undo step ([#84509](https://github.com/WordPress/gutenberg/pull/84509)).
+-   Grid: Behind the `gutenberg-grid-interactivity` and `gutenberg-block-rotation` experiments, a selected block in a manual placement grid has a rotate handle on the canvas. Dragging it previews the angle, snapping to multiples of 15° unless Shift is held, and releasing it stores the rotate support's `style.rotate` for the selected style state as one undo step; Escape cancels. The resize handles follow the block's rotation, and dragged blocks land by the cells they take up, without their rotation. Blocks of a grid stacked on mobile are shown unrotated, and images there keep their own size ([#84512](https://github.com/WordPress/gutenberg/pull/84512)).
 
 ### Bug Fixes
 

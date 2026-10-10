@@ -3,7 +3,7 @@ import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import { dispatch } from '@wordpress/data';
-import grid from '../grid';
+import grid, { hasFixedGridCells } from '../grid';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -453,7 +453,7 @@ describe( 'getMobileStackingStyle', () => {
 		window.__experimentalEnableGridInteractivity = originalExperiment;
 	} );
 
-	it( 'stacks the children of manual placement grids, keeping their row spans', () => {
+	it( 'stacks the children of manual placement grids, unrotated and keeping their row spans', () => {
 		expect(
 			grid.getMobileStackingStyle( {
 				selector: '.my-container',
@@ -461,7 +461,7 @@ describe( 'getMobileStackingStyle', () => {
 			} )
 		).toBe(
 			'.my-container.my-container { aspect-ratio: auto; grid-template-rows: none; grid-auto-rows: auto; --wp--style--grid-cells: auto; }' +
-				'.my-container.my-container > * { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); }'
+				'.my-container.my-container > * { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); rotate: none; }'
 		);
 	} );
 
@@ -497,5 +497,47 @@ describe( 'getMobileStackingStyle', () => {
 				layout: { isManualPlacement: true },
 			} )
 		).toBe( '' );
+	} );
+} );
+
+describe( 'hasFixedGridCells', () => {
+	let originalExperiment;
+	beforeEach( () => {
+		originalExperiment = window.__experimentalEnableGridInteractivity;
+		window.__experimentalEnableGridInteractivity = true;
+	} );
+	afterEach( () => {
+		window.__experimentalEnableGridInteractivity = originalExperiment;
+	} );
+
+	const manualLayout = {
+		type: 'grid',
+		columnCount: 3,
+		rowCount: 2,
+		isManualPlacement: true,
+	};
+
+	it( 'is true for manual placement grids sized by their width', () => {
+		expect( hasFixedGridCells( manualLayout ) ).toBe( true );
+	} );
+
+	it( 'is false for auto placement grids, grids with a minimum column width, and grids without both counts', () => {
+		expect(
+			hasFixedGridCells( { ...manualLayout, isManualPlacement: false } )
+		).toBe( false );
+		expect(
+			hasFixedGridCells( {
+				...manualLayout,
+				minimumColumnWidth: '12rem',
+			} )
+		).toBe( false );
+		expect(
+			hasFixedGridCells( { ...manualLayout, rowCount: undefined } )
+		).toBe( false );
+	} );
+
+	it( 'is false with the grid interactivity experiment off', () => {
+		window.__experimentalEnableGridInteractivity = false;
+		expect( hasFixedGridCells( manualLayout ) ).toBe( false );
 	} );
 } );

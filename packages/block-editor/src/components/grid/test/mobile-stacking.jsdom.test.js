@@ -141,6 +141,65 @@ describe( 'getUnstackedMobileUpdates()', () => {
 		} );
 	} );
 
+	it( 'keeps children rotated on mobile unrotated, as the stack showed them', () => {
+		const updates = getUnstackedMobileUpdates( {
+			gridClientId: 'grid',
+			gridAttributes,
+			children: [
+				{ clientId: 'a', attributes: { style: { rotate: 30 } } },
+				{
+					clientId: 'b',
+					attributes: {
+						style: { '@mobile': { rotate: -45 } },
+					},
+				},
+				{
+					clientId: 'c',
+					attributes: {
+						style: { rotate: 30, '@tablet': { rotate: 15 } },
+					},
+				},
+			],
+		} );
+		expect( updates.a.style ).toEqual( {
+			rotate: 30,
+			'@mobile': {
+				layout: {
+					columnStart: 1,
+					columnSpan: 3,
+					rowStart: 1,
+					rowSpan: 1,
+				},
+				rotate: 0,
+			},
+		} );
+		expect( updates.b.style[ '@mobile' ].rotate ).toBe( 0 );
+		// Only the mobile rotation changes.
+		expect( updates.c.style ).toMatchObject( {
+			rotate: 30,
+			'@tablet': { rotate: 15 },
+			'@mobile': { rotate: 0 },
+		} );
+	} );
+
+	it( 'leaves the rotation of unrotated children alone', () => {
+		const updates = getUnstackedMobileUpdates( {
+			gridClientId: 'grid',
+			gridAttributes,
+			children: [
+				{ clientId: 'a', attributes: {} },
+				{
+					clientId: 'b',
+					attributes: {
+						style: { rotate: 30, '@mobile': { rotate: 0 } },
+					},
+				},
+			],
+		} );
+		expect( updates.a.style[ '@mobile' ] ).not.toHaveProperty( 'rotate' );
+		expect( updates.b.style[ '@mobile' ].rotate ).toBe( 0 );
+	} );
+
 	it( 'uses the mobile column count when the grid has one', () => {
 		const updates = getUnstackedMobileUpdates( {
 			gridClientId: 'grid',

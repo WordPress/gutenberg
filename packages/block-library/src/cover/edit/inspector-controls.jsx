@@ -108,6 +108,7 @@ export default function CoverInspectorControls( {
 	onClearMedia,
 	featuredImage,
 	isSelected,
+	isInFixedGridCell,
 } ) {
 	const {
 		useFeaturedImage,
@@ -532,43 +533,45 @@ export default function CoverInspectorControls( {
 					</ToolsPanelItem>
 				</InspectorControls>
 			) }
-			<InspectorControls group="dimensions">
-				<ToolsPanelItem
-					key={ selectedStyleStateKey }
-					className="single-column"
-					hasValue={ () => !! activeMinHeight }
-					label={ __( 'Minimum height' ) }
-					onDeselect={ () =>
-						setAttributes( getResetMinHeightAttributes() )
-					}
-					resetAllFilter={ getResetMinHeightAttributes }
-					isShownByDefault
-					panelId={ clientId }
-				>
-					<CoverHeightInput
-						value={ activeAspectRatio ? '' : activeMinHeight }
-						unit={ activeMinHeightUnit }
-						onChange={ ( newMinHeight ) =>
-							setMinHeightAttributes( newMinHeight )
+			{ ! isInFixedGridCell && (
+				<InspectorControls group="dimensions">
+					<ToolsPanelItem
+						key={ selectedStyleStateKey }
+						className="single-column"
+						hasValue={ () => !! activeMinHeight }
+						label={ __( 'Minimum height' ) }
+						onDeselect={ () =>
+							setAttributes( getResetMinHeightAttributes() )
 						}
-						onUnitChange={ ( nextUnit ) => {
-							if ( hasSelectedStyleState ) {
-								if ( activeMinHeight !== undefined ) {
-									setMinHeightAttributes(
-										activeMinHeight,
-										nextUnit
-									);
-								}
-								return;
+						resetAllFilter={ getResetMinHeightAttributes }
+						isShownByDefault
+						panelId={ clientId }
+					>
+						<CoverHeightInput
+							value={ activeAspectRatio ? '' : activeMinHeight }
+							unit={ activeMinHeightUnit }
+							onChange={ ( newMinHeight ) =>
+								setMinHeightAttributes( newMinHeight )
 							}
+							onUnitChange={ ( nextUnit ) => {
+								if ( hasSelectedStyleState ) {
+									if ( activeMinHeight !== undefined ) {
+										setMinHeightAttributes(
+											activeMinHeight,
+											nextUnit
+										);
+									}
+									return;
+								}
 
-							setAttributes( {
-								minHeightUnit: nextUnit,
-							} );
-						} }
-					/>
-				</ToolsPanelItem>
-			</InspectorControls>
+								setAttributes( {
+									minHeightUnit: nextUnit,
+								} );
+							} }
+						/>
+					</ToolsPanelItem>
+				</InspectorControls>
+			) }
 			<InspectorControls group="advanced">
 				<HTMLElementControl
 					tagName={ tagName }

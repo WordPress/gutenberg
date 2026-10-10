@@ -10,6 +10,7 @@ import {
 	GridVisualizer,
 	GridItemResizer,
 	GridItemMovers,
+	GridItemRotator,
 	useUpdateGridChildLayout,
 	isGridStackedOnMobile,
 	getStackedLayouts,
@@ -21,9 +22,15 @@ import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/const
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
+	hasPseudoBlockStyleState,
 	hasViewportBlockStyleState,
 	setStyleForState,
 } from './block-style-state';
+import {
+	getRotateForState,
+	getUpdatedRotateStyle,
+	isRotateEnabled,
+} from './rotate';
 
 const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
@@ -385,7 +392,7 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 	return { className: `wp-container-content-${ id }` };
 }
 
-function ChildLayoutControlsPure( { clientId, style } ) {
+function ChildLayoutControlsPure( { clientId, name, style } ) {
 	const parentLayout = useLayout() || {};
 	const {
 		type: parentLayoutType = 'default',
@@ -400,6 +407,7 @@ function ChildLayoutControlsPure( { clientId, style } ) {
 	return (
 		<GridTools
 			clientId={ clientId }
+			name={ name }
 			style={ style }
 			allowSizingOnChildren={ allowSizingOnChildren }
 			isManualPlacement={ isManualPlacement }
@@ -410,6 +418,7 @@ function ChildLayoutControlsPure( { clientId, style } ) {
 
 function GridTools( {
 	clientId,
+	name,
 	style,
 	allowSizingOnChildren,
 	isManualPlacement,
@@ -425,6 +434,7 @@ function GridTools( {
 		isChildBlockAGrid,
 		selectedState,
 		parentStyle,
+		blockEditingMode,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -467,6 +477,7 @@ function GridTools( {
 				isChildBlockAGrid: blockAttributes?.layout?.type === 'grid',
 				selectedState: getSelectedBlockStyleState( clientId ),
 				parentStyle: parentAttributes?.style,
+				blockEditingMode: getBlockEditingMode( clientId ),
 			};
 		},
 		[ clientId ]
@@ -517,6 +528,8 @@ function GridTools( {
 
 	// Use useState() instead of useRef() so that GridItemResizer updates when ref is set.
 	const [ resizerBounds, setResizerBounds ] = useState();
+	// The angle shown while the rotate handle is being dragged.
+	const [ previewRotate, setPreviewRotate ] = useState( null );
 
 	const childGridClientId = isChildBlockAGrid ? clientId : undefined;
 
@@ -576,9 +589,30 @@ function GridTools( {
 			: undefined ),
 		...stackedLayouts?.grid,
 	};
+	// Stacked blocks are shown unrotated.
+	const rotate = isStackedOnMobile
+		? 0
+		: getRotateForState( style, selectedState );
+	// Like the Rotation control in the block settings, the handle is only
+	// offered for blocks that can be fully edited, and not in a state such as
+	// `:hover`, since rotation is stored per viewport.
+	const showRotator =
+		isManualGrid &&
+		! isBlockItselfCurrentlyHidden &&
+		blockEditingMode === 'default' &&
+		! hasPseudoBlockStyleState( selectedState ) &&
+		isRotateEnabled( name );
 
 	function updateLayout( layout ) {
 		updateGridChildLayout( clientId, layout );
+	}
+
+	function updateRotate( angle ) {
+		// Goes through the grid item update, so that rotating a block of a
+		// stacked grid on mobile first gives the grid its own mobile layout.
+		updateGridChildLayout( clientId, ( childStyle, state ) =>
+			getUpdatedRotateStyle( childStyle, angle, state )
+		);
 	}
 
 	return (
@@ -596,6 +630,15 @@ function GridTools( {
 					bounds={ resizerBounds }
 					onChange={ updateLayout }
 					parentLayout={ parentLayout }
+					angle={ previewRotate ?? rotate }
+				/>
+			) }
+			{ showRotator && (
+				<GridItemRotator
+					clientId={ clientId }
+					angle={ rotate }
+					onPreview={ setPreviewRotate }
+					onChange={ updateRotate }
 				/>
 			) }
 			{ isManualGrid && (

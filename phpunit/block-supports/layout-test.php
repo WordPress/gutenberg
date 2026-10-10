@@ -1813,11 +1813,11 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 
 		$stylesheet    = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
 		$sizing_rule   = ".$container_class.$container_class{aspect-ratio:auto;grid-template-rows:none;grid-auto-rows:auto;--wp--style--grid-cells:auto;}";
-		$stacking_rule = ".$container_class.$container_class > *{grid-column:1 / -1;grid-row:span var(--wp--grid-item--row-span, 1);}";
+		$stacking_rule = ".$container_class.$container_class > *{grid-column:1 / -1;grid-row:span var(--wp--grid-item--row-span, 1);rotate:none;}";
 
 		if ( $should_stack ) {
 			$this->assertStringContainsString( '@media (width <= 480px){' . $sizing_rule . '}', $stylesheet, 'A stacked grid should be sized by its content.' );
-			$this->assertStringContainsString( '@media (width <= 480px){' . $stacking_rule . '}', $stylesheet, 'The children of a stacked grid should be full width and keep their row spans.' );
+			$this->assertStringContainsString( '@media (width <= 480px){' . $stacking_rule . '}', $stylesheet, 'The children of a stacked grid should be full width, unrotated, and keep their row spans.' );
 		} else {
 			$this->assertStringNotContainsString( $sizing_rule, $stylesheet );
 			$this->assertStringNotContainsString( $stacking_rule, $stylesheet );
@@ -2030,6 +2030,61 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Check that the stacking rule unrotates the children of a stacked grid, with a
+	 * selector more specific than the rotate support's class rules, inside and outside
+	 * of media queries.
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 */
+	public function test_layout_support_flag_stacking_rule_beats_rotation() {
+		add_filter( 'pre_option_gutenberg-experiments', array( $this, 'filter_enable_grid_interactivity' ), 11 );
+		switch_theme( 'default' );
+
+		$child_content = '<p>Rotated</p>';
+		$child_output  = gutenberg_render_rotate_support(
+			$child_content,
+			array(
+				'blockName' => 'core/paragraph',
+				'attrs'     => array(
+					'style' => array(
+						'rotate'  => 30,
+						'@mobile' => array( 'rotate' => 15 ),
+					),
+				),
+			)
+		);
+		$this->assertMatchesRegularExpression( '/wp-rotate-[a-z0-9]+/', $child_output, 'The child should be rotated.' );
+		preg_match( '/wp-rotate-[a-z0-9]+/', $child_output, $rotate_matches );
+		$rotate_class = $rotate_matches[0];
+
+		$block_content = '<div class="wp-block-group"></div>';
+		$output        = gutenberg_render_layout_support_flag(
+			$block_content,
+			array(
+				'blockName'    => 'core/group',
+				'attrs'        => array(
+					'layout' => array(
+						'type'              => 'grid',
+						'isManualPlacement' => true,
+						'columnCount'       => 3,
+					),
+				),
+				'innerBlocks'  => array(),
+				'innerHTML'    => $block_content,
+				'innerContent' => array( $block_content ),
+			)
+		);
+		preg_match( '/wp-container-core-group-is-layout-[a-z0-9]+/', $output, $matches );
+		$container_class = $matches[0];
+
+		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+		$this->assertStringContainsString( ".$rotate_class{rotate:30deg;}", $stylesheet );
+		$this->assertStringContainsString( "@media (width <= 480px){.$rotate_class{rotate:15deg;}}", $stylesheet );
+		// Two classes beat the rotate support's single class, whatever the order of the rules.
+		$this->assertStringContainsString( "@media (width <= 480px){.$container_class.$container_class > *{grid-column:1 / -1;grid-row:span var(--wp--grid-item--row-span, 1);rotate:none;}}", $stylesheet );
+	}
+
+	/**
 	 * Check that the row span custom property and the stacking rule survive CSS sanitization.
 	 *
 	 * @covers ::gutenberg_render_layout_support_flag
@@ -2037,6 +2092,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	public function test_row_span_declarations_survive_sanitization() {
 		$this->assertSame( '--wp--grid-item--row-span:2', safecss_filter_attr( '--wp--grid-item--row-span:2' ) );
 		$this->assertSame( 'grid-row:span var(--wp--grid-item--row-span, 1)', safecss_filter_attr( 'grid-row:span var(--wp--grid-item--row-span, 1)' ) );
+		$this->assertSame( 'rotate:none', safecss_filter_attr( 'rotate:none' ) );
 	}
 
 	/**

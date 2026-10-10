@@ -46,3 +46,17 @@
 		width: 100%;
 	}
 }
+
+// In a grid whose cells have a fixed size, the image fills its cell, cropped as
+// needed. The cell decides the image's size, so it wins over a width, height or
+// aspect ratio set on the block. Its scale still applies.
+@container style(--wp--style--grid-cells: fixed) {
+	.is-layout-grid > .wp-block-post-featured-image {
+		> img,
+		> a > img {
+			width: 100% !important;
+			height: 100% !important;
+			object-fit: cover;
+		}
+	}
+}

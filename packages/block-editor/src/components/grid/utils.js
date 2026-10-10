@@ -239,8 +239,8 @@ export function getGridTrackPositions( gridElement ) {
 /**
  * Gets the position of a grid item in pixels, relative to the grid's content
  * box. Offsets ignore CSS transforms, such as the ones the editor uses to
- * animate block moves, so an item is measured by the area it takes up in the
- * grid.
+ * animate block moves, and the `rotate` property, so an item is measured by
+ * the area it takes up in the grid, without its rotation.
  *
  * @param {HTMLElement} gridItemElement The grid item element.
  *
@@ -262,6 +262,19 @@ export function getGridItemPixelRect( gridItemElement ) {
 		right: left + gridItemElement.offsetWidth,
 		bottom: top + gridItemElement.offsetHeight,
 	};
+}
+
+/**
+ * Sets an inline style on an element, or removes it when the value is empty.
+ * Used for previews that should not go through block attributes, such as the
+ * rotation while the rotate handle is dragged.
+ *
+ * @param {HTMLElement} element  The element.
+ * @param {string}      property The CSS property, in camel case.
+ * @param {string}      value    The value, or an empty string to remove it.
+ */
+export function setInlineStyle( element, property, value ) {
+	element.style[ property ] = value;
 }
 
 /**
