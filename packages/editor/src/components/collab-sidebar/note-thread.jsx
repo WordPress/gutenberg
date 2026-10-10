@@ -37,6 +37,8 @@ import {
 	findPostAttributeOps,
 	parseSuggestionPayload,
 } from '../suggestion-mode/operations';
+import { getPostFieldName } from '../suggestion-mode/post-field-labels';
+import { useTaxonomyNames } from '../suggestion-mode/use-taxonomy-names';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
@@ -95,15 +97,17 @@ export function NoteThread( {
 	onKeyDown,
 } ) {
 	const isFloating = !! floating;
-	// A post title suggestion has no block by design; it is not an orphan.
+	const taxonomyNames = useTaxonomyNames();
+	// A post field suggestion (the title, the excerpt...) has no block by
+	// design; it is not an orphan.
 	const suggestionPayload = note.meta?._wp_suggestion;
-	const isPostSuggestion = useMemo(
-		() =>
-			findPostAttributeOps(
-				parseSuggestionPayload( suggestionPayload )?.operations
-			).length > 0,
-		[ suggestionPayload ]
-	);
+	const postFieldName = useMemo( () => {
+		const [ op ] = findPostAttributeOps(
+			parseSuggestionPayload( suggestionPayload )?.operations
+		);
+		return op ? getPostFieldName( op, taxonomyNames ) : null;
+	}, [ suggestionPayload, taxonomyNames ] );
+	const isPostSuggestion = postFieldName !== null;
 	const { toggleBlockHighlight, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
 	);
@@ -236,8 +240,9 @@ export function NoteThread( {
 	let ariaLabel;
 	if ( isPostSuggestion ) {
 		ariaLabel = sprintf(
-			// translators: %s: note excerpt
-			__( 'Post title note: %s' ),
+			// translators: 1: post field name, e.g. "Post title". 2: note excerpt.
+			__( '%1$s note: %2$s' ),
+			postFieldName,
 			noteExcerpt
 		);
 	} else if ( note.blockClientId ) {
@@ -316,7 +321,7 @@ export function NoteThread( {
 			</Button>
 			{ isPostSuggestion && (
 				<p className="editor-collab-sidebar-panel__note-target">
-					{ __( 'Post title' ) }
+					{ postFieldName }
 				</p>
 			) }
 			{ ! note.blockClientId && ! isPostSuggestion && (

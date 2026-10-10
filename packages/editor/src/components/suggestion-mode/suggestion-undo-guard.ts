@@ -53,12 +53,14 @@
  * proposal restored by redo gets its note back via `SuggestionNoteGC`.
  */
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 // @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useSuggestionSession } from './suggestion-session';
+import { nextCaptureSeq, useSuggestionSession } from './suggestion-session';
 import type { StructuralCapture } from './suggestion-session';
+import { isAttributeEqual } from './operations';
+import type { PostFieldProposal } from './operations';
 import {
 	PENDING_ATTRIBUTES,
 	proposedAttributes,
@@ -149,6 +151,30 @@ export function findNewestPendingSuggestion(
 }
 
 /**
+ * The newest pending post field proposal, when it is newer than `after`.
+ *
+ * @param seqs  Capture sequence per proposal id.
+ * @param after The newest block capture's sequence.
+ * @return The proposal and its id, or null.
+ */
+export function findNewestPostFieldProposal(
+	seqs: ReadonlyMap< string, { proposal: PostFieldProposal; seq: number } >,
+	after: number
+): { id: string; proposal: PostFieldProposal } | null {
+	let newest: {
+		id: string;
+		proposal: PostFieldProposal;
+		seq: number;
+	} | null = null;
+	for ( const [ id, { proposal, seq } ] of seqs ) {
+		if ( seq > after && ( ! newest || seq > newest.seq ) ) {
+			newest = { id, proposal, seq };
+		}
+	}
+	return newest ? { id: newest.id, proposal: newest.proposal } : null;
+}
+
+/**
  * Build the attribute update that strips a withdrawn structural suggestion's
  * bookkeeping from a block: the `metadata.suggestion` marker and, when the
  * note already exists, its `metadata.noteId` linkage.
@@ -210,13 +236,55 @@ export default function SuggestionUndoGuard() {
 	} = useSuggestionSession();
 	const registry = useRegistry();
 
-	const isSuggestMode = useSelect(
-		( select ) =>
+	const { isSuggestMode, proposals } = useSelect(
+		( select ) => ( {
 			// `getEditorIntent` is private while Suggest mode is experimental.
-			unlock( select( STORE_NAME ) ).getEditorIntent() ===
-			EDITOR_INTENT_SUGGEST,
+			isSuggestMode:
+				unlock( select( STORE_NAME ) ).getEditorIntent() ===
+				EDITOR_INTENT_SUGGEST,
+			proposals: unlock(
+				select( STORE_NAME )
+			).getPostFieldProposals() as Record< string, PostFieldProposal >,
+		} ),
 		[]
 	);
+
+	/*
+	 * Post field proposals (the title, excerpt, a meta key...) never reach the
+	 * core-data history: they are held in the editor store. Stamp each change
+	 * to one with the session's capture sequence, so undo can tell whether
+	 * the newest suggestion is a post field and withdraw it, newest first
+	 * alongside the block captures. A ref: read inside the wrapped undo.
+	 */
+	const proposalSeqsRef = useRef(
+		new Map< string, { proposal: PostFieldProposal; seq: number } >()
+	);
+	const [ proposalSeqVersion, setProposalSeqVersion ] = useState( 0 );
+	useEffect( () => {
+		const seqs = proposalSeqsRef.current;
+		let changed = false;
+		for ( const [ id, proposal ] of Object.entries( proposals ?? {} ) ) {
+			const isPending = ! isAttributeEqual(
+				proposal.baseline ?? null,
+				proposal.proposed ?? null
+			);
+			if ( ! isPending ) {
+				changed = seqs.delete( id ) || changed;
+			} else if ( seqs.get( id )?.proposal !== proposal ) {
+				seqs.set( id, { proposal, seq: nextCaptureSeq() } );
+				changed = true;
+			}
+		}
+		for ( const id of [ ...seqs.keys() ] ) {
+			if ( ! proposals?.[ id ] ) {
+				seqs.delete( id );
+				changed = true;
+			}
+		}
+		if ( changed ) {
+			setProposalSeqVersion( ( version ) => version + 1 );
+		}
+	}, [ proposals ] );
 
 	// Read from inside the wrapped dispatch, which outlives any single render.
 	const isSuggestModeRef = useRef( isSuggestMode );
@@ -247,9 +315,25 @@ export default function SuggestionUndoGuard() {
 				getStructuralCaptures(),
 				select( blockEditorStore )
 			);
+			// The sequences live in a ref; the version is what re-runs this
+			// selector when they change.
+			if (
+				proposalSeqVersion >= 0 &&
+				findNewestPostFieldProposal(
+					proposalSeqsRef.current,
+					Math.max( newest?.seq ?? 0, getLastContentCaptureSeq() )
+				)
+			) {
+				return true;
+			}
 			return !! newest && newest.kind !== 'history';
 		},
-		[ isSuggestMode, getStructuralCaptures ]
+		[
+			isSuggestMode,
+			getStructuralCaptures,
+			getLastContentCaptureSeq,
+			proposalSeqVersion,
+		]
 	);
 	const { setHasSuggestionUndo } = unlock( useDispatch( editorStore ) );
 	useEffect( () => {
@@ -330,6 +414,25 @@ export default function SuggestionUndoGuard() {
 				getStructuralCaptures(),
 				registry.select( blockEditorStore )
 			);
+			/*
+			 * A post field proposal newer than every block capture is
+			 * withdrawn by putting the field back at its baseline: auto-save
+			 * then trashes its note, as it does for a block marker undone.
+			 */
+			const newestField = findNewestPostFieldProposal(
+				proposalSeqsRef.current,
+				Math.max( newest?.seq ?? 0, getLastContentCaptureSeq() )
+			);
+			if ( newestField ) {
+				const { setPostFieldProposal } = unlock(
+					registry.dispatch( STORE_NAME )
+				) as any;
+				setPostFieldProposal( newestField.id, {
+					...newestField.proposal,
+					proposed: newestField.proposal.baseline,
+				} );
+				return true;
+			}
 			/*
 			 * `history` kind: the newest suggestion is one the real undo stack
 			 * reverts. Standing aside is what keeps undo newest-first - reaching

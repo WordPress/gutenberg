@@ -16,6 +16,7 @@ import revisionsField from '../../dataviews/fields/revisions';
 import {
 	EDITOR_INTENT_SUGGEST,
 	SUGGEST_LOCKED_POST_FIELDS,
+	SUGGEST_PROPOSABLE_POST_FIELDS,
 } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 import readingSettingsField from '../../dataviews/fields/reading-settings';
@@ -30,7 +31,10 @@ const EMPTY_FORM = { layout: { type: 'panel' }, fields: [] };
  * @return {boolean} Whether the field stays editable.
  */
 function isProposableWhileSuggesting( id ) {
-	return [ 'post-content-info' ].includes( id );
+	return (
+		SUGGEST_PROPOSABLE_POST_FIELDS.includes( id ) ||
+		[ 'post-content-info' ].includes( id )
+	);
 }
 const VIEW_CONFIG_FIELDS = [ 'form' ];
 

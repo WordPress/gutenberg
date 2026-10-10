@@ -12,6 +12,8 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { STORE_NAME } from '../../store/constants';
+import { getPostFieldProposalId } from '../../store/suggest-post-edits';
+import { unlock } from '../../lock-unlock';
 import { useSuggestionSession } from './suggestion-session';
 import { withoutProposedAttributes } from './marker';
 import { getNoteIdsFromMetadata } from '../collab-sidebar/utils';
@@ -75,9 +77,28 @@ export function useSuggestionDecisions() {
 		getBlockAttributes: selectBlockAttributes,
 		getClientIdsWithDescendants: selectClientIdsWithDescendants,
 	} = useSelect( blockEditorStore );
-	const { requestInterceptorBypass, setPostTitleProposal } =
-		useSuggestionSession();
+	const { requestInterceptorBypass } = useSuggestionSession();
 	const registry = useRegistry();
+
+	/**
+	 * Drop the proposals a post-level decision resolved, so the fields show
+	 * the post's value again.
+	 *
+	 * @param postOps The decided post-level operations.
+	 */
+	const clearPostFieldProposals = useCallback(
+		( postOps: any[] ) => {
+			const { clearPostFieldProposal } = unlock(
+				registry.dispatch( STORE_NAME )
+			) as any;
+			for ( const op of postOps ) {
+				clearPostFieldProposal(
+					getPostFieldProposalId( op.attribute, op.key )
+				);
+			}
+		},
+		[ registry ]
+	);
 
 	/**
 	 * Dispatch a planned set of block-tree effects.
@@ -184,27 +205,33 @@ export function useSuggestionDecisions() {
 			}
 
 			/*
-			 * A post-level suggestion (the title) has no block: accept writes
-			 * the proposed fields with `editPost`, which the Suggest mode
-			 * capture never intercepts, so no bypass is needed. Rolled back
+			 * A post-level suggestion (the title, excerpt, a meta key...) has
+			 * no block: accept writes the proposed fields to the post past the
+			 * Suggestion mode guard, which would otherwise hold them as a
+			 * fresh proposal when the reviewer is suggesting too. Rolled back
 			 * if the decision fails to save, like the attribute path below.
 			 */
 			const postOps = findPostAttributeOps( payload.operations );
 			if ( postOps.length > 0 ) {
-				const editor = registry.select( STORE_NAME ) as any;
-				const { editPost } = registry.dispatch( STORE_NAME ) as any;
-				const previous: Record< string, any > = {};
-				for ( const op of postOps ) {
-					previous[ op.attribute ] = editor.getEditedPostAttribute(
-						op.attribute
-					);
-				}
+				const editor = unlock( registry.select( STORE_NAME ) ) as any;
+				const { applyPostFieldSuggestion } = unlock(
+					registry.dispatch( STORE_NAME )
+				) as any;
+				const previous = applyPostOperations(
+					postOps.map( ( op ) => ( {
+						...op,
+						after: editor.getPostFieldValueWithoutProposals(
+							op.attribute,
+							op.key
+						),
+					} ) )
+				);
 				try {
-					editPost( applyPostOperations( postOps ) );
+					applyPostFieldSuggestion( applyPostOperations( postOps ) );
 					await store.setLifecycleStatus( commentId, 'applied' );
-					setPostTitleProposal( null );
+					clearPostFieldProposals( postOps );
 				} catch ( error: any ) {
-					editPost( previous );
+					applyPostFieldSuggestion( previous );
 					createNotice(
 						'error',
 						error?.message ||
@@ -383,7 +410,7 @@ export function useSuggestionDecisions() {
 			runPlan,
 			createNotice,
 			requestInterceptorBypass,
-			setPostTitleProposal,
+			clearPostFieldProposals,
 			registry,
 		]
 	);
@@ -417,12 +444,13 @@ export function useSuggestionDecisions() {
 			/*
 			 * A post-level suggestion never touched the post: reject only
 			 * records the decision and drops the proposed value from the
-			 * session so the field shows the real title again.
+			 * editor so the field shows the post's value again.
 			 */
-			if ( findPostAttributeOps( payload?.operations ).length > 0 ) {
+			const rejectedPostOps = findPostAttributeOps( payload?.operations );
+			if ( rejectedPostOps.length > 0 ) {
 				try {
 					await store.setLifecycleStatus( commentId, 'rejected' );
-					setPostTitleProposal( null );
+					clearPostFieldProposals( rejectedPostOps );
 				} catch ( error: any ) {
 					createNotice(
 						'error',
@@ -572,7 +600,7 @@ export function useSuggestionDecisions() {
 			updateBlockAttributes,
 			markNextChangeAsNotPersistent,
 			requestInterceptorBypass,
-			setPostTitleProposal,
+			clearPostFieldProposals,
 			registry,
 		]
 	);

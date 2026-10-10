@@ -110,29 +110,55 @@ export function operationsFromMarker(
 	return operations;
 }
 
+/** A post field proposal, as the editor store holds it. */
+export interface PostFieldProposal {
+	/** The post field, e.g. `excerpt` or `meta`. */
+	attribute: string;
+	/** The meta key, for a `meta` proposal. */
+	key?: string;
+	baseline: any;
+	proposed: any;
+}
+
 /**
- * Build the `post-attribute-set` operation for a proposed post title.
+ * Build the `post-attribute-set` operation for a post field proposal. A
+ * meta proposal carries its key: one note per meta key.
  *
- * @param proposal The session's title proposal.
+ * @param proposal The proposal.
  * @return Operations describing the suggestion (empty when nothing changed).
  */
-export function postOperationsFromTitle(
-	proposal: { baseline: string; proposed: string } | null | undefined
+export function postOperationsFromProposal(
+	proposal: PostFieldProposal | null | undefined
 ): SuggestionOperation[] {
 	if (
 		! proposal ||
-		isAttributeEqual( proposal.baseline, proposal.proposed )
+		isAttributeEqual( proposal.baseline ?? null, proposal.proposed ?? null )
 	) {
 		return [];
 	}
 	return [
 		{
 			type: POST_ATTRIBUTE_OP_TYPE,
-			attribute: 'title',
-			before: proposal.baseline,
-			after: proposal.proposed,
+			attribute: proposal.attribute,
+			...( proposal.key ? { key: proposal.key } : {} ),
+			before: proposal.baseline ?? null,
+			after: proposal.proposed ?? null,
 		},
 	];
+}
+
+/**
+ * Build the `post-attribute-set` operation for a proposed post title.
+ *
+ * @param proposal The title proposal.
+ * @return Operations describing the suggestion (empty when nothing changed).
+ */
+export function postOperationsFromTitle(
+	proposal: { baseline: string; proposed: string } | null | undefined
+): SuggestionOperation[] {
+	return postOperationsFromProposal(
+		proposal ? { attribute: 'title', ...proposal } : null
+	);
 }
 
 /**
@@ -222,6 +248,13 @@ export function applyPostOperations(
 ): Record< string, any > {
 	const edits: Record< string, any > = {};
 	for ( const op of findPostAttributeOps( operations ) ) {
+		if ( op.attribute === 'meta' ) {
+			// Meta edits merge into the post's meta, one key at a time.
+			if ( typeof op.key === 'string' && op.key ) {
+				edits.meta = { ...edits.meta, [ op.key ]: op.after };
+			}
+			continue;
+		}
 		edits[ op.attribute ] = op.after;
 	}
 	return edits;
