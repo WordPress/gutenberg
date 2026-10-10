@@ -222,7 +222,7 @@ async function suggestAddition( { editor, page }: any ) {
 	await page.keyboard.press( 'End' );
 	await page.keyboard.type( ' world' );
 	await expect(
-		paragraph.locator( 'mark.wp-suggestion[data-suggestion-type="add"]' )
+		paragraph.locator( 'mark.wp-suggestion-add' )
 	).toHaveAttribute( 'data-suggestion-id', /\d/ );
 	await editor.saveDraft();
 	return currentPostId( page );
@@ -242,7 +242,7 @@ async function suggestDeletion( { editor, page, pageUtils }: any ) {
 	await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
 	await page.keyboard.press( 'Backspace' );
 	await expect(
-		paragraph.locator( 'mark.wp-suggestion[data-suggestion-type="del"]' )
+		paragraph.locator( 'mark.wp-suggestion-del' )
 	).toHaveAttribute( 'data-suggestion-id', /\d/ );
 	await editor.saveDraft();
 	return currentPostId( page );

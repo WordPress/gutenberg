@@ -83,9 +83,7 @@ async function suggestAddition( { editor, page }: any ) {
 	await paragraph.click();
 	await page.keyboard.press( 'End' );
 	await page.keyboard.type( ' world' );
-	const mark = paragraph.locator(
-		'mark.wp-suggestion[data-suggestion-type="add"]'
-	);
+	const mark = paragraph.locator( 'mark.wp-suggestion-add' );
 	await expect( mark ).toHaveAttribute( 'data-suggestion-id', /\d/ );
 	await editor.saveDraft();
 	return {
@@ -205,7 +203,7 @@ test.describe( 'Suggestion mode: outdated suggestions', () => {
 		await paragraph.click();
 		await page.keyboard.press( 'End' );
 		await page.keyboard.type( ' world' );
-		const mark = paragraph.locator( 'mark.wp-suggestion' );
+		const mark = paragraph.locator( 'mark.wp-suggestion-add' );
 		await expect( mark ).toHaveAttribute( 'data-suggestion-id', /\d/ );
 		const noteId = Number(
 			await mark.getAttribute( 'data-suggestion-id' )
