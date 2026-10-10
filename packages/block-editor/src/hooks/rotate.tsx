@@ -1,4 +1,4 @@
-import { hasBlockSupport } from '@wordpress/blocks';
+import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import type { BlockType } from '@wordpress/blocks';
 import {
 	AnglePickerControl,
@@ -14,6 +14,7 @@ import InspectorControls from '../components/inspector-controls';
 import { useSettings } from '../components/use-settings';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
+import { isPlainObject } from '../utils/object';
 import {
 	fromPickerAngle,
 	normalizeAngle,
@@ -55,16 +56,42 @@ interface RotateEditProps {
 // Used for generating the instance ID.
 const ROTATE_BLOCK_PROPS_REFERENCE = {};
 
+// A number in decimal notation, as PHP's `is_numeric()` accepts it. Hex,
+// binary and octal strings such as `0x10`, which `Number()` would read, are
+// not rotations.
+const DECIMAL_NUMBER_PATTERN = /^\s*[+-]?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?\s*$/i;
+
 /**
- * Returns whether a block supports rotation. Every block does unless it opts
- * out with `supports.rotate: false`.
+ * Returns whether a block supports rotation. Blocks do unless they opt out
+ * with `supports.rotate: false`, or define a `style` attribute of their own
+ * that is not an object, which rotation could not be stored in.
  *
  * @param nameOrType Block name or block type object.
  *
  * @return Whether the block supports rotation.
  */
 export function hasRotateSupport( nameOrType: string | BlockType ): boolean {
-	return hasBlockSupport( nameOrType, ROTATE_SUPPORT_KEY, true );
+	const blockType =
+		typeof nameOrType === 'string'
+			? getBlockType( nameOrType )
+			: nameOrType;
+	const styleType = blockType?.attributes?.style?.type;
+	return (
+		( styleType === undefined || styleType === 'object' ) &&
+		hasBlockSupport( nameOrType, ROTATE_SUPPORT_KEY, true )
+	);
+}
+
+/**
+ * Returns a block style attribute when it is an object, which is the only
+ * kind of style attribute rotation is read from or written to.
+ *
+ * @param style Block style attribute.
+ *
+ * @return The style attribute, or undefined when it is not an object.
+ */
+function getStyleObject( style: unknown ): BlockStyle | undefined {
+	return isPlainObject( style ) ? style : undefined;
 }
 
 /**
@@ -85,7 +112,8 @@ export function isRotateEnabled( nameOrType: string | BlockType ): boolean {
 
 /**
  * Reads a stored rotation, which is a number of degrees. Anything that is not
- * a finite number, or a string holding one, is ignored.
+ * a finite number, or a string holding one in decimal notation, is ignored.
+ * Matches `gutenberg_get_rotate_value()` in PHP.
  *
  * @param value Stored rotation.
  *
@@ -93,13 +121,21 @@ export function isRotateEnabled( nameOrType: string | BlockType ): boolean {
  */
 export function getRotateValue( value: unknown ): number | undefined {
 	const angle =
-		typeof value === 'string' && value.trim() !== ''
+		typeof value === 'string' && DECIMAL_NUMBER_PATTERN.test( value )
 			? Number( value )
 			: value;
 	if ( typeof angle !== 'number' || ! Number.isFinite( angle ) ) {
 		return undefined;
 	}
-	return normalizeAngle( Math.round( angle * 100 ) / 100 );
+	// Round halves away from zero, after removing floating point noise, the
+	// way PHP's `round()` does: 1.005 is 1.01 and -12.345 is -12.35.
+	const rounded =
+		( Math.sign( angle ) *
+			Math.round(
+				Number( ( Math.abs( angle ) * 100 ).toPrecision( 15 ) )
+			) ) /
+		100;
+	return normalizeAngle( rounded );
 }
 
 /**
@@ -131,7 +167,12 @@ function getRotateStateStyle(
 	style: BlockStyle | undefined,
 	selectedState: BlockStyleState
 ): BlockStyle | undefined {
-	return getStyleForState( style ?? {}, getRotateState( selectedState ) );
+	return getStyleObject(
+		getStyleForState(
+			getStyleObject( style ) ?? {},
+			getRotateState( selectedState )
+		)
+	);
 }
 
 /**
@@ -147,7 +188,8 @@ export function getRotateForState(
 	style: BlockStyle | undefined,
 	selectedState: BlockStyleState
 ): number {
-	const defaultRotate = getRotateValue( style?.rotate ) ?? 0;
+	const defaultRotate =
+		getRotateValue( getStyleObject( style )?.rotate ) ?? 0;
 	if ( ! hasViewportBlockStyleState( selectedState ) ) {
 		return defaultRotate;
 	}
@@ -182,6 +224,7 @@ export function getUpdatedRotateStyle(
 	angle: number | undefined,
 	selectedState: BlockStyleState
 ): BlockStyle | undefined {
+	const baseStyle = getStyleObject( style );
 	const rotateState = getRotateState( selectedState );
 	const isViewportState = hasViewportBlockStyleState( rotateState );
 	let rotate = getRotateValue( angle );
@@ -190,11 +233,11 @@ export function getUpdatedRotateStyle(
 	}
 
 	if ( ! isViewportState ) {
-		return cleanEmptyObject( { ...style, rotate } );
+		return cleanEmptyObject( { ...baseStyle, rotate } );
 	}
 
-	return setStyleForState( style ?? {}, rotateState, {
-		...getRotateStateStyle( style, rotateState ),
+	return setStyleForState( baseStyle ?? {}, rotateState, {
+		...getRotateStateStyle( baseStyle, rotateState ),
 		rotate,
 	} );
 }
@@ -207,14 +250,12 @@ export function getUpdatedRotateStyle(
  * @return Whether there is a rotation in the default or a viewport state.
  */
 function hasRotateValue( style: BlockStyle | undefined ): boolean {
-	if ( ! style || typeof style !== 'object' ) {
-		return false;
-	}
-	return Object.entries( style ).some(
+	return Object.entries( getStyleObject( style ) ?? {} ).some(
 		( [ key, value ] ) =>
 			key === ROTATE_SUPPORT_KEY ||
 			( key.startsWith( '@' ) &&
-				value?.[ ROTATE_SUPPORT_KEY ] !== undefined )
+				isPlainObject( value ) &&
+				value[ ROTATE_SUPPORT_KEY ] !== undefined )
 	);
 }
 
@@ -236,7 +277,7 @@ export function getRotateCSS(
 	viewportSettings?: Record< string, unknown >
 ): string {
 	const rules: string[] = [];
-	const rotate = getRotateValue( style?.rotate );
+	const rotate = getRotateValue( getStyleObject( style )?.rotate );
 	if ( rotate ) {
 		rules.push( `${ selector }{rotate:${ rotate }deg;}` );
 	}

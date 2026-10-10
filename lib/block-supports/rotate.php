@@ -2,7 +2,7 @@
 /**
  * Rotate block support flag.
  *
- * Every block supports rotation unless it opts out with `supports.rotate: false`.
+ * Blocks support rotation unless they opt out with `supports.rotate: false`.
  * The rotation is a number of degrees stored in `style.rotate`, with viewport
  * overrides in `style['@tablet'].rotate` and `style['@mobile'].rotate`.
  *
@@ -131,6 +131,12 @@ function gutenberg_render_rotate_support( $block_content, $block ) {
 
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	if ( ! $block_type || ! block_has_support( $block_type, 'rotate', true ) ) {
+		return $block_content;
+	}
+
+	// A block's own `style` attribute that is not an object doesn't hold a rotation.
+	$style_attribute_type = $block_type->attributes['style']['type'] ?? 'object';
+	if ( 'object' !== $style_attribute_type ) {
 		return $block_content;
 	}
 

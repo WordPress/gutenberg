@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   Opt the blocks that render no wrapper of their own out of the experimental rotate block support with `supports.rotate: false`: Classic, Custom HTML, Missing, More, Page Break, Pattern, Shortcode and synced patterns ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
 -   Query: List the existing terms in the taxonomy filters, so categories and tags can be browsed and selected instead of recalled and typed. The controls now use `SearchableChipSelectControl` from `@wordpress/ui` ([#82583](https://github.com/WordPress/gutenberg/pull/82583)).
 
 ## 11.2.0 (2026-10-07)

@@ -8,7 +8,7 @@
 
 ### New Features
 
--   Add a rotate block support, behind the `gutenberg-block-rotation` experiment: every block that doesn't opt out with `supports.rotate: false` gets a Rotation control in its Dimensions panel, stored in `style.rotate` with viewport overrides, and rotated with the CSS `rotate` property ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+-   Add a rotate block support, behind the `gutenberg-block-rotation` experiment: blocks get a Rotation control in their Dimensions panel unless they opt out with `supports.rotate: false`, stored in `style.rotate` with viewport overrides, and rotated with the CSS `rotate` property ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
 
 ### Enhancements
 
