@@ -80,7 +80,7 @@ export function CreatePatternModalContents( {
 			const newPattern = await createPattern(
 				patternTitle,
 				sync,
-				typeof content === 'function' ? await content() : content,
+				typeof content === 'function' ? content() : content,
 				categories
 			);
 			onSuccess( {

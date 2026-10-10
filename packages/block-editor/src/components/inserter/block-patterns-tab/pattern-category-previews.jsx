@@ -12,17 +12,22 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalText as WCText,
 	FlexBlock,
+	Spinner,
 } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import usePatternsState from '../hooks/use-patterns-state';
 import BlockPatternsList from '../../block-patterns-list';
 import usePatternsPaging from '../hooks/use-patterns-paging';
 import { PatternsFilter } from './patterns-filter';
 import { usePatternCategories } from './use-pattern-categories';
+import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 import {
 	isPatternFiltered,
 	allPatternsCategory,
 	myPatternsCategory,
 	starterPatternsCategory,
+	installedThemePatternsCategory,
 	INSERTER_PATTERN_TYPES,
 } from './utils';
 
@@ -39,6 +44,14 @@ export function PatternCategoryPreviews( {
 		onInsert,
 		rootClientId,
 		category?.name
+	);
+	const isLoading = useSelect(
+		( select ) =>
+			category.name === installedThemePatternsCategory.name &&
+			unlock(
+				select( blockEditorStore )
+			).isLoadingInstalledThemePatterns(),
+		[ category.name ]
 	);
 	const [ patternSyncFilter, setPatternSyncFilter ] = useState( 'all' );
 	const [ patternSourceFilter, setPatternSourceFilter ] = useState( 'all' );
@@ -58,6 +71,17 @@ export function PatternCategoryPreviews( {
 						patternSyncFilter
 					)
 				) {
+					return false;
+				}
+
+				// Patterns from other installed themes only show in their own
+				// category.
+				const isInstalledThemePattern =
+					pattern.type === INSERTER_PATTERN_TYPES.installedTheme;
+				if ( category.name === installedThemePatternsCategory.name ) {
+					return isInstalledThemePattern;
+				}
+				if ( isInstalledThemePattern ) {
 					return false;
 				}
 
@@ -153,7 +177,8 @@ export function PatternCategoryPreviews( {
 						category={ category }
 					/>
 				</HStack>
-				{ ! currentCategoryPatterns.length && (
+				{ ! currentCategoryPatterns.length && isLoading && <Spinner /> }
+				{ ! currentCategoryPatterns.length && ! isLoading && (
 					<WCText
 						variant="muted"
 						className="block-editor-inserter__patterns-category-no-results"

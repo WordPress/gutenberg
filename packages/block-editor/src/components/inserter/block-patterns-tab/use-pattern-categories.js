@@ -1,4 +1,5 @@
 import { useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import { _n, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import usePatternsState from '../hooks/use-patterns-state';
@@ -7,14 +8,26 @@ import {
 	allPatternsCategory,
 	myPatternsCategory,
 	starterPatternsCategory,
+	installedThemePatternsCategory,
 	getPopulatedCategories,
 	INSERTER_PATTERN_TYPES,
 } from './utils';
+import { store as blockEditorStore } from '../../../store';
+import { selectInstalledThemePatternsKey } from '../../../store/private-keys';
 
 export function usePatternCategories( rootClientId, sourceFilter = 'all' ) {
 	const [ patterns, allCategories ] = usePatternsState(
 		undefined,
 		rootClientId
+	);
+	// Patterns from other installed themes load once their category is open,
+	// so the category is offered whenever the editor can provide them.
+	const hasInstalledThemePatterns = useSelect(
+		( select ) =>
+			!! select( blockEditorStore ).getSettings()[
+				selectInstalledThemePatternsKey
+			],
+		[]
 	);
 
 	const filteredPatterns = useMemo(
@@ -54,6 +67,12 @@ export function usePatternCategories( rootClientId, sourceFilter = 'all' ) {
 				label: allPatternsCategory.label,
 			} );
 		}
+		if (
+			hasInstalledThemePatterns &&
+			[ 'all', INSERTER_PATTERN_TYPES.theme ].includes( sourceFilter )
+		) {
+			categories.push( installedThemePatternsCategory );
+		}
 		speak(
 			sprintf(
 				/* translators: %d: number of categories . */
@@ -66,7 +85,12 @@ export function usePatternCategories( rootClientId, sourceFilter = 'all' ) {
 			)
 		);
 		return categories;
-	}, [ allCategories, filteredPatterns ] );
+	}, [
+		allCategories,
+		filteredPatterns,
+		hasInstalledThemePatterns,
+		sourceFilter,
+	] );
 
 	return populatedCategories;
 }

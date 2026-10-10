@@ -1,13 +1,9 @@
 import { Page } from '@wordpress/admin-ui';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { parse } from '@wordpress/blocks';
-import { useDispatch } from '@wordpress/data';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { useMemo } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-import { __, _x } from '@wordpress/i18n';
-import { store as noticesStore } from '@wordpress/notices';
-import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { addQueryArgs } from '@wordpress/url';
 import { useView, useViewConfig } from '@wordpress/views';
@@ -17,57 +13,14 @@ import useInstalledThemePatterns from '../sidebar-navigation-screen-patterns/use
 import usePatternSettings from './use-pattern-settings';
 import { previewField } from './fields';
 import { searchItems } from './search-items';
-import copyThemeFiles from './copy-theme-files';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
-const { CreatePatternModalContents, useDuplicatePatternProps } =
-	unlock( patternsPrivateApis );
 
 const EMPTY_ARRAY = [];
 const VIEW_CONFIG_FIELDS = [ 'default_view', 'default_layouts' ];
 const PARSE_OPTIONS = { __unstableSkipMigrationLogs: true };
-
-/**
- * Duplicate modal that copies the files the pattern loads from the theme into
- * the Media Library before saving it, so the copy doesn't depend on the theme.
- *
- * @param {Object}     props
- * @param {Array}      props.items      Patterns to duplicate.
- * @param {() => void} props.closeModal Closes the modal.
- * @param {string[]}   props.themeUris  Folders the theme's files live in.
- */
-function DuplicateModal( { items, closeModal, themeUris } ) {
-	const [ item ] = items;
-	const { createWarningNotice } = useDispatch( noticesStore );
-	const duplicatedProps = useDuplicatePatternProps( {
-		pattern: item,
-		onSuccess: () => closeModal?.(),
-	} );
-	return (
-		<CreatePatternModalContents
-			onClose={ closeModal }
-			confirmLabel={ _x( 'Duplicate', 'action label' ) }
-			{ ...duplicatedProps }
-			content={ async () => {
-				const { content, failedUrls } = await copyThemeFiles(
-					item.content,
-					themeUris
-				);
-				if ( failedUrls.length ) {
-					createWarningNotice(
-						__(
-							'Some files couldn’t be copied to the Media Library, so they still load from the theme.'
-						),
-						{ type: 'snackbar' }
-					);
-				}
-				return content;
-			} }
-		/>
-	);
-}
 
 export default function InstalledThemePatterns( { stylesheet } ) {
 	const { path, query } = useLocation();
@@ -133,23 +86,15 @@ export default function InstalledThemePatterns( { stylesheet } ) {
 		postType: PATTERN_TYPES.user,
 		context: 'list',
 	} );
-	const themeUris = theme?.uris;
-	const actions = useMemo( () => {
-		const duplicateAction = patternActions.find(
-			( action ) => action.id === 'duplicate-pattern'
-		);
-		if ( ! duplicateAction || ! themeUris ) {
-			return EMPTY_ARRAY;
-		}
-		return [
-			{
-				...duplicateAction,
-				RenderModal: ( props ) => (
-					<DuplicateModal { ...props } themeUris={ themeUris } />
-				),
-			},
-		];
-	}, [ patternActions, themeUris ] );
+	// Duplicating saves a copy, and saving copies the files it loads from the
+	// theme into the Media Library.
+	const actions = useMemo(
+		() =>
+			patternActions.filter(
+				( action ) => action.id === 'duplicate-pattern'
+			),
+		[ patternActions ]
+	);
 	const settings = usePatternSettings();
 
 	return (
