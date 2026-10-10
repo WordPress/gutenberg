@@ -116,7 +116,7 @@ export function allSequences( state: OracleState ): Step[][] {
  * @param state Decided state.
  * @return Rendering.
  */
-export function render( state: OracleState ): string {
+export function publishedText( state: OracleState ): string {
 	let out = '';
 	let bold = false;
 	for ( const char of state.chars ) {
@@ -303,7 +303,7 @@ export function toContentHTML( state: OracleState ): string {
  * @return HTML of the original run.
  */
 export function formatOriginalHTML( state: OracleState, id: string ): string {
-	return render( {
+	return publishedText( {
 		chars: state.chars
 			.filter( ( char ) => char.format === id )
 			.map( ( char ) => ( {

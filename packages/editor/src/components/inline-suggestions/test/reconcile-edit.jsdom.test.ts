@@ -218,22 +218,33 @@ describe( 'planEditMarkers', () => {
 		} );
 	} );
 
-	it( 'does not act when typing inside another author addition', () => {
+	it( 'refuses typing inside another author addition, naming it', () => {
 		const prev = rtd( add( 7, 'ab', 2 ) );
 		const next = rtd( add( 7, 'aXb', 2 ) );
 		expect( planEditMarkers( prev, next, { authorId: 9 } ) ).toEqual( {
 			kind: 'insert',
 			actions: [],
+			refusal: {
+				reason: 'add-in-add',
+				blocking: { id: '7', kind: 'add', authorId: '2' },
+			},
 		} );
 	} );
 
-	it( 'does not act when typing inside a pending deletion', () => {
+	it( 'refuses typing inside another author deletion', () => {
 		const prev = rtd( del( 7, 'ab', 2 ) );
 		const next = rtd( del( 7, 'aXb', 2 ) );
-		expect( planEditMarkers( prev, next, { authorId: 2 } ) ).toEqual( {
-			kind: 'insert',
-			actions: [],
-		} );
+		expect(
+			planEditMarkers( prev, next, { authorId: 9 } ).refusal?.reason
+		).toBe( 'insert-in-del' );
+	} );
+
+	it( 'adds next to the author own pending deletion', () => {
+		const prev = rtd( del( 7, 'ab', 2 ) );
+		const next = rtd( del( 7, 'aXb', 2 ) );
+		expect(
+			planEditMarkers( prev, next, { authorId: 2 } ).actions
+		).toMatchObject( [ { type: 'insert-add', at: 1, text: 'X' } ] );
 	} );
 
 	it( 'plans a del marker for a delete of unmarked text', () => {
@@ -248,9 +259,10 @@ describe( 'planEditMarkers', () => {
 	it( 'is a no-op when deleting text already marked for deletion', () => {
 		const prev = rtd( del( 4, 'world' ) );
 		const next = rtd( '' );
-		expect( planEditMarkers( prev, next ) ).toEqual( {
+		expect( planEditMarkers( prev, next ) ).toMatchObject( {
 			kind: 'delete',
 			actions: [],
+			refusal: { reason: 'own-marker' },
 		} );
 	} );
 
@@ -263,18 +275,18 @@ describe( 'planEditMarkers', () => {
 		} );
 	} );
 
-	it( 'does not remove another author pending addition', () => {
+	it( 'proposes deleting another author pending addition instead of withdrawing it', () => {
 		const prev = rtd( add( 8, 'abc', 2 ) );
 		const next = rtd( '' );
-		expect( planEditMarkers( prev, next, { authorId: 9 } ) ).toEqual( {
+		const deletion = {
 			kind: 'delete',
-			actions: [],
-		} );
+			actions: [ { type: 'wrap-del', start: 0, end: 3, newNote: true } ],
+		};
+		expect( planEditMarkers( prev, next, { authorId: 9 } ) ).toEqual(
+			deletion
+		);
 		// An authored marker is not the unknown editor's either.
-		expect( planEditMarkers( prev, next ) ).toEqual( {
-			kind: 'delete',
-			actions: [],
-		} );
+		expect( planEditMarkers( prev, next ) ).toEqual( deletion );
 	} );
 
 	it( 'plans a del + add pair for a type-over of unmarked text', () => {

@@ -30,6 +30,8 @@ import {
 	suggestionMarkersIn,
 } from './format';
 import { buildSuggestionMarkerAttributes } from './operations';
+import { classifyOverlap } from './overlap';
+import type { OverlapBlocking, OverlapReason } from './overlap';
 
 /**
  * Serialize a rich-text record range to an HTML string, for capturing the
@@ -143,35 +145,12 @@ export function analyzeFormatEdit(
 	return { start, end };
 }
 
-/**
- * Whether any character in `[start, end)` already carries a suggestion marker in
- * either value. A format change overlapping an open suggestion is left alone
- * rather than nesting a marker inside another suggestion.
- *
- * @param prev  Previous record.
- * @param next  Next record.
- * @param start Range start.
- * @param end   Range end.
- * @return True when the range touches an existing marker.
- */
-function overlapsExistingMarker(
-	prev: any,
-	next: any,
-	start: number,
-	end: number
-): boolean {
-	for ( let i = start; i < end; i++ ) {
-		const inPrev = prev.formats?.[ i ]?.some( isSuggestionFormat );
-		const inNext = next.formats?.[ i ]?.some( isSuggestionFormat );
-		if ( inPrev || inNext ) {
-			return true;
-		}
-	}
-	return false;
-}
-
 export interface FormatPlan {
-	kind: 'format' | 'none';
+	kind: 'format' | 'none' | 'refuse';
+	/** Why a `refuse` plan declined the edit. */
+	reason?: OverlapReason;
+	/** The marker in the way of a `refuse` plan. */
+	blocking?: OverlapBlocking;
 	/** The changed character range. */
 	range?: { start: number; end: number };
 	/** HTML of the original run (for reject). */
@@ -440,14 +419,37 @@ export function planFormatMarkers(
 			),
 		};
 	}
-	if ( overlapsExistingMarker( prev, next, range.start, range.end ) ) {
-		return { kind: 'none' };
+	/*
+	 * Another author's addition may hold a formatting change, and a deletion
+	 * may sit under one, but formatting over a formatting change, or across
+	 * the edge of an addition, is declined with the marker in the way.
+	 */
+	const verdict = classifyOverlap( prev.formats, {
+		gesture: 'format',
+		start: range.start,
+		end: range.end,
+		authorToken:
+			authorId === undefined || authorId === null
+				? null
+				: String( authorId ),
+	} );
+	if ( verdict.verdict === 'refuse' ) {
+		return {
+			kind: 'refuse',
+			reason: verdict.reason,
+			blocking: verdict.blocking,
+		};
 	}
+	/*
+	 * Both runs are captured without markers: inside someone's addition the
+	 * original is the proposed text's own formatting, and a deletion over
+	 * the run is a suggestion of its own, not part of this one.
+	 */
 	return {
 		kind: 'format',
 		range,
-		beforeHTML: sliceToHTML( prev, range.start, range.end ),
-		afterHTML: sliceToHTML( next, range.start, range.end ),
+		beforeHTML: sliceToUnmarkedHTML( prev, range.start, range.end ),
+		afterHTML: sliceToUnmarkedHTML( next, range.start, range.end ),
 	};
 }
 

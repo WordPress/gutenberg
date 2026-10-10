@@ -226,18 +226,15 @@ describe( 'classifyOverlap', () => {
 	it.each( cases )(
 		'%s by another author',
 		( _label, kind, gesture, start, end, expected, reason ) => {
-			const result = verdict( fixture( kind ), gesture, start, end );
-			expect( result.verdict ).toBe( expected );
-			if ( expected === 'refuse' ) {
-				expect( result.reason ).toBe( reason );
-				expect( result.blocking ).toEqual( {
-					id: '7',
-					kind,
-					authorId: OTHER,
-				} );
-			} else {
-				expect( result.blocking ).toBeUndefined();
-			}
+			expect( verdict( fixture( kind ), gesture, start, end ) ).toEqual(
+				expected === 'refuse'
+					? {
+							verdict: 'refuse',
+							reason,
+							blocking: { id: '7', kind, authorId: OTHER },
+						}
+					: { verdict: 'allow' }
+			);
 		}
 	);
 

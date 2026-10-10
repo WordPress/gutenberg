@@ -23,7 +23,7 @@ import {
 	allSequences,
 	applyDecision,
 	formatOriginalHTML,
-	render,
+	publishedText,
 	toContentHTML,
 } from './fixtures/overlap-oracle';
 import type { OracleState, Step } from './fixtures/overlap-oracle';
@@ -95,7 +95,7 @@ function replay( start: OracleState, sequence: Step[] ) {
 		}
 		oracle = applyDecision( oracle, step );
 		expect( renderValue( value ) ).toBe(
-			render( {
+			publishedText( {
 				...oracle,
 				// Pending markers do not change text or formatting.
 				chars: oracle.chars,
@@ -114,7 +114,7 @@ function replay( start: OracleState, sequence: Step[] ) {
 			stack?.some( isSuggestionFormat )
 		)
 	).toBe( false );
-	return renderValue( value );
+	return { published: renderValue( value ), oracle };
 }
 
 const label = ( sequence: Step[] ) =>
@@ -156,8 +156,8 @@ describe( 'overlapping suggestions oracle', () => {
 			for ( const step of sequence ) {
 				state = applyDecision( state, step );
 			}
-			const text = render( state );
-			finals.set( text, ( finals.get( text ) ?? 0 ) + 1 );
+			const published = publishedText( state );
+			finals.set( published, ( finals.get( published ) ?? 0 ) + 1 );
 		}
 		expect( Object.fromEntries( finals ) ).toEqual( {
 			'Intro.': 13,
@@ -181,7 +181,11 @@ describe( 'overlapping suggestions oracle', () => {
 				sequence,
 			] )
 		)( '%s', ( _label, sequence ) => {
-			replay( ANNEZAZU, sequence as Step[] );
+			const { published, oracle } = replay(
+				ANNEZAZU,
+				sequence as Step[]
+			);
+			expect( published ).toBe( publishedText( oracle ) );
 		} );
 	} );
 
@@ -192,7 +196,11 @@ describe( 'overlapping suggestions oracle', () => {
 				sequence,
 			] )
 		)( '%s', ( _label, sequence ) => {
-			replay( ANNEZAZU_V2, sequence as Step[] );
+			const { published, oracle } = replay(
+				ANNEZAZU_V2,
+				sequence as Step[]
+			);
+			expect( published ).toBe( publishedText( oracle ) );
 		} );
 
 		it( 'accepting the deletion outdates the formatting change', () => {
@@ -213,7 +221,11 @@ describe( 'overlapping suggestions oracle', () => {
 				sequence,
 			] )
 		)( '%s', ( _label, sequence ) => {
-			replay( ANNEZAZU_V3, sequence as Step[] );
+			const { published, oracle } = replay(
+				ANNEZAZU_V3,
+				sequence as Step[]
+			);
+			expect( published ).toBe( publishedText( oracle ) );
 		} );
 
 		it( 'rejecting the addition shrinks the deletion instead', () => {
@@ -224,7 +236,7 @@ describe( 'overlapping suggestions oracle', () => {
 			expect(
 				state.suggestions.find( ( s ) => s.id === '3' )!.status
 			).toBe( 'pending' );
-			expect( render( state ) ).toBe( 'Intro.' );
+			expect( publishedText( state ) ).toBe( 'Intro.' );
 		} );
 	} );
 } );
