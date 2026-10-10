@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a `mariadbVersion` option and `WP_ENV_MARIADB_VERSION` environment variable to choose the MariaDB version used by the Docker runtime ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
+
 ### Bug fix
 
 -   Point the apt sources of the buster-based WordPress images (PHP 7.1 and 7.2) at `archive.debian.org`, so building them no longer fails now that Debian 10 has reached end-of-life and left the regular mirrors.
