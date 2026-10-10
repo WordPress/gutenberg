@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
+import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import rotate, {
 	getRotateCSS,
 	getRotateForState,
@@ -30,6 +31,21 @@ describe( 'rotate block support', () => {
 				false
 			);
 		} );
+
+		it( 'is off for blocks whose own style attribute is not an object', () => {
+			expect(
+				hasRotateSupport( {
+					supports: {},
+					attributes: { style: { type: 'string' } },
+				} )
+			).toBe( false );
+			expect(
+				hasRotateSupport( {
+					supports: {},
+					attributes: { style: { type: 'object' } },
+				} )
+			).toBe( true );
+		} );
 	} );
 
 	describe( 'isRotateEnabled()', () => {
@@ -55,10 +71,28 @@ describe( 'rotate block support', () => {
 			expect( getRotateValue( 0 ) ).toBe( 0 );
 		} );
 
+		it( 'reads decimal strings the way PHP does', () => {
+			expect( getRotateValue( ' 15 ' ) ).toBe( 15 );
+			expect( getRotateValue( '.5' ) ).toBe( 0.5 );
+			expect( getRotateValue( '1e2' ) ).toBe( 100 );
+			expect( getRotateValue( '0x10' ) ).toBeUndefined();
+			expect( getRotateValue( '0b11' ) ).toBeUndefined();
+			expect( getRotateValue( '0o7' ) ).toBeUndefined();
+			expect( getRotateValue( 'Infinity' ) ).toBeUndefined();
+		} );
+
 		it( 'wraps into (-180, 180] and rounds to two decimals', () => {
 			expect( getRotateValue( 270 ) ).toBe( -90 );
 			expect( getRotateValue( -180 ) ).toBe( 180 );
 			expect( getRotateValue( 12.3456 ) ).toBe( 12.35 );
+		} );
+
+		it( 'rounds halves away from zero, like PHP', () => {
+			expect( getRotateValue( -12.345 ) ).toBe( -12.35 );
+			expect( getRotateValue( 12.345 ) ).toBe( 12.35 );
+			expect( getRotateValue( 1.005 ) ).toBe( 1.01 );
+			expect( getRotateValue( 0.145 ) ).toBe( 0.15 );
+			expect( getRotateValue( -179.999 ) ).toBe( 180 );
 		} );
 
 		it( 'ignores values that are not numbers', () => {
@@ -244,6 +278,76 @@ describe( 'rotate block support', () => {
 					'.wp-rotate-1'
 				)
 			).toBe( '' );
+		} );
+	} );
+
+	describe( 'style attributes that are not objects', () => {
+		it( 'are read as no rotation', () => {
+			expect( getRotateForState( 'rotate: 15deg', DEFAULT_STATE ) ).toBe(
+				0
+			);
+			expect( getRotateCSS( 'rotate: 15deg', '.wp-rotate-1' ) ).toBe(
+				''
+			);
+			expect(
+				getRotateCSS( { '@mobile': 'rotate' }, '.wp-rotate-1' )
+			).toBe( '' );
+			expect( rotate.isMatch( { style: 'rotate' } ) ).toBe( false );
+		} );
+
+		it( 'are replaced when a rotation is set', () => {
+			expect(
+				getUpdatedRotateStyle( 'rotate: 15deg', 15, DEFAULT_STATE )
+			).toEqual( { rotate: 15 } );
+			expect(
+				getUpdatedRotateStyle(
+					{ '@mobile': 'rotate' },
+					15,
+					MOBILE_STATE
+				)
+			).toEqual( { '@mobile': { rotate: 15 } } );
+		} );
+	} );
+
+	describe( 'style attribute registration', () => {
+		const BLOCK_NAME = 'test/rotate-attribute';
+
+		afterEach( () => {
+			unregisterBlockType( BLOCK_NAME );
+		} );
+
+		function registerTestBlock( settings ) {
+			return registerBlockType( BLOCK_NAME, {
+				apiVersion: 3,
+				title: 'Rotate attribute test',
+				category: 'text',
+				edit: () => null,
+				save: () => null,
+				...settings,
+			} );
+		}
+
+		it( 'adds an object style attribute', () => {
+			expect( registerTestBlock().attributes.style ).toEqual( {
+				type: 'object',
+			} );
+		} );
+
+		it( 'keeps an existing style attribute definition', () => {
+			const style = {
+				type: 'object',
+				default: { color: { text: 'red' } },
+			};
+			expect(
+				registerTestBlock( { attributes: { style } } ).attributes.style
+			).toEqual( style );
+		} );
+
+		it( 'does not add a style attribute to blocks that opt out', () => {
+			expect(
+				registerTestBlock( { supports: { rotate: false } } ).attributes
+					.style
+			).toBeUndefined();
 		} );
 	} );
 

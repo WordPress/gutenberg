@@ -25,6 +25,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`lock`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#lock): `false`
 - [`reusable`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
 - [`renaming`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#renaming): `false`
+- `rotate`: `false`
 - [`visibility`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
 - `customCSS`: `false`
 

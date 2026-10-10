@@ -24,6 +24,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`customClassName`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#customclassname): `false`
 - [`html`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#html): `false`
 - `customCSS`: `false`
+- `rotate`: `false`
 - [`visibility`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
 
 ## Block Markup

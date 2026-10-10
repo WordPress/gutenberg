@@ -27,6 +27,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`customClassName`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#customclassname): `false`
 - [`className`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#classname): `false`
 - [`html`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- `rotate`: `false`
 - [`visibility`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`

@@ -100,6 +100,22 @@ class WP_Block_Supports_Rotate_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that a block's own style attribute definition is kept.
+	 *
+	 * @covers ::gutenberg_register_rotate_support
+	 */
+	public function test_keeps_existing_style_attribute() {
+		$style_attribute = array(
+			'type'    => 'object',
+			'default' => array( 'color' => array( 'text' => 'red' ) ),
+		);
+		$block_type      = $this->register_test_block( array(), array( 'style' => $style_attribute ) );
+		gutenberg_register_rotate_support( $block_type );
+
+		$this->assertSame( $style_attribute, $block_type->attributes['style'] );
+	}
+
+	/**
 	 * Tests that stored rotations are read as angles in (-180, 180].
 	 *
 	 * @covers ::gutenberg_get_rotate_value
@@ -120,25 +136,31 @@ class WP_Block_Supports_Rotate_Test extends WP_UnitTestCase {
 	 */
 	public function data_get_rotate_value() {
 		return array(
-			'integer'                     => array( 15, 15.0 ),
-			'negative float'              => array( -12.5, -12.5 ),
-			'numeric string'              => array( '30', 30.0 ),
-			'zero'                        => array( 0, 0.0 ),
-			'half turn'                   => array( 180, 180.0 ),
-			'minus half turn'             => array( -180, 180.0 ),
-			'more than a half turn'       => array( 270, -90.0 ),
-			'more than a turn'            => array( 405, 45.0 ),
-			'whole negative turn'         => array( -360, 0.0 ),
-			'rounded to two decimals'     => array( 12.3456, 12.35 ),
-			'rounded onto a half turn'    => array( -179.999, 180.0 ),
-			'string with a unit'          => array( '15deg', null ),
-			'string with a css injection' => array( '15deg; color: red', null ),
-			'empty string'                => array( '', null ),
-			'null'                        => array( null, null ),
-			'boolean'                     => array( true, null ),
-			'array'                       => array( array( 15 ), null ),
-			'infinite'                    => array( INF, null ),
-			'not a number'                => array( NAN, null ),
+			'integer'                              => array( 15, 15.0 ),
+			'negative float'                       => array( -12.5, -12.5 ),
+			'numeric string'                       => array( '30', 30.0 ),
+			'zero'                                 => array( 0, 0.0 ),
+			'half turn'                            => array( 180, 180.0 ),
+			'minus half turn'                      => array( -180, 180.0 ),
+			'more than a half turn'                => array( 270, -90.0 ),
+			'more than a turn'                     => array( 405, 45.0 ),
+			'whole negative turn'                  => array( -360, 0.0 ),
+			'rounded to two decimals'              => array( 12.3456, 12.35 ),
+			'negative half rounded away from zero' => array( -12.345, -12.35 ),
+			'half rounded away from zero'          => array( 1.005, 1.01 ),
+			'numeric string with spaces'           => array( ' 15 ', 15.0 ),
+			'numeric string with exponent'         => array( '1e2', 100.0 ),
+			'hexadecimal string'                   => array( '0x10', null ),
+			'binary string'                        => array( '0b11', null ),
+			'rounded onto a half turn'             => array( -179.999, 180.0 ),
+			'string with a unit'                   => array( '15deg', null ),
+			'string with a css injection'          => array( '15deg; color: red', null ),
+			'empty string'                         => array( '', null ),
+			'null'                                 => array( null, null ),
+			'boolean'                              => array( true, null ),
+			'array'                                => array( array( 15 ), null ),
+			'infinite'                             => array( INF, null ),
+			'not a number'                         => array( NAN, null ),
 		);
 	}
 
@@ -272,6 +294,65 @@ class WP_Block_Supports_Rotate_Test extends WP_UnitTestCase {
 		$this->assertSame( $first, $second, 'Blocks with the same rotation should share a class.' );
 		$this->assertNotSame( $first, $third, 'Blocks with different rotations should have different classes.' );
 		$this->assertSame( ".$first{rotate:15deg;}.$third{rotate:30deg;}", $this->get_block_supports_stylesheet() );
+	}
+
+	/**
+	 * Tests that a block whose own style attribute is not an object is not rotated.
+	 *
+	 * @covers ::gutenberg_render_rotate_support
+	 */
+	public function test_does_not_render_when_style_attribute_is_not_an_object() {
+		$this->register_test_block( array(), array( 'style' => array( 'type' => 'string' ) ) );
+		$block_content = '<div class="wp-block-test-rotate-block">Content</div>';
+
+		$this->assertSame( $block_content, $this->render_test_block( array( 'rotate' => 15 ), $block_content ) );
+		$this->assertSame( '', $this->get_block_supports_stylesheet() );
+	}
+
+	/**
+	 * Tests that viewport overrides use the theme's viewport breakpoints.
+	 *
+	 * @covers ::gutenberg_render_rotate_support
+	 */
+	public function test_renders_viewport_overrides_with_theme_breakpoints() {
+		$this->register_test_block();
+
+		$filter = static function ( $theme_json ) {
+			return $theme_json->update_with(
+				array(
+					'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'settings' => array(
+						'viewport' => array(
+							'mobile' => '640px',
+							'tablet' => '960px',
+						),
+					),
+				)
+			);
+		};
+
+		add_filter( 'wp_theme_json_data_theme', $filter );
+		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+
+		try {
+			$class_name = $this->get_rotate_class(
+				$this->render_test_block(
+					array(
+						'@mobile' => array( 'rotate' => 10 ),
+						'@tablet' => array( 'rotate' => 0 ),
+					)
+				)
+			);
+
+			$this->assertSame(
+				"@media (width <= 640px){.$class_name{rotate:10deg;}}" .
+				"@media (640px < width <= 960px){.$class_name{rotate:none;}}",
+				$this->get_block_supports_stylesheet()
+			);
+		} finally {
+			remove_filter( 'wp_theme_json_data_theme', $filter );
+			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+		}
 	}
 
 	/**
