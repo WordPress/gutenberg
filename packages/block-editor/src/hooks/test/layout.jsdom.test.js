@@ -236,7 +236,7 @@ describe( 'layout', () => {
 				columnCount: 3,
 			};
 			const stackingCSS =
-				'.wp-container-test.wp-container-test { aspect-ratio: auto; grid-template-rows: none; grid-auto-rows: auto; }' +
+				'.wp-container-test.wp-container-test { aspect-ratio: auto; grid-template-rows: none; grid-auto-rows: auto; --wp--style--grid-cells: auto; }' +
 				'.wp-container-test.wp-container-test > * { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); }';
 
 			let originalExperiment;

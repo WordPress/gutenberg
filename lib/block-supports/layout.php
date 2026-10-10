@@ -1470,16 +1470,17 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			false !== ( $mobile_layout['stackOnMobile'] ?? true ) &&
 			gutenberg_is_experiment_enabled( 'gutenberg-grid-interactivity' )
 		) {
-			// Stacked blocks are sized by their content again.
+			// Stacked blocks are sized by their content again, so their cells are no longer fixed.
 			$stacking_styles = gutenberg_style_engine_get_stylesheet_from_css_rules(
 				array(
 					array(
 						'rules_group'  => $mobile_media_query,
 						'selector'     => ".$container_class.$container_class",
 						'declarations' => array(
-							'aspect-ratio'       => 'auto',
-							'grid-template-rows' => 'none',
-							'grid-auto-rows'     => 'auto',
+							'aspect-ratio'            => 'auto',
+							'grid-template-rows'      => 'none',
+							'grid-auto-rows'          => 'auto',
+							'--wp--style--grid-cells' => 'auto',
 						),
 					),
 					array(

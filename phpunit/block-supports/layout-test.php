@@ -1812,7 +1812,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		$container_class = $matches[0];
 
 		$stylesheet    = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
-		$sizing_rule   = ".$container_class.$container_class{aspect-ratio:auto;grid-template-rows:none;grid-auto-rows:auto;}";
+		$sizing_rule   = ".$container_class.$container_class{aspect-ratio:auto;grid-template-rows:none;grid-auto-rows:auto;--wp--style--grid-cells:auto;}";
 		$stacking_rule = ".$container_class.$container_class > *{grid-column:1 / -1;grid-row:span var(--wp--grid-item--row-span, 1);}";
 
 		if ( $should_stack ) {

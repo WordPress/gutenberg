@@ -490,10 +490,11 @@ export default {
 			.map( ( subselector ) => `${ subselector }${ subselector } > *` )
 			.join( ',' );
 		// Stacked blocks are sized by their content again, so the grid stops
-		// taking its height from its width and its rows stop being the same
-		// height.
+		// taking its height from its width, its rows stop being the same
+		// height, and it tells its children that their cells are no longer
+		// fixed, so blocks that fill fixed cells keep their own size.
 		return (
-			`${ gridSelector } { aspect-ratio: auto; grid-template-rows: none; grid-auto-rows: auto; }` +
+			`${ gridSelector } { aspect-ratio: auto; grid-template-rows: none; grid-auto-rows: auto; --wp--style--grid-cells: auto; }` +
 			`${ childSelector } { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); }`
 		);
 	},
