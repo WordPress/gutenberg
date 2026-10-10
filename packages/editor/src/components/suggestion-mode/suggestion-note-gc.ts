@@ -535,6 +535,11 @@ export default function SuggestionNoteGC() {
 				continue;
 			}
 			forgetResolvedSuggestion( registry, note.id );
+			/*
+			 * Its anchor is on screen now, so it counts as seen: an undo
+			 * further back can withdraw it before the reopen below lands.
+			 */
+			seenRef.current.add( String( note.id ) );
 			const decision = getDecision( getSuggestionStatus( note ) );
 			if ( decision ) {
 				rememberReopenedDecision( registry, note.id, decision );
