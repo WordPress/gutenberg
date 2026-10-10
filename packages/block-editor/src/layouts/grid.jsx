@@ -56,6 +56,28 @@ const units = [
 	{ value: 'em', label: 'em', default: 0 },
 ];
 
+/**
+ * Checks whether a grid's cells have a fixed size: a manual placement grid
+ * that takes its height from its width, as part of the grid interactivity
+ * experiment. The grid sets `--wp--style--grid-cells: fixed` for exactly
+ * these grids, and blocks in their cells fill them.
+ *
+ * Cells take their size from the grid's width unless a minimum column width
+ * lets the columns wrap into more rows than the grid has.
+ *
+ * @param {Object} layout The grid's layout, with any viewport overrides merged in.
+ * @return {boolean} Whether the grid's cells have a fixed size.
+ */
+export function hasFixedGridCells( layout ) {
+	return (
+		!! layout?.isManualPlacement &&
+		!! window.__experimentalEnableGridInteractivity &&
+		! layout.minimumColumnWidth &&
+		!! layout.columnCount &&
+		!! layout.rowCount
+	);
+}
+
 export default {
 	name: 'grid',
 	label: __( 'Grid' ),
@@ -215,11 +237,8 @@ export default {
 		const hasSameSizeCells =
 			!! effectiveLayout.isManualPlacement &&
 			!! window.__experimentalEnableGridInteractivity;
-		// Cells take their size from the grid's width, unless a minimum column
-		// width lets the columns wrap into more rows than the grid has.
-		const hasCellsSizedByWidth = hasSameSizeCells && ! minimumColumnWidth;
-		const baseHasCellsSizedByWidth =
-			hasSameSizeCells && ! layout?.minimumColumnWidth;
+		const hasCellsSizedByWidth = hasFixedGridCells( effectiveLayout );
+		const baseHasCellsSizedByWidth = hasFixedGridCells( layout );
 
 		// When enabled, columns stretch to fill the available space using
 		// `auto-fit`; otherwise empty tracks are preserved with `auto-fill`.

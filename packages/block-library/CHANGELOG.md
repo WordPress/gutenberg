@@ -9,7 +9,7 @@
 ### Enhancements
 
 -   Query: List the existing terms in the taxonomy filters, so categories and tags can be browsed and selected instead of recalled and typed. The controls now use `SearchableChipSelectControl` from `@wordpress/ui` ([#82583](https://github.com/WordPress/gutenberg/pull/82583)).
--   Image, Cover, Video, Media & Text, Post Featured Image: Behind the `gutenberg-grid-interactivity` experiment, fill their cell in a manual placement grid whose cells have a fixed size, cropping media as needed. Each block reads the grid's `--wp--style--grid-cells` custom property with a container style query in its own styles ([#84504](https://github.com/WordPress/gutenberg/pull/84504)).
+-   Image, Cover, Video, Media & Text, Post Featured Image: Behind the `gutenberg-grid-interactivity` experiment, fill their cell in a manual placement grid whose cells have a fixed size, cropping media as needed. Each block reads the grid's `--wp--style--grid-cells` custom property with a container style query in its own styles. In the editor, Image and Post Featured Image hide their dimension controls there, and Cover hides its minimum height control, resize handle and full height toggle, since the cell decides their size ([#84504](https://github.com/WordPress/gutenberg/pull/84504)).
 
 ## 11.2.0 (2026-10-07)
 
