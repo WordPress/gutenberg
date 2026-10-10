@@ -1673,10 +1673,11 @@ test.describe( 'Suggestion mode review flows', () => {
 		expect( serialized ).not.toContain( 'pending-remove' );
 		expect( serialized ).not.toContain( 'pending-insert' );
 
-		// Both notes are resolved by the single decision.
+		// Both notes are decided by the single gesture; the post save makes
+		// the decision final.
 		await expect
 			.poll( () => suggestionStatuses( page ) )
-			.toEqual( [ 'applied', 'applied' ] );
+			.toEqual( [ 'applied-unsaved', 'applied-unsaved' ] );
 	} );
 
 	test( 'reject — rejecting one half of a transform withdraws the whole change', async ( {
@@ -1724,7 +1725,7 @@ test.describe( 'Suggestion mode review flows', () => {
 
 		await expect
 			.poll( () => suggestionStatuses( page ) )
-			.toEqual( [ 'rejected', 'rejected' ] );
+			.toEqual( [ 'rejected-unsaved', 'rejected-unsaved' ] );
 	} );
 
 	// --- Sidebar summaries carry enough context to review (F-27) ------------

@@ -38,8 +38,10 @@ sequenceDiagram
     alt targeted attribute changed since capture
         P-->>A: Confirm dialog ("Apply anyway?")
     end
+    P->>R: PUT status=hold + _wp_suggestion_status=applied-unsaved
     P->>B: updateBlockAttributes(applyOperations(...))
-    P->>R: PUT status=approved + _wp_suggestion_status
+    A->>R: Save the post
+    Note right of R: Save pass: the anchor is gone,<br/>so the decision becomes final<br/>(status=approved, applied)
 ```
 
 ## Editor Intent
@@ -207,7 +209,9 @@ The Suggestion mode subsystem lives in `packages/editor/src/components/suggestio
 | `run-anchor.ts`             | `rebaseRunAnchor`: maps a keyboard run's offsets, read when its first keystroke opened the note, onto the attribute's text when the note id resolves, so the deferred write lands by content rather than at the caret. |
 | `refuse-edit.ts`            | The one place Suggestion mode declines an edit outright (for example an edit overlapping a pending marker), with its notice. |
 | `use-abandoned-note-cleanup.ts` | Trashes the notes opened for a gesture that was abandoned before its marker was written, and drops their ids from the block's note linkage. |
-| `suggestion-note-gc.ts`     | `SuggestionNoteGC`: trashes a pending note whose anchor disappeared (undo, deleting the marked text while Editing), restores it when the anchor comes back, and spares notes with replies. Reopens a decided note when undo brings its marker back, and resolves it again when redo lands the decision again. |
+| `suggestion-note-gc.ts`     | `SuggestionNoteGC`: trashes the current user's own pending note whose anchor disappeared (undo, deleting the marked text while Editing), after reading the note fresh from the server, restores it when the anchor comes back, and spares notes with replies. Reopens a note this session decided when undo brings its marker back, and decides it again (provisionally) when redo lands the decision again. |
+| `anchor-index.ts`           | Where each suggestion note is anchored in the loaded content, shared by the note collector and the sidebar (`useSuggestionAnchorPresent`). |
+| `suggestion-status.ts`      | `_wp_suggestion_status` values and predicates (`getSuggestionStatus`, `isProvisionalStatus`, `getDecision`). |
 | `suggestion-undo-guard.ts`  | Suggestion-aware undo/redo: undoing right after a suggestion withdraws it rather than capturing the undo as a new suggestion. Records every redo, in any intent, so the note collector can tell a redone decision from a withdrawal. |
 | `clipboard-strip.ts`        | Keeps suggestion state off the clipboard: inline markers, `metadata.suggestion` and note links are stripped from copied and cut content. |
 | `multi-block-format-notice.ts` | Explains why a format shortcut does nothing across a multi-block selection in Suggestion mode. |
@@ -234,7 +238,9 @@ REST/PHP surface lives in `lib/compat/wordpress-7.1/`. Notes themselves (the `no
 
 | File | Role |
 |------|------|
-| `block-suggestions.php` | `gutenberg_register_suggestion_meta` registers `_wp_suggestion` (sanitized, 64 KB cap, KSES on serialized block snapshots) and `_wp_suggestion_status`, each with an `edit_post`-on-parent `auth_callback`. Also the render side: `gutenberg_strip_inline_suggestion_markers`, the type-aware `render_block` strip for inline `wp-suggestion` markers (`del` keeps text, `add` drops text, `format` restores the original run), and `gutenberg_strip_pending_structural_suggestions`, its structural counterpart (`pending-insert` blocks dropped, `pending-remove`/`pending-move` blocks kept). `gutenberg_restore_pending_move_order` runs earlier, on `the_content` ahead of `do_blocks()`, and restores the pre-move sibling order of any list holding a single pending move, so an un-accepted move does not change published output. |
+| `suggestion-status.php` (7.2) | Provisional and final status lists, `_wp_suggestion_decided_by` stamping, and the REST refusal of final statuses. |
+| `class-gutenberg-suggestion-reconciler.php`, `suggestion-reconciliation.php` (7.2) | The save pass and `gutenberg_get_suggestion_anchor_index()`, the one place that reads suggestion anchors from serialized content. |
+| `block-suggestions.php` | `gutenberg_register_suggestion_meta` registers `_wp_suggestion` (sanitized, 64 KB cap, KSES on serialized block snapshots) and `_wp_suggestion_status`, each with an `edit_post`-on-parent `auth_callback`, plus the read-only provenance meta. Also the render side: `gutenberg_strip_inline_suggestion_markers`, the type-aware `render_block` strip for inline `wp-suggestion` markers (`del` keeps text, `add` drops text, `format` restores the original run), and `gutenberg_strip_pending_structural_suggestions`, its structural counterpart (`pending-insert` blocks dropped, `pending-remove`/`pending-move` blocks kept). `gutenberg_restore_pending_move_order` runs earlier, on `the_content` ahead of `do_blocks()`, and restores the pre-move sibling order of any list holding a single pending move, so an un-accepted move does not change published output. |
 | `block-suggestions.php` (validation) | `gutenberg_validate_suggestion_post_operations` (on `rest_preprocess_comment`) refuses, with a 400, a note whose `post-attribute-set` op targets anything but the title, excerpt, featured image, slug, one of the post type's REST taxonomies, or a meta key registered with `show_in_rest` that the suggester could edit (`gutenberg_can_suggest_post_meta`, `edit_post_meta`). |
 | `class-gutenberg-rest-comment-controller-7-1.php` | Thin subclass of the core comments controller. Permissions stay core's. It adds only storage rules: `prepare_item_for_database` rejects an oversized `_wp_suggestion` with 413 and an invalid JSON payload with 400, and `check_is_comment_content_allowed` lets a note carrying a suggestion payload have empty content. |
 
@@ -342,10 +348,66 @@ The current implementation (`provider.ts`) uses comment meta. A future Yjs-backe
 
 ## Accept / Reject
 
-- **Accept** (attribute ops): runs `applyOperations(currentAttributes, payload.operations)` to produce new attributes, dispatches `updateBlockAttributes`, marks the note as resolved with `_wp_suggestion_status = 'applied'`.
+Every decision first writes a **provisional** status to the note (`applied-unsaved` or `rejected-unsaved`, comment kept `hold`), and only then changes the content. A failed status write leaves the editor untouched; a content change that fails puts the note back to `pending`. The decision becomes final when the post is saved (see [Decision lifecycle](#decision-lifecycle)).
+
+- **Accept** (attribute ops): runs `applyOperations(currentAttributes, payload.operations)` to produce new attributes and dispatches `updateBlockAttributes`.
 - **Accept** (structural ops): dispatches the corresponding block-editor action — `removeBlock` for `block-remove`, `insertBlock` for `block-insert-after`, `moveBlockToPosition` for `block-move` — then clears the `metadata.suggestion` marker via `clearSuggestionMarkerAttributes`.
-- **Reject**: marks the note as resolved with `_wp_suggestion_status = 'rejected'` and clears any `metadata.suggestion` marker. For structural suggestions it also undoes the in-canvas pending state: `block-insert-after` runs `removeBlock`, `block-move` runs `moveBlockToPosition` back to the original spot, `block-remove` simply drops the marker (the block was never actually removed). Attribute rejects make no content change.
+- **Reject**: clears any `metadata.suggestion` marker. For structural suggestions it also undoes the in-canvas pending state: `block-insert-after` runs `removeBlock`, `block-move` runs `moveBlockToPosition` back to the original spot, `block-remove` simply drops the marker (the block was never actually removed). Attribute rejects make no content change.
 - **Conflict detection**: accept-time staleness is checked at the attribute level, not the post level. `hasAttributeConflict(currentAttributes, operations)` compares each operation's captured `before` to the block's current value; only a real divergence on a targeted attribute prompts the "apply anyway" confirmation. (`block-insert-after` is exempt — its baseline is `{}`, so a comparison against the already-typed-into block would always read as divergence.) Post-level `baseRevision` is still stamped into the payload for provenance, but does not drive the prompt — every auto-save bumps `post_modified_gmt`, so a post-level compare would flag nearly every suggestion as stale.
+
+## Decision lifecycle
+
+A decision is content: Accept and Reject change the post, and the change only exists once the post is saved. `_wp_suggestion_status` records where a note is on that path, and only the server writes a final value.
+
+| `_wp_suggestion_status` | Comment status | Meaning | Written by |
+|---|---|---|---|
+| absent / `pending` | `hold` | Awaiting a decision | Client (create, reopen) |
+| `applied-unsaved` | `hold` | Accepted in an editor that has not saved the post | Client |
+| `rejected-unsaved` | `hold` | Rejected in an editor that has not saved the post | Client |
+| `applied` / `rejected` | `approved` | Final: a saved post no longer carries the suggestion | Server (save pass) |
+| `outdated` | `approved` | Someone else's save removed the suggestion before anyone decided | Server (save pass) |
+
+```mermaid
+stateDiagram-v2
+  state "pending (hold)" as P
+  state "applied-unsaved (hold)" as AU
+  state "rejected-unsaved (hold)" as RU
+  state "applied (approved)" as A
+  state "rejected (approved)" as R
+  state "outdated (approved)" as O
+  state "trashed" as T
+
+  [*] --> P: note created
+  P --> AU: Accept
+  P --> RU: Reject
+  AU --> RU: Reject
+  RU --> AU: Accept
+  AU --> P: undo / Reopen
+  RU --> P: undo / Reopen
+  AU --> A: post saved without the anchor
+  RU --> R: post saved without the anchor
+  P --> O: post saved without the anchor, by someone else
+  P --> T: own anchor withdrawn (note collector)
+  T --> P: redo brings the anchor back
+  A --> AU: Apply again
+  R --> RU: Reject again
+  A --> P: Reopen
+  R --> P: Reopen
+  O --> P: Reopen
+```
+
+**The save pass** (`Gutenberg_Suggestion_Reconciler`, `lib/compat/wordpress-7.2/`) runs on every write to a post whose type supports notes. On `wp_insert_post_data` (priority 999, after kses) it records the content the post had before the write; on `wp_insert_post` (priority 1, after the row is written and before a REST response is prepared) it compares the anchors of the previous and the saved content, read by `gutenberg_get_suggestion_anchor_index()`:
+
+- a provisional decision whose anchor is gone becomes final, whoever saves, so a decision made by one collaborator is finalized by another's save. A post-title accept is final once the saved title equals the proposal; a post-title reject on the next post write.
+- another author's pending suggestion whose anchor the write removed becomes `outdated`. A write without a user (cron, WP-CLI) counts as another author. The saver's own pending notes are left to the note collector.
+
+The pass runs for post updates and own-draft autosaves (which update the post itself), and skips revisions and autosave revisions. It is idempotent, and a nested `wp_update_post()` from a `save_post` handler pairs with its own commit. Finalizing sends no mail. The pass records `_wp_suggestion_resolved_by`; the server also stamps `_wp_suggestion_decided_by` when a provisional status is written. Both are read-only over REST.
+
+**Final statuses are the server's.** A REST write of `applied`, `rejected` or `outdated` is refused with a 403 (`rest_suggestion_status_server_only`), so an editor session from before this change cannot finalize a decision its content never reached. The `gutenberg_allow_client_final_suggestion_status` filter lifts the refusal (the e2e suite uses it to seed stuck notes).
+
+**On load**, a provisional decision whose anchor is still in the content means the decision was never saved, so the note shows Accept and Reject again, with "{Name} accepted this suggestion, but the post was not saved." Nothing is rewritten: the stored status stays provisional until someone decides again or a save finalizes it.
+
+**Nested suggestions.** Rejecting a parent addition removes the characters of any suggestion nested inside it. The child is not decided: the save pass's outdated rule (anchor gone, another author, no decision) is what marks it `outdated`, so no client write of `outdated` is needed.
 
 ## Review UI
 
@@ -353,6 +415,18 @@ In the notes sidebar, a suggestion thread renders:
 
 - **`SuggestionSummary`** — a Docs-style "Add: …", "Delete: …", "Change: …" summary derived from the operations. Inline formatting reads "Formatting: bold" and block attributes read "Change: heading level 3 → 4" (a scalar value names both sides; an object value such as `style` keeps the bare name), so the two families of suggestion stay tellable apart in a mixed list. Structural lines quote the block's text when it has some ("Insert block: paragraph “Brand new text”"); the sidebar reads it from the live block, falling back to the snapshot on the op, and a block without text keeps the bare label. It is the sidebar's sole suggestion renderer; its `wordDiff` engine lives in `word-diff.ts`, capped by `MAX_DIFF_LENGTH`/`MAX_DIFF_TOKENS` so a large payload can't freeze the sidebar. Quoted text is cut short so a card stays compact; when anything was cut, a "Show more" toggle (the same one a long note body uses) swaps in the full wording from `summarizeOperations( operations, { truncate: false } )`.
 - **Accept / Reject icon buttons** — checkmark and close icons that trigger the provider's apply/reject flows.
+- **Status** - read from `_wp_suggestion_status` together with whether the loaded content still carries the note's anchor (`useSuggestionAnchorPresent` in `anchor-index.ts`):
+
+| Status | Anchor in loaded content | Shows |
+|---|---|---|
+| pending | either | Accept / Reject |
+| provisional | yes | Accept / Reject, and "{Name} accepted this suggestion, but the post was not saved." |
+| provisional | no | "Applied" (or "Rejected"), and "Save the post to keep this decision." |
+| `applied` / `rejected` | yes | "Applied, but the change is not in the post." (or "Rejected, but the suggestion is still in the post."), with Apply again, Reject again and Reopen |
+| `applied` / `rejected` | no | "Applied" (or "Rejected") |
+| `outdated` | no | "No longer applies - the text was removed." (the block was removed, or the block changed, for block suggestions), with Reopen |
+
+Reopen, from the card or the note's menu, writes `hold` and `pending` together, so a reopened suggestion offers its decision again.
 
 ## Yjs v2 Migration Path
 
@@ -371,7 +445,7 @@ These are non-obvious quirks reviewers should keep in mind when reading the code
 
 - **RichTextData / wrapper-vs-primitive comparison**: text-valued block attributes (notably `core/paragraph`'s `content`) are wrapped in `RichTextData` objects whose payload sits in private class fields. Plain `Object.keys()` reflection returns empty arrays for these wrappers, so a deep structural comparison would consider every wrapper "different from itself" after a JSON round-trip. The provider's `isAttributeEqual` and the interceptor's `shallowAttributeEquals` detect the wrapper-vs-primitive case and fall back to `String(a) === String(b)`. Without this, every suggestion would be flagged stale or trigger an apparent attribute conflict on apply.
 - **`DEEP_MERGE_KEYS` (object-valued attributes)**: the proposal helpers do a one-level-deep merge only for keys in `DEEP_MERGE_KEYS`, which today is just `metadata`. The system keys (`noteId`, `suggestion`) are stripped from a proposed `metadata`, so the proposed copy is partial and must merge. Every other attribute, `style` included, is replaced wholesale, matching core `setAttributes` semantics: a style reset sends a style object without the cleared fields, and a merge would resurrect them. Add a key only when a proposal holds a partial copy of it.
-- **Comment status vs. suggestion status**: a note comment's WP status (`hold` / `approved`) tracks whether the discussion is open or resolved. `_wp_suggestion_status` (`pending` / `applied` / `rejected`) is a parallel axis tracking the suggestion lifecycle. The two are independent: a resolved suggestion can leave its comment thread open for follow-up discussion.
+- **Comment status vs. suggestion status**: a note comment's WP status (`hold` / `approved`) tracks whether the discussion is open or resolved. `_wp_suggestion_status` is a parallel axis tracking the suggestion lifecycle (see [Decision lifecycle](#decision-lifecycle)). A provisional decision keeps the comment `hold`, so `hold` alone does not mean "awaiting a decision": readers check the status too (`suggestion-status.ts`).
 - **Payload size limit**: both the client (`PAYLOAD_MAX_BYTES` in `provider.ts`) and the server (`GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES` in `block-suggestions.php`) cap payloads at 64 KB. The client check rejects oversized payloads before they leave the browser; the REST controller is the authoritative gate. The meta `sanitize_callback` rejects (rather than truncates) oversized values because mid-string truncation produces invalid JSON that `parseSuggestionPayload` would silently drop.
 
 ## Known Limitations
@@ -379,7 +453,7 @@ These are non-obvious quirks reviewers should keep in mind when reading the code
 - **Sub-attribute anchoring**: resolved for inline **text and formatting** changes — these are now edit-resilient `core/suggestion` markers anchored in content and re-resolved on read (see [Inline suggestion markers](#inline-suggestion-markers)), so an unrelated edit elsewhere in the attribute no longer invalidates them. It still applies to **non-text attribute** suggestions (alignment, color), which remain whole-attribute marker proposals: if the author edits the same attribute while one is pending, the captured `before` no longer matches and Apply overwrites the interim edit (after a staleness confirmation) rather than merging it.
 - **Marker-planner declines**: an edit that straddles an existing marker, a format toggle whose run overlaps one, or a text diff the planner can't resolve unambiguously falls back to the whole-attribute proposal path (captured marker-stripped). Live IME composition itself is not intercepted — only the committed composition is reconciled into markers.
 - **Format markers saved before the outermost-marker change**: a `format` marker nested inside the formatting it proposes (`<strong><mark>…</mark></strong>`) still leaks that formatting to the front end, because the restored run lands inside it. The next format toggle on the run rewrites the marker in the current layout.
-- **Permissions**: there is no Gutenberg permission override. Updating a note uses core's `edit_comment` check, which `map_meta_cap` resolves to `edit_post` on the note's parent post, so any post editor can apply or reject a suggestion on their post, and can also rewrite the content of any note on it. The `_wp_suggestion` and `_wp_suggestion_status` meta `auth_callback`s follow the same `edit_post`-on-parent rule. Stricter author-only protection for note content would be a separate policy with its own tests.
+- **Permissions**: there is no Gutenberg permission override. Updating a note uses core's `edit_comment` check, which `map_meta_cap` resolves to `edit_post` on the note's parent post, so any post editor can apply or reject a suggestion on their post, and can also rewrite the content of any note on it. The `_wp_suggestion` and `_wp_suggestion_status` meta `auth_callback`s follow the same `edit_post`-on-parent rule, though a REST client can only write a pending or provisional status: the final values come from the save pass, under the capabilities of whoever saves the post. The provenance meta (`_wp_suggestion_decided_by`, `_wp_suggestion_resolved_by`) is not writable over REST at all. Stricter author-only protection for note content would be a separate policy with its own tests.
 - **Post field proposals after a reload**: proposals are held in memory, so a reload drops the pending preview, and editing the same field again in a new session opens a second note rather than updating the first.
 - **Remote edits and direct writes in Suggesting**: edits that reach the post entity without passing through `editEntityRecord` (a collaborator's synced edit, the core-data undo stack replaying an edit made in Editing) are not refused locally; `savePost` keeps them from being saved from Suggesting.
 - **Site settings and trashing**: the blog title, posts-per-page and site discussion rows edit the site entity, not the post, and "Move to trash" deletes the post; neither is covered by the post field guard.
@@ -389,4 +463,4 @@ These are non-obvious quirks reviewers should keep in mind when reading the code
 - **The front-end restore only covers `the_content`**: render paths that parse post content themselves never apply it — `render_block_core_block()` calls `parse_blocks()` on a synced pattern's `post_content` directly — so a pending move stored in one of those would publish in its proposed order. This is currently unreachable: Suggestion mode is gated on the `editor.notes` post-type support, which only `post` and `page` declare, and both render through `the_content`. A PHPUnit canary asserts that gating so the gap surfaces if a new post type gains `editor.notes`.
 - **Only one pending move per sibling list is restored**: `fromIndex` is measured against the order the list was in when the move was made — the marker writer diffs each tick against the previous one — so a second move in the same list carries an index the first move already shifted. Replaying both would render an order that existed in no version of the document, and nothing in the serialized markers distinguishes a skewed pair from an honest one. A list holding more than one pending move therefore keeps its proposed order. Recording a baseline-relative index alongside `fromIndex` would lift the restriction; it has to be a separate field, because Reject wants the tick-relative meaning (undo one move, leave the rest pending) while the front end wants the baseline-relative one.
 - **Cross-parent move anchors after a reload**: a `block-move` op's `fromParentClientId` anchor is a session-local clientId. Rejecting a *same-parent* move after a reload works (`fromIndex` plus the block's live parent are enough), but rejecting a *cross-parent* move in a later session can't resolve the original parent and restores the block within its current parent instead.
-- **Orphaned notes and markers**: an inline marker and its backing note comment can drift apart. Deleting the backing comment leaves an orphaned marker in content — an orphaned `add` marker keeps hiding its text on the front end until the marker is removed manually. The other direction is covered: `SuggestionNoteGC` trashes a pending note whose anchor it has observed disappear (undo, deleting the marked text in Editing intent), restores it when the anchor comes back (redo bringing a marker back, or undoing the removal that replaced a pending move), and retries a failed trash a bounded number of times. A decision is undone and redone with its note: undo reopens the note when the decided marker comes back, and a redo that takes the marker away again resolves the note with its earlier decision instead of trashing it; a note opened for a keystroke that never wrote its marker (the text around the run's anchor changed or the intent changed during the note round trip) is trashed by the keyboard that opened it. The collector never trashes an anchor it has not observed, so a note stranded by a closed editor stays pending. Copying whole blocks strips markers and note links, and cut unwraps them from the clipboard HTML, but the browser's native copy of a partial rich-text selection still duplicates the `data-suggestion-id`, so two markers can point at one note.
+- **Orphaned notes and markers**: an inline marker and its backing note comment can drift apart. Deleting the backing comment leaves an orphaned marker in content — an orphaned `add` marker keeps hiding its text on the front end until the marker is removed manually. The other direction is covered: `SuggestionNoteGC` trashes the current user's own pending note whose anchor it has observed disappear (undo, deleting the marked text in Editing intent), restores it when the anchor comes back (redo bringing a marker back, or undoing the removal that replaced a pending move), and retries a failed trash a bounded number of times. A decision is undone and redone with its note: undo reopens the note when the decided marker comes back, and a redo that takes the marker away again gives the note its earlier decision back (provisional, until the post is saved) instead of trashing it; a note opened for a keystroke that never wrote its marker (the text around the run's anchor changed or the intent changed during the note round trip) is trashed by the keyboard that opened it. The collector never trashes an anchor it has not observed, so a note stranded by a closed editor stays pending, and never trashes another author's note: removing someone else's suggestion and saving marks their note `outdated` instead. An own anchor removed outside Gutenberg (the classic editor, a plugin's `wp_update_post()`) leaves the note pending, since the save pass leaves the saver's own notes to the collector. Copying whole blocks strips markers and note links, and cut unwraps them from the clipboard HTML, but the browser's native copy of a partial rich-text selection still duplicates the `data-suggestion-id`, so two markers can point at one note.

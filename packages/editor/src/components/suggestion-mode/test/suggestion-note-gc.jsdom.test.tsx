@@ -55,6 +55,14 @@ vi.mock( import( '@wordpress/api-fetch' ), async ( importOriginal ) => {
  */
 let serverThreads: any[] = [];
 let serverReplies: any[] | Error = [];
+/*
+ * The note as the server has it when the collector reads it fresh before
+ * trashing. Defaults to the root note the threads were seeded with.
+ */
+let serverNote: any = null;
+
+const CURRENT_USER_ID = 1;
+const OTHER_USER_ID = 2;
 
 const POST_ID = 77;
 const NOTE_ID = 9;
@@ -73,10 +81,15 @@ const THREADS_QUERY = {
  * the note's lifecycle: `hold` with no lifecycle status is pending, `approved`
  * plus `applied` is a decision that has landed.
  */
-function note( { status = 'approved', lifecycle = 'applied' } = {} ) {
+function note( {
+	status = 'approved',
+	lifecycle = 'applied',
+	author = CURRENT_USER_ID,
+} = {} ) {
 	return {
 		id: NOTE_ID,
 		parent: 0,
+		author,
 		status,
 		meta: {
 			_wp_suggestion_status: lifecycle,
@@ -115,6 +128,7 @@ function attributeNote() {
 	return {
 		id: NOTE_ID,
 		parent: 0,
+		author: CURRENT_USER_ID,
 		status: 'hold',
 		meta: {
 			_wp_suggestion_status: 'pending',
@@ -160,6 +174,7 @@ function setup( {
 	threads,
 	resolved = false,
 	metadata = { noteId: [ NOTE_ID ] },
+	currentUserId = CURRENT_USER_ID,
 }: {
 	content: string;
 	threads: any[];
@@ -167,14 +182,20 @@ function setup( {
 	resolved?: boolean;
 	/** The block's metadata; defaults to the note link alone. */
 	metadata?: Record< string, any >;
+	/** The signed-in user, or null while unresolved. */
+	currentUserId?: number | null;
 } ) {
 	serverThreads = threads;
 	serverReplies = threads.filter(
 		( thread: any ) => thread.parent === NOTE_ID
 	);
+	serverNote = threads.find( ( thread: any ) => thread.id === NOTE_ID );
 	( apiFetch as unknown as ReturnType< typeof vi.fn > ).mockReset();
 	( apiFetch as unknown as ReturnType< typeof vi.fn > ).mockImplementation(
 		async ( { path }: any ) => {
+			if ( path.startsWith( `/wp/v2/comments/${ NOTE_ID }?` ) ) {
+				return serverNote;
+			}
 			if ( ! path.includes( `parent=${ NOTE_ID }` ) ) {
 				return serverThreads;
 			}
@@ -196,6 +217,11 @@ function setup( {
 	}
 
 	registry.dispatch( editorStore ).setEditedPost( 'post', POST_ID as any );
+	if ( currentUserId !== null ) {
+		( registry.dispatch( coreStore ) as any ).receiveCurrentUser( {
+			id: currentUserId,
+		} );
+	}
 
 	const block = createBlock( TEST_BLOCK_NAME, {
 		content: RichTextData.fromHTMLString( content ),
@@ -352,8 +378,9 @@ describe( 'SuggestionNoteGC redoing an undone decision', () => {
 			'comment',
 			{
 				id: NOTE_ID,
-				status: 'approved',
-				meta: { _wp_suggestion_status: 'applied' },
+				// Provisional: only a post save makes it final.
+				status: 'hold',
+				meta: { _wp_suggestion_status: 'applied-unsaved' },
 			},
 			expect.anything()
 		);
@@ -666,7 +693,11 @@ describe( 'SuggestionNoteGC collecting an attribute proposal', () => {
 		expect( harness.saveEntityRecord ).toHaveBeenLastCalledWith(
 			'root',
 			'comment',
-			{ id: NOTE_ID, status: 'hold' },
+			{
+				id: NOTE_ID,
+				status: 'hold',
+				meta: { _wp_suggestion_status: 'pending' },
+			},
 			expect.anything()
 		);
 	} );
@@ -706,5 +737,125 @@ describe( 'SuggestionNoteGC collecting an attribute proposal', () => {
 		await settle();
 
 		expect( harness.saveEntityRecord ).not.toHaveBeenCalled();
+	} );
+} );
+
+describe( 'SuggestionNoteGC scope', () => {
+	beforeEach( () => {
+		vi.useFakeTimers( { toFake: [ 'setTimeout', 'clearTimeout' ] } );
+	} );
+
+	afterEach( () => {
+		vi.useRealTimers();
+	} );
+
+	/**
+	 * Mounts the collector on a marked block, removes the marker and lets the
+	 * grace period and the server reads run out.
+	 *
+	 * @param options         Setup options.
+	 * @param options.threads Note threads.
+	 * @param options.server  The note as a fresh server read returns it.
+	 * @param options.userId  The signed-in user, or null while unresolved.
+	 * @return The `saveEntityRecord` spy.
+	 */
+	async function withdraw( {
+		threads,
+		server,
+		userId = CURRENT_USER_ID,
+	}: {
+		threads: any[];
+		server?: any;
+		userId?: number | null;
+	} ) {
+		let harness: any;
+		await act( async () => {
+			harness = setup( {
+				content: MARKED,
+				threads,
+				currentUserId: userId,
+			} );
+		} );
+		if ( server ) {
+			serverNote = server;
+		}
+		await act( async () => {
+			harness.registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( harness.clientId, {
+					content: RichTextData.fromHTMLString( 'Hello world' ),
+				} );
+		} );
+		await act( async () => {
+			vi.advanceTimersByTime( 1000 );
+		} );
+		for ( let round = 0; round < 3; round++ ) {
+			await act( async () => {
+				vi.runOnlyPendingTimers();
+			} );
+		}
+		return harness.saveEntityRecord;
+	}
+
+	const TRASH = [
+		'root',
+		'comment',
+		{ id: NOTE_ID, status: 'trash' },
+		expect.anything(),
+	];
+
+	it( "never collects another author's note", async () => {
+		const saveEntityRecord = await withdraw( {
+			threads: [
+				note( {
+					status: 'hold',
+					lifecycle: 'pending',
+					author: OTHER_USER_ID,
+				} ),
+			],
+		} );
+
+		expect( saveEntityRecord ).not.toHaveBeenCalledWith( ...TRASH );
+	} );
+
+	it( 'collects nothing while the current user is unresolved', async () => {
+		const saveEntityRecord = await withdraw( {
+			threads: [ note( { status: 'hold', lifecycle: 'pending' } ) ],
+			userId: null,
+		} );
+
+		expect( saveEntityRecord ).not.toHaveBeenCalled();
+	} );
+
+	it.each( [ 'applied-unsaved', 'rejected-unsaved' ] )(
+		'never collects a note decided but not saved (%s)',
+		async ( lifecycle ) => {
+			const saveEntityRecord = await withdraw( {
+				threads: [ note( { status: 'hold', lifecycle } ) ],
+			} );
+
+			expect( saveEntityRecord ).not.toHaveBeenCalledWith( ...TRASH );
+		}
+	);
+
+	it( 'never collects an outdated note', async () => {
+		const saveEntityRecord = await withdraw( {
+			threads: [ note( { status: 'approved', lifecycle: 'outdated' } ) ],
+		} );
+
+		expect( saveEntityRecord ).not.toHaveBeenCalled();
+	} );
+
+	it( 'keeps the note when the server says a peer decided it meanwhile', async () => {
+		/*
+		 * The local copy still reads pending: a peer's accept synced its
+		 * content change here before the thread list heard of the decision.
+		 */
+		const saveEntityRecord = await withdraw( {
+			threads: [ note( { status: 'hold', lifecycle: 'pending' } ) ],
+			server: note( { status: 'hold', lifecycle: 'applied-unsaved' } ),
+		} );
+
+		expect( saveEntityRecord ).not.toHaveBeenCalledWith( ...TRASH );
 	} );
 } );

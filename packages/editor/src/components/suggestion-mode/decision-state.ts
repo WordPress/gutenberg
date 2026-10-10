@@ -4,14 +4,18 @@
  * scoped, so two editor instances on one page never read each other's
  * decisions, while every hook instance inside one editor sees the same sets.
  */
+import type { SuggestionDecision } from './suggestion-status';
+
+export type { SuggestionDecision };
 
 export interface SuggestionDecisionState {
 	/**
-	 * Comment ids with an apply/reject decision currently in flight. Deciding
-	 * a suggestion mutates block content (clears markers) BEFORE the comment's
-	 * lifecycle status lands on the server, so the note garbage collector (see
-	 * suggestion-note-gc.ts) would briefly observe "marker gone, note still
-	 * pending" and trash a note that was just resolved.
+	 * Comment ids with an apply/reject decision currently in flight. A
+	 * decision writes the note's provisional status and then changes block
+	 * content (clears markers); while that is under way the local record can
+	 * still read pending, so the note garbage collector (see
+	 * suggestion-note-gc.ts) would observe "marker gone, note still pending"
+	 * and trash a note that was just decided.
 	 */
 	decisionsInFlight: Set< string >;
 	/**
@@ -51,8 +55,6 @@ export interface SuggestionDecisionState {
 	/** When the last redo was dispatched, or 0. */
 	lastRedoAt: number;
 }
-
-export type SuggestionDecision = 'applied' | 'rejected';
 
 /*
  * How long a redo counts as the cause of the block changes that follow it.

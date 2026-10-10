@@ -112,9 +112,9 @@ async function decideSuggestion( page: any, action: 'Accept' | 'Reject' ) {
 /**
  * Polls a note until it settles out of the pending state a reopen gives it,
  * and returns the record. A redo that re-lands a decision has to put the
- * note back to resolved; the note collector trashing it instead is the
- * failure. Both fields are waited on: the REST update writes the status and
- * the lifecycle meta separately, so a read can land between the two.
+ * decision back (provisional, `applied-unsaved` / `rejected-unsaved`, until
+ * the post is saved); the note collector trashing it instead is the
+ * failure.
  *
  * @param requestUtils Request utils.
  * @param noteId       Note comment id.
@@ -131,8 +131,9 @@ async function settledNote( requestUtils: any, noteId: number ) {
 				} );
 				return (
 					note.status === 'trash' ||
-					( note.status !== 'hold' &&
-						note.meta._wp_suggestion_status !== 'pending' )
+					! [ '', 'pending' ].includes(
+						note.meta._wp_suggestion_status
+					)
 				);
 			},
 			{ timeout: 10000 }
@@ -856,8 +857,8 @@ test.describe( 'Suggestion mode undo', () => {
 		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 0 );
 
 		const note = await settledNote( requestUtils, noteId );
-		expect( note.status ).toBe( 'approved' );
-		expect( note.meta._wp_suggestion_status ).toBe( 'applied' );
+		expect( note.status ).toBe( 'hold' );
+		expect( note.meta._wp_suggestion_status ).toBe( 'applied-unsaved' );
 		await expect(
 			sidebar.getByText( 'Applied', { exact: true } )
 		).toBeVisible();
@@ -904,8 +905,8 @@ test.describe( 'Suggestion mode undo', () => {
 		await expect( paragraph ).toHaveText( 'Hello' );
 
 		const note = await settledNote( requestUtils, noteId );
-		expect( note.status ).toBe( 'approved' );
-		expect( note.meta._wp_suggestion_status ).toBe( 'rejected' );
+		expect( note.status ).toBe( 'hold' );
+		expect( note.meta._wp_suggestion_status ).toBe( 'rejected-unsaved' );
 		await expect(
 			sidebar.getByText( 'Rejected', { exact: true } )
 		).toBeVisible();
@@ -956,8 +957,20 @@ test.describe( 'Suggestion mode undo', () => {
 		await pageUtils.pressKeys( 'primary+z' );
 		await expect( paragraph ).toHaveText( 'Hello' );
 
-		const note = await settledNote( requestUtils, noteId );
-		expect( note.status ).toBe( 'trash' );
+		// The decision it carried is provisional too, so wait for the trash
+		// itself rather than for the note to leave the pending state.
+		await expect
+			.poll(
+				async () =>
+					(
+						await requestUtils.rest( {
+							path: `/wp/v2/comments/${ noteId }`,
+							params: { context: 'edit' },
+						} )
+					).status,
+				{ timeout: 10000 }
+			)
+			.toBe( 'trash' );
 	} );
 
 	test( 'redo after undoing an accepted deletion resolves its note again', async ( {
@@ -1003,8 +1016,8 @@ test.describe( 'Suggestion mode undo', () => {
 		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 0 );
 
 		const note = await settledNote( requestUtils, noteId );
-		expect( note.status ).toBe( 'approved' );
-		expect( note.meta._wp_suggestion_status ).toBe( 'applied' );
+		expect( note.status ).toBe( 'hold' );
+		expect( note.meta._wp_suggestion_status ).toBe( 'applied-unsaved' );
 		await expect(
 			sidebar.getByText( 'Applied', { exact: true } )
 		).toBeVisible();
@@ -1056,8 +1069,8 @@ test.describe( 'Suggestion mode undo', () => {
 		);
 
 		const note = await settledNote( requestUtils, noteId );
-		expect( note.status ).toBe( 'approved' );
-		expect( note.meta._wp_suggestion_status ).toBe( 'applied' );
+		expect( note.status ).toBe( 'hold' );
+		expect( note.meta._wp_suggestion_status ).toBe( 'applied-unsaved' );
 		await expect(
 			sidebar.getByText( 'Applied', { exact: true } )
 		).toBeVisible();
@@ -1103,8 +1116,8 @@ test.describe( 'Suggestion mode undo', () => {
 		await expect( doomed ).toHaveCount( 0 );
 
 		const note = await settledNote( requestUtils, noteId );
-		expect( note.status ).toBe( 'approved' );
-		expect( note.meta._wp_suggestion_status ).toBe( 'applied' );
+		expect( note.status ).toBe( 'hold' );
+		expect( note.meta._wp_suggestion_status ).toBe( 'applied-unsaved' );
 	} );
 
 	test( 'redo after undoing an accepted attribute suggestion resolves its note again', async ( {
@@ -1149,8 +1162,8 @@ test.describe( 'Suggestion mode undo', () => {
 		await expect( heading ).toHaveJSProperty( 'tagName', 'H3' );
 
 		const note = await settledNote( requestUtils, noteId );
-		expect( note.status ).toBe( 'approved' );
-		expect( note.meta._wp_suggestion_status ).toBe( 'applied' );
+		expect( note.status ).toBe( 'hold' );
+		expect( note.meta._wp_suggestion_status ).toBe( 'applied-unsaved' );
 		await expect(
 			sidebar.getByText( 'Applied', { exact: true } )
 		).toBeVisible();
