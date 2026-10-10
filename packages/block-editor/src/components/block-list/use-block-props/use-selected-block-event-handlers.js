@@ -26,6 +26,7 @@ export function useEventHandlers( { clientId, isSelected } ) {
 		isSectionBlock,
 		editedContentOnlySection,
 		getBlock,
+		getBlockAttributes,
 	} = unlock( useSelect( blockEditorStore ) );
 	const {
 		removeBlock,
@@ -127,6 +128,66 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				dragElement.style.visibility = 'hidden';
 				ownerDocument.body.appendChild( dragElement );
 				event.dataTransfer.setDragImage( dragElement, 0, 0 );
+
+				// In a manual placement grid, the grid shows the cells the
+				// block will land in, so the block stays in place, dimmed,
+				// instead of following the pointer.
+				const rootLayout = getBlockAttributes(
+					getBlockRootClientId( clientId )
+				)?.layout;
+				if (
+					rootLayout?.type === 'grid' &&
+					rootLayout.isManualPlacement &&
+					window.__experimentalEnableGridInteractivity
+				) {
+					const originalOpacity = node.style.opacity;
+					node.style.opacity = '0.5';
+
+					// The grid's drop layer is in the editor's document,
+					// outside the canvas, and a drop there can re-render the
+					// block, after which its `dragend` no longer reaches the
+					// canvas. The drag ends on whichever comes first.
+					const endTargets = new Set( [
+						ownerDocument,
+						document,
+						node,
+					] );
+
+					function endGridDrag() {
+						for ( const endTarget of endTargets ) {
+							endTarget.removeEventListener(
+								'dragend',
+								endGridDrag
+							);
+							endTarget.removeEventListener(
+								'drop',
+								endGridDrag
+							);
+						}
+						node.style.opacity = originalOpacity;
+						dragElement.remove();
+						stopDraggingBlocks();
+						document.body.classList.remove(
+							'is-dragging-components-draggable'
+						);
+						ownerDocument.documentElement.classList.remove(
+							'is-dragging'
+						);
+					}
+
+					for ( const endTarget of endTargets ) {
+						endTarget.addEventListener( 'dragend', endGridDrag );
+						endTarget.addEventListener( 'drop', endGridDrag );
+					}
+					startDraggingBlocks( [ clientId ] );
+					document.body.classList.add(
+						'is-dragging-components-draggable'
+					);
+					ownerDocument.documentElement.classList.add(
+						'is-dragging'
+					);
+					return;
+				}
 
 				const rect = node.getBoundingClientRect();
 

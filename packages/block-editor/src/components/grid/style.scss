@@ -13,7 +13,7 @@
 		}
 
 		&.is-dropping-allowed {
-			.block-editor-grid-visualizer__drop-zone {
+			.block-editor-grid-visualizer__drop-layer {
 				pointer-events: all;
 			}
 		}
@@ -54,13 +54,6 @@
 
 	}
 
-	&.is-highlighted {
-		.block-editor-inserter,
-		.block-editor-grid-visualizer__drop-zone {
-			background: var(--wp-admin-theme-color);
-		}
-	}
-
 	&:hover .block-editor-grid-visualizer__appender,
 	.block-editor-grid-visualizer__appender:focus {
 		opacity: 1;
@@ -68,16 +61,35 @@
 	}
 }
 
-.block-editor-grid-visualizer__drop-zone {
-	background: rgba($gray-400, 0.1);
-	width: 100%;
-	height: 100%;
-	grid-column: 1;
-	grid-row: 1;
+// Covers the whole grid so that one drop zone can work out the landing cells
+// from the pointer position. It only takes pointer events while dragging.
+.block-editor-grid-visualizer__drop-layer {
+	position: absolute;
+	inset: 0;
+	z-index: 33;
+}
 
-	// Make drop zone 8x8 at minimum so that it's easier to drag into. This will overflow the parent.
-	min-width: $grid-unit-10;
-	min-height: $grid-unit-10;
+.block-editor-grid-visualizer__drop-indicator {
+	position: absolute;
+	inset: 0;
+	z-index: 34;
+}
+
+.block-editor-grid-visualizer__landing,
+.block-editor-grid-visualizer__overlap {
+	position: absolute;
+}
+
+.block-editor-grid-visualizer__landing {
+	border-radius: $radius-small;
+	box-shadow: inset 0 0 0 $border-width-focus-fallback var(--wp-admin-theme-color);
+	background: color-mix(in srgb, var(--wp-admin-theme-color) 12%, transparent);
+}
+
+// Where the landing cells cover another block. Overlap is allowed, so this is
+// a warning tint rather than an error.
+.block-editor-grid-visualizer__overlap {
+	background: repeating-linear-gradient(-45deg, color-mix(in srgb, var(--wp-admin-theme-color) 35%, transparent) 0 $grid-unit-05, transparent $grid-unit-05 $grid-unit-10);
 }
 
 .block-editor-grid-item-resizer {
