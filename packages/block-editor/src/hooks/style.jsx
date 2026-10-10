@@ -383,7 +383,12 @@ export function getBlockStateStylesCSS( stateStyles, options ) {
 		.map( ( { selector: blockSelector, style } ) =>
 			getStateStylesCSS(
 				style,
-				buildScopedBlockSelector( baseSelector, blockSelector, state )
+				buildScopedBlockSelector(
+					baseSelector,
+					blockSelector,
+					state,
+					name
+				)
 			)
 		)
 		.filter( Boolean );

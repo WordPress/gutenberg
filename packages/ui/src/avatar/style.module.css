@@ -1,0 +1,88 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.root {
+			--_wp-ui-avatar-size: var(--wpds-dimension-size-md);
+
+			position: relative;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			flex-shrink: 0;
+			inline-size: var(--_wp-ui-avatar-size);
+			block-size: var(--_wp-ui-avatar-size);
+			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+			border-radius: 50%;
+			background-color: var(--wpds-color-background-surface-neutral-weak);
+			color: var(--wpds-color-foreground-content-neutral);
+			font-family: var(--wpds-typography-font-family-body);
+			font-size: var(--wpds-typography-font-size-sm);
+			font-weight: var(--wpds-typography-font-weight-emphasis);
+			line-height: 1;
+			vertical-align: middle;
+		}
+
+		.is-square {
+			border-radius: var(--wpds-border-radius-sm);
+		}
+
+		.is-xs {
+			--_wp-ui-avatar-size: var(--wpds-dimension-size-2xs);
+			font-size: calc(var(--_wp-ui-avatar-size) / 2);
+		}
+
+		.is-sm {
+			--_wp-ui-avatar-size: var(--wpds-dimension-size-sm);
+			font-size: var(--wpds-typography-font-size-xs);
+		}
+
+		.is-lg {
+			--_wp-ui-avatar-size: var(--wpds-dimension-size-lg);
+			font-size: var(--wpds-typography-font-size-md);
+		}
+
+		.is-xl {
+			--_wp-ui-avatar-size: calc(var(--wpds-dimension-size-md) * 2);
+			font-size: var(--wpds-typography-font-size-xl);
+		}
+
+		.image,
+		.fallback {
+			position: absolute;
+			inset: 0;
+			inline-size: 100%;
+			block-size: 100%;
+			border-radius: inherit;
+		}
+
+		.image {
+			object-fit: cover;
+
+			@media not (prefers-reduced-motion) {
+				transition: opacity var(--wpds-motion-duration-sm) var(--wpds-motion-easing-subtle);
+
+				&[data-starting-style],
+				&[data-loading],
+				&[data-error] {
+					opacity: 0;
+				}
+			}
+
+			/* Hide non-displayable images, keeping a box for native lazy loading. */
+			&[data-loading],
+			&[data-error],
+			&[data-ending-style] {
+				visibility: hidden;
+			}
+		}
+
+		.fallback {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			overflow: hidden;
+			white-space: nowrap;
+		}
+	}
+}
