@@ -20,11 +20,28 @@ interface GridItemRotatorProps {
 
 interface Rotation {
 	handle: HTMLElement;
+	/** The documents listened to for Escape: the canvas and the handle's. */
+	documents: Document[];
 	pointerId: number;
 	centerX: number;
 	centerY: number;
 	value: number;
 	onKeyDown: ( event: KeyboardEvent ) => void;
+}
+
+/**
+ * Stops listening for Escape during a rotation.
+ *
+ * @param rotation The rotation.
+ */
+function removeKeyListeners( rotation: Rotation ) {
+	for ( const ownerDocument of rotation.documents ) {
+		ownerDocument.removeEventListener(
+			'keydown',
+			rotation.onKeyDown,
+			true
+		);
+	}
 }
 
 /**
@@ -65,10 +82,7 @@ export function GridItemRotator( {
 				return;
 			}
 			rotationRef.current = null;
-			rotation.handle.ownerDocument.removeEventListener(
-				'keydown',
-				rotation.onKeyDown
-			);
+			removeKeyListeners( rotation );
 			if ( blockElement ) {
 				setInlineStyle( blockElement, 'rotate', '' );
 			}
@@ -99,8 +113,8 @@ export function GridItemRotator( {
 			return;
 		}
 		rotationRef.current = null;
-		const { handle, pointerId, onKeyDown } = rotation;
-		handle.ownerDocument.removeEventListener( 'keydown', onKeyDown );
+		removeKeyListeners( rotation );
+		const { handle, pointerId } = rotation;
 		if ( handle.hasPointerCapture( pointerId ) ) {
 			handle.releasePointerCapture( pointerId );
 		}
@@ -137,14 +151,25 @@ export function GridItemRotator( {
 						const rect = boxRef.current.getBoundingClientRect();
 						const onKeyDown = ( keyEvent: KeyboardEvent ) => {
 							if ( keyEvent.key === 'Escape' ) {
+								// Claim the key, so that the canvas doesn't
+								// also move focus away from the block.
 								keyEvent.preventDefault();
-								keyEvent.stopPropagation();
 								endRotation();
 								setPreview( null );
 							}
 						};
+						// Focus can be in the canvas or in the editor around
+						// it. Listen in the capture phase, so that Escape is
+						// handled before anything else in either document.
+						const documents = [
+							...new Set( [
+								blockElement.ownerDocument,
+								handle.ownerDocument,
+							] ),
+						];
 						rotationRef.current = {
 							handle,
+							documents,
 							pointerId: event.pointerId,
 							centerX: rect.left + rect.width / 2,
 							centerY: rect.top + rect.height / 2,
@@ -152,10 +177,13 @@ export function GridItemRotator( {
 							onKeyDown,
 						};
 						handle.setPointerCapture( event.pointerId );
-						handle.ownerDocument.addEventListener(
-							'keydown',
-							onKeyDown
-						);
+						for ( const ownerDocument of documents ) {
+							ownerDocument.addEventListener(
+								'keydown',
+								onKeyDown,
+								true
+							);
+						}
 					} }
 					onPointerMove={ ( event ) => {
 						const rotation = rotationRef.current;

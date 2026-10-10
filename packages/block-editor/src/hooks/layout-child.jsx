@@ -434,6 +434,7 @@ function GridTools( {
 		isChildBlockAGrid,
 		selectedState,
 		parentStyle,
+		blockEditingMode,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -476,6 +477,7 @@ function GridTools( {
 				isChildBlockAGrid: blockAttributes?.layout?.type === 'grid',
 				selectedState: getSelectedBlockStyleState( clientId ),
 				parentStyle: parentAttributes?.style,
+				blockEditingMode: getBlockEditingMode( clientId ),
 			};
 		},
 		[ clientId ]
@@ -610,11 +612,13 @@ function GridTools( {
 	const rotate = isStackedOnMobile
 		? 0
 		: getRotateForState( style, selectedState );
-	// Rotation is stored per viewport, so like the Rotation control in the
-	// block settings, the handle isn't offered in a state such as `:hover`.
+	// Like the Rotation control in the block settings, the handle is only
+	// offered for blocks that can be fully edited, and not in a state such as
+	// `:hover`, since rotation is stored per viewport.
 	const showRotator =
 		isManualGrid &&
 		! isBlockItselfCurrentlyHidden &&
+		blockEditingMode === 'default' &&
 		! hasPseudoBlockStyleState( selectedState ) &&
 		isRotateEnabled( name );
 
