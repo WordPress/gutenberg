@@ -46,6 +46,7 @@ import {
 	suggestionsEmptiedBy,
 } from '../inline-suggestions';
 import { suggestionContextLines } from './suggestion-context';
+import SuggestionSizeNotice from './suggestion-size-notice';
 
 const EMPTY_ARRAY: Array< string | null > = [];
 const EMPTY_LINES: string[] = [];
@@ -714,6 +715,7 @@ export default function SuggestionActions( {
 				thread={ thread }
 				operations={ payload.operations }
 			/>
+			{ ! isResolved && <SuggestionSizeNotice thread={ thread } /> }
 			{ contextLines.map( ( line ) => (
 				<Text
 					key={ line }
