@@ -319,6 +319,14 @@ const getNestedEditedPostProperty = createSelector(
  * edit if one exists, but falling back to the attribute for the last known
  * saved state of the post.
  *
+ * While the editor is in Suggestion mode (experimental), a post field with a
+ * pending suggestion returns the suggested value instead, so the fields the
+ * suggester changed show what they proposed. The post itself keeps its value
+ * until a reviewer accepts the suggestion: read the `core` entity record
+ * (`getEditedEntityRecord`) for the value the post will be saved with. A
+ * suggested meta value is merged into `meta`, and a suggested term field
+ * returns term ids only, leaving out terms that do not exist yet.
+ *
  * @param {Object} state         Global application state.
  * @param {string} attributeName Post attribute name.
  *
@@ -351,19 +359,89 @@ export function getEditedPostAttribute( state, attributeName ) {
 			return getEditedPostContent( state );
 	}
 
+	// While suggesting, a field with a pending proposal reads as the
+	// proposed value, so every panel and plugin that reads the post through
+	// this selector shows what the suggester proposed. The post itself keeps
+	// its value until a reviewer accepts. See issue #73411.
+	const proposals =
+		state.editorIntent === EDITOR_INTENT_SUGGEST
+			? state.postFieldProposals
+			: undefined;
+	if ( proposals && attributeName !== 'meta' && proposals[ attributeName ] ) {
+		return withoutProposedNewTerms( proposals[ attributeName ].proposed );
+	}
+
 	// Fall back to saved post value if not edited.
 	const edits = getPostEdits( state );
+	let value;
 	if ( ! edits.hasOwnProperty( attributeName ) ) {
-		return getCurrentPostAttribute( state, attributeName );
+		value = getCurrentPostAttribute( state, attributeName );
+	} else if ( EDIT_MERGE_PROPERTIES.has( attributeName ) ) {
+		// Merge properties are objects which contain only the patch edit in
+		// state, and thus must be merged with the current post attribute.
+		value = getNestedEditedPostProperty( state, attributeName );
+	} else {
+		value = edits[ attributeName ];
 	}
 
-	// Merge properties are objects which contain only the patch edit in state,
-	// and thus must be merged with the current post attribute.
-	if ( EDIT_MERGE_PROPERTIES.has( attributeName ) ) {
-		return getNestedEditedPostProperty( state, attributeName );
+	if ( proposals && attributeName === 'meta' ) {
+		return withProposedMeta( value, proposals );
 	}
+	return value;
+}
 
-	return edits[ attributeName ];
+/*
+ * A terms proposal can name terms that do not exist yet (`{ name, parent }`
+ * entries, created when a reviewer accepts). The post's term field only ever
+ * holds term ids, so readers get the ids alone; the term pickers read the
+ * new terms through `getProposedNewTerms`. Memoized per proposed value so the
+ * selector stays referentially stable.
+ */
+const proposedTermIds = new WeakMap();
+function withoutProposedNewTerms( value ) {
+	if (
+		! Array.isArray( value ) ||
+		value.every( ( item ) => typeof item !== 'object' )
+	) {
+		return value;
+	}
+	if ( ! proposedTermIds.has( value ) ) {
+		proposedTermIds.set(
+			value,
+			value.filter( ( item ) => typeof item !== 'object' )
+		);
+	}
+	return proposedTermIds.get( value );
+}
+
+/*
+ * The meta object with proposed meta values laid over it, memoized on its
+ * two inputs so a selector returning it stays referentially stable.
+ */
+let lastProposedMeta = { meta: undefined, proposals: undefined, value: null };
+function withProposedMeta( meta, proposals ) {
+	if (
+		lastProposedMeta.meta === meta &&
+		lastProposedMeta.proposals === proposals
+	) {
+		return lastProposedMeta.value;
+	}
+	const metaProposals = Object.values( proposals ).filter(
+		( proposal ) => proposal.attribute === 'meta'
+	);
+	const value = metaProposals.length
+		? {
+				...meta,
+				...Object.fromEntries(
+					metaProposals.map( ( proposal ) => [
+						proposal.key,
+						proposal.proposed,
+					] )
+				),
+			}
+		: meta;
+	lastProposedMeta = { meta, proposals, value };
+	return value;
 }
 
 /**

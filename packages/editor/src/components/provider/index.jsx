@@ -21,6 +21,7 @@ import { createBlock } from '@wordpress/blocks';
 import withRegistryProvider from './with-registry-provider';
 import { store as editorStore } from '../../store';
 import useAutosaveNotice from './use-autosave-notice';
+import { useSuggestPostEditGuard } from '../suggestion-mode/use-suggest-post-edit-guard';
 import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
 import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
@@ -404,6 +405,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		// effect above so that its own mount effect runs once `setupEditor`
 		// has populated the current post.
 		useAutosaveNotice( { post, recovery, settings } );
+
+		// Refuses direct post-level entity writes while suggesting.
+		useSuggestPostEditGuard();
 
 		// Synchronizes the active post with the state
 		useEffect( () => {
