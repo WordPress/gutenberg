@@ -230,11 +230,68 @@ class Tests_Suggestion_Content_Round_Trip extends WP_UnitTestCase {
 				array( 'new', 'bold' ),
 				array( '%2' => 'bold' ),
 			),
+			'block moved down'                            => array(
+				"<!-- wp:paragraph -->\n<p>Second paragraph</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph {\"metadata\":{\"suggestion\":{\"type\":\"pending-move\",\"fromIndex\":0,\"fromParentClientId\":null,\"crossedParents\":false,\"commentId\":%1},\"noteId\":[%1]}} -->\n<p>First paragraph</p>\n<!-- /wp:paragraph -->",
+				array(),
+			),
+			'block moved up to the start'                 => array(
+				"<!-- wp:paragraph {\"metadata\":{\"suggestion\":{\"type\":\"pending-move\",\"fromIndex\":2,\"commentId\":%1}}} -->\n<p>C</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph -->\n<p>A</p>\n<!-- /wp:paragraph -->\n<!-- wp:paragraph -->\n<p>B</p>\n<!-- /wp:paragraph -->",
+				array(),
+			),
+			'nested list reorder'                         => array(
+				"<!-- wp:list -->\n<ul class=\"wp-block-list\"><!-- wp:list-item -->\n<li>one</li>\n<!-- /wp:list-item -->\n\n<!-- wp:list-item {\"metadata\":{\"suggestion\":{\"type\":\"pending-move\",\"fromIndex\":0,\"fromParentClientId\":\"abc\",\"commentId\":%1}}} -->\n<li>zero</li>\n<!-- /wp:list-item --></ul>\n<!-- /wp:list -->",
+				array(),
+			),
+			'move next to a suggested block'              => array(
+				"<!-- wp:paragraph {\"metadata\":{\"suggestion\":{\"type\":\"pending-insert\",\"commentId\":%2}}} -->\n<p>Inserted words</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph -->\n<p>Stays</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph {\"metadata\":{\"suggestion\":{\"type\":\"pending-move\",\"fromIndex\":0,\"commentId\":%1}}} -->\n<p>Mover with " . $mark( '%3', 'add', 'riders' ) . "</p>\n<!-- /wp:paragraph -->",
+				array( 'Inserted words', 'riders' ),
+			),
 			'everything together'                         => array(
 				$paragraph( 'Lead ' . $mark( '%2', 'add', 'mixed' ) ) . "\n\n<!-- wp:heading {\"metadata\":{\"suggestion\":{\"type\":\"pending-attributes\",\"after\":{\"level\":3},\"commentId\":%3}}} -->\n<h2 class=\"wp-block-heading\">H</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph {\"metadata\":{\"suggestion\":{\"type\":\"pending-insert\",\"commentId\":%1}}} -->\n<p>Inserted</p>\n<!-- /wp:paragraph -->",
 				array( 'mixed', '"level":3', 'Inserted' ),
 			),
 		);
+	}
+
+	/**
+	 * Moves the extraction leaves in the proposed order, as the front-end
+	 * restore does.
+	 *
+	 * @dataProvider data_unrestorable_moves
+	 *
+	 * @param string $fixture Editor content.
+	 */
+	public function test_unrestorable_moves_stay_in_the_proposed_order( $fixture ) {
+		$content = $this->fill( $fixture );
+
+		$this->assertSame( $content, Gutenberg_Suggestion_Content::extract( $content, $this->notes() )['content'] );
+	}
+
+	public function data_unrestorable_moves() {
+		$block = static function ( $text, $suggestion = '' ) {
+			$attrs = $suggestion ? ' {"metadata":{"suggestion":' . $suggestion . '}}' : '';
+			return '<!-- wp:paragraph' . $attrs . " -->\n<p>{$text}</p>\n<!-- /wp:paragraph -->";
+		};
+		return array(
+			'two moves in one list'  => array( $block( 'B', '{"type":"pending-move","fromIndex":1,"commentId":%1}' ) . "\n\n" . $block( 'A', '{"type":"pending-move","fromIndex":0,"commentId":%2}' ) ),
+			'a cross-parent move'    => array( $block( 'B' ) . "\n\n" . $block( 'A', '{"type":"pending-move","fromIndex":0,"crossedParents":true,"commentId":%1}' ) ),
+			'an origin out of range' => array( $block( 'B' ) . "\n\n" . $block( 'A', '{"type":"pending-move","fromIndex":5,"commentId":%1}' ) ),
+			'markup between blocks'  => array( $block( 'B' ) . "\n<p>freeform</p>\n" . $block( 'A', '{"type":"pending-move","fromIndex":0,"commentId":%1}' ) ),
+			'no note yet'            => array( $block( 'B' ) . "\n\n" . $block( 'A', '{"type":"pending-move","fromIndex":0}' ) ),
+		);
+	}
+
+	public function test_a_move_is_stored_in_the_original_order() {
+		$content = $this->fill( "<!-- wp:paragraph -->\n<p>B</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph {\"metadata\":{\"suggestion\":{\"type\":\"pending-move\",\"fromIndex\":0,\"commentId\":%1}}} -->\n<p>A</p>\n<!-- /wp:paragraph -->" );
+
+		$extracted = Gutenberg_Suggestion_Content::extract( $content, $this->notes() )['content'];
+
+		$this->assertSame(
+			$this->fill( "<!-- wp:paragraph {\"metadata\":{\"suggestion\":{\"type\":\"pending-move\",\"fromIndex\":0,\"commentId\":%1}}} -->\n<p>A</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph -->\n<p>B</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:suggestion-placeholder {\"id\":%1,\"type\":\"pending-move\",\"run\":0} /-->" ),
+			$extracted
+		);
+		// The front end renders the stored order as it is.
+		$this->assertSame( $extracted, gutenberg_restore_pending_move_order( $extracted ) );
 	}
 
 	public function test_a_stale_formatting_original_stays_in_full_form() {

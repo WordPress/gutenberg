@@ -1256,6 +1256,17 @@ function gutenberg_restore_pending_move_block_order( $blocks, $is_root, &$change
 
 	$siblings = array();
 	foreach ( $positions as $index ) {
+		/*
+		 * The save pass already stored this list in its original order and
+		 * marks the proposed position with a placeholder; nothing to restore.
+		 */
+		if (
+			'core/suggestion-placeholder' === $blocks[ $index ]['blockName'] &&
+			isset( $blocks[ $index ]['attrs']['type'] ) &&
+			'pending-move' === $blocks[ $index ]['attrs']['type']
+		) {
+			return $blocks;
+		}
 		$siblings[] = $blocks[ $index ];
 	}
 	$count = count( $siblings );

@@ -23,7 +23,8 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 	 * | Suggested block (pending-insert) | `<!-- wp:suggestion-placeholder {"id":N,"type":"pending-insert","run":k} /-->` | `block` |
 	 * | Proposed attributes (`after`)    | the block opener with `after` replaced by `"run":k`         | `after`     |
  * | Formatting change                | the same `<mark>` with `data-suggestion-run="k"` around the original run | `inline` |
-		 *
+	 * | Moved block (pending-move)       | its sibling list back in the original order, plus `<!-- wp:suggestion-placeholder {"id":N,"type":"pending-move","run":k} /-->` at the proposed position | `move` |
+	 *
 	 * `k` numbers the anchors of one note, so every anchor is unique and an
 	 * anchor form is told apart from a full marker without a lookup. Each item
 	 * keeps the exact anchor it left and the exact original bytes. Inflating an
@@ -34,7 +35,8 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 	 *
 	 * Order matters, and inflation runs it backwards: block-level extraction
 	 * first (a suggested block takes everything inside it, inline markers
-	 * included, verbatim), then inline.
+	 * included, verbatim), then inline, then moves, whose stored region holds
+	 * the anchors the earlier steps left.
 	 */
 	class Gutenberg_Suggestion_Content {
 
@@ -96,6 +98,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 
 			$content = self::extract_blocks( $content, $notes, $exclude, $next_run, $result['items'] );
 			$content = self::extract_inline( $content, $notes, $exclude, $originals, $next_run, $result['items'] );
+			$content = self::extract_moves( $content, $notes, $exclude, $next_run, $result['items'] );
 
 			$result['content'] = $content;
 			return $result;
@@ -121,6 +124,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 				}
 			}
 
+			$content = self::inflate_moves( $content, $lookup );
 			$content = self::inflate_blocks( $content, $lookup );
 			return self::inflate_inline( $content, $lookup );
 		}
@@ -148,7 +152,8 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 			foreach ( (array) $blocks as $block ) {
 				if ( self::PLACEHOLDER === $block['name'] ) {
 					if ( isset( $block['attrs']['id'], $block['attrs']['run'] ) && is_numeric( $block['attrs']['id'] ) ) {
-						$add( (int) $block['attrs']['id'], 'block', $block['attrs']['run'] );
+						$kind = isset( $block['attrs']['type'] ) && 'pending-move' === $block['attrs']['type'] ? 'move' : 'block';
+						$add( (int) $block['attrs']['id'], $kind, $block['attrs']['run'] );
 					}
 					continue;
 				}
@@ -413,6 +418,191 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 		}
 
 		/**
+		 * Move extraction: a pending move goes back to its original position.
+		 *
+		 * A move is stored as the block at its proposed position with
+		 * `metadata.suggestion.fromIndex` recording where it came from. A
+		 * sibling list is put back in its original order under the same rules
+		 * the front-end restore (`gutenberg_restore_pending_move_block_order()`)
+		 * applies: exactly one pending move in the list, no `crossedParents`,
+		 * an origin on the same side of the root boundary, a `fromIndex` in
+		 * range. It also needs only whitespace between the siblings, so moving
+		 * block substrings never moves other markup. Anything else stays in the
+		 * proposed order, as before.
+		 *
+		 * The region between the move's two positions is rewritten with the
+		 * same separators in the same places, and a placeholder marks the
+		 * proposed position. The item keeps the exact region before and after,
+		 * and where the placeholder sits in it.
+		 *
+		 * @param string             $content  Content.
+		 * @param array<int, true>   $notes    Suggestion note ids of the post.
+		 * @param array<int, true>   $exclude  Note ids to leave in full form.
+		 * @param callable           $next_run Run allocator.
+		 * @param array<int, array[]> $items   Items per note id, added to.
+		 * @return string Content.
+		 */
+		private static function extract_moves( $content, $notes, $exclude, $next_run, &$items ) {
+			if ( false === strpos( $content, '"pending-move"' ) ) {
+				return $content;
+			}
+			$blocks = Gutenberg_Suggestion_Block_Scanner::scan( $content );
+			if ( null === $blocks ) {
+				return $content;
+			}
+
+			$lists = array( array( true, array() ) );
+			foreach ( $blocks as $index => $block ) {
+				if ( null === $block['parent'] ) {
+					$lists[0][1][] = $index;
+				}
+				if ( count( $block['children'] ) > 1 ) {
+					$lists[] = array( false, $block['children'] );
+				}
+			}
+
+			$candidates = array();
+			foreach ( $lists as $list ) {
+				list( $is_root, $siblings ) = $list;
+				$count                      = count( $siblings );
+				if ( $count < 2 ) {
+					continue;
+				}
+				$moves = array();
+				foreach ( $siblings as $offset => $index ) {
+					$block = $blocks[ $index ];
+					if ( self::PLACEHOLDER === $block['name'] ) {
+						if ( isset( $block['attrs']['type'] ) && 'pending-move' === $block['attrs']['type'] ) {
+							// Already in anchor form.
+							continue 2;
+						}
+						continue;
+					}
+					$marker = Gutenberg_Suggestion_Block_Scanner::marker( $block );
+					if ( $marker && 'pending-move' === $marker['type'] ) {
+						$moves[] = $offset;
+					}
+				}
+				if ( 1 !== count( $moves ) ) {
+					continue;
+				}
+				$current = $moves[0];
+				$block   = $blocks[ $siblings[ $current ] ];
+				$marker  = Gutenberg_Suggestion_Block_Scanner::marker( $block );
+				if ( ! isset( $marker['fromIndex'] ) || ! is_numeric( $marker['fromIndex'] ) || ! empty( $marker['crossedParents'] ) ) {
+					continue;
+				}
+				$from_parent = isset( $marker['fromParentClientId'] ) ? $marker['fromParentClientId'] : null;
+				if ( ( null === $from_parent || '' === $from_parent ) !== $is_root ) {
+					continue;
+				}
+				$from = (int) $marker['fromIndex'];
+				if ( $from < 0 || $from >= $count || $from === $current ) {
+					continue;
+				}
+				$owner = self::block_owner( $block, $notes );
+				if ( $owner <= 0 || isset( $exclude[ $owner ] ) ) {
+					continue;
+				}
+
+				$gaps = array();
+				for ( $offset = 0; $offset < $count - 1; $offset++ ) {
+					$gap_start = $blocks[ $siblings[ $offset ] ]['end'];
+					$gap       = substr( $content, $gap_start, $blocks[ $siblings[ $offset + 1 ] ]['start'] - $gap_start );
+					if ( '' !== trim( $gap ) ) {
+						continue 2;
+					}
+					$gaps[ $offset ] = $gap;
+				}
+
+				$low   = min( $current, $from );
+				$high  = max( $current, $from );
+				$order = range( $low, $high );
+				array_splice( $order, $current - $low, 1 );
+				array_splice( $order, $from - $low, 0, array( $current ) );
+				$baseline = '';
+				foreach ( $order as $slot => $offset ) {
+					$block     = $blocks[ $siblings[ $offset ] ];
+					$baseline .= substr( $content, $block['start'], $block['end'] - $block['start'] );
+					if ( $low + $slot < $high ) {
+						$baseline .= $gaps[ $low + $slot ];
+					}
+				}
+				$start = $blocks[ $siblings[ $low ] ]['start'];
+				$end   = $blocks[ $siblings[ $high ] ]['end'];
+
+				$candidates[] = array( $start, $end, $owner, $baseline, $gaps[ $low ], $current < $from );
+			}
+
+			// A move nested inside another move's region goes with that region.
+			$edits = array();
+			foreach ( $candidates as $candidate ) {
+				foreach ( $candidates as $other ) {
+					if ( $other !== $candidate && $other[0] <= $candidate[0] && $candidate[1] <= $other[1] ) {
+						continue 2;
+					}
+				}
+				list( $start, $end, $owner, $baseline, $separator, $moved_up ) = $candidate;
+
+				$run         = $next_run( $owner );
+				$placeholder = self::placeholder( $owner, 'pending-move', $run );
+				$anchor      = $moved_up ? $placeholder . $separator . $baseline : $baseline . $separator . $placeholder;
+
+				$edits[]           = array( $start, $end, $anchor );
+				$items[ $owner ][] = array(
+					'kind'     => 'move',
+					'run'      => $run,
+					'anchor'   => $anchor,
+					'original' => substr( $content, $start, $end - $start ),
+					'offset'   => $moved_up ? 0 : strlen( $baseline . $separator ),
+				);
+			}
+
+			return gutenberg_apply_suggestion_splices( $content, $edits );
+		}
+
+		/**
+		 * Move inflation: puts a moved block back at its proposed position.
+		 *
+		 * The region around the placeholder must still be exactly what the
+		 * extraction left; otherwise the placeholder is dropped and the blocks
+		 * stay in the original order.
+		 *
+		 * @param string $content Content.
+		 * @param array  $lookup  Items by note id and `kind:run`.
+		 * @return string Content.
+		 */
+		private static function inflate_moves( $content, $lookup ) {
+			if ( false === strpos( $content, '"type":"pending-move"' ) ) {
+				return $content;
+			}
+			$blocks = Gutenberg_Suggestion_Block_Scanner::scan( $content );
+			if ( null === $blocks ) {
+				return $content;
+			}
+
+			$edits = array();
+			foreach ( $blocks as $block ) {
+				if ( self::PLACEHOLDER !== $block['name'] || ! isset( $block['attrs']['type'] ) || 'pending-move' !== $block['attrs']['type'] ) {
+					continue;
+				}
+				$note_id = isset( $block['attrs']['id'] ) && is_numeric( $block['attrs']['id'] ) ? (int) $block['attrs']['id'] : 0;
+				$run     = isset( $block['attrs']['run'] ) && is_numeric( $block['attrs']['run'] ) ? (int) $block['attrs']['run'] : -1;
+				$item    = $lookup[ $note_id ][ 'move:' . $run ] ?? null;
+				if ( $item && isset( $item['offset'] ) ) {
+					$start = $block['start'] - (int) $item['offset'];
+					if ( $start >= 0 && substr( $content, $start, strlen( $item['anchor'] ) ) === $item['anchor'] ) {
+						$edits[] = array( $start, $start + strlen( $item['anchor'] ), $item['original'] );
+						continue;
+					}
+				}
+				$edits[] = array( $block['start'], $block['end'], '' );
+			}
+
+			return gutenberg_apply_suggestion_splices( $content, $edits );
+		}
+
+		/**
 		 * Block-level inflation.
 		 *
 		 * @param string $content Content.
@@ -433,9 +623,12 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 				if ( self::PLACEHOLDER === $block['name'] ) {
 					$note_id = isset( $block['attrs']['id'] ) && is_numeric( $block['attrs']['id'] ) ? (int) $block['attrs']['id'] : 0;
 					$run     = isset( $block['attrs']['run'] ) && is_numeric( $block['attrs']['run'] ) ? (int) $block['attrs']['run'] : -1;
-					$item    = $lookup[ $note_id ][ 'block:' . $run ] ?? null;
+					$is_move = isset( $block['attrs']['type'] ) && 'pending-move' === $block['attrs']['type'];
+					$item    = $is_move ? null : ( $lookup[ $note_id ][ 'block:' . $run ] ?? null );
 					// The placeholder carries nothing but its id, type and run,
-					// so a re-encoded copy still names the same item.
+					// so a re-encoded copy still names the same item. A move's
+					// placeholder still here could not be restored, so the
+					// blocks stay in the original order.
 					$edits[] = array( $block['start'], $block['end'], $item ? $item['original'] : '' );
 					continue;
 				}
