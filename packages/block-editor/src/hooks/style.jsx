@@ -53,6 +53,7 @@ import { useBlockEditingMode } from '../components/block-editing-mode';
 import { useSettings } from '../components/use-settings';
 import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
+import { isPlainObject } from '../utils/object';
 import { unlock } from '../lock-unlock';
 
 const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
@@ -287,10 +288,6 @@ export function getStateStylesCSS( stateStyles, selector ) {
 		.join( '\n' );
 }
 
-function isPlainObject( value ) {
-	return !! value && typeof value === 'object' && ! Array.isArray( value );
-}
-
 function mergeStyleObjects( target = {}, source = {} ) {
 	const merged = { ...target };
 
@@ -391,7 +388,12 @@ export function getBlockStateStylesCSS( stateStyles, options ) {
 		.map( ( { selector: blockSelector, style } ) =>
 			getStateStylesCSS(
 				style,
-				buildScopedBlockSelector( baseSelector, blockSelector, state )
+				buildScopedBlockSelector(
+					baseSelector,
+					blockSelector,
+					state,
+					name
+				)
 			)
 		)
 		.filter( Boolean );
@@ -606,6 +608,9 @@ const skipSerializationPathsEdit = {
 	],
 	[ `${ SHADOW_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		SHADOW_SUPPORT_KEY,
+	],
+	[ `${ BACKGROUND_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
+		BACKGROUND_SUPPORT_KEY,
 	],
 };
 

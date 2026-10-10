@@ -45,13 +45,14 @@ function getInputSelectionHint( selectedCount: number ): string | undefined {
 export const SearchableChipSelect = forwardRef<
 	HTMLInputElement,
 	SearchableChipSelectProps
->( function SearchableChipSelect(
+>( function UnforwardedSearchableChipSelect(
 	{
 		children,
 		disabled,
 		emptyContent = __( 'No results found.' ),
 		statusContent,
 		items,
+		onValueChange,
 		chipsContent,
 		searchPlaceholder = __( 'Search' ),
 		popupWidth,
@@ -74,6 +75,13 @@ export const SearchableChipSelect = forwardRef<
 			multiple
 			disabled={ disabled }
 			{ ...restProps }
+			onValueChange={ ( value, eventDetails ) => {
+				if ( eventDetails.reason === 'escape-key' ) {
+					eventDetails.cancel();
+					return;
+				}
+				onValueChange?.( value, eventDetails );
+			} }
 			readOnly={ undefined }
 		>
 			<Combobox.InputGroup>

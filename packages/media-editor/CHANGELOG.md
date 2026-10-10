@@ -2,11 +2,35 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   Migrate crop and story selectors to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
+
+### Internal
+
+-   Publish only runtime files, dropping `tsconfig.json`, `tsconfig.build.json`, `tsconfig.build.tsbuildinfo`, `global.d.ts` and the test and story files from the package ([#84164](https://github.com/WordPress/gutenberg/pull/84164)).
+
+## 0.20.0 (2026-10-07)
+
+### Enhancements
+
+-   Restore an image's original attachment and editable details from the media editor's More options menu ([#81805](https://github.com/WordPress/gutenberg/pull/81805)).
+-   Allow consumers to restore their own state with snackbar Undo after saving an image edit ([#81805](https://github.com/WordPress/gutenberg/pull/81805)).
+
 ### Bug Fixes
 
 -   Stop a pan drag started just after a wheel zoom from recording one undo entry per frame. The drag now ends the pending wheel gesture instead of letting its debounce timer close the drag's gesture mid-drag ([#83558](https://github.com/WordPress/gutenberg/pull/83558)).
 -   Keep the editor open with an error notice when saving attachment details fails ([#83560](https://github.com/WordPress/gutenberg/pull/83560)).
 -   Stop the crop's source-pixel snap from recording its own undo entry. A handle crop that magnified the image past 1:1 added an undo step that changed nothing visible, and redoing back onto that crop cleared the rest of the redo history ([#83571](https://github.com/WordPress/gutenberg/pull/83571)).
+-   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+
+### Internal
+
+-   Show the selected crop aspect ratio in a menu in the compact image controls ([#82968](https://github.com/WordPress/gutenberg/pull/82968)).
 
 ## 0.19.0 (2026-09-23)
 

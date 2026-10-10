@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
+import { Fragment } from '@wordpress/element';
 import { SearchableSelect } from '../';
 import {
 	GROUPED_ITEMS,
@@ -15,7 +16,10 @@ const meta: Meta< typeof SearchableSelect > = {
 	subcomponents: {
 		'SearchableSelect.Group': SearchableSelect.Group,
 		'SearchableSelect.GroupLabel': SearchableSelect.GroupLabel,
+		'SearchableSelect.Separator': SearchableSelect.Separator,
 		'SearchableSelect.Item': SearchableSelect.Item,
+		'SearchableSelect.ItemLabel': SearchableSelect.ItemLabel,
+		'SearchableSelect.ItemDescription': SearchableSelect.ItemDescription,
 		'SearchableSelect.Collection': SearchableSelect.Collection,
 	},
 	argTypes: {
@@ -38,6 +42,19 @@ export const Default: Story = {
 	args: {
 		'aria-label': 'Fruit',
 		items: ITEMS,
+	},
+};
+
+/**
+ * Item descriptions supplement each popup item and are not copied to the trigger.
+ */
+export const WithItemDescriptions: Story = {
+	args: {
+		...Default.args,
+		items: [
+			{ value: 'apple', label: 'Apple', description: 'A crisp fruit.' },
+			{ value: 'banana', label: 'Banana', description: 'A soft fruit.' },
+		],
 	},
 };
 
@@ -90,7 +107,9 @@ export const WithCustomTriggerAndItems: Story = {
 			item ? <CustomFruitItem label={ item.label } /> : null,
 		children: ( item: ( typeof ITEMS )[ 0 ] ) => (
 			<SearchableSelect.Item key={ item.value } value={ item }>
-				😋 { item.label }
+				<SearchableSelect.ItemLabel>
+					😋 { item.label }
+				</SearchableSelect.ItemLabel>
 			</SearchableSelect.Item>
 		),
 	},
@@ -129,11 +148,35 @@ export const Grouped: Story = {
 							key={ item.value }
 							value={ item }
 						>
-							{ item.label }
+							<SearchableSelect.ItemLabel>
+								{ item.label }
+							</SearchableSelect.ItemLabel>
 						</SearchableSelect.Item>
 					) }
 				</SearchableSelect.Collection>
 			</SearchableSelect.Group>
+		),
+	},
+};
+
+/**
+ * Use `SearchableSelect.Separator` to set choices apart from each other.
+ */
+export const WithSeparator: Story = {
+	args: {
+		...Default.args,
+		items: [ ...ITEMS.slice( 0, 3 ), { value: 'other', label: 'Other' } ],
+		children: ( item: FixtureItem, index: number ) => (
+			<Fragment key={ item.value }>
+				{ item.value === 'other' && index > 0 && (
+					<SearchableSelect.Separator />
+				) }
+				<SearchableSelect.Item value={ item }>
+					<SearchableSelect.ItemLabel>
+						{ item.label }
+					</SearchableSelect.ItemLabel>
+				</SearchableSelect.Item>
+			</Fragment>
 		),
 	},
 };

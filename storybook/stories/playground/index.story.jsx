@@ -1,7 +1,10 @@
+import { registerCoreBlocks } from '@wordpress/block-library';
 import EditorFullPage from './fullpage';
 import EditorBox from './box';
 import EditorWithUndoRedo from './with-undo-redo';
 import EditorZoomOut from './zoom-out';
+
+registerCoreBlocks();
 
 export default {
 	title: 'Playground/Block Editor',
@@ -10,32 +13,32 @@ export default {
 	},
 };
 
-export const _default = () => {
-	return <EditorFullPage />;
+export const _default = ( _args, { globals } ) => {
+	return <EditorFullPage direction={ globals.direction } />;
 };
 
 _default.parameters = {
 	sourceLink: 'storybook/stories/playground/fullpage/index.jsx',
 };
 
-export const Box = () => {
-	return <EditorBox />;
+export const Box = ( _args, { globals } ) => {
+	return <EditorBox direction={ globals.direction } />;
 };
 
 Box.parameters = {
 	sourceLink: 'storybook/stories/playground/box/index.jsx',
 };
 
-export const UndoRedo = () => {
-	return <EditorWithUndoRedo />;
+export const UndoRedo = ( _args, { globals } ) => {
+	return <EditorWithUndoRedo direction={ globals.direction } />;
 };
 
 UndoRedo.parameters = {
 	sourceLink: 'storybook/stories/playground/with-undo-redo/index.jsx',
 };
 
-export const ZoomOut = ( props ) => {
-	return <EditorZoomOut { ...props } />;
+export const ZoomOut = ( props, { globals } ) => {
+	return <EditorZoomOut { ...props } direction={ globals.direction } />;
 };
 
 ZoomOut.parameters = {

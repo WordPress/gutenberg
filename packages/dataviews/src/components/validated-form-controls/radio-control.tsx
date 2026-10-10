@@ -1,7 +1,10 @@
 import { forwardRef, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { RadioControl } from '@wordpress/components';
-import { ControlWithError } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	ControlWithError,
+} from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 
 type RadioControlProps = React.ComponentProps< typeof RadioControl >;
