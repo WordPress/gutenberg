@@ -57,6 +57,14 @@ export function getPostFieldSummaryLabel(
 	if ( op.attribute === 'title' ) {
 		return __( 'Title:' );
 	}
+	// The note already says it is post meta; the summary names the key.
+	if ( op.attribute === 'meta' ) {
+		return sprintf(
+			/* translators: %s: post meta key. */
+			__( '%s:' ),
+			op.key ?? ''
+		);
+	}
 	return sprintf(
 		/* translators: %s: post field name, e.g. "Excerpt". */
 		__( '%s:' ),

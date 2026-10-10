@@ -87,7 +87,7 @@ describe( 'summarizeOperations for post fields', () => {
 	it( 'names a meta key', () => {
 		expect(
 			summarizeOperations( [ op( 'meta', '', 'x', 'my_meta' ) ] )
-		).toEqual( [ { label: 'Post meta: my_meta:', value: '“x”' } ] );
+		).toEqual( [ { label: 'my_meta:', value: '“x”' } ] );
 	} );
 } );
 
