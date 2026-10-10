@@ -1,21 +1,25 @@
 import { RichTextData, slice, toHTMLString } from '@wordpress/rich-text';
 import { toRichTextRecord } from './rich-text-record';
-import { wrapInlineMarker } from '../inline-markers';
 import {
-	SUGGESTION_FORMAT_NAME,
 	SUGGESTION_ID_ATTRIBUTE,
-	SUGGESTION_TYPE_ATTRIBUTE,
 	SUGGESTION_AUTHOR_ATTRIBUTE,
 	SUGGESTION_TYPE_ADDITION,
 	SUGGESTION_TYPE_DELETION,
 	findSuggestionRange,
+	isSuggestionFormat,
+	suggestionMarkersAt,
+	suggestionMarkersIn,
 } from './format';
+import type { SuggestionMarkerKind } from './format';
+import { classifyOverlap } from './overlap';
+import type { OverlapBlocking, OverlapReason } from './overlap';
 import {
 	buildSuggestionMarkerAttributes,
 	formatsAdditionRunToExtend,
 	insertInlineAddition,
 	growInlineAddition,
 	rejectInlineAddition,
+	wrapSuggestionMarker,
 } from './operations';
 
 /**
@@ -213,26 +217,31 @@ export function widenReplaceToWords(
 }
 
 /**
- * The `core/suggestion` format active at a character, or null.
+ * The markers active at a character, by kind.
  *
  * @param record Rich-text record.
  * @param index  Character index.
- * @return The suggestion format object (with `attributes`), or null.
+ * @return Markers keyed by kind.
  */
-function suggestionAt( record: any, index: number ) {
-	const stack = record.formats?.[ index ];
-	if ( ! Array.isArray( stack ) ) {
-		return null;
-	}
-	return stack.find( ( f ) => f.type === SUGGESTION_FORMAT_NAME ) ?? null;
+function markersAt( record: any, index: number ) {
+	return suggestionMarkersAt( record.formats?.[ index ] );
+}
+
+/**
+ * The ids of every marker at a character.
+ *
+ * @param record Rich-text record.
+ * @param index  Character index.
+ * @return Marker ids.
+ */
+function markerIdsAt( record: any, index: number ): string[] {
+	return suggestionMarkersIn( record.formats?.[ index ] ).map( ( format ) =>
+		String( format.attributes?.[ SUGGESTION_ID_ATTRIBUTE ] )
+	);
 }
 
 function markerId( format: any ) {
 	return format?.attributes?.[ SUGGESTION_ID_ATTRIBUTE ] ?? null;
-}
-
-function markerType( format: any ) {
-	return format?.attributes?.[ SUGGESTION_TYPE_ATTRIBUTE ] ?? null;
 }
 
 /**
@@ -277,7 +286,7 @@ function insertedRunHTML( nextRecord: any, edit: TextEdit ): string | null {
 	);
 	const formats = run.formats.map( ( stack: any ) => {
 		const kept = Array.isArray( stack )
-			? stack.filter( ( f: any ) => f.type !== SUGGESTION_FORMAT_NAME )
+			? stack.filter( ( f: any ) => ! isSuggestionFormat( f ) )
 			: [];
 		return kept.length ? kept : undefined;
 	} );
@@ -285,6 +294,15 @@ function insertedRunHTML( nextRecord: any, edit: TextEdit ): string | null {
 		return null;
 	}
 	return toHTMLString( { value: { ...run, formats } as any } );
+}
+
+/**
+ * Why a plan refused an edit, and whose marker was in the way, for the
+ * refusal message.
+ */
+export interface EditRefusal {
+	reason: OverlapReason;
+	blocking?: OverlapBlocking;
 }
 
 export interface MarkerAction {
@@ -336,7 +354,7 @@ export function planEditMarkers(
 	prevValue: any,
 	nextValue: any,
 	{ authorId }: { authorId?: number | string } = {}
-): { kind: string; actions: MarkerAction[] } {
+): { kind: string; actions: MarkerAction[]; refusal?: EditRefusal } {
 	// The appliers only mark `RichTextData`; planning a plain string would open
 	// a note that never gets a marker.
 	if ( ! ( prevValue instanceof RichTextData ) ) {
@@ -361,15 +379,19 @@ export function planEditMarkers(
 		authorId !== undefined && authorId !== null ? String( authorId ) : null;
 
 	// Whether every character in [start, end) carries a suggestion marker of the
-	// given type sharing one id; returns that id, or null otherwise.
-	const uniformMarker = ( start: number, end: number, type: string ) => {
+	// given kind sharing one id; returns that id, or null otherwise.
+	const uniformMarker = (
+		start: number,
+		end: number,
+		kind: SuggestionMarkerKind
+	) => {
 		if ( start >= end ) {
 			return null;
 		}
 		let id: string | null = null;
 		for ( let i = start; i < end; i++ ) {
-			const f = suggestionAt( record, i );
-			if ( ! f || markerType( f ) !== type ) {
+			const f = markersAt( record, i )[ kind ];
+			if ( ! f ) {
 				return null;
 			}
 			const fid = markerId( f );
@@ -385,7 +407,7 @@ export function planEditMarkers(
 	// Whether [start, end) is entirely free of suggestion markers.
 	const isUnmarked = ( start: number, end: number ) => {
 		for ( let i = start; i < end; i++ ) {
-			if ( suggestionAt( record, i ) ) {
+			if ( markerIdsAt( record, i ).length ) {
 				return false;
 			}
 		}
@@ -422,16 +444,26 @@ export function planEditMarkers(
 			};
 		}
 		/*
-		 * Inside a marker this edit may not extend — a run proposed for
-		 * deletion, or someone else's addition. Splitting it would fragment a
-		 * marker whose accept/reject then acts on a partial range, so plan
-		 * nothing and leave the call to the caller.
+		 * Inside someone's addition or deletion the new text cannot be
+		 * expressed: splitting that marker would leave its accept/reject
+		 * acting on a partial range. Inside a formatting change it becomes
+		 * an addition of its own, next to (not part of) that change.
 		 */
-		const left =
-			edit.start > 0 ? suggestionAt( record, edit.start - 1 ) : null;
-		const right = suggestionAt( record, edit.start );
-		if ( left && right && markerId( left ) === markerId( right ) ) {
-			return { kind: 'insert', actions: [] };
+		const verdict = classifyOverlap( record.formats, {
+			gesture: 'insert',
+			start: edit.start,
+			end: edit.start,
+			authorToken,
+		} );
+		if ( verdict.verdict === 'refuse' ) {
+			return {
+				kind: 'insert',
+				actions: [],
+				refusal: {
+					reason: verdict.reason!,
+					blocking: verdict.blocking,
+				},
+			};
 		}
 		const html = insertedRunHTML( nextRecord, edit );
 		return {
@@ -449,32 +481,9 @@ export function planEditMarkers(
 	}
 
 	if ( edit.kind === 'delete' ) {
-		if ( isUnmarked( edit.start, edit.end ) ) {
-			return {
-				kind: 'delete',
-				actions: [
-					{
-						type: 'wrap-del',
-						start: edit.start,
-						end: edit.end,
-						newNote: true,
-					},
-				],
-			};
-		}
-		/*
-		 * Already proposed for deletion: no marker action to plan. An empty
-		 * plan reads as "not handled" to `maybeHandleContentEdit`, which
-		 * returns false so the edit falls through to the attribute-overlay
-		 * path and is captured there as a whole-attribute suggestion — the
-		 * removal is neither applied in place nor silently discarded.
-		 */
-		if ( uniformMarker( edit.start, edit.end, SUGGESTION_TYPE_DELETION ) ) {
-			return { kind: 'delete', actions: [] };
-		}
 		// The author removing their own pending addition: drop that marker.
-		// Another author's addition is not theirs to withdraw, so the edit is
-		// left unplanned like any other edit inside someone else's marker.
+		// Another author's addition is not theirs to withdraw; deleting in it
+		// proposes a deletion inside it instead (below).
 		const addId = uniformMarker(
 			edit.start,
 			edit.end,
@@ -482,25 +491,65 @@ export function planEditMarkers(
 		);
 		if (
 			addId !== null &&
-			isOwnMarker( suggestionAt( record, edit.start ), authorToken )
+			isOwnMarker( markersAt( record, edit.start ).add, authorToken )
 		) {
 			return {
 				kind: 'delete',
 				actions: [ { type: 'remove-add', id: addId } ],
 			};
 		}
-		// Mixed / straddling, or another author's marker: leave to a later phase.
-		return { kind: 'delete', actions: [] };
+		/*
+		 * Unmarked text, text inside someone else's addition, across it and
+		 * plain text, or over a formatting change: a new deletion. Over a
+		 * deletion, or a mix of the author's own markers, there is no marker
+		 * action to plan; the empty plan reads as "not handled" to
+		 * `maybeHandleContentEdit`, so the edit is declined rather than
+		 * applied in place or silently discarded.
+		 */
+		const verdict = classifyOverlap( record.formats, {
+			gesture: 'delete',
+			start: edit.start,
+			end: edit.end,
+			authorToken,
+		} );
+		if ( verdict.verdict === 'refuse' ) {
+			return {
+				kind: 'delete',
+				actions: [],
+				refusal: {
+					reason: verdict.reason!,
+					blocking: verdict.blocking,
+				},
+			};
+		}
+		return {
+			kind: 'delete',
+			actions: [
+				{
+					type: 'wrap-del',
+					start: edit.start,
+					end: edit.end,
+					newNote: true,
+				},
+			],
+		};
 	}
 
-	// replace (type-over): only the clean unmarked case for now.
+	// replace (type-over): over unmarked text, or text someone only
+	// reformatted. Widening to words stays out of marked text.
 	const replaceEdit = widenReplaceToWords(
 		record.text,
 		nextRecord ? nextRecord.text : '',
 		edit,
 		isUnmarked
 	);
-	if ( isUnmarked( replaceEdit.start, replaceEdit.end ) ) {
+	const replaceVerdict = classifyOverlap( record.formats, {
+		gesture: 'type-over',
+		start: replaceEdit.start,
+		end: replaceEdit.end,
+		authorToken,
+	} );
+	if ( replaceVerdict.verdict === 'allow' ) {
 		// Widening moves both ends together, so the widened range still spans
 		// exactly the inserted run in `nextRecord`.
 		const html = insertedRunHTML( nextRecord, replaceEdit );
@@ -523,7 +572,14 @@ export function planEditMarkers(
 			],
 		};
 	}
-	return { kind: 'replace', actions: [] };
+	return {
+		kind: 'replace',
+		actions: [],
+		refusal: {
+			reason: replaceVerdict.reason!,
+			blocking: replaceVerdict.blocking,
+		},
+	};
 }
 
 /**
@@ -590,8 +646,8 @@ export function applyEditPlan(
 			}
 			case 'wrap-del': {
 				const id = ids[ idIndex++ ];
-				const wrapped = wrapInlineMarker( result, {
-					formatType: SUGGESTION_FORMAT_NAME,
+				const wrapped = wrapSuggestionMarker( result, {
+					kind: 'del',
 					attributes: buildSuggestionMarkerAttributes( {
 						id,
 						type: SUGGESTION_TYPE_DELETION,

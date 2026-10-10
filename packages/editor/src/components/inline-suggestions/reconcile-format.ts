@@ -19,10 +19,15 @@ import { RichTextData, slice, removeFormat } from '@wordpress/rich-text';
 import { toRichTextRecord } from './rich-text-record';
 import {
 	SUGGESTION_AUTHOR_ATTRIBUTE,
-	SUGGESTION_FORMAT_NAME,
+	SUGGESTION_FORMAT_NAMES,
 	SUGGESTION_ID_ATTRIBUTE,
-	SUGGESTION_TYPE_ATTRIBUTE,
 	SUGGESTION_TYPE_FORMAT,
+	canonicalizeSuggestionStack,
+	isSuggestionFormat,
+	suggestionFormatNameFor,
+	suggestionKindOf,
+	suggestionMarkersAt,
+	suggestionMarkersIn,
 } from './format';
 import { buildSuggestionMarkerAttributes } from './operations';
 
@@ -84,7 +89,7 @@ function stackKey( stack: any ): string {
 		return cached;
 	}
 	const key = stack
-		.filter( ( f ) => f.type !== SUGGESTION_FORMAT_NAME )
+		.filter( ( f ) => ! isSuggestionFormat( f ) )
 		.map( formatKey )
 		.sort()
 		.join( '|' );
@@ -156,12 +161,8 @@ function overlapsExistingMarker(
 	end: number
 ): boolean {
 	for ( let i = start; i < end; i++ ) {
-		const inPrev = prev.formats?.[ i ]?.some(
-			( f: any ) => f.type === SUGGESTION_FORMAT_NAME
-		);
-		const inNext = next.formats?.[ i ]?.some(
-			( f: any ) => f.type === SUGGESTION_FORMAT_NAME
-		);
+		const inPrev = prev.formats?.[ i ]?.some( isSuggestionFormat );
+		const inNext = next.formats?.[ i ]?.some( isSuggestionFormat );
 		if ( inPrev || inNext ) {
 			return true;
 		}
@@ -186,27 +187,26 @@ export interface FormatPlan {
 }
 
 /**
- * The suggestion marker covering a character, if any.
+ * The `format` marker covering a character, if any.
  *
  * @param record Rich-text record.
  * @param index  Character index.
- * @return The `core/suggestion` format at that character, or undefined.
+ * @return The format marker at that character, or undefined.
  */
-function suggestionAt( record: any, index: number ) {
-	return record.formats?.[ index ]?.find(
-		( format: any ) => format.type === SUGGESTION_FORMAT_NAME
-	);
+function formatMarkerAt( record: any, index: number ) {
+	return suggestionMarkersAt( record.formats?.[ index ] ).format;
 }
 
 /**
- * The suggestion id a character's marker carries, as a string, or undefined.
+ * The id the `format` marker on a character carries, as a string, or
+ * undefined.
  *
  * @param record Rich-text record.
  * @param index  Character index.
  * @return Marker id.
  */
 function suggestionIdAt( record: any, index: number ): string | undefined {
-	const id = suggestionAt( record, index )?.attributes?.[
+	const id = formatMarkerAt( record, index )?.attributes?.[
 		SUGGESTION_ID_ATTRIBUTE
 	];
 	return id === undefined ? undefined : String( id );
@@ -215,12 +215,10 @@ function suggestionIdAt( record: any, index: number ): string | undefined {
 /**
  * Every suggestion id a character carries, outermost first.
  *
- * A character can sit under more than one marker — typing inside a formatted
- * suggestion nests an `add` marker beneath it — and `suggestionAt` reports only
- * the outermost. Extending applies `core/suggestion` across the whole run, and
- * `applyFormatPlan` drops the suggestion markers it finds inside that range,
- * so the extend path has to see the whole stack or it will silently strip a
- * nested marker and orphan its note.
+ * A character can sit under more than one marker - a deletion nested in a
+ * formatted run, say - and `formatMarkerAt` reports only the format marker.
+ * The extend path checks the whole stack so it only revises a run that holds
+ * no one else's marker.
  *
  * @param record Rich-text record.
  * @param index  Character index.
@@ -228,10 +226,7 @@ function suggestionIdAt( record: any, index: number ): string | undefined {
  */
 function suggestionIdsAt( record: any, index: number ): string[] {
 	const ids: string[] = [];
-	for ( const format of record.formats?.[ index ] ?? [] ) {
-		if ( format.type !== SUGGESTION_FORMAT_NAME ) {
-			continue;
-		}
+	for ( const format of suggestionMarkersIn( record.formats?.[ index ] ) ) {
 		const id = format.attributes?.[ SUGGESTION_ID_ATTRIBUTE ];
 		if ( id !== undefined ) {
 			ids.push( String( id ) );
@@ -306,13 +301,10 @@ function findExtendableFormatMarker(
 	attributes: Record< string, any >;
 	range: { start: number; end: number };
 } | null {
-	const marker = suggestionAt( next, range.start );
+	const marker = formatMarkerAt( next, range.start );
 	const attributes = marker?.attributes;
 	const id = attributes?.[ SUGGESTION_ID_ATTRIBUTE ];
-	if (
-		! id ||
-		attributes[ SUGGESTION_TYPE_ATTRIBUTE ] !== SUGGESTION_TYPE_FORMAT
-	) {
+	if ( ! id ) {
 		return null;
 	}
 	// Extending re-attributes nothing: the note stays the author's. Only that
@@ -379,11 +371,11 @@ function sliceToUnmarkedHTML(
 	start: number,
 	end: number
 ): string {
-	return sliceToHTML(
-		removeFormat( record, SUGGESTION_FORMAT_NAME, start, end ),
-		start,
-		end
-	);
+	let unmarked = record;
+	for ( const name of SUGGESTION_FORMAT_NAMES ) {
+		unmarked = removeFormat( unmarked, name, start, end );
+	}
+	return sliceToHTML( unmarked, start, end );
 }
 
 /**
@@ -516,13 +508,16 @@ export function applyFormatPlan(
 	 * original run, which only removes the proposed formatting when that
 	 * formatting sits inside the marker.
 	 */
-	const marker = { type: SUGGESTION_FORMAT_NAME, attributes };
+	const marker = { type: suggestionFormatNameFor( 'format' ), attributes };
 	const formats = next.formats.slice();
 	for ( let index = start; index < end; index++ ) {
 		const stack = ( formats[ index ] ?? [] ).filter(
-			( format: any ) => format.type !== SUGGESTION_FORMAT_NAME
+			( format: any ) =>
+				suggestionKindOf( format ) !== SUGGESTION_TYPE_FORMAT
 		);
 		formats[ index ] = [ marker, ...stack ];
 	}
-	return new RichTextData( { ...next, formats } as any );
+	return new RichTextData(
+		canonicalizeSuggestionStack( { ...next, formats } ) as any
+	);
 }

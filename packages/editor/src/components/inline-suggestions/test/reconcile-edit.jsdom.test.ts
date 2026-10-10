@@ -2,10 +2,8 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
 	RichTextData,
 	registerFormatType,
-	store as richTextStore,
 	unregisterFormatType,
 } from '@wordpress/rich-text';
-import { select } from '@wordpress/data';
 import {
 	analyzeTextEdit,
 	planEditMarkers,
@@ -16,19 +14,16 @@ import {
 	registerSuggestionFormat,
 	findSuggestionText,
 	findSuggestionRange,
-	SUGGESTION_FORMAT_NAME,
+	unregisterSuggestionFormats,
 } from '../format';
 
-const getFormatType = ( name: string ) =>
-	( select( richTextStore as any ) as any ).getFormatType( name );
-
 const add = ( id: number | string, text: string, author?: number | string ) =>
-	`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="add"${
+	`<mark class="wp-suggestion-add" data-suggestion-id="${ id }" data-suggestion-type="add"${
 		author !== undefined ? ` data-author="${ author }"` : ''
 	}>${ text }</mark>`;
 
 const del = ( id: number | string, text: string, author?: number | string ) =>
-	`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="del"${
+	`<mark class="wp-suggestion-del" data-suggestion-id="${ id }" data-suggestion-type="del"${
 		author !== undefined ? ` data-author="${ author }"` : ''
 	}>${ text }</mark>`;
 
@@ -147,9 +142,7 @@ describe( 'planEditMarkers', () => {
 	} );
 
 	afterAll( () => {
-		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 	} );
 
 	it( 'returns nothing for a non-rich value', () => {
@@ -406,9 +399,7 @@ describe( 'applyEditPlan', () => {
 	} );
 
 	afterAll( () => {
-		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 	} );
 
 	it( 'wraps an insert-add in a new marker with the supplied id', () => {
