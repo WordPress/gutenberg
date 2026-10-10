@@ -67,12 +67,15 @@ async function suggestAddition( { editor, page }: any ) {
 		name: 'core/paragraph',
 		attributes: { content: 'Hello' },
 	} );
-	// A title keeps the post saveable once the paragraph is deleted.
+	// A title keeps the post saveable once the paragraph is deleted. It is
+	// saved before suggesting, since a save from Suggesting leaves staged
+	// post field edits out.
 	await page.evaluate( () =>
 		( window as any ).wp.data
 			.dispatch( 'core/editor' )
 			.editPost( { title: 'Outdated suggestion' } )
 	);
+	await editor.saveDraft();
 	await switchIntent( page, 'Suggesting' );
 	const paragraph = editor.canvas
 		.getByRole( 'document', { name: 'Block: Paragraph' } )
