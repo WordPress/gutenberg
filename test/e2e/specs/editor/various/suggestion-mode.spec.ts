@@ -1068,7 +1068,9 @@ test.describe( 'Suggestion mode', () => {
 		await expect(
 			page
 				.locator( '.components-snackbar-list' )
-				.getByText( 'overlaps a pending suggestion' )
+				.getByText(
+					'othertypeover suggested adding this text. Reply to their suggestion to propose a change.'
+				)
 		).toBeVisible();
 		await expect( added() ).toHaveCount( 1 );
 		await expect( added() ).toHaveText( ' wrold' );
