@@ -14,6 +14,7 @@ import {
 	parseSuggestionPayload,
 } from './operations';
 import { useSuggestionsProvider } from './provider';
+import { getSuggestionStatus, isPendingStatus } from './suggestion-status';
 import {
 	SUGGESTION_TYPE_FORMAT,
 	applyFormatPlan,
@@ -231,12 +232,13 @@ export default function SuggestionFormatKeyboard() {
 			);
 			/*
 			 * The note has to still be the pending format suggestion the marker
-			 * claims it is. A peer accepting or rejecting it mid-toggle (status
-			 * off `hold`) leaves the marker about to be cleared, so revising the
-			 * note would fight that resolution.
+			 * claims it is. A peer accepting or rejecting it mid-toggle (a
+			 * decision on the note, saved or not) leaves the marker about to be
+			 * cleared, so revising the note would fight that resolution.
 			 */
 			if (
 				comment?.status !== 'hold' ||
+				! isPendingStatus( getSuggestionStatus( comment ) ) ||
 				existing?.suggestionType !== SUGGESTION_TYPE_FORMAT
 			) {
 				notifyDropped();
