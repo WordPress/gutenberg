@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Invalidate the loaded `wp_navigation` records when a page publish is received, so a Navigation block picks up the link that "Auto add pages" appended on the server without a reload ([#84508](https://github.com/WordPress/gutenberg/pull/84508)).
 -   Add the root-level `edit_root` field to the `Attachment` entity type — the edit root attachment's id, or `0` when the attachment was not created by editing another one; embeddable via the `wp:edit-root` link, exposed in the `edit` context ([#81803](https://github.com/WordPress/gutenberg/pull/81803)).
 -   `Icon`: add the `keywords` field exposed by the icons REST endpoint ([#82367](https://github.com/WordPress/gutenberg/pull/82367)).
 -   `__experimentalFetchLinkSuggestions`: add a `preferTypes` option to rank matches from one or more search types above the usual order ([#83408](https://github.com/WordPress/gutenberg/pull/83408)).
