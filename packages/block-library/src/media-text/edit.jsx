@@ -39,7 +39,7 @@ import {
 } from './constants';
 import { unlock } from '../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import { MediaControl } from '../utils/media-control';
+import { MediaPanel, MediaPanelItem } from '../utils/media-control';
 
 const { ResolutionTool } = unlock( blockEditorPrivateApis );
 
@@ -343,37 +343,26 @@ function MediaTextEdit( {
 	};
 
 	const mediaInspectorPanel = isSelected ? (
-		<InspectorControls group="content">
-			<ToolsPanel
-				label={ __( 'Media' ) }
-				resetAll={ () => onSelectMedia( undefined ) }
-				dropdownMenuProps={ dropdownMenuProps }
-			>
-				<ToolsPanelItem
-					label={ __( 'Media' ) }
-					hasValue={ () => !! mediaUrl || !! useFeaturedImage }
-					onDeselect={ () => onSelectMedia( undefined ) }
-					isShownByDefault
-				>
-					<MediaControl
-						mediaId={ mediaId }
-						mediaUrl={ mediaUrl || featuredImageURL }
-						filename={
-							image?.media_details?.sizes?.full?.file ||
-							image?.slug ||
-							getFilename( mediaUrl )
-						}
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						onSelect={ onSelectMedia }
-						onError={ onUploadError }
-						onReset={ () => onSelectMedia( undefined ) }
-						useFeaturedImage={ useFeaturedImage }
-						onToggleFeaturedImage={ toggleUseFeaturedImage }
-						emptyLabel={ __( 'Add media' ) }
-					/>
-				</ToolsPanelItem>
-			</ToolsPanel>
-		</InspectorControls>
+		<MediaPanel resetAll={ () => onSelectMedia( undefined ) }>
+			<MediaPanelItem
+				hasValue={ () => !! mediaUrl || !! useFeaturedImage }
+				onDeselect={ () => onSelectMedia( undefined ) }
+				mediaId={ mediaId }
+				mediaUrl={ mediaUrl || featuredImageURL }
+				filename={
+					image?.media_details?.sizes?.full?.file ||
+					image?.slug ||
+					getFilename( mediaUrl )
+				}
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				onSelect={ onSelectMedia }
+				onError={ onUploadError }
+				onReset={ () => onSelectMedia( undefined ) }
+				useFeaturedImage={ useFeaturedImage }
+				onToggleFeaturedImage={ toggleUseFeaturedImage }
+				emptyLabel={ __( 'Add media' ) }
+			/>
+		</MediaPanel>
 	) : null;
 
 	const mediaTextGeneralSettings = (

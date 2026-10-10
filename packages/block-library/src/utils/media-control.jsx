@@ -5,9 +5,12 @@ import {
 	Spinner,
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
 import {
+	InspectorControls,
 	MediaReplaceFlow,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -17,6 +20,7 @@ import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { reset as resetIcon } from '@wordpress/icons';
 import { getFilename } from '@wordpress/url';
+import { useToolsPanelDropdownMenuProps } from './hooks';
 
 /**
  * Focuses the toggle button.
@@ -170,5 +174,72 @@ export function MediaControl( {
 			) }
 			<DropZone onFilesDrop={ onFilesDrop } />
 		</div>
+	);
+}
+
+/**
+ * MediaPanel - The shared "Media" panel for a block's inspector.
+ *
+ * Renders the panel shell only. Blocks compose the contents, so each keeps its
+ * own conditions for what belongs in the panel: `MediaPanelItem` for the media
+ * control itself, and any further `ToolsPanelItem`s that configure that media.
+ *
+ * @param {Object}   props
+ * @param {string}   props.group    Inspector controls group the panel fills (default: 'content')
+ * @param {string}   props.label    Panel label (default: 'Media')
+ * @param {()=>void} props.resetAll Callback resetting every item in the panel
+ * @param {Element}  props.children Panel contents
+ * @return {Element} Media panel
+ */
+export function MediaPanel( {
+	group = 'content',
+	label = __( 'Media' ),
+	resetAll,
+	children,
+} ) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
+	return (
+		<InspectorControls group={ group }>
+			<ToolsPanel
+				label={ label }
+				resetAll={ resetAll }
+				dropdownMenuProps={ dropdownMenuProps }
+			>
+				{ children }
+			</ToolsPanel>
+		</InspectorControls>
+	);
+}
+
+/**
+ * MediaPanelItem - A `MediaControl` wrapped as an item of the Media panel.
+ *
+ * Takes the `ToolsPanelItem` props it needs and passes the rest to
+ * `MediaControl`.
+ *
+ * @param {Object}      props
+ * @param {string}      props.label      Item label (default: 'Media')
+ * @param {()=>boolean} props.hasValue   Whether the item holds a value; defaults to whether media is set
+ * @param {()=>void}    props.onDeselect Callback resetting the item
+ * @return {Element} Media panel item
+ */
+export function MediaPanelItem( {
+	label = __( 'Media' ),
+	hasValue,
+	onDeselect,
+	...mediaControlProps
+} ) {
+	const { mediaUrl } = mediaControlProps;
+
+	return (
+		<ToolsPanelItem
+			label={ label }
+			hasValue={ hasValue ?? ( () => !! mediaUrl ) }
+			onDeselect={ onDeselect }
+			isShownByDefault
+		>
+			<MediaControl { ...mediaControlProps } />
+		</ToolsPanelItem>
 	);
 }
