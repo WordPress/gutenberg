@@ -588,4 +588,147 @@ test.describe( 'Suggestion mode: post fields', () => {
 			).toBeHidden();
 		} );
 	} );
+	test.describe( 'post meta', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin(
+				'gutenberg-test-suggestion-mode-post-meta'
+			);
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-suggestion-mode-post-meta'
+			);
+		} );
+
+		async function typeIntoMetaField( page: any, text: string ) {
+			await openSettingsPanel( page, 'Test meta' );
+			const field = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'textbox', { name: 'Test meta value' } );
+			const saved = suggestionSavedPromise( page );
+			await field.fill( text );
+			await saved;
+			return field;
+		}
+
+		function getMeta( page: any ) {
+			return page.evaluate(
+				() =>
+					( window as any ).wp.data
+						.select( 'core/editor' )
+						.getEditedPostAttribute( 'meta' ).suggestion_test_meta
+			);
+		}
+
+		test( 'a meta change made in a plugin panel becomes a suggestion', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await editor.openDocumentSettingsSidebar();
+			await switchIntent( page, 'Suggesting' );
+			await typeIntoMetaField( page, 'Suggested value' );
+
+			// The plugin's field reads the proposal back through the editor.
+			expect( await getMeta( page ) ).toBe( 'Suggested value' );
+			expect(
+				( await getEntityValue( page, postId, 'meta' ) )
+					.suggestion_test_meta
+			).toBe( '' );
+
+			const sidebar = await openNotesSidebar( page );
+			const threads = suggestionThreads( sidebar );
+			await expect( threads ).toHaveCount( 1 );
+			await expect(
+				threads.locator(
+					'.editor-collab-sidebar-panel__suggestion-summary'
+				)
+			).toHaveText( 'suggestion_test_meta: “Suggested value”' );
+			await expect( threads ).toContainText(
+				'Post meta: suggestion_test_meta'
+			);
+
+			await savePost( page );
+			expect(
+				( await readStoredPost( requestUtils, postId ) ).meta
+					.suggestion_test_meta
+			).toBe( '' );
+
+			await switchIntent( page, 'Editing' );
+			expect( await getMeta( page ) ).toBe( '' );
+		} );
+
+		test( 'accepting a meta suggestion applies it, rejecting keeps the value', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await editor.openDocumentSettingsSidebar();
+			await switchIntent( page, 'Suggesting' );
+			await typeIntoMetaField( page, 'Accepted value' );
+			await switchIntent( page, 'Editing' );
+
+			const sidebar = await openNotesSidebar( page );
+			await sidebar
+				.getByRole( 'button', { name: 'Accept suggestion' } )
+				.click();
+			await expect.poll( () => getMeta( page ) ).toBe( 'Accepted value' );
+			await savePost( page );
+			expect(
+				( await readStoredPost( requestUtils, postId ) ).meta
+					.suggestion_test_meta
+			).toBe( 'Accepted value' );
+
+			await editor.openDocumentSettingsSidebar();
+			await switchIntent( page, 'Suggesting' );
+			await typeIntoMetaField( page, 'Rejected value' );
+			await openNotesSidebar( page );
+			await sidebar
+				.locator( '.editor-collab-sidebar-panel__thread' )
+				.filter( { hasText: 'Rejected value' } )
+				.getByRole( 'button', { name: 'Reject suggestion' } )
+				.click();
+			await expect.poll( () => getMeta( page ) ).toBe( 'Accepted value' );
+		} );
+
+		test( 'a meta suggestion for an unregistered key is refused by the server', async ( {
+			page,
+		} ) => {
+			const status = await page.evaluate( async ( id ) => {
+				try {
+					await ( window as any ).wp.apiFetch( {
+						path: '/wp/v2/comments',
+						method: 'POST',
+						data: {
+							post: id,
+							type: 'note',
+							status: 'hold',
+							content: '',
+							meta: {
+								_wp_suggestion: JSON.stringify( {
+									schemaVersion: 2,
+									blockName: '',
+									baseRevision: null,
+									operations: [
+										{
+											type: 'post-attribute-set',
+											attribute: 'meta',
+											key: '_not_registered',
+											before: '',
+											after: 'x',
+										},
+									],
+								} ),
+							},
+						},
+					} );
+					return 'created';
+				} catch ( error: any ) {
+					return error?.code;
+				}
+			}, postId );
+			expect( status ).toBe( 'rest_invalid_suggestion' );
+		} );
+	} );
 } );
