@@ -15,5 +15,5 @@ export function isValidFragment( fragment: string ): boolean {
 	if ( ! fragment ) {
 		return false;
 	}
-	return /^#[^\s#?\/]*$/.test( fragment );
+	return /^#[^\s#]*$/.test( fragment );
 }

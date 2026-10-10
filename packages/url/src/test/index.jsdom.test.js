@@ -588,6 +588,8 @@ describe( 'isValidFragment', () => {
 		expect( isValidFragment( '#yes_it_is' ) ).toBe( true );
 		expect( isValidFragment( '#yes~it~is' ) ).toBe( true );
 		expect( isValidFragment( '#yes-it-is' ) ).toBe( true );
+		expect( isValidFragment( '#yes-it-is?' ) ).toBe( true );
+		expect( isValidFragment( '#yes-it-is/' ) ).toBe( true );
 	} );
 
 	it( 'returns false if the fragment is invalid', () => {
@@ -595,10 +597,8 @@ describe( 'isValidFragment', () => {
 		expect( isValidFragment( ' #no-it-isnt ' ) ).toBe( false );
 		expect( isValidFragment( '#no-it-isnt#' ) ).toBe( false );
 		expect( isValidFragment( '#no-it-#isnt' ) ).toBe( false );
-		expect( isValidFragment( '#no-it-isnt?' ) ).toBe( false );
 		expect( isValidFragment( '#no-it isnt' ) ).toBe( false );
 		expect( isValidFragment( '/#no-it-isnt' ) ).toBe( false );
-		expect( isValidFragment( '#no-it-isnt/' ) ).toBe( false );
 	} );
 } );
 
