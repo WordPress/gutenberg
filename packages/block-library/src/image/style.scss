@@ -477,3 +477,28 @@
 		transform: translate(calc((-100vw + var(--wp--lightbox-scrollbar-width)) / 2 + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
 	}
 }
+
+// In a grid whose cells have a fixed size, the image fills its cell, cropped as
+// needed, below any caption. The cell decides the image's size, so it wins over
+// a width, height or aspect ratio set on the image. Its scale and focal point
+// still apply.
+@container style(--wp--style--grid-cells: fixed) {
+	.is-layout-grid > .wp-block-image {
+		display: flex;
+		flex-direction: column;
+
+		// The image itself, linked or not, leaving out images in the caption.
+		> img,
+		> a {
+			flex: 1 1 0;
+			min-height: 0;
+		}
+
+		> img,
+		> a > img {
+			width: 100% !important;
+			height: 100% !important;
+			object-fit: cover;
+		}
+	}
+}

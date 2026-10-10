@@ -150,3 +150,29 @@
 		}
 	}
 }
+
+// In a grid whose cells have a fixed size, the block fills its cell and the
+// media fills its side of the block, cropped as needed. The cell decides the
+// block's size, so it wins over the block's minimum height.
+@container style(--wp--style--grid-cells: fixed) {
+	.is-layout-grid > .wp-block-media-text {
+		min-height: 0 !important;
+		grid-template-rows: minmax(0, 1fr);
+
+		> .wp-block-media-text__media {
+			align-self: stretch;
+			min-height: 0;
+		}
+
+		> .wp-block-media-text__media > a {
+			display: block;
+			height: 100%;
+		}
+
+		> .wp-block-media-text__media img,
+		> .wp-block-media-text__media video {
+			height: 100%;
+			object-fit: cover;
+		}
+	}
+}
