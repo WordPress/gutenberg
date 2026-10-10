@@ -587,10 +587,17 @@ function gutenberg_get_suggestion_marker_kind( WP_HTML_Tag_Processor $processor 
  *   deletion handling.
  *
  * The raw `post_content` (and the REST `raw` view, revisions, exports) keeps the
- * markers so the editor can re-attach on reload. Only `wp-suggestion` markers
- * are touched: `WP_HTML_Tag_Processor::has_class()` matches the class by exact
- * token, so an unrelated `<mark>` (a `core/text-color` highlight, a `wp-note`,
- * or a `wp-suggestion-foo` class) survives byte-for-byte.
+ * markers so the editor can re-attach on reload. Only suggestion markers are
+ * touched, as told by `gutenberg_get_suggestion_marker_kind()`, which matches
+ * class tokens exactly, so an unrelated `<mark>` (a `core/text-color`
+ * highlight, a `wp-note`, or a `wp-suggestion-foo` class) survives
+ * byte-for-byte.
+ *
+ * Markers of different kinds nest (a deletion inside someone else's addition).
+ * The editor writes them in one order - add outermost, then format, then del -
+ * which never splits a format marker. Merged or hand-edited markup can still
+ * split one around a deletion; the first fragment of a format id then restores
+ * the whole original and later fragments render nothing.
  *
  * A single read-only `WP_HTML_Tag_Processor` walk classifies the markers and
  * records the byte ranges to replace, which are applied once the walk ends. The
@@ -620,7 +627,7 @@ function gutenberg_get_suggestion_marker_kind( WP_HTML_Tag_Processor $processor 
  * rendered.
  *
  * @param string $block_content Rendered block HTML.
- * @return string Block HTML with wp-suggestion markers stripped (type-aware).
+ * @return string Block HTML with suggestion markers stripped (kind-aware).
  */
 function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 	/*
@@ -630,7 +637,7 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 	 */
 	static $restoring = false;
 
-	if ( false === strpos( $block_content, 'wp-suggestion' ) ) {
+	if ( false === strpos( $block_content, 'wp-suggestion-' ) ) {
 		return $block_content;
 	}
 
@@ -746,8 +753,8 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 		if ( in_array( $tag, $void_elements, true ) ) {
 			continue;
 		}
-		$is_marker = 'MARK' === $tag && $processor->has_class( 'wp-suggestion' );
-		if ( ! $is_marker ) {
+		$kind = 'MARK' === $tag ? gutenberg_get_suggestion_marker_kind( $processor ) : null;
+		if ( null === $kind ) {
 			$open_elements[] = array( $tag, null );
 			if ( 'MARK' === $tag ) {
 				$lexical_marks[] = null;
@@ -755,11 +762,8 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 			continue;
 		}
 
-		// An unknown or missing type defaults to deletion (unwrap, keep text)
-		// so a malformed marker never silently drops content.
-		$type   = $processor->get_attribute( 'data-suggestion-type' );
 		$marker = array(
-			'mode'           => ( 'add' === $type ) ? 'add' : 'del',
+			'mode'           => ( 'add' === $kind ) ? 'add' : 'del',
 			'start'          => $span[0],
 			'length'         => $span[1],
 			'end'            => null,
@@ -767,13 +771,17 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 			'lexical_end'    => null,
 			'lexical_closer' => null,
 		);
-		if ( 'format' === $type ) {
-			$original = gutenberg_get_pending_format_suggestion_html(
-				(int) $processor->get_attribute( 'data-suggestion-id' ),
-				$post_id
-			);
+		if ( 'format' === $kind ) {
+			/*
+			 * A format marker whose original cannot be resolved is handled as
+			 * an unresolved format change below, never as an addition, so a
+			 * marker does not silently drop content it is not sure about.
+			 */
+			$id       = (int) $processor->get_attribute( 'data-suggestion-id' );
+			$original = gutenberg_get_pending_format_suggestion_html( $id, $post_id );
 			if ( null !== $original ) {
 				$marker['mode']     = 'format';
+				$marker['id']       = $id;
 				$marker['original'] = $original;
 			} else {
 				$marker['mode'] = 'unresolved-format';
@@ -804,6 +812,8 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 	 */
 	$length = strlen( $block_content );
 	$edits  = array();
+	// Format ids whose original has been emitted by an earlier fragment.
+	$format_seen = array();
 	foreach ( $markers as $marker ) {
 		$end      = $marker['end'] ?? $length;
 		$balanced = null !== $marker['closer'] && $marker['lexical_end'] === $end;
@@ -821,10 +831,11 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 		}
 
 		$text = '';
-		if ( 'format' === $marker['mode'] && $balanced ) {
-			$restoring = true;
-			$text      = gutenberg_strip_inline_suggestion_markers( $marker['original'] );
-			$restoring = false;
+		if ( 'format' === $marker['mode'] && $balanced && ! isset( $format_seen[ $marker['id'] ] ) ) {
+			$format_seen[ $marker['id'] ] = true;
+			$restoring                    = true;
+			$text                         = gutenberg_strip_inline_suggestion_markers( $marker['original'] );
+			$restoring                    = false;
 			// The note-marker strip may already have run on this block, so
 			// the swapped-in original gets its own pass.
 			if ( function_exists( 'gutenberg_strip_inline_note_markers' ) ) {
