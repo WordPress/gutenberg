@@ -111,6 +111,15 @@ function getEntityValue( page: any, postId: number, attribute: string ) {
 	);
 }
 
+async function openSettingsPanel( page: any, name: string ) {
+	const toggle = page
+		.getByRole( 'region', { name: 'Editor settings' } )
+		.getByRole( 'button', { name, exact: true } );
+	if ( ( await toggle.getAttribute( 'aria-expanded' ) ) === 'false' ) {
+		await toggle.click();
+	}
+}
+
 function readStoredPost( requestUtils: any, postId: number ) {
 	return requestUtils.rest( {
 		path: `/wp/v2/posts/${ postId }`,
@@ -445,6 +454,138 @@ test.describe( 'Suggestion mode: post fields', () => {
 				.poll( () => getEditedPostAttribute( page, 'slug' ) )
 				.toBe( 'saved-slug' );
 			await expect( suggestionThreads( sidebar ) ).toHaveCount( 0 );
+		} );
+	} );
+	test.describe( 'terms', () => {
+		let newsId: number;
+		let sportId: number;
+
+		const createdTermIds: number[] = [];
+		async function createCategory( requestUtils: any, name: string ) {
+			const term = await requestUtils.rest( {
+				method: 'POST',
+				path: '/wp/v2/categories',
+				data: { name },
+			} );
+			createdTermIds.push( term.id );
+			return term.id;
+		}
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			newsId = await createCategory( requestUtils, 'News' );
+			sportId = await createCategory( requestUtils, 'Sport' );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			for ( const id of createdTermIds ) {
+				await requestUtils.rest( {
+					method: 'DELETE',
+					path: `/wp/v2/categories/${ id }`,
+					params: { force: true },
+				} );
+			}
+		} );
+
+		test.beforeEach( async ( { admin, requestUtils } ) => {
+			await requestUtils.rest( {
+				method: 'POST',
+				path: `/wp/v2/posts/${ postId }`,
+				data: { categories: [ newsId ] },
+			} );
+			await admin.editPost( postId );
+		} );
+
+		test( 'a category change becomes a suggestion, not an edit', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await editor.openDocumentSettingsSidebar();
+			await openSettingsPanel( page, 'Categories' );
+			await switchIntent( page, 'Suggesting' );
+			const saved = suggestionSavedPromise( page );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'checkbox', { name: 'Sport' } )
+				.check();
+			await saved;
+
+			expect(
+				await getEditedPostAttribute( page, 'categories' )
+			).toEqual( [ newsId, sportId ] );
+			expect(
+				await getEntityValue( page, postId, 'categories' )
+			).toEqual( [ newsId ] );
+
+			const sidebar = await openNotesSidebar( page );
+			const threads = suggestionThreads( sidebar );
+			await expect( threads ).toHaveCount( 1 );
+			await expect(
+				threads.locator(
+					'.editor-collab-sidebar-panel__suggestion-summary'
+				)
+			).toHaveText( 'Categories: Add Sport' );
+
+			await savePost( page );
+			expect(
+				( await readStoredPost( requestUtils, postId ) ).categories
+			).toEqual( [ newsId ] );
+		} );
+
+		test( 'accepting a category suggestion assigns the category', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			await switchIntent( page, 'Suggesting' );
+			await suggestPostEdits( page, { categories: [ sportId ] } );
+			await switchIntent( page, 'Editing' );
+
+			const sidebar = await openNotesSidebar( page );
+			await expect(
+				sidebar.locator(
+					'.editor-collab-sidebar-panel__suggestion-summary'
+				)
+			).toHaveText( 'Categories: Add Sport; Remove News' );
+			await sidebar
+				.getByRole( 'button', { name: 'Accept suggestion' } )
+				.click();
+			await expect
+				.poll( () => getEditedPostAttribute( page, 'categories' ) )
+				.toEqual( [ sportId ] );
+
+			await savePost( page );
+			expect(
+				( await readStoredPost( requestUtils, postId ) ).categories
+			).toEqual( [ sportId ] );
+		} );
+
+		test( 'new terms cannot be created while suggesting', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.openDocumentSettingsSidebar();
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await openSettingsPanel( page, 'Categories' );
+			await openSettingsPanel( page, 'Tags' );
+			const addCategory = settings.getByRole( 'button', {
+				name: 'Add Category',
+			} );
+			await expect( addCategory ).toBeVisible();
+
+			await switchIntent( page, 'Suggesting' );
+			await expect( addCategory ).toBeHidden();
+
+			// A tag typed in that does not exist yet is not offered for
+			// creation: creating a term is a real write to the taxonomy.
+			const tags = settings.getByRole( 'combobox', {
+				name: 'Add Tag',
+			} );
+			await tags.fill( 'Brand new tag' );
+			await expect(
+				page.getByRole( 'option', { name: /^Create:/ } )
+			).toBeHidden();
 		} );
 	} );
 } );
