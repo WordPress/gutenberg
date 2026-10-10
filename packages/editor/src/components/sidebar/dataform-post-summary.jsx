@@ -313,11 +313,17 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 				?.map( ( field ) => {
 					const namespace = fieldNamespaces[ field.id ];
 					if ( namespace ) {
-						return bindFieldToNamespace(
+						const bound = bindFieldToNamespace(
 							field,
 							namespace,
 							ENTITIES[ postType ]?.[ namespace ]?.isVisible
 						);
+						// Site settings (and the posts page title) are not
+						// part of the post, so a suggestion cannot propose
+						// them. See issue #73411.
+						return isSuggesting
+							? { ...bound, readOnly: true }
+							: bound;
 					}
 					if ( field.id === 'status' ) {
 						return {
