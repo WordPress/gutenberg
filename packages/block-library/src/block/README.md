@@ -29,6 +29,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
 - `customCSS`: `false`
+- `rotate`: `false`
 - [`visibility`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
 
 ## Context
