@@ -1,7 +1,18 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { useCallback, useState } from '@wordpress/element';
+import type { RefCallback } from 'react';
 import useMergeRefs from '../';
+
+type RefHistory = Array< HTMLElement | null | 'cleanup' >;
+
+type MergedRefsProps = {
+	count?: number;
+	tagName?: 'ul' | 'button';
+	disable1?: boolean;
+	disable2?: boolean;
+	unused?: boolean;
+};
 
 describe( 'useMergeRefs', () => {
 	// Setup
@@ -20,11 +31,11 @@ describe( 'useMergeRefs', () => {
 	// never expected to be called on subsequent renders if no callback
 	// dependency updates!
 
-	function renderCallback( args ) {
+	function renderCallback( args: RefHistory[] ) {
 		renderCallback.history.push( args );
 	}
 
-	renderCallback.history = [];
+	renderCallback.history = [] as RefHistory[][];
 
 	function MergedRefs( {
 		count,
@@ -32,25 +43,27 @@ describe( 'useMergeRefs', () => {
 		disable1,
 		disable2,
 		unused,
-	} ) {
-		function refCallback1( value ) {
+	}: MergedRefsProps ) {
+		function refCallback1( value: HTMLElement | null ) {
 			refCallback1.history.push( value );
 		}
 
-		refCallback1.history = [];
+		refCallback1.history = [] as RefHistory;
 
-		function refCallback2( value ) {
+		function refCallback2( value: HTMLElement | null ) {
 			refCallback2.history.push( value );
 		}
 
-		refCallback2.history = [];
+		refCallback2.history = [] as RefHistory;
 
 		renderCallback( [ refCallback1.history, refCallback2.history ] );
 
 		const ref1 = useCallback( refCallback1, [] );
 		const ref2 = useCallback( refCallback2, [ count ] );
 		const mergedRefs = useMergeRefs( [
+			// @ts-expect-error `false` disables a ref at runtime.
 			! disable1 && ref1,
+			// @ts-expect-error `false` disables a ref at runtime.
 			! disable2 && ref2,
 		] );
 
@@ -63,7 +76,7 @@ describe( 'useMergeRefs', () => {
 
 	afterEach( () => {
 		// Reset all history.
-		renderCallback.history = [];
+		renderCallback.history = [] as RefHistory[][];
 	} );
 
 	it( 'should work', () => {
@@ -341,7 +354,11 @@ describe( 'useMergeRefs', () => {
 		// the canvas body once the iframe document is available). The parent
 		// does not render in that commit, so the hook must still detect and
 		// apply a later ref change on the parent's next render.
-		function Child( { mergedRefs } ) {
+		function Child( {
+			mergedRefs,
+		}: {
+			mergedRefs: RefCallback< HTMLElement >;
+		} ) {
 			const [ attached, setAttached ] = useState( false );
 			return (
 				<>
@@ -351,18 +368,18 @@ describe( 'useMergeRefs', () => {
 			);
 		}
 
-		function Parent( { count } ) {
-			function refCallback1( value ) {
+		function Parent( { count }: { count: number } ) {
+			function refCallback1( value: HTMLElement | null ) {
 				refCallback1.history.push( value );
 			}
 
-			refCallback1.history = [];
+			refCallback1.history = [] as RefHistory;
 
-			function refCallback2( value ) {
+			function refCallback2( value: HTMLElement | null ) {
 				refCallback2.history.push( value );
 			}
 
-			refCallback2.history = [];
+			refCallback2.history = [] as RefHistory;
 
 			renderCallback( [ refCallback1.history, refCallback2.history ] );
 
@@ -416,42 +433,44 @@ describe( 'useMergeRefs with cleanup-returning ref callbacks', () => {
 	// The strict invariant is that `null` never appears in the history of a
 	// cleanup-returning ref.
 
-	function renderCallback( args ) {
+	function renderCallback( args: RefHistory[] ) {
 		renderCallback.history.push( args );
 	}
 
-	renderCallback.history = [];
+	renderCallback.history = [] as RefHistory[][];
 
 	function MergedRefs( {
 		count,
 		tagName: TagName = 'ul',
 		disable1,
 		disable2,
-	} ) {
-		function refCallback1( value ) {
+	}: MergedRefsProps ) {
+		function refCallback1( value: HTMLElement | null ) {
 			refCallback1.history.push( value );
 			return () => {
 				refCallback1.history.push( 'cleanup' );
 			};
 		}
 
-		refCallback1.history = [];
+		refCallback1.history = [] as RefHistory;
 
-		function refCallback2( value ) {
+		function refCallback2( value: HTMLElement | null ) {
 			refCallback2.history.push( value );
 			return () => {
 				refCallback2.history.push( 'cleanup' );
 			};
 		}
 
-		refCallback2.history = [];
+		refCallback2.history = [] as RefHistory;
 
 		renderCallback( [ refCallback1.history, refCallback2.history ] );
 
 		const ref1 = useCallback( refCallback1, [] );
 		const ref2 = useCallback( refCallback2, [ count ] );
 		const mergedRefs = useMergeRefs( [
+			// @ts-expect-error `false` disables a ref at runtime.
 			! disable1 && ref1,
+			// @ts-expect-error `false` disables a ref at runtime.
 			! disable2 && ref2,
 		] );
 
@@ -459,7 +478,7 @@ describe( 'useMergeRefs with cleanup-returning ref callbacks', () => {
 	}
 
 	afterEach( () => {
-		renderCallback.history = [];
+		renderCallback.history = [] as RefHistory[][];
 	} );
 
 	it( 'should invoke cleanup on unmount instead of calling ref with null', () => {
@@ -598,20 +617,20 @@ describe( 'useMergeRefs with cleanup-returning ref callbacks', () => {
 
 	it( 'should support mixing a cleanup-returning ref with a void-returning ref', () => {
 		function MergedRefsMixed() {
-			function refCleanup( value ) {
+			function refCleanup( value: HTMLElement | null ) {
 				refCleanup.history.push( value );
 				return () => {
 					refCleanup.history.push( 'cleanup' );
 				};
 			}
 
-			refCleanup.history = [];
+			refCleanup.history = [] as RefHistory;
 
-			function refVoid( value ) {
+			function refVoid( value: HTMLElement | null ) {
 				refVoid.history.push( value );
 			}
 
-			refVoid.history = [];
+			refVoid.history = [] as RefHistory;
 
 			renderCallback( [ refCleanup.history, refVoid.history ] );
 
@@ -642,15 +661,17 @@ describe( 'useMergeRefs with cleanup-returning ref callbacks', () => {
 	it( 'should support mixing an object ref with a cleanup-returning ref', () => {
 		const objectRef = { current: null };
 
-		function MergedRefsMixed( { tagName: TagName = 'ul' } ) {
-			function refCleanup( value ) {
+		function MergedRefsMixed( {
+			tagName: TagName = 'ul',
+		}: Pick< MergedRefsProps, 'tagName' > ) {
+			function refCleanup( value: HTMLElement | null ) {
 				refCleanup.history.push( value );
 				return () => {
 					refCleanup.history.push( 'cleanup' );
 				};
 			}
 
-			refCleanup.history = [];
+			refCleanup.history = [] as RefHistory;
 
 			renderCallback( [ refCleanup.history ] );
 

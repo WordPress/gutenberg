@@ -5,7 +5,8 @@ import useDropZone from '../';
 
 describe( 'useDropZone', () => {
 	const ComponentWithWrapperDropZone = () => {
-		const [ dropZoneElement, setDropZoneElement ] = useState( null );
+		const [ dropZoneElement, setDropZoneElement ] =
+			useState< HTMLDivElement | null >( null );
 		const dropZoneRef = useDropZone( {
 			dropZoneElement,
 		} );

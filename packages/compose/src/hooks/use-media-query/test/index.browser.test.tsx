@@ -4,13 +4,13 @@ import { waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import useMediaQuery from '../';
 
-const TestComponent = ( { query } ) => {
+const TestComponent = ( { query }: { query?: string } ) => {
 	const queryResult = useMediaQuery( query );
 	return `useMediaQuery: ${ queryResult }`;
 };
 
 describe( 'useMediaQuery', () => {
-	let initialViewport;
+	let initialViewport: { width: number; height: number };
 
 	beforeAll( () => {
 		initialViewport = {
@@ -63,7 +63,12 @@ describe( 'useMediaQuery', () => {
 		// Query will be case to a boolean to simplify the return type.
 		expect( container ).toHaveTextContent( 'useMediaQuery: false' );
 
-		await rerender( <TestComponent query={ false } /> );
+		await rerender(
+			<TestComponent
+				// @ts-expect-error A non-string query is coerced to `false`.
+				query={ false }
+			/>
+		);
 
 		expect( container ).toHaveTextContent( 'useMediaQuery: false' );
 	} );

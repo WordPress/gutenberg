@@ -3,7 +3,11 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import useFocusOutside from '../';
 
-const FocusOutsideComponent = ( { onFocusOutside: callback } ) => (
+const FocusOutsideComponent = ( {
+	onFocusOutside: callback,
+}: {
+	onFocusOutside: Parameters< typeof useFocusOutside >[ 0 ];
+} ) => (
 	<div>
 		{ /* Wrapper */ }
 		<div { ...useFocusOutside( callback ) }>
@@ -111,7 +115,7 @@ describe( 'useFocusOutside', () => {
 	} );
 
 	it( 'should call handler when unmounting while queued', async () => {
-		let resolvePromise;
+		let resolvePromise!: ( value: unknown ) => void;
 		const promise = new Promise( ( resolve ) => {
 			resolvePromise = resolve;
 		} );

@@ -9,8 +9,8 @@ const TestComponent = () => {
 	return (
 		<div>
 			<input
-				value={ value }
-				onChange={ ( event ) => setValue( event.target.value ) }
+				value={ value as string }
+				onChange={ ( event ) => setValue( event.target.value, false ) }
 			/>
 			<button className="undo" onClick={ undo } disabled={ ! hasUndo }>
 				Undo

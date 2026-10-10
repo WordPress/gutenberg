@@ -4,18 +4,22 @@ import { forwardRef } from '@wordpress/element';
 import useDisabled from '../';
 
 describe( 'useDisabled', () => {
-	const Form = forwardRef( ( { showButton }, ref ) => {
-		return (
-			<form ref={ ref }>
-				<input />
-				<a href="https://wordpress.org/">A link</a>
-				<p role="document" contentEditable tabIndex="0"></p>
-				{ showButton && <button>Button</button> }
-			</form>
-		);
-	} );
+	type FormProps = { showButton?: boolean };
 
-	function DisabledComponent( props ) {
+	const Form = forwardRef< HTMLFormElement, FormProps >(
+		( { showButton }, ref ) => {
+			return (
+				<form ref={ ref }>
+					<input />
+					<a href="https://wordpress.org/">A link</a>
+					<p role="document" contentEditable tabIndex={ 0 }></p>
+					{ showButton && <button>Button</button> }
+				</form>
+			);
+		}
+	);
+
+	function DisabledComponent( props: FormProps ) {
 		const disabledRef = useDisabled();
 		return <Form ref={ disabledRef } { ...props } />;
 	}

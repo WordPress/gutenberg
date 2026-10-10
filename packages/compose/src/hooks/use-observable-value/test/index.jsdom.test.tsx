@@ -5,7 +5,7 @@ import useObservableValue from '..';
 
 describe( 'useObservableValue', () => {
 	test( 'reacts only to the specified key', () => {
-		const map = observableMap();
+		const map = observableMap< string, number >();
 		map.set( 'a', 1 );
 
 		const MapUI = vi.fn( () => {
