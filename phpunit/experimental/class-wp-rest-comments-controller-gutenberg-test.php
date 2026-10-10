@@ -553,6 +553,199 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Dispatch a note carrying one post-level suggestion operation.
+	 *
+	 * @param int   $post_id   Post ID.
+	 * @param array $operation The `post-attribute-set` operation.
+	 * @return WP_REST_Response The response.
+	 */
+	protected function create_post_field_suggestion( $post_id, $operation ) {
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'content' => '',
+					'type'    => 'note',
+					'author'  => get_current_user_id(),
+					'meta'    => array(
+						'_wp_suggestion' => wp_json_encode(
+							array(
+								'schemaVersion' => 2,
+								'blockName'     => '',
+								'baseRevision'  => null,
+								'operations'    => array(
+									array_merge(
+										array( 'type' => 'post-attribute-set' ),
+										$operation
+									),
+								),
+							)
+						),
+					),
+				)
+			)
+		);
+		return rest_get_server()->dispatch( $request );
+	}
+
+	/**
+	 * Test that the post fields Suggestion mode proposes are accepted.
+	 *
+	 * @dataProvider data_suggestable_post_fields
+	 *
+	 * @param array $operation The operation, without its type.
+	 */
+	public function test_create_note_with_suggestable_post_field( $operation ) {
+		wp_set_current_user( self::$editor_id );
+		register_post_meta(
+			'post',
+			'gutenberg_test_suggestable',
+			array(
+				'show_in_rest' => true,
+				'single'       => true,
+				'type'         => 'string',
+			)
+		);
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		$response = $this->create_post_field_suggestion( $post_id, $operation );
+
+		$this->assertSame( 201, $response->get_status() );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_suggestable_post_fields() {
+		return array(
+			'excerpt'         => array(
+				array(
+					'attribute' => 'excerpt',
+					'before'    => '',
+					'after'     => 'x',
+				),
+			),
+			'featured image'  => array(
+				array(
+					'attribute' => 'featured_media',
+					'before'    => 0,
+					'after'     => 5,
+				),
+			),
+			'categories'      => array(
+				array(
+					'attribute' => 'categories',
+					'before'    => array(),
+					'after'     => array( 1 ),
+				),
+			),
+			'registered meta' => array(
+				array(
+					'attribute' => 'meta',
+					'key'       => 'gutenberg_test_suggestable',
+					'before'    => '',
+					'after'     => 'x',
+				),
+			),
+		);
+	}
+
+	/**
+	 * Test that a suggestion for a post field Suggestion mode cannot
+	 * propose, or for a meta key the suggester could not edit, is refused.
+	 *
+	 * @dataProvider data_unsuggestable_post_fields
+	 *
+	 * @param array $operation The operation, without its type.
+	 */
+	public function test_cannot_create_note_with_unsuggestable_post_field( $operation ) {
+		wp_set_current_user( self::$editor_id );
+		register_post_meta(
+			'post',
+			'gutenberg_test_hidden',
+			array(
+				'show_in_rest' => false,
+				'single'       => true,
+				'type'         => 'string',
+			)
+		);
+		register_post_meta(
+			'post',
+			'_gutenberg_test_protected',
+			array(
+				'show_in_rest'  => true,
+				'single'        => true,
+				'type'          => 'string',
+				'auth_callback' => '__return_false',
+			)
+		);
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		$response = $this->create_post_field_suggestion( $post_id, $operation );
+
+		$this->assertErrorResponse( 'rest_invalid_suggestion', $response, 400 );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_unsuggestable_post_fields() {
+		return array(
+			'status'             => array(
+				array(
+					'attribute' => 'status',
+					'before'    => 'draft',
+					'after'     => 'publish',
+				),
+			),
+			'author'             => array(
+				array(
+					'attribute' => 'author',
+					'before'    => 1,
+					'after'     => 2,
+				),
+			),
+			'unregistered meta'  => array(
+				array(
+					'attribute' => 'meta',
+					'key'       => 'gutenberg_test_unregistered',
+					'before'    => '',
+					'after'     => 'x',
+				),
+			),
+			'meta not in REST'   => array(
+				array(
+					'attribute' => 'meta',
+					'key'       => 'gutenberg_test_hidden',
+					'before'    => '',
+					'after'     => 'x',
+				),
+			),
+			'meta not editable'  => array(
+				array(
+					'attribute' => 'meta',
+					'key'       => '_gutenberg_test_protected',
+					'before'    => '',
+					'after'     => 'x',
+				),
+			),
+			'meta without a key' => array(
+				array(
+					'attribute' => 'meta',
+					'before'    => '',
+					'after'     => 'x',
+				),
+			),
+		);
+	}
+
+	/**
 	 * Test that a user without `unfiltered_html` has script markup stripped
 	 * from the applied fields of a suggestion payload at write time. The
 	 * `after` value is what a reviewer's accept writes into block attributes,
