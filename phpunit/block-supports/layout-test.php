@@ -71,7 +71,10 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Turns on the grid interactivity experiment, on top of the experiments the test suite enables.
+	 * Turns on the grid interactivity experiment. It runs after the test suite's own
+	 * `pre_option_gutenberg-experiments` filter, so it keeps the experiments that filter
+	 * returns; when another test has removed it, the filter receives `false` and grid
+	 * interactivity is the only experiment on.
 	 *
 	 * @param mixed $experiments The `gutenberg-experiments` option.
 	 * @return array The experiments, with grid interactivity turned on.
@@ -1675,6 +1678,97 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		$this->assertSame(
 			'.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, auto));}',
 			$layout_styles
+		);
+	}
+
+	/**
+	 * Check that same-size cells are only output for manual placement grids with the grid
+	 * interactivity experiment on, and that the grid is only sized by its width when it has
+	 * no minimum column width.
+	 *
+	 * @dataProvider data_gutenberg_get_layout_style_same_size_cells
+	 *
+	 * @covers ::gutenberg_get_layout_style
+	 *
+	 * @param bool       $experiment_enabled Whether the grid interactivity experiment is on.
+	 * @param array      $layout             The grid's layout.
+	 * @param array|null $viewport_overrides Viewport layout overrides, or null for the default viewport.
+	 * @param string     $expected_output    The expected CSS.
+	 */
+	public function test_gutenberg_get_layout_style_same_size_cells( $experiment_enabled, $layout, $viewport_overrides, $expected_output ) {
+		if ( $experiment_enabled ) {
+			add_filter( 'pre_option_gutenberg-experiments', array( $this, 'filter_enable_grid_interactivity' ), 11 );
+		}
+
+		$options = null === $viewport_overrides ? array() : array( 'viewport_overrides' => $viewport_overrides );
+
+		$this->assertSame(
+			$expected_output,
+			gutenberg_get_layout_style( '.wp-layout', $layout, false, null, false, '0.5em', null, $options )
+		);
+	}
+
+	/**
+	 * Data provider for test_gutenberg_get_layout_style_same_size_cells().
+	 *
+	 * @return array
+	 */
+	public function data_gutenberg_get_layout_style_same_size_cells() {
+		$manual_layout = array(
+			'type'              => 'grid',
+			'columnCount'       => 3,
+			'rowCount'          => 2,
+			'isManualPlacement' => true,
+		);
+		$auto_layout   = array(
+			'type'        => 'grid',
+			'columnCount' => 3,
+			'rowCount'    => 2,
+		);
+
+		return array(
+			'manual grid, experiment on, viewport column count' => array(
+				'experiment_enabled' => true,
+				'layout'             => $manual_layout,
+				'viewport_overrides' => array( 'columnCount' => 1 ),
+				'expected_output'    => '.wp-layout{grid-template-columns:repeat(1, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);aspect-ratio:1 / 2;min-height:0;}',
+			),
+			'manual grid, experiment off, viewport column count' => array(
+				'experiment_enabled' => false,
+				'layout'             => $manual_layout,
+				'viewport_overrides' => array( 'columnCount' => 1 ),
+				'expected_output'    => '.wp-layout{grid-template-columns:repeat(1, minmax(0, 1fr));}',
+			),
+			'auto grid, experiment on' => array(
+				'experiment_enabled' => true,
+				'layout'             => $auto_layout,
+				'viewport_overrides' => null,
+				'expected_output'    => '.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, auto));}',
+			),
+			'auto grid, experiment on, viewport column count' => array(
+				'experiment_enabled' => true,
+				'layout'             => $auto_layout,
+				'viewport_overrides' => array( 'columnCount' => 1 ),
+				'expected_output'    => '.wp-layout{grid-template-columns:repeat(1, minmax(0, 1fr));}',
+			),
+			'auto grid, experiment off, viewport column count' => array(
+				'experiment_enabled' => false,
+				'layout'             => $auto_layout,
+				'viewport_overrides' => array( 'columnCount' => 1 ),
+				'expected_output'    => '.wp-layout{grid-template-columns:repeat(1, minmax(0, 1fr));}',
+			),
+			'manual grid with a minimum column width, experiment on' => array(
+				'experiment_enabled' => true,
+				'layout'             => array_merge( $manual_layout, array( 'minimumColumnWidth' => '12rem' ) ),
+				'viewport_overrides' => null,
+				'expected_output'    => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(max(min(12rem, 100%), (100% - (0.5em * (3 - 1))) /3), 1fr));container-type:inline-size;grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);}',
+			),
+			'manual grid, experiment on, viewport minimum column width' => array(
+				'experiment_enabled' => true,
+				'layout'             => $manual_layout,
+				'viewport_overrides' => array( 'minimumColumnWidth' => '12rem' ),
+				'expected_output'    => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(max(min(12rem, 100%), (100% - (0.5em * (3 - 1))) /3), 1fr));container-type:inline-size;grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);aspect-ratio:auto;min-height:auto;}',
+			),
 		);
 	}
 }

@@ -143,15 +143,27 @@ export function useEventHandlers( { clientId, isSelected } ) {
 					const originalOpacity = node.style.opacity;
 					node.style.opacity = '0.5';
 
+					// The grid's drop layer is in the editor's document,
+					// outside the canvas, and a drop there can re-render the
+					// block, after which its `dragend` no longer reaches the
+					// canvas. The drag ends on whichever comes first.
+					const endTargets = new Set( [
+						ownerDocument,
+						document,
+						node,
+					] );
+
 					function endGridDrag() {
-						ownerDocument.removeEventListener(
-							'dragend',
-							endGridDrag
-						);
-						ownerDocument.removeEventListener(
-							'drop',
-							endGridDrag
-						);
+						for ( const endTarget of endTargets ) {
+							endTarget.removeEventListener(
+								'dragend',
+								endGridDrag
+							);
+							endTarget.removeEventListener(
+								'drop',
+								endGridDrag
+							);
+						}
 						node.style.opacity = originalOpacity;
 						dragElement.remove();
 						stopDraggingBlocks();
@@ -163,8 +175,10 @@ export function useEventHandlers( { clientId, isSelected } ) {
 						);
 					}
 
-					ownerDocument.addEventListener( 'dragend', endGridDrag );
-					ownerDocument.addEventListener( 'drop', endGridDrag );
+					for ( const endTarget of endTargets ) {
+						endTarget.addEventListener( 'dragend', endGridDrag );
+						endTarget.addEventListener( 'drop', endGridDrag );
+					}
 					startDraggingBlocks( [ clientId ] );
 					document.body.classList.add(
 						'is-dragging-components-draggable'
