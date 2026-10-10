@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0cf149c16028f83c20563e8d9466a842",
+    "content-hash": "77516059d8dedfbc7168fce9a7574aba",
     "packages": [
         {
             "name": "composer/installers",
@@ -1932,12 +1932,12 @@
             "version": "3.5.8",
             "source": {
                 "type": "git",
-                "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
+                "url": "https://github.com/PHPCSStandards/PHP_CodeSniffer.git",
                 "reference": "9d583721a7157ee997f235f327de038e7ea6dac4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/9d583721a7157ee997f235f327de038e7ea6dac4",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/9d583721a7157ee997f235f327de038e7ea6dac4",
                 "reference": "9d583721a7157ee997f235f327de038e7ea6dac4",
                 "shasum": ""
             },
@@ -2270,7 +2270,12 @@
     "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": {},
+    "platform": {
+        "php": ">=5.6.20"
+    },
     "platform-dev": {},
+    "platform-overrides": {
+        "php": "7.4"
+    },
     "plugin-api-version": "2.9.0"
 }
