@@ -60,6 +60,43 @@ test.describe( 'Navigation block: Auto add pages', () => {
 		expect( updatedMenu.content.raw ).toContain( `"id":${ contact.id }` );
 	} );
 
+	test( 'a navigation block in the editor shows the new link once the page is published', async ( {
+		admin,
+		editor,
+		requestUtils,
+	} ) => {
+		const menu = await requestUtils.createNavigationMenu( {
+			title: 'Main menu',
+			content:
+				'<!-- wp:navigation-link {"label":"Home","url":"https://example.com","kind":"custom"} /-->',
+			meta: { [ META_KEY ]: true },
+		} );
+
+		await admin.createNewPost( {
+			postType: 'page',
+			title: 'Auto added page',
+		} );
+		await editor.insertBlock( {
+			name: 'core/navigation',
+			attributes: { ref: menu.id },
+		} );
+
+		const navigationBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Navigation',
+		} );
+		await expect( navigationBlock ).toContainText( 'Home' );
+
+		await editor.publishPost();
+
+		// The server appended the link; the block must pick it up without a
+		// reload.
+		await expect(
+			navigationBlock.getByRole( 'document', {
+				name: 'Block: Page Link',
+			} )
+		).toContainText( 'Auto added page', { timeout: 10000 } );
+	} );
+
 	test( 'the setting can be turned off from the block settings', async ( {
 		admin,
 		editor,

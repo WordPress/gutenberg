@@ -242,22 +242,36 @@ export const getEntityRecord =
 		}
 	};
 
-// Whenever a template is saved, the active templates might be updated, so
-// invalidate the site settings when a template is updated or deleted.
 getEntityRecord.shouldInvalidate = ( action, kind, name ) => {
-	return (
-		kind === 'root' &&
-		name === 'site' &&
-		( ( action.type === 'RECEIVE_ITEMS' &&
-			// Making sure persistedEdits is set seems to be the only way of
-			// knowing whether it's an update or fetch. Only an update would
-			// have persistedEdits.
-			action.persistedEdits &&
-			action.persistedEdits.status !== 'auto-draft' ) ||
-			action.type === 'REMOVE_ITEMS' ) &&
-		action.kind === 'postType' &&
-		action.name === 'wp_template'
-	);
+	// Whenever a template is saved, the active templates might be updated, so
+	// invalidate the site settings when a template is updated or deleted.
+	if ( kind === 'root' && name === 'site' ) {
+		return (
+			( ( action.type === 'RECEIVE_ITEMS' &&
+				// Making sure persistedEdits is set seems to be the only way of
+				// knowing whether it's an update or fetch. Only an update would
+				// have persistedEdits.
+				action.persistedEdits &&
+				action.persistedEdits.status !== 'auto-draft' ) ||
+				action.type === 'REMOVE_ITEMS' ) &&
+			action.kind === 'postType' &&
+			action.name === 'wp_template'
+		);
+	}
+
+	// Publishing a page appends a link to every Navigation Menu with "Auto add
+	// pages" switched on, so the menus held in the store are stale as soon as
+	// the page save is received.
+	if ( kind === 'postType' && name === 'wp_navigation' ) {
+		return (
+			action.type === 'RECEIVE_ITEMS' &&
+			action.kind === 'postType' &&
+			action.name === 'page' &&
+			action.persistedEdits?.status === 'publish'
+		);
+	}
+
+	return false;
 };
 
 /**
