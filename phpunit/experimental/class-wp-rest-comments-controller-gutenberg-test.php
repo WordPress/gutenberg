@@ -651,6 +651,26 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 					'after'     => 'x',
 				),
 			),
+			'new tag'         => array(
+				array(
+					'attribute' => 'tags',
+					'before'    => array(),
+					'after'     => array( array( 'name' => 'Fresh' ) ),
+				),
+			),
+			'new subcategory' => array(
+				array(
+					'attribute' => 'categories',
+					'before'    => array( 1 ),
+					'after'     => array(
+						1,
+						array(
+							'name'   => 'Fresh',
+							'parent' => 1,
+						),
+					),
+				),
+			),
 		);
 	}
 
@@ -742,7 +762,83 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 					'after'     => 'x',
 				),
 			),
+			'term not an id'     => array(
+				array(
+					'attribute' => 'tags',
+					'before'    => array(),
+					'after'     => array( 'Fresh' ),
+				),
+			),
+			'terms not a list'   => array(
+				array(
+					'attribute' => 'tags',
+					'before'    => array(),
+					'after'     => 'Fresh',
+				),
+			),
+			'new term unnamed'   => array(
+				array(
+					'attribute' => 'tags',
+					'before'    => array(),
+					'after'     => array( array( 'name' => '  ' ) ),
+				),
+			),
+			'flat term parent'   => array(
+				array(
+					'attribute' => 'tags',
+					'before'    => array(),
+					'after'     => array(
+						array(
+							'name'   => 'Fresh',
+							'parent' => 1,
+						),
+					),
+				),
+			),
+			'unknown parent'     => array(
+				array(
+					'attribute' => 'categories',
+					'before'    => array(),
+					'after'     => array(
+						array(
+							'name'   => 'Fresh',
+							'parent' => 999999,
+						),
+					),
+				),
+			),
 		);
+	}
+
+	/**
+	 * Test that a suggested new term is stored with a sanitized name, and
+	 * that suggesting it creates nothing: a suggester who cannot create
+	 * terms may still propose one, for a reviewer to create on accept.
+	 */
+	public function test_suggested_new_term_is_sanitized_and_not_created() {
+		wp_set_current_user( self::$author_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
+		$this->assertFalse( current_user_can( 'manage_categories' ) );
+
+		$response = $this->create_post_field_suggestion(
+			$post_id,
+			array(
+				'attribute' => 'categories',
+				'before'    => array(),
+				'after'     => array( array( 'name' => ' <b>Fresh</b> news ' ) ),
+			)
+		);
+
+		$this->assertSame( 201, $response->get_status() );
+		$payload = json_decode(
+			get_comment_meta( $response->get_data()['id'], '_wp_suggestion', true ),
+			true
+		);
+		$this->assertSame(
+			array( array( 'name' => 'Fresh news' ) ),
+			$payload['operations'][0]['after']
+		);
+		$this->assertEmpty( term_exists( 'Fresh news', 'category' ) );
 	}
 
 	/**

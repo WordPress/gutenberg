@@ -257,7 +257,8 @@ function gutenberg_validate_suggestion_post_operations( $prepared_comment, $requ
 		array( 'status' => 400 )
 	);
 
-	foreach ( $payload['operations'] as $operation ) {
+	$sanitized = false;
+	foreach ( $payload['operations'] as $index => $operation ) {
 		if ( ! is_array( $operation ) || ! isset( $operation['type'] ) || 'post-attribute-set' !== $operation['type'] ) {
 			continue;
 		}
@@ -275,19 +276,85 @@ function gutenberg_validate_suggestion_post_operations( $prepared_comment, $requ
 			}
 			continue;
 		}
-		$is_taxonomy = false;
+		$suggested_taxonomy = null;
 		foreach ( get_object_taxonomies( $post->post_type, 'objects' ) as $taxonomy ) {
 			if ( ! empty( $taxonomy->show_in_rest ) && ( $taxonomy->rest_base ? $taxonomy->rest_base : $taxonomy->name ) === $attribute ) {
-				$is_taxonomy = true;
+				$suggested_taxonomy = $taxonomy;
 				break;
 			}
 		}
-		if ( ! $is_taxonomy ) {
+		if ( ! $suggested_taxonomy ) {
 			return $error;
+		}
+		$after = isset( $operation['after'] ) ? $operation['after'] : array();
+		$terms = gutenberg_sanitize_suggested_terms( $after, $suggested_taxonomy );
+		if ( null === $terms ) {
+			return $error;
+		}
+		if ( $terms !== $after ) {
+			$payload['operations'][ $index ]['after'] = $terms;
+			$sanitized                                = true;
 		}
 	}
 
+	// Store the sanitized new term names, not the ones sent.
+	if ( $sanitized ) {
+		$meta['_wp_suggestion'] = wp_json_encode( $payload );
+		$request->set_param( 'meta', $meta );
+	}
+
 	return $prepared_comment;
+}
+
+/**
+ * Validates and sanitizes the terms a terms suggestion proposes.
+ *
+ * Each entry is either the id of a term to assign, or a term that does not
+ * exist yet, as `{ name, parent? }`: Suggestion mode never writes to a
+ * taxonomy, so a new term rides on the suggestion and is only created when a
+ * reviewer accepts it, through the normal term permissions. The suggester
+ * therefore needs no capability to create terms. A new term's name is
+ * sanitized, and a parent is only accepted for a hierarchical taxonomy, as
+ * the id of an existing term in it.
+ *
+ * @param mixed       $terms    The proposed terms.
+ * @param WP_Taxonomy $taxonomy The taxonomy they belong to.
+ * @return array|null The sanitized terms, or null if an entry is invalid.
+ */
+function gutenberg_sanitize_suggested_terms( $terms, $taxonomy ) {
+	if ( ! wp_is_numeric_array( $terms ) ) {
+		return null;
+	}
+	$sanitized = array();
+	foreach ( $terms as $term ) {
+		if ( is_int( $term ) && $term > 0 ) {
+			$sanitized[] = $term;
+			continue;
+		}
+		if ( ! is_array( $term ) || ! isset( $term['name'] ) || ! is_string( $term['name'] ) ) {
+			return null;
+		}
+		$name = sanitize_text_field( $term['name'] );
+		if ( '' === $name ) {
+			return null;
+		}
+		$new_term = array( 'name' => $name );
+		if ( isset( $term['parent'] ) ) {
+			$parent = $term['parent'];
+			if ( ! $taxonomy->hierarchical || ! is_int( $parent ) || $parent < 0 ) {
+				return null;
+			}
+			if ( $parent > 0 ) {
+				$parent_term = get_term( $parent, $taxonomy->name );
+				if ( ! $parent_term instanceof WP_Term ) {
+					return null;
+				}
+				$new_term['parent'] = $parent;
+			}
+		}
+		$sanitized[] = $new_term;
+	}
+	return $sanitized;
 }
 add_filter( 'rest_preprocess_comment', 'gutenberg_validate_suggestion_post_operations', 10, 2 );
 
