@@ -324,6 +324,11 @@
 	white-space: nowrap;
 	pointer-events: none;
 
+	// Match the outline color of synced blocks (template parts, synced patterns).
+	&.is-synced {
+		background: var(--wp-block-synced-color);
+	}
+
 	&.is-inside {
 		bottom: auto;
 		top: 0;

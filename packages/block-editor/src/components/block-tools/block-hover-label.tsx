@@ -128,6 +128,7 @@ export default function BlockHoverLabel( {
 					'block-editor-block-list__block-hover-label',
 					{
 						'is-inside': ! fitsAbove,
+						'is-synced': blockInformation?.isSynced,
 					}
 				) }
 			>
