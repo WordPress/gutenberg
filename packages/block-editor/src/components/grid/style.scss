@@ -418,3 +418,73 @@
 	}
 }
 
+
+.block-editor-grid-item-handles {
+	// Specificity to override the z-index and pointer-events set by .components-popover.
+	&.block-editor-grid-item-handles.block-editor-grid-item-handles {
+		z-index: z-index(".block-editor-grid-visualizer");
+
+		.components-popover__content * {
+			pointer-events: none;
+		}
+
+		.block-editor-grid-item-handles__rotate,
+		.block-editor-grid-item-handles__rotate * {
+			pointer-events: all;
+		}
+	}
+}
+
+.block-editor-grid-item-handles__box {
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+
+.block-editor-grid-item-handles__rotate {
+	position: absolute;
+	bottom: -$grid-unit-40;
+	left: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: $grid-unit-30;
+	height: $grid-unit-30;
+	margin-left: -$grid-unit-15;
+	border-radius: 50%;
+	background: $white;
+	color: $gray-900;
+	box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color), $elevation-x-small;
+	cursor: grab;
+	touch-action: none;
+
+	&:active {
+		cursor: grabbing;
+	}
+
+	// Connects the handle to the block.
+	&::before {
+		content: "";
+		position: absolute;
+		bottom: 100%;
+		left: 50%;
+		width: $border-width;
+		height: $grid-unit-10;
+		background: var(--wp-admin-theme-color);
+	}
+}
+
+.block-editor-grid-item-handles__angle {
+	position: absolute;
+	bottom: -$grid-unit-80;
+	left: 50%;
+	margin-left: -$grid-unit-30;
+	width: $grid-unit-60;
+	padding: 2px 0;
+	border-radius: $radius-small;
+	background: $gray-900;
+	color: $white;
+	font-family: $default-font;
+	font-size: $helptext-font-size;
+	text-align: center;
+}

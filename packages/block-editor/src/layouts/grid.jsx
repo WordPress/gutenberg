@@ -461,8 +461,8 @@ export default {
 	 * Gets the CSS that stacks the children of a manual placement grid on
 	 * mobile, as part of the grid interactivity experiment, unless the grid
 	 * has opted out with `stackOnMobile: false`. Each child becomes full
-	 * width, in block order, and keeps its row span, which it publishes as
-	 * `--wp--grid-item--row-span`.
+	 * width, in block order, and unrotated, and keeps its row span, which it
+	 * publishes as `--wp--grid-item--row-span`.
 	 *
 	 * @param {Object} options
 	 * @param {string} options.selector The grid's CSS selector.
@@ -488,12 +488,23 @@ export default {
 			.split( ',' )
 			.map( ( subselector ) => `${ subselector }${ subselector } > *` )
 			.join( ',' );
+		// The image itself, linked or not, as in the rules that make images
+		// cover their cells.
+		const imageSelector = [
+			appendSelectors( gridSelector, '> .wp-block-image > img' ),
+			appendSelectors( gridSelector, '> .wp-block-image > a > img' ),
+		].join( ',' );
 		// Stacked blocks are sized by their content again, so the grid stops
-		// taking its height from its width and its rows stop being the same
-		// height.
+		// taking its height from its width, its rows stop being the same
+		// height, and images keep their own size instead of covering cells.
 		return (
 			`${ gridSelector } { aspect-ratio: auto; grid-template-rows: none; grid-auto-rows: auto; }` +
-			`${ childSelector } { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); }`
+			`${ childSelector } { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); rotate: none; }` +
+			`${ appendSelectors(
+				gridSelector,
+				'> .wp-block-image'
+			) } { display: block; }` +
+			`${ imageSelector } { width: auto; height: auto; }`
 		);
 	},
 	getOrientation() {

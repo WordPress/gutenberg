@@ -463,7 +463,7 @@ describe( 'getMobileStackingStyle', () => {
 		window.__experimentalEnableGridInteractivity = originalExperiment;
 	} );
 
-	it( 'stacks the children of manual placement grids, keeping their row spans', () => {
+	it( 'stacks the children of manual placement grids, unrotated and keeping their row spans', () => {
 		expect(
 			grid.getMobileStackingStyle( {
 				selector: '.my-container',
@@ -471,7 +471,9 @@ describe( 'getMobileStackingStyle', () => {
 			} )
 		).toBe(
 			'.my-container.my-container { aspect-ratio: auto; grid-template-rows: none; grid-auto-rows: auto; }' +
-				'.my-container.my-container > * { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); }'
+				'.my-container.my-container > * { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); rotate: none; }' +
+				'.my-container.my-container > .wp-block-image { display: block; }' +
+				'.my-container.my-container > .wp-block-image > img,.my-container.my-container > .wp-block-image > a > img { width: auto; height: auto; }'
 		);
 	} );
 

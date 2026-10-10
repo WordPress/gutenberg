@@ -1,6 +1,8 @@
 import { setImmutably } from '../../utils/object';
+import { getRotateForState, getUpdatedRotateStyle } from '../../hooks/rotate';
 
 const MOBILE_VIEWPORT = '@mobile';
+const MOBILE_STATE = { viewport: MOBILE_VIEWPORT };
 
 /**
  * Returns whether a grid stacks its children on mobile. Manual placement grids
@@ -31,7 +33,8 @@ export function isGridStackedOnMobile( layout, style ) {
  * The grid stops stacking on mobile and gets a mobile column and row count.
  * Each child gets a mobile override that matches its place in the stack: the
  * full width of the grid, one after another in block order, keeping its row
- * span.
+ * span. A child rotated on mobile gets a mobile rotation of 0, since stacked
+ * blocks are shown unrotated.
  *
  * @param {Object}                                        options
  * @param {string}                                        options.gridClientId   Client ID of the grid.
@@ -57,15 +60,17 @@ export function getUnstackedMobileUpdates( {
 	for ( const { clientId, attributes } of children ) {
 		const style = attributes?.style ?? {};
 		const rowSpan = style.layout?.rowSpan ?? 1;
-		updates[ clientId ] = {
-			style: setImmutably( style, [ MOBILE_VIEWPORT, 'layout' ], {
-				...style[ MOBILE_VIEWPORT ]?.layout,
-				columnStart: 1,
-				columnSpan: columnCount,
-				rowStart: row,
-				rowSpan,
-			} ),
-		};
+		let nextStyle = setImmutably( style, [ MOBILE_VIEWPORT, 'layout' ], {
+			...style[ MOBILE_VIEWPORT ]?.layout,
+			columnStart: 1,
+			columnSpan: columnCount,
+			rowStart: row,
+			rowSpan,
+		} );
+		if ( getRotateForState( style, MOBILE_STATE ) ) {
+			nextStyle = getUpdatedRotateStyle( nextStyle, 0, MOBILE_STATE );
+		}
+		updates[ clientId ] = { style: nextStyle };
 		row += rowSpan;
 	}
 

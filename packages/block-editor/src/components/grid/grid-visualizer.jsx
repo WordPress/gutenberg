@@ -471,8 +471,9 @@ function GridVisualizerDropLayer( {
 		const layerRect = layer.getBoundingClientRect();
 		const scale = layer.offsetWidth / layerRect.width || 1;
 		// The pointer is the center of the block, measured by the area it
-		// takes up in the grid. Blocks dragged in from elsewhere are the size
-		// of the cells they span, up to the size of the grid.
+		// takes up in the grid, without its rotation, so a rotated block lands
+		// by the cells it takes up. Blocks dragged in from elsewhere are the
+		// size of the cells they span, up to the size of the grid.
 		const landing = getGridDropTarget( {
 			x: ( event.clientX - layerRect.left ) * scale,
 			y: ( event.clientY - layerRect.top ) * scale,

@@ -1476,9 +1476,10 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		/*
 		 * Manual placement grids stack their children on mobile, as part of the grid
 		 * interactivity experiment, unless they opt out with `stackOnMobile: false`: each
-		 * child becomes full width, in block order, and keeps the row span it publishes as
-		 * `--wp--grid-item--row-span`. The selector is repeated so that the rules beat the
-		 * grid's and each child's own rules, whatever order the stylesheets end up in.
+		 * child becomes full width, in block order, and unrotated, and keeps the row span
+		 * it publishes as `--wp--grid-item--row-span`. The selector is repeated so that
+		 * the rules beat the grid's and each child's own rules, such as rotation, whatever
+		 * order the stylesheets end up in.
 		 */
 		$mobile_media_query = $responsive_media_queries['@mobile'] ?? null;
 		$mobile_layout      = array_replace(
@@ -1492,12 +1493,13 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			false !== ( $mobile_layout['stackOnMobile'] ?? true ) &&
 			gutenberg_is_experiment_enabled( 'gutenberg-grid-interactivity' )
 		) {
-			// Stacked blocks are sized by their content again.
-			$stacking_styles = gutenberg_style_engine_get_stylesheet_from_css_rules(
+			// Stacked blocks are sized by their content again, images included.
+			$stacking_selector = ".$container_class.$container_class";
+			$stacking_styles   = gutenberg_style_engine_get_stylesheet_from_css_rules(
 				array(
 					array(
 						'rules_group'  => $mobile_media_query,
-						'selector'     => ".$container_class.$container_class",
+						'selector'     => $stacking_selector,
 						'declarations' => array(
 							'aspect-ratio'       => 'auto',
 							'grid-template-rows' => 'none',
@@ -1506,10 +1508,25 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 					),
 					array(
 						'rules_group'  => $mobile_media_query,
-						'selector'     => ".$container_class.$container_class > *",
+						'selector'     => "$stacking_selector > *",
 						'declarations' => array(
 							'grid-column' => '1 / -1',
 							'grid-row'    => 'span var(--wp--grid-item--row-span, 1)',
+							'rotate'      => 'none',
+						),
+					),
+					array(
+						'rules_group'  => $mobile_media_query,
+						'selector'     => "$stacking_selector > .wp-block-image",
+						'declarations' => array( 'display' => 'block' ),
+					),
+					array(
+						'rules_group'  => $mobile_media_query,
+						// The image itself, linked or not, as in the rules that make images cover their cells.
+						'selector'     => "$stacking_selector > .wp-block-image > img, $stacking_selector > .wp-block-image > a > img",
+						'declarations' => array(
+							'width'  => 'auto',
+							'height' => 'auto',
 						),
 					),
 				),
