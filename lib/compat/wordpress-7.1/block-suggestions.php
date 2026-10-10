@@ -1060,8 +1060,8 @@ add_filter( 'render_block', 'gutenberg_strip_inline_suggestion_markers' );
  * post's text onto that page:
  *
  * - the note is on the post whose content is being rendered,
- * - that post's stored content (or, in a preview, the current user's autosave
- *   of it) holds a marker for the note,
+ * - that post's stored content (or, in a preview by a user who can edit the
+ *   post, that user's autosave of it) holds a marker for the note,
  * - the post is not password protected, or its password was given,
  * - the note is not trashed or marked as spam,
  * - the suggestion is neither applied nor rejected.
@@ -1093,7 +1093,10 @@ function gutenberg_get_pending_format_suggestion_html( $note_id, $post_id ) {
 	}
 	$needle   = 'data-suggestion-id="' . $note_id . '"';
 	$contents = array( $post->post_content );
-	if ( is_preview() ) {
+	// Anyone can add `?preview=true`, and `wp_get_post_autosave()` for user 0
+	// returns any user's autosave, so only a user who can edit the post (as
+	// a real preview requires) has their autosave consulted.
+	if ( is_preview() && current_user_can( 'edit_post', $post_id ) ) {
 		$autosave = wp_get_post_autosave( $post_id, get_current_user_id() );
 		if ( $autosave ) {
 			$contents[] = $autosave->post_content;

@@ -135,4 +135,62 @@ class Tests_Suggestion_Note_Scope extends WP_UnitTestCase {
 		$this->assertSame( 'Hello original', trim( $excerpt ) );
 		$this->assertEmpty( $GLOBALS['gutenberg_suggestion_content_owners'], 'The owner stack is balanced.' );
 	}
+
+	/**
+	 * Renders content as the given post's, in a preview request.
+	 *
+	 * @param int    $post_id Post being rendered.
+	 * @param string $content Content to render.
+	 * @return string Rendered content.
+	 */
+	private function render_preview( $post_id, $content ) {
+		$GLOBALS['post']                 = get_post( $post_id );
+		$GLOBALS['wp_query']->is_preview = true;
+		$rendered                        = apply_filters( 'the_content', $content );
+		$GLOBALS['wp_query']->is_preview = false;
+		return $rendered;
+	}
+
+	/**
+	 * Creates a post whose saved content has no marker for a note, while an
+	 * editor's autosave of it does.
+	 *
+	 * @return int[] Post ID and note ID.
+	 */
+	private function create_post_with_marker_only_in_an_autosave() {
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id = $this->create_format_note( $post_id, 'UNSAVED ORIGINAL' );
+		$this->set_post_content( $post_id, $this->paragraph( 'Saved' ) );
+		wp_set_current_user( self::$editor_id );
+		_wp_put_post_revision(
+			array(
+				'ID'           => $post_id,
+				'post_title'   => 'Autosave',
+				'post_content' => $this->paragraph( 'Draft ' . $this->format_marker( $note_id, 'run' ) ),
+				'post_type'    => 'post',
+				'post_author'  => self::$editor_id,
+			),
+			true
+		);
+		return array( $post_id, $note_id );
+	}
+
+	public function test_a_logged_out_preview_does_not_read_any_users_autosave() {
+		list( $post_id, $note_id ) = $this->create_post_with_marker_only_in_an_autosave();
+		wp_set_current_user( 0 );
+
+		$rendered = $this->render_preview( $post_id, $this->paragraph( 'Draft ' . $this->format_marker( $note_id, 'run' ) ) );
+
+		$this->assertStringNotContainsString( 'UNSAVED ORIGINAL', $rendered );
+		$this->assertStringContainsString( 'Draft run', $rendered );
+	}
+
+	public function test_an_editors_preview_reads_their_own_autosave() {
+		list( $post_id, $note_id ) = $this->create_post_with_marker_only_in_an_autosave();
+		wp_set_current_user( self::$editor_id );
+
+		$rendered = $this->render_preview( $post_id, $this->paragraph( 'Draft ' . $this->format_marker( $note_id, 'run' ) ) );
+
+		$this->assertStringContainsString( 'Draft UNSAVED ORIGINAL', $rendered );
+	}
 }
