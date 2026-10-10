@@ -85,7 +85,7 @@ function carriesId(
  * carries every attribute value in `match`.
  *
  * @param stack       Formats applied to one character.
- * @param formatType  Rich-text format type to match.
+ * @param formatType  Rich-text format type or types to match.
  * @param idAttribute Marker attribute holding the id.
  * @param target      Marker id, as a string.
  * @param match       Attribute values to require; none means any marker.
@@ -93,7 +93,7 @@ function carriesId(
  */
 function matchesAttributes(
 	stack: any[] | undefined,
-	formatType: string,
+	formatType: MarkerFormatType,
 	idAttribute: string,
 	target: string,
 	match?: Record< string, string >
@@ -103,7 +103,7 @@ function matchesAttributes(
 	}
 	return !! stack?.some(
 		( f: any ) =>
-			f.type === formatType &&
+			isMarkerFormat( f, formatType ) &&
 			f.attributes?.[ idAttribute ] === target &&
 			Object.entries( match ).every(
 				( [ key, expected ] ) => f.attributes[ key ] === expected

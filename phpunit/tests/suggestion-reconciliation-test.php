@@ -79,7 +79,7 @@ class Tests_Suggestion_Reconciliation extends WP_UnitTestCase {
 
 	private function mark( $note_id, $type, $text, $author = 0 ) {
 		$author = $author ? $author : self::$author_id;
-		return '<mark class="wp-suggestion" data-suggestion-id="' . $note_id . '" data-suggestion-type="' . $type . '" data-author="' . $author . '">' . $text . '</mark>';
+		return '<mark class="wp-suggestion-' . $type . '" data-suggestion-id="' . $note_id . '" data-suggestion-type="' . $type . '" data-author="' . $author . '">' . $text . '</mark>';
 	}
 
 	private function create_post( $content = '' ) {
@@ -374,7 +374,7 @@ class Tests_Suggestion_Reconciliation extends WP_UnitTestCase {
 		$post_id = $this->create_post( '' );
 		$parent  = $this->create_note( $post_id, $this->inline_op(), 'rejected-unsaved', self::$editor_id );
 		$child   = $this->create_note( $post_id, $this->inline_op() );
-		$nested  = '<mark class="wp-suggestion" data-suggestion-id="' . $parent . '" data-suggestion-type="add" data-author="' . self::$editor_id . '">new ' . $this->mark( $child, 'del', 'words' ) . '</mark>';
+		$nested  = '<mark class="wp-suggestion-add" data-suggestion-id="' . $parent . '" data-suggestion-type="add" data-author="' . self::$editor_id . '">new ' . $this->mark( $child, 'del', 'words' ) . '</mark>';
 		$this->set_content( $post_id, $this->paragraph( 'Keep ' . $nested ) );
 
 		$this->set_content( $post_id, $this->paragraph( 'Keep ' ) );

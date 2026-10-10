@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { RegistryProvider, createRegistry, select } from '@wordpress/data';
+import { RegistryProvider, createRegistry } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 // @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -11,15 +11,12 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 } from '@wordpress/blocks';
-import { RichTextData, store as richTextStore } from '@wordpress/rich-text';
+import { RichTextData } from '@wordpress/rich-text';
 import SuggestionActions, {
 	SuggestionActionButtons,
 	useSuggestionDecision,
 } from '../suggestion-actions';
-import {
-	registerSuggestionFormat,
-	SUGGESTION_FORMAT_NAME,
-} from '../../inline-suggestions';
+import { registerSuggestionFormat } from '../../inline-suggestions';
 import { store as editorStore } from '../../../store';
 
 // The editor store pulls in `@wordpress/viewport`, which reads
@@ -69,7 +66,7 @@ vi.mock( import( '@wordpress/api-fetch' ), async ( importOriginal ) => {
 const BLOCK = 'test/suggestion-actions-block';
 const NOTE_ID = 9;
 const DECIDER_ID = 5;
-const MARKED = `Hello <mark class="wp-suggestion" data-suggestion-id="${ NOTE_ID }" data-suggestion-type="add" data-author="2">world</mark>`;
+const MARKED = `Hello <mark class="wp-suggestion-add" data-suggestion-id="${ NOTE_ID }" data-suggestion-type="add" data-author="2">world</mark>`;
 
 beforeAll( () => {
 	registerBlockType( BLOCK, {
@@ -82,13 +79,7 @@ beforeAll( () => {
 		},
 		save: () => null,
 	} );
-	if (
-		! ( select( richTextStore as any ) as any ).getFormatType(
-			SUGGESTION_FORMAT_NAME
-		)
-	) {
-		registerSuggestionFormat();
-	}
+	registerSuggestionFormat();
 } );
 
 afterAll( () => {

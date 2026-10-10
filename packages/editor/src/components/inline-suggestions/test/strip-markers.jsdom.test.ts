@@ -134,7 +134,7 @@ describe( 'settleInsertedSuggestionMarkers', () => {
 		author: number,
 		text: string
 	) =>
-		`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="${ type }" data-author="${ author }">${ text }</mark>`;
+		`<mark class="wp-suggestion-${ type }" data-suggestion-id="${ id }" data-suggestion-type="${ type }" data-author="${ author }">${ text }</mark>`;
 
 	it( "keeps the author's own addition as plain text", () => {
 		const { value, ids } = settleInsertedSuggestionMarkers(

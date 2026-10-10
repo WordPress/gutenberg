@@ -904,14 +904,12 @@ describe( 'inline replacement operations', () => {
 	} );
 
 	afterAll( () => {
-		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 	} );
 
 	// A type-over: the new text, then the replaced text, under one id.
 	const mine = ( id: number | string, text: string ) =>
-		`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="add" data-author="2">${ text }</mark>`;
+		`<mark class="wp-suggestion-add" data-suggestion-id="${ id }" data-suggestion-type="add" data-author="2">${ text }</mark>`;
 	const replaced = `This is ${ mine( 7, 'my' ) }${ del(
 		7,
 		'your'
@@ -988,13 +986,11 @@ describe( 'reviseOwnAddition', () => {
 	} );
 
 	afterAll( () => {
-		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 	} );
 
 	const addBy = ( id: number, author: number, text: string ) =>
-		`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="add" data-author="${ author }">${ text }</mark>`;
+		`<mark class="wp-suggestion-add" data-suggestion-id="${ id }" data-suggestion-type="add" data-author="${ author }">${ text }</mark>`;
 
 	it( 'replaces a selection inside the addition within the same marker', () => {
 		// "Hello wrold": select "ro" (offsets 7-9) and type "or".
@@ -1133,7 +1129,7 @@ describe( 'reviseOwnAddition', () => {
 
 	it( 'declines straddling a replacement that already owns a deletion', () => {
 		const value = RichTextData.fromHTMLString(
-			`Hi ${ addBy( 4, 1, 'new' ) }<mark class="wp-suggestion" data-suggestion-id="4" data-suggestion-type="del" data-author="1">old</mark>`
+			`Hi ${ addBy( 4, 1, 'new' ) }<mark class="wp-suggestion-del" data-suggestion-id="4" data-suggestion-type="del" data-author="1">old</mark>`
 		);
 		expect(
 			reviseOwnAddition( value, {
@@ -1175,13 +1171,36 @@ describe( 'deleteAcrossOwnMarkers', () => {
 	} );
 
 	afterAll( () => {
-		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 	} );
 
 	const mark = ( id: number, type: string, author: number, text: string ) =>
-		`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="${ type }" data-author="${ author }">${ text }</mark>`;
+		`<mark class="wp-suggestion-${ type }" data-suggestion-id="${ id }" data-suggestion-type="${ type }" data-author="${ author }">${ text }</mark>`;
+
+	it( 'removes an own addition together with another author marker nested in it', () => {
+		// Author 2 proposed deleting "ll" inside author 1's addition. Author
+		// 1 taking the addition back takes the nested deletion with it: it
+		// described text that is no longer proposed.
+		const value = RichTextData.fromHTMLString(
+			`a${ mark(
+				3,
+				'add',
+				1,
+				`he${ mark( 5, 'del', 2, 'll' ) }o`
+			) } world`
+		);
+		const result = deleteAcrossOwnMarkers( value, 0, 7, '1' );
+		expect( result!.value.text ).toBe( 'a world' );
+		expect( result!.deletion ).toEqual( { start: 0, end: 2 } );
+		expect( findSuggestionText( result!.value, 5 ) ).toBe( '' );
+	} );
+
+	it( 'declines another author marker outside an own addition', () => {
+		const value = RichTextData.fromHTMLString(
+			`${ mark( 3, 'add', 1, 'hi' ) }${ mark( 5, 'del', 2, 'there' ) }`
+		);
+		expect( deleteAcrossOwnMarkers( value, 0, 7, '1' ) ).toBeNull();
+	} );
 
 	it( 'removes own additions and keeps own deletions', () => {
 		// "Hi " (add) "Hello" (del) " there" (add).

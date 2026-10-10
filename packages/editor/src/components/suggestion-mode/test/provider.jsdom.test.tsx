@@ -2105,16 +2105,7 @@ describe( 'decisions record a provisional status first', () => {
 	const BLOCK = 'core/test-order-paragraph';
 
 	beforeAll( () => {
-		if (
-			! ( select( richTextStore as any ) as any ).getFormatType(
-				SUGGESTION_FORMAT_NAME
-			)
-		) {
-			registerFormatType(
-				SUGGESTION_FORMAT_NAME,
-				suggestionFormat as any
-			);
-		}
+		registerSuggestionFormat();
 		registerBlockType( BLOCK, {
 			apiVersion: 3,
 			attributes: {
@@ -2129,13 +2120,7 @@ describe( 'decisions record a provisional status first', () => {
 	} );
 
 	afterAll( () => {
-		if (
-			( select( richTextStore as any ) as any ).getFormatType(
-				SUGGESTION_FORMAT_NAME
-			)
-		) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 		getBlockTypes().forEach( ( block ) =>
 			unregisterBlockType( block.name )
 		);
@@ -2208,7 +2193,7 @@ describe( 'decisions record a provisional status first', () => {
 	const marked = () => {
 		const block = createBlock( BLOCK, { metadata: { noteId: [ 9 ] } } );
 		block.attributes.content = RichTextData.fromHTMLString(
-			'Hello <mark class="wp-suggestion" data-suggestion-id="9" data-suggestion-type="add">world</mark>'
+			'Hello <mark class="wp-suggestion-add" data-suggestion-id="9" data-suggestion-type="add">world</mark>'
 		);
 		return block;
 	};
