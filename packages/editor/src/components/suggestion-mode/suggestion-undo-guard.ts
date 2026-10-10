@@ -18,10 +18,11 @@
  * collector trashes the note. They are history-owned, and they stamp the
  * session's "last history-owned capture" sequence like inline markers do.
  *
- * This component wraps the core-data `undo` / `redo` actions while Suggest
- * intent is active. On undo it finds the most recent structural capture the
- * session recorded and compares it against the newest history-owned
- * capture:
+ * This component wraps the core-data `undo` / `redo` actions. In every
+ * intent it records each redo for `SuggestionNoteGC`, which tells a redo
+ * that lands a decision again from a withdrawal. While Suggest intent is
+ * active, on undo it finds the most recent structural capture the session
+ * recorded and compares it against the newest history-owned capture:
  *
  *   - Newest is a structural move or insertion: the undo is consumed by
  *     withdrawing it the way Reject restores the block (remove a suggested
@@ -43,7 +44,7 @@
  * and redo actions are thunks that resolve `dispatch( coreStore ).undo()` at
  * call time, so patching the core-data actions object intercepts the toolbar
  * button, the keyboard shortcut, and programmatic callers alike. Originals
- * are restored when Suggest intent deactivates.
+ * are restored on unmount.
  *
  * Known limitation: a swallowed undo doesn't consume the underlying history
  * item of the original structural dispatch; a follow-up Ctrl+Z replays that
@@ -63,6 +64,7 @@ import {
 	proposedAttributes,
 	readSuggestionMarker,
 } from './marker';
+import { rememberRedo } from './decision-state';
 import { removeNoteIdFromMetadata } from '../collab-sidebar/utils';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { store as editorStore } from '../../store';
@@ -217,6 +219,11 @@ export default function SuggestionUndoGuard() {
 	);
 
 	// Read from inside the wrapped dispatch, which outlives any single render.
+	const isSuggestModeRef = useRef( isSuggestMode );
+	useEffect( () => {
+		isSuggestModeRef.current = isSuggestMode;
+	}, [ isSuggestMode ] );
+
 	const clearStructuralCaptureRef = useRef( clearStructuralCapture );
 	clearStructuralCaptureRef.current = clearStructuralCapture;
 
@@ -254,10 +261,6 @@ export default function SuggestionUndoGuard() {
 	);
 
 	useEffect( () => {
-		if ( ! isSuggestMode ) {
-			return undefined;
-		}
-
 		const coreActions = registry.dispatch( coreStore );
 		if ( ! coreActions?.undo || ! coreActions?.redo ) {
 			return undefined;
@@ -355,6 +358,9 @@ export default function SuggestionUndoGuard() {
 		const coreSelect = registry.select( coreStore );
 
 		coreActions.undo = ( ...args ) => {
+			if ( ! isSuggestModeRef.current ) {
+				return originalUndo( ...args );
+			}
 			if ( withdrawNewestSuggestion() ) {
 				return Promise.resolve();
 			}
@@ -366,7 +372,10 @@ export default function SuggestionUndoGuard() {
 
 		coreActions.redo = ( ...args ) => {
 			if ( coreSelect.hasRedo?.() ?? true ) {
-				armUndoRedoAdoption();
+				rememberRedo( registry );
+				if ( isSuggestModeRef.current ) {
+					armUndoRedoAdoption();
+				}
 			}
 			return originalRedo( ...args );
 		};
@@ -376,7 +385,6 @@ export default function SuggestionUndoGuard() {
 			coreActions.redo = originalRedo;
 		};
 	}, [
-		isSuggestMode,
 		registry,
 		getLastContentCaptureSeq,
 		getStructuralCaptures,

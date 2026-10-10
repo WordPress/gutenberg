@@ -41,7 +41,25 @@ export interface SuggestionDecisionState {
 	 * collector's reply guard.
 	 */
 	withdrawnAnchors: Set< string >;
+	/**
+	 * Notes an undo reopened, with the decision the undo walked back. Redo
+	 * lands that decision again and takes the marker back off, which looks
+	 * like a withdrawal to the note collector; the decision here is what it
+	 * puts back instead of trashing the note.
+	 */
+	reopenedDecisions: Map< string, SuggestionDecision >;
+	/** When the last redo was dispatched, or 0. */
+	lastRedoAt: number;
 }
+
+export type SuggestionDecision = 'applied' | 'rejected';
+
+/*
+ * How long a redo counts as the cause of the block changes that follow it.
+ * The block sync lands a React commit after the dispatch, so the change is
+ * seen shortly after the redo rather than inside it.
+ */
+const REDO_TTL_MS = 1000;
 
 const stateByRegistry = new WeakMap< object, SuggestionDecisionState >();
 
@@ -60,6 +78,8 @@ export function getSuggestionDecisionState(
 			decisionsInFlight: new Set(),
 			resolvedThisSession: new Set(),
 			withdrawnAnchors: new Set(),
+			reopenedDecisions: new Map(),
+			lastRedoAt: 0,
 		};
 		stateByRegistry.set( registry, state );
 	}
@@ -93,7 +113,7 @@ export function isSuggestionDecisionInFlight(
 export function withDecisionInFlight<
 	Args extends { commentId?: number | string },
 >( registry: object, decide: ( args: Args ) => Promise< unknown > ) {
-	const { decisionsInFlight, resolvedThisSession } =
+	const { decisionsInFlight, resolvedThisSession, reopenedDecisions } =
 		getSuggestionDecisionState( registry );
 	return async ( args: Args ) => {
 		const key = String( args?.commentId );
@@ -103,6 +123,7 @@ export function withDecisionInFlight<
 		} finally {
 			decisionsInFlight.delete( key );
 			resolvedThisSession.add( key );
+			reopenedDecisions.delete( key );
 		}
 	};
 }
@@ -171,5 +192,77 @@ export function takeWithdrawnAnchor(
 ) {
 	return getSuggestionDecisionState( registry ).withdrawnAnchors.delete(
 		String( commentId )
+	);
+}
+
+/**
+ * Record the decision an undo walked back, so a redo can restore it.
+ *
+ * @param registry  Data registry.
+ * @param commentId Comment id.
+ * @param decision  The decision the note carried.
+ */
+export function rememberReopenedDecision(
+	registry: object,
+	commentId: number | string,
+	decision: SuggestionDecision
+) {
+	getSuggestionDecisionState( registry ).reopenedDecisions.set(
+		String( commentId ),
+		decision
+	);
+}
+
+/**
+ * The decision an undo walked back for a note, if any.
+ *
+ * @param registry  Data registry.
+ * @param commentId Comment id.
+ * @return The decision, or undefined.
+ */
+export function getReopenedDecision(
+	registry: object,
+	commentId: number | string
+): SuggestionDecision | undefined {
+	return getSuggestionDecisionState( registry ).reopenedDecisions.get(
+		String( commentId )
+	);
+}
+
+/**
+ * Forget a reopened decision, once it is restored or decided afresh.
+ *
+ * @param registry  Data registry.
+ * @param commentId Comment id.
+ */
+export function forgetReopenedDecision(
+	registry: object,
+	commentId: number | string
+) {
+	getSuggestionDecisionState( registry ).reopenedDecisions.delete(
+		String( commentId )
+	);
+}
+
+/**
+ * Record that a redo was dispatched.
+ *
+ * @param registry Data registry.
+ */
+export function rememberRedo( registry: object ) {
+	getSuggestionDecisionState( registry ).lastRedoAt = Date.now();
+}
+
+/**
+ * Whether a redo was dispatched recently enough to be the cause of the
+ * block change being looked at.
+ *
+ * @param registry Data registry.
+ * @return True within the redo window.
+ */
+export function isRecentRedo( registry: object ) {
+	return (
+		Date.now() - getSuggestionDecisionState( registry ).lastRedoAt <
+		REDO_TTL_MS
 	);
 }

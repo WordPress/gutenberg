@@ -18,10 +18,14 @@
  * still loading, marker write still in flight) is never collected, so load
  * order can't mass-trash healthy suggestions.
  *
- * Redo support: when an inline marker withdrawn by undo reappears (Ctrl+
- * Shift+Z), the trashed note is restored to pending so the marker stays
- * resolvable. Structural redo instead re-lands as a real edit under the
- * undo guard's adoption token (see suggestion-undo-guard.js).
+ * Redo support: when a collected anchor reappears (Ctrl+Shift+Z bringing an
+ * inline marker back, or an undo restoring the move a removal replaced),
+ * the trashed note is restored to pending so the anchor stays resolvable.
+ * Structural redo instead re-lands as a real edit under the undo guard's
+ * adoption token (see suggestion-undo-guard.js). A note an undo
+ * reopened after a decision is the mirror case: when a redo takes its anchor
+ * away again, it is the decision landing again, so the note gets its
+ * decision back rather than being trashed.
  *
  * Deliberate-removal races are excluded two ways: apply/reject decisions
  * register their comment id as in flight (provider.js) for their duration,
@@ -60,9 +64,14 @@ import {
 	parseSuggestionPayload,
 } from './operations';
 import {
+	forgetReopenedDecision,
 	forgetResolvedSuggestion,
+	getReopenedDecision,
+	getSuggestionDecisionState,
 	getSuggestionsResolvedThisSession,
+	isRecentRedo,
 	isSuggestionDecisionInFlight,
+	rememberReopenedDecision,
 	rememberResolvedSuggestion,
 	takeWithdrawnAnchor,
 } from './decision-state';
@@ -533,19 +542,18 @@ export default function SuggestionNoteGC() {
 			)
 				.then( () => {
 					seenRef.current.delete( String( note.id ) );
-					// Inline marks and attribute proposals live in block
-					// content, so redo can bring them back; the note then
-					// has to come back with them.
-					if (
-						anchor.kind === 'inline' ||
-						anchor.pendingType === PENDING_ATTRIBUTES
-					) {
-						trashedRef.current.set( String( note.id ), {
-							note,
-							anchor,
-						} );
-						setTrashedVersion( ( version ) => version + 1 );
-					}
+					/*
+					 * Every anchor lives in block content, so undo or redo
+					 * can bring it back - an inline mark, an attribute
+					 * proposal, or a structural marker, such as the move a
+					 * removal replaced coming back when the removal is
+					 * undone. The note then has to come back with it.
+					 */
+					trashedRef.current.set( String( note.id ), {
+						note,
+						anchor,
+					} );
+					setTrashedVersion( ( version ) => version + 1 );
 				} )
 				.catch( () => {
 					// A transient REST failure must not strand the note:
@@ -575,6 +583,48 @@ export default function SuggestionNoteGC() {
 					clearTimeout( timers.get( idKey ) );
 					timers.delete( idKey );
 				}
+				continue;
+			}
+			/*
+			 * Redo of a decision an undo walked back: the marker is gone
+			 * because the decision landed again, not because the suggestion
+			 * was withdrawn, so the note is resolved again rather than
+			 * collected. Held in flight for the save, like a decision, so
+			 * the collector leaves it alone meanwhile.
+			 */
+			const decision = getReopenedDecision( registry, idKey );
+			if (
+				decision &&
+				seenRef.current.has( idKey ) &&
+				isRecentRedo( registry ) &&
+				! isSuggestionDecisionInFlight( registry, note.id )
+			) {
+				if ( timers.has( idKey ) ) {
+					clearTimeout( timers.get( idKey ) );
+					timers.delete( idKey );
+				}
+				const { decisionsInFlight } =
+					getSuggestionDecisionState( registry );
+				decisionsInFlight.add( idKey );
+				forgetReopenedDecision( registry, idKey );
+				saveEntityRecord(
+					'root',
+					'comment',
+					{
+						id: note.id,
+						status: 'approved',
+						meta: { _wp_suggestion_status: decision },
+					},
+					{ throwOnError: true }
+				)
+					.then( () => {
+						seenRef.current.delete( idKey );
+						rememberResolvedSuggestion( registry, idKey );
+					} )
+					.catch( () => {
+						rememberReopenedDecision( registry, idKey, decision );
+					} )
+					.finally( () => decisionsInFlight.delete( idKey ) );
 				continue;
 			}
 			if ( takeWithdrawnAnchor( registry, idKey ) ) {
@@ -628,6 +678,10 @@ export default function SuggestionNoteGC() {
 				continue;
 			}
 			forgetResolvedSuggestion( registry, note.id );
+			const decision = note.meta?._wp_suggestion_status;
+			if ( decision === 'applied' || decision === 'rejected' ) {
+				rememberReopenedDecision( registry, note.id, decision );
+			}
 			saveEntityRecord(
 				'root',
 				'comment',
@@ -645,6 +699,7 @@ export default function SuggestionNoteGC() {
 				{ throwOnError: true }
 			).catch( () => {
 				// Reopen failed; leave it recorded so a later pass retries.
+				forgetReopenedDecision( registry, note.id );
 				rememberResolvedSuggestion( registry, note.id );
 			} );
 		}
