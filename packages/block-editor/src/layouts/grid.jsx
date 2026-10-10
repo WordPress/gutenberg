@@ -342,13 +342,22 @@ export default {
 			// The grid takes its height from its width, so that cells are
 			// close to square and content never makes them bigger. The gaps
 			// keep them from being exactly square.
+			//
+			// `--wp--style--grid-cells` tells the grid's children whether their
+			// cells have a fixed size, so that blocks can fill them. Blocks read
+			// it with a container style query in their own styles.
 			if ( hasCellsSizedByWidth ) {
 				rules.push(
 					`aspect-ratio: ${ columnCount } / ${ rowCount }`,
-					'min-height: 0'
+					'min-height: 0',
+					'--wp--style--grid-cells: fixed'
 				);
 			} else if ( hasViewportOverrides && baseHasCellsSizedByWidth ) {
-				rules.push( 'aspect-ratio: auto', 'min-height: auto' );
+				rules.push(
+					'aspect-ratio: auto',
+					'min-height: auto',
+					'--wp--style--grid-cells: auto'
+				);
 			}
 		} else if ( shouldOutputGridRows ) {
 			rules.push(
@@ -360,6 +369,16 @@ export default {
 			output = `${ appendSelectors( selector ) } { ${ rules.join(
 				'; '
 			) }; }`;
+		}
+
+		// The cell state is inherited, so grids nested inside this one reset
+		// it to describe their own cells. A nested grid with fixed cells sets
+		// it again, as its own rule is more specific.
+		if ( hasSameSizeCells && ! hasViewportOverrides ) {
+			output += `:where(${ appendSelectors(
+				selector,
+				'.is-layout-grid'
+			) }) { --wp--style--grid-cells: auto; }`;
 		}
 
 		// Output blockGap styles based on rules contained in layout definitions in theme.json.

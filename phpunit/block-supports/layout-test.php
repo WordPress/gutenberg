@@ -1635,7 +1635,8 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 
 	/**
 	 * Check that manual placement grids take their height from their width when the grid
-	 * interactivity experiment is on.
+	 * interactivity experiment is on, tell their children that the cells are fixed, and reset
+	 * that for grids nested inside them.
 	 *
 	 * @covers ::gutenberg_get_layout_style
 	 */
@@ -1653,7 +1654,8 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertSame(
-			'.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);aspect-ratio:3 / 2;min-height:0;}',
+			'.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);aspect-ratio:3 / 2;min-height:0;--wp--style--grid-cells:fixed;}' .
+			':where(.wp-layout .is-layout-grid){--wp--style--grid-cells:auto;}',
 			$layout_styles
 		);
 	}
@@ -1731,7 +1733,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				'experiment_enabled' => true,
 				'layout'             => $manual_layout,
 				'viewport_overrides' => array( 'columnCount' => 1 ),
-				'expected_output'    => '.wp-layout{grid-template-columns:repeat(1, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);aspect-ratio:1 / 2;min-height:0;}',
+				'expected_output'    => '.wp-layout{grid-template-columns:repeat(1, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);aspect-ratio:1 / 2;min-height:0;--wp--style--grid-cells:fixed;}',
 			),
 			'manual grid, experiment off, viewport column count' => array(
 				'experiment_enabled' => false,
@@ -1761,13 +1763,14 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				'experiment_enabled' => true,
 				'layout'             => array_merge( $manual_layout, array( 'minimumColumnWidth' => '12rem' ) ),
 				'viewport_overrides' => null,
-				'expected_output'    => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(max(min(12rem, 100%), (100% - (0.5em * (3 - 1))) /3), 1fr));container-type:inline-size;grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);}',
+				'expected_output'    => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(max(min(12rem, 100%), (100% - (0.5em * (3 - 1))) /3), 1fr));container-type:inline-size;grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);}' .
+					':where(.wp-layout .is-layout-grid){--wp--style--grid-cells:auto;}',
 			),
 			'manual grid, experiment on, viewport minimum column width' => array(
 				'experiment_enabled' => true,
 				'layout'             => $manual_layout,
 				'viewport_overrides' => array( 'minimumColumnWidth' => '12rem' ),
-				'expected_output'    => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(max(min(12rem, 100%), (100% - (0.5em * (3 - 1))) /3), 1fr));container-type:inline-size;grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);aspect-ratio:auto;min-height:auto;}',
+				'expected_output'    => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(max(min(12rem, 100%), (100% - (0.5em * (3 - 1))) /3), 1fr));container-type:inline-size;grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);aspect-ratio:auto;min-height:auto;--wp--style--grid-cells:auto;}',
 			),
 		);
 	}
