@@ -7,12 +7,14 @@
  * attribute. `findMarkerRange` is the single offset-resolution point and the
  * intended swap point for a future CRDT-backed resolver.
  *
- * Consumed by Notes (`core/note`) and Suggestions (`core/suggestion`); each
- * passes its own format type, id attribute, and annotation source so the two
+ * Consumed by Notes (`core/note`) and Suggestions (one format per marker
+ * kind, `core/suggestion-add`, `-del` and `-format`); each passes its own
+ * format type or types, id attribute, and annotation source so the two
  * coexist on one block without colliding.
  */
 
 export { findMarkerRange, findMarkerText } from './find-marker-range';
+export type { MarkerFormatType } from './find-marker-range';
 export { getMarkerSelector } from './marker-selector';
 export { wrapInlineMarker } from './wrap-inline-marker';
 export { readInlineSelection } from './read-inline-selection';
