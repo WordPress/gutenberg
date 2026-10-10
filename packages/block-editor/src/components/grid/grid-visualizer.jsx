@@ -7,7 +7,10 @@ import {
 	useMemo,
 } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
+import {
+	__experimentalUseDropZone as useDropZone,
+	useMergeRefs,
+} from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
@@ -68,9 +71,20 @@ const GridVisualizerGrid = forwardRef(
 		const [ gridInfo, setGridInfo ] = useState( () =>
 			getGridInfo( gridElement )
 		);
-		const isDroppingAllowed = useSelect(
-			( select ) => select( blockEditorStore ).isDraggingBlocks(),
-			[]
+		const { isDragging, isDroppingAllowed } = useSelect(
+			( select ) => {
+				if ( ! select( blockEditorStore ).isDraggingBlocks() ) {
+					return { isDragging: false, isDroppingAllowed: false };
+				}
+				return {
+					isDragging: true,
+					isDroppingAllowed: !! getBlockToPlaceInGrid(
+						select( blockEditorStore ),
+						gridClientId
+					),
+				};
+			},
+			[ gridClientId ]
 		);
 
 		// Get the element for the child grid block so we can
@@ -117,7 +131,7 @@ const GridVisualizerGrid = forwardRef(
 				// its drop layer stays and blocks can be moved between the
 				// grid and the block flow in both directions.
 				__unstablePopoverSlot={
-					isManualGrid && isDroppingAllowed
+					isManualGrid && isDragging
 						? 'Popover'
 						: '__unstable-block-tools-after'
 				}
@@ -259,13 +273,10 @@ function ManualGridVisualizer( {
 	);
 }
 
-function GridVisualizerCell( { color, children, className } ) {
+function GridVisualizerCell( { color, children } ) {
 	return (
 		<div
-			className={ clsx(
-				'block-editor-grid-visualizer__cell',
-				className
-			) }
+			className="block-editor-grid-visualizer__cell"
 			style={ {
 				boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${ color } 20%, #0000)`,
 				color,
@@ -283,6 +294,54 @@ function getPixelRectStyle( rect ) {
 		width: rect.right - rect.left,
 		height: rect.bottom - rect.top,
 	};
+}
+
+/**
+ * Gets the block being dragged, if it can be placed in the grid's cells.
+ *
+ * Only single blocks are placed in cells. Other drags, and blocks that can't
+ * be moved into the grid, leave the grid's drop layer inert, so they fall
+ * through to the block flow's drop zones.
+ *
+ * @param {Object} selectors    Block editor store selectors.
+ * @param {string} gridClientId Client ID of the grid block.
+ *
+ * @return {?string} The client ID of the dragged block, or null.
+ */
+function getBlockToPlaceInGrid( selectors, gridClientId ) {
+	const {
+		getDraggedBlockClientIds,
+		getBlockParents,
+		getBlockRootClientId,
+		canMoveBlocks,
+		canRemoveBlocks,
+		canInsertBlocks,
+	} = selectors;
+	const clientIds = getDraggedBlockClientIds();
+	if ( clientIds.length !== 1 ) {
+		return null;
+	}
+	const [ clientId ] = clientIds;
+	// A grid can't be dropped into itself or into a grid inside it.
+	if (
+		clientId === gridClientId ||
+		getBlockParents( gridClientId ).includes( clientId )
+	) {
+		return null;
+	}
+	// The same checks as `moveBlocksToPosition`, so that a drop it would
+	// refuse doesn't change the block's placement either.
+	if ( ! canMoveBlocks( clientIds ) ) {
+		return null;
+	}
+	if (
+		getBlockRootClientId( clientId ) !== gridClientId &&
+		( ! canRemoveBlocks( clientIds ) ||
+			! canInsertBlocks( clientIds, gridClientId ) )
+	) {
+		return null;
+	}
+	return clientId;
 }
 
 /**
@@ -304,14 +363,12 @@ function GridVisualizerDropLayer( {
 } ) {
 	const layerRef = useRef();
 	const lastTargetRef = useRef( null );
+	const blockEditorSelectors = unlock( useSelect( blockEditorStore ) );
 	const {
 		getBlockAttributes,
 		getBlockRootClientId,
-		getBlockName,
-		canInsertBlockType,
-		getDraggedBlockClientIds,
 		getSelectedBlockStyleState,
-	} = unlock( useSelect( blockEditorStore ) );
+	} = blockEditorSelectors;
 	const {
 		updateBlockAttributes,
 		moveBlocksToPosition,
@@ -328,14 +385,7 @@ function GridVisualizerDropLayer( {
 	}
 
 	function getDraggedBlock() {
-		const [ srcClientId ] = getDraggedBlockClientIds();
-		if (
-			! srcClientId ||
-			! canInsertBlockType( getBlockName( srcClientId ), gridClientId )
-		) {
-			return null;
-		}
-		return srcClientId;
+		return getBlockToPlaceInGrid( blockEditorSelectors, gridClientId );
 	}
 
 	function updateDropTarget( event ) {
@@ -382,9 +432,9 @@ function GridVisualizerDropLayer( {
 
 		const layerRect = layer.getBoundingClientRect();
 		const scale = layer.offsetWidth / layerRect.width || 1;
-		// The pointer is the centre of the block, measured by the area it
+		// The pointer is the center of the block, measured by the area it
 		// takes up in the grid. Blocks dragged in from elsewhere are the size
-		// of the cells they span.
+		// of the cells they span, up to the size of the grid.
 		const landing = getGridDropTarget( {
 			x: ( event.clientX - layerRect.left ) * scale,
 			y: ( event.clientY - layerRect.top ) * scale,
@@ -459,6 +509,7 @@ function GridVisualizerDropLayer( {
 
 		const target = {
 			srcClientId,
+			span: { columnSpan, rowSpan },
 			landing,
 			landingPixelRect,
 			overlaps,
@@ -479,12 +530,25 @@ function GridVisualizerDropLayer( {
 			if ( ! target || target.srcClientId !== srcClientId ) {
 				return;
 			}
-			const { columnStart, rowStart } = target.landing;
+			const { landing, span } = target;
+			const { columnStart, rowStart } = landing;
+			// A block bigger than the grid is shrunk to fit, as shown by the
+			// landing cells.
+			const layout = {
+				columnStart,
+				rowStart,
+				...( landing.columnSpan < span.columnSpan && {
+					columnSpan: landing.columnSpan,
+				} ),
+				...( landing.rowSpan < span.rowSpan && {
+					rowSpan: landing.rowSpan,
+				} ),
+			};
 			const { style } = getBlockAttributes( srcClientId );
 			updateBlockAttributes( srcClientId, {
 				style: getUpdatedChildLayoutStyle(
 					style,
-					{ columnStart, rowStart },
+					layout,
 					getSelectedBlockStyleState( srcClientId )
 				),
 			} );
@@ -500,10 +564,7 @@ function GridVisualizerDropLayer( {
 
 	return (
 		<div
-			ref={ ( node ) => {
-				layerRef.current = node;
-				dropZoneRef( node );
-			} }
+			ref={ useMergeRefs( [ layerRef, dropZoneRef ] ) }
 			className="block-editor-grid-visualizer__drop-layer"
 		/>
 	);
@@ -512,7 +573,10 @@ function GridVisualizerDropLayer( {
 function GridDropIndicator( { dropTarget } ) {
 	const { landingPixelRect, overlaps, guides } = dropTarget;
 	return (
-		<div className="block-editor-grid-visualizer__drop-indicator">
+		<div
+			className="block-editor-grid-visualizer__drop-indicator"
+			aria-hidden="true"
+		>
 			<div
 				className="block-editor-grid-visualizer__landing"
 				style={ getPixelRectStyle( landingPixelRect ) }
