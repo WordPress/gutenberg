@@ -688,12 +688,15 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 		$this->assertSame( '<p>kept</p>', gutenberg_strip_inline_suggestion_markers( $html ) );
 	}
 
-	public function test_leaves_the_old_single_class_untouched() {
-		// The single `wp-suggestion` class predates the per-kind markers and
-		// is no longer a marker.
-		$html = '<p><mark class="wp-suggestion" data-suggestion-id="7" data-suggestion-type="del">x</mark></p>';
+	public function test_drops_legacy_additions_and_unwraps_other_legacy_markers() {
+		// The single `wp-suggestion` class predates the per-kind markers. A
+		// pending addition saved with it must still never render.
+		$html = '<p>a<mark class="wp-suggestion" data-suggestion-id="7" data-suggestion-type="add">added</mark>'
+			. '<mark class="wp-suggestion" data-suggestion-id="8" data-suggestion-type="del">kept</mark>'
+			. '<mark class="wp-suggestion" data-suggestion-id="9" data-suggestion-type="format"><strong>run</strong></mark>'
+			. '<mark class="wp-suggestion" data-suggestion-id="10" data-suggestion-type="add">open</p>';
 
-		$this->assertSame( $html, gutenberg_strip_inline_suggestion_markers( $html ) );
+		$this->assertSame( '<p>akept<strong>run</strong></p>', gutenberg_strip_inline_suggestion_markers( $html ) );
 	}
 
 	/**
