@@ -116,7 +116,10 @@ function ReusableBlockControl( {
 				<BlockControls group="other">
 					<ToolbarGroup>
 						<ToolbarButton onClick={ handleEditOriginal }>
-							{ __( 'Edit original' ) }
+							{ window.__experimentalBlockToolbarViews
+								? /* translators: Button label to open the original of a synced pattern or template part in its own editor. */
+									__( 'Go to original' )
+								: __( 'Edit original' ) }
 						</ToolbarButton>
 					</ToolbarGroup>
 				</BlockControls>

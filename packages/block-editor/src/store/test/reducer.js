@@ -38,6 +38,7 @@ import {
 	expandedBlock,
 	zoomLevel,
 	editedContentOnlySection,
+	blockToolbarView,
 	withDerivedBlockEditingModes,
 	viewportModalClientIds,
 	selectedBlockStyleState,
@@ -4187,6 +4188,102 @@ describe( 'state', () => {
 				clientIds: [ 'block-1' ],
 			} );
 			expect( state ).toBeUndefined();
+		} );
+	} );
+
+	describe( 'blockToolbarView', () => {
+		const contentView = { clientId: 'block-1', view: 'content' };
+
+		it( 'returns null by default', () => {
+			expect( blockToolbarView( undefined, { type: 'UNKNOWN' } ) ).toBe(
+				null
+			);
+		} );
+
+		it( 'stores the chosen view for a block', () => {
+			const state = blockToolbarView( null, {
+				type: 'SET_BLOCK_TOOLBAR_VIEW',
+				clientId: 'block-1',
+				view: 'content',
+			} );
+			expect( state ).toEqual( contentView );
+		} );
+
+		it( 'keeps the view while the same block stays selected', () => {
+			expect(
+				blockToolbarView( contentView, {
+					type: 'SELECT_BLOCK',
+					clientId: 'block-1',
+				} )
+			).toBe( contentView );
+			expect(
+				blockToolbarView( contentView, {
+					type: 'SELECTION_CHANGE',
+					clientId: 'block-1',
+					attributeKey: 'content',
+					startOffset: 0,
+					endOffset: 4,
+				} )
+			).toBe( contentView );
+			expect(
+				blockToolbarView( contentView, {
+					type: 'SELECTION_CHANGE',
+					start: { clientId: 'block-1', offset: 2 },
+				} )
+			).toBe( contentView );
+		} );
+
+		it( 'drops the view when another block is selected', () => {
+			expect(
+				blockToolbarView( contentView, {
+					type: 'SELECT_BLOCK',
+					clientId: 'block-2',
+				} )
+			).toBe( null );
+			expect(
+				blockToolbarView( contentView, {
+					type: 'SELECTION_CHANGE',
+					start: { clientId: 'block-2' },
+					end: { clientId: 'block-2' },
+				} )
+			).toBe( null );
+			expect(
+				blockToolbarView( contentView, {
+					type: 'RESET_SELECTION',
+					selectionStart: { clientId: 'block-2' },
+					selectionEnd: { clientId: 'block-2' },
+				} )
+			).toBe( null );
+		} );
+
+		it( 'drops the view on multi-selection or when the selection is cleared', () => {
+			expect(
+				blockToolbarView( contentView, {
+					type: 'MULTI_SELECT',
+					start: 'block-1',
+					end: 'block-2',
+				} )
+			).toBe( null );
+			expect(
+				blockToolbarView( contentView, {
+					type: 'CLEAR_SELECTED_BLOCK',
+				} )
+			).toBe( null );
+		} );
+
+		it( 'drops the view when its block is removed or replaced', () => {
+			expect(
+				blockToolbarView( contentView, {
+					type: 'REMOVE_BLOCKS',
+					clientIds: [ 'block-1' ],
+				} )
+			).toBe( null );
+			expect(
+				blockToolbarView( contentView, {
+					type: 'REPLACE_BLOCKS',
+					clientIds: [ 'block-2' ],
+				} )
+			).toBe( contentView );
 		} );
 	} );
 
