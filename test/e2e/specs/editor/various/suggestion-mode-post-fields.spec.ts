@@ -46,6 +46,71 @@ async function savePost( page: any ) {
 		.toBe( false );
 }
 
+/*
+ * Returns a promise for the debounced suggestion auto-save REST call. Call
+ * this BEFORE the edit that triggers it.
+ */
+function suggestionSavedPromise( page: any ) {
+	return page.waitForResponse(
+		( response: any ) =>
+			/\/wp\/v2\/comments(\?|$|\/)/.test( response.url() ) &&
+			[ 'POST', 'PUT' ].includes( response.request().method() ) &&
+			response.ok()
+	);
+}
+
+async function openNotesSidebar( page: any ) {
+	const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
+	const allNotesToggle = topBar.getByRole( 'button', {
+		name: 'All notes',
+		exact: true,
+	} );
+	if (
+		( await allNotesToggle.getAttribute( 'aria-expanded' ) ) === 'false'
+	) {
+		await allNotesToggle.click();
+	}
+	return page.getByRole( 'region', { name: 'Editor settings' } );
+}
+
+function suggestionThreads( sidebar: any ) {
+	return sidebar.locator( '.editor-collab-sidebar-panel__thread' );
+}
+
+/*
+ * Proposes post edits the way the editor's panels do, through `editPost`,
+ * and resolves once the suggestion note is saved.
+ */
+async function suggestPostEdits( page: any, edits: Record< string, any > ) {
+	const saved = suggestionSavedPromise( page );
+	await page.evaluate(
+		( e: Record< string, any > ) =>
+			( window as any ).wp.data.dispatch( 'core/editor' ).editPost( e ),
+		edits
+	);
+	await saved;
+}
+
+function getEditedPostAttribute( page: any, attribute: string ) {
+	return page.evaluate(
+		( a: string ) =>
+			( window as any ).wp.data
+				.select( 'core/editor' )
+				.getEditedPostAttribute( a ),
+		attribute
+	);
+}
+
+function getEntityValue( page: any, postId: number, attribute: string ) {
+	return page.evaluate(
+		( [ id, a ]: [ number, string ] ) =>
+			( window as any ).wp.data
+				.select( 'core' )
+				.getEditedEntityRecord( 'postType', 'post', id )[ a ],
+		[ postId, attribute ]
+	);
+}
+
 function readStoredPost( requestUtils: any, postId: number ) {
 	return requestUtils.rest( {
 		path: `/wp/v2/posts/${ postId }`,
@@ -63,6 +128,8 @@ test.describe( 'Suggestion mode: post fields', () => {
 	} );
 
 	test.beforeEach( async ( { admin, requestUtils } ) => {
+		// The slug assertions need `saved-slug` free.
+		await requestUtils.deleteAllPosts();
 		const post = await requestUtils.createPost( {
 			title: 'Suggestion mode post fields',
 			content: '<!-- wp:paragraph --><p>Body</p><!-- /wp:paragraph -->',
@@ -203,6 +270,181 @@ test.describe( 'Suggestion mode: post fields', () => {
 
 			await switchIntent( page, 'Editing' );
 			await expect( discussion ).toBeEnabled();
+		} );
+	} );
+	test.describe( 'excerpt, featured image and slug', () => {
+		let mediaId: number;
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			const media = await requestUtils.uploadMedia(
+				'./assets/10x10_e2e_test_image_green.png'
+			);
+			mediaId = media.id;
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllMedia();
+		} );
+
+		for ( const { field, edit, stored, summary } of [
+			{
+				field: 'excerpt',
+				edit: 'Suggested excerpt',
+				stored: ( post: any ) => post.excerpt.raw,
+				summary: 'Excerpt: “Saved excerpt” → “Suggested excerpt”',
+			},
+			{
+				field: 'slug',
+				edit: 'suggested-slug',
+				stored: ( post: any ) => post.slug,
+				summary: 'Slug: “saved-slug” → “suggested-slug”',
+			},
+			{
+				field: 'featured_media',
+				edit: 'MEDIA',
+				stored: ( post: any ) => post.featured_media,
+				summary: 'Featured image: Set',
+			},
+		] ) {
+			test( `a ${ field } change becomes a suggestion, not an edit`, async ( {
+				page,
+				requestUtils,
+			} ) => {
+				const value = edit === 'MEDIA' ? mediaId : edit;
+				const before = await getEditedPostAttribute( page, field );
+				await switchIntent( page, 'Suggesting' );
+				await suggestPostEdits( page, { [ field ]: value } );
+
+				// The field shows the proposal while suggesting...
+				expect( await getEditedPostAttribute( page, field ) ).toEqual(
+					value
+				);
+				// ...which never reaches the post entity.
+				expect( await getEntityValue( page, postId, field ) ).toEqual(
+					before
+				);
+
+				const sidebar = await openNotesSidebar( page );
+				const threads = suggestionThreads( sidebar );
+				await expect( threads ).toHaveCount( 1 );
+				await expect(
+					threads.locator(
+						'.editor-collab-sidebar-panel__suggestion-summary'
+					)
+				).toHaveText( summary );
+				await expect( threads ).not.toContainText(
+					'Original block deleted.'
+				);
+
+				await savePost( page );
+				expect(
+					stored( await readStoredPost( requestUtils, postId ) )
+				).toEqual( before );
+
+				// Editing shows the saved value, not the proposal.
+				await switchIntent( page, 'Editing' );
+				expect( await getEditedPostAttribute( page, field ) ).toEqual(
+					before
+				);
+			} );
+		}
+
+		test( 'accepting a featured image suggestion sets the image', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			await switchIntent( page, 'Suggesting' );
+			await suggestPostEdits( page, { featured_media: mediaId } );
+			await switchIntent( page, 'Editing' );
+
+			const sidebar = await openNotesSidebar( page );
+			await sidebar
+				.getByRole( 'button', { name: 'Accept suggestion' } )
+				.click();
+			await expect(
+				page
+					.locator( '.components-snackbar-list' )
+					.getByText( 'Suggestion applied.' )
+			).toBeVisible();
+			await expect
+				.poll( () => getEditedPostAttribute( page, 'featured_media' ) )
+				.toBe( mediaId );
+
+			await savePost( page );
+			expect(
+				( await readStoredPost( requestUtils, postId ) ).featured_media
+			).toBe( mediaId );
+		} );
+
+		test( 'rejecting an excerpt suggestion keeps the saved excerpt', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			await switchIntent( page, 'Suggesting' );
+			await suggestPostEdits( page, { excerpt: 'Suggested excerpt' } );
+
+			const sidebar = await openNotesSidebar( page );
+			await sidebar
+				.getByRole( 'button', { name: 'Reject suggestion' } )
+				.click();
+			await expect(
+				page
+					.locator( '.components-snackbar-list' )
+					.getByText( 'Suggestion rejected.' )
+			).toBeVisible();
+			expect( await getEditedPostAttribute( page, 'excerpt' ) ).toBe(
+				'Saved excerpt'
+			);
+
+			await savePost( page );
+			expect(
+				( await readStoredPost( requestUtils, postId ) ).excerpt.raw
+			).toBe( 'Saved excerpt' );
+		} );
+
+		test( 'the excerpt panel proposes the excerpt typed into it', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.openDocumentSettingsSidebar();
+			await switchIntent( page, 'Suggesting' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: /excerpt/i } )
+				.first()
+				.click();
+			const textarea = page.getByRole( 'textbox', {
+				name: 'Write an excerpt (optional)',
+			} );
+			const saved = suggestionSavedPromise( page );
+			await textarea.fill( 'Typed excerpt' );
+			// The panel commits the excerpt when the textarea loses focus.
+			await textarea.blur();
+			await saved;
+			// The panel reads the proposal back, so the typing is not undone.
+			expect( await getEditedPostAttribute( page, 'excerpt' ) ).toBe(
+				'Typed excerpt'
+			);
+			expect( await getEntityValue( page, postId, 'excerpt' ) ).toBe(
+				'Saved excerpt'
+			);
+		} );
+
+		test( 'undo withdraws a post field suggestion', async ( { page } ) => {
+			await switchIntent( page, 'Suggesting' );
+			await suggestPostEdits( page, { slug: 'suggested-slug' } );
+			const sidebar = await openNotesSidebar( page );
+			await expect( suggestionThreads( sidebar ) ).toHaveCount( 1 );
+
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Undo' } )
+				.click();
+
+			await expect
+				.poll( () => getEditedPostAttribute( page, 'slug' ) )
+				.toBe( 'saved-slug' );
+			await expect( suggestionThreads( sidebar ) ).toHaveCount( 0 );
 		} );
 	} );
 } );
