@@ -109,7 +109,7 @@ export function ImageEdit( {
 	// Behind the grid interactivity experiment, a manual placement grid whose
 	// cells take their size from its width makes its images cover their
 	// cells. This matches the grid layout's own condition for that.
-	const isInManualGrid =
+	const hasHeightFromGrid =
 		layoutType === 'grid' &&
 		!! window.__experimentalEnableGridInteractivity &&
 		!! parentLayout?.isManualPlacement &&
@@ -486,7 +486,7 @@ export function ImageEdit( {
 					clientId={ clientId }
 					blockEditingMode={ blockEditingMode }
 					parentLayoutType={ layoutType }
-					isInManualGrid={ isInManualGrid }
+					hasHeightFromGrid={ hasHeightFromGrid }
 					maxContentWidth={ maxContentWidth }
 				/>
 				<MediaPlaceholder

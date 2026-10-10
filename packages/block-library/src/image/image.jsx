@@ -276,7 +276,7 @@ export default function Image( {
 	clientId,
 	blockEditingMode,
 	parentLayoutType,
-	isInManualGrid,
+	hasHeightFromGrid,
 	maxContentWidth,
 } ) {
 	const {
@@ -322,7 +322,7 @@ export default function Image( {
 	// `height: auto` so a theme can't squish them.
 	const isCroppedGalleryImage = imageCrop && parentLayoutType === 'flex';
 	// A manual placement grid sizes its images to cover their cells.
-	const hasHeightFromLayout = isCroppedGalleryImage || isInManualGrid;
+	const hasHeightFromLayout = isCroppedGalleryImage || hasHeightFromGrid;
 
 	const { image, attachmentResolutionError } = useSelect(
 		( select ) => {

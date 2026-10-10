@@ -951,6 +951,8 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				'grid-auto-rows'     => 'minmax(1rem, 1fr)',
 			);
 			$image_styles          = array();
+			// The image itself, linked or not, leaving out images in its caption.
+			$image_selector = "$selector > .wp-block-image > img, $selector > .wp-block-image > a > img";
 			/*
 			 * The grid takes its height from its width, so that cells are close to square and
 			 * content never makes them bigger. The gaps keep them from being exactly square.
@@ -979,7 +981,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 						),
 					),
 					array(
-						'selector'     => "$selector > .wp-block-image img",
+						'selector'     => $image_selector,
 						'declarations' => array(
 							'width'      => '100%',
 							'height'     => '100%',
@@ -997,8 +999,11 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 						'declarations' => array( 'display' => 'block' ),
 					),
 					array(
-						'selector'     => "$selector > .wp-block-image img",
-						'declarations' => array( 'height' => 'auto' ),
+						'selector'     => $image_selector,
+						'declarations' => array(
+							'width'  => 'auto',
+							'height' => 'auto',
+						),
 					),
 				);
 			}

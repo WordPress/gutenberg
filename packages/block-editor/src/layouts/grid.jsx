@@ -271,6 +271,11 @@ export default {
 		let output = '';
 		const rules = [];
 		let imageCSS = '';
+		// The image itself, linked or not, leaving out images in its caption.
+		const imageSelector = [
+			appendSelectors( selector, '> .wp-block-image > img' ),
+			appendSelectors( selector, '> .wp-block-image > a > img' ),
+		].join( ',' );
 		const shouldOutputGridColumns =
 			! hasViewportOverrides ||
 			hasViewportOverride( 'minimumColumnWidth' ) ||
@@ -361,10 +366,7 @@ export default {
 						selector,
 						'> .wp-block-image > :is(img, a)'
 					) } { flex: 1 1 0; min-height: 0; }` +
-					`${ appendSelectors(
-						selector,
-						'> .wp-block-image img'
-					) } { width: 100%; height: 100%; object-fit: cover; }`;
+					`${ imageSelector } { width: 100%; height: 100%; object-fit: cover; }`;
 			} else if ( hasViewportOverrides && baseHasCellsSizedByWidth ) {
 				rules.push( 'aspect-ratio: auto', 'min-height: auto' );
 				// Rows are sized by their content again, so images keep their
@@ -374,10 +376,7 @@ export default {
 						selector,
 						'> .wp-block-image'
 					) } { display: block; }` +
-					`${ appendSelectors(
-						selector,
-						'> .wp-block-image img'
-					) } { height: auto; }`;
+					`${ imageSelector } { width: auto; height: auto; }`;
 			}
 		} else if ( shouldOutputGridRows ) {
 			rules.push(
