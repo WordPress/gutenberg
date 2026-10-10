@@ -905,11 +905,13 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$should_output_grid_columns = true;
 		}
 
-		// Same-size cells are part of the grid interactivity experiment.
-		$has_same_size_cells     = gutenberg_is_experiment_enabled( 'gutenberg-grid-interactivity' );
-		$is_manual_placement     = $has_same_size_cells && ! empty( $layout_for_styles['isManualPlacement'] );
-		$should_output_grid_rows = ( null === $viewport_overrides || $has_viewport_property_override( 'rowCount' ) || ( $is_manual_placement && $has_viewport_property_override( 'columnCount' ) ) ) && ! empty( $column_count ) && ! empty( $row_count );
-		$grid_declarations       = array();
+		// Manual grids give all their cells the same size, as part of the grid interactivity experiment.
+		$has_same_size_cells = ! empty( $layout_for_styles['isManualPlacement'] ) && gutenberg_is_experiment_enabled( 'gutenberg-grid-interactivity' );
+		// Cells take their size from the grid's width, unless a minimum column width lets the columns wrap into more rows than the grid has.
+		$has_cells_sized_by_width      = $has_same_size_cells && empty( $layout_for_styles['minimumColumnWidth'] );
+		$base_has_cells_sized_by_width = $has_same_size_cells && empty( $base_layout['minimumColumnWidth'] );
+		$should_output_grid_rows       = ( null === $viewport_overrides || $has_viewport_property_override( 'rowCount' ) || ( $has_same_size_cells && ( $has_viewport_property_override( 'columnCount' ) || $has_viewport_property_override( 'minimumColumnWidth' ) ) ) ) && ! empty( $column_count ) && ! empty( $row_count );
+		$grid_declarations             = array();
 
 		/* When enabled, columns stretch to fill the available space using
 		 * `auto-fit`; otherwise empty tracks are preserved with `auto-fill`.
@@ -949,13 +951,15 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				'grid-auto-rows'     => 'minmax(1rem, 1fr)',
 			);
 			/*
-			 * Manual grids take their height from their width, so that cells are close to
-			 * square and content never makes them bigger. The gaps keep them from being
-			 * exactly square.
+			 * The grid takes its height from its width, so that cells are close to square and
+			 * content never makes them bigger. The gaps keep them from being exactly square.
 			 */
-			if ( $is_manual_placement ) {
+			if ( $has_cells_sized_by_width ) {
 				$grid_row_declarations['aspect-ratio'] = $column_count . ' / ' . $row_count;
 				$grid_row_declarations['min-height']   = '0';
+			} elseif ( null !== $viewport_overrides && $base_has_cells_sized_by_width ) {
+				$grid_row_declarations['aspect-ratio'] = 'auto';
+				$grid_row_declarations['min-height']   = 'auto';
 			}
 			$layout_styles[] = array(
 				'selector'     => $selector,
