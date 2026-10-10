@@ -12,7 +12,7 @@ interface SuggestionFormatEditProps {
 }
 
 /**
- * `edit` for the `core/suggestion` marker format: selects the note of the
+ * `edit` for the suggestion marker formats: selects the note of the
  * suggestion marker under the caret, the way `NoteFormat` does for inline
  * notes. Block-level sync alone picks the block's primary note, so in a block
  * holding several suggestions it could never point at the one the caret is in.

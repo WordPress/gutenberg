@@ -12,7 +12,7 @@ import { useSuggestionSession } from './suggestion-session';
 import useAbandonedNoteCleanup from './use-abandoned-note-cleanup';
 import { wrapInlineMarker, readInlineCaret } from '../inline-markers';
 import {
-	SUGGESTION_FORMAT_NAME,
+	suggestionFormatNameFor,
 	SUGGESTION_TYPE_DELETION,
 	buildSuggestionMarkerAttributes,
 	computeDeleteRange,
@@ -402,7 +402,7 @@ type DeletionRun = {
  * not delete it — it should mark it as proposed for deletion. This intercepts
  * `beforeinput` (capture phase) for delete input types and, instead of letting
  * the removal happen, wraps the affected text in an in-content
- * `core/suggestion` `<mark data-suggestion-type="del">` marker (Option B) keyed
+ * `core/suggestion-del` `<mark class="wp-suggestion-del">` marker (Option B) keyed
  * to a freshly created suggestion note.
  *
  * Two shapes are handled:
@@ -518,7 +518,7 @@ export default function SuggestionDeletionKeyboard() {
 		) => {
 			const value = getBlockAttributes( clientId )?.[ attributeKey ];
 			const wrapped = wrapInlineMarker( value, {
-				formatType: SUGGESTION_FORMAT_NAME,
+				formatType: suggestionFormatNameFor( 'del' ),
 				attributes: buildSuggestionMarkerAttributes( {
 					id,
 					type: SUGGESTION_TYPE_DELETION,

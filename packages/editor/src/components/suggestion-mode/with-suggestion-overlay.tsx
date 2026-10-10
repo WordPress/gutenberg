@@ -86,7 +86,7 @@ function isStringLike( value: any ): boolean {
  * A proposal stores marker-free values (see
  * `stripSuggestionMarkersFromAttributes`) and renders them in place of the
  * block's live values, so a proposal for an attribute whose live value
- * carries `<mark class="wp-suggestion">` suppresses every marker in it: the
+ * carries a `<mark class="wp-suggestion-<kind>">` suppresses every marker in it: the
  * earlier suggestion's note survives in the sidebar describing text the
  * reviewer can no longer see, and the block ends up carrying both
  * representations of a pending change at once (#73411, finding F-09).

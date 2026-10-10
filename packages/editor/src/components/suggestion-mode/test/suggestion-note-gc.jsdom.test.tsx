@@ -9,20 +9,17 @@ import {
 } from 'vitest';
 import { render, act } from '@testing-library/react';
 import apiFetch from '@wordpress/api-fetch';
-import { createRegistry, RegistryProvider, select } from '@wordpress/data';
+import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 // @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as noticesStore } from '@wordpress/notices';
 import { createBlock, registerBlockType } from '@wordpress/blocks';
-import { RichTextData, store as richTextStore } from '@wordpress/rich-text';
+import { RichTextData } from '@wordpress/rich-text';
 import SuggestionNoteGC from '../suggestion-note-gc';
 import { SuggestionSessionProvider } from '../suggestion-session';
-import {
-	registerSuggestionFormat,
-	SUGGESTION_FORMAT_NAME,
-} from '../../inline-suggestions';
+import { registerSuggestionFormat } from '../../inline-suggestions';
 import {
 	getReopenedDecision,
 	getSuggestionsResolvedThisSession,
@@ -147,7 +144,7 @@ function attributeNote() {
 	};
 }
 
-const MARKED = `Hello <mark class="wp-suggestion" data-suggestion-id="${ NOTE_ID }" data-suggestion-type="add" data-author="1">world</mark>`;
+const MARKED = `Hello <mark class="wp-suggestion-add" data-suggestion-id="${ NOTE_ID }" data-suggestion-type="add" data-author="1">world</mark>`;
 
 beforeAll( () => {
 	registerBlockType( TEST_BLOCK_NAME, {
@@ -160,13 +157,7 @@ beforeAll( () => {
 		},
 		save: () => null,
 	} );
-	if (
-		! ( select( richTextStore as any ) as any ).getFormatType(
-			SUGGESTION_FORMAT_NAME
-		)
-	) {
-		registerSuggestionFormat();
-	}
+	registerSuggestionFormat();
 } );
 
 function setup( {

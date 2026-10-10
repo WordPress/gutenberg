@@ -2,7 +2,7 @@
  * Keeps suggestion state off the clipboard.
  *
  * A suggestion is a proposal about *this* post: the inline `<mark
- * class="wp-suggestion">` wrapper, the block-level `metadata.suggestion`
+ * class="wp-suggestion-<kind>">` wrapper, the block-level `metadata.suggestion`
  * marker and the `metadata.noteId` link all point at a note comment attached
  * to this post's id. Copying blocks serializes those attributes verbatim, so
  * pasting into a different post carries markers whose notes do not exist

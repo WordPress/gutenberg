@@ -157,13 +157,13 @@ export function buildSuggestionAuthorAnnouncementCss(
  *
  * @param threads Unresolved note threads (each with `author` and the
  *                `_wp_suggestion` meta payload).
- * @return Serialized CSS targeting `.wp-suggestion[data-author]`.
+ * @return Serialized CSS targeting each marker kind's `[data-author]`.
  */
 export function buildSuggestionAuthorColorCss( threads?: any[] ): string {
 	const rules = [];
 	for ( const author of getInlineSuggestionAuthors( threads ).keys() ) {
 		const color = getAvatarBorderColor( author );
-		const sel = `.wp-suggestion[data-author="${ author }"]`;
+		const sel = `:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)[data-author="${ author }"]`;
 		rules.push( `${ sel }{--suggestion-author-color:${ color };}` );
 	}
 	return rules.join( '' );

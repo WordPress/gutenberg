@@ -14,7 +14,7 @@ import { useSuggestionSession } from './suggestion-session';
 import useAbandonedNoteCleanup from './use-abandoned-note-cleanup';
 import { readInlineCaret, wrapInlineMarker } from '../inline-markers';
 import {
-	SUGGESTION_FORMAT_NAME,
+	suggestionFormatNameFor,
 	SUGGESTION_TYPE_ADDITION,
 	SUGGESTION_TYPE_DELETION,
 	SUGGESTION_TYPE_REPLACEMENT,
@@ -182,7 +182,7 @@ function readEmbedPasteBlocks(
  *
  * In Suggest mode every ordinary edit is a suggestion, so newly entered text
  * should not land as permanent content — it is wrapped in an in-content
- * `core/suggestion` `<mark data-suggestion-type="add">` marker (Option B) keyed
+ * `core/suggestion-add` `<mark class="wp-suggestion-add">` marker (Option B) keyed
  * to a freshly created suggestion note. The front-end render-strip then hides
  * the proposed text until the suggestion is accepted.
  *
@@ -497,7 +497,7 @@ export default function SuggestionAdditionKeyboard() {
 				let value = attributes[ attributeKey ];
 				if ( isTypeOver ) {
 					const deleted = wrapInlineMarker( value, {
-						formatType: SUGGESTION_FORMAT_NAME,
+						formatType: suggestionFormatNameFor( 'del' ),
 						attributes: buildSuggestionMarkerAttributes( {
 							id,
 							type: SUGGESTION_TYPE_DELETION,

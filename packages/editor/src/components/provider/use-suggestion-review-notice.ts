@@ -15,12 +15,13 @@ import { ALL_NOTES_SIDEBAR } from '../collab-sidebar/constants';
 const NOTICE_ID = 'editor/pending-suggestions';
 
 /**
- * The `<mark>` element the `core/suggestion` format serializes to in post
- * content. Matched as an element so prose or a code sample that mentions the
- * class name does not count: in content the same markup is escaped
- * (`&lt;mark class="wp-suggestion"`) and has no `<mark` to match.
+ * The `<mark>` element an inline suggestion marker of any kind serializes to
+ * in post content. Matched as an element so prose or a code sample that
+ * mentions a class name does not count: in content the same markup is escaped
+ * (`&lt;mark class="wp-suggestion-add"`) and has no `<mark` to match.
  */
-const INLINE_MARKER_PROBE = /<mark\b[^>]*\bclass="wp-suggestion\b/;
+const INLINE_MARKER_PROBE =
+	/<mark\b[^>]*\bclass="(?:[^"]*\s)?wp-suggestion-(?:add|del|format)(?:[\s"])/;
 
 /**
  * The `metadata.suggestion` object a structural suggestion serializes into a
@@ -52,9 +53,9 @@ export function hasSuggestionMarkers( content: any ): boolean {
 /**
  * Explains suggestion markers to a user who does not have Suggest mode.
  *
- * Suggestion state outlives the experiment flag by design: the
- * `core/suggestion` format is registered unconditionally so a `<mark
- * class="wp-suggestion">` survives a load-and-save byte for byte, which is
+ * Suggestion state outlives the experiment flag by design: the marker
+ * formats are registered unconditionally so a `<mark
+ * class="wp-suggestion-add">` survives a load-and-save byte for byte, which is
  * what keeps content safe when the experiment is toggled off on a site that
  * has been using it. The cost is comprehension. With the experiment off the
  * intent switcher, the marker tooltips and the per-author tinting are all

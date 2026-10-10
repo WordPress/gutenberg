@@ -2,7 +2,7 @@
  * The one place Suggest mode declines an edit outright.
  *
  * Suggest mode has two representations for a pending change: inline
- * `core/suggestion` markers in the block's content, and the whole-attribute
+ * suggestion markers in the block's content, and the whole-attribute
  * overlay that auto-save turns into an `attribute-set` operation. They are
  * mutually exclusive on a given attribute — the overlay renders a clean value
  * in place of the live one, so an overlay over a marked `content` value hides

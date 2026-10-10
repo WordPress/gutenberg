@@ -1,12 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { RichTextData } from '@wordpress/rich-text';
 import {
-	RichTextData,
-	store as richTextStore,
-	unregisterFormatType,
-} from '@wordpress/rich-text';
-import { select } from '@wordpress/data';
-import {
-	SUGGESTION_FORMAT_NAME,
+	unregisterSuggestionFormats,
 	registerSuggestionFormat,
 } from '../../inline-suggestions';
 import {
@@ -26,20 +21,13 @@ vi.hoisted( () => {
 	globalThis.wpVitest.mockMatchMedia();
 } );
 
-const getFormatType = ( name: string ) =>
-	( select( richTextStore as any ) as any ).getFormatType( name );
-
 describe( 'sliceValueToHTML', () => {
 	beforeAll( () => {
-		if ( ! getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			registerSuggestionFormat();
-		}
+		registerSuggestionFormat();
 	} );
 
 	afterAll( () => {
-		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 	} );
 
 	it( 'serializes a plain slice', () => {
@@ -78,7 +66,7 @@ describe( 'sliceValueToHTML', () => {
 		// The marker points at this post's note; a pasted copy would bind a
 		// second run to the same suggestion.
 		const value = RichTextData.fromHTMLString(
-			`ab <mark class="wp-suggestion" data-suggestion-id="4" data-suggestion-type="add"><strong>cd</strong></mark> ef`
+			`ab <mark class="wp-suggestion-add" data-suggestion-id="4" data-suggestion-type="add"><strong>cd</strong></mark> ef`
 		);
 		expect( sliceValueToHTML( value, 0, value.text.length ) ).toBe(
 			'ab <strong>cd</strong> ef'
@@ -285,7 +273,7 @@ describe( 'collapsedDeleteTarget', () => {
 } );
 
 describe( 'collapsedDeleteDisposition', () => {
-	const marker = [ { type: SUGGESTION_FORMAT_NAME } ];
+	const marker = [ { type: 'core/suggestion-del' } ];
 	// "abcdef" whose leading "ab" already carries a marker.
 	const marked = [
 		marker,
@@ -372,7 +360,7 @@ describe( 'collapsedDeleteDisposition', () => {
 describe( 'expandBufferedDeleteRun', () => {
 	const marker = [
 		{
-			type: SUGGESTION_FORMAT_NAME,
+			type: 'core/suggestion-del',
 			attributes: { 'data-suggestion-id': '9' },
 		},
 	];
@@ -435,19 +423,15 @@ describe( 'expandBufferedDeleteRun', () => {
 
 describe( 'isWithinOwnAddition', () => {
 	beforeAll( () => {
-		if ( ! getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			registerSuggestionFormat();
-		}
+		registerSuggestionFormat();
 	} );
 
 	afterAll( () => {
-		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 	} );
 
 	const mark = ( type: string, author: string, text: string ) =>
-		`<mark class="wp-suggestion" data-suggestion-id="7" data-suggestion-type="${ type }" data-author="${ author }">${ text }</mark>`;
+		`<mark class="wp-suggestion-${ type }" data-suggestion-id="7" data-suggestion-type="${ type }" data-author="${ author }">${ text }</mark>`;
 
 	it( 'is true for a character inside the author own addition', () => {
 		// "Hi " + "tpyo" proposed by user 2; Backspace at the end targets "o".

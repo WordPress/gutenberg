@@ -1,17 +1,12 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import {
-	RichTextData,
-	unregisterFormatType,
-	store as richTextStore,
-} from '@wordpress/rich-text';
-import { select } from '@wordpress/data';
+import { RichTextData } from '@wordpress/rich-text';
 import {
 	planStoreContentEdit,
 	settleStoreContentRemoval,
 } from '../plan-store-content-edit';
 import {
 	registerSuggestionFormat,
-	SUGGESTION_FORMAT_NAME,
+	unregisterSuggestionFormats,
 } from '../../inline-suggestions/format';
 
 beforeAll( () => {
@@ -19,13 +14,7 @@ beforeAll( () => {
 } );
 
 afterAll( () => {
-	if (
-		( select( richTextStore as any ) as any ).getFormatType(
-			SUGGESTION_FORMAT_NAME
-		)
-	) {
-		unregisterFormatType( SUGGESTION_FORMAT_NAME );
-	}
+	unregisterSuggestionFormats();
 } );
 
 const SENTENCE = 'The quick brown fox jumps over the lazy dog.';
@@ -137,7 +126,7 @@ describe( 'planStoreContentEdit', () => {
 		// an existing note id — the reconciler only executes plans whose every
 		// action opens a fresh note, so this keeps the overlay path.
 		const withAddition =
-			'Hello <mark data-suggestion-id="7" data-suggestion-type="add" data-author="1" class="wp-suggestion">NEW</mark>';
+			'Hello <mark data-suggestion-id="7" data-suggestion-type="add" data-author="1" class="wp-suggestion-add">NEW</mark>';
 		expect(
 			planStoreContentEdit(
 				{ content: rtd( withAddition ) },
@@ -151,7 +140,7 @@ describe( 'planStoreContentEdit', () => {
 
 describe( 'settleStoreContentRemoval', () => {
 	const marker = ( type: string, author: number, text: string ) =>
-		`<mark class="wp-suggestion" data-suggestion-id="7" data-suggestion-type="${ type }" data-author="${ author }">${ text }</mark>`;
+		`<mark class="wp-suggestion-${ type }" data-suggestion-id="7" data-suggestion-type="${ type }" data-author="${ author }">${ text }</mark>`;
 
 	it( "retracts the author's own addition from the removed run, so the rest plans as a deletion", () => {
 		// "Hello world again" + own " and more", split after "aga".

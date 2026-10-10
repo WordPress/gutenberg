@@ -1,15 +1,9 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
-import {
-	RichTextData,
-	registerFormatType,
-	unregisterFormatType,
-	store as richTextStore,
-} from '@wordpress/rich-text';
-import { select } from '@wordpress/data';
+import { RichTextData } from '@wordpress/rich-text';
 import { suggestionAnnotations } from '../annotate-suggestions';
 import {
-	SUGGESTION_FORMAT_NAME,
-	suggestionFormat,
+	unregisterSuggestionFormats,
+	registerSuggestionFormat,
 } from '../../inline-suggestions';
 
 // The editor store pulls in `@wordpress/viewport`, which reads
@@ -17,11 +11,6 @@ import {
 vi.hoisted( () => {
 	globalThis.wpVitest.mockMatchMedia();
 } );
-
-const isRegistered = () =>
-	!! ( select( richTextStore as any ) as any ).getFormatType(
-		SUGGESTION_FORMAT_NAME
-	);
 
 const delPayload = ( attribute = 'content' ) =>
 	JSON.stringify( {
@@ -34,23 +23,16 @@ const delPayload = ( attribute = 'content' ) =>
 // "keep " (5 chars) then the marked "remove me" (9 chars) → range 5..14.
 const markedContent = ( id: number | string ) =>
 	RichTextData.fromHTMLString(
-		`keep <mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="del">remove me</mark> tail`
+		`keep <mark class="wp-suggestion-del" data-suggestion-id="${ id }" data-suggestion-type="del">remove me</mark> tail`
 	);
 
 describe( 'suggestionAnnotations', () => {
 	beforeAll( () => {
-		if ( ! isRegistered() ) {
-			registerFormatType(
-				SUGGESTION_FORMAT_NAME,
-				suggestionFormat as any
-			);
-		}
+		registerSuggestionFormat();
 	} );
 
 	afterAll( () => {
-		if ( isRegistered() ) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 	} );
 
 	it( 'returns an empty array for empty or missing threads', () => {
