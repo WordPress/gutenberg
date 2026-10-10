@@ -69,7 +69,6 @@ export default function BlockToolbarPopover( {
 					__experimentalOnIndexChange={ ( index ) => {
 						initialToolbarItemIndexRef.current = index;
 					} }
-					variant="toolbar"
 				/>
 			</PrivateBlockPopover>
 		)
