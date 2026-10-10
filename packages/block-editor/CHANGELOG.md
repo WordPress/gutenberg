@@ -9,8 +9,8 @@
 ### Enhancements
 
 -   Inserter: Replace random tips with info notices using the same light-bulb icon and style keyboard hints as keys ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
--   Grid: Behind the `gutenberg-grid-interactivity` experiment, every row of a manual placement grid is the same height, and a manual placement grid without a minimum column width takes its height from its width with `aspect-ratio: columns / rows`, so all its cells are the same size, close to square, whatever their content ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
--   Grid: Behind the `gutenberg-grid-interactivity` experiment, dragging a block in a manual placement grid snaps it to cells: one drop zone covers the grid, the pointer marks the center of the dragged block, the cells it will land in and any blocks it will overlap are shown, and the block stays in place, dimmed, while it is dragged. Dropped outside the grid, the block moves to wherever it lands. Drags of several blocks fall through to the block flow, and a block bigger than the grid shrinks to fit it ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+-   Grid: Behind the `gutenberg-grid-interactivity` experiment, every row of a manual placement grid is the same height, and a manual placement grid without a minimum column width takes its height from its width with `aspect-ratio: columns / rows`, so all its cells are the same size, close to square, whatever their content ([#84499](https://github.com/WordPress/gutenberg/pull/84499)).
+-   Grid: Behind the `gutenberg-grid-interactivity` experiment, dragging a block in a manual placement grid snaps it to cells: one drop zone covers the grid, the pointer marks the center of the dragged block, the cells it will land in and any blocks it will overlap are shown, and the block stays in place, dimmed, while it is dragged. Dropped outside the grid, the block moves to wherever it lands. Drags of several blocks fall through to the block flow, and a block bigger than the grid shrinks to fit it ([#84500](https://github.com/WordPress/gutenberg/pull/84500)).
 
 ### Bug Fixes
 
