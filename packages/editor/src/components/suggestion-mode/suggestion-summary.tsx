@@ -683,6 +683,27 @@ function isTextLike( value: any ): boolean {
 }
 
 /**
+ * The summary wording for terms a suggestion would create, by taxonomy
+ * `rest_base`: a sentence per built-in taxonomy, so translators see each
+ * whole phrase.
+ *
+ * @param restBase The taxonomy's `rest_base`.
+ * @return A `sprintf` format taking the comma-separated term names.
+ */
+function newTermsLabel( restBase: string ): string {
+	switch ( restBase ) {
+		case 'categories':
+			/* translators: %s: comma-separated category names. */
+			return __( 'New category: %s' );
+		case 'tags':
+			/* translators: %s: comma-separated tag names. */
+			return __( 'New tag: %s' );
+	}
+	/* translators: %s: comma-separated term names. */
+	return __( 'New term: %s' );
+}
+
+/**
  * Describe a change to a post field.
  *
  * Text fields (the title, excerpt and slug) quote the whole old and new
@@ -708,7 +729,12 @@ function describePostFieldChange(
 		const before: any[] = Array.isArray( op.before ) ? op.before : [];
 		const after: any[] = Array.isArray( op.after ) ? op.after : [];
 		const name = ( id: any ) => termNames[ id ] ?? `#${ id }`;
-		const added = after.filter( ( id ) => ! before.includes( id ) );
+		// Terms that do not exist yet ride on the proposal by name.
+		const isNew = ( item: any ) => !! item && typeof item === 'object';
+		const created = after.filter( isNew );
+		const added = after.filter(
+			( id ) => ! isNew( id ) && ! before.includes( id )
+		);
 		const removed = before.filter( ( id ) => ! after.includes( id ) );
 		const parts: string[] = [];
 		if ( added.length ) {
@@ -717,6 +743,16 @@ function describePostFieldChange(
 					/* translators: %s: comma-separated term names. */
 					__( 'Add %s' ),
 					added.map( name ).join( ', ' )
+				)
+			);
+		}
+		if ( created.length ) {
+			parts.push(
+				sprintf(
+					newTermsLabel( op.attribute ),
+					created
+						.map( ( term ) => stripTags( String( term.name ) ) )
+						.join( ', ' )
 				)
 			);
 		}
@@ -1128,7 +1164,7 @@ function useTermNames(
 				const ids = [
 					...( Array.isArray( op.before ) ? op.before : [] ),
 					...( Array.isArray( op.after ) ? op.after : [] ),
-				];
+				].filter( ( id ) => typeof id === 'number' );
 				if ( ! taxonomy || ! ids.length ) {
 					continue;
 				}

@@ -15,6 +15,7 @@ import { STORE_NAME } from '../../store/constants';
 import { getPostFieldProposalId } from '../../store/suggest-post-edits';
 import { unlock } from '../../lock-unlock';
 import { useSuggestionSession } from './suggestion-session';
+import { createProposedTerms } from './create-proposed-terms';
 import { withoutProposedAttributes } from './marker';
 import { getNoteIdsFromMetadata } from '../collab-sidebar/utils';
 import {
@@ -234,8 +235,31 @@ export function useSuggestionDecisions() {
 						),
 					} ) )
 				);
+				/*
+				 * New terms are created only now, as the reviewer. When one
+				 * cannot be created nothing is applied and the note stays
+				 * pending.
+				 */
+				let acceptedOps;
 				try {
-					applyPostFieldSuggestion( applyPostOperations( postOps ) );
+					acceptedOps = await createProposedTerms(
+						registry,
+						postOps
+					);
+				} catch ( error: any ) {
+					createNotice(
+						'error',
+						typeof error?.message === 'string' && error.message
+							? error.message
+							: __( 'The suggested term could not be created.' ),
+						{ type: 'snackbar', isDismissible: true }
+					);
+					return false;
+				}
+				try {
+					applyPostFieldSuggestion(
+						applyPostOperations( acceptedOps )
+					);
 					await store.setLifecycleStatus( commentId, 'applied' );
 					clearPostFieldProposals( postOps, commentId );
 				} catch ( error: any ) {
