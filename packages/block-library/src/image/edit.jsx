@@ -106,16 +106,6 @@ export function ImageEdit( {
 	const layoutType = parentLayout?.type || parentLayout?.default?.type;
 	const isMaxWidthContainerWidth =
 		! layoutType || ( layoutType !== 'flex' && layoutType !== 'grid' );
-	// Behind the grid interactivity experiment, a manual placement grid whose
-	// cells take their size from its width makes its images cover their
-	// cells. This matches the grid layout's own condition for that.
-	const hasHeightFromGrid =
-		layoutType === 'grid' &&
-		!! window.__experimentalEnableGridInteractivity &&
-		!! parentLayout?.isManualPlacement &&
-		! parentLayout?.minimumColumnWidth &&
-		!! parentLayout?.columnCount &&
-		!! parentLayout?.rowCount;
 	const [ maxWidthObserver, maxContentWidth ] = useMaxWidthObserver();
 
 	const [ placeholderResizeListener, { width: placeholderWidth } ] =
@@ -486,7 +476,6 @@ export function ImageEdit( {
 					clientId={ clientId }
 					blockEditingMode={ blockEditingMode }
 					parentLayoutType={ layoutType }
-					hasHeightFromGrid={ hasHeightFromGrid }
 					maxContentWidth={ maxContentWidth }
 				/>
 				<MediaPlaceholder
