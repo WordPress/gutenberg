@@ -8,4 +8,5 @@ export { useUpdateGridChildLayout } from './use-update-grid-child-layout';
 export {
 	isGridStackedOnMobile,
 	getUnstackedMobileUpdates,
+	getStackedLayouts,
 } from './mobile-stacking';

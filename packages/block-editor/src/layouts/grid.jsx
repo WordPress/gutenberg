@@ -18,7 +18,10 @@ import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../hooks/gap';
 import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
 import { cleanEmptyObject, shouldSkipSerialization } from '../hooks/utils';
-import { hasViewportBlockStyleState } from '../hooks/block-style-state';
+import {
+	hasPseudoBlockStyleState,
+	hasViewportBlockStyleState,
+} from '../hooks/block-style-state';
 import { LAYOUT_DEFINITIONS } from './definitions';
 import { store as blockEditorStore } from '../store';
 
@@ -73,11 +76,22 @@ export default {
 		clientId,
 	} ) {
 		const { allowSizingOnChildren = false } = layoutBlockSupport;
-		const viewport = useSelect(
-			( select ) =>
-				select( blockEditorStore ).getSelectedBlockStyleState(
-					clientId
-				)?.viewport,
+		// Stacking only applies on mobile, so it is set for every viewport or
+		// for mobile only. The layout panel edits a viewport's layout in a
+		// viewport state without a pseudo state, so the toggle is hidden in
+		// such states for other viewports.
+		const isOtherViewportLayoutState = useSelect(
+			( select ) => {
+				const selectedState =
+					select( blockEditorStore ).getSelectedBlockStyleState(
+						clientId
+					);
+				return (
+					hasViewportBlockStyleState( selectedState ) &&
+					! hasPseudoBlockStyleState( selectedState ) &&
+					selectedState.viewport !== '@mobile'
+				);
+			},
 			[ clientId ]
 		);
 
@@ -102,13 +116,10 @@ export default {
 		const hasMinimumColumnWidthValue = () =>
 			hasLayoutValue( 'minimumColumnWidth' );
 		const hasFillValue = () => hasLayoutValue( 'autoFit', false );
-		// Stacking only applies on mobile, so it is set for every viewport or
-		// for mobile only, not from other viewports.
 		const showStackOnMobileControl =
 			layout?.isManualPlacement &&
 			window.__experimentalEnableGridInteractivity &&
-			( ! hasViewportBlockStyleState( { viewport } ) ||
-				viewport === '@mobile' );
+			! isOtherViewportLayoutState;
 		const hasStackOnMobileValue = () =>
 			hasLayoutValue( 'stackOnMobile', true );
 		const resetGridType = () =>

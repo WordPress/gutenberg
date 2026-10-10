@@ -49,6 +49,7 @@
 	"exclude": [
 		"**/benchmark",
 		"src/components/block-icon/stories/index.story.ts",
+		"src/components/child-layout-control/test/stacked-grid.jsdom.test.tsx",
 		"src/components/contrast-checker/stories/index.story.ts",
 		"src/components/grid/test/grid-item-rotator.jsdom.test.tsx",
 		"src/components/inspector-controls-tabs/test/use-inspector-controls-tabs.jsdom.test.tsx",

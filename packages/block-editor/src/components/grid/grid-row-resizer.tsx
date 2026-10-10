@@ -1,5 +1,10 @@
 import clsx from 'clsx';
-import type { PointerEvent } from 'react';
+import type {
+	ComponentProps,
+	ComponentType,
+	HTMLAttributes,
+	PointerEvent,
+} from 'react';
 import { ResizableBox } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { _n, sprintf } from '@wordpress/i18n';
@@ -15,6 +20,13 @@ interface GridRowResizerProps {
 }
 
 type Edge = 'top' | 'bottom';
+
+// `ResizableBox` passes props it doesn't declare on to its element, but its
+// types don't include pointer events.
+const ResizableBoxWithPointerEvents = ResizableBox as ComponentType<
+	ComponentProps< typeof ResizableBox > &
+		Pick< HTMLAttributes< HTMLDivElement >, 'onPointerDown' >
+>;
 
 /**
  * Handles on the top and bottom edges of a selected manual grid, for adding
@@ -61,7 +73,7 @@ export function GridRowResizer( { clientId }: GridRowResizerProps ) {
 					resize?.edge === 'top' ? 'flex-end' : 'flex-start',
 			} }
 		>
-			<ResizableBox
+			<ResizableBoxWithPointerEvents
 				className={ clsx( 'block-editor-grid-row-resizer__box', {
 					'is-resizing': !! resize,
 				} ) }
@@ -106,7 +118,7 @@ export function GridRowResizer( { clientId }: GridRowResizerProps ) {
 						rowCount={ getRowCount( resize.edge, resize.rowDelta ) }
 					/>
 				) }
-			</ResizableBox>
+			</ResizableBoxWithPointerEvents>
 		</BlockPopoverCover>
 	);
 }
