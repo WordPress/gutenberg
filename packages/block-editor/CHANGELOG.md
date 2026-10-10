@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### New Features
+
+-   Add a rotate block support, behind the `gutenberg-block-rotation` experiment: every block that doesn't opt out with `supports.rotate: false` gets a Rotation control in its Dimensions panel, stored in `style.rotate` with viewport overrides, and rotated with the CSS `rotate` property ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+
 ### Enhancements
 
 -   Inserter: Replace random tips with info notices using the same light-bulb icon and style keyboard hints as keys ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
