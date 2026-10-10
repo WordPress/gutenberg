@@ -1,10 +1,8 @@
 /**
  * Garbage collection for orphaned suggestion notes.
  *
- * Every suggestion note is anchored to something the user can see: an inline
- * `<mark class="wp-suggestion">` marker in block content, a structural
- * `metadata.suggestion` marker on a block, or an attribute proposal carried
- * in that marker's `after`. When the anchor disappears without the note being
+ * Every suggestion note is anchored to something the user can see (see
+ * anchor-index.ts). When the anchor disappears without the note being
  * resolved — the classic case is Ctrl+Z right after making the suggestion,
  * but deleting the marked text in Editing intent lands here too — the note
  * has nothing left to accept or reject. Leaving it behind produces the
@@ -12,8 +10,11 @@
  * `docs/explanations/architecture/suggestions.md`: a pending suggestion in
  * the sidebar whose Apply/Reject can no longer do anything.
  *
- * This component watches the anchor of every unresolved suggestion note and
- * trashes a note when an anchor it has previously observed disappears.
+ * This component watches the anchor of the current user's own pending
+ * suggestion notes and trashes a note when an anchor it has previously
+ * observed disappears. Only their own: removing someone else's suggestion is
+ * an edit to the post, and the save pass records it on their note as
+ * `outdated` rather than anyone's editor deleting their work.
  * Transition-based on purpose: a note whose anchor was never seen (editor
  * still loading, marker write still in flight) is never collected, so load
  * order can't mass-trash healthy suggestions.
@@ -27,10 +28,12 @@
  * away again, it is the decision landing again, so the note gets its
  * decision back rather than being trashed.
  *
- * Deliberate-removal races are excluded two ways: apply/reject decisions
+ * Deliberate-removal races are excluded three ways: apply/reject decisions
  * register their comment id as in flight (provider.js) for their duration,
- * and the note's local record must still be pending (`status: 'hold'`, no
- * `_wp_suggestion_status`) at collection time.
+ * the note's local record must still be pending (`status: 'hold'`, status
+ * absent or `pending`) at collection time, and so must the server's copy,
+ * read fresh before trashing - a peer's decision syncs its content change
+ * before this session's thread list hears of it.
  *
  * A note somebody has replied to is never collected (#81958). Trashing a root
  * comment takes its replies with it, so collecting one would turn "I withdrew
@@ -46,23 +49,17 @@ import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
-import { RichTextData } from '@wordpress/rich-text';
-import type { RichTextValue } from '@wordpress/rich-text';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 // @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { getBlockTreeVersion } from './block-tree-version';
 import {
-	PENDING_ATTRIBUTES,
-	proposedAttributes,
-	readSuggestionMarker,
-} from './marker';
-import {
-	findInlineOp,
-	findStructuralOp,
-	parseSuggestionPayload,
-} from './operations';
+	describeAnchor,
+	getAnchorIndex,
+	inlineAttributesOf,
+	isAnchorPresent,
+} from './anchor-index';
+import type { SuggestionAnchor } from './anchor-index';
 import {
 	forgetReopenedDecision,
 	forgetResolvedSuggestion,
@@ -76,11 +73,12 @@ import {
 	takeWithdrawnAnchor,
 } from './decision-state';
 import {
-	SUGGESTION_CLASS,
-	SUGGESTION_FORMAT_NAME,
-	SUGGESTION_ID_ATTRIBUTE,
-} from '../inline-suggestions';
-import { getNoteIdsFromMetadata } from '../collab-sidebar/utils';
+	PENDING,
+	getDecision,
+	getProvisionalStatus,
+	getSuggestionStatus,
+	isPendingStatus,
+} from './suggestion-status';
 import { store as editorStore } from '../../store';
 import { getNoteThreadsQuery, useNoteThreads } from '../collab-sidebar/hooks';
 
@@ -101,201 +99,6 @@ const GC_RETRY_MS = 5000;
 const GC_MAX_ATTEMPTS = 3;
 
 /**
- * The id attribute of a serialized inline marker. Matched on the serialized
- * value rather than parsed: the index below runs on every block-editor store
- * update, and every marker carries the attribute, so a match can miss no
- * marker that is present.
- */
-const SUGGESTION_ID_PATTERN = /data-suggestion-id="([^"]+)"/g;
-
-const PENDING_MARKER_BY_OP: Record< string, string > = {
-	'block-remove': 'pending-remove',
-	'block-insert-after': 'pending-insert',
-	'block-move': 'pending-move',
-};
-
-/**
- * Describe the anchor a suggestion note must keep to stay meaningful.
- *
- * @param note Note comment record.
- * @return Anchor descriptor, or null when the note is not a pending suggestion
- * this collector manages.
- */
-function describeAnchor( note: any ) {
-	const payload = parseSuggestionPayload( note?.meta?._wp_suggestion );
-	if ( ! payload ) {
-		return null;
-	}
-	const structuralOp = findStructuralOp( payload.operations );
-	if ( structuralOp ) {
-		return {
-			kind: 'structural',
-			pendingType: PENDING_MARKER_BY_OP[ structuralOp.type ],
-		};
-	}
-	const inlineOp = findInlineOp( payload.operations );
-	if ( inlineOp ) {
-		return { kind: 'inline', attribute: inlineOp.attribute };
-	}
-	// Attribute-set suggestions: anchored to the proposal on the block's
-	// marker, whatever the marker's type (an attribute edit on a moved
-	// block rides along on the move's marker).
-	return { kind: 'structural', pendingType: PENDING_ATTRIBUTES };
-}
-
-/**
- * The anchors present in the editor, indexed in one pass over the blocks.
- *
- * Structural anchors are the `metadata.suggestion` markers, keyed by pending
- * type and note id. Inline anchors are the marker ids found in each block's
- * rich-text attributes, keyed by attribute: the marker travels with content,
- * so the content is what is scanned rather than a (possibly undone) metadata
- * linkage. Building the index once and testing every note against it keeps a
- * store update at one serialization per block instead of one per note.
- *
- * @param blockEditor      Block-editor selectors.
- * @param inlineAttributes Attribute names any tracked inline note anchors to.
- * @return The index.
- */
-function buildAnchorIndex(
-	blockEditor: any,
-	inlineAttributes: Set< string >
-): { inline: Map< string, Set< string > >; structural: Set< string > } {
-	const inline = new Map< string, Set< string > >();
-	const structural = new Set< string >();
-	for ( const clientId of blockEditor.getClientIdsWithDescendants?.() ??
-		[] ) {
-		const attributes = blockEditor.getBlockAttributes( clientId );
-		if ( ! attributes ) {
-			continue;
-		}
-		const marker = readSuggestionMarker( attributes );
-		if ( marker ) {
-			for ( const noteId of getNoteIdsFromMetadata(
-				attributes.metadata
-			) ) {
-				structural.add( `${ marker.type }:${ noteId }` );
-				if ( proposedAttributes( marker ) ) {
-					structural.add( `${ PENDING_ATTRIBUTES }:${ noteId }` );
-				}
-			}
-		}
-		for ( const attribute of inlineAttributes ) {
-			const value = attributes[ attribute ];
-			const addId = ( id: unknown ) => {
-				let ids = inline.get( attribute );
-				if ( ! ids ) {
-					ids = new Set();
-					inline.set( attribute, ids );
-				}
-				ids.add( String( id ) );
-			};
-			if ( value instanceof RichTextData ) {
-				// Read marker ids off the parsed formats; serializing every
-				// block's content on every store update was the cost here.
-				// `RichTextData` types its `formats` as `never[]`.
-				const formats: RichTextValue[ 'formats' ] = value.formats;
-				for ( const stack of formats ) {
-					for ( const format of stack ?? [] ) {
-						const id =
-							format.type === SUGGESTION_FORMAT_NAME &&
-							format.attributes?.[ SUGGESTION_ID_ATTRIBUTE ];
-						if ( id ) {
-							addId( id );
-						}
-					}
-				}
-			} else if (
-				typeof value === 'string' &&
-				value.includes( SUGGESTION_CLASS )
-			) {
-				for ( const match of value.matchAll( SUGGESTION_ID_PATTERN ) ) {
-					addId( match[ 1 ] );
-				}
-			}
-		}
-	}
-	return { inline, structural };
-}
-
-type AnchorIndex = ReturnType< typeof buildAnchorIndex >;
-
-/*
- * Index cache keyed by the block tree version, which changes on any block
- * attribute or structure change, controlled inner blocks included. Store
- * updates that leave every block alone (selection, notices, entity records)
- * reuse the last index.
- */
-const anchorIndexCache = new WeakMap<
-	object,
-	{ key: string; index: AnchorIndex }
->();
-
-/**
- * `buildAnchorIndex`, cached per block tree and attribute set.
- *
- * @param blockEditor      Block-editor selectors.
- * @param inlineAttributes Attribute names any tracked inline note anchors to.
- * @return The index.
- */
-function getAnchorIndex(
-	blockEditor: any,
-	inlineAttributes: Set< string >
-): AnchorIndex {
-	const version = getBlockTreeVersion( blockEditor );
-	const key = [ ...inlineAttributes ].sort().join( '|' );
-	const cached = version ? anchorIndexCache.get( version ) : undefined;
-	if ( cached && cached.key === key ) {
-		return cached.index;
-	}
-	const index = buildAnchorIndex( blockEditor, inlineAttributes );
-	if ( version ) {
-		anchorIndexCache.set( version, { key, index } );
-	}
-	return index;
-}
-
-/**
- * The rich-text attributes the given notes' inline anchors live in.
- *
- * @param lists Lists of tracked notes with their anchors.
- * @return Attribute names.
- */
-function inlineAttributesOf(
-	...lists: Array< Iterable< { anchor: any } > >
-): Set< string > {
-	const attributes = new Set< string >();
-	for ( const list of lists ) {
-		for ( const { anchor } of list ) {
-			if ( anchor.kind === 'inline' ) {
-				attributes.add( anchor.attribute );
-			}
-		}
-	}
-	return attributes;
-}
-
-/**
- * Whether a note's anchor is currently present in the editor.
- *
- * @param note   Note comment record.
- * @param anchor Anchor descriptor from `describeAnchor`.
- * @param index  Anchor index from `buildAnchorIndex`.
- * @return True when the anchor exists.
- */
-function isAnchorPresent(
-	note: any,
-	anchor: any,
-	index: AnchorIndex
-): boolean {
-	const idKey = String( note.id );
-	if ( anchor.kind === 'structural' ) {
-		return index.structural.has( `${ anchor.pendingType }:${ idKey }` );
-	}
-	return index.inline.get( anchor.attribute )?.has( idKey ) ?? false;
-}
-
-/**
  * Invisible component that trashes suggestion notes whose anchor disappears
  * and restores inline notes whose marker comes back (redo). Mounted for
  * every intent — withdrawals can happen outside Suggest mode too.
@@ -308,19 +111,32 @@ export default function SuggestionNoteGC() {
 		[]
 	);
 	const { notes } = useNoteThreads( postId );
+	const currentUserId = useSelect(
+		( select ) =>
+			( select( coreStore ) as any ).getCurrentUser()?.id ?? null,
+		[]
+	);
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createNotice } = useDispatch( noticesStore );
 	const registry = useRegistry();
 
-	// Pending suggestion root notes only; replies and resolved notes have no
-	// anchor contract.
-	const suggestionNotes: Array< { note: any; anchor: any } > = [];
+	/*
+	 * Pending suggestion root notes: the current user's own, which this
+	 * collector may trash, and any other a redo may resolve again (an undo
+	 * reopened a decision on it). Replies and decided notes have no anchor
+	 * contract. While the current user is unresolved nothing is owned.
+	 */
+	const suggestionNotes: Array< {
+		note: any;
+		anchor: SuggestionAnchor;
+		own: boolean;
+	} > = [];
 	/*
 	 * Notes this session applied or rejected. Their marker should be gone; if
 	 * it is back, an undo walked the block half of the decision back while the
 	 * note stayed resolved, and the note has to follow (#73411, F-18).
 	 */
-	const resolvedNotes: Array< { note: any; anchor: any } > = [];
+	const resolvedNotes: Array< { note: any; anchor: SuggestionAnchor } > = [];
 	const resolvedIds = getSuggestionsResolvedThisSession( registry );
 	for ( const note of notes ?? [] ) {
 		if ( note.parent !== 0 ) {
@@ -330,8 +146,16 @@ export default function SuggestionNoteGC() {
 		if ( ! anchor ) {
 			continue;
 		}
-		if ( note.status === 'hold' ) {
-			suggestionNotes.push( { note, anchor } );
+		if (
+			note.status === 'hold' &&
+			isPendingStatus( getSuggestionStatus( note ) )
+		) {
+			const own =
+				currentUserId !== null &&
+				Number( note.author ) === Number( currentUserId );
+			if ( own || getReopenedDecision( registry, note.id ) ) {
+				suggestionNotes.push( { note, anchor, own } );
+			}
 		} else if ( resolvedIds.has( String( note.id ) ) ) {
 			resolvedNotes.push( { note, anchor } );
 		}
@@ -341,7 +165,7 @@ export default function SuggestionNoteGC() {
 	// resurrect its note. Version state re-runs the presence probe below
 	// when the map changes.
 	const trashedRef = useRef(
-		new Map< string, { note: any; anchor: any } >()
+		new Map< string, { note: any; anchor: SuggestionAnchor } >()
 	);
 	const [ trashedVersion, setTrashedVersion ] = useState( 0 );
 
@@ -436,28 +260,44 @@ export default function SuggestionNoteGC() {
 		const index = indexAnchors();
 
 		/*
-		 * Whether anyone has answered this note, asked of the server rather than
-		 * of the thread list `useNoteThreads` resolved when the editor loaded.
-		 * Nothing refreshes that list for replies written elsewhere, which is the
-		 * case this guard exists for (#81958): a colleague answers the note in
-		 * their own session, the copy here still says nobody did, and the
-		 * withdrawal takes their comment with it. A withdrawal is rare and
-		 * already waits out a grace period, so it can afford the round trip.
+		 * The note as the server has it: whether it is still pending, and
+		 * whether anyone has answered it. Asked of the server rather than of
+		 * the thread list `useNoteThreads` resolved when the editor loaded.
+		 * Nothing refreshes that list for replies written elsewhere, which is
+		 * the case the reply guard exists for (#81958): a colleague answers the
+		 * note in their own session, the copy here still says nobody did, and
+		 * the withdrawal takes their comment with it. Likewise a peer's
+		 * decision: its content change syncs here before its status does. A
+		 * withdrawal is rare and already waits out a grace period, so it can
+		 * afford the round trip.
 		 *
 		 * Resolves to `null` when the answer is unknown - a request that failed.
 		 */
-		const fetchHasReplies = async ( noteId: number | string ) => {
+		const fetchServerState = async ( noteId: number | string ) => {
 			try {
-				const replies: any = await apiFetch( {
-					path: addQueryArgs( '/wp/v2/comments', {
-						...getNoteThreadsQuery( postId as number ),
-						parent: noteId,
-						// Existence is the whole question.
-						per_page: 1,
-						_fields: 'id',
+				const [ record, replies ]: any[] = await Promise.all( [
+					apiFetch( {
+						path: addQueryArgs( `/wp/v2/comments/${ noteId }`, {
+							context: 'edit',
+							_fields: 'status,meta',
+						} ),
 					} ),
-				} );
-				return replies.length > 0;
+					apiFetch( {
+						path: addQueryArgs( '/wp/v2/comments', {
+							...getNoteThreadsQuery( postId as number ),
+							parent: noteId,
+							// Existence is the whole question.
+							per_page: 1,
+							_fields: 'id',
+						} ),
+					} ),
+				] );
+				return {
+					pending:
+						record?.status === 'hold' &&
+						isPendingStatus( getSuggestionStatus( record ) ),
+					replied: replies.length > 0,
+				};
 			} catch {
 				return null;
 			}
@@ -468,7 +308,7 @@ export default function SuggestionNoteGC() {
 		 * again after it: the fetch is a real round trip, and a redo can put the
 		 * anchor back - or a peer decide the note - while it is in flight.
 		 */
-		const isWithdrawn = ( note: any, anchor: any ) => {
+		const isWithdrawn = ( note: any, anchor: SuggestionAnchor ) => {
 			if ( isAnchorPresent( note, anchor, indexAnchors() ) ) {
 				return false;
 			}
@@ -478,22 +318,25 @@ export default function SuggestionNoteGC() {
 			const record: any = registry
 				.select( coreStore )
 				.getEntityRecord( 'root', 'comment', note.id );
-			const lifecycleStatus = record?.meta?._wp_suggestion_status;
 			return (
 				!! record &&
 				record.status === 'hold' &&
-				( ! lifecycleStatus || lifecycleStatus === 'pending' )
+				isPendingStatus( getSuggestionStatus( record ) )
 			);
 		};
 
-		const collect = async ( note: any, anchor: any, attempt = 1 ) => {
+		const collect = async (
+			note: any,
+			anchor: SuggestionAnchor,
+			attempt = 1
+		) => {
 			timers.delete( String( note.id ) );
 			// Recheck against settled state: the anchor may be back (redo beat
 			// the grace period) or the note may have been decided.
 			if ( ! isWithdrawn( note, anchor ) ) {
 				return;
 			}
-			const replied = await fetchHasReplies( note.id );
+			const server = await fetchServerState( note.id );
 			if ( ! isWithdrawn( note, anchor ) ) {
 				return;
 			}
@@ -504,9 +347,14 @@ export default function SuggestionNoteGC() {
 			 * out of the collector's reach over one failed request. The next
 			 * presence change asks again.
 			 */
-			if ( replied === null ) {
+			if ( server === null ) {
 				return;
 			}
+			// Decided or outdated elsewhere: the anchor left with the decision.
+			if ( ! server.pending ) {
+				return;
+			}
+			const { replied } = server;
 			// The note is a discussion now, not just a proposal: keep it, and
 			// say so — the person who withdrew the suggestion is the only one
 			// who can see that the note outlived it.
@@ -572,7 +420,7 @@ export default function SuggestionNoteGC() {
 				} );
 		};
 
-		for ( const { note, anchor } of suggestionNotes ) {
+		for ( const { note, anchor, own } of suggestionNotes ) {
 			const idKey = String( note.id );
 			const present = isAnchorPresent( note, anchor, index );
 			if ( present ) {
@@ -612,8 +460,12 @@ export default function SuggestionNoteGC() {
 					'comment',
 					{
 						id: note.id,
-						status: 'approved',
-						meta: { _wp_suggestion_status: decision },
+						// Provisional again: only a post save makes it final.
+						status: 'hold',
+						meta: {
+							_wp_suggestion_status:
+								getProvisionalStatus( decision ),
+						},
 					},
 					{ throwOnError: true }
 				)
@@ -631,6 +483,7 @@ export default function SuggestionNoteGC() {
 				seenRef.current.add( idKey );
 			}
 			if (
+				! own ||
 				! seenRef.current.has( idKey ) ||
 				timers.has( idKey ) ||
 				keptRef.current.has( idKey ) ||
@@ -655,7 +508,11 @@ export default function SuggestionNoteGC() {
 			saveEntityRecord(
 				'root',
 				'comment',
-				{ id: info.note.id, status: 'hold' },
+				{
+					id: info.note.id,
+					status: 'hold',
+					meta: { _wp_suggestion_status: PENDING },
+				},
 				{ throwOnError: true }
 			).catch( () => {
 				// Restore failed; put it back so a later pass retries.
@@ -678,8 +535,8 @@ export default function SuggestionNoteGC() {
 				continue;
 			}
 			forgetResolvedSuggestion( registry, note.id );
-			const decision = note.meta?._wp_suggestion_status;
-			if ( decision === 'applied' || decision === 'rejected' ) {
+			const decision = getDecision( getSuggestionStatus( note ) );
+			if ( decision ) {
 				rememberReopenedDecision( registry, note.id, decision );
 			}
 			saveEntityRecord(
@@ -690,11 +547,11 @@ export default function SuggestionNoteGC() {
 					status: 'hold',
 					/*
 					 * `pending` rather than clearing the meta: the registered
-					 * enum (`pending` / `applied` / `rejected`) rejects the
-					 * empty string, and readers treat `pending` and absent
-					 * meta the same - awaiting a decision.
+					 * enum rejects the empty string, and readers treat
+					 * `pending` and absent meta the same - awaiting a
+					 * decision.
 					 */
-					meta: { _wp_suggestion_status: 'pending' },
+					meta: { _wp_suggestion_status: PENDING },
 				},
 				{ throwOnError: true }
 			).catch( () => {
