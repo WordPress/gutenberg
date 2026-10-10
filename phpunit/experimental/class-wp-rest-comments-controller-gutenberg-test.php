@@ -632,8 +632,8 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			'featured image'  => array(
 				array(
 					'attribute' => 'featured_media',
-					'before'    => 0,
-					'after'     => 5,
+					'before'    => 5,
+					'after'     => 0,
 				),
 			),
 			'categories'      => array(
@@ -807,6 +807,243 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 					),
 				),
 			),
+		);
+	}
+
+	/**
+	 * Creates a post field suggestion and returns the stored operation.
+	 *
+	 * @param int   $post_id   Post ID.
+	 * @param array $operation The operation, without its type.
+	 * @return array The stored operation.
+	 */
+	protected function store_post_field_suggestion( $post_id, $operation ) {
+		$response = $this->create_post_field_suggestion( $post_id, $operation );
+		$this->assertSame( 201, $response->get_status() );
+		$payload = json_decode(
+			get_comment_meta( $response->get_data()['id'], '_wp_suggestion', true ),
+			true
+		);
+		return $payload['operations'][0];
+	}
+
+	/**
+	 * Test that a suggested title or excerpt gets the filtering core applies
+	 * to that field for a user without `unfiltered_html`: the title is
+	 * limited to the tags allowed in comments, the excerpt to post markup.
+	 *
+	 * @dataProvider data_filtered_text_post_fields
+	 *
+	 * @param string $attribute Post field.
+	 * @param string $expected  Stored value.
+	 */
+	public function test_suggested_text_post_field_is_filtered_like_the_field( $attribute, $expected ) {
+		wp_set_current_user( self::$author_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
+
+		$operation = $this->store_post_field_suggestion(
+			$post_id,
+			array(
+				'attribute' => $attribute,
+				'before'    => '',
+				'after'     => '<img src="x.png"><div class="c" onclick="x()">Hello</div> <b>there</b><script>y</script>',
+			)
+		);
+
+		$this->assertSame( $expected, $operation['after'] );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_filtered_text_post_fields() {
+		return array(
+			'title'   => array( 'title', 'Hello <b>there</b>' ),
+			'excerpt' => array( 'excerpt', '<img src="x.png"><div class="c">Hello</div> <b>there</b>' ),
+		);
+	}
+
+	/**
+	 * Test that a user with `unfiltered_html` keeps markup in a suggested
+	 * title or excerpt, as when editing the field directly.
+	 *
+	 * @dataProvider data_text_post_fields
+	 *
+	 * @param string $attribute Post field.
+	 */
+	public function test_suggested_text_post_field_keeps_markup_for_user_with_unfiltered_html( $attribute ) {
+		wp_set_current_user( self::$admin_id );
+		if ( is_multisite() ) {
+			grant_super_admin( self::$admin_id );
+		}
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$admin_id ) );
+
+		$operation = $this->store_post_field_suggestion(
+			$post_id,
+			array(
+				'attribute' => $attribute,
+				'before'    => '',
+				'after'     => '<div class="c">Hello</div>',
+			)
+		);
+
+		$this->assertSame( '<div class="c">Hello</div>', $operation['after'] );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_text_post_fields() {
+		return array(
+			'title'   => array( 'title' ),
+			'excerpt' => array( 'excerpt' ),
+		);
+	}
+
+	/**
+	 * Test that a suggested slug is stored as a slug.
+	 */
+	public function test_suggested_slug_is_sanitized_as_a_slug() {
+		wp_set_current_user( self::$author_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
+
+		$operation = $this->store_post_field_suggestion(
+			$post_id,
+			array(
+				'attribute' => 'slug',
+				'before'    => 'old',
+				'after'     => 'Hello <b>World</b>!',
+			)
+		);
+
+		$this->assertSame( 'hello-world', $operation['after'] );
+	}
+
+	/**
+	 * Test that a suggested featured image is stored as an attachment id.
+	 */
+	public function test_suggested_featured_media_is_stored_as_an_id() {
+		wp_set_current_user( self::$author_id );
+		$post_id       = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
+		$attachment_id = self::factory()->attachment->create(
+			array(
+				'post_author'    => self::$author_id,
+				'post_mime_type' => 'image/jpeg',
+			)
+		);
+
+		$operation = $this->store_post_field_suggestion(
+			$post_id,
+			array(
+				'attribute' => 'featured_media',
+				'before'    => '0',
+				'after'     => (string) $attachment_id,
+			)
+		);
+
+		$this->assertSame( $attachment_id, $operation['after'] );
+		$this->assertSame( 0, $operation['before'] );
+	}
+
+	/**
+	 * Test that a featured image suggestion is refused for anything but an
+	 * attachment the suggester can read.
+	 *
+	 * @dataProvider data_invalid_featured_media
+	 *
+	 * @param string $target What the suggestion points at.
+	 */
+	public function test_cannot_suggest_featured_media_that_is_not_a_readable_attachment( $target ) {
+		wp_set_current_user( self::$author_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
+		switch ( $target ) {
+			case 'post':
+				$after = self::factory()->post->create();
+				break;
+			case 'private attachment':
+				$parent = self::factory()->post->create(
+					array(
+						'post_author' => self::$editor_id,
+						'post_status' => 'private',
+					)
+				);
+				$after  = self::factory()->attachment->create(
+					array(
+						'post_author'    => self::$editor_id,
+						'post_parent'    => $parent,
+						'post_mime_type' => 'image/jpeg',
+					)
+				);
+				break;
+			case 'missing':
+				$after = 999999;
+				break;
+			default:
+				$after = 'image';
+		}
+
+		$response = $this->create_post_field_suggestion(
+			$post_id,
+			array(
+				'attribute' => 'featured_media',
+				'before'    => 0,
+				'after'     => $after,
+			)
+		);
+
+		$this->assertErrorResponse( 'rest_invalid_suggestion', $response, 400 );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_invalid_featured_media() {
+		return array(
+			'a post'               => array( 'post' ),
+			'a private attachment' => array( 'private attachment' ),
+			'a missing attachment' => array( 'missing' ),
+			'not an id'            => array( 'not an id' ),
+		);
+	}
+
+	/**
+	 * Test that a text post field suggestion must carry text.
+	 *
+	 * @dataProvider data_non_text_post_field_values
+	 *
+	 * @param string $key   Operation key, `before` or `after`.
+	 * @param mixed  $value Value.
+	 */
+	public function test_cannot_suggest_a_non_text_title( $key, $value ) {
+		wp_set_current_user( self::$author_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
+
+		$operation         = array(
+			'attribute' => 'title',
+			'before'    => '',
+			'after'     => 'x',
+		);
+		$operation[ $key ] = $value;
+		$response          = $this->create_post_field_suggestion( $post_id, $operation );
+
+		$this->assertErrorResponse( 'rest_invalid_suggestion', $response, 400 );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_non_text_post_field_values() {
+		return array(
+			'array after'  => array( 'after', array( 'x' ) ),
+			'array before' => array( 'before', array( 'x' ) ),
 		);
 	}
 
