@@ -88,6 +88,7 @@ function note( {
 		parent: 0,
 		author,
 		status,
+		...( author !== undefined && { author } ),
 		meta: {
 			_wp_suggestion_status: lifecycle,
 			_wp_suggestion: JSON.stringify( {
@@ -488,10 +489,14 @@ describe( 'SuggestionNoteGC collecting a withdrawn suggestion', () => {
 	 *                   request that fails.
 	 * @return The registry and the `saveEntityRecord` spy.
 	 */
-	async function withdrawMarker( threads: any[], repliesNow?: any[] | null ) {
+	async function withdrawMarker(
+		threads: any[],
+		repliesNow?: any[] | null,
+		currentUserId?: number
+	) {
 		let harness: any;
 		await act( async () => {
-			harness = setup( { content: MARKED, threads } );
+			harness = setup( { content: MARKED, threads, currentUserId } );
 		} );
 
 		if ( repliesNow === null ) {
@@ -536,6 +541,36 @@ describe( 'SuggestionNoteGC collecting a withdrawn suggestion', () => {
 			{ id: NOTE_ID, status: 'trash' },
 			expect.anything()
 		);
+	} );
+
+	it( 'trashes the current user’s own note', async () => {
+		const { saveEntityRecord } = await withdrawMarker(
+			[ note( { status: 'hold', lifecycle: 'pending', author: 1 } ) ],
+			undefined,
+			1
+		);
+
+		expect( saveEntityRecord ).toHaveBeenCalledWith(
+			'root',
+			'comment',
+			{ id: NOTE_ID, status: 'trash' },
+			expect.anything()
+		);
+	} );
+
+	it( 'leaves another author’s note for the save pass to mark outdated', async () => {
+		/*
+		 * Rejecting someone's addition takes a third author's nested
+		 * deletion with it. That note is not the reviewer's to trash: the
+		 * server marks it outdated when the post saves.
+		 */
+		const { saveEntityRecord } = await withdrawMarker(
+			[ note( { status: 'hold', lifecycle: 'pending', author: 5 } ) ],
+			undefined,
+			1
+		);
+
+		expect( saveEntityRecord ).not.toHaveBeenCalled();
 	} );
 
 	it( 'keeps a pending note that has replies, and says so', async () => {
