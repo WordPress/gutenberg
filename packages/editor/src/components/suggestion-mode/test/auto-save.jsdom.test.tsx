@@ -425,6 +425,35 @@ describe( 'SuggestionAutoSave', () => {
 		expect( markerOf( registry, first.clientId ).commentId ).toBe( 43 );
 	} );
 
+	it.each( [ 'applied-unsaved', 'rejected-unsaved' ] )(
+		'creates a fresh suggestion when the linked note was decided but not saved (%s)',
+		async ( lifecycle ) => {
+			createSuggestion
+				.mockResolvedValueOnce( { id: 42 } )
+				.mockResolvedValueOnce( { id: 43 } );
+			updateSuggestion.mockResolvedValue( { id: 42 } );
+			const block = heading();
+			const { registry } = renderWith( 'suggest', [ block ] );
+
+			propose( registry, block.clientId, { level: 3 } );
+			await pastDebounce();
+
+			// A reviewer decided note 42; it stays open until the post saves.
+			seedComment( registry, {
+				id: 42,
+				status: 'hold',
+				meta: { _wp_suggestion_status: lifecycle },
+			} );
+
+			propose( registry, block.clientId, { level: 4 } );
+			await pastDebounce();
+
+			// The reviewer's evidence is never rewritten.
+			expect( updateSuggestion ).not.toHaveBeenCalled();
+			expect( createSuggestion ).toHaveBeenCalledTimes( 2 );
+		}
+	);
+
 	it( 'continues to update the linked note while it is still pending', async () => {
 		createSuggestion.mockResolvedValue( { id: 42 } );
 		updateSuggestion.mockResolvedValue( { id: 42 } );
