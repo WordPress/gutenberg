@@ -1120,6 +1120,31 @@ function gutenberg_apply_suggestion_splices( $input, $edits ) {
 add_filter( 'render_block', 'gutenberg_strip_inline_suggestion_markers' );
 
 /**
+ * Whether a note's suggestion data may be put into a post's content.
+ *
+ * The one gate every path that renders or re-inflates note data passes: the
+ * note is a `note` on that post, and it is not trashed, marked as spam or
+ * trashed with its post. Paths add their own checks on top: the front-end
+ * restore of a format original also needs a pending suggestion and a post
+ * whose password, if any, was given (see
+ * `gutenberg_get_pending_format_suggestion_html()`), while the edit-context
+ * re-inflation is already limited to users who can read the post's
+ * suggestions.
+ *
+ * @param int|WP_Comment $note    Note, or its ID.
+ * @param int            $post_id Post whose content would carry the data.
+ * @return bool Whether the note's data may be used.
+ */
+function gutenberg_can_render_suggestion_note( $note, $post_id ) {
+	$post_id = (int) $post_id;
+	$note    = get_comment( $note );
+	if ( $post_id <= 0 || ! $note || 'note' !== $note->comment_type || (int) $note->comment_post_ID !== $post_id ) {
+		return false;
+	}
+	return ! in_array( $note->comment_approved, array( 'trash', 'spam', 'post-trashed' ), true );
+}
+
+/**
  * Resolves the original run of a pending inline format suggestion.
  *
  * A `format` marker's run carries the proposed formatting; the note records the
@@ -1127,11 +1152,11 @@ add_filter( 'render_block', 'gutenberg_strip_inline_suggestion_markers' );
  * when all of these hold, so a marker copied into other content cannot pull a
  * post's text onto that page:
  *
- * - the note is on the post whose content is being rendered,
+ * - the note is on the post whose content is being rendered and is not
+ *   trashed or marked as spam (`gutenberg_can_render_suggestion_note()`),
  * - that post's stored content (or, in a preview by a user who can edit the
  *   post, that user's autosave of it) holds a marker for the note,
  * - the post is not password protected, or its password was given,
- * - the note is not trashed or marked as spam,
  * - the suggestion is neither applied nor rejected.
  *
  * `beforeHTML` was filtered at write time to what its author could publish
@@ -1142,14 +1167,7 @@ add_filter( 'render_block', 'gutenberg_strip_inline_suggestion_markers' );
  * @return string|null Original run HTML, or null when it cannot be resolved.
  */
 function gutenberg_get_pending_format_suggestion_html( $note_id, $post_id ) {
-	if ( $note_id <= 0 || $post_id <= 0 ) {
-		return null;
-	}
-	$note = get_comment( $note_id );
-	if ( ! $note || 'note' !== $note->comment_type || (int) $note->comment_post_ID !== $post_id ) {
-		return null;
-	}
-	if ( in_array( $note->comment_approved, array( 'trash', 'spam', 'post-trashed' ), true ) ) {
+	if ( $note_id <= 0 || ! gutenberg_can_render_suggestion_note( $note_id, $post_id ) ) {
 		return null;
 	}
 	if ( in_array( get_comment_meta( $note_id, '_wp_suggestion_status', true ), array( 'applied', 'rejected' ), true ) ) {

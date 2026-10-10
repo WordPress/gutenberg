@@ -296,6 +296,17 @@ class Tests_Suggestion_Content_Save extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'zanzibarian', $this->edit_view( $post_id ) );
 	}
 
+	public function test_a_note_trashed_with_its_post_is_not_shown_until_restored() {
+		list( $post_id, $content ) = $this->suggested_post();
+
+		// What trashing the post does to its notes.
+		wp_trash_post_comments( $post_id );
+		$this->assertStringNotContainsString( 'zanzibarian', $this->edit_view( $post_id ) );
+
+		wp_untrash_post_comments( $post_id );
+		$this->assertSame( $content, $this->edit_view( $post_id ) );
+	}
+
 	public function test_markers_for_other_notes_propose_nothing() {
 		$post_id    = $this->create_post( $this->paragraph( 'Hello' ) );
 		$other_post = $this->create_post();
