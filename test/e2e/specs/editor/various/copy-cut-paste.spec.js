@@ -928,4 +928,69 @@ test.describe( 'Copy/cut/paste', () => {
 			},
 		] );
 	} );
+
+	test.describe( 'Block bindings', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin(
+				'gutenberg-test-block-bindings'
+			);
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-block-bindings'
+			);
+		} );
+
+		test( 'should copy the text when the entire text of a bound block is selected', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					metadata: {
+						bindings: {
+							content: {
+								source: 'core/post-meta',
+								args: { key: 'text_custom_field' },
+							},
+						},
+					},
+				},
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'existing ' },
+			} );
+
+			// Wait for the bound value to load from post meta.
+			await expect(
+				editor.canvas.getByText( 'Value of the text custom field' )
+			).toBeVisible();
+
+			// Navigate with the keyboard: the selected paragraph's toolbar
+			// covers the bound paragraph above it.
+			await page.keyboard.press( 'ArrowUp' );
+			await pageUtils.pressKeys( 'primary+a' );
+			await pageUtils.pressKeys( 'primary+c' );
+
+			// The bound text isn't part of the serialized block, so the
+			// text is copied instead of the block.
+			await editor.canvas.getByText( 'existing' ).click();
+			await page.keyboard.press( 'End' );
+			await pageUtils.pressKeys( 'primary+v' );
+
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{ name: 'core/paragraph' },
+				{
+					name: 'core/paragraph',
+					attributes: {
+						content: 'existing Value of the text custom field',
+					},
+				},
+			] );
+		} );
+	} );
 } );
