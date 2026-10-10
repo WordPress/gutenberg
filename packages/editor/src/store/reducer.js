@@ -499,6 +499,34 @@ export function editorIntent( state = 'edit', action ) {
 	return state;
 }
 
+/**
+ * Post field proposals made while suggesting, keyed by proposal id (the post
+ * field, or `meta.<key>` for a meta key). Each holds the value the field had
+ * when the proposal was first made (`baseline`) and the proposed value. They
+ * are in-memory only: the record a reviewer acts on is the note each one is
+ * saved as. Cleared when another post is edited.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ * @return {Object} Updated state.
+ */
+export function postFieldProposals( state = {}, action ) {
+	switch ( action.type ) {
+		case 'SET_POST_FIELD_PROPOSAL':
+			return { ...state, [ action.id ]: action.proposal };
+		case 'CLEAR_POST_FIELD_PROPOSAL': {
+			if ( ! ( action.id in state ) ) {
+				return state;
+			}
+			const { [ action.id ]: _removed, ...rest } = state;
+			return rest;
+		}
+		case 'SET_EDITED_POST':
+			return Object.keys( state ).length ? {} : state;
+	}
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
@@ -525,5 +553,6 @@ export default combineReducers( {
 	showRevisionDiff,
 	selectedNote,
 	editorIntent,
+	postFieldProposals,
 	dataviews: dataviewsReducer,
 } );

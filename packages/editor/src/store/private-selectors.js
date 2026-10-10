@@ -31,6 +31,7 @@ import {
 	EDITOR_INTENT_EDIT,
 	EDITOR_INTENT_SUGGEST,
 	EDITOR_INTENT_VIEW,
+	SUGGEST_PROPOSABLE_POST_FIELDS,
 } from './constants';
 import { hasPendingSuggestionMarkers } from './utils/pending-suggestion-markers';
 import { unlock } from '../lock-unlock';
@@ -722,3 +723,116 @@ export function getCodeEditorUnavailableReason(
 
 	return null;
 }
+
+/**
+ * The post field proposals made while suggesting, keyed by proposal id.
+ *
+ * @param {Object} state Global application state.
+ * @return {Object} Proposals: `{ attribute, key?, baseline, proposed }`.
+ */
+export function getPostFieldProposals( state ) {
+	return state.postFieldProposals;
+}
+
+/**
+ * A post field's value as the post holds it (saved value plus staged
+ * edits), ignoring any proposal: what a proposal's baseline is, and what a
+ * reviewer's decision is checked against.
+ *
+ * @param {Object} state     Global application state.
+ * @param {string} attribute Post field.
+ * @param {string} [key]     Meta key, for `meta`.
+ * @return {*} The value.
+ */
+export const getPostFieldValueWithoutProposals = createRegistrySelector(
+	( select ) => ( state, attribute, key ) => {
+		const record = select( coreStore ).getEditedEntityRecord(
+			'postType',
+			getCurrentPostType( state ),
+			getCurrentPostId( state )
+		);
+		if ( attribute === 'meta' && key ) {
+			return record?.meta?.[ key ];
+		}
+		return record?.[ attribute ];
+	}
+);
+
+/**
+ * Whether Suggestion mode can hold a change to a post field (or one meta
+ * key) as a proposal, rather than refusing it.
+ *
+ * @param {Object} state     Global application state.
+ * @param {string} attribute Post field.
+ * @param {string} [key]     Meta key, for `meta`.
+ * @return {boolean} Whether the change can be proposed.
+ */
+export const isProposablePostField = createRegistrySelector(
+	( select ) => ( state, attribute, key ) => {
+		if ( SUGGEST_PROPOSABLE_POST_FIELDS.includes( attribute ) ) {
+			return true;
+		}
+		const postType = getCurrentPostType( state );
+		/*
+		 * A meta key the post's REST record carries: only keys registered
+		 * with `show_in_rest` are there. The server checks the suggester
+		 * could edit that key when the note is saved, and the reviewer's
+		 * save checks it again for the reviewer.
+		 */
+		if ( attribute === 'meta' ) {
+			const meta = select( coreStore ).getEntityRecord(
+				'postType',
+				postType,
+				getCurrentPostId( state )
+			)?.meta;
+			return (
+				!! key &&
+				!! meta &&
+				Object.prototype.hasOwnProperty.call( meta, key )
+			);
+		}
+		// The post type's taxonomies, by the `rest_base` their term ids are
+		// edited under. Proposing terms assigns existing ones; creating a
+		// term is a real write the term pickers do not offer while
+		// suggesting.
+		return !! select( coreStore )
+			.getTaxonomies( { per_page: -1 } )
+			?.some(
+				( taxonomy ) =>
+					taxonomy.rest_base === attribute &&
+					taxonomy.types?.includes( postType )
+			);
+	}
+);
+
+const EMPTY_NEW_TERMS = [];
+
+/**
+ * The terms a pending terms proposal adds that do not exist yet, for one of
+ * the post's taxonomies. Suggesting cannot create a term, so a new term
+ * rides on the proposal as `{ name, parent? }` until a reviewer accepts it.
+ * Empty unless suggesting.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} restBase The taxonomy's `rest_base`.
+ * @return {Array<{name: string, parent?: number}>} The new terms.
+ */
+export const getProposedNewTerms = createSelector(
+	( state, restBase ) => {
+		const proposed = state.postFieldProposals[ restBase ]?.proposed;
+		if (
+			state.editorIntent !== EDITOR_INTENT_SUGGEST ||
+			! Array.isArray( proposed )
+		) {
+			return EMPTY_NEW_TERMS;
+		}
+		const newTerms = proposed.filter(
+			( item ) => item && typeof item === 'object'
+		);
+		return newTerms.length ? newTerms : EMPTY_NEW_TERMS;
+	},
+	( state, restBase ) => [
+		state.editorIntent,
+		state.postFieldProposals[ restBase ],
+	]
+);
