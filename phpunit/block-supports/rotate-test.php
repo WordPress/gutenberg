@@ -150,7 +150,7 @@ class WP_Block_Supports_Rotate_Test extends WP_UnitTestCase {
 			'half rounded away from zero'          => array( 1.005, 1.01 ),
 			'numeric string with spaces'           => array( ' 15 ', 15.0 ),
 			'numeric string with exponent'         => array( '1e2', 100.0 ),
-			'hexadecimal string'                   => array( '0x10', null ),
+			'hexadecimal string'                   => array( '0x10', null ), // phpcs:ignore PHPCompatibility.Miscellaneous.ValidIntegers.HexNumericStringFound -- Checks that hexadecimal strings are rejected.
 			'binary string'                        => array( '0b11', null ),
 			'rounded onto a half turn'             => array( -179.999, 180.0 ),
 			'string with a unit'                   => array( '15deg', null ),
