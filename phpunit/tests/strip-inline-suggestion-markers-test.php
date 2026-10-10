@@ -138,14 +138,12 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	}
 
 	public function test_unpaired_flagged_opener_leaks_no_sentinel() {
-		// A suggestion opener with no closer can't be paired by the offset
-		// pass; the marker stays (defaulting safe: text kept) but the internal
-		// sentinel must not leak into public output.
-		$html     = '<p><mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add">oops</p>';
+		// An addition with no closer still never shows its text, and the
+		// internal sentinel must not leak into public output.
+		$html     = '<p><mark class="wp-suggestion" data-wp-suggestion-strip="del" data-suggestion-id="1" data-suggestion-type="add">oops</p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
-		$this->assertStringContainsString( 'oops', $stripped );
-		$this->assertStringNotContainsString( 'data-wp-suggestion-strip', $stripped );
+		$this->assertSame( '<p></p>', $stripped );
 	}
 
 	public function test_closer_inside_attribute_of_addition_child_does_not_end_the_addition() {
@@ -217,20 +215,68 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 		$this->assertSame( '<p>xyold</p>', $stripped );
 	}
 
-	public function test_unclosed_addition_keeps_its_content_and_unwraps_a_closed_inner_deletion() {
-		// The `</mark>` closes the inner deletion, leaving the addition without
-		// a closer: its content must never be dropped.
-		$html     = '<p><mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add">a<mark class="wp-suggestion" data-suggestion-id="2" data-suggestion-type="del">b</mark>c</p>';
+	public function test_unclosed_addition_ends_with_its_enclosing_element() {
+		// The `</p>` implicitly closes the addition, as it does in a browser and
+		// in the editor: the pending text up to it is removed, and its metadata
+		// never renders.
+		$html     = '<p>keep <mark class="wp-suggestion" data-suggestion-type="add" data-author="3" data-suggestion-id="1">PENDING</p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
-		$this->assertSame( '<p><mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add">abc</p>', $stripped );
+		$this->assertSame( '<p>keep </p>', $stripped );
+	}
+
+	public function test_addition_left_open_by_a_closed_plain_mark_is_removed() {
+		// The `</mark>` closes the inner plain mark, leaving the addition open.
+		$html     = '<p><mark class="wp-suggestion" data-suggestion-type="add" data-author="3" data-suggestion-id="1">PENDING<mark>x</mark></p>';
+		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
+
+		$this->assertSame( '<p></p>', $stripped );
+	}
+
+	public function test_unclosed_addition_is_removed_with_a_closed_inner_deletion() {
+		// The `</mark>` closes the inner deletion, leaving the addition open.
+		$html     = '<p>x<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add">a<mark class="wp-suggestion" data-suggestion-id="2" data-suggestion-type="del">b</mark>c</p><p>y</p>';
+		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
+
+		$this->assertSame( '<p>x</p><p>y</p>', $stripped );
+	}
+
+	public function test_unclosed_addition_runs_to_the_end_of_the_block() {
+		$html     = 'a<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add">PENDING<span>more';
+		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
+
+		$this->assertSame( 'a', $stripped );
+	}
+
+	public function test_unclosed_addition_is_not_ended_by_a_closer_outside_table_scope() {
+		// A browser ignores `</div>` inside the table cell, so the cell (and
+		// the text after it) stays inside the addition.
+		$html     = '<div>a<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add"><table><tr><td>X</div>Y</td></tr></table></div>';
+		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
+
+		$this->assertSame( '<div>a</div>', $stripped );
+	}
+
+	public function test_unclosed_deletion_keeps_its_text_but_drops_the_marker() {
+		$html     = '<p>a<mark class="wp-suggestion" data-suggestion-type="del" data-author="3" data-suggestion-id="1">kept</p>';
+		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
+
+		$this->assertSame( '<p>akept</p>', $stripped );
+	}
+
+	public function test_unclosed_format_is_removed() {
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_format_note( $post_id, 'orig' );
+		$html    = '<p>a<mark class="wp-suggestion" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>b</strong></p>';
+
+		$this->assertSame( '<p>a</p>', $this->strip_in_post( $post_id, $html ) );
 	}
 
 	public function test_planted_sentinel_on_unclosed_marker_is_removed() {
 		$html     = '<p><mark class="wp-suggestion" data-wp-suggestion-strip="add" data-suggestion-id="1" data-suggestion-type="del">kept</p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
-		$this->assertSame( '<p><mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del">kept</p>', $this->normalize_tag_whitespace( $stripped ) );
+		$this->assertSame( '<p>kept</p>', $stripped );
 	}
 
 	public function test_planted_sentinel_inside_deletion_is_removed() {
@@ -313,15 +359,155 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Renders a block as if it were part of the given post.
+	 * Stores markup as a post's content without content filters, so the
+	 * markers survive as written.
+	 *
+	 * @param int    $post_id Post to update.
+	 * @param string $content Post content.
+	 */
+	private function set_post_content( $post_id, $content ) {
+		global $wpdb;
+		$wpdb->update( $wpdb->posts, array( 'post_content' => $content ), array( 'ID' => $post_id ) );
+		clean_post_cache( $post_id );
+	}
+
+	/**
+	 * Renders a paragraph block as the content of the given post.
 	 *
 	 * @param int    $post_id Post being rendered.
-	 * @param string $html    Block HTML.
-	 * @return string Filtered block HTML.
+	 * @param string $html    Paragraph HTML.
+	 * @param bool   $store   Whether to store the paragraph as the post's
+	 *                        content first.
+	 * @return string Rendered content.
 	 */
-	private function strip_in_post( $post_id, $html ) {
+	private function strip_in_post( $post_id, $html, $store = true ) {
+		$content = '<!-- wp:paragraph -->' . $html . '<!-- /wp:paragraph -->';
+		if ( $store ) {
+			$this->set_post_content( $post_id, $content );
+		}
 		$GLOBALS['post'] = get_post( $post_id );
-		return gutenberg_strip_inline_suggestion_markers( $html );
+		return $this->without_paragraph_class( trim( apply_filters( 'the_content', $content ) ) );
+	}
+
+	/**
+	 * Removes the class the paragraph block adds on render.
+	 *
+	 * @param string $html Rendered HTML.
+	 * @return string HTML without the paragraph block class.
+	 */
+	private function without_paragraph_class( $html ) {
+		return str_replace( ' class="wp-block-paragraph"', '', $html );
+	}
+
+	/**
+	 * Builds a format marker.
+	 *
+	 * @param int    $note_id Note comment ID.
+	 * @param string $inner   Marked run.
+	 * @return string Marker HTML.
+	 */
+	private function format_marker( $note_id, $inner ) {
+		return '<mark class="wp-suggestion" data-suggestion-id="' . $note_id . '" data-suggestion-type="format">' . $inner . '</mark>';
+	}
+
+	/**
+	 * Creates a published post whose paragraph holds a pending format change
+	 * recorded with the original `SECRET`.
+	 *
+	 * @return int[] Post ID and note ID.
+	 */
+	private function create_post_with_format_change() {
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_format_note( $post_id, 'SECRET' );
+		$this->set_post_content( $post_id, '<!-- wp:paragraph --><p>Hello ' . $this->format_marker( $note_id, '<strong>world</strong>' ) . '</p><!-- /wp:paragraph -->' );
+		return array( $post_id, $note_id );
+	}
+
+	/**
+	 * Renders a page holding a Query Loop of posts.
+	 *
+	 * @param string $template Inner blocks of the post template.
+	 * @return string Rendered content.
+	 */
+	private function render_page_with_query_loop( $template ) {
+		$page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		$content = '<!-- wp:query {"queryId":1,"query":{"postType":"post","perPage":5,"inherit":false}} --><div class="wp-block-query"><!-- wp:post-template -->' . $template . '<!-- /wp:post-template --></div><!-- /wp:query -->';
+		$this->set_post_content( $page_id, $content );
+		$GLOBALS['post'] = get_post( $page_id );
+		return $this->without_paragraph_class( apply_filters( 'the_content', $content ) );
+	}
+
+	public function test_query_loop_item_does_not_resolve_a_queried_posts_note() {
+		list( , $note_id ) = $this->create_post_with_format_change();
+
+		$rendered = $this->render_page_with_query_loop(
+			'<!-- wp:paragraph --><p>' . $this->format_marker( $note_id, '<strong>planted</strong>' ) . '</p><!-- /wp:paragraph -->'
+		);
+
+		// The paragraph belongs to the page, so the queried post's note is
+		// not consulted and the marker unwraps.
+		$this->assertStringNotContainsString( 'SECRET', $rendered );
+		$this->assertStringContainsString( '<p><strong>planted</strong></p>', $rendered );
+	}
+
+	public function test_query_loop_post_content_restores_each_posts_own_original() {
+		$this->create_post_with_format_change();
+
+		$rendered = $this->render_page_with_query_loop( '<!-- wp:post-content /-->' );
+
+		$this->assertStringContainsString( '<p>Hello SECRET</p>', $rendered );
+	}
+
+	public function test_post_content_restores_its_own_original() {
+		list( $post_id ) = $this->create_post_with_format_change();
+		$GLOBALS['post'] = get_post( $post_id );
+
+		$this->assertStringContainsString( '<p>Hello SECRET</p>', $this->without_paragraph_class( apply_filters( 'the_content', get_post( $post_id )->post_content ) ) );
+	}
+
+	public function test_marker_outside_post_content_is_not_resolved() {
+		list( , $note_id ) = $this->create_post_with_format_change();
+
+		$this->assertSame( '<p><strong>world</strong></p>', gutenberg_strip_inline_suggestion_markers( '<p>' . $this->format_marker( $note_id, '<strong>world</strong>' ) . '</p>' ) );
+	}
+
+	public function test_note_missing_from_its_posts_content_is_not_used() {
+		list( $post_id, $note_id ) = $this->create_post_with_format_change();
+
+		$this->set_post_content( $post_id, '<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->' );
+		$html = '<p>' . $this->format_marker( $note_id, '<strong>world</strong>' ) . '</p>';
+
+		$this->assertSame( '<p><strong>world</strong></p>', $this->strip_in_post( $post_id, $html, false ) );
+	}
+
+	public function test_trashed_note_is_not_used() {
+		list( $post_id, $note_id ) = $this->create_post_with_format_change();
+		wp_trash_comment( $note_id );
+
+		$this->assertSame( '<p><strong>world</strong></p>', $this->strip_in_post( $post_id, '<p>' . $this->format_marker( $note_id, '<strong>world</strong>' ) . '</p>' ) );
+	}
+
+	public function test_spam_note_is_not_used() {
+		list( $post_id, $note_id ) = $this->create_post_with_format_change();
+		wp_spam_comment( $note_id );
+
+		$this->assertSame( '<p><strong>world</strong></p>', $this->strip_in_post( $post_id, '<p>' . $this->format_marker( $note_id, '<strong>world</strong>' ) . '</p>' ) );
+	}
+
+	public function test_rejected_note_is_not_used() {
+		list( $post_id, $note_id ) = $this->create_post_with_format_change();
+		update_comment_meta( $note_id, '_wp_suggestion_status', 'rejected' );
+
+		$this->assertSame( '<p><strong>world</strong></p>', $this->strip_in_post( $post_id, '<p>' . $this->format_marker( $note_id, '<strong>world</strong>' ) . '</p>' ) );
+	}
+
+	public function test_password_protected_post_is_not_resolved() {
+		list( $post_id, $note_id ) = $this->create_post_with_format_change();
+		global $wpdb;
+		$wpdb->update( $wpdb->posts, array( 'post_password' => 'pass' ), array( 'ID' => $post_id ) );
+		clean_post_cache( $post_id );
+
+		$this->assertSame( '<p><strong>world</strong></p>', $this->strip_in_post( $post_id, '<p>' . $this->format_marker( $note_id, '<strong>world</strong>' ) . '</p>' ) );
 	}
 
 	public function test_pending_format_restores_the_original_run() {
@@ -423,6 +609,78 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 		$html    = '<p><mark class="wp-suggestion" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>b</strong></mark></p>';
 
 		$this->assertSame( '<p><span>o</span></p>', $this->normalize_tag_whitespace( $this->strip_in_post( $post_id, $html ) ) );
+	}
+
+	/**
+	 * Builds a paragraph with many unclosed deletion openers followed by a
+	 * closed addition.
+	 *
+	 * @param int $deletions Number of unclosed deletion openers.
+	 * @return string Block HTML.
+	 */
+	private function many_open_deletions_then_addition( $deletions ) {
+		$html = '<p>';
+		for ( $i = 1; $i <= $deletions; $i++ ) {
+			$html .= '<mark class="wp-suggestion" data-suggestion-id="' . $i . '" data-suggestion-type="del">Q';
+		}
+		return $html . '<mark class="wp-suggestion" data-suggestion-id="0" data-suggestion-type="add">PENDING</mark></p>';
+	}
+
+	public function test_addition_after_999_open_deletions_is_removed_once() {
+		$stripped = gutenberg_strip_inline_suggestion_markers( $this->many_open_deletions_then_addition( 999 ) );
+
+		$this->assertSame( '<p>' . str_repeat( 'Q', 999 ) . '</p>', $stripped );
+	}
+
+	public function test_addition_after_1000_open_deletions_is_removed_once() {
+		$stripped = gutenberg_strip_inline_suggestion_markers( $this->many_open_deletions_then_addition( 1000 ) );
+
+		$this->assertSame( '<p>' . str_repeat( 'Q', 1000 ) . '</p>', $stripped );
+	}
+
+	public function test_restored_format_run_has_its_note_markers_stripped() {
+		// The note-marker strip has already run on the block by the time the
+		// original is swapped in, so the original needs its own pass.
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_format_note( $post_id, 'a<mark class="wp-note" data-note-id="4">orig</mark>b' );
+		$html    = '<p><mark class="wp-suggestion" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>x</strong></mark></p>';
+
+		$this->assertSame( '<p>aorigb</p>', $this->strip_in_post( $post_id, $html ) );
+	}
+
+	/**
+	 * Data provider: additions whose lexical span and browser span differ.
+	 *
+	 * @return array[] Input HTML and expected output.
+	 */
+	public function data_unbalanced_additions() {
+		$add = '<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add" data-author="3">';
+		return array(
+			'crossing </p><p>'               => array( '<p>a' . $add . 'X</p><p>Y</mark>b</p>', '<p>ab</p>' ),
+			'block-level start tag inside'   => array( '<p>a' . $add . 'X<div>Y</div></mark>b</p>', '<p>ab</p>' ),
+			'crossing </td> in a table cell' => array( '<table><tr><td>a' . $add . 'X</td><td>Y</mark>b</td></tr></table>', '<table><tr><td>ab</td></tr></table>' ),
+			'crossing </li> in a list item'  => array( '<ul><li>a' . $add . 'X</li><li>Y</mark>b</li></ul>', '<ul><li>ab</li></ul>' ),
+			'closer ignored inside a div'    => array( '<div>a' . $add . 'X<div>Y</mark>Z</div>W</div>c', '<div>a</div>c' ),
+			'closer ignored inside a table'  => array( '<div>a' . $add . '<table></mark>LEAK</table>Z</div>c', '<div>a</div>c' ),
+			'formatting closer past a div'   => array( '<p><b>a' . $add . 'X<div>Y</b>Z</div>W</p>', '<p><b>a</p>' ),
+			'format crossing </p><p>'        => array( '<p>a<mark class="wp-suggestion" data-suggestion-id="999999" data-suggestion-type="format">X</p><p>Y</mark>b</p>', '<p>ab</p>' ),
+		);
+	}
+
+	/**
+	 * @dataProvider data_unbalanced_additions
+	 *
+	 * @param string $html     Block HTML.
+	 * @param string $expected Expected output.
+	 */
+	public function test_unbalanced_addition_fails_closed( $html, $expected ) {
+		$this->assertSame( $expected, gutenberg_strip_inline_suggestion_markers( $html ) );
+	}
+
+	public function test_unbalanced_deletion_keeps_its_text() {
+		$html = '<p>a<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del">X</p><p>Y</mark>b</p>';
+
+		$this->assertSame( '<p>aX</p><p>Yb</p>', gutenberg_strip_inline_suggestion_markers( $html ) );
 	}
 
 	public function test_filter_is_registered_on_render_block() {
