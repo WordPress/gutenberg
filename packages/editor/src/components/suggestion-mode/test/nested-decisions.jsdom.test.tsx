@@ -220,8 +220,11 @@ describe( 'decisions on nested suggestions', () => {
 		expect( content().text ).toBe( 'Intro. Bright red .' );
 		const rebase = saved.find( ( record ) => record.id === 2 );
 		expect(
-			JSON.parse( rebase.meta._wp_suggestion ).operations[ 0 ].beforeHTML
-		).toBe( 'red ' );
+			JSON.parse( rebase.meta._wp_suggestion ).operations[ 0 ]
+		).toMatchObject( {
+			beforeHTML: 'red ',
+			afterHTML: '<strong>red </strong>',
+		} );
 	} );
 
 	it( 'says when a rejected formatting change could not restore its original', async () => {
