@@ -31,7 +31,7 @@ test.describe( 'Navigation menu screen: Auto add pages', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'the setting is saved as soon as it is changed', async ( {
+	test( 'the setting is saved from the Save button with the rest of the menu', async ( {
 		admin,
 		page,
 		requestUtils,
@@ -54,15 +54,23 @@ test.describe( 'Navigation menu screen: Auto add pages', () => {
 		await toggle.click();
 		await expect( toggle ).toBeChecked();
 
-		await expect
-			.poll( async () => {
-				const savedMenu = await requestUtils.rest( {
-					path: `/wp/v2/navigation/${ menu.id }`,
-					params: { context: 'edit' },
-				} );
-				return savedMenu.meta[ META_KEY ];
-			} )
-			.toBe( true );
+		// The change is one of the menu's pending edits, saved like its items.
+		await page
+			.getByRole( 'button', { name: /^Review \d+ changes?…$/ } )
+			.click();
+		await page
+			.getByRole( 'dialog', { name: 'Review changes' } )
+			.getByRole( 'button', { name: 'Save', exact: true } )
+			.click();
+		await expect(
+			page.getByRole( 'button', { name: 'Saved', exact: true } )
+		).toBeVisible();
+
+		const savedMenu = await requestUtils.rest( {
+			path: `/wp/v2/navigation/${ menu.id }`,
+			params: { context: 'edit' },
+		} );
+		expect( savedMenu.meta[ META_KEY ] ).toBe( true );
 
 		const about = await requestUtils.createPage( {
 			title: 'About',
