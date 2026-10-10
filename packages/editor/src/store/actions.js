@@ -273,6 +273,14 @@ export const editPost =
 					dispatch.setPostFieldProposal( proposalId, {
 						attribute,
 						...( key ? { key } : {} ),
+						// A proposal restored from its note keeps the link,
+						// so the note is updated rather than duplicated.
+						...( existing?.commentId
+							? {
+									commentId: existing.commentId,
+									noteValue: existing.noteValue,
+								}
+							: {} ),
 						baseline: existing
 							? existing.baseline
 							: select.getPostFieldValueWithoutProposals(
