@@ -506,7 +506,7 @@ flowchart LR
 - A move is moved out only under the rules of the front-end restore (one pending move in the list, no `crossedParents`, a `fromIndex` in range), with only whitespace between the siblings. Otherwise the list stays in the proposed order and `gutenberg_restore_pending_move_order` reorders it at render, as before.
 - Unbalanced markers and unbalanced block delimiters are left byte for byte; the render strip still fails closed on them.
 - A note whose proposals would exceed `GUTENBERG_SUGGESTION_CONTENT_MAX_BYTES` (1 MB) keeps them in the content, and `_wp_suggestion_extraction_skipped` (read-only over REST) is set. The sidebar shows a notice on that suggestion while it is pending.
-- A trashed or spam note keeps its stored proposal, but it is not inflated until the note is restored. A decided note's proposal is dropped when the save finalizes it.
+- A trashed or spam note, or one trashed with its post, keeps its stored proposal, but it is not inflated until the note is restored. The front-end restore of a format original and the re-inflation share one gate for this, `gutenberg_can_render_suggestion_note()`. A decided note's proposal is dropped when the save finalizes it.
 - Restoring a revision re-seeds, from the revision's snapshot, the proposals of anchors in the restored content that their note no longer stores. Nothing is overwritten and no status changes.
 - Deactivating Gutenberg leaves anchors only: emptied marks and void placeholders render nothing, so nothing leaks. Rich text drops an empty mark on the next save, so that proposal is lost rather than leaked, and a placeholder shows as an unsupported block. Turning the experiment off changes nothing here: the pass and the re-inflation run whenever Gutenberg is active.
 
