@@ -36,6 +36,7 @@ import {
 } from './suggest-post-edits';
 import {
 	announceSuggestRefusal,
+	announceSuggestTrashRefusal,
 	withoutSuggestPostEditGuard,
 } from './suggest-post-edit-guard';
 import attachMediaInPost from './utils/attach-media-in-post';
@@ -520,6 +521,15 @@ export function refreshPost() {
 export const trashPost =
 	( { force = false } = {} ) =>
 	async ( { select, dispatch, registry } ) => {
+		/*
+		 * Suggestion mode proposes changes; trashing the post is not one a
+		 * reviewer could accept or reject, so it is refused while suggesting,
+		 * whichever control asked. See issue #73411.
+		 */
+		if ( select.getEditorIntent() === EDITOR_INTENT_SUGGEST ) {
+			announceSuggestTrashRefusal( registry );
+			return;
+		}
 		const postTypeSlug = select.getCurrentPostType();
 		const postType = await registry
 			.resolveSelect( coreStore )

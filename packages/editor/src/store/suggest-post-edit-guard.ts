@@ -17,13 +17,31 @@ import { classifySuggestedPostEdits } from './suggest-post-edits';
 import { unlock } from '../lock-unlock';
 
 /**
- * Announce that a post-level change was refused while suggesting.
+ * Say a refusal twice over, in two channels: a refusal only screen reader
+ * users perceive is indistinguishable from a control that quietly does
+ * nothing. `speak` carries the announcement because it fires on every
+ * refusal and can be assertive; the snackbar carries the visible half with
+ * `speak: false`, since a spoken snackbar would announce the same sentence a
+ * second time.
  *
- * Said twice over, in two channels: a refusal only screen reader users
- * perceive is indistinguishable from a control that quietly does nothing.
- * `speak` carries the announcement because it fires on every refusal and can
- * be assertive; the snackbar carries the visible half with `speak: false`,
- * since a spoken snackbar would announce the same sentence a second time.
+ * @param registry The data registry.
+ * @param message  The refusal.
+ * @param id       The notice id: one per message, so a control that
+ *                 dispatches repeatedly replaces its own snackbar instead of
+ *                 stacking them.
+ */
+function announce( registry: any, message: string, id: string ) {
+	speak( message, 'assertive' );
+	registry.dispatch( noticesStore ).createNotice( 'info', message, {
+		id,
+		type: 'snackbar',
+		isDismissible: true,
+		speak: false,
+	} );
+}
+
+/**
+ * Announce that a post-level change was refused while suggesting.
  *
  * @param registry The data registry.
  * @param refused  The refused fields.
@@ -32,24 +50,48 @@ export function announceSuggestRefusal( registry: any, refused: string[] ) {
 	const isStatus = refused.some( ( field ) =>
 		( SUGGEST_LOCKED_POST_FIELDS as readonly string[] ).includes( field )
 	);
-	const message = isStatus
-		? __(
+	if ( isStatus ) {
+		announce(
+			registry,
+			__(
 				"The post status can't be changed while suggesting. Switch to Editing to change it."
-			)
-		: __(
-				"This setting can't be changed while suggesting. Switch to Editing to change it."
-			);
-	speak( message, 'assertive' );
-	registry.dispatch( noticesStore ).createNotice( 'info', message, {
-		// One notice id per message, so a control that dispatches
-		// repeatedly replaces its own snackbar instead of stacking them.
-		id: isStatus
-			? 'editor-suggest-locked-post-status'
-			: 'editor-suggest-locked-post-field',
-		type: 'snackbar',
-		isDismissible: true,
-		speak: false,
-	} );
+			),
+			'editor-suggest-locked-post-status'
+		);
+		return;
+	}
+	announce(
+		registry,
+		__(
+			"This setting can't be changed while suggesting. Switch to Editing to change it."
+		),
+		'editor-suggest-locked-post-field'
+	);
+}
+
+/**
+ * Why the post cannot be moved to the trash while suggesting: shown as the
+ * trash controls' description, and announced when a trash is refused.
+ *
+ * @return The message.
+ */
+export function getSuggestTrashRefusalMessage(): string {
+	return __(
+		"Moving to the trash isn't available while suggesting. Switch to Editing to move it to the trash."
+	);
+}
+
+/**
+ * Announce that moving the post to the trash was refused while suggesting.
+ *
+ * @param registry The data registry.
+ */
+export function announceSuggestTrashRefusal( registry: any ) {
+	announce(
+		registry,
+		getSuggestTrashRefusalMessage(),
+		'editor-suggest-locked-trash'
+	);
 }
 
 /*
@@ -77,11 +119,55 @@ export function withoutSuggestPostEditGuard< T >( callback: () => T ): T {
 	}
 }
 
-const installed = new WeakMap< object, ( ...args: any[] ) => any >();
+/** The core-data actions the guard wraps, with their originals. */
+type WrappedActions = Record< string, ( ...args: any[] ) => any >;
+
+const installed = new WeakMap< object, WrappedActions >();
 
 /**
- * Wrap the core-data `editEntityRecord` action so a direct write to the
- * current post is refused while suggesting.
+ * Whether the editor is suggesting.
+ *
+ * @param registry The data registry.
+ * @return Whether the intent is Suggesting.
+ */
+function isSuggesting( registry: any ): boolean {
+	return (
+		unlock( registry.select( STORE_NAME ) ).getEditorIntent() ===
+		EDITOR_INTENT_SUGGEST
+	);
+}
+
+/**
+ * Whether a record is the post being edited.
+ *
+ * @param registry The data registry.
+ * @param kind     Entity kind.
+ * @param name     Entity name.
+ * @param recordId Record id.
+ * @return Whether it is the current post.
+ */
+function isCurrentPost(
+	registry: any,
+	kind: string,
+	name: string,
+	recordId: any
+): boolean {
+	const editor = registry.select( STORE_NAME );
+	return (
+		kind === 'postType' &&
+		name === editor.getCurrentPostType() &&
+		String( recordId ) === String( editor.getCurrentPostId() )
+	);
+}
+
+/**
+ * Wrap the core-data actions that can change the post without passing
+ * through `editPost`, so a direct write is refused while suggesting:
+ *
+ *   - `editEntityRecord` on the current post keeps content edits and refuses
+ *     the rest.
+ *   - `deleteEntityRecord` on the current post (the actions menu's "Trash")
+ *     is refused.
  *
  * The wrap patches the actions object `registry.dispatch( coreStore )`
  * returns, which `useDispatch` and thunks share, so every caller resolving
@@ -92,7 +178,7 @@ const installed = new WeakMap< object, ( ...args: any[] ) => any >();
  * otherwise keep the unguarded original. Installing twice is a no-op.
  *
  * @param registry The data registry.
- * @return Restores the original action.
+ * @return Restores the original actions.
  */
 export function installSuggestPostEditGuard( registry: any ): () => void {
 	const coreActions = registry.dispatch( coreStore );
@@ -100,8 +186,13 @@ export function installSuggestPostEditGuard( registry: any ): () => void {
 		return () => {};
 	}
 	if ( ! installed.has( coreActions ) ) {
-		const original = coreActions.editEntityRecord;
-		installed.set( coreActions, original );
+		const originals: WrappedActions = {
+			editEntityRecord: coreActions.editEntityRecord,
+			deleteEntityRecord: coreActions.deleteEntityRecord,
+		};
+		installed.set( coreActions, originals );
+		const isGuarded = () => bypassDepth === 0 && isSuggesting( registry );
+
 		coreActions.editEntityRecord = (
 			kind: string,
 			name: string,
@@ -109,15 +200,11 @@ export function installSuggestPostEditGuard( registry: any ): () => void {
 			edits: Record< string, any >,
 			options?: Record< string, any >
 		) => {
-			if ( bypassDepth > 0 || kind !== 'postType' ) {
+			const original = originals.editEntityRecord;
+			if ( ! isGuarded() ) {
 				return original( kind, name, recordId, edits, options );
 			}
-			const editor = registry.select( STORE_NAME );
-			if (
-				unlock( editor ).getEditorIntent() !== EDITOR_INTENT_SUGGEST ||
-				name !== editor.getCurrentPostType() ||
-				String( recordId ) !== String( editor.getCurrentPostId() )
-			) {
+			if ( ! isCurrentPost( registry, kind, name, recordId ) ) {
 				return original( kind, name, recordId, edits, options );
 			}
 			const record = registry
@@ -135,11 +222,38 @@ export function installSuggestPostEditGuard( registry: any ): () => void {
 			}
 			return original( kind, name, recordId, passthrough, options );
 		};
+
+		if ( originals.deleteEntityRecord ) {
+			coreActions.deleteEntityRecord = (
+				kind: string,
+				name: string,
+				recordId: any,
+				...args: any[]
+			) => {
+				if (
+					isGuarded() &&
+					isCurrentPost( registry, kind, name, recordId )
+				) {
+					announceSuggestTrashRefusal( registry );
+					return Promise.resolve();
+				}
+				return originals.deleteEntityRecord(
+					kind,
+					name,
+					recordId,
+					...args
+				);
+			};
+		}
 	}
 	return () => {
-		const original = installed.get( coreActions );
-		if ( original ) {
-			coreActions.editEntityRecord = original;
+		const originals = installed.get( coreActions );
+		if ( originals ) {
+			for ( const [ action, original ] of Object.entries( originals ) ) {
+				if ( original ) {
+					coreActions[ action ] = original;
+				}
+			}
 			installed.delete( coreActions );
 		}
 	};
