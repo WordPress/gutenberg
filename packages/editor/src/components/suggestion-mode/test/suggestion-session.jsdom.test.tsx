@@ -1,9 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { render, act } from '@testing-library/react';
-import { useEffect } from '@wordpress/element';
 import {
 	SuggestionSessionProvider,
-	useSuggestionSession,
 	useSuggestionSessionActions,
 } from '../suggestion-session';
 
@@ -56,20 +54,6 @@ describe( 'SuggestionSessionProvider', () => {
 		);
 	} );
 
-	it( 'holds a single post title proposal as state', () => {
-		const get = capture( useSuggestionSession );
-		expect( get().postTitleProposal ).toBeNull();
-		act( () =>
-			get().setPostTitleProposal( { baseline: 'Old', proposed: 'New' } )
-		);
-		expect( get().postTitleProposal ).toEqual( {
-			baseline: 'Old',
-			proposed: 'New',
-		} );
-		act( () => get().setPostTitleProposal( null ) );
-		expect( get().postTitleProposal ).toBeNull();
-	} );
-
 	it( 'bypass tokens are consumed once', () => {
 		const get = capture( useSuggestionSessionActions );
 		act( () => get().requestInterceptorBypass( 'x' ) );
@@ -78,20 +62,18 @@ describe( 'SuggestionSessionProvider', () => {
 		expect( get().consumeInterceptorBypass( 'x' ) ).toBe( false );
 	} );
 
-	it( 'actions keep a stable identity across state changes', () => {
+	it( 'actions keep a stable identity across renders', () => {
 		const seen: any[] = [];
 		function Probe() {
-			const actions = useSuggestionSessionActions();
-			const { setPostTitleProposal } = useSuggestionSession();
-			useEffect( () => {
-				seen.push( actions );
-			} );
-			useEffect( () => {
-				setPostTitleProposal( { baseline: 'a', proposed: 'b' } );
-			}, [ setPostTitleProposal ] );
+			seen.push( useSuggestionSessionActions() );
 			return null;
 		}
-		render(
+		const { rerender } = render(
+			<SuggestionSessionProvider>
+				<Probe />
+			</SuggestionSessionProvider>
+		);
+		rerender(
 			<SuggestionSessionProvider>
 				<Probe />
 			</SuggestionSessionProvider>

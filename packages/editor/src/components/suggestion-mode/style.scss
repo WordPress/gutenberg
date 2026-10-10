@@ -20,6 +20,14 @@
 	}
 }
 
+// Before and after thumbnails of a featured image suggestion.
+.editor-collab-sidebar-panel__suggestion-thumbnail {
+	display: block;
+	object-fit: cover;
+	border-radius: var(--wpds-border-radius-sm);
+	outline: 1px solid var(--wpds-color-stroke-surface-neutral);
+}
+
 // Secondary status lines under a suggestion summary (resolved state, grouped
 // change hint, disabled-apply reason) read as muted metadata.
 .editor-collab-sidebar-panel__suggestion-status {

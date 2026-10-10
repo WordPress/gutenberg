@@ -1,11 +1,10 @@
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback, useMemo } from '@wordpress/element';
 import { useEntityProp } from '@wordpress/core-data';
 import { store as editorStore } from '../../store';
 import { EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 import { diffRevisionHTML } from '../post-revisions-preview/block-diff';
-import { useSuggestionSession } from '../suggestion-mode/suggestion-session';
 
 /**
  * Custom hook for managing the post title in the editor.
@@ -16,14 +15,14 @@ import { useSuggestionSession } from '../suggestion-mode/suggestion-session';
  * setter is a no-op there, so the title cannot be edited.
  *
  * In Suggest intent the setter never writes the post: the edit is held in the
- * suggestion overlay as a proposed title (saved as a note by the auto-saver),
- * and the proposed title is what the field shows.
+ * editor store as a proposed title (saved as a note by the auto-saver), and
+ * the proposed title is what the field shows.
  *
  * @return {Object} An object containing the current title, a function to update the title, and whether a title suggestion is pending.
  */
 export default function usePostTitle() {
-	const { postType, postId, previousTitle, isSuggesting } = useSelect(
-		( select ) => {
+	const { postType, postId, previousTitle, isSuggesting, titleProposal } =
+		useSelect( ( select ) => {
 			const {
 				getCurrentPostType,
 				getCurrentPostId,
@@ -31,6 +30,7 @@ export default function usePostTitle() {
 				isShowingRevisionDiff,
 				getPreviousRevision,
 				getEditorIntent,
+				getPostFieldProposals,
 			} = unlock( select( editorStore ) );
 			const isDiffing = isRevisionsMode() && isShowingRevisionDiff();
 
@@ -38,15 +38,14 @@ export default function usePostTitle() {
 				postType: getCurrentPostType(),
 				postId: getCurrentPostId(),
 				isSuggesting: getEditorIntent() === EDITOR_INTENT_SUGGEST,
+				titleProposal: getPostFieldProposals().title,
 				// The oldest revision has nothing to compare against, so its whole
 				// title reads as added.
 				previousTitle: isDiffing
 					? ( getPreviousRevision()?.title?.raw ?? '' )
 					: undefined,
 			};
-		},
-		[]
-	);
+		}, [] );
 
 	const [ title, setEntityTitle ] = useEntityProp(
 		'postType',
@@ -56,35 +55,23 @@ export default function usePostTitle() {
 	);
 
 	// The title is not a block, so its proposal has no marker to live in; it
-	// is the one proposal the session holds in memory.
-	const { postTitleProposal, setPostTitleProposal } = useSuggestionSession();
+	// is held in the editor store with the other post field proposals.
+	const { editPost } = useDispatch( editorStore );
 	const proposedTitle =
-		isSuggesting && postTitleProposal
-			? postTitleProposal.proposed
-			: undefined;
+		isSuggesting && titleProposal ? titleProposal.proposed : undefined;
 	const isSuggestionPending =
-		proposedTitle !== undefined &&
-		proposedTitle !== postTitleProposal.baseline;
+		proposedTitle !== undefined && proposedTitle !== titleProposal.baseline;
 
 	const setTitle = useCallback(
 		( newTitle ) => {
-			if ( ! isSuggesting ) {
-				setEntityTitle( newTitle );
+			// `editPost` holds the title as a proposal while suggesting.
+			if ( isSuggesting ) {
+				editPost( { title: newTitle } );
 				return;
 			}
-			// The baseline is captured on the first edit and kept after.
-			setPostTitleProposal( {
-				baseline: postTitleProposal?.baseline ?? title,
-				proposed: newTitle,
-			} );
+			setEntityTitle( newTitle );
 		},
-		[
-			isSuggesting,
-			setEntityTitle,
-			setPostTitleProposal,
-			postTitleProposal,
-			title,
-		]
+		[ isSuggesting, setEntityTitle, editPost ]
 	);
 
 	const shownTitle = proposedTitle ?? title;

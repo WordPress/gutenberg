@@ -69,7 +69,8 @@ export function findInlineOp(
 }
 
 /**
- * Op type for a change to a post field (today only the title) rather than a
+ * Op type for a change to a post field (the title, excerpt, featured image,
+ * slug, a taxonomy's terms, or one meta key, named by `key`) rather than a
  * block attribute. Its note has no block anchor.
  */
 export const POST_ATTRIBUTE_OP_TYPE = 'post-attribute-set';
