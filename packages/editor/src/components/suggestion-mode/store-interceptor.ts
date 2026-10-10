@@ -80,6 +80,7 @@ import {
 } from './operations';
 import type { BlockTreeReader, PlanStep } from './operations';
 import { rememberWithdrawnAnchor } from './decision-state';
+import { getNoteIdsFromMetadata } from '../collab-sidebar/utils';
 import { createRevertGuard } from '../attribute-suggestions/revert-guard';
 import {
 	planStoreContentEdit,
@@ -2299,6 +2300,27 @@ export default function SuggestionStoreInterceptor() {
 								blockEditor as unknown as BlockTreeReader
 							);
 						if ( moveOp ) {
+							/*
+							 * The move is withdrawn, so its note goes too,
+							 * even when the collector has not yet seen it
+							 * anchored (the delete came right after the move
+							 * saved). Undo brings the marker back, and the
+							 * collector restores the note with it.
+							 */
+							const attributes =
+								tree.blocksByClientId.get(
+									clientId
+								)?.attributes;
+							new Set( [
+								...( marker.commentId
+									? [ marker.commentId ]
+									: [] ),
+								...getNoteIdsFromMetadata(
+									attributes?.metadata
+								),
+							] ).forEach( ( id ) =>
+								rememberWithdrawnAnchor( registry, id )
+							);
 							runOwnPlanSteps(
 								planStructuralReject(
 									moveOp,

@@ -365,6 +365,66 @@ describe( 'SuggestionAutoSave', () => {
 		expect( markerOf( registry, block.clientId ).commentId ).toBe( 43 );
 	} );
 
+	it( 'opens a fresh note when a removal replaces a pending move', async () => {
+		/*
+		 * Deleting a block with a pending move swaps the move's marker for a
+		 * removal. The move's note is a separate suggestion: rewriting it as
+		 * the removal left nothing for undo to bring back, since the marker
+		 * undo restores still names a note that now proposes a removal.
+		 */
+		createSuggestion
+			.mockResolvedValueOnce( { id: 42 } )
+			.mockResolvedValueOnce( { id: 43 } );
+		updateSuggestion.mockResolvedValue( { id: 42 } );
+		const first = heading( 'First' );
+		const second = heading( 'Second' );
+		const { registry } = renderWith( 'suggest', [ second, first ] );
+		const setMarker = ( suggestion: Record< string, any > ) =>
+			act( () => {
+				registry
+					.dispatch( blockEditorStore )
+					.updateBlockAttributes( first.clientId, {
+						metadata: { suggestion },
+					} );
+			} );
+
+		setMarker( {
+			type: 'pending-move',
+			authorId: null,
+			fromIndex: 0,
+			fromParentClientId: null,
+			fromAnchorClientId: null,
+			crossedParents: false,
+		} );
+		await pastDebounce();
+		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
+		const moveOperations = createSuggestion.mock.calls[ 0 ][ 0 ].operations;
+		expect( moveOperations[ 0 ].type ).toBe( 'block-move' );
+		seedComment( registry, {
+			id: 42,
+			status: 'hold',
+			type: 'note',
+			post: POST_ID,
+			meta: {
+				_wp_suggestion: JSON.stringify( {
+					schemaVersion: 2,
+					blockName: TEST_BLOCK,
+					operations: moveOperations,
+				} ),
+			},
+		} );
+
+		setMarker( { type: 'pending-remove', authorId: null } );
+		await pastDebounce();
+
+		expect( updateSuggestion ).not.toHaveBeenCalled();
+		expect( createSuggestion ).toHaveBeenCalledTimes( 2 );
+		expect(
+			createSuggestion.mock.calls[ 1 ][ 0 ].operations[ 0 ].type
+		).toBe( 'block-remove' );
+		expect( markerOf( registry, first.clientId ).commentId ).toBe( 43 );
+	} );
+
 	it( 'continues to update the linked note while it is still pending', async () => {
 		createSuggestion.mockResolvedValue( { id: 42 } );
 		updateSuggestion.mockResolvedValue( { id: 42 } );
