@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
-import grid from '../grid';
+import grid, { hasFixedGridCells } from '../grid';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -320,5 +320,47 @@ describe( 'GridLayoutInspectorControls', () => {
 		expect(
 			screen.getByRole( 'spinbutton', { name: 'Columns' } )
 		).toHaveDisplayValue( '' );
+	} );
+} );
+
+describe( 'hasFixedGridCells', () => {
+	let originalExperiment;
+	beforeEach( () => {
+		originalExperiment = window.__experimentalEnableGridInteractivity;
+		window.__experimentalEnableGridInteractivity = true;
+	} );
+	afterEach( () => {
+		window.__experimentalEnableGridInteractivity = originalExperiment;
+	} );
+
+	const manualLayout = {
+		type: 'grid',
+		columnCount: 3,
+		rowCount: 2,
+		isManualPlacement: true,
+	};
+
+	it( 'is true for manual placement grids sized by their width', () => {
+		expect( hasFixedGridCells( manualLayout ) ).toBe( true );
+	} );
+
+	it( 'is false for auto placement grids, grids with a minimum column width, and grids without both counts', () => {
+		expect(
+			hasFixedGridCells( { ...manualLayout, isManualPlacement: false } )
+		).toBe( false );
+		expect(
+			hasFixedGridCells( {
+				...manualLayout,
+				minimumColumnWidth: '12rem',
+			} )
+		).toBe( false );
+		expect(
+			hasFixedGridCells( { ...manualLayout, rowCount: undefined } )
+		).toBe( false );
+	} );
+
+	it( 'is false with the grid interactivity experiment off', () => {
+		window.__experimentalEnableGridInteractivity = false;
+		expect( hasFixedGridCells( manualLayout ) ).toBe( false );
 	} );
 } );

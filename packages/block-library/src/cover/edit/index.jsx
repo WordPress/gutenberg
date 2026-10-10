@@ -54,7 +54,9 @@ import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
 import { getBackgroundEmbedHtml } from '../embed-video-utils';
 import { unlock } from '../../lock-unlock';
 
-const { openMediaEditorModalKey } = unlock( blockEditorPrivateApis );
+const { openMediaEditorModalKey, useIsInFixedGridCell } = unlock(
+	blockEditorPrivateApis
+);
 
 function getInnerBlocksTemplate( attributes ) {
 	return [
@@ -480,6 +482,9 @@ function CoverEdit( {
 
 	const blockEditingMode = useBlockEditingMode();
 	const hasNonContentControls = blockEditingMode === 'default';
+	// In a grid cell with a fixed size, the cover fills the cell, so its
+	// minimum height has no effect.
+	const isInFixedGridCell = useIsInFixedGridCell( clientId );
 
 	const [ resizeListener, { height, width } ] = useResizeObserver();
 	const resizableBoxDimensions = useMemo( () => {
@@ -724,6 +729,7 @@ function CoverEdit( {
 			editMediaButtonRef={ editMediaButtonRef }
 			showEditMediaButton={ showEditMediaButton }
 			isEditMediaDisabled={ isSwappingMedia }
+			isInFixedGridCell={ isInFixedGridCell }
 		/>
 	);
 
@@ -742,6 +748,7 @@ function CoverEdit( {
 			onClearMedia={ onClearMedia }
 			featuredImage={ media }
 			isSelected={ isSelected }
+			isInFixedGridCell={ isInFixedGridCell }
 		/>
 	);
 
@@ -772,9 +779,11 @@ function CoverEdit( {
 			<>
 				{ blockControls }
 				{ inspectorControls }
-				{ hasNonContentControls && isSelected && (
-					<ResizableCoverPopover { ...resizableCoverProps } />
-				) }
+				{ hasNonContentControls &&
+					isSelected &&
+					! isInFixedGridCell && (
+						<ResizableCoverPopover { ...resizableCoverProps } />
+					) }
 				<TagName
 					{ ...blockProps }
 					className={ clsx( 'is-placeholder', blockProps.className ) }
@@ -928,7 +937,7 @@ function CoverEdit( {
 				/>
 				<div { ...innerBlocksProps } />
 			</TagName>
-			{ hasNonContentControls && isSelected && (
+			{ hasNonContentControls && isSelected && ! isInFixedGridCell && (
 				<ResizableCoverPopover { ...resizableCoverProps } />
 			) }
 		</>
