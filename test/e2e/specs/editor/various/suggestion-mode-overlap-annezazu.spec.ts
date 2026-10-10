@@ -318,6 +318,7 @@ test.describe( 'Suggestion mode: overlapping suggestions (annezazu)', () => {
 			title: 'Overlapping suggestions',
 			content: '<!-- wp:paragraph --><p>Intro.</p><!-- /wp:paragraph -->',
 			status: 'draft',
+			date_gmt: new Date().toISOString(),
 		} );
 		const paragraph = editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )

@@ -304,7 +304,7 @@ test.describe( 'Suggestion mode: suggesting over another author', () => {
 			const deletion = paragraph.locator( 'mark.wp-suggestion-del' );
 			// One suggestion, split around the addition's edge.
 			await expect( deletion ).toHaveText( [ 'ro.', ' Bright' ] );
-			const ids = await deletion.evaluateAll( ( marks ) =>
+			const ids = await deletion.evaluateAll( ( marks: Element[] ) =>
 				marks.map( ( mark ) =>
 					mark.getAttribute( 'data-suggestion-id' )
 				)
