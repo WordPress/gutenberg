@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/plugins",
-	"version": "7.54.0",
+	"version": "7.57.0",
 	"description": "Plugins module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,15 +19,13 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
-		"npm": ">=8.19.2"
+		"node": ">=22.13.0"
 	},
 	"files": [
 		"src",
 		"build",
 		"build-module",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
@@ -50,13 +48,13 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"memize": "^2.1.1",
-		"react-is": "^18.3.0"
+		"react-is": "^19.3.0"
 	},
 	"devDependencies": {
-		"@testing-library/dom": "^10.4.1",
+		"@testing-library/dom": "^10.4.2",
 		"@testing-library/react": "^16.3.3",
-		"@types/react-is": "^18.3.1",
-		"vitest": "^5.0.0"
+		"@types/react-is": "^19.3.0",
+		"vitest": "^5.0.3"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/redux-routine",
-	"version": "5.54.0",
+	"version": "5.57.0",
 	"description": "Redux middleware for generator coroutines.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -21,15 +21,13 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
-		"npm": ">=8.19.2"
+		"node": ">=22.13.0"
 	},
 	"files": [
 		"src",
 		"build",
 		"build-module",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
@@ -52,7 +50,7 @@
 	},
 	"devDependencies": {
 		"redux": "^5.0.1",
-		"vitest": "^5.0.0"
+		"vitest": "^5.0.3"
 	},
 	"peerDependencies": {
 		"redux": ">=4"

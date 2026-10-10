@@ -13,7 +13,7 @@ vi.mock(
 		( {
 			createBlobURL: vi.fn(),
 			revokeBlobURL: vi.fn(),
-		} ) as unknown as typeof import('@wordpress/blob')
+		} ) as unknown as typeof import( '@wordpress/blob' )
 );
 
 const xmlFile = new window.File( [ 'fake_file' ], 'test.xml', {

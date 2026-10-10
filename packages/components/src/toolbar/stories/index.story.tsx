@@ -27,7 +27,8 @@ import {
 import DropdownMenu from '../../dropdown-menu';
 
 const meta: Meta< typeof Toolbar > = {
-	title: 'Components/Toolbar',
+	id: 'components-toolbar',
+	title: 'Components/@wordpress-components/Toolbar',
 	component: Toolbar,
 	subcomponents: {
 		ToolbarButton,

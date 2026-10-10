@@ -28,9 +28,17 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`splitting`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#splitting): `true`
 - [`anchor`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
 - [`className`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#classname): `false`
+- [`background`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#background):
+  - `backgroundImage`: `true`
+  - `backgroundSize`: `true`
+  - `gradient`: `true`
+- [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
 - [`color`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color):
   - [`gradients`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
   - [`link`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
+- [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
+  - `minHeight`: `true`
+  - `minWidth`: `true`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `margin`: `true`
   - `padding`: `true`
@@ -40,6 +48,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`textAlign`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-textalign): `true`
   - `textColumns`: `true`
   - `textIndent`: `true`
+  - [`textShadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-textshadow): `true`
   - `fitText`: `true`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`

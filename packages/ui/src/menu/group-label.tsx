@@ -6,6 +6,9 @@ import type { GroupLabelProps } from './types';
 
 /**
  * Renders an accessible label for a menu group.
+ *
+ * Place it inside the `Menu.Group` or `Menu.RadioGroup` it labels. A label in
+ * an outer group does not label an inner group.
  */
 const GroupLabel = forwardRef< HTMLDivElement, GroupLabelProps >(
 	function MenuGroupLabel( { className, ...props }, ref ) {

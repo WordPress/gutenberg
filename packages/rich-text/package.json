@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/rich-text",
-	"version": "7.54.0",
+	"version": "7.57.0",
 	"description": "Rich text value and manipulation API.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,15 +19,13 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
-		"npm": ">=8.19.2"
+		"node": ">=22.13.0"
 	},
 	"files": [
 		"src",
 		"build",
 		"build-module",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
@@ -44,7 +42,7 @@
 	"sideEffects": [
 		"src/**/*.scss",
 		"src/index.js",
-		"src/store/index.js",
+		"src/store/index.ts",
 		"build/index.cjs",
 		"build/store/index.cjs",
 		"build-module/index.mjs",
@@ -61,18 +59,23 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/private-apis": "file:../private-apis",
-		"colord": "^2.9.3"
+		"colord": "^2.9.4"
 	},
 	"devDependencies": {
 		"deep-freeze": "^0.0.1",
-		"vitest": "^5.0.0"
+		"vitest": "^5.0.3"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",
-		"react": "^18 || ^19"
+		"@types/react-dom": "^18 || ^19",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
 	},
 	"peerDependenciesMeta": {
 		"@types/react": {
+			"optional": true
+		},
+		"@types/react-dom": {
 			"optional": true
 		}
 	},

@@ -1,7 +1,9 @@
 import { speak } from '@wordpress/a11y';
 import apiFetch from '@wordpress/api-fetch';
 import { escapeHTML } from '@wordpress/escape-html';
+import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
+import warning from '@wordpress/warning';
 import {
 	parse,
 	synchronizeBlocksWithTemplate,
@@ -379,9 +381,12 @@ export function refreshPost() {
 
 /**
  * Action for trashing the current post in the editor.
+ *
+ * @param {Object}  [options]       Options.
+ * @param {boolean} [options.force] Whether to delete the post permanently instead of moving it to the trash.
  */
 export const trashPost =
-	() =>
+	( { force = false } = {} ) =>
 	async ( { select, dispatch, registry } ) => {
 		const postTypeSlug = select.getCurrentPostType();
 		const postType = await registry
@@ -393,11 +398,29 @@ export const trashPost =
 		try {
 			const post = select.getCurrentPost();
 			await apiFetch( {
-				path: `/${ restNamespace }/${ restBase }/${ post.id }`,
+				path: addQueryArgs(
+					`/${ restNamespace }/${ restBase }/${ post.id }`,
+					force ? { force } : {}
+				),
 				method: 'DELETE',
 			} );
 
-			await dispatch.savePost();
+			if ( force ) {
+				// Receiving no records only invalidates this post type's list
+				// queries. `deleteEntityRecord` would also remove the current
+				// post, which the redirect still needs.
+				registry
+					.dispatch( coreStore )
+					.receiveEntityRecords(
+						'postType',
+						postTypeSlug,
+						[],
+						undefined,
+						true
+					);
+			} else {
+				await dispatch.savePost();
+			}
 		} catch ( error ) {
 			registry
 				.dispatch( noticesStore )
@@ -716,10 +739,20 @@ export function updateEditorSettings( settings ) {
 export const setRenderingMode =
 	( mode ) =>
 	( { dispatch, registry, select } ) => {
-		if (
-			select.__unstableIsEditorReady() &&
-			! select.getEditorSettings().isPreviewMode
-		) {
+		const settings = select.getEditorSettings();
+
+		// An editor opened with a rendering mode of its own is showing what
+		// that context is for, so it stays in that mode. Applying that mode is
+		// what puts the editor in it, so only a move away is ignored. It warns,
+		// or the caller could not tell why nothing changed.
+		if ( settings.renderingMode && mode !== settings.renderingMode ) {
+			warning(
+				`setRenderingMode( '${ mode }' ) was ignored: this editor is using overriding rendering mode from '${ settings.renderingMode }'.`
+			);
+			return;
+		}
+
+		if ( select.__unstableIsEditorReady() && ! settings.isPreviewMode ) {
 			registry.dispatch( blockEditorStore ).clearSelectedBlock();
 		}
 

@@ -1,5 +1,7 @@
 import { useNavigate, useSearch } from '@wordpress/route';
 import { Page } from '@wordpress/admin-ui';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
 	privateApis as editorPrivateApis,
@@ -24,6 +26,13 @@ import './style.scss';
 
 const { GlobalStylesUIWrapper, GlobalStylesActionMenu } =
 	unlock( editorPrivateApis );
+const { ToolsPanelPopoverPropsContext } = unlock( blockEditorPrivateApis );
+
+// Panel padding (16px) + screen padding (12px) + spacing (4px)
+const TOOLS_PANEL_POPOVER_PROPS = {
+	dropdown: { placement: 'right-start', offset: 32 },
+	item: { placement: 'right-start', offset: 32, shift: true },
+};
 
 function Stage() {
 	const navigate = useNavigate();
@@ -114,14 +123,14 @@ function Stage() {
 												? {
 														...search,
 														preview: 'stylebook',
-												  }
+													}
 												: ( () => {
 														const {
 															preview,
 															...restSearch
 														} = search;
 														return restSearch;
-												  } )(),
+													} )(),
 										} );
 									} }
 								/>
@@ -169,11 +178,15 @@ function Stage() {
 			}
 		>
 			<div className="routes-styles__content">
-				<GlobalStylesUIWrapper
-					path={ section }
-					onPathChange={ onChangeSection }
-					settings={ editorSettings }
-				/>
+				<ToolsPanelPopoverPropsContext.Provider
+					value={ TOOLS_PANEL_POPOVER_PROPS }
+				>
+					<GlobalStylesUIWrapper
+						path={ section }
+						onPathChange={ onChangeSection }
+						settings={ editorSettings }
+					/>
+				</ToolsPanelPopoverPropsContext.Provider>
 			</div>
 			{ isActivatePanelOpen && (
 				<Modal

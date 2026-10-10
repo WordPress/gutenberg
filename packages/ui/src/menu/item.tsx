@@ -1,19 +1,14 @@
 import { Menu as _Menu } from '@base-ui/react/menu';
 import clsx from 'clsx';
-import {
-	Children,
-	cloneElement,
-	forwardRef,
-	isValidElement,
-	useId,
-} from '@wordpress/element';
-import type { ReactElement } from 'react';
+import { Children, forwardRef } from '@wordpress/element';
+import defenseStyles from '../utils/css/global-css-defense.module.css';
 import resetStyles from '../utils/css/resets.module.css';
 import {
 	KeyboardShortcutDescription,
 	KeyboardShortcutDisplay,
 	useKeyboardShortcutProps,
 } from '../utils/keyboard-shortcut';
+import { useItemContent as usePopupItemContent } from '../utils/item-popup';
 import styles from './style.module.css';
 import { MenuItemContentContext } from './context';
 import {
@@ -21,7 +16,8 @@ import {
 	ItemDescription,
 } from './item-description';
 import { ItemLabel } from './item-label';
-import type { ItemDescriptionProps, ItemProps } from './types';
+import { Text } from '../text';
+import type { ItemProps } from './types';
 
 type ItemAriaProps = Pick<
 	ItemProps,
@@ -32,36 +28,13 @@ type UseItemContentOptions = ItemAriaProps & {
 	shortcut?: ItemProps[ 'shortcut' ];
 };
 
-const VALIDATION_ENABLED = process.env.NODE_ENV !== 'production';
-
-function getItemContent( children: ItemProps[ 'children' ] ) {
-	const childArray = Children.toArray( children );
-	const [ label, ...descriptions ] = childArray;
-	const hasLabel =
-		isValidElement< { id?: string } >( label ) && label.type === ItemLabel;
-	const descriptionElements = descriptions.filter(
-		( description ): description is ReactElement< ItemDescriptionProps > =>
-			isValidElement< ItemDescriptionProps >( description ) &&
-			description.type === ItemDescription
-	);
-
-	if (
-		VALIDATION_ENABLED &&
-		( ! hasLabel || descriptionElements.length !== descriptions.length )
-	) {
-		throw new Error(
-			'Menu.ItemLabel must be the first direct child of every menu item, followed only by Menu.ItemDescription components.'
-		);
-	}
-
-	return {
-		descriptionIds: descriptionElements.map(
-			( description ) => description.props.id
-		),
-		hasLabel,
-		labelId: hasLabel ? label.props.id : undefined,
-	};
-}
+const ITEM_CONTENT_COMPONENTS = {
+	Label: ItemLabel,
+	Description: ItemDescription,
+	validationMessage:
+		'Menu.ItemLabel must be the first direct child of every menu item, followed only by Menu.ItemDescription components.',
+	descriptionValidationToken: ITEM_DESCRIPTION_DIRECT_CHILD,
+};
 
 function useItemContent(
 	children: ItemProps[ 'children' ],
@@ -74,65 +47,33 @@ function useItemContent(
 		shortcut,
 	}: UseItemContentOptions
 ) {
-	const generatedLabelId = useId();
-	const generatedDescriptionId = useId();
-	const { descriptionIds, hasLabel, labelId } = getItemContent( children );
-	const resolvedLabelId = hasLabel ? labelId ?? generatedLabelId : undefined;
-	const resolvedDescriptionIds = descriptionIds.map(
-		( descriptionId, index ) =>
-			descriptionId ?? `${ generatedDescriptionId }-${ index }`
-	);
-	const itemDescribedBy = Array.from(
-		new Set( [
-			...( ariaDescribedBy?.split( /\s+/ ).filter( Boolean ) ?? [] ),
-			...resolvedDescriptionIds,
-		] )
-	).join( ' ' );
-	let descriptionIndex = 0;
-	// React widens the tuple while mapping; validation preserves the item-child
-	// contract and cloning adds only private validation data and generated IDs.
-	const contentChildren = Children.map( children, ( child ) => {
-		if (
-			! isValidElement< ItemDescriptionProps >( child ) ||
-			child.type !== ItemDescription
-		) {
-			return child;
-		}
-
-		const descriptionId = resolvedDescriptionIds[ descriptionIndex++ ];
-		const descriptionProps = {
-			id: descriptionId,
-			validationToken: ITEM_DESCRIPTION_DIRECT_CHILD,
-		};
-		return cloneElement( child, descriptionProps );
-	} ) as ItemProps[ 'children' ];
+	const { contentChildren, resolvedLabelId, itemAriaProps } =
+		usePopupItemContent( children, ITEM_CONTENT_COMPONENTS, {
+			'aria-describedby': ariaDescribedBy,
+			'aria-label': ariaLabel,
+			'aria-labelledby': ariaLabelledBy,
+		} );
 	const {
 		descriptionId: shortcutDescriptionId,
 		targetProps: shortcutAriaProps,
 	} = useKeyboardShortcutProps( {
-		'aria-describedby': itemDescribedBy || undefined,
+		'aria-describedby': itemAriaProps[ 'aria-describedby' ],
 		'aria-keyshortcuts': ariaKeyShortcuts,
 		shortcut,
 	} );
-	/*
-	 * `aria-labelledby` takes precedence over `aria-label` in the accessible
-	 * name algorithm. Only provide our generated label relationship when the
-	 * consumer has not supplied either explicit naming prop, so explicit naming
-	 * stays fully consumer-controlled.
-	 */
-	const labelledBy =
-		ariaLabelledBy ?? ( ariaLabel ? undefined : resolvedLabelId );
 
 	return {
-		contentChildren,
+		// React widens the tuple while mapping; validation preserves the item-child
+		// contract and cloning changes only generated description IDs.
+		contentChildren: contentChildren as ItemProps[ 'children' ],
 		contentContextValue: {
 			labelId: resolvedLabelId,
 			labelTrailing,
 		},
 		itemAriaProps: {
 			...shortcutAriaProps,
-			'aria-label': ariaLabel,
-			'aria-labelledby': labelledBy,
+			'aria-label': itemAriaProps[ 'aria-label' ],
+			'aria-labelledby': itemAriaProps[ 'aria-labelledby' ],
 		},
 		shortcutDescriptionId,
 	};
@@ -158,6 +99,7 @@ function ItemContent( {
 	const hasTrailing = Children.toArray( trailing ).some(
 		( child ) => child !== ''
 	);
+	const [ label, ...descriptions ] = Children.toArray( children );
 
 	/*
 	 * Content comes first in the DOM because Base UI falls back to the item's
@@ -166,19 +108,28 @@ function ItemContent( {
 	 */
 	return (
 		<>
-			<span className={ styles[ 'item-content' ] }>
-				<span className={ styles[ 'item-children' ] }>
-					{ children }
-				</span>
+			<span
+				className={ clsx(
+					styles[ 'item-content' ],
+					hasPrefix && styles[ 'has-prefix' ]
+				) }
+			>
+				{ label }
 				{ hasSuffix && (
-					<span className={ styles[ 'item-suffix' ] }>
+					<Text
+						variant="body-sm"
+						className={ styles[ 'item-suffix' ] }
+					>
 						{ suffix }
-					</span>
+					</Text>
 				) }
 				{ shortcut && (
-					<span className={ styles[ 'item-shortcut' ] }>
+					<Text
+						variant="body-sm"
+						className={ styles[ 'item-shortcut' ] }
+					>
 						<KeyboardShortcutDisplay shortcut={ shortcut } />
-					</span>
+					</Text>
 				) }
 				{ hasTrailing && (
 					<span className={ styles[ 'item-trailing' ] }>
@@ -186,6 +137,11 @@ function ItemContent( {
 					</span>
 				) }
 			</span>
+			{ descriptions.length > 0 && (
+				<span className={ styles[ 'item-descriptions' ] }>
+					{ descriptions }
+				</span>
+			) }
 			{ hasPrefix && (
 				<span aria-hidden="true" className={ styles[ 'item-prefix' ] }>
 					{ prefix }
@@ -237,6 +193,7 @@ const Item = forwardRef< HTMLDivElement, ItemProps >( function MenuItem(
 			ref={ ref }
 			{ ...itemAriaProps }
 			className={ clsx(
+				defenseStyles.div,
 				resetStyles[ 'box-sizing' ],
 				styles.item,
 				className

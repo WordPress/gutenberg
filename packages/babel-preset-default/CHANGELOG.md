@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 9.0.0 (2026-10-07)
+
+### Breaking Changes
+
+-   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
+
+## 8.56.0 (2026-09-23)
+
+## 8.55.0 (2026-09-10)
+
 ## 8.54.0 (2026-08-26)
 
 ## 8.53.0 (2026-08-12)

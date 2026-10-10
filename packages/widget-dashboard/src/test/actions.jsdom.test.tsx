@@ -208,7 +208,7 @@ describe( 'WidgetDashboard.Actions', () => {
 		);
 
 		expect(
-			await screen.findByRole( 'menuitem', { name: 'Reset to default' } )
+			await screen.findByRole( 'menuitem', { name: 'Reset to default…' } )
 		).toBeInTheDocument();
 	} );
 
@@ -229,7 +229,6 @@ describe( 'WidgetDashboard.Actions', () => {
 	} );
 
 	it( 'throws when used outside a WidgetDashboard subtree', () => {
-		const spy = vi.spyOn( console, 'error' ).mockImplementation( () => {} );
 		const preventJSDOMError = ( event: ErrorEvent ) => {
 			event.preventDefault();
 		};
@@ -241,7 +240,6 @@ describe( 'WidgetDashboard.Actions', () => {
 			);
 		} finally {
 			window.removeEventListener( 'error', preventJSDOMError );
-			spy.mockRestore();
 		}
 	} );
 } );

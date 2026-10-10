@@ -6,6 +6,7 @@ import type {
 	ComboboxInputProps,
 	ComboboxItemProps,
 	ComboboxRootProps,
+	ComboboxStatusProps,
 	ComboboxTriggerProps,
 } from '../combobox/types';
 
@@ -13,6 +14,10 @@ export type Item = {
 	label: string;
 	value: string;
 	disabled?: boolean;
+	/**
+	 * Supplementary text for the item in the popup.
+	 */
+	description?: string;
 	/**
 	 * When `true`, the item renders in the list footer, not the main list,
 	 * when it is in the filtered items.
@@ -28,6 +33,9 @@ export type ItemGroup = {
 };
 
 export type SearchableSelectItemProps = Omit< ComboboxItemProps, 'value' > & {
+	/**
+	 * The option item this list item represents.
+	 */
 	value: Item;
 };
 
@@ -137,6 +145,10 @@ export type SearchableSelectProps = Omit<
 		 * which shows whenever there are no matching items.
 		 */
 		emptyContent?: ComboboxEmptyProps[ 'children' ];
+		/**
+		 * Content for the list status live region. The region stays mounted.
+		 */
+		statusContent?: ComboboxStatusProps[ 'children' ];
 		/**
 		 * The placeholder text to use for the search input.
 		 */

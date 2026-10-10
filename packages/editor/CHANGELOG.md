@@ -4,6 +4,77 @@
 
 ### Breaking Changes
 
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   Migrate the classic-theme template selector to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
+
+### Bug Fixes
+
+-   Notes: Highlight the text an unsent note is about, and keep the note anchored to it when the selection changes or the text is edited before the note is sent ([#84125](https://github.com/WordPress/gutenberg/pull/84125)).
+-   Notes: Select the note under the caret: an inline note while the caret is inside its highlight, otherwise the block's unsent draft or block-level note, instead of an inline note on any click in the block ([#84147](https://github.com/WordPress/gutenberg/pull/84147)).
+
+## 15.2.0 (2026-10-07)
+
+### Enhancements
+
+-   `trashPost`: Accept a `force` option to delete the post permanently instead of moving it to the trash ([#84045](https://github.com/WordPress/gutenberg/pull/84045)).
+-   `PostAuthor`: The field renders with the `SearchableSelect` component of `@wordpress/ui` instead of `ComboboxControl` and `SelectControl` ([#83323](https://github.com/WordPress/gutenberg/pull/83323)).
+-   `DocumentOutline`: Show the outline items' focus ring with the design system's outline instead of a legacy box-shadow ([#83755](https://github.com/WordPress/gutenberg/pull/83755)).
+-   Notes: Add a "Notes" submenu to the View group of the Options menu ([#83768](https://github.com/WordPress/gutenberg/pull/83768)).
+
+### Bug Fixes
+
+-   `PostTrash`: Offer "Delete permanently" instead of "Move to trash" when the post can't be moved to the trash, based on the new `wp:action-trash` REST link ([#84045](https://github.com/WordPress/gutenberg/pull/84045)).
+-   Keep post actions and note actions menus dismissible when their triggers become disabled. Close the View menu when it becomes unavailable ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
+-   Remove redundant menu groups from the mode switcher and preview menu, and associate the Editor label with its radio group ([#83792](https://github.com/WordPress/gutenberg/pull/83792)).
+-   Error boundary: Explicitly announce the error title and description, excluding action labels ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
+-   `PostURL`: Leaving the slug field without typing no longer saves the displayed fallback as the slug, so a new post no longer publishes with the `auto-draft` slug ([#83518](https://github.com/WordPress/gutenberg/pull/83518)).
+-   Notes: Keep the clicked thread selected on a block with several notes, instead of switching to the block's primary note ([#83528](https://github.com/WordPress/gutenberg/pull/83528)).
+-   Notes: Keep floating threads aligned with their blocks when an editor notice or the device preview moves the canvas ([#83485](https://github.com/WordPress/gutenberg/pull/83485)).
+-   Notes: Add an Undo action to the "Note deleted." snackbar, and stop the editor's undo from bringing back the highlight of a deleted note ([#83988](https://github.com/WordPress/gutenberg/pull/83988)).
+-   Notes: Stop the editor's undo from detaching a newly added note from its block, or bringing back the highlight of a resolved note ([#84079](https://github.com/WordPress/gutenberg/pull/84079)).
+-   Notes: Delete notes permanently when they can't be moved to the trash, instead of failing with an error ([#84102](https://github.com/WordPress/gutenberg/pull/84102)).
+-   Notes: Disable the note form field while a note or reply is being sent, instead of accepting text the save would not include ([#84083](https://github.com/WordPress/gutenberg/pull/84083)).
+-   Notes: Keep an unsent note or reply when selecting another block or thread, instead of discarding it ([#84110](https://github.com/WordPress/gutenberg/pull/84110)).
+
+### Internal
+
+-   Template options: Use the public `Menu` from `@wordpress/ui` ([#82964](https://github.com/WordPress/gutenberg/pull/82964)).
+
+## 15.1.0 (2026-09-23)
+
+### Enhancements
+
+-   Remove the `react-autosize-textarea` dependency. The post editor's "Code editor" view now auto-grows with CSS `field-sizing: content`. Browsers without support use a scrollable field ([#64208](https://github.com/WordPress/gutenberg/pull/64208)).
+-   `PostTaxonomiesFlatTermSelector`: The field renders with the `SearchableChipSelectControl` component of `@wordpress/ui` instead of `FormTokenField` ([#80967](https://github.com/WordPress/gutenberg/pull/80967)).
+-   `CollaboratorsPresence`: Show focus ring for avatar stack in header with button's outline instead of previous box-shadow override ([#82941](https://github.com/WordPress/gutenberg/pull/82941)).
+-   Add category filtering and search to the "Choose a pattern" modal shown when creating a new page or post. Only the categories containing start patterns for the current post type are listed, with labels pulled from the registered pattern categories ([#81396](https://github.com/WordPress/gutenberg/pull/81396)).
+-   `PostLastRevisionPanel`: Show the revisions button's focus ring with the design system's outline instead of a legacy box-shadow that doubled up with `Button`'s own ring ([#82955](https://github.com/WordPress/gutenberg/pull/82955)).
+-   Global Styles sidebar: Give the revisions screen a bounded height so its DataViews timeline scrolls internally and the pagination footer stays pinned to the bottom ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
+
+### Bug Fixes
+
+-   Tags and other flat taxonomies: Chip remove buttons are named Remove and described by the term, instead of repeating the term in the button name ([#82863](https://github.com/WordPress/gutenberg/pull/82863)).
+-   Distraction free: Raise the top bar above the notices overlay while it is revealed by hover or keyboard focus, so its controls are visible when focused instead of operable but hidden behind a notice. Also repoint the rule that overlays notices in distraction-free mode at the class the interface renders today ([#80349](https://github.com/WordPress/gutenberg/pull/80349)).
+-   Notes: Focus the text field when editing a note ([#81930](https://github.com/WordPress/gutenberg/pull/81930)).
+-   Template panel: Hide edit and create actions from users who can't create templates. ([#82858](https://github.com/WordPress/gutenberg/pull/82858))
+-   Featured image field: Only register it for the post types a theme lists in its `post-thumbnails` support, matching the classic panel. ([#82773](https://github.com/WordPress/gutenberg/pull/82773))
+-   `MediaUpload`: Coerce `multiple` to a boolean before passing it to the experimental media modal; callers such as the playlist block and the inserter media tab pass the legacy media frame's `'add'` mode. ([#82715](https://github.com/WordPress/gutenberg/pull/82715))
+-   Document bar: Preserve the subdued template-preview icon color after the icon became stroke-based. ([#82540](https://github.com/WordPress/gutenberg/pull/82540))
+-   `useGlobalStylesOutput`: Let the styles engine derive block gap support from the config it renders, instead of a separate check that treated a theme without block gap support as supporting it and so dropped the fallback gap styles the front end renders ([#82401](https://github.com/WordPress/gutenberg/pull/82401)).
+
+### Internal
+
+-   Post template panel: Remove the dead template read capability check. ([#82861](https://github.com/WordPress/gutenberg/pull/82861))
+-   Notes: Use the public `@wordpress/ui` Menu for note actions instead of the private Components API ([#81930](https://github.com/WordPress/gutenberg/pull/81930)).
+-   Post actions: Use the public `Menu` from `@wordpress/ui` instead of the private Components API ([#81922](https://github.com/WordPress/gutenberg/pull/81922)).
+
+## 15.0.0 (2026-09-10)
+
+### Breaking Changes
+
 -   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`, `PluginPreviewMenuItem`: Items render with the `Menu` component of `@wordpress/ui` instead of `MenuItem` ([#81564](https://github.com/WordPress/gutenberg/pull/81564), [#82321](https://github.com/WordPress/gutenberg/pull/82321), [#82428](https://github.com/WordPress/gutenberg/pull/82428)).
 
 ### Deprecations
@@ -16,6 +87,7 @@
 -   Post actions: Append an ellipsis (`…`) to the "Set as homepage" and "Set as posts page" action labels, which open a confirmation dialog, following the menu ellipsis guideline. The dialog titles keep the ellipsis-free wording. ([#81994](https://github.com/WordPress/gutenberg/pull/81994))
 -   Show a "Privacy Policy Page" badge in the document bar and the post card panel for the page assigned in Settings > Privacy, alongside the existing "Homepage" and "Posts Page" badges ([#82422](https://github.com/WordPress/gutenberg/pull/82422)).
 -   `PostCardPanel`: Migrate the page-type badge from the private Components `Badge` to `@wordpress/ui` `Badge`. ([#82500](https://github.com/WordPress/gutenberg/pull/82500)).
+-   `EditorProvider`: Add a `renderingMode` prop for editors that exist to show one rendering mode. It replaces the usual resolution, so the user's saved "Show template" preference cannot override it, and the controls that switch modes are not offered ([#82711](https://github.com/WordPress/gutenberg/pull/82711)).
 
 ### Bug Fixes
 
@@ -31,6 +103,7 @@
 
 ### Internal
 
+-   Global Styles: replace the sidebar action `DropdownMenu` from `@wordpress/components` with the public `Menu` from `@wordpress/ui`. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
 -   Stop passing the unused `editorTool` block editor setting; the selector that read it was removed with the Write/Design tool in [#72193](https://github.com/WordPress/gutenberg/pull/72193) ([#82677](https://github.com/WordPress/gutenberg/pull/82677)).
 -   Remove the template activation (`active_templates`) experiment: the post-save activation notice, the "Edit template" auto-activation, and template duplication in the actions list ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).
 -   Remove unused dependencies `@wordpress/reusable-blocks`, `client-zip` and `fast-deep-equal` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).

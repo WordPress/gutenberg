@@ -152,7 +152,7 @@ export function isUnmodifiedBlock( block: Block, role?: string ): boolean {
 					definition.role === role ||
 					definition.__experimentalRole === role
 				);
-		  } )
+			} )
 		: [];
 	// Fallback to all attributes if no attributes match the role.
 	const attributesToCheck: Array< [ string, BlockAttribute ] > =
@@ -247,7 +247,7 @@ export function normalizeIconObject(
 				: ICON_COLORS.find(
 						( iconColor ) =>
 							getColorContrast( iconColor ) === maxContrast
-				  ),
+					),
 			shadowColor: colordBgColor.alpha( 0.3 ).toRgbString(),
 		};
 	}

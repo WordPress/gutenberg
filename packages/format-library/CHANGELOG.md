@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   Language format: Migrate text direction selection to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
+
+## 5.57.0 (2026-10-07)
+
+## 5.56.0 (2026-09-23)
+
+## 5.55.0 (2026-09-10)
+
 ### Bug Fixes
 
 -   Prevent Highlight format toolbar from crashing when switching to Edit as HTML with background-only formatting active. ([#82215](https://github.com/WordPress/gutenberg/pull/82215))

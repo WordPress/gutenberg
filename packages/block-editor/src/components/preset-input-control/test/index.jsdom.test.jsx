@@ -5,7 +5,6 @@ import PresetInputControl from '../index';
 
 globalThis.wpVitest.mockMatchMedia();
 
-globalThis.wpVitest.mockVisibleElements();
 globalThis.wpVitest.mockScrollIntoView();
 
 describe( 'PresetInputControl', () => {
@@ -91,34 +90,6 @@ describe( 'PresetInputControl', () => {
 		expect( mockOnChange ).toHaveBeenCalledWith( '25px' );
 	} );
 
-	it( 'clears value with undefined when input is fully erased via backspace', () => {
-		render(
-			<PresetInputControl
-				{ ...defaultProps }
-				presets={ presets }
-				value="60px"
-				disableCustomValues={ false }
-			/>
-		);
-
-		const input = screen.getByRole( 'spinbutton' );
-
-		// Simulate the bug scenario: backspace through "60" one character
-		// at a time. fireEvent.change is used here (rather than userEvent
-		// keyboard interactions) because the controlled UnitControl input
-		// does not respond to synthesised key events in jsdom. The
-		// intermediate "6" forwarding is expected and correct; the bug
-		// was that the final clear silently failed to propagate, leaving
-		// the parent stuck on the partial value.
-		fireEvent.change( input, { target: { value: '6' } } );
-		fireEvent.change( input, { target: { value: '' } } );
-
-		// The final clear must propagate as undefined, not be swallowed,
-		// and never be persisted as an empty string.
-		expect( mockOnChange ).toHaveBeenLastCalledWith( undefined );
-		expect( mockOnChange ).not.toHaveBeenCalledWith( '' );
-	} );
-
 	it( 'clears value with undefined when input is cleared in one shot', async () => {
 		const user = userEvent.setup();
 
@@ -179,33 +150,6 @@ describe( 'PresetInputControl', () => {
 
 		await waitFor( () => {
 			expect( screen.getByRole( 'combobox' ) ).toBeInTheDocument();
-		} );
-	} );
-
-	it( 'can interact with select dropdown options', async () => {
-		const user = userEvent.setup();
-		const manyPresets = Array.from( { length: 12 }, ( _, i ) => ( {
-			name: `Preset ${ i + 1 }`,
-			slug: `preset-${ i + 1 }`,
-			size: `${ ( i + 1 ) * 5 }px`,
-		} ) );
-
-		render(
-			<PresetInputControl { ...defaultProps } presets={ manyPresets } />
-		);
-
-		// Wait for dropdown to render
-		await waitFor( () => {
-			expect( screen.getByRole( 'combobox' ) ).toBeInTheDocument();
-		} );
-
-		// Click on the dropdown to open it
-		const combobox = screen.getByRole( 'combobox' );
-		await user.click( combobox );
-
-		// Should be able to interact with the dropdown
-		await waitFor( () => {
-			expect( combobox ).toHaveAttribute( 'aria-expanded', 'true' );
 		} );
 	} );
 

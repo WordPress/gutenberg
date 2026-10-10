@@ -35,9 +35,7 @@ export function useViewConfig( {
 	// Sort fields so the cache key is independent of the order callers list
 	// them; `['title','author']` and `['author','title']` request the same data.
 	const fieldList = Array.isArray( fields ) ? fields : fields?.split( ',' );
-	const fieldsKey = fieldList
-		? [ ...fieldList ].sort().join( ',' )
-		: undefined;
+	const fieldsKey = fieldList ? fieldList.toSorted().join( ',' ) : undefined;
 	return useSelect(
 		( select ) => {
 			return unlock( select( coreStore ) ).getViewConfig(
@@ -46,7 +44,7 @@ export function useViewConfig( {
 				fieldsKey
 					? {
 							fields: fieldsKey,
-					  }
+						}
 					: undefined
 			);
 		},

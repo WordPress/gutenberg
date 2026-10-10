@@ -42,6 +42,7 @@ import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
  * @param {number}   props.__experimentalInitialIndex  The initial index of the toolbar item to focus.
  * @param {Function} props.__experimentalOnIndexChange Callback function to be called when the index of the focused toolbar item changes.
  * @param {string}   props.variant                     Style variant of the toolbar, also passed to the Dropdowns rendered from Block Toolbar Buttons.
+ * @param {boolean}  props.showPlaceholder             While no block is selected, show the default block's icon and the mover, disabled.
  */
 export function PrivateBlockToolbar( {
 	hideDragHandle,
@@ -49,6 +50,7 @@ export function PrivateBlockToolbar( {
 	__experimentalInitialIndex,
 	__experimentalOnIndexChange,
 	variant = 'unstyled',
+	showPlaceholder = false,
 } ) {
 	const {
 		blockClientId,
@@ -75,7 +77,6 @@ export function PrivateBlockToolbar( {
 		const {
 			getBlockName,
 			getBlockMode,
-			getBlockParents,
 			getSelectedBlockClientIds,
 			isBlockValid,
 			getBlockEditingMode,
@@ -83,6 +84,7 @@ export function PrivateBlockToolbar( {
 			getSettings,
 			getTemplateLock,
 			getParentSectionBlock,
+			getEnabledBlockParents,
 			isZoomOut,
 			isSectionBlock,
 			isBlockHiddenAtViewport,
@@ -91,9 +93,13 @@ export function PrivateBlockToolbar( {
 		} = unlock( select( blockEditorStore ) );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
-		const parents = getBlockParents( selectedBlockClientId );
 		const parentSection = getParentSectionBlock( selectedBlockClientId );
-		const parentClientId = parentSection ?? parents[ parents.length - 1 ];
+		// The parent is the nearest one shown in List View and the breadcrumb,
+		// skipping any disabled blocks in between.
+		const parentClientId = getEnabledBlockParents(
+			selectedBlockClientId,
+			true
+		)[ 0 ];
 		const parentBlockName = getBlockName( parentClientId );
 		const parentBlockType = getBlockType( parentBlockName );
 		const editingMode = getBlockEditingMode( selectedBlockClientId );
@@ -105,10 +111,12 @@ export function PrivateBlockToolbar( {
 		const isVisual = selectedBlockClientIds.every(
 			( id ) => getBlockMode( id ) === 'visual'
 		);
-		const _isUsingBindings = selectedBlockClientIds.every(
-			( clientId ) =>
-				!! getBlockAttributes( clientId )?.metadata?.bindings
-		);
+		const _isUsingBindings =
+			selectedBlockClientIds.length > 0 &&
+			selectedBlockClientIds.every(
+				( clientId ) =>
+					!! getBlockAttributes( clientId )?.metadata?.bindings
+			);
 
 		// If one or more selected blocks are locked, do not show the BlockGroupToolbar.
 		const _hasTemplateLock = selectedBlockClientIds.some(
@@ -129,6 +137,7 @@ export function PrivateBlockToolbar( {
 				isBlockHiddenAtViewport( id, _currentDeviceType )
 			);
 		const _isEditingResponsiveStyleState =
+			!! selectedBlockClientId &&
 			isResponsiveEditing() &&
 			hasViewportBlockStyleState(
 				getSelectedBlockStyleState( selectedBlockClientId )
@@ -144,7 +153,7 @@ export function PrivateBlockToolbar( {
 			showParentSelector:
 				! _isZoomOut &&
 				parentBlockType &&
-				editingMode !== 'contentOnly' &&
+				( editingMode !== 'contentOnly' || !! parentSection ) &&
 				getBlockEditingMode( parentClientId ) !== 'disabled' &&
 				hasBlockSupport(
 					parentBlockType,
@@ -180,7 +189,8 @@ export function PrivateBlockToolbar( {
 	const isLargeViewport = ! useViewportMatch( 'medium', '<' );
 
 	const hasBlockToolbar = useHasBlockToolbar();
-	if ( ! hasBlockToolbar ) {
+	const isPlaceholder = showPlaceholder && ! blockClientIds.length;
+	if ( ! hasBlockToolbar && ! isPlaceholder ) {
 		return null;
 	}
 
@@ -191,6 +201,7 @@ export function PrivateBlockToolbar( {
 	// Shifts the toolbar to make room for the parent block selector.
 	const classes = clsx( 'block-editor-block-contextual-toolbar', {
 		'has-parent': showParentSelector,
+		'is-placeholder': isPlaceholder,
 	} );
 
 	const innerClasses = clsx( 'block-editor-block-toolbar', {
@@ -201,6 +212,7 @@ export function PrivateBlockToolbar( {
 	return (
 		<NavigableToolbar
 			focusEditorOnEscape
+			shouldUseKeyboardFocusShortcut={ ! isPlaceholder }
 			className={ classes }
 			/* translators: accessibility text for the block toolbar */
 			aria-label={ __( 'Block tools' ) }
@@ -217,20 +229,24 @@ export function PrivateBlockToolbar( {
 				{ showParentSelector && ! isMultiToolbar && isLargeViewport && (
 					<BlockParentSelector />
 				) }
-				{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
+				{ ( shouldShowVisualToolbar ||
+					isMultiToolbar ||
+					isPlaceholder ) && (
 					<div ref={ nodeRef } { ...showHoveredOrFocusedGestures }>
 						<ToolbarGroup className="block-editor-block-toolbar__block-controls">
 							<BlockToolbarIcon
 								clientIds={ blockClientIds }
 								isSynced={ isSynced }
 							/>
-							{ isDefaultEditingMode &&
+							{ ! isPlaceholder &&
+								isDefaultEditingMode &&
 								showBlockVisibilityButton && (
 									<ViewportVisibilityToolbar
 										clientIds={ blockClientIds }
 									/>
 								) }
-							{ ! isMultiToolbar &&
+							{ ! isPlaceholder &&
+								! isMultiToolbar &&
 								isDefaultEditingMode &&
 								showLockButtons && (
 									<BlockLockToolbar
@@ -249,7 +265,7 @@ export function PrivateBlockToolbar( {
 					shouldShowVisualToolbar &&
 					isMultiToolbar &&
 					showGroupButtons && <BlockGroupToolbar /> }
-				{ ! isMultiToolbar && canEdit && (
+				{ ! isPlaceholder && ! isMultiToolbar && canEdit && (
 					<EditSectionButton clientId={ blockClientIds[ 0 ] } />
 				) }
 				{ ! areSelectedBlocksHiddenOnViewport && showShuffleButton && (
@@ -308,6 +324,12 @@ export function PrivateBlockToolbar( {
 }
 
 /**
+ * Private prop of BlockToolbar: while no block is selected, show the default
+ * block's icon, the mover and the options menu, disabled.
+ */
+export const showPlaceholderKey = Symbol( 'showPlaceholder' );
+
+/**
  * Renders the block toolbar.
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-toolbar/README.md
@@ -316,11 +338,13 @@ export function PrivateBlockToolbar( {
  * @param {boolean} props.hideDragHandle Show or hide the Drag Handle for drag and drop functionality.
  * @param {string}  props.variant        Style variant of the toolbar, also passed to the Dropdowns rendered from Block Toolbar Buttons.
  */
-export default function BlockToolbar( { hideDragHandle, variant } ) {
+export default function BlockToolbar( props ) {
+	const { hideDragHandle, variant } = props;
 	return (
 		<PrivateBlockToolbar
 			hideDragHandle={ hideDragHandle }
 			variant={ variant }
+			showPlaceholder={ !! props[ showPlaceholderKey ] }
 			focusOnMount={ undefined }
 			__experimentalInitialIndex={ undefined }
 			__experimentalOnIndexChange={ undefined }

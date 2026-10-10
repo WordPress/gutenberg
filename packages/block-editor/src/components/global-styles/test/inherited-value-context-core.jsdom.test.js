@@ -1,23 +1,12 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useSelect } from '@wordpress/data';
 import { useResolvedStyle } from '../inherited-value-context';
 import { globalStylesDataKey } from '../../../store/private-keys';
 
-// Coverage for `useResolvedStyle` with the `gutenberg-global-styles-inheritance-ui`
-// experiment off, which is what WordPress Core gets. Deleted rather than set to
-// `false`, because an experiment that was never turned on leaves the global
-// unset, and `undefined` is the value that fires a receiving component's own
-// default parameter. Setting `false` here would test a state that does not
-// occur.
-beforeEach( () => {
-	delete window.__experimentalGlobalStylesInheritanceUI;
-} );
-
-afterEach( () => {
-	delete window.__experimentalGlobalStylesInheritanceUI;
-} );
-
+// Coverage for `useResolvedStyle` with the inheritance indicator experiment
+// off, which is what WordPress Core gets. The cascade resolves either way: the
+// experiment gates the label treatment and the reset dot, not the values.
 // Only `useSelect` is called by the hook. The other four are needed at import
 // time by the store modules this file pulls in transitively.
 vi.mock( import( '@wordpress/data' ), () => ( {
@@ -48,15 +37,14 @@ vi.mock( import( '../../../hooks/block-style-variation' ), () => ( {
 	},
 } ) );
 
-describe( 'useResolvedStyle — experiment off', () => {
+describe( 'useResolvedStyle with the indicator experiment off', () => {
 	beforeEach( () => {
 		useSelect.mockReset();
 		useSelect.mockImplementation( ( mapSelect ) =>
 			mapSelect( () => ( {
 				getSettings: () => ( {
-					// Root, block and element layers that the plugin path
-					// would resolve into a non-empty value for `core/heading`.
-					// The core path must ignore all of them.
+					// Root, block and element layers, all three of
+					// which must reach the resolved value.
 					[ globalStylesDataKey ]: {
 						typography: { lineHeight: '1.6' },
 						blocks: {
@@ -73,16 +61,19 @@ describe( 'useResolvedStyle — experiment off', () => {
 		);
 	} );
 
-	// The hook must return undefined rather than an empty object. An empty
-	// object would still be passed down as `inheritedValue`, whereas undefined
-	// lets each panel apply its `inheritedValue = value` default. That default
-	// is what keeps core showing locally-set values only.
-	it( 'resolves nothing, so panels fall back to their `inheritedValue = value` default', () => {
+	it( 'resolves the root, block and element layers', () => {
 		const { result } = renderHook( () =>
 			useResolvedStyle( 'core/heading', 'is-style-fancy' )
 		);
 
-		expect( result.current.value ).toBeUndefined();
-		expect( result.current.sources ).toBeUndefined();
+		expect( result.current.value ).toEqual( {
+			typography: { lineHeight: '1.6', fontSize: '24px' },
+			// The `h2` layer applies to this level-2 Heading, so its color
+			// both flattens onto the block and stays available as the
+			// element passthrough.
+			color: { text: '#111111' },
+			elements: { h2: { color: { text: '#111111' } } },
+		} );
+		expect( result.current.sources ).toBeDefined();
 	} );
 } );

@@ -7,8 +7,12 @@ build-wp
 node_modules
 .wasm-vips-build
 gutenberg.zip
+/vendor/
 .content-entry.js
 coverage
+/.vitest-attachments/
+/test-results/
+**/__screenshots__/*.browser.test.*/
 .phpunit.result.cache
 .reassure
 .dev-ready
@@ -55,6 +59,8 @@ phpcs.xml
 phpunit.xml
 phpunit-watcher.yml
 .tool-versions
+/.vscode/settings.json
+/.zed/settings.json
 test/storybook-playwright/test-results
 test/storybook-playwright/specs/__snapshots__
 test/storybook-playwright/specs/*-snapshots/**

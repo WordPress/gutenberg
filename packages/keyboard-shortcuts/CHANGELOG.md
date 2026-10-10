@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 5.57.0 (2026-10-07)
+
+### Bug Fixes
+
+-   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+
+## 5.56.0 (2026-09-23)
+
+### New Features
+
+-   Add the `getKeyboardShortcut` selector, returning the values used to display and describe a registered shortcut (`displayShortcut`, `ariaKeyShortcut` and `label`) ([#82632](https://github.com/WordPress/gutenberg/pull/82632)).
+
+## 5.55.0 (2026-09-10)
+
 ## 5.54.0 (2026-08-26)
 
 ## 5.53.0 (2026-08-12)

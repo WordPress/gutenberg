@@ -37,7 +37,7 @@ export function PublishDateTimePicker(
 										label: __( 'Reset' ),
 										onClick: () => onChange?.( null ),
 									},
-							  ]
+								]
 							: undefined
 					}
 					onClose={ onClose }

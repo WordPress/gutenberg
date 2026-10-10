@@ -180,10 +180,6 @@
     - changed-files:
           - any-glob-to-any-file: 'packages/keycodes/**'
 
-'[Package] Lazy import':
-    - changed-files:
-          - any-glob-to-any-file: 'packages/lazy-import/**'
-
 '[Package] Media Utils':
     - changed-files:
           - any-glob-to-any-file: 'packages/media-utils/**'
@@ -333,14 +329,6 @@
 '[Tool] ESLint plugin':
     - changed-files:
           - any-glob-to-any-file: 'packages/eslint-plugin/**'
-
-'[Tool] Jest console':
-    - changed-files:
-          - any-glob-to-any-file: 'packages/jest-console/**'
-
-'[Tool] Jest preset':
-    - changed-files:
-          - any-glob-to-any-file: 'packages/jest-preset-default/**'
 
 '[Tool] npm-package-json-lint config':
     - changed-files:

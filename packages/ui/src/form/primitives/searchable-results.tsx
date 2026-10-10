@@ -1,10 +1,13 @@
-import { Combobox as BaseCombobox } from '@base-ui/react/combobox';
 import type { ReactNode } from 'react';
 import * as Combobox from './combobox';
-import type { ComboboxCollectionProps } from './combobox/types';
+import type {
+	ComboboxCollectionProps,
+	ComboboxStatusProps,
+} from './combobox/types';
 
 type Item = {
 	label: string;
+	description?: string;
 	value: string;
 	disabled?: boolean;
 	creatable?: boolean;
@@ -65,16 +68,19 @@ function shouldSkipCollectionEntry( entry: Item | ItemGroup ): boolean {
  */
 export function SearchableResults( {
 	emptyContent,
+	statusContent,
 	children,
 }: {
 	emptyContent: ReactNode;
+	statusContent?: ComboboxStatusProps[ 'children' ];
 	children?: ComboboxCollectionProps[ 'children' ];
 } ) {
-	const filteredItems = BaseCombobox.useFilteredItems< Item | ItemGroup >();
+	const filteredItems = Combobox.useFilteredItems< Item | ItemGroup >();
 	const creatableItem = findCreatableItem( filteredItems );
 
 	return (
 		<>
+			<Combobox.Status>{ statusContent }</Combobox.Status>
 			<Combobox.Empty>{ emptyContent }</Combobox.Empty>
 			<Combobox.List>
 				<Combobox.ListBody>
@@ -98,7 +104,14 @@ export function SearchableResults( {
 									value={ entry }
 									disabled={ entry.disabled }
 								>
-									{ entry.label }
+									<Combobox.ItemLabel>
+										{ entry.label }
+									</Combobox.ItemLabel>
+									{ entry.description ? (
+										<Combobox.ItemDescription>
+											{ entry.description }
+										</Combobox.ItemDescription>
+									) : null }
 								</Combobox.Item>
 							);
 						} }
@@ -111,7 +124,14 @@ export function SearchableResults( {
 							value={ creatableItem }
 							disabled={ creatableItem.disabled }
 						>
-							{ creatableItem.label }
+							<Combobox.ItemLabel>
+								{ creatableItem.label }
+							</Combobox.ItemLabel>
+							{ creatableItem.description ? (
+								<Combobox.ItemDescription>
+									{ creatableItem.description }
+								</Combobox.ItemDescription>
+							) : null }
 						</Combobox.Item>
 					</Combobox.ListFooter>
 				) }

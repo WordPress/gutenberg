@@ -490,6 +490,24 @@ function styles_for_block_core_search( $attributes ) {
 		}
 	}
 
+	// Background skips serialization, so it follows color onto the same element.
+	if ( ! empty( $attributes['style']['background']['gradient'] ) ) {
+		$background_styles = wp_style_engine_get_styles(
+			array(
+				'background' => array(
+					'gradient' => $attributes['style']['background']['gradient'],
+				),
+			)
+		);
+		if ( ! empty( $background_styles['css'] ) ) {
+			if ( $use_input_for_colors ) {
+				$input_styles[] = $background_styles['css'];
+			} else {
+				$button_styles[] = $background_styles['css'];
+			}
+		}
+	}
+
 	// Get typography styles to be shared across inner elements.
 	$typography_styles = esc_attr( get_typography_styles_for_block_core_search( $attributes ) );
 	if ( ! empty( $typography_styles ) ) {
@@ -646,11 +664,13 @@ function get_color_classes_for_block_core_search( $attributes ) {
 	$has_custom_background_color = ! empty( $attributes['style']['color']['background'] );
 	$has_named_gradient          = ! empty( $attributes['gradient'] );
 	$has_custom_gradient         = ! empty( $attributes['style']['color']['gradient'] );
+	$has_background_gradient     = ! empty( $attributes['style']['background']['gradient'] );
 	if (
 		$has_named_background_color ||
 		$has_custom_background_color ||
 		$has_named_gradient ||
-		$has_custom_gradient
+		$has_custom_gradient ||
+		$has_background_gradient
 	) {
 		$classnames[] = 'has-background';
 	}

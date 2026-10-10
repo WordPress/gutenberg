@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Internal
+
+-   Use the standard `Array.prototype.toSorted()` method instead of copying an array before sorting ([#52213](https://github.com/WordPress/gutenberg/pull/52213)).
+
+## 2.0.0 (2026-10-07)
+
+### Breaking Changes
+
+-   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
+
+### Bug Fixes
+
+-   Declare `react`, `react-dom`, and their types as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+
+## 1.23.0 (2026-09-23)
+
+## 1.22.0 (2026-09-10)
+
 ### Bug Fixes
 
 -   `useViewConfig`: request the full configuration under the same cache key as `getViewConfig( kind, name )`, so a route loader that preloads it no longer triggers a second request. ([#82141](https://github.com/WordPress/gutenberg/pull/82141))

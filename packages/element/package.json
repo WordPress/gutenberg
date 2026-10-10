@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/element",
-	"version": "8.6.0",
+	"version": "9.0.0",
 	"description": "Element React module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,15 +20,13 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
-		"npm": ">=8.19.2"
+		"node": ">=22.13.0"
 	},
 	"files": [
 		"src",
 		"build",
 		"build-module",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
@@ -49,9 +47,9 @@
 		"is-plain-object": "^5.1.0"
 	},
 	"devDependencies": {
-		"@testing-library/dom": "^10.4.1",
+		"@testing-library/dom": "^10.4.2",
 		"@testing-library/react": "^16.3.3",
-		"vitest": "^5.0.0"
+		"vitest": "^5.0.3"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

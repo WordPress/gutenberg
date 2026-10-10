@@ -3,7 +3,7 @@ import deprecated from '@wordpress/deprecated';
 import logEntityDeprecation from '../log-entity-deprecation';
 
 // Mock the deprecatedEntities import
-vi.mock( '../../entities', () => ( {
+vi.mock( import( '../../entities' ), () => ( {
 	deprecatedEntities: {
 		root: {
 			media: {
@@ -18,7 +18,7 @@ vi.mock( '../../entities', () => ( {
 } ) );
 
 // Mock the deprecated function
-vi.mock( '@wordpress/deprecated' );
+vi.mock( import( '@wordpress/deprecated' ) );
 
 describe( 'logEntityDeprecation', () => {
 	beforeEach( () => {

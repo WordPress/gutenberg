@@ -1,5 +1,4 @@
-import { useMemoOne } from 'use-memo-one';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
 import { throttle } from '../../utils/throttle';
 import type { ThrottleOptions } from '../../utils/throttle';
 import type { DebouncedFunc } from '../../utils/debounce';
@@ -24,7 +23,7 @@ export default function useThrottle< TFunc extends ( ...args: any[] ) => void >(
 	wait?: number,
 	options?: ThrottleOptions
 ): DebouncedFunc< TFunc > {
-	const throttled = useMemoOne(
+	const throttled = useMemo(
 		() => throttle( fn, wait ?? 0, options ),
 		[ fn, wait, options ]
 	);

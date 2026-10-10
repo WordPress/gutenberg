@@ -132,87 +132,6 @@ function mockScrollIntoView() {
 	} );
 }
 
-class FakeDOMRectList extends Array {
-	/**
-	 * @param {number} index Index of the rectangle to return.
-	 * @return {DOMRect | null} The rectangle at the requested index.
-	 */
-	item( index ) {
-		return this[ index ] ?? null;
-	}
-}
-
-/**
- * @param {Element} element Element to inspect.
- * @return {boolean} Whether the element has a layout box.
- */
-function hasAssociatedLayoutBox( element ) {
-	if ( ! element.isConnected ) {
-		return false;
-	}
-
-	let current = element;
-	while ( current ) {
-		if (
-			current instanceof globalThis.HTMLElement &&
-			( current.hidden || current.style.display === 'none' )
-		) {
-			return false;
-		}
-
-		if (
-			current === element &&
-			current instanceof globalThis.HTMLElement &&
-			current.style.display === 'contents'
-		) {
-			return false;
-		}
-
-		current = current.parentElement;
-	}
-
-	return true;
-}
-
-function mockVisibleElements() {
-	const originalGetClientRects = globalThis.Element.prototype.getClientRects;
-
-	const install = () => {
-		Reflect.set(
-			globalThis.Element.prototype,
-			'getClientRects',
-			function () {
-				const rects = [];
-
-				if ( hasAssociatedLayoutBox( this ) ) {
-					rects.push( {
-						bottom: 1,
-						height: 1,
-						left: 0,
-						right: 1,
-						top: 0,
-						width: 1,
-						x: 0,
-						y: 0,
-					} );
-				}
-
-				return new FakeDOMRectList( ...rects );
-			}
-		);
-	};
-
-	install();
-	beforeEach( install );
-	afterAll( () => {
-		Reflect.set(
-			globalThis.Element.prototype,
-			'getClientRects',
-			originalGetClientRects
-		);
-	} );
-}
-
 // Keep these opt-in mocks on `globalThis` so `vi.hoisted()` can call them
 // synchronously before static imports run.
 globalThis.wpVitest = {
@@ -221,7 +140,6 @@ globalThis.wpVitest = {
 	mockPointerEvent,
 	mockResizeObserver,
 	mockScrollIntoView,
-	mockVisibleElements,
 	timers: vi,
 };
 

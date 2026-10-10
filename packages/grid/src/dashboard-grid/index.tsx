@@ -99,7 +99,7 @@ const NO_SORT_STRATEGY = () => null;
  * @param ref   Forwarded to the grid's root `<div>`.
  */
 export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
-	function DashboardGrid( props, ref ) {
+	function UnforwardedDashboardGrid( props, ref ) {
 		const {
 			layout,
 			columns,
@@ -136,9 +136,9 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		} | null >( null );
 		// Mirror of `temporaryLayout` read synchronously on drag end —
 		// the state update from `handleDragMove` may still be batched.
-		const latestLayoutRef = useRef<
-			DashboardGridLayoutItem[] | undefined
-		>();
+		const latestLayoutRef = useRef< DashboardGridLayoutItem[] | undefined >(
+			undefined
+		);
 		// Cursor center at the last applied reorder. Used to skip the
 		// cascade of re-measured `onDragMove` events after a layout
 		// change, when the cursor has not actually moved.
@@ -225,8 +225,8 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		const minResizeHeightPx =
 			rowHeightPx === null
 				? undefined
-				: gridSpanToPixelSize( 1, 1, columnWidth, gapPx, rowHeightPx )
-						.heightPx ?? undefined;
+				: ( gridSpanToPixelSize( 1, 1, columnWidth, gapPx, rowHeightPx )
+						.heightPx ?? undefined );
 
 		const spanBoundsByKey = useSpanBounds(
 			itemLimits,
@@ -264,7 +264,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 								item.width,
 								bounds.minWidth,
 								bounds.maxWidth
-						  )
+							)
 						: item.width;
 				const height = clampSpan(
 					item.height ?? 1,
@@ -359,12 +359,15 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 
 					// Strip `actionableArea` so it does not leak to the DOM;
 					// the grid lifts it to a slot separately.
-					const { actionableArea } = child.props;
+					const typedChild = child as React.ReactElement< {
+						actionableArea?: React.ReactNode;
+					} >;
+					const { actionableArea } = typedChild.props;
 					const stripped =
 						actionableArea !== undefined
-							? cloneElement( child, {
+							? cloneElement( typedChild, {
 									actionableArea: undefined,
-							  } )
+								} )
 							: child;
 
 					byKey.set( key, stripped );

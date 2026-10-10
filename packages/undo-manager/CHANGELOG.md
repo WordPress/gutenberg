@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 1.57.0 (2026-10-07)
+
+## 1.56.0 (2026-09-23)
+
+## 1.55.0 (2026-09-10)
+
 ### Internal
 
 -   Update the `@types/node` development dependency to v24, matching the Node.js version the repository builds and tests against ([#82616](https://github.com/WordPress/gutenberg/pull/82616)).

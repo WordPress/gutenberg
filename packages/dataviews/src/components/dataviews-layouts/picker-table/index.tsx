@@ -435,7 +435,7 @@ function ViewPickerTable< Item >( {
 													__( '%1$s: %2$s' ),
 													groupField.label,
 													groupName
-											  ) }
+												) }
 									</td>
 								</tr>
 								{ groupItems.map( ( item, index ) => {

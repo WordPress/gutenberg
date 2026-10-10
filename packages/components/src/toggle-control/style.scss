@@ -3,6 +3,7 @@
 
 .components-toggle-control__label {
 	line-height: form-toggle.$toggle-height;
+	color: var(--wpds-color-foreground-content-neutral);
 
 	&:not(.is-disabled) {
 		cursor: var(--wpds-cursor-control);
