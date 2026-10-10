@@ -242,8 +242,12 @@ export const editPost =
 		if ( select.getEditorIntent() === EDITOR_INTENT_SUGGEST ) {
 			const { passthrough, proposals, refused } =
 				classifySuggestedPostEdits( edits, {
+					// A proposal's full value: a terms proposal can hold
+					// new terms `getEditedPostAttribute` leaves out.
 					getCurrentValue: ( key ) =>
-						select.getEditedPostAttribute( key ),
+						key !== 'meta' && select.getPostFieldProposals()[ key ]
+							? select.getPostFieldProposals()[ key ].proposed
+							: select.getEditedPostAttribute( key ),
 					isProposable: ( attribute, key ) =>
 						select.isProposablePostField( attribute, key ),
 				} );

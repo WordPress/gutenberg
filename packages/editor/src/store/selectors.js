@@ -360,7 +360,7 @@ export function getEditedPostAttribute( state, attributeName ) {
 			? state.postFieldProposals
 			: undefined;
 	if ( proposals && attributeName !== 'meta' && proposals[ attributeName ] ) {
-		return proposals[ attributeName ].proposed;
+		return withoutProposedNewTerms( proposals[ attributeName ].proposed );
 	}
 
 	// Fall back to saved post value if not edited.
@@ -380,6 +380,30 @@ export function getEditedPostAttribute( state, attributeName ) {
 		return withProposedMeta( value, proposals );
 	}
 	return value;
+}
+
+/*
+ * A terms proposal can name terms that do not exist yet (`{ name, parent }`
+ * entries, created when a reviewer accepts). The post's term field only ever
+ * holds term ids, so readers get the ids alone; the term pickers read the
+ * new terms through `getProposedNewTerms`. Memoized per proposed value so the
+ * selector stays referentially stable.
+ */
+const proposedTermIds = new WeakMap();
+function withoutProposedNewTerms( value ) {
+	if (
+		! Array.isArray( value ) ||
+		value.every( ( item ) => typeof item !== 'object' )
+	) {
+		return value;
+	}
+	if ( ! proposedTermIds.has( value ) ) {
+		proposedTermIds.set(
+			value,
+			value.filter( ( item ) => typeof item !== 'object' )
+		);
+	}
+	return proposedTermIds.get( value );
 }
 
 /*

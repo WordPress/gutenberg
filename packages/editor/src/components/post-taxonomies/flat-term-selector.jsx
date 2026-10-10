@@ -64,6 +64,14 @@ const isSameTerm = ( termA, termB ) => termA.value === termB.value;
 const isSameTermName = ( nameA, nameB ) =>
 	nameA.toLowerCase() === nameB.toLowerCase();
 const isPendingTerm = ( item ) => item.value.startsWith( PENDING_TERM_PREFIX );
+// A term proposed while suggesting, which does not exist until a reviewer
+// accepts the suggestion. See issue #73411.
+const NEW_TERM_PREFIX = '__new__:';
+const newTermToItem = ( term ) => ( {
+	value: NEW_TERM_PREFIX + term.name,
+	label: term.name,
+} );
+const isNewTerm = ( item ) => item.value.startsWith( NEW_TERM_PREFIX );
 
 /**
  * Renders a flat term selector component.
@@ -90,6 +98,8 @@ export function FlatTermSelector( { slug } ) {
 	const {
 		terms,
 		termIds,
+		newTerms = EMPTY_ARRAY,
+		isSuggesting,
 		taxonomy,
 		hasAssignAction,
 		hasCreateAction,
@@ -102,23 +112,25 @@ export function FlatTermSelector( { slug } ) {
 				select( coreStore );
 			const post = getCurrentPost();
 			// `getEditorIntent` is private while Suggestion mode is experimental.
-			const isSuggesting =
+			const _isSuggesting =
 				unlock( select( editorStore ) ).getEditorIntent() ===
 				EDITOR_INTENT_SUGGEST;
 			const _taxonomy = getEntityRecord( 'root', 'taxonomy', slug );
 			const _termIds = _taxonomy
 				? getEditedPostAttribute( _taxonomy.rest_base )
 				: EMPTY_ARRAY;
-			// Creating a term is a real write to the taxonomy, which
-			// Suggestion mode cannot hold as a proposal: only existing terms
-			// can be suggested. See issue #73411.
-			const canCreate =
-				! isSuggesting &&
-				!! _taxonomy &&
-				!! post._links?.[ 'wp:action-create-' + _taxonomy.rest_base ];
 			const canAssign =
 				!! _taxonomy &&
 				!! post._links?.[ 'wp:action-assign-' + _taxonomy.rest_base ];
+			// A new term suggested while suggesting is not created: it rides
+			// on the terms proposal until a reviewer accepts it, so assigning
+			// terms is all a suggester needs. See issue #73411.
+			const canCreate = _isSuggesting
+				? canAssign
+				: !! _taxonomy &&
+					!! post._links?.[
+						'wp:action-create-' + _taxonomy.rest_base
+					];
 
 			// If the user can't assign terms, there's no need to fetch them.
 			if ( ! canAssign ) {
@@ -141,6 +153,10 @@ export function FlatTermSelector( { slug } ) {
 				hasAssignAction: canAssign,
 				taxonomy: _taxonomy,
 				termIds: _termIds,
+				newTerms: unlock( select( editorStore ) ).getProposedNewTerms(
+					_taxonomy.rest_base
+				),
+				isSuggesting: _isSuggesting,
 				terms: _termIds?.length
 					? getEntityRecords( 'taxonomy', slug, query )
 					: EMPTY_ARRAY,
@@ -161,11 +177,27 @@ export function FlatTermSelector( { slug } ) {
 		if ( hasResolvedTerms ) {
 			setValues( ( currentValues ) => [
 				...( terms ?? [] ).map( termToItem ),
-				// Terms that are still being created aren't in the store yet.
-				...currentValues.filter( isPendingTerm ),
+				// Terms that are still being created, or only proposed,
+				// aren't in the store.
+				...currentValues.filter(
+					( item ) => isPendingTerm( item ) || isNewTerm( item )
+				),
 			] );
 		}
 	}, [ terms, hasResolvedTerms ] );
+
+	// Proposed new terms show like the terms they would become.
+	useEffect( () => {
+		setValues( ( currentValues ) => {
+			const kept = currentValues.filter(
+				( item ) => ! isNewTerm( item )
+			);
+			if ( kept.length === currentValues.length && ! newTerms.length ) {
+				return currentValues;
+			}
+			return [ ...kept, ...newTerms.map( newTermToItem ) ];
+		} );
+	}, [ newTerms ] );
 
 	const searchTerms = useCallback(
 		async ( search ) => {
@@ -237,8 +269,42 @@ export function FlatTermSelector( { slug } ) {
 		}
 	}
 
-	function onUpdateTerms( newTermIds ) {
-		editPost( { [ taxonomy.rest_base ]: newTermIds } );
+	/**
+	 * Assign terms.
+	 *
+	 * @param {number[]} newTermIds     Term ids.
+	 * @param {Object[]} [nextNewTerms] The proposed new terms to keep while
+	 *                                  suggesting; the current ones when
+	 *                                  omitted.
+	 */
+	function onUpdateTerms( newTermIds, nextNewTerms ) {
+		const keptNewTerms =
+			nextNewTerms ??
+			unlock( registry.select( editorStore ) ).getProposedNewTerms(
+				taxonomy.rest_base
+			);
+		editPost( {
+			[ taxonomy.rest_base ]: keptNewTerms.length
+				? [ ...newTermIds, ...keptNewTerms ]
+				: newTermIds,
+		} );
+	}
+
+	// Proposes a term that does not exist yet, while suggesting.
+	function proposeTerm( name ) {
+		const proposed = unlock(
+			registry.select( editorStore )
+		).getProposedNewTerms( taxonomy.rest_base );
+		if ( proposed.some( ( term ) => isSameTermName( term.name, name ) ) ) {
+			return;
+		}
+		onUpdateTerms(
+			registry
+				.select( editorStore )
+				.getEditedPostAttribute( taxonomy.rest_base ) ?? EMPTY_ARRAY,
+			[ ...proposed, { name } ]
+		);
+		speak( termAddedLabel, 'assertive' );
 	}
 
 	// Assigns a term on top of the terms assigned at that moment, rather than
@@ -310,6 +376,10 @@ export function FlatTermSelector( { slug } ) {
 			( item ) => item.value === CREATE_TERM_VALUE
 		);
 		if ( isCreatingTerm ) {
+			if ( isSuggesting ) {
+				proposeTerm( newTermName );
+				return;
+			}
 			// Picking the create item leaves the assigned terms untouched, and
 			// the term is only announced once it exists.
 			await createTerm( newTermName );
@@ -333,10 +403,18 @@ export function FlatTermSelector( { slug } ) {
 		// The selector will always re-fetch terms later.
 		setValues( newValues );
 		onUpdateTerms(
-			// Terms that are still being created have no id to assign yet.
+			// Terms that are still being created, or only proposed, have no
+			// id to assign yet.
 			newValues
-				.filter( ( item ) => ! isPendingTerm( item ) )
-				.map( itemToTermId )
+				.filter(
+					( item ) => ! isPendingTerm( item ) && ! isNewTerm( item )
+				)
+				.map( itemToTermId ),
+			newTerms.filter( ( term ) =>
+				newValues.some(
+					( item ) => item.value === newTermToItem( term ).value
+				)
+			)
 		);
 	}
 

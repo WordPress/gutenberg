@@ -804,3 +804,35 @@ export const isProposablePostField = createRegistrySelector(
 			);
 	}
 );
+
+const EMPTY_NEW_TERMS = [];
+
+/**
+ * The terms a pending terms proposal adds that do not exist yet, for one of
+ * the post's taxonomies. Suggesting cannot create a term, so a new term
+ * rides on the proposal as `{ name, parent? }` until a reviewer accepts it.
+ * Empty unless suggesting.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} restBase The taxonomy's `rest_base`.
+ * @return {Array<{name: string, parent?: number}>} The new terms.
+ */
+export const getProposedNewTerms = createSelector(
+	( state, restBase ) => {
+		const proposed = state.postFieldProposals[ restBase ]?.proposed;
+		if (
+			state.editorIntent !== EDITOR_INTENT_SUGGEST ||
+			! Array.isArray( proposed )
+		) {
+			return EMPTY_NEW_TERMS;
+		}
+		const newTerms = proposed.filter(
+			( item ) => item && typeof item === 'object'
+		);
+		return newTerms.length ? newTerms : EMPTY_NEW_TERMS;
+	},
+	( state, restBase ) => [
+		state.editorIntent,
+		state.postFieldProposals[ restBase ],
+	]
+);
