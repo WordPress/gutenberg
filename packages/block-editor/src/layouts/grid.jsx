@@ -13,11 +13,14 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../hooks/gap';
 import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
 import { cleanEmptyObject, shouldSkipSerialization } from '../hooks/utils';
+import { hasViewportBlockStyleState } from '../hooks/block-style-state';
 import { LAYOUT_DEFINITIONS } from './definitions';
+import { store as blockEditorStore } from '../store';
 
 const RANGE_CONTROL_MAX_VALUES = {
 	px: 600,
@@ -70,6 +73,13 @@ export default {
 		clientId,
 	} ) {
 		const { allowSizingOnChildren = false } = layoutBlockSupport;
+		const viewport = useSelect(
+			( select ) =>
+				select( blockEditorStore ).getSelectedBlockStyleState(
+					clientId
+				)?.viewport,
+			[ clientId ]
+		);
 
 		// Always show both column and minimum width controls in Auto mode.
 		// Manual mode (with isManualPlacement) is only available behind the experiment flag.
@@ -92,9 +102,13 @@ export default {
 		const hasMinimumColumnWidthValue = () =>
 			hasLayoutValue( 'minimumColumnWidth' );
 		const hasFillValue = () => hasLayoutValue( 'autoFit', false );
+		// Stacking only applies on mobile, so it is set for every viewport or
+		// for mobile only, not from other viewports.
 		const showStackOnMobileControl =
 			layout?.isManualPlacement &&
-			window.__experimentalEnableGridInteractivity;
+			window.__experimentalEnableGridInteractivity &&
+			( ! hasViewportBlockStyleState( { viewport } ) ||
+				viewport === '@mobile' );
 		const hasStackOnMobileValue = () =>
 			hasLayoutValue( 'stackOnMobile', true );
 		const resetGridType = () =>

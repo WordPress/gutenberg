@@ -1,8 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
+import { dispatch } from '@wordpress/data';
 import grid from '../grid';
+import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 globalThis.wpVitest.mockMatchMedia();
 globalThis.wpVitest.mockResizeObserver();
@@ -351,6 +354,46 @@ describe( 'GridLayoutInspectorControls', () => {
 				type: 'grid',
 				isManualPlacement: true,
 			} );
+		} );
+
+		it( 'offers stacking on mobile in the mobile state but not in the tablet state', async () => {
+			const { setStyleStateViewport } = unlock(
+				dispatch( blockEditorStore )
+			);
+			try {
+				act( () => {
+					setStyleStateViewport( '@mobile' );
+				} );
+				const { unmount } = renderInspectorControls( {
+					layout: { type: 'grid', isManualPlacement: true },
+				} );
+				expect(
+					await screen.findByRole( 'radio', { name: 'Manual' } )
+				).toBeChecked();
+				expect(
+					screen.getByRole( 'checkbox', { name: 'Stack on mobile' } )
+				).toBeInTheDocument();
+				unmount();
+
+				act( () => {
+					setStyleStateViewport( '@tablet' );
+				} );
+				renderInspectorControls( {
+					layout: { type: 'grid', isManualPlacement: true },
+				} );
+				expect(
+					await screen.findByRole( 'radio', { name: 'Manual' } )
+				).toBeChecked();
+				expect(
+					screen.queryByRole( 'checkbox', {
+						name: 'Stack on mobile',
+					} )
+				).not.toBeInTheDocument();
+			} finally {
+				act( () => {
+					setStyleStateViewport( 'default' );
+				} );
+			}
 		} );
 
 		it( 'does not offer stacking on mobile for auto placement grids', async () => {
