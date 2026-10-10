@@ -1,5 +1,6 @@
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
+import { getBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import {
 	GridVisualizer,
@@ -34,6 +35,8 @@ function GridTools( { clientId, layout } ) {
 				getTemplateLock,
 				getBlockEditingMode,
 				getBlockAttributes,
+				getBlockRootClientId,
+				getBlockName,
 				getSettings,
 				getSelectedBlockStyleState,
 			} = unlock( select( blockEditorStore ) );
@@ -57,15 +60,26 @@ function GridTools( { clientId, layout } ) {
 				settings?.[ deviceTypeKey ]?.toLowerCase() ||
 				BLOCK_VISIBILITY_VIEWPORTS.desktop.key;
 
+			// Rows are added and removed from the edges of a selected manual
+			// grid. A grid that is an item of a grid sizing its items already
+			// has the item resizer's handles on those edges, so it changes
+			// rows in the block settings instead.
+			const parentClientId = getBlockRootClientId( clientId );
+			const isSizedByParentGrid =
+				!! parentClientId &&
+				getBlockAttributes( parentClientId )?.layout?.type === 'grid' &&
+				!! getBlockSupport( getBlockName( parentClientId ), 'layout' )
+					?.allowSizingOnChildren;
+
 			return {
 				isVisible: true,
-				// Rows are added and removed from the edges of a selected
-				// manual grid, except while it is stacked on mobile.
 				showRowResizer:
 					!! window.__experimentalEnableGridInteractivity &&
 					!! layout?.isManualPlacement &&
 					! isDraggingBlocks() &&
 					isBlockSelected( clientId ) &&
+					! isSizedByParentGrid &&
+					// A grid stacked on mobile has no rows to change there.
 					! (
 						getSelectedBlockStyleState( clientId )?.viewport ===
 							'@mobile' &&

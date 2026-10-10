@@ -16,15 +16,6 @@ interface GridRowResizerProps {
 
 type Edge = 'top' | 'bottom';
 
-// `ResizableBox` passes props it doesn't know about to its element, but its
-// types don't include pointer events.
-const capturePointerProps = {
-	// Keeps the drag going over the canvas iframe.
-	onPointerDown: ( { target, pointerId }: PointerEvent< HTMLElement > ) => {
-		( target as HTMLElement ).setPointerCapture( pointerId );
-	},
-};
-
 /**
  * Handles on the top and bottom edges of a selected manual grid, for adding
  * and removing rows. The grid's height snaps to whole rows when the handle is
@@ -85,7 +76,13 @@ export function GridRowResizer( { clientId }: GridRowResizerProps ) {
 					bottomLeft: false,
 					bottomRight: false,
 				} }
-				{ ...capturePointerProps }
+				onPointerDown={ ( {
+					target,
+					pointerId,
+				}: PointerEvent< HTMLDivElement > ) => {
+					// Keeps the drag going over the canvas iframe.
+					( target as Element ).setPointerCapture( pointerId );
+				} }
 				onResizeStart={ ( _event, direction ) => {
 					setResize( { edge: direction as Edge, rowDelta: 0 } );
 				} }

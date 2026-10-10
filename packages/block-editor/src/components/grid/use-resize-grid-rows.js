@@ -2,9 +2,7 @@ import { useCallback, useMemo } from '@wordpress/element';
 import { useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { getUpdatedChildLayoutStyle } from '../../hooks/layout-child';
-import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
-import { getGridRowResize } from './get-grid-row-resize';
+import { getGridRowResizeUpdates } from './get-grid-row-updates';
 
 /**
  * Returns functions for adding or removing rows at the top or bottom edge of
@@ -27,41 +25,17 @@ export function useResizeGridRows( gridClientId ) {
 				getBlockOrder,
 				getSelectedBlockStyleState,
 			} = unlock( registry.select( blockEditorStore ) );
-			const selectedState = getSelectedBlockStyleState( gridClientId );
-			const viewport = hasViewportBlockStyleState( selectedState )
-				? selectedState.viewport
-				: null;
-			const getEffectiveLayout = ( layout, style ) => ( {
-				...layout,
-				...( viewport ? style?.[ viewport ]?.layout : undefined ),
+			return getGridRowResizeUpdates( {
+				gridClientId,
+				gridAttributes: getBlockAttributes( gridClientId ),
+				children: getBlockOrder( gridClientId ).map( ( clientId ) => ( {
+					clientId,
+					style: getBlockAttributes( clientId )?.style,
+				} ) ),
+				edge,
+				rowDelta,
+				selectedState: getSelectedBlockStyleState( gridClientId ),
 			} );
-
-			const gridAttributes = getBlockAttributes( gridClientId );
-			const children = getBlockOrder( gridClientId ).map(
-				( clientId ) => {
-					const style = getBlockAttributes( clientId )?.style;
-					return {
-						clientId,
-						style,
-						layout: getEffectiveLayout( style?.layout, style ),
-					};
-				}
-			);
-			return {
-				selectedState,
-				viewport,
-				gridAttributes,
-				children,
-				...getGridRowResize( {
-					rowCount: getEffectiveLayout(
-						gridAttributes?.layout,
-						gridAttributes?.style
-					).rowCount,
-					children: children.map( ( { layout } ) => layout ),
-					edge,
-					rowDelta,
-				} ),
-			};
 		},
 		[ registry, gridClientId ]
 	);
@@ -71,39 +45,9 @@ export function useResizeGridRows( gridClientId ) {
 			if ( ! rowDelta ) {
 				return;
 			}
-			const {
-				selectedState,
-				viewport,
-				gridAttributes,
-				children,
-				rowCount,
-				rowShift,
-			} = getResize( edge, rowDelta );
-
-			const updates = {
-				[ gridClientId ]: viewport
-					? {
-							style: getUpdatedChildLayoutStyle(
-								gridAttributes?.style,
-								{ rowCount },
-								selectedState
-							),
-						}
-					: { layout: { ...gridAttributes?.layout, rowCount } },
-			};
-			if ( rowShift ) {
-				for ( const { clientId, style, layout } of children ) {
-					if ( ! layout.rowStart ) {
-						continue;
-					}
-					updates[ clientId ] = {
-						style: getUpdatedChildLayoutStyle(
-							style,
-							{ rowStart: layout.rowStart + rowShift },
-							selectedState
-						),
-					};
-				}
+			const { updates } = getResize( edge, rowDelta );
+			if ( ! updates ) {
+				return;
 			}
 			updateBlockAttributes(
 				Object.keys( updates ),
@@ -111,7 +55,7 @@ export function useResizeGridRows( gridClientId ) {
 				/* uniqueByBlock: */ true
 			);
 		},
-		[ getResize, updateBlockAttributes, gridClientId ]
+		[ getResize, updateBlockAttributes ]
 	);
 
 	return useMemo(
