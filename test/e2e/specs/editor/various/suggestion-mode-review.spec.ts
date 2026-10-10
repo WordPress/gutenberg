@@ -789,6 +789,71 @@ test.describe( 'Suggestion mode review flows', () => {
 		).toBeVisible();
 	} );
 
+	/*
+	 * Removing a block that is already suggested to move replaces the move:
+	 * the block can carry one structural suggestion, and a removed block has
+	 * no position to propose. The removal is proposed where the block sits in
+	 * the post, so rejecting it leaves the post as it was - not with the
+	 * block parked at the destination of a move nobody accepted.
+	 */
+	test( 'reject — rejecting the removal of a moved block restores its original position', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First paragraph' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second paragraph' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const mover = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'First paragraph' } );
+		await editor.selectBlocks( mover );
+		const moveSaved = suggestionSavedPromise( page );
+		await editor.clickBlockToolbarButton( 'Move down' );
+		await expect( mover ).toHaveClass( /is-suggestion-pending-move/ );
+		await moveSaved;
+
+		await mover.click();
+		const removalSaved = suggestionSavedPromise( page );
+		await editor.clickBlockOptionsMenuItem( 'Delete' );
+		await expect( mover ).toHaveClass( /is-suggestion-pending-remove/ );
+		await removalSaved;
+
+		// The removal is proposed at the block's place in the post.
+		await expect(
+			editor.canvas.locator( '.is-suggestion-move-ghost' )
+		).toHaveCount( 0 );
+		let serialized = await editor.getEditedPostContent();
+		expect( serialized.indexOf( 'First paragraph' ) ).toBeLessThan(
+			serialized.indexOf( 'Second paragraph' )
+		);
+		expect( serialized ).not.toContain( 'pending-move' );
+
+		await switchIntent( page, 'Editing' );
+		const sidebar = await openNotesSidebar( page );
+		const threads = sidebar.locator(
+			'.editor-collab-sidebar-panel__thread'
+		);
+		await expect( threads ).toHaveCount( 1 );
+		await expect( threads ).toContainText( 'Remove block:' );
+		await decideSuggestion( page, 'Reject' );
+
+		// Rejecting the removal leaves the post exactly as it was.
+		await expect( mover ).not.toHaveClass( /is-suggestion-pending/ );
+		serialized = await editor.getEditedPostContent();
+		expect( serialized.indexOf( 'First paragraph' ) ).toBeLessThan(
+			serialized.indexOf( 'Second paragraph' )
+		);
+		expect( serialized ).not.toContain( '"suggestion"' );
+	} );
+
 	// --- List indent / outdent -------------------------------------------------
 
 	/*

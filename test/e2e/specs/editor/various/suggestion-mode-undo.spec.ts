@@ -109,6 +109,38 @@ async function decideSuggestion( page: any, action: 'Accept' | 'Reject' ) {
 	return sidebar;
 }
 
+/**
+ * Polls a note until it settles out of the pending state a reopen gives it,
+ * and returns the record. A redo that re-lands a decision has to put the
+ * note back to resolved; the note collector trashing it instead is the
+ * failure. Both fields are waited on: the REST update writes the status and
+ * the lifecycle meta separately, so a read can land between the two.
+ *
+ * @param requestUtils Request utils.
+ * @param noteId       Note comment id.
+ * @return The settled note.
+ */
+async function settledNote( requestUtils: any, noteId: number ) {
+	let note: any;
+	await expect
+		.poll(
+			async () => {
+				note = await requestUtils.rest( {
+					path: `/wp/v2/comments/${ noteId }`,
+					params: { context: 'edit' },
+				} );
+				return (
+					note.status === 'trash' ||
+					( note.status !== 'hold' &&
+						note.meta._wp_suggestion_status !== 'pending' )
+				);
+			},
+			{ timeout: 10000 }
+		)
+		.toBe( true );
+	return note;
+}
+
 test.describe( 'Suggestion mode undo', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.setGutenbergExperiments( [
@@ -438,6 +470,63 @@ test.describe( 'Suggestion mode undo', () => {
 		expect( serialized ).not.toContain( '"suggestion"' );
 	} );
 
+	/*
+	 * Removing a block that is suggested to move replaces the move. Undoing
+	 * the removal brings the move back, so its note has to come back too,
+	 * or the block is left marked with a move nobody can accept or reject.
+	 */
+	test( 'undo after removing a moved block brings the move back with its note', async ( {
+		editor,
+		page,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First paragraph' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second paragraph' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const mover = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'First paragraph' } );
+		await editor.selectBlocks( mover );
+		const moveSaved = suggestionSavedPromise( page );
+		await editor.clickBlockToolbarButton( 'Move down' );
+		await expect( mover ).toHaveClass( /is-suggestion-pending-move/ );
+		const { id: moveNoteId } = await ( await moveSaved ).json();
+
+		await editor.selectBlocks( mover );
+		const removalSaved = suggestionSavedPromise( page );
+		await editor.clickBlockOptionsMenuItem( 'Delete' );
+		await expect( mover ).toHaveClass( /is-suggestion-pending-remove/ );
+		await removalSaved;
+		const summaries = await openSuggestionSummaries( page );
+		await expect( summaries ).toHaveText( [ /^Remove block:/ ] );
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		// The removal's note goes, the move's comes back.
+		await expect( mover ).toHaveClass( /is-suggestion-pending-move/ );
+		await expect( summaries ).toHaveText( [ /^Move block:/ ] );
+		await expect
+			.poll(
+				async () =>
+					(
+						await requestUtils.rest( {
+							path: `/wp/v2/comments/${ moveNoteId }`,
+							params: { context: 'edit' },
+						} )
+					).status
+			)
+			.toBe( 'hold' );
+	} );
+
 	// --- Attribute suggestions -----------------------------------------------
 
 	test( 'undo cancels a pending attribute suggestion', async ( {
@@ -715,6 +804,355 @@ test.describe( 'Suggestion mode undo', () => {
 		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 1 );
 		await expect(
 			sidebar.getByRole( 'button', { name: 'Reject suggestion' } )
+		).toBeVisible();
+	} );
+
+	/*
+	 * Redo is the other leg of the same invariant. Undo reopened the note
+	 * because the marker came back; redo lands the decision again, so the
+	 * note has to go back to resolved with it - not be collected as if the
+	 * suggestion had been withdrawn, which leaves the change applied and its
+	 * note in the trash.
+	 */
+	test( 'redo after undoing an accepted addition resolves its note again', async ( {
+		editor,
+		page,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		const suggestionSaved = suggestionSavedPromise( page );
+		await page.keyboard.type( ' world' );
+		await expect(
+			paragraph.locator(
+				`${ SUGGESTION_MARK }[data-suggestion-type="add"]`
+			)
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		const { id: noteId } = await ( await suggestionSaved ).json();
+
+		await switchIntent( page, 'Editing' );
+		const sidebar = await decideSuggestion( page, 'Accept' );
+		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 0 );
+
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 1 );
+		await expect(
+			sidebar.getByRole( 'button', { name: 'Accept suggestion' } )
+		).toBeVisible();
+
+		await pageUtils.pressKeys( 'primary+shift+z' );
+		await expect( paragraph ).toHaveText( 'Hello world' );
+		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 0 );
+
+		const note = await settledNote( requestUtils, noteId );
+		expect( note.status ).toBe( 'approved' );
+		expect( note.meta._wp_suggestion_status ).toBe( 'applied' );
+		await expect(
+			sidebar.getByText( 'Applied', { exact: true } )
+		).toBeVisible();
+	} );
+
+	test( 'redo after undoing a rejected addition resolves its note again', async ( {
+		editor,
+		page,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		const suggestionSaved = suggestionSavedPromise( page );
+		await page.keyboard.type( ' world' );
+		await expect(
+			paragraph.locator(
+				`${ SUGGESTION_MARK }[data-suggestion-type="add"]`
+			)
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		const { id: noteId } = await ( await suggestionSaved ).json();
+
+		await switchIntent( page, 'Editing' );
+		const sidebar = await decideSuggestion( page, 'Reject' );
+		await expect( paragraph ).toHaveText( 'Hello' );
+
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 1 );
+		await expect(
+			sidebar.getByRole( 'button', { name: 'Reject suggestion' } )
+		).toBeVisible();
+
+		await pageUtils.pressKeys( 'primary+shift+z' );
+		await expect( paragraph ).toHaveText( 'Hello' );
+
+		const note = await settledNote( requestUtils, noteId );
+		expect( note.status ).toBe( 'approved' );
+		expect( note.meta._wp_suggestion_status ).toBe( 'rejected' );
+		await expect(
+			sidebar.getByText( 'Rejected', { exact: true } )
+		).toBeVisible();
+	} );
+
+	/*
+	 * Only a redo lands the decision again. Undoing further, past the
+	 * suggestion itself, withdraws it, and the note goes the way any
+	 * withdrawn suggestion's note does.
+	 */
+	test( 'undo past a reopened suggestion still withdraws its note', async ( {
+		editor,
+		page,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		const suggestionSaved = suggestionSavedPromise( page );
+		await page.keyboard.type( ' world' );
+		await expect(
+			paragraph.locator(
+				`${ SUGGESTION_MARK }[data-suggestion-type="add"]`
+			)
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		const { id: noteId } = await ( await suggestionSaved ).json();
+
+		await switchIntent( page, 'Editing' );
+		const sidebar = await decideSuggestion( page, 'Accept' );
+		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 0 );
+
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 1 );
+		await expect(
+			sidebar.getByRole( 'button', { name: 'Accept suggestion' } )
+		).toBeVisible();
+
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( paragraph ).toHaveText( 'Hello' );
+
+		const note = await settledNote( requestUtils, noteId );
+		expect( note.status ).toBe( 'trash' );
+	} );
+
+	test( 'redo after undoing an accepted deletion resolves its note again', async ( {
+		editor,
+		page,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 6 } );
+		const suggestionSaved = suggestionSavedPromise( page );
+		await page.keyboard.press( 'Backspace' );
+		await expect(
+			paragraph.locator(
+				`${ SUGGESTION_MARK }[data-suggestion-type="del"]`
+			)
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		const { id: noteId } = await ( await suggestionSaved ).json();
+
+		await switchIntent( page, 'Editing' );
+		const sidebar = await decideSuggestion( page, 'Accept' );
+		await expect( paragraph ).toHaveText( 'Hello' );
+
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 1 );
+		await expect(
+			sidebar.getByRole( 'button', { name: 'Accept suggestion' } )
+		).toBeVisible();
+
+		await pageUtils.pressKeys( 'primary+shift+z' );
+		await expect( paragraph ).toHaveText( 'Hello' );
+		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 0 );
+
+		const note = await settledNote( requestUtils, noteId );
+		expect( note.status ).toBe( 'approved' );
+		expect( note.meta._wp_suggestion_status ).toBe( 'applied' );
+		await expect(
+			sidebar.getByText( 'Applied', { exact: true } )
+		).toBeVisible();
+	} );
+
+	test( 'redo after undoing an accepted block insertion resolves its note again', async ( {
+		editor,
+		page,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Existing paragraph' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first()
+			.click();
+		await page.keyboard.press( 'End' );
+		const suggestionSaved = suggestionSavedPromise( page );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Inserted' );
+		const inserted = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Inserted' } );
+		await expect( inserted ).toHaveClass( /is-suggestion-pending-insert/ );
+		const { id: noteId } = await ( await suggestionSaved ).json();
+
+		await switchIntent( page, 'Editing' );
+		const sidebar = await decideSuggestion( page, 'Accept' );
+		await expect( inserted ).not.toHaveClass(
+			/is-suggestion-pending-insert/
+		);
+
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( inserted ).toHaveClass( /is-suggestion-pending-insert/ );
+		await expect(
+			sidebar.getByRole( 'button', { name: 'Accept suggestion' } )
+		).toBeVisible();
+
+		await pageUtils.pressKeys( 'primary+shift+z' );
+		await expect( inserted ).toBeVisible();
+		await expect( inserted ).not.toHaveClass(
+			/is-suggestion-pending-insert/
+		);
+
+		const note = await settledNote( requestUtils, noteId );
+		expect( note.status ).toBe( 'approved' );
+		expect( note.meta._wp_suggestion_status ).toBe( 'applied' );
+		await expect(
+			sidebar.getByText( 'Applied', { exact: true } )
+		).toBeVisible();
+	} );
+
+	test( 'redo after undoing an accepted block removal resolves its note again', async ( {
+		editor,
+		page,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Keep me' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Remove me' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const doomed = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Remove me' } );
+		await doomed.click();
+		const suggestionSaved = suggestionSavedPromise( page );
+		await editor.clickBlockOptionsMenuItem( 'Delete' );
+		await expect( doomed ).toHaveClass( /is-suggestion-pending-remove/ );
+		const { id: noteId } = await ( await suggestionSaved ).json();
+
+		await switchIntent( page, 'Editing' );
+		const sidebar = await decideSuggestion( page, 'Accept' );
+		await expect( doomed ).toHaveCount( 0 );
+
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( doomed ).toHaveClass( /is-suggestion-pending-remove/ );
+		await expect(
+			sidebar.getByRole( 'button', { name: 'Accept suggestion' } )
+		).toBeVisible();
+
+		await pageUtils.pressKeys( 'primary+shift+z' );
+		await expect( doomed ).toHaveCount( 0 );
+
+		const note = await settledNote( requestUtils, noteId );
+		expect( note.status ).toBe( 'approved' );
+		expect( note.meta._wp_suggestion_status ).toBe( 'applied' );
+	} );
+
+	test( 'redo after undoing an accepted attribute suggestion resolves its note again', async ( {
+		editor,
+		page,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { content: 'My Heading', level: 2 },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const heading = editor.canvas
+			.getByRole( 'document', { name: 'Block: Heading' } )
+			.first();
+		await heading.click();
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: /^Heading 2$/ } )
+			.click();
+		const suggestionSaved = suggestionSavedPromise( page );
+		await page.getByRole( 'menuitem', { name: /^Heading 3/ } ).click();
+		await expect( heading ).toHaveClass( /is-suggestion-pending/ );
+		const { id: noteId } = await ( await suggestionSaved ).json();
+
+		await switchIntent( page, 'Editing' );
+		const sidebar = await decideSuggestion( page, 'Accept' );
+		await expect( heading ).not.toHaveClass( /is-suggestion-pending/ );
+		await expect( heading ).toHaveJSProperty( 'tagName', 'H3' );
+
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( heading ).toHaveClass( /is-suggestion-pending/ );
+		await expect(
+			sidebar.getByRole( 'button', { name: 'Accept suggestion' } )
+		).toBeVisible();
+
+		await pageUtils.pressKeys( 'primary+shift+z' );
+		await expect( heading ).not.toHaveClass( /is-suggestion-pending/ );
+		await expect( heading ).toHaveJSProperty( 'tagName', 'H3' );
+
+		const note = await settledNote( requestUtils, noteId );
+		expect( note.status ).toBe( 'approved' );
+		expect( note.meta._wp_suggestion_status ).toBe( 'applied' );
+		await expect(
+			sidebar.getByText( 'Applied', { exact: true } )
 		).toBeVisible();
 	} );
 } );
