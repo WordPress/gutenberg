@@ -1,12 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { RichTextData } from '@wordpress/rich-text';
 import {
-	RichTextData,
-	store as richTextStore,
-	unregisterFormatType,
-} from '@wordpress/rich-text';
-import { select } from '@wordpress/data';
-import {
-	SUGGESTION_FORMAT_NAME,
+	unregisterSuggestionFormats,
 	registerSuggestionFormat,
 } from '../../inline-suggestions';
 import {
@@ -26,20 +21,13 @@ vi.hoisted( () => {
 	globalThis.wpVitest.mockMatchMedia();
 } );
 
-const getFormatType = ( name: string ) =>
-	( select( richTextStore as any ) as any ).getFormatType( name );
-
 describe( 'sliceValueToHTML', () => {
 	beforeAll( () => {
-		if ( ! getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			registerSuggestionFormat();
-		}
+		registerSuggestionFormat();
 	} );
 
 	afterAll( () => {
-		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 	} );
 
 	it( 'serializes a plain slice', () => {
@@ -78,7 +66,7 @@ describe( 'sliceValueToHTML', () => {
 		// The marker points at this post's note; a pasted copy would bind a
 		// second run to the same suggestion.
 		const value = RichTextData.fromHTMLString(
-			`ab <mark class="wp-suggestion" data-suggestion-id="4" data-suggestion-type="add"><strong>cd</strong></mark> ef`
+			`ab <mark class="wp-suggestion-add" data-suggestion-id="4" data-suggestion-type="add"><strong>cd</strong></mark> ef`
 		);
 		expect( sliceValueToHTML( value, 0, value.text.length ) ).toBe(
 			'ab <strong>cd</strong> ef'
@@ -285,7 +273,7 @@ describe( 'collapsedDeleteTarget', () => {
 } );
 
 describe( 'collapsedDeleteDisposition', () => {
-	const marker = [ { type: SUGGESTION_FORMAT_NAME } ];
+	const marker = [ { type: 'core/suggestion-del' } ];
 	// "abcdef" whose leading "ab" already carries a marker.
 	const marked = [
 		marker,
@@ -338,6 +326,48 @@ describe( 'collapsedDeleteDisposition', () => {
 		);
 	} );
 
+	it( 'marks a grapheme inside another author’s addition', () => {
+		// A deletion nested in someone's addition is its own suggestion.
+		const addition = [
+			{
+				type: 'core/suggestion-add',
+				attributes: {
+					'data-suggestion-id': '4',
+					'data-author': '2',
+				},
+			},
+		];
+		const formats = [ addition, addition, addition, addition ];
+		expect(
+			decide( {
+				text: 'abcd',
+				formats,
+				pos: 2,
+				authorToken: '1',
+			} )
+		).toBe( 'mark' );
+	} );
+
+	it( 'refuses a grapheme in another author’s deletion', () => {
+		const deletion = [
+			{
+				type: 'core/suggestion-del',
+				attributes: {
+					'data-suggestion-id': '4',
+					'data-author': '2',
+				},
+			},
+		];
+		expect(
+			decide( {
+				text: 'abcd',
+				formats: [ deletion, deletion, deletion, deletion ],
+				pos: 2,
+				authorToken: '1',
+			} )
+		).toBe( 'refuse' );
+	} );
+
 	it( 'refuses a forward run that has reached the end of the value', () => {
 		expect(
 			decide( {
@@ -372,7 +402,7 @@ describe( 'collapsedDeleteDisposition', () => {
 describe( 'expandBufferedDeleteRun', () => {
 	const marker = [
 		{
-			type: SUGGESTION_FORMAT_NAME,
+			type: 'core/suggestion-del',
 			attributes: { 'data-suggestion-id': '9' },
 		},
 	];
@@ -403,7 +433,7 @@ describe( 'expandBufferedDeleteRun', () => {
 				isBackward: true,
 				repeats: 2,
 			} )
-		).toEqual( { start: 1, end: 3, blocked: true } );
+		).toMatchObject( { start: 1, end: 3, blocked: true } );
 	} );
 
 	it( 'stops at a foreign suggestion going forward', () => {
@@ -416,7 +446,61 @@ describe( 'expandBufferedDeleteRun', () => {
 				isBackward: false,
 				repeats: 3,
 			} )
-		).toEqual( { start: 0, end: 2, blocked: true } );
+		).toMatchObject( { start: 0, end: 2, blocked: true } );
+	} );
+
+	it( 'grows into another author’s addition', () => {
+		const addition = [
+			{
+				type: 'core/suggestion-add',
+				attributes: {
+					'data-suggestion-id': '4',
+					'data-author': '2',
+				},
+			},
+		];
+		expect(
+			expandBufferedDeleteRun( {
+				text: 'Xab',
+				formats: [ addition, undefined, undefined ],
+				start: 2,
+				end: 3,
+				isBackward: true,
+				repeats: 2,
+				authorToken: '1',
+			} )
+		).toEqual( { start: 0, end: 3, blocked: false } );
+	} );
+
+	it( 'names the marker that stopped the run', () => {
+		const deletion = [
+			{
+				type: 'core/suggestion-del',
+				attributes: {
+					'data-suggestion-id': '4',
+					'data-author': '2',
+				},
+			},
+		];
+		expect(
+			expandBufferedDeleteRun( {
+				text: 'Xab',
+				formats: [ deletion, undefined, undefined ],
+				start: 2,
+				end: 3,
+				isBackward: true,
+				repeats: 2,
+				authorToken: '1',
+			} )
+		).toEqual( {
+			start: 1,
+			end: 3,
+			blocked: true,
+			refusal: {
+				reason: 'del-over-del',
+				blocking: { id: '4', kind: 'del', authorId: '2' },
+			},
+		} );
 	} );
 
 	it( 'clamps at the value edge without reporting a block', () => {
@@ -435,19 +519,15 @@ describe( 'expandBufferedDeleteRun', () => {
 
 describe( 'isWithinOwnAddition', () => {
 	beforeAll( () => {
-		if ( ! getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			registerSuggestionFormat();
-		}
+		registerSuggestionFormat();
 	} );
 
 	afterAll( () => {
-		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 	} );
 
 	const mark = ( type: string, author: string, text: string ) =>
-		`<mark class="wp-suggestion" data-suggestion-id="7" data-suggestion-type="${ type }" data-author="${ author }">${ text }</mark>`;
+		`<mark class="wp-suggestion-${ type }" data-suggestion-id="7" data-suggestion-type="${ type }" data-author="${ author }">${ text }</mark>`;
 
 	it( 'is true for a character inside the author own addition', () => {
 		// "Hi " + "tpyo" proposed by user 2; Backspace at the end targets "o".

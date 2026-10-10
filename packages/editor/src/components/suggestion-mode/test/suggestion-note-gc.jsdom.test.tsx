@@ -9,20 +9,17 @@ import {
 } from 'vitest';
 import { render, act } from '@testing-library/react';
 import apiFetch from '@wordpress/api-fetch';
-import { createRegistry, RegistryProvider, select } from '@wordpress/data';
+import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 // @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as noticesStore } from '@wordpress/notices';
 import { createBlock, registerBlockType } from '@wordpress/blocks';
-import { RichTextData, store as richTextStore } from '@wordpress/rich-text';
+import { RichTextData } from '@wordpress/rich-text';
 import SuggestionNoteGC from '../suggestion-note-gc';
 import { SuggestionSessionProvider } from '../suggestion-session';
-import {
-	registerSuggestionFormat,
-	SUGGESTION_FORMAT_NAME,
-} from '../../inline-suggestions';
+import { registerSuggestionFormat } from '../../inline-suggestions';
 import {
 	getReopenedDecision,
 	getSuggestionsResolvedThisSession,
@@ -91,6 +88,7 @@ function note( {
 		parent: 0,
 		author,
 		status,
+		...( author !== undefined && { author } ),
 		meta: {
 			_wp_suggestion_status: lifecycle,
 			_wp_suggestion: JSON.stringify( {
@@ -147,7 +145,7 @@ function attributeNote() {
 	};
 }
 
-const MARKED = `Hello <mark class="wp-suggestion" data-suggestion-id="${ NOTE_ID }" data-suggestion-type="add" data-author="1">world</mark>`;
+const MARKED = `Hello <mark class="wp-suggestion-add" data-suggestion-id="${ NOTE_ID }" data-suggestion-type="add" data-author="1">world</mark>`;
 
 beforeAll( () => {
 	registerBlockType( TEST_BLOCK_NAME, {
@@ -160,13 +158,7 @@ beforeAll( () => {
 		},
 		save: () => null,
 	} );
-	if (
-		! ( select( richTextStore as any ) as any ).getFormatType(
-			SUGGESTION_FORMAT_NAME
-		)
-	) {
-		registerSuggestionFormat();
-	}
+	registerSuggestionFormat();
 } );
 
 function setup( {
@@ -497,10 +489,14 @@ describe( 'SuggestionNoteGC collecting a withdrawn suggestion', () => {
 	 *                   request that fails.
 	 * @return The registry and the `saveEntityRecord` spy.
 	 */
-	async function withdrawMarker( threads: any[], repliesNow?: any[] | null ) {
+	async function withdrawMarker(
+		threads: any[],
+		repliesNow?: any[] | null,
+		currentUserId?: number
+	) {
 		let harness: any;
 		await act( async () => {
-			harness = setup( { content: MARKED, threads } );
+			harness = setup( { content: MARKED, threads, currentUserId } );
 		} );
 
 		if ( repliesNow === null ) {
@@ -545,6 +541,36 @@ describe( 'SuggestionNoteGC collecting a withdrawn suggestion', () => {
 			{ id: NOTE_ID, status: 'trash' },
 			expect.anything()
 		);
+	} );
+
+	it( 'trashes the current user’s own note', async () => {
+		const { saveEntityRecord } = await withdrawMarker(
+			[ note( { status: 'hold', lifecycle: 'pending', author: 1 } ) ],
+			undefined,
+			1
+		);
+
+		expect( saveEntityRecord ).toHaveBeenCalledWith(
+			'root',
+			'comment',
+			{ id: NOTE_ID, status: 'trash' },
+			expect.anything()
+		);
+	} );
+
+	it( 'leaves another author’s note for the save pass to mark outdated', async () => {
+		/*
+		 * Rejecting someone's addition takes a third author's nested
+		 * deletion with it. That note is not the reviewer's to trash: the
+		 * server marks it outdated when the post saves.
+		 */
+		const { saveEntityRecord } = await withdrawMarker(
+			[ note( { status: 'hold', lifecycle: 'pending', author: 5 } ) ],
+			undefined,
+			1
+		);
+
+		expect( saveEntityRecord ).not.toHaveBeenCalled();
 	} );
 
 	it( 'keeps a pending note that has replies, and says so', async () => {

@@ -46,10 +46,10 @@ describe( 'buildSuggestionAuthorColorCss', () => {
 		] );
 		// Author 1 → index 1 (#D94145), author 3 → index 3 (#FF35EE).
 		expect( css ).toContain(
-			'.wp-suggestion[data-author="1"]{--suggestion-author-color:#D94145;}'
+			':is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)[data-author="1"]{--suggestion-author-color:#D94145;}'
 		);
 		expect( css ).toContain(
-			'.wp-suggestion[data-author="3"]{--suggestion-author-color:#FF35EE;}'
+			':is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)[data-author="3"]{--suggestion-author-color:#FF35EE;}'
 		);
 	} );
 
@@ -59,9 +59,7 @@ describe( 'buildSuggestionAuthorColorCss', () => {
 			inlineThread( 2, 1 ),
 			inlineThread( 3, 1 ),
 		] );
-		expect( css.match( /\.wp-suggestion\[data-author/g ) ).toHaveLength(
-			1
-		);
+		expect( css.match( /format\)\[data-author/g ) ).toHaveLength( 1 );
 	} );
 
 	it( 'ignores threads without an inline-suggestion op', () => {
@@ -210,8 +208,8 @@ describe( 'announcements against the rendered editable DOM', () => {
 		// inner run is a descendant of the outer marker too, so an ancestor
 		// selector lets whichever author the stylesheet emits last win.
 		const spans = decorationSpansIn(
-			'<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add" data-author="4">out' +
-				'<mark class="wp-suggestion" data-suggestion-id="2" data-suggestion-type="del" data-author="7">in</mark>' +
+			'<mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add" data-author="4">out' +
+				'<mark class="wp-suggestion-del" data-suggestion-id="2" data-suggestion-type="del" data-author="7">in</mark>' +
 				'</mark>'
 		);
 		const css = buildSuggestionAuthorAnnouncementCss( [
@@ -233,7 +231,7 @@ describe( 'announcements against the rendered editable DOM', () => {
 		// A bold word inside a marker renders between the marker and the
 		// decoration span, so the span is not a direct child of the marker.
 		const spans = decorationSpansIn(
-			'<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del" data-author="4"><strong>bold</strong></mark>'
+			'<mark class="wp-suggestion-del" data-suggestion-id="1" data-suggestion-type="del" data-author="4"><strong>bold</strong></mark>'
 		);
 		const css = buildSuggestionAuthorAnnouncementCss( [
 			inlineThread( 1, 4, 'Ana' ),

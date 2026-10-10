@@ -12,7 +12,7 @@ describe( 'readValueText', () => {
 	it( 'reads the text of an HTML string', () => {
 		expect(
 			readValueText(
-				'Hi <mark class="wp-suggestion" data-suggestion-id="1">x</mark>'
+				'Hi <mark class="wp-suggestion-del" data-suggestion-id="1">x</mark>'
 			)
 		).toBe( 'Hi x' );
 	} );

@@ -1,12 +1,11 @@
 import { RichTextData, remove } from '@wordpress/rich-text';
 import {
 	SUGGESTION_AUTHOR_ATTRIBUTE,
-	SUGGESTION_FORMAT_NAME,
 	SUGGESTION_ID_ATTRIBUTE,
-	SUGGESTION_TYPE_ADDITION,
-	SUGGESTION_TYPE_ATTRIBUTE,
 	analyzeTextEdit,
+	isSuggestionFormat,
 	planEditMarkers,
+	suggestionMarkersAt,
 } from '../inline-suggestions';
 import { toRichTextRecord } from '../inline-suggestions/rich-text-record';
 
@@ -159,19 +158,22 @@ export function settleStoreContentRemoval(
 	const retractedIds = new Set< string >();
 	let marked = false;
 	for ( let i = edit.start; i < edit.end; i++ ) {
-		const marker = record.formats[ i ]?.find(
-			( format ) => format.type === SUGGESTION_FORMAT_NAME
-		);
-		if ( ! marker ) {
+		const stack = record.formats[ i ];
+		if ( ! stack?.some( isSuggestionFormat ) ) {
 			continue;
 		}
-		const attributes = ( marker.attributes ?? {} ) as Record<
+		/*
+		 * Only the author's own proposed text can be taken back. Another
+		 * author's deletion or formatting change nested in it goes with it:
+		 * it described text that is no longer proposed.
+		 */
+		const addition = suggestionMarkersAt( stack ).add;
+		const attributes = ( addition?.attributes ?? {} ) as Record<
 			string,
 			string
 		>;
 		if (
-			attributes[ SUGGESTION_TYPE_ATTRIBUTE ] !==
-				SUGGESTION_TYPE_ADDITION ||
+			! addition ||
 			String( attributes[ SUGGESTION_AUTHOR_ATTRIBUTE ] ?? '' ) !==
 				authorToken
 		) {
@@ -201,7 +203,7 @@ export function settleStoreContentRemoval(
 	// An addition split partway keeps its note anchored in what stays.
 	for ( const stack of nextRecord.formats ) {
 		for ( const format of stack ?? [] ) {
-			if ( format.type === SUGGESTION_FORMAT_NAME ) {
+			if ( isSuggestionFormat( format ) ) {
 				retractedIds.delete(
 					String( format.attributes?.[ SUGGESTION_ID_ATTRIBUTE ] )
 				);

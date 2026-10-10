@@ -49,6 +49,7 @@ import {
 	SuggestionStoreInterceptor,
 	SuggestionUndoGuard,
 	SuggestionNoteGC,
+	SuggestionMarkerGuard,
 	SuggestionAnnotations,
 	SuggestionAuthorColors,
 	RevealSelectedSuggestion,
@@ -76,7 +77,7 @@ if ( isSuggestionModeEnabled() ) {
 	registerSuggestionOverlayFilter();
 }
 
-// Register the `core/suggestion` inline marker format so rich-text round-trips
+// Register the inline suggestion marker formats so rich-text round-trips
 // suggestion markers in block content and the annotations API can decorate
 // them. It has no toolbar entry: suggestions are created by editing in Suggest
 // mode, not from a control. Its `edit` selects the note of the marker under
@@ -547,6 +548,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 													<SuggestionStoreInterceptor />
 													<SuggestionUndoGuard />
 													<SuggestionNoteGC />
+													<SuggestionMarkerGuard />
 													<SuggestionAutoSave />
 													<SuggestionAnnotations />
 													<SuggestionAuthorColors />

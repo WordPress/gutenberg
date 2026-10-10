@@ -30,7 +30,7 @@ import {
 } from '../suggestion-session';
 import {
 	registerSuggestionFormat,
-	SUGGESTION_FORMAT_NAME,
+	unregisterSuggestionFormats,
 	planFormatMarkers,
 } from '../../inline-suggestions';
 import { store as editorStore } from '../../../store';
@@ -105,9 +105,7 @@ afterAll( () => {
 	if ( getFormatType( 'test/bold' ) ) {
 		unregisterFormatType( 'test/bold' );
 	}
-	if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-		unregisterFormatType( SUGGESTION_FORMAT_NAME );
-	}
+	unregisterSuggestionFormats();
 } );
 
 beforeEach( () => {

@@ -24,6 +24,7 @@ import {
 import { parseSuggestionPayload } from './operations';
 import { useNoteThreads } from '../collab-sidebar/hooks';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Build the annotation ranges for a set of suggestion threads. Pure so it can
@@ -35,13 +36,20 @@ import { store as editorStore } from '../../store';
  * structural or whole-attribute suggestions) and markers that can no longer be
  * found in content are skipped.
  *
+ * The annotations API keeps one decoration per character, so where ranges
+ * overlap the later one wins. Ranges are ordered widest first, so an addition
+ * stays highlighted around the suggestions nested in it, and the selected
+ * thread last, so its highlight is never covered.
+ *
  * @param threads            Note threads (suggestion comments).
  * @param getBlockAttributes Selector returning a block's attributes.
+ * @param [selectedId]       Id of the selected note.
  * @return Ranges `{ id, clientId, attributeKey, start, end }`.
  */
 export function suggestionAnnotations(
 	threads: any[] | undefined,
-	getBlockAttributes: ( clientId: string ) => any
+	getBlockAttributes: ( clientId: string ) => any,
+	selectedId?: number | string | null
 ) {
 	if ( ! threads?.length ) {
 		return [];
@@ -78,7 +86,15 @@ export function suggestionAnnotations(
 			end: range.end,
 		} );
 	}
-	return out;
+	const isSelected = ( range: { id: string } ) =>
+		selectedId !== undefined &&
+		selectedId !== null &&
+		range.id === String( selectedId );
+	return out.sort(
+		( a, b ) =>
+			Number( isSelected( a ) ) - Number( isSelected( b ) ) ||
+			b.end - b.start - ( a.end - a.start )
+	);
 }
 
 /**
@@ -88,6 +104,10 @@ export function suggestionAnnotations(
  */
 export function useAnnotateSuggestionThreads( threads: any[] ) {
 	const { getBlockAttributes } = useSelect( blockEditorStore );
+	const selectedId = useSelect(
+		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
+		[]
+	);
 
 	// Reactive signature of the resolved ranges. Computed inside `useSelect`
 	// so it recomputes whenever a tracked block's content changes (a marker's
@@ -103,18 +123,19 @@ export function useAnnotateSuggestionThreads( threads: any[] ) {
 		( select ) =>
 			suggestionAnnotations(
 				threads,
-				select( blockEditorStore ).getBlockAttributes
+				select( blockEditorStore ).getBlockAttributes,
+				selectedId
 			)
 				.map(
 					( range ) =>
 						`${ range.id }:${ range.clientId }:${ range.attributeKey }:${ range.start }:${ range.end }`
 				)
 				.join( '|' ),
-		[ threads ]
+		[ threads, selectedId ]
 	);
 
 	const annotations = useMemo(
-		() => suggestionAnnotations( threads, getBlockAttributes ),
+		() => suggestionAnnotations( threads, getBlockAttributes, selectedId ),
 		// `signature` fully determines the ranges; `threads` and
 		// `getBlockAttributes` are read through it. Depending on them directly
 		// would recompute on every block-editor store tick.
