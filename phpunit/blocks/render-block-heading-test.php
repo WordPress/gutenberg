@@ -20,7 +20,7 @@ class Render_Block_Heading_Test extends WP_UnitTestCase {
 	 */
 	public function test_block_core_heading_render_appends_css_class_to_a_vanilla_element( $input, $expected_result ) {
 		$actual = gutenberg_block_core_heading_render( array(), $input );
-		$this->assertEquals( $expected_result, $actual );
+		$this->assertSame( $expected_result, $actual );
 	}
 
 	public function add_css_class_test_examples() {
