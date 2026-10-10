@@ -543,14 +543,19 @@ function gutenberg_get_suggestion_content_owner() {
  * keeps the walk clear of the bookmark limit however many markers a block
  * holds. Walking tokens rather than matching `<mark>` with a regex means
  * `</mark>`-looking text inside a comment or an attribute value can never be
- * mistaken for a tag. A stack of open elements pairs each opener with its own
- * closer. A marker without a closer (malformed or truncated markup) ends where
- * a browser would end it - at the closer of an element that encloses it, or at
- * the end of the block - and only a deletion fails open there: its tag is
- * removed and its text kept, while an unclosed addition or format change is
- * removed through that point so pending content and its metadata never
- * render. When markers nest, the outer replacement wins: replacing a span
- * discards every edit already recorded inside it.
+ * mistaken for a tag.
+ *
+ * Tag-level pairing is not enough on its own: a browser (and so the editor's
+ * rich text parse) ends a `<mark>` left open at the `</p>`, `</li>` or `</td>`
+ * of an enclosing element and ignores a `</mark>` it cannot reach, so the
+ * lexical `<mark>`...`</mark>` span can differ from the run a reader sees. The
+ * walk therefore tracks open elements to approximate the browser's tree as
+ * well, and a marker whose two readings disagree (or that has no closer) is
+ * unbalanced. Only a deletion fails open: its marker tags are removed and its
+ * text kept. An unbalanced addition or format change fails closed: everything
+ * from its opener through the later of its possible ends is removed, so
+ * pending content and its metadata never render. When markers nest, the outer
+ * replacement wins.
  *
  * The block's `postId` context is deliberately not consulted: inside a Query
  * Loop it names each queried post, not the owner of the content being
@@ -600,70 +605,42 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 	// phpcs:enable Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames.FunctionNotGuardedAgainstRedeclaration
 
 	/*
-	 * Edits to apply to the input, as `[ start, end, text ]` byte ranges. They
-	 * are collected during the walk and applied once it ends.
+	 * Suggestion markers in document order. Each records its opener span and
+	 * two ends: `end`/`closer`, where the tree walk below ends it (a browser's
+	 * view), and `lexical_end`, just past the `</mark>` a plain lexical pairing
+	 * gives it (null when there is none).
 	 */
-	$edits = array();
+	$markers = array();
 
 	/*
-	 * Queues a replacement of the half-open byte range [start, end). Markers
-	 * nest, so every edit already queued at or after `$start` lies inside the
-	 * range (inner markers close first): those are dropped, and the outer
-	 * replacement wins.
+	 * The tree walk keeps a stack of open elements, each `[ tag name, marker
+	 * index or null ]`, approximating how a browser (and so the editor's rich
+	 * text parse) builds the tree:
+	 *
+	 * - A closer ends every element opened after its match, the way a `</p>`
+	 *   ends a `<mark>` left open inside the paragraph.
+	 * - The closer of a special element (`</p>`, `</li>`, `</td>`, `</div>`,
+	 *   ...) does not reach past a table cell or the other default scope
+	 *   boundaries; any other closer (`</mark>`, `</span>`, `</b>`, ...) does
+	 *   not reach past a special element. A closer that finds no match is
+	 *   ignored, as a browser ignores it.
+	 * - Start tags that implicitly close an open element (a `<div>` inside a
+	 *   `<p>`), the reconstruction of formatting elements and foster parenting
+	 *   are not modelled. In each of those cases a browser ends the marker
+	 *   earlier than this walk does, never later.
+	 *
+	 * `WP_HTML_Processor` implements those rules fully, but it bails out on
+	 * markup it does not support and its implied closers have no byte span to
+	 * cut at, so it cannot be the only source of truth for a strip that must
+	 * not leak.
 	 */
-	$replace = static function ( $start, $end, $text ) use ( &$edits ) {
-		foreach ( $edits as $key => $edit ) {
-			if ( $edit[0] >= $start && $edit[0] < $end ) {
-				unset( $edits[ $key ] );
-			}
-		}
-		$edits[] = array( $start, $end, $text );
-	};
-
-	/*
-	 * Closes a suggestion marker. `$closer` is the span of its own `</mark>`,
-	 * or null when the marker was left open and ends implicitly at `$end`.
-	 * Only a deletion fails open: its text is real content, so it is kept and
-	 * only the marker tag goes. An unclosed addition or format change is
-	 * removed through `$end`, since its run is unaccepted content. A closed
-	 * format change whose original cannot be resolved unwraps like a deletion.
-	 */
-	$close = static function ( $marker, $end, $closer ) use ( &$edits, $replace, &$restoring ) {
-		if ( 'del' === $marker['mode'] || ( 'unresolved-format' === $marker['mode'] && null !== $closer ) ) {
-			$edits[] = array( $marker['start'], $marker['start'] + $marker['length'], '' );
-			if ( null !== $closer ) {
-				$edits[] = array( $closer[0], $closer[0] + $closer[1], '' );
-			}
-			return;
-		}
-		$text = '';
-		if ( 'format' === $marker['mode'] && null !== $closer ) {
-			$restoring = true;
-			$text      = gutenberg_strip_inline_suggestion_markers( $marker['original'] );
-			$restoring = false;
-			// The note-marker strip may already have run on this block, so
-			// the swapped-in original gets its own pass.
-			if ( function_exists( 'gutenberg_strip_inline_note_markers' ) ) {
-				$text = gutenberg_strip_inline_note_markers( $text );
-			}
-		}
-		$replace( $marker['start'], null === $closer ? $end : $closer[0] + $closer[1], $text );
-	};
-
-	/*
-	 * Open elements, each `[ tag name, suggestion marker or null ]`, so each
-	 * closer pairs with its own opener. A closer also ends every element
-	 * opened after its opener, the way a browser closes a `<mark>` left open
-	 * inside a `<p>` at the `</p>`. As in a browser, a closer does not reach
-	 * past a table cell or the other default scope boundaries, and a closer
-	 * without an opener is ignored. Start tags that implicitly close an open
-	 * element are not modelled: a marker then stays open until a later closer
-	 * or the end of the block, which removes more of an addition, never less.
-	 */
-	$void_elements  = array( 'AREA', 'BASE', 'BASEFONT', 'BGSOUND', 'BR', 'COL', 'EMBED', 'FRAME', 'HR', 'IMG', 'INPUT', 'KEYGEN', 'LINK', 'META', 'PARAM', 'SOURCE', 'TRACK', 'WBR' );
+	$special        = array( 'ADDRESS', 'APPLET', 'AREA', 'ARTICLE', 'ASIDE', 'BASE', 'BASEFONT', 'BGSOUND', 'BLOCKQUOTE', 'BODY', 'BR', 'BUTTON', 'CAPTION', 'CENTER', 'COL', 'COLGROUP', 'DD', 'DETAILS', 'DIR', 'DIV', 'DL', 'DT', 'EMBED', 'FIELDSET', 'FIGCAPTION', 'FIGURE', 'FOOTER', 'FORM', 'FRAME', 'FRAMESET', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'HEAD', 'HEADER', 'HGROUP', 'HR', 'HTML', 'IFRAME', 'IMG', 'INPUT', 'KEYGEN', 'LI', 'LINK', 'LISTING', 'MAIN', 'MARQUEE', 'MENU', 'META', 'NAV', 'NOEMBED', 'NOFRAMES', 'NOSCRIPT', 'OBJECT', 'OL', 'P', 'PARAM', 'PLAINTEXT', 'PRE', 'SCRIPT', 'SEARCH', 'SECTION', 'SELECT', 'SOURCE', 'STYLE', 'SUMMARY', 'TABLE', 'TBODY', 'TD', 'TEMPLATE', 'TEXTAREA', 'TFOOT', 'TH', 'THEAD', 'TITLE', 'TR', 'TRACK', 'UL', 'WBR', 'XMP' );
 	$scope_boundary = array( 'APPLET', 'CAPTION', 'HTML', 'MARQUEE', 'OBJECT', 'TABLE', 'TD', 'TEMPLATE', 'TH' );
+	$void_elements  = array( 'AREA', 'BASE', 'BASEFONT', 'BGSOUND', 'BR', 'COL', 'EMBED', 'FRAME', 'HR', 'IMG', 'INPUT', 'KEYGEN', 'LINK', 'META', 'PARAM', 'SOURCE', 'TRACK', 'WBR' );
 	$open_elements  = array();
-	$query          = array( 'tag_closers' => 'visit' );
+	// `<mark>` openers only, each with its marker index or null.
+	$lexical_marks = array();
+	$query         = array( 'tag_closers' => 'visit' );
 	while ( $processor->next_tag( $query ) ) {
 		$tag  = $processor->get_tag();
 		$span = $processor->get_token_span();
@@ -674,28 +651,36 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 		}
 
 		if ( $processor->is_tag_closer() ) {
-			$match = null;
+			if ( 'MARK' === $tag && $lexical_marks ) {
+				$index = array_pop( $lexical_marks );
+				if ( null !== $index ) {
+					$markers[ $index ]['lexical_end']    = $span[0] + $span[1];
+					$markers[ $index ]['lexical_closer'] = $span;
+				}
+			}
+
+			$stop_at = in_array( $tag, $special, true ) ? $scope_boundary : $special;
+			$match   = null;
 			for ( $i = count( $open_elements ) - 1; $i >= 0; $i-- ) {
 				if ( $tag === $open_elements[ $i ][0] ) {
 					$match = $i;
 					break;
 				}
-				if ( in_array( $open_elements[ $i ][0], $scope_boundary, true ) ) {
+				if ( in_array( $open_elements[ $i ][0], $stop_at, true ) ) {
 					break;
 				}
 			}
 			if ( null === $match ) {
 				continue;
 			}
-			while ( count( $open_elements ) > $match + 1 ) {
+			while ( count( $open_elements ) > $match ) {
 				$element = array_pop( $open_elements );
-				if ( null !== $element[1] ) {
-					$close( $element[1], $span[0], null );
+				if ( null === $element[1] ) {
+					continue;
 				}
-			}
-			$element = array_pop( $open_elements );
-			if ( null !== $element[1] ) {
-				$close( $element[1], $span[0] + $span[1], $span );
+				$is_own                           = count( $open_elements ) === $match;
+				$markers[ $element[1] ]['end']    = $is_own ? $span[0] + $span[1] : $span[0];
+				$markers[ $element[1] ]['closer'] = $is_own ? $span : null;
 			}
 			continue;
 		}
@@ -703,8 +688,12 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 		if ( in_array( $tag, $void_elements, true ) ) {
 			continue;
 		}
-		if ( 'MARK' !== $tag || ! $processor->has_class( 'wp-suggestion' ) ) {
+		$is_marker = 'MARK' === $tag && $processor->has_class( 'wp-suggestion' );
+		if ( ! $is_marker ) {
 			$open_elements[] = array( $tag, null );
+			if ( 'MARK' === $tag ) {
+				$lexical_marks[] = null;
+			}
 			continue;
 		}
 
@@ -712,42 +701,105 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 		// so a malformed marker never silently drops content.
 		$type   = $processor->get_attribute( 'data-suggestion-type' );
 		$marker = array(
-			'mode'   => ( 'add' === $type ) ? 'add' : 'del',
-			'start'  => $span[0],
-			'length' => $span[1],
+			'mode'           => ( 'add' === $type ) ? 'add' : 'del',
+			'start'          => $span[0],
+			'length'         => $span[1],
+			'end'            => null,
+			'closer'         => null,
+			'lexical_end'    => null,
+			'lexical_closer' => null,
 		);
 		if ( 'format' === $type ) {
-			$original       = gutenberg_get_pending_format_suggestion_html(
+			$original = gutenberg_get_pending_format_suggestion_html(
 				(int) $processor->get_attribute( 'data-suggestion-id' ),
 				$post_id
 			);
-			$marker['mode'] = 'format';
 			if ( null !== $original ) {
+				$marker['mode']     = 'format';
 				$marker['original'] = $original;
 			} else {
 				$marker['mode'] = 'unresolved-format';
 			}
 		}
-		$open_elements[] = array( $tag, $marker );
+		$markers[]       = $marker;
+		$open_elements[] = array( $tag, count( $markers ) - 1 );
+		$lexical_marks[] = count( $markers ) - 1;
 	}
 
-	// Whatever is still open ends with the block.
-	while ( $open_elements ) {
-		$element = array_pop( $open_elements );
-		if ( null !== $element[1] ) {
-			$close( $element[1], strlen( $block_content ), null );
+	/*
+	 * Turns each marker into edits. A marker is balanced when its own
+	 * `</mark>` ends it in the tree walk and that is also its lexical closer;
+	 * only then do the walk and a browser agree on its run. Otherwise (no
+	 * closer, a closer that a browser ignores or reaches through an enclosing
+	 * element, an implicit end) the marker is unbalanced:
+	 *
+	 * - A deletion fails open: its text is real content, so only its opener
+	 *   and any closer paired with it are removed.
+	 * - An addition or format change fails closed: everything from its opener
+	 *   through the later of its two ends is removed, so no pending text or
+	 *   marker metadata renders whichever way the markup is read, at the cost
+	 *   of hiding real text the run wrongly spans. Content still open at the
+	 *   end of the block ends with it.
+	 *
+	 * A balanced format change is replaced with its original; a balanced one
+	 * whose original cannot be resolved unwraps like a deletion.
+	 */
+	$length = strlen( $block_content );
+	$edits  = array();
+	foreach ( $markers as $marker ) {
+		$end      = $marker['end'] ?? $length;
+		$balanced = null !== $marker['closer'] && $marker['lexical_end'] === $end;
+		$opener   = array( $marker['start'], $marker['start'] + $marker['length'], '' );
+
+		if ( 'del' === $marker['mode'] || ( 'unresolved-format' === $marker['mode'] && $balanced ) ) {
+			$edits[] = $opener;
+			if ( null !== $marker['closer'] ) {
+				$edits[] = array( $marker['closer'][0], $marker['closer'][0] + $marker['closer'][1], '' );
+			}
+			if ( null !== $marker['lexical_end'] && $marker['lexical_end'] !== $end ) {
+				$edits[] = array( $marker['lexical_closer'][0], $marker['lexical_end'], '' );
+			}
+			continue;
 		}
+
+		$text = '';
+		if ( 'format' === $marker['mode'] && $balanced ) {
+			$restoring = true;
+			$text      = gutenberg_strip_inline_suggestion_markers( $marker['original'] );
+			$restoring = false;
+			// The note-marker strip may already have run on this block, so
+			// the swapped-in original gets its own pass.
+			if ( function_exists( 'gutenberg_strip_inline_note_markers' ) ) {
+				$text = gutenberg_strip_inline_note_markers( $text );
+			}
+		}
+		$edits[] = array( $marker['start'], max( $end, (int) $marker['lexical_end'] ), $text );
 	}
 
+	/*
+	 * Applies the edits in document order. An edit starting inside an earlier
+	 * one is part of the run being replaced: it is dropped, and when it
+	 * reaches further the earlier replacement is extended over it, so the
+	 * outer replacement wins and overlapping removals merge.
+	 */
 	usort(
 		$edits,
 		static function ( $a, $b ) {
-			return $a[0] - $b[0];
+			return $a[0] === $b[0] ? $b[1] - $a[1] : $a[0] - $b[0];
 		}
 	);
+	$merged = array();
+	foreach ( $edits as $edit ) {
+		$last = count( $merged ) - 1;
+		if ( $last >= 0 && $edit[0] < $merged[ $last ][1] ) {
+			$merged[ $last ][1] = max( $merged[ $last ][1], $edit[1] );
+			continue;
+		}
+		$merged[] = $edit;
+	}
 	$html   = '';
 	$cursor = 0;
-	foreach ( $edits as $edit ) {
+	foreach ( $merged as $edit ) {
 		$html  .= substr( $block_content, $cursor, $edit[0] - $cursor ) . $edit[2];
 		$cursor = $edit[1];
 	}

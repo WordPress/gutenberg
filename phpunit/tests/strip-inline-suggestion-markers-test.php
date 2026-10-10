@@ -648,6 +648,41 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 		$this->assertSame( '<p>aorigb</p>', $this->strip_in_post( $post_id, $html ) );
 	}
 
+	/**
+	 * Data provider: additions whose lexical span and browser span differ.
+	 *
+	 * @return array[] Input HTML and expected output.
+	 */
+	public function data_unbalanced_additions() {
+		$add = '<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add" data-author="3">';
+		return array(
+			'crossing </p><p>'               => array( '<p>a' . $add . 'X</p><p>Y</mark>b</p>', '<p>ab</p>' ),
+			'block-level start tag inside'   => array( '<p>a' . $add . 'X<div>Y</div></mark>b</p>', '<p>ab</p>' ),
+			'crossing </td> in a table cell' => array( '<table><tr><td>a' . $add . 'X</td><td>Y</mark>b</td></tr></table>', '<table><tr><td>ab</td></tr></table>' ),
+			'crossing </li> in a list item'  => array( '<ul><li>a' . $add . 'X</li><li>Y</mark>b</li></ul>', '<ul><li>ab</li></ul>' ),
+			'closer ignored inside a div'    => array( '<div>a' . $add . 'X<div>Y</mark>Z</div>W</div>c', '<div>a</div>c' ),
+			'closer ignored inside a table'  => array( '<div>a' . $add . '<table></mark>LEAK</table>Z</div>c', '<div>a</div>c' ),
+			'formatting closer past a div'   => array( '<p><b>a' . $add . 'X<div>Y</b>Z</div>W</p>', '<p><b>a</p>' ),
+			'format crossing </p><p>'        => array( '<p>a<mark class="wp-suggestion" data-suggestion-id="999999" data-suggestion-type="format">X</p><p>Y</mark>b</p>', '<p>ab</p>' ),
+		);
+	}
+
+	/**
+	 * @dataProvider data_unbalanced_additions
+	 *
+	 * @param string $html     Block HTML.
+	 * @param string $expected Expected output.
+	 */
+	public function test_unbalanced_addition_fails_closed( $html, $expected ) {
+		$this->assertSame( $expected, gutenberg_strip_inline_suggestion_markers( $html ) );
+	}
+
+	public function test_unbalanced_deletion_keeps_its_text() {
+		$html = '<p>a<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del">X</p><p>Y</mark>b</p>';
+
+		$this->assertSame( '<p>aX</p><p>Yb</p>', gutenberg_strip_inline_suggestion_markers( $html ) );
+	}
+
 	public function test_filter_is_registered_on_render_block() {
 		$this->assertNotFalse(
 			has_filter( 'render_block', 'gutenberg_strip_inline_suggestion_markers' )
