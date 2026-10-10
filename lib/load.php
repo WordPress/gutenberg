@@ -109,6 +109,8 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.2/notes.php';
 	require __DIR__ . '/compat/wordpress-7.2/suggestion-status.php';
 	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-suggestion-marker-processor.php';
+	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-suggestion-block-scanner.php';
+	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-suggestion-content.php';
 	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-suggestion-reconciler.php';
 	require __DIR__ . '/compat/wordpress-7.2/suggestion-reconciliation.php';
 	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-fields-registry.php';
