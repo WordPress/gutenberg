@@ -92,7 +92,7 @@ Reuse this design across your site.
 
 -	**Name:** [core/block](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-reusable/core-block-block/)
 -	**Category:** [reusable](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-reusable/)
--	**Supports:** interactivity (clientNavigation), ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~inserter~~, ~~renaming~~, ~~visibility~~
+-	**Supports:** interactivity (clientNavigation), ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~inserter~~, ~~renaming~~, ~~rotate~~, ~~visibility~~
 -	**Attributes:** content, ref
 
 ## Breadcrumbs
@@ -347,7 +347,7 @@ Use the classic WordPress editor.
 
 -	**Name:** [core/freeform](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-freeform/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
--	**Supports:** ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~lock~~, ~~renaming~~, ~~reusable~~, ~~visibility~~
+-	**Supports:** ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~lock~~, ~~renaming~~, ~~reusable~~, ~~rotate~~, ~~visibility~~
 -	**Attributes:** content
 
 ## Gallery
@@ -394,7 +394,7 @@ Add custom HTML code and preview it as you edit.
 
 -	**Name:** [core/html](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-html/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
--	**Supports:** interactivity (clientNavigation), listView, ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~visibility~~
+-	**Supports:** interactivity (clientNavigation), listView, ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~rotate~~, ~~visibility~~
 -	**Attributes:** content
 
 ## Icon
@@ -487,7 +487,7 @@ Your site doesn’t include support for this block.
 
 -	**Name:** [core/missing](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-missing/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
--	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~inserter~~, ~~lock~~, ~~renaming~~, ~~reusable~~, ~~visibility~~
+-	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~inserter~~, ~~lock~~, ~~renaming~~, ~~reusable~~, ~~rotate~~, ~~visibility~~
 -	**Attributes:** originalContent, originalName, originalUndelimitedContent
 
 ## More
@@ -496,7 +496,7 @@ Content before this block is shown in the excerpt on blog and archive pages. Whe
 
 -	**Name:** [core/more](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-more/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
--	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~multiple~~, ~~visibility~~
+-	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~multiple~~, ~~rotate~~, ~~visibility~~
 -	**Attributes:** customText, noTeaser
 
 ## Navigation
@@ -546,7 +546,7 @@ Separate your content into a multi-page experience.
 -	**Name:** [core/nextpage](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-nextpage/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/post-content
--	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~visibility~~
+-	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~rotate~~, ~~visibility~~
 
 ## Page List
 
@@ -583,7 +583,7 @@ Show a block pattern.
 
 -	**Name:** [core/pattern](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-pattern/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** interactivity (clientNavigation), ~~html~~, ~~inserter~~, ~~renaming~~, ~~visibility~~
+-	**Supports:** interactivity (clientNavigation), ~~html~~, ~~inserter~~, ~~renaming~~, ~~rotate~~, ~~visibility~~
 -	**Attributes:** slug
 
 ## Playlist
@@ -895,7 +895,7 @@ Insert additional custom elements with a WordPress shortcode.
 
 -	**Name:** [core/shortcode](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-shortcode/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
--	**Supports:** ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~visibility~~
+-	**Supports:** ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~rotate~~, ~~visibility~~
 -	**Attributes:** text
 
 ## Site Logo
