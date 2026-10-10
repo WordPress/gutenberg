@@ -22,10 +22,10 @@ class WP_Test_Block_Editor extends WP_UnitTestCase {
 	/**
 	 * Sets up each test method.
 	 */
-	public function setUp() {
+	public function set_up() {
 		global $post;
 
-		parent::setUp();
+		parent::set_up();
 
 		$args = array(
 			'post_title' => 'Example',
