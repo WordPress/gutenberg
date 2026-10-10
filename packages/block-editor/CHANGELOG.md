@@ -12,6 +12,7 @@
 -   Grid: Behind the `gutenberg-grid-interactivity` experiment, every row of a grid with a row count is the same height, and manual placement grids take their height from their width with `aspect-ratio: columns / rows`, so all their cells are the same size, close to square, whatever their content ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
 -   Grid: Behind the `gutenberg-grid-interactivity` experiment, dragging a block in a manual placement grid snaps it to cells: one drop zone covers the grid, the pointer marks the centre of the dragged block, the cells it will land in and any blocks it will overlap are shown, and the block stays in place, dimmed, while it is dragged. Dropped outside the grid, the block moves to wherever it lands ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
 -   Grid: Behind the `gutenberg-grid-interactivity` experiment, dragging a block in a manual placement grid shows alignment guides where the cells it will land in line up with the grid's edges or center, or with the edges or center of a nearby block ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+-   Grid: Behind the `gutenberg-grid-interactivity` experiment, a selected manual placement grid has handles on its top and bottom edges that add or remove rows in the selected style state. Rows added or removed at the top move every block with them, and rows with blocks in them can't be removed. Dragging a block's bottom resize handle past the last row also adds rows ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
 
 ### Bug Fixes
 
