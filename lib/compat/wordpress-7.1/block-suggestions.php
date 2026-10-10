@@ -678,7 +678,11 @@ function gutenberg_get_suggestion_marker_kind( WP_HTML_Tag_Processor $processor 
  * Each marker is an array:
  *
  * - `kind`: `add`, `del` or `format` (see
- *   `gutenberg_get_suggestion_marker_kind()`).
+ *   `gutenberg_get_suggestion_marker_kind()`), or for a `legacy` marker (the
+ *   single `wp-suggestion` class the per-kind classes replaced) `add` when its
+ *   type says so and `del` otherwise.
+ * - `legacy`: whether it is a legacy marker. Only the render strip acts on
+ *   one; the save pass leaves it alone.
  * - `id`: `data-suggestion-id` as an integer, 0 when absent.
  * - `run`: `data-suggestion-run`, or null. Set on the content-free anchors the
  *   save pass leaves in post content (see `Gutenberg_Suggestion_Content`).
@@ -775,7 +779,12 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
 		if ( in_array( $tag, $void_elements, true ) ) {
 			continue;
 		}
-		$kind = 'MARK' === $tag ? gutenberg_get_suggestion_marker_kind( $processor ) : null;
+		$kind   = 'MARK' === $tag ? gutenberg_get_suggestion_marker_kind( $processor ) : null;
+		$legacy = false;
+		if ( null === $kind && 'MARK' === $tag && $processor->has_class( 'wp-suggestion' ) ) {
+			$legacy = true;
+			$kind   = 'add' === $processor->get_attribute( 'data-suggestion-type' ) ? 'add' : 'del';
+		}
 		if ( null === $kind ) {
 			$open_elements[] = array( $tag, null );
 			if ( 'MARK' === $tag ) {
@@ -787,6 +796,7 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
 		$run             = $processor->get_attribute( 'data-suggestion-run' );
 		$markers[]       = array(
 			'kind'           => $kind,
+			'legacy'         => $legacy,
 			'id'             => (int) $processor->get_attribute( 'data-suggestion-id' ),
 			'run'            => is_string( $run ) ? $run : null,
 			'start'          => $span[0],
@@ -838,6 +848,10 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
  *   `gutenberg_push_suggestion_content_owner()`), never the block's `postId`
  *   context. When that original cannot be resolved the marker falls back to
  *   deletion handling.
+ * - A legacy marker (the single `wp-suggestion` class from before the per-kind
+ *   classes) fails closed the same way: an addition is removed with its text,
+ *   anything else is unwrapped, so a pending addition saved before the switch
+ *   never renders.
  *
  * Post content keeps the anchors the save pass leaves (and the REST `raw` view
  * re-inflates them for editors) so the editor can re-attach on reload. Only
@@ -875,7 +889,7 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 	 */
 	static $restoring = false;
 
-	if ( false === strpos( $block_content, 'wp-suggestion-' ) ) {
+	if ( false === strpos( $block_content, 'wp-suggestion' ) ) {
 		return $block_content;
 	}
 
