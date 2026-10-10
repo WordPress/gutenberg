@@ -5,6 +5,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import NavigationMenuEditor from './editor';
+import AutoAddPagesToggle from './auto-add-pages-toggle';
 import styles from './style.module.scss';
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
@@ -53,6 +54,9 @@ function NavigationEditStage() {
 			}
 		>
 			<div className={ styles.content }>
+				<div className={ styles.settings }>
+					<AutoAddPagesToggle id={ navigationId } />
+				</div>
 				<NavigationMenuEditor id={ navigationId } />
 			</div>
 		</Page>
