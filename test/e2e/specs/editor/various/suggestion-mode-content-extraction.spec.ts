@@ -15,6 +15,7 @@
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
 const RAW_CONTENT_PLUGIN = 'gutenberg-test-suggestion-raw-content';
+const CONTENT_CAP_PLUGIN = 'gutenberg-test-suggestion-content-cap';
 
 async function switchIntent( page: any, intentLabel: string ) {
 	await page
@@ -442,5 +443,41 @@ test.describe( 'Suggestion mode keeps proposals out of the stored post', () => {
 			accepted.indexOf( 'First paragraph' )
 		);
 		expect( accepted ).not.toContain( 'pending-move' );
+	} );
+
+	test.describe( 'when a suggestion is over the size cap', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin( CONTENT_CAP_PLUGIN );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin( CONTENT_CAP_PLUGIN );
+		} );
+
+		test( 'it stays in the post content and the sidebar says why', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const postId = await suggestAddition( { editor, page } );
+
+			// Too large for the note, so the proposal stays where it was.
+			const stored = await readStoredContent( requestUtils, postId );
+			expect( stored ).toContain( 'zanzibarian</mark>' );
+			expect( stored ).not.toContain( 'data-suggestion-run=' );
+
+			await reloadEditor( page );
+			const sidebar = await openNotesSidebar( page );
+			const notice = sidebar.getByText(
+				'This suggestion is too large to keep out of the saved post.',
+				{ exact: false }
+			);
+			await expect( notice ).toBeVisible();
+
+			// Deciding the suggestion takes the notice away.
+			await switchIntent( page, 'Editing' );
+			await decideSuggestion( page, 'Reject' );
+			await expect( notice ).toBeHidden();
+		} );
 	} );
 } );
