@@ -388,4 +388,59 @@ test.describe( 'Suggestion mode keeps proposals out of the stored post', () => {
 		expect( accepted ).toContain( '<strong>world</strong>' );
 		expect( accepted ).not.toContain( 'data-suggestion' );
 	} );
+
+	test( 'a suggested move is stored in the original order and comes back in the editor', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First paragraph' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second paragraph' },
+		} );
+		await switchIntent( page, 'Suggesting' );
+		const mover = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'First paragraph' } );
+		await editor.selectBlocks( mover );
+		const suggestionSaved = suggestionSavedPromise( page );
+		await editor.clickBlockToolbarButton( 'Move down' );
+		await expect( mover ).toHaveClass( /is-suggestion-pending-move/ );
+		await suggestionSaved;
+		await editor.saveDraft();
+		const postId = await currentPostId( page );
+		expect( await isDirty( page ) ).toBe( false );
+
+		const stored = await readStoredContent( requestUtils, postId );
+		expect( stored.indexOf( 'First paragraph' ) ).toBeLessThan(
+			stored.indexOf( 'Second paragraph' )
+		);
+		expect( stored ).toContain( '"type":"pending-move"' );
+
+		// Editors get the proposed order back.
+		const edit = await readEditContent( requestUtils, postId );
+		expect( edit.indexOf( 'Second paragraph' ) ).toBeLessThan(
+			edit.indexOf( 'First paragraph' )
+		);
+		expect( edit ).not.toContain( 'suggestion-placeholder' );
+		await reloadEditor( page );
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		).toHaveText( [ 'Second paragraph', 'First paragraph' ] );
+		expect( await isDirty( page ) ).toBe( false );
+
+		// Accept and save: the new order becomes the stored one.
+		await switchIntent( page, 'Editing' );
+		await decideSuggestion( page, 'Accept' );
+		await editor.saveDraft();
+		const accepted = await readStoredContent( requestUtils, postId );
+		expect( accepted.indexOf( 'Second paragraph' ) ).toBeLessThan(
+			accepted.indexOf( 'First paragraph' )
+		);
+		expect( accepted ).not.toContain( 'pending-move' );
+	} );
 } );
