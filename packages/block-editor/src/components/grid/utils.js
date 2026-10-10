@@ -59,6 +59,24 @@ export class GridRect {
 	}
 }
 
+/**
+ * Gets the smallest range of grid cells that contains two other ranges,
+ * whichever way round they are.
+ *
+ * @param {GridRect} rectA A range of grid cells.
+ * @param {GridRect} rectB Another range of grid cells.
+ *
+ * @return {GridRect} The cells from one range to the other.
+ */
+export function getBoundingGridRect( rectA, rectB ) {
+	return new GridRect( {
+		columnStart: Math.min( rectA.columnStart, rectB.columnStart ),
+		rowStart: Math.min( rectA.rowStart, rectB.rowStart ),
+		columnEnd: Math.max( rectA.columnEnd, rectB.columnEnd ),
+		rowEnd: Math.max( rectA.rowEnd, rectB.rowEnd ),
+	} );
+}
+
 export function getComputedCSS( element, property ) {
 	return element.ownerDocument.defaultView
 		.getComputedStyle( element )

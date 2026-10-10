@@ -22,12 +22,14 @@ import {
 	getGridTrackPositions,
 	getGridItemPixelRect,
 	getGridRectFromPixelRect,
+	getBoundingGridRect,
 } from './utils';
 import {
 	getGridDropTarget,
 	getPixelRectFromGridRect,
 } from './get-grid-drop-target';
 import { getAlignmentGuides } from './get-alignment-guides';
+import { getInsertedChildLayoutStyle } from './get-inserted-child-layout-style';
 import { store as blockEditorStore } from '../../store';
 import { useGetNumberOfBlocksBeforeCell } from './use-get-number-of-blocks-before-cell';
 import ButtonBlockAppender from '../button-block-appender';
@@ -256,6 +258,11 @@ function ManualGridVisualizer( {
 					);
 				} )
 			) }
+			<GridVisualizerMarquee
+				gridClientId={ gridClientId }
+				gridElement={ gridElement }
+				gridInfo={ gridInfo }
+			/>
 			<GridVisualizerDropLayer
 				gridClientId={ gridClientId }
 				gridElement={ gridElement }
@@ -615,7 +622,20 @@ function GridDropIndicator( { dropTarget } ) {
 	);
 }
 
-function GridVisualizerAppender( { column, row, gridClientId, gridInfo } ) {
+function GridVisualizerAppender( {
+	column,
+	row,
+	columnSpan = 1,
+	rowSpan = 1,
+	gridClientId,
+	gridInfo,
+	isInitiallyOpen = false,
+	onClose,
+} ) {
+	const appenderRef = useRef();
+	const { getBlockAttributes, getSelectedBlockStyleState } = unlock(
+		useSelect( blockEditorStore )
+	);
 	const {
 		updateBlockAttributes,
 		moveBlocksToPosition,
@@ -627,24 +647,39 @@ function GridVisualizerAppender( { column, row, gridClientId, gridInfo } ) {
 		gridInfo.numColumns
 	);
 
+	useEffect( () => {
+		if ( isInitiallyOpen ) {
+			appenderRef.current?.click();
+		}
+	}, [ isInitiallyOpen ] );
+
 	return (
 		<ButtonBlockAppender
+			ref={ appenderRef }
 			rootClientId={ gridClientId }
 			className="block-editor-grid-visualizer__appender"
 			style={ {
 				color: gridInfo.currentColor,
 			} }
 			onSelect={ ( block ) => {
+				// Called with the inserted block, and with nothing when the
+				// inserter closes.
 				if ( ! block ) {
+					onClose?.();
 					return;
 				}
 				updateBlockAttributes( block.clientId, {
-					style: {
-						layout: {
+					style: getInsertedChildLayoutStyle(
+						getBlockAttributes( block.clientId )?.style,
+						new GridRect( {
 							columnStart: column,
 							rowStart: row,
-						},
-					},
+							columnSpan,
+							rowSpan,
+						} ),
+						getSelectedBlockStyleState( block.clientId ),
+						getBlockAttributes( gridClientId )?.layout
+					),
 				} );
 				__unstableMarkNextChangeAsNotPersistent();
 				moveBlocksToPosition(
@@ -653,7 +688,225 @@ function GridVisualizerAppender( { column, row, gridClientId, gridInfo } ) {
 					gridClientId,
 					getNumberOfBlocksBeforeCell( column, row )
 				);
+				onClose?.();
 			} }
 		/>
+	);
+}
+
+/**
+ * Lets a rectangle of cells be selected by pressing on an empty cell and
+ * dragging across the grid. On release, an inserter opens, and the block
+ * inserted covers the selected cells. A press without a drag opens the
+ * inserter for the one cell, as before.
+ *
+ * @param {Object}      props
+ * @param {string}      props.gridClientId Client ID of the grid block.
+ * @param {HTMLElement} props.gridElement  The grid element in the canvas.
+ * @param {Object}      props.gridInfo     Grid info, from `getGridInfo`.
+ */
+function GridVisualizerMarquee( { gridClientId, gridElement, gridInfo } ) {
+	const anchorRef = useRef();
+	const [ marquee, setMarquee ] = useState( null );
+
+	useEffect( () => {
+		// The visualizer grid that the cells are drawn in.
+		const container = anchorRef.current?.parentElement;
+		if ( ! container ) {
+			return;
+		}
+		const ownerWindow = container.ownerDocument.defaultView;
+		// Escape is pressed in the canvas or in the editor, wherever the
+		// focus is.
+		const keyDocuments = new Set( [
+			container.ownerDocument,
+			gridElement.ownerDocument,
+		] );
+		let drag = null;
+		let shouldIgnoreClick = false;
+		let ignoreClickTimeout;
+
+		function getCell( event ) {
+			const { columnTracks, rowTracks } =
+				getGridTrackPositions( gridElement );
+			if ( ! columnTracks.length || ! rowTracks.length ) {
+				return null;
+			}
+			const rect = container.getBoundingClientRect();
+			const scale = container.offsetWidth / rect.width || 1;
+			return getGridDropTarget( {
+				x: ( event.clientX - rect.left ) * scale,
+				y: ( event.clientY - rect.top ) * scale,
+				columnTracks,
+				rowTracks,
+			} );
+		}
+
+		function onPointerDown( event ) {
+			shouldIgnoreClick = false;
+			// Drawing is for a mouse or a pen. A touch on a cell scrolls the
+			// page, or opens the inserter for that cell when it is a tap.
+			if (
+				event.pointerType === 'touch' ||
+				event.button !== 0 ||
+				! event.target.closest?.(
+					'.block-editor-grid-visualizer__cell .block-editor-grid-visualizer__appender'
+				)
+			) {
+				return;
+			}
+			const cell = getCell( event );
+			if ( ! cell ) {
+				return;
+			}
+			drag = { pointerId: event.pointerId, start: cell, isMoving: false };
+			// Keeps the drag going over the canvas iframe.
+			event.target.setPointerCapture( event.pointerId );
+		}
+
+		function onPointerMove( event ) {
+			if (
+				! drag ||
+				drag.isCancelled ||
+				event.pointerId !== drag.pointerId
+			) {
+				return;
+			}
+			const cell = getCell( event );
+			if ( ! cell ) {
+				return;
+			}
+			const { start } = drag;
+			if (
+				! drag.isMoving &&
+				cell.columnStart === start.columnStart &&
+				cell.rowStart === start.rowStart
+			) {
+				return;
+			}
+			drag.isMoving = true;
+			setMarquee( {
+				rect: getBoundingGridRect( start, cell ),
+				isInserting: false,
+			} );
+		}
+
+		function onPointerUp( event ) {
+			if ( ! drag || event.pointerId !== drag.pointerId ) {
+				return;
+			}
+			if ( drag.isMoving || drag.isCancelled ) {
+				// The press started on a cell's own appender, which would
+				// open on the click that follows. That click is part of the
+				// same press, so it comes before the timeout.
+				shouldIgnoreClick = true;
+				ownerWindow.clearTimeout( ignoreClickTimeout );
+				ignoreClickTimeout = ownerWindow.setTimeout( () => {
+					shouldIgnoreClick = false;
+				} );
+			}
+			if ( drag.isMoving && ! drag.isCancelled ) {
+				setMarquee( ( current ) =>
+					current ? { ...current, isInserting: true } : current
+				);
+			}
+			drag = null;
+		}
+
+		function cancelDrag() {
+			drag = null;
+			setMarquee( null );
+		}
+
+		function onLostPointerCapture( event ) {
+			// Capture is also lost after `pointerup`, once the drag is over.
+			if ( drag && event.pointerId === drag.pointerId ) {
+				cancelDrag();
+			}
+		}
+
+		function onKeyDown( event ) {
+			if ( drag && ! drag.isCancelled && event.key === 'Escape' ) {
+				event.preventDefault();
+				event.stopPropagation();
+				// The press goes on until the pointer is released, so that
+				// releasing it doesn't open the inserter.
+				drag.isCancelled = true;
+				setMarquee( null );
+			}
+		}
+
+		function onClick( event ) {
+			if (
+				shouldIgnoreClick &&
+				! event.target.closest?.(
+					'.block-editor-grid-visualizer__marquee'
+				)
+			) {
+				shouldIgnoreClick = false;
+				event.preventDefault();
+				event.stopPropagation();
+			}
+		}
+
+		container.addEventListener( 'pointerdown', onPointerDown );
+		container.addEventListener( 'pointermove', onPointerMove );
+		container.addEventListener( 'pointerup', onPointerUp );
+		container.addEventListener( 'pointercancel', cancelDrag );
+		container.addEventListener(
+			'lostpointercapture',
+			onLostPointerCapture
+		);
+		container.addEventListener( 'click', onClick, true );
+		for ( const keyDocument of keyDocuments ) {
+			keyDocument.addEventListener( 'keydown', onKeyDown, true );
+		}
+		return () => {
+			container.removeEventListener( 'pointerdown', onPointerDown );
+			container.removeEventListener( 'pointermove', onPointerMove );
+			container.removeEventListener( 'pointerup', onPointerUp );
+			container.removeEventListener( 'pointercancel', cancelDrag );
+			container.removeEventListener(
+				'lostpointercapture',
+				onLostPointerCapture
+			);
+			container.removeEventListener( 'click', onClick, true );
+			for ( const keyDocument of keyDocuments ) {
+				keyDocument.removeEventListener( 'keydown', onKeyDown, true );
+			}
+			ownerWindow.clearTimeout( ignoreClickTimeout );
+		};
+	}, [ gridElement ] );
+
+	return (
+		<>
+			<div ref={ anchorRef } hidden />
+			{ marquee && (
+				<div
+					className="block-editor-grid-visualizer__marquee"
+					style={ {
+						gridColumn: `${ marquee.rect.columnStart } / ${
+							marquee.rect.columnEnd + 1
+						}`,
+						gridRow: `${ marquee.rect.rowStart } / ${
+							marquee.rect.rowEnd + 1
+						}`,
+					} }
+				>
+					{ marquee.isInserting && (
+						<GridVisualizerAppender
+							column={ marquee.rect.columnStart }
+							row={ marquee.rect.rowStart }
+							columnSpan={ marquee.rect.columnSpan }
+							rowSpan={ marquee.rect.rowSpan }
+							gridClientId={ gridClientId }
+							gridInfo={ gridInfo }
+							isInitiallyOpen
+							onClose={ () => setMarquee( null ) }
+						/>
+					) }
+				</div>
+			) }
+		</>
 	);
 }
