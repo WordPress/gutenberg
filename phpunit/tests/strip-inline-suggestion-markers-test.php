@@ -359,15 +359,155 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Renders a block as if it were part of the given post.
+	 * Stores markup as a post's content without content filters, so the
+	 * markers survive as written.
+	 *
+	 * @param int    $post_id Post to update.
+	 * @param string $content Post content.
+	 */
+	private function set_post_content( $post_id, $content ) {
+		global $wpdb;
+		$wpdb->update( $wpdb->posts, array( 'post_content' => $content ), array( 'ID' => $post_id ) );
+		clean_post_cache( $post_id );
+	}
+
+	/**
+	 * Renders a paragraph block as the content of the given post.
 	 *
 	 * @param int    $post_id Post being rendered.
-	 * @param string $html    Block HTML.
-	 * @return string Filtered block HTML.
+	 * @param string $html    Paragraph HTML.
+	 * @param bool   $store   Whether to store the paragraph as the post's
+	 *                        content first.
+	 * @return string Rendered content.
 	 */
-	private function strip_in_post( $post_id, $html ) {
+	private function strip_in_post( $post_id, $html, $store = true ) {
+		$content = '<!-- wp:paragraph -->' . $html . '<!-- /wp:paragraph -->';
+		if ( $store ) {
+			$this->set_post_content( $post_id, $content );
+		}
 		$GLOBALS['post'] = get_post( $post_id );
-		return gutenberg_strip_inline_suggestion_markers( $html );
+		return $this->without_paragraph_class( trim( apply_filters( 'the_content', $content ) ) );
+	}
+
+	/**
+	 * Removes the class the paragraph block adds on render.
+	 *
+	 * @param string $html Rendered HTML.
+	 * @return string HTML without the paragraph block class.
+	 */
+	private function without_paragraph_class( $html ) {
+		return str_replace( ' class="wp-block-paragraph"', '', $html );
+	}
+
+	/**
+	 * Builds a format marker.
+	 *
+	 * @param int    $note_id Note comment ID.
+	 * @param string $inner   Marked run.
+	 * @return string Marker HTML.
+	 */
+	private function format_marker( $note_id, $inner ) {
+		return '<mark class="wp-suggestion" data-suggestion-id="' . $note_id . '" data-suggestion-type="format">' . $inner . '</mark>';
+	}
+
+	/**
+	 * Creates a published post whose paragraph holds a pending format change
+	 * recorded with the original `SECRET`.
+	 *
+	 * @return int[] Post ID and note ID.
+	 */
+	private function create_post_with_format_change() {
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_format_note( $post_id, 'SECRET' );
+		$this->set_post_content( $post_id, '<!-- wp:paragraph --><p>Hello ' . $this->format_marker( $note_id, '<strong>world</strong>' ) . '</p><!-- /wp:paragraph -->' );
+		return array( $post_id, $note_id );
+	}
+
+	/**
+	 * Renders a page holding a Query Loop of posts.
+	 *
+	 * @param string $template Inner blocks of the post template.
+	 * @return string Rendered content.
+	 */
+	private function render_page_with_query_loop( $template ) {
+		$page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		$content = '<!-- wp:query {"queryId":1,"query":{"postType":"post","perPage":5,"inherit":false}} --><div class="wp-block-query"><!-- wp:post-template -->' . $template . '<!-- /wp:post-template --></div><!-- /wp:query -->';
+		$this->set_post_content( $page_id, $content );
+		$GLOBALS['post'] = get_post( $page_id );
+		return $this->without_paragraph_class( apply_filters( 'the_content', $content ) );
+	}
+
+	public function test_query_loop_item_does_not_resolve_a_queried_posts_note() {
+		list( , $note_id ) = $this->create_post_with_format_change();
+
+		$rendered = $this->render_page_with_query_loop(
+			'<!-- wp:paragraph --><p>' . $this->format_marker( $note_id, '<strong>planted</strong>' ) . '</p><!-- /wp:paragraph -->'
+		);
+
+		// The paragraph belongs to the page, so the queried post's note is
+		// not consulted and the marker unwraps.
+		$this->assertStringNotContainsString( 'SECRET', $rendered );
+		$this->assertStringContainsString( '<p><strong>planted</strong></p>', $rendered );
+	}
+
+	public function test_query_loop_post_content_restores_each_posts_own_original() {
+		$this->create_post_with_format_change();
+
+		$rendered = $this->render_page_with_query_loop( '<!-- wp:post-content /-->' );
+
+		$this->assertStringContainsString( '<p>Hello SECRET</p>', $rendered );
+	}
+
+	public function test_post_content_restores_its_own_original() {
+		list( $post_id ) = $this->create_post_with_format_change();
+		$GLOBALS['post'] = get_post( $post_id );
+
+		$this->assertStringContainsString( '<p>Hello SECRET</p>', $this->without_paragraph_class( apply_filters( 'the_content', get_post( $post_id )->post_content ) ) );
+	}
+
+	public function test_marker_outside_post_content_is_not_resolved() {
+		list( , $note_id ) = $this->create_post_with_format_change();
+
+		$this->assertSame( '<p><strong>world</strong></p>', gutenberg_strip_inline_suggestion_markers( '<p>' . $this->format_marker( $note_id, '<strong>world</strong>' ) . '</p>' ) );
+	}
+
+	public function test_note_missing_from_its_posts_content_is_not_used() {
+		list( $post_id, $note_id ) = $this->create_post_with_format_change();
+
+		$this->set_post_content( $post_id, '<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->' );
+		$html = '<p>' . $this->format_marker( $note_id, '<strong>world</strong>' ) . '</p>';
+
+		$this->assertSame( '<p><strong>world</strong></p>', $this->strip_in_post( $post_id, $html, false ) );
+	}
+
+	public function test_trashed_note_is_not_used() {
+		list( $post_id, $note_id ) = $this->create_post_with_format_change();
+		wp_trash_comment( $note_id );
+
+		$this->assertSame( '<p><strong>world</strong></p>', $this->strip_in_post( $post_id, '<p>' . $this->format_marker( $note_id, '<strong>world</strong>' ) . '</p>' ) );
+	}
+
+	public function test_spam_note_is_not_used() {
+		list( $post_id, $note_id ) = $this->create_post_with_format_change();
+		wp_spam_comment( $note_id );
+
+		$this->assertSame( '<p><strong>world</strong></p>', $this->strip_in_post( $post_id, '<p>' . $this->format_marker( $note_id, '<strong>world</strong>' ) . '</p>' ) );
+	}
+
+	public function test_rejected_note_is_not_used() {
+		list( $post_id, $note_id ) = $this->create_post_with_format_change();
+		update_comment_meta( $note_id, '_wp_suggestion_status', 'rejected' );
+
+		$this->assertSame( '<p><strong>world</strong></p>', $this->strip_in_post( $post_id, '<p>' . $this->format_marker( $note_id, '<strong>world</strong>' ) . '</p>' ) );
+	}
+
+	public function test_password_protected_post_is_not_resolved() {
+		list( $post_id, $note_id ) = $this->create_post_with_format_change();
+		global $wpdb;
+		$wpdb->update( $wpdb->posts, array( 'post_password' => 'pass' ), array( 'ID' => $post_id ) );
+		clean_post_cache( $post_id );
+
+		$this->assertSame( '<p><strong>world</strong></p>', $this->strip_in_post( $post_id, '<p>' . $this->format_marker( $note_id, '<strong>world</strong>' ) . '</p>' ) );
 	}
 
 	public function test_pending_format_restores_the_original_run() {

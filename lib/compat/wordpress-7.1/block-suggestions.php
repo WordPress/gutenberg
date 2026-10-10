@@ -462,6 +462,53 @@ function gutenberg_can_suggest_post_meta( $post, $key ) {
 }
 
 /**
+ * Records the post whose content `the_content` is expanding.
+ *
+ * A format marker's original is resolved against the post that owns the
+ * content holding the marker, not the block's `postId` context: inside a
+ * Query Loop that context names each queried post, while the loop's own
+ * blocks still belong to the content that holds the loop. Hooked before
+ * `do_blocks()` (priority 9), so every block of the content renders while its
+ * post is on top of the stack; a `core/post-content` block nested inside
+ * (for a queried post) calls `the_content` again and pushes that post, and
+ * `gutenberg_pop_suggestion_content_owner()` restores the outer owner after.
+ *
+ * @param string $content Post content.
+ * @return string Unchanged content.
+ */
+function gutenberg_push_suggestion_content_owner( $content ) {
+	$GLOBALS['gutenberg_suggestion_content_owners'][] = (int) get_the_ID();
+	return $content;
+}
+add_filter( 'the_content', 'gutenberg_push_suggestion_content_owner', 1 );
+
+/**
+ * Pops the post recorded by `gutenberg_push_suggestion_content_owner()`.
+ *
+ * @param string $content Rendered content.
+ * @return string Unchanged content.
+ */
+function gutenberg_pop_suggestion_content_owner( $content ) {
+	if ( ! empty( $GLOBALS['gutenberg_suggestion_content_owners'] ) ) {
+		array_pop( $GLOBALS['gutenberg_suggestion_content_owners'] );
+	}
+	return $content;
+}
+add_filter( 'the_content', 'gutenberg_pop_suggestion_content_owner', PHP_INT_MAX );
+
+/**
+ * Returns the post whose content is being rendered, if any.
+ *
+ * @return int Post ID, or 0 outside `the_content`.
+ */
+function gutenberg_get_suggestion_content_owner() {
+	if ( empty( $GLOBALS['gutenberg_suggestion_content_owners'] ) ) {
+		return 0;
+	}
+	return (int) end( $GLOBALS['gutenberg_suggestion_content_owners'] );
+}
+
+/**
  * Strip inline suggestion markers from rendered block output.
  *
  * The public HTML must never expose suggestion metadata, and an un-accepted
@@ -475,8 +522,11 @@ function gutenberg_can_suggest_post_meta( $post, $key ) {
  *   wrapper *and* the text are removed. It only becomes permanent when accepted.
  * - `format` (suggested formatting change): the marked run carries the proposed
  *   formatting, so the whole span is replaced with the original run recorded on
- *   the note (see `gutenberg_get_pending_format_suggestion_html()`). When that
- *   original cannot be resolved the marker falls back to deletion handling.
+ *   the note (see `gutenberg_get_pending_format_suggestion_html()`). The note
+ *   is resolved against the post whose content is being rendered (see
+ *   `gutenberg_push_suggestion_content_owner()`), never the block's `postId`
+ *   context. When that original cannot be resolved the marker falls back to
+ *   deletion handling.
  *
  * The raw `post_content` (and the REST `raw` view, revisions, exports) keeps the
  * markers so the editor can re-attach on reload. Only `wp-suggestion` markers
@@ -502,13 +552,14 @@ function gutenberg_can_suggest_post_meta( $post, $key ) {
  * render. When markers nest, the outer replacement wins: replacing a span
  * discards every edit already recorded inside it.
  *
- * @param string        $block_content Rendered block HTML.
- * @param array         $block         Parsed block. Unused.
- * @param WP_Block|null $instance      Block instance, whose `postId` context
- *                                     names the post being rendered.
+ * The block's `postId` context is deliberately not consulted: inside a Query
+ * Loop it names each queried post, not the owner of the content being
+ * rendered.
+ *
+ * @param string $block_content Rendered block HTML.
  * @return string Block HTML with wp-suggestion markers stripped (type-aware).
  */
-function gutenberg_strip_inline_suggestion_markers( $block_content, $block = array(), $instance = null ) {
+function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 	/*
 	 * Set while a restored original run is stripped, so markers inside it are
 	 * unwrapped rather than resolved again - a note cannot pull in another
@@ -520,12 +571,7 @@ function gutenberg_strip_inline_suggestion_markers( $block_content, $block = arr
 		return $block_content;
 	}
 
-	$post_id = 0;
-	if ( ! $restoring ) {
-		$post_id = ( $instance instanceof WP_Block && isset( $instance->context['postId'] ) )
-			? (int) $instance->context['postId']
-			: (int) get_the_ID();
-	}
+	$post_id = $restoring ? 0 : gutenberg_get_suggestion_content_owner();
 
 	// Anonymous subclass exposing the byte span of the current token, which
 	// WP_HTML_Tag_Processor does not provide publicly yet. The redeclaration-
@@ -723,22 +769,28 @@ function gutenberg_strip_inline_suggestion_markers( $block_content, $block = arr
 
 	return $html;
 }
-add_filter( 'render_block', 'gutenberg_strip_inline_suggestion_markers', 10, 3 );
+add_filter( 'render_block', 'gutenberg_strip_inline_suggestion_markers' );
 
 /**
  * Resolves the original run of a pending inline format suggestion.
  *
  * A `format` marker's run carries the proposed formatting; the note records the
  * run as it was in its payload's `beforeHTML`. The original is only returned
- * for a note on the post being rendered, so a marker copied into another post
- * cannot pull that post's text onto this page, and only while the suggestion
- * has not been applied.
+ * when all of these hold, so a marker copied into other content cannot pull a
+ * post's text onto that page:
+ *
+ * - the note is on the post whose content is being rendered,
+ * - that post's stored content (or, in a preview, the current user's autosave
+ *   of it) holds a marker for the note,
+ * - the post is not password protected, or its password was given,
+ * - the note is not trashed or marked as spam,
+ * - the suggestion is neither applied nor rejected.
  *
  * `beforeHTML` was filtered at write time to what its author could publish
  * directly (see `gutenberg_sanitize_suggestion_payload()`).
  *
  * @param int $note_id Note comment ID from the marker.
- * @param int $post_id Post being rendered.
+ * @param int $post_id Post whose content is being rendered.
  * @return string|null Original run HTML, or null when it cannot be resolved.
  */
 function gutenberg_get_pending_format_suggestion_html( $note_id, $post_id ) {
@@ -749,7 +801,32 @@ function gutenberg_get_pending_format_suggestion_html( $note_id, $post_id ) {
 	if ( ! $note || 'note' !== $note->comment_type || (int) $note->comment_post_ID !== $post_id ) {
 		return null;
 	}
-	if ( 'applied' === get_comment_meta( $note_id, '_wp_suggestion_status', true ) ) {
+	if ( in_array( $note->comment_approved, array( 'trash', 'spam', 'post-trashed' ), true ) ) {
+		return null;
+	}
+	if ( in_array( get_comment_meta( $note_id, '_wp_suggestion_status', true ), array( 'applied', 'rejected' ), true ) ) {
+		return null;
+	}
+	$post = get_post( $post_id );
+	if ( ! $post || post_password_required( $post ) ) {
+		return null;
+	}
+	$needle   = 'data-suggestion-id="' . $note_id . '"';
+	$contents = array( $post->post_content );
+	if ( is_preview() ) {
+		$autosave = wp_get_post_autosave( $post_id, get_current_user_id() );
+		if ( $autosave ) {
+			$contents[] = $autosave->post_content;
+		}
+	}
+	$owned = false;
+	foreach ( $contents as $content ) {
+		if ( str_contains( $content, $needle ) ) {
+			$owned = true;
+			break;
+		}
+	}
+	if ( ! $owned ) {
 		return null;
 	}
 	$payload = json_decode( (string) get_comment_meta( $note_id, '_wp_suggestion', true ), true );
