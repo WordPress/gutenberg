@@ -41,6 +41,7 @@ import {
 	SuggestionSessionProvider,
 	useSuggestionSession,
 } from '../suggestion-session';
+import { takeWithdrawnAnchor } from '../decision-state';
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -827,6 +828,41 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			type: 'block-remove',
 			clientId: a.clientId,
 		} );
+	} );
+
+	it( 'withdraws the note of a move a removal replaces', async () => {
+		/*
+		 * The collector only trashes a note it has seen anchored. A delete
+		 * right after the move saved can beat the notes list, and the
+		 * move's note would then outlive the move it proposed.
+		 */
+		const a = createBlock( TEST_BLOCK_NAME, {
+			content: 'A',
+			metadata: {
+				noteId: [ 12 ],
+				suggestion: {
+					type: 'pending-move',
+					authorId: null,
+					fromAnchorClientId: null,
+					fromParentClientId: null,
+					fromIndex: 0,
+					crossedParents: false,
+					commentId: 12,
+				},
+			},
+		} );
+		const b = createBlock( TEST_BLOCK_NAME, { content: 'B' } );
+		const { registry } = setup( { initialBlocks: [ b, a ] } );
+
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).removeBlock( a.clientId );
+		} );
+		await flushSubscribers();
+
+		expect( markerOf( registry, a.clientId )?.type ).toBe(
+			'pending-remove'
+		);
+		expect( takeWithdrawnAnchor( registry, 12 ) ).toBe( true );
 	} );
 
 	it( 'adopts the removal once the linked note records the removal as applied', async () => {
