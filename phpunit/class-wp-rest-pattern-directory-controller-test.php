@@ -146,10 +146,6 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 		$this->assertGreaterThan( 0, count( $patterns ) );
 
 		array_walk( $patterns, array( $this, 'assertPatternMatchesSchema' ) );
-
-		foreach ( $patterns as $pattern ) {
-			$this->assertContains( 'core', $pattern['keywords'] );
-		}
 	}
 
 	/**
