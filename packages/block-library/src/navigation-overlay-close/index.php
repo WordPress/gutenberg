@@ -29,11 +29,17 @@ function render_block_core_navigation_overlay_close( $attributes ) {
 		$button_text .= '<span class="wp-block-navigation-overlay-close__text">' . wp_kses_post( $text ) . '</span>';
 	}
 
+	/*
+	 * With no visible text, the label is the button's only name, so it is the author's own wording
+	 * rather than a fixed one. `text` used to default to `Close`, which made the two the same
+	 * string; it no longer does, and a button labelled `Dismiss menu` was still announced as
+	 * `Close` to anyone who could not see the icon.
+	 */
 	$wrapper_attributes = get_block_wrapper_attributes();
 	$html_content       = sprintf(
 		'<button %1$s type="button" %2$s >%3$s</button>',
 		$wrapper_attributes,
-		! $show_text ? 'aria-label="' . __( 'Close' ) . '"' : '',
+		! $show_text ? 'aria-label="' . esc_attr( wp_strip_all_tags( $text ) ) . '"' : '',
 		$button_text
 	);
 
