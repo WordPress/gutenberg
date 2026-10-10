@@ -210,6 +210,16 @@ export default {
 			rowCount = null,
 			autoFit = false,
 		} = effectiveLayout;
+		// Manual grids give all their cells the same size, as part of the grid
+		// interactivity experiment.
+		const hasSameSizeCells =
+			!! effectiveLayout.isManualPlacement &&
+			!! window.__experimentalEnableGridInteractivity;
+		// Cells take their size from the grid's width, unless a minimum column
+		// width lets the columns wrap into more rows than the grid has.
+		const hasCellsSizedByWidth = hasSameSizeCells && ! minimumColumnWidth;
+		const baseHasCellsSizedByWidth =
+			hasSameSizeCells && ! layout?.minimumColumnWidth;
 
 		// When enabled, columns stretch to fill the available space using
 		// `auto-fit`; otherwise empty tracks are preserved with `auto-fill`.
@@ -267,7 +277,11 @@ export default {
 			hasViewportOverride( 'autoFit' ) ||
 			( hasBlockGapOverride && minimumColumnWidth && columnCount > 0 );
 		const shouldOutputGridRows =
-			( ! hasViewportOverrides || hasViewportOverride( 'rowCount' ) ) &&
+			( ! hasViewportOverrides ||
+				hasViewportOverride( 'rowCount' ) ||
+				( hasSameSizeCells &&
+					( hasViewportOverride( 'columnCount' ) ||
+						hasViewportOverride( 'minimumColumnWidth' ) ) ) ) &&
 			columnCount &&
 			rowCount;
 
@@ -317,7 +331,35 @@ export default {
 			}
 		}
 
-		if ( shouldOutputGridRows ) {
+		if ( shouldOutputGridRows && hasSameSizeCells ) {
+			// Every row gets the same height, the height of the tallest one, so
+			// that all the grid's cells are the same size. Rows added outside
+			// the row count match them.
+			rules.push(
+				`grid-template-rows: repeat(${ rowCount }, minmax(1rem, 1fr))`,
+				'grid-auto-rows: minmax(1rem, 1fr)'
+			);
+			// The grid takes its height from its width, so that cells are
+			// close to square and content never makes them bigger. The gaps
+			// keep them from being exactly square.
+			//
+			// `--wp--style--grid-cells` tells the grid's children whether their
+			// cells have a fixed size, so that blocks can fill them. Blocks read
+			// it with a container style query in their own styles.
+			if ( hasCellsSizedByWidth ) {
+				rules.push(
+					`aspect-ratio: ${ columnCount } / ${ rowCount }`,
+					'min-height: 0',
+					'--wp--style--grid-cells: fixed'
+				);
+			} else if ( hasViewportOverrides && baseHasCellsSizedByWidth ) {
+				rules.push(
+					'aspect-ratio: auto',
+					'min-height: auto',
+					'--wp--style--grid-cells: auto'
+				);
+			}
+		} else if ( shouldOutputGridRows ) {
 			rules.push(
 				`grid-template-rows: repeat(${ rowCount }, minmax(1rem, auto))`
 			);
@@ -327,6 +369,16 @@ export default {
 			output = `${ appendSelectors( selector ) } { ${ rules.join(
 				'; '
 			) }; }`;
+		}
+
+		// The cell state is inherited, so grids nested inside this one reset
+		// it to describe their own cells. A nested grid with fixed cells sets
+		// it again, as its own rule is more specific.
+		if ( hasSameSizeCells && ! hasViewportOverrides ) {
+			output += `:where(${ appendSelectors(
+				selector,
+				'.is-layout-grid'
+			) }) { --wp--style--grid-cells: auto; }`;
 		}
 
 		// Output blockGap styles based on rules contained in layout definitions in theme.json.

@@ -905,8 +905,13 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$should_output_grid_columns = true;
 		}
 
-		$should_output_grid_rows = ( null === $viewport_overrides || $has_viewport_property_override( 'rowCount' ) ) && ! empty( $column_count ) && ! empty( $row_count );
-		$grid_declarations       = array();
+		// Manual grids give all their cells the same size, as part of the grid interactivity experiment.
+		$has_same_size_cells = ! empty( $layout_for_styles['isManualPlacement'] ) && gutenberg_is_experiment_enabled( 'gutenberg-grid-interactivity' );
+		// Cells take their size from the grid's width, unless a minimum column width lets the columns wrap into more rows than the grid has.
+		$has_cells_sized_by_width      = $has_same_size_cells && empty( $layout_for_styles['minimumColumnWidth'] );
+		$base_has_cells_sized_by_width = $has_same_size_cells && empty( $base_layout['minimumColumnWidth'] );
+		$should_output_grid_rows       = ( null === $viewport_overrides || $has_viewport_property_override( 'rowCount' ) || ( $has_same_size_cells && ( $has_viewport_property_override( 'columnCount' ) || $has_viewport_property_override( 'minimumColumnWidth' ) ) ) ) && ! empty( $column_count ) && ! empty( $row_count );
+		$grid_declarations             = array();
 
 		/* When enabled, columns stretch to fill the available space using
 		 * `auto-fit`; otherwise empty tracks are preserved with `auto-fill`.
@@ -936,10 +941,52 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			);
 		}
 
-		if ( $should_output_grid_rows ) {
+		/*
+		 * Every row gets the same height, the height of the tallest one, so that all the
+		 * grid's cells are the same size. Rows added outside the row count match them.
+		 */
+		if ( $should_output_grid_rows && $has_same_size_cells ) {
+			$grid_row_declarations = array(
+				'grid-template-rows' => 'repeat(' . $row_count . ', minmax(1rem, 1fr))',
+				'grid-auto-rows'     => 'minmax(1rem, 1fr)',
+			);
+			/*
+			 * The grid takes its height from its width, so that cells are close to square and
+			 * content never makes them bigger. The gaps keep them from being exactly square.
+			 *
+			 * `--wp--style--grid-cells` tells the grid's children whether their cells have a
+			 * fixed size, so that blocks can fill them. Blocks read it with a container style
+			 * query in their own styles.
+			 */
+			if ( $has_cells_sized_by_width ) {
+				$grid_row_declarations['aspect-ratio']            = $column_count . ' / ' . $row_count;
+				$grid_row_declarations['min-height']              = '0';
+				$grid_row_declarations['--wp--style--grid-cells'] = 'fixed';
+			} elseif ( null !== $viewport_overrides && $base_has_cells_sized_by_width ) {
+				$grid_row_declarations['aspect-ratio']            = 'auto';
+				$grid_row_declarations['min-height']              = 'auto';
+				$grid_row_declarations['--wp--style--grid-cells'] = 'auto';
+			}
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => $grid_row_declarations,
+			);
+		} elseif ( $should_output_grid_rows ) {
 			$layout_styles[] = array(
 				'selector'     => $selector,
 				'declarations' => array( 'grid-template-rows' => 'repeat(' . $row_count . ', minmax(1rem, auto))' ),
+			);
+		}
+
+		/*
+		 * The cell state is inherited, so grids nested inside this one reset it to describe
+		 * their own cells. A nested grid with fixed cells sets it again, as its own rule is
+		 * more specific.
+		 */
+		if ( $has_same_size_cells && null === $viewport_overrides ) {
+			$layout_styles[] = array(
+				'selector'     => ":where($selector .is-layout-grid)",
+				'declarations' => array( '--wp--style--grid-cells' => 'auto' ),
 			);
 		}
 
