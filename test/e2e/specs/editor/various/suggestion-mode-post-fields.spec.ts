@@ -735,6 +735,207 @@ test.describe( 'Suggestion mode: post fields', () => {
 		} );
 	} );
 
+	test.describe( 'after a reload', () => {
+		let mediaId: number;
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			const media = await requestUtils.uploadMedia(
+				'./assets/10x10_e2e_test_image_green.png'
+			);
+			mediaId = media.id;
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllMedia();
+			await requestUtils.deleteAllUsers();
+		} );
+
+		function readPendingNotes( requestUtils: any ) {
+			return requestUtils.rest( {
+				path: '/wp/v2/comments',
+				params: {
+					post: postId,
+					type: 'note',
+					status: 'hold',
+					context: 'edit',
+				},
+			} );
+		}
+
+		function readOperation( note: any ) {
+			return JSON.parse( note.meta._wp_suggestion ).operations[ 0 ];
+		}
+
+		async function reloadSuggesting( page: any ) {
+			await page.reload();
+			await switchIntent( page, 'Suggesting' );
+		}
+
+		for ( const { field, first, second, baseline } of [
+			{
+				field: 'title',
+				first: 'First title',
+				second: 'Second title',
+				baseline: 'Suggestion mode post fields',
+			},
+			{
+				field: 'excerpt',
+				first: 'First excerpt',
+				second: 'Second excerpt',
+				baseline: 'Saved excerpt',
+			},
+			{
+				field: 'slug',
+				first: 'first-slug',
+				second: 'second-slug',
+				baseline: 'saved-slug',
+			},
+			{
+				field: 'featured_media',
+				first: 'MEDIA',
+				second: 0,
+				baseline: 0,
+			},
+		] ) {
+			test( `re-editing a reloaded ${ field } suggestion updates its note`, async ( {
+				page,
+				requestUtils,
+			} ) => {
+				const firstValue = first === 'MEDIA' ? mediaId : first;
+				await switchIntent( page, 'Suggesting' );
+				await suggestPostEdits( page, { [ field ]: firstValue } );
+				const [ note ] = await readPendingNotes( requestUtils );
+
+				await reloadSuggesting( page );
+				// The pending proposal is shown again while suggesting.
+				await expect
+					.poll( () => getEditedPostAttribute( page, field ) )
+					.toEqual( firstValue );
+
+				if ( second === baseline ) {
+					// Editing the field back to the post's value withdraws
+					// the suggestion, as undo does.
+					const trashed = page.waitForResponse(
+						( response: any ) =>
+							response
+								.url()
+								.includes( `/wp/v2/comments/${ note.id }` ) &&
+							response.request().postData()?.includes( 'trash' )
+					);
+					await page.evaluate(
+						( edits: Record< string, any > ) =>
+							( window as any ).wp.data
+								.dispatch( 'core/editor' )
+								.editPost( edits ),
+						{ [ field ]: second }
+					);
+					await trashed;
+					expect( await readPendingNotes( requestUtils ) ).toEqual(
+						[]
+					);
+					return;
+				}
+
+				await suggestPostEdits( page, { [ field ]: second } );
+				const notes = await readPendingNotes( requestUtils );
+				expect( notes.map( ( { id }: any ) => id ) ).toEqual( [
+					note.id,
+				] );
+				expect( readOperation( notes[ 0 ] ) ).toMatchObject( {
+					attribute: field,
+					before: baseline,
+					after: second,
+				} );
+			} );
+		}
+
+		test( 'undo after re-editing a reloaded suggestion goes back to its note', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			await switchIntent( page, 'Suggesting' );
+			await suggestPostEdits( page, { excerpt: 'First excerpt' } );
+			await reloadSuggesting( page );
+			await expect
+				.poll( () => getEditedPostAttribute( page, 'excerpt' ) )
+				.toBe( 'First excerpt' );
+			await suggestPostEdits( page, { excerpt: 'Second excerpt' } );
+
+			const restored = suggestionSavedPromise( page );
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Undo' } )
+				.click();
+			await restored;
+
+			// The suggestion made in the earlier session is kept, not withdrawn.
+			expect( await getEditedPostAttribute( page, 'excerpt' ) ).toBe(
+				'First excerpt'
+			);
+			const notes = await readPendingNotes( requestUtils );
+			expect( notes ).toHaveLength( 1 );
+			expect( readOperation( notes[ 0 ] ).after ).toBe( 'First excerpt' );
+		} );
+
+		test( "another author's suggestion on the same field is left alone", async ( {
+			page,
+			requestUtils,
+		} ) => {
+			const other = await requestUtils.createUser( {
+				username: 'otherreviewer',
+				email: 'otherreviewer@example.com',
+				password: 'password',
+				roles: [ 'editor' ],
+			} );
+			const theirs = await requestUtils.rest( {
+				method: 'POST',
+				path: '/wp/v2/comments',
+				data: {
+					post: postId,
+					type: 'note',
+					status: 'hold',
+					author: other.id,
+					content: '',
+					meta: {
+						_wp_suggestion: JSON.stringify( {
+							schemaVersion: 2,
+							blockName: '',
+							baseRevision: null,
+							operations: [
+								{
+									type: 'post-attribute-set',
+									attribute: 'excerpt',
+									before: 'Saved excerpt',
+									after: 'Their excerpt',
+								},
+							],
+						} ),
+					},
+				},
+			} );
+
+			await reloadSuggesting( page );
+			// Their proposal is theirs: it is not shown as ours.
+			expect( await getEditedPostAttribute( page, 'excerpt' ) ).toBe(
+				'Saved excerpt'
+			);
+			await suggestPostEdits( page, { excerpt: 'My excerpt' } );
+
+			const notes = await readPendingNotes( requestUtils );
+			expect( notes ).toHaveLength( 2 );
+			const mine = notes.find( ( { id }: any ) => id !== theirs.id );
+			expect( readOperation( mine ) ).toMatchObject( {
+				before: 'Saved excerpt',
+				after: 'My excerpt',
+			} );
+			expect(
+				readOperation(
+					notes.find( ( { id }: any ) => id === theirs.id )
+				).after
+			).toBe( 'Their excerpt' );
+		} );
+	} );
+
 	test.describe( 'trash', () => {
 		const TRASH_REFUSED_MESSAGE =
 			"Moving to the trash isn't available while suggesting. Switch to Editing to move it to the trash.";
@@ -794,7 +995,7 @@ test.describe( 'Suggestion mode: post fields', () => {
 							id
 						);
 					},
-					[ postId, path ]
+					[ postId, path ] as [ number, string ]
 				);
 				await expect(
 					page
