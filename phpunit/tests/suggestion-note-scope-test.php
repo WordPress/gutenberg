@@ -220,6 +220,97 @@ class Tests_Suggestion_Note_Scope extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Renders a page whose content holds a pending format change with a
+	 * private original (its marker sits inside a pending addition, which never
+	 * renders), followed by the given blocks.
+	 *
+	 * @param callable $blocks Returns the blocks to render after the page's
+	 *                         own, given the page's note ID.
+	 * @return string Rendered content.
+	 */
+	private function render_page_with_private_original( $blocks ) {
+		$page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		$note_id = $this->create_format_note( $page_id, 'HIDDEN ORIGINAL' );
+		$content = $this->paragraph( '<mark class="wp-suggestion-add" data-suggestion-id="' . ( $note_id + 1000 ) . '" data-suggestion-type="add">' . $this->format_marker( $note_id, 'x' ) . '</mark>' )
+			. $blocks( $note_id );
+		$this->set_post_content( $page_id, $content );
+		$rendered = $this->render_as( $page_id, $content );
+		$this->assertEmpty( $GLOBALS['gutenberg_suggestion_content_owners'], 'The owner stack is balanced.' );
+		$this->assertEmpty( $GLOBALS['gutenberg_suggestion_owner_frames'], 'The owner frames are balanced.' );
+		return $rendered;
+	}
+
+	public function test_latest_posts_full_content_does_not_resolve_the_outer_pages_note() {
+		$rendered = $this->render_page_with_private_original(
+			function ( $note_id ) {
+				$post_id = self::factory()->post->create(
+					array(
+						'post_author' => self::$author_id,
+						'post_status' => 'publish',
+					)
+				);
+				$this->set_post_content( $post_id, $this->paragraph( 'Copied ' . $this->format_marker( $note_id, 'run' ) ) );
+				return '<!-- wp:latest-posts {"displayPostContent":true,"displayPostContentRadio":"full_post"} /-->';
+			}
+		);
+
+		$this->assertStringNotContainsString( 'HIDDEN ORIGINAL', $rendered );
+		$this->assertStringContainsString( 'Copied run', $rendered );
+	}
+
+	public function test_template_part_does_not_resolve_the_outer_pages_note() {
+		$rendered = $this->render_page_with_private_original(
+			function ( $note_id ) {
+				$part_id = self::factory()->post->create(
+					array(
+						'post_type'   => 'wp_template_part',
+						'post_status' => 'publish',
+						'post_name'   => 'suggestion-scope-part',
+					)
+				);
+				wp_set_post_terms( $part_id, get_stylesheet(), 'wp_theme' );
+				$this->set_post_content( $part_id, $this->paragraph( 'Copied ' . $this->format_marker( $note_id, 'run' ) ) );
+				return '<!-- wp:template-part {"slug":"suggestion-scope-part"} /-->';
+			}
+		);
+
+		$this->assertStringNotContainsString( 'HIDDEN ORIGINAL', $rendered );
+		$this->assertStringContainsString( 'Copied run', $rendered );
+	}
+
+	public function test_navigation_does_not_resolve_the_outer_pages_note() {
+		$rendered = $this->render_page_with_private_original(
+			function ( $note_id ) {
+				$link    = array(
+					'label' => 'Copied ' . $this->format_marker( $note_id, 'run' ),
+					'url'   => 'https://example.org/',
+					'kind'  => 'custom',
+				);
+				$menu_id = self::factory()->post->create(
+					array(
+						'post_type'   => 'wp_navigation',
+						'post_status' => 'publish',
+					)
+				);
+				$this->set_post_content( $menu_id, '<!-- wp:navigation-link ' . serialize_block_attributes( $link ) . ' /-->' );
+				return '<!-- wp:navigation {"ref":' . $menu_id . '} /-->';
+			}
+		);
+
+		$this->assertStringNotContainsString( 'HIDDEN ORIGINAL', $rendered );
+		$this->assertStringContainsString( 'Copied run', $rendered );
+	}
+
+	public function test_blocks_rendered_with_no_post_context_restore_nothing() {
+		$note_id = $this->create_format_note( self::factory()->post->create(), 'HIDDEN ORIGINAL' );
+
+		$rendered = do_blocks( $this->paragraph( 'Copied ' . $this->format_marker( $note_id, 'run' ) ) );
+
+		$this->assertStringNotContainsString( 'HIDDEN ORIGINAL', $rendered );
+		$this->assertStringContainsString( 'Copied run', $rendered );
+	}
+
+	/**
 	 * Renders content as the given post's, in a preview request.
 	 *
 	 * @param int    $post_id Post being rendered.
