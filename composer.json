@@ -23,6 +23,17 @@
 		"allow-plugins": {
 			"dealerdirect/phpcodesniffer-composer-installer": true,
 			"composer/installers": true
+		},
+		"policy": {
+			"advisories": {
+				"ignore-id": {
+					"PKSA-z3gr-8qht-p93v": "CVE-2026-24765: unsafe deserialization in PHPUnit's PHPT-format code-coverage handling. The .phpt format is not used in this repository.",
+					"PKSA-v5yj-8nmz-sk2q": "CVE-2026-45304: YAML parser exponential memory allocation only reachable when parsing untrusted YAML input. The only symfony/yaml usage this dependency graph exercises serializes local data and is never invoked within this repository's own PHPUnit runs",
+					"PKSA-ft77-7h5f-p3r6": "CVE-2026-45305: ReDoS via catastrophic backtracking. This is only reachable by YAML parsing of untrusted input, which this repository's PHPUnit-5.7-driven usage never performs.",
+					"PKSA-b14r-zh1d-vdrc": "CVE-2026-45133: stack exhaustion via unbounded recursion in symfony/yaml's handling of deeply nested blocks/sequences/mappings. Only exercised by YAML parsing of untrusted input, which does not happen in this repository.",
+					"PKSA-mh9b-91zm-m1gy": "CVE-2026-45293 only affects the WordPress.WP.EnqueuedResourceParameters sniff included in the WordPress and WordPress-Extra rulesets, all of which are not used."
+				}
+			}
 		}
 	},
 	"require-dev": {
