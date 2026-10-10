@@ -196,6 +196,22 @@ export function receiveViewConfig( kind, name, config ) {
 }
 
 /**
+ * Returns an action object used to receive the patterns registered by a theme.
+ *
+ * @param {string} stylesheet Theme stylesheet.
+ * @param {Array}  patterns   Patterns registered while the theme is active.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveThemeBlockPatterns( stylesheet, patterns ) {
+	return {
+		type: 'RECEIVE_THEME_BLOCK_PATTERNS',
+		stylesheet,
+		patterns,
+	};
+}
+
+/**
  * Records that the entity sync manager opened a new undo level for a record
  * it syncs, so the level takes its place in core-data's undo history next to
  * the edits core-data records itself.

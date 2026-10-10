@@ -1,6 +1,9 @@
 export const globalStylesDataKey = Symbol( 'globalStylesDataKey' );
 export const globalStylesLinksDataKey = Symbol( 'globalStylesLinks' );
 export const selectBlockPatternsKey = Symbol( 'selectBlockPatternsKey' );
+export const selectInstalledThemePatternsKey = Symbol(
+	'selectInstalledThemePatterns'
+);
 export const reusableBlocksSelectKey = Symbol( 'reusableBlocksSelect' );
 export const userPatternCategoriesSelectKey = Symbol(
 	'userPatternCategoriesSelect'
