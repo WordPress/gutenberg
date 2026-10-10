@@ -14,6 +14,7 @@
 		{ "path": "packages/components/tsconfig.stories.json" },
 		{ "path": "packages/compose" },
 		{ "path": "packages/connectors" },
+		{ "path": "packages/core-commands" },
 		{ "path": "packages/core-data" },
 		{ "path": "packages/dataviews" },
 		{ "path": "packages/dataviews/tsconfig.stories.json" },

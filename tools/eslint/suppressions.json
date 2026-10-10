@@ -4982,11 +4982,6 @@
 			"count": 6
 		}
 	},
-	"packages/core-commands/src/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/core-data/src/components/entities-saved-states/entity-record-item.jsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
