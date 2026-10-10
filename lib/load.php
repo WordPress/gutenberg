@@ -177,6 +177,10 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-wpds-admin-restyle' ) ) {
 	require __DIR__ . '/experimental/wpds-admin/load.php';
 }
 
+if ( gutenberg_is_experiment_enabled( 'gutenberg-head-code' ) ) {
+	require __DIR__ . '/experimental/head-code.php';
+}
+
 // Plugin specific code.
 require __DIR__ . '/script-loader.php';
 require __DIR__ . '/global-styles-and-settings.php';
