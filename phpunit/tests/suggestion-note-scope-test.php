@@ -38,6 +38,7 @@ class Tests_Suggestion_Note_Scope extends WP_UnitTestCase {
 
 	public function tear_down() {
 		$GLOBALS['gutenberg_suggestion_content_owners'] = array();
+		$GLOBALS['gutenberg_suggestion_owner_frames']   = array();
 		parent::tear_down();
 	}
 
@@ -133,6 +134,88 @@ class Tests_Suggestion_Note_Scope extends WP_UnitTestCase {
 		gutenberg_pop_suggestion_content_owner( '' );
 
 		$this->assertSame( 'Hello original', trim( $excerpt ) );
+		$this->assertEmpty( $GLOBALS['gutenberg_suggestion_content_owners'], 'The owner stack is balanced.' );
+	}
+
+	/**
+	 * Creates a published synced pattern.
+	 *
+	 * @param int $author_id Pattern author.
+	 * @return int Pattern post ID.
+	 */
+	private function create_synced_pattern( $author_id ) {
+		return self::factory()->post->create(
+			array(
+				'post_type'   => 'wp_block',
+				'post_status' => 'publish',
+				'post_author' => $author_id,
+			)
+		);
+	}
+
+	/**
+	 * Renders a page's content as the front end does, with the page on the
+	 * content owner stack.
+	 *
+	 * @param int    $page_id Page being rendered.
+	 * @param string $content Content to render.
+	 * @return string Rendered content.
+	 */
+	private function render_as( $page_id, $content ) {
+		$GLOBALS['post'] = get_post( $page_id );
+		gutenberg_push_suggestion_content_owner( '' );
+		$rendered = do_blocks( $content );
+		gutenberg_pop_suggestion_content_owner( '' );
+		return $rendered;
+	}
+
+	public function test_synced_pattern_resolves_its_own_note() {
+		$pattern_id = $this->create_synced_pattern( self::$editor_id );
+		$note_id    = $this->create_format_note( $pattern_id, 'original' );
+		$this->set_post_content( $pattern_id, $this->paragraph( 'Hello ' . $this->format_marker( $note_id, '<strong>proposed</strong>' ) ) );
+
+		$page_id  = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		$rendered = $this->render_as( $page_id, '<!-- wp:block {"ref":' . $pattern_id . '} /-->' );
+
+		$this->assertStringContainsString( 'Hello original', $rendered );
+		$this->assertStringNotContainsString( 'proposed', $rendered );
+		$this->assertEmpty( $GLOBALS['gutenberg_suggestion_content_owners'], 'The owner stack is balanced.' );
+	}
+
+	public function test_a_pattern_that_does_not_render_keeps_the_owner_stack_balanced() {
+		$draft_id = self::factory()->post->create(
+			array(
+				'post_type'   => 'wp_block',
+				'post_status' => 'draft',
+			)
+		);
+		$page_id  = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		$this->render_as( $page_id, '<!-- wp:block {"ref":' . $draft_id . '} /--><!-- wp:block {"ref":' . $page_id . '} /--><!-- wp:block /-->' );
+
+		$this->assertEmpty( $GLOBALS['gutenberg_suggestion_content_owners'] );
+		$this->assertEmpty( $GLOBALS['gutenberg_suggestion_owner_frames'] );
+	}
+
+	public function test_synced_pattern_does_not_resolve_the_outer_pages_note() {
+		// A page with a pending format change whose original is not public:
+		// its marker sits inside a pending addition, which never renders.
+		$page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
+		$note_id = $this->create_format_note( $page_id, 'HIDDEN ORIGINAL' );
+
+		// Another author's synced pattern copies the page's marker.
+		$pattern_id = $this->create_synced_pattern( self::$author_id );
+		$this->set_post_content( $pattern_id, $this->paragraph( 'Copied ' . $this->format_marker( $note_id, 'run' ) ) );
+
+		$content = $this->paragraph( '<mark class="wp-suggestion-add" data-suggestion-id="' . ( $note_id + 1000 ) . '" data-suggestion-type="add">' . $this->format_marker( $note_id, 'x' ) . '</mark>' )
+			. '<!-- wp:block {"ref":' . $pattern_id . '} /-->'
+			. $this->paragraph( 'After ' . $this->format_marker( $note_id, 'y' ) );
+		$this->set_post_content( $page_id, $content );
+
+		$rendered = $this->render_as( $page_id, $content );
+
+		$this->assertSame( 1, substr_count( $rendered, 'HIDDEN ORIGINAL' ), 'Only the page\'s own marker after the pattern restores its original.' );
+		$this->assertStringContainsString( 'Copied run', $rendered );
+		$this->assertStringContainsString( 'After HIDDEN ORIGINAL', $rendered, 'The page is the owner again after the pattern.' );
 		$this->assertEmpty( $GLOBALS['gutenberg_suggestion_content_owners'], 'The owner stack is balanced.' );
 	}
 

@@ -635,6 +635,59 @@ add_filter( 'get_the_excerpt', 'gutenberg_push_suggestion_excerpt_owner', 1, 2 )
 add_filter( 'get_the_excerpt', 'gutenberg_pop_suggestion_content_owner', PHP_INT_MAX );
 
 /**
+ * Records the synced pattern whose content a `core/block` block renders.
+ *
+ * The pattern's blocks render inside the page holding the block, so without
+ * this they would resolve against the page's notes. Only a `wp_block` post is
+ * recorded; anything else records no owner, so its markers are not restored.
+ * The frame id stored on the parsed block lets
+ * `gutenberg_pop_suggestion_pattern_owner()` pop exactly this frame.
+ *
+ * @param array $parsed_block The block being rendered.
+ * @return array The block, tagged with its owner frame.
+ */
+function gutenberg_push_suggestion_pattern_owner( $parsed_block ) {
+	static $frame = 0;
+	if ( ! isset( $parsed_block['blockName'] ) || 'core/block' !== $parsed_block['blockName'] ) {
+		return $parsed_block;
+	}
+	$ref     = isset( $parsed_block['attrs']['ref'] ) ? (int) $parsed_block['attrs']['ref'] : 0;
+	$pattern = $ref > 0 ? get_post( $ref ) : null;
+
+	$GLOBALS['gutenberg_suggestion_content_owners'][] = ( $pattern && 'wp_block' === $pattern->post_type ) ? $ref : 0;
+
+	$parsed_block['gutenbergSuggestionOwnerFrame']  = ++$frame;
+	$GLOBALS['gutenberg_suggestion_owner_frames'][] = $frame;
+	return $parsed_block;
+}
+add_filter( 'render_block_data', 'gutenberg_push_suggestion_pattern_owner', PHP_INT_MAX );
+
+/**
+ * Pops the pattern recorded by `gutenberg_push_suggestion_pattern_owner()`.
+ *
+ * `render_block_core_block()` renders the block a second time from inside its
+ * own callback, so `render_block` runs twice for it: first right after the
+ * pattern's blocks, then for the outer render. The first one pops; by the
+ * second the frame is no longer on top, so nothing else is popped.
+ *
+ * @param string $block_content Rendered block.
+ * @param array  $parsed_block  The block.
+ * @return string Unchanged block content.
+ */
+function gutenberg_pop_suggestion_pattern_owner( $block_content, $parsed_block ) {
+	if (
+		isset( $parsed_block['gutenbergSuggestionOwnerFrame'] ) &&
+		! empty( $GLOBALS['gutenberg_suggestion_owner_frames'] ) &&
+		end( $GLOBALS['gutenberg_suggestion_owner_frames'] ) === $parsed_block['gutenbergSuggestionOwnerFrame']
+	) {
+		array_pop( $GLOBALS['gutenberg_suggestion_owner_frames'] );
+		array_pop( $GLOBALS['gutenberg_suggestion_content_owners'] );
+	}
+	return $block_content;
+}
+add_filter( 'render_block', 'gutenberg_pop_suggestion_pattern_owner', PHP_INT_MAX, 2 );
+
+/**
  * Returns the post whose content is being rendered, if any.
  *
  * @return int Post ID, or 0 outside `the_content`.
@@ -866,9 +919,10 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
  *   formatting, so the whole span is replaced with the original run recorded on
  *   the note (see `gutenberg_get_pending_format_suggestion_html()`). The note
  *   is resolved against the post whose content is being rendered (see
- *   `gutenberg_push_suggestion_content_owner()`), never the block's `postId`
- *   context. When that original cannot be resolved the marker falls back to
- *   deletion handling. The save pass already leaves the original run inside a
+ *   `gutenberg_push_suggestion_content_owner()`, and
+ *   `gutenberg_push_suggestion_pattern_owner()` for a synced pattern), never
+ *   the block's `postId` context. When that original cannot be resolved the
+ *   marker falls back to deletion handling. The save pass already leaves the original run inside a
  *   format marker's anchor (`data-suggestion-run`), so an anchor is unwrapped.
  * - A legacy marker (the single `wp-suggestion` class from before the per-kind
  *   classes) fails closed the same way: an addition is removed with its text,
