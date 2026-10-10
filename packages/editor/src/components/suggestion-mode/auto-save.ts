@@ -41,6 +41,7 @@ import { store as coreStore } from '@wordpress/core-data';
 // @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
+import { getSuggestionStatus, isPendingStatus } from './suggestion-status';
 import { useSuggestionSession } from './suggestion-session';
 import type { StructuralCapture } from './suggestion-session';
 import {
@@ -164,7 +165,10 @@ interface Tracked {
 /**
  * Content names the note, but content is editable by any author of the
  * post, so an id read from a marker or metadata.noteId is only a hint.
- * Act on it only when core-data shows a pending note on this very post.
+ * Act on it only when core-data shows a pending note on this very post. A
+ * note a reviewer has decided stays `hold` until the post is saved, so the
+ * decision is checked too: its payload is the reviewer's evidence and is
+ * never rewritten.
  *
  * @param note          The core-data comment record, if resolved.
  * @param postId        The current post id.
@@ -179,6 +183,7 @@ function isActionableNote(
 	return (
 		!! note &&
 		note.status === 'hold' &&
+		isPendingStatus( getSuggestionStatus( note ) ) &&
 		note.type === 'note' &&
 		Number( note.post ) === Number( postId ) &&
 		( currentUserId === null || Number( note.author ) === currentUserId )
@@ -424,15 +429,19 @@ export default function SuggestionAutoSave() {
 			}
 			// The link can outlive the note it points at: another
 			// collaborator may have accepted or rejected the suggestion
-			// mid-session. Treat a resolved link as none so the next save
-			// creates a fresh note that coexists with the resolved one.
+			// mid-session, saved or not. Treat a decided link as none so the
+			// next save creates a fresh note that coexists with that one.
 			if ( commentId ) {
 				const linked: any = coreSelect.getEntityRecord(
 					'root',
 					'comment',
 					commentId
 				);
-				if ( linked && linked.status !== 'hold' ) {
+				if (
+					linked &&
+					( linked.status !== 'hold' ||
+						! isPendingStatus( getSuggestionStatus( linked ) ) )
+				) {
 					commentId = null;
 					writeCommentId( clientId, null );
 				}

@@ -107,6 +107,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.2/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.2/edit-root-attachment.php';
 	require __DIR__ . '/compat/wordpress-7.2/notes.php';
+	require __DIR__ . '/compat/wordpress-7.2/suggestion-status.php';
+	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-suggestion-reconciler.php';
+	require __DIR__ . '/compat/wordpress-7.2/suggestion-reconciliation.php';
 	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-fields-registry.php';
 	require __DIR__ . '/compat/wordpress-7.2/fields-api.php';
 	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-fields-controller-7-2.php';

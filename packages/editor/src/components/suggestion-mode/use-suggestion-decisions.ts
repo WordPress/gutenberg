@@ -1,9 +1,10 @@
 /**
- * Apply and reject: the reviewer's half of Suggest mode. Each decision reads
- * the live block, computes the change with the pure operations, dispatches it
- * past the interceptor, records the decision through the suggestion store,
- * and rolls the block back or leaves the tree untouched when the save fails.
- * Notices and the grouped-replacement fan-out live here too.
+ * Apply and reject: the reviewer's half of Suggestion mode. Each decision
+ * records a provisional status through the suggestion store, then reads the
+ * live block, computes the change with the pure operations and dispatches it
+ * past the interceptor. A failed status write leaves the editor untouched.
+ * The decision becomes final when the post is saved. Notices and the
+ * grouped-replacement fan-out live here too.
  */
 import { useCallback, useMemo } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
@@ -38,11 +39,12 @@ import {
 	parseSuggestionPayload,
 	planStructuralApply,
 	planStructuralReject,
-	rollbackAttributesFor,
 } from './operations';
 import type { BlockPlan, PlanStep, SuggestionPayload } from './operations';
 import { withDecisionInFlight } from './decision-state';
 import { useSuggestionStore } from './suggestion-store';
+import { getSuggestionStatus, isPendingStatus } from './suggestion-status';
+import type { SuggestionDecision } from './suggestion-status';
 
 /**
  * The attribute update that drops a block's attribute proposal: the whole
@@ -180,9 +182,61 @@ export function useSuggestionDecisions() {
 	);
 
 	/**
-	 * Apply a suggestion to the live block, then persist the lifecycle
-	 * status to the comment meta. On a server failure the block is rolled
-	 * back so the UI is never left in a half-applied state.
+	 * Record a decision, then make its change to the content.
+	 *
+	 * The provisional status is written first, for every kind of suggestion:
+	 * a failed write then changes nothing, and the content can never lose a
+	 * suggestion's anchor before the server knows a decision was made, so a
+	 * save racing the decision cannot read it as someone else's removal
+	 * (`outdated`). If the content change itself fails, the note goes back to
+	 * pending, since the post still carries the suggestion.
+	 *
+	 * @param commentId      Comment id.
+	 * @param decision       The decision.
+	 * @param change         The content change. May return false when there
+	 *                       is nothing it can change.
+	 * @param failureMessage Notice shown when the decision does not land.
+	 * @return Whether the decision landed.
+	 */
+	const decide = useCallback(
+		async (
+			commentId: number | string,
+			decision: SuggestionDecision,
+			change: () => boolean | void,
+			failureMessage: string
+		) => {
+			const fail = ( error: any ) => {
+				createNotice( 'error', error?.message || failureMessage, {
+					type: 'snackbar',
+					isDismissible: true,
+				} );
+				return false;
+			};
+			try {
+				await store.setProvisionalDecision( commentId, decision );
+			} catch ( error: any ) {
+				return fail( error );
+			}
+			let changed: boolean | void;
+			let changeError: any;
+			try {
+				changed = change();
+			} catch ( error: any ) {
+				changed = false;
+				changeError = error;
+			}
+			if ( changed === false ) {
+				await store.reopenNote( commentId ).catch( () => {} );
+				return fail( changeError );
+			}
+			return true;
+		},
+		[ store, createNotice ]
+	);
+
+	/**
+	 * Apply a suggestion: record the provisional decision on the note, then
+	 * land the proposal on the live block. The post save makes it final.
 	 *
 	 * @param args           Apply arguments.
 	 * @param args.commentId Comment id holding the suggestion
@@ -212,35 +266,20 @@ export function useSuggestionDecisions() {
 				} );
 				return false;
 			}
-
 			/*
 			 * A post-level suggestion (the title, excerpt, a meta key...) has
 			 * no block: accept writes the proposed fields to the post past the
 			 * Suggestion mode guard, which would otherwise hold them as a
-			 * fresh proposal when the reviewer is suggesting too. Rolled back
-			 * if the decision fails to save, like the attribute path below.
+			 * fresh proposal when the reviewer is suggesting too.
 			 */
 			const postOps = findPostAttributeOps( payload.operations );
 			if ( postOps.length > 0 ) {
-				const editor = unlock( registry.select( STORE_NAME ) ) as any;
-				const { applyPostFieldSuggestion } = unlock(
-					registry.dispatch( STORE_NAME )
-				) as any;
-				const previous = applyPostOperations(
-					postOps.map( ( op ) => ( {
-						...op,
-						after: editor.getPostFieldValueWithoutProposals(
-							op.attribute,
-							op.key
-						),
-					} ) )
-				);
 				/*
-				 * New terms are created only now, as the reviewer. When one
-				 * cannot be created nothing is applied and the note stays
-				 * pending.
+				 * New terms are created only now, as the reviewer, and before
+				 * the decision is recorded. When one cannot be created nothing
+				 * is decided and the note stays pending.
 				 */
-				let acceptedOps;
+				let acceptedOps: typeof postOps;
 				try {
 					acceptedOps = await createProposedTerms(
 						registry,
@@ -256,23 +295,20 @@ export function useSuggestionDecisions() {
 					);
 					return false;
 				}
-				try {
-					applyPostFieldSuggestion(
-						applyPostOperations( acceptedOps )
-					);
-					await store.setLifecycleStatus( commentId, 'applied' );
-					clearPostFieldProposals( postOps, commentId );
-				} catch ( error: any ) {
-					applyPostFieldSuggestion( previous );
-					createNotice(
-						'error',
-						error?.message ||
-							__( 'Failed to save suggestion status.' ),
-						{ type: 'snackbar', isDismissible: true }
-					);
-					return false;
-				}
-				return true;
+				return decide(
+					commentId,
+					'applied',
+					() => {
+						const { applyPostFieldSuggestion } = unlock(
+							registry.dispatch( STORE_NAME )
+						) as any;
+						applyPostFieldSuggestion(
+							applyPostOperations( acceptedOps )
+						);
+						clearPostFieldProposals( postOps, commentId );
+					},
+					__( 'Failed to save suggestion status.' )
+				);
 			}
 
 			const targetClientId = resolveTarget( clientId, commentId );
@@ -288,154 +324,112 @@ export function useSuggestionDecisions() {
 				return false;
 			}
 
+			const failureMessage = __( 'Failed to save suggestion status.' );
+
 			// Inline suggestions live as a `core/suggestion` marker in a
 			// single rich-text attribute. Apply resolves the marker by comment
 			// id and rewrites that one attribute: a deletion drops the marked
 			// text with its marker; an addition unwraps the marker so the
 			// proposed text becomes permanent. The write bypasses the
-			// suggest-mode interceptor so it lands on the live block instead of
-			// being reverted into the overlay.
+			// Suggestion mode interceptor so it lands on the live block
+			// instead of being reverted into the overlay.
 			const inlineOp = findInlineOp( payload.operations );
 			if ( inlineOp ) {
 				const attributeKey = inlineOp.attribute;
-				const originalValue =
-					selectBlockAttributes( targetClientId )?.[ attributeKey ];
-				let nextValue;
-				if ( inlineOp.suggestionType === 'add' ) {
-					nextValue = acceptInlineAddition(
-						originalValue,
-						commentId
-					);
-				} else if ( inlineOp.suggestionType === 'replace' ) {
-					nextValue = acceptInlineReplacement(
-						originalValue,
-						commentId
-					);
-				} else if ( inlineOp.suggestionType === 'format' ) {
-					// Accepting a format suggestion unwraps the marker, leaving
-					// the proposed formatting (already carried on the run) in
-					// place — the same shape as accepting an addition.
-					nextValue = acceptInlineFormat( originalValue, commentId );
-				} else {
-					nextValue = acceptInlineDeletion(
-						originalValue,
-						commentId
-					);
-				}
-				try {
-					// The same block can hold a pending attribute proposal in
-					// its marker; this write touches only the marked
-					// attribute, so that proposal stays where it is (F-14).
-					requestInterceptorBypass( targetClientId );
-					updateBlockAttributes( targetClientId, {
-						[ attributeKey ]: nextValue,
-					} );
-
-					await store.setLifecycleStatus( commentId, 'applied' );
-				} catch ( error: any ) {
-					// Roll the attribute back so the block isn't left
-					// half-applied if the server rejected the status update.
-					requestInterceptorBypass( targetClientId );
-					updateBlockAttributes( targetClientId, {
-						[ attributeKey ]: originalValue,
-					} );
-					createNotice(
-						'error',
-						error?.message ||
-							__( 'Failed to save suggestion status.' ),
-						{ type: 'snackbar', isDismissible: true }
-					);
-					return false;
-				}
-				return true;
+				return decide(
+					commentId,
+					'applied',
+					() => {
+						const value =
+							selectBlockAttributes( targetClientId )?.[
+								attributeKey
+							];
+						let nextValue;
+						if ( inlineOp.suggestionType === 'add' ) {
+							nextValue = acceptInlineAddition(
+								value,
+								commentId
+							);
+						} else if ( inlineOp.suggestionType === 'replace' ) {
+							nextValue = acceptInlineReplacement(
+								value,
+								commentId
+							);
+						} else if ( inlineOp.suggestionType === 'format' ) {
+							// Accepting a format suggestion unwraps the
+							// marker, leaving the proposed formatting (already
+							// carried on the run) in place — the same shape as
+							// accepting an addition.
+							nextValue = acceptInlineFormat( value, commentId );
+						} else {
+							nextValue = acceptInlineDeletion(
+								value,
+								commentId
+							);
+						}
+						// The same block can hold a pending attribute proposal
+						// in its marker; this write touches only the marked
+						// attribute, so that proposal stays where it is (F-14).
+						requestInterceptorBypass( targetClientId );
+						updateBlockAttributes( targetClientId, {
+							[ attributeKey ]: nextValue,
+						} );
+					},
+					failureMessage
+				);
 			}
 
 			// Structural ops (block-remove, block-insert-after, block-move)
-			// can't ride the updateBlockAttributes path: their apply mutates
-			// the tree rather than a single block's attributes. Branch out,
-			// run the planned block-editor actions, and short-circuit before
-			// the attribute-set rollback machinery below.
+			// mutate the tree rather than a single block's attributes, so they
+			// run a planned set of block-editor actions.
 			const structuralOp = findStructuralOp( payload.operations );
 			if ( structuralOp ) {
-				try {
-					/*
-					 * Persist the decision BEFORE touching the tree. The
-					 * attribute-set path below can mutate first and roll
-					 * back on failure because restoring attributes is
-					 * exact; a structural rollback is not — re-inserting a
-					 * removed block would have to restore its position,
-					 * nested children, selection, and overlay entry. Saving
-					 * first costs one round-trip of latency and gives the
-					 * same invariant for free: a failed save leaves the
-					 * editor exactly as it was.
-					 */
-					await store.setLifecycleStatus( commentId, 'applied' );
-
-					const plan = planStructuralApply(
-						structuralOp,
-						payload.operations,
-						targetClientId,
-						registry.select( blockEditorStore )
-					);
-					if ( plan ) {
-						runPlan( plan );
-					}
-				} catch ( error: any ) {
-					createNotice(
-						'error',
-						error?.message ||
-							__( 'Failed to save suggestion status.' ),
-						{ type: 'snackbar', isDismissible: true }
-					);
-					return false;
-				}
-				return true;
-			}
-
-			const currentAttributes = selectBlockAttributes( targetClientId );
-			// One update lands the proposed values and drops the proposal.
-			const clearedProposal =
-				clearProposedAttributes( currentAttributes );
-			const newAttributes = {
-				...applyOperations( currentAttributes, payload.operations ),
-				...( clearedProposal ?? {} ),
-			};
-			// A failed save puts the proposal back along with the values.
-			const rollbackPayload = {
-				...rollbackAttributesFor(
-					currentAttributes,
-					payload.operations
-				),
-				...( clearedProposal
-					? { metadata: currentAttributes?.metadata }
-					: {} ),
-			};
-
-			try {
-				// Bypass the suggest-mode interceptor for this dispatch so
-				// the applied attributes actually land on the live block
-				// instead of being diverted into a proposal. Outside Suggest
-				// mode the interceptor isn't running and this is a no-op.
-				requestInterceptorBypass( targetClientId );
-				updateBlockAttributes( targetClientId, newAttributes );
-
-				await store.setLifecycleStatus( commentId, 'applied' );
-			} catch ( error: any ) {
-				// Roll back the block change so the UI isn't left in a
-				// half-applied state if the server rejected the update.
-				requestInterceptorBypass( targetClientId );
-				updateBlockAttributes( targetClientId, rollbackPayload );
-				createNotice(
-					'error',
-					error?.message || __( 'Failed to save suggestion status.' ),
-					{ type: 'snackbar', isDismissible: true }
+				return decide(
+					commentId,
+					'applied',
+					() => {
+						const plan = planStructuralApply(
+							structuralOp,
+							payload.operations,
+							targetClientId,
+							registry.select( blockEditorStore )
+						);
+						if ( plan ) {
+							runPlan( plan );
+						}
+					},
+					failureMessage
 				);
-				return false;
 			}
-			return true;
+
+			return decide(
+				commentId,
+				'applied',
+				() => {
+					const currentAttributes =
+						selectBlockAttributes( targetClientId );
+					// One update lands the proposed values and drops the
+					// proposal.
+					const clearedProposal =
+						clearProposedAttributes( currentAttributes );
+					// Bypass the Suggestion mode interceptor for this dispatch
+					// so the applied attributes land on the live block instead
+					// of being diverted into a proposal. Outside Suggestion
+					// mode the interceptor isn't running and this is a no-op.
+					requestInterceptorBypass( targetClientId );
+					updateBlockAttributes( targetClientId, {
+						...applyOperations(
+							currentAttributes,
+							payload.operations
+						),
+						...( clearedProposal ?? {} ),
+					} );
+				},
+				failureMessage
+			);
 		},
 		[
-			store,
+			decide,
 			updateBlockAttributes,
 			selectBlockAttributes,
 			resolveTarget,
@@ -448,12 +442,11 @@ export function useSuggestionDecisions() {
 	);
 
 	/**
-	 * Reject a suggestion by setting the comment's lifecycle status. The
-	 * comment itself stays as a thread (status `approved`) so the
-	 * conversation persists as evidence that the suggestion was reviewed.
-	 * For structural suggestions (e.g. `block-remove`), also clears the
-	 * `metadata.suggestion` marker on the live block so the dimmed/struck
-	 * visual treatment goes away.
+	 * Reject a suggestion: record the provisional decision on the note, then
+	 * take the proposal out of the content. For structural suggestions (e.g.
+	 * `block-remove`) that clears the `metadata.suggestion` marker on the live
+	 * block so the dimmed/struck visual treatment goes away. The post save
+	 * makes it final.
 	 *
 	 * @param args           Reject arguments.
 	 * @param args.commentId Comment id of the rejected suggestion.
@@ -473,6 +466,8 @@ export function useSuggestionDecisions() {
 			clientId?: string;
 			payload?: SuggestionPayload | null;
 		} ) => {
+			const failureMessage = __( 'Failed to reject suggestion.' );
+
 			/*
 			 * A post-level suggestion never touched the post: reject only
 			 * records the decision and drops the proposed value from the
@@ -480,18 +475,12 @@ export function useSuggestionDecisions() {
 			 */
 			const rejectedPostOps = findPostAttributeOps( payload?.operations );
 			if ( rejectedPostOps.length > 0 ) {
-				try {
-					await store.setLifecycleStatus( commentId, 'rejected' );
-					clearPostFieldProposals( rejectedPostOps, commentId );
-				} catch ( error: any ) {
-					createNotice(
-						'error',
-						error?.message || __( 'Failed to reject suggestion.' ),
-						{ type: 'snackbar', isDismissible: true }
-					);
-					return false;
-				}
-				return true;
+				return decide(
+					commentId,
+					'rejected',
+					() => clearPostFieldProposals( rejectedPostOps, commentId ),
+					failureMessage
+				);
 			}
 
 			// Inline suggestions: reject restores the block's pre-suggestion
@@ -501,71 +490,57 @@ export function useSuggestionDecisions() {
 			// may be absent on a fresh load) and bypass the interceptor so the
 			// change lands on the live block.
 			const inlineOp = findInlineOp( payload?.operations );
-			if ( inlineOp ) {
-				const targetClientId = resolveTarget( clientId, commentId );
-				if ( targetClientId ) {
-					const attributeKey = inlineOp.attribute;
-					const originalValue =
-						selectBlockAttributes( targetClientId )?.[
-							attributeKey
-						];
-					let nextValue;
-					if ( inlineOp.suggestionType === 'add' ) {
-						nextValue = rejectInlineAddition(
-							originalValue,
-							commentId
-						);
-					} else if ( inlineOp.suggestionType === 'replace' ) {
-						nextValue = rejectInlineReplacement(
-							originalValue,
-							commentId
-						);
-					} else if ( inlineOp.suggestionType === 'format' ) {
-						/*
-						 * Rejecting a format suggestion restores the original
-						 * run captured at suggest-time (`beforeHTML`),
-						 * discarding both the proposed formatting and the
-						 * marker.
-						 */
-						nextValue = rejectInlineFormat(
-							originalValue,
-							commentId,
-							inlineOp.beforeHTML
-						);
-					} else {
-						nextValue = rejectInlineDeletion(
-							originalValue,
-							commentId
-						);
-					}
-					try {
+			const inlineTarget = inlineOp
+				? resolveTarget( clientId, commentId )
+				: undefined;
+			if ( inlineOp && inlineTarget ) {
+				const attributeKey = inlineOp.attribute;
+				return decide(
+					commentId,
+					'rejected',
+					() => {
+						const value =
+							selectBlockAttributes( inlineTarget )?.[
+								attributeKey
+							];
+						let nextValue;
+						if ( inlineOp.suggestionType === 'add' ) {
+							nextValue = rejectInlineAddition(
+								value,
+								commentId
+							);
+						} else if ( inlineOp.suggestionType === 'replace' ) {
+							nextValue = rejectInlineReplacement(
+								value,
+								commentId
+							);
+						} else if ( inlineOp.suggestionType === 'format' ) {
+							/*
+							 * Rejecting a format suggestion restores the
+							 * original run captured at suggest-time
+							 * (`beforeHTML`), discarding both the proposed
+							 * formatting and the marker.
+							 */
+							nextValue = rejectInlineFormat(
+								value,
+								commentId,
+								inlineOp.beforeHTML
+							);
+						} else {
+							nextValue = rejectInlineDeletion(
+								value,
+								commentId
+							);
+						}
 						// As on the apply path: a co-resident attribute
 						// proposal lives in the marker and survives this.
-						requestInterceptorBypass( targetClientId );
-						updateBlockAttributes( targetClientId, {
+						requestInterceptorBypass( inlineTarget );
+						updateBlockAttributes( inlineTarget, {
 							[ attributeKey ]: nextValue,
 						} );
-
-						await store.setLifecycleStatus( commentId, 'rejected' );
-					} catch ( error: any ) {
-						// Roll the attribute back so the content isn't left
-						// inconsistent with a still-pending comment if the
-						// server rejected the status update. Mirrors the
-						// apply-path rollback.
-						requestInterceptorBypass( targetClientId );
-						updateBlockAttributes( targetClientId, {
-							[ attributeKey ]: originalValue,
-						} );
-						createNotice(
-							'error',
-							error?.message ||
-								__( 'Failed to reject suggestion.' ),
-							{ type: 'snackbar', isDismissible: true }
-						);
-						return false;
-					}
-					return true;
-				}
+					},
+					failureMessage
+				);
 			}
 
 			// A structural op undoes its live-block change (see
@@ -573,59 +548,44 @@ export function useSuggestionDecisions() {
 			// live-block change, so only the proposal on the marker is
 			// dropped.
 			const structuralOp = findStructuralOp( payload?.operations );
-
-			try {
-				await store.setLifecycleStatus( commentId, 'rejected' );
-
-				/*
-				 * Undo the live-block change only once the decision is
-				 * persisted. A structural change can't be rolled back
-				 * faithfully (position, children and selection would all
-				 * have to be restored), so the
-				 * tree is left untouched until the save succeeds — a
-				 * failed reject then leaves the editor exactly as it was.
-				 */
-				if ( structuralOp && clientId ) {
-					runPlan(
-						planStructuralReject(
-							structuralOp,
-							clientId,
-							registry.select( blockEditorStore )
-						)
-					);
-				} else if ( clientId ) {
-					/*
-					 * An attribute-only suggestion lives entirely in the
-					 * marker's proposal: the live block never took the
-					 * proposed value, so there is nothing to roll back, but
-					 * the proposal must go or it keeps rendering the rejected
-					 * value. Dropping it is a decision, not an edit, so it
-					 * stays off the undo stack.
-					 */
-					const clear = clearProposedAttributes(
-						selectBlockAttributes( clientId )
-					);
-					if ( clear ) {
-						requestInterceptorBypass( clientId );
-						markNextChangeAsNotPersistent?.( {
-							history: 'ignore',
-						} );
-						updateBlockAttributes( clientId, clear );
+			return decide(
+				commentId,
+				'rejected',
+				() => {
+					if ( structuralOp && clientId ) {
+						runPlan(
+							planStructuralReject(
+								structuralOp,
+								clientId,
+								registry.select( blockEditorStore )
+							)
+						);
+					} else if ( clientId ) {
+						/*
+						 * An attribute-only suggestion lives entirely in the
+						 * marker's proposal: the live block never took the
+						 * proposed value, so there is nothing to roll back,
+						 * but the proposal must go or it keeps rendering the
+						 * rejected value. Dropping it is a decision, not an
+						 * edit, so it stays off the undo stack.
+						 */
+						const clear = clearProposedAttributes(
+							selectBlockAttributes( clientId )
+						);
+						if ( clear ) {
+							requestInterceptorBypass( clientId );
+							markNextChangeAsNotPersistent?.( {
+								history: 'ignore',
+							} );
+							updateBlockAttributes( clientId, clear );
+						}
 					}
-				}
-			} catch ( error: any ) {
-				createNotice(
-					'error',
-					error?.message || __( 'Failed to reject suggestion.' ),
-					{ type: 'snackbar', isDismissible: true }
-				);
-				return false;
-			}
-			return true;
+				},
+				failureMessage
+			);
 		},
 		[
-			store,
-			createNotice,
+			decide,
 			selectBlockAttributes,
 			resolveTarget,
 			runPlan,
@@ -687,8 +647,8 @@ export function useSuggestionDecisions() {
 					}
 					seen.add( String( noteId ) );
 					const comment: any = store.getNote( noteId );
-					const status = comment?.meta?._wp_suggestion_status;
-					if ( status === 'applied' || status === 'rejected' ) {
+					// Decided already, saved or not, or outdated.
+					if ( ! isPendingStatus( getSuggestionStatus( comment ) ) ) {
 						continue;
 					}
 					const partnerPayload = parseSuggestionPayload(

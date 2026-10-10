@@ -90,6 +90,7 @@ import { notifyEditRefused } from './refuse-edit';
 import { settleInsertedSuggestionMarkers } from '../inline-suggestions';
 import { unlock } from '../../lock-unlock';
 import { getBlockTreeVersion } from './block-tree-version';
+import { APPLIED, getDecision, getSuggestionStatus } from './suggestion-status';
 
 const BLOCK_EDITOR_STORE_NAME = 'core/block-editor';
 
@@ -453,7 +454,8 @@ function isAcceptedSuggestionChange(
  * alone cannot tell the two apart: deleting the struck-through block again
  * produces exactly the state an accepted removal does. The linked note is the
  * confirmation — the provider records the decision on it before it removes
- * the block, and the note reaches collaborators through sync.
+ * the block, and the note reaches collaborators through sync. The decision
+ * counts whether or not the post has been saved since (`applied-unsaved`).
  *
  * @param coreSelect Selectors for the core-data store, or `null` when the
  *                   store isn't registered (e.g. unit tests).
@@ -469,7 +471,8 @@ export function isAppliedRemoval(
 	}
 	return readNoteIds( attributes?.metadata ).some( ( noteId ) => {
 		const comment = coreSelect.getEntityRecord( 'root', 'comment', noteId );
-		if ( comment?.meta?._wp_suggestion_status !== 'applied' ) {
+		// Saved or not: a peer's accept syncs before the post is saved.
+		if ( getDecision( getSuggestionStatus( comment ) ) !== APPLIED ) {
 			return false;
 		}
 		const payload = parseSuggestionPayload( comment?.meta?._wp_suggestion );

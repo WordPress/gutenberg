@@ -6,7 +6,8 @@
  * The comment-meta store keeps each suggestion as a `note` comment on the
  * post, with the payload serialized to the `_wp_suggestion` meta and the
  * reviewer's decision in `_wp_suggestion_status`. It reads and writes through
- * core-data only: no block tree access, no notices.
+ * core-data only: no block tree access, no notices. It only ever writes a
+ * provisional decision: the server makes it final when the post is saved.
  */
 import { useMemo } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
@@ -14,12 +15,8 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { PAYLOAD_MAX_BYTES, payloadByteLength } from './operations';
 import type { SuggestionPayload } from './operations';
-
-/**
- * Keep in sync with the `_wp_suggestion_status` enum declared in
- * `block-comments.php`.
- */
-export type SuggestionLifecycleStatus = 'applied' | 'rejected';
+import { PENDING, getProvisionalStatus } from './suggestion-status';
+import type { SuggestionDecision } from './suggestion-status';
 
 export interface SuggestionStore {
 	/**
@@ -52,18 +49,25 @@ export interface SuggestionStore {
 	 */
 	trashNote: ( commentId: number | string ) => Promise< void >;
 	/**
-	 * Record the reviewer's decision. The note stays as a thread (status
-	 * `approved`) so the conversation persists as evidence that the suggestion
-	 * was reviewed.
+	 * Record the reviewer's decision as provisional (`applied-unsaved` /
+	 * `rejected-unsaved`). The note stays open (`hold`) until a post save
+	 * without the suggestion's anchor lets the server finalize it.
 	 *
 	 * @param commentId Comment id.
-	 * @param status    The decision.
+	 * @param decision  The decision.
 	 * @return The saved comment record.
 	 */
-	setLifecycleStatus: (
+	setProvisionalDecision: (
 		commentId: number | string,
-		status: SuggestionLifecycleStatus
+		decision: SuggestionDecision
 	) => Promise< any >;
+	/**
+	 * Put a note back to awaiting a decision.
+	 *
+	 * @param commentId Comment id.
+	 * @return The saved comment record.
+	 */
+	reopenNote: ( commentId: number | string ) => Promise< any >;
 	/**
 	 * The note as currently loaded, if it is.
 	 *
@@ -130,11 +134,21 @@ export function createCommentMetaSuggestionStore(
 			await save( { id: commentId, status: 'trash' } );
 		},
 
-		async setLifecycleStatus( commentId, status ) {
+		async setProvisionalDecision( commentId, decision ) {
 			return await save( {
 				id: commentId,
-				status: 'approved',
-				meta: { _wp_suggestion_status: status },
+				status: 'hold',
+				meta: {
+					_wp_suggestion_status: getProvisionalStatus( decision ),
+				},
+			} );
+		},
+
+		async reopenNote( commentId ) {
+			return await save( {
+				id: commentId,
+				status: 'hold',
+				meta: { _wp_suggestion_status: PENDING },
 			} );
 		},
 

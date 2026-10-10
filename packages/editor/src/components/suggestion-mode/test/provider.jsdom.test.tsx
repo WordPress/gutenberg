@@ -1720,9 +1720,12 @@ describe( 'grouped structural decisions (block replacement)', () => {
 		expect( saves.map( ( record ) => record.id ).sort() ).toEqual( [
 			11, 12,
 		] );
+		// Provisional and still open: the post save makes it final.
 		expect(
 			saves.every(
-				( record ) => record.meta?._wp_suggestion_status === 'applied'
+				( record ) =>
+					record.status === 'hold' &&
+					record.meta?._wp_suggestion_status === 'applied-unsaved'
 			)
 		).toBe( true );
 	} );
@@ -1755,7 +1758,9 @@ describe( 'grouped structural decisions (block replacement)', () => {
 		] );
 		expect(
 			saves.every(
-				( record ) => record.meta?._wp_suggestion_status === 'rejected'
+				( record ) =>
+					record.status === 'hold' &&
+					record.meta?._wp_suggestion_status === 'rejected-unsaved'
 			)
 		).toBe( true );
 	} );
@@ -2145,4 +2150,261 @@ describe( 'withdrawn suggestions and failed applies', () => {
 			align: 'center',
 		} );
 	} );
+} );
+
+describe( 'decisions record a provisional status first', () => {
+	const BLOCK = 'core/test-order-paragraph';
+
+	beforeAll( () => {
+		if (
+			! ( select( richTextStore as any ) as any ).getFormatType(
+				SUGGESTION_FORMAT_NAME
+			)
+		) {
+			registerFormatType(
+				SUGGESTION_FORMAT_NAME,
+				suggestionFormat as any
+			);
+		}
+		registerBlockType( BLOCK, {
+			apiVersion: 3,
+			attributes: {
+				content: { type: 'string', default: '' },
+				level: { type: 'number', default: 2 },
+				metadata: { type: 'object' },
+			},
+			save: () => null,
+			category: 'text',
+			title: 'Test Order Paragraph',
+		} );
+	} );
+
+	afterAll( () => {
+		if (
+			( select( richTextStore as any ) as any ).getFormatType(
+				SUGGESTION_FORMAT_NAME
+			)
+		) {
+			unregisterFormatType( SUGGESTION_FORMAT_NAME );
+		}
+		getBlockTypes().forEach( ( block ) =>
+			unregisterBlockType( block.name )
+		);
+	} );
+
+	/**
+	 * Mounts the provider over one block. Each comment save records the block
+	 * as it was when the request went out, and can be made to fail.
+	 *
+	 * @param block    The block.
+	 * @param failSave Whether the status write fails.
+	 * @return Harness.
+	 */
+	function setup( block: any, failSave = false ) {
+		const saves: Array< { record: any; attributes: any } > = [];
+		const registry = createRegistry();
+		registry.register( noticesStore );
+		registry.register( blockEditorStore );
+		registry.register(
+			createReduxStore( 'core', {
+				reducer: ( state = {} ) => state,
+				actions: {
+					saveEntityRecord:
+						( kind: any, name: any, record: any ) => async () => {
+							saves.push( {
+								record,
+								attributes: registry
+									.select( blockEditorStore )
+									.getBlockAttributes( block.clientId ),
+							} );
+							if ( failSave ) {
+								throw new Error( 'save failed' );
+							}
+							return record;
+						},
+				},
+				selectors: {
+					getEditedEntityRecord: () => null,
+					getEntityRecord: () => null,
+					getCurrentUser: () => null,
+				},
+			} )
+		);
+		registry.register( createStubInterfaceStore() );
+		registry.dispatch( blockEditorStore ).resetBlocks( [ block ] );
+
+		let providerHandle: ReturnType< typeof useSuggestionsProvider >;
+		function Capture() {
+			providerHandle = useSuggestionsProvider();
+			return null;
+		}
+		render(
+			<RegistryProvider value={ registry }>
+				<SuggestionSessionProvider>
+					<Capture />
+				</SuggestionSessionProvider>
+			</RegistryProvider>
+		);
+		return {
+			registry,
+			saves,
+			getProvider: () => providerHandle,
+			attributes: () =>
+				registry
+					.select( blockEditorStore )
+					.getBlockAttributes( block.clientId ),
+		};
+	}
+
+	const marked = () => {
+		const block = createBlock( BLOCK, { metadata: { noteId: [ 9 ] } } );
+		block.attributes.content = RichTextData.fromHTMLString(
+			'Hello <mark class="wp-suggestion" data-suggestion-id="9" data-suggestion-type="add">world</mark>'
+		);
+		return block;
+	};
+	const inlinePayload = {
+		schemaVersion: 2,
+		blockName: BLOCK,
+		baseRevision: null,
+		operations: [
+			{
+				type: 'inline-suggestion',
+				attribute: 'content',
+				suggestionType: 'add',
+			},
+		],
+	};
+	const proposedLevel = () =>
+		createBlock( BLOCK, {
+			content: 'Title',
+			level: 2,
+			metadata: {
+				noteId: [ 9 ],
+				suggestion: {
+					type: 'pending-attributes',
+					commentId: 9,
+					after: { level: 3 },
+				},
+			},
+		} );
+	const levelPayload = {
+		schemaVersion: 2,
+		blockName: BLOCK,
+		baseRevision: null,
+		operations: [
+			{ type: 'attribute-set', attribute: 'level', before: 2, after: 3 },
+		],
+	};
+	const removal = () =>
+		createBlock( BLOCK, {
+			content: 'Gone',
+			metadata: {
+				noteId: [ 9 ],
+				suggestion: { type: 'pending-remove', commentId: 9 },
+			},
+		} );
+	const removalPayload = ( clientId: string ) => ( {
+		schemaVersion: 2,
+		blockName: BLOCK,
+		baseRevision: null,
+		operations: [ { type: 'block-remove', clientId, blockName: BLOCK } ],
+	} );
+
+	it.each( [
+		[ 'applySuggestion', 'applied-unsaved', 'Hello world' ],
+		[ 'rejectSuggestion', 'rejected-unsaved', 'Hello ' ],
+	] as const )(
+		'%s writes %s while the inline marker is still in the content',
+		async ( action, status, result ) => {
+			const block = marked();
+			const harness = setup( block );
+
+			await act( async () => {
+				await harness.getProvider()[ action ]( {
+					commentId: 9,
+					clientId: block.clientId,
+					payload: inlinePayload,
+				} );
+			} );
+
+			expect( harness.saves ).toHaveLength( 1 );
+			expect( harness.saves[ 0 ].record ).toEqual( {
+				id: 9,
+				status: 'hold',
+				meta: { _wp_suggestion_status: status },
+			} );
+			expect( String( harness.saves[ 0 ].attributes.content ) ).toContain(
+				'data-suggestion-id="9"'
+			);
+			expect( String( harness.attributes().content ) ).toBe( result );
+		}
+	);
+
+	it( 'writes the status before landing an attribute proposal', async () => {
+		const block = proposedLevel();
+		const harness = setup( block );
+
+		await act( async () => {
+			await harness.getProvider().applySuggestion( {
+				commentId: 9,
+				clientId: block.clientId,
+				payload: levelPayload,
+			} );
+		} );
+
+		expect( harness.saves[ 0 ].record.meta._wp_suggestion_status ).toBe(
+			'applied-unsaved'
+		);
+		expect( harness.saves[ 0 ].attributes.level ).toBe( 2 );
+		expect( harness.attributes().level ).toBe( 3 );
+	} );
+
+	it( 'writes the status before removing a block', async () => {
+		const block = removal();
+		const harness = setup( block );
+
+		await act( async () => {
+			await harness.getProvider().applySuggestion( {
+				commentId: 9,
+				clientId: block.clientId,
+				payload: removalPayload( block.clientId ),
+			} );
+		} );
+
+		expect( harness.saves[ 0 ].attributes ).toBeTruthy();
+		expect( harness.attributes() ).toBeFalsy();
+	} );
+
+	it.each( [
+		[ 'an inline addition', marked, () => inlinePayload ],
+		[ 'an attribute proposal', proposedLevel, () => levelPayload ],
+		[
+			'a block removal',
+			removal,
+			( clientId: string ) => removalPayload( clientId ),
+		],
+	] as const )(
+		'changes nothing when the status write for %s fails',
+		async ( label, makeBlock, makePayload ) => {
+			const block = makeBlock();
+			const harness = setup( block, true );
+			const before = harness.attributes();
+
+			await act( async () => {
+				await harness.getProvider().applySuggestion( {
+					commentId: 9,
+					clientId: block.clientId,
+					payload: makePayload( block.clientId ) as any,
+				} );
+			} );
+
+			expect( harness.attributes() ).toBe( before );
+			expect(
+				( harness.registry.select( noticesStore ) as any )
+					.getNotices()
+					.some( ( notice: any ) => notice.status === 'error' )
+			).toBe( true );
+		}
+	);
 } );

@@ -30,6 +30,7 @@ import SuggestionStoreInterceptor, {
 	adoptSystemMetadata,
 	stripSystemMetadata,
 	isAcceptedSuggestionChange,
+	isAppliedRemoval,
 	isPartOfPendingInsertion,
 	topLevelRemoved,
 	withSuggestionMarker,
@@ -2060,6 +2061,39 @@ describe( 'isAcceptedSuggestionChange', () => {
 			true
 		);
 	} );
+} );
+
+describe( 'isAppliedRemoval', () => {
+	const removed = { metadata: { noteId: [ 7 ] } };
+	const coreSelect = ( status: string ) => ( {
+		getEntityRecord: () => ( {
+			meta: {
+				_wp_suggestion_status: status,
+				_wp_suggestion: JSON.stringify( {
+					schemaVersion: 2,
+					operations: [ { type: 'block-remove' } ],
+				} ),
+			},
+		} ),
+	} );
+
+	it.each( [ 'applied', 'applied-unsaved' ] )(
+		'recognizes a removal accepted as %s, so a peer keeps it removed',
+		( status ) => {
+			expect( isAppliedRemoval( coreSelect( status ), removed ) ).toBe(
+				true
+			);
+		}
+	);
+
+	it.each( [ 'pending', 'rejected-unsaved', 'rejected', 'outdated' ] )(
+		'does not treat %s as an accepted removal',
+		( status ) => {
+			expect( isAppliedRemoval( coreSelect( status ), removed ) ).toBe(
+				false
+			);
+		}
+	);
 } );
 
 describe( 'stripSystemMetadata', () => {

@@ -339,13 +339,19 @@ export function useNoteActions() {
 		try {
 			// For resolution or reopen actions, create a new note with metadata.
 			if ( status === 'approved' || status === 'hold' ) {
-				// First, update the thread status.
+				// First, update the thread status. Reopening a suggestion also
+				// puts its decision back to pending, or it would still read as
+				// decided and offer no Accept or Reject.
 				await saveEntityRecord(
 					'root',
 					'comment',
 					{
 						id,
 						status,
+						...( status === 'hold' &&
+							note.meta?._wp_suggestion && {
+								meta: { _wp_suggestion_status: 'pending' },
+							} ),
 					},
 					{
 						throwOnError: true,
