@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Bug Fixes
+
+-   `wp-env reset` and `wp-env clean` now report a failed database reset or WordPress configuration and exit with a non-zero code instead of reporting success ([#PRNUMBER](https://github.com/WordPress/gutenberg/pull/PRNUMBER)).
+
 ## 11.17.0 (2026-10-07)
 
 ### New Features
