@@ -224,8 +224,11 @@ add_action( 'init', 'gutenberg_register_suggestion_meta' );
  * taxonomies (by `rest_base`), and a post meta key. A meta key must be
  * registered for the post type with `show_in_rest`, and the suggester must be
  * allowed to edit it (`edit_post_meta`), so a suggestion can never carry a
- * key its author could not have written directly. The reviewer's save checks
- * the reviewer's own capabilities again, as any post save does.
+ * key its author could not have written directly. The title, excerpt, slug
+ * and featured image values are sanitized the way core sanitizes each field
+ * for the suggester (see `gutenberg_sanitize_suggested_post_field()`). The
+ * reviewer's save checks the reviewer's own capabilities again, as any post
+ * save does.
  *
  * Hooked to `rest_preprocess_comment`, which runs for both creating and
  * updating a comment, so the request is refused with a 400 before anything
@@ -272,6 +275,19 @@ function gutenberg_validate_suggestion_post_operations( $prepared_comment, $requ
 		}
 		$attribute = $operation['attribute'];
 		if ( in_array( $attribute, array( 'title', 'excerpt', 'featured_media', 'slug' ), true ) ) {
+			foreach ( array( 'before', 'after' ) as $key ) {
+				if ( ! array_key_exists( $key, $operation ) ) {
+					continue;
+				}
+				$value = gutenberg_sanitize_suggested_post_field( $attribute, $operation[ $key ], $post, 'after' === $key );
+				if ( is_wp_error( $value ) ) {
+					return $error;
+				}
+				if ( $value !== $operation[ $key ] ) {
+					$payload['operations'][ $index ][ $key ] = $value;
+					$sanitized                               = true;
+				}
+			}
 			continue;
 		}
 		if ( 'meta' === $attribute ) {
@@ -302,13 +318,70 @@ function gutenberg_validate_suggestion_post_operations( $prepared_comment, $requ
 		}
 	}
 
-	// Store the sanitized new term names, not the ones sent.
+	// Store the sanitized values, not the ones sent.
 	if ( $sanitized ) {
 		$meta['_wp_suggestion'] = wp_json_encode( $payload );
 		$request->set_param( 'meta', $meta );
 	}
 
 	return $prepared_comment;
+}
+
+/**
+ * Sanitizes a proposed value of the title, excerpt, slug or featured image.
+ *
+ * A reviewer's accept writes the value to the post under the reviewer's own
+ * capabilities, so the value is filtered here, as the suggester, the way core
+ * filters that field when the suggester saves it directly: the title and
+ * excerpt run through the field's save filters (`title_save_pre`,
+ * `excerpt_save_pre`, which apply KSES for a user without `unfiltered_html`),
+ * the slug through `sanitize_title()`, and the featured image must be the id
+ * of an attachment the suggester can read.
+ *
+ * `before` is the field's current value, only compared and shown, never
+ * written. It is held to the same type, and a featured image id is cast, but
+ * the title and excerpt are kept verbatim like any other baseline (see
+ * `gutenberg_sanitize_suggestion_payload()`), since filtering them would
+ * misreport a field that already holds markup as changed.
+ *
+ * @param string  $attribute The post field.
+ * @param mixed   $value     The proposed or current value.
+ * @param WP_Post $post      The post the suggestion belongs to.
+ * @param bool    $is_after  Whether the value is the proposed one.
+ * @return mixed|WP_Error The sanitized value, or an error for a value of the
+ *                        wrong type or an attachment that cannot be used.
+ */
+function gutenberg_sanitize_suggested_post_field( $attribute, $value, $post, $is_after ) {
+	if ( null === $value ) {
+		return null;
+	}
+	$invalid = new WP_Error( 'rest_invalid_suggestion' );
+
+	if ( 'featured_media' === $attribute ) {
+		if ( ! is_int( $value ) && ! ( is_string( $value ) && ctype_digit( $value ) ) ) {
+			return $invalid;
+		}
+		$attachment_id = absint( $value );
+		if ( $is_after && $attachment_id > 0 ) {
+			$attachment = get_post( $attachment_id );
+			if ( ! $attachment || 'attachment' !== $attachment->post_type || ! current_user_can( 'read_post', $attachment_id ) ) {
+				return $invalid;
+			}
+		}
+		return $attachment_id;
+	}
+
+	if ( ! is_string( $value ) ) {
+		return $invalid;
+	}
+	if ( ! $is_after ) {
+		return $value;
+	}
+	if ( 'slug' === $attribute ) {
+		return sanitize_title( $value );
+	}
+	$field = 'title' === $attribute ? 'post_title' : 'post_excerpt';
+	return wp_unslash( sanitize_post_field( $field, wp_slash( $value ), $post->ID, 'db' ) );
 }
 
 /**
