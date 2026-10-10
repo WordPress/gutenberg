@@ -22,6 +22,14 @@ export const PRELOADED_NAVIGATION_MENUS_QUERY = {
 	orderby: 'date',
 };
 
+export const VIEW_NAVIGATION_MENUS_QUERY = {
+	per_page: 100,
+	status: 'publish',
+	context: 'view',
+	order: 'desc',
+	orderby: 'date',
+};
+
 export const SELECT_NAVIGATION_MENUS_ARGS = [
 	'postType',
 	'wp_navigation',
