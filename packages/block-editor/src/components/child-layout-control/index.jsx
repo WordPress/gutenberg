@@ -10,12 +10,15 @@ import {
 	FlexItem,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useGetNumberOfBlocksBeforeCell } from '../grid/use-get-number-of-blocks-before-cell';
 import { store as blockEditorStore } from '../../store';
 import { useSettings } from '../use-settings';
-import { isGridStackedOnMobile } from '../grid/mobile-stacking';
+import {
+	getStackedLayouts,
+	isGridStackedOnMobile,
+} from '../grid/mobile-stacking';
 import { useUpdateGridChildLayout } from '../grid/use-update-grid-child-layout';
 
 // These are the serialized `selfStretch` values. `max` used to be called
@@ -249,32 +252,58 @@ function GridControls( {
 	panelId,
 	showGridSpanDefaults,
 } ) {
-	const { columnStart, rowStart, columnSpan, rowSpan } = childLayout;
-	const { columnCount, rowCount } = parentLayout ?? {};
 	const rootClientId = useSelect( ( select ) =>
 		select( blockEditorStore ).getBlockRootClientId( panelId )
 	);
-	// On mobile, a stacked grid needs its own mobile layout before an edit to
-	// one of its blocks can have an effect, so edits go through the grid
-	// updater, which creates it from the stack.
-	const isStackedOnMobile = useSelect(
+	// On mobile, a stacked grid shows every block full width, one after
+	// another, so the controls show the block's place in the stack. The grid
+	// needs its own mobile layout before an edit to one of its blocks can have
+	// an effect, so edits go through the grid updater, which creates it from
+	// the stack.
+	const { stackGridAttributes, stackItems } = useSelect(
 		( select ) => {
 			if ( ! window.__experimentalEnableGridInteractivity ) {
-				return false;
+				return {};
 			}
-			const { getBlockAttributes, getSelectedBlockStyleState } =
-				select( blockEditorStore );
+			const {
+				getBlockAttributes,
+				getBlockOrder,
+				getBlocksByClientId,
+				getSelectedBlockStyleState,
+			} = select( blockEditorStore );
 			const gridAttributes = getBlockAttributes( rootClientId );
-			return (
-				getSelectedBlockStyleState()?.viewport === '@mobile' &&
-				isGridStackedOnMobile(
+			if (
+				getSelectedBlockStyleState()?.viewport !== '@mobile' ||
+				! isGridStackedOnMobile(
 					gridAttributes?.layout,
 					gridAttributes?.style
 				)
-			);
+			) {
+				return {};
+			}
+			return {
+				stackGridAttributes: gridAttributes,
+				stackItems: getBlocksByClientId(
+					getBlockOrder( rootClientId )
+				),
+			};
 		},
 		[ rootClientId ]
 	);
+	const isStackedOnMobile = !! stackItems;
+	const stackedLayouts = useMemo(
+		() =>
+			stackItems
+				? getStackedLayouts( stackGridAttributes, stackItems, panelId )
+				: undefined,
+		[ stackGridAttributes, stackItems, panelId ]
+	);
+	const { columnStart, rowStart, columnSpan, rowSpan } =
+		stackedLayouts?.child ?? childLayout;
+	const { columnCount, rowCount } = {
+		...parentLayout,
+		...stackedLayouts?.grid,
+	};
 	const updateGridChildLayout = useUpdateGridChildLayout();
 	const onChangeLayout = isStackedOnMobile
 		? ( changes ) => updateGridChildLayout( panelId, changes )

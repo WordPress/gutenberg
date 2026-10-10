@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
+	getStackedLayouts,
 	getUnstackedMobileUpdates,
+	isBlockHiddenOnMobile,
 	isGridStackedOnMobile,
 } from '../mobile-stacking';
 
@@ -37,6 +39,21 @@ describe( 'isGridStackedOnMobile()', () => {
 				{ '@mobile': { layout: { stackOnMobile: false } } }
 			)
 		).toBe( false );
+	} );
+
+	it( 'uses the placement of the mobile layout', () => {
+		expect(
+			isGridStackedOnMobile(
+				{ isManualPlacement: true },
+				{ '@mobile': { layout: { isManualPlacement: null } } }
+			)
+		).toBe( false );
+		expect(
+			isGridStackedOnMobile(
+				{ columnCount: 3 },
+				{ '@mobile': { layout: { isManualPlacement: true } } }
+			)
+		).toBe( true );
 	} );
 
 	it( 'does not stack without the grid interactivity experiment', () => {
@@ -135,5 +152,65 @@ describe( 'getUnstackedMobileUpdates()', () => {
 		} );
 		expect( updates.a.style[ '@mobile' ].layout.columnSpan ).toBe( 2 );
 		expect( updates.grid.style[ '@mobile' ].layout.columnCount ).toBe( 2 );
+	} );
+} );
+
+describe( 'isBlockHiddenOnMobile()', () => {
+	it( 'is true for blocks hidden everywhere or on mobile', () => {
+		expect(
+			isBlockHiddenOnMobile( { metadata: { blockVisibility: false } } )
+		).toBe( true );
+		expect(
+			isBlockHiddenOnMobile( {
+				metadata: { blockVisibility: { viewport: { mobile: false } } },
+			} )
+		).toBe( true );
+	} );
+
+	it( 'is false for blocks shown on mobile', () => {
+		expect( isBlockHiddenOnMobile( {} ) ).toBe( false );
+		expect(
+			isBlockHiddenOnMobile( {
+				metadata: { blockVisibility: { viewport: { tablet: false } } },
+			} )
+		).toBe( false );
+	} );
+} );
+
+describe( 'stacking with blocks hidden on mobile', () => {
+	const gridAttributes = {
+		layout: { type: 'grid', isManualPlacement: true, columnCount: 2 },
+	};
+	const children = [
+		{ clientId: 'a', attributes: {} },
+		{
+			clientId: 'hidden',
+			attributes: {
+				style: { layout: { columnStart: 2, rowStart: 1 } },
+				metadata: { blockVisibility: { viewport: { mobile: false } } },
+			},
+		},
+		{ clientId: 'b', attributes: {} },
+	];
+
+	it( 'gives hidden blocks no place in the stack', () => {
+		const updates = getUnstackedMobileUpdates( {
+			gridClientId: 'grid',
+			gridAttributes,
+			children,
+		} );
+		expect( updates.hidden ).toBeUndefined();
+		expect( updates.b.style[ '@mobile' ].layout.rowStart ).toBe( 2 );
+		expect( updates.grid.style[ '@mobile' ].layout.rowCount ).toBe( 2 );
+	} );
+
+	it( 'gets the stacked layouts of a block and its grid', () => {
+		expect( getStackedLayouts( gridAttributes, children, 'b' ) ).toEqual( {
+			child: { columnStart: 1, columnSpan: 2, rowStart: 2, rowSpan: 1 },
+			grid: { stackOnMobile: false, columnCount: 2, rowCount: 2 },
+		} );
+		expect(
+			getStackedLayouts( gridAttributes, children, 'hidden' ).child
+		).toBeUndefined();
 	} );
 } );

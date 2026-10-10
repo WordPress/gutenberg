@@ -194,46 +194,51 @@ function ManualGridVisualizer( {
 } ) {
 	const [ dropTarget, setDropTarget ] = useState( null );
 
-	const { gridItemStyles, gridAttributes, viewport } = useSelect(
-		( select ) => {
-			const {
-				getBlockOrder,
-				getBlockStyles,
-				getBlockAttributes,
-				getSelectedBlockStyleState,
-			} = unlock( select( blockEditorStore ) );
-			const blockOrder = getBlockOrder( gridClientId );
-			return {
-				gridItemStyles: getBlockStyles( blockOrder ),
-				gridAttributes: getBlockAttributes( gridClientId ),
-				viewport: getSelectedBlockStyleState()?.viewport,
-			};
-		},
-		[ gridClientId ]
-	);
+	const { gridItemStyles, gridAttributes, viewport, stackedItems } =
+		useSelect(
+			( select ) => {
+				const {
+					getBlockOrder,
+					getBlockStyles,
+					getBlockAttributes,
+					getBlocksByClientId,
+					getSelectedBlockStyleState,
+				} = unlock( select( blockEditorStore ) );
+				const blockOrder = getBlockOrder( gridClientId );
+				const _gridAttributes = getBlockAttributes( gridClientId );
+				const _viewport = getSelectedBlockStyleState()?.viewport;
+				const isStacked =
+					_viewport === '@mobile' &&
+					isGridStackedOnMobile(
+						_gridAttributes?.layout,
+						_gridAttributes?.style
+					);
+				return {
+					gridItemStyles: getBlockStyles( blockOrder ),
+					gridAttributes: _gridAttributes,
+					viewport: _viewport,
+					// The stack depends on more than the blocks' styles, such
+					// as whether they are hidden on mobile.
+					stackedItems: isStacked
+						? getBlocksByClientId( blockOrder )
+						: undefined,
+				};
+			},
+			[ gridClientId ]
+		);
 	const occupiedRects = useMemo( () => {
 		// Use the placement shown in the selected viewport: the stack when
 		// the grid is stacked on mobile, otherwise any viewport overrides.
 		let layouts;
-		if (
-			viewport === '@mobile' &&
-			isGridStackedOnMobile(
-				gridAttributes?.layout,
-				gridAttributes?.style
-			)
-		) {
+		if ( stackedItems ) {
 			const updates = getUnstackedMobileUpdates( {
 				gridClientId,
 				gridAttributes,
-				children: Object.entries( gridItemStyles ).map(
-					( [ clientId, style ] ) => ( {
-						clientId,
-						attributes: { style },
-					} )
-				),
+				children: stackedItems,
 			} );
-			layouts = Object.keys( gridItemStyles ).map(
-				( clientId ) => updates[ clientId ].style[ '@mobile' ].layout
+			layouts = stackedItems.map(
+				( { clientId } ) =>
+					updates[ clientId ]?.style[ '@mobile' ].layout ?? {}
 			);
 		} else {
 			layouts = Object.values( gridItemStyles ).map( ( style ) => ( {
@@ -264,7 +269,13 @@ function ManualGridVisualizer( {
 			);
 		}
 		return rects;
-	}, [ gridItemStyles, gridAttributes, viewport, gridClientId ] );
+	}, [
+		gridItemStyles,
+		gridAttributes,
+		viewport,
+		stackedItems,
+		gridClientId,
+	] );
 
 	return (
 		<>

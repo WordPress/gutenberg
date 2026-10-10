@@ -1861,6 +1861,20 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 					),
 				),
 			),
+			'manual placement grid switched to auto on mobile does not stack' => array(
+				'experiment_enabled' => true,
+				'layout'             => array(
+					'type'              => 'grid',
+					'isManualPlacement' => true,
+					'columnCount'       => 8,
+				),
+				'should_stack'       => false,
+				'style'              => array(
+					'@mobile' => array(
+						'layout' => array( 'isManualPlacement' => null ),
+					),
+				),
+			),
 			'auto placement grid does not stack'          => array(
 				'experiment_enabled' => true,
 				'layout'             => array(
@@ -2020,5 +2034,38 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	public function test_row_span_declarations_survive_sanitization() {
 		$this->assertSame( '--wp--grid-item--row-span:2', safecss_filter_attr( '--wp--grid-item--row-span:2' ) );
 		$this->assertSame( 'grid-row:span var(--wp--grid-item--row-span, 1)', safecss_filter_attr( 'grid-row:span var(--wp--grid-item--row-span, 1)' ) );
+	}
+
+	/**
+	 * Check that children of manual placement grids without a child layout of their own
+	 * publish a row span of 1 when the grid interactivity experiment is on, and are left
+	 * alone when it is off.
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 */
+	public function test_layout_support_flag_publishes_row_span_for_manual_grid_children_without_layout() {
+		$block_content = '<p>Child</p>';
+		$block         = array(
+			'blockName'    => 'core/paragraph',
+			'attrs'        => array(),
+			'parentLayout' => array(
+				'type'              => 'grid',
+				'columnCount'       => 3,
+				'isManualPlacement' => true,
+			),
+			'innerBlocks'  => array(),
+			'innerHTML'    => $block_content,
+			'innerContent' => array( $block_content ),
+		);
+
+		$this->assertSame( $block_content, gutenberg_render_layout_support_flag( $block_content, $block ), 'Without the experiment, the child should be left alone.' );
+
+		add_filter( 'pre_option_gutenberg-experiments', array( $this, 'filter_enable_grid_interactivity' ), 11 );
+		$output = gutenberg_render_layout_support_flag( $block_content, $block );
+		preg_match( '/wp-container-content-[a-z0-9]+/', $output, $matches );
+		$this->assertNotEmpty( $matches, 'The child should get a content class.' );
+
+		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+		$this->assertStringContainsString( ".{$matches[0]}{--wp--grid-item--row-span:1;}", $stylesheet );
 	}
 }

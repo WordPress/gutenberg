@@ -12,7 +12,7 @@ import {
 	GridItemMovers,
 	useUpdateGridChildLayout,
 	isGridStackedOnMobile,
-	getUnstackedMobileUpdates,
+	getStackedLayouts,
 } from '../components/grid';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import useBlockVisibility from '../components/block-visibility/use-block-visibility';
@@ -528,47 +528,28 @@ function GridTools( {
 	const isStackedOnMobile =
 		selectedState?.viewport === '@mobile' &&
 		isGridStackedOnMobile( parentLayout, parentStyle );
-	const { siblingOrder, siblingStyles } = useSelect(
+	const siblings = useSelect(
 		( select ) => {
 			if ( ! isStackedOnMobile ) {
-				return {};
+				return undefined;
 			}
-			const { getBlockOrder, getBlockStyles } = unlock(
-				select( blockEditorStore )
-			);
-			const blockOrder = getBlockOrder( rootClientId );
-			return {
-				siblingOrder: blockOrder,
-				siblingStyles: getBlockStyles( blockOrder ),
-			};
+			const { getBlockOrder, getBlocksByClientId } =
+				select( blockEditorStore );
+			return getBlocksByClientId( getBlockOrder( rootClientId ) );
 		},
 		[ isStackedOnMobile, rootClientId ]
 	);
-	const stackedLayouts = useMemo( () => {
-		if ( ! isStackedOnMobile || ! siblingOrder ) {
-			return null;
-		}
-		const updates = getUnstackedMobileUpdates( {
-			gridClientId: rootClientId,
-			gridAttributes: { layout: parentLayout, style: parentStyle },
-			children: siblingOrder.map( ( siblingClientId ) => ( {
-				clientId: siblingClientId,
-				attributes: { style: siblingStyles?.[ siblingClientId ] },
-			} ) ),
-		} );
-		return {
-			child: updates[ clientId ]?.style?.[ '@mobile' ]?.layout,
-			grid: updates[ rootClientId ]?.style?.[ '@mobile' ]?.layout,
-		};
-	}, [
-		isStackedOnMobile,
-		siblingOrder,
-		siblingStyles,
-		rootClientId,
-		clientId,
-		parentLayout,
-		parentStyle,
-	] );
+	const stackedLayouts = useMemo(
+		() =>
+			isStackedOnMobile && siblings
+				? getStackedLayouts(
+						{ layout: parentLayout, style: parentStyle },
+						siblings,
+						clientId
+					)
+				: null,
+		[ isStackedOnMobile, siblings, clientId, parentLayout, parentStyle ]
+	);
 	const updateGridChildLayout = useUpdateGridChildLayout();
 
 	if ( ! isVisible || isParentBlockCurrentlyHidden || isAnyAncestorHidden ) {

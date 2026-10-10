@@ -1072,8 +1072,16 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$block['blockName']
 	);
 	/*
-	 * A block with no layout support and no style attribute at all cannot
-	 * produce layout output, so return before resolving global settings.
+	 * Children of manual grids publish their row span for mobile stacking, as part of the grid
+	 * interactivity experiment, even when they have no child layout of their own.
+	 */
+	$parent_layout         = is_array( $block['parentLayout'] ?? null ) ? $block['parentLayout'] : array();
+	$publishes_grid_layout = ! empty( $parent_layout['isManualPlacement'] ) && gutenberg_is_experiment_enabled( 'gutenberg-grid-interactivity' );
+
+	/*
+	 * A block with no layout support and no style attribute at all, that isn't a
+	 * child of a manual grid, cannot produce layout output, so return before
+	 * resolving global settings.
 	 *
 	 * Resolving settings is not read-only: on a cold cache it queries the
 	 * user's `wp_global_styles` post, which fires `the_posts`. A callback on
@@ -1082,7 +1090,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	 * single block with no name and no attributes. Without this return that
 	 * block resolves settings again and the recursion has no base case.
 	 */
-	if ( ! $block_supports_layout && empty( $style_attr ) ) {
+	if ( ! $block_supports_layout && empty( $style_attr ) && ! $publishes_grid_layout ) {
 		return $block_content;
 	}
 
@@ -1105,16 +1113,15 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		}
 	}
 
-	if ( ! $block_supports_layout && ! $child_layout && empty( $viewport_child_layouts ) ) {
+	if ( ! $block_supports_layout && ! $child_layout && empty( $viewport_child_layouts ) && ! $publishes_grid_layout ) {
 		return $block_content;
 	}
 
 	$outer_class_names = array();
 
 	// Child layout specific logic.
-	if ( $child_layout || ! empty( $viewport_child_layouts ) ) {
+	if ( $child_layout || ! empty( $viewport_child_layouts ) || $publishes_grid_layout ) {
 		$base_child_layout = gutenberg_get_layout_child_values( $child_layout );
-		$parent_layout     = $block['parentLayout'] ?? array();
 
 		/*
 		 * Generates a unique class for child block layout styles.
@@ -1437,10 +1444,11 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			is_array( $used_layout ) ? $used_layout : array(),
 			gutenberg_get_layout_container_values( $style_attr['@mobile']['layout'] ?? null )
 		);
+		// Placement can be switched to auto in the mobile state, so check the mobile layout.
 		if (
 			$mobile_media_query &&
 			'grid' === ( $used_layout['type'] ?? null ) &&
-			! empty( $used_layout['isManualPlacement'] ) &&
+			! empty( $mobile_layout['isManualPlacement'] ) &&
 			false !== ( $mobile_layout['stackOnMobile'] ?? true ) &&
 			gutenberg_is_experiment_enabled( 'gutenberg-grid-interactivity' )
 		) {

@@ -308,6 +308,24 @@ describe( 'layout', () => {
 				).toBe( '' );
 			} );
 
+			it( 'does not stack a grid switched to auto placement on mobile', () => {
+				expect(
+					getResponsiveLayoutStyles( {
+						attributes: {
+							style: {
+								'@mobile': {
+									layout: { isManualPlacement: null },
+								},
+							},
+						},
+						blockName: 'core/group',
+						selector: '.wp-container-test',
+						layout: manualGridLayout,
+						hasBlockGapSupport: true,
+					} )
+				).not.toContain( 'grid-row: span' );
+			} );
+
 			it( 'does not stack auto placement grids', () => {
 				expect(
 					getResponsiveLayoutStyles( {
