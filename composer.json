@@ -25,8 +25,7 @@
 		"wp-coding-standards/wpcs": "^2.2",
 		"sirbrillig/phpcs-variable-analysis": "^2.8",
 		"wp-phpunit/wp-phpunit": "^5.4",
-		"phpunit/phpunit": "^8.5",
-		"spatie/phpunit-watcher": "^1.23"
+		"phpunit/phpunit": "^8.5"
 	},
 	"require": {
 		"composer/installers": "~1.0"
@@ -34,7 +33,6 @@
 	"scripts": {
 		"format": "phpcbf --standard=phpcs.xml.dist --report-summary --report-source",
 		"lint": "phpcs --standard=phpcs.xml.dist --runtime-set ignore_warnings_on_exit 1",
-		"test": "phpunit",
-		"test:watch": "phpunit-watcher watch < /dev/tty"
+		"test": "phpunit"
 	}
 }
