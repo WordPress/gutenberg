@@ -49,10 +49,26 @@ jobs:
               run: npm run test:unit:date -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     unit-php:
-        name: PHP
+        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }} on 'ubuntu-24.04'
         runs-on: 'ubuntu-24.04'
         timeout-minutes: 20
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+
+        strategy:
+            # Let every PHP version finish so a failure at one version doesn't
+            # cancel the runs still verifying the others.
+            fail-fast: false
+            matrix:
+                php:
+                    - '5.6'
+                    - '7.0'
+                    - '7.4'
+                    - '8.0'
+                    - '8.2'
+                multisite: [false, true]
+
+        env:
+            WP_ENV_PHP_VERSION: ${{ matrix.php }}
 
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -62,6 +78,27 @@ jobs:
               with:
                   node-version-file: '.nvmrc'
                   cache: npm
+
+            ##
+            # This allows Composer dependencies to be installed using a single step.
+            #
+            # Since the tests are currently run within the Docker containers where the PHP version varies,
+            # the same PHP version needs to be configured for the action runner machine so that the correct
+            # dependency versions are installed and cached.
+            ##
+            - name: Set up PHP
+              uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+              with:
+                  php-version: '${{ matrix.php }}'
+                  ini-file: development
+                  coverage: none
+
+            # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
+            # passing a custom cache suffix ensures that the cache is flushed at least once per week.
+            - name: Install Composer dependencies
+              uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
+              with:
+                  custom-cache-suffix: $(/bin/date -u --date='last Mon' "+%F")
 
             - name: Npm install and build
               run: |
@@ -76,9 +113,9 @@ jobs:
               run: npm run lint:php
 
             - name: Running single site unit tests
+              if: ${{ ! matrix.multisite }}
               run: npm run test:unit:php
-              if: ${{ success() || failure() }}
 
             - name: Running multisite unit tests
+              if: ${{ matrix.multisite }}
               run: npm run test:unit:php:multisite
-              if: ${{ success() || failure() }}
