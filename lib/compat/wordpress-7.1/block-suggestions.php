@@ -26,6 +26,15 @@ if ( ! defined( 'GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES' ) ) {
 }
 
 /**
+ * Maximum byte length of the proposals the save pass stores on one note
+ * (`_wp_suggestion_content`). A note whose proposals would not fit keeps them
+ * in post content instead, where the render filters still hide them.
+ */
+if ( ! defined( 'GUTENBERG_SUGGESTION_CONTENT_MAX_BYTES' ) ) {
+	define( 'GUTENBERG_SUGGESTION_CONTENT_MAX_BYTES', 1048576 );
+}
+
+/**
  * Applies `wp_kses_post()` to the HTML-bearing string fields of a serialized
  * block snapshot carried inside a suggestion operation (`op.block` on
  * `block-remove` / `block-insert-after` ops), recursing into `innerBlocks`.
@@ -142,6 +151,18 @@ function gutenberg_sanitize_suggestion_payload( $value ) {
  *   - `_wp_suggestion_decided_by` / `_wp_suggestion_resolved_by` — read-only
  *                               provenance: who made the provisional decision,
  *                               and whose save finalized or outdated it.
+ *   - `_wp_suggestion_content` — private: the proposals the save pass moved
+ *                               out of post content (added text, suggested
+ *                               blocks, proposed attribute values), JSON. Never
+ *                               readable or writable over REST; only the save
+ *                               pass writes it.
+ *   - `_wp_suggestion_extraction_skipped` — read-only flag: the note's
+ *                               proposals were too large to move out of post
+ *                               content on the last save, so they stayed there.
+ *
+ * Revisions and autosaves carry `_wp_suggestion_snapshot` post meta, the same
+ * proposals for the anchors in that revision's content, since comment meta is
+ * not revisioned.
  *
  * The suggestion is stored as comment meta rather than `comment_content` so a
  * note can carry both a discussion (content) and a proposed edit (meta), and so
@@ -238,8 +259,75 @@ function gutenberg_register_suggestion_meta() {
 			)
 		);
 	}
+
+	register_meta(
+		'comment',
+		'_wp_suggestion_extraction_skipped',
+		array(
+			'type'          => 'boolean',
+			'description'   => __( 'Whether the suggestion was too large to move out of the post content on the last save.', 'gutenberg' ),
+			'single'        => true,
+			'show_in_rest'  => true,
+			'auth_callback' => '__return_false',
+		)
+	);
+
+	// The stored proposals are never exposed or writable over REST: editors
+	// get them back inside the post's own `content.raw`.
+	$private_json = array(
+		'type'              => 'string',
+		'single'            => true,
+		'show_in_rest'      => false,
+		'auth_callback'     => '__return_false',
+		'sanitize_callback' => 'gutenberg_sanitize_suggestion_content_meta',
+	);
+	register_meta(
+		'comment',
+		'_wp_suggestion_content',
+		array_merge( $private_json, array( 'description' => __( 'Proposals moved out of the post content by the save pass (JSON).', 'gutenberg' ) ) )
+	);
+	register_meta(
+		'post',
+		'_wp_suggestion_snapshot',
+		array_merge( $private_json, array( 'description' => __( 'Suggestion proposals for the anchors in a revision (JSON).', 'gutenberg' ) ) )
+	);
 }
 add_action( 'init', 'gutenberg_register_suggestion_meta' );
+
+/**
+ * Validates the JSON the save pass stores for a note or a revision.
+ *
+ * Only checks shape and size. The content inside was already filtered by kses
+ * as part of `post_content` for the user who saved it, and is stored exactly,
+ * so a second pass (not idempotent on every input) never changes it.
+ *
+ * @param mixed $value Meta value.
+ * @return string The value, or '' when it is not a valid object within the
+ *                size limit.
+ */
+function gutenberg_sanitize_suggestion_content_meta( $value ) {
+	if ( ! is_string( $value ) || strlen( $value ) > GUTENBERG_SUGGESTION_CONTENT_MAX_BYTES ) {
+		return '';
+	}
+	$decoded = json_decode( $value, true );
+	return is_array( $decoded ) ? $value : '';
+}
+
+/**
+ * Leaves the stored proposals out of WXR exports.
+ *
+ * An imported post gets new note ids, so the anchors in its content would not
+ * match them anyway, and the export keeps the public baseline.
+ *
+ * @param bool   $skip     Whether to skip the meta.
+ * @param string $meta_key Meta key.
+ * @return bool
+ */
+function gutenberg_skip_suggestion_content_in_export( $skip, $meta_key ) {
+	return $skip || in_array( $meta_key, array( '_wp_suggestion_content', '_wp_suggestion_snapshot' ), true );
+}
+add_filter( 'wxr_export_skip_commentmeta', 'gutenberg_skip_suggestion_content_in_export', 10, 2 );
+add_filter( 'wxr_export_skip_postmeta', 'gutenberg_skip_suggestion_content_in_export', 10, 2 );
 
 /**
  * Validates the post-level operations of a suggestion before its note is
