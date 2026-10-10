@@ -1,6 +1,7 @@
 /**
- * Inline suggestions: the `core/suggestion` marker format and its decoration,
- * built on the shared inline-markers primitive. A suggested inline change lives
+ * Inline suggestions: the marker formats (one per kind: `core/suggestion-add`,
+ * `-del` and `-format`) and their decoration, built on the shared
+ * inline-markers primitive. A suggested inline change lives
  * as marked text in block content (Option B) and is type-aware:
  *
  * - `del` (deletion): existing text proposed for removal. Front-end keeps the
@@ -8,15 +9,24 @@
  * - `add` (addition): proposed new text. Front-end strips the wrapper *and* the
  *   text until the suggestion is accepted.
  *
+ * - `format`: existing text whose formatting is proposed to change.
+ *
+ * Markers of different kinds nest over the same characters (a deletion inside
+ * someone else's addition) in one canonical order: add outermost, then
+ * format, then del.
+ *
  * The render-time strip (keep del-text, drop add-text, remove all wrappers) is
  * handled server-side by `gutenberg_strip_inline_suggestion_markers`
  * (`lib/compat/wordpress-7.1/block-suggestions.php`).
  */
 
 export {
-	SUGGESTION_FORMAT_NAME,
 	SUGGESTION_A11Y_FORMAT_NAME,
-	SUGGESTION_CLASS,
+	SUGGESTION_MARKER_KINDS,
+	SUGGESTION_KIND_ORDER,
+	SUGGESTION_FORMAT_NAMES,
+	SUGGESTION_CLASSES,
+	SUGGESTION_CLASS_PROBE,
 	SUGGESTION_ANNOTATION_SOURCE,
 	SUGGESTION_ID_ATTRIBUTE,
 	SUGGESTION_TYPE_ATTRIBUTE,
@@ -24,14 +34,22 @@ export {
 	SUGGESTION_TYPE_DELETION,
 	SUGGESTION_TYPE_ADDITION,
 	SUGGESTION_TYPE_FORMAT,
-	suggestionFormat,
+	suggestionMarkerFormats,
 	suggestionA11yFormat,
 	addSuggestionRoleFormats,
 	registerSuggestionFormat,
+	unregisterSuggestionFormats,
+	isSuggestionFormat,
+	suggestionKindOf,
+	suggestionFormatNameFor,
+	suggestionMarkersAt,
+	suggestionMarkersIn,
+	canonicalizeSuggestionStack,
 	findSuggestionRange,
 	findSuggestionText,
 	getSuggestionMarkerSelector,
 } from './format';
+export type { SuggestionMarkerKind } from './format';
 export { useAnnotateSuggestions } from './use-annotate-suggestions';
 export {
 	acceptInlineDeletion,
@@ -47,13 +65,36 @@ export {
 	valueRangeHasSuggestion,
 	formatsAdditionRunToExtend,
 	valueAdditionRunToExtend,
+	suggestionMarkerRuns,
+	formatOriginalAligns,
+	wrapSuggestionMarker,
 } from './operations';
+export { classifyOverlap } from './overlap';
+export type {
+	OverlapBlocking,
+	OverlapGesture,
+	OverlapReason,
+	OverlapVerdict,
+} from './overlap';
+export {
+	resolveInlineSuggestion,
+	rebaseFormatOriginal,
+	suggestionsEmptiedBy,
+} from './resolution';
+export type { InlineSuggestionType, ResolutionEffect } from './resolution';
+export { suggestionRelations } from './relations';
+export type { RelatedSuggestion, SuggestionRelations } from './relations';
+export {
+	normalizeSuggestionMarkers,
+	guardMarkerIntegrity,
+} from './marker-integrity';
 export { computeDeleteRange } from './delete-range';
 export {
 	analyzeTextEdit,
 	planEditMarkers,
 	applyEditPlan,
 } from './reconcile-edit';
+export type { EditRefusal } from './reconcile-edit';
 export {
 	analyzeFormatEdit,
 	planFormatMarkers,

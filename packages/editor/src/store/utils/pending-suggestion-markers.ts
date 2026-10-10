@@ -1,4 +1,4 @@
-import { SUGGESTION_MARKER_CLASS } from '../constants';
+import { SUGGESTION_MARKER_CLASSES } from '../constants';
 
 /**
  * Opening tag of every `<mark>` element in a serialized document. Matching the
@@ -17,9 +17,10 @@ const SUGGESTION_ID_ATTRIBUTE_PATTERN = /\sdata-suggestion-id="/i;
  * Whether serialized post content still carries an unresolved inline
  * suggestion marker.
  *
- * A marker is `<mark class="wp-suggestion" data-suggestion-id="…" …>`, so all
- * three parts are required: the element, the exact class *token* (not a
- * substring), and the id that links the marker to its suggestion. Testing the
+ * A marker is `<mark class="wp-suggestion-<kind>" data-suggestion-id="…" …>`,
+ * so all three parts are required: the element, one of the exact class
+ * *tokens* (not a substring), and the id that links the marker to its
+ * suggestion. Testing the
  * whole document for the class alone would refuse the code editor over content
  * that has no suggestions in it at all — a `wp-suggestion-box` block class, a
  * code sample showing the markup (escaped, so the `<mark` never appears), or
@@ -40,7 +41,12 @@ const SUGGESTION_ID_ATTRIBUTE_PATTERN = /\sdata-suggestion-id="/i;
 export function hasPendingSuggestionMarkers(
 	content: string | undefined
 ): boolean {
-	if ( ! content || ! content.includes( SUGGESTION_MARKER_CLASS ) ) {
+	if (
+		! content ||
+		! SUGGESTION_MARKER_CLASSES.some( ( className ) =>
+			content.includes( className )
+		)
+	) {
 		return false;
 	}
 
@@ -49,7 +55,13 @@ export function hasPendingSuggestionMarkers(
 			continue;
 		}
 		const classNames = tag.match( CLASS_ATTRIBUTE_PATTERN )?.[ 1 ];
-		if ( classNames?.split( /\s+/ ).includes( SUGGESTION_MARKER_CLASS ) ) {
+		if (
+			classNames
+				?.split( /\s+/ )
+				.some( ( className ) =>
+					SUGGESTION_MARKER_CLASSES.includes( className )
+				)
+		) {
 			return true;
 		}
 	}

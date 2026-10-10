@@ -3,27 +3,22 @@ import {
 	RichTextData,
 	create,
 	toHTMLString,
-	registerFormatType,
 	unregisterFormatType,
 	store as richTextStore,
 } from '@wordpress/rich-text';
 import { select } from '@wordpress/data';
 import {
-	SUGGESTION_FORMAT_NAME,
+	SUGGESTION_FORMAT_NAMES,
 	SUGGESTION_A11Y_FORMAT_NAME,
 	SUGGESTION_TYPE_ATTRIBUTE,
 	SUGGESTION_TYPE_DELETION,
 	SUGGESTION_TYPE_ADDITION,
-	suggestionFormat,
+	isSuggestionFormat,
+	unregisterSuggestionFormats,
 	findSuggestionRange,
 	registerSuggestionFormat,
 	addSuggestionRoleFormats,
 } from '../format';
-
-const isRegistered = () =>
-	!! ( select( richTextStore as any ) as any ).getFormatType(
-		SUGGESTION_FORMAT_NAME
-	);
 
 /**
  * Read the suggestion-type attribute off whichever marker covers `offset`.
@@ -34,31 +29,24 @@ const isRegistered = () =>
  */
 function typeAt( html: string, offset: number ): string | null {
 	const { formats } = create( { html } );
-	const hit = ( formats[ offset ] as any )?.find(
-		( f: any ) => f.type === SUGGESTION_FORMAT_NAME
+	const hit = ( formats[ offset ] as any )?.find( ( f: any ) =>
+		isSuggestionFormat( f )
 	);
 	return hit?.attributes?.[ SUGGESTION_TYPE_ATTRIBUTE ] ?? null;
 }
 
 describe( 'suggestion format', () => {
 	beforeAll( () => {
-		if ( ! isRegistered() ) {
-			registerFormatType(
-				SUGGESTION_FORMAT_NAME,
-				suggestionFormat as any
-			);
-		}
+		registerSuggestionFormat();
 	} );
 
 	afterAll( () => {
-		if ( isRegistered() ) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 	} );
 
 	it( 'round-trips a deletion marker through rich text', () => {
 		const html =
-			'keep <mark class="wp-suggestion" data-suggestion-id="5" data-suggestion-type="del" data-author="2">remove me</mark> tail';
+			'keep <mark class="wp-suggestion-del" data-suggestion-id="5" data-suggestion-type="del" data-author="2">remove me</mark> tail';
 		const value = RichTextData.fromHTMLString( html );
 		const out = value.toHTMLString();
 		expect( out ).toContain( 'data-suggestion-id="5"' );
@@ -68,7 +56,7 @@ describe( 'suggestion format', () => {
 
 	it( 'resolves a deletion marker range by id', () => {
 		const value = RichTextData.fromHTMLString(
-			'keep <mark class="wp-suggestion" data-suggestion-id="5" data-suggestion-type="del">remove me</mark> tail'
+			'keep <mark class="wp-suggestion-del" data-suggestion-id="5" data-suggestion-type="del">remove me</mark> tail'
 		);
 		expect( findSuggestionRange( value, 5 ) ).toEqual( {
 			start: 5,
@@ -78,7 +66,7 @@ describe( 'suggestion format', () => {
 
 	it( 'resolves an addition marker range by id', () => {
 		const value = RichTextData.fromHTMLString(
-			'before <mark class="wp-suggestion" data-suggestion-id="9" data-suggestion-type="add">added</mark>'
+			'before <mark class="wp-suggestion-add" data-suggestion-id="9" data-suggestion-type="add">added</mark>'
 		);
 		expect( findSuggestionRange( value, 9 ) ).toEqual( {
 			start: 7,
@@ -88,16 +76,16 @@ describe( 'suggestion format', () => {
 
 	it( 'distinguishes del vs add markers on the same block', () => {
 		const html =
-			'<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del">x</mark>' +
+			'<mark class="wp-suggestion-del" data-suggestion-id="1" data-suggestion-type="del">x</mark>' +
 			' mid ' +
-			'<mark class="wp-suggestion" data-suggestion-id="2" data-suggestion-type="add">y</mark>';
+			'<mark class="wp-suggestion-add" data-suggestion-id="2" data-suggestion-type="add">y</mark>';
 		expect( typeAt( html, 0 ) ).toBe( SUGGESTION_TYPE_DELETION );
 		expect( typeAt( html, 6 ) ).toBe( SUGGESTION_TYPE_ADDITION );
 	} );
 
 	it( 'returns null for a missing id', () => {
 		const value = RichTextData.fromHTMLString(
-			'<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del">x</mark>'
+			'<mark class="wp-suggestion-del" data-suggestion-id="1" data-suggestion-type="del">x</mark>'
 		);
 		expect( findSuggestionRange( value, 99 ) ).toBeNull();
 	} );
@@ -117,7 +105,7 @@ describe( 'suggestion a11y role decoration', () => {
 
 	afterAll( () => {
 		for ( const name of [
-			SUGGESTION_FORMAT_NAME,
+			...SUGGESTION_FORMAT_NAMES,
 			SUGGESTION_A11Y_FORMAT_NAME,
 		] ) {
 			if (
@@ -129,7 +117,7 @@ describe( 'suggestion a11y role decoration', () => {
 	} );
 
 	const marker = ( id: number | string, type: string, text: string ) =>
-		`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="${ type }">${ text }</mark>`;
+		`<mark class="wp-suggestion-${ type }" data-suggestion-id="${ id }" data-suggestion-type="${ type }">${ text }</mark>`;
 
 	it( 'registers the editor-only decoration format', () => {
 		const format = ( select( richTextStore as any ) as any ).getFormatType(
@@ -269,7 +257,7 @@ describe( 'suggestion a11y role decoration', () => {
 			// (the editable DOM read path), the editor-only format is ignored
 			// on parse and the serialized value stays clean.
 			const value = RichTextData.fromHTMLString(
-				`a<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add"><span class="wp-suggestion-a11y" role="insertion">b</span></mark>c`
+				`a<mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add"><span class="wp-suggestion-a11y" role="insertion">b</span></mark>c`
 			);
 			const html = value.toHTMLString();
 			expect( html ).not.toContain( 'role=' );
@@ -280,7 +268,7 @@ describe( 'suggestion a11y role decoration', () => {
 
 		it( 'drops the announcement attributes read back from the editable DOM', () => {
 			const value = RichTextData.fromHTMLString(
-				`a<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del"><span class="wp-suggestion-a11y" role="deletion" data-suggestion-a11y-start="Start of suggested deletion." data-suggestion-a11y-end="End of suggested deletion.">b</span></mark>c`
+				`a<mark class="wp-suggestion-del" data-suggestion-id="1" data-suggestion-type="del"><span class="wp-suggestion-a11y" role="deletion" data-suggestion-a11y-start="Start of suggested deletion." data-suggestion-a11y-end="End of suggested deletion.">b</span></mark>c`
 			);
 			const html = value.toHTMLString();
 			expect( html ).not.toContain( 'data-suggestion-a11y' );
@@ -297,7 +285,7 @@ describe( 'nested suggestion markers', () => {
 
 	afterAll( () => {
 		for ( const name of [
-			SUGGESTION_FORMAT_NAME,
+			...SUGGESTION_FORMAT_NAMES,
 			SUGGESTION_A11Y_FORMAT_NAME,
 		] ) {
 			if (
@@ -314,18 +302,20 @@ describe( 'nested suggestion markers', () => {
 	 * are covered by the outer add only, offsets 3-4 by both.
 	 */
 	const nested =
-		'<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add" data-author="4">out' +
-		'<mark class="wp-suggestion" data-suggestion-id="2" data-suggestion-type="del" data-author="7">in</mark>' +
+		'<mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add" data-author="4">out' +
+		'<mark class="wp-suggestion-del" data-suggestion-id="2" data-suggestion-type="del" data-author="7">in</mark>' +
 		'</mark>';
 
+	// Each marker carries its own decoration; the last one in the stack
+	// describes the marker that directly wraps the run.
 	const decorationAt = ( decorated: any, offset: number ) =>
-		decorated[ offset ].find(
+		decorated[ offset ].findLast(
 			( f: any ) => f.type === SUGGESTION_A11Y_FORMAT_NAME
 		);
 
 	it( 'describes the marker that directly wraps the run', () => {
-		// The decoration renders innermost, so it belongs to the innermost
-		// marker covering the character. Taking the outer one announces the
+		// The innermost decoration belongs to the innermost marker covering
+		// the character. Describing the outer one there announces the
 		// opposite change: a deletion read aloud as an addition.
 		const { formats } = create( { html: nested } );
 		const decorated = addSuggestionRoleFormats( formats );
@@ -366,7 +356,7 @@ describe( 'nested suggestion markers', () => {
 		// rich-text renders every key in the attribute object, so a missing
 		// author must be absent rather than the string "undefined".
 		const { formats } = create( {
-			html: '<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del">x</mark>',
+			html: '<mark class="wp-suggestion-del" data-suggestion-id="1" data-suggestion-type="del">x</mark>',
 		} );
 		const { attributes } = decorationAt(
 			addSuggestionRoleFormats( formats ),
@@ -392,7 +382,7 @@ describe( 'announcement element boundaries', () => {
 
 	afterAll( () => {
 		for ( const name of [
-			SUGGESTION_FORMAT_NAME,
+			...SUGGESTION_FORMAT_NAMES,
 			SUGGESTION_A11Y_FORMAT_NAME,
 		] ) {
 			if (
@@ -429,7 +419,7 @@ describe( 'announcement element boundaries', () => {
 	] )( 'brackets a marker containing %s exactly once', ( _label, inner ) => {
 		expect(
 			countAnnouncements(
-				`<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del" data-author="2">${ inner }</mark>`
+				`<mark class="wp-suggestion-del" data-suggestion-id="1" data-suggestion-type="del" data-author="2">${ inner }</mark>`
 			)
 		).toBe( 1 );
 	} );

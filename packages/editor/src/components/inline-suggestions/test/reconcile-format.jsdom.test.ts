@@ -14,7 +14,7 @@ import {
 import {
 	registerSuggestionFormat,
 	findSuggestionRange,
-	SUGGESTION_FORMAT_NAME,
+	unregisterSuggestionFormats,
 } from '../format';
 
 const getFormatType = ( name: string ) =>
@@ -24,12 +24,10 @@ const rtd = ( html: string ) => RichTextData.fromHTMLString( html );
 
 // A pending `format` marker authored by user 7, wrapping the given inner HTML.
 const formatMark = ( id: number | string, inner: string ) =>
-	`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="format" data-author="7">${ inner }</mark>`;
+	`<mark class="wp-suggestion-format" data-suggestion-id="${ id }" data-suggestion-type="format" data-author="7">${ inner }</mark>`;
 
 beforeAll( () => {
-	if ( ! getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-		registerSuggestionFormat();
-	}
+	registerSuggestionFormat();
 	if ( ! getFormatType( 'test/bold' ) ) {
 		registerFormatType( 'test/bold', {
 			title: 'Bold',
@@ -50,7 +48,8 @@ beforeAll( () => {
 } );
 
 afterAll( () => {
-	[ 'test/bold', 'test/link', SUGGESTION_FORMAT_NAME ].forEach( ( name ) => {
+	unregisterSuggestionFormats();
+	[ 'test/bold', 'test/link' ].forEach( ( name ) => {
 		if ( getFormatType( name ) ) {
 			unregisterFormatType( name );
 		}
@@ -114,7 +113,7 @@ describe( 'analyzeFormatEdit', () => {
 
 	it( 'ignores the suggestion marker itself (no false positive)', () => {
 		const marked = rtd(
-			'Hello <mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del">world</mark>'
+			'Hello <mark class="wp-suggestion-del" data-suggestion-id="1" data-suggestion-type="del">world</mark>'
 		);
 		expect( analyzeFormatEdit( marked, marked ) ).toBeNull();
 	} );
@@ -139,15 +138,19 @@ describe( 'planFormatMarkers', () => {
 		).toEqual( { kind: 'none' } );
 	} );
 
-	it( 'returns kind "none" when the change overlaps an existing marker', () => {
-		// The run already carries a suggestion marker; do not nest.
+	it( 'declines a change inside the author own pending addition', () => {
+		// An unauthored marker and an unknown editor count as the same
+		// author: their own addition is not a run to suggest formatting on.
 		const prev = rtd(
-			'Hello <mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add">world</mark>'
+			'Hello <mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add">world</mark>'
 		);
 		const next = rtd(
-			'Hello <mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add"><strong>world</strong></mark>'
+			'Hello <mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add"><strong>world</strong></mark>'
 		);
-		expect( planFormatMarkers( prev, next ) ).toEqual( { kind: 'none' } );
+		expect( planFormatMarkers( prev, next ) ).toMatchObject( {
+			kind: 'refuse',
+			reason: 'own-marker',
+		} );
 	} );
 
 	it( "extends the suggester's own format marker on a second toggle", () => {
@@ -175,11 +178,16 @@ describe( 'planFormatMarkers', () => {
 		const next = rtd(
 			`Hello ${ formatMark( 1, '<strong><em>world</em></strong>' ) }`
 		);
-		expect( planFormatMarkers( prev, next, { authorId: 9 } ) ).toEqual( {
-			kind: 'none',
-		} );
+		const refusal = {
+			kind: 'refuse',
+			reason: 'format-on-format',
+			blocking: { id: '1', kind: 'format', authorId: '7' },
+		};
+		expect( planFormatMarkers( prev, next, { authorId: 9 } ) ).toEqual(
+			refusal
+		);
 		// And with no author at all (anonymous edit) it stays conservative.
-		expect( planFormatMarkers( prev, next ) ).toEqual( { kind: 'none' } );
+		expect( planFormatMarkers( prev, next ) ).toEqual( refusal );
 	} );
 
 	it( 'declines to extend when the toggle spills past the marker', () => {
@@ -187,21 +195,19 @@ describe( 'planFormatMarkers', () => {
 		const next = rtd(
 			`<strong>Hello ${ formatMark( 1, 'world' ) }</strong>`
 		);
-		expect( planFormatMarkers( prev, next, { authorId: 7 } ) ).toEqual( {
-			kind: 'none',
-		} );
+		expect(
+			planFormatMarkers( prev, next, { authorId: 7 } )
+		).toMatchObject( { kind: 'refuse', reason: 'own-marker' } );
 	} );
 
 	it( 'declines to extend over a marker nested inside the run', () => {
 		/*
-		 * Typing inside a formatted suggestion nests an `add` marker beneath
-		 * the `format` one. Extending applies `core/suggestion` across the
-		 * whole run, and `applyFormat` drops same-type formats it finds inside
-		 * a non-collapsed range - so extending here would strip the nested
-		 * marker and orphan its note. The outermost-only lookup used to miss it.
+		 * An `add` marker inside the run (merged or older markup) is not
+		 * part of this suggestion: extending only revises a run that holds no
+		 * other marker, so the toggle is declined.
 		 */
 		const nested =
-			'<mark class="wp-suggestion" data-suggestion-id="2" data-suggestion-type="add" data-author="7">XX</mark>';
+			'<mark class="wp-suggestion-add" data-suggestion-id="2" data-suggestion-type="add" data-author="7">XX</mark>';
 		const prev = rtd(
 			`Hello ${ formatMark( 1, `<strong>wor${ nested }ld</strong>` ) }`
 		);
@@ -211,9 +217,9 @@ describe( 'planFormatMarkers', () => {
 				`<strong><em>wor${ nested }ld</em></strong>`
 			) }`
 		);
-		expect( planFormatMarkers( prev, next, { authorId: 7 } ) ).toEqual( {
-			kind: 'none',
-		} );
+		expect(
+			planFormatMarkers( prev, next, { authorId: 7 } )
+		).toMatchObject( { kind: 'refuse', reason: 'own-marker' } );
 	} );
 
 	it( 'reports the run text so the caller can check it against the note', () => {
@@ -232,14 +238,14 @@ describe( 'planFormatMarkers', () => {
 
 	it( 'declines to extend a marker that is not a format suggestion', () => {
 		const prev = rtd(
-			'Hello <mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add" data-author="7">world</mark>'
+			'Hello <mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add" data-author="7">world</mark>'
 		);
 		const next = rtd(
-			'Hello <mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add" data-author="7"><strong>world</strong></mark>'
+			'Hello <mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add" data-author="7"><strong>world</strong></mark>'
 		);
-		expect( planFormatMarkers( prev, next, { authorId: 7 } ) ).toEqual( {
-			kind: 'none',
-		} );
+		expect(
+			planFormatMarkers( prev, next, { authorId: 7 } )
+		).toMatchObject( { kind: 'refuse', reason: 'own-marker' } );
 	} );
 } );
 

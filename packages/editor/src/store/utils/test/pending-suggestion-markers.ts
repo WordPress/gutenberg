@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { hasPendingSuggestionMarkers } from '../pending-suggestion-markers';
 
 const marker =
-	'<mark class="wp-suggestion" data-suggestion-id="7" data-suggestion-type="add">there</mark>';
+	'<mark class="wp-suggestion-add" data-suggestion-id="7" data-suggestion-type="add">there</mark>';
 
 describe( 'hasPendingSuggestionMarkers', () => {
 	it( 'finds a marker in serialized content', () => {
@@ -16,7 +16,7 @@ describe( 'hasPendingSuggestionMarkers', () => {
 	it( 'finds a marker whatever order its attributes serialize in', () => {
 		expect(
 			hasPendingSuggestionMarkers(
-				'<mark data-suggestion-type="del" data-suggestion-id="7" class="wp-suggestion">gone</mark>'
+				'<mark data-suggestion-type="del" data-suggestion-id="7" class="wp-suggestion-del">gone</mark>'
 			)
 		).toBe( true );
 	} );
@@ -24,7 +24,7 @@ describe( 'hasPendingSuggestionMarkers', () => {
 	it( 'finds a marker sharing its element with another class', () => {
 		expect(
 			hasPendingSuggestionMarkers(
-				'<mark class="wp-note wp-suggestion" data-suggestion-id="7">both</mark>'
+				'<mark class="wp-note wp-suggestion-format" data-suggestion-id="7">both</mark>'
 			)
 		).toBe( true );
 	} );
@@ -37,7 +37,25 @@ describe( 'hasPendingSuggestionMarkers', () => {
 		);
 	} );
 
-	it( 'ignores a class the marker class is only a prefix of', () => {
+	it( 'finds a marker of every kind', () => {
+		for ( const kind of [ 'add', 'del', 'format' ] ) {
+			expect(
+				hasPendingSuggestionMarkers(
+					`<mark class="wp-suggestion-${ kind }" data-suggestion-id="7">x</mark>`
+				)
+			).toBe( true );
+		}
+	} );
+
+	it( 'ignores the old single marker class', () => {
+		expect(
+			hasPendingSuggestionMarkers(
+				'<mark class="wp-suggestion" data-suggestion-id="7" data-suggestion-type="add">x</mark>'
+			)
+		).toBe( false );
+	} );
+
+	it( 'ignores a class that only shares the marker prefix', () => {
 		expect(
 			hasPendingSuggestionMarkers(
 				'<p class="wp-suggestion-box">A callout.</p>'
@@ -53,7 +71,7 @@ describe( 'hasPendingSuggestionMarkers', () => {
 	it( 'ignores a code sample showing the markup', () => {
 		expect(
 			hasPendingSuggestionMarkers(
-				'<pre class="wp-block-code"><code>&lt;mark class="wp-suggestion" data-suggestion-id="1"&gt;</code></pre>'
+				'<pre class="wp-block-code"><code>&lt;mark class="wp-suggestion-add" data-suggestion-id="1"&gt;</code></pre>'
 			)
 		).toBe( false );
 	} );
@@ -61,7 +79,7 @@ describe( 'hasPendingSuggestionMarkers', () => {
 	it( 'ignores prose naming the class', () => {
 		expect(
 			hasPendingSuggestionMarkers(
-				'<p>Suggestions serialize as <code>wp-suggestion</code>.</p>'
+				'<p>Suggestions serialize as <code>wp-suggestion-add</code>.</p>'
 			)
 		).toBe( false );
 	} );
@@ -72,7 +90,7 @@ describe( 'hasPendingSuggestionMarkers', () => {
 		// something the author can accept or reject.
 		expect(
 			hasPendingSuggestionMarkers(
-				'<mark class="wp-suggestion">orphan</mark>'
+				'<mark class="wp-suggestion-add">orphan</mark>'
 			)
 		).toBe( false );
 	} );
@@ -80,7 +98,7 @@ describe( 'hasPendingSuggestionMarkers', () => {
 	it( 'ignores a suggestion id on an element that is not a marker', () => {
 		expect(
 			hasPendingSuggestionMarkers(
-				'<span class="wp-suggestion" data-suggestion-id="7">x</span>'
+				'<span class="wp-suggestion-add" data-suggestion-id="7">x</span>'
 			)
 		).toBe( false );
 	} );

@@ -1,6 +1,24 @@
 import { RichTextData, create, removeFormat } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
-import { SUGGESTION_CLASS, SUGGESTION_FORMAT_NAME } from './format';
+import {
+	SUGGESTION_CLASS_PROBE,
+	SUGGESTION_FORMAT_NAMES,
+	isSuggestionFormat,
+} from './format';
+
+/**
+ * Drop every suggestion marker, of every kind, from a record.
+ *
+ * @param record Rich-text record.
+ * @return The record without markers.
+ */
+function removeAllMarkers( record: RichTextValue ): RichTextValue {
+	let result = record;
+	for ( const name of SUGGESTION_FORMAT_NAMES ) {
+		result = removeFormat( result, name, 0, result.text.length );
+	}
+	return result;
+}
 
 /**
  * Whether an attribute value carries a live inline suggestion marker.
@@ -12,25 +30,23 @@ import { SUGGESTION_CLASS, SUGGESTION_FORMAT_NAME } from './format';
  * (text that mentions the class) only cost an edit its overlay capture.
  *
  * @param value Attribute value (string, RichTextData, or anything else).
- * @return True when the value contains a `core/suggestion` marker.
+ * @return True when the value contains a suggestion marker of any kind.
  */
 export function hasSuggestionMarkers( value: any ): boolean {
 	if ( typeof value === 'string' ) {
-		return value.includes( SUGGESTION_CLASS );
+		return value.includes( SUGGESTION_CLASS_PROBE );
 	}
 	if ( value instanceof RichTextData ) {
 		// `RichTextData` types its `formats` as `never[]`.
 		const formats: RichTextValue[ 'formats' ] = value.formats;
-		return formats.some( ( stack ) =>
-			stack?.some( ( format ) => format.type === SUGGESTION_FORMAT_NAME )
-		);
+		return formats.some( ( stack ) => stack?.some( isSuggestionFormat ) );
 	}
 	return false;
 }
 
 /**
- * Strip inline `core/suggestion` markers from a single attribute value,
- * unwrapping the `<mark class="wp-suggestion">` format while keeping the text
+ * Strip inline suggestion markers of every kind from a single attribute value,
+ * unwrapping each `<mark class="wp-suggestion-<kind>">` while keeping the text
  * and every other format (bold, links, and nested notes markers included).
  *
  * Why: values captured into the attribute overlay (baseline and proposed
@@ -54,16 +70,10 @@ export function stripSuggestionMarkers( value: any ): any {
 		return value;
 	}
 	const html = isRich ? value.toHTMLString() : value;
-	if ( ! html.includes( SUGGESTION_CLASS ) ) {
+	if ( ! html.includes( SUGGESTION_CLASS_PROBE ) ) {
 		return value;
 	}
-	const record = create( { html } );
-	const stripped = removeFormat(
-		record,
-		SUGGESTION_FORMAT_NAME,
-		0,
-		record.text.length
-	);
+	const stripped = removeAllMarkers( create( { html } ) );
 	const result = new RichTextData( stripped as any );
 	return isRich ? result : result.toHTMLString();
 }
