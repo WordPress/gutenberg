@@ -716,6 +716,77 @@ describe( 'readConfig', () => {
 		} );
 	} );
 
+	describe( 'mariadbVersion parsing', () => {
+		afterEach( () => {
+			delete process.env.WP_ENV_MARIADB_VERSION;
+		} );
+
+		it( 'should default to null', async () => {
+			readFile.mockImplementation( () =>
+				Promise.resolve( JSON.stringify( {} ) )
+			);
+			const config = await readConfig( '.wp-env.json' );
+			expect( config.env.development.mariadbVersion ).toBeNull();
+			expect( config.env.tests.mariadbVersion ).toBeNull();
+		} );
+
+		it( 'should parse mariadbVersion at the root and per environment', async () => {
+			readFile.mockImplementation( () =>
+				Promise.resolve(
+					JSON.stringify( {
+						mariadbVersion: '10.11',
+						env: { tests: { mariadbVersion: 'latest' } },
+					} )
+				)
+			);
+			const config = await readConfig( '.wp-env.json' );
+			expect( config.env.development.mariadbVersion ).toBe( '10.11' );
+			expect( config.env.tests.mariadbVersion ).toBe( 'latest' );
+		} );
+
+		it( 'should throw a validation error for an invalid mariadbVersion', async () => {
+			readFile.mockImplementation( () =>
+				Promise.resolve(
+					JSON.stringify( {
+						env: { tests: { mariadbVersion: 'LTS' } },
+					} )
+				)
+			);
+			await expect( readConfig( '.wp-env.json' ) ).rejects.toEqual(
+				new ValidationError(
+					'Invalid .wp-env.json: "env.tests.mariadbVersion" must be "lts", "latest", or a version such as "10.11" or "11.4.2".'
+				)
+			);
+		} );
+
+		it( 'should override mariadbVersion in every environment with WP_ENV_MARIADB_VERSION', async () => {
+			readFile.mockImplementation( () =>
+				Promise.resolve(
+					JSON.stringify( {
+						mariadbVersion: '10.11',
+						env: { tests: { mariadbVersion: 'latest' } },
+					} )
+				)
+			);
+			process.env.WP_ENV_MARIADB_VERSION = '10.3';
+			const config = await readConfig( '.wp-env.json' );
+			expect( config.env.development.mariadbVersion ).toBe( '10.3' );
+			expect( config.env.tests.mariadbVersion ).toBe( '10.3' );
+		} );
+
+		it( 'should throw a validation error for an invalid WP_ENV_MARIADB_VERSION', async () => {
+			readFile.mockImplementation( () =>
+				Promise.resolve( JSON.stringify( {} ) )
+			);
+			process.env.WP_ENV_MARIADB_VERSION = 'LTS';
+			await expect( readConfig( '.wp-env.json' ) ).rejects.toEqual(
+				new ValidationError(
+					'Invalid environment variable: "WP_ENV_MARIADB_VERSION" must be "lts", "latest", or a version such as "10.11" or "11.4.2".'
+				)
+			);
+		} );
+	} );
+
 	describe( 'port number parsing', () => {
 		it( 'should throw a validaton error if the ports are not numbers', async () => {
 			expect.assertions( 10 );
