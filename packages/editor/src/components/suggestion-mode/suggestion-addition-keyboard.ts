@@ -12,20 +12,21 @@ import { INLINE_OP_TYPE } from './operations';
 import { useSuggestionsProvider } from './provider';
 import { useSuggestionSession } from './suggestion-session';
 import useAbandonedNoteCleanup from './use-abandoned-note-cleanup';
-import { readInlineCaret, wrapInlineMarker } from '../inline-markers';
+import { readInlineCaret } from '../inline-markers';
 import {
-	suggestionFormatNameFor,
 	SUGGESTION_TYPE_ADDITION,
 	SUGGESTION_TYPE_DELETION,
 	SUGGESTION_TYPE_REPLACEMENT,
 	buildSuggestionMarkerAttributes,
+	classifyOverlap,
 	insertInlineAddition,
 	growInlineAddition,
 	rejectInlineDeletion,
 	reviseOwnAddition,
 	valueAdditionRunToExtend,
-	valueRangeHasSuggestion,
+	wrapSuggestionMarker,
 } from '../inline-suggestions';
+import { toRichTextRecord } from '../inline-suggestions/rich-text-record';
 import {
 	getCandidateDocuments,
 	isEventTargetSelectedRichText,
@@ -496,8 +497,8 @@ export default function SuggestionAdditionKeyboard() {
 				 */
 				let value = attributes[ attributeKey ];
 				if ( isTypeOver ) {
-					const deleted = wrapInlineMarker( value, {
-						formatType: suggestionFormatNameFor( 'del' ),
+					const deleted = wrapSuggestionMarker( value, {
+						kind: 'del',
 						attributes: buildSuggestionMarkerAttributes( {
 							id,
 							type: SUGGESTION_TYPE_DELETION,
@@ -723,26 +724,44 @@ export default function SuggestionAdditionKeyboard() {
 					return true;
 				}
 			}
-			if (
-				start !== end &&
-				valueRangeHasSuggestion(
+			/*
+			 * Typing over a selection, or at a caret, that someone else's
+			 * marker would have to share is declined: the new text cannot sit
+			 * inside their addition or deletion, and the replaced text cannot
+			 * be deleted twice. Over someone's formatting change it is a
+			 * replacement of its own. The gesture is consumed, so the caller
+			 * cancels the native edit and the existing suggestion stays
+			 * exactly as it was.
+			 */
+			const authorToken =
+				authorId === null || authorId === undefined
+					? null
+					: String( authorId );
+			const record = toRichTextRecord(
+				getBlockAttributes( clientId )?.[ attributeKey ]
+			);
+			const isOwnRunCaret =
+				start === end &&
+				!! valueAdditionRunToExtend(
 					getBlockAttributes( clientId )?.[ attributeKey ],
 					start,
-					end
-				)
-			) {
-				/*
-				 * Type-over of a selection that overlaps an existing
-				 * suggestion marker: wrapping it in the `del` marker would
-				 * re-attribute part of that marker to the new id (see
-				 * `formatsRangeHasSuggestion`), and the overlay it used to
-				 * fall through to would hide that marker (#73411, F-09).
-				 * Neither representation fits, so the gesture is consumed and
-				 * declined — the caller cancels the native edit, leaving the
-				 * existing suggestion exactly as it was.
-				 */
+					authorToken
+				);
+			const verdict =
+				record && ! isOwnRunCaret
+					? classifyOverlap( record.formats, {
+							gesture: start === end ? 'insert' : 'type-over',
+							start,
+							end,
+							authorToken,
+						} )
+					: null;
+			if ( verdict?.verdict === 'refuse' ) {
 				resetRun();
-				notifyEditRefused( registry );
+				notifyEditRefused( registry, {
+					reason: verdict.reason!,
+					blocking: verdict.blocking,
+				} );
 				return true;
 			}
 			const run = runRef.current;
