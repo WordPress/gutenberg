@@ -156,11 +156,22 @@ function dockerFileContents( image, config ) {
 	return `FROM ${ image }
 
 RUN apt-get -qy install $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
-${ shouldInstallXdebug ? installXdebug( config.xdebug ) : '' }
+${ shouldInstallXdebug ? installXdebug( config ) : '' }
 `;
 }
 
-function installXdebug( enableXdebug ) {
+function installXdebug( config ) {
+	const enableXdebug = config.xdebug;
+	const phpVersion = config.env.development.phpVersion;
+
+	// For now, we support PHP 7 by installing the final version of Xdebug to
+	// support PHP 7 when the environment uses that version. By default, use the
+	// latest version.
+	const xdebugVersion =
+		phpVersion && parseInt( phpVersion.split( '.' )[ 0 ] ) === 7
+			? 'xdebug-3.1.6'
+			: 'xdebug';
+
 	const isLinux = os.type() === 'Linux';
 	// Discover client host does not appear to work on macOS with Docker.
 	const clientDetectSettings = isLinux
@@ -169,7 +180,7 @@ function installXdebug( enableXdebug ) {
 
 	return `
 # Install Xdebug:
-RUN if [ -z "$(pecl list | grep xdebug)" ] ; then pecl install xdebug ; fi
+RUN if [ -z "$(pecl list | grep ${ xdebugVersion })" ] ; then pecl install ${ xdebugVersion } ; fi
 RUN docker-php-ext-enable xdebug
 RUN echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/php.ini
 RUN echo 'xdebug.mode=${ enableXdebug }' >> /usr/local/etc/php/php.ini
