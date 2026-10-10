@@ -61,6 +61,7 @@ import type { SuggestionMarker } from './marker';
 import { getNoteIdsFromMetadata } from '../collab-sidebar/utils';
 import { getBlockTreeVersion } from './block-tree-version';
 import { useSuggestionsProvider } from './provider';
+import { useHydratePostFieldProposals } from './post-field-proposal-hydration';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 
@@ -265,6 +266,8 @@ export default function SuggestionAutoSave() {
 	const proposalsRef = useRef( proposals );
 	proposalsRef.current = proposals;
 
+	useHydratePostFieldProposals( currentUserId );
+
 	// Per-clientId debounce timer.
 	const timersRef = useRef(
 		new Map< string, ReturnType< typeof setTimeout > >()
@@ -328,11 +331,13 @@ export default function SuggestionAutoSave() {
 			let blockName = '';
 			let metadata: any;
 			let marker: SuggestionMarker | null = null;
+			// A proposal restored from its pending note names that note.
+			let proposalNoteId: number | undefined;
 			const proposalId = proposalIdFromClientId( clientId );
 			if ( proposalId !== null ) {
-				operations = postOperationsFromProposal(
-					proposalsRef.current?.[ proposalId ]
-				);
+				const proposal = proposalsRef.current?.[ proposalId ];
+				operations = postOperationsFromProposal( proposal );
+				proposalNoteId = proposal?.commentId;
 			} else {
 				const block = readBlock( clientId );
 				marker = block.marker;
@@ -364,7 +369,7 @@ export default function SuggestionAutoSave() {
 			const userId: number | null =
 				coreSelect.getCurrentUser?.()?.id ?? null;
 			let commentId: number | null = tracked.commentId;
-			if ( ! commentId && marker ) {
+			if ( ! commentId && ( marker || proposalNoteId ) ) {
 				/*
 				 * An id this session did not create is only a hint from
 				 * content (see `isActionableNote`). One that is not a
@@ -375,15 +380,16 @@ export default function SuggestionAutoSave() {
 				 * nor replaced: this sync waits, and the next marker change
 				 * (or the notes arriving) retries.
 				 */
-				const hinted =
-					marker.commentId ??
-					findLinkedPendingNote(
-						coreSelect,
-						metadata,
-						marker.type !== 'pending-attributes',
-						postId,
-						userId
-					);
+				const hinted = marker
+					? ( marker.commentId ??
+						findLinkedPendingNote(
+							coreSelect,
+							metadata,
+							marker.type !== 'pending-attributes',
+							postId,
+							userId
+						) )
+					: proposalNoteId;
 				if ( hinted ) {
 					const record = coreSelect.getEntityRecord(
 						'root',
@@ -396,9 +402,10 @@ export default function SuggestionAutoSave() {
 					if ( isActionableNote( record, postId, userId ) ) {
 						commentId = hinted;
 						/*
-						 * A reloaded marker whose note already holds these
-						 * operations has nothing to save; without this every
-						 * pending note of ours would be rewritten on load.
+						 * A reloaded marker (or restored proposal) whose note
+						 * already holds these operations has nothing to save;
+						 * without this every pending note of ours would be
+						 * rewritten on load.
 						 */
 						const payload = parseSuggestionPayload(
 							record.meta?._wp_suggestion

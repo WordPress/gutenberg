@@ -87,14 +87,22 @@ export function useSuggestionDecisions() {
 	 * @param postOps The decided post-level operations.
 	 */
 	const clearPostFieldProposals = useCallback(
-		( postOps: any[] ) => {
+		( postOps: any[], commentId: number | string ) => {
 			const { clearPostFieldProposal } = unlock(
 				registry.dispatch( STORE_NAME )
 			) as any;
+			const proposals = unlock(
+				registry.select( STORE_NAME )
+			).getPostFieldProposals();
 			for ( const op of postOps ) {
-				clearPostFieldProposal(
-					getPostFieldProposalId( op.attribute, op.key )
-				);
+				const id = getPostFieldProposalId( op.attribute, op.key );
+				// A proposal restored from another of the user's notes is
+				// not the one decided.
+				const linked = proposals[ id ]?.commentId;
+				if ( linked && String( linked ) !== String( commentId ) ) {
+					continue;
+				}
+				clearPostFieldProposal( id );
 			}
 		},
 		[ registry ]
@@ -229,7 +237,7 @@ export function useSuggestionDecisions() {
 				try {
 					applyPostFieldSuggestion( applyPostOperations( postOps ) );
 					await store.setLifecycleStatus( commentId, 'applied' );
-					clearPostFieldProposals( postOps );
+					clearPostFieldProposals( postOps, commentId );
 				} catch ( error: any ) {
 					applyPostFieldSuggestion( previous );
 					createNotice(
@@ -450,7 +458,7 @@ export function useSuggestionDecisions() {
 			if ( rejectedPostOps.length > 0 ) {
 				try {
 					await store.setLifecycleStatus( commentId, 'rejected' );
-					clearPostFieldProposals( rejectedPostOps );
+					clearPostFieldProposals( rejectedPostOps, commentId );
 				} catch ( error: any ) {
 					createNotice(
 						'error',

@@ -264,10 +264,20 @@ export default function SuggestionUndoGuard() {
 		const seqs = proposalSeqsRef.current;
 		let changed = false;
 		for ( const [ id, proposal ] of Object.entries( proposals ?? {} ) ) {
-			const isPending = ! isAttributeEqual(
-				proposal.baseline ?? null,
-				proposal.proposed ?? null
-			);
+			// A proposal restored from its note, and not edited since, is
+			// from an earlier session: nothing in this one to undo.
+			const isPending =
+				! isAttributeEqual(
+					proposal.baseline ?? null,
+					proposal.proposed ?? null
+				) &&
+				! (
+					proposal.commentId &&
+					isAttributeEqual(
+						proposal.noteValue ?? null,
+						proposal.proposed ?? null
+					)
+				);
 			if ( ! isPending ) {
 				changed = seqs.delete( id ) || changed;
 			} else if ( seqs.get( id )?.proposal !== proposal ) {
@@ -427,9 +437,13 @@ export default function SuggestionUndoGuard() {
 				const { setPostFieldProposal } = unlock(
 					registry.dispatch( STORE_NAME )
 				) as any;
+				// A restored proposal goes back to what its note holds;
+				// withdrawing the note would undo an earlier session.
 				setPostFieldProposal( newestField.id, {
 					...newestField.proposal,
-					proposed: newestField.proposal.baseline,
+					proposed: newestField.proposal.commentId
+						? newestField.proposal.noteValue
+						: newestField.proposal.baseline,
 				} );
 				return true;
 			}

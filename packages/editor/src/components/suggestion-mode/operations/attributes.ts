@@ -118,6 +118,17 @@ export interface PostFieldProposal {
 	key?: string;
 	baseline: any;
 	proposed: any;
+	/**
+	 * The pending note the proposal was restored from after a reload, which
+	 * later edits update rather than opening another.
+	 */
+	commentId?: number;
+	/**
+	 * The value that note holds as restored. Undo goes back to it rather
+	 * than withdrawing the note, since it was proposed in an earlier
+	 * session.
+	 */
+	noteValue?: any;
 }
 
 /**
