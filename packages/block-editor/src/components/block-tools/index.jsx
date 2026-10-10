@@ -13,6 +13,7 @@ import {
 	default as InsertionPoint,
 } from './insertion-point';
 import BlockToolbarPopover from './block-toolbar-popover';
+import BlockSelectionLabel from './block-selection-label';
 import { store as blockEditorStore } from '../../store';
 import { groupBlocks } from '../../utils/group-blocks';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
@@ -85,8 +86,11 @@ export default function BlockTools( {
 		canEditBlock,
 	} = unlock( useSelect( blockEditorStore ) );
 	const { getGroupingBlockName } = useSelect( blocksStore );
-	const { showEmptyBlockSideInserter, showBlockToolbarPopover } =
-		useShowBlockTools();
+	const {
+		showEmptyBlockSideInserter,
+		showBlockToolbarPopover,
+		showBlockSelectionLabel,
+	} = useShowBlockTools();
 	const pasteStyles = usePasteStyles();
 	const [ renamingBlockClientId, setRenamingBlockClientId ] =
 		useState( null );
@@ -308,6 +312,13 @@ export default function BlockTools( {
 						__unstableContentRef={ __unstableContentRef }
 						clientId={ clientId }
 						isTyping={ isTyping }
+					/>
+				) }
+
+				{ showBlockSelectionLabel && (
+					<BlockSelectionLabel
+						__unstableContentRef={ __unstableContentRef }
+						clientId={ clientId }
 					/>
 				) }
 

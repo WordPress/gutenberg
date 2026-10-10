@@ -18,6 +18,7 @@ export function useShowBlockTools() {
 			getSettings,
 			isTyping,
 			isBlockInterfaceHidden,
+			hasMultiSelection,
 		} = unlock( select( blockEditorStore ) );
 
 		const clientId =
@@ -38,9 +39,20 @@ export function useShowBlockTools() {
 			hasSelectedBlock &&
 			! isEmptyDefaultBlock;
 
+		// The label names the single selected block on the canvas. An empty
+		// default block shows its placeholder instead, and typing hides it
+		// along with the rest of the block UI.
+		const _showBlockSelectionLabel =
+			! isBlockInterfaceHidden() &&
+			hasSelectedBlock &&
+			! hasMultiSelection() &&
+			! isEmptyDefaultBlock &&
+			! isTyping();
+
 		return {
 			showEmptyBlockSideInserter: _showEmptyBlockSideInserter,
 			showBlockToolbarPopover: _showBlockToolbarPopover,
+			showBlockSelectionLabel: _showBlockSelectionLabel,
 		};
 	}, [] );
 }
