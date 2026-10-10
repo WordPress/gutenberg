@@ -20,6 +20,8 @@ import {
 	useSuggestionsProvider,
 } from '../suggestion-mode';
 import SuggestionSummary from '../suggestion-mode/suggestion-summary';
+import { isAttributeEqual } from '../suggestion-mode/operations';
+import { unlock } from '../../lock-unlock';
 import {
 	SUGGESTION_TYPE_ADDITION,
 	SUGGESTION_TYPE_DELETION,
@@ -120,16 +122,23 @@ export function useSuggestionDecision( thread: any ) {
 			// A post-level suggestion targets the post itself, which always
 			// exists; its staleness is checked against the post's fields.
 			if ( isPostSuggestion ) {
-				const { getEditedPostAttribute } = select( editorStore );
-				const currentFields = Object.fromEntries(
-					postOps.map( ( op: any ) => [
-						op.attribute,
-						getEditedPostAttribute( op.attribute ),
-					] )
+				// The post's own value, not a pending proposal laid over it:
+				// a reviewer who is suggesting sees proposals in the fields.
+				const { getPostFieldValueWithoutProposals } = unlock(
+					select( editorStore )
 				);
 				return {
 					blockExists: true,
-					hasConflict: hasAttributeConflict( currentFields, postOps ),
+					hasConflict: postOps.some(
+						( op: any ) =>
+							! isAttributeEqual(
+								op.before ?? null,
+								getPostFieldValueWithoutProposals(
+									op.attribute,
+									op.key
+								) ?? null
+							)
+					),
 				};
 			}
 			const { getBlock, getBlockAttributes } = select( blockEditorStore );
@@ -298,7 +307,7 @@ export function SuggestionActionButtons( {
 				>
 					{ decision.isPostSuggestion
 						? __(
-								'The title has changed since the suggestion was made. Applying it will overwrite the newer edit. Continue?'
+								'This post setting has changed since the suggestion was made. Applying it will overwrite the newer edit. Continue?'
 							)
 						: __(
 								'This block has changed since the suggestion was made. Applying it will overwrite the newer edit. Continue?'

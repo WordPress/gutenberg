@@ -83,14 +83,46 @@ export const EDITOR_INTENTS = [
 export type EditorIntent = ( typeof EDITOR_INTENTS )[ number ];
 
 /**
- * Post-level fields the Suggest intent refuses to edit because there is no way
- * to hold them as a pending proposal: they are not part of the block tree, so
- * nothing can carry a marker for them and nothing can review them later. Only
- * `status` is listed for now — it is the field that carries editorial
- * authority. The rest of the post-level fields (title, excerpt, featured image)
- * still need a per-field capture-or-disable decision. See issue #73411 (F-15).
+ * Post-level fields the Suggest intent refuses with a field-specific message
+ * and discards when staged on the way in. `status` carries editorial
+ * authority, so it gets its own announcement; every other post-level field
+ * that is not proposable is refused by the generic guard in
+ * `suggest-post-edits.ts`. See issue #73411 (F-15).
  */
 export const SUGGEST_LOCKED_POST_FIELDS = [ 'status' ] as const;
+
+/**
+ * Post edits that carry the block content rather than a post-level field.
+ * Suggestion mode captures content changes as markers inside the blocks, so
+ * these edits pass through to the post while suggesting; every other key of
+ * the post record is either proposed or refused. See issue #73411.
+ */
+export const SUGGEST_CONTENT_POST_FIELDS = [
+	'blocks',
+	'content',
+	'selection',
+] as const;
+
+/**
+ * Post meta keys that are derived from the block content (footnotes are
+ * written to meta by the block sync as the blocks change), so they pass
+ * through like the content itself.
+ */
+export const SUGGEST_CONTENT_META_KEYS = [ 'footnotes' ] as const;
+
+/**
+ * Post fields Suggestion mode holds as proposals: an edit to one is kept in
+ * the editor store (`postFieldProposals`), shown in place of the post's value
+ * while suggesting, and saved as a note for a reviewer to accept or reject.
+ * The post's taxonomies (by `rest_base`) and its registered meta keys are
+ * proposable too; see `isProposablePostField`.
+ */
+export const SUGGEST_PROPOSABLE_POST_FIELDS = [
+	'title',
+	'excerpt',
+	'featured_media',
+	'slug',
+] as const;
 
 /**
  * Class token carried by an inline suggestion marker

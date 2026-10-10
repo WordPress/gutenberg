@@ -8,7 +8,22 @@ import { kebabCase } from '@wordpress/kebab-case';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
 import { Menu } from '@wordpress/ui';
 import { unlock } from '../../lock-unlock';
+import { useIsPostSettingLocked } from '../suggestion-mode/use-locked-post-field';
 import { usePostActions } from './actions';
+
+/*
+ * Suggestion mode proposes changes to the post. Trashing or deleting it, and
+ * changing which page is the homepage or posts page (a site setting), are not
+ * changes a reviewer could accept, so they are not offered while suggesting.
+ * See issue #73411.
+ */
+const SUGGEST_LOCKED_ACTIONS = [
+	'move-to-trash',
+	'permanently-delete',
+	'delete-post',
+	'set-as-homepage',
+	'set-as-posts-page',
+];
 
 export default function PostActions( { postType, postId, onActionPerformed } ) {
 	const [ activeModalAction, setActiveModalAction ] = useState( null );
@@ -35,14 +50,21 @@ export default function PostActions( { postType, postId, onActionPerformed } ) {
 		};
 	}, [ item, permissions ] );
 	const allActions = usePostActions( { postType, onActionPerformed } );
+	const isSuggesting = useIsPostSettingLocked();
 
 	const actions = useMemo( () => {
 		return allActions.filter( ( action ) => {
+			if (
+				isSuggesting &&
+				SUGGEST_LOCKED_ACTIONS.includes( action.id )
+			) {
+				return false;
+			}
 			return (
 				! action.isEligible || action.isEligible( itemWithPermissions )
 			);
 		} );
-	}, [ allActions, itemWithPermissions ] );
+	}, [ allActions, itemWithPermissions, isSuggesting ] );
 
 	return (
 		<>

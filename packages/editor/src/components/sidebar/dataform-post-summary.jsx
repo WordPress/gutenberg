@@ -16,11 +16,26 @@ import revisionsField from '../../dataviews/fields/revisions';
 import {
 	EDITOR_INTENT_SUGGEST,
 	SUGGEST_LOCKED_POST_FIELDS,
+	SUGGEST_PROPOSABLE_POST_FIELDS,
 } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 import readingSettingsField from '../../dataviews/fields/reading-settings';
 
 const EMPTY_FORM = { layout: { type: 'panel' }, fields: [] };
+
+/**
+ * Whether a summary field stays editable while suggesting: one Suggestion
+ * mode holds as a proposal, or one that does not edit the post at all.
+ *
+ * @param {string} id Field id.
+ * @return {boolean} Whether the field stays editable.
+ */
+function isProposableWhileSuggesting( id ) {
+	return (
+		SUGGEST_PROPOSABLE_POST_FIELDS.includes( id ) ||
+		[ 'post-content-info' ].includes( id )
+	);
+}
 const VIEW_CONFIG_FIELDS = [ 'form' ];
 
 /**
@@ -275,6 +290,7 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 	}, [ record, entityRecords, availableTemplates ] );
 
 	const { editEntityRecord } = useDispatch( coreDataStore );
+	const { editPost } = useDispatch( editorStore );
 	const registry = useRegistry();
 
 	// Map of namespaced field id to the namespace key its entity is merged under.
@@ -297,11 +313,17 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 				?.map( ( field ) => {
 					const namespace = fieldNamespaces[ field.id ];
 					if ( namespace ) {
-						return bindFieldToNamespace(
+						const bound = bindFieldToNamespace(
 							field,
 							namespace,
 							ENTITIES[ postType ]?.[ namespace ]?.isVisible
 						);
+						// Site settings (and the posts page title) are not
+						// part of the post, so a suggestion cannot propose
+						// them. See issue #73411.
+						return isSuggesting
+							? { ...bound, readOnly: true }
+							: bound;
 					}
 					if ( field.id === 'status' ) {
 						return {
@@ -315,6 +337,17 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 							// change it. See issue #73411 (F-15).
 							readOnly: isSuggesting,
 						};
+					}
+					/*
+					 * Every other post setting is read-only while suggesting:
+					 * the store refuses an edit it cannot hold as a proposal,
+					 * so the form should not offer one. See issue #73411.
+					 */
+					if (
+						isSuggesting &&
+						! isProposableWhileSuggesting( field.id )
+					) {
+						return { ...field, readOnly: true };
 					}
 					if ( field.id === 'template' ) {
 						// `usePostTemplatePanelMode` is reused in the Post Template panel to match
@@ -409,6 +442,16 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 			record?.password
 		) {
 			baseEdits.password = '';
+		}
+
+		/*
+		 * While suggesting, the post's own edits go through `editPost`, which
+		 * holds proposable fields as proposals and refuses the rest. A direct
+		 * entity write would only be refused.
+		 */
+		if ( isSuggesting ) {
+			editPost( baseEdits );
+			return;
 		}
 
 		editEntityRecord( 'postType', postType, postId, baseEdits );

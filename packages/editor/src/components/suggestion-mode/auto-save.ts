@@ -45,18 +45,23 @@ import { useSuggestionSession } from './suggestion-session';
 import type { StructuralCapture } from './suggestion-session';
 import {
 	operationsFromMarker,
-	postOperationsFromTitle,
+	postOperationsFromProposal,
 	parseSuggestionPayload,
 	findStructuralOp,
 	findInlineOp,
 	structuralOpFromMarker,
 } from './operations';
-import type { SuggestionOperation, BlockTreeReader } from './operations';
+import type {
+	SuggestionOperation,
+	BlockTreeReader,
+	PostFieldProposal,
+} from './operations';
 import { readSuggestionMarker, proposedAttributes } from './marker';
 import type { SuggestionMarker } from './marker';
 import { getNoteIdsFromMetadata } from '../collab-sidebar/utils';
 import { getBlockTreeVersion } from './block-tree-version';
 import { useSuggestionsProvider } from './provider';
+import { useHydratePostFieldProposals } from './post-field-proposal-hydration';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 
@@ -64,6 +69,36 @@ const AUTOSAVE_DEBOUNCE_MS = 1500;
 
 /** Queue key for the post title, which is not a block. */
 export const POST_TITLE_CLIENT_ID = '__post_title__';
+
+const POST_FIELD_CLIENT_ID_PREFIX = '__post_field__:';
+
+/**
+ * Queue key for a post field proposal, which has no block. The title keeps
+ * the key it always had.
+ *
+ * @param proposalId The proposal id (`title`, `excerpt`, `meta.<key>`...).
+ * @return Queue key.
+ */
+export function postFieldClientId( proposalId: string ): string {
+	return proposalId === 'title'
+		? POST_TITLE_CLIENT_ID
+		: `${ POST_FIELD_CLIENT_ID_PREFIX }${ proposalId }`;
+}
+
+/**
+ * The proposal id behind a post field queue key, or null for a block.
+ *
+ * @param clientId Queue key.
+ * @return Proposal id, or null.
+ */
+function proposalIdFromClientId( clientId: string ): string | null {
+	if ( clientId === POST_TITLE_CLIENT_ID ) {
+		return 'title';
+	}
+	return clientId.startsWith( POST_FIELD_CLIENT_ID_PREFIX )
+		? clientId.slice( POST_FIELD_CLIENT_ID_PREFIX.length )
+		: null;
+}
 
 /**
  * Deterministic fingerprint of a list of operations so we can detect whether
@@ -198,17 +233,20 @@ function findLinkedPendingNote(
  * @return Renders nothing.
  */
 export default function SuggestionAutoSave() {
-	const { getStructuralCaptures, postTitleProposal } = useSuggestionSession();
+	const { getStructuralCaptures } = useSuggestionSession();
 	const { createSuggestion, updateSuggestion, deleteSuggestion } =
 		useSuggestionsProvider();
 	const registry = useRegistry();
 
-	const { isSuggestMode, treeVersion, currentUserId } = useSelect(
+	const { isSuggestMode, treeVersion, currentUserId, proposals } = useSelect(
 		( select ) => ( {
 			// `getEditorIntent` is private while Suggest mode is experimental.
 			isSuggestMode:
 				unlock( select( STORE_NAME ) ).getEditorIntent() ===
 				EDITOR_INTENT_SUGGEST,
+			proposals: unlock(
+				select( STORE_NAME )
+			).getPostFieldProposals() as Record< string, PostFieldProposal >,
 			treeVersion: getBlockTreeVersion( select( blockEditorStore ) ),
 			currentUserId:
 				( select( coreStore ) as any )?.getCurrentUser?.()?.id ?? null,
@@ -225,8 +263,10 @@ export default function SuggestionAutoSave() {
 	updateRef.current = updateSuggestion;
 	const deleteRef = useRef( deleteSuggestion );
 	deleteRef.current = deleteSuggestion;
-	const titleRef = useRef( postTitleProposal );
-	titleRef.current = postTitleProposal;
+	const proposalsRef = useRef( proposals );
+	proposalsRef.current = proposals;
+
+	useHydratePostFieldProposals( currentUserId );
 
 	// Per-clientId debounce timer.
 	const timersRef = useRef(
@@ -264,7 +304,7 @@ export default function SuggestionAutoSave() {
 	const writeCommentId = useCallback(
 		( clientId: string, id: number | null ) => {
 			track( clientId ).commentId = id;
-			if ( clientId === POST_TITLE_CLIENT_ID ) {
+			if ( proposalIdFromClientId( clientId ) !== null ) {
 				return;
 			}
 			const { attributes, marker } = readBlock( clientId );
@@ -291,8 +331,13 @@ export default function SuggestionAutoSave() {
 			let blockName = '';
 			let metadata: any;
 			let marker: SuggestionMarker | null = null;
-			if ( clientId === POST_TITLE_CLIENT_ID ) {
-				operations = postOperationsFromTitle( titleRef.current );
+			// A proposal restored from its pending note names that note.
+			let proposalNoteId: number | undefined;
+			const proposalId = proposalIdFromClientId( clientId );
+			if ( proposalId !== null ) {
+				const proposal = proposalsRef.current?.[ proposalId ];
+				operations = postOperationsFromProposal( proposal );
+				proposalNoteId = proposal?.commentId;
 			} else {
 				const block = readBlock( clientId );
 				marker = block.marker;
@@ -324,7 +369,7 @@ export default function SuggestionAutoSave() {
 			const userId: number | null =
 				coreSelect.getCurrentUser?.()?.id ?? null;
 			let commentId: number | null = tracked.commentId;
-			if ( ! commentId && marker ) {
+			if ( ! commentId && ( marker || proposalNoteId ) ) {
 				/*
 				 * An id this session did not create is only a hint from
 				 * content (see `isActionableNote`). One that is not a
@@ -335,15 +380,16 @@ export default function SuggestionAutoSave() {
 				 * nor replaced: this sync waits, and the next marker change
 				 * (or the notes arriving) retries.
 				 */
-				const hinted =
-					marker.commentId ??
-					findLinkedPendingNote(
-						coreSelect,
-						metadata,
-						marker.type !== 'pending-attributes',
-						postId,
-						userId
-					);
+				const hinted = marker
+					? ( marker.commentId ??
+						findLinkedPendingNote(
+							coreSelect,
+							metadata,
+							marker.type !== 'pending-attributes',
+							postId,
+							userId
+						) )
+					: proposalNoteId;
 				if ( hinted ) {
 					const record = coreSelect.getEntityRecord(
 						'root',
@@ -356,9 +402,10 @@ export default function SuggestionAutoSave() {
 					if ( isActionableNote( record, postId, userId ) ) {
 						commentId = hinted;
 						/*
-						 * A reloaded marker whose note already holds these
-						 * operations has nothing to save; without this every
-						 * pending note of ours would be rewritten on load.
+						 * A reloaded marker (or restored proposal) whose note
+						 * already holds these operations has nothing to save;
+						 * without this every pending note of ours would be
+						 * rewritten on load.
 						 */
 						const payload = parseSuggestionPayload(
 							record.meta?._wp_suggestion
@@ -397,9 +444,7 @@ export default function SuggestionAutoSave() {
 						await deleteRef.current( {
 							commentId,
 							clientId:
-								clientId === POST_TITLE_CLIENT_ID
-									? undefined
-									: clientId,
+								proposalId !== null ? undefined : clientId,
 						} );
 						writeCommentId( clientId, null );
 					}
@@ -412,10 +457,7 @@ export default function SuggestionAutoSave() {
 					tracked.commentId = commentId;
 				} else {
 					const saved = await createRef.current( {
-						clientId:
-							clientId === POST_TITLE_CLIENT_ID
-								? undefined
-								: clientId,
+						clientId: proposalId !== null ? undefined : clientId,
 						blockName,
 						operations,
 					} );
@@ -537,12 +579,33 @@ export default function SuggestionAutoSave() {
 		enqueueSync,
 	] );
 
-	// Title: its own slot.
+	/*
+	 * Post fields: one slot per proposal (the title, the excerpt, one per
+	 * meta key...). Only a proposal whose identity changed restarts its
+	 * timer. A proposal dropped from the store was resolved by a decision,
+	 * so its note needs nothing more from this component.
+	 */
+	const scheduledProposalsRef = useRef< Record< string, PostFieldProposal > >(
+		{}
+	);
 	useEffect( () => {
-		if ( isSuggestMode && postTitleProposal ) {
-			schedule( POST_TITLE_CLIENT_ID );
+		if ( ! isSuggestMode ) {
+			scheduledProposalsRef.current = {};
+			return;
 		}
-	}, [ isSuggestMode, postTitleProposal, schedule ] );
+		const previous = scheduledProposalsRef.current;
+		for ( const [ id, proposal ] of Object.entries( proposals ?? {} ) ) {
+			if ( previous[ id ] !== proposal ) {
+				schedule( postFieldClientId( id ) );
+			}
+		}
+		for ( const id of Object.keys( previous ) ) {
+			if ( ! proposals?.[ id ] ) {
+				trackedRef.current.delete( postFieldClientId( id ) );
+			}
+		}
+		scheduledProposalsRef.current = proposals ?? {};
+	}, [ isSuggestMode, proposals, schedule ] );
 
 	// Save anything still waiting out its debounce on unmount (the
 	// experiment toggled off, the editor closed) rather than dropping it.

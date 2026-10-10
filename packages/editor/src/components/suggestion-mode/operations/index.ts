@@ -20,12 +20,14 @@ export {
 	isAttributeEqual,
 	operationsFromMarker,
 	postOperationsFromTitle,
+	postOperationsFromProposal,
 	clearSuggestionMarkerAttributes,
 	applyOperations,
 	rollbackAttributesFor,
 	applyPostOperations,
 	hasAttributeConflict,
 } from './attributes';
+export type { PostFieldProposal } from './attributes';
 export type { PlanStep, BlockPlan, BlockTreeReader } from './plan';
 export { planStructuralApply } from './structural-apply';
 export { planStructuralReject } from './structural-reject';
