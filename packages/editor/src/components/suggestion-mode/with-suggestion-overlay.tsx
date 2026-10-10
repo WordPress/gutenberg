@@ -219,6 +219,18 @@ function SuggestingBlockEdit( {
 			const plan = planFormatMarkers( prevContent, nextContent, {
 				authorId,
 			} );
+			/*
+			 * Formatting over someone's formatting change, or across the edge
+			 * of someone's addition, is declined here, naming whose
+			 * suggestion is in the way. The toggle never reaches the block.
+			 */
+			if ( plan.kind === 'refuse' ) {
+				notifyEditRefused( registry, {
+					reason: plan.reason!,
+					blocking: plan.blocking,
+				} );
+				return true;
+			}
 			if ( plan.kind !== 'format' ) {
 				return false;
 			}
@@ -233,7 +245,7 @@ function SuggestingBlockEdit( {
 				plan,
 			} );
 		},
-		[ clientId, name, authorId, requestFormatSuggestion ]
+		[ clientId, name, authorId, requestFormatSuggestion, registry ]
 	);
 
 	// Detect a text edit that reaches the block as a whole new `content` value
@@ -273,6 +285,21 @@ function SuggestingBlockEdit( {
 				authorId,
 			} );
 			const actions = plan?.actions ?? [];
+			/*
+			 * Typing inside someone's addition or deletion, or deleting over
+			 * someone's deletion, is declined, naming whose suggestion is in
+			 * the way. Over the author's own markers the plan has no single
+			 * marker to name, so the edit takes the path below, which
+			 * declines it too.
+			 */
+			if (
+				actions.length === 0 &&
+				plan.refusal?.blocking &&
+				plan.refusal.reason !== 'own-marker'
+			) {
+				notifyEditRefused( registry, plan.refusal );
+				return true;
+			}
 			if ( actions.length === 0 ) {
 				return false;
 			}
@@ -298,7 +325,7 @@ function SuggestingBlockEdit( {
 				plan,
 			} );
 		},
-		[ clientId, name, authorId, requestContentSuggestion ]
+		[ clientId, name, authorId, requestContentSuggestion, registry ]
 	);
 
 	const wrappedSetAttributes = useCallback(
