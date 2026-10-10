@@ -22,6 +22,7 @@ import withRegistryProvider from './with-registry-provider';
 import { store as editorStore } from '../../store';
 import useAutosaveNotice from './use-autosave-notice';
 import useSuggestionReviewNotice from './use-suggestion-review-notice';
+import { useSuggestPostEditGuard } from '../suggestion-mode/use-suggest-post-edit-guard';
 import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
 import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
@@ -435,6 +436,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		// mode. Same ordering requirement as the autosave notice: it reads
 		// the current post, which `setupEditor` populates above.
 		useSuggestionReviewNotice();
+
+		// Refuses direct post-level entity writes while suggesting.
+		useSuggestPostEditGuard();
 
 		// Synchronizes the active post with the state
 		useEffect( () => {

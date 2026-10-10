@@ -170,9 +170,9 @@ function propose(
 	} );
 }
 
-let session: ReturnType< typeof useSuggestionSession >;
+// Stands in for the editor around the auto-saver, inside the session.
 function CaptureSession() {
-	session = useSuggestionSession();
+	useSuggestionSession();
 	return null;
 }
 
@@ -696,13 +696,13 @@ describe( 'SuggestionAutoSave', () => {
 
 	it( 'saves the post title proposal with no block to link', async () => {
 		createSuggestion.mockResolvedValue( { id: 9 } );
-		renderWith( 'suggest', [] );
+		const { registry } = renderWith( 'suggest', [] );
 
 		act( () => {
-			session.setPostTitleProposal( {
-				baseline: 'Old',
-				proposed: 'New',
-			} );
+			unlock( registry.dispatch( editorStore ) ).setPostFieldProposal(
+				'title',
+				{ attribute: 'title', baseline: 'Old', proposed: 'New' }
+			);
 		} );
 		await pastDebounce();
 
@@ -719,6 +719,44 @@ describe( 'SuggestionAutoSave', () => {
 			],
 		} );
 		expect( POST_TITLE_CLIENT_ID ).toBe( '__post_title__' );
+	} );
+
+	it( 'saves each post field proposal as its own note', async () => {
+		createSuggestion.mockResolvedValue( { id: 10 } );
+		const { registry } = renderWith( 'suggest', [] );
+
+		act( () => {
+			const { setPostFieldProposal } = unlock(
+				registry.dispatch( editorStore )
+			);
+			setPostFieldProposal( 'excerpt', {
+				attribute: 'excerpt',
+				baseline: 'Old',
+				proposed: 'New',
+			} );
+			setPostFieldProposal( 'meta.my_meta', {
+				attribute: 'meta',
+				key: 'my_meta',
+				baseline: '',
+				proposed: 'x',
+			} );
+		} );
+		await pastDebounce();
+
+		expect( createSuggestion ).toHaveBeenCalledTimes( 2 );
+		expect( createSuggestion ).toHaveBeenCalledWith( {
+			clientId: undefined,
+			blockName: '',
+			operations: [
+				{
+					type: 'post-attribute-set',
+					attribute: 'meta',
+					key: 'my_meta',
+					before: '',
+					after: 'x',
+				},
+			],
+		} );
 	} );
 } );
 

@@ -4,9 +4,10 @@
  * What lives here is state that only one editor session needs and that
  * must never reach post content: interceptor bypass tokens, the single
  * format and content handler slots, the per-block write queue, the set of
- * deferred insertions, undo/redo adoption tokens, the structural operations
- * the interceptor captured as they happened, and the one proposed post
- * title (the title is not a block, so it has no marker to live in).
+ * deferred insertions, undo/redo adoption tokens, and the structural
+ * operations the interceptor captured as they happened. Post field
+ * proposals (the title, excerpt and the rest) live in the editor store, so
+ * `editPost` can hold them and `getEditedPostAttribute` can show them.
  *
  * What does NOT live here: proposals. A pending attribute suggestion is
  * written into the block's own `metadata.suggestion.after` (see `marker.ts`),
@@ -22,7 +23,6 @@ import {
 	useContext,
 	useMemo,
 	useRef,
-	useState,
 } from '@wordpress/element';
 import { createSuggestionWriteQueue } from './suggestion-write-queue';
 import type { SuggestionWriteQueue } from './suggestion-write-queue';
@@ -38,7 +38,7 @@ export type { SuggestionOperation };
  * not persisted.
  */
 let captureSequence = 0;
-const nextCaptureSeq = () => ++captureSequence;
+export const nextCaptureSeq = () => ++captureSequence;
 
 /*
  * How long an armed undo/redo adoption token stays valid. The token is armed
@@ -59,12 +59,6 @@ export interface StructuralCapture {
 	op: SuggestionOperation;
 	blockName: string;
 	seq: number;
-}
-
-/** The one in-memory proposal: the post title is not a block. */
-export interface PostTitleProposal {
-	baseline: string;
-	proposed: string;
 }
 
 /**
@@ -102,12 +96,9 @@ export interface SuggestionSessionActions {
 	) => void;
 	clearStructuralCapture: ( clientId: string ) => void;
 	getStructuralCaptures: () => ReadonlyMap< string, StructuralCapture >;
-	setPostTitleProposal: ( proposal: PostTitleProposal | null ) => void;
 }
 
-export interface SuggestionSessionValue extends SuggestionSessionActions {
-	postTitleProposal: PostTitleProposal | null;
-}
+export type SuggestionSessionValue = SuggestionSessionActions;
 
 const DEFAULT_ACTIONS: SuggestionSessionActions = {
 	requestInterceptorBypass: () => {},
@@ -130,16 +121,10 @@ const DEFAULT_ACTIONS: SuggestionSessionActions = {
 	recordStructuralCapture: () => {},
 	clearStructuralCapture: () => {},
 	getStructuralCaptures: () => new Map(),
-	setPostTitleProposal: () => {},
-};
-
-const DEFAULT_SESSION: SuggestionSessionValue = {
-	...DEFAULT_ACTIONS,
-	postTitleProposal: null,
 };
 
 const SessionContext =
-	createContext< SuggestionSessionValue >( DEFAULT_SESSION );
+	createContext< SuggestionSessionValue >( DEFAULT_ACTIONS );
 
 const SessionActionsContext =
 	createContext< SuggestionSessionActions >( DEFAULT_ACTIONS );
@@ -206,9 +191,6 @@ export function SuggestionSessionProvider( {
 			>,
 		[]
 	);
-
-	const [ postTitleProposal, setPostTitleProposal ] =
-		useState< PostTitleProposal | null >( null );
 
 	// Tracks clientIds whose next block-attribute mutation should bypass the
 	// store interceptor. The accept-suggestion flow uses this to land applied
@@ -416,7 +398,6 @@ export function SuggestionSessionProvider( {
 			recordStructuralCapture,
 			clearStructuralCapture,
 			getStructuralCaptures,
-			setPostTitleProposal,
 		} ),
 		[
 			requestInterceptorBypass,
@@ -438,18 +419,12 @@ export function SuggestionSessionProvider( {
 			recordStructuralCapture,
 			clearStructuralCapture,
 			getStructuralCaptures,
-			setPostTitleProposal,
 		]
-	);
-
-	const value = useMemo< SuggestionSessionValue >(
-		() => ( { ...actions, postTitleProposal } ),
-		[ actions, postTitleProposal ]
 	);
 
 	return (
 		<SessionActionsContext.Provider value={ actions }>
-			<SessionContext.Provider value={ value }>
+			<SessionContext.Provider value={ actions }>
 				{ children }
 			</SessionContext.Provider>
 		</SessionActionsContext.Provider>
@@ -457,8 +432,7 @@ export function SuggestionSessionProvider( {
 }
 
 /**
- * The session API including the post title proposal (re-renders when the
- * title proposal changes).
+ * The session API.
  *
  * @return Session value.
  */

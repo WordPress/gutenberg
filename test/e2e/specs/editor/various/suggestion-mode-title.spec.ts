@@ -99,10 +99,24 @@ test.describe( 'Suggestion mode: post title', () => {
 		const title = await suggestTitleChange( editor, page );
 
 		// The proposed title is shown, marked pending, and never reaches
-		// the post.
+		// the post: the editor reads the proposal while suggesting, the post
+		// entity keeps its title.
 		await expect( title ).toHaveText( 'Original title revised' );
 		await expect( title ).toHaveClass( /\bis-suggestion-pending\b/ );
-		expect( await getEditedTitle( page ) ).toBe( 'Original title' );
+		expect( await getEditedTitle( page ) ).toBe( 'Original title revised' );
+		expect(
+			await page.evaluate( () => {
+				const { wp } = window as any;
+				const editorSelect = wp.data.select( 'core/editor' );
+				return wp.data
+					.select( 'core' )
+					.getEditedEntityRecord(
+						'postType',
+						editorSelect.getCurrentPostType(),
+						editorSelect.getCurrentPostId()
+					).title;
+			} )
+		).toBe( 'Original title' );
 
 		const sidebar = await openNotesSidebar( page );
 		const thread = sidebar.locator(

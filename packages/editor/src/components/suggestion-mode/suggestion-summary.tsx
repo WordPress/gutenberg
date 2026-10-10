@@ -57,11 +57,16 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Matches the note card's own "Show more" toggle.
 import { Button as UIButton, Stack, Text } from '@wordpress/ui';
 import { useMemo, useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { useInstanceId } from '@wordpress/compose';
 import { __unstableStripHTML as wpStripHTML } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { wordDiff, MAX_DIFF_LENGTH } from './word-diff';
 import type { SuggestionOperation } from './operations';
+import { getPostFieldSummaryLabel } from './post-field-labels';
+import type { TaxonomyNames } from './post-field-labels';
+import { useTaxonomyNames } from './use-taxonomy-names';
 import type { WordDiffSegment } from './word-diff';
 
 /**
@@ -678,6 +683,108 @@ function isTextLike( value: any ): boolean {
 }
 
 /**
+ * The summary wording for terms a suggestion would create, by taxonomy
+ * `rest_base`: a sentence per built-in taxonomy, so translators see each
+ * whole phrase.
+ *
+ * @param restBase The taxonomy's `rest_base`.
+ * @param names    The comma-separated new term names.
+ * @return The wording.
+ */
+function describeNewTerms( restBase: string, names: string ): string {
+	switch ( restBase ) {
+		case 'categories':
+			/* translators: %s: comma-separated category names. */
+			return sprintf( __( 'New category: %s' ), names );
+		case 'tags':
+			/* translators: %s: comma-separated tag names. */
+			return sprintf( __( 'New tag: %s' ), names );
+	}
+	/* translators: %s: comma-separated term names. */
+	return sprintf( __( 'New term: %s' ), names );
+}
+
+/**
+ * Describe a change to a post field.
+ *
+ * Text fields (the title, excerpt and slug) quote the whole old and new
+ * value: they are short, and a word diff would hide what the field would
+ * read. The featured image says what happens to the image (its thumbnails
+ * show beside the summary), and terms list what is added and removed.
+ *
+ * @param op        A `post-attribute-set` operation.
+ * @param termNames Term names by id.
+ * @return The change, ready to show.
+ */
+function describePostFieldChange(
+	op: SuggestionOperation,
+	termNames: Record< number, string >
+): string {
+	if ( op.attribute === 'featured_media' ) {
+		if ( ! op.before ) {
+			return __( 'Set' );
+		}
+		return op.after ? __( 'Replace' ) : __( 'Remove' );
+	}
+	if ( Array.isArray( op.after ) || Array.isArray( op.before ) ) {
+		const before: any[] = Array.isArray( op.before ) ? op.before : [];
+		const after: any[] = Array.isArray( op.after ) ? op.after : [];
+		const name = ( id: any ) => termNames[ id ] ?? `#${ id }`;
+		// Terms that do not exist yet ride on the proposal by name.
+		const isNew = ( item: any ) => !! item && typeof item === 'object';
+		const created = after.filter( isNew );
+		const added = after.filter(
+			( id ) => ! isNew( id ) && ! before.includes( id )
+		);
+		const removed = before.filter( ( id ) => ! after.includes( id ) );
+		const parts: string[] = [];
+		if ( added.length ) {
+			parts.push(
+				sprintf(
+					/* translators: %s: comma-separated term names. */
+					__( 'Add %s' ),
+					added.map( name ).join( ', ' )
+				)
+			);
+		}
+		if ( created.length ) {
+			parts.push(
+				describeNewTerms(
+					op.attribute,
+					created
+						.map( ( term ) => stripTags( String( term.name ) ) )
+						.join( ', ' )
+				)
+			);
+		}
+		if ( removed.length ) {
+			parts.push(
+				sprintf(
+					/* translators: %s: comma-separated term names. */
+					__( 'Remove %s' ),
+					removed.map( name ).join( ', ' )
+				)
+			);
+		}
+		return parts.join( '; ' );
+	}
+	const text = ( value: any ) =>
+		typeof value === 'string' || typeof value === 'number'
+			? stripTags( String( value ) )
+			: JSON.stringify( value ?? '' );
+	const before = text( op.before ?? '' );
+	const after = text( op.after ?? '' );
+	return before
+		? sprintf(
+				/* translators: 1: current value. 2: proposed value. */
+				__( '%1$s → %2$s' ),
+				`“${ clampText( before, REPLACE_SIDE_MAX_CHARS ) }”`,
+				`“${ clampText( after, REPLACE_SIDE_MAX_CHARS ) }”`
+			)
+		: `“${ clampText( after ) }”`;
+}
+
+/**
  * Build a list of `{ label, value }` lines summarizing a suggestion. The
  * content attribute is reported with `Add:` / `Delete:` quotes; other
  * attribute changes are collapsed into a single `Change:` line listing the
@@ -687,14 +794,24 @@ function isTextLike( value: any ): boolean {
  * `truncate: false` for the uncapped wording behind a "Show more" toggle. Both
  * calls return the same lines in the same order, only the quotes differ.
  *
- * @param operations       Operations.
- * @param options          Options.
- * @param options.truncate Whether to cap quoted text. Defaults to true.
+ * @param operations         Operations.
+ * @param options            Options.
+ * @param options.truncate   Whether to cap quoted text. Defaults to true.
+ * @param options.taxonomies Taxonomy names by `rest_base`, for terms.
+ * @param options.termNames  Term names by id, for terms.
  * @return Rendered lines.
  */
 export function summarizeOperations(
 	operations: SuggestionOperation[] | null | undefined,
-	{ truncate = true }: { truncate?: boolean } = {}
+	{
+		truncate = true,
+		taxonomies = {},
+		termNames = {},
+	}: {
+		truncate?: boolean;
+		taxonomies?: TaxonomyNames;
+		termNames?: Record< number, string >;
+	} = {}
 ): Array< { label: string; value: string } > {
 	if ( ! Array.isArray( operations ) || operations.length === 0 ) {
 		return [];
@@ -732,24 +849,10 @@ export function summarizeOperations(
 			} );
 			continue;
 		}
-		// A post title suggestion quotes the whole old and new title: titles
-		// are short, and a word diff would hide what the title would read.
 		if ( op.type === 'post-attribute-set' ) {
-			const before = stripTags( op.before ?? '' );
-			const after = stripTags( op.after ?? '' );
 			lines.push( {
-				label:
-					op.attribute === 'title'
-						? __( 'Title:' )
-						: `${ humanizeAttributeName( op.attribute ) }:`,
-				value: before
-					? sprintf(
-							/* translators: 1: current post title. 2: proposed post title. */
-							__( '%1$s → %2$s' ),
-							`“${ clampText( before, REPLACE_SIDE_MAX_CHARS ) }”`,
-							`“${ clampText( after, REPLACE_SIDE_MAX_CHARS ) }”`
-						)
-					: `“${ clampText( after ) }”`,
+				label: getPostFieldSummaryLabel( op, taxonomies ),
+				value: describePostFieldChange( op, termNames ),
 			} );
 			continue;
 		}
@@ -1031,6 +1134,111 @@ export function summarizeOperations(
  * @param props            Props.
  * @param props.operations Operations to summarize.
  */
+const EMPTY_TERM_NAMES: Record< number, string > = {};
+
+/**
+ * Names of the terms a terms suggestion adds or removes, by id.
+ *
+ * @param operations Operations.
+ * @param taxonomies Taxonomy names by `rest_base`.
+ * @return Term names by id.
+ */
+function useTermNames(
+	operations: SuggestionOperation[],
+	taxonomies: TaxonomyNames
+): Record< number, string > {
+	return useSelect(
+		( select ) => {
+			const core = select( coreStore ) as any;
+			const all = core.getTaxonomies( { per_page: -1 } ) ?? [];
+			const names: Record< number, string > = {};
+			for ( const op of operations ?? [] ) {
+				if (
+					op?.type !== 'post-attribute-set' ||
+					! ( op.attribute in taxonomies )
+				) {
+					continue;
+				}
+				const taxonomy = all.find(
+					( item: any ) => item.rest_base === op.attribute
+				);
+				const ids = [
+					...( Array.isArray( op.before ) ? op.before : [] ),
+					...( Array.isArray( op.after ) ? op.after : [] ),
+				].filter( ( id ) => typeof id === 'number' );
+				if ( ! taxonomy || ! ids.length ) {
+					continue;
+				}
+				const terms =
+					core.getEntityRecords( 'taxonomy', taxonomy.slug, {
+						include: ids,
+						per_page: -1,
+						context: 'view',
+					} ) ?? [];
+				for ( const term of terms ) {
+					names[ term.id ] = decodeEntities( term.name );
+				}
+			}
+			return Object.keys( names ).length ? names : EMPTY_TERM_NAMES;
+		},
+		[ operations, taxonomies ]
+	);
+}
+
+/**
+ * Before and after thumbnails for a featured image suggestion.
+ *
+ * @param props            Props.
+ * @param props.operations Operations.
+ * @return The thumbnails, or nothing when no featured image changes.
+ */
+function FeaturedImageChange( {
+	operations,
+}: {
+	operations: SuggestionOperation[];
+} ) {
+	const op = operations?.find(
+		( item ) =>
+			item?.type === 'post-attribute-set' &&
+			item.attribute === 'featured_media'
+	);
+	const { before, after } = useSelect(
+		( select ) => {
+			const core = select( coreStore ) as any;
+			const media = ( id: any ) =>
+				id
+					? core.getEntityRecord( 'postType', 'attachment', id )
+					: null;
+			return { before: media( op?.before ), after: media( op?.after ) };
+		},
+		[ op?.before, op?.after ]
+	);
+	if ( ! op || ( ! before && ! after ) ) {
+		return null;
+	}
+	const thumbnail = ( media: any, label: string ) => {
+		const url =
+			media?.media_details?.sizes?.thumbnail?.source_url ??
+			media?.source_url;
+		return url ? (
+			<img
+				className="editor-collab-sidebar-panel__suggestion-thumbnail"
+				src={ url }
+				alt={ label }
+				width={ 48 }
+				height={ 48 }
+			/>
+		) : null;
+	};
+	return (
+		<Stack direction="row" gap="sm" align="center">
+			{ thumbnail( before, __( 'Current featured image' ) ) }
+			{ before && after && <span aria-hidden="true">→</span> }
+			{ thumbnail( after, __( 'Suggested featured image' ) ) }
+		</Stack>
+	);
+}
+
 export default function SuggestionSummary( {
 	operations,
 }: {
@@ -1041,13 +1249,20 @@ export default function SuggestionSummary( {
 		SuggestionSummary,
 		'editor-collab-sidebar-panel__suggestion-summary'
 	);
+	const taxonomies = useTaxonomyNames();
+	const termNames = useTermNames( operations, taxonomies );
 	const lines = useMemo(
-		() => summarizeOperations( operations ),
-		[ operations ]
+		() => summarizeOperations( operations, { taxonomies, termNames } ),
+		[ operations, taxonomies, termNames ]
 	);
 	const fullLines = useMemo(
-		() => summarizeOperations( operations, { truncate: false } ),
-		[ operations ]
+		() =>
+			summarizeOperations( operations, {
+				truncate: false,
+				taxonomies,
+				termNames,
+			} ),
+		[ operations, taxonomies, termNames ]
 	);
 	if ( lines.length === 0 ) {
 		return null;
@@ -1072,6 +1287,7 @@ export default function SuggestionSummary( {
 					</Text>
 				) ) }
 			</Stack>
+			<FeaturedImageChange operations={ operations } />
 			{ isTruncated && (
 				<UIButton
 					className="editor-collab-sidebar-panel__show-more-button"
