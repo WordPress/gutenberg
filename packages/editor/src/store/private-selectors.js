@@ -768,15 +768,33 @@ export const getPostFieldValueWithoutProposals = createRegistrySelector(
  * @return {boolean} Whether the change can be proposed.
  */
 export const isProposablePostField = createRegistrySelector(
-	( select ) => ( state, attribute ) => {
+	( select ) => ( state, attribute, key ) => {
 		if ( SUGGEST_PROPOSABLE_POST_FIELDS.includes( attribute ) ) {
 			return true;
+		}
+		const postType = getCurrentPostType( state );
+		/*
+		 * A meta key the post's REST record carries: only keys registered
+		 * with `show_in_rest` are there. The server checks the suggester
+		 * could edit that key when the note is saved, and the reviewer's
+		 * save checks it again for the reviewer.
+		 */
+		if ( attribute === 'meta' ) {
+			const meta = select( coreStore ).getEntityRecord(
+				'postType',
+				postType,
+				getCurrentPostId( state )
+			)?.meta;
+			return (
+				!! key &&
+				!! meta &&
+				Object.prototype.hasOwnProperty.call( meta, key )
+			);
 		}
 		// The post type's taxonomies, by the `rest_base` their term ids are
 		// edited under. Proposing terms assigns existing ones; creating a
 		// term is a real write the term pickers do not offer while
 		// suggesting.
-		const postType = getCurrentPostType( state );
 		return !! select( coreStore )
 			.getTaxonomies( { per_page: -1 } )
 			?.some(
