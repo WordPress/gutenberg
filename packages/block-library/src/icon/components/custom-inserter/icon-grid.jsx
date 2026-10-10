@@ -51,11 +51,8 @@ export default function IconGrid( { icons, onChange, value, collections } ) {
 		node.scrollIntoView( { block: 'center' } );
 	}, [ isReadyToScroll ] );
 
-	const renderIcons = ( iconsToRender, label ) => (
-		<div
-			className="wp-block-icon__inserter-grid-icons-list"
-			aria-label={ label }
-		>
+	const renderIcons = ( iconsToRender ) => (
+		<div className="wp-block-icon__inserter-grid-icons-list">
 			{ iconsToRender.map( ( icon ) => (
 				<Button
 					key={ icon.name }
@@ -120,13 +117,7 @@ export default function IconGrid( { icons, onChange, value, collections } ) {
 
 	return (
 		<div className="wp-block-icon__inserter-grid">
-			{ groups ? (
-				<div aria-label={ __( 'Icon library' ) }>
-					{ renderGroups() }
-				</div>
-			) : (
-				renderIcons( shownIcons, __( 'Icon library' ) )
-			) }
+			{ groups ? renderGroups() : renderIcons( shownIcons ) }
 		</div>
 	);
 }

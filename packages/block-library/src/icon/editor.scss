@@ -81,6 +81,10 @@
 	background-color: $white;
 }
 
+.wp-block-icon__inserter-modal .wp-block-icon__inserter-grid > :first-child > .wp-block-icon__inserter-grid-group-title {
+	margin-top: -$grid-unit-05;
+}
+
 .wp-block-icon__toolbar-content {
 	width: 250px;
 }
