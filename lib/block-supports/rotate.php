@@ -41,6 +41,10 @@ function gutenberg_register_rotate_support( $block_type ) {
  * @return float|null The rotation in degrees, or null when the value is not a rotation.
  */
 function gutenberg_get_rotate_value( $value ) {
+	// PHP 7 rejects numeric strings with trailing whitespace, PHP 8 accepts them.
+	if ( is_string( $value ) ) {
+		$value = trim( $value );
+	}
 	if ( ! is_numeric( $value ) ) {
 		return null;
 	}
