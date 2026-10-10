@@ -1,13 +1,10 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { select } from '@wordpress/data';
-import {
-	store as richTextStore,
-	unregisterFormatType,
-} from '@wordpress/rich-text';
+import { store as richTextStore } from '@wordpress/rich-text';
 import {
 	registerSuggestionFormat,
-	SUGGESTION_FORMAT_NAME,
-	SUGGESTION_CLASS,
+	unregisterSuggestionFormats,
+	SUGGESTION_MARKER_KINDS,
 	SUGGESTION_ID_ATTRIBUTE,
 	SUGGESTION_TYPE_ATTRIBUTE,
 	SUGGESTION_AUTHOR_ATTRIBUTE,
@@ -18,34 +15,53 @@ const getFormatType = ( name: string ) =>
 
 describe( 'registerSuggestionFormat', () => {
 	afterEach( () => {
-		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 	} );
 
-	it( 'registers the core/suggestion format as a wp-suggestion <mark>', () => {
+	it( 'registers one <mark> format per marker kind, with its class token', () => {
 		registerSuggestionFormat();
-		const format = getFormatType( SUGGESTION_FORMAT_NAME );
-		expect( format ).toBeTruthy();
-		expect( format.tagName ).toBe( 'mark' );
-		expect( format.className ).toBe( SUGGESTION_CLASS );
+		for ( const { formatName, className } of Object.values(
+			SUGGESTION_MARKER_KINDS
+		) ) {
+			const format = getFormatType( formatName );
+			expect( format ).toBeTruthy();
+			expect( format.tagName ).toBe( 'mark' );
+			expect( format.className ).toBe( className );
+		}
 	} );
 
 	it( 'declares the id, type, and author marker attributes', () => {
 		registerSuggestionFormat();
-		const format = getFormatType( SUGGESTION_FORMAT_NAME );
-		expect( Object.keys( format.attributes ) ).toEqual(
-			expect.arrayContaining( [
-				SUGGESTION_ID_ATTRIBUTE,
-				SUGGESTION_TYPE_ATTRIBUTE,
-				SUGGESTION_AUTHOR_ATTRIBUTE,
-			] )
-		);
+		for ( const { formatName } of Object.values(
+			SUGGESTION_MARKER_KINDS
+		) ) {
+			expect(
+				Object.keys( getFormatType( formatName ).attributes )
+			).toEqual(
+				expect.arrayContaining( [
+					SUGGESTION_ID_ATTRIBUTE,
+					SUGGESTION_TYPE_ATTRIBUTE,
+					SUGGESTION_AUTHOR_ATTRIBUTE,
+				] )
+			);
+		}
+	} );
+
+	it( 'registers the given edit component on every kind', () => {
+		const edit = () => null;
+		registerSuggestionFormat( edit );
+		for ( const { formatName } of Object.values(
+			SUGGESTION_MARKER_KINDS
+		) ) {
+			expect( getFormatType( formatName ).edit ).toBe( edit );
+		}
 	} );
 
 	it( 'is idempotent — a second call does not throw or duplicate', () => {
 		registerSuggestionFormat();
 		expect( () => registerSuggestionFormat() ).not.toThrow();
-		expect( getFormatType( SUGGESTION_FORMAT_NAME ) ).toBeTruthy();
+		expect(
+			getFormatType( SUGGESTION_MARKER_KINDS.add.formatName )
+		).toBeTruthy();
 	} );
 } );

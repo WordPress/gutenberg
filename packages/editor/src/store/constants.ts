@@ -125,16 +125,21 @@ export const SUGGEST_PROPOSABLE_POST_FIELDS = [
 ] as const;
 
 /**
- * Class token carried by an inline suggestion marker
- * (`<mark class="wp-suggestion">`) in serialized block content.
+ * Class tokens carried by inline suggestion markers in serialized block
+ * content, one per marker kind (`<mark class="wp-suggestion-add">`, `-del`,
+ * `-format`).
  *
- * Mirrors `SUGGESTION_CLASS` in `components/inline-suggestions/format.js`,
+ * Mirrors `SUGGESTION_CLASSES` in `components/inline-suggestions/format.ts`,
  * duplicated here because the store must not import from the component tree.
- * A serialization contract: `utils/pending-suggestion-markers.js` reads it back
- * out of saved content, so the two copies must not drift.
+ * A serialization contract: `utils/pending-suggestion-markers.ts` reads them
+ * back out of saved content, so the two copies must not drift.
  *
- * On its own the token is only a cheap pre-filter, never the answer - it also
- * appears in block class names and in prose about the feature. See
+ * On their own the tokens are only a cheap pre-filter, never the answer -
+ * they also appear in block class names and in prose about the feature. See
  * `hasPendingSuggestionMarkers` for what actually identifies a marker.
  */
-export const SUGGESTION_MARKER_CLASS = 'wp-suggestion';
+export const SUGGESTION_MARKER_CLASSES: readonly string[] = [
+	'wp-suggestion-add',
+	'wp-suggestion-del',
+	'wp-suggestion-format',
+];

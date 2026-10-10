@@ -30,20 +30,20 @@ import {
 import {
 	registerSuggestionFormat,
 	findSuggestionText,
-	SUGGESTION_FORMAT_NAME,
+	unregisterSuggestionFormats,
 } from '../format';
 
 const getFormatType = ( name: string ) =>
 	( select( richTextStore as any ) as any ).getFormatType( name );
 
 const del = ( id: number | string, text: string ) =>
-	`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="del">${ text }</mark>`;
+	`<mark class="wp-suggestion-del" data-suggestion-id="${ id }" data-suggestion-type="del">${ text }</mark>`;
 
 const add = ( id: number | string, text: string ) =>
-	`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="add">${ text }</mark>`;
+	`<mark class="wp-suggestion-add" data-suggestion-id="${ id }" data-suggestion-type="add">${ text }</mark>`;
 
 const fmt = ( id: number | string, inner: string ) =>
-	`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="format">${ inner }</mark>`;
+	`<mark class="wp-suggestion-format" data-suggestion-id="${ id }" data-suggestion-type="format">${ inner }</mark>`;
 
 describe( 'inline deletion operations', () => {
 	beforeAll( () => {
@@ -51,9 +51,7 @@ describe( 'inline deletion operations', () => {
 	} );
 
 	afterAll( () => {
-		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 	} );
 
 	describe( 'acceptInlineDeletion', () => {
@@ -160,9 +158,7 @@ describe( 'inline addition operations', () => {
 	} );
 
 	afterAll( () => {
-		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 	} );
 
 	describe( 'acceptInlineAddition', () => {
@@ -304,7 +300,7 @@ describe( 'inline addition operations', () => {
 			} );
 			const html = result.toHTMLString();
 			expect( stripTags( html ) ).toBe( 'before NEW after' );
-			expect( html ).toContain( 'class="wp-suggestion"' );
+			expect( html ).toContain( 'class="wp-suggestion-add"' );
 			expect( html ).toContain( 'data-suggestion-id="9"' );
 			expect( html ).toContain( 'data-suggestion-type="add"' );
 		} );
@@ -582,14 +578,12 @@ describe( 'formatsAdditionRunToExtend / valueAdditionRunToExtend', () => {
 	} );
 
 	afterAll( () => {
-		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 	} );
 
 	// A pending `add` marker authored by user 2.
 	const mine = ( id: number | string, text: string ) =>
-		`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="add" data-author="2">${ text }</mark>`;
+		`<mark class="wp-suggestion-add" data-suggestion-id="${ id }" data-suggestion-type="add" data-author="2">${ text }</mark>`;
 
 	it( 'matches a caret inside the author own addition', () => {
 		const value = RichTextData.fromHTMLString(
@@ -654,18 +648,19 @@ describe( 'formatsAdditionRunToExtend / valueAdditionRunToExtend', () => {
 		expect( valueAdditionRunToExtend( value, 2, '2' ) ).toBeNull();
 	} );
 
-	it( 'does not match an own addition with another marker nested inside it', () => {
+	it( 'matches an own addition with another kind of marker nested inside it', () => {
 		// A collaborator proposed deleting part of this author's addition.
-		// Growing would re-apply the outer marker over the run and strip the
-		// nested one, orphaning its note.
+		// Growing re-applies the `add` marker only, which leaves the nested
+		// `del` marker and its note alone.
 		const value = RichTextData.fromHTMLString(
-			`<mark class="wp-suggestion" data-suggestion-id="41" data-suggestion-type="add" data-author="2">out${ del(
+			`<mark class="wp-suggestion-add" data-suggestion-id="41" data-suggestion-type="add" data-author="2">out${ del(
 				42,
 				'in'
 			) }</mark>`
 		);
-		expect( valueAdditionRunToExtend( value, 5, '2' ) ).toBeNull();
-		expect( valueAdditionRunToExtend( value, 3, '2' ) ).toBeNull();
+		const run = { id: '41', start: 0, end: 5 };
+		expect( valueAdditionRunToExtend( value, 5, '2' ) ).toEqual( run );
+		expect( valueAdditionRunToExtend( value, 3, '2' ) ).toEqual( run );
 	} );
 
 	it( 'returns null for unmarked text and non-rich values', () => {
@@ -745,9 +740,7 @@ describe( 'inline format operations', () => {
 		if ( getFormatType( 'test/bold' ) ) {
 			unregisterFormatType( 'test/bold' );
 		}
-		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 	} );
 
 	describe( 'acceptInlineFormat', () => {
@@ -832,9 +825,7 @@ describe( 'suggestion range overlap detection', () => {
 	} );
 
 	afterAll( () => {
-		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 	} );
 
 	describe( 'valueRangeHasSuggestion', () => {
@@ -893,7 +884,7 @@ describe( 'suggestion range overlap detection', () => {
 
 	describe( 'formatsRangeHasSuggestion', () => {
 		it( 'clamps out-of-bounds ranges', () => {
-			const stack = [ { type: SUGGESTION_FORMAT_NAME } ];
+			const stack = [ { type: 'core/suggestion-del' } ];
 			const formats = [ undefined, stack, stack ];
 			expect( formatsRangeHasSuggestion( formats, -5, 1 ) ).toBe( false );
 			expect( formatsRangeHasSuggestion( formats, 1, 99 ) ).toBe( true );

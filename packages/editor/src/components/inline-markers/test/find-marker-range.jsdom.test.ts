@@ -272,3 +272,68 @@ describe( 'findMarkerText', () => {
 		expect( findMarkerText( value, { ...options, id: null } ) ).toBe( '' );
 	} );
 } );
+
+describe( 'markers of several format types', () => {
+	const OUTER = 'test/marker-outer';
+	const INNER = 'test/marker-inner';
+	const both = { ...options, formatType: [ OUTER, INNER ] };
+
+	beforeAll( () => {
+		for ( const [ name, className ] of [
+			[ OUTER, 'wp-marker-outer' ],
+			[ INNER, 'wp-marker-inner' ],
+		] ) {
+			if (
+				! ( select( richTextStore as any ) as any ).getFormatType(
+					name
+				)
+			) {
+				registerFormatType( name, {
+					title: name,
+					tagName: 'mark',
+					className,
+					attributes: {
+						'data-id': 'data-id',
+						'data-kind': 'data-kind',
+					},
+					edit: () => null,
+				} as any );
+			}
+		}
+	} );
+
+	afterAll( () => {
+		unregisterFormatType( OUTER );
+		unregisterFormatType( INNER );
+	} );
+
+	const nested = () =>
+		RichTextData.fromHTMLString(
+			'a<mark class="wp-marker-outer" data-id="7" data-kind="o">bc' +
+				'<mark class="wp-marker-inner" data-id="9">de</mark>' +
+				'</mark><mark class="wp-marker-inner" data-id="7" data-kind="i">fg</mark>h'
+		);
+
+	it( 'resolves one id across every listed format type', () => {
+		expect( findMarkerRange( nested(), { ...both, id: 7 } ) ).toEqual( {
+			start: 1,
+			end: 7,
+		} );
+		expect( findMarkerText( nested(), { ...both, id: 7 } ) ).toBe(
+			'bcdefg'
+		);
+	} );
+
+	it( 'still matches a single type when given a string', () => {
+		expect(
+			findMarkerRange( nested(), {
+				...options,
+				formatType: INNER,
+				id: 7,
+			} )
+		).toEqual( { start: 5, end: 7 } );
+		expect(
+			findMarkerText( nested(), { ...options, formatType: INNER, id: 9 } )
+		).toBe( 'de' );
+	} );
+} );
