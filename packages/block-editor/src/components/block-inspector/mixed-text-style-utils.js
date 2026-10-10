@@ -10,6 +10,7 @@ const ATTRIBUTE_STYLE_SUPPORTS = {
 	fontSize: 'fontSize',
 	gradient: 'background',
 	textColor: 'color',
+	textShadow: 'textShadow',
 };
 
 const ATTRIBUTE_STYLE_PATHS = {
@@ -19,6 +20,7 @@ const ATTRIBUTE_STYLE_PATHS = {
 	fontSize: [ 'typography', 'fontSize' ],
 	gradient: [ 'color', 'gradient' ],
 	textColor: [ 'color', 'text' ],
+	textShadow: [ 'typography', 'textShadow' ],
 };
 
 const FONT_SIZE_PATH = ATTRIBUTE_STYLE_PATHS.fontSize;
@@ -228,9 +230,9 @@ function getSpacingSides( blockType, feature ) {
 /**
  * Returns registered text-category blocks without changing their input order.
  *
- * @param {string[]} clientIds    Block client IDs in document order.
- * @param {Function} getBlockName Resolves a client ID to its block name.
- * @param {Function} getBlockType Resolves a block name to its registered type.
+ * @param {string[]}                                                 clientIds    Block client IDs in document order.
+ * @param {(clientId: string) => string}                             getBlockName Resolves a client ID to its block name.
+ * @param {(blockName: string) => { category?: string } | undefined} getBlockType Resolves a block name to its registered type.
  * @return {string[]} Eligible block client IDs.
  */
 export function getTextStyleTargetClientIds(
@@ -248,10 +250,10 @@ export function getTextStyleTargetClientIds(
  * Returns the content-only descendants represented by section blocks while
  * excluding descendants already represented beneath a List View item.
  *
- * @param {string[]} sectionClientIds          Section block client IDs.
- * @param {Function} getClientIdsOfDescendants Resolves all descendants.
- * @param {Function} getBlockEditingMode       Resolves a block editing mode.
- * @param {Function} shouldRenderBlockListView Whether a block has List View UI.
+ * @param {string[]}                       sectionClientIds          Section block client IDs.
+ * @param {(clientId: string) => string[]} getClientIdsOfDescendants Resolves all descendants.
+ * @param {(clientId: string) => string}   getBlockEditingMode       Resolves a block editing mode.
+ * @param {(clientId: string) => boolean}  shouldRenderBlockListView Whether a block has List View UI.
  * @return {string[]} Represented descendant client IDs in document order.
  */
 export function getContentOnlySectionClientIds(
@@ -291,11 +293,11 @@ export function getContentOnlySectionClientIds(
  * Expands selected sections in place so eligible text targets retain document
  * order across direct selections and represented section descendants.
  *
- * @param {string[]} clientIds                  Selected block client IDs.
- * @param {string[]} sectionClientIds           Selected section client IDs.
- * @param {Function} getSectionContentClientIds Resolves represented descendants.
- * @param {Function} getBlockName               Resolves a client ID to its name.
- * @param {Function} getBlockType               Resolves a name to its block type.
+ * @param {string[]}                                                 clientIds                  Selected block client IDs.
+ * @param {string[]}                                                 sectionClientIds           Selected section client IDs.
+ * @param {(clientId: string) => string[]}                           getSectionContentClientIds Resolves represented descendants.
+ * @param {(clientId: string) => string}                             getBlockName               Resolves a client ID to its name.
+ * @param {(blockName: string) => { category?: string } | undefined} getBlockType               Resolves a name to its block type.
  * @return {string[]} Eligible text target client IDs in document order.
  */
 export function getExpandedTextStyleTargetClientIds(
@@ -465,6 +467,7 @@ export function getSharedStyleSettings(
 		'textTransform',
 		'textDecoration',
 		'textIndent',
+		'textShadow',
 		'writingMode',
 	].forEach( ( key ) => {
 		if ( ! supportedStyles.has( key ) ) {

@@ -18,7 +18,7 @@ const paragraph = {
 	supports: {
 		color: { text: true },
 		spacing: { padding: true },
-		typography: { fitText: true, fontSize: true },
+		typography: { fitText: true, fontSize: true, textShadow: true },
 	},
 };
 const heading = {
@@ -27,9 +27,18 @@ const heading = {
 	supports: {
 		color: { text: true },
 		spacing: { padding: true },
-		typography: { fitText: true, fontSize: true },
+		typography: { fitText: true, fontSize: true, textShadow: true },
 	},
 };
+const code = {
+	name: 'core/code',
+	category: 'text',
+	supports: {
+		typography: { fontSize: true },
+	},
+};
+
+const customTextShadow = '1px 1px 2px #000';
 
 describe( 'mixed text style utilities', () => {
 	test( 'selects only registered text-category targets in document order', () => {
@@ -153,6 +162,39 @@ describe( 'mixed text style utilities', () => {
 		expect( settings.typography.fontSizes.theme ).toHaveLength( 1 );
 		expect( settings.color.text ).toBe( true );
 	} );
+
+	test.each( [
+		[ 'Paragraph then Code', [ paragraph, code ] ],
+		[ 'Code then Paragraph', [ code, paragraph ] ],
+	] )( 'disables text shadow for %s', ( _, blockTypes ) => {
+		const commonSupportedStyles = getCommonSupportedStyles(
+			blockTypes.map( ( blockType ) =>
+				blockType.supports.typography.textShadow
+					? [ 'fontSize', 'textShadow' ]
+					: [ 'fontSize' ]
+			)
+		);
+		const settings = getSharedStyleSettings(
+			{ typography: { textShadow: true } },
+			commonSupportedStyles,
+			blockTypes
+		);
+
+		expect( settings.typography.textShadow ).toBe( false );
+	} );
+
+	test.each( [ true, false ] )(
+		'preserves the text shadow setting %s when every target supports it',
+		( textShadow ) => {
+			const settings = getSharedStyleSettings(
+				{ typography: { textShadow } },
+				[ 'textShadow' ],
+				[ paragraph, heading ]
+			);
+
+			expect( settings.typography.textShadow ).toBe( textShadow );
+		}
+	);
 
 	test( 'intersects settings resolved for every target instance', () => {
 		const sourceSettings = {
@@ -435,6 +477,99 @@ describe( 'mixed text style utilities', () => {
 			style: undefined,
 		} );
 	} );
+
+	test.each( [
+		[
+			'applies a preset',
+			{},
+			{ textShadow: 'natural' },
+			'natural',
+			undefined,
+		],
+		[
+			'replaces a custom shadow with a preset',
+			{ style: { typography: { textShadow: customTextShadow } } },
+			{ textShadow: 'natural', style: undefined },
+			'natural',
+			undefined,
+		],
+		[
+			'replaces a preset with a custom shadow',
+			{ textShadow: 'natural' },
+			{
+				textShadow: undefined,
+				style: { typography: { textShadow: customTextShadow } },
+			},
+			undefined,
+			customTextShadow,
+		],
+		[
+			'removes a preset',
+			{ textShadow: 'natural' },
+			{ textShadow: undefined },
+			undefined,
+			undefined,
+		],
+		[
+			'removes a custom shadow',
+			{ style: { typography: { textShadow: customTextShadow } } },
+			{ style: undefined },
+			undefined,
+			undefined,
+		],
+	] )(
+		'%s across different target representations',
+		( _, sourceAttributes, nextAttributes, preset, custom ) => {
+			const { stylePaths, attributeNames } = getSharedStylePaths(
+				[ 'textShadow' ],
+				[ paragraph, heading ]
+			);
+			const changes = getSharedStyleAttributeChanges(
+				sourceAttributes,
+				nextAttributes,
+				stylePaths,
+				attributeNames
+			);
+			const targets = [
+				{},
+				{ textShadow: 'deep' },
+				{ style: { typography: { textShadow: '2px 2px 4px #f00' } } },
+			];
+
+			for ( const target of targets ) {
+				const targetAttributes = {
+					...target,
+					fitText: true,
+					style: {
+						color: { text: '#111' },
+						typography: {
+							...target.style?.typography,
+							lineHeight: '1.5',
+						},
+					},
+				};
+				const updatedAttributes = {
+					...targetAttributes,
+					...applySharedStyleAttributeChanges(
+						targetAttributes,
+						changes
+					),
+				};
+
+				expect( updatedAttributes.textShadow ).toBe( preset );
+				expect( updatedAttributes.style.typography.textShadow ).toBe(
+					custom
+				);
+				expect( updatedAttributes.style.color ).toEqual( {
+					text: '#111',
+				} );
+				expect( updatedAttributes.style.typography.lineHeight ).toBe(
+					'1.5'
+				);
+				expect( updatedAttributes.fitText ).toBe( true );
+			}
+		}
+	);
 
 	test( 'preserves a target-specific link color when text color changes', () => {
 		const { stylePaths, attributeNames } = getSharedStylePaths(
