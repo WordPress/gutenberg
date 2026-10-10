@@ -29,11 +29,16 @@ import {
 	getPixelRectFromGridRect,
 } from './get-grid-drop-target';
 import { getAlignmentGuides } from './get-alignment-guides';
+import {
+	getUnstackedMobileUpdates,
+	isGridStackedOnMobile,
+} from './mobile-stacking';
 import { store as blockEditorStore } from '../../store';
 import { useGetNumberOfBlocksBeforeCell } from './use-get-number-of-blocks-before-cell';
 import ButtonBlockAppender from '../button-block-appender';
 import { unlock } from '../../lock-unlock';
-import { getUpdatedChildLayoutStyle } from '../../hooks/layout-child';
+import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
+import { useUpdateGridChildLayout } from './use-update-grid-child-layout';
 
 export function GridVisualizer( {
 	clientId,
@@ -188,25 +193,63 @@ function ManualGridVisualizer( {
 } ) {
 	const [ dropTarget, setDropTarget ] = useState( null );
 
-	const gridItemStyles = useSelect(
+	const { gridItemStyles, gridAttributes, viewport } = useSelect(
 		( select ) => {
-			const { getBlockOrder, getBlockStyles } = unlock(
-				select( blockEditorStore )
-			);
+			const {
+				getBlockOrder,
+				getBlockStyles,
+				getBlockAttributes,
+				getSelectedBlockStyleState,
+			} = unlock( select( blockEditorStore ) );
 			const blockOrder = getBlockOrder( gridClientId );
-			return getBlockStyles( blockOrder );
+			return {
+				gridItemStyles: getBlockStyles( blockOrder ),
+				gridAttributes: getBlockAttributes( gridClientId ),
+				viewport: getSelectedBlockStyleState()?.viewport,
+			};
 		},
 		[ gridClientId ]
 	);
 	const occupiedRects = useMemo( () => {
+		// Use the placement shown in the selected viewport: the stack when
+		// the grid is stacked on mobile, otherwise any viewport overrides.
+		let layouts;
+		if (
+			viewport === '@mobile' &&
+			isGridStackedOnMobile(
+				gridAttributes?.layout,
+				gridAttributes?.style
+			)
+		) {
+			const updates = getUnstackedMobileUpdates( {
+				gridClientId,
+				gridAttributes,
+				children: Object.entries( gridItemStyles ).map(
+					( [ clientId, style ] ) => ( {
+						clientId,
+						attributes: { style },
+					} )
+				),
+			} );
+			layouts = Object.keys( gridItemStyles ).map(
+				( clientId ) => updates[ clientId ].style[ '@mobile' ].layout
+			);
+		} else {
+			layouts = Object.values( gridItemStyles ).map( ( style ) => ( {
+				...style?.layout,
+				...( hasViewportBlockStyleState( { viewport } )
+					? style?.[ viewport ]?.layout
+					: undefined ),
+			} ) );
+		}
 		const rects = [];
-		for ( const style of Object.values( gridItemStyles ) ) {
+		for ( const layout of layouts ) {
 			const {
 				columnStart,
 				rowStart,
 				columnSpan = 1,
 				rowSpan = 1,
-			} = style?.layout ?? {};
+			} = layout;
 			if ( ! columnStart || ! rowStart ) {
 				continue;
 			}
@@ -220,7 +263,7 @@ function ManualGridVisualizer( {
 			);
 		}
 		return rects;
-	}, [ gridItemStyles ] );
+	}, [ gridItemStyles, gridAttributes, viewport, gridClientId ] );
 
 	return (
 		<>
@@ -364,16 +407,10 @@ function GridVisualizerDropLayer( {
 	const layerRef = useRef();
 	const lastTargetRef = useRef( null );
 	const blockEditorSelectors = unlock( useSelect( blockEditorStore ) );
-	const {
-		getBlockAttributes,
-		getBlockRootClientId,
-		getSelectedBlockStyleState,
-	} = blockEditorSelectors;
-	const {
-		updateBlockAttributes,
-		moveBlocksToPosition,
-		__unstableMarkNextChangeAsNotPersistent,
-	} = useDispatch( blockEditorStore );
+	const { getBlockAttributes, getBlockRootClientId } = blockEditorSelectors;
+	const { moveBlocksToPosition, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+	const updateGridChildLayout = useUpdateGridChildLayout();
 	const getNumberOfBlocksBeforeCell = useGetNumberOfBlocksBeforeCell(
 		gridClientId,
 		gridInfo.numColumns
@@ -544,14 +581,9 @@ function GridVisualizerDropLayer( {
 					rowSpan: landing.rowSpan,
 				} ),
 			};
-			const { style } = getBlockAttributes( srcClientId );
-			updateBlockAttributes( srcClientId, {
-				style: getUpdatedChildLayoutStyle(
-					style,
-					layout,
-					getSelectedBlockStyleState( srcClientId )
-				),
-			} );
+			// The grid is given to the updater because a block dropped in
+			// from elsewhere isn't in it yet.
+			updateGridChildLayout( srcClientId, layout, gridClientId );
 			__unstableMarkNextChangeAsNotPersistent();
 			moveBlocksToPosition(
 				[ srcClientId ],
@@ -632,14 +664,9 @@ function GridVisualizerAppender( {
 	onClose,
 } ) {
 	const appenderRef = useRef();
-	const { getBlockAttributes, getSelectedBlockStyleState } = unlock(
-		useSelect( blockEditorStore )
-	);
-	const {
-		updateBlockAttributes,
-		moveBlocksToPosition,
-		__unstableMarkNextChangeAsNotPersistent,
-	} = useDispatch( blockEditorStore );
+	const { moveBlocksToPosition, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+	const updateGridChildLayout = useUpdateGridChildLayout();
 
 	const getNumberOfBlocksBeforeCell = useGetNumberOfBlocksBeforeCell(
 		gridClientId,
@@ -667,18 +694,16 @@ function GridVisualizerAppender( {
 					onClose?.();
 					return;
 				}
-				updateBlockAttributes( block.clientId, {
-					style: getUpdatedChildLayoutStyle(
-						getBlockAttributes( block.clientId )?.style,
-						{
-							columnStart: column,
-							rowStart: row,
-							...( columnSpan > 1 && { columnSpan } ),
-							...( rowSpan > 1 && { rowSpan } ),
-						},
-						getSelectedBlockStyleState( block.clientId )
-					),
-				} );
+				updateGridChildLayout(
+					block.clientId,
+					{
+						columnStart: column,
+						rowStart: row,
+						...( columnSpan > 1 && { columnSpan } ),
+						...( rowSpan > 1 && { rowSpan } ),
+					},
+					gridClientId
+				);
 				__unstableMarkNextChangeAsNotPersistent();
 				moveBlocksToPosition(
 					[ block.clientId ],

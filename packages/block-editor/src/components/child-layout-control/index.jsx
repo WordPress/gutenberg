@@ -15,6 +15,8 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useGetNumberOfBlocksBeforeCell } from '../grid/use-get-number-of-blocks-before-cell';
 import { store as blockEditorStore } from '../../store';
 import { useSettings } from '../use-settings';
+import { isGridStackedOnMobile } from '../grid/mobile-stacking';
+import { useUpdateGridChildLayout } from '../grid/use-update-grid-child-layout';
 
 // These are the serialized `selfStretch` values. `max` used to be called
 // "Fixed" in the UI, but was renamed and replaced by `fixedNoShrink`.
@@ -252,6 +254,31 @@ function GridControls( {
 	const rootClientId = useSelect( ( select ) =>
 		select( blockEditorStore ).getBlockRootClientId( panelId )
 	);
+	// On mobile, a stacked grid needs its own mobile layout before an edit to
+	// one of its blocks can have an effect, so edits go through the grid
+	// updater, which creates it from the stack.
+	const isStackedOnMobile = useSelect(
+		( select ) => {
+			if ( ! window.__experimentalEnableGridInteractivity ) {
+				return false;
+			}
+			const { getBlockAttributes, getSelectedBlockStyleState } =
+				select( blockEditorStore );
+			const gridAttributes = getBlockAttributes( rootClientId );
+			return (
+				getSelectedBlockStyleState()?.viewport === '@mobile' &&
+				isGridStackedOnMobile(
+					gridAttributes?.layout,
+					gridAttributes?.style
+				)
+			);
+		},
+		[ rootClientId ]
+	);
+	const updateGridChildLayout = useUpdateGridChildLayout();
+	const onChangeLayout = isStackedOnMobile
+		? ( changes ) => updateGridChildLayout( panelId, changes )
+		: onChange;
 	const { moveBlocksToPosition, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 	const getNumberOfBlocksBeforeCell = useGetNumberOfBlocksBeforeCell(
@@ -261,13 +288,13 @@ function GridControls( {
 	const hasStartValue = () => !! columnStart || !! rowStart;
 	const hasSpanValue = () => !! columnSpan || !! rowSpan;
 	const resetGridStarts = () => {
-		onChange( {
+		onChangeLayout( {
 			columnStart: undefined,
 			rowStart: undefined,
 		} );
 	};
 	const resetGridSpans = () => {
-		onChange( {
+		onChangeLayout( {
 			columnSpan: undefined,
 			rowSpan: undefined,
 		} );
@@ -309,7 +336,7 @@ function GridControls( {
 								? Math.min( newColumnSpan, maxColumnSpan )
 								: newColumnSpan;
 
-							onChange( {
+							onChangeLayout( {
 								columnStart,
 								rowStart,
 								rowSpan,
@@ -332,7 +359,7 @@ function GridControls( {
 								? Math.min( newRowSpan, maxRowSpan )
 								: newRowSpan;
 
-							onChange( {
+							onChangeLayout( {
 								columnStart,
 								rowStart,
 								columnSpan,
@@ -366,7 +393,7 @@ function GridControls( {
 								// Don't allow unsetting.
 								const newColumnStart =
 									value === '' ? 1 : parseInt( value, 10 );
-								onChange( {
+								onChangeLayout( {
 									columnStart: newColumnStart,
 									rowStart,
 									columnSpan,
@@ -400,7 +427,7 @@ function GridControls( {
 								// Don't allow unsetting.
 								const newRowStart =
 									value === '' ? 1 : parseInt( value, 10 );
-								onChange( {
+								onChangeLayout( {
 									columnStart,
 									rowStart: newRowStart,
 									columnSpan,

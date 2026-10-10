@@ -5,6 +5,7 @@ import {
 	GridVisualizer,
 	GridRowResizer,
 	useGridLayoutSync,
+	isGridStackedOnMobile,
 } from '../components/grid';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
@@ -34,7 +35,8 @@ function GridTools( { clientId, layout } ) {
 				getBlockEditingMode,
 				getBlockAttributes,
 				getSettings,
-			} = select( blockEditorStore );
+				getSelectedBlockStyleState,
+			} = unlock( select( blockEditorStore ) );
 
 			// These calls are purposely ordered from least expensive to most expensive.
 			// Hides the visualizer in cases where the user is not or cannot interact with it.
@@ -58,12 +60,17 @@ function GridTools( { clientId, layout } ) {
 			return {
 				isVisible: true,
 				// Rows are added and removed from the edges of a selected
-				// manual grid.
+				// manual grid, except while it is stacked on mobile.
 				showRowResizer:
 					!! window.__experimentalEnableGridInteractivity &&
 					!! layout?.isManualPlacement &&
 					! isDraggingBlocks() &&
-					isBlockSelected( clientId ),
+					isBlockSelected( clientId ) &&
+					! (
+						getSelectedBlockStyleState( clientId )?.viewport ===
+							'@mobile' &&
+						isGridStackedOnMobile( layout, attributes?.style )
+					),
 				blockVisibility: attributes?.metadata?.blockVisibility,
 				deviceType: currentDeviceType,
 				viewportSettings: settings?.__experimentalFeatures?.viewport,

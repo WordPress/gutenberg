@@ -1771,4 +1771,254 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 			),
 		);
 	}
+
+	/**
+	 * Check that manual placement grids stack their children on mobile when the grid
+	 * interactivity experiment is on, unless they opt out.
+	 *
+	 * @dataProvider data_layout_support_flag_stacks_manual_grids_on_mobile
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 *
+	 * @param bool  $experiment_enabled Whether the grid interactivity experiment is on.
+	 * @param array $layout             Grid layout attribute.
+	 * @param bool  $should_stack       Whether stacking rules are expected.
+	 * @param array $style              Optional. Grid style attribute.
+	 */
+	public function test_layout_support_flag_stacks_manual_grids_on_mobile( $experiment_enabled, $layout, $should_stack, $style = array() ) {
+		if ( $experiment_enabled ) {
+			add_filter( 'pre_option_gutenberg-experiments', array( $this, 'filter_enable_grid_interactivity' ), 11 );
+		}
+		switch_theme( 'default' );
+
+		$block_content = '<div class="wp-block-group"></div>';
+		$block         = array(
+			'blockName'    => 'core/group',
+			'attrs'        => array(
+				'layout' => $layout,
+				'style'  => $style,
+			),
+			'innerBlocks'  => array(),
+			'innerHTML'    => $block_content,
+			'innerContent' => array( $block_content ),
+		);
+
+		$output = gutenberg_render_layout_support_flag( $block_content, $block );
+		preg_match( '/wp-container-core-group-is-layout-[a-z0-9]+/', $output, $matches );
+		$this->assertNotEmpty( $matches, 'The grid should get a container class.' );
+		$container_class = $matches[0];
+
+		$stylesheet    = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+		$sizing_rule   = ".$container_class.$container_class{aspect-ratio:auto;grid-template-rows:none;grid-auto-rows:auto;}";
+		$stacking_rule = ".$container_class.$container_class > *{grid-column:1 / -1;grid-row:span var(--wp--grid-item--row-span, 1);}";
+
+		if ( $should_stack ) {
+			$this->assertStringContainsString( '@media (width <= 480px){' . $sizing_rule . '}', $stylesheet, 'A stacked grid should be sized by its content.' );
+			$this->assertStringContainsString( '@media (width <= 480px){' . $stacking_rule . '}', $stylesheet, 'The children of a stacked grid should be full width and keep their row spans.' );
+		} else {
+			$this->assertStringNotContainsString( $sizing_rule, $stylesheet );
+			$this->assertStringNotContainsString( $stacking_rule, $stylesheet );
+		}
+	}
+
+	/**
+	 * Data provider for test_layout_support_flag_stacks_manual_grids_on_mobile().
+	 *
+	 * @return array
+	 */
+	public function data_layout_support_flag_stacks_manual_grids_on_mobile() {
+		return array(
+			'manual placement grid stacks by default'     => array(
+				'experiment_enabled' => true,
+				'layout'             => array(
+					'type'              => 'grid',
+					'isManualPlacement' => true,
+					'columnCount'       => 3,
+				),
+				'should_stack'       => true,
+			),
+			'manual placement grid can opt out'           => array(
+				'experiment_enabled' => true,
+				'layout'             => array(
+					'type'              => 'grid',
+					'isManualPlacement' => true,
+					'columnCount'       => 4,
+					'stackOnMobile'     => false,
+				),
+				'should_stack'       => false,
+			),
+			'manual placement grid can opt out on mobile' => array(
+				'experiment_enabled' => true,
+				'layout'             => array(
+					'type'              => 'grid',
+					'isManualPlacement' => true,
+					'columnCount'       => 6,
+				),
+				'should_stack'       => false,
+				'style'              => array(
+					'@mobile' => array(
+						'layout' => array( 'stackOnMobile' => false ),
+					),
+				),
+			),
+			'auto placement grid does not stack'          => array(
+				'experiment_enabled' => true,
+				'layout'             => array(
+					'type'        => 'grid',
+					'columnCount' => 5,
+				),
+				'should_stack'       => false,
+			),
+			'manual placement grid without the experiment does not stack' => array(
+				'experiment_enabled' => false,
+				'layout'             => array(
+					'type'              => 'grid',
+					'isManualPlacement' => true,
+					'columnCount'       => 7,
+				),
+				'should_stack'       => false,
+			),
+		);
+	}
+
+	/**
+	 * Check that children of manual placement grids publish their row span for mobile
+	 * stacking when the grid interactivity experiment is on.
+	 *
+	 * @covers ::gutenberg_get_child_layout_style_rules
+	 */
+	public function test_gutenberg_get_child_layout_style_rules_publishes_row_span_in_manual_grids() {
+		add_filter( 'pre_option_gutenberg-experiments', array( $this, 'filter_enable_grid_interactivity' ), 11 );
+
+		$manual_grid = array(
+			'isManualPlacement' => true,
+			'columnCount'       => 3,
+		);
+
+		$this->assertSame(
+			array(
+				array(
+					'selector'     => '.wp-container-content-test',
+					'declarations' => array(
+						'grid-column'               => '1',
+						'grid-row'                  => '1 / span 2',
+						'--wp--grid-item--row-span' => '2',
+					),
+				),
+			),
+			gutenberg_get_child_layout_style_rules(
+				'.wp-container-content-test',
+				array(
+					'columnStart' => 1,
+					'rowStart'    => 1,
+					'rowSpan'     => 2,
+				),
+				$manual_grid
+			)
+		);
+
+		$single_row_rules = gutenberg_get_child_layout_style_rules(
+			'.wp-container-content-test',
+			array( 'columnStart' => 2 ),
+			$manual_grid
+		);
+		$this->assertSame( '1', $single_row_rules[0]['declarations']['--wp--grid-item--row-span'], 'A child without a row span should publish 1.' );
+
+		$viewport_rules = gutenberg_get_child_layout_style_rules(
+			'.wp-container-content-test',
+			array( 'rowSpan' => 2 ),
+			$manual_grid,
+			array( 'rowSpan' => 3 )
+		);
+		$this->assertArrayNotHasKey( '--wp--grid-item--row-span', $viewport_rules[0]['declarations'], 'Viewport overrides should not publish a row span.' );
+
+		$auto_grid_rules = gutenberg_get_child_layout_style_rules(
+			'.wp-container-content-test',
+			array( 'rowSpan' => 2 ),
+			array( 'columnCount' => 3 )
+		);
+		$this->assertArrayNotHasKey( '--wp--grid-item--row-span', $auto_grid_rules[0]['declarations'], 'Auto placement grid children should not publish a row span.' );
+	}
+
+	/**
+	 * Check that children of manual placement grids don't publish their row span when the
+	 * grid interactivity experiment is off.
+	 *
+	 * @covers ::gutenberg_get_child_layout_style_rules
+	 */
+	public function test_gutenberg_get_child_layout_style_rules_does_not_publish_row_span_without_experiment() {
+		$this->assertSame(
+			array(
+				array(
+					'selector'     => '.wp-container-content-test',
+					'declarations' => array(
+						'grid-row' => 'span 2',
+					),
+				),
+			),
+			gutenberg_get_child_layout_style_rules(
+				'.wp-container-content-test',
+				array( 'rowSpan' => 2 ),
+				array(
+					'isManualPlacement' => true,
+					'columnCount'       => 3,
+				)
+			)
+		);
+	}
+
+	/**
+	 * Check that children of manual and auto placement grids get different content classes
+	 * when the grid interactivity experiment is on, since only the former publish their row
+	 * span, and the same classes when it is off.
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 */
+	public function test_layout_support_flag_content_class_depends_on_manual_placement() {
+		$render_child = static function ( $parent_layout ) {
+			$block_content = '<p>Child</p>';
+			return gutenberg_render_layout_support_flag(
+				$block_content,
+				array(
+					'blockName'    => 'core/paragraph',
+					'attrs'        => array(
+						'style' => array(
+							'layout' => array(
+								'columnStart' => 1,
+								'rowStart'    => 1,
+							),
+						),
+					),
+					'parentLayout' => $parent_layout,
+					'innerBlocks'  => array(),
+					'innerHTML'    => $block_content,
+					'innerContent' => array( $block_content ),
+				)
+			);
+		};
+		$manual_grid  = array(
+			'type'              => 'grid',
+			'columnCount'       => 3,
+			'isManualPlacement' => true,
+		);
+		$auto_grid    = array(
+			'type'        => 'grid',
+			'columnCount' => 3,
+		);
+
+		$this->assertSame( $render_child( $auto_grid ), $render_child( $manual_grid ), 'Without the experiment, manual placement should not change the content class.' );
+
+		add_filter( 'pre_option_gutenberg-experiments', array( $this, 'filter_enable_grid_interactivity' ), 11 );
+		$this->assertNotSame( $render_child( $auto_grid ), $render_child( $manual_grid ), 'With the experiment, manual placement should change the content class.' );
+	}
+
+	/**
+	 * Check that the row span custom property and the stacking rule survive CSS sanitization.
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 */
+	public function test_row_span_declarations_survive_sanitization() {
+		$this->assertSame( '--wp--grid-item--row-span:2', safecss_filter_attr( '--wp--grid-item--row-span:2' ) );
+		$this->assertSame( 'grid-row:span var(--wp--grid-item--row-span, 1)', safecss_filter_attr( 'grid-row:span var(--wp--grid-item--row-span, 1)' ) );
+	}
 }

@@ -1,6 +1,6 @@
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
@@ -10,6 +10,9 @@ import {
 	GridVisualizer,
 	GridItemResizer,
 	GridItemMovers,
+	useUpdateGridChildLayout,
+	isGridStackedOnMobile,
+	getUnstackedMobileUpdates,
 } from '../components/grid';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import useBlockVisibility from '../components/block-visibility/use-block-visibility';
@@ -78,7 +81,7 @@ export function getChildLayoutStyleRules( {
 		rowSpan,
 	} = effectiveLayout;
 	const baseSelfStretch = layout.selfStretch;
-	const { columnCount, minimumColumnWidth } = parentLayout;
+	const { columnCount, minimumColumnWidth, isManualPlacement } = parentLayout;
 	const rules = [];
 
 	const declarations = {};
@@ -142,6 +145,19 @@ export function getChildLayoutStyleRules( {
 		} else if ( rowSpan ) {
 			declarations[ 'grid-row' ] = `span ${ rowSpan }`;
 		}
+	}
+
+	// Manual grids stack their children on mobile, as part of the grid
+	// interactivity experiment, with a rule on the grid that reads each
+	// child's row span from this custom property so that tall blocks stay
+	// tall. It is always set, so that a child doesn't inherit the row span of
+	// a grid it is nested in.
+	if (
+		! hasViewportOverrides &&
+		isManualPlacement &&
+		window.__experimentalEnableGridInteractivity
+	) {
+		declarations[ '--wp--grid-item--row-span' ] = `${ rowSpan || 1 }`;
 	}
 
 	if ( Object.keys( declarations ).length ) {
@@ -369,7 +385,7 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 	return { className: `wp-container-content-${ id }` };
 }
 
-function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
+function ChildLayoutControlsPure( { clientId, style } ) {
 	const parentLayout = useLayout() || {};
 	const {
 		type: parentLayoutType = 'default',
@@ -385,7 +401,6 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 		<GridTools
 			clientId={ clientId }
 			style={ style }
-			setAttributes={ setAttributes }
 			allowSizingOnChildren={ allowSizingOnChildren }
 			isManualPlacement={ isManualPlacement }
 			parentLayout={ parentLayout }
@@ -396,7 +411,6 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 function GridTools( {
 	clientId,
 	style,
-	setAttributes,
 	allowSizingOnChildren,
 	isManualPlacement,
 	parentLayout,
@@ -410,6 +424,7 @@ function GridTools( {
 		viewportSettings,
 		isChildBlockAGrid,
 		selectedState,
+		parentStyle,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -451,6 +466,7 @@ function GridTools( {
 				// Check if the selected child block is itself a grid.
 				isChildBlockAGrid: blockAttributes?.layout?.type === 'grid',
 				selectedState: getSelectedBlockStyleState( clientId ),
+				parentStyle: parentAttributes?.style,
 			};
 		},
 		[ clientId ]
@@ -504,16 +520,84 @@ function GridTools( {
 
 	const childGridClientId = isChildBlockAGrid ? clientId : undefined;
 
+	const isManualGrid =
+		isManualPlacement && window.__experimentalEnableGridInteractivity;
+	// On mobile, a stacked grid shows every block full width, one after
+	// another. The tools work from that stack: the first edit gives the grid
+	// its own mobile layout matching it (see `useUpdateGridChildLayout`).
+	const isStackedOnMobile =
+		selectedState?.viewport === '@mobile' &&
+		isGridStackedOnMobile( parentLayout, parentStyle );
+	const { siblingOrder, siblingStyles } = useSelect(
+		( select ) => {
+			if ( ! isStackedOnMobile ) {
+				return {};
+			}
+			const { getBlockOrder, getBlockStyles } = unlock(
+				select( blockEditorStore )
+			);
+			const blockOrder = getBlockOrder( rootClientId );
+			return {
+				siblingOrder: blockOrder,
+				siblingStyles: getBlockStyles( blockOrder ),
+			};
+		},
+		[ isStackedOnMobile, rootClientId ]
+	);
+	const stackedLayouts = useMemo( () => {
+		if ( ! isStackedOnMobile || ! siblingOrder ) {
+			return null;
+		}
+		const updates = getUnstackedMobileUpdates( {
+			gridClientId: rootClientId,
+			gridAttributes: { layout: parentLayout, style: parentStyle },
+			children: siblingOrder.map( ( siblingClientId ) => ( {
+				clientId: siblingClientId,
+				attributes: { style: siblingStyles?.[ siblingClientId ] },
+			} ) ),
+		} );
+		return {
+			child: updates[ clientId ]?.style?.[ '@mobile' ]?.layout,
+			grid: updates[ rootClientId ]?.style?.[ '@mobile' ]?.layout,
+		};
+	}, [
+		isStackedOnMobile,
+		siblingOrder,
+		siblingStyles,
+		rootClientId,
+		clientId,
+		parentLayout,
+		parentStyle,
+	] );
+	const updateGridChildLayout = useUpdateGridChildLayout();
+
 	if ( ! isVisible || isParentBlockCurrentlyHidden || isAnyAncestorHidden ) {
 		return null;
 	}
 
 	const showResizer = allowSizingOnChildren && ! isBlockItselfCurrentlyHidden;
+	const isViewportState = hasViewportBlockStyleState( selectedState );
+	// The layout the canvas shows for this block and its grid in the
+	// selected state.
+	const effectiveLayout = stackedLayouts?.child ?? {
+		...style?.layout,
+		...( isViewportState
+			? getStyleForState( style, {
+					viewport: selectedState.viewport,
+					pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
+				} )?.layout
+			: undefined ),
+	};
+	const effectiveParentLayout = {
+		...parentLayout,
+		...( isViewportState
+			? parentStyle?.[ selectedState.viewport ]?.layout
+			: undefined ),
+		...stackedLayouts?.grid,
+	};
 
 	function updateLayout( layout ) {
-		setAttributes( {
-			style: getUpdatedChildLayoutStyle( style, layout, selectedState ),
-		} );
+		updateGridChildLayout( clientId, layout );
 	}
 
 	return (
@@ -533,16 +617,15 @@ function GridTools( {
 					parentLayout={ parentLayout }
 				/>
 			) }
-			{ isManualPlacement &&
-				window.__experimentalEnableGridInteractivity && (
-					<GridItemMovers
-						layout={ style?.layout }
-						parentLayout={ parentLayout }
-						onChange={ updateLayout }
-						gridClientId={ rootClientId }
-						blockClientId={ clientId }
-					/>
-				) }
+			{ isManualGrid && (
+				<GridItemMovers
+					layout={ effectiveLayout }
+					parentLayout={ effectiveParentLayout }
+					onChange={ updateLayout }
+					gridClientId={ rootClientId }
+					blockClientId={ clientId }
+				/>
+			) }
 		</>
 	);
 }

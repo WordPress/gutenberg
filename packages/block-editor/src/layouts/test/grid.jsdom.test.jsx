@@ -1,9 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import grid from '../grid';
 
 globalThis.wpVitest.mockMatchMedia();
+globalThis.wpVitest.mockResizeObserver();
 
 const GridLayoutInspectorControls = grid.inspectorControls;
 const PANEL_ID = 'test-panel';
@@ -297,5 +299,137 @@ describe( 'GridLayoutInspectorControls', () => {
 		expect(
 			screen.getByRole( 'spinbutton', { name: 'Columns' } )
 		).toHaveDisplayValue( '' );
+	} );
+
+	describe( 'with the grid interactivity experiment', () => {
+		let originalExperiment;
+		beforeEach( () => {
+			originalExperiment = window.__experimentalEnableGridInteractivity;
+			window.__experimentalEnableGridInteractivity = true;
+		} );
+		afterEach( () => {
+			window.__experimentalEnableGridInteractivity = originalExperiment;
+		} );
+
+		it( 'turns stacking on mobile off for manual placement grids', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			renderInspectorControls( {
+				layout: { type: 'grid', isManualPlacement: true },
+				onChange,
+			} );
+
+			const toggle = screen.getByRole( 'checkbox', {
+				name: 'Stack on mobile',
+			} );
+			expect( toggle ).toBeChecked();
+
+			await user.click( toggle );
+			expect( onChange ).toHaveBeenCalledWith( {
+				type: 'grid',
+				isManualPlacement: true,
+				stackOnMobile: false,
+			} );
+		} );
+
+		it( 'stores nothing when stacking on mobile is turned back on', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			renderInspectorControls( {
+				layout: {
+					type: 'grid',
+					isManualPlacement: true,
+					stackOnMobile: false,
+				},
+				onChange,
+			} );
+
+			await user.click(
+				screen.getByRole( 'checkbox', { name: 'Stack on mobile' } )
+			);
+			expect( onChange ).toHaveBeenCalledWith( {
+				type: 'grid',
+				isManualPlacement: true,
+			} );
+		} );
+
+		it( 'does not offer stacking on mobile for auto placement grids', async () => {
+			renderInspectorControls( { layout: { type: 'grid' } } );
+
+			// Wait for the grid item position control to settle.
+			expect(
+				await screen.findByRole( 'radio', { name: 'Auto' } )
+			).toBeChecked();
+			expect(
+				screen.queryByRole( 'checkbox', { name: 'Stack on mobile' } )
+			).not.toBeInTheDocument();
+		} );
+	} );
+
+	it( 'does not offer stacking on mobile without the grid interactivity experiment', () => {
+		renderInspectorControls( {
+			layout: { type: 'grid', isManualPlacement: true },
+		} );
+
+		expect(
+			screen.queryByRole( 'checkbox', { name: 'Stack on mobile' } )
+		).not.toBeInTheDocument();
+	} );
+} );
+
+describe( 'getMobileStackingStyle', () => {
+	let originalExperiment;
+	beforeEach( () => {
+		originalExperiment = window.__experimentalEnableGridInteractivity;
+		window.__experimentalEnableGridInteractivity = true;
+	} );
+	afterEach( () => {
+		window.__experimentalEnableGridInteractivity = originalExperiment;
+	} );
+
+	it( 'stacks the children of manual placement grids, keeping their row spans', () => {
+		expect(
+			grid.getMobileStackingStyle( {
+				selector: '.my-container',
+				layout: { isManualPlacement: true, columnCount: 3 },
+			} )
+		).toBe(
+			'.my-container.my-container { aspect-ratio: auto; grid-template-rows: none; grid-auto-rows: auto; }' +
+				'.my-container.my-container > * { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); }'
+		);
+	} );
+
+	it( 'repeats each selector of a selector list', () => {
+		expect(
+			grid.getMobileStackingStyle( {
+				selector: '.a,.b',
+				layout: { isManualPlacement: true },
+			} )
+		).toContain( '.a.a > *,.b.b > * {' );
+	} );
+
+	it( 'does not stack grids that opt out, or auto placement grids', () => {
+		expect(
+			grid.getMobileStackingStyle( {
+				selector: '.my-container',
+				layout: { isManualPlacement: true, stackOnMobile: false },
+			} )
+		).toBe( '' );
+		expect(
+			grid.getMobileStackingStyle( {
+				selector: '.my-container',
+				layout: { columnCount: 3 },
+			} )
+		).toBe( '' );
+	} );
+
+	it( 'does not stack without the grid interactivity experiment', () => {
+		window.__experimentalEnableGridInteractivity = false;
+		expect(
+			grid.getMobileStackingStyle( {
+				selector: '.my-container',
+				layout: { isManualPlacement: true },
+			} )
+		).toBe( '' );
 	} );
 } );
