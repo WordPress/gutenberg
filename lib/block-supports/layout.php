@@ -415,6 +415,20 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 		}
 	}
 
+	/*
+	 * Manual grids stack their children on mobile, as part of the grid interactivity
+	 * experiment, with a rule on the grid that reads each child's row span from this custom
+	 * property so that tall blocks stay tall. It is always set, so that a child doesn't
+	 * inherit the row span of a grid it is nested in.
+	 */
+	if (
+		null === $viewport_overrides &&
+		! empty( $parent_layout['isManualPlacement'] ) &&
+		gutenberg_is_experiment_enabled( 'gutenberg-grid-interactivity' )
+	) {
+		$child_layout_declarations['--wp--grid-item--row-span'] = (string) ( $row_span ? $row_span : 1 );
+	}
+
 	if ( ! empty( $child_layout_declarations ) ) {
 		$child_layout_styles[] = array(
 			'selector'     => $selector,
@@ -1076,8 +1090,16 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$block['blockName']
 	);
 	/*
-	 * A block with no layout support and no style attribute at all cannot
-	 * produce layout output, so return before resolving global settings.
+	 * Children of manual grids publish their row span for mobile stacking, as part of the grid
+	 * interactivity experiment, even when they have no child layout of their own.
+	 */
+	$parent_layout         = is_array( $block['parentLayout'] ?? null ) ? $block['parentLayout'] : array();
+	$publishes_grid_layout = ! empty( $parent_layout['isManualPlacement'] ) && gutenberg_is_experiment_enabled( 'gutenberg-grid-interactivity' );
+
+	/*
+	 * A block with no layout support and no style attribute at all, that isn't a
+	 * child of a manual grid, cannot produce layout output, so return before
+	 * resolving global settings.
 	 *
 	 * Resolving settings is not read-only: on a cold cache it queries the
 	 * user's `wp_global_styles` post, which fires `the_posts`. A callback on
@@ -1086,7 +1108,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	 * single block with no name and no attributes. Without this return that
 	 * block resolves settings again and the recursion has no base case.
 	 */
-	if ( ! $block_supports_layout && empty( $style_attr ) ) {
+	if ( ! $block_supports_layout && empty( $style_attr ) && ! $publishes_grid_layout ) {
 		return $block_content;
 	}
 
@@ -1109,16 +1131,15 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		}
 	}
 
-	if ( ! $block_supports_layout && ! $child_layout && empty( $viewport_child_layouts ) ) {
+	if ( ! $block_supports_layout && ! $child_layout && empty( $viewport_child_layouts ) && ! $publishes_grid_layout ) {
 		return $block_content;
 	}
 
 	$outer_class_names = array();
 
 	// Child layout specific logic.
-	if ( $child_layout || ! empty( $viewport_child_layouts ) ) {
+	if ( $child_layout || ! empty( $viewport_child_layouts ) || $publishes_grid_layout ) {
 		$base_child_layout = gutenberg_get_layout_child_values( $child_layout );
-		$parent_layout     = $block['parentLayout'] ?? array();
 
 		/*
 		 * Generates a unique class for child block layout styles.
@@ -1131,11 +1152,16 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		 *
 		 * As long as these properties coincide, the generated class will be the same.
 		 */
+		// Children of manual grids publish their row span for mobile stacking.
+		$parent_layout_hash_keys = array( 'minimumColumnWidth', 'columnCount' );
+		if ( gutenberg_is_experiment_enabled( 'gutenberg-grid-interactivity' ) ) {
+			$parent_layout_hash_keys[] = 'isManualPlacement';
+		}
 		$container_content_hash_input = array(
 			'layout'       => $base_child_layout,
 			'parentLayout' => array_intersect_key(
 				$parent_layout,
-				array_flip( array( 'minimumColumnWidth', 'columnCount' ) )
+				array_flip( $parent_layout_hash_keys )
 			),
 		);
 		foreach ( $viewport_child_layouts as $breakpoint => $viewport_data ) {
@@ -1420,6 +1446,59 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			);
 
 			if ( ! empty( $viewport_styles ) && ! in_array( $container_class, $class_names, true ) ) {
+				$class_names[] = $container_class;
+			}
+		}
+
+		/*
+		 * Manual placement grids stack their children on mobile, as part of the grid
+		 * interactivity experiment, unless they opt out with `stackOnMobile: false`: each
+		 * child becomes full width, in block order, and keeps the row span it publishes as
+		 * `--wp--grid-item--row-span`. The selector is repeated so that the rules beat the
+		 * grid's and each child's own rules, whatever order the stylesheets end up in.
+		 */
+		$mobile_media_query = $responsive_media_queries['@mobile'] ?? null;
+		$mobile_layout      = array_replace(
+			is_array( $used_layout ) ? $used_layout : array(),
+			gutenberg_get_layout_container_values( $style_attr['@mobile']['layout'] ?? null )
+		);
+		// Placement can be switched to auto in the mobile state, so check the mobile layout.
+		if (
+			$mobile_media_query &&
+			'grid' === ( $used_layout['type'] ?? null ) &&
+			! empty( $mobile_layout['isManualPlacement'] ) &&
+			false !== ( $mobile_layout['stackOnMobile'] ?? true ) &&
+			gutenberg_is_experiment_enabled( 'gutenberg-grid-interactivity' )
+		) {
+			// Stacked blocks are sized by their content again, so their cells are no longer fixed.
+			$stacking_styles = gutenberg_style_engine_get_stylesheet_from_css_rules(
+				array(
+					array(
+						'rules_group'  => $mobile_media_query,
+						'selector'     => ".$container_class.$container_class",
+						'declarations' => array(
+							'aspect-ratio'            => 'auto',
+							'grid-template-rows'      => 'none',
+							'grid-auto-rows'          => 'auto',
+							'--wp--style--grid-cells' => 'auto',
+						),
+					),
+					array(
+						'rules_group'  => $mobile_media_query,
+						'selector'     => ".$container_class.$container_class > *",
+						'declarations' => array(
+							'grid-column' => '1 / -1',
+							'grid-row'    => 'span var(--wp--grid-item--row-span, 1)',
+						),
+					),
+				),
+				array(
+					'context'  => 'block-supports',
+					'prettify' => false,
+				)
+			);
+
+			if ( ! empty( $stacking_styles ) && ! in_array( $container_class, $class_names, true ) ) {
 				$class_names[] = $container_class;
 			}
 		}

@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import {
 	getLayoutStateOverrides,
@@ -227,6 +227,129 @@ describe( 'layout', () => {
 			).toBe(
 				'@media (width <= 480px){.wp-container-test { grid-template-columns: repeat(3, minmax(0, 1fr)); }}'
 			);
+		} );
+
+		describe( 'mobile stacking', () => {
+			const manualGridLayout = {
+				type: 'grid',
+				isManualPlacement: true,
+				columnCount: 3,
+			};
+			const stackingCSS =
+				'.wp-container-test.wp-container-test { aspect-ratio: auto; grid-template-rows: none; grid-auto-rows: auto; --wp--style--grid-cells: auto; }' +
+				'.wp-container-test.wp-container-test > * { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); }';
+
+			let originalExperiment;
+			beforeEach( () => {
+				originalExperiment =
+					window.__experimentalEnableGridInteractivity;
+				window.__experimentalEnableGridInteractivity = true;
+			} );
+			afterEach( () => {
+				window.__experimentalEnableGridInteractivity =
+					originalExperiment;
+			} );
+
+			it( 'stacks the children of a manual placement grid on mobile', () => {
+				expect(
+					getResponsiveLayoutStyles( {
+						attributes: {},
+						blockName: 'core/group',
+						selector: '.wp-container-test',
+						layout: manualGridLayout,
+						hasBlockGapSupport: true,
+					} )
+				).toBe( `@media (width <= 480px){${ stackingCSS }}` );
+			} );
+
+			it( 'combines mobile stacking with mobile layout overrides', () => {
+				expect(
+					getResponsiveLayoutStyles( {
+						attributes: {
+							style: {
+								'@mobile': { layout: { columnCount: 2 } },
+							},
+						},
+						blockName: 'core/group',
+						selector: '.wp-container-test',
+						layout: manualGridLayout,
+						hasBlockGapSupport: true,
+					} )
+				).toBe(
+					`@media (width <= 480px){.wp-container-test { grid-template-columns: repeat(2, minmax(0, 1fr)); }${ stackingCSS }}`
+				);
+			} );
+
+			it( 'does not stack a manual placement grid when stacking is turned off', () => {
+				expect(
+					getResponsiveLayoutStyles( {
+						attributes: {},
+						blockName: 'core/group',
+						selector: '.wp-container-test',
+						layout: { ...manualGridLayout, stackOnMobile: false },
+						hasBlockGapSupport: true,
+					} )
+				).toBe( '' );
+			} );
+
+			it( 'does not stack a manual placement grid when stacking is turned off on mobile', () => {
+				expect(
+					getResponsiveLayoutStyles( {
+						attributes: {
+							style: {
+								'@mobile': { layout: { stackOnMobile: false } },
+							},
+						},
+						blockName: 'core/group',
+						selector: '.wp-container-test',
+						layout: manualGridLayout,
+						hasBlockGapSupport: true,
+					} )
+				).toBe( '' );
+			} );
+
+			it( 'does not stack a grid switched to auto placement on mobile', () => {
+				expect(
+					getResponsiveLayoutStyles( {
+						attributes: {
+							style: {
+								'@mobile': {
+									layout: { isManualPlacement: null },
+								},
+							},
+						},
+						blockName: 'core/group',
+						selector: '.wp-container-test',
+						layout: manualGridLayout,
+						hasBlockGapSupport: true,
+					} )
+				).not.toContain( 'grid-row: span' );
+			} );
+
+			it( 'does not stack auto placement grids', () => {
+				expect(
+					getResponsiveLayoutStyles( {
+						attributes: {},
+						blockName: 'core/group',
+						selector: '.wp-container-test',
+						layout: { type: 'grid', columnCount: 3 },
+						hasBlockGapSupport: true,
+					} )
+				).toBe( '' );
+			} );
+
+			it( 'does not stack manual placement grids without the grid interactivity experiment', () => {
+				window.__experimentalEnableGridInteractivity = false;
+				expect(
+					getResponsiveLayoutStyles( {
+						attributes: {},
+						blockName: 'core/group',
+						selector: '.wp-container-test',
+						layout: manualGridLayout,
+						hasBlockGapSupport: true,
+					} )
+				).toBe( '' );
+			} );
 		} );
 
 		it( 'generates responsive auto grid columns when column count is unset', () => {
