@@ -80,6 +80,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	if (
 		is_callable( 'get_current_screen' ) &&
 		function_exists( 'gutenberg_is_edit_site_page' ) &&
+		is_object( get_current_screen() ) &&
 		gutenberg_is_edit_site_page( get_current_screen()->id ) &&
 		WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() &&
 		gutenberg_supports_block_templates()
