@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   Block Tools: Show the name of the selected block at the top-left corner of its selection outline.
+-   Block Tools: Show the name of the block under the pointer at its top-left corner.
 -   Inserter: Replace random tips with info notices using the same light-bulb icon and style keyboard hints as keys ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
 
 ### Bug Fixes

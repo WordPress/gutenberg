@@ -3,7 +3,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { isTextField } from '@wordpress/dom';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
-import { useRef, useState } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, sprintf, _n } from '@wordpress/i18n';
@@ -13,7 +13,8 @@ import {
 	default as InsertionPoint,
 } from './insertion-point';
 import BlockToolbarPopover from './block-toolbar-popover';
-import BlockSelectionLabel from './block-selection-label';
+import BlockHoverLabel from './block-hover-label';
+import { BlockHoverContext } from '../block-list/use-block-props/use-is-hovered';
 import { store as blockEditorStore } from '../../store';
 import { groupBlocks } from '../../utils/group-blocks';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
@@ -89,11 +90,34 @@ export default function BlockTools( {
 	const {
 		showEmptyBlockSideInserter,
 		showBlockToolbarPopover,
-		showBlockSelectionLabel,
+		showBlockHoverLabel,
 	} = useShowBlockTools();
 	const pasteStyles = usePasteStyles();
 	const [ renamingBlockClientId, setRenamingBlockClientId ] =
 		useState( null );
+
+	// Blocks report hover changes on every element boundary the pointer
+	// crosses, so the latest value is committed once per animation frame.
+	const [ hoveredClientId, setHoveredClientId ] = useState( null );
+	const pendingHoverRef = useRef( { clientId: null, frame: null } );
+	const onHoverChange = useCallback( ( hoveredId ) => {
+		const pending = pendingHoverRef.current;
+		pending.clientId = hoveredId;
+		if ( pending.frame === null ) {
+			pending.frame = window.requestAnimationFrame( () => {
+				pending.frame = null;
+				setHoveredClientId( pending.clientId );
+			} );
+		}
+	}, [] );
+	useEffect( () => {
+		const pending = pendingHoverRef.current;
+		return () => {
+			if ( pending.frame !== null ) {
+				window.cancelAnimationFrame( pending.frame );
+			}
+		};
+	}, [] );
 
 	const { canRename } = useBlockRename(
 		getBlockName( getSelectedBlockClientIds()[ 0 ] )
@@ -315,10 +339,10 @@ export default function BlockTools( {
 					/>
 				) }
 
-				{ showBlockSelectionLabel && (
-					<BlockSelectionLabel
+				{ showBlockHoverLabel && ! isDragging && hoveredClientId && (
+					<BlockHoverLabel
 						__unstableContentRef={ __unstableContentRef }
-						clientId={ clientId }
+						clientId={ hoveredClientId }
 					/>
 				) }
 
@@ -329,7 +353,9 @@ export default function BlockTools( {
 						ref={ blockToolbarRef }
 					/>
 				) }
-				{ children }
+				<BlockHoverContext.Provider value={ onHoverChange }>
+					{ children }
+				</BlockHoverContext.Provider>
 				{ /* Used for inline rich text popovers. */ }
 				<Popover.Slot
 					name="__unstable-block-tools-after"
