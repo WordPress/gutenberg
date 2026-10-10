@@ -425,6 +425,35 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 		$this->assertSame( '<p><span>o</span></p>', $this->normalize_tag_whitespace( $this->strip_in_post( $post_id, $html ) ) );
 	}
 
+	/**
+	 * Builds a paragraph with many unclosed deletion openers followed by a
+	 * closed addition.
+	 *
+	 * @param int $deletions Number of unclosed deletion openers.
+	 * @return string Block HTML.
+	 */
+	private function many_open_deletions_then_addition( $deletions ) {
+		$html = '<p>';
+		for ( $i = 1; $i <= $deletions; $i++ ) {
+			$html .= '<mark class="wp-suggestion" data-suggestion-id="' . $i . '" data-suggestion-type="del">Q';
+		}
+		return $html . '<mark class="wp-suggestion" data-suggestion-id="0" data-suggestion-type="add">PENDING</mark></p>';
+	}
+
+	public function test_addition_after_999_open_deletions_is_removed_once() {
+		$stripped = gutenberg_strip_inline_suggestion_markers( $this->many_open_deletions_then_addition( 999 ) );
+
+		$this->assertStringNotContainsString( 'PENDING', $stripped );
+		$this->assertSame( 999, substr_count( $stripped, 'Q' ) );
+	}
+
+	public function test_addition_after_1000_open_deletions_is_removed_once() {
+		$stripped = gutenberg_strip_inline_suggestion_markers( $this->many_open_deletions_then_addition( 1000 ) );
+
+		$this->assertStringNotContainsString( 'PENDING', $stripped );
+		$this->assertSame( 1000, substr_count( $stripped, 'Q' ) );
+	}
+
 	public function test_filter_is_registered_on_render_block() {
 		$this->assertNotFalse(
 			has_filter( 'render_block', 'gutenberg_strip_inline_suggestion_markers' )

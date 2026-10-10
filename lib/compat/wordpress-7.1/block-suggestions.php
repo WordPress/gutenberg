@@ -484,18 +484,19 @@ function gutenberg_can_suggest_post_meta( $post, $key ) {
  * token, so an unrelated `<mark>` (a `core/text-color` highlight, a `wp-note`,
  * or a `wp-suggestion-foo` class) survives byte-for-byte.
  *
- * A single `WP_HTML_Tag_Processor` walk classifies and strips the markers, the
- * same way `gutenberg_strip_inline_note_markers()` unwraps note markers. The
+ * A single read-only `WP_HTML_Tag_Processor` walk classifies the markers and
+ * records the byte ranges to replace, which are applied once the walk ends. The
  * HTML API has no public way to remove a tag (or a tag and everything up to its
  * closer) yet - it is on the roadmap,
  * https://github.com/WordPress/gutenberg/discussions/54583 - so an anonymous
- * subclass enqueues the text replacements directly. Walking tokens rather than
- * matching `<mark>` with a regex means `</mark>`-looking text inside a comment
- * or an attribute value can never be mistaken for a tag. A nesting stack pairs
- * each opener with its own closer; a marker without a closer (malformed or
- * truncated markup) is left in place so its content is never dropped. When
- * markers nest, the outer replacement wins: replacing a span discards every
- * edit already queued inside it.
+ * subclass exposes the current token's span through one reused bookmark, which
+ * keeps the walk clear of the bookmark limit however many markers a block
+ * holds. Walking tokens rather than matching `<mark>` with a regex means
+ * `</mark>`-looking text inside a comment or an attribute value can never be
+ * mistaken for a tag. A nesting stack pairs each opener with its own closer; a
+ * marker without a closer (malformed or truncated markup) is left in place so
+ * its content is never dropped. When markers nest, the outer replacement wins:
+ * replacing a span discards every edit already recorded inside it.
  *
  * @param string        $block_content Rendered block HTML.
  * @param array         $block         Parsed block. Unused.
@@ -522,87 +523,79 @@ function gutenberg_strip_inline_suggestion_markers( $block_content, $block = arr
 			: (int) get_the_ID();
 	}
 
-	// Anonymous subclass exposing span replacement, which WP_HTML_Tag_Processor
-	// does not provide publicly yet. The redeclaration-guard sniff cannot tell
-	// these class methods from global functions, so it is disabled for the
-	// class body.
+	// Anonymous subclass exposing the byte span of the current token, which
+	// WP_HTML_Tag_Processor does not provide publicly yet. The redeclaration-
+	// guard sniff cannot tell these class methods from global functions, so it
+	// is disabled for the class body.
 	// phpcs:disable Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames.FunctionNotGuardedAgainstRedeclaration
 	$processor = new class( $block_content ) extends WP_HTML_Tag_Processor {
 		/**
-		 * One bookmark per open suggestion marker, so the default limit of 10
-		 * would cap how deeply markers may nest.
-		 */
-		const MAX_BOOKMARKS = 1000;
-
-		/**
-		 * Replaces the bytes from the start of a bookmarked opener to the end
-		 * of the current token, then releases the bookmark.
+		 * Returns the byte span of the current token in the input HTML.
 		 *
-		 * @param string $opener Bookmark set on the opener.
-		 * @param string $text   Replacement text.
-		 */
-		public function replace_through_current_token( string $opener, string $text ): void {
-			$this->set_bookmark( 'here' );
-			$this->replace_range( $this->bookmarks[ $opener ]->start, $this->bookmarks['here']->start + $this->bookmarks['here']->length, $text );
-			$this->release_bookmark( $opener );
-		}
-
-		/**
-		 * Removes a bookmarked opener and the current token, keeping the text
-		 * between them, then releases the bookmark.
+		 * A single bookmark name is reused for every token, so the walk never
+		 * nears the bookmark limit however many markers the block holds. No
+		 * edit is ever enqueued on this processor, so the offsets always refer
+		 * to the unmodified input.
 		 *
-		 * @param string $opener Bookmark set on the opener.
+		 * @return int[]|null Start offset and length, or null when the
+		 *                    processor is not paused on a token.
 		 */
-		public function unwrap_through_current_token( string $opener ): void {
-			$this->set_bookmark( 'here' );
-			$open = $this->bookmarks[ $opener ];
-			$here = $this->bookmarks['here'];
-			$this->replace_range( $open->start, $open->start + $open->length, '' );
-			$this->replace_range( $here->start, $here->start + $here->length, '' );
-			$this->release_bookmark( $opener );
-		}
-
-		/**
-		 * Enqueues a replacement of the half-open byte range [start, end).
-		 *
-		 * Markers nest, so every edit already queued at or after `$start` lies
-		 * inside the range (the cursor is at its end). Those edits are dropped
-		 * first: the processor applies updates in order and would garble the
-		 * output if two of them overlapped. Edits already flushed into the
-		 * document are accounted for, because bookmarks move with them.
-		 *
-		 * @param int    $start Range start.
-		 * @param int    $end   Range end.
-		 * @param string $text  Replacement text.
-		 */
-		private function replace_range( int $start, int $end, string $text ): void {
-			foreach ( $this->lexical_updates as $key => $update ) {
-				if ( $update->start >= $start && $update->start < $end ) {
-					unset( $this->lexical_updates[ $key ] );
-				}
+		public function get_token_span(): ?array {
+			if ( ! $this->set_bookmark( 'here' ) ) {
+				return null;
 			}
-			$this->lexical_updates[] = new WP_HTML_Text_Replacement( $start, $end - $start, $text );
+			return array( $this->bookmarks['here']->start, $this->bookmarks['here']->length );
 		}
 	};
 	// phpcs:enable Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames.FunctionNotGuardedAgainstRedeclaration
+
+	/*
+	 * Edits to apply to the input, as `[ start, end, text ]` byte ranges. They
+	 * are collected during the walk and applied once it ends.
+	 */
+	$edits = array();
+
+	/*
+	 * Queues a replacement of the half-open byte range [start, end). Markers
+	 * nest, so every edit already queued at or after `$start` lies inside the
+	 * range (inner markers close first): those are dropped, and the outer
+	 * replacement wins.
+	 */
+	$replace = static function ( $start, $end, $text ) use ( &$edits ) {
+		foreach ( $edits as $key => $edit ) {
+			if ( $edit[0] >= $start && $edit[0] < $end ) {
+				unset( $edits[ $key ] );
+			}
+		}
+		$edits[] = array( $start, $end, $text );
+	};
 
 	/*
 	 * Each `<mark>` opener pushes its strip mode (`null` for a mark that is not
 	 * a suggestion marker) so each closer pops the mode of its own opener.
 	 */
 	$mark_stack = array();
-	$count      = 0;
 	$query      = array( 'tag_closers' => 'visit' );
 	while ( $processor->next_tag( $query ) ) {
-		$is_mark = 'MARK' === $processor->get_tag();
+		if ( 'MARK' !== $processor->get_tag() ) {
+			continue;
+		}
+
+		$span = $processor->get_token_span();
+		if ( null === $span ) {
+			// Unreachable while paused on a tag; fail closed rather than
+			// guess where a marker starts or ends.
+			return '';
+		}
 
 		if ( $processor->is_tag_closer() ) {
-			$open = $is_mark ? array_pop( $mark_stack ) : null;
+			$open = array_pop( $mark_stack );
 			if ( null === $open ) {
 				continue;
 			}
 			if ( 'del' === $open['mode'] ) {
-				$processor->unwrap_through_current_token( $open['bookmark'] );
+				$edits[] = array( $open['start'], $open['start'] + $open['length'], '' );
+				$edits[] = array( $span[0], $span[0] + $span[1], '' );
 				continue;
 			}
 			$text = '';
@@ -611,21 +604,10 @@ function gutenberg_strip_inline_suggestion_markers( $block_content, $block = arr
 				$text      = gutenberg_strip_inline_suggestion_markers( $open['original'] );
 				$restoring = false;
 			}
-			$processor->replace_through_current_token( $open['bookmark'], $text );
+			$replace( $open['start'], $span[0] + $span[1], $text );
 			continue;
 		}
 
-		/*
-		 * `data-wp-suggestion-strip` was the sentinel attribute of an earlier
-		 * implementation. Keep removing it so a copy planted by a user (data-*
-		 * attributes pass KSES) never reaches public output. On a tag that is
-		 * later removed, the queued removal is dropped with it.
-		 */
-		$processor->remove_attribute( 'data-wp-suggestion-strip' );
-
-		if ( ! $is_mark ) {
-			continue;
-		}
 		if ( ! $processor->has_class( 'wp-suggestion' ) ) {
 			$mark_stack[] = null;
 			continue;
@@ -635,8 +617,9 @@ function gutenberg_strip_inline_suggestion_markers( $block_content, $block = arr
 		// so a malformed marker never silently drops content.
 		$type  = $processor->get_attribute( 'data-suggestion-type' );
 		$entry = array(
-			'mode'     => ( 'add' === $type ) ? 'add' : 'del',
-			'bookmark' => 'suggestion-' . ++$count,
+			'mode'   => ( 'add' === $type ) ? 'add' : 'del',
+			'start'  => $span[0],
+			'length' => $span[1],
 		);
 		if ( 'format' === $type ) {
 			$original = gutenberg_get_pending_format_suggestion_html(
@@ -648,12 +631,38 @@ function gutenberg_strip_inline_suggestion_markers( $block_content, $block = arr
 				$entry['original'] = $original;
 			}
 		}
-		// Past the bookmark limit the marker is left in place, like an
-		// unclosed one, rather than paired without knowing where it starts.
-		$mark_stack[] = $processor->set_bookmark( $entry['bookmark'] ) ? $entry : null;
+		$mark_stack[] = $entry;
 	}
 
-	return $processor->get_updated_html();
+	usort(
+		$edits,
+		static function ( $a, $b ) {
+			return $a[0] - $b[0];
+		}
+	);
+	$html   = '';
+	$cursor = 0;
+	foreach ( $edits as $edit ) {
+		$html  .= substr( $block_content, $cursor, $edit[0] - $cursor ) . $edit[2];
+		$cursor = $edit[1];
+	}
+	$html .= substr( $block_content, $cursor );
+
+	/*
+	 * `data-wp-suggestion-strip` was the sentinel attribute of an earlier
+	 * implementation. Keep removing it so a copy planted by a user (data-*
+	 * attributes pass KSES) never reaches public output. Content removed above
+	 * takes its copies with it.
+	 */
+	if ( false !== strpos( $html, 'data-wp-suggestion-strip' ) ) {
+		$sentinels = new WP_HTML_Tag_Processor( $html );
+		while ( $sentinels->next_tag() ) {
+			$sentinels->remove_attribute( 'data-wp-suggestion-strip' );
+		}
+		$html = $sentinels->get_updated_html();
+	}
+
+	return $html;
 }
 add_filter( 'render_block', 'gutenberg_strip_inline_suggestion_markers', 10, 3 );
 
