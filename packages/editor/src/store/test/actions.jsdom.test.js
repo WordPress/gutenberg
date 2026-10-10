@@ -11,6 +11,7 @@ import warning from '@wordpress/warning';
 import { store as editorStore } from '..';
 import * as actions from '../actions';
 import { EDITOR_INTENT_SUGGEST, EDITOR_INTENT_VIEW } from '../constants';
+import { installSuggestPostEditGuard } from '../suggest-post-edit-guard';
 import { unlock } from '../../lock-unlock';
 
 vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
@@ -220,9 +221,12 @@ describe( 'Post actions', () => {
 			excerpt: 'crackers',
 			status: 'draft',
 			password: 'hunter2',
+			comment_status: 'open',
 		};
 		const REFUSED_STATUS_MESSAGE =
 			"The post status can't be changed while suggesting. Switch to Editing to change it.";
+		const REFUSED_FIELD_MESSAGE =
+			"This setting can't be changed while suggesting. Switch to Editing to change it.";
 
 		function setupPost() {
 			const registry = createRegistryWithStores();
@@ -337,12 +341,12 @@ describe( 'Post actions', () => {
 			 */
 			registry
 				.dispatch( editorStore )
-				.editPost( { status: 'draft', excerpt: 'new crackers' } );
+				.editPost( { status: 'draft', content: 'new crackers' } );
 
 			expect(
 				registry
 					.select( editorStore )
-					.getEditedPostAttribute( 'excerpt' )
+					.getEditedPostAttribute( 'content' )
 			).toBe( 'new crackers' );
 			expect( speak ).not.toHaveBeenCalled();
 			// The no-op status was dropped rather than written back as an edit.
@@ -351,6 +355,71 @@ describe( 'Post actions', () => {
 					.select( coreStore )
 					.getEntityRecordEdits( 'postType', 'post', draftPost.id )
 			).not.toHaveProperty( 'status' );
+		} );
+
+		it( 'refuses any other post-level field it cannot propose while suggesting', () => {
+			const registry = setupPost();
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				EDITOR_INTENT_SUGGEST
+			);
+			speak.mockClear();
+
+			registry
+				.dispatch( editorStore )
+				.editPost( { comment_status: 'closed' } );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getEditedPostAttribute( 'comment_status' )
+			).toBe( draftPost.comment_status );
+			expect( speak ).toHaveBeenCalledWith(
+				REFUSED_FIELD_MESSAGE,
+				'assertive'
+			);
+		} );
+
+		it( 'refuses a direct entity write to the current post while suggesting', () => {
+			const registry = setupPost();
+			const uninstall = installSuggestPostEditGuard( registry );
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				EDITOR_INTENT_SUGGEST
+			);
+			speak.mockClear();
+
+			registry
+				.dispatch( coreStore )
+				.editEntityRecord( 'postType', 'post', draftPost.id, {
+					comment_status: 'closed',
+					content: 'kept',
+				} );
+
+			const edits = registry
+				.select( coreStore )
+				.getEntityRecordEdits( 'postType', 'post', draftPost.id );
+			expect( edits ).not.toHaveProperty( 'comment_status' );
+			// Content still lands: it carries its own suggestion markers.
+			expect( edits ).toHaveProperty( 'content', 'kept' );
+			expect( speak ).toHaveBeenCalledWith(
+				REFUSED_FIELD_MESSAGE,
+				'assertive'
+			);
+
+			// Another intent writes through.
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'edit'
+			);
+			registry
+				.dispatch( coreStore )
+				.editEntityRecord( 'postType', 'post', draftPost.id, {
+					comment_status: 'closed',
+				} );
+			expect(
+				registry
+					.select( coreStore )
+					.getEntityRecordEdits( 'postType', 'post', draftPost.id )
+			).toHaveProperty( 'comment_status', 'closed' );
+			uninstall();
 		} );
 
 		it( 'discards a status staged while editing when the suggest intent is entered', () => {
