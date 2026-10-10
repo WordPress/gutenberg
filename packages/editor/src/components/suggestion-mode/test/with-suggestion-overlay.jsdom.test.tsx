@@ -25,7 +25,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createBlock, registerBlockType } from '@wordpress/blocks';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { RichTextData, unregisterFormatType } from '@wordpress/rich-text';
+import { RichTextData } from '@wordpress/rich-text';
 import withSuggestionOverlay, {
 	structuralMarkerClass,
 	withSuggestionBlockClassName,
@@ -38,7 +38,7 @@ import {
 } from '../suggestion-session';
 import {
 	registerSuggestionFormat,
-	SUGGESTION_FORMAT_NAME,
+	unregisterSuggestionFormats,
 } from '../../inline-suggestions';
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
@@ -335,7 +335,7 @@ describe( 'withSuggestionOverlay', () => {
 		registerSuggestionFormat();
 		try {
 			const marked =
-				'Hello <mark class="wp-suggestion" data-suggestion-id="9" data-suggestion-type="del">doomed</mark>';
+				'Hello <mark class="wp-suggestion-del" data-suggestion-id="9" data-suggestion-type="del">doomed</mark>';
 			const setAttributes = vi.fn();
 			const block = createBlock( HOC_BLOCK, { content: marked } );
 			const { registry } = renderWithProviders(
@@ -363,7 +363,7 @@ describe( 'withSuggestionOverlay', () => {
 			expect( refusal ).toBeDefined();
 			expect( refusal!.status ).toBe( 'warning' );
 		} finally {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
+			unregisterSuggestionFormats();
 		}
 	} );
 
@@ -376,7 +376,7 @@ describe( 'withSuggestionOverlay', () => {
 		registerSuggestionFormat();
 		try {
 			const marked =
-				'Hello <mark class="wp-suggestion" data-suggestion-id="9" data-suggestion-type="del">doomed</mark>';
+				'Hello <mark class="wp-suggestion-del" data-suggestion-id="9" data-suggestion-type="del">doomed</mark>';
 			const block = createBlock( HOC_BLOCK, {
 				content: marked,
 				level: 2,
@@ -403,7 +403,7 @@ describe( 'withSuggestionOverlay', () => {
 				'wp-suggestion'
 			);
 		} finally {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
+			unregisterSuggestionFormats();
 		}
 	} );
 

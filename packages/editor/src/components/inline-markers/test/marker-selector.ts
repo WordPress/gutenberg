@@ -31,3 +31,29 @@ describe( 'getMarkerSelector', () => {
 		);
 	} );
 } );
+
+describe( 'getMarkerSelector with several class tokens', () => {
+	it( 'matches a marker carrying any of the tokens', () => {
+		expect(
+			getMarkerSelector(
+				[ 'wp-suggestion-add', 'wp-suggestion-del' ],
+				'data-suggestion-id',
+				7
+			)
+		).toBe(
+			'mark:is(.wp-suggestion-add, .wp-suggestion-del)[data-suggestion-id="7"]'
+		);
+	} );
+
+	it( 'keeps the plain form for a one-token list', () => {
+		expect( getMarkerSelector( [ 'wp-note' ], 'data-id', 7 ) ).toBe(
+			'mark.wp-note[data-id="7"]'
+		);
+	} );
+
+	it( 'escapes the id the same way', () => {
+		expect( getMarkerSelector( [ 'a', 'b' ], 'data-id', 'x"y' ) ).toBe(
+			'mark:is(.a, .b)[data-id="x\\"y"]'
+		);
+	} );
+} );

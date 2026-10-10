@@ -39,23 +39,42 @@ function parseMarkerValue(
 }
 
 /**
+ * One rich-text format type, or several that share an id space (Suggestion
+ * mode keeps one format per marker kind, and a replacement's id spans two).
+ */
+export type MarkerFormatType = string | readonly string[];
+
+/**
+ * Whether a format is of one of the marker's format types.
+ *
+ * @param format     Rich-text format.
+ * @param formatType Format type or types to match.
+ * @return True on a match.
+ */
+function isMarkerFormat( format: any, formatType: MarkerFormatType ) {
+	return typeof formatType === 'string'
+		? format.type === formatType
+		: formatType.includes( format.type );
+}
+
+/**
  * Whether a character's format stack carries the marker with the given id.
  *
  * @param stack       Formats applied to one character.
- * @param formatType  Rich-text format type to match.
+ * @param formatType  Rich-text format type or types to match.
  * @param idAttribute Marker attribute holding the id.
  * @param target      Marker id, as a string.
  * @return True when the stack holds the marker.
  */
 function carriesId(
 	stack: any[] | undefined,
-	formatType: string,
+	formatType: MarkerFormatType,
 	idAttribute: string,
 	target: string
 ): boolean {
 	return !! stack?.some(
 		( f: any ) =>
-			f.type === formatType &&
+			isMarkerFormat( f, formatType ) &&
 			f.attributes &&
 			f.attributes[ idAttribute ] === target
 	);
@@ -66,7 +85,7 @@ function carriesId(
  * carries every attribute value in `match`.
  *
  * @param stack       Formats applied to one character.
- * @param formatType  Rich-text format type to match.
+ * @param formatType  Rich-text format type or types to match.
  * @param idAttribute Marker attribute holding the id.
  * @param target      Marker id, as a string.
  * @param match       Attribute values to require; none means any marker.
@@ -74,7 +93,7 @@ function carriesId(
  */
 function matchesAttributes(
 	stack: any[] | undefined,
-	formatType: string,
+	formatType: MarkerFormatType,
 	idAttribute: string,
 	target: string,
 	match?: Record< string, string >
@@ -84,7 +103,7 @@ function matchesAttributes(
 	}
 	return !! stack?.some(
 		( f: any ) =>
-			f.type === formatType &&
+			isMarkerFormat( f, formatType ) &&
 			f.attributes?.[ idAttribute ] === target &&
 			Object.entries( match ).every(
 				( [ key, expected ] ) => f.attributes[ key ] === expected
@@ -106,14 +125,14 @@ function matchesAttributes(
  * inline-suggestions) test each character with `carriesId`.
  *
  * @param record      Rich-text record.
- * @param formatType  Rich-text format type to match.
+ * @param formatType  Rich-text format type or types to match.
  * @param idAttribute Marker attribute holding the id.
  * @param id          Marker id to search for.
  * @return Range or null when no marker is found.
  */
 function rangeInRecord(
 	record: any,
-	formatType: string,
+	formatType: MarkerFormatType,
 	idAttribute: string,
 	id: number | string
 ): { start: number; end: number } | null {
@@ -146,7 +165,8 @@ function rangeInRecord(
  *
  * @param value               Block attribute value (RichTextData, string, or other).
  * @param options             Options.
- * @param options.formatType  Rich-text format type to match (e.g. `core/note`).
+ * @param options.formatType  Rich-text format type to match (e.g. `core/note`),
+ *                            or a list of types sharing one id space.
  * @param options.idAttribute Marker attribute holding the id.
  * @param options.id          Marker id to search for.
  * @param options.quickReject Optional substring (e.g. the marker class) used to
@@ -161,7 +181,7 @@ export function findMarkerRange(
 		id,
 		quickReject,
 	}: {
-		formatType: string;
+		formatType: MarkerFormatType;
 		idAttribute?: string;
 		id: number | string | null | undefined;
 		quickReject?: string;
@@ -182,7 +202,7 @@ export function findMarkerRange(
  *
  * @param value               Block attribute value (RichTextData, string, or other).
  * @param options             Options.
- * @param options.formatType  Rich-text format type to match.
+ * @param options.formatType  Rich-text format type, or list of types, to match.
  * @param options.idAttribute Marker attribute holding the id.
  * @param options.id          Marker id to search for.
  * @param options.quickReject Optional substring used to skip parsing when absent.
@@ -200,7 +220,7 @@ export function findMarkerText(
 		quickReject,
 		match,
 	}: {
-		formatType: string;
+		formatType: MarkerFormatType;
 		idAttribute?: string;
 		id: number | string | null | undefined;
 		quickReject?: string;

@@ -4,7 +4,6 @@ import {
 	createRegistry,
 	createReduxStore,
 	RegistryProvider,
-	select,
 } from '@wordpress/data';
 // @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -15,15 +14,10 @@ import {
 	unregisterBlockType,
 	getBlockTypes,
 } from '@wordpress/blocks';
+import { RichTextData } from '@wordpress/rich-text';
 import {
-	RichTextData,
-	registerFormatType,
-	unregisterFormatType,
-	store as richTextStore,
-} from '@wordpress/rich-text';
-import {
-	SUGGESTION_FORMAT_NAME,
-	suggestionFormat,
+	unregisterSuggestionFormats,
+	registerSuggestionFormat,
 } from '../../inline-suggestions';
 import {
 	operationsFromMarker,
@@ -821,16 +815,7 @@ describe( 'attribute proposals on the block marker', () => {
 	const PARAGRAPH = 'core/test-proposal-paragraph';
 
 	beforeAll( () => {
-		if (
-			! ( select( richTextStore as any ) as any ).getFormatType(
-				SUGGESTION_FORMAT_NAME
-			)
-		) {
-			registerFormatType(
-				SUGGESTION_FORMAT_NAME,
-				suggestionFormat as any
-			);
-		}
+		registerSuggestionFormat();
 		registerBlockType( PARAGRAPH, {
 			apiVersion: 3,
 			attributes: {
@@ -845,13 +830,7 @@ describe( 'attribute proposals on the block marker', () => {
 	} );
 
 	afterAll( () => {
-		if (
-			( select( richTextStore as any ) as any ).getFormatType(
-				SUGGESTION_FORMAT_NAME
-			)
-		) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 		getBlockTypes().forEach( ( block ) =>
 			unregisterBlockType( block.name )
 		);
@@ -989,7 +968,7 @@ describe( 'attribute proposals on the block marker', () => {
 				.dispatch( blockEditorStore )
 				.updateBlockAttributes( block.clientId, {
 					content: RichTextData.fromHTMLString(
-						'Hello <mark class="wp-suggestion" data-suggestion-id="9" data-suggestion-type="add">world</mark>'
+						'Hello <mark class="wp-suggestion-add" data-suggestion-id="9" data-suggestion-type="add">world</mark>'
 					),
 				} );
 		} );
@@ -1077,16 +1056,7 @@ describe( 'rejectSuggestion (inline marker)', () => {
 	const PARAGRAPH = 'core/test-inline-paragraph';
 
 	beforeAll( () => {
-		if (
-			! ( select( richTextStore as any ) as any ).getFormatType(
-				SUGGESTION_FORMAT_NAME
-			)
-		) {
-			registerFormatType(
-				SUGGESTION_FORMAT_NAME,
-				suggestionFormat as any
-			);
-		}
+		registerSuggestionFormat();
 		registerBlockType( PARAGRAPH, {
 			apiVersion: 3,
 			attributes: {
@@ -1100,13 +1070,7 @@ describe( 'rejectSuggestion (inline marker)', () => {
 	} );
 
 	afterAll( () => {
-		if (
-			( select( richTextStore as any ) as any ).getFormatType(
-				SUGGESTION_FORMAT_NAME
-			)
-		) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 		getBlockTypes().forEach( ( block ) =>
 			unregisterBlockType( block.name )
 		);
@@ -1148,7 +1112,7 @@ describe( 'rejectSuggestion (inline marker)', () => {
 		// Write the marked value directly so the attribute is a real
 		// RichTextData (as in the editor), bypassing string sanitization.
 		const markedValue = RichTextData.fromHTMLString(
-			'Hello <mark class="wp-suggestion" data-suggestion-id="9" data-suggestion-type="add">world</mark>'
+			'Hello <mark class="wp-suggestion-add" data-suggestion-id="9" data-suggestion-type="add">world</mark>'
 		);
 		registry
 			.dispatch( blockEditorStore )
@@ -1825,16 +1789,7 @@ describe( 'review decisions and undo history', () => {
 	const PARAGRAPH = 'core/test-decision-paragraph';
 
 	beforeAll( () => {
-		if (
-			! ( select( richTextStore as any ) as any ).getFormatType(
-				SUGGESTION_FORMAT_NAME
-			)
-		) {
-			registerFormatType(
-				SUGGESTION_FORMAT_NAME,
-				suggestionFormat as any
-			);
-		}
+		registerSuggestionFormat();
 		registerBlockType( PARAGRAPH, {
 			apiVersion: 3,
 			attributes: {
@@ -1848,13 +1803,7 @@ describe( 'review decisions and undo history', () => {
 	} );
 
 	afterAll( () => {
-		if (
-			( select( richTextStore as any ) as any ).getFormatType(
-				SUGGESTION_FORMAT_NAME
-			)
-		) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 		getBlockTypes().forEach( ( block ) =>
 			unregisterBlockType( block.name )
 		);
@@ -1885,7 +1834,7 @@ describe( 'review decisions and undo history', () => {
 			.dispatch( blockEditorStore )
 			.updateBlockAttributes( block.clientId, {
 				content: RichTextData.fromHTMLString(
-					'Hello <mark class="wp-suggestion" data-suggestion-id="9" data-suggestion-type="add">world</mark>'
+					'Hello <mark class="wp-suggestion-add" data-suggestion-id="9" data-suggestion-type="add">world</mark>'
 				),
 			} );
 		// Close the setup writes as a normal undo level so the assertions
@@ -2156,16 +2105,7 @@ describe( 'decisions record a provisional status first', () => {
 	const BLOCK = 'core/test-order-paragraph';
 
 	beforeAll( () => {
-		if (
-			! ( select( richTextStore as any ) as any ).getFormatType(
-				SUGGESTION_FORMAT_NAME
-			)
-		) {
-			registerFormatType(
-				SUGGESTION_FORMAT_NAME,
-				suggestionFormat as any
-			);
-		}
+		registerSuggestionFormat();
 		registerBlockType( BLOCK, {
 			apiVersion: 3,
 			attributes: {
@@ -2180,13 +2120,7 @@ describe( 'decisions record a provisional status first', () => {
 	} );
 
 	afterAll( () => {
-		if (
-			( select( richTextStore as any ) as any ).getFormatType(
-				SUGGESTION_FORMAT_NAME
-			)
-		) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 		getBlockTypes().forEach( ( block ) =>
 			unregisterBlockType( block.name )
 		);
@@ -2259,7 +2193,7 @@ describe( 'decisions record a provisional status first', () => {
 	const marked = () => {
 		const block = createBlock( BLOCK, { metadata: { noteId: [ 9 ] } } );
 		block.attributes.content = RichTextData.fromHTMLString(
-			'Hello <mark class="wp-suggestion" data-suggestion-id="9" data-suggestion-type="add">world</mark>'
+			'Hello <mark class="wp-suggestion-add" data-suggestion-id="9" data-suggestion-type="add">world</mark>'
 		);
 		return block;
 	};

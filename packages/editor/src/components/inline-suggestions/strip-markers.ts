@@ -7,12 +7,27 @@ import {
 import type { RichTextValue } from '@wordpress/rich-text';
 import {
 	SUGGESTION_AUTHOR_ATTRIBUTE,
-	SUGGESTION_CLASS,
-	SUGGESTION_FORMAT_NAME,
+	SUGGESTION_CLASS_PROBE,
+	SUGGESTION_FORMAT_NAMES,
 	SUGGESTION_ID_ATTRIBUTE,
-	SUGGESTION_TYPE_ADDITION,
-	SUGGESTION_TYPE_ATTRIBUTE,
+	isSuggestionFormat,
+	suggestionMarkersAt,
+	suggestionMarkersIn,
 } from './format';
+
+/**
+ * Drop every suggestion marker, of every kind, from a record.
+ *
+ * @param record Rich-text record.
+ * @return The record without markers.
+ */
+function removeAllMarkers( record: RichTextValue ): RichTextValue {
+	let result = record;
+	for ( const name of SUGGESTION_FORMAT_NAMES ) {
+		result = removeFormat( result, name, 0, result.text.length );
+	}
+	return result;
+}
 
 /**
  * Whether an attribute value carries a live inline suggestion marker.
@@ -24,25 +39,23 @@ import {
  * (text that mentions the class) only cost an edit its overlay capture.
  *
  * @param value Attribute value (string, RichTextData, or anything else).
- * @return True when the value contains a `core/suggestion` marker.
+ * @return True when the value contains a suggestion marker of any kind.
  */
 export function hasSuggestionMarkers( value: any ): boolean {
 	if ( typeof value === 'string' ) {
-		return value.includes( SUGGESTION_CLASS );
+		return value.includes( SUGGESTION_CLASS_PROBE );
 	}
 	if ( value instanceof RichTextData ) {
 		// `RichTextData` types its `formats` as `never[]`.
 		const formats: RichTextValue[ 'formats' ] = value.formats;
-		return formats.some( ( stack ) =>
-			stack?.some( ( format ) => format.type === SUGGESTION_FORMAT_NAME )
-		);
+		return formats.some( ( stack ) => stack?.some( isSuggestionFormat ) );
 	}
 	return false;
 }
 
 /**
- * Strip inline `core/suggestion` markers from a single attribute value,
- * unwrapping the `<mark class="wp-suggestion">` format while keeping the text
+ * Strip inline suggestion markers of every kind from a single attribute value,
+ * unwrapping each `<mark class="wp-suggestion-<kind>">` while keeping the text
  * and every other format (bold, links, and nested notes markers included).
  *
  * Why: values captured into the attribute overlay (baseline and proposed
@@ -66,16 +79,10 @@ export function stripSuggestionMarkers( value: any ): any {
 		return value;
 	}
 	const html = isRich ? value.toHTMLString() : value;
-	if ( ! html.includes( SUGGESTION_CLASS ) ) {
+	if ( ! html.includes( SUGGESTION_CLASS_PROBE ) ) {
 		return value;
 	}
-	const record = create( { html } );
-	const stripped = removeFormat(
-		record,
-		SUGGESTION_FORMAT_NAME,
-		0,
-		record.text.length
-	);
+	const stripped = removeAllMarkers( create( { html } ) );
 	const result = new RichTextData( stripped as any );
 	return isRich ? result : result.toHTMLString();
 }
@@ -117,7 +124,8 @@ export function stripSuggestionMarkersFromAttributes(
  * them (`gutenberg_strip_inline_suggestion_markers`): text proposed for
  * deletion is real text and stays; the author's own proposed text stays, now
  * proposed by the insertion; formatting proposed on a run stays on it; text
- * another author proposed is not this author's to adopt, so it is dropped.
+ * another author proposed is not this author's to adopt, so it is dropped,
+ * with whatever was nested inside it.
  *
  * @param value    Attribute value (string, RichTextData, or anything else).
  * @param authorId Current author id. An unauthored marker counts as the
@@ -134,7 +142,7 @@ export function settleInsertedSuggestionMarkers(
 		return { value, ids: [] };
 	}
 	const html = isRich ? value.toHTMLString() : value;
-	if ( ! html.includes( SUGGESTION_CLASS ) ) {
+	if ( ! html.includes( SUGGESTION_CLASS_PROBE ) ) {
 		return { value, ids: [] };
 	}
 	const authorToken =
@@ -143,20 +151,18 @@ export function settleInsertedSuggestionMarkers(
 	const ids = new Set< string >();
 	const isForeignAddition: boolean[] = [];
 	record.formats.forEach( ( stack, index ) => {
-		const marker = stack?.find(
-			( format ) => format.type === SUGGESTION_FORMAT_NAME
-		);
-		const attributes: Record< string, string > =
-			( marker?.attributes as Record< string, string > ) ?? {};
-		if ( marker && attributes[ SUGGESTION_ID_ATTRIBUTE ] ) {
-			ids.add( String( attributes[ SUGGESTION_ID_ATTRIBUTE ] ) );
+		for ( const marker of suggestionMarkersIn( stack ) ) {
+			const id = marker.attributes?.[ SUGGESTION_ID_ATTRIBUTE ];
+			if ( id ) {
+				ids.add( String( id ) );
+			}
 		}
+		const addition = suggestionMarkersAt( stack ).add;
 		isForeignAddition[ index ] =
-			!! marker &&
-			attributes[ SUGGESTION_TYPE_ATTRIBUTE ] ===
-				SUGGESTION_TYPE_ADDITION &&
-			String( attributes[ SUGGESTION_AUTHOR_ATTRIBUTE ] ?? '' ) !==
-				authorToken;
+			!! addition &&
+			String(
+				addition.attributes?.[ SUGGESTION_AUTHOR_ATTRIBUTE ] ?? ''
+			) !== authorToken;
 	} );
 	// Last run first, so earlier offsets stay valid as text is removed.
 	for ( let end = record.text.length; end > 0; ) {
@@ -171,12 +177,7 @@ export function settleInsertedSuggestionMarkers(
 		record = remove( record, start, end );
 		end = start;
 	}
-	record = removeFormat(
-		record,
-		SUGGESTION_FORMAT_NAME,
-		0,
-		record.text.length
-	);
+	record = removeAllMarkers( record );
 	const result = new RichTextData( record as any );
 	return {
 		value: isRich ? result : result.toHTMLString(),

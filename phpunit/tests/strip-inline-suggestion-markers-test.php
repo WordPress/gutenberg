@@ -3,8 +3,7 @@
  * Tests that inline suggestion markers are stripped from rendered block output
  * via the render_block filter, type-aware, while raw post content is untouched.
  *
- * A `<mark class="wp-suggestion" data-suggestion-type="del|add">` wrapper is
- * removed entirely. A deletion keeps the marked text (it is only removed when
+ * A `<mark class="wp-suggestion-del|add|format">` wrapper is removed entirely. A deletion keeps the marked text (it is only removed when
  * the suggestion is accepted in the editor); an addition removes the marked text
  * too (un-accepted proposed content must never reach the public HTML).
  *
@@ -13,29 +12,29 @@
 class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 
 	public function test_deletion_unwraps_wrapper_but_keeps_text() {
-		$html     = '<p>Hello <mark class="wp-suggestion" data-suggestion-id="7" data-suggestion-type="del">marked</mark> world</p>';
+		$html     = '<p>Hello <mark class="wp-suggestion-del" data-suggestion-id="7" data-suggestion-type="del">marked</mark> world</p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertSame( '<p>Hello marked world</p>', $stripped );
 	}
 
 	public function test_addition_removes_wrapper_and_text() {
-		$html     = '<p>Hello <mark class="wp-suggestion" data-suggestion-id="7" data-suggestion-type="add">added </mark>world</p>';
+		$html     = '<p>Hello <mark class="wp-suggestion-add" data-suggestion-id="7" data-suggestion-type="add">added </mark>world</p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertSame( '<p>Hello world</p>', $stripped );
 	}
 
-	public function test_missing_type_defaults_to_deletion() {
-		// A malformed marker with no type must keep its text rather than drop it.
-		$html     = '<p><mark class="wp-suggestion" data-suggestion-id="7">kept</mark></p>';
+	public function test_deletion_without_a_type_attribute_keeps_its_text() {
+		// The class says what the marker is; the type attribute is optional.
+		$html     = '<p><mark class="wp-suggestion-del" data-suggestion-id="7">kept</mark></p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertSame( '<p>kept</p>', $stripped );
 	}
 
 	public function test_mixed_deletion_and_addition_in_one_block() {
-		$html     = '<p><mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del">old</mark> and <mark class="wp-suggestion" data-suggestion-id="2" data-suggestion-type="add">new</mark></p>';
+		$html     = '<p><mark class="wp-suggestion-del" data-suggestion-id="1" data-suggestion-type="del">old</mark> and <mark class="wp-suggestion-add" data-suggestion-id="2" data-suggestion-type="add">new</mark></p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		// Deletion keeps "old"; addition drops "new".
@@ -74,7 +73,7 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	}
 
 	public function test_deletion_preserves_nested_formatting() {
-		$html     = '<p><mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del">a <span style="color:red">red</span> b</mark></p>';
+		$html     = '<p><mark class="wp-suggestion-del" data-suggestion-id="1" data-suggestion-type="del">a <span style="color:red">red</span> b</mark></p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertSame( '<p>a <span style="color:red">red</span> b</p>', $stripped );
@@ -82,7 +81,7 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 
 	public function test_addition_removes_nested_formatting() {
 		// The whole proposed span goes, including any nested formatting.
-		$html     = '<p>keep<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add"> a <span style="color:red">red</span> b</mark></p>';
+		$html     = '<p>keep<mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add"> a <span style="color:red">red</span> b</mark></p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertSame( '<p>keep</p>', $stripped );
@@ -91,7 +90,7 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	public function test_deletion_nested_inside_addition_removes_whole_span() {
 		// A deletion marker nested inside an addition: the whole addition span is
 		// removed, so the nested deletion's wrappers cannot corrupt offsets.
-		$html     = '<p>x<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add">a<mark class="wp-suggestion" data-suggestion-id="2" data-suggestion-type="del">b</mark>c</mark>y</p>';
+		$html     = '<p>x<mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add">a<mark class="wp-suggestion-del" data-suggestion-id="2" data-suggestion-type="del">b</mark>c</mark>y</p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertSame( '<p>xy</p>', $stripped );
@@ -100,7 +99,7 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	public function test_addition_nested_inside_deletion_keeps_del_text_drops_add_text() {
 		// A deletion wrapping an addition: the deletion unwraps (text kept) while
 		// the inner addition drops its own wrapper and text.
-		$html     = '<p><mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del">keep <mark class="wp-suggestion" data-suggestion-id="2" data-suggestion-type="add">new</mark> end</mark></p>';
+		$html     = '<p><mark class="wp-suggestion-del" data-suggestion-id="1" data-suggestion-type="del">keep <mark class="wp-suggestion-add" data-suggestion-id="2" data-suggestion-type="add">new</mark> end</mark></p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertSame( '<p>keep  end</p>', $stripped );
@@ -120,13 +119,13 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	public function test_planted_sentinel_does_not_affect_a_genuine_marker_pass() {
 		// The planted "add" sentinel on the first (plain) mark is defused, so
 		// its text survives; the genuine deletion marker still unwraps.
-		$html     = '<p><mark data-wp-suggestion-strip="add">safe</mark><mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del">old</mark></p>';
+		$html     = '<p><mark data-wp-suggestion-strip="add">safe</mark><mark class="wp-suggestion-del" data-suggestion-id="1" data-suggestion-type="del">old</mark></p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertStringContainsString( 'safe', $stripped );
 		$this->assertStringContainsString( 'old', $stripped );
 		$this->assertStringNotContainsString( 'data-wp-suggestion-strip', $stripped );
-		$this->assertStringNotContainsString( 'wp-suggestion"', $stripped );
+		$this->assertStringNotContainsString( 'wp-suggestion-', $stripped );
 	}
 
 	public function test_planted_sentinel_on_non_mark_tag_is_removed() {
@@ -140,7 +139,7 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	public function test_unpaired_flagged_opener_leaks_no_sentinel() {
 		// An addition with no closer still never shows its text, and the
 		// internal sentinel must not leak into public output.
-		$html     = '<p><mark class="wp-suggestion" data-wp-suggestion-strip="del" data-suggestion-id="1" data-suggestion-type="add">oops</p>';
+		$html     = '<p><mark class="wp-suggestion-add" data-wp-suggestion-strip="del" data-suggestion-id="1" data-suggestion-type="add">oops</p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertSame( '<p></p>', $stripped );
@@ -149,21 +148,21 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	public function test_closer_inside_attribute_of_addition_child_does_not_end_the_addition() {
 		// A literal `</mark>` inside an attribute value is not a tag; the
 		// addition still spans to its real closer and is removed whole.
-		$html     = '<p>x<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add">a<span title="</mark>">b</span>c</mark>y</p>';
+		$html     = '<p>x<mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add">a<span title="</mark>">b</span>c</mark>y</p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertSame( '<p>xy</p>', $stripped );
 	}
 
 	public function test_closer_inside_attribute_of_deletion_child_is_kept_verbatim() {
-		$html     = '<p><mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del">a<span title="</mark>">b</span>c</mark>d</p>';
+		$html     = '<p><mark class="wp-suggestion-del" data-suggestion-id="1" data-suggestion-type="del">a<span title="</mark>">b</span>c</mark>d</p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertSame( '<p>a<span title="</mark>">b</span>cd</p>', $stripped );
 	}
 
 	public function test_mark_lookalikes_inside_attributes_outside_markers_are_kept() {
-		$html     = '<p><span title="</mark>">t</span><span title="<mark class=wp-suggestion>">u</span><mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add">new</mark>z</p>';
+		$html     = '<p><span title="</mark>">t</span><span title="<mark class=wp-suggestion>">u</span><mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add">new</mark>z</p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertSame( '<p><span title="</mark>">t</span><span title="<mark class=wp-suggestion>">u</span>z</p>', $stripped );
@@ -173,7 +172,7 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 		// The sentinel-shaped text is an attribute value, not an attribute, so
 		// the plain highlight must survive byte-for-byte.
 		$plain    = '<mark title=\'x data-wp-suggestion-strip="add"\'>keep</mark>';
-		$html     = '<p>' . $plain . '<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del">old</mark></p>';
+		$html     = '<p>' . $plain . '<mark class="wp-suggestion-del" data-suggestion-id="1" data-suggestion-type="del">old</mark></p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertSame( '<p>' . $plain . 'old</p>', $stripped );
@@ -181,35 +180,35 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 
 	public function test_sentinel_lookalike_in_attribute_value_inside_deletion_is_ignored() {
 		$plain    = '<mark title=\'x data-wp-suggestion-strip="add"\'>keep</mark>';
-		$html     = '<p><mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del">a' . $plain . 'b</mark></p>';
+		$html     = '<p><mark class="wp-suggestion-del" data-suggestion-id="1" data-suggestion-type="del">a' . $plain . 'b</mark></p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertSame( '<p>a' . $plain . 'b</p>', $stripped );
 	}
 
 	public function test_sentinel_lookalike_in_attribute_value_inside_addition_is_removed_with_it() {
-		$html     = '<p>x<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add">a<mark title=\'data-wp-suggestion-strip="del" </mark>\'>k</mark>b</mark>y</p>';
+		$html     = '<p>x<mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add">a<mark title=\'data-wp-suggestion-strip="del" </mark>\'>k</mark>b</mark>y</p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertSame( '<p>xy</p>', $stripped );
 	}
 
 	public function test_closer_inside_html_comment_in_addition_does_not_end_the_addition() {
-		$html     = '<p>x<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add">a<!-- </mark> -->b</mark>y</p>';
+		$html     = '<p>x<mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add">a<!-- </mark> -->b</mark>y</p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertSame( '<p>xy</p>', $stripped );
 	}
 
 	public function test_closer_inside_html_comment_in_deletion_is_kept_verbatim() {
-		$html     = '<p><mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del">a<!-- </mark> -->b</mark>c</p>';
+		$html     = '<p><mark class="wp-suggestion-del" data-suggestion-id="1" data-suggestion-type="del">a<!-- </mark> -->b</mark>c</p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertSame( '<p>a<!-- </mark> -->bc</p>', $stripped );
 	}
 
 	public function test_uppercase_mark_tags_are_stripped() {
-		$html     = '<p>x<MARK class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add">new</Mark>y<MARK class="wp-suggestion" data-suggestion-id="2" data-suggestion-type="del">old</MARK></p>';
+		$html     = '<p>x<MARK class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add">new</Mark>y<MARK class="wp-suggestion-del" data-suggestion-id="2" data-suggestion-type="del">old</MARK></p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertSame( '<p>xyold</p>', $stripped );
@@ -219,7 +218,7 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 		// The `</p>` implicitly closes the addition, as it does in a browser and
 		// in the editor: the pending text up to it is removed, and its metadata
 		// never renders.
-		$html     = '<p>keep <mark class="wp-suggestion" data-suggestion-type="add" data-author="3" data-suggestion-id="1">PENDING</p>';
+		$html     = '<p>keep <mark class="wp-suggestion-add" data-suggestion-type="add" data-author="3" data-suggestion-id="1">PENDING</p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertSame( '<p>keep </p>', $stripped );
@@ -227,7 +226,7 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 
 	public function test_addition_left_open_by_a_closed_plain_mark_is_removed() {
 		// The `</mark>` closes the inner plain mark, leaving the addition open.
-		$html     = '<p><mark class="wp-suggestion" data-suggestion-type="add" data-author="3" data-suggestion-id="1">PENDING<mark>x</mark></p>';
+		$html     = '<p><mark class="wp-suggestion-add" data-suggestion-type="add" data-author="3" data-suggestion-id="1">PENDING<mark>x</mark></p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertSame( '<p></p>', $stripped );
@@ -235,14 +234,14 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 
 	public function test_unclosed_addition_is_removed_with_a_closed_inner_deletion() {
 		// The `</mark>` closes the inner deletion, leaving the addition open.
-		$html     = '<p>x<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add">a<mark class="wp-suggestion" data-suggestion-id="2" data-suggestion-type="del">b</mark>c</p><p>y</p>';
+		$html     = '<p>x<mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add">a<mark class="wp-suggestion-del" data-suggestion-id="2" data-suggestion-type="del">b</mark>c</p><p>y</p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertSame( '<p>x</p><p>y</p>', $stripped );
 	}
 
 	public function test_unclosed_addition_runs_to_the_end_of_the_block() {
-		$html     = 'a<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add">PENDING<span>more';
+		$html     = 'a<mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add">PENDING<span>more';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertSame( 'a', $stripped );
@@ -251,14 +250,14 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	public function test_unclosed_addition_is_not_ended_by_a_closer_outside_table_scope() {
 		// A browser ignores `</div>` inside the table cell, so the cell (and
 		// the text after it) stays inside the addition.
-		$html     = '<div>a<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add"><table><tr><td>X</div>Y</td></tr></table></div>';
+		$html     = '<div>a<mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add"><table><tr><td>X</div>Y</td></tr></table></div>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertSame( '<div>a</div>', $stripped );
 	}
 
 	public function test_unclosed_deletion_keeps_its_text_but_drops_the_marker() {
-		$html     = '<p>a<mark class="wp-suggestion" data-suggestion-type="del" data-author="3" data-suggestion-id="1">kept</p>';
+		$html     = '<p>a<mark class="wp-suggestion-del" data-suggestion-type="del" data-author="3" data-suggestion-id="1">kept</p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertSame( '<p>akept</p>', $stripped );
@@ -267,20 +266,20 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	public function test_unclosed_format_is_removed() {
 		$post_id = self::factory()->post->create();
 		$note_id = $this->create_format_note( $post_id, 'orig' );
-		$html    = '<p>a<mark class="wp-suggestion" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>b</strong></p>';
+		$html    = '<p>a<mark class="wp-suggestion-format" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>b</strong></p>';
 
 		$this->assertSame( '<p>a</p>', $this->strip_in_post( $post_id, $html ) );
 	}
 
 	public function test_planted_sentinel_on_unclosed_marker_is_removed() {
-		$html     = '<p><mark class="wp-suggestion" data-wp-suggestion-strip="add" data-suggestion-id="1" data-suggestion-type="del">kept</p>';
+		$html     = '<p><mark class="wp-suggestion-del" data-wp-suggestion-strip="add" data-suggestion-id="1" data-suggestion-type="del">kept</p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertSame( '<p>kept</p>', $stripped );
 	}
 
 	public function test_planted_sentinel_inside_deletion_is_removed() {
-		$html     = '<p><mark class="wp-suggestion" data-wp-suggestion-strip="add" data-suggestion-id="1" data-suggestion-type="del">a<span data-wp-suggestion-strip="add" class="c">b</span></mark></p>';
+		$html     = '<p><mark class="wp-suggestion-del" data-wp-suggestion-strip="add" data-suggestion-id="1" data-suggestion-type="del">a<span data-wp-suggestion-strip="add" class="c">b</span></mark></p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertSame( '<p>a<span class="c">b</span></p>', $this->normalize_tag_whitespace( $stripped ) );
@@ -290,7 +289,7 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 		// More open markers than the tag processor's default bookmark limit.
 		$html = '<p>';
 		for ( $i = 1; $i <= 15; $i++ ) {
-			$html .= '<mark class="wp-suggestion" data-suggestion-id="' . $i . '" data-suggestion-type="del">' . $i;
+			$html .= '<mark class="wp-suggestion-del" data-suggestion-id="' . $i . '" data-suggestion-type="del">' . $i;
 		}
 		$html    .= str_repeat( '</mark>', 15 ) . '</p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
@@ -301,14 +300,14 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	public function test_many_planted_sentinels_inside_an_addition_are_removed_with_it() {
 		// Enough attribute updates to make the tag processor flush its queue
 		// mid-walk, before the addition's closer is reached.
-		$html     = '<p>x<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add">' . str_repeat( '<span data-wp-suggestion-strip="add">s</span>', 1200 ) . '</mark>y</p>';
+		$html     = '<p>x<mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add">' . str_repeat( '<span data-wp-suggestion-strip="add">s</span>', 1200 ) . '</mark>y</p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertSame( '<p>xy</p>', $stripped );
 	}
 
 	public function test_many_planted_sentinels_inside_a_deletion_are_removed() {
-		$html     = '<p><mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del">' . str_repeat( '<span data-wp-suggestion-strip="add">s</span>', 1200 ) . '</mark>y</p>';
+		$html     = '<p><mark class="wp-suggestion-del" data-suggestion-id="1" data-suggestion-type="del">' . str_repeat( '<span data-wp-suggestion-strip="add">s</span>', 1200 ) . '</mark>y</p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
 		$this->assertSame( '<p>' . str_repeat( '<span>s</span>', 1200 ) . 'y</p>', $this->normalize_tag_whitespace( $stripped ) );
@@ -407,7 +406,7 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	 * @return string Marker HTML.
 	 */
 	private function format_marker( $note_id, $inner ) {
-		return '<mark class="wp-suggestion" data-suggestion-id="' . $note_id . '" data-suggestion-type="format">' . $inner . '</mark>';
+		return '<mark class="wp-suggestion-format" data-suggestion-id="' . $note_id . '" data-suggestion-type="format">' . $inner . '</mark>';
 	}
 
 	/**
@@ -513,7 +512,7 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	public function test_pending_format_restores_the_original_run() {
 		$post_id = self::factory()->post->create();
 		$note_id = $this->create_format_note( $post_id, 'world' );
-		$html    = '<p>Hello <mark class="wp-suggestion" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>world</strong></mark></p>';
+		$html    = '<p>Hello <mark class="wp-suggestion-format" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>world</strong></mark></p>';
 
 		// The proposed bold must not reach readers until it is accepted.
 		$this->assertSame( '<p>Hello world</p>', $this->strip_in_post( $post_id, $html ) );
@@ -522,7 +521,7 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	public function test_pending_format_restores_original_formatting() {
 		$post_id = self::factory()->post->create();
 		$note_id = $this->create_format_note( $post_id, '<em>world</em>' );
-		$html    = '<p>Hello <mark class="wp-suggestion" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>world</strong></mark>!</p>';
+		$html    = '<p>Hello <mark class="wp-suggestion-format" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>world</strong></mark>!</p>';
 
 		$this->assertSame( '<p>Hello <em>world</em>!</p>', $this->strip_in_post( $post_id, $html ) );
 	}
@@ -530,7 +529,7 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	public function test_applied_format_keeps_the_proposed_formatting() {
 		$post_id = self::factory()->post->create();
 		$note_id = $this->create_format_note( $post_id, 'world', 'applied' );
-		$html    = '<p>Hello <mark class="wp-suggestion" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>world</strong></mark></p>';
+		$html    = '<p>Hello <mark class="wp-suggestion-format" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>world</strong></mark></p>';
 
 		$this->assertSame( '<p>Hello <strong>world</strong></p>', $this->strip_in_post( $post_id, $html ) );
 	}
@@ -541,14 +540,14 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 		$other_id = self::factory()->post->create( array( 'post_status' => 'private' ) );
 		$post_id  = self::factory()->post->create();
 		$note_id  = $this->create_format_note( $other_id, 'secret' );
-		$html     = '<p><mark class="wp-suggestion" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>world</strong></mark></p>';
+		$html     = '<p><mark class="wp-suggestion-format" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>world</strong></mark></p>';
 
 		$this->assertSame( '<p><strong>world</strong></p>', $this->strip_in_post( $post_id, $html ) );
 	}
 
 	public function test_format_marker_without_a_note_unwraps() {
 		$post_id = self::factory()->post->create();
-		$html    = '<p><mark class="wp-suggestion" data-suggestion-id="999999" data-suggestion-type="format"><strong>world</strong></mark></p>';
+		$html    = '<p><mark class="wp-suggestion-format" data-suggestion-id="999999" data-suggestion-type="format"><strong>world</strong></mark></p>';
 
 		$this->assertSame( '<p><strong>world</strong></p>', $this->strip_in_post( $post_id, $html ) );
 	}
@@ -564,7 +563,7 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 				'comment_approved' => '0',
 			)
 		);
-		$inner   = '<mark class="wp-suggestion" data-suggestion-id="' . $note_id . '" data-suggestion-type="format">world</mark>';
+		$inner   = '<mark class="wp-suggestion-format" data-suggestion-id="' . $note_id . '" data-suggestion-type="format">world</mark>';
 		update_comment_meta(
 			$note_id,
 			'_wp_suggestion',
@@ -590,7 +589,7 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	public function test_format_nested_inside_addition_is_removed_with_it() {
 		$post_id = self::factory()->post->create();
 		$note_id = $this->create_format_note( $post_id, 'orig' );
-		$html    = '<p>x<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add">a<mark class="wp-suggestion" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>b</strong></mark>c</mark>y</p>';
+		$html    = '<p>x<mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add">a<mark class="wp-suggestion-format" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>b</strong></mark>c</mark>y</p>';
 
 		$this->assertSame( '<p>xy</p>', $this->strip_in_post( $post_id, $html ) );
 	}
@@ -598,15 +597,15 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	public function test_markers_nested_inside_a_restored_format_run_are_replaced_with_it() {
 		$post_id = self::factory()->post->create();
 		$note_id = $this->create_format_note( $post_id, 'orig' );
-		$html    = '<p>x<mark class="wp-suggestion" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>a<mark class="wp-suggestion" data-suggestion-id="2" data-suggestion-type="add">b</mark><mark class="wp-suggestion" data-suggestion-id="3" data-suggestion-type="del">c</mark></strong></mark>y</p>';
+		$html    = '<p>x<mark class="wp-suggestion-format" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>a<mark class="wp-suggestion-add" data-suggestion-id="2" data-suggestion-type="add">b</mark><mark class="wp-suggestion-del" data-suggestion-id="3" data-suggestion-type="del">c</mark></strong></mark>y</p>';
 
 		$this->assertSame( '<p>xorigy</p>', $this->strip_in_post( $post_id, $html ) );
 	}
 
 	public function test_restored_format_run_has_its_own_markers_and_sentinels_stripped() {
 		$post_id = self::factory()->post->create();
-		$note_id = $this->create_format_note( $post_id, '<span data-wp-suggestion-strip="add">o</span><mark class="wp-suggestion" data-suggestion-id="5" data-suggestion-type="add">new</mark>' );
-		$html    = '<p><mark class="wp-suggestion" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>b</strong></mark></p>';
+		$note_id = $this->create_format_note( $post_id, '<span data-wp-suggestion-strip="add">o</span><mark class="wp-suggestion-add" data-suggestion-id="5" data-suggestion-type="add">new</mark>' );
+		$html    = '<p><mark class="wp-suggestion-format" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>b</strong></mark></p>';
 
 		$this->assertSame( '<p><span>o</span></p>', $this->normalize_tag_whitespace( $this->strip_in_post( $post_id, $html ) ) );
 	}
@@ -621,9 +620,9 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	private function many_open_deletions_then_addition( $deletions ) {
 		$html = '<p>';
 		for ( $i = 1; $i <= $deletions; $i++ ) {
-			$html .= '<mark class="wp-suggestion" data-suggestion-id="' . $i . '" data-suggestion-type="del">Q';
+			$html .= '<mark class="wp-suggestion-del" data-suggestion-id="' . $i . '" data-suggestion-type="del">Q';
 		}
-		return $html . '<mark class="wp-suggestion" data-suggestion-id="0" data-suggestion-type="add">PENDING</mark></p>';
+		return $html . '<mark class="wp-suggestion-add" data-suggestion-id="0" data-suggestion-type="add">PENDING</mark></p>';
 	}
 
 	public function test_addition_after_999_open_deletions_is_removed_once() {
@@ -643,7 +642,7 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 		// original is swapped in, so the original needs its own pass.
 		$post_id = self::factory()->post->create();
 		$note_id = $this->create_format_note( $post_id, 'a<mark class="wp-note" data-note-id="4">orig</mark>b' );
-		$html    = '<p><mark class="wp-suggestion" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>x</strong></mark></p>';
+		$html    = '<p><mark class="wp-suggestion-format" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>x</strong></mark></p>';
 
 		$this->assertSame( '<p>aorigb</p>', $this->strip_in_post( $post_id, $html ) );
 	}
@@ -654,7 +653,7 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	 * @return array[] Input HTML and expected output.
 	 */
 	public function data_unbalanced_additions() {
-		$add = '<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add" data-author="3">';
+		$add = '<mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add" data-author="3">';
 		return array(
 			'crossing </p><p>'               => array( '<p>a' . $add . 'X</p><p>Y</mark>b</p>', '<p>ab</p>' ),
 			'block-level start tag inside'   => array( '<p>a' . $add . 'X<div>Y</div></mark>b</p>', '<p>ab</p>' ),
@@ -663,7 +662,7 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 			'closer ignored inside a div'    => array( '<div>a' . $add . 'X<div>Y</mark>Z</div>W</div>c', '<div>a</div>c' ),
 			'closer ignored inside a table'  => array( '<div>a' . $add . '<table></mark>LEAK</table>Z</div>c', '<div>a</div>c' ),
 			'formatting closer past a div'   => array( '<p><b>a' . $add . 'X<div>Y</b>Z</div>W</p>', '<p><b>a</p>' ),
-			'format crossing </p><p>'        => array( '<p>a<mark class="wp-suggestion" data-suggestion-id="999999" data-suggestion-type="format">X</p><p>Y</mark>b</p>', '<p>ab</p>' ),
+			'format crossing </p><p>'        => array( '<p>a<mark class="wp-suggestion-format" data-suggestion-id="999999" data-suggestion-type="format">X</p><p>Y</mark>b</p>', '<p>ab</p>' ),
 		);
 	}
 
@@ -678,9 +677,120 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	}
 
 	public function test_unbalanced_deletion_keeps_its_text() {
-		$html = '<p>a<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del">X</p><p>Y</mark>b</p>';
+		$html = '<p>a<mark class="wp-suggestion-del" data-suggestion-id="1" data-suggestion-type="del">X</p><p>Y</mark>b</p>';
 
 		$this->assertSame( '<p>aX</p><p>Yb</p>', gutenberg_strip_inline_suggestion_markers( $html ) );
+	}
+
+	public function test_class_wins_over_a_mismatched_type_attribute() {
+		$html = '<p><mark class="wp-suggestion-del" data-suggestion-id="7" data-suggestion-type="add">kept</mark></p>';
+
+		$this->assertSame( '<p>kept</p>', gutenberg_strip_inline_suggestion_markers( $html ) );
+	}
+
+	public function test_leaves_the_old_single_class_untouched() {
+		// The single `wp-suggestion` class predates the per-kind markers and
+		// is no longer a marker.
+		$html = '<p><mark class="wp-suggestion" data-suggestion-id="7" data-suggestion-type="del">x</mark></p>';
+
+		$this->assertSame( $html, gutenberg_strip_inline_suggestion_markers( $html ) );
+	}
+
+	/**
+	 * Markers of different kinds nested in both orders. `%f` is replaced
+	 * with the id of a pending format note whose original run is `orig`.
+	 *
+	 * @dataProvider data_nested_kinds
+	 *
+	 * @param string $html     Block HTML.
+	 * @param string $expected Rendered HTML.
+	 */
+	public function test_nested_marker_kinds( $html, $expected ) {
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_format_note( $post_id, 'orig' );
+		$html    = str_replace( '%f', (string) $note_id, $html );
+
+		$this->assertSame( $expected, $this->strip_in_post( $post_id, $html ) );
+	}
+
+	/**
+	 * @return array[]
+	 */
+	public function data_nested_kinds() {
+		$add = '<mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add">';
+		$del = '<mark class="wp-suggestion-del" data-suggestion-id="2" data-suggestion-type="del">';
+		$fmt = '<mark class="wp-suggestion-format" data-suggestion-id="%f" data-suggestion-type="format">';
+		return array(
+			'del inside add'    => array( "<p>x{$add}a{$del}b</mark>c</mark>y</p>", '<p>xy</p>' ),
+			'add inside del'    => array( "<p>x{$del}a{$add}b</mark>c</mark>y</p>", '<p>xacy</p>' ),
+			'format inside add' => array( "<p>x{$add}a{$fmt}<strong>b</strong></mark></mark>y</p>", '<p>xy</p>' ),
+			'add inside format' => array( "<p>x{$fmt}<strong>a{$add}b</mark></strong></mark>y</p>", '<p>xorigy</p>' ),
+			'del inside format' => array( "<p>x{$fmt}<strong>a{$del}b</mark></strong></mark>y</p>", '<p>xorigy</p>' ),
+			'format inside del' => array( "<p>x{$del}a{$fmt}<strong>b</strong></mark>c</mark>y</p>", '<p>xaorigcy</p>' ),
+			'all three'         => array( "<p>x{$add}a{$fmt}<strong>b{$del}c</mark></strong></mark>{$del}d</mark></mark>y</p>", '<p>xy</p>' ),
+		);
+	}
+
+	public function test_format_marker_split_by_a_deletion_restores_the_original_once() {
+		// Canonical order never splits a format marker, but merged or
+		// hand-edited markup can: the first fragment carries the whole
+		// original and the later ones render nothing.
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_format_note( $post_id, 'ab' );
+		$fmt     = '<mark class="wp-suggestion-format" data-suggestion-id="' . $note_id . '" data-suggestion-type="format">';
+		$del     = '<mark class="wp-suggestion-del" data-suggestion-id="6" data-suggestion-type="del">';
+		$html    = "<p>x{$fmt}<strong>a</strong></mark>{$del}{$fmt}<strong>b</strong></mark>c</mark>y</p>";
+
+		$this->assertSame( '<p>xabcy</p>', $this->strip_in_post( $post_id, $html ) );
+	}
+
+	public function test_format_fragments_are_counted_per_render() {
+		// The first-fragment rule is per strip call: rendering the same block
+		// twice restores the original both times.
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_format_note( $post_id, 'ab' );
+		$html    = '<p><mark class="wp-suggestion-format" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>ab</strong></mark></p>';
+
+		$this->assertSame( '<p>ab</p>', $this->strip_in_post( $post_id, $html ) );
+		$this->assertSame( '<p>ab</p>', $this->strip_in_post( $post_id, $html ) );
+	}
+
+	/**
+	 * annezazu's example (#73411): A adds " Bright red apples fell.", B
+	 * bolds "red apples" inside it, C deletes "apples fell" inside it. Each
+	 * case is the content a sequence of decisions leaves, with the rest
+	 * still pending; `%b` is B's format note, whose original is the run
+	 * without the bold (shrunk when C's deletion was accepted).
+	 *
+	 * @dataProvider data_annezazu_states
+	 *
+	 * @param string $html     Block HTML.
+	 * @param string $original B's recorded original run.
+	 * @param string $expected Rendered HTML.
+	 */
+	public function test_annezazu_states( $html, $original, $expected ) {
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_format_note( $post_id, $original );
+		$html    = str_replace( '%b', (string) $note_id, $html );
+
+		$this->assertSame( $expected, $this->strip_in_post( $post_id, $html ) );
+	}
+
+	/**
+	 * @return array[]
+	 */
+	public function data_annezazu_states() {
+		$a  = '<mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add" data-author="1">';
+		$b  = '<mark class="wp-suggestion-format" data-suggestion-id="%b" data-suggestion-type="format" data-author="2">';
+		$c  = '<mark class="wp-suggestion-del" data-suggestion-id="3" data-suggestion-type="del" data-author="3">';
+		$bc = "{$b}<strong>red </strong>{$c}<strong>apples</strong></mark></mark>{$c} fell</mark>";
+		return array(
+			'all pending'      => array( "<p>Intro.{$a} Bright {$bc}.</mark></p>", 'red apples', '<p>Intro.</p>' ),
+			'a accepted'       => array( "<p>Intro. Bright {$bc}.</p>", 'red apples', '<p>Intro. Bright red apples fell.</p>' ),
+			'a, b accepted'    => array( "<p>Intro. Bright <strong>red </strong>{$c}<strong>apples</strong></mark>{$c} fell</mark>.</p>", 'red apples', '<p>Intro. Bright <strong>red </strong><strong>apples</strong> fell.</p>' ),
+			'a, c accepted'    => array( "<p>Intro. Bright {$b}<strong>red </strong></mark>.</p>", 'red ', '<p>Intro. Bright red .</p>' ),
+			'c accepted first' => array( "<p>Intro.{$a} Bright {$b}<strong>red </strong></mark>.</mark></p>", 'red ', '<p>Intro.</p>' ),
+		);
 	}
 
 	public function test_filter_is_registered_on_render_block() {

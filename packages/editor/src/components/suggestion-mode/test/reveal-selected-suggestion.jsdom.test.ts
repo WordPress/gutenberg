@@ -17,7 +17,7 @@ describe( 'buildSelectedSuggestionCss', () => {
 	it( 'targets the selected suggestion marker by id', () => {
 		const css = buildSelectedSuggestionCss( 42, 1 );
 		expect( css ).toContain(
-			'mark.wp-suggestion[data-suggestion-id="42"]{'
+			'mark:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format)[data-suggestion-id="42"]{'
 		);
 	} );
 
@@ -30,6 +30,6 @@ describe( 'buildSelectedSuggestionCss', () => {
 
 	it( 'only ever styles the selected marker', () => {
 		const css = buildSelectedSuggestionCss( 7, 1 );
-		expect( css.match( /mark\.wp-suggestion/g ) ).toHaveLength( 1 );
+		expect( css.match( /\[data-suggestion-id=/g ) ).toHaveLength( 1 );
 	} );
 } );

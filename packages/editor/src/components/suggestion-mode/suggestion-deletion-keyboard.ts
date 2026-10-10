@@ -10,19 +10,19 @@ import { INLINE_OP_TYPE } from './operations';
 import { useSuggestionsProvider } from './provider';
 import { useSuggestionSession } from './suggestion-session';
 import useAbandonedNoteCleanup from './use-abandoned-note-cleanup';
-import { wrapInlineMarker, readInlineCaret } from '../inline-markers';
+import { readInlineCaret } from '../inline-markers';
 import {
-	SUGGESTION_FORMAT_NAME,
 	SUGGESTION_TYPE_DELETION,
 	buildSuggestionMarkerAttributes,
+	classifyOverlap,
 	computeDeleteRange,
 	deleteAcrossOwnMarkers,
-	formatsRangeHasSuggestion,
 	removeInlineAdditionRange,
 	stripSuggestionMarkers,
 	valueAdditionRunToExtend,
-	valueRangeHasSuggestion,
+	wrapSuggestionMarker,
 } from '../inline-suggestions';
+import type { EditRefusal } from '../inline-suggestions';
 import {
 	getCandidateDocuments,
 	isEventTargetSelectedRichText,
@@ -275,7 +275,8 @@ export function collapsedDeleteTarget(
  *
  * - `mark` — wrap the target grapheme in a deletion marker.
  * - `refuse` — decline the keystroke and tell the user why (`refuseDeletion`).
- *   The grapheme already carries a marker, so the edit fits neither
+ *   The grapheme already carries a marker a deletion cannot sit on (someone's
+ *   deletion, or the author's own markers), so the edit fits neither
  *   representation. A caret lands there mid-run (a forward run parks it inside
  *   its own marker) but also from a plain arrow key next to a marker an earlier
  *   run left behind.
@@ -287,11 +288,12 @@ export function collapsedDeleteTarget(
  * caret `preventDefault` never moved, against a range that may no longer exist.
  *
  * @param options
- * @param options.text       Plain text of the attribute value.
- * @param options.formats    Per-character format stacks.
- * @param options.pos        Collapsed caret offset.
- * @param options.isBackward True for Backspace, false for Delete.
- * @param options.run        The contiguous run in progress, if any.
+ * @param options.text        Plain text of the attribute value.
+ * @param options.formats     Per-character format stacks.
+ * @param options.pos         Collapsed caret offset.
+ * @param options.isBackward  True for Backspace, false for Delete.
+ * @param options.run         The contiguous run in progress, if any.
+ * @param options.authorToken Id of the author deleting, as a string, or null.
  * @return What this keystroke should do.
  */
 export function collapsedDeleteDisposition( {
@@ -300,12 +302,14 @@ export function collapsedDeleteDisposition( {
 	pos,
 	isBackward,
 	run,
+	authorToken = null,
 }: {
 	text: string;
 	formats: any[];
 	pos: number;
 	isBackward: boolean;
 	run?: any;
+	authorToken?: string | null;
 } ): 'mark' | 'refuse' | 'default' {
 	const target = collapsedDeleteTarget( text, pos, isBackward, run );
 	if ( ! target ) {
@@ -317,9 +321,38 @@ export function collapsedDeleteDisposition( {
 		 */
 		return run && ! isBackward ? 'refuse' : 'default';
 	}
-	return formatsRangeHasSuggestion( formats, target.start, target.end )
+	return deletionRefusal( formats, target.start, target.end, authorToken )
 		? 'refuse'
 		: 'mark';
+}
+
+/**
+ * Why a deletion of `[start, end)` cannot be marked, or null when it can: a
+ * deletion may sit inside someone's addition or over a formatting change, but
+ * not over someone's deletion (or a mix of the author's own markers, which
+ * the own-marker paths handle first).
+ *
+ * @param formats     Per-character format stacks.
+ * @param start       Range start.
+ * @param end         Range end (exclusive).
+ * @param authorToken Id of the author deleting, as a string, or null.
+ * @return The refusal, or null.
+ */
+export function deletionRefusal(
+	formats: any[],
+	start: number,
+	end: number,
+	authorToken: string | null
+): EditRefusal | null {
+	const verdict = classifyOverlap( formats, {
+		gesture: 'delete',
+		start,
+		end,
+		authorToken,
+	} );
+	return verdict.verdict === 'refuse'
+		? { reason: verdict.reason!, blocking: verdict.blocking }
+		: null;
 }
 
 /**
@@ -330,17 +363,20 @@ export function collapsedDeleteDisposition( {
  * The buffered keystrokes were each checked against the character at the
  * caret, but `preventDefault` never moved the caret, so every one of them
  * checked the same character. The range they add has to be checked here, or
- * the replay wraps a neighbouring suggestion's text in this deletion's marker
- * and takes its identity away.
+ * the replay wraps a neighbouring deletion's text in this deletion's marker
+ * and takes its identity away. Someone's addition is fine to grow into: the
+ * deletion nests inside it.
  *
  * @param options
- * @param options.text       Plain text of the attribute value.
- * @param options.formats    Per-character format stacks.
- * @param options.start      Anchored range start.
- * @param options.end        Anchored range end.
- * @param options.isBackward True for Backspace, false for Delete.
- * @param options.repeats    Buffered repeats after the first keystroke.
- * @return The grown range, and whether a marker cut the replay short.
+ * @param options.text        Plain text of the attribute value.
+ * @param options.formats     Per-character format stacks.
+ * @param options.start       Anchored range start.
+ * @param options.end         Anchored range end.
+ * @param options.isBackward  True for Backspace, false for Delete.
+ * @param options.repeats     Buffered repeats after the first keystroke.
+ * @param options.authorToken Id of the author deleting, as a string, or null.
+ * @return The grown range, and whether (and why) a marker cut the replay
+ *         short.
  */
 export function expandBufferedDeleteRun( {
 	text,
@@ -349,6 +385,7 @@ export function expandBufferedDeleteRun( {
 	end,
 	isBackward,
 	repeats,
+	authorToken = null,
 }: {
 	text: string;
 	formats: any[];
@@ -356,7 +393,13 @@ export function expandBufferedDeleteRun( {
 	end: number;
 	isBackward: boolean;
 	repeats: number;
-} ): { start: number; end: number; blocked: boolean } {
+	authorToken?: string | null;
+} ): {
+	start: number;
+	end: number;
+	blocked: boolean;
+	refusal?: EditRefusal;
+} {
 	let nextStart = start;
 	let nextEnd = end;
 	for ( let step = 0; step < repeats; step++ ) {
@@ -369,8 +412,14 @@ export function expandBufferedDeleteRun( {
 		if ( target.start === target.end ) {
 			break;
 		}
-		if ( formatsRangeHasSuggestion( formats, target.start, target.end ) ) {
-			return { start: nextStart, end: nextEnd, blocked: true };
+		const refusal = deletionRefusal(
+			formats,
+			target.start,
+			target.end,
+			authorToken
+		);
+		if ( refusal ) {
+			return { start: nextStart, end: nextEnd, blocked: true, refusal };
 		}
 		nextStart = Math.min( nextStart, target.start );
 		nextEnd = Math.max( nextEnd, target.end );
@@ -402,7 +451,7 @@ type DeletionRun = {
  * not delete it — it should mark it as proposed for deletion. This intercepts
  * `beforeinput` (capture phase) for delete input types and, instead of letting
  * the removal happen, wraps the affected text in an in-content
- * `core/suggestion` `<mark data-suggestion-type="del">` marker (Option B) keyed
+ * `core/suggestion-del` `<mark class="wp-suggestion-del">` marker (Option B) keyed
  * to a freshly created suggestion note.
  *
  * Two shapes are handled:
@@ -470,12 +519,14 @@ export default function SuggestionDeletionKeyboard() {
 	 * apply it and the overlay swallow the result.
 	 */
 	const refuseDeletion = useCallback(
-		( event: any ) => {
+		( event: any, refusal?: EditRefusal | null ) => {
 			event.preventDefault();
-			notifyEditRefused( registry );
+			notifyEditRefused( registry, refusal ?? undefined );
 		},
 		[ registry ]
 	);
+	const authorToken =
+		authorId === null || authorId === undefined ? null : String( authorId );
 
 	// The in-progress collapsed-cursor deletion run. `id` is null while the note
 	// is being created; repeats in that window accumulate in `steps`. `start`/
@@ -517,8 +568,8 @@ export default function SuggestionDeletionKeyboard() {
 			caret?: number
 		) => {
 			const value = getBlockAttributes( clientId )?.[ attributeKey ];
-			const wrapped = wrapInlineMarker( value, {
-				formatType: SUGGESTION_FORMAT_NAME,
+			const wrapped = wrapSuggestionMarker( value, {
+				kind: 'del',
 				attributes: buildSuggestionMarkerAttributes( {
 					id,
 					type: SUGGESTION_TYPE_DELETION,
@@ -788,10 +839,11 @@ export default function SuggestionDeletionKeyboard() {
 						: null;
 				if (
 					! anchor ||
-					formatsRangeHasSuggestion(
+					deletionRefusal(
 						formats,
 						anchor.start,
-						anchor.end
+						anchor.end,
+						authorToken
 					)
 				) {
 					if ( isCurrent ) {
@@ -835,12 +887,13 @@ export default function SuggestionDeletionKeyboard() {
 					end: anchor.end,
 					isBackward,
 					repeats: newRun.steps - 1,
+					authorToken,
 				} );
 				newRun.start = grown.start;
 				newRun.end = grown.end;
 				newRun.caret += shift;
 				if ( grown.blocked ) {
-					notifyEditRefused( registry );
+					notifyEditRefused( registry, grown.refusal );
 				}
 				if ( isBackward ) {
 					newRun.caret = newRun.start;
@@ -868,6 +921,7 @@ export default function SuggestionDeletionKeyboard() {
 			getSelectionStart,
 			getSelectionEnd,
 			registry,
+			authorToken,
 		]
 	);
 
@@ -937,10 +991,6 @@ export default function SuggestionDeletionKeyboard() {
 			const start = domRange ? domRange.start : anchor.start;
 			const end = domRange ? domRange.end : anchor.end;
 			const value = getBlockAttributes( clientId )?.[ attributeKey ];
-			const authorToken =
-				authorId === null || authorId === undefined
-					? null
-					: String( authorId );
 
 			// Selection delete (any delete input type over a range).
 			if ( start !== end ) {
@@ -965,17 +1015,19 @@ export default function SuggestionDeletionKeyboard() {
 					event.preventDefault();
 					return;
 				}
-				// Any other selection overlapping an existing marker is
-				// declined; see `refuseDeletion`.
-				if (
-					valueRangeHasSuggestion(
-						getBlockAttributes( clientId )?.[ attributeKey ],
-						start,
-						end
-					)
-				) {
+				// A selection over someone's deletion (or a mix of the
+				// author's own markers) is declined; see `refuseDeletion`.
+				// Inside or across someone's addition it is a deletion of
+				// its own.
+				const refusal = deletionRefusal(
+					readValueMetrics( value ).formats,
+					start,
+					end,
+					authorToken
+				);
+				if ( refusal ) {
 					resetRun();
-					refuseDeletion( event );
+					refuseDeletion( event, refusal );
 					return;
 				}
 				event.preventDefault();
@@ -1037,12 +1089,28 @@ export default function SuggestionDeletionKeyboard() {
 					pos,
 					isBackward,
 					run,
+					authorToken,
 				} );
 				if ( disposition !== 'mark' ) {
 					// Neither outcome can grow the run, so it ends here.
 					resetRun();
 					if ( disposition === 'refuse' ) {
-						refuseDeletion( event );
+						const target = collapsedDeleteTarget(
+							text,
+							pos,
+							isBackward,
+							run
+						);
+						refuseDeletion(
+							event,
+							target &&
+								deletionRefusal(
+									formats,
+									target.start,
+									target.end,
+									authorToken
+								)
+						);
 					}
 					return;
 				}
@@ -1082,13 +1150,17 @@ export default function SuggestionDeletionKeyboard() {
 				);
 				return;
 			}
-			// A word/line range overlapping an existing marker is declined
-			// rather than nesting marks; see `refuseDeletion`.
-			if (
-				formatsRangeHasSuggestion( formats, range.start, range.end )
-			) {
+			// A word/line range over someone's deletion is declined; see
+			// `refuseDeletion`.
+			const rangeRefusal = deletionRefusal(
+				formats,
+				range.start,
+				range.end,
+				authorToken
+			);
+			if ( rangeRefusal ) {
 				resetRun();
-				refuseDeletion( event );
+				refuseDeletion( event, rangeRefusal );
 				return;
 			}
 			event.preventDefault();
@@ -1111,7 +1183,7 @@ export default function SuggestionDeletionKeyboard() {
 			refuseDeletion,
 			resetRun,
 			shrinkOwnAddition,
-			authorId,
+			authorToken,
 		]
 	);
 
@@ -1244,12 +1316,13 @@ export default function SuggestionDeletionKeyboard() {
 			) {
 				return;
 			}
-			// Any other selection overlapping an existing marker is declined
-			// rather than nesting marks; see `refuseDeletion`. The
-			// `preventDefault` above already cancelled the removal.
-			if ( formatsRangeHasSuggestion( formats, start, end ) ) {
+			// A selection over someone's deletion is declined; see
+			// `refuseDeletion`. The `preventDefault` above already cancelled
+			// the removal.
+			const refusal = deletionRefusal( formats, start, end, authorToken );
+			if ( refusal ) {
 				resetRun();
-				notifyEditRefused( registry );
+				notifyEditRefused( registry, refusal );
 				return;
 			}
 			deleteSelection( { clientId, attributeKey, start, end } );
@@ -1262,6 +1335,7 @@ export default function SuggestionDeletionKeyboard() {
 			deleteAcrossOwnSelection,
 			registry,
 			resetRun,
+			authorToken,
 		]
 	);
 

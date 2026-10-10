@@ -2,10 +2,8 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
 	RichTextData,
 	registerFormatType,
-	store as richTextStore,
 	unregisterFormatType,
 } from '@wordpress/rich-text';
-import { select } from '@wordpress/data';
 import {
 	analyzeTextEdit,
 	planEditMarkers,
@@ -16,19 +14,16 @@ import {
 	registerSuggestionFormat,
 	findSuggestionText,
 	findSuggestionRange,
-	SUGGESTION_FORMAT_NAME,
+	unregisterSuggestionFormats,
 } from '../format';
 
-const getFormatType = ( name: string ) =>
-	( select( richTextStore as any ) as any ).getFormatType( name );
-
 const add = ( id: number | string, text: string, author?: number | string ) =>
-	`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="add"${
+	`<mark class="wp-suggestion-add" data-suggestion-id="${ id }" data-suggestion-type="add"${
 		author !== undefined ? ` data-author="${ author }"` : ''
 	}>${ text }</mark>`;
 
 const del = ( id: number | string, text: string, author?: number | string ) =>
-	`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="del"${
+	`<mark class="wp-suggestion-del" data-suggestion-id="${ id }" data-suggestion-type="del"${
 		author !== undefined ? ` data-author="${ author }"` : ''
 	}>${ text }</mark>`;
 
@@ -147,9 +142,7 @@ describe( 'planEditMarkers', () => {
 	} );
 
 	afterAll( () => {
-		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 	} );
 
 	it( 'returns nothing for a non-rich value', () => {
@@ -225,22 +218,33 @@ describe( 'planEditMarkers', () => {
 		} );
 	} );
 
-	it( 'does not act when typing inside another author addition', () => {
+	it( 'refuses typing inside another author addition, naming it', () => {
 		const prev = rtd( add( 7, 'ab', 2 ) );
 		const next = rtd( add( 7, 'aXb', 2 ) );
 		expect( planEditMarkers( prev, next, { authorId: 9 } ) ).toEqual( {
 			kind: 'insert',
 			actions: [],
+			refusal: {
+				reason: 'add-in-add',
+				blocking: { id: '7', kind: 'add', authorId: '2' },
+			},
 		} );
 	} );
 
-	it( 'does not act when typing inside a pending deletion', () => {
+	it( 'refuses typing inside another author deletion', () => {
 		const prev = rtd( del( 7, 'ab', 2 ) );
 		const next = rtd( del( 7, 'aXb', 2 ) );
-		expect( planEditMarkers( prev, next, { authorId: 2 } ) ).toEqual( {
-			kind: 'insert',
-			actions: [],
-		} );
+		expect(
+			planEditMarkers( prev, next, { authorId: 9 } ).refusal?.reason
+		).toBe( 'insert-in-del' );
+	} );
+
+	it( 'adds next to the author own pending deletion', () => {
+		const prev = rtd( del( 7, 'ab', 2 ) );
+		const next = rtd( del( 7, 'aXb', 2 ) );
+		expect(
+			planEditMarkers( prev, next, { authorId: 2 } ).actions
+		).toMatchObject( [ { type: 'insert-add', at: 1, text: 'X' } ] );
 	} );
 
 	it( 'plans a del marker for a delete of unmarked text', () => {
@@ -255,9 +259,10 @@ describe( 'planEditMarkers', () => {
 	it( 'is a no-op when deleting text already marked for deletion', () => {
 		const prev = rtd( del( 4, 'world' ) );
 		const next = rtd( '' );
-		expect( planEditMarkers( prev, next ) ).toEqual( {
+		expect( planEditMarkers( prev, next ) ).toMatchObject( {
 			kind: 'delete',
 			actions: [],
+			refusal: { reason: 'own-marker' },
 		} );
 	} );
 
@@ -270,18 +275,18 @@ describe( 'planEditMarkers', () => {
 		} );
 	} );
 
-	it( 'does not remove another author pending addition', () => {
+	it( 'proposes deleting another author pending addition instead of withdrawing it', () => {
 		const prev = rtd( add( 8, 'abc', 2 ) );
 		const next = rtd( '' );
-		expect( planEditMarkers( prev, next, { authorId: 9 } ) ).toEqual( {
+		const deletion = {
 			kind: 'delete',
-			actions: [],
-		} );
+			actions: [ { type: 'wrap-del', start: 0, end: 3, newNote: true } ],
+		};
+		expect( planEditMarkers( prev, next, { authorId: 9 } ) ).toEqual(
+			deletion
+		);
 		// An authored marker is not the unknown editor's either.
-		expect( planEditMarkers( prev, next ) ).toEqual( {
-			kind: 'delete',
-			actions: [],
-		} );
+		expect( planEditMarkers( prev, next ) ).toEqual( deletion );
 	} );
 
 	it( 'plans a del + add pair for a type-over of unmarked text', () => {
@@ -406,9 +411,7 @@ describe( 'applyEditPlan', () => {
 	} );
 
 	afterAll( () => {
-		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-			unregisterFormatType( SUGGESTION_FORMAT_NAME );
-		}
+		unregisterSuggestionFormats();
 	} );
 
 	it( 'wraps an insert-add in a new marker with the supplied id', () => {
