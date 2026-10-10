@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Internal
+
+-   Consolidate border mode overrides in the resolver and inherit default values from the base tokens ([#84108](https://github.com/WordPress/gutenberg/pull/84108)).
+
 ## 2.3.0 (2026-10-07)
 
 ### New Features

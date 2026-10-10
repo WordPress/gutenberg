@@ -6,6 +6,11 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### New Features
+
+-   Add `Avatar.Root`, `Avatar.Image`, and `Avatar.Fallback` for profile images with customizable fallbacks, circle and square shapes, a neutral border, five sizes from 16px to 64px, and a reduced-motion-aware image fade. ([#84145](https://github.com/WordPress/gutenberg/pull/84145))
+-   `Breadcrumb`: Add `ButtonItem` ancestors for hierarchy selection, current-only trails, and customizable `CurrentItem` `aria-current` ([#84156](https://github.com/WordPress/gutenberg/pull/84156)).
+
 ### Bug Fixes
 
 -   `Menu`, `Popover`: Keep popups open when the user interacts with an iframe inside the popup. ([#83870](https://github.com/WordPress/gutenberg/pull/83870))

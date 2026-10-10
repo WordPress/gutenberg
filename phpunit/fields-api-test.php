@@ -4,13 +4,19 @@
  *
  * @package gutenberg
  *
- * @covers ::_gutenberg_add_field_modules_to_editor_script
- * @covers ::gutenberg_get_field_collection_fields
- * @covers ::_gutenberg_get_field_collection
- * @covers ::gutenberg_register_field_collection
- * @covers Gutenberg_Fields_Registry::initialize
- * @covers Gutenberg_Fields_Registry::register
- * @covers Gutenberg_Fields_Registry::unregister
+ * @covers ::_wp_add_field_modules_to_editor_script
+ * @covers ::wp_register_fields
+ * @covers ::wp_update_fields
+ * @covers ::wp_unregister_fields
+ * @covers ::wp_register_field_collection
+ * @covers ::gutenberg_override_wp_fields_registry
+ * @covers WP_Fields_Registry::initialize
+ * @covers WP_Fields_Registry::register
+ * @covers WP_Fields_Registry::unregister
+ * @covers WP_Fields_Registry::register_collection
+ * @covers WP_Fields_Registry::get_collection
+ * @covers WP_Fields_Registry::get_collection_fields
+ * @covers WP_Fields_Registry_Gutenberg::get_instance
  */
 class Tests_Fields_API extends WP_UnitTestCase {
 
@@ -65,11 +71,9 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	/**
 	 * Registers the default fields of the tests, with the `core` origin: the
 	 * author and comment status fields of pages, with a script module.
-	 *
-	 * @param Gutenberg_Fields_Registry $registry The registry.
 	 */
-	public static function register_default_fields( $registry ) {
-		$registry->register(
+	public static function register_default_fields() {
+		wp_register_fields(
 			'core',
 			'postType',
 			'page',
@@ -90,16 +94,17 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Resets the registry: drops the singleton instance, so the next
-	 * get_instance() creates an empty registry and its first read fires
+	 * Resets the registry: drops the singleton instance and puts an empty
+	 * plugin registry in its place, as `init` does, so its first read fires
 	 * `wp_fields_api_init` again.
 	 */
 	private static function reset_registry() {
-		$instance = new ReflectionProperty( Gutenberg_Fields_Registry::class, 'instance' );
+		$instance = new ReflectionProperty( WP_Fields_Registry::class, 'instance' );
 		if ( PHP_VERSION_ID < 80100 ) {
 			$instance->setAccessible( true );
 		}
 		$instance->setValue( null, null );
+		WP_Fields_Registry_Gutenberg::get_instance();
 	}
 
 	/**
@@ -112,7 +117,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * the callbacks hooked so far replay, in order. The callbacks are
 	 * removed on tear down.
 	 *
-	 * @param callable $callback The callback, receiving the registry.
+	 * @param callable $callback The callback.
 	 * @param int      $priority The priority. Default 10, after the defaults.
 	 */
 	private function on_fields_api_init( $callback, $priority = 10 ) {
@@ -120,8 +125,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->callbacks[] = array( $callback, $priority );
 
 		self::reset_registry();
-		$registry = Gutenberg_Fields_Registry::get_instance();
-		$registry->get_all_registered();
+		WP_Fields_Registry::get_instance()->get_all_registered();
 	}
 
 	/**
@@ -131,10 +135,10 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 */
 	private function unregister_all_field_modules() {
 		$this->on_fields_api_init(
-			static function ( $registry ) {
-				foreach ( $registry->get_all_registered_field_modules() as $kind => $entities ) {
+			static function () {
+				foreach ( wp_get_all_registered_field_modules() as $kind => $entities ) {
 					foreach ( array_keys( $entities ) as $name ) {
-						$registry->unregister( $kind, $name );
+						wp_unregister_fields( $kind, $name );
 					}
 				}
 			}
@@ -171,8 +175,8 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	private function register_fields( $kind, $name, $fields, $module = null ) {
 		$registered = array();
 		$this->on_fields_api_init(
-			static function ( $registry ) use ( &$registered, $kind, $name, $fields, $module ) {
-				$registered = $registry->register( 'test-plugin', $kind, $name, $fields, $module );
+			static function () use ( &$registered, $kind, $name, $fields, $module ) {
+				$registered = wp_register_fields( 'test-plugin', $kind, $name, $fields, $module );
 			}
 		);
 		return $registered;
@@ -185,16 +189,16 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * @param string   $fixture     The folder of the collections, in
 	 *                              data/core-fields/collections.
 	 * @param string[] $collections The collections to register, in order.
-	 * @return bool[] What gutenberg_register_field_collection() returned for
+	 * @return bool[] What wp_register_field_collection() returned for
 	 *                each collection, keyed by collection.
 	 */
 	private function register_fixture_collections( $fixture, $collections ) {
 		$directory = __DIR__ . '/data/core-fields/collections/' . $fixture;
 		$results   = array();
 		$this->on_fields_api_init(
-			static function ( $registry ) use ( $directory, $collections, &$results ) {
+			static function () use ( $directory, $collections, &$results ) {
 				foreach ( $collections as $collection ) {
-					$results[ $collection ] = gutenberg_register_field_collection( $registry, $directory . '/' . $collection );
+					$results[ $collection ] = wp_register_field_collection( $directory . '/' . $collection );
 				}
 			},
 			0
@@ -243,8 +247,8 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * outside it.
 	 */
 	public function test_the_modules_are_added_on_admin_footer() {
-		$this->assertSame( 10, has_action( 'admin_footer', '_gutenberg_add_field_modules_to_editor_script' ) );
-		$this->assertFalse( has_action( 'admin_init', '_gutenberg_add_field_modules_to_editor_script' ) );
+		$this->assertSame( 10, has_action( 'admin_footer', '_wp_add_field_modules_to_editor_script' ) );
+		$this->assertFalse( has_action( 'admin_init', '_wp_add_field_modules_to_editor_script' ) );
 	}
 
 	/**
@@ -258,7 +262,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 
 		$fired = did_action( 'wp_fields_api_init' );
 		self::reset_registry();
-		_gutenberg_add_field_modules_to_editor_script( $scripts );
+		_wp_add_field_modules_to_editor_script( $scripts );
 
 		$this->assertSame( array(), $scripts->get_data( 'wp-editor', 'module_dependencies' ) );
 		$this->assertSame( $fired, did_action( 'wp_fields_api_init' ), 'The registry is not read.' );
@@ -278,7 +282,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$scripts->add_data( 'wp-editor', 'module_dependencies', array() );
 		$scripts->add( 'boot', '/boot.js', array( 'wp-editor' ) );
 		$scripts->enqueue( 'boot' );
-		_gutenberg_add_field_modules_to_editor_script( $scripts );
+		_wp_add_field_modules_to_editor_script( $scripts );
 
 		$this->assertSame( array( 'plugin/color' ), $this->get_module_dependency_ids( $scripts, 'wp-editor' ) );
 	}
@@ -293,7 +297,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$scripts = new WP_Scripts();
 		// The default scripts register the real editor script.
 		$scripts->remove( 'wp-editor' );
-		_gutenberg_add_field_modules_to_editor_script( $scripts );
+		_wp_add_field_modules_to_editor_script( $scripts );
 
 		$this->assertFalse( $scripts->query( 'wp-editor', 'registered' ) );
 		$this->assertFalse( $scripts->get_data( 'wp-editor', 'module_dependencies' ) );
@@ -305,13 +309,13 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 */
 	public function test_nothing_happens_without_registered_field_modules() {
 		$this->unregister_all_field_modules();
-		$this->assertSame( array(), gutenberg_get_all_registered_field_modules(), 'No field script module is registered.' );
+		$this->assertSame( array(), wp_get_all_registered_field_modules(), 'No field script module is registered.' );
 
 		$scripts = new WP_Scripts();
 		$scripts->add( 'wp-editor', '/editor.js' );
 		$scripts->enqueue( 'wp-editor' );
 		$scripts->add_data( 'wp-editor', 'module_dependencies', array() );
-		_gutenberg_add_field_modules_to_editor_script( $scripts );
+		_wp_add_field_modules_to_editor_script( $scripts );
 
 		$this->assertSame( array(), $scripts->get_data( 'wp-editor', 'module_dependencies' ) );
 	}
@@ -329,7 +333,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$scripts->enqueue( 'wp-editor' );
 		// Only the dependencies added by the function are of interest.
 		$scripts->add_data( 'wp-editor', 'module_dependencies', array() );
-		_gutenberg_add_field_modules_to_editor_script( $scripts );
+		_wp_add_field_modules_to_editor_script( $scripts );
 
 		$this->assertSame(
 			array(
@@ -354,9 +358,9 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$scripts->enqueue( 'wp-editor' );
 		$scripts->add_data( 'wp-editor', 'module_dependencies', array( '@wordpress/existing' ) );
 
-		_gutenberg_add_field_modules_to_editor_script( $scripts );
+		_wp_add_field_modules_to_editor_script( $scripts );
 		$dependencies = $scripts->get_data( 'wp-editor', 'module_dependencies' );
-		_gutenberg_add_field_modules_to_editor_script( $scripts );
+		_wp_add_field_modules_to_editor_script( $scripts );
 
 		$this->assertSame( $dependencies, $scripts->get_data( 'wp-editor', 'module_dependencies' ), 'A second run adds nothing.' );
 		$ids = $this->get_module_dependency_ids( $scripts, 'wp-editor' );
@@ -383,7 +387,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$scripts->enqueue( 'wp-editor' );
 		// Only the dependencies added by the function are of interest.
 		$scripts->add_data( 'wp-editor', 'module_dependencies', array() );
-		_gutenberg_add_field_modules_to_editor_script( $scripts );
+		_wp_add_field_modules_to_editor_script( $scripts );
 
 		$ids = $this->get_module_dependency_ids( $scripts, 'wp-editor' );
 		$this->assertSame( array( 'plugin/fields' ), array_values( array_intersect( $ids, array( 'plugin/fields' ) ) ) );
@@ -407,7 +411,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			wp_register_script_module( 'plugin/color', '/color.js' );
 
 			$wp_scripts->enqueue( 'wp-editor' );
-			_gutenberg_add_field_modules_to_editor_script( $wp_scripts );
+			_wp_add_field_modules_to_editor_script( $wp_scripts );
 
 			$processor = new WP_HTML_Tag_Processor( get_echo( array( wp_script_modules(), 'print_import_map' ) ) );
 			$this->assertTrue( $processor->next_tag( 'SCRIPT' ), 'An import map is printed.' );
@@ -427,7 +431,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * the alphabetical order of their folders, keyed by id.
 	 */
 	public function test_a_collection_has_a_field_per_folder() {
-		$fields = gutenberg_get_field_collection_fields( __DIR__ . '/data/core-fields/fixture' );
+		$fields = wp_get_field_collection_fields( __DIR__ . '/data/core-fields/fixture' );
 
 		$this->assertSame( array( 'zeta', 'beta' ), array_keys( $fields ), 'The folder name is the id, unless the field sets one; the folders set the order.' );
 		$this->assertSame( array( 'zeta', 'beta' ), array_column( $fields, 'id' ), 'Each field has its id.' );
@@ -439,7 +443,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * A missing collection has no fields.
 	 */
 	public function test_a_missing_collection_has_no_fields() {
-		$this->assertSame( array(), gutenberg_get_field_collection_fields( __DIR__ . '/data/core-fields/missing' ) );
+		$this->assertSame( array(), wp_get_field_collection_fields( __DIR__ . '/data/core-fields/missing' ) );
 	}
 
 	/**
@@ -469,14 +473,14 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			$results
 		);
 
-		$book = gutenberg_get_registered_fields( 'postType', 'gutenberg_book' );
+		$book = wp_get_registered_fields( 'postType', 'gutenberg_book' );
 		$this->assertSame( array( 'subtitle', 'isbn' ), array_column( $book, 'id' ), 'The fields registered first come first: the fixture collections run at priority 0.' );
 		$this->assertSame( 'fixture', $book[0]['origin']['registeredBy'], 'The fields carry the origin of their collection.' );
-		$this->assertSame( array( 'fixture/book' => array( 'subtitle' ) ), gutenberg_get_registered_field_modules( 'postType', 'gutenberg_book' ), 'Each field is registered with the module of its collection.' );
+		$this->assertSame( array( 'fixture/book' => array( 'subtitle' ) ), wp_get_registered_field_modules( 'postType', 'gutenberg_book' ), 'Each field is registered with the module of its collection.' );
 
-		$this->assertSame( array( 'issue' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_magazine' ), 'id' ) );
-		$this->assertSame( array(), gutenberg_get_registered_field_modules( 'postType', 'gutenberg_magazine' ), 'A collection without module registers none.' );
-		$this->assertSame( array( 'secret' ), array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_hidden' ), 'id' ), 'A post type not exposed in the REST API gets its fields too.' );
+		$this->assertSame( array( 'issue' ), array_column( wp_get_registered_fields( 'postType', 'gutenberg_magazine' ), 'id' ) );
+		$this->assertSame( array(), wp_get_registered_field_modules( 'postType', 'gutenberg_magazine' ), 'A collection without module registers none.' );
+		$this->assertSame( array( 'secret' ), array_column( wp_get_registered_fields( 'postType', 'gutenberg_hidden' ), 'id' ), 'A post type not exposed in the REST API gets its fields too.' );
 	}
 
 	/**
@@ -487,7 +491,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	public function test_the_files_of_a_collection_have_their_own_scope() {
 		$this->assertSame( array( 'scoped' => true ), $this->register_fixture_collections( 'valid', array( 'scoped' ) ) );
 
-		$fields = gutenberg_get_registered_fields( 'postType', 'gutenberg_scoped' );
+		$fields = wp_get_registered_fields( 'postType', 'gutenberg_scoped' );
 		$this->assertSame( array( 'plain', 'scoped' ), array_column( $fields, 'id' ), 'The index reusing `$directory` still reads its folder; the field reusing `$fields` and `$file` keeps the field read before it and the name of its folder.' );
 		$this->assertSame( array( 'draft', 'publish' ), array_column( $fields[1]['elements'], 'value' ) );
 	}
@@ -500,12 +504,12 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	public function test_a_collection_redefining_a_registered_field_is_skipped() {
 		$this->register_post_types( array( 'gutenberg_book' => array( 'title' ) ) );
 
-		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::register' );
+		$this->setExpectedIncorrectUsage( 'WP_Fields_Registry::register' );
 		$directory = __DIR__ . '/data/core-fields/collections/duplicate/book';
 		$result    = null;
 		$this->on_fields_api_init(
-			static function ( $registry ) use ( $directory, &$result ) {
-				$registry->register(
+			static function () use ( $directory, &$result ) {
+				wp_register_fields(
 					'defaults',
 					'postType',
 					'gutenberg_book',
@@ -517,11 +521,11 @@ class Tests_Fields_API extends WP_UnitTestCase {
 						),
 					)
 				);
-				$result = gutenberg_register_field_collection( $registry, $directory );
+				$result = wp_register_field_collection( $directory );
 			},
 			0
 		);
-		$fields = gutenberg_get_registered_fields( 'postType', 'gutenberg_book' );
+		$fields = wp_get_registered_fields( 'postType', 'gutenberg_book' );
 
 		$this->assertFalse( $result, 'A collection that loses a field returns false.' );
 		$this->assertSame( array( 'authorship' ), array_column( $fields, 'id' ) );
@@ -558,16 +562,16 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	public function test_an_invalid_collection_is_skipped() {
 		$this->register_post_types( array( 'gutenberg_book' => array( 'title' ) ) );
 
-		$this->setExpectedIncorrectUsage( 'gutenberg_register_field_collection' );
+		$this->setExpectedIncorrectUsage( 'WP_Fields_Registry::register_collection' );
 		$reported = array();
 		$report   = static function ( $function_name, $message ) use ( &$reported ) {
-			if ( 'gutenberg_register_field_collection' === $function_name ) {
+			if ( 'WP_Fields_Registry::register_collection' === $function_name ) {
 				$reported[] = $message;
 			}
 		};
 		add_action( 'doing_it_wrong_run', $report, 10, 2 );
 		$results = $this->register_fixture_collections( 'invalid', array( 'book', 'no_name', 'null_name', 'no_origin', 'missing' ) );
-		$ids     = array_column( gutenberg_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' );
+		$ids     = array_column( wp_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' );
 
 		$this->assertSame( array( 'subtitle' ), $ids );
 		$this->assertSame(
@@ -589,11 +593,17 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A collection is registered on the registry `wp_fields_api_init` passes.
+	 * A collection is registered on the action, like fields are: elsewhere
+	 * it is refused and the registry is left untouched.
 	 */
-	public function test_a_collection_needs_the_registry() {
-		$this->setExpectedIncorrectUsage( 'gutenberg_register_field_collection' );
-		$this->assertFalse( gutenberg_register_field_collection( null, __DIR__ . '/data/core-fields/collections/valid/book' ) );
+	public function test_registering_a_collection_outside_the_action_is_refused() {
+		$this->setExpectedIncorrectUsage( 'WP_Fields_Registry::register_collection' );
+		self::reset_registry();
+		$fired = did_action( 'wp_fields_api_init' );
+
+		$this->assertFalse( wp_register_field_collection( __DIR__ . '/data/core-fields/collections/valid/book' ) );
+		$this->assertSame( $fired, did_action( 'wp_fields_api_init' ), 'Refusing does not fire the action.' );
+		$this->assertSame( array(), wp_get_registered_fields( 'postType', 'gutenberg_book' ) );
 	}
 
 	/**
@@ -602,47 +612,56 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 */
 	public function test_reading_the_registry_fires_the_action_once() {
 		self::reset_registry();
-		$registry = Gutenberg_Fields_Registry::get_instance();
+		$registry = WP_Fields_Registry::get_instance();
 		$fired    = did_action( 'wp_fields_api_init' );
 
-		gutenberg_get_registered_fields( 'postType', 'page' );
+		wp_get_registered_fields( 'postType', 'page' );
 		$this->assertSame( $fired + 1, did_action( 'wp_fields_api_init' ), 'The first read fires the action.' );
 
-		gutenberg_get_registered_fields( 'postType', 'post' );
-		gutenberg_get_registered_field_modules( 'postType', 'page' );
-		gutenberg_get_all_registered_field_modules();
+		wp_get_registered_fields( 'postType', 'post' );
+		wp_get_registered_field_modules( 'postType', 'page' );
+		wp_get_all_registered_field_modules();
 		$registry->get_all_registered();
 		$this->assertSame( $fired + 1, did_action( 'wp_fields_api_init' ), 'Further reads do not fire it again.' );
 	}
 
 	/**
-	 * The action receives the registry, so a callback can read and adjust it.
+	 * The plugin registry replaces the core one on `init`, so every reader
+	 * of `WP_Fields_Registry::get_instance()`, the functions included, gets
+	 * the plugin one, holding whatever the core one held.
 	 */
-	public function test_the_action_receives_the_registry() {
-		$received = null;
-		$callback = static function ( $registry ) use ( &$received ) {
-			$received = $registry;
-		};
-		add_action( 'wp_fields_api_init', $callback );
+	public function test_the_plugin_registry_replaces_the_core_one() {
+		$this->assertSame( 1, has_action( 'init', 'gutenberg_override_wp_fields_registry' ) );
 
-		try {
-			self::reset_registry();
-			gutenberg_get_registered_fields( 'postType', 'page' );
-		} finally {
-			remove_action( 'wp_fields_api_init', $callback );
+		$instance = new ReflectionProperty( WP_Fields_Registry::class, 'instance' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$instance->setAccessible( true );
 		}
+		$instance->setValue( null, null );
+		$core_registry = WP_Fields_Registry::get_instance();
+		$this->assertNotInstanceOf( WP_Fields_Registry_Gutenberg::class, $core_registry, 'Until the plugin replaces it, core creates its own registry.' );
+		$fields  = wp_get_registered_fields( 'postType', 'page' );
+		$modules = wp_get_registered_field_modules( 'postType', 'page' );
+		$fired   = did_action( 'wp_fields_api_init' );
+		$this->assertNotEmpty( $fields, 'The defaults are registered on the core registry.' );
 
-		$this->assertSame( Gutenberg_Fields_Registry::get_instance(), $received );
+		gutenberg_override_wp_fields_registry();
+
+		$registry = WP_Fields_Registry::get_instance();
+		$this->assertInstanceOf( WP_Fields_Registry_Gutenberg::class, $registry );
+		$this->assertSame( $registry, WP_Fields_Registry_Gutenberg::get_instance(), 'Both getters share the instance.' );
+		$this->assertSame( $fields, wp_get_registered_fields( 'postType', 'page' ), 'The fields of the core registry are handed over.' );
+		$this->assertSame( $modules, wp_get_registered_field_modules( 'postType', 'page' ), 'So are their script modules.' );
+		$this->assertSame( $fired, did_action( 'wp_fields_api_init' ), 'The action does not fire again.' );
 	}
 
 	/**
 	 * A plugin hooking the action at the default priority sees the final
-	 * defaults: on the registry it receives, it can update a default field,
-	 * or remove it.
+	 * defaults: it can update a default field, or remove it.
 	 */
 	public function test_a_callback_at_the_default_priority_alters_the_defaults() {
-		$callback = static function ( $registry ) {
-			$registry->update(
+		$callback = static function () {
+			wp_update_fields(
 				'test-plugin',
 				'postType',
 				'page',
@@ -653,13 +672,13 @@ class Tests_Fields_API extends WP_UnitTestCase {
 					),
 				)
 			);
-			$registry->unregister( 'postType', 'page', array( 'author' ) );
+			wp_unregister_fields( 'postType', 'page', array( 'author' ) );
 		};
 		add_action( 'wp_fields_api_init', $callback );
 
 		try {
 			self::reset_registry();
-			$fields = gutenberg_get_registered_fields( 'postType', 'page' );
+			$fields = wp_get_registered_fields( 'postType', 'page' );
 		} finally {
 			remove_action( 'wp_fields_api_init', $callback );
 		}
@@ -687,7 +706,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	public function test_fields_carry_the_origin_they_are_registered_with() {
 		$this->register_fields( 'postType', 'page', array( $this->field( 'color' ) + array( 'origin' => 'spoofed' ) ) );
 
-		$fields = array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'origin', 'id' );
+		$fields = array_column( wp_get_registered_fields( 'postType', 'page' ), 'origin', 'id' );
 		$this->assertSame(
 			array(
 				'registeredBy' => 'test-plugin',
@@ -704,8 +723,8 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * the fields of the call are registered.
 	 */
 	public function test_registering_a_registered_field_is_skipped() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::register' );
-		$reported   = &$this->record_notices( 'Gutenberg_Fields_Registry::register' );
+		$this->setExpectedIncorrectUsage( 'WP_Fields_Registry::register' );
+		$reported   = &$this->record_notices( 'WP_Fields_Registry::register' );
 		$registered = $this->register_fields(
 			'postType',
 			'page',
@@ -720,11 +739,11 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		);
 
 		$this->assertSame( array( 'color' ), $registered, 'The ids of the fields registered are returned.' );
-		$fields = array_column( gutenberg_get_registered_fields( 'postType', 'page' ), null, 'id' );
+		$fields = array_column( wp_get_registered_fields( 'postType', 'page' ), null, 'id' );
 		$this->assertArrayHasKey( 'color', $fields, 'The rest of the fields of the call are registered.' );
 		$this->assertSame( 'Author', $fields['author']['label'], 'The registered field is left untouched.' );
 		$this->assertSame( 'core', $fields['author']['origin']['registeredBy'] );
-		$this->assertSame( array( 'color' ), gutenberg_get_registered_field_modules( 'postType', 'page' )['plugin/fields'], 'The script module only applies to the fields registered.' );
+		$this->assertSame( array( 'color' ), wp_get_registered_field_modules( 'postType', 'page' )['plugin/fields'], 'The script module only applies to the fields registered.' );
 		$this->assertCount( 1, $reported );
 		$this->assertStringContainsString( 'postType "page"', $reported[0], 'The notice names the entity.' );
 		$this->assertStringContainsString( 'already registered: author', $reported[0], 'The notice names the field that is already registered, not the others of the call.' );
@@ -736,8 +755,8 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * registered.
 	 */
 	public function test_registering_the_same_field_twice_keeps_the_first_definition() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::register' );
-		$reported   = &$this->record_notices( 'Gutenberg_Fields_Registry::register' );
+		$this->setExpectedIncorrectUsage( 'WP_Fields_Registry::register' );
+		$reported   = &$this->record_notices( 'WP_Fields_Registry::register' );
 		$registered = $this->register_fields(
 			'postType',
 			'page',
@@ -752,7 +771,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		);
 
 		$this->assertSame( array( 'color', 'size' ), $registered );
-		$fields = array_column( gutenberg_get_registered_fields( 'postType', 'page' ), null, 'id' );
+		$fields = array_column( wp_get_registered_fields( 'postType', 'page' ), null, 'id' );
 		$this->assertSame( $this->field( 'color' )['label'], $fields['color']['label'], 'The first definition is kept.' );
 		$this->assertArrayHasKey( 'size', $fields, 'The rest of the fields of the call are registered.' );
 		$this->assertCount( 1, $reported );
@@ -766,14 +785,14 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	public function test_an_unregistered_field_can_be_registered_again() {
 		$registered = array();
 		$this->on_fields_api_init(
-			static function ( $registry ) use ( &$registered ) {
-				$registry->unregister( 'postType', 'page', array( 'author' ) );
-				$registered = $registry->register( 'test-plugin', 'postType', 'page', array( array( 'id' => 'author' ) ) );
+			static function () use ( &$registered ) {
+				wp_unregister_fields( 'postType', 'page', array( 'author' ) );
+				$registered = wp_register_fields( 'test-plugin', 'postType', 'page', array( array( 'id' => 'author' ) ) );
 			}
 		);
 
 		$this->assertSame( array( 'author' ), $registered );
-		$fields = array_column( gutenberg_get_registered_fields( 'postType', 'page' ), null, 'id' );
+		$fields = array_column( wp_get_registered_fields( 'postType', 'page' ), null, 'id' );
 		$this->assertSame(
 			array(
 				'id'     => 'author',
@@ -794,21 +813,21 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	public function test_entities_whose_kind_and_name_join_alike_are_kept_apart() {
 		$result = array();
 		$this->on_fields_api_init(
-			function ( $registry ) use ( &$result ) {
-				$result['first']        = $registry->register( 'test-plugin', 'a/b', 'c', array( $this->field( 'color' ) ), 'plugin/first' );
-				$result['second']       = $registry->register( 'test-plugin', 'a', 'b/c', array( $this->field( 'color' ), $this->field( 'size' ) ), 'plugin/second' );
-				$result['unregistered'] = $registry->unregister( 'a/b', 'c' );
+			function () use ( &$result ) {
+				$result['first']        = wp_register_fields( 'test-plugin', 'a/b', 'c', array( $this->field( 'color' ) ), 'plugin/first' );
+				$result['second']       = wp_register_fields( 'test-plugin', 'a', 'b/c', array( $this->field( 'color' ), $this->field( 'size' ) ), 'plugin/second' );
+				$result['unregistered'] = wp_unregister_fields( 'a/b', 'c' );
 			}
 		);
 
 		$this->assertSame( array( 'color' ), $result['first'], 'The first entity registers its field.' );
 		$this->assertSame( array( 'color', 'size' ), $result['second'], 'The second entity registers a field with the same id.' );
 		$this->assertSame( array( 'color' ), array_column( $result['unregistered'], 'id' ), 'Unregistering the first entity only removes its own field.' );
-		$this->assertSame( array(), gutenberg_get_registered_fields( 'a/b', 'c' ) );
-		$this->assertSame( array( 'color', 'size' ), array_column( gutenberg_get_registered_fields( 'a', 'b/c' ), 'id' ), 'The second entity keeps its fields.' );
-		$this->assertSame( array( 'plugin/second' => array( 'color', 'size' ) ), gutenberg_get_registered_field_modules( 'a', 'b/c' ), 'The second entity keeps only its own module.' );
-		$this->assertSame( array( 'b/c' => array( 'plugin/second' ) ), gutenberg_get_all_registered_field_modules()['a'], 'Only the second entity has modules under its kind.' );
-		$this->assertArrayNotHasKey( 'a/b', gutenberg_get_all_registered_field_modules(), 'The kind of the first entity, emptied, is forgotten.' );
+		$this->assertSame( array(), wp_get_registered_fields( 'a/b', 'c' ) );
+		$this->assertSame( array( 'color', 'size' ), array_column( wp_get_registered_fields( 'a', 'b/c' ), 'id' ), 'The second entity keeps its fields.' );
+		$this->assertSame( array( 'plugin/second' => array( 'color', 'size' ) ), wp_get_registered_field_modules( 'a', 'b/c' ), 'The second entity keeps only its own module.' );
+		$this->assertSame( array( 'b/c' => array( 'plugin/second' ) ), wp_get_all_registered_field_modules()['a'], 'Only the second entity has modules under its kind.' );
+		$this->assertArrayNotHasKey( 'a/b', wp_get_all_registered_field_modules(), 'The kind of the first entity, emptied, is forgotten.' );
 	}
 
 	/**
@@ -819,12 +838,12 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	public function test_unregistering_returns_the_unregistered_fields() {
 		$unregistered = array();
 		$this->on_fields_api_init(
-			function ( $registry ) use ( &$unregistered ) {
-				$registry->register( 'test-plugin', 'test', 'entity', array( $this->field( 'a' ), $this->field( 'b' ), $this->field( 'c' ) ), 'plugin/fields' );
-				$unregistered['by_id']   = $registry->unregister( 'test', 'entity', array( 'c', 'missing', 'a' ) );
-				$unregistered['missing'] = $registry->unregister( 'test', 'entity', array( 'a' ) );
-				$unregistered['every']   = $registry->unregister( 'test', 'entity' );
-				$unregistered['empty']   = $registry->unregister( 'test', 'entity' );
+			function () use ( &$unregistered ) {
+				wp_register_fields( 'test-plugin', 'test', 'entity', array( $this->field( 'a' ), $this->field( 'b' ), $this->field( 'c' ) ), 'plugin/fields' );
+				$unregistered['by_id']   = wp_unregister_fields( 'test', 'entity', array( 'c', 'missing', 'a' ) );
+				$unregistered['missing'] = wp_unregister_fields( 'test', 'entity', array( 'a' ) );
+				$unregistered['every']   = wp_unregister_fields( 'test', 'entity' );
+				$unregistered['empty']   = wp_unregister_fields( 'test', 'entity' );
 			}
 		);
 
@@ -847,8 +866,8 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			'Unregistering every field returns them all.'
 		);
 		$this->assertSame( array(), $unregistered['empty'], 'Nothing is returned for an entity without fields.' );
-		$this->assertSame( array(), gutenberg_get_registered_fields( 'test', 'entity' ), 'The entity has no fields left.' );
-		$this->assertArrayNotHasKey( 'test', gutenberg_get_all_registered_field_modules(), 'The entity has no script module left.' );
+		$this->assertSame( array(), wp_get_registered_fields( 'test', 'entity' ), 'The entity has no fields left.' );
+		$this->assertArrayNotHasKey( 'test', wp_get_all_registered_field_modules(), 'The entity has no script module left.' );
 	}
 
 	/**
@@ -860,7 +879,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	public function test_updating_merges_into_the_registered_field() {
 		$updated = array();
 		$this->on_fields_api_init(
-			static function ( $registry ) use ( &$updated ) {
+			static function () use ( &$updated ) {
 				$update    = array(
 					array(
 						'id'     => 'author',
@@ -868,8 +887,8 @@ class Tests_Fields_API extends WP_UnitTestCase {
 						'origin' => 'spoofed',
 					),
 				);
-				$updated[] = $registry->update( 'plugin-a', 'postType', 'page', $update, 'plugin/author' );
-				$updated[] = $registry->update(
+				$updated[] = wp_update_fields( 'plugin-a', 'postType', 'page', $update, 'plugin/author' );
+				$updated[] = wp_update_fields(
 					'plugin-b',
 					'postType',
 					'page',
@@ -880,7 +899,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 						),
 					)
 				);
-				$updated[] = $registry->update(
+				$updated[] = wp_update_fields(
 					'plugin-a',
 					'postType',
 					'page',
@@ -895,7 +914,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		);
 
 		$this->assertSame( array( array( 'author' ), array( 'author' ), array( 'author' ) ), $updated );
-		$fields = gutenberg_get_registered_fields( 'postType', 'page' );
+		$fields = wp_get_registered_fields( 'postType', 'page' );
 		$this->assertSame( 'author', $fields[0]['id'], 'The field keeps its position.' );
 		$this->assertSame( 'Byline', $fields[0]['label'], 'The last update wins.' );
 		$this->assertTrue( $fields[0]['readOnly'], 'The updates add up.' );
@@ -907,7 +926,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			),
 			$fields[0]['origin']
 		);
-		$modules = gutenberg_get_registered_field_modules( 'postType', 'page' );
+		$modules = wp_get_registered_field_modules( 'postType', 'page' );
 		$this->assertContains( 'author', $modules['core/defaults'], 'The field keeps its modules.' );
 		$this->assertSame( array( 'author' ), $modules['plugin/author'], 'The module applies to the field.' );
 	}
@@ -918,8 +937,8 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * `type` is not reported.
 	 */
 	public function test_registering_a_field_with_an_unknown_type_is_reported() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::register' );
-		$reported   = &$this->record_notices( 'Gutenberg_Fields_Registry::register' );
+		$this->setExpectedIncorrectUsage( 'WP_Fields_Registry::register' );
+		$reported   = &$this->record_notices( 'WP_Fields_Registry::register' );
 		$registered = $this->register_fields(
 			'postType',
 			'page',
@@ -948,12 +967,12 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * and the rest of the fields of the call are updated.
 	 */
 	public function test_updating_an_unregistered_field_is_skipped() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::update' );
-		$reported = &$this->record_notices( 'Gutenberg_Fields_Registry::update' );
+		$this->setExpectedIncorrectUsage( 'WP_Fields_Registry::update' );
+		$reported = &$this->record_notices( 'WP_Fields_Registry::update' );
 		$updated  = array();
 		$this->on_fields_api_init(
-			static function ( $registry ) use ( &$updated ) {
-				$updated = $registry->update(
+			static function () use ( &$updated ) {
+				$updated = wp_update_fields(
 					'test-plugin',
 					'postType',
 					'page',
@@ -973,11 +992,11 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		);
 
 		$this->assertSame( array( 'author' ), $updated, 'The ids of the fields updated are returned.' );
-		$fields = array_column( gutenberg_get_registered_fields( 'postType', 'page' ), null, 'id' );
+		$fields = array_column( wp_get_registered_fields( 'postType', 'page' ), null, 'id' );
 		$this->assertArrayNotHasKey( 'color', $fields, 'The field is not registered.' );
 		$this->assertSame( 'Writer', $fields['author']['label'], 'The rest of the fields of the call are updated.' );
 		$this->assertSame( array( 'test-plugin' ), $fields['author']['origin']['updatedBy'] );
-		$this->assertSame( array( 'author' ), gutenberg_get_registered_field_modules( 'postType', 'page' )['plugin/fields'], 'The script module only applies to the fields updated.' );
+		$this->assertSame( array( 'author' ), wp_get_registered_field_modules( 'postType', 'page' )['plugin/fields'], 'The script module only applies to the fields updated.' );
 		$this->assertCount( 1, $reported );
 		$this->assertStringContainsString( 'postType "page"', $reported[0], 'The notice names the entity.' );
 		$this->assertStringContainsString( 'not registered: color', $reported[0], 'The notice names only the field that is not registered.' );
@@ -989,14 +1008,14 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * rest of the fields of the call are registered, or updated.
 	 */
 	public function test_an_invalid_definition_is_skipped() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::register' );
-		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::update' );
-		$reported   = &$this->record_notices( 'Gutenberg_Fields_Registry::register' );
+		$this->setExpectedIncorrectUsage( 'WP_Fields_Registry::register' );
+		$this->setExpectedIncorrectUsage( 'WP_Fields_Registry::update' );
+		$reported   = &$this->record_notices( 'WP_Fields_Registry::register' );
 		$registered = null;
 		$updated    = null;
 		$this->on_fields_api_init(
-			function ( $registry ) use ( &$registered, &$updated ) {
-				$registered = $registry->register(
+			function () use ( &$registered, &$updated ) {
+				$registered = wp_register_fields(
 					'test-plugin',
 					'postType',
 					'page',
@@ -1011,7 +1030,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 						$this->field( 'weight' ),
 					)
 				);
-				$updated    = $registry->update(
+				$updated    = wp_update_fields(
 					'test-plugin',
 					'postType',
 					'page',
@@ -1028,7 +1047,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 
 		$this->assertSame( array( 'color', 'weight' ), $registered, 'The valid definitions are registered.' );
 		$this->assertSame( array( 'color' ), $updated, 'The valid definitions are updated.' );
-		$fields = array_column( gutenberg_get_registered_fields( 'postType', 'page' ), null, 'id' );
+		$fields = array_column( wp_get_registered_fields( 'postType', 'page' ), null, 'id' );
 		$this->assertSame( 'Colour', $fields['color']['label'] );
 		$this->assertArrayHasKey( 'weight', $fields );
 		$this->assertCount( 1, $reported );
@@ -1040,32 +1059,32 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * An origin that is not a non-empty string is refused.
 	 */
 	public function test_registering_with_an_invalid_origin_is_refused() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::register' );
+		$this->setExpectedIncorrectUsage( 'WP_Fields_Registry::register' );
 		$registered = null;
 		$this->on_fields_api_init(
-			static function ( $registry ) use ( &$registered ) {
-				$registered = $registry->register( '', 'postType', 'page', array( array( 'id' => 'color' ) ) );
+			static function () use ( &$registered ) {
+				$registered = wp_register_fields( '', 'postType', 'page', array( array( 'id' => 'color' ) ) );
 			}
 		);
 
 		$this->assertSame( array(), $registered );
-		$this->assertNotContains( 'color', array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' ) );
+		$this->assertNotContains( 'color', array_column( wp_get_registered_fields( 'postType', 'page' ), 'id' ) );
 	}
 
 	/**
 	 * Fields that are not a list, such as fields keyed by id, are refused.
 	 */
 	public function test_registering_fields_that_are_not_a_list_is_refused() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::register' );
+		$this->setExpectedIncorrectUsage( 'WP_Fields_Registry::register' );
 		$registered = null;
 		$this->on_fields_api_init(
-			static function ( $registry ) use ( &$registered ) {
-				$registered = $registry->register( 'test-plugin', 'postType', 'page', array( 'color' => array( 'id' => 'color' ) ) );
+			static function () use ( &$registered ) {
+				$registered = wp_register_fields( 'test-plugin', 'postType', 'page', array( 'color' => array( 'id' => 'color' ) ) );
 			}
 		);
 
 		$this->assertSame( array(), $registered );
-		$this->assertNotContains( 'color', array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' ) );
+		$this->assertNotContains( 'color', array_column( wp_get_registered_fields( 'postType', 'page' ), 'id' ) );
 	}
 
 	/**
@@ -1074,12 +1093,12 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * registry is left untouched.
 	 */
 	public function test_unregistering_with_an_invalid_entity_is_refused() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::unregister' );
+		$this->setExpectedIncorrectUsage( 'WP_Fields_Registry::unregister' );
 		$results = array();
 		$this->on_fields_api_init(
-			static function ( $registry ) use ( &$results ) {
-				$results['no name']    = $registry->unregister( 'postType', array( 'author' ) );
-				$results['empty kind'] = $registry->unregister( '', 'page', array( 'author' ) );
+			static function () use ( &$results ) {
+				$results['no name']    = wp_unregister_fields( 'postType', array( 'author' ) );
+				$results['empty kind'] = wp_unregister_fields( '', 'page', array( 'author' ) );
 			}
 		);
 
@@ -1090,7 +1109,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			),
 			$results
 		);
-		$this->assertContains( 'author', array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' ), 'The default field is kept.' );
+		$this->assertContains( 'author', array_column( wp_get_registered_fields( 'postType', 'page' ), 'id' ), 'The default field is kept.' );
 	}
 
 	/**
@@ -1098,16 +1117,16 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * other ids of the call are unregistered.
 	 */
 	public function test_unregistering_with_an_invalid_id_skips_it() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::unregister' );
+		$this->setExpectedIncorrectUsage( 'WP_Fields_Registry::unregister' );
 		$unregistered = null;
 		$this->on_fields_api_init(
-			static function ( $registry ) use ( &$unregistered ) {
-				$unregistered = $registry->unregister( 'postType', 'page', array( array( 'id' => 'author' ), '', 'comment_status' ) );
+			static function () use ( &$unregistered ) {
+				$unregistered = wp_unregister_fields( 'postType', 'page', array( array( 'id' => 'author' ), '', 'comment_status' ) );
 			}
 		);
 
 		$this->assertSame( array( 'comment_status' ), array_column( $unregistered, 'id' ) );
-		$ids = array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' );
+		$ids = array_column( wp_get_registered_fields( 'postType', 'page' ), 'id' );
 		$this->assertContains( 'author', $ids, 'A definition in place of an id is skipped, not matched.' );
 		$this->assertNotContains( 'comment_status', $ids );
 	}
@@ -1119,15 +1138,14 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * the import map of the editor script built from them.
 	 */
 	public function test_registering_outside_the_action_is_refused() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::register' );
+		$this->setExpectedIncorrectUsage( 'WP_Fields_Registry::register' );
 		self::reset_registry();
-		$registry = Gutenberg_Fields_Registry::get_instance();
-		$fired    = did_action( 'wp_fields_api_init' );
+		$fired = did_action( 'wp_fields_api_init' );
 
-		$this->assertSame( array(), $registry->register( 'test-plugin', 'postType', 'page', array( $this->field( 'color' ) ), 'plugin/color' ) );
+		$this->assertSame( array(), wp_register_fields( 'test-plugin', 'postType', 'page', array( $this->field( 'color' ) ), 'plugin/color' ) );
 		$this->assertSame( $fired, did_action( 'wp_fields_api_init' ), 'Refusing does not fire the action.' );
-		$this->assertNotContains( 'color', array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' ) );
-		$this->assertArrayNotHasKey( 'plugin/color', gutenberg_get_registered_field_modules( 'postType', 'page' ) );
+		$this->assertNotContains( 'color', array_column( wp_get_registered_fields( 'postType', 'page' ), 'id' ) );
+		$this->assertArrayNotHasKey( 'plugin/color', wp_get_registered_field_modules( 'postType', 'page' ) );
 	}
 
 	/**
@@ -1135,14 +1153,13 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * refused and the registry is left untouched.
 	 */
 	public function test_updating_outside_the_action_is_refused() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::update' );
+		$this->setExpectedIncorrectUsage( 'WP_Fields_Registry::update' );
 		self::reset_registry();
-		$registry = Gutenberg_Fields_Registry::get_instance();
-		$fired    = did_action( 'wp_fields_api_init' );
+		$fired = did_action( 'wp_fields_api_init' );
 
 		$this->assertSame(
 			array(),
-			$registry->update(
+			wp_update_fields(
 				'test-plugin',
 				'postType',
 				'page',
@@ -1155,7 +1172,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			)
 		);
 		$this->assertSame( $fired, did_action( 'wp_fields_api_init' ), 'Refusing does not fire the action.' );
-		$fields = array_column( gutenberg_get_registered_fields( 'postType', 'page' ), null, 'id' );
+		$fields = array_column( wp_get_registered_fields( 'postType', 'page' ), null, 'id' );
 		$this->assertSame( 'Author', $fields['author']['label'] );
 	}
 
@@ -1166,15 +1183,14 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * post types still being registered.
 	 */
 	public function test_unregistering_outside_the_action_is_refused() {
-		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::unregister' );
+		$this->setExpectedIncorrectUsage( 'WP_Fields_Registry::unregister' );
 		self::reset_registry();
-		$registry = Gutenberg_Fields_Registry::get_instance();
-		$fired    = did_action( 'wp_fields_api_init' );
+		$fired = did_action( 'wp_fields_api_init' );
 
-		$this->assertSame( array(), $registry->unregister( 'postType', 'page', array( 'author' ) ), 'Unregistering fields by id is refused.' );
-		$this->assertSame( array(), $registry->unregister( 'postType', 'page' ), 'Unregistering every field is refused.' );
+		$this->assertSame( array(), wp_unregister_fields( 'postType', 'page', array( 'author' ) ), 'Unregistering fields by id is refused.' );
+		$this->assertSame( array(), wp_unregister_fields( 'postType', 'page' ), 'Unregistering every field is refused.' );
 		$this->assertSame( $fired, did_action( 'wp_fields_api_init' ), 'Refusing does not fire the action.' );
-		$this->assertContains( 'author', array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' ), 'The default field is kept.' );
+		$this->assertContains( 'author', array_column( wp_get_registered_fields( 'postType', 'page' ), 'id' ), 'The default field is kept.' );
 	}
 
 	/**
@@ -1185,7 +1201,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	public function test_reading_before_init_does_not_fire_the_action() {
 		global $wp_actions;
 
-		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::initialize' );
+		$this->setExpectedIncorrectUsage( 'WP_Fields_Registry::initialize' );
 		self::reset_registry();
 		$fired = did_action( 'wp_fields_api_init' );
 
@@ -1195,14 +1211,14 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		unset( $wp_actions['init'] );
 		try {
 			$this->assertFalse( (bool) did_action( 'init' ) );
-			$this->assertSame( array(), gutenberg_get_registered_fields( 'postType', 'page' ) );
-			$this->assertSame( array(), gutenberg_get_all_registered_field_modules() );
+			$this->assertSame( array(), wp_get_registered_fields( 'postType', 'page' ) );
+			$this->assertSame( array(), wp_get_all_registered_field_modules() );
 			$this->assertSame( $fired, did_action( 'wp_fields_api_init' ), 'A read before `init` does not fire the action.' );
 		} finally {
 			$wp_actions['init'] = $did_init;
 		}
 
-		$this->assertContains( 'author', array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' ), 'The next read fires the action and registers the defaults.' );
+		$this->assertContains( 'author', array_column( wp_get_registered_fields( 'postType', 'page' ), 'id' ), 'The next read fires the action and registers the defaults.' );
 		$this->assertSame( $fired + 1, did_action( 'wp_fields_api_init' ) );
 	}
 
@@ -1214,7 +1230,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	public function test_reading_during_init_does_not_fire_the_action() {
 		global $wp_current_filter;
 
-		$this->setExpectedIncorrectUsage( 'Gutenberg_Fields_Registry::initialize' );
+		$this->setExpectedIncorrectUsage( 'WP_Fields_Registry::initialize' );
 		self::reset_registry();
 		$fired = did_action( 'wp_fields_api_init' );
 
@@ -1223,14 +1239,14 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$wp_current_filter[] = 'init';
 		try {
 			$this->assertTrue( doing_action( 'init' ) );
-			$this->assertSame( array(), gutenberg_get_registered_fields( 'postType', 'page' ) );
-			$this->assertSame( array(), gutenberg_get_all_registered_field_modules() );
+			$this->assertSame( array(), wp_get_registered_fields( 'postType', 'page' ) );
+			$this->assertSame( array(), wp_get_all_registered_field_modules() );
 			$this->assertSame( $fired, did_action( 'wp_fields_api_init' ), 'A read during `init` does not fire the action.' );
 		} finally {
 			array_pop( $wp_current_filter );
 		}
 
-		$this->assertContains( 'author', array_column( gutenberg_get_registered_fields( 'postType', 'page' ), 'id' ), 'The next read fires the action and registers the defaults.' );
+		$this->assertContains( 'author', array_column( wp_get_registered_fields( 'postType', 'page' ), 'id' ), 'The next read fires the action and registers the defaults.' );
 		$this->assertSame( $fired + 1, did_action( 'wp_fields_api_init' ) );
 	}
 }
