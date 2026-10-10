@@ -108,8 +108,10 @@ describe( 'getLayoutStyle', () => {
 
 			expect( result ).toBe( expected );
 		} );
-		it( 'should size manual placement grids by their width', () => {
-			const expected = `.my-container { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(1rem, 1fr)); grid-auto-rows: minmax(1rem, 1fr); aspect-ratio: 3 / 2; min-height: 0; }`;
+		it( 'should size manual placement grids by their width and tell their children the cells are fixed', () => {
+			const expected =
+				`.my-container { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(1rem, 1fr)); grid-auto-rows: minmax(1rem, 1fr); aspect-ratio: 3 / 2; min-height: 0; --wp--style--grid-cells: fixed; }` +
+				`:where(.my-container .is-layout-grid) { --wp--style--grid-cells: auto; }`;
 
 			const result = grid.getLayoutStyle( {
 				selector: '.my-container',
@@ -141,7 +143,11 @@ describe( 'getLayoutStyle', () => {
 				layoutDefinitions: undefined,
 			} );
 
-			expect( result ).toContain( 'aspect-ratio: 1 / 2' );
+			expect( result ).toContain(
+				'aspect-ratio: 1 / 2; min-height: 0; --wp--style--grid-cells: fixed;'
+			);
+			// Nested grids are reset once, by the grid's own styles.
+			expect( result ).not.toContain( ':where(' );
 		} );
 		it( 'should not output rows for a viewport column count of auto placement grids', () => {
 			const result = grid.getLayoutStyle( {
@@ -177,6 +183,11 @@ describe( 'getLayoutStyle', () => {
 				'grid-template-rows: repeat(2, minmax(1rem, 1fr)); grid-auto-rows: minmax(1rem, 1fr);'
 			);
 			expect( result ).not.toContain( 'aspect-ratio' );
+			expect( result ).not.toContain( '--wp--style--grid-cells: fixed' );
+			// A grid nested inside it still describes its own cells.
+			expect( result ).toContain(
+				':where(.my-container .is-layout-grid) { --wp--style--grid-cells: auto; }'
+			);
 		} );
 		it( 'should stop sizing manual placement grids by their width when a viewport adds a minimum column width', () => {
 			const result = grid.getLayoutStyle( {
@@ -194,8 +205,20 @@ describe( 'getLayoutStyle', () => {
 			} );
 
 			expect( result ).toContain(
-				'grid-auto-rows: minmax(1rem, 1fr); aspect-ratio: auto; min-height: auto;'
+				'grid-auto-rows: minmax(1rem, 1fr); aspect-ratio: auto; min-height: auto; --wp--style--grid-cells: auto;'
 			);
+		} );
+		it( 'should not tell the children of auto placement grids anything about their cells', () => {
+			const result = grid.getLayoutStyle( {
+				selector: '.my-container',
+				layout: { columnCount: 3, rowCount: 2 },
+				style: {},
+				blockName: 'test-block',
+				hasBlockGapSupport: false,
+				layoutDefinitions: undefined,
+			} );
+
+			expect( result ).not.toContain( '--wp--style--grid-cells' );
 		} );
 	} );
 	it( 'should return `grid-template-columns` with max() function if both minimumColumnWidth and columnCount are provided', () => {
