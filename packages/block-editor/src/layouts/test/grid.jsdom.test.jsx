@@ -64,6 +64,21 @@ describe( 'getLayoutStyle', () => {
 
 		expect( result ).toBe( expected );
 	} );
+	it( 'should not output rows for a viewport column count if the grid interactivity experiment is off', () => {
+		const result = grid.getLayoutStyle( {
+			selector: '.my-container',
+			layout: { columnCount: 3, rowCount: 2, isManualPlacement: true },
+			viewportOverrides: { columnCount: 1 },
+			style: {},
+			blockName: 'test-block',
+			hasBlockGapSupport: false,
+			layoutDefinitions: undefined,
+		} );
+
+		expect( result ).toBe(
+			'.my-container { grid-template-columns: repeat(1, minmax(0, 1fr)); }'
+		);
+	} );
 	describe( 'with the grid interactivity experiment', () => {
 		let originalExperiment;
 		beforeEach( () => {
@@ -74,8 +89,8 @@ describe( 'getLayoutStyle', () => {
 			window.__experimentalEnableGridInteractivity = originalExperiment;
 		} );
 
-		it( 'should give every row the same height if columnCount and rowCount are provided', () => {
-			const expected = `.my-container { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(1rem, 1fr)); grid-auto-rows: minmax(1rem, 1fr); }`;
+		it( 'should size the rows of auto placement grids by their content', () => {
+			const expected = `.my-container { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(1rem, auto)); }`;
 
 			const result = grid.getLayoutStyle( {
 				selector: '.my-container',
@@ -122,6 +137,60 @@ describe( 'getLayoutStyle', () => {
 			} );
 
 			expect( result ).toContain( 'aspect-ratio: 1 / 2' );
+		} );
+		it( 'should not output rows for a viewport column count of auto placement grids', () => {
+			const result = grid.getLayoutStyle( {
+				selector: '.my-container',
+				layout: { columnCount: 3, rowCount: 2 },
+				viewportOverrides: { columnCount: 1 },
+				style: {},
+				blockName: 'test-block',
+				hasBlockGapSupport: false,
+				layoutDefinitions: undefined,
+			} );
+
+			expect( result ).toBe(
+				'.my-container { grid-template-columns: repeat(1, minmax(0, 1fr)); }'
+			);
+		} );
+		it( 'should give rows the same height but not size manual placement grids by their width if they have a minimum column width', () => {
+			const result = grid.getLayoutStyle( {
+				selector: '.my-container',
+				layout: {
+					columnCount: 3,
+					rowCount: 2,
+					minimumColumnWidth: '12rem',
+					isManualPlacement: true,
+				},
+				style: {},
+				blockName: 'test-block',
+				hasBlockGapSupport: false,
+				layoutDefinitions: undefined,
+			} );
+
+			expect( result ).toContain(
+				'grid-template-rows: repeat(2, minmax(1rem, 1fr)); grid-auto-rows: minmax(1rem, 1fr);'
+			);
+			expect( result ).not.toContain( 'aspect-ratio' );
+		} );
+		it( 'should stop sizing manual placement grids by their width when a viewport adds a minimum column width', () => {
+			const result = grid.getLayoutStyle( {
+				selector: '.my-container',
+				layout: {
+					columnCount: 3,
+					rowCount: 2,
+					isManualPlacement: true,
+				},
+				viewportOverrides: { minimumColumnWidth: '12rem' },
+				style: {},
+				blockName: 'test-block',
+				hasBlockGapSupport: false,
+				layoutDefinitions: undefined,
+			} );
+
+			expect( result ).toContain(
+				'grid-auto-rows: minmax(1rem, 1fr); aspect-ratio: auto; min-height: auto;'
+			);
 		} );
 	} );
 	it( 'should return `grid-template-columns` with max() function if both minimumColumnWidth and columnCount are provided', () => {

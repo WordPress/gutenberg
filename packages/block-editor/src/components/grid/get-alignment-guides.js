@@ -35,14 +35,25 @@ function getGapAlongAxis( axis, a, b ) {
 	);
 }
 
+function isOverlapping( a, b, tolerance ) {
+	return Object.values( AXES ).every(
+		( { getStart, getEnd } ) =>
+			Math.min( getEnd( a ), getEnd( b ) ) -
+				Math.max( getStart( a ), getStart( b ) ) >
+			tolerance
+	);
+}
+
 /**
  * Works out which alignment guides to draw while a block is dragged over a
- * grid. A guide is drawn when one of the landing area's edges or centers lines
- * up with the same kind of line on the container or on another block.
+ * grid. A guide is drawn when one of the landing area's edges or its center
+ * lines up with an edge or the center of the container or of another block.
  *
  * For each line of the landing area, only the nearest matching block gets a
  * guide, so a grid where everything shares the same tracks doesn't fill up
- * with lines. Every container match gets a guide.
+ * with lines. Every container match gets a guide, and a block guide on the
+ * same line as a container guide is left out. Blocks that the landing area
+ * overlaps get no guides, since the overlap is already shown.
  *
  * All rectangles are `{ left, top, right, bottom }` in pixels, in the same
  * coordinate space.
@@ -66,9 +77,13 @@ export function getAlignmentGuides( {
 } ) {
 	const guides = [];
 	const isMatch = ( a, b ) => Math.abs( a - b ) <= tolerance;
+	const candidates = siblings.filter(
+		( sibling ) => ! isOverlapping( target, sibling, tolerance )
+	);
 
 	for ( const [ orientation, axis ] of Object.entries( AXES ) ) {
 		const targetLines = axis.getLines( target );
+		const containerLines = [];
 
 		if ( container ) {
 			axis.getLines( container ).forEach( ( containerLine, index ) => {
@@ -77,6 +92,7 @@ export function getAlignmentGuides( {
 						isMatch( targetLine, containerLine )
 					)
 				) {
+					containerLines.push( containerLine );
 					guides.push( {
 						orientation,
 						position: containerLine,
@@ -93,7 +109,7 @@ export function getAlignmentGuides( {
 
 		for ( const targetLine of targetLines ) {
 			let nearest = null;
-			for ( const sibling of siblings ) {
+			for ( const sibling of candidates ) {
 				const siblingLine = axis
 					.getLines( sibling )
 					.find( ( line ) => isMatch( targetLine, line ) );
@@ -105,7 +121,12 @@ export function getAlignmentGuides( {
 					nearest = { sibling, line: siblingLine, gap };
 				}
 			}
-			if ( nearest ) {
+			if (
+				nearest &&
+				! containerLines.some( ( line ) =>
+					isMatch( line, nearest.line )
+				)
+			) {
 				guides.push( {
 					orientation,
 					position: nearest.line,

@@ -210,11 +210,16 @@ export default {
 			rowCount = null,
 			autoFit = false,
 		} = effectiveLayout;
-		// Same-size cells are part of the grid interactivity experiment.
+		// Manual grids give all their cells the same size, as part of the grid
+		// interactivity experiment.
 		const hasSameSizeCells =
+			!! effectiveLayout.isManualPlacement &&
 			!! window.__experimentalEnableGridInteractivity;
-		const isManualPlacement =
-			hasSameSizeCells && !! effectiveLayout.isManualPlacement;
+		// Cells take their size from the grid's width, unless a minimum column
+		// width lets the columns wrap into more rows than the grid has.
+		const hasCellsSizedByWidth = hasSameSizeCells && ! minimumColumnWidth;
+		const baseHasCellsSizedByWidth =
+			hasSameSizeCells && ! layout?.minimumColumnWidth;
 
 		// When enabled, columns stretch to fill the available space using
 		// `auto-fit`; otherwise empty tracks are preserved with `auto-fill`.
@@ -274,8 +279,9 @@ export default {
 		const shouldOutputGridRows =
 			( ! hasViewportOverrides ||
 				hasViewportOverride( 'rowCount' ) ||
-				( isManualPlacement &&
-					hasViewportOverride( 'columnCount' ) ) ) &&
+				( hasSameSizeCells &&
+					( hasViewportOverride( 'columnCount' ) ||
+						hasViewportOverride( 'minimumColumnWidth' ) ) ) ) &&
 			columnCount &&
 			rowCount;
 
@@ -333,14 +339,16 @@ export default {
 				`grid-template-rows: repeat(${ rowCount }, minmax(1rem, 1fr))`,
 				'grid-auto-rows: minmax(1rem, 1fr)'
 			);
-			// Manual grids take their height from their width, so that cells
-			// are close to square and content never makes them bigger. The
-			// gaps keep them from being exactly square.
-			if ( isManualPlacement ) {
+			// The grid takes its height from its width, so that cells are
+			// close to square and content never makes them bigger. The gaps
+			// keep them from being exactly square.
+			if ( hasCellsSizedByWidth ) {
 				rules.push(
 					`aspect-ratio: ${ columnCount } / ${ rowCount }`,
 					'min-height: 0'
 				);
+			} else if ( hasViewportOverrides && baseHasCellsSizedByWidth ) {
+				rules.push( 'aspect-ratio: auto', 'min-height: auto' );
 			}
 		} else if ( shouldOutputGridRows ) {
 			rules.push(

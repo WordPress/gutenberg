@@ -32,8 +32,8 @@ describe( 'getGridDropTarget()', () => {
 		).toEqual( { columnStart: 3, rowStart: 2, columnSpan: 1, rowSpan: 1 } );
 	} );
 
-	it( 'treats the pointer as the centre of the block', () => {
-		// A 2x2 block centred on the gap corner between cells 2/2 and 3/3.
+	it( 'treats the pointer as the center of the block', () => {
+		// A 2x2 block centered on the gap corner between cells 2/2 and 3/3.
 		expect(
 			toPlain(
 				getGridDropTarget( {
@@ -48,7 +48,7 @@ describe( 'getGridDropTarget()', () => {
 		).toEqual( { columnStart: 2, rowStart: 2, columnSpan: 2, rowSpan: 2 } );
 	} );
 
-	it( 'centres the block by its measured size', () => {
+	it( 'centers the block by its measured size', () => {
 		// The cells a block spans give a 100px wide block, which lands in
 		// column 2. Measured at 300px wide, its left edge is in column 1.
 		const options = { x: 160, y: 25, columnTracks, rowTracks };
@@ -89,7 +89,7 @@ describe( 'getGridDropTarget()', () => {
 		).toEqual( { columnStart: 1, rowStart: 1, columnSpan: 2, rowSpan: 2 } );
 	} );
 
-	it( 'starts at the first cell when the block is wider than the grid', () => {
+	it( 'shrinks a block bigger than the grid to fit it', () => {
 		expect(
 			toPlain(
 				getGridDropTarget( {
@@ -98,9 +98,10 @@ describe( 'getGridDropTarget()', () => {
 					columnTracks,
 					rowTracks,
 					columnSpan: 5,
+					rowSpan: 4,
 				} )
 			)
-		).toEqual( { columnStart: 1, rowStart: 1, columnSpan: 5, rowSpan: 1 } );
+		).toEqual( { columnStart: 1, rowStart: 1, columnSpan: 3, rowSpan: 3 } );
 	} );
 
 	it( 'handles uneven track sizes', () => {

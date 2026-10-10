@@ -147,18 +147,70 @@ describe( 'getAlignmentGuides()', () => {
 			target: rect( 100, 100, 100, 100 ),
 			siblings: [
 				rect( 100, 0, 100, 50 ),
-				rect( 100, 250, 100, 50 ),
+				rect( 100, 260, 100, 50 ),
 				rect( 0, 100, 50, 100 ),
-				rect( 250, 100, 50, 100 ),
+				rect( 260, 100, 50, 100 ),
 			],
 			container: { left: -1000, top: -1000, right: 1000, bottom: 1001 },
 		} );
-		const siblingGuides = byKind( guides, 'sibling' );
+		// The block above and the block to the left are the nearest, 50px
+		// away, and win over the ones 60px away below and to the right.
+		expect( byKind( guides, 'sibling' ) ).toEqual( [
+			...[ 100, 150, 200 ].map( ( position ) => ( {
+				orientation: 'vertical',
+				position,
+				start: 0,
+				end: 200,
+				kind: 'sibling',
+			} ) ),
+			...[ 100, 150, 200 ].map( ( position ) => ( {
+				orientation: 'horizontal',
+				position,
+				start: 0,
+				end: 200,
+				kind: 'sibling',
+			} ) ),
+		] );
+	} );
+
+	it( 'draws no guides to a block that the landing area overlaps', () => {
+		const guides = getAlignmentGuides( {
+			target: rect( 40, 40, 50, 50 ),
+			siblings: [ rect( 40, 60, 50, 50 ) ],
+			container,
+		} );
+		expect( byKind( guides, 'sibling' ) ).toEqual( [] );
+	} );
+
+	it( 'draws guides to a block that only touches the landing area', () => {
+		const guides = getAlignmentGuides( {
+			target: rect( 40, 40, 50, 50 ),
+			siblings: [ rect( 40, 90, 50, 50 ) ],
+			container,
+		} );
 		expect(
-			siblingGuides.filter( ( g ) => g.orientation === 'vertical' )
+			byKind( guides, 'sibling' ).filter(
+				( guide ) => guide.orientation === 'vertical'
+			)
 		).toHaveLength( 3 );
+	} );
+
+	it( 'leaves out a block guide on the same line as a container guide', () => {
+		const guides = getAlignmentGuides( {
+			target: rect( 0, 200, 50, 50 ),
+			siblings: [ rect( 0, 20, 80, 30 ) ],
+			container,
+		} );
 		expect(
-			siblingGuides.filter( ( g ) => g.orientation === 'horizontal' )
-		).toHaveLength( 3 );
+			guides.filter( ( guide ) => guide.orientation === 'vertical' )
+		).toEqual( [
+			{
+				orientation: 'vertical',
+				position: 0,
+				start: 0,
+				end: 300,
+				kind: 'container-edge',
+			},
+		] );
 	} );
 } );
