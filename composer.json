@@ -26,7 +26,6 @@
 		"sirbrillig/phpcs-variable-analysis": "^2.8",
 		"wp-phpunit/wp-phpunit": "^5.4",
 		"phpunit/phpunit": "^8.5",
-		"spatie/phpunit-watcher": "^1.23",
 		"yoast/phpunit-polyfills": "^1.0"
 	},
 	"require": {
@@ -35,7 +34,6 @@
 	"scripts": {
 		"format": "phpcbf --standard=phpcs.xml.dist --report-summary --report-source",
 		"lint": "phpcs --standard=phpcs.xml.dist",
-		"test": "phpunit",
-		"test:watch": "phpunit-watcher watch < /dev/tty"
+		"test": "phpunit"
 	}
 }
