@@ -29,6 +29,15 @@ if ( ! defined( 'GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES' ) ) {
 }
 
 /**
+ * Maximum byte length of the proposals the save pass stores on one note
+ * (`_wp_suggestion_content`). A note whose proposals would not fit keeps them
+ * in post content instead, where the render filters still hide them.
+ */
+if ( ! defined( 'GUTENBERG_SUGGESTION_CONTENT_MAX_BYTES' ) ) {
+	define( 'GUTENBERG_SUGGESTION_CONTENT_MAX_BYTES', 1048576 );
+}
+
+/**
  * Applies `wp_kses_post()` to the HTML-bearing string fields of a serialized
  * block snapshot carried inside a suggestion operation (`op.block` on
  * `block-remove` / `block-insert-after` ops), recursing into `innerBlocks`.
@@ -145,6 +154,18 @@ function gutenberg_sanitize_suggestion_payload( $value ) {
  *   - `_wp_suggestion_decided_by` / `_wp_suggestion_resolved_by` — read-only
  *                               provenance: who made the provisional decision,
  *                               and whose save finalized or outdated it.
+ *   - `_wp_suggestion_content` — private: the proposals the save pass moved
+ *                               out of post content (added text, suggested
+ *                               blocks, proposed attribute values), JSON. Never
+ *                               readable or writable over REST; only the save
+ *                               pass writes it.
+ *   - `_wp_suggestion_extraction_skipped` — read-only flag: the note's
+ *                               proposals were too large to move out of post
+ *                               content on the last save, so they stayed there.
+ *
+ * Revisions and autosaves carry `_wp_suggestion_snapshot` post meta, the same
+ * proposals for the anchors in that revision's content, since comment meta is
+ * not revisioned.
  *
  * The suggestion is stored as comment meta rather than `comment_content` so a
  * note can carry both a discussion (content) and a proposed edit (meta), and so
@@ -241,8 +262,75 @@ function gutenberg_register_suggestion_meta() {
 			)
 		);
 	}
+
+	register_meta(
+		'comment',
+		'_wp_suggestion_extraction_skipped',
+		array(
+			'type'          => 'boolean',
+			'description'   => __( 'Whether the suggestion was too large to move out of the post content on the last save.', 'gutenberg' ),
+			'single'        => true,
+			'show_in_rest'  => true,
+			'auth_callback' => '__return_false',
+		)
+	);
+
+	// The stored proposals are never exposed or writable over REST: editors
+	// get them back inside the post's own `content.raw`.
+	$private_json = array(
+		'type'              => 'string',
+		'single'            => true,
+		'show_in_rest'      => false,
+		'auth_callback'     => '__return_false',
+		'sanitize_callback' => 'gutenberg_sanitize_suggestion_content_meta',
+	);
+	register_meta(
+		'comment',
+		'_wp_suggestion_content',
+		array_merge( $private_json, array( 'description' => __( 'Proposals moved out of the post content by the save pass (JSON).', 'gutenberg' ) ) )
+	);
+	register_meta(
+		'post',
+		'_wp_suggestion_snapshot',
+		array_merge( $private_json, array( 'description' => __( 'Suggestion proposals for the anchors in a revision (JSON).', 'gutenberg' ) ) )
+	);
 }
 add_action( 'init', 'gutenberg_register_suggestion_meta' );
+
+/**
+ * Validates the JSON the save pass stores for a note or a revision.
+ *
+ * Only checks shape and size. The content inside was already filtered by kses
+ * as part of `post_content` for the user who saved it, and is stored exactly,
+ * so a second pass (not idempotent on every input) never changes it.
+ *
+ * @param mixed $value Meta value.
+ * @return string The value, or '' when it is not a valid object within the
+ *                size limit.
+ */
+function gutenberg_sanitize_suggestion_content_meta( $value ) {
+	if ( ! is_string( $value ) || strlen( $value ) > GUTENBERG_SUGGESTION_CONTENT_MAX_BYTES ) {
+		return '';
+	}
+	$decoded = json_decode( $value, true );
+	return is_array( $decoded ) ? $value : '';
+}
+
+/**
+ * Leaves the stored proposals out of WXR exports.
+ *
+ * An imported post gets new note ids, so the anchors in its content would not
+ * match them anyway, and the export keeps the public baseline.
+ *
+ * @param bool   $skip     Whether to skip the meta.
+ * @param string $meta_key Meta key.
+ * @return bool
+ */
+function gutenberg_skip_suggestion_content_in_export( $skip, $meta_key ) {
+	return $skip || in_array( $meta_key, array( '_wp_suggestion_content', '_wp_suggestion_snapshot' ), true );
+}
+add_filter( 'wxr_export_skip_commentmeta', 'gutenberg_skip_suggestion_content_in_export', 10, 2 );
+add_filter( 'wxr_export_skip_postmeta', 'gutenberg_skip_suggestion_content_in_export', 10, 2 );
 
 /**
  * Validates the post-level operations of a suggestion before its note is
@@ -526,6 +614,93 @@ function gutenberg_pop_suggestion_content_owner( $content ) {
 add_filter( 'the_content', 'gutenberg_pop_suggestion_content_owner', PHP_INT_MAX );
 
 /**
+ * Records the post whose excerpt is being generated.
+ *
+ * `wp_trim_excerpt()` renders the post's blocks (`excerpt_remove_blocks()`)
+ * before it applies `the_content`, so without this the blocks of a listed
+ * post (a Latest Posts or Post Excerpt block) would render while the post
+ * holding the list is on top of the stack. Hooked before `wp_trim_excerpt()`
+ * (priority 10); `gutenberg_pop_suggestion_content_owner()` pops it after.
+ *
+ * @param string       $excerpt The post excerpt.
+ * @param WP_Post|null $post    The post the excerpt belongs to.
+ * @return string Unchanged excerpt.
+ */
+function gutenberg_push_suggestion_excerpt_owner( $excerpt, $post = null ) {
+	$post = get_post( $post );
+	$GLOBALS['gutenberg_suggestion_content_owners'][] = $post ? (int) $post->ID : 0;
+	return $excerpt;
+}
+add_filter( 'get_the_excerpt', 'gutenberg_push_suggestion_excerpt_owner', 1, 2 );
+add_filter( 'get_the_excerpt', 'gutenberg_pop_suggestion_content_owner', PHP_INT_MAX );
+
+/**
+ * Records the post that owns the blocks a block renders from elsewhere.
+ *
+ * Some blocks render blocks that are not part of the content holding them,
+ * outside `the_content`, while the page holding them is still on top of the
+ * owner stack. Without a frame of their own, a format marker in those blocks
+ * would resolve against the page's notes:
+ *
+ * - `core/block` renders a synced pattern; its `wp_block` post is the owner.
+ *   A `ref` that is not a `wp_block` post records no owner.
+ * - `core/template-part` and `core/navigation` render a template part or a
+ *   menu post, and `core/latest-posts` can render the full content of each
+ *   listed post. None of these resolves an owner, so their markers are not
+ *   restored.
+ *
+ * The frame id stored on the parsed block lets
+ * `gutenberg_pop_suggestion_block_owner()` pop exactly this frame.
+ *
+ * @param array $parsed_block The block being rendered.
+ * @return array The block, tagged with its owner frame.
+ */
+function gutenberg_push_suggestion_block_owner( $parsed_block ) {
+	static $frame = 0;
+	$name         = isset( $parsed_block['blockName'] ) ? $parsed_block['blockName'] : null;
+	if ( 'core/block' === $name ) {
+		$ref     = isset( $parsed_block['attrs']['ref'] ) ? (int) $parsed_block['attrs']['ref'] : 0;
+		$pattern = $ref > 0 ? get_post( $ref ) : null;
+		$owner   = ( $pattern && 'wp_block' === $pattern->post_type ) ? $ref : 0;
+	} elseif ( in_array( $name, array( 'core/template-part', 'core/navigation', 'core/latest-posts' ), true ) ) {
+		$owner = 0;
+	} else {
+		return $parsed_block;
+	}
+
+	$GLOBALS['gutenberg_suggestion_content_owners'][] = $owner;
+	$parsed_block['gutenbergSuggestionOwnerFrame']    = ++$frame;
+	$GLOBALS['gutenberg_suggestion_owner_frames'][]   = $frame;
+	return $parsed_block;
+}
+add_filter( 'render_block_data', 'gutenberg_push_suggestion_block_owner', PHP_INT_MAX );
+
+/**
+ * Pops the owner recorded by `gutenberg_push_suggestion_block_owner()`.
+ *
+ * `render_block_core_block()` renders the block a second time from inside its
+ * own callback, so `render_block` runs twice for it: first right after the
+ * pattern's blocks, then for the outer render. The first one pops; by the
+ * second the frame is no longer on top, so nothing else is popped.
+ *
+ * @param string $block_content Rendered block.
+ * @param array  $parsed_block  The block.
+ * @return string Unchanged block content.
+ */
+function gutenberg_pop_suggestion_block_owner( $block_content, $parsed_block ) {
+	if (
+		isset( $parsed_block['gutenbergSuggestionOwnerFrame'] ) &&
+		! empty( $GLOBALS['gutenberg_suggestion_owner_frames'] ) &&
+		end( $GLOBALS['gutenberg_suggestion_owner_frames'] ) === $parsed_block['gutenbergSuggestionOwnerFrame']
+	) {
+		array_pop( $GLOBALS['gutenberg_suggestion_owner_frames'] );
+		array_pop( $GLOBALS['gutenberg_suggestion_content_owners'] );
+	}
+	return $block_content;
+}
+add_filter( 'render_block', 'gutenberg_pop_suggestion_block_owner', PHP_INT_MAX, 2 );
+
+/**
  * Returns the post whose content is being rendered, if any.
  *
  * @return int Post ID, or 0 outside `the_content`.
@@ -567,115 +742,53 @@ function gutenberg_get_suggestion_marker_kind( WP_HTML_Tag_Processor $processor 
 }
 
 /**
- * Strip inline suggestion markers from rendered block output.
+ * Pairs the inline suggestion markers of an HTML fragment with their ends.
  *
- * The public HTML must never expose suggestion metadata, and an un-accepted
- * addition must never reach the front end. `render_block` therefore strips the
- * markers, type-aware:
+ * The single classifier behind every consumer of inline markers: the render
+ * strip, and the save pass that moves proposals out of post content and puts
+ * them back for editors. Each consumer decides what to do with a marker; they
+ * all agree on where it starts and ends.
  *
- * - `del` (suggested deletion): the marked text already exists, so the wrapper
- *   is unwrapped but the text is kept. It is only removed when the suggestion
- *   is accepted in the editor.
- * - `add` (suggested addition): the marked text is proposed new content, so the
- *   wrapper *and* the text are removed. It only becomes permanent when accepted.
- * - `format` (suggested formatting change): the marked run carries the proposed
- *   formatting, so the whole span is replaced with the original run recorded on
- *   the note (see `gutenberg_get_pending_format_suggestion_html()`). The note
- *   is resolved against the post whose content is being rendered (see
- *   `gutenberg_push_suggestion_content_owner()`), never the block's `postId`
- *   context. When that original cannot be resolved the marker falls back to
- *   deletion handling.
- *
- * The raw `post_content` (and the REST `raw` view, revisions, exports) keeps the
- * markers so the editor can re-attach on reload. Only suggestion markers are
- * touched, as told by `gutenberg_get_suggestion_marker_kind()`, which matches
- * class tokens exactly, so an unrelated `<mark>` (a `core/text-color`
- * highlight, a `wp-note`, or a `wp-suggestion-foo` class) survives
- * byte-for-byte.
- *
- * Markers of different kinds nest (a deletion inside someone else's addition).
- * The editor writes them in one order - add outermost, then format, then del -
- * which never splits a format marker. Merged or hand-edited markup can still
- * split one around a deletion; the first fragment of a format id then restores
- * the whole original and later fragments render nothing.
- *
- * A single read-only `WP_HTML_Tag_Processor` walk classifies the markers and
- * records the byte ranges to replace, which are applied once the walk ends. The
- * HTML API has no public way to remove a tag (or a tag and everything up to its
- * closer) yet - it is on the roadmap,
- * https://github.com/WordPress/gutenberg/discussions/54583 - so an anonymous
- * subclass exposes the current token's span through one reused bookmark, which
- * keeps the walk clear of the bookmark limit however many markers a block
- * holds. Walking tokens rather than matching `<mark>` with a regex means
- * `</mark>`-looking text inside a comment or an attribute value can never be
- * mistaken for a tag.
+ * A single read-only Tag Processor walk records, for each marker in document
+ * order, its opener span and two ends. Walking tokens rather than matching
+ * `<mark>` with a regex means `</mark>`-looking text inside a comment or an
+ * attribute value can never be mistaken for a tag.
  *
  * Tag-level pairing is not enough on its own: a browser (and so the editor's
  * rich text parse) ends a `<mark>` left open at the `</p>`, `</li>` or `</td>`
  * of an enclosing element and ignores a `</mark>` it cannot reach, so the
  * lexical `<mark>`...`</mark>` span can differ from the run a reader sees. The
  * walk therefore tracks open elements to approximate the browser's tree as
- * well, and a marker whose two readings disagree (or that has no closer) is
- * unbalanced. Only a deletion fails open: its marker tags are removed and its
- * text kept. An unbalanced addition or format change fails closed: everything
- * from its opener through the later of its possible ends is removed, so
- * pending content and its metadata never render. When markers nest, the outer
- * replacement wins.
+ * well, and a marker is balanced only when its own `</mark>` ends it in the
+ * tree walk and that is also its lexical closer.
  *
- * The block's `postId` context is deliberately not consulted: inside a Query
- * Loop it names each queried post, not the owner of the content being
- * rendered.
+ * Each marker is an array:
  *
- * @param string $block_content Rendered block HTML.
- * @return string Block HTML with suggestion markers stripped (kind-aware).
+ * - `kind`: `add`, `del` or `format` (see
+ *   `gutenberg_get_suggestion_marker_kind()`), or for a `legacy` marker (the
+ *   single `wp-suggestion` class the per-kind classes replaced) `add` when its
+ *   type says so and `del` otherwise.
+ * - `legacy`: whether it is a legacy marker. Only the render strip acts on
+ *   one; the save pass leaves it alone.
+ * - `id`: `data-suggestion-id` as an integer, 0 when absent.
+ * - `run`: `data-suggestion-run`, or null. Set on the content-free anchors the
+ *   save pass leaves in post content (see `Gutenberg_Suggestion_Content`).
+ * - `start`, `length`: the opener span.
+ * - `end`, `closer`: where the tree walk ends the marker (a browser's view),
+ *   and its own closer span when that is what ends it. `end` is null when the
+ *   marker is still open at the end of the input.
+ * - `lexical_end`, `lexical_closer`: just past the `</mark>` a plain lexical
+ *   pairing gives it, and that closer's span, or null when there is none.
+ * - `balanced`: whether both readings agree, see above.
+ * - `inner_markers`: how many other markers open inside its run.
+ *
+ * @param string $html HTML fragment.
+ * @return array[]|null Markers in document order, or null when the walk could
+ *                      not tell where a token is (callers fail closed).
  */
-function gutenberg_strip_inline_suggestion_markers( $block_content ) {
-	/*
-	 * Set while a restored original run is stripped, so markers inside it are
-	 * unwrapped rather than resolved again - a note cannot pull in another
-	 * note's original, or its own.
-	 */
-	static $restoring = false;
-
-	if ( false === strpos( $block_content, 'wp-suggestion-' ) ) {
-		return $block_content;
-	}
-
-	$post_id = $restoring ? 0 : gutenberg_get_suggestion_content_owner();
-
-	// Anonymous subclass exposing the byte span of the current token, which
-	// WP_HTML_Tag_Processor does not provide publicly yet. The redeclaration-
-	// guard sniff cannot tell these class methods from global functions, so it
-	// is disabled for the class body.
-	// phpcs:disable Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames.FunctionNotGuardedAgainstRedeclaration
-	$processor = new class( $block_content ) extends WP_HTML_Tag_Processor {
-		/**
-		 * Returns the byte span of the current token in the input HTML.
-		 *
-		 * A single bookmark name is reused for every token, so the walk never
-		 * nears the bookmark limit however many markers the block holds. No
-		 * edit is ever enqueued on this processor, so the offsets always refer
-		 * to the unmodified input.
-		 *
-		 * @return int[]|null Start offset and length, or null when the
-		 *                    processor is not paused on a token.
-		 */
-		public function get_token_span(): ?array {
-			if ( ! $this->set_bookmark( 'here' ) ) {
-				return null;
-			}
-			return array( $this->bookmarks['here']->start, $this->bookmarks['here']->length );
-		}
-	};
-	// phpcs:enable Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames.FunctionNotGuardedAgainstRedeclaration
-
-	/*
-	 * Suggestion markers in document order. Each records its opener span and
-	 * two ends: `end`/`closer`, where the tree walk below ends it (a browser's
-	 * view), and `lexical_end`, just past the `</mark>` a plain lexical pairing
-	 * gives it (null when there is none).
-	 */
-	$markers = array();
+function gutenberg_pair_inline_suggestion_markers( $html ) {
+	$processor = new Gutenberg_Suggestion_Marker_Processor( $html );
+	$markers   = array();
 
 	/*
 	 * The tree walk keeps a stack of open elements, each `[ tag name, marker
@@ -712,7 +825,7 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 		if ( null === $span ) {
 			// Unreachable while paused on a tag; fail closed rather than
 			// guess where a marker starts or ends.
-			return '';
+			return null;
 		}
 
 		if ( $processor->is_tag_closer() ) {
@@ -753,7 +866,12 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 		if ( in_array( $tag, $void_elements, true ) ) {
 			continue;
 		}
-		$kind = 'MARK' === $tag ? gutenberg_get_suggestion_marker_kind( $processor ) : null;
+		$kind   = 'MARK' === $tag ? gutenberg_get_suggestion_marker_kind( $processor ) : null;
+		$legacy = false;
+		if ( null === $kind && 'MARK' === $tag && $processor->has_class( 'wp-suggestion' ) ) {
+			$legacy = true;
+			$kind   = 'add' === $processor->get_attribute( 'data-suggestion-type' ) ? 'add' : 'del';
+		}
 		if ( null === $kind ) {
 			$open_elements[] = array( $tag, null );
 			if ( 'MARK' === $tag ) {
@@ -762,8 +880,12 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 			continue;
 		}
 
-		$marker = array(
-			'mode'           => ( 'add' === $kind ) ? 'add' : 'del',
+		$run             = $processor->get_attribute( 'data-suggestion-run' );
+		$markers[]       = array(
+			'kind'           => $kind,
+			'legacy'         => $legacy,
+			'id'             => (int) $processor->get_attribute( 'data-suggestion-id' ),
+			'run'            => is_string( $run ) ? $run : null,
 			'start'          => $span[0],
 			'length'         => $span[1],
 			'end'            => null,
@@ -771,33 +893,126 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 			'lexical_end'    => null,
 			'lexical_closer' => null,
 		);
-		if ( 'format' === $kind ) {
+		$open_elements[] = array( $tag, count( $markers ) - 1 );
+		$lexical_marks[] = count( $markers ) - 1;
+	}
+
+	$count = count( $markers );
+	foreach ( $markers as $index => $marker ) {
+		$markers[ $index ]['balanced'] = null !== $marker['closer'] && $marker['lexical_end'] === $marker['end'];
+		$reach                         = max( (int) $marker['end'], (int) $marker['lexical_end'] );
+		if ( null === $marker['end'] ) {
+			$reach = strlen( $html );
+		}
+		$inner = 0;
+		for ( $next = $index + 1; $next < $count && $markers[ $next ]['start'] < $reach; $next++ ) {
+			++$inner;
+		}
+		$markers[ $index ]['inner_markers'] = $inner;
+	}
+
+	return $markers;
+}
+
+/**
+ * Strip inline suggestion markers from rendered block output.
+ *
+ * The public HTML must never expose suggestion metadata, and an un-accepted
+ * addition must never reach the front end. `render_block` therefore strips the
+ * markers, type-aware:
+ *
+ * - `del` (suggested deletion): the marked text already exists, so the wrapper
+ *   is unwrapped but the text is kept. It is only removed when the suggestion
+ *   is accepted in the editor.
+ * - `add` (suggested addition): the marked text is proposed new content, so the
+ *   wrapper *and* the text are removed. It only becomes permanent when accepted.
+ *   The save pass already leaves an addition's anchor empty in post content;
+ *   it goes the same way.
+ * - `format` (suggested formatting change): the marked run carries the proposed
+ *   formatting, so the whole span is replaced with the original run recorded on
+ *   the note (see `gutenberg_get_pending_format_suggestion_html()`). The note
+ *   is resolved against the post whose content is being rendered (see
+ *   `gutenberg_push_suggestion_content_owner()`, and
+ *   `gutenberg_push_suggestion_block_owner()` for blocks rendered from
+ *   another post, such as a synced pattern), never the block's `postId`
+ *   context. When that original cannot be resolved the marker falls back to
+ *   deletion handling. The save pass already leaves the original run inside a
+ *   format marker's anchor (`data-suggestion-run`), so an anchor is unwrapped.
+ * - A legacy marker (the single `wp-suggestion` class from before the per-kind
+ *   classes) fails closed the same way: an addition is removed with its text,
+ *   anything else is unwrapped, so a pending addition saved before the switch
+ *   never renders.
+ *
+ * Post content keeps the anchors the save pass leaves (and the REST `raw` view
+ * re-inflates them for editors) so the editor can re-attach on reload. Only
+ * suggestion markers are touched, as told by
+ * `gutenberg_get_suggestion_marker_kind()`, which matches class tokens exactly,
+ * so an unrelated `<mark>` (a `core/text-color` highlight, a `wp-note`, or a
+ * `wp-suggestion-foo` class) survives byte-for-byte.
+ *
+ * Markers of different kinds nest (a deletion inside someone else's addition).
+ * The editor writes them in one order - add outermost, then format, then del -
+ * which never splits a format marker. Merged or hand-edited markup can still
+ * split one around a deletion; the first fragment of a format id then restores
+ * the whole original and later fragments render nothing.
+ *
+ * Markers are paired by `gutenberg_pair_inline_suggestion_markers()`, and the
+ * byte ranges to replace are applied once the walk ends. A marker whose two
+ * readings disagree (or that has no closer) is unbalanced. Only a deletion
+ * fails open: its marker tags are removed and its text kept. An unbalanced
+ * addition or format change fails closed: everything from its opener through
+ * the later of its possible ends is removed, so pending content and its
+ * metadata never render. When markers nest, the outer replacement wins.
+ *
+ * The block's `postId` context is deliberately not consulted: inside a Query
+ * Loop it names each queried post, not the owner of the content being
+ * rendered.
+ *
+ * @param string $block_content Rendered block HTML.
+ * @return string Block HTML with suggestion markers stripped (kind-aware).
+ */
+function gutenberg_strip_inline_suggestion_markers( $block_content ) {
+	/*
+	 * Set while a restored original run is stripped, so markers inside it are
+	 * unwrapped rather than resolved again - a note cannot pull in another
+	 * note's original, or its own.
+	 */
+	static $restoring = false;
+
+	if ( false === strpos( $block_content, 'wp-suggestion' ) ) {
+		return $block_content;
+	}
+
+	$post_id = $restoring ? 0 : gutenberg_get_suggestion_content_owner();
+
+	$markers = gutenberg_pair_inline_suggestion_markers( $block_content );
+	if ( null === $markers ) {
+		return '';
+	}
+
+	foreach ( $markers as $index => $marker ) {
+		$mode = ( 'add' === $marker['kind'] ) ? 'add' : 'del';
+		if ( 'format' === $marker['kind'] && null === $marker['run'] ) {
 			/*
 			 * A format marker whose original cannot be resolved is handled as
 			 * an unresolved format change below, never as an addition, so a
 			 * marker does not silently drop content it is not sure about.
 			 */
-			$id       = (int) $processor->get_attribute( 'data-suggestion-id' );
-			$original = gutenberg_get_pending_format_suggestion_html( $id, $post_id );
+			$original = gutenberg_get_pending_format_suggestion_html( $marker['id'], $post_id );
 			if ( null !== $original ) {
-				$marker['mode']     = 'format';
-				$marker['id']       = $id;
-				$marker['original'] = $original;
+				$mode                          = 'format';
+				$markers[ $index ]['original'] = $original;
 			} else {
-				$marker['mode'] = 'unresolved-format';
+				$mode = 'unresolved-format';
 			}
 		}
-		$markers[]       = $marker;
-		$open_elements[] = array( $tag, count( $markers ) - 1 );
-		$lexical_marks[] = count( $markers ) - 1;
+		$markers[ $index ]['mode'] = $mode;
 	}
 
 	/*
-	 * Turns each marker into edits. A marker is balanced when its own
-	 * `</mark>` ends it in the tree walk and that is also its lexical closer;
-	 * only then do the walk and a browser agree on its run. Otherwise (no
-	 * closer, a closer that a browser ignores or reaches through an enclosing
-	 * element, an implicit end) the marker is unbalanced:
+	 * Turns each marker into edits. Only a balanced marker has a run a browser
+	 * and the walk agree on. Otherwise (no closer, a closer that a browser
+	 * ignores or reaches through an enclosing element, an implicit end):
 	 *
 	 * - A deletion fails open: its text is real content, so only its opener
 	 *   and any closer paired with it are removed.
@@ -816,7 +1031,7 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 	$format_seen = array();
 	foreach ( $markers as $marker ) {
 		$end      = $marker['end'] ?? $length;
-		$balanced = null !== $marker['closer'] && $marker['lexical_end'] === $end;
+		$balanced = $marker['balanced'];
 		$opener   = array( $marker['start'], $marker['start'] + $marker['length'], '' );
 
 		if ( 'del' === $marker['mode'] || ( 'unresolved-format' === $marker['mode'] && $balanced ) ) {
@@ -845,34 +1060,7 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 		$edits[] = array( $marker['start'], max( $end, (int) $marker['lexical_end'] ), $text );
 	}
 
-	/*
-	 * Applies the edits in document order. An edit starting inside an earlier
-	 * one is part of the run being replaced: it is dropped, and when it
-	 * reaches further the earlier replacement is extended over it, so the
-	 * outer replacement wins and overlapping removals merge.
-	 */
-	usort(
-		$edits,
-		static function ( $a, $b ) {
-			return $a[0] === $b[0] ? $b[1] - $a[1] : $a[0] - $b[0];
-		}
-	);
-	$merged = array();
-	foreach ( $edits as $edit ) {
-		$last = count( $merged ) - 1;
-		if ( $last >= 0 && $edit[0] < $merged[ $last ][1] ) {
-			$merged[ $last ][1] = max( $merged[ $last ][1], $edit[1] );
-			continue;
-		}
-		$merged[] = $edit;
-	}
-	$html   = '';
-	$cursor = 0;
-	foreach ( $merged as $edit ) {
-		$html  .= substr( $block_content, $cursor, $edit[0] - $cursor ) . $edit[2];
-		$cursor = $edit[1];
-	}
-	$html .= substr( $block_content, $cursor );
+	$html = gutenberg_apply_suggestion_splices( $block_content, $edits );
 
 	/*
 	 * `data-wp-suggestion-strip` was the sentinel attribute of an earlier
@@ -890,7 +1078,71 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 
 	return $html;
 }
+
+/**
+ * Applies byte-range replacements to a string.
+ *
+ * Each edit is `[ start, end, replacement ]` against the original string. The
+ * edits are applied in document order. An edit starting inside an earlier one
+ * is part of the run being replaced: it is dropped, and when it reaches
+ * further the earlier replacement is extended over it, so the outer
+ * replacement wins and overlapping removals merge. Bytes outside every edit
+ * are copied unchanged.
+ *
+ * @param string  $input Original string.
+ * @param array[] $edits Edits.
+ * @return string The edited string.
+ */
+function gutenberg_apply_suggestion_splices( $input, $edits ) {
+	usort(
+		$edits,
+		static function ( $a, $b ) {
+			return $a[0] === $b[0] ? $b[1] - $a[1] : $a[0] - $b[0];
+		}
+	);
+	$merged = array();
+	foreach ( $edits as $edit ) {
+		$last = count( $merged ) - 1;
+		if ( $last >= 0 && $edit[0] < $merged[ $last ][1] ) {
+			$merged[ $last ][1] = max( $merged[ $last ][1], $edit[1] );
+			continue;
+		}
+		$merged[] = $edit;
+	}
+	$output = '';
+	$cursor = 0;
+	foreach ( $merged as $edit ) {
+		$output .= substr( $input, $cursor, $edit[0] - $cursor ) . $edit[2];
+		$cursor  = $edit[1];
+	}
+	return $output . substr( $input, $cursor );
+}
 add_filter( 'render_block', 'gutenberg_strip_inline_suggestion_markers' );
+
+/**
+ * Whether a note's suggestion data may be put into a post's content.
+ *
+ * The one gate every path that renders or re-inflates note data passes: the
+ * note is a `note` on that post, and it is not trashed, marked as spam or
+ * trashed with its post. Paths add their own checks on top: the front-end
+ * restore of a format original also needs a pending suggestion and a post
+ * whose password, if any, was given (see
+ * `gutenberg_get_pending_format_suggestion_html()`), while the edit-context
+ * re-inflation is already limited to users who can read the post's
+ * suggestions.
+ *
+ * @param int|WP_Comment $note    Note, or its ID.
+ * @param int            $post_id Post whose content would carry the data.
+ * @return bool Whether the note's data may be used.
+ */
+function gutenberg_can_render_suggestion_note( $note, $post_id ) {
+	$post_id = (int) $post_id;
+	$note    = get_comment( $note );
+	if ( $post_id <= 0 || ! $note || 'note' !== $note->comment_type || (int) $note->comment_post_ID !== $post_id ) {
+		return false;
+	}
+	return ! in_array( $note->comment_approved, array( 'trash', 'spam', 'post-trashed' ), true );
+}
 
 /**
  * Resolves the original run of a pending inline format suggestion.
@@ -900,11 +1152,11 @@ add_filter( 'render_block', 'gutenberg_strip_inline_suggestion_markers' );
  * when all of these hold, so a marker copied into other content cannot pull a
  * post's text onto that page:
  *
- * - the note is on the post whose content is being rendered,
- * - that post's stored content (or, in a preview, the current user's autosave
- *   of it) holds a marker for the note,
+ * - the note is on the post whose content is being rendered and is not
+ *   trashed or marked as spam (`gutenberg_can_render_suggestion_note()`),
+ * - that post's stored content (or, in a preview by a user who can edit the
+ *   post, that user's autosave of it) holds a marker for the note,
  * - the post is not password protected, or its password was given,
- * - the note is not trashed or marked as spam,
  * - the suggestion is neither applied nor rejected.
  *
  * `beforeHTML` was filtered at write time to what its author could publish
@@ -915,14 +1167,7 @@ add_filter( 'render_block', 'gutenberg_strip_inline_suggestion_markers' );
  * @return string|null Original run HTML, or null when it cannot be resolved.
  */
 function gutenberg_get_pending_format_suggestion_html( $note_id, $post_id ) {
-	if ( $note_id <= 0 || $post_id <= 0 ) {
-		return null;
-	}
-	$note = get_comment( $note_id );
-	if ( ! $note || 'note' !== $note->comment_type || (int) $note->comment_post_ID !== $post_id ) {
-		return null;
-	}
-	if ( in_array( $note->comment_approved, array( 'trash', 'spam', 'post-trashed' ), true ) ) {
+	if ( $note_id <= 0 || ! gutenberg_can_render_suggestion_note( $note_id, $post_id ) ) {
 		return null;
 	}
 	if ( in_array( get_comment_meta( $note_id, '_wp_suggestion_status', true ), array( 'applied', 'rejected' ), true ) ) {
@@ -934,7 +1179,10 @@ function gutenberg_get_pending_format_suggestion_html( $note_id, $post_id ) {
 	}
 	$needle   = 'data-suggestion-id="' . $note_id . '"';
 	$contents = array( $post->post_content );
-	if ( is_preview() ) {
+	// Anyone can add `?preview=true`, and `wp_get_post_autosave()` for user 0
+	// returns any user's autosave, so only a user who can edit the post (as
+	// a real preview requires) has their autosave consulted.
+	if ( is_preview() && current_user_can( 'edit_post', $post_id ) ) {
 		$autosave = wp_get_post_autosave( $post_id, get_current_user_id() );
 		if ( $autosave ) {
 			$contents[] = $autosave->post_content;
@@ -1118,6 +1366,17 @@ function gutenberg_restore_pending_move_block_order( $blocks, $is_root, &$change
 
 	$siblings = array();
 	foreach ( $positions as $index ) {
+		/*
+		 * The save pass already stored this list in its original order and
+		 * marks the proposed position with a placeholder; nothing to restore.
+		 */
+		if (
+			'core/suggestion-placeholder' === $blocks[ $index ]['blockName'] &&
+			isset( $blocks[ $index ]['attrs']['type'] ) &&
+			'pending-move' === $blocks[ $index ]['attrs']['type']
+		) {
+			return $blocks;
+		}
 		$siblings[] = $blocks[ $index ];
 	}
 	$count = count( $siblings );
