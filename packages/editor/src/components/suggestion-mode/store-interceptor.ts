@@ -73,7 +73,12 @@ import {
 import type { SuggestionMarker } from './marker';
 export type { SuggestionMarker };
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
-import { parseSuggestionPayload } from './operations';
+import {
+	parseSuggestionPayload,
+	planStructuralReject,
+	structuralOpFromMarker,
+} from './operations';
+import type { BlockTreeReader, PlanStep } from './operations';
 import { rememberWithdrawnAnchor } from './decision-state';
 import { createRevertGuard } from '../attribute-suggestions/revert-guard';
 import {
@@ -1298,6 +1303,61 @@ export default function SuggestionStoreInterceptor() {
 		 */
 		let lastSeenVersion: object | null = null;
 
+		/*
+		 * Dispatch a reject plan as the interceptor's own write: off the undo
+		 * stack, with the subscriber gated by the caller. Bypass steps are
+		 * skipped, since the gate already keeps these writes from being
+		 * captured, and the snapshot follows the blocks the plan adds or
+		 * removes so the next fire does not read them as user edits.
+		 */
+		const runOwnPlanSteps = ( plan: {
+			steps: PlanStep[];
+			batched: PlanStep[];
+		} ) => {
+			const markOwn =
+				blockEditorDispatch.__unstableMarkNextChangeAsNotPersistent;
+			for ( const step of [ ...plan.steps, ...plan.batched ] ) {
+				switch ( step.step ) {
+					case 'updateBlockAttributes':
+						markOwn();
+						blockEditorDispatch.updateBlockAttributes(
+							step.clientId,
+							step.attributes
+						);
+						break;
+					case 'removeBlock':
+						markOwn();
+						blockEditorDispatch.removeBlock( step.clientId, false );
+						snapshot.delete( step.clientId );
+						break;
+					case 'insertBlock':
+						markOwn();
+						blockEditorDispatch.insertBlock(
+							step.block,
+							step.index,
+							step.rootClientId,
+							step.updateSelection
+						);
+						snapshot.set(
+							step.block.clientId,
+							blockEditor.getBlockAttributes(
+								step.block.clientId
+							)
+						);
+						break;
+					case 'moveBlockToPosition':
+						markOwn();
+						blockEditorDispatch.moveBlockToPosition(
+							step.clientId,
+							step.fromRootClientId,
+							step.toRootClientId,
+							step.index
+						);
+						break;
+				}
+			}
+		};
+
 		const unsubscribe = registry.subscribe( () => {
 			if ( isDispatchingOwnWrite ) {
 				return;
@@ -2217,6 +2277,37 @@ export default function SuggestionStoreInterceptor() {
 							false
 						);
 					}
+					/*
+					 * A block removed while it is suggested to move goes back
+					 * where the move started. It carries one structural
+					 * suggestion, and a removed block has no position to
+					 * propose, so the removal replaces the move and is
+					 * proposed from the block's place in the post: rejecting
+					 * it then leaves the post as it was, rather than with the
+					 * block parked where a move nobody accepted put it. The
+					 * restore is the move's own reject plan.
+					 */
+					for ( const clientId of tops ) {
+						const marker = readSuggestionMarker(
+							tree.blocksByClientId.get( clientId )?.attributes
+						);
+						const moveOp =
+							marker?.type === 'pending-move' &&
+							structuralOpFromMarker(
+								clientId,
+								marker,
+								blockEditor as unknown as BlockTreeReader
+							);
+						if ( moveOp ) {
+							runOwnPlanSteps(
+								planStructuralReject(
+									moveOp,
+									clientId,
+									blockEditor as unknown as BlockTreeReader
+								)
+							);
+						}
+					}
 				} finally {
 					isDispatchingOwnWrite = false;
 				}
@@ -2235,6 +2326,11 @@ export default function SuggestionStoreInterceptor() {
 					}
 					const block = tree.blocksByClientId.get( clientId );
 					const groupId = groupIds.get( clientId );
+					// An attribute proposal riding on a move the restore above
+					// cleared stays with the block.
+					const after = proposedAttributes(
+						readSuggestionMarker( block?.attributes )
+					);
 					isDispatchingOwnWrite = true;
 					try {
 						// Programmatic marker write — keep it off the undo
@@ -2247,6 +2343,7 @@ export default function SuggestionStoreInterceptor() {
 									type: 'pending-remove',
 									authorId: currentUserId,
 									...( groupId ? { groupId } : {} ),
+									...( after ? { after } : {} ),
 								}
 							),
 						} );

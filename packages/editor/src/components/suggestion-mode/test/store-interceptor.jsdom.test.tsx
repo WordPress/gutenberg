@@ -785,6 +785,50 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		] );
 	} );
 
+	it( 'proposes the removal of a moved block from where the move started', async () => {
+		/*
+		 * The block can carry one structural suggestion, so the removal
+		 * replaces the move. Left at the move's destination, a rejected
+		 * removal would keep the block there as though the move had been
+		 * accepted.
+		 */
+		const a = createBlock( TEST_BLOCK_NAME, {
+			content: 'A',
+			metadata: {
+				suggestion: {
+					type: 'pending-move',
+					authorId: null,
+					fromAnchorClientId: null,
+					fromParentClientId: null,
+					fromIndex: 0,
+					crossedParents: false,
+					after: { content: 'A2' },
+				},
+			},
+		} );
+		const b = createBlock( TEST_BLOCK_NAME, { content: 'B' } );
+		const { registry, getOverlay } = setup( { initialBlocks: [ b, a ] } );
+
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).removeBlock( a.clientId );
+		} );
+		await flushSubscribers();
+
+		expect( registry.select( blockEditorStore ).getBlockOrder() ).toEqual( [
+			a.clientId,
+			b.clientId,
+		] );
+		expect( markerOf( registry, a.clientId ) ).toEqual( {
+			type: 'pending-remove',
+			authorId: null,
+			after: { content: 'A2' },
+		} );
+		expect( captureOf( getOverlay, a.clientId ) ).toMatchObject( {
+			type: 'block-remove',
+			clientId: a.clientId,
+		} );
+	} );
+
 	it( 'adopts the removal once the linked note records the removal as applied', async () => {
 		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
 		const b = createBlock( TEST_BLOCK_NAME, { content: 'B' } );

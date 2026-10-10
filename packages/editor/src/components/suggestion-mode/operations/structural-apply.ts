@@ -24,26 +24,28 @@ export function planStructuralApply(
 ): BlockPlan | null {
 	const plan: BlockPlan = { steps: [], batched: [] };
 	if ( structuralOp.type === 'block-remove' ) {
-		// Bypass twice: the marker-clear dispatch lands first (so the live
-		// block ends without the pending-remove flag should the removeBlock
-		// fail), then the actual removal.
+		/*
+		 * The marker-clear and the removal are batched into one store update,
+		 * so the accept is one undo level: undoing it brings the block back
+		 * with its pending-remove marker, which reopens the note, and redo
+		 * removes it again. Two updates would let the first undo bring the
+		 * block back unmarked, beside a note that still reads as applied.
+		 */
+		plan.steps.push( { step: 'bypass', clientId: targetClientId } );
 		const clearAttrs = clearSuggestionMarkerAttributes(
 			reader.getBlockAttributes( targetClientId )
 		);
 		if ( clearAttrs ) {
-			plan.steps.push(
-				{ step: 'bypass', clientId: targetClientId },
-				{
-					step: 'updateBlockAttributes',
-					clientId: targetClientId,
-					attributes: clearAttrs,
-				}
-			);
+			plan.batched.push( {
+				step: 'updateBlockAttributes',
+				clientId: targetClientId,
+				attributes: clearAttrs,
+			} );
 		}
-		plan.steps.push(
-			{ step: 'bypass', clientId: targetClientId },
-			{ step: 'removeBlock', clientId: targetClientId }
-		);
+		plan.batched.push( {
+			step: 'removeBlock',
+			clientId: targetClientId,
+		} );
 		return plan;
 	}
 	if (
