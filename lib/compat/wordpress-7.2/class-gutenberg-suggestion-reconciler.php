@@ -203,7 +203,27 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 				}
 			}
 
-			self::reconcile( $saved, $entry['previous'], $entry['previous_full'], $effective );
+			if ( self::saver_can_change_notes( $post_id ) ) {
+				self::reconcile( $saved, $entry['previous'], $entry['previous_full'], $effective );
+			}
+		}
+
+		/**
+		 * Whether the current write may change the post's note statuses.
+		 *
+		 * Finalizing and outdating change notes on the saver's behalf, so they
+		 * are held to the gate a REST write of those notes needs
+		 * (`edit_comment`, which maps to `edit_post`). `wp_insert_post()`
+		 * itself checks no capability, so a write a plugin makes during another
+		 * user's request leaves the statuses alone; its proposals are still
+		 * stored, since the content it wrote holds their anchors. A write with
+		 * no user (cron, WP-CLI) is server code and still acts.
+		 *
+		 * @param int $post_id Post ID.
+		 * @return bool
+		 */
+		private static function saver_can_change_notes( $post_id ) {
+			return 0 === get_current_user_id() || current_user_can( 'edit_post', $post_id );
 		}
 
 		/**
@@ -287,7 +307,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 			if ( ! $post instanceof WP_Post || 'revision' === $post->post_type || ! self::post_type_supports_notes( $post->post_type ) ) {
 				return;
 			}
-			if ( ! self::has_provisional_notes( $post_id ) ) {
+			if ( ! self::saver_can_change_notes( $post_id ) || ! self::has_provisional_notes( $post_id ) ) {
 				return;
 			}
 			$notes = get_comments(
