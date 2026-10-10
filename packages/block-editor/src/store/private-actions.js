@@ -400,6 +400,22 @@ export function stopEditingContentOnlySection() {
 }
 
 /**
+ * Shows the block-level actions (`block`) or the editing tools (`content`) in
+ * the toolbar of the given block. Only changes what the toolbar shows; the
+ * block behaves the same in the canvas either way.
+ *
+ * @param {string} clientId The client id of the block.
+ * @param {string} view     Either `block` or `content`.
+ */
+export function setBlockToolbarView( clientId, view ) {
+	return {
+		type: 'SET_BLOCK_TOOLBAR_VIEW',
+		clientId,
+		view,
+	};
+}
+
+/**
  * Sets the zoom level.
  *
  * @param {number} zoom the new zoom level
