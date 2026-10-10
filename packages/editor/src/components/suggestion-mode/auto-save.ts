@@ -436,6 +436,28 @@ export default function SuggestionAutoSave() {
 					commentId = null;
 					writeCommentId( clientId, null );
 				}
+				/*
+				 * A different structural change is a different suggestion.
+				 * Deleting a block with a pending move swaps the move's
+				 * marker for a removal; rewriting the move's note as the
+				 * removal would leave undo, which brings the move's marker
+				 * back, pointing at a note that proposes the removal. The
+				 * move's note is the collector's to withdraw and restore.
+				 */
+				const linkedType = findStructuralOp(
+					parseSuggestionPayload( linked?.meta?._wp_suggestion )
+						?.operations
+				)?.type;
+				const nextType = findStructuralOp( operations )?.type;
+				if (
+					commentId &&
+					linkedType &&
+					nextType &&
+					linkedType !== nextType
+				) {
+					commentId = null;
+					writeCommentId( clientId, null );
+				}
 			}
 
 			try {
