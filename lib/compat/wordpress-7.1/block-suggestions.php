@@ -3,8 +3,9 @@
  * Inline suggestion support for suggest mode.
  *
  * Inline suggestions are anchored in raw block content as
- * `<mark class="wp-suggestion" data-suggestion-id="N" data-suggestion-type="del|add" data-author="A">…</mark>`
- * so a suggestion survives edits elsewhere in the block (offsets are derived
+ * `<mark class="wp-suggestion-<kind>" data-suggestion-id="N" data-suggestion-type="<kind>" data-author="A">…</mark>`,
+ * one class per kind (`add`, `del`, `format`), so a suggestion survives edits
+ * elsewhere in the block (offsets are derived
  * from the marker on read, never stored). This mirrors inline notes
  * (`lib/compat/wordpress-7.1/block-comments.php`) but the render-time strip is
  * type-aware.
@@ -534,6 +535,35 @@ function gutenberg_get_suggestion_content_owner() {
 		return 0;
 	}
 	return (int) end( $GLOBALS['gutenberg_suggestion_content_owners'] );
+}
+
+/**
+ * Tells the kind of the inline suggestion marker the processor is on.
+ *
+ * Each kind has its own class token - `wp-suggestion-add`, `wp-suggestion-del`
+ * and `wp-suggestion-format` - so markers of different kinds can nest over the
+ * same text, as rich text stores one format per type per character. The class
+ * is authoritative: `data-suggestion-type` is written alongside it for styling
+ * and is ignored here. `has_class()` matches exact tokens, so an unrelated
+ * class such as `wp-suggestion-foo` is never taken for a marker.
+ *
+ * This is the one place server code tells marker kinds apart; the render strip
+ * and the save pass's anchor index both read markers through it.
+ *
+ * @param WP_HTML_Tag_Processor $processor Processor positioned on a tag.
+ * @return string|null `add`, `del` or `format`, or null when the tag is not a
+ *                     suggestion marker opener.
+ */
+function gutenberg_get_suggestion_marker_kind( WP_HTML_Tag_Processor $processor ) {
+	if ( 'MARK' !== $processor->get_tag() || $processor->is_tag_closer() ) {
+		return null;
+	}
+	foreach ( array( 'add', 'del', 'format' ) as $kind ) {
+		if ( $processor->has_class( 'wp-suggestion-' . $kind ) ) {
+			return $kind;
+		}
+	}
+	return null;
 }
 
 /**
