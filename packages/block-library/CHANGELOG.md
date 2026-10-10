@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   Opt the blocks that render no wrapper of their own out of the experimental rotate block support with `supports.rotate: false`: Classic, Custom HTML, Missing, More, Page Break, Pattern, Shortcode and synced patterns ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+-   Opt the blocks that render no wrapper of their own out of the experimental rotate block support with `supports.rotate: false`: Classic, Custom HTML, Missing, More, Page Break, Pattern, Shortcode and synced patterns ([#84505](https://github.com/WordPress/gutenberg/pull/84505)).
 -   Query: List the existing terms in the taxonomy filters, so categories and tags can be browsed and selected instead of recalled and typed. The controls now use `SearchableChipSelectControl` from `@wordpress/ui` ([#82583](https://github.com/WordPress/gutenberg/pull/82583)).
 -   Image: In the editor, leave out the default inline `height: auto` when the image is in a manual placement grid that makes its images cover their cells (behind the `gutenberg-grid-interactivity` experiment), so the grid's CSS sizes the image ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
 
