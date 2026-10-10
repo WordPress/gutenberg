@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   `wp-env reset` and `wp-env clean` now report a failed database reset or WordPress configuration and exit with a non-zero code instead of reporting success ([#PRNUMBER](https://github.com/WordPress/gutenberg/pull/PRNUMBER)).
+-   `wp-env reset` and `wp-env clean` now report a failed database reset or WordPress configuration and exit with a non-zero code instead of reporting success ([#84495](https://github.com/WordPress/gutenberg/pull/84495)).
 
 ## 11.17.0 (2026-10-07)
 
