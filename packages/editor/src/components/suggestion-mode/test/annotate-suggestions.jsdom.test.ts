@@ -124,4 +124,42 @@ describe( 'suggestionAnnotations', () => {
 			} ) )
 		).toEqual( [] );
 	} );
+
+	it( 'lists enclosing ranges first and the selected thread last', () => {
+		/*
+		 * The annotations API keeps one decoration per character, so where
+		 * ranges overlap the later one wins. An addition holding someone's
+		 * deletion is listed before it, and the selected thread after all.
+		 */
+		const content = RichTextData.fromHTMLString(
+			'a<mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add">bc<mark class="wp-suggestion-del" data-suggestion-id="3" data-suggestion-type="del">de</mark>f</mark>g'
+		);
+		const thread = ( id: number, suggestionType: string ) => ( {
+			id,
+			status: 'hold',
+			blockClientId: 'abc',
+			meta: {
+				_wp_suggestion: JSON.stringify( {
+					schemaVersion: 2,
+					operations: [
+						{
+							type: 'inline-suggestion',
+							attribute: 'content',
+							suggestionType,
+						},
+					],
+				} ),
+			},
+		} );
+		const threads = [ thread( 3, 'del' ), thread( 1, 'add' ) ];
+		const ids = ( selected?: number ) =>
+			suggestionAnnotations(
+				threads,
+				() => ( { content } ),
+				selected
+			).map( ( range ) => range.id );
+		expect( ids() ).toEqual( [ '1', '3' ] );
+		expect( ids( 3 ) ).toEqual( [ '1', '3' ] );
+		expect( ids( 1 ) ).toEqual( [ '3', '1' ] );
+	} );
 } );
