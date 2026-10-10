@@ -32,9 +32,19 @@ module.exports = async function clean( { environment, spinner, debug } ) {
 
 	const tasks = [];
 
-	// Start the database first to avoid race conditions where all tasks create
-	// different docker networks with the same name.
-	await dockerCompose.upOne( 'mysql', {
+	// Start the appropriate MySQL service(s) first to avoid race conditions
+	// where parallel tasks try to create docker networks with the same name.
+	// The dependency chain (cli -> wordpress -> mysql with service_healthy)
+	// ensures MySQL is ready before database operations run.
+	const mysqlServices = [];
+	if ( environment === 'all' || environment === 'development' ) {
+		mysqlServices.push( 'mysql' );
+	}
+	if ( environment === 'all' || environment === 'tests' ) {
+		mysqlServices.push( 'tests-mysql' );
+	}
+
+	await dockerCompose.upMany( mysqlServices, {
 		config: config.dockerComposeConfigPath,
 		log: config.debug,
 	} );
