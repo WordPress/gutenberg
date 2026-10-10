@@ -319,6 +319,14 @@ const getNestedEditedPostProperty = createSelector(
  * edit if one exists, but falling back to the attribute for the last known
  * saved state of the post.
  *
+ * While the editor is in Suggestion mode (experimental), a post field with a
+ * pending suggestion returns the suggested value instead, so the fields the
+ * suggester changed show what they proposed. The post itself keeps its value
+ * until a reviewer accepts the suggestion: read the `core` entity record
+ * (`getEditedEntityRecord`) for the value the post will be saved with. A
+ * suggested meta value is merged into `meta`, and a suggested term field
+ * returns term ids only, leaving out terms that do not exist yet.
+ *
  * @param {Object} state         Global application state.
  * @param {string} attributeName Post attribute name.
  *
