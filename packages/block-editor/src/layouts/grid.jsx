@@ -210,6 +210,11 @@ export default {
 			rowCount = null,
 			autoFit = false,
 		} = effectiveLayout;
+		// Same-size cells are part of the grid interactivity experiment.
+		const hasSameSizeCells =
+			!! window.__experimentalEnableGridInteractivity;
+		const isManualPlacement =
+			hasSameSizeCells && !! effectiveLayout.isManualPlacement;
 
 		// When enabled, columns stretch to fill the available space using
 		// `auto-fit`; otherwise empty tracks are preserved with `auto-fill`.
@@ -267,7 +272,10 @@ export default {
 			hasViewportOverride( 'autoFit' ) ||
 			( hasBlockGapOverride && minimumColumnWidth && columnCount > 0 );
 		const shouldOutputGridRows =
-			( ! hasViewportOverrides || hasViewportOverride( 'rowCount' ) ) &&
+			( ! hasViewportOverrides ||
+				hasViewportOverride( 'rowCount' ) ||
+				( isManualPlacement &&
+					hasViewportOverride( 'columnCount' ) ) ) &&
 			columnCount &&
 			rowCount;
 
@@ -317,7 +325,24 @@ export default {
 			}
 		}
 
-		if ( shouldOutputGridRows ) {
+		if ( shouldOutputGridRows && hasSameSizeCells ) {
+			// Every row gets the same height, the height of the tallest one, so
+			// that all the grid's cells are the same size. Rows added outside
+			// the row count match them.
+			rules.push(
+				`grid-template-rows: repeat(${ rowCount }, minmax(1rem, 1fr))`,
+				'grid-auto-rows: minmax(1rem, 1fr)'
+			);
+			// Manual grids take their height from their width, so that cells
+			// are close to square and content never makes them bigger. The
+			// gaps keep them from being exactly square.
+			if ( isManualPlacement ) {
+				rules.push(
+					`aspect-ratio: ${ columnCount } / ${ rowCount }`,
+					'min-height: 0'
+				);
+			}
+		} else if ( shouldOutputGridRows ) {
 			rules.push(
 				`grid-template-rows: repeat(${ rowCount }, minmax(1rem, auto))`
 			);

@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import grid from '../grid';
@@ -49,6 +49,80 @@ describe( 'getLayoutStyle', () => {
 		} );
 
 		expect( result ).toBe( expected );
+	} );
+	it( 'should size rows by their content if the grid interactivity experiment is off', () => {
+		const expected = `.my-container { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(1rem, auto)); }`;
+
+		const result = grid.getLayoutStyle( {
+			selector: '.my-container',
+			layout: { columnCount: 3, rowCount: 2, isManualPlacement: true },
+			style: {},
+			blockName: 'test-block',
+			hasBlockGapSupport: false,
+			layoutDefinitions: undefined,
+		} );
+
+		expect( result ).toBe( expected );
+	} );
+	describe( 'with the grid interactivity experiment', () => {
+		let originalExperiment;
+		beforeEach( () => {
+			originalExperiment = window.__experimentalEnableGridInteractivity;
+			window.__experimentalEnableGridInteractivity = true;
+		} );
+		afterEach( () => {
+			window.__experimentalEnableGridInteractivity = originalExperiment;
+		} );
+
+		it( 'should give every row the same height if columnCount and rowCount are provided', () => {
+			const expected = `.my-container { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(1rem, 1fr)); grid-auto-rows: minmax(1rem, 1fr); }`;
+
+			const result = grid.getLayoutStyle( {
+				selector: '.my-container',
+				layout: { columnCount: 3, rowCount: 2 },
+				style: {},
+				blockName: 'test-block',
+				hasBlockGapSupport: false,
+				layoutDefinitions: undefined,
+			} );
+
+			expect( result ).toBe( expected );
+		} );
+		it( 'should size manual placement grids by their width', () => {
+			const expected = `.my-container { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(1rem, 1fr)); grid-auto-rows: minmax(1rem, 1fr); aspect-ratio: 3 / 2; min-height: 0; }`;
+
+			const result = grid.getLayoutStyle( {
+				selector: '.my-container',
+				layout: {
+					columnCount: 3,
+					rowCount: 2,
+					isManualPlacement: true,
+				},
+				style: {},
+				blockName: 'test-block',
+				hasBlockGapSupport: false,
+				layoutDefinitions: undefined,
+			} );
+
+			expect( result ).toBe( expected );
+		} );
+		it( 'should update the aspect ratio of manual placement grids when a viewport changes the column count', () => {
+			const result = grid.getLayoutStyle( {
+				selector: '.my-container',
+				layout: {
+					columnCount: 3,
+					rowCount: 2,
+					isManualPlacement: true,
+				},
+				viewportOverrides: { columnCount: 1 },
+				style: {},
+				blockName: 'test-block',
+				hasBlockGapSupport: false,
+				layoutDefinitions: undefined,
+			} );
+
+			expect( result ).toContain( 'aspect-ratio: 1 / 2' );
+		} );
 	} );
 	it( 'should return `grid-template-columns` with max() function if both minimumColumnWidth and columnCount are provided', () => {
 		const expected = `.my-container { grid-template-columns: repeat(auto-fill, minmax(max(min( 12rem, 100%), ( 100% - (1.2rem*2) ) / 3), 1fr)); container-type: inline-size; }`;

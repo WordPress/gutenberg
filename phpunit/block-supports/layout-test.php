@@ -65,7 +65,21 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		unregister_block_style( 'core/group', 'custom-gap' );
 		WP_Theme_JSON_Resolver::clean_cached_data();
 
+		remove_filter( 'pre_option_gutenberg-experiments', array( $this, 'filter_enable_grid_interactivity' ), 11 );
+
 		parent::tear_down();
+	}
+
+	/**
+	 * Turns on the grid interactivity experiment, on top of the experiments the test suite enables.
+	 *
+	 * @param mixed $experiments The `gutenberg-experiments` option.
+	 * @return array The experiments, with grid interactivity turned on.
+	 */
+	public function filter_enable_grid_interactivity( $experiments ) {
+		$experiments                                 = is_array( $experiments ) ? $experiments : array();
+		$experiments['gutenberg-grid-interactivity'] = true;
+		return $experiments;
 	}
 
 	public function filter_set_theme_root() {
@@ -1607,6 +1621,54 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				'type'        => 'grid',
 				'columnCount' => '3',
 				'rowCount'    => '2',
+			)
+		);
+
+		$this->assertSame(
+			'.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, auto));}',
+			$layout_styles
+		);
+	}
+
+	/**
+	 * Check that manual placement grids take their height from their width when the grid
+	 * interactivity experiment is on.
+	 *
+	 * @covers ::gutenberg_get_layout_style
+	 */
+	public function test_gutenberg_get_layout_style_sizes_manual_grids_by_width() {
+		add_filter( 'pre_option_gutenberg-experiments', array( $this, 'filter_enable_grid_interactivity' ), 11 );
+
+		$layout_styles = gutenberg_get_layout_style(
+			'.wp-layout',
+			array(
+				'type'              => 'grid',
+				'columnCount'       => 3,
+				'rowCount'          => 2,
+				'isManualPlacement' => true,
+			)
+		);
+
+		$this->assertSame(
+			'.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, 1fr));grid-auto-rows:minmax(1rem, 1fr);aspect-ratio:3 / 2;min-height:0;}',
+			$layout_styles
+		);
+	}
+
+	/**
+	 * Check that manual placement grids size their rows by their content when the grid
+	 * interactivity experiment is off.
+	 *
+	 * @covers ::gutenberg_get_layout_style
+	 */
+	public function test_gutenberg_get_layout_style_sizes_manual_grid_rows_by_content_without_experiment() {
+		$layout_styles = gutenberg_get_layout_style(
+			'.wp-layout',
+			array(
+				'type'              => 'grid',
+				'columnCount'       => 3,
+				'rowCount'          => 2,
+				'isManualPlacement' => true,
 			)
 		);
 

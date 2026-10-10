@@ -905,7 +905,10 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$should_output_grid_columns = true;
 		}
 
-		$should_output_grid_rows = ( null === $viewport_overrides || $has_viewport_property_override( 'rowCount' ) ) && ! empty( $column_count ) && ! empty( $row_count );
+		// Same-size cells are part of the grid interactivity experiment.
+		$has_same_size_cells     = gutenberg_is_experiment_enabled( 'gutenberg-grid-interactivity' );
+		$is_manual_placement     = $has_same_size_cells && ! empty( $layout_for_styles['isManualPlacement'] );
+		$should_output_grid_rows = ( null === $viewport_overrides || $has_viewport_property_override( 'rowCount' ) || ( $is_manual_placement && $has_viewport_property_override( 'columnCount' ) ) ) && ! empty( $column_count ) && ! empty( $row_count );
 		$grid_declarations       = array();
 
 		/* When enabled, columns stretch to fill the available space using
@@ -936,7 +939,29 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			);
 		}
 
-		if ( $should_output_grid_rows ) {
+		/*
+		 * Every row gets the same height, the height of the tallest one, so that all the
+		 * grid's cells are the same size. Rows added outside the row count match them.
+		 */
+		if ( $should_output_grid_rows && $has_same_size_cells ) {
+			$grid_row_declarations = array(
+				'grid-template-rows' => 'repeat(' . $row_count . ', minmax(1rem, 1fr))',
+				'grid-auto-rows'     => 'minmax(1rem, 1fr)',
+			);
+			/*
+			 * Manual grids take their height from their width, so that cells are close to
+			 * square and content never makes them bigger. The gaps keep them from being
+			 * exactly square.
+			 */
+			if ( $is_manual_placement ) {
+				$grid_row_declarations['aspect-ratio'] = $column_count . ' / ' . $row_count;
+				$grid_row_declarations['min-height']   = '0';
+			}
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => $grid_row_declarations,
+			);
+		} elseif ( $should_output_grid_rows ) {
 			$layout_styles[] = array(
 				'selector'     => $selector,
 				'declarations' => array( 'grid-template-rows' => 'repeat(' . $row_count . ', minmax(1rem, auto))' ),
