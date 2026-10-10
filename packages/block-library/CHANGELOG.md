@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Navigation: Add an "Auto add pages" menu setting. While it is on, publishing a top-level page appends a link to the menu, as classic menus do. The default menu a site creates for itself now starts as one link per published page with the setting on, instead of a Page List block.
+
 ### Bug Fixes
 
 -   Template Part: Show the "Default based on area" HTML element as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).

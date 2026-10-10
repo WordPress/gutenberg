@@ -20,19 +20,25 @@ test.describe( 'Navigation block', () => {
 			] );
 		} );
 
-		test( 'default to a list of pages if there are no menus', async ( {
+		test( 'default to links to the published pages if there are no menus', async ( {
 			admin,
 			editor,
+			requestUtils,
 		} ) => {
+			await requestUtils.createPage( {
+				title: 'About',
+				status: 'publish',
+			} );
+
 			await admin.createNewPost();
 			await editor.insertBlock( { name: 'core/navigation' } );
 
-			const pageListBlock = editor.canvas.getByRole( 'document', {
-				name: 'Block: Page List',
+			const pageLinkBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Page Link',
 			} );
 
-			await expect( pageListBlock ).toBeVisible( {
-				// Wait for the Nav and Page List block API requests to resolve.
+			await expect( pageLinkBlock ).toContainText( 'About', {
+				// Wait for the Nav block and fallback API requests to resolve.
 				// Note: avoid waiting on network requests as these are not perceivable
 				// to the user.
 				// See: https://github.com/WordPress/gutenberg/pull/45070#issuecomment-1373712007.
