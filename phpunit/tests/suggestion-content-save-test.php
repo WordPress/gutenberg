@@ -289,6 +289,13 @@ class Tests_Suggestion_Content_Save extends WP_UnitTestCase {
 		$this->assertSame( $content, $this->edit_view( $post_id ) );
 	}
 
+	public function test_a_spam_notes_proposal_is_not_shown() {
+		list( $post_id, , $notes ) = $this->suggested_post();
+
+		wp_spam_comment( $notes[0] );
+		$this->assertStringNotContainsString( 'zanzibarian', $this->edit_view( $post_id ) );
+	}
+
 	public function test_markers_for_other_notes_propose_nothing() {
 		$post_id    = $this->create_post( $this->paragraph( 'Hello' ) );
 		$other_post = $this->create_post();

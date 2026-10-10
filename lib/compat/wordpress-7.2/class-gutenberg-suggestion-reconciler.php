@@ -403,8 +403,8 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 *
 		 * `content.rendered` is left alone: it went through the render strip.
 		 * A revision or autosave is inflated from its own snapshot, falling
-		 * back to what the notes store. Proposals of trashed notes stay out
-		 * until the note is restored.
+		 * back to what the notes store. Proposals of trashed or spam notes
+		 * stay out until the note is restored.
 		 *
 		 * @param WP_REST_Response $response Response.
 		 * @param WP_Post          $post     Post, autosave or revision.
@@ -434,7 +434,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 				$items = self::load_items( $notes );
 			}
 			foreach ( array_keys( $items ) as $note_id ) {
-				if ( ! isset( $notes[ $note_id ] ) || 'trash' === $notes[ $note_id ] ) {
+				if ( ! isset( $notes[ $note_id ] ) || in_array( $notes[ $note_id ], array( 'trash', 'spam' ), true ) ) {
 					unset( $items[ $note_id ] );
 				}
 			}
