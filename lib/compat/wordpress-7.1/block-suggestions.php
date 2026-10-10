@@ -124,10 +124,19 @@ function gutenberg_sanitize_suggestion_payload( $value ) {
  *
  *   - `_wp_suggestion`        — proposed edit, JSON payload. Presence of this
  *                               meta is what makes a note a suggestion.
- *   - `_wp_suggestion_status` — suggestion lifecycle (`pending` / `applied`
- *                               / `rejected`). Set on apply or reject so the
- *                               comment thread persists as evidence even after
- *                               the suggestion is resolved.
+ *   - `_wp_suggestion_status` — suggestion lifecycle. `pending` while it
+ *                               awaits a decision; `applied-unsaved` /
+ *                               `rejected-unsaved` once a reviewer decided in
+ *                               an editor that has not saved the post yet;
+ *                               `applied` / `rejected` once a post save no
+ *                               longer carries the suggestion's anchor; and
+ *                               `outdated` when someone else's save removed
+ *                               the anchor before anyone decided. The final
+ *                               values are written only by the server (see
+ *                               `lib/compat/wordpress-7.2/suggestion-status.php`).
+ *   - `_wp_suggestion_decided_by` / `_wp_suggestion_resolved_by` — read-only
+ *                               provenance: who made the provisional decision,
+ *                               and whose save finalized or outdated it.
  *
  * The suggestion is stored as comment meta rather than `comment_content` so a
  * note can carry both a discussion (content) and a proposed edit (meta), and so
@@ -193,7 +202,7 @@ function gutenberg_register_suggestion_meta() {
 			'show_in_rest'  => array(
 				'schema' => array(
 					'type' => 'string',
-					'enum' => array( 'pending', 'applied', 'rejected' ),
+					'enum' => array( 'pending', 'applied-unsaved', 'rejected-unsaved', 'applied', 'rejected', 'outdated' ),
 				),
 			),
 			'auth_callback' => function ( $allowed, $meta_key, $object_id ) {
@@ -205,6 +214,25 @@ function gutenberg_register_suggestion_meta() {
 			},
 		)
 	);
+
+	// Provenance is stamped by the server; no REST client may write it.
+	$provenance = array(
+		'_wp_suggestion_decided_by'  => __( 'User who made the provisional suggestion decision.', 'gutenberg' ),
+		'_wp_suggestion_resolved_by' => __( 'User whose post save finalized or outdated the suggestion.', 'gutenberg' ),
+	);
+	foreach ( $provenance as $meta_key => $description ) {
+		register_meta(
+			'comment',
+			$meta_key,
+			array(
+				'type'          => 'integer',
+				'description'   => $description,
+				'single'        => true,
+				'show_in_rest'  => true,
+				'auth_callback' => '__return_false',
+			)
+		);
+	}
 }
 add_action( 'init', 'gutenberg_register_suggestion_meta' );
 
