@@ -264,3 +264,30 @@ export function getGridRectFromPixelRect( rect, columnTracks, rowTracks ) {
 		rowEnd: getClosestTrack( rowTracks, rect.bottom, 'end' ) + 1,
 	} );
 }
+
+/**
+ * Gets the row a resized grid item ends on. Past the last row, the grid grows:
+ * every average row height (plus gap) dragged past the end adds a row.
+ *
+ * @param {Array<{start: number, end: number}>} rowTracks Row tracks.
+ * @param {number}                              position  Bottom edge of the item in pixels, relative to the grid's content box.
+ * @param {number}                              gap       Row gap in pixels.
+ *
+ * @return {number} The 1-based row the item ends on.
+ */
+export function getRowEndForResize( rowTracks, position, gap = 0 ) {
+	const closestRowEnd = getClosestTrack( rowTracks, position, 'end' ) + 1;
+	const lastTrack = rowTracks[ rowTracks.length - 1 ];
+	if ( ! lastTrack || position <= lastTrack.end ) {
+		return closestRowEnd;
+	}
+	const averageRowHeight =
+		rowTracks.reduce(
+			( total, track ) => total + track.end - track.start,
+			0
+		) / rowTracks.length;
+	const extraRows = Math.round(
+		( position - lastTrack.end ) / ( averageRowHeight + gap )
+	);
+	return extraRows > 0 ? rowTracks.length + extraRows : closestRowEnd;
+}
