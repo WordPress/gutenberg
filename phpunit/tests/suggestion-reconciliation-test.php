@@ -266,6 +266,32 @@ class Tests_Suggestion_Reconciliation extends WP_UnitTestCase {
 		$this->assertSame( 'applied', $this->status_of( $note_id ) );
 	}
 
+	public function test_post_slug_accept_finalizes_once_the_slug_is_saved() {
+		$post_id = $this->create_post( $this->paragraph( 'Body' ) );
+		$note_id = $this->create_note(
+			$post_id,
+			array(
+				array(
+					'type'      => 'post-attribute-set',
+					'attribute' => 'slug',
+					'after'     => 'better-slug',
+				),
+			),
+			'applied-unsaved'
+		);
+
+		$this->set_content( $post_id, $this->paragraph( 'Body' ) );
+		$this->assertSame( 'applied-unsaved', $this->status_of( $note_id ) );
+
+		wp_update_post(
+			array(
+				'ID'        => $post_id,
+				'post_name' => 'better-slug',
+			)
+		);
+		$this->assertSame( 'applied', $this->status_of( $note_id ) );
+	}
+
 	public function test_post_title_reject_finalizes_on_the_next_post_write() {
 		$post_id = $this->create_post( $this->paragraph( 'Body' ) );
 		$note_id = $this->create_note(

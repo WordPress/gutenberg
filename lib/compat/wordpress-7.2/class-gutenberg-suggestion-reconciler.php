@@ -237,9 +237,13 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 			if ( 'rejected-unsaved' === $status ) {
 				return true;
 			}
+			// Fields stored on the post row, so they are already saved when
+			// this pass runs on `wp_insert_post`. Terms, meta and the featured
+			// image are written after it and are not finalized here.
 			$fields = array(
 				'title'   => 'post_title',
 				'excerpt' => 'post_excerpt',
+				'slug'    => 'post_name',
 			);
 			foreach ( $payload['operations'] as $operation ) {
 				if ( ! is_array( $operation ) || ! isset( $operation['type'] ) || 'post-attribute-set' !== $operation['type'] ) {
