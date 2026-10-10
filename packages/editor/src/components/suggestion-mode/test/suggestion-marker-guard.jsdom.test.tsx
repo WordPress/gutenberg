@@ -77,7 +77,6 @@ describe( 'SuggestionMarkerGuard', () => {
 		const { writes, content } = setup(
 			`a${ mark( 21, `b${ mark( 20, 'cd' ) }` ) }e`
 		);
-		await act( async () => {} );
 		expect( findSuggestionText( content(), 20 ) ).toBe( 'cd' );
 		expect( findSuggestionText( content(), 21 ) ).toBe( 'b' );
 		expect( writes ).toHaveBeenCalledTimes( 1 );
@@ -85,7 +84,6 @@ describe( 'SuggestionMarkerGuard', () => {
 
 	it( 'resolves content that arrives later, and only touches what needs it', async () => {
 		const { registry, block, writes, content } = setup( 'plain' );
-		await act( async () => {} );
 		expect( writes ).not.toHaveBeenCalled();
 		await act( async () => {
 			registry

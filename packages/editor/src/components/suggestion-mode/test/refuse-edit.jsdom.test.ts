@@ -14,18 +14,17 @@ vi.hoisted( () => {
 
 // The registry below is a stand-in, so its editor store dispatch is not a
 // locked object; pass it through, and keep the real unlock for the rest.
-vi.mock( '../../../lock-unlock', async ( importOriginal ) => {
-	const actual =
-		await importOriginal< typeof import( '../../../lock-unlock' ) >();
+vi.mock( import( '../../../lock-unlock' ), async ( importOriginal ) => {
+	const actual = await importOriginal();
 	return {
 		...actual,
-		unlock: ( object: any ) => {
+		unlock: ( ( object: any ) => {
 			try {
 				return actual.unlock( object );
 			} catch {
 				return object;
 			}
-		},
+		} ) as typeof actual.unlock,
 	};
 } );
 

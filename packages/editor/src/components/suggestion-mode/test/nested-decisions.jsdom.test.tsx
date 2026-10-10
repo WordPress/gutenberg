@@ -36,7 +36,10 @@ vi.hoisted( () => {
 	globalThis.wpVitest.mockMatchMedia();
 } );
 
-vi.mock( '@wordpress/a11y', () => ( { speak: vi.fn() } ) );
+vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	speak: vi.fn(),
+} ) );
 
 const PARAGRAPH = 'core/test-nested-paragraph';
 const BOLD = 'test/nested-bold';
