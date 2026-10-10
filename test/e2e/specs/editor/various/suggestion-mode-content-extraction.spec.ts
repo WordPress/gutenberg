@@ -342,4 +342,50 @@ test.describe( 'Suggestion mode keeps proposals out of the stored post', () => {
 			editor.canvas.locator( 'mark.wp-suggestion-add' )
 		).toHaveText( ' zanzibarian' );
 	} );
+
+	test( 'a formatting suggestion is stored as an anchor around the original run', async ( {
+		editor,
+		page,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+		await switchIntent( page, 'Suggesting' );
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		const suggestionSaved = suggestionSavedPromise( page );
+		await pageUtils.pressKeys( 'primary+b' );
+		await expect(
+			paragraph.locator( 'mark.wp-suggestion-format' )
+		).toContainText( 'world' );
+		await suggestionSaved;
+		await editor.saveDraft();
+		const postId = await currentPostId( page );
+		expect( await isDirty( page ) ).toBe( false );
+
+		const stored = await readStoredContent( requestUtils, postId );
+		expect( stored ).toContain( 'Hello ' );
+		expect( stored ).toContain( 'world</mark>' );
+		expect( stored ).not.toContain( '<strong>' );
+
+		await reloadEditor( page );
+		await expect(
+			editor.canvas.locator( 'mark.wp-suggestion-format strong' )
+		).toHaveText( 'world' );
+		expect( await isDirty( page ) ).toBe( false );
+
+		await switchIntent( page, 'Editing' );
+		await decideSuggestion( page, 'Accept' );
+		await editor.saveDraft();
+		const accepted = await readStoredContent( requestUtils, postId );
+		expect( accepted ).toContain( '<strong>world</strong>' );
+		expect( accepted ).not.toContain( 'data-suggestion' );
+	} );
 } );
