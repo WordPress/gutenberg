@@ -10,3 +10,4 @@ export {
 	getUnstackedMobileUpdates,
 	getStackedLayouts,
 } from './mobile-stacking';
+export { useIsInFixedGridCell } from './use-is-in-fixed-grid-cell';
