@@ -22,6 +22,7 @@ import {
 	findSuggestionText,
 	stripSuggestionMarkers,
 } from '../inline-suggestions';
+import SuggestionSizeNotice from './suggestion-size-notice';
 
 const EMPTY_ARRAY: Array< string | null > = [];
 
@@ -411,6 +412,7 @@ export default function SuggestionActions( {
 				thread={ thread }
 				operations={ payload.operations }
 			/>
+			{ ! isResolved && <SuggestionSizeNotice thread={ thread } /> }
 			{ ! isResolved && isGrouped && (
 				<Text
 					variant="body-sm"
