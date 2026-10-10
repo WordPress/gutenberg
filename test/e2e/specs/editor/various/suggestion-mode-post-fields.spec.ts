@@ -561,33 +561,387 @@ test.describe( 'Suggestion mode: post fields', () => {
 			).toEqual( [ sportId ] );
 		} );
 
-		test( 'new terms cannot be created while suggesting', async ( {
+		async function findTerms(
+			requestUtils: any,
+			base: string,
+			name: string
+		) {
+			const terms = await requestUtils.rest( {
+				path: `/wp/v2/${ base }`,
+				params: { search: name, context: 'edit' },
+			} );
+			return terms.filter( ( term: any ) => term.name === name );
+		}
+
+		async function deleteTermsNamed(
+			requestUtils: any,
+			base: string,
+			name: string
+		) {
+			for ( const term of await findTerms( requestUtils, base, name ) ) {
+				await requestUtils.rest( {
+					method: 'DELETE',
+					path: `/wp/v2/${ base }/${ term.id }`,
+					params: { force: true },
+				} );
+			}
+		}
+
+		test.afterEach( async ( { requestUtils } ) => {
+			await deleteTermsNamed( requestUtils, 'tags', 'Brand new tag' );
+			await deleteTermsNamed(
+				requestUtils,
+				'categories',
+				'Proposed category'
+			);
+		} );
+
+		test( 'a new tag is proposed, and only created once accepted', async ( {
 			editor,
 			page,
+			requestUtils,
+		} ) => {
+			await editor.openDocumentSettingsSidebar();
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await openSettingsPanel( page, 'Tags' );
+			await switchIntent( page, 'Suggesting' );
+
+			const tags = settings.getByRole( 'combobox', { name: 'Add Tag' } );
+			await tags.fill( 'Brand new tag' );
+			const saved = suggestionSavedPromise( page );
+			await page
+				.getByRole( 'option', { name: 'Create: Brand new tag' } )
+				.click();
+			await saved;
+
+			// The picker shows the proposed tag (a new suggestion opens the
+			// notes; go back to the post settings)...
+			await editor.openDocumentSettingsSidebar();
+			await openSettingsPanel( page, 'Tags' );
+			await expect(
+				settings.getByText( 'Brand new tag', { exact: true } )
+			).toBeVisible();
+			// ...which exists nowhere but on the note.
+			expect(
+				await findTerms( requestUtils, 'tags', 'Brand new tag' )
+			).toEqual( [] );
+
+			const sidebar = await openNotesSidebar( page );
+			await expect(
+				sidebar.locator(
+					'.editor-collab-sidebar-panel__suggestion-summary'
+				)
+			).toHaveText( 'Tags: New tag: Brand new tag' );
+
+			await savePost( page );
+			expect(
+				( await readStoredPost( requestUtils, postId ) ).tags
+			).toEqual( [] );
+
+			await switchIntent( page, 'Editing' );
+			await sidebar
+				.getByRole( 'button', { name: 'Accept suggestion' } )
+				.click();
+			await expect(
+				page
+					.locator( '.components-snackbar-list' )
+					.getByText( 'Suggestion applied.' )
+			).toBeVisible();
+			const [ created ] = await findTerms(
+				requestUtils,
+				'tags',
+				'Brand new tag'
+			);
+			expect( created ).toBeDefined();
+			await expect
+				.poll( () => getEditedPostAttribute( page, 'tags' ) )
+				.toEqual( [ created.id ] );
+
+			await savePost( page );
+			expect(
+				( await readStoredPost( requestUtils, postId ) ).tags
+			).toEqual( [ created.id ] );
+		} );
+
+		test( 'removing a proposed new tag withdraws the suggestion', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.openDocumentSettingsSidebar();
+			await openSettingsPanel( page, 'Tags' );
+			await switchIntent( page, 'Suggesting' );
+			await suggestPostEdits( page, {
+				tags: [ { name: 'Brand new tag' } ],
+			} );
+			const sidebar = await openNotesSidebar( page );
+			await expect( suggestionThreads( sidebar ) ).toHaveCount( 1 );
+
+			await editor.openDocumentSettingsSidebar();
+			const chip = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByText( 'Brand new tag', { exact: true } );
+			await chip.locator( '..' ).getByRole( 'button' ).click();
+
+			// The proposal is back at the post's terms, so its note goes.
+			await openNotesSidebar( page );
+			await expect( suggestionThreads( sidebar ) ).toHaveCount( 0 );
+		} );
+
+		test( 'accepting a new category reuses one that appeared meanwhile', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			await switchIntent( page, 'Suggesting' );
+			await suggestPostEdits( page, {
+				categories: [ newsId, { name: 'Proposed category' } ],
+			} );
+			// Someone creates the same category before the review.
+			const existing = await requestUtils.rest( {
+				method: 'POST',
+				path: '/wp/v2/categories',
+				data: { name: 'Proposed category' },
+			} );
+
+			await switchIntent( page, 'Editing' );
+			const sidebar = await openNotesSidebar( page );
+			await sidebar
+				.getByRole( 'button', { name: 'Accept suggestion' } )
+				.click();
+			await expect
+				.poll( () => getEditedPostAttribute( page, 'categories' ) )
+				.toEqual( [ newsId, existing.id ] );
+			expect(
+				await findTerms(
+					requestUtils,
+					'categories',
+					'Proposed category'
+				)
+			).toHaveLength( 1 );
+		} );
+
+		test( 'a new child category is proposed from the picker, and rejecting creates nothing', async ( {
+			editor,
+			page,
+			requestUtils,
 		} ) => {
 			await editor.openDocumentSettingsSidebar();
 			const settings = page.getByRole( 'region', {
 				name: 'Editor settings',
 			} );
 			await openSettingsPanel( page, 'Categories' );
-			await openSettingsPanel( page, 'Tags' );
-			const addCategory = settings.getByRole( 'button', {
-				name: 'Add Category',
-			} );
-			await expect( addCategory ).toBeVisible();
-
 			await switchIntent( page, 'Suggesting' );
-			await expect( addCategory ).toBeHidden();
 
-			// A tag typed in that does not exist yet is not offered for
-			// creation: creating a term is a real write to the taxonomy.
-			const tags = settings.getByRole( 'combobox', {
-				name: 'Add Tag',
-			} );
-			await tags.fill( 'Brand new tag' );
+			await settings
+				.getByRole( 'button', { name: 'Add Category' } )
+				.click();
+			await settings
+				.getByRole( 'textbox', { name: 'New Category Name' } )
+				.fill( 'Proposed category' );
+			await settings
+				.getByRole( 'combobox', { name: 'Parent Category' } )
+				.selectOption( { label: 'News' } );
+			const saved = suggestionSavedPromise( page );
+			await settings
+				.getByRole( 'button', { name: 'Add Category', exact: true } )
+				.last()
+				.click();
+			await saved;
+
+			// A new suggestion opens the notes; go back to the post settings.
+			await editor.openDocumentSettingsSidebar();
+			await openSettingsPanel( page, 'Categories' );
 			await expect(
-				page.getByRole( 'option', { name: /^Create:/ } )
-			).toBeHidden();
+				settings.getByRole( 'checkbox', { name: 'Proposed category' } )
+			).toBeChecked();
+			expect(
+				await findTerms(
+					requestUtils,
+					'categories',
+					'Proposed category'
+				)
+			).toEqual( [] );
+
+			const sidebar = await openNotesSidebar( page );
+			const summary = sidebar.locator(
+				'.editor-collab-sidebar-panel__suggestion-summary'
+			);
+			await expect( summary ).toHaveText(
+				'Categories: New category: Proposed category'
+			);
+			await sidebar
+				.getByRole( 'button', { name: 'Reject suggestion' } )
+				.click();
+			await expect(
+				page
+					.locator( '.components-snackbar-list' )
+					.getByText( 'Suggestion rejected.' )
+			).toBeVisible();
+			expect(
+				await findTerms(
+					requestUtils,
+					'categories',
+					'Proposed category'
+				)
+			).toEqual( [] );
+			expect(
+				await getEditedPostAttribute( page, 'categories' )
+			).toEqual( [ newsId ] );
+		} );
+
+		test( 'accepting a new category the reviewer cannot create fails cleanly', async ( {
+			browser,
+			requestUtils,
+		} ) => {
+			// Authors can assign categories but not create them.
+			const author = await requestUtils.createUser( {
+				username: 'termauthor',
+				email: 'termauthor@example.com',
+				password: 'termauthorpassword',
+				roles: [ 'author' ],
+			} );
+			const post = await requestUtils.createPost( {
+				title: 'An author post',
+				content:
+					'<!-- wp:paragraph --><p>Body</p><!-- /wp:paragraph -->',
+				status: 'draft',
+				author: author.id,
+			} as any );
+			const context = await browser.newContext( {
+				baseURL: requestUtils.baseURL,
+				storageState: { cookies: [], origins: [] },
+			} );
+			try {
+				const page = await context.newPage();
+				await page.goto( '/wp-login.php' );
+				await page
+					.getByLabel( 'Username or Email Address' )
+					.fill( 'termauthor' );
+				await page
+					.getByLabel( 'Password', { exact: true } )
+					.fill( 'termauthorpassword' );
+				await page.getByRole( 'button', { name: 'Log In' } ).click();
+				await page.waitForURL( '**/wp-admin/**' );
+				await page.goto(
+					`/wp-admin/post.php?post=${ post.id }&action=edit`
+				);
+				await page.waitForFunction(
+					() => !! ( window as any ).wp?.data
+				);
+				await page.evaluate( () =>
+					( window as any ).wp.data
+						.dispatch( 'core/preferences' )
+						.set( 'core/edit-post', 'welcomeGuide', false )
+				);
+				// The guide may have opened before the preference landed.
+				const guide = page.getByRole( 'dialog', {
+					name: 'Welcome to the editor',
+				} );
+				if ( await guide.isVisible() ) {
+					await guide
+						.getByRole( 'button', { name: 'Close' } )
+						.click();
+				}
+
+				const getCategories = () =>
+					page.evaluate( () =>
+						( window as any ).wp.data
+							.select( 'core/editor' )
+							.getEditedPostAttribute( 'categories' )
+					);
+				const categories = await getCategories();
+				await switchIntent( page, 'Suggesting' );
+				await suggestPostEdits( page, {
+					categories: [
+						...categories,
+						{ name: 'Proposed category' },
+					],
+				} );
+				await switchIntent( page, 'Editing' );
+
+				const sidebar = await openNotesSidebar( page );
+				await sidebar
+					.getByRole( 'button', { name: 'Accept suggestion' } )
+					.click();
+				await expect(
+					page
+						.locator( '.components-snackbar-list' )
+						.getByText( /not allowed to create terms/ )
+				).toBeVisible();
+				// The note stays pending, and nothing was assigned.
+				await expect(
+					sidebar.getByRole( 'button', {
+						name: 'Accept suggestion',
+					} )
+				).toBeVisible();
+				expect( await getCategories() ).toEqual( categories );
+				expect(
+					await findTerms(
+						requestUtils,
+						'categories',
+						'Proposed category'
+					)
+				).toEqual( [] );
+				const [ note ] = await requestUtils.rest( {
+					path: '/wp/v2/comments',
+					params: { post: post.id, type: 'note', status: 'all' },
+				} );
+				expect( note.status ).toBe( 'hold' );
+			} finally {
+				await context.close();
+				await requestUtils.deleteAllUsers();
+			}
+		} );
+
+		test( 'a new term suggestion for a taxonomy the post cannot have is refused by the server', async ( {
+			page,
+		} ) => {
+			const codes = await page.evaluate( async ( id ) => {
+				const send = async ( after: any[] ) => {
+					try {
+						await ( window as any ).wp.apiFetch( {
+							path: '/wp/v2/comments',
+							method: 'POST',
+							data: {
+								post: id,
+								type: 'note',
+								status: 'hold',
+								content: '',
+								meta: {
+									_wp_suggestion: JSON.stringify( {
+										schemaVersion: 2,
+										blockName: '',
+										baseRevision: null,
+										operations: [
+											{
+												type: 'post-attribute-set',
+												attribute: 'tags',
+												before: [],
+												after,
+											},
+										],
+									} ),
+								},
+							},
+						} );
+						return 'created';
+					} catch ( error: any ) {
+						return error?.code;
+					}
+				};
+				return [
+					await send( [ { name: '   ' } ] ),
+					// Tags are flat: a parent cannot be proposed.
+					await send( [ { name: 'Child tag', parent: 3 } ] ),
+					await send( [ 'not a term' ] ),
+				];
+			}, postId );
+			expect( codes ).toEqual( [
+				'rest_invalid_suggestion',
+				'rest_invalid_suggestion',
+				'rest_invalid_suggestion',
+			] );
 		} );
 	} );
 
