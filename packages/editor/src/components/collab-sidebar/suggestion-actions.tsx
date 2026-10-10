@@ -1,4 +1,4 @@
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import {
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -6,6 +6,7 @@ import {
 } from '@wordpress/components';
 import { Stack, Text } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { getBlockType } from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
 // @ts-expect-error No exported types
@@ -23,6 +24,19 @@ import SuggestionSummary from '../suggestion-mode/suggestion-summary';
 import { isAttributeEqual } from '../suggestion-mode/operations';
 import { unlock } from '../../lock-unlock';
 import {
+	describeAnchor,
+	useSuggestionAnchorPresent,
+} from '../suggestion-mode/anchor-index';
+import {
+	APPLIED,
+	OUTDATED,
+	REJECTED,
+	getDecision,
+	getSuggestionStatus,
+	isPendingStatus,
+	isProvisionalStatus,
+} from '../suggestion-mode/suggestion-status';
+import {
 	SUGGESTION_TYPE_ADDITION,
 	SUGGESTION_TYPE_DELETION,
 	SUGGESTION_TYPE_REPLACEMENT,
@@ -37,6 +51,28 @@ const STRUCTURAL_OP_TYPES = new Set( [
 	'block-remove',
 	'block-move',
 ] );
+
+/**
+ * Whether a post field does not yet hold what a suggestion proposed for it.
+ * A term field's proposal can name terms that do not exist yet; accepting
+ * creates them and assigns their ids, so a term field is compared by the ids
+ * it proposed and by how many terms it proposed.
+ *
+ * @param op    A `post-attribute-set` operation.
+ * @param value The field's saved value.
+ * @return Whether the field still differs from the proposal.
+ */
+function isPostFieldStillProposed( op: any, value: unknown ): boolean {
+	if ( Array.isArray( op.after ) && Array.isArray( value ) ) {
+		return (
+			op.after.some(
+				( term: unknown ) =>
+					typeof term === 'number' && ! value.includes( term )
+			) || value.length < op.after.length
+		);
+	}
+	return ! isAttributeEqual( op.after ?? null, value );
+}
 
 /**
  * Plain visible text of a block, read from its first non-empty rich-text
@@ -81,11 +117,22 @@ function readBlockText(
 }
 
 /**
- * Read-only status constants — keep in sync with `_wp_suggestion_status`
- * enum declared in `block-comments.php`.
+ * How a suggestion note presents, from its status and whether the loaded
+ * content still carries the suggestion:
+ *
+ * - `pending`: awaiting a decision; Accept and Reject.
+ * - `pending-again`: decided in an editor that never saved the post, so the
+ *   suggestion is still there; Accept and Reject, with a hint.
+ * - `unsaved`: decided here, waiting for the post to be saved.
+ * - `stuck`: final, yet the post still carries the suggestion (left by an
+ *   editor from before decisions were saved with the post); Apply again,
+ *   Reject again and Reopen.
+ * - `resolved`: final, and the post reflects it.
+ * - `outdated`: someone else's save removed the suggestion before anyone
+ *   decided; Reopen.
  */
-const APPLIED = 'applied';
-const REJECTED = 'rejected';
+type SuggestionPresentation =
+	'pending' | 'pending-again' | 'unsaved' | 'stuck' | 'resolved' | 'outdated';
 
 /**
  * Shared accept/reject wiring for a note that carries a suggestion payload.
@@ -101,7 +148,7 @@ export function useSuggestionDecision( thread: any ) {
 		() => parseSuggestionPayload( thread?.meta?._wp_suggestion ),
 		[ thread?.meta?._wp_suggestion ]
 	);
-	const suggestionStatus = thread?.meta?._wp_suggestion_status;
+	const anchorPresent = useSuggestionAnchorPresent( thread );
 	const { applySuggestion, rejectSuggestion } = useSuggestionsProvider();
 	const [ busy, setBusy ] = useState( false );
 	const [ showStaleDialog, setShowStaleDialog ] = useState( false );
@@ -117,56 +164,104 @@ export function useSuggestionDecision( thread: any ) {
 		[ payload ]
 	);
 	const isPostSuggestion = postOps.length > 0;
-	const { blockExists, hasConflict } = useSelect(
-		( select ) => {
-			// A post-level suggestion targets the post itself, which always
-			// exists; its staleness is checked against the post's fields.
-			if ( isPostSuggestion ) {
-				// The post's own value, not a pending proposal laid over it:
-				// a reviewer who is suggesting sees proposals in the fields.
-				const { getPostFieldValueWithoutProposals } = unlock(
-					select( editorStore )
-				);
+	const decidedBy = Number( thread?.meta?._wp_suggestion_decided_by ) || 0;
+	const { blockExists, hasConflict, postFieldProposed, deciderName } =
+		useSelect(
+			( select ) => {
+				const core: any = select( coreStore );
+				const name = decidedBy
+					? core.getEntityRecord( 'root', 'user', decidedBy, {
+							context: 'view',
+						} )?.name
+					: undefined;
+				const deciderLabel =
+					decidedBy && decidedBy === core.getCurrentUser()?.id
+						? null
+						: name;
+				// A post-level suggestion targets the post itself, which
+				// always exists; its staleness is checked against the post's
+				// fields.
+				if ( isPostSuggestion ) {
+					// The post's own value, not a pending proposal laid over
+					// it: a reviewer who is suggesting sees proposals in the
+					// fields.
+					const { getPostFieldValueWithoutProposals } = unlock(
+						select( editorStore )
+					);
+					const valueOf = ( op: any ) =>
+						getPostFieldValueWithoutProposals(
+							op.attribute,
+							op.key
+						) ?? null;
+					return {
+						blockExists: true,
+						hasConflict: postOps.some(
+							( op: any ) =>
+								! isAttributeEqual(
+									op.before ?? null,
+									valueOf( op )
+								)
+						),
+						postFieldProposed: postOps.some( ( op: any ) =>
+							isPostFieldStillProposed( op, valueOf( op ) )
+						),
+						deciderName: deciderLabel,
+					};
+				}
+				const { getBlock, getBlockAttributes } =
+					select( blockEditorStore );
+				const currentAttributes = thread?.blockClientId
+					? getBlockAttributes( thread.blockClientId )
+					: null;
 				return {
-					blockExists: true,
-					hasConflict: postOps.some(
-						( op: any ) =>
-							! isAttributeEqual(
-								op.before ?? null,
-								getPostFieldValueWithoutProposals(
-									op.attribute,
-									op.key
-								) ?? null
-							)
-					),
+					blockExists: thread?.blockClientId
+						? !! getBlock( thread.blockClientId )
+						: false,
+					hasConflict:
+						!! payload &&
+						!! currentAttributes &&
+						hasAttributeConflict(
+							currentAttributes,
+							payload.operations
+						),
+					postFieldProposed: false,
+					deciderName: deciderLabel,
 				};
-			}
-			const { getBlock, getBlockAttributes } = select( blockEditorStore );
-			const currentAttributes = thread?.blockClientId
-				? getBlockAttributes( thread.blockClientId )
-				: null;
-			return {
-				blockExists: thread?.blockClientId
-					? !! getBlock( thread.blockClientId )
-					: false,
-				hasConflict:
-					!! payload &&
-					!! currentAttributes &&
-					hasAttributeConflict(
-						currentAttributes,
-						payload.operations
-					),
-			};
-		},
-		[ thread?.blockClientId, payload, isPostSuggestion, postOps ]
-	);
+			},
+			[
+				thread?.blockClientId,
+				payload,
+				isPostSuggestion,
+				postOps,
+				decidedBy,
+			]
+		);
 
 	if ( ! payload ) {
 		return null;
 	}
 
+	const suggestionStatus = getSuggestionStatus( thread );
+	const decision = getDecision( suggestionStatus );
+	/*
+	 * Whether the post still carries the suggestion, so a decision on it did
+	 * not reach the content. A post field only changes on accept; a rejected
+	 * one never leaves anything behind.
+	 */
+	const stillProposed = isPostSuggestion
+		? decision === APPLIED && postFieldProposed
+		: anchorPresent === true;
+	let presentation: SuggestionPresentation = 'pending';
+	if ( suggestionStatus === OUTDATED ) {
+		presentation = 'outdated';
+	} else if ( isProvisionalStatus( suggestionStatus ) ) {
+		presentation = stillProposed ? 'pending-again' : 'unsaved';
+	} else if ( ! isPendingStatus( suggestionStatus ) ) {
+		// Not while a decision is landing: its status is written first.
+		presentation = stillProposed && ! busy ? 'stuck' : 'resolved';
+	}
 	const isResolved =
-		suggestionStatus === APPLIED || suggestionStatus === REJECTED;
+		presentation !== 'pending' && presentation !== 'pending-again';
 
 	// A block-switcher transform (any `replaceBlocks`) is captured as a
 	// removal plus an insertion, stamped with a shared group id. Either
@@ -225,6 +320,10 @@ export function useSuggestionDecision( thread: any ) {
 	return {
 		payload,
 		suggestionStatus,
+		decision,
+		presentation,
+		deciderName,
+		anchorKind: describeAnchor( thread ),
 		isResolved,
 		isGrouped,
 		isPostSuggestion,
@@ -444,21 +543,77 @@ function ResolvedSuggestionSummary( {
 }
 
 /**
+ * Why an outdated suggestion no longer applies, by what held it.
+ *
+ * @param anchor Anchor descriptor of the note, if any.
+ * @return The label.
+ */
+function outdatedLabel( anchor: ReturnType< typeof describeAnchor > ) {
+	if ( anchor?.kind === 'structural' ) {
+		return anchor.pendingType === 'pending-attributes'
+			? __( 'No longer applies - the block changed.' )
+			: __( 'No longer applies - the block was removed.' );
+	}
+	return __( 'No longer applies - the text was removed.' );
+}
+
+/**
+ * The hint on a decision that was made but never saved with the post.
+ *
+ * @param decision    The decision.
+ * @param deciderName Who made it, `null` for the current user, or undefined
+ *                    while unknown.
+ * @return The hint.
+ */
+function notSavedHint(
+	decision: ReturnType< typeof getDecision >,
+	deciderName: string | null | undefined
+) {
+	if ( deciderName === null ) {
+		return decision === REJECTED
+			? __( 'You rejected this suggestion, but the post was not saved.' )
+			: __( 'You accepted this suggestion, but the post was not saved.' );
+	}
+	if ( deciderName && decision === REJECTED ) {
+		return sprintf(
+			// translators: %s: name of the user who rejected the suggestion.
+			__( '%s rejected this suggestion, but the post was not saved.' ),
+			deciderName
+		);
+	}
+	if ( deciderName ) {
+		return sprintf(
+			// translators: %s: name of the user who accepted the suggestion.
+			__( '%s accepted this suggestion, but the post was not saved.' ),
+			deciderName
+		);
+	}
+	return decision === REJECTED
+		? __( 'This suggestion was rejected, but the post was not saved.' )
+		: __( 'This suggestion was accepted, but the post was not saved.' );
+}
+
+/**
  * Body for a note that carries a suggestion payload: the compact
- * Add/Delete/Formatting summary and a resolved-state label if applicable.
+ * Add/Delete/Formatting summary and a status label if applicable.
  * Accept/Reject and the staleness dialog live in the header slot via
- * `SuggestionActionButtons` so the click and the dialog share state.
+ * `SuggestionActionButtons` so the click and the dialog share state. A note
+ * whose final decision never reached the post, or that is outdated, offers
+ * its way back here.
  *
  * @param props          Props.
  * @param props.thread   The note thread.
  * @param props.decision Controls from `useSuggestionDecision`.
+ * @param props.onReopen Puts the note back to awaiting a decision.
  */
 export default function SuggestionActions( {
 	thread,
 	decision,
+	onReopen,
 }: {
 	thread: any;
 	decision: SuggestionDecision | null;
+	onReopen?: () => void;
 } ) {
 	if ( ! decision ) {
 		return null;
@@ -466,11 +621,35 @@ export default function SuggestionActions( {
 
 	const {
 		payload,
-		suggestionStatus,
+		presentation,
 		isResolved,
 		isGrouped,
 		applyDisabledReason,
 	} = decision;
+	const decisionLabel =
+		decision.decision === REJECTED ? __( 'Rejected' ) : __( 'Applied' );
+
+	let status: string | null = null;
+	let hint: string | null = null;
+	if ( presentation === 'pending-again' ) {
+		hint = notSavedHint( decision.decision, decision.deciderName );
+	} else if ( presentation === 'unsaved' ) {
+		status = decisionLabel;
+		hint = __( 'Save the post to keep this decision.' );
+	} else if ( presentation === 'stuck' ) {
+		status =
+			decision.decision === REJECTED
+				? __( 'Rejected, but the suggestion is still in the post.' )
+				: __( 'Applied, but the change is not in the post.' );
+	} else if ( presentation === 'resolved' ) {
+		status = decisionLabel;
+	} else if ( presentation === 'outdated' ) {
+		status = outdatedLabel( decision.anchorKind );
+	}
+
+	const canReopen =
+		!! onReopen &&
+		( presentation === 'stuck' || presentation === 'outdated' );
 
 	return (
 		<Stack
@@ -492,14 +671,20 @@ export default function SuggestionActions( {
 					) }
 				</Text>
 			) }
-			{ isResolved && (
+			{ status && (
 				<Text
 					variant="body-sm"
 					className="editor-collab-sidebar-panel__suggestion-status"
 				>
-					{ suggestionStatus === APPLIED
-						? __( 'Applied' )
-						: __( 'Rejected' ) }
+					{ status }
+				</Text>
+			) }
+			{ hint && (
+				<Text
+					variant="body-sm"
+					className="editor-collab-sidebar-panel__suggestion-status"
+				>
+					{ hint }
 				</Text>
 			) }
 			{ ! isResolved && applyDisabledReason && (
@@ -509,6 +694,51 @@ export default function SuggestionActions( {
 				>
 					{ applyDisabledReason }
 				</Text>
+			) }
+			{ ( presentation === 'stuck' || canReopen ) && (
+				<Stack
+					direction="row"
+					gap="sm"
+					wrap="wrap"
+					onClick={ ( event ) => {
+						// Keep the click from toggling the thread.
+						event.stopPropagation();
+					} }
+				>
+					{ presentation === 'stuck' && (
+						<>
+							<Button
+								variant="secondary"
+								size="compact"
+								disabled={ decision.applyDisabled }
+								accessibleWhenDisabled
+								onClick={ decision.onApplyClick }
+							>
+								{ __( 'Apply again' ) }
+							</Button>
+							<Button
+								variant="secondary"
+								size="compact"
+								disabled={ decision.busy }
+								accessibleWhenDisabled
+								onClick={ decision.onReject }
+							>
+								{ __( 'Reject again' ) }
+							</Button>
+						</>
+					) }
+					{ canReopen && (
+						<Button
+							variant="tertiary"
+							size="compact"
+							disabled={ decision.busy }
+							accessibleWhenDisabled
+							onClick={ onReopen }
+						>
+							{ __( 'Reopen' ) }
+						</Button>
+					) }
+				</Stack>
 			) }
 		</Stack>
 	);
