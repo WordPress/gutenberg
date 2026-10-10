@@ -34,6 +34,7 @@ import { addFilter } from '@wordpress/hooks';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { VisuallyHidden } from '@wordpress/ui';
+import { RichTextData } from '@wordpress/rich-text';
 import { useSuggestionSessionActions } from './suggestion-session';
 import {
 	mergeProposedAttributes,
@@ -147,6 +148,30 @@ function SuggestingBlockEdit( {
 	// store.
 	const registry = useRegistry();
 
+	/*
+	 * Rich text applies a toggle to its own record before the block hears of
+	 * it, so a declined edit stays painted until the value changes. Hand it a
+	 * fresh copy of the unchanged content so it re-renders from props. The
+	 * copy is equal, so the interceptor sees no change, and it stays off the
+	 * undo stack.
+	 */
+	const repaintDeclined = useCallback(
+		( prevContent: any ) => {
+			if ( ! ( prevContent instanceof RichTextData ) ) {
+				return;
+			}
+			registry
+				.dispatch( blockEditorStore )
+				.__unstableMarkNextChangeAsNotPersistent?.();
+			setAttributes( {
+				content: RichTextData.fromHTMLString(
+					prevContent.toHTMLString()
+				),
+			} );
+		},
+		[ registry, setAttributes ]
+	);
+
 	// Track the latest attributes via a ref so the wrapped `setAttributes`
 	// callback stays stable across renders. `useRef` seeds it with the initial
 	// value, and this effect keeps it in sync after each commit so the callback
@@ -229,6 +254,7 @@ function SuggestingBlockEdit( {
 					reason: plan.reason!,
 					blocking: plan.blocking,
 				} );
+				repaintDeclined( prevContent );
 				return true;
 			}
 			if ( plan.kind !== 'format' ) {
@@ -245,7 +271,14 @@ function SuggestingBlockEdit( {
 				plan,
 			} );
 		},
-		[ clientId, name, authorId, requestFormatSuggestion, registry ]
+		[
+			clientId,
+			name,
+			authorId,
+			requestFormatSuggestion,
+			registry,
+			repaintDeclined,
+		]
 	);
 
 	// Detect a text edit that reaches the block as a whole new `content` value
@@ -298,6 +331,7 @@ function SuggestingBlockEdit( {
 				plan.refusal.reason !== 'own-marker'
 			) {
 				notifyEditRefused( registry, plan.refusal );
+				repaintDeclined( prevContent );
 				return true;
 			}
 			if ( actions.length === 0 ) {
@@ -325,7 +359,14 @@ function SuggestingBlockEdit( {
 				plan,
 			} );
 		},
-		[ clientId, name, authorId, requestContentSuggestion, registry ]
+		[
+			clientId,
+			name,
+			authorId,
+			requestContentSuggestion,
+			registry,
+			repaintDeclined,
+		]
 	);
 
 	const wrappedSetAttributes = useCallback(
