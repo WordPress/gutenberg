@@ -19,6 +19,8 @@ import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+import { EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { unescapeString } from '../../utils/terms';
 import MostUsedTerms from './most-used-terms';
 
@@ -99,11 +101,19 @@ export function FlatTermSelector( { slug } ) {
 			const { getEntityRecords, getEntityRecord, hasFinishedResolution } =
 				select( coreStore );
 			const post = getCurrentPost();
+			// `getEditorIntent` is private while Suggestion mode is experimental.
+			const isSuggesting =
+				unlock( select( editorStore ) ).getEditorIntent() ===
+				EDITOR_INTENT_SUGGEST;
 			const _taxonomy = getEntityRecord( 'root', 'taxonomy', slug );
 			const _termIds = _taxonomy
 				? getEditedPostAttribute( _taxonomy.rest_base )
 				: EMPTY_ARRAY;
+			// Creating a term is a real write to the taxonomy, which
+			// Suggestion mode cannot hold as a proposal: only existing terms
+			// can be suggested. See issue #73411.
 			const canCreate =
+				! isSuggesting &&
 				!! _taxonomy &&
 				!! post._links?.[ 'wp:action-create-' + _taxonomy.rest_base ];
 			const canAssign =

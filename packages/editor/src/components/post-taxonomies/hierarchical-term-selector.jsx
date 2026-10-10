@@ -26,6 +26,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { buildTermsTree } from '../../utils/terms';
 import { normalizeTextString } from '../../utils/normalize-text-string';
 import { store as editorStore } from '../../store';
+import { EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 
 const { RECEIVE_INTERMEDIATE_RESULTS } = unlock( coreDataPrivateApis );
@@ -229,13 +230,21 @@ export function HierarchicalTermSelector( { slug } ) {
 				select( coreStore );
 			const _taxonomy = getEntityRecord( 'root', 'taxonomy', slug );
 			const post = getCurrentPost();
+			// `getEditorIntent` is private while Suggestion mode is experimental.
+			const isSuggesting =
+				unlock( select( editorStore ) ).getEditorIntent() ===
+				EDITOR_INTENT_SUGGEST;
 
 			return {
-				hasCreateAction: _taxonomy
-					? !! post._links?.[
-							'wp:action-create-' + _taxonomy.rest_base
-						]
-					: false,
+				// Creating a term is a real write to the taxonomy, which
+				// Suggestion mode cannot hold as a proposal: only existing
+				// terms can be suggested. See issue #73411.
+				hasCreateAction:
+					_taxonomy && ! isSuggesting
+						? !! post._links?.[
+								'wp:action-create-' + _taxonomy.rest_base
+							]
+						: false,
 				hasAssignAction: _taxonomy
 					? !! post._links?.[
 							'wp:action-assign-' + _taxonomy.rest_base

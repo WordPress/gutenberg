@@ -768,6 +768,21 @@ export const getPostFieldValueWithoutProposals = createRegistrySelector(
  * @return {boolean} Whether the change can be proposed.
  */
 export const isProposablePostField = createRegistrySelector(
-	() => ( state, attribute ) =>
-		SUGGEST_PROPOSABLE_POST_FIELDS.includes( attribute )
+	( select ) => ( state, attribute ) => {
+		if ( SUGGEST_PROPOSABLE_POST_FIELDS.includes( attribute ) ) {
+			return true;
+		}
+		// The post type's taxonomies, by the `rest_base` their term ids are
+		// edited under. Proposing terms assigns existing ones; creating a
+		// term is a real write the term pickers do not offer while
+		// suggesting.
+		const postType = getCurrentPostType( state );
+		return !! select( coreStore )
+			.getTaxonomies( { per_page: -1 } )
+			?.some(
+				( taxonomy ) =>
+					taxonomy.rest_base === attribute &&
+					taxonomy.types?.includes( postType )
+			);
+	}
 );
