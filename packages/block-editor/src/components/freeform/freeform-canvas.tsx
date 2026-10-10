@@ -1,0 +1,1159 @@
+import clsx from 'clsx';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
+import { __, sprintf } from '@wordpress/i18n';
+import { ESCAPE } from '@wordpress/keycodes';
+import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import BlockPopoverCover from '../block-popover/cover';
+import { DEFAULT_CANVAS_HEIGHT, DESIGN_WIDTH } from './constants';
+import {
+	toDesignUnits,
+	toOverlayPx,
+	useCanvasGeometry,
+} from './use-canvas-geometry';
+import {
+	getBirthPlacement,
+	getRequiredCanvasHeight,
+	isPlaced,
+	readRects,
+} from './rects';
+import {
+	BASE_MESH,
+	constrainRect,
+	getDistanceLabels,
+	resolveDragPosition,
+	resolveResize,
+} from './snapping';
+import {
+	getCanvasConversion,
+	getRepairedRect,
+	measureSection,
+} from './conversion';
+import { getCanvasChild } from './canvas-child';
+import { getGrownCanvasLayout } from './canvases';
+import {
+	canDissolveIntoCanvas,
+	getLayoutSupport,
+	hasVisualStyling,
+	isAbsorbable,
+	planSectionFlatten,
+} from './flatten';
+
+/**
+ * How far the pointer has to travel before a press becomes a drag. Below this a
+ * press is a click, and a block whose grip was merely clicked must not move.
+ */
+const DRAG_THRESHOLD = 4;
+const TOUCH_DRAG_THRESHOLD = 10;
+
+/**
+ * The resize handles, in the order they are drawn.
+ */
+const HANDLES = [ 'nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w' ];
+
+function mergeChildLayout( style, layout ) {
+	return {
+		...style,
+		layout: { ...style?.layout, ...layout },
+	};
+}
+
+/**
+ * The editing surface for a freeform canvas: the outlines around what is
+ * selected, the handles that resize it, and the guides and measurements that
+ * say what the magnets are doing. Moving a block is not done from here — the
+ * block itself is its own drag handle.
+ *
+ * @param {Object}   props
+ * @param {string}   props.canvasClientId    The section acting as the canvas.
+ * @param {string[]} props.selectedClientIds The selected blocks within it.
+ * @param {boolean}  props.isCanvas          Whether the section has already
+ *                                           been converted to a canvas.
+ */
+export default function FreeformCanvas( {
+	canvasClientId,
+	selectedClientIds,
+	isCanvas,
+} ) {
+	const canvasElement = useBlockElement( canvasClientId );
+	const [ overlayElement, setOverlayElement ] = useState( null );
+	const geometry = useCanvasGeometry( canvasElement, overlayElement );
+
+	const enteredClientId = useSelect(
+		( select ) =>
+			unlock( select( blockEditorStore ) ).getFreeformEnteredBlock(),
+		[]
+	);
+
+	const { childClientIds, childStyles, canvasLayout } = useSelect(
+		( select ) => {
+			const { getBlockOrder, getBlockAttributes, getBlockStyles } =
+				unlock( select( blockEditorStore ) );
+			const order = getBlockOrder( canvasClientId );
+			return {
+				childClientIds: order,
+				childStyles: getBlockStyles( order ),
+				canvasLayout: getBlockAttributes( canvasClientId )?.layout,
+			};
+		},
+		[ canvasClientId ]
+	);
+
+	const registry = useRegistry();
+	const {
+		updateBlockAttributes,
+		moveBlocksToPosition,
+		removeBlocks,
+		duplicateBlocks,
+		__unstableMarkNextChangeAsNotPersistent,
+		__unstableMarkLastChangeAsPersistent,
+		setFreeformEnteredBlock,
+	} = unlock( useDispatch( blockEditorStore ) );
+
+	// Set the moment a section is converted, so the stylesheet below is correct
+	// immediately rather than after the store has made its way back through a
+	// render that, for a section with a selected child, never comes.
+	const [ converted, setConverted ] = useState( null );
+	const isLive = isCanvas || !! converted;
+
+	const canvasHeight =
+		canvasLayout?.canvasHeight ??
+		converted?.canvasHeight ??
+		DEFAULT_CANVAS_HEIGHT;
+
+	const rects = useMemo( () => {
+		if ( ! geometry ) {
+			return {};
+		}
+		return readRects( {
+			canvasElement,
+			childClientIds,
+			childStyles,
+			designToCanvasPx: geometry.designToCanvasPx,
+		} );
+	}, [ canvasElement, childClientIds, childStyles, geometry ] );
+
+	// A block inserted into the canvas has no coordinates yet, so without this
+	// every new block would stack at the origin. They are born at the content
+	// margin, below whatever is already there.
+	useEffect( () => {
+		// Before a section is a canvas every block in it is "unplaced", and
+		// placing them would throw away the layout the conversion preserves.
+		if ( ! isLive ) {
+			return;
+		}
+		const unplaced = childClientIds.filter(
+			( clientId ) => ! isPlaced( childStyles[ clientId ]?.layout )
+		);
+		if ( ! unplaced.length || ! Object.keys( rects ).length ) {
+			return;
+		}
+
+		const placedRects = childClientIds
+			.filter( ( clientId ) =>
+				isPlaced( childStyles[ clientId ]?.layout )
+			)
+			.map( ( clientId ) => rects[ clientId ] )
+			.filter( Boolean );
+
+		const updates = {};
+		const running = [ ...placedRects ];
+		for ( const clientId of unplaced ) {
+			const placement = getBirthPlacement( running );
+			updates[ clientId ] = {
+				style: mergeChildLayout( childStyles[ clientId ], placement ),
+			};
+			running.push( {
+				...placement,
+				height: rects[ clientId ]?.height ?? 0,
+			} );
+		}
+
+		__unstableMarkNextChangeAsNotPersistent();
+		updateBlockAttributes( Object.keys( updates ), updates, true );
+	}, [
+		isLive,
+		childClientIds,
+		childStyles,
+		rects,
+		updateBlockAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
+
+	// Everything a live gesture needs, kept out of state so that a pointermove
+	// does not re-render the whole canvas to read it back.
+	const gestureRef = useRef( null );
+	// A press waiting to become either a drag or a click.
+	const pendingRef = useRef( null );
+	// What the gesture is currently claiming, which is what gets drawn.
+	const [ feedback, setFeedback ] = useState( null );
+
+	// The block toolbar overlaps whatever is being moved, so the editor is told
+	// a gesture is live and gets it out of the way.
+	useEffect( () => {
+		const className = 'is-freeform-canvas-gesturing';
+		document.body.classList.toggle( className, !! feedback );
+		return () => document.body.classList.remove( className );
+	}, [ feedback ] );
+
+	// The canvas paints its own lattice, because it has to sit *under* the
+	// blocks: a tint and gutters drawn over the content would wash the text
+	// out. That puts it inside the editor's iframe rather than in this
+	// overlay, so the canvas element is told when a gesture is live.
+	useEffect( () => {
+		const className = 'is-freeform-gesturing';
+		if ( ! canvasElement ) {
+			return;
+		}
+		canvasElement.classList.toggle( className, !! feedback );
+		return () => canvasElement.classList.remove( className );
+	}, [ canvasElement, feedback ] );
+
+	// A gesture writes every frame, and the store already folds consecutive
+	// updates of the same attribute on the same blocks into one undo step, so
+	// these are plain persistent writes. Marking them not-persistent instead
+	// would merge the whole drag into whatever undo level came *before* it,
+	// and undoing would jump back past the drag to some earlier edit.
+	const writeLayouts = useCallback(
+		( updates ) => {
+			updateBlockAttributes( Object.keys( updates ), updates, true );
+		},
+		[ updateBlockAttributes ]
+	);
+
+	const growCanvasToFit = useCallback(
+		( movedRects ) => {
+			const everyRect = [
+				...Object.entries( rects )
+					.filter( ( [ clientId ] ) => ! movedRects[ clientId ] )
+					.map( ( [ , rect ] ) => rect ),
+				...Object.values( movedRects ),
+			];
+			const required = getRequiredCanvasHeight( everyRect, canvasHeight );
+			if ( required > canvasHeight ) {
+				__unstableMarkNextChangeAsNotPersistent();
+				updateBlockAttributes( canvasClientId, {
+					layout: getGrownCanvasLayout( canvasLayout, required ),
+				} );
+			}
+		},
+		[
+			rects,
+			canvasHeight,
+			canvasLayout,
+			canvasClientId,
+			updateBlockAttributes,
+			__unstableMarkNextChangeAsNotPersistent,
+		]
+	);
+
+	const endGesture = useCallback( () => {
+		const gesture = gestureRef.current;
+		gestureRef.current = null;
+		setFeedback( null );
+		if ( ! gesture || ! gesture.hasMoved ) {
+			return;
+		}
+
+		growCanvasToFit( gesture.lastRects );
+	}, [ growCanvasToFit ] );
+
+	const applyDrag = useCallback(
+		( event ) => {
+			const gesture = gestureRef.current;
+			if ( ! gesture || gesture.kind !== 'drag' ) {
+				return;
+			}
+
+			let deltaX = event.clientX - gesture.pointerX;
+			let deltaY = event.clientY - gesture.pointerY;
+
+			if (
+				! gesture.hasMoved &&
+				Math.abs( deltaX ) < DRAG_THRESHOLD &&
+				Math.abs( deltaY ) < DRAG_THRESHOLD
+			) {
+				return;
+			}
+			gesture.hasMoved = true;
+
+			// Shift locks the drag to whichever axis the hand has committed to.
+			let lockedAxis = null;
+			if ( event.shiftKey ) {
+				if ( Math.abs( deltaX ) > Math.abs( deltaY ) ) {
+					deltaY = 0;
+					lockedAxis = 'y';
+				} else {
+					deltaX = 0;
+					lockedAxis = 'x';
+				}
+			}
+
+			gesture.movedX ||= Math.abs( deltaX ) > DRAG_THRESHOLD;
+			gesture.movedY ||= Math.abs( deltaY ) > DRAG_THRESHOLD;
+
+			const unitsX = toDesignUnits( deltaX, gesture.geometry );
+			const unitsY = toDesignUnits( deltaY, gesture.geometry );
+
+			const leadRect = gesture.startRects[ gesture.leadClientId ];
+			const resolved = resolveDragPosition( {
+				rect: leadRect,
+				others: gesture.otherRects,
+				canvasHeight: gesture.canvasHeight,
+				rawX: leadRect.x + unitsX,
+				rawY: leadRect.y + unitsY,
+				movedX: gesture.movedX,
+				movedY: gesture.movedY,
+				lockedAxis,
+				freeform: event.metaKey || event.ctrlKey,
+				// The lattice is painted for the whole gesture, so its lines
+				// are honest magnets for the whole gesture.
+				lattice: true,
+			} );
+
+			// The whole selection travels by the same amount the lead block
+			// did, so a group keeps its own shape while snapping as one thing.
+			const shiftX = resolved.x - leadRect.x;
+			const shiftY = resolved.y - leadRect.y;
+
+			const updates = {};
+			const movedRects = {};
+			for ( const clientId of gesture.clientIds ) {
+				const startRect = gesture.startRects[ clientId ];
+				const moved = constrainRect( {
+					...startRect,
+					x: startRect.x + shiftX,
+					y: startRect.y + shiftY,
+				} );
+				movedRects[ clientId ] = moved;
+				updates[ clientId ] = {
+					style: mergeChildLayout( gesture.startStyles[ clientId ], {
+						x: moved.x,
+						y: moved.y,
+					} ),
+				};
+			}
+
+			gesture.lastUpdates = updates;
+			gesture.lastRects = movedRects;
+			writeLayouts( updates );
+
+			setFeedback( {
+				kind: 'drag',
+				guideX: resolved.guideX,
+				guideY: resolved.guideY,
+				// Measurements are power-user furniture: they appear while Alt
+				// is held, or when a spacing magnet is actually holding — never
+				// by default. Nothing on screen until something is true.
+				labels:
+					event.altKey ||
+					resolved.equalX ||
+					resolved.equalY ||
+					resolved.repeatX ||
+					resolved.repeatY ||
+					resolved.rhythmX ||
+					resolved.rhythmY
+						? getDistanceLabels( {
+								rect: movedRects[ gesture.leadClientId ],
+								others: gesture.otherRects,
+								canvasHeight: gesture.canvasHeight,
+								isEqualX:
+									resolved.equalX ||
+									!! resolved.repeatX ||
+									!! resolved.rhythmX,
+								isEqualY:
+									resolved.equalY ||
+									!! resolved.repeatY ||
+									!! resolved.rhythmY,
+								guideX: resolved.guideX,
+								guideY: resolved.guideY,
+							} )
+						: [],
+			} );
+		},
+		[ writeLayouts ]
+	);
+
+	const applyResize = useCallback(
+		( event ) => {
+			const gesture = gestureRef.current;
+			if ( ! gesture || gesture.kind !== 'resize' ) {
+				return;
+			}
+
+			const deltaX = event.clientX - gesture.pointerX;
+			const deltaY = event.clientY - gesture.pointerY;
+			if (
+				! gesture.hasMoved &&
+				Math.abs( deltaX ) < DRAG_THRESHOLD &&
+				Math.abs( deltaY ) < DRAG_THRESHOLD
+			) {
+				return;
+			}
+			gesture.hasMoved = true;
+
+			const resolved = resolveResize( {
+				rect: gesture.startRects[ gesture.leadClientId ],
+				direction: gesture.direction,
+				others: gesture.otherRects,
+				canvasHeight: gesture.canvasHeight,
+				deltaX: toDesignUnits( deltaX, gesture.geometry ),
+				deltaY: toDesignUnits( deltaY, gesture.geometry ),
+				freeform: event.metaKey || event.ctrlKey,
+				lattice: true,
+			} );
+
+			const updates = {
+				[ gesture.leadClientId ]: {
+					style: mergeChildLayout(
+						gesture.startStyles[ gesture.leadClientId ],
+						{
+							x: resolved.rect.x,
+							y: resolved.rect.y,
+							width: resolved.rect.width,
+							height: resolved.rect.height,
+						}
+					),
+				},
+			};
+
+			gesture.lastUpdates = updates;
+			gesture.lastRects = { [ gesture.leadClientId ]: resolved.rect };
+			writeLayouts( updates );
+
+			setFeedback( {
+				kind: 'resize',
+				guideX: resolved.guideX,
+				guideY: resolved.guideY,
+				sizeLabelX: resolved.sizeLabelX,
+				sizeLabelY: resolved.sizeLabelY,
+				rect: resolved.rect,
+				labels: [],
+			} );
+		},
+		[ writeLayouts ]
+	);
+
+	// Whether the canvas dissolves a block rather than placing it. Asked at
+	// event time rather than subscribed to, because it is only ever needed to
+	// answer where a press landed.
+	//
+	// A press has to resolve to a block that will still be there once the
+	// canvas has absorbed what it absorbs. Without this a press inside a
+	// column picked up the Columns, or the wrapper Group inside it — and the
+	// first drag then dissolved the very block being dragged, so the section
+	// converted and nothing moved.
+	const isAbsorbed = useCallback(
+		( clientId ) => {
+			if ( ! clientId ) {
+				return false;
+			}
+			const { getBlock, getBlockName, getBlockRootClientId } =
+				registry.select( blockEditorStore );
+			const root = getBlockRootClientId( clientId );
+			if ( ! root ) {
+				// A section is the canvas, never something it swallows.
+				return false;
+			}
+			const block = getBlock( clientId );
+			return (
+				!! block &&
+				isAbsorbable(
+					block,
+					{ name: getBlockName( root ) },
+					getLayoutSupport
+				)
+			);
+		},
+		[ registry ]
+	);
+
+	// The rect of what you can actually see inside each of these blocks, in
+	// design units. Shares the conversion's measuring so that both answer in
+	// the same space.
+	const measureVisibleRects = useCallback(
+		( clientIds ) => {
+			const measured =
+				canvasElement &&
+				measureSection( canvasElement, clientIds, () => true );
+			const conversion = measured && getCanvasConversion( measured );
+			if ( ! conversion ) {
+				return {};
+			}
+			const rectByClientId = {};
+			measured.clientIds.forEach( ( clientId, index ) => {
+				rectByClientId[ clientId ] = conversion.rects[ index ];
+			} );
+			return rectByClientId;
+		},
+		[ canvasElement ]
+	);
+
+	// Measures the section and freezes its current layout as coordinates, so a
+	// block can be picked up out of normal flow without the rest of the section
+	// collapsing onto the same spot. The rects are kept locally as well as
+	// written to the blocks: the stylesheet above uses them straight away.
+	//
+	// A section is one canvas, so this is also where a grid inside the grid is
+	// absorbed: the contents of any Columns in the section come out into the
+	// section itself, at the positions they already occupy, and the emptied
+	// Columns goes. Without that, a block in the second column could only ever
+	// be moved around the second column, which is not what a canvas means.
+	const convertSectionToCanvas = useCallback( () => {
+		const section = registry
+			.select( blockEditorStore )
+			.getBlock( canvasClientId );
+		const plan =
+			section && planSectionFlatten( section, canDissolveIntoCanvas );
+		const measured =
+			plan && canvasElement
+				? measureSection(
+						canvasElement,
+						plan.citizens,
+						( clientId ) =>
+							! hasVisualStyling(
+								registry
+									.select( blockEditorStore )
+									.getBlockAttributes( clientId )
+							)
+					)
+				: null;
+		const conversion = measured && getCanvasConversion( measured );
+		if ( ! conversion ) {
+			return null;
+		}
+
+		// Read every citizen's style from the store rather than from the
+		// section's current children: a block still sitting in a column is not
+		// one of those yet, and merging its rect into nothing would throw away
+		// whatever colour and spacing it already carries.
+		const citizenStyles = unlock(
+			registry.select( blockEditorStore )
+		).getBlockStyles( measured.clientIds );
+
+		const updates = {};
+		const convertedRects = {};
+		measured.clientIds.forEach( ( clientId, index ) => {
+			const rect = conversion.rects[ index ];
+			convertedRects[ clientId ] = rect;
+			updates[ clientId ] = {
+				style: mergeChildLayout( citizenStyles[ clientId ], rect ),
+			};
+		} );
+
+		setConverted( {
+			rects: convertedRects,
+			canvasHeight: conversion.canvasHeight,
+		} );
+
+		// The section becoming a canvas is the persistent change; everything
+		// after it is marked as not persistent so the whole conversion, grids
+		// absorbed and all, is a single thing to undo.
+		updateBlockAttributes( canvasClientId, {
+			layout: {
+				...canvasLayout,
+				type: 'freeform',
+				canvasHeight: conversion.canvasHeight,
+			},
+		} );
+
+		for ( const wrapper of plan.wrappers ) {
+			// Read afresh: dissolving the wrapper before it has shifted the
+			// ones after it along.
+			let index = registry
+				.select( blockEditorStore )
+				.getBlockIndex( wrapper.clientId );
+			for ( const move of wrapper.moves ) {
+				__unstableMarkNextChangeAsNotPersistent();
+				moveBlocksToPosition(
+					move.clientIds,
+					move.fromRootClientId,
+					canvasClientId,
+					index
+				);
+				index += move.clientIds.length;
+			}
+		}
+		if ( plan.wrappers.length ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			// Emptied, so this takes the columns with it. `false` keeps the
+			// selection where it is: the block being picked up is in it.
+			removeBlocks(
+				plan.wrappers.map( ( wrapper ) => wrapper.clientId ),
+				false
+			);
+		}
+
+		__unstableMarkNextChangeAsNotPersistent();
+		updateBlockAttributes( Object.keys( updates ), updates, true );
+
+		return { rects: convertedRects, canvasHeight: conversion.canvasHeight };
+	}, [
+		canvasElement,
+		canvasClientId,
+		canvasLayout,
+		registry,
+		updateBlockAttributes,
+		moveBlocksToPosition,
+		removeBlocks,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
+
+	const beginGesture = useCallback(
+		( event, { kind, clientIds, leadClientId, direction } ) => {
+			if ( ! geometry ) {
+				return;
+			}
+			event.preventDefault();
+			event.stopPropagation();
+			try {
+				event.target.setPointerCapture( event.pointerId );
+			} catch {
+				// Pointer capture is a nicety; the document listeners below
+				// still see the gesture through to its end without it.
+			}
+
+			// The first drag in a section is also what turns it into a canvas.
+			const conversion = isLive ? null : convertSectionToCanvas();
+			if ( ! isLive && ! conversion ) {
+				return;
+			}
+			const liveRects = conversion ? conversion.rects : rects;
+			const liveCanvasHeight = conversion
+				? conversion.canvasHeight
+				: canvasHeight;
+
+			// Close whatever undo level is open before the first frame writes.
+			// Without this, dragging the same block twice in a row looks to the
+			// store like one long run of same-attribute updates, and both drags
+			// collapse into a single undo step.
+			__unstableMarkLastChangeAsPersistent();
+
+			// Alt-drag leaves a copy behind and carries the original away, so a
+			// layout can be built by repetition without a trip to the toolbar.
+			// The copy is a faithful clone, coordinates included, so it lands
+			// exactly where the hand picked the original up and nothing has to
+			// be written to it. It is deliberately the original that travels:
+			// the selection then still points at the block under the pointer,
+			// and nothing here has to wait on the duplication to finish.
+			if ( kind === 'drag' && event.altKey ) {
+				duplicateBlocks( clientIds, false );
+			}
+
+			// A section converted before blocks were measured by their
+			// contents still holds them at the full width of the canvas, and
+			// such a block cannot move sideways at all. Picking one up is the
+			// moment to give it the size of the thing you can see. Only a
+			// move does this: a resize is the one gesture that is about the
+			// width, and silently changing it under the hand would fight the
+			// person doing it.
+			const visibleRects =
+				kind === 'drag' ? measureVisibleRects( clientIds ) : {};
+
+			const startRects = {};
+			const startStyles = {};
+			const repairs = {};
+			for ( const clientId of clientIds ) {
+				const stored = liveRects[ clientId ];
+				const repaired = getRepairedRect(
+					stored,
+					visibleRects[ clientId ],
+					DESIGN_WIDTH
+				);
+				startRects[ clientId ] = repaired;
+				if ( repaired !== stored ) {
+					repairs[ clientId ] = repaired;
+				}
+				startStyles[ clientId ] = mergeChildLayout(
+					childStyles[ clientId ],
+					repaired
+				);
+			}
+			// Write the new size straight away: the stylesheet places the
+			// block from the stored rect, so without this the block would be
+			// dragged by one width and drawn at another.
+			if ( Object.keys( repairs ).length ) {
+				writeLayouts(
+					Object.fromEntries(
+						Object.entries( repairs ).map(
+							( [ clientId, rect ] ) => [
+								clientId,
+								{
+									style: mergeChildLayout(
+										childStyles[ clientId ],
+										rect
+									),
+								},
+							]
+						)
+					)
+				);
+			}
+			const dragged = clientIds;
+
+			const draggedSet = new Set( dragged );
+			gestureRef.current = {
+				kind,
+				direction,
+				clientIds: dragged,
+				leadClientId: draggedSet.has( leadClientId )
+					? leadClientId
+					: dragged[ 0 ],
+				pointerX: event.clientX,
+				pointerY: event.clientY,
+				geometry,
+				canvasHeight: liveCanvasHeight,
+				startRects,
+				startStyles,
+				// Blocks travelling with the grabbed one must not act as
+				// magnets for it: they are part of the thing being moved.
+				otherRects: childClientIds
+					.filter(
+						( clientId ) =>
+							! draggedSet.has( clientId ) &&
+							liveRects[ clientId ]
+					)
+					.map( ( clientId ) => liveRects[ clientId ] ),
+				movedX: false,
+				movedY: false,
+				hasMoved: false,
+				lastUpdates: {},
+				lastRects: {},
+			};
+		},
+		[
+			geometry,
+			isLive,
+			convertSectionToCanvas,
+			canvasHeight,
+			childClientIds,
+			childStyles,
+			rects,
+			duplicateBlocks,
+			__unstableMarkLastChangeAsPersistent,
+		]
+	);
+
+	// The whole block is the drag handle, the way gogh does it. A press
+	// anywhere on a block starts a pending drag; a few pixels of travel
+	// promotes it to a real one, and a press that never moves is a click.
+	//
+	// Nothing is preventDefault-ed here, deliberately — gogh's comment says
+	// doing so stops the frame taking focus and breaks keyboard nudging and
+	// undo, and it also stops the editor selecting the block at all. It does
+	// not need to: a block on a canvas is not editable until it is entered, so
+	// the browser puts no caret in it and a drag across its words selects
+	// nothing.
+	useEffect( () => {
+		if ( ! canvasElement ) {
+			return;
+		}
+		const onPointerDown = ( event ) => {
+			if ( event.button !== 0 || gestureRef.current ) {
+				return;
+			}
+			const clientId = getCanvasChild(
+				event.target,
+				canvasElement,
+				isAbsorbed
+			);
+			// Already typing in this block: the caret and the selection are
+			// the browser's business.
+			if ( ! clientId || clientId === enteredClientId ) {
+				return;
+			}
+			pendingRef.current = {
+				clientId,
+				wasSelected: selectedClientIds.includes( clientId ),
+				x: event.clientX,
+				y: event.clientY,
+				pointerId: event.pointerId,
+				altKey: event.altKey,
+				target: event.target,
+			};
+		};
+		// The browser drags images and links off by itself, and that native
+		// drag swallows the pointer stream the instant it starts: the press
+		// arrives, `dragstart` fires, and no further move or release is ever
+		// seen, so the gesture never finishes and the block stays put. CSS says
+		// so too, but only Blink and WebKit listen to it.
+		//
+		// Scoped to a press that has already been taken for this canvas, so the
+		// editor's own block dragging — which starts from the toolbar, not from
+		// the block — is left alone.
+		const onDragStart = ( event ) => {
+			if ( pendingRef.current || gestureRef.current ) {
+				event.preventDefault();
+			}
+		};
+
+		canvasElement.addEventListener( 'pointerdown', onPointerDown );
+		canvasElement.addEventListener( 'dragstart', onDragStart );
+		return () => {
+			canvasElement.removeEventListener( 'pointerdown', onPointerDown );
+			canvasElement.removeEventListener( 'dragstart', onDragStart );
+		};
+	}, [ canvasElement, enteredClientId, selectedClientIds, isAbsorbed ] );
+
+	// The gesture is followed on the document so it survives the pointer
+	// leaving the block it started on.
+	useEffect( () => {
+		const onPointerMove = ( event ) => {
+			const pending = pendingRef.current;
+			if ( pending && ! gestureRef.current ) {
+				const threshold =
+					event.pointerType === 'touch'
+						? TOUCH_DRAG_THRESHOLD
+						: DRAG_THRESHOLD;
+				if (
+					Math.abs( event.clientX - pending.x ) +
+						Math.abs( event.clientY - pending.y ) >=
+					threshold
+				) {
+					pendingRef.current = null;
+					beginGesture(
+						{
+							clientX: pending.x,
+							clientY: pending.y,
+							altKey: pending.altKey,
+							pointerId: pending.pointerId,
+							target: pending.target,
+							preventDefault() {},
+							stopPropagation() {},
+						},
+						{
+							kind: 'drag',
+							clientIds: selectedClientIds.includes(
+								pending.clientId
+							)
+								? selectedClientIds
+								: [ pending.clientId ],
+							leadClientId: pending.clientId,
+						}
+					);
+				}
+				return;
+			}
+
+			const gesture = gestureRef.current;
+			if ( ! gesture ) {
+				return;
+			}
+			if ( gesture.kind === 'drag' ) {
+				applyDrag( event );
+			} else {
+				applyResize( event );
+			}
+		};
+		const onPointerUp = () => {
+			const pending = pendingRef.current;
+			pendingRef.current = null;
+			// A press that never moved, on a block that was already selected:
+			// that is the "let me edit the words" gesture, so the block is
+			// entered and becomes editable.
+			if ( pending && ! gestureRef.current ) {
+				if ( pending.wasSelected ) {
+					setFreeformEnteredBlock( pending.clientId );
+				}
+				return;
+			}
+			endGesture();
+		};
+		const onKeyDown = ( event ) => {
+			if ( gestureRef.current && event.keyCode === ESCAPE ) {
+				const gesture = gestureRef.current;
+				gestureRef.current = null;
+				setFeedback( null );
+				// Put everything back where it was found.
+				const reverted = {};
+				for ( const clientId of gesture.clientIds ) {
+					reverted[ clientId ] = {
+						style: gesture.startStyles[ clientId ],
+					};
+				}
+				writeLayouts( reverted );
+				event.preventDefault();
+			}
+		};
+
+		// Both documents. A gesture that starts on a block starts inside the
+		// editor's iframe, and those events never reach the document this
+		// overlay lives in; one that starts on a resize handle is the other way
+		// round. Listening to only one of them leaves a drag that can begin and
+		// never end.
+		const documents = new Set( [ document ] );
+		if ( canvasElement?.ownerDocument ) {
+			documents.add( canvasElement.ownerDocument );
+		}
+		for ( const doc of documents ) {
+			doc.addEventListener( 'pointermove', onPointerMove );
+			doc.addEventListener( 'pointerup', onPointerUp );
+			doc.addEventListener( 'pointercancel', onPointerUp );
+			doc.addEventListener( 'keydown', onKeyDown );
+		}
+		return () => {
+			for ( const doc of documents ) {
+				doc.removeEventListener( 'pointermove', onPointerMove );
+				doc.removeEventListener( 'pointerup', onPointerUp );
+				doc.removeEventListener( 'pointercancel', onPointerUp );
+				doc.removeEventListener( 'keydown', onKeyDown );
+			}
+		};
+	}, [
+		applyDrag,
+		applyResize,
+		beginGesture,
+		canvasElement,
+		endGesture,
+		selectedClientIds,
+		setFreeformEnteredBlock,
+		writeLayouts,
+	] );
+
+	const nudge = useCallback(
+		( event, clientIds ) => {
+			const steps = {
+				ArrowLeft: [ -1, 0 ],
+				ArrowRight: [ 1, 0 ],
+				ArrowUp: [ 0, -1 ],
+				ArrowDown: [ 0, 1 ],
+			};
+			const step = steps[ event.key ];
+			if ( ! step ) {
+				return;
+			}
+			event.preventDefault();
+			event.stopPropagation();
+
+			// A plain arrow moves by the mesh; Shift is the fine adjustment.
+			const distance = event.shiftKey ? 1 : BASE_MESH;
+			const updates = {};
+			const movedRects = {};
+			for ( const clientId of clientIds ) {
+				const rect = rects[ clientId ];
+				if ( ! rect ) {
+					continue;
+				}
+				const moved = constrainRect( {
+					...rect,
+					x: rect.x + step[ 0 ] * distance,
+					y: rect.y + step[ 1 ] * distance,
+				} );
+				movedRects[ clientId ] = moved;
+				updates[ clientId ] = {
+					style: mergeChildLayout( childStyles[ clientId ], {
+						x: moved.x,
+						y: moved.y,
+					} ),
+				};
+			}
+			if ( Object.keys( updates ).length ) {
+				writeLayouts( updates );
+				growCanvasToFit( movedRects );
+			}
+		},
+		[ rects, childStyles, writeLayouts, growCanvasToFit ]
+	);
+
+	if ( ! canvasElement ) {
+		return null;
+	}
+
+	const placedSelection = selectedClientIds.filter(
+		( clientId ) => rects[ clientId ]
+	);
+	const leadClientId = placedSelection[ 0 ];
+	const isGesturing = !! feedback;
+	// The surface carries the cursor for the whole gesture, so it has to know
+	// which one: a resize keeps its handle's directional cursor, not `move`.
+	const isDragging = feedback?.kind === 'drag';
+
+	return (
+		<BlockPopoverCover
+			className={ clsx( 'block-editor-freeform-canvas', {
+				'is-gesturing': isGesturing,
+				'is-dragging': isDragging,
+			} ) }
+			clientId={ canvasClientId }
+			__unstablePopoverSlot="__unstable-block-tools-after"
+		>
+			<div
+				ref={ setOverlayElement }
+				className="block-editor-freeform-canvas__surface"
+			>
+				{ geometry && (
+					<>
+						{ placedSelection.map( ( clientId ) => (
+							<FreeformItem
+								key={ clientId }
+								clientId={ clientId }
+								rect={ rects[ clientId ] }
+								geometry={ geometry }
+								isLead={ clientId === leadClientId }
+								showHandles={ placedSelection.length === 1 }
+								onHandlePointerDown={ ( event, direction ) =>
+									beginGesture( event, {
+										kind: 'resize',
+										clientIds: [ clientId ],
+										leadClientId: clientId,
+										direction,
+									} )
+								}
+								onKeyDown={ ( event ) =>
+									nudge( event, placedSelection )
+								}
+							/>
+						) ) }
+						{ feedback && (
+							<FreeformFeedback
+								feedback={ feedback }
+								geometry={ geometry }
+							/>
+						) }
+					</>
+				) }
+			</div>
+		</BlockPopoverCover>
+	);
+}
+
+function FreeformItem( {
+	rect,
+	geometry,
+	isLead,
+	showHandles,
+	onHandlePointerDown,
+	onKeyDown,
+} ) {
+	// The canvas keeps the design aspect ratio, so one design unit is the same
+	// number of pixels on both axes and a single conversion covers the lot.
+	const style = {
+		left: toOverlayPx( rect.x, geometry ),
+		top: toOverlayPx( rect.y, geometry ),
+		width: toOverlayPx( rect.width, geometry ),
+		height: toOverlayPx( rect.height, geometry ),
+	};
+
+	return (
+		<div
+			className={ clsx( 'block-editor-freeform-canvas__item', {
+				'is-lead': isLead,
+			} ) }
+			style={ style }
+			onKeyDown={ onKeyDown }
+			tabIndex={ -1 }
+			role="presentation"
+		>
+			{ showHandles &&
+				HANDLES.map( ( direction ) => (
+					<button
+						type="button"
+						key={ direction }
+						className={ `block-editor-freeform-canvas__handle is-${ direction }` }
+						onPointerDown={ ( event ) =>
+							onHandlePointerDown( event, direction )
+						}
+						aria-label={ sprintf(
+							// translators: %s: a resize direction, such as "north west".
+							__( 'Resize block (%s)' ),
+							RESIZE_HANDLE_LABELS[ direction ]
+						) }
+					/>
+				) ) }
+		</div>
+	);
+}
+
+const RESIZE_HANDLE_LABELS = {
+	n: __( 'top' ),
+	ne: __( 'top right' ),
+	e: __( 'right' ),
+	se: __( 'bottom right' ),
+	s: __( 'bottom' ),
+	sw: __( 'bottom left' ),
+	w: __( 'left' ),
+	nw: __( 'top left' ),
+};
+
+function FreeformFeedback( { feedback, geometry } ) {
+	const {
+		guideX,
+		guideY,
+		labels = [],
+		sizeLabelX,
+		sizeLabelY,
+		rect,
+	} = feedback;
+
+	return (
+		<>
+			{ guideX !== null && (
+				<div
+					className="block-editor-freeform-canvas__guide is-vertical"
+					style={ { left: toOverlayPx( guideX, geometry ) } }
+				/>
+			) }
+			{ guideY !== null && (
+				<div
+					className="block-editor-freeform-canvas__guide is-horizontal"
+					style={ { top: toOverlayPx( guideY, geometry ) } }
+				/>
+			) }
+			{ labels.map( ( label, index ) => (
+				<div
+					key={ index }
+					className={ clsx(
+						'block-editor-freeform-canvas__measure',
+						`is-${ label.axis }`,
+						{ 'is-equal': label.isEqual }
+					) }
+					style={
+						label.axis === 'horizontal'
+							? {
+									left: toOverlayPx( label.start, geometry ),
+									top: toOverlayPx( label.at, geometry ),
+									width: toOverlayPx(
+										label.distance,
+										geometry
+									),
+								}
+							: {
+									left: toOverlayPx( label.at, geometry ),
+									top: toOverlayPx( label.start, geometry ),
+									height: toOverlayPx(
+										label.distance,
+										geometry
+									),
+								}
+					}
+				>
+					<span>
+						{ label.isEqual ? '= ' : '' }
+						{ Math.round( label.distance ) }
+					</span>
+				</div>
+			) ) }
+			{ ( sizeLabelX || sizeLabelY ) && rect && (
+				<div
+					className="block-editor-freeform-canvas__size-match"
+					style={ {
+						left: toOverlayPx( rect.x + rect.width, geometry ),
+						top: toOverlayPx( rect.y + rect.height, geometry ),
+					} }
+				>
+					{ sizeLabelX === 'width'
+						? __( 'Same width' )
+						: __( 'Same height' ) }
+				</div>
+			) }
+		</>
+	);
+}

@@ -19,6 +19,8 @@ import {
 	getBlockRootClientId,
 	getBlockAttributes,
 } from './selectors';
+import { getLayoutSupport, isAbsorbable } from '../components/freeform/flatten';
+import { canHoldACanvas } from '../components/freeform/canvases';
 import {
 	checkAllowListRecursive,
 	getAllPatternsDependants,
@@ -1414,4 +1416,169 @@ export function isSelectedBlockStyleStateShownOnCanvas( state, clientId ) {
 	}
 
 	return state.selectedBlockStyleState.showStateOnCanvas ?? true;
+}
+
+/**
+ * Whether a block is on a freeform canvas and has not been entered for editing.
+ *
+ * A locked block is not editable, which is what lets the whole block be its own
+ * drag handle: pressing on its words starts a move instead of placing a caret,
+ * and dragging across them selects nothing because there is nothing selectable.
+ * Clicking a selected block a second time enters it and unlocks it.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId The block to check.
+ *
+ * @return {boolean} Whether the block is locked.
+ */
+export function isBlockFreeformLocked( state, clientId ) {
+	// Behind the experiment. Without this guard every Group in every post would
+	// need two clicks before you could type in it. Selectors run where there is
+	// no window, so this cannot read one blindly.
+	if (
+		typeof window === 'undefined' ||
+		! window.__experimentalEnableFreeformCanvas
+	) {
+		return false;
+	}
+
+	if ( state.freeformEnteredBlock === clientId ) {
+		return false;
+	}
+
+	// Walk up to the canvas the block is placed on, stepping over everything
+	// the canvas absorbs — the Columns, its columns, the bare wrapper Groups
+	// patterns leave behind. A block inside those is placed by the section, not
+	// by them: the first drag dissolves them into it.
+	//
+	// The walk never steps over a section, however plain it is: that is the
+	// canvas, rather than something the canvas swallows.
+	let rootClientId = state.blocks.parents.get( clientId );
+	while (
+		rootClientId &&
+		! isSection( state, rootClientId ) &&
+		( isAbsorbedByCanvas( state, rootClientId ) ||
+			arrangesItsChildren( state, rootClientId ) )
+	) {
+		rootClientId = state.blocks.parents.get( rootClientId );
+	}
+	if ( ! rootClientId || ! isSection( state, rootClientId ) ) {
+		// Nothing above it, or the walk stopped short of a section — on a
+		// block the canvas keeps, such as a card. A card travels as one piece,
+		// so the words inside it are not the canvas's to hold still and stay
+		// editable.
+		return false;
+	}
+
+	// A section that could be a canvas holds its blocks still from the start,
+	// not from its first drag. Waiting meant an untouched section looked like
+	// ordinary text and gave no sign it could be rearranged — no move cursor,
+	// and a caret where a drag was about to start.
+	//
+	// Normal editing has to stay normal where the canvas has no business: a
+	// content-only or disabled section, or one a template has locked down, is
+	// not the canvas's to arrange, and holding its text still would stop it
+	// being edited at all.
+	return (
+		canHoldACanvas( getLayoutSupport( nameOf( state, rootClientId ) ) ) &&
+		! getTemplateLock( state, rootClientId ) &&
+		getBlockEditingMode( state, rootClientId ) === 'default'
+	);
+}
+
+/**
+ * A block's name, straight off the state.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId A block's client id.
+ *
+ * @return {string|undefined} The block name.
+ */
+function nameOf( state, clientId ) {
+	return state.blocks.byClientId.get( clientId )?.name;
+}
+
+/**
+ * Whether a block is a section — one of the things a canvas can be.
+ *
+ * The editor says where sections live: they are the children of the section
+ * root, which is the main content of the template or post. In the site editor
+ * that is the Post Content block, so a page's sections sit two levels down
+ * while the top-level blocks are the template's parts and wrappers. Reading
+ * "top-level" as "section" there finds the template wrapper instead, and
+ * converting that would take the header and footer with it.
+ *
+ * With no section root — the post editor — a section is a top-level block.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId A block's client id.
+ *
+ * @return {boolean} Whether the block is a section.
+ */
+function isSection( state, clientId ) {
+	const sectionRootClientId = getSectionRootClientId( state );
+	const parentClientId = state.blocks.parents.get( clientId );
+	return sectionRootClientId
+		? parentClientId === sectionRootClientId
+		: ! parentClientId;
+}
+
+/**
+ * Whether a block exists to arrange its own children.
+ *
+ * Buttons, Gallery, Navigation and the paginations all say so with
+ * `allowSwitching: false`. The canvas places such a block whole and a press
+ * anywhere on it picks the whole thing up — so what is inside it is part of it,
+ * and is held still with it. Otherwise every pixel you could press would belong
+ * to a Button's label, the press would put a caret in that label, and no move
+ * would ever start.
+ *
+ * This is not the same as a Group with a background, which is a box holding
+ * ordinary blocks: those are edited as usual.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId A block's client id.
+ *
+ * @return {boolean} Whether its children are part of it.
+ */
+function arrangesItsChildren( state, clientId ) {
+	return (
+		getLayoutSupport( nameOf( state, clientId ) )?.allowSwitching === false
+	);
+}
+
+/**
+ * Whether the section's canvas dissolves a block rather than placing it.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId A block's client id.
+ *
+ * @return {boolean} Whether the canvas absorbs it.
+ */
+function isAbsorbedByCanvas( state, clientId ) {
+	const parentClientId = state.blocks.parents.get( clientId );
+	return isAbsorbable(
+		{
+			name: nameOf( state, clientId ),
+			attributes: state.blocks.attributes.get( clientId ),
+			innerBlocks: getBlockOrder( state, clientId ).map( ( id ) => ( {
+				name: nameOf( state, id ),
+			} ) ),
+		},
+		{
+			name: parentClientId ? nameOf( state, parentClientId ) : undefined,
+		},
+		getLayoutSupport
+	);
+}
+
+/**
+ * The block on a freeform canvas that has been entered for text editing.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {?string} The entered block's client id.
+ */
+export function getFreeformEnteredBlock( state ) {
+	return state.freeformEnteredBlock;
 }

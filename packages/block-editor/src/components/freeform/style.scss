@@ -1,0 +1,197 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+// The freeform canvas editing surface. It covers the canvas block exactly, so
+// everything inside is positioned in the canvas's own pixels.
+.block-editor-freeform-canvas {
+	// Doubled for specificity, the way the grid visualizer does it, because
+	// `.components-popover` and its content set pointer-events themselves and
+	// re-enable them on everything inside. Left alone, the surface covers the
+	// whole canvas and swallows every click, so no other block can be selected.
+	&.block-editor-freeform-canvas.block-editor-freeform-canvas {
+		.components-popover__content * {
+			pointer-events: none;
+		}
+
+		// Only the resize handles are interactive out here. Moving a block is
+		// done by pressing the block itself, which is in the canvas.
+		.block-editor-freeform-canvas__handle {
+			pointer-events: auto;
+		}
+
+		// While a gesture is live the surface does take the pointer, so a drag
+		// crossing another block does not select it on the way past.
+		&.is-gesturing .block-editor-freeform-canvas__surface {
+			pointer-events: auto;
+		}
+
+		// The surface is then the element under the pointer for the rest of the
+		// gesture, so it has to carry the cursor: without this the move cursor
+		// drops the moment the block starts travelling. Only for a move — a
+		// resize keeps the directional cursor of the handle it started from.
+		&.is-dragging .block-editor-freeform-canvas__surface {
+			cursor: move;
+		}
+	}
+}
+
+// The block toolbar sits directly over the block it belongs to, which is
+// exactly where a gesture's guides and measurements are. It has nothing to say
+// while a block is being moved, so it steps out of the way until the hand opens.
+body.is-freeform-canvas-gesturing .block-editor-block-contextual-toolbar {
+	visibility: hidden;
+}
+
+.block-editor-freeform-canvas__surface {
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+
+.block-editor-freeform-canvas__item {
+	position: absolute;
+	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+	&.is-lead {
+		z-index: 1;
+	}
+}
+
+.block-editor-freeform-canvas__handle {
+	position: absolute;
+	width: $grid-unit-15;
+	height: $grid-unit-15;
+	padding: 0;
+	border: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
+	border-radius: 50%;
+	background: #fff;
+	pointer-events: auto;
+
+	// Each handle straddles its own edge or corner.
+	&.is-n,
+	&.is-ne,
+	&.is-nw {
+		top: calc(#{$grid-unit-15} / -2);
+	}
+
+	&.is-s,
+	&.is-se,
+	&.is-sw {
+		bottom: calc(#{$grid-unit-15} / -2);
+	}
+
+	&.is-w,
+	&.is-nw,
+	&.is-sw {
+		left: calc(#{$grid-unit-15} / -2);
+	}
+
+	&.is-e,
+	&.is-ne,
+	&.is-se {
+		right: calc(#{$grid-unit-15} / -2);
+	}
+
+	&.is-n,
+	&.is-s {
+		left: 50%;
+		margin-left: calc(#{$grid-unit-15} / -2);
+		cursor: ns-resize;
+	}
+
+	&.is-e,
+	&.is-w {
+		top: 50%;
+		margin-top: calc(#{$grid-unit-15} / -2);
+		cursor: ew-resize;
+	}
+
+	&.is-nw,
+	&.is-se {
+		cursor: nwse-resize;
+	}
+
+	&.is-ne,
+	&.is-sw {
+		cursor: nesw-resize;
+	}
+}
+
+// The alignment guide: it exists only while a magnet is actually holding.
+.block-editor-freeform-canvas__guide {
+	position: absolute;
+	background: #f0b849;
+	pointer-events: none;
+
+	&.is-vertical {
+		top: 0;
+		bottom: 0;
+		width: 1px;
+	}
+
+	&.is-horizontal {
+		right: 0;
+		left: 0;
+		height: 1px;
+	}
+}
+
+// A measured gap, with its number.
+.block-editor-freeform-canvas__measure {
+	position: absolute;
+	pointer-events: none;
+
+	&::before {
+		content: "";
+		position: absolute;
+		background: var(--wp-admin-theme-color);
+	}
+
+	&.is-horizontal::before {
+		top: 0;
+		right: 0;
+		left: 0;
+		height: 1px;
+	}
+
+	&.is-vertical::before {
+		top: 0;
+		bottom: 0;
+		left: 0;
+		width: 1px;
+	}
+
+	span {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		padding: 0 4px;
+		border-radius: $radius-small;
+		background: var(--wp-admin-theme-color);
+		color: #fff;
+		font-size: 10px;
+		line-height: $grid-unit-20;
+		white-space: nowrap;
+		transform: translate(-50%, -50%);
+	}
+
+	&.is-equal span {
+		background: #f0b849;
+		color: #1e1e1e;
+	}
+}
+
+// "Same width" / "Same height": a size match is about the size, not about a
+// line on the canvas, so it says so in words instead of drawing a guide.
+.block-editor-freeform-canvas__size-match {
+	position: absolute;
+	padding: 2px 6px;
+	border-radius: $radius-small;
+	background: #f0b849;
+	color: #1e1e1e;
+	font-size: 10px;
+	line-height: $grid-unit-20;
+	white-space: nowrap;
+	pointer-events: none;
+	transform: translate(-100%, 4px);
+}

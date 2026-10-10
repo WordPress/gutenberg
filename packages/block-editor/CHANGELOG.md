@@ -18,6 +18,7 @@
 
 ### New Features
 
+-   Add a `freeform` layout type, behind the `gutenberg-freeform-canvas` experiment: a canvas whose children are positioned by dragging them anywhere inside it, with a lattice painted under the blocks while one is on the move, tiered alignment magnets and guides, equal-spacing and repeated-gap snapping, live distance measurements, same-width/same-height resize magnets, and Alt to duplicate, Shift to lock an axis and Cmd/Ctrl to drag free of every magnet. No block has to be inserted to use it: dragging anything inside a section converts that section to a canvas in place, at the layout it already had, so nothing moves at the moment of conversion. A section stays an ordinary Group throughout — there is no freeform block to insert. The canvas positions itself and its blocks through a stylesheet of its own rather than through block rendering, because the editor does not re-render a section whose child is selected — which is exactly when a drag happens. On a canvas the block toolbar's drag handle is hidden, because dragging there means placing a block rather than reordering it.
 -   Add `useBackgroundProps` and `getBackgroundClassesAndStyles`, and honour `background.__experimentalSkipSerialization` in the editor ([#83943](https://github.com/WordPress/gutenberg/pull/83943)).
 
 ### Enhancements

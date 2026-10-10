@@ -617,3 +617,18 @@ export function setResponsiveEditing( enabled ) {
 		enabled,
 	};
 }
+
+/**
+ * Enters a block on a freeform canvas for text editing, or leaves the one you
+ * were in when passed null.
+ *
+ * @param {?string} clientId The block to enter.
+ *
+ * @return {Object} Action object.
+ */
+export function setFreeformEnteredBlock( clientId ) {
+	return {
+		type: 'SET_FREEFORM_ENTERED_BLOCK',
+		clientId: clientId ?? null,
+	};
+}

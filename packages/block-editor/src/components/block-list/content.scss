@@ -440,3 +440,83 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		}
 	}
 }
+
+// The freeform canvas lattice: 24 columns with gutters between them inside the
+// content margins, rows of 24 with a gutter of 12 running from the top, and
+// hairlines on the two margins and the centre. Nothing is painted in the side
+// margins — the content column is the thing being laid out.
+//
+// It lives here, in the canvas's own stylesheet, rather than in the editing
+// overlay, because it has to sit *under* the blocks: a tint and gutters drawn
+// over the content would wash the text out. Lengths are in `cqw` so one design
+// unit is the same distance on both axes whatever the canvas is rendered at —
+// 1cqw is 12 design units of the 1200-unit design space. Keep these in step
+// with `LATTICE` in `components/freeform/snapping.js`, which is what makes the
+// drawn lines snap.
+.is-layout-freeform,
+.is-freeform-gesturing {
+	container-type: inline-size;
+
+	$lattice-cell: rgba(var(--wp-admin-theme-color--rgb), 0.07);
+	$lattice-gutter: rgba(255, 255, 255, 0.55);
+	$lattice-line: rgba(var(--wp-admin-theme-color--rgb), 0.4);
+
+	&::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		z-index: 0;
+		pointer-events: none;
+		opacity: 0;
+		transition: opacity 0.18s ease;
+		// Three layers, topmost first, because that is the order CSS paints them
+		// in: hairlines on the two margins and the centre, the lines people aim
+		// for most; then the row gutters, 24 units on and 12 off measured from
+		// the canvas top so the content margin is itself a row start; then the
+		// columns, a tinted cell 32.5 units wide and a 12-unit gutter. The rows
+		// have to sit above the columns: they read as gutters cut through the
+		// column tint, and underneath it they would not show at all.
+		background-image:
+			linear-gradient(90deg, transparent calc(6cqw - 1px), #{$lattice-line} calc(6cqw - 1px), #{$lattice-line} 6cqw, transparent 6cqw, transparent calc(50cqw - 1px), #{$lattice-line} calc(50cqw - 1px), #{$lattice-line} 50cqw, transparent 50cqw, transparent 94cqw, #{$lattice-line} 94cqw, #{$lattice-line} calc(94cqw + 1px), transparent calc(94cqw + 1px)),
+			repeating-linear-gradient(180deg, transparent 0, transparent 2cqw, #{$lattice-gutter} 2cqw, #{$lattice-gutter} 3cqw),
+			repeating-linear-gradient(90deg, #{$lattice-cell} 0, #{$lattice-cell} 2.70833cqw, transparent 2.70833cqw, transparent 3.70833cqw);
+		background-repeat: no-repeat;
+		background-position: 0 0, 6cqw 0, 6cqw 0;
+		background-size: 100% 100%, 88cqw 100%, 88cqw 100%;
+	}
+
+	// Shown while something is on the move, so the lines are there exactly when
+	// an edge can land on one.
+	&.is-freeform-gesturing::before {
+		opacity: 1;
+	}
+
+	// The layout style already says `position: absolute` for these, but in the
+	// editor it loses: `.block-editor-block-list__layout
+	// .block-editor-block-list__block` sets `position: relative` at 0-2-0, and
+	// the layout's `.wp-container-… > :is(*, div)` is only 0-1-1. Left alone,
+	// blocks stay in flow and their coordinates read as a nudge from where they
+	// already were. Doubling up on the group's own two classes gets to 0-2-1,
+	// which is the lowest thing that wins. The front end never needed this —
+	// the rule it loses to is the editor's.
+	&.block-editor-block-list__layout > :is(*, div) {
+		position: absolute;
+		// Above the lattice.
+		z-index: 1;
+	}
+}
+
+// A block on a canvas is its own drag handle, so it shows the move cursor and
+// must not look like text you can sweep over. Both of those are said in the
+// canvas's own stylesheet rather than here — see `freeform/override-css.js` —
+// because a section that has just become a canvas has not re-rendered, so its
+// element does not carry `is-layout-freeform` and a rule written here would
+// wait for a reload to take effect.
+//
+// This is the companion to it: wherever text really is editable, it is
+// selectable. Suppressing selection on a block that is moved as one piece
+// inherits into everything inside it, and a Group kept whole on a canvas still
+// has words in it that can be typed into.
+.block-editor-block-list__block[contenteditable="true"] {
+	user-select: text;
+}
