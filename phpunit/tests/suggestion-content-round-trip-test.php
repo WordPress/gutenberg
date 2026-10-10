@@ -23,6 +23,14 @@ class Tests_Suggestion_Content_Round_Trip extends WP_UnitTestCase {
 		return str_replace( array( '%1', '%2', '%3' ), array_map( 'strval', $this->ids ), $fixture );
 	}
 
+	private function originals( $originals ) {
+		$filled = array();
+		foreach ( $originals as $placeholder => $html ) {
+			$filled[ (int) $this->fill( $placeholder ) ] = $html;
+		}
+		return $filled;
+	}
+
 	private function notes() {
 		return array_fill_keys( $this->ids, true );
 	}
@@ -30,12 +38,15 @@ class Tests_Suggestion_Content_Round_Trip extends WP_UnitTestCase {
 	/**
 	 * @dataProvider data_fixtures
 	 *
-	 * @param string   $fixture  Editor content.
-	 * @param string[] $proposed Words only a proposal holds.
+	 * @param string   $fixture   Editor content.
+	 * @param string[] $proposed  Words only a proposal holds.
+	 * @param string[] $originals Original run of a formatting suggestion, by
+	 *                            placeholder (`%1`).
 	 */
-	public function test_round_trip( $fixture, $proposed ) {
+	public function test_round_trip( $fixture, $proposed, $originals = array() ) {
 		$content   = $this->fill( $fixture );
-		$extracted = Gutenberg_Suggestion_Content::extract( $content, $this->notes() );
+		$originals = $this->originals( $originals );
+		$extracted = Gutenberg_Suggestion_Content::extract( $content, $this->notes(), array(), $originals );
 
 		// I1: inflating the extracted content gives the editor's bytes back.
 		$this->assertSame( $content, Gutenberg_Suggestion_Content::inflate( $extracted['content'], $extracted['items'] ) );
@@ -46,13 +57,13 @@ class Tests_Suggestion_Content_Round_Trip extends WP_UnitTestCase {
 		}
 
 		// I3: extraction is idempotent and keeps no new items.
-		$again = Gutenberg_Suggestion_Content::extract( $extracted['content'], $this->notes() );
+		$again = Gutenberg_Suggestion_Content::extract( $extracted['content'], $this->notes(), array(), $originals );
 		$this->assertSame( $extracted['content'], $again['content'] );
 		$this->assertSame( array(), $again['items'] );
 
 		// Extracting the re-inflated content anchors it the same way.
 		$inflated = Gutenberg_Suggestion_Content::inflate( $extracted['content'], $extracted['items'] );
-		$this->assertSame( $extracted['content'], Gutenberg_Suggestion_Content::extract( $inflated, $this->notes() )['content'] );
+		$this->assertSame( $extracted['content'], Gutenberg_Suggestion_Content::extract( $inflated, $this->notes(), array(), $originals )['content'] );
 
 		// Every item's anchor is in the content, once.
 		foreach ( $extracted['items'] as $items ) {
@@ -199,11 +210,52 @@ class Tests_Suggestion_Content_Round_Trip extends WP_UnitTestCase {
 				"<!-- wp:heading {\"metadata\":{\"suggestion\":{\"type\":\"pending-insert\",\"after\":{\"level\":5},\"commentId\":%1}}} -->\n<h2 class=\"wp-block-heading\">Inserted heading</h2>\n<!-- /wp:heading -->",
 				array( '"level":5', 'Inserted heading' ),
 			),
+			'bold proposed on a run'                      => array(
+				$paragraph( 'Hello ' . $mark( '%1', 'format', '<strong>world</strong>' ) ),
+				array( '<strong>' ),
+				array( '%1' => 'world' ),
+			),
+			'italic and a link proposed'                  => array(
+				$paragraph( 'a ' . $mark( '%1', 'format', '<em><a href="https://example.com/proposed">run</a></em>' ) . ' b' ),
+				array( '<em>', 'example.com/proposed' ),
+				array( '%1' => 'run' ),
+			),
+			'bold proposed off a run'                     => array(
+				$paragraph( 'a ' . $mark( '%1', 'format', 'plain' ) . ' b' ),
+				array(),
+				array( '%1' => '<strong>plain</strong>' ),
+			),
+			'formatting inside an addition'               => array(
+				$paragraph( $mark( '%1', 'add', 'new ' . $mark( '%2', 'format', '<strong>bold</strong>' ) ) ),
+				array( 'new', 'bold' ),
+				array( '%2' => 'bold' ),
+			),
 			'everything together'                         => array(
 				$paragraph( 'Lead ' . $mark( '%2', 'add', 'mixed' ) ) . "\n\n<!-- wp:heading {\"metadata\":{\"suggestion\":{\"type\":\"pending-attributes\",\"after\":{\"level\":3},\"commentId\":%3}}} -->\n<h2 class=\"wp-block-heading\">H</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph {\"metadata\":{\"suggestion\":{\"type\":\"pending-insert\",\"commentId\":%1}}} -->\n<p>Inserted</p>\n<!-- /wp:paragraph -->",
 				array( 'mixed', '"level":3', 'Inserted' ),
 			),
 		);
+	}
+
+	public function test_a_stale_formatting_original_stays_in_full_form() {
+		$content = $this->fill( "<!-- wp:paragraph -->\n<p>Hello <mark data-suggestion-id=\"%1\" data-suggestion-type=\"format\" class=\"wp-suggestion-format\"><strong>world</strong></mark></p>\n<!-- /wp:paragraph -->" );
+
+		$stale  = Gutenberg_Suggestion_Content::extract( $content, $this->notes(), array(), array( 101 => 'other text' ) );
+		$nested = Gutenberg_Suggestion_Content::extract(
+			$this->fill( '<p><mark data-suggestion-id="%1" data-suggestion-type="format" class="wp-suggestion-format"><strong>a<mark data-suggestion-id="%2" data-suggestion-type="del" class="wp-suggestion-del">b</mark></strong></mark></p>' ),
+			$this->notes(),
+			array(),
+			array( 101 => 'ab' )
+		);
+
+		$this->assertSame( $content, $stale['content'] );
+		$this->assertSame( array(), $nested['items'] );
+	}
+
+	public function test_the_render_strip_unwraps_a_formatting_anchor() {
+		$html = '<p>Hello <mark data-suggestion-run="0" data-suggestion-id="101" data-suggestion-type="format" class="wp-suggestion-format">world</mark></p>';
+
+		$this->assertSame( '<p>Hello world</p>', gutenberg_strip_inline_suggestion_markers( $html ) );
 	}
 
 	public function test_unclosed_marker_is_left_byte_for_byte() {

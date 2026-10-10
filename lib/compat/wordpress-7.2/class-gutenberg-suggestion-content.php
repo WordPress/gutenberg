@@ -22,13 +22,15 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 	 * | Inline addition                  | the same `<mark>` with `data-suggestion-run="k"`, emptied   | `inline`    |
 	 * | Suggested block (pending-insert) | `<!-- wp:suggestion-placeholder {"id":N,"type":"pending-insert","run":k} /-->` | `block` |
 	 * | Proposed attributes (`after`)    | the block opener with `after` replaced by `"run":k`         | `after`     |
-	 *
+ * | Formatting change                | the same `<mark>` with `data-suggestion-run="k"` around the original run | `inline` |
+		 *
 	 * `k` numbers the anchors of one note, so every anchor is unique and an
 	 * anchor form is told apart from a full marker without a lookup. Each item
 	 * keeps the exact anchor it left and the exact original bytes. Inflating an
 	 * anchor whose item is missing, or whose bytes changed since, fails closed:
-	 * an addition and a suggested block come back as nothing, and an attribute
-	 * proposal is merged back into the changed opener.
+	 * an addition and a suggested block come back as nothing, a formatting
+	 * change comes back as the original run, and an attribute proposal is
+	 * merged back into the changed opener.
 	 *
 	 * Order matters, and inflation runs it backwards: block-level extraction
 	 * first (a suggested block takes everything inside it, inline markers
@@ -60,11 +62,20 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 		 *
 		 * @param string             $content Serialized content, as kses left it.
 		 * @param array<int, true>   $notes   Suggestion note ids of the post.
-		 * @param array<int, true>   $exclude Note ids whose markers to leave in full form.
+		 * A formatting change is only moved out when its note recorded the
+		 * original run (`$originals`, the payload's `beforeHTML`), that run has
+		 * the same text as the marked one, and no other marker sits inside it.
+		 * Otherwise it stays in full form and the render strip swaps in the
+		 * original, so a stale original can never publish the wrong text.
+		 *
+		 * @param string                $content   Serialized content, as kses left it.
+		 * @param array<int, true>      $notes     Suggestion note ids of the post.
+		 * @param array<int, true>      $exclude   Note ids whose markers to leave in full form.
+		 * @param array<int, string>    $originals Original run of each formatting suggestion.
 		 * @return array{content: string, items: array<int, array[]>} The
 		 *         anchored content and, per note, the extracted items.
 		 */
-		public static function extract( $content, $notes, $exclude = array() ) {
+		public static function extract( $content, $notes, $exclude = array(), $originals = array() ) {
 			$result = array(
 				'content' => $content,
 				'items'   => array(),
@@ -84,7 +95,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 			};
 
 			$content = self::extract_blocks( $content, $notes, $exclude, $next_run, $result['items'] );
-			$content = self::extract_inline( $content, $notes, $exclude, $next_run, $result['items'] );
+			$content = self::extract_inline( $content, $notes, $exclude, $originals, $next_run, $result['items'] );
 
 			$result['content'] = $content;
 			return $result;
@@ -333,16 +344,17 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 		}
 
 		/**
-		 * Inline extraction: additions.
+		 * Inline extraction: additions and formatting changes.
 		 *
-		 * @param string             $content  Content.
-		 * @param array<int, true>   $notes    Suggestion note ids of the post.
-		 * @param array<int, true>   $exclude  Note ids to leave in full form.
-		 * @param callable           $next_run Run allocator.
+		 * @param string             $content   Content.
+		 * @param array<int, true>   $notes     Suggestion note ids of the post.
+		 * @param array<int, true>   $exclude   Note ids to leave in full form.
+		 * @param array<int, string> $originals Original run of each formatting suggestion.
+		 * @param callable           $next_run  Run allocator.
 		 * @param array<int, array[]> $items   Items per note id, added to.
 		 * @return string Content.
 		 */
-		private static function extract_inline( $content, $notes, $exclude, $next_run, &$items ) {
+		private static function extract_inline( $content, $notes, $exclude, $originals, $next_run, &$items ) {
 			if ( false === strpos( $content, 'wp-suggestion-' ) ) {
 				return $content;
 			}
@@ -358,12 +370,25 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 				if ( $marker['start'] < $covered ) {
 					continue;
 				}
-				if ( $marker['legacy'] || null !== $marker['run'] || ! $marker['balanced'] || 'add' !== $marker['kind'] ) {
+				if ( $marker['legacy'] || null !== $marker['run'] || ! $marker['balanced'] || 'del' === $marker['kind'] ) {
 					continue;
 				}
 				$note_id = $marker['id'];
 				if ( isset( $exclude[ $note_id ] ) ) {
 					continue;
+				}
+				$inner = '';
+				if ( 'format' === $marker['kind'] ) {
+					$inner_start = $marker['start'] + $marker['length'];
+					if (
+						! isset( $notes[ $note_id ], $originals[ $note_id ] ) ||
+						! is_string( $originals[ $note_id ] ) ||
+						$marker['inner_markers'] > 0 ||
+						self::text_of( $originals[ $note_id ] ) !== self::text_of( substr( $content, $inner_start, $marker['closer'][0] - $inner_start ) )
+					) {
+						continue;
+					}
+					$inner = $originals[ $note_id ];
 				}
 				$covered = $marker['end'];
 				if ( ! isset( $notes[ $note_id ] ) ) {
@@ -372,6 +397,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 				}
 				$run    = $next_run( $note_id );
 				$anchor = self::anchor_opener( substr( $content, $marker['start'], $marker['length'] ), $run )
+					. $inner
 					. substr( $content, $marker['closer'][0], $marker['closer'][1] );
 
 				$edits[]             = array( $marker['start'], $marker['end'], $anchor );
@@ -481,6 +507,10 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 				if ( 'add' === $marker['kind'] ) {
 					// Fail closed: an anchor nobody can vouch for proposes nothing.
 					$edits[] = array( $marker['start'], $marker['end'], '' );
+				} elseif ( 'format' === $marker['kind'] ) {
+					// Fail closed: keep the original run the anchor holds.
+					$edits[] = array( $marker['start'], $marker['start'] + $marker['length'], '' );
+					$edits[] = array( $marker['closer'][0], $marker['closer'][0] + $marker['closer'][1], '' );
 				}
 			}
 
@@ -506,6 +536,23 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 				}
 			}
 			return 0;
+		}
+
+		/**
+		 * The text of an HTML fragment, entities decoded.
+		 *
+		 * @param string $html HTML.
+		 * @return string Text.
+		 */
+		private static function text_of( $html ) {
+			$processor = new WP_HTML_Tag_Processor( $html );
+			$text      = '';
+			while ( $processor->next_token() ) {
+				if ( '#text' === $processor->get_token_type() ) {
+					$text .= $processor->get_modifiable_text();
+				}
+			}
+			return $text;
 		}
 
 		/**

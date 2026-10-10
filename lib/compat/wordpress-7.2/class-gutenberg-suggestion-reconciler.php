@@ -123,7 +123,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 					return $data;
 				}
 				$state     = self::stored_state( $parent_id );
-				$extracted = self::extract( $incoming, $state['notes'] );
+				$extracted = self::extract( $incoming, $state['notes'], $state['originals'] );
 
 				self::$revisions[ $parent_id ][] = self::merge_items( $state['items'], $extracted['items'] );
 				$data['post_content']            = wp_slash( $extracted['content'] );
@@ -140,7 +140,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 			}
 
 			$state     = self::stored_state( $post_id );
-			$extracted = self::extract( $incoming, $state['notes'] );
+			$extracted = self::extract( $incoming, $state['notes'], $state['originals'] );
 
 			self::$previous[ $post_id ][] = array(
 				'previous'      => $previous,
@@ -451,14 +451,15 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 * Extracts proposals, leaving any note whose proposals would exceed the
 		 * size limit in full form.
 		 *
-		 * @param string           $content Content.
-		 * @param array<int, true> $notes   Suggestion notes of the post.
+		 * @param string             $content   Content.
+		 * @param array<int, true>   $notes     Suggestion notes of the post.
+		 * @param array<int, string> $originals Original run of each formatting suggestion.
 		 * @return array{content: string, items: array<int, array[]>, skipped: array<int, true>}
 		 */
-		private static function extract( $content, $notes ) {
+		private static function extract( $content, $notes, $originals ) {
 			$exclude = array();
 			while ( true ) {
-				$result = Gutenberg_Suggestion_Content::extract( $content, $notes, $exclude );
+				$result = Gutenberg_Suggestion_Content::extract( $content, $notes, $exclude, $originals );
 				$over   = array();
 				foreach ( $result['items'] as $note_id => $items ) {
 					if ( strlen( Gutenberg_Suggestion_Content::encode( $items ) ) > GUTENBERG_SUGGESTION_CONTENT_MAX_BYTES ) {
@@ -479,21 +480,47 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 * outer write's proposals as stored).
 		 *
 		 * @param int $post_id Post ID.
-		 * @return array{notes: array<int, string>, items: array<int, array[]>}
+		 * @return array{notes: array<int, string>, items: array<int, array[]>, originals: array<int, string>}
 		 */
 		private static function stored_state( $post_id ) {
-			$notes = self::suggestion_notes( $post_id );
+			$notes     = self::suggestion_notes( $post_id );
+			$originals = array();
+			foreach ( array_keys( $notes ) as $note_id ) {
+				$original = self::format_original( $note_id );
+				if ( null !== $original ) {
+					$originals[ $note_id ] = $original;
+				}
+			}
 			if ( ! empty( self::$previous[ $post_id ] ) ) {
 				$pending = end( self::$previous[ $post_id ] );
-				return array(
-					'notes' => $notes,
-					'items' => $pending['candidates'],
-				);
+				$items   = $pending['candidates'];
+			} else {
+				$items = self::load_items( $notes );
 			}
 			return array(
-				'notes' => $notes,
-				'items' => self::load_items( $notes ),
+				'notes'     => $notes,
+				'items'     => $items,
+				'originals' => $originals,
 			);
+		}
+
+		/**
+		 * The original run a formatting suggestion recorded (`beforeHTML`).
+		 *
+		 * @param int $note_id Note ID.
+		 * @return string|null The run, or null for any other suggestion.
+		 */
+		private static function format_original( $note_id ) {
+			$payload = json_decode( (string) get_comment_meta( $note_id, '_wp_suggestion', true ), true );
+			if ( ! is_array( $payload ) || ! isset( $payload['operations'] ) || ! is_array( $payload['operations'] ) ) {
+				return null;
+			}
+			foreach ( $payload['operations'] as $operation ) {
+				if ( is_array( $operation ) && isset( $operation['suggestionType'], $operation['beforeHTML'] ) && 'format' === $operation['suggestionType'] && is_string( $operation['beforeHTML'] ) ) {
+					return $operation['beforeHTML'];
+				}
+			}
+			return null;
 		}
 
 		/**

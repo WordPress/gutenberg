@@ -847,7 +847,8 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
  *   is resolved against the post whose content is being rendered (see
  *   `gutenberg_push_suggestion_content_owner()`), never the block's `postId`
  *   context. When that original cannot be resolved the marker falls back to
- *   deletion handling.
+ *   deletion handling. The save pass already leaves the original run inside a
+ *   format marker's anchor (`data-suggestion-run`), so an anchor is unwrapped.
  * - A legacy marker (the single `wp-suggestion` class from before the per-kind
  *   classes) fails closed the same way: an addition is removed with its text,
  *   anything else is unwrapped, so a pending addition saved before the switch
@@ -902,7 +903,7 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 
 	foreach ( $markers as $index => $marker ) {
 		$mode = ( 'add' === $marker['kind'] ) ? 'add' : 'del';
-		if ( 'format' === $marker['kind'] ) {
+		if ( 'format' === $marker['kind'] && null === $marker['run'] ) {
 			/*
 			 * A format marker whose original cannot be resolved is handled as
 			 * an unresolved format change below, never as an addition, so a
