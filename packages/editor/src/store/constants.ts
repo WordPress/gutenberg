@@ -111,6 +111,20 @@ export const SUGGEST_CONTENT_POST_FIELDS = [
 export const SUGGEST_CONTENT_META_KEYS = [ 'footnotes' ] as const;
 
 /**
+ * Post fields Suggestion mode holds as proposals: an edit to one is kept in
+ * the editor store (`postFieldProposals`), shown in place of the post's value
+ * while suggesting, and saved as a note for a reviewer to accept or reject.
+ * The post's taxonomies (by `rest_base`) and its registered meta keys are
+ * proposable too; see `isProposablePostField`.
+ */
+export const SUGGEST_PROPOSABLE_POST_FIELDS = [
+	'title',
+	'excerpt',
+	'featured_media',
+	'slug',
+] as const;
+
+/**
  * Class token carried by an inline suggestion marker
  * (`<mark class="wp-suggestion">`) in serialized block content.
  *

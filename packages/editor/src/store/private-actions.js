@@ -21,6 +21,7 @@ import {
 	getDeviceTypeByCanvasWidth,
 	VIEWPORT_STATE_BY_DEVICE_TYPE,
 } from '../utils/device-type';
+import { withoutSuggestPostEditGuard } from './suggest-post-edit-guard';
 import { unlock } from '../lock-unlock';
 export * from '../dataviews/store/private-actions';
 
@@ -755,6 +756,45 @@ export const restoreRevision =
 				type: 'snackbar',
 				id: 'editor-revision-restored',
 			}
+		);
+	};
+
+/**
+ * Hold a post field proposal made while suggesting.
+ *
+ * @param {string} id       Proposal id: the post field, or `meta.<key>`.
+ * @param {Object} proposal `{ attribute, key?, baseline, proposed }`.
+ * @return {Object} Action object.
+ */
+export function setPostFieldProposal( id, proposal ) {
+	return { type: 'SET_POST_FIELD_PROPOSAL', id, proposal };
+}
+
+/**
+ * Drop a post field proposal, once it is resolved.
+ *
+ * @param {string} id Proposal id.
+ * @return {Object} Action object.
+ */
+export function clearPostFieldProposal( id ) {
+	return { type: 'CLEAR_POST_FIELD_PROPOSAL', id };
+}
+
+/**
+ * Apply post edits a reviewer accepted from a suggestion. They reach the
+ * post even while suggesting: the Suggestion mode guard is what refuses
+ * every other post-level edit, and accepting is the decision it waits for.
+ *
+ * @param {Object} edits Post edits.
+ */
+export const applyPostFieldSuggestion =
+	( edits ) =>
+	( { select, registry } ) => {
+		const { id, type } = select.getCurrentPost();
+		withoutSuggestPostEditGuard( () =>
+			registry
+				.dispatch( coreStore )
+				.editEntityRecord( 'postType', type, id, edits )
 		);
 	};
 

@@ -31,6 +31,7 @@ import {
 	EDITOR_INTENT_EDIT,
 	EDITOR_INTENT_SUGGEST,
 	EDITOR_INTENT_VIEW,
+	SUGGEST_PROPOSABLE_POST_FIELDS,
 } from './constants';
 import { hasPendingSuggestionMarkers } from './utils/pending-suggestion-markers';
 import { unlock } from '../lock-unlock';
@@ -722,3 +723,51 @@ export function getCodeEditorUnavailableReason(
 
 	return null;
 }
+
+/**
+ * The post field proposals made while suggesting, keyed by proposal id.
+ *
+ * @param {Object} state Global application state.
+ * @return {Object} Proposals: `{ attribute, key?, baseline, proposed }`.
+ */
+export function getPostFieldProposals( state ) {
+	return state.postFieldProposals;
+}
+
+/**
+ * A post field's value as the post holds it (saved value plus staged
+ * edits), ignoring any proposal: what a proposal's baseline is, and what a
+ * reviewer's decision is checked against.
+ *
+ * @param {Object} state     Global application state.
+ * @param {string} attribute Post field.
+ * @param {string} [key]     Meta key, for `meta`.
+ * @return {*} The value.
+ */
+export const getPostFieldValueWithoutProposals = createRegistrySelector(
+	( select ) => ( state, attribute, key ) => {
+		const record = select( coreStore ).getEditedEntityRecord(
+			'postType',
+			getCurrentPostType( state ),
+			getCurrentPostId( state )
+		);
+		if ( attribute === 'meta' && key ) {
+			return record?.meta?.[ key ];
+		}
+		return record?.[ attribute ];
+	}
+);
+
+/**
+ * Whether Suggestion mode can hold a change to a post field (or one meta
+ * key) as a proposal, rather than refusing it.
+ *
+ * @param {Object} state     Global application state.
+ * @param {string} attribute Post field.
+ * @param {string} [key]     Meta key, for `meta`.
+ * @return {boolean} Whether the change can be proposed.
+ */
+export const isProposablePostField = createRegistrySelector(
+	() => ( state, attribute ) =>
+		SUGGEST_PROPOSABLE_POST_FIELDS.includes( attribute )
+);

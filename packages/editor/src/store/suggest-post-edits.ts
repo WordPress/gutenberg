@@ -207,3 +207,18 @@ export function stripSuggestedPostSave(
 	}
 	return kept;
 }
+
+/**
+ * The id a post field proposal is held under: the post field, or
+ * `meta.<key>` for one key of its meta.
+ *
+ * @param attribute Post field.
+ * @param key       Meta key, for `meta`.
+ * @return Proposal id.
+ */
+export function getPostFieldProposalId(
+	attribute: string,
+	key?: string
+): string {
+	return attribute === 'meta' && key ? `meta.${ key }` : attribute;
+}

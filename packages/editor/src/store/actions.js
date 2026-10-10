@@ -31,6 +31,7 @@ import {
 import { EDITOR_INTENT_SUGGEST } from './constants';
 import {
 	classifySuggestedPostEdits,
+	getPostFieldProposalId,
 	stripSuggestedPostSave,
 } from './suggest-post-edits';
 import {
@@ -191,7 +192,7 @@ export function setEditedPost( postType, postId ) {
  */
 export const editPost =
 	( edits, options ) =>
-	( { select, registry } ) => {
+	( { select, dispatch, registry } ) => {
 		const { id, type } = select.getCurrentPost();
 		let nextEdits = edits;
 
@@ -238,13 +239,13 @@ export const editPost =
 		 * reach the post through this action. See issue #73411 (F-15).
 		 */
 		if ( select.getEditorIntent() === EDITOR_INTENT_SUGGEST ) {
-			const { passthrough, refused } = classifySuggestedPostEdits(
-				edits,
-				{
+			const { passthrough, proposals, refused } =
+				classifySuggestedPostEdits( edits, {
 					getCurrentValue: ( key ) =>
 						select.getEditedPostAttribute( key ),
-				}
-			);
+					isProposable: ( attribute, key ) =>
+						select.isProposablePostField( attribute, key ),
+				} );
 			if ( refused.length ) {
 				announceSuggestRefusal( registry, refused );
 				/*
@@ -258,6 +259,28 @@ export const editPost =
 				 * nothing else), so a stray locked key never costs the user
 				 * their block edits.
 				 */
+			} else {
+				/*
+				 * A proposal keeps the value the field had when it was first
+				 * proposed as its baseline, so revising a proposal never
+				 * moves what the reviewer compares against.
+				 */
+				for ( const { attribute, key, value } of proposals ) {
+					const proposalId = getPostFieldProposalId( attribute, key );
+					const existing =
+						select.getPostFieldProposals()[ proposalId ];
+					dispatch.setPostFieldProposal( proposalId, {
+						attribute,
+						...( key ? { key } : {} ),
+						baseline: existing
+							? existing.baseline
+							: select.getPostFieldValueWithoutProposals(
+									attribute,
+									key
+								),
+						proposed: value,
+					} );
+				}
 			}
 			nextEdits = passthrough;
 			if ( ! Object.keys( nextEdits ).length ) {

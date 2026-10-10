@@ -351,19 +351,65 @@ export function getEditedPostAttribute( state, attributeName ) {
 			return getEditedPostContent( state );
 	}
 
+	// While suggesting, a field with a pending proposal reads as the
+	// proposed value, so every panel and plugin that reads the post through
+	// this selector shows what the suggester proposed. The post itself keeps
+	// its value until a reviewer accepts. See issue #73411.
+	const proposals =
+		state.editorIntent === EDITOR_INTENT_SUGGEST
+			? state.postFieldProposals
+			: undefined;
+	if ( proposals && attributeName !== 'meta' && proposals[ attributeName ] ) {
+		return proposals[ attributeName ].proposed;
+	}
+
 	// Fall back to saved post value if not edited.
 	const edits = getPostEdits( state );
+	let value;
 	if ( ! edits.hasOwnProperty( attributeName ) ) {
-		return getCurrentPostAttribute( state, attributeName );
+		value = getCurrentPostAttribute( state, attributeName );
+	} else if ( EDIT_MERGE_PROPERTIES.has( attributeName ) ) {
+		// Merge properties are objects which contain only the patch edit in
+		// state, and thus must be merged with the current post attribute.
+		value = getNestedEditedPostProperty( state, attributeName );
+	} else {
+		value = edits[ attributeName ];
 	}
 
-	// Merge properties are objects which contain only the patch edit in state,
-	// and thus must be merged with the current post attribute.
-	if ( EDIT_MERGE_PROPERTIES.has( attributeName ) ) {
-		return getNestedEditedPostProperty( state, attributeName );
+	if ( proposals && attributeName === 'meta' ) {
+		return withProposedMeta( value, proposals );
 	}
+	return value;
+}
 
-	return edits[ attributeName ];
+/*
+ * The meta object with proposed meta values laid over it, memoized on its
+ * two inputs so a selector returning it stays referentially stable.
+ */
+let lastProposedMeta = { meta: undefined, proposals: undefined, value: null };
+function withProposedMeta( meta, proposals ) {
+	if (
+		lastProposedMeta.meta === meta &&
+		lastProposedMeta.proposals === proposals
+	) {
+		return lastProposedMeta.value;
+	}
+	const metaProposals = Object.values( proposals ).filter(
+		( proposal ) => proposal.attribute === 'meta'
+	);
+	const value = metaProposals.length
+		? {
+				...meta,
+				...Object.fromEntries(
+					metaProposals.map( ( proposal ) => [
+						proposal.key,
+						proposal.proposed,
+					] )
+				),
+			}
+		: meta;
+	lastProposedMeta = { meta, proposals, value };
+	return value;
 }
 
 /**
