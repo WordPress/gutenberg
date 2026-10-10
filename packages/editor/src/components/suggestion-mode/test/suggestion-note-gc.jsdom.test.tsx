@@ -23,7 +23,13 @@ import {
 	registerSuggestionFormat,
 	SUGGESTION_FORMAT_NAME,
 } from '../../inline-suggestions';
-import { rememberResolvedSuggestion } from '../decision-state';
+import {
+	getReopenedDecision,
+	getSuggestionsResolvedThisSession,
+	rememberRedo,
+	rememberReopenedDecision,
+	rememberResolvedSuggestion,
+} from '../decision-state';
 import { store as editorStore } from '../../../store';
 
 // The editor store pulls in `@wordpress/viewport`, which reads
@@ -248,6 +254,19 @@ describe( 'SuggestionNoteGC reopening an undone decision', () => {
 		);
 	} );
 
+	it( 'remembers the decision it reopened, so a redo can restore it', async () => {
+		let registry: any;
+		await act( async () => {
+			( { registry } = setup( {
+				content: MARKED,
+				threads: [ note( { lifecycle: 'rejected' } ) ],
+				resolved: true,
+			} ) );
+		} );
+
+		expect( getReopenedDecision( registry, NOTE_ID ) ).toBe( 'rejected' );
+	} );
+
 	it( 'leaves a resolved note alone while its marker is gone', async () => {
 		// The ordinary post-decision state: the decision stands.
 		let saveEntityRecord;
@@ -277,6 +296,92 @@ describe( 'SuggestionNoteGC reopening an undone decision', () => {
 		} );
 
 		expect( saveEntityRecord ).not.toHaveBeenCalled();
+	} );
+} );
+
+describe( 'SuggestionNoteGC redoing an undone decision', () => {
+	beforeEach( () => {
+		vi.useFakeTimers( { toFake: [ 'setTimeout', 'clearTimeout' ] } );
+	} );
+
+	afterEach( () => {
+		vi.useRealTimers();
+	} );
+
+	/**
+	 * Mounts the collector on a note an undo reopened, with its marker on
+	 * screen, then takes the marker away again and lets the grace period run.
+	 *
+	 * @param redo Whether a redo was dispatched just before the marker went.
+	 * @return The registry and the `saveEntityRecord` spy.
+	 */
+	async function removeMarkerAfterReopen( redo: boolean ) {
+		let harness: any;
+		await act( async () => {
+			harness = setup( {
+				content: MARKED,
+				threads: [ note( { status: 'hold', lifecycle: 'pending' } ) ],
+			} );
+		} );
+		rememberReopenedDecision( harness.registry, NOTE_ID, 'applied' );
+		if ( redo ) {
+			rememberRedo( harness.registry );
+		}
+
+		await act( async () => {
+			harness.registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( harness.clientId, {
+					content: RichTextData.fromHTMLString( 'Hello world' ),
+				} );
+		} );
+		for ( let round = 0; round < 3; round++ ) {
+			await act( async () => {
+				vi.runOnlyPendingTimers();
+			} );
+		}
+		return harness;
+	}
+
+	it( 'resolves the note again when a redo lands the decision', async () => {
+		const { registry, saveEntityRecord } =
+			await removeMarkerAfterReopen( true );
+
+		expect( saveEntityRecord ).toHaveBeenCalledWith(
+			'root',
+			'comment',
+			{
+				id: NOTE_ID,
+				status: 'approved',
+				meta: { _wp_suggestion_status: 'applied' },
+			},
+			expect.anything()
+		);
+		expect( saveEntityRecord ).not.toHaveBeenCalledWith(
+			'root',
+			'comment',
+			{ id: NOTE_ID, status: 'trash' },
+			expect.anything()
+		);
+		// Recorded as decided again, so a second undo reopens it again.
+		expect(
+			getSuggestionsResolvedThisSession( registry ).has(
+				String( NOTE_ID )
+			)
+		).toBe( true );
+		expect( getReopenedDecision( registry, NOTE_ID ) ).toBeUndefined();
+	} );
+
+	it( 'still collects the note when the marker goes without a redo', async () => {
+		// Undoing further, past the suggestion itself, withdraws it.
+		const { saveEntityRecord } = await removeMarkerAfterReopen( false );
+
+		expect( saveEntityRecord ).toHaveBeenCalledWith(
+			'root',
+			'comment',
+			{ id: NOTE_ID, status: 'trash' },
+			expect.anything()
+		);
 	} );
 } );
 

@@ -22,6 +22,7 @@ import {
 	SuggestionSessionProvider,
 	useSuggestionSession,
 } from '../suggestion-session';
+import { isRecentRedo } from '../decision-state';
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -160,6 +161,7 @@ describe( 'SuggestionUndoGuard', () => {
 		hasUndo = false,
 		hasRedo = false,
 		blocks = [] as any[],
+		intent = 'suggest',
 	} = {} ) {
 		const undo = vi.fn( () => Promise.resolve() );
 		const redo = vi.fn( () => Promise.resolve() );
@@ -181,7 +183,7 @@ describe( 'SuggestionUndoGuard', () => {
 		registry.register( blockEditorStore );
 		registry.register( editorStore );
 		registry.dispatch( blockEditorStore ).resetBlocks( blocks );
-		unlock( registry.dispatch( editorStore ) ).setEditorIntent( 'suggest' );
+		unlock( registry.dispatch( editorStore ) ).setEditorIntent( intent );
 
 		const overlay: { current: any } = { current: null };
 		function Probe() {
@@ -222,6 +224,21 @@ describe( 'SuggestionUndoGuard', () => {
 		core.redo();
 		expect( overlay.current.consumeUndoRedoAdoption() ).toBe( true );
 		expect( overlay.current.consumeUndoRedoAdoption() ).toBe( true );
+		expect( overlay.current.consumeUndoRedoAdoption() ).toBe( false );
+	} );
+
+	it( 'records a redo in every intent, for the note collector', () => {
+		// The post author reviews in Editing intent, and redoing a decision
+		// there must not read as a withdrawal.
+		const { registry, overlay } = setup( {
+			hasRedo: true,
+			intent: 'edit',
+		} );
+		expect( isRecentRedo( registry ) ).toBe( false );
+		( registry.dispatch( 'core' ) as any ).redo();
+		expect( isRecentRedo( registry ) ).toBe( true );
+		// Adoption tokens are for the interceptor, which only runs while
+		// suggesting.
 		expect( overlay.current.consumeUndoRedoAdoption() ).toBe( false );
 	} );
 
