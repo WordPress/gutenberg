@@ -10,8 +10,11 @@
 //
 // - Block-level classes (`is-suggestion-pending*`) are set by the editor
 //   suggestion system via `metadata.suggestion`.
-// - Inline `.wp-suggestion` markers live in block content (Option B) and are
-//   tinted by their `data-suggestion-type` (del/add/format).
+// - Inline markers live in block content (Option B), one class per kind:
+//   `.wp-suggestion-add`, `.wp-suggestion-del` and `.wp-suggestion-format`.
+//   Markers of different kinds nest over the same text (someone's deletion
+//   inside someone else's addition), always add outermost, then format, then
+//   del.
 //
 // Both consume `--suggestion-author-color`, which the suggestion system writes
 // from the suggester's avatar color — so individual suggestions tint to their
@@ -145,14 +148,14 @@ $suggestion-deletion-text-color: color-mix(in srgb, #{$suggestion-deletion-color
 	}
 }
 
-// Inline `core/suggestion` markers that live in block content (Option B). The
-// type-specific visual is keyed off the in-content marker's
-// `data-suggestion-type`; the marker is also decorated at runtime through the
-// annotations API (`.annotation-text-core-suggestion`). The default `<mark>`
-// highlight is neutralized so the deletion/addition treatment reads cleanly.
-// Per-author tinting (via `data-author`) and alignment with the Revisions diff
-// UI land with the Phase 5 visual work.
-.wp-suggestion {
+// Inline suggestion markers that live in block content (Option B). The
+// kind-specific visual is keyed off the marker's class, which is the
+// authoritative kind (`data-suggestion-type` is written alongside it); the
+// marker is also decorated at runtime through the annotations API
+// (`.annotation-text-core-suggestion`). The default `<mark>` highlight is
+// neutralized so the deletion/addition treatment reads cleanly. Per-author
+// tinting comes from `--suggestion-author-color`, set per `data-author`.
+:is(.wp-suggestion-add, .wp-suggestion-del, .wp-suggestion-format) {
 	// The marker is a `<mark>`, which browsers paint black on yellow by
 	// default. Inherit the text color so the run follows the theme (and the
 	// mixes below start from it) instead of going black on a dark canvas.
@@ -173,12 +176,15 @@ $suggestion-deletion-text-color: color-mix(in srgb, #{$suggestion-deletion-color
 		color: inherit;
 	}
 
-	&[data-suggestion-type="del"] {
+	// Text decorations propagate to nested markers, so a deletion inside an
+	// addition shows both the addition's underline and its own line-through,
+	// each in its own author's color.
+	&.wp-suggestion-del {
 		color: $suggestion-deletion-text-color;
 		text-decoration: line-through;
 	}
 
-	&[data-suggestion-type="add"] {
+	&.wp-suggestion-add {
 		color: $suggestion-text-color;
 		text-decoration: underline;
 		text-decoration-color: $suggestion-color;
@@ -191,11 +197,19 @@ $suggestion-deletion-text-color: color-mix(in srgb, #{$suggestion-deletion-color
 	// underline (the text itself isn't new). The fuller treatment (per-author
 	// tinting alignment with the Revisions diff UI) still lands with the
 	// Phase 5 visual work.
-	&[data-suggestion-type="format"] {
+	&.wp-suggestion-format {
 		text-decoration: underline dotted;
 		text-decoration-color: $suggestion-color;
 		text-decoration-thickness: var(--wpds-border-width-sm);
 		text-underline-offset: 2px;
+	}
+
+	// A formatting change inside someone's addition would draw its dotted
+	// underline on top of the addition's solid one. Drop it lower so both
+	// read: the solid line says "proposed text", the dotted one below it
+	// "proposed formatting".
+	&.wp-suggestion-add .wp-suggestion-format {
+		text-underline-offset: 0.35em;
 	}
 
 	// Everything above is color and text-decoration, which conveys nothing to
