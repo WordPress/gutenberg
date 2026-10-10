@@ -12,6 +12,7 @@ describe( 'create', () => {
 	afterEach( () => {
 		mockedApiFetch.mockReset();
 		vi.restoreAllMocks();
+		window.localStorage.clear();
 	} );
 
 	describe( 'set', () => {
@@ -153,6 +154,28 @@ describe( 'create', () => {
 				meta: {
 					persisted_preferences: null,
 				},
+			} );
+			vi.spyOn( global.Storage.prototype, 'getItem' ).mockReturnValueOnce(
+				'null'
+			);
+
+			const { get } = create();
+			expect( await get() ).toEqual( {} );
+		} );
+
+		it( 'returns a new empty object for each persistence layer', async () => {
+			mockedApiFetch.mockResolvedValue( {
+				meta: { persisted_preferences: null },
+			} );
+
+			const first = await create().get();
+			first.core = { fixedToolbar: true };
+			expect( await create().get() ).toEqual( {} );
+		} );
+
+		it( 'ignores an empty array from the REST API', async () => {
+			mockedApiFetch.mockResolvedValueOnce( {
+				meta: { persisted_preferences: [] },
 			} );
 			vi.spyOn( global.Storage.prototype, 'getItem' ).mockReturnValueOnce(
 				'null'

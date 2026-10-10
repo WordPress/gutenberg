@@ -10,6 +10,7 @@
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
+		{ "path": "../preferences-persistence" },
 		{ "path": "../private-apis" }
 	]
 }
