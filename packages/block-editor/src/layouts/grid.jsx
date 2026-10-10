@@ -489,23 +489,13 @@ export default {
 			.split( ',' )
 			.map( ( subselector ) => `${ subselector }${ subselector } > *` )
 			.join( ',' );
-		// The image itself, linked or not, as in the rules that make images
-		// cover their cells.
-		const imageSelector = [
-			appendSelectors( gridSelector, '> .wp-block-image > img' ),
-			appendSelectors( gridSelector, '> .wp-block-image > a > img' ),
-		].join( ',' );
 		// Stacked blocks are sized by their content again, so the grid stops
 		// taking its height from its width, its rows stop being the same
-		// height, and images keep their own size instead of covering cells.
+		// height, and it tells its children that their cells are no longer
+		// fixed, so blocks that fill fixed cells keep their own size.
 		return (
-			`${ gridSelector } { aspect-ratio: auto; grid-template-rows: none; grid-auto-rows: auto; }` +
-			`${ childSelector } { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); rotate: none; }` +
-			`${ appendSelectors(
-				gridSelector,
-				'> .wp-block-image'
-			) } { display: block; }` +
-			`${ imageSelector } { width: auto; height: auto; }`
+			`${ gridSelector } { aspect-ratio: auto; grid-template-rows: none; grid-auto-rows: auto; --wp--style--grid-cells: auto; }` +
+			`${ childSelector } { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); rotate: none; }`
 		);
 	},
 	getOrientation() {

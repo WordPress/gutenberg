@@ -1471,7 +1471,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			false !== ( $mobile_layout['stackOnMobile'] ?? true ) &&
 			gutenberg_is_experiment_enabled( 'gutenberg-grid-interactivity' )
 		) {
-			// Stacked blocks are sized by their content again, images included.
+			// Stacked blocks are sized by their content again, so their cells are no longer fixed.
 			$stacking_selector = ".$container_class.$container_class";
 			$stacking_styles   = gutenberg_style_engine_get_stylesheet_from_css_rules(
 				array(
@@ -1479,9 +1479,10 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 						'rules_group'  => $mobile_media_query,
 						'selector'     => $stacking_selector,
 						'declarations' => array(
-							'aspect-ratio'       => 'auto',
-							'grid-template-rows' => 'none',
-							'grid-auto-rows'     => 'auto',
+							'aspect-ratio'            => 'auto',
+							'grid-template-rows'      => 'none',
+							'grid-auto-rows'          => 'auto',
+							'--wp--style--grid-cells' => 'auto',
 						),
 					),
 					array(
@@ -1491,20 +1492,6 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 							'grid-column' => '1 / -1',
 							'grid-row'    => 'span var(--wp--grid-item--row-span, 1)',
 							'rotate'      => 'none',
-						),
-					),
-					array(
-						'rules_group'  => $mobile_media_query,
-						'selector'     => "$stacking_selector > .wp-block-image",
-						'declarations' => array( 'display' => 'block' ),
-					),
-					array(
-						'rules_group'  => $mobile_media_query,
-						// The image itself, linked or not, as in the rules that make images cover their cells.
-						'selector'     => "$stacking_selector > .wp-block-image > img, $stacking_selector > .wp-block-image > a > img",
-						'declarations' => array(
-							'width'  => 'auto',
-							'height' => 'auto',
 						),
 					),
 				),

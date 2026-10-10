@@ -1812,21 +1812,15 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		$container_class = $matches[0];
 
 		$stylesheet    = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
-		$sizing_rule   = ".$container_class.$container_class{aspect-ratio:auto;grid-template-rows:none;grid-auto-rows:auto;}";
+		$sizing_rule   = ".$container_class.$container_class{aspect-ratio:auto;grid-template-rows:none;grid-auto-rows:auto;--wp--style--grid-cells:auto;}";
 		$stacking_rule = ".$container_class.$container_class > *{grid-column:1 / -1;grid-row:span var(--wp--grid-item--row-span, 1);rotate:none;}";
-		$figure_rule   = ".$container_class.$container_class > .wp-block-image{display:block;}";
-		$image_rule    = ".$container_class.$container_class > .wp-block-image > img, .$container_class.$container_class > .wp-block-image > a > img{width:auto;height:auto;}";
 
 		if ( $should_stack ) {
 			$this->assertStringContainsString( '@media (width <= 480px){' . $sizing_rule . '}', $stylesheet, 'A stacked grid should be sized by its content.' );
 			$this->assertStringContainsString( '@media (width <= 480px){' . $stacking_rule . '}', $stylesheet, 'The children of a stacked grid should be full width, unrotated, and keep their row spans.' );
-			$this->assertStringContainsString( '@media (width <= 480px){' . $figure_rule . '}', $stylesheet, 'The images of a stacked grid should be laid out as blocks.' );
-			$this->assertStringContainsString( '@media (width <= 480px){' . $image_rule . '}', $stylesheet, 'The images of a stacked grid should keep their own size.' );
 		} else {
 			$this->assertStringNotContainsString( $sizing_rule, $stylesheet );
 			$this->assertStringNotContainsString( $stacking_rule, $stylesheet );
-			$this->assertStringNotContainsString( $figure_rule, $stylesheet );
-			$this->assertStringNotContainsString( $image_rule, $stylesheet );
 		}
 	}
 

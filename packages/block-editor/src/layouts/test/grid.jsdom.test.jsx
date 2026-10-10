@@ -460,10 +460,8 @@ describe( 'getMobileStackingStyle', () => {
 				layout: { isManualPlacement: true, columnCount: 3 },
 			} )
 		).toBe(
-			'.my-container.my-container { aspect-ratio: auto; grid-template-rows: none; grid-auto-rows: auto; }' +
-				'.my-container.my-container > * { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); rotate: none; }' +
-				'.my-container.my-container > .wp-block-image { display: block; }' +
-				'.my-container.my-container > .wp-block-image > img,.my-container.my-container > .wp-block-image > a > img { width: auto; height: auto; }'
+			'.my-container.my-container { aspect-ratio: auto; grid-template-rows: none; grid-auto-rows: auto; --wp--style--grid-cells: auto; }' +
+				'.my-container.my-container > * { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); rotate: none; }'
 		);
 	} );
 
