@@ -3,11 +3,13 @@ import clsx from 'clsx';
 import { useSelect } from '@wordpress/data';
 import { useLayoutEffect, useRef, useState } from '@wordpress/element';
 import { getScrollContainer } from '@wordpress/dom';
-import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import {
+	isUnmodifiedDefaultBlock,
+	store as blocksStore,
+} from '@wordpress/blocks';
 import BlockPopoverCover from '../block-popover/cover';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import useBlockDisplayInformation from '../use-block-display-information';
-import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { store as blockEditorStore } from '../../store';
 
 type BlockHoverLabelProps = {
@@ -70,7 +72,13 @@ export default function BlockHoverLabel( {
 	__unstableContentRef,
 }: BlockHoverLabelProps ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const blockTitle = useBlockDisplayTitle( { clientId, maximumLength: 35 } );
+	const blockTypeTitle = useSelect(
+		( select ) => {
+			const name = select( blockEditorStore ).getBlockName( clientId );
+			return select( blocksStore ).getBlockType( name )?.title;
+		},
+		[ clientId ]
+	);
 	const blockElement = useBlockElement( clientId );
 	const labelRef = useRef< HTMLSpanElement >( null );
 	const fitsAbove = useFitsAbove( blockElement, labelRef );
@@ -95,8 +103,14 @@ export default function BlockHoverLabel( {
 		},
 		[ clientId ]
 	);
-	// A block renamed by the user shows its custom name, like the list view.
-	const title = blockInformation?.name || blockTitle;
+	// A block renamed by the user shows its custom name, like the list view,
+	// and a synced block shows the entity it embeds. Otherwise the plain
+	// block type title names the block: "Heading" rather than "Heading 2",
+	// and never the block's content.
+	const title =
+		blockInformation?.name ||
+		( blockInformation?.isSynced ? blockInformation.title : undefined ) ||
+		blockTypeTitle;
 
 	if ( isHidden || ! title ) {
 		return null;

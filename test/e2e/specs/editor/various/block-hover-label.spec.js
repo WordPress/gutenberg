@@ -27,7 +27,7 @@ test.describe( 'Block hover label', () => {
 		const label = page.locator(
 			'.block-editor-block-list__block-hover-label'
 		);
-		await expect( label ).toHaveText( 'Heading 2' );
+		await expect( label ).toHaveText( 'Heading' );
 		// The label is real text for assistive technology, not decoration.
 		await expect( label ).not.toHaveAttribute( 'aria-hidden' );
 
@@ -94,6 +94,29 @@ test.describe( 'Block hover label', () => {
 		).toHaveText( 'Hero' );
 	} );
 
+	test( 'labels a navigation link by its block type, not its link text', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		await requestUtils.createNavigationMenu( {
+			title: 'Hover label menu',
+			content:
+				'<!-- wp:navigation-link {"label":"About","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} /-->',
+		} );
+		await editor.insertBlock( { name: 'core/navigation' } );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Custom Link' } )
+			.hover();
+
+		await expect(
+			page.locator( '.block-editor-block-list__block-hover-label' )
+		).toHaveText( 'Navigation Link' );
+
+		await requestUtils.deleteAllMenus();
+	} );
+
 	test( 'hides the label once the hovered block is selected', async ( {
 		editor,
 		page,
@@ -118,7 +141,7 @@ test.describe( 'Block hover label', () => {
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Heading' } )
 			.hover();
-		await expect( label ).toHaveText( 'Heading 2' );
+		await expect( label ).toHaveText( 'Heading' );
 	} );
 
 	test( 'removes the label when the pointer leaves the block', async ( {
@@ -134,7 +157,7 @@ test.describe( 'Block hover label', () => {
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Heading' } )
 			.hover();
-		await expect( label ).toHaveText( 'Heading 2' );
+		await expect( label ).toHaveText( 'Heading' );
 
 		await page.mouse.move( 0, 0 );
 		await expect( label ).toBeHidden();

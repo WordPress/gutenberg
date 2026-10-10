@@ -318,6 +318,9 @@
 	font-size: $helptext-font-size;
 	font-weight: 500;
 	line-height: $grid-unit-20;
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
 	white-space: nowrap;
 	pointer-events: none;
 
