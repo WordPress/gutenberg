@@ -10,6 +10,7 @@
 		{ "path": "../block-serialization-default-parser" },
 		{ "path": "../blob/tsconfig.build.json" },
 		{ "path": "../blocks" },
+		{ "path": "../commands" },
 		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../data" },

@@ -6,7 +6,7 @@ import { getActiveFormat } from '../get-active-format';
  * @template T
  * @typedef {import('@wordpress/element').RefObject<T>} RefObject<T>
  */
-/** @typedef {import('../register-format-type').WPFormat} WPFormat */
+/** @typedef {import('../types').FormatType} FormatType */
 /** @typedef {import('../types').RichTextValue} RichTextValue */
 
 /**
@@ -19,7 +19,7 @@ import { getActiveFormat } from '../get-active-format';
  * @param {RefObject<HTMLElement>} $1.ref      React ref of the element
  *                                             containing  the editable content.
  * @param {RichTextValue}          $1.value    Value to check for selection.
- * @param {WPFormat}               $1.settings The format type's settings.
+ * @param {FormatType}             $1.settings The format type's settings.
  *
  * @return {Element|Range} The active element or selection range.
  */

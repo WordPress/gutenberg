@@ -5,6 +5,31 @@
 ### Breaking Changes
 
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+    -   `Tabs` ([#84332](https://github.com/WordPress/gutenberg/pull/84332))
+    -   `NumberControl` ([#84330](https://github.com/WordPress/gutenberg/pull/84330))
+    -   `TimePicker` ([#84331](https://github.com/WordPress/gutenberg/pull/84331))
+    -   `CustomSelectControl` and `CustomSelectControlV2` ([#84131](https://github.com/WordPress/gutenberg/pull/84131))
+    -   `DateTimePicker` ([#84129](https://github.com/WordPress/gutenberg/pull/84129))
+    -   `ColorPicker` ([#84128](https://github.com/WordPress/gutenberg/pull/84128))
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Deprecations
+
+-   `Tip`: Deprecate in favor of `Notice` from `@wordpress/ui`, preserving the legacy component for existing consumers ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
+
+### Bug Fixes
+
+-   `InputControl`, `NumberControl`, `UnitControl`: Ignore the drag gesture for touch input, where it has no cursor affordance and is easy to trigger by accident ([#38865](https://github.com/WordPress/gutenberg/issues/38865), [#81519](https://github.com/WordPress/gutenberg/pull/81519)).
+-   `navigateRegions`: Only outline the Publish and Save controls when their region has focus ([#84343](https://github.com/WordPress/gutenberg/pull/84343)).
+
+## 42.0.0 (2026-10-07)
+
+### Breaking Changes
+
+-   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
+-   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+    -   `FontSizePicker` ([#84126](https://github.com/WordPress/gutenberg/pull/84126))
+    -   `PaletteEdit` ([#84130](https://github.com/WordPress/gutenberg/pull/84130)).
     -   `CustomGradientPicker` ([#82576](https://github.com/WordPress/gutenberg/pull/82576))
     -   `Text` ([#82573](https://github.com/WordPress/gutenberg/pull/82573))
     -   `Card`, `CardBody`, `CardHeader`, `CardFooter`, `CardMedia`, `CardDivider` ([#82577](https://github.com/WordPress/gutenberg/pull/82577))
@@ -30,6 +55,8 @@
 -   Deprecate `Badge` in the private APIs; use `Badge` from `@wordpress/ui` instead. ([#82379](https://github.com/WordPress/gutenberg/pull/82379)).
 
 ### Bug Fixes
+
+-   `CustomGradientPicker`: Extend the clickable area of control points and the plus button to the full height of the gradient bar ([#84124](https://github.com/WordPress/gutenberg/pull/84124)).
 
 -   `Popover`: Keep the `will-change: transform` hint only while the popover is moving, so its content is no longer left on a compositing layer that Chrome can render blurry ([#77359](https://github.com/WordPress/gutenberg/pull/77359)).
 -   `RadioControl`: Keep radio circles visually 16px at all viewport widths while retaining a 24px pointer target ([#83840](https://github.com/WordPress/gutenberg/pull/83840)).

@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   Query: List the existing terms in the taxonomy filters, so categories and tags can be browsed and selected instead of recalled and typed. The controls now use `SearchableChipSelectControl` from `@wordpress/ui` ([#82583](https://github.com/WordPress/gutenberg/pull/82583)).
+
+## 11.2.0 (2026-10-07)
+
 ### Enhancements
 
 -   Icon: Group the "All" tab of the icon library by collection, under a heading that stays at the top while scrolling, when more than one collection is registered.
@@ -19,6 +29,7 @@
 
 ### Bug Fixes
 
+-   Custom HTML: Keep a block whose markup renders nothing in the editor, such as a script or an empty container a third-party script fills in, selectable. The block takes no space, as on the front end, and a marker floats next to it that selects the block when clicked ([#84150](https://github.com/WordPress/gutenberg/pull/84150)).
 -   Tag Cloud: Space the tags of the Outline style evenly. The base link margin outranked the style's own reset, so each tag carried that margin on top of the container's gap and the horizontal spacing did not match the spacing between rows ([#70224](https://github.com/WordPress/gutenberg/pull/70224)).
 -   Image: Stop a click on the enlarged image from closing the lightbox, so tapping the image to inspect it, or mis-tapping while reaching for Previous or Next, no longer dismisses it. The Close button, Escape and the area around the image still close the lightbox ([#78898](https://github.com/WordPress/gutenberg/pull/78898)).
 -   Math: Align the cells of `aligned` and `cases`, and draw `\overline` and `\underline`, in Chromium, in the Math block and in inline math. The rules key on the MathML attributes and only apply where the engine does not render them natively ([#83164](https://github.com/WordPress/gutenberg/pull/83164)).
