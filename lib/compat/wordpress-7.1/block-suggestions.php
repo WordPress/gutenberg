@@ -614,6 +614,27 @@ function gutenberg_pop_suggestion_content_owner( $content ) {
 add_filter( 'the_content', 'gutenberg_pop_suggestion_content_owner', PHP_INT_MAX );
 
 /**
+ * Records the post whose excerpt is being generated.
+ *
+ * `wp_trim_excerpt()` renders the post's blocks (`excerpt_remove_blocks()`)
+ * before it applies `the_content`, so without this the blocks of a listed
+ * post (a Latest Posts or Post Excerpt block) would render while the post
+ * holding the list is on top of the stack. Hooked before `wp_trim_excerpt()`
+ * (priority 10); `gutenberg_pop_suggestion_content_owner()` pops it after.
+ *
+ * @param string       $excerpt The post excerpt.
+ * @param WP_Post|null $post    The post the excerpt belongs to.
+ * @return string Unchanged excerpt.
+ */
+function gutenberg_push_suggestion_excerpt_owner( $excerpt, $post = null ) {
+	$post = get_post( $post );
+	$GLOBALS['gutenberg_suggestion_content_owners'][] = $post ? (int) $post->ID : 0;
+	return $excerpt;
+}
+add_filter( 'get_the_excerpt', 'gutenberg_push_suggestion_excerpt_owner', 1, 2 );
+add_filter( 'get_the_excerpt', 'gutenberg_pop_suggestion_content_owner', PHP_INT_MAX );
+
+/**
  * Returns the post whose content is being rendered, if any.
  *
  * @return int Post ID, or 0 outside `the_content`.
