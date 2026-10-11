@@ -5494,6 +5494,118 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @dataProvider data_get_stylesheet_ignores_values_of_unexpected_types
+	 *
+	 * @param array $theme_json_data The theme.json data, without the version.
+	 */
+	public function test_get_stylesheet_ignores_values_of_unexpected_types( $theme_json_data ) {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array_merge( array( 'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA ), $theme_json_data )
+		);
+
+		$this->assertIsString( $theme_json->get_stylesheet() );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_get_stylesheet_ignores_values_of_unexpected_types() {
+		return array(
+			'element custom css as an object'       => array(
+				array( 'styles' => array( 'elements' => array( 'link' => array( 'css' => array( 'color' => 'red' ) ) ) ) ),
+			),
+			'block custom css as a list'            => array(
+				array( 'styles' => array( 'blocks' => array( 'core/paragraph' => array( 'css' => array( 'color: red;' ) ) ) ) ),
+			),
+			'ref as an array'                       => array(
+				array( 'styles' => array( 'color' => array( 'text' => array( 'ref' => array( 'styles', 'color' ) ) ) ) ),
+			),
+			'palette as a list of strings'          => array(
+				array( 'settings' => array( 'color' => array( 'palette' => array( '#000', '#fff' ) ) ) ),
+			),
+			'palette keyed by origin with a string' => array(
+				array( 'settings' => array( 'color' => array( 'palette' => array( 'custom' => array( '#000' ) ) ) ) ),
+			),
+			'preset slug as an array'               => array(
+				array(
+					'settings' => array(
+						'typography' => array(
+							'fontSizes' => array(
+								array(
+									'slug' => array( 'small' ),
+									'size' => '1rem',
+								),
+							),
+						),
+					),
+				),
+			),
+			'font families as a list of strings'    => array(
+				array( 'settings' => array( 'typography' => array( 'fontFamilies' => array( 'Inter' ) ) ) ),
+			),
+			'spacing scale as a string'             => array(
+				array( 'settings' => array( 'spacing' => array( 'spacingScale' => '1.5' ) ) ),
+			),
+			'spacing scale unit as an array'        => array(
+				array(
+					'settings' => array(
+						'spacing' => array(
+							'spacingScale' => array(
+								'operator'   => '*',
+								'increment'  => 1.5,
+								'steps'      => 7,
+								'mediumStep' => 1.5,
+								'unit'       => array( 'rem' ),
+							),
+						),
+					),
+				),
+			),
+			'shared style variation as a string'    => array(
+				array( 'styles' => array( 'variations' => array( 'plain' => 'red' ) ) ),
+			),
+			'block types item as an array'          => array(
+				array( 'blockTypes' => array( array( 'core/button' ) ) ),
+			),
+		);
+	}
+
+	public function test_sanitize_removes_preset_items_of_unexpected_types() {
+		$valid_color = array(
+			'slug'  => 'black',
+			'color' => '#000',
+			'name'  => 'Black',
+		);
+		$invalid     = array(
+			'#fff',
+			array(
+				'slug'  => array( 'white' ),
+				'color' => '#fff',
+			),
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'color'  => array( 'palette' => array_merge( $invalid, array( $valid_color ) ) ),
+					'blocks' => array(
+						'core/paragraph' => array(
+							'color' => array( 'palette' => array( 'custom' => array_merge( $invalid, array( $valid_color ) ) ) ),
+						),
+					),
+				),
+			)
+		);
+		$settings   = $theme_json->get_settings();
+
+		$this->assertSame( array( $valid_color ), $settings['color']['palette']['theme'], 'Top-level preset list' );
+		$this->assertSame( array( $valid_color ), $settings['blocks']['core/paragraph']['color']['palette']['custom'], 'Block-level presets keyed by origin' );
+	}
+
+	/**
 	 * @dataProvider data_get_styles_for_block_with_style_variations
 	 *
 	 * @param array  $theme_json_variations Theme.json variations to test.
@@ -7273,6 +7385,20 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'input'    => array(
 					'selector' => '.foo',
 					'css'      => '',
+				),
+				'expected' => '',
+			),
+			'css as an object'             => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => array( 'color' => 'red' ),
+				),
+				'expected' => '',
+			),
+			'css as a list of strings'     => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => array( 'color: red;' ),
 				),
 				'expected' => '',
 			),
