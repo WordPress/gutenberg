@@ -345,6 +345,30 @@ describe( 'filters', () => {
 		expect( result[ 7 ].name.title ).toBe( 'Uranus' );
 	} );
 
+	it.each( [
+		[ 'number', 'satellites', 2 ],
+		[ 'string', 'author', 'lunarian_observer' ],
+	] )(
+		'should exclude a %s value from the IS ALL filter instead of throwing',
+		( _type, fieldId, value ) => {
+			// Fields with no type accept every operator, so an item's scalar
+			// value can reach the IS ALL filter.
+			const untypedFields = fields.map( ( field ) =>
+				field.id === fieldId ? { id: fieldId } : field
+			);
+			const { data: result } = filterSortAndPaginate(
+				data,
+				{
+					filters: [
+						{ field: fieldId, operator: 'isAll', value: [ value ] },
+					],
+				},
+				untypedFields
+			);
+			expect( result ).toHaveLength( 0 );
+		}
+	);
+
 	it( 'should search using IS NOT ALL filter (deprecated operator)', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,

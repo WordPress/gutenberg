@@ -332,6 +332,94 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 <!-- /wp:paragraph -->` );
 	} );
 
+	test( 'should navigate up over an empty line inside a block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph block' },
+		} );
+		await editor.insertBlock( { name: 'core/preformatted' } );
+		await page.keyboard.type( 'Pre block' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Foo' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Paragraph block' },
+			},
+			{
+				name: 'core/preformatted',
+				attributes: { content: 'Pre block<br><br>Foo' },
+			},
+		] );
+
+		// The second ArrowUp starts on the empty line and must stop on the
+		// first line, not leave the block.
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.type( 'X' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Paragraph block' },
+			},
+			{
+				name: 'core/preformatted',
+				attributes: { content: 'PreX block<br><br>Foo' },
+			},
+		] );
+	} );
+
+	test( 'should navigate up from an empty line at the end of a citation', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/quote' } );
+		await page.keyboard.type( 'Quote text' );
+		await editor.clickBlockToolbarButton( 'Select parent block: Quote' );
+		await editor.clickBlockToolbarButton( 'Add citation' );
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Quote citation' } )
+			.click();
+		await page.keyboard.type( 'Cite line' );
+		await pageUtils.pressKeys( 'shift+Enter' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/quote',
+				attributes: { citation: 'Cite line<br>' },
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Quote text' },
+					},
+				],
+			},
+		] );
+
+		// ArrowUp from the empty last line must move to the citation's first
+		// line, not into the quoted text.
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.type( 'X' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/quote',
+				attributes: { citation: 'XCite line<br>' },
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Quote text' },
+					},
+				],
+			},
+		] );
+	} );
+
 	test( 'should not create extra line breaks in multiline value', async ( {
 		editor,
 		page,
@@ -1318,7 +1406,14 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 	test( 'should show format toolbar when selecting text from the left edge of a block', async ( {
 		editor,
 		page,
+		browserName,
 	} ) => {
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			browserName === 'chromium',
+			'Chromium does not extend a selection from non-editable padding into editable text.'
+		);
+
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'Hello world' },
@@ -1352,6 +1447,23 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 				.getByRole( 'toolbar', { name: 'Block tools' } )
 				.getByRole( 'button', { name: 'Bold' } )
 		).toBeVisible();
+
+		// The selection is editable: typing replaces it. A selection made
+		// while the text was non-editable would show the toolbar but not
+		// take input. The engines differ in where the selection starts.
+		const selected = await editor.canvas
+			.locator( ':root' )
+			.evaluate( ( root ) =>
+				root.ownerDocument.getSelection().toString()
+			);
+		expect( selected ).not.toBe( '' );
+		await page.keyboard.type( 'x' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Hello world'.replace( selected, 'x' ) },
+			},
+		] );
 	} );
 
 	// Regression test: ArrowDown should not skip over a paragraph that contains

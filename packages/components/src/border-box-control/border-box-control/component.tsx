@@ -100,7 +100,7 @@ const UnconnectedBorderBoxControl = (
 							offset: popoverOffset,
 							anchor: popoverAnchor,
 							shift: true,
-					  }
+						}
 					: undefined,
 			[ popoverPlacement, popoverOffset, popoverAnchor ]
 		);

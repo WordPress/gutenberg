@@ -1,3 +1,4 @@
+import { describe, expect, test, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ExternalLink } from '..';
@@ -5,7 +6,7 @@ import { ExternalLink } from '..';
 describe( 'ExternalLink', () => {
 	test( 'should call function passed in onClick handler when clicking the link', async () => {
 		const user = await userEvent.setup();
-		const onClickMock = jest.fn();
+		const onClickMock = vi.fn();
 
 		render(
 			<ExternalLink href="https://wordpress.org" onClick={ onClickMock }>
@@ -35,7 +36,7 @@ describe( 'ExternalLink', () => {
 
 		// We are using this approach so we can test the defaultPrevented
 		// without passing an onClick prop to the component.
-		const onClickMock = jest.fn();
+		const onClickMock = vi.fn();
 		link.onclick = onClickMock;
 
 		await user.click( link );
@@ -47,7 +48,7 @@ describe( 'ExternalLink', () => {
 
 	test( 'should call function passed in onClick handler and prevent default action when clicking an internal anchor link', async () => {
 		const user = await userEvent.setup();
-		const onClickMock = jest.fn();
+		const onClickMock = vi.fn();
 
 		render(
 			<ExternalLink href="#test" onClick={ onClickMock }>
@@ -81,7 +82,7 @@ describe( 'ExternalLink', () => {
 
 		// We are using this approach so we can test the defaultPrevented
 		// without passing an onClick prop to the component.
-		const onClickMock = jest.fn();
+		const onClickMock = vi.fn();
 		link.onclick = onClickMock;
 
 		await user.click( link );

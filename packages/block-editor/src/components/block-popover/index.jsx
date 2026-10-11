@@ -91,7 +91,7 @@ function BlockPopover(
 					? rectUnion(
 							getElementBounds( selectedElement ),
 							getElementBounds( lastSelectedElement )
-					  )
+						)
 					: getElementBounds( selectedElement );
 			},
 			contextElement: selectedElement,

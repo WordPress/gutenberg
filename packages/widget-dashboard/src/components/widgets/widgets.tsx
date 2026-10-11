@@ -10,14 +10,12 @@ import type {
 import type { WidgetName } from '@wordpress/widget-primitives';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardContainerColumnCount } from '../../hooks/use-dashboard-container-column-count';
-import { splitWidgetActions } from '../../utils/split-widget-actions';
-import { WidgetActions } from '../widget-actions';
-import { WidgetAttributes } from '../widget-attributes';
 import { WidgetChrome } from '../widget-chrome';
 import { WidgetHeader } from '../widget-header';
 import { WidgetLayoutControls } from '../widget-layout-controls';
 import { WidgetToolbar } from '../widget-toolbar';
 import { WidgetResizeHandle } from './widget-resize-handle';
+import { WidgetTileControls } from './widget-tile-controls';
 import styles from './widgets.module.css';
 import type {
 	DashboardInstanceOperation,
@@ -122,7 +120,7 @@ export interface WidgetsProps {
  * or masonry, picked from `gridSettings.model`).
  */
 export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
-	function Widgets( { className }, ref ) {
+	function UnforwardedWidgets( { className }, ref ) {
 		const {
 			layout,
 			onLayoutChange,
@@ -183,60 +181,44 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 				( type ) => type.name === widget.type
 			);
 			const { removable, resizable, editable } = permissionsFor( widget );
-			const hasSettings = editable && !! widgetType?.attributes?.length;
-
 			const isFullBleed = widgetType?.presentation === 'full-bleed';
-
-			const { menu: menuActions } = splitWidgetActions( widgetType );
-			const hasActions = menuActions.length > 0;
-
-			// The active mode's controls: layout while customizing, the
-			// attribute controls (high-relevance fields on the prominent
-			// surface, plus a settings entry point when needed) and the
-			// menu actions otherwise.
-			let controls: React.ReactNode;
-			if ( editMode ) {
-				controls =
-					removable || resizable ? (
-						<WidgetLayoutControls
-							widget={ widget }
-							canRemove={ removable }
-							canResize={ resizable }
-						/>
-					) : undefined;
-			} else if ( ( hasSettings || hasActions ) && widgetType ) {
-				controls = (
-					<>
-						{ hasSettings && (
-							<WidgetAttributes
-								widget={ widget }
-								widgetType={ widgetType }
-							/>
-						) }
-
-						{ hasActions && (
-							<WidgetActions actions={ menuActions } />
-						) }
-					</>
-				);
-			}
-
-			const toolbar = controls ? (
-				<WidgetToolbar editMode={ editMode }>
-					{ controls }
-				</WidgetToolbar>
-			) : undefined;
 
 			// Normal mode hosts the toolbar in the in-card header, beside the
 			// identity. Customize controls and full-bleed widgets need it in
 			// the grid's actionable-area slot instead: the slot sits outside
 			// the draggable card, so the controls stay clickable (in-card they
 			// would be captured by the drag listeners).
-			const inSlot = editMode || isFullBleed;
-			const actionableArea =
-				inSlot && toolbar ? (
-					<WidgetHeader overlay>{ toolbar }</WidgetHeader>
-				) : undefined;
+			let actionableArea: React.ReactNode;
+			let headerToolbar: React.ReactNode;
+			if ( editMode ) {
+				if ( removable || resizable ) {
+					actionableArea = (
+						<WidgetHeader overlay>
+							<WidgetToolbar editMode>
+								<WidgetLayoutControls
+									widget={ widget }
+									canRemove={ removable }
+									canResize={ resizable }
+								/>
+							</WidgetToolbar>
+						</WidgetHeader>
+					);
+				}
+			} else if ( widgetType ) {
+				const controls = (
+					<WidgetTileControls
+						widget={ widget }
+						widgetType={ widgetType }
+						editable={ editable }
+						overlay={ isFullBleed }
+					/>
+				);
+				if ( isFullBleed ) {
+					actionableArea = controls;
+				} else {
+					headerToolbar = controls;
+				}
+			}
 
 			return (
 				<WidgetChrome
@@ -247,7 +229,7 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 						[ styles[ 'tile-edit-mode' ] ]: editMode,
 					} ) }
 					actionableArea={ actionableArea }
-					headerToolbar={ ! inSlot ? toolbar : undefined }
+					headerToolbar={ headerToolbar }
 				/>
 			);
 		} );

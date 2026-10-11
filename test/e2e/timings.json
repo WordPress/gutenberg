@@ -8284,34 +8284,6 @@
 			]
 		},
 		{
-			"title": "editor/various/block-bindings/block-fields-pattern-overrides.spec.js",
-			"type": "file",
-			"suites": [
-				{
-					"title": "Block Fields with pattern overrides bindings",
-					"type": "suite",
-					"tests": [
-						{
-							"title": "renders the panel for a `__default` binding without crashing",
-							"attempts": [
-								{
-									"duration": 6323
-								}
-							]
-						},
-						{
-							"title": "renders the panel for an expanded binding without crashing",
-							"attempts": [
-								{
-									"duration": 3364
-								}
-							]
-						}
-					]
-				}
-			]
-		},
-		{
 			"title": "editor/various/block-bindings/custom-sources.spec.js",
 			"type": "file",
 			"suites": [
@@ -8912,14 +8884,6 @@
 									"attempts": [
 										{
 											"duration": 3740
-										}
-									]
-								},
-								{
-									"title": "should be possible to edit the value of the connected custom fields in the inspector control registered by Block Fields experiment",
-									"attempts": [
-										{
-											"duration": 3627
 										}
 									]
 								},

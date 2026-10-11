@@ -9,11 +9,17 @@
 		.popup {
 			--wp-ui-menu-popup-padding: var(--wpds-dimension-padding-xs);
 			--wp-ui-menu-min-width: 160px;
-			--wp-ui-menu-max-width: var(--wpds-dimension-surface-width-md);
-			--wp-ui-menu-item-padding-inline: var(--wpds-dimension-padding-md);
-			--wp-ui-menu-group-head-padding-inline: var(--wpds-dimension-padding-md);
+			--wp-ui-menu-max-width: var(--wpds-dimension-surface-width-sm);
+			/*
+			 * `--wp-ui-menu-item-padding-inline` is left unset so a consumer
+			 * override still sets both edges; these are the fallbacks.
+			 */
+			--_wp-ui-menu-item-padding-inline-start: var(--wpds-dimension-padding-sm);
+			--_wp-ui-menu-item-padding-inline-end: var(--wpds-dimension-padding-sm);
+			--_wp-ui-menu-group-head-padding-base: var(--wpds-dimension-padding-sm);
+			--wp-ui-menu-group-head-padding-inline: var(--_wp-ui-menu-group-head-padding-base);
 			--wp-ui-menu-selection-indicator-track-size: 0px;
-			--wp-ui-menu-selection-indicator-size: var(--wpds-dimension-size-sm);
+			--wp-ui-menu-selection-indicator-size: var(--wpds-dimension-size-2xs);
 			--wp-ui-menu-selection-indicator-gap: 0px;
 			--_wp-ui-menu-elevation-md: 0px 2px 3px 0px #0000000d, 0px 4px 5px 0px #0000000a, 0px 12px 12px 0px #00000008, 0px 16px 16px 0px #00000005;
 
@@ -30,10 +36,10 @@
 			background-color: var(--wpds-color-background-surface-neutral-strong);
 			outline: none;
 
+			/* The indicator already sets labels in, so tighten the start edge. */
 			&:has(.item-selection-indicator) {
-				--wp-ui-menu-item-padding-inline: var(--wpds-dimension-padding-sm);
+				--_wp-ui-menu-item-padding-inline-start: var(--wpds-dimension-padding-xs);
 				--wp-ui-menu-selection-indicator-track-size: var(--wpds-dimension-size-2xs);
-				--wp-ui-menu-selection-indicator-gap: var(--wpds-dimension-gap-sm);
 			}
 		}
 
@@ -57,7 +63,8 @@
 		/*
 		 * The list is the implicit alignment group for direct items. Explicit
 		 * groups and radio groups each establish an independent prefix track while
-		 * inheriting the menu-wide selection tracks.
+		 * inheriting the menu-wide selection tracks. Group labels and separators
+		 * follow that shared selection track so they line up with item labels.
 		 */
 		.list,
 		.group,
@@ -66,13 +73,13 @@
 
 			display: grid;
 			grid-template-columns:
-				[item-padding-start] var(--wp-ui-menu-item-padding-inline)
+				[item-padding-start] var(--wp-ui-menu-item-padding-inline, var(--_wp-ui-menu-item-padding-inline-start))
 				[selection-start] var(--wp-ui-menu-selection-indicator-track-size)
 				[selection-end] var(--wp-ui-menu-selection-indicator-gap)
 				[prefix-start] max-content
 				[prefix-end] var(--wp-ui-menu-group-prefix-gap)
 				[content-start] minmax(0, 1fr)
-				[content-end] var(--wp-ui-menu-item-padding-inline)
+				[content-end] var(--wp-ui-menu-item-padding-inline, var(--_wp-ui-menu-item-padding-inline-end))
 				[item-padding-end];
 			min-width: 0;
 		}
@@ -88,13 +95,22 @@
 			--wp-ui-menu-group-prefix-gap: var(--wpds-dimension-gap-xs);
 		}
 
+		/*
+		 * Start after the selection track (`prefix-start`) and stop before the
+		 * trailing item padding (`content-end`). A zero-width prefix track keeps
+		 * this on the label line; a real prefix stays in its own column so one
+		 * group's icons do not shift every heading and divider.
+		 * `--wp-ui-menu-group-head-padding-inline` still nudges both edges. Its
+		 * default matches the item padding the grid already applies.
+		 */
 		.group-label {
-			grid-column: 1 / -1;
+			grid-column: prefix-start / content-end;
 			display: flex;
 			align-items: center;
-			min-height: var(--wpds-dimension-size-md);
+			min-width: 0;
+			min-height: var(--wpds-dimension-size-sm);
 			padding-block: var(--wpds-dimension-padding-xs);
-			padding-inline: var(--wp-ui-menu-group-head-padding-inline);
+			margin-inline: calc(var(--wp-ui-menu-group-head-padding-inline) - var(--_wp-ui-menu-group-head-padding-base));
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-xs);
 			font-weight: var(--wpds-typography-font-weight-emphasis);
@@ -104,10 +120,10 @@
 		}
 
 		.separator {
-			grid-column: 1 / -1;
+			grid-column: prefix-start / content-end;
 			height: var(--wpds-border-width-xs);
 			margin-block: var(--wpds-dimension-gap-xs);
-			margin-inline: var(--wp-ui-menu-group-head-padding-inline);
+			margin-inline: calc(var(--wp-ui-menu-group-head-padding-inline) - var(--_wp-ui-menu-group-head-padding-base));
 			background-color: var(--wpds-color-stroke-surface-neutral-weak);
 
 			@media ( forced-colors: active ) {
@@ -123,17 +139,19 @@
 			display: grid;
 			grid-column: 1 / -1;
 			grid-template-columns:
-				[item-padding-start] var(--wp-ui-menu-item-padding-inline)
+				[item-padding-start] var(--wp-ui-menu-item-padding-inline, var(--_wp-ui-menu-item-padding-inline-start))
 				[selection-start] var(--wp-ui-menu-selection-indicator-track-size)
 				[selection-end] var(--wp-ui-menu-selection-indicator-gap)
 				[prefix-start] max-content
 				[prefix-end] var(--wp-ui-menu-group-prefix-gap)
 				[content-start] minmax(0, 1fr)
-				[content-end] var(--wp-ui-menu-item-padding-inline)
+				[content-end] var(--wp-ui-menu-item-padding-inline, var(--_wp-ui-menu-item-padding-inline-end))
 				[item-padding-end];
 			gap: 0;
-			/* Keep every slot anchored to the label's first line. */
+			/* Keep leading content at the top of the content row. */
 			align-items: start;
+			/* Center a single line without shifting wrapped content. */
+			align-content: center;
 			justify-content: stretch;
 			min-width: 0;
 			min-height: var(--wp-ui-menu-item-height);
@@ -157,13 +175,27 @@
 				grid-template-columns: subgrid;
 			}
 
+			&[data-popup-open]:not([data-disabled]) {
+				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+
+				@media ( forced-colors: active ) {
+					--_gcd-div-outline: var(--wpds-border-width-xs) solid GrayText;
+					--_gcd-a-outline: var(--wpds-border-width-xs) solid GrayText;
+				}
+			}
+
 			&[data-highlighted]:not([aria-disabled="true"]) {
 				background-color: var(--wpds-color-background-interactive-brand-weak-active);
 				color: var(--wpds-color-foreground-interactive-neutral);
 				outline: none;
 
+				/*
+				 * Set the outline through the global CSS defense bridge, since
+				 * wp-admin's unlayered `div { outline: 0 }` beats layered styles.
+				 */
 				@media ( forced-colors: active ) {
-					outline: var(--wpds-border-width-xs) solid Highlight;
+					--_gcd-div-outline: var(--wpds-border-width-focus) solid Highlight;
+					--_gcd-a-outline: var(--wpds-border-width-focus) solid Highlight;
 				}
 			}
 
@@ -196,6 +228,8 @@
 			justify-content: center;
 			width: var(--wp-ui-menu-selection-indicator-size);
 			height: var(--_wp-ui-menu-item-label-line-height);
+			/* Separate the indicator from the label without widening its track. */
+			margin-inline-end: var(--wpds-dimension-gap-xs);
 			color: var(--wpds-color-foreground-content-neutral-weak);
 			pointer-events: none;
 
@@ -210,8 +244,8 @@
 		}
 
 		.radio-selection-icon {
-			width: var(--wpds-dimension-size-xs);
-			height: var(--wpds-dimension-size-xs);
+			width: var(--wpds-dimension-size-2xs);
+			height: var(--wpds-dimension-size-2xs);
 			fill: currentColor;
 		}
 
@@ -222,18 +256,23 @@
 			justify-content: center;
 			gap: var(--wpds-dimension-gap-xs);
 			min-width: 0;
-			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
 		.prefix-icon {
 			flex-shrink: 0;
-			/* Center a known-size icon on the first label line. */
+			/* Center a known-size icon on a label line at the top of the row. */
 			align-self: flex-start;
 			margin-block-start: calc((var(--_wp-ui-menu-item-label-line-height) - var(--_wp-ui-menu-prefix-icon-size)) / 2);
 		}
 
+		/*
+		 * Without its own prefix, an item starts at the prefix column so its
+		 * label lines up with the icons of its siblings instead of their labels.
+		 */
 		.item-content {
-			grid-column: content-start / content-end;
+			grid-column: prefix-start / content-end;
+			/* Include the height of leading content when centering these slots. */
+			align-self: stretch;
 			/* Everything after the prefix is laid out independently per item. */
 			display: grid;
 			grid-template-columns:
@@ -247,21 +286,32 @@
 			min-width: 0;
 			/* Keep clicks on presentational labels and suffixes routed to the menu item. */
 			pointer-events: none;
+
+			&.has-prefix {
+				grid-column: content-start / content-end;
+			}
 		}
 
-		.item-children {
-			grid-column: label-start / label-end;
-			align-self: start;
-			display: inline-flex;
+		/*
+		 * Descriptions take their own row, starting at the prefix column, so
+		 * suffixes, shortcuts and chevrons stay centered on the label line.
+		 */
+		.item-descriptions {
+			grid-row: 2;
+			grid-column: prefix-start / content-end;
+			display: flex;
 			flex-direction: column;
-			gap: 2px; /* var(--wpds-dimension-gap-xs); */
 			min-width: 0;
+			/* For better optical alignment and spacing */
+			padding-block-end: var(--wpds-dimension-padding-xs);
+			pointer-events: none;
 		}
 
 		.item-label {
 			--_gcd-heading-color: currentColor;
 			--_gcd-p-line-height: var(--_wp-ui-menu-item-label-line-height);
 
+			grid-column: label-start / label-end;
 			min-width: 0;
 			overflow-wrap: anywhere;
 			color: inherit;
@@ -273,11 +323,10 @@
 
 			color: var(--wpds-color-foreground-content-neutral-weak);
 			overflow-wrap: anywhere;
-			/* For better optical alignment and spacing */
-			padding-block-end: var(--wpds-dimension-padding-xs);
 		}
 
-		.item-suffix {
+		/* Outrank the `Text` margin reset, whose stylesheet may load after this one. */
+		.item-content > .item-suffix {
 			grid-column: suffix-start / suffix-end;
 			display: flex;
 			align-items: center;
@@ -286,7 +335,7 @@
 			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
-		.item-shortcut {
+		.item-content > .item-shortcut {
 			grid-column: shortcut-start / shortcut-end;
 			margin-inline-start: var(--wpds-dimension-gap-md);
 			color: var(--wpds-color-foreground-content-neutral-weak);
@@ -300,7 +349,7 @@
 			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
-		.item-children + :is(.item-suffix, .item-shortcut, .item-trailing) {
+		.item-label + :is(.item-suffix, .item-shortcut, .item-trailing) {
 			margin-inline-start: var(--wpds-dimension-gap-xl);
 		}
 
@@ -332,13 +381,11 @@
 			content: "\2196";
 		}
 
-		.item[data-highlighted]:not([aria-disabled="true"]) .item-prefix,
 		.item[data-highlighted]:not([aria-disabled="true"]) .item-description,
 		.item[data-highlighted]:not([aria-disabled="true"]) .item-suffix,
 		.item[data-highlighted]:not([aria-disabled="true"]) .item-shortcut,
 		.item[data-highlighted]:not([aria-disabled="true"]) .item-trailing,
 		.item[data-highlighted]:not([aria-disabled="true"]) .item-selection-indicator,
-		.item[aria-disabled="true"] .item-prefix,
 		.item[aria-disabled="true"] .item-description,
 		.item[aria-disabled="true"] .item-suffix,
 		.item[aria-disabled="true"] .item-shortcut,

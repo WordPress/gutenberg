@@ -19,9 +19,7 @@ type MenuShortcut = NonNullable<
  * Shortcut in any of the shapes the legacy `MenuItem` took.
  */
 type LegacyShortcut =
-	| string
-	| MenuShortcut
-	| { display: string; ariaLabel?: string };
+	string | MenuShortcut | { display: string; ariaLabel?: string };
 
 type MoreMenuItemProps = Omit<
 	HTMLAttributes< HTMLElement >,

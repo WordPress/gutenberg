@@ -1,9 +1,7 @@
-import { createRequire } from 'node:module';
 import { describe, expect, it } from 'vitest';
-const require = createRequire( import.meta.url );
-const getAssociatedPullRequest = require( '../get-associated-pull-request' );
+import getAssociatedPullRequest from '../get-associated-pull-request.js';
 
-/** @typedef {import('../get-associated-pull-request').WebhookPayloadPushCommit} WebhookPayloadPushCommit */
+/** @typedef {import('../get-associated-pull-request.js').WebhookPayloadPushCommit} WebhookPayloadPushCommit */
 
 /**
  * An example commit which can be associated with a pull request, e.g. a pull

@@ -5,7 +5,7 @@ import TreeSelect from '../';
 
 const meta: Meta< typeof TreeSelect > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Selection & Input/Common/TreeSelect',
+	title: 'Components/@wordpress-components/Selection & Input/Common/TreeSelect',
 	id: 'components-treeselect',
 	component: TreeSelect,
 	argTypes: {

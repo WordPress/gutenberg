@@ -11,7 +11,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { lineSolid, moreVertical, plus } from '@wordpress/icons';
 import { useDebounce, useInstanceId } from '@wordpress/compose';
-import { kebabCase } from '@wordpress/kebab-case';
+import { Menu, Stack, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import Button from '../button';
 import { ColorPicker } from '../color-picker';
 import { FlexBlock, FlexItem } from '../flex';
@@ -27,20 +27,12 @@ import {
 	getDefaultColors,
 	getGradientFromCSSColors,
 } from '../duotone-picker/utils';
-import DropdownMenu from '../dropdown-menu';
 import Popover from '../popover';
-import {
-	PaletteActionsContainer,
-	PaletteEditStyles,
-	PaletteHeading,
-	IndicatorStyled,
-	NameContainer,
-	NameInputControl,
-	DoneButton,
-	RemoveButton,
-	PaletteEditContents,
-} from './styles';
-import { NavigableMenu } from '../navigable-container';
+import { Heading } from '../heading';
+import { View } from '../view';
+import InputControl from '../input-control';
+import ColorIndicator from '../color-indicator';
+import styles from './style.module.scss';
 import { DEFAULT_GRADIENT } from '../custom-gradient-picker/constants';
 import CustomGradientPicker from '../custom-gradient-picker';
 import type {
@@ -160,9 +152,9 @@ function getNameInputLabel( variant: PaletteVariant ) {
 function getRemoveLabelFormat( variant: PaletteVariant ) {
 	return variant === 'duotone'
 		? /* translators: %s is a duotone name, e.g. "Purple and yellow". */
-		  __( 'Remove duotone: %s' )
+			__( 'Remove duotone: %s' )
 		: /* translators: %s is a color or gradient name, e.g. "Red". */
-		  __( 'Remove color: %s' );
+			__( 'Remove color: %s' );
 }
 
 /**
@@ -231,7 +223,8 @@ function getResetLabel( variant: PaletteVariant ) {
 
 function NameInput( { value, onChange, label }: NameInputProps ) {
 	return (
-		<NameInputControl
+		<InputControl
+			className={ styles[ 'name-input' ] }
 			size="compact"
 			label={ label }
 			hideLabelFromVision
@@ -304,12 +297,12 @@ export function getNameAndSlugForPosition(
 						/* translators: %d: is an id for a custom duotone */
 						__( 'Duotone %d' ),
 						position
-				  )
+					)
 				: sprintf(
 						/* translators: %d: is an id for a custom color */
 						__( 'Color %d' ),
 						position
-				  ),
+					),
 		slug: `${ slugPrefix }${ stem }-${ position }`,
 	};
 }
@@ -420,7 +413,6 @@ function Option< T extends PaletteElement >( {
 	onChange,
 	onRemove,
 	popoverProps: receivedPopoverProps,
-	slugPrefix,
 	variant,
 	colorPalette,
 }: OptionProps< T > ) {
@@ -454,7 +446,10 @@ function Option< T extends PaletteElement >( {
 					) }
 					style={ { padding: 0 } }
 				>
-					<IndicatorStyled colorValue={ value } />
+					<ColorIndicator
+						className={ styles.indicator }
+						colorValue={ value }
+					/>
 				</Button>
 				<FlexBlock>
 					{ ! canOnlyChangeValues ? (
@@ -465,24 +460,22 @@ function Option< T extends PaletteElement >( {
 								onChange( {
 									...element,
 									name: nextName,
-									slug:
-										slugPrefix +
-										kebabCase( nextName ?? '' ),
 								} )
 							}
 						/>
 					) : (
-						<NameContainer>
+						<div className={ styles.name }>
 							{ element.name.trim().length
 								? element.name
 								: /* Fall back to non-breaking space to maintain height */
-								  '\u00A0' }
-						</NameContainer>
+									'\u00A0' }
+						</div>
 					) }
 				</FlexBlock>
 				{ ! canOnlyChangeValues && (
 					<FlexItem>
-						<RemoveButton
+						<Button
+							className={ styles.remove }
 							size="small"
 							icon={ lineSolid }
 							label={ sprintf(
@@ -514,7 +507,6 @@ function PaletteEditListView< T extends PaletteElement >( {
 	elements,
 	onChange,
 	canOnlyChangeValues,
-	slugPrefix,
 	variant,
 	colorPalette,
 	popoverProps,
@@ -568,7 +560,6 @@ function PaletteEditListView< T extends PaletteElement >( {
 							);
 							addColorRef.current?.focus();
 						} }
-						slugPrefix={ slugPrefix }
 						popoverProps={ popoverProps }
 					/>
 				) ) }
@@ -613,6 +604,10 @@ export function PaletteEdit( {
 	slugPrefix = '',
 	popoverProps,
 }: PaletteEditProps ) {
+	// PaletteEdit combines Components overlays with UI Menu. Direct package
+	// consumers do not expose window.wp.components for automatic opt-in.
+	useEnableWpCompatOverlaySlot();
+
 	let variant: PaletteVariant = 'color';
 	if ( gradients ) {
 		variant = 'gradient';
@@ -686,17 +681,19 @@ export function PaletteEdit( {
 	);
 
 	return (
-		<PaletteEditStyles>
+		<View className={ styles.palette }>
 			<HStack>
-				<PaletteHeading
+				<Heading
+					className={ styles.heading }
 					id={ paletteLabelId }
 					level={ paletteLabelHeadingLevel }
 				>
 					{ paletteLabel }
-				</PaletteHeading>
-				<PaletteActionsContainer>
+				</Heading>
+				<Stack direction="row" gap="xs">
 					{ hasElements && isEditing && (
-						<DoneButton
+						<Button
+							className={ styles.done }
 							size="small"
 							onClick={ () => {
 								setIsEditing( false );
@@ -704,7 +701,7 @@ export function PaletteEdit( {
 							} }
 						>
 							{ __( 'Done' ) }
-						</DoneButton>
+						</Button>
 					) }
 					{ ! canOnlyChangeValues && (
 						<Button
@@ -761,80 +758,71 @@ export function PaletteEdit( {
 						( ! isEditing ||
 							! canOnlyChangeValues ||
 							canReset ) && (
-							<DropdownMenu
-								icon={ moreVertical }
-								label={ getOptionsLabel( variant ) }
-								toggleProps={ {
-									size: 'small',
-								} }
-							>
-								{ ( { onClose }: { onClose: () => void } ) => (
-									<>
-										<NavigableMenu role="menu">
-											{ ! isEditing && (
-												<Button
-													__next40pxDefaultSize
-													variant="tertiary"
-													onClick={ () => {
-														setIsEditing( true );
-														onClose();
-													} }
-													className="components-palette-edit__menu-button"
-												>
-													{ __( 'Show details' ) }
-												</Button>
-											) }
-											{ ! canOnlyChangeValues && (
-												<Button
-													__next40pxDefaultSize
-													variant="tertiary"
-													onClick={ () => {
-														setEditingElement(
-															null
-														);
-														setIsEditing( false );
-														onChange();
-														onClose();
-													} }
-													className="components-palette-edit__menu-button"
-												>
-													{ getRemoveAllLabel(
-														variant
-													) }
-												</Button>
-											) }
-											{ canReset && (
-												<Button
-													__next40pxDefaultSize
-													className="components-palette-edit__menu-button"
-													variant="tertiary"
-													onClick={ () => {
-														setEditingElement(
-															null
-														);
-														onChange();
-														onClose();
-													} }
-												>
-													{ getResetLabel( variant ) }
-												</Button>
-											) }
-										</NavigableMenu>
-									</>
-								) }
-							</DropdownMenu>
+							<Menu.Root modal={ false }>
+								<Menu.Trigger
+									render={
+										<Button
+											size="small"
+											icon={ moreVertical }
+											label={ getOptionsLabel( variant ) }
+											showTooltip
+										/>
+									}
+								/>
+								<Menu.Popup
+									positioner={
+										<Menu.Positioner align="end" />
+									}
+								>
+									{ ! isEditing && (
+										<Menu.Item
+											onClick={ () =>
+												setIsEditing( true )
+											}
+										>
+											<Menu.ItemLabel>
+												{ __( 'Show details' ) }
+											</Menu.ItemLabel>
+										</Menu.Item>
+									) }
+									{ ! canOnlyChangeValues && (
+										<Menu.Item
+											onClick={ () => {
+												setEditingElement( null );
+												setIsEditing( false );
+												onChange();
+											} }
+										>
+											<Menu.ItemLabel>
+												{ getRemoveAllLabel( variant ) }
+											</Menu.ItemLabel>
+										</Menu.Item>
+									) }
+									{ canReset && (
+										<Menu.Item
+											onClick={ () => {
+												setEditingElement( null );
+												onChange();
+											} }
+										>
+											<Menu.ItemLabel>
+												{ getResetLabel( variant ) }
+											</Menu.ItemLabel>
+										</Menu.Item>
+									) }
+								</Menu.Popup>
+							</Menu.Root>
 						) }
-				</PaletteActionsContainer>
+				</Stack>
 			</HStack>
 			{ hasElements && (
-				<PaletteEditContents>
+				<View className={ styles.contents }>
 					{ isEditing && (
 						<PaletteEditListView< ( typeof elements )[ number ] >
 							canOnlyChangeValues={ canOnlyChangeValues }
 							elements={ elements }
 							// @ts-expect-error TODO: Don't know how to resolve
 							onChange={ onChange }
-							slugPrefix={ slugPrefix }
 							variant={ variant }
 							colorPalette={ duotoneColorPalette }
 							popoverProps={ popoverProps }
@@ -903,12 +891,12 @@ export function PaletteEdit( {
 							disableCustomColors
 						/>
 					) }
-				</PaletteEditContents>
+				</View>
 			) }
 			{ ! hasElements && emptyMessage && (
-				<PaletteEditContents>{ emptyMessage }</PaletteEditContents>
+				<View className={ styles.contents }>{ emptyMessage }</View>
 			) }
-		</PaletteEditStyles>
+		</View>
 	);
 }
 

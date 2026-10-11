@@ -178,7 +178,7 @@ export default function UploadProgressSnackbar() {
 							__( 'Uploaded %1$d of %2$d' ),
 							uploaded,
 							total
-					  );
+						);
 
 				speak(
 					isFullSuccess ? __( 'Media upload complete' ) : content,
@@ -237,14 +237,14 @@ export default function UploadProgressSnackbar() {
 						/* translators: %s: filename. */
 						__( 'Uploading — %s' ),
 						filename
-				  )
+					)
 				: sprintf(
 						/* translators: 1: current upload number, 2: total uploads, 3: filename. */
 						__( 'Uploading %1$d of %2$d — %3$s' ),
 						current,
 						total,
 						filename
-				  );
+					);
 
 		createNotice( 'info', content, {
 			id: NOTICE_ID,

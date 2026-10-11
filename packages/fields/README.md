@@ -66,8 +66,8 @@ A React component that renders a modal for creating a template part. The modal d
 
 _Parameters_
 
--   _props_ `{ modalTitle?: string; } & CreateTemplatePartModalContentsProps`: The component props.
--   _props.modalTitle_ `{ modalTitle?: string; } & CreateTemplatePartModalContentsProps[ 'modalTitle' ]`:
+- _props_ `{ modalTitle?: string; } & CreateTemplatePartModalContentsProps`: The component props.
+- _props.modalTitle_ `{ modalTitle?: string; } & CreateTemplatePartModalContentsProps[ 'modalTitle' ]`:
 
 ### dateField
 
@@ -141,18 +141,18 @@ const featuredImageField = {
 
 _Parameters_
 
--   _props_ `MediaEditProps<Item>`: - The component props.
--   _props.data_ `Item`: - The item being edited.
--   _props.field_ `Object`: - The field configuration with getValue and setValue methods.
--   _props.onChange_ `Function`: - Callback function when the media selection changes.
--   _props.allowedTypes_ `[string[]]`: - Array of allowed media types. Use `['*']` to allow all file types. Default `['image']`.
--   _props.multiple_ `[boolean]`: - Whether to allow multiple media selections. Default `false`.
--   _props.hideLabelFromVision_ `[boolean]`: - Whether the label should be hidden from vision.
--   _props.isExpanded_ `[boolean]`: - Whether to render in an expanded form. Default `false`.
+- _props_ `MediaEditProps<Item>`: - The component props.
+- _props.data_ `Item`: - The item being edited.
+- _props.field_ `Object`: - The field configuration with getValue and setValue methods.
+- _props.onChange_ `Function`: - Callback function when the media selection changes.
+- _props.allowedTypes_ `[string[]]`: - Array of allowed media types. Use `['*']` to allow all file types. Default `['image']`.
+- _props.multiple_ `[boolean]`: - Whether to allow multiple media selections. Default `false`.
+- _props.hideLabelFromVision_ `[boolean]`: - Whether the label should be hidden from vision.
+- _props.isExpanded_ `[boolean]`: - Whether to render in an expanded form. Default `false`.
 
 _Returns_
 
--   `React.JSX.Element`: The media edit control component.
+- `React.JSX.Element`: The media edit control component.
 
 ### MediaEditProps
 
@@ -224,7 +224,7 @@ Read-only description field for theme-provided templates, which can't be edited.
 
 _Type_
 
--   `Field< Template >`
+- `Field< Template >`
 
 ### renamePost
 
@@ -268,7 +268,7 @@ Author field for templates.
 
 _Type_
 
--   `Field< Template >`
+- `Field< Template >`
 
 ### templateField
 
@@ -280,7 +280,7 @@ Author field for template parts.
 
 _Type_
 
--   `Field< TemplatePart >`
+- `Field< TemplatePart >`
 
 ### templateTitleField
 

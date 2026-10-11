@@ -166,7 +166,7 @@
 	<button data-testid="async navigate" data-wp-on--click="actions.asyncNavigate">Async Navigate</button>
 </div>
 
-<!-- Count of succesfull client-side navigations -->
+<!-- Count of successful client-side navigations -->
 <div
 	data-testid="navigation count"
 	data-wp-interactive="directive-context-navigate"

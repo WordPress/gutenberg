@@ -1,0 +1,11 @@
+[
+	{
+		"name": "core/math",
+		"isValid": true,
+		"attributes": {
+			"latex": "\\frac{",
+			"mathML": ""
+		},
+		"innerBlocks": []
+	}
+]

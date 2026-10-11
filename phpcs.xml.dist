@@ -45,7 +45,6 @@
 	<!-- Check up to 20 files simultaneously. -->
 	<arg name="parallel" value="20"/>
 
-	<file>./bin</file>
 	<file>./gutenberg.php</file>
 	<file>./lib</file>
 	<file>./packages</file>

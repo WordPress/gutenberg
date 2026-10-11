@@ -3,7 +3,7 @@ import path from 'node:path';
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 const require = createRequire( import.meta.url );
 const os = require( 'node:os' );
-const homedir = vi.spyOn( os, 'homedir' ).mockImplementation( () => undefined );
+let homedir = vi.spyOn( os, 'homedir' ).mockImplementation( () => undefined );
 const { ValidationError } = require( '../validate-config' );
 const { parseSourceString } = require( '../parse-source-string' );
 
@@ -17,6 +17,7 @@ describe( 'parseSourceString', () => {
 	};
 
 	beforeEach( () => {
+		homedir = vi.spyOn( os, 'homedir' );
 		homedir.mockReset().mockReturnValue( '/home/test' );
 	} );
 
@@ -25,16 +26,11 @@ describe( 'parseSourceString', () => {
 	} );
 
 	it( 'should throw when source not parseable', () => {
-		expect.assertions( 1 );
-		try {
-			parseSourceString( 'test://test', options );
-		} catch ( error ) {
-			expect( error ).toEqual(
-				new ValidationError(
-					'Invalid or unrecognized source: "test://test".'
-				)
-			);
-		}
+		expect( () => parseSourceString( 'test://test', options ) ).toThrow(
+			new ValidationError(
+				'Invalid or unrecognized source: "test://test".'
+			)
+		);
 	} );
 
 	describe( 'local sources', () => {

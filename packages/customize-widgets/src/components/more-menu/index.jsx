@@ -3,12 +3,16 @@ import {
 	MenuItem,
 	ToolbarDropdownMenu,
 } from '@wordpress/components';
+import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { external, moreVertical } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
-import { PreferenceToggleMenuItem } from '@wordpress/preferences';
+import {
+	PreferenceToggleMenuItem,
+	store as preferencesStore,
+} from '@wordpress/preferences';
 import { VisuallyHidden } from '@wordpress/ui';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 
@@ -24,6 +28,8 @@ export default function MoreMenu() {
 		'core/customize-widgets/keyboard-shortcuts',
 		toggleKeyboardShortcutsModal
 	);
+
+	const { toggle } = useDispatch( preferencesStore );
 
 	return (
 		<>
@@ -66,11 +72,16 @@ export default function MoreMenu() {
 							>
 								{ __( 'Keyboard shortcuts' ) }
 							</MenuItem>
-							<PreferenceToggleMenuItem
-								scope="core/customize-widgets"
-								name="welcomeGuide"
-								label={ __( 'Welcome Guide' ) }
-							/>
+							<MenuItem
+								onClick={ () =>
+									toggle(
+										'core/customize-widgets',
+										'welcomeGuide'
+									)
+								}
+							>
+								{ __( 'Welcome Guide' ) }
+							</MenuItem>
 							<MenuItem
 								role="menuitem"
 								icon={ external }

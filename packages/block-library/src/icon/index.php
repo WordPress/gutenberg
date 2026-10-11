@@ -15,8 +15,17 @@
  * @return string Returns the Icon.
  */
 function render_block_core_icon( $attributes ) {
-	if ( empty( $attributes['icon'] ) ) {
+	if ( empty( $attributes['icon'] ) || ! is_string( $attributes['icon'] ) ) {
 		return;
+	}
+
+	// Icons in non-public collections are not available in the editor, so do not render them either.
+	$registered_icon = WP_Icons_Registry::get_instance()->get_registered_icon( $attributes['icon'] );
+	if ( null !== $registered_icon ) {
+		$icon_collection = WP_Icon_Collections_Registry::get_instance()->get_registered( $registered_icon['collection'] );
+		if ( null !== $icon_collection && ! $icon_collection['public'] ) {
+			return;
+		}
 	}
 
 	// Text color and background color.
@@ -57,16 +66,21 @@ function render_block_core_icon( $attributes ) {
 		);
 	}
 
+	// Shadow.
+	$shadow_styles = $attributes['style']['shadow'] ?? null;
+
 	// Spacing (Padding).
 	$spacing_styles = array();
 	if ( isset( $attributes['style']['spacing']['padding'] ) ) {
 		$spacing_styles['padding'] = $attributes['style']['spacing']['padding'];
 	}
 
-	// Dimensions (Width).
+	// Dimensions (Width, Min width, Min height).
 	$dimensions_styles = array();
-	if ( isset( $attributes['style']['dimensions']['width'] ) ) {
-		$dimensions_styles['width'] = $attributes['style']['dimensions']['width'];
+	foreach ( array( 'width', 'minWidth', 'minHeight' ) as $dimension ) {
+		if ( isset( $attributes['style']['dimensions'][ $dimension ] ) ) {
+			$dimensions_styles[ $dimension ] = $attributes['style']['dimensions'][ $dimension ];
+		}
 	}
 
 	// Generate styles and classes.
@@ -74,6 +88,7 @@ function render_block_core_icon( $attributes ) {
 		array(
 			'color'      => $color_styles,
 			'border'     => $border_styles,
+			'shadow'     => $shadow_styles,
 			'spacing'    => $spacing_styles,
 			'dimensions' => $dimensions_styles,
 		),

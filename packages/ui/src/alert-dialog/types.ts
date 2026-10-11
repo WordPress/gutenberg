@@ -15,11 +15,10 @@ export type PortalProps = ComponentProps< typeof _AlertDialog.Portal >;
  */
 export type ConfirmResult = void | { close?: boolean; error?: string };
 
-export interface RootProps
-	extends Pick<
-		_AlertDialog.Root.Props,
-		'open' | 'onOpenChange' | 'defaultOpen'
-	> {
+export interface RootProps extends Pick<
+	_AlertDialog.Root.Props,
+	'open' | 'onOpenChange' | 'defaultOpen'
+> {
 	/**
 	 * The content to be rendered inside the component. Typically includes
 	 * `AlertDialog.Trigger` and `AlertDialog.Popup`.
@@ -66,7 +65,8 @@ export type TriggerProps = Omit<
 };
 
 export interface PopupProps
-	extends ComponentProps< 'div' >,
+	extends
+		ComponentProps< 'div' >,
 		Pick< _AlertDialog.Popup.Props, 'initialFocus' | 'finalFocus' > {
 	/**
 	 * Optional portal element, typically `<AlertDialog.Portal />` with

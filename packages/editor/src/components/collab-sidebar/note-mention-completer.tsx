@@ -48,7 +48,7 @@ const noteMentionCompleter = {
 							key: `note-mention-${ user.slug }`,
 							value: user,
 							label: getUserLabel( user ),
-					  } ) )
+						} ) )
 					: [],
 			[ users ]
 		);

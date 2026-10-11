@@ -70,7 +70,7 @@ export default function ClassicThemeContent() {
 					onClick: () =>
 						getEditorSettings().onNavigateToPreviousEntityRecord(),
 				},
-		  ]
+			]
 		: undefined;
 
 	const mayShowTemplateEditNotice = () => {
@@ -103,7 +103,7 @@ export default function ClassicThemeContent() {
 								/* translators: %s: template name */
 								__( 'Template: %s' ),
 								templateName
-						  )
+							)
 						: __( 'Template' )
 				}
 				initialOpen={ false }

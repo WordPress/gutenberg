@@ -1,3 +1,4 @@
+import { describe, expect, test, vi } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 import { observableMap } from '../../../utils/observable-map';
 import useObservableValue from '..';
@@ -7,7 +8,7 @@ describe( 'useObservableValue', () => {
 		const map = observableMap();
 		map.set( 'a', 1 );
 
-		const MapUI = jest.fn( () => {
+		const MapUI = vi.fn( () => {
 			const value = useObservableValue( map, 'a' );
 			return <div>value is { value }</div>;
 		} );

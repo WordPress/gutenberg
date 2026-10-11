@@ -227,7 +227,10 @@ const MediaReplaceFlow = ( {
 						{ onToggleFeaturedImage && (
 							<MenuItem
 								icon={ postFeaturedImage }
-								onClick={ onToggleFeaturedImage }
+								onClick={ () => {
+									onToggleFeaturedImage();
+									onClose();
+								} }
 								isPressed={ useFeaturedImage }
 							>
 								{ __( 'Use featured image' ) }

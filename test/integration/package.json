@@ -23,7 +23,7 @@
 		"./helpers/integration-test-editor": "./helpers/integration-test-editor.jsx"
 	},
 	"devDependencies": {
-		"@testing-library/react": "^16.3.2",
+		"@testing-library/react": "^16.3.3",
 		"@testing-library/user-event": "^14.6.1",
 		"@wordpress/block-editor": "file:../../packages/block-editor",
 		"@wordpress/block-library": "file:../../packages/block-library",
@@ -36,9 +36,9 @@
 		"@wordpress/rich-text": "file:../../packages/rich-text",
 		"ajv": "^8.20.0",
 		"fast-glob": "^3.2.7",
-		"react": "^18.3.1",
+		"react": "^19.3.0",
 		"rimraf": "^5.0.10",
-		"vitest": "^4.1.10"
+		"vitest": "^5.0.3"
 	},
 	"publishConfig": {
 		"access": "public"

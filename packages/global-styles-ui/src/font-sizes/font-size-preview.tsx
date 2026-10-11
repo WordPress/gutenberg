@@ -18,10 +18,10 @@ function FontSizePreview( { fontSize }: FontSizePreviewProps ) {
 			? {
 					minimumFontSize: fontSize.fluid.min,
 					maximumFontSize: fontSize.fluid.max,
-			  }
+				}
 			: {
 					fontSize: fontSize.size,
-			  };
+				};
 
 	const computedFontSize = getComputedFluidTypographyValue( input );
 	return (

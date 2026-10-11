@@ -1,3 +1,4 @@
+import { beforeAll, describe, expect, it } from 'vitest';
 import { pasteHandler, serialize } from '@wordpress/blocks';
 import { init as initAndRegisterImageBlock } from '../../../../../block-library/src/image';
 import { init as initAndRegisterTableBlock } from '../../../../../block-library/src/table';

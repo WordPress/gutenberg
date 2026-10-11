@@ -6,7 +6,7 @@ import * as Styled from './styles';
 export const ItemLabel = forwardRef<
 	HTMLSpanElement,
 	WordPressComponentProps< { children: React.ReactNode }, 'span', true >
->( function ItemLabel( props, ref ) {
+>( function UnforwardedItemLabel( props, ref ) {
 	const menuContext = useContext( Context );
 
 	if ( ! menuContext?.store ) {

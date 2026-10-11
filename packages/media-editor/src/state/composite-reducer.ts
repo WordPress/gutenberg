@@ -117,18 +117,17 @@ export function areMediaEditorStatesEqual(
 }
 
 /**
- * Build the initial composite state from optional partial overrides.
+ * Build the composite state a session starts from: the given cropper
+ * slice and default crop options.
  *
- * @param initialCropper Initial cropper-slice fields to merge.
- * @param initialOptions Initial cropOptions-slice fields to merge.
+ * @param cropper The cropper slice.
  * @return Composite initial state.
  */
 export function buildInitialMediaEditorState(
-	initialCropper: CropperState,
-	initialOptions?: Partial< CropOptionsSlice >
+	cropper: CropperState
 ): MediaEditorState {
 	return {
-		cropper: initialCropper,
-		cropOptions: { ...DEFAULT_CROP_OPTIONS, ...initialOptions },
+		cropper,
+		cropOptions: { ...DEFAULT_CROP_OPTIONS },
 	};
 }

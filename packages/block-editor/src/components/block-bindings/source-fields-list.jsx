@@ -1,14 +1,12 @@
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { getBlockBindingsSource } from '@wordpress/blocks';
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useContext, useMemo } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { Menu } from '@wordpress/ui';
 import useBlockBindingsUtils from './use-block-bindings-utils';
-import { unlock } from '../../lock-unlock';
 import BlockContext from '../block-context';
-
-const { Menu } = unlock( componentsPrivateApis );
 
 function BlockBindingsSourceFieldsListItem( {
 	args,
@@ -43,25 +41,11 @@ function BlockBindingsSourceFieldsListItem( {
 
 	return (
 		<Menu.CheckboxItem
-			onChange={ () => {
-				const isCurrentlySelected =
-					fastDeepEqual( args, field.args ) ??
-					// Deprecate key dependency in 7.0.
-					field.key === args?.key;
-
-				if ( isCurrentlySelected ) {
-					// Unset if the same field is selected again.
-					updateBlockBindings( {
-						[ attribute ]: undefined,
-					} );
-				} else {
-					updateBlockBindings( {
-						[ attribute ]: itemBindings,
-					} );
-				}
+			onCheckedChange={ ( checked ) => {
+				updateBlockBindings( {
+					[ attribute ]: checked ? itemBindings : undefined,
+				} );
 			} }
-			name={ attribute + '-binding' }
-			value={ values[ attribute ] }
 			checked={
 				fastDeepEqual( args, field.args ) ??
 				// Deprecate key dependency in 7.0.
@@ -69,7 +53,7 @@ function BlockBindingsSourceFieldsListItem( {
 			}
 		>
 			<Menu.ItemLabel>{ field.label }</Menu.ItemLabel>
-			<Menu.ItemHelpText>{ values[ attribute ] }</Menu.ItemHelpText>
+			<Menu.ItemDescription>{ values[ attribute ] }</Menu.ItemDescription>
 		</Menu.CheckboxItem>
 	);
 }
@@ -90,14 +74,20 @@ export default function BlockBindingsSourceFieldsList( {
 	const source = getBlockBindingsSource( sourceKey );
 
 	return (
-		<Menu
-			key={ sourceKey }
-			placement={ isMobile ? 'bottom-start' : 'left-start' }
-		>
-			<Menu.SubmenuTriggerItem>
+		<Menu.SubmenuRoot key={ sourceKey }>
+			<Menu.SubmenuTrigger>
 				<Menu.ItemLabel>{ source.label }</Menu.ItemLabel>
-			</Menu.SubmenuTriggerItem>
-			<Menu.Popover gutter={ 8 }>
+			</Menu.SubmenuTrigger>
+			<Menu.Popup
+				positioner={
+					<Menu.Positioner
+						side={ isMobile ? 'bottom' : 'inline-start' }
+						align="start"
+						sideOffset={ 8 }
+						alignOffset={ -4 }
+					/>
+				}
+			>
 				<Menu.Group>
 					{ fields.map( ( field ) => (
 						<BlockBindingsSourceFieldsListItem
@@ -113,7 +103,7 @@ export default function BlockBindingsSourceFieldsList( {
 						/>
 					) ) }
 				</Menu.Group>
-			</Menu.Popover>
-		</Menu>
+			</Menu.Popup>
+		</Menu.SubmenuRoot>
 	);
 }

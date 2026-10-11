@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	DropdownMenu,
 	TextControl,
@@ -19,9 +19,11 @@ import {
 	useBlockEditingMode,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalUseBorderProps as useBorderProps,
+	__experimentalGetShadowClassesAndStyles as useShadowProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	getDimensionsClassesAndStyles as useDimensionsProps,
 } from '@wordpress/block-editor';
+import { getBlockBindingsSource } from '@wordpress/blocks';
 import { useState } from '@wordpress/element';
 import { SVG, Rect, Path } from '@wordpress/primitives';
 import { useSelect } from '@wordpress/data';
@@ -29,6 +31,10 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
 import { CustomInserterModal } from './components';
+
+// Matches the icon name pattern accepted by /wp/v2/icons/<name> REST route.
+const ICON_NAME_REGEX =
+	/^[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?\/[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?$/;
 
 const IconPlaceholder = ( { className, style } ) => (
 	<SVG
@@ -50,13 +56,50 @@ const IconPlaceholder = ( { className, style } ) => (
 	</SVG>
 );
 
-export function Edit( { attributes, setAttributes } ) {
-	const { icon, ariaLabel, flipHorizontal, flipVertical, rotation } =
-		attributes;
+export function Edit( { attributes, setAttributes, isSelected, context } ) {
+	const {
+		icon,
+		ariaLabel,
+		flipHorizontal,
+		flipVertical,
+		rotation,
+		metadata,
+	} = attributes;
 
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
 
 	const isContentOnlyMode = useBlockEditingMode() === 'contentOnly';
+	const { isIconBindingReadOnly = false, iconBindingReadOnlyMessage } =
+		useSelect(
+			( select ) => {
+				if ( ! isSelected ) {
+					return {};
+				}
+
+				const iconBinding = metadata?.bindings?.icon;
+				const blockBindingsSource = getBlockBindingsSource(
+					iconBinding?.source
+				);
+
+				return {
+					isIconBindingReadOnly:
+						!! iconBinding &&
+						! blockBindingsSource?.canUserEditValue?.( {
+							select,
+							context,
+							args: iconBinding.args,
+						} ),
+					iconBindingReadOnlyMessage: blockBindingsSource?.label
+						? sprintf(
+								/* translators: %s: Label of the bindings source. */
+								__( 'Connected to %s' ),
+								blockBindingsSource.label
+							)
+						: __( 'Connected to dynamic data' ),
+				};
+			},
+			[ context, isSelected, metadata?.bindings?.icon ]
+		);
 
 	const colorProps = useColorProps( attributes );
 	// Only padding is applied to the inner SVG element, matching the front
@@ -69,12 +112,19 @@ export function Edit( { attributes, setAttributes } ) {
 		},
 	} );
 	const borderProps = useBorderProps( attributes );
+	const shadowProps = useShadowProps( attributes );
 	const dimensionsProps = useDimensionsProps( attributes );
 
 	const selectedIcon = useSelect(
 		( select ) => {
-			const { getEntityRecord } = select( coreDataStore );
-			return icon ? getEntityRecord( 'root', 'icon', icon ) : null;
+			if ( typeof icon !== 'string' || ! ICON_NAME_REGEX.test( icon ) ) {
+				return null;
+			}
+			return select( coreDataStore ).getEntityRecord(
+				'root',
+				'icon',
+				icon
+			);
 		},
 		[ icon ]
 	);
@@ -87,6 +137,7 @@ export function Edit( { attributes, setAttributes } ) {
 	};
 
 	const rotationStyle = rotation ? { rotate: `${ rotation }deg` } : {};
+	const iconToolbarButtonLabel = icon ? __( 'Replace' ) : __( 'Choose icon' );
 
 	const blockControls = (
 		<>
@@ -125,11 +176,23 @@ export function Edit( { attributes, setAttributes } ) {
 			) }
 			<BlockControls group="other">
 				<ToolbarButton
+					disabled={ isIconBindingReadOnly }
+					label={
+						isIconBindingReadOnly
+							? iconBindingReadOnlyMessage
+							: undefined
+					}
+					showTooltip={ isIconBindingReadOnly }
+					aria-label={
+						isIconBindingReadOnly
+							? iconToolbarButtonLabel
+							: undefined
+					}
 					onClick={ () => {
 						setInserterOpen( true );
 					} }
 				>
-					{ icon ? __( 'Replace' ) : __( 'Choose icon' ) }
+					{ iconToolbarButtonLabel }
 				</ToolbarButton>
 				{ isContentOnlyMode && icon && (
 					// Add some extra controls for content attributes when content only mode is active.
@@ -221,6 +284,7 @@ export function Edit( { attributes, setAttributes } ) {
 							style: {
 								...colorProps.style,
 								...borderProps.style,
+								...shadowProps.style,
 								...spacingProps.style,
 								...dimensionsProps.style,
 								...rotationStyle,
@@ -237,6 +301,7 @@ export function Edit( { attributes, setAttributes } ) {
 						) }
 						style={ {
 							...borderProps.style,
+							...shadowProps.style,
 							...spacingProps.style,
 							...dimensionsProps.style,
 							...rotationStyle,

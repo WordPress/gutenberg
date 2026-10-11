@@ -5,6 +5,7 @@ import {
 	RichText,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
+	useBackgroundProps,
 	getTypographyClassesAndStyles as useTypographyProps,
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
@@ -13,7 +14,7 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import {
-	SelectControl,
+	SelectControl as WCSelectControl,
 	ToggleControl,
 	ResizableBox,
 	__experimentalUseCustomUnits as useCustomUnits,
@@ -135,6 +136,7 @@ export default function SearchEdit( {
 	}
 
 	const colorProps = useColorProps( attributes );
+	const backgroundProps = useBackgroundProps( attributes );
 	const [ fluidTypographySettings, layout ] = useSettings(
 		'typography.fluid',
 		'layout'
@@ -220,11 +222,13 @@ export default function SearchEdit( {
 		const textFieldClasses = clsx(
 			'wp-block-search__input',
 			hasNoButton ? colorProps.className : undefined,
+			hasNoButton ? backgroundProps.className : undefined,
 			isButtonPositionInside ? undefined : borderProps.className,
 			typographyProps.className
 		);
 		const textFieldStyles = {
 			...( hasNoButton ? colorProps.style : {} ),
+			...( hasNoButton ? backgroundProps.style : {} ),
 			...( isButtonPositionInside
 				? {
 						borderRadius: borderProps.style?.borderRadius,
@@ -236,7 +240,7 @@ export default function SearchEdit( {
 							borderProps.style?.borderBottomLeftRadius,
 						borderBottomRightRadius:
 							borderProps.style?.borderBottomRightRadius,
-				  }
+					}
 				: borderProps.style ),
 			...typographyProps.style,
 			textDecoration: undefined,
@@ -268,6 +272,7 @@ export default function SearchEdit( {
 		const buttonClasses = clsx(
 			'wp-block-search__button',
 			colorProps.className,
+			backgroundProps.className,
 			typographyProps.className,
 			isButtonPositionInside ? undefined : borderProps.className,
 			buttonUseIcon ? 'has-icon' : undefined,
@@ -275,6 +280,7 @@ export default function SearchEdit( {
 		);
 		const buttonStyles = {
 			...colorProps.style,
+			...backgroundProps.style,
 			...typographyProps.style,
 			...( isButtonPositionInside
 				? {
@@ -287,7 +293,7 @@ export default function SearchEdit( {
 							borderProps.style?.borderBottomLeftRadius,
 						borderBottomRightRadius:
 							borderProps.style?.borderBottomRightRadius,
-				  }
+					}
 				: borderProps.style ),
 		};
 		return (
@@ -373,7 +379,7 @@ export default function SearchEdit( {
 						} }
 						isShownByDefault
 					>
-						<SelectControl
+						<WCSelectControl
 							value={ buttonPosition }
 							label={ __( 'Button position' ) }
 							onChange={ ( value ) => {
@@ -490,7 +496,7 @@ export default function SearchEdit( {
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
-				<SelectControl
+				<WCSelectControl
 					label={ __( 'HTML element' ) }
 					value={ tagName ?? '' }
 					options={ [
@@ -536,7 +542,7 @@ export default function SearchEdit( {
 						borderProps.style?.borderBottomLeftRadius,
 					borderBottomRightRadius:
 						borderProps.style?.borderBottomRightRadius,
-			  };
+				};
 
 		if ( isButtonPositionInside ) {
 			// We have button inside wrapper and a border radius value to apply.

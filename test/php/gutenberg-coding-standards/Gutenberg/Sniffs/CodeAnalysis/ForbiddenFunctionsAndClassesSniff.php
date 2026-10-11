@@ -173,7 +173,7 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 	 *
 	 * @param File $phpcs_file    File being scanned.
 	 * @param int  $stack_pointer Position of the text token in the token stack.
-	 * @return bool               Returns true if the token is guarded.
+	 * @return bool Returns true if the token is guarded.
 	 */
 	private function check_if_token_guarded( File $phpcs_file, $stack_pointer ) {
 		if ( false === $phpcs_file->hasCondition( $stack_pointer, T_IF ) ) {

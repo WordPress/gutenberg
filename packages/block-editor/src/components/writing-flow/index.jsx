@@ -50,6 +50,14 @@ export function useWritingFlow() {
 				( node ) => {
 					node.tabIndex = 0;
 					node.dataset.hasMultiSelection = hasMultiSelection;
+					// The wrapper is the canvas root: an editing host while
+					// a selection spans blocks or the selected block
+					// supports `editableRoot`, explicitly not one otherwise,
+					// so it can always be found as the outermost editable
+					// ancestor of a field.
+					if ( ! node.hasAttribute( 'contenteditable' ) ) {
+						node.contentEditable = false;
+					}
 
 					if ( ! hasMultiSelection ) {
 						return () => {

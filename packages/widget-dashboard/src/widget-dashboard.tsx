@@ -55,7 +55,7 @@ import type { WidgetDashboardProps } from './types';
  * internal context.
  */
 export const WidgetDashboard = Object.assign(
-	function WidgetDashboard( {
+	function WidgetDashboardRoot( {
 		layout,
 		onLayoutChange,
 		onLayoutReset,

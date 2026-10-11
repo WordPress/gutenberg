@@ -1,9 +1,19 @@
+import { beforeEach, describe, expect, it } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { logged } from '@wordpress/deprecated';
 import { ValidatedTextareaControl } from '../components';
+
+const DEPRECATION_MESSAGE =
+	'wp.components.privateApis.ValidatedTextareaControl is deprecated since version 7.2. Please use ValidatedTextareaControl from @wordpress/ui instead. Note: This private API will be completely removed within a few Gutenberg plugin releases.';
+
+beforeEach( () => {
+	logged[ DEPRECATION_MESSAGE ] = true;
+} );
 
 describe( 'Shows a deprecation warning', () => {
 	it( 'ValidatedTextareaControl', () => {
+		delete logged[ DEPRECATION_MESSAGE ];
 		render(
 			<ValidatedTextareaControl
 				label="Bio"
@@ -13,9 +23,7 @@ describe( 'Shows a deprecation warning', () => {
 			/>
 		);
 
-		expect( console ).toHaveWarnedWith(
-			'wp.components.privateApis.ValidatedTextareaControl is deprecated since version 7.2. Please use ValidatedTextareaControl from @wordpress/ui instead. Note: This private API will be completely removed within a few Gutenberg plugin releases.'
-		);
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
 	} );
 } );
 

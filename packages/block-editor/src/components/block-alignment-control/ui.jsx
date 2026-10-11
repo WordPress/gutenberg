@@ -6,7 +6,7 @@ import {
 	MenuGroup,
 	MenuItem,
 } from '@wordpress/components';
-import useAvailableAlignments from './use-available-alignments';
+import { useAlignmentMenu } from './use-available-alignments';
 import { BLOCK_ALIGNMENTS_CONTROLS, DEFAULT_CONTROL } from './constants';
 
 function BlockAlignmentUI( {
@@ -18,12 +18,33 @@ function BlockAlignmentUI( {
 	label = __( 'Align block' ),
 	description,
 } ) {
-	const enabledControls = useAvailableAlignments( controls );
-	const hasEnabledControls = !! enabledControls.length;
+	/*
+	 * Wide and Full are the alignments users look for and fail to find. When a
+	 * parent layout does not offer them they disappear from this menu with no
+	 * explanation, which reads as the editor losing the setting. List them as
+	 * unavailable instead, so the menu says why it cannot do what was asked.
+	 */
+	const { enabled: enabledControls, unavailable: unavailableControls } =
+		useAlignmentMenu( controls );
 
-	if ( ! hasEnabledControls ) {
+	// A menu of nothing but unavailable options could never change anything.
+	if ( ! enabledControls.length ) {
 		return null;
 	}
+
+	const menuControls = [ ...enabledControls ];
+	const enabledNames = menuControls.map( ( { name } ) => name );
+
+	// Unavailable alignments sit where they would have sat had they been
+	// offered, which is directly after `none`.
+	menuControls.splice(
+		enabledNames.indexOf( 'none' ) + 1,
+		0,
+		...unavailableControls.map( ( name ) => ( {
+			name,
+			isUnavailable: true,
+		} ) )
+	);
 
 	function onChangeAlignment( align ) {
 		onChange( [ value, 'none' ].includes( align ) ? undefined : align );
@@ -53,20 +74,27 @@ function BlockAlignmentUI( {
 						onClick: () => onChangeAlignment( controlName ),
 					};
 				} ),
-		  }
+			}
 		: {
 				toggleProps: description ? { description } : {},
 				children: ( { onClose } ) => {
 					return (
 						<>
 							<MenuGroup className="block-editor-block-alignment-control__menu-group">
-								{ enabledControls.map(
-									( { name: controlName, info } ) => {
+								{ menuControls.map(
+									( {
+										name: controlName,
+										info,
+										isUnavailable,
+									} ) => {
 										const { icon, title } =
 											BLOCK_ALIGNMENTS_CONTROLS[
 												controlName
 											];
 										// If no value is provided, mark as selected the `none` option.
+										// An unavailable alignment can still be the saved value, and
+										// showing it as selected is how the menu says the setting
+										// exists but has no effect in this position.
 										const isSelected =
 											controlName === value ||
 											( ! value &&
@@ -83,6 +111,7 @@ function BlockAlignmentUI( {
 													}
 												) }
 												isSelected={ isSelected }
+												disabled={ isUnavailable }
 												onClick={ () => {
 													onChangeAlignment(
 														controlName
@@ -90,7 +119,11 @@ function BlockAlignmentUI( {
 													onClose();
 												} }
 												role="menuitemradio"
-												info={ info }
+												info={
+													isUnavailable
+														? __( 'Not available' )
+														: info
+												}
 											>
 												{ title }
 											</MenuItem>
@@ -101,7 +134,7 @@ function BlockAlignmentUI( {
 						</>
 					);
 				},
-		  };
+			};
 
 	return <UIComponent { ...commonProps } { ...extraProps } />;
 }

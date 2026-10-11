@@ -49,7 +49,7 @@ function showAutosaveExistsNotice( {
 									}
 									setCurrentRevisionId( autosaveId );
 								},
-						  }
+							}
 						: { url: autosave.editLink } ),
 				},
 			],

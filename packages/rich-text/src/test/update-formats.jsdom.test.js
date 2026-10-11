@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+import '../store';
 import { updateFormats } from '../update-formats';
 import { create } from '../create';
 import { toHTMLString } from '../to-html-string';
@@ -7,11 +9,6 @@ import { getSparseArrayLength } from './helpers';
 
 describe( 'updateFormats', () => {
 	const em = { type: 'em' };
-
-	beforeAll( () => {
-		// Initialize the rich-text store.
-		require( '../store' );
-	} );
 
 	it( 'should update formats with empty array', () => {
 		const value = {

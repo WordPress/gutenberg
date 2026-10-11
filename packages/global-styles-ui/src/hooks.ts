@@ -1,5 +1,3 @@
-import { colord, extend } from 'colord';
-import a11yPlugin from 'colord/plugins/a11y';
 import { useCallback, useContext, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -15,13 +13,9 @@ import {
 import type {
 	GlobalStylesConfig,
 	StyleVariation,
-	Color,
 } from '@wordpress/global-styles-engine';
 import { GlobalStylesContext } from './context';
 import { removePropertiesFromObject, isVariationWithProperties } from './utils';
-
-// Enable colord's a11y plugin.
-extend( [ a11yPlugin ] );
 
 /**
  * Hook to get and set style values with memoization.
@@ -249,45 +243,6 @@ export function useColorVariations(): StyleVariation[] {
 	return useCurrentMergeThemeStyleVariationsWithUserConfig(
 		propertiesToFilter
 	);
-}
-
-/**
- * Hook to randomize theme colors using color rotation.
- *
- * @param blockName The name of the block, if applicable.
- * @return Array containing the randomize function if feature is enabled, empty array otherwise.
- */
-export function useColorRandomizer( blockName?: string ): [ () => void ] | [] {
-	const [ themeColors, setThemeColors ] = useSetting< Color[] >(
-		'color.palette.theme',
-		blockName
-	);
-
-	const randomizeColors = useCallback( () => {
-		if ( ! themeColors || ! themeColors.length ) {
-			return;
-		}
-
-		const randomRotationValue = Math.floor( Math.random() * 225 );
-
-		const newColors = themeColors.map( ( colorObject ) => {
-			const { color } = colorObject;
-			const newColor = colord( color )
-				.rotate( randomRotationValue )
-				.toHex();
-
-			return {
-				...colorObject,
-				color: newColor,
-			};
-		} );
-
-		setThemeColors( newColors );
-	}, [ themeColors, setThemeColors ] );
-
-	return ( window as any ).__experimentalEnableColorRandomizer
-		? [ randomizeColors ]
-		: [];
 }
 
 /**

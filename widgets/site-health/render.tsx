@@ -1,9 +1,9 @@
-import { useState, useEffect } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@wordpress/components';
 import { Link, Stack, Text } from '@wordpress/ui';
-import { useWidgetHost } from '@wordpress/widget-primitives';
+import { HostLink, useWidgetActions } from '@wordpress/widget-primitives';
 import { CircleProgress, type HealthTone } from './components';
 import styles from './style.module.css';
 
@@ -104,7 +104,28 @@ function reviewHref( counts: IssueCounts ): string {
 export default function SiteHealth() {
 	const [ counts, setCounts ] = useState< IssueCounts | null >( null );
 	const [ isLoading, setIsLoading ] = useState( true );
-	const { links } = useWidgetHost();
+
+	const issuesTotal = counts ? counts.recommended + counts.critical : 0;
+	const reviewLabel = sprintf(
+		/* translators: %d: Number of issues to address. */
+		_n( 'Review %d item', 'Review %d items', issuesTotal ),
+		issuesTotal
+	);
+	const href = counts ? reviewHref( counts ) : '';
+
+	// With items to review, a link to them joins the declared actions.
+	const hosted = useWidgetActions(
+		issuesTotal > 0
+			? [
+					{
+						id: 'site-health-review',
+						label: reviewLabel,
+						relevance: 'medium',
+						href,
+					},
+				]
+			: []
+	);
 
 	useEffect( () => {
 		let ignore = false;
@@ -159,17 +180,7 @@ export default function SiteHealth() {
 	const total = counts.good + counts.recommended + counts.critical;
 	const percentage =
 		total > 0 ? Math.round( ( counts.good / total ) * 100 ) : 0;
-	const issuesTotal = counts.recommended + counts.critical;
 	const tone = toneForPercentage( percentage );
-	const href = reviewHref( counts );
-
-	const path = links?.match( href ) ?? null;
-	const HostLink = links?.Link;
-	const reviewLabel = sprintf(
-		/* translators: %d: Number of issues to address. */
-		_n( 'Review %d item', 'Review %d items', issuesTotal ),
-		issuesTotal
-	);
 
 	return (
 		<Stack
@@ -181,14 +192,11 @@ export default function SiteHealth() {
 		>
 			<CircleProgress percentage={ percentage } tone={ tone } />
 			<Text variant="body-lg">{ statusMessage( counts ) }</Text>
-			{ issuesTotal > 0 &&
-				( path !== null && HostLink ? (
-					<Link render={ <HostLink path={ path } /> }>
-						{ reviewLabel }
-					</Link>
-				) : (
-					<Link href={ href }>{ reviewLabel }</Link>
-				) ) }
+			{ issuesTotal > 0 && ! hosted && (
+				<Link render={ <HostLink href={ href } /> }>
+					{ reviewLabel }
+				</Link>
+			) }
 		</Stack>
 	);
 }

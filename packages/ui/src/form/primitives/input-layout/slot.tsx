@@ -9,7 +9,7 @@ import type { InputLayoutSlotProps } from './types';
 export const InputLayoutSlot = forwardRef<
 	HTMLDivElement,
 	InputLayoutSlotProps
->( function InputLayoutSlot(
+>( function UnforwardedInputLayoutSlot(
 	{ padding = 'default', className, ...restProps },
 	ref
 ) {

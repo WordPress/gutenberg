@@ -258,13 +258,25 @@ export type EditConfigText = {
 	 */
 	control: 'text';
 	/**
-	 * Prefix component to display before the input.
+	 * Prefix to display before the input: a string or a component.
 	 */
-	prefix?: React.ComponentType;
+	prefix?: string | React.ComponentType;
 	/**
-	 * Suffix component to display after the input.
+	 * Padding of the prefix slot. Use `minimal` for icons and buttons.
+	 *
+	 * @default 'default'
 	 */
-	suffix?: React.ComponentType;
+	prefixPadding?: 'default' | 'minimal';
+	/**
+	 * Suffix to display after the input: a string or a component.
+	 */
+	suffix?: string | React.ComponentType;
+	/**
+	 * Padding of the suffix slot. Use `minimal` for icons and buttons.
+	 *
+	 * @default 'default'
+	 */
+	suffixPadding?: 'default' | 'minimal';
 };
 
 /**
@@ -350,8 +362,10 @@ export type Field< Item > = {
 
 	/**
 	 * Callback used to sort the field.
+	 *
+	 * Receives the field values of the two items being compared.
 	 */
-	sort?: ( a: Item, b: Item, direction: SortDirection ) => number;
+	sort?: ( a: any, b: any, direction: SortDirection ) => number;
 
 	/**
 	 * Validation config for the field.
@@ -432,11 +446,7 @@ export type Field< Item > = {
 	 * Display format configuration for fields.
 	 */
 	format?:
-		| FormatDatetime
-		| FormatDate
-		| FormatTime
-		| FormatNumber
-		| FormatInteger;
+		FormatDatetime | FormatDate | FormatTime | FormatNumber | FormatInteger;
 
 	/**
 	 * Callback used to format the value of the field for display.
@@ -575,8 +585,10 @@ export type NormalizedField< Item > = Omit<
 	/**
 	 * Callback used to sort the field. Defaults to the sorter
 	 * of the field's type.
+	 *
+	 * Receives the field values of the two items being compared.
 	 */
-	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
+	sort: ( a: any, b: any, direction: SortDirection ) => number;
 
 	/**
 	 * The validation rules of the field, normalized.
@@ -761,13 +773,27 @@ export type DataFormControlProps< Item > = {
 	 */
 	config?: {
 		/**
-		 * Prefix component to display before the input (text control).
+		 * Prefix to display before the input, a string or a component
+		 * (text control).
 		 */
-		prefix?: React.ComponentType;
+		prefix?: string | React.ComponentType;
 		/**
-		 * Suffix component to display after the input (text control).
+		 * Padding of the prefix slot (text control).
+		 *
+		 * @default 'default'
 		 */
-		suffix?: React.ComponentType;
+		prefixPadding?: 'default' | 'minimal';
+		/**
+		 * Suffix to display after the input, a string or a component
+		 * (text control).
+		 */
+		suffix?: string | React.ComponentType;
+		/**
+		 * Padding of the suffix slot (text control).
+		 *
+		 * @default 'default'
+		 */
+		suffixPadding?: 'default' | 'minimal';
 		/**
 		 * Number of rows (textarea control).
 		 */

@@ -28,18 +28,26 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`html`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#html): `false`
 - [`align`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#align): `"wide"`, `"full"`
 - [`layout`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout): `true`
+- [`background`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#background):
+  - `backgroundImage`: `true`
+  - `backgroundSize`: `true`
+  - `gradient`: `true`
 - [`color`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color):
   - [`gradients`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
   - [`link`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
+- [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
+  - `minHeight`: `true`
+  - `minWidth`: `true`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `margin`: `true`
   - `padding`: `true`
   - `blockGap`: `{"__experimentalDefault":"1.25em"}`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
+- [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
 
 ## Context
 

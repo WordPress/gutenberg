@@ -1,8 +1,11 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Fragment, useState } from '@wordpress/element';
-import { SelectControl } from '@wordpress/components';
+import { SelectControl as WCSelectControl } from '@wordpress/components';
 import ResponsiveBlockControl from '../index';
+
+globalThis.wpVitest.mockMatchMedia();
 
 const inputId = 'input-12345678';
 
@@ -28,7 +31,7 @@ const sizeOptions = [
 const renderTestDefaultControlComponent = ( labelComponent, device ) => {
 	return (
 		<>
-			<SelectControl label={ labelComponent } options={ sizeOptions } />
+			<WCSelectControl label={ labelComponent } options={ sizeOptions } />
 			<p id={ device.id }>
 				{ device.label } is used here for testing purposes to ensure we
 				have access to details about the device.
@@ -198,7 +201,7 @@ describe( 'Default and Responsive modes', () => {
 			},
 		];
 
-		const mockRenderDefaultControl = jest.fn(
+		const mockRenderDefaultControl = vi.fn(
 			renderTestDefaultControlComponent
 		);
 
@@ -285,9 +288,9 @@ describe( 'Default and Responsive modes', () => {
 	} );
 
 	it( 'should render custom responsive controls when renderResponsiveControls prop is provided and in responsive mode', () => {
-		const spyRenderDefaultControl = jest.fn();
+		const spyRenderDefaultControl = vi.fn();
 
-		const mockRenderResponsiveControls = jest.fn( ( viewports ) => {
+		const mockRenderResponsiveControls = vi.fn( ( viewports ) => {
 			return viewports.map( ( { id, label } ) => {
 				return (
 					<Fragment key={ `${ inputId }-${ id }` }>

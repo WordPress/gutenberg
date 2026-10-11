@@ -1,6 +1,6 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
 	"compilerOptions": {
 		"types": [ "gutenberg-env" ],
 		"strictNullChecks": true
@@ -34,6 +34,7 @@
 		{ "path": "../kebab-case" },
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../primitives" },
+		{ "path": "../react-inert-value/tsconfig.build.json" },
 		{ "path": "../rich-text" },
 		{ "path": "../server-side-render/tsconfig.build.json" },
 		{ "path": "../shortcode/tsconfig.build.json" },

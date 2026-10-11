@@ -1,5 +1,40 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+// `aligned` right-aligns the cells before `&` and left-aligns the ones
+// after it. `cases` left-aligns both columns, and temml writes no alignment
+// attribute on its table, so it only aligns because the converter writes
+// the attribute on the cells.
+const ALIGNED_AND_CASES =
+	'\\begin{aligned} A &= 1 \\\\ AB + C &= 2 \\end{aligned} \\quad \\begin{cases} x & x > 0 \\\\ -x & x \\le 0 \\end{cases}';
+
+// Returns, for every aligned cell, how far its content is from the edge
+// its `columnalign` names; nothing is misaligned when all are within a
+// pixel.
+async function getMisalignedCells( container ) {
+	const cells = container.locator(
+		'math mtd[columnalign="right"], math mtd[columnalign="left"]'
+	);
+	await expect( cells ).toHaveCount( 8 );
+	return cells.evaluateAll( ( elements ) =>
+		elements
+			.map( ( cell ) => {
+				const cellRect = cell.getBoundingClientRect();
+				const rects = Array.from( cell.children, ( child ) =>
+					child.getBoundingClientRect()
+				);
+				const style = window.getComputedStyle( cell );
+				return cell.getAttribute( 'columnalign' ) === 'right'
+					? cellRect.right -
+							parseFloat( style.paddingRight ) -
+							Math.max( ...rects.map( ( r ) => r.right ) )
+					: Math.min( ...rects.map( ( r ) => r.left ) ) -
+							cellRect.left -
+							parseFloat( style.paddingLeft );
+			} )
+			.filter( ( gap ) => Math.abs( gap ) > 1 )
+	);
+}
+
 test.describe( 'Math Block', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
@@ -87,5 +122,40 @@ test.describe( 'Math Block', () => {
 				},
 			},
 		] );
+	} );
+
+	test( 'should align the cells of aligned and cases in a Math block @webkit @firefox', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/math',
+			attributes: { latex: ALIGNED_AND_CASES },
+		} );
+		expect( await getMisalignedCells( editor.canvas ) ).toEqual( [] );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+		expect( await getMisalignedCells( page ) ).toEqual( [] );
+	} );
+
+	test( 'should align the cells of aligned and cases in inline math @webkit @firefox', async ( {
+		editor,
+		page,
+	} ) => {
+		// The rules live in the block library's common stylesheet, which
+		// loads on every page, not in the Math block's own.
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type( 'Inline ' );
+		await editor.clickBlockToolbarButton( 'More' );
+		await page.getByRole( 'menuitem', { name: 'Math' } ).click();
+		await page
+			.getByRole( 'textbox', { name: 'LaTeX math syntax' } )
+			.fill( ALIGNED_AND_CASES );
+		expect( await getMisalignedCells( editor.canvas ) ).toEqual( [] );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+		expect( await getMisalignedCells( page ) ).toEqual( [] );
 	} );
 } );

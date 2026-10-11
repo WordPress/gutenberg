@@ -12,6 +12,10 @@ export type IconButtonProps = Omit< ButtonProps, 'children' > & {
 
 	/**
 	 * The icon to display in the button.
+	 *
+	 * When using `@wordpress/icons`, only version 15.0.0 or later is supported.
+	 * For custom SVGs, use `currentColor` for any fill or stroke that should
+	 * follow the button text color.
 	 */
 	icon: IconProps[ 'icon' ];
 

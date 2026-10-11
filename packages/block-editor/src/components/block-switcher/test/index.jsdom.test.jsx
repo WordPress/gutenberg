@@ -1,3 +1,4 @@
+import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { render, screen, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useSelect } from '@wordpress/data';
@@ -5,10 +6,13 @@ import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { copy } from '@wordpress/icons';
 import { BlockSwitcher } from '../';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
-jest.mock( '../../block-title/use-block-display-title', () =>
-	jest.fn().mockReturnValue( 'Block Name' )
-);
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: vi.fn(),
+} ) );
+vi.mock( import( '../../block-title/use-block-display-title' ), () => ( {
+	default: vi.fn().mockReturnValue( 'Block Name' ),
+} ) );
 
 describe( 'BlockSwitcher', () => {
 	const headingBlock1 = {

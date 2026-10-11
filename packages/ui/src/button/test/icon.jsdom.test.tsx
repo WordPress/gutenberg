@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { createRef } from '@wordpress/element';
 import { render } from '@testing-library/react';
 import { ButtonIcon } from '../icon';

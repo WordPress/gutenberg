@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 6.57.0 (2026-10-07)
+
+### Bug Fixes
+
+-   Error boundary: Explicitly announce the error title and description, excluding action labels ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
+
+## 6.56.0 (2026-09-23)
+
+### Bug Fixes
+
+-   Open the Welcome Guide from a plain menu item instead of a preference toggle, so the Options menu no longer announces "Preference activated - Welcome Guide" ([#82395](https://github.com/WordPress/gutenberg/pull/82395)).
+
+## 6.55.0 (2026-09-10)
+
 ### Enhancements
 
 -   `WidgetAreasBlockEditorProvider`: Wire `selectBlockPatternsKey`, `reusableBlocksSelectKey`, `userPatternCategoriesSelectKey`, and `__experimentalBlockPatternCategories` into the block editor settings so patterns from themes, the Pattern Directory, and user categories are available in the widgets editor inserter. Patterns whose blocks are not allowed in widget areas (post, query, site, navigation, term) are still filtered out automatically ([#78884](https://github.com/WordPress/gutenberg/pull/78884)).
@@ -15,6 +33,7 @@
 
 ### Internal
 
+-   Stop passing the unused `editorTool` block editor setting; the selector that read it was removed with the Write/Design tool in [#72193](https://github.com/WordPress/gutenberg/pull/72193) ([#82677](https://github.com/WordPress/gutenberg/pull/82677)).
 -   Remove unused dependency `@wordpress/reusable-blocks` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
 

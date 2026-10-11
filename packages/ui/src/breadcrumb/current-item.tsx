@@ -2,7 +2,7 @@ import { mergeProps, useRender } from '@base-ui/react';
 import clsx from 'clsx';
 import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useState } from '@wordpress/element';
-import type { ForwardedRef } from 'react';
+import type { ForwardedRef, ReactElement } from 'react';
 import * as Tooltip from '../tooltip';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
 import focusStyles from '../utils/css/focus.module.scss';
@@ -26,6 +26,7 @@ type CurrentItemImplementationProps = CurrentItemProps & {
 const MEASUREMENT_RENDER = <span />;
 
 function VisibleCurrentItem( {
+	'aria-current': ariaCurrent,
 	children,
 	className,
 	forwardedRef,
@@ -34,15 +35,26 @@ function VisibleCurrentItem( {
 	render,
 	...props
 }: CurrentItemImplementationProps ) {
-	const { measurementVersion, showSeparator, shouldTruncateCurrent } =
-		useBreadcrumbItemRenderContext();
+	const {
+		currentRef,
+		variant,
+		measurementVersion,
+		showSeparator,
+		shouldTruncateCurrent,
+	} = useBreadcrumbItemRenderContext();
 	const [ element, setElement ] = useState< HTMLSpanElement | null >( null );
 	const [ isFocusPinned, setIsFocusPinned ] = useState( false );
-	const mergedRef = useMergeRefs( [ forwardedRef, setElement ] );
+	const mergedRef = useMergeRefs( [
+		forwardedRef,
+		setElement,
+		currentRef ?? null,
+	] );
 	const isTruncated = useIsTruncated( element, measurementVersion );
 	const tabIndex = isTruncated || isFocusPinned ? 0 : undefined;
+	const resolvedAriaCurrent =
+		ariaCurrent ?? ( variant === 'selection' ? 'true' : 'page' );
 	const enforcedRender = enforceRenderProps( render, {
-		'aria-current': 'page',
+		'aria-current': resolvedAriaCurrent,
 		href: undefined,
 		tabIndex,
 	} );
@@ -53,7 +65,7 @@ function VisibleCurrentItem( {
 		props: mergeProps< 'span' >(
 			{ ...props, onBlur, onFocus },
 			{
-				'aria-current': 'page',
+				'aria-current': resolvedAriaCurrent,
 				children,
 				className: clsx(
 					defenseStyles.div,
@@ -66,9 +78,7 @@ function VisibleCurrentItem( {
 				),
 				onBlur: () => setIsFocusPinned( false ),
 				onFocus: () => {
-					if ( isTruncated ) {
-						setIsFocusPinned( true );
-					}
+					setIsFocusPinned( true );
 				},
 				tabIndex,
 			}
@@ -84,7 +94,11 @@ function VisibleCurrentItem( {
 		>
 			{ showSeparator && <Separator /> }
 			<Tooltip.Root disabled={ ! isTruncated }>
-				<Tooltip.Trigger render={ currentItem } />
+				<Tooltip.Trigger
+					render={
+						currentItem as ReactElement< Record< string, unknown > >
+					}
+				/>
 				{ isTruncated && <Tooltip.Popup>{ children }</Tooltip.Popup> }
 			</Tooltip.Root>
 		</Item>
@@ -92,6 +106,7 @@ function VisibleCurrentItem( {
 }
 
 function MeasurementCurrentItem( {
+	'aria-current': _ariaCurrent,
 	children,
 	className,
 	render,
@@ -140,7 +155,7 @@ function MeasurementCurrentItem( {
 }
 
 /**
- * Renders the current, non-navigable page in a breadcrumb trail.
+ * Renders the current, non-activatable item in a breadcrumb trail.
  */
 const CurrentItem = forwardRef< HTMLSpanElement, CurrentItemProps >(
 	function BreadcrumbCurrentItem( props, ref ) {

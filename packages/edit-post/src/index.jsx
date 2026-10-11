@@ -60,7 +60,6 @@ export function initializeEditor(
 	dispatch( preferencesStore ).setDefaults( 'core', {
 		allowRightClickOverrides: true,
 		editorMode: 'visual',
-		editorTool: 'edit',
 		fixedToolbar: false,
 		hiddenBlockTypes: [],
 		inactivePanels: [],
@@ -199,7 +198,7 @@ async function preloadResolutions( postType, postId ) {
 						unlock( core ).getViewConfig( 'postType', postType, {
 							fields: 'form',
 						} ),
-				  ]
+					]
 				: [] ),
 			// Per-post resolvers. `getPostType` and `getEditedEntityRecord`
 			// are shorthand/forward-resolver aliases with their own
@@ -219,7 +218,7 @@ async function preloadResolutions( postType, postId ) {
 							kind: 'postType',
 							name: postType,
 						} ),
-				  ]
+					]
 				: [] ),
 		] );
 

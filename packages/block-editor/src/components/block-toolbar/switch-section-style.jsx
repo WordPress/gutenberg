@@ -62,7 +62,7 @@ function SwitchSectionStyle( { clientId } ) {
 				},
 				blockName,
 				activeStyle.name
-		  )?.color?.background
+			)?.color?.background
 		: undefined;
 
 	if ( ! stylesToRender || stylesToRender.length === 0 ) {

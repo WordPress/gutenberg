@@ -14,7 +14,7 @@
 	th {
 		text-align: left;
 		color: var(--wpds-color-foreground-content-neutral);
-		font-weight: normal;
+		font-weight: 400;
 		font-size: var(--wpds-typography-font-size-md);
 	}
 	td,
@@ -266,13 +266,6 @@
 	}
 }
 
-
-.dataviews-view-table-selection-checkbox {
-	--checkbox-input-size: 24px;
-	@include break-small() {
-		--checkbox-input-size: 16px;
-	}
-}
 
 .dataviews-column-primary__media {
 	max-width: 60px;

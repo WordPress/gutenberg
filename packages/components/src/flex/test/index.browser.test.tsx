@@ -1,0 +1,181 @@
+import { describe, expect, test } from 'vitest';
+import type { CSSProperties } from 'react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
+import { View } from '../../view';
+import { Flex, FlexBlock, FlexItem } from '../';
+
+function expectCustomProperty(
+	testId: string,
+	property: string,
+	value: string
+) {
+	expect(
+		getComputedStyle( screen.getByTestId( testId ) )
+			.getPropertyValue( property )
+			.trim()
+	).toBe( value );
+}
+
+describe( 'props', () => {
+	test( 'should render correctly', async () => {
+		await render(
+			<Flex data-testid="base-flex">
+				<FlexItem data-testid="base-flex-item">Item</FlexItem>
+				<FlexBlock>Item</FlexBlock>
+			</Flex>
+		);
+
+		const flex = screen.getByTestId( 'base-flex' );
+		const style = getComputedStyle( flex );
+		expect( style.display ).toBe( 'flex' );
+		expect( style.alignItems ).toBe( 'center' );
+		expect( style.flexDirection ).toBe( 'row' );
+		expect( style.flexWrap ).toBe( 'nowrap' );
+		expect( style.gap ).toBe( '8px' );
+		expect( style.justifyContent ).toBe( 'space-between' );
+		expect(
+			getComputedStyle( screen.getByTestId( 'base-flex-item' ) ).display
+		).toBe( 'block' );
+		expect( flex ).toHaveTextContent( 'ItemItem' );
+	} );
+
+	test( 'should render non Flex children', async () => {
+		await render(
+			<Flex data-testid="flex">
+				<FlexItem>Item</FlexItem>
+				<View data-testid="view-child" />
+				<div data-testid="div-child" />
+				<FlexBlock>Item</FlexBlock>
+			</Flex>
+		);
+
+		expect( screen.getByTestId( 'view-child' ) ).toBeInTheDocument();
+		expect( screen.getByTestId( 'div-child' ) ).toBeInTheDocument();
+	} );
+
+	test( 'should render align', async () => {
+		await render(
+			<Flex align="flex-start" data-testid="flex">
+				<FlexItem>Item</FlexItem>
+				<FlexBlock>Item</FlexBlock>
+			</Flex>
+		);
+		expectCustomProperty(
+			'flex',
+			'--wp-components-flex-align',
+			'flex-start'
+		);
+	} );
+
+	test( 'should render justify', async () => {
+		await render(
+			<Flex justify="flex-start" data-testid="flex">
+				<FlexItem>Item</FlexItem>
+				<FlexBlock>Item</FlexBlock>
+			</Flex>
+		);
+		expectCustomProperty(
+			'flex',
+			'--wp-components-flex-justify',
+			'flex-start'
+		);
+	} );
+
+	test( 'should render spacing', async () => {
+		await render(
+			<Flex gap={ 5 } data-testid="flex">
+				<FlexItem>Item</FlexItem>
+				<FlexBlock>Item</FlexBlock>
+			</Flex>
+		);
+
+		expectCustomProperty(
+			'flex',
+			'--wp-components-flex-gap',
+			'calc(4px * 5)'
+		);
+	} );
+
+	test( 'should prefer generated flex styles over consumer CSS custom properties', async () => {
+		await render(
+			<Flex
+				align="flex-start"
+				data-testid="flex"
+				style={
+					{
+						'--wp-components-flex-align': 'center',
+					} as CSSProperties
+				}
+			>
+				<FlexItem>Item</FlexItem>
+			</Flex>
+		);
+
+		expectCustomProperty(
+			'flex',
+			'--wp-components-flex-align',
+			'flex-start'
+		);
+	} );
+
+	test( 'should render column direction', async () => {
+		await render(
+			<Flex direction="column" data-testid="flex">
+				<FlexItem data-testid="flex-item">Item</FlexItem>
+			</Flex>
+		);
+
+		expectCustomProperty( 'flex', '--wp-components-flex-align', 'normal' );
+		expectCustomProperty(
+			'flex',
+			'--wp-components-flex-direction',
+			'column'
+		);
+		expectCustomProperty(
+			'flex-item',
+			'--wp-components-flex-item-display',
+			'block'
+		);
+	} );
+
+	test( 'should render flex item display', async () => {
+		await render(
+			<Flex>
+				<FlexItem display="inline-flex" data-testid="item">
+					Item
+				</FlexItem>
+			</Flex>
+		);
+
+		expectCustomProperty(
+			'item',
+			'--wp-components-flex-item-display',
+			'inline-flex'
+		);
+	} );
+
+	test( 'should prefer generated flex item styles over consumer CSS custom properties', async () => {
+		await render(
+			<Flex>
+				<FlexItem
+					display="inline-flex"
+					data-testid="item"
+					style={
+						{
+							'--wp-components-flex-item-display': 'block',
+						} as CSSProperties
+					}
+				>
+					Item
+				</FlexItem>
+			</Flex>
+		);
+
+		expectCustomProperty(
+			'item',
+			'--wp-components-flex-item-display',
+			'inline-flex'
+		);
+	} );
+} );

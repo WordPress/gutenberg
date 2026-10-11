@@ -1,3 +1,4 @@
+import { afterAll, beforeAll, describe, expect, it, test, vi } from 'vitest';
 import {
 	registerBlockType,
 	unregisterBlockType,
@@ -19,7 +20,10 @@ import metadata from '../block.json';
 
 const { name: DEFAULT_EMBED_BLOCK, attributes } = metadata;
 
-jest.mock( '@wordpress/data/src/components/use-select', () => () => ( {} ) );
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: () => ( {} ),
+} ) );
 
 describe( 'utils', () => {
 	beforeAll( () => {

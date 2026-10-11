@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`ColorIndicator matches the snapshot 1`] = `
+exports[`ColorIndicator > matches the snapshot 1`] = `
 <div>
   <span
     aria-label="sample label"

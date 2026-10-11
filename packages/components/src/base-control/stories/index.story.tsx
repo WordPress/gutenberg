@@ -4,7 +4,7 @@ import Button from '../../button';
 
 const meta: Meta< typeof BaseControl > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Selection & Input/Common/BaseControl',
+	title: 'Components/@wordpress-components/Selection & Input/Common/BaseControl',
 	id: 'components-basecontrol',
 	component: BaseControl,
 	subcomponents: {

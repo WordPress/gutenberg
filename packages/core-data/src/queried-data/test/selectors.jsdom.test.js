@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getQueriedItems } from '../selectors';
 import { getMergedItemIds } from '../reducer';
 

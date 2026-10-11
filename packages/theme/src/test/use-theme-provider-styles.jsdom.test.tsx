@@ -13,6 +13,7 @@
 // The resolved values of the semantic `--wpds-*` tokens are covered by the
 // `ThemeProvider` tests (which read them as computed CSS custom properties).
 
+import { describe, expect, it } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { type ReactNode } from 'react';
 import { ThemeProvider } from '../theme-provider';

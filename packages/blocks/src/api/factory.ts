@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import { createHooks, applyFilters } from '@wordpress/hooks';
+import { applyFilters } from '@wordpress/hooks';
 import deprecated from '@wordpress/deprecated';
 import warning from '@wordpress/warning';
 import {
@@ -126,7 +126,7 @@ export function createBlocksFromInnerBlocksTemplate(
 					innerBlock.attributes,
 					innerBlock.innerBlocks,
 					innerBlock.innerContent,
-			  ];
+				];
 		const [ name, attributes, innerBlocks = [], innerContent ] =
 			innerBlockTemplate;
 		return createBlock(
@@ -369,7 +369,7 @@ const getBlockTypesForPossibleToTransforms = (
 					? getBlockTypeWithTransformMetadata(
 							transformedBlockType,
 							transformation
-					  )
+						)
 					: undefined;
 			} );
 		} )
@@ -460,24 +460,12 @@ export function findTransform< T extends BlockTransform >(
 	transforms: T[],
 	predicate: ( transform: T ) => boolean
 ): T | null {
-	// The hooks library already has built-in mechanisms for managing priority
-	// queue, so leverage via locally-defined instance.
-	const hooks = createHooks();
-
-	for ( let i = 0; i < transforms.length; i++ ) {
-		const candidate = transforms[ i ];
-		if ( predicate( candidate ) ) {
-			hooks.addFilter(
-				'transform',
-				'transform/' + i.toString(),
-				( result ) => ( result ? result : candidate ),
-				candidate.priority
-			);
-		}
-	}
-
-	// Filter name is arbitrarily chosen but consistent with above aggregation.
-	return hooks.applyFilters( 'transform', null ) as T | null;
+	// `priority` has the same meaning as in WP hooks: lower runs earlier, default is 10.
+	const priority = ( t: T ) => t.priority ?? 10;
+	const candidates = transforms
+		.filter( ( t ) => predicate( t ) )
+		.toSorted( ( t1, t2 ) => priority( t1 ) - priority( t2 ) );
+	return candidates.length > 0 ? candidates[ 0 ] : null;
 }
 
 /**

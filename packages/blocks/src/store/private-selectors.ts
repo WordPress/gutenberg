@@ -9,6 +9,7 @@ import type {
 	BlockBindingsSource,
 	BlockShortcut,
 	BlockType,
+	BlockVariation,
 } from '../types';
 
 /**
@@ -51,6 +52,7 @@ const ROOT_BLOCK_SUPPORTS: string[] = [
 	'textDecoration',
 	'textIndent',
 	'textTransform',
+	'textShadow',
 	'letterSpacing',
 ];
 
@@ -152,8 +154,7 @@ export const getSupportedStyles = createSelector(
 		// Check for blockGap support.
 		// Block spacing support doesn't map directly to a single style property, so needs to be handled separately.
 		const supports = blockType?.supports as
-			| Record< string, unknown >
-			| undefined;
+			Record< string, unknown > | undefined;
 		if (
 			( supports?.spacing as Record< string, unknown > | undefined )
 				?.blockGap
@@ -243,6 +244,21 @@ export function getUnprocessedBlockTypes(
 	state: BlockStoreState
 ): Record< string, Partial< BlockType > > {
 	return state.unprocessedBlockTypes;
+}
+
+/**
+ * Returns the registered block variations of every block type, keyed by block
+ * name. The reference changes whenever a variation is added or removed, so it
+ * can serve as a cache dependency.
+ *
+ * @param state Data state.
+ *
+ * @return Block variations keyed by block name.
+ */
+export function getBlockVariationsRaw(
+	state: BlockStoreState
+): Record< string, BlockVariation[] > {
+	return state.blockVariations;
 }
 
 /**
