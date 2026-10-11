@@ -372,8 +372,11 @@ test.describe( 'Widgets Customizer', () => {
 		const legacyWidgetBlock =
 			await widgetsCustomizerPage.addBlock( 'Legacy Widget' );
 		await page
-			.locator( 'role=combobox[name="Legacy widget"i]' )
-			.selectOption( 'test_widget' );
+			.getByRole( 'combobox', { name: 'Legacy widget', exact: true } )
+			.click();
+		await page
+			.getByRole( 'option', { name: 'Test Widget', exact: true } )
+			.click();
 
 		await expect(
 			legacyWidgetBlock.locator(
