@@ -1,4 +1,5 @@
 import { store as blocksStore } from '@wordpress/blocks';
+import type { BlockEditProps, BlockType } from '@wordpress/blocks';
 import { useCallback, useMemo } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import {
@@ -6,6 +7,10 @@ import {
 	blockEditingModeKey,
 } from '../block-edit/context';
 import BlockStylePanels from './block-style-panels';
+import type {
+	BlockStylePanel,
+	BlockStylePanelsProps,
+} from './block-style-panels';
 import {
 	BLOCK_STYLE_SETTINGS_PATHS,
 	useBlockSettings,
@@ -36,11 +41,24 @@ const PANEL_WRAPPERS = {
 	typography: TypographyToolsPanel,
 };
 
-export const SECTION_TEXT_STYLE_PANELS = [
+export const SECTION_TEXT_STYLE_PANELS: readonly BlockStylePanel[] = [
 	'typography',
 	'border',
 	'dimensions',
 ];
+
+type MixedTextStyleControlsProps = {
+	clientIds: string[];
+	panels?: BlockStylePanelsProps[ 'panels' ];
+};
+
+type MixedTextStylePanelsProps = MixedTextStyleControlsProps & {
+	blockTypes: ( BlockType | undefined )[];
+	commonSupportedStyles: string[];
+	settingsByTarget: ReturnType< typeof createBlockStyleSettings >[];
+	sourceClientId: string;
+	sourceName: string;
+};
 
 function MixedTextStylePanels( {
 	blockTypes,
@@ -50,10 +68,10 @@ function MixedTextStylePanels( {
 	settingsByTarget,
 	sourceClientId,
 	sourceName,
-} ) {
+}: MixedTextStylePanelsProps ) {
 	const registry = useRegistry();
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const sourceSettings = useBlockSettings( sourceName );
+	const sourceSettings = useBlockSettings( sourceName, undefined );
 	const commonSettings = useMemo(
 		() => getCommonStyleSettings( sourceSettings, settingsByTarget ),
 		[ sourceSettings, settingsByTarget ]
@@ -72,7 +90,7 @@ function MixedTextStylePanels( {
 		[ commonSupportedStyles, blockTypes ]
 	);
 
-	const setAttributes = useCallback(
+	const setAttributes = useCallback< BlockEditProps[ 'setAttributes' ] >(
 		( nextAttributes ) => {
 			const blockEditorSelect = registry.select( blockEditorStore );
 			const sourceAttributes =
@@ -84,7 +102,9 @@ function MixedTextStylePanels( {
 
 			const sourceAttributePatch =
 				typeof nextAttributes === 'function'
-					? nextAttributes( sourceAttributes )
+					? nextAttributes(
+							sourceAttributes as Record< string, unknown >
+						)
 					: nextAttributes;
 			const changes = getSharedStyleAttributeChanges(
 				sourceAttributes,
@@ -100,24 +120,29 @@ function MixedTextStylePanels( {
 				return;
 			}
 
-			const liveClientIds = clientIds.filter( ( clientId ) =>
-				blockEditorSelect.getBlockAttributes( clientId )
-			);
-			if ( ! liveClientIds.length ) {
+			const liveBlocks = clientIds.flatMap( ( clientId ) => {
+				const attributes =
+					blockEditorSelect.getBlockAttributes( clientId );
+
+				return attributes ? [ { clientId, attributes } ] : [];
+			} );
+			if ( ! liveBlocks.length ) {
 				return;
 			}
 
+			const liveClientIds = liveBlocks.map(
+				( { clientId } ) => clientId
+			);
 			const attributePatches = Object.fromEntries(
-				liveClientIds.map( ( clientId ) => [
+				liveBlocks.map( ( { clientId, attributes } ) => [
 					clientId,
-					applySharedStyleAttributeChanges(
-						blockEditorSelect.getBlockAttributes( clientId ),
-						changes
-					),
+					applySharedStyleAttributeChanges( attributes, changes ),
 				] )
 			);
 
-			updateBlockAttributes( liveClientIds, attributePatches, true );
+			updateBlockAttributes( liveClientIds, attributePatches, {
+				uniqueByBlock: true,
+			} );
 		},
 		[
 			attributeNames,
@@ -141,7 +166,10 @@ function MixedTextStylePanels( {
 	);
 }
 
-export default function MixedTextStyleControls( { clientIds, panels } ) {
+export default function MixedTextStyleControls( {
+	clientIds,
+	panels,
+}: MixedTextStyleControlsProps ) {
 	const targetClientIds = useSelect(
 		( select ) => {
 			const blockEditorSelect = select( blockEditorStore );

@@ -1,9 +1,16 @@
 import { useMemo } from '@wordpress/element';
+import type { BlockEditProps } from '@wordpress/blocks';
 import { BackgroundImagePanel } from '../../hooks/background';
 import { BorderPanel } from '../../hooks/border';
 import { DimensionsPanel } from '../../hooks/dimensions';
 import { ElementsEdit } from '../../hooks/elements';
 import { TypographyPanel } from '../../hooks/typography';
+import type { useBlockSettings } from '../../hooks/utils';
+import type { BackgroundToolsPanel } from '../global-styles/background-panel';
+import type { BorderToolsPanel } from '../global-styles/border-panel';
+import type { ColorToolsPanel } from '../global-styles/color-panel';
+import type { DimensionsToolsPanel } from '../global-styles/dimensions-panel';
+import type { TypographyToolsPanel } from '../global-styles/typography-panel';
 
 const DEFAULT_PANELS = [
 	'elements',
@@ -11,7 +18,24 @@ const DEFAULT_PANELS = [
 	'typography',
 	'border',
 	'dimensions',
-];
+] as const;
+
+export type BlockStylePanel = ( typeof DEFAULT_PANELS )[ number ];
+
+export type BlockStylePanelsProps = {
+	clientId: string;
+	name: string;
+	setAttributes: BlockEditProps[ 'setAttributes' ];
+	settings: ReturnType< typeof useBlockSettings > & { typography?: object };
+	panelWrappers?: {
+		elements?: typeof ColorToolsPanel;
+		background?: typeof BackgroundToolsPanel;
+		typography?: typeof TypographyToolsPanel;
+		border?: typeof BorderToolsPanel;
+		dimensions?: typeof DimensionsToolsPanel;
+	};
+	panels?: readonly BlockStylePanel[];
+};
 
 export default function BlockStylePanels( {
 	clientId,
@@ -20,7 +44,7 @@ export default function BlockStylePanels( {
 	settings,
 	panelWrappers = {},
 	panels = DEFAULT_PANELS,
-} ) {
+}: BlockStylePanelsProps ) {
 	const panelSettings = useMemo(
 		() => ( {
 			...settings,

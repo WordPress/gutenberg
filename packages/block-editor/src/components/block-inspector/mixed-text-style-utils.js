@@ -380,8 +380,8 @@ export function createBlockStyleSettings( paths, values ) {
 /**
  * Returns spacing sides supported by every block type.
  *
- * @param {Object[]} blockTypes Registered block types.
- * @param {string}   feature    Spacing feature.
+ * @param {(Object|undefined)[]} blockTypes Registered block types.
+ * @param {string}               feature    Spacing feature.
  * @return {string[]} Common spacing sides.
  */
 export function getCommonSpacingSides( blockTypes, feature ) {
@@ -402,9 +402,9 @@ export function getCommonSpacingSides( blockTypes, feature ) {
 /**
  * Restricts source settings to style features shared by every target.
  *
- * @param {Object}   settings              Source block settings.
- * @param {string[]} commonSupportedStyles Shared style names.
- * @param {Object[]} blockTypes            Target block types.
+ * @param {Object}               settings              Source block settings.
+ * @param {string[]}             commonSupportedStyles Shared style names.
+ * @param {(Object|undefined)[]} blockTypes            Target block types.
  * @return {Object} Shared settings.
  */
 export function getSharedStyleSettings(
@@ -562,8 +562,8 @@ export function getSharedStyleSettings(
 /**
  * Builds the style paths and top-level attributes that shared panels may edit.
  *
- * @param {string[]} commonSupportedStyles Shared style names.
- * @param {Object[]} blockTypes            Target block types.
+ * @param {string[]}             commonSupportedStyles Shared style names.
+ * @param {(Object|undefined)[]} blockTypes            Target block types.
  * @return {{ stylePaths: string[][], attributeNames: string[] }} Supported paths.
  */
 export function getSharedStylePaths( commonSupportedStyles, blockTypes ) {
