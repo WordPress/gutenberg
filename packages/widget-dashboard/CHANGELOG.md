@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.9.0 (2026-10-07)
+
+### Breaking Changes
+
+-   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
+
 ### New Features
 
 -   Runtime actions: the footer and the More menu place the actions a mounted widget declares through `useWidgetActions`, merged with the type's actions by `id`. A `callback` action mounts a button, disabled while a promise it returns settles ([#83877](https://github.com/WordPress/gutenberg/pull/83877)).

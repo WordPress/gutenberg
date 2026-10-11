@@ -36,6 +36,8 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 
 - [`anchor`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
 - [`align`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#align): `true`
+- [`filter`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#filter):
+  - [`duotone`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#filter-duotone): `true`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `margin`: `true`
   - `padding`: `true`
@@ -48,6 +50,8 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
 
 - **shadow**: `.wp-block-video video`
+- **filter**:
+  - duotone: `.wp-block-video video`
 
 ## Block Markup
 

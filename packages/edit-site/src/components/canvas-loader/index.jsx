@@ -2,7 +2,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Migrate the canvas loader to Progress with a theme-colored indicator.
 import { Progress } from '@wordpress/ui';
 import { unlock } from '../../lock-unlock';
 
@@ -24,7 +23,6 @@ export default function CanvasLoader( { id } ) {
 		<div className="edit-site-canvas-loader">
 			<Progress.Root
 				id={ id }
-				className="edit-site-canvas-loader__progress"
 				aria-label={ __( 'Loading editor' ) }
 				max={ total }
 				value={ elapsed }

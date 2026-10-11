@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "41.0.0",
+	"version": "42.0.0",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -108,7 +108,7 @@
 		"@testing-library/jest-dom": "^7.0.1",
 		"@testing-library/react": "^16.3.3",
 		"@testing-library/user-event": "^14.6.1",
-		"@types/react-dom": "^18.3.1",
+		"@types/react-dom": "^19.3.0",
 		"@wordpress/stylelint-tools": "file:../../tools/stylelint",
 		"storybook": "^10.6.1",
 		"timezone-mock": "^1.3.6",

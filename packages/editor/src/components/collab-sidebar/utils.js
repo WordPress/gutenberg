@@ -1,6 +1,5 @@
 import { _x } from '@wordpress/i18n';
 import { create, RichTextData } from '@wordpress/rich-text';
-import { getRectangleFromRange } from '@wordpress/dom';
 import { NOTE_FORMAT_NAME } from './constants';
 
 /**
@@ -233,52 +232,14 @@ export function getNoteMarkerSelector( noteId ) {
 }
 
 /**
- * Measure the bounding rect of the current text selection within a block
- * element, or return null when there is no usable selection (collapsed, or
- * not fully inside the block). A pending new note has no in-content marker
- * yet, so the selection it will attach to is the only anchor available for
- * positioning its floating form.
- *
- * @param {HTMLElement} blockEl Block DOM element to resolve the selection in.
- * @return {?DOMRect} Selection rect, or null.
- */
-export function getSelectionRect( blockEl ) {
-	const selection = blockEl.ownerDocument.defaultView?.getSelection();
-	if ( ! selection || selection.rangeCount === 0 || selection.isCollapsed ) {
-		return null;
-	}
-	const range = selection.getRangeAt( 0 );
-	// `isCollapsed` can be false with a collapsed first range, and
-	// `getRectangleFromRange` measures those by inserting a temporary node.
-	if ( range.collapsed ) {
-		return null;
-	}
-	if ( ! blockEl.contains( range.commonAncestorContainer ) ) {
-		return null;
-	}
-	// `getRectangleFromRange` over `Range.getBoundingClientRect()`: it drops
-	// the hairline rects a selection picks up at a line's edge, so a
-	// selection starting at the end of one line aligns to the line that
-	// actually holds the text rather than to the line above it.
-	const rect = getRectangleFromRange( range );
-	// A range with no rendered client rects still yields an all-zero rect
-	// rather than null, which would pin the thread to the top of the canvas.
-	// Treat it as "no usable selection" so callers fall back to the block.
-	if ( ! rect || ( rect.width === 0 && rect.height === 0 ) ) {
-		return null;
-	}
-	return rect;
-}
-
-/**
  * Measure where a note's floating thread should line up in the canvas.
  *
  * An inline note anchors to its in-content marker, so the thread aligns with
- * the noted text rather than the block. A marker split into several runs
- * (crossing overlaps) resolves to its first run. The pending new note has no
- * marker yet, so it anchors to the text selection it will attach to. Anything
- * else falls back to the block itself. An anchor inside collapsed content
- * (e.g. a closed Details) falls back to the closest visible block.
+ * the noted text rather than the block, and so does a pending new note through
+ * its draft marker. A marker split into several runs (crossing overlaps)
+ * resolves to its first run. Anything else falls back to the block itself. An
+ * anchor inside collapsed content (e.g. a closed Details) falls back to the
+ * closest visible block.
  *
  * Resolved at read time, because rich-text re-renders replace the marker.
  *
@@ -287,9 +248,6 @@ export function getSelectionRect( blockEl ) {
  * @return {DOMRect} Anchor rect, in viewport coordinates.
  */
 export function getNoteAnchorRect( noteId, blockEl ) {
-	if ( noteId === 'new' ) {
-		return getSelectionRect( blockEl ) ?? blockEl.getBoundingClientRect();
-	}
 	let anchor =
 		blockEl.querySelector( getNoteMarkerSelector( noteId ) ) ?? blockEl;
 	// Collapsed content still reports the box it would have when expanded,
@@ -520,38 +478,17 @@ export function removeNoteFormat( value, noteId ) {
 }
 
 /**
- * Strip a note's inline `core/note` marker from whichever block holds it, if
- * any, so a deleted or resolved note's highlight does not linger in the content.
- * No-op for block-level notes (those carry no marker). Used by the resolve path,
- * which only knows the note id; the delete path strips the marker inline since
- * it already has the block.
+ * Remove a note's inline `core/note` marker from block attributes.
  *
- * @param {number}                                         noteId                      Note id whose marker to remove.
- * @param {() => string[]}                                 getClientIdsWithDescendants Block-editor selector.
- * @param {(clientId: string) => Record<string, unknown>}  getBlockAttributes          Block-editor selector.
- * @param {(clientId: string, attributes: Object) => void} updateBlockAttributes       Block-editor action.
+ * @param {?Object}       attributes Block attributes.
+ * @param {number|string} noteId     Note id whose marker to remove.
+ * @return {?{attributeKey: string, start: number, end: number, value: RichTextData}} Marker range and the new attribute value, or null when no marker.
  */
-export function clearInlineNoteMarker(
-	noteId,
-	getClientIdsWithDescendants,
-	getBlockAttributes,
-	updateBlockAttributes
-) {
-	for ( const clientId of getClientIdsWithDescendants() ) {
-		const attributes = getBlockAttributes( clientId );
-		const found = findNoteInBlock( attributes, noteId );
-		if ( ! found ) {
-			continue;
-		}
-		const next = removeNoteFormat(
-			attributes[ found.attributeKey ],
-			noteId
-		);
-		if ( next ) {
-			updateBlockAttributes( clientId, { [ found.attributeKey ]: next } );
-		}
-		return;
-	}
+export function removeInlineNote( attributes, noteId ) {
+	const found = findNoteInBlock( attributes, noteId );
+	const value =
+		found && removeNoteFormat( attributes[ found.attributeKey ], noteId );
+	return value ? { ...found, value } : null;
 }
 
 /**
@@ -595,7 +532,7 @@ export function removeNoteIdFromMetadata( metadata, noteId ) {
  * @param {Object<string,Object>}   params.blockRects     Anchor rects (`{ top }`) keyed by thread ID.
  * @param {Object<string,number>}   params.heights        Rendered heights keyed by thread ID.
  * @param {number}                  params.scrollTop      Current scroll offset of the editor content.
- * @return {{ positions: Object<string,number> }} Computed top positions.
+ * @return {{ positions: Object<string,number>, contentHeight: number }} Computed top positions, and the content height that fits every measured thread.
  */
 export function calculateNotePositions( {
 	threads,
@@ -628,7 +565,7 @@ export function calculateNotePositions( {
 	const anchorThread = orderedThreads[ anchorIndex ];
 
 	if ( ! anchorThread || ! blockRects[ anchorThread.id ] ) {
-		return { positions: {} };
+		return { positions: {}, contentHeight: 0 };
 	}
 
 	const anchorRect = blockRects[ anchorThread.id ];
@@ -692,17 +629,26 @@ export function calculateNotePositions( {
 	}
 
 	// blockRect.top + scrollTop is the block's absolute y within the editor's
-	// scroll content; CSS translates each thread by -scrollTop at render time.
+	// scroll content. The content height reaches a gap past the lowest
+	// measured thread's box, which starts a THREAD_GAP (its top margin, the
+	// one THREAD_ALIGN_OFFSET cancels) below its position.
 	const positions = {};
+	let contentHeight = 0;
 	for ( const thread of orderedThreads ) {
 		const blockRect = blockRects[ thread.id ];
 		if ( blockRect && offsets[ thread.id ] !== undefined ) {
-			positions[ thread.id ] =
-				blockRect.top + scrollTop + offsets[ thread.id ];
+			const top = blockRect.top + scrollTop + offsets[ thread.id ];
+			positions[ thread.id ] = top;
+			if ( heights[ thread.id ] ) {
+				contentHeight = Math.max(
+					contentHeight,
+					top + THREAD_GAP + heights[ thread.id ] + THREAD_GAP
+				);
+			}
 		}
 	}
 
-	return { positions };
+	return { positions, contentHeight };
 }
 
 /**

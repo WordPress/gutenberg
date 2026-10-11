@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.57.0 (2026-10-07)
+
 ### Enhancements
 
 -   Add `@wordpress/sync` as a bundled package, so consumer builds bundle it instead of externalizing it to the removed `wp-sync` script ([#81999](https://github.com/WordPress/gutenberg/pull/81999)).

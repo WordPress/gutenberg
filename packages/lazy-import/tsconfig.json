@@ -2,8 +2,9 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
 	"compilerOptions": {
-		"rootDir": "lib",
+		"module": "node16",
+		"moduleResolution": "node16",
+		"types": [ "node" ],
 		"useUnknownInCatchVariables": false
-	},
-	"include": [ "lib" ]
+	}
 }

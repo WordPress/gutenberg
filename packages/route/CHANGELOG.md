@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.23.0 (2026-10-07)
+
 ### Bug Fixes
 
 -   Declare `react-dom` and the React types as peer dependencies, forwarding the peers of `@tanstack/react-router`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).

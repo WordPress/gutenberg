@@ -1,0 +1,97 @@
+{
+	"languages": {
+		"JavaScript": {
+			"language_servers": [
+				"typescript-ls",
+				"eslint",
+				"!vtsls",
+				"!typescript-language-server",
+				"..."
+			]
+		},
+		"JSX": {
+			"language_servers": [
+				"typescript-ls",
+				"eslint",
+				"!vtsls",
+				"!typescript-language-server",
+				"..."
+			]
+		},
+		"TypeScript": {
+			"language_servers": [
+				"typescript-ls",
+				"eslint",
+				"!vtsls",
+				"!typescript-language-server",
+				"..."
+			]
+		},
+		"TSX": {
+			"language_servers": [
+				"typescript-ls",
+				"eslint",
+				"!vtsls",
+				"!typescript-language-server",
+				"..."
+			]
+		},
+		"CSS": {
+			"language_servers": [ "stylelint-lsp", "..." ],
+			"formatter": [
+				{
+					"code_action": "source.fixAll.stylelint"
+				}
+			]
+		},
+		"SCSS": {
+			"language_servers": [ "stylelint-lsp", "..." ],
+			"formatter": [
+				{
+					"code_action": "source.fixAll.stylelint"
+				}
+			]
+		},
+		"PHP": {
+			"language_servers": [
+				"intelephense",
+				"phpcs",
+				"!phpactor",
+				"!phptools",
+				"!phpantom",
+				"..."
+			],
+			"formatter": [
+				{
+					"code_action": "source.fixAll.phpcs"
+				}
+			]
+		}
+	},
+	"lsp": {
+		"typescript-ls": {
+			"binary": {
+				"path": "node",
+				"arguments": [
+					"tools/build-scripts/node_modules/@typescript/native/bin/tsc",
+					"--lsp",
+					"--stdio"
+				]
+			}
+		},
+		"stylelint-lsp": {
+			"settings": {
+				"stylelint": {
+					"validate": [ "css", "postcss", "scss" ]
+				}
+			}
+		},
+		"intelephense": {
+			"settings": {
+				"environment": {
+					"phpVersion": "7.4.0"
+				}
+			}
+		}
+	}
+}

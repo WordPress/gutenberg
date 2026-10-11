@@ -15,6 +15,7 @@ export * from './icon';
 export * from './icon-button';
 export * from './link';
 export * as Menu from './menu';
+export * as Meter from './meter';
 export * as Notice from './notice';
 export * as Popover from './popover';
 export * as Progress from './progress';

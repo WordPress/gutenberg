@@ -71,12 +71,12 @@ function queryExternalLinkIndicator( item: HTMLElement ) {
 }
 
 describe( 'Menu', () => {
-	it( 'renders prefix icons at 24px by default', () => {
+	it( 'renders prefix icons at 16px by default', () => {
 		render( <Menu.PrefixIcon icon={ <svg /> } role="img" /> );
 
 		const icon = screen.getByRole( 'img', { hidden: true } );
-		expect( icon ).toHaveAttribute( 'width', '24' );
-		expect( icon ).toHaveAttribute( 'height', '24' );
+		expect( icon ).toHaveAttribute( 'width', '16' );
+		expect( icon ).toHaveAttribute( 'height', '16' );
 	} );
 
 	it( 'supports custom icon sizes and forwards SVG props and refs', () => {
@@ -478,7 +478,6 @@ describe( 'Menu', () => {
 						</Parent>
 					)
 				).toThrow( message );
-				expect( console ).toHaveErrored();
 			}
 		);
 
@@ -593,7 +592,6 @@ describe( 'Menu', () => {
 		).toThrow(
 			'Menu.ItemDescription: Missing direct menu item parent. Render <Menu.ItemDescription> as a direct child of a menu item.'
 		);
-		expect( console ).toHaveErrored();
 	} );
 
 	it( 'throws when ItemDescription is nested inside a menu item', () => {
@@ -616,7 +614,6 @@ describe( 'Menu', () => {
 		).toThrow(
 			'Menu.ItemDescription: Missing direct menu item parent. Render <Menu.ItemDescription> as a direct child of a menu item.'
 		);
-		expect( console ).toHaveErrored();
 	} );
 
 	it( 'throws when a nested ItemDescription reuses a direct sibling ID', () => {
@@ -646,7 +643,6 @@ describe( 'Menu', () => {
 		expect( () => render( <MenuWithDuplicateDescriptionId /> ) ).toThrow(
 			'Menu.ItemDescription: Missing direct menu item parent. Render <Menu.ItemDescription> as a direct child of a menu item.'
 		);
-		expect( console ).toHaveErrored();
 	} );
 
 	it( 'requires an ItemLabel as a direct child of every item', () => {
@@ -661,7 +657,6 @@ describe( 'Menu', () => {
 				</Menu.Root>
 			)
 		).toThrow( 'Menu.ItemLabel must be the first direct child' );
-		expect( console ).toHaveErrored();
 	} );
 
 	it( 'rejects an ItemLabel wrapped in a fragment', () => {
@@ -679,7 +674,6 @@ describe( 'Menu', () => {
 				</Menu.Root>
 			)
 		).toThrow( 'Menu.ItemLabel must be the first direct child' );
-		expect( console ).toHaveErrored();
 	} );
 
 	it( 'uses shortcut metadata for visual and accessible item descriptions', async () => {

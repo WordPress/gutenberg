@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 2.0.0 (2026-10-07)
+
+### Breaking Changes
+
+-   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
+
 ### Bug Fixes
 
 -   Declare `react`, `react-dom`, and their types as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).

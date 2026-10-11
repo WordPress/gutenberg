@@ -205,7 +205,7 @@ export const AsyncItems: Story = {
 		const [ query, setQuery ] = useState( '' );
 		const [ loading, setLoading ] = useState( false );
 		const [ results, setResults ] = useState< typeof URLS >( [] );
-		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
+		const timeoutRef = useRef< ReturnType< typeof setTimeout > >( null );
 
 		return (
 			<Autocomplete.Root
@@ -216,7 +216,9 @@ export const AsyncItems: Story = {
 					setQuery( newValue );
 					setLoading( true );
 					setResults( [] );
-					clearTimeout( timeoutRef.current );
+					if ( timeoutRef.current ) {
+						clearTimeout( timeoutRef.current );
+					}
 					timeoutRef.current = setTimeout( () => {
 						setResults(
 							URLS.filter( ( item ) =>

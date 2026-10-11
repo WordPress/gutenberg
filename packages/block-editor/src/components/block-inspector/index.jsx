@@ -219,9 +219,9 @@ function BlockInspector() {
 			hasBlockStyles: _hasBlockStyles,
 			editedContentOnlySection: getEditedContentOnlySection(),
 			blockEditingMode: getBlockEditingMode( _renderedBlockClientId ),
-			selectedBlockStyleState: getSelectedBlockStyleState(
-				_renderedBlockClientId
-			),
+			selectedBlockStyleState: _renderedBlockClientId
+				? getSelectedBlockStyleState( _renderedBlockClientId )
+				: undefined,
 			showStateOnCanvas: isSelectedBlockStyleStateShownOnCanvas(
 				_renderedBlockClientId
 			),

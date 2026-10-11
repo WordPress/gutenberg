@@ -2,8 +2,19 @@
 
 ## Unreleased
 
+## 0.49.0 (2026-10-07)
+
+### Breaking Changes
+
+-   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
+
+### Enhancements
+
+-   `MediaEdit`: Use design system's outine focus ring instead of previous box-shadow based implementation. ([#83854](https://github.com/WordPress/gutenberg/pull/83854))
+
 ### Bug Fixes
 
+-   `trashPost`, `permanentlyDeletePost`: Offer "Permanently delete" instead of "Trash" for posts without the `wp:action-trash` REST link. Requires WordPress 7.2 or the Gutenberg plugin ([#84045](https://github.com/WordPress/gutenberg/pull/84045)).
 -   `AuthorView`: Fetch the author through the users list in the `view` context, so users who can't edit other users still see the author's name and avatar, including for authors without published posts. ([#83498](https://github.com/WordPress/gutenberg/pull/83498))
 -   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
 -   `MediaEdit`: Show a checkerboard background behind image previews, so images with transparent backgrounds stay visible, as in the classic featured image panel. ([#83846](https://github.com/WordPress/gutenberg/pull/83846))

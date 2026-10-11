@@ -52,7 +52,7 @@ jobs:
             # The head SHA comes from the event. PR code is never checked out,
             # built, or executed.
             - name: Report the status for this pull request
-              uses: mawesomedev/pr-baseline-action@cc4d934b8c7c8cd2fd965d8334849d8108321ab3 # v0.2.0
+              uses: mawesomedev/pr-baseline-action@729efbcd239b8a4e578eead7b5321af2f79bbd99 # v0.2.1
               with:
                   base: trunk
                   baselines: ${{ env.PR_BASELINES }}
@@ -98,7 +98,7 @@ jobs:
               # An unforced move still moves when a labeled merge earned it, which
               # is not what a maintainer asking for a refresh asked for.
               if: ${{ inputs.mode != 'refresh-pr-statuses' }}
-              uses: mawesomedev/pr-baseline-action@cc4d934b8c7c8cd2fd965d8334849d8108321ab3 # v0.2.0
+              uses: mawesomedev/pr-baseline-action@729efbcd239b8a4e578eead7b5321af2f79bbd99 # v0.2.1
               with:
                   base: trunk
                   baselines: ${{ env.PR_BASELINES }}
@@ -109,7 +109,7 @@ jobs:
 
             - name: Refresh the pull requests a move can invalidate
               id: refresh
-              uses: mawesomedev/pr-baseline-action@cc4d934b8c7c8cd2fd965d8334849d8108321ab3 # v0.2.0
+              uses: mawesomedev/pr-baseline-action@729efbcd239b8a4e578eead7b5321af2f79bbd99 # v0.2.1
               with:
                   base: trunk
                   baselines: ${{ env.PR_BASELINES }}
@@ -161,7 +161,7 @@ jobs:
                   persist-credentials: false
 
             - name: Stamp the unstamped pull requests
-              uses: mawesomedev/pr-baseline-action@cc4d934b8c7c8cd2fd965d8334849d8108321ab3 # v0.2.0
+              uses: mawesomedev/pr-baseline-action@729efbcd239b8a4e578eead7b5321af2f79bbd99 # v0.2.1
               with:
                   base: trunk
                   baselines: ${{ env.PR_BASELINES }}

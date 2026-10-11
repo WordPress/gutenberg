@@ -138,10 +138,16 @@ class WP_Test_REST_Icons_Controller extends WP_Test_REST_TestCase {
 		$this->assertSame( 'core/arrow-left', $data['name'] );
 		$this->assertSame( 'Arrow Left', $data['label'] );
 		$this->assertNotEmpty( $data['content'] );
+
 		$this->assertStringStartsWith(
-			'<svg xmlns="',
+			'<svg ',
 			$data['content'],
-			'Icon content should match the actual SVG asset'
+			'Icon content should start with an SVG element'
+		);
+		$this->assertStringContainsString(
+			'xmlns="http://www.w3.org/2000/svg"',
+			$data['content'],
+			'Icon should include the xmlns attribute'
 		);
 	}
 

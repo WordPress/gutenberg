@@ -419,6 +419,31 @@ test.describe( 'Registered sources', () => {
 				);
 			} );
 
+			test( 'icon', async ( { editor, page } ) => {
+				await editor.insertBlock( {
+					name: 'core/icon',
+					attributes: {
+						icon: 'core/arrow-right',
+						metadata: {
+							bindings: {
+								icon: {
+									source: 'testing/can-user-edit-false',
+									args: { key: 'icon_field' },
+								},
+							},
+						},
+					},
+				} );
+				const replaceButton = page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Replace' } );
+				await expect( replaceButton ).toBeDisabled();
+				await replaceButton.focus();
+				await expect( replaceButton ).toHaveAccessibleDescription(
+					'Connected to Can User Edit: False'
+				);
+			} );
+
 			test( 'button', async ( { editor, page } ) => {
 				await editor.insertBlock( {
 					name: 'core/buttons',
@@ -1084,6 +1109,43 @@ test.describe( 'Registered sources', () => {
 				name: 'Show content',
 			} );
 			await expect( contentAttribute ).toBeVisible();
+		} );
+
+		test( 'should be possible to connect the icon block icon', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/icon',
+				attributes: {
+					icon: 'core/arrow-right',
+				},
+			} );
+			await page.getByLabel( 'Attributes options' ).click();
+			const iconAttribute = page.getByRole( 'menuitemcheckbox', {
+				name: 'Show icon',
+			} );
+			await expect( iconAttribute ).toBeVisible();
+			await iconAttribute.click();
+			await page
+				.getByRole( 'button', {
+					name: 'icon Not connected',
+					exact: true,
+				} )
+				.click();
+			await page
+				.getByRole( 'menuitem', { name: 'Complete Source' } )
+				.click();
+			await page
+				.getByRole( 'menuitemcheckbox' )
+				.filter( { hasText: 'Icon Field Label' } )
+				.click();
+			await expect(
+				page.getByRole( 'button', {
+					name: 'icon Icon Field Label',
+					exact: true,
+				} )
+			).toContainText( 'Icon Field Label' );
 		} );
 
 		test( 'should be possible to connect the button supported attributes', async ( {

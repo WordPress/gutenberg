@@ -291,9 +291,7 @@ export default function RichTextControl( {
 	 */
 	const enterRef = useRefEffect< HTMLElement >(
 		( element ) => {
-			// A disabled field is not editable; nothing to handle. (Real
-			// keyboard input cannot reach it either, since a
-			// non-`contentEditable` div is not focusable.)
+			// A disabled field is not editable; nothing to handle.
 			if ( disabled ) {
 				return;
 			}

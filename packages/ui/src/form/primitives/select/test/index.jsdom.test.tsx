@@ -246,7 +246,6 @@ describe( 'Select', () => {
 				</Select.Root>
 			)
 		).toThrow( 'Select.ItemLabel must be the first direct child' );
-		expect( console ).toHaveErrored();
 	} );
 
 	it( 'rejects a description nested in the item label', () => {
@@ -269,7 +268,6 @@ describe( 'Select', () => {
 		).toThrow(
 			'Select.ItemDescription: Missing direct select item parent. Render <Select.ItemDescription> as a direct child of <Select.Item>.'
 		);
-		expect( console ).toHaveErrored();
 	} );
 
 	it( 'rejects a description outside an item', () => {
@@ -280,6 +278,5 @@ describe( 'Select', () => {
 		).toThrow(
 			'Select.ItemDescription: Missing direct select item parent. Render <Select.ItemDescription> as a direct child of <Select.Item>.'
 		);
-		expect( console ).toHaveErrored();
 	} );
 } );

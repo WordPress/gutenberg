@@ -592,7 +592,6 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 				{ visibleListContent }
 			</ol>
 			<div
-				// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
 				inert={ inertValue( true ) }
 				aria-hidden="true"
 				className={ styles.measurement }

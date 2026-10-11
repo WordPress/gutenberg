@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.57.0 (2026-10-07)
+
 ### Bug Fixes
 
 -   `date`: Drop a backslash that ends the format string instead of emitting the literal text `undefined`, matching PHP's `date()` ([#81528](https://github.com/WordPress/gutenberg/pull/81528)).
