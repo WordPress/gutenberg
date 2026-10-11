@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### New Features
+
+-   Table layout: add a `stickyFirstColumn` option to pin the first column to the leading edge while the table scrolls horizontally, mirroring the sticky actions column. It is off by default; when enabled with bulk actions, the checkbox column is pinned alongside it, and below 480px of table width the column scrolls with the rest of the table ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
+
 ### Enhancements
 
 -   DataForm: The `text` control's `prefix` and `suffix` accept a string, and the new `prefixPadding` and `suffixPadding` options use the minimal slot padding for icons and buttons. ([#84314](https://github.com/WordPress/gutenberg/pull/84314))

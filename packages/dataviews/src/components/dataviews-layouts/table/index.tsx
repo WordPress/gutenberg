@@ -37,6 +37,7 @@ import getTableColumns from '../utils/get-table-columns';
 import useSelectionProps from '../utils/use-selection-props';
 import { PropertiesSection } from '../../dataviews-view-config/properties-section';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
+import useContainerWidth from '../../../hooks/use-container-width';
 
 function getEffectiveAlign(
 	explicitAlign: 'start' | 'center' | 'end' | undefined,
@@ -83,6 +84,8 @@ interface TableRowProps< Item > {
 		} & ComponentProps< 'a' >
 	) => ReactElement;
 	isActionsColumnSticky?: boolean;
+	isFirstColumnSticky?: boolean;
+	isFirstColumnStuck?: boolean;
 	posinset?: number;
 }
 
@@ -131,6 +134,8 @@ function TableRow< Item >( {
 	onMouseDown,
 	onClickCapture,
 	isActionsColumnSticky,
+	isFirstColumnSticky,
+	isFirstColumnStuck,
 	posinset,
 }: TableRowProps< Item > ) {
 	const { paginationInfo } = useContext( DataViewsContext );
@@ -178,7 +183,12 @@ function TableRow< Item >( {
 			} }
 		>
 			{ hasBulkActions && (
-				<td className="dataviews-view-table__checkbox-column">
+				<td
+					className={ clsx( 'dataviews-view-table__checkbox-column', {
+						'dataviews-view-table__checkbox-column--sticky':
+							isFirstColumnSticky,
+					} ) }
+				>
 					<div className="dataviews-view-table__cell-content-wrapper">
 						<DataViewsSelectionCheckbox
 							item={ item }
@@ -192,7 +202,14 @@ function TableRow< Item >( {
 				</td>
 			) }
 			{ hasPrimaryColumn && (
-				<td>
+				<td
+					className={ clsx( {
+						'dataviews-view-table__primary-column--sticky':
+							isFirstColumnSticky,
+						'dataviews-view-table__primary-column--stuck':
+							isFirstColumnSticky && isFirstColumnStuck,
+					} ) }
+				>
 					<ColumnPrimary
 						item={ item }
 						level={ level }
@@ -208,16 +225,27 @@ function TableRow< Item >( {
 					/>
 				</td>
 			) }
-			{ columns.map( ( column: string ) => {
+			{ columns.map( ( column: string, index: number ) => {
 				// Explicit picks the supported styles.
 				const { width, maxWidth, minWidth, align } =
 					view.layout?.styles?.[ column ] ?? {};
 				const field = fields.find( ( f ) => f.id === column );
 				const effectiveAlign = getEffectiveAlign( align, field?.type );
+				// Without a primary column, the first column in `fields` is the
+				// leading data column and takes the sticky treatment in its
+				// place, after the checkbox column when bulk actions are on.
+				const isStickyDataColumn =
+					isFirstColumnSticky && ! hasPrimaryColumn && index === 0;
 
 				return (
 					<td
 						key={ column }
+						className={ clsx( {
+							'dataviews-view-table__primary-column--sticky':
+								isStickyDataColumn,
+							'dataviews-view-table__primary-column--stuck':
+								isStickyDataColumn && isFirstColumnStuck,
+						} ) }
 						style={ {
 							width,
 							maxWidth,
@@ -312,12 +340,24 @@ function ViewTable< Item >( {
 
 	const tableNoticeId = useId();
 
-	const { isHorizontalScrollEnd, isVerticallyScrolled } = useScrollState( {
+	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
+	const isStickyFirstColumn = !! view.layout?.stickyFirstColumn;
+
+	const {
+		isHorizontalScrollStart,
+		isHorizontalScrollEnd,
+		isVerticallyScrolled,
+	} = useScrollState( {
 		scrollContainerRef: containerRef,
-		enabledHorizontal: !! actions?.length,
+		enabledHorizontal: !! actions?.length || isStickyFirstColumn,
 	} );
 
-	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
+	// Measures the checkbox cell so the sticky first column can start after it
+	// when bulk actions are on. The observer is only attached when the option
+	// is enabled, so tables that don't opt in pay nothing for it.
+	const [ firstColumnWidth, firstColumnWidthRef ] =
+		useContainerWidth< HTMLTableCellElement >();
+	const firstColumnOffset = hasBulkActions ? firstColumnWidth : 0;
 
 	if ( nextHeaderMenuToFocus ) {
 		// If we need to force focus, we short-circuit rendering here
@@ -399,6 +439,7 @@ function ViewTable< Item >( {
 			: undefined;
 	const tableStyle = {
 		'--wp-dataviews-media-aspect-ratio': mediaAspectRatio ?? '1/1',
+		'--wp-dataviews-first-column-offset': `${ firstColumnOffset }px`,
 	} as CSSProperties;
 	if ( ! hasData ) {
 		return (
@@ -425,6 +466,7 @@ function ViewTable< Item >( {
 					'has-bulk-actions': hasBulkActions,
 					'is-refreshing': ! isInfiniteScroll && isDelayedLoading,
 					'has-media-aspect-ratio': !! mediaAspectRatio,
+					'has-sticky-first-column': isStickyFirstColumn,
 				} ) }
 				style={ tableStyle }
 				aria-busy={ isLoading }
@@ -475,7 +517,18 @@ function ViewTable< Item >( {
 					<tr className="dataviews-view-table__row">
 						{ hasBulkActions && (
 							<th
-								className="dataviews-view-table__checkbox-column"
+								ref={
+									isStickyFirstColumn
+										? firstColumnWidthRef
+										: undefined
+								}
+								className={ clsx(
+									'dataviews-view-table__checkbox-column',
+									{
+										'dataviews-view-table__checkbox-column--sticky':
+											isStickyFirstColumn,
+									}
+								) }
 								scope="col"
 								onContextMenu={ handleHeaderContextMenu }
 							>
@@ -489,7 +542,16 @@ function ViewTable< Item >( {
 							</th>
 						) }
 						{ hasPrimaryColumn && (
-							<th scope="col">
+							<th
+								scope="col"
+								className={ clsx( {
+									'dataviews-view-table__primary-column--sticky':
+										isStickyFirstColumn,
+									'dataviews-view-table__primary-column--stuck':
+										isStickyFirstColumn &&
+										! isHorizontalScrollStart,
+								} ) }
+							>
 								{ titleField && (
 									<ColumnHeaderMenu
 										ref={ headerMenuRef(
@@ -532,9 +594,20 @@ function ViewTable< Item >( {
 							);
 							const canInsertOrMove =
 								view.layout?.enableMoving ?? true;
+							const isStickyDataColumn =
+								isStickyFirstColumn &&
+								! hasPrimaryColumn &&
+								index === 0;
 							return (
 								<th
 									key={ column }
+									className={ clsx( {
+										'dataviews-view-table__primary-column--sticky':
+											isStickyDataColumn,
+										'dataviews-view-table__primary-column--stuck':
+											isStickyDataColumn &&
+											! isHorizontalScrollStart,
+									} ) }
 									style={ {
 										width,
 										maxWidth,
@@ -646,6 +719,12 @@ function ViewTable< Item >( {
 											isActionsColumnSticky={
 												! isHorizontalScrollEnd
 											}
+											isFirstColumnSticky={
+												isStickyFirstColumn
+											}
+											isFirstColumnStuck={
+												! isHorizontalScrollStart
+											}
 										/>
 									);
 								} ) }
@@ -686,6 +765,12 @@ function ViewTable< Item >( {
 										isItemClickable={ isItemClickable }
 										isActionsColumnSticky={
 											! isHorizontalScrollEnd
+										}
+										isFirstColumnSticky={
+											isStickyFirstColumn
+										}
+										isFirstColumnStuck={
+											! isHorizontalScrollStart
 										}
 										posinset={
 											isInfiniteScroll

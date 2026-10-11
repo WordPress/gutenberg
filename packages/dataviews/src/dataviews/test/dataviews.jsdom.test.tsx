@@ -750,6 +750,86 @@ describe( 'DataViews component', () => {
 		} );
 	} );
 
+	describe( 'sticky first column', () => {
+		const view = {
+			...DEFAULT_VIEW,
+			fields: [ 'order', 'author' ],
+			titleField: 'title',
+			layout: { stickyFirstColumn: true },
+		};
+
+		it( 'does not opt in by default', () => {
+			render( <DataViewWrapper /> );
+
+			expect( screen.getByRole( 'table' ) ).not.toHaveClass(
+				'has-sticky-first-column'
+			);
+			expect(
+				screen
+					.getAllByRole( 'columnheader' )
+					.some( ( header ) =>
+						header.classList.contains(
+							'dataviews-view-table__primary-column--sticky'
+						)
+					)
+			).toBe( false );
+		} );
+
+		it( 'marks the table and the primary cell when the view opts in', () => {
+			const { container } = render( <DataViewWrapper view={ view } /> );
+			expect( screen.getByRole( 'table' ) ).toHaveClass(
+				'has-sticky-first-column'
+			);
+
+			// The header and each row's primary cell carry the sticky class.
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			const stickyCells = container.querySelectorAll(
+				'.dataviews-view-table__primary-column--sticky'
+			);
+			expect( stickyCells ).toHaveLength( data.length + 1 );
+		} );
+
+		it( 'does not mark any cell while the table is at the scroll start', () => {
+			const { container } = render( <DataViewWrapper view={ view } /> );
+
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			const stuck = container.querySelector(
+				'.dataviews-view-table__primary-column--stuck'
+			);
+			expect( stuck ).not.toBeInTheDocument();
+		} );
+
+		it( 'pins the checkbox column alongside the primary column with bulk actions', () => {
+			const { container } = render(
+				<DataViewWrapper view={ view } actions={ actions } />
+			);
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			const stickyCheckboxes = container.querySelectorAll(
+				'.dataviews-view-table__checkbox-column--sticky'
+			);
+			// The header plus one per rendered row.
+			expect( stickyCheckboxes ).toHaveLength( data.length + 1 );
+		} );
+
+		it( 'falls back to the first data column when there is no primary column', () => {
+			const { container } = render(
+				<DataViewWrapper
+					view={ {
+						...DEFAULT_VIEW,
+						fields: [ 'order', 'author' ],
+						layout: { stickyFirstColumn: true },
+					} }
+				/>
+			);
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			const stickyCells = container.querySelectorAll(
+				'.dataviews-view-table__primary-column--sticky'
+			);
+			// The header plus one per rendered row.
+			expect( stickyCells ).toHaveLength( data.length + 1 );
+		} );
+	} );
+
 	describe( 'in grid view', () => {
 		it( 'should display the passed in data', async () => {
 			render(

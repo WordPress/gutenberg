@@ -337,6 +337,72 @@
 	width: 1%;
 }
 
+/*
+ * The sticky first column engages only once the table is wide enough for the
+ * reservation to be worth it.
+ *
+ * On a narrow table the first column loses: a title column runs 166px and up,
+ * so at 390px the reservation would hold over two fifths of the table and
+ * leave less than one column to read it against. The actions column keeps its
+ * edge at every width because what it reserves is a control rather than
+ * content; a first column is data, so below this breakpoint it scrolls with
+ * the rest of the table.
+ *
+ * A container query rather than a media query, because it is the table's own
+ * width that matters, not the viewport's: wp-admin's menu collapses at 782px,
+ * so a table can be wider in a narrower window.
+ */
+@container dataviews-wrapper (min-width: 480px) {
+	.dataviews-view-table.has-sticky-first-column {
+		// The first column pinned to the leading edge, mirroring the actions
+		// column at the trailing one. The background is needed because a sticky
+		// cell slides over its neighbours and `background-color: inherit` on the
+		// row resolves to the table's, which is transparent once the cell has
+		// left the flow.
+		:is(td, th).dataviews-view-table__checkbox-column--sticky,
+		:is(td, th).dataviews-view-table__primary-column--sticky {
+			background-color: var(--wp-dataviews-color-background, var(--wpds-color-background-surface-neutral-strong));
+		}
+
+		:is(td, th).dataviews-view-table__checkbox-column--sticky {
+			position: sticky;
+			left: 0;
+		}
+
+		:is(td, th).dataviews-view-table__primary-column--sticky {
+			position: sticky;
+			left: var(--wp-dataviews-first-column-offset, 0px);
+		}
+
+		// Selected rows keep their tint under the pinned cells, or the columns
+		// that say which row is picked stop looking picked.
+		tr.is-selected :is(td, th).dataviews-view-table__checkbox-column--sticky,
+		tr.is-selected :is(td, th).dataviews-view-table__primary-column--sticky {
+			background-color: var(--wpds-color-background-interactive-brand-weak-active);
+		}
+
+		// The divider appears only once something has scrolled underneath,
+		// drawn on the trailing cell of the pair (the one with the content
+		// passing under it, which is the primary cell even when the checkbox
+		// column leads it). A `::after` rather than a border because
+		// `border-collapse: collapse` drops borders on positioned cells, and on
+		// the checkbox cell it would draw a line between the boxes and the
+		// titles they belong to.
+		:is(td, th).dataviews-view-table__primary-column--stuck {
+			&::after {
+				display: block;
+				content: "";
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				right: 0;
+				width: 1px;
+				background-color: var(--wpds-color-stroke-surface-neutral-weak);
+			}
+		}
+	}
+}
+
 .dataviews-view-table.is-refreshing {
 	@include dataviews-refreshing();
 }
