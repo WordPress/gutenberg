@@ -5,6 +5,7 @@ import {
 	RichText,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
+	useBackgroundProps,
 	getTypographyClassesAndStyles as useTypographyProps,
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
@@ -135,6 +136,7 @@ export default function SearchEdit( {
 	}
 
 	const colorProps = useColorProps( attributes );
+	const backgroundProps = useBackgroundProps( attributes );
 	const [ fluidTypographySettings, layout ] = useSettings(
 		'typography.fluid',
 		'layout'
@@ -220,11 +222,13 @@ export default function SearchEdit( {
 		const textFieldClasses = clsx(
 			'wp-block-search__input',
 			hasNoButton ? colorProps.className : undefined,
+			hasNoButton ? backgroundProps.className : undefined,
 			isButtonPositionInside ? undefined : borderProps.className,
 			typographyProps.className
 		);
 		const textFieldStyles = {
 			...( hasNoButton ? colorProps.style : {} ),
+			...( hasNoButton ? backgroundProps.style : {} ),
 			...( isButtonPositionInside
 				? {
 						borderRadius: borderProps.style?.borderRadius,
@@ -268,6 +272,7 @@ export default function SearchEdit( {
 		const buttonClasses = clsx(
 			'wp-block-search__button',
 			colorProps.className,
+			backgroundProps.className,
 			typographyProps.className,
 			isButtonPositionInside ? undefined : borderProps.className,
 			buttonUseIcon ? 'has-icon' : undefined,
@@ -275,6 +280,7 @@ export default function SearchEdit( {
 		);
 		const buttonStyles = {
 			...colorProps.style,
+			...backgroundProps.style,
 			...typographyProps.style,
 			...( isButtonPositionInside
 				? {
