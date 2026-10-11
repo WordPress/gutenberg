@@ -7,3 +7,6 @@
 	background: var(--wpds-made-up-color);
 }
 
+.escaped {
+	color: v\61r(--wpds-nonexistent-token);
+}
