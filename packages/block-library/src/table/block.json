@@ -159,6 +159,10 @@
 	"supports": {
 		"anchor": true,
 		"align": true,
+		"background": {
+			"__experimentalSkipSerialization": true,
+			"gradient": true
+		},
 		"color": {
 			"__experimentalSkipSerialization": true,
 			"gradients": true,
@@ -176,6 +180,7 @@
 			}
 		},
 		"typography": {
+			"__experimentalSkipSerialization": [ "textAlign" ],
 			"fontSize": true,
 			"lineHeight": true,
 			"__experimentalFontFamily": true,
@@ -184,6 +189,7 @@
 			"__experimentalLetterSpacing": true,
 			"__experimentalTextTransform": true,
 			"__experimentalTextDecoration": true,
+			"textAlign": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}

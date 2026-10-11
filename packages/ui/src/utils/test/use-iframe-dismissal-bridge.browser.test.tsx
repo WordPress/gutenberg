@@ -1,60 +1,13 @@
 import { describe, expect, it, vi } from 'vitest';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { page, userEvent } from 'vitest/browser';
-import {
-	useId,
-	useImperativeHandle,
-	useRef,
-	useState,
-} from '@wordpress/element';
-import { useIframeDismissalBridge } from '../use-iframe-dismissal-bridge';
-
-function IframeDismissalHarness() {
-	const [ open, setOpen ] = useState( false );
-	const triggerRef = useRef< HTMLButtonElement >( null );
-	const popupId = useId();
-	const bridge = useIframeDismissalBridge( {
-		modal: false,
-		onOpenChange: setOpen,
-	} );
-	const changeOpen = ( nextOpen: boolean ) => {
-		bridge.onOpenChange( nextOpen, {
-			isCanceled: false,
-			trigger: triggerRef.current ?? undefined,
-		} );
-	};
-	useImperativeHandle( bridge.actionsRef, () => ( {
-		close: () => changeOpen( false ),
-	} ) );
-
-	return (
-		<>
-			<button
-				ref={ triggerRef }
-				aria-controls={ open ? popupId : undefined }
-				onClick={ () => changeOpen( ! open ) }
-			>
-				Actions
-			</button>
-			{ open && (
-				<div
-					id={ popupId }
-					role="dialog"
-					aria-label="Popup"
-					data-rootownerid={ popupId }
-				>
-					<iframe title="Popup frame" />
-				</div>
-			) }
-		</>
-	);
-}
+import { IframeDismissalHarness } from './fixtures/iframe-dismissal-harness';
 
 describe( 'useIframeDismissalBridge', () => {
 	it( 'stays open for a press inside an iframe in its popup', async () => {
 		const onPopupClick = vi.fn();
-		await render( <IframeDismissalHarness /> );
+		await render( <IframeDismissalHarness popupIframe /> );
 
 		await userEvent.click(
 			screen.getByRole( 'button', { name: 'Actions' } )
@@ -78,5 +31,61 @@ describe( 'useIframeDismissalBridge', () => {
 
 		expect( onPopupClick ).toHaveBeenCalledTimes( 1 );
 		await expect.element( page.getByRole( 'dialog' ) ).toBeVisible();
+	} );
+
+	it( 'closes on a nested same-origin iframe pointer interaction', async () => {
+		const user = userEvent;
+
+		await render( <IframeDismissalHarness /> );
+
+		const editorIframe =
+			screen.getByTitle< HTMLIFrameElement >( 'Editor canvas' );
+		const editorDocument = editorIframe.contentDocument;
+
+		if ( ! editorDocument ) {
+			throw new Error( 'Expected a same-origin iframe document.' );
+		}
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		await expect.element( page.getByRole( 'dialog' ) ).toBeVisible();
+
+		const nestedIframe = editorDocument.createElement( 'iframe' );
+		nestedIframe.title = 'Nested canvas';
+		editorDocument.body.appendChild( nestedIframe );
+		const nestedDocument = nestedIframe.contentDocument;
+
+		if ( ! nestedDocument ) {
+			throw new Error( 'Expected a nested same-origin iframe document.' );
+		}
+
+		const canvasTarget = nestedDocument.createElement( 'button' );
+		canvasTarget.textContent = 'Edit nested block';
+		nestedDocument.body.appendChild( canvasTarget );
+
+		const nestedAddEventListener = vi.spyOn(
+			nestedDocument,
+			'addEventListener'
+		);
+		await waitFor( () => {
+			expect( nestedAddEventListener ).toHaveBeenCalledWith(
+				'pointerdown',
+				expect.any( Function ),
+				true
+			);
+		} );
+
+		const editorFrame = page.frameLocator(
+			page.getByTitle( 'Editor canvas' )
+		);
+		const nestedFrame = page.frameLocator(
+			editorFrame.getByTitle( 'Nested canvas' )
+		);
+		await nestedFrame
+			.getByRole( 'button', { name: 'Edit nested block' } )
+			.click();
+
+		await waitFor( () => {
+			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+		} );
 	} );
 } );
