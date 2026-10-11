@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Bug Fixes
+
+-   Correct the `useResourcePermissions` return type to match its permission and resolution object, including permissions for entity resources with an ID ([#84496](https://github.com/WordPress/gutenberg/issues/84496)).
+
 ## 8.2.0 (2026-10-07)
 
 ### Enhancements
