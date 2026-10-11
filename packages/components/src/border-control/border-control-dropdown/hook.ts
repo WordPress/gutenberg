@@ -1,14 +1,32 @@
 import clsx from 'clsx';
 import { parseQuantityAndUnitFromRawValue } from '../../unit-control/utils';
-import type { WordPressComponentProps } from '../../context';
+import type { HookReturnProps, WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import { COLORS } from '../../utils';
 import styles from '../style.module.scss';
-import type { DropdownProps } from '../types';
+import type { Border, DropdownProps } from '../types';
 
 export function useBorderControlDropdown(
 	props: WordPressComponentProps< DropdownProps, 'div' >
-) {
+): HookReturnProps<
+	WordPressComponentProps< DropdownProps, 'div' >,
+	'onChange' | 'previousStyleSelection',
+	{
+		border: Border | undefined;
+		className: string;
+		colors: NonNullable< DropdownProps[ 'colors' ] >;
+		enableAlpha: boolean;
+		enableStyle: boolean;
+		indicatorWrapperClassName: string;
+		indicatorWrapperStyle: React.CSSProperties | undefined;
+		onColorChange: ( color?: string ) => void;
+		onStyleChange: ( style?: string ) => void;
+		onReset: () => void;
+		popoverControlsClassName: string;
+		resetButtonWrapperClassName: string;
+		__experimentalIsRenderedInSidebar: boolean;
+	}
+> {
 	const {
 		border,
 		className,

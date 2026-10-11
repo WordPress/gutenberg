@@ -1,12 +1,16 @@
 import clsx from 'clsx';
-import type { WordPressComponentProps } from '../context';
+import type { HookReturnProps, WordPressComponentProps } from '../context';
 import { useContextSystem } from '../context';
 import type { ScrollableProps } from './types';
 import styles from './style.module.scss';
 
 export function useScrollable(
 	props: WordPressComponentProps< ScrollableProps, 'div' >
-) {
+): HookReturnProps<
+	WordPressComponentProps< ScrollableProps, 'div' >,
+	'scrollDirection' | 'smoothScroll',
+	{ className: string }
+> {
 	const {
 		className,
 		scrollDirection = 'y',

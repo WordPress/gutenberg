@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { useCallback, useState } from '@wordpress/element';
 import { parseQuantityAndUnitFromRawValue } from '../../unit-control/utils';
-import type { WordPressComponentProps } from '../../context';
+import type { HookReturnProps, WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import styles from '../style.module.scss';
 import type { Border, BorderControlProps } from '../types';
@@ -16,7 +16,33 @@ const isValidBorder = ( border?: Border ) => {
 
 export function useBorderControl(
 	props: WordPressComponentProps< BorderControlProps, 'div' >
-) {
+): HookReturnProps<
+	WordPressComponentProps< BorderControlProps, 'div' >,
+	| 'isCompact'
+	| 'onChange'
+	| 'shouldSanitizeBorder'
+	| 'width'
+	| 'size'
+	| '__next40pxDefaultSize',
+	{
+		className: string;
+		colors: NonNullable< BorderControlProps[ 'colors' ] >;
+		enableAlpha: boolean;
+		enableStyle: boolean;
+		innerWrapperClassName: string;
+		inputWidth: BorderControlProps[ 'width' ];
+		isStyleSettable: boolean;
+		onBorderChange: ( newBorder?: Border ) => void;
+		onSliderChange: ( value?: number ) => void;
+		onWidthChange: ( newWidth?: string ) => void;
+		previousStyleSelection: string | undefined;
+		sliderClassName: string;
+		value: Border | undefined;
+		widthUnit: string;
+		widthValue: number | undefined;
+		__experimentalIsRenderedInSidebar: boolean;
+	}
+> {
 	const {
 		className,
 		colors = [],

@@ -7,10 +7,12 @@ import {
 	useState,
 } from '@wordpress/element';
 import styles from '../style.module.scss';
-import type { WordPressComponentProps } from '../../context';
+import type { HookReturnProps, WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
+import type { HeadingSize } from '../../heading/types';
 import type {
 	RegisteredToolsPanelItem,
+	ToolsPanelContext,
 	ToolsPanelMenuItemKey,
 	ToolsPanelMenuItems,
 	ToolsPanelProps,
@@ -213,7 +215,22 @@ const isMenuItemTypeEmpty = (
 
 export function useToolsPanel(
 	props: WordPressComponentProps< ToolsPanelProps, 'div' >
-) {
+): HookReturnProps<
+	WordPressComponentProps< ToolsPanelProps, 'div' >,
+	| 'resetAll'
+	| 'panelId'
+	| 'hasInnerWrapper'
+	| 'shouldRenderPlaceholderItems'
+	| '__experimentalFirstVisibleItemClass'
+	| '__experimentalLastVisibleItemClass',
+	{
+		className: string;
+		headingLevel: HeadingSize;
+		panelContext: ToolsPanelContext;
+		resetAllItems: () => void;
+		toggleItem: ( label: string ) => void;
+	}
+> {
 	const {
 		className,
 		headingLevel = 2,
