@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   RichText: Add a `maxLength` prop that limits the number of characters the field accepts ([#63987](https://github.com/WordPress/gutenberg/issues/63987)).
 -   Inserter: Replace random tips with info notices using the same light-bulb icon and style keyboard hints as keys ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
 
 ### Bug Fixes

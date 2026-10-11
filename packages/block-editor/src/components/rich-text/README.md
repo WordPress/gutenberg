@@ -75,6 +75,10 @@ _Optional._ A list of autocompleters to use instead of the default.
 _Optional._ Whether or not to preserve white space characters in the `value`. Normally tab, newline and space characters are collapsed to a single space or
 trimmed.
 
+### `maxLength: Number`
+
+_Optional._ The maximum number of characters the field accepts, counted as the length of its plain text (like the native `maxLength` attribute, characters outside the Basic Multilingual Plane such as emoji count as two, and an embedded object counts as one). Input beyond the limit, including pasted text, is cut off. A `value` that is already longer than the limit is kept as is, but the field cannot grow further.
+
 ## RichText.Content
 
 `RichText.Content` should be used in the `save` function of your block to correctly save rich text content.
