@@ -32,7 +32,11 @@ export default function PageTitleView( { item }: { item: CommonPost } ) {
 	}
 	return (
 		<BaseTitleView item={ item } className="fields-field__page-title">
-			{ badge && <Badge>{ badge }</Badge> }
+			{ badge && (
+				<Badge className="fields-field__page-title-badge">
+					{ badge }
+				</Badge>
+			) }
 		</BaseTitleView>
 	);
 }

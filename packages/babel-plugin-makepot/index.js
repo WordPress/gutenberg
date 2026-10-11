@@ -190,7 +190,7 @@ function isSameTranslation( a, b ) {
  * @return {Array} Sorted translations.
  */
 function sortByReference( translations = [] ) {
-	return [ ...translations ].sort( ( a, b ) =>
+	return translations.toSorted( ( a, b ) =>
 		a.comments.reference.localeCompare( b.comments.reference )
 	);
 }
