@@ -144,18 +144,15 @@ export function findNoteRange( value, noteId ) {
 	if ( noteId === undefined || noteId === null ) {
 		return null;
 	}
-	let html = null;
+	let formats;
 	if ( value instanceof RichTextData ) {
-		html = value.toHTMLString();
-	} else if ( typeof value === 'string' ) {
-		html = value;
-	}
-	if ( ! html || html.indexOf( 'wp-note' ) === -1 ) {
+		formats = value.formats;
+	} else if ( typeof value === 'string' && value.includes( 'wp-note' ) ) {
+		formats = create( { html: value } ).formats;
+	} else {
 		return null;
 	}
 	const target = String( noteId );
-	const record = create( { html } );
-	const formats = record.formats;
 	let start = -1;
 	for ( let i = 0; i < formats.length; i++ ) {
 		const stack = formats[ i ];
@@ -293,8 +290,7 @@ export function getInlineMarkerStart( thread, attributes ) {
  * and orders the markers outermost-first by span, so a note fully contained in
  * another nests inside it (`<mark><mark>…</mark></mark>`). Crossing (partial)
  * overlaps can't nest in HTML and serialize as split runs, but each note keeps
- * its full range. The returned record is not normalised; callers should
- * round-trip it (e.g. through `RichTextData`) before storing.
+ * its full range.
  *
  * @param {Object} record A rich-text record (`{ text, formats, … }`).
  * @param {Object} format The `core/note` format to add (`{ type, attributes }`).
@@ -419,16 +415,12 @@ export function wrapInlineNote( value, id, start, end ) {
 		return null;
 	}
 	const record = applyNoteFormat(
-		create( { html: value.toHTMLString() } ),
+		create( { html: value } ),
 		{ type: NOTE_FORMAT_NAME, attributes: { 'data-id': String( id ) } },
 		start,
 		end
 	);
-	// Round-trip through HTML to normalise format references (applyNoteFormat
-	// leaves them un-normalised) so the stored value matches a fresh reload.
-	return RichTextData.fromHTMLString(
-		new RichTextData( record ).toHTMLString()
-	);
+	return new RichTextData( record );
 }
 
 /**
@@ -450,12 +442,10 @@ export function removeNoteFormat( value, noteId ) {
 		return null;
 	}
 	const target = String( noteId );
-	const record = create( { html: value.toHTMLString() } );
+	const record = create( { html: value } );
 	let changed = false;
-	const formats = record.formats.map( ( stack ) => {
-		if ( ! stack ) {
-			return stack;
-		}
+	const formats = record.formats.slice();
+	formats.forEach( ( stack, index ) => {
 		const filtered = stack.filter(
 			( format ) =>
 				! (
@@ -464,17 +454,17 @@ export function removeNoteFormat( value, noteId ) {
 				)
 		);
 		if ( filtered.length === stack.length ) {
-			return stack;
+			return;
 		}
 		changed = true;
-		return filtered.length ? filtered : undefined;
+		if ( filtered.length ) {
+			formats[ index ] = filtered;
+		} else {
+			// Rich-text expects holes, not `undefined`, at unformatted indices.
+			delete formats[ index ];
+		}
 	} );
-	// Round-trip through HTML so the stored value matches a fresh reload.
-	return changed
-		? RichTextData.fromHTMLString(
-				new RichTextData( { ...record, formats } ).toHTMLString()
-			)
-		: null;
+	return changed ? new RichTextData( { ...record, formats } ) : null;
 }
 
 /**
@@ -732,7 +722,7 @@ export function calculateNotePositions( {
 	// sweep's assumption holds and cards never displace past their markers.
 	// Threads without a rect keep their relative order; they are skipped
 	// below and never receive a position.
-	const orderedThreads = [ ...threads ].sort(
+	const orderedThreads = threads.toSorted(
 		( a, b ) =>
 			( blockRects[ a.id ]?.top ?? Number.MAX_VALUE ) -
 			( blockRects[ b.id ]?.top ?? Number.MAX_VALUE )

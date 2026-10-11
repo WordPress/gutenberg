@@ -23,7 +23,7 @@ class Render_Block_Paragraph_Test extends WP_UnitTestCase {
 		$parsed_blocks = parse_blocks( '<!-- wp:paragraph -->' . $input . '<!-- /wp:paragraph -->' );
 		$block         = new WP_Block( $parsed_blocks[0] );
 		$actual        = $block->render();
-		$this->assertEquals( $expected_result, $actual );
+		$this->assertSame( $expected_result, $actual );
 	}
 
 	public function data_css_class_examples() {
