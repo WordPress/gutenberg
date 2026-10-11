@@ -82,12 +82,56 @@ describe( 'mediaUpload with client-side media processing', () => {
 		);
 
 		await finishServerUpload( 'one.txt' );
+		await waitFor( () =>
+			expect( onFileChange ).toHaveBeenLastCalledWith( [
+				expect.objectContaining( { id: 'one.txt' } ),
+				expect.objectContaining( { url: 'blob:two.txt' } ),
+				expect.objectContaining( { id: 'three.txt' } ),
+			] )
+		);
+
 		await finishServerUpload( 'two.txt' );
 		await waitFor( () =>
 			expect( onFileChange ).toHaveBeenLastCalledWith( [
 				expect.objectContaining( { id: 'one.txt' } ),
 				expect.objectContaining( { id: 'two.txt' } ),
 				expect.objectContaining( { id: 'three.txt' } ),
+			] )
+		);
+	} );
+
+	it( 'reports only files from the current upload when uploading again', async () => {
+		const mediaUpload = setUpMediaUpload();
+		const onFileChange = vi.fn();
+		const onBatchSuccess = vi.fn();
+
+		mediaUpload( {
+			filesList: createFiles( 'earlier.txt' ),
+			onFileChange,
+			onBatchSuccess,
+		} );
+
+		await finishServerUpload( 'earlier.txt' );
+		await waitFor( () =>
+			expect( onBatchSuccess ).toHaveBeenCalledTimes( 1 )
+		);
+		onFileChange.mockClear();
+
+		mediaUpload( {
+			filesList: createFiles( 'later.txt' ),
+			onFileChange,
+		} );
+
+		await waitFor( () =>
+			expect( onFileChange ).toHaveBeenLastCalledWith( [
+				expect.objectContaining( { url: 'blob:later.txt' } ),
+			] )
+		);
+
+		await finishServerUpload( 'later.txt' );
+		await waitFor( () =>
+			expect( onFileChange ).toHaveBeenLastCalledWith( [
+				expect.objectContaining( { id: 'later.txt' } ),
 			] )
 		);
 	} );
@@ -146,5 +190,56 @@ describe( 'mediaUpload with client-side media processing', () => {
 		expect( onBatchSuccess ).toHaveBeenCalledTimes( 1 );
 		expect( onError ).toHaveBeenCalledBefore( onBatchSuccess );
 		expect( queuedAtBatchSuccess ).toEqual( [ [] ] );
+	} );
+
+	it( 'finishes a batch when every file is refused before upload', async () => {
+		const mediaUpload = setUpMediaUpload();
+		const onFileChange = vi.fn();
+		const onError = vi.fn();
+		const onBatchSuccess = vi.fn();
+
+		mediaUpload( {
+			allowedTypes: [ 'image' ],
+			filesList: createFiles( 'refused-one.txt', 'refused-two.txt' ),
+			onFileChange,
+			onError,
+			onBatchSuccess,
+		} );
+
+		await waitFor( () =>
+			expect( onBatchSuccess ).toHaveBeenCalledTimes( 1 )
+		);
+		expect( onError ).toHaveBeenCalledTimes( 2 );
+		expect( onError ).toHaveBeenCalledBefore( onBatchSuccess );
+		expect( onFileChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'waits for accepted files when other files are refused before upload', async () => {
+		const mediaUpload = setUpMediaUpload();
+		const onFileChange = vi.fn();
+		const onError = vi.fn();
+		const onBatchSuccess = vi.fn();
+		const acceptedFile = new File( [ 'image' ], 'accepted.png', {
+			type: 'image/png',
+		} );
+
+		mediaUpload( {
+			allowedTypes: [ 'image' ],
+			filesList: [ createFiles( 'refused.txt' )[ 0 ], acceptedFile ],
+			onFileChange,
+			onError,
+			onBatchSuccess,
+		} );
+
+		await waitFor( () => expect( onError ).toHaveBeenCalledTimes( 1 ) );
+		expect( onBatchSuccess ).not.toHaveBeenCalled();
+
+		await finishServerUpload( 'accepted.png' );
+		await waitFor( () =>
+			expect( onBatchSuccess ).toHaveBeenCalledTimes( 1 )
+		);
+		expect( onFileChange ).toHaveBeenLastCalledWith( [
+			expect.objectContaining( { id: 'accepted.png' } ),
+		] );
 	} );
 } );
