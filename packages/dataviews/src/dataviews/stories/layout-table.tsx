@@ -12,6 +12,7 @@ export const LayoutTableComponent = ( {
 	groupByLabel = true,
 	perPageSizes = [ 10, 25, 50, 100 ],
 	showMedia = true,
+	stickyFirstColumn = false,
 }: {
 	backgroundColor?: string;
 	hasClickableItems?: boolean;
@@ -19,13 +20,14 @@ export const LayoutTableComponent = ( {
 	groupByLabel?: boolean;
 	perPageSizes?: number[];
 	showMedia?: boolean;
+	stickyFirstColumn?: boolean;
 } ) => {
 	const [ view, setView ] = useState< View >( {
 		type: LAYOUT_TABLE,
 		search: '',
 		page: 1,
 		perPage: 10,
-		layout: {},
+		layout: { stickyFirstColumn },
 		filters: [],
 		fields: [ 'categories' ],
 		titleField: 'title',
@@ -46,9 +48,15 @@ export const LayoutTableComponent = ( {
 						}
 					: undefined,
 				showMedia,
+				layout: {
+					...( prevView.type === LAYOUT_TABLE
+						? prevView.layout
+						: undefined ),
+					stickyFirstColumn,
+				},
 			};
 		} );
-	}, [ groupBy, groupByLabel, showMedia ] );
+	}, [ groupBy, groupByLabel, showMedia, stickyFirstColumn ] );
 
 	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( data, view, fields );

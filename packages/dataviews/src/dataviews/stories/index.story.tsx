@@ -62,6 +62,7 @@ export const LayoutTable = {
 		hasClickableItems: true,
 		perPageSizes: [ 10, 25, 50, 100 ],
 		showMedia: true,
+		stickyFirstColumn: false,
 	},
 	argTypes: {
 		backgroundColor: {
@@ -88,6 +89,11 @@ export const LayoutTable = {
 		showMedia: {
 			control: 'boolean',
 			description: 'Whether to display the media field',
+		},
+		stickyFirstColumn: {
+			control: 'boolean',
+			description:
+				'Whether the first column stays pinned while the table scrolls horizontally',
 		},
 	},
 };
