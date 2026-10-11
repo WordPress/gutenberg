@@ -8,7 +8,7 @@ import {
 } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { hasFixedLayout, head, body, foot, caption } = attributes;
+	const { hasFixedLayout, head, body, foot, caption, style } = attributes;
 	const isEmpty = ! head.length && ! body.length && ! foot.length;
 
 	if ( isEmpty ) {
@@ -18,8 +18,11 @@ export default function save( { attributes } ) {
 	const colorProps = getColorClassesAndStyles( attributes );
 	const borderProps = getBorderClassesAndStyles( attributes );
 
+	const textAlign = style?.typography?.textAlign;
+
 	const classes = clsx( colorProps.className, borderProps.className, {
 		'has-fixed-layout': hasFixedLayout,
+		[ `has-text-align-${ textAlign }` ]: textAlign,
 	} );
 
 	const hasCaption = ! RichText.isEmpty( caption );

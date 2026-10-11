@@ -66,6 +66,9 @@ function render_block_core_icon( $attributes ) {
 		);
 	}
 
+	// Shadow.
+	$shadow_styles = $attributes['style']['shadow'] ?? null;
+
 	// Spacing (Padding).
 	$spacing_styles = array();
 	if ( isset( $attributes['style']['spacing']['padding'] ) ) {
@@ -83,6 +86,7 @@ function render_block_core_icon( $attributes ) {
 		array(
 			'color'      => $color_styles,
 			'border'     => $border_styles,
+			'shadow'     => $shadow_styles,
 			'spacing'    => $spacing_styles,
 			'dimensions' => $dimensions_styles,
 		),
