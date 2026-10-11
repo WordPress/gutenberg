@@ -73,7 +73,7 @@ function fixed( number ) {
  * @param {number[]} array
  */
 function quartiles( array ) {
-	const numbers = array.slice().sort( ( a, b ) => a - b );
+	const numbers = array.toSorted( ( a, b ) => a - b );
 
 	/**
 	 * @param {number} offset

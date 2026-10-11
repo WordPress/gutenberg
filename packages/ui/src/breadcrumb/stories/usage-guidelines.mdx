@@ -1,0 +1,49 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as BreadcrumbStories from './index.story';
+import * as UsageGuidelinesStories from './usage-guidelines.story';
+
+<Meta of={ UsageGuidelinesStories } name="Usage guidelines" />
+
+# Breadcrumb usage guidelines
+
+Use Breadcrumb to show a hierarchical path to the current page or selected item. Every ancestor must belong to that hierarchy. Commands such as Delete and Duplicate belong in a separate menu.
+
+## Page navigation
+
+Use `LinkItem` ancestors with meaningful destinations followed by exactly one `CurrentItem`. Give `Root` an `aria-label` that describes the hierarchy, such as "Page hierarchy". The current item is not a link and defaults to `aria-current="page"`. This follows the [APG breadcrumb pattern](https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/).
+
+<Canvas of={ BreadcrumbStories.Default } />
+
+## Hierarchy selection
+
+Use `ButtonItem` ancestors followed by exactly one `CurrentItem` when ancestors select or activate a position in the hierarchy. For example, a block editor trail can show Document, Group, and Paragraph. Group selects the ancestor block; Document clears selection. Give `Root` a descriptive `aria-label`, such as "Block hierarchy".
+
+Use `onClick` to update your selection state. If selection should move focus into the editor, do that in your handler. Breadcrumb preserves that focus move.
+
+Set `aria-current="true"` on `CurrentItem` if selecting an ancestor can leave it as the only item. This keeps the trail as a group after all button ancestors are removed.
+
+<Canvas of={ UsageGuidelinesStories.HierarchySelection } />
+
+When using a ref or an event's `currentTarget`, handle both possible elements: `HTMLButtonElement` in the visible trail and `HTMLDivElement` in the overflow menu. A custom `render` must support both button and menu-item composition.
+
+## Current-only trails
+
+A single `CurrentItem` is supported. For page navigation, no `aria-current` prop is needed. For hierarchy selection, set `aria-current="true"` explicitly:
+
+```tsx
+<Breadcrumb.Root aria-label="Block hierarchy">
+	<Breadcrumb.CurrentItem aria-current="true">
+		Document
+	</Breadcrumb.CurrentItem>
+</Breadcrumb.Root>
+```
+
+<Canvas of={ BreadcrumbStories.CurrentOnly } />
+
+## Supported collections
+
+Use only links or only buttons for ancestors within one trail. Keep exactly one final `CurrentItem`, use non-empty text labels, and give items generated from arrays stable React keys.
+
+## Truncated labels
+
+Keep labels concise and leave enough space to read them where possible. Truncated labels have a tooltip for mouse and keyboard users. Tooltips are unavailable on touch devices, so provide another way to read the full label when it is needed to understand the hierarchy.
