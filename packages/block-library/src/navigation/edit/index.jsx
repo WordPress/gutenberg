@@ -58,6 +58,7 @@ import { useInnerBlocks } from './use-inner-blocks';
 import { detectColors } from './utils';
 import ManageMenusButton from './manage-menus-button';
 import MenuInspectorControls from './menu-inspector-controls';
+import AutoAddPagesControl from './auto-add-pages-control';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
@@ -788,6 +789,16 @@ function Navigation( {
 
 	const stylingInspectorControls = (
 		<>
+			{ isEntityAvailable &&
+				hasResolvedCanUserUpdateNavigationMenu &&
+				canUserUpdateNavigationMenu && (
+					<InspectorControls>
+						<AutoAddPagesControl
+							menuId={ ref }
+							dropdownMenuProps={ dropdownMenuProps }
+						/>
+					</InspectorControls>
+				) }
 			<InspectorControls>
 				{ hasSubmenus && (
 					<ToolsPanel
