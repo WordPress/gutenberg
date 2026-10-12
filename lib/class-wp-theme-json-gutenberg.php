@@ -4456,11 +4456,13 @@ class WP_Theme_JSON_Gutenberg {
 			$scale_path = array( 'settings', 'spacing', 'spacingScale', $origin );
 
 			// Apply the base spacing scale to the current layer.
-			$base_spacing_scale      = _wp_array_get( $this->theme_json, $scale_path, array() );
-			$flattened_spacing_scale = array_replace( $flattened_spacing_scale, $base_spacing_scale );
+			$base_spacing_scale = _wp_array_get( $this->theme_json, $scale_path, array() );
+			if ( is_array( $base_spacing_scale ) ) {
+				$flattened_spacing_scale = array_replace( $flattened_spacing_scale, $base_spacing_scale );
+			}
 
 			$spacing_scale = _wp_array_get( $incoming_data, $scale_path, null );
-			if ( ! isset( $spacing_scale ) ) {
+			if ( ! is_array( $spacing_scale ) ) {
 				continue;
 			}
 
