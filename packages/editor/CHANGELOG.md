@@ -9,6 +9,7 @@
 ### Enhancements
 
 -   Notes: Mark noted content in the author's color at rest. Inline notes get a tint and an underline that thickens when the note is selected, and block-level notes tint the whole block with an outline around it. Selecting a note outlines its block instead of dimming the rest of the canvas, and hiding notes hides the marks ([#80578](https://github.com/WordPress/gutenberg/pull/80578)).
+-   Migrate the classic-theme template selector to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
 
 ### Bug Fixes
 
