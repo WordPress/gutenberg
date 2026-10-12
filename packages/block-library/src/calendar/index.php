@@ -147,10 +147,15 @@ if ( ! is_multisite() ) {
 	 *
 	 * @since 5.9.0
 	 *
-	 * @param int $post_id Deleted post ID.
+	 * @param int          $post_id Deleted post ID.
+	 * @param WP_Post|null $post    Optional. Deleted post object. Default null.
 	 */
-	function block_core_calendar_update_has_published_post_on_delete( $post_id ) {
-		$post = get_post( $post_id );
+	function block_core_calendar_update_has_published_post_on_delete( $post_id, $post = null ) {
+		// The post is already removed from the database on `deleted_post`,
+		// so rely on the post object the action passes.
+		if ( ! $post instanceof WP_Post ) {
+			$post = get_post( $post_id );
+		}
 
 		if ( ! $post || 'publish' !== $post->post_status || 'post' !== $post->post_type ) {
 			return;
@@ -184,6 +189,6 @@ if ( ! is_multisite() ) {
 		block_core_calendar_update_has_published_posts();
 	}
 
-	add_action( 'delete_post', 'block_core_calendar_update_has_published_post_on_delete' );
+	add_action( 'deleted_post', 'block_core_calendar_update_has_published_post_on_delete', 10, 2 );
 	add_action( 'transition_post_status', 'block_core_calendar_update_has_published_post_on_transition_post_status', 10, 3 );
 }
