@@ -360,4 +360,42 @@ class WP_Test_REST_Icon_Collections_Controller extends WP_Test_REST_TestCase {
 		$this->assertArrayHasKey( 'context', $params );
 		$this->assertSame( 'view', $params['context']['default'] );
 	}
+
+	/**
+	 * Asserts that no icon collections can be created.
+	 * No controller method is executed; 404 is returned by route matching.
+	 */
+	public function test_create_item() {
+		$request = new WP_REST_Request( 'POST', '/wp/v2/icon-collections' );
+		$request->set_param( 'slug', 'foo' );
+		$request->set_param( 'label', 'Foo' );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 404, $response->get_status() );
+	}
+
+	/**
+	 * Asserts that no icon collections can be updated.
+	 * No controller method is executed; 404 is returned by route matching.
+	 */
+	public function test_update_item() {
+		$request = new WP_REST_Request( 'POST', '/wp/v2/icon-collections/core' );
+		$request->set_param( 'label', 'Foo' );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 404, $response->get_status() );
+	}
+
+	/**
+	 * Asserts that no icon collections can be deleted.
+	 * No controller method is executed; 404 is returned by route matching.
+	 */
+	public function test_delete_item() {
+		$request  = new WP_REST_Request( 'DELETE', '/wp/v2/icon-collections/core' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 404, $response->get_status() );
+	}
 }
