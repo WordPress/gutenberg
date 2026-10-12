@@ -2169,6 +2169,31 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			{ name: 'core/paragraph', attributes: { content: 'ab' } },
 		] );
 
+		// Undo brings back the format and the selection.
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'a<strong>b</strong>' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '<strong>a</strong>b' },
+			},
+		] );
+		await expect.poll( getSelection ).toEqual( {
+			blocks: 2,
+			anchorOffset: 1,
+			focusOffset: 1,
+		} );
+		await expect.poll( getSelectedText ).toBe( 'ba' );
+		await pageUtils.pressKeys( 'primary+shift+z' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'ab' } },
+			{ name: 'core/paragraph', attributes: { content: 'ab' } },
+		] );
+		await expect.poll( getSelectedText ).toBe( 'ba' );
+
 		// A link is one anchor per block, as it is one per line within a
 		// block.
 		await pageUtils.pressKeys( 'primary+k' );

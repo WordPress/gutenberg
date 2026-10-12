@@ -1,10 +1,9 @@
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useMemo, useRef } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { Popover } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import {
 	RichTextData,
-	create,
 	join,
 	split,
 	toHTMLString,
@@ -22,13 +21,10 @@ import {
 import FormatEdit from './format-edit';
 import { getFieldFormatSettings } from './field-format-settings';
 import FormatToolbarContainer from './format-toolbar-container';
+import { toRecord } from './utils';
 
-const {
-	KeyboardShortcutContext,
-	InputEventContext,
-	useFormatTypes,
-	getDomPosition,
-} = unlock( richTextPrivateApis );
+const { KeyboardShortcutContext, InputEventContext, useFormatTypes } =
+	unlock( richTextPrivateApis );
 
 // Cannot occur in rich text, so the joined fields split back unambiguously.
 const SEPARATOR = '\u0000';
@@ -68,17 +64,8 @@ function getSoleRichTextAttributeKey( blockName: string ): string | undefined {
 	}
 }
 
-function toRecord( value: unknown ): Record {
-	if ( value instanceof RichTextData ) {
-		const { formats, replacements, text } = value;
-		return { formats, replacements, text };
-	}
-	return create( { html: value ? String( value ) : '' } );
-}
-
 const NONE: {
 	clientIds?: string[];
-	keys?: string;
 	anchor?: SelectionEnd;
 	focus?: SelectionEnd;
 } = {};
@@ -120,24 +107,21 @@ function selector( select: ( store: typeof blockEditorStore ) => any ) {
 		return NONE;
 	}
 
-	const keys = [];
-
 	for ( const clientId of clientIds ) {
-		const key = getSoleRichTextAttributeKey( getBlockName( clientId ) );
 		// Inner blocks would be inside the selection but outside the text.
-		if ( ! key || getBlockCount( clientId ) ) {
+		if (
+			! getSoleRichTextAttributeKey( getBlockName( clientId ) ) ||
+			getBlockCount( clientId )
+		) {
 			return NONE;
 		}
-		keys.push( key );
 	}
 
-	// A string, so an unchanged result compares equal.
-	return { clientIds, keys: keys.join( ',' ), anchor, focus };
+	return { clientIds, anchor, focus };
 }
 
 type FieldsProps = {
 	clientIds: string[];
-	keys: string[];
 	anchor: SelectionEnd;
 	focus: SelectionEnd;
 	contentRef: RefObject< HTMLElement >;
@@ -154,17 +138,15 @@ type FieldsProps = {
 export default function MultiBlockFormatEdit( {
 	contentRef,
 }: Pick< FieldsProps, 'contentRef' > ) {
-	const { clientIds, keys, anchor, focus } = useSelect( selector, [] );
-	const keyList = useMemo( () => keys?.split( ',' ), [ keys ] );
+	const { clientIds, anchor, focus } = useSelect( selector, [] );
 
-	if ( ! clientIds || ! keyList || ! anchor || ! focus ) {
+	if ( ! clientIds || ! anchor || ! focus ) {
 		return null;
 	}
 
 	return (
 		<Fields
 			clientIds={ clientIds }
-			keys={ keyList }
 			anchor={ anchor }
 			focus={ focus }
 			contentRef={ contentRef }
@@ -172,8 +154,19 @@ export default function MultiBlockFormatEdit( {
 	);
 }
 
-function Fields( { clientIds, keys, anchor, focus, contentRef }: FieldsProps ) {
+function Fields( { clientIds, anchor, focus, contentRef }: FieldsProps ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const { getBlockName } = useSelect( blockEditorStore );
+	const keys = useMemo(
+		() =>
+			clientIds.map(
+				( clientId ) =>
+					getSoleRichTextAttributeKey(
+						getBlockName( clientId )
+					) as string
+			),
+		[ clientIds, getBlockName ]
+	);
 	// The formats every selected field allows.
 	const { allowedFormats, withoutInteractiveFormatting } = useMemo( () => {
 		const fields = clientIds.map( ( clientId, i ) =>
@@ -197,8 +190,12 @@ function Fields( { clientIds, keys, anchor, focus, contentRef }: FieldsProps ) {
 		allowedFormats,
 		withoutInteractiveFormatting,
 	} );
-	const keyboardShortcuts = useRef( new Set< ( event: Event ) => void >() );
-	const inputEvents = useRef( new Set< ( event: Event ) => void >() );
+	const [ keyboardShortcuts ] = useState(
+		() => new Set< ( event: Event ) => void >()
+	);
+	const [ inputEvents ] = useState(
+		() => new Set< ( event: Event ) => void >()
+	);
 	const values: unknown[] = useSelect(
 		( select ) => {
 			const { getBlockAttributes } = select( blockEditorStore );
@@ -244,47 +241,13 @@ function Fields( { clientIds, keys, anchor, focus, contentRef }: FieldsProps ) {
 		return { ...joined, start, end };
 	}, [ records, clientIds, anchor, focus ] );
 
-	// Applying the formats changes the text nodes, and the browser moves the
-	// selection with the nodes it loses. Put it back once the blocks have
-	// rendered the new values.
-	const shouldRestoreSelectionRef = useRef( false );
-	useEffect( () => {
-		if ( ! shouldRestoreSelectionRef.current || ! contentRef.current ) {
-			return;
-		}
-		shouldRestoreSelectionRef.current = false;
-		const root = contentRef.current;
-		const positionOf = ( {
-			clientId,
-			attributeKey,
-			offset,
-		}: SelectionEnd ) =>
-			getDomPosition(
-				records[ clientIds.indexOf( clientId ) ],
-				offset,
-				root.querySelector(
-					`[data-block="${ clientId }"][data-wp-block-attribute-key="${ attributeKey }"], [data-block="${ clientId }"] [data-wp-block-attribute-key="${ attributeKey }"]`
-				)
-			);
-		const anchorPosition = positionOf( anchor );
-		const focusPosition = positionOf( focus );
-		root.ownerDocument.defaultView
-			?.getSelection()
-			?.setBaseAndExtent(
-				anchorPosition.node,
-				anchorPosition.offset,
-				focusPosition.node,
-				focusPosition.offset
-			);
-	}, [ records, clientIds, anchor, focus, contentRef ] );
-
 	useEffect( () => {
 		const element = contentRef.current;
 		if ( ! element ) {
 			return;
 		}
 		function onKeyDown( event: KeyboardEvent ) {
-			for ( const callback of keyboardShortcuts.current ) {
+			for ( const callback of keyboardShortcuts ) {
 				callback( event );
 			}
 		}
@@ -292,7 +255,7 @@ function Fields( { clientIds, keys, anchor, focus, contentRef }: FieldsProps ) {
 		return () => {
 			element.removeEventListener( 'keydown', onKeyDown );
 		};
-	}, [ contentRef ] );
+	}, [ contentRef, keyboardShortcuts ] );
 
 	function onChange( newValue: RichTextValue ) {
 		// Only formatting: a change to the text itself would have to merge or
@@ -301,7 +264,6 @@ function Fields( { clientIds, keys, anchor, focus, contentRef }: FieldsProps ) {
 			return;
 		}
 		const parts = split( newValue, SEPARATOR );
-		shouldRestoreSelectionRef.current = true;
 		updateBlockAttributes(
 			clientIds,
 			Object.fromEntries(
