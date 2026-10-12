@@ -20,10 +20,13 @@ import { getBlockDisplayTitle } from '../block-title/use-block-display-title';
 function BlockBreadcrumb( { rootLabelText, className } ) {
 	const { selectBlock, clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { clientId, parents, currentTitle } = useSelect( ( select ) => {
-		const { getSelectedBlockClientId, getEnabledBlockParents } = unlock(
-			select( blockEditorStore )
-		);
-		const selectedBlockClientId = getSelectedBlockClientId();
+		const {
+			getSelectedBlockClientId,
+			getSelectionStart,
+			getEnabledBlockParents,
+		} = unlock( select( blockEditorStore ) );
+		const selectedBlockClientId =
+			getSelectedBlockClientId() || getSelectionStart().clientId;
 		return {
 			clientId: selectedBlockClientId,
 			parents: getEnabledBlockParents( selectedBlockClientId ),
