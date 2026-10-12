@@ -702,9 +702,11 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 	);
 	const componentContent = (
 		<>
+			{ /* eslint-disable-next-line jsx-a11y/no-redundant-roles -- Safari needs an explicit list role when list markers are hidden outside a nav element. */ }
 			<ol
 				ref={ visibleListRef }
 				className={ clsx( defenseStyles.ol, styles.list ) }
+				role="list"
 			>
 				{ visibleListContent }
 			</ol>

@@ -42,6 +42,7 @@ describe( 'Breadcrumb server rendering', () => {
 				</Breadcrumb.Root>
 			);
 			expect( view ).toContain( `role="${ role }"` );
+			expect( view ).toContain( 'role="list"' );
 			expect( view ).toContain(
 				`aria-current="${ renderedAriaCurrent }"`
 			);
