@@ -7,9 +7,12 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 
 .wp-block-search__button {
 	margin-left: $button-spacing-x;
-	// Preserve the opt-out when an ancestor sets overflow-wrap.
 	word-break: normal;
-	overflow-wrap: normal;
+
+	.wp-block-media-text__content & {
+		// Preserve Search's opt-out inside Media & Text.
+		overflow-wrap: normal;
+	}
 
 	&.has-icon {
 		line-height: 0;
