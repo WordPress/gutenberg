@@ -6,9 +6,8 @@ import {
 	ExternalLink,
 	ToggleControl,
 	__experimentalVStack as VStack,
-	CustomSelectControl,
 } from '@wordpress/components';
-import { VisuallyHidden } from '@wordpress/ui';
+import { SelectControl, VisuallyHidden } from '@wordpress/ui';
 
 // So that we illustrate the different formats in the dropdown properly, show a date that is
 // somewhat recent, has a day greater than 12, and a month with more than three letters.
@@ -91,24 +90,22 @@ function NonDefaultControls( { format, onChange } ) {
 	];
 
 	const suggestedOptions = [
-		...suggestedFormats.map( ( suggestedFormat, index ) => ( {
-			key: `suggested-${ index }`,
-			name: dateI18n( suggestedFormat, exampleDate ),
+		...suggestedFormats.map( ( suggestedFormat ) => ( {
+			value: suggestedFormat,
+			label: dateI18n( suggestedFormat, exampleDate ),
 			format: suggestedFormat,
 		} ) ),
 		{
-			key: 'human-diff',
-			name: humanTimeDiff( exampleDate ),
+			value: 'human-diff',
+			label: humanTimeDiff( exampleDate ),
 			format: 'human-diff',
 		},
 	];
 
 	const customOption = {
-		key: 'custom',
-		name: __( 'Custom' ),
-		className:
-			'block-editor-date-format-picker__custom-format-select-control__custom-option',
-		hint: __( 'Enter your own date format' ),
+		value: 'custom',
+		label: __( 'Custom' ),
+		description: __( 'Enter your own date format' ),
 	};
 
 	const [ isCustom, setIsCustom ] = useState(
@@ -119,9 +116,9 @@ function NonDefaultControls( { format, onChange } ) {
 
 	return (
 		<VStack>
-			<CustomSelectControl
+			<SelectControl
 				label={ __( 'Choose a format' ) }
-				options={ [ ...suggestedOptions, customOption ] }
+				items={ [ ...suggestedOptions, customOption ] }
 				value={
 					isCustom
 						? customOption
@@ -129,7 +126,10 @@ function NonDefaultControls( { format, onChange } ) {
 								( option ) => option.format === format
 							) ?? customOption )
 				}
-				onChange={ ( { selectedItem } ) => {
+				onValueChange={ ( selectedItem ) => {
+					if ( ! selectedItem ) {
+						return;
+					}
 					if ( selectedItem === customOption ) {
 						setIsCustom( true );
 					} else {
@@ -137,7 +137,24 @@ function NonDefaultControls( { format, onChange } ) {
 						onChange( selectedItem.format );
 					}
 				} }
-			/>
+			>
+				{ suggestedOptions.map( ( option ) => (
+					<SelectControl.Item key={ option.value } value={ option }>
+						<SelectControl.ItemLabel>
+							{ option.label }
+						</SelectControl.ItemLabel>
+					</SelectControl.Item>
+				) ) }
+				<SelectControl.Separator />
+				<SelectControl.Item value={ customOption }>
+					<SelectControl.ItemLabel>
+						{ customOption.label }
+					</SelectControl.ItemLabel>
+					<SelectControl.ItemDescription>
+						{ customOption.description }
+					</SelectControl.ItemDescription>
+				</SelectControl.Item>
+			</SelectControl>
 			{ isCustom && (
 				<TextControl
 					label={ __( 'Custom format' ) }

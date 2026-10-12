@@ -4,6 +4,8 @@
 
 ### Breaking Changes
 
+-   `FontFamilyControl` and `FontAppearanceControl`: Forward additional props to `@wordpress/ui` `SelectControl` instead of the legacy `CustomSelectControl`. Legacy trigger event handlers, `size="small"`, `describedBy`, and `showSelectedHint` need to use the UI component's supported composition and props.
+
 -   `ImageSizeControl`: The event in the `onChangeImage` callback's `{ event }` argument now comes from popup selection rather than a native select change. Read the selected value from the `slug` argument rather than `event.target.value` ([#84546](https://github.com/WordPress/gutenberg/pull/84546)).
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
@@ -15,6 +17,7 @@
 
 ### Enhancements
 
+-   Migrate date format, font family, font appearance, and preset input custom selectors to `@wordpress/ui`, preserving saved values, option previews, and preset trigger callbacks.
 -   Migrate `FontAppearanceControl` to `@wordpress/ui`. Internal markup and CSS classes have changed; custom CSS overrides may need updates. See the pull request for details ([#84716](https://github.com/WordPress/gutenberg/pull/84716)).
 -   Migrate HTML element, image size, resolution, aspect ratio, and text-shadow preset controls to `@wordpress/ui` `SelectControl` ([#84546](https://github.com/WordPress/gutenberg/pull/84546)).
 -   `BlockBreadcrumb`: Use the `Breadcrumb` component from `@wordpress/ui` to collapse overflowing ancestors into a menu while preserving block selection and document-root activation, including multi-block selections. Use block titles when renamed labels are blank after stripping HTML. Accept a `className` for consumer-specific layout ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).

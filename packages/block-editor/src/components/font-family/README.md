@@ -72,4 +72,4 @@ The current font family value.
 - Required: No
 - Default: ''
 
-The rest of the props are passed down to the underlying `<SelectControl />` instance.
+The rest of the props are passed down to the underlying `SelectControl` from `@wordpress/ui`. Its `size` values are `default` and `compact`. Trigger event handlers and legacy `CustomSelectControl` props such as `describedBy` and `showSelectedHint` are not forwarded to the trigger. Use `description` for an accessible text description and `triggerContent` for custom selected content. The `onChange` callback still receives the font family string, including an empty string for Default.

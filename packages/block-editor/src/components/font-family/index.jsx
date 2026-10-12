@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { CustomSelectControl } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useSettings } from '../use-settings';
 
@@ -27,26 +27,35 @@ export default function FontFamilyControl( {
 
 	const options = [
 		{
-			key: '',
-			name: __( 'Default' ),
+			value: null,
+			label: __( 'Default' ),
 		},
 		...fontFamilies.map( ( { fontFamily, name } ) => ( {
-			key: fontFamily,
-			name: name || fontFamily,
+			value: fontFamily,
+			label: name || fontFamily,
 			style: { fontFamily },
 		} ) ),
 	];
 
 	const selectedValue =
-		options.find( ( option ) => option.key === value ) ?? '';
+		options.find( ( option ) => option.value === ( value || null ) ) ??
+		options[ 0 ];
 	return (
-		<CustomSelectControl
+		<SelectControl
 			label={ __( 'Font' ) }
 			value={ selectedValue }
-			onChange={ ( { selectedItem } ) => onChange( selectedItem.key ) }
-			options={ options }
+			onValueChange={ ( item ) => onChange( item?.value ?? '' ) }
+			items={ options }
 			className={ clsx( 'block-editor-font-family-control', className ) }
 			{ ...props }
-		/>
+		>
+			{ options.map( ( option ) => (
+				<SelectControl.Item key={ option.value } value={ option }>
+					<SelectControl.ItemLabel style={ option.style }>
+						{ option.label }
+					</SelectControl.ItemLabel>
+				</SelectControl.Item>
+			) ) }
+		</SelectControl>
 	);
 }
