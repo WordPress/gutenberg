@@ -4734,11 +4734,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/date-time/time-picker/styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
 	"packages/components/src/draggable/index.tsx": {
 		"react-hooks/refs": {
 			"count": 1
@@ -4820,11 +4815,6 @@
 	"packages/components/src/style-provider/index.tsx": {
 		"no-restricted-imports": {
 			"count": 2
-		}
-	},
-	"packages/components/src/tabs/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
 		}
 	},
 	"packages/components/src/toggle-group-control/toggle-group-control/utils.ts": {

@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Enhancements
+
+-   Template field: Migrate template selection to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
+
 ### Bug Fixes
 
 -   `PageTitleView`: Keep the page-type badge on a single line, so a list row with the `Privacy Policy Page` badge no longer grows and jumps when hovering reveals the primary action. ([#84368](https://github.com/WordPress/gutenberg/pull/84368))
