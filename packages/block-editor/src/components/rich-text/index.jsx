@@ -22,6 +22,7 @@ import {
 	blockBindingsKey,
 	blockEditingModeKey,
 	isPreviewModeKey,
+	isMultiSelectedKey,
 } from '../block-edit/context';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
@@ -91,6 +92,7 @@ function RichTextWrapper(
 	const [ anchorElement, setAnchorElement ] = useState( null );
 	const context = useBlockEditContext();
 	const { clientId, isSelected: isBlockSelected, name: blockName } = context;
+	const isBlockMultiSelected = context[ isMultiSelectedKey ];
 	const blockBindings = context[ blockBindingsKey ];
 	const hasDefaultEditingMode = context[ blockEditingModeKey ] === 'default';
 	const blockContext = useContext( BlockContext );
@@ -98,7 +100,7 @@ function RichTextWrapper(
 	const selector = ( select ) => {
 		// Avoid subscribing to the block editor store if the block is not
 		// selected.
-		if ( ! isBlockSelected ) {
+		if ( ! isBlockSelected && ! isBlockMultiSelected ) {
 			return { isSelected: false };
 		}
 
@@ -106,32 +108,53 @@ function RichTextWrapper(
 			select( blockEditorStore );
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
+		const isInField = ( end ) =>
+			end.clientId === clientId &&
+			( identifier
+				? end.attributeKey === identifier
+				: end[ instanceIdKey ] === instanceId );
 
 		let isSelected;
 
 		if ( originalIsSelected === undefined ) {
 			isSelected =
-				selectionStart.clientId === clientId &&
-				selectionEnd.clientId === clientId &&
-				( identifier
-					? selectionStart.attributeKey === identifier
-					: selectionStart[ instanceIdKey ] === instanceId );
+				isInField( selectionStart ) &&
+				selectionEnd.clientId === clientId;
 		} else if ( originalIsSelected ) {
 			isSelected = selectionStart.clientId === clientId;
 		}
+
+		// The field holds one end of a text selection across blocks.
+		const isCrossBlockEnd =
+			! isSelected && selectionStart.clientId !== selectionEnd.clientId;
 
 		return {
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
+			crossBlockStart:
+				isCrossBlockEnd && isInField( selectionStart )
+					? selectionStart.offset
+					: undefined,
+			crossBlockEnd:
+				isCrossBlockEnd && isInField( selectionEnd )
+					? selectionEnd.offset
+					: undefined,
 		};
 	};
-	const { selectionStart, selectionEnd, isSelected } = useSelect( selector, [
+	const {
+		selectionStart,
+		selectionEnd,
+		isSelected,
+		crossBlockStart,
+		crossBlockEnd,
+	} = useSelect( selector, [
 		clientId,
 		identifier,
 		instanceId,
 		originalIsSelected,
 		isBlockSelected,
+		isBlockMultiSelected,
 	] );
 
 	const { disableBoundBlock, bindingsPlaceholder, bindingsLabel } = useSelect(
@@ -352,6 +375,7 @@ function RichTextWrapper(
 		onChange,
 		ref: richTextRef,
 		formatTypes,
+		getDomPosition,
 	} = useRichText( {
 		value: adjustedValue,
 		onChange: adjustedOnChange,
@@ -408,6 +432,50 @@ function RichTextWrapper(
 			target.focus();
 		}
 	}, [ selectionStart, selectionEnd, isSelected ] );
+
+	// One end of a text selection across blocks is in this field. The field
+	// puts that end of the native selection back once it has rendered, as it
+	// does for a selection within it. The field at the other end does the
+	// same for its end.
+	useLayoutEffect( () => {
+		if ( crossBlockStart === undefined && crossBlockEnd === undefined ) {
+			return;
+		}
+		const element = anchorRef.current;
+		if ( ! element ) {
+			return;
+		}
+		const { ownerDocument } = element;
+		if ( ownerDocument.activeElement?.contentEditable !== 'true' ) {
+			return;
+		}
+		const selection = ownerDocument.defaultView.getSelection();
+		if ( ! selection.rangeCount ) {
+			return;
+		}
+		if ( crossBlockStart !== undefined ) {
+			const { node, offset } = getDomPosition( crossBlockStart );
+			if (
+				selection.anchorNode !== node ||
+				selection.anchorOffset !== offset
+			) {
+				selection.setBaseAndExtent(
+					node,
+					offset,
+					selection.focusNode,
+					selection.focusOffset
+				);
+			}
+		} else {
+			const { node, offset } = getDomPosition( crossBlockEnd );
+			if (
+				selection.focusNode !== node ||
+				selection.focusOffset !== offset
+			) {
+				selection.extend( node, offset );
+			}
+		}
+	}, [ crossBlockStart, crossBlockEnd, value, getDomPosition ] );
 
 	const autocompleteProps = useBlockEditorAutocompleteProps( {
 		onReplace,

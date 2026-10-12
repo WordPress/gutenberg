@@ -3,7 +3,7 @@ import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { useRegistry } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { create, RichTextData } from '../create';
-import { apply } from '../to-dom';
+import { apply, getDomPosition } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
 import { removeFormat } from '../remove-format';
 import { useDefaultStyle } from './use-default-style';
@@ -233,6 +233,16 @@ function useRichTextBase( {
 		getValue: () => recordRef.current,
 		onChange: handleChange,
 		ref: mergedRefs,
+		// The DOM position of an offset in the value, for a selection set
+		// from outside the element.
+		getDomPosition: ( offset ) =>
+			getDomPosition( {
+				value: recordRef.current,
+				offset: Math.min( offset, recordRef.current.text.length ),
+				element: ref.current,
+				prepareEditableTree: __unstableAddInvisibleFormats,
+				placeholder,
+			} ),
 	};
 }
 

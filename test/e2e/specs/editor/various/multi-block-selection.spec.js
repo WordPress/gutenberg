@@ -2218,6 +2218,67 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		] );
 	} );
 
+	test( 'should keep a selection ending after a non-breaking space', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'ab' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'a&nbsp;bcd' },
+		} );
+		// The inserted block starts with the caret at its start. The space
+		// is rendered in its own element, which the selection must not
+		// confuse with the text around it.
+		await pageUtils.pressKeys( 'ArrowRight', { times: 3 } );
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
+		const getSelection = () =>
+			page.evaluate( () => {
+				const {
+					getSelectedBlockClientIds,
+					getSelectionStart,
+					getSelectionEnd,
+				} = window.wp.data.select( 'core/block-editor' );
+				return {
+					blocks: getSelectedBlockClientIds().length,
+					anchorOffset: getSelectionStart().offset,
+					focusOffset: getSelectionEnd().offset,
+				};
+			} );
+		await expect.poll( getSelection ).toEqual( {
+			blocks: 2,
+			anchorOffset: 3,
+			focusOffset: 2,
+		} );
+
+		await pageUtils.pressKeys( 'primary+b' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'ab' } },
+			{
+				name: 'core/paragraph',
+				attributes: { content: '<strong>a\u00a0b</strong>cd' },
+			},
+		] );
+		await expect.poll( getSelection ).toEqual( {
+			blocks: 2,
+			anchorOffset: 3,
+			focusOffset: 2,
+		} );
+		await expect
+			.poll( () =>
+				editor.canvas
+					.locator( ':root' )
+					.evaluate( () =>
+						window.getSelection().toString().replace( /\s/g, '' )
+					)
+			)
+			.toBe( 'ab' );
+	} );
+
 	test( 'should offer the formats every selected block allows', async ( {
 		editor,
 		page,
