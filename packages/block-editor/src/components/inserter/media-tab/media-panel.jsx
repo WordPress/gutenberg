@@ -10,13 +10,15 @@ import InsertExternalImageModal from './insert-external-image-modal';
 import { getBlockAndPreviewFromMedia, getItemId } from './utils';
 import InserterNoResults from '../no-results';
 
-// Four rows at the grid's two columns: roughly one screen of the open panel,
-// so a page is browsed with little scrolling and the pager does the rest.
+// Four rows at the grid's two columns: roughly one screen, so a page is
+// browsed with little scrolling and the pager does the rest.
 const MEDIA_ITEMS_PER_PAGE = 8;
 
 // The attach flow is image-only, so the picker is constrained to images.
 const ATTACH_ALLOWED_TYPES = [ 'image' ];
 
+// The media-type and source props pass through to the grid: they belong to
+// the tab, but render inside its `DataViews`.
 export function MediaCategoryPanel( {
 	onInsert,
 	category,
@@ -114,7 +116,6 @@ export function MediaCategoryPanel( {
 				onChangePage={ changePage }
 				search={ search }
 				onChangeSearch={ onChangeSearch }
-				category={ category }
 				onClickItem={ handleClickItem }
 				insertingId={ insertingId }
 				actions={ actions }

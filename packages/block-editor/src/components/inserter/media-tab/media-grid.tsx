@@ -8,7 +8,7 @@ import { Stack, Tabs } from '@wordpress/ui';
 import UntypedInserterDraggableBlocks from '../../inserter-draggable-blocks';
 import MediaSearch from './media-search';
 import { getBlockAndPreviewFromMedia, getItemId } from './utils';
-import type { MediaCategory, MediaItem, MediaType } from './types';
+import type { MediaItem, MediaType } from './types';
 
 // `inserter-draggable-blocks` is untyped JS, so TypeScript infers every
 // destructured prop as required. Narrow it to what this file passes and
@@ -41,7 +41,6 @@ type MediaGridProps = {
 	onChangePage: ( page: number ) => void;
 	search: string;
 	onChangeSearch: ( search: string ) => void;
-	category: MediaCategory;
 	/**
 	 * Called with the item the reader chose to insert.
 	 */
@@ -72,7 +71,7 @@ type MediaGridProps = {
 	 * bar, since there is nothing to switch between.
 	 */
 	mediaTypes?: { value: MediaType; label: string }[];
-	mediaType?: MediaType;
+	mediaType: MediaType;
 	onChangeMediaType?: ( mediaType: MediaType ) => void;
 };
 
@@ -172,7 +171,6 @@ export default function MediaGrid( {
 	onChangePage,
 	search,
 	onChangeSearch,
-	category,
 	onClickItem,
 	insertingId,
 	actions,
@@ -181,11 +179,9 @@ export default function MediaGrid( {
 	footer,
 	sourceMenu,
 	mediaTypes,
-	mediaType: selectedMediaType,
+	mediaType,
 	onChangeMediaType,
 }: MediaGridProps ) {
-	const { mediaType } = category;
-
 	const fields: Field< MediaItem >[] = useMemo(
 		() => [
 			{
@@ -294,7 +290,7 @@ export default function MediaGrid( {
 			</Stack>
 			{ hasTabs ? (
 				<Tabs.Root
-					value={ selectedMediaType }
+					value={ mediaType }
 					onValueChange={ onChangeMediaType }
 					className="block-editor-inserter__media-grid__tabs"
 				>
