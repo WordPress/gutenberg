@@ -14,19 +14,42 @@ export interface ReactionEmoji {
 }
 
 /**
- * The emoji a note can be reacted with. Labels are lowercase since they
- * also appear mid-sentence ("Adam reacted with heart").
+ * The emoji a note can be reacted with. `label` names the emoji on its own
+ * (picker items, the reaction count label). `sentenceLabel` is only used in
+ * the "reacted with" sentences, so translators can give it whatever form
+ * that phrase needs.
  */
 export const REACTION_EMOJIS: ReactionEmoji[] = [
-	{ emoji: '❤️', hexKey: '2764', label: _x( 'heart', 'emoji reaction' ) },
+	{
+		emoji: '❤️',
+		hexKey: '2764',
+		label: _x( 'Heart', 'emoji reaction' ),
+		sentenceLabel: _x( 'heart', 'emoji reaction, after "reacted with"' ),
+	},
 	{
 		emoji: '🎉',
 		hexKey: '1f389',
-		label: _x( 'celebration', 'emoji reaction' ),
+		label: _x( 'Celebration', 'emoji reaction' ),
+		sentenceLabel: _x( 'celebration', 'emoji reaction, after "reacted with"' ),
 	},
-	{ emoji: '😄', hexKey: '1f604', label: _x( 'smile', 'emoji reaction' ) },
-	{ emoji: '👀', hexKey: '1f440', label: _x( 'eyes', 'emoji reaction' ) },
-	{ emoji: '🚀', hexKey: '1f680', label: _x( 'rocket', 'emoji reaction' ) },
+	{
+		emoji: '😄',
+		hexKey: '1f604',
+		label: _x( 'Smile', 'emoji reaction' ),
+		sentenceLabel: _x( 'smile', 'emoji reaction, after "reacted with"' ),
+	},
+	{
+		emoji: '👀',
+		hexKey: '1f440',
+		label: _x( 'Eyes', 'emoji reaction' ),
+		sentenceLabel: _x( 'eyes', 'emoji reaction, after "reacted with"' ),
+	},
+	{
+		emoji: '🚀',
+		hexKey: '1f680',
+		label: _x( 'Rocket', 'emoji reaction' ),
+		sentenceLabel: _x( 'rocket', 'emoji reaction, after "reacted with"' ),
+	},
 ];
 
 /**
