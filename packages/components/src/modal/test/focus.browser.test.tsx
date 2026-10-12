@@ -120,6 +120,33 @@ describe( 'Modal focus handling', () => {
 		await expect.element( screen.getByRole( 'dialog' ) ).toHaveFocus();
 	} );
 
+	it.each( [
+		[ 'Tab', false ],
+		[ 'Shift+Tab', true ],
+	] )(
+		'keeps focus inside a Modal with no tabbable elements when pressing %s',
+		async ( _key, shift ) => {
+			const user = userEvent.setup();
+			await render(
+				<FocusMountDemo
+					focusOnMount="firstContentElement"
+					isDismissible={ false }
+				>
+					<p>Modal content</p>
+				</FocusMountDemo>
+			);
+
+			await user.tab();
+			await user.keyboard( '{Enter}' );
+
+			const dialog = screen.getByRole( 'dialog' );
+			await expect.element( dialog ).toHaveFocus();
+
+			await user.tab( { shift } );
+			await expect.element( dialog ).toHaveFocus();
+		}
+	);
+
 	it( 'should not move focus when `false` passed as value for `focusOnMount` prop', async () => {
 		const user = userEvent.setup();
 		await render( <FocusMountDemo focusOnMount={ false } /> );
