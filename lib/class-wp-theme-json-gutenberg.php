@@ -3980,9 +3980,19 @@ class WP_Theme_JSON_Gutenberg {
 				$variation_pseudo_declarations = $this->process_pseudo_selectors( $style_variation_node, $style_variation['selector'], $settings, $block_name, $block_metadata, $style_variation );
 				$style_variation_declarations  = array_merge( $style_variation_declarations, $variation_pseudo_declarations );
 
+				// Custom CSS targets the block's `css` feature selector, if any.
+				$variation_css_selector = $style_variation['selector'];
+				$css_feature_selector   = $block_metadata['selectors']['css'] ?? null;
+				if ( is_array( $css_feature_selector ) ) {
+					$css_feature_selector = $css_feature_selector['root'] ?? null;
+				}
+				if ( is_string( $css_feature_selector ) ) {
+					$variation_css_selector = static::get_block_style_variation_feature_selector( $style_variation, $css_feature_selector );
+				}
+
 				// Store custom CSS for the style variation.
 				if ( isset( $style_variation_node['css'] ) ) {
-					$style_variation_custom_css[ $style_variation['selector'] ] = $this->process_blocks_custom_css( $style_variation_node['css'], $style_variation['selector'] );
+					$style_variation_custom_css[ $style_variation['selector'] ] = $this->process_blocks_custom_css( $style_variation_node['css'], $variation_css_selector );
 				}
 
 				// Store variation metadata and node for layout styles generation.
@@ -4048,7 +4058,7 @@ class WP_Theme_JSON_Gutenberg {
 
 					// Process custom CSS for this breakpoint.
 					if ( isset( $breakpoint_node['css'] ) ) {
-						$breakpoint_custom_css     = static::process_blocks_custom_css( $breakpoint_node['css'], $style_variation['selector'] );
+						$breakpoint_custom_css     = static::process_blocks_custom_css( $breakpoint_node['css'], $variation_css_selector );
 						$variation_responsive_css .= $breakpoint_media . '{' . $breakpoint_custom_css . '}';
 					}
 
