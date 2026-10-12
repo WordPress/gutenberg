@@ -5549,6 +5549,20 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_merge_ignores_spacing_scale_per_origin_value_of_unexpected_type() {
+		$theme_json = new WP_Theme_JSON_Gutenberg( array( 'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA ), 'default' );
+		$theme_json->merge(
+			new WP_Theme_JSON_Gutenberg(
+				array(
+					'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'settings' => array( 'spacing' => array( 'spacingScale' => array( 'theme' => '1.5' ) ) ),
+				)
+			)
+		);
+
+		$this->assertIsString( $theme_json->get_stylesheet() );
+	}
+
 	/**
 	 * @dataProvider data_get_styles_for_block_with_style_variations
 	 *
