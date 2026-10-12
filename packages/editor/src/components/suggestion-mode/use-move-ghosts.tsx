@@ -36,6 +36,28 @@ const EMPTY_GHOSTS = Object.freeze( {
 const MoveGhostContext = createContext( EMPTY_GHOSTS );
 
 /**
+ * The parent a pending move's ghost goes in. The recorded parent is a
+ * session-local client id that parsing regenerates, so after a reload it
+ * matches no block. Fall back to the moved block's current parent, where
+ * Reject restores the block too, rather than letting the ghost vanish.
+ *
+ * @param blockEditor Block-editor selectors.
+ * @param clientId    The moved block.
+ * @param fromParent  The recorded parent ('' = root).
+ * @return The parent to place the ghost in.
+ */
+function resolveGhostParent(
+	blockEditor: any,
+	clientId: string,
+	fromParent: string
+): string {
+	if ( fromParent === '' || blockEditor.getBlockName( fromParent ) ) {
+		return fromParent;
+	}
+	return blockEditor.getBlockRootClientId( clientId ) ?? '';
+}
+
+/**
  * Build the pending-move ghost index for the whole document. Internal to the
  * provider — per-block consumers must go through `useMoveGhosts` so the
  * document scan runs once, not once per block.
@@ -81,7 +103,11 @@ function useMoveGhostIndex() {
 			if ( marker?.type !== 'pending-move' ) {
 				continue;
 			}
-			const fromParent = marker.fromParentClientId ?? '';
+			const fromParent = resolveGhostParent(
+				blockEditor,
+				clientId,
+				marker.fromParentClientId ?? ''
+			);
 			const fromAnchor = marker.fromAnchorClientId ?? '';
 			const anchorUsable =
 				fromAnchor &&
@@ -131,7 +157,11 @@ function useMoveGhostIndex() {
 					name: blockEditor.getBlockName( clientId ),
 					authorId: marker.authorId ?? null,
 					fromAnchorClientId: marker.fromAnchorClientId ?? null,
-					fromParentClientId: marker.fromParentClientId ?? '',
+					fromParentClientId: resolveGhostParent(
+						blockEditor,
+						clientId,
+						marker.fromParentClientId ?? ''
+					),
 					fromIndex: marker.fromIndex ?? 0,
 				} );
 			}
