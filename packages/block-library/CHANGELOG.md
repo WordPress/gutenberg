@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Image, Gallery, Cover, Audio, Video, Site Logo, and Playlist: Open toolbar media and text popovers with the default popover instead of the high-contrast `toolbar` variant.
+-   Image, Gallery, Cover, Audio, Video, Site Logo, and Playlist: Open toolbar media and text popovers with the default popover instead of the high-contrast `toolbar` variant ([#84567](https://github.com/WordPress/gutenberg/pull/84567)).
 
 ## 12.0.0 (2026-10-20)
 

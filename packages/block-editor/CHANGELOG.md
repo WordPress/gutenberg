@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Block toolbar: Paint the floating toolbar and parent selector with the `Menu` popup surface, and separate groups with inset hairlines. The docked toolbar stays a flat bar. Toolbar popovers, including the link popover, no longer opt into the high-contrast `toolbar` variant. This is the alternative to the menu variant proposed in #83850.
+-   Block toolbar: Paint the floating toolbar and parent selector with the `Menu` popup surface, and separate groups with inset hairlines. The docked toolbar stays a flat bar. Toolbar popovers, including the link popover, no longer opt into the high-contrast `toolbar` variant. This is the alternative to the menu variant proposed in #83850 ([#84567](https://github.com/WordPress/gutenberg/pull/84567)).
 
 ## 19.0.0 (2026-10-20)
 
