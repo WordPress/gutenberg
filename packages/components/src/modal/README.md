@@ -190,7 +190,7 @@ If this property is false, focus will not be transferred and it is the responsib
 
 If set to `firstElement` focus will be placed on the first tabbable element anywhere within the Modal.
 
-If set to `firstContentElement`, focus will be placed on the first tabbable element within the Modal's **content** (i.e. children). If the children contain no tabbable elements, focus falls back to the first tabbable element anywhere within the Modal, then to the Modal's dialog frame if no tabbable elements are found.
+If set to `firstContentElement`, focus will be placed on the first tabbable element within the Modal's **content** (i.e. children).
 
 -   Required: No
 -   Default: `true`
