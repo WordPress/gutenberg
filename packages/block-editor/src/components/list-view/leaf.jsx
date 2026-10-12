@@ -39,6 +39,9 @@ const ListViewLeaf = forwardRef(
 			enableAnimation: true,
 			triggerAnimationOnChange: path,
 			getPreviousRect,
+			// Rows are already shown in their new positions while dragging,
+			// so they don't need to animate there on drop.
+			animateWhileDragging: false,
 		} );
 
 		const mergedRef = useMergeRefs( [ ref, animationRef ] );

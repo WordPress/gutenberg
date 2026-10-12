@@ -35,11 +35,14 @@ function getAbsolutePosition( element ) {
  *                                                                                of the element's own previous position, for example a
  *                                                                                drag chip. Positions are then compared in viewport
  *                                                                                coordinates.
+ * @param {boolean}                                   [$1.animateWhileDragging]   Whether to animate when the position changes while blocks
+ *                                                                                are being dragged, e.g. on drop. Defaults to true.
  */
 function useMovingAnimation( {
 	triggerAnimationOnChange,
 	clientId,
 	getPreviousRect,
+	animateWhileDragging = true,
 } ) {
 	const ref = useRef();
 	const {
@@ -122,6 +125,12 @@ function useMovingAnimation( {
 			return;
 		}
 
+		// Skip the animation when the caller has already shown where the
+		// element moves to while dragging.
+		if ( isDragging && ! fromRect && ! animateWhileDragging ) {
+			return;
+		}
+
 		// Make sure the other blocks move under the selected block(s). This has to
 		// clear the in-block UI of the blocks being moved past (z-index 1 and 2),
 		// which a plain `1` ties with and loses to on DOM order. Matches
@@ -171,6 +180,7 @@ function useMovingAnimation( {
 		previous,
 		prevRect,
 		fromRect,
+		animateWhileDragging,
 		clientId,
 		isTyping,
 		getGlobalBlockCount,
