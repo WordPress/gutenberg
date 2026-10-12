@@ -114,6 +114,8 @@ for _ in $( seq 1 120 ); do
 	grep -q "wp-login.php?warm-up" "$ROOT/test/ios/build/server.log" && break
 	sleep 1
 done
+grep -q "wp-login.php?warm-up" "$ROOT/test/ios/build/server.log" ||
+	{ echo "Safari did not open the page"; exit 1; }
 # The login is remembered in a cookie, which outlives the server: start
 # Safari without cookies from an earlier run.
 xcrun simctl terminate "$UDID" com.apple.mobilesafari 2>/dev/null || true
