@@ -49,8 +49,16 @@ step "Downloading WP-CLI and SQLite"
 [ -f "$CACHE/sqlite.zip" ] || curl -sSLf -o "$CACHE/sqlite.zip" https://downloads.wordpress.org/plugin/sqlite-database-integration.latest-stable.zip
 wp() { php -d memory_limit=512M "$CACHE/wp-cli.phar" --path="$WP_DIR" --quiet "$@"; }
 rm -rf "$WP_DIR"
-step "Downloading WordPress"
-wp core download --version=latest
+# The same WordPress as the end-to-end tests: a GitHub repository, with
+# an optional #branch, from .wp-env.test.json.
+CORE=$( python3 -c 'import json; print( json.load( open( ".wp-env.test.json" ) )[ "core" ] )' )
+[[ "$CORE" =~ ^[^/#]+/[^/#]+(#.+)?$ ]] || { echo "Unsupported core in .wp-env.test.json: $CORE"; exit 1; }
+REPO="${CORE%%#*}"
+REF="HEAD"
+[[ "$CORE" == *#* ]] && REF="${CORE#*#}"
+step "Downloading WordPress from $REPO"
+mkdir -p "$WP_DIR"
+curl -sSLf "https://codeload.github.com/$REPO/tar.gz/$REF" | tar xz --strip-components=1 -C "$WP_DIR"
 unzip -q "$CACHE/sqlite.zip" -d "$WP_DIR/wp-content/plugins"
 SQLITE="$WP_DIR/wp-content/plugins/sqlite-database-integration"
 sed -e "s#{SQLITE_IMPLEMENTATION_FOLDER_PATH}#$SQLITE#" -e "s#{SQLITE_PLUGIN}#sqlite-database-integration/load.php#" \
