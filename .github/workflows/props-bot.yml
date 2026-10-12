@@ -21,23 +21,25 @@ on:
         types:
             - created
     # This event will run everytime a new PR review is initially submitted.
+    # Every inline comment and thread reply is submitted as part of a review,
+    # so `pull_request_review_comment` would only add one run per comment.
     pull_request_review:
         types:
             - submitted
-    # This event runs anytime a PR review comment is created or deleted.
-    pull_request_review_comment:
-        types:
-            - created
 
-# Cancels all previous runs for a pull request that have not completed, which
-# is also what keeps two gathers from writing their lists out of order.
+# Queues runs for a pull request in order, which keeps two gathers from writing
+# their lists out of order. Runs wait for a runner for minutes at busy times, so
+# cancelling superseded ones instead left most events with a cancelled check.
 concurrency:
-    # Keyed by the pull request, which the four events carry in three different
-    # places. Two kinds of run stand apart, or they would cancel a refresh and
-    # then do nothing in its place: a label event that is not `props-bot`, whose
-    # jobs all skip, and a fork's review run, whose token cannot write.
-    group: ${{ github.workflow }}-${{ ( github.event.action != 'labeled' || github.event.label.name == 'props-bot' ) && ( ! startsWith( github.event_name, 'pull_request_review' ) || github.event.pull_request.head.repo.full_name == github.repository ) && ( github.event.number || github.event.issue.number || github.event.pull_request.number ) || github.run_id }}
-    cancel-in-progress: true
+    # Keyed by the pull request, which each of the three events carries in a
+    # different place. Two kinds of run stand apart, or they would hold up a
+    # refresh while doing nothing themselves: a label event that is not
+    # `props-bot`, whose jobs all skip, and a fork's review run, whose token
+    # cannot write.
+    group: ${{ github.workflow }}-${{ ( github.event.action != 'labeled' || github.event.label.name == 'props-bot' ) && ( github.event_name != 'pull_request_review' || github.event.pull_request.head.repo.full_name == github.repository ) && ( github.event.number || github.event.issue.number || github.event.pull_request.number ) || github.run_id }}
+    cancel-in-progress: false
+    # The default would still cancel a pending run once a newer one arrived.
+    queue: max
 
 # Disable permissions for all available scopes by default.
 # Any needed permissions should be configured at the job level.
@@ -55,7 +57,7 @@ jobs:
         # The job will run when pull requests are open, ready for review and:
         #
         # - A comment is added to the pull request.
-        # - A review is created or commented on.
+        # - A review is submitted, including a single comment or thread reply.
         # - The pull request is opened, synchronized, marked ready for review, or reopened.
         # - The `props-bot` label is added to the pull request.
         # A fork's review run is skipped rather than gathered and thrown away:
@@ -63,7 +65,7 @@ jobs:
         if: |
             (
               github.event_name == 'issue_comment' && github.event.issue.pull_request ||
-              contains( fromJSON( '["pull_request_review", "pull_request_review_comment"]' ), github.event_name ) && github.event.pull_request.head.repo.full_name == github.repository ||
+              github.event_name == 'pull_request_review' && github.event.pull_request.head.repo.full_name == github.repository ||
               github.event_name == 'pull_request_target' && github.event.action != 'labeled' ||
               'props-bot' == github.event.label.name
             ) &&
@@ -135,7 +137,7 @@ jobs:
             pull-requests: write
         timeout-minutes: 5
         # Shared with every other writer of this comment. See bundle-size.yml.
-        # This workflow runs on four events, and only some of them carry the
+        # This workflow runs on three events, and only some of them carry the
         # pull request at the same place in the payload.
         concurrency:
             group: pr-meta-${{ github.event.number || github.event.issue.number || github.event.pull_request.number }}
@@ -184,7 +186,7 @@ jobs:
                   section: props
                   body-path: pr-meta/body.md
                   # The action comes from the default branch, which need not
-                  # yet know where each of the four events carries this.
+                  # yet know where each of the three events carries this.
                   pr-number: ${{ github.event.number || github.event.issue.number || github.event.pull_request.number }}
                   # This workflow also runs from the default branch for a pull
                   # request targeting a release branch, whose own writers are

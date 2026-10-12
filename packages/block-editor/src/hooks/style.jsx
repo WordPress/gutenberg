@@ -388,7 +388,12 @@ export function getBlockStateStylesCSS( stateStyles, options ) {
 		.map( ( { selector: blockSelector, style } ) =>
 			getStateStylesCSS(
 				style,
-				buildScopedBlockSelector( baseSelector, blockSelector, state )
+				buildScopedBlockSelector(
+					baseSelector,
+					blockSelector,
+					state,
+					name
+				)
 			)
 		)
 		.filter( Boolean );
@@ -603,6 +608,9 @@ const skipSerializationPathsEdit = {
 	],
 	[ `${ SHADOW_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		SHADOW_SUPPORT_KEY,
+	],
+	[ `${ BACKGROUND_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
+		BACKGROUND_SUPPORT_KEY,
 	],
 };
 

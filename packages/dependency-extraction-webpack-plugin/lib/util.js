@@ -12,6 +12,7 @@ const BUNDLED_PACKAGES = [
 	'@wordpress/kebab-case',
 	'@wordpress/react-inert-value',
 	'@wordpress/style-runtime',
+	'@wordpress/sync',
 	'@wordpress/ui',
 	'@wordpress/undo-manager',
 	'@wordpress/views',

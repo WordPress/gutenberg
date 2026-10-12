@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 // Load the tokens that the production build also supplies as fallbacks.
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '../../../../theme/prebuilt/css/design-tokens.css';
 import {
 	Card,

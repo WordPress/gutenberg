@@ -60,6 +60,7 @@ export default {
 	'--wpds-color-background-thumb-brand-active':
 		'var(--wp-admin-theme-color, #3858e9)',
 	'--wpds-color-background-thumb-brand-disabled': '#dbdbdb',
+	'--wpds-color-background-thumb-neutral': '#1e1e1e',
 	'--wpds-color-background-thumb-neutral-weak': '#8d8d8d',
 	'--wpds-color-background-thumb-neutral-weak-active': '#6e6e6e',
 	'--wpds-color-background-thumb-neutral-weak-disabled': '#dbdbdb',

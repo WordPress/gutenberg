@@ -83,11 +83,14 @@ jobs:
             - name: Install Subversion
               run: sudo apt-get update -y && sudo apt-get install -y subversion
 
-            - name: Lint release scripts
-              run: shellcheck tools/release/*.sh tools/release/test/*.sh
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version-file: .nvmrc
+                  package-manager-cache: false
 
             - name: Test SVN publication and recovery
-              run: bash tools/release/test/publish-to-svn.sh
+              run: node --test tools/release/test-publish-to-svn.mts
 
     unit-js:
         name: JavaScript (Node.js ${{ matrix.node }}) ${{ matrix.shard }}
@@ -403,7 +406,7 @@ jobs:
 
             - name: Docker container debug information
               run: |
-                  npm run wp-env-test -- run mysql mariadb -- --version
+                  npm run wp-env-test -- run mysql -- sh -c 'if command -v mariadb > /dev/null; then mariadb --version; else mysql --version; fi'
                   npm run wp-env-test -- run wordpress php -- --version
                   npm run wp-env-test -- run wordpress php -m
                   npm run wp-env-test -- run wordpress php -i

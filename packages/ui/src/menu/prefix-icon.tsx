@@ -10,7 +10,7 @@ import styles from './style.module.css';
  * top of the content row. The prefix slot hides it from assistive technology.
  */
 export const PrefixIcon = forwardRef< SVGSVGElement, PrefixIconProps >(
-	function MenuPrefixIcon( { className, size = 24, style, ...props }, ref ) {
+	function MenuPrefixIcon( { className, size = 16, style, ...props }, ref ) {
 		return (
 			<Icon
 				{ ...props }

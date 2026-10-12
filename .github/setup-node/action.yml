@@ -52,7 +52,7 @@ runs:
                   !test/ai-development/node_modules
                   tools/*/node_modules
                   widgets/*/node_modules
-              key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-npm-${{ steps.node-version.outputs.NPM_VERSION }}-${{ hashFiles('package-lock.json', '.npmrc') }}
+              key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-npm-${{ steps.node-version.outputs.NPM_VERSION }}-${{ hashFiles('package-lock.json', '.npmrc', 'package.json') }}
 
         - name: Install npm dependencies
           if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' }}

@@ -1,4 +1,3 @@
-import type { UndoManager } from '@wordpress/undo-manager';
 import warning from '@wordpress/warning';
 
 /**
@@ -35,11 +34,6 @@ export interface EntitySyncEditOptions {
 	undoIgnore: boolean;
 }
 
-export interface EntitySyncUndoStackState {
-	hasUndo: boolean;
-	hasRedo: boolean;
-}
-
 /**
  * What a manager can ask core-data to do for one loaded record.
  */
@@ -60,10 +54,13 @@ export interface EntitySyncRecordHandlers {
 	refetchRecord: () => Promise< void >;
 
 	/**
-	 * Tells core-data that the manager's undo stack changed, so `hasUndo`
-	 * and `hasRedo` reflect it.
+	 * Tells core-data that a local change to the record opened a new undo
+	 * level in the manager's undo history. core-data records a placeholder
+	 * for it in its own undo manager, so the level keeps its place among
+	 * the edits core-data records itself, and delegates it back to
+	 * `undoHistory` when it is undone or redone.
 	 */
-	onUndoStackChange: ( state: EntitySyncUndoStackState ) => void;
+	onUndoLevelOpened: () => void;
 }
 
 /**
@@ -98,14 +95,45 @@ export interface EntitySyncAfterSaveContext {
 }
 
 /**
- * An undo manager a sync manager substitutes for core-data's own while
- * synced records are loaded.
+ * The undo history a sync manager keeps for the records it syncs, one per
+ * record. core-data's own undo manager stays in charge: it holds one
+ * placeholder per level reported through `onUndoLevelOpened`, naming the
+ * record that opened it, in order with the edits it records itself. It calls
+ * back here for that record when a placeholder is the level to move.
  */
-export interface EntitySyncUndoManager extends UndoManager< EntitySyncRecord > {
+export interface EntitySyncUndoHistory {
 	/**
-	 * Closes the current undo level so the next change starts a new one.
+	 * Undoes the most recent level of a record. Returns false when there is
+	 * none left, for example because the record was unloaded.
 	 */
-	stopCapturing?: () => void;
+	undo: (
+		kind: string,
+		name: string,
+		recordId: EntitySyncRecordId
+	) => boolean;
+
+	/** Redoes the most recently undone level of a record. */
+	redo: (
+		kind: string,
+		name: string,
+		recordId: EntitySyncRecordId
+	) => boolean;
+
+	/**
+	 * Closes the current level of every record so the next change opens a
+	 * new one. core-data calls it when it records an edit itself, so a later
+	 * synced change cannot merge into a level that is no longer the most
+	 * recent one.
+	 *
+	 * Some managers wait a tick before they apply a local change. Managers
+	 * must apply every waiting change when this is called. core-data calls
+	 * this right before an undo or redo to ensure its history will also
+	 * include deferred changes in the operation.
+	 */
+	stopCapturing: () => void;
+
+	/** Drops the redo levels of every record. core-data calls it when another edit ends the redo history. */
+	clearRedo: () => void;
 }
 
 export interface EntitySyncManager {
@@ -217,10 +245,22 @@ export interface EntitySyncManager {
 	unloadAll: () => void;
 
 	/**
-	 * When set, replaces core-data's undo manager. `hasUndo`/`hasRedo`
-	 * then reflect the state reported through `onUndoStackChange`.
+	 * Whether the manager has the record loaded: `load` accepted it and it
+	 * was not unloaded since. core-data then leaves the record's
+	 * undo history to the manager instead of recording its edits.
 	 */
-	readonly undoManager?: EntitySyncUndoManager;
+	isLoaded?: (
+		kind: string,
+		name: string,
+		recordId: EntitySyncRecordId
+	) => boolean;
+
+	/**
+	 * The manager's undo history for the records it syncs. See
+	 * `EntitySyncUndoHistory` for how core-data keeps it in order with its
+	 * own undo manager.
+	 */
+	readonly undoHistory?: EntitySyncUndoHistory;
 }
 
 let registeredManager: EntitySyncManager | undefined;

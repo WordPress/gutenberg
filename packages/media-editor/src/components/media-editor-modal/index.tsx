@@ -49,16 +49,20 @@ export function MediaEditorModal( {
 	fields = [],
 	aspectRatioPresets,
 }: MediaEditorModalProps ) {
-	const { isModalOpen, id, onUpdate, onClose } = useSelect( ( select ) => {
-		const { isOpen, getId, getOnUpdate, getOnClose } =
-			select( mediaEditorStore );
-		return {
-			isModalOpen: isOpen(),
-			id: getId(),
-			onUpdate: getOnUpdate(),
-			onClose: getOnClose(),
-		};
-	}, [] );
+	const { isModalOpen, id, onUpdate, onUndo, onClose } = useSelect(
+		( select ) => {
+			const { isOpen, getId, getOnUpdate, getOnUndo, getOnClose } =
+				select( mediaEditorStore );
+			return {
+				isModalOpen: isOpen(),
+				id: getId(),
+				onUpdate: getOnUpdate(),
+				onUndo: getOnUndo(),
+				onClose: getOnClose(),
+			};
+		},
+		[]
+	);
 
 	const { closeMediaEditorModal } = useDispatch( mediaEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
@@ -113,6 +117,10 @@ export function MediaEditorModal( {
 							{
 								label: __( 'Undo' ),
 								onClick: () => {
+									if ( onUndo ) {
+										onUndo();
+										return;
+									}
 									onUpdate( {
 										id: previous.id,
 										url: previous.url,
