@@ -4,7 +4,7 @@ import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import CustomSelect from '../custom-select-control-v2/custom-select';
 import CustomSelectItem from '../custom-select-control-v2/item';
-import * as Styled from '../custom-select-control-v2/styles';
+import styles from '../custom-select-control-v2/style.module.scss';
 import type { CustomSelectProps, CustomSelectOption } from './types';
 import { VisuallyHidden } from '../visually-hidden';
 
@@ -106,15 +106,18 @@ function CustomSelectControl< T extends CustomSelectOption >(
 		.map( applyOptionDeprecations )
 		.map( ( { name, key, hint, style, className } ) => {
 			const withHint = (
-				<Styled.WithHintItemWrapper>
+				<div className={ styles[ 'hint-wrapper' ] }>
 					<span>{ name }</span>
-					<Styled.WithHintItemHint
+					<span
 						// Keeping the classname for legacy reasons
-						className="components-custom-select-control__item-hint"
+						className={ clsx(
+							styles[ 'item-hint' ],
+							'components-custom-select-control__item-hint'
+						) }
 					>
 						{ hint }
-					</Styled.WithHintItemHint>
-				</Styled.WithHintItemWrapper>
+					</span>
+				</div>
 			);
 
 			return (
@@ -148,15 +151,18 @@ function CustomSelectControl< T extends CustomSelectOption >(
 		}
 
 		return (
-			<Styled.SelectedExperimentalHintWrapper>
+			<div className={ styles[ 'selected-hint-wrapper' ] }>
 				{ selectedOption?.name }
-				<Styled.SelectedExperimentalHintItem
+				<span
 					// Keeping the classname for legacy reasons
-					className="components-custom-select-control__hint"
+					className={ clsx(
+						styles[ 'selected-hint' ],
+						'components-custom-select-control__hint'
+					) }
 				>
 					{ selectedOption?.hint }
-				</Styled.SelectedExperimentalHintItem>
-			</Styled.SelectedExperimentalHintWrapper>
+				</span>
+			</div>
 		);
 	};
 
