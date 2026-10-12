@@ -345,6 +345,7 @@
 	// Toggled style.
 	&.is-pressed {
 		&,
+		&.is-primary.is-busy:not(:disabled, [aria-disabled="true"]),
 		&:is(:hover, :active):not(:disabled, [aria-disabled="true"]) {
 			color: var(--wpds-color-foreground-interactive-neutral-strong-active);
 		}
