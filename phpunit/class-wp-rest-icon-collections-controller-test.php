@@ -4,7 +4,7 @@
  *
  * @package gutenberg
  */
-class WP_Test_REST_Icon_Collections_Controller extends WP_Test_REST_TestCase {
+class WP_Test_REST_Icon_Collections_Controller extends WP_Test_REST_Controller_Testcase {
 
 	/**
 	 * Administrator user ID.
@@ -93,9 +93,26 @@ class WP_Test_REST_Icon_Collections_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Tests that the context parameter defaults to view and accepts view, embed, and edit.
+	 */
+	public function test_context_param() {
+		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/icon-collections' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertSame( 'view', $data['endpoints'][0]['args']['context']['default'] );
+		$this->assertSame( array( 'view', 'embed', 'edit' ), $data['endpoints'][0]['args']['context']['enum'] );
+
+		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/icon-collections/core' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertSame( 'view', $data['endpoints'][0]['args']['context']['default'] );
+		$this->assertSame( array( 'view', 'embed', 'edit' ), $data['endpoints'][0]['args']['context']['enum'] );
+	}
+
+	/**
 	 * Tests that GET /wp/v2/icon-collections returns an array of registered collections for editors.
 	 */
-	public function test_get_items_returns_registered_collections() {
+	public function test_get_items() {
 		wp_set_current_user( self::$editor_id );
 
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/icon-collections' );
@@ -216,7 +233,7 @@ class WP_Test_REST_Icon_Collections_Controller extends WP_Test_REST_TestCase {
 	/**
 	 * Tests that GET /wp/v2/icon-collections/<slug> returns single collection data.
 	 */
-	public function test_get_item_returns_collection_data() {
+	public function test_get_item() {
 		wp_set_current_user( self::$editor_id );
 
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/icon-collections/core' );
@@ -228,6 +245,23 @@ class WP_Test_REST_Icon_Collections_Controller extends WP_Test_REST_TestCase {
 		$this->assertSame( 'core', $data['slug'] );
 		$this->assertSame( 'WordPress', $data['label'] );
 		$this->assertSame( 'Core icon collection.', $data['description'] );
+	}
+
+	/**
+	 * Tests that a prepared collection item contains the expected fields.
+	 */
+	public function test_prepare_item() {
+		wp_set_current_user( self::$editor_id );
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/icon-collections/core' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertArrayHasKey( 'slug', $data );
+		$this->assertArrayHasKey( 'label', $data );
+		$this->assertArrayHasKey( 'description', $data );
+		$this->assertSame( 'core', $data['slug'] );
 	}
 
 	/**
