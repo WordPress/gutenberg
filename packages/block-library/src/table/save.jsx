@@ -5,6 +5,7 @@ import {
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 	__experimentalGetElementClassName,
+	getBackgroundClassesAndStyles,
 } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
@@ -17,13 +18,19 @@ export default function save( { attributes } ) {
 
 	const colorProps = getColorClassesAndStyles( attributes );
 	const borderProps = getBorderClassesAndStyles( attributes );
+	const backgroundProps = getBackgroundClassesAndStyles( attributes );
 
 	const textAlign = style?.typography?.textAlign;
 
-	const classes = clsx( colorProps.className, borderProps.className, {
-		'has-fixed-layout': hasFixedLayout,
-		[ `has-text-align-${ textAlign }` ]: textAlign,
-	} );
+	const classes = clsx(
+		colorProps.className,
+		borderProps.className,
+		backgroundProps.className,
+		{
+			'has-fixed-layout': hasFixedLayout,
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		}
+	);
 
 	const hasCaption = ! RichText.isEmpty( caption );
 
@@ -84,7 +91,11 @@ export default function save( { attributes } ) {
 		<figure { ...useBlockProps.save() }>
 			<table
 				className={ classes === '' ? undefined : classes }
-				style={ { ...colorProps.style, ...borderProps.style } }
+				style={ {
+					...colorProps.style,
+					...borderProps.style,
+					...backgroundProps.style,
+				} }
 			>
 				<Section type="head" rows={ head } />
 				<Section type="body" rows={ body } />
