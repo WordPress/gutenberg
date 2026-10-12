@@ -32,6 +32,7 @@
 		"anchor": true,
 		"className": false,
 		"background": {
+			"backgroundClip": true,
 			"backgroundImage": true,
 			"backgroundSize": true,
 			"gradient": true
@@ -43,16 +44,6 @@
 			"width": true
 		},
 		"shadow": true,
-		"background": {
-			"backgroundClip": true,
-			"backgroundImage": true,
-			"backgroundSize": true,
-			"gradient": true,
-			"__experimentalDefaultControls": {
-				"backgroundImage": false,
-				"gradient": false
-			}
-		},
 		"color": {
 			"gradients": true,
 			"link": true,
