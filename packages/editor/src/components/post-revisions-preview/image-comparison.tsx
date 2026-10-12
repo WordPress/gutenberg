@@ -74,7 +74,7 @@ function FittedImagePreview( {
 		>
 			{ /* Match the preview viewport to its container; fit the whole block above. */ }
 			<BlockPreview
-				blocks={ [ block ] }
+				blocks={ block }
 				viewportWidth={ 0 }
 				additionalStyles={ IMAGE_PREVIEW_STYLES }
 			/>
