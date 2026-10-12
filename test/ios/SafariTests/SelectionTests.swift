@@ -18,10 +18,6 @@ final class SelectionTests: XCTestCase {
 		safari.terminate()
 	}
 
-	func paragraph( startingWith text: String ) -> XCUIElement {
-		web.textViews.matching( NSPredicate( format: "value BEGINSWITH %@", text ) ).firstMatch
-	}
-
 	func point( _ x: CGFloat, _ y: CGFloat ) -> XCUICoordinate {
 		safari.coordinate( withNormalizedOffset: .zero ).withOffset( CGVector( dx: x, dy: y ) )
 	}
@@ -39,7 +35,7 @@ final class SelectionTests: XCTestCase {
 		safari.activate()
 		XCTAssertTrue( safari.wait( for: .runningForeground, timeout: 30 ) )
 
-		let second = paragraph( startingWith: "Delta echo" )
+		let second = editor.block( title: "Paragraph", content: "Delta echo foxtrot" )
 		XCTAssertTrue( second.waitForExistence( timeout: 240 ), "The post did not load" )
 
 		// Select the second paragraph.
@@ -74,6 +70,6 @@ final class SelectionTests: XCTestCase {
 
 		// Cutting a selection across the two paragraphs joins what is left
 		// of them into one.
-		editor.expectBlocks( [ Block( title: "Paragraph", text: "Alpha  echo foxtrot" ) ] )
+		editor.expectBlocks( [ Block( title: "Paragraph", content: "Alpha  echo foxtrot" ) ] )
 	}
 }
