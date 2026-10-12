@@ -4691,14 +4691,11 @@
 			"count": 2
 		}
 	},
-	"packages/commands/src/components/command-menu.jsx": {
+	"packages/commands/src/components/command-menu.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		},
 		"react-hooks/refs": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -4735,11 +4732,6 @@
 	"packages/components/src/date-time/date-picker/styles.ts": {
 		"no-restricted-imports": {
 			"count": 1
-		}
-	},
-	"packages/components/src/date-time/time-picker/styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
 		}
 	},
 	"packages/components/src/draggable/index.tsx": {
@@ -4787,11 +4779,6 @@
 			"count": 2
 		}
 	},
-	"packages/components/src/number-control/styles/number-control-styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
 	"packages/components/src/panel/body.tsx": {
 		"react-hooks/refs": {
 			"count": 1
@@ -4828,11 +4815,6 @@
 	"packages/components/src/style-provider/index.tsx": {
 		"no-restricted-imports": {
 			"count": 2
-		}
-	},
-	"packages/components/src/tabs/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
 		}
 	},
 	"packages/components/src/toggle-group-control/toggle-group-control/utils.ts": {
