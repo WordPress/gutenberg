@@ -27,14 +27,27 @@ export const DEFAULT_CROP_OPTIONS: CropOptionsSlice = {
 };
 
 /**
+ * A value an edit can hold: plain data only, because the session
+ * compares values by content to tell a real change from a no-op.
+ * Anything else, such as a `Blob`, would compare equal to any other
+ * and the change would be dropped — keep bytes behind a URL instead.
+ *
+ * Objects must satisfy the index signature, so type a value with a
+ * `type` alias rather than an `interface`.
+ */
+export type EditValue =
+	| string
+	| number
+	| boolean
+	| null
+	| EditValue[]
+	| { [ key: string ]: EditValue };
+
+/**
  * Named edits other than crop, keyed by edit name (for example
  * `my-plugin/vignette`). An edit that is not present means "no edit".
- *
- * Values must be plain data — numbers, strings, booleans, arrays and
- * objects of those — because the session compares them by content to
- * tell a real change from a no-op.
  */
-export type EditsSlice = Record< string, unknown >;
+export type EditsSlice = Record< string, EditValue >;
 
 /**
  * The full composite state for the media editor — cropper geometry,
@@ -92,7 +105,10 @@ export type MediaEditorAction =
 	/** Reset cropOptions to defaults. */
 	| { type: 'RESET_CROP_OPTIONS' }
 	/** Set a named edit, or remove it when `value` is `undefined`. */
-	| { type: 'SET_EDIT'; payload: { name: string; value: unknown } }
+	| {
+			type: 'SET_EDIT';
+			payload: { name: string; value: EditValue | undefined };
+	  }
 	/**
 	 * Replace the entire composite state with `payload`. Used by
 	 * undo/redo to restore a full snapshot atomically.

@@ -26,6 +26,7 @@ import {
 import type {
 	CropOptionsSlice,
 	EditsSlice,
+	EditValue,
 	MediaEditorAction,
 	MediaEditorState,
 } from './types';
@@ -112,7 +113,7 @@ export interface MediaEditorSession {
 	 * in the session history like any crop change. Setting a value
 	 * equal in content to the current one is a no-op.
 	 */
-	setEdit: ( name: string, value: unknown ) => void;
+	setEdit: ( name: string, value: EditValue | undefined ) => void;
 	/**
 	 * Replace the image being edited. A different image starts a
 	 * fresh session: default geometry and crop options, a clean
@@ -353,7 +354,7 @@ export function useMediaEditorState(): MediaEditorSession {
 	// =====================================================================
 
 	const setEdit = useCallback(
-		( name: string, value: unknown ) => {
+		( name: string, value: EditValue | undefined ) => {
 			dispatchWithHistory( {
 				type: 'SET_EDIT',
 				payload: { name, value },
