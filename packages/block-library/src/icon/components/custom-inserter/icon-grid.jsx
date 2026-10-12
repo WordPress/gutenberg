@@ -1,9 +1,16 @@
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { useAsyncList } from '@wordpress/compose';
-import { forwardRef, memo, useRef, useLayoutEffect } from '@wordpress/element';
+import { useAsyncList, useInstanceId } from '@wordpress/compose';
+import {
+	forwardRef,
+	memo,
+	useRef,
+	useLayoutEffect,
+	useMemo,
+} from '@wordpress/element';
 import { getScrollContainer } from '@wordpress/dom';
 import HtmlRenderer from '../../../utils/html-renderer';
+import { groupIconsByCollection } from './utils';
 
 const BATCH_SIZE = 20;
 
@@ -32,8 +39,24 @@ const IconGridItem = memo(
 	} )
 );
 
-export default function IconGrid( { icons, onChange, value } ) {
-	const shownIcons = useAsyncList( icons, {
+export default function IconGrid( { icons, onChange, value, collections } ) {
+	const instanceId = useInstanceId(
+		IconGrid,
+		'wp-block-icon__inserter-grid'
+	);
+
+	const { groups, orderedIcons } = useMemo( () => {
+		if ( ! icons?.length || ! collections ) {
+			return { groups: null, orderedIcons: icons };
+		}
+		const iconGroups = groupIconsByCollection( icons, collections );
+		return {
+			groups: iconGroups,
+			orderedIcons: iconGroups.flatMap( ( group ) => group.icons ),
+		};
+	}, [ icons, collections ] );
+
+	const shownIcons = useAsyncList( orderedIcons, {
 		step: BATCH_SIZE,
 	} );
 
@@ -42,11 +65,11 @@ export default function IconGrid( { icons, onChange, value } ) {
 	// if the user has already scrolled the list.
 	const selectedIconRef = useRef();
 	const selectedIndex =
-		icons?.findIndex( ( icon ) => icon.name === value ) ?? -1;
+		orderedIcons?.findIndex( ( icon ) => icon.name === value ) ?? -1;
 	const isReadyToScroll =
 		selectedIndex >= 0 &&
 		( shownIcons.length >= selectedIndex + BATCH_SIZE ||
-			shownIcons.length === icons.length );
+			shownIcons.length === orderedIcons.length );
 
 	useLayoutEffect( () => {
 		const node = selectedIconRef.current;
@@ -59,32 +82,65 @@ export default function IconGrid( { icons, onChange, value } ) {
 		node.scrollIntoView( { block: 'center' } );
 	}, [ isReadyToScroll ] );
 
-	return (
-		<div className="wp-block-icon__inserter-grid">
-			{ ! icons?.length ? (
+	const renderIcons = ( iconsToRender ) => (
+		<div className="wp-block-icon__inserter-grid-icons-list">
+			{ iconsToRender.map( ( icon ) => (
+				<IconGridItem
+					key={ icon.name }
+					ref={ icon.name === value ? selectedIconRef : undefined }
+					icon={ icon }
+					isSelected={ icon.name === value }
+					onChange={ onChange }
+				/>
+			) ) }
+		</div>
+	);
+
+	const renderGroups = () => {
+		let offset = 0;
+		return groups.map( ( group ) => {
+			const start = offset;
+			offset += group.icons.length;
+			// Show this group's icons, as many as have loaded so far.
+			const shownGroupIcons = group.icons.slice(
+				0,
+				Math.max( 0, shownIcons.length - start )
+			);
+			if ( ! shownGroupIcons.length ) {
+				return null;
+			}
+			const headingId = `${ instanceId }-${ group.slug }`;
+			return (
+				<div
+					key={ group.slug }
+					role="group"
+					aria-labelledby={ headingId }
+				>
+					<h2
+						id={ headingId }
+						className="wp-block-icon__inserter-grid-group-title"
+					>
+						{ group.label }
+					</h2>
+					{ renderIcons( shownGroupIcons ) }
+				</div>
+			);
+		} );
+	};
+
+	if ( ! icons?.length ) {
+		return (
+			<div className="wp-block-icon__inserter-grid">
 				<div className="wp-block-icon__inserter-grid-no-results">
 					<p>{ __( 'No results found.' ) }</p>
 				</div>
-			) : (
-				<div
-					className="wp-block-icon__inserter-grid-icons-list"
-					aria-label={ __( 'Icon library' ) }
-				>
-					{ shownIcons.map( ( icon ) => (
-						<IconGridItem
-							key={ icon.name }
-							ref={
-								icon.name === value
-									? selectedIconRef
-									: undefined
-							}
-							icon={ icon }
-							isSelected={ icon.name === value }
-							onChange={ onChange }
-						/>
-					) ) }
-				</div>
-			) }
+			</div>
+		);
+	}
+
+	return (
+		<div className="wp-block-icon__inserter-grid">
+			{ groups ? renderGroups() : renderIcons( shownIcons ) }
 		</div>
 	);
 }
