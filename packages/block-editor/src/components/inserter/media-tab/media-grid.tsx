@@ -292,7 +292,7 @@ export default function MediaGrid( {
 			>
 				<MediaSearch
 					label={ searchLabel }
-					value={ search }
+					defaultValue={ search }
 					onChange={ onChangeSearch }
 				/>
 				{ sourceMenu }

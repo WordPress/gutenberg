@@ -1,5 +1,5 @@
 import { SearchControl } from '@wordpress/components';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { useDebouncedInput } from '@wordpress/compose';
 
 /**
@@ -9,39 +9,25 @@ import { useDebouncedInput } from '@wordpress/compose';
  * tab matches the search control the other inserter tabs use. The debounce it
  * would have provided is reproduced here, so the caller only sees settled
  * values and refetches once the reader stops typing.
+ *
+ * The field owns what is typed and reports it once it settles, so the caller
+ * cannot drive it: `defaultValue` seeds it and nothing more.
  */
 export default function MediaSearch( {
 	label,
-	value,
+	defaultValue,
 	onChange,
 }: {
 	label: string;
-	value: string;
+	defaultValue: string;
 	onChange: ( value: string ) => void;
 } ) {
-	const [ search, setSearch, debouncedSearch ] = useDebouncedInput( value );
+	const [ search, setSearch, debouncedSearch ] =
+		useDebouncedInput( defaultValue );
 
-	// Follow the value back when it changes from elsewhere (e.g. switching
-	// source resets it), without clobbering what is being typed.
 	useEffect( () => {
-		if ( value !== debouncedSearch ) {
-			setSearch( value );
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps -- `debouncedSearch` would re-sync mid-type.
-	}, [ value, setSearch ] );
-
-	// Held in refs so the effect below depends on the debounced value alone.
-	const onChangeRef = useRef( onChange );
-	const valueRef = useRef( value );
-	useEffect( () => {
-		onChangeRef.current = onChange;
-		valueRef.current = value;
-	}, [ onChange, value ] );
-	useEffect( () => {
-		if ( debouncedSearch !== valueRef.current ) {
-			onChangeRef.current( debouncedSearch );
-		}
-	}, [ debouncedSearch ] );
+		onChange( debouncedSearch );
+	}, [ debouncedSearch, onChange ] );
 
 	return (
 		<SearchControl
