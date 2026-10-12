@@ -14,7 +14,7 @@
 ### Bug Fixes
 
 -   Accordion Heading: Anchor notes to the selected title text instead of the whole block ([#84497](https://github.com/WordPress/gutenberg/pull/84497)).
--   Calendar: Hide the block again after the last published post is permanently deleted. The `wp_calendar_block_has_published_posts` option was not updated in that case.
+-   Calendar: Hide the block again after the last published post is permanently deleted. The `wp_calendar_block_has_published_posts` option was not updated in that case ([#84549](https://github.com/WordPress/gutenberg/pull/84549)).
 
 ## 11.2.0 (2026-10-07)
 
