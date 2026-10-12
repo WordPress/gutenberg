@@ -258,8 +258,6 @@ export default function MediaGrid( {
 		[ totalItems, totalPages ]
 	);
 	const showPagination = paginationInfo.totalPages > 1;
-	// A single media type has nothing to switch between, so the bar is
-	// left out rather than showing one lone tab.
 	const hasTabs = !! mediaTypes && mediaTypes.length > 1;
 	const hasFooter = showPagination || !! footer;
 	const itemRange = getItemRange( {

@@ -4,12 +4,6 @@ import { settings } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
 import { Menu } from '@wordpress/ui';
 
-/**
- * One entry in the menu. Deliberately not a category: "Media library" stands
- * for the `images`, `videos` and `audio` categories together, which the tab
- * offers as media-type tabs, while every other source maps to a single
- * registered `InserterMediaCategory`.
- */
 export type MediaSource = {
 	name: string;
 	label: string;

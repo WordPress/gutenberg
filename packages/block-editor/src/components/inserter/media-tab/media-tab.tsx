@@ -63,8 +63,6 @@ function MediaTab( {
 				isDataViewsModal && item.mime_type
 					? ( item.mime_type.split( '/' )[ 0 ] as MediaType )
 					: item.type;
-			// Without a type there is no block to build, so there is nothing
-			// useful to insert.
 			if ( ! mediaType ) {
 				return;
 			}
