@@ -331,18 +331,23 @@ class WP_Test_REST_Icon_Collections_Controller extends WP_Test_REST_TestCase {
 	 * Tests that the item schema matches the expected specification.
 	 */
 	public function test_get_item_schema() {
-		$controller = new WP_REST_Icon_Collections_Controller_Gutenberg();
-		$schema     = $controller->get_item_schema();
+		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/icon-collections' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$schema   = $data['schema'];
 
 		$this->assertSame( 'icon-collection', $schema['title'] );
 		$this->assertSame( 'object', $schema['type'] );
-		$this->assertArrayHasKey( 'slug', $schema['properties'] );
-		$this->assertArrayHasKey( 'label', $schema['properties'] );
-		$this->assertArrayHasKey( 'description', $schema['properties'] );
 
-		$this->assertTrue( $schema['properties']['slug']['readonly'] );
-		$this->assertTrue( $schema['properties']['label']['readonly'] );
-		$this->assertTrue( $schema['properties']['description']['readonly'] );
+		$properties = $schema['properties'];
+		$this->assertCount( 3, $properties );
+		$this->assertArrayHasKey( 'slug', $properties );
+		$this->assertArrayHasKey( 'label', $properties );
+		$this->assertArrayHasKey( 'description', $properties );
+
+		$this->assertTrue( $properties['slug']['readonly'] );
+		$this->assertTrue( $properties['label']['readonly'] );
+		$this->assertTrue( $properties['description']['readonly'] );
 	}
 
 	/**
