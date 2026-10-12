@@ -199,6 +199,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 						<Menu.Separator />
 						<Menu.Group>
 							<Menu.CheckboxItem
+								disabled={ deviceType === 'Desktop' }
 								checked={ isResponsiveEditing }
 								onCheckedChange={
 									handleResponsiveEditingChange
@@ -208,9 +209,13 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 									{ __( 'Responsive styles' ) }
 								</Menu.ItemLabel>
 								<Menu.ItemDescription>
-									{ __(
-										'Style changes apply only to the selected viewport.'
-									) }
+									{ deviceType === 'Desktop'
+										? __(
+												'Select Tablet or Mobile to style a specific viewport.'
+											)
+										: __(
+												'Style changes apply only to the selected viewport.'
+											) }
 								</Menu.ItemDescription>
 							</Menu.CheckboxItem>
 						</Menu.Group>
