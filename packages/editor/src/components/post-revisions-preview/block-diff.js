@@ -8,6 +8,7 @@ import { parse as grammarParse } from '@wordpress/block-serialization-default-pa
 import {
 	privateApis as blocksPrivateApis,
 	getBlockType,
+	cloneBlock,
 } from '@wordpress/blocks';
 import {
 	RichTextData,
@@ -818,6 +819,42 @@ function applyDiffRecursively( parsedBlock, rawBlock ) {
 		) {
 			const previousParsed = parseRawBlock( rawBlock.__previousRawBlock );
 			if ( previousParsed ) {
+				// Keep clean image versions before adding inline caption diffs.
+				// Non-visual changes still use the text/attribute comparison.
+				const visualAttributes = [
+					'url',
+					'width',
+					'height',
+					'aspectRatio',
+					'scale',
+					'focalPoint',
+					'sizeSlug',
+					'align',
+					'borderColor',
+					'style',
+					'className',
+				];
+				if (
+					parsedBlock.name === 'core/image' &&
+					typeof parsedBlock.attributes.url === 'string' &&
+					parsedBlock.attributes.url.trim() &&
+					typeof previousParsed.attributes.url === 'string' &&
+					previousParsed.attributes.url.trim() &&
+					visualAttributes.some(
+						( attribute ) =>
+							JSON.stringify(
+								parsedBlock.attributes[ attribute ]
+							) !==
+							JSON.stringify(
+								previousParsed.attributes[ attribute ]
+							)
+					)
+				) {
+					rawBlock.__revisionDiffStatus.imageComparison = {
+						before: cloneBlock( previousParsed ),
+						after: cloneBlock( parsedBlock ),
+					};
+				}
 				applyDiffToBlock(
 					parsedBlock,
 					previousParsed,
