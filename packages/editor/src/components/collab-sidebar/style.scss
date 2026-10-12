@@ -562,6 +562,47 @@ mark.wp-note {
 	forced-color-adjust: none;
 }
 
+// The highlighted emoji with its name. The height is fixed so the grid doesn't
+// resize while the footer is empty.
+.editor-collab-sidebar-panel__picker-footer {
+	display: flex;
+	flex-shrink: 0;
+	align-items: center;
+	gap: var(--emoji-picker-gap);
+	box-sizing: border-box;
+	block-size: calc(var(--emoji-picker-cell-size) + var(--wpds-dimension-padding-sm) * 2);
+	padding: var(--wpds-dimension-padding-sm) var(--emoji-picker-padding);
+	border-block-start: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+	// Reserve the grid viewport's scrollbar gutters too, so the emoji stays
+	// in line with the first column under classic scrollbars.
+	overflow: hidden;
+	scrollbar-gutter: stable both-edges;
+	// Stretch to the grid's width rather than widening the picker.
+	contain: inline-size;
+}
+
+// A cell-sized box, so the emoji lines up with the grid's first column.
+.editor-collab-sidebar-panel__picker-footer-emoji {
+	flex-shrink: 0;
+	inline-size: var(--emoji-picker-cell-size);
+	font-size: 24px;
+	line-height: 1;
+	text-align: center;
+	forced-color-adjust: none;
+}
+
+.editor-collab-sidebar-panel__picker-footer-name {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+
+	// Emojibase names are lowercase; the footer reads them as a title.
+	&::first-letter {
+		text-transform: uppercase;
+	}
+}
+
 // Mention chips, both in the note input and the rendered note content. A
 // mention is a non-interactive `span` carrying the mentioned user's ID in a
 // `user-N` class, styled as a chip.

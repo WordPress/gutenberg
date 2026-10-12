@@ -1357,6 +1357,127 @@ test.describe( 'Block Notes', () => {
 			await expect( searchField ).toBeHidden();
 		} );
 
+		test( 'the emoji picker footer names the highlighted emoji', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing the picker footer' },
+				comment: 'Test comment for the picker footer',
+			} );
+
+			await page
+				.getByRole( 'combobox', { name: 'Add reaction' } )
+				.click();
+			await blockNoteUtils.waitForFullPicker();
+
+			// The footer is visual only, since the highlighted cell is
+			// already announced through `aria-activedescendant`.
+			const footer = page.locator(
+				'.editor-collab-sidebar-panel__picker-footer'
+			);
+			await expect( footer ).toHaveAttribute( 'aria-hidden', 'true' );
+			const footerName = footer.locator(
+				'.editor-collab-sidebar-panel__picker-footer-name'
+			);
+			const cells = page.getByRole( 'gridcell' );
+
+			// The arrow keys move the highlight from the search field.
+			await expect(
+				page.getByRole( 'combobox', { name: 'Search emoji' } )
+			).toBeFocused();
+			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'ArrowRight' );
+			await expect( footerName ).toHaveText(
+				await cells.nth( 1 ).getAttribute( 'aria-label' )
+			);
+
+			// Hovering a cell highlights it too.
+			const hoveredCell = cells.nth( 8 );
+			await hoveredCell.hover();
+			await expect( footerName ).toHaveText(
+				await hoveredCell.getAttribute( 'aria-label' )
+			);
+		} );
+
+		test( 'the emoji picker footer follows search and reopening', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing the picker footer search' },
+				comment: 'Test comment for the picker footer search',
+			} );
+
+			const trigger = page.getByRole( 'combobox', {
+				name: 'Add reaction',
+			} );
+			await trigger.click();
+			await blockNoteUtils.waitForFullPicker();
+
+			const footerName = page.locator(
+				'.editor-collab-sidebar-panel__picker-footer-name'
+			);
+			const searchField = page.getByRole( 'combobox', {
+				name: 'Search emoji',
+			} );
+			const cells = page.getByRole( 'gridcell' );
+
+			// Nothing is highlighted until the user moves or types.
+			await expect( footerName ).toHaveCount( 0 );
+
+			// Typing highlights the top hit, which Enter would pick.
+			await searchField.fill( 'heart' );
+			await expect(
+				page.locator( '.editor-collab-sidebar-panel__picker-list' )
+			).toHaveClass( /is-searching/ );
+			await expect( cells.first() ).toHaveAttribute( 'data-highlighted' );
+			await expect( footerName ).toHaveText(
+				await cells.first().getAttribute( 'aria-label' )
+			);
+
+			// A search with no hits leaves nothing to name.
+			await searchField.fill( 'zzqqxxnotanemoji' );
+			await expect( page.getByText( 'No emoji found.' ) ).toBeVisible();
+			await expect( footerName ).toHaveCount( 0 );
+
+			// Highlight a cell, close, and reopen: the footer starts empty.
+			await searchField.fill( '' );
+			await page.keyboard.press( 'ArrowDown' );
+			await expect( footerName ).toHaveCount( 1 );
+			await page.keyboard.press( 'Escape' );
+			await expect( searchField ).toBeHidden();
+			await trigger.click();
+			await blockNoteUtils.waitForFullPicker();
+			await expect( footerName ).toHaveCount( 0 );
+		} );
+
+		test( 'the emoji picker footer is hidden when emojis fail to load', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await page.route( /\/data\.json(\?|$)/, ( route ) =>
+				route.abort()
+			);
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing the picker load failure' },
+				comment: 'Test comment for the picker load failure',
+			} );
+
+			await page
+				.getByRole( 'combobox', { name: 'Add reaction' } )
+				.click();
+			await expect(
+				page.getByText( 'Couldn’t load emojis.' )
+			).toBeVisible();
+			await expect(
+				page.locator( '.editor-collab-sidebar-panel__picker-footer' )
+			).toHaveCount( 0 );
+		} );
+
 		test( 'the add-reaction trigger is revealed on hover and focus', async ( {
 			page,
 			blockNoteUtils,
@@ -1721,12 +1842,20 @@ test.describe( 'Block Notes', () => {
 
 			// Tone-capable emoji in the grid now carry the chosen tone.
 			await page.getByPlaceholder( 'Search emoji' ).fill( 'thumbs up' );
-			await page
-				.getByRole( 'gridcell', {
-					name: 'thumbs up: dark skin tone',
-					exact: true,
-				} )
-				.click();
+			const tonedCell = page.getByRole( 'gridcell', {
+				name: 'thumbs up: dark skin tone',
+				exact: true,
+			} );
+
+			// The footer leaves out the tone, which the emoji already shows.
+			await tonedCell.hover();
+			await expect(
+				page.locator(
+					'.editor-collab-sidebar-panel__picker-footer-name'
+				)
+			).toHaveText( 'thumbs up' );
+
+			await tonedCell.click();
 
 			// The stored reaction renders the toned emoji.
 			const reactionButton = page.locator(
