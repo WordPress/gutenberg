@@ -123,8 +123,14 @@ export default function useSelectionObserver() {
 				// in progress so the clicked block's focus handler does not
 				// select it (collapsing the native range being made), and so
 				// use-multi-selection does not clear the native selection.
-				// The selection is built on mouseup.
-				if ( event.shiftKey ) {
+				// When shift+clicking within the same block, leave multi-selection
+				// inactive so rich text selection is preserved. The selection
+				// is built on mouseup.
+				if (
+					event.shiftKey &&
+					getBlockSelectionStart() !==
+						getBlockClientId( event.target )
+				) {
 					startMultiSelect();
 				}
 			}
