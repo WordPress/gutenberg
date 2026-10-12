@@ -19,6 +19,7 @@ import SuggestionsList from './suggestions-list';
 import type { FormTokenFieldProps, TokenItem } from './types';
 import { Flex, FlexItem } from '../flex';
 import styles from './style.module.scss';
+import { useKeyboardNavigation } from '../utils/hooks/use-keyboard-navigation';
 import {
 	StyledHelp,
 	StyledLabel,
@@ -37,6 +38,11 @@ const identity = ( value: string ) => value;
  * See [Forms](https://react.dev/reference/react-dom/components#form-components) in the React Documentation for more information.
  */
 export function FormTokenField( props: FormTokenFieldProps ) {
+	const {
+		isKeyboardNavigation,
+		onKeyDown: onNavigationKeyDown,
+		onPointer,
+	} = useKeyboardNavigation();
 	const {
 		autoCapitalize,
 		autoComplete,
@@ -811,6 +817,9 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			<div
 				ref={ tokensAndInput }
 				className={ classes }
+				onKeyDownCapture={ onNavigationKeyDown }
+				onPointerMoveCapture={ onPointer }
+				onPointerDownCapture={ onPointer }
 				tabIndex={ -1 }
 				onMouseDown={ onContainerTouched }
 				onTouchStart={ onContainerTouched }
@@ -826,6 +835,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 				</Flex>
 				{ isExpanded && (
 					<SuggestionsList
+						isKeyboardNavigation={ isKeyboardNavigation }
 						instanceId={ instanceId }
 						match={ saveTransform( incompleteTokenValue ) }
 						displayTransform={ displayTransform }

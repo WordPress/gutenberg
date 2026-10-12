@@ -3,6 +3,7 @@ import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { COLORS, font, rtl, CONFIG, DROPDOWN_MOTION_CSS } from '../utils';
 import { space } from '../utils/space';
+import { FOCUS_RING_WIDTH } from '../utils/colors-values';
 import Icon from '../icon';
 import { Truncate } from '../truncate';
 import type { ContextProps } from './types';
@@ -20,7 +21,6 @@ const DEFAULT_BORDER_COLOR = COLORS.theme.gray[ 300 ];
 // TODO: should use the `stroke-surface-neutral-weak` WPDS token when refactored to SCSS modules
 const DIVIDER_COLOR = COLORS.theme.gray[ 200 ];
 const LIGHTER_TEXT_COLOR = COLORS.theme.gray[ 700 ];
-const LIGHT_BACKGROUND_COLOR = COLORS.theme.gray[ 100 ];
 const TOOLBAR_VARIANT_BORDER_COLOR = COLORS.theme.foreground;
 const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.elevationMedium }`;
 const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VARIANT_BORDER_COLOR }`;
@@ -169,32 +169,28 @@ const baseItem = css`
 		color: ${ COLORS.ui.textDisabled };
 	}
 
-	/* Active item (including hover) */
-	&[data-active-item]:not( [data-focus-visible] ):not(
-			[aria-disabled='true']
-		) {
-		background-color: ${ COLORS.theme.accent };
-		color: ${ COLORS.theme.accentInverted };
+	/* Hover and keyboard focus share the same neutral highlight. */
+	&[data-active-item]:not( [aria-disabled='true'] ),
+	${ Menu }:not(:focus) &:not( :focus )[aria-expanded='true'] {
+		background-color: ${ COLORS.theme.itemHighlightBackground };
+		color: ${ COLORS.theme.itemHighlightForeground };
+
+		@media ( forced-colors: active ) {
+			forced-color-adjust: none;
+			background-color: Highlight;
+			color: HighlightText;
+		}
 	}
 
-	/* Keyboard focus (focus-visible) */
 	&[data-focus-visible] {
-		box-shadow: 0 0 0 1.5px ${ COLORS.theme.accent };
+		outline: ${ FOCUS_RING_WIDTH } solid ${ COLORS.theme.focusStroke };
+		outline-offset: 0;
+		box-shadow: none;
+		z-index: 1;
 
-		/* Only visible in Windows High Contrast mode */
-		outline: 2px solid transparent;
-	}
-
-	/* Active (ie. pressed, mouse down) */
-	&:active,
-	&[data-active] {
-		/* TODO: should there be a visual active state? */
-	}
-
-	/* When the item is the trigger of an open submenu */
-	${ Menu }:not(:focus) &:not(:focus)[aria-expanded="true"] {
-		background-color: ${ LIGHT_BACKGROUND_COLOR };
-		color: ${ COLORS.theme.foreground };
+		@media ( forced-colors: active ) {
+			outline-color: Highlight;
+		}
 	}
 
 	svg {
@@ -241,10 +237,10 @@ export const ItemPrefixWrapper = styled.span`
 	color: ${ LIGHTER_TEXT_COLOR };
 
 	/*
-	* When the parent menu item is active, except when it's a non-focused/hovered
-	* submenu trigger (in that case, color should not be inherited)
+	* When the parent menu item is highlighted or keeps a submenu open
 	*/
-	[data-active-item]:not( [data-focus-visible] ) > &,
+	[data-active-item] > &,
+	[aria-expanded='true'] > &,
 	/* When the parent menu item is disabled */
 	[aria-disabled='true'] > & {
 		color: inherit;
@@ -287,10 +283,10 @@ export const ItemSuffixWrapper = styled.span`
 	color: ${ LIGHTER_TEXT_COLOR };
 
 	/*
-	 * When the parent menu item is active, except when it's a non-focused/hovered
-	 * submenu trigger (in that case, color should not be inherited)
+	 * When the parent menu item is highlighted or keeps a submenu open
 	 */
-	[data-active-item]:not( [data-focus-visible] ) *:not(${ Menu }) &,
+	[data-active-item] *:not(${ Menu }) &,
+	[aria-expanded='true'] *:not(${ Menu }) &,
 	/* When the parent menu item is disabled */
 	[aria-disabled='true'] *:not(${ Menu }) & {
 		color: inherit;
@@ -355,7 +351,8 @@ export const ItemHelpText = styled( Truncate )`
 	color: ${ LIGHTER_TEXT_COLOR };
 	overflow-wrap: anywhere;
 
-	[data-active-item]:not( [data-focus-visible] ) *:not( ${ Menu } ) &,
+	[data-active-item] *:not( ${ Menu } ) &,
+	[aria-expanded='true'] *:not( ${ Menu } ) &,
 	[aria-disabled='true'] *:not( ${ Menu } ) & {
 		color: inherit;
 	}
