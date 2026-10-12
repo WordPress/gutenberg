@@ -172,7 +172,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		useBlockRefProvider( clientId ),
 		useFocusHandler( clientId ),
 		useEventHandlers( { clientId, isSelected } ),
-		useIsHovered( { isEnabled: isHoverEnabled } ),
+		useIsHovered( { clientId, isEnabled: isHoverEnabled } ),
 		useIntersectionObserver(),
 		useMovingAnimation( { triggerAnimationOnChange: index, clientId } ),
 		useDisabled( { isDisabled: ! hasOverlay } ),

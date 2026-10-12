@@ -38,9 +38,14 @@ export function useShowBlockTools() {
 			hasSelectedBlock &&
 			! isEmptyDefaultBlock;
 
+		// The hover label names the block under the pointer. Typing hides
+		// it along with the rest of the block UI.
+		const _showBlockHoverLabel = ! isBlockInterfaceHidden() && ! isTyping();
+
 		return {
 			showEmptyBlockSideInserter: _showEmptyBlockSideInserter,
 			showBlockToolbarPopover: _showBlockToolbarPopover,
+			showBlockHoverLabel: _showBlockHoverLabel,
 		};
 	}, [] );
 }
