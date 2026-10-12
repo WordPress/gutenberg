@@ -1,17 +1,8 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import AuthorView from '../author-view';
 import type { BasePostWithEmbeddedAuthor } from '../../../types';
-
-vi.mock( import( '@wordpress/icons' ), async ( importOriginal ) => ( {
-	...( await importOriginal() ),
-	commentAuthorAvatarAlt: (
-		<svg>
-			<title>Author fallback</title>
-		</svg>
-	),
-} ) );
 
 function postWithAuthor(
 	id: number,
@@ -41,9 +32,7 @@ describe( 'AuthorView', () => {
 			screen.getByRole( 'img', { hidden: true } );
 		fireEvent.load( image );
 		expect( screen.getByText( 'Alex' ) ).toBeVisible();
-		expect(
-			screen.queryByTitle( 'Author fallback' )
-		).not.toBeInTheDocument();
+		expect( screen.queryByText( 'A' ) ).not.toBeInTheDocument();
 
 		rerender(
 			<RegistryProvider value={ registry }>
@@ -54,7 +43,7 @@ describe( 'AuthorView', () => {
 		expect( screen.queryByText( 'Alex' ) ).not.toBeInTheDocument();
 		expect( image ).toHaveAttribute( 'src', '/sam.png' );
 		fireEvent.error( image );
-		expect( screen.getByTitle( 'Author fallback' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'S' ) ).toBeInTheDocument();
 		expect( screen.queryByRole( 'img' ) ).not.toBeInTheDocument();
 	} );
 } );

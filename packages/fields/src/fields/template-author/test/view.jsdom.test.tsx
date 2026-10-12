@@ -10,7 +10,7 @@ import type { Template } from '../../../types';
 
 vi.mock( import( '@wordpress/icons' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
-	commentAuthorAvatarAlt: (
+	commentAuthorAvatar: (
 		<svg>
 			<title>User fallback</title>
 		</svg>
@@ -41,7 +41,7 @@ const sources = [
 
 describe( 'TemplateAuthorView', () => {
 	it.each( sources )(
-		'keeps the %s source icon when the image is missing or fails',
+		'keeps the %s source fallback when the image is missing or fails',
 		( source, fallbackTitle ) => {
 			const registry = createRegistry();
 			registry.register(
@@ -81,7 +81,11 @@ describe( 'TemplateAuthorView', () => {
 				</RegistryProvider>
 			);
 			expect( screen.getByText( 'Template author' ) ).toBeVisible();
-			expect( screen.getByTitle( fallbackTitle ) ).toBeInTheDocument();
+			expect(
+				source === 'user'
+					? screen.getByText( 'TA' )
+					: screen.getByTitle( fallbackTitle )
+			).toBeInTheDocument();
 			expect( screen.queryByRole( 'img' ) ).not.toBeInTheDocument();
 		}
 	);

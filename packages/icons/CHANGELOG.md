@@ -6,10 +6,6 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
-### New Features
-
--   Add `commentAuthorAvatarAlt`, a borderless author silhouette for Avatar fallbacks. ([#84540](https://github.com/WordPress/gutenberg/pull/84540))
-
 ## 18.0.0 (2026-10-07)
 
 ### Breaking Changes

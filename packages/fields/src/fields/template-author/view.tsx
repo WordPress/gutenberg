@@ -1,7 +1,7 @@
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
-	commentAuthorAvatarAlt as authorIcon,
+	commentAuthorAvatar as authorIcon,
 	layout as themeIcon,
 	plugins as pluginIcon,
 	globe as globeIcon,
@@ -32,6 +32,18 @@ export default function TemplateAuthorView( {
 	const icon = getIconForSource( originalSource );
 	const text = item.author_text;
 	const authorId = item.author;
+	const isAuthor = originalSource === 'user' || originalSource === undefined;
+	const initials = isAuthor
+		? text
+				?.trim()
+				.split( /\s+/ )
+				.slice( 0, 2 )
+				.map( ( word ) => Array.from( word )[ 0 ] )
+				.join( '' )
+				.toUpperCase()
+		: undefined;
+	const hasStandaloneIcon =
+		originalSource === 'theme' || ( isAuthor && ! initials );
 
 	const imageUrl = useSelect(
 		( select ) => {
@@ -60,22 +72,29 @@ export default function TemplateAuthorView( {
 		<Stack
 			direction="row"
 			align="center"
-			gap={ originalSource === 'theme' ? undefined : 'sm' }
+			gap={ hasStandaloneIcon ? undefined : 'sm' }
 		>
-			{ originalSource === 'theme' ? (
+			{ hasStandaloneIcon ? (
 				<div
 					className="fields-controls__author-icon"
 					aria-hidden="true"
 				>
-					<Icon icon={ themeIcon } />
+					<Icon icon={ icon } />
 				</div>
 			) : (
 				<Avatar.Root size="xs" aria-hidden="true">
 					<Avatar.Fallback>
-						<Icon
-							icon={ icon }
-							style={ { inlineSize: '100%', blockSize: '100%' } }
-						/>
+						{ isAuthor ? (
+							initials
+						) : (
+							<Icon
+								icon={ icon }
+								style={ {
+									inlineSize: '100%',
+									blockSize: '100%',
+								} }
+							/>
+						) }
 					</Avatar.Fallback>
 					<Avatar.Image src={ imageUrl } alt="" keepMounted />
 				</Avatar.Root>

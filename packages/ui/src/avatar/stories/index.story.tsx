@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { forwardRef } from '@wordpress/element';
-import { commentAuthorAvatarAlt } from '@wordpress/icons';
+import { commentAuthorAvatar } from '@wordpress/icons';
 import * as Avatar from '../index';
 import { Icon } from '../../icon';
 import { Stack } from '../../stack';
@@ -63,10 +63,10 @@ export const IconFallback: Story = {
 		<Avatar.Root { ...args }>
 			<Avatar.Fallback>
 				<Icon
-					icon={ commentAuthorAvatarAlt }
+					icon={ commentAuthorAvatar }
 					style={ {
-						inlineSize: '100%',
-						blockSize: '100%',
+						inlineSize: '75%',
+						blockSize: '75%',
 					} }
 				/>
 			</Avatar.Fallback>
