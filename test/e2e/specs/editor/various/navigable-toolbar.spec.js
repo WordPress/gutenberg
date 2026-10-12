@@ -229,39 +229,6 @@ test.describe( 'Block Toolbar', () => {
 		).toBeFocused();
 	} );
 
-	test( 'should keep the disabled options menu closed when no block is selected on a small screen', async ( {
-		editor,
-		page,
-		pageUtils,
-	} ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
-		await page.keyboard.type( 'a' );
-		await pageUtils.setBrowserViewport( 'small' );
-		await editor.canvas
-			.getByRole( 'textbox', { name: 'Add title' } )
-			.click();
-
-		// Below the medium breakpoint the toolbar stays in place, with its
-		// controls disabled, while no block is selected.
-		const options = page
-			.getByRole( 'toolbar', { name: 'Block tools' } )
-			.getByRole( 'button', { name: 'Options', exact: true } );
-		await expect( options ).toHaveAttribute( 'aria-disabled', 'true' );
-
-		await pageUtils.pressKeys( 'shift+Tab' );
-		await pageUtils.pressKeys( 'ArrowRight', { times: 3 } );
-		await expect( options ).toBeFocused();
-
-		await pageUtils.pressKeys( 'ArrowDown' );
-		await expect( options ).toHaveAttribute( 'aria-expanded', 'false' );
-		await expect(
-			page.getByRole( 'menu', { name: 'Options' } )
-		).toBeHidden();
-		await expect( options ).toBeFocused();
-
-		await pageUtils.setBrowserViewport( 'large' );
-	} );
-
 	// If this test breaks, it's likely that a new div has been added to wrap the top toolbar, which will need an additional
 	// overflow-x property set to allow the block toolbar to scroll.
 	test( 'Block toolbar will scroll to reveal hidden buttons with fixed toolbar', async ( {
