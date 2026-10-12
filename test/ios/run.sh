@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Runs the Safari tests against the plugin in this checkout on an iOS
-# simulator. Needs macOS with Xcode, xcodegen, the Node version in
-# .nvmrc and a built plugin (npm run build). Set WP_PORT to serve
-# WordPress on another port and SIMULATOR_UDID to pick a device.
+# simulator. Needs macOS with Xcode, xcodegen, PHP with SQLite and a
+# built plugin (npm run build). Set WP_PORT to serve WordPress on
+# another port and SIMULATOR_UDID to pick a device.
 set -euo pipefail
 
 # Steps print like the performance tests: elapsed time, then the step.
@@ -90,8 +90,7 @@ done
 # it only does when its build exists. Its first request also does the
 # one-time work of a fresh site before the test's clock starts.
 step "Loading the editor once"
-# Playground logs the request in through a redirect, so cookies must be
-# kept between the hops: -b "" holds them in memory.
+# -b "" keeps the login cookie between redirects, in memory.
 if ! EDITOR_HTML=$( curl -sSL --fail -b "" "$WP_BASE_URL/wp-admin/post-new.php" ); then
 	echo "The editor did not load from $WP_BASE_URL"
 	tail -40 "$ROOT/test/ios/build/server.log"
@@ -127,7 +126,6 @@ step "Generating the Xcode project"
 ( cd test/ios && xcodegen generate --quiet )
 step "Building and running the tests"
 rm -rf test/ios/build/results.xcresult
-TEST_START=$( date +'%Y-%m-%d %H:%M:%S' )
 STATUS=0
 TEST_RUNNER_WP_BASE_URL="$WP_BASE_URL" xcodebuild test \
 	-project test/ios/GutenbergIOS.xcodeproj \
@@ -136,8 +134,4 @@ TEST_RUNNER_WP_BASE_URL="$WP_BASE_URL" xcodebuild test \
 	-derivedDataPath test/ios/build \
 	-resultBundlePath test/ios/build/results.xcresult \
 	"$@" || STATUS=$?
-# Temporary diagnostics: the simulator's touch log, one line per tap.
-xcrun simctl spawn "$UDID" log show --info --debug --style compact --start "$TEST_START" \
-	--predicate 'process == "backboardd" AND category == "TouchEvents"' > test/ios/build/touches.log 2>&1 || true
-python3 test/ios/diagnostics/touches.py test/ios/build/touches.log || true
 exit "$STATUS"
