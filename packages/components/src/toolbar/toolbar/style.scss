@@ -82,7 +82,11 @@
 			}
 
 			&::before {
-				background: $components-color-foreground;
+				background: var(--wpds-color-background-interactive-neutral-strong-active);
+			}
+
+			&:is(:disabled, [aria-disabled="true"])::before {
+				background: var(--wpds-color-background-interactive-neutral-strong-disabled);
 			}
 		}
 
