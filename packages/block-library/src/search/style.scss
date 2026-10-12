@@ -9,11 +9,6 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 	margin-left: $button-spacing-x;
 	word-break: normal;
 
-	.wp-block-media-text__content & {
-		// Preserve Search's opt-out inside Media & Text.
-		overflow-wrap: normal;
-	}
-
 	&.has-icon {
 		line-height: 0;
 	}
