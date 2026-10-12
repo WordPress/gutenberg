@@ -13,6 +13,7 @@
 ### Bug Fixes
 
 -   DataForm: Center the `prefix` and `suffix` of the `text` control's `Edit` config vertically and give them the standard input padding, so consumers pass only the content. ([#84314](https://github.com/WordPress/gutenberg/pull/84314))
+-   List layout: The up and down arrow keys on an item's actions button move focus to the adjacent row when one item ID is a prefix of another, such as `1` and `12`, instead of jumping to the wrong row.
 
 ## 20.0.0 (2026-10-07)
 
