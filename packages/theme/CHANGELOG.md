@@ -9,6 +9,7 @@
 ### Internal
 
 -   Consolidate border mode overrides in the resolver and inherit default values from the base tokens ([#84108](https://github.com/WordPress/gutenberg/pull/84108)).
+-   Update the Vite development dependency to 8.3.4 ([#84544](https://github.com/WordPress/gutenberg/pull/84544)).
 
 ## 2.3.0 (2026-10-07)
 

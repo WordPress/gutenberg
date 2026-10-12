@@ -4817,11 +4817,6 @@
 			"count": 2
 		}
 	},
-	"packages/components/src/tabs/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/toggle-group-control/toggle-group-control/utils.ts": {
 		"react-hooks/refs": {
 			"count": 11

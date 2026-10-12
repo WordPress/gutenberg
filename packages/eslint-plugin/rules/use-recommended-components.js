@@ -64,6 +64,7 @@ const ALLOWLIST = {
 		],
 		caution: [
 			'AlertDialog',
+			'Avatar',
 			'Breadcrumb',
 			'Button',
 			'ButtonLink',
