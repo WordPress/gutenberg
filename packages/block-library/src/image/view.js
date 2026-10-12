@@ -5,6 +5,7 @@ import {
 	getConfig,
 	withSyncEvent,
 	withScope,
+	splitTask,
 } from '@wordpress/interactivity';
 import { prefersReducedMotion } from '../utils/reduced-motion';
 import { IMAGE_PRELOAD_DELAY } from './constants';
@@ -69,7 +70,7 @@ const touchDrag = {
 // milliseconds. These drive `element.animate()` directly, so they are the only
 // definition: nothing in `style.scss` has to be kept in step with them.
 const SLIDE_DURATION_MS = 220;
-const FADE_DURATION_MS = 150;
+const FADE_DURATION_MS = 300;
 const SLIDE_EASING = 'cubic-bezier(0.2, 0.7, 0.2, 1)';
 
 // Movement (px) needed before a gesture latches to horizontal or vertical.
@@ -152,6 +153,21 @@ function resetTouchDrag() {
 	touchDrag.isDragging = false;
 	touchDrag.direction = null;
 	touchDrag.slideEls = [];
+}
+
+/**
+ * Resolves once an image is ready to be painted.
+ *
+ * @param {HTMLImageElement|null} img The image to wait for.
+ * @return {Promise<void>} Resolves when the image is decoded or has failed.
+ */
+async function waitForImage( img ) {
+	await splitTask();
+	try {
+		await img?.decode();
+	} catch {
+		// Fades the image in regardless.
+	}
 }
 
 const focusableSelectors = [
@@ -547,16 +563,48 @@ const { state, actions, callbacks } = store(
 						if ( reducedMotion ) {
 							return;
 						}
-						// Fades the image that replaced the one carried off.
+						// Keeps the slides hidden until the image that replaced
+						// the one carried off is ready. Fading straight away
+						// plays the fade on an empty box while the image is
+						// still loading, and the image then pops in when it
+						// arrives.
 						// Scripted animations take precedence over the overlay's
 						// own CSS animations without touching its class list, so
 						// this cannot disturb the zoom the lightbox plays when an
 						// image is first opened.
-						touchDrag.animations = slideEls.map( ( el ) =>
-							el.animate( [ { opacity: 0 }, { opacity: 1 } ], {
-								duration: FADE_DURATION_MS,
-								easing: 'ease-out',
+						const hold = slideEls.map( ( el ) =>
+							el.animate( [ { opacity: 0 }, { opacity: 0 } ], {
+								fill: 'forwards',
 							} )
+						);
+						touchDrag.animations = hold;
+						const enlargedEl = slideEls[ slideEls.length - 1 ];
+						waitForImage( enlargedEl.querySelector( 'img' ) ).then(
+							() => {
+								if ( touchDrag.animations !== hold ) {
+									return;
+								}
+								stopDragAnimations();
+								// Fades only the enlarged image, keeping the
+								// thumbnail behind it hidden until the fade ends.
+								// Fading both lets a thumbnail cropped to another
+								// shape show through as a darker box.
+								touchDrag.animations = slideEls.map( ( el ) =>
+									el.animate(
+										[
+											{ opacity: 0 },
+											{
+												opacity:
+													el === enlargedEl ? 1 : 0,
+											},
+										],
+										{
+											duration: FADE_DURATION_MS,
+											easing: 'ease-out',
+										}
+									)
+								);
+							}
 						);
 					};
 					touchDrag.settle = settle;
