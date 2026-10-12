@@ -1,11 +1,13 @@
 import clsx from 'clsx';
 import { Spinner as WCSpinner } from '@wordpress/components';
+import { useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { Stack } from '@wordpress/ui';
 import type { ViewGridProps } from '../../../types';
 import getDataByGroup from '../utils/get-data-by-group';
 import useSelectionProps from '../utils/use-selection-props';
 import { hasAPossibleBulkAction } from '../../dataviews-bulk-actions';
+import DataViewsContext from '../../dataviews-context';
 import CompositeGrid from './composite-grid';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
 
@@ -24,6 +26,7 @@ function ViewGrid< Item >( {
 	className,
 	empty,
 }: ViewGridProps< Item > ) {
+	const { isItemLocked } = useContext( DataViewsContext );
 	const isDelayedLoading = useDelayedLoading( !! isLoading );
 	const hasData = !! data?.length;
 	const groupField = view.groupBy?.field
@@ -41,7 +44,8 @@ function ViewGrid< Item >( {
 	const { getSelectionProps } = useSelectionProps( {
 		data: orderedData,
 		getItemId,
-		isItemSelectable: ( item ) => hasAPossibleBulkAction( actions, item ),
+		isItemSelectable: ( item ) =>
+			! isItemLocked( item ) && hasAPossibleBulkAction( actions, item ),
 		selection,
 		onChangeSelection,
 		selectionMode: 'multi',

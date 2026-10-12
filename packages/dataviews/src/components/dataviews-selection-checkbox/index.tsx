@@ -1,5 +1,9 @@
 import { CheckboxControl as WCCheckboxControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { useContext } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+import { lock } from '@wordpress/icons';
+import { Icon, Tooltip } from '@wordpress/ui';
+import DataViewsContext from '../dataviews-context';
 import type { SetSelection } from '../../types/private';
 import type { NormalizedField } from '../../types';
 
@@ -25,6 +29,7 @@ export default function DataViewsSelectionCheckbox< Item >( {
 	disabled,
 	...extraProps
 }: DataViewsSelectionCheckboxProps< Item > ) {
+	const { isItemLocked } = useContext( DataViewsContext );
 	const id = getItemId( item );
 	const isInSelectionArray = selection.includes( id );
 	const checked = ! disabled && isInSelectionArray;
@@ -32,6 +37,32 @@ export default function DataViewsSelectionCheckbox< Item >( {
 	// Fallback label to ensure accessibility
 	const selectionLabel =
 		titleField?.getValue?.( { item } ) || __( '(no title)' );
+
+	// A locked item can't be selected, so it shows a lock in place of the
+	// checkbox, like the list tables of WordPress.
+	if ( isItemLocked( item ) ) {
+		const lockedLabel = sprintf(
+			/* translators: %s: The title of the item. */
+			__( '"%s" is locked' ),
+			selectionLabel
+		);
+		return (
+			<Tooltip.Root>
+				<Tooltip.Trigger
+					render={
+						<span
+							className="dataviews-selection-checkbox__lock"
+							role="img"
+							aria-label={ lockedLabel }
+						/>
+					}
+				>
+					<Icon icon={ lock } size={ 16 } />
+				</Tooltip.Trigger>
+				<Tooltip.Popup>{ __( 'Locked' ) }</Tooltip.Popup>
+			</Tooltip.Root>
+		);
+	}
 
 	return (
 		<WCCheckboxControl

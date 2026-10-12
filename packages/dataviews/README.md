@@ -460,6 +460,10 @@ A function that determines if a media field or a primary field is clickable. It 
 
 Note that layouts may still decide not to render clickable primary and media fields. For example, the `list` layout has a different interaction model and doesn't enable this feature.
 
+#### `isItemLocked`: `function`
+
+A function that determines if an item is locked, for example because someone else is editing it. It receives an item as an argument and returns a boolean value. A locked item shows a lock icon in place of its selection checkbox, and can't be selected for bulk actions. By default, no item is locked.
+
 #### `onClickItem`: `function`
 
 A function that is called when an item is clicked. It receives the item as a parameter.

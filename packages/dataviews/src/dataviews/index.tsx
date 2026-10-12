@@ -34,6 +34,7 @@ import type { SelectionOrUpdater } from '../types/private';
 
 const defaultGetItemId = ( item: ItemWithId ) => item.id;
 const defaultIsItemClickable = () => true;
+const defaultIsItemLocked = () => false;
 const EMPTY_ARRAY: any[] = [];
 const DEFAULT_LAYOUTS: SupportedLayouts = { table: {}, grid: {}, list: {} };
 
@@ -104,6 +105,7 @@ function DataViews< Item >( {
 	onClickItem,
 	renderItemLink,
 	isItemClickable = defaultIsItemClickable,
+	isItemLocked = defaultIsItemLocked,
 	header,
 	children,
 	config = { perPageSizes: [ 10, 20, 50, 100 ] },
@@ -234,6 +236,7 @@ function DataViews< Item >( {
 				getItemId,
 				getItemLevel,
 				isItemClickable,
+				isItemLocked,
 				onClickItem,
 				renderItemLink,
 				containerWidth,
