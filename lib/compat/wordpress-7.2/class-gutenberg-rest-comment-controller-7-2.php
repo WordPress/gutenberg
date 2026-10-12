@@ -405,9 +405,11 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		}
 
 		// START CHANGE: Reject a reaction on behalf of another user.
-		// A reaction is always first-person: the uniqueness check and the
-		// reaction summary key on the current user, so one stored against
-		// somebody else could never be counted or removed.
+		/*
+		 * A reaction is always first-person: the uniqueness check and the
+		 * reaction summary key on the current user, so one stored against
+		 * somebody else could never be counted or removed.
+		 */
 		if (
 			! empty( $request['type'] ) && 'reaction' === $request['type'] &&
 			isset( $request['author'] ) && get_current_user_id() !== (int) $request['author']
@@ -542,8 +544,10 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		// END CHANGE.
 
 		// START CHANGE: Validate reactions.
-		// The canonical reaction key, populated once validated below so the
-		// stored content matches what was validated (not the raw input).
+		/*
+		 * The canonical reaction key, populated once validated below so the
+		 * stored content matches what was validated (not the raw input).
+		 */
 		$reaction_key = null;
 
 		// Validate reaction-specific requirements.
@@ -566,9 +570,11 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				);
 			}
 
-			// The parent note must belong to the post the reaction targets. Check
-			// this before the note's status, which would otherwise leak to a user
-			// who can only edit some other post.
+			/*
+			 * The parent note must belong to the post the reaction targets. Check
+			 * this before the note's status, which would otherwise leak to a user
+			 * who can only edit some other post.
+			 */
 			if ( ! empty( $request['post'] ) && (int) $parent_comment->comment_post_ID !== (int) $request['post'] ) {
 				return new WP_Error(
 					'rest_comment_invalid_parent',
@@ -586,8 +592,10 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				);
 			}
 
-			// Resolving a thread approves its root note, and the editor
-			// disables reactions from then on; hold stale tabs to that too.
+			/*
+			 * Resolving a thread approves its root note, and the editor
+			 * disables reactions from then on; hold stale tabs to that too.
+			 */
 			$thread_root = $parent_comment;
 			$visited     = array( (int) $thread_root->comment_ID => true );
 			while ( $thread_root->comment_parent ) {
@@ -607,12 +615,14 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				);
 			}
 
-			// Validate the reaction content: the hex key of one of the
-			// curated reaction emoji, lowercase code points padded to four
-			// digits (e.g. "2764" for ❤️). Raw emoji bytes are rejected
-			// because the comments table is not guaranteed to be utf8mb4
-			// across all WordPress installs; clients normalize before
-			// submitting.
+			/*
+			 * Validate the reaction content: the hex key of one of the
+			 * curated reaction emoji, lowercase code points padded to four
+			 * digits (e.g. "2764" for ❤️). Raw emoji bytes are rejected
+			 * because the comments table is not guaranteed to be utf8mb4
+			 * across all WordPress installs; clients normalize before
+			 * submitting.
+			 */
 			$raw_content = '';
 
 			// Accept `content` as a string or `{ raw }`, like prepare_item_for_database().
@@ -632,10 +642,12 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				);
 			}
 
-			// A reaction is always approved. The uniqueness check, the race
-			// cleanup below and the reaction summary only see approved rows, so
-			// a reaction created in any other status could never be counted,
-			// deduplicated or, since reactions cannot be updated, fixed.
+			/*
+			 * A reaction is always approved. The uniqueness check, the race
+			 * cleanup below and the reaction summary only see approved rows, so
+			 * a reaction created in any other status could never be counted,
+			 * deduplicated or, since reactions cannot be updated, fixed.
+			 */
 			if ( isset( $request['status'] ) && ! in_array( $request['status'], array( 'approve', 'approved', '1' ), true ) ) {
 				return new WP_Error(
 					'rest_comment_invalid_status',
@@ -644,9 +656,11 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				);
 			}
 
-			// Enforce uniqueness: prevent duplicate emoji per user per note.
-			// Limit to active reactions - trashed reactions are invisible and
-			// must not block the user from re-adding the same emoji.
+			/*
+			 * Enforce uniqueness: prevent duplicate emoji per user per note.
+			 * Limit to active reactions - trashed reactions are invisible and
+			 * must not block the user from re-adding the same emoji.
+			 */
 			$existing = get_comments(
 				array(
 					'parent'  => $request['parent'],
@@ -678,9 +692,11 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		$prepared_comment['comment_type'] = $request['type'];
 
 		// START CHANGE: Store the canonical reaction key.
-		// Persist the validated, canonical reaction key rather than the raw
-		// request content, so stored values stay consistent for grouping and
-		// counting (e.g. "<b>2764</b>" is stored as "2764").
+		/*
+		 * Persist the validated, canonical reaction key rather than the raw
+		 * request content, so stored values stay consistent for grouping and
+		 * counting (e.g. "<b>2764</b>" is stored as "2764").
+		 */
 		if ( null !== $reaction_key ) {
 			$prepared_comment['comment_content'] = $reaction_key;
 		}
@@ -724,9 +740,11 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		}
 
 		// START CHANGE: Pin a reaction to the current user.
-		// Pin a reaction to the current user, whatever author details the
-		// request carried. Author fields alone leave `user_id` at 0, which
-		// the uniqueness check and the reaction summary both key on.
+		/*
+		 * Pin a reaction to the current user, whatever author details the
+		 * request carried. Author fields alone leave `user_id` at 0, which
+		 * the uniqueness check and the reaction summary both key on.
+		 */
 		if ( null !== $reaction_key ) {
 			$user = wp_get_current_user();
 
@@ -819,13 +837,15 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		}
 
 		// START CHANGE: Remove duplicate reactions from concurrent requests.
-		// The pre-insert uniqueness check is not atomic, so two concurrent
-		// requests for the same user/note/emoji can both insert an approved
-		// row. Converge on a single row deterministically: keep the earliest
-		// matching reaction (lowest comment ID) and delete any later
-		// duplicates. Every concurrent request applies the same rule, so they
-		// all settle on the same surviving row. If this request's own row lost
-		// the race, repoint the response to the survivor.
+		/*
+		 * The pre-insert uniqueness check is not atomic, so two concurrent
+		 * requests for the same user/note/emoji can both insert an approved
+		 * row. Converge on a single row deterministically: keep the earliest
+		 * matching reaction (lowest comment ID) and delete any later
+		 * duplicates. Every concurrent request applies the same rule, so they
+		 * all settle on the same surviving row. If this request's own row lost
+		 * the race, repoint the response to the survivor.
+		 */
 		if ( null !== $reaction_key ) {
 			$matching   = get_comments(
 				array(
@@ -844,10 +864,12 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				}
 			}
 
-			// Repoint whenever any matching row survives, not only when this
-			// request still sees its own duplicate: a competing request may
-			// already have deleted this request's row, leaving a single
-			// survivor that is not `$comment_id`.
+			/*
+			 * Repoint whenever any matching row survives, not only when this
+			 * request still sees its own duplicate: a competing request may
+			 * already have deleted this request's row, leaving a single
+			 * survivor that is not `$comment_id`.
+			 */
 			if ( ! empty( $duplicates ) ) {
 				$survivor_id = array_shift( $duplicates );
 				foreach ( $duplicates as $duplicate_id ) {
@@ -859,9 +881,11 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		// END CHANGE.
 
 		// START CHANGE: Skip the status param for reactions.
-		// Reactions are inserted approved and their status was validated above.
-		// Skipping them here also keeps a request from changing the status of a
-		// row that the race cleanup above may have handed it from another request.
+		/*
+		 * Reactions are inserted approved and their status was validated above.
+		 * Skipping them here also keeps a request from changing the status of a
+		 * row that the race cleanup above may have handed it from another request.
+		 */
 		if ( isset( $request['status'] ) && null === $reaction_key ) {
 			$this->handle_status_param( $request['status'], $comment_id );
 		}
@@ -928,9 +952,11 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	public function get_items( $request ) {
 		$fields = $this->get_fields_for_response( $request );
 
-		// Pre-fetch reaction summaries for the notes the parent query actually
-		// returns, so pagination, ordering, and `rest_comment_query` filters
-		// all apply. The filter removes itself after the first query.
+		/*
+		 * Pre-fetch reaction summaries for the notes the parent query actually
+		 * returns, so pagination, ordering, and `rest_comment_query` filters
+		 * all apply. The filter removes itself after the first query.
+		 */
 		$prefetch = null;
 		if (
 			! empty( $request['type'] ) &&

@@ -102,11 +102,13 @@ add_filter( 'comment_feed_where', 'gutenberg_exclude_internal_comment_types_from
  */
 function gutenberg_filter_comment_count_query_exclude_block_comments_7_2( $query ) {
 	if ( str_starts_with( $query, 'SELECT comment_post_ID, COUNT(comment_ID) as num_comments FROM' ) && str_contains( $query, 'comment_approved' ) ) {
-		// Add an exclusion clause for each internal type not already present.
-		// Core's query already hardcodes the note-only exclusion, so expanding
-		// per type - rather than bailing when any exclusion exists - ensures
-		// reactions are excluded too and keeps the filter idempotent if it
-		// runs more than once.
+		/*
+		 * Add an exclusion clause for each internal type not already present.
+		 * Core's query already hardcodes the note-only exclusion, so expanding
+		 * per type - rather than bailing when any exclusion exists - ensures
+		 * reactions are excluded too and keeps the filter idempotent if it
+		 * runs more than once.
+		 */
 		$type_clauses = array();
 		foreach ( array( 'note', 'reaction' ) as $internal_type ) {
 			$clause = "comment_type != '" . esc_sql( $internal_type ) . "'";
@@ -256,8 +258,10 @@ function gutenberg_delete_note_reactions( $comment_id, $comment ) {
 		return;
 	}
 
-	// Every status: trashing the note, or a REST delete without `force`,
-	// leaves reactions in the trash.
+	/*
+	 * Every status: trashing the note, or a REST delete without `force`,
+	 * leaves reactions in the trash.
+	 */
 	foreach ( gutenberg_get_note_reaction_ids( $comment ) as $reaction_id ) {
 		wp_delete_comment( $reaction_id, true );
 	}
