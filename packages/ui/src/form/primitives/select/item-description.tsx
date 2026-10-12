@@ -4,15 +4,32 @@ import { Text } from '../../../text';
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 import type { SelectItemDescriptionProps } from './types';
 
+const ITEM_DESCRIPTION_DIRECT_CHILD = Symbol();
+
+type InternalItemDescriptionProps = SelectItemDescriptionProps & {
+	validationToken?: typeof ITEM_DESCRIPTION_DIRECT_CHILD;
+};
+
 /**
- * Supplementary text below a select item label. Use it as a
- * direct child after `Select.ItemLabel`. Content should be text or
- * non-interactive inline markup.
+ * Supplementary content for a select item. Its text contributes to the item's
+ * accessible description. Use it as a direct child after `Select.ItemLabel`.
+ * Content should be text or non-interactive inline markup.
  */
-export const ItemDescription = forwardRef<
+const ItemDescription = forwardRef<
 	HTMLSpanElement,
 	SelectItemDescriptionProps
->( function ItemDescription( { className, ...restProps }, ref ) {
+>( function UnforwardedItemDescription( props, ref ) {
+	const { className, validationToken, ...restProps } =
+		props as InternalItemDescriptionProps;
+	if (
+		process.env.NODE_ENV !== 'production' &&
+		validationToken !== ITEM_DESCRIPTION_DIRECT_CHILD
+	) {
+		throw new Error(
+			'Select.ItemDescription: Missing direct select item parent. Render <Select.ItemDescription> as a direct child of <Select.Item>.'
+		);
+	}
+
 	return (
 		<Text
 			ref={ ref }
@@ -25,3 +42,5 @@ export const ItemDescription = forwardRef<
 		/>
 	);
 } );
+
+export { ITEM_DESCRIPTION_DIRECT_CHILD, ItemDescription };

@@ -121,7 +121,7 @@ export function FlatTermSelector( { slug } ) {
 				...DEFAULT_QUERY,
 				// Sort ids so reordering alone doesn't produce a new query key and re-fetch.
 				include: _termIds?.length
-					? [ ..._termIds ].sort( ( a, b ) => a - b ).join( ',' )
+					? _termIds.toSorted( ( a, b ) => a - b ).join( ',' )
 					: undefined,
 				per_page: -1,
 			};

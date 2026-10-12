@@ -1,4 +1,5 @@
 @use "../utils/theme-variables" as *;
+@use "@wordpress/base-styles/mixins" as *;
 
 // Matches CONFIG.surfaceBorderColor — not the WPDS stroke token (#dbdbdb).
 $surface-border-color: rgba(0, 0, 0, 0.1);
@@ -79,15 +80,12 @@ $padding-y-large: calc((calc(#{$control-height} * 1.2) - #{$base-font-height} - 
 		}
 
 		&:focus {
+			// Override style from wp-admin common.css.
 			box-shadow: none;
-			outline: none;
 		}
 
 		&:focus-visible {
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
-			// Windows high contrast mode.
-			outline: 2px solid transparent;
-			outline-offset: 0;
+			@include outset-ring__focus();
 		}
 	}
 

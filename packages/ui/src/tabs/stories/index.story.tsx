@@ -80,7 +80,7 @@ export const Minimal: StoryObj< typeof Tabs.Root > = {
 };
 
 export const SizeAndOverflowPlayground: StoryObj< typeof Tabs.Root > = {
-	render: function SizeAndOverflowPlayground( props ) {
+	render: function SizeAndOverflowPlaygroundRender( props ) {
 		const [ fullWidth, setFullWidth ] = useState( false );
 		return (
 			<div>

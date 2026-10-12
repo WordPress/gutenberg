@@ -383,8 +383,12 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			[ mediaEditKey ]: hasUploadPermissions
 				? editMediaEntity
 				: undefined,
-			[ openMediaEditorModalKey ]: ( { id, onUpdate, onClose } ) =>
-				openMediaEditorModal( { id, onUpdate, onClose } ),
+			[ openMediaEditorModalKey ]: ( {
+				id,
+				onUpdate,
+				onUndo,
+				onClose,
+			} ) => openMediaEditorModal( { id, onUpdate, onUndo, onClose } ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			[ mediaUploadOnSuccessKey ]: hasUploadPermissions
 				? mediaUploadOnSuccess

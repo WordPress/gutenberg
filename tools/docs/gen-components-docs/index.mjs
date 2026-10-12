@@ -128,6 +128,7 @@ await Promise.all(
 			typeDocs,
 			subcomponentTypeDocs,
 			tags,
+			deprecated: manifest.deprecated,
 		} );
 		const outputFile = path.resolve(
 			path.dirname( manifestPath ),

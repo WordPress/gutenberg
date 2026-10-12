@@ -39,6 +39,9 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - `backgroundImage`: `true`
   - `backgroundSize`: `true`
   - `gradient`: `true`
+- [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
+  - `minHeight`: `true`
+  - `minWidth`: `true`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `blockGap`: `{"__experimentalDefault":"2em","sides":["horizontal","vertical"]}`
   - `margin`: `["top","bottom"]`

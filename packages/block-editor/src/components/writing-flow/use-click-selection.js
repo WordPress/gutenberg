@@ -3,7 +3,13 @@ import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
 import { getBlockClientId } from '../../utils/dom';
-import { unlock } from '../../lock-unlock';
+
+// iOS WebKit places the caret on the tap itself, before the mouse events it
+// synthesizes from it. Other engines place it in the mousedown's default
+// action, which must run there.
+const placesCaretOnTap =
+	typeof window !== 'undefined' &&
+	!! window.CSS?.supports?.( '-webkit-touch-callout', 'none' );
 
 export default function useClickSelection() {
 	const { selectBlock } = useDispatch( blockEditorStore );
@@ -12,20 +18,16 @@ export default function useClickSelection() {
 		getBlockSelectionStart,
 		getSelectionStart,
 		hasMultiSelection,
-		canHostEditableRoot,
-		isBlockMultiSelected,
-		isAncestorMultiSelected,
-		__unstableIsFullySelected,
-	} = unlock( useSelect( blockEditorStore ) );
+	} = useSelect( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
-			// The block to collapse a multi-selection to on click, recorded
-			// on mousedown. See the comment in `onMouseDown`.
-			let clickCollapseClientId;
+			let pointerType;
+
+			function onPointerDown( event ) {
+				pointerType = event.pointerType;
+			}
 
 			function onMouseDown( event ) {
-				clickCollapseClientId = undefined;
-
 				// The main button.
 				// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 				if ( ! isSelectionEnabled() || event.button !== 0 ) {
@@ -34,6 +36,24 @@ export default function useClickSelection() {
 
 				const startClientId = getBlockSelectionStart();
 				const clickedClientId = getBlockClientId( event.target );
+
+				// A tap in the block the wrapper hosts, with the caret already
+				// placed by the tap: all the default action would do is focus
+				// the nearest focusable element (the field, its block element
+				// or a container), which the handover moves straight back to
+				// the wrapper. On iOS that flicker cancels the double tap word
+				// selection.
+				if (
+					placesCaretOnTap &&
+					pointerType === 'touch' &&
+					clickedClientId &&
+					clickedClientId === startClientId &&
+					node.contentEditable === 'true' &&
+					node.ownerDocument.activeElement === node
+				) {
+					event.preventDefault();
+					return;
+				}
 
 				if ( event.shiftKey ) {
 					// When selecting a single block in a document by holding the shift key,
@@ -94,63 +114,16 @@ export default function useClickSelection() {
 					// multiselection, as focus can be incurred by starting a
 					// multiselection (focus moved to first block's multi-
 					// controls).
-					if (
-						clickedClientId &&
-						__unstableIsFullySelected() &&
-						( isBlockMultiSelected( clickedClientId ) ||
-							isAncestorMultiSelected( clickedClientId ) )
-					) {
-						// Pressing on one of the selected blocks may start a
-						// drag of the whole selection, so wait for the click
-						// event to collapse the selection: no click fires
-						// when a drag takes place.
-						clickCollapseClientId = clickedClientId;
-					} else {
-						selectBlock( clickedClientId );
-					}
-				} else if (
-					clickedClientId &&
-					clickedClientId !== startClientId &&
-					canHostEditableRoot( clickedClientId )
-				) {
-					// Selecting the block makes its field inert under the
-					// engaged wrapper. Left to the re-render, that lands
-					// mid-click, after the browser placed the caret and focus
-					// in the field, and drops both. Do it now, so the default
-					// action places the caret through the host instead.
-					const editable = event.target.closest(
-						'[contenteditable="true"]'
-					);
-
-					if (
-						editable &&
-						getBlockClientId( editable ) === clickedClientId
-					) {
-						setContentEditableWrapper( node, true );
-						// Remove the attribute rather than set "inherit":
-						// Gecko does not map the invalid value to the inherit
-						// state and treats the element as non-editable.
-						editable.removeAttribute( 'contenteditable' );
-						selectBlock( clickedClientId, null );
-					}
+					selectBlock( clickedClientId );
 				}
 			}
 
-			function onClick() {
-				const clientId = clickCollapseClientId;
-				clickCollapseClientId = undefined;
-
-				if ( clientId && hasMultiSelection() ) {
-					selectBlock( clientId );
-				}
-			}
-
+			node.addEventListener( 'pointerdown', onPointerDown );
 			node.addEventListener( 'mousedown', onMouseDown );
-			node.addEventListener( 'click', onClick );
 
 			return () => {
+				node.removeEventListener( 'pointerdown', onPointerDown );
 				node.removeEventListener( 'mousedown', onMouseDown );
-				node.removeEventListener( 'click', onClick );
 			};
 		},
 		[
@@ -159,8 +132,6 @@ export default function useClickSelection() {
 			getBlockSelectionStart,
 			getSelectionStart,
 			hasMultiSelection,
-			isBlockMultiSelected,
-			isAncestorMultiSelected,
 		]
 	);
 }

@@ -2,9 +2,28 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 11.17.0 (2026-10-07)
+
+### New Features
+
+-   Add a `mariadbVersion` option and `WP_ENV_MARIADB_VERSION` environment variable to choose the MariaDB version used by the Docker runtime, including versions older than 10.4 ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
+-   Explain why `wp-env start` fails when a database was last used by a newer MariaDB version, which MariaDB cannot downgrade from ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
+-   Stop `wp-env start` with an error naming the image when an image cannot be pulled and is not available locally, such as a `mariadbVersion` that does not exist, instead of reporting that cached images will be used ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
+-   Make `wp db` commands, and so `wp-env reset`, work with a `mariadbVersion` older than 11.4. The MariaDB client in the CLI image requires TLS, which those servers do not offer, so the CLI image now runs the client without verifying the server certificate, as WP-CLI does from db-command 3.0 ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
+
 ### Bug Fixes
 
+-   Reject a `phpVersion` or `WP_ENV_PHP_VERSION` that is not only a version number, such as `8.2-apache` or `abc8`, instead of failing later because the Docker image does not exist ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
 -   Pass `-T` to `docker compose exec` when stdin is not a terminal, so commands run from a Git hook, which has a TTY on stdout but not on stdin, no longer fail with "cannot attach stdin to a TTY-enabled container" ([#78374](https://github.com/WordPress/gutenberg/pull/78374)).
+
+### Internal
+
+-   Update `@wp-playground/cli` to 3.1.56, which replaces the `fs-ext` optional dependency, compiled with `node-gyp` at install time, with `fs-ext-extra-prebuilt`, which ships prebuilt binaries and works without running install scripts ([#84012](https://github.com/WordPress/gutenberg/pull/84012)).
+-   Update `simple-git` to v4, which has better TypeScript support ([#84137](https://github.com/WordPress/gutenberg/pull/84137)).
 
 ## 11.16.0 (2026-09-23)
 

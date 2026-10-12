@@ -6,7 +6,7 @@ import * as Styled from './styles';
 export const ItemHelpText = forwardRef<
 	HTMLSpanElement,
 	WordPressComponentProps< { children: React.ReactNode }, 'span', true >
->( function ItemHelpText( props, ref ) {
+>( function UnforwardedItemHelpText( props, ref ) {
 	const menuContext = useContext( Context );
 
 	if ( ! menuContext?.store ) {

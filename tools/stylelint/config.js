@@ -176,6 +176,38 @@ module.exports = {
 				'no-duplicate-selectors': true,
 			},
 		},
+		{
+			/*
+			 * The admin design tokens experiment ships inside a cascade layer, and
+			 * layer priority REVERSES for `!important`: a layered `!important`
+			 * beats a third-party plugin's *unlayered* `!important`, even when the
+			 * plugin's stylesheet loads later. Allowing one would silently break
+			 * overrides the ecosystem has relied on for years. Normal declarations
+			 * are safe, since unlayered plugin CSS still wins.
+			 *
+			 * DELETE WHEN: `lib/experimental/wpds-admin/` is removed.
+			 */
+			files: [ 'lib/experimental/wpds-admin/**/*.css' ],
+			rules: {
+				'declaration-no-important': true,
+			},
+		},
+		{
+			/*
+			 * The single exception. `99-overrides.css` exists only to cancel
+			 * `!important` declarations in WordPress's admin CSS, which survive
+			 * being demoted into a lower layer because importance is compared
+			 * before layer order. Every rule in that file must cancel a specific
+			 * WordPress `!important` and record what would let it be deleted. Do
+			 * not widen this exception to any other file.
+			 *
+			 * DELETE WHEN: `lib/experimental/wpds-admin/` is removed.
+			 */
+			files: [ 'lib/experimental/wpds-admin/css/99-overrides.css' ],
+			rules: {
+				'declaration-no-important': null,
+			},
+		},
 	],
 	reportDescriptionlessDisables: true,
 };

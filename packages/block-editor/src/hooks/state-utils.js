@@ -1,4 +1,4 @@
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockDefaultClassName, getBlockType } from '@wordpress/blocks';
 import { splitSelectorList } from '@wordpress/global-styles-engine';
 
 /**
@@ -29,20 +29,69 @@ export function getRelativeRootSelector( rootSelector ) {
 }
 
 /**
+ * Returns the ancestor part of a block selector whose leading compound names
+ * a different block, e.g. `.wp-block-list > ` in List Item's `.wp-block-list > li`.
+ * Mirror of `gutenberg_get_state_selector_ancestor()` in PHP.
+ *
+ * @param {string}  selector A single block or feature selector.
+ * @param {string=} name     Name of the block being scoped.
+ * @return {string} The leading compound and its combinator, or an empty string.
+ */
+function getStateSelectorAncestor( selector, name ) {
+	const match = name && selector.match( /^\.(wp-block-[-_a-zA-Z0-9]+)/ );
+	if ( ! match || match[ 1 ] === getBlockDefaultClassName( name ) ) {
+		return '';
+	}
+
+	let ancestorLength = 0;
+	let nextCompound = '';
+	let depth = 0;
+
+	for ( let i = 0; i < selector.length; i++ ) {
+		const char = selector[ i ];
+
+		if ( char === '(' || char === '[' ) {
+			depth++;
+		} else if ( ( char === ')' || char === ']' ) && depth > 0 ) {
+			depth--;
+		} else if ( depth === 0 && /[\s>+~]/.test( char ) ) {
+			if ( ancestorLength ) {
+				break;
+			}
+			ancestorLength =
+				i + selector.slice( i ).match( /^[\s>+~]*/ )[ 0 ].length;
+			i = ancestorLength - 1;
+		} else if ( depth === 0 && ancestorLength ) {
+			nextCompound += char;
+		}
+	}
+
+	if ( ! nextCompound || nextCompound.includes( '.wp-block-' ) ) {
+		return '';
+	}
+
+	return selector.slice( 0, ancestorLength );
+}
+
+/**
  * Builds a scoped selector from a block selector and optional suffix.
  *
  * If the block selector targets a descendant, the descendant portion is scoped
  * under the provided base selector. Otherwise the base selector itself is used.
+ * When the leading compound names a different block (an ancestor outside this
+ * block's markup), it is kept and the next compound is scoped instead.
  *
- * @param {string} baseSelector  The block-instance scoping selector.
- * @param {string} blockSelector The block or feature selector from block metadata.
- * @param {string} suffix        Optional selector suffix, e.g. ":hover".
+ * @param {string}  baseSelector  The block-instance scoping selector.
+ * @param {string}  blockSelector The block or feature selector from block metadata.
+ * @param {string}  suffix        Optional selector suffix, e.g. ":hover".
+ * @param {string=} name          Optional name of the block being scoped.
  * @return {string} The scoped CSS selector.
  */
 export function buildScopedBlockSelector(
 	baseSelector,
 	blockSelector,
-	suffix = ''
+	suffix = '',
+	name
 ) {
 	if ( typeof blockSelector !== 'string' || ! blockSelector ) {
 		return splitSelectorList( baseSelector )
@@ -66,6 +115,8 @@ export function buildScopedBlockSelector(
 	return selectors
 		.map( ( selector ) => {
 			selector = selector.trim();
+			const ancestor = getStateSelectorAncestor( selector, name );
+			selector = selector.slice( ancestor.length );
 
 			/*
 			 * Replace only the leading block selector part (e.g. class name,
@@ -78,7 +129,7 @@ export function buildScopedBlockSelector(
 				return baseSelectors
 					.map(
 						( base ) =>
-							`${ base.trim() }${ selector.slice(
+							`${ ancestor }${ base.trim() }${ selector.slice(
 								match[ 0 ].length
 							) }${ suffix }`
 					)
@@ -86,7 +137,7 @@ export function buildScopedBlockSelector(
 			}
 
 			return baseSelectors
-				.map( ( base ) => `${ base.trim() }${ suffix }` )
+				.map( ( base ) => `${ ancestor }${ base.trim() }${ suffix }` )
 				.join( ', ' );
 		} )
 		.join( ', ' );

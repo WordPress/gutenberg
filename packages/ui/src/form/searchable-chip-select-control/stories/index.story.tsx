@@ -28,7 +28,13 @@ const meta: Meta< typeof SearchableChipSelectControl > = {
 		'SearchableChipSelectControl.Group': SearchableChipSelectControl.Group,
 		'SearchableChipSelectControl.GroupLabel':
 			SearchableChipSelectControl.GroupLabel,
+		'SearchableChipSelectControl.Separator':
+			SearchableChipSelectControl.Separator,
 		'SearchableChipSelectControl.Item': SearchableChipSelectControl.Item,
+		'SearchableChipSelectControl.ItemLabel':
+			SearchableChipSelectControl.ItemLabel,
+		'SearchableChipSelectControl.ItemDescription':
+			SearchableChipSelectControl.ItemDescription,
 		'SearchableChipSelectControl.ChipWithRemove':
 			SearchableChipSelectControl.ChipWithRemove,
 		'SearchableChipSelectControl.Collection':
@@ -57,6 +63,14 @@ export const Default: Story = {
 		...SearchableChipSelectStories.Default.args,
 		label: 'Label',
 		description: 'This is a description.',
+	},
+};
+
+export const WithItemDescriptions: Story = {
+	...SearchableChipSelectStories.WithItemDescriptions,
+	args: {
+		...SearchableChipSelectStories.WithItemDescriptions.args,
+		label: 'Fruit',
 	},
 };
 
@@ -215,7 +229,7 @@ export const AsyncItems: Story = {
 	render: function Template( args ) {
 		const [ loading, setLoading ] = useState( false );
 		const [ items, setItems ] = useState< typeof ITEMS >( [] );
-		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
+		const timeoutRef = useRef< ReturnType< typeof setTimeout > >( null );
 
 		return (
 			<SearchableChipSelectControl
@@ -233,13 +247,14 @@ export const AsyncItems: Story = {
 				}
 				emptyContent={ loading ? null : undefined }
 				onOpenChange={ ( open ) => {
-					if ( ! open ) {
+					if ( timeoutRef.current ) {
 						clearTimeout( timeoutRef.current );
+					}
+					if ( ! open ) {
 						return;
 					}
 					setLoading( true );
 					setItems( [] );
-					clearTimeout( timeoutRef.current );
 					timeoutRef.current = setTimeout( () => {
 						setItems( ITEMS );
 						setLoading( false );
@@ -273,6 +288,18 @@ export const Grouped: Story = {
 			GROUPED_ITEMS[ 0 ].items[ 0 ],
 			GROUPED_ITEMS[ 1 ].items[ 0 ],
 		],
+		label: 'Fruit',
+		description: 'Choose your favorite fruits.',
+	},
+};
+
+/**
+ * Use `SearchableChipSelectControl.Separator` to set choices apart from each other.
+ */
+export const WithSeparator: Story = {
+	...SearchableChipSelectStories.WithSeparator,
+	args: {
+		...SearchableChipSelectStories.WithSeparator.args,
 		label: 'Fruit',
 		description: 'Choose your favorite fruits.',
 	},
@@ -345,7 +372,9 @@ export const GroupedCreatable: Story = {
 									key={ item.value }
 									value={ item }
 								>
-									{ item.label }
+									<SearchableChipSelectControl.ItemLabel>
+										{ item.label }
+									</SearchableChipSelectControl.ItemLabel>
 								</SearchableChipSelectControl.Item>
 							) }
 						</SearchableChipSelectControl.Collection>
