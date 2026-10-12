@@ -33,7 +33,7 @@ final class SelectionTests: XCTestCase {
 		var url = URLComponents( string: base + "/wp-admin/post-new.php" )!
 		url.queryItems = [ URLQueryItem(
 			name: "content",
-			value: "<!-- wp:paragraph --><p>Alpha bravo charlie</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Delta echo foxtrot</p><!-- /wp:paragraph -->"
+			value: "<!-- wp:paragraph --><p>Alpha <em>bravo</em> charlie</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Delta echo foxtrot</p><!-- /wp:paragraph -->"
 		) ]
 		XCUIDevice.shared.system.open( url.url! )
 		safari.activate()
@@ -47,7 +47,9 @@ final class SelectionTests: XCTestCase {
 		let focused = web.textViews.matching( NSPredicate( format: "hasKeyboardFocus == true" ) ).firstMatch
 		XCTAssertTrue( focused.waitForExistence( timeout: 10 ), "The tap did not focus the paragraph" )
 
-		let first = paragraph( startingWith: "Alpha bravo" ).frame
+		// The emphasis makes "bravo" a text element of its own, with its
+		// own frame.
+		let bravo = web.staticTexts[ "bravo" ].frame
 		let target = second.frame
 
 		// Double tap the first word, "Delta".
@@ -57,13 +59,12 @@ final class SelectionTests: XCTestCase {
 
 		// The start handle's knob sits above the line, at the start of the
 		// word. The selection moves by as much as the finger does, so drag
-		// the knob straight up by the distance between the two paragraphs,
-		// to the start of the first one.
+		// the knob by the distance from the start of "Delta" to the start of
+		// "bravo".
 		let knob = target.minY - 6
-		let up = target.minY - first.minY
 		point( target.minX + 1, knob ).press(
 			forDuration: 0.5,
-			thenDragTo: point( target.minX + 1, knob - up ),
+			thenDragTo: point( bravo.minX + 1, knob - ( target.minY - bravo.minY ) ),
 			withVelocity: 60,
 			thenHoldForDuration: 1
 		)
@@ -73,6 +74,6 @@ final class SelectionTests: XCTestCase {
 
 		// Cutting a selection across the two paragraphs joins what is left
 		// of them into one.
-		editor.expectBlocks( [ Block( title: "Paragraph", text: " echo foxtrot" ) ] )
+		editor.expectBlocks( [ Block( title: "Paragraph", text: "Alpha  echo foxtrot" ) ] )
 	}
 }
