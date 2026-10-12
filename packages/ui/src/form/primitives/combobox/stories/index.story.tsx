@@ -576,7 +576,7 @@ export const PopupWidth: Story = {
 	render: ( args ) => (
 		<Combobox.Root { ...args }>
 			<Combobox.Trigger aria-label="Label" />
-			<Combobox.Popup width="sm">
+			<Combobox.Popup aria-label="Label" width="sm">
 				<div style={ inputWrapperStyle }>
 					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
