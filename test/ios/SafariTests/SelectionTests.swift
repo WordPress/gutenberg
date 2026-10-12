@@ -17,10 +17,19 @@ final class SelectionTests: XCTestCase {
 		safari.terminate()
 	}
 
-	/// Opens the post the blueprint seeds with paragraphs.
-	func openPost() {
-		let base = ProcessInfo.processInfo.environment[ "WP_BASE_URL" ] ?? "http://127.0.0.1:9400"
-		XCUIDevice.shared.system.open( URL( string: base + "/wp-admin/post.php?post=100&action=edit" )! )
+	var base: String {
+		ProcessInfo.processInfo.environment[ "WP_BASE_URL" ] ?? "http://127.0.0.1:9400"
+	}
+
+	/// Creates a new post with these paragraphs and opens it in the editor.
+	func openNewPost( paragraphs: [ String ] ) throws {
+		let requestUtils = RequestUtils( base: base )
+		try requestUtils.login()
+		let id = try requestUtils.createPost(
+			title: "Selection across paragraphs",
+			content: paragraphs.map { "<!-- wp:paragraph -->\n<p>\( $0 )</p>\n<!-- /wp:paragraph -->" }.joined( separator: "\n\n" )
+		)
+		XCUIDevice.shared.system.open( URL( string: base + "/wp-admin/post.php?post=\( id )&action=edit" )! )
 		safari.activate()
 		XCTAssertTrue( safari.wait( for: .runningForeground, timeout: 30 ) )
 	}
@@ -40,7 +49,7 @@ final class SelectionTests: XCTestCase {
 	}
 
 	func testHandleExtendsSelectionIntoPreviousParagraph() throws {
-		openPost()
+		try openNewPost( paragraphs: [ "Alpha bravo charlie", "Delta echo foxtrot" ] )
 
 		let second = paragraph( startingWith: "Delta echo" )
 		XCTAssertTrue( second.waitForExistence( timeout: 240 ), "The post did not load" )
@@ -81,6 +90,6 @@ final class SelectionTests: XCTestCase {
 			"The selection did not extend into the previous paragraph: \( paragraphs() )"
 		)
 		XCTAssertFalse( paragraphs().contains { $0.contains( "Delta" ) }, "The selected word is still there" )
-		XCTAssertEqual( paragraphs().count, 3, "The two paragraphs did not join" )
+		XCTAssertEqual( paragraphs().count, 1, "The two paragraphs did not join" )
 	}
 }
