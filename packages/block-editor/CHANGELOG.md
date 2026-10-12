@@ -15,6 +15,10 @@
 -   NavigableToolbar: Ignore menu focus guards so menus from `@wordpress/ui` open on the first click ([#84547](https://github.com/WordPress/gutenberg/pull/84547)).
 -   Inserter: Only show the block-section separator when both sections contain blocks, avoiding a double border above the tip ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
 
+### Internal
+
+-   Remove the private `toggleBlockSpotlight` action, the state it set, and the private `hasBlockSpotlight` selector. Notes were the only thing that dispatched the action and they now mark their block with the block highlight instead. `BlockList` reads `getEditedContentOnlySection` directly for the one case that still dims the canvas ([#81538](https://github.com/WordPress/gutenberg/pull/81538)).
+
 ## 18.1.0 (2026-10-07)
 
 ### New Features
@@ -42,10 +46,6 @@
 ### Internal
 
 -   Apply the disabled state to block binding menu triggers instead of their roots ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
-
-### Internal
-
--   Remove the private `toggleBlockSpotlight` action, the state it set, and the private `hasBlockSpotlight` selector. Notes were the only thing that dispatched the action and they now mark their block with the block highlight instead. `BlockList` reads `getEditedContentOnlySection` directly for the one case that still dims the canvas ([#81538](https://github.com/WordPress/gutenberg/pull/81538)).
 
 ## 18.0.0 (2026-09-23)
 
