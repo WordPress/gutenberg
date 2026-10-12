@@ -50,7 +50,7 @@ export interface ActionsProps extends ComponentProps< 'div' > {
 	children?: ReactNode;
 }
 
-export interface CloseIconProps extends Omit<
+export interface CloseIconButtonProps extends Omit<
 	IconButtonProps,
 	| 'loading'
 	| 'loadingAnnouncement'

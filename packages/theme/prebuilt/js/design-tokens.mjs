@@ -54,6 +54,7 @@ export default [
 	'--wpds-color-background-interactive-error-weak-disabled',
 	'--wpds-color-background-track-neutral-weak',
 	'--wpds-color-background-track-neutral',
+	'--wpds-color-background-thumb-neutral',
 	'--wpds-color-background-thumb-neutral-weak',
 	'--wpds-color-background-thumb-neutral-weak-active',
 	'--wpds-color-background-thumb-brand',

@@ -91,6 +91,19 @@ function useBlockProps( { name, style } ) {
 		return;
 	}
 
+	// An opted-in block applies the background, defaults included, itself.
+	const skipSerialization = getBlockSupport( name, [
+		BACKGROUND_SUPPORT_KEY,
+		'__experimentalSkipSerialization',
+	] );
+	if (
+		skipSerialization === true ||
+		( Array.isArray( skipSerialization ) &&
+			skipSerialization.includes( 'backgroundImage' ) )
+	) {
+		return;
+	}
+
 	const backgroundStyles = setBackgroundStyleDefaults( style?.background );
 
 	if ( ! backgroundStyles ) {

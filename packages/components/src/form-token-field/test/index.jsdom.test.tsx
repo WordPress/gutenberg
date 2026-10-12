@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
 	render,
 	screen,
@@ -9,7 +9,6 @@ import {
 import userEvent from '@testing-library/user-event';
 import type { ComponentProps } from 'react';
 import { useState } from '@wordpress/element';
-import { logged } from '@wordpress/deprecated';
 import FormTokenField from '../';
 
 globalThis.wpVitest.mockMatchMedia();
@@ -114,14 +113,6 @@ const SHOW_HOW_TO_DEPRECATION =
 	'`__experimentalShowHowTo` prop in wp.components.FormTokenField is deprecated since version 7.1. Please use `help` prop instead. Note: The `help` prop now defaults to the previous how-to text. Pass an empty string to hide it.';
 
 describe( 'FormTokenField', () => {
-	beforeEach( () => {
-		delete logged[ SHOW_HOW_TO_DEPRECATION ];
-	} );
-
-	afterEach( () => {
-		delete logged[ SHOW_HOW_TO_DEPRECATION ];
-	} );
-
 	describe( 'basic usage', () => {
 		it( "should add tokens with the input's value when pressing the enter key", async () => {
 			const user = userEvent.setup();

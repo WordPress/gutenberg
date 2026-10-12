@@ -13,11 +13,13 @@ import {
 	MediaReplaceFlow,
 	useBlockProps,
 	useBlockEditingMode,
+	__experimentalGetDimensionsClassesAndStyles as getDimensionsClassesAndStyles,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
 import { useRef, useEffect, useState } from '@wordpress/element';
 import { useReducedMotion } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
+import { inertValue } from '@wordpress/react-inert-value';
 import { useDispatch } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -68,6 +70,7 @@ function VideoEdit( {
 		width && height ? `${ width } / ${ height }` : undefined;
 	const videoStyle = {
 		...( aspectRatio && { aspectRatio } ),
+		...getDimensionsClassesAndStyles( attributes ).style,
 		...getShadowClassesAndStyles( attributes ).style,
 	};
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
@@ -260,7 +263,7 @@ function VideoEdit( {
 			<figure { ...blockProps }>
 				<video
 					controls={ controls }
-					inert={ ! isSingleSelected ? 'true' : undefined }
+					inert={ inertValue( ! isSingleSelected ) }
 					poster={ poster }
 					src={ src || temporaryURL }
 					ref={ videoPlayer }

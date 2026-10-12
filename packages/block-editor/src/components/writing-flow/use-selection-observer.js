@@ -184,30 +184,19 @@ export default function useSelectionObserver() {
 						// While the wrapper is editable it must hold focus: a
 						// nested editable element cannot retain it (the first
 						// DOM mutation moves focus to the host, inconsistently
-						// across browsers). Any focused element containing the
-						// caret hands over (Firefox focuses an ancestor block
-						// wrapper on a click in the inert field). UI elements
-						// and editables outside the block keep focus. The rich
-						// text instance owning the selection syncs it to the
-						// store itself.
+						// across browsers). Don't steal focus from UI elements
+						// (e.g. buttons) or editables outside the block (e.g.
+						// the post title). The rich text instance owning the
+						// selection syncs it to the store itself.
 						const { activeElement } = ownerDocument;
 						if (
 							activeElement !== node &&
 							activeElement?.isContentEditable &&
 							node.contains( activeElement ) &&
-							activeElement.contains( selection.anchorNode )
+							getBlockClientId( activeElement ) ===
+								collapsedClientId
 						) {
 							node.focus();
-						} else if (
-							// A click on the inert field leaves the default
-							// target (iframe body or page body) active but
-							// unfocused: take focus for the host.
-							( activeElement === node ||
-								activeElement === ownerDocument.body ) &&
-							ownerDocument.hasFocus() &&
-							! activeElement.matches( ':focus' )
-						) {
-							node.focus( { preventScroll: true } );
 						}
 
 						return;
@@ -445,9 +434,9 @@ export default function useSelectionObserver() {
 			}
 
 			// Native `selectionchange` events are asynchronous: a clipboard
-			// event may fire before the store has been updated with a cross
-			// block selection that was just made. Sync it before the clipboard
-			// handlers (bubble phase) read the store.
+			// event or a keydown may fire before the store has been updated
+			// with a cross block selection that was just made. Sync it before
+			// the handlers that read the store run.
 			function ensureMultiBlockSelectionSync( event ) {
 				const selection = defaultView.getSelection();
 
@@ -464,9 +453,22 @@ export default function useSelectionObserver() {
 					extractSelectionEndNode( selection, isTripleClick )
 				);
 
-				if ( startClientId !== endClientId ) {
-					onSelectionChange( event );
+				if ( startClientId === endClientId ) {
+					return;
 				}
+
+				// Skip when the store already reflects the block range. The
+				// sync runs on every keydown, and a `multiSelect` dispatch
+				// announces itself to screen readers, so an unchanged range
+				// must not be dispatched again.
+				if (
+					getSelectionStart().clientId === startClientId &&
+					getSelectionEnd().clientId === endClientId
+				) {
+					return;
+				}
+
+				onSelectionChange( event );
 			}
 
 			ownerDocument.addEventListener(
@@ -481,6 +483,13 @@ export default function useSelectionObserver() {
 			defaultView.addEventListener( 'mouseup', onMouseUp );
 			node.addEventListener( 'mousedown', onMouseDown );
 			node.addEventListener( 'keydown', onKeyDown );
+			// On the window, so it runs before any document listener that
+			// reads the store on keydown, whatever order they were added in.
+			defaultView.addEventListener(
+				'keydown',
+				ensureMultiBlockSelectionSync,
+				true
+			);
 			ownerDocument.addEventListener(
 				'copy',
 				ensureMultiBlockSelectionSync,
@@ -504,6 +513,11 @@ export default function useSelectionObserver() {
 				defaultView.removeEventListener( 'mouseup', onMouseUp );
 				node.removeEventListener( 'mousedown', onMouseDown );
 				node.removeEventListener( 'keydown', onKeyDown );
+				defaultView.removeEventListener(
+					'keydown',
+					ensureMultiBlockSelectionSync,
+					true
+				);
 				ownerDocument.removeEventListener(
 					'copy',
 					ensureMultiBlockSelectionSync,
