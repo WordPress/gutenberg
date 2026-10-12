@@ -211,7 +211,8 @@
 
 			.is-minimal-variant.is-scrolling[data-orientation="horizontal"] &::after {
 				/* Keep the outline inside the scrolling list's clipped edges. */
-				inset-inline: round(up, calc(var(--wpds-border-width-focus) + var(--wpds-dimension-padding-xs)), 1px);
+				inset-inline: round(up, var(--wpds-border-width-focus), 1px);
+				outline-offset: 0;
 			}
 
 			[data-orientation="vertical"] & {
