@@ -1,5 +1,5 @@
 import { getScrollContainer } from '@wordpress/dom';
-import { getNoteAnchorRect } from './utils';
+import { getHiddenBlockAnchorRect, getNoteAnchorRect } from './utils';
 
 const EMPTY_SNAPSHOT = {
 	heights: {},
@@ -39,6 +39,7 @@ function isSameHeights( a, b ) {
 export function createBoardStore() {
 	const listeners = new Set();
 	const blockRefs = new Map();
+	const clientIds = new Map();
 	const floatingRefs = new Map();
 	const idByElement = new WeakMap();
 	const heights = {};
@@ -47,6 +48,7 @@ export function createBoardStore() {
 	let frameEl = null;
 	let observer = null;
 	let styleObserver = null;
+	let blockOrder = [];
 	let snapshot = EMPTY_SNAPSHOT;
 
 	function measure() {
@@ -55,8 +57,19 @@ export function createBoardStore() {
 		const scrollTop = canvas?.scrollTop ?? 0;
 		const anchorRects = {};
 		for ( const [ id, blockEl ] of blockRefs ) {
-			if ( blockEl ) {
-				const rect = getNoteAnchorRect( id, blockEl );
+			// A block hidden at the current viewport renders nothing once it
+			// is deselected. Anchor its threads to the place it would take.
+			const rect = blockEl
+				? getNoteAnchorRect( id, blockEl )
+				: getHiddenBlockAnchorRect(
+						clientIds.get( id ),
+						blockOrder,
+						( clientId ) =>
+							rootEl?.ownerDocument.getElementById(
+								`block-${ clientId }`
+							) ?? null
+					);
+			if ( rect ) {
 				anchorRects[ id ] = { top: rect.top + scrollTop };
 			}
 		}
@@ -132,6 +145,20 @@ export function createBoardStore() {
 		}
 	}
 
+	// With every noted block hidden there is no block to climb from, so look
+	// the root up from the threads' document. The canvas is iframed unless
+	// something (e.g. meta boxes) forces same-document rendering.
+	function findCanvasRoot() {
+		const doc = [ ...floatingRefs.values() ][ 0 ]?.ownerDocument;
+		if ( ! doc ) {
+			return null;
+		}
+		const canvasDoc =
+			doc.querySelector( 'iframe[name="editor-canvas"]' )
+				?.contentDocument ?? doc;
+		return canvasDoc.querySelector( '.is-root-container' );
+	}
+
 	// Watch the block-list root, so editing, adding or removing any block
 	// re-anchors the threads after it. Climbing to the root also keeps nested
 	// scroll containers (e.g. a Group with overflow:auto) from shadowing the
@@ -139,7 +166,9 @@ export function createBoardStore() {
 	function syncRoot() {
 		const blockEl = [ ...blockRefs.values() ].find( Boolean );
 		const nextRootEl =
-			blockEl?.closest( '.is-root-container' ) ?? blockEl ?? null;
+			blockEl?.closest( '.is-root-container' ) ??
+			blockEl ??
+			findCanvasRoot();
 		if ( nextRootEl === rootEl ) {
 			return;
 		}
@@ -214,8 +243,18 @@ export function createBoardStore() {
 
 		requestMeasure,
 
-		registerThread( id, blockEl, floatingEl ) {
+		// Document order of every block, so a thread whose block isn't
+		// rendered can be placed between the neighbours that are.
+		setBlockOrder( clientIdsInOrder ) {
+			if ( clientIdsInOrder !== blockOrder ) {
+				blockOrder = clientIdsInOrder;
+				requestMeasure();
+			}
+		},
+
+		registerThread( id, blockEl, floatingEl, clientId ) {
 			blockRefs.set( id, blockEl );
+			clientIds.set( id, clientId );
 			if ( floatingRefs.get( id ) !== floatingEl ) {
 				untrackFloating( id );
 				floatingRefs.set( id, floatingEl );
@@ -228,6 +267,7 @@ export function createBoardStore() {
 
 		unregisterThread( id ) {
 			blockRefs.delete( id );
+			clientIds.delete( id );
 			untrackFloating( id );
 			delete heights[ id ];
 			syncRoot();

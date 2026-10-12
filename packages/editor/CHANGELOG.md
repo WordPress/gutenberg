@@ -14,6 +14,7 @@
 
 -   Notes: Highlight the text an unsent note is about, and keep the note anchored to it when the selection changes or the text is edited before the note is sent ([#84125](https://github.com/WordPress/gutenberg/pull/84125)).
 -   Notes: Select the note under the caret: an inline note while the caret is inside its highlight, otherwise the block's unsent draft or block-level note, instead of an inline note on any click in the block ([#84147](https://github.com/WordPress/gutenberg/pull/84147)).
+-   Notes: Keep a floating note thread at its block's place in the document when the block is hidden at the current viewport, and label the thread as hidden, instead of hiding it until the block is selected ([#81549](https://github.com/WordPress/gutenberg/pull/81549)).
 
 ## 15.2.0 (2026-10-07)
 
