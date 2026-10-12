@@ -511,6 +511,18 @@ export function isNoteFocused( state ) {
 }
 
 /**
+ * Returns the emoji a note can be reacted with, as the server supplied them.
+ * Private so the data can move off editor settings without breaking anyone.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {*} The raw `noteReactionEmojis` editor setting, unvalidated.
+ */
+export function getNoteReactionEmojis( state ) {
+	return getEditorSettings( state ).noteReactionEmojis;
+}
+
+/**
  * Returns the previous revision (the one before the current revision).
  * Used for diffing between revisions.
  *

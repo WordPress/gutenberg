@@ -10,7 +10,12 @@ import { Button, IconButton, Menu, Stack, Tooltip } from '@wordpress/ui';
 import { ThemeProvider } from '@wordpress/theme';
 import { reaction as reactionIcon } from '@wordpress/icons';
 import { store as editorStore } from '../../../store';
-import { REACTION_EMOJIS, getReactionEmoji } from './reaction-emojis';
+import {
+	getReactionEmoji,
+	hexKeyToEmoji,
+	useReactionEmojis,
+} from './reaction-emojis';
+import type { ReactionEmoji } from './reaction-emojis';
 import { useNoteReactions } from './use-note-reactions';
 
 interface ReactionButtonProps {
@@ -18,6 +23,7 @@ interface ReactionButtonProps {
 	hexKey: string;
 	count: number;
 	isActive: boolean;
+	emoji: ReactionEmoji | undefined;
 	disabled: boolean;
 	onToggle: ( hexKey: string ) => void;
 }
@@ -75,6 +81,7 @@ function ReactionButton( {
 	hexKey,
 	count,
 	isActive,
+	emoji,
 	disabled,
 	onToggle,
 }: ReactionButtonProps ) {
@@ -103,7 +110,6 @@ function ReactionButton( {
 	const names = reactions
 		?.filter( ( reaction ) => reaction.content.raw === hexKey )
 		.map( ( reaction ) => reaction.author_name );
-	const emoji = getReactionEmoji( hexKey );
 	const emojiLabel = emoji?.label ?? hexKey;
 	// Names that don't add up to the count are stale until the refetch lands.
 	const label =
@@ -151,7 +157,7 @@ function ReactionButton( {
 				}
 			>
 				<span className="editor-collab-sidebar-panel__reaction-button-emoji">
-					{ emoji?.emoji ?? hexKey }
+					{ emoji?.emoji || hexKeyToEmoji( hexKey ) || hexKey }
 				</span>
 				<span>{ count.toLocaleString() }</span>
 			</Tooltip.Trigger>
@@ -175,9 +181,12 @@ export function NoteReactions( {
 	disabled,
 }: NoteReactionsProps ) {
 	const [ reactions, toggleReaction ] = useNoteReactions( noteId );
+	const emojis = useReactionEmojis();
 	const entries = Object.entries( reactions ?? {} );
+	// Nothing to offer when the site has filtered the reaction emoji to none.
+	const canAddReaction = canReact && emojis.length > 0;
 
-	if ( ! entries.length && ! canReact ) {
+	if ( ! entries.length && ! canAddReaction ) {
 		return null;
 	}
 
@@ -196,22 +205,29 @@ export function NoteReactions( {
 					'is-floating': ! entries.length,
 				} ) }
 			>
-				{ entries.map( ( [ hexKey, entry ] ) => (
-					<ReactionButton
-						key={ hexKey }
-						noteId={ noteId }
-						hexKey={ hexKey }
-						count={ entry.count }
-						isActive={ entry.current_user_reaction > 0 }
-						disabled={ disabled }
-						onToggle={ toggleReaction }
-					/>
-				) ) }
+				{ entries.map( ( [ hexKey, entry ] ) => {
+					const isActive = entry.current_user_reaction > 0;
+					// An emoji the site no longer offers keeps its pill, which
+					// can still remove the user's own reaction but not add one.
+					const emoji = getReactionEmoji( emojis, hexKey );
+					return (
+						<ReactionButton
+							key={ hexKey }
+							noteId={ noteId }
+							hexKey={ hexKey }
+							count={ entry.count }
+							isActive={ isActive }
+							emoji={ emoji }
+							disabled={ disabled || ( ! emoji && ! isActive ) }
+							onToggle={ toggleReaction }
+						/>
+					);
+				} ) }
 				{ /*
 				 * Same tree position with or without pills: moving it when the
 				 * first reaction lands would remount the open picker's trigger.
 				 */ }
-				{ canReact && (
+				{ canAddReaction && (
 					<Menu.Root>
 						<Menu.Trigger
 							render={
@@ -231,30 +247,26 @@ export function NoteReactions( {
 								<Menu.Positioner side="bottom" align="end" />
 							}
 						>
-							{ REACTION_EMOJIS.map(
-								( { emoji, hexKey, label } ) => (
-									<Menu.CheckboxItem
-										key={ hexKey }
-										checked={
-											!! reactions?.[ hexKey ]
-												?.current_user_reaction
-										}
-										onCheckedChange={ () =>
-											toggleReaction( hexKey )
-										}
-										closeOnClick
-										prefix={
-											<span className="editor-collab-sidebar-panel__reaction-option-emoji">
-												{ emoji }
-											</span>
-										}
-									>
-										<Menu.ItemLabel>
-											{ label }
-										</Menu.ItemLabel>
-									</Menu.CheckboxItem>
-								)
-							) }
+							{ emojis.map( ( { emoji, hexKey, label } ) => (
+								<Menu.CheckboxItem
+									key={ hexKey }
+									checked={
+										!! reactions?.[ hexKey ]
+											?.current_user_reaction
+									}
+									onCheckedChange={ () =>
+										toggleReaction( hexKey )
+									}
+									closeOnClick
+									prefix={
+										<span className="editor-collab-sidebar-panel__reaction-option-emoji">
+											{ emoji }
+										</span>
+									}
+								>
+									<Menu.ItemLabel>{ label }</Menu.ItemLabel>
+								</Menu.CheckboxItem>
+							) ) }
 						</Menu.Popup>
 					</Menu.Root>
 				) }

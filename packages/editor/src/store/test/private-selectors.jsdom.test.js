@@ -3,6 +3,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	getDefaultRenderingMode,
+	getNoteReactionEmojis,
 	getPostBlocksByName,
 	isCollaborationEnabledForCurrentPost,
 } from '../private-selectors';
@@ -245,5 +246,20 @@ describe( 'getDefaultRenderingMode', () => {
 				'post-only'
 			);
 		} );
+	} );
+} );
+
+describe( 'getNoteReactionEmojis', () => {
+	it( 'returns the noteReactionEmojis editor setting', () => {
+		const emojis = [ { hexKey: '1f984', label: 'unicorn' } ];
+		const state = { editorSettings: { noteReactionEmojis: emojis } };
+
+		expect( getNoteReactionEmojis( state ) ).toBe( emojis );
+	} );
+
+	it( 'returns undefined when the setting is missing', () => {
+		expect(
+			getNoteReactionEmojis( { editorSettings: {} } )
+		).toBeUndefined();
 	} );
 } );
