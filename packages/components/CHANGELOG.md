@@ -19,7 +19,7 @@
 
 ### Bug Fixes
 
--   `ExternalLink`: Match underline color to link text and strengthen hover, active, and keyboard-focus styles ([#82294](https://github.com/WordPress/gutenberg/pull/82294)).
+-   `ExternalLink`: Match underline color to link text and strengthen hover, active, and keyboard-focus styles ([#84570](https://github.com/WordPress/gutenberg/pull/84570)).
 -   `Tabs`: Restore the `fit-content` width of horizontal tab lists, which stretched to full width after the SCSS Modules migration ([#84626](https://github.com/WordPress/gutenberg/pull/84626)).
 -   `InputControl`, `NumberControl`, `UnitControl`: Ignore the drag gesture for touch input, where it has no cursor affordance and is easy to trigger by accident ([#38865](https://github.com/WordPress/gutenberg/issues/38865), [#81519](https://github.com/WordPress/gutenberg/pull/81519)).
 -   `Modal`: Keep focus inside the dialog when `focusOnMount="firstContentElement"` finds no tabbable elements in the content ([#84344](https://github.com/WordPress/gutenberg/pull/84344)).

@@ -20,7 +20,7 @@
 
 ### Bug Fixes
 
--   `Link`: Match underline color to link text and strengthen hover, active, and keyboard-focus styles ([#82294](https://github.com/WordPress/gutenberg/pull/82294)).
+-   `Link`: Match underline color to link text and strengthen hover, active, and keyboard-focus styles ([#84570](https://github.com/WordPress/gutenberg/pull/84570)).
 -   `Breadcrumb`: Apply hierarchy-selection labels to the ordered list instead of its wrapper, while retaining navigation landmark labels for page breadcrumbs ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
 -   `Breadcrumb`: Align button, link, and current-item padding, separate button hover backgrounds from separators, and preserve list semantics in Safari ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
 -   `Breadcrumb.CurrentItem`: Exclude false values from the `aria-current` type ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
