@@ -140,6 +140,14 @@ export const getInsertBlockTypeDependants = () => ( state, rootClientId ) => {
 		state.blocks.order.get( rootClientId || '' ),
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
+		/*
+		 * Preview mode refuses insertion outright, and unlike the settings
+		 * above it flips while the editor is running - switching the editor
+		 * intent to "view" turns it on and back off again. Without it here,
+		 * every answer cached before the switch survives it, so the editor
+		 * goes on believing it can insert blocks in a read-only canvas.
+		 */
+		state.settings.isPreviewMode,
 		getBlockEditingMode( state, rootClientId ),
 		getSectionRootClientId( state ),
 		isSectionBlock( state, rootClientId ),

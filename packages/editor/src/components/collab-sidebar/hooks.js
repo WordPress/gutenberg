@@ -43,13 +43,26 @@ const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
  */
 export const NoteDraftsContext = createContext();
 
-export function useNoteThreads( postId ) {
-	const queryArgs = {
+/**
+ * Query that loads every note thread on a post, replies included. Exported so
+ * code outside the sidebar can read the same cached list synchronously with
+ * `select( coreStore ).getEntityRecords()` — a queried list is only found under
+ * the exact query it was fetched with.
+ *
+ * @param {number} postId Post id.
+ * @return {Object} Query arguments for the `root`/`comment` entity.
+ */
+export function getNoteThreadsQuery( postId ) {
+	return {
 		post: postId,
 		type: 'note',
 		status: 'all',
 		per_page: -1,
 	};
+}
+
+export function useNoteThreads( postId ) {
+	const queryArgs = getNoteThreadsQuery( postId );
 
 	const { records: threads } = useEntityRecords(
 		'root',
@@ -326,13 +339,19 @@ export function useNoteActions() {
 		try {
 			// For resolution or reopen actions, create a new note with metadata.
 			if ( status === 'approved' || status === 'hold' ) {
-				// First, update the thread status.
+				// First, update the thread status. Reopening a suggestion also
+				// puts its decision back to pending, or it would still read as
+				// decided and offer no Accept or Reject.
 				await saveEntityRecord(
 					'root',
 					'comment',
 					{
 						id,
 						status,
+						...( status === 'hold' &&
+							note.meta?._wp_suggestion && {
+								meta: { _wp_suggestion_status: 'pending' },
+							} ),
 					},
 					{
 						throwOnError: true,

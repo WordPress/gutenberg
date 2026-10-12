@@ -1,6 +1,27 @@
 <?php
 /**
- * Unit tests covering WP_Test_REST_Comments_Controller_Gutenberg functionality.
+ * Tests for the Gutenberg REST comment controller subclass that backs block
+ * notes and suggestions.
+ *
+ * Coverage areas:
+ *   - **Permissions**: that post editors can create/read/update note comments
+ *     and apply suggestions through core's `edit_comment` check (mapped to
+ *     `edit_post` on the parent post); that contributors and subscribers are
+ *     gated as expected.
+ *   - **Suggestion meta round-trip**: that `_wp_suggestion` and
+ *     `_wp_suggestion_status` survive create + read + update, and that the
+ *     payload-size cap (`GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES`) is
+ *     enforced with a 413 before the meta sanitize_callback can silently
+ *     truncate the JSON.
+ *   - **Note vs. regular comment divergence**: that `note`-typed comments
+ *     follow the new permission model while plain `comment`-type traffic
+ *     stays on core's defaults.
+ *   - **Meta registration setup**: every test re-registers the note meta
+ *     (`wp_create_initial_comment_meta()`, core) and the suggestion meta
+ *     (`gutenberg_register_suggestion_meta()`, Gutenberg 7.1) because
+ *     `WP_UnitTestCase_Base` wipes `$wp_meta_keys` between tests; without
+ *     this REST sees `_wp_suggestion` as unregistered and silently
+ *     no-ops on writes, masking real failures.
  *
  * @package gutenberg
  */
@@ -56,6 +77,25 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		self::delete_user( self::$contributor_id );
 		self::delete_user( self::$subscriber_id );
 		self::delete_user( self::$author_id );
+	}
+
+	/**
+	 * Re-register the note/suggestion comment meta before each test.
+	 *
+	 * `WP_UnitTestCase_Base::tear_down()` wipes the global `$wp_meta_keys`
+	 * registry between tests, but the meta is only registered once on `init`.
+	 * Without re-registering, REST writes to `_wp_note_status` /
+	 * `_wp_suggestion` (and friends) silently no-op for any test after the
+	 * first because the meta isn't recognized as a registered REST field.
+	 *
+	 * `_wp_note_status` graduated to WordPress 6.9 core
+	 * (`wp_create_initial_comment_meta()`); the suggestion meta is the
+	 * Gutenberg 7.1 addition (`gutenberg_register_suggestion_meta()`).
+	 */
+	public function set_up() {
+		parent::set_up();
+		wp_create_initial_comment_meta();
+		gutenberg_register_suggestion_meta();
 	}
 
 	/**
@@ -454,5 +494,1113 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			'resolved' => array( 'resolved' ),
 			'reopen'   => array( 'reopen' ),
 		);
+	}
+
+	/**
+	 * Test that a suggestion payload can be stored and retrieved via meta.
+	 */
+	public function test_create_note_with_suggestion_meta() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		$payload = wp_json_encode(
+			array(
+				'schemaVersion' => 1,
+				'blockName'     => 'core/paragraph',
+				'baseRevision'  => '2026-04-15T00:00:00',
+				'operations'    => array(
+					array(
+						'type'      => 'attribute-set',
+						'attribute' => 'content',
+						'before'    => 'Hello',
+						'after'     => 'Hello world',
+					),
+				),
+			)
+		);
+
+		$params = array(
+			'post'    => $post_id,
+			'content' => '',
+			'type'    => 'note',
+			'author'  => self::$editor_id,
+			'meta'    => array(
+				'_wp_suggestion' => $payload,
+			),
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 201, $response->get_status() );
+
+		$data       = $response->get_data();
+		$comment_id = $data['id'] ?? null;
+		$this->assertIsInt( $comment_id );
+
+		// Bypass REST schema variability across WP versions and check the
+		// stored meta directly. The sanitize_callback is in scope of this
+		// test; the REST layer assembles schemas at runtime in a way that
+		// isn't always available in the experimental phpunit harness.
+		$stored = get_comment_meta( $comment_id, '_wp_suggestion', true );
+		$this->assertNotEmpty( $stored, 'Suggestion meta should round-trip into storage.' );
+		$decoded = json_decode( $stored, true );
+		$this->assertSame( 'core/paragraph', $decoded['blockName'] ?? null );
+		$this->assertSame( 1, $decoded['schemaVersion'] ?? null );
+		$this->assertCount( 1, $decoded['operations'] ?? array() );
+	}
+
+	/**
+	 * Dispatch a note carrying one post-level suggestion operation.
+	 *
+	 * @param int   $post_id   Post ID.
+	 * @param array $operation The `post-attribute-set` operation.
+	 * @return WP_REST_Response The response.
+	 */
+	protected function create_post_field_suggestion( $post_id, $operation ) {
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'content' => '',
+					'type'    => 'note',
+					'author'  => get_current_user_id(),
+					'meta'    => array(
+						'_wp_suggestion' => wp_json_encode(
+							array(
+								'schemaVersion' => 2,
+								'blockName'     => '',
+								'baseRevision'  => null,
+								'operations'    => array(
+									array_merge(
+										array( 'type' => 'post-attribute-set' ),
+										$operation
+									),
+								),
+							)
+						),
+					),
+				)
+			)
+		);
+		return rest_get_server()->dispatch( $request );
+	}
+
+	/**
+	 * Test that the post fields Suggestion mode proposes are accepted.
+	 *
+	 * @dataProvider data_suggestable_post_fields
+	 *
+	 * @param array $operation The operation, without its type.
+	 */
+	public function test_create_note_with_suggestable_post_field( $operation ) {
+		wp_set_current_user( self::$editor_id );
+		register_post_meta(
+			'post',
+			'gutenberg_test_suggestable',
+			array(
+				'show_in_rest' => true,
+				'single'       => true,
+				'type'         => 'string',
+			)
+		);
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		$response = $this->create_post_field_suggestion( $post_id, $operation );
+
+		$this->assertSame( 201, $response->get_status() );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_suggestable_post_fields() {
+		return array(
+			'excerpt'         => array(
+				array(
+					'attribute' => 'excerpt',
+					'before'    => '',
+					'after'     => 'x',
+				),
+			),
+			'featured image'  => array(
+				array(
+					'attribute' => 'featured_media',
+					'before'    => 5,
+					'after'     => 0,
+				),
+			),
+			'categories'      => array(
+				array(
+					'attribute' => 'categories',
+					'before'    => array(),
+					'after'     => array( 1 ),
+				),
+			),
+			'registered meta' => array(
+				array(
+					'attribute' => 'meta',
+					'key'       => 'gutenberg_test_suggestable',
+					'before'    => '',
+					'after'     => 'x',
+				),
+			),
+			'new tag'         => array(
+				array(
+					'attribute' => 'tags',
+					'before'    => array(),
+					'after'     => array( array( 'name' => 'Fresh' ) ),
+				),
+			),
+			'new subcategory' => array(
+				array(
+					'attribute' => 'categories',
+					'before'    => array( 1 ),
+					'after'     => array(
+						1,
+						array(
+							'name'   => 'Fresh',
+							'parent' => 1,
+						),
+					),
+				),
+			),
+		);
+	}
+
+	/**
+	 * Test that a suggestion for a post field Suggestion mode cannot
+	 * propose, or for a meta key the suggester could not edit, is refused.
+	 *
+	 * @dataProvider data_unsuggestable_post_fields
+	 *
+	 * @param array $operation The operation, without its type.
+	 */
+	public function test_cannot_create_note_with_unsuggestable_post_field( $operation ) {
+		wp_set_current_user( self::$editor_id );
+		register_post_meta(
+			'post',
+			'gutenberg_test_hidden',
+			array(
+				'show_in_rest' => false,
+				'single'       => true,
+				'type'         => 'string',
+			)
+		);
+		register_post_meta(
+			'post',
+			'_gutenberg_test_protected',
+			array(
+				'show_in_rest'  => true,
+				'single'        => true,
+				'type'          => 'string',
+				'auth_callback' => '__return_false',
+			)
+		);
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		$response = $this->create_post_field_suggestion( $post_id, $operation );
+
+		$this->assertErrorResponse( 'rest_invalid_suggestion', $response, 400 );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_unsuggestable_post_fields() {
+		return array(
+			'status'             => array(
+				array(
+					'attribute' => 'status',
+					'before'    => 'draft',
+					'after'     => 'publish',
+				),
+			),
+			'author'             => array(
+				array(
+					'attribute' => 'author',
+					'before'    => 1,
+					'after'     => 2,
+				),
+			),
+			'unregistered meta'  => array(
+				array(
+					'attribute' => 'meta',
+					'key'       => 'gutenberg_test_unregistered',
+					'before'    => '',
+					'after'     => 'x',
+				),
+			),
+			'meta not in REST'   => array(
+				array(
+					'attribute' => 'meta',
+					'key'       => 'gutenberg_test_hidden',
+					'before'    => '',
+					'after'     => 'x',
+				),
+			),
+			'meta not editable'  => array(
+				array(
+					'attribute' => 'meta',
+					'key'       => '_gutenberg_test_protected',
+					'before'    => '',
+					'after'     => 'x',
+				),
+			),
+			'meta without a key' => array(
+				array(
+					'attribute' => 'meta',
+					'before'    => '',
+					'after'     => 'x',
+				),
+			),
+			'term not an id'     => array(
+				array(
+					'attribute' => 'tags',
+					'before'    => array(),
+					'after'     => array( 'Fresh' ),
+				),
+			),
+			'terms not a list'   => array(
+				array(
+					'attribute' => 'tags',
+					'before'    => array(),
+					'after'     => 'Fresh',
+				),
+			),
+			'new term unnamed'   => array(
+				array(
+					'attribute' => 'tags',
+					'before'    => array(),
+					'after'     => array( array( 'name' => '  ' ) ),
+				),
+			),
+			'flat term parent'   => array(
+				array(
+					'attribute' => 'tags',
+					'before'    => array(),
+					'after'     => array(
+						array(
+							'name'   => 'Fresh',
+							'parent' => 1,
+						),
+					),
+				),
+			),
+			'unknown parent'     => array(
+				array(
+					'attribute' => 'categories',
+					'before'    => array(),
+					'after'     => array(
+						array(
+							'name'   => 'Fresh',
+							'parent' => 999999,
+						),
+					),
+				),
+			),
+		);
+	}
+
+	/**
+	 * Creates a post field suggestion and returns the stored operation.
+	 *
+	 * @param int   $post_id   Post ID.
+	 * @param array $operation The operation, without its type.
+	 * @return array The stored operation.
+	 */
+	protected function store_post_field_suggestion( $post_id, $operation ) {
+		$response = $this->create_post_field_suggestion( $post_id, $operation );
+		$this->assertSame( 201, $response->get_status() );
+		$payload = json_decode(
+			get_comment_meta( $response->get_data()['id'], '_wp_suggestion', true ),
+			true
+		);
+		return $payload['operations'][0];
+	}
+
+	/**
+	 * Test that a suggested title or excerpt gets the filtering core applies
+	 * to that field for a user without `unfiltered_html`: the title is
+	 * limited to the tags allowed in comments, the excerpt to post markup.
+	 *
+	 * @dataProvider data_filtered_text_post_fields
+	 *
+	 * @param string $attribute Post field.
+	 * @param string $expected  Stored value.
+	 */
+	public function test_suggested_text_post_field_is_filtered_like_the_field( $attribute, $expected ) {
+		wp_set_current_user( self::$author_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
+
+		$operation = $this->store_post_field_suggestion(
+			$post_id,
+			array(
+				'attribute' => $attribute,
+				'before'    => '',
+				'after'     => '<img src="x.png"><div class="c" onclick="x()">Hello</div> <b>there</b><script>y</script>',
+			)
+		);
+
+		$this->assertSame( $expected, $operation['after'] );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_filtered_text_post_fields() {
+		return array(
+			'title'   => array( 'title', 'Hello <b>there</b>' ),
+			'excerpt' => array( 'excerpt', '<img src="x.png"><div class="c">Hello</div> <b>there</b>' ),
+		);
+	}
+
+	/**
+	 * Test that a user with `unfiltered_html` keeps markup in a suggested
+	 * title or excerpt, as when editing the field directly.
+	 *
+	 * @dataProvider data_text_post_fields
+	 *
+	 * @param string $attribute Post field.
+	 */
+	public function test_suggested_text_post_field_keeps_markup_for_user_with_unfiltered_html( $attribute ) {
+		wp_set_current_user( self::$admin_id );
+		if ( is_multisite() ) {
+			grant_super_admin( self::$admin_id );
+		}
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$admin_id ) );
+
+		$operation = $this->store_post_field_suggestion(
+			$post_id,
+			array(
+				'attribute' => $attribute,
+				'before'    => '',
+				'after'     => '<div class="c">Hello</div>',
+			)
+		);
+
+		$this->assertSame( '<div class="c">Hello</div>', $operation['after'] );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_text_post_fields() {
+		return array(
+			'title'   => array( 'title' ),
+			'excerpt' => array( 'excerpt' ),
+		);
+	}
+
+	/**
+	 * Test that a suggested slug is stored as a slug.
+	 */
+	public function test_suggested_slug_is_sanitized_as_a_slug() {
+		wp_set_current_user( self::$author_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
+
+		$operation = $this->store_post_field_suggestion(
+			$post_id,
+			array(
+				'attribute' => 'slug',
+				'before'    => 'old',
+				'after'     => 'Hello <b>World</b>!',
+			)
+		);
+
+		$this->assertSame( 'hello-world', $operation['after'] );
+	}
+
+	/**
+	 * Test that a suggested featured image is stored as an attachment id.
+	 */
+	public function test_suggested_featured_media_is_stored_as_an_id() {
+		wp_set_current_user( self::$author_id );
+		$post_id       = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
+		$attachment_id = self::factory()->attachment->create(
+			array(
+				'post_author'    => self::$author_id,
+				'post_mime_type' => 'image/jpeg',
+			)
+		);
+
+		$operation = $this->store_post_field_suggestion(
+			$post_id,
+			array(
+				'attribute' => 'featured_media',
+				'before'    => '0',
+				'after'     => (string) $attachment_id,
+			)
+		);
+
+		$this->assertSame( $attachment_id, $operation['after'] );
+		$this->assertSame( 0, $operation['before'] );
+	}
+
+	/**
+	 * Test that a featured image suggestion is refused for anything but an
+	 * attachment the suggester can read.
+	 *
+	 * @dataProvider data_invalid_featured_media
+	 *
+	 * @param string $target What the suggestion points at.
+	 */
+	public function test_cannot_suggest_featured_media_that_is_not_a_readable_attachment( $target ) {
+		wp_set_current_user( self::$author_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
+		switch ( $target ) {
+			case 'post':
+				$after = self::factory()->post->create();
+				break;
+			case 'private attachment':
+				$parent = self::factory()->post->create(
+					array(
+						'post_author' => self::$editor_id,
+						'post_status' => 'private',
+					)
+				);
+				$after  = self::factory()->attachment->create(
+					array(
+						'post_author'    => self::$editor_id,
+						'post_parent'    => $parent,
+						'post_mime_type' => 'image/jpeg',
+					)
+				);
+				break;
+			case 'missing':
+				$after = 999999;
+				break;
+			default:
+				$after = 'image';
+		}
+
+		$response = $this->create_post_field_suggestion(
+			$post_id,
+			array(
+				'attribute' => 'featured_media',
+				'before'    => 0,
+				'after'     => $after,
+			)
+		);
+
+		$this->assertErrorResponse( 'rest_invalid_suggestion', $response, 400 );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_invalid_featured_media() {
+		return array(
+			'a post'               => array( 'post' ),
+			'a private attachment' => array( 'private attachment' ),
+			'a missing attachment' => array( 'missing' ),
+			'not an id'            => array( 'not an id' ),
+		);
+	}
+
+	/**
+	 * Test that a text post field suggestion must carry text.
+	 *
+	 * @dataProvider data_non_text_post_field_values
+	 *
+	 * @param string $key   Operation key, `before` or `after`.
+	 * @param mixed  $value Value.
+	 */
+	public function test_cannot_suggest_a_non_text_title( $key, $value ) {
+		wp_set_current_user( self::$author_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
+
+		$operation         = array(
+			'attribute' => 'title',
+			'before'    => '',
+			'after'     => 'x',
+		);
+		$operation[ $key ] = $value;
+		$response          = $this->create_post_field_suggestion( $post_id, $operation );
+
+		$this->assertErrorResponse( 'rest_invalid_suggestion', $response, 400 );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_non_text_post_field_values() {
+		return array(
+			'array after'  => array( 'after', array( 'x' ) ),
+			'array before' => array( 'before', array( 'x' ) ),
+		);
+	}
+
+	/**
+	 * Test that a suggested new term is stored with a sanitized name, and
+	 * that suggesting it creates nothing: a suggester who cannot create
+	 * terms may still propose one, for a reviewer to create on accept.
+	 */
+	public function test_suggested_new_term_is_sanitized_and_not_created() {
+		wp_set_current_user( self::$author_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
+		$this->assertFalse( current_user_can( 'manage_categories' ) );
+
+		$response = $this->create_post_field_suggestion(
+			$post_id,
+			array(
+				'attribute' => 'categories',
+				'before'    => array(),
+				'after'     => array( array( 'name' => ' <b>Fresh</b> news ' ) ),
+			)
+		);
+
+		$this->assertSame( 201, $response->get_status() );
+		$payload = json_decode(
+			get_comment_meta( $response->get_data()['id'], '_wp_suggestion', true ),
+			true
+		);
+		$this->assertSame(
+			array( array( 'name' => 'Fresh news' ) ),
+			$payload['operations'][0]['after']
+		);
+		$this->assertEmpty( term_exists( 'Fresh news', 'category' ) );
+	}
+
+	/**
+	 * Test that a user without `unfiltered_html` has script markup stripped
+	 * from the applied fields of a suggestion payload at write time. The
+	 * `after` value is what a reviewer's accept writes into block attributes,
+	 * so it must be limited to what the suggester could publish directly.
+	 */
+	public function test_suggestion_payload_is_ksesed_for_user_without_unfiltered_html() {
+		wp_set_current_user( self::$author_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
+
+		$payload = wp_json_encode(
+			array(
+				'schemaVersion' => 2,
+				'blockName'     => 'core/paragraph',
+				'baseRevision'  => null,
+				'operations'    => array(
+					array(
+						'type'      => 'attribute-set',
+						'attribute' => 'content',
+						'before'    => 'Hello',
+						'after'     => 'Hello <script>alert(1)</script><em>world</em>',
+					),
+				),
+			)
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'content' => '',
+					'type'    => 'note',
+					'author'  => self::$author_id,
+					'meta'    => array(
+						'_wp_suggestion' => $payload,
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 201, $response->get_status() );
+
+		$data    = $response->get_data();
+		$stored  = get_comment_meta( $data['id'], '_wp_suggestion', true );
+		$decoded = json_decode( $stored, true );
+		$after   = $decoded['operations'][0]['after'] ?? '';
+
+		$this->assertStringNotContainsString( '<script>', $after, 'Script markup must be stripped from `after`.' );
+		$this->assertStringContainsString( '<em>world</em>', $after, 'Allowed markup must survive KSES.' );
+	}
+
+	/**
+	 * Test that structured `after` values (a table's `body` rows, for example)
+	 * are filtered down to every string leaf, as are the attributes of a block
+	 * snapshot, for a user without `unfiltered_html`.
+	 */
+	public function test_suggestion_payload_kses_reaches_nested_values() {
+		wp_set_current_user( self::$author_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
+
+		$payload = wp_json_encode(
+			array(
+				'schemaVersion' => 2,
+				'blockName'     => 'core/table',
+				'baseRevision'  => null,
+				'operations'    => array(
+					array(
+						'type'      => 'attribute-set',
+						'attribute' => 'body',
+						'before'    => array(),
+						'after'     => array(
+							array(
+								'cells' => array(
+									array(
+										'content' => '<script>alert(1)</script><strong>cell</strong>',
+										'tag'     => 'td',
+									),
+								),
+							),
+						),
+					),
+					array(
+						'type'      => 'block-insert-after',
+						'clientId'  => 'abc',
+						'blockName' => 'core/paragraph',
+						'block'     => array(
+							'name'        => 'core/paragraph',
+							'attributes'  => array(
+								'content' => '<img src=x onerror=alert(1)>text',
+							),
+							'innerBlocks' => array(
+								array(
+									'name'       => 'core/paragraph',
+									'attributes' => array( 'content' => '<script>alert(2)</script>inner' ),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'content' => '',
+					'type'    => 'note',
+					'author'  => self::$author_id,
+					'meta'    => array(
+						'_wp_suggestion' => $payload,
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 201, $response->get_status() );
+
+		$data       = $response->get_data();
+		$decoded    = json_decode( get_comment_meta( $data['id'], '_wp_suggestion', true ), true );
+		$cell       = $decoded['operations'][0]['after'][0]['cells'][0];
+		$snapshot   = $decoded['operations'][1]['block'];
+		$inner_text = $snapshot['innerBlocks'][0]['attributes']['content'];
+
+		$this->assertStringNotContainsString( '<script>', $cell['content'], 'Nested `after` strings must be filtered.' );
+		$this->assertStringContainsString( '<strong>cell</strong>', $cell['content'], 'Allowed markup must survive KSES.' );
+		$this->assertSame( 'td', $cell['tag'], 'Plain string leaves must survive unchanged.' );
+		$this->assertStringNotContainsString( 'onerror', $snapshot['attributes']['content'], 'Snapshot attributes must be filtered.' );
+		$this->assertStringNotContainsString( '<script>', $inner_text, 'Inner block snapshot attributes must be filtered.' );
+	}
+
+	/**
+	 * Test that a user WITH `unfiltered_html` keeps their markup verbatim —
+	 * the same freedom they have in post content.
+	 */
+	public function test_suggestion_payload_keeps_markup_for_user_with_unfiltered_html() {
+		if ( is_multisite() ) {
+			grant_super_admin( self::$admin_id );
+		}
+		wp_set_current_user( self::$admin_id );
+		$this->assertTrue(
+			current_user_can( 'unfiltered_html' ),
+			'Precondition: the acting user must have unfiltered_html.'
+		);
+
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$admin_id ) );
+
+		$payload = wp_json_encode(
+			array(
+				'schemaVersion' => 2,
+				'blockName'     => 'core/html',
+				'baseRevision'  => null,
+				'operations'    => array(
+					array(
+						'type'      => 'attribute-set',
+						'attribute' => 'content',
+						'before'    => '',
+						'after'     => '<script>console.log("intentional");</script>',
+					),
+				),
+			)
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'content' => '',
+					'type'    => 'note',
+					'author'  => self::$admin_id,
+					'meta'    => array(
+						'_wp_suggestion' => $payload,
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 201, $response->get_status() );
+
+		$data    = $response->get_data();
+		$stored  = get_comment_meta( $data['id'], '_wp_suggestion', true );
+		$decoded = json_decode( $stored, true );
+
+		$this->assertStringContainsString(
+			'<script>',
+			$decoded['operations'][0]['after'] ?? '',
+			'Users with unfiltered_html keep their markup as-is.'
+		);
+
+		if ( is_multisite() ) {
+			revoke_super_admin( self::$admin_id );
+		}
+	}
+
+	/**
+	 * Test that the `before` field is left untouched by the KSES pass. It is
+	 * only compared for conflict detection, never applied — filtering it would
+	 * cause false staleness warnings when the live content is unfiltered.
+	 */
+	public function test_suggestion_payload_before_field_is_not_ksesed() {
+		wp_set_current_user( self::$author_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
+
+		// Deliberately contains markup KSES would strip: `before` is a
+		// comparison baseline that must round-trip byte-for-byte.
+		$before_value = 'Existing <script>window.baseline</script> content';
+		$payload      = wp_json_encode(
+			array(
+				'schemaVersion' => 2,
+				'blockName'     => 'core/paragraph',
+				'baseRevision'  => null,
+				'operations'    => array(
+					array(
+						'type'      => 'attribute-set',
+						'attribute' => 'content',
+						'before'    => $before_value,
+						'after'     => 'Plain replacement',
+					),
+				),
+			)
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'content' => '',
+					'type'    => 'note',
+					'author'  => self::$author_id,
+					'meta'    => array(
+						'_wp_suggestion' => $payload,
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 201, $response->get_status() );
+
+		$data    = $response->get_data();
+		$stored  = get_comment_meta( $data['id'], '_wp_suggestion', true );
+		$decoded = json_decode( $stored, true );
+
+		$this->assertSame(
+			$before_value,
+			$decoded['operations'][0]['before'] ?? null,
+			'The `before` baseline must be stored verbatim for conflict detection.'
+		);
+	}
+
+	/**
+	 * Test that a payload that isn't valid JSON is rejected with a 400 rather
+	 * than stored as garbage the client would silently null out.
+	 */
+	public function test_create_rejects_invalid_json_suggestion_payload() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'content' => '',
+					'type'    => 'note',
+					'meta'    => array(
+						'_wp_suggestion' => 'this is {not valid json',
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_suggestion_invalid_json', $response, 400 );
+	}
+
+	/**
+	 * Test that an editor can update a note they did not author (edit_post check).
+	 */
+	public function test_editor_can_update_note_on_own_post() {
+		wp_set_current_user( self::$admin_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		// Admin creates a note on editor's post.
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'note',
+				'comment_approved' => 1,
+				'user_id'          => self::$admin_id,
+				'comment_content'  => 'suggestion note',
+			)
+		);
+
+		// Editor (post author) updates the note they did not author.
+		wp_set_current_user( self::$editor_id );
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $comment_id );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'status' => 'approved',
+					'meta'   => array(
+						'_wp_suggestion_status' => 'applied-unsaved',
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		// Core maps `edit_comment` to `edit_post` on the parent post, which
+		// the editor holds; the update succeeds with a 200 status. The status
+		// is the provisional one an editor writes: only a post save makes it
+		// final.
+		$this->assertSame( 200, $response->get_status() );
+	}
+
+	/**
+	 * Test that a subscriber cannot update a note on someone else's post.
+	 */
+	public function test_subscriber_cannot_update_note() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID' => $post_id,
+				'comment_type'    => 'note',
+				'user_id'         => self::$editor_id,
+				'comment_content' => 'a suggestion',
+			)
+		);
+
+		// Subscriber tries to update the note.
+		wp_set_current_user( self::$subscriber_id );
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $comment_id );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'meta' => array(
+						'_wp_suggestion_status' => 'rejected-unsaved',
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_cannot_edit', $response, 403 );
+	}
+
+	/**
+	 * Test that _wp_suggestion_status does not persist invalid enum values.
+	 */
+	public function test_suggestion_status_ignores_invalid_value() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'note',
+				'comment_approved' => 1,
+				'user_id'          => self::$editor_id,
+			)
+		);
+
+		// First set a valid value.
+		update_comment_meta( $comment_id, '_wp_suggestion_status', 'pending' );
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $comment_id );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'meta' => array(
+						'_wp_suggestion_status' => 'invalid_value',
+					),
+				)
+			)
+		);
+
+		rest_get_server()->dispatch( $request );
+		// Even if the request succeeds, the invalid value should not
+		// overwrite the existing valid value.
+		$stored = get_comment_meta( $comment_id, '_wp_suggestion_status', true );
+		$this->assertSame( 'pending', $stored );
+	}
+
+	/**
+	 * Test that a subscriber cannot apply a suggestion even if the request
+	 * only touches the suggestion-lifecycle fields.
+	 */
+	public function test_subscriber_cannot_apply_suggestion() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'note',
+				'comment_approved' => 1,
+				'user_id'          => self::$editor_id,
+				'comment_content'  => '',
+			)
+		);
+
+		wp_set_current_user( self::$subscriber_id );
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $comment_id );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'status' => 'approved',
+					'meta'   => array(
+						'_wp_suggestion_status' => 'applied-unsaved',
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_cannot_edit', $response, 403 );
+	}
+
+	/**
+	 * Test that creating a note with an oversized suggestion payload is
+	 * rejected with a clear 413 error rather than silently truncated.
+	 */
+	public function test_create_rejects_oversized_suggestion_payload() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		$oversized = str_repeat( 'a', GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES + 1 );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'content' => '',
+					'type'    => 'note',
+					'meta'    => array(
+						'_wp_suggestion' => $oversized,
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_suggestion_too_large', $response, 413 );
+	}
+
+	/**
+	 * Test that updating a note with an oversized suggestion payload is
+	 * rejected with a clear 413 error.
+	 */
+	public function test_update_rejects_oversized_suggestion_payload() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'note',
+				'comment_approved' => 1,
+				'user_id'          => self::$editor_id,
+				'comment_content'  => 'a suggestion',
+			)
+		);
+
+		$oversized = str_repeat( 'a', GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES + 1 );
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $comment_id );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'meta' => array(
+						'_wp_suggestion' => $oversized,
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_suggestion_too_large', $response, 413 );
+	}
+
+	/**
+	 * Test that the sanitize_callback rejects rather than truncates an
+	 * oversized payload reaching the meta layer through a non-REST path.
+	 * Truncating mid-string would corrupt the JSON.
+	 */
+	public function test_sanitize_callback_rejects_oversized_value() {
+		$post_id    = self::factory()->post->create();
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID' => $post_id,
+				'comment_type'    => 'note',
+			)
+		);
+
+		$oversized = str_repeat( 'a', GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES + 1 );
+		update_comment_meta( $comment_id, '_wp_suggestion', $oversized );
+
+		$stored = get_comment_meta( $comment_id, '_wp_suggestion', true );
+		$this->assertSame( '', $stored, 'Oversized payload should be rejected, not truncated.' );
 	}
 }

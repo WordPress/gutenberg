@@ -10,6 +10,10 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { moreVertical, published } from '@wordpress/icons';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
+import SuggestionActions, {
+	SuggestionActionButtons,
+	useSuggestionDecision,
+} from './suggestion-actions';
 
 function NoteActionsMenu( { items, buttonRef } ) {
 	return (
@@ -76,7 +80,14 @@ export function Note( {
 		}
 	}, [ rawContent ] );
 
-	const canResolve = note.parent === 0;
+	// Suggestion threads expose their own Accept/Reject affordance in the
+	// header; the generic "Resolve" button would duplicate that action with
+	// a confusingly similar checkmark icon, so hide it for suggestion notes.
+	const hasSuggestionPayload = !! note?.meta?._wp_suggestion;
+	const suggestionDecision = useSuggestionDecision(
+		hasSuggestionPayload ? note : null
+	);
+	const canResolve = note.parent === 0 && ! hasSuggestionPayload;
 	const metaStatus = note.meta?._wp_note_status;
 	const isResolutionNote =
 		metaStatus === 'resolved' || metaStatus === 'reopen';
@@ -98,7 +109,12 @@ export function Note( {
 		{
 			id: 'reopen',
 			title: _x( 'Reopen', 'Reopen note' ),
-			isEligible: ( { status } ) => canResolve && hasResolved( status ),
+			// A decided suggestion can be reopened too; its own Accept and
+			// Reject replace Resolve, but not Reopen.
+			isEligible: ( { status } ) =>
+				( canResolve ||
+					( note.parent === 0 && hasSuggestionPayload ) ) &&
+				hasResolved( status ),
 			onClick: () => onEditNote( note, { status: 'hold' } ),
 		},
 		{
@@ -186,9 +202,13 @@ export function Note( {
 		);
 	}
 
-	const actions = isSelected ? (
+	const showActions = isSelected || hasSuggestionPayload;
+	const actions = showActions ? (
 		<>
-			{ canResolve && onResolve && (
+			{ hasSuggestionPayload && (
+				<SuggestionActionButtons decision={ suggestionDecision } />
+			) }
+			{ isSelected && canResolve && onResolve && (
 				<Button
 					label={ _x( 'Resolve', 'Mark note as resolved' ) }
 					size="small"
@@ -198,10 +218,12 @@ export function Note( {
 					onClick={ onResolve }
 				/>
 			) }
-			<NoteActionsMenu
-				items={ availableItems }
-				buttonRef={ actionButtonRef }
-			/>
+			{ isSelected && (
+				<NoteActionsMenu
+					items={ availableItems }
+					buttonRef={ actionButtonRef }
+				/>
+			) }
 		</>
 	) : null;
 
@@ -212,6 +234,13 @@ export function Note( {
 			role={ note.parent !== 0 ? 'treeitem' : undefined }
 		>
 			{ body }
+			{ hasSuggestionPayload && (
+				<SuggestionActions
+					thread={ note }
+					decision={ suggestionDecision }
+					onReopen={ () => onEditNote( note, { status: 'hold' } ) }
+				/>
+			) }
 			{ actionState === 'delete' && (
 				<ConfirmDialog
 					isOpen

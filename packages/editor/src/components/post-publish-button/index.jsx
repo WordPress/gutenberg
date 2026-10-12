@@ -1,7 +1,11 @@
 import { Button } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { Tooltip } from '@wordpress/ui';
 import PublishButtonLabel from './label';
 import { store as editorStore } from '../../store';
+import { EDITOR_INTENT_SUGGEST } from '../../store/constants';
+import { unlock } from '../../lock-unlock';
 
 const noop = () => {};
 
@@ -29,6 +33,7 @@ export function PostPublishButton( {
 		postStatusHasChanged,
 		postType,
 		postId,
+		isSuggesting,
 	} = useSelect( ( select ) => {
 		const store = select( editorStore );
 		return {
@@ -48,10 +53,39 @@ export function PostPublishButton( {
 			postStatusHasChanged: store.getPostEdits()?.status,
 			hasNonPostEntityChanges: store.hasNonPostEntityChanges(),
 			isSavingNonPostEntityChanges: store.isSavingNonPostEntityChanges(),
+			// `getEditorIntent` is private while Suggest mode is experimental.
+			isSuggesting:
+				unlock( store ).getEditorIntent() === EDITOR_INTENT_SUGGEST,
 		};
 	}, [] );
 
 	const { editPost, savePost } = useDispatch( editorStore );
+
+	// If the new status has not changed explicitly, we derive it from
+	// other factors, like having a publish action, etc.. We need to preserve
+	// this because it affects when to show the pre and post publish panels.
+	// If it has changed though explicitly, we need to respect that.
+	let publishStatus = 'publish';
+	if ( postStatusHasChanged ) {
+		publishStatus = postStatus;
+	} else if ( ! hasPublishAction ) {
+		publishStatus = 'pending';
+	} else if ( visibility === 'private' ) {
+		publishStatus = 'private';
+	} else if ( isBeingScheduled ) {
+		publishStatus = 'future';
+	}
+
+	/*
+	 * Publishing is the editorial decision Suggest mode exists to withhold,
+	 * and so are scheduling and submitting for review: each moves the post
+	 * along the workflow. A click that leaves the status where it is - the
+	 * "Save" of a published or scheduled post - is a plain save, and suggesting
+	 * has no save lock: suggestions write their markers into the post content,
+	 * so on a published post this button is the only way to persist them.
+	 * Withhold the status change, not the save. See issue #73411 (F-15).
+	 */
+	const isPublishWithheld = isSuggesting && publishStatus !== postStatus;
 
 	const savePostStatus = ( status ) => {
 		editPost( { status }, { undoIgnore: true } );
@@ -61,6 +95,18 @@ export function PostPublishButton( {
 	const createOnClick =
 		( callback ) =>
 		( ...args ) => {
+			/*
+			 * Both controls are disabled while the status change is withheld,
+			 * but they carry `aria-disabled` rather than `disabled`, so the
+			 * click still arrives here - ahead of the callbacks that check for
+			 * it. Stop at the seam: otherwise a dirty non-post entity sends a
+			 * control reporting `aria-disabled="true"` on to open the "Are you
+			 * ready to save?" dialog. See issue #73411 (F-15).
+			 */
+			if ( isPublishWithheld ) {
+				return noop;
+			}
+
 			// If a post with non-post entities is published, but the user
 			// elects to not save changes to the non-post entities, those
 			// entities will still be dirty when the Publish button is clicked.
@@ -94,7 +140,15 @@ export function PostPublishButton( {
 			return callback( ...args );
 		};
 
+	/*
+	 * `editPost` drops a withheld status, but the button doesn't stop at the
+	 * status edit: it calls `savePost()` right after, which would write the
+	 * post to the server while the pre-publish flow waits on a state change
+	 * that never comes. Disable the control rather than let it run half of
+	 * itself.
+	 */
 	const isButtonDisabled =
+		isPublishWithheld ||
 		isPostSavingLocked ||
 		// Disable while a non-post entity (e.g. a newly created term) is mid-save.
 		isSavingNonPostEntityChanges ||
@@ -104,6 +158,7 @@ export function PostPublishButton( {
 			! hasNonPostEntityChanges );
 
 	const isToggleDisabled =
+		isPublishWithheld ||
 		isPostSavingLocked ||
 		isSavingNonPostEntityChanges ||
 		( ( isPublished ||
@@ -111,21 +166,6 @@ export function PostPublishButton( {
 			! isSaveable ||
 			( ! isPublishable && ! forceIsDirty ) ) &&
 			! hasNonPostEntityChanges );
-
-	// If the new status has not changed explicitly, we derive it from
-	// other factors, like having a publish action, etc.. We need to preserve
-	// this because it affects when to show the pre and post publish panels.
-	// If it has changed though explicitly, we need to respect that.
-	let publishStatus = 'publish';
-	if ( postStatusHasChanged ) {
-		publishStatus = postStatus;
-	} else if ( ! hasPublishAction ) {
-		publishStatus = 'pending';
-	} else if ( visibility === 'private' ) {
-		publishStatus = 'private';
-	} else if ( isBeingScheduled ) {
-		publishStatus = 'future';
-	}
 
 	const onClickButton = () => {
 		if ( isButtonDisabled ) {
@@ -163,14 +203,37 @@ export function PostPublishButton( {
 		'aria-haspopup': hasNonPostEntityChanges ? 'dialog' : undefined,
 	};
 	const componentProps = isToggle ? toggleProps : buttonProps;
-	return (
+	const withheldHint = __( 'Switch to Editing to change the post status.' );
+	const button = (
 		<Button
 			{ ...componentProps }
 			className={ `${ componentProps.className } editor-post-publish-button__button` }
 			size="compact"
+			/*
+			 * `description` rather than `label`, which doubles as the button's
+			 * `aria-label` and would replace the visible "Publish" / "Update"
+			 * text as its accessible name.
+			 */
+			description={ isPublishWithheld ? withheldHint : undefined }
 		>
 			<PublishButtonLabel />
 		</Button>
+	);
+
+	if ( ! isPublishWithheld ) {
+		return button;
+	}
+
+	/*
+	 * `description` carries the reason to assistive technology; the tooltip
+	 * carries it to everyone else. Tooltip popups are visual-only by design,
+	 * so neither channel covers for the other.
+	 */
+	return (
+		<Tooltip.Root>
+			<Tooltip.Trigger render={ button } />
+			<Tooltip.Popup>{ withheldHint }</Tooltip.Popup>
+		</Tooltip.Root>
 	);
 }
 

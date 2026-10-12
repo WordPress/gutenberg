@@ -41,7 +41,7 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 
 	const { ref: focusRef } = usePostTitleFocus( forwardedRef );
 
-	const { title, setTitle: onUpdate } = usePostTitle();
+	const { title, setTitle: onUpdate, isSuggestionPending } = usePostTitle();
 
 	const [ selection, setSelection ] = useState( {} );
 
@@ -175,6 +175,7 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 	// This same block is used in both the visual and the code editor.
 	const className = clsx( DEFAULT_CLASSNAMES, {
 		'is-selected': isSelected,
+		'is-suggestion-pending': isSuggestionPending,
 	} );
 
 	// Because the title is within the editor iframe, we can't use scss styles.

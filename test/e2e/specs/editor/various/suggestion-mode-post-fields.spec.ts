@@ -1,0 +1,1561 @@
+/**
+ * E2E coverage for post-level fields in Suggestion mode (#73411).
+ *
+ * Suggesting must never change the saved post behind a reviewer's back. Every
+ * post-level field is either proposed (held in the editor and saved as a note
+ * the post author accepts or rejects) or locked (shown read-only, and refused
+ * whichever path tries to write it). These tests read the stored post over
+ * REST, so a change that only looks refused in the UI still fails them.
+ */
+import { test, expect } from '@wordpress/e2e-test-utils-playwright';
+
+const REFUSED_FIELD_MESSAGE =
+	"This setting can't be changed while suggesting. Switch to Editing to change it.";
+
+const LOCKED_FIELD_HINT =
+	'This setting cannot be suggested. Switch to Editing to change it.';
+
+async function switchIntent( page: any, intentLabel: string ) {
+	await page
+		.getByRole( 'region', { name: 'Editor top bar' } )
+		.getByRole( 'button', { name: 'Options' } )
+		.click();
+	const menuItem = page.getByRole( 'menuitemradio', {
+		name: new RegExp( `^${ intentLabel }` ),
+	} );
+	await menuItem.waitFor( { state: 'visible', timeout: 10000 } );
+	await menuItem.click();
+	// `MenuItemsChoice` doesn't auto-close its dropdown on selection.
+	await page.keyboard.press( 'Escape' );
+}
+
+/*
+ * Saves the post the way the editor does and waits for the request to finish,
+ * so a following REST read sees whatever the save sent.
+ */
+async function savePost( page: any ) {
+	await page.evaluate( () =>
+		( window as any ).wp.data.dispatch( 'core/editor' ).savePost()
+	);
+	await expect
+		.poll( () =>
+			page.evaluate( () =>
+				( window as any ).wp.data.select( 'core/editor' ).isSavingPost()
+			)
+		)
+		.toBe( false );
+}
+
+/*
+ * Returns a promise for the debounced suggestion auto-save REST call. Call
+ * this BEFORE the edit that triggers it.
+ */
+function suggestionSavedPromise( page: any ) {
+	return page.waitForResponse(
+		( response: any ) =>
+			/\/wp\/v2\/comments(\?|$|\/)/.test( response.url() ) &&
+			[ 'POST', 'PUT' ].includes( response.request().method() ) &&
+			response.ok()
+	);
+}
+
+async function openNotesSidebar( page: any ) {
+	const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
+	const allNotesToggle = topBar.getByRole( 'button', {
+		name: 'All notes',
+		exact: true,
+	} );
+	if (
+		( await allNotesToggle.getAttribute( 'aria-expanded' ) ) === 'false'
+	) {
+		await allNotesToggle.click();
+	}
+	return page.getByRole( 'region', { name: 'Editor settings' } );
+}
+
+function suggestionThreads( sidebar: any ) {
+	return sidebar.locator( '.editor-collab-sidebar-panel__thread' );
+}
+
+/*
+ * Proposes post edits the way the editor's panels do, through `editPost`,
+ * and resolves once the suggestion note is saved.
+ */
+async function suggestPostEdits( page: any, edits: Record< string, any > ) {
+	const saved = suggestionSavedPromise( page );
+	await page.evaluate(
+		( e: Record< string, any > ) =>
+			( window as any ).wp.data.dispatch( 'core/editor' ).editPost( e ),
+		edits
+	);
+	await saved;
+}
+
+function getEditedPostAttribute( page: any, attribute: string ) {
+	return page.evaluate(
+		( a: string ) =>
+			( window as any ).wp.data
+				.select( 'core/editor' )
+				.getEditedPostAttribute( a ),
+		attribute
+	);
+}
+
+function getEntityValue( page: any, postId: number, attribute: string ) {
+	return page.evaluate(
+		( [ id, a ]: [ number, string ] ) =>
+			( window as any ).wp.data
+				.select( 'core' )
+				.getEditedEntityRecord( 'postType', 'post', id )[ a ],
+		[ postId, attribute ]
+	);
+}
+
+async function openSettingsPanel( page: any, name: string ) {
+	const toggle = page
+		.getByRole( 'region', { name: 'Editor settings' } )
+		.getByRole( 'button', { name, exact: true } );
+	if ( ( await toggle.getAttribute( 'aria-expanded' ) ) === 'false' ) {
+		await toggle.click();
+	}
+}
+
+function readStoredPost( requestUtils: any, postId: number ) {
+	return requestUtils.rest( {
+		path: `/wp/v2/posts/${ postId }`,
+		params: { context: 'edit' },
+	} );
+}
+
+test.describe( 'Suggestion mode: post fields', () => {
+	let postId: number;
+
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.setGutenbergExperiments( [
+			'gutenberg-suggestion-mode',
+		] );
+	} );
+
+	test.beforeEach( async ( { admin, requestUtils } ) => {
+		// The slug assertions need `saved-slug` free.
+		await requestUtils.deleteAllPosts();
+		const post = await requestUtils.createPost( {
+			title: 'Suggestion mode post fields',
+			content: '<!-- wp:paragraph --><p>Body</p><!-- /wp:paragraph -->',
+			excerpt: 'Saved excerpt',
+			slug: 'saved-slug',
+			status: 'draft',
+			comment_status: 'open',
+		} as any );
+		postId = post.id;
+		await admin.editPost( postId );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllComments( 'note' );
+		await requestUtils.deleteAllPosts();
+		await requestUtils.setGutenbergExperiments( [] );
+	} );
+
+	test.describe( 'locked fields', () => {
+		test( 'a direct entity write to a post field is refused while suggesting', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			await switchIntent( page, 'Suggesting' );
+
+			// `useEntityProp` and plugin code write the entity directly,
+			// never passing through `editPost`.
+			await page.evaluate( ( id ) => {
+				( window as any ).wp.data
+					.dispatch( 'core' )
+					.editEntityRecord( 'postType', 'post', id, {
+						comment_status: 'closed',
+					} );
+			}, postId );
+
+			await expect(
+				page
+					.locator( '.components-snackbar-list' )
+					.getByText( REFUSED_FIELD_MESSAGE )
+			).toBeVisible();
+			const edited = await page.evaluate(
+				( id ) =>
+					( window as any ).wp.data
+						.select( 'core' )
+						.getEditedEntityRecord( 'postType', 'post', id )
+						.comment_status,
+				postId
+			);
+			expect( edited ).toBe( 'open' );
+
+			await savePost( page );
+			const stored = await readStoredPost( requestUtils, postId );
+			expect( stored.comment_status ).toBe( 'open' );
+		} );
+
+		test( 'an editPost write to a locked field is refused while suggesting', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			await switchIntent( page, 'Suggesting' );
+
+			await page.evaluate( () =>
+				( window as any ).wp.data
+					.dispatch( 'core/editor' )
+					.editPost( { comment_status: 'closed' } )
+			);
+
+			await expect(
+				page
+					.locator( '.components-snackbar-list' )
+					.getByText( REFUSED_FIELD_MESSAGE )
+			).toBeVisible();
+			expect(
+				await page.evaluate( () =>
+					( window as any ).wp.data
+						.select( 'core/editor' )
+						.getEditedPostAttribute( 'comment_status' )
+				)
+			).toBe( 'open' );
+
+			await savePost( page );
+			const stored = await readStoredPost( requestUtils, postId );
+			expect( stored.comment_status ).toBe( 'open' );
+		} );
+
+		test( 'a post-level edit staged in Editing is not saved from Suggesting', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			// Staged while editing, and left unsaved.
+			await page.evaluate( () =>
+				( window as any ).wp.data.dispatch( 'core/editor' ).editPost( {
+					comment_status: 'closed',
+					excerpt: 'Staged in Editing',
+				} )
+			);
+
+			await switchIntent( page, 'Suggesting' );
+			await savePost( page );
+
+			const stored = await readStoredPost( requestUtils, postId );
+			expect( stored.comment_status ).toBe( 'open' );
+			expect( stored.excerpt.raw ).toBe( 'Saved excerpt' );
+
+			// The staged edits are not lost: Editing saves them as usual.
+			await switchIntent( page, 'Editing' );
+			await savePost( page );
+			const saved = await readStoredPost( requestUtils, postId );
+			expect( saved.comment_status ).toBe( 'closed' );
+			expect( saved.excerpt.raw ).toBe( 'Staged in Editing' );
+		} );
+
+		test( 'locked post settings are read-only while suggesting', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.openDocumentSettingsSidebar();
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			const discussion = settings.getByRole( 'button', {
+				name: 'Change discussion options',
+			} );
+			const author = settings.getByRole( 'button', {
+				name: /^Change author:/,
+			} );
+			await expect( discussion ).toBeEnabled();
+			await expect( author ).toBeEnabled();
+
+			await switchIntent( page, 'Suggesting' );
+
+			for ( const toggle of [ discussion, author ] ) {
+				await expect( toggle ).toBeDisabled();
+				await expect( toggle ).toHaveAccessibleDescription(
+					LOCKED_FIELD_HINT
+				);
+			}
+
+			await switchIntent( page, 'Editing' );
+			await expect( discussion ).toBeEnabled();
+		} );
+	} );
+
+	test.describe( 'excerpt, featured image and slug', () => {
+		let mediaId: number;
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			const media = await requestUtils.uploadMedia(
+				'./assets/10x10_e2e_test_image_green.png'
+			);
+			mediaId = media.id;
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllMedia();
+		} );
+
+		for ( const { field, edit, stored, summary } of [
+			{
+				field: 'excerpt',
+				edit: 'Suggested excerpt',
+				stored: ( post: any ) => post.excerpt.raw,
+				summary: 'Excerpt: “Saved excerpt” → “Suggested excerpt”',
+			},
+			{
+				field: 'slug',
+				edit: 'suggested-slug',
+				stored: ( post: any ) => post.slug,
+				summary: 'Slug: “saved-slug” → “suggested-slug”',
+			},
+			{
+				field: 'featured_media',
+				edit: 'MEDIA',
+				stored: ( post: any ) => post.featured_media,
+				summary: 'Featured image: Set',
+			},
+		] ) {
+			test( `a ${ field } change becomes a suggestion, not an edit`, async ( {
+				page,
+				requestUtils,
+			} ) => {
+				const value = edit === 'MEDIA' ? mediaId : edit;
+				const before = await getEditedPostAttribute( page, field );
+				await switchIntent( page, 'Suggesting' );
+				await suggestPostEdits( page, { [ field ]: value } );
+
+				// The field shows the proposal while suggesting...
+				expect( await getEditedPostAttribute( page, field ) ).toEqual(
+					value
+				);
+				// ...which never reaches the post entity.
+				expect( await getEntityValue( page, postId, field ) ).toEqual(
+					before
+				);
+
+				const sidebar = await openNotesSidebar( page );
+				const threads = suggestionThreads( sidebar );
+				await expect( threads ).toHaveCount( 1 );
+				await expect(
+					threads.locator(
+						'.editor-collab-sidebar-panel__suggestion-summary'
+					)
+				).toHaveText( summary );
+				await expect( threads ).not.toContainText(
+					'Original block deleted.'
+				);
+
+				await savePost( page );
+				expect(
+					stored( await readStoredPost( requestUtils, postId ) )
+				).toEqual( before );
+
+				// Editing shows the saved value, not the proposal.
+				await switchIntent( page, 'Editing' );
+				expect( await getEditedPostAttribute( page, field ) ).toEqual(
+					before
+				);
+			} );
+		}
+
+		test( 'accepting a featured image suggestion sets the image', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			await switchIntent( page, 'Suggesting' );
+			await suggestPostEdits( page, { featured_media: mediaId } );
+			await switchIntent( page, 'Editing' );
+
+			const sidebar = await openNotesSidebar( page );
+			await sidebar
+				.getByRole( 'button', { name: 'Accept suggestion' } )
+				.click();
+			await expect(
+				page
+					.locator( '.components-snackbar-list' )
+					.getByText( 'Suggestion applied.' )
+			).toBeVisible();
+			await expect
+				.poll( () => getEditedPostAttribute( page, 'featured_media' ) )
+				.toBe( mediaId );
+
+			await savePost( page );
+			expect(
+				( await readStoredPost( requestUtils, postId ) ).featured_media
+			).toBe( mediaId );
+		} );
+
+		test( 'rejecting an excerpt suggestion keeps the saved excerpt', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			await switchIntent( page, 'Suggesting' );
+			await suggestPostEdits( page, { excerpt: 'Suggested excerpt' } );
+
+			const sidebar = await openNotesSidebar( page );
+			await sidebar
+				.getByRole( 'button', { name: 'Reject suggestion' } )
+				.click();
+			await expect(
+				page
+					.locator( '.components-snackbar-list' )
+					.getByText( 'Suggestion rejected.' )
+			).toBeVisible();
+			expect( await getEditedPostAttribute( page, 'excerpt' ) ).toBe(
+				'Saved excerpt'
+			);
+
+			await savePost( page );
+			expect(
+				( await readStoredPost( requestUtils, postId ) ).excerpt.raw
+			).toBe( 'Saved excerpt' );
+		} );
+
+		test( 'the excerpt panel proposes the excerpt typed into it', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.openDocumentSettingsSidebar();
+			await switchIntent( page, 'Suggesting' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: /excerpt/i } )
+				.first()
+				.click();
+			const textarea = page.getByRole( 'textbox', {
+				name: 'Write an excerpt (optional)',
+			} );
+			const saved = suggestionSavedPromise( page );
+			await textarea.fill( 'Typed excerpt' );
+			// The panel commits the excerpt when the textarea loses focus.
+			await textarea.blur();
+			await saved;
+			// The panel reads the proposal back, so the typing is not undone.
+			expect( await getEditedPostAttribute( page, 'excerpt' ) ).toBe(
+				'Typed excerpt'
+			);
+			expect( await getEntityValue( page, postId, 'excerpt' ) ).toBe(
+				'Saved excerpt'
+			);
+		} );
+
+		test( 'undo withdraws a post field suggestion', async ( { page } ) => {
+			await switchIntent( page, 'Suggesting' );
+			await suggestPostEdits( page, { slug: 'suggested-slug' } );
+			const sidebar = await openNotesSidebar( page );
+			await expect( suggestionThreads( sidebar ) ).toHaveCount( 1 );
+
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Undo' } )
+				.click();
+
+			await expect
+				.poll( () => getEditedPostAttribute( page, 'slug' ) )
+				.toBe( 'saved-slug' );
+			await expect( suggestionThreads( sidebar ) ).toHaveCount( 0 );
+		} );
+	} );
+
+	test.describe( 'terms', () => {
+		let newsId: number;
+		let sportId: number;
+
+		const createdTermIds: number[] = [];
+		async function createCategory( requestUtils: any, name: string ) {
+			const term = await requestUtils.rest( {
+				method: 'POST',
+				path: '/wp/v2/categories',
+				data: { name },
+			} );
+			createdTermIds.push( term.id );
+			return term.id;
+		}
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			newsId = await createCategory( requestUtils, 'News' );
+			sportId = await createCategory( requestUtils, 'Sport' );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			for ( const id of createdTermIds ) {
+				await requestUtils.rest( {
+					method: 'DELETE',
+					path: `/wp/v2/categories/${ id }`,
+					params: { force: true },
+				} );
+			}
+		} );
+
+		test.beforeEach( async ( { admin, requestUtils } ) => {
+			await requestUtils.rest( {
+				method: 'POST',
+				path: `/wp/v2/posts/${ postId }`,
+				data: { categories: [ newsId ] },
+			} );
+			await admin.editPost( postId );
+		} );
+
+		test( 'a category change becomes a suggestion, not an edit', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await editor.openDocumentSettingsSidebar();
+			await openSettingsPanel( page, 'Categories' );
+			await switchIntent( page, 'Suggesting' );
+			const saved = suggestionSavedPromise( page );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'checkbox', { name: 'Sport' } )
+				.check();
+			await saved;
+
+			expect(
+				await getEditedPostAttribute( page, 'categories' )
+			).toEqual( [ newsId, sportId ] );
+			expect(
+				await getEntityValue( page, postId, 'categories' )
+			).toEqual( [ newsId ] );
+
+			const sidebar = await openNotesSidebar( page );
+			const threads = suggestionThreads( sidebar );
+			await expect( threads ).toHaveCount( 1 );
+			await expect(
+				threads.locator(
+					'.editor-collab-sidebar-panel__suggestion-summary'
+				)
+			).toHaveText( 'Categories: Add Sport' );
+
+			await savePost( page );
+			expect(
+				( await readStoredPost( requestUtils, postId ) ).categories
+			).toEqual( [ newsId ] );
+		} );
+
+		test( 'accepting a category suggestion assigns the category', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			await switchIntent( page, 'Suggesting' );
+			await suggestPostEdits( page, { categories: [ sportId ] } );
+			await switchIntent( page, 'Editing' );
+
+			const sidebar = await openNotesSidebar( page );
+			await expect(
+				sidebar.locator(
+					'.editor-collab-sidebar-panel__suggestion-summary'
+				)
+			).toHaveText( 'Categories: Add Sport; Remove News' );
+			await sidebar
+				.getByRole( 'button', { name: 'Accept suggestion' } )
+				.click();
+			await expect
+				.poll( () => getEditedPostAttribute( page, 'categories' ) )
+				.toEqual( [ sportId ] );
+
+			await savePost( page );
+			expect(
+				( await readStoredPost( requestUtils, postId ) ).categories
+			).toEqual( [ sportId ] );
+		} );
+
+		async function findTerms(
+			requestUtils: any,
+			base: string,
+			name: string
+		) {
+			const terms = await requestUtils.rest( {
+				path: `/wp/v2/${ base }`,
+				params: { search: name, context: 'edit' },
+			} );
+			return terms.filter( ( term: any ) => term.name === name );
+		}
+
+		async function deleteTermsNamed(
+			requestUtils: any,
+			base: string,
+			name: string
+		) {
+			for ( const term of await findTerms( requestUtils, base, name ) ) {
+				await requestUtils.rest( {
+					method: 'DELETE',
+					path: `/wp/v2/${ base }/${ term.id }`,
+					params: { force: true },
+				} );
+			}
+		}
+
+		test.afterEach( async ( { requestUtils } ) => {
+			await deleteTermsNamed( requestUtils, 'tags', 'Brand new tag' );
+			await deleteTermsNamed(
+				requestUtils,
+				'categories',
+				'Proposed category'
+			);
+		} );
+
+		test( 'a new tag is proposed, and only created once accepted', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await editor.openDocumentSettingsSidebar();
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await openSettingsPanel( page, 'Tags' );
+			await switchIntent( page, 'Suggesting' );
+
+			const tags = settings.getByRole( 'combobox', { name: 'Add Tag' } );
+			await tags.fill( 'Brand new tag' );
+			const saved = suggestionSavedPromise( page );
+			await page
+				.getByRole( 'option', { name: 'Create: Brand new tag' } )
+				.click();
+			await saved;
+
+			// The picker shows the proposed tag (a new suggestion opens the
+			// notes; go back to the post settings)...
+			await editor.openDocumentSettingsSidebar();
+			await openSettingsPanel( page, 'Tags' );
+			await expect(
+				settings.getByText( 'Brand new tag', { exact: true } )
+			).toBeVisible();
+			// ...which exists nowhere but on the note.
+			expect(
+				await findTerms( requestUtils, 'tags', 'Brand new tag' )
+			).toEqual( [] );
+
+			const sidebar = await openNotesSidebar( page );
+			await expect(
+				sidebar.locator(
+					'.editor-collab-sidebar-panel__suggestion-summary'
+				)
+			).toHaveText( 'Tags: New tag: Brand new tag' );
+
+			await savePost( page );
+			expect(
+				( await readStoredPost( requestUtils, postId ) ).tags
+			).toEqual( [] );
+
+			await switchIntent( page, 'Editing' );
+			await sidebar
+				.getByRole( 'button', { name: 'Accept suggestion' } )
+				.click();
+			await expect(
+				page
+					.locator( '.components-snackbar-list' )
+					.getByText( 'Suggestion applied.' )
+			).toBeVisible();
+			const [ created ] = await findTerms(
+				requestUtils,
+				'tags',
+				'Brand new tag'
+			);
+			expect( created ).toBeDefined();
+			await expect
+				.poll( () => getEditedPostAttribute( page, 'tags' ) )
+				.toEqual( [ created.id ] );
+
+			await savePost( page );
+			expect(
+				( await readStoredPost( requestUtils, postId ) ).tags
+			).toEqual( [ created.id ] );
+		} );
+
+		test( 'removing a proposed new tag withdraws the suggestion', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.openDocumentSettingsSidebar();
+			await openSettingsPanel( page, 'Tags' );
+			await switchIntent( page, 'Suggesting' );
+			await suggestPostEdits( page, {
+				tags: [ { name: 'Brand new tag' } ],
+			} );
+			const sidebar = await openNotesSidebar( page );
+			await expect( suggestionThreads( sidebar ) ).toHaveCount( 1 );
+
+			await editor.openDocumentSettingsSidebar();
+			const chip = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByText( 'Brand new tag', { exact: true } );
+			await chip.locator( '..' ).getByRole( 'button' ).click();
+
+			// The proposal is back at the post's terms, so its note goes.
+			await openNotesSidebar( page );
+			await expect( suggestionThreads( sidebar ) ).toHaveCount( 0 );
+		} );
+
+		test( 'accepting a new category reuses one that appeared meanwhile', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			await switchIntent( page, 'Suggesting' );
+			await suggestPostEdits( page, {
+				categories: [ newsId, { name: 'Proposed category' } ],
+			} );
+			// Someone creates the same category before the review.
+			const existing = await requestUtils.rest( {
+				method: 'POST',
+				path: '/wp/v2/categories',
+				data: { name: 'Proposed category' },
+			} );
+
+			await switchIntent( page, 'Editing' );
+			const sidebar = await openNotesSidebar( page );
+			await sidebar
+				.getByRole( 'button', { name: 'Accept suggestion' } )
+				.click();
+			await expect
+				.poll( () => getEditedPostAttribute( page, 'categories' ) )
+				.toEqual( [ newsId, existing.id ] );
+			expect(
+				await findTerms(
+					requestUtils,
+					'categories',
+					'Proposed category'
+				)
+			).toHaveLength( 1 );
+		} );
+
+		test( 'a new child category is proposed from the picker, and rejecting creates nothing', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await editor.openDocumentSettingsSidebar();
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await openSettingsPanel( page, 'Categories' );
+			await switchIntent( page, 'Suggesting' );
+
+			await settings
+				.getByRole( 'button', { name: 'Add Category' } )
+				.click();
+			await settings
+				.getByRole( 'textbox', { name: 'New Category Name' } )
+				.fill( 'Proposed category' );
+			await settings
+				.getByRole( 'combobox', { name: 'Parent Category' } )
+				.selectOption( { label: 'News' } );
+			const saved = suggestionSavedPromise( page );
+			await settings
+				.getByRole( 'button', { name: 'Add Category', exact: true } )
+				.last()
+				.click();
+			await saved;
+
+			// A new suggestion opens the notes; go back to the post settings.
+			await editor.openDocumentSettingsSidebar();
+			await openSettingsPanel( page, 'Categories' );
+			await expect(
+				settings.getByRole( 'checkbox', { name: 'Proposed category' } )
+			).toBeChecked();
+			expect(
+				await findTerms(
+					requestUtils,
+					'categories',
+					'Proposed category'
+				)
+			).toEqual( [] );
+
+			const sidebar = await openNotesSidebar( page );
+			const summary = sidebar.locator(
+				'.editor-collab-sidebar-panel__suggestion-summary'
+			);
+			await expect( summary ).toHaveText(
+				'Categories: New category: Proposed category'
+			);
+			await sidebar
+				.getByRole( 'button', { name: 'Reject suggestion' } )
+				.click();
+			await expect(
+				page
+					.locator( '.components-snackbar-list' )
+					.getByText( 'Suggestion rejected.' )
+			).toBeVisible();
+			expect(
+				await findTerms(
+					requestUtils,
+					'categories',
+					'Proposed category'
+				)
+			).toEqual( [] );
+			expect(
+				await getEditedPostAttribute( page, 'categories' )
+			).toEqual( [ newsId ] );
+		} );
+
+		test( 'accepting a new category the reviewer cannot create fails cleanly', async ( {
+			browser,
+			requestUtils,
+		} ) => {
+			// Authors can assign categories but not create them.
+			const author = await requestUtils.createUser( {
+				username: 'termauthor',
+				email: 'termauthor@example.com',
+				password: 'termauthorpassword',
+				roles: [ 'author' ],
+			} );
+			const post = await requestUtils.createPost( {
+				title: 'An author post',
+				content:
+					'<!-- wp:paragraph --><p>Body</p><!-- /wp:paragraph -->',
+				status: 'draft',
+				author: author.id,
+			} as any );
+			const context = await browser.newContext( {
+				baseURL: requestUtils.baseURL,
+				storageState: { cookies: [], origins: [] },
+			} );
+			try {
+				const page = await context.newPage();
+				await page.goto( '/wp-login.php' );
+				await page
+					.getByLabel( 'Username or Email Address' )
+					.fill( 'termauthor' );
+				await page
+					.getByLabel( 'Password', { exact: true } )
+					.fill( 'termauthorpassword' );
+				await page.getByRole( 'button', { name: 'Log In' } ).click();
+				await page.waitForURL( '**/wp-admin/**' );
+				await page.goto(
+					`/wp-admin/post.php?post=${ post.id }&action=edit`
+				);
+				await page.waitForFunction(
+					() => !! ( window as any ).wp?.data
+				);
+				await page.evaluate( () =>
+					( window as any ).wp.data
+						.dispatch( 'core/preferences' )
+						.set( 'core/edit-post', 'welcomeGuide', false )
+				);
+				// The guide may have opened before the preference landed.
+				const guide = page.getByRole( 'dialog', {
+					name: 'Welcome to the editor',
+				} );
+				if ( await guide.isVisible() ) {
+					await guide
+						.getByRole( 'button', { name: 'Close' } )
+						.click();
+				}
+
+				const getCategories = () =>
+					page.evaluate( () =>
+						( window as any ).wp.data
+							.select( 'core/editor' )
+							.getEditedPostAttribute( 'categories' )
+					);
+				const categories = await getCategories();
+				await switchIntent( page, 'Suggesting' );
+				await suggestPostEdits( page, {
+					categories: [
+						...categories,
+						{ name: 'Proposed category' },
+					],
+				} );
+				await switchIntent( page, 'Editing' );
+
+				const sidebar = await openNotesSidebar( page );
+				await sidebar
+					.getByRole( 'button', { name: 'Accept suggestion' } )
+					.click();
+				await expect(
+					page
+						.locator( '.components-snackbar-list' )
+						.getByText( /not allowed to create terms/ )
+				).toBeVisible();
+				// The note stays pending, and nothing was assigned.
+				await expect(
+					sidebar.getByRole( 'button', {
+						name: 'Accept suggestion',
+					} )
+				).toBeVisible();
+				expect( await getCategories() ).toEqual( categories );
+				expect(
+					await findTerms(
+						requestUtils,
+						'categories',
+						'Proposed category'
+					)
+				).toEqual( [] );
+				const [ note ] = await requestUtils.rest( {
+					path: '/wp/v2/comments',
+					params: { post: post.id, type: 'note', status: 'all' },
+				} );
+				expect( note.status ).toBe( 'hold' );
+			} finally {
+				await context.close();
+				await requestUtils.deleteAllUsers();
+			}
+		} );
+
+		test( 'a new term suggestion for a taxonomy the post cannot have is refused by the server', async ( {
+			page,
+		} ) => {
+			const codes = await page.evaluate( async ( id ) => {
+				const send = async ( after: any[] ) => {
+					try {
+						await ( window as any ).wp.apiFetch( {
+							path: '/wp/v2/comments',
+							method: 'POST',
+							data: {
+								post: id,
+								type: 'note',
+								status: 'hold',
+								content: '',
+								meta: {
+									_wp_suggestion: JSON.stringify( {
+										schemaVersion: 2,
+										blockName: '',
+										baseRevision: null,
+										operations: [
+											{
+												type: 'post-attribute-set',
+												attribute: 'tags',
+												before: [],
+												after,
+											},
+										],
+									} ),
+								},
+							},
+						} );
+						return 'created';
+					} catch ( error: any ) {
+						return error?.code;
+					}
+				};
+				return [
+					await send( [ { name: '   ' } ] ),
+					// Tags are flat: a parent cannot be proposed.
+					await send( [ { name: 'Child tag', parent: 3 } ] ),
+					await send( [ 'not a term' ] ),
+				];
+			}, postId );
+			expect( codes ).toEqual( [
+				'rest_invalid_suggestion',
+				'rest_invalid_suggestion',
+				'rest_invalid_suggestion',
+			] );
+		} );
+	} );
+
+	test.describe( 'post meta', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin(
+				'gutenberg-test-suggestion-mode-post-meta'
+			);
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-suggestion-mode-post-meta'
+			);
+		} );
+
+		async function typeIntoMetaField( page: any, text: string ) {
+			await openSettingsPanel( page, 'Test meta' );
+			const field = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'textbox', { name: 'Test meta value' } );
+			const saved = suggestionSavedPromise( page );
+			await field.fill( text );
+			await saved;
+			return field;
+		}
+
+		function getMeta( page: any ) {
+			return page.evaluate(
+				() =>
+					( window as any ).wp.data
+						.select( 'core/editor' )
+						.getEditedPostAttribute( 'meta' ).suggestion_test_meta
+			);
+		}
+
+		test( 'a meta change made in a plugin panel becomes a suggestion', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await editor.openDocumentSettingsSidebar();
+			await switchIntent( page, 'Suggesting' );
+			await typeIntoMetaField( page, 'Suggested value' );
+
+			// The plugin's field reads the proposal back through the editor.
+			expect( await getMeta( page ) ).toBe( 'Suggested value' );
+			expect(
+				( await getEntityValue( page, postId, 'meta' ) )
+					.suggestion_test_meta
+			).toBe( '' );
+
+			const sidebar = await openNotesSidebar( page );
+			const threads = suggestionThreads( sidebar );
+			await expect( threads ).toHaveCount( 1 );
+			await expect(
+				threads.locator(
+					'.editor-collab-sidebar-panel__suggestion-summary'
+				)
+			).toHaveText( 'suggestion_test_meta: “Suggested value”' );
+			await expect( threads ).toContainText(
+				'Post meta: suggestion_test_meta'
+			);
+
+			await savePost( page );
+			expect(
+				( await readStoredPost( requestUtils, postId ) ).meta
+					.suggestion_test_meta
+			).toBe( '' );
+
+			await switchIntent( page, 'Editing' );
+			expect( await getMeta( page ) ).toBe( '' );
+		} );
+
+		test( 'accepting a meta suggestion applies it, rejecting keeps the value', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await editor.openDocumentSettingsSidebar();
+			await switchIntent( page, 'Suggesting' );
+			await typeIntoMetaField( page, 'Accepted value' );
+			await switchIntent( page, 'Editing' );
+
+			const sidebar = await openNotesSidebar( page );
+			await sidebar
+				.getByRole( 'button', { name: 'Accept suggestion' } )
+				.click();
+			await expect.poll( () => getMeta( page ) ).toBe( 'Accepted value' );
+			await savePost( page );
+			expect(
+				( await readStoredPost( requestUtils, postId ) ).meta
+					.suggestion_test_meta
+			).toBe( 'Accepted value' );
+
+			await editor.openDocumentSettingsSidebar();
+			await switchIntent( page, 'Suggesting' );
+			await typeIntoMetaField( page, 'Rejected value' );
+			await openNotesSidebar( page );
+			await sidebar
+				.locator( '.editor-collab-sidebar-panel__thread' )
+				.filter( { hasText: 'Rejected value' } )
+				.getByRole( 'button', { name: 'Reject suggestion' } )
+				.click();
+			await expect.poll( () => getMeta( page ) ).toBe( 'Accepted value' );
+		} );
+
+		test( 'a meta suggestion for an unregistered key is refused by the server', async ( {
+			page,
+		} ) => {
+			const status = await page.evaluate( async ( id ) => {
+				try {
+					await ( window as any ).wp.apiFetch( {
+						path: '/wp/v2/comments',
+						method: 'POST',
+						data: {
+							post: id,
+							type: 'note',
+							status: 'hold',
+							content: '',
+							meta: {
+								_wp_suggestion: JSON.stringify( {
+									schemaVersion: 2,
+									blockName: '',
+									baseRevision: null,
+									operations: [
+										{
+											type: 'post-attribute-set',
+											attribute: 'meta',
+											key: '_not_registered',
+											before: '',
+											after: 'x',
+										},
+									],
+								} ),
+							},
+						},
+					} );
+					return 'created';
+				} catch ( error: any ) {
+					return error?.code;
+				}
+			}, postId );
+			expect( status ).toBe( 'rest_invalid_suggestion' );
+		} );
+	} );
+
+	test.describe( 'after a reload', () => {
+		let mediaId: number;
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			const media = await requestUtils.uploadMedia(
+				'./assets/10x10_e2e_test_image_green.png'
+			);
+			mediaId = media.id;
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllMedia();
+			await requestUtils.deleteAllUsers();
+		} );
+
+		function readPendingNotes( requestUtils: any ) {
+			return requestUtils.rest( {
+				path: '/wp/v2/comments',
+				params: {
+					post: postId,
+					type: 'note',
+					status: 'hold',
+					context: 'edit',
+				},
+			} );
+		}
+
+		function readOperation( note: any ) {
+			return JSON.parse( note.meta._wp_suggestion ).operations[ 0 ];
+		}
+
+		async function reloadSuggesting( page: any ) {
+			await page.reload();
+			await switchIntent( page, 'Suggesting' );
+		}
+
+		for ( const { field, first, second, baseline } of [
+			{
+				field: 'title',
+				first: 'First title',
+				second: 'Second title',
+				baseline: 'Suggestion mode post fields',
+			},
+			{
+				field: 'excerpt',
+				first: 'First excerpt',
+				second: 'Second excerpt',
+				baseline: 'Saved excerpt',
+			},
+			{
+				field: 'slug',
+				first: 'first-slug',
+				second: 'second-slug',
+				baseline: 'saved-slug',
+			},
+			{
+				field: 'featured_media',
+				first: 'MEDIA',
+				second: 0,
+				baseline: 0,
+			},
+		] ) {
+			test( `re-editing a reloaded ${ field } suggestion updates its note`, async ( {
+				page,
+				requestUtils,
+			} ) => {
+				const firstValue = first === 'MEDIA' ? mediaId : first;
+				await switchIntent( page, 'Suggesting' );
+				await suggestPostEdits( page, { [ field ]: firstValue } );
+				const [ note ] = await readPendingNotes( requestUtils );
+
+				await reloadSuggesting( page );
+				// The pending proposal is shown again while suggesting.
+				await expect
+					.poll( () => getEditedPostAttribute( page, field ) )
+					.toEqual( firstValue );
+
+				if ( second === baseline ) {
+					// Editing the field back to the post's value withdraws
+					// the suggestion, as undo does.
+					const trashed = page.waitForResponse(
+						( response: any ) =>
+							response
+								.url()
+								.includes( `/wp/v2/comments/${ note.id }` ) &&
+							response.request().postData()?.includes( 'trash' )
+					);
+					await page.evaluate(
+						( edits: Record< string, any > ) =>
+							( window as any ).wp.data
+								.dispatch( 'core/editor' )
+								.editPost( edits ),
+						{ [ field ]: second }
+					);
+					await trashed;
+					expect( await readPendingNotes( requestUtils ) ).toEqual(
+						[]
+					);
+					return;
+				}
+
+				await suggestPostEdits( page, { [ field ]: second } );
+				const notes = await readPendingNotes( requestUtils );
+				expect( notes.map( ( { id }: any ) => id ) ).toEqual( [
+					note.id,
+				] );
+				expect( readOperation( notes[ 0 ] ) ).toMatchObject( {
+					attribute: field,
+					before: baseline,
+					after: second,
+				} );
+			} );
+		}
+
+		test( 'undo after re-editing a reloaded suggestion goes back to its note', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			await switchIntent( page, 'Suggesting' );
+			await suggestPostEdits( page, { excerpt: 'First excerpt' } );
+			await reloadSuggesting( page );
+			await expect
+				.poll( () => getEditedPostAttribute( page, 'excerpt' ) )
+				.toBe( 'First excerpt' );
+			await suggestPostEdits( page, { excerpt: 'Second excerpt' } );
+
+			const restored = suggestionSavedPromise( page );
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Undo' } )
+				.click();
+			await restored;
+
+			// The suggestion made in the earlier session is kept, not withdrawn.
+			expect( await getEditedPostAttribute( page, 'excerpt' ) ).toBe(
+				'First excerpt'
+			);
+			const notes = await readPendingNotes( requestUtils );
+			expect( notes ).toHaveLength( 1 );
+			expect( readOperation( notes[ 0 ] ).after ).toBe( 'First excerpt' );
+		} );
+
+		test( "another author's suggestion on the same field is left alone", async ( {
+			page,
+			requestUtils,
+		} ) => {
+			const other = await requestUtils.createUser( {
+				username: 'otherreviewer',
+				email: 'otherreviewer@example.com',
+				password: 'password',
+				roles: [ 'editor' ],
+			} );
+			const theirs = await requestUtils.rest( {
+				method: 'POST',
+				path: '/wp/v2/comments',
+				data: {
+					post: postId,
+					type: 'note',
+					status: 'hold',
+					author: other.id,
+					content: '',
+					meta: {
+						_wp_suggestion: JSON.stringify( {
+							schemaVersion: 2,
+							blockName: '',
+							baseRevision: null,
+							operations: [
+								{
+									type: 'post-attribute-set',
+									attribute: 'excerpt',
+									before: 'Saved excerpt',
+									after: 'Their excerpt',
+								},
+							],
+						} ),
+					},
+				},
+			} );
+
+			await reloadSuggesting( page );
+			// Their proposal is theirs: it is not shown as ours.
+			expect( await getEditedPostAttribute( page, 'excerpt' ) ).toBe(
+				'Saved excerpt'
+			);
+			await suggestPostEdits( page, { excerpt: 'My excerpt' } );
+
+			const notes = await readPendingNotes( requestUtils );
+			expect( notes ).toHaveLength( 2 );
+			const mine = notes.find( ( { id }: any ) => id !== theirs.id );
+			expect( readOperation( mine ) ).toMatchObject( {
+				before: 'Saved excerpt',
+				after: 'My excerpt',
+			} );
+			expect(
+				readOperation(
+					notes.find( ( { id }: any ) => id === theirs.id )
+				).after
+			).toBe( 'Their excerpt' );
+		} );
+	} );
+
+	test.describe( 'trash', () => {
+		const TRASH_REFUSED_MESSAGE =
+			"Moving to the trash isn't available while suggesting. Switch to Editing to move it to the trash.";
+
+		test( 'Move to trash is locked while suggesting', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.openDocumentSettingsSidebar();
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			const trashButton = settings.getByRole( 'button', {
+				name: 'Move to trash',
+			} );
+			await expect( trashButton ).toBeEnabled();
+
+			await switchIntent( page, 'Suggesting' );
+			await expect( trashButton ).toBeDisabled();
+			await expect( trashButton ).toHaveAccessibleDescription(
+				TRASH_REFUSED_MESSAGE
+			);
+
+			// The post actions menu does not offer it either.
+			await settings.getByRole( 'button', { name: 'Actions' } ).click();
+			await expect(
+				page.getByRole( 'menuitem', { name: 'Rename…' } )
+			).toBeVisible();
+			await expect(
+				page.getByRole( 'menuitem', { name: 'Trash…' } )
+			).toBeHidden();
+			await page.keyboard.press( 'Escape' );
+
+			await switchIntent( page, 'Editing' );
+			await expect( trashButton ).toBeEnabled();
+		} );
+
+		test( 'trashing the post is refused while suggesting, whatever the path', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			await switchIntent( page, 'Suggesting' );
+
+			for ( const path of [ 'trashPost', 'deleteEntityRecord' ] ) {
+				await page.evaluate(
+					( [ id, via ]: [ number, string ] ) => {
+						const { dispatch } = ( window as any ).wp.data;
+						dispatch( 'core/notices' ).removeAllNotices(
+							'snackbar'
+						);
+						if ( via === 'trashPost' ) {
+							return dispatch( 'core/editor' ).trashPost();
+						}
+						return dispatch( 'core' ).deleteEntityRecord(
+							'postType',
+							'post',
+							id
+						);
+					},
+					[ postId, path ] as [ number, string ]
+				);
+				await expect(
+					page
+						.locator( '.components-snackbar-list' )
+						.getByText( TRASH_REFUSED_MESSAGE )
+				).toBeVisible();
+			}
+
+			// `status: 'trash'` through the post itself is refused as a status
+			// change.
+			await page.evaluate( () =>
+				( window as any ).wp.data
+					.dispatch( 'core/editor' )
+					.editPost( { status: 'trash' } )
+			);
+			await savePost( page );
+
+			const stored = await readStoredPost( requestUtils, postId );
+			expect( stored.status ).toBe( 'draft' );
+		} );
+	} );
+
+	test.describe( 'site settings', () => {
+		test.afterEach( async ( { requestUtils } ) => {
+			await requestUtils.updateSiteSettings( {
+				posts_per_page: 10,
+				default_comment_status: 'open',
+			} );
+		} );
+
+		test( 'a site settings edit is refused while suggesting', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			await switchIntent( page, 'Suggesting' );
+
+			await page.evaluate( () =>
+				( window as any ).wp.data
+					.dispatch( 'core' )
+					.editEntityRecord( 'root', 'site', undefined, {
+						posts_per_page: 3,
+					} )
+			);
+			await expect(
+				page
+					.locator( '.components-snackbar-list' )
+					.getByText( REFUSED_FIELD_MESSAGE )
+			).toBeVisible();
+			expect(
+				await page.evaluate(
+					() =>
+						( window as any ).wp.data
+							.select( 'core' )
+							.getEditedEntityRecord( 'root', 'site' )
+							.posts_per_page
+				)
+			).toBe( 10 );
+
+			// A direct save of the site entity is refused too.
+			await page.evaluate( () =>
+				( window as any ).wp.data
+					.dispatch( 'core' )
+					.saveEntityRecord( 'root', 'site', {
+						default_comment_status: 'closed',
+					} )
+			);
+			const settings = await requestUtils.getSiteSettings();
+			expect( settings.posts_per_page ).toBe( 10 );
+			expect( settings.default_comment_status ).toBe( 'open' );
+		} );
+
+		test.describe( 'in the index template', () => {
+			let blogPage: any;
+
+			test.beforeAll( async ( { requestUtils } ) => {
+				await requestUtils.activateTheme( 'emptytheme' );
+				blogPage = await requestUtils.createPage( {
+					title: 'Blog',
+					status: 'publish',
+				} );
+				await requestUtils.updateSiteSettings( {
+					show_on_front: 'page',
+					page_for_posts: blogPage.id,
+				} );
+			} );
+
+			test.afterAll( async ( { requestUtils } ) => {
+				await requestUtils.updateSiteSettings( {
+					show_on_front: 'posts',
+					page_for_posts: 0,
+				} );
+				await requestUtils.deleteAllPages();
+				await requestUtils.activateTheme( 'twentytwentyone' );
+			} );
+
+			test( 'the site settings rows are read-only while suggesting', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.setPreferences( 'core/edit-post', {
+					welcomeGuideTemplate: false,
+				} );
+				await switchIntent( page, 'Suggesting' );
+				// The template panel is locked while suggesting, so open the
+				// template the way its "Edit template" item does.
+				await page.evaluate( () =>
+					( window as any ).wp.data
+						.select( 'core/editor' )
+						.getEditorSettings()
+						.onNavigateToEntityRecord( {
+							postId: 'emptytheme//index',
+							postType: 'wp_template',
+						} )
+				);
+				await editor.openDocumentSettingsSidebar();
+				const settings = page.getByRole( 'region', {
+					name: 'Editor settings',
+				} );
+				const rows = [
+					settings.getByRole( 'button', {
+						name: 'Change blog title: Blog',
+					} ),
+					settings.getByRole( 'button', {
+						name: 'Change posts per page',
+					} ),
+					settings.getByRole( 'button', {
+						name: 'Change discussion settings',
+					} ),
+				];
+				for ( const row of rows ) {
+					await expect( row ).toBeDisabled();
+					await expect( row ).toHaveAccessibleDescription(
+						LOCKED_FIELD_HINT
+					);
+				}
+
+				// The blog title is the posts page's title, also refused.
+				await page.evaluate(
+					( id ) =>
+						( window as any ).wp.data
+							.dispatch( 'core' )
+							.editEntityRecord( 'postType', 'page', id, {
+								title: 'Latest news',
+							} ),
+					blogPage.id
+				);
+				await expect(
+					page
+						.locator( '.components-snackbar-list' )
+						.getByText( REFUSED_FIELD_MESSAGE )
+				).toBeVisible();
+				expect(
+					await page.evaluate(
+						( id ) =>
+							( window as any ).wp.data
+								.select( 'core' )
+								.getEditedEntityRecord( 'postType', 'page', id )
+								.title,
+						blogPage.id
+					)
+				).toBe( 'Blog' );
+			} );
+
+			test( 'the DataForm summary shows the site settings read-only while suggesting', async ( {
+				admin,
+				editor,
+				page,
+				requestUtils,
+			} ) => {
+				await requestUtils.setGutenbergExperiments( [
+					'gutenberg-suggestion-mode',
+					'gutenberg-dataform-inspector',
+				] );
+				try {
+					await admin.editPost( postId );
+					await editor.setPreferences( 'core/edit-post', {
+						welcomeGuideTemplate: false,
+					} );
+					await switchIntent( page, 'Suggesting' );
+					await page.evaluate( () =>
+						( window as any ).wp.data
+							.select( 'core/editor' )
+							.getEditorSettings()
+							.onNavigateToEntityRecord( {
+								postId: 'emptytheme//index',
+								postType: 'wp_template',
+							} )
+					);
+					await editor.openDocumentSettingsSidebar();
+					const settings = page.getByRole( 'region', {
+						name: 'Editor settings',
+					} );
+					await expect(
+						settings.getByText( 'Posts per page' )
+					).toBeVisible();
+					await expect(
+						settings.getByRole( 'button', {
+							name: /^Edit (Blog title|Posts per page|Discussion)$/,
+						} )
+					).toHaveCount( 0 );
+				} finally {
+					await requestUtils.setGutenbergExperiments( [
+						'gutenberg-suggestion-mode',
+					] );
+				}
+			} );
+		} );
+	} );
+} );

@@ -2,6 +2,7 @@
 @use "@wordpress/base-styles/mixins" as *;
 @use "./components/block-icon/content.scss" as *;
 @use "./components/block-list/content.scss" as *;
+@use "./components/block-list/content-suggestion.scss" as *;
 @use "./components/block-list-appender/content.scss" as *;
 @use "./components/block-content-overlay/content.scss" as *;
 @use "./components/block-draggable/content.scss" as *;

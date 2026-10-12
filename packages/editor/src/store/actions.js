@@ -28,10 +28,24 @@ import {
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
+import { EDITOR_INTENT_SUGGEST } from './constants';
+import {
+	classifySuggestedPostEdits,
+	getPostFieldProposalId,
+	stripSuggestedPostSave,
+} from './suggest-post-edits';
+import {
+	announceSuggestRefusal,
+	announceSuggestTrashRefusal,
+	withoutSuggestPostEditGuard,
+} from './suggest-post-edit-guard';
 import attachMediaInPost from './utils/attach-media-in-post';
 import { unlock } from '../lock-unlock';
 import { setCanvasWidth } from './private-actions';
 import { getCanvasWidthByDeviceType } from '../utils/device-type';
+
+// Edits the read-only `view` intent lets through; see `editPost`.
+const VIEW_UNGUARDED_POST_FIELDS = [ 'blocks', 'content', 'selection' ];
 
 const { getEntitySnapshot } = unlock( coreDataPrivateApis );
 
@@ -179,11 +193,129 @@ export function setEditedPost( postType, postId ) {
  */
 export const editPost =
 	( edits, options ) =>
-	( { select, registry } ) => {
+	( { select, dispatch, registry } ) => {
 		const { id, type } = select.getCurrentPost();
+		let nextEdits = edits;
+
+		/*
+		 * Viewing is a read-only preview, but the sidebar controls (excerpt,
+		 * author, slug, featured image...) are not part of the preview-mode
+		 * canvas, so refuse their edits here, where every one of them lands.
+		 * Block content is left alone: the canvas and the block-editor store
+		 * already refuse changes in preview mode, and `blocks`/`content`
+		 * edits are also how block sync and `savePost` keep the entity current.
+		 * An edit that only repeats a current value changes nothing and passes.
+		 */
+		if ( select.isEditorIntentReadOnly() ) {
+			const changesPostFields = Object.keys( edits ).some(
+				( key ) =>
+					! VIEW_UNGUARDED_POST_FIELDS.includes( key ) &&
+					edits[ key ] !== select.getEditedPostAttribute( key )
+			);
+			if ( changesPostFields ) {
+				registry
+					.dispatch( noticesStore )
+					.createNotice(
+						'info',
+						__(
+							"The post can't be changed while viewing. Switch to Editing to change it."
+						),
+						{
+							id: 'editor-view-read-only',
+							type: 'snackbar',
+							isDismissible: true,
+						}
+					);
+				return;
+			}
+		}
+
+		/*
+		 * Suggestion mode proposes changes, it doesn't apply them. Content
+		 * edits pass (the blocks carry their own suggestion markers); every
+		 * other post-level change is refused - status among them, the field
+		 * that moves the post along the editorial workflow. Refused here
+		 * rather than in the sidebar controls alone: the publish button,
+		 * "Switch to draft", the command palette and third-party code all
+		 * reach the post through this action. See issue #73411 (F-15).
+		 */
+		if ( select.getEditorIntent() === EDITOR_INTENT_SUGGEST ) {
+			const { passthrough, proposals, refused } =
+				classifySuggestedPostEdits( edits, {
+					// A proposal's full value: a terms proposal can hold
+					// new terms `getEditedPostAttribute` leaves out.
+					getCurrentValue: ( key ) =>
+						key !== 'meta' && select.getPostFieldProposals()[ key ]
+							? select.getPostFieldProposals()[ key ].proposed
+							: select.getEditedPostAttribute( key ),
+					isProposable: ( attribute, key ) =>
+						select.isProposablePostField( attribute, key ),
+				} );
+			if ( refused.length ) {
+				announceSuggestRefusal( registry, refused );
+				/*
+				 * Refuse the whole call, not just the locked key. A status
+				 * edit rarely travels alone - `PostVisibility` pairs it with
+				 * `password`, scheduling pairs it with `date` - and applying
+				 * the companion while dropping the status leaves the post in
+				 * a state nobody asked for: switching a published post to
+				 * Private while suggesting would strip its password and keep
+				 * it published. Content still passes (`passthrough` holds
+				 * nothing else), so a stray locked key never costs the user
+				 * their block edits.
+				 */
+			} else {
+				/*
+				 * A proposal keeps the value the field had when it was first
+				 * proposed as its baseline, so revising a proposal never
+				 * moves what the reviewer compares against.
+				 */
+				for ( const { attribute, key, value } of proposals ) {
+					const proposalId = getPostFieldProposalId( attribute, key );
+					const existing =
+						select.getPostFieldProposals()[ proposalId ];
+					dispatch.setPostFieldProposal( proposalId, {
+						attribute,
+						...( key ? { key } : {} ),
+						// A proposal restored from its note keeps the link,
+						// so the note is updated rather than duplicated.
+						...( existing?.commentId
+							? {
+									commentId: existing.commentId,
+									noteValue: existing.noteValue,
+								}
+							: {} ),
+						baseline: existing
+							? existing.baseline
+							: select.getPostFieldValueWithoutProposals(
+									attribute,
+									key
+								),
+						proposed: value,
+					} );
+				}
+			}
+			nextEdits = passthrough;
+			if ( ! Object.keys( nextEdits ).length ) {
+				return;
+			}
+			withoutSuggestPostEditGuard( () =>
+				registry
+					.dispatch( coreStore )
+					.editEntityRecord(
+						'postType',
+						type,
+						id,
+						nextEdits,
+						options
+					)
+			);
+			return;
+		}
+
 		registry
 			.dispatch( coreStore )
-			.editEntityRecord( 'postType', type, id, edits, options );
+			.editEntityRecord( 'postType', type, id, nextEdits, options );
 	};
 
 /**
@@ -228,6 +360,19 @@ export const savePost =
 			);
 		} catch ( err ) {
 			error = err;
+		}
+
+		/*
+		 * A save made while suggesting sends the content and nothing else.
+		 * `editPost` and the entity guard refuse post-level edits as they are
+		 * made, but an edit staged in Editing is still on the entity when the
+		 * intent changes, and a plugin's `editor.preSavePost` filter can add
+		 * one: neither may reach the post from Suggesting. Stripped after the
+		 * filter so nothing can add a field back. The stripped edits stay on
+		 * the entity, so returning to Editing saves them as usual.
+		 */
+		if ( select.getEditorIntent() === EDITOR_INTENT_SUGGEST ) {
+			edits = stripSuggestedPostSave( edits );
 		}
 
 		if ( ! error ) {
@@ -388,6 +533,15 @@ export function refreshPost() {
 export const trashPost =
 	( { force = false } = {} ) =>
 	async ( { select, dispatch, registry } ) => {
+		/*
+		 * Suggestion mode proposes changes; trashing the post is not one a
+		 * reviewer could accept or reject, so it is refused while suggesting,
+		 * whichever control asked. See issue #73411.
+		 */
+		if ( select.getEditorIntent() === EDITOR_INTENT_SUGGEST ) {
+			announceSuggestTrashRefusal( registry );
+			return;
+		}
 		const postTypeSlug = select.getCurrentPostType();
 		const postType = await registry
 			.resolveSelect( coreStore )
@@ -503,19 +657,30 @@ export const __unstableSaveForPreview =
 
 /**
  * Action that restores last popped state in undo history.
+ *
+ * Refused in the read-only `view` intent: undo and redo rewrite the post the
+ * same way a keystroke does, and the header buttons stay mounted there.
  */
 export const redo =
 	() =>
-	( { registry } ) => {
+	( { registry, select } ) => {
+		if ( select.isEditorIntentReadOnly() ) {
+			return;
+		}
 		registry.dispatch( coreStore ).redo();
 	};
 
 /**
  * Action that pops a record from undo history and undoes the edit.
+ *
+ * Refused in the read-only `view` intent — see `redo`.
  */
 export const undo =
 	() =>
-	( { registry } ) => {
+	( { registry, select } ) => {
+		if ( select.isEditorIntentReadOnly() ) {
+			return;
+		}
 		registry.dispatch( coreStore ).undo();
 	};
 
@@ -1060,7 +1225,42 @@ export const toggleTopToolbar =
  */
 export const switchEditorMode =
 	( mode ) =>
-	( { dispatch, registry } ) => {
+	( { dispatch, registry, select } ) => {
+		/*
+		 * The code editor edits raw `post_content`, which has nowhere to put
+		 * an inline marker and is re-parsed wholesale on the way back, so a
+		 * raw edit bypasses suggestion capture and takes the existing markers
+		 * down with it. It is also the one editing surface the read-only
+		 * canvas does not cover, so without this the Viewing intent would
+		 * hand a user a fully writable copy of the post.
+		 * `getCodeEditorUnavailableReason` owns all three cases - the `view`
+		 * intent, the `suggest` intent, and any intent while markers are
+		 * still pending - so this refusal, the disabled menu item, and the
+		 * filtered command all agree.
+		 *
+		 * Refusing here is what actually closes the hole: the menu item is
+		 * disabled and the command is filtered out, but the keyboard shortcut
+		 * reaches this action directly. Raise a snackbar, because a shortcut
+		 * that silently does nothing reads as a broken editor. The snackbar
+		 * is the sole announcer: it speaks its own content politely, which is
+		 * the right register for a refusal.
+		 */
+		if ( mode === 'text' ) {
+			const unavailableReason = select.getCodeEditorUnavailableReason( {
+				checkPendingSuggestions: true,
+			} );
+			if ( unavailableReason ) {
+				registry
+					.dispatch( noticesStore )
+					.createNotice( 'info', unavailableReason, {
+						id: 'editor-code-editor-unavailable',
+						type: 'snackbar',
+						isDismissible: true,
+					} );
+				return;
+			}
+		}
+
 		registry.dispatch( preferencesStore ).set( 'core', 'editorMode', mode );
 
 		if ( mode !== 'visual' ) {

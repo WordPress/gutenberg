@@ -6,6 +6,7 @@ import {
 	TextControl,
 	RadioControl,
 } from '@wordpress/components';
+import { Tooltip } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
@@ -19,11 +20,15 @@ import {
 	pending,
 	notAllowed,
 } from '@wordpress/icons';
-import { DESIGN_POST_TYPES } from '../../store/constants';
+import {
+	DESIGN_POST_TYPES,
+	EDITOR_INTENT_SUGGEST,
+} from '../../store/constants';
 import PostPanelRow from '../post-panel-row';
 import PostSticky from '../post-sticky';
 import { PrivatePostSchedule } from '../post-schedule';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const postStatusesInfo = {
 	'auto-draft': { label: __( 'Draft' ), icon: drafts },
@@ -63,8 +68,8 @@ export const STATUS_OPTIONS = [
 ];
 
 export default function PostStatus() {
-	const { status, date, password, postId, postType, canEdit } = useSelect(
-		( select ) => {
+	const { status, date, password, postId, postType, canEdit, isSuggesting } =
+		useSelect( ( select ) => {
 			const {
 				getEditedPostAttribute,
 				getCurrentPostId,
@@ -79,10 +84,12 @@ export default function PostStatus() {
 				postType: getCurrentPostType(),
 				canEdit:
 					getCurrentPost()._links?.[ 'wp:action-publish' ] ?? false,
+				// `getEditorIntent` is private while Suggest mode is experimental.
+				isSuggesting:
+					unlock( select( editorStore ) ).getEditorIntent() ===
+					EDITOR_INTENT_SUGGEST,
 			};
-		},
-		[]
-	);
+		}, [] );
 	const [ showPassword, setShowPassword ] = useState( !! password );
 	const passwordInputId = useInstanceId(
 		PostStatus,
@@ -107,6 +114,52 @@ export default function PostStatus() {
 
 	if ( DESIGN_POST_TYPES.includes( postType ) ) {
 		return null;
+	}
+
+	/*
+	 * A status change is an editorial decision, not a proposal: nothing in the
+	 * suggestion layer can hold it as pending or hand it to a reviewer. Rather
+	 * than let the control move the post through the workflow behind the
+	 * reviewer's back, show the current status and say where to change it.
+	 * `editPost` refuses the same field for the paths that don't go through
+	 * this control. See issue #73411 (F-15).
+	 */
+	if ( isSuggesting ) {
+		const suggestingHint = __(
+			'The post status cannot be suggested. Switch to Editing to change it.'
+		);
+		return (
+			<PostPanelRow label={ __( 'Status' ) }>
+				<Tooltip.Root>
+					<Tooltip.Trigger
+						render={
+							<Button
+								className="editor-post-status__toggle"
+								variant="tertiary"
+								size="compact"
+								icon={ postStatusesInfo[ status ]?.icon }
+								disabled
+								accessibleWhenDisabled
+								/*
+								 * `description` rather than `label`, which
+								 * doubles as the button's `aria-label` and
+								 * would replace the status with the reason as
+								 * its accessible name - leaving a screen
+								 * reader user told why the control is disabled
+								 * but never told what the status is. The
+								 * tooltip carries the reason to everyone else,
+								 * since tooltip popups are visual-only.
+								 */
+								description={ suggestingHint }
+							>
+								{ postStatusesInfo[ status ]?.label }
+							</Button>
+						}
+					/>
+					<Tooltip.Popup>{ suggestingHint }</Tooltip.Popup>
+				</Tooltip.Root>
+			</PostPanelRow>
+		);
 	}
 
 	const updatePost = ( {

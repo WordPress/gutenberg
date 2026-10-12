@@ -204,7 +204,6 @@ export const registerPostTypeSchema =
 			canCreate &&
 			duplicatePost;
 
-		// @ts-expect-error `globalThis` has no index signature for this build-time global.
 		if ( ! globalThis.IS_GUTENBERG_PLUGIN ) {
 			// Outside Gutenberg, disable duplication.
 			canDuplicate = undefined;

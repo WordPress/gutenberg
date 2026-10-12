@@ -290,6 +290,8 @@ _Returns_
 
 Returns a single attribute of the post being edited, preferring the unsaved edit if one exists, but falling back to the attribute for the last known saved state of the post.
 
+While the editor is in Suggestion mode (experimental), a post field with a pending suggestion returns the suggested value instead, so the fields the suggester changed show what they proposed. The post itself keeps its value until a reviewer accepts the suggestion: read the `core` entity record (`getEditedEntityRecord`) for the value the post will be saved with. A suggested meta value is merged into `meta`, and a suggested term field returns term ids only, leaving out terms that do not exist yet.
+
 _Usage_
 
 ```js
@@ -1393,6 +1395,8 @@ _Related_
 
 Action that restores last popped state in undo history.
 
+Refused in the read-only `view` intent: undo and redo rewrite the post the same way a keystroke does, and the header buttons stay mounted there.
+
 ### refreshPost
 
 > **Deprecated** Since WordPress 6.0.
@@ -1675,6 +1679,8 @@ _Parameters_
 ### undo
 
 Action that pops a record from undo history and undoes the edit.
+
+Refused in the read-only `view` intent — see `redo`.
 
 ### unlockPostAutosaving
 
