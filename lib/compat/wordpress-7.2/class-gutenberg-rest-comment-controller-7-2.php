@@ -23,7 +23,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 *
 	 * @since 7.2.0
 	 *
-	 * @return array Item schema data.
+	 * @return array<string, mixed> Item schema data.
 	 */
 	public function get_item_schema() {
 		$schema = parent::get_item_schema();
@@ -39,10 +39,12 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 					'count'                 => array(
 						'description' => __( 'Total number of reactions with this emoji.', 'gutenberg' ),
 						'type'        => 'integer',
+						'minimum'     => 0,
 					),
 					'current_user_reaction' => array(
 						'description' => __( 'The current user\'s reaction comment ID for this emoji, or 0 if they have not reacted.', 'gutenberg' ),
 						'type'        => 'integer',
+						'minimum'     => 0,
 					),
 				),
 			),
@@ -54,10 +56,10 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	/**
 	 * Checks whether the request type is an internal comment type (note or reaction).
 	 *
-	 * @param string $type The comment type from the request.
+	 * @param mixed $type The comment type from the request.
 	 * @return bool True if the type is one of the internal comment types.
 	 */
-	protected function is_note_or_reaction( $type ) {
+	protected function is_note_or_reaction( $type ): bool {
 		return in_array( $type, array( 'note', 'reaction' ), true );
 	}
 
@@ -71,7 +73,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 * @param string $post_type Post type name.
 	 * @return bool True if the post type supports notes, false otherwise.
 	 */
-	protected function check_post_type_supports_notes( $post_type ) {
+	protected function check_post_type_supports_notes( string $post_type ): bool {
 		$supports = get_all_post_type_supports( $post_type );
 		if ( ! isset( $supports['editor'] ) ) {
 			return false;
@@ -362,7 +364,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 */
 	public function create_item_permissions_check( $request ) {
 		// START CHANGE: Treat `reaction` like `note`.
-		$is_note = ! empty( $request['type'] ) && $this->is_note_or_reaction( $request['type'] );
+		$is_note = $this->is_note_or_reaction( $request['type'] );
 		// END CHANGE.
 
 		if ( ! is_user_logged_in() && $is_note ) {
@@ -411,7 +413,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		 * somebody else could never be counted or removed.
 		 */
 		if (
-			! empty( $request['type'] ) && 'reaction' === $request['type'] &&
+			'reaction' === $request['type'] &&
 			isset( $request['author'] ) && get_current_user_id() !== (int) $request['author']
 		) {
 			return new WP_Error(
@@ -551,7 +553,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		$reaction_key = null;
 
 		// Validate reaction-specific requirements.
-		if ( ! empty( $request['type'] ) && 'reaction' === $request['type'] ) {
+		if ( 'reaction' === $request['type'] ) {
 			// Validate parent is a note.
 			if ( empty( $request['parent'] ) ) {
 				return new WP_Error(
@@ -934,7 +936,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 * multiple note comments.
 	 *
 	 * @since 7.2.0
-	 * @var array|null
+	 * @var array<int, array<string, array{count: int, current_user_reaction: int}>>|null
 	 */
 	protected $reaction_summaries = null;
 
@@ -959,7 +961,6 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		 */
 		$prefetch = null;
 		if (
-			! empty( $request['type'] ) &&
 			'note' === $request['type'] &&
 			rest_is_field_included( 'reaction_summary', $fields )
 		) {
@@ -1008,35 +1009,26 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 
 		$current_user_id = get_current_user_id();
 
-		// Query 1: Get aggregated counts per emoji per note.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$counts = $wpdb->get_results(
-			$wpdb->prepare(
-				'SELECT comment_parent, comment_content, COUNT(*) AS reaction_count
-				FROM ' . $wpdb->comments . '
-				WHERE comment_parent IN (' . implode( ',', array_fill( 0, count( $note_ids ), '%d' ) ) . ')
-				AND comment_type = %s
-				AND comment_approved = %s
-				GROUP BY comment_parent, comment_content',
-				...array_merge( $note_ids, array( 'reaction', '1' ) )
-			)
+		$parent_in = $wpdb->prepare(
+			'comment_parent IN (' . implode( ',', array_fill( 0, count( $note_ids ), '%d' ) ) . ')',
+			...$note_ids
 		);
+
+		// Query 1: Get aggregated counts per emoji per note.
+		$query  = "SELECT comment_parent, comment_content, COUNT(*) AS reaction_count FROM $wpdb->comments WHERE comment_type = 'reaction' AND comment_approved = '1' AND ";
+		$query .= $parent_in;
+		$query .= ' GROUP BY comment_parent, comment_content';
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		$counts = $wpdb->get_results( $query );
 
 		// Query 2: Get the current user's own reaction IDs (if logged in).
 		$my_reactions = array();
 		if ( $current_user_id ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$user_rows = $wpdb->get_results(
-				$wpdb->prepare(
-					'SELECT comment_ID, comment_parent, comment_content
-					FROM ' . $wpdb->comments . '
-					WHERE comment_parent IN (' . implode( ',', array_fill( 0, count( $note_ids ), '%d' ) ) . ')
-					AND comment_type = %s
-					AND comment_approved = %s
-					AND user_id = %d',
-					...array_merge( $note_ids, array( 'reaction', '1', $current_user_id ) )
-				)
-			);
+			$query  = "SELECT comment_ID, comment_parent, comment_content FROM $wpdb->comments WHERE comment_type = 'reaction' AND comment_approved = '1' AND ";
+			$query .= $parent_in;
+			$query .= $wpdb->prepare( ' AND user_id = %d', $current_user_id );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			$user_rows = $wpdb->get_results( $query );
 
 			if ( $user_rows ) {
 				foreach ( $user_rows as $row ) {
