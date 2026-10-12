@@ -7,7 +7,11 @@ import BaseControl from '../base-control';
 import Button from '../button';
 import Icon from '../icon';
 import { COLORS } from '../utils';
-import { floatClamp, useControlledRangeValue } from './utils';
+import {
+	floatClamp,
+	useControlledRangeValue,
+	getCSSWideKeyword,
+} from './utils';
 import { clamp } from '../utils/math';
 import InputRange from './input-range';
 import RangeRail from './rail';
@@ -117,10 +121,13 @@ function UnforwardedRangeControl(
 
 	const classes = clsx( 'components-range-control', className );
 
+	const colorKeyword = getCSSWideKeyword( colorProp );
+	const trackColorKeyword = getCSSWideKeyword( trackColor );
+
 	const wrapperClasses = clsx(
 		'components-range-control__wrapper',
 		styles.wrapper,
-		styles[ `color-${ colorProp || 'inherit' }` ],
+		colorKeyword && styles[ `color-${ colorKeyword }` ],
 		!! marks && 'is-marked'
 	);
 
@@ -272,14 +279,16 @@ function UnforwardedRangeControl(
 							'components-range-control__track',
 							styles.track,
 							{ [ styles[ 'is-disabled' ] ]: disabled },
-							! disabled && styles[ `background-${ trackColor }` ]
+							! disabled &&
+								trackColorKeyword &&
+								styles[ `background-${ trackColorKeyword }` ]
 						) }
 						{ ...{ disabled } }
 						style={
 							{
 								width: fillValueOffset,
 								'--wp-components-range-control-track-color':
-									trackColor || undefined,
+									trackColor || 'currentColor',
 							} as React.CSSProperties
 						}
 					/>

@@ -1,5 +1,7 @@
 import { isRTL } from '@wordpress/i18n';
 import clsx from 'clsx';
+import { COLORS } from '../utils';
+import { getCSSWideKeyword } from './utils';
 import RangeMark from './mark';
 import { PolymorphicElement } from '../utils/polymorphic-element';
 import styles from './style.module.scss';
@@ -27,6 +29,8 @@ export default function RangeRail(
 		...restProps
 	} = props;
 
+	const railColorKeyword = getCSSWideKeyword( railColor );
+
 	return (
 		<>
 			<PolymorphicElement
@@ -37,12 +41,14 @@ export default function RangeRail(
 					styles.rail,
 					className,
 					{ [ styles[ 'is-disabled' ] ]: disabled },
-					! disabled && styles[ `background-${ railColor }` ]
+					! disabled &&
+						railColorKeyword &&
+						styles[ `background-${ railColorKeyword }` ]
 				) }
 				style={
 					{
 						'--wp-components-range-control-rail-color':
-							railColor || undefined,
+							railColor || COLORS.theme.gray[ 300 ],
 						...style,
 					} as React.CSSProperties
 				}

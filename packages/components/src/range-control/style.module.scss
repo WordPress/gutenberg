@@ -1,9 +1,6 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "../utils/theme-variables" as *;
 
-$color-default: $components-color-accent;
-$rail-default: $components-color-gray-300;
-
 .root {
 	-webkit-tap-highlight-color: transparent;
 	align-items: center;
@@ -22,7 +19,7 @@ $rail-default: $components-color-gray-300;
 	flex: 1;
 	position: relative;
 	width: 100%;
-	color: var(--wp-components-range-control-color, $color-default);
+	color: var(--wp-components-range-control-color);
 	height: 30px;
 	min-height: 30px;
 }
@@ -50,7 +47,7 @@ $rail-default: $components-color-gray-300;
 	margin-top: 13px;
 	top: 0;
 	border-radius: $radius-full;
-	background: var(--wp-components-range-control-rail-color, $rail-default);
+	background: var(--wp-components-range-control-rail-color);
 
 	&:where(.is-disabled) {
 		background: $components-color-gray-100;
@@ -66,7 +63,7 @@ $rail-default: $components-color-gray-300;
 	position: absolute;
 	margin-top: 13px;
 	top: 0;
-	background: var(--wp-components-range-control-track-color, currentColor);
+	background: var(--wp-components-range-control-track-color);
 
 	&:where(.is-disabled) {
 		background: $components-color-gray-400;
