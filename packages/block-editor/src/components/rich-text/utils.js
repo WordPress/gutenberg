@@ -47,9 +47,10 @@ getAllowedFormats.EMPTY_ARRAY = [];
  * rich text data or an HTML string. Spreading rich text data would lose them:
  * they are getters.
  *
- * @param {RichTextData|string|undefined} value Attribute value.
+ * @param {unknown} value Attribute value.
  *
- * @return {Object} Rich text value without a selection.
+ * @return {import('@wordpress/rich-text').RichTextValue} Rich text value
+ *                                                       without a selection.
  */
 export function toRecord( value ) {
 	if ( value instanceof RichTextData ) {

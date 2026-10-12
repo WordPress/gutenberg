@@ -4,6 +4,7 @@ import { Popover } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import {
 	RichTextData,
+	create,
 	join,
 	split,
 	toHTMLString,
@@ -43,8 +44,6 @@ type SelectionEnd = {
 	offset?: number;
 };
 
-type Record = Pick< RichTextValue, 'formats' | 'replacements' | 'text' >;
-
 /**
  * Returns the key of the block's rich text attribute if that is all the
  * content the block has: exactly one attribute sourced from the markup, and
@@ -55,20 +54,17 @@ type Record = Pick< RichTextValue, 'formats' | 'replacements' | 'text' >;
  *
  * @return Attribute key.
  */
-function getSoleRichTextAttributeKey( blockName: string ): string | undefined {
+function getSoleRichTextAttributeKey(
+	blockName: string | null
+): string | undefined {
 	const sourced = Object.entries(
-		getBlockType( blockName )?.attributes ?? {}
+		getBlockType( blockName ?? '' )?.attributes ?? {}
 	).filter( ( [ , { source } ] ) => source );
 	if ( sourced.length === 1 && sourced[ 0 ][ 1 ].source === 'rich-text' ) {
 		return sourced[ 0 ][ 0 ];
 	}
+	return undefined;
 }
-
-const NONE: {
-	clientIds?: string[];
-	anchor?: SelectionEnd;
-	focus?: SelectionEnd;
-} = {};
 
 function selector( select: ( store: typeof blockEditorStore ) => any ) {
 	const {
@@ -81,7 +77,7 @@ function selector( select: ( store: typeof blockEditorStore ) => any ) {
 	} = select( blockEditorStore );
 
 	if ( ! hasMultiSelection() ) {
-		return NONE;
+		return null;
 	}
 
 	const anchor: SelectionEnd = getSelectionStart();
@@ -93,7 +89,7 @@ function selector( select: ( store: typeof blockEditorStore ) => any ) {
 		anchor.offset === undefined ||
 		focus.offset === undefined
 	) {
-		return NONE;
+		return null;
 	}
 
 	const clientIds: string[] = getSelectedBlockClientIds();
@@ -104,7 +100,7 @@ function selector( select: ( store: typeof blockEditorStore ) => any ) {
 		! clientIds.includes( anchor.clientId ) ||
 		! clientIds.includes( focus.clientId )
 	) {
-		return NONE;
+		return null;
 	}
 
 	for ( const clientId of clientIds ) {
@@ -113,7 +109,7 @@ function selector( select: ( store: typeof blockEditorStore ) => any ) {
 			! getSoleRichTextAttributeKey( getBlockName( clientId ) ) ||
 			getBlockCount( clientId )
 		) {
-			return NONE;
+			return null;
 		}
 	}
 
@@ -138,34 +134,41 @@ type FieldsProps = {
 export default function MultiBlockFormatEdit( {
 	contentRef,
 }: Pick< FieldsProps, 'contentRef' > ) {
-	const { clientIds, anchor, focus } = useSelect( selector, [] );
+	const selection = useSelect( selector, [] );
 
-	if ( ! clientIds || ! anchor || ! focus ) {
+	if ( ! selection ) {
 		return null;
 	}
 
-	return (
-		<Fields
-			clientIds={ clientIds }
-			anchor={ anchor }
-			focus={ focus }
-			contentRef={ contentRef }
-		/>
-	);
+	return <Fields { ...selection } contentRef={ contentRef } />;
 }
 
 function Fields( { clientIds, anchor, focus, contentRef }: FieldsProps ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const { getBlockName } = useSelect( blockEditorStore );
-	const keys = useMemo(
-		() =>
-			clientIds.map(
+	const keys: string[] = useSelect(
+		( select ) => {
+			const { getBlockName } = select( blockEditorStore );
+			return clientIds.map(
 				( clientId ) =>
 					getSoleRichTextAttributeKey(
 						getBlockName( clientId )
 					) as string
-			),
-		[ clientIds, getBlockName ]
+			);
+		},
+		[ clientIds ]
+	);
+	const values: unknown[] = useSelect(
+		( select ) => {
+			const { getBlockAttributes } = select( blockEditorStore );
+			return clientIds.map( ( clientId, i ) => {
+				const attributes = getBlockAttributes( clientId ) as Record<
+					string,
+					unknown
+				> | null;
+				return attributes?.[ keys[ i ] ];
+			} );
+		},
+		[ clientIds, keys ]
 	);
 	// The formats every selected field allows.
 	const { allowedFormats, withoutInteractiveFormatting } = useMemo( () => {
@@ -196,15 +199,6 @@ function Fields( { clientIds, anchor, focus, contentRef }: FieldsProps ) {
 	const [ inputEvents ] = useState(
 		() => new Set< ( event: Event ) => void >()
 	);
-	const values: unknown[] = useSelect(
-		( select ) => {
-			const { getBlockAttributes } = select( blockEditorStore );
-			return clientIds.map(
-				( clientId, i ) => getBlockAttributes( clientId )[ keys[ i ] ]
-			);
-		},
-		[ clientIds, keys ]
-	);
 
 	const records = useMemo( () => values.map( toRecord ), [ values ] );
 	const value = useMemo( () => {
@@ -226,13 +220,7 @@ function Fields( { clientIds, anchor, focus, contentRef }: FieldsProps ) {
 			const formats =
 				previous.formats[ previous.text.length - 1 ] ??
 				record.formats[ 0 ];
-			// Sparse arrays, like rich text uses: an index without formats
-			// must be a hole, not undefined.
-			const separator: Record = {
-				formats: Array( 1 ),
-				replacements: Array( 1 ),
-				text: SEPARATOR,
-			};
+			const separator = create( { text: SEPARATOR } );
 			if ( formats ) {
 				separator.formats[ 0 ] = formats;
 			}
@@ -264,6 +252,9 @@ function Fields( { clientIds, anchor, focus, contentRef }: FieldsProps ) {
 			return;
 		}
 		const parts = split( newValue, SEPARATOR );
+		if ( ! parts ) {
+			return;
+		}
 		updateBlockAttributes(
 			clientIds,
 			Object.fromEntries(
@@ -300,7 +291,10 @@ function Fields( { clientIds, anchor, focus, contentRef }: FieldsProps ) {
 					</Popover.__unstableSlotNameProvider>
 				</InputEventContext.Provider>
 			</KeyboardShortcutContext.Provider>
-			<FormatToolbarContainer />
+			<FormatToolbarContainer
+				inline={ false }
+				editableContentElement={ null }
+			/>
 		</BlockEditContextProvider>
 	);
 }
