@@ -13,6 +13,7 @@
 
 ### Bug Fixes
 
+-   NavigableToolbar: Ignore menu focus guards so menus from `@wordpress/ui` open on the first click ([#84547](https://github.com/WordPress/gutenberg/pull/84547)).
 -   Inserter: Only show the block-section separator when both sections contain blocks, avoiding a double border above the tip ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
 
 ## 18.1.0 (2026-10-07)
