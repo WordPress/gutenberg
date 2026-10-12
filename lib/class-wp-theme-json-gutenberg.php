@@ -2065,7 +2065,10 @@ class WP_Theme_JSON_Gutenberg {
 		// Load the custom CSS last so it has the highest specificity.
 		if ( in_array( 'custom-css', $types, true ) ) {
 			// Add the global styles root CSS.
-			$stylesheet .= _wp_array_get( $this->theme_json, array( 'styles', 'css' ) );
+			$root_css = $this->theme_json['styles']['css'] ?? '';
+			if ( is_string( $root_css ) ) {
+				$stylesheet .= $root_css;
+			}
 		}
 
 		return $stylesheet;
