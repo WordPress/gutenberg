@@ -209,12 +209,6 @@
 				}
 			}
 
-			.is-minimal-variant.is-scrolling[data-orientation="horizontal"] &::after {
-				/* Keep the outline inside the scrolling list's clipped edges. */
-				inset-inline: round(up, var(--wpds-border-width-focus), 1px);
-				outline-offset: 0;
-			}
-
 			[data-orientation="vertical"] & {
 				padding: var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-md);
 				min-height: var(--wpds-dimension-size-lg);
