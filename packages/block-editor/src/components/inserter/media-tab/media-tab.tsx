@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useMediaCategories } from './hooks';
@@ -140,14 +139,6 @@ function MediaTab( {
 		return <InserterNoResults />;
 	}
 
-	const footer: ReactNode = (
-		<MediaLibraryButton
-			label={ __( 'Open Media Library' ) }
-			onSelect={ onSelectMedia }
-			allowedTypes={ ALLOWED_MEDIA_TYPES }
-		/>
-	);
-
 	return (
 		<MediaCategoryPanel
 			category={ category }
@@ -158,15 +149,21 @@ function MediaTab( {
 			mediaType={ category.mediaType }
 			onChangeMediaType={ setMediaType }
 			sourceMenu={
-				sources.length > 1 && (
+				sources.length > 1 ? (
 					<SourceMenu
 						sources={ sources }
 						value={ activeSource.name }
 						onChange={ setSourceName }
 					/>
-				)
+				) : undefined
 			}
-			footer={ footer }
+			footer={
+				<MediaLibraryButton
+					label={ __( 'Open Media Library' ) }
+					onSelect={ onSelectMedia }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+				/>
+			}
 		/>
 	);
 }
