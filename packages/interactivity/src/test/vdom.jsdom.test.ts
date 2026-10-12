@@ -1,6 +1,18 @@
 import { h } from 'preact';
-import type { VNode } from 'preact';
-import { toVdom, hydratedIslands } from '../vdom';
+import type { ComponentChild } from 'preact';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { parseDirectiveValue, toVdom, hydratedIslands } from '../vdom';
+
+declare module 'vitest' {
+	// Must match Vitest's generic declaration for module augmentation.
+	interface Matchers<
+		R extends void | Promise< void > = void | Promise< void >,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		T = unknown,
+	> {
+		toMatchVNode: ( expected: ComponentChild ) => R;
+	}
+}
 
 function createElementFromHTML( html: string ): HTMLElement {
 	const div = document.createElement( 'div' );
@@ -8,11 +20,11 @@ function createElementFromHTML( html: string ): HTMLElement {
 	return div.firstChild as HTMLElement;
 }
 
-const normalizeVNode = ( obj: object ) =>
+const normalizeVNode = ( obj: ComponentChild ) =>
 	JSON.stringify( obj ).replace( /"__v":\d+/g, '"__v":null' );
 
 expect.extend( {
-	toMatchVNode( received: VNode, expected: VNode ) {
+	toMatchVNode( received: ComponentChild, expected: ComponentChild ) {
 		const pass = normalizeVNode( received ) === normalizeVNode( expected );
 		return {
 			pass,
@@ -26,6 +38,28 @@ describe( 'toVdom', () => {
 	beforeEach( () => {
 		// @ts-expect-error `_values` is an internal property, accessed here for testing.
 		hydratedIslands._values = new WeakMap();
+	} );
+
+	describe( 'parseDirectiveValue', () => {
+		it( 'should separate a namespace from a plain directive value', () => {
+			expect( parseDirectiveValue( 'myplugin::sidebar' ) ).toEqual( {
+				namespace: 'myplugin',
+				value: 'sidebar',
+			} );
+		} );
+
+		it( 'should keep plain objects and preserve JSON scalar values as strings', () => {
+			expect(
+				parseDirectiveValue( 'myplugin::{"id":"sidebar"}' )
+			).toEqual( {
+				namespace: 'myplugin',
+				value: { id: 'sidebar' },
+			} );
+			expect( parseDirectiveValue( '123' ) ).toEqual( {
+				namespace: null,
+				value: '123',
+			} );
+		} );
 	} );
 
 	describe( 'Basic node types', () => {
@@ -199,7 +233,7 @@ describe( 'toVdom', () => {
 		it( 'should warn about malformed directive names', () => {
 			const console = global.console;
 			const originalWarn = console.warn;
-			console.warn = jest.fn();
+			console.warn = vi.fn();
 
 			toVdom(
 				createElementFromHTML( `<div data-wp-invalid[name]></div>` )

@@ -988,8 +988,8 @@ export function getPermalink( state ) {
 
 /**
  * Returns the slug for the post being edited, preferring a manually edited
- * value if one exists, then a sanitized version of the current post title, and
- * finally the post ID.
+ * value if one exists, then the server-generated slug from the post entity,
+ * then a JS approximation of the current post title, and finally the post ID.
  *
  * @param {Object} state Editor state.
  *
@@ -998,6 +998,7 @@ export function getPermalink( state ) {
 export function getEditedPostSlug( state ) {
 	return (
 		getEditedPostAttribute( state, 'slug' ) ||
+		getEditedPostAttribute( state, 'generated_slug' ) ||
 		cleanForSlug( getEditedPostAttribute( state, 'title' ) ) ||
 		getCurrentPostId( state )
 	);

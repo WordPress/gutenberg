@@ -13,7 +13,7 @@ export default function getCustomValidity< Item >(
 			? {
 					type: validity.required.type,
 					message: validity.required.message,
-			  }
+				}
 			: undefined;
 	} else if ( isValid?.pattern && validity?.pattern ) {
 		customValidity = validity.pattern;

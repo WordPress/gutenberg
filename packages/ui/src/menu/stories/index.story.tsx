@@ -2,21 +2,25 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import {
 	archive,
-	create,
 	alignLeft,
 	alignCenter,
 	alignRight,
+	copy,
+	grid,
+	list,
+	moveTo,
+	share,
 } from '@wordpress/icons';
 import {
 	ariaKeyShortcut,
 	displayShortcut,
 	shortcutAriaLabel,
 } from '@wordpress/keycodes';
-import { Icon } from '../../icon';
 import * as Menu from '../';
 
 const meta: Meta< typeof Menu.Root > = {
-	title: 'Design System/Components/Menu',
+	title: 'Components/@wordpress-ui/Menu',
+	id: 'design-system-components-menu',
 	component: Menu.Root,
 	subcomponents: {
 		'Menu.Trigger': Menu.Trigger,
@@ -26,6 +30,7 @@ const meta: Meta< typeof Menu.Root > = {
 		'Menu.Item': Menu.Item,
 		'Menu.ItemLabel': Menu.ItemLabel,
 		'Menu.ItemDescription': Menu.ItemDescription,
+		'Menu.PrefixIcon': Menu.PrefixIcon,
 		'Menu.LinkItem': Menu.LinkItem,
 		'Menu.CheckboxItem': Menu.CheckboxItem,
 		'Menu.RadioGroup': Menu.RadioGroup,
@@ -95,17 +100,13 @@ export const Default: Story = {
 			<Menu.Root>
 				<Menu.Trigger>Open menu</Menu.Trigger>
 				<Menu.Popup>
-					<Menu.Item prefix={ <Icon icon={ archive } /> }>
+					<Menu.Item>
 						<Menu.ItemLabel>Rename…</Menu.ItemLabel>
 					</Menu.Item>
-					<Menu.Item prefix={ <Icon icon={ archive } /> }>
+					<Menu.Item>
 						<Menu.ItemLabel>Archive</Menu.ItemLabel>
 					</Menu.Item>
-					<Menu.Item
-						prefix={ <Icon icon={ archive } /> }
-						shortcut={ SHORTCUTS.save }
-						suffix="Draft"
-					>
+					<Menu.Item shortcut={ SHORTCUTS.save } suffix="Draft">
 						<Menu.ItemLabel>Save</Menu.ItemLabel>
 					</Menu.Item>
 					<Menu.Separator />
@@ -129,9 +130,6 @@ export const Default: Story = {
 							onCheckedChange={ setBookmarks }
 						>
 							<Menu.ItemLabel>Bookmarks</Menu.ItemLabel>
-							<Menu.ItemDescription>
-								Show saved pages in the table.
-							</Menu.ItemDescription>
 						</Menu.CheckboxItem>
 						<Menu.CheckboxItem
 							checked={ downloads }
@@ -139,9 +137,6 @@ export const Default: Story = {
 							shortcut={ SHORTCUTS.downloads }
 						>
 							<Menu.ItemLabel>Downloads</Menu.ItemLabel>
-							<Menu.ItemDescription>
-								Show downloaded files in the table.
-							</Menu.ItemDescription>
 						</Menu.CheckboxItem>
 					</Menu.Group>
 					<Menu.Separator />
@@ -149,21 +144,15 @@ export const Default: Story = {
 						<Menu.GroupLabel>View</Menu.GroupLabel>
 						<Menu.RadioItem
 							value="list"
-							prefix={ <Icon icon={ archive } /> }
+							prefix={ <Menu.PrefixIcon icon={ list } /> }
 						>
 							<Menu.ItemLabel>List</Menu.ItemLabel>
-							<Menu.ItemDescription>
-								Show compact rows.
-							</Menu.ItemDescription>
 						</Menu.RadioItem>
 						<Menu.RadioItem
 							value="grid"
-							prefix={ <Icon icon={ archive } /> }
+							prefix={ <Menu.PrefixIcon icon={ grid } /> }
 						>
 							<Menu.ItemLabel>Grid</Menu.ItemLabel>
-							<Menu.ItemDescription>
-								Show larger preview tiles.
-							</Menu.ItemDescription>
 						</Menu.RadioItem>
 					</Menu.RadioGroup>
 					<Menu.Separator />
@@ -174,15 +163,12 @@ export const Default: Story = {
 								suffix="3"
 							>
 								<Menu.ItemLabel>Move to</Menu.ItemLabel>
-								<Menu.ItemDescription>
-									Choose another collection.
-								</Menu.ItemDescription>
 							</Menu.SubmenuTrigger>
 							<Menu.Popup>
 								<Menu.Item>
 									<Menu.ItemLabel>Favorites</Menu.ItemLabel>
 								</Menu.Item>
-								<Menu.Item prefix={ <Icon icon={ archive } /> }>
+								<Menu.Item>
 									<Menu.ItemLabel>Archive</Menu.ItemLabel>
 								</Menu.Item>
 								<Menu.SubmenuRoot>
@@ -224,29 +210,20 @@ export const LinkItem: Story = {
 				<Menu.Popup>
 					<Menu.LinkItem href="https://wordpress.org" openInNewTab>
 						<Menu.ItemLabel>WordPress.org</Menu.ItemLabel>
-						<Menu.ItemDescription>
-							Open the WordPress project website.
-						</Menu.ItemDescription>
 					</Menu.LinkItem>
 					<Menu.LinkItem
 						href="https://developer.wordpress.org"
 						openInNewTab
+						target="wordpress-developer-resources"
 						shortcut={ SHORTCUTS.developerResources }
 						suffix="Docs"
 					>
 						<Menu.ItemLabel>
 							WordPress developer resources
 						</Menu.ItemLabel>
-						<Menu.ItemDescription>
-							Open docs with a visible suffix and external
-							indicator.
-						</Menu.ItemDescription>
 					</Menu.LinkItem>
 					<Menu.LinkItem href="#menu-link-item-example">
 						<Menu.ItemLabel>In-page destination</Menu.ItemLabel>
-						<Menu.ItemDescription>
-							Navigate with a regular anchor target.
-						</Menu.ItemDescription>
 					</Menu.LinkItem>
 				</Menu.Popup>
 			</>
@@ -260,35 +237,74 @@ export const RichItems: Story = {
 			<>
 				<Menu.Trigger>Open menu</Menu.Trigger>
 				<Menu.Popup>
-					<Menu.Item>
-						<Menu.ItemLabel>Label</Menu.ItemLabel>
-						<Menu.ItemDescription>Help text</Menu.ItemDescription>
-					</Menu.Item>
-					<Menu.Item>
+					<Menu.Group>
+						<Menu.GroupLabel>File</Menu.GroupLabel>
+						<Menu.Item
+							shortcut={ SHORTCUTS.save }
+							suffix="Modified"
+						>
+							<Menu.ItemLabel>Save</Menu.ItemLabel>
+						</Menu.Item>
+						<Menu.Item disabled shortcut={ SHORTCUTS.downloads }>
+							<Menu.ItemLabel>Download</Menu.ItemLabel>
+						</Menu.Item>
+						<Menu.Item>
+							<Menu.ItemLabel>Delete…</Menu.ItemLabel>
+							<Menu.ItemDescription>
+								Also deletes all versions of this item.
+							</Menu.ItemDescription>
+						</Menu.Item>
+					</Menu.Group>
+					<Menu.Separator />
+					<Menu.Group>
+						<Menu.GroupLabel>Organize</Menu.GroupLabel>
+						<Menu.Item prefix={ <Menu.PrefixIcon icon={ copy } /> }>
+							<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+						</Menu.Item>
+						<Menu.Item
+							prefix={ <Menu.PrefixIcon icon={ archive } /> }
+						>
+							<Menu.ItemLabel>Archive</Menu.ItemLabel>
+						</Menu.Item>
+					</Menu.Group>
+				</Menu.Popup>
+			</>
+		),
+	},
+};
+
+export const WrappedItems: Story = {
+	parameters: {
+		docs: {
+			description: {
+				story: 'Uses long text to demonstrate wrapping and disabled items. Keep product menu labels short and descriptions rare.',
+			},
+		},
+	},
+	args: {
+		children: (
+			<>
+				<Menu.Trigger>Open menu</Menu.Trigger>
+				<Menu.Popup style={ { width: 240 } }>
+					<Menu.Item shortcut={ SHORTCUTS.save } suffix="Modified">
 						<Menu.ItemLabel>
 							A long menu item label that wraps onto multiple
 							lines
 						</Menu.ItemLabel>
 						<Menu.ItemDescription>
-							The menu item description wraps within the popup
-							instead of creating extra grid columns.
-						</Menu.ItemDescription>
-					</Menu.Item>
-					<Menu.Item
-						prefix={ <Icon icon={ archive } /> }
-						shortcut={ SHORTCUTS.save }
-						suffix="Modified"
-					>
-						<Menu.ItemLabel>With prefix and suffix</Menu.ItemLabel>
-						<Menu.ItemDescription>
-							Description text keeps the same highlighted area.
+							This deliberately long description should wrap below
+							the label without overlapping the suffix or
+							shortcut.
 						</Menu.ItemDescription>
 					</Menu.Item>
 					<Menu.Item disabled shortcut={ SHORTCUTS.downloads }>
-						<Menu.ItemLabel>Disabled item</Menu.ItemLabel>
+						<Menu.ItemLabel>
+							A disabled item with a long label that wraps onto
+							multiple lines
+						</Menu.ItemLabel>
 						<Menu.ItemDescription>
-							Disabled foreground treatment applies to all item
-							content.
+							The disabled foreground treatment should apply to
+							the label, description, and shortcut.
 						</Menu.ItemDescription>
 					</Menu.Item>
 				</Menu.Popup>
@@ -305,40 +321,28 @@ export const GroupedItems: Story = {
 				<Menu.Popup>
 					<Menu.Group>
 						<Menu.GroupLabel>File</Menu.GroupLabel>
-						<Menu.Item prefix={ <Icon icon={ create } /> }>
+						<Menu.Item>
 							<Menu.ItemLabel>New draft</Menu.ItemLabel>
-							<Menu.ItemDescription>
-								Create a new draft document.
-							</Menu.ItemDescription>
 						</Menu.Item>
-						<Menu.Item
-							prefix={ <Icon icon={ archive } /> }
-							shortcut={ SHORTCUTS.save }
-						>
+						<Menu.Item shortcut={ SHORTCUTS.save }>
 							<Menu.ItemLabel>Save</Menu.ItemLabel>
 						</Menu.Item>
 						<Menu.Item suffix="Edited">
 							<Menu.ItemLabel>Save as copy…</Menu.ItemLabel>
-							<Menu.ItemDescription>
-								Create a duplicate from the current version.
-							</Menu.ItemDescription>
 						</Menu.Item>
 					</Menu.Group>
 					<Menu.Separator />
 					<Menu.Group>
 						<Menu.GroupLabel>Organize</Menu.GroupLabel>
 						<Menu.Item
-							prefix={ <Icon icon={ archive } /> }
+							prefix={ <Menu.PrefixIcon icon={ moveTo } /> }
 							shortcut={ SHORTCUTS.move }
 							suffix="3"
 						>
 							<Menu.ItemLabel>Move to collection…</Menu.ItemLabel>
-							<Menu.ItemDescription>
-								Choose from recent destinations.
-							</Menu.ItemDescription>
 						</Menu.Item>
 						<Menu.Item
-							prefix={ <Icon icon={ archive } /> }
+							prefix={ <Menu.PrefixIcon icon={ archive } /> }
 							suffix="12"
 						>
 							<Menu.ItemLabel>Archive</Menu.ItemLabel>
@@ -418,9 +422,6 @@ export const CheckboxItems: Story = {
 							onCheckedChange={ setBookmarks }
 						>
 							<Menu.ItemLabel>Bookmarks</Menu.ItemLabel>
-							<Menu.ItemDescription>
-								Show saved pages in the table.
-							</Menu.ItemDescription>
 						</Menu.CheckboxItem>
 						<Menu.CheckboxItem
 							checked={ downloads }
@@ -428,9 +429,6 @@ export const CheckboxItems: Story = {
 							shortcut={ SHORTCUTS.downloads }
 						>
 							<Menu.ItemLabel>Downloads</Menu.ItemLabel>
-							<Menu.ItemDescription>
-								Show downloaded files in the table.
-							</Menu.ItemDescription>
 						</Menu.CheckboxItem>
 					</Menu.Group>
 					<Menu.Separator />
@@ -439,23 +437,17 @@ export const CheckboxItems: Story = {
 						<Menu.CheckboxItem
 							checked={ archived }
 							onCheckedChange={ setArchived }
-							prefix={ <Icon icon={ archive } /> }
+							prefix={ <Menu.PrefixIcon icon={ archive } /> }
 						>
 							<Menu.ItemLabel>Archived</Menu.ItemLabel>
-							<Menu.ItemDescription>
-								Include archived records.
-							</Menu.ItemDescription>
 						</Menu.CheckboxItem>
 						<Menu.CheckboxItem
 							checked={ shared }
 							onCheckedChange={ setShared }
-							prefix={ <Icon icon={ archive } /> }
+							prefix={ <Menu.PrefixIcon icon={ share } /> }
 							shortcut={ SHORTCUTS.shared }
 						>
 							<Menu.ItemLabel>Shared</Menu.ItemLabel>
-							<Menu.ItemDescription>
-								Include shared records.
-							</Menu.ItemDescription>
 						</Menu.CheckboxItem>
 					</Menu.Group>
 				</Menu.Popup>
@@ -480,19 +472,19 @@ export const RadioItems: Story = {
 						<Menu.GroupLabel>Alignment</Menu.GroupLabel>
 						<Menu.RadioItem
 							value="left"
-							prefix={ <Icon icon={ alignLeft } /> }
+							prefix={ <Menu.PrefixIcon icon={ alignLeft } /> }
 						>
 							<Menu.ItemLabel>Left</Menu.ItemLabel>
 						</Menu.RadioItem>
 						<Menu.RadioItem
 							value="center"
-							prefix={ <Icon icon={ alignCenter } /> }
+							prefix={ <Menu.PrefixIcon icon={ alignCenter } /> }
 						>
 							<Menu.ItemLabel>Center</Menu.ItemLabel>
 						</Menu.RadioItem>
 						<Menu.RadioItem
 							value="right"
-							prefix={ <Icon icon={ alignRight } /> }
+							prefix={ <Menu.PrefixIcon icon={ alignRight } /> }
 						>
 							<Menu.ItemLabel>Right</Menu.ItemLabel>
 						</Menu.RadioItem>
@@ -508,24 +500,15 @@ export const RadioItems: Story = {
 						<Menu.GroupLabel>Density</Menu.GroupLabel>
 						<Menu.RadioItem value="compact">
 							<Menu.ItemLabel>Compact</Menu.ItemLabel>
-							<Menu.ItemDescription>
-								Show shorter rows.
-							</Menu.ItemDescription>
 						</Menu.RadioItem>
 						<Menu.RadioItem
 							value="comfortable"
 							shortcut={ SHORTCUTS.comfortableDensity }
 						>
 							<Menu.ItemLabel>Comfortable</Menu.ItemLabel>
-							<Menu.ItemDescription>
-								Show more spacing between rows.
-							</Menu.ItemDescription>
 						</Menu.RadioItem>
 						<Menu.RadioItem value="spacious">
 							<Menu.ItemLabel>Spacious</Menu.ItemLabel>
-							<Menu.ItemDescription>
-								Show the largest row spacing.
-							</Menu.ItemDescription>
 						</Menu.RadioItem>
 					</Menu.RadioGroup>
 				</Menu.Popup>

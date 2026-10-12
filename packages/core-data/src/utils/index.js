@@ -1,5 +1,6 @@
 export { default as clearUnchangedEdits } from './clear-unchanged-edits';
 export { default as conservativeMapItem } from './conservative-map-item';
+export { default as getFilteredItem } from './get-filtered-item';
 export { default as getNormalizedCommaSeparable } from './get-normalized-comma-separable';
 export { default as ifMatchingAction } from './if-matching-action';
 export { default as forwardResolver } from './forward-resolver';

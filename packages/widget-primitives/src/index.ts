@@ -6,7 +6,7 @@ export { WidgetRender } from './components/widget-render';
 /**
  * Hooks
  */
-export { useWidgetTypes } from './hooks';
+export { useWidgetActions, useWidgetTypes } from './hooks';
 
 /**
  * Field types
@@ -21,8 +21,12 @@ export { registerIconResolver } from './icon-resolver';
 /**
  * Host capabilities
  */
-export { WidgetHostProvider, useWidgetHost } from './widget-host';
-export type { WidgetHost, WidgetHostLinks } from './widget-host';
+export { WidgetHostProvider, useWidgetHost, HostLink } from './widget-host';
+export type {
+	WidgetHost,
+	WidgetHostActions,
+	WidgetHostLinks,
+} from './widget-host';
 
 /**
  * Types
@@ -34,8 +38,12 @@ export type {
 	WidgetRelevance,
 	WidgetType,
 	WidgetAction,
+	WidgetActionEnvelope,
 	WidgetActionRecord,
+	WidgetCallbackAction,
+	WidgetRuntimeAction,
 	WidgetAttributeField,
+	WidgetAttributeRecord,
 	WidgetRenderProps,
 	ResolveWidgetModule,
 	WidgetModuleRecord,

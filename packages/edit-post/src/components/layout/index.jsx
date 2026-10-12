@@ -108,7 +108,7 @@ function useEditorStyles( settings ) {
 			} );
 		}
 
-		return hasThemeStyles ? settings.styles ?? [] : defaultEditorStyles;
+		return hasThemeStyles ? ( settings.styles ?? [] ) : defaultEditorStyles;
 	}, [
 		settings.defaultEditorStyles,
 		settings.disableLayoutStyles,
@@ -496,6 +496,14 @@ function Layout( {
 							trashed: 1,
 							post_type: items[ 0 ].type,
 							ids: items[ 0 ].id,
+						} );
+					}
+					break;
+				case 'permanently-delete':
+					{
+						document.location.href = addQueryArgs( 'edit.php', {
+							deleted: 1,
+							post_type: items[ 0 ].type,
 						} );
 					}
 					break;

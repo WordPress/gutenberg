@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getCSSRules, compileCSS } from '../index';
 
 describe( 'generate', () => {
@@ -445,6 +446,78 @@ describe( 'getCSSRules', () => {
 				value: '11px',
 			},
 		] );
+	} );
+
+	it( 'should output backgroundClip rule for non-text values', () => {
+		expect(
+			getCSSRules(
+				{
+					background: {
+						backgroundClip: 'border-box',
+					},
+				},
+				{
+					selector: '.some-selector',
+				}
+			)
+		).toEqual( [
+			{
+				selector: '.some-selector',
+				key: 'backgroundClip',
+				value: 'border-box',
+			},
+			{
+				selector: '.some-selector',
+				key: '-webkit-text-fill-color',
+				value: 'currentColor',
+			},
+		] );
+	} );
+
+	it( 'should output backgroundClip rules with vendor prefixes for text value', () => {
+		expect(
+			getCSSRules(
+				{
+					background: {
+						backgroundClip: 'text',
+					},
+				},
+				{
+					selector: '.some-selector',
+				}
+			)
+		).toEqual( [
+			{
+				selector: '.some-selector',
+				key: 'backgroundClip',
+				value: 'text',
+			},
+			{
+				selector: '.some-selector',
+				key: '-webkit-background-clip',
+				value: 'text',
+			},
+			{
+				selector: '.some-selector',
+				key: '-webkit-text-fill-color',
+				value: 'transparent',
+			},
+		] );
+	} );
+
+	it( 'should not output backgroundClip rules for invalid values', () => {
+		expect(
+			getCSSRules(
+				{
+					background: {
+						backgroundClip: 'invalid-value',
+					},
+				},
+				{
+					selector: '.some-selector',
+				}
+			)
+		).toEqual( [] );
 	} );
 
 	it( 'should output background image value when that value is a string', () => {

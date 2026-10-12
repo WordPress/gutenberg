@@ -11,7 +11,7 @@ import {
 	isSectionBlock,
 	getParentSectionBlock,
 } from './private-selectors';
-import { getBlockEditingMode } from './selectors';
+import { getBlockEditingMode, getBlockRootClientId } from './selectors';
 import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
 
 export const isFiltered = Symbol( 'isFiltered' );
@@ -146,3 +146,28 @@ export const getInsertBlockTypeDependants = () => ( state, rootClientId ) => {
 		getParentSectionBlock( state, rootClientId ),
 	];
 };
+
+/**
+ * Returns the containers above the root that a block can be inserted into
+ * instead, closest first: the section root for the top level, otherwise the
+ * ancestors.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Root client ID.
+ *
+ * @return {string[]} Client IDs of the fallback containers.
+ */
+export function getFallbackInsertionRoots( state, rootClientId ) {
+	if ( ! rootClientId ) {
+		const sectionRootClientId = getSectionRootClientId( state );
+		return sectionRootClientId ? [ sectionRootClientId ] : [];
+	}
+
+	const roots = [];
+	let current = getBlockRootClientId( state, rootClientId );
+	while ( current !== null ) {
+		roots.push( current );
+		current = getBlockRootClientId( state, current );
+	}
+	return roots;
+}

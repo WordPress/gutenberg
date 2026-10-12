@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createElement } from '@wordpress/element';
 import {
 	getBlockTypes,
@@ -6,13 +7,11 @@ import {
 	validateBlock,
 } from '@wordpress/blocks';
 import { useBlockProps } from '@wordpress/block-editor';
+import '../../packages/editor/src/hooks';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 describe( 'validateBlock', () => {
-	beforeAll( () => {
-		// Load all hooks that modify blocks.
-		require( '../../packages/editor/src/hooks' );
-	} );
-
 	afterEach( () => {
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );

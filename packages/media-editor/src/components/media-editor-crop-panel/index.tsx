@@ -1,5 +1,4 @@
-import { SelectControl } from '@wordpress/components';
-import { Stack, VisuallyHidden } from '@wordpress/ui';
+import { SelectControl, Stack, VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
 import MediaEditorImageControls from '../media-editor-image-controls';
@@ -16,6 +15,8 @@ export interface MediaEditorCropPanelProps {
 	onAspectRatioChange: ( value: string ) => void;
 	/** Aspect-ratio presets to display in the selector. */
 	aspectRatioOptions: AspectRatioPreset[];
+	/** Disable every control in the panel while the edit is saving. */
+	disabled?: boolean;
 }
 
 /**
@@ -26,12 +27,19 @@ export interface MediaEditorCropPanelProps {
  * @param props.aspectRatioValue
  * @param props.onAspectRatioChange
  * @param props.aspectRatioOptions
+ * @param props.disabled
  */
 export default function MediaEditorCropPanel( {
 	aspectRatioValue,
 	onAspectRatioChange,
 	aspectRatioOptions,
+	disabled = false,
 }: MediaEditorCropPanelProps ) {
+	const items = aspectRatioOptions.map( ( preset ) => ( {
+		label: preset.label,
+		value: preset.value.toString(),
+	} ) );
+
 	return (
 		// Tag the whole panel as a crop-control region so the modal's
 		// Cmd+Z handler doesn't mistake the SelectControl input for a
@@ -44,15 +52,20 @@ export default function MediaEditorCropPanel( {
 			<VisuallyHidden render={ <h2 /> }>
 				{ __( 'Crop options' ) }
 			</VisuallyHidden>
-			<MediaEditorImageControls withLabels />
+			<MediaEditorImageControls withLabels disabled={ disabled } />
 			<SelectControl
 				label={ __( 'Aspect ratio' ) }
-				value={ aspectRatioValue }
-				onChange={ onAspectRatioChange }
-				options={ aspectRatioOptions.map( ( preset ) => ( {
-					label: preset.label,
-					value: preset.value.toString(),
-				} ) ) }
+				value={
+					items.find( ( item ) => item.value === aspectRatioValue ) ??
+					null
+				}
+				onValueChange={ ( item ) => {
+					if ( item && item.value !== null ) {
+						onAspectRatioChange( item.value );
+					}
+				} }
+				disabled={ disabled }
+				items={ items }
 			/>
 		</Stack>
 	);

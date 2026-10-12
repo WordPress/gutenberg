@@ -14,13 +14,15 @@ interface UseDashboardContainerColumnCountResult {
 
 /**
  * Tracks the dashboard grid container width and maps it to an opinionated
- * column count (4 → 2 → 1). Measurement is container-based via
+ * column count (cap → 2 → 1). Measurement is container-based via
  * `ResizeObserver`, not viewport media queries.
  *
  * @param {Ref< HTMLDivElement >} [forwardedRef] Ref forwarded from the grid wrapper.
+ * @param {number}                [maxColumns]   Column cap for wide containers.
  */
 export function useDashboardContainerColumnCount(
-	forwardedRef?: Ref< HTMLDivElement >
+	forwardedRef?: Ref< HTMLDivElement >,
+	maxColumns?: number
 ): UseDashboardContainerColumnCountResult {
 	const [ container, setContainer ] = useState< HTMLDivElement | null >(
 		null
@@ -48,8 +50,8 @@ export function useDashboardContainerColumnCount(
 	}, [ container ] );
 
 	const columnCount = useMemo(
-		() => resolveDashboardColumnCount( containerWidth ),
-		[ containerWidth ]
+		() => resolveDashboardColumnCount( containerWidth, maxColumns ),
+		[ containerWidth, maxColumns ]
 	);
 
 	return { containerRef, columnCount };

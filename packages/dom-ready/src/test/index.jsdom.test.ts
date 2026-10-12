@@ -1,9 +1,10 @@
+import { describe, expect, it, vi } from 'vitest';
 import domReady from '../';
 
 describe( 'domReady', () => {
 	describe( 'when document readystate is complete', () => {
 		it( 'should call the callback.', () => {
-			const callback = jest.fn( () => {} );
+			const callback = vi.fn( () => {} );
 			Object.defineProperty( document, 'readyState', {
 				get: () => 'complete',
 				configurable: true,
@@ -15,7 +16,7 @@ describe( 'domReady', () => {
 
 	describe( 'when document readystate is interactive', () => {
 		it( 'should call the callback.', () => {
-			const callback = jest.fn( () => {} );
+			const callback = vi.fn( () => {} );
 			Object.defineProperty( document, 'readyState', {
 				get: () => 'interactive',
 				configurable: true,
@@ -27,7 +28,7 @@ describe( 'domReady', () => {
 
 	describe( 'when document readystate is still loading', () => {
 		it( 'should add the callback as an event listener to the DOMContentLoaded event.', () => {
-			const addEventListener = jest.fn( () => {} );
+			const addEventListener = vi.fn( () => {} );
 			Object.defineProperty( document, 'readyState', {
 				get: () => 'loading',
 				configurable: true,
@@ -36,7 +37,7 @@ describe( 'domReady', () => {
 				value: addEventListener,
 			} );
 
-			const callback = jest.fn( () => {} );
+			const callback = vi.fn( () => {} );
 			domReady( callback );
 			expect( callback ).not.toHaveBeenCalled();
 			expect( addEventListener ).toHaveBeenCalledWith(

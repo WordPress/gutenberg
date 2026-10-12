@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
@@ -60,6 +61,42 @@ describe( 'SelectControl', () => {
 				name: 'Country',
 			} )
 		).toHaveTextContent( 'Choose a country' );
+	} );
+
+	it( 'shows an item description from the items array in the popup, not the trigger', async () => {
+		const user = userEvent.setup();
+		const items = [
+			{
+				value: 'apple',
+				label: 'Apple',
+				description:
+					'99 in stock. Ships in two to three business days.',
+			},
+		];
+
+		render(
+			<SelectControl
+				label="Fruit"
+				items={ items }
+				defaultValue={ items[ 0 ] }
+			/>
+		);
+
+		const trigger = screen.getByRole( 'combobox', { name: 'Fruit' } );
+
+		expect( trigger ).toHaveTextContent( 'Apple' );
+		expect( trigger ).not.toHaveTextContent( '99 in stock' );
+
+		await user.click( trigger );
+
+		const option = await screen.findByRole( 'option', { name: 'Apple' } );
+
+		expect( option ).toHaveAccessibleDescription(
+			'99 in stock. Ships in two to three business days.'
+		);
+		expect( option ).toHaveTextContent(
+			'99 in stock. Ships in two to three business days.'
+		);
 	} );
 
 	it( 'renders with a visually hidden label', () => {
@@ -125,7 +162,7 @@ describe( 'SelectControl', () => {
 	describe( 'Form data behavior', () => {
 		it( 'submits correct form data when option is selected with custom name', async () => {
 			const user = userEvent.setup();
-			const handleSubmit = jest.fn(
+			const handleSubmit = vi.fn(
 				( event: React.FormEvent< HTMLFormElement > ) => {
 					event.preventDefault();
 					return new FormData( event.currentTarget );
@@ -166,7 +203,7 @@ describe( 'SelectControl', () => {
 
 		it( 'submits form data with default value when no selection is made', async () => {
 			const user = userEvent.setup();
-			const handleSubmit = jest.fn(
+			const handleSubmit = vi.fn(
 				( event: React.FormEvent< HTMLFormElement > ) => {
 					event.preventDefault();
 					return new FormData( event.currentTarget );

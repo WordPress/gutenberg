@@ -2,7 +2,7 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse, build } from '@terrazzo/parser';
-import config from '../../terrazzo.config';
+import config from '../../terrazzo.config.ts';
 
 const sources = await Promise.all(
 	config.tokens.map( async ( tokenUrl: URL ) => ( {

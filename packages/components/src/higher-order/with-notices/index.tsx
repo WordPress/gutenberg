@@ -101,5 +101,5 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 		isForwardRef = true;
 		return forwardRef( Component );
 	}
-	return Component;
+	return Component as React.ComponentType< any >;
 }, 'withNotices' );

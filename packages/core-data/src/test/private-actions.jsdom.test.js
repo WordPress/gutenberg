@@ -1,16 +1,21 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '..';
-import { editMediaEntity, setCollaborationSupported } from '../private-actions';
-import { getSyncManager, hasSyncManager } from '../sync';
+import {
+	editMediaEntity,
+	setCollaborationSupported,
+	recordSyncUndoLevel,
+} from '../private-actions';
+import { getEntitySyncManager } from '../entity-sync';
 import { unlock } from '../lock-unlock';
 
-jest.mock( '@wordpress/api-fetch' );
-jest.mock( '../sync', () => ( {
-	getSyncManager: jest.fn(),
-	hasSyncManager: jest.fn(),
+vi.mock( import( '@wordpress/api-fetch' ) );
+vi.mock( import( '../entity-sync' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	getEntitySyncManager: vi.fn(),
 } ) );
 
 describe( 'editMediaEntity', () => {
@@ -19,13 +24,13 @@ describe( 'editMediaEntity', () => {
 
 	beforeEach( () => {
 		apiFetch.mockReset();
-		dispatch = Object.assign( jest.fn(), {
-			receiveEntityRecords: jest.fn(),
-			__unstableAcquireStoreLock: jest.fn( () => 'test-lock' ),
-			__unstableReleaseStoreLock: jest.fn(),
+		dispatch = Object.assign( vi.fn(), {
+			receiveEntityRecords: vi.fn(),
+			__unstableAcquireStoreLock: vi.fn( () => 'test-lock' ),
+			__unstableReleaseStoreLock: vi.fn(),
 		} );
 		resolveSelect = {
-			getEntitiesConfig: jest.fn( () => [
+			getEntitiesConfig: vi.fn( () => [
 				{
 					kind: 'postType',
 					name: 'attachment',
@@ -182,7 +187,7 @@ describe( 'editMediaEntity', () => {
 	it( 'should use custom fetch function when provided', async () => {
 		const recordId = 123;
 		const edits = { src: 'https://example.com/image.jpg' };
-		const customFetch = jest.fn().mockResolvedValue( { id: recordId } );
+		const customFetch = vi.fn().mockResolvedValue( { id: recordId } );
 
 		await editMediaEntity( recordId, edits, {
 			__unstableFetch: customFetch,
@@ -217,19 +222,15 @@ describe( 'editMediaEntity', () => {
 
 describe( 'setCollaborationSupported', () => {
 	afterEach( () => {
-		getSyncManager.mockReset();
-		hasSyncManager.mockReset();
+		getEntitySyncManager.mockReset();
 	} );
 
 	it( 'unloads sync and resets sync undo state when disabling collaboration', () => {
 		const syncManager = {
-			unloadAll: jest.fn(),
+			unloadAll: vi.fn(),
 		};
-		const dispatch = Object.assign( jest.fn(), {
-			__unstableNotifySyncUndoManagerChange: jest.fn(),
-		} );
-		hasSyncManager.mockReturnValue( true );
-		getSyncManager.mockReturnValue( syncManager );
+		const dispatch = vi.fn();
+		getEntitySyncManager.mockReturnValue( syncManager );
 
 		setCollaborationSupported( false )( { dispatch } );
 
@@ -238,11 +239,29 @@ describe( 'setCollaborationSupported', () => {
 			supported: false,
 		} );
 		expect( syncManager.unloadAll ).toHaveBeenCalledTimes( 1 );
-		expect(
-			dispatch.__unstableNotifySyncUndoManagerChange
-		).toHaveBeenCalledWith( {
-			hasUndo: false,
-			hasRedo: false,
+	} );
+} );
+
+describe( 'recordSyncUndoLevel', () => {
+	it( 'adds a level to the undo manager and changes state', () => {
+		const undoManager = { addRecord: vi.fn() };
+		const select = { getUndoManager: () => undoManager };
+		const dispatch = vi.fn();
+
+		recordSyncUndoLevel( 'postType', 'post', 1 )( { select, dispatch } );
+
+		expect( undoManager.addRecord ).toHaveBeenCalledTimes( 1 );
+		const [ record ] = undoManager.addRecord.mock.calls[ 0 ];
+		expect( record ).toHaveLength( 1 );
+		// The level names the record that opened it.
+		expect( record[ 0 ].id ).toEqual( {
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+			isSyncUndoLevel: true,
+		} );
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'RECORD_SYNC_UNDO_LEVEL',
 		} );
 	} );
 } );

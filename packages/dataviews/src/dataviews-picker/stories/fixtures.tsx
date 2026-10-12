@@ -293,8 +293,9 @@ export const data: SpaceObject[] = [
 	{
 		id: 19,
 		name: {
-			title: 'Thessalonikopolymnianebuchodonossarinacharybdis',
-			description: 'Takes longer to say than to orbit.',
+			title: 'TheRoguePlanetWithAVeryLongNameToTestTitleOverflow',
+			description:
+				'A long unbroken title, used to check that layouts overflow instead of breaking.',
 		},
 		image: 'https://live.staticflickr.com/1357/935805705_119635028c_b.jpg',
 		type: 'Rogue planet',
@@ -303,7 +304,7 @@ export const data: SpaceObject[] = [
 		satellites: 0,
 		date: '2020-03-01',
 		datetime: '2020-03-01T10:15:20Z',
-		email: 'thessalonikopolymnianebuchodonossarinacharybdis@example.com',
+		email: 'longunbrokentitle@example.com',
 	},
 	{
 		id: 20,

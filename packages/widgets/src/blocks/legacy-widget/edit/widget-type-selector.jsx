@@ -1,4 +1,5 @@
-import { Spinner, SelectControl } from '@wordpress/components';
+import { Spinner } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -22,18 +23,24 @@ export default function WidgetTypeSelector( { selectedId, onSelect } ) {
 		return __( 'There are no widgets available.' );
 	}
 
+	const items = [
+		{ value: '', label: __( 'Select widget' ) },
+		...widgetTypes.map( ( widgetType ) => ( {
+			value: widgetType.id,
+			label: widgetType.name,
+		} ) ),
+	];
+
 	return (
 		<SelectControl
 			label={ __( 'Legacy widget' ) }
-			value={ selectedId ?? '' }
-			options={ [
-				{ value: '', label: __( 'Select widget' ) },
-				...widgetTypes.map( ( widgetType ) => ( {
-					value: widgetType.id,
-					label: widgetType.name,
-				} ) ),
-			] }
-			onChange={ ( value ) => {
+			value={
+				items.find( ( item ) => item.value === selectedId ) ??
+				items[ 0 ]
+			}
+			items={ items }
+			onValueChange={ ( item ) => {
+				const value = item?.value;
 				if ( value ) {
 					const selected = widgetTypes.find(
 						( widgetType ) => widgetType.id === value

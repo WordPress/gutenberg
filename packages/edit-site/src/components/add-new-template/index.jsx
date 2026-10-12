@@ -4,15 +4,14 @@ import {
 	Modal,
 	__experimentalGrid as Grid,
 	__experimentalText as WCText,
-	__experimentalVStack as VStack,
 	Flex,
 	Icon as WCIcon,
 } from '@wordpress/components';
+import { Stack, Text } from '@wordpress/ui';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState, memo, useRef, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useViewportMatch } from '@wordpress/compose';
 import {
 	archive,
 	blockMeta,
@@ -38,6 +37,7 @@ import { focus } from '@wordpress/dom';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import AddCustomTemplateModalContent from './add-custom-template-modal-content';
 import {
+	useExistingTemplates,
 	useDefaultTemplateTypes,
 	useTaxonomiesMenuItems,
 	usePostTypeMenuItems,
@@ -81,49 +81,36 @@ const TEMPLATE_ICONS = {
 	attachment: media,
 };
 
-function TemplateListItem( {
-	title,
-	direction,
-	className,
-	description,
-	icon,
-	onClick,
-	children,
-} ) {
+function TemplateListItem( { title, className, description, icon, onClick } ) {
 	return (
 		<Button
 			__next40pxDefaultSize
 			className={ className }
 			onClick={ onClick }
-			label={ description }
-			showTooltip={ !! description }
 		>
-			<Flex
-				as="span"
-				spacing={ 2 }
-				align="center"
-				justify="center"
-				style={ { width: '100%' } }
-				direction={ direction }
-			>
-				<div className="edit-site-add-new-template__template-icon">
-					<WCIcon icon={ icon } />
-				</div>
-				<VStack
-					className="edit-site-add-new-template__template-name"
-					alignment="center"
-					spacing={ 0 }
+			<Stack direction="column" gap="sm">
+				<Stack
+					render={ <span /> }
+					direction="row"
+					align="center"
+					gap="sm"
 				>
-					<WCText
-						align="center"
-						weight="var(--wpds-typography-font-weight-emphasis)"
-						lineHeight={ 1.53846153846 } // 20px
-					>
-						{ title }
-					</WCText>
-					{ children }
-				</VStack>
-			</Flex>
+					<div className="edit-site-add-new-template__template-icon">
+						<WCIcon icon={ icon } />
+					</div>
+					<span className="edit-site-add-new-template__template-name">
+						<WCText
+							weight="var(--wpds-typography-font-weight-emphasis)"
+							lineHeight={ 1.53846153846 } // 20px
+						>
+							{ title }
+						</WCText>
+					</span>
+				</Stack>
+				{ description && (
+					<Text variant="body-sm">{ description }</Text>
+				) }
+			</Stack>
 		</Button>
 	);
 }
@@ -148,22 +135,6 @@ function NewTemplateModal( { onClose } ) {
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 	const containerRef = useRef( null );
-	const isMobile = useViewportMatch( 'medium', '<' );
-
-	const homeUrl = useSelect( ( select ) => {
-		// Site index.
-		return select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
-			?.home;
-	}, [] );
-
-	const TEMPLATE_SHORT_DESCRIPTIONS = {
-		'front-page': homeUrl,
-		date: sprintf(
-			// translators: %s: The homepage url.
-			__( 'E.g. %s' ),
-			homeUrl + '/' + new Date().getFullYear()
-		),
-	};
 
 	useEffect( () => {
 		// Focus the first focusable element when component mounts or UI changes
@@ -196,9 +167,7 @@ function NewTemplateModal( { onClose } ) {
 					status: 'publish',
 					title,
 					// This adds a post meta field in template that is part of `is_custom` value calculation.
-					meta: {
-						is_wp_suggestion: isWPSuggestion,
-					},
+					is_wp_suggestion: isWPSuggestion,
 				},
 				{ throwOnError: true }
 			);
@@ -267,7 +236,7 @@ function NewTemplateModal( { onClose } ) {
 		>
 			{ modalContent === modalContentMap.templatesList && (
 				<Grid
-					columns={ isMobile ? 2 : 3 }
+					templateColumns="repeat(auto-fill, minmax(240px, 1fr))"
 					gap={ 4 }
 					align="flex-start"
 					justify="center"
@@ -279,16 +248,13 @@ function NewTemplateModal( { onClose } ) {
 						) }
 					</Flex>
 					{ missingTemplates.map( ( template ) => {
-						const { title, slug, onClick } = template;
+						const { title, description, slug, onClick } = template;
 						return (
 							<TemplateListItem
 								key={ slug }
 								title={ title }
-								direction="column"
 								className="edit-site-add-new-template__template-button"
-								description={
-									TEMPLATE_SHORT_DESCRIPTIONS[ slug ]
-								}
+								description={ description }
 								icon={ TEMPLATE_ICONS[ slug ] || layout }
 								onClick={ () =>
 									onClick
@@ -300,23 +266,17 @@ function NewTemplateModal( { onClose } ) {
 					} ) }
 					<TemplateListItem
 						title={ __( 'Custom template' ) }
-						direction="row"
 						className="edit-site-add-new-template__custom-template-button"
+						description={ __(
+							'A custom template can be manually applied to any post or page.'
+						) }
 						icon={ pencil }
 						onClick={ () =>
 							setModalContent(
 								modalContentMap.customGenericTemplate
 							)
 						}
-					>
-						<WCText
-							lineHeight={ 1.53846153846 } // 20px
-						>
-							{ __(
-								'A custom template can be manually applied to any post or page.'
-							) }
-						</WCText>
-					</TemplateListItem>
+					/>
 				</Grid>
 			) }
 			{ modalContent === modalContentMap.customTemplate && (
@@ -375,9 +335,15 @@ function NewTemplate() {
 }
 
 function useMissingTemplates( setEntityForSuggestions, onClick ) {
+	const existingTemplates = useExistingTemplates();
 	const defaultTemplateTypes = useDefaultTemplateTypes();
+	const existingTemplateSlugs = ( existingTemplates || [] ).map(
+		( { slug } ) => slug
+	);
 	const missingDefaultTemplates = ( defaultTemplateTypes || [] ).filter(
-		( template ) => DEFAULT_TEMPLATE_SLUGS.includes( template.slug )
+		( template ) =>
+			DEFAULT_TEMPLATE_SLUGS.includes( template.slug ) &&
+			! existingTemplateSlugs.includes( template.slug )
 	);
 	const onClickMenuItem = ( _entityForSuggestions ) => {
 		onClick?.();

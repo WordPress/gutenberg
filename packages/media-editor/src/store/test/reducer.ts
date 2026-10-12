@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import reducer, { DEFAULT_STATE } from '../reducer';
 
 describe( 'core/media-editor reducer', () => {
@@ -7,8 +8,8 @@ describe( 'core/media-editor reducer', () => {
 	} );
 
 	it( 'opens the modal with id and onUpdate', () => {
-		const onUpdate = jest.fn();
-		const onClose = jest.fn();
+		const onUpdate = vi.fn();
+		const onClose = vi.fn();
 		const state = reducer( undefined, {
 			type: 'OPEN_MEDIA_EDITOR_MODAL',
 			id: 42,
@@ -24,10 +25,10 @@ describe( 'core/media-editor reducer', () => {
 	} );
 
 	it( 'replaces state on a subsequent open (new onUpdate)', () => {
-		const firstOnUpdate = jest.fn();
-		const firstOnClose = jest.fn();
-		const secondOnUpdate = jest.fn();
-		const secondOnClose = jest.fn();
+		const firstOnUpdate = vi.fn();
+		const firstOnClose = vi.fn();
+		const secondOnUpdate = vi.fn();
+		const secondOnClose = vi.fn();
 		const first = reducer( undefined, {
 			type: 'OPEN_MEDIA_EDITOR_MODAL',
 			id: 42,
@@ -52,8 +53,8 @@ describe( 'core/media-editor reducer', () => {
 		const opened = reducer( undefined, {
 			type: 'OPEN_MEDIA_EDITOR_MODAL',
 			id: 42,
-			onUpdate: jest.fn(),
-			onClose: jest.fn(),
+			onUpdate: vi.fn(),
+			onClose: vi.fn(),
 		} );
 		const closed = reducer( opened, {
 			type: 'CLOSE_MEDIA_EDITOR_MODAL',

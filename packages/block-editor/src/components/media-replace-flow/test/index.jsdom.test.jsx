@@ -1,8 +1,11 @@
+import { describe, expect, it } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import MediaReplaceFlow from '../';
+
+globalThis.wpVitest.mockMatchMedia();
 
 const noop = () => {};
 
@@ -67,7 +70,8 @@ describe( 'General media replace flow', () => {
 		);
 
 		const link = screen.getByRole( 'link', {
-			name: 'example.media (opens in a new tab)',
+			// TODO: jsdom-only name; browsers separate the notice with a space.
+			name: 'example.media(opens in a new tab)',
 		} );
 
 		await waitFor( () => expect( link ).toBePositionedPopover() );
@@ -90,7 +94,8 @@ describe( 'General media replace flow', () => {
 		await waitFor( () =>
 			expect(
 				screen.getByRole( 'link', {
-					name: 'example.media (opens in a new tab)',
+					// TODO: jsdom-only name; browsers separate the notice with a space.
+					name: 'example.media(opens in a new tab)',
 				} )
 			).toBePositionedPopover()
 		);
@@ -117,7 +122,8 @@ describe( 'General media replace flow', () => {
 
 		expect(
 			screen.getByRole( 'link', {
-				name: 'new.example.media (opens in a new tab)',
+				// TODO: jsdom-only name; browsers separate the notice with a space.
+				name: 'new.example.media(opens in a new tab)',
 			} )
 		).toHaveAttribute( 'href', 'https://new.example.media' );
 	} );

@@ -1,6 +1,7 @@
 import { Popover as _Popover } from '@base-ui/react/popover';
 import type { RootProps } from './types';
 import { DirectionProvider } from '../utils/direction-provider';
+import { useIframeDismissalBridge } from '../utils/use-iframe-dismissal-bridge';
 
 /**
  * An accessible popup anchored to a trigger element.
@@ -39,9 +40,20 @@ import { DirectionProvider } from '../utils/direction-provider';
  * ```
  */
 function Root( props: RootProps ) {
+	const iframeDismissalProps = useIframeDismissalBridge<
+		_Popover.Root.Actions,
+		_Popover.Root.ChangeEventDetails
+	>( {
+		defaultOpen: props.defaultOpen,
+		modal: props.modal ?? false,
+		onOpenChange: ( nextOpen, eventDetails ) =>
+			props.onOpenChange?.( nextOpen, eventDetails ),
+		open: props.open,
+	} );
+
 	return (
 		<DirectionProvider>
-			<_Popover.Root { ...props } />
+			<_Popover.Root { ...props } { ...iframeDismissalProps } />
 		</DirectionProvider>
 	);
 }

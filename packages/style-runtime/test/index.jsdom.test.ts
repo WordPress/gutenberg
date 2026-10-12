@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it } from 'vitest';
 import { registerDocument, registerStyle } from '../src';
 
 type GlobalScopeWithStyleRuntime = typeof globalThis & {

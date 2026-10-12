@@ -14,16 +14,16 @@ function isPlainObject( data: unknown ): data is Record< string, unknown > {
 /**
  * Recursively flatten data passed to form data, to allow using multi-level objects.
  *
- * @param {FormData}      formData Form data object.
- * @param {string}        key      Key to amend to form data object
- * @param {string|Object} data     Data to be amended to form data.
+ * @param formData Form data object.
+ * @param key      Key to amend to form data object.
+ * @param data     Data to be amended to form data.
  */
 export function flattenFormData(
 	formData: FormData,
 	key: string,
-	data: string | undefined | Record< string, string >
+	data: unknown
 ) {
-	if ( isPlainObject( data ) ) {
+	if ( Array.isArray( data ) || isPlainObject( data ) ) {
 		for ( const [ name, value ] of Object.entries( data ) ) {
 			flattenFormData( formData, `${ key }[${ name }]`, value );
 		}

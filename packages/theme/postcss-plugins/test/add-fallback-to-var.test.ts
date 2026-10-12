@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { addFallbackToVar } from '../add-fallback-to-var.mjs';
 
 const mockFallbacks: Record< string, string > = {

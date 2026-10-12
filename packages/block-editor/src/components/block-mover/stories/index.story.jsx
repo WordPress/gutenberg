@@ -28,7 +28,8 @@ const blocks = [
  * BlockMover component allows moving blocks inside the editor using up and down buttons.
  */
 const meta = {
-	title: 'BlockEditor/BlockMover',
+	id: 'blockeditor-blockmover',
+	title: 'Editor/Block Editor/BlockMover',
 	component: BlockMover,
 	parameters: {
 		docs: { canvas: { sourceState: 'shown' } },

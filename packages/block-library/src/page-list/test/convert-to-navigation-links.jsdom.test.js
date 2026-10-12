@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { convertToNavigationLinks } from '../use-convert-to-navigation-links';
 
 // Expected entity binding structure for navigation links
@@ -12,8 +13,8 @@ const EXPECTED_ENTITY_BINDING = {
 
 // Mock createBlock to avoid creating the blocks in test environment
 // as convertToNavigationLinks calls this method internally.
-jest.mock( '@wordpress/blocks', () => {
-	const blocks = jest.requireActual( '@wordpress/blocks' );
+vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => {
+	const blocks = await importOriginal();
 
 	return {
 		...blocks,

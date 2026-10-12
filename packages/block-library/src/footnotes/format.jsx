@@ -114,7 +114,11 @@ export const format = {
 					const object = value.replacements[ value.start ];
 					id = object?.attributes?.[ 'data-fn' ];
 				} else {
-					id = createId();
+					// The ID doubles as the anchor target of the footnote link.
+					// A CSS identifier cannot start with a digit, so a bare UUID
+					// (which often does) breaks `querySelector( '#' + id )` and
+					// `#id` style rules on the front end. Prefix it with a letter.
+					id = `fn-${ createId() }`;
 					const newValue = insertObject(
 						value,
 						{

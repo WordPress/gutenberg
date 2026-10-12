@@ -1,4 +1,4 @@
-import { SelectControl } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import { __, _x } from '@wordpress/i18n';
 import { useSettings } from '../use-settings';
 import { InheritanceToolsPanelItem } from '../global-styles/inheritance';
@@ -84,8 +84,8 @@ export default function AspectRatioTool( {
 	const displayValue =
 		value === undefined || value === null || value === 'auto'
 			? 'auto'
-			: findAspectRatioOption( value, resolvedOptions )?.value ??
-			  'custom';
+			: ( findAspectRatioOption( value, resolvedOptions )?.value ??
+				'custom' );
 
 	return (
 		<InheritanceToolsPanelItem
@@ -102,10 +102,31 @@ export default function AspectRatioTool( {
 		>
 			<SelectControl
 				label={ __( 'Aspect ratio' ) }
-				value={ displayValue }
-				options={ resolvedOptions }
-				onChange={ onChange }
-			/>
+				value={
+					resolvedOptions.find(
+						( item ) => item.value === displayValue
+					) ??
+					resolvedOptions.find( ( item ) => ! item.disabled ) ??
+					null
+				}
+				items={ resolvedOptions }
+				onValueChange={ ( item ) => onChange( item?.value ?? '' ) }
+			>
+				{ resolvedOptions
+					.filter( ( item ) => ! item.hidden )
+					.map( ( item ) => (
+						<SelectControl.Item
+							key={ item.value }
+							value={ item }
+							label={ item.label }
+							disabled={ item.disabled }
+						>
+							<SelectControl.ItemLabel>
+								{ item.label }
+							</SelectControl.ItemLabel>
+						</SelectControl.Item>
+					) ) }
+			</SelectControl>
 		</InheritanceToolsPanelItem>
 	);
 }

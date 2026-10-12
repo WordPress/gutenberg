@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import {
 	PRELOAD_ERROR_RELOAD_GUARD_INTERVAL,
 	handlePreloadError,
@@ -12,8 +13,8 @@ function createStorage(
 	}
 
 	return {
-		getItem: jest.fn( ( key: string ) => values.get( key ) ?? null ),
-		setItem: jest.fn( ( key: string, value: string ) => {
+		getItem: vi.fn( ( key: string ) => values.get( key ) ?? null ),
+		setItem: vi.fn( ( key: string, value: string ) => {
 			values.set( key, value );
 		} ),
 	};
@@ -21,9 +22,9 @@ function createStorage(
 
 describe( 'handlePreloadError', () => {
 	it( 'reloads the full Storybook page after the first preload error', () => {
-		const event = { preventDefault: jest.fn() };
+		const event = { preventDefault: vi.fn() };
 		const storage = createStorage();
-		const reload = jest.fn();
+		const reload = vi.fn();
 
 		handlePreloadError( event, {
 			now: 100_000,
@@ -40,9 +41,9 @@ describe( 'handlePreloadError', () => {
 	} );
 
 	it( 'lets a repeated preload error surface instead of reloading again', () => {
-		const event = { preventDefault: jest.fn() };
+		const event = { preventDefault: vi.fn() };
 		const storage = createStorage( '100000' );
-		const reload = jest.fn();
+		const reload = vi.fn();
 
 		handlePreloadError( event, {
 			now: 100_001,
@@ -56,9 +57,9 @@ describe( 'handlePreloadError', () => {
 	} );
 
 	it( 'allows another recovery attempt after the guard interval', () => {
-		const event = { preventDefault: jest.fn() };
+		const event = { preventDefault: vi.fn() };
 		const storage = createStorage( '100000' );
-		const reload = jest.fn();
+		const reload = vi.fn();
 
 		handlePreloadError( event, {
 			now: 100_000 + PRELOAD_ERROR_RELOAD_GUARD_INTERVAL,

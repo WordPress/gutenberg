@@ -4,6 +4,16 @@
 
 ### Breaking Changes
 
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 6.2.0 (2026-10-07)
+
+## 6.1.0 (2026-09-23)
+
+## 6.0.0 (2026-09-10)
+
+### Breaking Changes
+
 -   Turn `@wordpress/reusable-blocks` into a deprecated no-op compatibility package. `ReusableBlocksMenuItems` renders nothing, the store selectors and actions no longer have runtime effects, and the convert/delete utilities are now no-ops. The `core/reusable-blocks` store remains registered for backward compatibility.
 
 ### Internal

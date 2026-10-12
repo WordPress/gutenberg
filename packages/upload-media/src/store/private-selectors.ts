@@ -18,6 +18,22 @@ export function getAllItems( state: State ): QueueItem[] {
 }
 
 /**
+ * Returns how many top-level items have been cancelled because they failed.
+ *
+ * Failed items are removed from the queue just like successful ones, so an
+ * empty queue on its own says nothing about whether anything was uploaded.
+ * This tally only ever grows: to learn how many items failed within a single
+ * batch, read it when the batch starts and subtract that from its later value.
+ *
+ * @param state Upload state.
+ *
+ * @return Number of failed uploads since the editor loaded.
+ */
+export function getFailureCount( state: State ): number {
+	return state.failureCount;
+}
+
+/**
  * Returns a specific item given its unique ID.
  *
  * @param state Upload state.

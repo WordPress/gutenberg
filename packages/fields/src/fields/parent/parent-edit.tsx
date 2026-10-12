@@ -123,7 +123,7 @@ export function PageAttributesParent( {
 						'postType',
 						postTypeSlug,
 						pageId
-				  )
+					)
 				: null;
 
 			const query = {
@@ -151,7 +151,7 @@ export function PageAttributesParent( {
 							'postType',
 							postTypeSlug,
 							query
-					  )
+						)
 					: null,
 			};
 		},

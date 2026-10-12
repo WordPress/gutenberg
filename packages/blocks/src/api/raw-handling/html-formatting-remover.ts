@@ -23,7 +23,7 @@ export default function htmlFormattingRemover( node: Node ): void {
 
 	// Ignore pre content. Note that this does not use Element#closest due to
 	// a combination of (a) node may not be Element and (b) node.parentElement
-	// does not have full support in all browsers (Internet Exporer).
+	// does not have full support in all browsers (Internet Explorer).
 	//
 	// See: https://developer.mozilla.org/en-US/docs/Web/API/Node/parentElement#Browser_compatibility
 

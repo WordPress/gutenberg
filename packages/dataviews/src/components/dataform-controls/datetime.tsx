@@ -4,7 +4,12 @@ import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
-import { Calendar, Stack, ValidatedInputControl } from '@wordpress/ui';
+import {
+	Calendar,
+	Stack,
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	ValidatedInputControl,
+} from '@wordpress/ui';
 import type { DataFormControlProps, FormatDatetime } from '../../types';
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../../constants';
 import RelativeDateControl from './utils/relative-date-control';
@@ -12,6 +17,7 @@ import toCalendarDate from './utils/to-calendar-date';
 import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import getCustomValidity from './utils/get-custom-validity';
 import getCalendarLocale from './utils/get-calendar-locale';
+import getTimezoneDescription from './utils/get-timezone-description';
 import parseDateTime from '../../field-types/utils/parse-date-time';
 
 const formatDateTime = ( value?: string ): string => {
@@ -179,6 +185,7 @@ function CalendarDateTimeControl< Item >( {
 					value={ formatDateTime( value ) }
 					onValueChange={ handleManualDateTimeChange }
 					disabled={ disabled }
+					description={ getTimezoneDescription() }
 					min={
 						minConstraint
 							? formatDateTime( minConstraint )

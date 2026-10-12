@@ -1,21 +1,27 @@
-const fs = require( 'fs' );
-const path = require( 'path' );
-const { globSync } = require( 'glob' );
-const mkdirp = require( 'mkdirp' ).mkdirp.sync;
-const rimraf = require( 'rimraf' ).sync;
-const webpack = require( 'webpack' );
+import fs from 'node:fs';
+import { createRequire } from 'node:module';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { globSync } from 'glob';
+import { mkdirpSync } from 'mkdirp';
+import { rimrafSync } from 'rimraf';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+import webpack from 'webpack';
+
+const require = createRequire( import.meta.url );
+const currentDirectory = path.dirname( fileURLToPath( import.meta.url ) );
 
 describe( 'ReadableJsAssetsWebpackPlugin', () => {
-	const outputDirectory = path.join( __dirname, 'build' );
-	const testDirectory = path.join( __dirname, 'fixtures' );
+	const outputDirectory = path.join( currentDirectory, 'build' );
+	const testDirectory = path.join( currentDirectory, 'fixtures' );
 
 	beforeEach( () => {
-		rimraf( outputDirectory );
-		mkdirp( outputDirectory );
+		rimrafSync( outputDirectory );
+		mkdirpSync( outputDirectory );
 	} );
 
 	// This afterEach is necessary to prevent watched tests from retriggering on every run.
-	afterEach( () => rimraf( outputDirectory ) );
+	afterEach( () => rimrafSync( outputDirectory ) );
 
 	test( 'should produce the expected output', async () => {
 		await new Promise( ( resolve ) => {

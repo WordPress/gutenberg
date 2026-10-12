@@ -1,6 +1,7 @@
+import { describe, expect, it } from 'vitest';
 import { debounce } from '../index';
 
-const identity = ( value ) => value;
+const identity = < T >( value: T ) => value;
 
 describe( 'debounce', () => {
 	it( 'should debounce a function', () => {
@@ -326,12 +327,12 @@ describe( 'debounce', () => {
 
 	it( 'should invoke the trailing call with the correct arguments and `this` binding', () => {
 		return new Promise( ( done ) => {
-			let actual;
+			let actual: unknown[] | undefined;
 			let callCount = 0;
 			const object = {};
 
 			const debounced = debounce(
-				function ( ...args ) {
+				function ( this: object, ...args: unknown[] ) {
 					actual = [ this ];
 					Array.prototype.push.apply( actual, args );
 					return ++callCount !== 2;

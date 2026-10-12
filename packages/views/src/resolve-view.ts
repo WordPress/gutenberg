@@ -150,6 +150,38 @@ interface ResolveViewArgs extends ViewLayers {
 }
 
 /**
+ * The user's persisted modifications that still apply.
+ *
+ * A persisted `type` that `defaultLayouts` does not offer is dropped: DataViews
+ * renders nothing for a layout it is not given, and the preference may predate
+ * the current set of layouts (a screen that used to offer the list layout, say,
+ * and no longer does). The type then resolves out of the layers below, and the
+ * other modifications are kept. Without `defaultLayouts` every type is offered.
+ *
+ * `true` is a valid entry, so the check mirrors DataViews': an entry counts as
+ * long as it is truthy.
+ *
+ * @param persistedView  The user's persisted modifications.
+ * @param defaultLayouts The layouts on offer, keyed by layout type.
+ * @return The modifications that apply, or `undefined` when there are none.
+ */
+export function getApplicablePersistedView(
+	persistedView: ViewOverrides | undefined,
+	defaultLayouts: SupportedLayouts | undefined
+): ViewOverrides | undefined {
+	if (
+		! persistedView ||
+		persistedView.type === undefined ||
+		! defaultLayouts ||
+		defaultLayouts[ persistedView.type as keyof SupportedLayouts ]
+	) {
+		return persistedView;
+	}
+	const { type, ...rest } = persistedView;
+	return Object.keys( rest ).length > 0 ? rest : undefined;
+}
+
+/**
  * Resolves the layers below the user's modifications — what a modification has
  * to differ from to count as one. The layout type selects which entry of
  * `defaultLayouts` applies, so the base only makes sense relative to a type.
@@ -181,15 +213,19 @@ function resolveBaseView(
  * 1. `defaultView`
  * 2. `defaultLayouts` (for the effective type)
  * 3. `activeViewOverrides`
- * 4. the user's persisted modifications
+ * 4. the user's persisted modifications (see `getApplicablePersistedView`)
  * 5. the URL query params (`page` and `search` only)
  *
  * @param args See `ResolveViewArgs`.
  * @return The resolved `view`.
  */
 export function resolveView( args: ResolveViewArgs ): View {
-	const { defaultView, activeViewOverrides, persistedView, page, search } =
+	const { defaultView, defaultLayouts, activeViewOverrides, page, search } =
 		args;
+	const persistedView = getApplicablePersistedView(
+		args.persistedView,
+		defaultLayouts
+	);
 
 	// Resolve the effective layout type first: it selects which entry of
 	// `defaultLayouts` applies, and the layers above the layouts may change it.
@@ -229,6 +265,10 @@ export function resolveView( args: ResolveViewArgs ): View {
  * already provide, which then linger as phantom modifications after switching
  * back.
  *
+ * A persisted `type` the current layouts do not offer never applied (see
+ * `getApplicablePersistedView`), so it is not carried over either: the
+ * modifications returned replace it with whatever the user picked.
+ *
  * @param newView The view the user produced.
  * @param layers  The layers the view resolves from. See `ViewLayers`.
  * @return The modified properties, or `undefined` when the user modified none.
@@ -237,7 +277,11 @@ export function getUserModifications(
 	newView: View,
 	layers: ViewLayers
 ): ViewOverrides | undefined {
-	const { activeViewOverrides, persistedView } = layers;
+	const { defaultLayouts, activeViewOverrides } = layers;
+	const persistedView = getApplicablePersistedView(
+		layers.persistedView,
+		defaultLayouts
+	);
 	const baseView = resolveBaseView( layers, newView.type );
 
 	const modifications = diffLayer(

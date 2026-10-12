@@ -5,13 +5,16 @@ import {
 	useBlockProps,
 	__experimentalUseColorProps as useColorProps,
 } from '@wordpress/block-editor';
-import { HorizontalRule, SelectControl } from '@wordpress/components';
+import {
+	HorizontalRule,
+	SelectControl as WCSelectControl,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import useDeprecatedOpacity from './use-deprecated-opacity';
 
 const HtmlElementControl = ( { tagName, setAttributes } ) => {
 	return (
-		<SelectControl
+		<WCSelectControl
 			label={ __( 'HTML element' ) }
 			value={ tagName }
 			onChange={ ( newValue ) => setAttributes( { tagName: newValue } ) }
@@ -23,10 +26,10 @@ const HtmlElementControl = ( { tagName, setAttributes } ) => {
 				tagName === 'hr'
 					? __(
 							'Only select <hr> if the separator conveys important information and should be announced by screen readers.'
-					  )
+						)
 					: __(
 							'The <div> element should only be used if the block is a design element with no semantic meaning.'
-					  )
+						)
 			}
 		/>
 	);

@@ -1,7 +1,8 @@
-import { ProgressBar } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { __ } from '@wordpress/i18n';
+import { Progress } from '@wordpress/ui';
 import { unlock } from '../../lock-unlock';
 
 const { useStyle } = unlock( editorPrivateApis );
@@ -19,11 +20,17 @@ export default function CanvasLoader( { id } ) {
 	}, [] );
 
 	return (
-		<div
-			className="edit-site-canvas-loader"
-			style={ textColor ? { '--color': textColor } : undefined }
-		>
-			<ProgressBar id={ id } max={ total } value={ elapsed } />
+		<div className="edit-site-canvas-loader">
+			<Progress.Root
+				id={ id }
+				aria-label={ __( 'Loading editor' ) }
+				max={ total }
+				value={ elapsed }
+			>
+				<Progress.Track>
+					<Progress.Indicator color={ textColor } />
+				</Progress.Track>
+			</Progress.Root>
 		</div>
 	);
 }

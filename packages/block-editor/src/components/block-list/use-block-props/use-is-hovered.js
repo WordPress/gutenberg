@@ -22,15 +22,32 @@ export function useIsHovered( { isEnabled = true } = {} ) {
 				return;
 			}
 
+			let timeoutId;
+
 			function listener( event ) {
 				if ( event.defaultPrevented ) {
 					return;
 				}
 				event.preventDefault();
-				node.classList.toggle(
-					'is-hovered',
-					event.type === 'mouseover'
-				);
+				const isHovered = event.type === 'mouseover';
+				node.classList.toggle( 'is-hovered', isHovered );
+				clearTimeout( timeoutId );
+				if ( ! isHovered ) {
+					node.classList.remove( 'is-hovered-draggable' );
+					return;
+				}
+				// Over editable content the cursor is a text cursor, not
+				// the grab cursor, so no drag would start there. The
+				// editability check can force a style recalculation, so it
+				// runs once the pointer rests, which also keeps the
+				// outline from flashing on blocks it merely passes over.
+				const { target } = event;
+				timeoutId = setTimeout( () => {
+					node.classList.toggle(
+						'is-hovered-draggable',
+						! target.isContentEditable
+					);
+				}, 100 );
 			}
 
 			const unsubscribeOut = subscribeDelegatedListener(
@@ -48,8 +65,10 @@ export function useIsHovered( { isEnabled = true } = {} ) {
 				unsubscribeOut();
 				unsubscribeOver();
 
-				// Remove class in case it lingers.
+				// Remove classes in case they linger.
+				clearTimeout( timeoutId );
 				node.classList.remove( 'is-hovered' );
+				node.classList.remove( 'is-hovered-draggable' );
 			};
 		},
 		[ isEnabled ]

@@ -351,6 +351,13 @@ export default {
 		}
 
 		if ( orientation === 'horizontal' ) {
+			// `row` is the flex default, so the base layout never declares it.
+			// A viewport override that switches a vertical base layout to
+			// horizontal has to declare it explicitly, otherwise the base
+			// `flex-direction: column` keeps applying.
+			if ( hasViewportOverride( 'orientation' ) ) {
+				rules.push( 'flex-direction: row' );
+			}
 			if ( shouldOutputFlexAlignment && verticalAlignment ) {
 				rules.push( `align-items: ${ verticalAlignment }` );
 			}

@@ -4,12 +4,8 @@ import type {
 	ComponentPropsWithoutRef,
 	ComponentType,
 } from 'react';
-// Form controls read these stylesheets, normally enqueued by WordPress.
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
-import '@wordpress/components/build-style/style.css';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
-import '@wordpress/dataviews/build-style/style.css';
 import { Page } from '@wordpress/admin-ui';
+import { CommandMenu } from '@wordpress/commands';
 import {
 	forwardRef,
 	useCallback,
@@ -17,8 +13,13 @@ import {
 	useMemo,
 	useState,
 } from '@wordpress/element';
-import { chartBar, download, trendingUp } from '@wordpress/icons';
-import { WidgetHostProvider } from '@wordpress/widget-primitives';
+import { chartBar, download, shield, trendingUp } from '@wordpress/icons';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Button } from '@wordpress/ui';
+import {
+	WidgetHostProvider,
+	useWidgetActions,
+} from '@wordpress/widget-primitives';
 import type {
 	ResolveWidgetModule,
 	WidgetAction,
@@ -27,8 +28,15 @@ import type {
 	WidgetRenderProps,
 	WidgetType,
 } from '@wordpress/widget-primitives';
+import { ROW_HEIGHT_PRESETS } from '../utils/row-height-presets';
+import type { RowHeightPreset } from '../utils/row-height-presets';
 import { WidgetDashboard } from '../widget-dashboard';
-import type { CanPerformDashboardOperation, DashboardWidget } from '../types';
+import type {
+	CanPerformDashboardOperation,
+	DashboardWidget,
+	WidgetGridModel,
+	WidgetGridSettings,
+} from '../types';
 
 /*
  * Stories run without WordPress, so both halves of the demo widget are
@@ -302,14 +310,205 @@ const goalProgressWidgetType: WidgetType = {
 	},
 };
 
+/*
+ * A widget whose actions come from what it loads and from two components:
+ * once the check settles, the widget takes the declared "Details" action's
+ * place with a counted link, and its export section declares the download.
+ */
+interface SiteCheck {
+	id: number;
+	label: string;
+	status: 'critical' | 'recommended';
+}
+
+const SITE_CHECKS: SiteCheck[] = [
+	{ id: 1, label: 'Background updates', status: 'critical' },
+	{ id: 2, label: 'HTTPS status', status: 'recommended' },
+	{ id: 3, label: 'Page cache', status: 'recommended' },
+];
+
+const wait = ( ms: number ) =>
+	new Promise< void >( ( resolve ) => setTimeout( resolve, ms ) );
+
+function downloadChecks( checks: SiteCheck[] ) {
+	const rows = [
+		'Check,Status',
+		...checks.map( ( check ) => `${ check.label },${ check.status }` ),
+	];
+	const url = URL.createObjectURL(
+		new Blob( [ rows.join( '\n' ) ], { type: 'text/csv' } )
+	);
+	const anchor = document.createElement( 'a' );
+	anchor.href = url;
+	anchor.download = 'site-checks.csv';
+	anchor.click();
+	URL.revokeObjectURL( url );
+}
+
+function ChecksExportSection( { checks }: { checks: SiteCheck[] } ) {
+	const [ exported, setExported ] = useState( 0 );
+
+	useWidgetActions( [
+		{
+			id: 'export',
+			label: 'Download CSV',
+			icon: download,
+			relevance: 'medium',
+			callback: async () => {
+				// A slow export, so the pending state is visible.
+				await wait( 1500 );
+				downloadChecks( checks );
+				setExported( checks.length );
+			},
+		},
+	] );
+
+	return (
+		<span
+			style={ {
+				color: 'var(--wpds-color-foreground-content-neutral-weak)',
+				fontSize: 'var(--wpds-typography-font-size-sm)',
+			} }
+		>
+			{ exported > 0
+				? `Exported ${ exported } checks.`
+				: `Export ready for ${ checks.length } checks.` }
+		</span>
+	);
+}
+
+function SiteStatusWidget() {
+	const [ checks, setChecks ] = useState< SiteCheck[] | null >( null );
+	const [ hasExport, setHasExport ] = useState( true );
+
+	useEffect( () => {
+		const timer = setTimeout( () => setChecks( SITE_CHECKS ), 1500 );
+		return () => clearTimeout( timer );
+	}, [] );
+
+	useWidgetActions(
+		checks?.length
+			? [
+					{
+						id: 'details',
+						label: `Review ${ checks.length } items`,
+						relevance: 'high',
+						href: 'admin.php?page=demo-dashboard&p=/status?filter=issues',
+					},
+				]
+			: []
+	);
+
+	let status = 'Checking the site…';
+	if ( checks ) {
+		status =
+			checks.length > 0
+				? `${ checks.length } checks need attention.`
+				: 'Every check passes.';
+	}
+
+	return (
+		<div
+			style={ {
+				display: 'grid',
+				gap: 'var(--wpds-dimension-gap-sm)',
+				alignContent: 'start',
+				color: 'var(--wpds-color-foreground-content-neutral)',
+			} }
+		>
+			<strong>{ status }</strong>
+			{ checks && checks.length > 0 && (
+				<ul style={ { margin: 0, paddingInlineStart: '1.25em' } }>
+					{ checks.map( ( check ) => (
+						<li key={ check.id }>
+							{ `${ check.label } (${ check.status })` }
+						</li>
+					) ) }
+				</ul>
+			) }
+			{ checks && checks.length > 0 && hasExport && (
+				<ChecksExportSection checks={ checks } />
+			) }
+			{ checks && (
+				<div
+					style={ {
+						display: 'flex',
+						gap: 'var(--wpds-dimension-gap-xs)',
+					} }
+				>
+					<Button
+						variant="outline"
+						tone="neutral"
+						size="compact"
+						onClick={ () =>
+							setChecks(
+								checks.length > 0
+									? checks.slice( 1 )
+									: SITE_CHECKS
+							)
+						}
+					>
+						{ checks.length > 0 ? 'Resolve one' : 'Reset' }
+					</Button>
+					{ checks.length > 0 && (
+						<Button
+							variant="outline"
+							tone="neutral"
+							size="compact"
+							onClick={ () => setHasExport( ! hasExport ) }
+						>
+							{ hasExport ? 'Hide export' : 'Show export' }
+						</Button>
+					) }
+				</div>
+			) }
+		</div>
+	);
+}
+
+const siteStatusWidgetType: WidgetType = {
+	apiVersion: 1,
+	name: 'demo/site-status',
+	title: 'Site Status',
+	description: 'Checks the site and declares what to do next.',
+	help: {
+		content:
+			'The declared <strong>Details</strong> action shows while the check runs. Then the widget declares <strong>Review N items</strong> in its place, and its export section declares <strong>Download CSV</strong>.',
+	},
+	icon: shield,
+	renderModule: 'demo/widgets/site-status/render',
+	actions: [
+		{
+			id: 'details',
+			label: 'Details',
+			relevance: 'high',
+			href: 'admin.php?page=demo-dashboard&p=/status',
+		},
+		{
+			id: 'about',
+			label: 'About site health',
+			href: 'https://wordpress.org/documentation/article/site-health-screen/',
+			openInNewTab: true,
+		},
+	],
+};
+
 // What `import( widget.renderModule )` resolves to in a real host.
-const resolveDemoModule: ResolveWidgetModule = async ( moduleId ) => ( {
-	default: ( moduleId === goalProgressWidgetType.renderModule
-		? GoalProgressWidget
-		: TrafficSnapshotWidget ) as ComponentType<
-		WidgetRenderProps< unknown >
-	>,
-} );
+const resolveDemoModule: ResolveWidgetModule = async ( moduleId ) => {
+	let component: ComponentType< WidgetRenderProps< unknown > >;
+	if ( moduleId === goalProgressWidgetType.renderModule ) {
+		component = GoalProgressWidget as ComponentType<
+			WidgetRenderProps< unknown >
+		>;
+	} else if ( moduleId === siteStatusWidgetType.renderModule ) {
+		component = SiteStatusWidget;
+	} else {
+		component = TrafficSnapshotWidget as ComponentType<
+			WidgetRenderProps< unknown >
+		>;
+	}
+	return { default: component };
+};
 
 // The snapshot type at two widths, plus a one-column goal tile whose
 // attributes are all promoted, so the header presentations can be compared
@@ -336,7 +535,8 @@ const INITIAL_LAYOUT: DashboardWidget[] = [
 ];
 
 const meta: Meta< typeof WidgetDashboard > = {
-	title: 'Widget Dashboard/Playground',
+	id: 'widget-dashboard-playground',
+	title: 'Widgets/Dashboard/Playground',
 	component: WidgetDashboard,
 	tags: [ 'status-experimental' ],
 	parameters: {
@@ -475,7 +675,10 @@ const DEMO_NAVIGATE_EVENT = 'widget-dashboard-demo-navigate';
 const DemoRouteLink = forwardRef<
 	HTMLAnchorElement,
 	{ path: string } & Omit< ComponentPropsWithoutRef< 'a' >, 'href' >
->( function DemoRouteLink( { path, onClick, children, ...props }, ref ) {
+>( function UnforwardedDemoRouteLink(
+	{ path, onClick, children, ...props },
+	ref
+) {
 	return (
 		<a
 			ref={ ref }
@@ -627,6 +830,52 @@ Without the provider the same declarations still work; every action falls back t
 	},
 };
 
+const RUNTIME_ACTIONS_LAYOUT: DashboardWidget[] = [
+	{
+		uuid: 'site-status',
+		type: 'demo/site-status',
+		attributes: {},
+		placement: { width: 2, height: 1, order: 1 },
+	},
+];
+
+function RuntimeActionsStory() {
+	const [ layout, setLayout ] = useState< DashboardWidget[] >(
+		RUNTIME_ACTIONS_LAYOUT
+	);
+
+	return (
+		<WidgetHostProvider value={ demoHost }>
+			<WidgetDashboard
+				widgetTypes={ [ siteStatusWidgetType ] }
+				layout={ layout }
+				onLayoutChange={ setLayout }
+				resolveWidgetModule={ resolveDemoModule }
+				gridSettings={ { model: 'grid', rowHeight: 260 } }
+			>
+				<WidgetDashboard.Widgets />
+			</WidgetDashboard>
+		</WidgetHostProvider>
+	);
+}
+
+export const RuntimeActions: StoryObj = {
+	render: () => <RuntimeActionsStory />,
+	parameters: {
+		docs: {
+			description: {
+				story: `
+A widget declares actions from what its render knows, through \`useWidgetActions\`, and from more than one component.
+
+The footer starts with the declared "Details" link. Once the check settles, the widget declares "Review 3 items" with the same \`id\`, and it takes that place. Its export section, a child component, declares "Download CSV": a \`callback\` action, disabled while the export runs. \`WidgetRender\` joins both declarations, so the host receives one list.
+
+"Hide export" unmounts the section and withdraws only its action. "Resolve one" shrinks the list; once nothing is left, "Details" returns.
+`,
+			},
+		},
+	},
+};
+
 /*
  * The policy demo: an application with user profiles and sections. The
  * profile decides which operations the user may perform; the active section
@@ -653,7 +902,7 @@ const PROFILES = {
 	arranger: {
 		label: 'Arranger',
 		summary:
-			'may customize, move, and resize; never adds, removes, or edits',
+			'may customize, move, and resize; never adds, removes, edits, or resets',
 		operations: [ 'customize', 'move', 'resize' ] as readonly string[],
 	},
 	owner: {
@@ -717,6 +966,27 @@ function PolicyStory( { profile }: PolicyStoryProps ) {
 		[]
 	);
 
+	// Storybook forwards every keydown to its manager (`window.onkeydown`)
+	// without honoring `defaultPrevented`, so its own search would answer
+	// the palette combination too. Stop the event before it leaves the
+	// document; the palette's global shortcut listens on the document as
+	// well, and `stopPropagation` never affects same-target listeners.
+	useEffect( () => {
+		const containPaletteShortcut = ( event: KeyboardEvent ) => {
+			if (
+				( event.metaKey || event.ctrlKey ) &&
+				! event.shiftKey &&
+				! event.altKey &&
+				event.key.toLowerCase() === 'k'
+			) {
+				event.stopPropagation();
+			}
+		};
+		document.addEventListener( 'keydown', containPaletteShortcut );
+		return () =>
+			document.removeEventListener( 'keydown', containPaletteShortcut );
+	}, [] );
+
 	const { label, summary } = PROFILES[ profile ];
 
 	return (
@@ -728,6 +998,7 @@ function PolicyStory( { profile }: PolicyStoryProps ) {
 				] }
 				layout={ layout }
 				onLayoutChange={ setLayout }
+				onLayoutReset={ () => setLayout( INITIAL_LAYOUT ) }
 				editMode={ editMode }
 				onEditChange={ setEditMode }
 				resolveWidgetModule={ resolveDemoModule }
@@ -752,6 +1023,8 @@ function PolicyStory( { profile }: PolicyStoryProps ) {
 					hasPadding
 				>
 					<WidgetDashboard.Widgets />
+					<WidgetDashboard.Commands />
+					<CommandMenu />
 				</Page>
 			</WidgetDashboard>
 		</WidgetDashboard.Policy>
@@ -768,7 +1041,7 @@ export const Policy: StoryObj< PolicyStoryProps > = {
 			control: 'select',
 			options: Object.keys( PROFILES ),
 			description:
-				'The user profile the application maps to a policy. Viewer: nothing. Arranger: customize, move, resize. Owner: everything.',
+				'The user profile the application maps to a policy. Viewer: nothing. Arranger: customize, move, resize. Owner: everything, including reset.',
 		},
 	},
 	parameters: {
@@ -777,11 +1050,180 @@ export const Policy: StoryObj< PolicyStoryProps > = {
 				story: `
 The application governs the dashboard; the widget types stay untouched. This story mounts \`WidgetDashboard.Policy\` around the dashboard with a \`canPerform\` closing over the signed-in profile and the active section, and composes the dashboard inside an admin \`Page\`: the section links in its navigation, the dashboard actions in its actions slot.
 
-Switch the \`profile\` control. A Viewer gets no Customize button, no attribute controls, and read-only widgets (no \`setAttributes\`). An Arranger enters customize mode and drags or resizes tiles, but has no Add widget trigger, no Remove control, and no attribute editing. An Owner does everything.
+Switch the \`profile\` control. A Viewer gets no Customize button, no Reset to default entry, no attribute controls, and read-only widgets (no \`setAttributes\`). An Arranger enters customize mode and drags or resizes tiles, but has no Add widget trigger, no Reset to default entry, no Remove control, and no attribute editing. An Owner does everything.
+
+The command palette is mounted too: press ⌘K (Ctrl+K outside macOS) and the commands follow the same policy. An Owner sees Customize dashboard, Add dashboard widgets, and Reset dashboard widgets to default; an Arranger keeps Customize dashboard only; a Viewer gets no dashboard commands.
 
 Switch the section, then open "Add widget": the listing follows the section, even while open; the excluded types keep rendering where already placed because the \`widgetTypes\` registry never changes.
 
 Nested policies compose restrictively; without a policy, every operation is allowed. See the **Policy** page for the contract.
+`,
+			},
+		},
+	},
+};
+
+// A fuller board than INITIAL_LAYOUT: a hero spanning the whole first row at
+// any column count (the grid clamps the span), then a rank of small tiles so
+// the columns control visibly repacks them.
+const GRID_SETTINGS_LAYOUT: DashboardWidget[] = [
+	{
+		uuid: 'grid-settings-traffic-week',
+		type: 'demo/traffic-snapshot',
+		attributes: { metric: 'views', period: 'week', label: 'Traffic' },
+		placement: { width: 2, height: 1, order: 1 },
+	},
+	{
+		uuid: 'grid-settings-goal-revenue',
+		type: 'demo/goal-progress',
+		attributes: { metric: 'revenue', target: '5000' },
+		placement: { width: 1, height: 1, order: 2 },
+	},
+	{
+		uuid: 'grid-settings-audience-tall',
+		type: 'demo/traffic-snapshot',
+		attributes: { metric: 'visitors', period: 'month', label: 'Audience' },
+		placement: { width: 1, height: 2, order: 3 },
+	},
+	{
+		uuid: 'grid-settings-goal-orders',
+		type: 'demo/goal-progress',
+		attributes: { metric: 'orders', target: '1000' },
+		placement: { width: 2, height: 1, order: 4 },
+	},
+	{
+		uuid: 'grid-settings-traffic-day',
+		type: 'demo/traffic-snapshot',
+		attributes: { metric: 'views', period: 'day', label: 'Today' },
+		placement: { width: 1, height: 1, order: 5 },
+	},
+	{
+		uuid: 'grid-settings-goal-stretch',
+		type: 'demo/goal-progress',
+		attributes: { metric: 'revenue', target: '10000' },
+		placement: { width: 1, height: 1, order: 6 },
+	},
+];
+
+type GridSettingsStoryProps = {
+	columns: number;
+	model: WidgetGridModel;
+	rowHeight: RowHeightPreset;
+	flowTolerance: number;
+};
+
+// The ladder in words, so the caption tracks the count the story asked for
+// rather than describing the four-column default.
+function describeColumnSteps( columns: number ): string {
+	if ( columns === 1 ) {
+		return 'one column at every width';
+	}
+
+	const middle = Math.min( 2, columns );
+	if ( middle === columns ) {
+		return `${ columns } columns until the container narrows to one`;
+	}
+
+	return `${ columns } columns on a wide container, ${ middle } as it narrows, then one`;
+}
+
+function GridSettingsStory( {
+	columns,
+	model,
+	rowHeight,
+	flowTolerance,
+}: GridSettingsStoryProps ) {
+	const [ layout, setLayout ] =
+		useState< DashboardWidget[] >( GRID_SETTINGS_LAYOUT );
+	const [ editMode, setEditMode ] = useState( false );
+
+	// The settings union is per model: `rowHeight` belongs to the grid and
+	// `flowTolerance` to masonry, so only the active model's field travels.
+	const gridSettings = useMemo< WidgetGridSettings >(
+		() =>
+			model === 'masonry'
+				? { model, columns, flowTolerance }
+				: {
+						model,
+						columns,
+						rowHeight: ROW_HEIGHT_PRESETS[ rowHeight ],
+					},
+		[ model, columns, flowTolerance, rowHeight ]
+	);
+
+	return (
+		<WidgetDashboard
+			widgetTypes={ [
+				trafficSnapshotWidgetType,
+				goalProgressWidgetType,
+			] }
+			layout={ layout }
+			onLayoutChange={ setLayout }
+			editMode={ editMode }
+			onEditChange={ setEditMode }
+			resolveWidgetModule={ resolveDemoModule }
+			gridSettings={ gridSettings }
+		>
+			<Page
+				title="Dashboard"
+				subTitle={ `${
+					model === 'masonry' ? 'Masonry' : 'Standard grid'
+				}: ${ describeColumnSteps( columns ) }.` }
+				actions={ <WidgetDashboard.Actions /> }
+				showSidebarToggle={ false }
+				hasPadding
+			>
+				<WidgetDashboard.Widgets />
+			</Page>
+		</WidgetDashboard>
+	);
+}
+
+export const GridSettings: StoryObj< GridSettingsStoryProps > = {
+	render: ( args ) => <GridSettingsStory { ...args } />,
+	args: {
+		columns: 4,
+		model: 'grid',
+		rowHeight: 'medium',
+		flowTolerance: 16,
+	},
+	argTypes: {
+		columns: {
+			control: { type: 'range', min: 1, max: 12, step: 1 },
+			description:
+				'Wide-container column count. The host decides; the package only floors it at one.',
+		},
+		model: {
+			control: 'radio',
+			options: [ 'grid', 'masonry' ],
+			description:
+				'The grid model. `grid` gives uniform rows and two-axis spans; `masonry` drives heights from content.',
+		},
+		rowHeight: {
+			control: 'radio',
+			options: Object.keys( ROW_HEIGHT_PRESETS ),
+			description: 'Height of each grid row. Grid model only.',
+			if: { arg: 'model', eq: 'grid' },
+		},
+		flowTolerance: {
+			control: { type: 'range', min: 0, max: 200, step: 4 },
+			description:
+				'Pixel tolerance for source-order tiebreaking between lanes. Masonry model only.',
+			if: { arg: 'model', eq: 'masonry' },
+		},
+	},
+	parameters: {
+		controls: {
+			include: [ 'columns', 'model', 'rowHeight', 'flowTolerance' ],
+		},
+		docs: {
+			description: {
+				story: `
+The \`gridSettings\` prop carries the host's layout decisions. \`columns\` sets the wide-container count (\`WIDGET_DASHBOARD_COLUMN_COUNT\` is only the default when the host sets nothing), and container width steps the effective count down to \`min( 2, count )\` and then one as it narrows. Drag the columns control; resize the canvas to watch the steps.
+
+\`model\` picks the surface, and the per-model field follows it: \`rowHeight\` belongs to \`grid\`, \`flowTolerance\` to \`masonry\`. Only the active one is passed in \`gridSettings\`, and only its control is shown.
+
+Tile spans are stored per widget and do not scale with the count. Raise \`columns\` and every track narrows, so the same spans cover less of the surface. Enter Customize and resize a tile to see it take the new count.
 `,
 			},
 		},

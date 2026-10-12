@@ -1,27 +1,30 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { createBlock, parse, serialize } from '@wordpress/blocks';
 import useCreateOverlayTemplatePart from '../use-create-overlay';
 
 // Mock useDispatch and useSelect
-jest.mock( '@wordpress/data', () => ( {
-	useDispatch: jest.fn(),
-	useSelect: jest.fn(),
+vi.mock( import( '@wordpress/data' ), () => ( {
+	useDispatch: vi.fn(),
+	useSelect: vi.fn(),
 } ) );
 
 // Mock coreStore
-jest.mock( '@wordpress/core-data', () => ( {
+vi.mock( import( '@wordpress/core-data' ), () => ( {
 	store: {},
 } ) );
 
 // Mock blockEditorStore
-jest.mock( '@wordpress/block-editor', () => ( {
+vi.mock( import( '@wordpress/block-editor' ), () => ( {
 	store: {},
 } ) );
 
 // Mock @wordpress/blocks
-jest.mock( '@wordpress/blocks', () => ( {
-	serialize: jest.fn( ( blocks ) => JSON.stringify( blocks ) ),
-	parse: jest.fn( ( content ) => {
+vi.mock( import( '@wordpress/blocks' ), () => ( {
+	serialize: vi.fn( ( blocks ) => JSON.stringify( blocks ) ),
+	parse: vi.fn( ( content ) => {
 		// Return mock blocks when parsing pattern content
 		if ( content && typeof content === 'string' ) {
 			return [
@@ -34,7 +37,7 @@ jest.mock( '@wordpress/blocks', () => ( {
 		}
 		return [];
 	} ),
-	createBlock: jest.fn( ( name ) => ( {
+	createBlock: vi.fn( ( name ) => ( {
 		name,
 		attributes: {},
 		innerBlocks: [],
@@ -42,17 +45,17 @@ jest.mock( '@wordpress/blocks', () => ( {
 } ) );
 
 // Mock lock-unlock
-const mockUnlock = jest.fn();
-jest.mock( '../../../lock-unlock', () => ( {
+const mockUnlock = vi.fn();
+vi.mock( import( '../../../lock-unlock' ), () => ( {
 	unlock: ( select ) => mockUnlock( select ),
 } ) );
 
 describe( 'useCreateOverlayTemplatePart', () => {
-	const mockSaveEntityRecord = jest.fn();
-	const mockGetPatternBySlug = jest.fn();
+	const mockSaveEntityRecord = vi.fn();
+	const mockGetPatternBySlug = vi.fn();
 
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 		useDispatch.mockReturnValue( {
 			saveEntityRecord: mockSaveEntityRecord,
 		} );
@@ -62,8 +65,8 @@ describe( 'useCreateOverlayTemplatePart', () => {
 		} );
 
 		useSelect.mockImplementation( ( selector ) => {
-			const mockSelect = jest.fn( ( store ) => {
-				if ( store === require( '@wordpress/block-editor' ).store ) {
+			const mockSelect = vi.fn( ( store ) => {
+				if ( store === blockEditorStore ) {
 					return {}; // Return mock block editor store
 				}
 				return {};
@@ -175,10 +178,6 @@ describe( 'useCreateOverlayTemplatePart', () => {
 
 		mockSaveEntityRecord.mockResolvedValue( createdOverlay );
 
-		// Import mocked functions
-		const blocksModule = require( '@wordpress/blocks' );
-		const { parse, serialize } = blocksModule;
-
 		const { result: createOverlayTemplatePart } = renderHook( () =>
 			useCreateOverlayTemplatePart( overlayTemplateParts )
 		);
@@ -212,10 +211,6 @@ describe( 'useCreateOverlayTemplatePart', () => {
 
 		mockSaveEntityRecord.mockResolvedValue( createdOverlay );
 		mockGetPatternBySlug.mockReturnValue( null );
-
-		// Import mocked functions
-		const blocksModule = require( '@wordpress/blocks' );
-		const { createBlock, serialize } = blocksModule;
 
 		const { result: createOverlayTemplatePart } = renderHook( () =>
 			useCreateOverlayTemplatePart( overlayTemplateParts )

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getUploadErrorMessage } from '../get-upload-error-message';
 
 const SERVER_ERROR = 'Failed to upload "kitten.jpeg". Please try again.';

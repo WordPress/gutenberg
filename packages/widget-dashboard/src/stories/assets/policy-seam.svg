@@ -31,7 +31,7 @@
 
   <rect x="84" y="236" width="113" height="52" rx="5" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
   <text x="140" y="257" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" font-weight="700" fill="#334155">Customize</text>
-  <text x="140" y="274" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="8.5" fill="#64748b">customize</text>
+  <text x="140" y="274" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="8.5" fill="#64748b">customize · reset</text>
 
   <rect x="202" y="236" width="113" height="52" rx="5" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
   <text x="258" y="257" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10.5" font-weight="700" fill="#334155">inserter</text>

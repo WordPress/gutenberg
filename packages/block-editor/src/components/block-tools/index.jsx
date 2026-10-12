@@ -134,7 +134,7 @@ export default function BlockTools( {
 					? clientIds.length
 					: 1;
 				const message = sprintf(
-					// translators: %d: the name of the block that has been moved
+					// translators: %d: Number of blocks moved.
 					_n(
 						'%d block moved.',
 						'%d blocks moved.',

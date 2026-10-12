@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import getPaginationMeta from '../get-pagination-meta';
 
 const createHeaders = ( values ) => ( {

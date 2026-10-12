@@ -6,7 +6,6 @@ import {
 	__experimentalTruncate as Truncate,
 	__experimentalHStack as HStack,
 	Flex,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
@@ -22,9 +21,8 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { unlock } from '../../lock-unlock';
+import { Badge } from '@wordpress/ui';
 import { ViewerSlot } from './viewer-slot';
-const { Badge: WCBadge } = unlock( componentsPrivateApis );
 import useRichUrlData from './use-rich-url-data';
 
 export default function LinkPreview( {
@@ -151,12 +149,12 @@ export default function LinkPreview( {
 									>
 										{ value.badges.map(
 											( badge, index ) => (
-												<WCBadge
+												<Badge
 													key={ `${ badge.label }|${ badge.intent }|${ index }` }
 													intent={ badge.intent }
 												>
 													{ badge.label }
-												</WCBadge>
+												</Badge>
 											)
 										) }
 									</HStack>

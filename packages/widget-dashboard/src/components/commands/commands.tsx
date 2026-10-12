@@ -4,6 +4,7 @@ import {
 	useCommands,
 	privateApis as commandsPrivateApis,
 } from '@wordpress/commands';
+import type { CommandConfig } from '@wordpress/commands';
 import { layout as layoutIcon, plus, trash } from '@wordpress/icons';
 import { unlock } from '../../lock-unlock';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
@@ -25,6 +26,7 @@ export function Commands() {
 		useDashboardInternalContext();
 
 	const canCustomize = canPerform( { operation: 'customize' } );
+	const canReset = canPerform( { operation: 'reset' } );
 	const canInsertAny = useMemo(
 		() =>
 			widgetTypes.some( ( widgetType ) =>
@@ -68,7 +70,7 @@ export function Commands() {
 		[ onEditChange ]
 	);
 
-	const commands = useMemo(
+	const commands = useMemo< CommandConfig[] >(
 		() => [
 			{
 				name: 'core/dashboard/customize',
@@ -101,7 +103,7 @@ export function Commands() {
 				category: 'command',
 				context: DASHBOARD_COMMAND_CONTEXT,
 				keywords: [ __( 'reset' ), __( 'default' ) ],
-				disabled: ! onLayoutReset,
+				disabled: ! onLayoutReset || ! canReset,
 				callback: resetToDefault,
 			},
 		],
@@ -109,6 +111,7 @@ export function Commands() {
 			onEditChange,
 			editMode,
 			canCustomize,
+			canReset,
 			canInsertAny,
 			customize,
 			addWidgets,

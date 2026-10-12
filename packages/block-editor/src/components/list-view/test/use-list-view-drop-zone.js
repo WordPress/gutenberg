@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import {
 	getListViewDropTarget,
 	NESTING_LEVEL_INDENTATION,

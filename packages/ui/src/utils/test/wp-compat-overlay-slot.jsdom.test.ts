@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
 	getWpCompatOverlaySlot,
 	WP_COMPAT_OVERLAY_SLOT_ATTRIBUTE,

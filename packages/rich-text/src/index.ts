@@ -38,6 +38,13 @@ export function __experimentalRichText() {}
 export type { RichTextValue } from './types';
 
 /**
- * The callback-Set refs the private event-listener helpers dispatch from.
+ * A single format, such as `core/bold`, applied to a range of characters within
+ * a `RichTextValue`. See main `@wordpress/rich-text` documentation for more
+ * information.
  */
-export type { EventListenersProps } from './event-listeners';
+export type { RichTextFormat } from './types';
+
+/**
+ * A Set of callbacks that format types register for an event.
+ */
+export type { EventCallbacksSet } from './event-listeners';

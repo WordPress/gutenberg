@@ -1,11 +1,11 @@
 import {
-	SelectControl,
 	__experimentalNumberControl as NumberControl,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import useDimensionHandler from './use-dimension-handler';
 
@@ -85,10 +85,29 @@ export default function ImageSizeControl( {
 			{ imageSizeOptions && imageSizeOptions.length > 0 && (
 				<SelectControl
 					label={ __( 'Resolution' ) }
-					value={ slug }
-					options={ imageSizeOptions }
-					onChange={ onChangeImage }
-					help={ imageSizeHelp }
+					value={
+						imageSizeOptions.find(
+							( item ) => item.value === slug
+						) ??
+						imageSizeOptions.find( ( item ) => ! item.disabled ) ??
+						null
+					}
+					items={ imageSizeOptions }
+					onValueChange={ ( item, eventDetails ) =>
+						onChangeImage( item?.value ?? '', {
+							event: eventDetails.event,
+						} )
+					}
+					description={
+						typeof imageSizeHelp === 'string'
+							? imageSizeHelp
+							: undefined
+					}
+					details={
+						typeof imageSizeHelp !== 'string'
+							? imageSizeHelp
+							: undefined
+					}
 				/>
 			) }
 			{ isResizable && (

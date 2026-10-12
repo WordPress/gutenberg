@@ -1,4 +1,11 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+	act,
+	fireEvent,
+	render,
+	screen,
+	waitFor,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { speak } from '@wordpress/a11y';
 import { useState } from '@wordpress/element';
@@ -8,7 +15,10 @@ import URLInput from '../';
 import { store as blockEditorStore } from '../../../store';
 import { expectValidatedInputControlDeprecationIfCalled } from './fixtures/validated-input-control-deprecation';
 
-jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
+globalThis.wpVitest.mockScrollIntoView();
+globalThis.wpVitest.mockMatchMedia();
+
+vi.mock( import( '@wordpress/a11y' ), () => ( { speak: vi.fn() } ) );
 
 const SUGGESTIONS = [
 	{
@@ -37,8 +47,8 @@ const KEY_EVENTS = {
  * Waits long enough for the suggestions request debounce to elapse, so that
  * assertions about a request _not_ being made are meaningful.
  */
-function flushDebounce() {
-	return new Promise( ( resolve ) => setTimeout( resolve, 250 ) );
+async function flushDebounce() {
+	await act( () => new Promise( ( resolve ) => setTimeout( resolve, 250 ) ) );
 }
 
 /**
@@ -68,16 +78,16 @@ describe( 'URLInput', () => {
 	let fetchLinkSuggestions;
 
 	beforeEach( () => {
-		fetchLinkSuggestions = jest.fn().mockResolvedValue( SUGGESTIONS );
+		fetchLinkSuggestions = vi.fn().mockResolvedValue( SUGGESTIONS );
 	} );
 
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	function renderURLInput( props = {} ) {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<ControlledURLInput
@@ -471,7 +481,7 @@ describe( 'URLInput', () => {
 		} );
 
 		it( 'should select and submit the active suggestion when pressing Enter', async () => {
-			const onSubmit = jest.fn();
+			const onSubmit = vi.fn();
 			const { input, onChange } = await renderWithSuggestions( {
 				onSubmit,
 			} );
@@ -491,7 +501,7 @@ describe( 'URLInput', () => {
 		} );
 
 		it( 'should submit without a suggestion when pressing Enter with no active suggestion', async () => {
-			const onSubmit = jest.fn();
+			const onSubmit = vi.fn();
 			const { input } = await renderWithSuggestions( { onSubmit } );
 
 			fireEvent.keyDown( input, KEY_EVENTS.enter );
@@ -500,8 +510,8 @@ describe( 'URLInput', () => {
 		} );
 
 		it( 'should submit without a suggestion when pressing Enter and there are no suggestions', async () => {
-			const onSubmit = jest.fn();
-			const onKeyDown = jest.fn();
+			const onSubmit = vi.fn();
+			const onKeyDown = vi.fn();
 			const { input } = renderURLInput( {
 				value: 'hello',
 				disableSuggestions: true,
@@ -587,7 +597,7 @@ describe( 'URLInput', () => {
 
 	describe( 'custom rendering', () => {
 		it( 'should render the control via `__experimentalRenderControl`', () => {
-			const renderControl = jest
+			const renderControl = vi
 				.fn()
 				.mockReturnValue( <div>Custom control</div> );
 
@@ -608,7 +618,7 @@ describe( 'URLInput', () => {
 		} );
 
 		it( 'should render suggestions via `__experimentalRenderSuggestions`', async () => {
-			const renderSuggestions = jest.fn( ( { suggestions } ) => (
+			const renderSuggestions = vi.fn( ( { suggestions } ) => (
 				<ul>
 					{ suggestions.map( ( suggestion ) => (
 						<li key={ suggestion.id }>{ suggestion.title }</li>

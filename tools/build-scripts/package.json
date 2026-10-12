@@ -40,6 +40,9 @@
 		"rimraf": "^5.0.10",
 		"source-map": "^0.6.1"
 	},
+	"devDependencies": {
+		"vitest": "^5.0.3"
+	},
 	"publishConfig": {
 		"access": "public"
 	},

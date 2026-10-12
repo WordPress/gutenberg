@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import setNestedValue from '../set-nested-value';
 
 describe( 'setNestedValue', () => {

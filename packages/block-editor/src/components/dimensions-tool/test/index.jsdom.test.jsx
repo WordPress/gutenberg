@@ -1,8 +1,13 @@
-import { act, render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import DimensionsTool from '../';
+
+globalThis.wpVitest.mockMatchMedia();
+
+globalThis.wpVitest.mockResizeObserver();
 
 const EMPTY_OBJECT = {};
 const ASPECT_RATIO_OPTIONS = [
@@ -100,7 +105,7 @@ function ControlledExample( { value, onChange, ...props } ) {
 describe( 'DimensionsTool', () => {
 	describe( 'controlled values', () => {
 		it( 'updates the aspect ratio control when the value prop changes', () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const { rerender } = render(
 				<ControlledExample
 					value={ { aspectRatio: '16/9' } }
@@ -111,7 +116,7 @@ describe( 'DimensionsTool', () => {
 				name: 'Aspect ratio',
 			} );
 
-			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^16\/9$/ );
 
 			rerender(
 				<ControlledExample
@@ -119,7 +124,7 @@ describe( 'DimensionsTool', () => {
 					onChange={ onChange }
 				/>
 			);
-			expect( aspectRatioSelect ).toHaveValue( '4/3' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^4\/3$/ );
 
 			rerender(
 				<ControlledExample
@@ -127,11 +132,11 @@ describe( 'DimensionsTool', () => {
 					onChange={ onChange }
 				/>
 			);
-			expect( aspectRatioSelect ).toHaveValue( 'auto' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^Original$/ );
 		} );
 
-		it( 'displays an aspect ratio that is written differently to the option with the same ratio', () => {
-			const onChange = jest.fn();
+		it( 'displays an aspect ratio that is written differently to the option with the same ratio', async () => {
+			const onChange = vi.fn();
 			const { rerender } = render(
 				<ControlledExample
 					value={ { aspectRatio: '1/1' } }
@@ -142,7 +147,7 @@ describe( 'DimensionsTool', () => {
 				name: 'Aspect ratio',
 			} );
 
-			expect( aspectRatioSelect ).toHaveValue( '1' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^Square$/ );
 
 			rerender(
 				<ControlledExample
@@ -150,11 +155,13 @@ describe( 'DimensionsTool', () => {
 					onChange={ onChange }
 				/>
 			);
-			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+			await waitFor( () =>
+				expect( aspectRatioSelect ).toHaveTextContent( /^16\/9$/ )
+			);
 		} );
 
-		it( 'displays an aspect ratio without a matching option as custom', () => {
-			const onChange = jest.fn();
+		it( 'displays an aspect ratio without a matching option as custom', async () => {
+			const onChange = vi.fn();
 			render(
 				<ControlledExample
 					value={ { aspectRatio: '7/5' } }
@@ -162,13 +169,15 @@ describe( 'DimensionsTool', () => {
 				/>
 			);
 
-			expect(
-				screen.getByRole( 'combobox', { name: 'Aspect ratio' } )
-			).toHaveValue( 'custom' );
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'combobox', { name: 'Aspect ratio' } )
+				).toHaveTextContent( /^Custom$/ )
+			);
 		} );
 
-		it( 'updates the scale control when the value prop changes', () => {
-			const onChange = jest.fn();
+		it( 'updates the scale control when the value prop changes', async () => {
+			const onChange = vi.fn();
 			const { rerender } = render(
 				<ControlledExample
 					value={ { aspectRatio: '16/9', scale: 'cover' } }
@@ -187,16 +196,18 @@ describe( 'DimensionsTool', () => {
 				/>
 			);
 
-			expect(
-				screen.getByRole( 'radio', { name: 'Contain' } )
-			).toBeChecked();
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'radio', { name: 'Contain' } )
+				).toBeChecked()
+			);
 		} );
 	} );
 
 	describe( 'external updates', () => {
 		it( 'restores the scale that was set externally', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const updateRef = { current: null };
 
 			render(
@@ -213,13 +224,23 @@ describe( 'DimensionsTool', () => {
 			);
 
 			// Clearing and setting the aspect ratio again restores the scale.
-			await user.selectOptions(
-				screen.getByRole( 'combobox', { name: 'Aspect ratio' } ),
-				'auto'
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Aspect ratio' } )
 			);
-			await user.selectOptions(
-				screen.getByRole( 'combobox', { name: 'Aspect ratio' } ),
-				'4/3'
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: 'Original',
+					exact: true,
+				} )
+			);
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Aspect ratio' } )
+			);
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: '4/3',
+					exact: true,
+				} )
 			);
 
 			expect( onChange ).toHaveBeenLastCalledWith( {
@@ -230,7 +251,7 @@ describe( 'DimensionsTool', () => {
 
 		it( 'restores the aspect ratio that was set externally', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const updateRef = { current: null };
 
 			render(
@@ -271,7 +292,7 @@ describe( 'DimensionsTool', () => {
 	describe( 'updating aspectRatio', () => {
 		it( 'when starting with empty initial state, setting aspectRatio also sets scale (0000) -> (1100)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				// aspectRatio,
@@ -288,9 +309,15 @@ describe( 'DimensionsTool', () => {
 				name: 'Aspect ratio',
 			} );
 
-			await user.selectOptions( aspectRatioSelect, '16/9' );
+			await user.click( aspectRatioSelect );
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: '16/9',
+					exact: true,
+				} )
+			);
 
-			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^16\/9$/ );
 
 			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
 				name: 'Scale',
@@ -311,7 +338,7 @@ describe( 'DimensionsTool', () => {
 
 		it( 'when starting with just height, setting aspectRatio also sets scale (0001) -> (1101)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				// aspectRatio,
@@ -328,9 +355,15 @@ describe( 'DimensionsTool', () => {
 				name: 'Aspect ratio',
 			} );
 
-			await user.selectOptions( aspectRatioSelect, '16/9' );
+			await user.click( aspectRatioSelect );
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: '16/9',
+					exact: true,
+				} )
+			);
 
-			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^16\/9$/ );
 
 			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
 				name: 'Scale',
@@ -351,7 +384,7 @@ describe( 'DimensionsTool', () => {
 
 		it( 'when starting with just width, setting aspectRatio also sets scale (0010) -> (1110)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				// aspectRatio,
@@ -368,9 +401,15 @@ describe( 'DimensionsTool', () => {
 				name: 'Aspect ratio',
 			} );
 
-			await user.selectOptions( aspectRatioSelect, '16/9' );
+			await user.click( aspectRatioSelect );
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: '16/9',
+					exact: true,
+				} )
+			);
 
-			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^16\/9$/ );
 
 			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
 				name: 'Scale',
@@ -391,7 +430,7 @@ describe( 'DimensionsTool', () => {
 
 		it( 'when starting with scale, width, and height, setting aspectRatio also clears height (0111) -> (1110)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				// aspectRatio,
@@ -408,9 +447,15 @@ describe( 'DimensionsTool', () => {
 				name: 'Aspect ratio',
 			} );
 
-			await user.selectOptions( aspectRatioSelect, '16/9' );
+			await user.click( aspectRatioSelect );
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: '16/9',
+					exact: true,
+				} )
+			);
 
-			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^16\/9$/ );
 
 			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
 				name: 'Scale',
@@ -431,7 +476,7 @@ describe( 'DimensionsTool', () => {
 
 		it( 'when starting with aspectRatio and scale, setting aspectRatio to "Original" also clears scale (1100) -> (0000)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				aspectRatio: '16/9',
@@ -448,9 +493,15 @@ describe( 'DimensionsTool', () => {
 				name: 'Aspect ratio',
 			} );
 
-			await user.selectOptions( aspectRatioSelect, 'auto' );
+			await user.click( aspectRatioSelect );
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: 'Original',
+					exact: true,
+				} )
+			);
 
-			expect( aspectRatioSelect ).toHaveValue( 'auto' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^Original$/ );
 
 			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
 				name: 'Scale',
@@ -463,7 +514,7 @@ describe( 'DimensionsTool', () => {
 
 		it( 'when starting with aspectRatio, scale, and height, setting aspectRatio to "Original" also clears scale (1101) -> (0001)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				aspectRatio: '16/9',
@@ -480,9 +531,15 @@ describe( 'DimensionsTool', () => {
 				name: 'Aspect ratio',
 			} );
 
-			await user.selectOptions( aspectRatioSelect, 'auto' );
+			await user.click( aspectRatioSelect );
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: 'Original',
+					exact: true,
+				} )
+			);
 
-			expect( aspectRatioSelect ).toHaveValue( 'auto' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^Original$/ );
 
 			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
 				name: 'Scale',
@@ -497,7 +554,7 @@ describe( 'DimensionsTool', () => {
 
 		it( 'when starting with aspectRatio, scale, and width, setting aspectRatio to "Original" also clears scale (1110) -> (0010)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				aspectRatio: '16/9',
@@ -514,9 +571,15 @@ describe( 'DimensionsTool', () => {
 				name: 'Aspect ratio',
 			} );
 
-			await user.selectOptions( aspectRatioSelect, 'auto' );
+			await user.click( aspectRatioSelect );
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: 'Original',
+					exact: true,
+				} )
+			);
 
-			expect( aspectRatioSelect ).toHaveValue( 'auto' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^Original$/ );
 
 			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
 				name: 'Scale',
@@ -533,7 +596,7 @@ describe( 'DimensionsTool', () => {
 	describe( 'updating scale', () => {
 		it( 'when default scale is cover, setting scale to fill preserves the fill value', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				aspectRatio: '16/9',
@@ -560,7 +623,7 @@ describe( 'DimensionsTool', () => {
 	describe( 'updating dimensions', () => {
 		it( 'when starting with just height, setting width also sets scale (0001) -> (0111)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				// aspectRatio,
@@ -600,7 +663,7 @@ describe( 'DimensionsTool', () => {
 
 		it( 'when starting with just width, setting height also sets scale (0010) -> (0111)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				// aspectRatio,
@@ -640,7 +703,7 @@ describe( 'DimensionsTool', () => {
 
 		it( 'when starting with scale, width, and height, clearing width also clears scale (0111) -> (0001)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				// aspectRatio,
@@ -674,7 +737,7 @@ describe( 'DimensionsTool', () => {
 
 		it( 'when starting with scale, width, and height, clearing height also clears scale (0111) -> (0010)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				// aspectRatio,
@@ -708,7 +771,7 @@ describe( 'DimensionsTool', () => {
 
 		it( 'when starting with aspectRatio, scale, and height, setting width also clears aspectRatio (1101) -> (0111)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				aspectRatio: '16/9',
@@ -733,7 +796,7 @@ describe( 'DimensionsTool', () => {
 				name: 'Aspect ratio',
 			} );
 
-			expect( aspectRatioSelect ).toHaveValue( 'custom' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^Custom$/ );
 
 			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
 				name: 'Scale',
@@ -754,7 +817,7 @@ describe( 'DimensionsTool', () => {
 
 		it( 'when starting with aspectRatio, scale, and width, setting height also clears aspectRatio (1110) -> (0111)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const initialValue = {
 				aspectRatio: '16/9',
@@ -779,7 +842,7 @@ describe( 'DimensionsTool', () => {
 				name: 'Aspect ratio',
 			} );
 
-			expect( aspectRatioSelect ).toHaveValue( 'custom' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^Custom$/ );
 
 			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
 				name: 'Scale',
@@ -802,7 +865,7 @@ describe( 'DimensionsTool', () => {
 	describe( 'internal component state', () => {
 		it( 'when aspect ratio is change to custom by setting width and height then removing a width value should return the original aspect ratio (1100) -> (1110) -> (0111) -> (1101)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const value = {
 				aspectRatio: '16/9',
@@ -824,13 +887,13 @@ describe( 'DimensionsTool', () => {
 			} );
 
 			await user.type( widthInput, '8' );
-			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^16\/9$/ );
 
 			await user.type( heightInput, '6' );
-			expect( aspectRatioSelect ).toHaveValue( 'custom' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^Custom$/ );
 
 			await user.clear( widthInput, '' );
-			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^16\/9$/ );
 
 			expect( onChange.mock.calls ).toStrictEqual( [
 				[ { aspectRatio: '16/9', scale: 'cover', width: '8px' } ],
@@ -841,7 +904,7 @@ describe( 'DimensionsTool', () => {
 
 		it( 'when custom scale is set then aspect ratio is set to original and then aspect ratio is changed back (1100) -> (1100) -> (0000) -> (1100)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			const value = {
 				aspectRatio: '16/9',
@@ -861,11 +924,23 @@ describe( 'DimensionsTool', () => {
 			await user.click( scaleContainRadio );
 			expect( scaleContainRadio ).toBeChecked();
 
-			await user.selectOptions( aspectRatioSelect, 'auto' );
-			expect( aspectRatioSelect ).toHaveValue( 'auto' );
+			await user.click( aspectRatioSelect );
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: 'Original',
+					exact: true,
+				} )
+			);
+			expect( aspectRatioSelect ).toHaveTextContent( /^Original$/ );
 
-			await user.selectOptions( aspectRatioSelect, '16/9' );
-			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+			await user.click( aspectRatioSelect );
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: '16/9',
+					exact: true,
+				} )
+			);
+			expect( aspectRatioSelect ).toHaveTextContent( /^16\/9$/ );
 
 			expect( onChange.mock.calls ).toStrictEqual( [
 				[ { aspectRatio: '16/9', scale: 'contain' } ],

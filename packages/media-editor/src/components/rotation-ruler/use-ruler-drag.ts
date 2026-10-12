@@ -152,6 +152,14 @@ export function useRulerDrag(
 	// listeners or stale pointer capture.
 	useEffect( () => endDrag, [ endDrag ] );
 
+	// Becoming disabled mid-drag ends it, so a rotation cannot keep
+	// changing after a save has read it.
+	useEffect( () => {
+		if ( disabled ) {
+			endDrag();
+		}
+	}, [ disabled, endDrag ] );
+
 	const onPointerDown = useCallback(
 		( event: React.PointerEvent< HTMLElement > ) => {
 			if ( disabled || event.button !== 0 ) {
@@ -184,7 +192,7 @@ export function useRulerDrag(
 	const onPointerMove = useCallback(
 		( event: React.PointerEvent< HTMLElement > ) => {
 			const state = latestRef.current;
-			if ( ! state.dragging ) {
+			if ( disabled || ! state.dragging ) {
 				return;
 			}
 			// Shift toggles fine mode mid-drag. The drag math computes
@@ -215,7 +223,7 @@ export function useRulerDrag(
 				onChange( next );
 			}
 		},
-		[ onChange, min, max, step, pixelsPerStep ]
+		[ disabled, onChange, min, max, step, pixelsPerStep ]
 	);
 
 	return {

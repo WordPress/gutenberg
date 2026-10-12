@@ -90,7 +90,7 @@ export default function FootnotesEdit( { context: { postType, postId } } ) {
 											? {
 													content: nextFootnote,
 													id,
-											  }
+												}
 											: footnote;
 									} )
 								),

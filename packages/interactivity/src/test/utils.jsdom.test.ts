@@ -1,4 +1,5 @@
-import { kebabToCamelCase, withScope } from '../utils';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { kebabToCamelCase, withScope, afterNextFrame } from '../utils';
 import { setScope, getScope, resetScope, type Scope } from '../scopes';
 import { setNamespace, getNamespace, resetNamespace } from '../namespaces';
 
@@ -22,6 +23,24 @@ describe( 'Interactivity API', () => {
 			expect( kebabToCamelCase( '-my-item' ) ).toBe( 'myItem' );
 			expect( kebabToCamelCase( 'my-item-' ) ).toBe( 'myItem' );
 			expect( kebabToCamelCase( '-my-item-' ) ).toBe( 'myItem' );
+		} );
+	} );
+
+	describe( 'afterNextFrame', () => {
+		afterEach( () => {
+			vi.useRealTimers();
+		} );
+
+		it( 'runs the callback after the next frame, not on a microtask', async () => {
+			vi.useFakeTimers();
+			const callback = vi.fn();
+			afterNextFrame( callback );
+
+			await Promise.resolve();
+			expect( callback ).not.toHaveBeenCalled();
+
+			vi.runAllTimers();
+			expect( callback ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 
@@ -97,7 +116,7 @@ describe( 'Interactivity API', () => {
 		} );
 
 		it( 'should return an async function when passed a generator function', async () => {
-			function* gen() {
+			function* gen(): Generator< Promise< string >, string, string > {
 				yield Promise.resolve( 'value' );
 				return 'done';
 			}
@@ -116,7 +135,7 @@ describe( 'Interactivity API', () => {
 
 		it( 'should execute a generator function step by step and yield the correct values, maintaining scope and namespace', async () => {
 			const steps: Array< { scope: any; namespace: string } > = [];
-			function* gen() {
+			function* gen(): Generator< Promise< number >, number, number > {
 				steps.push( { scope: getScope(), namespace: getNamespace() } );
 				const a = yield Promise.resolve( 1 );
 				steps.push( { scope: getScope(), namespace: getNamespace() } );
@@ -137,7 +156,11 @@ describe( 'Interactivity API', () => {
 		} );
 
 		it( 'should return the resolved value when a promise is returned in generator functions', async () => {
-			function* gen() {
+			function* gen(): Generator<
+				Promise< number >,
+				Promise< number >,
+				number
+			> {
 				const a = yield Promise.resolve( 3 );
 				return Promise.resolve( a + 2 );
 			}
@@ -149,7 +172,9 @@ describe( 'Interactivity API', () => {
 		} );
 
 		it( 'should accept arguments in generator functions like in normal functions', async () => {
-			function* gen( ...values: number[] ) {
+			function* gen(
+				...values: number[]
+			): Generator< Promise< number >, number, number > {
 				let result = 0;
 				for ( const value of values ) {
 					result += yield Promise.resolve( value );
@@ -185,7 +210,7 @@ describe( 'Interactivity API', () => {
 
 		it( 'hould handle captured errors within generator execution and resume correctly, maintaining scope and namespace', async () => {
 			const steps: Array< { scope: any; namespace: string } > = [];
-			function* gen() {
+			function* gen(): Generator< Promise< number >, number, number > {
 				let a: number;
 				try {
 					steps.push( {
@@ -218,7 +243,7 @@ describe( 'Interactivity API', () => {
 		} );
 
 		it( 'should handle rejected promises within a generator function and throw after yielding', async () => {
-			function* gen() {
+			function* gen(): Generator< Promise< number >, number, number > {
 				const a = yield Promise.resolve( 2 );
 				yield Promise.reject( new Error( 'FinalReject' ) );
 				return a;

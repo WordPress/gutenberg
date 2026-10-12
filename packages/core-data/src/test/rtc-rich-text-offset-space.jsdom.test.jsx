@@ -1,12 +1,5 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, waitFor } from '@testing-library/react';
-import {
-	afterEach,
-	beforeEach,
-	describe,
-	expect,
-	it,
-	jest,
-} from '@jest/globals';
 import {
 	getBlockTypes,
 	registerBlockType,
@@ -15,21 +8,14 @@ import {
 import { RichText } from '@wordpress/block-editor';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { Y } from '@wordpress/sync';
-/**
- * Mock sync manager accessor.
- */
-jest.mock( '../sync', () => ( {
-	...jest.requireActual( '../sync' ),
-	getSyncManager: jest.fn(),
-	LOCAL_EDITOR_ORIGIN: 'local-editor',
-} ) );
 import { store as coreDataStore } from '../index';
-import { CRDT_RECORD_MAP_KEY, getSyncManager } from '../sync';
+import { registerEntitySyncManager } from '../entity-sync';
+import { CRDT_RECORD_MAP_KEY } from '../sync';
 import useEntityBlockEditor from '../hooks/use-entity-block-editor';
 import { applyPostChangesToCRDTDoc } from '../utils/crdt';
 import { getRootMap } from '../utils/crdt-utils';
 
-const mockGetSyncManager = jest.mocked( getSyncManager );
+vi.mock( import( '@wordpress/api-fetch' ) );
 
 const postTypeConfig = {
 	kind: 'postType',
@@ -38,7 +24,6 @@ const postTypeConfig = {
 	transientEdits: { blocks: true, selection: true },
 	mergedEdits: { meta: true },
 	rawAttributes: [ 'title', 'excerpt', 'content' ],
-	syncConfig: {},
 };
 
 const postTypeEntity = {
@@ -90,6 +75,7 @@ function readFirstBlockContentFromDoc( doc ) {
 
 describe( 'useEntityBlockEditor RTC rich-text offset-space bug', () => {
 	let crdtDoc;
+	let unregisterSyncManager;
 
 	beforeEach( () => {
 		crdtDoc = new Y.Doc();
@@ -114,20 +100,30 @@ describe( 'useEntityBlockEditor RTC rich-text offset-space bug', () => {
 			),
 		} );
 
-		mockGetSyncManager.mockReturnValue( {
-			update: jest.fn( ( _objectType, _objectId, changes ) => {
+		// A minimal entity sync manager: every edit lands in the CRDT
+		// document the way the Yjs engine applies it.
+		unregisterSyncManager = registerEntitySyncManager( {
+			load: () => {},
+			update: ( _kind, _name, _recordId, changes ) => {
 				applyPostChangesToCRDTDoc(
 					crdtDoc,
 					changes,
 					SYNCED_PROPERTIES
 				);
-			} ),
+			},
+			unload: () => {},
+			unloadAll: () => {},
 		} );
 	} );
 
 	afterEach( () => {
+		if ( vi.isFakeTimers() ) {
+			// Finish selection updates before destroying their document.
+			vi.runOnlyPendingTimers();
+			vi.useRealTimers();
+		}
 		crdtDoc.destroy();
-		mockGetSyncManager.mockReset();
+		unregisterSyncManager();
 		if (
 			getBlockTypes().some( ( block ) => block.name === 'core/paragraph' )
 		) {
@@ -155,6 +151,8 @@ describe( 'useEntityBlockEditor RTC rich-text offset-space bug', () => {
 		);
 
 		await waitFor( () => expect( blocks ).toHaveLength( 1 ) );
+		// Keep the async render setup on real timers.
+		vi.useFakeTimers();
 
 		const selection = {
 			selectionStart: {

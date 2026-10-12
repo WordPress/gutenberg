@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { validateFileSize } from '../validate-file-size';
 import { UploadError } from '../upload-error';
 
@@ -11,7 +12,7 @@ const emptyFile = new window.File( [], 'test.jpeg', {
 
 describe( 'validateFileSize', () => {
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'should error if the file is empty', () => {
@@ -21,7 +22,7 @@ describe( 'validateFileSize', () => {
 			new UploadError( {
 				code: 'EMPTY_FILE',
 				message: 'test.jpeg: This file is empty.',
-				file: imageFile,
+				file: emptyFile,
 			} )
 		);
 	} );

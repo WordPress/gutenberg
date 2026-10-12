@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, test, vi } from 'vitest';
 // eslint-disable-next-line testing-library/no-manual-cleanup
 import { act, render, cleanup } from '@testing-library/react';
 import { getPlugins, unregisterPlugin, registerPlugin } from '../../api';
@@ -87,7 +88,7 @@ describe( 'PluginArea', () => {
 	} );
 
 	test( 'does not rerender when a plugin is added to a different scope', () => {
-		const ComponentSpy = jest.fn( ( { content } ) => {
+		const ComponentSpy = vi.fn( ( { content } ) => {
 			return `plugin: ${ content }.`;
 		} );
 

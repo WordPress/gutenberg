@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getShadowParts, shadowStringToObject } from '../shadow-utils';
 
 const colorFormats = {

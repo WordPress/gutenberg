@@ -1,5 +1,5 @@
-import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 import { useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as commandsStore } from '@wordpress/commands';
@@ -7,6 +7,8 @@ import type { WidgetType } from '@wordpress/widget-primitives';
 import { WidgetDashboard } from '../widget-dashboard';
 import { DASHBOARD_COMMAND_CONTEXT } from '../components/commands';
 import type { CanPerformDashboardOperation, DashboardWidget } from '../types';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 const widgetTypes: WidgetType[] = [
 	{
@@ -21,13 +23,24 @@ const layout: DashboardWidget[] = [
 	{ uuid: 'a', type: 'core/test', placement: { width: 1, height: 1 } },
 ];
 
+interface CommandsSelectors {
+	getContext: () => string;
+	getCommands: ( contextual: boolean ) => Array< { name: string } >;
+}
+
 function CommandsProbe( { names }: { names: string[] } ) {
 	const context = useSelect(
-		( select ) => select( commandsStore ).getContext(),
+		( select ) =>
+			(
+				select( commandsStore ) as unknown as CommandsSelectors
+			 ).getContext(),
 		[]
 	);
 	const contextualCommands = useSelect(
-		( select ) => select( commandsStore ).getCommands( true ),
+		( select ) =>
+			(
+				select( commandsStore ) as unknown as CommandsSelectors
+			 ).getCommands( true ),
 		[]
 	);
 
@@ -101,6 +114,9 @@ function Harness( {
 const denyCustomize: CanPerformDashboardOperation = ( request ) =>
 	request.operation !== 'customize';
 
+const denyReset: CanPerformDashboardOperation = ( request ) =>
+	request.operation !== 'reset';
+
 function getRegistered( probe: HTMLElement ): Record< string, boolean > {
 	return JSON.parse( probe.getAttribute( 'data-registered' ) ?? '{}' );
 }
@@ -147,6 +163,17 @@ describe( 'WidgetDashboard.Commands', () => {
 		const registered = getRegistered(
 			screen.getByTestId( 'commands-probe' )
 		);
+		expect( registered[ 'core/dashboard/add-widgets' ] ).toBe( true );
+	} );
+
+	it( 'unregisters Reset to default when the policy denies reset', () => {
+		render( <Harness withLayoutReset canPerform={ denyReset } /> );
+
+		const registered = getRegistered(
+			screen.getByTestId( 'commands-probe' )
+		);
+		expect( registered[ 'core/dashboard/reset-to-default' ] ).toBe( false );
+		expect( registered[ 'core/dashboard/customize' ] ).toBe( true );
 		expect( registered[ 'core/dashboard/add-widgets' ] ).toBe( true );
 	} );
 

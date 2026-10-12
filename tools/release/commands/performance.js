@@ -1,7 +1,7 @@
 const os = require( 'os' );
 const fs = require( 'fs' );
 const path = require( 'path' );
-const SimpleGit = require( 'simple-git' );
+const { simpleGit } = require( 'simple-git' );
 const { formats, log } = require( '../lib/logger' );
 const {
 	runShellScript,
@@ -10,12 +10,18 @@ const {
 	getFilesFromDir,
 } = require( '../lib/utils' );
 const config = require( '../config' );
+const { devEngines } = require( '../../../package.json' );
 const { sanitizeBranchName } = require( '../lib/sanitize-branch-name' );
 
 const ARTIFACTS_PATH =
 	process.env.WP_ARTIFACTS_PATH || path.join( process.cwd(), 'artifacts' );
 const RAW_RESULTS_FILE_SUFFIX = '.performance-results.raw.json';
 const RESULTS_FILE_SUFFIX = '.performance-results.json';
+/*
+ * Read from the CLI's own checkout so every branch under test builds with the npm
+ * version trunk requires, narrowed to that major so a new one cannot land mid-run.
+ */
+const NPM_VERSION = devEngines.packageManager.version.replace( '>=', '^' );
 
 /**
  * @typedef WPPerformanceCommandOptions
@@ -67,7 +73,7 @@ function fixed( number ) {
  * @param {number[]} array
  */
 function quartiles( array ) {
-	const numbers = array.slice().sort( ( a, b ) => a - b );
+	const numbers = array.toSorted( ( a, b ) => a - b );
 
 	/**
 	 * @param {number} offset
@@ -305,7 +311,7 @@ async function runPerformanceTests( branches, options ) {
 		logAtIndent( 2, 'Using checkout:', formats.success( testRunnerDir ) );
 		logAtIndent( 2, 'Building test utilities' );
 		await runShellScript(
-			`bash -c "npm run build --workspace @wordpress/e2e-test-utils-playwright && npx playwright install chromium --with-deps"`,
+			`bash -c "npm run build --workspace @wordpress/e2e-test-utils-playwright && npm exec --no --workspace @wordpress/e2e-tests-playwright -- playwright install chromium --with-deps"`,
 			testRunnerDir
 		);
 	} else {
@@ -314,8 +320,7 @@ async function runPerformanceTests( branches, options ) {
 		logAtIndent( 2, 'Creating directory:', formats.success( sourceDir ) );
 		fs.mkdirSync( sourceDir );
 
-		// @ts-expect-error The `simple-git` module namespace has no call signatures.
-		const sourceGit = SimpleGit( sourceDir );
+		const sourceGit = simpleGit( sourceDir );
 		logAtIndent(
 			2,
 			'Initializing:',
@@ -374,12 +379,11 @@ async function runPerformanceTests( branches, options ) {
 			'Checking out branch:',
 			formats.success( testRunnerBranch )
 		);
-		// @ts-expect-error The `simple-git` module namespace has no call signatures.
-		await SimpleGit( testRunnerDir ).raw( 'checkout', testRunnerBranch );
+		await simpleGit( testRunnerDir ).raw( 'checkout', testRunnerBranch );
 
 		logAtIndent( 2, 'Installing dependencies and building' );
 		await runShellScript(
-			`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm install --global npm@10 && npm ci && npm run build --workspace @wordpress/e2e-test-utils-playwright && npx playwright install chromium --with-deps"`,
+			`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm install --global npm@'${ NPM_VERSION }' && npm ci && npm run build --workspace @wordpress/e2e-test-utils-playwright && npm exec --no --workspace @wordpress/e2e-tests-playwright -- playwright install chromium --with-deps"`,
 			testRunnerDir
 		);
 	}
@@ -460,12 +464,11 @@ async function runPerformanceTests( branches, options ) {
 			await runShellScript( `cp -R ${ sourceDir } ${ buildDir }` );
 
 			logAtIndent( 3, 'Checking out:', formats.success( branch ) );
-			// @ts-expect-error The `simple-git` module namespace has no call signatures.
-			await SimpleGit( buildDir ).raw( 'checkout', branch );
+			await simpleGit( buildDir ).raw( 'checkout', branch );
 
 			logAtIndent( 3, 'Installing dependencies and building' );
 			await runShellScript(
-				`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm install --global npm@10 && npm ci && (npm run build -- --skip-types || npm run build)"`,
+				`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm install --global npm@'${ NPM_VERSION }' && npm ci && (npm run build -- --skip-types || npm run build)"`,
 				buildDir
 			);
 		}
@@ -698,9 +701,8 @@ async function runPerformanceTests( branches, options ) {
 				const percentageChange = fixed(
 					( ( value1 - value2 ) / value2 ) * 100
 				);
-				printedResult[ metric ][
-					'% Change'
-				] = `${ percentageChange }%`;
+				printedResult[ metric ][ '% Change' ] =
+					`${ percentageChange }%`;
 			}
 		}
 

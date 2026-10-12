@@ -173,7 +173,7 @@ export function SyncConnectionErrorModal() {
 		? () => {
 				onManualRetry();
 				retrySyncConnection();
-		  }
+			}
 		: undefined;
 
 	const messages = getSyncErrorMessages( error );

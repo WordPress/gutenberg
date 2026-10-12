@@ -1,5 +1,9 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+// Whether the run targets the extensible site editor (v2), which lives at
+// `admin.php?page=site-editor-v2` and routes via the `p` query param.
+const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
+
 test.describe( 'Site editor url navigation', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
@@ -38,10 +42,7 @@ test.describe( 'Site editor url navigation', () => {
 			status: 'publish',
 		} );
 
-		await admin.visitSiteEditor();
-		await page
-			.getByRole( 'button', { name: 'Templates', exact: true } )
-			.click();
+		await admin.visitSiteEditor( { postType: 'wp_template' } );
 		await page.getByRole( 'button', { name: 'Add Template' } ).click();
 		const singleItemPost = page.getByRole( 'button', {
 			name: 'Single item: Post',
@@ -53,7 +54,9 @@ test.describe( 'Site editor url navigation', () => {
 			.click();
 		await page.getByRole( 'option', { name: 'Demo' } ).click();
 		await expect( page ).toHaveURL(
-			'/wp-admin/site-editor.php?p=%2Fwp_template%2Femptytheme%2F%2Fsingle-post-demo&canvas=edit'
+			isSiteEditorV2
+				? '/wp-admin/admin.php?page=site-editor-v2&p=%2Ftypes%2Fwp_template%2Fedit%2Femptytheme%252F%252Fsingle-post-demo'
+				: '/wp-admin/site-editor.php?p=%2Fwp_template%2Femptytheme%2F%2Fsingle-post-demo&canvas=edit'
 		);
 	} );
 
@@ -61,13 +64,22 @@ test.describe( 'Site editor url navigation', () => {
 		admin,
 		page,
 	} ) => {
-		await admin.visitSiteEditor();
-		await page.getByRole( 'button', { name: 'Patterns' } ).click();
-		await page.getByRole( 'button', { name: 'add pattern' } ).click();
-		await page
-			.getByRole( 'menu', { name: 'add pattern' } )
-			.getByRole( 'menuitem', { name: 'add template part' } )
-			.click();
+		// Template parts are created from their own page in the extensible
+		// site editor, and from the Patterns page in the classic one.
+		if ( isSiteEditorV2 ) {
+			await admin.visitSiteEditor( { postType: 'wp_template_part' } );
+			await page
+				.getByRole( 'button', { name: 'Add Template Part' } )
+				.click();
+		} else {
+			await admin.visitSiteEditor();
+			await page.getByRole( 'button', { name: 'Patterns' } ).click();
+			await page.getByRole( 'button', { name: 'add pattern' } ).click();
+			await page
+				.getByRole( 'menu', { name: 'add pattern' } )
+				.getByRole( 'menuitem', { name: 'add template part' } )
+				.click();
+		}
 		// Fill in a name in the dialog that pops up.
 		await page
 			.getByRole( 'dialog' )
@@ -75,11 +87,15 @@ test.describe( 'Site editor url navigation', () => {
 			.type( 'Demo' );
 		await page.keyboard.press( 'Enter' );
 		await expect( page ).toHaveURL(
-			'/wp-admin/site-editor.php?p=%2Fwp_template_part%2Femptytheme%2F%2Fdemo&canvas=edit'
+			isSiteEditorV2
+				? '/wp-admin/admin.php?page=site-editor-v2&p=%2Ftypes%2Fwp_template_part%2Fedit%2Femptytheme%252F%252Fdemo'
+				: '/wp-admin/site-editor.php?p=%2Fwp_template_part%2Femptytheme%2F%2Fdemo&canvas=edit'
 		);
 	} );
 
-	test( 'The Patterns page should keep the previously selected template part category', async ( {
+	// The extensible site editor's Patterns page has no category sidebar;
+	// template parts live on their own page there.
+	test( 'The Patterns page should keep the previously selected template part category @site-editor-v1-only', async ( {
 		admin,
 		page,
 	} ) => {

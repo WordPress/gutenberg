@@ -10,6 +10,13 @@ export type SelectItem = {
 	label: string;
 	value: string | null;
 	disabled?: boolean;
+	/**
+	 * Supplementary text shown under the label in the standard item layout.
+	 * Rendered as `SelectControl.ItemDescription`. Compose
+	 * `SelectControl.Item` children instead when you need multiple
+	 * descriptions or custom markup.
+	 */
+	description?: string;
 };
 
 export type SelectControlProps = Omit<
@@ -56,8 +63,7 @@ export type SelectControlProps = Omit<
 		 * ```
 		 */
 		triggerContent?:
-			| ( ( item: SelectItem ) => React.ReactNode )
-			| React.ReactNode;
+			( ( item: SelectItem ) => React.ReactNode ) | React.ReactNode;
 		/**
 		 * The size of the control.
 		 *

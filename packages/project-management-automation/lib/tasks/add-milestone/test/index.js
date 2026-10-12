@@ -1,4 +1,5 @@
-import addMilestone from '../';
+import { describe, expect, it, vi } from 'vitest';
+import addMilestone from '../index.js';
 
 describe( 'addMilestone', () => {
 	it( 'does nothing if base is not trunk', async () => {
@@ -7,21 +8,21 @@ describe( 'addMilestone', () => {
 		};
 		const octokit = {
 			paginate: {
-				iterator: jest.fn(),
+				iterator: vi.fn(),
 			},
 			rest: {
 				issues: {
-					get: jest.fn(),
-					createMilestone: jest.fn(),
+					get: vi.fn(),
+					createMilestone: vi.fn(),
 					listMilestones: {
 						endpoint: {
-							merge: jest.fn(),
+							merge: vi.fn(),
 						},
 					},
-					update: jest.fn(),
+					update: vi.fn(),
 				},
 				repos: {
-					getContent: jest.fn(),
+					getContent: vi.fn(),
 				},
 			},
 		};
@@ -37,6 +38,27 @@ describe( 'addMilestone', () => {
 		expect( octokit.rest.repos.getContent ).not.toHaveBeenCalled();
 	} );
 
+	it( 'does nothing if the repository owner is unavailable', async () => {
+		const payload = {
+			ref: 'refs/heads/trunk',
+			commits: [ { message: '(#123)' } ],
+			repository: {
+				name: 'gutenberg',
+			},
+		};
+		const get = vi.fn();
+
+		await addMilestone( payload, {
+			rest: {
+				issues: {
+					get,
+				},
+			},
+		} );
+
+		expect( get ).not.toHaveBeenCalled();
+	} );
+
 	it( 'does nothing if PR already has a milestone', async () => {
 		const payload = {
 			ref: 'refs/heads/trunk',
@@ -50,23 +72,23 @@ describe( 'addMilestone', () => {
 		};
 		const octokit = {
 			paginate: {
-				iterator: jest.fn(),
+				iterator: vi.fn(),
 			},
 			rest: {
 				issues: {
-					get: jest.fn( () =>
+					get: vi.fn( () =>
 						Promise.resolve( {
 							data: {
 								milestone: 'Gutenberg 6.4',
 							},
 						} )
 					),
-					createMilestone: jest.fn(),
-					listMilestones: jest.fn(),
-					update: jest.fn(),
+					createMilestone: vi.fn(),
+					listMilestones: vi.fn(),
+					update: vi.fn(),
 				},
 				repos: {
-					getContent: jest.fn(),
+					getContent: vi.fn(),
 				},
 			},
 		};
@@ -97,7 +119,7 @@ describe( 'addMilestone', () => {
 		};
 		const octokit = {
 			paginate: {
-				iterator: jest.fn().mockReturnValue( [
+				iterator: vi.fn().mockReturnValue( [
 					Promise.resolve( {
 						data: [
 							{
@@ -121,23 +143,23 @@ describe( 'addMilestone', () => {
 			},
 			rest: {
 				issues: {
-					get: jest.fn( () =>
+					get: vi.fn( () =>
 						Promise.resolve( {
 							data: {
 								milestone: null,
 							},
 						} )
 					),
-					createMilestone: jest.fn(),
+					createMilestone: vi.fn(),
 					listMilestones: {
 						endpoint: {
-							merge: jest.fn(),
+							merge: vi.fn(),
 						},
 					},
-					update: jest.fn(),
+					update: vi.fn(),
 				},
 				repos: {
-					getContent: jest.fn( () =>
+					getContent: vi.fn( () =>
 						Promise.resolve( {
 							data: {
 								content: Buffer.from(
@@ -192,7 +214,7 @@ describe( 'addMilestone', () => {
 		};
 		const octokit = {
 			paginate: {
-				iterator: jest.fn().mockReturnValue( [
+				iterator: vi.fn().mockReturnValue( [
 					Promise.resolve( {
 						data: [
 							{
@@ -216,23 +238,23 @@ describe( 'addMilestone', () => {
 			},
 			rest: {
 				issues: {
-					get: jest.fn( () =>
+					get: vi.fn( () =>
 						Promise.resolve( {
 							data: {
 								milestone: null,
 							},
 						} )
 					),
-					createMilestone: jest.fn(),
+					createMilestone: vi.fn(),
 					listMilestones: {
 						endpoint: {
-							merge: jest.fn(),
+							merge: vi.fn(),
 						},
 					},
-					update: jest.fn(),
+					update: vi.fn(),
 				},
 				repos: {
-					getContent: jest.fn( () =>
+					getContent: vi.fn( () =>
 						Promise.resolve( {
 							data: {
 								content: Buffer.from(

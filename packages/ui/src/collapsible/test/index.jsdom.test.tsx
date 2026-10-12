@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { createRef, useState } from '@wordpress/element';
@@ -113,7 +114,7 @@ describe( 'Collapsible', () => {
 
 	describe( 'controlled', () => {
 		it( 'calls onOpenChange when toggled', async () => {
-			const onOpenChange = jest.fn();
+			const onOpenChange = vi.fn();
 			const user = userEvent.setup();
 
 			render( <ControlledCollapsible onOpenChange={ onOpenChange } /> );

@@ -1,5 +1,13 @@
-import { render, waitFor, queryByAttribute } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import {
+	render,
+	screen,
+	waitFor,
+	queryByAttribute,
+} from '@testing-library/react';
 import ColorPaletteControl from '../control';
+
+globalThis.wpVitest.mockMatchMedia();
 
 const noop = () => {};
 
@@ -17,8 +25,8 @@ async function renderAndValidate( ...renderArgs ) {
 }
 
 describe( 'ColorPaletteControl', () => {
-	it( 'matches the snapshot', async () => {
-		const { container } = await renderAndValidate(
+	it( 'marks the selected color as active', async () => {
+		await renderAndValidate(
 			<ColorPaletteControl
 				label="Test Color"
 				value="#f00"
@@ -28,6 +36,9 @@ describe( 'ColorPaletteControl', () => {
 			/>
 		);
 
-		expect( container ).toMatchSnapshot();
+		expect( screen.getByRole( 'option', { name: 'red' } ) ).toHaveAttribute(
+			'aria-selected',
+			'true'
+		);
 	} );
 } );

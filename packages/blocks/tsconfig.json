@@ -1,9 +1,6 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
-	"compilerOptions": {
-		"checkJs": false
-	},
+	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
 	"references": [
 		{ "path": "../autop/tsconfig.build.json" },
 		{ "path": "../blob/tsconfig.build.json" },

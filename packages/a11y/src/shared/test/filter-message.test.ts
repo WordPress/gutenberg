@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import filterMessage from '../filter-message';
 
 describe( 'filterMessage', () => {

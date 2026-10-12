@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getNamedNodeMapAsObject, toHTML, fromDOM } from '../node';
 
 describe( 'getNamedNodeMapAsObject', () => {
@@ -48,6 +49,7 @@ describe( 'fromDOM', () => {
 		expect( () => {
 			fromDOM( document.createDocumentFragment() );
 		} ).toThrow( TypeError );
+		expect( console ).toHaveWarned();
 	} );
 
 	it( 'should return an equivalent block node, including children', () => {

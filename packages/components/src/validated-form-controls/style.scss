@@ -1,23 +1,23 @@
-@use "@wordpress/base-styles/colors" as *;
-
 %red-focus-ring {
-	--focus-color: #{ $alert-red };
+	--focus-color: var(--wpds-color-stroke-interactive-error);
+}
+
+%red-error-border {
+	@extend %red-focus-ring;
+
+	border-color: var(--wpds-color-stroke-interactive-error);
 }
 
 .components-validated-control {
 	// For components based on InputBase
 	&:has(:is(input, select):invalid[data-validity-visible])
 	.components-input-control__backdrop {
-		@extend %red-focus-ring;
-
-		border-color: $alert-red;
+		@extend %red-error-border;
 	}
 
 	// For TextareaControl
 	textarea:invalid[data-validity-visible] {
-		@extend %red-focus-ring;
-
-		border-color: $alert-red;
+		@extend %red-error-border;
 	}
 }
 
@@ -26,17 +26,13 @@
 
 	// For CustomSelectControl
 	&:has(select:invalid[data-validity-visible]) .components-input-control__backdrop {
-		@extend %red-focus-ring;
-
-		border-color: $alert-red;
+		@extend %red-error-border;
 	}
 
 	// For ContentEditableControl
 	&:has(input:invalid[data-validity-visible])
 	.components-validated-control__content-editable [role="textbox"] {
-		@extend %red-focus-ring;
-
-		border-color: $alert-red;
+		@extend %red-error-border;
 	}
 }
 

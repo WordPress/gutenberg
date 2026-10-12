@@ -1,23 +1,33 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createQueue } from '../';
 import _requestIdleCallback from '../request-idle-callback';
+import type { RequestIdleCallbackCallback } from '../types';
 
 const requestIdleCallback =
 	_requestIdleCallback as typeof _requestIdleCallback & {
 		tick: ( deadline?: Partial< IdleDeadline > | number ) => void;
 	};
 
-jest.mock( '../request-idle-callback', () => {
-	const emitter = new ( jest.requireActual( 'events' ).EventEmitter )();
+vi.mock( import( '../request-idle-callback' ), () => {
+	const callbacks = new Set< RequestIdleCallbackCallback >();
 
-	return Object.assign(
-		( callback: ( deadline: number ) => void ) =>
-			emitter.once( 'tick', ( deadline = Date.now() ) =>
-				callback( deadline )
-			),
-		{
-			tick: ( deadline?: number ) => emitter.emit( 'tick', deadline ),
-		}
-	);
+	return {
+		default: Object.assign(
+			( callback: RequestIdleCallbackCallback ) =>
+				callbacks.add( callback ),
+			{
+				tick: (
+					deadline: Partial< IdleDeadline > | number = Date.now()
+				) => {
+					const pendingCallbacks = [ ...callbacks ];
+					callbacks.clear();
+					for ( const callback of pendingCallbacks ) {
+						callback( deadline as IdleDeadline | number );
+					}
+				},
+			}
+		),
+	};
 } );
 
 describe( 'createQueue', () => {
@@ -28,7 +38,7 @@ describe( 'createQueue', () => {
 
 	describe( 'add', () => {
 		it( 'runs callback after processing waiting queue', () => {
-			const callback = jest.fn();
+			const callback = vi.fn();
 
 			queue.add( {}, callback );
 
@@ -40,8 +50,8 @@ describe( 'createQueue', () => {
 		it( 'runs callbacks in order by distinct added element', () => {
 			const elementA = {};
 			const elementB = {};
-			const callbackElementA = jest.fn();
-			const callbackElementB = jest.fn();
+			const callbackElementA = vi.fn();
+			const callbackElementB = vi.fn();
 			queue.add( elementA, callbackElementA );
 			queue.add( elementB, callbackElementB );
 
@@ -61,8 +71,8 @@ describe( 'createQueue', () => {
 
 		it( 'calls most recently added callback if added for same element', () => {
 			const element = {};
-			const callbackOne = jest.fn();
-			const callbackTwo = jest.fn();
+			const callbackOne = vi.fn();
+			const callbackTwo = vi.fn();
 			queue.add( element, callbackOne );
 			queue.add( element, callbackTwo );
 
@@ -78,9 +88,9 @@ describe( 'createQueue', () => {
 			const elementA = {};
 			const elementB = {};
 			const elementC = {};
-			const callbackElementA = jest.fn();
-			const callbackElementB = jest.fn();
-			const callbackElementC = jest.fn();
+			const callbackElementA = vi.fn();
+			const callbackElementB = vi.fn();
+			const callbackElementC = vi.fn();
 			queue.add( elementA, callbackElementA );
 			queue.add( elementB, callbackElementB );
 			queue.add( elementC, callbackElementC );
@@ -91,7 +101,7 @@ describe( 'createQueue', () => {
 
 			// Mock implementation such that with the first call, it reports as
 			// having some time remaining, but no time remaining on the second.
-			const timeRemaining = jest
+			const timeRemaining = vi
 				.fn()
 				.mockImplementationOnce( () => 100 )
 				.mockImplementationOnce( () => 0 );
@@ -111,8 +121,8 @@ describe( 'createQueue', () => {
 		it( 'invokes all callbacks associated with element', () => {
 			const elementA = {};
 			const elementB = {};
-			const callbackElementA = jest.fn();
-			const callbackElementB = jest.fn();
+			const callbackElementA = vi.fn();
+			const callbackElementB = vi.fn();
 			queue.add( elementA, callbackElementA );
 			queue.add( elementB, callbackElementB );
 
@@ -137,8 +147,8 @@ describe( 'createQueue', () => {
 		it( 'removes all callbacks associated with element without executing', () => {
 			const elementA = {};
 			const elementB = {};
-			const callbackElementA = jest.fn();
-			const callbackElementB = jest.fn();
+			const callbackElementA = vi.fn();
+			const callbackElementB = vi.fn();
 			queue.add( elementA, callbackElementA );
 			queue.add( elementB, callbackElementB );
 

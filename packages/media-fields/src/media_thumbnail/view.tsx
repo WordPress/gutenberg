@@ -50,9 +50,7 @@ export function getBestImageUrl(
 		}
 
 		// Sort ascending by width.
-		const sorted = [ ...validEntries ].sort(
-			( a, b ) => a.width - b.width
-		);
+		const sorted = validEntries.toSorted( ( a, b ) => a.width - b.width );
 		// Pick the smallest size that is >= target width.
 		const match = sorted.find( ( s ) => s.width >= targetWidth );
 		if ( match ) {
@@ -169,7 +167,7 @@ export default function MediaThumbnailView( {
 			if ( ! item.featured_media ) {
 				return;
 			}
-			return select( coreStore ).getEntityRecord< Attachment >(
+			return select( coreStore ).getEntityRecord(
 				'postType',
 				'attachment',
 				item.featured_media

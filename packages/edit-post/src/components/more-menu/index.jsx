@@ -1,14 +1,14 @@
 import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-import { displayShortcut } from '@wordpress/keycodes';
-import { PreferenceToggleMenuItem } from '@wordpress/preferences';
+import { keyboardShortcut } from '@wordpress/keycodes';
 import { unlock } from '../../lock-unlock';
 import ManagePatternsMenuItem from './manage-patterns-menu-item';
 import WelcomeGuideMenuItem from './welcome-guide-menu-item';
 import EditPostPreferencesModal from '../preferences-modal';
 
-const { ToolsMoreMenuGroup, ViewMoreMenuGroup } = unlock( editorPrivateApis );
+const { MoreMenuPreferenceItem, ToolsMoreMenuGroup, ViewMoreMenuGroup } =
+	unlock( editorPrivateApis );
 
 const MoreMenu = () => {
 	const isLargeViewport = useViewportMatch( 'large' );
@@ -17,7 +17,7 @@ const MoreMenu = () => {
 		<>
 			{ isLargeViewport && (
 				<ViewMoreMenuGroup>
-					<PreferenceToggleMenuItem
+					<MoreMenuPreferenceItem
 						scope="core/edit-post"
 						name="fullscreenMode"
 						label={ __( 'Fullscreen mode' ) }
@@ -26,7 +26,7 @@ const MoreMenu = () => {
 						messageDeactivated={ __(
 							'Fullscreen mode deactivated.'
 						) }
-						shortcut={ displayShortcut.secondary( 'f' ) }
+						shortcut={ keyboardShortcut.secondary( 'f' ) }
 					/>
 				</ViewMoreMenuGroup>
 			) }

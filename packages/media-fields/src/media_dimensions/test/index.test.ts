@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import type { Attachment, Updatable } from '@wordpress/core-data';
 import mediaDimensionsField from '../index';
 
