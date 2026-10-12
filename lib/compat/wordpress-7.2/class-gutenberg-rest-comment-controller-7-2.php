@@ -2,11 +2,15 @@
 /**
  * REST API comment controller with reaction support for WordPress 7.2 compatibility.
  *
- * Extends the 6.9 comment controller to add support for the 'reaction'
- * comment type, enabling emoji reactions on notes.
+ * Overrides core's WP_REST_Comments_Controller to add the 'reaction' comment
+ * type, enabling emoji reactions on notes on older WordPress versions.
+ *
+ * Methods that only extend core call the parent. Where a change is needed
+ * inside a core method, the whole method is copied from WordPress 7.1.0 and
+ * every line that differs from core is wrapped in START CHANGE / END CHANGE
+ * comments, so the rest of the method can be read as unmodified core code.
  *
  * @package gutenberg
- * @since   7.2.0
  */
 
 class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller {
@@ -86,7 +90,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	/**
 	 * Checks if a given request has access to read comments.
 	 *
-	 * Mirrors core's check, extended to the 'reaction' type.
+	 * Copied from core, extended to the 'reaction' type.
 	 *
 	 * @since 7.2.0
 	 *
@@ -94,7 +98,9 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 * @return true|WP_Error True if the request has read access, error object otherwise.
 	 */
 	public function get_items_permissions_check( $request ) {
-		$is_note          = $this->is_note_or_reaction( $request['type'] );
+		// START CHANGE: Treat `reaction` like `note`.
+		$is_note = $this->is_note_or_reaction( $request['type'] );
+		// END CHANGE.
 		$is_edit_context  = 'edit' === $request['context'];
 		$protected_params = array( 'author', 'author_exclude', 'author_email', 'type', 'status' );
 		$forbidden_params = array();
@@ -196,14 +202,26 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		return true;
 	}
 
+	/**
+	 * Checks if a given request has access to read the comment.
+	 *
+	 * Copied from core, extended to the 'reaction' type.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has read access for the item, error object otherwise.
+	 */
 	public function get_item_permissions_check( $request ) {
 		$comment = $this->get_comment( $request['id'] );
 		if ( is_wp_error( $comment ) ) {
 			return $comment;
 		}
 
+		// START CHANGE: Treat `reaction` like `note`.
 		// Re-map edit context capabilities when requesting `note` or `reaction` type.
 		$edit_cap = $this->is_note_or_reaction( $comment->comment_type ) ? array( 'edit_comment', $comment->comment_ID ) : array( 'moderate_comments' );
+		// END CHANGE.
 		if ( ! empty( $request['context'] ) && 'edit' === $request['context'] && ! current_user_can( ...$edit_cap ) ) {
 			return new WP_Error(
 				'rest_forbidden_context',
@@ -331,8 +349,21 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		return parent::delete_item_permissions_check( $request );
 	}
 
+	/**
+	 * Checks if a given request has access to create a comment.
+	 *
+	 * Copied from core, extended to the 'reaction' type. A reaction can only
+	 * be added by the current user, never on behalf of someone else.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has access to create items, error object otherwise.
+	 */
 	public function create_item_permissions_check( $request ) {
+		// START CHANGE: Treat `reaction` like `note`.
 		$is_note = ! empty( $request['type'] ) && $this->is_note_or_reaction( $request['type'] );
+		// END CHANGE.
 
 		if ( ! is_user_logged_in() && $is_note ) {
 			return new WP_Error(
@@ -363,6 +394,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			}
 		}
 
+		// Limit who can set comment `author`, `author_ip` or `status` to anything other than the default.
 		if ( isset( $request['author'] ) && get_current_user_id() !== $request['author'] && ! current_user_can( 'moderate_comments' ) ) {
 			return new WP_Error(
 				'rest_comment_invalid_author',
@@ -372,6 +404,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			);
 		}
 
+		// START CHANGE: Reject a reaction on behalf of another user.
 		// A reaction is always first-person: the uniqueness check and the
 		// reaction summary key on the current user, so one stored against
 		// somebody else could never be counted or removed.
@@ -385,6 +418,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
+		// END CHANGE.
 
 		if ( isset( $request['author_ip'] ) && ! current_user_can( 'moderate_comments' ) ) {
 			if ( empty( $_SERVER['REMOTE_ADDR'] ) || $request['author_ip'] !== $_SERVER['REMOTE_ADDR'] ) {
@@ -397,9 +431,6 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			}
 		}
 
-		// Notes and reactions require edit access to the post they belong to,
-		// regardless of whether a status is supplied. Mirrors core's note guard
-		// in WP_REST_Comments_Controller::create_item_permissions_check().
 		if ( $is_note && ! empty( $request['post'] ) && ! current_user_can( 'edit_post', (int) $request['post'] ) ) {
 			return new WP_Error(
 				'rest_cannot_create_note',
@@ -482,7 +513,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	/**
 	 * Creates a comment.
 	 *
-	 * Extends the 6.9 implementation to support 'reaction' comment type
+	 * Copied from core, extended to support the 'reaction' comment type
 	 * with validation for parent note, valid emoji hex keys, and uniqueness.
 	 *
 	 * @since 7.2.0
@@ -499,15 +530,18 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			);
 		}
 
-		// Allow 'comment' plus internal comment types (note, reaction).
-		if ( ! empty( $request['type'] ) && ! in_array( $request['type'], array_merge( array( 'comment' ), array( 'note', 'reaction' ) ), true ) ) {
+		// START CHANGE: Allow the `reaction` type.
+		// Do not allow comments to be created with a non-core type.
+		if ( ! empty( $request['type'] ) && ! in_array( $request['type'], array( 'comment', 'note', 'reaction' ), true ) ) {
 			return new WP_Error(
 				'rest_invalid_comment_type',
 				__( 'Cannot create a comment with that type.', 'gutenberg' ),
 				array( 'status' => 400 )
 			);
 		}
+		// END CHANGE.
 
+		// START CHANGE: Validate reactions.
 		// The canonical reaction key, populated once validated below so the
 		// stored content matches what was validated (not the raw input).
 		$reaction_key = null;
@@ -634,6 +668,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 
 			$reaction_key = $emoji_key;
 		}
+		// END CHANGE.
 
 		$prepared_comment = $this->prepare_item_for_database( $request );
 		if ( is_wp_error( $prepared_comment ) ) {
@@ -642,18 +677,20 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 
 		$prepared_comment['comment_type'] = $request['type'];
 
+		// START CHANGE: Store the canonical reaction key.
 		// Persist the validated, canonical reaction key rather than the raw
 		// request content, so stored values stay consistent for grouping and
 		// counting (e.g. "<b>2764</b>" is stored as "2764").
 		if ( null !== $reaction_key ) {
 			$prepared_comment['comment_content'] = $reaction_key;
 		}
+		// END CHANGE.
 
 		if ( ! isset( $prepared_comment['comment_content'] ) ) {
 			$prepared_comment['comment_content'] = '';
 		}
 
-		// Include note metadata into check_is_comment_content_allowed [backport].
+		// Include note metadata into check_is_comment_content_allowed.
 		if ( isset( $request['meta']['_wp_note_status'] ) ) {
 			$prepared_comment['meta']['_wp_note_status'] = $request['meta']['_wp_note_status'];
 		}
@@ -686,6 +723,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			$prepared_comment['comment_author_url']   = $user->user_url;
 		}
 
+		// START CHANGE: Pin a reaction to the current user.
 		// Pin a reaction to the current user, whatever author details the
 		// request carried. Author fields alone leave `user_id` at 0, which
 		// the uniqueness check and the reaction summary both key on.
@@ -697,6 +735,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			$prepared_comment['comment_author_email'] = $user->user_email;
 			$prepared_comment['comment_author_url']   = $user->user_url;
 		}
+		// END CHANGE.
 
 		// Honor the discussion setting that requires a name and email address of the comment author.
 		if ( get_option( 'require_name_email' ) ) {
@@ -732,11 +771,13 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			);
 		}
 
+		// START CHANGE: Treat `reaction` like `note`.
 		// Don't check for duplicates or flooding for notes and reactions.
 		$prepared_comment['comment_approved'] =
 			$this->is_note_or_reaction( $prepared_comment['comment_type'] ) ?
 			'1' :
 			wp_allow_comment( $prepared_comment, true );
+		// END CHANGE.
 
 		if ( is_wp_error( $prepared_comment['comment_approved'] ) ) {
 			$error_code    = $prepared_comment['comment_approved']->get_error_code();
@@ -777,6 +818,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			);
 		}
 
+		// START CHANGE: Remove duplicate reactions from concurrent requests.
 		// The pre-insert uniqueness check is not atomic, so two concurrent
 		// requests for the same user/note/emoji can both insert an approved
 		// row. Converge on a single row deterministically: keep the earliest
@@ -814,13 +856,16 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				$comment_id = $survivor_id;
 			}
 		}
+		// END CHANGE.
 
+		// START CHANGE: Skip the status param for reactions.
 		// Reactions are inserted approved and their status was validated above.
 		// Skipping them here also keeps a request from changing the status of a
 		// row that the race cleanup above may have handed it from another request.
 		if ( isset( $request['status'] ) && null === $reaction_key ) {
 			$this->handle_status_param( $request['status'], $comment_id );
 		}
+		// END CHANGE.
 
 		$comment = get_comment( $comment_id );
 
