@@ -1,5 +1,6 @@
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { wordpress } from '@wordpress/icons';
+import { createPortal, useRef } from '@wordpress/element';
 import Button from '../../button';
 import Icon from '../../icon';
 import Snackbar from '..';
@@ -104,3 +105,32 @@ export const WithFocusReturn: StoryFn< typeof Snackbar > = ( args ) => (
 	</>
 );
 WithFocusReturn.args = WithActionAndExplicitDismiss.args;
+
+export const WithPortaledFocusReturn: StoryFn< typeof Snackbar > = ( args ) => {
+	const snackbarRef = useRef< HTMLDivElement >( null );
+	return (
+		<>
+			<Button
+				__next40pxDefaultSize
+				variant="secondary"
+				onClick={ () => snackbarRef.current?.focus() }
+			>
+				Focus snackbar
+			</Button>
+			<Button __next40pxDefaultSize variant="secondary">
+				Unrelated footer control
+			</Button>
+			{ createPortal(
+				<div style={ { position: 'fixed', bottom: 24, right: 24 } }>
+					<Snackbar { ...args } ref={ snackbarRef } />
+				</div>,
+				document.body
+			) }
+		</>
+	);
+};
+WithPortaledFocusReturn.args = WithActionAndExplicitDismiss.args;
+WithPortaledFocusReturn.parameters = {
+	// The dynamic source preview cannot serialize React portals.
+	docs: { source: { type: 'code' } },
+};

@@ -99,5 +99,5 @@ Used to provide a custom spoken message.
 
 ## Related components
 
--   Use SnackbarList to display multiple snackbars. When a user dismisses a snackbar, focus moves to the list. For a standalone snackbar, focus moves to the preceding tabbable element if focus is inside the snackbar and that element exists.
+-   Use SnackbarList to display multiple snackbars. When a user dismisses a snackbar, focus moves to the list. For a standalone snackbar, dismissal returns focus to the control that had focus before focus last entered the snackbar, including when the snackbar uses a portal. Focus only returns if it is still inside the snackbar and the previous control is still in the document. If there is no previous control, dismissal succeeds without selecting another target.
 -   To create a prominent message that requires a higher-level of attention, use a Notice.

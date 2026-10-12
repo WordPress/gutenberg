@@ -1,9 +1,13 @@
-import type { ForwardedRef, KeyboardEvent, MouseEvent } from 'react';
+import type {
+	FocusEvent,
+	ForwardedRef,
+	KeyboardEvent,
+	MouseEvent,
+} from 'react';
 import clsx from 'clsx';
 import { useIsPresent } from 'framer-motion';
 import { speak } from '@wordpress/a11y';
 import { useMergeRefs } from '@wordpress/compose';
-import { focus } from '@wordpress/dom';
 import {
 	useEffect,
 	useLayoutEffect,
@@ -63,6 +67,15 @@ function UnforwardedSnackbar(
 	const isPresent = useIsPresent();
 	const snackbarRef = useRef< HTMLDivElement >( null );
 	const mergedRef = useMergeRefs( [ snackbarRef, ref ] );
+	const focusReturnRef = useRef< HTMLElement | SVGElement | null >( null );
+
+	function onFocus(
+		event: FocusEvent< HTMLDivElement, HTMLElement | SVGElement >
+	) {
+		if ( ! event.currentTarget.contains( event.relatedTarget ) ) {
+			focusReturnRef.current = event.relatedTarget;
+		}
+	}
 
 	function dismissMe( event: KeyboardEvent | MouseEvent ) {
 		if ( event && event.preventDefault ) {
@@ -77,8 +90,10 @@ function UnforwardedSnackbar(
 				snackbarRef.current.ownerDocument.activeElement
 			)
 		) {
-			// Search from the snackbar root to avoid its own action controls.
-			focus.tabbable.findPrevious( snackbarRef.current )?.focus();
+			// DOM order does not identify a meaningful return target for portals.
+			if ( focusReturnRef.current?.isConnected ) {
+				focusReturnRef.current.focus( { preventScroll: true } );
+			}
 		}
 
 		onDismiss?.();
@@ -139,6 +154,7 @@ function UnforwardedSnackbar(
 	return (
 		<div
 			ref={ mergedRef }
+			onFocus={ onFocus }
 			className={ classes }
 			onClick={ ! explicitDismiss ? dismissMe : undefined }
 			tabIndex={ 0 }
