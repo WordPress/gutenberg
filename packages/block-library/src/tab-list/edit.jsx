@@ -224,6 +224,11 @@ function Edit( {
 								tagName="span"
 								withoutInteractiveFormatting
 								placeholder={ __( 'Tab title' ) }
+								// The label lives on the Tab Panel block, not here;
+								// encodes it for Notes. Must match
+								// TAB_PANEL_ANCHOR_PREFIX in @wordpress/editor.
+								// See WordPress/gutenberg#84328.
+								identifier={ `tab-panel:${ tab.clientId }` }
 								value={ tab.label }
 								onChange={ ( newLabel ) =>
 									handleLabelChange( index, newLabel )
