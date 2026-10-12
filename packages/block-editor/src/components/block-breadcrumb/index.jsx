@@ -54,11 +54,9 @@ function BlockBreadcrumb( { rootLabelText, className } ) {
 		>
 			{ !! clientId &&
 				!! currentTitle && [
-					<Breadcrumb.LinkItem
-						href="#"
+					<Breadcrumb.ButtonItem
 						key="document"
-						onClick={ ( event ) => {
-							event.preventDefault();
+						onClick={ () => {
 							const editorRegion = getEditorRegion(
 								blockRef.current
 							);
@@ -67,20 +65,18 @@ function BlockBreadcrumb( { rootLabelText, className } ) {
 						} }
 					>
 						{ rootLabel }
-					</Breadcrumb.LinkItem>,
+					</Breadcrumb.ButtonItem>,
 					parents.map(
 						( parentClientId, index ) =>
 							parentTitles[ index ] && (
-								<Breadcrumb.LinkItem
+								<Breadcrumb.ButtonItem
 									key={ parentClientId }
-									href={ `#block-${ parentClientId }` }
-									onClick={ ( event ) => {
-										event.preventDefault();
-										selectBlock( parentClientId );
-									} }
+									onClick={ () =>
+										selectBlock( parentClientId )
+									}
 								>
 									{ parentTitles[ index ] }
-								</Breadcrumb.LinkItem>
+								</Breadcrumb.ButtonItem>
 							)
 					),
 				] }

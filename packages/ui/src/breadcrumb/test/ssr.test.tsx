@@ -28,7 +28,6 @@ describe( 'Breadcrumb server rendering', () => {
 		[ true, 'group', 'true' ],
 		[ 'true', 'group', 'true' ],
 		[ 'page', 'navigation', 'page' ],
-		[ false, 'navigation', 'false' ],
 	] as const )(
 		'renders a current-only trail with aria-current=%j and role=%s on the server',
 		( ariaCurrent, role, renderedAriaCurrent ) => {

@@ -52,7 +52,7 @@ beforeEach( async () => {
 
 afterEach( () => unregisterBlockType( 'test/breadcrumb' ) );
 
-it( 'selects an ancestor from its fragment link', async () => {
+it( 'selects an ancestor with the keyboard', async () => {
 	await render(
 		<RegistryProvider value={ registry }>
 			<div style={ { width: 1500 } }>
@@ -61,14 +61,12 @@ it( 'selects an ancestor from its fragment link', async () => {
 		</RegistryProvider>
 	);
 
-	// Each ancestor link points to its block in the editor canvas.
-	const ancestor = page.getByRole( 'link', {
+	// Ancestors are buttons for selecting blocks within the document.
+	const ancestor = page.getByRole( 'button', {
 		name: 'Ancestor 3',
 		exact: true,
 	} );
-	await expect
-		.element( ancestor )
-		.toHaveAttribute( 'href', `#block-${ blocks[ 3 ].clientId }` );
+	await expect.element( ancestor ).toBeVisible();
 
 	// Activating an ancestor with the keyboard selects that block.
 	ancestor.element().focus();
@@ -78,8 +76,8 @@ it( 'selects an ancestor from its fragment link', async () => {
 	).toBe( blocks[ 3 ].clientId );
 } );
 
-it( 'clears selection and focuses the editor canvas from the document link', async () => {
-	// Supply block DOM refs so the document link can find and focus the editor canvas.
+it( 'clears selection and focuses the editor canvas from the document button', async () => {
+	// Supply block DOM refs so the document button can find and focus the editor canvas.
 	const refsMap = observableMap();
 	await render(
 		<RegistryProvider value={ registry }>
@@ -100,8 +98,8 @@ it( 'clears selection and focuses the editor canvas from the document link', asy
 		</RegistryProvider>
 	);
 
-	// Activating the document link clears the block selection.
-	await page.getByRole( 'link', { name: 'Document', exact: true } ).click();
+	// Activating the document button clears the block selection.
+	await page.getByRole( 'button', { name: 'Document', exact: true } ).click();
 	expect(
 		registry.select( blockEditorStore ).getSelectedBlockClientId()
 	).toBeNull();
@@ -115,7 +113,7 @@ it( 'clears selection and focuses the editor canvas from the document link', asy
 		)
 		.toHaveAttribute( 'aria-current', 'true' );
 
-	// Focus returns to the editor canvas after activating the document link.
+	// Focus returns to the editor canvas after activating the document button.
 	await expect
 		.element( page.getByRole( 'region', { name: 'Editor canvas' } ) )
 		.toHaveFocus();
@@ -179,10 +177,10 @@ it( 'restores ancestors to the breadcrumb trail when more space is available', a
 		)
 		.not.toBeInTheDocument();
 
-	// Previously hidden ancestors are available as links again.
+	// Previously hidden ancestors are available as buttons again.
 	await expect
 		.element(
-			page.getByRole( 'link', { name: 'Ancestor 1', exact: true } )
+			page.getByRole( 'button', { name: 'Ancestor 1', exact: true } )
 		)
 		.toBeVisible();
 } );
