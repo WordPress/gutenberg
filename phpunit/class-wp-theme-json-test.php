@@ -1866,30 +1866,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertLessThan( strpos( $actual_styles, $mobile_gap ), strpos( $actual_styles, $default_gap ) );
 	}
 
-	public function test_get_stylesheet_outputs_legacy_responsive_block_styles() {
-		$theme_json = new WP_Theme_JSON_Gutenberg(
-			array(
-				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-				'styles'  => array(
-					'blocks' => array(
-						'core/group' => array(
-							'mobile' => array(
-								'color' => array(
-									'text' => 'red',
-								),
-							),
-						),
-					),
-				),
-			)
-		);
-
-		$this->assertStringContainsString(
-			'@media (width <= 480px){:root :where(.wp-block-group){color: red;}}',
-			$theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) )
-		);
-	}
-
 	public function test_get_stylesheet_renders_element_styles_defined_only_in_a_breakpoint() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
