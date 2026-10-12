@@ -26,7 +26,9 @@ const DefaultControlsGroup = ( {
 	}
 
 	const resetSuffix = (
-		<span className={ styles[ 'reset-label' ] }>{ __( 'Reset' ) }</span>
+		<span aria-hidden className={ styles[ 'reset-label' ] }>
+			{ __( 'Reset' ) }
+		</span>
 	);
 
 	return (

@@ -629,7 +629,9 @@ describe( 'ToolsPanel', () => {
 			const menuItem = screen.getByRole( 'menuitem', {
 				name: 'Example, reset to default',
 			} );
-			expect( within( menuItem ).getByText( 'Reset' ) ).toBeVisible();
+			const resetSuffix = within( menuItem ).getByText( 'Reset' );
+			expect( resetSuffix ).toBeVisible();
+			expect( resetSuffix ).toHaveAttribute( 'aria-hidden', 'true' );
 			await selectMenuItem( controlProps.label );
 			const resetControl = screen.getByText( 'Default control' );
 			const disabledItem = screen.getByRole( 'menuitemcheckbox', {
