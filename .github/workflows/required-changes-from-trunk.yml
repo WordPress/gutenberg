@@ -7,8 +7,8 @@ on:
     push:
         branches: [trunk]
     schedule:
-        # Daily at 04:23 UTC, to stamp the pull requests nothing else reaches.
-        - cron: '23 4 * * *'
+        # Every 4 hours, to stamp the pull requests nothing else reaches.
+        - cron: '23 */4 * * *'
     workflow_dispatch:
         inputs:
             mode:
@@ -138,7 +138,7 @@ jobs:
         # are never stamped by their own events. This is what reaches them.
         if: >
             github.repository == 'WordPress/gutenberg' &&
-            github.event.schedule == '23 4 * * *'
+            github.event.schedule == '23 */4 * * *'
         runs-on: ubuntu-latest
         timeout-minutes: 60
         permissions:
