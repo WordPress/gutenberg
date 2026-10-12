@@ -275,7 +275,7 @@ describe( 'ImageSizeControl', () => {
 
 			expect(
 				await screen.findByRole( 'combobox', { name: 'Resolution' } )
-			).toHaveValue( 'medium' );
+			).toHaveTextContent( /^Medium$/ );
 		} );
 
 		it( 'calls onChangeImage with selected slug on selection', async () => {
@@ -284,15 +284,20 @@ describe( 'ImageSizeControl', () => {
 			render(
 				<ImageSizeControl
 					imageSizeOptions={ IMAGE_SIZE_OPTIONS }
-					slug="Medium"
+					slug="medium"
 					onChange={ mockOnChange }
 					onChangeImage={ mockOnChangeImage }
 				/>
 			);
 
-			await user.selectOptions(
-				screen.getByRole( 'combobox', { name: 'Resolution' } ),
-				'thumbnail'
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Resolution' } )
+			);
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: 'Thumbnail',
+					exact: true,
+				} )
 			);
 
 			// onChangeImage is called with the slug and the event.
