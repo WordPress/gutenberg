@@ -5549,8 +5549,24 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_merge_ignores_spacing_scale_per_origin_value_of_unexpected_type() {
-		$theme_json = new WP_Theme_JSON_Gutenberg( array( 'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA ), 'default' );
+	public function test_merge_does_not_generate_spacing_sizes_from_a_non_array_per_origin_spacing_scale() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'spacing' => array(
+						'spacingScale' => array(
+							'operator'   => '*',
+							'increment'  => 1.5,
+							'steps'      => 3,
+							'mediumStep' => 1.5,
+							'unit'       => 'rem',
+						),
+					),
+				),
+			),
+			'default'
+		);
 		$theme_json->merge(
 			new WP_Theme_JSON_Gutenberg(
 				array(
@@ -5559,8 +5575,30 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				)
 			)
 		);
+		$spacing_sizes = $theme_json->get_settings()['spacing']['spacingSizes'];
 
-		$this->assertIsString( $theme_json->get_stylesheet() );
+		$this->assertSame( array(), $spacing_sizes['theme'], 'The theme layer with a non-array spacing scale should generate no sizes.' );
+		$this->assertSame(
+			array(
+				array(
+					'name' => 'Small',
+					'slug' => '40',
+					'size' => '1rem',
+				),
+				array(
+					'name' => 'Medium',
+					'slug' => '50',
+					'size' => '1.5rem',
+				),
+				array(
+					'name' => 'Large',
+					'slug' => '60',
+					'size' => '2.25rem',
+				),
+			),
+			$spacing_sizes['default'],
+			'The default layer sizes should be unaffected.'
+		);
 	}
 
 	/**
