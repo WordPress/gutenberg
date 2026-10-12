@@ -13,6 +13,10 @@
     -   `ColorPicker` ([#84128](https://github.com/WordPress/gutenberg/pull/84128))
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Enhancements
+
+-   `Popover`: Use the design-system border, radius, and background on the default surface, with elevation on the shadow. The stroke sits inside the border box, so the content area is 1px smaller on each side. `Dropdown` and `DropdownMenu` pick this up through `Popover`.
+
 ### Deprecations
 
 -   `Tip`: Deprecate in favor of `Notice` from `@wordpress/ui`, preserving the legacy component for existing consumers ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
