@@ -49,15 +49,26 @@ export function Overlay( {
 	const [ overlayElement, setOverlayElement ] =
 		useState< HTMLDivElement | null >( null );
 
-	// Avatars sit above the line they annotate, so they cover the text while
-	// it is being written. Hide them for as long as the local user is typing,
-	// matching how the block toolbar gets out of the way. Carets and selection
-	// highlights stay put: they are what tells you where someone else is
-	// working, and they never overlap the text.
-	const isTyping = useSelect(
-		( select ) => select( blockEditorStore ).isTyping(),
-		[]
-	);
+	// A cursor avatar sits above the line it annotates, so it covers the text
+	// while that text is being written. Hide it for as long as the local user
+	// is typing in the same block, matching how the block toolbar gets out of
+	// the way. An avatar in another block isn't covering anything the local
+	// user is writing, so it stays. Carets and selection highlights always
+	// stay put: they are what tells you where someone else is working, and
+	// they never overlap the text.
+	const { isTyping, selectedBlockClientId } = useSelect( ( select ) => {
+		const { isTyping: _isTyping, getSelectedBlockClientId } =
+			select( blockEditorStore );
+		return {
+			isTyping: _isTyping(),
+			selectedBlockClientId: getSelectedBlockClientId(),
+		};
+	}, [] );
+
+	// True when an avatar would be sitting over the text the local user is
+	// writing right now, which is the only case worth hiding it for.
+	const coversTextBeingWritten = ( blockClientId?: string ) =>
+		isTyping && blockClientId === selectedBlockClientId;
 
 	const { cursors, rerenderCursorsAfterDelay, rerenderCursorsOnResize } =
 		useRenderCursors(
@@ -198,7 +209,9 @@ export function Overlay( {
 									} }
 								/>
 							) }
-							{ ! isTyping && (
+							{ ! coversTextBeingWritten(
+								cursor.blockClientId
+							) && (
 								<Avatar
 									className="collaborators-overlay-user-label"
 									variant="badge"
@@ -225,16 +238,14 @@ export function Overlay( {
 						top: `${ highlight.y }px`,
 					} }
 				>
-					{ ! isTyping && (
-						<Avatar
-							className="collaborators-overlay-block-label"
-							variant="badge"
-							size="small"
-							src={ highlight.avatarUrl }
-							name={ highlight.userName }
-							borderColor={ highlight.color }
-						/>
-					) }
+					<Avatar
+						className="collaborators-overlay-block-label"
+						variant="badge"
+						size="small"
+						src={ highlight.avatarUrl }
+						name={ highlight.userName }
+						borderColor={ highlight.color }
+					/>
 				</div>
 			) ) }
 		</div>
