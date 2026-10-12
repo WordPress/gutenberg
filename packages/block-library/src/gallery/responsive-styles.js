@@ -78,6 +78,10 @@ export function getUpdatedGalleryStyle( {
 	};
 
 	Object.entries( settings ).forEach( ( [ key, value ] ) => {
+		/* Columns is an exception to deletion of duplicate styles because
+		 * we need to be able to override the legacy responsive styles that
+		 * default to 2 columns under 600px.
+		 */
 		if (
 			value === undefined ||
 			( key !== 'columns' && value === baseSettings[ key ] )
