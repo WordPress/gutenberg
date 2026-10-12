@@ -362,10 +362,10 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 				<details>
 					<summary>Color values</summary>
 					<p>
-						The surface3 text samples show fgSurface1 through
-						fgSurface4 in order. The bgFill1, bgFillInverted1, and
-						bgFillDark text samples show fgFill, fgFillInverted, and
-						fgFillDark, respectively.
+						The surface3 text samples show fgSurface2 through
+						fgSurface5 in order. The bgFill1 and bgFillInverted1
+						text samples show fgFill and fgFillInverted,
+						respectively.
 					</p>
 					{ ramps.map( ( { name, ramp } ) => (
 						<table key={ name }>

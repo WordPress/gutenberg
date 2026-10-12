@@ -78,7 +78,7 @@
 	&[aria-orientation="horizontal"]:has(
 		[aria-selected="true"]:not([aria-disabled="true"]):is(:hover, :active, [data-focus-visible])
 	)::before {
-		border-bottom-color: var(--wpds-color-foreground-interactive-neutral-active);
+		border-block-end-color: var(--wpds-color-foreground-interactive-neutral-active);
 	}
 
 	&[aria-orientation="vertical"] {
@@ -163,7 +163,7 @@
 			// Outline works for Windows high contrast mode as well.
 			outline:
 				var(--wp-admin-border-width-focus) solid
-				$components-color-accent;
+				transparent;
 			border-radius: $radius-small;
 
 			// Animation
@@ -175,6 +175,7 @@
 		}
 
 		&[data-focus-visible]::after {
+			outline-color: $components-color-accent;
 			opacity: 1;
 		}
 	}
@@ -198,9 +199,13 @@
 			fill: currentColor;
 		}
 	}
-	[aria-orientation="vertical"][data-select-on-move="false"] &::after {
+	[aria-orientation="vertical"] &::after {
 		content: "";
 		inset: var(--wp-admin-border-width-focus);
+	}
+	[aria-orientation="vertical"][data-select-on-move="true"] &::after {
+		// The shared selection indicator supplies the focus ring.
+		outline: none;
 	}
 }
 

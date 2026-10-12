@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Bug Fixes
+
+-   Use matching strong neutral colors for pressed header controls. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
+
 ## 5.57.0 (2026-10-07)
 
 ### Bug Fixes

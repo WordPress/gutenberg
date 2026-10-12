@@ -28,14 +28,6 @@
 			color: var(--wp-ui-notice-decorative-icon-color);
 		}
 
-		.title {
-			grid-column: 2;
-
-			padding-block: var(--text-vertical-padding);
-
-			color: var(--wp-ui-notice-text-color);
-		}
-
 		.description {
 			grid-column: 2;
 
@@ -120,6 +112,14 @@
 	}
 
 	@layer compositions {
+		.title {
+			--_gcd-heading-color: var(--wp-ui-notice-text-color);
+
+			grid-column: 2;
+			padding-block: var(--text-vertical-padding);
+			color: var(--wp-ui-notice-text-color);
+		}
+
 		/* Override `Text` margin */
 		.action-link {
 			margin-block: auto;
