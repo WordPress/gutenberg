@@ -18,6 +18,7 @@
 ### Internal
 
 -   Update Ariakit to 0.4.41 ([#84539](https://github.com/WordPress/gutenberg/pull/84539)).
+-   Use the `RefObject` React type instead of `MutableRefObject` which is deprecated in React 19 types ([#84550](https://github.com/WordPress/gutenberg/pull/84550)).
 
 ## 20.0.0 (2026-10-07)
 
