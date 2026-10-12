@@ -13,6 +13,7 @@
 
 ### Bug Fixes
 
+-   Media & Text: Replace deprecated `word-break: break-word` while keeping long content within the text column and preserving nested wrapping opt-outs ([#82580](https://github.com/WordPress/gutenberg/pull/82580)).
 -   Accordion Heading: Anchor notes to the selected title text instead of the whole block ([#84497](https://github.com/WordPress/gutenberg/pull/84497)).
 
 ## 11.2.0 (2026-10-07)

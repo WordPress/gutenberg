@@ -7,8 +7,7 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 
 .wp-block-search__button {
 	margin-left: $button-spacing-x;
-	// Opt out of wrapping: pair both properties so an ancestor's
-	// `overflow-wrap: anywhere` (e.g. Media & Text) cannot force wraps.
+	// Preserve the opt-out when an ancestor sets overflow-wrap.
 	word-break: normal;
 	overflow-wrap: normal;
 
