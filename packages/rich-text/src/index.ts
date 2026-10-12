@@ -45,6 +45,6 @@ export type { RichTextValue } from './types';
 export type { RichTextFormat } from './types';
 
 /**
- * The callback-Set refs the private event-listener helpers dispatch from.
+ * A Set of callbacks that format types register for an event.
  */
-export type { EventListenersProps } from './event-listeners';
+export type { EventCallbacksSet } from './event-listeners';

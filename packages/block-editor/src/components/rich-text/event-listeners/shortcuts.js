@@ -6,7 +6,7 @@ const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 export default ( props ) => ( element ) => {
 	const { keyboardShortcuts } = props.current;
 	function onKeyDown( event ) {
-		for ( const keyboardShortcut of keyboardShortcuts.current ) {
+		for ( const keyboardShortcut of keyboardShortcuts ) {
 			keyboardShortcut( event );
 		}
 	}

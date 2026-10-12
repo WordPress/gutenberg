@@ -13,7 +13,6 @@ export function RichTextInputEvent( { inputType, onInput } ) {
 	const stableOnInput = useEvent( onInput );
 
 	useEffect( () => {
-		const inputCallbacks = callbacks.current;
 		function callback( event ) {
 			if ( event.inputType === inputType ) {
 				stableOnInput();
@@ -21,9 +20,9 @@ export function RichTextInputEvent( { inputType, onInput } ) {
 			}
 		}
 
-		inputCallbacks.add( callback );
+		callbacks.add( callback );
 		return () => {
-			inputCallbacks.delete( callback );
+			callbacks.delete( callback );
 		};
 	}, [ inputType, callbacks, stableOnInput ] );
 
