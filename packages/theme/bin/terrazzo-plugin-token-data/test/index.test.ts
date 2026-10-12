@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
 	computeBrandFallback,
 	formatDesignTokenFallbacksScss,
-} from '../index.ts';
+} from '../fallbacks.ts';
 import { DEFAULT_SEED_COLORS } from '../../../src/color-ramps/lib/constants.ts';
 
 describe( 'computeBrandFallback', () => {
