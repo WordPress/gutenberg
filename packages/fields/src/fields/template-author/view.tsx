@@ -1,7 +1,7 @@
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
-	commentAuthorAvatar as authorIcon,
+	commentAuthorAvatarAlt as authorIcon,
 	layout as themeIcon,
 	plugins as pluginIcon,
 	globe as globeIcon,
@@ -60,7 +60,10 @@ export default function TemplateAuthorView( {
 		<Stack direction="row" align="center" gap="sm">
 			<Avatar.Root size="xs" aria-hidden="true">
 				<Avatar.Fallback>
-					<Icon icon={ icon } size={ 16 } />
+					<Icon
+						icon={ icon }
+						style={ { inlineSize: '100%', blockSize: '100%' } }
+					/>
 				</Avatar.Fallback>
 				<Avatar.Image src={ imageUrl } alt="" keepMounted />
 			</Avatar.Root>

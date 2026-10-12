@@ -10,7 +10,7 @@ import type { Template } from '../../../types';
 
 vi.mock( import( '@wordpress/icons' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
-	commentAuthorAvatar: (
+	commentAuthorAvatarAlt: (
 		<svg>
 			<title>User fallback</title>
 		</svg>

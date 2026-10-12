@@ -389,6 +389,11 @@
 		"filePath": "library/comment-author-avatar.svg"
 	},
 	{
+		"slug": "comment-author-avatar-alt",
+		"label": "Comment Author Avatar (Alternative)",
+		"filePath": "library/comment-author-avatar-alt.svg"
+	},
+	{
 		"slug": "comment-author-name",
 		"label": "Comment Author Name",
 		"filePath": "library/comment-author-name.svg"

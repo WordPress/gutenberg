@@ -6,7 +6,7 @@ import type { BasePostWithEmbeddedAuthor } from '../../../types';
 
 vi.mock( import( '@wordpress/icons' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
-	commentAuthorAvatar: (
+	commentAuthorAvatarAlt: (
 		<svg>
 			<title>Author fallback</title>
 		</svg>

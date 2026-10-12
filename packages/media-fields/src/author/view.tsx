@@ -1,4 +1,4 @@
-import { commentAuthorAvatar as authorIcon } from '@wordpress/icons';
+import { commentAuthorAvatarAlt as authorIcon } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components -- This bundled package already depends on @wordpress/ui.
 import { Avatar, Icon, Stack } from '@wordpress/ui';
 import type { DataViewRenderFieldProps } from '@wordpress/dataviews';
@@ -15,7 +15,10 @@ export default function AuthorView( {
 		<Stack direction="row" align="center" gap="sm">
 			<Avatar.Root size="xs" aria-hidden="true">
 				<Avatar.Fallback>
-					<Icon icon={ authorIcon } size={ 16 } />
+					<Icon
+						icon={ authorIcon }
+						style={ { inlineSize: '100%', blockSize: '100%' } }
+					/>
 				</Avatar.Fallback>
 				<Avatar.Image src={ imageUrl } alt="" keepMounted />
 			</Avatar.Root>
