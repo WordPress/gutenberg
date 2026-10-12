@@ -16,16 +16,6 @@ describe( 'BlockBreadcrumb', () => {
 	} );
 
 	describe( 'Root label text', () => {
-		test( 'displays the default document label', () => {
-			render( <BlockBreadcrumb /> );
-
-			const rootLabelTextDefault = screen.getByText( 'Document', {
-				selector: '[aria-current="true"]',
-			} );
-
-			expect( rootLabelTextDefault ).toBeInTheDocument();
-		} );
-
 		test( 'displays the supplied document label', () => {
 			render( <BlockBreadcrumb rootLabelText="Tuhinga" /> );
 

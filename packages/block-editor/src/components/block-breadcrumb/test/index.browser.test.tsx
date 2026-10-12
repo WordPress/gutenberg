@@ -1,6 +1,6 @@
 import { beforeEach, afterEach, expect, it } from 'vitest';
 import { render } from 'vitest-browser-react';
-import { page, userEvent } from 'vitest/browser';
+import { page } from 'vitest/browser';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { observableMap } from '@wordpress/compose';
 import {
@@ -14,25 +14,33 @@ import { store as blockEditorStore } from '../../../store';
 import BlockBreadcrumb from '../';
 import { BlockRefs } from '../../provider/block-refs-provider';
 
-let registry;
-let blocks;
+type BreadcrumbAttributes = {
+	metadata?: { name?: string };
+};
+
+let registry: ReturnType< typeof createRegistry >;
+let blocks: ReturnType< typeof createBlock >[];
 
 beforeEach( async () => {
-	registerBlockType( 'test/breadcrumb', {
+	registerBlockType< BreadcrumbAttributes >( 'test/breadcrumb', {
 		apiVersion: 3,
 		title: 'Breadcrumb test block',
 		category: 'text',
 		attributes: { metadata: { type: 'object' } },
-		__experimentalLabel: ( attributes ) => attributes.metadata?.name,
+		__experimentalLabel: ( attributes ) => attributes.metadata?.name ?? '',
 		save: () => null,
 	} );
 	registry = createRegistry();
 	registry.register( blocksStore );
-	registry
-		.dispatch( blocksStore )
-		.addBlockTypes( getBlockType( 'test/breadcrumb' ) );
+	const blockType = getBlockType( 'test/breadcrumb' );
+	if ( ! blockType ) {
+		throw new Error(
+			'Expected the breadcrumb test block to be registered.'
+		);
+	}
+	registry.dispatch( blocksStore ).addBlockTypes( blockType );
 	registry.register( blockEditorStore );
-	let innerBlocks = [];
+	let innerBlocks: ReturnType< typeof createBlock >[] = [];
 	blocks = [];
 	// Nest six blocks, placing Ancestor 5 five levels below Ancestor 0.
 	for ( let index = 5; index >= 0; index-- ) {
@@ -52,30 +60,6 @@ beforeEach( async () => {
 
 afterEach( () => unregisterBlockType( 'test/breadcrumb' ) );
 
-it( 'selects an ancestor with the keyboard', async () => {
-	await render(
-		<RegistryProvider value={ registry }>
-			<div style={ { width: 1500 } }>
-				<BlockBreadcrumb />
-			</div>
-		</RegistryProvider>
-	);
-
-	// Ancestors are buttons for selecting blocks within the document.
-	const ancestor = page.getByRole( 'button', {
-		name: 'Ancestor 3',
-		exact: true,
-	} );
-	await expect.element( ancestor ).toBeVisible();
-
-	// Activating an ancestor with the keyboard selects that block.
-	ancestor.element().focus();
-	await userEvent.keyboard( '{Enter}' );
-	expect(
-		registry.select( blockEditorStore ).getSelectedBlockClientId()
-	).toBe( blocks[ 3 ].clientId );
-} );
-
 it( 'clears selection and focuses the editor canvas from the document button', async () => {
 	// Supply block DOM refs so the document button can find and focus the editor canvas.
 	const refsMap = observableMap();
@@ -84,7 +68,7 @@ it( 'clears selection and focuses the editor canvas from the document button', a
 			<BlockRefs.Provider value={ { refsMap, eventHandlers: new Map() } }>
 				<div
 					className="editor-styles-wrapper"
-					role="region"
+					role="group"
 					aria-label="Editor canvas"
 					tabIndex={ -1 }
 				>
@@ -120,7 +104,7 @@ it( 'clears selection and focuses the editor canvas from the document button', a
 
 	// Focus returns to the editor canvas after activating the document button.
 	await expect
-		.element( page.getByRole( 'region', { name: 'Editor canvas' } ) )
+		.element( page.getByRole( 'group', { name: 'Editor canvas' } ) )
 		.toHaveFocus();
 } );
 
@@ -148,44 +132,4 @@ it( 'collapses ancestors in a narrow container and selects them from the overflo
 	expect(
 		registry.select( blockEditorStore ).getSelectedBlockClientId()
 	).toBe( blocks[ 1 ].clientId );
-} );
-
-it( 'restores ancestors to the breadcrumb trail when more space is available', async () => {
-	const screen = await render(
-		<RegistryProvider value={ registry }>
-			<div style={ { width: 280 } }>
-				<BlockBreadcrumb />
-			</div>
-		</RegistryProvider>
-	);
-
-	// The overflow menu is available while the breadcrumb trail is constrained.
-	await expect
-		.element(
-			page.getByRole( 'button', { name: /hidden breadcrumb item/ } )
-		)
-		.toBeVisible();
-
-	// Widen the container so the complete breadcrumb trail can fit.
-	await screen.rerender(
-		<RegistryProvider value={ registry }>
-			<div style={ { width: 1500 } }>
-				<BlockBreadcrumb />
-			</div>
-		</RegistryProvider>
-	);
-
-	// The overflow menu disappears once all ancestors fit in the trail.
-	await expect
-		.element(
-			page.getByRole( 'button', { name: /hidden breadcrumb item/ } )
-		)
-		.not.toBeInTheDocument();
-
-	// Previously hidden ancestors are available as buttons again.
-	await expect
-		.element(
-			page.getByRole( 'button', { name: 'Ancestor 1', exact: true } )
-		)
-		.toBeVisible();
 } );

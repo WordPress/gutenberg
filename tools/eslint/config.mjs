@@ -1046,6 +1046,19 @@ export default dedupePlugins( [
 		},
 	},
 
+	// BlockBreadcrumb intentionally adopts the shared use-with-caution Breadcrumb.
+	{
+		files: [
+			'packages/block-editor/src/components/block-breadcrumb/index.jsx',
+		],
+		rules: {
+			'@wordpress/use-recommended-components': [
+				'error',
+				{ allowUseWithCaution: true },
+			],
+		},
+	},
+
 	// Override: block-library — the waveform player's default entry initializes
 	// every `[data-waveform-player]` element on the page when it is imported.
 	{

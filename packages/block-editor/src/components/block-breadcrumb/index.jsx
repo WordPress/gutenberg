@@ -12,10 +12,10 @@ import { getBlockDisplayTitle } from '../block-title/use-block-display-title';
 /**
  * Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
  *
- * @param {Object} props               Component props.
- * @param {string} props.rootLabelText Translated label for the root element of the breadcrumb trail.
- * @param {string} props.className     Additional class name for the breadcrumb navigation.
- * @return {Element}                   Block Breadcrumb.
+ * @param {Object} props                 Component props.
+ * @param {string} [props.rootLabelText] Translated label for the root element of the breadcrumb trail.
+ * @param {string} [props.className]     Additional class name for the breadcrumb navigation.
+ * @return {React.JSX.Element}           Block Breadcrumb.
  */
 function BlockBreadcrumb( { rootLabelText, className } ) {
 	const { selectBlock, clearSelectedBlock } = useDispatch( blockEditorStore );
