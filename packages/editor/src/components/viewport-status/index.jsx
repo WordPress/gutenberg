@@ -49,7 +49,7 @@ export default function ViewportStatus() {
 			gap="md"
 			className="editor-viewport-status"
 		>
-			{ isResponsiveEditing && (
+			{ isResponsiveEditing && deviceType !== 'Desktop' && (
 				<span className="editor-viewport-status__responsive-styles">
 					{ __( 'Responsive styles' ) }
 				</span>

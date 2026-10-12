@@ -161,7 +161,8 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 				render={
 					<Button
 						className={ clsx( 'editor-preview-dropdown__toggle', {
-							'is-responsive-editing': isResponsiveEditing,
+							'is-responsive-editing':
+								isResponsiveEditing && deviceType !== 'Desktop',
 						} ) }
 						size="compact"
 						icon={ DEVICE_TYPE_METADATA[ deviceType ].icon }

@@ -60,6 +60,18 @@ it( 'shows responsive editing status when enabled and removes it when disabled',
 	await expect
 		.element( page.getByText( 'Responsive styles', { exact: true } ) )
 		.toBeVisible();
+	const editorActions = unlock( registry.dispatch( editorStore ) );
+	editorActions.setCanvasWidth( 1200 );
+	await expect
+		.element( page.getByText( 'Responsive styles', { exact: true } ) )
+		.not.toBeInTheDocument();
+	await expect
+		.element( page.getByText( 'Desktop (1200 × 640)' ) )
+		.toBeVisible();
+	editorActions.setCanvasWidth( 781 );
+	await expect
+		.element( page.getByText( 'Responsive styles', { exact: true } ) )
+		.toBeVisible();
 	actions.setResponsiveEditing( false );
 	await expect
 		.element( page.getByText( 'Responsive styles', { exact: true } ) )

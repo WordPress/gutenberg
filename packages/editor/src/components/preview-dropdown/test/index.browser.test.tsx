@@ -58,3 +58,28 @@ it( 'closes the View menu when it becomes unavailable and keeps its trigger focu
 	await userEvent.keyboard( '{Escape}' );
 	await expect.element( page.getByRole( 'menu' ) ).not.toBeInTheDocument();
 } );
+
+it( 'shows the responsive editing cue only on viewport-specific breakpoints', async () => {
+	const selection = {
+		deviceType: 'Tablet',
+		hasMobileViewport: true,
+		hasTabletViewport: true,
+		isResponsiveEditing: true,
+		isResponsiveEditingEnabled: true,
+	};
+	vi.mocked( useSelect ).mockReturnValue( selection );
+	const screen = await render( <Preview disabled={ false } /> );
+	const trigger = page.getByRole( 'button', { name: 'View', exact: true } );
+	await expect.element( trigger ).toHaveClass( 'is-responsive-editing' );
+
+	vi.mocked( useSelect ).mockReturnValue( {
+		...selection,
+		deviceType: 'Desktop',
+	} );
+	await screen.rerender( <Preview disabled={ false } /> );
+	await expect.element( trigger ).not.toHaveClass( 'is-responsive-editing' );
+
+	vi.mocked( useSelect ).mockReturnValue( selection );
+	await screen.rerender( <Preview disabled={ false } /> );
+	await expect.element( trigger ).toHaveClass( 'is-responsive-editing' );
+} );
