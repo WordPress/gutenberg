@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Update Ariakit to 0.4.41.
+
 ### Breaking Changes
 
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
