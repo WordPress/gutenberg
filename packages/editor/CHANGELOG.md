@@ -9,11 +9,10 @@
 ### Enhancements
 
 -   Migrate the classic-theme template selector to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
--   Show viewport dimensions and responsive editing status in the footer, and use the existing breadcrumb preference to show or hide the entire footer ([#84146](https://github.com/WordPress/gutenberg/pull/84146)).
+-   Show viewport dimensions and responsive editing status in the editor footer, and clarify when viewport-specific styling is available ([#84146](https://github.com/WordPress/gutenberg/pull/84146)).
 
 ### Bug Fixes
 
--   Hide responsive editing indicators and disable the Responsive styles menu option on the default viewport ([#84146](https://github.com/WordPress/gutenberg/pull/84146)).
 -   Notes: Highlight the text an unsent note is about, and keep the note anchored to it when the selection changes or the text is edited before the note is sent ([#84125](https://github.com/WordPress/gutenberg/pull/84125)).
 -   Notes: Select the note under the caret: an inline note while the caret is inside its highlight, otherwise the block's unsent draft or block-level note, instead of an inline note on any click in the block ([#84147](https://github.com/WordPress/gutenberg/pull/84147)).
 
