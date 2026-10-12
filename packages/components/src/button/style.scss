@@ -214,6 +214,10 @@
 		}
 	}
 
+	&:not(:disabled, [aria-disabled="true"]):active {
+		color: $components-color-foreground;
+	}
+
 	/**
 	 * Link buttons.
 	 */
@@ -229,8 +233,22 @@
 		font-weight: var(--wpds-typography-font-weight-default);
 		color: $components-color-accent;
 		text-decoration: underline;
+		text-decoration-color: currentColor;
 		text-underline-offset: 0.2em;
 		text-decoration-thickness: from-font;
+
+		&:is(:hover, :active, :focus-visible):not(:disabled, [aria-disabled="true"]) {
+			text-decoration-thickness: max(0.12em, var(--wpds-border-width-sm));
+		}
+
+		&:where(:not(.is-destructive, .is-pressed, :disabled, [aria-disabled="true"])) {
+			color: var(--wpds-color-foreground-interactive-brand);
+
+			&:is(:hover, :active),
+			&:where(:focus-visible) {
+				color: var(--wpds-color-foreground-interactive-brand-active);
+			}
+		}
 
 		@media not (prefers-reduced-motion) {
 			transition-property: border, background, color;
@@ -242,17 +260,12 @@
 
 		&:focus:not(:active) {
 			border-radius: $radius-small;
-			text-decoration: none;
 		}
 
 		&:disabled,
 		&[aria-disabled="true"] {
 			color: $gray-600;
 		}
-	}
-
-	&:not(:disabled, [aria-disabled="true"]):active {
-		color: $components-color-foreground;
 	}
 
 	&:disabled,

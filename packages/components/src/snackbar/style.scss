@@ -58,7 +58,8 @@
 	flex-shrink: 0;
 	--focus-color: #{$white};
 
-	&:hover {
+	&:hover,
+	&:active {
 		text-decoration: none;
 		color: currentColor;
 	}
