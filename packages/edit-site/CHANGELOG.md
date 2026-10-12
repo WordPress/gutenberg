@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   Announce the current screen to screen readers ("Pages", "Templates", or the item being edited) instead of the template shown in the preview, and only when the screen changes. Do not announce on first load or when a search, filter or selection changes the URL. The document title now names the current screen, and pages and posts are labeled "Page" and "Post" instead of "Template" ([#51578](https://github.com/WordPress/gutenberg/issues/51578)).
+-   Announce the current screen to screen readers ("Pages", "Templates", or the item being edited) instead of the template shown in the preview, and only when the screen changes. Do not announce on first load or when a search, filter or selection changes the URL. The document title now names the current screen, and pages and posts are labeled "Page" and "Post" instead of "Template" ([#84586](https://github.com/WordPress/gutenberg/pull/84586)).
 
 ## 7.6.0 (2026-10-07)
 
