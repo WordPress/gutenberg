@@ -1056,9 +1056,9 @@ describe( 'withSuggestionBlockClassName', () => {
 
 		const wrapper = ( { children }: { children?: ReactNode } ) => (
 			<RegistryProvider value={ registry }>
-				<SuggestionOverlayProvider>
+				<SuggestionSessionProvider>
 					<MoveGhostsProvider>{ children }</MoveGhostsProvider>
-				</SuggestionOverlayProvider>
+				</SuggestionSessionProvider>
 			</RegistryProvider>
 		);
 
