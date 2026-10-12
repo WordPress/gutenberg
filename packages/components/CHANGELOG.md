@@ -19,6 +19,7 @@
 
 ### Bug Fixes
 
+-   Keep JavaScript color fallbacks in sync with the generated design tokens.
 -   `InputControl`, `NumberControl`, `UnitControl`: Ignore the drag gesture for touch input, where it has no cursor affordance and is easy to trigger by accident ([#38865](https://github.com/WordPress/gutenberg/issues/38865), [#81519](https://github.com/WordPress/gutenberg/pull/81519)).
 -   `Modal`: Keep focus inside the dialog when `focusOnMount="firstContentElement"` finds no tabbable elements in the content ([#84344](https://github.com/WordPress/gutenberg/pull/84344)).
 -   `navigateRegions`: Only outline the Publish and Save controls when their region has focus ([#84343](https://github.com/WordPress/gutenberg/pull/84343)).
