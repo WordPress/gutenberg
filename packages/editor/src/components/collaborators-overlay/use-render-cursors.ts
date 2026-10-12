@@ -34,6 +34,10 @@ export interface CursorData {
 	clientId: number;
 	color: string;
 	avatarUrl?: string;
+	// The local clientId of the block this cursor sits in, so consumers can
+	// tell whether a collaborator is working in the same block as the local
+	// user. Absent when the selection could not be resolved to a block.
+	blockClientId?: string;
 	// x/y/height absent for multi-block selections — avatar comes from
 	// use-block-highlighting; only selectionRects are rendered here.
 	x?: number;
@@ -231,6 +235,7 @@ export function useRenderCursors(
 					color,
 					avatarUrl,
 					isMe: user.isMe,
+					blockClientId: start.localClientId ?? undefined,
 					...( selectionVisual.coords ?? {} ),
 				};
 				if ( selectionVisual.selectionRects ) {
