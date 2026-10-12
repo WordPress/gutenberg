@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
@@ -116,7 +116,7 @@ describe( 'DimensionsTool', () => {
 				name: 'Aspect ratio',
 			} );
 
-			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^16\/9$/ );
 
 			rerender(
 				<ControlledExample
@@ -124,7 +124,7 @@ describe( 'DimensionsTool', () => {
 					onChange={ onChange }
 				/>
 			);
-			expect( aspectRatioSelect ).toHaveValue( '4/3' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^4\/3$/ );
 
 			rerender(
 				<ControlledExample
@@ -132,10 +132,10 @@ describe( 'DimensionsTool', () => {
 					onChange={ onChange }
 				/>
 			);
-			expect( aspectRatioSelect ).toHaveValue( 'auto' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^Original$/ );
 		} );
 
-		it( 'displays an aspect ratio that is written differently to the option with the same ratio', () => {
+		it( 'displays an aspect ratio that is written differently to the option with the same ratio', async () => {
 			const onChange = vi.fn();
 			const { rerender } = render(
 				<ControlledExample
@@ -147,7 +147,7 @@ describe( 'DimensionsTool', () => {
 				name: 'Aspect ratio',
 			} );
 
-			expect( aspectRatioSelect ).toHaveValue( '1' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^Square$/ );
 
 			rerender(
 				<ControlledExample
@@ -155,10 +155,12 @@ describe( 'DimensionsTool', () => {
 					onChange={ onChange }
 				/>
 			);
-			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+			await waitFor( () =>
+				expect( aspectRatioSelect ).toHaveTextContent( /^16\/9$/ )
+			);
 		} );
 
-		it( 'displays an aspect ratio without a matching option as custom', () => {
+		it( 'displays an aspect ratio without a matching option as custom', async () => {
 			const onChange = vi.fn();
 			render(
 				<ControlledExample
@@ -167,12 +169,14 @@ describe( 'DimensionsTool', () => {
 				/>
 			);
 
-			expect(
-				screen.getByRole( 'combobox', { name: 'Aspect ratio' } )
-			).toHaveValue( 'custom' );
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'combobox', { name: 'Aspect ratio' } )
+				).toHaveTextContent( /^Custom$/ )
+			);
 		} );
 
-		it( 'updates the scale control when the value prop changes', () => {
+		it( 'updates the scale control when the value prop changes', async () => {
 			const onChange = vi.fn();
 			const { rerender } = render(
 				<ControlledExample
@@ -192,9 +196,11 @@ describe( 'DimensionsTool', () => {
 				/>
 			);
 
-			expect(
-				screen.getByRole( 'radio', { name: 'Contain' } )
-			).toBeChecked();
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'radio', { name: 'Contain' } )
+				).toBeChecked()
+			);
 		} );
 	} );
 
@@ -218,13 +224,23 @@ describe( 'DimensionsTool', () => {
 			);
 
 			// Clearing and setting the aspect ratio again restores the scale.
-			await user.selectOptions(
-				screen.getByRole( 'combobox', { name: 'Aspect ratio' } ),
-				'auto'
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Aspect ratio' } )
 			);
-			await user.selectOptions(
-				screen.getByRole( 'combobox', { name: 'Aspect ratio' } ),
-				'4/3'
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: 'Original',
+					exact: true,
+				} )
+			);
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Aspect ratio' } )
+			);
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: '4/3',
+					exact: true,
+				} )
 			);
 
 			expect( onChange ).toHaveBeenLastCalledWith( {
@@ -293,9 +309,15 @@ describe( 'DimensionsTool', () => {
 				name: 'Aspect ratio',
 			} );
 
-			await user.selectOptions( aspectRatioSelect, '16/9' );
+			await user.click( aspectRatioSelect );
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: '16/9',
+					exact: true,
+				} )
+			);
 
-			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^16\/9$/ );
 
 			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
 				name: 'Scale',
@@ -333,9 +355,15 @@ describe( 'DimensionsTool', () => {
 				name: 'Aspect ratio',
 			} );
 
-			await user.selectOptions( aspectRatioSelect, '16/9' );
+			await user.click( aspectRatioSelect );
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: '16/9',
+					exact: true,
+				} )
+			);
 
-			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^16\/9$/ );
 
 			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
 				name: 'Scale',
@@ -373,9 +401,15 @@ describe( 'DimensionsTool', () => {
 				name: 'Aspect ratio',
 			} );
 
-			await user.selectOptions( aspectRatioSelect, '16/9' );
+			await user.click( aspectRatioSelect );
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: '16/9',
+					exact: true,
+				} )
+			);
 
-			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^16\/9$/ );
 
 			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
 				name: 'Scale',
@@ -413,9 +447,15 @@ describe( 'DimensionsTool', () => {
 				name: 'Aspect ratio',
 			} );
 
-			await user.selectOptions( aspectRatioSelect, '16/9' );
+			await user.click( aspectRatioSelect );
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: '16/9',
+					exact: true,
+				} )
+			);
 
-			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^16\/9$/ );
 
 			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
 				name: 'Scale',
@@ -453,9 +493,15 @@ describe( 'DimensionsTool', () => {
 				name: 'Aspect ratio',
 			} );
 
-			await user.selectOptions( aspectRatioSelect, 'auto' );
+			await user.click( aspectRatioSelect );
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: 'Original',
+					exact: true,
+				} )
+			);
 
-			expect( aspectRatioSelect ).toHaveValue( 'auto' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^Original$/ );
 
 			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
 				name: 'Scale',
@@ -485,9 +531,15 @@ describe( 'DimensionsTool', () => {
 				name: 'Aspect ratio',
 			} );
 
-			await user.selectOptions( aspectRatioSelect, 'auto' );
+			await user.click( aspectRatioSelect );
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: 'Original',
+					exact: true,
+				} )
+			);
 
-			expect( aspectRatioSelect ).toHaveValue( 'auto' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^Original$/ );
 
 			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
 				name: 'Scale',
@@ -519,9 +571,15 @@ describe( 'DimensionsTool', () => {
 				name: 'Aspect ratio',
 			} );
 
-			await user.selectOptions( aspectRatioSelect, 'auto' );
+			await user.click( aspectRatioSelect );
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: 'Original',
+					exact: true,
+				} )
+			);
 
-			expect( aspectRatioSelect ).toHaveValue( 'auto' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^Original$/ );
 
 			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
 				name: 'Scale',
@@ -738,7 +796,7 @@ describe( 'DimensionsTool', () => {
 				name: 'Aspect ratio',
 			} );
 
-			expect( aspectRatioSelect ).toHaveValue( 'custom' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^Custom$/ );
 
 			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
 				name: 'Scale',
@@ -784,7 +842,7 @@ describe( 'DimensionsTool', () => {
 				name: 'Aspect ratio',
 			} );
 
-			expect( aspectRatioSelect ).toHaveValue( 'custom' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^Custom$/ );
 
 			const scaleRadioGroup = screen.queryByRole( 'radiogroup', {
 				name: 'Scale',
@@ -829,13 +887,13 @@ describe( 'DimensionsTool', () => {
 			} );
 
 			await user.type( widthInput, '8' );
-			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^16\/9$/ );
 
 			await user.type( heightInput, '6' );
-			expect( aspectRatioSelect ).toHaveValue( 'custom' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^Custom$/ );
 
 			await user.clear( widthInput, '' );
-			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+			expect( aspectRatioSelect ).toHaveTextContent( /^16\/9$/ );
 
 			expect( onChange.mock.calls ).toStrictEqual( [
 				[ { aspectRatio: '16/9', scale: 'cover', width: '8px' } ],
@@ -866,11 +924,23 @@ describe( 'DimensionsTool', () => {
 			await user.click( scaleContainRadio );
 			expect( scaleContainRadio ).toBeChecked();
 
-			await user.selectOptions( aspectRatioSelect, 'auto' );
-			expect( aspectRatioSelect ).toHaveValue( 'auto' );
+			await user.click( aspectRatioSelect );
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: 'Original',
+					exact: true,
+				} )
+			);
+			expect( aspectRatioSelect ).toHaveTextContent( /^Original$/ );
 
-			await user.selectOptions( aspectRatioSelect, '16/9' );
-			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+			await user.click( aspectRatioSelect );
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: '16/9',
+					exact: true,
+				} )
+			);
+			expect( aspectRatioSelect ).toHaveTextContent( /^16\/9$/ );
 
 			expect( onChange.mock.calls ).toStrictEqual( [
 				[ { aspectRatio: '16/9', scale: 'contain' } ],

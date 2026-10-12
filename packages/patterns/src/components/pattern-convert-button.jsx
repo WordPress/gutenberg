@@ -145,12 +145,12 @@ export default function PatternConvertButton( {
 						// translators: %s: the name the user has given to the pattern.
 						__( 'Unsynced pattern created: %s' ),
 						pattern.title.raw
-				  )
+					)
 				: sprintf(
 						// translators: %s: the name the user has given to the pattern.
 						__( 'Synced pattern created: %s' ),
 						pattern.title.raw
-				  ),
+					),
 			{
 				type: 'snackbar',
 				id: 'convert-to-pattern-success',

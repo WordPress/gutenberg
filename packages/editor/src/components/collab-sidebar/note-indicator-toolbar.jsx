@@ -39,7 +39,7 @@ function ThreadParticipants( { participants } ) {
 					// translators: %s: Number of participants.
 					__( '+%s' ),
 					overflowCount
-			  );
+				);
 
 	return (
 		<Stack direction="row" align="center" gap="xs">

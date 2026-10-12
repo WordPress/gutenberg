@@ -7,6 +7,78 @@
  */
 
 /**
+ * Recursively casts empty arrays to objects where the schema types them as
+ * objects.
+ *
+ * PHP cannot distinguish an empty associative array from an empty list, so
+ * `json_encode()` always serializes `array()` as a JSON array (`[]`). A REST
+ * schema, however, may type a value as an object, which must encode as `{}`.
+ * This walks the value against its schema and casts any empty, object-typed
+ * array to an object. Non-empty associative arrays already encode as objects,
+ * so they are left as arrays and only recursed into to fix any nested empty
+ * objects.
+ *
+ * Union schemas (`oneOf`/`anyOf`) are handled only for the empty-array case:
+ * an empty value is cast to an object when any branch allows an object. Such
+ * values are not recursed into.
+ *
+ * @param mixed $value  The value to normalize.
+ * @param array $schema The schema node describing the value.
+ * @return mixed The normalized value, with empty object-typed arrays cast to objects.
+ */
+function gutenberg_rest_cast_empty_objects_from_schema( $value, $schema ) {
+	if ( ! is_array( $value ) || ! is_array( $schema ) ) {
+		return $value;
+	}
+
+	if ( isset( $schema['oneOf'] ) || isset( $schema['anyOf'] ) ) {
+		$branches = isset( $schema['oneOf'] ) ? $schema['oneOf'] : $schema['anyOf'];
+		if ( array() === $value ) {
+			foreach ( $branches as $branch ) {
+				if ( is_array( $branch ) && in_array( 'object', (array) ( isset( $branch['type'] ) ? $branch['type'] : array() ), true ) ) {
+					return (object) array();
+				}
+			}
+		}
+		return $value;
+	}
+
+	$types = (array) ( isset( $schema['type'] ) ? $schema['type'] : array() );
+
+	if ( in_array( 'array', $types, true ) && isset( $schema['items'] ) ) {
+		foreach ( $value as $index => $item ) {
+			$value[ $index ] = gutenberg_rest_cast_empty_objects_from_schema( $item, $schema['items'] );
+		}
+		return $value;
+	}
+
+	if ( in_array( 'object', $types, true ) ) {
+		if ( isset( $schema['properties'] ) ) {
+			foreach ( $schema['properties'] as $property => $property_schema ) {
+				if ( array_key_exists( $property, $value ) ) {
+					$value[ $property ] = gutenberg_rest_cast_empty_objects_from_schema( $value[ $property ], $property_schema );
+				}
+			}
+		}
+		if ( isset( $schema['additionalProperties'] ) && is_array( $schema['additionalProperties'] ) ) {
+			foreach ( $value as $key => $item ) {
+				if ( isset( $schema['properties'][ $key ] ) ) {
+					continue;
+				}
+				$value[ $key ] = gutenberg_rest_cast_empty_objects_from_schema( $item, $schema['additionalProperties'] );
+			}
+		}
+
+		// Empty object-typed arrays must serialize as {} to match the schema.
+		if ( array() === $value ) {
+			return (object) array();
+		}
+	}
+
+	return $value;
+}
+
+/**
  * Registers the View Config REST API routes.
  *
  * Replaces the 7.1 registration so the route is served by the 7.2 controller.
@@ -19,10 +91,22 @@ remove_action( 'rest_api_init', 'gutenberg_register_view_config_controller_endpo
 add_action( 'rest_api_init', 'gutenberg_register_view_config_controller_endpoints_7_2', PHP_INT_MAX );
 
 /**
+ * Registers the Fields REST API route.
+ *
+ * Exposes the fields registered on the server on the `wp_fields_api_init` action.
+ *
+ * @see Gutenberg_REST_Fields_Controller_7_2
+ */
+function gutenberg_register_fields_controller_endpoints() {
+	$fields_controller = new Gutenberg_REST_Fields_Controller_7_2();
+	$fields_controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_fields_controller_endpoints', PHP_INT_MAX );
+
+/**
  * Registers the Templates and Template Parts REST API routes.
  *
- * Runs after the WordPress 7.0 filters of the same shape, so this controller
- * class wins.
+ * Replaces the core controller class so the 7.2 controller is used.
  *
  * @see Gutenberg_REST_Templates_Controller_7_2
  *
@@ -92,3 +176,111 @@ function gutenberg_restrict_privacy_policy_page_setting_update( $updated, $name 
 	return $updated;
 }
 add_filter( 'rest_pre_update_setting', 'gutenberg_restrict_privacy_policy_page_setting_update', 10, 2 );
+
+/**
+ * Adds the `action-trash` link to a REST response.
+ *
+ * Targets the `self` link, so responses whose `_fields` leave out `_links`
+ * are skipped. Attachments run `rest_prepare_attachment` twice, so an
+ * existing link is kept.
+ *
+ * @param WP_REST_Response $response The response object.
+ */
+function gutenberg_add_trash_action_link( $response ) {
+	$links = $response->get_links();
+	if (
+		empty( $links['self'][0]['href'] ) ||
+		isset( $links['https://api.w.org/action-trash'] )
+	) {
+		return;
+	}
+
+	$response->add_link( 'https://api.w.org/action-trash', $links['self'][0]['href'] );
+}
+
+/**
+ * Adds the `action-trash` link to posts the current user can move to the trash.
+ *
+ * Without the link, deleting the post is permanent.
+ *
+ * @param WP_REST_Response $response The response object.
+ * @param WP_Post          $post     Post object.
+ * @param WP_REST_Request  $request  Request object.
+ * @return WP_REST_Response The response object.
+ */
+function gutenberg_add_post_trash_action_link( $response, $post, $request ) {
+	if (
+		! $post instanceof WP_Post ||
+		'edit' !== $request['context'] ||
+		'trash' === $post->post_status ||
+		! current_user_can( 'delete_post', $post->ID )
+	) {
+		return $response;
+	}
+
+	// Mirrors `WP_REST_Posts_Controller::delete_item()`.
+	$supports_trash = ( EMPTY_TRASH_DAYS > 0 );
+	if ( 'attachment' === $post->post_type ) {
+		$supports_trash = $supports_trash && MEDIA_TRASH;
+	}
+
+	/** This filter is documented in wp-includes/rest-api/endpoints/class-wp-rest-posts-controller.php */
+	$supports_trash = apply_filters( "rest_{$post->post_type}_trashable", $supports_trash, $post );
+	if ( $supports_trash ) {
+		gutenberg_add_trash_action_link( $response );
+	}
+
+	return $response;
+}
+
+/**
+ * Adds the `action-trash` link to comments the current user can move to the trash.
+ *
+ * Without the link, deleting the comment is permanent.
+ *
+ * @param WP_REST_Response $response The response object.
+ * @param WP_Comment       $comment  Comment object.
+ * @param WP_REST_Request  $request  Request object.
+ * @return WP_REST_Response The response object.
+ */
+function gutenberg_add_comment_trash_action_link( $response, $comment, $request ) {
+	if (
+		'edit' !== $request['context'] ||
+		'trash' === $comment->comment_approved ||
+		(
+			! current_user_can( 'moderate_comments' ) &&
+			! current_user_can( 'edit_comment', $comment->comment_ID )
+		)
+	) {
+		return $response;
+	}
+
+	/** This filter is documented in wp-includes/rest-api/endpoints/class-wp-rest-comments-controller.php */
+	$supports_trash = apply_filters( 'rest_comment_trashable', ( EMPTY_TRASH_DAYS > 0 ), $comment );
+	if ( $supports_trash ) {
+		gutenberg_add_trash_action_link( $response );
+	}
+
+	return $response;
+}
+add_filter( 'rest_prepare_comment', 'gutenberg_add_comment_trash_action_link', 10, 3 );
+
+/**
+ * Registers the `action-trash` link filter for post types shown in REST.
+ *
+ * Menu items and fonts can only be deleted permanently, so they're skipped.
+ *
+ * @param string       $post_type        Post type slug.
+ * @param WP_Post_Type $post_type_object Post type object.
+ */
+function gutenberg_register_post_trash_action_link( $post_type, $post_type_object ) {
+	if (
+		! $post_type_object->show_in_rest ||
+		in_array( $post_type, array( 'nav_menu_item', 'wp_font_family', 'wp_font_face' ), true )
+	) {
+		return;
+	}
+
+	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_post_trash_action_link', 10, 3 );
+}
+add_action( 'registered_post_type', 'gutenberg_register_post_trash_action_link', 10, 2 );

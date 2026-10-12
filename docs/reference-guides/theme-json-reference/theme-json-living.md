@@ -62,6 +62,7 @@ Settings related to background.
 | backgroundImage | Allow users to set a background image. | `boolean` | `false` |
 | backgroundSize | Allow users to set values related to the size of a background image, including size, position, and repeat controls. | `boolean` | `false` |
 | gradient | Allow users to set a gradient background. | `boolean` | `false` |
+| backgroundClip | Allow users to set background clip. Pass true for all methods, or an array of CSS values: ["text", "padding-box", "border-box", "content-box"]. | `boolean`, `[ string ]` |  |
 
 ---
 
@@ -209,6 +210,9 @@ Settings related to typography.
 | textAlign | Allow users to set the text align. | `boolean` | `true` |
 | textColumns | Allow users to set the number of text columns. | `boolean` | `false` |
 | textDecoration | Allow users to set custom text decorations. | `boolean` | `true` |
+| textShadow | Allow users to set custom text shadows. | `boolean` | `true` |
+| defaultTextShadowPresets | Allow users to choose text shadows from the default text shadow presets. | `boolean` | `true` |
+| textShadowPresets | Text shadow presets for the text shadow picker. | `[ { name, slug, textShadow } ]` |  |
 | writingMode | Allow users to set the writing mode. | `boolean` | `false` |
 | textTransform | Allow users to set custom text transforms. | `boolean` | `true` |
 | dropCap | Enable drop cap. | `boolean` | `true` |
@@ -238,6 +242,8 @@ Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-
 
 Organized way to set CSS properties. Styles in the top-level will be added in the `body` selector.
 
+In a block style variation partial (a theme.json file with a `blockTypes` property), the styles are scoped to the listed block types instead, and the responsive (`@mobile`, `@tablet`) and pseudo-selector (`:hover`, `:focus`, `:focus-visible`, `:active`) states available to block style variations are also allowed at this level.
+
 ### background
 
 Background styles.
@@ -249,6 +255,7 @@ Background styles.
 | backgroundRepeat | Sets the `background-repeat` CSS property. | `string`, `{ ref }` |
 | backgroundSize | Sets the `background-size` CSS property. | `string`, `{ ref }` |
 | backgroundAttachment | Sets the `background-attachment` CSS property. | `string`, `{ ref }` |
+| backgroundClip | Sets the `background-clip` CSS property. One of `border-box`, `padding-box`, `content-box` or `text`. | `string`, `{ ref }` |
 
 ---
 

@@ -1,13 +1,16 @@
 import { h } from 'preact';
 import type { ComponentChild } from 'preact';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { toVdom, hydratedIslands } from '../vdom';
+import { parseDirectiveValue, toVdom, hydratedIslands } from '../vdom';
 
 declare module 'vitest' {
 	// Must match Vitest's generic declaration for module augmentation.
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	interface Assertion< T = any > {
-		toMatchVNode: ( expected: ComponentChild ) => void;
+	interface Matchers<
+		R extends void | Promise< void > = void | Promise< void >,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		T = unknown,
+	> {
+		toMatchVNode: ( expected: ComponentChild ) => R;
 	}
 }
 
@@ -35,6 +38,28 @@ describe( 'toVdom', () => {
 	beforeEach( () => {
 		// @ts-expect-error `_values` is an internal property, accessed here for testing.
 		hydratedIslands._values = new WeakMap();
+	} );
+
+	describe( 'parseDirectiveValue', () => {
+		it( 'should separate a namespace from a plain directive value', () => {
+			expect( parseDirectiveValue( 'myplugin::sidebar' ) ).toEqual( {
+				namespace: 'myplugin',
+				value: 'sidebar',
+			} );
+		} );
+
+		it( 'should keep plain objects and preserve JSON scalar values as strings', () => {
+			expect(
+				parseDirectiveValue( 'myplugin::{"id":"sidebar"}' )
+			).toEqual( {
+				namespace: 'myplugin',
+				value: { id: 'sidebar' },
+			} );
+			expect( parseDirectiveValue( '123' ) ).toEqual( {
+				namespace: null,
+				value: '123',
+			} );
+		} );
 	} );
 
 	describe( 'Basic node types', () => {

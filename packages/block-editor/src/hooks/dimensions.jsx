@@ -101,12 +101,12 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 				setAttributes( {
 					style: setStyleForState( style, selectedState, newStyle ),
 				} );
-		  }
+			}
 		: ( newStyle ) => {
 				setAttributes( {
 					style: cleanEmptyObject( newStyle ),
 				} );
-		  };
+			};
 
 	if ( ! isEnabled ) {
 		return null;

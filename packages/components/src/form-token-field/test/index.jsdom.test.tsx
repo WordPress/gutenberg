@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
 	render,
 	screen,
@@ -9,7 +9,6 @@ import {
 import userEvent from '@testing-library/user-event';
 import type { ComponentProps } from 'react';
 import { useState } from '@wordpress/element';
-import { logged } from '@wordpress/deprecated';
 import FormTokenField from '../';
 
 globalThis.wpVitest.mockMatchMedia();
@@ -110,15 +109,10 @@ function unescapeAndFormatSpaces( str: string ) {
 	return escaped.documentElement.textContent?.replace( / /g, nbsp ) ?? '';
 }
 
-describe( 'FormTokenField', () => {
-	afterEach( () => {
-		// `@wordpress/deprecated` caches each warning message after the first
-		// log; reset it so multiple tests can assert the same deprecation.
-		for ( const key in logged ) {
-			delete logged[ key ];
-		}
-	} );
+const SHOW_HOW_TO_DEPRECATION =
+	'`__experimentalShowHowTo` prop in wp.components.FormTokenField is deprecated since version 7.1. Please use `help` prop instead. Note: The `help` prop now defaults to the previous how-to text. Pass an empty string to hide it.';
 
+describe( 'FormTokenField', () => {
 	describe( 'basic usage', () => {
 		it( "should add tokens with the input's value when pressing the enter key", async () => {
 			const user = userEvent.setup();
@@ -632,9 +626,7 @@ describe( 'FormTokenField', () => {
 				<FormTokenFieldWithState __experimentalShowHowTo={ false } />
 			);
 
-			expect( console ).toHaveWarnedWith(
-				'`__experimentalShowHowTo` prop in wp.components.FormTokenField is deprecated since version 7.1. Please use `help` prop instead. Note: The `help` prop now defaults to the previous how-to text. Pass an empty string to hide it.'
-			);
+			expect( console ).toHaveWarnedWith( SHOW_HOW_TO_DEPRECATION );
 
 			expect(
 				screen.queryByText( 'Separate with commas or the Enter key.' )
@@ -652,7 +644,7 @@ describe( 'FormTokenField', () => {
 				/>
 			);
 
-			expect( console ).toHaveWarned();
+			expect( console ).toHaveWarnedWith( SHOW_HOW_TO_DEPRECATION );
 			expect(
 				screen.getByRole( 'combobox' )
 			).toHaveAccessibleDescription( 'Help text' );
@@ -1029,6 +1021,44 @@ describe( 'FormTokenField', () => {
 			expectTokensToBeInTheDocument( [ 'Carnation' ] );
 
 			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should select the last suggestion when pressing the up arrow with no suggestion selected', async () => {
+			const user = userEvent.setup();
+
+			const suggestions = [ 'Pink', 'Salmon', 'Carnation', 'Neon' ];
+
+			render( <FormTokenFieldWithState suggestions={ suggestions } /> );
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Typing "on" will show the "Salmon", "Carnation" and "Neon" suggestions
+			await user.type( input, 'on' );
+
+			const suggestionList = screen.getByRole( 'listbox' );
+
+			expectVisibleSuggestionsToBe( suggestionList, [
+				'Salmon',
+				'Carnation',
+				'Neon',
+			] );
+
+			// Currently, none of the suggestions are selected
+			expect(
+				within( suggestionList ).queryByRole( 'option', {
+					selected: true,
+				} )
+			).not.toBeInTheDocument();
+
+			// Pressing the up arrow from an empty selection wraps to the end of
+			// the list and selects "Neon"
+			await user.keyboard( '[ArrowUp]' );
+
+			expect(
+				within( suggestionList ).getByRole( 'option', {
+					selected: true,
+				} )
+			).toHaveAccessibleName( 'Neon' );
 		} );
 
 		it( 'should allow the user to use the mouse to navigate and select suggestions (which are marked with the `aria-selected` attribute)', async () => {

@@ -2,12 +2,7 @@
  * Breakpoint names supported by the viewport package.
  */
 export type BreakpointName =
-	| 'huge'
-	| 'wide'
-	| 'large'
-	| 'medium'
-	| 'small'
-	| 'mobile';
+	'huge' | 'wide' | 'large' | 'medium' | 'small' | 'mobile';
 
 /**
  * Query operators for viewport matching.
@@ -19,8 +14,7 @@ export type QueryOperator = '<' | '>=';
  * Examples: '< small', '>= medium', 'large' (defaults to '>= large')
  */
 export type ViewportQuery =
-	| BreakpointName
-	| `${ QueryOperator } ${ BreakpointName }`;
+	BreakpointName | `${ QueryOperator } ${ BreakpointName }`;
 
 /**
  * Hash of breakpoint names with pixel width at which it becomes effective.

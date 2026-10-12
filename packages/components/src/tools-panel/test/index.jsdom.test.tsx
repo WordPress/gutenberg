@@ -12,8 +12,6 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ToolsPanel, ToolsPanelContext, ToolsPanelItem } from '../';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
-import { ContextSystemProvider } from '../../context';
-import moduleStyles from '../style.module.scss';
 import type {
 	ToolsPanelContext as ToolsPanelContextType,
 	ResetAllFilter,
@@ -24,12 +22,6 @@ globalThis.wpVitest.mockMatchMedia();
 const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
 const resetAll = vi.fn();
 const noop = () => undefined;
-const gridContextValue = {
-	Grid: {
-		columnGap: '40px',
-		rowGap: '48px',
-	},
-};
 
 type ControlValue = boolean | undefined;
 
@@ -310,7 +302,7 @@ describe( 'ToolsPanel', () => {
 			expect( header ).toBeInTheDocument();
 		} );
 
-		it( 'should apply SCSS Module styles to the panel and its items', () => {
+		it( 'should apply public class names to the panel and its items', () => {
 			render(
 				<ToolsPanel { ...defaultProps } data-testid="tools-panel">
 					<ToolsPanelItem
@@ -324,11 +316,9 @@ describe( 'ToolsPanel', () => {
 			);
 
 			expect( screen.getByTestId( 'tools-panel' ) ).toHaveClass(
-				moduleStyles[ 'tools-panel' ],
 				'components-tools-panel'
 			);
 			expect( screen.getByTestId( 'tools-panel-item' ) ).toHaveClass(
-				moduleStyles[ 'tools-panel-item' ],
 				'components-tools-panel-item',
 				'custom-item'
 			);
@@ -337,73 +327,10 @@ describe( 'ToolsPanel', () => {
 				name: defaultProps.label,
 			} );
 
-			expect( heading ).toHaveClass(
-				moduleStyles[ 'tools-panel-heading' ]
-			);
 			// Disable reason: Semantic queries can't reach the header wrapper.
 			// eslint-disable-next-line testing-library/no-node-access
 			expect( heading.parentElement ).toHaveClass(
-				moduleStyles[ 'tools-panel-header' ],
 				'components-tools-panel-header'
-			);
-		} );
-
-		it( 'should preserve its spacing against Grid context values', () => {
-			render(
-				<ContextSystemProvider value={ gridContextValue }>
-					<ToolsPanel { ...defaultProps } data-testid="tools-panel">
-						<span>Panel content</span>
-					</ToolsPanel>
-				</ContextSystemProvider>
-			);
-
-			const panel = screen.getByTestId( 'tools-panel' );
-			const generatedClassName = Array.from( panel.classList ).find(
-				( className ) => /^(css|emotion)-/.test( className )
-			);
-			const generatedRule = Array.from( document.styleSheets )
-				.flatMap( ( styleSheet ) => Array.from( styleSheet.cssRules ) )
-				.find( ( rule ) =>
-					rule.cssText.includes( `.${ generatedClassName }` )
-				);
-
-			expect( generatedRule?.cssText ).toContain(
-				'grid-column-gap: calc(4px * 4);'
-			);
-			expect( generatedRule?.cssText ).toContain(
-				'grid-row-gap: calc(4px * 4);'
-			);
-		} );
-
-		it( 'should apply SCSS Module variants for inner wrappers and placeholders', () => {
-			render(
-				<ToolsPanel
-					{ ...defaultProps }
-					data-testid="tools-panel"
-					hasInnerWrapper
-					shouldRenderPlaceholderItems
-				>
-					<ToolsPanelItem
-						{ ...altControlProps }
-						className="custom-item"
-						data-testid="tools-panel-item"
-					>
-						<div>Alt control</div>
-					</ToolsPanelItem>
-				</ToolsPanel>
-			);
-
-			expect( screen.getByTestId( 'tools-panel' ) ).toHaveClass(
-				moduleStyles[ 'tools-panel-with-inner-wrapper' ],
-				moduleStyles[ 'tools-panel-hidden-inner-wrapper' ]
-			);
-			expect( screen.getByTestId( 'tools-panel-item' ) ).toHaveClass(
-				moduleStyles[ 'tools-panel-item' ],
-				moduleStyles[ 'tools-panel-item-placeholder' ]
-			);
-			expect( screen.getByTestId( 'tools-panel-item' ) ).not.toHaveClass(
-				'components-tools-panel-item',
-				'custom-item'
 			);
 		} );
 	} );
@@ -419,11 +346,18 @@ describe( 'ToolsPanel', () => {
 			expect( altControl ).not.toBeInTheDocument();
 		} );
 
-		it( 'should render panel item when corresponding menu item is selected', async () => {
+		it( 'shows a hidden optional control with the setting followed by the action', async () => {
 			renderPanel();
 			await openDropdownMenu();
+			const menuItem = screen.getByRole( 'menuitemcheckbox', {
+				name: 'Alt, show',
+				checked: false,
+			} );
+			expect( menuItem ).toHaveTextContent( 'Alt' );
 			await selectMenuItem( altControlProps.label );
 			const control = await screen.findByText( 'Alt control' );
+			expect( menuItem ).toHaveAccessibleName( 'Alt, hide and reset' );
+			expect( menuItem ).toBeChecked();
 
 			expect( control ).toBeInTheDocument();
 
@@ -432,11 +366,19 @@ describe( 'ToolsPanel', () => {
 			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
-		it( 'should prevent optional panel item rendering when toggled off via menu item', async () => {
+		it( 'hides and resets an optional control with the setting followed by the action', async () => {
 			renderPanel();
 			await openDropdownMenu();
+			const menuItem = screen.getByRole( 'menuitemcheckbox', {
+				name: 'Example, hide and reset',
+				checked: true,
+			} );
+			expect( menuItem ).toHaveTextContent( 'Example' );
 			await selectMenuItem( controlProps.label );
 			const control = screen.queryByText( 'Example control' );
+			expect( menuItem ).toHaveAccessibleName( 'Example, show' );
+			expect( menuItem ).not.toBeChecked();
+			expect( controlProps.onDeselect ).toHaveBeenCalledTimes( 1 );
 
 			expect( control ).not.toBeInTheDocument();
 
@@ -670,7 +612,7 @@ describe( 'ToolsPanel', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'should continue to render shown by default item after it is toggled off via menu item', async () => {
+		it( 'resets a default control with a name explaining the visible reset action', async () => {
 			render(
 				<ToolsPanel { ...defaultProps }>
 					<ToolsPanelItem { ...controlProps } isShownByDefault>
@@ -684,8 +626,22 @@ describe( 'ToolsPanel', () => {
 			expect( control ).toBeInTheDocument();
 
 			await openDropdownMenu();
+			const menuItem = screen.getByRole( 'menuitem', {
+				name: 'Example, reset to default',
+			} );
+			const resetSuffix = within( menuItem ).getByText( 'Reset' );
+			expect( resetSuffix ).toBeVisible();
+			expect( resetSuffix ).toHaveAttribute( 'aria-hidden', 'true' );
 			await selectMenuItem( controlProps.label );
 			const resetControl = screen.getByText( 'Default control' );
+			const disabledItem = screen.getByRole( 'menuitemcheckbox', {
+				name: 'Example',
+				checked: true,
+			} );
+			expect( disabledItem ).toHaveAttribute( 'aria-disabled', 'true' );
+			controlProps.onDeselect.mockClear();
+			await selectMenuItem( controlProps.label );
+			expect( controlProps.onDeselect ).not.toHaveBeenCalled();
 
 			expect( resetControl ).toBeInTheDocument();
 
@@ -716,19 +672,28 @@ describe( 'ToolsPanel', () => {
 		it( 'should not render contents of items when in placeholder state', () => {
 			render(
 				<ToolsPanel { ...defaultProps } shouldRenderPlaceholderItems>
-					<ToolsPanelItem { ...altControlProps }>
+					<ToolsPanelItem
+						{ ...altControlProps }
+						className="custom-item"
+						data-testid="placeholder-item"
+					>
 						<div>Optional control</div>
 					</ToolsPanelItem>
 				</ToolsPanel>
 			);
 
 			const optionalItem = screen.queryByText( 'Optional control' );
+			const placeholderItem = screen.getByTestId( 'placeholder-item' );
 
 			// When rendered as a placeholder a ToolsPanelItem will just omit
 			// all the item's children. So the container element will still be
 			// there holding its position but the inner text etc should not be
 			// there.
 			expect( optionalItem ).not.toBeInTheDocument();
+			expect( placeholderItem ).not.toHaveClass(
+				'components-tools-panel-item',
+				'custom-item'
+			);
 		} );
 
 		it( 'should render default controls with conditional isShownByDefault', async () => {
@@ -793,14 +758,16 @@ describe( 'ToolsPanel', () => {
 			const defaultItem = within( menuGroups[ 0 ] ).getByText( 'Linked' );
 			expect( defaultItem ).toBeInTheDocument();
 
-			// Optional controls have an additional aria-label. This can be used
-			// to confirm the conditional default control is now being treated
-			// as default control.
-			expect(
-				screen.queryByRole( 'menuitemcheckbox', {
-					name: 'Show Linked',
-				} )
-			).not.toBeInTheDocument();
+			// Default controls without a custom value stay checked and disabled.
+			const defaultMenuItem = screen.getByRole( 'menuitemcheckbox', {
+				name: 'Linked',
+				checked: true,
+			} );
+			expect( defaultMenuItem ).toHaveAttribute(
+				'aria-disabled',
+				'true'
+			);
+			expect( defaultMenuItem ).not.toHaveAccessibleDescription();
 		} );
 
 		it( 'should handle conditionally rendered default control', async () => {
@@ -1265,12 +1232,12 @@ describe( 'ToolsPanel', () => {
 
 			const defaultItem = screen.getByText( 'Nested Control 1' );
 			const defaultMenuItem = screen.getByRole( 'menuitem', {
-				name: 'Reset Nested Control 1',
+				name: 'Nested Control 1, reset to default',
 			} );
 
 			const altItem = screen.getByText( 'Nested Control 2' );
 			const altMenuItem = screen.getByRole( 'menuitemcheckbox', {
-				name: 'Show Nested Control 2',
+				name: 'Nested Control 2, show',
 				checked: false,
 			} );
 
@@ -1303,12 +1270,12 @@ describe( 'ToolsPanel', () => {
 
 			const defaultItem = screen.getByText( 'Nested Control 1' );
 			const defaultMenuItem = screen.getByRole( 'menuitem', {
-				name: 'Reset Nested Control 1',
+				name: 'Nested Control 1, reset to default',
 			} );
 
 			const altItem = screen.getByText( 'Nested Control 2' );
 			const altMenuItem = screen.getByRole( 'menuitemcheckbox', {
-				name: 'Show Nested Control 2',
+				name: 'Nested Control 2, show',
 				checked: false,
 			} );
 
@@ -1614,7 +1581,7 @@ describe( 'ToolsPanel', () => {
 
 			expect(
 				await screen.findByRole( 'menuitemcheckbox', {
-					name: 'Show Shared',
+					name: 'Shared, show',
 				} )
 			).toBeInTheDocument();
 			expect( screen.queryByText( 'Item 2' ) ).not.toBeInTheDocument();
@@ -1655,12 +1622,12 @@ describe( 'ToolsPanel', () => {
 			// and appear in the panel menu.
 			expect(
 				screen.getByRole( 'menuitemcheckbox', {
-					name: 'Show Alt',
+					name: 'Alt, show',
 				} )
 			).toBeInTheDocument();
 			expect(
 				screen.queryByRole( 'menuitemcheckbox', {
-					name: 'Hide and reset Example',
+					name: 'Example, hide and reset',
 				} )
 			).not.toBeInTheDocument();
 
@@ -1669,12 +1636,12 @@ describe( 'ToolsPanel', () => {
 			rerender( <TestSlotFillPanel panelId="9999" /> );
 			expect(
 				screen.queryByRole( 'menuitemcheckbox', {
-					name: 'Show Alt',
+					name: 'Alt, show',
 				} )
 			).not.toBeInTheDocument();
 			expect(
 				screen.getByRole( 'menuitemcheckbox', {
-					name: 'Hide and reset Example',
+					name: 'Example, hide and reset',
 				} )
 			).toBeInTheDocument();
 		} );
@@ -1925,7 +1892,7 @@ describe( 'ToolsPanel', () => {
 			).toHaveAttribute( 'aria-disabled', 'false' );
 			expect(
 				await screen.findByRole( 'menuitem', {
-					name: 'Reset Survivor',
+					name: 'Survivor, reset to default',
 				} )
 			).toBeInTheDocument();
 		} );

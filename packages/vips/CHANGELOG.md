@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 4.3.0 (2026-10-07)
+
+## 4.2.0 (2026-09-23)
+
+## 4.1.0 (2026-09-10)
+
 ### Bug Fixes
 
 -   Keep indexed (palette) PNGs indexed when resizing, compressing, converting, or rotating them, instead of re-encoding them as truecolour, which made sub-sizes several times larger than the original. The image quality setting is not applied to the resulting palette, since PNG output stays lossless. Reported against core as https://core.trac.wordpress.org/ticket/65922 ([#81895](https://github.com/WordPress/gutenberg/issues/81895)).

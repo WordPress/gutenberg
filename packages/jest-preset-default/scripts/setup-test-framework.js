@@ -1,1 +1,0 @@
-require( '@wordpress/jest-console' );

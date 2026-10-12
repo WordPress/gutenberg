@@ -22,19 +22,13 @@ const excerptField: Field< BasePost > = {
 		</ExternalLink>
 	),
 	render: ( { item } ) => {
-		let excerpt;
-		if ( typeof item.excerpt === 'string' ) {
-			excerpt = !! item.excerpt
-				? decodeEntities( item.excerpt )
-				: __( 'Add an excerpt' );
-		} else {
-			excerpt = decodeEntities( item.excerpt?.raw || '' );
-		}
-		return (
+		const excerpt =
+			typeof item.excerpt === 'string' ? item.excerpt : item.excerpt?.raw;
+		return excerpt ? (
 			<WCText align="left" numberOfLines={ 3 } truncate>
-				{ excerpt }
+				{ decodeEntities( excerpt ) }
 			</WCText>
-		);
+		) : null;
 	},
 	Edit: {
 		control: 'textarea',

@@ -279,7 +279,7 @@ export const usePostTypeMenuItems = (
 							_x( '%1$s (%2$s)', 'post type menu label' ),
 							labels.template_name,
 							slug
-					  )
+						)
 					: sprintf(
 							// translators: 1: Name of the post type e.g: "Post". 2: Slug of the post type e.g: "book".
 							_x(
@@ -288,13 +288,13 @@ export const usePostTypeMenuItems = (
 							),
 							labels.singular_name,
 							slug
-					  );
+						);
 			}
 			const menuItem = defaultTemplateType
 				? {
 						...defaultTemplateType,
 						templatePrefix: templatePrefixes[ slug ],
-				  }
+					}
 				: {
 						slug: generalTemplateSlug,
 						title: menuItemTitle,
@@ -312,7 +312,7 @@ export const usePostTypeMenuItems = (
 								? icon.slice( 10 )
 								: post,
 						templatePrefix: templatePrefixes[ slug ],
-				  };
+					};
 			const hasEntities = postTypesInfo?.[ slug ]?.hasEntities;
 			// We have a different template creation flow only if they have entities.
 			if ( hasEntities ) {
@@ -449,19 +449,19 @@ export const useTaxonomiesMenuItems = (
 							_x( '%1$s (%2$s)', 'taxonomy template menu label' ),
 							labels.template_name,
 							slug
-					  )
+						)
 					: sprintf(
 							// translators: 1: Name of the taxonomy e.g: "Category". 2: Slug of the taxonomy e.g: "product_cat".
 							_x( '%1$s (%2$s)', 'taxonomy menu label' ),
 							labels.singular_name,
 							slug
-					  );
+						);
 			}
 			const menuItem = defaultTemplateType
 				? {
 						...defaultTemplateType,
 						templatePrefix: templatePrefixes[ slug ],
-				  }
+					}
 				: {
 						slug: generalTemplateSlug,
 						title: menuItemTitle,
@@ -472,7 +472,7 @@ export const useTaxonomiesMenuItems = (
 						),
 						icon: blockMeta,
 						templatePrefix: templatePrefixes[ slug ],
-				  };
+					};
 			const hasEntities = taxonomiesInfo?.[ slug ]?.hasEntities;
 			// We have a different template creation flow only if they have entities.
 			if ( hasEntities ) {

@@ -32,6 +32,15 @@ export default ( props ) => ( element ) => {
 	const { defaultView } = ownerDocument;
 
 	let isComposing = false;
+	let isPointerDown = false;
+
+	function onPointerDown() {
+		isPointerDown = true;
+	}
+
+	function onPointerUp() {
+		isPointerDown = false;
+	}
 
 	function onInput( event ) {
 		// Do not trigger a change if characters are being composed. Browsers
@@ -259,9 +268,6 @@ export default ( props ) => ( element ) => {
 					selection.collapse( element, 0 );
 				}
 			}
-			// The caret placed after this focus must still be synchronized
-			// in this task (see below).
-			window.queueMicrotask( handleSelectionChange );
 			return;
 		}
 
@@ -280,9 +286,11 @@ export default ( props ) => ( element ) => {
 			// The record no longer reflects the selection, so a matching
 			// snapshot must not skip synchronization.
 			selectionSnapshot = undefined;
-		} else {
+		} else if ( ! isPointerDown ) {
 			// The document's selection may have moved elsewhere while the
-			// element was blurred, so restore it from the record.
+			// element was blurred, so restore it from the record. A pointer
+			// press places the caret itself; a selection set during the
+			// press would replace it.
 			applyRecord( record.current );
 		}
 
@@ -319,6 +327,21 @@ export default ( props ) => ( element ) => {
 		element,
 		'focusin',
 		onFocus
+	);
+	const unsubscribePointerDown = subscribeDelegatedListener(
+		element,
+		'pointerdown',
+		onPointerDown
+	);
+	const unsubscribePointerUp = subscribeDelegatedListener(
+		defaultView,
+		'pointerup',
+		onPointerUp
+	);
+	const unsubscribePointerCancel = subscribeDelegatedListener(
+		defaultView,
+		'pointercancel',
+		onPointerUp
 	);
 	// Permanently subscribed rather than added on focus and removed on blur:
 	// `handleSelectionChange` checks whether the element is focused itself,
@@ -359,6 +382,9 @@ export default ( props ) => ( element ) => {
 		unsubscribeCompositionStart();
 		unsubscribeCompositionEnd();
 		unsubscribeFocus();
+		unsubscribePointerDown();
+		unsubscribePointerUp();
+		unsubscribePointerCancel();
 		unsubscribeSelectionChange();
 		unsubscribeEnsureSelectionSync.forEach( ( unsubscribe ) =>
 			unsubscribe()

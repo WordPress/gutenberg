@@ -18,39 +18,3 @@ exports[`FormToggle > basic rendering > should render a span element with an unc
   </span>
 </div>
 `;
-
-exports[`FormToggle > basic rendering > should render an id prop for the input checkbox 1`] = `
-Snapshot Diff:
-- First value
-+ Second value
-
-@@ -2,10 +2,11 @@
-    <span
-      class="components-form-toggle"
-    >
-      <input
-        class="components-form-toggle__input"
-+       id="test"
-        type="checkbox"
-      />
-      <span
-        class="components-form-toggle__track"
-      />
-`;
-
-exports[`FormToggle > basic rendering > should render with an additional className 1`] = `
-Snapshot Diff:
-- First value
-+ Second value
-
-@@ -1,8 +1,8 @@
-  <div>
-    <span
--     class="components-form-toggle"
-+     class="components-form-toggle testing"
-    >
-      <input
-        class="components-form-toggle__input"
-        type="checkbox"
-      />
-`;

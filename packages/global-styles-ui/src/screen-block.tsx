@@ -346,13 +346,13 @@ function ScreenBlock( {
 					right: border,
 					bottom: border,
 					left: border,
-			  }
+				}
 			: {
 					color: null,
 					style: null,
 					width: null,
 					...border,
-			  };
+				};
 
 		setStyle( { ...newStyle, border: { ...updatedBorder, radius } } );
 	};

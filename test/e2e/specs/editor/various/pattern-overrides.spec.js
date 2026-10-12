@@ -154,14 +154,8 @@ test.describe( 'Pattern Overrides', () => {
 			} );
 			// Ensure the first pattern is selected.
 			await patternBlocks.first().selectText();
-			await expect( paragraphs.first() ).not.toHaveAttribute(
-				'inert',
-				'true'
-			);
-			await expect( paragraphs.last() ).toHaveAttribute(
-				'inert',
-				'true'
-			);
+			await expect( paragraphs.first() ).not.toHaveAttribute( 'inert' );
+			await expect( paragraphs.last() ).toHaveAttribute( 'inert' );
 
 			await expect( paragraphs.first() ).toHaveText(
 				'This paragraph can be edited'
@@ -397,6 +391,48 @@ test.describe( 'Pattern Overrides', () => {
 		} );
 	} );
 
+	test( 'the parent block selector of a block with overrides selects the pattern', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const { id } = await requestUtils.createBlock( {
+			title: 'Test Pattern',
+			content: `<!-- wp:paragraph {"metadata":{"name":"Editable Paragraph","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
+<p>Editable paragraph</p>
+<!-- /wp:paragraph -->`,
+			status: 'publish',
+		} );
+
+		await admin.createNewPost();
+
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: id },
+		} );
+
+		const patternBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Pattern',
+		} );
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+			includeHidden: true,
+		} );
+
+		await editor.selectBlocks( paragraph );
+		await editor.showBlockToolbar();
+
+		const parentSelector = page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Select parent block' } );
+		await expect( parentSelector ).toBeVisible();
+
+		await parentSelector.click();
+
+		await expect( patternBlock ).toHaveClass( /is-selected/ );
+	} );
+
 	test.describe( 'block editing modes', () => {
 		test( 'blocks with bindings in a synced pattern are editable, and all other blocks are disabled', async ( {
 			admin,
@@ -498,26 +534,16 @@ test.describe( 'Pattern Overrides', () => {
 
 				// In zoomed out only the pattern block is editable,
 				// as in this scenario it's a section.
-				await expect( patternBlock ).not.toHaveAttribute(
-					'inert',
-					'true'
-				);
+				await expect( patternBlock ).not.toHaveAttribute( 'inert' );
 
 				// Ensure the pattern block is selected before checking the child blocks
 				// to ensure the click-through behavior isn't interfering.
 				await editor.selectBlocks( patternBlock );
 
-				await expect( blockWithOverrides ).toHaveAttribute(
-					'inert',
-					'true'
-				);
-				await expect( blockWithBindings ).toHaveAttribute(
-					'inert',
-					'true'
-				);
+				await expect( blockWithOverrides ).toHaveAttribute( 'inert' );
+				await expect( blockWithBindings ).toHaveAttribute( 'inert' );
 				await expect( blockWithoutOverridesOrBindings ).toHaveAttribute(
-					'inert',
-					'true'
+					'inert'
 				);
 			} );
 
@@ -528,17 +554,10 @@ test.describe( 'Pattern Overrides', () => {
 
 			await test.step( 'Zoomed out - pattern nested in a section', async () => {
 				// None of the pattern is editable in zoomed out when nested in a section.
-				await expect( blockWithOverrides ).toHaveAttribute(
-					'inert',
-					'true'
-				);
-				await expect( blockWithBindings ).toHaveAttribute(
-					'inert',
-					'true'
-				);
+				await expect( blockWithOverrides ).toHaveAttribute( 'inert' );
+				await expect( blockWithBindings ).toHaveAttribute( 'inert' );
 				await expect( blockWithoutOverridesOrBindings ).toHaveAttribute(
-					'inert',
-					'true'
+					'inert'
 				);
 			} );
 		} );
@@ -750,6 +769,7 @@ test.describe( 'Pattern Overrides', () => {
 		requestUtils,
 		editor,
 		context,
+		pageUtils,
 	} ) => {
 		const buttonName = 'Editable button';
 		const { id } = await requestUtils.createBlock( {
@@ -769,11 +789,12 @@ test.describe( 'Pattern Overrides', () => {
 			attributes: { ref: id },
 		} );
 
-		// Focus the button, open the link popup.
-		await editor.canvas
+		const button = editor.canvas
 			.getByRole( 'document', { name: 'Block: Button' } )
-			.getByRole( 'textbox', { name: 'Button text' } )
-			.focus();
+			.getByRole( 'textbox', { name: 'Button text' } );
+		// Focus the button, open the link popup.
+		await button.focus();
+		await pageUtils.pressKeys( 'primary+k' );
 		await expect(
 			page.getByRole( 'link', { name: 'wp.org' } ).getByText( '↗' )
 		).toHaveAttribute( 'aria-label', '(opens in a new tab)' );
@@ -822,6 +843,10 @@ test.describe( 'Pattern Overrides', () => {
 		await expect( buttonLink ).toHaveAttribute( 'target', '_blank' );
 		await expect( buttonLink ).toHaveAttribute( 'rel', 'noopener' );
 
+		// Reopen the link popup.
+		await button.focus();
+		await pageUtils.pressKeys( 'primary+k' );
+
 		// Uncheck both checkboxes.
 		await editLinkButton.click();
 		await openInNewTabCheckbox.setChecked( false );
@@ -837,6 +862,10 @@ test.describe( 'Pattern Overrides', () => {
 		await previewPage.reload();
 		await expect( buttonLink ).toHaveAttribute( 'target', '' );
 		await expect( buttonLink ).toHaveAttribute( 'rel', '' );
+
+		// Reopen the link popup.
+		await button.focus();
+		await pageUtils.pressKeys( 'primary+k' );
 
 		// Check only the "mark as nofollow" checkbox.
 		await editLinkButton.click();

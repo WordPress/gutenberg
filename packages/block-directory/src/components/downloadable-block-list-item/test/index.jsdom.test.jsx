@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Composite } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -21,38 +21,41 @@ function renderItem( props ) {
 }
 
 describe( 'DownloadableBlockListItem', () => {
-	it( 'should render a block item', () => {
+	it( 'should render a block item', async () => {
 		useSelect.mockImplementation( () => ( {
 			isInstalling: false,
 			isInstallable: true,
 		} ) );
 
 		renderItem( { onClick: vi.fn(), item: plugin } );
+		await waitFor( () =>
+			expect( screen.getByRole( 'option' ) ).toBeVisible()
+		);
 		const author = screen.queryByText( `by ${ plugin.author }` );
 		const description = screen.queryByText( plugin.description );
 		expect( author ).toBeInTheDocument();
 		expect( description ).toBeInTheDocument();
 	} );
 
-	it( 'should show installing status when installing the block', () => {
+	it( 'should show installing status when installing the block', async () => {
 		useSelect.mockImplementation( () => ( {
 			isInstalling: true,
 			isInstallable: true,
 		} ) );
 
 		renderItem( { onClick: vi.fn(), item: plugin } );
-		const statusLabel = screen.queryByText( 'Installing…' );
+		const statusLabel = await screen.findByText( 'Installing…' );
 		expect( statusLabel ).toBeInTheDocument();
 	} );
 
-	it( "should be disabled when a plugin can't be installed", () => {
+	it( "should be disabled when a plugin can't be installed", async () => {
 		useSelect.mockImplementation( () => ( {
 			isInstalling: false,
 			isInstallable: false,
 		} ) );
 
 		renderItem( { onClick: vi.fn(), item: plugin } );
-		const button = screen.getByRole( 'option' );
+		const button = await screen.findByRole( 'option' );
 		// Keeping it false to avoid focus loss and disable it using aria-disabled.
 		expect( button ).toBeEnabled();
 		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );

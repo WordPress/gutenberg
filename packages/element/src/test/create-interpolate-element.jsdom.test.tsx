@@ -284,7 +284,7 @@ describe( 'createInterpolateElement', () => {
 		const tags: Tags[] = [ 'Name', 'Link' ];
 		expect( tags ).toHaveLength( 2 );
 	} );
-	it( 'handles parsing emojii correctly', () => {
+	it( 'handles parsing emoji correctly', () => {
 		const testString = '👳‍♀️<icon>🚨🤷‍♂️⛈️fully</icon> here';
 		const expectedElement = createElement(
 			Fragment,

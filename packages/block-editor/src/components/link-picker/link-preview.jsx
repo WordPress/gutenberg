@@ -3,13 +3,10 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	FlexItem,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { Icon, chevronDown } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { unlock } from '../../lock-unlock';
-
-const { Badge: WCBadge } = unlock( componentsPrivateApis );
+import { Badge } from '@wordpress/ui';
 
 /**
  * Link preview component that displays the current link information.
@@ -60,12 +57,12 @@ export function LinkPreview( { title, url, image, badges } ) {
 								alignment="left"
 							>
 								{ badges.map( ( badge ) => (
-									<WCBadge
+									<Badge
 										key={ `${ badge.label }|${ badge.intent }` }
 										intent={ badge.intent }
 									>
 										{ badge.label }
-									</WCBadge>
+									</Badge>
 								) ) }
 							</HStack>
 						) }

@@ -12,21 +12,19 @@ export type PositionerProps = ComponentProps< typeof _Menu.Positioner >;
 
 // Keep the menu vertical, expose Escape bubbling only on SubmenuRoot, and omit
 // Base UI's detached-trigger handle and payload-rendering API.
-export interface RootProps
-	extends Pick<
-		_Menu.Root.Props,
-		| 'open'
-		| 'onOpenChange'
-		| 'onOpenChangeComplete'
-		| 'defaultOpen'
-		| 'modal'
-		| 'loopFocus'
-		| 'highlightItemOnHover'
-		| 'disabled'
-		| 'actionsRef'
-		| 'triggerId'
-		| 'defaultTriggerId'
-	> {
+export interface RootProps extends Pick<
+	_Menu.Root.Props,
+	| 'open'
+	| 'onOpenChange'
+	| 'onOpenChangeComplete'
+	| 'defaultOpen'
+	| 'modal'
+	| 'loopFocus'
+	| 'highlightItemOnHover'
+	| 'actionsRef'
+	| 'triggerId'
+	| 'defaultTriggerId'
+> {
 	/**
 	 * The menu subcomponents (`Menu.Trigger`, `Menu.Popup`, etc.).
 	 */
@@ -47,19 +45,17 @@ export type TriggerProps = Omit<
 
 // Keep submenus vertical; horizontal orientation is not supported by the
 // styled Menu layout.
-export interface SubmenuRootProps
-	extends Pick<
-		_Menu.SubmenuRoot.Props,
-		| 'open'
-		| 'onOpenChange'
-		| 'onOpenChangeComplete'
-		| 'defaultOpen'
-		| 'loopFocus'
-		| 'highlightItemOnHover'
-		| 'disabled'
-		| 'closeParentOnEsc'
-		| 'actionsRef'
-	> {
+export interface SubmenuRootProps extends Pick<
+	_Menu.SubmenuRoot.Props,
+	| 'open'
+	| 'onOpenChange'
+	| 'onOpenChangeComplete'
+	| 'defaultOpen'
+	| 'loopFocus'
+	| 'highlightItemOnHover'
+	| 'closeParentOnEsc'
+	| 'actionsRef'
+> {
 	/**
 	 * The submenu subcomponents (`Menu.SubmenuTrigger`, `Menu.Popup`, etc.).
 	 */
@@ -115,8 +111,14 @@ export interface PopupProps extends ComponentProps< typeof _Menu.Popup > {
 
 export interface MenuItemLayoutProps {
 	/**
-	 * Presentational content displayed before the item label.
-	 * Use `Menu.PrefixIcon` for an icon aligned with the label.
+	 * Presentational content before the item label. Use `Menu.PrefixIcon` for
+	 * icons that help users recognize actions or give a key action useful
+	 * prominence.
+	 *
+	 * Prefer icons on every item in a group, or none. If only one item needs an
+	 * icon, reconsider its grouping. Prefer omitting it over adding unnecessary
+	 * icons to the other items. Mixed icon usage is supported. Avoid combining
+	 * a prefix icon and a description in the same item.
 	 */
 	prefix?: ReactNode;
 
@@ -138,16 +140,18 @@ export interface MenuItemLayoutProps {
 export interface ItemLabelProps extends ComponentProps< 'span' > {
 	/**
 	 * The primary label for a menu item. Use as the first direct child of every
-	 * menu item.
+	 * menu item. Keep labels short, clear, and understandable on their own.
 	 */
 	children: ReactNode;
 }
 
 export interface ItemDescriptionProps extends ComponentProps< 'span' > {
 	/**
-	 * Supplementary content displayed below a menu item label. Use as a direct
-	 * child after `Menu.ItemLabel`. Content should be text or non-interactive
-	 * inline markup.
+	 * Supporting text below a menu item label. Use as a direct child after
+	 * `Menu.ItemLabel`. Content should be text or non-interactive inline markup.
+	 * Keep descriptions brief and use them only for essential context the label
+	 * cannot convey. Avoid combining a description and a prefix icon in the
+	 * same item.
 	 */
 	children: ReactNode;
 }
@@ -157,10 +161,7 @@ type MenuItemChildren =
 	| [
 			ReactElement< ItemLabelProps >,
 			...(
-				| ReactElement< ItemDescriptionProps >
-				| false
-				| null
-				| undefined
+				ReactElement< ItemDescriptionProps > | false | null | undefined
 			)[],
 	  ];
 

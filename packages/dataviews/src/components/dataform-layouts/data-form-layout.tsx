@@ -68,8 +68,9 @@ export function DataFormLayout< Item >( {
 	return (
 		<Wrapper layout={ form.layout }>
 			{ form.fields.map( ( formField ) => {
-				const FieldLayout = getFormFieldLayout( formField.layout.type )
-					?.component;
+				const FieldLayout = getFormFieldLayout(
+					formField.layout.type
+				)?.component;
 
 				if ( ! FieldLayout ) {
 					return null;

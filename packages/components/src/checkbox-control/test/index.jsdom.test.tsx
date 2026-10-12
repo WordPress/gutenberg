@@ -65,17 +65,24 @@ describe( 'CheckboxControl', () => {
 		} );
 
 		it( 'should render the indeterminate icon when in the indeterminate state', () => {
-			const { container: containerDefault } = render(
-				<CheckboxControl />
+			const id = 'checkbox-control';
+			const { asFragment, rerender } = render(
+				<BaseCheckboxControl id={ id } onChange={ noop } />
 			);
+			const checkboxDefault = asFragment();
 
-			const { container: containerIndeterminate } = render(
-				<CheckboxControl indeterminate />
+			rerender(
+				<BaseCheckboxControl
+					id={ id }
+					onChange={ noop }
+					indeterminate
+				/>
 			);
+			const checkboxIndeterminate = asFragment();
 
 			// Expect the diff snapshot to be mostly about the indeterminate icon
-			expect( containerDefault ).toMatchDiffSnapshot(
-				containerIndeterminate
+			expect( checkboxDefault ).toMatchDiffSnapshot(
+				checkboxIndeterminate
 			);
 		} );
 

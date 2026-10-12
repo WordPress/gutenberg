@@ -1,3 +1,4 @@
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import {
 	cropperReducer,
 	areCropperStatesEqual,
@@ -64,6 +65,7 @@ export function mediaEditorReducer(
 				payload: newCropRect,
 			} );
 			return {
+				...state,
 				cropper: nextCropper,
 				cropOptions: nextCropOptions,
 			};
@@ -79,6 +81,21 @@ export function mediaEditorReducer(
 				...state,
 				cropOptions: { ...DEFAULT_CROP_OPTIONS },
 			};
+		}
+		case 'SET_EDIT': {
+			const { name, value } = action.payload;
+			if ( value === undefined ) {
+				if ( ! Object.hasOwn( state.edits, name ) ) {
+					return state;
+				}
+				const edits = { ...state.edits };
+				delete edits[ name ];
+				return { ...state, edits };
+			}
+			if ( fastDeepEqual( state.edits[ name ], value ) ) {
+				return state;
+			}
+			return { ...state, edits: { ...state.edits, [ name ]: value } };
 		}
 		case 'RESTORE_SNAPSHOT':
 			return action.payload;
@@ -112,23 +129,24 @@ export function areMediaEditorStatesEqual(
 	}
 	return (
 		areCropperStatesEqual( a.cropper, b.cropper ) &&
-		a.cropOptions.aspectRatioValue === b.cropOptions.aspectRatioValue
+		a.cropOptions.aspectRatioValue === b.cropOptions.aspectRatioValue &&
+		fastDeepEqual( a.edits, b.edits )
 	);
 }
 
 /**
- * Build the initial composite state from optional partial overrides.
+ * Build the composite state a session starts from: the given cropper
+ * slice, default crop options, and no edits.
  *
- * @param initialCropper Initial cropper-slice fields to merge.
- * @param initialOptions Initial cropOptions-slice fields to merge.
+ * @param cropper The cropper slice.
  * @return Composite initial state.
  */
 export function buildInitialMediaEditorState(
-	initialCropper: CropperState,
-	initialOptions?: Partial< CropOptionsSlice >
+	cropper: CropperState
 ): MediaEditorState {
 	return {
-		cropper: initialCropper,
-		cropOptions: { ...DEFAULT_CROP_OPTIONS, ...initialOptions },
+		cropper,
+		cropOptions: { ...DEFAULT_CROP_OPTIONS },
+		edits: {},
 	};
 }

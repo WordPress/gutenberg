@@ -4,6 +4,7 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { desktop, mobile, tablet } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { useEffect, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { ActionItem, store as interfaceStore } from '@wordpress/interface';
@@ -12,8 +13,8 @@ import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Menu } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
-import MoreMenuGroup from '../more-menu/more-menu-group';
 import MoreMenuItem from '../more-menu/more-menu-item';
+import { toMenuItems } from '../more-menu/more-menu-submenu';
 import { PostPreviewMenuItem } from '../post-preview-button';
 import { sidebars } from '../sidebar/constants';
 import { VIEWPORT_STATE_BY_DEVICE_TYPE } from '../../utils/device-type';
@@ -22,6 +23,13 @@ import { unlock } from '../../lock-unlock';
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 function PreviewMenu( { forceIsAutosaveable, disabled } ) {
+	const menuActionsRef = useRef( null );
+	useEffect( () => {
+		if ( disabled ) {
+			menuActionsRef.current?.close();
+		}
+	}, [ disabled ] );
+
 	const {
 		deviceType,
 		homeUrl,
@@ -31,6 +39,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 		isViewable,
 		showIconLabels,
 		isTemplateHidden,
+		hasRenderingMode,
 		templateId,
 		isResponsiveEditing,
 		isResponsiveEditingEnabled,
@@ -64,6 +73,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 			isViewable: getPostType( _currentPostType )?.viewable ?? false,
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isTemplateHidden: getRenderingMode() === 'post-only',
+			hasRenderingMode: !! getEditorSettings().renderingMode,
 			templateId: getCurrentTemplateId(),
 			isResponsiveEditing: _isResponsiveEditing(),
 			isResponsiveEditingEnabled:
@@ -89,7 +99,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 		setResponsiveEditing( newIsResponsiveEditing );
 		setStyleStateViewport(
 			newIsResponsiveEditing
-				? VIEWPORT_STATE_BY_DEVICE_TYPE[ deviceType ] ?? 'default'
+				? ( VIEWPORT_STATE_BY_DEVICE_TYPE[ deviceType ] ?? 'default' )
 				: 'default'
 		);
 		// Only auto-open the block inspector when enabling responsive styles
@@ -133,7 +143,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 							? __( 'Style tablet only.' )
 							: __( 'Preview tablet viewport.' ),
 					},
-			  ]
+				]
 			: [] ),
 		...( hasMobileViewport
 			? [
@@ -144,13 +154,14 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 							? __( 'Style mobile only.' )
 							: __( 'Preview mobile viewport.' ),
 					},
-			  ]
+				]
 			: [] ),
 	];
 
 	return (
-		<Menu.Root modal={ false } disabled={ disabled }>
+		<Menu.Root modal={ false } actionsRef={ menuActionsRef }>
 			<Menu.Trigger
+				disabled={ disabled }
 				render={
 					<Button
 						className={ clsx( 'editor-preview-dropdown__toggle', {
@@ -160,7 +171,6 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 						icon={ deviceIcons[ deviceType.toLowerCase() ] }
 						label={ __( 'View' ) }
 						showTooltip={ ! showIconLabels }
-						disabled={ disabled }
 						accessibleWhenDisabled={ disabled }
 					/>
 				}
@@ -175,21 +185,17 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 						handleDevicePreviewChange( value )
 					}
 				>
-					<Menu.Group>
-						{ choices.map( ( choice ) => (
-							<Menu.RadioItem
-								key={ choice.value }
-								value={ choice.value }
-							>
-								<Menu.ItemLabel>
-									{ choice.label }
-								</Menu.ItemLabel>
-								<Menu.ItemDescription>
-									{ choice.info }
-								</Menu.ItemDescription>
-							</Menu.RadioItem>
-						) ) }
-					</Menu.Group>
+					{ choices.map( ( choice ) => (
+						<Menu.RadioItem
+							key={ choice.value }
+							value={ choice.value }
+						>
+							<Menu.ItemLabel>{ choice.label }</Menu.ItemLabel>
+							<Menu.ItemDescription>
+								{ choice.info }
+							</Menu.ItemDescription>
+						</Menu.RadioItem>
+					) ) }
 				</Menu.RadioGroup>
 				{ isResponsiveEditingEnabled && (
 					<>
@@ -229,7 +235,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 						</Menu.Group>
 					</>
 				) }
-				{ ! isTemplate && !! templateId && (
+				{ ! isTemplate && !! templateId && ! hasRenderingMode && (
 					<>
 						<Menu.Separator />
 						<Menu.Group>
@@ -265,7 +271,12 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 					name="core/plugin-preview-menu"
 					fillProps={ { as: MoreMenuItem } }
 				>
-					{ ( items ) => <MoreMenuGroup>{ items }</MoreMenuGroup> }
+					{ ( items ) => (
+						<>
+							<Menu.Separator />
+							<Menu.Group>{ toMenuItems( items ) }</Menu.Group>
+						</>
+					) }
 				</ActionItem.Slot>
 			</Menu.Popup>
 		</Menu.Root>

@@ -142,7 +142,7 @@ export default function TemplatePartEdit( {
 				? hasFinishedResolution(
 						'getEditedEntityRecord',
 						getEntityArgs
-				  )
+					)
 				: false;
 
 			const _canUserEdit = hasResolvedEntity
@@ -150,7 +150,7 @@ export default function TemplatePartEdit( {
 						kind: 'postType',
 						name: 'wp_template_part',
 						id: templatePartId,
-				  } )
+					} )
 				: false;
 
 			return {

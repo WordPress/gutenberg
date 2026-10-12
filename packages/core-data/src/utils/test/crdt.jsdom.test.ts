@@ -58,7 +58,7 @@ vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => {
 					},
 				},
 			},
-		] ) as unknown as typeof import('@wordpress/blocks').getBlockTypes,
+		] ) as unknown as typeof import( '@wordpress/blocks' ).getBlockTypes,
 		// Mocked so tests can control what the Code Editor sync path "parses"
 		// from raw content without needing real block-type registration.
 		parse: vi.fn( () => [] ),

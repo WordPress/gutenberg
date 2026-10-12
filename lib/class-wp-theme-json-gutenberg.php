@@ -125,6 +125,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.2.0 Added 'shadow' presets.
 	 * @since 6.6.0 Updated the 'prevent_override' value for font size presets to use 'typography.defaultFontSizes' and spacing size presets to use `spacing.defaultSpacingSizes`.
 	 * @since 6.6.0 Added `aspectRatios`.
+	 * @since 7.2.0 Added 'textShadow' presets.
 	 * @var array
 	 */
 	const PRESETS_METADATA = array(
@@ -185,6 +186,15 @@ class WP_Theme_JSON_Gutenberg {
 			'css_vars'          => '--wp--preset--font-family--$slug',
 			'classes'           => array( '.has-$slug-font-family' => 'font-family' ),
 			'properties'        => array( 'font-family' ),
+		),
+		array(
+			'path'              => array( 'typography', 'textShadowPresets' ),
+			'prevent_override'  => array( 'typography', 'defaultTextShadowPresets' ),
+			'use_default_names' => false,
+			'value_key'         => 'textShadow',
+			'css_vars'          => '--wp--preset--text-shadow--$slug',
+			'classes'           => array( '.has-$slug-text-shadow' => 'text-shadow' ),
+			'properties'        => array( 'text-shadow' ),
 		),
 		array(
 			'path'              => array( 'spacing', 'spacingSizes' ),
@@ -255,6 +265,7 @@ class WP_Theme_JSON_Gutenberg {
 		'background-repeat'                 => array( 'background', 'backgroundRepeat' ),
 		'background-size'                   => array( 'background', 'backgroundSize' ),
 		'background-attachment'             => array( 'background', 'backgroundAttachment' ),
+		'background-clip'                   => array( 'background', 'backgroundClip' ),
 		'border-radius'                     => array( 'border', 'radius' ),
 		'border-top-left-radius'            => array( 'border', 'radius', 'topLeft' ),
 		'border-top-right-radius'           => array( 'border', 'radius', 'topRight' ),
@@ -393,12 +404,15 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`, and
 	 *              `typography.textIndent` properties.
 	 * @since 7.1.0 Added `viewport` property.
+	 * @since 7.2.0 Added `typography.textShadow`, `typography.textShadowPresets`,
+	 *              and `typography.defaultTextShadowPresets`.
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
 		'appearanceTools'               => null,
 		'useRootPaddingAwareAlignments' => null,
 		'background'                    => array(
+			'backgroundClip'  => null,
 			'backgroundImage' => null,
 			'backgroundSize'  => null,
 			'gradient'        => null,
@@ -470,22 +484,25 @@ class WP_Theme_JSON_Gutenberg {
 			'defaultPresets' => null,
 		),
 		'typography'                    => array(
-			'fluid'            => null,
-			'customFontSize'   => null,
-			'defaultFontSizes' => null,
-			'dropCap'          => null,
-			'fontFamilies'     => null,
-			'fontSizes'        => null,
-			'fontStyle'        => null,
-			'fontWeight'       => null,
-			'letterSpacing'    => null,
-			'lineHeight'       => null,
-			'textAlign'        => null,
-			'textColumns'      => null,
-			'textDecoration'   => null,
-			'textIndent'       => null,
-			'textTransform'    => null,
-			'writingMode'      => null,
+			'fluid'                    => null,
+			'customFontSize'           => null,
+			'defaultFontSizes'         => null,
+			'dropCap'                  => null,
+			'fontFamilies'             => null,
+			'fontSizes'                => null,
+			'fontStyle'                => null,
+			'fontWeight'               => null,
+			'letterSpacing'            => null,
+			'lineHeight'               => null,
+			'textAlign'                => null,
+			'textColumns'              => null,
+			'textDecoration'           => null,
+			'textIndent'               => null,
+			'textTransform'            => null,
+			'textShadow'               => null,
+			'defaultTextShadowPresets' => null,
+			'textShadowPresets'        => null,
+			'writingMode'              => null,
 		),
 		'viewport'                      => array(
 			'mobile' => null,
@@ -537,6 +554,7 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	const VALID_STYLES = array(
 		'background' => array(
+			'backgroundClip'       => null,
 			'backgroundImage'      => null,
 			'backgroundAttachment' => null,
 			'backgroundPosition'   => null,
@@ -652,7 +670,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 7.1.0
 	 *
 	 * @param mixed $viewport_settings Viewport settings from theme.json.
-	 * @param array      $options           {
+	 * @param array $options           {
 	 *     Optional. Options for generating media queries.
 	 *
 	 *     @type bool $include_desktop Whether to include the desktop media query. Default false.
@@ -917,11 +935,13 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Processes pseudo-selectors for any node (block or variation).
 	 *
-	 * @param array  $node The node data (block or variation).
-	 * @param string $base_selector The base selector.
-	 * @param array  $settings The theme settings.
-	 * @param string $block_name The block name.
-	 * @param array|null $block_metadata Metadata about the block to get styles for.
+	 * @since 7.0.0
+	 *
+	 * @param array      $node            The node data (block or variation).
+	 * @param string     $base_selector   The base selector.
+	 * @param array      $settings        The theme settings.
+	 * @param string     $block_name      The block name.
+	 * @param array|null $block_metadata  Metadata about the block to get styles for.
 	 * @param array|null $style_variation Style variation metadata.
 	 * @return array Array of pseudo-selector declarations.
 	 */
@@ -1090,7 +1110,7 @@ class WP_Theme_JSON_Gutenberg {
 		// In addition to presets, spacingScale (which generates presets) is also keyed by origin.
 		$scale_path    = array( 'settings', 'spacing', 'spacingScale' );
 		$spacing_scale = _wp_array_get( $this->theme_json, $scale_path, null );
-		if ( null !== $spacing_scale ) {
+		if ( is_array( $spacing_scale ) ) {
 			// If the spacingScale is not already keyed by origin.
 			if ( empty( array_intersect( array_keys( $spacing_scale ), static::VALID_ORIGINS ) ) ) {
 				_wp_array_set( $this->theme_json, $scale_path, array( $origin => $spacing_scale ) );
@@ -1165,7 +1185,10 @@ class WP_Theme_JSON_Gutenberg {
 			foreach ( $registered_variations as $variation_name ) {
 				$block_level_data = $new_theme_json['styles']['blocks'][ $block_type ]['variations'][ $variation_name ] ?? array();
 				$top_level_data   = $variations[ $variation_name ] ?? array();
-				$merged_data      = array_replace_recursive( $top_level_data, $block_level_data );
+				if ( ! is_array( $block_level_data ) || ! is_array( $top_level_data ) ) {
+					continue;
+				}
+				$merged_data = array_replace_recursive( $top_level_data, $block_level_data );
 				if ( ! empty( $merged_data ) ) {
 					_wp_array_set( $new_theme_json, array( 'styles', 'blocks', $block_type, 'variations', $variation_name ), $merged_data );
 				}
@@ -1231,6 +1254,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 5.8.0
 	 * @since 5.9.0 Added the `$valid_block_names` and `$valid_element_name` parameters.
 	 * @since 6.6.0 Extended schema definition to allow enhanced block style variations.
+	 * @since 7.1.1 Updated schema to allow responsive breakpoint states and pseudo-selectors
+	 *              at the top level of `styles` for block style variation partials.
 	 *
 	 * @param array $input               Structure to sanitize.
 	 * @param array $valid_block_names   List of valid block names.
@@ -1391,7 +1416,6 @@ class WP_Theme_JSON_Gutenberg {
 					foreach ( array_keys( $responsive_media_queries ) as $breakpoint_state ) {
 						$variation_schema[ $breakpoint_state ]             = $styles_non_top_level;
 						$variation_schema[ $breakpoint_state ]['elements'] = $schema_styles_elements;
-						$variation_schema[ $breakpoint_state ]['blocks']   = $schema_styles_blocks;
 
 						if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] ) ) {
 							foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] as $pseudo_selector ) {
@@ -1420,6 +1444,47 @@ class WP_Theme_JSON_Gutenberg {
 		$schema['settings']                               = static::VALID_SETTINGS;
 		$schema['settings']['blocks']                     = $schema_settings_blocks;
 		$schema['settings']['typography']['fontFamilies'] = static::schema_in_root_and_per_origin( static::FONT_FAMILY_SCHEMA );
+
+		/*
+		 * Add block style variation states to the top-level styles schema.
+		 *
+		 * Block style variations defined in a standalone JSON partial within a
+		 * theme's `styles` directory declare their styles at the root of the
+		 * `styles` object, so they are sanitized against the top-level schema.
+		 * It needs to allow the same states that are allowed for variations
+		 * declared inline in theme.json, otherwise those states are silently
+		 * removed as unknown keys.
+		 *
+		 * The `blockTypes` property is only present on block style variation
+		 * partials, so it both identifies the config as a variation and
+		 * determines which pseudo-selectors are valid for it. Regular
+		 * theme.json files are unaffected.
+		 */
+		if ( ! empty( $input['blockTypes'] ) && is_array( $input['blockTypes'] ) ) {
+			$variation_pseudo_selectors = array();
+			foreach ( $input['blockTypes'] as $variation_block_type ) {
+				if ( is_string( $variation_block_type ) && isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $variation_block_type ] ) ) {
+					$variation_pseudo_selectors = array_merge(
+						$variation_pseudo_selectors,
+						static::VALID_BLOCK_PSEUDO_SELECTORS[ $variation_block_type ]
+					);
+				}
+			}
+			$variation_pseudo_selectors = array_unique( $variation_pseudo_selectors );
+
+			foreach ( $breakpoint_states as $breakpoint_state ) {
+				$schema['styles'][ $breakpoint_state ]             = $styles_non_top_level;
+				$schema['styles'][ $breakpoint_state ]['elements'] = $schema_styles_elements;
+
+				foreach ( $variation_pseudo_selectors as $pseudo_selector ) {
+					$schema['styles'][ $breakpoint_state ][ $pseudo_selector ] = $styles_non_top_level;
+				}
+			}
+
+			foreach ( $variation_pseudo_selectors as $pseudo_selector ) {
+				$schema['styles'][ $pseudo_selector ] = $styles_non_top_level;
+			}
+		}
 
 		// Remove anything that's not present in the schema.
 		foreach ( array( 'styles', 'settings' ) as $subtree ) {
@@ -2000,7 +2065,10 @@ class WP_Theme_JSON_Gutenberg {
 		// Load the custom CSS last so it has the highest specificity.
 		if ( in_array( 'custom-css', $types, true ) ) {
 			// Add the global styles root CSS.
-			$stylesheet .= _wp_array_get( $this->theme_json, array( 'styles', 'css' ) );
+			$root_css = $this->theme_json['styles']['css'] ?? '';
+			if ( is_string( $root_css ) ) {
+				$stylesheet .= $root_css;
+			}
 		}
 
 		return $stylesheet;
@@ -2018,7 +2086,7 @@ class WP_Theme_JSON_Gutenberg {
 	public static function process_blocks_custom_css( $css, $selector ) {
 		$processed_css = '';
 
-		if ( empty( $css ) ) {
+		if ( empty( $css ) || ! is_string( $css ) ) {
 			return $processed_css;
 		}
 
@@ -2125,7 +2193,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * Returns the global styles custom CSS for a single block.
 	 * This function is deprecated; please do not sync to core.
 	 *
-	 * @param array  $css The block css node.
+	 * @param array  $css      The block css node.
 	 * @param string $selector The block selector.
 	 *
 	 * @return string The global styles custom CSS for the block.
@@ -3019,13 +3087,13 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.6.0 Passing current theme JSON settings to wp_get_typography_font_size_value(). Using style engine to correctly fetch background CSS values.
 	 * @since 6.7.0 Allow ref resolution of background properties.
 	 *
-	 * @param array   $styles Styles to process.
-	 * @param array   $settings Theme settings.
-	 * @param array   $properties Properties metadata.
-	 * @param array   $theme_json Theme JSON array.
-	 * @param string  $selector The style block selector.
+	 * @param array   $styles           Styles to process.
+	 * @param array   $settings         Theme settings.
+	 * @param array   $properties       Properties metadata.
+	 * @param array   $theme_json       Theme JSON array.
+	 * @param string  $selector         The style block selector.
 	 * @param boolean $use_root_padding Whether to add custom properties at root level.
-	 * @return array  Returns the modified $declarations.
+	 * @return array Returns the modified $declarations.
 	 */
 	protected static function compute_style_properties( $styles, $settings = array(), $properties = null, $theme_json = null, $selector = null, $use_root_padding = null ) {
 		if ( empty( $styles ) ) {
@@ -3126,6 +3194,34 @@ class WP_Theme_JSON_Gutenberg {
 				'name'  => $css_property,
 				'value' => $value,
 			);
+
+			/*
+			 * When background-clip is set, add vendor-prefixed properties for
+			 * cross-browser support. For 'text', this clips the background to
+			 * the text and makes it visible via transparent fill. For box-model
+			 * values, only the fill color is reset, to cancel any inherited
+			 * text gradient. `-webkit-background-clip` is an alias of
+			 * `background-clip` in Chromium, so resetting it there would
+			 * discard the value set above. Values outside the set the style
+			 * engine accepts get neither, so a typo cannot reset the fill color.
+			 */
+			if ( 'background-clip' === $css_property ) {
+				if ( 'text' === $value ) {
+					$declarations[] = array(
+						'name'  => '-webkit-background-clip',
+						'value' => 'text',
+					);
+					$declarations[] = array(
+						'name'  => '-webkit-text-fill-color',
+						'value' => 'transparent',
+					);
+				} elseif ( in_array( $value, array( 'border-box', 'padding-box', 'content-box' ), true ) ) {
+					$declarations[] = array(
+						'name'  => '-webkit-text-fill-color',
+						'value' => 'currentColor',
+					);
+				}
+			}
 		}
 
 		// If a variable value is added to the root, the corresponding property should be removed.
@@ -3151,8 +3247,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.1.0 Added the `$theme_json` parameter.
 	 * @since 6.7.0 Added support for background image refs
 	 *
-	 * @param array $styles Styles subtree.
-	 * @param array $path   Which property to process.
+	 * @param array $styles     Styles subtree.
+	 * @param array $path       Which property to process.
 	 * @param array $theme_json Theme JSON array.
 	 * @return string|array Style property value.
 	 */
@@ -3170,7 +3266,7 @@ class WP_Theme_JSON_Gutenberg {
 		 * to a path, this converts that path into the value at that path.
 		 * For example: { "ref": "style.color.background" } => "#fff".
 		 */
-		if ( is_array( $value ) && isset( $value['ref'] ) ) {
+		if ( is_array( $value ) && isset( $value['ref'] ) && is_string( $value['ref'] ) ) {
 			$value_path = explode( '.', $value['ref'] );
 			$ref_value  = _wp_array_get( $theme_json, $value_path, null );
 			// Background Image refs can refer to a string or an array containing a URL string.
@@ -3526,7 +3622,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @param array $theme_json The theme.json converted to an array.
 	 * @param array $selectors  Optional list of selectors per block.
-	 * @param array $options {
+	 * @param array $options    {
 	 *     Optional. An array of options for now used for internal purposes only (may change without notice).
 	 *
 	 *     @type bool $include_block_style_variations Includes nodes for block style variations. Default false.
@@ -4360,11 +4456,13 @@ class WP_Theme_JSON_Gutenberg {
 			$scale_path = array( 'settings', 'spacing', 'spacingScale', $origin );
 
 			// Apply the base spacing scale to the current layer.
-			$base_spacing_scale      = _wp_array_get( $this->theme_json, $scale_path, array() );
-			$flattened_spacing_scale = array_replace( $flattened_spacing_scale, $base_spacing_scale );
+			$base_spacing_scale = _wp_array_get( $this->theme_json, $scale_path, array() );
+			if ( is_array( $base_spacing_scale ) ) {
+				$flattened_spacing_scale = array_replace( $flattened_spacing_scale, $base_spacing_scale );
+			}
 
 			$spacing_scale = _wp_array_get( $incoming_data, $scale_path, null );
-			if ( ! isset( $spacing_scale ) ) {
+			if ( ! is_array( $spacing_scale ) ) {
 				continue;
 			}
 
@@ -4629,7 +4727,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 5.9.0
 	 *
-	 * @param string $slug The slug we want to find a match from default presets.
+	 * @param string $slug      The slug we want to find a match from default presets.
 	 * @param array  $base_path The path to inspect. It's 'settings' by default.
 	 * @return string|null
 	 */
@@ -4679,8 +4777,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.6.0 Added support for block style variation element styles and $origin parameter.
 	 *
 	 * @param array  $theme_json Structure to sanitize.
-	 * @param string $origin    Optional. What source of data this object represents.
-	 *                          One of 'blocks', 'default', 'theme', or 'custom'. Default 'theme'.
+	 * @param string $origin     Optional. What source of data this object represents.
+	 *                           One of 'blocks', 'default', 'theme', or 'custom'. Default 'theme'.
 	 * @return array Sanitized structure.
 	 */
 	public static function remove_insecure_properties( $theme_json, $origin = 'theme' ) {
@@ -5481,6 +5579,7 @@ class WP_Theme_JSON_Gutenberg {
 			! isset( $spacing_scale['mediumStep'] ) ||
 			! is_numeric( $spacing_scale['mediumStep'] ) ||
 			! isset( $spacing_scale['unit'] ) ||
+			! is_string( $spacing_scale['unit'] ) ||
 			! isset( $spacing_scale['operator'] ) ||
 			( '+' !== $spacing_scale['operator'] && '*' !== $spacing_scale['operator'] ) ||
 			! isset( $spacing_scale['increment'] ) ||
@@ -5769,7 +5868,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * It is recursive and modifies the input in-place.
 	 *
 	 * @since 6.3.0
-	 * @param array $tree   Input to process.
+	 * @param array $tree Input to process.
 	 * @return array The modified $tree.
 	 */
 	private static function resolve_custom_css_format( $tree ) {
@@ -5919,7 +6018,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * declarations instead of deriving it by subtracting the root selector from
 	 * the feature selector.
 	 *
-	 * @param array  $style_variation Style variation metadata.
+	 * @param array  $style_variation  Style variation metadata.
 	 * @param string $feature_selector CSS selector for the feature.
 	 * @return string Feature selector with block style variation selector added.
 	 */

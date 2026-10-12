@@ -185,8 +185,7 @@ export interface WidgetMasonryLayoutSettings extends BaseWidgetGridSettings {
  * pre-union shape.
  */
 export type WidgetGridSettings =
-	| WidgetGridLayoutSettings
-	| WidgetMasonryLayoutSettings;
+	WidgetGridLayoutSettings | WidgetMasonryLayoutSettings;
 
 /**
  * The operations that act on one placed widget.

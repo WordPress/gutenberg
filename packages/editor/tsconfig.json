@@ -1,8 +1,12 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.dev.base.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/dev.base.json",
 	"compilerOptions": {
-		"types": [ "jest", "style-imports", "react-css-custom-properties" ]
+		"types": [
+			"gutenberg-vitest-test-env",
+			"style-imports",
+			"react-css-custom-properties"
+		]
 	},
 	"files": [ "global.d.ts" ],
 	"references": [
@@ -13,6 +17,7 @@
 		{ "path": "../block-editor/tsconfig.build.json" },
 		{ "path": "../block-serialization-default-parser" },
 		{ "path": "../blocks" },
+		{ "path": "../commands" },
 		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../core-data/tsconfig.build.json" },
@@ -30,6 +35,7 @@
 		{ "path": "../html-entities/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
+		{ "path": "../interface/tsconfig.build.json" },
 		{ "path": "../kebab-case" },
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../keyboard-shortcuts" },

@@ -1,5 +1,8 @@
 import { useContext, useId } from '@wordpress/element';
-import { CheckboxControl, Flex } from '@wordpress/components';
+import {
+	CheckboxControl as WCCheckboxControl,
+	Flex,
+} from '@wordpress/components';
 import type { FontFace, FontFamily } from '@wordpress/core-data';
 import { getFontFaceVariantName } from './utils';
 import { FontLibraryContext } from './context';
@@ -22,7 +25,7 @@ function LibraryFontVariant( {
 					face.fontStyle,
 					face.fontWeight,
 					font.source
-			  )
+				)
 			: isFontActivated( font.slug, undefined, undefined, font.source );
 
 	const handleToggleActivation = () => {
@@ -39,7 +42,7 @@ function LibraryFontVariant( {
 	return (
 		<div className="font-library__font-card">
 			<Flex justify="flex-start" align="center" gap="1rem">
-				<CheckboxControl
+				<WCCheckboxControl
 					checked={ isInstalled }
 					onChange={ handleToggleActivation }
 					id={ checkboxId }

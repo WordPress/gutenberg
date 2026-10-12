@@ -5,7 +5,7 @@ const target = {
 	method: () => 'original method implementation',
 };
 
-describe.sequential( 'Vitest test isolation', () => {
+describe( 'Vitest test isolation', { concurrent: false }, () => {
 	it( 'can change mocks, spies, globals, environment variables, and timers', () => {
 		mock.mockImplementation( () => 'changed mock implementation' );
 		mock();

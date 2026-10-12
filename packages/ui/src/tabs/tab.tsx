@@ -13,20 +13,25 @@ import type { TabProps } from './types';
  * `Tabs` is a collection of React components that combine to render
  * an [ARIA-compliant tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/).
  */
-export const Tab = forwardRef< HTMLButtonElement, TabProps >( function Tab(
-	{ className, children, ...otherProps },
-	forwardedRef
-) {
-	useRegisterTab();
+export const Tab = forwardRef< HTMLButtonElement, TabProps >(
+	function UnforwardedTab(
+		{ className, children, ...otherProps },
+		forwardedRef
+	) {
+		useRegisterTab();
 
-	return (
-		<_Tabs.Tab
-			ref={ forwardedRef }
-			className={ clsx( styles.tab, className ) }
-			{ ...otherProps }
-		>
-			<span className={ styles[ 'tab-children' ] }>{ children }</span>
-			<Icon icon={ chevronRight } className={ styles[ 'tab-chevron' ] } />
-		</_Tabs.Tab>
-	);
-} );
+		return (
+			<_Tabs.Tab
+				ref={ forwardedRef }
+				className={ clsx( styles.tab, className ) }
+				{ ...otherProps }
+			>
+				<span className={ styles[ 'tab-children' ] }>{ children }</span>
+				<Icon
+					icon={ chevronRight }
+					className={ styles[ 'tab-chevron' ] }
+				/>
+			</_Tabs.Tab>
+		);
+	}
+);

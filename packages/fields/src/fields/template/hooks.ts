@@ -14,41 +14,30 @@ import type { BasePost } from '../../types';
 export function useTemplateFieldMode(
 	record: BasePost
 ): 'block-theme' | 'classic' | null {
-	const postType = record.type;
+	const { type: postType, id: postId } = record;
 	const availableTemplates = ( ( record as Record< string, any > )
 		?.available_templates ?? {} ) as Record< string, string >;
 	const hasAvailableTemplates = Object.keys( availableTemplates ).length > 0;
 	return useSelect(
 		( select ) => {
-			const isBlockTheme =
-				!! select( coreStore ).getCurrentTheme()?.is_block_theme;
-			const postTypeObj = select( coreStore ).getPostType( postType );
-			if ( ! postTypeObj?.viewable ) {
+			if ( ! select( coreStore ).getPostType( postType )?.viewable ) {
 				return null;
 			}
-			const canCreateTemplates =
-				isBlockTheme &&
-				( select( coreStore ).canUser( 'create', {
-					kind: 'postType',
-					name: 'wp_template',
-				} ) ??
-					false );
-			const isVisible = hasAvailableTemplates || canCreateTemplates;
-			const canViewTemplates = isVisible
-				? !! select( coreStore ).canUser( 'read', {
-						kind: 'postType',
-						name: 'wp_template',
-				  } )
-				: false;
-			if ( ( ! isBlockTheme || ! canViewTemplates ) && isVisible ) {
-				return 'classic';
+			if ( ! select( coreStore ).getCurrentTheme()?.is_block_theme ) {
+				return hasAvailableTemplates ? 'classic' : null;
 			}
-			if ( isBlockTheme && canViewTemplates ) {
-				return 'block-theme';
-			}
-			return null;
+			// The field only assigns a template from the list, which any
+			// user who can edit posts may read, so it applies whenever the
+			// post resolves to a template.
+			const templateId = postId
+				? unlock( select( coreStore ) ).getTemplateId(
+						postType,
+						postId
+					)
+				: undefined;
+			return templateId ? 'block-theme' : null;
 		},
-		[ postType, hasAvailableTemplates ]
+		[ postType, postId, hasAvailableTemplates ]
 	);
 }
 

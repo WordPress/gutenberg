@@ -15,7 +15,6 @@ import { store as blockEditorStore } from '../store';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import InspectorControls from '../components/inspector-controls';
 import FitTextSizeWarning from '../components/fit-text-size-warning';
-import { unlock } from '../lock-unlock';
 
 export const FIT_TEXT_SUPPORT_KEY = 'typography.fitText';
 
@@ -90,28 +89,20 @@ function useFitText( { fitText, name, clientId } ) {
 			return;
 		}
 
-		// Get or create style element with unique ID
-		const styleId = `fit-text-${ clientId }`;
-		let styleElement = blockElement.ownerDocument.getElementById( styleId );
-		if ( ! styleElement ) {
-			styleElement = blockElement.ownerDocument.createElement( 'style' );
-			styleElement.id = styleId;
-			blockElement.ownerDocument.head.appendChild( styleElement );
-		}
-
-		const blockSelector = `#block-${ clientId }`;
-
+		// Size the measured element itself: a block rendered once per item in
+		// a loop shares its client ID, so a rule keyed to it would size every
+		// copy at once. Mirrors the front end in `fit-text-frontend.ts`.
 		const applyFontSizeStyle = ( size ) => {
 			if ( size === 0 ) {
-				styleElement.textContent = '';
+				blockElement.style.removeProperty( 'font-size' );
 			} else {
-				styleElement.textContent = `${ blockSelector } { font-size: ${ size }px !important; }`;
+				blockElement.style.setProperty( 'font-size', `${ size }px` );
 			}
 		};
 
 		const optimalSize = optimizeFitText( blockElement, applyFontSizeStyle );
 		setFontSize( optimalSize );
-	}, [ blockElement, clientId, hasFitTextSupport, fitText ] );
+	}, [ blockElement, hasFitTextSupport, fitText ] );
 
 	useEffect( () => {
 		if (
@@ -176,12 +167,7 @@ function useFitText( { fitText, name, clientId } ) {
 				resizeObserver.disconnect();
 			}
 
-			const styleId = `fit-text-${ clientId }`;
-			const styleElement =
-				currentElement.ownerDocument.getElementById( styleId );
-			if ( styleElement ) {
-				styleElement.remove();
-			}
+			currentElement.style.removeProperty( 'font-size' );
 		};
 	}, [
 		fitText,
@@ -241,12 +227,13 @@ export function FitTextControl( {
 	fontSize,
 	style,
 } ) {
-	const hasSelectedStyleState = useSelect(
+	const hasSelectedBlockStyleState = useSelect(
 		( select ) => {
-			const { hasSelectedStyleState: hasSelectedBlockStyleState } =
-				unlock( select( blockEditorStore ) );
+			const {
+				hasSelectedBlockStyleState: hasSelectedBlockStyleStateSelector,
+			} = select( blockEditorStore );
 
-			return hasSelectedBlockStyleState( clientId );
+			return hasSelectedBlockStyleStateSelector( clientId );
 		},
 		[ clientId ]
 	);
@@ -255,7 +242,7 @@ export function FitTextControl( {
 		return null;
 	}
 
-	if ( hasSelectedStyleState ) {
+	if ( hasSelectedBlockStyleState ) {
 		return null;
 	}
 
@@ -297,7 +284,7 @@ export function FitTextControl( {
 						? __( 'Text will resize to fit its container.' )
 						: __(
 								'The text will resize to fit its container, resetting other font size settings.'
-						  )
+							)
 				}
 			/>
 		</ToolsPanelItem>

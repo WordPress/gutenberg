@@ -9,6 +9,8 @@ import {
 	FlexItem,
 } from '@wordpress/components';
 import { Icon, chevronRight } from '@wordpress/icons';
+import { useEffect } from '@wordpress/element';
+import { useDebounce, useEvent } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 import useBlockDisplayInformation from '../use-block-display-information';
@@ -77,7 +79,32 @@ function BlockQuickNavigationItem( {
 		context: 'list-view',
 	} );
 	const blockTitle = displayTitle || blockType?.title || blockName;
-	const { selectBlock } = useDispatch( blockEditorStore );
+	const { selectBlock, toggleBlockHighlight } =
+		useDispatch( blockEditorStore );
+
+	// Debounced, as in the List View, so sweeping the pointer down the list
+	// does not dispatch for every item it crosses.
+	const debouncedToggleBlockHighlight = useDebounce(
+		toggleBlockHighlight,
+		50
+	);
+	const highlightBlock = useEvent( () =>
+		debouncedToggleBlockHighlight( clientId, true )
+	);
+	const clearBlockHighlight = useEvent( () =>
+		debouncedToggleBlockHighlight( clientId, false )
+	);
+
+	// Selecting an item can switch the inspector to the List View tab, which
+	// unmounts this panel before the pointer leaves, so `onMouseLeave` never
+	// runs and the highlight would stick.
+	const clearBlockHighlightOnUnmount = useEvent( () =>
+		toggleBlockHighlight( clientId, false )
+	);
+	useEffect(
+		() => () => clearBlockHighlightOnUnmount(),
+		[ clearBlockHighlightOnUnmount ]
+	);
 
 	const hasChildren = childBlocks && childBlocks.length > 0;
 	const canNavigateToListView =
@@ -88,6 +115,10 @@ function BlockQuickNavigationItem( {
 			__next40pxDefaultSize
 			className="block-editor-block-quick-navigation__item"
 			isPressed={ isSelected }
+			onMouseEnter={ highlightBlock }
+			onMouseLeave={ clearBlockHighlight }
+			onFocus={ highlightBlock }
+			onBlur={ clearBlockHighlight }
 			onClick={ async () => {
 				await selectBlock( clientId );
 

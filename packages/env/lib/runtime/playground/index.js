@@ -176,9 +176,8 @@ class PlaygroundRuntime {
 		// Resolve the CLI binary directly so that it is found even when
 		// the package is nested inside workspace node_modules (where npx
 		// cannot discover it).
-		const cliPackageJson = require.resolve(
-			'@wp-playground/cli/package.json'
-		);
+		const cliPackageJson =
+			require.resolve( '@wp-playground/cli/package.json' );
 		const cliEntryPoint = path.join(
 			path.dirname( cliPackageJson ),
 			'wp-playground.js'

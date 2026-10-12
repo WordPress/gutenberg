@@ -1151,6 +1151,25 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_gutenberg_get_viewport_media_queries_returns_media_queries() {
+		$this->assertSame(
+			array(
+				'@mobile'  => '@media (width <= 640px)',
+				'@tablet'  => '@media (640px < width <= 960px)',
+				'@desktop' => '@media (width > 960px)',
+			),
+			gutenberg_get_viewport_media_queries(
+				array(
+					'mobile' => '640px',
+					'tablet' => '960px',
+				),
+				array(
+					'include_desktop' => true,
+				)
+			)
+		);
+	}
+
 	public function test_get_viewport_media_queries_uses_defaults_when_no_custom_breakpoints_are_valid() {
 		$this->assertSame(
 			array(
@@ -5475,6 +5494,114 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @dataProvider data_get_stylesheet_ignores_values_of_unexpected_types
+	 *
+	 * @param array $theme_json_data The theme.json data, without the version.
+	 */
+	public function test_get_stylesheet_ignores_values_of_unexpected_types( $theme_json_data ) {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array_merge( array( 'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA ), $theme_json_data )
+		);
+
+		$this->assertIsString( $theme_json->get_stylesheet() );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_get_stylesheet_ignores_values_of_unexpected_types() {
+		return array(
+			'element custom css as an object'    => array(
+				array( 'styles' => array( 'elements' => array( 'link' => array( 'css' => array( 'color' => 'red' ) ) ) ) ),
+			),
+			'block custom css as a list'         => array(
+				array( 'styles' => array( 'blocks' => array( 'core/paragraph' => array( 'css' => array( 'color: red;' ) ) ) ) ),
+			),
+			'ref as an array'                    => array(
+				array( 'styles' => array( 'color' => array( 'text' => array( 'ref' => array( 'styles', 'color' ) ) ) ) ),
+			),
+			'spacing scale as a string'          => array(
+				array( 'settings' => array( 'spacing' => array( 'spacingScale' => '1.5' ) ) ),
+			),
+			'spacing scale unit as an array'     => array(
+				array(
+					'settings' => array(
+						'spacing' => array(
+							'spacingScale' => array(
+								'operator'   => '*',
+								'increment'  => 1.5,
+								'steps'      => 7,
+								'mediumStep' => 1.5,
+								'unit'       => array( 'rem' ),
+							),
+						),
+					),
+				),
+			),
+			'shared style variation as a string' => array(
+				array( 'styles' => array( 'variations' => array( 'plain' => 'red' ) ) ),
+			),
+			'block types item as an array'       => array(
+				array( 'blockTypes' => array( array( 'core/button' ) ) ),
+			),
+		);
+	}
+
+	public function test_merge_does_not_generate_spacing_sizes_from_a_non_array_per_origin_spacing_scale() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'spacing' => array(
+						'spacingScale' => array(
+							'operator'   => '*',
+							'increment'  => 1.5,
+							'steps'      => 3,
+							'mediumStep' => 1.5,
+							'unit'       => 'rem',
+						),
+					),
+				),
+			),
+			'default'
+		);
+		$theme_json->merge(
+			new WP_Theme_JSON_Gutenberg(
+				array(
+					'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'settings' => array( 'spacing' => array( 'spacingScale' => array( 'theme' => '1.5' ) ) ),
+				)
+			)
+		);
+		$spacing_sizes = $theme_json->get_settings()['spacing']['spacingSizes'];
+
+		$this->assertSame( array(), $spacing_sizes['theme'], 'The theme layer with a non-array spacing scale should generate no sizes.' );
+		$this->assertSame(
+			array(
+				array(
+					'name' => 'Small',
+					'slug' => '40',
+					'size' => '1rem',
+				),
+				array(
+					'name' => 'Medium',
+					'slug' => '50',
+					'size' => '1.5rem',
+				),
+				array(
+					'name' => 'Large',
+					'slug' => '60',
+					'size' => '2.25rem',
+				),
+			),
+			$spacing_sizes['default'],
+			'The default layer sizes should be unaffected.'
+		);
+	}
+
+	/**
 	 * @dataProvider data_get_styles_for_block_with_style_variations
 	 *
 	 * @param array  $theme_json_variations Theme.json variations to test.
@@ -7257,6 +7384,20 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'expected' => '',
 			),
+			'css as an object'             => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => array( 'color' => 'red' ),
+				),
+				'expected' => '',
+			),
+			'css as a list of strings'     => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => array( 'color: red;' ),
+				),
+				'expected' => '',
+			),
 			'no nested selectors'          => array(
 				'input'    => array(
 					'selector' => '.foo',
@@ -7555,8 +7696,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_get_block_style_variation_selector
 	 *
-	 * @param string $selector  CSS selector.
-	 * @param string $expected  Expected block style variation CSS selector.
+	 * @param string $selector CSS selector.
+	 * @param string $expected Expected block style variation CSS selector.
 	 */
 	public function test_get_block_style_variation_selector( $selector, $expected ) {
 		$theme_json = new ReflectionClass( 'WP_Theme_JSON_Gutenberg' );
@@ -8002,7 +8143,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$this->assertEquals( $expected, $block_nodes );
+		$this->assertSame( $expected, $block_nodes );
 	}
 
 	/**
@@ -8081,7 +8222,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$this->assertEquals( $expected, $block_nodes );
+		$this->assertSame( $expected, $block_nodes );
 	}
 
 	public function test_merge_incoming_data_duotone_presets_with_block_level_default_disabled() {

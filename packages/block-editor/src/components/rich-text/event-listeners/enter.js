@@ -1,4 +1,3 @@
-import { ENTER } from '@wordpress/keycodes';
 import {
 	insert,
 	remove,
@@ -11,8 +10,15 @@ const { subscribeOwnedListener, ownsSelection } = unlock( richTextPrivateApis );
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 export default ( props ) => ( element ) => {
-	function onKeyDown( event ) {
-		if ( event.keyCode !== ENTER ) {
+	// Enter is handled on beforeinput: the input type tells a paragraph
+	// break from a line break. The iOS keyboard sends Return with the
+	// shift key down while it shows capitals, so the key event cannot.
+	function onBeforeInput( event ) {
+		const { inputType } = event;
+		if (
+			inputType !== 'insertParagraph' &&
+			inputType !== 'insertLineBreak'
+		) {
 			return;
 		}
 
@@ -33,7 +39,12 @@ export default ( props ) => ( element ) => {
 		const value = getValue();
 		const { text, start, end } = value;
 
-		if ( event.shiftKey ) {
+		// Flagged for the writing flow, which handles the event otherwise.
+		if ( inputType === 'insertParagraph' && onReplace && onSplit ) {
+			event.__deprecatedOnSplit = true;
+		}
+
+		if ( inputType === 'insertLineBreak' ) {
 			if ( ! disableLineBreaks ) {
 				event.preventDefault();
 				onChange( insert( value, '\n' ) );
@@ -43,7 +54,6 @@ export default ( props ) => ( element ) => {
 			onSplitAtEnd();
 		} else if (
 			! supportsSplitting &&
-			// The deprecated onSplit is flagged on the beforeinput event.
 			! ( onReplace && onSplit ) &&
 			! disableLineBreaks &&
 			! event.defaultPrevented
@@ -67,16 +77,6 @@ export default ( props ) => ( element ) => {
 			} else {
 				onChange( insert( value, '\n' ) );
 			}
-		}
-	}
-
-	function onBeforeInput( event ) {
-		if ( event.inputType !== 'insertParagraph' ) {
-			return;
-		}
-		const { onReplace, onSplit } = props.current;
-		if ( onReplace && onSplit ) {
-			event.__deprecatedOnSplit = true;
 		}
 	}
 
@@ -109,13 +109,7 @@ export default ( props ) => ( element ) => {
 		onDefaultBeforeInput
 	);
 	// Capture phase so this runs before ancestor (writing flow) bubble
-	// handlers, matching the timing of the previous raw element listener.
-	const unsubscribeKeyDown = subscribeOwnedListener(
-		element,
-		'keydown',
-		onKeyDown,
-		true
-	);
+	// handlers.
 	const unsubscribeBeforeInput = subscribeOwnedListener(
 		element,
 		'beforeinput',
@@ -124,7 +118,6 @@ export default ( props ) => ( element ) => {
 	);
 	return () => {
 		unsubscribeDefaultBeforeInput();
-		unsubscribeKeyDown();
 		unsubscribeBeforeInput();
 	};
 };

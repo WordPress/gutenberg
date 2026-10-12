@@ -1,18 +1,14 @@
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import {
-	privateApis as componentsPrivateApis,
-	Button,
-	Modal,
-} from '@wordpress/components';
+import { Button, Modal } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { kebabCase } from '@wordpress/kebab-case';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { Menu } from '@wordpress/ui';
 import { unlock } from '../../lock-unlock';
 import { usePostActions } from './actions';
-
-const { Menu } = unlock( componentsPrivateApis );
 
 export default function PostActions( { postType, postId, onActionPerformed } ) {
 	const [ activeModalAction, setActiveModalAction ] = useState( null );
@@ -50,27 +46,29 @@ export default function PostActions( { postType, postId, onActionPerformed } ) {
 
 	return (
 		<>
-			<Menu placement="bottom-end">
-				<Menu.TriggerButton
+			<Menu.Root>
+				<Menu.Trigger
+					disabled={ ! actions.length }
 					render={
 						<Button
 							size="small"
 							icon={ moreVertical }
 							label={ __( 'Actions' ) }
-							disabled={ ! actions.length }
 							accessibleWhenDisabled
 							className="editor-all-actions-button"
 						/>
 					}
 				/>
-				<Menu.Popover>
+				<Menu.Popup
+					positioner={ <Menu.Positioner side="bottom" align="end" /> }
+				>
 					<ActionsDropdownMenuGroup
 						actions={ actions }
 						items={ [ itemWithPermissions ] }
 						setActiveModalAction={ setActiveModalAction }
 					/>
-				</Menu.Popover>
-			</Menu>
+				</Menu.Popup>
+			</Menu.Root>
 			{ !! activeModalAction && (
 				<ActionModal
 					action={ activeModalAction }

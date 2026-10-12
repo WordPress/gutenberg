@@ -62,7 +62,7 @@ function ViewGrid< Item >( {
 		className: clsx( className, {
 			'is-refreshing': ! isInfiniteScroll && isDelayedLoading,
 		} ),
-		inert: ! isInfiniteScroll && !! isLoading ? 'true' : undefined,
+		inert: ! isInfiniteScroll && !! isLoading,
 		isLoading,
 		view,
 		fields,
@@ -96,7 +96,7 @@ function ViewGrid< Item >( {
 													__( '%1$s: %2$s' ),
 													groupField.label,
 													groupName
-											  ) }
+												) }
 									</h3>
 									<CompositeGrid
 										{ ...gridProps }

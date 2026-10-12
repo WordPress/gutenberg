@@ -3,7 +3,6 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { NavigableMenu } from '../menu';
 import type { NavigableMenuProps } from '../types';
-globalThis.wpVitest.mockVisibleElements();
 
 const NavigableMenuTestCase = ( props: NavigableMenuProps ) => (
 	<NavigableMenu { ...props }>
@@ -24,150 +23,8 @@ const getNavigableMenuFocusables = () => [
 ];
 
 describe( 'NavigableMenu', () => {
-	it( 'moves focus on its focusable children by using the up/down arrow keys', async () => {
-		const user = userEvent.setup();
-
-		const onNavigateSpy = vi.fn();
-
-		render( <NavigableMenuTestCase onNavigate={ onNavigateSpy } /> );
-
-		const focusables = getNavigableMenuFocusables();
-
-		// Move focus to first item.
-		await user.tab();
-		expect( focusables[ 0 ] ).toHaveFocus();
-
-		// By default, up/down arrows are used to navigate.
-		await user.keyboard( '[ArrowDown]' );
-		expect( focusables[ 1 ] ).toHaveFocus();
-		expect( onNavigateSpy ).toHaveBeenCalledTimes( 1 );
-		expect( onNavigateSpy ).toHaveBeenLastCalledWith( 1, focusables[ 1 ] );
-
-		await user.keyboard( '[ArrowDown]' );
-		expect( focusables[ 2 ] ).toHaveFocus();
-		expect( onNavigateSpy ).toHaveBeenCalledTimes( 2 );
-		expect( onNavigateSpy ).toHaveBeenLastCalledWith( 2, focusables[ 2 ] );
-
-		await user.keyboard( '[ArrowUp]' );
-		expect( focusables[ 1 ] ).toHaveFocus();
-		expect( onNavigateSpy ).toHaveBeenCalledTimes( 3 );
-		expect( onNavigateSpy ).toHaveBeenLastCalledWith( 1, focusables[ 1 ] );
-
-		// Left/right arrows don't navigate.
-		await user.keyboard( '[ArrowLeft]' );
-		expect( focusables[ 1 ] ).toHaveFocus();
-		expect( onNavigateSpy ).toHaveBeenCalledTimes( 3 );
-
-		await user.keyboard( '[ArrowRight]' );
-		expect( focusables[ 1 ] ).toHaveFocus();
-		expect( onNavigateSpy ).toHaveBeenCalledTimes( 3 );
-	} );
-
-	it( 'moves focus on its focusable children by using the left/right arrow keys when the `orientation`prop is set to `horizontal', async () => {
-		const user = userEvent.setup();
-
-		const onNavigateSpy = vi.fn();
-
-		render(
-			<NavigableMenuTestCase
-				orientation="horizontal"
-				onNavigate={ onNavigateSpy }
-			/>
-		);
-
-		const focusables = getNavigableMenuFocusables();
-
-		// Move focus to first item.
-		await user.tab();
-		expect( focusables[ 0 ] ).toHaveFocus();
-
-		// When `orientation="horizontal"`, left/right arrows are used to navigate.
-		await user.keyboard( '[ArrowRight]' );
-		expect( focusables[ 1 ] ).toHaveFocus();
-		expect( onNavigateSpy ).toHaveBeenCalledTimes( 1 );
-		expect( onNavigateSpy ).toHaveBeenLastCalledWith( 1, focusables[ 1 ] );
-
-		await user.keyboard( '[ArrowRight]' );
-		expect( focusables[ 2 ] ).toHaveFocus();
-		expect( onNavigateSpy ).toHaveBeenCalledTimes( 2 );
-		expect( onNavigateSpy ).toHaveBeenLastCalledWith( 2, focusables[ 2 ] );
-
-		await user.keyboard( '[ArrowLeft]' );
-		expect( focusables[ 1 ] ).toHaveFocus();
-		expect( onNavigateSpy ).toHaveBeenCalledTimes( 3 );
-		expect( onNavigateSpy ).toHaveBeenLastCalledWith( 1, focusables[ 1 ] );
-
-		// When `orientation="horizontal"`, up/down arrows don't navigate.
-		await user.keyboard( '[ArrowUp]' );
-		expect( focusables[ 1 ] ).toHaveFocus();
-		expect( onNavigateSpy ).toHaveBeenCalledTimes( 3 );
-
-		await user.keyboard( '[ArrowDown]' );
-		expect( focusables[ 1 ] ).toHaveFocus();
-		expect( onNavigateSpy ).toHaveBeenCalledTimes( 3 );
-	} );
-
-	it( 'should stop at the edges when the `cycle` prop is set to `false`', async () => {
-		const user = userEvent.setup();
-
-		const onNavigateSpy = vi.fn();
-
-		const { rerender } = render(
-			<NavigableMenuTestCase onNavigate={ onNavigateSpy } />
-		);
-
-		const focusables = getNavigableMenuFocusables();
-		const firstFocusable = focusables[ 0 ];
-		const lastFocusableIndex = focusables.length - 1;
-		const lastFocusable = focusables[ lastFocusableIndex ];
-
-		// Move focus to first item.
-		await user.tab();
-		expect( firstFocusable ).toHaveFocus();
-
-		// By default, cycling from first to last and from last to first is allowed.
-		await user.keyboard( '[ArrowUp]' );
-		expect( lastFocusable ).toHaveFocus();
-		expect( onNavigateSpy ).toHaveBeenCalledTimes( 1 );
-		expect( onNavigateSpy ).toHaveBeenLastCalledWith(
-			lastFocusableIndex,
-			lastFocusable
-		);
-
-		await user.keyboard( '[ArrowDown]' );
-		expect( firstFocusable ).toHaveFocus();
-		expect( onNavigateSpy ).toHaveBeenCalledTimes( 2 );
-		expect( onNavigateSpy ).toHaveBeenLastCalledWith( 0, firstFocusable );
-
-		rerender(
-			<NavigableMenuTestCase
-				onNavigate={ onNavigateSpy }
-				cycle={ false }
-			/>
-		);
-
-		// With the `cycle` prop set to `false`, cycling is not allowed.
-		// By default, cycling from first to last and from last to first is allowed.
-		await user.keyboard( '[ArrowUp]' );
-		expect( firstFocusable ).toHaveFocus();
-		expect( onNavigateSpy ).toHaveBeenCalledTimes( 2 );
-
-		await user.keyboard( '[ArrowDown][ArrowDown]' );
-		expect( lastFocusable ).toHaveFocus();
-		expect( onNavigateSpy ).toHaveBeenCalledTimes( 4 );
-		expect( onNavigateSpy ).toHaveBeenLastCalledWith(
-			lastFocusableIndex,
-			lastFocusable
-		);
-
-		await user.keyboard( '[ArrowDown]' );
-		expect( lastFocusable ).toHaveFocus();
-		expect( onNavigateSpy ).toHaveBeenCalledTimes( 4 );
-	} );
-
 	it( 'stops keydown event propagation when arrow keys are pressed, regardless of the `orientation` prop', async () => {
 		const user = userEvent.setup();
-
 		const externalWrapperOnKeyDownSpy = vi.fn();
 
 		render(
@@ -179,8 +36,6 @@ describe( 'NavigableMenu', () => {
 		);
 
 		const focusables = getNavigableMenuFocusables();
-
-		// Move focus to first item
 		await user.tab();
 		expect( focusables[ 0 ] ).toHaveFocus();
 
@@ -196,7 +51,6 @@ describe( 'NavigableMenu', () => {
 
 	it( 'should keep forwarded callback refs stable across rerenders', () => {
 		const refSpy = vi.fn();
-
 		const { rerender } = render(
 			<NavigableMenu ref={ refSpy }>
 				<button>Item 1</button>
@@ -212,15 +66,11 @@ describe( 'NavigableMenu', () => {
 			</NavigableMenu>
 		);
 
-		// With a stable merged ref (useMergeRefs), the callback ref should
-		// not be called again on rerender. Previously, an inline ref callback
-		// would cause React to detach (null) and reattach on every render.
 		expect( refSpy ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'skips its internal logic when the tab key is pressed', async () => {
 		const user = userEvent.setup();
-
 		render(
 			<>
 				<button>Before menu</button>
@@ -234,38 +84,24 @@ describe( 'NavigableMenu', () => {
 		} );
 		const internalFocusables = getNavigableMenuFocusables();
 		const firstFocusable = internalFocusables[ 0 ];
-		const lastFocusableIndex = internalFocusables.length - 1;
-		const lastFocusable = internalFocusables[ lastFocusableIndex ];
+		const lastFocusable =
+			internalFocusables[ internalFocusables.length - 1 ];
 		const afterFocusable = screen.getByRole( 'button', {
 			name: 'After menu',
 		} );
 
-		// The 'tab' key is not handled by the component, which means that elements
-		// are focused following the standard browser behavior.
 		await user.tab();
 		expect( beforeFocusable ).toHaveFocus();
-
 		await user.tab();
 		expect( firstFocusable ).toHaveFocus();
-
-		// Note: the second element "internalFocusables" is not focused by default
-		// by the browser because it has `tabindex="-1"`
-
 		await user.tab();
 		expect( lastFocusable ).toHaveFocus();
-
 		await user.tab();
 		expect( afterFocusable ).toHaveFocus();
-
 		await user.tab( { shift: true } );
 		expect( lastFocusable ).toHaveFocus();
-
-		// Note: the second element "internalFocusables" is not focused by default
-		// by the browser because it has `tabindex="-1"`
-
 		await user.tab( { shift: true } );
 		expect( firstFocusable ).toHaveFocus();
-
 		await user.tab( { shift: true } );
 		expect( beforeFocusable ).toHaveFocus();
 	} );

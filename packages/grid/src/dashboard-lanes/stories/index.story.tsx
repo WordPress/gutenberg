@@ -5,7 +5,8 @@ import type { DashboardLanesLayoutItem } from '../types';
 import type { GridOverlayRenderProps } from '../../shared/types';
 
 const meta: Meta< typeof DashboardLanes > = {
-	title: 'Grid/DashboardLanes',
+	id: 'grid-dashboardlanes',
+	title: 'Widgets/Grid/DashboardLanes',
 	component: DashboardLanes,
 	tags: [ 'status-experimental' ],
 	args: {

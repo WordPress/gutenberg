@@ -2,7 +2,8 @@ import { useState } from '@wordpress/element';
 import TextTransformControl from '../';
 
 const meta = {
-	title: 'BlockEditor/TextTransformControl',
+	id: 'blockeditor-texttransformcontrol',
+	title: 'Editor/Block Editor/TextTransformControl',
 	component: TextTransformControl,
 	parameters: {
 		docs: {

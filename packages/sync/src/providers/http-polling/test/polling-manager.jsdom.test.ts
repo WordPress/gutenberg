@@ -19,11 +19,13 @@ vi.mock( import( 'yjs' ), async ( importOriginal ) => ( {
 
 vi.mock( import( 'lib0/encoding' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
-	createEncoder: vi.fn< typeof import('lib0/encoding').createEncoder >(
+	createEncoder: vi.fn< typeof import( 'lib0/encoding' ).createEncoder >(
 		() =>
-			( {} ) as ReturnType< typeof import('lib0/encoding').createEncoder >
+			( {} ) as ReturnType<
+				typeof import( 'lib0/encoding' ).createEncoder
+			>
 	),
-	toUint8Array: vi.fn< typeof import('lib0/encoding').toUint8Array >(
+	toUint8Array: vi.fn< typeof import( 'lib0/encoding' ).toUint8Array >(
 		() => new Uint8Array( [ 0 ] )
 	),
 } ) );
@@ -178,9 +180,9 @@ function getServerAwareness(
 
 describe( 'polling-manager', () => {
 	let pollingManager: PollingManager;
-	let mockPostSyncUpdate: Mock< typeof import('../utils').postSyncUpdate >;
+	let mockPostSyncUpdate: Mock< typeof import( '../utils' ).postSyncUpdate >;
 	let mockPostSyncUpdateNonBlocking: Mock<
-		typeof import('../utils').postSyncUpdateNonBlocking
+		typeof import( '../utils' ).postSyncUpdateNonBlocking
 	>;
 	let mockApplyFilters: Mock;
 	let registeredRooms: Set< string >;
