@@ -8,8 +8,7 @@ import { Stack, Tabs } from '@wordpress/ui';
 import UntypedInserterDraggableBlocks from '../../inserter-draggable-blocks';
 import MediaSearch from './media-search';
 import { getBlockAndPreviewFromMedia, getItemId } from './utils';
-
-type MediaType = 'image' | 'video' | 'audio';
+import type { MediaCategory, MediaItem, MediaType } from './types';
 
 // `inserter-draggable-blocks` is untyped JS, so TypeScript infers every
 // destructured prop as required. Narrow it to what this file passes and
@@ -25,27 +24,6 @@ const InserterDraggableBlocks =
 			onDragEnd: React.DragEventHandler;
 		} ) => React.ReactElement;
 	} >;
-
-/**
- * An `InserterMediaItem` (see the `registerInserterMediaCategory` typedef in
- * the store actions). Core sources spread the attachment record in, so `date`
- * is present for them and absent for external sources.
- */
-type MediaItem = {
-	id?: number;
-	sourceId?: number | string;
-	title?: string | { rendered?: string };
-	url: string;
-	previewUrl?: string;
-	alt?: string;
-	caption?: string;
-	date?: string;
-};
-
-type MediaCategory = {
-	name: string;
-	mediaType: MediaType;
-};
 
 type MediaGridProps = {
 	/**
@@ -93,9 +71,9 @@ type MediaGridProps = {
 	 * The media types to offer as tabs. Fewer than two renders no tab
 	 * bar, since there is nothing to switch between.
 	 */
-	mediaTypes?: { value: string; label: string }[];
-	mediaType?: string;
-	onChangeMediaType?: ( mediaType: string ) => void;
+	mediaTypes?: { value: MediaType; label: string }[];
+	mediaType?: MediaType;
+	onChangeMediaType?: ( mediaType: MediaType ) => void;
 };
 
 const EMPTY_ARRAY: MediaItem[] = [];

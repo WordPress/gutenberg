@@ -7,15 +7,7 @@ import { MediaCategoryPanel } from './media-panel';
 import MediaLibraryButton from './media-library-button';
 import SourceMenu from './source-menu';
 import InserterNoResults from '../no-results';
-
-type MediaType = 'image' | 'video' | 'audio';
-
-type MediaCategory = {
-	name: string;
-	label: string;
-	mediaType: string;
-	attach?: unknown;
-};
+import type { MediaCategory, MediaType } from './types';
 
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
 
@@ -29,7 +21,7 @@ const ALLOWED_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
 const LIBRARY_CATEGORIES = [ 'images', 'videos', 'audio' ];
 
 const LIBRARY_SOURCE = 'media-library';
-const DEFAULT_MEDIA_TYPE = 'image';
+const DEFAULT_MEDIA_TYPE: MediaType = 'image';
 
 /**
  * The inserter's Media tab: one search, a source menu, and a tab per media
@@ -116,7 +108,8 @@ function MediaTab( {
 	}, [ categories ] );
 
 	const [ sourceName, setSourceName ] = useState( LIBRARY_SOURCE );
-	const [ mediaType, setMediaType ] = useState( DEFAULT_MEDIA_TYPE );
+	const [ mediaType, setMediaType ] =
+		useState< MediaType >( DEFAULT_MEDIA_TYPE );
 	// Kept here rather than in the panel so a term survives switching tab or
 	// source: the tab has one search box, so it should hold one term.
 	const [ search, setSearch ] = useState( '' );

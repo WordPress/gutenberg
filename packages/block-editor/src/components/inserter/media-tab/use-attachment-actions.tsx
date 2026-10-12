@@ -4,11 +4,10 @@ import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { external, linkOff } from '@wordpress/icons';
 import DetachConfirmation from './detach-confirmation';
+import type { MediaItem } from './types';
 
 type InserterMediaCategory =
 	import( '../../../store/actions' ).InserterMediaCategory;
-
-type MediaItem = { id?: number; sourceId?: number | string };
 
 /**
  * A core media category: the public interface plus the private capabilities
