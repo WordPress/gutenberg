@@ -3936,6 +3936,15 @@ class WP_Theme_JSON_Gutenberg {
 
 		$feature_declarations = static::get_feature_declarations_for_node( $block_metadata, $node );
 
+		// The block's `css` feature selector, used for custom CSS of the block and its style variations.
+		$css_feature_selector = $block_metadata['selectors']['css'] ?? null;
+		if ( is_array( $css_feature_selector ) ) {
+			$css_feature_selector = $css_feature_selector['root'] ?? null;
+		}
+		if ( ! is_string( $css_feature_selector ) ) {
+			$css_feature_selector = null;
+		}
+
 		// Update text indent selector for paragraph blocks based on the textIndent setting.
 		$block_name           = $block_metadata['name'] ?? null;
 		$feature_declarations = static::update_paragraph_text_indent_selector( $feature_declarations, $settings, $block_name );
@@ -3981,14 +3990,9 @@ class WP_Theme_JSON_Gutenberg {
 				$style_variation_declarations  = array_merge( $style_variation_declarations, $variation_pseudo_declarations );
 
 				// Custom CSS targets the block's `css` feature selector, if any.
-				$variation_css_selector = $style_variation['selector'];
-				$css_feature_selector   = $block_metadata['selectors']['css'] ?? null;
-				if ( is_array( $css_feature_selector ) ) {
-					$css_feature_selector = $css_feature_selector['root'] ?? null;
-				}
-				if ( is_string( $css_feature_selector ) ) {
-					$variation_css_selector = static::get_block_style_variation_feature_selector( $style_variation, $css_feature_selector );
-				}
+				$variation_css_selector = null !== $css_feature_selector
+					? static::get_block_style_variation_feature_selector( $style_variation, $css_feature_selector )
+					: $style_variation['selector'];
 
 				// Store custom CSS for the style variation.
 				if ( isset( $style_variation_node['css'] ) ) {
@@ -4302,11 +4306,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		// Compute selector for block custom CSS.
-		$css_feature_selector = $block_metadata['selectors']['css'] ?? null;
-		if ( is_array( $css_feature_selector ) ) {
-			$css_feature_selector = $css_feature_selector['root'] ?? null;
-		}
-		$css_selector = is_string( $css_feature_selector ) ? $css_feature_selector : $selector;
+		$css_selector = $css_feature_selector ?? $selector;
 
 		// 7. Generate and append any custom CSS rules.
 		if ( isset( $node['css'] ) && ! $is_root_selector ) {
