@@ -1,0 +1,286 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
+$color-default: $components-color-accent;
+$rail-default: $components-color-gray-300;
+
+.root {
+	-webkit-tap-highlight-color: transparent;
+	align-items: center;
+	display: flex;
+	justify-content: flex-start;
+	padding: 0;
+	position: relative;
+	touch-action: none;
+	width: 100%;
+	min-height: 40px;
+}
+
+.wrapper {
+	--wp-components-range-control-color: initial;
+	display: block;
+	flex: 1;
+	position: relative;
+	width: 100%;
+	color: var(--wp-components-range-control-color, $color-default);
+	height: 30px;
+	min-height: 30px;
+}
+
+.before-icon,
+.after-icon {
+	display: flex; // Avoid changing the height with line-height.
+	margin-top: 4px;
+}
+.before-icon {
+	margin-inline-end: 6px;
+}
+.after-icon {
+	margin-inline-start: 6px;
+}
+
+.rail {
+	--wp-components-range-control-rail-color: initial;
+	left: 0; /* stylelint-disable-line logical-css/require-logical-properties -- Preserve the existing physical offset alongside RTL positioning. */
+	pointer-events: none;
+	right: 0; /* stylelint-disable-line logical-css/require-logical-properties -- Preserve the existing physical offset alongside RTL positioning. */
+	display: block;
+	height: 4px;
+	position: absolute;
+	margin-top: 13px;
+	top: 0;
+	border-radius: $radius-full;
+	background: var(--wp-components-range-control-rail-color, $rail-default);
+
+	&:where(.is-disabled) {
+		background: $components-color-gray-100;
+	}
+}
+
+.track {
+	--wp-components-range-control-track-color: initial;
+	border-radius: $radius-full;
+	height: 4px;
+	pointer-events: none;
+	display: block;
+	position: absolute;
+	margin-top: 13px;
+	top: 0;
+	background: var(--wp-components-range-control-track-color, currentColor);
+
+	&:where(.is-disabled) {
+		background: $components-color-gray-400;
+	}
+
+	:global(.is-marked) & {
+		@media not (prefers-reduced-motion) {
+			transition: width ease 0.1s;
+		}
+	}
+}
+
+.marks {
+	display: block;
+	pointer-events: none;
+	position: relative;
+	width: 100%;
+	user-select: none;
+	margin-top: 17px;
+}
+
+.mark {
+	position: absolute;
+	left: 0; /* stylelint-disable-line logical-css/require-logical-properties -- Preserve the existing physical offset alongside RTL positioning. */
+	top: -4px;
+	height: 4px;
+	width: 2px;
+	transform: translateX(-50%);
+	background-color: $components-color-background;
+	z-index: 1;
+}
+
+.mark-label {
+	color: $components-color-gray-300;
+	font-size: 11px;
+	position: absolute;
+	top: 8px;
+	white-space: nowrap;
+	inset-inline-start: 0;
+	transform: translateX(-50%);
+
+	&:where(:dir(rtl)) {
+		transform: translateX(50%);
+	}
+	&:where(.is-filled) {
+		color: $components-color-gray-700;
+	}
+}
+
+@mixin thumb-color {
+	background: $components-color-accent;
+	&:where(.is-disabled) {
+		background: $components-color-gray-400;
+	}
+}
+
+.thumb-wrapper {
+	align-items: center;
+	display: flex;
+	height: 12px;
+	justify-content: center;
+	margin-top: 9px;
+	outline: 0;
+	pointer-events: none;
+	position: absolute;
+	top: 0;
+	user-select: none;
+	width: 12px;
+	border-radius: $radius-round;
+	z-index: 3;
+	@include thumb-color;
+	margin-inline-start: -10px;
+	transform: translateX(4.5px);
+
+	&:where(:dir(rtl)) {
+		transform: translateX(-4.5px);
+	}
+	:global(.is-marked) & {
+		@media not (prefers-reduced-motion) {
+			transition: left ease 0.1s;
+		}
+	}
+}
+
+.thumb {
+	align-items: center;
+	border-radius: $radius-round;
+	height: 100%;
+	outline: 0;
+	position: absolute;
+	user-select: none;
+	width: 100%;
+	box-shadow:
+		0 1px 1px rgba(0, 0, 0, 0.03),
+		0 1px 2px rgba(0, 0, 0, 0.02),
+		0 3px 3px rgba(0, 0, 0, 0.02),
+		0 4px 4px rgba(0, 0, 0, 0.01);
+	@include thumb-color;
+
+	&:where(.is-focused)::before {
+		content: " ";
+		position: absolute;
+		background-color: $components-color-accent;
+		opacity: 0.4;
+		border-radius: $radius-round;
+		height: 20px;
+		width: 20px;
+		top: -4px;
+		left: -4px; /* stylelint-disable-line logical-css/require-logical-properties -- Preserve the existing physical offset alongside RTL positioning. */
+	}
+}
+
+.input {
+	box-sizing: border-box;
+	cursor: var(--wpds-cursor-control);
+	display: block;
+	height: 100%;
+	left: 0; /* stylelint-disable-line logical-css/require-logical-properties -- Preserve the existing physical offset alongside RTL positioning. */
+	margin: 0 -6px;
+	opacity: 0;
+	outline: none;
+	position: absolute;
+	right: 0; /* stylelint-disable-line logical-css/require-logical-properties -- Preserve the existing physical offset alongside RTL positioning. */
+	top: 0;
+	width: calc(100% + 12px);
+}
+
+.tooltip {
+	background: rgba(0, 0, 0, 0.8);
+	border-radius: $radius-small;
+	color: #fff;
+	font-size: 12px;
+	min-width: 32px;
+	padding: 4px 8px;
+	pointer-events: none;
+	position: absolute;
+	text-align: center;
+	user-select: none;
+	line-height: 1.4;
+	display: none;
+	opacity: 0;
+	transform: translateX(-50%);
+
+	&:where(:dir(rtl)) {
+		transform: translateX(50%);
+	}
+	&:where(.is-visible) {
+		display: inline-block;
+		opacity: 1;
+	}
+	&:where(:not(.is-bottom)) {
+		top: -80%;
+	}
+	&:where(.is-bottom) {
+		bottom: -80%;
+	}
+	@media not (prefers-reduced-motion) {
+		transition:
+			opacity 120ms ease,
+			display 120ms ease allow-discrete;
+	}
+	@starting-style {
+		opacity: 0;
+	}
+}
+
+// Preserve the existing NumberControl composition and reset-button sizing.
+.input-number {
+	display: inline-block;
+	font-size: 13px;
+	margin-top: 0;
+	margin-inline-start: $grid-unit-20 !important;
+
+	@at-root input[type="number"]#{&} {
+		height: 30px;
+		min-height: 30px;
+	}
+}
+.action-right {
+	display: block;
+	margin-top: 0;
+	margin-inline-start: $grid-unit-10;
+
+	button,
+	button:global(.is-small) {
+		margin-left: 0; /* stylelint-disable-line logical-css/require-logical-properties -- Preserve the existing physical offset alongside RTL positioning. */
+		height: 30px;
+		min-height: 30px;
+	}
+}
+
+// CSS-wide keywords must apply to the actual property, not the custom property.
+@each $keyword in inherit, initial, unset, revert, revert-layer {
+	.color-#{$keyword} {
+		color: $keyword;
+	}
+	.background-#{$keyword} {
+		background: $keyword;
+	}
+}
+
+@media (forced-colors: active) {
+	.rail {
+		background: GrayText;
+	}
+	.track,
+	.thumb,
+	.thumb-wrapper {
+		background: CanvasText;
+		&:where(.is-disabled) {
+			background: GrayText;
+		}
+	}
+	.thumb:where(.is-focused)::before {
+		background: GrayText;
+	}
+}

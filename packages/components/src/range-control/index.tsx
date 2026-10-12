@@ -12,17 +12,8 @@ import { clamp } from '../utils/math';
 import InputRange from './input-range';
 import RangeRail from './rail';
 import SimpleTooltip from './tooltip';
-import {
-	ActionRightWrapper,
-	AfterIconWrapper,
-	BeforeIconWrapper,
-	InputNumber,
-	Root,
-	Track,
-	ThumbWrapper,
-	Thumb,
-	Wrapper,
-} from './styles/range-control-styles';
+import NumberControl from '../number-control';
+import styles from './style.module.scss';
 import type { RangeControlProps } from './types';
 import type { WordPressComponentProps } from '../context';
 import { space } from '../utils/space';
@@ -128,6 +119,8 @@ function UnforwardedRangeControl(
 
 	const wrapperClasses = clsx(
 		'components-range-control__wrapper',
+		styles.wrapper,
+		styles[ `color-${ colorProp || 'inherit' }` ],
 		!! marks && 'is-marked'
 	);
 
@@ -226,16 +219,24 @@ function UnforwardedRangeControl(
 			id={ `${ id }` }
 			help={ help }
 		>
-			<Root className="components-range-control__root">
-				{ beforeIcon && (
-					<BeforeIconWrapper>
-						<Icon icon={ beforeIcon } />
-					</BeforeIconWrapper>
+			<div
+				className={ clsx(
+					'components-range-control__root',
+					styles.root
 				) }
-				<Wrapper
+			>
+				{ beforeIcon && (
+					<span className={ styles[ 'before-icon' ] }>
+						<Icon icon={ beforeIcon } />
+					</span>
+				) }
+				<div
 					className={ wrapperClasses }
-					color={ colorProp }
-					marks={ !! marks }
+					style={
+						{
+							'--wp-components-range-control-color': colorProp,
+						} as React.CSSProperties
+					}
 				>
 					<InputRange
 						{ ...otherProps }
@@ -265,24 +266,41 @@ function UnforwardedRangeControl(
 						step={ step }
 						value={ rangeFillValue }
 					/>
-					<Track
+					<span
 						aria-hidden
-						className="components-range-control__track"
-						disabled={ disabled }
-						style={ { width: fillValueOffset } }
-						trackColor={ trackColor }
+						className={ clsx(
+							'components-range-control__track',
+							styles.track,
+							{ [ styles[ 'is-disabled' ] ]: disabled },
+							! disabled && styles[ `background-${ trackColor }` ]
+						) }
+						{ ...{ disabled } }
+						style={
+							{
+								width: fillValueOffset,
+								'--wp-components-range-control-track-color':
+									trackColor || undefined,
+							} as React.CSSProperties
+						}
 					/>
-					<ThumbWrapper
-						className="components-range-control__thumb-wrapper"
+					<span
+						className={ clsx(
+							'components-range-control__thumb-wrapper',
+							styles[ 'thumb-wrapper' ],
+							{ [ styles[ 'is-disabled' ] ]: disabled }
+						) }
 						style={ offsetStyle }
-						disabled={ disabled }
+						{ ...{ disabled } }
 					>
-						<Thumb
+						<span
 							aria-hidden
-							isFocused={ isThumbFocused }
-							disabled={ disabled }
+							className={ clsx( styles.thumb, {
+								[ styles[ 'is-disabled' ] ]: disabled,
+								[ styles[ 'is-focused' ] ]: isThumbFocused,
+							} ) }
+							{ ...{ disabled } }
 						/>
-					</ThumbWrapper>
+					</span>
 					{ enableTooltip && (
 						<SimpleTooltip
 							className="components-range-control__tooltip"
@@ -294,16 +312,19 @@ function UnforwardedRangeControl(
 							value={ value }
 						/>
 					) }
-				</Wrapper>
+				</div>
 				{ afterIcon && (
-					<AfterIconWrapper>
+					<span className={ styles[ 'after-icon' ] }>
 						<Icon icon={ afterIcon } />
-					</AfterIconWrapper>
+					</span>
 				) }
 				{ hasInputField && (
-					<InputNumber
+					<NumberControl
 						aria-label={ label }
-						className="components-range-control__number"
+						className={ clsx(
+							'components-range-control__number',
+							styles[ 'input-number' ]
+						) }
 						disabled={ disabled }
 						inputMode="decimal"
 						isShiftStepEnabled={ isShiftStepEnabled }
@@ -319,7 +340,7 @@ function UnforwardedRangeControl(
 					/>
 				) }
 				{ allowReset && (
-					<ActionRightWrapper>
+					<span className={ styles[ 'action-right' ] }>
 						<Button
 							className="components-range-control__reset"
 							// If the RangeControl itself is disabled, the reset button shouldn't be in the tab sequence.
@@ -341,9 +362,9 @@ function UnforwardedRangeControl(
 						>
 							{ __( 'Reset' ) }
 						</Button>
-					</ActionRightWrapper>
+					</span>
 				) }
-			</Root>
+			</div>
 		</BaseControl>
 	);
 }

@@ -1,5 +1,6 @@
 import clsx from 'clsx';
-import { Mark, MarkLabel } from './styles/range-control-styles';
+import { PolymorphicElement } from '../utils/polymorphic-element';
+import styles from './style.module.scss';
 import type { RangeMarkProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
@@ -16,31 +17,34 @@ export default function RangeMark(
 
 	const classes = clsx(
 		'components-range-control__mark',
+		styles.mark,
 		isFilled && 'is-filled',
 		className
 	);
 	const labelClasses = clsx(
 		'components-range-control__mark-label',
+		styles[ 'mark-label' ],
+		{ [ styles[ 'is-filled' ] ]: isFilled },
 		isFilled && 'is-filled'
 	);
 
 	return (
 		<>
-			<Mark
+			<PolymorphicElement
+				as="span"
 				{ ...otherProps }
 				aria-hidden="true"
 				className={ classes }
 				style={ style }
 			/>
 			{ label && (
-				<MarkLabel
+				<span
 					aria-hidden="true"
 					className={ labelClasses }
-					isFilled={ isFilled }
 					style={ style }
 				>
 					{ label }
-				</MarkLabel>
+				</span>
 			) }
 		</>
 	);

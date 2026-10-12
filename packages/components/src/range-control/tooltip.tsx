@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { useCallback, useEffect, useState } from '@wordpress/element';
-import { Tooltip } from './styles/range-control-styles';
+import { PolymorphicElement } from '../utils/polymorphic-element';
+import moduleStyles from './style.module.scss';
 import type { TooltipProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
@@ -19,24 +20,31 @@ export default function SimpleTooltip(
 		...restProps
 	} = props;
 	const placement = useTooltipPlacement( { inputRef, tooltipPlacement } );
-	const classes = clsx( 'components-simple-tooltip', className );
+	const classes = clsx(
+		'components-simple-tooltip',
+		moduleStyles.tooltip,
+		className,
+		{
+			[ moduleStyles[ 'is-visible' ] ]: show,
+			[ moduleStyles[ 'is-bottom' ] ]: placement === 'bottom',
+		}
+	);
 	const styles = {
 		...style,
 		zIndex,
 	};
 
 	return (
-		<Tooltip
+		<PolymorphicElement
+			as="span"
 			{ ...restProps }
 			aria-hidden="false"
 			className={ classes }
-			placement={ placement }
-			show={ show }
 			role="tooltip"
 			style={ styles }
 		>
 			{ renderTooltipContent( value ) }
-		</Tooltip>
+		</PolymorphicElement>
 	);
 }
 
