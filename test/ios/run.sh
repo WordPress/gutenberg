@@ -37,25 +37,49 @@ print( devices[ -1 ][ "udid" ] )
 step "Booting simulator $UDID"
 # The boot goes on in the background while WordPress starts.
 xcrun simctl boot "$UDID" 2>/dev/null || true
-# WordPress runs in Playground: PHP compiled to WebAssembly, no Docker.
+# WordPress runs on PHP's built-in server with SQLite, set up fresh on
+# every run, with the same steps as Playground's blueprint.json.
 step "Starting WordPress"
-PLAYGROUND_LOG=$( mktemp )
-# npx runs outside the checkout: the checkout's npm settings refuse
-# Playground's install scripts.
 ROOT="$PWD"
-( cd "$( mktemp -d )" && exec npx --yes @wp-playground/cli@3.1.53 server \
-	--auto-mount="$ROOT" \
-	--blueprint="$ROOT/test/ios/blueprint.json" \
-	--port "$PORT" ) > "$PLAYGROUND_LOG" 2>&1 &
-PLAYGROUND_PID=$!
-trap 'kill "$PLAYGROUND_PID" 2>/dev/null || true' EXIT
-# Playground prints "Ready!" once it listens and the blueprint has run; the
-# server answers earlier, before the plugin is active.
-until grep -q "Ready!" "$PLAYGROUND_LOG"; do
-	kill -0 "$PLAYGROUND_PID" 2>/dev/null || { cat "$PLAYGROUND_LOG"; echo "WordPress did not start"; exit 1; }
+CACHE="$ROOT/test/ios/build/cache"
+WP_DIR="$ROOT/test/ios/build/wordpress"
+mkdir -p "$CACHE"
+[ -f "$CACHE/wp-cli.phar" ] || curl -sSLf -o "$CACHE/wp-cli.phar" https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+[ -f "$CACHE/sqlite.zip" ] || curl -sSLf -o "$CACHE/sqlite.zip" https://downloads.wordpress.org/plugin/sqlite-database-integration.latest-stable.zip
+wp() { php -d memory_limit=512M "$CACHE/wp-cli.phar" --path="$WP_DIR" --quiet "$@"; }
+rm -rf "$WP_DIR"
+wp core download --version=latest
+unzip -q "$CACHE/sqlite.zip" -d "$WP_DIR/wp-content/plugins"
+SQLITE="$WP_DIR/wp-content/plugins/sqlite-database-integration"
+sed -e "s#{SQLITE_IMPLEMENTATION_FOLDER_PATH}#$SQLITE#" -e "s#{SQLITE_PLUGIN}#sqlite-database-integration/load.php#" \
+	"$SQLITE/db.copy" > "$WP_DIR/wp-content/db.php"
+wp config create --dbname=wordpress --dbuser=wordpress --dbpass=wordpress --skip-check
+wp core install --url="$WP_BASE_URL" --title="iOS tests" --admin_user=admin --admin_password=password --admin_email=admin@example.com --skip-email
+ln -s "$ROOT" "$WP_DIR/wp-content/plugins/gutenberg"
+wp plugin activate gutenberg
+python3 "$ROOT/test/ios/blueprint-steps.py" "$ROOT/test/ios/blueprint.json" "$WP_DIR"
+# Like Playground's login option: every request is the administrator's.
+cat > "$WP_DIR/wp-content/mu-plugins/login.php" <<'PHP'
+<?php
+add_action( 'init', function () {
+	if ( is_user_logged_in() ) {
+		return;
+	}
+	// The admin checks this request's cookies, so set them here too.
+	$expiration = time() + DAY_IN_SECONDS;
+	$_COOKIE[ AUTH_COOKIE ] = wp_generate_auth_cookie( 1, $expiration, 'auth' );
+	$_COOKIE[ LOGGED_IN_COOKIE ] = wp_generate_auth_cookie( 1, $expiration, 'logged_in' );
+	wp_set_auth_cookie( 1, true );
+	wp_set_current_user( 1 );
+}, 0 );
+PHP
+PHP_CLI_SERVER_WORKERS=8 php -d memory_limit=512M -S "127.0.0.1:$PORT" -t "$WP_DIR" > "$ROOT/test/ios/build/server.log" 2>&1 &
+SERVER_PID=$!
+trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+until curl -sf -o /dev/null "$WP_BASE_URL/wp-login.php"; do
+	kill -0 "$SERVER_PID" 2>/dev/null || { cat "$ROOT/test/ios/build/server.log"; echo "WordPress did not start"; exit 1; }
 	sleep 1
 done
-cat "$PLAYGROUND_LOG"
 
 # The editor page shows whether the plugin replaces core's bundles, which
 # it only does when its build exists. Its first request also does the
