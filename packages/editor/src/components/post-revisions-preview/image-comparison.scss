@@ -10,6 +10,9 @@
 
 .editor-post-revisions-preview__image-labels {
 	display: flex;
+	// Match labels to the fixed LTR slider and clipping direction.
+	/*rtl:ignore*/
+	direction: ltr;
 	justify-content: space-between;
 	gap: var(--wpds-dimension-gap-md);
 	margin-bottom: var(--wpds-dimension-gap-sm);
@@ -89,6 +92,7 @@
 	width: 24px;
 	height: 24px;
 	box-sizing: border-box;
+	/*rtl:ignore*/
 	transform: translate(-50%, -50%);
 	border: 2px solid var(--wpds-color-stroke-interactive-neutral-strong);
 	border-radius: 50%;
