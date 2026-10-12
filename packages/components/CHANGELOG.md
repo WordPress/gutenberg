@@ -15,7 +15,7 @@
 
 ### Enhancements
 
--   `MenuItem`, `DropdownMenu`, deprecated `Menu`, `CustomSelectControl`, `CustomSelectControlV2`, `ComboboxControl`, `FormTokenField`, and `Autocomplete`: Use neutral item highlights, theme-aware popup backgrounds, and zero-offset keyboard focus rings, matching `@wordpress/ui` ([#84087](https://github.com/WordPress/gutenberg/pull/84087)).
+-   `MenuItem`, `DropdownMenu`, deprecated `Menu`, `CustomSelectControl`, `CustomSelectControlV2`, `ComboboxControl`, `FormTokenField`, and `Autocomplete`: Use neutral item highlights, theme-aware popup backgrounds, and zero-offset keyboard focus rings, matching the design proposed for `@wordpress/ui` in [#84087](https://github.com/WordPress/gutenberg/pull/84087) ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
 
 ### Deprecations
 
