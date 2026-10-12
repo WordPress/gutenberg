@@ -344,3 +344,81 @@ function gutenberg_add_page_homepage_action_links( $response, $post, $request ) 
 	return $response;
 }
 add_filter( 'rest_prepare_page', 'gutenberg_add_page_homepage_action_links', 10, 3 );
+
+/**
+ * Registers the `locked_by` field for post types that can be edited.
+ *
+ * Lists of posts use it to show that someone else is editing a post, as the
+ * list tables in the admin do.
+ *
+ * @since 7.2.0
+ */
+function gutenberg_register_post_locked_by_field() {
+	$post_types = array_filter(
+		get_post_types( array( 'show_in_rest' => true ), 'names' ),
+		static function ( $post_type ) {
+			return post_type_supports( $post_type, 'editor' ) &&
+				! in_array( $post_type, array( 'wp_template', 'wp_template_part' ), true );
+		}
+	);
+
+	register_rest_field(
+		array_values( $post_types ),
+		'locked_by',
+		array(
+			'schema'       => array(
+				'description' => __( 'The user currently editing the post, if it is not the current user.', 'gutenberg' ),
+				'type'        => array( 'object', 'null' ),
+				'context'     => array( 'edit' ),
+				'readonly'    => true,
+				'properties'  => array(
+					'id'          => array(
+						'description' => __( 'The ID of the user.', 'gutenberg' ),
+						'type'        => 'integer',
+					),
+					'name'        => array(
+						'description' => __( 'The display name of the user.', 'gutenberg' ),
+						'type'        => 'string',
+					),
+					'avatar_urls' => array(
+						'description' => __( 'The avatar URLs of the user.', 'gutenberg' ),
+						'type'        => 'object',
+					),
+				),
+			),
+			'get_callback' => 'gutenberg_get_post_locked_by',
+		)
+	);
+}
+add_action( 'rest_api_init', 'gutenberg_register_post_locked_by_field' );
+
+/**
+ * Returns the user holding the edit lock of a post, if it is not the current
+ * user.
+ *
+ * @since 7.2.0
+ *
+ * @param array $item The prepared post data.
+ * @return array|null The user holding the lock, or null if the post is not locked.
+ */
+function gutenberg_get_post_locked_by( $item ) {
+	if ( empty( $item['id'] ) || ! current_user_can( 'edit_post', $item['id'] ) ) {
+		return null;
+	}
+
+	if ( ! function_exists( 'wp_check_post_lock' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/post.php';
+	}
+
+	$user_id = wp_check_post_lock( $item['id'] );
+	$user    = $user_id ? get_userdata( $user_id ) : false;
+	if ( ! $user ) {
+		return null;
+	}
+
+	return array(
+		'id'          => $user->ID,
+		'name'        => $user->display_name,
+		'avatar_urls' => rest_get_avatar_urls( $user ),
+	);
+}
