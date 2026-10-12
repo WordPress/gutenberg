@@ -182,27 +182,37 @@ export function NotesDisplayModeMenu( {
 		}
 	}
 
+	const allNotesItem = hasAllNotes && (
+		<Menu.CheckboxItem
+			checked={ isAllNotesOpen }
+			onCheckedChange={ toggleAllNotes }
+		>
+			<Menu.ItemLabel>{ __( 'Show all notes' ) }</Menu.ItemLabel>
+		</Menu.CheckboxItem>
+	);
+
 	return (
 		<NotesMoreMenuGroup.Fill>
-			<MoreMenuSubmenu label={ __( 'Notes' ) }>
-				{ isLargeViewport && (
+			{ isLargeViewport ? (
+				<MoreMenuSubmenu label={ __( 'Notes' ) }>
 					<DisplayModeItems
 						displayMode={ displayMode }
 						onChange={ setDisplayMode }
 					/>
-				) }
-				{ isLargeViewport && hasAllNotes && <Menu.Separator /> }
-				{ hasAllNotes && (
-					<Menu.CheckboxItem
-						checked={ isAllNotesOpen }
-						onCheckedChange={ toggleAllNotes }
-					>
+					{ hasAllNotes && <Menu.Separator /> }
+					{ allNotesItem }
+				</MoreMenuSubmenu>
+			) : (
+				hasAllNotes && (
+					<Menu.Item onClick={ toggleAllNotes }>
 						<Menu.ItemLabel>
-							{ __( 'Show all notes' ) }
+							{ isAllNotesOpen
+								? __( 'Hide notes' )
+								: __( 'Show notes' ) }
 						</Menu.ItemLabel>
-					</Menu.CheckboxItem>
-				) }
-			</MoreMenuSubmenu>
+					</Menu.Item>
+				)
+			) }
 		</NotesMoreMenuGroup.Fill>
 	);
 }
