@@ -19,8 +19,8 @@ class Emoji_Picker_Data_Test extends WP_UnitTestCase {
 	public function test_default_overrides_seeded_from_named_reactions() {
 		$overrides = gutenberg_get_emoji_picker_label_overrides();
 
-		// Heart, Celebration, Smile, Eyes, Rocket.
-		$this->assertSame( 'Heart', $overrides['2764'] );
+		// heart, celebration, smile, eyes, rocket.
+		$this->assertSame( 'heart', $overrides['2764'] );
 		$this->assertArrayHasKey( '1F389', $overrides );
 		$this->assertArrayHasKey( '1F604', $overrides );
 		$this->assertArrayHasKey( '1F440', $overrides );
