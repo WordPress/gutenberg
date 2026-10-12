@@ -1,3 +1,17 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.fields-controls__author-icon {
+	display: flex;
+	flex-shrink: 0;
+	width: $grid-unit-30;
+	height: $grid-unit-30;
+
+	svg {
+		margin-left: -$grid-unit-05;
+		fill: currentColor;
+	}
+}
+
 .fields-controls__author-name {
 	text-overflow: ellipsis;
 	overflow: hidden;

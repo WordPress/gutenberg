@@ -57,16 +57,29 @@ export default function TemplateAuthorView( {
 	);
 
 	return (
-		<Stack direction="row" align="center" gap="sm">
-			<Avatar.Root size="xs" aria-hidden="true">
-				<Avatar.Fallback>
-					<Icon
-						icon={ icon }
-						style={ { inlineSize: '100%', blockSize: '100%' } }
-					/>
-				</Avatar.Fallback>
-				<Avatar.Image src={ imageUrl } alt="" keepMounted />
-			</Avatar.Root>
+		<Stack
+			direction="row"
+			align="center"
+			gap={ originalSource === 'theme' ? undefined : 'sm' }
+		>
+			{ originalSource === 'theme' ? (
+				<div
+					className="fields-controls__author-icon"
+					aria-hidden="true"
+				>
+					<Icon icon={ themeIcon } />
+				</div>
+			) : (
+				<Avatar.Root size="xs" aria-hidden="true">
+					<Avatar.Fallback>
+						<Icon
+							icon={ icon }
+							style={ { inlineSize: '100%', blockSize: '100%' } }
+						/>
+					</Avatar.Fallback>
+					<Avatar.Image src={ imageUrl } alt="" keepMounted />
+				</Avatar.Root>
+			) }
 			<span className="fields-controls__author-name">{ text }</span>
 		</Stack>
 	);
