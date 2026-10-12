@@ -65,6 +65,9 @@ sed -e "s#{SQLITE_IMPLEMENTATION_FOLDER_PATH}#$SQLITE#" -e "s#{SQLITE_PLUGIN}#sq
 	"$SQLITE/db.copy" > "$WP_DIR/wp-content/db.php"
 step "Installing WordPress"
 wp config create --dbname=wordpress --dbuser=wordpress --dbpass=wordpress --skip-check
+# Like Playground, without the network: a fresh site's first admin page
+# otherwise waits on update checks from wordpress.org.
+wp config set WP_HTTP_BLOCK_EXTERNAL true --raw
 wp core install --url="$WP_BASE_URL" --title="iOS tests" --admin_user=admin --admin_password=password --admin_email=admin@example.com --skip-email
 step "Activating the plugin"
 ln -s "$ROOT" "$WP_DIR/wp-content/plugins/gutenberg"
@@ -88,7 +91,8 @@ PHP
 step "Starting the server"
 PHP_CLI_SERVER_WORKERS=8 php -d memory_limit=512M -S "127.0.0.1:$PORT" -t "$WP_DIR" > "$ROOT/test/ios/build/server.log" 2>&1 &
 SERVER_PID=$!
-trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+# The server's workers are its child processes: stop them too.
+trap 'pkill -P "$SERVER_PID" 2>/dev/null; kill "$SERVER_PID" 2>/dev/null || true' EXIT
 until curl -sf -o /dev/null "$WP_BASE_URL/wp-login.php"; do
 	kill -0 "$SERVER_PID" 2>/dev/null || { cat "$ROOT/test/ios/build/server.log"; echo "WordPress did not start"; exit 1; }
 	sleep 1
