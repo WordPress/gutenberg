@@ -13,6 +13,7 @@
 
 .components-tab-panel__tabs-item {
 	position: relative;
+	isolation: isolate;
 	border-radius: 0;
 	height: $grid-unit-60 !important; // https://github.com/WordPress/gutenberg/pull/65075#discussion_r1746282734
 	background: transparent;
@@ -28,8 +29,12 @@
 		color: var(--wpds-color-foreground-interactive-neutral-disabled);
 	}
 
-	&:not(:disabled, [aria-disabled="true"]):is(:hover, :focus-visible) {
+	&:not(:disabled, [aria-disabled="true"]):is(:hover, :active, :focus-visible) {
 		color: var(--wpds-color-foreground-interactive-neutral-active);
+
+		&::before {
+			background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+		}
 	}
 
 	&:focus:not(:disabled) {
@@ -47,7 +52,7 @@
 		pointer-events: none;
 
 		// Draw the indicator.
-		background: var(--wpds-color-stroke-interactive-neutral-strong);
+		background: currentColor;
 		height: calc(0 * var(--wpds-border-width-focus));
 		border-radius: 0;
 
@@ -66,10 +71,11 @@
 		outline-offset: -1px;
 	}
 
-	// Focus.
+	// Interaction background and focus ring.
 	&::before {
 		content: "";
 		position: absolute;
+		z-index: -1;
 		inset: var(--wpds-dimension-padding-md);
 		pointer-events: none;
 		border-radius: var(--wpds-border-radius-sm);

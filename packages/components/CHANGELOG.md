@@ -13,11 +13,17 @@
     -   `ColorPicker` ([#84128](https://github.com/WordPress/gutenberg/pull/84128))
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Enhancements
+
+-   `TabPanel`: Add interaction backgrounds within the focus ring and match selection indicators to the tab text ([#82294](https://github.com/WordPress/gutenberg/pull/82294)).
+
 ### Deprecations
 
 -   `Tip`: Deprecate in favor of `Notice` from `@wordpress/ui`, preserving the legacy component for existing consumers ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
 
 ### Bug Fixes
+
+-   `Tabs`: Use semantic interaction colors and separate hover backgrounds from keyboard focus rings in both orientations ([#82294](https://github.com/WordPress/gutenberg/pull/82294)).
 
 -   `InputControl`, `NumberControl`, `UnitControl`: Ignore the drag gesture for touch input, where it has no cursor affordance and is easy to trigger by accident ([#38865](https://github.com/WordPress/gutenberg/issues/38865), [#81519](https://github.com/WordPress/gutenberg/pull/81519)).
 -   `navigateRegions`: Only outline the Publish and Save controls when their region has focus ([#84343](https://github.com/WordPress/gutenberg/pull/84343)).
