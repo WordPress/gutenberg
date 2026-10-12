@@ -93,7 +93,7 @@ class Gutenberg_REST_View_Config_Controller_7_2 extends Gutenberg_REST_View_Conf
 
 		$data = $response->get_data();
 		if ( is_array( $data['view_list'] ) ) {
-			$data['view_list'] = _gutenberg_add_counts_to_view_list( 'page', $data['view_list'] );
+			$data['view_list'] = _gutenberg_add_counts_to_view_list( 'page', $data['view_list'], $data['default_view'], $data['default_layouts'] );
 			$response->set_data( $data );
 		}
 

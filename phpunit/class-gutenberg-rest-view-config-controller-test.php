@@ -295,7 +295,7 @@ class Tests_REST_View_Config_Controller extends WP_Test_REST_TestCase {
 		$this->assertSame( $config['default_view'], $data['default_view'] );
 		$this->assertSame( $config['default_layouts'], $data['default_layouts'] );
 		// The 7.2 controller adds the item counts to the `page` view list.
-		$this->assertSame( _gutenberg_add_counts_to_view_list( 'page', $config['view_list'] ), $data['view_list'] );
+		$this->assertSame( _gutenberg_add_counts_to_view_list( 'page', $config['view_list'], $config['default_view'], $config['default_layouts'] ), $data['view_list'] );
 		$this->assertSame( $config['form'], $data['form'] );
 	}
 
