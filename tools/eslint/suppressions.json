@@ -4837,11 +4837,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/unit-control/styles/unit-control-styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
 	"packages/components/src/utils/base-label.ts": {
 		"no-restricted-imports": {
 			"count": 1
