@@ -54,11 +54,10 @@ rm -rf "$WP_DIR"
 CORE=$( python3 -c 'import json; print( json.load( open( ".wp-env.test.json" ) )[ "core" ] )' )
 [[ "$CORE" =~ ^[^/#]+/[^/#]+(#.+)?$ ]] || { echo "Unsupported core in .wp-env.test.json: $CORE"; exit 1; }
 REPO="${CORE%%#*}"
-REF="HEAD"
-[[ "$CORE" == *#* ]] && REF="${CORE#*#}"
+BRANCH=""
+[[ "$CORE" == *#* ]] && BRANCH="--branch=${CORE#*#}"
 step "Downloading WordPress from $REPO"
-mkdir -p "$WP_DIR"
-curl -sSLf "https://codeload.github.com/$REPO/tar.gz/$REF" | tar xz --strip-components=1 -C "$WP_DIR"
+git clone --quiet --depth 1 $BRANCH "https://github.com/$REPO.git" "$WP_DIR"
 unzip -q "$CACHE/sqlite.zip" -d "$WP_DIR/wp-content/plugins"
 SQLITE="$WP_DIR/wp-content/plugins/sqlite-database-integration"
 sed -e "s#{SQLITE_IMPLEMENTATION_FOLDER_PATH}#$SQLITE#" -e "s#{SQLITE_PLUGIN}#sqlite-database-integration/load.php#" \
