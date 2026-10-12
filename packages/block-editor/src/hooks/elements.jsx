@@ -47,8 +47,8 @@ export function ElementsEdit( {
 	setAttributes,
 	settings,
 	asWrapper,
-	label,
-	defaultControls,
+	label = undefined,
+	defaultControls = undefined,
 } ) {
 	const selectedState = useBlockStyleState();
 	const isEnabled = useHasColorPanel( settings );

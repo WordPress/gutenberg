@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   Mixed block selections containing text blocks now expose the core style controls shared by every selected text block, while leaving non-text blocks unchanged ([#81118](https://github.com/WordPress/gutenberg/pull/81118)).
 -   Inserter: Replace random tips with info notices using the same light-bulb icon and style keyboard hints as keys ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
 
 ### Bug Fixes

@@ -1,5 +1,20 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+async function selectGroupBlock( editor ) {
+	await editor.selectBlocks(
+		editor.canvas.getByRole( 'document', { name: 'Block: Group' } )
+	);
+}
+
+async function openGroupBlockSettings( editor, page ) {
+	await selectGroupBlock( editor );
+	await editor.openDocumentSettingsSidebar();
+	await page
+		.getByRole( 'region', { name: 'Editor settings' } )
+		.getByRole( 'tab', { name: 'Block', exact: true } )
+		.click();
+}
+
 test.describe( 'Background gradient block support', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		// Switch to emptytheme so WordPress default gradient presets are
@@ -38,6 +53,7 @@ test.describe( 'Background gradient block support', () => {
 					},
 				},
 			} );
+			await selectGroupBlock( editor );
 
 			// Block should be valid — no "Attempt Block Recovery" notice.
 			await expect(
@@ -60,7 +76,7 @@ test.describe( 'Background gradient block support', () => {
 				},
 			} );
 
-			await editor.openDocumentSettingsSidebar();
+			await openGroupBlockSettings( editor, page );
 
 			// The gradient indicator in the Background panel should be visible,
 			// meaning the color.gradient value surfaced via the read-through fallback.
@@ -95,7 +111,7 @@ test.describe( 'Background gradient block support', () => {
 				},
 			} );
 
-			await editor.openDocumentSettingsSidebar();
+			await openGroupBlockSettings( editor, page );
 
 			// Open the gradient picker in the Background panel and select a
 			// preset, which triggers the migration.
@@ -135,7 +151,7 @@ test.describe( 'Background gradient block support', () => {
 				},
 			} );
 
-			await editor.openDocumentSettingsSidebar();
+			await openGroupBlockSettings( editor, page );
 
 			// Open the gradient picker and clear it. The inline reset icon
 			// button (aria-label="Reset") is hidden until hover; using the
@@ -179,7 +195,7 @@ test.describe( 'Background gradient block support', () => {
 				},
 			} );
 
-			await editor.openDocumentSettingsSidebar();
+			await openGroupBlockSettings( editor, page );
 
 			// First, trigger migration by selecting a preset gradient.
 			await page
@@ -231,7 +247,7 @@ test.describe( 'Background gradient block support', () => {
 				},
 			} );
 
-			await editor.openDocumentSettingsSidebar();
+			await openGroupBlockSettings( editor, page );
 
 			// Trigger migration by clearing the gradient via the picker.
 			await page

@@ -296,7 +296,7 @@ function splitGapValue( value, isAxialGap ) {
 	};
 }
 
-function DimensionsToolsPanel( {
+export function DimensionsToolsPanel( {
 	resetAllFilter,
 	onChange,
 	value,
