@@ -9,9 +9,6 @@
 ### Enhancements
 
 -   Migrate the classic-theme template selector to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
-
-### Enhancements
-
 -   Visual revisions: Introduce contextual image comparison with a reveal slider ([#84298](https://github.com/WordPress/gutenberg/pull/84298)).
 
 ### Bug Fixes
