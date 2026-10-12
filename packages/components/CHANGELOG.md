@@ -13,12 +13,22 @@
     -   `ColorPicker` ([#84128](https://github.com/WordPress/gutenberg/pull/84128))
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Enhancements
+
+-   Add interaction backgrounds within `TabPanel` tabs' focus-ring bounds and match their indicators to the text color, match `Notice` dismiss controls to the notice's tone with a tinted interaction background, and make `ExternalLink` underlines follow the text color and thicken on hover, press, and keyboard focus. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
+
 ### Deprecations
 
 -   `Tip`: Deprecate in favor of `Notice` from `@wordpress/ui`, preserving the legacy component for existing consumers ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
 
 ### Bug Fixes
 
+-   `Tabs`: Separate hover backgrounds from keyboard focus rings in both orientations. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
+-   Use matching strong neutral colors for pressed toolbar buttons and inherit their subscript color. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
+
+-   Use semantic colors for `Modal`, `Panel`, and `ToolsPanel` surfaces, headings, and controls. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
+-   Align pressed `Button` colors and legacy `Tabs` interaction states with the semantic design tokens. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
+-   Keep JavaScript color fallbacks in sync with the generated design tokens. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 -   `InputControl`, `NumberControl`, `UnitControl`: Ignore the drag gesture for touch input, where it has no cursor affordance and is easy to trigger by accident ([#38865](https://github.com/WordPress/gutenberg/issues/38865), [#81519](https://github.com/WordPress/gutenberg/pull/81519)).
 -   `navigateRegions`: Only outline the Publish and Save controls when their region has focus ([#84343](https://github.com/WordPress/gutenberg/pull/84343)).
 -   `ToolsPanel`: Use setting-first accessible action labels without changing the menu design ([#84341](https://github.com/WordPress/gutenberg/pull/84341)).

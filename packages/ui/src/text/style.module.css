@@ -9,6 +9,16 @@
 
 		/* Text variants can render as either paragraphs or headings, so each variant
 		   provides values for both element-specific CSS defenses. */
+		.heading-2xl,
+		.heading-xl,
+		.heading-lg,
+		.heading-md,
+		.heading-sm {
+			--_gcd-heading-color: var(--wpds-color-foreground-content-neutral-strong);
+
+			color: var(--wpds-color-foreground-content-neutral-strong);
+		}
+
 		.heading-2xl {
 			--_gcd-heading-font-size: var(--wpds-typography-font-size-2xl);
 			--_gcd-heading-font-weight: var(--wpds-typography-font-weight-emphasis);

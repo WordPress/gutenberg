@@ -9,11 +9,18 @@
 ### New Features
 
 -   Add `tokens` and `groups` named exports to `design-tokens.js`, exposing descriptions, types, the full group hierarchy, default DTCG and CSS values, and build-plugin fallback expressions for every semantic token while retaining the default token-name list ([#76604](https://github.com/WordPress/gutenberg/pull/76604)).
+-   Add `--wpds-color-foreground-content-neutral-strong` for headings and other content with strong emphasis. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
+
+### Enhancements
+
+-   Swap resting and active backgrounds for strong neutral controls. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
+-   Generate perception-aware color ramps with ordered surface and stroke progressions, preserve available surface spacing near black and white, align normal content with resting interactive colors, use the fifth foreground step for strong content and interaction states, and keep WCAG contrast floors unchanged. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 
 ### Internal
 
 -   Consolidate border mode overrides in the resolver and inherit default values from the base tokens ([#84108](https://github.com/WordPress/gutenberg/pull/84108)).
 -   Update the Vite development dependency to 8.3.4 ([#84544](https://github.com/WordPress/gutenberg/pull/84544)).
+-   Register color spaces only when calculating colors, avoiding module-import side effects. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 
 ## 2.3.0 (2026-10-07)
 

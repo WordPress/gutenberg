@@ -26,6 +26,7 @@
 				}
 
 				&::after {
+					opacity: 0.04;
 					background: var(--wp-block-synced-color);
 				}
 			}
@@ -38,7 +39,7 @@
 	flex-direction: column;
 	width: 100%;
 	font-size: $default-font-size;
-	color: $gray-900;
+	color: var(--wpds-color-foreground-interactive-neutral);
 	padding: $grid-unit-10;
 	align-items: stretch;
 	justify-content: center;
@@ -50,6 +51,7 @@
 		transition: all 0.05s ease-in-out;
 	}
 	position: relative;
+	isolation: isolate;
 	height: auto;
 
 	&:disabled,
@@ -61,24 +63,23 @@
 	&:not(:disabled, [aria-disabled="true"]) {
 		&:hover {
 			.block-editor-block-types-list__item-title {
-				color: var(--wp-admin-theme-color) !important;
-				filter: brightness(0.95);
+				color: var(--wpds-color-foreground-interactive-brand-active) !important;
 			}
 
 			svg {
-				color: var(--wp-admin-theme-color) !important;
+				color: var(--wpds-color-foreground-interactive-brand-active) !important;
 			}
 
 			&::after {
 				content: "";
 				position: absolute;
+				z-index: -1;
 				top: 0;
 				bottom: 0;
 				left: 0;
 				right: 0;
 				border-radius: $radius-small;
-				opacity: 0.04;
-				background: var(--wp-admin-theme-color);
+				background: var(--wpds-color-background-interactive-brand-weak-active);
 				// This fixes drag-and-drop in Firefox.
 				pointer-events: none;
 			}
@@ -88,7 +89,7 @@
 
 .block-editor-block-types-list__item-icon {
 	padding: 12px 20px;
-	color: $gray-900;
+	color: inherit;
 	@media not ( prefers-reduced-motion ) {
 		transition: all 0.05s ease-in-out;
 	}

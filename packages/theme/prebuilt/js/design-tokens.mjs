@@ -193,16 +193,16 @@ export const tokens = /** @type {const} */ ( {
 		$description: 'Background color for surfaces with weak emphasis.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#f4f4f4',
+		fallback: '#f7f7f7',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.957, 0.957, 0.957 ],
-					hex: '#f4f4f4',
+					components: [ 0.969, 0.969, 0.969 ],
+					hex: '#f7f7f7',
 					alpha: 1,
 				},
-				css: '#f4f4f4',
+				css: '#f7f7f7',
 			},
 		},
 	},
@@ -212,16 +212,16 @@ export const tokens = /** @type {const} */ ( {
 		$type: 'color',
 		group: 'color',
 		fallback:
-			'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 9%, white)',
+			'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 8%, white)',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.925, 0.941, 0.98 ],
-					hex: '#ecf0fa',
+					components: [ 0.929, 0.945, 0.984 ],
+					hex: '#edf1fb',
 					alpha: 1,
 				},
-				css: '#ecf0fa',
+				css: '#edf1fb',
 			},
 		},
 	},
@@ -230,16 +230,16 @@ export const tokens = /** @type {const} */ ( {
 			'Background color for surfaces with success tone and normal emphasis.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#c2f8ca',
+		fallback: '#c5fbcd',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.761, 0.973, 0.792 ],
-					hex: '#c2f8ca',
+					components: [ 0.773, 0.984, 0.804 ],
+					hex: '#c5fbcd',
 					alpha: 1,
 				},
-				css: '#c2f8ca',
+				css: '#c5fbcd',
 			},
 		},
 	},
@@ -266,16 +266,16 @@ export const tokens = /** @type {const} */ ( {
 			'Background color for surfaces with info tone and normal emphasis.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#deebfa',
+		fallback: '#e0edfc',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.871, 0.922, 0.98 ],
-					hex: '#deebfa',
+					components: [ 0.878, 0.929, 0.988 ],
+					hex: '#e0edfc',
 					alpha: 1,
 				},
-				css: '#deebfa',
+				css: '#e0edfc',
 			},
 		},
 	},
@@ -302,16 +302,16 @@ export const tokens = /** @type {const} */ ( {
 			'Background color for surfaces with warning tone and normal emphasis.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#fde6be',
+		fallback: '#ffe8c0',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.992, 0.902, 0.745 ],
-					hex: '#fde6be',
+					components: [ 1, 0.91, 0.753 ],
+					hex: '#ffe8c0',
 					alpha: 1,
 				},
-				css: '#fde6be',
+				css: '#ffe8c0',
 			},
 		},
 	},
@@ -338,16 +338,16 @@ export const tokens = /** @type {const} */ ( {
 			'Background color for surfaces with caution tone and normal emphasis.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#fee995',
+		fallback: '#ffea96',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.996, 0.914, 0.584 ],
-					hex: '#fee995',
+					components: [ 1, 0.918, 0.588 ],
+					hex: '#ffea96',
 					alpha: 1,
 				},
-				css: '#fee995',
+				css: '#ffea96',
 			},
 		},
 	},
@@ -374,16 +374,16 @@ export const tokens = /** @type {const} */ ( {
 			'Background color for surfaces with error tone and normal emphasis.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#fae5e1',
+		fallback: '#fce7e3',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.98, 0.898, 0.882 ],
-					hex: '#fae5e1',
+					components: [ 0.988, 0.906, 0.89 ],
+					hex: '#fce7e3',
 					alpha: 1,
 				},
-				css: '#fae5e1',
+				css: '#fce7e3',
 			},
 		},
 	},
@@ -464,24 +464,6 @@ export const tokens = /** @type {const} */ ( {
 			'Background color for interactive elements with neutral tone and strong emphasis.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#2d2d2d',
-		modes: {
-			default: {
-				$value: {
-					colorSpace: 'srgb',
-					components: [ 0.176, 0.176, 0.176 ],
-					hex: '#2d2d2d',
-					alpha: 1,
-				},
-				css: '#2d2d2d',
-			},
-		},
-	},
-	'--wpds-color-background-interactive-neutral-strong-active': {
-		$description:
-			'Background color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active.',
-		$type: 'color',
-		group: 'color',
 		fallback: '#1e1e1e',
 		modes: {
 			default: {
@@ -495,21 +477,39 @@ export const tokens = /** @type {const} */ ( {
 			},
 		},
 	},
+	'--wpds-color-background-interactive-neutral-strong-active': {
+		$description:
+			'Background color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active.',
+		$type: 'color',
+		group: 'color',
+		fallback: '#2d2d2d',
+		modes: {
+			default: {
+				$value: {
+					colorSpace: 'srgb',
+					components: [ 0.176, 0.176, 0.176 ],
+					hex: '#2d2d2d',
+					alpha: 1,
+				},
+				css: '#2d2d2d',
+			},
+		},
+	},
 	'--wpds-color-background-interactive-neutral-strong-disabled': {
 		$description:
 			'Background color for interactive elements with neutral tone and strong emphasis, in their disabled state.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#e6e6e6',
+		fallback: '#e3e3e3',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.902, 0.902, 0.902 ],
-					hex: '#e6e6e6',
+					components: [ 0.89, 0.89, 0.89 ],
+					hex: '#e3e3e3',
 					alpha: 1,
 				},
-				css: '#e6e6e6',
+				css: '#e3e3e3',
 			},
 		},
 	},
@@ -535,16 +535,16 @@ export const tokens = /** @type {const} */ ( {
 			'Background color for interactive elements with neutral tone and weak emphasis that are hovered, focused, or active.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#ededed',
+		fallback: '#efefef',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.929, 0.929, 0.929 ],
-					hex: '#ededed',
+					components: [ 0.937, 0.937, 0.937 ],
+					hex: '#efefef',
 					alpha: 1,
 				},
-				css: '#ededed',
+				css: '#efefef',
 			},
 		},
 	},
@@ -607,16 +607,16 @@ export const tokens = /** @type {const} */ ( {
 			'Background color for interactive elements with brand tone and strong emphasis, in their disabled state.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#e6e6e6',
+		fallback: '#e3e3e3',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.902, 0.902, 0.902 ],
-					hex: '#e6e6e6',
+					components: [ 0.89, 0.89, 0.89 ],
+					hex: '#e3e3e3',
 					alpha: 1,
 				},
-				css: '#e6e6e6',
+				css: '#e3e3e3',
 			},
 		},
 	},
@@ -648,11 +648,11 @@ export const tokens = /** @type {const} */ ( {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.898, 0.918, 0.969 ],
-					hex: '#e5eaf7',
+					components: [ 0.902, 0.922, 0.973 ],
+					hex: '#e6ebf8',
 					alpha: 1,
 				},
-				css: '#e5eaf7',
+				css: '#e6ebf8',
 			},
 		},
 	},
@@ -766,16 +766,16 @@ export const tokens = /** @type {const} */ ( {
 			'Background color for interactive elements with error tone and strong emphasis, in their disabled state.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#e6e6e6',
+		fallback: '#e3e3e3',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.902, 0.902, 0.902 ],
-					hex: '#e6e6e6',
+					components: [ 0.89, 0.89, 0.89 ],
+					hex: '#e3e3e3',
 					alpha: 1,
 				},
-				css: '#e6e6e6',
+				css: '#e3e3e3',
 			},
 		},
 	},
@@ -801,16 +801,16 @@ export const tokens = /** @type {const} */ ( {
 			'Background color for interactive elements with error tone and weak emphasis that are hovered, focused, or active.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#fae5e1',
+		fallback: '#fce7e3',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.98, 0.898, 0.882 ],
-					hex: '#fae5e1',
+					components: [ 0.988, 0.906, 0.89 ],
+					hex: '#fce7e3',
 					alpha: 1,
 				},
-				css: '#fae5e1',
+				css: '#fce7e3',
 			},
 		},
 	},
@@ -872,16 +872,16 @@ export const tokens = /** @type {const} */ ( {
 			'Background color for thumbs with a neutral tone and normal emphasis (eg. progressbar indicator).',
 		$type: 'color',
 		group: 'color',
-		fallback: '#1e1e1e',
+		fallback: '#464646',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.118, 0.118, 0.118 ],
-					hex: '#1e1e1e',
+					components: [ 0.275, 0.275, 0.275 ],
+					hex: '#464646',
 					alpha: 1,
 				},
-				css: '#1e1e1e',
+				css: '#464646',
 			},
 		},
 	},
@@ -998,16 +998,34 @@ export const tokens = /** @type {const} */ ( {
 			'Foreground color for content like text with normal emphasis.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#1e1e1e',
+		fallback: '#464646',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.118, 0.118, 0.118 ],
-					hex: '#1e1e1e',
+					components: [ 0.275, 0.275, 0.275 ],
+					hex: '#464646',
 					alpha: 1,
 				},
-				css: '#1e1e1e',
+				css: '#464646',
+			},
+		},
+	},
+	'--wpds-color-foreground-content-neutral-strong': {
+		$description:
+			'Foreground color for content like headings with strong emphasis.',
+		$type: 'color',
+		group: 'color',
+		fallback: '#141414',
+		modes: {
+			default: {
+				$value: {
+					colorSpace: 'srgb',
+					components: [ 0.078, 0.078, 0.078 ],
+					hex: '#141414',
+					alpha: 1,
+				},
+				css: '#141414',
 			},
 		},
 	},
@@ -1016,16 +1034,16 @@ export const tokens = /** @type {const} */ ( {
 			'Foreground color for content like text with weak emphasis.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#707070',
+		fallback: '#717171',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.439, 0.439, 0.439 ],
-					hex: '#707070',
+					components: [ 0.443, 0.443, 0.443 ],
+					hex: '#717171',
 					alpha: 1,
 				},
-				css: '#707070',
+				css: '#717171',
 			},
 		},
 	},
@@ -1034,16 +1052,16 @@ export const tokens = /** @type {const} */ ( {
 			'Foreground color for content like text with success tone and normal emphasis.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#002900',
+		fallback: '#1b4f29',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0, 0.161, 0 ],
-					hex: '#002900',
+					components: [ 0.106, 0.31, 0.161 ],
+					hex: '#1b4f29',
 					alpha: 1,
 				},
-				css: '#002900',
+				css: '#1b4f29',
 			},
 		},
 	},
@@ -1052,16 +1070,16 @@ export const tokens = /** @type {const} */ ( {
 			'Foreground color for content like text with success tone and weak emphasis.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#008030',
+		fallback: '#307e44',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0, 0.502, 0.188 ],
-					hex: '#008030',
+					components: [ 0.188, 0.494, 0.267 ],
+					hex: '#307e44',
 					alpha: 1,
 				},
-				css: '#008030',
+				css: '#307e44',
 			},
 		},
 	},
@@ -1070,16 +1088,16 @@ export const tokens = /** @type {const} */ ( {
 			'Foreground color for content like text with info tone and normal emphasis.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#001b4f',
+		fallback: '#004580',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0, 0.106, 0.31 ],
-					hex: '#001b4f',
+					components: [ 0, 0.271, 0.502 ],
+					hex: '#004580',
 					alpha: 1,
 				},
-				css: '#001b4f',
+				css: '#004580',
 			},
 		},
 	},
@@ -1088,16 +1106,16 @@ export const tokens = /** @type {const} */ ( {
 			'Foreground color for content like text with info tone and weak emphasis.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#006bd7',
+		fallback: '#006fc7',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0, 0.42, 0.843 ],
-					hex: '#006bd7',
+					components: [ 0, 0.435, 0.78 ],
+					hex: '#006fc7',
 					alpha: 1,
 				},
-				css: '#006bd7',
+				css: '#006fc7',
 			},
 		},
 	},
@@ -1106,16 +1124,16 @@ export const tokens = /** @type {const} */ ( {
 			'Foreground color for content like text with warning tone and normal emphasis.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#2e1900',
+		fallback: '#594215',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.18, 0.098, 0 ],
-					hex: '#2e1900',
+					components: [ 0.349, 0.259, 0.082 ],
+					hex: '#594215',
 					alpha: 1,
 				},
-				css: '#2e1900',
+				css: '#594215',
 			},
 		},
 	},
@@ -1124,16 +1142,16 @@ export const tokens = /** @type {const} */ ( {
 			'Foreground color for content like text with warning tone and weak emphasis.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#936300',
+		fallback: '#886726',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.576, 0.388, 0 ],
-					hex: '#936300',
+					components: [ 0.533, 0.404, 0.149 ],
+					hex: '#886726',
 					alpha: 1,
 				},
-				css: '#936300',
+				css: '#886726',
 			},
 		},
 	},
@@ -1142,16 +1160,16 @@ export const tokens = /** @type {const} */ ( {
 			'Foreground color for content like text with caution tone and normal emphasis.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#281d00',
+		fallback: '#514513',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.157, 0.114, 0 ],
-					hex: '#281d00',
+					components: [ 0.318, 0.271, 0.075 ],
+					hex: '#514513',
 					alpha: 1,
 				},
-				css: '#281d00',
+				css: '#514513',
 			},
 		},
 	},
@@ -1160,16 +1178,16 @@ export const tokens = /** @type {const} */ ( {
 			'Foreground color for content like text with caution tone and weak emphasis.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#836a00',
+		fallback: '#7c6c21',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.514, 0.416, 0 ],
-					hex: '#836a00',
+					components: [ 0.486, 0.424, 0.129 ],
+					hex: '#7c6c21',
 					alpha: 1,
 				},
-				css: '#836a00',
+				css: '#7c6c21',
 			},
 		},
 	},
@@ -1178,16 +1196,16 @@ export const tokens = /** @type {const} */ ( {
 			'Foreground color for content like text with error tone and normal emphasis.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#470000',
+		fallback: '#850c0c',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.278, 0, 0 ],
-					hex: '#470000',
+					components: [ 0.522, 0.047, 0.047 ],
+					hex: '#850c0c',
 					alpha: 1,
 				},
-				css: '#470000',
+				css: '#850c0c',
 			},
 		},
 	},
@@ -1196,16 +1214,16 @@ export const tokens = /** @type {const} */ ( {
 			'Foreground color for content like text with error tone and weak emphasis.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#cc1818',
+		fallback: '#d81a1a',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.8, 0.094, 0.094 ],
-					hex: '#cc1818',
+					components: [ 0.847, 0.102, 0.102 ],
+					hex: '#d81a1a',
 					alpha: 1,
 				},
-				css: '#cc1818',
+				css: '#d81a1a',
 			},
 		},
 	},
@@ -1214,16 +1232,16 @@ export const tokens = /** @type {const} */ ( {
 			'Foreground color for interactive elements with neutral tone and normal emphasis.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#1e1e1e',
+		fallback: '#464646',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.118, 0.118, 0.118 ],
-					hex: '#1e1e1e',
+					components: [ 0.275, 0.275, 0.275 ],
+					hex: '#464646',
 					alpha: 1,
 				},
-				css: '#1e1e1e',
+				css: '#464646',
 			},
 		},
 	},
@@ -1232,16 +1250,16 @@ export const tokens = /** @type {const} */ ( {
 			'Foreground color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#1e1e1e',
+		fallback: '#141414',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.118, 0.118, 0.118 ],
-					hex: '#1e1e1e',
+					components: [ 0.078, 0.078, 0.078 ],
+					hex: '#141414',
 					alpha: 1,
 				},
-				css: '#1e1e1e',
+				css: '#141414',
 			},
 		},
 	},
@@ -1322,16 +1340,16 @@ export const tokens = /** @type {const} */ ( {
 			'Foreground color for interactive elements with neutral tone and weak emphasis.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#707070',
+		fallback: '#717171',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.439, 0.439, 0.439 ],
-					hex: '#707070',
+					components: [ 0.443, 0.443, 0.443 ],
+					hex: '#717171',
 					alpha: 1,
 				},
-				css: '#707070',
+				css: '#717171',
 			},
 		},
 	},
@@ -1340,16 +1358,16 @@ export const tokens = /** @type {const} */ ( {
 			'Foreground color for interactive elements with neutral tone and weak emphasis that are hovered, focused, or active.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#1e1e1e',
+		fallback: '#141414',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.118, 0.118, 0.118 ],
-					hex: '#1e1e1e',
+					components: [ 0.078, 0.078, 0.078 ],
+					hex: '#141414',
 					alpha: 1,
 				},
-				css: '#1e1e1e',
+				css: '#141414',
 			},
 		},
 	},
@@ -1376,16 +1394,17 @@ export const tokens = /** @type {const} */ ( {
 			'Foreground color for interactive elements with brand tone and normal emphasis.',
 		$type: 'color',
 		group: 'color',
-		fallback: 'var(--wp-admin-theme-color, #3858e9)',
+		fallback:
+			'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 80%, black)',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.22, 0.345, 0.914 ],
-					hex: '#3858e9',
+					components: [ 0.114, 0.153, 0.749 ],
+					hex: '#1d27bf',
 					alpha: 1,
 				},
-				css: '#3858e9',
+				css: '#1d27bf',
 			},
 		},
 	},
@@ -1395,16 +1414,16 @@ export const tokens = /** @type {const} */ ( {
 		$type: 'color',
 		group: 'color',
 		fallback:
-			'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 52%, black)',
+			'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 35%, black)',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.043, 0, 0.439 ],
-					hex: '#0b0070',
+					components: [ 0.012, 0.024, 0.231 ],
+					hex: '#03063b',
 					alpha: 1,
 				},
-				css: '#0b0070',
+				css: '#03063b',
 			},
 		},
 	},
@@ -1485,16 +1504,16 @@ export const tokens = /** @type {const} */ ( {
 			'Foreground color for interactive elements with error tone and normal emphasis.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#cc1818',
+		fallback: '#850c0c',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.8, 0.094, 0.094 ],
-					hex: '#cc1818',
+					components: [ 0.522, 0.047, 0.047 ],
+					hex: '#850c0c',
 					alpha: 1,
 				},
-				css: '#cc1818',
+				css: '#850c0c',
 			},
 		},
 	},
@@ -1503,16 +1522,16 @@ export const tokens = /** @type {const} */ ( {
 			'Foreground color for interactive elements with error tone and normal emphasis that are hovered, focused, or active.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#470000',
+		fallback: '#260101',
 		modes: {
 			default: {
 				$value: {
 					colorSpace: 'srgb',
-					components: [ 0.278, 0, 0 ],
-					hex: '#470000',
+					components: [ 0.149, 0.004, 0.004 ],
+					hex: '#260101',
 					alpha: 1,
 				},
-				css: '#470000',
+				css: '#260101',
 			},
 		},
 	},
@@ -2996,6 +3015,7 @@ export const groups = /** @type {const} */ ( {
 					content: {
 						tokens: [
 							'--wpds-color-foreground-content-neutral',
+							'--wpds-color-foreground-content-neutral-strong',
 							'--wpds-color-foreground-content-neutral-weak',
 							'--wpds-color-foreground-content-success',
 							'--wpds-color-foreground-content-success-weak',

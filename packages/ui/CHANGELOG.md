@@ -16,8 +16,11 @@
 -   `Select`, `Combobox`, `Autocomplete`, and the select controls: Tighten popup item spacing, use 16px selection indicators, and align group labels and separators with item content ([#84393](https://github.com/WordPress/gutenberg/pull/84393)).
 -   `Button`, `IconButton`: Use the shared `Spinner` for loading indicators ([#84321](https://github.com/WordPress/gutenberg/pull/84321)).
 -   `useEnableWpCompatOverlaySlot`: Mark as recommended for use in a WordPress environment ([#84305](https://github.com/WordPress/gutenberg/pull/84305)).
+-   Use strong neutral text for headings and overlay titles, give tabs padded interaction backgrounds and focus rings without widening minimal tab lists and match their indicators to the text color, match Notice dismiss controls to the notice's tone, and make link underlines follow the text color and thicken on hover, press, and keyboard focus. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 
 ### Bug Fixes
+
+-   `Notice.Title`: Preserve the notice tone when heading styles load later or the title renders as a heading. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 
 -   `Popover`, `Menu`, `Tooltip`, `Select`, `Autocomplete`, and `Combobox`: Preserve an explicit null portal container so popup content waits until its target is available ([#84370](https://github.com/WordPress/gutenberg/pull/84370)).
 -   `Menu`, `Popover`: Keep popups open when the user interacts with an iframe inside the popup. ([#83870](https://github.com/WordPress/gutenberg/pull/83870))
