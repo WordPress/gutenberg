@@ -117,7 +117,7 @@
 			background: transparent;
 			border: none;
 			box-shadow: none;
-			outline: none; /* Focus ring applied to the ::after pseudo-element */
+			outline: none; /* Focus ring applied to pseudo-elements */
 			padding: 0;
 
 			/* Positioning */
@@ -160,6 +160,7 @@
 			}
 
 			/* Interaction background and focus indicator. */
+			&::before,
 			&::after {
 				position: absolute;
 				z-index: -1;
@@ -206,6 +207,27 @@
 
 				&::after {
 					inset-inline: 0;
+				}
+			}
+
+			.is-minimal-variant.is-scrolling[data-orientation="horizontal"] & {
+				/* Paint the ring separately so only the background can be clipped. */
+				&::before {
+					content: "";
+					z-index: 0;
+					inset-block: var(--wpds-dimension-padding-md);
+					inset-inline: round(up, var(--wpds-border-width-focus), 1px);
+				}
+
+				&:focus-visible {
+					&::before {
+						outline-color: var(--wpds-color-stroke-focus);
+						opacity: 1;
+					}
+
+					&::after {
+						outline: none;
+					}
 				}
 			}
 
