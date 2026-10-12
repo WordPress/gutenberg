@@ -28,7 +28,7 @@
 -   `Breadcrumb`: Apply hierarchy-selection labels to the ordered list instead of its wrapper, while retaining navigation landmark labels for page breadcrumbs ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
 -   `Breadcrumb`: Align button, link, and current-item padding, separate button hover backgrounds from separators, and preserve list semantics in Safari ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
 -   `Breadcrumb.CurrentItem`: Exclude false values from the `aria-current` type ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
--   `Notice`: Match dismiss button colors to the notice intent and preserve title colors when composed with `Text` ([#82294](https://github.com/WordPress/gutenberg/pull/82294)).
+-   `Notice`: Match dismiss button colors to the notice intent and preserve title colors when composed with `Text` ([#84571](https://github.com/WordPress/gutenberg/pull/84571)).
 -   `Popover`, `Menu`, `Tooltip`, `Select`, `Autocomplete`, and `Combobox`: Preserve an explicit null portal container so popup content waits until its target is available ([#84370](https://github.com/WordPress/gutenberg/pull/84370)).
 -   `Menu`, `Popover`: Keep popups open when the user interacts with an iframe inside the popup. ([#83870](https://github.com/WordPress/gutenberg/pull/83870))
 -   `AlertDialog`: Use the WordPress compatibility overlay slot as the default portal container when available, preserving an explicit null container to delay rendering ([#83878](https://github.com/WordPress/gutenberg/pull/83878)).
