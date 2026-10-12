@@ -747,7 +747,8 @@ describe( 'Menu', () => {
 		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
 
 		const item = await screen.findByRole( 'menuitem', {
-			name: 'WordPress.org (opens in a new tab)',
+			// TODO: jsdom-only name; browsers separate the notice with a space.
+			name: 'WordPress.org(opens in a new tab)',
 		} );
 
 		expect( item ).toHaveAttribute( 'target', '_blank' );
@@ -764,7 +765,8 @@ describe( 'Menu', () => {
 			screen.getAllByLabelText( '(opens in a new tab)' )
 		).toHaveLength( 3 );
 		const developerItem = screen.getByRole( 'menuitem', {
-			name: 'Developer resources (opens in a new tab)',
+			// TODO: jsdom-only name; browsers separate the notice with a space.
+			name: 'Developer resources(opens in a new tab)',
 		} );
 		const developerItemIndicator =
 			queryExternalLinkIndicator( developerItem );

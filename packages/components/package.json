@@ -48,7 +48,7 @@
 		"src/**/*.scss"
 	],
 	"dependencies": {
-		"@ariakit/react": "^0.4.40",
+		"@ariakit/react": "^0.4.41",
 		"@date-fns/utc": "^2.1.1",
 		"@emotion/cache": "^11.14.0",
 		"@emotion/css": "^11.13.5",

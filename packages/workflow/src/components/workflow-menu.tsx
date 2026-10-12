@@ -13,6 +13,7 @@ import { executeAbility, store as abilitiesStore } from '@wordpress/abilities';
 import type { Ability } from '@wordpress/abilities';
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
 import type { AbilityRunResult } from './types';
+import { getErrorMessage } from '../utils/get-error-message';
 import './workflow-menu.scss';
 
 /**
@@ -26,43 +27,7 @@ const inputLabel = __( 'Run abilities and workflows' );
  */
 export function WorkflowMenu() {
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
-	const [ search, setSearch ] = useState( '' );
 	const [ isOpen, setIsOpen ] = useState( false );
-	const [ abilityOutput, setAbilityOutput ] =
-		useState< AbilityRunResult | null >( null );
-	const [ isExecuting, setIsExecuting ] = useState( false );
-	const containerRef = useRef< HTMLDivElement >( null );
-	const inputRef = useRef< HTMLInputElement >( null );
-
-	const abilities = useSelect( ( select ) => {
-		const allAbilities = select( abilitiesStore ).getAbilities();
-		return allAbilities || EMPTY_ARRAY;
-	}, [] );
-
-	const filteredAbilities = useMemo( () => {
-		if ( ! search ) {
-			return abilities;
-		}
-		const searchLower = search.toLowerCase();
-		return abilities.filter(
-			( ability ) =>
-				ability.label?.toLowerCase().includes( searchLower ) ||
-				ability.name?.toLowerCase().includes( searchLower )
-		);
-	}, [ abilities, search ] );
-
-	// Focus container when output is shown so it can receive keyboard events
-	useEffect( () => {
-		if ( abilityOutput && containerRef.current ) {
-			containerRef.current.focus();
-		}
-	}, [ abilityOutput ] );
-
-	useEffect( () => {
-		if ( isOpen && ! abilityOutput ) {
-			inputRef.current?.focus();
-		}
-	}, [ isOpen, abilityOutput ] );
 
 	useEffect( () => {
 		registerShortcut( {
@@ -85,7 +50,7 @@ export function WorkflowMenu() {
 			}
 
 			event.preventDefault();
-			setIsOpen( ! isOpen );
+			setIsOpen( ( open ) => ! open );
 		} )
 	);
 
@@ -97,12 +62,54 @@ export function WorkflowMenu() {
 		}
 	}, [ isOpen ] );
 
-	const closeAndReset = () => {
-		setSearch( '' );
-		setIsOpen( false );
-		setAbilityOutput( null );
-		setIsExecuting( false );
-	};
+	if ( ! isOpen ) {
+		return null;
+	}
+
+	return <WorkflowPalette onClose={ () => setIsOpen( false ) } />;
+}
+
+/*
+ * Unmounted on close, so its state resets and a run that finishes after
+ * closing is dropped.
+ */
+function WorkflowPalette( { onClose }: { onClose: () => void } ) {
+	const [ search, setSearch ] = useState( '' );
+	const [ abilityOutput, setAbilityOutput ] =
+		useState< AbilityRunResult | null >( null );
+	const [ isExecuting, setIsExecuting ] = useState( false );
+	const containerRef = useRef< HTMLDivElement >( null );
+	const inputRef = useRef< HTMLInputElement >( null );
+
+	const abilities = useSelect( ( select ) => {
+		const allAbilities = select( abilitiesStore ).getAbilities();
+		return allAbilities || EMPTY_ARRAY;
+	}, [] );
+
+	const filteredAbilities = useMemo( () => {
+		if ( ! search ) {
+			return abilities;
+		}
+		const searchLower = search.toLowerCase();
+		return abilities.filter(
+			( ability ) =>
+				ability.label.toLowerCase().includes( searchLower ) ||
+				ability.name.toLowerCase().includes( searchLower )
+		);
+	}, [ abilities, search ] );
+
+	// Focus container when output is shown so it can receive keyboard events
+	useEffect( () => {
+		if ( abilityOutput && containerRef.current ) {
+			containerRef.current.focus();
+		}
+	}, [ abilityOutput ] );
+
+	useEffect( () => {
+		if ( ! abilityOutput ) {
+			inputRef.current?.focus();
+		}
+	}, [ abilityOutput ] );
 
 	const goBack = () => {
 		setAbilityOutput( null );
@@ -112,24 +119,19 @@ export function WorkflowMenu() {
 
 	const handleExecuteAbility = async ( ability: Ability ) => {
 		setIsExecuting( true );
+		const details = {
+			name: ability.name,
+			label: ability.label || ability.name,
+			description: ability.description || '',
+		};
 		try {
 			const result = await executeAbility( ability.name );
-			setAbilityOutput( {
-				name: ability.name,
-				label: ability?.label || ability.name,
-				description: ability?.description || '',
-				success: true,
-				data: result,
-			} );
+			setAbilityOutput( { ...details, success: true, data: result } );
 		} catch ( error ) {
 			setAbilityOutput( {
-				name: ability.name,
-				label: ability?.label || ability.name,
-				description: ability?.description || '',
+				...details,
 				success: false,
-				error:
-					( error as { message?: string } ).message ||
-					String( error ),
+				error: getErrorMessage( error ),
 			} );
 		} finally {
 			setIsExecuting( false );
@@ -150,10 +152,6 @@ export function WorkflowMenu() {
 		}
 	};
 
-	if ( ! isOpen ) {
-		return null;
-	}
-
 	const items = isExecuting ? EMPTY_ARRAY : filteredAbilities;
 	const showEmpty = ! isExecuting && !! search && ! filteredAbilities.length;
 
@@ -161,7 +159,7 @@ export function WorkflowMenu() {
 		<Modal
 			className="workflows-workflow-menu"
 			overlayClassName="workflows-workflow-menu__overlay"
-			onRequestClose={ abilityOutput ? goBack : closeAndReset }
+			onRequestClose={ abilityOutput ? goBack : onClose }
 			__experimentalHideHeader
 			contentLabel={ __( 'Workflow palette' ) }
 		>
