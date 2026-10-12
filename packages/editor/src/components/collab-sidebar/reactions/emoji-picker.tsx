@@ -257,8 +257,7 @@ export default function EmojiPicker( {
 
 	/*
 	 * Announce once when a pending load fills the grid. A cached dataset
-	 * renders straight away, and searching filters synchronously, so
-	 * neither needs an announcement.
+	 * renders straight away, so it needs no announcement.
 	 */
 	const [ hasJustLoaded, setHasJustLoaded ] = useState( false );
 	const wasLoadingRef = useRef( isLoading );
@@ -430,6 +429,17 @@ export default function EmojiPicker( {
 				) }
 			</VisuallyHidden>
 		);
+	} else if ( isSearching && items.length > 0 ) {
+		// No results are left to `Autocomplete.Empty`.
+		status = (
+			<VisuallyHidden>
+				{ sprintf(
+					/* translators: %d: number of emojis matching the search. */
+					_n( '%d emoji found.', '%d emojis found.', items.length ),
+					items.length
+				) }
+			</VisuallyHidden>
+		);
 	}
 
 	return (
@@ -465,7 +475,7 @@ export default function EmojiPicker( {
 					return;
 				}
 				setQuery( value );
-				// Searches stay quiet, so drop the load announcement.
+				// The search result count replaces the load announcement.
 				setHasJustLoaded( false );
 			} }
 		>
