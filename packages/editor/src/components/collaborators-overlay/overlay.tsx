@@ -10,6 +10,7 @@ import { AVATAR_IFRAME_STYLES } from './avatar-iframe-styles';
 import { OVERLAY_IFRAME_STYLES } from './overlay-iframe-styles';
 import { setDelayedInterval } from './timing-utils';
 import { useBlockHighlighting } from './use-block-highlighting';
+import { useRecentlyTyped } from './use-recently-typed';
 import { useRenderCursors } from './use-render-cursors';
 import { type CursorRegistry } from './cursor-registry';
 
@@ -21,6 +22,12 @@ const RERENDER_DELAY_MS = 500;
 // applying formatting shifts text but the cursor's logical position is
 // unchanged). Only active when remote cursors are visible.
 const CURSOR_REDRAW_INTERVAL_MS = 10_000;
+
+// How long after the last keystroke an avatar stays hidden. `isTyping` only
+// clears on pointer movement, so without this a keyboard-only user would
+// never see the avatar again. Long enough not to flicker between keystrokes,
+// short enough that a pause in writing brings the avatar back.
+const TYPING_PAUSE_MS = 1000;
 
 interface OverlayProps {
 	blockEditorDocument?: Document;
@@ -65,10 +72,18 @@ export function Overlay( {
 		};
 	}, [] );
 
+	const recentlyTyped = useRecentlyTyped(
+		blockEditorDocument ?? null,
+		TYPING_PAUSE_MS
+	);
+
 	// True when an avatar would be sitting over the text the local user is
-	// writing right now, which is the only case worth hiding it for.
+	// writing right now, which is the only case worth hiding it for. Both
+	// signals matter: `isTyping` brings the avatar back as soon as the pointer
+	// moves, and `recentlyTyped` brings it back after a pause in writing even
+	// if the pointer never moves at all.
 	const coversTextBeingWritten = ( blockClientId?: string ) =>
-		isTyping && blockClientId === selectedBlockClientId;
+		isTyping && recentlyTyped && blockClientId === selectedBlockClientId;
 
 	const { cursors, rerenderCursorsAfterDelay, rerenderCursorsOnResize } =
 		useRenderCursors(
