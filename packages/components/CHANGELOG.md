@@ -18,7 +18,7 @@
 
 ### Enhancements
 
--   `Toolbar`: Use the same surface as the `Menu` popup — medium radius, neutral surface stroke and background, and the shared elevation — with inset group dividers instead of full-height borders. Dropdowns inside a toolbar use the default popover rather than the high-contrast `toolbar` variant, so the editor does not need the menu variant proposed in #83850.
+-   `Toolbar`: Use the same surface as the `Menu` popup — medium radius, neutral surface stroke and background, and the shared elevation — with inset group dividers instead of full-height borders. Dropdowns inside a toolbar use the default popover rather than the high-contrast `toolbar` variant, so the editor does not need the menu variant proposed in #83850 ([#84567](https://github.com/WordPress/gutenberg/pull/84567)).
 
 ### Deprecations
 
