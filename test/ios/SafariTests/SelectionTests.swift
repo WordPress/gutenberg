@@ -8,6 +8,7 @@ final class SelectionTests: XCTestCase {
 	let safari = XCUIApplication( bundleIdentifier: "com.apple.mobilesafari" )
 
 	var web: XCUIElement { safari.webViews.firstMatch }
+	var editor: Editor { Editor( safari: safari ) }
 
 	override func setUpWithError() throws {
 		continueAfterFailure = false
@@ -15,29 +16,6 @@ final class SelectionTests: XCTestCase {
 
 	override func tearDownWithError() throws {
 		safari.terminate()
-	}
-
-	var base: String {
-		ProcessInfo.processInfo.environment[ "WP_BASE_URL" ] ?? "http://127.0.0.1:9400"
-	}
-
-	/// Creates a new post with these paragraphs and opens it in the editor.
-	func openNewPost( paragraphs: [ String ] ) throws {
-		let requestUtils = RequestUtils( base: base )
-		try requestUtils.login()
-		let id = try requestUtils.createPost(
-			title: "Selection across paragraphs",
-			content: paragraphs.map { "<!-- wp:paragraph -->\n<p>\( $0 )</p>\n<!-- /wp:paragraph -->" }.joined( separator: "\n\n" )
-		)
-		XCUIDevice.shared.system.open( URL( string: base + "/wp-admin/post.php?post=\( id )&action=edit" )! )
-		safari.activate()
-		XCTAssertTrue( safari.wait( for: .runningForeground, timeout: 30 ) )
-	}
-
-	func paragraphs() -> [ String ] {
-		web.textViews.matching( NSPredicate( format: "label == 'Block: Paragraph'" ) )
-			.allElementsBoundByIndex
-			.map { $0.value as? String ?? "" }
 	}
 
 	func paragraph( startingWith text: String ) -> XCUIElement {
@@ -49,7 +27,17 @@ final class SelectionTests: XCTestCase {
 	}
 
 	func testHandleExtendsSelectionIntoPreviousParagraph() throws {
-		try openNewPost( paragraphs: [ "Alpha bravo charlie", "Delta echo foxtrot" ] )
+		// A new post starting with this content: the blueprint passes the
+		// content argument of post-new.php through unescaped.
+		let base = ProcessInfo.processInfo.environment[ "WP_BASE_URL" ] ?? "http://127.0.0.1:9400"
+		var url = URLComponents( string: base + "/wp-admin/post-new.php" )!
+		url.queryItems = [ URLQueryItem(
+			name: "content",
+			value: "<!-- wp:paragraph --><p>Alpha bravo charlie</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Delta echo foxtrot</p><!-- /wp:paragraph -->"
+		) ]
+		XCUIDevice.shared.system.open( url.url! )
+		safari.activate()
+		XCTAssertTrue( safari.wait( for: .runningForeground, timeout: 30 ) )
 
 		let second = paragraph( startingWith: "Delta echo" )
 		XCTAssertTrue( second.waitForExistence( timeout: 240 ), "The post did not load" )
@@ -69,27 +57,22 @@ final class SelectionTests: XCTestCase {
 
 		// The start handle's knob sits above the line, at the start of the
 		// word. The selection moves by as much as the finger does, so drag
-		// the knob up by the distance between the two paragraphs, into
-		// "bravo".
+		// the knob straight up by the distance between the two paragraphs,
+		// to the start of the first one.
 		let knob = target.minY - 6
+		let up = target.minY - first.minY
 		point( target.minX + 1, knob ).press(
 			forDuration: 0.5,
-			thenDragTo: point( first.minX + 60, knob - ( target.minY - first.minY ) ),
+			thenDragTo: point( target.minX + 1, knob - up ),
 			withVelocity: 60,
 			thenHoldForDuration: 1
 		)
-
 		XCTAssertTrue( cut.waitForExistence( timeout: 5 ), "The drag lost the selection" )
+
 		cut.tap()
 
 		// Cutting a selection across the two paragraphs joins what is left
 		// of them into one.
-		let joined = NSPredicate( format: "value BEGINSWITH 'Alpha b' AND value ENDSWITH 'echo foxtrot'" )
-		XCTAssertTrue(
-			web.textViews.matching( joined ).firstMatch.waitForExistence( timeout: 5 ),
-			"The selection did not extend into the previous paragraph: \( paragraphs() )"
-		)
-		XCTAssertFalse( paragraphs().contains { $0.contains( "Delta" ) }, "The selected word is still there" )
-		XCTAssertEqual( paragraphs().count, 1, "The two paragraphs did not join" )
+		editor.expectBlocks( [ Block( title: "Paragraph", text: " echo foxtrot" ) ] )
 	}
 }

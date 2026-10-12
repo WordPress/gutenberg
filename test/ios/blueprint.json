@@ -5,6 +5,10 @@
 		{
 			"step": "runPHP",
 			"code": "<?php require '/wordpress/wp-load.php'; update_user_meta( 1, 'wp_persisted_preferences', array( 'core/edit-post' => array( 'welcomeGuide' => false, 'fullscreenMode' => false ), '_modified' => gmdate( 'c' ) ) );"
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php require '/wordpress/wp-load.php'; if ( ! is_dir( WPMU_PLUGIN_DIR ) ) { mkdir( WPMU_PLUGIN_DIR ); } file_put_contents( WPMU_PLUGIN_DIR . '/new-post-content.php', \"<?php add_filter( 'default_content', function ( \\$content ) { return isset( \\$_GET['content'] ) ? wp_unslash( \\$_GET['content'] ) : \\$content; } );\" );"
 		}
 	]
 }
