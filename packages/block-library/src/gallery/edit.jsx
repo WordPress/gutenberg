@@ -917,7 +917,7 @@ export default function GalleryEdit( props ) {
 			<InspectorControls
 				group={
 					isViewportStyleState && hasViewportSettings
-						? 'viewport'
+						? 'styleStates'
 						: 'default'
 				}
 			>

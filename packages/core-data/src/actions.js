@@ -8,6 +8,7 @@ import { DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
 import { getEntitySyncManager } from './entity-sync';
+import { applyUndoLevel, recordEntityEdit } from './utils/sync-undo-levels';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 function addTitleToAutoDraft( record ) {
@@ -396,12 +397,21 @@ export const editEntityRecord =
 		// Tell the entity sync manager about the edit before it arrives in the
 		// store. It receives merged edits and the edit's intent, and decides
 		// what to do with them.
-		getEntitySyncManager()?.update( kind, name, recordId, editsWithMerges, {
+		const syncManager = getEntitySyncManager();
+		syncManager?.update( kind, name, recordId, editsWithMerges, {
 			isCached: Boolean( options.isCached ),
 			undoIgnore: Boolean( options.undoIgnore ),
 		} );
-		if ( ! options.undoIgnore ) {
-			select.getUndoManager().addRecord(
+		// A record the sync manager has loaded has its undo history tracked
+		// by the manager, which reports each level it opens (see
+		// `recordSyncUndoLevel`). Every other record is recorded here.
+		if (
+			! options.undoIgnore &&
+			! syncManager?.isLoaded?.( kind, name, recordId )
+		) {
+			recordEntityEdit(
+				select.getUndoManager(),
+				syncManager,
 				[
 					{
 						id: { kind, name, recordId },
@@ -479,7 +489,11 @@ export const clearEntityRecordEdits =
 export const undo =
 	() =>
 	( { select, dispatch } ) => {
-		const undoRecord = select.getUndoManager().undo();
+		const undoRecord = applyUndoLevel(
+			select.getUndoManager(),
+			getEntitySyncManager(),
+			'undo'
+		);
 		if ( ! undoRecord ) {
 			return;
 		}
@@ -496,7 +510,11 @@ export const undo =
 export const redo =
 	() =>
 	( { select, dispatch } ) => {
-		const redoRecord = select.getUndoManager().redo();
+		const redoRecord = applyUndoLevel(
+			select.getUndoManager(),
+			getEntitySyncManager(),
+			'redo'
+		);
 		if ( ! redoRecord ) {
 			return;
 		}
@@ -514,7 +532,7 @@ export const redo =
 export const __unstableCreateUndoLevel =
 	() =>
 	( { select } ) => {
-		select.getUndoManager().addRecord();
+		recordEntityEdit( select.getUndoManager(), getEntitySyncManager() );
 	};
 
 /**

@@ -11,6 +11,45 @@ const browserTest =
 	'packages/components/src/button/test/index.browser.test.tsx';
 const sharedHelper = 'packages/block-serialization-spec-parser/shared-tests.js';
 
+// Tests load styles directly; production and Storybook keep their import rules.
+for ( const [ file, expectedRule ] of [
+	[ nodeTest, undefined ],
+	[ jsdomTest, undefined ],
+	[ browserTest, undefined ],
+	[ 'packages/components/src/menu/test/utils.ts', undefined ],
+	[ 'packages/components/src/menu/__tests__/styles.ts', undefined ],
+	[
+		'packages/components/src/menu/index.tsx',
+		'@wordpress/no-non-module-stylesheet-imports',
+	],
+	[
+		'routes/post-list/stage.tsx',
+		'@wordpress/no-non-module-stylesheet-imports',
+	],
+	[
+		'widgets/hello-dolly/render.tsx',
+		'@wordpress/no-non-module-stylesheet-imports',
+	],
+	[
+		'packages/components/src/menu/stories/index.story.tsx',
+		'gutenberg-storybook/no-non-module-stylesheet-imports',
+	],
+] ) {
+	const [ result ] = await eslint.lintText( "import './style.scss';", {
+		filePath: resolve( rootDir, file ),
+	} );
+	assert.equal( result.fatalErrorCount, 0 );
+	assert.deepEqual(
+		result.messages
+			.filter( ( { ruleId } ) =>
+				ruleId?.endsWith( '/no-non-module-stylesheet-imports' )
+			)
+			.map( ( { ruleId } ) => ruleId ),
+		expectedRule ? [ expectedRule ] : [],
+		`${ file }: non-module stylesheet imports`
+	);
+}
+
 // Check the complete repository config, including file discovery and overrides.
 for ( const file of [ nodeTest, jsdomTest, browserTest, sharedHelper ] ) {
 	const config = await eslint.calculateConfigForFile( file );

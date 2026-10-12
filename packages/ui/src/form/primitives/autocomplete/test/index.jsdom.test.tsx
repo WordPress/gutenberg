@@ -60,7 +60,6 @@ describe( 'Autocomplete', () => {
 				</Autocomplete.Root>
 			)
 		).toThrow( 'Autocomplete.ItemLabel must be the first direct child' );
-		expect( console ).toHaveErrored();
 	} );
 
 	it( 'rejects a description nested in the item label', () => {
@@ -84,7 +83,6 @@ describe( 'Autocomplete', () => {
 		).toThrow(
 			'Autocomplete.ItemDescription: Missing direct autocomplete item parent. Render <Autocomplete.ItemDescription> as a direct child of <Autocomplete.Item>.'
 		);
-		expect( console ).toHaveErrored();
 	} );
 
 	it( 'rejects a description outside an item', () => {
@@ -97,7 +95,6 @@ describe( 'Autocomplete', () => {
 		).toThrow(
 			'Autocomplete.ItemDescription: Missing direct autocomplete item parent. Render <Autocomplete.ItemDescription> as a direct child of <Autocomplete.Item>.'
 		);
-		expect( console ).toHaveErrored();
 	} );
 
 	describe( 'when disabled', () => {
@@ -126,7 +123,6 @@ describe( 'Autocomplete', () => {
 			expect( () => render( <Autocomplete.Row /> ) ).toThrow(
 				'Autocomplete.Row: Missing parent <Autocomplete.Root grid>. Render <Autocomplete.Row> inside <Autocomplete.Root grid>.'
 			);
-			expect( console ).toHaveErrored();
 		} );
 
 		it( 'throws when Autocomplete.Root does not enable grid mode', () => {
@@ -139,7 +135,6 @@ describe( 'Autocomplete', () => {
 			).toThrow(
 				'Autocomplete.Row: Missing parent <Autocomplete.Root grid>. Render <Autocomplete.Row> inside <Autocomplete.Root grid>.'
 			);
-			expect( console ).toHaveErrored();
 		} );
 
 		it( 'forwards ref', async () => {

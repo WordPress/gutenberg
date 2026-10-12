@@ -53,7 +53,6 @@ export default function ViewActivity< Item >(
 				direction="column"
 				gap="sm"
 				className={ wrapperClassName }
-				// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
 				inert={ inertValue( isInert ) }
 			>
 				{ groupedEntries.map(
@@ -82,7 +81,6 @@ export default function ViewActivity< Item >(
 			<div
 				className={ wrapperClassName }
 				role={ view.infiniteScrollEnabled ? 'feed' : undefined }
-				// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
 				inert={ inertValue( isInert ) }
 			>
 				<ActivityItems< Item > { ...props } />
