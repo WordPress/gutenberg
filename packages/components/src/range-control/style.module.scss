@@ -30,10 +30,20 @@
 	margin-top: 4px;
 }
 .before-icon {
-	margin-inline-end: 6px;
+	:where(.root:not(.is-rtl)) & {
+		margin-right: 6px; /* stylelint-disable-line logical-css/require-logical-properties -- Match the locale-based isRTL() position calculations. */
+	}
+	:where(.root.is-rtl) & {
+		margin-left: 6px; /* stylelint-disable-line logical-css/require-logical-properties -- Match the locale-based isRTL() position calculations. */
+	}
 }
 .after-icon {
-	margin-inline-start: 6px;
+	:where(.root:not(.is-rtl)) & {
+		margin-left: 6px; /* stylelint-disable-line logical-css/require-logical-properties -- Match the locale-based isRTL() position calculations. */
+	}
+	:where(.root.is-rtl) & {
+		margin-right: 6px; /* stylelint-disable-line logical-css/require-logical-properties -- Match the locale-based isRTL() position calculations. */
+	}
 }
 
 .rail {
@@ -102,10 +112,14 @@
 	position: absolute;
 	top: 8px;
 	white-space: nowrap;
-	inset-inline-start: 0;
 	transform: translateX(-50%);
 
-	&:where(:dir(rtl)) {
+	&:where(:not(.is-rtl)) {
+		left: 0; /* stylelint-disable-line logical-css/require-logical-properties -- Match the locale-based isRTL() position calculations. */
+	}
+
+	&:where(.is-rtl) {
+		right: 0; /* stylelint-disable-line logical-css/require-logical-properties -- Match the locale-based isRTL() position calculations. */
 		transform: translateX(50%);
 	}
 	&:where(.is-filled) {
@@ -135,10 +149,14 @@
 	border-radius: $radius-round;
 	z-index: 3;
 	@include thumb-color;
-	margin-inline-start: -10px;
 	transform: translateX(4.5px);
 
-	&:where(:dir(rtl)) {
+	:where(.root:not(.is-rtl)) & {
+		margin-left: -10px; /* stylelint-disable-line logical-css/require-logical-properties -- Match the locale-based isRTL() position calculations. */
+	}
+
+	:where(.root.is-rtl) & {
+		margin-right: -10px; /* stylelint-disable-line logical-css/require-logical-properties -- Match the locale-based isRTL() position calculations. */
 		transform: translateX(-4.5px);
 	}
 	:global(.is-marked) & {
@@ -207,7 +225,7 @@
 	opacity: 0;
 	transform: translateX(-50%);
 
-	&:where(:dir(rtl)) {
+	&:where(.is-rtl) {
 		transform: translateX(50%);
 	}
 	&:where(.is-visible) {
@@ -235,7 +253,12 @@
 	display: inline-block;
 	font-size: 13px;
 	margin-top: 0;
-	margin-inline-start: $grid-unit-20 !important;
+	:where(.root:not(.is-rtl)) & {
+		margin-left: $grid-unit-20 !important; /* stylelint-disable-line logical-css/require-logical-properties -- Match the locale-based isRTL() position calculations. */
+	}
+	:where(.root.is-rtl) & {
+		margin-right: $grid-unit-20 !important; /* stylelint-disable-line logical-css/require-logical-properties -- Match the locale-based isRTL() position calculations. */
+	}
 
 	@at-root input[type="number"]#{&} {
 		height: 30px;
@@ -245,7 +268,12 @@
 .action-right {
 	display: block;
 	margin-top: 0;
-	margin-inline-start: $grid-unit-10;
+	:where(.root:not(.is-rtl)) & {
+		margin-left: $grid-unit-10; /* stylelint-disable-line logical-css/require-logical-properties -- Match the locale-based isRTL() position calculations. */
+	}
+	:where(.root.is-rtl) & {
+		margin-right: $grid-unit-10; /* stylelint-disable-line logical-css/require-logical-properties -- Match the locale-based isRTL() position calculations. */
+	}
 
 	button,
 	button:global(.is-small) {

@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { isRTL } from '@wordpress/i18n';
 import { PolymorphicElement } from '../utils/polymorphic-element';
 import styles from './style.module.scss';
 import type { RangeMarkProps } from './types';
@@ -24,7 +25,10 @@ export default function RangeMark(
 	const labelClasses = clsx(
 		'components-range-control__mark-label',
 		styles[ 'mark-label' ],
-		{ [ styles[ 'is-filled' ] ]: isFilled },
+		{
+			[ styles[ 'is-filled' ] ]: isFilled,
+			[ styles[ 'is-rtl' ] ]: isRTL(),
+		},
 		isFilled && 'is-filled'
 	);
 

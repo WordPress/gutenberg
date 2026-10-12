@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { isRTL } from '@wordpress/i18n';
 import { useCallback, useEffect, useState } from '@wordpress/element';
 import { PolymorphicElement } from '../utils/polymorphic-element';
 import moduleStyles from './style.module.scss';
@@ -26,6 +27,7 @@ export default function SimpleTooltip(
 		className,
 		{
 			[ moduleStyles[ 'is-visible' ] ]: show,
+			[ moduleStyles[ 'is-rtl' ] ]: isRTL(),
 			[ moduleStyles[ 'is-bottom' ] ]: placement === 'bottom',
 		}
 	);

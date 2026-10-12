@@ -229,7 +229,8 @@ function UnforwardedRangeControl(
 			<div
 				className={ clsx(
 					'components-range-control__root',
-					styles.root
+					styles.root,
+					{ [ styles[ 'is-rtl' ] ]: isRTL() }
 				) }
 			>
 				{ beforeIcon && (
