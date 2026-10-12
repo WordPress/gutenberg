@@ -94,7 +94,9 @@ export default function ImageSizeControl( {
 					}
 					items={ imageSizeOptions }
 					onValueChange={ ( item, eventDetails ) =>
-						onChangeImage( item?.value ?? '', eventDetails.event )
+						onChangeImage( item?.value ?? '', {
+							event: eventDetails.event,
+						} )
 					}
 					description={
 						typeof imageSizeHelp === 'string'

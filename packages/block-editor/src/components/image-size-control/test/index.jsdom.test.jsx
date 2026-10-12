@@ -278,7 +278,7 @@ describe( 'ImageSizeControl', () => {
 			).toHaveTextContent( /^Medium$/ );
 		} );
 
-		it( 'calls onChangeImage with selected slug on selection', async () => {
+		it( 'passes the selected image-size slug and an event envelope after pointer selection', async () => {
 			const user = userEvent.setup();
 
 			render(
@@ -300,11 +300,34 @@ describe( 'ImageSizeControl', () => {
 				} )
 			);
 
-			// onChangeImage is called with the slug and the event.
-			expect( mockOnChangeImage ).toHaveBeenLastCalledWith(
-				'thumbnail',
-				expect.any( Object )
+			expect( mockOnChangeImage ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnChangeImage ).toHaveBeenLastCalledWith( 'thumbnail', {
+				event: expect.objectContaining( { type: 'click', detail: 1 } ),
+			} );
+		} );
+
+		it( 'passes the selected image-size slug and an event envelope after keyboard selection', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<ImageSizeControl
+					imageSizeOptions={ IMAGE_SIZE_OPTIONS }
+					slug="medium"
+					isResizable={ false }
+					onChange={ mockOnChange }
+					onChangeImage={ mockOnChangeImage }
+				/>
 			);
+
+			await user.tab();
+			await user.keyboard( '{Enter}' );
+			await screen.findByRole( 'option', { name: 'Large', exact: true } );
+			await user.keyboard( '{ArrowDown}{Enter}' );
+
+			expect( mockOnChangeImage ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnChangeImage ).toHaveBeenLastCalledWith( 'large', {
+				event: expect.objectContaining( { type: 'click', detail: 0 } ),
+			} );
 		} );
 	} );
 } );

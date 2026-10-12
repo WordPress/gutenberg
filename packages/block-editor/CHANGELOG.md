@@ -4,6 +4,8 @@
 
 ### Breaking Changes
 
+-   `ImageSizeControl`: The event in the `onChangeImage` callback's `{ event }` argument now comes from popup selection rather than a native select change. Read the selected value from the `slug` argument rather than `event.target.value` ([#84546](https://github.com/WordPress/gutenberg/pull/84546)).
+
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
 ### Enhancements
