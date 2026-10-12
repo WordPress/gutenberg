@@ -17,6 +17,7 @@
 		{ "path": "../block-editor/tsconfig.build.json" },
 		{ "path": "../block-serialization-default-parser" },
 		{ "path": "../blocks" },
+		{ "path": "../commands" },
 		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../core-data/tsconfig.build.json" },

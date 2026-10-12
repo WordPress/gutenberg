@@ -28,7 +28,6 @@ const ALLOWLIST = {
 			'CheckboxGroup',
 			'Collapsible',
 			'CollapsibleCard',
-			'ControlWithError',
 			'EmptyState',
 			'Field',
 			'Fieldset',
@@ -59,8 +58,6 @@ const ALLOWLIST = {
 			'Textarea',
 			'TextareaControl',
 			'Tooltip',
-			'ValidatedInputControl',
-			'ValidatedTextareaControl',
 			'ValidityIndicator',
 			'VisuallyHidden',
 			'useEnableWpCompatOverlaySlot',
@@ -68,10 +65,12 @@ const ALLOWLIST = {
 		],
 		caution: [
 			'AlertDialog',
+			'Avatar',
 			'Breadcrumb',
 			'Button',
 			'ButtonLink',
 			'Combobox',
+			'ControlWithError',
 			'Dialog',
 			'Drawer',
 			'IconButton',
@@ -80,6 +79,8 @@ const ALLOWLIST = {
 			'Popover',
 			'SearchableSelect',
 			'SearchableSelectControl',
+			'ValidatedInputControl',
+			'ValidatedTextareaControl',
 		],
 		message:
 			'`{{ name }}` from `{{ source }}` is not yet recommended for use in a WordPress environment.',
@@ -149,6 +150,7 @@ const DENYLIST = {
 			'Use `InputControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		TextareaControl:
 			'Use `TextareaControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
+		Tip: 'Use `Notice` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		ToggleControl:
 			'Use `SwitchControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		Tooltip: 'Use `Tooltip` from `@wordpress/ui` instead.',
