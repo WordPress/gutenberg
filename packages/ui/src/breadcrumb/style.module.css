@@ -132,7 +132,7 @@
 		}
 
 		.overflow-trigger {
-			--wp-ui-button-min-width: unset;
+			--wp-ui-button-min-width: var(--wpds-dimension-size-sm);
 		}
 	}
 }
