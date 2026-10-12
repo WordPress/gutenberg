@@ -30,6 +30,11 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Marks which block inspector controls show a value inherited from Global Styles, and adds a shortcut to clear a value you set back to the inherited one. Inherited values show in the inspector whether or not this is on.', 'gutenberg' ),
 				),
 				array(
+					'id'          => 'gutenberg-block-toolbar-views',
+					'label'       => __( 'Block toolbar views', 'gutenberg' ),
+					'description' => __( 'Splits the block toolbar into block actions and editing tools, with an Edit toggle to switch between them. The same toggle unlocks the blocks of an unsynced pattern.', 'gutenberg' ),
+				),
+				array(
 					'id'          => 'gutenberg-grid-interactivity',
 					'label'       => __( 'Grid interactivity', 'gutenberg' ),
 					'description' => __( 'Enables enhancements to the Grid block that let you move and resize items in the editor canvas.', 'gutenberg' ),

@@ -9,10 +9,14 @@ import {
 	isReusableBlock,
 	isTemplatePart,
 } from '@wordpress/blocks';
-import { ToolbarGroup } from '@wordpress/components';
+import {
+	ToolbarGroup,
+	__experimentalUseSlotFills as useSlotFills,
+} from '@wordpress/components';
 import BlockMover from '../block-mover';
 import BlockParentSelector from '../block-parent-selector';
 import BlockControls from '../block-controls';
+import blockControlsGroups from '../block-controls/groups';
 import __unstableBlockToolbarLastItem from './block-toolbar-last-item';
 import BlockSettingsMenu from '../block-settings-menu';
 import { BlockLockToolbar } from '../block-lock';
@@ -26,10 +30,36 @@ import { useHasBlockToolbar } from './use-has-block-toolbar';
 import ChangeDesign from './change-design';
 import SwitchSectionStyle from './switch-section-style';
 import EditSectionButton from './edit-section-button';
+import BlockEditToggle from './block-edit-toggle';
 import { unlock } from '../../lock-unlock';
 import { deviceTypeKey } from '../../store/private-keys';
 import BlockToolbarIcon from './block-toolbar-icon';
 import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
+
+/**
+ * Whether any block, or a block support, has added editing tools to the
+ * toolbar of the selected block. Fills register whether or not their slot is
+ * rendered, so this also works while the block view hides the slots.
+ *
+ * @param {boolean} showStyleStateSlot Whether the style state slot replaces the regular slots.
+ *
+ * @return {boolean} Whether there are editing tools to show.
+ */
+function useHasContentTools( showStyleStateSlot ) {
+	const blockFills = useSlotFills( blockControlsGroups.block.name );
+	const defaultFills = useSlotFills( blockControlsGroups.default.name );
+	const inlineFills = useSlotFills( blockControlsGroups.inline.name );
+	const otherFills = useSlotFills( blockControlsGroups.other.name );
+	const styleStateFills = useSlotFills(
+		blockControlsGroups[ 'style-state' ].name
+	);
+	if ( showStyleStateSlot ) {
+		return !! styleStateFills?.length;
+	}
+	return [ blockFills, defaultFills, inlineFills, otherFills ].some(
+		( fills ) => !! fills?.length
+	);
+}
 
 /**
  * Renders the block toolbar.
@@ -72,6 +102,8 @@ export function PrivateBlockToolbar( {
 		areSelectedBlocksHiddenOnViewport,
 		showStyleStateSlot,
 		canEdit,
+		isEditedSection,
+		toolbarView,
 	} = useSelect( ( select ) => {
 		const { canEditBlock } = select( blockEditorStore );
 		const {
@@ -90,6 +122,8 @@ export function PrivateBlockToolbar( {
 			isBlockHiddenAtViewport,
 			getSelectedBlockStyleState,
 			isResponsiveEditing,
+			getEditedContentOnlySection,
+			getBlockToolbarView,
 		} = unlock( select( blockEditorStore ) );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
@@ -174,8 +208,14 @@ export function PrivateBlockToolbar( {
 			areSelectedBlocksHiddenOnViewport:
 				_areSelectedBlocksHiddenOnViewport,
 			canEdit: _canEditBlock,
+			isEditedSection:
+				!! selectedBlockClientId &&
+				getEditedContentOnlySection() === selectedBlockClientId,
+			toolbarView: getBlockToolbarView( selectedBlockClientId ),
 		};
 	}, [] );
+
+	const hasContentTools = useHasContentTools( showStyleStateSlot );
 
 	const toolbarWrapperRef = useRef( null );
 
@@ -197,6 +237,29 @@ export function PrivateBlockToolbar( {
 	const isMultiToolbar = blockClientIds.length > 1;
 	const isSynced =
 		isReusableBlock( blockType ) || isTemplatePart( blockType );
+
+	// With the block toolbar views experiment, a single "Edit" toggle either
+	// unlocks an unsynced pattern section (replacing "Edit pattern") or swaps
+	// the toolbar between block-level actions and the block's editing tools.
+	// Synced patterns and template parts get no toggle: they are edited in
+	// their own editor, through "Go to original".
+	let editToggle = null;
+	if (
+		window.__experimentalBlockToolbarViews &&
+		! isPlaceholder &&
+		! isMultiToolbar &&
+		! isSynced &&
+		shouldShowVisualToolbar
+	) {
+		if ( isSectionContainer || isEditedSection ) {
+			editToggle = canEdit ? 'section' : null;
+		} else if ( ( showSlots || showStyleStateSlot ) && hasContentTools ) {
+			editToggle = 'view';
+		}
+	}
+	const hasToolbarViews = editToggle === 'view';
+	const showBlockActions = ! hasToolbarViews || toolbarView === 'block';
+	const showContentTools = ! hasToolbarViews || toolbarView === 'content';
 
 	// Shifts the toolbar to make room for the parent block selector.
 	const classes = clsx( 'block-editor-block-contextual-toolbar', {
@@ -238,9 +301,17 @@ export function PrivateBlockToolbar( {
 								clientIds={ blockClientIds }
 								isSynced={ isSynced }
 							/>
+							{ /* The toggle sits right after the block icon so it stays in place when the view changes. */ }
+							{ editToggle && (
+								<BlockEditToggle
+									clientId={ blockClientId }
+									isSection={ editToggle === 'section' }
+								/>
+							) }
 							{ ! isPlaceholder &&
 								isDefaultEditingMode &&
-								showBlockVisibilityButton && (
+								showBlockVisibilityButton &&
+								showBlockActions && (
 									<ViewportVisibilityToolbar
 										clientIds={ blockClientIds }
 									/>
@@ -248,15 +319,18 @@ export function PrivateBlockToolbar( {
 							{ ! isPlaceholder &&
 								! isMultiToolbar &&
 								isDefaultEditingMode &&
-								showLockButtons && (
+								showLockButtons &&
+								showBlockActions && (
 									<BlockLockToolbar
 										clientId={ blockClientId }
 									/>
 								) }
-							<BlockMover
-								clientIds={ blockClientIds }
-								hideDragHandle={ hideDragHandle }
-							/>
+							{ showBlockActions && (
+								<BlockMover
+									clientIds={ blockClientIds }
+									hideDragHandle={ hideDragHandle }
+								/>
+							) }
 						</ToolbarGroup>
 					</div>
 				) }
@@ -265,9 +339,12 @@ export function PrivateBlockToolbar( {
 					shouldShowVisualToolbar &&
 					isMultiToolbar &&
 					showGroupButtons && <BlockGroupToolbar /> }
-				{ ! isPlaceholder && ! isMultiToolbar && canEdit && (
-					<EditSectionButton clientId={ blockClientIds[ 0 ] } />
-				) }
+				{ ! window.__experimentalBlockToolbarViews &&
+					! isPlaceholder &&
+					! isMultiToolbar &&
+					canEdit && (
+						<EditSectionButton clientId={ blockClientIds[ 0 ] } />
+					) }
 				{ ! areSelectedBlocksHiddenOnViewport && showShuffleButton && (
 					<ChangeDesign clientId={ blockClientIds[ 0 ] } />
 				) }
@@ -280,12 +357,14 @@ export function PrivateBlockToolbar( {
 						<>
 							{ ! isSectionContainer && (
 								<>
-									{ showSlots && (
+									{ showSlots && showBlockActions && (
+										<BlockControls.Slot
+											group="parent"
+											className="block-editor-block-toolbar__slot"
+										/>
+									) }
+									{ showSlots && showContentTools && (
 										<>
-											<BlockControls.Slot
-												group="parent"
-												className="block-editor-block-toolbar__slot"
-											/>
 											<BlockControls.Slot
 												group="block"
 												className="block-editor-block-toolbar__slot"
@@ -297,20 +376,23 @@ export function PrivateBlockToolbar( {
 											/>
 										</>
 									) }
-									{ showStyleStateSlot && (
-										<BlockControls.Slot
-											group="style-state"
-											className="block-editor-block-toolbar__slot"
-										/>
-									) }
+									{ showStyleStateSlot &&
+										showContentTools && (
+											<BlockControls.Slot
+												group="style-state"
+												className="block-editor-block-toolbar__slot"
+											/>
+										) }
 								</>
 							) }
 							{ showSlots && (
 								<>
-									<BlockControls.Slot
-										group="other"
-										className="block-editor-block-toolbar__slot"
-									/>
+									{ showContentTools && (
+										<BlockControls.Slot
+											group="other"
+											className="block-editor-block-toolbar__slot"
+										/>
+									) }
 									<__unstableBlockToolbarLastItem.Slot />
 								</>
 							) }

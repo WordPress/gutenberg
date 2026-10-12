@@ -18,6 +18,7 @@ import { groupBlocks } from '../../utils/group-blocks';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
 import { useShowBlockTools } from './use-show-block-tools';
+import useBlockToolbarViewTriggers from './use-block-toolbar-view-triggers';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
 import { BlockRenameModal, useBlockRename } from '../block-rename';
@@ -73,6 +74,7 @@ export default function BlockTools( {
 		viewportModalClientIds,
 		blockVisibilitySetting,
 	} = useSelect( selector, [] );
+	useBlockToolbarViewTriggers();
 	const isMatch = useShortcutEventMatch();
 	const {
 		getBlocksByClientId,

@@ -876,6 +876,22 @@ export function getEditedContentOnlySection( state ) {
 	return state.editedContentOnlySection;
 }
 
+/**
+ * Returns which view of the block toolbar is shown for a block: `block` for
+ * block-level actions or `content` for the block's editing tools.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The client id of the block.
+ *
+ * @return {string} `block` or `content`.
+ */
+export function getBlockToolbarView( state, clientId ) {
+	const { blockToolbarView } = state;
+	return blockToolbarView && blockToolbarView.clientId === clientId
+		? blockToolbarView.view
+		: 'block';
+}
+
 export function isWithinEditedContentOnlySection( state, clientId ) {
 	if ( ! state.editedContentOnlySection ) {
 		return false;
