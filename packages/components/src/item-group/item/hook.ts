@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import type { WordPressComponentProps } from '../../context';
+import type { HookReturnProps, WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import { useItemGroupContext } from '../context';
 import type { ItemProps } from '../types';
@@ -11,7 +11,21 @@ const sizeClassName = {
 	large: styles[ 'is-size-large' ],
 };
 
-export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
+export function useItem(
+	props: WordPressComponentProps< ItemProps, 'div' >
+): HookReturnProps<
+	WordPressComponentProps< ItemProps, 'div' >,
+	'size',
+	{
+		as:
+			| React.JSXElementConstructor< any >
+			| keyof React.JSX.IntrinsicElements;
+		className: string;
+		onClick: React.MouseEventHandler< HTMLDivElement > | undefined;
+		wrapperClassName: string;
+		role: React.AriaRole | undefined;
+	}
+> {
 	const { isList, spacedAround, size: contextSize } = useItemGroupContext();
 	const {
 		as: asProp,

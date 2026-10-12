@@ -5,7 +5,7 @@ import type { VStackProps } from './types';
 
 export function useVStack(
 	props: WordPressComponentProps< VStackProps, 'div' >
-) {
+): ReturnType< typeof useHStack > {
 	const {
 		expanded = false,
 		alignment = 'stretch',

@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import styles from '../style.module.scss';
 import { COLORS, CONFIG } from '../../utils';
-import type { WordPressComponentProps } from '../../context';
+import type { HookReturnProps, WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import type { Border } from '../../border-control/types';
 import type { VisualizerProps } from '../types';
@@ -23,7 +23,11 @@ const borderBoxStyleWithFallback = ( border?: Border ) => {
 
 export function useBorderBoxControlVisualizer(
 	props: WordPressComponentProps< VisualizerProps, 'div' >
-) {
+): HookReturnProps<
+	WordPressComponentProps< VisualizerProps, 'div' >,
+	never,
+	{ className: string; style: React.CSSProperties }
+> {
 	const { className, style, value, ...otherProps } = useContextSystem(
 		props,
 		'BorderBoxControlVisualizer'
