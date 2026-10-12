@@ -19,7 +19,7 @@
 
 ### Documentation
 
--   Document accessible naming for Combobox popups.
+-   Document accessible naming for Combobox popups ([#84551](https://github.com/WordPress/gutenberg/pull/84551)).
 
 ## 0.24.0 (2026-10-07)
 
