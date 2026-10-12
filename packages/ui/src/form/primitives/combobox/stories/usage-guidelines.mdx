@@ -5,42 +5,10 @@ import * as ComboboxStories from './index.story';
 
 # Combobox usage guidelines
 
-## Accessible names
+## Name the popup when it contains an input
 
 When `Combobox.Input` is inside `Combobox.Popup`, the popup renders with `role="dialog"` and needs its own accessible name. Give the popup an `aria-label` or an `aria-labelledby` that references an existing label element. Naming `Combobox.Trigger` or `Combobox.Input` does not name the popup dialog.
 
 The default example labels the trigger and popup as Fruit, and the input as Search. Preserve all three names when adapting the example.
 
 <Canvas of={ ComboboxStories.Default } />
-
-To reuse a visible label, reference its ID from both the trigger and popup. Use a unique ID for each combobox instance, for example with `useId` from `@wordpress/element`.
-
-```jsx
-import { useId } from '@wordpress/element';
-import { Combobox } from '@wordpress/ui';
-
-function FruitPicker() {
-	const labelId = useId();
-
-	return (
-		<Combobox.Root items={ [ 'Apple', 'Banana' ] }>
-			<span id={ labelId }>Fruit</span>
-			<Combobox.Trigger aria-labelledby={ labelId } />
-			<Combobox.Popup aria-labelledby={ labelId }>
-				<Combobox.Input aria-label="Search fruit" />
-				<Combobox.List>
-					<Combobox.Collection>
-						{ ( fruit ) => (
-							<Combobox.Item key={ fruit } value={ fruit }>
-								<Combobox.ItemLabel>
-									{ fruit }
-								</Combobox.ItemLabel>
-							</Combobox.Item>
-						) }
-					</Combobox.Collection>
-				</Combobox.List>
-			</Combobox.Popup>
-		</Combobox.Root>
-	);
-}
-```
