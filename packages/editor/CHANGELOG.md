@@ -12,6 +12,10 @@
 -   Notes: the add-reaction button now opens a full searchable emoji picker with a per-user skin tone preference, powered by a self-hosted Emojibase dataset configured via the `noteEmojibaseUrl` editor setting ([#78176](https://github.com/WordPress/gutenberg/pull/78176)).
 -   Notes: the emoji picker shows the highlighted emoji with its name in a footer under the grid, following both the pointer and the arrow keys ([#84051](https://github.com/WordPress/gutenberg/pull/84051)).
 
+### Enhancements
+
+-   Migrate the classic-theme template selector to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
+
 ### Bug Fixes
 
 -   Notes: Highlight the text an unsent note is about, and keep the note anchored to it when the selection changes or the text is edited before the note is sent ([#84125](https://github.com/WordPress/gutenberg/pull/84125)).

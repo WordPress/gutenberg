@@ -1,10 +1,5 @@
 import { useState, useMemo } from '@wordpress/element';
-import {
-	Icon as WCIcon,
-	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
-	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
-} from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Icon, Stack } from '@wordpress/ui';
 import { starFilled } from '@wordpress/icons';
 import DataViews from '../../dataviews/index';
 import DataForm from '../../dataform/index';
@@ -82,26 +77,7 @@ const meta = {
 };
 export default meta;
 
-const DollarPrefix = () => (
-	<InputControlPrefixWrapper>
-		<span>$</span>
-	</InputControlPrefixWrapper>
-);
-const StarIconPrefix = () => (
-	<InputControlPrefixWrapper variant="icon">
-		<WCIcon icon={ starFilled } />
-	</InputControlPrefixWrapper>
-);
-const PercentSuffix = () => (
-	<InputControlSuffixWrapper>
-		<span>%</span>
-	</InputControlSuffixWrapper>
-);
-const USDSuffix = () => (
-	<InputControlSuffixWrapper>
-		<span>USD</span>
-	</InputControlSuffixWrapper>
-);
+const StarIconPrefix = () => <Icon icon={ starFilled } />;
 type DataType = {
 	id: number;
 	text: string;
@@ -563,7 +539,7 @@ const fields: Field< DataType >[] = [
 		description: 'Text field with dollar sign prefix.',
 		Edit: {
 			control: 'text',
-			prefix: DollarPrefix,
+			prefix: '$',
 		},
 	},
 	{
@@ -574,6 +550,7 @@ const fields: Field< DataType >[] = [
 		Edit: {
 			control: 'text',
 			prefix: StarIconPrefix,
+			prefixPadding: 'minimal',
 		},
 	},
 	{
@@ -583,7 +560,7 @@ const fields: Field< DataType >[] = [
 		description: 'Text field with percent sign suffix.',
 		Edit: {
 			control: 'text',
-			suffix: PercentSuffix,
+			suffix: '%',
 		},
 	},
 	{
@@ -593,8 +570,8 @@ const fields: Field< DataType >[] = [
 		description: 'Text field with both dollar prefix and USD suffix.',
 		Edit: {
 			control: 'text',
-			prefix: DollarPrefix,
-			suffix: USDSuffix,
+			prefix: '$',
+			suffix: 'USD',
 		},
 	},
 ];
