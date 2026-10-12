@@ -130,7 +130,7 @@
 		color: $components-color-accent;
 		background: transparent;
 
-		&:active:not(:disabled) {
+		&:active:not(:disabled, .is-pressed) {
 			// Hide the border while pressed, keeping its width to avoid a size shift.
 			border-color: transparent;
 		}
@@ -141,7 +141,7 @@
 			background: color-mix(in srgb, $components-color-accent 4%, transparent);
 		}
 
-		&:focus:not(:active) {
+		&:focus:not(:active, .is-pressed) {
 			border-color: $components-color-accent;
 		}
 
@@ -185,7 +185,7 @@
 		--wp-components-color-accent-darker-20: #{color.adjust($alert-red, $lightness: -20%)};
 
 		// Only the default variant is styled differently from the non-destructive counterparts.
-		&:not(.is-primary):not(.is-secondary):not(.is-tertiary):not(.is-link) {
+		&:not(.is-primary):not(.is-secondary):not(.is-tertiary):not(.is-link):not(.is-pressed) {
 			color: $alert-red;
 
 			&:hover:not(:disabled, [aria-disabled="true"]) {
@@ -204,11 +204,11 @@
 
 		&.is-tertiary,
 		&.is-secondary {
-			&:hover:not(:disabled, [aria-disabled="true"]) {
+			&:hover:not(:disabled, [aria-disabled="true"], .is-pressed) {
 				background: rgba($alert-red, 0.04);
 			}
 
-			&:active:not(:disabled, [aria-disabled="true"]) {
+			&:active:not(:disabled, [aria-disabled="true"], .is-pressed) {
 				background: rgba($alert-red, 0.08);
 			}
 		}
@@ -351,6 +351,10 @@
 
 		&:not(:disabled, [aria-disabled="true"]) {
 			background: var(--wpds-color-background-interactive-neutral-strong-active);
+
+			&.is-secondary {
+				border-color: var(--wpds-color-stroke-interactive-neutral-active);
+			}
 		}
 
 		&:disabled,
