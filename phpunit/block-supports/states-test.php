@@ -225,6 +225,28 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that a text color is painted under a text clip from global styles,
+	 * which the block's own styles do not show.
+	 *
+	 * @covers ::gutenberg_get_state_declarations_with_text_clip_escapes
+	 */
+	public function test_adds_text_fill_reset_for_a_text_color_without_a_known_text_clip() {
+		$actual = gutenberg_get_state_declarations_with_text_clip_escapes(
+			array( 'color' => '#ff0000' ),
+			array( 'color' => array( 'text' => '#ff0000' ) ),
+			array()
+		);
+
+		$this->assertSame(
+			array(
+				'color'                   => '#ff0000',
+				'-webkit-text-fill-color' => 'currentColor',
+			),
+			$actual
+		);
+	}
+
+	/**
 	 * Tests that the fill is left alone when the state paints its own gradient.
 	 *
 	 * @covers ::gutenberg_get_state_declarations_with_text_clip_escapes
@@ -1189,7 +1211,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
 
 		$this->assertStringContainsString(
-			'@media (width <= 480px){.' . $matches[0] . '{color:#ff0000 !important;}}',
+			'@media (width <= 480px){.' . $matches[0] . '{color:#ff0000 !important;-webkit-text-fill-color:currentColor !important;}}',
 			$actual_stylesheet
 		);
 	}
@@ -1261,7 +1283,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
 
 		$this->assertStringContainsString(
-			'@media (width <= 480px){.' . $matches[0] . '{color:#ff0000 !important;}}',
+			'@media (width <= 480px){.' . $matches[0] . '{color:#ff0000 !important;-webkit-text-fill-color:currentColor !important;}}',
 			$actual_stylesheet
 		);
 	}

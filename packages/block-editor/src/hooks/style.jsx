@@ -242,19 +242,18 @@ function getStateTextClipEscapeCSS( stateStyles, baseStyle, selector ) {
 
 /**
  * Returns the CSS that shows a state's text color under a text clip from below,
- * which otherwise leaves the fill `transparent`.
+ * which otherwise leaves the fill `transparent`. The clip may come from global
+ * styles, which the block cannot see, and the fill does nothing without one.
  *
  * @param {Object}  stateStyles State style object.
- * @param {Object=} baseStyle   Styles the state layers over.
+ * @param {Object=} baseStyle   Styles the state layers over. Without it the
+ *                              block cannot sit under a text clip.
  * @param {string}  selector    CSS selector for the generated style.
  * @return {string|undefined} CSS string with the text fill reset.
  */
 function getStateTextFillResetCSS( stateStyles, baseStyle, selector ) {
-	if ( 'text' !== baseStyle?.background?.backgroundClip ) {
-		return undefined;
-	}
-
 	if (
+		! baseStyle ||
 		! stateStyles?.color?.text ||
 		stateStyles?.background?.backgroundClip ||
 		paintsItsOwnBackground( stateStyles )
@@ -473,7 +472,15 @@ function getStateStyleGroups( stateStyles, name ) {
  * @return {string|undefined} Generated stylesheet.
  */
 export function getBlockStateStylesCSS( stateStyles, options ) {
-	const { name, baseSelector, state = '', baseStyle } = options;
+	const { name, baseSelector, state = '' } = options;
+	// Mirror of the PHP gate: only a block that supports the clip can sit
+	// under a text clip to escape.
+	const baseStyle = hasBlockSupport( name, [
+		BACKGROUND_SUPPORT_KEY,
+		'backgroundClip',
+	] )
+		? ( options.baseStyle ?? {} )
+		: undefined;
 	const rules = getStateStyleGroups( stateStyles, name )
 		.map( ( { selector: blockSelector, style } ) =>
 			getStateStylesCSS(

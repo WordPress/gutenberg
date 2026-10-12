@@ -467,13 +467,35 @@ describe( 'getStateStylesCSS under a text clip', () => {
 		expect( css ).not.toContain( 'currentColor' );
 	} );
 
-	it( 'says nothing without a clip to escape', () => {
+	it( 'paints a text color over a text clip the block cannot see', () => {
+		const css = getStateStylesCSS(
+			{ color: { text: '#ff0000' } },
+			'.wp-block-test',
+			{}
+		);
+
+		expect( css ).toContain( 'color: #ff0000 !important' );
+		expect( css ).toContain(
+			'-webkit-text-fill-color: currentColor !important'
+		);
+	} );
+
+	it( 'says nothing for a block that cannot sit under a text clip', () => {
 		expect(
 			getStateStylesCSS(
 				{ color: { text: '#ff0000' } },
 				'.wp-block-test'
 			)
 		).toBe( '.wp-block-test { color: #ff0000 !important; }' );
+	} );
+
+	it( 'leaves a box clip alone without a text clip to escape', () => {
+		expect(
+			getStateStylesCSS(
+				{ background: { backgroundClip: 'padding-box' } },
+				'.wp-block-test'
+			)
+		).not.toContain( 'background-image: unset' );
 	} );
 } );
 
@@ -527,6 +549,29 @@ describe( 'getResponsiveStateCSSRules', () => {
 			)
 		).toEqual( [
 			'@media (width <= 480px){.wp-elements-1 { color: red !important; }}',
+		] );
+	} );
+
+	it( 'paints a viewport text color for a block that supports the clip', () => {
+		registerBlockType( 'test/state-text', {
+			apiVersion: 3,
+			title: 'State Text',
+			category: 'text',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+			supports: { background: { backgroundClip: true } },
+		} );
+
+		const rules = getResponsiveStateCSSRules(
+			{ '@mobile': { color: { text: 'red' } } },
+			'test/state-text',
+			'.wp-elements-1'
+		);
+		unregisterBlockType( 'test/state-text' );
+
+		expect( rules ).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 { color: red !important; }\n.wp-elements-1 { -webkit-text-fill-color: currentColor !important; }}',
 		] );
 	} );
 
