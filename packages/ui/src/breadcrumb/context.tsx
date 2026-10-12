@@ -3,9 +3,12 @@ import type { Ref } from 'react';
 
 type BreadcrumbItemRenderContextValue = {
 	itemKey: string;
+	currentRef?: Ref< HTMLSpanElement >;
+	variant: 'navigation' | 'selection';
 	measurementRef?: Ref< HTMLSpanElement >;
 	measurementVersion: number;
 	mode: 'measurement' | 'overflow' | 'visible';
+	onButtonActivate?: ( focusTarget: HTMLElement | null ) => void;
 	onLinkBlur: ( itemKey: string ) => void;
 	onLinkFocus: ( itemKey: string ) => void;
 	separatorRef?: Ref< HTMLSpanElement >;
@@ -21,13 +24,14 @@ function useBreadcrumbItemRenderContext() {
 
 	if ( process.env.NODE_ENV !== 'production' && ! context ) {
 		throw new Error(
-			'Breadcrumb: <Breadcrumb.LinkItem> and <Breadcrumb.CurrentItem> must be direct children of <Breadcrumb.Root>.'
+			'Breadcrumb: <Breadcrumb.LinkItem>, <Breadcrumb.ButtonItem>, and <Breadcrumb.CurrentItem> must be direct children of <Breadcrumb.Root>.'
 		);
 	}
 
 	return (
 		context ?? {
 			itemKey: '',
+			variant: 'navigation' as const,
 			measurementVersion: 0,
 			mode: 'visible' as const,
 			onLinkBlur: () => {},
