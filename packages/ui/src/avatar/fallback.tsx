@@ -10,13 +10,22 @@ import styles from './style.module.css';
  * Use `delay` to postpone showing the fallback, in milliseconds.
  * For example, `delay={300}` avoids briefly showing a fallback for a fast image.
  * The delay starts when this part mounts, not when each image request starts.
+ * Set `variant="unframed"` to show standalone content without an avatar frame.
+ * Loaded images retain the root's configured size and shape.
  */
 export const Fallback = forwardRef< HTMLSpanElement, FallbackProps >(
-	function AvatarFallback( { className, ...props }, ref ) {
+	function AvatarFallback(
+		{ variant = 'default', className, ...props },
+		ref
+	) {
 		return (
 			<_Avatar.Fallback
 				ref={ ref }
-				className={ clsx( styles.fallback, className ) }
+				className={ clsx(
+					styles.fallback,
+					variant === 'unframed' && styles[ 'is-unframed' ],
+					className
+				) }
 				{ ...props }
 			/>
 		);

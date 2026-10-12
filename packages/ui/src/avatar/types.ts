@@ -38,6 +38,16 @@ export type ImageProps = Omit<
 
 export type FallbackProps = ComponentProps< typeof _Avatar.Fallback > & {
 	/**
+	 * The fallback's presentation. `unframed` removes the root's border,
+	 * background, and clipping while the fallback is visible, and lets the
+	 * fallback content determine its size. Loaded images still use the root's
+	 * configured size and shape. With `delay`, the root keeps its normal frame
+	 * until the fallback appears. Place the fallback directly inside `Avatar.Root`.
+	 *
+	 * @default "default"
+	 */
+	variant?: 'default' | 'unframed';
+	/**
 	 * The initials, icon, or other content to show until the image loads.
 	 */
 	children?: React.ReactNode;

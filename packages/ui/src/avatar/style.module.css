@@ -84,5 +84,27 @@
 			overflow: hidden;
 			white-space: nowrap;
 		}
+
+		.root:has(> .fallback.is-unframed) {
+			inline-size: auto;
+			block-size: auto;
+			border: 0;
+			border-radius: 0;
+			background-color: transparent;
+			color: inherit;
+
+			/* The image can finish loading before the fallback unmounts. */
+			> .image {
+				visibility: hidden;
+			}
+		}
+
+		.fallback.is-unframed {
+			position: static;
+			inline-size: auto;
+			block-size: auto;
+			border-radius: 0;
+			overflow: visible;
+		}
 	}
 }
