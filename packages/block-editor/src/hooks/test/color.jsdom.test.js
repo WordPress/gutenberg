@@ -162,6 +162,46 @@ describe( 'color useBlockProps has-background', () => {
 		).toEqual( [ 'has-background' ] );
 	} );
 
+	it( 'is not added for a background color clipped to the text', () => {
+		registerWithSkip();
+		expect(
+			getClassNames( {
+				...colorValue,
+				background: { backgroundClip: 'text' },
+			} )
+		).not.toContain( 'has-background' );
+	} );
+
+	it( 'is added for a background color clipped to a box', () => {
+		registerWithSkip();
+		expect(
+			getClassNames( {
+				...colorValue,
+				background: { backgroundClip: 'padding-box' },
+			} )
+		).toContain( 'has-background' );
+	} );
+
+	it( 'is added for a background color when the text clip is skipped', () => {
+		registerWithSkip( { backgroundSkip: [ 'backgroundClip' ] } );
+		expect(
+			getClassNames( {
+				...colorValue,
+				background: { backgroundClip: 'text' },
+			} )
+		).toContain( 'has-background' );
+	} );
+
+	it( 'is still added for a color gradient over a text clip', () => {
+		registerWithSkip();
+		expect(
+			getClassNames( {
+				...colorGradientValue,
+				background: { backgroundClip: 'text' },
+			} )
+		).toContain( 'has-background' );
+	} );
+
 	it( 'follows the background gradient skip separately from the image', () => {
 		registerWithSkip( { backgroundSkip: [ 'backgroundImage' ] } );
 		expect(
