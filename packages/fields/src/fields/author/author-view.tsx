@@ -53,9 +53,25 @@ function AuthorView( { item }: { item: BasePostWithEmbeddedAuthor } ) {
 			align="center"
 			gap={ initials ? 'sm' : undefined }
 		>
-			{ initials ? (
-				<Avatar.Root size="xs" aria-hidden="true">
-					<Avatar.Fallback>{ initials }</Avatar.Fallback>
+			{ imageUrl || initials ? (
+				<Avatar.Root
+					size="xs"
+					aria-hidden="true"
+					className={
+						! initials
+							? 'fields-controls__author-avatar'
+							: undefined
+					}
+				>
+					<Avatar.Fallback
+						className={
+							! initials
+								? 'fields-controls__author-icon'
+								: undefined
+						}
+					>
+						{ initials || <Icon icon={ authorIcon } /> }
+					</Avatar.Fallback>
 					<Avatar.Image src={ imageUrl } alt="" keepMounted />
 				</Avatar.Root>
 			) : (

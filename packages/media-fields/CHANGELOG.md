@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   Author field: Use the `@wordpress/ui` Avatar with initials for named authors and the original standalone icon for unnamed authors ([#84540](https://github.com/WordPress/gutenberg/pull/84540)).
+-   Author field: Use the `@wordpress/ui` Avatar with image-first rendering, initials for named authors, and the original standalone icon when neither is available ([#84540](https://github.com/WordPress/gutenberg/pull/84540)).
 
 ## 0.22.0 (2026-10-07)
 

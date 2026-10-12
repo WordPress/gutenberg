@@ -24,9 +24,21 @@ export default function AuthorView( {
 			align="center"
 			gap={ initials ? 'sm' : undefined }
 		>
-			{ initials ? (
-				<Avatar.Root size="xs" aria-hidden="true">
-					<Avatar.Fallback>{ initials }</Avatar.Fallback>
+			{ imageUrl || initials ? (
+				<Avatar.Root
+					size="xs"
+					aria-hidden="true"
+					className={
+						! initials ? 'media-author-field__avatar' : undefined
+					}
+				>
+					<Avatar.Fallback
+						className={
+							! initials ? 'media-author-field__icon' : undefined
+						}
+					>
+						{ initials || <Icon icon={ authorIcon } /> }
+					</Avatar.Fallback>
 					<Avatar.Image src={ imageUrl } alt="" keepMounted />
 				</Avatar.Root>
 			) : (

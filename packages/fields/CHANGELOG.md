@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   Author and template author fields: Use the `@wordpress/ui` Avatar with initials for named authors, preserving standalone icons for unnamed authors and theme sources ([#84540](https://github.com/WordPress/gutenberg/pull/84540)).
+-   Author and template author fields: Use the `@wordpress/ui` Avatar with image-first rendering and initials for named authors, preserving standalone icons when no image or initials are available and for theme sources ([#84540](https://github.com/WordPress/gutenberg/pull/84540)).
 -   Template field: Migrate template selection to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
 
 ### Bug Fixes

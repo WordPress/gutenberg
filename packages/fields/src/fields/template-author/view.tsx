@@ -42,8 +42,6 @@ export default function TemplateAuthorView( {
 				.join( '' )
 				.toUpperCase()
 		: undefined;
-	const hasStandaloneIcon =
-		originalSource === 'theme' || ( isAuthor && ! initials );
 
 	const imageUrl = useSelect(
 		( select ) => {
@@ -68,11 +66,15 @@ export default function TemplateAuthorView( {
 		[ originalSource, authorId ]
 	);
 
+	const hasIconFallback = isAuthor && ! initials;
+	const hasStandaloneIcon =
+		originalSource === 'theme' || ( hasIconFallback && ! imageUrl );
+
 	return (
 		<Stack
 			direction="row"
 			align="center"
-			gap={ hasStandaloneIcon ? undefined : 'sm' }
+			gap={ hasStandaloneIcon || hasIconFallback ? undefined : 'sm' }
 		>
 			{ hasStandaloneIcon ? (
 				<div
@@ -82,10 +84,24 @@ export default function TemplateAuthorView( {
 					<Icon icon={ icon } />
 				</div>
 			) : (
-				<Avatar.Root size="xs" aria-hidden="true">
-					<Avatar.Fallback>
+				<Avatar.Root
+					size="xs"
+					aria-hidden="true"
+					className={
+						hasIconFallback
+							? 'fields-controls__author-avatar'
+							: undefined
+					}
+				>
+					<Avatar.Fallback
+						className={
+							hasIconFallback
+								? 'fields-controls__author-icon'
+								: undefined
+						}
+					>
 						{ isAuthor ? (
-							initials
+							initials || <Icon icon={ authorIcon } />
 						) : (
 							<Icon
 								icon={ icon }

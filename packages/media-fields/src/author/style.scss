@@ -1,6 +1,25 @@
 @use "@wordpress/base-styles/variables" as *;
 
+.media-author-field__avatar {
+	margin-inline-end: var(--wpds-dimension-gap-sm);
+
+	// The native fallback stays unframed when no initials are available.
+	&:has(> .media-author-field__icon) {
+		display: contents;
+		color: inherit;
+
+		// Keep the image hidden until the native fallback unmounts.
+		> img {
+			visibility: hidden;
+		}
+	}
+}
+
 .media-author-field__icon {
+	position: static;
+	justify-content: flex-start;
+	border-radius: 0;
+	overflow: visible;
 	display: flex;
 	flex-shrink: 0;
 	width: $grid-unit-30;
