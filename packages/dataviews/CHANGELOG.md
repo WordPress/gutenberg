@@ -12,6 +12,7 @@
 
 ### Bug Fixes
 
+-   Enable overlay compatibility for `DataViews` and `DataViewsPicker` in directly bundled applications so `@wordpress/ui` popups stack above `@wordpress/components` overlays ([#84305](https://github.com/WordPress/gutenberg/pull/84305)).
 -   DataForm: Center the `prefix` and `suffix` of the `text` control's `Edit` config vertically and give them the standard input padding, so consumers pass only the content. ([#84314](https://github.com/WordPress/gutenberg/pull/84314))
 
 ### Internal
