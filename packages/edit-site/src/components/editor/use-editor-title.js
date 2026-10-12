@@ -11,7 +11,7 @@ import { unlock } from '../../lock-unlock';
 
 const { getTemplateInfo } = unlock( coreDataPrivateApis );
 
-function useEditorTitle( postType, postId ) {
+function useEditorTitle( postType, postId, isEditorScreen ) {
 	const { title, isLoaded } = useSelect(
 		( select ) => {
 			const {
@@ -64,8 +64,9 @@ function useEditorTitle( postType, postId ) {
 	}
 
 	// Only announce the title once the editor is ready to prevent "Replace"
-	// action in <URLQueryController> from double-announcing.
-	useTitle( isLoaded && editorTitle );
+	// action in <URLQueryController> from double-announcing. When the canvas
+	// is only a preview, the layout names the screen instead.
+	useTitle( isEditorScreen && isLoaded && editorTitle );
 }
 
 export default useEditorTitle;
