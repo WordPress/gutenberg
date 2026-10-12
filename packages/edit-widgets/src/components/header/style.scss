@@ -1,5 +1,4 @@
 @use "sass:math";
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 
@@ -9,7 +8,7 @@
 	justify-content: space-between;
 	height: $header-height;
 	overflow: auto;
-	background: #fff;
+	background: var(--wpds-color-background-surface-neutral-strong);
 
 	@include break-small {
 		overflow: visible;
@@ -49,7 +48,7 @@
 				content: "";
 				width: $border-width;
 				height: $grid-unit-30;
-				background-color: $gray-300;
+				background-color: var(--wpds-color-stroke-surface-neutral);
 				margin-top: $grid-unit-05;
 				margin-left: $grid-unit;
 			}
