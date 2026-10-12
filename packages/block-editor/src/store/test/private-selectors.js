@@ -2643,10 +2643,18 @@ describe( 'private selectors', () => {
 			},
 			derivedBlockEditingModes: new Map(),
 			blocksMode: {},
+			settings: {},
 		} );
 
 		it( 'should return true for a block supporting editableRoot with editable siblings', () => {
 			expect( canHostEditableRoot( createState(), 'a' ) ).toBe( true );
+		} );
+
+		it( 'should return false in preview mode', () => {
+			const state = createState();
+			state.settings = { isPreviewMode: true };
+
+			expect( canHostEditableRoot( state, 'a' ) ).toBe( false );
 		} );
 
 		it( 'should return false for a lone block', () => {

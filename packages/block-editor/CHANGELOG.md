@@ -13,6 +13,7 @@
 ### Bug Fixes
 
 -   Inserter: Only show the block-section separator when both sections contain blocks, avoiding a double border above the tip ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
+-   Writing flow: Do not make the canvas an editing host in preview mode. In the revisions screen, the canvas stays read-only when a Paragraph or List Item block is focused or clicked, and Tab moves past these blocks instead of looping back to the first block ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
 
 ## 18.1.0 (2026-10-07)
 
