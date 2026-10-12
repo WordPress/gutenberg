@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   Migrate HTML element, image size, resolution, aspect ratio, and text-shadow preset controls to `@wordpress/ui` `SelectControl`.
+-   Migrate HTML element, image size, resolution, aspect ratio, and text-shadow preset controls to `@wordpress/ui` `SelectControl` ([#84546](https://github.com/WordPress/gutenberg/pull/84546)).
 -   Inserter: Replace random tips with info notices using the same light-bulb icon and style keyboard hints as keys ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
 
 ### Bug Fixes
