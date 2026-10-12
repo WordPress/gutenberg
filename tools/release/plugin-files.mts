@@ -10,6 +10,7 @@ export const PLUGIN_FILES = [
 	'lib',
 	'packages/block-serialization-default-parser/*.php',
 	'packages/icons/src/manifest.php',
+	'packages/icons/src/inlined-icons.php',
 	'packages/icons/src/library/*.svg',
 	'build',
 	'build-module',

@@ -394,6 +394,104 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Provides the icons whose markup is inlined in the generated file.
+	 *
+	 * @return array<string, array{0: string, 1: string, 2: string}> Data sets of [ $icon_name, $content, $file_path ], keyed by icon name.
+	 */
+	public function data_inlined_icons(): array {
+		$manifest = include gutenberg_dir_path() . 'packages/icons/src/manifest.php';
+		$inlined  = include gutenberg_dir_path() . 'packages/icons/src/inlined-icons.php';
+		$data     = array();
+
+		foreach ( $inlined as $icon_name => $content ) {
+			$slug               = explode( '/', $icon_name, 2 )[1];
+			$file_path          = gutenberg_dir_path() . 'packages/icons/src/' . ( $manifest[ $slug ]['filePath'] ?? '' );
+			$data[ $icon_name ] = array( $icon_name, $content, $file_path );
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Should only inline icons which exist in the manifest.
+	 *
+	 * If this fails, regenerate the file with `npm run build --workspace @wordpress/icons`.
+	 */
+	public function test_inlined_icons_exist_in_manifest() {
+		$manifest = include gutenberg_dir_path() . 'packages/icons/src/manifest.php';
+		$inlined  = include gutenberg_dir_path() . 'packages/icons/src/inlined-icons.php';
+
+		$this->assertNotEmpty( $inlined );
+
+		foreach ( array_keys( $inlined ) as $icon_name ) {
+			list( $collection, $slug ) = explode( '/', $icon_name, 2 );
+
+			$this->assertArrayHasKey( $slug, $manifest, "The inlined icon \"$icon_name\" should exist in the manifest." );
+			$this->assertContains( $collection, $manifest[ $slug ]['collections'], "The inlined icon \"$icon_name\" should belong to its collection." );
+		}
+	}
+
+	/**
+	 * The inlined markup is not sanitized at runtime, so it should be equivalent
+	 * to the sanitized content of the icon file it was generated from.
+	 *
+	 * @dataProvider data_inlined_icons
+	 *
+	 * @param string $icon_name The namespaced icon name.
+	 * @param string $content   The inlined SVG markup of the icon.
+	 * @param string $file_path Absolute path to the icon file.
+	 */
+	public function test_inlined_icon_content_matches_sanitized_icon_file( $icon_name, $content, $file_path ) {
+		$expected = $this->sanitize_icon_content( file_get_contents( $file_path ) );
+
+		// The generated file has the whitespace between tags removed.
+		$expected = preg_replace( '/>\s+</', '><', trim( $expected ) );
+
+		$this->assertEqualHTML( $expected, $content );
+	}
+
+	/**
+	 * Should use the inlined markup for a bundled icon, without reading its file.
+	 *
+	 * @dataProvider data_inlined_icons
+	 *
+	 * @param string $icon_name The namespaced icon name.
+	 * @param string $content   The inlined SVG markup of the icon.
+	 * @param string $file_path Absolute path to the icon file.
+	 */
+	public function test_get_content_uses_inlined_content_for_bundled_icon( $icon_name, $content, $file_path ) {
+		$this->register(
+			$icon_name,
+			array(
+				'label'     => 'Inlined',
+				'file_path' => $file_path,
+			)
+		);
+
+		$icon = $this->registry->get_registered_icon( $icon_name );
+		$this->assertSame( $content, $icon['content'] );
+	}
+
+	/**
+	 * Should read the file of an icon registered under an inlined name from another location.
+	 *
+	 */
+	public function test_get_content_reads_file_for_core_admin_name_outside_bundled_directory() {
+		$path = $this->create_temp_icon_file( '<svg><path d="M1 2"/></svg>' );
+
+		$this->register(
+			'core-admin/dashboard',
+			array(
+				'label'     => 'Replacement',
+				'file_path' => $path,
+			)
+		);
+
+		$icon = $this->registry->get_registered_icon( 'core-admin/dashboard' );
+		$this->assertEqualHTML( '<svg><path d="M1 2"/></svg>', $icon['content'] );
+	}
+
+	/**
 	 * Should register an icon that provides its content through `file_path`.
 	 */
 	public function test_register_icon_with_file_path() {

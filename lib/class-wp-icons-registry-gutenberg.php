@@ -322,14 +322,32 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 *
 	 * Overridden so that the file validation is applied even when the base
 	 * `WP_Icons_Registry` is provided by WordPress core rather than the
-	 * Gutenberg compat shim.
+	 * Gutenberg compat shim, and so that the inlined markup comes from the
+	 * icons bundled with the plugin.
 	 *
 	 * @param string $icon_name Icon name including namespace.
 	 * @return string|null The content of the icon, if found.
 	 */
 	protected function get_content( $icon_name ) {
+		static $inlined_icons = null;
+
 		if ( ! isset( $this->registered_icons[ $icon_name ]['content'] ) ) {
-			$file_path  = $this->registered_icons[ $icon_name ]['file_path'] ?? '';
+			$file_path = $this->registered_icons[ $icon_name ]['file_path'] ?? '';
+
+			// Some bundled icons have their markup inlined in a generated file, to skip reading and sanitizing their files.
+			$icons_directory = gutenberg_dir_path() . 'packages/icons/src/';
+			if ( is_string( $file_path ) && str_starts_with( $file_path, $icons_directory ) ) {
+				if ( null === $inlined_icons ) {
+					$inlined_icons_path = $icons_directory . 'inlined-icons.php';
+					$inlined_icons      = file_exists( $inlined_icons_path ) ? include $inlined_icons_path : array();
+				}
+
+				if ( isset( $inlined_icons[ $icon_name ] ) ) {
+					$this->registered_icons[ $icon_name ]['content'] = $inlined_icons[ $icon_name ];
+					return $inlined_icons[ $icon_name ];
+				}
+			}
+
 			$is_stringy = is_string( $file_path ) || ( is_object( $file_path ) && method_exists( $file_path, '__toString' ) );
 			$icon_path  = $is_stringy ? realpath( (string) $file_path ) : false;
 
