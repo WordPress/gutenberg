@@ -106,4 +106,5 @@ jobs:
                   path: |
                       test/ios/build/results.xcresult
                       test/ios/build/touches.log
+                      test/ios/build/server.log
                   if-no-files-found: ignore

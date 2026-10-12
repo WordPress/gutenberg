@@ -89,6 +89,7 @@ step "Loading the editor once"
 # kept between the hops: -b "" holds them in memory.
 if ! EDITOR_HTML=$( curl -sSL --fail -b "" "$WP_BASE_URL/wp-admin/post-new.php" ); then
 	echo "The editor did not load from $WP_BASE_URL"
+	tail -40 "$ROOT/test/ios/build/server.log"
 	exit 1
 fi
 if ! grep -q "/build/scripts/rich-text/" <<< "$EDITOR_HTML"; then
