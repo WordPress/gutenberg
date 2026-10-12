@@ -315,5 +315,7 @@ export function useDeprecatedRichText( props ) {
 	deprecated( '`__unstableUseRichText` hook', {
 		since: '7.0',
 	} );
-	return useRichTextBase( props );
+	// `getDomPosition` is private, only through `useRichText`.
+	const { getDomPosition: omitted, ...result } = useRichTextBase( props );
+	return result;
 }
