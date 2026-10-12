@@ -1336,6 +1336,184 @@ test.describe( 'Block Notes', () => {
 				'false'
 			);
 		} );
+
+		test( 'keeps a clicked inline note selected', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Alpha bravo charlie.' },
+			} );
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.click();
+			await blockNoteUtils.selectBlockText( { start: 0, length: 5 } );
+			await blockNoteUtils.addNote( 'Alpha note' );
+			// Move the block selection away, so clicking the thread also selects its block.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Another block' },
+			} );
+
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Alpha note' } );
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+
+			await thread.click();
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+		} );
+	} );
+
+	test.describe( 'Draft persistence', () => {
+		test.beforeEach( async ( { editor } ) => {
+			/*
+			 * The middle block keeps the selected block's toolbar from covering
+			 * the other block's click target.
+			 */
+			for ( const content of [
+				'First block',
+				'Middle block',
+				'Second block',
+			] ) {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: { content },
+				} );
+			}
+		} );
+
+		test( 'preserves an unsent draft per block when switching blocks', async ( {
+			editor,
+			page,
+		} ) => {
+			const newNoteForm = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+
+			await editor.canvas.getByText( 'First block' ).click();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await newNoteForm.pressSequentially( 'First draft' );
+
+			await editor.canvas.getByText( 'Second block' ).click();
+			await expect( newNoteForm ).toBeHidden();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect( newNoteForm ).toHaveText( '' );
+			await newNoteForm.pressSequentially( 'Second draft' );
+
+			await editor.canvas.getByText( 'First block' ).click();
+			await expect( newNoteForm ).toHaveText( 'First draft' );
+			await editor.canvas.getByText( 'Second block' ).click();
+			await expect( newNoteForm ).toHaveText( 'Second draft' );
+
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+			await expect(
+				page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'treeitem', { name: 'Note: Second draft' } )
+			).toBeVisible();
+		} );
+
+		test( 'preserves an unsent draft across the code editor', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			const newNoteForm = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+
+			await editor.canvas.getByText( 'First block' ).click();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await newNoteForm.pressSequentially( 'Unsent draft' );
+
+			await pageUtils.pressKeys( 'secondary+m' );
+			await expect( newNoteForm ).toBeHidden();
+			await pageUtils.pressKeys( 'secondary+m' );
+
+			await editor.canvas.getByText( 'Second block' ).click();
+			await editor.canvas.getByText( 'First block' ).click();
+			await expect( newNoteForm ).toHaveText( 'Unsent draft' );
+		} );
+
+		test( 'closes the new note form on focus-out only when empty', async ( {
+			editor,
+			page,
+		} ) => {
+			const newNoteForm = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+
+			await editor.canvas.getByText( 'First block' ).click();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect( newNoteForm ).toBeFocused();
+			await editor.canvas.getByText( 'First block' ).click();
+			await expect( newNoteForm ).toBeHidden();
+
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await newNoteForm.pressSequentially( 'Unsent draft' );
+			await editor.canvas.getByText( 'First block' ).click();
+			await expect( newNoteForm ).toHaveText( 'Unsent draft' );
+		} );
+
+		test( 'discards a draft when the form is cancelled', async ( {
+			editor,
+			page,
+		} ) => {
+			const newNoteForm = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+
+			await editor.canvas.getByText( 'First block' ).click();
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await newNoteForm.pressSequentially( 'Discarded draft' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Cancel' } )
+				.click();
+			await expect( newNoteForm ).toBeHidden();
+
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect( newNoteForm ).toHaveText( '' );
+		} );
+
+		test( 'preserves an unsent reply draft when the thread is deselected', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Noted block' },
+				comment: 'Test comment',
+			} );
+
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Test comment' } );
+			const replyForm = page.getByRole( 'textbox', {
+				name: 'Reply to',
+			} );
+
+			await thread.click();
+			await replyForm.click();
+			await replyForm.pressSequentially( 'Unsent reply' );
+
+			await editor.canvas.getByText( 'First block' ).click();
+			await expect( replyForm ).toBeHidden();
+
+			await editor.canvas.getByText( 'Noted block' ).click();
+			await expect( replyForm ).toHaveText( 'Unsent reply' );
+		} );
 	} );
 
 	test.describe( 'Inline notes', () => {
@@ -1376,10 +1554,10 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
 
-			// Wait for the inline-note `<mark>` to appear in the canvas; the
-			// `core/note` format serializes the marker as `mark.wp-note`.
+			// The draft marker shows while the note is saved; wait for the
+			// saved note's id so the thread focus that follows has settled.
 			const mark = editor.canvas.locator( 'mark.wp-note' ).first();
-			await expect( mark ).toBeVisible();
+			await expect( mark ).toHaveAttribute( 'data-id', /^\d+$/ );
 
 			// Creating a note auto-selects it, which emphasizes the marker with
 			// an underline. Move focus to the title to deselect so only the
@@ -1628,6 +1806,245 @@ test.describe( 'Block Notes', () => {
 			await expect( paragraph ).toHaveText( 'Hello brave new world.' );
 		} );
 
+		test( 'anchors an inline note to selected accordion heading text after reloading', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/accordion',
+				innerBlocks: [
+					{
+						name: 'core/accordion-item',
+						innerBlocks: [
+							{
+								name: 'core/accordion-heading',
+								attributes: { title: 'Hello brave new world.' },
+							},
+							{
+								name: 'core/accordion-panel',
+								innerBlocks: [
+									{
+										name: 'core/paragraph',
+										attributes: {
+											content: 'Accordion panel content.',
+										},
+									},
+								],
+							},
+						],
+					},
+				],
+			} );
+			const headingTitle = editor.canvas.locator(
+				'.wp-block-accordion-heading__toggle-title'
+			);
+			await headingTitle.focus();
+			await expect( headingTitle ).toBeFocused();
+			await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
+			await blockNoteUtils.addNote( 'Just this accordion word' );
+
+			const marker = editor.canvas.locator( 'mark.wp-note' );
+			await expect( marker ).toHaveCount( 1 );
+			await expect( marker ).toHaveText( 'brave' );
+			await expect( marker ).toHaveAttribute( 'data-id', /^\d+$/ );
+			await expect( headingTitle ).toHaveText( 'Hello brave new world.' );
+			const noteId = await marker.getAttribute( 'data-id' );
+
+			await editor.saveDraft();
+			await page.reload();
+			await blockNoteUtils.openBlockNoteSidebar();
+
+			await expect( marker ).toHaveCount( 1 );
+			await expect( marker ).toHaveText( 'brave' );
+			await expect( marker ).toHaveAttribute( 'data-id', noteId );
+			await expect( headingTitle ).toHaveText( 'Hello brave new world.' );
+			await expect(
+				blockNoteUtils.getThread( 'Just this accordion word' )
+			).toBeVisible();
+		} );
+
+		test( 'highlights the drafted text and anchors the note to it across a block switch', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Hello brave new world.' },
+			} );
+			// The middle block keeps the selected block's toolbar from
+			// covering the other block's click target.
+			for ( const content of [ 'Middle block', 'Another block' ] ) {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: { content },
+				} );
+			}
+			const paragraph = editor.canvas.getByText(
+				'Hello brave new world.'
+			);
+			const newNoteForm = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+			const draftMark = editor.canvas.locator(
+				'mark.wp-note[data-id="new"]'
+			);
+
+			await paragraph.click();
+			await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect( draftMark ).toHaveText( 'brave' );
+			await newNoteForm.pressSequentially( 'Still brave' );
+
+			// Leaving collapses the canvas selection; the marker stays.
+			await editor.canvas.getByText( 'Another block' ).click();
+			await expect( newNoteForm ).toBeHidden();
+			await expect( draftMark ).toHaveText( 'brave' );
+			await paragraph.click();
+			await expect( newNoteForm ).toHaveText( 'Still brave' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+
+			const mark = editor.canvas.locator( 'mark.wp-note' );
+			await expect( mark ).toHaveCount( 1 );
+			await expect( mark ).toHaveText( 'brave' );
+			await expect( mark ).toHaveAttribute( 'data-id', /^\d+$/ );
+		} );
+
+		test( 'removes the draft marker when the empty form is dismissed', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Hello brave new world.' },
+			} );
+			// The middle block keeps the selected block's toolbar from
+			// covering the other block's click target.
+			for ( const content of [ 'Middle block', 'Another block' ] ) {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: { content },
+				} );
+			}
+			const paragraph = editor.canvas.getByText(
+				'Hello brave new world.'
+			);
+			const mark = editor.canvas.locator( 'mark.wp-note' );
+
+			await paragraph.click();
+			await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect( mark ).toHaveText( 'brave' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Cancel' } )
+				.click();
+			await expect( mark ).toHaveCount( 0 );
+			expect( await editor.getEditedPostContent() ).not.toContain(
+				'wp-note'
+			);
+
+			// A click past the end of the text moves the caret out of the
+			// marker, which closes the form.
+			await paragraph.click();
+			await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect( mark ).toHaveText( 'brave' );
+			await paragraph.click();
+			await expect( mark ).toHaveCount( 0 );
+
+			// Selecting another block closes the form before its own
+			// focus-out runs.
+			await paragraph.click();
+			await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect( mark ).toHaveText( 'brave' );
+			await editor.canvas.getByText( 'Another block' ).click();
+			await expect( mark ).toHaveCount( 0 );
+		} );
+
+		test( 'removes the draft marker when another note in the block is picked', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Hello brave new world.' },
+				comment: 'Block note',
+			} );
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			const blockThread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Block note' } );
+
+			await paragraph.click();
+			await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect(
+				editor.canvas.locator( 'mark.wp-note[data-id="new"]' )
+			).toHaveText( 'brave' );
+
+			await blockThread.click();
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
+			expect( await editor.getEditedPostContent() ).not.toContain(
+				'wp-note'
+			);
+		} );
+
+		test( 'moves the draft marker to a new selection when Add note runs again', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Hello brave new world.' },
+			} );
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			const newNoteForm = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+			const draftMark = editor.canvas.locator(
+				'mark.wp-note[data-id="new"]'
+			);
+
+			await paragraph.click();
+			await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await newNoteForm.pressSequentially( 'Second thoughts' );
+
+			// Select a word before the marker: stepping across its boundary
+			// would skew keyboard offsets.
+			await paragraph.click();
+			await blockNoteUtils.selectBlockText( { start: 0, length: 5 } );
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect( draftMark ).toHaveCount( 1 );
+			await expect( draftMark ).toHaveText( 'Hello' );
+			await expect( newNoteForm ).toHaveText( 'Second thoughts' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+
+			const mark = editor.canvas.locator( 'mark.wp-note' );
+			await expect( mark ).toHaveCount( 1 );
+			await expect( mark ).toHaveText( 'Hello' );
+		} );
+
 		test( 'underlines the marker at rest and thickens it on selection, without deepening the tint', async ( {
 			editor,
 			page,
@@ -1661,22 +2078,6 @@ test.describe( 'Block Notes', () => {
 
 			const mark = editor.canvas.locator( 'mark.wp-note' ).first();
 			await expect( mark ).toBeVisible();
-
-			/*
-			 * The range that anchored the note is collapsed once the marker is
-			 * written: browsers paint text decorations inside a selected range
-			 * with the selection's text color, so a lingering selection would
-			 * mask the author-colored underline until the next click.
-			 */
-			await expect
-				.poll( () =>
-					mark.evaluate(
-						( el ) =>
-							el.ownerDocument.defaultView.getSelection()
-								.isCollapsed
-					)
-				)
-				.toBe( true );
 
 			const alphaOf = async () => {
 				const bg = await mark.evaluate(
@@ -1846,10 +2247,116 @@ test.describe( 'Block Notes', () => {
 				'false'
 			);
 		} );
+
+		test( 'selects no note while the caret is outside the inline highlights', async ( {
+			editor,
+			page,
+			pageUtils,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Alpha bravo charlie.' },
+			} );
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraph.click();
+			await blockNoteUtils.selectBlockText( { start: 0, length: 5 } );
+			await blockNoteUtils.addNote( 'Alpha note' );
+
+			const alphaThread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Alpha note' } );
+			await expect( alphaThread ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+
+			// The block's only note is inline, so a click past the end of its
+			// text selects the block but no note.
+			await paragraph.click();
+			await expect( paragraph ).toBeFocused();
+			await expect( alphaThread ).toHaveAttribute(
+				'aria-expanded',
+				'false'
+			);
+
+			// Into the marker and out again.
+			await pageUtils.pressKeys( 'ArrowLeft', { times: 18 } );
+			await expect( alphaThread ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+			await pageUtils.pressKeys( 'ArrowRight', { times: 8 } );
+			await expect( alphaThread ).toHaveAttribute(
+				'aria-expanded',
+				'false'
+			);
+		} );
+
+		test( 'selects the block-level note when the caret leaves an inline highlight', async ( {
+			editor,
+			page,
+			pageUtils,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Alpha bravo charlie.' },
+				comment: 'Block note',
+			} );
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraph.click();
+			await blockNoteUtils.selectBlockText( { start: 0, length: 5 } );
+			await blockNoteUtils.addNote( 'Alpha note' );
+
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			const blockThread = settings.getByRole( 'treeitem', {
+				name: 'Note: Block note',
+			} );
+			const alphaThread = settings.getByRole( 'treeitem', {
+				name: 'Note: Alpha note',
+			} );
+			await expect( alphaThread ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+
+			// Focus leaves the thread for its own block: the caret, inside the
+			// marker, keeps the note selected.
+			await editor.canvas
+				.locator( 'mark.wp-note' )
+				.filter( { hasText: 'Alpha' } )
+				.click();
+			await expect( alphaThread ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+			await expect( blockThread ).toHaveAttribute(
+				'aria-expanded',
+				'false'
+			);
+
+			// Past the marker, the block-level note stands for the caret.
+			await pageUtils.pressKeys( 'ArrowRight', { times: 8 } );
+			await expect( blockThread ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+			await expect( alphaThread ).toHaveAttribute(
+				'aria-expanded',
+				'false'
+			);
+		} );
 	} );
 
 	test.describe( 'Block-level note highlight', () => {
-		test( 'tints the whole text block with the author color, holding the tint flat while the outline marks selection', async ( {
+		test( 'overlays the whole text block with the author tint, holding it flat while the outline marks selection', async ( {
 			editor,
 			page,
 			requestUtils,
@@ -1877,44 +2384,39 @@ test.describe( 'Block Notes', () => {
 				0
 			);
 
-			// Move focus to the title so the freshly added note is deselected.
+			// Move focus to the title so the freshly added note is deselected:
+			// an annotated block has to be legible as one at rest.
 			await editor.canvas
 				.getByRole( 'textbox', { name: 'Add title' } )
 				.click();
 			await expect
-				.poll( () => readTint( paragraph, rgb ) )
+				.poll( () => readTint( paragraph, rgb, '::after' ) )
 				.toBe( 'tint' );
 			await expect( paragraph ).not.toHaveClass( /is-highlighted/ );
 
-			/*
-			 * Both halves of the marking survive deselection: an annotated block
-			 * has to be legible as one at rest, without clicking it first. The
-			 * rule is a text underline, so every line of a wrapped paragraph
-			 * carries it, matching the inline-marker treatment.
-			 */
-			const decoration = await paragraph.evaluate( ( el ) => {
-				const style = window.getComputedStyle( el );
-				return {
-					line: style.textDecorationLine,
-					thickness: style.textDecorationThickness,
-				};
-			} );
-			expect( decoration.line ).toBe( 'underline' );
-			expect( decoration.thickness ).toBe( '1.5px' );
+			// The underline is the inline-note signal; the block-level note
+			// marks the block, not its text.
+			expect(
+				await paragraph.evaluate(
+					( el ) => window.getComputedStyle( el ).textDecorationLine
+				)
+			).toBe( 'none' );
 
 			// Selecting the note from the sidebar marks the block with its
-			// outline. The tint behind the text must not deepen with it: it
-			// covers the whole paragraph, so every increment is subtracted from
-			// the theme's text contrast for all of it. See #80543.
+			// outline. The tint must not deepen with it: it covers the whole
+			// paragraph, so every increment is subtracted from the theme's
+			// text contrast for all of it. See #80543.
 			await page
 				.getByRole( 'region', { name: 'Editor settings' } )
 				.getByRole( 'treeitem', { name: 'Note: Whole block note' } )
 				.click();
 			await expect( paragraph ).toHaveClass( /is-highlighted/ );
-			expect( await readTint( paragraph, rgb ) ).toBe( 'tint' );
+			expect( await readTint( paragraph, rgb, '::after' ) ).toBe(
+				'tint'
+			);
 		} );
 
-		test( 'tints and underlines each list item of an annotated list', async ( {
+		test( 'overlays text blocks with nested editables as a whole, not their text', async ( {
 			editor,
 			requestUtils,
 			blockNoteUtils,
@@ -1924,61 +2426,9 @@ test.describe( 'Block Notes', () => {
 				AVATAR_BORDER_COLORS[ me.id % AVATAR_BORDER_COLORS.length ]
 			);
 
-			// A list's wrapper is not a rich-text editable, but its direct
-			// children are block wrappers, so the treatment lands on each
-			// rich-text leaf: every list item tinted and underlined.
-			await editor.insertBlock( {
-				name: 'core/list',
-				innerBlocks: [
-					{
-						name: 'core/list-item',
-						attributes: { content: 'First item' },
-					},
-					{
-						name: 'core/list-item',
-						attributes: { content: 'Second item' },
-					},
-				],
-			} );
-			await blockNoteUtils.addNote( 'Whole list note' );
-
-			// Move focus to the title so the freshly added note is deselected:
-			// the marking has to be legible at rest.
-			await editor.canvas
-				.getByRole( 'textbox', { name: 'Add title' } )
-				.click();
-
-			const items = editor.canvas.getByRole( 'textbox', {
-				name: 'List text',
-			} );
-			await expect( items ).toHaveCount( 2 );
-			for ( const item of await items.all() ) {
-				await expect.poll( () => readTint( item, rgb ) ).toBe( 'tint' );
-				const decoration = await item.evaluate( ( el ) => {
-					const style = window.getComputedStyle( el );
-					return {
-						line: style.textDecorationLine,
-						thickness: style.textDecorationThickness,
-					};
-				} );
-				expect( decoration.line ).toBe( 'underline' );
-				expect( decoration.thickness ).toBe( '1.5px' );
-			}
-		} );
-
-		test( 'tints and underlines each cell of an annotated table', async ( {
-			editor,
-			requestUtils,
-			blockNoteUtils,
-		} ) => {
-			const me = await requestUtils.rest( { path: '/wp/v2/users/me' } );
-			const rgb = hexToRgb(
-				AVATAR_BORDER_COLORS[ me.id % AVATAR_BORDER_COLORS.length ]
-			);
-
-			// A table's editables are its cells, nested in its own markup
-			// rather than in child blocks. It holds no media, so its text
-			// takes the same treatment as a paragraph, not the image overlay.
+			// A table's editables are its cells, nested in its own markup.
+			// The note marks the block it is attached to, so the table is
+			// overlaid as a whole rather than cell by cell.
 			await editor.insertBlock( {
 				name: 'core/table',
 				attributes: {
@@ -2001,26 +2451,22 @@ test.describe( 'Block Notes', () => {
 			const table = editor.canvas.getByRole( 'document', {
 				name: 'Block: Table',
 			} );
+			await expect
+				.poll( () => readTint( table, rgb, '::after' ) )
+				.toBe( 'tint' );
 			const cells = table.getByRole( 'textbox', {
 				name: 'Body cell text',
 			} );
 			await expect( cells ).toHaveCount( 2 );
 			for ( const cell of await cells.all() ) {
-				await expect.poll( () => readTint( cell, rgb ) ).toBe( 'tint' );
-				const decoration = await cell.evaluate( ( el ) => {
-					const style = window.getComputedStyle( el );
-					return {
-						line: style.textDecorationLine,
-						thickness: style.textDecorationThickness,
-					};
-				} );
-				expect( decoration.line ).toBe( 'underline' );
-				expect( decoration.thickness ).toBe( '1.5px' );
+				expect( await readTint( cell, rgb ) ).not.toBe( 'tint' );
+				expect(
+					await cell.evaluate(
+						( el ) =>
+							window.getComputedStyle( el ).textDecorationLine
+					)
+				).toBe( 'none' );
 			}
-			// The text carries the marking, so no overlay veils it.
-			expect( await readTint( table, rgb, '::after' ) ).not.toBe(
-				'tint'
-			);
 		} );
 
 		test( 'overlays a non-text block with the tint and an all-around rule, alongside the selection outline', async ( {
@@ -2034,10 +2480,9 @@ test.describe( 'Block Notes', () => {
 				AVATAR_BORDER_COLORS[ me.id % AVATAR_BORDER_COLORS.length ]
 			);
 
-			// An image's editables (its caption) are nested inside non-block
-			// containers, so it takes the overlay path: a background behind it
-			// would be hidden by the image itself, so the tint is painted
-			// above the block instead, with the rule drawn all the way around.
+			// A background behind an image would be hidden by the image
+			// itself, which is why the tint is painted on an overlay above
+			// the block, with the rule drawn all the way around.
 			await editor.insertBlock( { name: 'core/image' } );
 			await blockNoteUtils.addNote( 'Whole image note' );
 
@@ -2061,8 +2506,7 @@ test.describe( 'Block Notes', () => {
 					};
 				} );
 
-			// Same tint classification as the text blocks, read off the
-			// overlay: the author color at the single allowed alpha.
+			// The author color at the single allowed alpha.
 			await expect
 				.poll( () => readTint( image, rgb, '::after' ) )
 				.toBe( 'tint' );
@@ -2110,9 +2554,8 @@ test.describe( 'Block Notes', () => {
 				AVATAR_BORDER_COLORS[ me.id % AVATAR_BORDER_COLORS.length ]
 			);
 
-			// Columns of images have no text for the leaf rule to tint, so
-			// they need the overlay or the note would leave no mark in the
-			// canvas.
+			// Columns of images hold no text at all; the overlay still marks
+			// them, so the note leaves a mark in the canvas.
 			await editor.insertBlock( {
 				name: 'core/columns',
 				innerBlocks: [
@@ -2152,7 +2595,8 @@ test.describe( 'Block Notes', () => {
 			} );
 			const backgroundOf = () =>
 				paragraph.evaluate(
-					( el ) => window.getComputedStyle( el ).backgroundColor
+					( el ) =>
+						window.getComputedStyle( el, '::after' ).backgroundColor
 				);
 
 			// Tinted while the note exists.
@@ -2182,6 +2626,114 @@ test.describe( 'Block Notes', () => {
 				.poll( backgroundOf )
 				.toMatch( /rgba\(0,\s*0,\s*0,\s*0\)|transparent/ );
 		} );
+
+		test( 'hides the highlights along with the notes', async ( {
+			editor,
+			requestUtils,
+			blockNoteUtils,
+		} ) => {
+			const me = await requestUtils.rest( { path: '/wp/v2/users/me' } );
+			const rgb = hexToRgb(
+				AVATAR_BORDER_COLORS[ me.id % AVATAR_BORDER_COLORS.length ]
+			);
+
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Note the whole block.' },
+			} );
+			await blockNoteUtils.addNote( 'Block-level note' );
+			const blockNoted = editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.first();
+
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Note these words.' },
+			} );
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.last()
+				.click();
+			await blockNoteUtils.selectBlockText();
+			await blockNoteUtils.addNote( 'Inline note' );
+			const marker = editor.canvas.locator( 'mark.wp-note' );
+
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.click();
+			await expect
+				.poll( () => readTint( blockNoted, rgb, '::after' ) )
+				.toBe( 'tint' );
+			await expect.poll( () => readTint( marker, rgb ) ).toBe( 'tint' );
+
+			// "All notes" is still a view of the notes, so the highlights
+			// stay while it's open.
+			await blockNoteUtils.clickNotesMenuItem( 'Hide notes' );
+			expect( await readTint( marker, rgb ) ).toBe( 'tint' );
+
+			// With no notes left on screen, the canvas carries no marking.
+			await blockNoteUtils.clickNotesMenuItem( 'Show all notes' );
+			const isUnmarked = ( locator, pseudo = null ) =>
+				locator.evaluate( ( el, pseudoElt ) => {
+					const style = window.getComputedStyle( el, pseudoElt );
+					return (
+						/rgba\(0,\s*0,\s*0,\s*0\)|transparent/.test(
+							style.backgroundColor
+						) && style.textDecorationLine === 'none'
+					);
+				}, pseudo );
+			await expect
+				.poll( () => isUnmarked( blockNoted, '::after' ) )
+				.toBe( true );
+			await expect.poll( () => isUnmarked( marker ) ).toBe( true );
+			// The marker stays in the content, it just isn't painted.
+			await expect( marker ).toHaveText( 'Note these words.' );
+
+			await blockNoteUtils.clickNotesMenuItem( 'Expand notes' );
+			await expect
+				.poll( () => readTint( blockNoted, rgb, '::after' ) )
+				.toBe( 'tint' );
+			await expect.poll( () => readTint( marker, rgb ) ).toBe( 'tint' );
+		} );
+	} );
+
+	test( 'keeps note anchors out of the undo history', async ( {
+		editor,
+		page,
+		pageUtils,
+		blockNoteUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Keep my anchor.' },
+		} );
+		// Start with an empty undo stack, so the shortcut can only reach the
+		// note's anchor.
+		await editor.saveDraft();
+		await page.reload();
+		await blockNoteUtils.showAllNotes();
+
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await paragraph.click();
+		await blockNoteUtils.selectBlockText();
+		await blockNoteUtils.addNote( 'Stay attached' );
+		const marker = editor.canvas.locator( 'mark.wp-note' );
+
+		// Undo doesn't detach the new note from its block.
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( marker ).toHaveText( 'Keep my anchor.' );
+		const [ block ] = await editor.getBlocks();
+		expect( block.attributes.metadata?.noteId ).toHaveLength( 1 );
+
+		// Undo doesn't bring back the marker of a resolved note.
+		await blockNoteUtils.getThread( 'Stay attached' ).click();
+		await page.getByRole( 'button', { name: 'Resolve' } ).click();
+		await expect( marker ).toHaveCount( 0 );
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( marker ).toHaveCount( 0 );
+		await expect( paragraph ).toHaveText( 'Keep my anchor.' );
 	} );
 
 	test.describe( 'Restoring a deleted note', () => {
@@ -2273,6 +2825,11 @@ test.describe( 'Block Notes', () => {
 				name: 'core/paragraph',
 				attributes: { content: 'Undo after delete.' },
 			} );
+			// Start with an empty undo stack, so the shortcut can't undo the
+			// block insertion instead.
+			await editor.saveDraft();
+			await page.reload();
+			await blockNoteUtils.showAllNotes();
 			await addInlineNote( { editor, blockNoteUtils }, 'Stay deleted' );
 
 			await blockNoteUtils.deleteNote();

@@ -145,7 +145,6 @@ export function toVdom( root: Node ): ComponentChild {
 		const directives: Array<
 			[ name: string, namespace: string | null, value: unknown ]
 		> = [];
-		let ignore = false;
 		let island = false;
 
 		for ( let i = 0; i < attributes.length; i++ ) {
@@ -156,24 +155,27 @@ export function toVdom( root: Node ): ComponentChild {
 				attributeName.slice( 0, directivePrefix.length ) ===
 					directivePrefix
 			) {
-				if ( attributeName === 'data-wp-ignore' ) {
-					ignore = true;
-				} else {
-					const { namespace, value } =
-						parseDirectiveValue( attributeValue );
-					if ( attributeName === 'data-wp-interactive' ) {
-						island = true;
-						const islandNamespace =
-							// eslint-disable-next-line no-nested-ternary
-							typeof value === 'string'
-								? value
-								: typeof value?.namespace === 'string'
-									? value.namespace
-									: null;
-						namespaces.push( islandNamespace );
-					} else {
-						directives.push( [ attributeName, namespace, value ] );
+				if ( globalThis.SCRIPT_DEBUG ) {
+					if ( attributeName === 'data-wp-ignore' ) {
+						warn(
+							'The data-wp-ignore directive has been removed. The element and its descendants are now hydrated like any other element. Please remove the attribute.'
+						);
 					}
+				}
+				const { namespace, value } =
+					parseDirectiveValue( attributeValue );
+				if ( attributeName === 'data-wp-interactive' ) {
+					island = true;
+					const islandNamespace =
+						// eslint-disable-next-line no-nested-ternary
+						typeof value === 'string'
+							? value
+							: typeof value?.namespace === 'string'
+								? value.namespace
+								: null;
+					namespaces.push( islandNamespace );
+				} else {
+					directives.push( [ attributeName, namespace, value ] );
 				}
 			} else if ( attributeName === 'ref' ) {
 				continue;
@@ -193,15 +195,6 @@ export function toVdom( root: Node ): ComponentChild {
 			}
 		}
 
-		if ( ignore && ! island ) {
-			return [
-				h< any, any >( localName, {
-					...props,
-					innerHTML: elementNode.innerHTML,
-					__directives: { ignore: true },
-				} ),
-			];
-		}
 		if ( island ) {
 			hydratedIslands.add( elementNode );
 		}

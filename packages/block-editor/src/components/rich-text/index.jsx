@@ -452,8 +452,8 @@ function RichTextWrapper(
 		onMarkPersistent: __unstableMarkLastChangeAsPersistent,
 	} );
 
-	const keyboardShortcuts = useRef( new Set() );
-	const inputEvents = useRef( new Set() );
+	const [ keyboardShortcuts ] = useState( () => new Set() );
+	const [ inputEvents ] = useState( () => new Set() );
 
 	function onFocus() {
 		anchorRef.current?.focus();

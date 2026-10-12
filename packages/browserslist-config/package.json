@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/browserslist-config",
-	"version": "6.56.0",
+	"version": "6.57.0",
 	"description": "WordPress Browserslist shared configuration.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,7 +20,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0"
+		"node": ">=22.13.0"
 	},
 	"files": [
 		"index.js"

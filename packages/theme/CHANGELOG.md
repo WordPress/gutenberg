@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Internal
+
+-   Consolidate border mode overrides in the resolver and inherit default values from the base tokens ([#84108](https://github.com/WordPress/gutenberg/pull/84108)).
+-   Update the Vite development dependency to 8.3.4 ([#84544](https://github.com/WordPress/gutenberg/pull/84544)).
+
+## 2.3.0 (2026-10-07)
+
 ### New Features
 
 -   Add `--wpds-color-background-thumb-neutral` for neutral progress indicators. ([#83781](https://github.com/WordPress/gutenberg/pull/83781))
@@ -15,6 +26,7 @@
 
 ### Internal
 
+-   Generate and commit complete border radius and width tokens for Figma mode imports during the theme build. ([#84035](https://github.com/WordPress/gutenberg/pull/84035))
 -   Update the Vite development dependency to 8.3.2 ([#83992](https://github.com/WordPress/gutenberg/pull/83992)).
 -   Update the Vite development dependency to 8.3.1. ([#83569](https://github.com/WordPress/gutenberg/pull/83569))
 -   Restore color-scale Storybook accessibility checks with labeled color samples, readable seed labels, and keyboard scrolling ([#83358](https://github.com/WordPress/gutenberg/pull/83358)).

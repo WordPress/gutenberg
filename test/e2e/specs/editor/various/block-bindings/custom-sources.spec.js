@@ -76,7 +76,7 @@ test.describe( 'Registered sources', () => {
 			await page.getByRole( 'tab', { name: 'Settings' } ).click();
 			await page.getByLabel( 'Attributes options' ).click();
 			await page
-				.getByRole( 'menuitemcheckbox', { name: 'Show id' } )
+				.getByRole( 'menuitemcheckbox', { name: 'id, show' } )
 				.click();
 			const idAttribute = page.getByRole( 'button', {
 				name: 'id',
@@ -416,6 +416,31 @@ test.describe( 'Registered sources', () => {
 				await expect( headingBlock ).toHaveAttribute(
 					'contenteditable',
 					'false'
+				);
+			} );
+
+			test( 'icon', async ( { editor, page } ) => {
+				await editor.insertBlock( {
+					name: 'core/icon',
+					attributes: {
+						icon: 'core/arrow-right',
+						metadata: {
+							bindings: {
+								icon: {
+									source: 'testing/can-user-edit-false',
+									args: { key: 'icon_field' },
+								},
+							},
+						},
+					},
+				} );
+				const replaceButton = page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Replace' } );
+				await expect( replaceButton ).toBeDisabled();
+				await replaceButton.focus();
+				await expect( replaceButton ).toHaveAccessibleDescription(
+					'Connected to Can User Edit: False'
 				);
 			} );
 
@@ -1039,7 +1064,7 @@ test.describe( 'Registered sources', () => {
 			await page.getByLabel( 'Attributes options' ).click();
 			await page
 				.getByRole( 'menuitemcheckbox', {
-					name: 'Show content',
+					name: 'content, show',
 				} )
 				.click();
 			await page.getByRole( 'button', { name: 'content' } ).click();
@@ -1067,7 +1092,7 @@ test.describe( 'Registered sources', () => {
 			} );
 			await page.getByLabel( 'Attributes options' ).click();
 			const contentAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'Show content',
+				name: 'content, show',
 			} );
 			await expect( contentAttribute ).toBeVisible();
 		} );
@@ -1081,9 +1106,46 @@ test.describe( 'Registered sources', () => {
 			} );
 			await page.getByLabel( 'Attributes options' ).click();
 			const contentAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'Show content',
+				name: 'content, show',
 			} );
 			await expect( contentAttribute ).toBeVisible();
+		} );
+
+		test( 'should be possible to connect the icon block icon', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/icon',
+				attributes: {
+					icon: 'core/arrow-right',
+				},
+			} );
+			await page.getByLabel( 'Attributes options' ).click();
+			const iconAttribute = page.getByRole( 'menuitemcheckbox', {
+				name: 'icon, show',
+			} );
+			await expect( iconAttribute ).toBeVisible();
+			await iconAttribute.click();
+			await page
+				.getByRole( 'button', {
+					name: 'icon Not connected',
+					exact: true,
+				} )
+				.click();
+			await page
+				.getByRole( 'menuitem', { name: 'Complete Source' } )
+				.click();
+			await page
+				.getByRole( 'menuitemcheckbox' )
+				.filter( { hasText: 'Icon Field Label' } )
+				.click();
+			await expect(
+				page.getByRole( 'button', {
+					name: 'icon Icon Field Label',
+					exact: true,
+				} )
+			).toContainText( 'Icon Field Label' );
 		} );
 
 		test( 'should be possible to connect the button supported attributes', async ( {
@@ -1107,24 +1169,24 @@ test.describe( 'Registered sources', () => {
 				.click();
 			await page.getByLabel( 'Attributes options' ).click();
 			const urlAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'Show url',
+				name: 'url, show',
 			} );
 			await expect( urlAttribute ).toBeVisible();
 			const textAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'Show text',
+				name: 'text, show',
 			} );
 			await expect( textAttribute ).toBeVisible();
 			const linkTargetAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'Show linkTarget',
+				name: 'linkTarget, show',
 			} );
 			await expect( linkTargetAttribute ).toBeVisible();
 			const relAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'Show rel',
+				name: 'rel, show',
 			} );
 			await expect( relAttribute ).toBeVisible();
 			// Check not supported attributes are not included.
 			const tagNameAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'Show tagName',
+				name: 'tagName, show',
 			} );
 			await expect( tagNameAttribute ).toBeHidden();
 		} );
@@ -1144,24 +1206,24 @@ test.describe( 'Registered sources', () => {
 				.getByLabel( 'Attributes options' )
 				.click();
 			const urlAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'Show url',
+				name: 'url, show',
 			} );
 			await expect( urlAttribute ).toBeVisible();
 			const idAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'Show id',
+				name: 'id, show',
 			} );
 			await expect( idAttribute ).toBeVisible();
 			const titleAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'Show title',
+				name: 'title, show',
 			} );
 			await expect( titleAttribute ).toBeVisible();
 			const altAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'Show alt',
+				name: 'alt, show',
 			} );
 			await expect( altAttribute ).toBeVisible();
 			// Check not supported attributes are not included.
 			const linkClassAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'Show linkClass',
+				name: 'linkClass, show',
 			} );
 			await expect( linkClassAttribute ).toBeHidden();
 		} );
@@ -1502,7 +1564,7 @@ test.describe( 'Registered sources', () => {
 			await page.getByRole( 'tab', { name: 'Settings' } ).click();
 			await page.getByLabel( 'Attributes options' ).click();
 			await page
-				.getByRole( 'menuitemcheckbox', { name: 'Show id' } )
+				.getByRole( 'menuitemcheckbox', { name: 'id, show' } )
 				.click();
 			await page.getByRole( 'button', { name: 'id' } ).click();
 

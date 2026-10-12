@@ -93,7 +93,6 @@ describe( 'Combobox', () => {
 				</Combobox.Root>
 			)
 		).toThrow( 'Combobox.ItemLabel must be the first direct child' );
-		expect( console ).toHaveErrored();
 	} );
 
 	it( 'rejects a description nested in the item label', () => {
@@ -117,7 +116,6 @@ describe( 'Combobox', () => {
 		).toThrow(
 			'ItemDescription: Missing direct item parent. Render ItemDescription as a direct child of Item.'
 		);
-		expect( console ).toHaveErrored();
 	} );
 
 	it( 'rejects a description outside an item', () => {
@@ -130,7 +128,6 @@ describe( 'Combobox', () => {
 		).toThrow(
 			'ItemDescription: Missing direct item parent. Render ItemDescription as a direct child of Item.'
 		);
-		expect( console ).toHaveErrored();
 	} );
 
 	it( 'renders a default trigger placeholder when no value is selected', () => {
