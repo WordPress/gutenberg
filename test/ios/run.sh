@@ -89,6 +89,7 @@ step "Generating the Xcode project"
 ( cd test/ios && xcodegen generate --quiet )
 step "Building and running the tests"
 rm -rf test/ios/build/results.xcresult
+TEST_START=$( date +'%Y-%m-%d %H:%M:%S' )
 STATUS=0
 TEST_RUNNER_WP_BASE_URL="$WP_BASE_URL" xcodebuild test \
 	-project test/ios/GutenbergIOS.xcodeproj \
@@ -97,4 +98,11 @@ TEST_RUNNER_WP_BASE_URL="$WP_BASE_URL" xcodebuild test \
 	-derivedDataPath test/ios/build \
 	-resultBundlePath test/ios/build/results.xcresult \
 	"$@" || STATUS=$?
+# Temporary diagnostics: touches the simulator lost.
+xcrun simctl spawn "$UDID" log show --info --style compact --start "$TEST_START" \
+	--predicate 'process == "backboardd" AND category == "TouchEvents"' > test/ios/build/touches.log 2>&1 || true
+echo "TOUCHDIAG unknown digitizer: $( grep -c 'unknown digitizer' test/ios/build/touches.log || true )"
+echo "TOUCHDIAG skipped events: $( grep -c 'skipping event' test/ios/build/touches.log || true )"
+echo "TOUCHDIAG cancelled contacts: $( grep -c 'canceling paths contacts' test/ios/build/touches.log || true )"
+echo "TOUCHDIAG taps: $( grep -c 'digitizer attached' test/ios/build/touches.log || true )"
 exit "$STATUS"
