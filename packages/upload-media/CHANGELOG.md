@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
 ### Enhancements
 
 -   Add a `generateAnimatedImageSubsizes` store setting, carried in the REST API root index from the new `wp_generate_animated_image_subsizes` filter, and a matching `preserveAnimation` option on `vipsResizeImage`. With the setting enabled, uncropped sub-sizes of animated images keep their animation instead of flattening to the first frame. It defaults to `false` ([#80385](https://github.com/WordPress/gutenberg/pull/80385)).

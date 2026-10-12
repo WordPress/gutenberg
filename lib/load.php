@@ -99,7 +99,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.2/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.2/edit-root-attachment.php';
 	require __DIR__ . '/compat/wordpress-7.2/notes.php';
-	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-fields-registry.php';
+	require __DIR__ . '/compat/wordpress-7.2/class-wp-fields-registry.php';
 	require __DIR__ . '/compat/wordpress-7.2/fields-api.php';
 	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-fields-controller-7-2.php';
 
@@ -115,6 +115,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/class-wp-rest-icon-collections-controller-gutenberg.php';
 	require_once __DIR__ . '/class-wp-icons-registry-gutenberg.php';
 	require_once __DIR__ . '/class-wp-rest-icons-controller-gutenberg.php';
+	require_once __DIR__ . '/class-wp-fields-registry-gutenberg.php';
 	require_once __DIR__ . '/rest-api.php';
 
 	require_once __DIR__ . '/experimental/rest-api.php';
