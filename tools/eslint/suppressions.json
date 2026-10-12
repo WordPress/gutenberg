@@ -7339,11 +7339,6 @@
 			"count": 3
 		}
 	},
-	"packages/fields/src/fields/author/author-view.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/fields/src/fields/excerpt/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
@@ -7778,11 +7773,6 @@
 	},
 	"packages/media-editor/src/private-apis.ts": {
 		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/media-fields/src/author/view.tsx": {
-		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
 	},
