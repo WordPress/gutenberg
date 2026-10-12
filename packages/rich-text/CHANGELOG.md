@@ -5,6 +5,11 @@
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+-   Remove refs from `KeyboardShortcutContext` and `InputEventContext` context values and pass `Set`s directly. Also affects the `shortcutsListener` and `inputEventsListener` parameters and replaces the `EventListenersProps` type with `EventCallbacksSet` ([#84545](https://github.com/WordPress/gutenberg/pull/84545)).
+
+### Internal
+
+-   Refactor to TypeScript ([#84324](https://github.com/WordPress/gutenberg/pull/84324)).
 
 ## 7.57.0 (2026-10-07)
 
