@@ -37,20 +37,30 @@
 		margin-right: $grid-unit - $border-width;
 	}
 
-	// Modified group borders.
-	.components-toolbar-group,
-	.components-toolbar {
+	// Header buttons are 32px and sit at the top of the 48px group. The block
+	// toolbar hairline centers itself in that group, which drops it below
+	// these shorter buttons. Pin it to the button instead.
+	.block-editor-block-toolbar .components-toolbar-group,
+	.block-editor-block-toolbar .components-toolbar {
 		border-right: none;
 		position: relative;
 
 		&::after {
 			content: "";
-			width: $border-width;
-			height: $grid-unit-30;
-			background-color: $gray-300;
-			top: $grid-unit-05;
 			position: absolute;
-			right: -$border-width;
+			z-index: 1;
+			inset: auto;
+			margin: 0;
+			top: $grid-unit-05;
+			inset-inline-end: calc(var(--wpds-border-width-xs) * -1);
+			width: var(--wpds-border-width-xs);
+			height: var(--wpds-dimension-size-sm);
+			background-color: var(--wpds-color-stroke-surface-neutral-weak);
+			pointer-events: none;
+
+			@media ( forced-colors: active ) {
+				background-color: CanvasText;
+			}
 		}
 
 		& .components-toolbar-group.components-toolbar-group {
