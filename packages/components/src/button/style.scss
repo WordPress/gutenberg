@@ -64,12 +64,12 @@
 		text-decoration: none;
 		text-shadow: none;
 
-		&:hover:not(:disabled) {
+		&:hover:not(:disabled, .is-pressed) {
 			background: $components-color-accent-darker-10;
 			color: $components-color-accent-inverted;
 		}
 
-		&:active:not(:disabled) {
+		&:active:not(:disabled, .is-pressed) {
 			background: $components-color-accent-darker-20;
 			color: $components-color-accent-inverted;
 		}
@@ -166,7 +166,7 @@
 			color: $components-color-accent-darker-20;
 		}
 
-		&:active:not(:disabled, [aria-disabled="true"]) {
+		&:active:not(:disabled, [aria-disabled="true"], .is-pressed) {
 			background: color-mix(in srgb, $components-color-accent 8%, transparent);
 		}
 
@@ -347,9 +347,10 @@
 		&,
 		&:is(:hover, :active):not(:disabled, [aria-disabled="true"]) {
 			color: var(--wpds-color-foreground-interactive-neutral-strong-active);
-			&:not(:disabled, [aria-disabled="true"]) {
-				background: var(--wpds-color-background-interactive-neutral-strong-active);
-			}
+		}
+
+		&:not(:disabled, [aria-disabled="true"]) {
+			background: var(--wpds-color-background-interactive-neutral-strong-active);
 		}
 
 		&:disabled,
