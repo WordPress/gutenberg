@@ -29,7 +29,10 @@ export function getBlockDisplayTitle( select, clientId, context ) {
 	}
 	const attributes = getBlockAttributes( clientId );
 	const label = getBlockLabel( blockType, attributes, context );
-	if ( label !== blockType.title ) {
+	if (
+		label !== blockType.title &&
+		( context !== 'breadcrumb' || label.trim() )
+	) {
 		return label;
 	}
 	const match = getActiveBlockVariation(

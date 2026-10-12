@@ -46,7 +46,10 @@ function BlockBreadcrumb( { rootLabelText, className } ) {
 	);
 
 	// translators: Default label for the document in the block breadcrumb.
-	const rootLabel = rootLabelText || _x( 'Document', 'noun, breadcrumb' );
+	const rootLabel =
+		typeof rootLabelText === 'string' && rootLabelText.trim()
+			? rootLabelText
+			: _x( 'Document', 'noun, breadcrumb' );
 	const blockRef = useRef();
 	useBlockElementRef( clientId, blockRef );
 
