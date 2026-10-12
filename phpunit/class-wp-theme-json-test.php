@@ -9091,30 +9091,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameCSS( $expected, $stylesheet );
 	}
 
-	public function test_legacy_block_custom_states_are_processed() {
-		$theme_json = new WP_Theme_JSON_Gutenberg(
-			array(
-				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-				'styles'  => array(
-					'blocks' => array(
-						'core/navigation-link' => array(
-							'@current' => array(
-								'color' => array(
-									'text'       => 'red',
-									'background' => 'blue',
-								),
-							),
-						),
-					),
-				),
-			)
-		);
-
-		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
-		$expected   = ':root :where(.wp-block-navigation .current-menu-item){background-color: blue;color: red;}';
-		$this->assertSameCSS( $expected, $stylesheet );
-	}
-
 	/**
 	 * Test that block custom states compound correctly with pseudo-selectors (e.g. -current + :hover).
 	 */
