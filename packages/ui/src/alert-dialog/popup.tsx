@@ -25,7 +25,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 		{
 			className,
 			portal,
-			size = 'medium',
 			intent = 'default',
 			title,
 			description,
@@ -130,7 +129,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 					className={ clsx(
 						dialogStyles.popup,
 						className,
-						dialogStyles[ `is-${ size }` ]
+						dialogStyles[ 'is-medium' ]
 					) }
 					initialFocus={ resolvedInitialFocus }
 					finalFocus={ finalFocus }

@@ -80,22 +80,6 @@ export interface PopupProps
 	portal?: ReactElement< Omit< PortalProps, 'children' > >;
 
 	/**
-	 * Controls the dialog width, excluding the viewport inset.
-	 *
-	 * - `'medium'`: Fills the available width up to the medium preset.
-	 * - `'auto'`: Fits content between the responsive minimum and available
-	 *   viewport width. The minimum is 320px below a 480px viewport and 400px
-	 *   otherwise, limited by the available width.
-	 *
-	 * Height fits content up to the available viewport height, with internal
-	 * scrolling when it overflows. Constrain wide content, such as images,
-	 * to the available content width.
-	 *
-	 * @default 'medium'
-	 */
-	size?: 'medium' | 'auto';
-
-	/**
 	 * The semantic intent of the dialog, which determines its styling.
 	 *
 	 * All intents use `role="alertdialog"`, are always modal, and block

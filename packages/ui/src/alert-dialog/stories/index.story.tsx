@@ -53,30 +53,6 @@ export const Default: Story = {
 };
 
 /**
- * Fits the content width while retaining the responsive minimum and viewport
- * inset. The default size remains medium.
- */
-export const AutoSize: Story = {
-	args: {
-		children: [
-			<AlertDialog.Trigger key="trigger">
-				Send preview
-			</AlertDialog.Trigger>,
-			<AlertDialog.Popup
-				key="popup"
-				size="auto"
-				title="Send preview?"
-				description="The preview will be sent to the selected recipients."
-			>
-				<div style={ { width: 450, maxWidth: '100%' } }>
-					<Text>Check the content before sending.</Text>
-				</div>
-			</AlertDialog.Popup>,
-		],
-	},
-};
-
-/**
  * Confirmation dialog for irreversible actions that cannot be undone.
  * The confirm button uses error/danger coloring.
  */
