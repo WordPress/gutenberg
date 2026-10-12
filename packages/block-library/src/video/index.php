@@ -23,7 +23,10 @@ function render_block_core_video( array $attributes, string $content ): string {
 	}
 
 	/*
-	 * Stop the video on the front end when the visitor prefers reduced motion.
+	 * Inspect the video to determine whether autoplay is enabled and, when it
+	 * is, set the interactivity directives that stop playback for visitors who
+	 * prefer reduced motion.
+	 *
 	 * The directives are added here rather than in the saved markup so existing
 	 * content does not need a deprecation.
 	 *
