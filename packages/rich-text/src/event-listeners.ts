@@ -37,8 +37,9 @@ export const shortcutsListener =
  *         cleanup function.
  */
 export const inputEventsListener =
-	( inputEvents: EventCallbacksSet< Event > ) => ( element: HTMLElement ) => {
-		function onInput( event: Event ) {
+	( inputEvents: EventCallbacksSet< InputEvent > ) =>
+	( element: HTMLElement ) => {
+		function onInput( event: InputEvent ) {
 			for ( const inputEventHandler of inputEvents ) {
 				inputEventHandler( event );
 			}

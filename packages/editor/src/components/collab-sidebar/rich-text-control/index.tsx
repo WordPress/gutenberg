@@ -204,7 +204,7 @@ export default function RichTextControl( {
 	} );
 	const [ isSelected, setIsSelected ] = useState( false );
 	const anchorRef = useRef< HTMLElement | undefined >( undefined );
-	const [ inputEvents ] = useState< EventCallbacksSet< Event > >(
+	const [ inputEvents ] = useState< EventCallbacksSet< InputEvent > >(
 		() => new Set()
 	);
 	const [ keyboardShortcuts ] = useState<
