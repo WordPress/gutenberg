@@ -136,32 +136,32 @@ Check that longer or translated labels and descriptions wrap cleanly.
 
 Append an ellipsis (`…`) when activating an item opens another interface that requires more user input before the command can finish, such as a dialog.
 
--   Use **Rename…** when activation opens a dialog where the user enters a new name.
--   Use **Delete…** when activation opens a confirmation dialog that requires a decision.
--   Use **Preferences** without an ellipsis when activation completes the command by opening the preferences interface.
--   Use **Duplicate** when activation completes the command immediately.
--   Use **Move to** without an ellipsis when the item opens a submenu.
+- Use **Rename…** when activation opens a dialog where the user enters a new name.
+- Use **Delete…** when activation opens a confirmation dialog that requires a decision.
+- Use **Preferences** without an ellipsis when activation completes the command by opening the preferences interface.
+- Use **Duplicate** when activation completes the command immediately.
+- Use **Move to** without an ellipsis when the item opens a submenu.
 
 The consumer must add the ellipsis because `Menu.Item` cannot infer what happens after activation. See the [WAI-ARIA APG Menu and Menubar Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/) and the [WordPress ellipsis guidance](https://github.com/WordPress/gutenberg/issues/64555#issuecomment-5244971187).
 
 ## Common mistakes
 
--   **Using Menu to choose the control's only value.** Use `SelectControl` so the trigger and options communicate value selection.
--   **Putting commands or links in Select.** Use `Menu.Item` for commands and `Menu.LinkItem` for destinations.
--   **Using Menu for a large set of searchable commands.** Use `Autocomplete` when users need to filter commands or suggestions by typing.
--   **Using radio items to recreate a Select.** Use `Menu.RadioItem` only when the state belongs inside a broader command menu.
--   **Adding icons only for consistency.** Omit unnecessary icons instead.
--   **Combining an icon and a description.** Use only the supporting detail the item needs.
--   **Adding descriptions to most items.** Keep labels clear and reserve descriptions for essential context.
--   **Adding an ellipsis to every item that opens another interface.** Reserve it for commands that require more input before completion. Do not add it when opening the interface completes the command, as with **Preferences**.
+- **Using Menu to choose the control's only value.** Use `SelectControl` so the trigger and options communicate value selection.
+- **Putting commands or links in Select.** Use `Menu.Item` for commands and `Menu.LinkItem` for destinations.
+- **Using Menu for a large set of searchable commands.** Use `Autocomplete` when users need to filter commands or suggestions by typing.
+- **Using radio items to recreate a Select.** Use `Menu.RadioItem` only when the state belongs inside a broader command menu.
+- **Adding icons only for consistency.** Omit unnecessary icons instead.
+- **Combining an icon and a description.** Use only the supporting detail the item needs.
+- **Adding descriptions to most items.** Keep labels clear and reserve descriptions for essential context.
+- **Adding an ellipsis to every item that opens another interface.** Reserve it for commands that require more input before completion. Do not add it when opening the interface completes the command, as with **Preferences**.
 
 ## References
 
--   [WAI-ARIA APG: Menu and Menubar Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/)
--   [WAI-ARIA APG: Listbox Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/)
--   [WAI-ARIA: `menuitemcheckbox` role](https://www.w3.org/TR/wai-aria-1.2/#menuitemcheckbox)
--   [WAI-ARIA: `menuitemradio` role](https://www.w3.org/TR/wai-aria-1.2/#menuitemradio)
--   [HTML Standard: The `select` element](https://html.spec.whatwg.org/dev/form-elements.html#the-select-element)
--   [Base UI: Menu](https://base-ui.com/react/components/menu)
--   [Base UI: Select](https://base-ui.com/react/components/select)
--   [Base UI: Autocomplete](https://base-ui.com/react/components/autocomplete)
+- [WAI-ARIA APG: Menu and Menubar Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/)
+- [WAI-ARIA APG: Listbox Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/)
+- [WAI-ARIA: `menuitemcheckbox` role](https://www.w3.org/TR/wai-aria-1.2/#menuitemcheckbox)
+- [WAI-ARIA: `menuitemradio` role](https://www.w3.org/TR/wai-aria-1.2/#menuitemradio)
+- [HTML Standard: The `select` element](https://html.spec.whatwg.org/dev/form-elements.html#the-select-element)
+- [Base UI: Menu](https://base-ui.com/react/components/menu)
+- [Base UI: Select](https://base-ui.com/react/components/select)
+- [Base UI: Autocomplete](https://base-ui.com/react/components/autocomplete)

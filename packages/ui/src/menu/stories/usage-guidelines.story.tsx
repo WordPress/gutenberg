@@ -17,10 +17,6 @@ export default meta;
 
 type Story = StoryObj;
 
-/**
- * Prefer prefix icons on every item in a group, or omit them from the whole group.
- * Groups can make different choices.
- */
 export const ConsistentPrefixIconsWithinGroups: Story = {
 	render: () => (
 		<Menu.Root>
@@ -50,10 +46,6 @@ export const ConsistentPrefixIconsWithinGroups: Story = {
 	),
 };
 
-/**
- * Mixed icon usage is supported. Labels without icons start at the same
- * position as neighboring icons, without an empty icon space.
- */
 export const MixedPrefixIcons: Story = {
 	render: () => (
 		<Menu.Root>
@@ -87,10 +79,6 @@ const commandItems = [
 	{ id: 'view-details', value: 'View details' },
 ];
 
-/**
- * Use SelectControl when the trigger represents a value and opens choices for
- * replacing it.
- */
 export const SelectForValues: Story = {
 	render: () => (
 		<SelectControl
@@ -101,9 +89,6 @@ export const SelectForValues: Story = {
 	),
 };
 
-/**
- * Use Menu when the trigger opens commands or destinations.
- */
 export const MenuForCommands: Story = {
 	render: () => (
 		<Menu.Root>
@@ -123,10 +108,6 @@ export const MenuForCommands: Story = {
 	),
 };
 
-/**
- * Use Autocomplete when users need to type to filter a menu-like list of
- * commands or suggestions. The input also accepts free-form text.
- */
 export const AutocompleteForSearchableCommands: Story = {
 	render: () => (
 		<Autocomplete.Root items={ commandItems }>
@@ -159,10 +140,6 @@ export const AutocompleteForSearchableCommands: Story = {
 	),
 };
 
-/**
- * Checkbox and radio items represent settings within a broader command menu.
- * Use SelectControl instead when choosing one value is the control's purpose.
- */
 export const CheckedOptionsWithinACommandMenu: Story = {
 	render: function Render() {
 		const [ showAuthor, setShowAuthor ] = useState( true );
