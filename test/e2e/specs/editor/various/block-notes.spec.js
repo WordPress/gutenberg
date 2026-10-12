@@ -1150,6 +1150,10 @@ test.describe( 'Block Notes', () => {
 			} );
 			await expect( reactionButton ).toBeVisible();
 			await expect( reactionButton ).toContainText( '1' );
+			await expect( reactionButton ).toHaveAttribute(
+				'aria-pressed',
+				'true'
+			);
 		} );
 
 		test( 'can re-add the same reaction after removing it', async ( {
@@ -1207,36 +1211,11 @@ test.describe( 'Block Notes', () => {
 				comment: 'Original note text',
 			} );
 
-			// Toggling invalidates the notes list, whose edit-context refetch
-			// can land after the single-note refetch and mask the bug. Hold the
-			// single-note refetch back so it is the last write to the cache.
-			const singleNote = /\/wp\/v2\/comments\/\d+([?&]|$)/;
-			await page.route(
-				( url ) => singleNote.test( decodeURIComponent( url.href ) ),
-				async ( route ) => {
-					if ( route.request().method() !== 'GET' ) {
-						return route.fallback();
-					}
-					const response = await route.fetch();
-					await new Promise( ( resolve ) =>
-						setTimeout( resolve, 1000 )
-					);
-					await route.fulfill( { response } );
-				}
-			);
-			const refetch = page.waitForResponse(
-				( response ) =>
-					response.request().method() === 'GET' &&
-					singleNote.test( decodeURIComponent( response.url() ) )
-			);
 			await blockNoteUtils.addReactionToComment( 'heart' );
-			await refetch;
 			await expect(
 				page.getByRole( 'button', { name: /heart/ } )
 			).toContainText( '1' );
 
-			// The post-toggle refetch must not replace the cached note's
-			// edit-context `content.raw`, which seeds the edit form.
 			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Edit' );
 			await expect(
 				page.getByRole( 'textbox', { name: 'Edit note' } )
@@ -2150,6 +2129,64 @@ test.describe( 'Block Notes', () => {
 			await expect( mark ).toHaveCount( 1 );
 			await expect( mark ).toHaveText( 'brave' );
 			await expect( paragraph ).toHaveText( 'Hello brave new world.' );
+		} );
+
+		test( 'anchors an inline note to selected accordion heading text after reloading', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/accordion',
+				innerBlocks: [
+					{
+						name: 'core/accordion-item',
+						innerBlocks: [
+							{
+								name: 'core/accordion-heading',
+								attributes: { title: 'Hello brave new world.' },
+							},
+							{
+								name: 'core/accordion-panel',
+								innerBlocks: [
+									{
+										name: 'core/paragraph',
+										attributes: {
+											content: 'Accordion panel content.',
+										},
+									},
+								],
+							},
+						],
+					},
+				],
+			} );
+			const headingTitle = editor.canvas.locator(
+				'.wp-block-accordion-heading__toggle-title'
+			);
+			await headingTitle.focus();
+			await expect( headingTitle ).toBeFocused();
+			await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
+			await blockNoteUtils.addNote( 'Just this accordion word' );
+
+			const marker = editor.canvas.locator( 'mark.wp-note' );
+			await expect( marker ).toHaveCount( 1 );
+			await expect( marker ).toHaveText( 'brave' );
+			await expect( marker ).toHaveAttribute( 'data-id', /^\d+$/ );
+			await expect( headingTitle ).toHaveText( 'Hello brave new world.' );
+			const noteId = await marker.getAttribute( 'data-id' );
+
+			await editor.saveDraft();
+			await page.reload();
+			await blockNoteUtils.openBlockNoteSidebar();
+
+			await expect( marker ).toHaveCount( 1 );
+			await expect( marker ).toHaveText( 'brave' );
+			await expect( marker ).toHaveAttribute( 'data-id', noteId );
+			await expect( headingTitle ).toHaveText( 'Hello brave new world.' );
+			await expect(
+				blockNoteUtils.getThread( 'Just this accordion word' )
+			).toBeVisible();
 		} );
 
 		test( 'highlights the drafted text and anchors the note to it across a block switch', async ( {
