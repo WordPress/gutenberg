@@ -44,17 +44,21 @@ ROOT="$PWD"
 CACHE="$ROOT/test/ios/build/cache"
 WP_DIR="$ROOT/test/ios/build/wordpress"
 mkdir -p "$CACHE"
+step "Downloading WP-CLI and SQLite"
 [ -f "$CACHE/wp-cli.phar" ] || curl -sSLf -o "$CACHE/wp-cli.phar" https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 [ -f "$CACHE/sqlite.zip" ] || curl -sSLf -o "$CACHE/sqlite.zip" https://downloads.wordpress.org/plugin/sqlite-database-integration.latest-stable.zip
 wp() { php -d memory_limit=512M "$CACHE/wp-cli.phar" --path="$WP_DIR" --quiet "$@"; }
 rm -rf "$WP_DIR"
+step "Downloading WordPress"
 wp core download --version=latest
 unzip -q "$CACHE/sqlite.zip" -d "$WP_DIR/wp-content/plugins"
 SQLITE="$WP_DIR/wp-content/plugins/sqlite-database-integration"
 sed -e "s#{SQLITE_IMPLEMENTATION_FOLDER_PATH}#$SQLITE#" -e "s#{SQLITE_PLUGIN}#sqlite-database-integration/load.php#" \
 	"$SQLITE/db.copy" > "$WP_DIR/wp-content/db.php"
+step "Installing WordPress"
 wp config create --dbname=wordpress --dbuser=wordpress --dbpass=wordpress --skip-check
 wp core install --url="$WP_BASE_URL" --title="iOS tests" --admin_user=admin --admin_password=password --admin_email=admin@example.com --skip-email
+step "Activating the plugin"
 ln -s "$ROOT" "$WP_DIR/wp-content/plugins/gutenberg"
 wp plugin activate gutenberg
 python3 "$ROOT/test/ios/blueprint-steps.py" "$ROOT/test/ios/blueprint.json" "$WP_DIR"
@@ -73,6 +77,7 @@ add_action( 'init', function () {
 	wp_set_current_user( 1 );
 }, 0 );
 PHP
+step "Starting the server"
 PHP_CLI_SERVER_WORKERS=8 php -d memory_limit=512M -S "127.0.0.1:$PORT" -t "$WP_DIR" > "$ROOT/test/ios/build/server.log" 2>&1 &
 SERVER_PID=$!
 trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
@@ -102,8 +107,16 @@ xcrun simctl bootstatus "$UDID" -b
 # Safari's tips cover the page on a fresh simulator, and a tap then only
 # closes the tip.
 xcrun simctl spawn "$UDID" defaults write com.apple.mobilesafari com.apple.TipKit.HideAllTips -bool YES
-# Playground logs a browser in once and remembers that in a cookie, which
-# outlives the server: start Safari without cookies from an earlier run.
+# Safari's first launch on a fresh simulator takes most of a minute, and
+# the simulator then loses the test's first tap. Launch it once here.
+step "Starting Safari once"
+xcrun simctl openurl "$UDID" "$WP_BASE_URL/wp-login.php?warm-up"
+for _ in $( seq 1 120 ); do
+	grep -q "wp-login.php?warm-up" "$ROOT/test/ios/build/server.log" && break
+	sleep 1
+done
+# The login is remembered in a cookie, which outlives the server: start
+# Safari without cookies from an earlier run.
 xcrun simctl terminate "$UDID" com.apple.mobilesafari 2>/dev/null || true
 SAFARI_DATA=$( xcrun simctl get_app_container "$UDID" com.apple.mobilesafari data )
 if [[ -n "$SAFARI_DATA" && -d "$SAFARI_DATA" ]]; then
