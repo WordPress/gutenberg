@@ -7226,6 +7226,64 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that block style variation custom CSS, including breakpoint custom
+	 * CSS, uses the block's css feature selector when defined.
+	 */
+	public function test_get_styles_for_block_variation_custom_css_uses_css_feature_selector() {
+		register_block_style(
+			'core/paragraph',
+			array(
+				'name'  => 'fancy',
+				'label' => 'Fancy',
+			)
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/paragraph' => array(
+							'variations' => array(
+								'fancy' => array(
+									'css'     => 'color:red;',
+									'@tablet' => array(
+										'css' => 'color:blue;',
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$paragraph_node = array(
+			'name'       => 'core/paragraph',
+			'path'       => array( 'styles', 'blocks', 'core/paragraph' ),
+			'selector'   => 'p',
+			'selectors'  => array(
+				'root' => 'p',
+				'css'  => '.custom-p',
+			),
+			'variations' => array(
+				array(
+					'path'     => array( 'styles', 'blocks', 'core/paragraph', 'variations', 'fancy' ),
+					'selector' => 'p.is-style-fancy',
+				),
+			),
+		);
+
+		$actual = $theme_json->get_styles_for_block( $paragraph_node );
+
+		unregister_block_style( 'core/paragraph', 'fancy' );
+
+		$this->assertStringContainsString( ':root :where(.custom-p.is-style-fancy){color:red;}', $actual );
+		$this->assertStringContainsString( '{:root :where(.custom-p.is-style-fancy){color:blue;}}', $actual );
+		$this->assertStringNotContainsString( ':root :where(p.is-style-fancy){color:', $actual );
+	}
+
+	/**
 	 * Tests that custom CSS is kept for users with correct capabilities and removed for others.
 	 *
 	 * @dataProvider data_custom_css_for_user_caps
