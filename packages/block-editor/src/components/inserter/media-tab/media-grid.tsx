@@ -26,6 +26,7 @@ const InserterDraggableBlocks =
 	} >;
 
 type MediaGridProps = {
+	// Results.
 	/**
 	 * The items for the current page, or `undefined` before the first fetch.
 	 */
@@ -33,14 +34,26 @@ type MediaGridProps = {
 	isLoading: boolean;
 	totalItems?: number;
 	totalPages?: number;
-	page: number;
-	/**
-	 * Items per page, as requested from the source by the panel.
-	 */
-	perPage: number;
-	onChangePage: ( page: number ) => void;
+
+	// Search row.
 	search: string;
 	onChangeSearch: ( search: string ) => void;
+	searchLabel: string;
+	/**
+	 * Rendered beside the search input (the source menu).
+	 */
+	sourceMenu?: ReactNode;
+
+	// Media-type tabs.
+	/**
+	 * Fewer than two renders no tab bar, since there is nothing to switch
+	 * between.
+	 */
+	mediaTypes?: { value: MediaType; label: string }[];
+	mediaType: MediaType;
+	onChangeMediaType?: ( mediaType: MediaType ) => void;
+
+	// Grid.
 	/**
 	 * Called with the item the reader chose to insert.
 	 */
@@ -53,26 +66,22 @@ type MediaGridProps = {
 	 * Per-item actions, shown in each card's menu.
 	 */
 	actions: Action< MediaItem >[];
-	searchLabel: string;
 	/**
 	 * Rendered when there are no items to show.
 	 */
 	empty: ReactNode;
+
+	// Footer.
+	page: number;
+	/**
+	 * Items per page, as requested from the source by the panel.
+	 */
+	perPage: number;
+	onChangePage: ( page: number ) => void;
 	/**
 	 * Rendered beneath the pager (e.g. the attach button).
 	 */
 	footer?: ReactNode;
-	/**
-	 * Rendered beside the search input (the source menu).
-	 */
-	sourceMenu?: ReactNode;
-	/**
-	 * The media types to offer as tabs. Fewer than two renders no tab
-	 * bar, since there is nothing to switch between.
-	 */
-	mediaTypes?: { value: MediaType; label: string }[];
-	mediaType: MediaType;
-	onChangeMediaType?: ( mediaType: MediaType ) => void;
 };
 
 const EMPTY_ARRAY: MediaItem[] = [];
@@ -166,21 +175,21 @@ export default function MediaGrid( {
 	isLoading,
 	totalItems,
 	totalPages,
-	page,
-	perPage,
-	onChangePage,
 	search,
 	onChangeSearch,
-	onClickItem,
-	insertingId,
-	actions,
 	searchLabel,
-	empty,
-	footer,
 	sourceMenu,
 	mediaTypes,
 	mediaType,
 	onChangeMediaType,
+	onClickItem,
+	insertingId,
+	actions,
+	empty,
+	page,
+	perPage,
+	onChangePage,
+	footer,
 }: MediaGridProps ) {
 	const fields: Field< MediaItem >[] = useMemo(
 		() => [
