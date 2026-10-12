@@ -1022,4 +1022,51 @@ describe( 'withSuggestionBlockClassName', () => {
 			screen.getByTestId( 'suggestion-move-ghost' )
 		).toBeInTheDocument();
 	} );
+
+	it( 'keeps the ghost inside the parent when the recorded ids are stale after a reload', () => {
+		const registry = createRegistry();
+		registry.register( createStubCoreStore() );
+		registry.register( noticesStore );
+		registry.register( preferencesStore );
+		registry.register( blockEditorStore );
+		registry.register( editorStore );
+		unlock( registry.dispatch( editorStore ) ).setEditorIntent( 'edit' );
+
+		// A move within one parent, read back after a reload: parsing gave
+		// every block a new client id, so the recorded parent and anchor
+		// match nothing in the tree.
+		const sibling = createBlock( TEST_BLOCK_NAME, { content: 'Stayed' } );
+		const moved = createBlock( TEST_BLOCK_NAME, {
+			content: 'Moved within the parent',
+			metadata: {
+				suggestion: {
+					type: 'pending-move',
+					authorId: null,
+					fromAnchorClientId: 'stale-anchor',
+					fromParentClientId: 'stale-parent',
+					fromIndex: 0,
+				},
+			},
+		} );
+		const parent = createBlock( TEST_BLOCK_NAME, { content: 'Parent' }, [
+			sibling,
+			moved,
+		] );
+		registry.dispatch( blockEditorStore ).resetBlocks( [ parent ] );
+
+		const wrapper = ( { children }: { children?: ReactNode } ) => (
+			<RegistryProvider value={ registry }>
+				<SuggestionOverlayProvider>
+					<MoveGhostsProvider>{ children }</MoveGhostsProvider>
+				</SuggestionOverlayProvider>
+			</RegistryProvider>
+		);
+
+		render( <WrappedBlockListBlock clientId={ sibling.clientId } />, {
+			wrapper,
+		} );
+		expect(
+			screen.getByTestId( 'suggestion-move-ghost' )
+		).toBeInTheDocument();
+	} );
 } );
