@@ -10,7 +10,7 @@
 
 ### Bug Fixes
 
--   Use matching strong neutral colors for pressed header controls ([#84573](https://github.com/WordPress/gutenberg/pull/84573)).
+-   Use matching strong neutral colors for pressed header controls and semantic header background and divider colors ([#84573](https://github.com/WordPress/gutenberg/pull/84573)).
 
 ### Internal
 

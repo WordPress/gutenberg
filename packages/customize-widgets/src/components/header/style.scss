@@ -1,4 +1,3 @@
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/z-index" as *;
@@ -21,9 +20,8 @@
 	// Zero bottom margin so that the fixed toolbar is right under the header.
 	margin: -15px ( -$grid-unit-15 ) ( 0 ) ( -$grid-unit-15 );
 
-	// Match the customizer grey background.
-	background: #f0f0f1;
-	border-bottom: 1px solid $gray-200;
+	background: var(--wpds-color-background-surface-neutral);
+	border-bottom: 1px solid var(--wpds-color-stroke-surface-neutral);
 
 	z-index: z-index(".customize-widgets__topbar");
 }
