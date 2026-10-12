@@ -507,6 +507,19 @@ export function setCanvasHeight( height ) {
 }
 
 /**
+ * Set the measured canvas width without changing the requested width.
+ *
+ * @param {number|undefined} width Rendered canvas width in pixels.
+ * @return {Object} Action object.
+ */
+export function setPhysicalCanvasWidth( width ) {
+	return {
+		type: 'SET_PHYSICAL_CANVAS_WIDTH',
+		width,
+	};
+}
+
+/**
  * Set the current revision ID for revisions preview mode.
  * Pass a revision ID to enter revisions mode, or null to exit.
  *

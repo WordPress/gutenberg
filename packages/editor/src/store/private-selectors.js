@@ -338,6 +338,16 @@ export const getCanvasHeight = createRegistrySelector(
 );
 
 /**
+ * Get the measured canvas width, independently of the requested width.
+ *
+ * @param {Object} state Global application state.
+ * @return {number|undefined} Rendered canvas width in pixels.
+ */
+export function getPhysicalCanvasWidth( state ) {
+	return state.physicalCanvasWidth;
+}
+
+/**
  * Returns the current revisions page number.
  *
  * @param {Object} state Global application state.

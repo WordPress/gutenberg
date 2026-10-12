@@ -18,6 +18,40 @@ test.describe( 'Preview', () => {
 		await admin.createNewPost();
 	} );
 
+	test( 'hides viewport dimensions when space is limited and restores them when space returns', async ( {
+		page,
+	} ) => {
+		await page.setViewportSize( { width: 1600, height: 900 } );
+		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
+		await page.getByRole( 'menuitemradio', { name: 'Tablet' } ).click();
+		await page.keyboard.press( 'Escape' );
+		const footer = page.getByRole( 'region', { name: 'Editor footer' } );
+		await expect( footer ).toContainText( /Tablet \(781 × \d+\)/ );
+		const canvas = page.locator( 'iframe[name="editor-canvas"]' );
+		await expect
+			.poll( async () =>
+				Math.round( ( await canvas.boundingBox() ).width )
+			)
+			.toBe( 781 );
+
+		await page.setViewportSize( { width: 900, height: 900 } );
+		await expect(
+			footer.getByText( 'Tablet', { exact: true } )
+		).toBeVisible();
+		await expect( footer ).not.toContainText( /Tablet \(781 × \d+\)/ );
+		await expect
+			.poll( async () => ( await canvas.boundingBox() ).width )
+			.toBeLessThan( 780 );
+
+		await page.setViewportSize( { width: 1600, height: 900 } );
+		await expect( footer ).toContainText( /Tablet \(781 × \d+\)/ );
+		await expect
+			.poll( async () =>
+				Math.round( ( await canvas.boundingBox() ).width )
+			)
+			.toBe( 781 );
+	} );
+
 	test( 'preserves responsive editing when switching through the default viewport', async ( {
 		page,
 	} ) => {
