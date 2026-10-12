@@ -1933,9 +1933,6 @@
 		}
 	},
 	"packages/block-editor/src/components/rich-text/index.jsx": {
-		"react-hooks/refs": {
-			"count": 1
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}

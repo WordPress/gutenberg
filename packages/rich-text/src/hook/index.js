@@ -11,6 +11,9 @@ import { useBoundaryStyle } from './use-boundary-style';
 import { useEventListeners } from './event-listeners';
 import { useFormatTypes } from './use-format-types';
 
+// A symbol, so the function stays private if the hook becomes public.
+export const getDomPositionKey = Symbol( 'getDomPosition' );
+
 /**
  * Whether a selection may be set into the element: it (or an editing host
  * around it) has focus. Otherwise the focus handler sets the selection once
@@ -235,7 +238,7 @@ function useRichTextBase( {
 		ref: mergedRefs,
 		// The DOM position of an offset in the value, for a selection set
 		// from outside the element.
-		getDomPosition: ( offset ) =>
+		[ getDomPositionKey ]: ( offset ) =>
 			getDomPosition( {
 				value: recordRef.current,
 				offset: Math.min( offset, recordRef.current.text.length ),
@@ -315,7 +318,5 @@ export function useDeprecatedRichText( props ) {
 	deprecated( '`__unstableUseRichText` hook', {
 		since: '7.0',
 	} );
-	// `getDomPosition` is private, only through `useRichText`.
-	const { getDomPosition: omitted, ...result } = useRichTextBase( props );
-	return result;
+	return useRichTextBase( props );
 }

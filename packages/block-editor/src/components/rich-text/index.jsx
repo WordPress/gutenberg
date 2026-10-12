@@ -46,6 +46,7 @@ import { PrivateBlockContext } from '../block-list/private-block-context';
 // `@wordpress/format-library` imports them from `@wordpress/block-editor`).
 const {
 	useRichText,
+	getDomPositionKey,
 	KeyboardShortcutContext,
 	InputEventContext,
 	RichTextShortcut,
@@ -375,7 +376,7 @@ function RichTextWrapper(
 		onChange,
 		ref: richTextRef,
 		formatTypes,
-		getDomPosition,
+		[ getDomPositionKey ]: getDomPosition,
 	} = useRichText( {
 		value: adjustedValue,
 		onChange: adjustedOnChange,
