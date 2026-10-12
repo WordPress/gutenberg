@@ -124,7 +124,9 @@
 		padding: 4px;
 
 		&.is-pressed {
-			background: $gray-900;
+			&:not(:disabled, [aria-disabled="true"]) {
+				background: var(--wpds-color-background-interactive-neutral-strong-active);
+			}
 
 			@media (forced-colors: active) {
 				background: SelectedItem !important;
