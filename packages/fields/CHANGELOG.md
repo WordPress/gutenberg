@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   Author and template author fields: Use the `@wordpress/ui` Avatar with source-specific icon fallbacks.
+-   Author and template author fields: Use the `@wordpress/ui` Avatar with source-specific icon fallbacks ([#84540](https://github.com/WordPress/gutenberg/pull/84540)).
 -   Template field: Migrate template selection to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
 
 ### Bug Fixes
