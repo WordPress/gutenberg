@@ -119,12 +119,14 @@ test.describe( 'Pages (DataForm inspector)', () => {
 		const templateSelect = page.getByRole( 'combobox', {
 			name: 'Template',
 		} );
+		await templateSelect.click();
 		// Empty theme's custom template with `postTypes: ['post']`, should not be suggested.
-		await expect( templateSelect.getByRole( 'option' ) ).toHaveText( [
-			'Single Entries',
-			templateName,
-		] );
-		await templateSelect.selectOption( { label: templateName } );
+		await expect(
+			page.getByRole( 'listbox' ).getByRole( 'option' )
+		).toHaveText( [ 'Single Entries', templateName ] );
+		await page
+			.getByRole( 'option', { name: templateName, exact: true } )
+			.click();
 		await page.keyboard.press( 'Escape' );
 		await expect( templateButton ).toHaveAccessibleDescription(
 			templateName
@@ -135,7 +137,10 @@ test.describe( 'Pages (DataForm inspector)', () => {
 
 		// Now reset, and apply the default template back.
 		await templateButton.click();
-		await templateSelect.selectOption( { label: 'Single Entries' } );
+		await templateSelect.click();
+		await page
+			.getByRole( 'option', { name: 'Single Entries', exact: true } )
+			.click();
 		await page.keyboard.press( 'Escape' );
 		await expect( templateButton ).toHaveAccessibleDescription(
 			'Single Entries'
@@ -149,12 +154,11 @@ test.describe( 'Pages (DataForm inspector)', () => {
 		await draftNewPage( page );
 		const summary = await openPostSummary( { editor, page } );
 		await summary.getByRole( 'button', { name: 'Edit Template' } ).click();
+		await page.getByRole( 'combobox', { name: 'Template' } ).click();
 		// Empty theme has only one custom template with `postTypes: ['post']`,
 		// so it should not be suggested.
 		await expect(
-			page
-				.getByRole( 'combobox', { name: 'Template' } )
-				.getByRole( 'option' )
+			page.getByRole( 'listbox' ).getByRole( 'option' )
 		).toHaveText( [ 'Single Entries' ] );
 	} );
 } );

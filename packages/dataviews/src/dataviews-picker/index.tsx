@@ -7,7 +7,7 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { Stack } from '@wordpress/ui';
+import { Stack, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import DataViewsContext from '../components/dataviews-context';
 import { VIEW_LAYOUTS } from '../components/dataviews-layouts';
 import {
@@ -249,6 +249,7 @@ function DataViewsPicker< Item >( {
 	empty,
 	onReset,
 }: DataViewsPickerProps< Item > ) {
+	useEnableWpCompatOverlaySlot();
 	// useData ensures data loading is correct whether infinite scroll is enabled or pagination is used.
 	const { data: displayData, setVisibleEntries } = useData( {
 		view,
