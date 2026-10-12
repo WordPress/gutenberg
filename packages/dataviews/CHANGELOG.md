@@ -14,6 +14,10 @@
 
 -   DataForm: Center the `prefix` and `suffix` of the `text` control's `Edit` config vertically and give them the standard input padding, so consumers pass only the content. ([#84314](https://github.com/WordPress/gutenberg/pull/84314))
 
+### Internal
+
+-   Update Ariakit to 0.4.41 ([#84539](https://github.com/WordPress/gutenberg/pull/84539)).
+
 ## 20.0.0 (2026-10-07)
 
 ### Breaking Changes
