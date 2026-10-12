@@ -414,6 +414,7 @@ function gutenberg_get_block_state_element_selectors( $root_selector ) {
  * @param string|null $selector    Block, feature, or element selector.
  * @param array       $style       Style object.
  * @param string|null $rules_group Optional CSS grouping rule, e.g. a media query.
+ * @param array|null  $base_style  Optional styles the state layers over.
  */
 function gutenberg_add_block_state_style_rule( &$css_rules, $state, $selector, $style, $rules_group = null, $base_style = null ) {
 	if ( empty( $style ) || ! is_array( $style ) ) {
@@ -458,6 +459,7 @@ function gutenberg_add_block_state_style_rule( &$css_rules, $state, $selector, $
  * @param array         $state_styles Map of state to style array.
  * @param WP_Block_Type $block_type   Block type.
  * @param string|null   $rules_group  Optional CSS grouping rule, e.g. a media query.
+ * @param array|null    $base_style   Optional styles the state layers over.
  * @return array[] State style rules.
  */
 function gutenberg_get_block_state_style_rules( $state_styles, $block_type, $rules_group = null, $base_style = null ) {
