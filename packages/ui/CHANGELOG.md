@@ -14,11 +14,17 @@
 ### Enhancements
 
 -   `Select`, `Combobox`, `Autocomplete`, and the select controls: Tighten popup item spacing, use 16px selection indicators, and align group labels and separators with item content ([#84393](https://github.com/WordPress/gutenberg/pull/84393)).
+-   `useEnableWpCompatOverlaySlot`: Mark as recommended for use in a WordPress environment ([#84305](https://github.com/WordPress/gutenberg/pull/84305)).
 
 ### Bug Fixes
 
+-   `Popover`, `Menu`, `Tooltip`, `Select`, `Autocomplete`, and `Combobox`: Preserve an explicit null portal container so popup content waits until its target is available ([#84370](https://github.com/WordPress/gutenberg/pull/84370)).
 -   `Menu`, `Popover`: Keep popups open when the user interacts with an iframe inside the popup. ([#83870](https://github.com/WordPress/gutenberg/pull/83870))
 -   `AlertDialog`: Use the WordPress compatibility overlay slot as the default portal container when available, preserving an explicit null container to delay rendering ([#83878](https://github.com/WordPress/gutenberg/pull/83878)).
+
+### Documentation
+
+-   Add popup width stories for Autocomplete, Combobox, Select, SearchableSelect, and SearchableChipSelect ([#84320](https://github.com/WordPress/gutenberg/pull/84320)).
 
 ## 0.24.0 (2026-10-07)
 
