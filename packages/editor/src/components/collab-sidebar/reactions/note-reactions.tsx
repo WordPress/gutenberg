@@ -247,30 +247,26 @@ export function NoteReactions( {
 								<Menu.Positioner side="bottom" align="end" />
 							}
 						>
-							{ emojis.map(
-								( { emoji, hexKey, label } ) => (
-									<Menu.CheckboxItem
-										key={ hexKey }
-										checked={
-											!! reactions?.[ hexKey ]
-												?.current_user_reaction
-										}
-										onCheckedChange={ () =>
-											toggleReaction( hexKey )
-										}
-										closeOnClick
-										prefix={
-											<span className="editor-collab-sidebar-panel__reaction-option-emoji">
-												{ emoji }
-											</span>
-										}
-									>
-										<Menu.ItemLabel>
-											{ label }
-										</Menu.ItemLabel>
-									</Menu.CheckboxItem>
-								)
-							) }
+							{ emojis.map( ( { emoji, hexKey, label } ) => (
+								<Menu.CheckboxItem
+									key={ hexKey }
+									checked={
+										!! reactions?.[ hexKey ]
+											?.current_user_reaction
+									}
+									onCheckedChange={ () =>
+										toggleReaction( hexKey )
+									}
+									closeOnClick
+									prefix={
+										<span className="editor-collab-sidebar-panel__reaction-option-emoji">
+											{ emoji }
+										</span>
+									}
+								>
+									<Menu.ItemLabel>{ label }</Menu.ItemLabel>
+								</Menu.CheckboxItem>
+							) ) }
 						</Menu.Popup>
 					</Menu.Root>
 				) }
