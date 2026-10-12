@@ -947,6 +947,190 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		);
 	}
 
+	public function test_reaction_emojis_filter_affects_validation() {
+		$filter = function ( $settings ) {
+			$settings['emojis']         = array(
+				array(
+					'hexcode' => '1F44D',
+					'label'   => 'Thumbs Up',
+				),
+			);
+			$settings['allow_unlisted'] = false;
+			return $settings;
+		};
+		add_filter( 'gutenberg_note_reaction_emoji_settings', $filter );
+
+		try {
+			wp_set_current_user( self::$editor_id );
+			$post_id = self::factory()->post->create();
+			$note_id = $this->create_note( $post_id, self::$editor_id );
+
+			// The named emoji should be accepted.
+			$params  = array(
+				'post'    => $post_id,
+				'type'    => 'reaction',
+				'parent'  => $note_id,
+				'content' => '1f44d',
+				'author'  => self::$editor_id,
+			);
+			$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+			$request->add_header( 'Content-Type', 'application/json' );
+			$request->set_body( wp_json_encode( $params ) );
+			$response = rest_get_server()->dispatch( $request );
+			$this->assertSame( 201, $response->get_status() );
+
+			// A previously named emoji is now unlisted, so it is rejected.
+			$params['content'] = '2764';
+			$request           = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+			$request->add_header( 'Content-Type', 'application/json' );
+			$request->set_body( wp_json_encode( $params ) );
+			$response = rest_get_server()->dispatch( $request );
+			$this->assertErrorResponse( 'rest_comment_invalid_reaction', $response, 400 );
+		} finally {
+			// Always remove the filter so a failed assertion above does not
+			// leak it into the rest of the suite.
+			remove_filter( 'gutenberg_note_reaction_emoji_settings', $filter );
+		}
+	}
+
+	/**
+	 * `gutenberg_note_reaction_emoji_settings` controls which reactions
+	 * outside the named list the controller accepts.
+	 *
+	 * @dataProvider data_reaction_emoji_rules
+	 *
+	 * @param mixed  $rules   The filtered settings.
+	 * @param string $content The reaction hex key to submit.
+	 * @param int    $status  Expected response status.
+	 */
+	public function test_reaction_emoji_rules_affect_validation( $rules, $content, $status ) {
+		$filter = function ( $settings ) use ( $rules ) {
+			return is_array( $rules ) ? array_merge( $settings, $rules ) : $rules;
+		};
+		add_filter( 'gutenberg_note_reaction_emoji_settings', $filter );
+
+		try {
+			wp_set_current_user( self::$editor_id );
+			$post_id = self::factory()->post->create();
+			$note_id = $this->create_note( $post_id, self::$editor_id );
+
+			$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+			$request->add_header( 'Content-Type', 'application/json' );
+			$request->set_body(
+				wp_json_encode(
+					array(
+						'post'    => $post_id,
+						'type'    => 'reaction',
+						'parent'  => $note_id,
+						'content' => $content,
+					)
+				)
+			);
+			$response = rest_get_server()->dispatch( $request );
+
+			if ( 201 === $status ) {
+				$this->assertSame( 201, $response->get_status() );
+			} else {
+				$this->assertErrorResponse( 'rest_comment_invalid_reaction', $response, $status );
+			}
+		} finally {
+			remove_filter( 'gutenberg_note_reaction_emoji_settings', $filter );
+		}
+	}
+
+	public function data_reaction_emoji_rules() {
+		$exclude_thumbs = array( 'exclude' => array( '1F44D' ) );
+		$named_only     = array( 'allow_unlisted' => false );
+
+		return array(
+			'excluded emoji'                     => array( $exclude_thumbs, '1f44d', 400 ),
+			'skin-tone variant of excluded'      => array( $exclude_thumbs, '1f44d-1f3fd', 400 ),
+			'emoji that is not excluded'         => array( $exclude_thumbs, '1f389', 201 ),
+			'exclusion written with VS-16'       => array( array( 'exclude' => array( '2763-FE0F' ) ), '2763', 400 ),
+			'unpadded exclusion'                 => array( array( 'exclude' => array( 'A9' ) ), '00a9', 400 ),
+			'named-only rejects unlisted'        => array( $named_only, '1f44d', 400 ),
+			'named-only accepts named'           => array( $named_only, '2764', 201 ),
+			'named emoji wins over an exclusion' => array( array( 'exclude' => array( '2764' ) ), '2764', 201 ),
+			'malformed rules fall back'          => array( 'not-an-array', '1f389', 201 ),
+		);
+	}
+
+	/**
+	 * A callback that returns only some keys keeps the defaults for the rest,
+	 * and a non-array return falls back to the defaults entirely.
+	 */
+	public function test_reaction_emoji_settings_fill_missing_keys_from_defaults() {
+		$defaults = gutenberg_get_note_reaction_emoji_settings();
+
+		$partial = function () {
+			return array( 'allow_unlisted' => false );
+		};
+		add_filter( 'gutenberg_note_reaction_emoji_settings', $partial );
+		try {
+			$settings = gutenberg_get_note_reaction_emoji_settings();
+		} finally {
+			remove_filter( 'gutenberg_note_reaction_emoji_settings', $partial );
+		}
+		$this->assertFalse( $settings['allow_unlisted'] );
+		$this->assertSame( $defaults['emojis'], $settings['emojis'] );
+		$this->assertSame( array(), $settings['exclude'] );
+
+		add_filter( 'gutenberg_note_reaction_emoji_settings', '__return_false' );
+		try {
+			$settings = gutenberg_get_note_reaction_emoji_settings();
+		} finally {
+			remove_filter( 'gutenberg_note_reaction_emoji_settings', '__return_false' );
+		}
+		$this->assertSame( $defaults, $settings );
+	}
+
+	/**
+	 * Named emoji reach the editor as formatted hex keys, and malformed
+	 * entries drop.
+	 */
+	public function test_reaction_emojis_reach_editor_settings() {
+		$filter = function ( $settings ) {
+			$settings['emojis']         = array(
+				array(
+					'hexcode' => '2764-FE0F',
+					'label'   => 'Heart',
+				),
+				array(
+					'hexcode' => 'not hex',
+					'label'   => 'Broken',
+				),
+				array( 'label' => 'No hexcode' ),
+			);
+			$settings['allow_unlisted'] = false;
+			$settings['exclude']        = array( '1F595', 'not hex', 42 );
+			return $settings;
+		};
+		add_filter( 'gutenberg_note_reaction_emoji_settings', $filter );
+
+		try {
+			$settings = gutenberg_add_note_reaction_emojis_setting( array() );
+		} finally {
+			remove_filter( 'gutenberg_note_reaction_emoji_settings', $filter );
+		}
+
+		$this->assertSame(
+			array(
+				array(
+					'hexcode' => '2764',
+					'label'   => 'Heart',
+				),
+			),
+			$settings['noteReactionEmojis']
+		);
+		$this->assertSame(
+			array(
+				'allowUnlisted' => false,
+				'exclude'       => array( '1f595' ),
+			),
+			$settings['noteReactionEmojiRules']
+		);
+	}
+
 	public function test_note_response_includes_reaction_summary() {
 		wp_set_current_user( self::$editor_id );
 		$post_id = self::factory()->post->create();
