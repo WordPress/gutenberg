@@ -186,7 +186,7 @@ function Fields( { clientIds, keys, anchor, focus, contentRef }: FieldsProps ) {
 			allowedFormats: lists.length
 				? lists.reduce( ( a, b ) =>
 						a.filter( ( name ) => b.includes( name ) )
-				  )
+					)
 				: undefined,
 			withoutInteractiveFormatting: fields.some(
 				( field ) => field?.withoutInteractiveFormatting
