@@ -28,8 +28,8 @@ final class SelectionTests: XCTestCase {
 	}
 
 	func testHandleExtendsSelectionIntoPreviousParagraph() throws {
-		// A new post starting with this content: the blueprint passes the
-		// content argument of post-new.php through unescaped.
+		// A new post starting with this content: run.sh passes the content
+		// argument of post-new.php through unescaped.
 		let base = ProcessInfo.processInfo.environment[ "WP_BASE_URL" ] ?? "http://127.0.0.1:9400"
 		var url = URLComponents( string: base + "/wp-admin/post-new.php" )!
 		url.queryItems = [ URLQueryItem(

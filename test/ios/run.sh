@@ -38,41 +38,56 @@ step "Booting simulator $UDID"
 # The boot goes on in the background while WordPress starts.
 xcrun simctl boot "$UDID" 2>/dev/null || true
 # WordPress runs on PHP's built-in server with SQLite, set up fresh on
-# every run, with the same steps as Playground's blueprint.json.
+# every run.
 step "Starting WordPress"
 ROOT="$PWD"
 CACHE="$ROOT/test/ios/build/cache"
 WP_DIR="$ROOT/test/ios/build/wordpress"
 mkdir -p "$CACHE"
 step "Downloading WP-CLI and SQLite"
-[ -f "$CACHE/wp-cli.phar" ] || curl -sSLf -o "$CACHE/wp-cli.phar" https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-[ -f "$CACHE/sqlite.zip" ] || curl -sSLf -o "$CACHE/sqlite.zip" https://downloads.wordpress.org/plugin/sqlite-database-integration.latest-stable.zip
+# A failed download leaves no file behind, so the next run tries again.
+fetch() { [ -f "$2" ] || { curl -sSLf -o "$2.part" "$1" && mv "$2.part" "$2"; }; }
+fetch https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar "$CACHE/wp-cli.phar"
+fetch https://downloads.wordpress.org/plugin/sqlite-database-integration.latest-stable.zip "$CACHE/sqlite.zip"
 wp() { php -d memory_limit=512M "$CACHE/wp-cli.phar" --path="$WP_DIR" --quiet "$@"; }
 rm -rf "$WP_DIR"
 # The same WordPress as the end-to-end tests: a GitHub repository, with
 # an optional #branch, from .wp-env.test.json.
-CORE=$( python3 -c 'import json; print( json.load( open( ".wp-env.test.json" ) )[ "core" ] )' )
-[[ "$CORE" =~ ^[^/#]+/[^/#]+(#.+)?$ ]] || { echo "Unsupported core in .wp-env.test.json: $CORE"; exit 1; }
-REPO="${CORE%%#*}"
-BRANCH=""
-[[ "$CORE" == *#* ]] && BRANCH="--branch=${CORE#*#}"
+CORE=$( python3 -c '
+import json, sys
+repo, _, branch = json.load( open( ".wp-env.test.json" ) )[ "core" ].partition( "#" )
+if repo.count( "/" ) != 1:
+	sys.exit( "Unsupported core in .wp-env.test.json: " + repo )
+print( repo, branch )
+' )
+read -r REPO BRANCH <<< "$CORE"
 step "Downloading WordPress from $REPO"
-git clone --quiet --depth 1 $BRANCH "https://github.com/$REPO.git" "$WP_DIR"
+git clone --quiet --depth 1 ${BRANCH:+--branch "$BRANCH"} "https://github.com/$REPO.git" "$WP_DIR"
 unzip -q "$CACHE/sqlite.zip" -d "$WP_DIR/wp-content/plugins"
 SQLITE="$WP_DIR/wp-content/plugins/sqlite-database-integration"
 sed -e "s#{SQLITE_IMPLEMENTATION_FOLDER_PATH}#$SQLITE#" -e "s#{SQLITE_PLUGIN}#sqlite-database-integration/load.php#" \
 	"$SQLITE/db.copy" > "$WP_DIR/wp-content/db.php"
 step "Installing WordPress"
 wp config create --dbname=wordpress --dbuser=wordpress --dbpass=wordpress --skip-check
-# Like Playground, without the network: a fresh site's first admin page
-# otherwise waits on update checks from wordpress.org.
+# No requests to other sites: a fresh site's first admin page otherwise
+# waits on update checks from wordpress.org.
 wp config set WP_HTTP_BLOCK_EXTERNAL true --raw
 wp core install --url="$WP_BASE_URL" --title="iOS tests" --admin_user=admin --admin_password=password --admin_email=admin@example.com --skip-email
 step "Activating the plugin"
 ln -s "$ROOT" "$WP_DIR/wp-content/plugins/gutenberg"
 wp plugin activate gutenberg
-python3 "$ROOT/test/ios/blueprint-steps.py" "$ROOT/test/ios/blueprint.json" "$WP_DIR"
-# Like Playground's login option: every request is the administrator's.
+# The editor opens without the welcome guide or fullscreen mode.
+wp user meta update 1 wp_persisted_preferences --format=json \
+	"{\"core/edit-post\":{\"welcomeGuide\":false,\"fullscreenMode\":false},\"_modified\":\"$( date -u +%Y-%m-%dT%H:%M:%S+00:00 )\"}"
+mkdir -p "$WP_DIR/wp-content/mu-plugins"
+# A new post starts with the content argument of post-new.php, unescaped.
+cat > "$WP_DIR/wp-content/mu-plugins/new-post-content.php" <<'PHP'
+<?php
+add_filter( 'default_content', function ( $content ) {
+	return isset( $_GET['content'] ) ? wp_unslash( $_GET['content'] ) : $content;
+} );
+PHP
+# Every request is the administrator's.
 cat > "$WP_DIR/wp-content/mu-plugins/login.php" <<'PHP'
 <?php
 add_action( 'init', function () {
