@@ -61,7 +61,9 @@ function BlockBreadcrumb( { rootLabelText, className } ) {
 						key="document"
 						onClick={ () => {
 							const editorRegion = getEditorRegion(
-								blockRef.current
+								blockRef.current?.closest(
+									'.editor-styles-wrapper'
+								)
 							);
 							clearSelectedBlock();
 							editorRegion?.focus();

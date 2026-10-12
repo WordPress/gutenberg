@@ -82,7 +82,12 @@ it( 'clears selection and focuses the editor canvas from the document button', a
 	await render(
 		<RegistryProvider value={ registry }>
 			<BlockRefs.Provider value={ { refsMap, eventHandlers: new Map() } }>
-				<div role="region" aria-label="Editor canvas" tabIndex={ -1 }>
+				<div
+					className="editor-styles-wrapper"
+					role="region"
+					aria-label="Editor canvas"
+					tabIndex={ -1 }
+				>
 					<div
 						ref={ ( element ) => {
 							for ( const block of blocks ) {
