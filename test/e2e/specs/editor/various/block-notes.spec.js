@@ -2197,6 +2197,81 @@ test.describe( 'Block Notes', () => {
 		} );
 	} );
 
+	// A tab's label is stored on its Tab Panel block, not Tab List; see
+	// `getInlineAnchorClientId` in the collab-sidebar utils.
+	// https://github.com/WordPress/gutenberg/issues/84328
+	test.describe( 'Tab List', () => {
+		test( 'anchors an inline note to selected text in a tab label', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/tabs',
+				innerBlocks: [
+					{ name: 'core/tab-list' },
+					{
+						name: 'core/tab-panels',
+						innerBlocks: [
+							{
+								name: 'core/tab-panel',
+								attributes: { label: 'Settings page' },
+								innerBlocks: [
+									{
+										name: 'core/paragraph',
+										attributes: { content: 'Panel 1' },
+									},
+								],
+							},
+						],
+					},
+				],
+			} );
+
+			const tab = editor.canvas.getByRole( 'tab', {
+				name: 'Settings page',
+			} );
+
+			// Select just "page" (offsets 9-13) so the note anchors to a
+			// sub-range of the label rather than the whole Tab List.
+			await tab.click();
+			await blockNoteUtils.selectBlockText( { start: 9, length: 4 } );
+
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await page
+				.getByRole( 'textbox', { name: 'New note', exact: true } )
+				.fill( 'Just this word' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+
+			// The marker wraps only "page", so the note is inline rather than
+			// attached to the whole Tab List.
+			const mark = editor.canvas.locator( 'mark.wp-note' );
+			await expect( mark ).toHaveCount( 1 );
+			await expect( mark ).toHaveText( 'page' );
+			await expect( tab ).toHaveText( 'Settings page' );
+
+			// Metadata lives on Tab List; the marker is on the Tab Panel.
+			const [ tabsBlock ] = await editor.getBlocks();
+			const [ tabListBlock, tabPanelsBlock ] = tabsBlock.innerBlocks;
+			expect( tabListBlock.attributes.metadata?.noteId ).toHaveLength(
+				1
+			);
+			const [ tabPanelBlock ] = tabPanelsBlock.innerBlocks;
+			expect( tabPanelBlock.attributes.label ).toContain(
+				'<mark data-id='
+			);
+
+			await editor.saveDraft();
+			await page.reload();
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveText(
+				'page'
+			);
+		} );
+	} );
+
 	test( 'keeps note anchors out of the undo history', async ( {
 		editor,
 		page,
