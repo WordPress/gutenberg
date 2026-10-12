@@ -19,6 +19,7 @@ import * as Tooltip from '../tooltip';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
 import resetStyles from '../utils/css/resets.module.css';
 import { BreadcrumbItemRenderContext } from './context';
+import { ButtonItem } from './button-item';
 import { CurrentItem } from './current-item';
 import { enforceRenderProps } from './enforce-render-props';
 import { Item } from './item';
@@ -27,12 +28,17 @@ import { LinkItem } from './link-item';
 import { OverflowTriggerButton } from './overflow-trigger-button';
 import { Separator } from './separator';
 import styles from './style.module.css';
-import type { CurrentItemProps, LinkItemProps, RootProps } from './types';
+import type {
+	ButtonItemProps,
+	CurrentItemProps,
+	LinkItemProps,
+	RootProps,
+} from './types';
 
 type BreadcrumbItemDescriptor = {
-	element: ReactElement< LinkItemProps | CurrentItemProps >;
+	element: ReactElement< LinkItemProps | ButtonItemProps | CurrentItemProps >;
 	itemKey: string;
-	kind: 'link' | 'current';
+	kind: 'link' | 'button' | 'current';
 };
 
 type ResponsiveState = {
@@ -75,10 +81,14 @@ function getBreadcrumbItems( children: ReactNode ) {
 	const items: BreadcrumbItemDescriptor[] = [];
 
 	childArray.forEach( ( child, index ) => {
-		if ( ! isValidElement< LinkItemProps | CurrentItemProps >( child ) ) {
+		if (
+			! isValidElement<
+				LinkItemProps | ButtonItemProps | CurrentItemProps
+			>( child )
+		) {
 			if ( process.env.NODE_ENV !== 'production' ) {
 				throw new Error(
-					'Breadcrumb: <Breadcrumb.Root> only accepts <Breadcrumb.LinkItem> and <Breadcrumb.CurrentItem> as direct children.'
+					'Breadcrumb: <Breadcrumb.Root> only accepts <Breadcrumb.LinkItem>, <Breadcrumb.ButtonItem>, and <Breadcrumb.CurrentItem> as direct children.'
 				);
 			}
 			return;
@@ -87,6 +97,8 @@ function getBreadcrumbItems( children: ReactNode ) {
 		let kind: BreadcrumbItemDescriptor[ 'kind' ] | undefined;
 		if ( child.type === LinkItem ) {
 			kind = 'link';
+		} else if ( child.type === ButtonItem ) {
+			kind = 'button';
 		} else if ( child.type === CurrentItem ) {
 			kind = 'current';
 		}
@@ -94,7 +106,7 @@ function getBreadcrumbItems( children: ReactNode ) {
 		if ( ! kind ) {
 			if ( process.env.NODE_ENV !== 'production' ) {
 				throw new Error(
-					'Breadcrumb: <Breadcrumb.Root> only accepts <Breadcrumb.LinkItem> and <Breadcrumb.CurrentItem> as direct children.'
+					'Breadcrumb: <Breadcrumb.Root> only accepts <Breadcrumb.LinkItem>, <Breadcrumb.ButtonItem>, and <Breadcrumb.CurrentItem> as direct children.'
 				);
 			}
 			return;
@@ -104,9 +116,7 @@ function getBreadcrumbItems( children: ReactNode ) {
 		if ( typeof label !== 'string' || ! label.trim() ) {
 			if ( process.env.NODE_ENV !== 'production' ) {
 				throw new Error(
-					`Breadcrumb: <Breadcrumb.${
-						kind === 'link' ? 'LinkItem' : 'CurrentItem'
-					}> requires a non-empty text label.`
+					`Breadcrumb: <Breadcrumb.${ { link: 'LinkItem', button: 'ButtonItem', current: 'CurrentItem' }[ kind ] }> requires a non-empty text label.`
 				);
 			}
 			return;
@@ -138,9 +148,12 @@ function getBreadcrumbItems( children: ReactNode ) {
 			( item ) => item.kind === 'current'
 		);
 
-		if ( linkItems.length === 0 ) {
+		if (
+			linkItems.length > 0 &&
+			items.some( ( item ) => item.kind === 'button' )
+		) {
 			throw new Error(
-				'Breadcrumb: <Breadcrumb.Root> requires at least one <Breadcrumb.LinkItem>.'
+				'Breadcrumb: Ancestors must all be LinkItem or all be ButtonItem. Mixed trails are not supported.'
 			);
 		}
 		if ( currentItems.length === 0 ) {
@@ -183,7 +196,9 @@ function itemKeysAreEqual(
 	return (
 		current.length === next.length &&
 		current.every(
-			( item, index ) => item.itemKey === next[ index ].itemKey
+			( item, index ) =>
+				item.itemKey === next[ index ].itemKey &&
+				item.kind === next[ index ].kind
 		)
 	);
 }
@@ -214,8 +229,8 @@ function getContentBoxInlineSize( element: HTMLElement ) {
 }
 
 /**
- * Renders a labelled breadcrumb navigation landmark and automatically moves
- * ancestors that do not fit into an accessible overflow menu.
+ * Renders a labelled page-navigation landmark or hierarchy-selection group.
+ * Automatically moves ancestors that do not fit into an accessible overflow menu.
  *
  * ```jsx
  * <Breadcrumb.Root aria-label="Breadcrumbs">
@@ -237,14 +252,25 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 	forwardedRef
 ) {
 	const items = useMemo( () => getBreadcrumbItems( children ), [ children ] );
-	const linkItems = useMemo(
-		() => items.filter( ( item ) => item.kind === 'link' ),
+	const ancestorItems = useMemo(
+		() => items.filter( ( item ) => item.kind !== 'current' ),
 		[ items ]
 	);
 	const currentItem = useMemo(
 		() => items.find( ( item ) => item.kind === 'current' ),
 		[ items ]
 	);
+	const currentAriaCurrent =
+		currentItem && 'aria-current' in currentItem.element.props
+			? currentItem.element.props[ 'aria-current' ]
+			: undefined;
+	const variant =
+		ancestorItems[ 0 ]?.kind === 'button' ||
+		( ancestorItems.length === 0 &&
+			( currentAriaCurrent === true || currentAriaCurrent === 'true' ) )
+			? 'selection'
+			: 'navigation';
+
 	const [ rootElement, setRootElement ] = useState< HTMLElement | null >(
 		null
 	);
@@ -265,11 +291,46 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 	const intrinsicOverflowTriggerRef = useRef< HTMLSpanElement | null >(
 		null
 	);
+	const activationFocusRef = useRef< HTMLElement | null >( null );
+	const menuPopupRef = useRef< HTMLDivElement | null >( null );
+	const currentItemRef = useRef< HTMLSpanElement | null >( null );
+	const focusedElementRef = useRef< HTMLElement | null >( null );
 	const overflowTriggerRef = useRef< HTMLButtonElement | null >( null );
 	const frozenItemsRef = useRef( items );
 	const pendingStateRef = useRef< ResponsiveState | null >( null );
 	const focusOverflowAfterLayoutRef = useRef( false );
 	const menuOpenRef = useRef( false );
+	const selectionChanged =
+		( variant === 'selection' ||
+			frozenItemsRef.current.some(
+				( item ) => item.kind === 'button'
+			) ) &&
+		! itemKeysAreEqual( frozenItemsRef.current, items );
+
+	const focusCurrentItem = useCallback( () => {
+		const current = currentItemRef.current;
+		if ( current ) {
+			current.tabIndex = -1;
+			current.focus();
+		}
+	}, [] );
+
+	useIsomorphicLayoutEffect( () => {
+		if ( selectionChanged ) {
+			setMenuOpen( false );
+			menuOpenRef.current = false;
+			setIsOverflowTriggerFocused( false );
+			frozenItemsRef.current = items;
+		}
+		const focused = focusedElementRef.current;
+		if (
+			focused &&
+			! focused.isConnected &&
+			focused.ownerDocument.activeElement === focused.ownerDocument.body
+		) {
+			focusCurrentItem();
+		}
+	} );
 
 	if ( ! menuOpen && ! isOverflowTriggerFocused ) {
 		frozenItemsRef.current = items;
@@ -277,13 +338,14 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 
 	const applyResponsiveState = useCallback(
 		( next: ResponsiveState ) => {
-			if ( menuOpen ) {
+			if ( menuOpen && ! selectionChanged ) {
 				pendingStateRef.current = next;
 				return;
 			}
 
 			if (
 				isOverflowTriggerFocused &&
+				! selectionChanged &&
 				( next.collapsedKeys.length === 0 ||
 					! itemKeysAreEqual( frozenItemsRef.current, items ) )
 			) {
@@ -296,7 +358,7 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 				responsiveStatesAreEqual( current, next ) ? current : next
 			);
 		},
-		[ isOverflowTriggerFocused, items, menuOpen ]
+		[ isOverflowTriggerFocused, items, menuOpen, selectionChanged ]
 	);
 
 	useIsomorphicLayoutEffect( () => {
@@ -335,13 +397,13 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 							null
 					)
 				: 0;
-			const linkItemWidths = linkItems.map( ( item ) =>
+			const linkItemWidths = ancestorItems.map( ( item ) =>
 				measureElement(
 					intrinsicItemRefs.current.get( item.itemKey ) ?? null
 				)
 			);
 			const pinnedIndex = pinnedItemKey
-				? linkItems.findIndex(
+				? ancestorItems.findIndex(
 						( item ) => item.itemKey === pinnedItemKey
 					)
 				: undefined;
@@ -361,7 +423,7 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 			);
 			const nextState = {
 				collapsedKeys: nextLayout.collapsedIndices.map(
-					( index ) => linkItems[ index ].itemKey
+					( index ) => ancestorItems[ index ].itemKey
 				),
 				shouldTruncateCurrent: nextLayout.shouldTruncateCurrent,
 			};
@@ -417,7 +479,7 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 		applyResponsiveState,
 		children,
 		currentItem,
-		linkItems,
+		ancestorItems,
 		pinnedItemKey,
 		props.dir,
 		rootElement,
@@ -452,8 +514,34 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 			>[ 1 ]
 		) => {
 			menuOpenRef.current = open;
+			if ( ! open && eventDetails.reason === 'item-press' ) {
+				// Menu's click handling focuses the item after consumer handlers.
+				// Restore an intentional focus move before Menu returns to its trigger.
+				// Upstream: https://github.com/mui/base-ui/issues/5930
+				activationFocusRef.current?.focus();
+				activationFocusRef.current = null;
+			}
+			if ( ! open && variant === 'selection' && rootElement ) {
+				// Menu cleanup can run before the consumer's activation handler.
+				// Resolve focus after that handler has had a chance to move it.
+				const ownerDocument = rootElement.ownerDocument;
+				queueMicrotask( () => {
+					const active = ownerDocument.activeElement;
+					if (
+						active === ownerDocument.body ||
+						( active && menuPopupRef.current?.contains( active ) )
+					) {
+						if ( overflowTriggerRef.current ) {
+							overflowTriggerRef.current.focus();
+						} else {
+							focusCurrentItem();
+						}
+					}
+				} );
+			}
 			if ( open ) {
 				frozenItemsRef.current = items;
+				activationFocusRef.current = null;
 			} else if (
 				eventDetails.reason !== 'escape-key' &&
 				eventDetails.reason !== 'trigger-press'
@@ -463,7 +551,13 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 			}
 			setMenuOpen( open );
 		},
-		[ applyPendingResponsiveState, items ]
+		[
+			applyPendingResponsiveState,
+			focusCurrentItem,
+			items,
+			rootElement,
+			variant,
+		]
 	);
 	const handleOverflowTriggerBlur = useCallback( () => {
 		if ( menuOpenRef.current ) {
@@ -474,23 +568,27 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 	}, [ applyPendingResponsiveState ] );
 
 	const displayedItems =
-		menuOpen || isOverflowTriggerFocused ? frozenItemsRef.current : items;
-	const displayedLinks = displayedItems.filter(
-		( item ) => item.kind === 'link'
+		variant !== 'selection' &&
+		! selectionChanged &&
+		( menuOpen || isOverflowTriggerFocused )
+			? frozenItemsRef.current
+			: items;
+	const displayedAncestors = displayedItems.filter(
+		( item ) => item.kind !== 'current'
 	);
 	const displayedCurrentItem = displayedItems.find(
 		( item ) => item.kind === 'current'
 	);
 	const collapsedKeySet = new Set( responsiveState.collapsedKeys );
-	const collapsedItems = displayedLinks.filter( ( item ) =>
+	const collapsedItems = displayedAncestors.filter( ( item ) =>
 		collapsedKeySet.has( item.itemKey )
 	);
-	const visibleLinks = displayedLinks.filter(
+	const visibleAncestors = displayedAncestors.filter(
 		( item ) => ! collapsedKeySet.has( item.itemKey )
 	);
 	const overflowLabel = collapsedItems.length
 		? sprintf(
-				/* translators: %d: number of breadcrumb links hidden in the overflow menu. */
+				/* translators: %d: number of breadcrumb ancestors hidden in the overflow menu. */
 				_n(
 					'Show %d hidden breadcrumb item',
 					'Show %d hidden breadcrumb items',
@@ -510,8 +608,11 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 				key={ `visible-${ item.itemKey }` }
 				value={ {
 					itemKey: item.itemKey,
+					variant,
 					measurementVersion,
 					mode: 'visible',
+					currentRef:
+						item.kind === 'current' ? currentItemRef : undefined,
 					onLinkBlur: ( itemKey ) =>
 						setPinnedItemKey( ( current ) =>
 							current === itemKey ? null : current
@@ -526,19 +627,22 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 			</BreadcrumbItemRenderContext.Provider>
 		);
 	};
-	const rootLink = visibleLinks.find(
-		( item ) => item.itemKey === displayedLinks[ 0 ]?.itemKey
+	const rootAncestor = visibleAncestors.find(
+		( item ) => item.itemKey === displayedAncestors[ 0 ]?.itemKey
 	);
-	const remainingVisibleLinks = rootLink
-		? visibleLinks.filter( ( item ) => item !== rootLink )
-		: visibleLinks;
+	const remainingVisibleAncestors = rootAncestor
+		? visibleAncestors.filter( ( item ) => item !== rootAncestor )
+		: visibleAncestors;
 	const visibleListContent = (
 		<>
-			{ rootLink && renderVisibleItem( rootLink ) }
+			{ rootAncestor && renderVisibleItem( rootAncestor ) }
 			{ collapsedItems.length > 0 && (
 				<Item>
 					{ visiblePosition++ > 0 && <Separator /> }
-					<Menu.Root onOpenChange={ handleMenuOpenChange }>
+					<Menu.Root
+						open={ menuOpen }
+						onOpenChange={ handleMenuOpenChange }
+					>
 						<Tooltip.Root disabled={ menuOpen }>
 							<Menu.Trigger
 								ref={ overflowTriggerRef }
@@ -557,14 +661,27 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 							</Menu.Trigger>
 							<Tooltip.Popup>{ overflowLabel }</Tooltip.Popup>
 						</Tooltip.Root>
-						<Menu.Popup>
+						<Menu.Popup
+							onFocusCapture={ ( event ) => {
+								focusedElementRef.current =
+									event.target as HTMLElement;
+							} }
+							ref={ menuPopupRef }
+							finalFocus={
+								variant === 'selection' ? false : undefined
+							}
+						>
 							{ collapsedItems.map( ( item ) => (
 								<BreadcrumbItemRenderContext.Provider
 									key={ `overflow-${ item.itemKey }` }
 									value={ {
 										itemKey: item.itemKey,
+										variant,
 										measurementVersion,
 										mode: 'overflow',
+										onButtonActivate: ( target ) => {
+											activationFocusRef.current = target;
+										},
 										onLinkBlur: () => {},
 										onLinkFocus: () => {},
 										showSeparator: false,
@@ -578,7 +695,7 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 					</Menu.Root>
 				</Item>
 			) }
-			{ remainingVisibleLinks.map( renderVisibleItem ) }
+			{ remainingVisibleAncestors.map( renderVisibleItem ) }
 			{ displayedCurrentItem &&
 				renderVisibleItem( displayedCurrentItem ) }
 		</>
@@ -605,6 +722,7 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 							key={ `measurement-${ item.itemKey }` }
 							value={ {
 								itemKey: item.itemKey,
+								variant,
 								measurementRef: ( element ) => {
 									if ( element ) {
 										intrinsicItemRefs.current.set(
@@ -655,24 +773,34 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 				'aria-labelledby': hasAriaLabelledBy
 					? ariaLabelledBy
 					: undefined,
-				role: 'navigation',
+				role: variant === 'selection' ? 'group' : 'navigation',
 			} ),
-		[ ariaLabelledBy, hasAriaLabelledBy, render, resolvedAriaLabel ]
+		[
+			ariaLabelledBy,
+			hasAriaLabelledBy,
+			render,
+			resolvedAriaLabel,
+			variant,
+		]
 	);
 	const root = useRender( {
 		render: enforcedRender,
-		defaultTagName: 'nav',
+		defaultTagName: variant === 'selection' ? 'div' : 'nav',
 		ref: mergedRootRef,
 		props: mergeProps< 'nav' >( props, {
 			'aria-label': resolvedAriaLabel,
 			'aria-labelledby': hasAriaLabelledBy ? ariaLabelledBy : undefined,
 			children: componentContent,
+			onFocusCapture: ( event ) => {
+				focusedElementRef.current = event.target as HTMLElement;
+			},
 			className: clsx(
 				resetStyles[ 'box-sizing' ],
 				styles.root,
+				variant === 'selection' && styles[ 'root--selection' ],
 				className
 			),
-			role: 'navigation',
+			role: variant === 'selection' ? 'group' : 'navigation',
 		} ),
 	} );
 

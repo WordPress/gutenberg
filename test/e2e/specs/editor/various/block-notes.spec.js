@@ -1769,6 +1769,64 @@ test.describe( 'Block Notes', () => {
 			await expect( paragraph ).toHaveText( 'Hello brave new world.' );
 		} );
 
+		test( 'anchors an inline note to selected accordion heading text after reloading', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/accordion',
+				innerBlocks: [
+					{
+						name: 'core/accordion-item',
+						innerBlocks: [
+							{
+								name: 'core/accordion-heading',
+								attributes: { title: 'Hello brave new world.' },
+							},
+							{
+								name: 'core/accordion-panel',
+								innerBlocks: [
+									{
+										name: 'core/paragraph',
+										attributes: {
+											content: 'Accordion panel content.',
+										},
+									},
+								],
+							},
+						],
+					},
+				],
+			} );
+			const headingTitle = editor.canvas.locator(
+				'.wp-block-accordion-heading__toggle-title'
+			);
+			await headingTitle.focus();
+			await expect( headingTitle ).toBeFocused();
+			await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
+			await blockNoteUtils.addNote( 'Just this accordion word' );
+
+			const marker = editor.canvas.locator( 'mark.wp-note' );
+			await expect( marker ).toHaveCount( 1 );
+			await expect( marker ).toHaveText( 'brave' );
+			await expect( marker ).toHaveAttribute( 'data-id', /^\d+$/ );
+			await expect( headingTitle ).toHaveText( 'Hello brave new world.' );
+			const noteId = await marker.getAttribute( 'data-id' );
+
+			await editor.saveDraft();
+			await page.reload();
+			await blockNoteUtils.openBlockNoteSidebar();
+
+			await expect( marker ).toHaveCount( 1 );
+			await expect( marker ).toHaveText( 'brave' );
+			await expect( marker ).toHaveAttribute( 'data-id', noteId );
+			await expect( headingTitle ).toHaveText( 'Hello brave new world.' );
+			await expect(
+				blockNoteUtils.getThread( 'Just this accordion word' )
+			).toBeVisible();
+		} );
+
 		test( 'highlights the drafted text and anchors the note to it across a block switch', async ( {
 			editor,
 			page,

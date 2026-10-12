@@ -14,6 +14,7 @@
 		{ "path": "packages/block-serialization-default-parser" },
 		{ "path": "packages/blocks" },
 		{ "path": "packages/boot" },
+		{ "path": "packages/commands" },
 		{ "path": "packages/components/tsconfig.build.json" },
 		{ "path": "packages/connectors/tsconfig.build.json" },
 		{ "path": "packages/compose/tsconfig.build.json" },
@@ -61,6 +62,7 @@
 		{ "path": "packages/notices/tsconfig.build.json" },
 		{ "path": "packages/plugins" },
 		{ "path": "packages/preferences/tsconfig.build.json" },
+		{ "path": "packages/preferences-persistence" },
 		{ "path": "packages/prettier-config" },
 		{ "path": "packages/primitives" },
 		{ "path": "packages/priority-queue/tsconfig.build.json" },
@@ -94,7 +96,7 @@
 		{ "path": "packages/widget-primitives/tsconfig.build.json" },
 		{ "path": "packages/wordcount/tsconfig.build.json" },
 		{ "path": "packages/worker-threads/tsconfig.build.json" },
-		{ "path": "packages/workflow" },
+		{ "path": "packages/workflow/tsconfig.build.json" },
 		{ "path": "packages/wp-build" }
 	],
 	"files": []
