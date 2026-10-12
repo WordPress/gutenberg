@@ -19,7 +19,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0"
+		"node": ">=22.13.0"
 	},
 	"files": [
 		"src",
@@ -27,8 +27,7 @@
 		"build-module",
 		"build-style",
 		"build-types",
-		"build-wp",
-		"*.md"
+		"build-wp"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",

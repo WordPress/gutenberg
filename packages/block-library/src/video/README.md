@@ -45,11 +45,15 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - `clientNavigation`: `true`
   - `interactive`: `true`
 - [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
+- [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
+  - `minWidth`: `true`
+  - `minHeight`: `true`
 
 ## CSS Selectors
 
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
 
+- **dimensions**: `.wp-block-video video`
 - **shadow**: `.wp-block-video video`
 - **filter**:
   - duotone: `.wp-block-video video`
