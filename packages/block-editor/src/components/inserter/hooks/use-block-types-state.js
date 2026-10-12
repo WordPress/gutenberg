@@ -1,12 +1,16 @@
 import {
+	getBlockType,
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 	store as blocksStore,
 	parse,
 } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 import { isFiltered } from '../../../store/utils';
 
 // Shared so the selector cache survives the inserter closing and reopening.
@@ -37,6 +41,10 @@ const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
 		const { getCategories, getCollections } = select( blocksStore );
 		return [ getCategories(), getCollections() ];
 	}, [] );
+	const { getClosestAllowedInsertionPoint } = unlock(
+		useSelect( blockEditorStore )
+	);
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const onSelectItem = useCallback(
 		(
@@ -50,20 +58,65 @@ const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
 			},
 			shouldFocusBlock
 		) => {
-			const insertedBlock =
-				syncStatus === 'unsynced'
-					? parse( content, {
-							__unstableSkipMigrationLogs: true,
-						} )
-					: createBlock(
-							name,
-							initialAttributes,
-							createBlocksFromInnerBlocksTemplate( innerBlocks ),
-							innerContent
-						);
-			onInsert( insertedBlock, undefined, shouldFocusBlock );
+			const destinationClientId = getClosestAllowedInsertionPoint(
+				name,
+				rootClientId
+			);
+			if ( destinationClientId === null ) {
+				const title = getBlockType( name )?.title ?? name;
+				createErrorNotice(
+					sprintf(
+						/* translators: %s: block pattern title. */
+						__( 'Block "%s" can\'t be inserted.' ),
+						title
+					),
+					{
+						type: 'snackbar',
+						id: 'inserter-notice',
+					}
+				);
+				return;
+			}
+
+			const unsyncedFallbackBlock = createBlock(
+				name,
+				initialAttributes
+			);
+
+			const unsyncedBlocks = parse( content, {
+				__unstableSkipMigrationLogs: true,
+			} );
+
+			let insertedBlock;
+			if ( syncStatus === 'unsynced' ) {
+				if ( name === 'core/block' && initialAttributes?.ref ) {
+					insertedBlock = [ unsyncedFallbackBlock ];
+				} else if ( unsyncedBlocks.length ) {
+					insertedBlock = unsyncedBlocks;
+				} else {
+					insertedBlock = [ unsyncedFallbackBlock ];
+				}
+			} else {
+				insertedBlock = createBlock(
+					name,
+					initialAttributes,
+					createBlocksFromInnerBlocksTemplate( innerBlocks ),
+					innerContent
+				);
+			}
+			onInsert(
+				insertedBlock,
+				undefined,
+				shouldFocusBlock,
+				destinationClientId
+			);
 		},
-		[ onInsert ]
+		[
+			getClosestAllowedInsertionPoint,
+			rootClientId,
+			onInsert,
+			createErrorNotice,
+		]
 	);
 
 	return [ items, categories, collections, onSelectItem ];
