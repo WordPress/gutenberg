@@ -4,6 +4,9 @@
 
 ### Breaking Changes
 
+-   `Select`, `Autocomplete`, `Combobox`, and the select controls: `actionsRef` no longer keeps closed popups mounted. For externally controlled exit animations, call `eventDetails.preventUnmountOnClose()` in `onOpenChange` when closing, then `actionsRef.current?.unmount()` when the animation ends. Close through `actionsRef.current?.close()` to run that handler. Automatic CSS exit animations need no migration. See [Base UI's migration guide](https://github.com/mui/base-ui/pull/5734) ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
+-   The `actionsRef` types for these components now require `close()`. Add it to manually constructed action objects and ref stubs. See [Base UI #5734](https://github.com/mui/base-ui/pull/5734) ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
+-   `Autocomplete`, `Combobox`, and the searchable selects and controls: `onItemHighlighted` now receives native events. Accept `MouseEvent | PointerEvent` for pointer highlights, handle `none` when typing or clearing and `pointer` when hovering after keyboard navigation, and avoid canceling or stopping the event unless intended. See [Base UI #5838](https://github.com/mui/base-ui/pull/5838) ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
 ### New Features
@@ -27,6 +30,10 @@
 -   `Popover`, `Menu`, `Tooltip`, `Select`, `Autocomplete`, and `Combobox`: Preserve an explicit null portal container so popup content waits until its target is available ([#84370](https://github.com/WordPress/gutenberg/pull/84370)).
 -   `Menu`, `Popover`: Keep popups open when the user interacts with an iframe inside the popup. ([#83870](https://github.com/WordPress/gutenberg/pull/83870))
 -   `AlertDialog`: Use the WordPress compatibility overlay slot as the default portal container when available, preserving an explicit null container to delay rendering ([#83878](https://github.com/WordPress/gutenberg/pull/83878)).
+
+### Internal
+
+-   Update Base UI to 1.9.0 ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
 
 ### Documentation
 
