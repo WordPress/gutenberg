@@ -3,8 +3,7 @@
  * `@wordpress/core-actions/wp_template_part`.
  *
  * The actions template parts have on top of the defaults. Its default export
- * maps the id of each action to the action, a copy of the one
- * `@wordpress/fields` exports.
+ * maps the id of each action to the action.
  */
 
 import type { Action } from '@wordpress/dataviews';

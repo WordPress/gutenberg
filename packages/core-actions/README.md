@@ -2,7 +2,7 @@
 
 The actions WordPress core registers for its entities, such as "Rename", "Duplicate" or "Move to trash". They are shown in the DataViews lists of the site editor and in the inspector of the editor.
 
-Each collection of actions is a script module, which `registerPostTypeSchema()` of `@wordpress/editor` imports on demand to register the actions of a post type. The actions are copies of the ones `@wordpress/fields` exports, which keeps exporting them until it is deprecated.
+Each collection of actions is a script module, which `registerPostTypeSchema()` of `@wordpress/editor` imports on demand to register the actions of a post type. The actions moved here from `@wordpress/fields`.
 
 ## Collections
 

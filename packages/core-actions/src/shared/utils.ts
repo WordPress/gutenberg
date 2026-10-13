@@ -2,10 +2,6 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import type { Post, TemplatePart, Template } from './types';
 
-/*
- * A copy of the utilities the actions of `@wordpress/fields` share.
- */
-
 export function isTemplate( post: Post ): post is Template {
 	return post.type === 'wp_template';
 }

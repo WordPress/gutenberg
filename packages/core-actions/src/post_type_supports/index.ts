@@ -5,7 +5,7 @@
  * The default actions of every post type, each registered on the post types
  * that support it or on every post type, see `registerPostTypeSchema()` in
  * `@wordpress/editor`. Its default export maps the id of each action to the
- * action, a copy of the one `@wordpress/fields` exports.
+ * action.
  */
 
 import type { Action } from '@wordpress/dataviews';

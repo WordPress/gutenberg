@@ -3,7 +3,6 @@
 	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
 	"references": [
 		{ "path": "../a11y/tsconfig.build.json" },
-		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../blob/tsconfig.build.json" },
 		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },

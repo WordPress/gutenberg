@@ -3,8 +3,7 @@
  * `@wordpress/core-actions/wp_block`.
  *
  * The actions patterns have on top of the defaults. Its default export maps
- * the id of each action to the action, a copy of the one `@wordpress/fields`
- * exports.
+ * the id of each action to the action.
  */
 
 import type { Action } from '@wordpress/dataviews';
