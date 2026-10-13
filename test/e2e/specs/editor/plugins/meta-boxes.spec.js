@@ -6,8 +6,13 @@ test.describe( 'Meta boxes', () => {
 		await requestUtils.deleteAllPosts();
 	} );
 
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.createNewPost();
+		// Default is the inline area. Clear a height saved by another test.
+		await editor.setPreferences( 'core/edit-post', {
+			metaBoxesMainIsPinned: false,
+			metaBoxesMainOpenHeight: undefined,
+		} );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -45,14 +50,11 @@ test.describe( 'Meta boxes', () => {
 			.click();
 		await page.keyboard.type( 'canvas text' );
 
-		// Click near the label, away from the resize handle overlaying the
-		// center of the toggle.
-		await page
-			.getByRole( 'button', { name: 'Meta Boxes', exact: true } )
-			.click( { position: { x: 40, y: 10 } } );
 		const field = page.getByRole( 'textbox', {
 			name: 'Test meta box field',
 		} );
+		// The field sits below the canvas until the content area is scrolled.
+		await field.scrollIntoViewIfNeeded();
 		await field.click();
 		await page.keyboard.type( 'META' );
 		await expect( field ).toHaveValue( 'META' );

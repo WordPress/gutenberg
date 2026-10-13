@@ -10,6 +10,15 @@
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
+
+	// Inline meta boxes sit in the document scroll, so the drop-shadow filter
+	// (a containing block for position: fixed) is replaced with a border.
+	&.is-inline {
+		filter: none;
+		border-top: $border-width solid $gray-300;
+		overflow: visible;
+		flex: 0 0 auto;
+	}
 }
 
 .edit-post-meta-boxes-main__presenter {
@@ -91,6 +100,35 @@
 	}
 }
 
+.edit-post-meta-boxes-main__label {
+	font-size: 13px;
+}
+
+.edit-post-meta-boxes-main__pin {
+	cursor: var(--wpds-cursor-control);
+	color: var(--wp-admin-theme-color);
+	font-size: 13px;
+	flex-shrink: 0;
+
+	&:is(:hover, :focus-visible) {
+		text-decoration: underline;
+	}
+}
+
+.edit-post-meta-boxes-main.is-inline .edit-post-meta-boxes-main__presenter {
+	justify-content: space-between;
+	align-items: center;
+	padding-inline: $grid-unit-30 $grid-unit-15;
+}
+
+// Sit left of the chevron, above the full-width toggle.
+.edit-post-meta-boxes-main.is-pinned .edit-post-meta-boxes-main__pin {
+	position: absolute;
+	z-index: 2;
+	inset-block: 0;
+	inset-inline-end: $grid-unit-60;
+}
+
 .edit-post-meta-boxes-main__liner {
 	// Enable scrolling only for the split view.
 	.edit-post-meta-boxes-main & {
@@ -103,6 +141,12 @@
 	.is-resizing.edit-post-meta-boxes-main & {
 		display: unset;
 	}
+
+	// Inline meta boxes scroll with the canvas, and must not trap fixed dialogs.
+	.edit-post-meta-boxes-main.is-inline & {
+		overflow: visible;
+		isolation: auto;
+	}
 }
 
 // In case the canvas is not iframe’d.
@@ -110,10 +154,10 @@
 	clear: both;
 }
 
-// When split view is active the editors should allow shrinking so the meta box
+// When the pane is pinned the editors should allow shrinking so the meta box
 // pane remains visible and reachable. Apply common sizing to both editors, then
 // specialise overflow handling per editor so scroll behavior is correct.
-.has-metaboxes .interface-interface-skeleton__content:has(.edit-post-meta-boxes-main) {
+.has-metaboxes .interface-interface-skeleton__content:has(.edit-post-meta-boxes-main.is-pinned) {
 	// Shared sizing for both editors.
 	.editor-visual-editor,
 	.editor-text-editor {
@@ -131,6 +175,33 @@
 	// the meta box pane outside the viewport.
 	.editor-text-editor {
 		overflow: auto;
+	}
+}
+
+// Inline meta boxes follow the canvas in this scroller. The canvas grows with
+// the post instead of scrolling inside the iframe, which otherwise shows a
+// second scrollbar and sticks when the scroll hands off.
+.has-metaboxes .interface-interface-skeleton__content:has(.edit-post-meta-boxes-main.is-inline) {
+	.editor-visual-editor {
+		flex: 0 0 auto;
+		height: auto;
+		max-height: none;
+		min-height: 100%;
+		overflow: visible;
+	}
+
+	.block-editor-iframe__container,
+	.block-editor-iframe__scale-container {
+		height: auto;
+	}
+
+	iframe[name="editor-canvas"] {
+		display: block;
+		min-height: 100%;
+	}
+
+	.editor-text-editor {
+		flex: 0 0 100%;
 	}
 }
 

@@ -16,6 +16,7 @@ import { PluginArea } from '@wordpress/plugins';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	useCallback,
+	useEffect,
 	useMemo,
 	useId,
 	useRef,
@@ -117,19 +118,145 @@ function useEditorStyles( settings ) {
 	] );
 }
 
+// Opened with no saved height. A percentage resolves against the content
+// area before the resize observer has measured it.
+const DEFAULT_PINNED_HEIGHT = '50%';
+// A saved height is capped on load so the pane cannot cover the canvas.
+// Dragging within the session is not capped.
+const MAX_RESTORED_HEIGHT = '80%';
+
 function MetaBoxesMain() {
-	const [ isOpen, openHeight, hasAnyVisible ] = useSelect( ( select ) => {
-		const { get } = select( preferencesStore );
-		const { isMetaBoxLocationVisible } = select( editPostStore );
-		return [
-			!! get( 'core/edit-post', 'metaBoxesMainIsOpen' ),
-			get( 'core/edit-post', 'metaBoxesMainOpenHeight' ),
-			isMetaBoxLocationVisible( 'normal' ) ||
-				isMetaBoxLocationVisible( 'advanced' ) ||
-				isMetaBoxLocationVisible( 'side' ),
-		];
-	}, [] );
+	const [ isOpen, openHeight, isPinnedPreference, hasAnyVisible ] = useSelect(
+		( select ) => {
+			const { get } = select( preferencesStore );
+			const { isMetaBoxLocationVisible } = select( editPostStore );
+			return [
+				!! get( 'core/edit-post', 'metaBoxesMainIsOpen' ),
+				get( 'core/edit-post', 'metaBoxesMainOpenHeight' ),
+				get( 'core/edit-post', 'metaBoxesMainIsPinned' ),
+				// Sidebar meta boxes render in the settings sidebar. Counting
+				// them here showed an empty pane on post types that only
+				// register side meta boxes.
+				isMetaBoxLocationVisible( 'normal' ) ||
+					isMetaBoxLocationVisible( 'advanced' ),
+			];
+		},
+		[]
+	);
 	const { set: setPreference } = useDispatch( preferencesStore );
+	// Users who already saved a pane height stay pinned without a stored flag.
+	const isPinned = isPinnedPreference ?? typeof openHeight === 'number';
+	// Pixel height from a drag in this session. While set, the 80% restore cap
+	// does not apply, including if the pane is collapsed and opened again.
+	const [ sessionHeight, setSessionHeight ] = useState();
+
+	// Grow the canvas iframe to its content while meta boxes are inline, so the
+	// content area is the only scroller. An inner iframe scrollbar plus the
+	// outer one sticks at the handoff and shows both bars. The iframe is
+	// mounted after this component, and later replaced, so watch for it.
+	useEffect( () => {
+		if ( isPinned || ! hasAnyVisible ) {
+			return;
+		}
+		const content = document.querySelector(
+			'.interface-interface-skeleton__content'
+		);
+		if ( ! content ) {
+			return;
+		}
+
+		let resizeObserver;
+		let iframe = null;
+
+		const release = ( frame ) => {
+			if ( ! frame ) {
+				return;
+			}
+			frame.style.height = '';
+			const doc = frame.contentDocument;
+			if ( doc?.documentElement ) {
+				doc.documentElement.style.overflow = '';
+			}
+		};
+		const sync = () => {
+			const doc = iframe?.contentDocument;
+			const body = doc?.body;
+			if ( ! iframe || ! body ) {
+				return;
+			}
+			doc.documentElement.style.overflow = 'hidden';
+			// In-flow boxes only. The canvas cover is position:absolute and
+			// matches the iframe height, and the document's min-height stretches
+			// to the iframe, so either of those would grow the frame forever.
+			const bodyTop = body.getBoundingClientRect().top;
+			let bottom = bodyTop;
+			for ( const child of body.children ) {
+				const position = window.getComputedStyle( child ).position;
+				if ( position === 'absolute' || position === 'fixed' ) {
+					continue;
+				}
+				bottom = Math.max(
+					bottom,
+					child.getBoundingClientRect().bottom
+				);
+			}
+			const pad =
+				parseFloat( window.getComputedStyle( body ).paddingBottom ) ||
+				0;
+			const next = Math.max(
+				Math.ceil( bottom - bodyTop + pad ),
+				content.clientHeight
+			);
+			const nextHeight = `${ next }px`;
+			if ( iframe.style.height !== nextHeight ) {
+				iframe.style.height = nextHeight;
+			}
+		};
+		const watch = ( next ) => {
+			resizeObserver?.disconnect();
+			resizeObserver = undefined;
+			if ( iframe && iframe !== next ) {
+				release( iframe );
+			}
+			iframe = next;
+			const doc = iframe?.contentDocument;
+			if ( ! doc?.body ) {
+				return;
+			}
+			resizeObserver = new window.ResizeObserver( sync );
+			resizeObserver.observe( doc.documentElement );
+			resizeObserver.observe( content );
+			sync();
+		};
+		const find = () =>
+			content.querySelector( 'iframe[name="editor-canvas"]' );
+		// The same iframe element is reused when its document is replaced.
+		const onLoad = ( event ) => {
+			if ( event.target === find() ) {
+				watch( event.target );
+			}
+		};
+
+		content.addEventListener( 'load', onLoad, true );
+		const mutationObserver = new window.MutationObserver( () => {
+			const next = find();
+			if ( next !== iframe ) {
+				watch( next );
+			}
+		} );
+		mutationObserver.observe( content, {
+			childList: true,
+			subtree: true,
+		} );
+		watch( find() );
+
+		return () => {
+			content.removeEventListener( 'load', onLoad, true );
+			mutationObserver.disconnect();
+			resizeObserver?.disconnect();
+			release( iframe );
+		};
+	}, [ isPinned, hasAnyVisible ] );
 
 	const isShort = useMediaQuery( '(max-height: 549px)' );
 
@@ -246,6 +373,8 @@ function MetaBoxesMain() {
 				onTap?.();
 				return;
 			}
+			// A drag this session may exceed the 80% restore cap.
+			setSessionHeight( heightRef.current );
 			const nextIsOpen = heightRef.current > min;
 			persistIsOpen( nextIsOpen );
 			// Persists height only if still open. This is so that when closed by a drag the
@@ -264,21 +393,49 @@ function MetaBoxesMain() {
 		<div
 			// The class name 'edit-post-layout__metaboxes' is retained because some plugins use it.
 			className="edit-post-layout__metaboxes edit-post-meta-boxes-main__liner"
-			hidden={ ! isOpen }
+			// Inline meta boxes stay in the scroll area, so they are never hidden.
+			hidden={ isPinned ? ! isOpen : undefined }
 		>
 			<MetaBoxes location="normal" />
 			<MetaBoxes location="advanced" />
 		</div>
 	);
 
-	const isAutoHeight = openHeight === undefined;
-	const usedOpenHeight = isShort ? 'auto' : openHeight;
-	const usedHeight = isOpen ? usedOpenHeight : min;
+	let usedHeight;
+	if ( isPinned ) {
+		if ( ! isOpen ) {
+			usedHeight = min;
+		} else if ( typeof sessionHeight === 'number' ) {
+			usedHeight = sessionHeight;
+		} else if ( typeof openHeight === 'number' ) {
+			usedHeight = `min(${ openHeight }px, ${ MAX_RESTORED_HEIGHT })`;
+		} else {
+			usedHeight = DEFAULT_PINNED_HEIGHT;
+		}
+	}
 
-	const usedAriaValueNow =
-		max === undefined || isAutoHeight ? 50 : getAriaValueNow( usedHeight );
+	const usedAriaValueNow = ( () => {
+		if ( max === undefined || ! isPinned || ! isOpen ) {
+			return 50;
+		}
+		if ( typeof openHeight !== 'number' ) {
+			return 50;
+		}
+		const restored =
+			typeof sessionHeight === 'number'
+				? sessionHeight
+				: Math.min( openHeight, max * 0.8 );
+		return getAriaValueNow( restored );
+	} )();
 
 	const paneLabel = __( 'Meta Boxes' );
+	const pinToBottom = () => {
+		setPreference( 'core/edit-post', 'metaBoxesMainIsPinned', true );
+		setPreference( 'core/edit-post', 'metaBoxesMainIsOpen', true );
+	};
+	const unpin = () => {
+		setPreference( 'core/edit-post', 'metaBoxesMainIsPinned', false );
+	};
 
 	// The toggle button. It also resizes when the viewport is tall to provide
 	// a larger hit area than the small separator button.
@@ -302,7 +459,7 @@ function MetaBoxesMain() {
 	);
 
 	// The separator button that provides a11y for resizing.
-	const separator = ! isShort && (
+	const separator = isPinned && ! isShort && (
 		<>
 			<Tooltip.Root>
 				<Tooltip.Trigger
@@ -333,13 +490,38 @@ function MetaBoxesMain() {
 			ref={ setMainRefs }
 			className={ clsx(
 				'edit-post-meta-boxes-main',
-				! isShort && 'is-resizable'
+				isPinned ? 'is-pinned' : 'is-inline',
+				isPinned && ! isShort && 'is-resizable'
 			) }
-			style={ { height: usedHeight } }
+			style={ isPinned ? { height: usedHeight } : undefined }
 		>
 			<div className="edit-post-meta-boxes-main__presenter">
-				{ toggle }
-				{ separator }
+				{ isPinned ? (
+					<>
+						{ toggle }
+						<button
+							type="button"
+							className="edit-post-meta-boxes-main__pin"
+							onClick={ unpin }
+						>
+							{ __( 'Unpin' ) }
+						</button>
+						{ separator }
+					</>
+				) : (
+					<>
+						<span className="edit-post-meta-boxes-main__label">
+							{ paneLabel }
+						</span>
+						<button
+							type="button"
+							className="edit-post-meta-boxes-main__pin"
+							onClick={ pinToBottom }
+						>
+							{ __( 'Pin to bottom' ) }
+						</button>
+					</>
+				) }
 			</div>
 			{ contents }
 		</NavigableRegion>
