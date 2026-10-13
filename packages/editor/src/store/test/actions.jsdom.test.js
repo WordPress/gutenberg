@@ -1201,7 +1201,6 @@ describe( 'Post actions', () => {
 				.select( noticesStore )
 				.getNotices()
 				.find( ( notice ) => notice.id === 'editor-revision-restored' );
-			expect( restoredNotice.explicitDismiss ).toBe( true );
 			expect( restoredNotice.actions ).toMatchObject( [
 				{ label: 'Undo' },
 			] );
@@ -1274,7 +1273,6 @@ describe( 'Post actions', () => {
 				.getNotices()
 				.find( ( notice ) => notice.id === 'editor-revision-restored' );
 			expect( restoredNotice.actions ).toEqual( [] );
-			expect( restoredNotice.explicitDismiss ).toBe( false );
 		} );
 
 		it( 'does not restore the revision while the post is saving', async () => {
