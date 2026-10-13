@@ -172,6 +172,18 @@ export function addSaveProps( props, blockNameOrType, attributes ) {
 		'has-link-color':
 			shouldSerialize( 'link' ) && style?.elements?.link?.color,
 	} );
+
+	// Mirror of the full skip above. A block that serializes only the link
+	// color keeps its props, and their attribute order, until one is set.
+	if (
+		! newClassName &&
+		! shouldSerialize( 'text' ) &&
+		! shouldSerialize( 'background' ) &&
+		! shouldSerialize( 'gradients' )
+	) {
+		return props;
+	}
+
 	props.className = newClassName ? newClassName : undefined;
 
 	return props;
