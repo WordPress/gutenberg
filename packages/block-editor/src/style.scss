@@ -68,6 +68,7 @@
 @use "./hooks/dimensions.scss" as *;
 @use "./hooks/layout.scss" as *;
 @use "./hooks/spacing.scss" as *;
+@use "./hooks/style-overrides.scss" as *;
 @use "./hooks/typography.scss" as *;
 
 @use "./components/block-toolbar/style.scss" as *;
