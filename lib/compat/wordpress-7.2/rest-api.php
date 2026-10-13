@@ -121,6 +121,22 @@ add_filter( 'register_wp_template_post_type_args', 'gutenberg_modify_template_po
 add_filter( 'register_wp_template_part_post_type_args', 'gutenberg_modify_template_post_type_args_7_2' );
 
 /**
+ * Registers the synced patterns REST API routes.
+ *
+ * Replaces the core controller class so the 7.2 controller is used.
+ *
+ * @see Gutenberg_REST_Blocks_Controller_7_2
+ *
+ * @param array $args Array of arguments for registering a post type.
+ * @return array Modified array of arguments.
+ */
+function gutenberg_modify_block_post_type_args_7_2( $args ) {
+	$args['rest_controller_class'] = 'Gutenberg_REST_Blocks_Controller_7_2';
+	return $args;
+}
+add_filter( 'register_wp_block_post_type_args', 'gutenberg_modify_block_post_type_args_7_2' );
+
+/**
  * Exposes the privacy policy page setting in the REST API.
  *
  * WordPress stores the page assigned in Settings > Privacy in the
