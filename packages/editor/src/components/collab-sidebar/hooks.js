@@ -664,7 +664,7 @@ export function useNoteSelection( { notes, drafts, onDiscard } ) {
 export function usePickNote( { drafts, onDiscard } ) {
 	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
-	const { selectBlock, toggleBlockSpotlight } = unlock(
+	const { selectBlock, toggleBlockHighlight } = unlock(
 		useDispatch( blockEditorStore )
 	);
 	const { selectNote } = unlock( useDispatch( editorStore ) );
@@ -672,7 +672,7 @@ export function usePickNote( { drafts, onDiscard } ) {
 		if ( clientId ) {
 			// `null`: don't move focus to the block.
 			selectBlock( clientId, null );
-			toggleBlockSpotlight( clientId, true );
+			toggleBlockHighlight( clientId, true );
 		}
 
 		// No caret event strips the marker here, and the form unmounts before its focus-out runs.
