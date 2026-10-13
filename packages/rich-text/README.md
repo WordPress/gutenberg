@@ -130,12 +130,12 @@ _Parameters_
 
 - _value_ `RichTextValue`: Value to modify.
 - _format_ `RichTextFormat`: Format to apply.
-- _startIndex_ `[number]`: Start index.
-- _endIndex_ `[number]`: End index.
+- _startIndex_ Start index.
+- _endIndex_ End index.
 
 _Returns_
 
-- `RichTextValue`: A new value with the format applied.
+- A new value with the format applied.
 
 ### concat
 
@@ -143,11 +143,11 @@ Combine all Rich Text values into one. This is similar to `String.prototype.conc
 
 _Parameters_
 
-- _values_ `...RichTextValue`: Objects to combine.
+- _values_ `RichTextContent[]`: Objects to combine.
 
 _Returns_
 
-- `RichTextValue`: A new value combining all given records.
+- A new value combining all given records.
 
 ### create
 
@@ -169,20 +169,20 @@ As you can see, text and formatting are separated. `text` holds the text, includ
 
 _Parameters_
 
-- _$1_ `[Object]`: Optional named arguments.
-- _$1.element_ `[Element]`: Element to create value from.
-- _$1.text_ `[string]`: Text to create value from.
-- _$1.html_ `[string]`: HTML to create value from.
-- _$1.range_ `[Range]`: Range to create value from.
-- _$1.\_\_unstableIsEditableTree_ `[boolean]`:
+- _options_ `[{ element?: Element; text?: string; html?: string | RichTextData; range?: Range | null; __unstableIsEditableTree?: boolean; }]`: Optional named arguments.
+- _options.element_ `[Element]`: Element to create value from.
+- _options.text_ `[string]`: Text to create value from.
+- _options.html_ `[string | RichTextData]`: HTML to create value from.
+- _options.range_ `[Range | null]`: Range to create value from.
+- _options.\_\_unstableIsEditableTree_ `[boolean]`:
 
 _Returns_
 
-- `RichTextValue`: A rich text value.
+- A rich text value.
 
-### EventListenersProps
+### EventCallbacksSet
 
-The callback-Set refs the private event-listener helpers dispatch from.
+A Set of callbacks that format types register for an event.
 
 ### getActiveFormat
 
@@ -195,7 +195,7 @@ _Parameters_
 
 _Returns_
 
-- `RichTextFormat|undefined`: Active format object of the specified type, or undefined.
+- Active format object of the specified type, or undefined.
 
 ### getActiveFormats
 
@@ -204,11 +204,11 @@ Gets the all format objects at the start of the selection.
 _Parameters_
 
 - _value_ `RichTextValue`: Value to inspect.
-- _EMPTY_ACTIVE_FORMATS_ `Array`: Array to return if there are no active formats.
+- _EMPTY_ACTIVE_FORMATS_ `RichTextFormatList`: Array to return if there are no active formats.
 
 _Returns_
 
-- `RichTextFormatList`: Active format objects.
+- Active format objects.
 
 ### getActiveObject
 
@@ -228,7 +228,7 @@ Get the textual content of a Rich Text value. This is similar to `Element.textCo
 
 _Parameters_
 
-- _value_ `RichTextValue`: Value to use.
+- _value_ `Pick<RichTextValue, 'text'>`: Value to use.
 
 _Returns_
 
@@ -241,13 +241,13 @@ Insert a Rich Text value, an HTML string, or a plain text string, into a Rich Te
 _Parameters_
 
 - _value_ `RichTextValue`: Value to modify.
-- _valueToInsert_ `RichTextValue|string`: Value to insert.
-- _startIndex_ `[number]`: Start index.
-- _endIndex_ `[number]`: End index.
+- _valueToInsert_ `RichTextContent | string`: Value to insert.
+- _startIndex_ Start index.
+- _endIndex_ End index.
 
 _Returns_
 
-- `RichTextValue`: A new value with the value inserted.
+- A new value with the value inserted.
 
 ### insertObject
 
@@ -296,16 +296,16 @@ Combine an array of Rich Text values into one, optionally separated by `separato
 
 _Parameters_
 
-- _values_ `Array<RichTextValue>`: An array of values to join.
-- _separator_ `[string|RichTextValue]`: Separator string or value.
+- _values_ `RichTextContent[]`: An array of values to join.
+- _separator_ `[string | RichTextContent]`: Separator string or value.
 
 _Returns_
 
-- `RichTextValue`: A new combined value.
+- A new combined value.
 
 ### privateApis
 
-Private @wordpress/rich-text APIs.
+Private `@wordpress/rich-text` APIs.
 
 ### registerFormatType
 
@@ -314,11 +314,11 @@ Registers a new format provided a unique name and an object defining its behavio
 _Parameters_
 
 - _name_ `string`: Format name.
-- _settings_ `Omit<WPFormat, 'name'>`: Format settings. `name` is injected from the first argument.
+- _settings_ `Omit< FormatType, 'name' >`: Format settings. `name` is injected from the first argument.
 
 _Returns_
 
-- `WPFormat|undefined`: The format, if it has been successfully registered; otherwise `undefined`.
+- The format, if it has been successfully registered; otherwise `undefined`.
 
 ### remove
 
@@ -342,12 +342,12 @@ _Parameters_
 
 - _value_ `RichTextValue`: Value to modify.
 - _formatType_ `string`: Format type to remove.
-- _startIndex_ `[number]`: Start index.
-- _endIndex_ `[number]`: End index.
+- _startIndex_ Start index.
+- _endIndex_ End index.
 
 _Returns_
 
-- `RichTextValue`: A new value with the format applied.
+- A new value with the format applied.
 
 ### replace
 
@@ -362,6 +362,10 @@ _Parameters_
 _Returns_
 
 - `RichTextValue`: A new value with replacements applied.
+
+### RichTextContent
+
+The text, formats and replacements of a `RichTextValue`, without the selection.
 
 ### RichTextData
 
@@ -380,6 +384,10 @@ formats: [ ... ] } )`.
 
 A single format, such as `core/bold`, applied to a range of characters within a `RichTextValue`. See main `@wordpress/rich-text` documentation for more information.
 
+### RichTextFormatList
+
+The formats applied to a single character of a `RichTextValue`.
+
 ### RichTextValue
 
 An object which represents a formatted string. See main `@wordpress/rich-text` documentation for more information.
@@ -391,12 +399,12 @@ Slice a Rich Text value from `startIndex` to `endIndex`. Indices are retrieved f
 _Parameters_
 
 - _value_ `RichTextValue`: Value to modify.
-- _startIndex_ `[number]`: Start index.
-- _endIndex_ `[number]`: End index.
+- _startIndex_ Start index.
+- _endIndex_ End index.
 
 _Returns_
 
-- `RichTextValue`: A new extracted value.
+- A new extracted value.
 
 ### split
 
@@ -404,12 +412,13 @@ Split a Rich Text value in two at the given `startIndex` and `endIndex`, or spli
 
 _Parameters_
 
-- _value_ `RichTextValue`:
-- _string_ `[number|string]`: Start index, or string at which to split.
+- _richTextValue_ `RichTextValue`: Value to split.
+- _string_ `[number | string]`: Start index, or string at which to split.
+- _endIndex_ `[number]`: End index, when splitting at indices.
 
 _Returns_
 
-- `Array<RichTextValue>|undefined`: An array of new values.
+- An array of new values.
 
 ### store
 
@@ -418,10 +427,6 @@ Store definition for the rich-text namespace.
 _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore>
-
-_Type_
-
-- `Object`
 
 ### toggleFormat
 
@@ -434,7 +439,7 @@ _Parameters_
 
 _Returns_
 
-- `RichTextValue`: A new value with the format applied or removed.
+- A new value with the format applied or removed.
 
 ### toHTMLString
 
@@ -442,13 +447,13 @@ Create an HTML string from a Rich Text value.
 
 _Parameters_
 
-- _$1_ `Object`: Named arguments.
-- _$1.value_ `RichTextValue`: Rich text value.
-- _$1.preserveWhiteSpace_ `[boolean]`: Preserves newlines if true.
+- _options_ `{ value: RichTextValue; preserveWhiteSpace?: boolean; }`: Named arguments.
+- _options.value_ `RichTextValue`: Rich text value.
+- _options.preserveWhiteSpace_ `[boolean]`: Preserves newlines if true.
 
 _Returns_
 
-- `string`: HTML string.
+- HTML string.
 
 ### unregisterFormatType
 
@@ -460,7 +465,7 @@ _Parameters_
 
 _Returns_
 
-- `WPFormat|undefined`: The previous format value, if it has been successfully unregistered; otherwise `undefined`.
+- The previous format value, if it has been successfully unregistered; otherwise `undefined`.
 
 ### useAnchor
 
@@ -468,9 +473,9 @@ This hook, to be used in a format type's Edit component, returns the active elem
 
 _Parameters_
 
-- _obj_ `{ editableContentElement: HTMLElement | null; settings?: WPFormat; }`: Named parameters.
+- _obj_ `{ editableContentElement: HTMLElement | null; settings?: FormatType; }`: Named parameters.
 - _obj.editableContentElement_ `HTMLElement | null`: The element containing the editable content.
-- _obj.settings_ `WPFormat`: The format type's settings.
+- _obj.settings_ `FormatType`: The format type's settings.
 
 _Returns_
 
@@ -482,10 +487,10 @@ This hook, to be used in a format type's Edit component, returns the active elem
 
 _Parameters_
 
-- _$1_ `Object`: Named parameters.
-- _$1.ref_ `RefObject<HTMLElement>`: React ref of the element containing the editable content.
-- _$1.value_ `RichTextValue`: Value to check for selection.
-- _$1.settings_ `WPFormat`: The format type's settings.
+- _options_ `Object`: Named parameters.
+- _options.ref_ `RefObject<HTMLElement>`: React ref of the element containing the editable content.
+- _options.value_ `RichTextValue`: Value to check for selection.
+- _options.settings_ `FormatType`: The format type's settings.
 
 _Returns_
 

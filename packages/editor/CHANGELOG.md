@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   Migrate the classic-theme template selector to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
+-   Show viewport dimensions and responsive editing status in the editor footer, and clarify when viewport-specific styling is available ([#84146](https://github.com/WordPress/gutenberg/pull/84146)).
+
+### Bug Fixes
+
+-   Notes: Highlight the text an unsent note is about, and keep the note anchored to it when the selection changes or the text is edited before the note is sent ([#84125](https://github.com/WordPress/gutenberg/pull/84125)).
+-   Notes: Select the note under the caret: an inline note while the caret is inside its highlight, otherwise the block's unsent draft or block-level note, instead of an inline note on any click in the block ([#84147](https://github.com/WordPress/gutenberg/pull/84147)).
+
+### Internal
+
+-   Move footer-specific block breadcrumb layout styles into the package ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
+
+## 15.2.0 (2026-10-07)
+
 ### Enhancements
 
 -   `trashPost`: Accept a `force` option to delete the post permanently instead of moving it to the trash ([#84045](https://github.com/WordPress/gutenberg/pull/84045)).
@@ -21,6 +41,8 @@
 -   Notes: Add an Undo action to the "Note deleted." snackbar, and stop the editor's undo from bringing back the highlight of a deleted note ([#83988](https://github.com/WordPress/gutenberg/pull/83988)).
 -   Notes: Stop the editor's undo from detaching a newly added note from its block, or bringing back the highlight of a resolved note ([#84079](https://github.com/WordPress/gutenberg/pull/84079)).
 -   Notes: Delete notes permanently when they can't be moved to the trash, instead of failing with an error ([#84102](https://github.com/WordPress/gutenberg/pull/84102)).
+-   Notes: Disable the note form field while a note or reply is being sent, instead of accepting text the save would not include ([#84083](https://github.com/WordPress/gutenberg/pull/84083)).
+-   Notes: Keep an unsent note or reply when selecting another block or thread, instead of discarding it ([#84110](https://github.com/WordPress/gutenberg/pull/84110)).
 
 ### Internal
 

@@ -2102,8 +2102,8 @@ export function canRemoveBlock( state, clientId ) {
 /**
  * Determines if the given blocks are allowed to be removed.
  *
- * @param {Object} state     Editor state.
- * @param {string} clientIds The block client IDs to be removed.
+ * @param {Object}   state     Editor state.
+ * @param {string[]} clientIds The block client IDs to be removed.
  *
  * @return {boolean} Whether the given blocks are allowed to be removed.
  */
@@ -3629,8 +3629,8 @@ export function __unstableGetTemporarilyEditingAsBlocks( state ) {
 export const getSelectedBlockStyleState = createSelector(
 	( state, clientId ) => {
 		const perBlockState =
-			state.selectedBlockStyleState?.clientId === clientId
-				? ( state.selectedBlockStyleState.value ??
+			clientId && state.selectedBlockStyleState?.clientId === clientId
+				? ( state.selectedBlockStyleState?.value ??
 					DEFAULT_BLOCK_STYLE_STATE )
 				: DEFAULT_BLOCK_STYLE_STATE;
 

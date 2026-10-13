@@ -38,7 +38,11 @@ import {
 } from '@wordpress/keycodes';
 import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import type { Field } from '@wordpress/dataviews';
-import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react';
+import type {
+	KeyboardEvent as ReactKeyboardEvent,
+	ReactElement,
+	ReactNode,
+} from 'react';
 import { MediaEditorProvider } from '../media-editor-provider';
 import type { Media } from '../media-editor-provider';
 import MediaPreview from '../media-preview';
@@ -82,7 +86,7 @@ const CROP_PANEL = 'crop';
 interface MediaEditorTab {
 	id: string;
 	title: string;
-	render: () => JSX.Element;
+	render: () => ReactElement;
 }
 
 export interface MediaEditorFrameProps {
@@ -116,7 +120,7 @@ export interface MediaEditorProps {
 	aspectRatioPresets?: AspectRatioPreset[];
 	onClose?: () => void;
 	onSaved?: ( result: MediaEditorSaveResult ) => void;
-	renderFrame: ( props: MediaEditorFrameProps ) => JSX.Element;
+	renderFrame: ( props: MediaEditorFrameProps ) => ReactElement;
 	noticesClassName?: string;
 	noticesPortalElement?: Element | null;
 	shouldCloseOnEsc?: boolean;
@@ -214,7 +218,6 @@ interface MediaEditorFrameContextValue {
 	onTogglePanel: () => void;
 	onCancel: () => void;
 	onSave: () => void;
-	onReset: () => void;
 	/**
 	 * When `true`, the media has a lineage root to restore to, so the
 	 * "Restore original image" menu item is shown.
@@ -360,20 +363,18 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 }
 
 function HistoryActions() {
-	const { isImage, isUndoRedoDisabled, onReset, isWide, activePanel } =
+	const { isImage, isUndoRedoDisabled, isWide, activePanel } =
 		useMediaEditorFrameContext();
 	const {
-		cropper: { reset },
+		reset,
 		isDirty,
 		hasUndo,
 		hasRedo,
 		undo: undoCrop,
 		redo: redoCrop,
-		beginGesture,
-		endGesture,
 	} = useMediaEditor();
-	// Reset, undo and redo act on the cropper, so they only appear where the
-	// canvas does. Non-image media has no edit history at all; below the dock
+	// Reset, undo and redo act on the image edits, so they only appear where
+	// the canvas does. Non-image media has no edit history at all; below the dock
 	// breakpoint an open panel replaces the canvas, and leaving these behind
 	// would put an enabled, destructive Reset next to metadata fields it does
 	// not touch — clicking it would discard a crop the user cannot see.
@@ -399,10 +400,7 @@ function HistoryActions() {
 		if ( isUndoRedoDisabled ) {
 			return;
 		}
-		beginGesture();
 		reset();
-		onReset();
-		endGesture();
 	};
 	return (
 		<Stack
@@ -576,8 +574,9 @@ function MediaEditorContent( {
 	// counts as a change even though swapping the source resets the
 	// cropper's own dirty baseline.
 	const [ isSourceReplaced, setIsSourceReplaced ] = useState( false );
-	const placementControlTimerRef =
-		useRef< ReturnType< typeof setTimeout > >();
+	const placementControlTimerRef = useRef<
+		ReturnType< typeof setTimeout > | undefined
+	>( undefined );
 
 	const signalPlacementControlInteraction = useCallback( () => {
 		setIsPlacementActive( true );
@@ -727,14 +726,8 @@ function MediaEditorContent( {
 			setActivePanel( isWide ? lastPanelRef.current : null );
 		}
 	}, [ isWide, isImage ] );
-	// Only `resetCropOptions` is needed here, for the Reset button; the
-	// aspect-ratio members are read by `MediaEditorImageControls` itself.
-	const {
-		aspectRatioValue,
-		setAspectRatioValue,
-		aspectRatioOptions,
-		resetCropOptions,
-	} = useCropOptions( { aspectRatioPresets } );
+	const { aspectRatioValue, setAspectRatioValue, aspectRatioOptions } =
+		useCropOptions( { aspectRatioPresets } );
 	const { isSaving, save: saveMediaEditor } = useSaveMediaEditor( {
 		session,
 		id,
@@ -985,7 +978,6 @@ function MediaEditorContent( {
 		onTogglePanel: togglePanel,
 		onCancel: handleRequestClose,
 		onSave: saveMediaEditor,
-		onReset: resetCropOptions,
 		canRestoreOriginal,
 		isSourceReplaced,
 		onRestoreOriginal: handleRestoreOriginal,

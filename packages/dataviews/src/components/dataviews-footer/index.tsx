@@ -43,11 +43,7 @@ export default function DataViewsFooter() {
 	}
 
 	return (
-		<div
-			className="dataviews-footer"
-			// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
-			inert={ inertValue( isRefreshing ) }
-		>
+		<div className="dataviews-footer" inert={ inertValue( isRefreshing ) }>
 			<Stack
 				direction="row"
 				justify="end"
