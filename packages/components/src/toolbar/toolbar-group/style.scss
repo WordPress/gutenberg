@@ -2,6 +2,26 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "../../utils/theme-variables" as *;
 
+// Hairline between groups. Matches a Menu separator: 1px weak stroke, sized
+// to the content (the 24px icon) rather than the button. This only draws it;
+// the rules that set `content` decide where it shows.
+.components-toolbar-group::after,
+.components-toolbar::after {
+	position: absolute;
+	z-index: 1;
+	inset-block: 0;
+	inset-inline-end: 0;
+	margin-block: auto;
+	width: var(--wpds-border-width-xs);
+	height: var(--wpds-dimension-size-sm);
+	background-color: var(--wpds-color-stroke-surface-neutral-weak);
+	pointer-events: none;
+
+	@media ( forced-colors: active ) {
+		background-color: CanvasText;
+	}
+}
+
 .components-toolbar-group {
 	position: relative;
 	min-height: $block-toolbar-height;
@@ -12,23 +32,8 @@
 	padding-left: $grid-unit-15 * 0.5; // 6px.
 	padding-right: $grid-unit-15 * 0.5;
 
-	// Hairline between groups. Matches a Menu separator: 1px weak stroke, sized
-	// to the content (the 24px icon) rather than the button.
 	&:not(:last-child)::after {
 		content: "";
-		position: absolute;
-		z-index: 1;
-		inset-block: 0;
-		inset-inline-end: 0;
-		margin-block: auto;
-		width: var(--wpds-border-width-xs);
-		height: var(--wpds-dimension-size-sm);
-		background-color: var(--wpds-color-stroke-surface-neutral-weak);
-		pointer-events: none;
-
-		@media ( forced-colors: active ) {
-			background-color: CanvasText;
-		}
 	}
 
 	// Unset for nested toolbar groups. Increase specificity.
@@ -71,7 +76,7 @@
 	margin: 0;
 	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 	border-radius: var(--wpds-border-radius-md);
-	background-color: var(--wpds-color-background-surface-neutral-strong);
+	background-color: $components-color-background;
 	// Same shadow as `.components-accessible-toolbar`.
 	box-shadow: $elevation-medium;
 	display: inline-flex;
@@ -86,19 +91,6 @@
 
 		&:not(:last-child)::after {
 			content: "";
-			position: absolute;
-			z-index: 1;
-			inset-block: 0;
-			inset-inline-end: 0;
-			margin-block: auto;
-			width: var(--wpds-border-width-xs);
-			height: var(--wpds-dimension-size-sm);
-			background-color: var(--wpds-color-stroke-surface-neutral-weak);
-			pointer-events: none;
-
-			@media ( forced-colors: active ) {
-				background-color: CanvasText;
-			}
 		}
 	}
 

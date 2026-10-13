@@ -7,7 +7,7 @@
 	display: inline-flex;
 	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 	border-radius: var(--wpds-border-radius-md);
-	background-color: var(--wpds-color-background-surface-neutral-strong);
+	background-color: $components-color-background;
 	// Same four-layer shadow Menu uses. `$elevation-medium` is that stack;
 	// the design-system elevation tokens are not restored.
 	box-shadow: $elevation-medium;
@@ -58,6 +58,7 @@
 
 	&.is-unstyled {
 		border: none;
+		border-radius: 0;
 		background-color: transparent;
 		box-shadow: none;
 
