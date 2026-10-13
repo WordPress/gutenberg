@@ -21,6 +21,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | Attribute | [Type](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
 | `activeTabIndex` | `number` | `0` | — |
+| `autoActivate` | `boolean` | `false` | — |
 | `editorActiveTabIndex` | `number` | — | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `local` |
 
 ## Supports
