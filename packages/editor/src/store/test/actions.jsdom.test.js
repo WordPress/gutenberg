@@ -1114,12 +1114,16 @@ describe( 'Post actions', () => {
 			expect(
 				registry.select( editorStore ).getEditedPostContent()
 			).toBe( 'unsaved content' );
+			// Revisions mode only shows snackbars.
 			expect(
 				registry
 					.select( noticesStore )
 					.getNotices()
-					.map( ( notice ) => notice.id )
-			).toContain( 'editor-revision-restore-failed' );
+					.find(
+						( notice ) =>
+							notice.id === 'editor-revision-restore-failed'
+					)
+			).toMatchObject( { type: 'snackbar', explicitDismiss: true } );
 		} );
 
 		it( 'keeps the restored content in the editor when saving the restored revision fails', async () => {
@@ -1163,11 +1167,15 @@ describe( 'Post actions', () => {
 				true
 			);
 
-			const noticeIds = registry
-				.select( noticesStore )
-				.getNotices()
-				.map( ( notice ) => notice.id );
-			expect( noticeIds ).toContain( 'editor-revision-restore-failed' );
+			const allNotices = registry.select( noticesStore ).getNotices();
+			const noticeIds = allNotices.map( ( notice ) => notice.id );
+			// The editor has left revisions mode by now, so the notice is
+			// shown inline where it stays in view.
+			expect(
+				allNotices.find(
+					( notice ) => notice.id === 'editor-revision-restore-failed'
+				)
+			).toMatchObject( { type: 'default' } );
 			expect( noticeIds ).toContain( 'autosave-exists' );
 			expect( noticeIds ).not.toContain( 'editor-revision-restored' );
 		} );
@@ -1306,12 +1314,16 @@ describe( 'Post actions', () => {
 			expect(
 				registry.select( editorStore ).getEditedPostContent()
 			).toBe( 'unsaved content' );
+			// Revisions mode only shows snackbars.
 			expect(
 				registry
 					.select( noticesStore )
 					.getNotices()
-					.map( ( notice ) => notice.id )
-			).toContain( 'editor-revision-restore-failed' );
+					.find(
+						( notice ) =>
+							notice.id === 'editor-revision-restore-failed'
+					)
+			).toMatchObject( { type: 'snackbar', explicitDismiss: true } );
 
 			finishSave();
 			await savePromise;
