@@ -137,10 +137,6 @@ step "Generating the Xcode project"
 ( cd test/ios && xcodegen generate --quiet )
 step "Building and running the tests"
 rm -rf test/ios/build/results.xcresult
-# Temporary diagnostics: CPU samples and the simulator's touch log.
-TEST_START=$( date +'%Y-%m-%d %H:%M:%S' )
-top -l 0 -s 2 -n 3 -o cpu -stats command,cpu > test/ios/build/top.log 2>&1 &
-TOP_PID=$!
 STATUS=0
 TEST_RUNNER_WP_BASE_URL="$WP_BASE_URL" xcodebuild test \
 	-project test/ios/GutenbergIOS.xcodeproj \
@@ -149,8 +145,4 @@ TEST_RUNNER_WP_BASE_URL="$WP_BASE_URL" xcodebuild test \
 	-derivedDataPath test/ios/build \
 	-resultBundlePath test/ios/build/results.xcresult \
 	"$@" || STATUS=$?
-kill "$TOP_PID" 2>/dev/null || true
-xcrun simctl spawn "$UDID" log show --info --debug --style compact --start "$TEST_START" \
-	--predicate 'process == "backboardd" AND category == "TouchEvents"' > test/ios/build/touches.log 2>&1 || true
-python3 test/ios/diagnostics/touches.py test/ios/build/touches.log test/ios/build/top.log || true
 exit "$STATUS"
