@@ -7,11 +7,9 @@ import BaseControl from '../base-control';
 import Button from '../button';
 import Icon from '../icon';
 import { COLORS } from '../utils';
-import {
-	floatClamp,
-	useControlledRangeValue,
-	getCSSWideKeyword,
-} from './utils';
+import { floatClamp, useControlledRangeValue } from './utils';
+import { useCx } from '../utils/hooks';
+import { wrapperColor, trackBackgroundColor } from './styles';
 import { clamp } from '../utils/math';
 import InputRange from './input-range';
 import RangeRail from './rail';
@@ -121,13 +119,11 @@ function UnforwardedRangeControl(
 
 	const classes = clsx( 'components-range-control', className );
 
-	const colorKeyword = getCSSWideKeyword( colorProp );
-	const trackColorKeyword = getCSSWideKeyword( trackColor );
-
-	const wrapperClasses = clsx(
+	const cx = useCx();
+	const wrapperClasses = cx(
 		'components-range-control__wrapper',
 		styles.wrapper,
-		colorKeyword && styles[ `color-${ colorKeyword }` ],
+		wrapperColor( { color: colorProp } ),
 		!! marks && 'is-marked'
 	);
 
@@ -238,14 +234,7 @@ function UnforwardedRangeControl(
 						<Icon icon={ beforeIcon } />
 					</span>
 				) }
-				<div
-					className={ wrapperClasses }
-					style={
-						{
-							'--wp-components-range-control-color': colorProp,
-						} as React.CSSProperties
-					}
-				>
+				<div className={ wrapperClasses }>
 					<InputRange
 						{ ...otherProps }
 						className="components-range-control__slider"
@@ -276,22 +265,13 @@ function UnforwardedRangeControl(
 					/>
 					<span
 						aria-hidden
-						className={ clsx(
+						className={ cx(
 							'components-range-control__track',
 							styles.track,
-							{ [ styles[ 'is-disabled' ] ]: disabled },
-							! disabled &&
-								trackColorKeyword &&
-								styles[ `background-${ trackColorKeyword }` ]
+							trackBackgroundColor( { disabled, trackColor } )
 						) }
 						{ ...{ disabled } }
-						style={
-							{
-								width: fillValueOffset,
-								'--wp-components-range-control-track-color':
-									trackColor || 'currentColor',
-							} as React.CSSProperties
-						}
+						style={ { width: fillValueOffset } }
 					/>
 					<span
 						className={ clsx(

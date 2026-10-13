@@ -14,12 +14,10 @@
 }
 
 .wrapper {
-	--wp-components-range-control-color: initial;
 	display: block;
 	flex: 1;
 	position: relative;
 	width: 100%;
-	color: var(--wp-components-range-control-color);
 	height: 30px;
 	min-height: 30px;
 }
@@ -47,7 +45,6 @@
 }
 
 .rail {
-	--wp-components-range-control-rail-color: initial;
 	left: 0; /* stylelint-disable-line logical-css/require-logical-properties -- Preserve the existing physical offset alongside RTL positioning. */
 	pointer-events: none;
 	right: 0; /* stylelint-disable-line logical-css/require-logical-properties -- Preserve the existing physical offset alongside RTL positioning. */
@@ -57,15 +54,9 @@
 	margin-top: 13px;
 	top: 0;
 	border-radius: $radius-full;
-	background: var(--wp-components-range-control-rail-color);
-
-	&:where(.is-disabled) {
-		background: $components-color-gray-100;
-	}
 }
 
 .track {
-	--wp-components-range-control-track-color: initial;
 	border-radius: $radius-full;
 	height: 4px;
 	pointer-events: none;
@@ -73,11 +64,6 @@
 	position: absolute;
 	margin-top: 13px;
 	top: 0;
-	background: var(--wp-components-range-control-track-color);
-
-	&:where(.is-disabled) {
-		background: $components-color-gray-400;
-	}
 
 	:global(.is-marked) & {
 		@media not (prefers-reduced-motion) {
@@ -283,21 +269,7 @@
 	}
 }
 
-// CSS-wide keywords must apply to the actual property, not the custom property.
-@each $keyword in inherit, initial, unset, revert, revert-layer {
-	.color-#{$keyword} {
-		color: $keyword;
-	}
-	.background-#{$keyword} {
-		background: $keyword;
-	}
-}
-
 @media (forced-colors: active) {
-	.rail {
-		background: GrayText;
-	}
-	.track,
 	.thumb,
 	.thumb-wrapper {
 		background: CanvasText;
