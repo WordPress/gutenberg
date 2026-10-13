@@ -52,7 +52,7 @@
 		}
 
 		.list {
-			--_wp-ui-menu-item-label-line-height: var(--wpds-typography-line-height-sm);
+			--_wp-ui-menu-item-label-line-height: var(--wpds-typography-line-height-xs);
 
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-md);
@@ -133,7 +133,7 @@
 
 		.item {
 			--wp-ui-menu-item-height: var(--wpds-dimension-size-md);
-			--wp-ui-menu-item-padding-block: var(--wpds-dimension-padding-xs);
+			--wp-ui-menu-item-padding-block: var(--wpds-dimension-padding-sm);
 			--_gcd-a-border-radius: var(--wpds-border-radius-sm);
 
 			display: grid;
@@ -147,7 +147,8 @@
 				[content-start] minmax(0, 1fr)
 				[content-end] var(--wp-ui-menu-item-padding-inline, var(--_wp-ui-menu-item-padding-inline-end))
 				[item-padding-end];
-			gap: 0;
+			column-gap: 0;
+			row-gap: var(--wpds-dimension-gap-xs);
 			/* Keep leading content at the top of the content row. */
 			align-items: start;
 			/* Center a single line without shifting wrapped content. */
@@ -301,21 +302,18 @@
 			grid-column: prefix-start / content-end;
 			display: flex;
 			flex-direction: column;
+			gap: var(--wpds-dimension-gap-xs);
 			min-width: 0;
-			/* For better optical alignment and spacing */
-			padding-block-end: var(--wpds-dimension-padding-xs);
 			pointer-events: none;
 		}
 
 		.item-label {
 			--_gcd-heading-color: currentColor;
-			--_gcd-p-line-height: var(--_wp-ui-menu-item-label-line-height);
 
 			grid-column: label-start / label-end;
 			min-width: 0;
 			overflow-wrap: anywhere;
 			color: inherit;
-			line-height: var(--_wp-ui-menu-item-label-line-height);
 		}
 
 		.item-description {
@@ -345,6 +343,8 @@
 			grid-column: trailing-start / trailing-end;
 			display: flex;
 			align-items: center;
+			/* A 24px chevron overflows evenly instead of growing the row. */
+			height: var(--_wp-ui-menu-item-label-line-height);
 			margin-inline-start: var(--wpds-dimension-gap-md);
 			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
@@ -394,6 +394,19 @@
 			--_gcd-heading-color: currentColor;
 
 			color: inherit;
+		}
+	}
+
+	/*
+	 * Text variants set line-height in the components layer. This composition
+	 * wins over that, including the global CSS defense bridge in wp-admin.
+	 */
+	@layer compositions {
+		.item-label,
+		.item-description {
+			--_gcd-p-line-height: var(--_wp-ui-menu-item-label-line-height);
+
+			line-height: var(--_wp-ui-menu-item-label-line-height);
 		}
 	}
 }
