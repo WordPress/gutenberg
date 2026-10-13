@@ -40,7 +40,7 @@ export interface CurrentItemProps extends Omit<
 	 * How this item represents the current location. Defaults to `true` for
 	 * button ancestors and `page` for links or a current-only trail.
 	 * With no ancestors, an explicit `true` or `"true"` also makes Root a
-	 * selection group. Ancestor links or buttons take precedence when present.
+	 * selection list. Ancestor links or buttons take precedence when present.
 	 */
 	'aria-current'?: Exclude<
 		ComponentProps< 'span' >[ 'aria-current' ],

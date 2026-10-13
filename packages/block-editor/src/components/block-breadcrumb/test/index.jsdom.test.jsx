@@ -6,7 +6,7 @@ describe( 'BlockBreadcrumb', () => {
 	it( 'displays the document breadcrumb when no block is selected', () => {
 		render( <BlockBreadcrumb /> );
 		expect(
-			screen.getByRole( 'group', { name: 'Block breadcrumb' } )
+			screen.getByRole( 'list', { name: 'Block breadcrumb' } )
 		).toBeVisible();
 		expect(
 			screen.getByText( 'Document', {

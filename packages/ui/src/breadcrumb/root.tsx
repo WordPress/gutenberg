@@ -229,7 +229,7 @@ function getContentBoxInlineSize( element: HTMLElement ) {
 }
 
 /**
- * Renders a labelled page-navigation landmark or hierarchy-selection group.
+ * Renders a labelled page-navigation landmark or hierarchy-selection list.
  * Automatically moves ancestors that do not fit into an accessible overflow menu.
  *
  * ```jsx
@@ -270,6 +270,12 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 			( currentAriaCurrent === true || currentAriaCurrent === 'true' ) )
 			? 'selection'
 			: 'navigation';
+	const hasAriaLabel =
+		typeof ariaLabel === 'string' && ariaLabel.trim().length > 0;
+	const hasAriaLabelledBy =
+		typeof ariaLabelledBy === 'string' && ariaLabelledBy.trim().length > 0;
+	const resolvedAriaLabel =
+		hasAriaLabel || hasAriaLabelledBy ? ariaLabel : __( 'Breadcrumbs' );
 
 	const [ rootElement, setRootElement ] = useState< HTMLElement | null >(
 		null
@@ -707,6 +713,14 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 				ref={ visibleListRef }
 				className={ clsx( defenseStyles.ol, styles.list ) }
 				role="list"
+				aria-label={
+					variant === 'selection' ? resolvedAriaLabel : undefined
+				}
+				aria-labelledby={
+					variant === 'selection' && hasAriaLabelledBy
+						? ariaLabelledBy
+						: undefined
+				}
 			>
 				{ visibleListContent }
 			</ol>
@@ -762,20 +776,16 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 			</div>
 		</>
 	);
-	const hasAriaLabel =
-		typeof ariaLabel === 'string' && ariaLabel.trim().length > 0;
-	const hasAriaLabelledBy =
-		typeof ariaLabelledBy === 'string' && ariaLabelledBy.trim().length > 0;
-	const resolvedAriaLabel =
-		hasAriaLabel || hasAriaLabelledBy ? ariaLabel : __( 'Breadcrumbs' );
 	const enforcedRender = useMemo(
 		() =>
 			enforceRenderProps( render, {
-				'aria-label': resolvedAriaLabel,
-				'aria-labelledby': hasAriaLabelledBy
-					? ariaLabelledBy
-					: undefined,
-				role: variant === 'selection' ? 'group' : 'navigation',
+				'aria-label':
+					variant === 'navigation' ? resolvedAriaLabel : undefined,
+				'aria-labelledby':
+					variant === 'navigation' && hasAriaLabelledBy
+						? ariaLabelledBy
+						: undefined,
+				role: variant === 'navigation' ? 'navigation' : undefined,
 			} ),
 		[
 			ariaLabelledBy,
@@ -790,8 +800,12 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 		defaultTagName: variant === 'selection' ? 'div' : 'nav',
 		ref: mergedRootRef,
 		props: mergeProps< 'nav' >( props, {
-			'aria-label': resolvedAriaLabel,
-			'aria-labelledby': hasAriaLabelledBy ? ariaLabelledBy : undefined,
+			'aria-label':
+				variant === 'navigation' ? resolvedAriaLabel : undefined,
+			'aria-labelledby':
+				variant === 'navigation' && hasAriaLabelledBy
+					? ariaLabelledBy
+					: undefined,
 			children: componentContent,
 			onFocusCapture: ( event ) => {
 				focusedElementRef.current = event.target as HTMLElement;
@@ -801,7 +815,7 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 				styles.root,
 				className
 			),
-			role: variant === 'selection' ? 'group' : 'navigation',
+			role: variant === 'navigation' ? 'navigation' : undefined,
 		} ),
 	} );
 
