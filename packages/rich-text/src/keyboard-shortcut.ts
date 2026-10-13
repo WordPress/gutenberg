@@ -2,8 +2,13 @@ import { isKeyboardEvent } from '@wordpress/keycodes';
 import { useEffect, useContext } from '@wordpress/element';
 import { useEvent } from '@wordpress/compose';
 import { KeyboardShortcutContext } from './contexts';
+import type { RichTextShortcutProps } from './types';
 
-export function RichTextShortcut( { character, type, onUse } ) {
+export function RichTextShortcut( {
+	character,
+	type,
+	onUse,
+}: RichTextShortcutProps ) {
 	const keyboardShortcuts = useContext( KeyboardShortcutContext );
 
 	/*
@@ -14,16 +19,16 @@ export function RichTextShortcut( { character, type, onUse } ) {
 	const stableOnUse = useEvent( onUse );
 
 	useEffect( () => {
-		function callback( event ) {
+		function callback( event: KeyboardEvent ) {
 			if ( isKeyboardEvent[ type ]( event, character ) ) {
 				stableOnUse();
 				event.preventDefault();
 			}
 		}
 
-		keyboardShortcuts.add( callback );
+		keyboardShortcuts!.add( callback );
 		return () => {
-			keyboardShortcuts.delete( callback );
+			keyboardShortcuts!.delete( callback );
 		};
 	}, [ character, type, keyboardShortcuts, stableOnUse ] );
 

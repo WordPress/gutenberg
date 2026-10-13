@@ -1,13 +1,22 @@
 import { getActiveFormats } from './get-active-formats';
 import { getFormatType } from './get-format-type';
 import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from './special-characters';
+import type {
+	ParsedFormat,
+	RichTextFormatList,
+	ToTreeOptions,
+	TreeAttributes,
+} from './types';
 
-function restoreOnAttributes( attributes, isEditableTree ) {
+function restoreOnAttributes(
+	attributes: TreeAttributes,
+	isEditableTree?: boolean
+) {
 	if ( isEditableTree ) {
 		return attributes;
 	}
 
-	const newAttributes = {};
+	const newAttributes: TreeAttributes = {};
 
 	for ( const key in attributes ) {
 		let newKey = key;
@@ -25,19 +34,19 @@ function restoreOnAttributes( attributes, isEditableTree ) {
  * Converts a format object to information that can be used to create an element
  * from (type, attributes and object).
  *
- * @param {Object}  $1                        Named parameters.
- * @param {string}  $1.type                   The format type.
- * @param {string}  $1.tagName                The tag name.
- * @param {Object}  $1.attributes             The format attributes.
- * @param {Object}  $1.unregisteredAttributes The unregistered format
- *                                            attributes.
- * @param {boolean} $1.object                 Whether or not it is an object
- *                                            format.
- * @param {boolean} $1.boundaryClass          Whether or not to apply a boundary
- *                                            class.
- * @param {boolean} $1.isEditableTree
+ * @param options                        Named parameters.
+ * @param options.type                   The format type.
+ * @param options.tagName                The tag name.
+ * @param options.attributes             The format attributes.
+ * @param options.unregisteredAttributes The unregistered format
+ *                                       attributes.
+ * @param options.object                 Whether or not it is an object
+ *                                       format.
+ * @param options.boundaryClass          Whether or not to apply a boundary
+ *                                       class.
+ * @param options.isEditableTree
  *
- * @return {Object} Information to be used for element creation.
+ * @return Information to be used for element creation.
  */
 function fromFormat( {
 	type,
@@ -47,10 +56,14 @@ function fromFormat( {
 	object,
 	boundaryClass,
 	isEditableTree,
+}: ParsedFormat & {
+	object?: boolean;
+	boundaryClass?: boolean;
+	isEditableTree?: boolean;
 } ) {
 	const formatType = getFormatType( type );
 
-	let elementAttributes = {};
+	let elementAttributes: TreeAttributes = {};
 
 	if ( boundaryClass && isEditableTree ) {
 		elementAttributes[ 'data-rich-text-format-boundary' ] = 'true';
@@ -103,11 +116,15 @@ function fromFormat( {
 /**
  * Checks if both arrays of formats up until a certain index are equal.
  *
- * @param {Array}  a     Array of formats to compare.
- * @param {Array}  b     Array of formats to compare.
- * @param {number} index Index to check until.
+ * @param a     Array of formats to compare.
+ * @param b     Array of formats to compare.
+ * @param index Index to check until.
  */
-function isEqualUntil( a, b, index ) {
+function isEqualUntil(
+	a: RichTextFormatList,
+	b: RichTextFormatList,
+	index: number
+) {
 	do {
 		if ( a[ index ] !== b[ index ] ) {
 			return false;
@@ -117,7 +134,7 @@ function isEqualUntil( a, b, index ) {
 	return true;
 }
 
-export function toTree( {
+export function toTree< T >( {
 	value,
 	preserveWhiteSpace,
 	createEmpty,
@@ -132,15 +149,15 @@ export function toTree( {
 	onEndIndex,
 	isEditableTree,
 	placeholder,
-} ) {
+}: ToTreeOptions< T > ) {
 	const { formats, replacements, text, start, end } = value;
 	const formatsLength = formats.length + 1;
 	const tree = createEmpty();
 	const activeFormats = getActiveFormats( value );
 	const deepestActiveFormat = activeFormats[ activeFormats.length - 1 ];
 
-	let lastCharacterFormats;
-	let lastCharacter;
+	let lastCharacterFormats: RichTextFormatList | undefined;
+	let lastCharacter: string | undefined;
 
 	append( tree, '' );
 
@@ -155,10 +172,10 @@ export function toTree( {
 				lastCharacter === '\n' );
 
 		const characterFormats = formats[ i ];
-		let pointer = getLastChild( tree );
+		let pointer: T = getLastChild( tree )!;
 
 		if ( characterFormats ) {
-			characterFormats.forEach( ( format, formatIndex ) => {
+			characterFormats.forEach( ( format: ParsedFormat, formatIndex ) => {
 				if (
 					pointer &&
 					lastCharacterFormats &&
@@ -169,7 +186,7 @@ export function toTree( {
 						formatIndex
 					)
 				) {
-					pointer = getLastChild( pointer );
+					pointer = getLastChild( pointer )!;
 					return;
 				}
 
@@ -225,12 +242,12 @@ export function toTree( {
 					attributes: {
 						contenteditable: 'false',
 						'data-rich-text-comment':
-							attributes[ 'data-rich-text-comment' ],
+							attributes![ 'data-rich-text-comment' ],
 					},
 				} );
 				append(
 					append( pointer, { type: 'span' } ),
-					attributes[ 'data-rich-text-comment' ].trim()
+					attributes![ 'data-rich-text-comment' ].trim()
 				);
 			} else if ( ! isEditableTree && type === 'script' ) {
 				pointer = append(
@@ -242,7 +259,7 @@ export function toTree( {
 				);
 				append( pointer, {
 					html: decodeURIComponent(
-						attributes[ 'data-rich-text-script' ]
+						attributes![ 'data-rich-text-script' ]
 					),
 				} );
 			} else if ( formatType?.contentEditable === false ) {
@@ -250,7 +267,7 @@ export function toTree( {
 					pointer = getParent( pointer );
 					// For non editable formats, render the stored inner HTML.
 					if ( isEditableTree ) {
-						const attrs = {
+						const attrs: TreeAttributes = {
 							contenteditable: 'false',
 							'data-rich-text-bogus': true,
 						};

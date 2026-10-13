@@ -1,22 +1,21 @@
 import { normaliseFormats } from './normalise-formats';
-
-/** @typedef {import('./types').RichTextValue} RichTextValue */
+import type { RichTextFormatList, RichTextValue } from './types';
 
 /**
  * Remove any format object from a Rich Text value by type from the given
  * `startIndex` to the given `endIndex`. Indices are retrieved from the
  * selection if none are provided.
  *
- * @param {RichTextValue} value        Value to modify.
- * @param {string}        formatType   Format type to remove.
- * @param {number}        [startIndex] Start index.
- * @param {number}        [endIndex]   End index.
+ * @param value        Value to modify.
+ * @param formatType   Format type to remove.
+ * @param [startIndex] Start index.
+ * @param [endIndex]   End index.
  *
- * @return {RichTextValue} A new value with the format applied.
+ * @return A new value with the format applied.
  */
 export function removeFormat(
-	value,
-	formatType,
+	value: RichTextValue,
+	formatType: string,
 	startIndex = value.start,
 	endIndex = value.end
 ) {
@@ -67,7 +66,11 @@ export function removeFormat(
 	} );
 }
 
-function filterFormats( formats, index, formatType ) {
+function filterFormats(
+	formats: RichTextFormatList[],
+	index: number,
+	formatType: string
+) {
 	const newFormats = formats[ index ].filter(
 		( { type } ) => type !== formatType
 	);

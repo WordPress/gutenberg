@@ -1,8 +1,12 @@
 import { useEffect, useContext } from '@wordpress/element';
 import { useEvent } from '@wordpress/compose';
 import { InputEventContext } from './contexts';
+import type { RichTextInputEventProps } from './types';
 
-export function RichTextInputEvent( { inputType, onInput } ) {
+export function RichTextInputEvent( {
+	inputType,
+	onInput,
+}: RichTextInputEventProps ) {
 	const callbacks = useContext( InputEventContext );
 
 	/*
@@ -13,16 +17,16 @@ export function RichTextInputEvent( { inputType, onInput } ) {
 	const stableOnInput = useEvent( onInput );
 
 	useEffect( () => {
-		function callback( event ) {
+		function callback( event: InputEvent ) {
 			if ( event.inputType === inputType ) {
 				stableOnInput();
 				event.preventDefault();
 			}
 		}
 
-		callbacks.add( callback );
+		callbacks!.add( callback );
 		return () => {
-			callbacks.delete( callback );
+			callbacks!.delete( callback );
 		};
 	}, [ inputType, callbacks, stableOnInput ] );
 
