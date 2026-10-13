@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { addFilter } from '@wordpress/hooks';
-import { getBlockSupport } from '@wordpress/blocks';
+import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useMemo } from '@wordpress/element';
 import {
 	getColorClassName,
@@ -145,9 +145,21 @@ export function addSaveProps( props, blockNameOrType, attributes ) {
 
 	const serializeHasBackground =
 		shouldSerialize( 'background' ) || shouldSerialize( 'gradients' );
+	// Mirror of the background support: a color clipped to the text paints
+	// the glyphs, not the box.
+	const clipsToText =
+		'text' === style?.background?.backgroundClip &&
+		hasBlockSupport( blockNameOrType, [
+			BACKGROUND_SUPPORT_KEY,
+			'backgroundClip',
+		] ) &&
+		! shouldSkipSerialization(
+			blockNameOrType,
+			BACKGROUND_SUPPORT_KEY,
+			'backgroundClip'
+		);
 	const hasBackground =
-		backgroundColor ||
-		style?.color?.background ||
+		( ! clipsToText && ( backgroundColor || style?.color?.background ) ) ||
 		( hasGradient && ( gradient || style?.color?.gradient ) );
 
 	const newClassName = clsx( props.className, textClass, gradientClass, {
@@ -177,6 +189,9 @@ function getSerializedBackgroundClasses( name, style ) {
 				: undefined,
 			gradient: shouldSerialize( 'gradient' )
 				? style?.background?.gradient
+				: undefined,
+			backgroundClip: shouldSerialize( 'backgroundClip' )
+				? style?.background?.backgroundClip
 				: undefined,
 		},
 	} );
