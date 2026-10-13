@@ -74,13 +74,13 @@ test.describe( 'Autosave failure notice', () => {
 	for ( const [ title, failure, notice ] of [
 		// TODO: Show the PHP error the response includes in `data.error`.
 		[ 'PHP fatal error', 'fatal-error', AUTOSAVE_FAILED ],
-		// TODO: Show the message without its HTML tags.
+		// TODO: Sanitize the message HTML and show it, keeping links.
 		[
 			'database connection lost',
 			'database-connection-lost',
 			AUTOSAVE_FAILED,
 		],
-		// TODO: Show the message without its HTML tags.
+		// TODO: Sanitize the message HTML and show it, keeping links.
 		[
 			'error message containing a link',
 			'link-in-message',
