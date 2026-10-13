@@ -151,6 +151,7 @@ function OperatorSelector( {
 						variant="minimal"
 						aria-label={ __( 'Conditions' ) }
 						className="dataviews-filters__summary-operators-filter-select"
+						style={ { minWidth: 0 } }
 					/>
 					<Select.Popup width="content">
 						{ operatorOptions.map( ( option ) => (
