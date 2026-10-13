@@ -235,7 +235,21 @@ RUN apk --no-cache add $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
 
 # Set up sudo so they can have root access.
 RUN apk --no-cache add sudo linux-headers
-RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
+RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# The MariaDB 11.4+ client requires TLS by default, which MariaDB servers
+# before 11.4 do not offer, so every \`wp db\` command fails against them. WP-CLI
+# runs the client with --no-defaults, which ignores option files, so wrap each
+# client to skip server certificate verification instead, which lets it fall
+# back to an unencrypted connection when the server has no TLS. This is the same
+# flag WP-CLI adds from db-command 3.0, so these wrappers can be removed once a
+# WP-CLI release with it is in the image. --no-defaults has to stay the first
+# argument.
+RUN for bin in mariadb mariadb-check mariadb-dump mysql mysqlcheck mysqldump; do \\
+	[ -x /usr/bin/$bin ] || continue; \\
+	printf '#!/bin/sh\\nif [ "$1" = "--no-defaults" ]; then\\n\\tshift\\n\\texec /usr/bin/%s --no-defaults --skip-ssl-verify-server-cert "$@"\\nfi\\nexec /usr/bin/%s --skip-ssl-verify-server-cert "$@"\\n' "$bin" "$bin" > /usr/local/bin/$bin; \\
+	chmod +x /usr/local/bin/$bin; \\
+done`;
 			break;
 		}
 		default: {
@@ -319,3 +333,6 @@ RUN echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/php.ini
 RUN echo 'xdebug.mode=${ xdebugMode }' >> /usr/local/etc/php/php.ini
 RUN echo 'xdebug.client_host="host.docker.internal"' >> /usr/local/etc/php/php.ini`;
 }
+
+// Exported for testing.
+module.exports.cliDockerFileContents = cliDockerFileContents;
