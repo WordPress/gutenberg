@@ -2,9 +2,37 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+    -   `Tabs` ([#84332](https://github.com/WordPress/gutenberg/pull/84332))
+    -   `NumberControl` ([#84330](https://github.com/WordPress/gutenberg/pull/84330))
+    -   `TimePicker` ([#84331](https://github.com/WordPress/gutenberg/pull/84331))
+    -   `CustomSelectControl` and `CustomSelectControlV2` ([#84131](https://github.com/WordPress/gutenberg/pull/84131))
+    -   `DateTimePicker` ([#84129](https://github.com/WordPress/gutenberg/pull/84129))
+    -   `ColorPicker` ([#84128](https://github.com/WordPress/gutenberg/pull/84128))
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
 ### Enhancements
 
 -   `ColorPicker`: Use `Select` from `@wordpress/ui` for the color format selector ([#83035](https://github.com/WordPress/gutenberg/pull/83035)).
+
+### Deprecations
+
+-   `Tip`: Deprecate in favor of `Notice` from `@wordpress/ui`, preserving the legacy component for existing consumers ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
+
+### Bug Fixes
+
+-   `InputControl`, `NumberControl`, `UnitControl`: Ignore the drag gesture for touch input, where it has no cursor affordance and is easy to trigger by accident ([#38865](https://github.com/WordPress/gutenberg/issues/38865), [#81519](https://github.com/WordPress/gutenberg/pull/81519)).
+-   `Modal`: Keep focus inside the dialog when `focusOnMount="firstContentElement"` finds no tabbable elements in the content ([#84344](https://github.com/WordPress/gutenberg/pull/84344)).
+-   `navigateRegions`: Only outline the Publish and Save controls when their region has focus ([#84343](https://github.com/WordPress/gutenberg/pull/84343)).
+-   `ToolsPanel`: Use setting-first accessible action labels without changing the menu design ([#84341](https://github.com/WordPress/gutenberg/pull/84341)).
+-   `DropdownMenu`: Keep the menu closed on ArrowDown when the toggle is disabled ([#84556](https://github.com/WordPress/gutenberg/pull/84556)).
+
+### Internal
+
+-   Update Ariakit to 0.4.41 ([#84539](https://github.com/WordPress/gutenberg/pull/84539)).
+-   Refactor to TypeScript ([#84611](https://github.com/WordPress/gutenberg/pull/84611)).
 
 ## 42.0.0 (2026-10-07)
 

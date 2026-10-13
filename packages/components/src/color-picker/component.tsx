@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import type { ClipboardEvent, ForwardedRef } from 'react';
 import type { Colord } from 'colord';
 import { colord, extend, getFormat } from 'colord';
@@ -14,13 +15,10 @@ import { useDebounce } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Select } from '@wordpress/ui';
 import { useContextSystem, contextConnect } from '../context';
-import {
-	ColorfulWrapper,
-	ColorFormatSelect,
-	AuxiliaryColorArtefactWrapper,
-	AuxiliaryColorArtefactHStackHeader,
-	ColorInputWrapper,
-} from './styles';
+import { HStack } from '../h-stack';
+import { Flex } from '../flex';
+import { PolymorphicElement } from '../utils/polymorphic-element';
+import styles from './style.module.scss';
 import { ColorCopyButton } from './color-copy-button';
 import { ColorInput } from './color-input';
 import { Picker } from './picker';
@@ -60,6 +58,7 @@ const UnconnectedColorPicker = (
 		onChange,
 		defaultValue = '#fff',
 		copyFormat,
+		className,
 		...divProps
 	} = useContextSystem( props, 'ColorPicker' );
 
@@ -191,9 +190,10 @@ const UnconnectedColorPicker = (
 	);
 
 	return (
-		<ColorfulWrapper
+		<PolymorphicElement
 			ref={ forwardedRef }
 			{ ...divProps }
+			className={ clsx( styles.colorful, className ) }
 			onPasteCapture={ maybeHandlePaste }
 		>
 			<Picker
@@ -207,9 +207,9 @@ const UnconnectedColorPicker = (
 					isPickerInteractingRef.current = false;
 				} }
 			/>
-			<AuxiliaryColorArtefactWrapper>
-				<AuxiliaryColorArtefactHStackHeader justify="space-between">
-					<ColorFormatSelect>
+			<div className={ styles.auxiliary }>
+				<HStack className={ styles.header } justify="space-between">
+					<div className={ styles.select }>
 						<Select.Root
 							value={ colorType }
 							onValueChange={ ( nextColorType ) => {
@@ -242,13 +242,17 @@ const UnconnectedColorPicker = (
 								) ) }
 							</Select.Popup>
 						</Select.Root>
-					</ColorFormatSelect>
+					</div>
 					<ColorCopyButton
 						color={ safeColordColor }
 						colorType={ copyFormat || colorType }
 					/>
-				</AuxiliaryColorArtefactHStackHeader>
-				<ColorInputWrapper direction="column" gap={ 2 }>
+				</HStack>
+				<Flex
+					className={ styles[ 'color-input' ] }
+					direction="column"
+					gap={ 2 }
+				>
 					<ColorInput
 						colorType={ colorType }
 						color={ safeColordColor }
@@ -257,9 +261,9 @@ const UnconnectedColorPicker = (
 						onHSLChange={ handleHSLAChange }
 						enableAlpha={ enableAlpha }
 					/>
-				</ColorInputWrapper>
-			</AuxiliaryColorArtefactWrapper>
-		</ColorfulWrapper>
+				</Flex>
+			</div>
+		</PolymorphicElement>
 	);
 };
 

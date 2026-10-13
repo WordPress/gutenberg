@@ -14,6 +14,7 @@ import { getPopulatedCategories } from './components/inserter/block-patterns-tab
 import { PrivateListView } from './components/list-view';
 import InspectorControlsLastItem from './components/inspector-controls/last-item';
 import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
+import { showPlaceholderKey as blockToolbarShowPlaceholderKey } from './components/block-toolbar';
 import { cleanEmptyObject, usePrivateStyleOverride } from './hooks/utils';
 import { isDefaultBlockStyleState } from './hooks/block-style-state';
 import BlockQuickNavigation from './components/block-quick-navigation';
@@ -82,7 +83,7 @@ import { isElementVisible } from './utils/dom';
 const { getDuotoneFilter } = unlock( globalStylesEnginePrivateApis );
 
 /**
- * Private @wordpress/block-editor APIs.
+ * Private `@wordpress/block-editor` APIs.
  */
 export const privateApis = {};
 lock( privateApis, {
@@ -99,6 +100,7 @@ lock( privateApis, {
 	ResizableBoxPopover,
 	InspectorControlsLastItem,
 	useHasBlockToolbar,
+	blockToolbarShowPlaceholderKey,
 	cleanEmptyObject,
 	isDefaultBlockStyleState,
 	usePrivateStyleOverride,
