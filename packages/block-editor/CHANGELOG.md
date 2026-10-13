@@ -26,6 +26,10 @@
 -   Inserter: Only show the block-section separator when both sections contain blocks, avoiding a double border above the tip ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
 -   Block Toolbar: Show a generic icon and accessible name on the phone placeholder's block button when no default block type is registered ([#84533](https://github.com/WordPress/gutenberg/pull/84533)).
 
+### Internal
+
+-   Remove the private `toggleBlockSpotlight` action, the state it set, and the private `hasBlockSpotlight` selector. Notes were the only thing that dispatched the action and they now mark their block with the block highlight instead. `BlockList` reads `getEditedContentOnlySection` directly for the one case that still dims the canvas ([#81538](https://github.com/WordPress/gutenberg/pull/81538)).
+
 ## 18.1.0 (2026-10-07)
 
 ### New Features
