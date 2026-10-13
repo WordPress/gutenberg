@@ -87,14 +87,19 @@
 	}
 
 	.components-tab-panel__tabs[aria-orientation="vertical"] & {
-		border-radius: var(--wpds-border-radius-sm);
-
 		&::after {
-			display: none;
+			inset-block: 0;
+			inset-inline: 0 auto;
+			width: 0;
+			height: auto;
+
+			@media not (prefers-reduced-motion) {
+				transition-property: width;
+			}
 		}
 
-		&.is-active {
-			background: var(--wpds-color-background-interactive-neutral-weak-active);
+		&.is-active::after {
+			width: var(--wpds-border-width-focus);
 		}
 	}
 }

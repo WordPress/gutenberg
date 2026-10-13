@@ -13,7 +13,7 @@
 
 ### Enhancements
 
--   `Tabs`: Add padded interaction backgrounds, separate hover and keyboard focus styling, and match selection indicators to the tab text without widening minimal tab lists ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
+-   `Tabs`: Add padded interaction backgrounds, separate hover and keyboard focus styling, and use neutral selection lines in both orientations without widening minimal tab lists ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
 
 -   `Select`, `Combobox`, `Autocomplete`, and the select controls: Tighten popup item spacing, use 16px selection indicators, and align group labels and separators with item content ([#84393](https://github.com/WordPress/gutenberg/pull/84393)).
 -   `Button`, `IconButton`: Use the shared `Spinner` for loading indicators ([#84321](https://github.com/WordPress/gutenberg/pull/84321)).

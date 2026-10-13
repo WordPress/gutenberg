@@ -27,7 +27,7 @@
 
 	@media not (prefers-reduced-motion) {
 		&[data-indicator-animated]::before {
-			transition-property: transform, border-radius, border-block;
+			transition-property: transform;
 			transition-duration: 0.2s;
 			transition-timing-function: ease-out;
 		}
@@ -38,6 +38,7 @@
 		position: absolute;
 		pointer-events: none;
 		transform-origin: var(--direction-start) top;
+		color: var(--wpds-color-foreground-interactive-neutral);
 
 		// Windows high contrast mode.
 		outline: 2px solid transparent;
@@ -70,44 +71,29 @@
 			transform:
 				translateX(calc(var(--selected-start) * var(--direction-factor) * 1px))
 				scaleX(calc(var(--selected-width, 0) / var(--antialiasing-factor)));
-			border-bottom:
-				var(--wp-admin-border-width-focus) solid
-				var(--wpds-color-foreground-interactive-neutral);
+			border-bottom: var(--wp-admin-border-width-focus) solid currentColor;
 		}
 	}
-	&[aria-orientation="horizontal"]:has(
-		[aria-selected="true"]:not([aria-disabled="true"]):is(:hover, :active, [data-focus-visible])
+	&:has(
+		[aria-selected="true"]:not([aria-disabled="true"]):is(
+			:hover,
+			:active,
+			[data-focus-visible]
+		)
 	)::before {
-		border-block-end-color: var(--wpds-color-foreground-interactive-neutral-active);
+		color: var(--wpds-color-foreground-interactive-neutral-active);
 	}
 
 	&[aria-orientation="vertical"] {
 		&::before {
-			/* Adjusting the border radius to match the scaling in the y axis. */
-			border-radius:
-				$radius-small /
-				calc($radius-small /
-				(var(--selected-height, 0) / var(--antialiasing-factor)));
 			top: 0;
 			inset-inline-start: 0;
-			width: 100%;
+			width: var(--wp-admin-border-width-focus);
 			height: calc(var(--antialiasing-factor) * 1px);
 			transform:
 				translateY(calc(var(--selected-top, 0) * 1px))
 				scaleY(calc(var(--selected-height, 0) / var(--antialiasing-factor)));
-			background-color: var(--wpds-color-background-interactive-neutral-weak-active);
-		}
-		&[data-select-on-move="true"]:has(
-			:is(:focus-visible, [data-focus-visible])
-		)::before {
-			box-sizing: border-box;
-			border:
-				var(--wp-admin-border-width-focus) solid
-				$components-color-accent;
-			/* Adjusting the border width to match the scaling in the y axis. */
-			border-block-width:
-				calc(var(--wp-admin-border-width-focus, 1px) /
-				(var(--selected-height, 0) / var(--antialiasing-factor)));
+			background-color: currentColor;
 		}
 	}
 }
@@ -201,11 +187,9 @@
 	}
 	[aria-orientation="vertical"] &::after {
 		content: "";
-		inset: var(--wp-admin-border-width-focus);
-	}
-	[aria-orientation="vertical"][data-select-on-move="true"] &::after {
-		// The shared selection indicator supplies the focus ring.
-		outline: none;
+		inset-block: var(--wp-admin-border-width-focus);
+		// Keep the focus ring clear of the selection indicator.
+		inset-inline: calc(2 * var(--wp-admin-border-width-focus));
 	}
 }
 

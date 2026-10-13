@@ -57,25 +57,25 @@
 
 		.indicator {
 			@media not ( prefers-reduced-motion ) {
-				transition-property:
-					translate,
-					width,
-					height,
-					border-radius,
-					border-block;
+				transition-property: translate, width, height;
 				transition-duration: 0.2s;
 				transition-timing-function: ease-out;
 			}
 
 			position: absolute;
 			pointer-events: none;
+			z-index: 1;
+			background-color: var(--wpds-color-foreground-interactive-neutral);
+
+			.tablist:has(> .tab[aria-selected="true"]:not([data-disabled]):is(:hover, :active, :focus-visible)) & {
+				background-color: var(--wpds-color-foreground-interactive-neutral-active);
+			}
 
 			/* Windows high contrast mode. */
 			outline: 2px solid transparent;
 			outline-offset: -1px;
 
 			&[data-orientation="horizontal"] {
-				z-index: 1;
 				/* stylelint-disable-next-line logical-css/require-logical-properties -- Physical properties are necessary for the indicator to work as expected. */
 				left: 0;
 				bottom: 0;
@@ -83,31 +83,14 @@
 
 				width: var(--active-tab-width);
 				translate: var(--active-tab-left) 0;
-				background-color: var(--wpds-color-foreground-interactive-neutral);
-
-				.tablist:has(> .tab[aria-selected="true"]:not([data-disabled]):is(:hover, :active, :focus-visible)) & {
-					background-color: var(--wpds-color-foreground-interactive-neutral-active);
-				}
 			}
 
 			&[data-orientation="vertical"] {
-				z-index: 0;
-				border-radius: var(--wpds-border-radius-sm);
 				top: 0;
-				/* stylelint-disable-next-line logical-css/require-logical-properties -- Physical properties are necessary for the indicator to work as expected. */
-				left: 50%;
-				width: 100%;
+				inset-inline-start: 0;
+				width: var(--wpds-border-width-focus);
 				height: var(--active-tab-height);
-				translate: -50% var(--active-tab-top);
-				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
-			}
-
-			.tablist[data-select-on-move="true"]:has(:focus-visible)
-			&[data-orientation="vertical"] {
-				box-sizing: border-box;
-				border:
-					var(--wpds-border-width-focus) solid
-					var(--wpds-color-stroke-focus);
+				translate: 0 var(--active-tab-top);
 			}
 		}
 
@@ -237,13 +220,10 @@
 
 				&::after {
 					content: "";
-					inset: var(--wpds-border-width-focus); /* TODO: Use or create new control/interactive padding token */
+					inset-block: var(--wpds-border-width-focus);
+					/* Keep the focus ring clear of the selection indicator. */
+					inset-inline: calc(2 * var(--wpds-border-width-focus));
 				}
-			}
-
-			[data-orientation="vertical"][data-select-on-move="true"] &::after {
-				/* The shared selection indicator supplies the focus ring. */
-				outline: none;
 			}
 		}
 
