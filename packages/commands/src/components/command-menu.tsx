@@ -75,7 +75,7 @@ const CATEGORY_LABELS: Record< CommandCategory, string > = {
  */
 function isValidIcon( icon: unknown ): icon is IconType {
 	return (
-		typeof icon === 'string' ||
+		( typeof icon === 'string' && icon !== '' ) ||
 		typeof icon === 'function' ||
 		isValidElement( icon )
 	);
@@ -119,7 +119,7 @@ function CommandItem( {
 					'has-icon': !! icon,
 				} ) }
 			>
-				{ icon && <WCIcon icon={ icon } /> }
+				{ icon && <WCIcon icon={ icon } size={ 24 } /> }
 				<span className="commands-command-menu__item-label">
 					<TextHighlight
 						text={ command.label }
