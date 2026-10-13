@@ -18,16 +18,24 @@ export default function useClickSelection() {
 		getBlockSelectionStart,
 		getSelectionStart,
 		hasMultiSelection,
+		isBlockMultiSelected,
+		isAncestorMultiSelected,
+		__unstableIsFullySelected,
 	} = useSelect( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
 			let pointerType;
+			// The block to collapse a multi-selection to on click, recorded
+			// on mousedown. See the comment in `onMouseDown`.
+			let clickCollapseClientId;
 
 			function onPointerDown( event ) {
 				pointerType = event.pointerType;
 			}
 
 			function onMouseDown( event ) {
+				clickCollapseClientId = undefined;
+
 				// The main button.
 				// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 				if ( ! isSelectionEnabled() || event.button !== 0 ) {
@@ -114,16 +122,40 @@ export default function useClickSelection() {
 					// multiselection, as focus can be incurred by starting a
 					// multiselection (focus moved to first block's multi-
 					// controls).
-					selectBlock( clickedClientId );
+					if (
+						clickedClientId &&
+						__unstableIsFullySelected() &&
+						( isBlockMultiSelected( clickedClientId ) ||
+							isAncestorMultiSelected( clickedClientId ) )
+					) {
+						// Pressing on one of the selected blocks may start a
+						// drag of the whole selection, so wait for the click
+						// event to collapse the selection: no click fires
+						// when a drag takes place.
+						clickCollapseClientId = clickedClientId;
+					} else {
+						selectBlock( clickedClientId );
+					}
+				}
+			}
+
+			function onClick() {
+				const clientId = clickCollapseClientId;
+				clickCollapseClientId = undefined;
+
+				if ( clientId && hasMultiSelection() ) {
+					selectBlock( clientId );
 				}
 			}
 
 			node.addEventListener( 'pointerdown', onPointerDown );
 			node.addEventListener( 'mousedown', onMouseDown );
+			node.addEventListener( 'click', onClick );
 
 			return () => {
 				node.removeEventListener( 'pointerdown', onPointerDown );
 				node.removeEventListener( 'mousedown', onMouseDown );
+				node.removeEventListener( 'click', onClick );
 			};
 		},
 		[
@@ -132,6 +164,9 @@ export default function useClickSelection() {
 			getBlockSelectionStart,
 			getSelectionStart,
 			hasMultiSelection,
+			isBlockMultiSelected,
+			isAncestorMultiSelected,
+			__unstableIsFullySelected,
 		]
 	);
 }
