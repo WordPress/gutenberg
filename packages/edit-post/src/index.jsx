@@ -17,7 +17,9 @@ import {
 } from '@wordpress/editor';
 import { store as coreDataStore } from '@wordpress/core-data';
 import apiFetch from '@wordpress/api-fetch';
+import { getQueryArg } from '@wordpress/url';
 import Layout from './components/layout';
+import { store as editPostStore } from './store';
 import { unlock } from './lock-unlock';
 
 const {
@@ -80,6 +82,14 @@ export function initializeEditor(
 			requireApproval: true,
 			optimizeOnUpload: true,
 		} );
+	}
+
+	// The posts list links here to show a post's new note activity.
+	// `BrowserURL` drops the query arg, so a reload does not reopen it.
+	if ( getQueryArg( window.location.href, 'notes' ) === 'open' ) {
+		dispatch( editPostStore ).openGeneralSidebar(
+			'edit-post/collab-history-sidebar'
+		);
 	}
 
 	dispatch( blocksStore ).reapplyBlockTypeFilters();
