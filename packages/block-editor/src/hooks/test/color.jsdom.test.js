@@ -28,7 +28,11 @@ const gradientValue = {
 	},
 };
 
-function registerWithSkip( { colorSkip, backgroundSkip } = {} ) {
+function registerWithSkip( {
+	colorSkip,
+	backgroundSkip,
+	backgroundClip = true,
+} = {} ) {
 	registerBlockType( BLOCK_NAME, {
 		apiVersion: 3,
 		title: 'Test block',
@@ -43,7 +47,7 @@ function registerWithSkip( { colorSkip, backgroundSkip } = {} ) {
 			background: {
 				backgroundImage: true,
 				gradient: true,
-				backgroundClip: true,
+				backgroundClip,
 				__experimentalSkipSerialization: backgroundSkip,
 			},
 		},
@@ -184,6 +188,16 @@ describe( 'color useBlockProps has-background', () => {
 
 	it( 'is added for a background color when the text clip is skipped', () => {
 		registerWithSkip( { backgroundSkip: [ 'backgroundClip' ] } );
+		expect(
+			getClassNames( {
+				...colorValue,
+				background: { backgroundClip: 'text' },
+			} )
+		).toContain( 'has-background' );
+	} );
+
+	it( 'is added for a background color when the clip is unsupported', () => {
+		registerWithSkip( { backgroundClip: false } );
 		expect(
 			getClassNames( {
 				...colorValue,
