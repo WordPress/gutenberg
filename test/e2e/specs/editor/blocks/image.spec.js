@@ -312,6 +312,36 @@ test.describe( 'Image', () => {
 		page,
 		editor,
 	} ) => {
+		// Serve Openverse and its image hosts locally; CI runners can't reliably fetch them.
+		const mockImages = [
+			'10x10_e2e_test_image_green.png',
+			'10x10_e2e_test_image_z9T8jK.png',
+		];
+		await page.route( 'https://api.openverse.org/v1/images/?*', ( route ) =>
+			route.fulfill( {
+				json: {
+					results: mockImages.map( ( fileName, index ) => ( {
+						id: `mock-${ index }`,
+						title: fileName,
+						url: `https://openverse.test/${ fileName }`,
+						thumbnail: `https://openverse.test/${ fileName }`,
+						license: 'cc0',
+						license_version: '1.0',
+					} ) ),
+				},
+			} )
+		);
+		await page.route( 'https://openverse.test/*', ( route ) =>
+			route.fulfill( {
+				path: path.join(
+					__dirname,
+					'../../../assets',
+					new URL( route.request().url() ).pathname
+				),
+				headers: { 'Access-Control-Allow-Origin': '*' },
+			} )
+		);
+
 		await editor.insertBlock( { name: 'core/image' } );
 		const imageBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Image',
@@ -1038,6 +1068,62 @@ test.describe( 'Image - lightbox', () => {
 					.getPropertyValue( 'margin' );
 			} );
 			expect( margin ).toBe( '0px' );
+		} );
+
+		test.describe( 'Overlay not a direct child of body', () => {
+			test.beforeAll( async ( { requestUtils } ) => {
+				await requestUtils.activatePlugin(
+					'gutenberg-test-lightbox-overlay-wrapper'
+				);
+			} );
+
+			test.afterAll( async ( { requestUtils } ) => {
+				await requestUtils.deactivatePlugin(
+					'gutenberg-test-lightbox-overlay-wrapper'
+				);
+			} );
+
+			test( 'should make only the rest of the page inert and restore it on close', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.setContent( `<!-- wp:image {"id":${ uploadedMedia.id },"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true}} -->
+				<figure class="wp-block-image size-full"><img src="${ uploadedMedia.source_url }" alt="" class="wp-image-${ uploadedMedia.id }"/></figure>
+				<!-- /wp:image --> ` );
+
+				const postId = await editor.publishPost();
+				await page.goto( `/?p=${ postId }` );
+
+				const wrapper = page.locator( '#site-wrap' );
+				const pageContent = page.locator(
+					'#site-wrap > :has(.wp-lightbox-container)'
+				);
+				const overlay = page.locator(
+					'#site-wrap > .wp-lightbox-overlay'
+				);
+				await expect( overlay ).toBeAttached();
+
+				// A direct child of <body> the theme made inert must stay inert
+				// after closing.
+				await page.evaluate( () => {
+					const themeInert = document.createElement( 'div' );
+					themeInert.id = 'theme-inert';
+					themeInert.inert = true;
+					document.body.prepend( themeInert );
+				} );
+
+				await page.locator( '.wp-lightbox-container img' ).click();
+				await expect( overlay ).toHaveClass( /active/ );
+				await expect( wrapper ).not.toHaveAttribute( 'inert' );
+				await expect( pageContent ).toHaveAttribute( 'inert' );
+
+				await overlay.getByRole( 'button', { name: 'Close' } ).click();
+				await expect( overlay ).not.toHaveClass( /active/ );
+				await expect( pageContent ).not.toHaveAttribute( 'inert' );
+				await expect( page.locator( '#theme-inert' ) ).toHaveAttribute(
+					'inert'
+				);
+			} );
 		} );
 	} );
 } );

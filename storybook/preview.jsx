@@ -83,6 +83,7 @@ export const parameters = {
 		test: 'error',
 	},
 	controls: {
+		expanded: true,
 		sort: 'requiredFirst',
 	},
 	backgrounds: {
@@ -116,6 +117,7 @@ export const parameters = {
 				'Design System',
 				[
 					'Introduction',
+					'Contributing',
 					'Foundations',
 					'Tokens',
 					'Theme',

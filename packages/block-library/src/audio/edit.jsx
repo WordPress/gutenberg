@@ -7,6 +7,7 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { inertValue } from '@wordpress/react-inert-value';
 import { Text } from '@wordpress/ui';
 import {
 	BlockControls,
@@ -251,7 +252,7 @@ function AudioEdit( {
 			<figure { ...blockProps }>
 				<audio
 					controls="controls"
-					inert={ ! isSingleSelected ? 'true' : undefined }
+					inert={ inertValue( ! isSingleSelected ) }
 					src={ src ?? temporaryURL }
 				/>
 				{ !! temporaryURL && <Spinner /> }

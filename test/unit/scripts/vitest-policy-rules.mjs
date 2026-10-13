@@ -2248,6 +2248,23 @@ export function validateVitestPolicy( {
 			report( 'commonjs-import', 'CommonJS import', node );
 		}
 
+		// Preserve jest/no-export for suites. Vitest has no equivalent rule;
+		// shared helpers and setup modules must remain able to export.
+		if (
+			isVitestTest &&
+			[
+				'ExportNamedDeclaration',
+				'ExportDefaultDeclaration',
+				'ExportAllDeclaration',
+			].includes( node.type )
+		) {
+			report(
+				'test-export',
+				'Do not export from a test file. Move shared helpers to a separate module',
+				node
+			);
+		}
+
 		if (
 			node.type === 'TSExportAssignment' ||
 			( node.type === 'AssignmentExpression' &&

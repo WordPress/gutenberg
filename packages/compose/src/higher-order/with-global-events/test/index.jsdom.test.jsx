@@ -1,7 +1,6 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { Component } from '@wordpress/element';
-import { logged } from '@wordpress/deprecated';
 import withGlobalEvents from '../';
 import Listener from '../listener';
 
@@ -43,10 +42,6 @@ describe( 'withGlobalEvents', () => {
 			vi.spyOn( Listener._instance, 'add' );
 			vi.spyOn( Listener._instance, 'remove' );
 		}
-	} );
-
-	afterEach( () => {
-		delete logged[ DEPRECATION_MESSAGE ];
 	} );
 
 	it( 'renders with original component', () => {

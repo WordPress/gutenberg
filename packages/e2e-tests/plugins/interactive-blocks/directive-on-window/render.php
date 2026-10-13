@@ -23,7 +23,7 @@
 	</div>
 	<div
 		data-wp-on-window--resize="actions.resizeHandler"
-		data-wp-on-window--resize--second="actions.resizeSecondHandler"
+		data-wp-on-window--resize---second="actions.resizeSecondHandler"
 		data-wp-on-window--resize---third="actions.resizeThirdHandler"
 	>
 		<p data-wp-text="state.resizeHandler" data-testid="resizeHandler">no</p>

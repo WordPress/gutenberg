@@ -18,7 +18,7 @@ describe( 'Notice', () => {
 			const actionsRef = createRef< HTMLDivElement >();
 			const actionButtonRef = createRef< HTMLButtonElement >();
 			const actionLinkRef = createRef< HTMLAnchorElement >();
-			const closeIconRef = createRef< HTMLButtonElement >();
+			const closeIconButtonRef = createRef< HTMLButtonElement >();
 
 			render(
 				<Notice.Root ref={ rootRef }>
@@ -37,7 +37,7 @@ describe( 'Notice', () => {
 							Action Link
 						</Notice.ActionLink>
 					</Notice.Actions>
-					<Notice.CloseIcon ref={ closeIconRef } />
+					<Notice.CloseIconButton ref={ closeIconButtonRef } />
 				</Notice.Root>
 			);
 			expect( rootRef.current ).toBeInstanceOf( HTMLDivElement );
@@ -48,7 +48,9 @@ describe( 'Notice', () => {
 				HTMLButtonElement
 			);
 			expect( actionLinkRef.current ).toBeInstanceOf( HTMLAnchorElement );
-			expect( closeIconRef.current ).toBeInstanceOf( HTMLButtonElement );
+			expect( closeIconButtonRef.current ).toBeInstanceOf(
+				HTMLButtonElement
+			);
 		} );
 
 		it( 'renders content', () => {
@@ -68,15 +70,15 @@ describe( 'Notice', () => {
 		} );
 	} );
 
-	describe( 'dismissing via CloseIcon', () => {
-		it( 'renders dismiss button when CloseIcon included', async () => {
+	describe( 'dismissing via CloseIconButton', () => {
+		it( 'renders dismiss button when CloseIconButton included', async () => {
 			const user = userEvent.setup();
 			const handleDismiss = vi.fn();
 
 			render(
 				<Notice.Root>
 					<Notice.Description>Dismissible</Notice.Description>
-					<Notice.CloseIcon onClick={ handleDismiss } />
+					<Notice.CloseIconButton onClick={ handleDismiss } />
 				</Notice.Root>
 			);
 
@@ -86,7 +88,7 @@ describe( 'Notice', () => {
 			expect( handleDismiss ).toHaveBeenCalledTimes( 1 );
 		} );
 
-		it( 'does not render dismiss button when CloseIcon omitted', () => {
+		it( 'does not render dismiss button when CloseIconButton omitted', () => {
 			render(
 				<Notice.Root>
 					<Notice.Description>Non-dismissible</Notice.Description>
@@ -98,11 +100,11 @@ describe( 'Notice', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'supports custom CloseIcon label', () => {
+		it( 'supports custom CloseIconButton label', () => {
 			render(
 				<Notice.Root>
 					<Notice.Description>Test</Notice.Description>
-					<Notice.CloseIcon
+					<Notice.CloseIconButton
 						label="Close notification"
 						onClick={ vi.fn() }
 					/>

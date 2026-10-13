@@ -15,7 +15,10 @@ import type { FieldVisualLabelProps } from './types';
  * associated with a control.
  */
 export const VisualLabel = forwardRef< HTMLSpanElement, FieldVisualLabelProps >(
-	function VisualLabel( { className, render, variant, ...restProps }, ref ) {
+	function UnforwardedVisualLabel(
+		{ className, render, variant, ...restProps },
+		ref
+	) {
 		return useRender( {
 			defaultTagName: 'span',
 			render,

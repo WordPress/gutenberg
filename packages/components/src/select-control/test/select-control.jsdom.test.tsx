@@ -97,6 +97,7 @@ describe( 'SelectControl', () => {
 	} );
 
 	describe( 'static typing', () => {
+		/* eslint-disable vitest/expect-expect -- TypeScript checks these cases during typecheck. */
 		describe( 'single', () => {
 			it( 'should infer the value type from available `options`, but not the `value` or `onChange` prop', () => {
 				const onChange: ( value: 'foo' | 'bar' ) => void = () => {};
@@ -217,5 +218,6 @@ describe( 'SelectControl', () => {
 				/>;
 			} );
 		} );
+		/* eslint-enable vitest/expect-expect */
 	} );
 } );

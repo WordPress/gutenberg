@@ -12,6 +12,10 @@ import {
 import { INSERTER_PATTERN_TYPES } from '../block-patterns-tab/utils';
 import { isFiltered } from '../../../store/utils';
 
+// Shared so the selector cache survives the inserter closing and reopening.
+const FILTERED_OPTIONS = { [ isFiltered ]: true };
+const UNFILTERED_OPTIONS = { [ isFiltered ]: false };
+
 /**
  * Retrieves the block patterns inserter state.
  *
@@ -28,10 +32,7 @@ const usePatternsState = (
 	selectedCategory,
 	isQuick
 ) => {
-	const options = useMemo(
-		() => ( { [ isFiltered ]: !! isQuick } ),
-		[ isQuick ]
-	);
+	const options = isQuick ? FILTERED_OPTIONS : UNFILTERED_OPTIONS;
 
 	// Check if we're editing a navigation-overlay template part.
 	// This information is passed through block editor settings to avoid

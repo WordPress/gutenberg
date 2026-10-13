@@ -233,7 +233,7 @@ export const STYLE_BOOK_IFRAME_STYLES = `
 	}
 
 	.editor-style-book__example.is-selected {
-		box-shadow: 0 0 0 1px var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+		box-shadow: 0 0 0 1px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 	}
 
 	.editor-style-book__example.is-disabled-example {
@@ -241,7 +241,7 @@ export const STYLE_BOOK_IFRAME_STYLES = `
 	}
 
 	.editor-style-book__example:focus:not(:disabled) {
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 		outline: 3px solid transparent;
 	}
 

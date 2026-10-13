@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
 import { useNavigate, useSearch } from '@wordpress/route';
 import { __ } from '@wordpress/i18n';
+import { inertValue } from '@wordpress/react-inert-value';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as bootStore } from '../../store';
@@ -157,8 +158,7 @@ export default function Canvas( { canvas }: CanvasProps ) {
 		<div style={ { height: '100%', position: 'relative' } }>
 			<div
 				style={ { height: '100%' } }
-				// @ts-expect-error inert not typed properly
-				inert={ canvas.isPreview ? 'true' : undefined }
+				inert={ inertValue( canvas.isPreview ) }
 			>
 				<Editor
 					postType={ canvas.postType }

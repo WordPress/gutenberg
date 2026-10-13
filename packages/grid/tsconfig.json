@@ -9,6 +9,7 @@
 		{ "path": "./tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../react-inert-value/tsconfig.build.json" },
 		{ "path": "../style-runtime/tsconfig.build.json" }
 	]
 }

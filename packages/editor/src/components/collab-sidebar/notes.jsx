@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useRef } from '@wordpress/element';
+import { Fragment, useContext, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Stack, Text } from '@wordpress/ui';
@@ -8,55 +8,47 @@ import {
 } from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
 import { NoteThread } from './note-thread';
+import { focusNoteThread } from './utils';
 import {
-	focusNoteThread,
-	getNoteIdsFromMetadata,
-	pickPrimaryNote,
-} from './utils';
-import { useFloatingBoard, useNoteActions } from './hooks';
+	NoteDraftsContext,
+	useFloatingBoard,
+	useNoteActions,
+	useNoteFocus,
+	usePickNote,
+} from './hooks';
 import { AddNote } from './add-note';
 import { store as editorStore } from '../../store';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
+export function Notes( { notes, sidebarRef, isFloating = false } ) {
 	const {
 		onCreate: onAddReply,
 		onEdit: onEditNote,
+		onDiscard,
 		onDelete,
 	} = useNoteActions();
 	const { selectNote } = unlock( useDispatch( editorStore ) );
-	const { selectBlock, toggleBlockSpotlight } = unlock(
-		useDispatch( blockEditorStore )
-	);
+	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
+	const drafts = useContext( NoteDraftsContext );
+	const pickNote = usePickNote( { drafts, onDiscard } );
+	useNoteFocus( { sidebarRef } );
 
-	const { noteId, selectedBlockClientId, orderedBlockIds } = useSelect(
+	const { selectedBlockClientId, orderedBlockIds } = useSelect(
 		( select ) => {
-			const {
-				getBlockAttributes,
-				getSelectedBlockClientId,
-				getClientIdsWithDescendants,
-			} = select( blockEditorStore );
-			const clientId = getSelectedBlockClientId();
+			const { getSelectedBlockClientId, getClientIdsWithDescendants } =
+				select( blockEditorStore );
 			return {
-				noteId: clientId
-					? getBlockAttributes( clientId )?.metadata?.noteId
-					: null,
-				selectedBlockClientId: clientId,
+				selectedBlockClientId: getSelectedBlockClientId(),
 				orderedBlockIds: getClientIdsWithDescendants(),
 			};
 		},
 		[]
 	);
-	const { selectedNote, noteFocused } = useSelect( ( select ) => {
-		const { getSelectedNote, isNoteFocused } = unlock(
-			select( editorStore )
-		);
-		return {
-			selectedNote: getSelectedNote(),
-			noteFocused: isNoteFocused(),
-		};
-	}, [] );
+	const selectedNote = useSelect(
+		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
+		[]
+	);
 
 	const relatedBlockElement = useBlockElement( selectedBlockClientId );
 
@@ -114,13 +106,8 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 
 		const adjacentThread = nextThread ?? prevThread;
 		if ( adjacentThread ) {
-			selectNote( adjacentThread.id );
+			pickNote( adjacentThread.id, adjacentThread.blockClientId );
 			focusNoteThread( adjacentThread.id, sidebarRef.current );
-			if ( adjacentThread.blockClientId ) {
-				toggleBlockSpotlight( adjacentThread.blockClientId, true );
-				// Pass `null` as the second parameter to prevent focusing the block.
-				selectBlock( adjacentThread.blockClientId, null );
-			}
 		} else {
 			selectNote( undefined );
 			toggleBlockSpotlight( note.blockClientId, false );
@@ -129,51 +116,13 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 		}
 	};
 
-	// Pick the most relevant thread for the selected block. Derived outside
-	// the effect so the effect body stays minimal.
-	const targetNoteId = useMemo( () => {
-		const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
-		const blockThreads = notes.filter( ( t ) =>
-			blockNoteIds.includes( t.id )
-		);
-		return pickPrimaryNote( blockThreads )?.id;
-	}, [ noteId, notes ] );
-
-	// Sync the selected note to the new block's primary thread when the
-	// block context changes. The ref tracks the previous block id so the
-	// effect only fires on block transitions, leaving in-block note changes
-	// (Escape, Cancel, "new" form) alone.
-	const prevBlockIdRef = useRef( selectedBlockClientId );
-	useEffect( () => {
-		if ( prevBlockIdRef.current === selectedBlockClientId ) {
-			return;
-		}
-		prevBlockIdRef.current = selectedBlockClientId;
-		selectNote( targetNoteId );
-	}, [ selectedBlockClientId, targetNoteId, selectNote ] );
-
-	// Focus the selected note when requested.
-	useEffect( () => {
-		if ( noteFocused && selectedNote ) {
-			focusNoteThread(
-				selectedNote,
-				sidebarRef.current,
-				selectedNote === 'new' ? '[role="textbox"]' : undefined
-			);
-			// Clear focus flag to avoid re-triggering.
-			selectNote( selectedNote );
-		}
-	}, [ noteFocused, selectedNote, selectNote, sidebarRef ] );
-
-	const { notePositions, registerThread, unregisterThread } =
+	const { notePositions, heights, registerThread, unregisterThread } =
 		useFloatingBoard( {
 			threads,
 			selectedNoteId: selectedNote,
 			isFloating,
 			sidebarRef,
 		} );
-
-	const hasThreads = Array.isArray( threads ) && threads.length > 0;
 
 	const navigate = ( event, thread, isSelected ) => {
 		if ( event.defaultPrevented ) {
@@ -189,12 +138,7 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 			! isSelected
 		) {
 			// Expand thread.
-			selectNote( thread.id );
-			if ( !! thread.blockClientId ) {
-				// Pass `null` as the second parameter to prevent focusing the block.
-				selectBlock( thread.blockClientId, null );
-				toggleBlockSpotlight( thread.blockClientId, true );
-			}
+			pickNote( thread.id, thread.blockClientId );
 		} else if (
 			( ( event.key === 'Enter' || event.key === 'ArrowLeft' ) &&
 				isSelfTarget &&
@@ -207,31 +151,21 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 				toggleBlockSpotlight( thread.blockClientId, false );
 			}
 			focusNoteThread( thread.id, sidebarRef.current );
-		} else if (
-			event.key === 'ArrowDown' &&
-			currentIndex < threads.length - 1 &&
-			isSelfTarget
-		) {
-			focusNoteThread(
-				threads[ currentIndex + 1 ].id,
-				sidebarRef.current
-			);
-		} else if (
-			event.key === 'ArrowUp' &&
-			currentIndex > 0 &&
-			isSelfTarget
-		) {
-			focusNoteThread(
-				threads[ currentIndex - 1 ].id,
-				sidebarRef.current
-			);
-		} else if ( event.key === 'Home' && isSelfTarget ) {
-			focusNoteThread( threads[ 0 ].id, sidebarRef.current );
-		} else if ( event.key === 'End' && isSelfTarget ) {
-			focusNoteThread(
-				threads[ threads.length - 1 ].id,
-				sidebarRef.current
-			);
+		} else if ( isSelfTarget ) {
+			const targetIndex = {
+				ArrowDown: Math.min( currentIndex + 1, threads.length - 1 ),
+				ArrowUp: Math.max( currentIndex - 1, 0 ),
+				Home: 0,
+				End: threads.length - 1,
+			}[ event.key ];
+			if ( targetIndex !== undefined ) {
+				// The floating panel scrolls; keep the key from scrolling it too.
+				event.preventDefault();
+				focusNoteThread(
+					threads[ targetIndex ].id,
+					sidebarRef.current
+				);
+			}
 		}
 	};
 
@@ -246,11 +180,12 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 				( thread ) =>
 					thread.status === 'approved' && !! thread.blockClientId
 			);
+	const isAddingNote =
+		! isFloating && selectedNote === 'new' && !! selectedBlockClientId;
 
 	return (
 		<Stack
 			className="editor-collab-sidebar-panel"
-			style={ styles }
 			role="tree"
 			direction="column"
 			gap="md"
@@ -266,59 +201,58 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 				isFloating ? __( 'Unresolved notes' ) : __( 'All notes' )
 			}
 		>
-			{ ! hasThreads && ! isFloating ? (
-				<AddNote onSubmit={ onAddReply } sidebarRef={ sidebarRef } />
-			) : (
-				<>
-					{ ! isFloating && selectedNote === 'new' && (
-						<AddNote
-							onSubmit={ onAddReply }
-							sidebarRef={ sidebarRef }
-						/>
-					) }
-					{ threads.map( ( thread, index ) => (
-						<Fragment key={ thread.id }>
-							{ index === firstResolvedIndex && (
-								<Stack
-									direction="row"
-									align="center"
-									justify="center"
-									gap="sm"
-									className="editor-collab-sidebar-panel__status-separator"
-								>
-									<Text variant="heading-sm" render={ <p /> }>
-										{ __( 'Resolved' ) }
-									</Text>
-								</Stack>
-							) }
-							<NoteThread
-								note={ thread }
-								onAddReply={ onAddReply }
-								onDeleteNote={ handleDelete }
-								onEditNote={ onEditNote }
-								isSelected={ selectedNote === thread.id }
-								sidebarRef={ sidebarRef }
-								floating={
-									isFloating
-										? {
-												y: notePositions[ thread.id ],
-												registerThread,
-												unregisterThread,
-											}
-										: undefined
-								}
-								onKeyDown={ ( event ) =>
-									navigate(
-										event,
-										thread,
-										selectedNote === thread.id
-									)
-								}
-							/>
-						</Fragment>
-					) ) }
-				</>
+			{ isAddingNote && (
+				<AddNote
+					key={ selectedBlockClientId }
+					clientId={ selectedBlockClientId }
+					onSubmit={ onAddReply }
+					onDiscard={ onDiscard }
+					sidebarRef={ sidebarRef }
+				/>
 			) }
+			{ threads.map( ( thread, index ) => (
+				<Fragment key={ thread.id }>
+					{ index === firstResolvedIndex && (
+						<Stack
+							direction="row"
+							align="center"
+							justify="center"
+							gap="sm"
+							className="editor-collab-sidebar-panel__status-separator"
+						>
+							<Text variant="heading-sm" render={ <p /> }>
+								{ __( 'Resolved' ) }
+							</Text>
+						</Stack>
+					) }
+					<NoteThread
+						note={ thread }
+						onAddReply={ onAddReply }
+						onDiscard={ onDiscard }
+						onDeleteNote={ handleDelete }
+						onEditNote={ onEditNote }
+						isSelected={ selectedNote === thread.id }
+						sidebarRef={ sidebarRef }
+						floating={
+							isFloating
+								? {
+										y: notePositions[ thread.id ],
+										height: heights[ thread.id ],
+										registerThread,
+										unregisterThread,
+									}
+								: undefined
+						}
+						onKeyDown={ ( event ) =>
+							navigate(
+								event,
+								thread,
+								selectedNote === thread.id
+							)
+						}
+					/>
+				</Fragment>
+			) ) }
 		</Stack>
 	);
 }

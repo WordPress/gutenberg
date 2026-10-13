@@ -162,6 +162,10 @@ class ToolbarRovingTabindexUtils {
 	}
 
 	async expectLabelToHaveFocus( label ) {
+		if ( label.startsWith( 'Block: ' ) ) {
+			await this.expectBlockToOwnFocus( label );
+			return;
+		}
 		let ariaLabel = await this.editor.getFocusOwnerLabel();
 		// If the labels don't match, try pressing Up Arrow to focus the block wrapper in non-content editable block.
 		if ( ariaLabel !== label ) {
@@ -169,6 +173,32 @@ class ToolbarRovingTabindexUtils {
 			ariaLabel = await this.editor.getFocusOwnerLabel();
 		}
 		expect( ariaLabel ).toBe( label );
+	}
+
+	// The selected block is the labelled one, and it owns focus: it is
+	// focused itself, or the focused editing host contains it and the
+	// selection.
+	async expectBlockToOwnFocus( label ) {
+		const block = this.editor.canvas.locator(
+			`[data-block="${ await this.getSelectedBlockClientId() }"]`
+		);
+		await expect( block ).toHaveAttribute( 'aria-label', label );
+		if ( ! ( await this.editor.ownsSelection( block ) ) ) {
+			// Focus may be within a block without text (e.g. on an image
+			// placeholder button): ArrowUp moves it to the block wrapper.
+			await this.page.keyboard.press( 'ArrowUp' );
+		}
+		await expect
+			.poll( () => this.editor.ownsSelection( block ) )
+			.toBe( true );
+	}
+
+	async getSelectedBlockClientId() {
+		return this.page.evaluate( () =>
+			window.wp.data
+				.select( 'core/block-editor' )
+				.getSelectedBlockClientId()
+		);
 	}
 
 	async wrapCurrentBlockWithGroup( currentBlockTitle ) {

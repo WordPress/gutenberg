@@ -11,6 +11,7 @@ const {
 	getRegionRootFragment,
 	initialVdomPromise,
 	toVdom,
+	parseDirectiveValue,
 	render,
 	parseServerData,
 	populateServerData,
@@ -20,6 +21,8 @@ const {
 	navigationSignal,
 	sessionId,
 	warn,
+	afterNextFrame,
+	getScope,
 } = privateApis(
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
 );
@@ -35,6 +38,15 @@ export interface NavigateOptions {
 	timeout?: number;
 	loadingAnimation?: boolean;
 	screenReaderAnnouncement?: boolean;
+	/**
+	 * Who started this navigation, published on `state.initiator` while the
+	 * navigation is in flight. A nonempty string (for example a router region
+	 * id) is used as is. `null` suppresses attribution silently. When omitted,
+	 * the router derives it from the directive scope the action was called from.
+	 * An empty string or any other invalid value resolves to `null`, warns when
+	 * `SCRIPT_DEBUG` is enabled, and never derives an initiator.
+	 */
+	initiator?: string | null;
 }
 
 export interface PrefetchOptions {
@@ -73,19 +85,41 @@ const getPagePath = ( url: string ) => {
 };
 
 /**
- * Parses the given region's directive.
+ * Parses the given region's directive using the runtime's shared directive
+ * value parser.
  *
  * @param region Region element.
- * @return Data contained in the region directive value.
+ * @return The region `id` and optional `attachTo` selector.
  */
 const parseRegionAttribute = ( region: Element ) => {
-	const value = region.getAttribute( regionAttr );
-	try {
-		const { id, attachTo } = JSON.parse( value );
-		return { id, attachTo };
-	} catch {
+	const { value } = parseDirectiveValue(
+		region.getAttribute( regionAttr ) ?? ''
+	);
+	if ( typeof value === 'string' ) {
 		return { id: value };
 	}
+	return {
+		id: value.id as string,
+		attachTo: value.attachTo as string | undefined,
+	};
+};
+
+/**
+ * Extracts the region id from a `data-wp-router-region` attribute value.
+ *
+ * The parser returns either a string or an object with an `id` property. Only
+ * a nonempty string id counts; anything else yields `null`.
+ *
+ * @param value The raw `data-wp-router-region` attribute value, or `null`.
+ * @return The region id, or `null` when no usable id is present.
+ */
+const parseRegionId = ( value: string | null ): string | null => {
+	if ( value === null ) {
+		return null;
+	}
+	const { value: parsedValue } = parseDirectiveValue( value );
+	const id = typeof parsedValue === 'string' ? parsedValue : parsedValue.id;
+	return typeof id === 'string' && id ? id : null;
 };
 
 /**
@@ -192,8 +226,12 @@ const preparePage: PreparePage = async ( url, dom, { vdom } = {} ) => {
 	// This prevents browsers from extracting styles from noscript tags.
 	dom.querySelectorAll( 'noscript' ).forEach( ( el ) => el.remove() );
 
-	const regions = {};
-	const regionsToAttach = {};
+	// Preserve every extracted region id as an own enumerable key, including
+	// ids that collide with Object.prototype properties.
+	const regions: Record< string, any > = Object.create( null );
+	// Preserve every extracted attachment selector under its region id for the
+	// render pass, including ids that collide with Object.prototype properties.
+	const regionsToAttach: Record< string, string > = Object.create( null );
 	dom.querySelectorAll( regionsSelector ).forEach( ( region ) => {
 		const { id, attachTo } = parseRegionAttribute( region );
 
@@ -325,18 +363,141 @@ const forcePageReload = ( href: string ) => {
 	return new Promise( () => {} );
 };
 
+// Safety timer (in ms) that resets a stuck `state.navigating`. It is armed in
+// two places: at the start of the popstate handler and right before
+// `navigate()` falls back to a full page reload. Both paths can leave a
+// navigation that never reaches its own end write (a promise that never
+// settles, or a reload whose new document never arrives), so this timer sets
+// `navigating` back to `false` after the bound. The callback only writes if
+// the navigation still holds the current token and `navigating` is still
+// `true`, so a navigation that ended normally or was superseded makes it a
+// no-op. It leaves `initiator` untouched, like every other end write.
+// Browsers may delay the callback in background tabs; the guard makes that
+// harmless.
+//
+// The value matches `navigate()`'s default `timeout` by choice, but the two
+// are independent.
+const LIFECYCLE_RELEASE_BOUND = 10000;
+
+// Reloads the page on the popstate exits below and ends a superseded
+// lifecycle. If a navigation was in flight, the traversal superseded it:
+// end its lifecycle and clear the retained `initiator`, writing only the
+// keys that actually change so no watcher is notified for nothing. The
+// `finally` guarantees the discharge runs even if `reload()` throws
+// synchronously or the new document never arrives.
+const reloadAndDischarge = ( token: number ) => {
+	try {
+		window.location.reload();
+	} finally {
+		if (
+			currentNavigationId === token &&
+			( state.navigating ||
+				( state.initiator !== null && state.initiator !== undefined ) )
+		) {
+			batch( () => {
+				if ( state.navigating ) {
+					state.navigating = false;
+				}
+				if ( state.initiator !== null ) {
+					state.initiator = null;
+				}
+			} );
+		}
+	}
+};
+
 // Listen to the back and forward buttons and restore the page if it's in the
 // cache.
+//
+// Every write that ends a navigation lifecycle in this file (in `navigate()`'s
+// `finally`, in this handler, and in the release timers) is guarded by
+// `currentNavigationId === token`. Any new lifecycle write needs the same
+// guard, or a stale navigation could end a newer one. Derivation reads
+// whatever scope is ambient at `navigate()` entry: an unwrapped `watch()`
+// callback contributes no scope, while a `withScope()`-wrapped callback
+// contributes the scope it installed.
 window.addEventListener( 'popstate', async () => {
 	const pagePath = getPagePath( window.location.href ); // Remove hash.
-	const page = pages.has( pagePath ) && ( await pages.get( pagePath ) );
-	if ( page ) {
+
+	// Claim the lifecycle token (see the `navigationId` comment above
+	// `navigate()`). From here on this handler is responsible for ending the
+	// lifecycle on every exit path.
+	const token = ++navigationId;
+	currentNavigationId = token;
+
+	// Arm the release timer before deciding whether to reload, so that a
+	// reload whose new document never arrives, or an `await` that never
+	// settles, still ends the lifecycle. The timer is never cleared: its guard
+	// already makes it a no-op once the lifecycle has ended.
+	setTimeout( () => {
+		if ( currentNavigationId === token && state.navigating ) {
+			state.navigating = false;
+		}
+	}, LIFECYCLE_RELEASE_BOUND );
+
+	// Reload first when the page is not cached, before any state write. This
+	// way no consumer effect can run (and throw) before the reload starts.
+	if ( ! pages.has( pagePath ) ) {
+		reloadAndDischarge( token );
+		return;
+	}
+
+	try {
+		// Clear an identity retained from either a superseded in-flight
+		// navigation or a completed navigation while idle. A plain idle
+		// traversal leaves a never-written key absent.
+		if ( state.initiator !== null && state.initiator !== undefined ) {
+			state.initiator = null;
+		}
+
+		const page = await pages.get( pagePath );
+
+		// A cached entry that resolved to nothing also reloads. The claim-frame
+		// clear above already ran; on this exit, reload comes before the
+		// discharge, which writes only what changes.
+		if ( ! page ) {
+			reloadAndDischarge( token );
+			return;
+		}
+
+		// Start of the lifecycle. If a `navigate()` call is still in flight,
+		// `navigating` is already `true` and the signal dedups the write.
+		if ( currentNavigationId === token ) {
+			batch( () => {
+				state.navigating = true;
+				state.initiator = null;
+			} );
+		}
+
 		batch( () => {
 			state.url = window.location.href;
 			renderPage( page );
 		} );
-	} else {
-		window.location.reload();
+
+		// Schedule the end write on the next frame, like `navigate()` does, so
+		// directives observe the transition (see the comment on that write).
+		// The guard is re-checked inside the callback because a newer
+		// navigation may have claimed the token in the meantime.
+		if ( currentNavigationId === token ) {
+			afterNextFrame( () => {
+				if ( currentNavigationId === token ) {
+					state.navigating = false;
+				}
+			} );
+		}
+	} catch ( error ) {
+		// The reload paths above handle their own end writes, so a `finally`
+		// here would wrongly end a lifecycle on those exits. Errors are handled
+		// here instead: schedule the guarded end write and rethrow at once,
+		// with nothing asynchronous in between.
+		if ( currentNavigationId === token && state.navigating ) {
+			afterNextFrame( () => {
+				if ( currentNavigationId === token ) {
+					state.navigating = false;
+				}
+			} );
+		}
+		throw error;
 	}
 } );
 
@@ -371,6 +532,15 @@ window.document
 // Variable to store the current navigation.
 let navigatingTo = '';
 
+// Token that identifies the navigation currently in flight. A navigation
+// claims it with `currentNavigationId = ++navigationId` and then guards all
+// its lifecycle writes (`state.navigating` and `state.initiator`) with
+// `currentNavigationId === token`, so a superseded navigation never writes
+// over a newer one. Whoever claims the token must end the lifecycle on every
+// exit path.
+let navigationId = 0;
+let currentNavigationId = 0;
+
 let hasLoadedNavigationTextsData = false;
 const navigationTexts = {
 	loading: 'Loading page, please wait.',
@@ -384,6 +554,10 @@ interface Store {
 			hasStarted: boolean;
 			hasFinished: boolean;
 		};
+		// Both keys stay `undefined` until the first navigation. See the
+		// comment on the store literal below.
+		navigating?: boolean;
+		initiator?: string | null;
 	};
 	actions: {
 		navigate: (
@@ -393,6 +567,59 @@ interface Store {
 		prefetch: ( url: string, options?: PrefetchOptions ) => Promise< void >;
 	};
 }
+
+/**
+ * Resolves the `initiator` option of `actions.navigate()` into the value
+ * published on `state.initiator`.
+ *
+ * A nonempty string is returned as is; `null` suppresses attribution silently.
+ * When the option is omitted, the initiator is derived from
+ * whatever directive scope is ambient when the action is called: the id of
+ * the closest router region (including the element itself), or `null` when
+ * there is none. An unwrapped `watch()` callback contributes no scope, while
+ * a `withScope()`-wrapped callback contributes the scope it installed. An
+ * empty string or any other invalid value warns when `SCRIPT_DEBUG` is
+ * enabled, resolves to `null`, and never derives an initiator.
+ *
+ * Derivation never throws. It returns `null` for a call made outside any
+ * scope, for a scope whose `ref.current` is not an element, and for an
+ * element with no enclosing region. There is no `isConnected` check on
+ * purpose: a detached element still inside a region reports that region.
+ *
+ * It must run synchronously at the start of `navigate()`, before any
+ * `yield`, because the store proxy only keeps the caller's scope active for
+ * the synchronous part of the call. Timer callbacks and awaited
+ * continuations run without it.
+ *
+ * @param declared The raw `options.initiator` value passed to `navigate()`.
+ * @return The value to publish on `state.initiator`.
+ */
+const resolveInitiator = ( declared: unknown ): string | null => {
+	if ( typeof declared === 'string' && declared !== '' ) {
+		return declared;
+	}
+	if ( declared === null ) {
+		return null;
+	}
+	if ( declared === undefined ) {
+		const scope = getScope();
+		const element = scope?.ref?.current;
+		if ( typeof element?.closest !== 'function' ) {
+			return null;
+		}
+		const region = element.closest( `[${ regionAttr }]` );
+		if ( ! region ) {
+			return null;
+		}
+		return parseRegionId( region.getAttribute( regionAttr ) );
+	}
+	if ( globalThis.SCRIPT_DEBUG ) {
+		warn(
+			'The `initiator` option of `actions.navigate()` must be a nonempty string or null. Ignoring the value.'
+		);
+	}
+	return null;
+};
 
 const { state: privateState } = store(
 	'core/router/private',
@@ -409,6 +636,10 @@ const { state: privateState } = store(
 
 export const { state, actions } = store< Store >( 'core/router', {
 	state: {
+		// `navigating` and `initiator` are deliberately not declared here.
+		// Giving them an idle value would change a tracked signal from
+		// `undefined` to a value when the router module lazily loads, which
+		// would re-run every watcher already bound to them.
 		get navigation() {
 			if ( globalThis.SCRIPT_DEBUG ) {
 				warn(
@@ -434,6 +665,7 @@ export const { state, actions } = store< Store >( 'core/router', {
 		 * @param [options.timeout]                  Time until the navigation is aborted, in milliseconds. Default is 10000.
 		 * @param [options.loadingAnimation]         Whether an animation should be shown while navigating. Default to `true`.
 		 * @param [options.screenReaderAnnouncement] Whether a message for screen readers should be announced while navigating. Default to `true`.
+		 * @param [options.initiator]                Who started the navigation. A nonempty string is used as is; `null` suppresses attribution silently; omitting it derives the value from the directive scope. An empty string or any other invalid value warns when `SCRIPT_DEBUG` is enabled, resolves to `null`, and never derives an initiator.
 		 *
 		 * @return  Promise that resolves once the navigation is completed or aborted.
 		 */
@@ -442,6 +674,12 @@ export const { state, actions } = store< Store >( 'core/router', {
 			if ( clientNavigationDisabled ) {
 				yield forcePageReload( href );
 			}
+
+			// Derive the initiator now, before any `yield`, while the caller's
+			// scope is still active. An unwrapped `watch()` callback contributes
+			// no scope, while a `withScope()`-wrapped callback contributes the
+			// scope it installed.
+			const initiator = resolveInitiator( options.initiator );
 
 			const pagePath = getPagePath( href );
 			const { navigation } = privateState;
@@ -475,58 +713,108 @@ export const { state, actions } = store< Store >( 'core/router', {
 				}
 			}, 400 );
 
-			const page = yield Promise.race( [
-				pages.get( pagePath ),
-				timeoutPromise,
-			] );
+			// Claim the lifecycle token. This navigation must end the lifecycle
+			// on every exit path; see the `finally` below.
+			const token = ++navigationId;
+			currentNavigationId = token;
 
-			// Dismisses loading message if it hasn't been added yet.
-			clearTimeout( loadingTimeout );
-
-			// Once the page is fetched, the destination URL could have changed
-			// (e.g., by clicking another link in the meantime). If so, bail
-			// out, and let the newer execution to update the HTML.
-			if ( navigatingTo !== href ) {
-				return;
-			}
-
-			if (
-				page &&
-				! page.initialData?.config?.[ 'core/router' ]
-					?.clientNavigationDisabled
-			) {
-				yield importScriptModules( page.scriptModules );
-
+			try {
+				// Write both keys in one batch so no watcher sees `navigating`
+				// as `true` before `initiator` is set. No token guard is needed:
+				// this runs synchronously, before any other navigation can
+				// claim the token. Derivation reads whatever scope is ambient at
+				// the `navigate()` entry, before this batch begins.
 				batch( () => {
-					// Updates the URL in the state.
-					state.url = href;
-
-					// Updates the navigation status once the new page rendering
-					// has been completed.
-					if ( loadingAnimation ) {
-						navigation.hasStarted = false;
-						navigation.hasFinished = true;
-					}
-
-					// Renders the new page.
-					renderPage( page );
+					state.navigating = true;
+					state.initiator = initiator;
 				} );
 
-				window.history[
-					options.replace ? 'replaceState' : 'pushState'
-				]( { wpInteractivityId: sessionId }, '', href );
+				const page = yield Promise.race( [
+					pages.get( pagePath ),
+					timeoutPromise,
+				] );
 
-				if ( screenReaderAnnouncement ) {
-					a11ySpeak( 'loaded' );
+				// Dismisses loading message if it hasn't been added yet.
+				clearTimeout( loadingTimeout );
+
+				// Once the page is fetched, the destination URL could have changed
+				// (e.g., by clicking another link in the meantime). If so, bail
+				// out, and let the newer execution to update the HTML.
+				if ( navigatingTo !== href ) {
+					return;
 				}
 
-				// Scroll to the anchor if exits in the link.
-				const { hash } = new URL( href, window.location.href );
-				if ( hash ) {
-					document.querySelector( hash )?.scrollIntoView();
+				if (
+					page &&
+					! page.initialData?.config?.[ 'core/router' ]
+						?.clientNavigationDisabled
+				) {
+					yield importScriptModules( page.scriptModules );
+
+					// The batch keeps `state.url` and `renderPage()` together so
+					// consumers see the URL and the DOM change at once. Derivation
+					// reads whatever scope is ambient at the `navigate()` entry.
+					batch( () => {
+						// Updates the URL in the state.
+						state.url = href;
+
+						// Updates the navigation status once the new page rendering
+						// has been completed.
+						if ( loadingAnimation ) {
+							navigation.hasStarted = false;
+							navigation.hasFinished = true;
+						}
+
+						// Renders the new page.
+						renderPage( page );
+					} );
+
+					window.history[
+						options.replace ? 'replaceState' : 'pushState'
+					]( { wpInteractivityId: sessionId }, '', href );
+
+					if ( screenReaderAnnouncement ) {
+						a11ySpeak( 'loaded' );
+					}
+
+					// Scroll to the anchor if exits in the link.
+					const { hash } = new URL( href, window.location.href );
+					if ( hash ) {
+						document.querySelector( hash )?.scrollIntoView();
+					}
+				} else {
+					// `forcePageReload()` never resolves, so the `finally` below
+					// never runs if the new document does not arrive. Arm the
+					// release timer so `navigating` is still reset. It leaves
+					// `initiator` untouched.
+					setTimeout( () => {
+						if (
+							currentNavigationId === token &&
+							state.navigating
+						) {
+							state.navigating = false;
+						}
+					}, LIFECYCLE_RELEASE_BOUND );
+					yield forcePageReload( href );
 				}
-			} else {
-				yield forcePageReload( href );
+			} finally {
+				// The end write. It runs on the next frame, like every other end
+				// write, so the directive runtime's frame scheduler observes the
+				// transition; a microtask or a plain `setTimeout` would hide it
+				// from directive consumers. The guard is re-checked inside the
+				// callback because a second click or a Back press can claim the
+				// token before the frame runs.
+				//
+				// Derivation reads whatever scope is ambient at `navigate()` entry.
+				// An unwrapped `watch()` callback contributes no scope, while a
+				// `withScope()`-wrapped callback contributes the scope it installed.
+				if ( currentNavigationId === token ) {
+					afterNextFrame( () => {
+						if ( currentNavigationId === token ) {
+							state.navigating = false;
+						}
+					} );
+				}
 			}
 		},
 

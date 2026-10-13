@@ -1,7 +1,6 @@
 import { useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { unseen } from '@wordpress/icons';
-// eslint-disable-next-line @wordpress/use-recommended-components
 import { Notice } from '@wordpress/ui';
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';

@@ -1,4 +1,5 @@
 import { getLazyWidgetComponent } from '../../tools/get-lazy-widget-component';
+import { WidgetActionsCollector } from '../../widget-host/widget-actions-collector';
 import type { ResolveWidgetModule, WidgetType } from '../../types';
 
 interface WidgetRenderProps< Item = unknown > {
@@ -25,13 +26,13 @@ export function WidgetRender< Item = unknown >( {
 	);
 
 	return (
-		<>
+		<WidgetActionsCollector>
 			{ /* Cached `lazy()` keyed by renderModule; identity is stable across renders. */ }
 			{ /* eslint-disable-next-line react-hooks/static-components */ }
 			<WidgetComponent
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 			/>
-		</>
+		</WidgetActionsCollector>
 	);
 }

@@ -15,6 +15,63 @@ This README is the entry point for package consumers. It covers how to load desi
 - To pick the right design token or browse every available token, see the generated [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md).
 - To edit token source files, see the [Design Tokens Maintainer's Guide](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/tokens/README.md).
 
+## Public API
+
+| Entrypoint | Supported use |
+| --- | --- |
+| `@wordpress/theme` | `ThemeProvider` and the generated token scale types, such as `PaddingSize` and `GapSize`. Derive provider props and callback types from the component as shown below. |
+| `@wordpress/theme/design-tokens.css` | Default semantic `--wpds-*` custom properties. Load once per document. |
+| `@wordpress/theme/design-tokens.js` | Default token-name array, plus `tokens` metadata and `groups` named exports. Does not load styles. |
+| Build plugin subpaths | The four public integrations listed under [Build Plugins](#build-plugins). |
+| Stylelint plugin subpaths | The three public rules listed under [Stylelint Plugins](#stylelint-plugins). |
+
+The `privateApis` export exists for temporary compatibility with older WordPress bundles. It is not a supported consumer API. Token source JSON, ramp builders, generated fallback maps, and other paths not listed in the package's `exports` are implementation details.
+
+Runtime APIs supplied by WordPress follow its [backward compatibility policy](https://developer.wordpress.org/block-editor/contributors/code/backward-compatibility/). Installing a newer npm package does not upgrade the runtime supplied by WordPress. Check the target WordPress version before using a runtime API. Tooling subpaths use the installed npm package. Removing or renaming semantic tokens is a compatibility change; meaningful value changes belong in the changelog.
+
+To inspect token names in development tooling:
+
+```js
+import { tokens } from '@wordpress/theme/design-tokens.js';
+
+const tokenNames = Object.keys( tokens );
+const isKnownToken = tokenNames.includes( '--wpds-dimension-gap-sm' );
+```
+
+To inspect token metadata and default values:
+
+```js
+import { tokens, groups } from '@wordpress/theme/design-tokens.js';
+
+const brand = tokens[ '--wpds-color-background-interactive-brand-strong' ];
+// brand.modes.default.css: '#3858e9'
+// brand.fallback: 'var(--wp-admin-theme-color, #3858e9)'
+
+const radiusTokenNames = groups.border.groups.radius.tokens;
+const fontFamilyTokenNames = groups.typography.groups[ 'font-family' ].tokens;
+```
+
+`tokens` is keyed by semantic CSS custom property name. Each entry has `$description`, `$type`, `group`, `fallback`, and `modes.default`, containing the resolved DTCG `$value` and CSS string `css`. `group` identifies the top-level namespace, such as `border`, `color`, or `typography`.
+
+`groups` preserves the source token hierarchy, keyed by top-level namespace. Each group has a `tokens` array of CSS custom property names belonging directly to it and a `groups` object containing its child groups. These are empty when the group has no direct tokens or children, respectively.
+
+`modes.default` contains build-time defaults and does not reflect theme overrides. Use CSS custom properties to follow the current theme. `fallback` is the expression used by the build plugins when a token variable is unavailable and can differ from the default value, as shown above.
+
+Literal token types are preserved in TypeScript declarations, allowing narrowing by `$type`.
+
+To build a fallback map for a custom plugin:
+
+```js
+import { tokens } from '@wordpress/theme/design-tokens.js';
+
+const tokenFallbacks = Object.fromEntries(
+	Object.entries( tokens ).map( ( [ name, token ] ) => [
+		name,
+		token.fallback,
+	] )
+);
+```
+
 ## Design Tokens
 
 Design tokens are named values that describe the visual purpose of a value. Rather than hardcoding values like `#3858e9` or `16px`, use semantic custom properties like `--wpds-color-background-interactive-brand-strong` or `--wpds-dimension-padding-2xl`.
@@ -52,7 +109,7 @@ npm install @wordpress/theme
 import '@wordpress/theme/design-tokens.css';
 ```
 
-The package's JavaScript entrypoints are ESM-only and require Node.js `^20.19.0` or `>=22.13.0`. Use `import` syntax from ESM or TypeScript configuration files.
+The package's JavaScript entrypoints are ESM-only and require Node.js `>=22.13.0`. Use `import` syntax from ESM or TypeScript configuration files.
 
 TypeScript consumers require TypeScript 5 or newer.
 
@@ -101,6 +158,10 @@ function App() {
 }
 ```
 
+When a setting is omitted, it inherits from the closest parent `ThemeProvider`. If there is no parent value, the prebuilt defaults from the design-tokens stylesheet apply.
+
+`ThemeProvider` does not accept wrapper customization props such as `className`, `style`, `as`, `render`, or `ref`.
+
 The `color` prop accepts an object with the following optional properties:
 
 - `primary`: The primary/accent seed color (default: `'#3858e9'`).
@@ -128,15 +189,38 @@ Use `onColorWarnings` to receive structured warnings after the provider calculat
 
 The callback reports failures from the generated ramp checks and a defined set of semantic foreground/background pairs. It does not validate every possible token pairing. It receives an empty array when all checked targets are met. Ramp warnings identify the affected ramp and step. Contrast warnings identify the semantic foreground/background token pair and include the required and achieved contrast values. React may invoke the callback more than once in development under Strict Mode.
 
+### TypeScript props and warnings
+
+Derive types from the public component instead of importing package internals:
+
+```ts
+import type { ComponentProps } from 'react';
+import { ThemeProvider } from '@wordpress/theme';
+
+type ThemeProviderProps = ComponentProps< typeof ThemeProvider >;
+type OnColorWarnings = NonNullable< ThemeProviderProps[ 'onColorWarnings' ] >;
+type ThemeProviderColorWarning = Parameters< OnColorWarnings >[ 0 ][ number ];
+
+const onColorWarnings: OnColorWarnings = ( warnings ) => {
+	for ( const warning of warnings ) {
+		if ( warning.type === 'contrast' ) {
+			console.log( warning.foregroundToken, warning.achievedContrast );
+		} else {
+			console.log( warning.ramp, warning.step );
+		}
+	}
+};
+```
+
+The derived warning type is a union. Check `type` before accessing the fields specific to ramp or contrast warnings. Derive individual settings in the same way, for example `ThemeProviderProps[ 'cornerRadius' ]`.
+
+### Cursor and corner radius
+
 The `cursor` prop accepts an object with the following optional properties:
 
 - `control`: The cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). Accepts `'default'` or `'pointer'` (default: `'pointer'`).
 
 The `cornerRadius` prop sets the overall roundness preset for the theme subtree. Accepts `'none'` (square corners), `'subtle'`, `'moderate'`, or `'pronounced'` (most rounded) (default: `'subtle'`). This scales the primitive `--wpds-border-radius-*` tokens for the provider subtree. The preset sets the overall amount of roundness, not an individual border-radius token size.
-
-When a setting is omitted, it inherits from the closest parent `ThemeProvider`. If there is no parent value, the prebuilt defaults from the design-tokens stylesheet apply.
-
-`ThemeProvider` does not accept wrapper customization props such as `className`, `style`, `as`, `render`, or `ref`.
 
 ### Light and dark themes
 
@@ -228,7 +312,8 @@ This step will:
 2. Generate primitive tokens.
 3. Build CSS and JavaScript token files.
 4. Update the design tokens documentation.
-5. Format all generated files.
+5. Generate complete Figma border collection mode files in `prebuilt/figma`.
+6. Format all generated files.
 
 The files generated in this step will all be committed to the repo.
 
@@ -310,7 +395,7 @@ const { code } = transform( {
 } );
 ```
 
-> **Note:** CSS Modules [`from global`](https://lightningcss.dev/css-modules.html#local-css-variables) references (for example `var(--wpds-dimension-gap-sm from global)` with `cssModules.dashedIdents`) are not yet supported. The visitor rebuilds `var()` from the token name alone, so `from` metadata is dropped and global custom properties may be incorrectly hashed.
+The visitor preserves CSS Modules [`from global`](https://lightningcss.dev/css-modules.html#local-css-variables) references such as `var(--wpds-dimension-gap-sm from global)` when it adds a fallback. Custom properties inside generated fallbacks, including `--wp-admin-*` variables, also remain global so admin overrides still apply.
 
 ### esbuild
 

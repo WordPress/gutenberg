@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { addFilter } from '@wordpress/hooks';
-import { getBlockSupport } from '@wordpress/blocks';
+import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useMemo } from '@wordpress/element';
 import {
 	getColorClassName,
@@ -8,7 +8,10 @@ import {
 } from '../components/colors';
 import { __experimentalGetGradientClass } from '../components/gradients';
 import { transformStyles, shouldSkipSerialization } from './utils';
-import { getBackgroundImageClasses } from './background';
+import {
+	BACKGROUND_SUPPORT_KEY,
+	getBackgroundImageClasses,
+} from './background';
 import { useSettings } from '../components/use-settings';
 
 export const COLOR_SUPPORT_KEY = 'color';
@@ -142,9 +145,21 @@ export function addSaveProps( props, blockNameOrType, attributes ) {
 
 	const serializeHasBackground =
 		shouldSerialize( 'background' ) || shouldSerialize( 'gradients' );
+	// Mirror of the background support: a color clipped to the text paints
+	// the glyphs, not the box.
+	const clipsToText =
+		'text' === style?.background?.backgroundClip &&
+		hasBlockSupport( blockNameOrType, [
+			BACKGROUND_SUPPORT_KEY,
+			'backgroundClip',
+		] ) &&
+		! shouldSkipSerialization(
+			blockNameOrType,
+			BACKGROUND_SUPPORT_KEY,
+			'backgroundClip'
+		);
 	const hasBackground =
-		backgroundColor ||
-		style?.color?.background ||
+		( ! clipsToText && ( backgroundColor || style?.color?.background ) ) ||
 		( hasGradient && ( gradient || style?.color?.gradient ) );
 
 	const newClassName = clsx( props.className, textClass, gradientClass, {
@@ -160,6 +175,26 @@ export function addSaveProps( props, blockNameOrType, attributes ) {
 	props.className = newClassName ? newClassName : undefined;
 
 	return props;
+}
+
+// Mirror of the background support's per-feature skip on the front end.
+function getSerializedBackgroundClasses( name, style ) {
+	const shouldSerialize = ( feature ) =>
+		! shouldSkipSerialization( name, BACKGROUND_SUPPORT_KEY, feature );
+
+	return getBackgroundImageClasses( {
+		background: {
+			backgroundImage: shouldSerialize( 'backgroundImage' )
+				? style?.background?.backgroundImage
+				: undefined,
+			gradient: shouldSerialize( 'gradient' )
+				? style?.background?.gradient
+				: undefined,
+			backgroundClip: shouldSerialize( 'backgroundClip' )
+				? style?.background?.backgroundClip
+				: undefined,
+		},
+	} );
 }
 
 function useBlockProps( {
@@ -183,11 +218,16 @@ function useBlockProps( {
 		],
 		[ userPalette, themePalette, defaultPalette ]
 	);
-	if (
-		! hasColorSupport( name ) ||
-		shouldSkipSerialization( name, COLOR_SUPPORT_KEY )
-	) {
+	if ( ! hasColorSupport( name ) ) {
 		return {};
+	}
+
+	// Each support adds `has-background` for the values it serializes, so a
+	// background image still adds it when color serialization is skipped.
+	const backgroundClassName = getSerializedBackgroundClasses( name, style );
+
+	if ( shouldSkipSerialization( name, COLOR_SUPPORT_KEY ) ) {
+		return backgroundClassName ? { className: backgroundClassName } : {};
 	}
 	const extraStyles = {};
 
@@ -217,18 +257,15 @@ function useBlockProps( {
 		style,
 	} );
 
-	const hasBackgroundValue =
-		backgroundColor ||
-		style?.color?.background ||
-		gradient ||
-		style?.color?.gradient;
+	const hasColorBackgroundClass = saveProps.className
+		?.split( ' ' )
+		.includes( 'has-background' );
 
 	return {
 		...saveProps,
 		className: clsx(
 			saveProps.className,
-			// Add background image classes in the editor, if not already handled by background color values.
-			! hasBackgroundValue && getBackgroundImageClasses( style )
+			! hasColorBackgroundClass && backgroundClassName
 		),
 	};
 }

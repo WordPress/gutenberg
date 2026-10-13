@@ -21,7 +21,7 @@ const WORKSPACE_ROUTING_COMMAND = 'node scripts/validate-test-routing.mjs';
 const ROOT_SHUFFLED_COMMAND =
 	'npm run --workspace @wordpress/unit-tests test:unit:vitest:shuffled --';
 const WORKSPACE_SHUFFLED_COMMAND =
-	'npm run test:unit:vitest -- --sequence.shuffle.files --sequence.seed=80855';
+	'npm run test:unit:vitest -- --sequence.shuffle.files --sequence.shuffle.tests';
 
 function normalizeShellCommand( command ) {
 	return command

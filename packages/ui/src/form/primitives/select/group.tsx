@@ -9,7 +9,7 @@ import itemPopupStyles from '../../../utils/css/item-popup.module.css';
  * `Select.GroupLabel`.
  */
 export const Group = forwardRef< HTMLDivElement, SelectGroupProps >(
-	function Group( { className, children, ...restProps }, ref ) {
+	function UnforwardedGroup( { className, children, ...restProps }, ref ) {
 		return (
 			<_Select.Group
 				className={ clsx( itemPopupStyles.group, className ) }
