@@ -5,6 +5,12 @@
 		.root {
 			--_wp-ui-avatar-size: var(--wpds-dimension-size-md);
 
+			--_gcd-span-position: relative;
+			--_gcd-span-display: inline-flex;
+			--_gcd-span-font-family: var(--wpds-typography-font-family-body);
+			--_gcd-span-font-size: var(--_wp-ui-avatar-font-size);
+			--_wp-ui-avatar-font-size: var(--wpds-typography-font-size-sm);
+
 			position: relative;
 			display: inline-flex;
 			align-items: center;
@@ -17,7 +23,7 @@
 			background-color: var(--wpds-color-background-surface-neutral-weak);
 			color: var(--wpds-color-foreground-content-neutral);
 			font-family: var(--wpds-typography-font-family-body);
-			font-size: var(--wpds-typography-font-size-sm);
+			font-size: var(--_wp-ui-avatar-font-size);
 			font-weight: var(--wpds-typography-font-weight-emphasis);
 			line-height: 1;
 			vertical-align: middle;
@@ -29,22 +35,22 @@
 
 		.is-xs {
 			--_wp-ui-avatar-size: var(--wpds-dimension-size-2xs);
-			font-size: calc(var(--_wp-ui-avatar-size) / 2);
+			--_wp-ui-avatar-font-size: calc(var(--_wp-ui-avatar-size) / 2);
 		}
 
 		.is-sm {
 			--_wp-ui-avatar-size: var(--wpds-dimension-size-sm);
-			font-size: var(--wpds-typography-font-size-xs);
+			--_wp-ui-avatar-font-size: var(--wpds-typography-font-size-xs);
 		}
 
 		.is-lg {
 			--_wp-ui-avatar-size: var(--wpds-dimension-size-lg);
-			font-size: var(--wpds-typography-font-size-md);
+			--_wp-ui-avatar-font-size: var(--wpds-typography-font-size-md);
 		}
 
 		.is-xl {
 			--_wp-ui-avatar-size: calc(var(--wpds-dimension-size-md) * 2);
-			font-size: var(--wpds-typography-font-size-xl);
+			--_wp-ui-avatar-font-size: var(--wpds-typography-font-size-xl);
 		}
 
 		.image,
@@ -78,11 +84,20 @@
 		}
 
 		.fallback {
+			--_gcd-span-position: absolute;
+			--_gcd-span-display: flex;
+
 			display: flex;
 			align-items: center;
 			justify-content: center;
 			overflow: hidden;
 			white-space: nowrap;
+
+			> svg {
+				inline-size: 100%;
+				block-size: 100%;
+				flex-shrink: 0;
+			}
 		}
 	}
 }

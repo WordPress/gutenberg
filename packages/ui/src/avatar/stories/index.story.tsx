@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { forwardRef } from '@wordpress/element';
-import { commentAuthorAvatar } from '@wordpress/icons';
 import * as Avatar from '../index';
-import { Icon } from '../../icon';
 import { Stack } from '../../stack';
 import { Text } from '../../text';
 
@@ -17,6 +15,7 @@ const meta: Meta< typeof Avatar.Root > = {
 	subcomponents: {
 		'Avatar.Image': Avatar.Image,
 		'Avatar.Fallback': Avatar.Fallback,
+		'Avatar.Initials': Avatar.Initials,
 	},
 	parameters: {
 		componentStatus: {
@@ -57,20 +56,48 @@ export const FallbackOnly: Story = {
 	),
 };
 
-/** Supply a profile icon from `@wordpress/icons` as fallback content. */
+/** Omit fallback content to display the borderless person silhouette. */
 export const IconFallback: Story = {
 	render: ( args ) => (
 		<Avatar.Root { ...args }>
-			<Avatar.Fallback>
-				<Icon
-					icon={ commentAuthorAvatar }
-					style={ {
-						inlineSize: '75%',
-						blockSize: '75%',
-					} }
-				/>
-			</Avatar.Fallback>
+			<Avatar.Fallback />
 		</Avatar.Root>
+	),
+};
+
+/** Derive complete initials from a display name, or use the person silhouette. */
+export const Initials: Story = {
+	render: ( args ) => (
+		<Avatar.Root { ...args }>
+			<Avatar.Initials name="Alex Morgan" />
+			<Avatar.Image src={ IMAGE_SRC } alt="" />
+		</Avatar.Root>
+	),
+};
+
+/** Missing images display the fallback immediately despite a delay. */
+export const MissingImage: Story = {
+	render: ( args ) => (
+		<Avatar.Root { ...args }>
+			<Avatar.Initials name="Alex Morgan" delay={ 300 } />
+			<Avatar.Image alt="" />
+		</Avatar.Root>
+	),
+};
+
+/** Decorative avatars retain their layout inside an admin tree item. */
+export const InTree: Story = {
+	render: ( args ) => (
+		<div role="tree">
+			<div role="treeitem">
+				<Stack align="center" gap="sm">
+					<Avatar.Root { ...args } aria-hidden="true">
+						<Avatar.Initials name="Alex Morgan" />
+					</Avatar.Root>
+					<Text>Alex Morgan</Text>
+				</Stack>
+			</div>
+		</div>
 	),
 };
 
@@ -121,6 +148,20 @@ export const Sizes: Story = {
 									shape={ shape }
 								>
 									<Avatar.Fallback>AM</Avatar.Fallback>
+								</Avatar.Root>
+							)
+						) }
+					</Stack>
+					<Stack gap="md" align="center">
+						{ ( [ 'xs', 'sm', 'md', 'lg', 'xl' ] as const ).map(
+							( size ) => (
+								<Avatar.Root
+									{ ...args }
+									key={ size }
+									size={ size }
+									shape={ shape }
+								>
+									<Avatar.Fallback />
 								</Avatar.Root>
 							)
 						) }
