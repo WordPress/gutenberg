@@ -25,7 +25,7 @@ import {
 	InnerBlocks,
 } from '@wordpress/block-editor';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
-import { getBlockBindingsSource } from '@wordpress/blocks';
+import { getBlockBindingsSource, parse } from '@wordpress/blocks';
 import { unlock } from '../lock-unlock';
 
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
@@ -139,6 +139,7 @@ function ReusableBlockControl( {
 }
 
 const EMPTY_OBJECT = {};
+const EMPTY_ARRAY = [];
 
 function ReusableBlockEdit( {
 	name,
@@ -151,10 +152,40 @@ function ReusableBlockEdit( {
 		'wp_block',
 		ref
 	);
-	const [ blocks ] = useEntityBlockEditor( 'postType', 'wp_block', {
+	const [ editableBlocks ] = useEntityBlockEditor( 'postType', 'wp_block', {
 		id: ref,
 	} );
-	const isMissing = hasResolved && ! record;
+
+	// A user who can read the pattern but not edit it can't load it in the
+	// `edit` context. Its `view` context has the content too, so render that.
+	const isUnavailableToEdit = hasResolved && ! record;
+	const { readOnlyRecord, hasResolvedReadOnly } = useSelect(
+		( select ) => {
+			if ( ! isUnavailableToEdit ) {
+				return {};
+			}
+			const args = [ 'postType', 'wp_block', ref, { context: 'view' } ];
+			const { getEntityRecord, hasFinishedResolution } =
+				select( coreStore );
+			return {
+				readOnlyRecord: getEntityRecord( ...args ),
+				hasResolvedReadOnly: hasFinishedResolution(
+					'getEntityRecord',
+					args
+				),
+			};
+		},
+		[ isUnavailableToEdit, ref ]
+	);
+	const readOnlyContent = readOnlyRecord?.content?.raw;
+	const readOnlyBlocks = useMemo(
+		() => ( readOnlyContent ? parse( readOnlyContent ) : EMPTY_ARRAY ),
+		[ readOnlyContent ]
+	);
+	const blocks = readOnlyRecord ? readOnlyBlocks : editableBlocks;
+	const isResolving =
+		! hasResolved || ( isUnavailableToEdit && ! hasResolvedReadOnly );
+	const isMissing = isUnavailableToEdit && ! isResolving && ! readOnlyRecord;
 
 	const { __unstableMarkLastChangeAsPersistent } =
 		useDispatch( blockEditorStore );
@@ -238,7 +269,7 @@ function ReusableBlockEdit( {
 		);
 	}
 
-	if ( ! hasResolved ) {
+	if ( isResolving ) {
 		children = (
 			<Placeholder>
 				<Spinner />
@@ -248,7 +279,7 @@ function ReusableBlockEdit( {
 
 	return (
 		<>
-			{ hasResolved && ! isMissing && (
+			{ ! isResolving && ! isMissing && (
 				<ReusableBlockControl
 					recordId={ ref }
 					canOverrideBlocks={ canOverrideBlocks }
