@@ -308,12 +308,8 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 	/** This action is documented in wp-admin/admin-footer.php */
 	do_action( 'admin_footer', $hook_suffix );
 
-	// Print import map first so it's available for inline scripts
-	wp_script_modules()->print_import_map();
-	print_footer_scripts();
-	wp_script_modules()->print_enqueued_script_modules();
-	wp_script_modules()->print_script_module_preloads();
-	wp_script_modules()->print_script_module_data();
+	/** This action is documented in wp-admin/admin-footer.php */
+	do_action( 'admin_print_footer_scripts' );
 
 	/** This action is documented in wp-admin/admin-footer.php */
 	do_action( "admin_footer-{$hook_suffix}" ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
