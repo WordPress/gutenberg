@@ -38,7 +38,13 @@ export const Fallback = forwardRef< HTMLSpanElement, FallbackProps >(
 	function AvatarFallback(
 		{
 			className,
-			children = <Icon icon={ person } role="presentation" />,
+			children = (
+				<Icon
+					icon={ person }
+					role="presentation"
+					className={ styles[ 'person-icon' ] }
+				/>
+			),
 			delay = 0,
 			render,
 			...props

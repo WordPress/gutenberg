@@ -98,6 +98,11 @@
 				block-size: 100%;
 				flex-shrink: 0;
 			}
+
+			> .person-icon {
+				inline-size: 70%;
+				block-size: 70%;
+			}
 		}
 	}
 }
