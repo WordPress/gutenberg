@@ -15,7 +15,7 @@
 
 ### Enhancements
 
--   Migrate date format, font family, font appearance, and preset input custom selectors to `@wordpress/ui`, preserving saved values, option previews, and preset trigger callbacks. Keep the legacy font controls for callers that pass additional props ([#84584](https://github.com/WordPress/gutenberg/pull/84584)).
+-   Migrate date format, font family, font appearance, and preset input custom selectors to `@wordpress/ui`, preserving saved values, option previews, and preset trigger callbacks. Keep the legacy font controls for callers that pass additional props, and simplify the aspect-ratio control's option rendering ([#84584](https://github.com/WordPress/gutenberg/pull/84584)).
 -   Migrate `FontAppearanceControl` to `@wordpress/ui`. Internal markup and CSS classes have changed; custom CSS overrides may need updates. See the pull request for details ([#84716](https://github.com/WordPress/gutenberg/pull/84716)).
 -   Migrate HTML element, image size, resolution, aspect ratio, and text-shadow preset controls to `@wordpress/ui` `SelectControl` ([#84546](https://github.com/WordPress/gutenberg/pull/84546)).
 -   `BlockBreadcrumb`: Use the `Breadcrumb` component from `@wordpress/ui` to collapse overflowing ancestors into a menu while preserving block selection and document-root activation, including multi-block selections. Use block titles when renamed labels are blank after stripping HTML. Accept a `className` for consumer-specific layout ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).

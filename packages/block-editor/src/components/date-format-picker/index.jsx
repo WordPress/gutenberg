@@ -118,7 +118,6 @@ function NonDefaultControls( { format, onChange } ) {
 		<VStack>
 			<SelectControl
 				label={ __( 'Choose a format' ) }
-				items={ [ ...suggestedOptions, customOption ] }
 				value={
 					isCustom
 						? customOption

@@ -19,7 +19,6 @@ describe( 'Select', () => {
 		await render(
 			<Select.Root
 				defaultValue={ users[ 0 ] }
-				items={ users }
 				onValueChange={ onValueChange }
 			>
 				<Select.Trigger>{ ( value ) => value?.label }</Select.Trigger>
@@ -314,9 +313,7 @@ describe( 'Select', () => {
 			const groupLabelRef = createRef< HTMLDivElement >();
 
 			await render(
-				<Select.Root
-					items={ GROUPED_ITEMS.flatMap( ( group ) => group.items ) }
-				>
+				<Select.Root>
 					<Select.Trigger />
 					<Select.Popup>
 						{ GROUPED_ITEMS.map( ( group ) => (

@@ -173,14 +173,14 @@ const groupedItems = [
 
 /**
  * Options can be organized into labeled groups with `SelectControl.Group`
- * and `SelectControl.GroupLabel`. Pass a flat `items` array for trigger label
- * resolution, and use `children` to render the grouped popup content.
+ * and `SelectControl.GroupLabel`. With the nonempty object values used here,
+ * each selected item supplies its own trigger label. Only `children` is needed
+ * for the grouped popup content.
  */
 export const Grouped: Story = {
 	args: {
 		label: 'Fruit',
 		description: 'Choose a fruit.',
-		items: groupedItems.flatMap( ( group ) => group.items ),
 		children: [
 			groupedItems.map( ( group ) => (
 				<SelectControl.Group key={ group.label }>
@@ -210,7 +210,6 @@ export const Grouped: Story = {
 export const WithSeparator: Story = {
 	args: {
 		label: 'Fruit',
-		items: separatorItems,
 		children: [
 			...separatorItems.slice( 0, 2 ).map( ( item ) => (
 				<SelectControl.Item
@@ -284,7 +283,6 @@ const User = ( { user }: { user: ( typeof userOptions )[ number ] } ) => (
  */
 export const WithCustomTriggerAndItems: Story = {
 	args: {
-		items: userOptions,
 		label: 'Label',
 		description: 'This is the description.',
 		triggerContent: ( item ) => <User user={ item } />,
@@ -307,22 +305,20 @@ export const WithCustomTriggerAndItems: Story = {
 };
 
 /**
- * By default, the `items` array is used to render both the Trigger
- * and the Item list. Passing a custom `triggerContent` or `children` in addition
- * to `items` will override that particular aspect of the behavior.
- * In other words, if you pass both an `items` array and a custom `triggerContent`,
- * the Item list in the popover will still be rendered based on the `items` array.
+ * When custom children include a null-valued option, keep `items` so the
+ * trigger can resolve its placeholder label before the popup is mounted.
+ * The custom children still replace the automatically generated item list.
  */
 export const WithItemsArrayAndPartialCustomization: Story = {
 	args: {
 		...Default.args,
+		items: nullValueOptionItems,
 		children: [
-			Default.args?.items?.map( ( item ) => (
+			nullValueOptionItems.map( ( item ) => (
 				<SelectControl.Item
 					key={ item.value ?? 'null' }
 					value={ item }
 					label={ item.label }
-					disabled={ item.disabled }
 				>
 					<SelectControl.ItemLabel>
 						✨ { item.label }

@@ -49,7 +49,6 @@ const separatorItems = [
 
 export const Default: Story = {
 	args: {
-		items: defaultItems,
 		children: [
 			<Select.Trigger aria-label="Item" key="trigger" />,
 			<Select.Popup key="popup">
@@ -148,7 +147,6 @@ const groupedItems = [
  */
 export const Grouped: Story = {
 	args: {
-		items: groupedItems.flatMap( ( group ) => group.items ),
 		children: [
 			<Select.Trigger aria-label="Item" key="trigger" />,
 			<Select.Popup key="popup">
@@ -174,7 +172,6 @@ export const Grouped: Story = {
  */
 export const WithSeparator: Story = {
 	args: {
-		items: separatorItems,
 		children: [
 			<Select.Trigger aria-label="Fruit" key="trigger" />,
 			<Select.Popup key="popup">
@@ -198,7 +195,6 @@ export const WithSeparator: Story = {
  */
 export const WithCustomPlaceholder: Story = {
 	args: {
-		items: defaultItems,
 		children: [
 			<Select.Trigger
 				placeholder="Choose an item"
@@ -285,7 +281,6 @@ const overflowItems = [
 
 export const WithOverflow: Story = {
 	args: {
-		items: overflowItems,
 		children: [
 			<Select.Trigger aria-label="Item" key="trigger" />,
 			<Select.Popup key="popup">
@@ -308,7 +303,6 @@ const longListItems = Array.from( { length: 30 }, ( _, index ) => ( {
 
 export const WithLongList: Story = {
 	args: {
-		items: longListItems,
 		defaultValue: longListItems[ 17 ],
 		children: [
 			<Select.Trigger aria-label="Item" key="trigger" />,
@@ -356,7 +350,6 @@ const disabledItemItems = [
 
 export const WithDisabledItem: Story = {
 	args: {
-		items: disabledItemItems,
 		children: [
 			<Select.Trigger aria-label="Item" key="trigger" />,
 			<Select.Popup key="popup">
@@ -393,7 +386,6 @@ const customOptions = [
  */
 export const WithCustomTriggerAndItem: Story = {
 	args: {
-		items: customOptions,
 		children: [
 			<Select.Trigger aria-label="Item" key="trigger">
 				{ ( item ) => (
@@ -449,7 +441,6 @@ const stockItems = [
  */
 export const WithItemDescription: Story = {
 	args: {
-		items: stockItems,
 		children: [
 			<Select.Trigger aria-label="Item" key="trigger" />,
 			<Select.Popup key="popup">
@@ -511,9 +502,6 @@ export const WithCustomZIndex: Story = {
  */
 export const PopupWidth: Story = {
 	decorators: [ narrowContainerDecorator ],
-	args: {
-		items: longLabelPopupItems,
-	},
 	render: ( args ) => (
 		<Select.Root { ...args }>
 			<Select.Trigger aria-label="Label" />

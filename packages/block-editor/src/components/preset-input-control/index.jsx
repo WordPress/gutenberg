@@ -267,7 +267,6 @@ export default function PresetInputControl( {
 			) }
 			{ hasPresets && ! showRangeControl && ! showCustomValueControl && (
 				<Select.Root
-					items={ options }
 					onValueChange={ ( selection ) => {
 						if ( ! selection ) {
 							return;
