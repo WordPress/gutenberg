@@ -310,6 +310,9 @@ export interface Attachment {
 }
 
 export type OnChangeHandler = ( attachments: Partial< Attachment >[] ) => void;
+export type OnBatchChangeHandler = (
+	attachments: Array< Partial< Attachment > | null >
+) => void;
 export type OnSuccessHandler = ( attachments: Partial< Attachment >[] ) => void;
 export type OnErrorHandler = ( error: Error ) => void;
 export type OnBatchSuccessHandler = () => void;

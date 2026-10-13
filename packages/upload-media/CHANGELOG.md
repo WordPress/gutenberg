@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add an optional `onBatchChange` callback to `addItems` that reports the latest attachment for each input file while keeping the existing per-file `onChange` callback ([#84364](https://github.com/WordPress/gutenberg/pull/84364)).
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).

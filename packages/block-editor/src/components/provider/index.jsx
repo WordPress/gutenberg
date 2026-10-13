@@ -149,6 +149,26 @@ function shouldEnableHeicCanvasProcessing() {
 	return true;
 }
 
+function getUploadChangeCallbacks( onFileChange, onFilesChange ) {
+	if ( ! onFilesChange ) {
+		return { onChange: onFileChange };
+	}
+
+	let receivedBatchChange = false;
+	return {
+		// Older versions of the queue do not support onBatchChange.
+		onChange: ( attachments ) => {
+			if ( ! receivedBatchChange ) {
+				onFileChange?.( attachments );
+			}
+		},
+		onBatchChange: ( attachments ) => {
+			receivedBatchChange = true;
+			onFilesChange( attachments.filter( Boolean ) );
+		},
+	};
+}
+
 /**
  * Upload a media file when the file upload button is activated
  * or when adding a file to the editor via drag & drop.
@@ -161,6 +181,7 @@ function shouldEnableHeicCanvasProcessing() {
  * @param {Array<File>}    $3.filesList      List of files.
  * @param {Function}       $3.onError        Function called when an error happens.
  * @param {Function}       $3.onFileChange   Function called each time a file or a temporary representation of the file is available.
+ * @param {Function}       $3.onFilesChange  Function called with the current files from this upload, in input order.
  * @param {Function}       $3.onSuccess      Function called once a file has completely finished uploading, including thumbnails.
  * @param {Function}       $3.onBatchSuccess Function called once all files in a group have completely finished uploading, including thumbnails.
  * @param {boolean}        $3.multiple       Whether the caller accepts more than one file.
@@ -174,6 +195,7 @@ function mediaUpload(
 		filesList,
 		onError = noop,
 		onFileChange,
+		onFilesChange,
 		onSuccess,
 		onBatchSuccess,
 		multiple = true,
@@ -185,7 +207,7 @@ function mediaUpload(
 
 	void registry.dispatch( uploadStore ).addItems( {
 		files: Array.from( filesList ),
-		onChange: onFileChange,
+		...getUploadChangeCallbacks( onFileChange, onFilesChange ),
 		onSuccess: ( attachments ) => {
 			settings?.[ mediaUploadOnSuccessKey ]?.( attachments );
 			onSuccess?.( attachments );
@@ -215,6 +237,7 @@ function mediaUpload(
  * @param {Array<File>}    $3.filesList      List of files.
  * @param {Function}       $3.onError        Function called when an error happens.
  * @param {Function}       $3.onFileChange   Function called each time a file or a temporary representation of the file is available.
+ * @param {Function}       $3.onFilesChange  Function called with the current files from this upload, in input order when the upload uses one path.
  * @param {Function}       $3.onSuccess      Function called once a file has completely finished uploading, including thumbnails.
  * @param {Function}       $3.onBatchSuccess Function called once all files in a group have completely finished uploading, including thumbnails.
  * @param {boolean}        $3.multiple       Whether the caller accepts more than one file.
@@ -228,6 +251,7 @@ async function heicMediaUpload(
 		filesList,
 		onError = noop,
 		onFileChange,
+		onFilesChange,
 		onSuccess,
 		onBatchSuccess,
 		multiple = true,
@@ -268,7 +292,10 @@ async function heicMediaUpload(
 	if ( heicFiles.length > 0 ) {
 		void registry.dispatch( uploadStore ).addItems( {
 			files: heicFiles,
-			onChange: onFileChange,
+			...getUploadChangeCallbacks(
+				onFileChange,
+				hasBothPaths ? undefined : onFilesChange
+			),
 			onSuccess: ( attachments ) => {
 				settings?.[ mediaUploadOnSuccessKey ]?.( attachments );
 				onSuccess?.( attachments );
@@ -291,6 +318,8 @@ async function heicMediaUpload(
 			filesList: otherFiles,
 			onError,
 			onFileChange,
+			// A mixed upload has two independent paths and no combined snapshot.
+			onFilesChange: hasBothPaths ? undefined : onFilesChange,
 			onSuccess,
 			onBatchSuccess: coordinatedBatchSuccess,
 			multiple,

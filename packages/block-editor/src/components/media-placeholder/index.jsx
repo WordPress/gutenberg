@@ -228,6 +228,8 @@ export function MediaPlaceholder( {
 			allowedTypes,
 			filesList: files,
 			onFileChange: setMedia,
+			// Older upload functions ignore this option and use onFileChange.
+			onFilesChange: multiple ? setMedia : undefined,
 			onError,
 			multiple,
 		} );

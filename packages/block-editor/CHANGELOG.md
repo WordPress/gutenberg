@@ -17,6 +17,7 @@
 
 -   NavigableToolbar: Ignore menu focus guards so menus from `@wordpress/ui` open on the first click ([#84547](https://github.com/WordPress/gutenberg/pull/84547)).
 -   Inserter: Only show the block-section separator when both sections contain blocks, avoiding a double border above the tip ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
+-   Client-side media processing: Let `MediaPlaceholder` receive the current files in input order through the optional `onFilesChange` callback, while keeping the existing `onFileChange` behavior for other callers ([#84364](https://github.com/WordPress/gutenberg/pull/84364)).
 
 ## 18.1.0 (2026-10-07)
 
