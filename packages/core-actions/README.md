@@ -2,7 +2,7 @@
 
 The actions WordPress core registers for its entities, such as "Rename", "Duplicate" or "Move to trash". They are shown in the DataViews lists of the site editor and in the inspector of the editor.
 
-Each collection of actions is a script module, which `registerPostTypeSchema()` of `@wordpress/editor` imports on demand to register the actions of a post type. The actions moved here from `@wordpress/fields`.
+WordPress registers them on the server through the entity actions API, like a plugin registers its own: the data of each action, such as its label, is registered in PHP, and its JavaScript parts, such as its callback or its modal, are in a script module. The editor reads the actions of an entity from the `/wp/v2/entity-actions` REST API route, imports the script modules the route lists, and merges each action with its JavaScript parts. The actions moved here from `@wordpress/fields`.
 
 ## Collections
 
@@ -12,9 +12,9 @@ The actions of this package live in folders of `src`, one per collection:
 -   `wp_block`: the actions patterns have on top of the defaults (`duplicate-pattern` and `export-pattern`).
 -   `wp_template_part`: the actions template parts have on top of the defaults (`duplicate-template-part`).
 
-Each action has a folder named after its id, with the action in `action.tsx`. The `index.ts` of each collection is its script module, whose default export maps the id of each action to the action.
+Each action has a folder named after its id, with the data of the action in `action.php` and its JavaScript parts in `action.tsx`. The `index.ts` of each collection is its script module, whose default export maps the id of each action to its JavaScript parts.
 
-`registerPostTypeSchema()` decides which post type gets which action:
+`src/index.php` registers the actions of each post type exposed in the REST API, on the `wp_entity_actions_api_init` action at priority 0, so a plugin hooking it at the default priority can remove or replace them:
 
 -   `view-post`, for the viewable post types.
 -   `view-post-revisions`, for the post types supporting `revisions`.
@@ -25,6 +25,8 @@ Each action has a folder named after its id, with the action in `action.tsx`. Th
 -   `order-pages`, for the post types supporting `page-attributes`.
 -   `export-pattern`, for patterns.
 -   `restore`, `reset-post`, `delete-post`, `move-to-trash`, and `permanently-delete`, for every post type. Each one checks which posts it applies to.
+
+The actions are registered in that order, which is the order they are shown in, for the current user: the actions depending on what the user can do are only registered for the users who can. The Gutenberg plugin copies the PHP files into its build, with its `gutenberg_` prefix.
 
 ## Prerequisites
 
@@ -42,13 +44,34 @@ _This package assumes that your code will run in an ES2015+ environment. If you'
 
 ## Usage
 
-The package provides the `@wordpress/core-actions/post_type_supports`, `@wordpress/core-actions/wp_block`, and `@wordpress/core-actions/wp_template_part` script modules. Their default export maps the id of each action to a DataViews action:
+The package provides the `@wordpress/core-actions/post_type_supports`, `@wordpress/core-actions/wp_block`, and `@wordpress/core-actions/wp_template_part` script modules. Their default export maps the id of each action to the properties of the DataViews action that PHP cannot serialize, which complete the action the `/wp/v2/entity-actions` route returns:
 
 ```js
 const { default: actions } = await import(
 	'@wordpress/core-actions/post_type_supports'
 );
-const renamePost = actions[ 'rename-post' ];
+const renamePost = { ...actionFromTheServer, ...actions[ 'rename-post' ] };
+```
+
+A plugin replacing a core action registers its own definition with the script module of the core action, so the action keeps its JavaScript parts:
+
+```php
+add_action( 'wp_entity_actions_api_init', function () {
+	wp_unregister_entity_actions( 'postType', 'page', array( 'move-to-trash' ) );
+	wp_register_entity_actions(
+		'acme',
+		'postType',
+		'page',
+		array(
+			array(
+				'id'           => 'move-to-trash',
+				'label'        => __( 'Move to the bin…', 'acme' ),
+				'supportsBulk' => true,
+			),
+		),
+		'@wordpress/core-actions/post_type_supports'
+	);
+} );
 ```
 
 ## Contributing to this package
