@@ -472,6 +472,9 @@ const { state, actions, callbacks } = store(
 			} ),
 			handleTouchStart( event ) {
 				isTouching = true;
+				if ( event.touches?.length > 1 ) {
+					return;
+				}
 				const t = event.touches && event.touches[ 0 ];
 				if ( t ) {
 					touchStartEvent.startX = t.clientX;
@@ -499,6 +502,10 @@ const { state, actions, callbacks } = store(
 				isTouching = false;
 			},
 			handleTouchEnd: withSyncEvent( ( event ) => {
+				// Ignores fingers lifting while another is still down.
+				if ( event.touches?.length ) {
+					return;
+				}
 				const touchEndEvent =
 					( event.changedTouches && event.changedTouches[ 0 ] ) ||
 					( event.touches && event.touches[ 0 ] );
