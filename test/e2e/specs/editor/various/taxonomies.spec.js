@@ -336,4 +336,67 @@ test.describe( 'Taxonomies', () => {
 		} );
 		expect( post.tags ).toHaveLength( 2 );
 	} );
+
+	test( 'should create a tag when pressing Enter', async ( { page } ) => {
+		await openTaxonomyPanel( page, 'Tags' );
+
+		const tagName = 'tag-' + generateRandomNumber();
+		const tagInput = page.getByRole( 'combobox', { name: 'Add tag' } );
+
+		await tagInput.fill( tagName );
+		await tagInput.press( 'Enter' );
+
+		await expect( getTagChip( page, tagName ) ).toBeVisible();
+		await expect( tagInput ).toHaveValue( '' );
+		await expect.poll( () => getAssignedTags( page ) ).toHaveLength( 1 );
+	} );
+
+	test( 'should create a tag for each comma-separated name', async ( {
+		page,
+	} ) => {
+		await openTaxonomyPanel( page, 'Tags' );
+
+		const firstTagName = 'tag-a-' + generateRandomNumber();
+		const secondTagName = 'tag-b-' + generateRandomNumber();
+		const tagNames = `${ firstTagName }, ${ secondTagName }`;
+
+		await page
+			.getByRole( 'combobox', { name: 'Add tag' } )
+			.fill( tagNames );
+		await page
+			.getByRole( 'option', { name: `Create: ${ tagNames }` } )
+			.click();
+
+		await expect( getTagChip( page, firstTagName ) ).toBeVisible();
+		await expect( getTagChip( page, secondTagName ) ).toBeVisible();
+		await expect.poll( () => getAssignedTags( page ) ).toHaveLength( 2 );
+	} );
+
+	test( 'should pick the highlighted tag over the typed one when pressing Enter', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const tagName = 'tag-' + generateRandomNumber();
+		const { id: tagId } = await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/tags',
+			data: { name: tagName },
+		} );
+
+		await openTaxonomyPanel( page, 'Tags' );
+
+		const typedName = tagName.slice( 0, -1 );
+		const tagInput = page.getByRole( 'combobox', { name: 'Add tag' } );
+
+		await tagInput.fill( typedName );
+		await expect(
+			page.getByRole( 'option', { name: tagName, exact: true } )
+		).toBeVisible();
+		await tagInput.press( 'ArrowDown' );
+		await tagInput.press( 'Enter' );
+
+		await expect( getTagChip( page, tagName ) ).toBeVisible();
+		await expect( getTagChip( page, typedName ) ).toBeHidden();
+		await expect.poll( () => getAssignedTags( page ) ).toEqual( [ tagId ] );
+	} );
 } );

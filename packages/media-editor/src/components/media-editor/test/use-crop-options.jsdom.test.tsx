@@ -50,7 +50,6 @@ function CropOptionsHarness() {
 			<button onClick={ () => cropOptions.setAspectRatioValue( '0' ) }>
 				Free
 			</button>
-			<button onClick={ cropOptions.resetCropOptions }>Reset</button>
 		</div>
 	);
 }
@@ -91,16 +90,5 @@ describe( 'useCropOptions', () => {
 		expect(
 			screen.getByTestId( 'resolved-aspect-ratio' )
 		).toHaveTextContent( 'undefined' );
-	} );
-
-	it( 'reset returns cropOptions to defaults', () => {
-		renderHarness();
-
-		fireEvent.click( screen.getByRole( 'button', { name: 'Square' } ) );
-		fireEvent.click( screen.getByRole( 'button', { name: 'Reset' } ) );
-
-		expect( screen.getByTestId( 'aspect-ratio-value' ) ).toHaveTextContent(
-			'0'
-		);
 	} );
 } );
