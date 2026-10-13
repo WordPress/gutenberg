@@ -6,6 +6,7 @@ import type {
 	NormalizedField,
 	NormalizedSupportedLayouts,
 	NormalizedFilter,
+	HierarchyPagination,
 } from '../../types';
 import type { SetSelection } from '../../types/private';
 import { LAYOUT_TABLE } from '../../constants';
@@ -31,6 +32,10 @@ type DataViewsContextType< Item > = {
 	getItemHasChildren?: ( item: Item ) => boolean | undefined;
 	expandedItemIds?: string[];
 	onChangeExpandedItemIds?: ( itemIds: string[] ) => void;
+	hierarchyPagination?: HierarchyPagination;
+	isTreeHierarchy?: boolean;
+	isHierarchyPaginationActive?: boolean;
+	isInfiniteScroll?: boolean;
 	onClickItem?: ( item: Item ) => void;
 	renderItemLink?: (
 		props: {
@@ -67,6 +72,9 @@ const DataViewsContext = createContext< DataViewsContextType< any > >( {
 	setOpenedFilter: () => {},
 	openedFilter: null,
 	getItemId: ( item ) => item.id,
+	isTreeHierarchy: false,
+	isHierarchyPaginationActive: false,
+	isInfiniteScroll: false,
 	isItemClickable: () => true,
 	renderItemLink: undefined,
 	containerWidth: 0,

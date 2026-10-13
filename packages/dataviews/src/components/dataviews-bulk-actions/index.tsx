@@ -448,7 +448,7 @@ export function BulkActionToolbar( {
 		actions = EMPTY_ARRAY,
 		onChangeSelection,
 		getItemId,
-		view,
+		isInfiniteScroll,
 	} = useContext( DataViewsContext );
 	return (
 		<BulkActionsContent
@@ -460,7 +460,7 @@ export function BulkActionToolbar( {
 			data={ data }
 			actions={ actions }
 			getItemId={ getItemId }
-			isInfiniteScroll={ !! view.infiniteScrollEnabled }
+			isInfiniteScroll={ !! isInfiniteScroll }
 		/>
 	);
 }
