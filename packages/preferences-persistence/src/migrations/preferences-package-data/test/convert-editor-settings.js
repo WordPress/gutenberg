@@ -32,8 +32,24 @@ describe( 'convertEditorSettings', () => {
 		expect( input ).toEqual( snapshot );
 	} );
 
-	it( 'leaves scopes that are not objects untouched', () => {
-		const input = { 'core/edit-post': 'abc', 'core/edit-site': [] };
-		expect( convertEditorSettings( input ) ).toEqual( input );
+	it.each( [ [ 'abc' ], [ [] ], [ null ], [ {} ] ] )(
+		'removes an editor scope that is %j',
+		( scope ) => {
+			expect(
+				convertEditorSettings( {
+					'core/edit-post': scope,
+					'core/edit-site': scope,
+				} )
+			).toEqual( {} );
+		}
+	);
+
+	it( 'replaces a `core` scope that is not an object', () => {
+		expect(
+			convertEditorSettings( {
+				core: 'abc',
+				'core/edit-post': { fixedToolbar: true },
+			} )
+		).toEqual( { core: { fixedToolbar: true } } );
 	} );
 } );

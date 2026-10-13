@@ -1,11 +1,8 @@
-import type { ScopePreferences, ScopedPreferences } from '../../types';
+import isPreferencesData from '../../is-preferences-data';
+import type { ScopedPreferences } from '../../types';
 
-// Leaves a scope that is not an object, such as a corrupt string, untouched.
-function copyScope( scope: unknown ): ScopePreferences | undefined {
-	return scope && typeof scope === 'object' && ! Array.isArray( scope )
-		? { ...scope }
-		: undefined;
-}
+const copyScope = ( scope: unknown ) =>
+	isPreferencesData( scope ) ? { ...scope } : undefined;
 
 export default function convertEditorSettings( data: ScopedPreferences ) {
 	const newData = { ...data };
@@ -33,7 +30,7 @@ export default function convertEditorSettings( data: ScopedPreferences ) {
 	settingsToMoveToCore.forEach( ( setting ) => {
 		if ( editPost?.[ setting ] !== undefined ) {
 			newData.core = {
-				...newData.core,
+				...copyScope( newData.core ),
 				[ setting ]: editPost[ setting ],
 			};
 			delete editPost[ setting ];
@@ -44,20 +41,17 @@ export default function convertEditorSettings( data: ScopedPreferences ) {
 		}
 	} );
 
-	if ( editPost ) {
-		if ( Object.keys( editPost ).length === 0 ) {
-			delete newData[ 'core/edit-post' ];
-		} else {
-			newData[ 'core/edit-post' ] = editPost;
-		}
+	// Empty and invalid scopes are removed rather than persisted.
+	if ( editPost && Object.keys( editPost ).length > 0 ) {
+		newData[ 'core/edit-post' ] = editPost;
+	} else {
+		delete newData[ 'core/edit-post' ];
 	}
 
-	if ( editSite ) {
-		if ( Object.keys( editSite ).length === 0 ) {
-			delete newData[ 'core/edit-site' ];
-		} else {
-			newData[ 'core/edit-site' ] = editSite;
-		}
+	if ( editSite && Object.keys( editSite ).length > 0 ) {
+		newData[ 'core/edit-site' ] = editSite;
+	} else {
+		delete newData[ 'core/edit-site' ];
 	}
 
 	return newData;
