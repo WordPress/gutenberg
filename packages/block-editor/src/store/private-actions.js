@@ -1,7 +1,15 @@
 import deprecated from '@wordpress/deprecated';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
-import { getBlockType, isUnmodifiedBlock } from '@wordpress/blocks';
+import {
+	getBlockType,
+	isUnmodifiedBlock,
+	privateApis as blocksPrivateApis,
+} from '@wordpress/blocks';
+import { findRichTextAttributeKey } from '../utils/selection';
+import { unlock } from '../lock-unlock';
+
+const { editableRootKey } = unlock( blocksPrivateApis );
 
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
@@ -617,3 +625,25 @@ export function setResponsiveEditing( enabled ) {
 		enabled,
 	};
 }
+
+/**
+ * Selects a block. A block that opts into the editable root gets the start
+ * of its text selected, so its field places the caret as it mounts:
+ * focusing the field later moves focus off the editing host and back,
+ * which resets the iOS keyboard's capitalization.
+ *
+ * @param {string} clientId Block client ID.
+ */
+export const selectStartOfBlock =
+	( clientId ) =>
+	( { select, dispatch } ) => {
+		const blockType = getBlockType( select.getBlockName( clientId ) );
+		const attributeKey =
+			blockType?.[ editableRootKey ] &&
+			findRichTextAttributeKey( blockType );
+		if ( attributeKey ) {
+			dispatch.selectionChange( clientId, attributeKey, 0, 0 );
+		} else {
+			dispatch.selectionChange( clientId );
+		}
+	};
