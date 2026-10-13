@@ -10,8 +10,7 @@
 
 -   Migrate the classic-theme template selector to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
 -   Show viewport dimensions and responsive editing status in the editor footer, and clarify when viewport-specific styling is available ([#84146](https://github.com/WordPress/gutenberg/pull/84146)).
--   Notes Sidebar: Once a post has a note, add an "Add note" button to the block toolbar alongside the block options menu item. The button toggles the form it opened and exposes `aria-expanded` ([#78205](https://github.com/WordPress/gutenberg/pull/78205)).
--   Notes Sidebar: Fade the floating note card in once its anchor has been measured, rather than cutting it to full opacity in a single frame ([#78205](https://github.com/WordPress/gutenberg/pull/78205)).
+-   Notes: Add an "Add note" button to the block toolbar once the post has notes ([#78205](https://github.com/WordPress/gutenberg/pull/78205)).
 
 ### Bug Fixes
 
