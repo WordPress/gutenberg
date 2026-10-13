@@ -1,7 +1,7 @@
 import apiFetch from '@wordpress/api-fetch';
 import debounceAsync from './debounce-async';
-import isPreferencesData from '../is-preferences-data';
-import { readStoredJSON, writeStoredJSON } from '../local-storage';
+import getNewestData from '../get-newest-data';
+import { writeStoredJSON } from '../local-storage';
 import type {
 	CreateOptions,
 	PersistenceLayer,
@@ -44,27 +44,11 @@ export default function create( {
 			path: '/wp/v2/users/me?context=edit',
 		} );
 
-		const persistedData = user?.meta?.persisted_preferences;
-		const serverData = isPreferencesData( persistedData )
-			? persistedData
-			: null;
-		const storedData = readStoredJSON( localStorageRestoreKey );
-		const localData = isPreferencesData( storedData ) ? storedData : null;
-
-		// Date parse returns NaN for invalid input. Coerce anything invalid
-		// into a conveniently comparable zero.
-		const serverTimestamp = Date.parse( serverData?._modified ?? '' ) || 0;
-		const localTimestamp = Date.parse( localData?._modified ?? '' ) || 0;
-
-		// Prefer server data if it exists and is more recent.
-		// Otherwise fallback to localStorage data.
-		if ( serverData && serverTimestamp >= localTimestamp ) {
-			cache = serverData;
-		} else if ( localData ) {
-			cache = localData;
-		} else {
-			cache = {};
-		}
+		cache =
+			getNewestData(
+				user?.meta?.persisted_preferences,
+				localStorageRestoreKey
+			) ?? {};
 
 		return cache;
 	}
