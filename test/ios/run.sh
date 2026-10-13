@@ -70,7 +70,7 @@ sed -e "s#{SQLITE_IMPLEMENTATION_FOLDER_PATH}#$SQLITE#" -e "s#{SQLITE_PLUGIN}#sq
 step "Installing WordPress"
 wp config create --dbname=wordpress --dbuser=wordpress --dbpass=wordpress --skip-check
 # No requests to other sites: a fresh site's first admin page otherwise
-# waits on update checks from wordpress.org.
+# checks wordpress.org for updates.
 wp config set WP_HTTP_BLOCK_EXTERNAL true --raw
 wp core install --url="$WP_BASE_URL" --title="iOS tests" --admin_user=admin --admin_password=password --admin_email=admin@example.com --skip-email
 step "Activating the plugin"
@@ -102,9 +102,10 @@ add_action( 'init', function () {
 	wp_set_current_user( 1 );
 }, 0 );
 PHP
-cp "$ROOT/test/ios/diagnostics/timing.php" "$WP_DIR/wp-content/mu-plugins/0-timing.php" # Temporary diagnostics.
 step "Starting the server"
-PHP_CLI_SERVER_WORKERS=8 php -d memory_limit=512M -S "127.0.0.1:$PORT" -t "$WP_DIR" > "$ROOT/test/ios/build/server.log" 2>&1 &
+# Without the JIT: compiling WordPress on the first request takes longer
+# than the request's time limit on the CI runner.
+PHP_CLI_SERVER_WORKERS=8 php -d memory_limit=512M -d opcache.jit=disable -S "127.0.0.1:$PORT" -t "$WP_DIR" > "$ROOT/test/ios/build/server.log" 2>&1 &
 SERVER_PID=$!
 # The server's workers are its child processes: stop them too.
 trap 'pkill -P "$SERVER_PID" 2>/dev/null; kill "$SERVER_PID" 2>/dev/null || true' EXIT
@@ -118,10 +119,8 @@ done
 # one-time work of a fresh site before the test's clock starts.
 step "Loading the editor once"
 # -b "" keeps the login cookie between redirects, in memory.
-"$ROOT/test/ios/diagnostics/sample-workers.sh" "$SERVER_PID" 10 & # Temporary diagnostics.
 if ! EDITOR_HTML=$( curl -sSL --fail -b "" "$WP_BASE_URL/wp-admin/post-new.php" ); then
 	echo "The editor did not load from $WP_BASE_URL"
-	sort "$WP_DIR/timing.log" | grep -v "rest end .* 0\.[0-4]" # Temporary diagnostics.
 	tail -40 "$ROOT/test/ios/build/server.log"
 	exit 1
 fi
