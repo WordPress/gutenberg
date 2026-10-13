@@ -1,4 +1,5 @@
-import { css } from '@emotion/react';
+import { css, type CSSObject } from '@emotion/react';
+import type { CSSProperties } from 'react';
 import { isRTL } from '@wordpress/i18n';
 
 const LOWER_LEFT_REGEXP = new RegExp( /-left/g );
@@ -9,11 +10,11 @@ const UPPER_RIGHT_REGEXP = new RegExp( /Right/g );
 /**
  * Flips a CSS property from left <-> right.
  *
- * @param {string} key The CSS property name.
+ * @param key The CSS property name.
  *
- * @return {string} The flipped CSS property name, if applicable.
+ * @return The flipped CSS property name, if applicable.
  */
-function getConvertedKey( key ) {
+function getConvertedKey( key: string ) {
 	if ( key === 'left' ) {
 		return 'right';
 	}
@@ -44,11 +45,13 @@ function getConvertedKey( key ) {
 /**
  * An incredibly basic ltr -> rtl converter for style properties
  *
- * @param {React.CSSProperties} ltrStyles
+ * @param ltrStyles
  *
- * @return {React.CSSProperties} Converted ltr -> rtl styles
+ * @return Converted ltr -> rtl styles
  */
-export const convertLTRToRTL = ( ltrStyles = {} ) => {
+export const convertLTRToRTL = (
+	ltrStyles: CSSProperties = {}
+): CSSProperties => {
 	return Object.fromEntries(
 		Object.entries( ltrStyles ).map( ( [ key, value ] ) => [
 			getConvertedKey( key ),
@@ -60,20 +63,25 @@ export const convertLTRToRTL = ( ltrStyles = {} ) => {
 /**
  * A higher-order function that create an incredibly basic ltr -> rtl style converter for CSS objects.
  *
- * @param {React.CSSProperties} ltrStyles   Ltr styles. Converts and renders from ltr -> rtl styles, if applicable.
- * @param {React.CSSProperties} [rtlStyles] Rtl styles. Renders if provided.
+ * @param ltrStyles   Ltr styles. Converts and renders from ltr -> rtl styles, if applicable.
+ * @param [rtlStyles] Rtl styles. Renders if provided.
  *
- * @return {() => import('@emotion/react').SerializedStyles} A function to output CSS styles for Emotion's renderer
+ * @return A function to output CSS styles for Emotion's renderer
  */
-export function rtl( ltrStyles = {}, rtlStyles ) {
+export function rtl(
+	ltrStyles: CSSProperties = {},
+	rtlStyles?: CSSProperties
+) {
 	return () => {
 		if ( rtlStyles ) {
-			// @ts-expect-error `React.CSSProperties` lacks the string index signature Emotion's `CSSObject` requires.
-			return isRTL() ? css( rtlStyles ) : css( ltrStyles );
+			return isRTL()
+				? css( rtlStyles as CSSObject )
+				: css( ltrStyles as CSSObject );
 		}
 
-		// @ts-expect-error `React.CSSProperties` lacks the string index signature Emotion's `CSSObject` requires.
-		return isRTL() ? css( convertLTRToRTL( ltrStyles ) ) : css( ltrStyles );
+		return isRTL()
+			? css( convertLTRToRTL( ltrStyles ) as CSSObject )
+			: css( ltrStyles as CSSObject );
 	};
 }
 

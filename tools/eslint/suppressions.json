@@ -4859,7 +4859,7 @@
 			"count": 4
 		}
 	},
-	"packages/components/src/utils/rtl.js": {
+	"packages/components/src/utils/rtl.ts": {
 		"no-restricted-imports": {
 			"count": 1
 		}

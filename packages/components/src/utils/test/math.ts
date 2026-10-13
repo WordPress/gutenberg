@@ -52,15 +52,36 @@ describe( 'clamp', () => {
 	it( 'should clamp number or string values', () => {
 		expect( clamp( '50', 1, 10 ) ).toBe( 10 );
 		expect( clamp( '50', -10, 10 ) ).toBe( 10 );
-		expect( clamp( -50, -10, '10' ) ).toBe( -10 );
+		expect(
+			clamp(
+				-50,
+				-10,
+				// @ts-expect-error `max` is typed as a number but coerced at runtime.
+				'10'
+			)
+		).toBe( -10 );
 	} );
 } );
 
 describe( 'ensureValidStep', () => {
 	it( 'should work with number or string values', () => {
 		expect( ensureValidStep( '49', 0, 10 ) ).toBe( 50 );
-		expect( ensureValidStep( 49, '0', 10 ) ).toBe( 50 );
-		expect( ensureValidStep( 49, 0, '10' ) ).toBe( 50 );
+		expect(
+			ensureValidStep(
+				49,
+				// @ts-expect-error `min` is typed as a number but coerced at runtime.
+				'0',
+				10
+			)
+		).toBe( 50 );
+		expect(
+			ensureValidStep(
+				49,
+				0,
+				// @ts-expect-error `step` is typed as a number but coerced at runtime.
+				'10'
+			)
+		).toBe( 50 );
 	} );
 
 	it( 'should round to step', () => {

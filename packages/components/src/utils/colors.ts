@@ -2,17 +2,16 @@ import memoize from 'memize';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 
-/** @type {HTMLDivElement} */
-let colorComputationNode;
+let colorComputationNode: HTMLDivElement;
 
 extend( [ namesPlugin ] );
 
 /**
  * Generating a CSS compliant rgba() color value.
  *
- * @param {string} hexValue The hex value to convert to rgba().
- * @param {number} alpha    The alpha value for opacity.
- * @return {string} The converted rgba() color value.
+ * @param hexValue The hex value to convert to rgba().
+ * @param alpha    The alpha value for opacity.
+ * @return The converted rgba() color value.
  *
  * @example
  * rgba( '#000000', 0.5 )
@@ -23,7 +22,7 @@ export function rgba( hexValue = '', alpha = 1 ) {
 }
 
 /**
- * @return {HTMLDivElement | undefined} The HTML element for color computation.
+ * @return The HTML element for color computation.
  */
 function getColorComputationNode() {
 	if ( typeof document === 'undefined' ) {
@@ -43,11 +42,11 @@ function getColorComputationNode() {
 }
 
 /**
- * @param {string | unknown} value
+ * @param value
  *
- * @return {boolean} Whether the value is a valid color.
+ * @return Whether the value is a valid color.
  */
-function isColor( value ) {
+function isColor( value: string | unknown ) {
 	if ( typeof value !== 'string' ) {
 		return false;
 	}
@@ -60,11 +59,11 @@ function isColor( value ) {
  * Retrieves the computed background color. This is useful for getting the
  * value of a CSS variable color.
  *
- * @param {string | unknown} backgroundColor The background color to compute.
+ * @param backgroundColor The background color to compute.
  *
- * @return {string} The computed background color.
+ * @return The computed background color.
  */
-function _getComputedBackgroundColor( backgroundColor ) {
+function _getComputedBackgroundColor( backgroundColor: string | unknown ) {
 	if ( typeof backgroundColor !== 'string' ) {
 		return '';
 	}
@@ -100,11 +99,13 @@ const getComputedBackgroundColor = memoize( _getComputedBackgroundColor );
 /**
  * Get the text shade optimized for readability, based on a background color.
  *
- * @param {string | unknown} backgroundColor The background color.
+ * @param backgroundColor The background color.
  *
- * @return {string} The optimized text color (black or white).
+ * @return The optimized text color (black or white).
  */
-export function getOptimalTextColor( backgroundColor ) {
+export function getOptimalTextColor(
+	backgroundColor: string | unknown
+): string {
 	const background = getComputedBackgroundColor( backgroundColor );
 
 	return colord( background ).isLight() ? '#000000' : '#ffffff';
@@ -113,11 +114,13 @@ export function getOptimalTextColor( backgroundColor ) {
 /**
  * Get the text shade optimized for readability, based on a background color.
  *
- * @param {string | unknown} backgroundColor The background color.
+ * @param backgroundColor The background color.
  *
- * @return {string} The optimized text shade (dark or light).
+ * @return The optimized text shade (dark or light).
  */
-export function getOptimalTextShade( backgroundColor ) {
+export function getOptimalTextShade(
+	backgroundColor: string | unknown
+): string {
 	const result = getOptimalTextColor( backgroundColor );
 
 	return result === '#000000' ? 'dark' : 'light';
