@@ -11,6 +11,8 @@
 
 ### New Features
 
+-   `Avatar`: Add `Avatar.Initials` for complete Unicode initials and a borderless person icon as the default fallback ([#84653](https://github.com/WordPress/gutenberg/pull/84653)).
+
 -   Add `Avatar.Root`, `Avatar.Image`, and `Avatar.Fallback` for profile images with customizable fallbacks, circle and square shapes, a neutral border, five sizes from 16px to 64px, and a reduced-motion-aware image fade. ([#84145](https://github.com/WordPress/gutenberg/pull/84145))
 -   `Breadcrumb`: Add `ButtonItem` ancestors for hierarchy selection, current-only trails, and customizable `CurrentItem` `aria-current` ([#84156](https://github.com/WordPress/gutenberg/pull/84156)).
 
@@ -28,6 +30,8 @@
 ### Bug Fixes
 
 -   `Combobox.Input`, `SearchableSelect`, and `SearchableSelectControl`: Orient the search icon toward the top left in LTR and the top right in RTL ([#84690](https://github.com/WordPress/gutenberg/pull/84690)).
+-   `Avatar`: Show missing and failed image fallbacks immediately despite a delay, scale fallback SVGs with the avatar, and preserve decorative avatar layout and typography inside wp-admin trees ([#84653](https://github.com/WordPress/gutenberg/pull/84653)).
+
 -   `Breadcrumb`: Apply hierarchy-selection labels to the ordered list instead of its wrapper, while retaining navigation landmark labels for page breadcrumbs ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
 -   `Breadcrumb`: Align button, link, and current-item padding, separate button hover backgrounds from separators, and preserve list semantics in Safari ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
 -   `Breadcrumb.CurrentItem`: Exclude false values from the `aria-current` type ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
