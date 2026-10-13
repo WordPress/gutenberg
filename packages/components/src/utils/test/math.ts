@@ -52,6 +52,7 @@ describe( 'clamp', () => {
 	it( 'should clamp number or string values', () => {
 		expect( clamp( '50', 1, 10 ) ).toBe( 10 );
 		expect( clamp( '50', -10, 10 ) ).toBe( 10 );
+		// @ts-expect-error `max` is typed as a number but coerced at runtime.
 		expect( clamp( -50, -10, '10' ) ).toBe( -10 );
 	} );
 } );
@@ -59,7 +60,9 @@ describe( 'clamp', () => {
 describe( 'ensureValidStep', () => {
 	it( 'should work with number or string values', () => {
 		expect( ensureValidStep( '49', 0, 10 ) ).toBe( 50 );
+		// @ts-expect-error `min` is typed as a number but coerced at runtime.
 		expect( ensureValidStep( 49, '0', 10 ) ).toBe( 50 );
+		// @ts-expect-error `step` is typed as a number but coerced at runtime.
 		expect( ensureValidStep( 49, 0, '10' ) ).toBe( 50 );
 	} );
 

@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
+import type { CSSProperties } from 'react';
 import { convertLTRToRTL } from '../rtl';
 
 describe( 'convertLTRToRTL', () => {
 	it( 'converts (*)Left <-> (*)Right', () => {
-		const style = {
+		const style: CSSProperties = {
 			// Left values.
 			borderLeft: '10px solid red',
 			borderLeftColor: 'red',
@@ -86,7 +87,8 @@ describe( 'convertLTRToRTL', () => {
 			// Edge cases.
 			'text-combine-upright': 'none',
 		};
-		const nextStyle = convertLTRToRTL( style );
+		// Kebab-case keys are not in `CSSProperties`, but pass through at runtime.
+		const nextStyle = convertLTRToRTL( style ) as Record< string, unknown >;
 
 		expect( Object.keys( style ).length ).toBe(
 			Object.keys( nextStyle ).length
