@@ -77,13 +77,11 @@ jobs:
                   name: ios-build-output
                   path: build
 
-            # The runner's Node is older than the repository requires, and
-            # npx enforces that requirement when it starts Playground.
-            - name: Use desired version of Node.js
-              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+            - name: Set up PHP
+              uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
               with:
-                  node-version-file: .nvmrc
-                  package-manager-cache: false
+                  php-version: '8.4'
+                  coverage: none
 
             - name: Install xcodegen
               run: brew install xcodegen
@@ -105,5 +103,7 @@ jobs:
               if: ${{ always() }}
               with:
                   name: ios-test-results
-                  path: test/ios/build/results.xcresult
+                  path: |
+                      test/ios/build/results.xcresult
+                      test/ios/build/server.log
                   if-no-files-found: ignore
